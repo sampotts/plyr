@@ -267,11 +267,10 @@ function InitPxVideo(options) {
 		obj.playAriaLabel = "Play video, " + options.videoTitle;
 	}
 
-	// Get the container, video element, and controls container
+	// Get the container and video element
 	obj.container = document.getElementById(options.videoId);
 	obj.container.className = obj.container.className + " stopped";
 	obj.movie = obj.container.getElementsByTagName("video")[0];
-	obj.controls = obj.container.getElementsByClassName("px-video-controls")[0];
 
 	// Remove native video controls
 	obj.movie.removeAttribute("controls");
@@ -281,11 +280,14 @@ function InitPxVideo(options) {
 	
 	// Insert custom video controls
 	if (options.debug) {
-		console.log("Inserting custom video controls");
+		console.log("Inserting custom controls...");
 	}
-	obj.controls.innerHTML = options.html
+	obj.container.insertAdjacentHTML("beforeend", options.html
 								.replaceAll("{aria-label}", obj.playAriaLabel)
-								.replaceAll("{id}", obj.randomNum);
+								.replaceAll("{id}", obj.randomNum));
+
+	// Store reference
+	obj.controls = obj.container.querySelector(".player-controls");
 
 	// Responsive ffs
 	// ----

@@ -22,6 +22,7 @@
 // Controls
 @control-color: 		@gray-lightest;
 @control-color-active: 	@blue;
+@control-color-inactive: @gray;
 @control-spacing: 		10px;
 
 
@@ -58,7 +59,19 @@
 	&:after { content: ""; display: table; }
 	&:after { clear: both; }
 }
+// Font smoothing
+// ---------------------------------------
+.font-smoothing(@mode: on) when (@mode = on) {
+	-moz-osx-font-smoothing: grayscale;
+	-webkit-font-smoothing: antialiased;
+}
+.font-smoothing(@mode: on) when (@mode = off) {
+	-moz-osx-font-smoothing: auto;
+	-webkit-font-smoothing: subpixel-antialiased;
+}
 
+// Styles
+// -------------------------------
 // Base 
 .player {
 	position: relative;
@@ -75,14 +88,14 @@
 		height: 100%;
 		width: 100%;
 
-		.player-video {
+		&-video {
 			position: absolute;
 			top: 50%;
 			left: 0;
 			right: 0;
 			transform: translateY(-50%);
 		}
-		.controls {
+		&-controls {
 			position: absolute;
 			bottom: 0;
 			left: 0;
@@ -113,57 +126,62 @@
 		width: 100%;
 		padding: 20px;
 		min-height: 2.5em;
-		//background-color: #000;
 		color: #fff;
 		font-size: 24px;
 		text-shadow: 0 1px 1px rgba(0,0,0, .75);
 		text-align: center;
-		//opacity: 0.75;
-
-		-webkit-font-smoothing: antialiased;
-		font-weight: 500;
+		.font-smoothing();
 	}
-	.controls {
+
+	&-controls {
 		.clearfix();
 		position: relative;
-		//position: absolute;
-		//bottom: 0;
-		//left: 0;
-		//right: 0;
 		padding: (@control-spacing * 2) @control-spacing @control-spacing;
-		//background: rgba(red(@gray-dark), green(@gray-dark), blue(@gray-dark), .9);
 		background: @gray-dark;
-		//transition: transform .3s ease;
 		line-height: 1;
-
-		button {
-			border: 0;
-			background: transparent;
-			overflow: hidden;
-		}
-		label, 
+		
+		input + label, 
 		button {
 			display: inline-block;
 			vertical-align: middle;
 			margin: 0 2px;
 			padding: (@control-spacing / 2) @control-spacing;
-			color: @control-color;
+			
 			transition: background .3s ease;
 			border-radius: 3px;
+			cursor: pointer;
 
 			svg {
 				display: block;
 				fill: currentColor;
 				transition: fill .3s ease;
 			}
+		}
+		input + label,
+		input.inverted:checked + label {
+			color: @control-color-inactive;
+		}
+		button, 
+		input.inverted + label,
+		input:checked + label {
+			color: @control-color;
+		}
+		button {
+			border: 0;
+			background: transparent;
+			overflow: hidden;
+
 			&:focus {
 				outline: 0;
 			}
-			&:hover {
-				background: @control-color-active;
-			}
-			&:hover svg,
-			&:focus svg {
+		}
+		button:hover,
+		button:focus,
+		label:hover,
+		input:focus + label {
+			background: @control-color-active;
+
+			svg {
 				fill: #fff;
 			}
 		}
@@ -177,7 +195,7 @@
 			color: #fff;
 			font-weight: 600;
 			font-size: 14px;
-			-webkit-font-smoothing: antialiased;
+			.font-smoothing();
 		}
 	}
 	progress {
@@ -191,7 +209,6 @@
 		vertical-align: top;
 		
 		&[value] {
-			/* Reset the default appearance */
 			-webkit-appearance: none;
 			border: none;
 			background: @gray;
@@ -216,19 +233,16 @@
 	.sound-controls {
 		float: right;
 	}
-	/*&.playing .controls {
-		transform: translateY(100%);
-	}*/
 
-	.controls .px-video-pause,
-	&.playing .controls .px-video-play {
+	&-controls .px-video-pause,
+	&.playing .player-controls .px-video-play {
 		display: none;
 	}
-	&.playing .controls .px-video-pause {
+	&.playing .player-controls .px-video-pause {
 		display: inline-block;
 	}
 
-	/* volume range input */
+	// Volume control
 	input[type='range'] {
 		-webkit-appearance: none;
 		height: 6px;
@@ -237,16 +251,12 @@
 		background: @gray;
 		outline: 0;
 		border-radius: 10px;
-
-		&:focus::-webkit-slider-thumb {
-			//outline: 1px #999 dotted;
-			background: @control-color-active;
-		}
+		
 		&::-moz-range-track {
 			-moz-appearance: none;
 			height: 6px;
 			background: @gray;
-			border: none;
+			border: 0;
 			border-radius: 10px;
 		}
 		&::-webkit-slider-thumb {
@@ -260,98 +270,17 @@
 		&::-moz-range-thumb {
 			height: 12px;
 			width: 12px;
+			border: 0;
 			background: @control-color;
 			border-radius: 100%;
 		}
+		&:focus::-webkit-slider-thumb {
+			background: @control-color-active;
+		}
+		&:focus::-moz-range-thumb {
+			background: @control-color-active;
+		}
 	}
-}
-
-
-/* containers */
-
-/* progress indicator */
-.px-video-progress {
-	
-	
-}
-
-/* time */
-/*.px-video-time {
-	float: right;
-	margin-top: 2px;
-	font-size: 14px;
-}*/
-
-/* caption area */
-
-
-/* buttons */
-.px-video-controls button {
-	
-	//background: no-repeat url('../images/px-video-sprite.png');
-}
-.px-video-controls button:focus {
-	//border: 1px #999 dotted;
-	//outline: none;
-}
-.px-video-controls button {
-	//cursor: pointer;
-}
-
-/* captions button */
-.px-video-captions-btn-container label {
-	display: inline-block;
-	width: 25px;
-	height: 20px;
-	margin-left: 25px;
-	background: no-repeat url('../images/px-video-sprite.png');
-	background-position: -6px -835px;
-}
-.px-video-captions-btn-container input[type="checkbox"]:focus+label {
-	outline: 1px #999 dotted;
-	background-position: -6px -799px;
-}
-.px-video-captions-btn-container input[type="checkbox"]:hover+label {
-	background-position: -6px -799px;
-	cursor: pointer;
-}
-.px-video-captions-btn-container input[type="checkbox"]:focus+label {
-	outline: 1px #999 dotted;
-	background-position: -6px -799px;
-}
-.px-video-captions-btn-container input[type="checkbox"]:checked+label {
-	background-position: -6px -871px;
-}
-
-/* mute button */
-.px-video-mute-btn-container label {
-	display: inline-block;
-	width: 25px;
-	height: 20px;
-	margin-left: 240px;
-	margin-top: 2px;
-	background: no-repeat url('../images/px-video-sprite.png');
-	background-position: -6px -476px;
-}
-.px-video-mute-btn-container input[type="checkbox"]:focus+label {
-	outline: 1px #999 dotted;
-	background-position: -6px -440px;
-}
-.px-video-mute-btn-container input[type="checkbox"]:hover+label {
-	background-position: -6px -440px;
-	cursor: pointer;
-}
-.px-video-mute-btn-container input[type="checkbox"]:focus+label {
-	outline: 1px #999 dotted;
-	background-position: -6px -440px;
-}
-/* checked state of mute button */
-.px-video-mute-btn-container input[type="checkbox"]:checked+label {
-	background-position: -6px -692px;
-}
-.px-video-mute-btn-container input[type="checkbox"]:checked:hover+label,
-.px-video-mute-btn-container input[type="checkbox"]:checked:focus+label {
-	background-position: -6px -656px;
 }
 
 /* fixing display for IE10+ */
@@ -370,250 +299,3 @@
 		min-height: 36px;
 	}
 }
-
-/*.media {
-	position: relative;
-	overflow: hidden;
-	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-
-	video {
-		width: 100%;
-
-		&::-webkit-media-controls {
-		  display:none !important;
-		}
-	}
-	&.stopped,
-	&.paused {
-		.overlay-play {
-			display: block;
-		}
-		.media-controls {
-			transform: translate3d(0, 0, 0);
-		}
-	}
-}
-.media-controls {
-	height: 50px;
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	z-index: 2;
-
-	.translate3d(0, 100%, 0);
-	.transition-transform(.5s);
-
-	background-color: @base-color;
-	color: #fff;
-	.font-size(15);
-	-webkit-font-smoothing: antialiased;
-	font-weight: 600;
-	.user-select(none);
-
-	button {
-		display: inline-block;
-		padding: 8px 15px;
-		margin: 0;
-
-		-webkit-appearance: none;
-		background: none;
-		border: none;
-		color: #fff;
-		.font-size(24);
-
-		.transition();
-
-		&:focus {
-			outline: none;
-		}
-
-		&:hover,
-		&:focus {
-			text-shadow: 0 0 15px @green;
-		}
-	}
-
-	.progress {
-		position: relative;
-		.border-radius(10px);
-		height: 10px;
-		background: lighten(@base-color, 10%);
-
-		div {
-			position: absolute;
-			z-index: 1;
-			left: 0;
-			.border-radius(10px);
-			height: 10px;
-			min-width: 10px; // So it doesn't look strange at 0%
-
-			&.progress-played,
-			&.progress-volume {
-				background: @green;
-				z-index: 2;
-			}
-			&.progress-buffered {
-				background: lighten(@base-color, 20%);
-			}
-		}
-		&.vertical-progress {
-			margin: 0 auto;
-			width: 10px;
-			height: auto;
-			min-height: 100px;
-
-			div {
-				bottom: 0;
-				width: 10px;
-				height: auto;
-				min-height: 10px;
-			}
-		}
-	}
-
-	.popover {
-		display: none;
-		position: absolute;
-		left: 50%;
-		bottom: 100%;
-		margin-bottom: 10px;
-
-		background: @base-color;
-		.border-radius(4px);
-
-		-webkit-animation: pop-upwards 160ms forwards linear;
-        -moz-animation: pop-upwards 160ms forwards linear;
-        -ms-animation: pop-upwards 160ms forwards linear;
-        -o-animation: pop-upwards 160ms forwards linear;
-        animation: pop-upwards 160ms forwards linear;
-
-        .transition();
-
-        // Psuedo bits
-		&::before {
-		    position: absolute;
-		    bottom: -7px;
-		    left: 50%;
-		    margin-left: -7px;
-		    width: 0;
-		    height: 0;
-		    border-right: 7px solid transparent;
-		    border-top: 7px solid @base-color;
-		    border-left: 7px solid transparent;
-			content: '';
-			z-index: 1;
-		}	
-	}
-	.has-popover:focus,
-	.has-popover:hover {
-		.popover {
-			display: block;
-		}
-	}
-
-	.popover-volume {
-		width: 54px;
-		padding: 15px 5px 8px;
-		margin-left: -27px;
-		
-		text-align: center;
-		
-		.progress {
-			height: 120px;
-			margin-bottom: 5px;
-		}
-	}
-
-	// Layout
-	.play,
-	.progress-play,
-	.volume, 
-	.time,
-	.fullscreen {
-		position: absolute;
-		top: 0;
-	}
-	.play {
-		left: 10px;
-	}
-	.progress-play {
-		left: 70px;
-		right: 240px;
-		margin-top: 20px;		
-	}
-	.time {
-		right: 120px;
-		width: 100px;
-		text-align: center;
-		line-height: 1;
-		padding-top: 17px;
-	}
-	.volume {
-		right: 60px;
-	}
-	.fullscreen {
-		right: 10px;
-	}
-
-	@media only screen 
-	and (max-width: 480px) {	
-		.time-seperator,
-		.time-total {
-			display: none;
-		}
-		.time {
-			width: 50px;
-			right: 70px;
-		}
-		.fullscreen {
-			display: none;
-		}
-		.volume {
-			right: 10px;
-		}
-		.progress-play {
-			right: 140px;
-		}
-	}
-	@media only screen 
-	and (max-width: 320px) {	
-		.time {
-			display: none;
-		}
-		.progress-play {
-			right: 70px;
-		}
-	}
-}
-.media-pause .mejs-overlay-play {
-	background: rgba(0,0,0, .1);
-}
-.overlay {
-	display: none;
-	position: absolute;
-	z-index: 1;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	right: 0;
-	background: rgba(0,0,0, .1);
-}
-.overlay-play > span {
-	display: block;
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	width: 60px;
-	height: 60px;
-    line-height: 1.5;
-	margin: -34px 0 0 -34px !important;
-    text-align: center;
-    background: rgba(red(@base-color), green(@base-color), blue(@base-color), .8);
-    border: 4px solid #fff;
-    color: #fff;
-    .border-radius(50%);
-    @shadow: 0 1px 5px rgba(0,0,0, .25), inset 0 1px 1px rgba(0,0,0,.25);
-    .box-shadow(@shadow);
-    .font-size(34);
-}*/

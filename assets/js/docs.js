@@ -11,9 +11,7 @@ var video = new InitPxVideo({
 	"seekInterval": 		20,
 	"videoTitle": 			"PayPal Austin promo",
 	"debug": 				true,
-	"html": 				templates.controls.render({
-
-	})
+	"html": 				templates.controls.render({})
 });
 
 console.log(video);
