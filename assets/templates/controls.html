@@ -1,0 +1,51 @@
+<div class="controls">
+	<progress class="px-video-progress" max="100" value="0"><span>0</span>% played</progress>
+
+	<div class="play-controls">
+		<button class="px-video-restart" data-player="restart">
+			<svg><use xlink:href="#icon-refresh"></use></svg>
+			<span class="sr-only">Restart</span>
+		</button>
+		<button class="px-video-rewind" data-player="rewind">
+			<svg><use xlink:href="#icon-rewind"></use></svg>
+			<span class="sr-only">Rewind <span class="px-seconds">10</span> seconds</span>
+		</button>
+		<button class="px-video-play" aria-label="{aria-label}" data-player="play">
+			<svg><use xlink:href="#icon-play"></use></svg>
+			<span class="sr-only">Play</span>
+		</button>
+		<button class="px-video-pause hide" data-player="pause">
+			<svg><use xlink:href="#icon-pause"></use></svg>
+			<span class="sr-only">Pause</span>
+		</button>
+		<button class="px-video-forward" data-player="fast-forward">
+			<svg><use xlink:href="#icon-fast-forward"></use></svg>
+			<span class="sr-only">Fast forward <span class="px-seconds">10</span> seconds</span>
+		</button>
+		<div class="px-video-time">
+			<span class="sr-only">Time</span>
+			<span class="px-video-duration">00:00</span>
+		</div>
+	</div>
+
+	<div class="sound-controls">
+		<!--<div class="px-video-mute-btn-container">-->
+			<input class="px-video-mute sr-only" id="btnMute{id}" type="checkbox">
+			<label id="labelMute{id}" for="btnMute{id}">
+				<svg><use xlink:href="#icon-sound"></use></svg>
+				<span class="sr-only">Mute</span>
+			</label>
+		<!--</div>-->
+
+		<label for="volume{id}" class="sr-only">Volume:</label>
+		<input id="volume{id}" class="px-video-volume" type="range" min="0" max="10" value="5">
+
+		<!--<div class="px-video-captions-btn-container hide">-->
+			<input class="px-video-btnCaptions sr-only" id="btnCaptions{id}" type="checkbox">
+			<label for="btnCaptions{id}">
+				<svg><use xlink:href="#icon-film"></use></svg>
+				<span class="sr-only">Captions</span>
+			</label>
+		<!--</div>-->
+	</div>
+</div>

@@ -1,0 +1,29 @@
+{
+  "name": "simple-media",
+  "description": "A simple HTML5 media player using custom controls",
+  "homepage": "https://github.com/sampotts/simple-media",
+  "keywords": [
+    "Audio",
+    "Video",
+    "HTML5 Audio",
+    "HTml5 Video"
+  ],
+  "authors": [
+    "Sam Potts <me@sampotts.me>"
+  ],
+  "dependencies": {},
+  "main": [
+    "dist/css/simple-media.css",
+    "dist/js/simple-media.js"
+  ],
+  "ignore": [
+    "node_modules",
+    "bower_components",
+    ".gitignore"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/sampotts/simple-media.git"
+  },
+  "license": "MIT"
+}

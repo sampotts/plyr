@@ -1,0 +1,37 @@
+// ==========================================================================
+// HTML5 Video Player Demo Page
+// ==========================================================================
+
+// Reset
+@import "lib/normalize.less";
+// Mixins
+@import "lib/mixins.less";
+
+// BORDER-BOX ALL THE THINGS! 
+// http://paulirish.com/2012/box-sizing-border-box-ftw/
+*, *::after, *::before {  
+	box-sizing: border-box; 
+}
+html {
+	font-size: 62.5%;
+}
+body {
+	font-family: "Avenir Next", "Helvetica Neue", Helvetica, Arial, sans-serif;
+	.font-size(18);
+	color: #6D797F;
+	line-height: 1.5;
+	background: #ECF0F1;
+	max-width: 960px;
+	margin: 50px auto;
+	text-align: center;
+}
+h1 {
+	.font-size(48);
+	letter-spacing: -.025em;
+	color: #2E3C44;
+	margin: 0 0 20px;
+	line-height: 1.2;
+}
+p {
+	margin: 0 0 20px;
+}
