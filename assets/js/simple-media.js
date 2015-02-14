@@ -1,3 +1,77 @@
+// ==========================================================================
+// Simple Media Player
+// simple-media.js v1.0.0
+// https://github.com/sampotts/simple-media
+// ==========================================================================
+// Credits: http://paypal.github.io/accessible-html5-video-player/
+// ==========================================================================
+
+// Fullscreen API
+(function() {
+    var
+        fullscreen = {
+            supportsFullScreen: false,
+            isFullScreen: function() { return false; },
+            requestFullScreen: function() {},
+            cancelFullScreen: function() {},
+            fullScreenEventName: "",
+            element: null,
+            prefix: ""
+        },
+        browserPrefixes = "webkit moz o ms khtml".split(" ");
+
+    // check for native support
+    if (typeof document.cancelFullScreen != "undefined") {
+        fullscreen.supportsFullScreen = true;
+    }
+    else {
+        // check for fullscreen support by vendor prefix
+        for (var i = 0, il = browserPrefixes.length; i < il; i++ ) {
+            fullscreen.prefix = browserPrefixes[i];
+
+            if (typeof document[fullscreen.prefix + "CancelFullScreen" ] != "undefined" ) {
+                fullscreen.supportsFullScreen = true;
+
+                break;
+            }
+        }
+    }
+
+    // Safari doesn't support the ALLOW_KEYBOARD_INPUT flag so set it to not supported
+    // https://bugs.webkit.org/show_bug.cgi?id=121496
+    if(fullscreen.prefix === "webkit" && !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/)) {
+    	 fullscreen.supportsFullScreen = false;
+    }
+
+    // Update methods to do something useful
+    if (fullscreen.supportsFullScreen) {
+        fullscreen.fullScreenEventName = fullscreen.prefix + "fullscreenchange";
+
+        fullscreen.isFullScreen = function() {
+            switch (this.prefix) {
+                case "":
+                    return document.fullScreen;
+                case "webkit":
+                    return document.webkitIsFullScreen;
+                default:
+                    return document[this.prefix + "FullScreen"];
+            }
+        };
+        fullscreen.requestFullScreen = function(element) {
+            return (this.prefix === "") ? element.requestFullScreen() : element[this.prefix + "RequestFullScreen"](this.prefix === "webkit" ? element.ALLOW_KEYBOARD_INPUT : null);
+        };
+        fullscreen.cancelFullScreen = function() {
+            return (this.prefix === "") ? document.cancelFullScreen() : document[this.prefix + "CancelFullScreen"]();
+        };
+    	fullscreen.element = function() { 
+    		return (this.prefix === "") ? document.fullscreenElement : document[this.prefix + "FullscreenElement"];
+    	};
+    }
+
+    // Export api
+    window.fullscreen = fullscreen;
+})();
+
 function InitPxVideo(options) {
 
 	"use strict";
@@ -10,6 +84,37 @@ function InitPxVideo(options) {
 				return this.replace(new RegExp(find.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1"), "g"), replace);
 			}
 		});
+	}
+
+	// Get click position relative to parent
+	// http://www.kirupa.com/html5/getting_mouse_click_position.htm
+	// ---------------------------------
+	function getClickPosition(e) {
+		var parentPosition = window.fullscreen.isFullScreen() ? { x: 0, y: 0 } : getPosition(e.currentTarget);
+
+		return {
+			x: e.clientX - parentPosition.x,
+			y: e.clientY - parentPosition.y
+		};
+	}
+
+	// Get element position
+	// http://www.kirupa.com/html5/getting_mouse_click_position.htm
+	// ---------------------------------
+	function getPosition(element) {
+		var xPosition = 0;
+		var yPosition = 0;
+
+		while (element) {
+			xPosition += (element.offsetLeft - element.scrollLeft + element.clientLeft);
+			yPosition += (element.offsetTop - element.scrollTop + element.clientTop);
+			element = element.offsetParent;
+		}
+		
+		return { 
+			x: xPosition, 
+			y: yPosition 
+		};
 	}
 
 	// Utilities for caption time codes
@@ -255,6 +360,9 @@ function InitPxVideo(options) {
 	obj.duration = obj.container.getElementsByClassName("px-video-duration")[0];
 	obj.txtSeconds = obj.container.getElementsByClassName("px-seconds");
 
+	obj.toggleFullscreen = obj.container.querySelector("[data-player='toggle-fullscreen']");
+	obj.videoContainer = obj.container.querySelector(".player-video");
+
 	// Update number of seconds in rewind and fast forward buttons
 	obj.txtSeconds[0].innerHTML = obj.seekInterval;
 	obj.txtSeconds[1].innerHTML = obj.seekInterval;
@@ -265,30 +373,41 @@ function InitPxVideo(options) {
 		obj.isTextTracks = true;
 	}
 
-	// Play
-	obj.btnPlay.addEventListener("click", function() {
+	// Fullscreen
+	obj.toggleFullscreen.addEventListener("click", function() {
+		if(!window.fullscreen.isFullScreen()) {
+			window.fullscreen.requestFullScreen(obj.container);
+		}
+		else {
+			window.fullscreen.cancelFullScreen();
+		}
+	}, false);
+
+	// Click video
+	obj.videoContainer.addEventListener("click", function() {
+		if(obj.movie.paused) {
+			play();
+		}
+		else if(obj.movie.ended) {
+			restart();
+		}
+		else {
+			pause();
+		}
+	}, false);
+
+	function play() {
 		obj.movie.play();
-
 		obj.container.className = obj.container.className.replace("stopped", "playing");
+		
+	}
 
-		obj.btnPlay.className = "px-video-play hide";
-		obj.btnPause.className = "px-video-pause px-video-show-inline";
-		obj.btnPause.focus();
-	}, false);
-
-	// Pause
-	obj.btnPause.addEventListener("click", function() {
+	function pause() {
 		obj.movie.pause(); 
-
 		obj.container.className = obj.container.className.replace("playing", "stopped");
+	}
 
-		obj.btnPlay.className = "px-video-play px-video-show-inline";
-		obj.btnPause.className = "px-video-pause hide";
-		obj.btnPlay.focus();
-	}, false);
-
-	// Restart
-	obj.btnRestart.addEventListener("click", function() {
+	function restart() {
 		// Move to beginning
 		obj.movie.currentTime = 0;
 
@@ -298,11 +417,17 @@ function InitPxVideo(options) {
 		}
 
 		// Play and ensure the play button is in correct state
-		obj.movie.play();
-		obj.btnPlay.className = "px-video-play hide";
-		obj.btnPause.className = "px-video-pause px-video-show-inline";
+		play();
+	}
 
-	}, false);
+	// Play
+	obj.btnPlay.addEventListener("click", function() { play(); obj.btnPause.focus(); }, false);
+
+	// Pause
+	obj.btnPause.addEventListener("click", function() { pause(); obj.btnPlay.focus(); }, false);
+
+	// Restart
+	obj.btnRestart.addEventListener("click", restart, false);
 
 	// Rewind
 	obj.btnRewind.addEventListener("click", function() {
@@ -373,7 +498,7 @@ function InitPxVideo(options) {
 
 	// Skip when clicking progress bar
 	obj.progressBar.addEventListener("click", function(e) {
-		obj.pos = (e.pageX - this.offsetLeft) / this.offsetWidth;
+		obj.pos = getClickPosition(e).x / this.offsetWidth;
 		obj.movie.currentTime = obj.pos * obj.movie.duration;
 		
 		// Special handling for "manual" captions
@@ -527,101 +652,5 @@ function InitPxVideo(options) {
 			var tracks = obj.movie.getElementsByTagName("track");
 			obj.movie.removeChild(tracks[0]);
 		}
-
 	}
-};
-
-
-
-/*$(function() { 
-	$("video").simplePlayer();
-});*/
-
-// Simple player plugin
-// ---------------------------------
-/*;(function($) {
-	$.fn.simplePlayer = function (settings) {
-		// Config defaults
-		var config = {
-			wrapperClass: 	"media", // Class name added to replaced selects
-			shownClass: 	"in",
-			autoplay: 		false,
-			templates: 		{
-								controls: "<div class="media-controls js-media-controls"> \
-									<button type="button" class="play button-toggle-play js-button-toggle-play"> \
-										<span class="icon-play"></span> \
-									</button> \
-									<div class="progress progress-play js-progress-play" role="progress-bar"> \
-										<div class="progress-buffered js-progress-buffered"></div> \
-										<div class="progress-played js-progress-played"></div> \
-									</div> \
-									<div class="time js-time"> \
-										<span class="time-elapsed js-time-elapsed">88:88</span> \
-										<span class="time-seperator js-time-seperator">/</span> \
-										<span class="time-total js-time-total">88:88</span> \
-									</div> \
-									<div class="volume has-popover js-volume"> \
-										<button type="button" class="button-toggle-mute js-button-toggle-mute"> \
-											<span class="icon-volume-up"></span> \
-										</button> \
-										<div class="popover popover-volume js-popover-volume"> \
-											<div class="progress vertical-progress progress-audio-volume js-progress-audio-volume"> \
-												<div class="progress-volume js-progress-volume" style="height: 80%"></div> \
-											</div> \
-											<div class="volume-label js-volume-label">100%</div> \
-										</div> \
-									</div> \
-									<button type="button" class="fullscreen button-fullscreen js-button-fullscreen"> \
-										<span class="icon-resize-full"></span> \
-									</button> \
-								</div>",
-								overlay: "<div class="overlay overlay-play"><span><i class="icon-play"></i></span></div>"
-							}
-		};
-
-		// Extend settings if they"re passed
-		if (settings) {
-			$.extend(config, settings);
-		}
-		
-		this.each(function() {
-			var player = this,
-				status = {},
-				$player = $(this).wrap("<div class="" + config.wrapperClass + (config.autoplay ? " playing" : " stopped") + "" />"),
-				$wrapper = $player.parents("." + config.wrapperClass),
-				supportMP4 = (function (v) { return (v.canPlayType && v.canPlayType("video/mp4")); }(document.createElement("video")));
-
-				console.log($wrapper);
-
-			// Inject the controls
-			$(config.templates.controls).insertAfter($player);
-			$(config.templates.overlay).insertAfter($player);
-
-			// Select controls
-			var $playbackToggle = $(".js-button-toggle-play"),
-				$muteToggle = $(".js-button-toggle-mute");
-
-			function togglePlayback() { 
-				if(status.playing && status.playing == true) {
-					player.pause();
-					status.playing = false;
-					$wrapper.removeClass("playing").addClass("paused");
-				} else {
-					player.play();
-					status.playing = true;
-					$wrapper.removeClass("paused stopped").addClass("playing");
-				}
-				$("span", this).attr("class", "icon-" + (status.playing ? "pause" : "play"));
-			};
-
-			function toggleMute() { 
-				player.muted = !status.muted;
-				status.muted = player.muted;
-				$("span", this).attr("class", "icon-" + (status.muted ? "mute" : "volume-up"));
-			};
-
-			$playbackToggle.on("click", togglePlayback);
-			$muteToggle.on("click", toggleMute);
-		});
-	};
-})(jQuery);*/
+}

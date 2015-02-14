@@ -10,3 +10,7 @@
 - [http://stackoverflow.com/questions/5138077/html5-video-file-loading-complete-event](http://stackoverflow.com/questions/5138077/html5-video-file-loading-complete-event)
 - [http://www.sitepoint.com/essential-audio-and-video-events-for-html5/](http://www.sitepoint.com/essential-audio-and-video-events-for-html5/)
 - [http://dev.opera.com/articles/view/simple-html5-video-flash-fallback-custom-controls/](http://dev.opera.com/articles/view/simple-html5-video-flash-fallback-custom-controls/)
+
+- [http://www.hongkiat.com/blog/html5-progress-bar/](http://www.hongkiat.com/blog/html5-progress-bar/)
+- [http://codereview.stackexchange.com/questions/21105/pattern-for-creating-a-globally-accessible-custom-plugin](http://codereview.stackexchange.com/questions/21105/pattern-for-creating-a-globally-accessible-custom-plugin)
+- [https://scotch.io/tutorials/building-your-own-javascript-modal-plugin](https://scotch.io/tutorials/building-your-own-javascript-modal-plugin)

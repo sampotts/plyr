@@ -4,12 +4,25 @@
 
 // Variables
 // -------------------------------
-@base-color: 	#2E3C44;
-@green: 		#1ABC9C;
-@red:           #D44334;
-//@green:       #4CB953;
-@blue:          #3498DB;
-@control-color: @blue;
+// Colors
+@base-color: 		#2E3C44;
+@green: 			#1ABC9C;
+@red:           	#D44334;
+@blue:          	#3498DB;
+
+// Grays
+@gray-dark: 		#343f4a;
+@gray: 				#565d64;
+@gray-light: 		#6f7e86;
+@gray-lighter: 		#859093;
+@gray-lightest: 	#cbd0d3;
+@gray-light-mega: 	#dadfe2;
+@off-white:         #f9fafb;
+
+// Controls
+@control-color: 		@gray-lightest;
+@control-color-active: 	@blue;
+@control-spacing: 		10px;
 
 
 // BORDER-BOX ALL THE THINGS! (http://paulirish.com/2012/box-sizing-border-box-ftw/)
@@ -51,7 +64,39 @@
 	position: relative;
 	max-width: 100%;
 	overflow: hidden; // For the controls
+	background: #000;
 
+	// For video
+	&-video {
+		position: relative;
+	}
+
+	&:fullscreen {
+		height: 100%;
+		width: 100%;
+
+		.player-video {
+			position: absolute;
+			top: 50%;
+			left: 0;
+			right: 0;
+			transform: translateY(-50%);
+		}
+		.controls {
+			position: absolute;
+			bottom: 0;
+			left: 0;
+			right: 0;
+
+			.icon-exit-fullscreen {
+				display: block;
+
+				& + svg {
+					display: none;
+				}
+			}
+		}
+	}
 	video {
 		width: 100%;
 		height: auto;
@@ -61,15 +106,34 @@
 		width: 18px;
 		height: 18px;
 	}
-	.controls {
-		.clearfix();
+	.px-video-captions {
 		position: absolute;
 		bottom: 0;
 		left: 0;
-		right: 0;
-		padding: 10px 5px;
-		background: rgba(0,0,0, .75);
-		transition: transform .3s ease;
+		width: 100%;
+		padding: 20px;
+		min-height: 2.5em;
+		//background-color: #000;
+		color: #fff;
+		font-size: 24px;
+		text-shadow: 0 1px 1px rgba(0,0,0, .75);
+		text-align: center;
+		//opacity: 0.75;
+
+		-webkit-font-smoothing: antialiased;
+		font-weight: 500;
+	}
+	.controls {
+		.clearfix();
+		position: relative;
+		//position: absolute;
+		//bottom: 0;
+		//left: 0;
+		//right: 0;
+		padding: (@control-spacing * 2) @control-spacing @control-spacing;
+		//background: rgba(red(@gray-dark), green(@gray-dark), blue(@gray-dark), .9);
+		background: @gray-dark;
+		//transition: transform .3s ease;
 		line-height: 1;
 
 		button {
@@ -82,8 +146,8 @@
 			display: inline-block;
 			vertical-align: middle;
 			margin: 0 2px;
-			padding: 5px 10px;
-			color: #ddd;
+			padding: (@control-spacing / 2) @control-spacing;
+			color: @control-color;
 			transition: background .3s ease;
 			border-radius: 3px;
 
@@ -93,22 +157,23 @@
 				transition: fill .3s ease;
 			}
 			&:focus {
-				background: #000;
 				outline: 0;
 			}
 			&:hover {
-				background: @control-color;
+				background: @control-color-active;
 			}
 			&:hover svg,
 			&:focus svg {
 				fill: #fff;
 			}
 		}
+		.icon-exit-fullscreen {
+			display: none;
+		}
 		.px-video-time {
 			display: inline-block;
 			vertical-align: middle;
-			padding-top: 3px;
-			margin-left: 10px;
+			margin-left: @control-spacing;
 			color: #fff;
 			font-weight: 600;
 			font-size: 14px;
@@ -117,24 +182,31 @@
 	}
 	progress {
 		position: absolute;
-		top: -10px;
+		top: 0;
 		left: 0;
 		right: 0;
 		width: 100%;
-		height: 10px;
+		height: @control-spacing;
 		margin: 0;
 		vertical-align: top;
-
+		
 		&[value] {
 			/* Reset the default appearance */
 			-webkit-appearance: none;
 			border: none;
-			
+			background: @gray;
+			cursor: pointer;
+
 			&::-webkit-progress-bar {
-				background-color: #eee;
+				background: @gray;
 			}
+
+			// The value
 			&::-webkit-progress-value {
-				background-color: @control-color;
+				background: @control-color-active;
+			}
+			&::-moz-progress-bar {
+				background: @control-color-active;
 			}
 		}
 	}
@@ -147,17 +219,55 @@
 	/*&.playing .controls {
 		transform: translateY(100%);
 	}*/
+
+	.controls .px-video-pause,
+	&.playing .controls .px-video-play {
+		display: none;
+	}
+	&.playing .controls .px-video-pause {
+		display: inline-block;
+	}
+
+	/* volume range input */
+	input[type='range'] {
+		-webkit-appearance: none;
+		height: 6px;
+		width: 100px;
+		margin-right: @control-spacing;
+		background: @gray;
+		outline: 0;
+		border-radius: 10px;
+
+		&:focus::-webkit-slider-thumb {
+			//outline: 1px #999 dotted;
+			background: @control-color-active;
+		}
+		&::-moz-range-track {
+			-moz-appearance: none;
+			height: 6px;
+			background: @gray;
+			border: none;
+			border-radius: 10px;
+		}
+		&::-webkit-slider-thumb {
+			-webkit-appearance: none !important;
+			height: 12px;
+			width: 12px;
+			background: @control-color;
+			border-radius: 100%;
+			transition: background .3s ease;
+		}
+		&::-moz-range-thumb {
+			height: 12px;
+			width: 12px;
+			background: @control-color;
+			border-radius: 100%;
+		}
+	}
 }
 
 
 /* containers */
-.px-video-img-captions-container * {
-	box-sizing: border-box;
-}
-
-.px-video-img-captions-container {
-	position: relative;
-}
 
 /* progress indicator */
 .px-video-progress {
@@ -173,22 +283,7 @@
 }*/
 
 /* caption area */
-.px-video-captions {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	padding: .5em;
-	min-height: 2.5em;
-	background-color: #000;
-	color: #fff;
-	font-size: 1.1em;
-	text-align: center;
-	opacity: 0.75;
 
-	-webkit-font-smoothing: antialiased;
-	font-weight: 500;
-}
 
 /* buttons */
 .px-video-controls button {
@@ -259,34 +354,6 @@
 	background-position: -6px -656px;
 }
 
-/* volume range input */
-.px-video-controls input[type='range'] {
-	-webkit-appearance: none;
-	height: 6px;
-	width: 100px;
-	margin-top: 8px;
-	background-color: #E6E6E6;
-	outline:none;
-}
-.px-video-controls input[type='range']:focus::-webkit-slider-thumb {
-	outline: 1px #999 dotted;
-}
-.px-video-controls input[type='range']::-moz-range-track {
-	-moz-appearance: none;
-	height: 6px;
-	background-color: #E6E6E6;
-	border: none;
-}
-.px-video-controls input[type='range']::-webkit-slider-thumb {
-	-webkit-appearance: none !important;
-	height: 10px;
-	width: 6px;
-	background-color: #666;
-}
-.px-video-controls input[type='range']::-moz-range-thumb {
-	height: 12px;
-	width: 8px;
-}
 /* fixing display for IE10+ */
 @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
 	.px-video-controls input[type='range'] {

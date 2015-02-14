@@ -2,23 +2,23 @@
 <html lang="en">
 <head>
 		<meta charset="utf-8" />
-		<title>Simple HTML5 Video Player</title>
+		<title>Simple Media</title>
 		<meta name="description" content="Custom HTML5 video controls and WebVTT captions.">
 		<meta name="author" content="Sam Potts">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 
 		<!-- Styles -->
-		<link rel="stylesheet" href="../dist/css/simple-player.css">
+		<link rel="stylesheet" href="../dist/css/simple-media.css">
 		<link rel="stylesheet" href="../dist/css/docs.css">
 	</head>
 	<body class="container">
 		<header>
-			<h1>HTML5 Media Player</h1>
+			<h1>Simple Media</h1>
 			<p>A simple HTML5 media player</p>
 		</header>
 
-		<div class="player px-video-container" id="myvid">
-			<div class="px-video-img-captions-container">
+		<div class="player" id="myvid">
+			<div class="player-video">
 				<div class="px-video-captions hide"></div>
 				<video width="640" height="360" poster="../media/poster_PayPal_Austin2.jpg" controls>
 					<!-- video files -->
@@ -44,7 +44,7 @@
 		<script>(function(d,p){var a=new XMLHttpRequest(),b=d.body; a.open("GET",p,!0);a.send();a.onload=function(){var c=d.createElement("div");c.style.display="none";c.innerHTML=a.responseText;b.insertBefore(c,b.childNodes[0])}})(document,"../dist/svg/sprite.svg");</script>
 
 		<!-- Core player -->
-		<script src="../dist/js/simple-player.js"></script>
+		<script src="../dist/js/simple-media.js"></script>
 
 		<!-- Docs setup -->
 		<script src="../dist/js/docs.js"></script>
