@@ -14,11 +14,11 @@
 	// Globals
 	var fullscreen, config;
 
-	// Handler cache
-	var handlers = {};
-
 	// Object cache
 	var player = {};
+
+	// Handler cache
+	var handlers = {};
 
 	// Default config
 	var defaults = {
@@ -911,6 +911,12 @@
 			return false;
 		}
 		setupPlayer(element);
+
+		/*var elements = document.querySelectorAll(config.selectors.container);
+
+		for (var i = elements.length - 1; i >= 0; i--) {
+			setupPlayer(elements[i]);
+		}*/
 
 		// Trigger the setup event
 		executeHandlers("setup");
