@@ -132,8 +132,8 @@ gulp.task(taskNames.jsAll, function(){
 
 // Watch for file changes
 gulp.task("watch", function () {
-	gulp.watch(paths.watchtemplates, taskNames.jsAll);
-    gulp.watch(paths.watchjs, taskNames.jsAll);
+	//gulp.watch(paths.watchtemplates, [taskNames.jsAll]);
+    //gulp.watch(paths.watchjs, [taskNames.jsAll]);
     gulp.watch(paths.watchless, lessBuildTasks);
-    gulp.watch(paths.watchicons, taskNames.iconBuild);
+    gulp.watch(paths.watchicons, [taskNames.iconBuild]);
 });

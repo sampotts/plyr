@@ -2,16 +2,16 @@
 // Docs example
 // ==========================================================================
 
-/*global InitPxVideo, Mustache, templates */
+/*global simpleMedia, templates */
 
-// Initialize
-var video = new InitPxVideo({
-	"videoId": 				"myvid",
-	"captionsOnDefault": 	true,
-	"seekInterval": 		20,
-	"videoTitle": 			"PayPal Austin promo",
-	"debug": 				true,
-	"html": 				templates.controls.render({})
+// Register a callback
+simpleMedia.on("setup", function() {
+	console.log(this);
 });
 
-console.log(video);
+//execute shout
+simpleMedia.setup({
+	debug: 	true,
+	title: 	"PayPal demo",
+	html: 	templates.controls.render({})
+});
