@@ -21,7 +21,12 @@
 @progress-bg: 				@gray;
 @progress-value-bg: 		@blue;
 
-
+// Range
+@range-track-height: 		6px;
+@range-thumb-height: 		(@range-track-height * 2);
+@range-thumb-width: 		(@range-track-height * 2);
+@range-thumb-bg: 			@control-color;
+@range-thumb-bg-focus: 		@control-color-active;
 
 // Utility classes & mixins
 // -------------------------------
@@ -47,6 +52,24 @@
 .tab-focus() {
 	outline: thin dotted #000;
 	outline-offset: 1px;
+}
+
+
+// Range styling
+// ---------------------------------------
+.range-thumb() {
+	height: @range-thumb-height;
+	width: @range-thumb-width;
+	background: @range-thumb-bg;
+	border: 0;
+	border-radius: (@range-thumb-height / 2);
+	transition: background .3s ease;
+}
+.range-track() {
+	height: @range-track-height;
+	background: @gray;
+	border: 0;
+	border-radius: (@range-track-height / 2);
 }
 
 // Font smoothing
@@ -190,6 +213,7 @@
 	}
 
 	// Player progress
+	// <progress> element
 	&-progress {
 		position: absolute;
 		top: 0;
@@ -239,44 +263,63 @@
 	}
 
 	// Volume control
+	// <input[type='range']> element
 	&-volume {
+		vertical-align: middle;
 		-webkit-appearance: none;
-		height: 6px;
+		-moz-appearance: none;
+		//height: 6px;
 		width: 100px;
-		margin-right: @control-spacing;
-		background: @gray;
-		border-radius: 10px;
+		margin: 0 @control-spacing 0 0;
+		padding: 0;		
+		cursor: pointer;
+		background: none;
 		
-		&::-moz-range-track {
-			-moz-appearance: none;
-			height: 6px;
-			background: @gray;
-			border: 0;
-			border-radius: 10px;
+		// Webkit
+		&::-webkit-slider-runnable-track {
+			.range-track();
 		}
 		&::-webkit-slider-thumb {
-			-webkit-appearance: none !important;
-			height: 12px;
-			width: 12px;
-			background: @control-color;
-			border-radius: 100%;
-			transition: background .3s ease;
+			-webkit-appearance: none;
+			margin-top: -((@range-thumb-height - @range-track-height) / 2);
+			.range-thumb();
+		}
+
+		// Mozilla
+		&::-moz-range-track {
+			.range-track();
 		}
 		&::-moz-range-thumb {
-			height: 12px;
-			width: 12px;
-			border: 0;
-			background: @control-color;
-			border-radius: 100%;
+			.range-thumb();
 		}
+		
+		// Microsoft
+		&::-ms-track {
+			height: @range-track-height;
+			background: transparent;
+			border-color: transparent;
+			border-width: ((@range-thumb-height - @range-track-height) / 2) 0;
+			color: transparent;
+		}
+		&::-ms-fill-lower,
+		&::-ms-fill-upper {
+			.range-track();
+		}
+		&::-ms-thumb {
+			.range-thumb();
+		}
+
 		&:focus {
 			outline: 0;
 
 			&::-webkit-slider-thumb {
-				background: @control-color-active;
+				background: @range-thumb-bg-focus;
 			}
 			&::-moz-range-thumb {
-				background: @control-color-active;
+				background: @range-thumb-bg-focus;
+			}
+			&::-ms-thumb {
+				background: @range-thumb-bg-focus;
 			}
 		}
 	}
@@ -315,8 +358,8 @@
 	.video-controls .player-volume {
 		position: relative;
 		padding: 0;
-		height: 8px;
-		top: -3px;
+		//height: 8px;
+		//top: -3px;
 	}
 	.player-time {
 		margin-top: 4px;
