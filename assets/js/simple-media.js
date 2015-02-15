@@ -25,6 +25,7 @@
 		debug: 					false,
 		seekInterval: 			10,
 		volume: 				5,
+		clickToPause: 			true,
 		selectors: {
 			container: 			".player",
 			controls: 			".player-controls",
@@ -689,7 +690,7 @@
 		}, false);
 
 		// Click video
-		if(player.type === "video") {
+		if(player.type === "video" && config.clickToPause) {
 			player.videoContainer.addEventListener("click", function() {
 				if(player.media.paused) {
 					play();
