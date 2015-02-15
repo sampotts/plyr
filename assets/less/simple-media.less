@@ -127,7 +127,7 @@
 		text-align: center;
 		.font-smoothing();
 	}
-	&.captions &-captions {
+	&.captions-active &-captions {
 		display: block;
 	}
 
@@ -229,17 +229,18 @@
 			border: none;
 			background: @progress-bg;
 			cursor: pointer;
+			color: @progress-value-bg;
 
 			&::-webkit-progress-bar {
 				background: @progress-bg;
 			}
 
-			// The value
+			// Inherit from currentColor;
 			&::-webkit-progress-value {
-				background: @progress-value-bg;
+				background: currentColor;
 			}
 			&::-moz-progress-bar {
-				background: @progress-value-bg;
+				background: currentColor;
 			}
 		}
 	}
@@ -350,6 +351,20 @@
 				}
 			}
 		}
+	}
+
+	// Some options are hidden by default
+	[data-player='captions'],
+	[data-player='captions'] + label,
+	[data-player='fullscreen'],
+	[data-player='fullscreen'] + label {
+		display: none;
+	}
+	&.captions-enabled [data-player='captions'],
+	&.captions-enabled [data-player='captions'] + label,
+	&.fullscreen-enabled [data-player='fullscreen'],
+	&.fullscreen-enabled [data-player='fullscreen'] + label {
+		display: inline-block;
 	}
 }
 

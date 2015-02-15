@@ -49,10 +49,19 @@
 			stopped: 			"stopped",
 			playing: 			"playing",
 			muted: 				"muted",
-			captions: 			"captions"
+			captions: {
+				active: 		"captions-active",
+				enabled: 		"captions-enabled"
+			},
+			fullscreen: {
+				enabled: 		"fullscreen-enabled"
+			}
 		},
 		captions: {
-			default: 			true
+			defaultActive: 		true
+		},
+		fullscreen: {
+			enabled: 			true
 		}
 	};
 
@@ -159,9 +168,11 @@
 		}
 	}
 	// Display captions container and button (for initialization)
-	function showCaptionContainerAndButton(player) {
-		if (config.captions.default) {
-			player.container.className += " " + config.classes.captions;
+	function showCaptions(player) {
+		player.container.className += " " + config.classes.captions.enabled;
+
+		if (config.captions.defaultActive) {
+			player.container.className += " " + config.classes.captions.active;
 			player.buttons.captions.setAttribute("checked", "checked");
 		}
 	}
@@ -508,7 +519,7 @@
 
 			// If no caption file exists, hide container for caption text
 			if (!player.captionExists) {
-				player.container.className = player.container.className.replace(config.classes.captions, "");
+				player.container.className = player.container.className.replace(config.classes.captions.enabled, "");
 			}
 
 			// If caption file exists, process captions
@@ -540,7 +551,7 @@
 					if (config.debug) {
 						console.log("textTracks supported");
 					}
-					showCaptionContainerAndButton(player);
+					showCaptions(player);
 
 					track = {};
 					tracks = player.media.textTracks;
@@ -563,7 +574,7 @@
 					if (config.debug) {
 						console.log("textTracks not supported so rendering captions manually");
 					}
-					showCaptionContainerAndButton(player);
+					showCaptions(player);
 
 					// Render captions from array at appropriate time
 					player.currentCaption = "";
@@ -644,6 +655,15 @@
 		// Update number of seconds in rewind and fast forward buttons
 		player.seekTime[0].innerHTML = config.seekInterval;
 		player.seekTime[1].innerHTML = config.seekInterval;
+	}
+
+	// Setup fullscreen
+	function setupFullscreen() {
+		console.log(fullscreen.supportsFullScreen ? "Fullscreen supported" : "No fullscreen supported");
+
+		if(config.fullscreen.enabled && fullscreen.supportsFullScreen) {
+			player.container.className += " " + config.classes.fullscreen.enabled;
+		}
 	}
 
 	// Listen for events
@@ -774,10 +794,10 @@
 		// Captions
 		player.buttons.captions.addEventListener("click", function() { 
 			if (this.checked) {
-				player.container.className += " " + config.classes.captions;
+				player.container.className += " " + config.classes.captions.active;
 			} 
 			else {
-				player.container.className = player.container.className.replace(config.classes.captions, "");
+				player.container.className = player.container.className.replace(config.classes.captions.active, "");
 			}
 		}, false);
 
@@ -817,6 +837,9 @@
 		// Set volume
 		setVolume();
 
+		// Setup fullscreen
+		setupFullscreen();
+
 		// Captions
 		setupCaptions();
 
@@ -833,7 +856,6 @@
 		config = extend(defaults, options);
 
 		// Setup the fullscreen api 
-		// Check for support to hide/show the button
 		fullscreen = fullscreenApi();
 
 		// Sniff 
@@ -843,7 +865,6 @@
 
 		// Debug info
 		if(config.debug) {
-			console.log(fullscreen.supportsFullScreen ? "Fullscreen supported" : "No fullscreen supported");
 			console.log(player.browserName + " " + player.browserMajorVersion);
 		}
 
