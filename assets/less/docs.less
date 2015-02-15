@@ -8,21 +8,21 @@
 @import "lib/mixins.less";
 
 @font-face {
-  font-family: "Avenir";
-  src: 	url("../../assets/fonts/AvenirLTStd-Medium.woff2") format("woff2"), 
-  		url("../../assets/fonts/AvenirLTStd-Medium.woff") format("woff"), 
-       	url("../../assets/fonts/AvenirLTStd-Medium.ttf")  format("truetype");
-  font-style:   normal;
-  font-weight:  400;
+	font-family: "Avenir";
+	src: 	url("../../assets/fonts/AvenirLTStd-Medium.woff2") format("woff2"), 
+			url("../../assets/fonts/AvenirLTStd-Medium.woff") format("woff"), 
+			url("../../assets/fonts/AvenirLTStd-Medium.ttf")  format("truetype");
+	font-style:   normal;
+	font-weight:  400;
 }
 
 @font-face {
-  font-family: "Avenir";
-  src: 	url("../../assets/fonts/AvenirLTStd-Heavy.woff2") format("woff2"), 
-  		url("../../assets/fonts/AvenirLTStd-Heavy.woff") format("woff"), 
-       	url("../../assets/fonts/AvenirLTStd-Heavy.ttf")  format("truetype");
-  font-style:   normal;
-  font-weight:  600;
+	font-family: "Avenir";
+	src: 	url("../../assets/fonts/AvenirLTStd-Heavy.woff2") format("woff2"), 
+			url("../../assets/fonts/AvenirLTStd-Heavy.woff") format("woff"), 
+			url("../../assets/fonts/AvenirLTStd-Heavy.ttf")  format("truetype");
+	font-style:   normal;
+	font-weight:  600;
 }
 
 // BORDER-BOX ALL THE THINGS! 
@@ -38,9 +38,7 @@ body {
 	.font-size(18);
 	color: #6D797F;
 	line-height: 1.5;
-	background: #ECF0F1;
-	max-width: 960px;
-	margin: 40px auto;
+	background: #fff;
 	text-align: center;
 }
 h1 {
@@ -56,5 +54,20 @@ p {
 	margin: 0 0 20px;
 }
 header {
-	margin-bottom: 40px;
+	margin: 40px 0;
+}
+
+.example-audio .player,
+.example-video .player {
+	margin: 0 auto;
+
+	&:fullscreen {
+		max-width: none;
+	}
+}
+.example-audio .player {
+	max-width: 480px;
+}
+.example-video .player {
+	max-width: 1200px;
 }

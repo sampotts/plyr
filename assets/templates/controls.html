@@ -2,8 +2,7 @@
 	<progress class="player-progress" max="100" value="0">
 		<span>0</span>% played
 	</progress>
-
-	<div class="player-controls-playback">
+	<span class="player-controls-playback">
 		<button data-player="restart">
 			<svg><use xlink:href="#icon-refresh"></use></svg>
 			<span class="sr-only">Restart</span>
@@ -28,9 +27,8 @@
 			<span class="sr-only">Time</span>
 			<span class="player-duration">00:00</span>
 		</span>
-	</div>
-
-	<div class="player-controls-sound">
+	</span>
+	<span class="player-controls-sound">
 		<input class="inverted sr-only" id="mute{id}" type="checkbox" data-player="mute">
 		<label id="mute{id}" for="mute{id}">
 			<svg class="icon-muted"><use xlink:href="#icon-muted"></use></svg>
@@ -52,5 +50,5 @@
 			<svg><use xlink:href="#icon-expand"></use></svg>
 			<span class="sr-only">Toggle fullscreen</span>
 		</button>
-	</div>
+	</span>
 </div>

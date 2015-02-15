@@ -89,6 +89,7 @@
 .player {
 	position: relative;
 	max-width: 100%;
+	min-width: 290px;
 	overflow: hidden; // For the controls
 	background: #000;
 
@@ -141,11 +142,18 @@
 		line-height: 1;
 
 		// Layout
-		&-playback {
-			float: left;
-		}
 		&-sound {
-			float: right;
+			display: inline-block;
+			margin-top: @control-spacing;
+		}
+		@media (min-width: 560px) {
+			&-playback {
+				float: left;
+			}
+			&-sound {
+				float: right;
+				margin-top: 0;
+			}
 		}
 		
 		input + label, 
@@ -327,15 +335,25 @@
 
 	// Full screen mode
 	&:fullscreen {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
 		height: 100%;
 		width: 100%;
 
 		.player-video {
-			position: absolute;
-			top: 50%;
-			left: 0;
-			right: 0;
-			transform: translateY(-50%);
+			height: 100%;
+			width: 100%;
+
+			video {
+				height: 100%;
+			}
+			.player-captions {
+				top: auto;
+				bottom: 80px;
+			}
 		}
 		.player-controls {
 			position: absolute;

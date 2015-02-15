@@ -65,8 +65,8 @@
 		}
 	};
 
+	// Credits: http://paypal.github.io/accessible-html5-video-player/
 	// Unfortunately, due to scattered support, browser sniffing is required
-	// http://paypal.github.io/accessible-html5-video-player/
 	function browserSniff() {
 		var nAgt = navigator.userAgent,
 			browserName = navigator.appName,
@@ -128,9 +128,7 @@
 		// Return data
 		return [browserName, majorVersion];
 	}
-
 	// Utilities for caption time codes
-	// http://paypal.github.io/accessible-html5-video-player/
 	function video_timecode_min(tc) {
 		var tcpair = [];
 		tcpair = tc.split(" --> ");
@@ -224,9 +222,7 @@
 			y: e.clientY - parentPosition.y
 		};
 	}
-
 	// Get element position
-	// http://www.kirupa.com/html5/getting_mouse_click_position.htm
 	function getPosition(element) {
 		var xPosition = 0;
 		var yPosition = 0;
@@ -642,7 +638,9 @@
 
 				// If Safari 7, removing track from DOM [see "turn off native caption rendering" above]
 				if (player.browserName === "Safari" && player.browserMajorVersion === 7) {
-					console.log("Safari 7 detected; removing track from DOM");
+					if (config.debug) {
+						console.log("Safari 7 detected; removing track from DOM");
+					}
 					tracks = player.media.getElementsByTagName("track");
 					player.media.removeChild(tracks[0]);
 				}
@@ -659,11 +657,23 @@
 
 	// Setup fullscreen
 	function setupFullscreen() {
-		console.log(fullscreen.supportsFullScreen ? "Fullscreen supported" : "No fullscreen supported");
+		if(player.type === "video" && config.fullscreen.enabled) {
+			
+			if(config.debug) {
+				console.log(fullscreen.supportsFullScreen ? "Fullscreen supported" : "No fullscreen supported");
+			}
+			if(fullscreen.supportsFullScreen) {
+				if(config.debug) {
+					console.log("Fullscreen enabled");
+				}
 
-		if(config.fullscreen.enabled && fullscreen.supportsFullScreen) {
-			player.container.className += " " + config.classes.fullscreen.enabled;
+				player.container.className += " " + config.classes.fullscreen.enabled;
+			}
+			else if(config.debug) {
+				console.warn("Fullscreen not supported");
+			}
 		}
+		
 	}
 
 	// Listen for events
@@ -904,7 +914,7 @@
 		}
 		setupPlayer(element);
 
-		//now we execute callbacks registered to shout
+		// Trigger the setup event
 		executeHandlers("setup");
 	}
 

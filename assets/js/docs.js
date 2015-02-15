@@ -6,12 +6,12 @@
 
 // Register a callback
 simpleMedia.on("setup", function() {
-	console.log(this);
+	//console.log(this);
 });
 
 //execute shout
 simpleMedia.setup({
-	debug: 	true,
-	title: 	"PayPal demo",
+	//debug: 	true,
+	title: 	"Video demo",
 	html: 	templates.controls.render({})
 });
