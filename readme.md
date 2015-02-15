@@ -14,3 +14,5 @@
 - [http://www.hongkiat.com/blog/html5-progress-bar/](http://www.hongkiat.com/blog/html5-progress-bar/)
 - [http://codereview.stackexchange.com/questions/21105/pattern-for-creating-a-globally-accessible-custom-plugin](http://codereview.stackexchange.com/questions/21105/pattern-for-creating-a-globally-accessible-custom-plugin)
 - [https://scotch.io/tutorials/building-your-own-javascript-modal-plugin](https://scotch.io/tutorials/building-your-own-javascript-modal-plugin)
+- [http://stackoverflow.com/questions/13606188/writing-a-library-what-structure](http://stackoverflow.com/questions/13606188/writing-a-library-what-structure)
+- [http://code.tutsplus.com/tutorials/build-your-first-javascript-library--net-26796](http://code.tutsplus.com/tutorials/build-your-first-javascript-library--net-26796)
