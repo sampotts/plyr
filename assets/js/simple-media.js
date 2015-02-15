@@ -34,7 +34,7 @@
 				play: 			"[data-player='play']",
 				pause: 			"[data-player='pause']",
 				restart: 		"[data-player='restart']",
-				rewind: 		"[data-player='restart']",
+				rewind: 		"[data-player='rewind']",
 				forward: 		"[data-player='fast-forward']",
 				mute: 			"[data-player='mute']",
 				volume: 		"[data-player='volume']",
