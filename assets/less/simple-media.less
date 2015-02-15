@@ -123,10 +123,14 @@
 		padding: 20px;
 		min-height: 2.5em;
 		color: #fff;
-		font-size: 24px;
+		font-size: 16px;
 		text-shadow: 0 1px 1px rgba(0,0,0, .75);
 		text-align: center;
 		.font-smoothing();
+
+		@media (min-width: 560px) {
+			font-size: 24px;
+		}
 	}
 	&.captions-active &-captions {
 		display: block;
@@ -352,8 +356,17 @@
 			}
 			.player-captions {
 				top: auto;
-				bottom: 80px;
+				bottom: 90px;
+
+				@media (min-width: 560px) and (max-width: 767px) {
+					bottom: 60px;
+				}
+
+				@media (min-width: 768px) {
+					bottom: 80px;
+				}
 			}
+
 		}
 		.player-controls {
 			position: absolute;
@@ -391,8 +404,6 @@
 	.video-controls .player-volume {
 		position: relative;
 		padding: 0;
-		//height: 8px;
-		//top: -3px;
 	}
 	.player-time {
 		margin-top: 4px;

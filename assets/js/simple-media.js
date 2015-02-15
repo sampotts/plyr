@@ -22,6 +22,7 @@
 
 	// Default config
 	var defaults = {
+		enabled: 				true, // /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent)
 		debug: 					false,
 		seekInterval: 			10,
 		volume: 				5,
@@ -866,6 +867,11 @@
 		// Extend the default options with user specified
 		config = extend(defaults, options);
 
+		// If enabled carry on
+		if(!config.enabled) {
+			return false;
+		}
+
 		// Setup the fullscreen api 
 		fullscreen = fullscreenApi();
 
@@ -882,15 +888,6 @@
 		// If IE8, stop customization (use fallback)
 		// If IE9, stop customization (use native controls)
 		if (player.browserName === "IE" && (player.browserMajorVersion === 8 || player.browserMajorVersion === 9) ) {
-			if(config.debug) {
-				console.error("Browser not suppported.");
-			}
-			return false;
-		}
-
-		// If smartphone or tablet, stop customization as video (and captions in latest devices) are handled natively
-		player.isSmartphoneOrTablet = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent);
-		if (player.isSmartphoneOrTablet) {
 			if(config.debug) {
 				console.error("Browser not suppported.");
 			}
