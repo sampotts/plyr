@@ -24,9 +24,9 @@
 	var defaults = {
 		debug: 					false,
 		seekInterval: 			10,
+		volume: 				5,
 		selectors: {
 			container: 			".player",
-			videoContainer:		".player-video",
 			controls: 			".player-controls",
 			buttons: {
 				play: 			"[data-player='play']",
@@ -45,6 +45,7 @@
 			seekTime: 			".player-seek-time"
 		},
 		classes: {
+			videoContainer:		"player-video",
 			stopped: 			"stopped",
 			playing: 			"playing",
 			muted: 				"muted",
@@ -168,6 +169,38 @@
 	// Replace all
 	function replaceAll(string, find, replace) {
 		return string.replace(new RegExp(find.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1"), "g"), replace);
+	}
+
+	// Wrap an element
+	function wrap(elements, wrapper) {
+	    // Convert `elms` to an array, if necessary.
+	    if (!elements.length) {
+	    	elements = [elements];
+	    } 
+	    
+	    // Loops backwards to prevent having to clone the wrapper on the
+	    // first element (see `child` below).
+	    for (var i = elements.length - 1; i >= 0; i--) {
+	        var child = (i > 0) ? wrapper.cloneNode(true) : wrapper;
+	        var el    = elements[i];
+	        
+	        // Cache the current parent and sibling.
+	        var parent  = el.parentNode;
+	        var sibling = el.nextSibling;
+	        
+	        // Wrap the element (is automatically removed from its current
+	        // parent).
+	        child.appendChild(el);
+	        
+	        // If the element had a sibling, insert the wrapper before
+	        // the sibling to maintain the HTML structure; otherwise, just
+	        // append it to the parent.
+	        if (sibling) {
+	            parent.insertBefore(child, sibling);
+	        } else {
+	            parent.appendChild(child);
+	        }
+	    }
 	}
 
 	// Get click position relative to parent
@@ -336,7 +369,6 @@
 		player.buttons.rewind 		= getElement(config.selectors.buttons.rewind);
 		player.buttons.forward 		= getElement(config.selectors.buttons.forward);
 		player.buttons.mute 		= getElement(config.selectors.buttons.mute);
-		player.buttons.volume 		= getElement(config.selectors.buttons.volume);
 		player.buttons.captions		= getElement(config.selectors.buttons.captions);
 		player.buttons.fullscreen 	= getElement(config.selectors.buttons.fullscreen);
 
@@ -344,6 +376,9 @@
 		player.progress = {};
 		player.progress.bar			= getElement(config.selectors.progress);
 		player.progress.text 		= player.progress.bar.getElementsByTagName("span")[0];
+
+		// Volume
+		player.volume 				= getElement(config.selectors.buttons.volume);
 
 		// Timing
 		player.duration 			= getElement(config.selectors.duration);
@@ -376,13 +411,30 @@
 		play();
 	}
 
+	// Set volume
+	function setVolume() {
+		player.volume.value = config.volume;
+		player.media.volume = parseFloat(config.volume / 10);
+		checkMute();
+	}
+
+	// Check mute state
+	function checkMute() {
+		if(player.media.volume === 0 || player.media.muted) {
+			player.container.className += " " + config.classes.muted;
+		}
+		else {
+			player.container.className = player.container.className.replace(config.classes.muted, "");
+		}
+	}
+
 	// Setup media
 	function setupMedia() {
 		player.media = player.container.querySelectorAll("audio, video")[0];
 
 		// If there's no media, bail
 		if(!player.media) {
-			console.warn("No audio or video element found!");
+			console.error("No audio or video element found!");
 			return false;
 		}
 
@@ -396,11 +448,24 @@
 
 		// Set type
 		player.type = (player.media.tagName.toLowerCase() == "video" ? "video" : "audio");
+
+		// Inject the player wrapper
+		if(player.type === "video") {
+			// Create the wrapper div
+			var wrapper = document.createElement("div");
+			wrapper.setAttribute("class", config.classes.videoContainer);
+
+			// Wrap the video in a container
+			wrap(player.media, wrapper);
+
+			// Cache the container
+			player.videoContainer = wrapper;
+		}
 	}
 
 	// Setup captions
 	function setupCaptions() {
-		if(player.type == "video") {
+		if(player.type === "video") {
 			// Inject the container
 			player.videoContainer.insertAdjacentHTML("afterbegin", "<div class='" + config.selectors.captions.replace(".", "") + "'></div>");
 
@@ -583,7 +648,6 @@
 
 	// Listen for events
 	function listeners() {
-
 		// Fullscreen
 		player.buttons.fullscreen.addEventListener("click", function() {
 			if(!fullscreen.isFullScreen()) {
@@ -595,17 +659,19 @@
 		}, false);
 
 		// Click video
-		player.videoContainer.addEventListener("click", function() {
-			if(player.media.paused) {
-				play();
-			}
-			else if(player.media.ended) {
-				restart();
-			}
-			else {
-				pause();
-			}
-		}, false);
+		if(player.type === "video") {
+			player.videoContainer.addEventListener("click", function() {
+				if(player.media.paused) {
+					play();
+				}
+				else if(player.media.ended) {
+					restart();
+				}
+				else {
+					pause();
+				}
+			}, false);
+		}
 
 		// Play
 		player.buttons.play.addEventListener("click", function() { 
@@ -633,7 +699,7 @@
 				player.media.currentTime = targetTime;
 			}
 			// Special handling for "manual" captions
-			if (!player.isTextTracks) {
+			if (!player.isTextTracks && player.type === "video") {
 				adjustManualCaptions(player);
 			}
 		}, false);
@@ -649,26 +715,26 @@
 				player.media.currentTime = targetTime;
 			}
 			// Special handling for "manual" captions
-			if (!player.isTextTracks) {
+			if (!player.isTextTracks && player.type === "video") {
 				adjustManualCaptions(player);
 			}
 		}, false);
 
 		// Get the HTML5 range input element and append audio volume adjustment on change
-		player.buttons.volume.addEventListener("change", function() {
-			player.media.volume = parseFloat(this.value / 10);
+		player.volume.addEventListener("change", function() {
+			config.volume = this.value;
+			setVolume();
 		}, false);
 
 		// Mute
 		player.buttons.mute.addEventListener("click", function() {
 			if (player.media.muted === true) {
 				player.media.muted = false;
-				player.container.className = player.container.className.replace(config.classes.muted, "");
 			}
 			else {
 				player.media.muted = true;
-				player.container.className += " " + config.classes.muted;
 			}
+			checkMute();
 		}, false);
 		
 		// Duration
@@ -700,7 +766,7 @@
 			player.media.currentTime = player.pos * player.media.duration;
 			
 			// Special handling for "manual" captions
-			if (!player.isTextTracks) {
+			if (!player.isTextTracks && player.type === "video") {
 				adjustManualCaptions(player);
 			}
 		});
@@ -717,7 +783,9 @@
 
 		// Clear captions at end of video
 		player.media.addEventListener("ended", function() {
-			player.captionsContainer.innerHTML = "";
+			if(player.type === "video") {
+				player.captionsContainer.innerHTML = "";
+			}
 			player.container.className = player.container.className.replace(config.classes.playing, config.classes.stopped);
 		});
 	}
@@ -732,8 +800,7 @@
 	}
 
 	function setupPlayer(element) {
-		player.container 		= element;
-		player.videoContainer 	= getElement(config.selectors.videoContainer);
+		player.container = element;
 		
 		// Setup media
 		setupMedia();
@@ -746,6 +813,9 @@
 
 		// Find the elements
 		findElements();
+
+		// Set volume
+		setVolume();
 
 		// Captions
 		setupCaptions();
@@ -773,22 +843,25 @@
 
 		// Debug info
 		if(config.debug) {
-			console.log(config);
-			console.log("fullscreen support: " + fullscreen.supportsFullScreen);
+			console.log(fullscreen.supportsFullScreen ? "Fullscreen supported" : "No fullscreen supported");
 			console.log(player.browserName + " " + player.browserMajorVersion);
 		}
 
 		// If IE8, stop customization (use fallback)
 		// If IE9, stop customization (use native controls)
 		if (player.browserName === "IE" && (player.browserMajorVersion === 8 || player.browserMajorVersion === 9) ) {
-			console.warn("Browser not suppported.");
+			if(config.debug) {
+				console.error("Browser not suppported.");
+			}
 			return false;
 		}
 
 		// If smartphone or tablet, stop customization as video (and captions in latest devices) are handled natively
 		player.isSmartphoneOrTablet = /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent);
 		if (player.isSmartphoneOrTablet) {
-			console.warn("Browser not suppported.");
+			if(config.debug) {
+				console.error("Browser not suppported.");
+			}
 			return false;
 		}
 
@@ -801,25 +874,17 @@
 		}
 
 		// Get the container and video container
-		var elements = document.querySelectorAll(config.selectors.container);
-		for (var i = elements.length - 1; i >= 0; i--) {
-			setupPlayer(elements[i]);
+		var element = document.querySelector(config.selectors.container);
+		if(element === null) {
+			if(config.debug) {
+				console.error("Selector " + config.selectors.container + " not found!");
+			}
+			return false;
 		}
+		setupPlayer(element);
 
 		//now we execute callbacks registered to shout
 		executeHandlers("setup");
 	}
 
 }(this.simpleMedia = this.simpleMedia || {}));
-
-/*function InitPxVideo(options) {
-
-	"use strict";
-
-
-	// ***
-	// Captions
-	// ***
-
-
-}*/

@@ -21,14 +21,7 @@
 @progress-bg: 				@gray;
 @progress-value-bg: 		@blue;
 
-// BORDER-BOX ALL THE THINGS! (http://paulirish.com/2012/box-sizing-border-box-ftw/)
-// -------------------------------
-.player,
-.player *,
-.player *::after,
-.player *::before { 
-	box-sizing: border-box; 
-}
+
 
 // Utility classes & mixins
 // -------------------------------
@@ -76,6 +69,14 @@
 	overflow: hidden; // For the controls
 	background: #000;
 
+	// BORDER-BOX ALL THE THINGS! 
+	// http://paulirish.com/2012/box-sizing-border-box-ftw/
+	&,
+	*,
+	*::after,
+	*::before { 
+		box-sizing: border-box; 
+	}
 
 	// For video
 	&-video {
@@ -270,7 +271,7 @@
 		}
 		&:focus {
 			outline: 0;
-			
+
 			&::-webkit-slider-thumb {
 				background: @control-color-active;
 			}
@@ -309,7 +310,7 @@
 	}
 }
 
-/* fixing display for IE10+ */
+// Fixing display for IE10+
 @media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
 	.video-controls .player-volume {
 		position: relative;

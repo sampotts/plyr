@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+		<meta charset="utf-8" />
+		<title>Simple Media</title>
+		<meta name="description" content="Custom HTML5 video controls and WebVTT captions.">
+		<meta name="author" content="Sam Potts">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<!-- Styles -->
+		<link rel="stylesheet" href="../dist/css/simple-media.css">
+		<link rel="stylesheet" href="../dist/css/docs.css">
+	</head>
+	<body class="container">
+		<header>
+			<h1>Simple Media</h1>
+			<p>A simple HTML5 media player</p>
+		</header>
+
+		<div class="player">
+			<audio controls>
+				<!-- Audio files -->
+				<source src="../media/Covox_-_Switchblade_Squadron.mp3" type="audio/mp3">
+				
+				<!-- Fallback for browsers that don't support the <audio> element -->
+				<div>
+					<a href="../media/Covox_-_Switchblade_Squadron.mp3">Download it</a>
+				</div>
+			</video>
+		</div>
+
+		<!-- Load SVG defs -->
+		<script>(function(d,p){var a=new XMLHttpRequest(),b=d.body; a.open("GET",p,!0);a.send();a.onload=function(){var c=d.createElement("div");c.style.display="none";c.innerHTML=a.responseText;b.insertBefore(c,b.childNodes[0])}})(document,"../dist/svg/sprite.svg");</script>
+
+		<!-- Core player -->
+		<script src="../dist/js/simple-media.js"></script>
+
+		<!-- Docs setup -->
+		<script src="../dist/js/docs.js"></script>
+	</body>
+</html>
