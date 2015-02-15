@@ -216,16 +216,16 @@
 
 	// Get click position relative to parent
 	// http://www.kirupa.com/html5/getting_mouse_click_position.htm
-	function getClickPosition(e) {
-		var parentPosition = fullscreen.isFullScreen() ? { x: 0, y: 0 } : getPosition(e.currentTarget);
+	function _getClickPosition(event) {
+		var parentPosition = _fullscreen().isFullScreen() ? { x: 0, y: 0 } : _getPosition(event.currentTarget);
 
 		return {
-			x: e.clientX - parentPosition.x,
-			y: e.clientY - parentPosition.y
+			x: event.clientX - parentPosition.x,
+			y: event.clientY - parentPosition.y
 		};
 	}
 	// Get element position
-	function getPosition(element) {
+	function _getPosition(element) {
 		var xPosition = 0;
 		var yPosition = 0;
 
@@ -244,11 +244,11 @@
 	// Deep extend/merge two Objects
 	// http://andrewdupont.net/2009/08/28/deep-extending-objects-in-javascript/
 	// Removed call to arguments.callee (used explicit function name instead)
-    function extend(destination, source) {
+    function _extend(destination, source) {
 		for (var property in source) {
 			if (source[property] && source[property].constructor && source[property].constructor === Object) {
 				destination[property] = destination[property] || {};
-				extend(destination[property], source[property]);
+				_extend(destination[property], source[property]);
 			} 
 			else {
 				destination[property] = source[property];
@@ -257,22 +257,8 @@
 		return destination;
 	}
 
-	// Our internal function that executes handlers with a given name
-	function executeHandlers(eventName){
-		// Get all handlers with the selected name
-		var handler = handlers[eventName] || [], 
-			len = handler.length, 
-			i;
-		
-		// Execute each
-		for(i = 0; i< len; i++){
-			// You can use apply to specify what "this" and parameters the callback gets
-			handler[i].apply(player.media,[]);
-		}
-	}
-
 	// Fullscreen API
-	function fullscreenApi() {
+	function _fullscreen() {
 		var fullscreen = {
 				supportsFullScreen: false,
 				isFullScreen: function() { return false; },
@@ -334,6 +320,21 @@
 
 		return fullscreen;
 	}
+
+	// Our internal function that executes handlers with a given name
+	function executeHandlers(eventName){
+		// Get all handlers with the selected name
+		var handler = handlers[eventName] || [], 
+			len = handler.length, 
+			i;
+		
+		// Execute each
+		for(i = 0; i< len; i++){
+			// You can use apply to specify what "this" and parameters the callback gets
+			handler[i].apply(player.media,[]);
+		}
+	}
+
 
 	// Insert controls
 	function injectControls() {
@@ -674,8 +675,7 @@
 			else if(config.debug) {
 				console.warn("Fullscreen not supported");
 			}
-		}
-		
+		}	
 	}
 
 	// Listen for events
@@ -793,8 +793,8 @@
 		}, false);
 
 		// Skip when clicking progress bar
-		player.progress.bar.addEventListener("click", function(e) {
-			player.pos = getClickPosition(e).x / this.offsetWidth;
+		player.progress.bar.addEventListener("click", function(event) {
+			player.pos = _getClickPosition(event).x / this.offsetWidth;
 			player.media.currentTime = player.pos * player.media.duration;
 			
 			// Special handling for "manual" captions
@@ -822,15 +822,6 @@
 		});
 	}
  
-	// Our "on" function which collects handlers
-	api.on = function(eventName, handler){
-		// If no handler collection exists, create one
-		if(!handlers[eventName]){
-			handlers[eventName] = [];
-		}
-		handlers[eventName].push(handler);
-	}
-
 	function setupPlayer(element) {
 		player.container = element;
 		
@@ -862,10 +853,19 @@
 		listeners();
 	}
 
+	// Our "on" function which collects handlers
+	api.on = function(eventName, handler){
+		// If no handler collection exists, create one
+		if(!handlers[eventName]){
+			handlers[eventName] = [];
+		}
+		handlers[eventName].push(handler);
+	}
+
 	// Expose setup function
 	api.setup = function(options){
 		// Extend the default options with user specified
-		config = extend(defaults, options);
+		config = _extend(defaults, options);
 
 		// If enabled carry on
 		if(!config.enabled) {
@@ -873,7 +873,7 @@
 		}
 
 		// Setup the fullscreen api 
-		fullscreen = fullscreenApi();
+		fullscreen = _fullscreen();
 
 		// Sniff 
 		player.browserInfo = browserSniff();
