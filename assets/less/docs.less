@@ -35,14 +35,14 @@ html {
 }
 body {
 	font-family: "Avenir", "Helvetica Neue", Helvetica, Arial, sans-serif;
-	.font-size(18);
-	color: #6D797F;
-	line-height: 1.5;
 	background: #fff;
+	.font-size(16);
+	line-height: 1.5;
 	text-align: center;
+	color: #6D797F;
 }
-h1 {
-	.font-size(48);
+h1,
+h2 {
 	letter-spacing: -.025em;
 	color: #2E3C44;
 	margin: 0 0 10px;
@@ -50,16 +50,27 @@ h1 {
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
+h1 {
+	.font-size(48);
+}
+h2 {
+	.font-size(32);
+	margin: 0 0 20px;
+}
 p {
 	margin: 0 0 20px;
 }
 header {
 	margin: 40px 0;
+
+	p {
+		.font-size(18);
+	}
 }
 
 .example-audio .player,
 .example-video .player {
-	margin: 0 auto;
+	margin: 0 auto 40px;
 
 	&:fullscreen {
 		max-width: none;

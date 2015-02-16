@@ -8,14 +8,11 @@
 
 /*global ActiveXObject*/
 
-(function(api){
+(function (api) {
 	"use strict";
 
 	// Globals
 	var fullscreen, config;
-
-	// Object cache
-	var player = {};
 
 	// Handler cache
 	var handlers = {};
@@ -69,7 +66,7 @@
 
 	// Credits: http://paypal.github.io/accessible-html5-video-player/
 	// Unfortunately, due to scattered support, browser sniffing is required
-	function browserSniff() {
+	function _browserSniff() {
 		var nAgt = navigator.userAgent,
 			browserName = navigator.appName,
 			fullVersion = ""+parseFloat(navigator.appVersion),
@@ -130,60 +127,14 @@
 		// Return data
 		return [browserName, majorVersion];
 	}
-	// Utilities for caption time codes
-	function video_timecode_min(tc) {
-		var tcpair = [];
-		tcpair = tc.split(" --> ");
-		return videosub_tcsecs(tcpair[0]);
-	}
-	function video_timecode_max(tc) {
-		var tcpair = [];
-		tcpair = tc.split(" --> ");
-		return videosub_tcsecs(tcpair[1]);
-	}
-	function videosub_tcsecs(tc) {
-		if (tc === null || tc === undefined) {
-			return 0;
-		}
-		else {
-			var tc1 = [],
-				tc2 = [],
-				seconds;
-			tc1 = tc.split(",");
-			tc2 = tc1[0].split(":");
-			seconds = Math.floor(tc2[0]*60*60) + Math.floor(tc2[1]*60) + Math.floor(tc2[2]);
-			return seconds;
-		}
-	}
-	// For "manual" captions, adjust caption position when play time changed (via rewind, clicking progress bar, etc.)
-	// http://paypal.github.io/accessible-html5-video-player/
-	function adjustManualCaptions(player) {
-		player.subcount = 0;
-		while (video_timecode_max(player.captions[player.subcount][0]) < player.media.currentTime.toFixed(1)) {
-			player.subcount++;
-			if (player.subcount > player.captions.length-1) {
-				player.subcount = player.captions.length-1;
-				break;
-			}
-		}
-	}
-	// Display captions container and button (for initialization)
-	function showCaptions(player) {
-		player.container.className += " " + config.classes.captions.enabled;
-
-		if (config.captions.defaultActive) {
-			player.container.className += " " + config.classes.captions.active;
-			player.buttons.captions.setAttribute("checked", "checked");
-		}
-	}
-
+	
 	// Replace all
-	function replaceAll(string, find, replace) {
+	function _replaceAll(string, find, replace) {
 		return string.replace(new RegExp(find.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1"), "g"), replace);
 	}
 
 	// Wrap an element
-	function wrap(elements, wrapper) {
+	function _wrap(elements, wrapper) {
 	    // Convert `elms` to an array, if necessary.
 	    if (!elements.length) {
 	    	elements = [elements];
@@ -212,6 +163,24 @@
 	            parent.appendChild(child);
 	        }
 	    }
+	}
+
+	// Toggle class on an element
+	function _toggleClass(element, name, state) {
+		if(element){
+			if(element.classList) {
+				element.classList[state ? "add" : "remove"](name);
+			}
+			else {
+				var className = (" " + element.className + " ").replace(/\s+/g, " ").replace(" " + name + " ", "");
+				element.className = className + (state ? " " + name : "")
+			}
+		}
+	}
+
+	// Bind event
+	function _on(element, event, callback) {
+		element.addEventListener(event, callback, false);
 	}
 
 	// Get click position relative to parent
@@ -321,407 +290,389 @@
 		return fullscreen;
 	}
 
-	// Our internal function that executes handlers with a given name
-	function executeHandlers(eventName){
-		// Get all handlers with the selected name
-		var handler = handlers[eventName] || [], 
-			len = handler.length, 
-			i;
-		
-		// Execute each
-		for(i = 0; i< len; i++){
-			// You can use apply to specify what "this" and parameters the callback gets
-			handler[i].apply(player.media,[]);
-		}
-	}
+	// Player instance
+	function Player(container) {
+		var player = this;
+		player.container = container;
 
+		// Captions functions
+		// Credits: http://paypal.github.io/accessible-html5-video-player/
 
-	// Insert controls
-	function injectControls() {
-		// Insert custom video controls
-		if (config.debug) {
-			console.log("Injecting custom controls");
-		}
-
-		// Use specified html 
-		// Need to do a default?
-		var html = config.html;
-
-		// Replace aria label instances
-		html = replaceAll(html, "{aria-label}", config.playAriaLabel);
-
-		// Replace all id references
-		html = replaceAll(html, "{id}", player.random);
-
-		// Inject into the container
-		player.container.insertAdjacentHTML("beforeend", html);
-	}
-
-	// Find all elements
-	function getElements(selector) {
-		return player.container.querySelectorAll(selector);
-	}
-
-	// Find a single element
-	function getElement(selector) {
-		return getElements(selector)[0];
-	}
-
-	// Find the UI controls and store references
-	function findElements() {
-		player.controls 			= getElement(config.selectors.controls);
-
-		// Buttons
-		player.buttons = {};
-		player.buttons.play 		= getElement(config.selectors.buttons.play);
-		player.buttons.pause 		= getElement(config.selectors.buttons.pause);
-		player.buttons.restart 		= getElement(config.selectors.buttons.restart);
-		player.buttons.rewind 		= getElement(config.selectors.buttons.rewind);
-		player.buttons.forward 		= getElement(config.selectors.buttons.forward);
-		player.buttons.mute 		= getElement(config.selectors.buttons.mute);
-		player.buttons.captions		= getElement(config.selectors.buttons.captions);
-		player.buttons.fullscreen 	= getElement(config.selectors.buttons.fullscreen);
-
-		// Progress
-		player.progress = {};
-		player.progress.bar			= getElement(config.selectors.progress);
-		player.progress.text 		= player.progress.bar.getElementsByTagName("span")[0];
-
-		// Volume
-		player.volume 				= getElement(config.selectors.buttons.volume);
-
-		// Timing
-		player.duration 			= getElement(config.selectors.duration);
-		player.seekTime 			= getElements(config.selectors.seekTime);
-	}
-
-	// Play media
-	function play() {
-		player.media.play();
-		player.container.className = player.container.className.replace(config.classes.stopped, config.classes.playing);
-	}
-
-	// Pause media
-	function pause() {
-		player.media.pause(); 
-		player.container.className = player.container.className.replace(config.classes.playing, config.classes.stopped);
-	}
-
-	// Restart playback
-	function restart() {
-		// Move to beginning
-		player.media.currentTime = 0;
-
-		// Special handling for "manual" captions
-		if (!player.isTextTracks) {
+		// For "manual" captions, adjust caption position when play time changed (via rewind, clicking progress bar, etc.)
+		function _adjustManualCaptions() {
 			player.subcount = 0;
-		}
-
-		// Play and ensure the play button is in correct state
-		play();
-	}
-
-	// Set volume
-	function setVolume() {
-		player.volume.value = config.volume;
-		player.media.volume = parseFloat(config.volume / 10);
-		checkMute();
-	}
-
-	// Check mute state
-	function checkMute() {
-		if(player.media.volume === 0 || player.media.muted) {
-			player.container.className += " " + config.classes.muted;
-		}
-		else {
-			player.container.className = player.container.className.replace(config.classes.muted, "");
-		}
-	}
-
-	// Setup media
-	function setupMedia() {
-		player.media = player.container.querySelectorAll("audio, video")[0];
-
-		// If there's no media, bail
-		if(!player.media) {
-			console.error("No audio or video element found!");
-			return false;
-		}
-
-		// If there's no autoplay attribute, assume the video is stopped
-		if(player.media.getAttribute("autoplay") === null) {
-			player.container.className += " " + config.classes.stopped;
-		}
-
-		// Remove native video controls
-		player.media.removeAttribute("controls");
-
-		// Set type
-		player.type = (player.media.tagName.toLowerCase() == "video" ? "video" : "audio");
-
-		// Inject the player wrapper
-		if(player.type === "video") {
-			// Create the wrapper div
-			var wrapper = document.createElement("div");
-			wrapper.setAttribute("class", config.classes.videoContainer);
-
-			// Wrap the video in a container
-			wrap(player.media, wrapper);
-
-			// Cache the container
-			player.videoContainer = wrapper;
-		}
-	}
-
-	// Setup captions
-	function setupCaptions() {
-		if(player.type === "video") {
-			// Inject the container
-			player.videoContainer.insertAdjacentHTML("afterbegin", "<div class='" + config.selectors.captions.replace(".", "") + "'></div>");
-
-			// Cache selector
-			player.captionsContainer = getElement(config.selectors.captions);
-
-			// Determine if HTML5 textTracks is supported
-			player.isTextTracks = false;
-			if (player.media.textTracks) {
-				player.isTextTracks = true;
-			}
-
-			// Get URL of caption file if exists
-			var captionSrc = "",
-				kind,
-				children = player.media.childNodes;
-
-			for (var i = 0; i < children.length; i++) {
-				if (children[i].nodeName.toLowerCase() === "track") {
-					kind = children[i].getAttribute("kind");
-					if (kind === "captions") {
-						captionSrc = children[i].getAttribute("src");
-					}
+			while (_timecodeMax(player.captions[player.subcount][0]) < player.media.currentTime.toFixed(1)) {
+				player.subcount++;
+				if (player.subcount > player.captions.length-1) {
+					player.subcount = player.captions.length-1;
+					break;
 				}
 			}
+		}
+		// Display captions container and button (for initialization)
+		function _showCaptions() {
+			_toggleClass(player.container, config.classes.captions.enabled, true);
 
-			// Record if caption file exists or not
-			player.captionExists = true;
-			if (captionSrc === "") {
-				player.captionExists = false;
-				if (config.debug) {
-					console.log("No caption track found.");
-				}
+			if (config.captions.defaultActive) {
+				_toggleClass(player.container, config.classes.captions.active, true);
+				player.buttons.captions.setAttribute("checked", "checked");
+			}
+		}
+		// Utilities for caption time codes
+		function _timecodeMin(tc) {
+			var tcpair = [];
+			tcpair = tc.split(" --> ");
+			return _subTcSecs(tcpair[0]);
+		}
+		function _timecodeMax(tc) {
+			var tcpair = [];
+			tcpair = tc.split(" --> ");
+			return _subTcSecs(tcpair[1]);
+		}
+		function _subTcSecs(tc) {
+			if (tc === null || tc === undefined) {
+				return 0;
 			}
 			else {
-				if (config.debug) {
-					console.log("Caption track found; URI: " + captionSrc);
-				}
+				var tc1 = [],
+					tc2 = [],
+					seconds;
+				tc1 = tc.split(",");
+				tc2 = tc1[0].split(":");
+				seconds = Math.floor(tc2[0]*60*60) + Math.floor(tc2[1]*60) + Math.floor(tc2[2]);
+				return seconds;
+			}
+		}
+
+		// Find all elements
+		function _getElements(selector) {
+			return player.container.querySelectorAll(selector);
+		}
+
+		// Find a single element
+		function _getElement(selector) {
+			return _getElements(selector)[0];
+		}
+
+		// Insert controls
+		function _injectControls() {
+			// Insert custom video controls
+			if (config.debug) {
+				console.log("Injecting custom controls");
 			}
 
-			// If no caption file exists, hide container for caption text
-			if (!player.captionExists) {
-				player.container.className = player.container.className.replace(config.classes.captions.enabled, "");
+			// Use specified html 
+			// Need to do a default?
+			var html = config.html;
+
+			// Replace aria label instances
+			html = _replaceAll(html, "{aria-label}", config.playAriaLabel);
+
+			// Replace all id references
+			html = _replaceAll(html, "{id}", player.random);
+
+			// Inject into the container
+			player.container.insertAdjacentHTML("beforeend", html);
+		}
+
+		// Find the UI controls and store references
+		function _findElements() {
+			player.controls 			= _getElement(config.selectors.controls);
+
+			// Buttons
+			player.buttons = {};
+			player.buttons.play 		= _getElement(config.selectors.buttons.play);
+			player.buttons.pause 		= _getElement(config.selectors.buttons.pause);
+			player.buttons.restart 		= _getElement(config.selectors.buttons.restart);
+			player.buttons.rewind 		= _getElement(config.selectors.buttons.rewind);
+			player.buttons.forward 		= _getElement(config.selectors.buttons.forward);
+			player.buttons.mute 		= _getElement(config.selectors.buttons.mute);
+			player.buttons.captions		= _getElement(config.selectors.buttons.captions);
+			player.buttons.fullscreen 	= _getElement(config.selectors.buttons.fullscreen);
+
+			// Progress
+			player.progress = {};
+			player.progress.bar			= _getElement(config.selectors.progress);
+			player.progress.text 		= player.progress.bar.getElementsByTagName("span")[0];
+
+			// Volume
+			player.volume 				= _getElement(config.selectors.buttons.volume);
+
+			// Timing
+			player.duration 			= _getElement(config.selectors.duration);
+			player.seekTime 			= _getElements(config.selectors.seekTime);
+		}
+
+		// Setup media
+		function _setupMedia() {
+			player.media = player.container.querySelectorAll("audio, video")[0];
+
+			// If there's no media, bail
+			if(!player.media) {
+				console.error("No audio or video element found!");
+				return false;
 			}
 
-			// If caption file exists, process captions
-			else {
-				var track = {}, tracks, j;
+			// If there's no autoplay attribute, assume the video is stopped
+			_toggleClass(player.container, config.classes.stopped, (player.media.getAttribute("autoplay") === null));
 
-				// If IE 10/11 or Firefox 31+ or Safari 7+, don"t use native captioning (still doesn"t work although they claim it"s now supported)
-				if ((player.browserName === "IE" && player.browserMajorVersion === 10) || 
-						(player.browserName === "IE" && player.browserMajorVersion === 11) || 
-						(player.browserName === "Firefox" && player.browserMajorVersion >= 31) || 
-						(player.browserName === "Safari" && player.browserMajorVersion >= 7)) {
-					if (config.debug) {
-						console.log("Detected IE 10/11 or Firefox 31+ or Safari 7+");
-					}
-					// set to false so skips to "manual" captioning
-					player.isTextTracks = false;
-					
-					// turn off native caption rendering to avoid double captions [doesn"t work in Safari 7; see patch below]
-					track = {};
-					tracks = player.media.textTracks;
-					for (j=0; j < tracks.length; j++) {
-						track = player.media.textTracks[j];
-						track.mode = "hidden";
-					}
+			// Remove native video controls
+			player.media.removeAttribute("controls");
+
+			// Set type
+			player.type = (player.media.tagName.toLowerCase() == "video" ? "video" : "audio");
+
+			// Inject the player wrapper
+			if(player.type === "video") {
+				// Create the wrapper div
+				var wrapper = document.createElement("div");
+				wrapper.setAttribute("class", config.classes.videoContainer);
+
+				// Wrap the video in a container
+				_wrap(player.media, wrapper);
+
+				// Cache the container
+				player.videoContainer = wrapper;
+			}
+		}
+
+		// Setup captions
+		function _setupCaptions() {
+			if(player.type === "video") {
+				// Inject the container
+				player.videoContainer.insertAdjacentHTML("afterbegin", "<div class='" + config.selectors.captions.replace(".", "") + "'></div>");
+
+				// Cache selector
+				player.captionsContainer = _getElement(config.selectors.captions);
+
+				// Determine if HTML5 textTracks is supported
+				player.isTextTracks = false;
+				if (player.media.textTracks) {
+					player.isTextTracks = true;
 				}
 
-				// Rendering caption tracks - native support required - http://caniuse.com/webvtt
-				if (player.isTextTracks) {
-					if (config.debug) {
-						console.log("textTracks supported");
-					}
-					showCaptions(player);
+				// Get URL of caption file if exists
+				var captionSrc = "",
+					kind,
+					children = player.media.childNodes;
 
-					track = {};
-					tracks = player.media.textTracks;
-					for (j=0; j < tracks.length; j++) {
-						track = player.media.textTracks[j];
-						track.mode = "hidden";
-						if (track.kind === "captions") {
-							track.addEventListener("cuechange",function() {
-								if (this.activeCues[0]) {
-									if (this.activeCues[0].hasOwnProperty("text")) {
-										player.captionsContainer.innerHTML = this.activeCues[0].text;
-									}
-								}
-							},false);
+				for (var i = 0; i < children.length; i++) {
+					if (children[i].nodeName.toLowerCase() === "track") {
+						kind = children[i].getAttribute("kind");
+						if (kind === "captions") {
+							captionSrc = children[i].getAttribute("src");
 						}
 					}
 				}
-				// Caption tracks not natively supported
+
+				// Record if caption file exists or not
+				player.captionExists = true;
+				if (captionSrc === "") {
+					player.captionExists = false;
+					if (config.debug) {
+						console.log("No caption track found.");
+					}
+				}
 				else {
 					if (config.debug) {
-						console.log("textTracks not supported so rendering captions manually");
+						console.log("Caption track found; URI: " + captionSrc);
 					}
-					showCaptions(player);
+				}
 
-					// Render captions from array at appropriate time
-					player.currentCaption = "";
-					player.subcount = 0;
-					player.captions = [];
+				// If no caption file exists, hide container for caption text
+				if (!player.captionExists) {
+					_toggleClass(player.container, config.classes.captions.enabled);
+				}
+				// If caption file exists, process captions
+				else {
+					var track = {}, tracks, j;
 
-					player.media.addEventListener("timeupdate", function() {
-						// Check if the next caption is in the current time range
-						if (player.media.currentTime.toFixed(1) > video_timecode_min(player.captions[player.subcount][0]) && 
-							player.media.currentTime.toFixed(1) < video_timecode_max(player.captions[player.subcount][0])) {
-								player.currentCaption = player.captions[player.subcount][1];
+					// If IE 10/11 or Firefox 31+ or Safari 7+, don"t use native captioning (still doesn"t work although they claim it"s now supported)
+					if ((player.browserName === "IE" && player.browserMajorVersion === 10) || 
+							(player.browserName === "IE" && player.browserMajorVersion === 11) || 
+							(player.browserName === "Firefox" && player.browserMajorVersion >= 31) || 
+							(player.browserName === "Safari" && player.browserMajorVersion >= 7)) {
+						if (config.debug) {
+							console.log("Detected IE 10/11 or Firefox 31+ or Safari 7+");
 						}
-						// Is there a next timecode?
-						if (player.media.currentTime.toFixed(1) > video_timecode_max(player.captions[player.subcount][0]) && 
-							player.subcount < (player.captions.length-1)) {
-								player.subcount++;
+						// set to false so skips to "manual" captioning
+						player.isTextTracks = false;
+						
+						// turn off native caption rendering to avoid double captions [doesn"t work in Safari 7; see patch below]
+						track = {};
+						tracks = player.media.textTracks;
+						for (j=0; j < tracks.length; j++) {
+							track = player.media.textTracks[j];
+							track.mode = "hidden";
 						}
-						// Render the caption
-						player.captionsContainer.innerHTML = player.currentCaption;
-					}, false);
+					}
 
-					if (captionSrc !== "") {
-						// Create XMLHttpRequest Object
-						var xhr;
-						if (window.XMLHttpRequest) {
-							xhr = new XMLHttpRequest();
-						} 
-						else if (window.ActiveXObject) { // IE8
-							xhr = new ActiveXObject("Microsoft.XMLHTTP");
+					// Rendering caption tracks - native support required - http://caniuse.com/webvtt
+					if (player.isTextTracks) {
+						if (config.debug) {
+							console.log("textTracks supported");
 						}
-						xhr.onreadystatechange = function() {
-							if (xhr.readyState === 4) {
-								if (xhr.status === 200) {
-									if (config.debug) {
-										console.log("xhr = 200");
-									}
-									
-									player.captions = [];
-									var records = [], 
-										record,
-										req = xhr.responseText;
-									records = req.split("\n\n");
-									for (var r=0; r < records.length; r++) {
-										record = records[r];
-										player.captions[r] = [];
-										player.captions[r] = record.split("\n");
-									}
-									// Remove first element ("VTT")
-									player.captions.shift();
+						_showCaptions(player);
 
-									if (config.debug) {
-										console.log("Successfully loaded the caption file via ajax.");
+						track = {};
+						tracks = player.media.textTracks;
+						for (j=0; j < tracks.length; j++) {
+							track = player.media.textTracks[j];
+							track.mode = "hidden";
+							if (track.kind === "captions") {
+								_on(track, "cuechange",function() {
+									if (this.activeCues[0]) {
+										if (this.activeCues[0].hasOwnProperty("text")) {
+											player.captionsContainer.innerHTML = this.activeCues[0].text;
+										}
 									}
-								} else {
-									if (config.debug) {
-										console.log("There was a problem loading the caption file via ajax.");
+								});
+							}
+						}
+					}
+					// Caption tracks not natively supported
+					else {
+						if (config.debug) {
+							console.log("textTracks not supported so rendering captions manually");
+						}
+						_showCaptions(player);
+
+						// Render captions from array at appropriate time
+						player.currentCaption = "";
+						player.subcount = 0;
+						player.captions = [];
+
+						_on(player.media, "timeupdate", function() {
+							// Check if the next caption is in the current time range
+							if (player.media.currentTime.toFixed(1) > _timecodeMin(player.captions[player.subcount][0]) && 
+								player.media.currentTime.toFixed(1) < _timecodeMax(player.captions[player.subcount][0])) {
+									player.currentCaption = player.captions[player.subcount][1];
+							}
+							// Is there a next timecode?
+							if (player.media.currentTime.toFixed(1) > _timecodeMax(player.captions[player.subcount][0]) && 
+								player.subcount < (player.captions.length-1)) {
+									player.subcount++;
+							}
+							// Render the caption
+							player.captionsContainer.innerHTML = player.currentCaption;
+						});
+
+						if (captionSrc !== "") {
+							// Create XMLHttpRequest Object
+							var xhr;
+							if (window.XMLHttpRequest) {
+								xhr = new XMLHttpRequest();
+							} 
+							else if (window.ActiveXObject) { // IE8
+								xhr = new ActiveXObject("Microsoft.XMLHTTP");
+							}
+							xhr.onreadystatechange = function() {
+								if (xhr.readyState === 4) {
+									if (xhr.status === 200) {
+										if (config.debug) {
+											console.log("xhr = 200");
+										}
+										
+										player.captions = [];
+										var records = [], 
+											record,
+											req = xhr.responseText;
+										records = req.split("\n\n");
+										for (var r=0; r < records.length; r++) {
+											record = records[r];
+											player.captions[r] = [];
+											player.captions[r] = record.split("\n");
+										}
+										// Remove first element ("VTT")
+										player.captions.shift();
+
+										if (config.debug) {
+											console.log("Successfully loaded the caption file via ajax.");
+										}
+									} 
+									else {
+										if (config.debug) {
+											console.log("There was a problem loading the caption file via ajax.");
+										}
 									}
 								}
 							}
+							xhr.open("get", captionSrc, true);
+							xhr.send();
 						}
-						xhr.open("get", captionSrc, true);
-						xhr.send();
 					}
-				}
 
-				// If Safari 7, removing track from DOM [see "turn off native caption rendering" above]
-				if (player.browserName === "Safari" && player.browserMajorVersion === 7) {
-					if (config.debug) {
-						console.log("Safari 7 detected; removing track from DOM");
+					// If Safari 7, removing track from DOM [see "turn off native caption rendering" above]
+					if (player.browserName === "Safari" && player.browserMajorVersion === 7) {
+						if (config.debug) {
+							console.log("Safari 7 detected; removing track from DOM");
+						}
+						tracks = player.media.getElementsByTagName("track");
+						player.media.removeChild(tracks[0]);
 					}
-					tracks = player.media.getElementsByTagName("track");
-					player.media.removeChild(tracks[0]);
 				}
 			}
 		}
-	}
 
-	// Setup seeking
-	function setupSeeking() {
-		// Update number of seconds in rewind and fast forward buttons
-		player.seekTime[0].innerHTML = config.seekInterval;
-		player.seekTime[1].innerHTML = config.seekInterval;
-	}
+		// Setup seeking
+		function _setupSeeking() {
+			// Update number of seconds in rewind and fast forward buttons
+			player.seekTime[0].innerHTML = config.seekInterval;
+			player.seekTime[1].innerHTML = config.seekInterval;
+		}
 
-	// Setup fullscreen
-	function setupFullscreen() {
-		if(player.type === "video" && config.fullscreen.enabled) {
-			
-			if(config.debug) {
-				console.log(fullscreen.supportsFullScreen ? "Fullscreen supported" : "No fullscreen supported");
-			}
-			if(fullscreen.supportsFullScreen) {
+		// Setup fullscreen
+		function _setupFullscreen() {
+			if(player.type === "video" && config.fullscreen.enabled) {
+				
 				if(config.debug) {
-					console.log("Fullscreen enabled");
+					console.log(fullscreen.supportsFullScreen ? "Fullscreen supported" : "No fullscreen supported");
 				}
+				if(fullscreen.supportsFullScreen) {
+					if(config.debug) {
+						console.log("Fullscreen enabled");
+					}
 
-				player.container.className += " " + config.classes.fullscreen.enabled;
-			}
-			else if(config.debug) {
-				console.warn("Fullscreen not supported");
-			}
-		}	
-	}
-
-	// Listen for events
-	function listeners() {
-		// Fullscreen
-		player.buttons.fullscreen.addEventListener("click", function() {
-			if(!fullscreen.isFullScreen()) {
-				fullscreen.requestFullScreen(player.container);
-			}
-			else {
-				fullscreen.cancelFullScreen();
-			}
-		}, false);
-
-		// Click video
-		if(player.type === "video" && config.clickToPause) {
-			player.videoContainer.addEventListener("click", function() {
-				if(player.media.paused) {
-					play();
+					_toggleClass(player.container, config.classes.fullscreen.enabled, true);
 				}
-				else if(player.media.ended) {
-					restart();
+				else if(config.debug) {
+					console.warn("Fullscreen not supported");
 				}
-				else {
-					pause();
-				}
-			}, false);
+			}	
 		}
 
-		// Play
-		player.buttons.play.addEventListener("click", function() { 
-			play(); 
-			player.buttons.pause.focus(); 
-		}, false);
+		// Play media
+		function _play() {
+			player.media.play();
 
-		// Pause
-		player.buttons.pause.addEventListener("click", function() { 
-			pause(); 
-			player.buttons.play.focus(); 
-		}, false);
+			_toggleClass(player.container, config.classes.stopped);
+			_toggleClass(player.container, config.classes.playing, true);
+		}
 
-		// Restart
-		player.buttons.restart.addEventListener("click", restart, false);
+		// Pause media
+		function _pause() {
+			player.media.pause(); 
+
+			_toggleClass(player.container, config.classes.playing);
+			_toggleClass(player.container, config.classes.stopped, true);
+		}
+
+		// Restart playback
+		function _restart() {
+			// Move to beginning
+			player.media.currentTime = 0;
+
+			// Special handling for "manual" captions
+			if (!player.isTextTracks) {
+				player.subcount = 0;
+			}
+
+			// Play and ensure the play button is in correct state
+			_play();
+		}
 
 		// Rewind
-		player.buttons.rewind.addEventListener("click", function() {
+		function _rewind() {
 			var targetTime = player.media.currentTime - config.seekInterval;
 
 			if (targetTime < 0) {
@@ -732,12 +683,12 @@
 			}
 			// Special handling for "manual" captions
 			if (!player.isTextTracks && player.type === "video") {
-				adjustManualCaptions(player);
+				_adjustManualCaptions(player);
 			}
-		}, false);
+		}
 
 		// Fast forward
-		player.buttons.forward.addEventListener("click", function() {
+		function _forward() {
 			var targetTime = player.media.currentTime + config.seekInterval;
 
 			if (targetTime > player.media.duration) {
@@ -748,118 +699,232 @@
 			}
 			// Special handling for "manual" captions
 			if (!player.isTextTracks && player.type === "video") {
-				adjustManualCaptions(player);
+				_adjustManualCaptions(player);
 			}
-		}, false);
+		}
 
-		// Get the HTML5 range input element and append audio volume adjustment on change
-		player.volume.addEventListener("change", function() {
-			config.volume = this.value;
-			setVolume();
-		}, false);
-
-		// Mute
-		player.buttons.mute.addEventListener("click", function() {
-			if (player.media.muted === true) {
-				player.media.muted = false;
+		// Toggle fullscreen
+		function _toggleFullscreen() {
+			if(!fullscreen.isFullScreen()) {
+				fullscreen.requestFullScreen(player.container);
 			}
 			else {
-				player.media.muted = true;
+				fullscreen.cancelFullScreen();
 			}
-			checkMute();
-		}, false);
-		
-		// Duration
-		player.media.addEventListener("timeupdate", function() {
-			player.secs = parseInt(player.media.currentTime % 60);
-			player.mins = parseInt((player.media.currentTime / 60) % 60);
-			
-			// Ensure it"s two digits. For example, 03 rather than 3.
-			player.secs = ("0" + player.secs).slice(-2);
-			player.mins = ("0" + player.mins).slice(-2);
-
-			// Render
-			player.duration.innerHTML = player.mins + ":" + player.secs;
-		}, false);
-
-		// Progress bar
-		player.media.addEventListener("timeupdate", function() {
-			player.percent = (100 / player.media.duration) * player.media.currentTime;
-
-			if (player.percent > 0) {
-				player.progress.bar.value = player.percent;
-				player.progress.text.innerHTML = player.percent;
-			}
-		}, false);
-
-		// Skip when clicking progress bar
-		player.progress.bar.addEventListener("click", function(event) {
-			player.pos = _getClickPosition(event).x / this.offsetWidth;
-			player.media.currentTime = player.pos * player.media.duration;
-			
-			// Special handling for "manual" captions
-			if (!player.isTextTracks && player.type === "video") {
-				adjustManualCaptions(player);
-			}
-		});
-
-		// Captions
-		player.buttons.captions.addEventListener("click", function() { 
-			if (this.checked) {
-				player.container.className += " " + config.classes.captions.active;
-			} 
-			else {
-				player.container.className = player.container.className.replace(config.classes.captions.active, "");
-			}
-		}, false);
-
-		// Clear captions at end of video
-		player.media.addEventListener("ended", function() {
-			if(player.type === "video") {
-				player.captionsContainer.innerHTML = "";
-			}
-			player.container.className = player.container.className.replace(config.classes.playing, config.classes.stopped);
-		});
-	}
- 
-	function setupPlayer(element) {
-		player.container = element;
-		
-		// Setup media
-		setupMedia();
-
-		// Generate random number for id/for attribute values for controls
-		player.random = Math.floor(Math.random() * (10000));
-
-		// Inject custom controls
-		injectControls();
-
-		// Find the elements
-		findElements();
+		}
 
 		// Set volume
-		setVolume();
-
-		// Setup fullscreen
-		setupFullscreen();
-
-		// Captions
-		setupCaptions();
-
-		// Seeking
-		setupSeeking();
-
-		// Listeners
-		listeners();
-	}
-
-	// Our "on" function which collects handlers
-	api.on = function(eventName, handler){
-		// If no handler collection exists, create one
-		if(!handlers[eventName]){
-			handlers[eventName] = [];
+		function _setVolume(volume) {
+			player.volume.value = volume;
+			player.media.volume = parseFloat(volume / 10);
+			_checkMute();
 		}
-		handlers[eventName].push(handler);
+
+		// Mute
+		function _toggleMute(muted) {
+			// If the method is called without parameter, toggle based on current value
+			if(typeof active === "undefined") {
+				muted = !player.media.muted;
+				player.buttons.mute.checked = muted;
+			}
+
+			player.media.muted = muted;
+			_checkMute();
+		}
+
+		// Toggle captions
+		function _toggleCaptions(active) { 
+			// If the method is called without parameter, toggle based on current value
+			if(typeof active === "undefined") {
+				active = (player.container.className.indexOf(config.classes.captions.active) === -1);
+				player.buttons.captions.checked = active;
+			}
+
+			if (active) {
+				_toggleClass(player.container, config.classes.captions.active, true);
+			} 
+			else {
+				_toggleClass(player.container, config.classes.captions.active);
+			}
+		}
+
+		// Check mute state
+		function _checkMute() {
+			_toggleClass(player.container, config.classes.muted, (player.media.volume === 0 || player.media.muted));
+		}
+
+		// Listen for events
+		function _listeners() {
+			// Fullscreen
+			_on(player.buttons.fullscreen, "click", _toggleFullscreen);
+
+			// Click video
+			if(player.type === "video" && config.clickToPause) {
+				_on(player.videoContainer, "click", function() {
+					if(player.media.paused) {
+						_play();
+					}
+					else if(player.media.ended) {
+						_restart();
+					}
+					else {
+						_pause();
+					}
+				});
+			}
+
+			// Play
+			_on(player.buttons.play, "click", function() { 
+				_play(); 
+				player.buttons.pause.focus(); 
+			});
+
+			// Pause
+			_on(player.buttons.pause, "click", function() { 
+				_pause(); 
+				player.buttons.play.focus(); 
+			});
+
+			// Restart
+			_on(player.buttons.restart, "click", _restart);
+
+			// Rewind
+			_on(player.buttons.rewind, "click", _rewind);
+
+			// Fast forward
+			_on(player.buttons.forward, "click", _forward);
+
+			// Get the HTML5 range input element and append audio volume adjustment on change
+			_on(player.volume, "change", function() {
+				_setVolume(this.value);
+			});
+
+			// Mute
+			_on(player.buttons.mute, "change", function() {
+				_toggleMute(this.checked);
+			});
+			
+			// Duration
+			_on(player.media, "timeupdate", function() {
+				player.secs = parseInt(player.media.currentTime % 60);
+				player.mins = parseInt((player.media.currentTime / 60) % 60);
+				
+				// Ensure it"s two digits. For example, 03 rather than 3.
+				player.secs = ("0" + player.secs).slice(-2);
+				player.mins = ("0" + player.mins).slice(-2);
+
+				// Render
+				player.duration.innerHTML = player.mins + ":" + player.secs;
+			});
+
+			// Progress bar
+			_on(player.media, "timeupdate", function() {
+				player.percent = (100 / player.media.duration) * player.media.currentTime;
+
+				if (player.percent > 0) {
+					player.progress.bar.value = player.percent;
+					player.progress.text.innerHTML = player.percent;
+				}
+			});
+
+			// Skip when clicking progress bar
+			_on(player.progress.bar, "click", function(event) {
+				player.pos = _getClickPosition(event).x / this.offsetWidth;
+				player.media.currentTime = player.pos * player.media.duration;
+				
+				// Special handling for "manual" captions
+				if (!player.isTextTracks && player.type === "video") {
+					_adjustManualCaptions(player);
+				}
+			});
+
+			// Captions
+			_on(player.buttons.captions, "click", function() { 
+				_toggleCaptions(this.checked);
+			});
+
+			// Clear captions at end of video
+			_on(player.media, "ended", function() {
+				if(player.type === "video") {
+					player.captionsContainer.innerHTML = "";
+				}
+				_toggleClass(player.container, config.classes.stopped, true);
+				_toggleClass(player.container, config.classes.playing);
+			});
+		}
+
+		function _init() {
+			// Setup the fullscreen api 
+			fullscreen = _fullscreen();
+
+			// Sniff 
+			player.browserInfo = _browserSniff();
+			player.browserName = player.browserInfo[0];
+			player.browserMajorVersion = player.browserInfo[1];
+
+			// Debug info
+			if(config.debug) {
+				console.log(player.browserName + " " + player.browserMajorVersion);
+			}
+
+			// If IE8, stop customization (use fallback)
+			// If IE9, stop customization (use native controls)
+			if (player.browserName === "IE" && (player.browserMajorVersion === 8 || player.browserMajorVersion === 9) ) {
+				if(config.debug) {
+					console.error("Browser not suppported.");
+				}
+				return false;
+			}
+
+			// Set up aria-label for Play button with the title option
+			if (typeof(config.title) === "undefined" || !config.title.length) {
+				config.playAriaLabel = "Play";
+			}
+			else {
+				config.playAriaLabel = "Play " + config.title;
+			}
+
+			// Setup media
+			_setupMedia();
+
+			// Generate random number for id/for attribute values for controls
+			player.random = Math.floor(Math.random() * (10000));
+
+			// Inject custom controls
+			_injectControls();
+
+			// Find the elements
+			_findElements();
+
+			// Set volume
+			_setVolume(config.volume);
+
+			// Setup fullscreen
+			_setupFullscreen();
+
+			// Captions
+			_setupCaptions();
+
+			// Seeking
+			_setupSeeking();
+
+			// Listeners
+			_listeners();
+		}
+
+		_init();
+
+		return {
+			media: 				player.media,
+			play: 				_play,
+			pause: 				_pause,
+			restart: 			_restart,
+			rewind: 			_rewind,
+			forward: 			_forward,
+			setVolume: 			_setVolume,
+			toggleMute: 		_toggleMute,
+			toggleCaptions: 	_toggleCaptions
+		}
 	}
 
 	// Expose setup function
@@ -868,58 +933,24 @@
 		config = _extend(defaults, options);
 
 		// If enabled carry on
+		// You may want to disable certain UAs etc
 		if(!config.enabled) {
 			return false;
 		}
 
-		// Setup the fullscreen api 
-		fullscreen = _fullscreen();
+		// Get the players 
+		var elements = document.querySelectorAll(config.selectors.container);
 
-		// Sniff 
-		player.browserInfo = browserSniff();
-		player.browserName = player.browserInfo[0];
-		player.browserMajorVersion = player.browserInfo[1];
-
-		// Debug info
-		if(config.debug) {
-			console.log(player.browserName + " " + player.browserMajorVersion);
-		}
-
-		// If IE8, stop customization (use fallback)
-		// If IE9, stop customization (use native controls)
-		if (player.browserName === "IE" && (player.browserMajorVersion === 8 || player.browserMajorVersion === 9) ) {
-			if(config.debug) {
-				console.error("Browser not suppported.");
-			}
-			return false;
-		}
-
-		// Set up aria-label for Play button with the title option
-		if (typeof(config.title) === "undefined" || !config.title.length) {
-			config.playAriaLabel = "Play";
-		}
-		else {
-			config.playAriaLabel = "Play " + config.title;
-		}
-
-		// Get the container and video container
-		var element = document.querySelector(config.selectors.container);
-		if(element === null) {
-			if(config.debug) {
-				console.error("Selector " + config.selectors.container + " not found!");
-			}
-			return false;
-		}
-		setupPlayer(element);
-
-		/*var elements = document.querySelectorAll(config.selectors.container);
-
+		// Create a player instance for each element
 		for (var i = elements.length - 1; i >= 0; i--) {
-			setupPlayer(elements[i]);
-		}*/
+			// Get the current element
+			var element = elements[i];
+			
+			// Setup a player instance
+			var player = new Player(element);
 
-		// Trigger the setup event
-		executeHandlers("setup");
+			// Add the player object to the element
+			element.player = player;
+		}
 	}
-
 }(this.simpleMedia = this.simpleMedia || {}));

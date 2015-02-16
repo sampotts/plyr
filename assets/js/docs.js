@@ -4,14 +4,9 @@
 
 /*global simpleMedia, templates */
 
-// Register a callback
-simpleMedia.on("setup", function() {
-	//console.log(this);
-});
-
-//execute shout
+// Setup the player
 simpleMedia.setup({
-	//debug: 	true,
+	debug: 	true,
 	title: 	"Video demo",
 	html: 	templates.controls.render({})
 });
