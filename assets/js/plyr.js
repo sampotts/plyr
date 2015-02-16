@@ -8,6 +8,7 @@
 
 // Replace browser sniff with feature detection
 // http://diveintohtml5.info/everything.html
+// 
 
 /*global ActiveXObject*/
 
@@ -624,10 +625,6 @@
 		// Setup fullscreen
 		function _setupFullscreen() {
 			if(player.type === "video" && config.fullscreen.enabled) {
-				
-				if(config.debug) {
-					console.log(fullscreen.supportsFullScreen ? "Fullscreen supported" : "No fullscreen supported");
-				}
 				if(fullscreen.supportsFullScreen) {
 					if(config.debug) {
 						console.log("Fullscreen enabled");
