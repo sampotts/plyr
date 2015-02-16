@@ -1,11 +1,11 @@
 {
 	"less": {
-		"simple-media.css": 	["assets/less/simple-media.less"],
-		"docs.css": 			["assets/less/docs.less"]
+		"plyr.css": 	["assets/less/plyr.less"],
+		"docs.css": 	["assets/less/docs.less"]
 	},
 	"js": {
-		"simple-media.js": 	["assets/js/simple-media.js"],
-		"docs.js": 				[
+		"plyr.js": 		["assets/js/plyr.js"],
+		"docs.js": 		[
 			"assets/js/lib/hogan-3.0.2.mustache.js",
 			"dist/js/templates.js",
 			"assets/js/docs.js"

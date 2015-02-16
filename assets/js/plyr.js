@@ -1,7 +1,7 @@
 // ==========================================================================
-// Simple Media Player
-// simple-media.js v1.0.0
-// https://github.com/sampotts/simple-media
+// Plyr
+// plyr.js v1.0.0
+// https://github.com/sampotts/plyr
 // ==========================================================================
 // Credits: http://paypal.github.io/accessible-html5-video-player/
 // ==========================================================================
@@ -13,9 +13,6 @@
 
 	// Globals
 	var fullscreen, config;
-
-	// Handler cache
-	var handlers = {};
 
 	// Default config
 	var defaults = {
@@ -291,7 +288,7 @@
 	}
 
 	// Player instance
-	function Player(container) {
+	function Plyr(container) {
 		var player = this;
 		player.container = container;
 
@@ -946,11 +943,8 @@
 			// Get the current element
 			var element = elements[i];
 			
-			// Setup a player instance
-			var player = new Player(element);
-
-			// Add the player object to the element
-			element.player = player;
+			// Setup a player instance and add to the element
+			element.plyr = new Plyr(element);
 		}
 	}
-}(this.simpleMedia = this.simpleMedia || {}));
+}(this.plyr = this.plyr || {}));

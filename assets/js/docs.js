@@ -2,10 +2,10 @@
 // Docs example
 // ==========================================================================
 
-/*global simpleMedia, templates */
+/*global plyr, templates */
 
 // Setup the player
-simpleMedia.setup({
+plyr.setup({
 	debug: 	true,
 	title: 	"Video demo",
 	html: 	templates.controls.render({})
