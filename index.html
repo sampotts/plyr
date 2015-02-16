@@ -8,8 +8,8 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 
 		<!-- Styles -->
-		<link rel="stylesheet" href="../dist/css/plyr.css">
-		<link rel="stylesheet" href="../dist/css/docs.css">
+		<link rel="stylesheet" href="dist/css/plyr.css">
+		<link rel="stylesheet" href="dist/css/docs.css">
 	</head>
 	<body>
 		<header>
@@ -21,7 +21,7 @@
 			<h2>Video</h2>
 			<p>Using the native &lt;video&gt; element.</p>
 			<div class="player">
-				<video poster="../media/poster_PayPal_Austin2.jpg" controls>
+				<video poster="media/poster_PayPal_Austin2.jpg" controls>
 					<!-- Video files -->
 					<source src="https://www.paypalobjects.com/webstatic/mktg/videos/PayPal_AustinSMB_baseline.mp4" type="video/mp4">
 					<source src="https://www.paypalobjects.com/webstatic/mktg/videos/PayPal_AustinSMB_baseline.webm" type="video/webm">
@@ -32,7 +32,7 @@
 					<!-- Fallback for browsers that don't support the <video> element -->
 					<div>
 						<a href="https://www.paypalobjects.com/webstatic/mktg/videos/PayPal_AustinSMB_baseline.mp4">
-							<img src="../media/poster_PayPal_Austin2.jpg" width="640" height="360" alt="download video">
+							<img src="media/poster_PayPal_Austin2.jpg" width="640" height="360" alt="download video">
 						</a>
 					</div>
 				</video>
@@ -45,23 +45,23 @@
 			<div class="player">
 				<audio controls>
 					<!-- Audio files -->
-					<source src="../media/Covox_-_Switchblade_Squadron.mp3" type="audio/mp3">
+					<source src="media/Covox_-_Switchblade_Squadron.mp3" type="audio/mp3">
 					
 					<!-- Fallback for browsers that don't support the <audio> element -->
 					<div>
-						<a href="../media/Covox_-_Switchblade_Squadron.mp3">Download it</a>
+						<a href="media/Covox_-_Switchblade_Squadron.mp3">Download it</a>
 					</div>
 				</audio>
 			</div>
 		</section>
 
 		<!-- Load SVG defs -->
-		<script>(function(d,p){var a=new XMLHttpRequest(),b=d.body; a.open("GET",p,!0);a.send();a.onload=function(){var c=d.createElement("div");c.style.display="none";c.innerHTML=a.responseText;b.insertBefore(c,b.childNodes[0])}})(document,"../dist/svg/sprite.svg");</script>
+		<script>(function(d,p){var a=new XMLHttpRequest(),b=d.body; a.open("GET",p,!0);a.send();a.onload=function(){var c=d.createElement("div");c.style.display="none";c.innerHTML=a.responseText;b.insertBefore(c,b.childNodes[0])}})(document,"dist/svg/sprite.svg");</script>
 
 		<!-- Core player -->
-		<script src="../dist/js/plyr.js"></script>
+		<script src="dist/js/plyr.js"></script>
 
 		<!-- Docs setup -->
-		<script src="../dist/js/docs.js"></script>
+		<script src="dist/js/docs.js"></script>
 	</body>
 </html>

@@ -6,6 +6,9 @@
 // Credits: http://paypal.github.io/accessible-html5-video-player/
 // ==========================================================================
 
+// Replace browser sniff with feature detection
+// http://diveintohtml5.info/everything.html
+
 /*global ActiveXObject*/
 
 (function (api) {
