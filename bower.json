@@ -25,5 +25,5 @@
     "type": "git",
     "url": "git://github.com/selz/plyr.git"
   },
-  "license": "MIT"
+  "license": "BSD"
 }

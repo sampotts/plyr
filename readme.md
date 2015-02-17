@@ -22,6 +22,13 @@ We wanted a lightweight, accessible and customisable media player that just supp
 
 ## Implementation
 
+### Bower
+If bower is your thang, you can grab Plyr using:
+```
+bower install plyr
+```
+More info on setting up dependencies can be found in the [Bower Docs](http://bower.io/docs/creating-packages/#maintaining-dependencies)
+
 ### CSS
 If you want to use the default css, add the css file from /dist into your head, or even better use the less file included in /assets in your build to save a request. 
 
