@@ -6,8 +6,6 @@
 // Credits: http://paypal.github.io/accessible-html5-video-player/
 // ==========================================================================
 
-/*global ActiveXObject*/
-
 (function (api) {
 	"use strict";
 
