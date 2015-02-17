@@ -281,7 +281,20 @@ If a User Agent is disabled but supports `<video>` and `<audio>` natively, it wi
 
 Any unsupported browsers will display links to download the media if the correct html is used.
 
-## Useful links and credits
+## Issues
+If you find anything weird with the library, please let us know using the Github issues tracker.
 
-- [Styling the `<progress>` element - hongkiat.com](http://www.hongkiat.com/blog/html5-progress-bar/)
+## Author
+This was created by Sam Potts ([@sam_potts](https://twitter.com/sam_potts))
+
+
+## Useful links and credits
+Credit to the PayPal HTML5 Video player from which Plyr's caption functionality is ported from:
 - [PayPal's Accessible HTML5 Video Player](https://github.com/paypal/accessible-html5-video-player)
+
+Also these links helped created Plyr:
+- [Media Events - W3.org](http://www.w3.org/2010/05/video/mediaevents.html)
+- [Styling the `<progress>` element - hongkiat.com](http://www.hongkiat.com/blog/html5-progress-bar/)
+
+## Copyright and License
+Copyright 2014, Selz.com under [the BSD license](license.md).
