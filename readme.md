@@ -186,6 +186,82 @@ You can pass the following settings:
  </tbody>
 </table>
 
+## API
+
+A `plyr` object is added to any element that Plyr is initialised on. You can then control the player by accessing methods in the `plyr` object. For example if you wanted to pause Plyr:
+
+```javascript
+document.querySelectorAll(".player")[0].plyr.pause();
+```
+
+Here's a list of the methods supported:
+
+<table class="table" width="100%">
+<thead>
+  <tr>
+    <th width="20%">Method</th>
+    <th width="15%">Parameters</th>
+    <th width="65%">Description</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td><code>play</code></td>
+    <td>&mdash;</td>
+    <td>Plays the media</td>
+  </tr>
+  <tr>
+    <td><code>pause</code></td>
+    <td>&mdash;</td>
+    <td>Pauses the media</td>
+  </tr>
+    <tr>
+    <td><code>restart</code></td>
+    <td>&mdash;</td>
+    <td>Restarts playback</td>
+  </tr>
+  <tr>
+    <td><code>rewind</code></td>
+    <td>Number</td>
+    <td>Rewinds by the provided parameter, in seconds. If no parameter is provided, the default seekInterval is used (10 seconds).</td>
+  </tr>
+  <tr>
+    <td><code>forward</code></td>
+    <td>Number</td>
+    <td>Fast forwards by the provided parameter, in seconds. If no parameter is provided, the default seekInterval is used (10 seconds).</td>
+  </tr>
+  <tr>
+    <td><code>setVolume</code></td>
+    <td>Number</td>
+    <td>Sets the player voume to the provided parameter. The value should be between 0 (muted) and 10 (loudest). If no parameter is provided, the default volume is used (5). Values over 10 are ignored.</td>
+  </tr>
+  <tr>
+    <td><code>toggleMute</code></td>
+    <td>&mdash;</td>
+    <td>Toggles mute for the player.</td>
+  </tr>
+  <tr>
+    <td><code>toggleCaptions</code></td>
+    <td>&mdash;</td>
+    <td>Toggles whether captions are enabled.</td>
+  </tr>
+ </tbody>
+</table>
+
+## Events/Callbacks
+
+The `plyr` object on the player element also contains a `media` property which is a reference to the `<audio>` or `<video>` element within the player which you can use to listen for events. Here's an example:
+
+```javascript
+var media = document.querySelectorAll(".player")[0].plyr.media;
+
+media.addEventListener("playing", function() { 
+  console.log("playing");
+});
+```
+A complete list of events can be found here:
+[Media Events - W3.org](http://www.w3.org/2010/05/video/mediaevents.html)
+
 ## Fullscreen
 Fullscreen in Plyr is supported for all browsers that [currently support it](http://caniuse.com/#feat=fullscreen). If you're using the default CSS, you can also use a "full browser" mode which will use the full browser window by adding the `player-fullscreen` class to your container.
 
@@ -205,8 +281,7 @@ If a User Agent is disabled but supports `<video>` and `<audio>` natively, it wi
 
 Any unsupported browsers will display links to download the media if the correct html is used.
 
-## Useful links 
+## Useful links and credits
 
-- [Media Events - W3.org](http://www.w3.org/2010/05/video/mediaevents.html)
 - [Styling the `<progress>` element - hongkiat.com](http://www.hongkiat.com/blog/html5-progress-bar/)
 - [PayPal's Accessible HTML5 Video Player](https://github.com/paypal/accessible-html5-video-player)

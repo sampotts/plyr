@@ -665,8 +665,13 @@
 		}
 
 		// Rewind
-		function _rewind() {
-			var targetTime = player.media.currentTime - config.seekInterval;
+		function _rewind(seekInterval) {
+			// Use default if needed
+			if(typeof seekInterval === "undefined") {
+				seekInterval = config.seekInterval;
+			}
+
+			var targetTime = player.media.currentTime - seekInterval;
 
 			if (targetTime < 0) {
 				player.media.currentTime = 0;
@@ -681,8 +686,13 @@
 		}
 
 		// Fast forward
-		function _forward() {
-			var targetTime = player.media.currentTime + config.seekInterval;
+		function _forward(seekInterval) {
+			// Use default if needed
+			if(typeof seekInterval === "undefined") {
+				seekInterval = config.seekInterval;
+			}
+
+			var targetTime = player.media.currentTime + seekInterval;
 
 			if (targetTime > player.media.duration) {
 				player.media.currentTime = player.media.duration;
@@ -708,6 +718,15 @@
 
 		// Set volume
 		function _setVolume(volume) {
+			// Use default if needed
+			if(typeof volume === "undefined") {
+				volume = config.volume;
+			}
+			// Maximum is 10
+			if(volume > 10) {
+				volume = 10;
+			}
+
 			player.volume.value = volume;
 			player.media.volume = parseFloat(volume / 10);
 			_checkMute();
@@ -782,10 +801,14 @@
 			_on(player.buttons.restart, "click", _restart);
 
 			// Rewind
-			_on(player.buttons.rewind, "click", _rewind);
+			_on(player.buttons.rewind, "click", function() {
+				_rewind(config.seekInterval);
+			});
 
 			// Fast forward
-			_on(player.buttons.forward, "click", _forward);
+			_on(player.buttons.forward, "click", function() {
+				_forward(config.seekInterval);
+			});
 
 			// Get the HTML5 range input element and append audio volume adjustment on change
 			_on(player.volume, "change", function() {
