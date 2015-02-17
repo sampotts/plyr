@@ -561,30 +561,23 @@
 
 						if (captionSrc !== "") {
 							// Create XMLHttpRequest Object
-							var xhr;
-							if (window.XMLHttpRequest) {
-								xhr = new XMLHttpRequest();
-							} 
-							else if (window.ActiveXObject) { // IE8
-								xhr = new ActiveXObject("Microsoft.XMLHTTP");
-							}
+							var xhr = new XMLHttpRequest();
+
 							xhr.onreadystatechange = function() {
 								if (xhr.readyState === 4) {
 									if (xhr.status === 200) {
-										if (config.debug) {
-											console.log("xhr = 200");
-										}
-										
 										player.captions = [];
 										var records = [], 
 											record,
 											req = xhr.responseText;
+
 										records = req.split("\n\n");
 										for (var r=0; r < records.length; r++) {
 											record = records[r];
 											player.captions[r] = [];
 											player.captions[r] = record.split("\n");
 										}
+
 										// Remove first element ("VTT")
 										player.captions.shift();
 
@@ -592,14 +585,14 @@
 											console.log("Successfully loaded the caption file via ajax.");
 										}
 									} 
-									else {
-										if (config.debug) {
-											console.log("There was a problem loading the caption file via ajax.");
-										}
+									else if (config.debug) {
+										console.error("There was a problem loading the caption file via ajax.");
 									}
 								}
 							}
+							
 							xhr.open("get", captionSrc, true);
+
 							xhr.send();
 						}
 					}
