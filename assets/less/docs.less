@@ -51,21 +51,39 @@ h2 {
 	-moz-osx-font-smoothing: grayscale;
 }
 h1 {
-	.font-size(48);
+	.font-size(64);
+	color: #3498DB;
 }
-h2 {
-	.font-size(32);
+p,
+small {
 	margin: 0 0 20px;
 }
-p {
-	margin: 0 0 20px;
+small {
+	display: block;
+	.font-size(14);
 }
 header {
-	margin: 40px 0;
+	padding: 60px 0;
+	margin-bottom: 20px;
 
 	p {
 		.font-size(18);
 	}
+}
+a {
+	text-decoration: none;
+	color: #3498DB;
+	border-bottom: 1px solid currentColor;
+	transition: color .3s ease, border .3s ease;
+
+	&:hover,
+	&:focus {
+		color: #000;
+	}
+}
+
+section {
+	padding-bottom: 80px;
 }
 
 // Players
@@ -77,7 +95,7 @@ header {
 }
 .example-audio .player,
 .example-video .player {
-	margin: 0 auto 40px;
+	margin: 0 auto 20px;
 
 	&:fullscreen,
 	&-fullscreen {
