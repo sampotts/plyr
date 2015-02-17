@@ -3,27 +3,22 @@
 // ==========================================================================
 
 // Reset
-@import "lib/normalize.less";
+@import "docs/normalize.less";
 // Mixins
-@import "lib/mixins.less";
+@import "docs/mixins.less";
+// Fonts
+@import "docs/fontface.less";
 
-@font-face {
-	font-family: "Avenir";
-	src: 	url("../../assets/fonts/AvenirLTStd-Medium.woff2") format("woff2"), 
-			url("../../assets/fonts/AvenirLTStd-Medium.woff") format("woff"), 
-			url("../../assets/fonts/AvenirLTStd-Medium.ttf")  format("truetype");
-	font-style:   normal;
-	font-weight:  400;
-}
+// Variables
+// ---------------------------------------
+// Colors
+@blue:          			#3498DB;
+@gray-dark: 				#343f4a;
+@gray: 						#565d64;
+@gray-light: 				#cbd0d3;
 
-@font-face {
-	font-family: "Avenir";
-	src: 	url("../../assets/fonts/AvenirLTStd-Heavy.woff2") format("woff2"), 
-			url("../../assets/fonts/AvenirLTStd-Heavy.woff") format("woff"), 
-			url("../../assets/fonts/AvenirLTStd-Heavy.ttf")  format("truetype");
-	font-style:   normal;
-	font-weight:  600;
-}
+// Elements
+@link-color: 				@blue;
 
 // BORDER-BOX ALL THE THINGS! 
 // http://paulirish.com/2012/box-sizing-border-box-ftw/
@@ -47,8 +42,7 @@ h2 {
 	color: #2E3C44;
 	margin: 0 0 10px;
 	line-height: 1.2;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
+	.font-smoothing();
 }
 h1 {
 	.font-size(64);
@@ -72,13 +66,32 @@ header {
 }
 a {
 	text-decoration: none;
-	color: #3498DB;
+	color: @link-color;
 	border-bottom: 1px solid currentColor;
-	transition: color .3s ease, border .3s ease;
+	transition: all .3s ease;
 
 	&:hover,
 	&:focus {
 		color: #000;
+	}
+	&:focus {
+		.tab-focus();
+	}
+}
+.btn {
+	display: inline-block;
+	padding: 10px 25px;
+	background: @link-color;
+	border: 0;
+	color: #fff;
+	.font-smoothing(on);
+	font-weight: 600;
+	border-radius: 3px;
+	
+	&:hover,
+	&:focus {
+		color: #fff;
+		background: darken(@link-color, 5%);
 	}
 }
 
