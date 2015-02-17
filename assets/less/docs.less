@@ -68,17 +68,19 @@ header {
 	}
 }
 
-.example-audio .player,
-.example-video .player {
-	margin: 0 auto 40px;
-
-	&:fullscreen {
-		max-width: none;
-	}
-}
+// Players
 .example-audio .player {
 	max-width: 480px;
 }
 .example-video .player {
 	max-width: 1200px;
+}
+.example-audio .player,
+.example-video .player {
+	margin: 0 auto 40px;
+
+	&:fullscreen,
+	&-fullscreen {
+		max-width: none;
+	}
 }

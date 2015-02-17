@@ -339,6 +339,7 @@
 	}
 
 	// Full screen mode
+	&-fullscreen,
 	&:fullscreen {
 		position: absolute;
 		top: 0;
@@ -347,6 +348,7 @@
 		bottom: 0;
 		height: 100%;
 		width: 100%;
+		z-index: 999999;
 
 		.player-video {
 			height: 100%;
@@ -383,6 +385,12 @@
 				}
 			}
 		}
+	}
+
+	// Full browser view hides toggle
+	&-fullscreen [data-player='fullscreen'],
+	&-fullscreen [data-player='fullscreen'] + label {
+		display: none;
 	}
 
 	// Some options are hidden by default
