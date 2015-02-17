@@ -6,8 +6,6 @@
 @import "docs/normalize.less";
 // Mixins
 @import "docs/mixins.less";
-// Fonts
-@import "docs/fontface.less";
 
 // Variables
 // ---------------------------------------
@@ -19,12 +17,18 @@
 
 // Elements
 @link-color: 				@blue;
+@padding-base: 				20px;
+
+// Breakpoints
+@screen-md: 				768px;
 
 // BORDER-BOX ALL THE THINGS! 
 // http://paulirish.com/2012/box-sizing-border-box-ftw/
 *, *::after, *::before {  
 	box-sizing: border-box; 
 }
+
+// Base
 html {
 	font-size: 62.5%;
 }
@@ -36,11 +40,13 @@ body {
 	text-align: center;
 	color: #6D797F;
 }
+
+// Type
 h1,
 h2 {
 	letter-spacing: -.025em;
 	color: #2E3C44;
-	margin: 0 0 10px;
+	margin: 0 0 (@padding-base / 2);
 	line-height: 1.2;
 	.font-smoothing();
 }
@@ -50,20 +56,38 @@ h1 {
 }
 p,
 small {
-	margin: 0 0 20px;
+	margin: 0 0 @padding-base;
 }
 small {
 	display: block;
+	padding: 0 (@padding-base / 2);
 	.font-size(14);
 }
+
+// Header
 header {
-	padding: 60px 0;
-	margin-bottom: 20px;
+	padding: @padding-base;
+	margin-bottom: @padding-base;
 
 	p {
 		.font-size(18);
 	}
+	@media (min-width: 560px) {
+		padding-top: (@padding-base * 3);
+		padding-bottom: (@padding-base * 3);
+	}
 }
+
+// Sections
+section {
+	padding-bottom: @padding-base;
+
+	@media (min-width: 560px) {
+		padding-bottom: (@padding-base * 2);
+	}
+}
+
+// Links & Buttons
 a {
 	text-decoration: none;
 	color: @link-color;
@@ -80,7 +104,7 @@ a {
 }
 .btn {
 	display: inline-block;
-	padding: 10px 25px;
+	padding: (@padding-base / 2) (@padding-base * 1.5);
 	background: @link-color;
 	border: 0;
 	color: #fff;
@@ -95,10 +119,6 @@ a {
 	}
 }
 
-section {
-	padding-bottom: 80px;
-}
-
 // Players
 .example-audio .player {
 	max-width: 480px;
@@ -108,10 +128,14 @@ section {
 }
 .example-audio .player,
 .example-video .player {
-	margin: 0 auto 20px;
+	margin: 0 auto @padding-base;
 
 	&:fullscreen,
 	&-fullscreen {
 		max-width: none;
 	}
 }
+
+// Fonts
+// Last to not block rendering
+@import "docs/fontface.less";
