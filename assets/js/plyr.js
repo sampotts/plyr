@@ -955,7 +955,7 @@
 		}
 
 		// Get the players 
-		var elements = document.querySelectorAll(config.selectors.container);
+		var elements = document.querySelectorAll(config.selectors.container), players = [];
 
 		// Create a player instance for each element
 		for (var i = elements.length - 1; i >= 0; i--) {
@@ -964,6 +964,11 @@
 			
 			// Setup a player instance and add to the element
 			element.plyr = new Plyr(element);
+
+			// Add to return array
+			players.push(element.plyr);
 		}
+
+		return players;
 	}
 }(this.plyr = this.plyr || {}));
