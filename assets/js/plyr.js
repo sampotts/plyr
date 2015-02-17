@@ -247,9 +247,14 @@
 			for (var i = 0, il = browserPrefixes.length; i < il; i++ ) {
 				fullscreen.prefix = browserPrefixes[i];
 
-				if (typeof document[fullscreen.prefix + "CancelFullScreen" ] != "undefined" ) {
+				if (typeof document[fullscreen.prefix + "CancelFullScreen"] != "undefined") {
 					fullscreen.supportsFullScreen = true;
-
+					break;
+				}
+				// Special case for MS (when isn't it?)
+				else if (typeof document.msExitFullscreen != "undefined" && document.msFullscreenEnabled) {
+					fullscreen.prefix = "ms";
+					fullscreen.supportsFullScreen = true;
 					break;
 				}
 			}
@@ -271,15 +276,20 @@
 						return document.fullScreen;
 					case "webkit":
 						return document.webkitIsFullScreen;
+					case "ms":
+						// Docs say document.msFullScreenElement returns undefined
+						// if no element is full screem but it returns null, cheers
+						// https://msdn.microsoft.com/en-us/library/ie/dn265028%28v=vs.85%29.aspx
+						return (document.msFullscreenElement !== null);
 					default:
 						return document[this.prefix + "FullScreen"];
 				}
 			};
 			fullscreen.requestFullScreen = function(element) {
-				return (this.prefix === "") ? element.requestFullScreen() : element[this.prefix + "RequestFullScreen"](this.prefix === "webkit" ? element.ALLOW_KEYBOARD_INPUT : null);
+				return (this.prefix === "") ? element.requestFullScreen() : element[this.prefix + (this.prefix == "ms" ? "RequestFullscreen" : "RequestFullScreen")](this.prefix === "webkit" ? element.ALLOW_KEYBOARD_INPUT : null);
 			};
 			fullscreen.cancelFullScreen = function() {
-				return (this.prefix === "") ? document.cancelFullScreen() : document[this.prefix + "CancelFullScreen"]();
+				return (this.prefix === "") ? document.cancelFullScreen() : document[this.prefix + (this.prefix == "ms" ? "ExitFullscreen" : "CancelFullScreen")]();
 			};
 			fullscreen.element = function() { 
 				return (this.prefix === "") ? document.fullscreenElement : document[this.prefix + "FullscreenElement"];
