@@ -54,7 +54,6 @@
 	outline-offset: 1px;
 }
 
-
 // Range styling
 // ---------------------------------------
 .range-thumb() {
@@ -104,10 +103,9 @@
 	}
 
 	// For video
-	&-video {
+	&-video-wrapper {
 		position: relative;
 	}
-
 	video {
 		width: 100%;
 		height: auto;
@@ -148,8 +146,8 @@
 
 		// Layout
 		&-sound {
-			display: inline-block;
-			margin-top: @control-spacing;
+			display: block;
+			margin: @control-spacing auto 0;
 		}
 		@media (min-width: 560px) {
 			&-playback {
@@ -350,7 +348,7 @@
 		width: 100%;
 		z-index: 999999;
 
-		.player-video {
+		.player-video-wrapper {
 			height: 100%;
 			width: 100%;
 
@@ -405,20 +403,5 @@
 	&-fullscreen [data-player='fullscreen'],
 	&-fullscreen [data-player='fullscreen'] + label {
 		display: none !important;
-	}
-}
-
-// Fixing display for IE10+
-@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-	.video-controls .player-volume {
-		position: relative;
-		padding: 0;
-	}
-	.player-time {
-		margin-top: 4px;
-	}
-	.player-captions {
-		padding: 8px;
-		min-height: 36px;
 	}
 }

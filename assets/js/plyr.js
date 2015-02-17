@@ -41,7 +41,9 @@
 			seekTime: 			".player-seek-time"
 		},
 		classes: {
-			videoContainer:		"player-video",
+			video:				"player-video",
+			videoWrapper: 		"player-video-wrapper",
+			audio:				"player-audio",
 			stopped: 			"stopped",
 			playing: 			"playing",
 			muted: 				"muted",
@@ -410,20 +412,23 @@
 				return false;
 			}
 
-			// If there's no autoplay attribute, assume the video is stopped
-			_toggleClass(player.container, config.classes.stopped, (player.media.getAttribute("autoplay") === null));
-
 			// Remove native video controls
 			player.media.removeAttribute("controls");
 
-			// Set type
+			// Set media type
 			player.type = (player.media.tagName.toLowerCase() == "video" ? "video" : "audio");
+
+			// Add type class
+			_toggleClass(player.container, config.classes[player.type], true);
+
+			// If there's no autoplay attribute, assume the video is stopped and add state class
+			_toggleClass(player.container, config.classes.stopped, (player.media.getAttribute("autoplay") === null));
 
 			// Inject the player wrapper
 			if(player.type === "video") {
 				// Create the wrapper div
 				var wrapper = document.createElement("div");
-				wrapper.setAttribute("class", config.classes.videoContainer);
+				wrapper.setAttribute("class", config.classes.videoWrapper);
 
 				// Wrap the video in a container
 				_wrap(player.media, wrapper);
