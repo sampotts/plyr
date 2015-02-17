@@ -387,12 +387,6 @@
 		}
 	}
 
-	// Full browser view hides toggle
-	&-fullscreen [data-player='fullscreen'],
-	&-fullscreen [data-player='fullscreen'] + label {
-		display: none;
-	}
-
 	// Some options are hidden by default
 	[data-player='captions'],
 	[data-player='captions'] + label,
@@ -405,6 +399,12 @@
 	&.fullscreen-enabled [data-player='fullscreen'],
 	&.fullscreen-enabled [data-player='fullscreen'] + label {
 		display: inline-block;
+	}
+
+	// Full browser view hides toggle
+	&-fullscreen [data-player='fullscreen'],
+	&-fullscreen [data-player='fullscreen'] + label {
+		display: none !important;
 	}
 }
 

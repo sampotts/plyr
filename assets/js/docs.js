@@ -8,5 +8,8 @@
 plyr.setup({
 	debug: 	true,
 	title: 	"Video demo",
-	html: 	templates.controls.render({})
+	html: 	templates.controls.render({}),
+	captions: {
+		defaultActive: true
+	}
 });

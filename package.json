@@ -2,6 +2,7 @@
   "name": "plyr",
   "version": "1.0.0",
   "description": "A simple HTML5 media player using custom controls",
+  "homepage": "http://plyr.io",
   "main": "gulpfile.js",
   "dependencies": {},
   "devDependencies": {
@@ -27,7 +28,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/sampotts/plyr.git"
+    "url": "git://github.com/selz/plyr.git"
   },
   "authors": [
     "Sam Potts <me@sampotts.me>"

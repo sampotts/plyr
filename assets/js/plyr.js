@@ -6,10 +6,6 @@
 // Credits: http://paypal.github.io/accessible-html5-video-player/
 // ==========================================================================
 
-// Replace browser sniff with feature detection
-// http://diveintohtml5.info/everything.html
-// 
-
 /*global ActiveXObject*/
 
 (function (api) {
@@ -20,11 +16,11 @@
 
 	// Default config
 	var defaults = {
-		enabled: 				true, // /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent)
+		enabled: 				true, 
 		debug: 					false,
 		seekInterval: 			10,
 		volume: 				5,
-		clickToPause: 			true,
+		click: 					true,
 		selectors: {
 			container: 			".player",
 			controls: 			".player-controls",
@@ -58,7 +54,7 @@
 			}
 		},
 		captions: {
-			defaultActive: 		true
+			defaultActive: 		false
 		},
 		fullscreen: {
 			enabled: 			true
@@ -756,7 +752,7 @@
 			_on(player.buttons.fullscreen, "click", _toggleFullscreen);
 
 			// Click video
-			if(player.type === "video" && config.clickToPause) {
+			if(player.type === "video" && config.click) {
 				_on(player.videoContainer, "click", function() {
 					if(player.media.paused) {
 						_play();
