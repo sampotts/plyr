@@ -170,7 +170,7 @@
 			}
 			else {
 				var className = (" " + element.className + " ").replace(/\s+/g, " ").replace(" " + name + " ", "");
-				element.className = className + (state ? " " + name : "")
+				element.className = className + (state ? " " + name : "");
 			}
 		}
 	}
