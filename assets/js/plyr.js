@@ -967,9 +967,11 @@
 		for (var i = elements.length - 1; i >= 0; i--) {
 			// Get the current element
 			var element = elements[i];
-			
+
 			// Setup a player instance and add to the element
-			element.plyr = new Plyr(element);
+			if(typeof element.plyr === "undefined") { 
+				element.plyr = new Plyr(element);
+			}
 
 			// Add to return array
 			players.push(element.plyr);
