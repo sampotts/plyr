@@ -60,6 +60,17 @@
 		fullscreen: {
 			enabled: 			true,
 			fallback: 			true
+		},
+		storage: {
+			enabled: 			true,
+			supported: 			function() {
+				try {
+					return "localStorage" in window && window.localStorage !== null;
+				} 
+				catch(e) {
+					return false;
+				}
+			}
 		}
 	};
 
@@ -782,7 +793,12 @@
 		function _setVolume(volume) {
 			// Use default if needed
 			if(typeof volume === "undefined") {
-				volume = config.volume;
+				if(config.storage.enabled && config.storage.supported) {
+					volume = window.localStorage.plyr_volume;
+				}
+				else {
+					volume = config.volume;
+				}
 			}
 			// Maximum is 10
 			if(volume > 10) {
@@ -792,6 +808,11 @@
 			player.volume.value = volume;
 			player.media.volume = parseFloat(volume / 10);
 			_checkMute();
+
+			// Store the volume in storage
+			if(config.storage.enabled && config.storage.supported) {
+				window.localStorage.plyr_volume = volume;
+			}
 		}
 
 		// Mute
@@ -974,7 +995,7 @@
 			_findElements();
 
 			// Set volume
-			_setVolume(config.volume);
+			_setVolume();
 
 			// Setup fullscreen
 			_setupFullscreen();
