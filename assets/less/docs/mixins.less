@@ -22,10 +22,11 @@
 }
 
 // Use rems for font sizing
+// Leave <body> at 100%/16px
 // ---------------------------------------
 .font-size(@font-size: 16){
-	@rem: (@font-size / 10);
-	font-size: @font-size * 1px;
+	@rem: round((@font-size / 16), 1);
+	font-size: (@font-size * 1px);
 	font-size: ~"@{rem}rem";
 }
 

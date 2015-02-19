@@ -23,10 +23,15 @@
 
 // Range
 @range-track-height: 		6px;
+@range-track-bg: 			@gray;
 @range-thumb-height: 		(@range-track-height * 2);
 @range-thumb-width: 		(@range-track-height * 2);
 @range-thumb-bg: 			@control-color;
 @range-thumb-bg-focus: 		@control-color-active;
+
+// Breakpoints
+@bp-control-split: 			560px; // When controls split into left/right
+@bg-captions-large: 		768px; // When captions jump to the larger font size
 
 // Utility classes & mixins
 // -------------------------------
@@ -67,7 +72,7 @@
 }
 .range-track() {
 	height: @range-track-height;
-	background: @gray;
+	background: @range-track-bg;
 	border: 0;
 	border-radius: (@range-track-height / 2);
 }
@@ -132,7 +137,7 @@
 		text-align: center;
 		.font-smoothing();
 
-		@media (min-width: 560px) {
+		@media (min-width: @bg-captions-large) {
 			font-size: 24px;
 		}
 	}
@@ -155,7 +160,7 @@
 			display: block;
 			margin: @control-spacing auto 0;
 		}
-		@media (min-width: 560px) {
+		@media (min-width: @bp-control-split) {
 			&-playback {
 				float: left;
 			}
@@ -198,17 +203,17 @@
 			background: transparent;
 			overflow: hidden;
 		}
-		button:hover,
-		label:hover {
-			background: @control-color-active;
+		input:focus + label,
+		button:focus {
+			.tab-focus();
 
 			svg {
 				fill: #fff;
 			}
 		}
-		input:focus + label,
-		button:focus {
-			.tab-focus();
+		button:hover,
+		input + label:hover {
+			background: @control-color-active;
 
 			svg {
 				fill: #fff;
@@ -365,15 +370,13 @@
 				top: auto;
 				bottom: 90px;
 
-				@media (min-width: 560px) and (max-width: 767px) {
+				@media (min-width: @bp-control-split) and (max-width: (@bg-captions-large - 1)) {
 					bottom: 60px;
 				}
-
-				@media (min-width: 768px) {
+				@media (min-width: @bg-captions-large) {
 					bottom: 80px;
 				}
 			}
-
 		}
 		.player-controls {
 			position: absolute;
