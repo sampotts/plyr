@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.0.0
+// plyr.js v1.0.6
 // https://github.com/sampotts/plyr
 // ==========================================================================
 // Credits: http://paypal.github.io/accessible-html5-video-player/
@@ -46,20 +46,29 @@
 			playing: 			"playing",
 			muted: 				"muted",
 			captions: {
-				active: 		"captions-active",
-				enabled: 		"captions-enabled"
+				enabled: 		"captions-enabled",
+				active: 		"captions-active"
 			},
 			fullscreen: {
-				enabled: 		"fullscreen-enabled"
+				enabled: 		"fullscreen-enabled",
+				active: 		"fullscreen-active"
 			}
 		},
 		captions: {
 			defaultActive: 		false
 		},
 		fullscreen: {
-			enabled: 			true
+			enabled: 			true,
+			fallback: 			true
 		}
 	};
+
+	// Debugging
+	function _log(text, error) {
+		if(config.debug && window.console) {
+			console[(error ? "error" : "log")](text);
+		}
+	}
 
 	// Credits: http://paypal.github.io/accessible-html5-video-player/
 	// Unfortunately, due to scattered support, browser sniffing is required
@@ -180,6 +189,11 @@
 		element.addEventListener(event, callback, false);
 	}
 
+	// Unbind event
+	function _off(element, event, callback) {
+		element.removeEventListener(event, callback, false);
+	}
+
 	// Get click position relative to parent
 	// http://www.kirupa.com/html5/getting_mouse_click_position.htm
 	function _getClickPosition(event) {
@@ -266,7 +280,9 @@
 
 		// Update methods to do something useful
 		if (fullscreen.supportsFullScreen) {
-			fullscreen.fullScreenEventName = fullscreen.prefix + "fullscreenchange";
+			// Yet again Microsoft awesomeness, 
+			// Sometimes the prefix is "ms", sometimes "MS" to keep you on your toes
+			fullscreen.fullScreenEventName = (fullscreen.prefix == "ms" ? "MSFullscreenChange" : fullscreen.prefix + "fullscreenchange");
 
 			fullscreen.isFullScreen = function() {
 				switch (this.prefix) {
@@ -361,12 +377,20 @@
 			return _getElements(selector)[0];
 		}
 
+		// Determine if we're in an iframe
+		function _inFrame() {
+			try {
+				return window.self !== window.top;
+			} 
+			catch (e) {
+				return true;
+			}
+		}
+
 		// Insert controls
 		function _injectControls() {
 			// Insert custom video controls
-			if (config.debug) {
-				console.log("Injecting custom controls");
-			}
+			_log("Injecting custom controls");
 
 			// Use specified html 
 			// Need to do a default?
@@ -416,7 +440,7 @@
 
 			// If there's no media, bail
 			if(!player.media) {
-				console.error("No audio or video element found!");
+				_log("No audio or video element found!", true);
 				return false;
 			}
 
@@ -479,14 +503,10 @@
 				player.captionExists = true;
 				if (captionSrc === "") {
 					player.captionExists = false;
-					if (config.debug) {
-						console.log("No caption track found.");
-					}
+					_log("No caption track found.");
 				}
 				else {
-					if (config.debug) {
-						console.log("Caption track found; URI: " + captionSrc);
-					}
+					_log("Caption track found; URI: " + captionSrc);
 				}
 
 				// If no caption file exists, hide container for caption text
@@ -502,13 +522,13 @@
 							(player.browserName === "IE" && player.browserMajorVersion === 11) || 
 							(player.browserName === "Firefox" && player.browserMajorVersion >= 31) || 
 							(player.browserName === "Safari" && player.browserMajorVersion >= 7)) {
-						if (config.debug) {
-							console.log("Detected IE 10/11 or Firefox 31+ or Safari 7+");
-						}
-						// set to false so skips to "manual" captioning
+						// Debugging
+						_log("Detected IE 10/11 or Firefox 31+ or Safari 7+");
+
+						// Set to false so skips to "manual" captioning
 						player.isTextTracks = false;
 						
-						// turn off native caption rendering to avoid double captions [doesn"t work in Safari 7; see patch below]
+						// Turn off native caption rendering to avoid double captions [doesn"t work in Safari 7; see patch below]
 						track = {};
 						tracks = player.media.textTracks;
 						for (j=0; j < tracks.length; j++) {
@@ -519,9 +539,7 @@
 
 					// Rendering caption tracks - native support required - http://caniuse.com/webvtt
 					if (player.isTextTracks) {
-						if (config.debug) {
-							console.log("textTracks supported");
-						}
+						_log("textTracks supported");
 						_showCaptions(player);
 
 						track = {};
@@ -542,9 +560,7 @@
 					}
 					// Caption tracks not natively supported
 					else {
-						if (config.debug) {
-							console.log("textTracks not supported so rendering captions manually");
-						}
+						_log("textTracks not supported so rendering captions manually");
 						_showCaptions(player);
 
 						// Render captions from array at appropriate time
@@ -589,12 +605,10 @@
 										// Remove first element ("VTT")
 										player.captions.shift();
 
-										if (config.debug) {
-											console.log("Successfully loaded the caption file via ajax.");
-										}
+										_log("Successfully loaded the caption file via ajax.");
 									} 
-									else if (config.debug) {
-										console.error("There was a problem loading the caption file via ajax.");
+									else {
+										_log("There was a problem loading the caption file via ajax.", true);
 									}
 								}
 							}
@@ -607,10 +621,10 @@
 
 					// If Safari 7, removing track from DOM [see "turn off native caption rendering" above]
 					if (player.browserName === "Safari" && player.browserMajorVersion === 7) {
-						if (config.debug) {
-							console.log("Safari 7 detected; removing track from DOM");
-						}
+						_log("Safari 7 detected; removing track from DOM");
+
 						tracks = player.media.getElementsByTagName("track");
+						
 						player.media.removeChild(tracks[0]);
 					}
 				}
@@ -627,15 +641,17 @@
 		// Setup fullscreen
 		function _setupFullscreen() {
 			if(player.type === "video" && config.fullscreen.enabled) {
-				if(fullscreen.supportsFullScreen) {
-					if(config.debug) {
-						console.log("Fullscreen enabled");
-					}
+				// Check for native support
+				var nativeSupport = fullscreen.supportsFullScreen;
 
+				if(nativeSupport || (config.fullscreen.fallback && !_inFrame())) {
+					_log((nativeSupport ? "Native" : "Fallback") + " fullscreen enabled");
+
+					// Add styling hook
 					_toggleClass(player.container, config.classes.fullscreen.enabled, true);
 				}
-				else if(config.debug) {
-					console.warn("Fullscreen not supported");
+				else {
+					_log("Fullscreen not supported and fallback disabled.");
 				}
 			}	
 		}
@@ -714,11 +730,51 @@
 
 		// Toggle fullscreen
 		function _toggleFullscreen() {
-			if(!fullscreen.isFullScreen()) {
-				fullscreen.requestFullScreen(player.container);
+			// Check for native support
+			var nativeSupport = fullscreen.supportsFullScreen;
+
+			// If it's a fullscreen change event, it's probably a native close
+			if(event.type === fullscreen.fullScreenEventName) {
+				config.fullscreen.active = fullscreen.isFullScreen();
+			}
+			// If there's native support, use it
+			else if(nativeSupport) {
+				// Request fullscreen
+				if(!fullscreen.isFullScreen()) {
+					fullscreen.requestFullScreen(player.container);
+				}
+				// Bail from fullscreen
+				else {
+					fullscreen.cancelFullScreen();
+				}
+
+				// Check if we're actually full screen (it could fail)
+				config.fullscreen.active = fullscreen.isFullScreen();
 			}
 			else {
-				fullscreen.cancelFullScreen();
+				// Otherwise, it's a simple toggle
+				config.fullscreen.active = !config.fullscreen.active;
+
+				// Bind/unbind escape key
+				if(config.fullscreen.active) {
+					_on(document, "keyup", _handleEscapeFullscreen);
+					document.body.style.overflow = "hidden";
+				}
+				else {
+					_off(document, "keyup", _handleEscapeFullscreen);
+					document.body.style.overflow = "";
+				}
+			}
+
+			// Set class hook
+			_toggleClass(player.container, config.classes.fullscreen.active, config.fullscreen.active);
+		}
+
+		// Bail from faux-fullscreen 
+		function _handleEscapeFullscreen(event) {
+			// If it's a keypress and not escape, bail
+			if((event.which || event.charCode || event.keyCode) === 27 && config.fullscreen.active) {
+				_toggleFullscreen();				
 			}
 		}
 
@@ -773,24 +829,6 @@
 
 		// Listen for events
 		function _listeners() {
-			// Fullscreen
-			_on(player.buttons.fullscreen, "click", _toggleFullscreen);
-
-			// Click video
-			if(player.type === "video" && config.click) {
-				_on(player.videoContainer, "click", function() {
-					if(player.media.paused) {
-						_play();
-					}
-					else if(player.media.ended) {
-						_restart();
-					}
-					else {
-						_pause();
-					}
-				});
-			}
-
 			// Play
 			_on(player.buttons.play, "click", function() { 
 				_play(); 
@@ -825,6 +863,27 @@
 			_on(player.buttons.mute, "change", function() {
 				_toggleMute(this.checked);
 			});
+
+			// Fullscreen
+			_on(player.buttons.fullscreen, "click", _toggleFullscreen);
+
+			// Handle user exiting fullscreen by escaping etc
+			_on(document, fullscreen.fullScreenEventName, _toggleFullscreen);
+
+			// Click video
+			if(player.type === "video" && config.click) {
+				_on(player.videoContainer, "click", function() {
+					if(player.media.paused) {
+						_play();
+					}
+					else if(player.media.ended) {
+						_restart();
+					}
+					else {
+						_pause();
+					}
+				});
+			}
 			
 			// Duration
 			_on(player.media, "timeupdate", function() {
@@ -885,16 +944,12 @@
 			player.browserMajorVersion = player.browserInfo[1];
 
 			// Debug info
-			if(config.debug) {
-				console.log(player.browserName + " " + player.browserMajorVersion);
-			}
+			_log(player.browserName + " " + player.browserMajorVersion);
 
 			// If IE8, stop customization (use fallback)
 			// If IE9, stop customization (use native controls)
 			if (player.browserName === "IE" && (player.browserMajorVersion === 8 || player.browserMajorVersion === 9) ) {
-				if(config.debug) {
-					console.error("Browser not suppported.");
-				}
+				_log("Browser not suppported.", true);
 				return false;
 			}
 
