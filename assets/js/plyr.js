@@ -794,7 +794,7 @@
 			// Use default if needed
 			if(typeof volume === "undefined") {
 				if(config.storage.enabled && config.storage.supported) {
-					volume = window.localStorage.plyr_volume;
+					volume = window.localStorage.plyr_volume || config.volume;
 				}
 				else {
 					volume = config.volume;
