@@ -16,12 +16,15 @@ We wanted a lightweight, accessible and customisable media player that just supp
 - **Fallback** - if there's no support, the native players are used.
 - **Fullscreen** - options to run the player full browser or the user can toggle fullscreen.
 
+## Changelog
+Check out [the changelog](changelog.md)
+
 ## Planned development
 - Accept a string selector, a node, or a nodelist for the `container` property of `selectors`.
 - Accept a selector for the `html` template property.
+- Multiple language captions (with selection)
 
-## Changelog
-Check out [the changelog](changelog.md)
+If you have any cool ideas or features, please let me know by [creating an issue](https://github.com/Selz/plyr/issues/new) or of course, forking and sending a pull request.
 
 ## Implementation
 
@@ -292,11 +295,10 @@ If a User Agent is disabled but supports `<video>` and `<audio>` natively, it wi
 Any unsupported browsers will display links to download the media if the correct html is used.
 
 ## Issues
-If you find anything weird with the library, please let us know using the Github issues tracker.
+If you find anything weird with Plyr, please let us know using the Github issues tracker.
 
 ## Author
 This was created by Sam Potts ([@sam_potts](https://twitter.com/sam_potts))
-
 
 ## Useful links and credits
 Credit to the PayPal HTML5 Video player from which Plyr's caption functionality is ported from:
