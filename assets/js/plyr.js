@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.0.8
+// plyr.js v1.0.9
 // https://github.com/sampotts/plyr
 // ==========================================================================
 // Credits: http://paypal.github.io/accessible-html5-video-player/
@@ -33,7 +33,11 @@
 				captions: 		"[data-player='captions']",
 				fullscreen: 	"[data-player='fullscreen']"
 			},
-			progress: 			".player-progress",
+			progress: {
+				container: 		".player-progress",
+				buffer: 		".player-progress-buffer",
+				played: 		".player-progress-played"
+			},
 			captions: 			".player-captions",
 			duration: 			".player-duration",
 			seekTime: 			".player-seek-time"
@@ -203,6 +207,11 @@
 	// Unbind event
 	function _off(element, event, callback) {
 		element.removeEventListener(event, callback, false);
+	}
+
+	// Get percentage
+	function _getPercentage(current, max) {
+		return Math.floor((current / max) * 100);
 	}
 
 	// Get click position relative to parent
@@ -419,30 +428,47 @@
 
 		// Find the UI controls and store references
 		function _findElements() {
-			player.controls 			= _getElement(config.selectors.controls);
+			try {
+				player.controls 				= _getElement(config.selectors.controls);
 
-			// Buttons
-			player.buttons = {};
-			player.buttons.play 		= _getElement(config.selectors.buttons.play);
-			player.buttons.pause 		= _getElement(config.selectors.buttons.pause);
-			player.buttons.restart 		= _getElement(config.selectors.buttons.restart);
-			player.buttons.rewind 		= _getElement(config.selectors.buttons.rewind);
-			player.buttons.forward 		= _getElement(config.selectors.buttons.forward);
-			player.buttons.mute 		= _getElement(config.selectors.buttons.mute);
-			player.buttons.captions		= _getElement(config.selectors.buttons.captions);
-			player.buttons.fullscreen 	= _getElement(config.selectors.buttons.fullscreen);
+				// Buttons
+				player.buttons = {};
+				player.buttons.play 			= _getElement(config.selectors.buttons.play);
+				player.buttons.pause 			= _getElement(config.selectors.buttons.pause);
+				player.buttons.restart 			= _getElement(config.selectors.buttons.restart);
+				player.buttons.rewind 			= _getElement(config.selectors.buttons.rewind);
+				player.buttons.forward 			= _getElement(config.selectors.buttons.forward);
+				player.buttons.mute 			= _getElement(config.selectors.buttons.mute);
+				player.buttons.captions			= _getElement(config.selectors.buttons.captions);
+				player.buttons.fullscreen 		= _getElement(config.selectors.buttons.fullscreen);
 
-			// Progress
-			player.progress = {};
-			player.progress.bar			= _getElement(config.selectors.progress);
-			player.progress.text 		= player.progress.bar.getElementsByTagName("span")[0];
+				// Progress
+				player.progress = {};
+				player.progress.container		= _getElement(config.selectors.progress.container);
 
-			// Volume
-			player.volume 				= _getElement(config.selectors.buttons.volume);
+				// Progress - Buffering
+				player.progress.buffer 			= {};
+				player.progress.buffer.bar		= _getElement(config.selectors.progress.buffer);
+				player.progress.buffer.text 	= player.progress.buffer.bar.getElementsByTagName("span")[0];
 
-			// Timing
-			player.duration 			= _getElement(config.selectors.duration);
-			player.seekTime 			= _getElements(config.selectors.seekTime);
+				// Progress - Played
+				player.progress.played 			= {};
+				player.progress.played.bar		= _getElement(config.selectors.progress.played);
+				player.progress.played.text 	= player.progress.played.bar.getElementsByTagName("span")[0];
+
+				// Volume
+				player.volume 					= _getElement(config.selectors.buttons.volume);
+
+				// Timing
+				player.duration 				= _getElement(config.selectors.duration);
+				player.seekTime 				= _getElements(config.selectors.seekTime);
+
+				return true;
+			}
+			catch(e) {
+				_log("It looks like there's a problem with your controls html. Bailing.", true);
+				return false;
+			}
 		}
 
 		// Setup media
@@ -526,7 +552,15 @@
 				}
 				// If caption file exists, process captions
 				else {
-					var track = {}, tracks, j;
+					// Turn off native caption rendering to avoid double captions 
+					// This doesn't seem to work in Safari 7+, so the <track> elements are removed from the dom below
+					var tracks = player.media.textTracks;
+					for (var x=0; x < tracks.length; x++) {
+						tracks[x].mode = "hidden";
+					}
+
+					// Enable UI
+					_showCaptions(player);
 
 					// If IE 10/11 or Firefox 31+ or Safari 7+, don"t use native captioning (still doesn"t work although they claim it"s now supported)
 					if ((player.browserName === "IE" && player.browserMajorVersion === 10) || 
@@ -538,28 +572,18 @@
 
 						// Set to false so skips to "manual" captioning
 						player.isTextTracks = false;
-						
-						// Turn off native caption rendering to avoid double captions [doesn"t work in Safari 7; see patch below]
-						track = {};
-						tracks = player.media.textTracks;
-						for (j=0; j < tracks.length; j++) {
-							track = player.media.textTracks[j];
-							track.mode = "hidden";
-						}
 					}
 
-					// Rendering caption tracks - native support required - http://caniuse.com/webvtt
+					// Rendering caption tracks
+					// Native support required - http://caniuse.com/webvtt
 					if (player.isTextTracks) {
 						_log("textTracks supported");
-						_showCaptions(player);
+			
+						for (var y=0; y < tracks.length; y++) {
+							var track = tracks[y];
 
-						track = {};
-						tracks = player.media.textTracks;
-						for (j=0; j < tracks.length; j++) {
-							track = player.media.textTracks[j];
-							track.mode = "hidden";
 							if (track.kind === "captions") {
-								_on(track, "cuechange",function() {
+								_on(track, "cuechange", function() {
 									if (this.activeCues[0]) {
 										if (this.activeCues[0].hasOwnProperty("text")) {
 											player.captionsContainer.innerHTML = this.activeCues[0].text;
@@ -572,7 +596,6 @@
 					// Caption tracks not natively supported
 					else {
 						_log("textTracks not supported so rendering captions manually");
-						_showCaptions(player);
 
 						// Render captions from array at appropriate time
 						player.currentCaption = "";
@@ -601,12 +624,12 @@
 							xhr.onreadystatechange = function() {
 								if (xhr.readyState === 4) {
 									if (xhr.status === 200) {
-										player.captions = [];
 										var records = [], 
 											record,
 											req = xhr.responseText;
 
 										records = req.split("\n\n");
+
 										for (var r=0; r < records.length; r++) {
 											record = records[r];
 											player.captions[r] = [];
@@ -630,13 +653,17 @@
 						}
 					}
 
-					// If Safari 7, removing track from DOM [see "turn off native caption rendering" above]
-					if (player.browserName === "Safari" && player.browserMajorVersion === 7) {
-						_log("Safari 7 detected; removing track from DOM");
+					// If Safari 7+, removing track from DOM [see "turn off native caption rendering" above]
+					if (player.browserName === "Safari" && player.browserMajorVersion >= 7) {
+						_log("Safari 7+ detected; removing track from DOM");
 
+						// Find all <track> elements
 						tracks = player.media.getElementsByTagName("track");
 						
-						player.media.removeChild(tracks[0]);
+						// Loop through and remove one by one
+						for (var t=0; t < tracks.length; t++) {
+							player.media.removeChild(tracks[t]);
+						}
 					}
 				}
 			}
@@ -848,6 +875,54 @@
 			_toggleClass(player.container, config.classes.muted, (player.media.volume === 0 || player.media.muted));
 		}
 
+		// Update <progress> elements
+		function _updateProgress(event) {
+			var progress, text, value = 0;
+
+			switch(event.type) {
+				// Video playing
+				case "timeupdate":
+					progress 	= player.progress.played.bar;
+					text 		= player.progress.played.text;
+					value 		= _getPercentage(player.media.currentTime, player.media.duration);
+					break;
+
+				// Check buffer status
+				case "playing":
+				case "progress":
+					progress 	= player.progress.buffer.bar;
+					text 		= player.progress.buffer.text;
+					value 		= (function() { 
+									var buffered = player.media.buffered;
+
+									if(buffered.length) {
+										return _getPercentage(buffered.end(0), player.media.duration);
+									}
+
+									return 0;									
+								})();
+					break;
+			}
+
+			if (progress && value > 0) {
+				progress.value = value;
+				text.innerHTML = value;
+			}
+		}
+
+		// Update the displayed play time
+		function _updateTimeDisplay() {
+			player.secs = parseInt(player.media.currentTime % 60);
+			player.mins = parseInt((player.media.currentTime / 60) % 60);
+			
+			// Ensure it"s two digits. For example, 03 rather than 3.
+			player.secs = ("0" + player.secs).slice(-2);
+			player.mins = ("0" + player.mins).slice(-2);
+
+			// Render
+			player.duration.innerHTML = player.mins + ":" + player.secs;
+		}
+
 		// Listen for events
 		function _listeners() {
 			// Play
@@ -907,30 +982,13 @@
 			}
 			
 			// Duration
-			_on(player.media, "timeupdate", function() {
-				player.secs = parseInt(player.media.currentTime % 60);
-				player.mins = parseInt((player.media.currentTime / 60) % 60);
-				
-				// Ensure it"s two digits. For example, 03 rather than 3.
-				player.secs = ("0" + player.secs).slice(-2);
-				player.mins = ("0" + player.mins).slice(-2);
+			_on(player.media, "timeupdate", _updateTimeDisplay);
 
-				// Render
-				player.duration.innerHTML = player.mins + ":" + player.secs;
-			});
-
-			// Progress bar
-			_on(player.media, "timeupdate", function() {
-				player.percent = (100 / player.media.duration) * player.media.currentTime;
-
-				if (player.percent > 0) {
-					player.progress.bar.value = player.percent;
-					player.progress.text.innerHTML = player.percent;
-				}
-			});
+			// Playing progress
+			_on(player.media, "timeupdate", _updateProgress);
 
 			// Skip when clicking progress bar
-			_on(player.progress.bar, "click", function(event) {
+			_on(player.progress.played.bar, "click", function(event) {
 				player.pos = _getClickPosition(event).x / this.offsetWidth;
 				player.media.currentTime = player.pos * player.media.duration;
 				
@@ -953,6 +1011,15 @@
 				_toggleClass(player.container, config.classes.stopped, true);
 				_toggleClass(player.container, config.classes.playing);
 			});
+
+			_on(player.media, "loadstart", function() {
+				_log("loadstart");
+			});
+
+			// Check for buffer progress
+			_on(player.media, "progress", _updateProgress);
+			// Also check on start of playing
+			_on(player.media, "playing", _updateProgress);
 		}
 
 		function _init() {
@@ -992,16 +1059,18 @@
 			_injectControls();
 
 			// Find the elements
-			_findElements();
+			if(!_findElements()) {
+				return false;
+			}
+
+			// Captions
+			_setupCaptions();
 
 			// Set volume
 			_setVolume();
 
 			// Setup fullscreen
 			_setupFullscreen();
-
-			// Captions
-			_setupCaptions();
 
 			// Seeking
 			_setupSeeking();

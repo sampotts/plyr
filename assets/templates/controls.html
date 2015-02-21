@@ -1,7 +1,12 @@
 <div class="player-controls">
-	<progress class="player-progress" max="100" value="0">
-		<span>0</span>% played
-	</progress>
+	<div class="player-progress">
+		<progress class="player-progress-played" max="100" value="0">
+			<span>0</span>% played
+		</progress>
+		<progress class="player-progress-buffer" max="100" value="0">
+			<span>0</span>% buffered
+		</progress>
+	</div>
 	<span class="player-controls-playback">
 		<button type="button" data-player="restart">
 			<svg><use xlink:href="#icon-refresh"></use></svg>

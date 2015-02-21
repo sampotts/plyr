@@ -18,8 +18,9 @@
 @control-spacing: 			10px;
 
 // Progress
-@progress-bg: 				@gray;
-@progress-value-bg: 		@blue;
+@progress-bg: 				lighten(@gray, 10%);
+@progress-playing-bg: 		@blue;
+@progress-buffered-bg: 		@gray;
 
 // Range
 @range-track-height: 		6px;
@@ -96,9 +97,8 @@
 	max-width: 100%;
 	min-width: 290px;
 	overflow: hidden; // For the controls
-	background: #000;
 
-	// BORDER-BOX ALL THE THINGS! 
+	// border-box everything
 	// http://paulirish.com/2012/box-sizing-border-box-ftw/
 	&,
 	*,
@@ -130,10 +130,10 @@
 		font-size: 16px;
 		font-weight: 600;
 		text-shadow: 
-		-1px -1px 0 rgba(red(@gray-dark), green(@gray-dark), blue(@gray-dark), .5), 
-		1px -1px 0 rgba(red(@gray-dark), green(@gray-dark), blue(@gray-dark), .5), 
-		-1px 1px 0 rgba(red(@gray-dark), green(@gray-dark), blue(@gray-dark), .5), 
-		1px 1px 0 rgba(red(@gray-dark), green(@gray-dark), blue(@gray-dark), .5);
+		-1px -1px 0 @gray, 
+		1px -1px 0 @gray, 
+		-1px 1px 0 @gray, 
+		1px 1px 0 @gray;
 		text-align: center;
 		.font-smoothing();
 
@@ -206,18 +206,12 @@
 		input:focus + label,
 		button:focus {
 			.tab-focus();
-
-			svg {
-				fill: #fff;
-			}
+			color: #fff;
 		}
 		button:hover,
 		input + label:hover {
 			background: @control-color-active;
-
-			svg {
-				fill: #fff;
-			}
+			color: #fff;
 		}
 		.icon-exit-fullscreen,
 		.icon-muted {
@@ -243,27 +237,48 @@
 		right: 0;
 		width: 100%;
 		height: @control-spacing;
-		margin: 0;
-		vertical-align: top;
-		
-		&[value] {
-			-webkit-appearance: none;
-			border: none;
-			background: @progress-bg;
+		background: @progress-bg;
+
+		&-buffer,
+		&-played {
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			margin: 0;
+			vertical-align: top;
+			
+			&[value] {
+				-webkit-appearance: none;
+				border: none;
+				background: transparent;
+
+
+				&::-webkit-progress-bar {
+					background: transparent;
+				}
+
+				// Inherit from currentColor;
+				&::-webkit-progress-value {
+					background: currentColor;
+					transition: width .1s ease;
+				}
+				&::-moz-progress-bar {
+					background: currentColor;
+					transition: width .1s ease;
+				}
+			}
+		}
+		&-played {
+			z-index: 2;
+		}
+		&-played[value] {
 			cursor: pointer;
-			color: @progress-value-bg;
-
-			&::-webkit-progress-bar {
-				background: @progress-bg;
-			}
-
-			// Inherit from currentColor;
-			&::-webkit-progress-value {
-				background: currentColor;
-			}
-			&::-moz-progress-bar {
-				background: currentColor;
-			}
+			color: @progress-playing-bg;
+		}
+		&-buffer[value] {
+			color: @progress-buffered-bg;
 		}
 	}
 

@@ -8,7 +8,7 @@ We wanted a lightweight, accessible and customisable media player that just supp
 
 ## Features
 - **Accessible** - full support for captions and screen readers.
-- **Lightweight** - just 4KB minified and gzipped.
+- **Lightweight** - just 4.8KB minified and gzipped.
 - **Customisable** - make the player look how you want with the markup you want.
 - **Semantic** - uses HTML5 form inputs for volume (range) and progress element for playback progress.
 - **No dependencies** - written in native JS.
@@ -19,6 +19,9 @@ We wanted a lightweight, accessible and customisable media player that just supp
 ## Planned development
 - Accept a string selector, a node, or a nodelist for the `container` property of `selectors`.
 - Accept a selector for the `html` template property.
+
+## Changelog
+Check out [the changelog](changelog.md)
 
 ## Implementation
 
