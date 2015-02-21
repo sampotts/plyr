@@ -410,7 +410,7 @@
 		// Insert controls
 		function _injectControls() {
 			// Insert custom video controls
-			_log("Injecting custom controls");
+			_log("Injecting custom controls.");
 
 			// Use specified html 
 			// Need to do a default?
@@ -568,7 +568,7 @@
 							(player.browserName === "Firefox" && player.browserMajorVersion >= 31) || 
 							(player.browserName === "Safari" && player.browserMajorVersion >= 7)) {
 						// Debugging
-						_log("Detected IE 10/11 or Firefox 31+ or Safari 7+");
+						_log("Detected IE 10/11 or Firefox 31+ or Safari 7+.");
 
 						// Set to false so skips to "manual" captioning
 						player.isTextTracks = false;
@@ -577,7 +577,7 @@
 					// Rendering caption tracks
 					// Native support required - http://caniuse.com/webvtt
 					if (player.isTextTracks) {
-						_log("textTracks supported");
+						_log("TextTracks supported.");
 			
 						for (var y=0; y < tracks.length; y++) {
 							var track = tracks[y];
@@ -595,7 +595,7 @@
 					}
 					// Caption tracks not natively supported
 					else {
-						_log("textTracks not supported so rendering captions manually");
+						_log("TextTracks not supported so rendering captions manually.");
 
 						// Render captions from array at appropriate time
 						player.currentCaption = "";
@@ -639,10 +639,10 @@
 										// Remove first element ("VTT")
 										player.captions.shift();
 
-										_log("Successfully loaded the caption file via ajax.");
+										_log("Successfully loaded the caption file via AJAX.");
 									} 
 									else {
-										_log("There was a problem loading the caption file via ajax.", true);
+										_log("There was a problem loading the caption file via AJAX.", true);
 									}
 								}
 							}
@@ -655,7 +655,7 @@
 
 					// If Safari 7+, removing track from DOM [see "turn off native caption rendering" above]
 					if (player.browserName === "Safari" && player.browserMajorVersion >= 7) {
-						_log("Safari 7+ detected; removing track from DOM");
+						_log("Safari 7+ detected; removing track from DOM.");
 
 						// Find all <track> elements
 						tracks = player.media.getElementsByTagName("track");
@@ -683,7 +683,7 @@
 				var nativeSupport = fullscreen.supportsFullScreen;
 
 				if(nativeSupport || (config.fullscreen.fallback && !_inFrame())) {
-					_log((nativeSupport ? "Native" : "Fallback") + " fullscreen enabled");
+					_log((nativeSupport ? "Native" : "Fallback") + " fullscreen enabled.");
 
 					// Add styling hook
 					_toggleClass(player.container, config.classes.fullscreen.enabled, true);
@@ -1010,10 +1010,6 @@
 				}
 				_toggleClass(player.container, config.classes.stopped, true);
 				_toggleClass(player.container, config.classes.playing);
-			});
-
-			_on(player.media, "loadstart", function() {
-				_log("loadstart");
 			});
 
 			// Check for buffer progress
