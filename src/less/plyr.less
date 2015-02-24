@@ -10,12 +10,19 @@
 @gray: 						#565d64;
 @gray-light: 				#cbd0d3;
 
+// Font sizes
+@font-size-small: 			14px;
+@font-size-base: 			16px;
+@font-size-large:           ceil((@font-size-base * 1.5)); 
+
 // Controls
-@controls-bg: 				@gray-dark;
-@control-color: 			@gray-light;
-@control-color-active: 		@blue;
-@control-color-inactive: 	@gray;
 @control-spacing: 			10px;
+@controls-bg: 				@gray-dark;
+@control-bg-hover: 			@blue;
+@control-color: 			@gray-light;
+@control-color-inactive: 	@gray;
+@control-color-focus: 		#fff;
+@control-color-hover: 		#fff;
 
 // Progress
 @progress-bg: 				lighten(@gray, 10%);
@@ -28,11 +35,11 @@
 @range-thumb-height: 		(@range-track-height * 2);
 @range-thumb-width: 		(@range-track-height * 2);
 @range-thumb-bg: 			@control-color;
-@range-thumb-bg-focus: 		@control-color-active;
+@range-thumb-bg-focus: 		@control-bg-hover;
 
 // Breakpoints
 @bp-control-split: 			560px; // When controls split into left/right
-@bg-captions-large: 		768px; // When captions jump to the larger font size
+@bp-captions-large: 		768px; // When captions jump to the larger font size
 
 // Utility classes & mixins
 // -------------------------------
@@ -127,7 +134,7 @@
 		padding: 20px;
 		min-height: 2.5em;
 		color: #fff;
-		font-size: 16px;
+		font-size: @font-size-base;
 		font-weight: 600;
 		text-shadow: 
 		-1px -1px 0 @gray, 
@@ -137,8 +144,8 @@
 		text-align: center;
 		.font-smoothing();
 
-		@media (min-width: @bg-captions-large) {
-			font-size: 24px;
+		@media (min-width: @bp-captions-large) {
+			font-size: @font-size-large;
 		}
 	}
 	&.captions-active &-captions {
@@ -206,12 +213,12 @@
 		input:focus + label,
 		button:focus {
 			.tab-focus();
-			color: #fff;
+			color: @control-color-focus;
 		}
 		button:hover,
 		input + label:hover {
-			background: @control-color-active;
-			color: #fff;
+			background: @control-bg-hover;
+			color: @control-color-hover;
 		}
 		.icon-exit-fullscreen,
 		.icon-muted {
@@ -221,9 +228,9 @@
 			display: inline-block;
 			vertical-align: middle;
 			margin-left: @control-spacing;
-			color: #fff;
+			color: @control-color;
 			font-weight: 600;
-			font-size: 14px;
+			font-size: @font-size-small;
 			.font-smoothing();
 		}
 	}
@@ -254,7 +261,6 @@
 				border: none;
 				background: transparent;
 
-
 				&::-webkit-progress-bar {
 					background: transparent;
 				}
@@ -262,11 +268,9 @@
 				// Inherit from currentColor;
 				&::-webkit-progress-value {
 					background: currentColor;
-					transition: width .1s ease;
 				}
 				&::-moz-progress-bar {
 					background: currentColor;
-					transition: width .1s ease;
 				}
 			}
 		}
@@ -306,7 +310,6 @@
 		vertical-align: middle;
 		-webkit-appearance: none;
 		-moz-appearance: none;
-		//height: 6px;
 		width: 100px;
 		margin: 0 @control-spacing 0 0;
 		padding: 0;		
@@ -373,6 +376,7 @@
 		height: 100%;
 		width: 100%;
 		z-index: 10000000;
+		background: #000;
 
 		.player-video-wrapper {
 			height: 100%;
@@ -385,10 +389,10 @@
 				top: auto;
 				bottom: 90px;
 
-				@media (min-width: @bp-control-split) and (max-width: (@bg-captions-large - 1)) {
+				@media (min-width: @bp-control-split) and (max-width: (@bp-captions-large - 1)) {
 					bottom: 60px;
 				}
-				@media (min-width: @bg-captions-large) {
+				@media (min-width: @bp-captions-large) {
 					bottom: 80px;
 				}
 			}
@@ -398,14 +402,15 @@
 			bottom: 0;
 			left: 0;
 			right: 0;
+		}
+	}
 
-			.icon-exit-fullscreen {
-				display: block;
+	// When true full screen, show exit fullscreen icon
+	&.fullscreen-active .icon-exit-fullscreen {
+		display: block;
 
-				& + svg {
-					display: none;
-				}
-			}
+		& + svg {
+			display: none;
 		}
 	}
 
