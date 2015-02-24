@@ -1,6 +1,6 @@
 {
   "name": "plyr",
-  "version": "1.0.0",
+  "version": "1.0.10",
   "description": "A simple HTML5 media player using custom controls",
   "homepage": "http://plyr.io",
   "main": "gulpfile.js",
@@ -13,7 +13,7 @@
     "gulp-less": "~1.3.1",
     "gulp-minify-css": "~0.3.6",
     "gulp-svgmin": "^1.0.0",
-    "gulp-svgstore": "^4.0.1",
+    "gulp-svgstore": "^5.0.0",
     "gulp-uglify": "~0.3.1",
     "gulp-util": "~2.2.20",
     "run-sequence": "^0.3.6"

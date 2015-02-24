@@ -17,23 +17,21 @@ var fs 			= require("fs"),
 	svgmin 		= require("gulp-svgmin"),
 	hogan 		= require("gulp-hogan-compile");
 
-var projectPath = __dirname;
-var paths = {
-    project: 		projectPath,
-
+var root = __dirname,
+	paths = {
     // Watch paths
-    watchless: 		path.join(projectPath, "assets/less/**/*"),
-    watchjs: 		path.join(projectPath, "assets/js/**/*"),
-    watchicons: 	path.join(projectPath, "assets/icons/**/*"),
-    watchtemplates: path.join(projectPath, "assets/templates/**/*"),
-
-    // SVG Icons
-   	svg: 			path.join(projectPath, "assets/icons/*.svg"),
-
+    watch: {
+    	less: 		path.join(root, "src/less/**/*"),
+	    js: 		path.join(root, "src/js/**/*"),
+	    sprite: 	path.join(root, "src/sprite/*.svg"),
+	    templates: 	path.join(root, "src/templates/*.html"),
+    },    
     // Output paths
-    js:  			path.join(projectPath, "dist/js/"),
-    css:  			path.join(projectPath, "dist/css/"),
-    icons:  		path.join(projectPath, "dist/svg/")
+    output: {
+		js:  		path.join(root, "dist/js/"),
+		css:  		path.join(root, "dist/css/"),
+		sprite:  	path.join(root, "dist/")
+    }
 },
 
 // Task names
@@ -41,7 +39,7 @@ taskNames = {
 	jsAll: 		"js-all",
     lessBuild: 	"less-",
     jsBuild: 	"js-",
-    iconBuild: 	"icon-build",
+    sprite: 	"sprite-build",
     templates: 	"templates"
 },
 // Task arrays
@@ -49,7 +47,7 @@ lessBuildTasks 	= [],
 jsBuildTasks 	= [],
 
 // Fetch bundles from JSON
-bundles = loadJSON(path.join(paths.project, "bundles.json"));
+bundles = loadJSON(path.join(root, "bundles.json"));
 
 // Load json
 function loadJSON(path) {
@@ -59,14 +57,14 @@ function loadJSON(path) {
 // Build templates
 gulp.task(taskNames.templates, function () {
     return gulp
-    	.src(paths.watchtemplates)
+    	.src(paths.watch.templates)
         .pipe(hogan("templates.js", {
             wrapper: false,
             templateName: function (file) {
                 return path.basename(file.relative.replace(/\\/g, "-"), path.extname(file.relative));
             }
         }))
-        .pipe(gulp.dest(paths.js));
+        .pipe(gulp.dest(paths.output.js));
 });
 
 // Process JS 
@@ -80,7 +78,7 @@ for (var key in bundles.js) {
 	        	.src(bundles.js[key])
 				.pipe(concat(key))
 	            .pipe(uglify())
-	            .pipe(gulp.dest(paths.js));
+	            .pipe(gulp.dest(paths.output.js));
 	    });
 	})(key);
 }
@@ -97,32 +95,29 @@ for (var key in bundles.less) {
 				.pipe(less())
 				.on("error", gutil.log)
 				.pipe(concat(key))
-				.pipe(prefix(["last 2 versions", "> 1%", "ie 9"], { cascade: true }))
+				.pipe(prefix(["last 2 versions"], { cascade: true }))
 				.pipe(minifyCss())
-				.pipe(gulp.dest(paths.css));
+				.pipe(gulp.dest(paths.output.css));
 		});
 	})(key);
 }
 
 // Process Icons
-gulp.task(taskNames.iconBuild, function () {
+gulp.task(taskNames.sprite, function () {
 	return gulp
-		.src(paths.svg)
+		.src(paths.watch.sprite)
 		.pipe(svgmin({
 			plugins: [{
 				removeDesc: true
 			}]
 		}))
-        .pipe(svgstore({ 
-        	prefix: 	"icon-",
-        	fileName: 	"sprite.svg"
-        }))
-	    .pipe(gulp.dest(paths.icons));
+        .pipe(svgstore())
+	    .pipe(gulp.dest(paths.output.sprite));
 });
 
 // Default gulp task
 gulp.task("default", function(){
-	runSequence(taskNames.jsAll, lessBuildTasks.concat(taskNames.iconBuild, "watch"));
+	runSequence(taskNames.jsAll, lessBuildTasks.concat(taskNames.sprite, "watch"));
 });
 
 // Build all JS (inc. templates)
@@ -132,8 +127,8 @@ gulp.task(taskNames.jsAll, function(){
 
 // Watch for file changes
 gulp.task("watch", function () {
-	//gulp.watch(paths.watchtemplates, [taskNames.jsAll]);
-    //gulp.watch(paths.watchjs, [taskNames.jsAll]);
-    gulp.watch(paths.watchless, lessBuildTasks);
-    gulp.watch(paths.watchicons, [taskNames.iconBuild]);
+	//gulp.watch(paths.watch.templates, [taskNames.jsAll]);
+    //gulp.watch(paths.watch.js, [taskNames.jsAll]);
+    gulp.watch(paths.watch.less, lessBuildTasks);
+    gulp.watch(paths.watch.sprite, [taskNames.iconBuild]);
 });

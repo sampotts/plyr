@@ -1,5 +1,6 @@
 {
   "name": "plyr",
+  "version": "1.0.10",
   "description": "A simple HTML5 media player using custom controls",
   "homepage": "http://plyr.io",
   "keywords": [
@@ -14,7 +15,10 @@
   "dependencies": {},
   "main": [
     "dist/css/plyr.css",
-    "dist/js/plyr.js"
+    "dist/js/plyr.js",
+    "dist/sprite.svg",
+    "src/less/plyr.less",
+    "src/js/plyr.js"
   ],
   "ignore": [
     "node_modules",

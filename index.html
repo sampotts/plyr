@@ -26,7 +26,7 @@
 					<source src="//cdn.sampotts.me/plyr/movie.webm" type="video/webm">
 					
 					<!-- Text track file -->
-					<track kind="captions" label="English" srclang="en" src="assets/movie_en_captions.vtt" default>
+					<track kind="captions" label="English" srclang="en" src="//cdn.sampotts.me/plyr/movie_en_captions.vtt" default>
 					
 					<!-- Fallback for browsers that don't support the <video> element -->
 					<div>
@@ -55,7 +55,7 @@
 
 		<!-- Load SVG defs -->
 		<script>
-		(function(d,p){var a=new XMLHttpRequest(),b=d.body;a.open("GET",p,!0);a.send();a.onload=function(){var c=d.createElement("div");c.style.display="none";c.innerHTML=a.responseText;b.insertBefore(c,b.childNodes[0])}})(document,"dist/svg/sprite.svg");
+		(function(d,p){var a=new XMLHttpRequest(),b=d.body;a.open("GET",p,!0);a.send();a.onload=function(){var c=d.createElement("div");c.style.display="none";c.innerHTML=a.responseText;b.insertBefore(c,b.childNodes[0])}})(document,"dist/sprite.svg");
 		</script>
 
 		<!-- Core player -->
