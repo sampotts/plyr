@@ -303,6 +303,7 @@ This was created by Sam Potts ([@sam_potts](https://twitter.com/sam_potts))
 ## Useful links and credits
 Credit to the PayPal HTML5 Video player from which Plyr's caption functionality is ported from:
 - [PayPal's Accessible HTML5 Video Player](https://github.com/paypal/accessible-html5-video-player)
+- The icons used in Plyr are [Vicons](https://dribbble.com/shots/1663443-60-Vicons-Free-Icon-Set) plus some ones I made
 
 Also these links helped created Plyr:
 - [Media Events - W3.org](http://www.w3.org/2010/05/video/mediaevents.html)

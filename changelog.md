@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.0.11
+- Bug fixes for fullscreen mode
+
+## v1.0.10
+- Bower includes src files now
+- Folder re-arrangement
+
 ## v1.0.9
 - Added buffer progress bar
 - Fixed Safari 8 caption track (it needs to be removed from the DOM like in Safari 7)
