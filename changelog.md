@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.0.13
+- Minor tweaks
+
 ## v1.0.12
 - Handle native events (Issue #34)
 

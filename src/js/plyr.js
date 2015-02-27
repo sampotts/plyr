@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.0.11
+// plyr.js v1.0.13
 // https://github.com/sampotts/plyr
 // ==========================================================================
 // Credits: http://paypal.github.io/accessible-html5-video-player/
@@ -713,12 +713,6 @@
             player.media.pause();
         }
 
-        // Check playing state
-        function _checkPlaying() {
-            _toggleClass(player.container, config.classes.playing, !player.media.paused);
-            _toggleClass(player.container, config.classes.stopped, player.media.paused);
-        }
-
         // Restart playback
         function _restart() {
             // Move to beginning
@@ -736,7 +730,7 @@
         // Rewind
         function _rewind(seekInterval) {
             // Use default if needed
-            if(typeof seekInterval === "undefined") {
+            if(typeof seekInterval !== "number") {
                 seekInterval = config.seekInterval;
             }
 
@@ -757,7 +751,7 @@
         // Fast forward
         function _forward(seekInterval) {
             // Use default if needed
-            if(typeof seekInterval === "undefined") {
+            if(typeof seekInterval !== "number") {
                 seekInterval = config.seekInterval;
             }
 
@@ -773,6 +767,12 @@
             if (!player.isTextTracks && player.type === "video") {
                 _adjustManualCaptions(player);
             }
+        }
+
+        // Check playing state
+        function _checkPlaying() {
+            _toggleClass(player.container, config.classes.playing, !player.media.paused);
+            _toggleClass(player.container, config.classes.stopped, player.media.paused);
         }
 
         // Toggle fullscreen
@@ -937,27 +937,23 @@
             // Play
             _on(player.buttons.play, "click", function() { 
                 _play(); 
-                player.buttons.pause.focus(); 
+                setTimeout(function() { player.buttons.pause.focus(); }, 100);
             });
 
             // Pause
             _on(player.buttons.pause, "click", function() { 
                 _pause(); 
-                player.buttons.play.focus(); 
+                setTimeout(function() { player.buttons.play.focus(); }, 100);
             });
 
             // Restart
             _on(player.buttons.restart, "click", _restart);
 
             // Rewind
-            _on(player.buttons.rewind, "click", function() {
-                _rewind(config.seekInterval);
-            });
+            _on(player.buttons.rewind, "click", _rewind);
 
             // Fast forward
-            _on(player.buttons.forward, "click", function() {
-                _forward(config.seekInterval);
-            });
+            _on(player.buttons.forward, "click", _forward);
 
             // Get the HTML5 range input element and append audio volume adjustment on change
             _on(player.volume, "change", function() {
@@ -1017,8 +1013,7 @@
                 if(player.type === "video") {
                     player.captionsContainer.innerHTML = "";
                 }
-                _toggleClass(player.container, config.classes.stopped, true);
-                _toggleClass(player.container, config.classes.playing);
+                _checkPlaying();
             });
 
             // Check for buffer progress
