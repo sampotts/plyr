@@ -70,19 +70,17 @@ and the AJAX technique here:
 The only extra markup that's needed to use plyr is a `<div>` wrapper. Replace the source, poster and captions with urls for your media.
 ```html
 <div class="player">
-	<video poster="//cdn.sampotts.me/plyr/poster.jpg" controls crossorigin>
+	<video poster="//cdn.selz.com/plyr/1.0/poster.jpg" controls crossorigin>
 		<!-- Video files -->
-		<source src="//cdn.sampotts.me/plyr/movie.mp4" type="video/mp4">
-		<source src="//cdn.sampotts.me/plyr/movie.webm" type="video/webm">
+		<source src="//cdn.selz.com/plyr/1.0/movie.mp4" type="video/mp4">
+		<source src="//cdn.selz.com/plyr/1.0/movie.webm" type="video/webm">
 		
 		<!-- Text track file -->
-		<track kind="captions" label="English captions" src="//cdn.sampotts.me/plyr/movie_captions_en.vtt" srclang="en" default>
+		<track kind="captions" label="English captions" src="//cdn.selz.com/plyr/1.0/movie_captions_en.vtt" srclang="en" default>
 		
 		<!-- Fallback for browsers that don't support the <video> element -->
 		<div>
-			<a href="//cdn.sampotts.me/plyr/movie.mp4">
-				<img src="//cdn.sampotts.me/plyr/poster.jpg" alt="Download">
-			</a>
+			<a href="//cdn.selz.com/plyr/1.0/movie.mp4">Download</a>
 		</div>
 	</video>
 </div>
@@ -93,11 +91,12 @@ And the same for `<audio>`
 <div class="player">
 	<audio controls>
 		<!-- Audio files -->
-		<source src="//cdn.sampotts.me/plyr/logistics-96-sample.mp3" type="audio/mp3">
+		<source src="//cdn.selz.com/plyr/1.0/logistics-96-sample.mp3" type="audio/mp3">
+    <source src="//cdn.selz.com/plyr/1.0/logistics-96-sample.ogg" type="audio/ogg">
 		
 		<!-- Fallback for browsers that don't support the <audio> element -->
 		<div>
-			<a href="//cdn.sampotts.me/plyr/logistics-96-sample.mp3">Download</a>
+			<a href="//cdn.selz.com/plyr/1.0/logistics-96-sample.mp3">Download</a>
 		</div>
 	</audio>
 </div>
@@ -298,7 +297,7 @@ Any unsupported browsers will display links to download the media if the correct
 If you find anything weird with Plyr, please let us know using the Github issues tracker.
 
 ## Author
-This was created by Sam Potts ([@sam_potts](https://twitter.com/sam_potts))
+Plyr is developed by Sam Potts ([@sam_potts](https://twitter.com/sam_potts)) ([sampotts.me](http://sampotts.me))
 
 ## Useful links and credits
 Credit to the PayPal HTML5 Video player from which Plyr's caption functionality is ported from:
