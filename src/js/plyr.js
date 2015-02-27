@@ -706,15 +706,11 @@
         // Play media
         function _play() {
             player.media.play();
-
-            _checkPlaying();
         }
 
         // Pause media
         function _pause() {
-            player.media.pause(); 
-
-            _checkPlaying();
+            player.media.pause();
         }
 
         // Check playing state
