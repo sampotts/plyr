@@ -199,14 +199,23 @@
         }
     }
 
+    // Toggle event
+    function _toggleHandler(element, events, callback, toggle) {
+        events = events.split(" ");
+
+        for (var i = 0; i < events.length; i++) {
+            element[toggle ? "addEventListener" : "removeEventListener"](events[i], callback, false);
+        }
+    }
+
     // Bind event
-    function _on(element, event, callback) {
-        element.addEventListener(event, callback, false);
+    function _on(element, events, callback) {
+        _toggleHandler(element, events, callback, true);
     }
 
     // Unbind event
-    function _off(element, event, callback) {
-        element.removeEventListener(event, callback, false);
+    function _off(element, events, callback) {
+        _toggleHandler(element, events, callback, false);
     }
 
     // Get percentage
@@ -698,16 +707,20 @@
         function _play() {
             player.media.play();
 
-            _toggleClass(player.container, config.classes.stopped);
-            _toggleClass(player.container, config.classes.playing, true);
+            _checkPlaying();
         }
 
         // Pause media
         function _pause() {
             player.media.pause(); 
 
-            _toggleClass(player.container, config.classes.playing);
-            _toggleClass(player.container, config.classes.stopped, true);
+            _checkPlaying();
+        }
+
+        // Check playing state
+        function _checkPlaying() {
+            _toggleClass(player.container, config.classes.playing, !player.media.paused);
+            _toggleClass(player.container, config.classes.stopped, player.media.paused);
         }
 
         // Restart playback
@@ -1014,8 +1027,15 @@
 
             // Check for buffer progress
             _on(player.media, "progress", _updateProgress);
+
             // Also check on start of playing
             _on(player.media, "playing", _updateProgress);
+
+            // Handle native mute
+            _on(player.media, "volumechange", _checkMute);
+
+            // Handle native play/pause
+            _on(player.media, "play pause", _checkPlaying);
         }
 
         function _init() {
