@@ -306,7 +306,9 @@
 
 	// Volume control
 	// <input[type='range']> element
-	&-volume {
+	// Specificty is for bootstrap compatibility
+	&-volume[type=range] {
+		display: inline-block;
 		vertical-align: middle;
 		-webkit-appearance: none;
 		-moz-appearance: none;

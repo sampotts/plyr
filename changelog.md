@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.0.14
+- Minor change for bootstrap compatibility
+
 ## v1.0.13
 - Minor tweaks
 
