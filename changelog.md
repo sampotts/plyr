@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.0.12
+- Handle native events (Issue #34)
+
 ## v1.0.11
 - Bug fixes for fullscreen mode
 
