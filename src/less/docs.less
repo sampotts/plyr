@@ -100,6 +100,9 @@ a {
 	&:focus {
 		.tab-focus();
 	}
+	&.logo {
+		border: 0;
+	}
 }
 .btn {
 	display: inline-block;
@@ -110,6 +113,7 @@ a {
 	.font-smoothing(on);
 	font-weight: 600;
 	border-radius: 3px;
+	user-select: none;
 	
 	&:hover,
 	&:focus {
@@ -132,6 +136,15 @@ a {
 	&-fullscreen,
 	&.fullscreen-active {
 		max-width: none;
+	}
+}
+
+// Footer
+footer {
+	margin-bottom: @padding-base;
+
+	p {
+		margin-bottom: (@padding-base / 2);
 	}
 }
 
