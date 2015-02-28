@@ -20,7 +20,7 @@ Currently all buttons and inputs need to be present for Plyr to work but later w
 
 You can of course, just specify vanilla HTML. Here's an example snippet:
 
-```javascript
+```html
 var controls = [
 '<div class="player-controls">',
 	'<div class="player-progress">',
