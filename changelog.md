@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.0.15
+- Fix for seek time display in controls
+- More documentation for controls html
+
 ## v1.0.14
 - Minor change for bootstrap compatibility
 
