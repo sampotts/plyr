@@ -1,6 +1,8 @@
 # Controls HTML
 
-This is the markup that is rendered for controls. It is a seperate option to allow full customisation of markup based on your needs. The default Plyr setup uses a Hogan template, this is to allow for localisation at a later date. If you check `controls.html` in `/src/templates` to get an idea of how the default html works.
+This is the markup that is rendered for the Plyr controls. The reason it's a seperate option is to allow full customization of markup based on your needs. It's a pet hate of other libraries that use `<a href="#">` or `<span>`s as buttons! 
+
+The default Plyr setup uses a Hogan template, this is to allow for localization at a later date. Check out `controls.html` in `/src/templates` to get an idea of how the default html is structured. Alternatively just use the vanilla HTML below.
 
 ## Requirements
 
