@@ -2,17 +2,17 @@
 
 This is the markup that is rendered for the Plyr controls. The reason it's a seperate option is to allow full customization of markup based on your needs. It's a pet hate of other libraries that use `<a href="#">` or `<span>`s as buttons! 
 
-The default Plyr setup uses a Hogan template, this is to allow for localization at a later date. Check out `controls.html` in `/src/templates` to get an idea of how the default html is structured. Alternatively just use the vanilla HTML below.
+The default Plyr setup uses a Hogan template. The reason being to allow for localization at a later date. Check out `controls.html` in `/src/templates` to get an idea of how the default html is structured. Alternatively just use the vanilla HTML below.
 
 ## Requirements
 
 The classes and data attributes used in your template should match the `selectors` option. 
 
-You need to add two placeholders to your html template:
+You need to add several placeholders to your html template that are replaced when rendering:
 
-- {id} for the dynamically generated ID for the player (for form controls)
-- {aria-label} for the dynamically generated play button label for screen readers
-- {seek-time} for the seek time specified in options for fast forward and rewind
+- `{id}` - the dynamically generated ID for the player (for form controls)
+- `{aria-label}` - the play button label for screen readers
+- `{seek-time}` - the seek time specified in options for fast forward and rewind
 
 Currently all buttons and inputs need to be present for Plyr to work but later we'll make it more dynamic so if you omit a button or input, it'll still work. 
 
