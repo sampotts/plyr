@@ -144,7 +144,7 @@ plyr.setup({
     <td><code>html</code></td>
     <td>String</td>
     <td><code>&mdash;</code></td>
-    <td>This is **required**. See [controls.md](controls.md) for more info on how the html needs to be structured.</td>
+    <td>This is **required**. See <a href="controls.md">controls.md</a> for more info on how the html needs to be structured.</td>
   </tr>
   <tr>
     <td><code>debug</code></td>
@@ -290,12 +290,14 @@ Fullscreen in Plyr is supported for all browsers that [currently support it](htt
       <td>Safari</td>
       <td>Firefox</td>
       <td>Chrome</td>
+      <td>Opera</td>
       <td>IE9</td>
       <td>IE10+</td>
     </tr>
   </thead>
   <tbody>
     <tr>
+      <td>✔</td>
       <td>✔</td>
       <td>✔</td>
       <td>✔</td>
@@ -306,6 +308,7 @@ Fullscreen in Plyr is supported for all browsers that [currently support it](htt
 </table>
 
 &sup1; Native player used (no support for `<progress>` or `<input type="range">`)
+
 &sup2; IE10 has no native fullscreen support, fallback can be used (see options)
 
 The `enabled` option can be used to disable certain User Agents. For example, if you don't want to use Plyr for smartphones, you could use: 
