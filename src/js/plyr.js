@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.0.15
+// plyr.js v1.0.16
 // https://github.com/sampotts/plyr
 // ==========================================================================
 // Credits: http://paypal.github.io/accessible-html5-video-player/
@@ -432,11 +432,8 @@
             // Need to do a default?
             var html = config.html;
 
-            // Replace aria label instances
-            html = _replaceAll(html, "{aria-label}", config.playAriaLabel);
-
             // Replace seek time instances
-            html = _replaceAll(html, "{seek-time}", config.seekTime);
+            html = _replaceAll(html, "{seektime}", config.seekTime);
 
             // Replace all id references
             html = _replaceAll(html, "{id}", player.random);
@@ -488,6 +485,18 @@
                 _log("It looks like there's a problem with your controls html. Bailing.", true);
                 return false;
             }
+        }
+
+        // Setup aria attributes
+        function _setupAria() {
+            var label = player.buttons.play.innerText;
+
+            // If there's a media title set, use that for the label
+            if (typeof(config.title) !== "undefined" && config.title.length) {
+                label = player.buttons.play.innerText + ", " + config.title;
+            }
+
+            player.buttons.play.setAttribute("aria-label", label);
         }
 
         // Setup media
@@ -1058,14 +1067,6 @@
                 return false;
             }
 
-            // Set up aria-label for Play button with the title option
-            if (typeof(config.title) === "undefined" || !config.title.length) {
-                config.playAriaLabel = "Play";
-            }
-            else {
-                config.playAriaLabel = "Play " + config.title;
-            }
-
             // Setup media
             _setupMedia();
 
@@ -1079,6 +1080,9 @@
             if(!_findElements()) {
                 return false;
             }
+
+            // Set up aria-label for Play button with the title option
+            _setupAria();
 
             // Captions
             _setupCaptions();

@@ -11,8 +11,7 @@ The classes and data attributes used in your template should match the `selector
 You need to add several placeholders to your html template that are replaced when rendering:
 
 - `{id}` - the dynamically generated ID for the player (for form controls)
-- `{aria-label}` - the play button label for screen readers
-- `{seek-time}` - the seek time specified in options for fast forward and rewind
+- `{seektime}` - the seek time specified in options for fast forward and rewind
 
 Currently all buttons and inputs need to be present for Plyr to work but later we'll make it more dynamic so if you omit a button or input, it'll still work. 
 
@@ -38,9 +37,9 @@ var controls = [
 		'</button>',
 		'<button type="button" data-player="rewind">',
 			'<svg><use xlink:href="#icon-rewind"></use></svg>',
-			'<span class="sr-only">Rewind <span class="player-seek-time">{seek_time}</span> seconds</span>',
+			'<span class="sr-only">Rewind <span class="player-seek-time">{seektime}</span> seconds</span>',
 		'</button>',
-		'<button type="button" aria-label="{aria-label}" data-player="play">',
+		'<button type="button" data-player="play">',
 			'<svg><use xlink:href="#icon-play"></use></svg>',
 			'<span class="sr-only">Play</span>',
 		'</button>',
@@ -50,7 +49,7 @@ var controls = [
 		'</button>',
 		'<button type="button" data-player="fast-forward">',
 			'<svg><use xlink:href="#icon-fast-forward"></use></svg>',
-			'<span class="sr-only">Fast forward <span class="player-seek-time">{seek_time}</span> seconds</span>',
+			'<span class="sr-only">Fast forward <span class="player-seek-time">{seektime}</span> seconds</span>',
 		'</button>',
 		'<span class="player-time">',
 			'<span class="sr-only">Time</span>',
@@ -64,7 +63,7 @@ var controls = [
 			'<svg><use xlink:href="#icon-sound"></use></svg>',
 			'<span class="sr-only">Mute</span>',
 		'</label>',
-		'<label for="volume{id}" class="sr-only">Volume:</label>',
+		'<label for="volume{id}" class="sr-only">Volume</label>',
 		'<input id="volume{id}" class="player-volume" type="range" min="0" max="10" value="5" data-player="volume">',
 		'<input class="sr-only" id="captions{id}" type="checkbox" data-player="captions">',
 		'<label for="captions{id}">',

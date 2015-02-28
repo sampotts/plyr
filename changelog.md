@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.0.16
+- Aria label is now dynamic
+
 ## v1.0.15
 - Fix for seek time display in controls
 - More documentation for controls html
