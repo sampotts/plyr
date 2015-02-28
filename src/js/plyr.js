@@ -16,7 +16,7 @@
     var defaults = {
         enabled:                true, 
         debug:                  false,
-        seekInterval:           10,
+        seekTime:               10,
         volume:                 5,
         click:                  true,
         selectors: {
@@ -435,6 +435,9 @@
             // Replace aria label instances
             html = _replaceAll(html, "{aria-label}", config.playAriaLabel);
 
+            // Replace seek time instances
+            html = _replaceAll(html, "{seek-time}", config.seekTime);
+
             // Replace all id references
             html = _replaceAll(html, "{id}", player.random);
 
@@ -688,8 +691,8 @@
         // Setup seeking
         function _setupSeeking() {
             // Update number of seconds in rewind and fast forward buttons
-            player.seekTime[0].innerHTML = config.seekInterval;
-            player.seekTime[1].innerHTML = config.seekInterval;
+            player.seekTime[0].innerHTML = config.seekTime;
+            player.seekTime[1].innerHTML = config.seekTime;
         }
 
         // Setup fullscreen
@@ -735,13 +738,13 @@
         }
 
         // Rewind
-        function _rewind(seekInterval) {
+        function _rewind(seekTime) {
             // Use default if needed
-            if(typeof seekInterval !== "number") {
-                seekInterval = config.seekInterval;
+            if(typeof seekTime !== "number") {
+                seekTime = config.seekTime;
             }
 
-            var targetTime = player.media.currentTime - seekInterval;
+            var targetTime = player.media.currentTime - seekTime;
 
             if (targetTime < 0) {
                 player.media.currentTime = 0;
@@ -756,13 +759,13 @@
         }
 
         // Fast forward
-        function _forward(seekInterval) {
+        function _forward(seekTime) {
             // Use default if needed
-            if(typeof seekInterval !== "number") {
-                seekInterval = config.seekInterval;
+            if(typeof seekTime !== "number") {
+                seekTime = config.seekTime;
             }
 
-            var targetTime = player.media.currentTime + seekInterval;
+            var targetTime = player.media.currentTime + seekTime;
 
             if (targetTime > player.media.duration) {
                 player.media.currentTime = player.media.duration;

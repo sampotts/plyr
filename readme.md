@@ -11,7 +11,8 @@ We wanted a lightweight, accessible and customisable media player that just supp
 - **Lightweight** - just 4.8KB minified and gzipped.
 - **Customisable** - make the player look how you want with the markup you want.
 - **Semantic** - uses HTML5 form inputs for volume (range) and progress element for playback progress.
-- **No dependencies** - written in native JS.
+- **Responsive** - any screen size.
+- **No dependencies** - written in vanilla JavaScript.
 - **API** - easy to use API.
 - **Fallback** - if there's no support, the native players are used.
 - **Fullscreen** - options to run the player full browser or the user can toggle fullscreen.
@@ -23,6 +24,7 @@ Check out [the changelog](changelog.md)
 - Accept a string selector, a node, or a nodelist for the `container` property of `selectors`.
 - Accept a selector for the `html` template property.
 - Multiple language captions (with selection)
+- Localisation of control labels 
 
 If you have any cool ideas or features, please let me know by [creating an issue](https://github.com/Selz/plyr/issues/new) or of course, forking and sending a pull request.
 
@@ -36,10 +38,10 @@ bower install plyr
 More info on setting up dependencies can be found in the [Bower Docs](http://bower.io/docs/creating-packages/#maintaining-dependencies)
 
 ### CSS
-If you want to use the default css, add the css file from /dist into your head, or even better use the less file included in /assets in your build to save a request. 
+If you want to use the default css, add the css file from /dist into your head, or even better use the less file included in `/src` in your build to save a request. 
 
 ```html
-<link rel="stylesheet" href="/css/plyr.css" />
+<link rel="stylesheet" href="dist/css/plyr.css">
 ```
 
 ### SVG
@@ -58,7 +60,7 @@ The SVG sprite for the controls icons is loaded in by AJAX to help with performa
 		c.innerHTML=a.responseText;
 		b.insertBefore(c,b.childNodes[0])
 	}
-})(document,"/svg/sprite.svg");
+})(document,"dist/svg/sprite.svg");
 </script>
 ```
 More info on SVG sprites here:
@@ -112,14 +114,15 @@ More info on CORS here:
 Much of the behaviour of the player is configurable when initialising the library. Below is an example of a default instance.
 
 ```html
-<script src="js/plyr.js"></script>
+<script src="dist/js/plyr.js"></script>
 <script>
 plyr.setup({
 	html: **your controls html**
 });
 </script>
 ```
-You can pass the following settings:
+
+#### Options
 
 <table class="table" width="100%">
 <thead>
@@ -141,11 +144,7 @@ You can pass the following settings:
     <td><code>html</code></td>
     <td>String</td>
     <td><code>&mdash;</code></td>
-    <td>This is **required**. It is the markup used for the controls. In the demo, we use Hogan templates as we are already using them. You can of course, just specify vanilla html. The only requirement is your selectors should match the `selectors` option below. If you check `controls.html` in `/assets/templates` to get an idea of how the default html works. 
-
-    You need to add two placeholders to your html template:
-    - {id} for the dynamically generated ID for the player (for form controls)
-    - {aria_label} for the dynamically generated play button label for screen readers</td>
+    <td>This is **required**. See [controls.md](controls.md) for more info on how the html needs to be structured.</td>
   </tr>
   <tr>
     <td><code>debug</code></td>
@@ -154,7 +153,7 @@ You can pass the following settings:
     <td>Display debugging information on what Plyr is doing.</td>
   </tr>
   <tr>
-    <td><code>seekInterval</code></td>
+    <td><code>seekTime</code></td>
     <td>Number</td>
     <td><code>10</code></td>
     <td>The time, in seconds, to seek when a user hits fast forward or rewind.</td>
@@ -175,7 +174,7 @@ You can pass the following settings:
     <td><code>selectors</code></td>
     <td>Object</td>
     <td>&mdash;</td>
-    <td>See `plyr.js` in `/assets` for more info. The only option you might want to change is `player` which is the hook used for Plyr, the default is `.player`.</td>
+    <td>See `plyr.js` in `/src` for more info. The only option you might want to change is `player` which is the hook used for Plyr, the default is `.player`.</td>
   </tr>
   <tr>
     <td><code>classes</code></td>
@@ -283,12 +282,31 @@ A complete list of events can be found here:
 ## Fullscreen
 Fullscreen in Plyr is supported for all browsers that [currently support it](http://caniuse.com/#feat=fullscreen). If you're using the default CSS, you can also use a "full browser" mode which will use the full browser window by adding the `player-fullscreen` class to your container.
 
-## Support
-- Chrome: full support
-- Safari: full support
-- Firefox: full support
-- Internet Explorer 10, 11: full support
-- Internet Explorer 9: native player used (no support for `<progress>` or `<input type="range">`) 
+## Browser support
+
+<table width="100%" style="text-align: center;">
+  <thead>
+    <tr>
+      <td>Safari</td>
+      <td>Firefox</td>
+      <td>Chrome</td>
+      <td>IE9</td>
+      <td>IE10+</td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>✔</td>
+      <td>✔</td>
+      <td>✔</td>
+      <td>✖&sup1;</td>
+      <td>✔&sup2;</td>
+    </tr>
+  </tbody>
+</table>
+
+&sup1; Native player used (no support for `<progress>` or `<input type="range">`)
+&sup2; IE10 has no native fullscreen support, fallback can be used (see options)
 
 The `enabled` option can be used to disable certain User Agents. For example, if you don't want to use Plyr for smartphones, you could use: 
 
@@ -304,6 +322,16 @@ If you find anything weird with Plyr, please let us know using the Github issues
 
 ## Author
 Plyr is developed by Sam Potts ([@sam_potts](https://twitter.com/sam_potts)) ([sampotts.me](http://sampotts.me))
+
+## Mentions
+- [The Changelog](http://thechangelog.com/plyr-simple-html5-media-player-custom-controls-webvtt-captions/)
+- [HTML5 Weekly #177](http://html5weekly.com/issues/177)
+- [Web Design Weekly #174](https://web-design-weekly.com/2015/02/24/web-design-weekly-174/)
+
+## Used by
+- [Selz.com](https://selz.com)
+
+Let me know on [Twitter](https://twitter.com/sam_potts) I can add you to the above list. It'd be awesome to see how you're using Plyr :-) 
 
 ## Useful links and credits
 Credit to the PayPal HTML5 Video player from which Plyr's caption functionality is ported from:
