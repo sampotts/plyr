@@ -66,15 +66,7 @@
             fallback:           true
         },
         storage: {
-            enabled:            true,
-            supported:          function() {
-                try {
-                    return "localStorage" in window && window.localStorage !== null;
-                } 
-                catch(e) {
-                    return false;
-                }
-            }
+            enabled:            true
         }
     };
 
@@ -340,6 +332,21 @@
         }
 
         return fullscreen;
+    }
+
+    // Local storage
+    function _storage() {
+        var storage = {
+            supported: (function() {
+                try {
+                    return "localStorage" in window && window.localStorage !== null;
+                } 
+                catch(e) {
+                    return false;
+                }
+            })()
+        }
+        return storage;
     }
 
     // Player instance
@@ -829,7 +836,7 @@
         function _setVolume(volume) {
             // Use default if needed
             if(typeof volume === "undefined") {
-                if(config.storage.enabled && config.storage.supported) {
+                if(config.storage.enabled && _storage().supported) {
                     volume = window.localStorage.plyr_volume || config.volume;
                 }
                 else {
@@ -846,7 +853,7 @@
             _checkMute();
 
             // Store the volume in storage
-            if(config.storage.enabled && config.storage.supported) {
+            if(config.storage.enabled && _storage().supported) {
                 window.localStorage.plyr_volume = volume;
             }
         }

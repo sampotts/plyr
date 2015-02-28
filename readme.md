@@ -193,7 +193,13 @@ You can pass the following settings:
     <td><code>fullscreen</code></td>
     <td>Object</td>
     <td>&mdash;</td>
-    <td>This currently contains one property `enabled` which toggles if fullscreen should be enabled (if the browser supports it). The default value is `true`.</td>
+    <td>This currently contains two properties; `enabled` which toggles if fullscreen should be enabled (if the browser supports it). The default value is `true`. Also an extra property called `fallback` which will enable a 'full window' view for older browsers. The default value is `true`.</td>
+  </tr>
+  <tr>
+    <td><code>storage</code></td>
+    <td>Object</td>
+    <td>&mdash;</td>
+    <td>This currently contains one property `enabled` which toggles if local storage should be enabled (if the browser supports it). The default value is `true`. This enables storing user settings, currently it only stores volume but more will be added later.</td>
   </tr>
  </tbody>
 </table>
