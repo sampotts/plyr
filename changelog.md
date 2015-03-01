@@ -1,6 +1,9 @@
 # Changelog
 
-## v1.0.7
+## v1.0.18
+- Added CDN references
+
+## v1.0.17
 - SASS support added (thanks to @brunowego)
 - Docs completely seperated to avoid any confusion
 - New gulp tasks (will add more documentation for this)

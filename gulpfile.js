@@ -19,10 +19,11 @@ var fs 			= require("fs"),
 	hogan 		= require("gulp-hogan-compile"),
 	rename 		= require("gulp-rename"),
 	s3 			= require("gulp-s3"),
-	gzip 		= require("gulp-gzip");
+	gzip 		= require("gulp-gzip"),
+	replace  	= require("gulp-replace");
 
 var root = __dirname,
-	paths = {
+paths = {
 	plyr: {
 		// Source paths
 		src: {
@@ -32,7 +33,7 @@ var root = __dirname,
 			sprite: 	path.join(root, "src/sprite/*.svg")
 		},
 		// Output paths
-		output: path.join(root, "dist/")
+		output: 		path.join(root, "dist/")
 	},
 	docs: {
 		// Source paths
@@ -42,8 +43,11 @@ var root = __dirname,
 			templates: 	path.join(root, "docs/src/templates/*.html")
 		},
 		// Output paths
-		output: path.join(root, "docs/dist/")
-	}
+		output: 		path.join(root, "docs/dist/"),
+		// Docs
+		root: 			path.join(root, "docs/")
+	},
+	upload: [path.join(root, "dist/**"), path.join(root, "docs/dist/**")]
 },
 
 // Task arrays
@@ -187,32 +191,53 @@ gulp.task("watch", function () {
 });
 
 // Publish the docs site
+try {
+	var aws = loadJSON(path.join(root, "aws.json"));
+}
+catch (e) { }
+
+var version = package.version,
+maxAge 	= 31536000, // seconds 1 year
+options = {
+	cdn: {
+		headers: {
+			"Cache-Control": "max-age=" + maxAge + ", no-transform, public",
+			"Vary": "Accept-Encoding"
+		},
+		gzippedOnly: true
+	},
+	docs: {
+		headers: {
+			"Cache-Control": "public, must-revalidate, proxy-revalidate, max-age=0",
+			"Vary": "Accept-Encoding"
+		},
+		gzippedOnly: true
+	}
+},
+cdnpath = new RegExp(aws.cdn.bucket + "\/(\\d+\\.)?(\\d+\\.)?(\\*|\\d+)","gi");
+
 gulp.task("cdn", function () {
-	try {
-		var aws 	= loadJSON(path.join(root, "aws.json")),
-			version = package.version,
-			maxAge 	= 31536000, // seconds 1 year
-			options = {
-				headers: {
-					"Cache-Control": "max-age=" + maxAge + ", no-transform, public",
-					"Content-Encoding": "gzip",
-					"Vary": "Accept-Encoding"
-				},
-				gzippedOnly: true
-			};
+	console.log("Uploading " + version + " to " + aws.cdn.bucket);
 
-		console.log("Publishing " + version);
+	// Upload to CDN 
+	gulp.src(paths.upload)
+		.pipe(rename(function (path) {
+		    path.dirname = path.dirname.replace(".", version);
+		}))
+		.pipe(gzip())
+		.pipe(s3(aws.cdn, options.cdn));
+});
 
-		return gulp.src("dist/**")
-			.pipe(rename(function (path) {
-			    path.dirname = path.dirname.replace(".", version);
-			}))
-			.pipe(gzip())
-			.pipe(s3(aws, options));
-	} 
-	catch (e) {}
+gulp.task("docs", function () {
+	console.log("Uploading " + version + " docs to " + aws.docs.bucket);
+
+	// Replace versioned files in index.html
+	gulp.src([paths.docs.root + "index.html"])
+		.pipe(replace(cdnpath, aws.cdn.bucket + "/" + version))
+		.pipe(gzip())
+		.pipe(s3(aws.docs, options.docs));
 });
 
 gulp.task("publish", function () {
-
+	run("templates", tasks.js, tasks.less, "sprite", "cdn", "docs");
 });
