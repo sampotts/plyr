@@ -16,10 +16,14 @@ var fs 			= require("fs"),
 	prefix 		= require("gulp-autoprefixer"),
 	svgstore 	= require("gulp-svgstore"),
 	svgmin 		= require("gulp-svgmin"),
-	hogan 		= require("gulp-hogan-compile");
+	hogan 		= require("gulp-hogan-compile"),
+	rename 		= require("gulp-rename"),
+	s3 			= require("gulp-s3"),
+	gzip 		= require("gulp-gzip"),
+	replace  	= require("gulp-replace");
 
 var root = __dirname,
-	paths = {
+paths = {
 	plyr: {
 		// Source paths
 		src: {
@@ -29,11 +33,7 @@ var root = __dirname,
 			sprite: 	path.join(root, "src/sprite/*.svg")
 		},
 		// Output paths
-		output: {
-			js:  		path.join(root, "dist/js/"),
-			css:  		path.join(root, "dist/css/"),
-			sprite:  	path.join(root, "dist/")
-		}
+		output: 		path.join(root, "dist/")
 	},
 	docs: {
 		// Source paths
@@ -43,11 +43,11 @@ var root = __dirname,
 			templates: 	path.join(root, "docs/src/templates/*.html")
 		},
 		// Output paths
-		output: {
-			js:  		path.join(root, "docs/dist/js/"),
-			css:  		path.join(root, "docs/dist/css/")
-		}
-	}
+		output: 		path.join(root, "docs/dist/"),
+		// Docs
+		root: 			path.join(root, "docs/")
+	},
+	upload: [path.join(root, "dist/**"), path.join(root, "docs/dist/**")]
 },
 
 // Task arrays
@@ -58,7 +58,8 @@ tasks = {
 },
 
 // Fetch bundles from JSON
-bundles = loadJSON(path.join(root, "bundles.json"));
+bundles = loadJSON(path.join(root, "bundles.json")),
+package = loadJSON(path.join(root, "package.json"));
 
 // Load json
 function loadJSON(path) {
@@ -66,7 +67,7 @@ function loadJSON(path) {
 }
 
 var build = {
-	js: function (files, bundle, output) {
+	js: function (files, bundle) {
 		for (var key in files) {
 			(function(key) {
 				var name = "js-" + key;
@@ -77,12 +78,12 @@ var build = {
 						.src(bundles[bundle].js[key])
 						.pipe(concat(key))
 						.pipe(uglify())
-						.pipe(gulp.dest(output));
+						.pipe(gulp.dest(paths[bundle].output));
 				});
 			})(key);
 		}
 	},
-	less: function(files, bundle, output) {
+	less: function(files, bundle) {
 		for (var key in files) {
 			(function (key) {		
 				var name = "less-" + key;
@@ -96,12 +97,12 @@ var build = {
 						.pipe(concat(key))
 						.pipe(prefix(["last 2 versions"], { cascade: true }))
 						.pipe(minify())
-						.pipe(gulp.dest(output));
+						.pipe(gulp.dest(paths[bundle].output));
 				});
 			})(key);
 		}
 	},
-	sass: function(files, bundle, output) {
+	sass: function(files, bundle) {
 		for (var key in files) {
 			(function (key) {		
 				var name = "sass-" + key;
@@ -115,51 +116,51 @@ var build = {
 						.pipe(concat(key))
 						.pipe(prefix(["last 2 versions"], { cascade: true }))
 						.pipe(minify())
-						.pipe(gulp.dest(output));
+						.pipe(gulp.dest(paths[bundle].output));
 				});
 			})(key);
 		}
 	},
-	sprite: function(source, output) {
+	sprite: function() {
 		// Process Icons
 		gulp.task("sprite", function () {
 			return gulp
-				.src(source)
+				.src(paths.plyr.src.sprite)
 				.pipe(svgmin({
 					plugins: [{
 						removeDesc: true
 					}]
 				}))
 		        .pipe(svgstore())
-			    .pipe(gulp.dest(output));
+			    .pipe(gulp.dest(paths.plyr.output));
 		});
 	},
-	templates: function(source, output) {
+	templates: function() {
 		// Build templates
 		gulp.task("templates", function () {
 			return gulp
-				.src(source)
+				.src(paths.docs.src.templates)
 				.pipe(hogan("templates.js", {
 					wrapper: false,
 					templateName: function (file) {
 						return path.basename(file.relative.replace(/\\/g, "-"), path.extname(file.relative));
 					}
 				}))
-				.pipe(gulp.dest(output));
+				.pipe(gulp.dest(paths.docs.output));
 		});
 	}
 };
 
 // Plyr core files
-build.js(bundles.plyr.js, "plyr", paths.plyr.output.js);
-build.less(bundles.plyr.less, "plyr", paths.plyr.output.css);
-build.sass(bundles.plyr.sass, "plyr", paths.plyr.output.css);
-build.sprite(paths.plyr.src.sprite, paths.plyr.output.sprite);
+build.js(bundles.plyr.js, "plyr");
+build.less(bundles.plyr.less, "plyr");
+build.sass(bundles.plyr.sass, "plyr");
+build.sprite();
 
 // Docs files
-build.templates(paths.docs.src.templates, paths.docs.output.js);
-build.less(bundles.docs.less, "docs", paths.docs.output.css);
-build.js(bundles.docs.js, "docs", paths.docs.output.js);
+build.templates();
+build.less(bundles.docs.less, "docs");
+build.js(bundles.docs.js, "docs");
 
 // Default gulp task
 gulp.task("default", function(){
@@ -187,4 +188,56 @@ gulp.task("watch", function () {
     gulp.watch(paths.docs.src.js, tasks.js);
     gulp.watch(paths.docs.src.less, tasks.less);
 	gulp.watch(paths.docs.src.templates, "js");
+});
+
+// Publish the docs site
+try {
+	var aws = loadJSON(path.join(root, "aws.json"));
+}
+catch (e) { }
+
+var version = package.version,
+maxAge 	= 31536000, // seconds 1 year
+options = {
+	cdn: {
+		headers: {
+			"Cache-Control": "max-age=" + maxAge + ", no-transform, public",
+			"Vary": "Accept-Encoding"
+		},
+		gzippedOnly: true
+	},
+	docs: {
+		headers: {
+			"Cache-Control": "public, must-revalidate, proxy-revalidate, max-age=0",
+			"Vary": "Accept-Encoding"
+		},
+		gzippedOnly: true
+	}
+},
+cdnpath = new RegExp(aws.cdn.bucket + "\/(\\d+\\.)?(\\d+\\.)?(\\*|\\d+)","gi");
+
+gulp.task("cdn", function () {
+	console.log("Uploading " + version + " to " + aws.cdn.bucket);
+
+	// Upload to CDN 
+	gulp.src(paths.upload)
+		.pipe(rename(function (path) {
+		    path.dirname = path.dirname.replace(".", version);
+		}))
+		.pipe(gzip())
+		.pipe(s3(aws.cdn, options.cdn));
+});
+
+gulp.task("docs", function () {
+	console.log("Uploading " + version + " docs to " + aws.docs.bucket);
+
+	// Replace versioned files in index.html
+	gulp.src([paths.docs.root + "index.html"])
+		.pipe(replace(cdnpath, aws.cdn.bucket + "/" + version))
+		.pipe(gzip())
+		.pipe(s3(aws.docs, options.docs));
+});
+
+gulp.task("publish", function () {
+	run("templates", tasks.js, tasks.less, "sprite", "cdn", "docs");
 });
