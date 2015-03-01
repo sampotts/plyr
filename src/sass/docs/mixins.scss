@@ -1,0 +1,47 @@
+// ==========================================================================
+// Mixins
+// ==========================================================================
+
+// Contain floats: nicolasgallagher.com/micro-clearfix-hack/
+// ---------------------------------------
+@mixin clearfix()
+{
+	zoom: 1;
+	&:before, 
+	&:after { content: ""; display: table; }
+	&:after { clear: both; }
+}
+
+// Webkit-style focus
+// ---------------------------------------
+@mixin tab-focus()
+{
+	// Default
+	outline: thin dotted $gray-dark;
+	// Webkit
+	//outline: 5px auto -webkit-focus-ring-color;
+	outline-offset: 1px;
+}
+
+// Use rems for font sizing
+// Leave <body> at 100%/16px
+// ---------------------------------------
+@mixin font-size($font-size: 16)
+{
+	$rem: round(($font-size / 16), 1);
+	font-size: ($font-size * 1px);
+	font-size: #{"${rem}rem"};
+}
+
+// Font smoothing
+// ---------------------------------------
+@mixin font-smoothing($mode: on) when ($mode = on)
+{
+	-moz-osx-font-smoothing: grayscale;
+	-webkit-font-smoothing: antialiased;
+}
+@mixin font-smoothing($mode: on) when ($mode = off)
+{
+	-moz-osx-font-smoothing: auto;
+	-webkit-font-smoothing: subpixel-antialiased;
+}

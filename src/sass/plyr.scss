@@ -1,0 +1,442 @@
+// ==========================================================================
+// HTML5 Media Player
+// ==========================================================================
+
+// Variables
+// -------------------------------
+// Colors
+$blue:          			#3498DB;
+$gray-dark: 				#343f4a;
+$gray: 						#565d64;
+$gray-light: 				#cbd0d3;
+
+// Font sizes
+$font-size-small: 			14px;
+$font-size-base: 			16px;
+$font-size-large:           ceil(($font-size-base * 1.5));
+
+// Controls
+$control-spacing: 			10px;
+$controls-bg: 				$gray-dark;
+$control-bg-hover: 			$blue;
+$control-color: 			$gray-light;
+$control-color-inactive: 	$gray;
+$control-color-focus: 		#fff;
+$control-color-hover: 		#fff;
+
+// Progress
+$progress-bg: 				lighten($gray, 10%);
+$progress-playing-bg: 		$blue;
+$progress-buffered-bg: 		$gray;
+
+// Range
+$range-track-height: 		6px;
+$range-track-bg: 			$gray;
+$range-thumb-height: 		($range-track-height * 2);
+$range-thumb-width: 		($range-track-height * 2);
+$range-thumb-bg: 			$control-color;
+$range-thumb-bg-focus: 		$control-bg-hover;
+
+// Breakpoints
+$bp-control-split: 			560px; // When controls split into left/right
+$bp-captions-large: 		768px; // When captions jump to the larger font size
+
+// Utility classes & mixins
+// -------------------------------
+// Screen reader only
+.sr-only {
+	position: absolute !important;
+	clip: rect(1px, 1px, 1px, 1px);
+	padding: 0 !important;
+	border: 0 !important;
+	height: 1px !important;
+	width: 1px !important;
+	overflow: hidden;
+}
+// Contain floats: nicolasgallagher.com/micro-clearfix-hack/
+@mixin clearfix()
+{
+	zoom: 1;
+	&:before,
+	&:after { content: ""; display: table; }
+	&:after { clear: both; }
+}
+
+// Tab focus styles
+@mixin tab-focus()
+{
+	outline: thin dotted #000;
+	outline-offset: 1px;
+}
+
+// Range styling
+// ---------------------------------------
+@mixin range-thumb()
+{
+	height: $range-thumb-height;
+	width: $range-thumb-width;
+	background: $range-thumb-bg;
+	border: 0;
+	border-radius: ($range-thumb-height / 2);
+	transition: background .3s ease;
+	cursor: ew-resize;
+}
+@mixin range-track()
+{
+	height: $range-track-height;
+	background: $range-track-bg;
+	border: 0;
+	border-radius: ($range-track-height / 2);
+}
+
+// Font smoothing
+// ---------------------------------------
+@mixin font-smoothing($mode: on) when ($mode = on)
+{
+	-moz-osx-font-smoothing: grayscale;
+	-webkit-font-smoothing: antialiased;
+}
+@mixin font-smoothing($mode: on) when ($mode = off)
+{
+	-moz-osx-font-smoothing: auto;
+	-webkit-font-smoothing: subpixel-antialiased;
+}
+
+// Styles
+// -------------------------------
+// Base
+.player {
+	position: relative;
+	max-width: 100%;
+	min-width: 290px;
+	overflow: hidden; // For the controls
+
+	// border-box everything
+	// http://paulirish.com/2012/box-sizing-border-box-ftw/
+	&,
+	*,
+	*::after,
+	*::before {
+		box-sizing: border-box;
+	}
+
+	// For video
+	&-video-wrapper {
+		position: relative;
+	}
+	video {
+		width: 100%;
+		height: auto;
+		vertical-align: middle;
+	}
+
+	// Captions
+	&-captions {
+		display: none;
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		width: 100%;
+		padding: 20px;
+		min-height: 2.5em;
+		color: #fff;
+		font-size: $font-size-base;
+		font-weight: 600;
+		text-shadow:
+		-1px -1px 0 $gray,
+		1px -1px 0 $gray,
+		-1px 1px 0 $gray,
+		1px 1px 0 $gray;
+		text-align: center;
+		@include font-smoothing();
+
+		@media (min-width: $bp-captions-large) {
+			font-size: $font-size-large;
+		}
+	}
+	&.captions-active &-captions {
+		display: block;
+	}
+
+	// Player controls
+	&-controls {
+		@include clearfix();
+		@include font-smoothing();
+		position: relative;
+		padding: ($control-spacing * 2) $control-spacing $control-spacing;
+		background: $controls-bg;
+		line-height: 1;
+		text-align: center;
+
+		// Layout
+		&-sound {
+			display: block;
+			margin: $control-spacing auto 0;
+		}
+		@media (min-width: $bp-control-split) {
+			&-playback {
+				float: left;
+			}
+			&-sound {
+				float: right;
+				margin-top: 0;
+			}
+		}
+
+		input + label,
+		button {
+			display: inline-block;
+			vertical-align: middle;
+			margin: 0 2px;
+			padding: ($control-spacing / 2) $control-spacing;
+
+			transition: background .3s ease;
+			border-radius: 3px;
+			cursor: pointer;
+
+			svg {
+				width: 18px;
+				height: 18px;
+				display: block;
+				fill: currentColor;
+				transition: fill .3s ease;
+			}
+		}
+		input + label,
+		input.inverted:checked + label {
+			color: $control-color-inactive;
+		}
+		button,
+		input.inverted + label,
+		input:checked + label {
+			color: $control-color;
+		}
+		button {
+			border: 0;
+			background: transparent;
+			overflow: hidden;
+		}
+		input:focus + label,
+		button:focus {
+			@include tab-focus();
+			color: $control-color-focus;
+		}
+		button:hover,
+		input + label:hover {
+			background: $control-bg-hover;
+			color: $control-color-hover;
+		}
+		.icon-exit-fullscreen,
+		.icon-muted {
+			display: none;
+		}
+		.player-time {
+			display: inline-block;
+			vertical-align: middle;
+			margin-left: $control-spacing;
+			color: $control-color;
+			font-weight: 600;
+			font-size: $font-size-small;
+			@include font-smoothing();
+		}
+	}
+
+	// Player progress
+	// <progress> element
+	&-progress {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		width: 100%;
+		height: $control-spacing;
+		background: $progress-bg;
+
+		&-buffer,
+		&-played {
+			position: absolute;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			margin: 0;
+			vertical-align: top;
+
+			&[value] {
+				-webkit-appearance: none;
+				border: none;
+				background: transparent;
+
+				&::-webkit-progress-bar {
+					background: transparent;
+				}
+
+				// Inherit from currentColor;
+				&::-webkit-progress-value {
+					background: currentColor;
+				}
+				&::-moz-progress-bar {
+					background: currentColor;
+				}
+			}
+		}
+		&-played {
+			z-index: 2;
+		}
+		&-played[value] {
+			cursor: pointer;
+			color: $progress-playing-bg;
+		}
+		&-buffer[value] {
+			color: $progress-buffered-bg;
+		}
+	}
+
+	// States
+	&-controls [data-player='pause'],
+	&.playing .player-controls [data-player='play'] {
+		display: none;
+	}
+	&.playing .player-controls [data-player='pause'] {
+		display: inline-block;
+	}
+
+	// Muted
+	&.muted .player-controls .icon-muted {
+		display: block;
+
+		& + svg {
+			display: none;
+		}
+	}
+
+	// Volume control
+	// <input[type='range']> element
+	&-volume {
+		vertical-align: middle;
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		width: 100px;
+		margin: 0 $control-spacing 0 0;
+		padding: 0;
+		cursor: pointer;
+		background: none;
+
+		// Webkit
+		&::-webkit-slider-runnable-track {
+			@include range-track();
+		}
+		&::-webkit-slider-thumb {
+			-webkit-appearance: none;
+			margin-top: -(($range-thumb-height - $range-track-height) / 2);
+			@include range-thumb();
+		}
+
+		// Mozilla
+		&::-moz-range-track {
+			@include range-track();
+		}
+		&::-moz-range-thumb {
+			@include range-thumb();
+		}
+
+		// Microsoft
+		&::-ms-track {
+			height: $range-track-height;
+			background: transparent;
+			border-color: transparent;
+			border-width: (($range-thumb-height - $range-track-height) / 2) 0;
+			color: transparent;
+		}
+		&::-ms-fill-lower,
+		&::-ms-fill-upper {
+			@include range-track();
+		}
+		&::-ms-thumb {
+			@include range-thumb();
+		}
+
+		&:focus {
+			outline: 0;
+
+			&::-webkit-slider-thumb {
+				background: $range-thumb-bg-focus;
+			}
+			&::-moz-range-thumb {
+				background: $range-thumb-bg-focus;
+			}
+			&::-ms-thumb {
+				background: $range-thumb-bg-focus;
+			}
+		}
+	}
+
+	// Full screen mode
+	&-fullscreen,
+	&.fullscreen-active {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		height: 100%;
+		width: 100%;
+		z-index: 10000000;
+		background: #000;
+
+		.player-video-wrapper {
+			height: 100%;
+			width: 100%;
+
+			video {
+				height: 100%;
+			}
+			.player-captions {
+				top: auto;
+				bottom: 90px;
+
+				@media (min-width: $bp-control-split) and (max-width: ($bp-captions-large - 1)) {
+					bottom: 60px;
+				}
+				@media (min-width: $bp-captions-large) {
+					bottom: 80px;
+				}
+			}
+		}
+		.player-controls {
+			position: absolute;
+			bottom: 0;
+			left: 0;
+			right: 0;
+		}
+	}
+
+	// When true full screen, show exit fullscreen icon
+	&.fullscreen-active .icon-exit-fullscreen {
+		display: block;
+
+		& + svg {
+			display: none;
+		}
+	}
+
+	// Some options are hidden by default
+	[data-player='captions'],
+	[data-player='captions'] + label,
+	[data-player='fullscreen'],
+	[data-player='fullscreen'] + label {
+		display: none;
+	}
+	&.captions-enabled [data-player='captions'],
+	&.captions-enabled [data-player='captions'] + label,
+	&.fullscreen-enabled [data-player='fullscreen'],
+	&.fullscreen-enabled [data-player='fullscreen'] + label {
+		display: inline-block;
+	}
+
+	// Full browser view hides toggle
+	&-fullscreen [data-player='fullscreen'],
+	&-fullscreen [data-player='fullscreen'] + label {
+		display: none !important;
+	}
+}
