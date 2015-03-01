@@ -30,7 +30,7 @@ If you have any cool ideas or features, please let me know by [creating an issue
 
 ## Implementation
 
-Check `docs/index.html` and `docs/dist/js/docs.js` for an example setup.
+Check `docs/index.html` and `docs/dist/docs.js` for an example setup.
 
 ### Bower
 If bower is your thang, you can grab Plyr using:
@@ -43,7 +43,7 @@ More info on setting up dependencies can be found in the [Bower Docs](http://bow
 If you want to use the default css, add the `plyr.css` file from /dist into your head, or even better use `plyr.less` or `plyr.sass` file included in `/src` in your build to save a request. 
 
 ```html
-<link rel="stylesheet" href="dist/css/plyr.css">
+<link rel="stylesheet" href="dist/plyr.css">
 ```
 
 ### SVG
@@ -62,7 +62,7 @@ The SVG sprite for the controls icons is loaded in by AJAX to help with performa
 		c.innerHTML=a.responseText;
 		b.insertBefore(c,b.childNodes[0])
 	}
-})(document,"dist/svg/sprite.svg");
+})(document,"dist/sprite.svg");
 </script>
 ```
 More info on SVG sprites here:
@@ -116,7 +116,7 @@ More info on CORS here:
 Much of the behaviour of the player is configurable when initialising the library. Below is an example of a default instance.
 
 ```html
-<script src="dist/js/plyr.js"></script>
+<script src="dist/plyr.js"></script>
 <script>
 plyr.setup({
 	html: **your controls html**
