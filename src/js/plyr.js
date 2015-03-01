@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.0.16
+// plyr.js v1.0.17
 // https://github.com/sampotts/plyr
 // ==========================================================================
 // Credits: http://paypal.github.io/accessible-html5-video-player/

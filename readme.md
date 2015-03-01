@@ -30,6 +30,8 @@ If you have any cool ideas or features, please let me know by [creating an issue
 
 ## Implementation
 
+Check `docs/index.html` and `docs/dist/js/docs.js` for an example setup.
+
 ### Bower
 If bower is your thang, you can grab Plyr using:
 ```
@@ -38,14 +40,14 @@ bower install plyr
 More info on setting up dependencies can be found in the [Bower Docs](http://bower.io/docs/creating-packages/#maintaining-dependencies)
 
 ### CSS
-If you want to use the default css, add the css file from /dist into your head, or even better use the less file included in `/src` in your build to save a request. 
+If you want to use the default css, add the `plyr.css` file from /dist into your head, or even better use `plyr.less` or `plyr.sass` file included in `/src` in your build to save a request. 
 
 ```html
 <link rel="stylesheet" href="dist/css/plyr.css">
 ```
 
 ### SVG
-The SVG sprite for the controls icons is loaded in by AJAX to help with performance. This is best added before the closing `</body>`
+The SVG sprite for the controls icons is loaded in by AJAX to help with performance. This is best added before the closing `</body>`, before any other scripts.
 
 ```html
 <script>
