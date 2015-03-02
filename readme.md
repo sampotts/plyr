@@ -72,7 +72,7 @@ The SVG sprite for the controls icons is loaded in by AJAX to help with performa
 		c.innerHTML=a.responseText;
 		b.insertBefore(c,b.childNodes[0])
 	}
-})(document,"//cdn.plyr.io/1.0.19/sprite.svg");
+})(document,"dist/sprite.svg");
 </script>
 ```
 More info on SVG sprites here:

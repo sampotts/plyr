@@ -234,6 +234,7 @@ gulp.task("docs", function () {
 	// Replace versioned files in index.html
 	gulp.src([paths.docs.root + "index.html"])
 		.pipe(replace(cdnpath, aws.cdn.bucket + "/" + version))
+		.pipe(gulp.dest(paths.docs.root))
 		.pipe(gzip())
 		.pipe(s3(aws.docs, options.docs));
 });
