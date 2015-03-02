@@ -231,12 +231,17 @@ gulp.task("cdn", function () {
 gulp.task("docs", function () {
 	console.log("Uploading " + version + " docs to " + aws.docs.bucket);
 
-	// Replace versioned files in index.html
-	gulp.src([paths.docs.root + "index.html"])
+	// Replace versioned files in *.html
+	gulp.src([paths.docs.root + "*.html"])
 		.pipe(replace(cdnpath, aws.cdn.bucket + "/" + version))
 		.pipe(gulp.dest(paths.docs.root))
 		.pipe(gzip())
 		.pipe(s3(aws.docs, options.docs));
+
+	// Upload error.html to cdn using docs options
+	gulp.src([paths.docs.root + "error.html"])
+		.pipe(gzip())
+		.pipe(s3(aws.cdn, options.docs));
 });
 
 gulp.task("publish", function () {

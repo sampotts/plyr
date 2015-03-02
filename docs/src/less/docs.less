@@ -31,15 +31,28 @@
 }
 
 // Base
-html {
-	//font-size: 62.5%;
-}
 body {
 	font-family: "Avenir", "Helvetica Neue", Helvetica, Arial, sans-serif;
 	background: #fff;
 	line-height: 1.5;
 	text-align: center;
 	color: #6D797F;
+}
+
+// Error page
+html.error,
+.error body {
+	height: 100%;
+}
+.error body {
+	width: 100%;
+	display: table;
+	table-layout: fixed;
+}
+.error main {
+	display: table-cell;
+	width: 100%;
+	vertical-align: middle;
 }
 
 // Type
