@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.0.17
+// plyr.js v1.0.19
 // https://github.com/sampotts/plyr
 // ==========================================================================
 // Credits: http://paypal.github.io/accessible-html5-video-player/
@@ -795,12 +795,12 @@
         }
 
         // Toggle fullscreen
-        function _toggleFullscreen() {
+        function _toggleFullscreen(event) {
             // Check for native support
             var nativeSupport = fullscreen.supportsFullScreen;
 
             // If it's a fullscreen change event, it's probably a native close
-            if(event.type === fullscreen.fullScreenEventName) {
+            if(event && event.type === fullscreen.fullScreenEventName) {
                 config.fullscreen.active = fullscreen.isFullScreen();
             }
             // If there's native support, use it

@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.0.19
+- Fixed firefox fullscreen issue (#38)
+
 ## v1.0.18
 - Added CDN references
 
