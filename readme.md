@@ -40,14 +40,14 @@ bower install plyr
 More info on setting up dependencies can be found in the [Bower Docs](http://bower.io/docs/creating-packages/#maintaining-dependencies)
 
 ### CDN 
-If you want to use our CDN, you can use the following. Currently it's HTTP only. 
+If you want to use our CDN, you can use the following. HTTPS (SSL) is supported.
 
 ```html
-<link rel="stylesheet" href="http://cdn.plyr.io/1.0.19/plyr.css">
-<script src="http://cdn.plyr.io/1.0.19/plyr.js"></script>
+<link rel="stylesheet" href="//cdn.plyr.io/1.0.19/plyr.css">
+<script src="//cdn.plyr.io/1.0.19/plyr.js"></script>
 ```
 
-You can also access the `sprite.svg` file at `http://cdn.plyr.io/1.0.19/sprite.svg`.
+You can also access the `sprite.svg` file at `//cdn.plyr.io/1.0.19/sprite.svg`.
 
 ### CSS
 If you want to use the default css, add the `plyr.css` file from /dist into your head, or even better use `plyr.less` or `plyr.sass` file included in `/src` in your build to save a request. 
@@ -72,7 +72,7 @@ The SVG sprite for the controls icons is loaded in by AJAX to help with performa
 		c.innerHTML=a.responseText;
 		b.insertBefore(c,b.childNodes[0])
 	}
-})(document,"dist/sprite.svg");
+})(document,"//cdn.plyr.io/1.0.19/sprite.svg");
 </script>
 ```
 More info on SVG sprites here:
