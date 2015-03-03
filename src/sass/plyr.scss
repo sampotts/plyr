@@ -312,7 +312,7 @@ $bp-captions-large: 		768px; // When captions jump to the larger font size
 
 	// Volume control
 	// <input[type='range']> element
-	// Specificty is for bootstrap compatibility
+	// Specificity is for bootstrap compatibility
 	&-volume[type=range] {
 		vertical-align: middle;
 		-webkit-appearance: none;
