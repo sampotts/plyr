@@ -10,7 +10,7 @@ We wanted a lightweight, accessible and customisable media player that just supp
 
 ## Features
 - **Accessible** - full support for captions and screen readers.
-- **Lightweight** - just 4.8KB minified and gzipped.
+- **Lightweight** - just 5.3KB minified and gzipped.
 - **Customisable** - make the player look how you want with the markup you want.
 - **Semantic** - uses the *right* elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no `<span>` or `<a href="#">` button hacks.
 - **Responsive** - as you'd expect these days.
@@ -131,12 +131,14 @@ Much of the behaviour of the player is configurable when initialising the librar
 <script src="dist/plyr.js"></script>
 <script>
 plyr.setup({
-	html: **your controls html**
+	*options*
 });
 </script>
 ```
 
 #### Options
+
+You can pass the following options to the setup method.
 
 <table class="table" width="100%">
 <thead>
@@ -157,8 +159,8 @@ plyr.setup({
   <tr>
     <td><code>html</code></td>
     <td>String</td>
-    <td><code>&mdash;</code></td>
-    <td>This is **required**. See <a href="controls.md">controls.md</a> for more info on how the html needs to be structured.</td>
+    <td><code><a href="controls.md">See controls.md</a></code></td>
+    <td>See <a href="controls.md">controls.md</a> for more info on how the html needs to be structured.</td>
   </tr>
   <tr>
     <td><code>debug</code></td>
@@ -360,4 +362,4 @@ Also these links helped created Plyr:
 - [Styling the `<progress>` element - hongkiat.com](http://www.hongkiat.com/blog/html5-progress-bar/)
 
 ## Copyright and License
-Copyright 2014, Selz.com under [the BSD license](license.md).
+[The MIT license](license.md).

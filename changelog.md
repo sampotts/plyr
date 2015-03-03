@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.0.20
+- Default controls included (Fixes #45)
+- Volume changes on `input` as well as `change` (Fixes #43)
+- Fix for undefined Play text
+- License changed to MIT
+
 ## v1.0.19
 - Fixed firefox fullscreen issue (#38)
 

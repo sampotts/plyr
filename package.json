@@ -1,6 +1,6 @@
 {
   "name": "plyr",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "description": "A simple HTML5 media player using custom controls",
   "homepage": "http://plyr.io",
   "main": "gulpfile.js",
@@ -39,5 +39,5 @@
   "authors": [
     "Sam Potts <me@sampotts.me>"
   ],
-  "license": "BSD"
+  "license": "MIT"
 }
