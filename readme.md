@@ -3,6 +3,8 @@ A simple, accessible HTML5 media player.
 
 [Checkout the demo](http://plyr.io)
 
+![Image of Plyr](https://cdn.plyr.io/static/plyr.png)
+
 ## Why?
 We wanted a lightweight, accessible and customisable media player that just supports *modern* browsers. Sure, there are many other players out there but we wanted to keep things simple, using the right elements for the job. 
 
