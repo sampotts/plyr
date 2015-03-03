@@ -12,12 +12,12 @@ We wanted a lightweight, accessible and customisable media player that just supp
 - **Accessible** - full support for captions and screen readers.
 - **Lightweight** - just 4.8KB minified and gzipped.
 - **Customisable** - make the player look how you want with the markup you want.
-- **Semantic** - uses HTML5 form inputs for volume (range) and progress element for playback progress.
-- **Responsive** - any screen size.
-- **No dependencies** - written in vanilla JavaScript.
-- **API** - easy to use API.
-- **Fallback** - if there's no support, the native players are used.
-- **Fullscreen** - options to run the player full browser or the user can toggle fullscreen.
+- **Semantic** - uses the *right* elements. `<input type="range">` for volume and `<progress>` for progress and well `<button>`s for buttons - no `<span>` or `<a href="#">` button hacks here.
+- **Responsive** - as you'd expect these days.
+- **Audio & Video** - support for both formats.
+- **API** - toggle playback, volume, seeking, and more.
+- **Fullscreen** - supports native fullscreen with fallback to "full window" modes.
+- **No dependencies** - written in vanilla JavaScript, no jQuery required.
 
 ## Changelog
 Check out [the changelog](changelog.md)
