@@ -8,7 +8,7 @@
 
 ## v1.0.17
 - SASS support added (thanks to @brunowego)
-- Docs completely seperated to avoid any confusion
+- Docs completely separated to avoid any confusion
 - New gulp tasks (will add more documentation for this)
 
 ## v1.0.16

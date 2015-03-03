@@ -176,7 +176,7 @@ plyr.setup({
     <td><code>volume</code></td>
     <td>Number</td>
     <td><code>5</code></td>
-    <td>A number, between 1 and 10, representing the inital volume of the player.</td>
+    <td>A number, between 1 and 10, representing the initial volume of the player.</td>
   </tr>
   <tr>
     <td><code>click</code></td>
@@ -264,7 +264,7 @@ Here's a list of the methods supported:
   <tr>
     <td><code>setVolume</code></td>
     <td>Number</td>
-    <td>Sets the player voume to the provided parameter. The value should be between 0 (muted) and 10 (loudest). If no parameter is provided, the default volume is used (5). Values over 10 are ignored.</td>
+    <td>Sets the player volume to the provided parameter. The value should be between 0 (muted) and 10 (loudest). If no parameter is provided, the default volume is used (5). Values over 10 are ignored.</td>
   </tr>
   <tr>
     <td><code>toggleMute</code></td>
@@ -335,7 +335,7 @@ If a User Agent is disabled but supports `<video>` and `<audio>` natively, it wi
 Any unsupported browsers will display links to download the media if the correct html is used.
 
 ## Issues
-If you find anything weird with Plyr, please let us know using the Github issues tracker.
+If you find anything weird with Plyr, please let us know using the GitHub issues tracker.
 
 ## Author
 Plyr is developed by Sam Potts ([@sam_potts](https://twitter.com/sam_potts)) ([sampotts.me](http://sampotts.me))
