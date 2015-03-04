@@ -3,3 +3,4 @@ node_modules
 *.sublime-workspace
 .DS_Store
 aws.json
+docs/index.dev.html
