@@ -24,6 +24,7 @@
             container:          ".player",
             controls:           ".player-controls",
             buttons: {
+                seek:           "[data-player='seek']",
                 play:           "[data-player='play']",
                 pause:          "[data-player='pause']",
                 restart:        "[data-player='restart']",
@@ -40,8 +41,7 @@
                 played:         ".player-progress-played"
             },
             captions:           ".player-captions",
-            duration:           ".player-duration",
-            seekTime:           ".player-seek-time"
+            duration:           ".player-duration"
         },
         classes: {
             video:              "player-video",
@@ -72,6 +72,8 @@
         html: (function() {
                 return ["<div class='player-controls'>",
                 "<div class='player-progress'>",
+                    "<label for='seek{id}' class='sr-only'>Seek</label>",
+                    "<input id='seek{id}' class='player-progress-seek' type='range' min='0' max='100' step='0.5' value='0' data-player='seek'>",
                     "<progress class='player-progress-played' max='100' value='0'>",
                         "<span>0</span>% played",
                     "</progress>",
@@ -86,7 +88,7 @@
                     "</button>",
                     "<button type='button' data-player='rewind'>",
                         "<svg><use xlink:href='#icon-rewind'></use></svg>",
-                        "<span class='sr-only'>Rewind <span class='player-seek-time'>{seektime}</span> seconds</span>",
+                        "<span class='sr-only'>Rewind {seektime} seconds</span>",
                     "</button>",
                     "<button type='button' data-player='play'>",
                         "<svg><use xlink:href='#icon-play'></use></svg>",
@@ -98,7 +100,7 @@
                     "</button>",
                     "<button type='button' data-player='fast-forward'>",
                         "<svg><use xlink:href='#icon-fast-forward'></use></svg>",
-                        "<span class='sr-only'>Fast forward <span class='player-seek-time'>{seektime}</span> seconds</span>",
+                        "<span class='sr-only'>Fast forward {seektime} seconds</span>",
                     "</button>",
                     "<span class='player-time'>",
                         "<span class='sr-only'>Time</span>",
@@ -273,33 +275,6 @@
     // Get percentage
     function _getPercentage(current, max) {
         return Math.floor((current / max) * 100);
-    }
-
-    // Get click position relative to parent
-    // http://www.kirupa.com/html5/getting_mouse_click_position.htm
-    function _getClickPosition(event) {
-        var parentPosition = _fullscreen().isFullScreen() ? { x: 0, y: 0 } : _getPosition(event.currentTarget);
-
-        return {
-            x: event.clientX - parentPosition.x,
-            y: event.clientY - parentPosition.y
-        };
-    }
-    // Get element position
-    function _getPosition(element) {
-        var xPosition = 0;
-        var yPosition = 0;
-
-        while (element) {
-            xPosition += (element.offsetLeft - element.scrollLeft + element.clientLeft);
-            yPosition += (element.offsetTop - element.scrollTop + element.clientTop);
-            element = element.offsetParent;
-        }
-        
-        return { 
-            x: xPosition, 
-            y: yPosition 
-        };
     }
 
     // Deep extend/merge two Objects
@@ -509,6 +484,7 @@
 
                 // Buttons
                 player.buttons = {};
+                player.buttons.seek             = _getElement(config.selectors.buttons.seek);
                 player.buttons.play             = _getElement(config.selectors.buttons.play);
                 player.buttons.pause            = _getElement(config.selectors.buttons.pause);
                 player.buttons.restart          = _getElement(config.selectors.buttons.restart);
@@ -757,13 +733,6 @@
             }
         }
 
-        // Setup seeking
-        function _setupSeeking() {
-            // Update number of seconds in rewind and fast forward buttons
-            player.seekTime[0].innerHTML = config.seekTime;
-            player.seekTime[1].innerHTML = config.seekTime;
-        }
-
         // Setup fullscreen
         function _setupFullscreen() {
             if(player.type === "video" && config.fullscreen.enabled) {
@@ -973,7 +942,20 @@
                     progress    = player.progress.played.bar;
                     text        = player.progress.played.text;
                     value       = _getPercentage(player.media.currentTime, player.media.duration);
+
+                    // Set seeking value
+                    player.buttons.seek.value = value;
+
                     break;
+
+                // Seeking
+                case "change":
+                case "input":
+                    progress    = player.progress.played.bar;
+                    text        = player.progress.played.text;
+                    value       = event.target.value;
+                    break;
+
 
                 // Check buffer status
                 case "playing":
@@ -996,6 +978,8 @@
                 progress.value = value;
                 text.innerHTML = value;
             }
+
+            //_log(event);
         }
 
         // Update the displayed play time
@@ -1066,17 +1050,25 @@
                 });
             }
             
-            // Duration
-            _on(player.media, "timeupdate", _updateTimeDisplay);
+            // Time change on media
+            _on(player.media, "timeupdate", function(event) {
+                // Duration
+                _updateTimeDisplay();
+                // Playing progress
+                _updateProgress(event);
+            });
 
-            // Playing progress
-            _on(player.media, "timeupdate", _updateProgress);
+            // Seek 
+            _on(player.buttons.seek, "change input", function(event) {
+                // Update progress elements
+                _updateProgress(event);
 
-            // Skip when clicking progress bar
-            _on(player.progress.played.bar, "click", function(event) {
-                player.pos = _getClickPosition(event).x / this.offsetWidth;
-                player.media.currentTime = player.pos * player.media.duration;
-                
+                // Update the text label
+                _updateTimeDisplay();
+
+                // Seek to the selected time
+                player.media.currentTime = ((this.value / this.max) * player.media.duration);
+
                 // Special handling for "manual" captions
                 if (!player.isTextTracks && player.type === "video") {
                     _adjustManualCaptions(player);
@@ -1153,9 +1145,6 @@
 
             // Setup fullscreen
             _setupFullscreen();
-
-            // Seeking
-            _setupSeeking();
 
             // Listeners
             _listeners();
