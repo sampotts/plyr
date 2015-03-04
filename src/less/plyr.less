@@ -196,13 +196,13 @@
 				transition: fill .3s ease;
 			}
 		}
-		input + label,
-		input.inverted:checked + label {
+		[type="checkbox"] + label,
+		.inverted:checked + label {
 			color: @control-color-inactive;
 		}
 		button, 
-		input.inverted + label,
-		input:checked + label {
+		.inverted + label,
+		[type="checkbox"]:checked + label {
 			color: @control-color;
 		}
 		button {
@@ -210,18 +210,19 @@
 			background: transparent;
 			overflow: hidden;
 		}
-		input:focus + label,
+		[type="checkbox"]:focus + label,
 		button:focus {
 			.tab-focus();
 			color: @control-color-focus;
 		}
 		button:hover,
-		input + label:hover {
+		[type="checkbox"] + label:hover {
 			background: @control-bg-hover;
 			color: @control-color-hover;
 		}
 		.icon-exit-fullscreen,
-		.icon-muted {
+		.icon-muted,
+		.icon-captions-on {
 			display: none;
 		}
 		.player-time {
@@ -293,15 +294,6 @@
 	}
 	&.playing .player-controls [data-player='pause'] {
 		display: inline-block;
-	}
-
-	// Muted
-	&.muted .player-controls .icon-muted {
-		display: block;
-
-		& + svg {
-			display: none;
-		}
 	}
 
 	// Volume control
@@ -407,8 +399,10 @@
 		}
 	}
 
-	// When true full screen, show exit fullscreen icon
-	&.fullscreen-active .icon-exit-fullscreen {
+	// Change icons on state change
+	&.fullscreen-active .icon-exit-fullscreen,
+	&.muted .player-controls .icon-muted,
+	&.captions-active .player-controls .icon-captions-on {
 		display: block;
 
 		& + svg {

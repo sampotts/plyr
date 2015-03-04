@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="18px" height="18px" viewBox="0 0 18 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.2.2 (9983) - http://www.bohemiancoding.com/sketch -->
+    <title>icon-restart</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" sketch:type="MSPage">
+        <path d="M17,2 C16.448,2 16,2.448 16,3 L16,7.318 L7,2 C6.448,2 6,2.448 6,3 L6,4.954 L1,2 C0.448,2 0,2.448 0,3 L0,15 C0,15.552 0.448,16 1,16 L6,13.045 L6,15 C6,15.552 6.448,16 7,16 L16,10.682 L16,15 C16,15.552 16.448,16 17,16 C17.552,16 18,15.552 18,15 L18,3 C18,2.448 17.552,2 17,2 L17,2 Z M6,10.722 L2,13.086 L2,4.914 L6,7.278 L6,10.722 L6,10.722 Z M8,13.086 L8,4.914 L14.915,9 L8,13.086 L8,13.086 Z" id="Shape" sketch:type="MSShapeGroup" transform="translate(9.000000, 9.000000) scale(-1, 1) translate(-9.000000, -9.000000) "></path>
+    </g>
+</svg>
