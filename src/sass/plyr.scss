@@ -30,12 +30,12 @@ $progress-playing-bg: 		$blue;
 $progress-buffered-bg: 		$gray;
 
 // Range
-$range-track-height: 		6px;
-$range-track-bg: 			$gray;
-$range-thumb-height: 		($range-track-height * 2);
-$range-thumb-width: 		($range-track-height * 2);
-$range-thumb-bg: 			$control-color;
-$range-thumb-bg-focus: 		$control-bg-hover;
+$volume-track-height: 		6px;
+$volume-track-bg: 			$gray;
+$volume-thumb-height: 		($volume-track-height * 2);
+$volume-thumb-width: 		($volume-track-height * 2);
+$volume-thumb-bg: 			$control-color;
+$volume-thumb-bg-focus: 	$control-bg-hover;
 
 // Breakpoints
 $bp-control-split: 			560px; // When controls split into left/right
@@ -66,27 +66,37 @@ $bp-captions-large: 		768px; // When captions jump to the larger font size
 @mixin tab-focus()
 {
 	outline: thin dotted #000;
-	outline-offset: 1px;
+	outline-offset: 0;
 }
 
-// Range styling
+// <input type="range"> styling
 // ---------------------------------------
-@mixin range-thumb()
+@mixin volume-thumb()
 {
-	height: $range-thumb-height;
-	width: $range-thumb-width;
-	background: $range-thumb-bg;
+	height: $volume-thumb-height;
+	width: $volume-thumb-width;
+	background: $volume-thumb-bg;
 	border: 0;
-	border-radius: ($range-thumb-height / 2);
+	border-radius: ($volume-thumb-height / 2);
 	transition: background .3s ease;
 	cursor: ew-resize;
 }
-@mixin range-track()
+@mixin volume-track()
 {
-	height: $range-track-height;
-	background: $range-track-bg;
+	height: $volume-track-height;
+	background: $volume-track-bg;
 	border: 0;
-	border-radius: ($range-track-height / 2);
+	border-radius: ($volume-track-height / 2);
+}
+@mixin seek-thumb() {
+	background: transparent;
+	border: 0;
+	width: 2px;
+	height: $control-spacing;
+}
+@mixin seek-track() {
+	background: none;
+	border: 0;
 }
 
 // Font smoothing
@@ -202,13 +212,13 @@ $bp-captions-large: 		768px; // When captions jump to the larger font size
 				transition: fill .3s ease;
 			}
 		}
-		[type="checkbox"] + label,
+		input + label,
 		.inverted:checked + label {
 			color: $control-color-inactive;
 		}
 		button,
 		.inverted + label,
-		[type="checkbox"]:checked + label {
+		input:checked + label {
 			color: $control-color;
 		}
 		button {
@@ -216,13 +226,13 @@ $bp-captions-large: 		768px; // When captions jump to the larger font size
 			background: transparent;
 			overflow: hidden;
 		}
-		[type="checkbox"]:focus + label,
+		input:focus + label,
 		button:focus {
 			@include tab-focus();
 			color: $control-color-focus;
 		}
 		button:hover,
-		[type="checkbox"] + label:hover {
+		input + label:hover {
 			background: $control-bg-hover;
 			color: $control-color-hover;
 		}
@@ -253,8 +263,9 @@ $bp-captions-large: 		768px; // When captions jump to the larger font size
 		height: $control-spacing;
 		background: $progress-bg;
 
-		&-buffer,
-		&-played {
+		&-buffer[value],
+		&-played[value],
+		&-seek[type=range] {
 			position: absolute;
 			left: 0;
 			top: 0;
@@ -263,33 +274,81 @@ $bp-captions-large: 		768px; // When captions jump to the larger font size
 			margin: 0;
 			vertical-align: top;
 
-			&[value] {
-				-webkit-appearance: none;
-				border: none;
+			-webkit-appearance: none;
+			-moz-appearance: none;
+			border: none;
+			background: transparent;
+		}
+
+		&-buffer[value],
+		&-played[value] {	
+			&::-webkit-progress-bar {
 				background: transparent;
+			}
 
-				&::-webkit-progress-bar {
-					background: transparent;
-				}
-
-				// Inherit from currentColor;
-				&::-webkit-progress-value {
-					background: currentColor;
-				}
-				&::-moz-progress-bar {
-					background: currentColor;
-				}
+			// Inherit from currentColor;
+			&::-webkit-progress-value {
+				background: currentColor;
+				transition: width .1s ease;
+			}
+			&::-moz-progress-bar {
+				background: currentColor;
+				transition: width .1s ease;
 			}
 		}
-		&-played {
-			z-index: 2;
-		}
 		&-played[value] {
-			cursor: pointer;
+			z-index: 2;
 			color: $progress-playing-bg;
 		}
 		&-buffer[value] {
 			color: $progress-buffered-bg;
+		}
+
+		// Seek control
+		// <input[type='range']> element
+		// Specificity is for bootstrap compatibility
+		&-seek[type=range] {
+			z-index: 3;
+			cursor: pointer;
+			outline: 0;
+
+			// Webkit
+			&::-webkit-slider-runnable-track {
+				@include seek-track();
+			}
+			&::-webkit-slider-thumb {
+				-webkit-appearance: none;
+				@include seek-thumb();
+			}
+
+			// Mozilla
+			&::-moz-range-track {
+				@include seek-track();
+			}
+			&::-moz-range-thumb {
+				-moz-appearance: none;
+				@include seek-thumb();
+			}
+			
+			// Microsoft
+			&::-ms-track {
+				color: transparent;
+				@include seek-track();
+			}
+			&::-ms-fill-lower,
+			&::-ms-fill-upper {
+				@include seek-track();
+			}
+			&::-ms-thumb {
+				@include seek-thumb();
+			}
+
+			&:focus {
+				outline: 0;
+			}
+			&::-moz-focus-outer {
+				border: 0;
+			}
 		}
 	}
 
@@ -321,7 +380,7 @@ $bp-captions-large: 		768px; // When captions jump to the larger font size
 		}
 		&::-webkit-slider-thumb {
 			-webkit-appearance: none;
-			margin-top: -(($range-thumb-height - $range-track-height) / 2);
+			margin-top: -(($volume-thumb-height - $volume-track-height) / 2);
 			@include range-thumb();
 		}
 
@@ -335,10 +394,10 @@ $bp-captions-large: 		768px; // When captions jump to the larger font size
 
 		// Microsoft
 		&::-ms-track {
-			height: $range-track-height;
+			height: $volume-track-height;
 			background: transparent;
 			border-color: transparent;
-			border-width: (($range-thumb-height - $range-track-height) / 2) 0;
+			border-width: (($volume-thumb-height - $volume-track-height) / 2) 0;
 			color: transparent;
 		}
 		&::-ms-fill-lower,
@@ -353,13 +412,13 @@ $bp-captions-large: 		768px; // When captions jump to the larger font size
 			outline: 0;
 
 			&::-webkit-slider-thumb {
-				background: $range-thumb-bg-focus;
+				background: $volume-thumb-bg-focus;
 			}
 			&::-moz-range-thumb {
-				background: $range-thumb-bg-focus;
+				background: $volume-thumb-bg-focus;
 			}
 			&::-ms-thumb {
-				background: $range-thumb-bg-focus;
+				background: $volume-thumb-bg-focus;
 			}
 		}
 	}
