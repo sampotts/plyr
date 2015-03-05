@@ -264,6 +264,18 @@
         }
     }
 
+    // Set attributes
+    function _setAttributes(element, attributes) {
+        for(var key in attributes) {
+            element.setAttribute(key, attributes[key]);
+        }
+    }
+
+    // Prepend child
+    function _prependChild(parent, element) {
+        parent.insertBefore(element, parent.firstChild);
+    }
+
     // Bind event
     function _on(element, events, callback) {
         _toggleHandler(element, events, callback, true);
@@ -571,6 +583,11 @@
                 // Cache the container
                 player.videoContainer = wrapper;
             }
+
+            // Autoplay
+            if(player.media.getAttribute("autoplay") !== null) {
+                _play();
+            }
         }
 
         // Setup captions
@@ -772,9 +789,6 @@
             if (!player.isTextTracks) {
                 player.subcount = 0;
             }
-
-            // Play and ensure the play button is in correct state
-            _play();
         }
 
         // Rewind
@@ -991,8 +1005,6 @@
                 progress.value = value;
                 text.innerHTML = value;
             }
-
-            //_log(event);
         }
 
         // Update the displayed play time
@@ -1008,11 +1020,84 @@
             player.duration.innerHTML = player.mins + ":" + player.secs;
         }
 
+        // Handle time change event
         function _timeUpdate(event) {
             // Duration
             _updateTimeDisplay();
             // Playing progress
             _updateProgress(event);
+        }
+
+        // Remove an element
+        function _remove(element) {
+            element.parentNode.removeChild(element);
+        }
+
+        // Remove sources
+        function _removeSources() {
+            // Remove child <source> elements
+            var sources = player.media.querySelectorAll("source");
+            for (var i = sources.length - 1; i >= 0; i--) {
+                _remove(sources[i]);
+            }
+
+            // Remove src attribute
+            player.media.removeAttribute("src");
+        }   
+
+        // Inject a source
+        function _addSource(attributes) {
+            // Create a new <source>
+            var element = document.createElement("source");
+
+            // Set all passed attributes
+            _setAttributes(element, attributes);
+
+            // Inject the new source
+            _prependChild(player.media, element);
+        }
+
+        // Update source
+        function _updateSource(sources) {
+            // Pause on update 
+            // Play automatically if autoplay set or already playing
+
+            // Remove current sources
+            _removeSources();
+
+            // If a single source is provided
+            // ("path/to/src.mp4")
+            if(typeof sources === "string") {
+                // Set src attribute on the element
+                player.media.setAttribute("src", sources);
+            }
+            // Single source but using object to pass attributes
+            // ({ src: "path/to/src.mp4", type: "video/mp4" })
+            else if (typeof sources === "object") {
+                _addSource(sources);   
+            }
+            // Array of source objects to pass attributes
+            // ([{ src: "path/to/src.mp4", type: "video/mp4" },{ src: "path/to/src.webm", type: "video/webm" }])
+            else if (sources.constructor === Array) {
+                for (var key in sources) { 
+                    _addSource(sources[key]);   
+                }
+            }
+
+            // Restart
+            _restart();
+
+            // Play if autoplay attribute is present
+            if(player.media.getAttribute("autoplay") !== null) {
+                _play();
+            }
+        }
+
+        // Update poster
+        function _updatePoster(source) {
+            if(player.type === "video") {
+                player.media.setAttribute("poster", source);
+            }
         }
 
         // Listen for events
@@ -1063,6 +1148,7 @@
                     }
                     else if(player.media.ended) {
                         _restart();
+                        _play();
                     }
                     else {
                         _pause();
@@ -1163,7 +1249,9 @@
             seek:               _seek,
             setVolume:          _setVolume,
             toggleMute:         _toggleMute,
-            toggleCaptions:     _toggleCaptions
+            toggleCaptions:     _toggleCaptions,
+            source:             _updateSource,
+            poster:             _updatePoster
         }
     }
 
