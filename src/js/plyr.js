@@ -24,6 +24,7 @@
             container:          ".player",
             controls:           ".player-controls",
             buttons: {
+                seek:           "[data-player='seek']",
                 play:           "[data-player='play']",
                 pause:          "[data-player='pause']",
                 restart:        "[data-player='restart']",
@@ -40,8 +41,7 @@
                 played:         ".player-progress-played"
             },
             captions:           ".player-captions",
-            duration:           ".player-duration",
-            seekTime:           ".player-seek-time"
+            duration:           ".player-duration"
         },
         classes: {
             video:              "player-video",
@@ -70,64 +70,68 @@
             enabled:            true
         },
         html: (function() {
-                return ["<div class='player-controls'>",
-                "<div class='player-progress'>",
-                    "<progress class='player-progress-played' max='100' value='0'>",
-                        "<span>0</span>% played",
-                    "</progress>",
-                    "<progress class='player-progress-buffer' max='100' value='0'>",
-                        "<span>0</span>% buffered",
-                    "</progress>",
-                "</div>",
-                "<span class='player-controls-playback'>",
-                    "<button type='button' data-player='restart'>",
-                        "<svg><use xlink:href='#icon-restart'></use></svg>",
-                        "<span class='sr-only'>Restart</span>",
-                    "</button>",
-                    "<button type='button' data-player='rewind'>",
-                        "<svg><use xlink:href='#icon-rewind'></use></svg>",
-                        "<span class='sr-only'>Rewind <span class='player-seek-time'>{seektime}</span> seconds</span>",
-                    "</button>",
-                    "<button type='button' data-player='play'>",
-                        "<svg><use xlink:href='#icon-play'></use></svg>",
-                        "<span class='sr-only'>Play</span>",
-                    "</button>",
-                    "<button type='button' data-player='pause'>",
-                        "<svg><use xlink:href='#icon-pause'></use></svg>",
-                        "<span class='sr-only'>Pause</span>",
-                    "</button>",
-                    "<button type='button' data-player='fast-forward'>",
-                        "<svg><use xlink:href='#icon-fast-forward'></use></svg>",
-                        "<span class='sr-only'>Fast forward <span class='player-seek-time'>{seektime}</span> seconds</span>",
-                    "</button>",
-                    "<span class='player-time'>",
-                        "<span class='sr-only'>Time</span>",
-                        "<span class='player-duration'>00:00</span>",
+            return [
+                "<div class='player-controls'>",
+                    "<div class='player-progress'>",
+                        "<label for='seek{id}' class='sr-only'>Seek</label>",
+                        "<input id='seek{id}' class='player-progress-seek' type='range' min='0' max='100' step='0.5' value='0' data-player='seek'>",
+                        "<progress class='player-progress-played' max='100' value='0'>",
+                            "<span>0</span>% played",
+                        "</progress>",
+                        "<progress class='player-progress-buffer' max='100' value='0'>",
+                            "<span>0</span>% buffered",
+                        "</progress>",
+                    "</div>",
+                    "<span class='player-controls-playback'>",
+                        "<button type='button' data-player='restart'>",
+                            "<svg><use xlink:href='#icon-restart'></use></svg>",
+                            "<span class='sr-only'>Restart</span>",
+                        "</button>",
+                        "<button type='button' data-player='rewind'>",
+                            "<svg><use xlink:href='#icon-rewind'></use></svg>",
+                            "<span class='sr-only'>Rewind {seektime} seconds</span>",
+                        "</button>",
+                        "<button type='button' data-player='play'>",
+                            "<svg><use xlink:href='#icon-play'></use></svg>",
+                            "<span class='sr-only'>Play</span>",
+                        "</button>",
+                        "<button type='button' data-player='pause'>",
+                            "<svg><use xlink:href='#icon-pause'></use></svg>",
+                            "<span class='sr-only'>Pause</span>",
+                        "</button>",
+                        "<button type='button' data-player='fast-forward'>",
+                            "<svg><use xlink:href='#icon-fast-forward'></use></svg>",
+                            "<span class='sr-only'>Fast forward {seektime} seconds</span>",
+                        "</button>",
+                        "<span class='player-time'>",
+                            "<span class='sr-only'>Time</span>",
+                            "<span class='player-duration'>00:00</span>",
+                        "</span>",
                     "</span>",
-                "</span>",
-                "<span class='player-controls-sound'>",
-                    "<input class='inverted sr-only' id='mute{id}' type='checkbox' data-player='mute'>",
-                    "<label id='mute{id}' for='mute{id}'>",
-                        "<svg class='icon-muted'><use xlink:href='#icon-muted'></use></svg>",
-                        "<svg><use xlink:href='#icon-volume'></use></svg>",
-                        "<span class='sr-only'>Toggle Mute</span>",
-                    "</label>",
-                    "<label for='volume{id}' class='sr-only'>Volume</label>",
-                    "<input id='volume{id}' class='player-volume' type='range' min='0' max='10' value='5' data-player='volume'>",
-                    "<input class='sr-only' id='captions{id}' type='checkbox' data-player='captions'>",
-                    "<label for='captions{id}'>",
-                        "<svg class='icon-captions-on'><use xlink:href='#icon-captions-on'></use></svg>",
-                        "<svg><use xlink:href='#icon-captions-off'></use></svg>",
-                        "<span class='sr-only'>Toggle Captions</span>",
-                    "</label>",
-                    "<button type='button' data-player='fullscreen'>",
-                        "<svg class='icon-exit-fullscreen'><use xlink:href='#icon-exit-fullscreen'></use></svg>",
-                        "<svg><use xlink:href='#icon-enter-fullscreen'></use></svg>",
-                        "<span class='sr-only'>Toggle fullscreen</span>",
-                    "</button>",
-                "</span>",
-            "</div>"].join("\n");
-        })()
+                    "<span class='player-controls-sound'>",
+                        "<input class='inverted sr-only' id='mute{id}' type='checkbox' data-player='mute'>",
+                        "<label id='mute{id}' for='mute{id}'>",
+                            "<svg class='icon-muted'><use xlink:href='#icon-muted'></use></svg>",
+                            "<svg><use xlink:href='#icon-volume'></use></svg>",
+                            "<span class='sr-only'>Toggle Mute</span>",
+                        "</label>",
+                        "<label for='volume{id}' class='sr-only'>Volume</label>",
+                        "<input id='volume{id}' class='player-volume' type='range' min='0' max='10' value='5' data-player='volume'>",
+                        "<input class='sr-only' id='captions{id}' type='checkbox' data-player='captions'>",
+                        "<label for='captions{id}'>",
+                            "<svg class='icon-captions-on'><use xlink:href='#icon-captions-on'></use></svg>",
+                            "<svg><use xlink:href='#icon-captions-off'></use></svg>",
+                            "<span class='sr-only'>Toggle Captions</span>",
+                        "</label>",
+                        "<button type='button' data-player='fullscreen'>",
+                            "<svg class='icon-exit-fullscreen'><use xlink:href='#icon-exit-fullscreen'></use></svg>",
+                            "<svg><use xlink:href='#icon-enter-fullscreen'></use></svg>",
+                            "<span class='sr-only'>Toggle fullscreen</span>",
+                        "</button>",
+                    "</span>",
+                "</div>"
+            ].join("\n");
+    })()
     };
 
     // Debugging
@@ -272,34 +276,7 @@
 
     // Get percentage
     function _getPercentage(current, max) {
-        return Math.floor((current / max) * 100);
-    }
-
-    // Get click position relative to parent
-    // http://www.kirupa.com/html5/getting_mouse_click_position.htm
-    function _getClickPosition(event) {
-        var parentPosition = _fullscreen().isFullScreen() ? { x: 0, y: 0 } : _getPosition(event.currentTarget);
-
-        return {
-            x: event.clientX - parentPosition.x,
-            y: event.clientY - parentPosition.y
-        };
-    }
-    // Get element position
-    function _getPosition(element) {
-        var xPosition = 0;
-        var yPosition = 0;
-
-        while (element) {
-            xPosition += (element.offsetLeft - element.scrollLeft + element.clientLeft);
-            yPosition += (element.offsetTop - element.scrollTop + element.clientTop);
-            element = element.offsetParent;
-        }
-        
-        return { 
-            x: xPosition, 
-            y: yPosition 
-        };
+        return ((current / max) * 100).toFixed(2);
     }
 
     // Deep extend/merge two Objects
@@ -509,6 +486,7 @@
 
                 // Buttons
                 player.buttons = {};
+                player.buttons.seek             = _getElement(config.selectors.buttons.seek);
                 player.buttons.play             = _getElement(config.selectors.buttons.play);
                 player.buttons.pause            = _getElement(config.selectors.buttons.pause);
                 player.buttons.restart          = _getElement(config.selectors.buttons.restart);
@@ -757,13 +735,6 @@
             }
         }
 
-        // Setup seeking
-        function _setupSeeking() {
-            // Update number of seconds in rewind and fast forward buttons
-            player.seekTime[0].innerHTML = config.seekTime;
-            player.seekTime[1].innerHTML = config.seekTime;
-        }
-
         // Setup fullscreen
         function _setupFullscreen() {
             if(player.type === "video" && config.fullscreen.enabled) {
@@ -812,19 +783,7 @@
             if(typeof seekTime !== "number") {
                 seekTime = config.seekTime;
             }
-
-            var targetTime = player.media.currentTime - seekTime;
-
-            if (targetTime < 0) {
-                player.media.currentTime = 0;
-            }
-            else {
-                player.media.currentTime = targetTime;
-            }
-            // Special handling for "manual" captions
-            if (!player.isTextTracks && player.type === "video") {
-                _adjustManualCaptions(player);
-            }
+            _seek(player.media.currentTime - seekTime);
         }
 
         // Fast forward
@@ -833,15 +792,35 @@
             if(typeof seekTime !== "number") {
                 seekTime = config.seekTime;
             }
+            _seek(player.media.currentTime + seekTime);
+        }
 
-            var targetTime = player.media.currentTime + seekTime;
+        // Seek to time
+        var _seek = function(input) {
+            //var value = config.seekTime;
+            var targetTime = 0;
 
-            if (targetTime > player.media.duration) {
-                player.media.currentTime = player.media.duration;
+            // If no event or time is passed, bail
+            if (typeof input === "undefined") {
+                return;
             }
-            else {
-                player.media.currentTime = targetTime;
+            // Explicit position
+            else if (typeof input === "number") {
+                targetTime = input;
             }
+            // Event
+            else if (input.type === "change" || input.type === "input") {
+                // It's the seek slider
+                // Seek to the selected time
+                targetTime = ((this.value / this.max) * player.media.duration).toFixed(1);
+            }
+
+            // Set the current time
+            player.media.currentTime = targetTime;
+
+            // Logging
+            _log("Seeking to " + player.media.currentTime + " seconds");
+
             // Special handling for "manual" captions
             if (!player.isTextTracks && player.type === "video") {
                 _adjustManualCaptions(player);
@@ -970,10 +949,26 @@
             switch(event.type) {
                 // Video playing
                 case "timeupdate":
+                case "seeking":
                     progress    = player.progress.played.bar;
                     text        = player.progress.played.text;
                     value       = _getPercentage(player.media.currentTime, player.media.duration);
+
+                    // Set seek range value only if it's a "natural" time event
+                    if(event.type == "timeupdate") {
+                        player.buttons.seek.value = value;
+                    }
+                    
                     break;
+
+                // Events from seek range
+                case "change":
+                case "input":
+                    progress    = player.progress.played.bar;
+                    text        = player.progress.played.text;
+                    value       = event.target.value;
+                    break;
+
 
                 // Check buffer status
                 case "playing":
@@ -996,6 +991,8 @@
                 progress.value = value;
                 text.innerHTML = value;
             }
+
+            //_log(event);
         }
 
         // Update the displayed play time
@@ -1009,6 +1006,13 @@
 
             // Render
             player.duration.innerHTML = player.mins + ":" + player.secs;
+        }
+
+        function _timeUpdate(event) {
+            // Duration
+            _updateTimeDisplay();
+            // Playing progress
+            _updateProgress(event);
         }
 
         // Listen for events
@@ -1066,22 +1070,11 @@
                 });
             }
             
-            // Duration
-            _on(player.media, "timeupdate", _updateTimeDisplay);
+            // Time change on media
+            _on(player.media, "timeupdate seeking", _timeUpdate);
 
-            // Playing progress
-            _on(player.media, "timeupdate", _updateProgress);
-
-            // Skip when clicking progress bar
-            _on(player.progress.played.bar, "click", function(event) {
-                player.pos = _getClickPosition(event).x / this.offsetWidth;
-                player.media.currentTime = player.pos * player.media.duration;
-                
-                // Special handling for "manual" captions
-                if (!player.isTextTracks && player.type === "video") {
-                    _adjustManualCaptions(player);
-                }
-            });
+            // Seek 
+            _on(player.buttons.seek, "change input", _seek);
 
             // Captions
             _on(player.buttons.captions, "click", function() { 
@@ -1154,9 +1147,6 @@
             // Setup fullscreen
             _setupFullscreen();
 
-            // Seeking
-            _setupSeeking();
-
             // Listeners
             _listeners();
         }
@@ -1170,6 +1160,7 @@
             restart:            _restart,
             rewind:             _rewind,
             forward:            _forward,
+            seek:               _seek,
             setVolume:          _setVolume,
             toggleMute:         _toggleMute,
             toggleCaptions:     _toggleCaptions

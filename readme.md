@@ -17,16 +17,20 @@ We wanted a lightweight, accessible and customisable media player that just supp
 - **Audio & Video** - support for both formats.
 - **API** - toggle playback, volume, seeking, and more.
 - **Fullscreen** - supports native fullscreen with fallback to "full window" modes.
-- **No dependencies** - written in vanilla JavaScript, no jQuery required.
+- **No dependencies** - written in vanilla JavaScript, no jQuery required. 
+
+Oh and yes, it works with Bootstrap. 
 
 ## Changelog
 Check out [the changelog](changelog.md)
 
 ## Planned development
 - Accept a string selector, a node, or a nodelist for the `container` property of `selectors`.
-- Accept a selector for the `html` template property.
 - Multiple language captions (with selection)
-- Localisation of control labels 
+- Playlists (audio and video)
+- Set source by API
+- Tooltip option (for seeking and controls)
+... and whatever else has been raised in [issues](https://github.com/Selz/plyr/issues)
 
 If you have any cool ideas or features, please let me know by [creating an issue](https://github.com/Selz/plyr/issues/new) or of course, forking and sending a pull request.
 
@@ -264,6 +268,11 @@ Here's a list of the methods supported:
     <td>Fast forwards by the provided parameter, in seconds. If no parameter is provided, the default seekInterval is used (10 seconds).</td>
   </tr>
   <tr>
+    <td><code>seek</code></td>
+    <td>Number</td>
+    <td>Seeks the media to the provided parameter, time in seconds.</td>
+  </tr>
+  <tr>
     <td><code>setVolume</code></td>
     <td>Number</td>
     <td>Sets the player volume to the provided parameter. The value should be between 0 (muted) and 10 (loudest). If no parameter is provided, the default volume is used (5). Values over 10 are ignored.</td>
@@ -346,6 +355,9 @@ Plyr is developed by Sam Potts ([@sam_potts](https://twitter.com/sam_potts)) ([s
 - [The Changelog](http://thechangelog.com/plyr-simple-html5-media-player-custom-controls-webvtt-captions/)
 - [HTML5 Weekly #177](http://html5weekly.com/issues/177)
 - [Web Design Weekly #174](https://web-design-weekly.com/2015/02/24/web-design-weekly-174/)
+- [Hacker News](https://news.ycombinator.com/item?id=9136774)
+- [Web Platform Daily](http://webplatformdaily.org/releases/2015-03-04)
+- [LayerVault Designer News](https://news.layervault.com/stories/45394-plyr--a-simple-html5-media-player)
 
 ## Used by
 - [Selz.com](https://selz.com)
@@ -356,6 +368,7 @@ Let me know on [Twitter](https://twitter.com/sam_potts) I can add you to the abo
 Credit to the PayPal HTML5 Video player from which Plyr's caption functionality is ported from:
 - [PayPal's Accessible HTML5 Video Player](https://github.com/paypal/accessible-html5-video-player)
 - The icons used in Plyr are [Vicons](https://dribbble.com/shots/1663443-60-Vicons-Free-Icon-Set) plus some ones I made
+- [An awesome guide for Plyr in Japanese!](http://syncer.jp/how-to-use-plyr-io) by [@arayutw](https://twitter.com/arayutw)
 
 Also these links helped created Plyr:
 - [Media Events - W3.org](http://www.w3.org/2010/05/video/mediaevents.html)
