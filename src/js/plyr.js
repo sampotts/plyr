@@ -70,66 +70,68 @@
             enabled:            true
         },
         html: (function() {
-                return ["<div class='player-controls'>",
-                "<div class='player-progress'>",
-                    "<label for='seek{id}' class='sr-only'>Seek</label>",
-                    "<input id='seek{id}' class='player-progress-seek' type='range' min='0' max='100' step='0.5' value='0' data-player='seek'>",
-                    "<progress class='player-progress-played' max='100' value='0'>",
-                        "<span>0</span>% played",
-                    "</progress>",
-                    "<progress class='player-progress-buffer' max='100' value='0'>",
-                        "<span>0</span>% buffered",
-                    "</progress>",
-                "</div>",
-                "<span class='player-controls-playback'>",
-                    "<button type='button' data-player='restart'>",
-                        "<svg><use xlink:href='#icon-restart'></use></svg>",
-                        "<span class='sr-only'>Restart</span>",
-                    "</button>",
-                    "<button type='button' data-player='rewind'>",
-                        "<svg><use xlink:href='#icon-rewind'></use></svg>",
-                        "<span class='sr-only'>Rewind {seektime} seconds</span>",
-                    "</button>",
-                    "<button type='button' data-player='play'>",
-                        "<svg><use xlink:href='#icon-play'></use></svg>",
-                        "<span class='sr-only'>Play</span>",
-                    "</button>",
-                    "<button type='button' data-player='pause'>",
-                        "<svg><use xlink:href='#icon-pause'></use></svg>",
-                        "<span class='sr-only'>Pause</span>",
-                    "</button>",
-                    "<button type='button' data-player='fast-forward'>",
-                        "<svg><use xlink:href='#icon-fast-forward'></use></svg>",
-                        "<span class='sr-only'>Fast forward {seektime} seconds</span>",
-                    "</button>",
-                    "<span class='player-time'>",
-                        "<span class='sr-only'>Time</span>",
-                        "<span class='player-duration'>00:00</span>",
+            return [
+                "<div class='player-controls'>",
+                    "<div class='player-progress'>",
+                        "<label for='seek{id}' class='sr-only'>Seek</label>",
+                        "<input id='seek{id}' class='player-progress-seek' type='range' min='0' max='100' step='0.5' value='0' data-player='seek'>",
+                        "<progress class='player-progress-played' max='100' value='0'>",
+                            "<span>0</span>% played",
+                        "</progress>",
+                        "<progress class='player-progress-buffer' max='100' value='0'>",
+                            "<span>0</span>% buffered",
+                        "</progress>",
+                    "</div>",
+                    "<span class='player-controls-playback'>",
+                        "<button type='button' data-player='restart'>",
+                            "<svg><use xlink:href='#icon-restart'></use></svg>",
+                            "<span class='sr-only'>Restart</span>",
+                        "</button>",
+                        "<button type='button' data-player='rewind'>",
+                            "<svg><use xlink:href='#icon-rewind'></use></svg>",
+                            "<span class='sr-only'>Rewind {seektime} seconds</span>",
+                        "</button>",
+                        "<button type='button' data-player='play'>",
+                            "<svg><use xlink:href='#icon-play'></use></svg>",
+                            "<span class='sr-only'>Play</span>",
+                        "</button>",
+                        "<button type='button' data-player='pause'>",
+                            "<svg><use xlink:href='#icon-pause'></use></svg>",
+                            "<span class='sr-only'>Pause</span>",
+                        "</button>",
+                        "<button type='button' data-player='fast-forward'>",
+                            "<svg><use xlink:href='#icon-fast-forward'></use></svg>",
+                            "<span class='sr-only'>Fast forward {seektime} seconds</span>",
+                        "</button>",
+                        "<span class='player-time'>",
+                            "<span class='sr-only'>Time</span>",
+                            "<span class='player-duration'>00:00</span>",
+                        "</span>",
                     "</span>",
-                "</span>",
-                "<span class='player-controls-sound'>",
-                    "<input class='inverted sr-only' id='mute{id}' type='checkbox' data-player='mute'>",
-                    "<label id='mute{id}' for='mute{id}'>",
-                        "<svg class='icon-muted'><use xlink:href='#icon-muted'></use></svg>",
-                        "<svg><use xlink:href='#icon-volume'></use></svg>",
-                        "<span class='sr-only'>Toggle Mute</span>",
-                    "</label>",
-                    "<label for='volume{id}' class='sr-only'>Volume</label>",
-                    "<input id='volume{id}' class='player-volume' type='range' min='0' max='10' value='5' data-player='volume'>",
-                    "<input class='sr-only' id='captions{id}' type='checkbox' data-player='captions'>",
-                    "<label for='captions{id}'>",
-                        "<svg class='icon-captions-on'><use xlink:href='#icon-captions-on'></use></svg>",
-                        "<svg><use xlink:href='#icon-captions-off'></use></svg>",
-                        "<span class='sr-only'>Toggle Captions</span>",
-                    "</label>",
-                    "<button type='button' data-player='fullscreen'>",
-                        "<svg class='icon-exit-fullscreen'><use xlink:href='#icon-exit-fullscreen'></use></svg>",
-                        "<svg><use xlink:href='#icon-enter-fullscreen'></use></svg>",
-                        "<span class='sr-only'>Toggle fullscreen</span>",
-                    "</button>",
-                "</span>",
-            "</div>"].join("\n");
-        })()
+                    "<span class='player-controls-sound'>",
+                        "<input class='inverted sr-only' id='mute{id}' type='checkbox' data-player='mute'>",
+                        "<label id='mute{id}' for='mute{id}'>",
+                            "<svg class='icon-muted'><use xlink:href='#icon-muted'></use></svg>",
+                            "<svg><use xlink:href='#icon-volume'></use></svg>",
+                            "<span class='sr-only'>Toggle Mute</span>",
+                        "</label>",
+                        "<label for='volume{id}' class='sr-only'>Volume</label>",
+                        "<input id='volume{id}' class='player-volume' type='range' min='0' max='10' value='5' data-player='volume'>",
+                        "<input class='sr-only' id='captions{id}' type='checkbox' data-player='captions'>",
+                        "<label for='captions{id}'>",
+                            "<svg class='icon-captions-on'><use xlink:href='#icon-captions-on'></use></svg>",
+                            "<svg><use xlink:href='#icon-captions-off'></use></svg>",
+                            "<span class='sr-only'>Toggle Captions</span>",
+                        "</label>",
+                        "<button type='button' data-player='fullscreen'>",
+                            "<svg class='icon-exit-fullscreen'><use xlink:href='#icon-exit-fullscreen'></use></svg>",
+                            "<svg><use xlink:href='#icon-enter-fullscreen'></use></svg>",
+                            "<span class='sr-only'>Toggle fullscreen</span>",
+                        "</button>",
+                    "</span>",
+                "</div>"
+            ].join("\n");
+    })()
     };
 
     // Debugging
@@ -813,16 +815,8 @@
                 targetTime = ((this.value / this.max) * player.media.duration).toFixed(1);
             }
 
-            // Handle min and max values
-            if (targetTime > player.media.duration) {
-                player.media.currentTime = player.media.duration;
-            }
-            else if (targetTime < 0) {
-                player.media.currentTime = 0;
-            }
-            else {
-                player.media.currentTime = targetTime;
-            }
+            // Set the current time
+            player.media.currentTime = targetTime;
 
             // Logging
             _log("Seeking to " + player.media.currentTime + " seconds");
@@ -1078,22 +1072,6 @@
             
             // Time change on media
             _on(player.media, "timeupdate seeking", _timeUpdate);
-
-            // Pause and resume while seeking
-            /*_on(player.media, "seeking", function() {
-                if(!player.media.paused && !player.seekPaused) {
-                    player.seekPaused = true;
-                    _pause();
-                }
-                _log("Seeking")
-            });
-            _on(player.media, "seeked", function() {
-                if(player.seekPaused) {
-                    player.seekPaused = false;
-                    _play();
-                }
-                _log("Seeked")
-            });*/
 
             // Seek 
             _on(player.buttons.seek, "change input", _seek);

@@ -17,16 +17,20 @@ We wanted a lightweight, accessible and customisable media player that just supp
 - **Audio & Video** - support for both formats.
 - **API** - toggle playback, volume, seeking, and more.
 - **Fullscreen** - supports native fullscreen with fallback to "full window" modes.
-- **No dependencies** - written in vanilla JavaScript, no jQuery required.
+- **No dependencies** - written in vanilla JavaScript, no jQuery required. 
+
+Oh and yes, it works with Bootstrap. 
 
 ## Changelog
 Check out [the changelog](changelog.md)
 
 ## Planned development
 - Accept a string selector, a node, or a nodelist for the `container` property of `selectors`.
-- Accept a selector for the `html` template property.
 - Multiple language captions (with selection)
-- Localisation of control labels 
+- Playlists (audio and video)
+- Set source by API
+- Tooltip option (for seeking and controls)
+... and whatever else has been raised in [issues](https://github.com/Selz/plyr/issues)
 
 If you have any cool ideas or features, please let me know by [creating an issue](https://github.com/Selz/plyr/issues/new) or of course, forking and sending a pull request.
 
