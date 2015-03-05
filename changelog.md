@@ -1,11 +1,20 @@
 # Changelog
 
+## v1.0.20
+- Default controls included (Fixes #45)
+- Volume changes on `input` as well as `change` (Fixes #43)
+- Fix for undefined Play text
+- License changed to MIT
+
+## v1.0.19
+- Fixed firefox fullscreen issue (#38)
+
 ## v1.0.18
 - Added CDN references
 
 ## v1.0.17
 - SASS support added (thanks to @brunowego)
-- Docs completely seperated to avoid any confusion
+- Docs completely separated to avoid any confusion
 - New gulp tasks (will add more documentation for this)
 
 ## v1.0.16

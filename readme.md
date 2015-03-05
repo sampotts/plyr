@@ -3,19 +3,21 @@ A simple, accessible HTML5 media player.
 
 [Checkout the demo](http://plyr.io)
 
+[![Image of Plyr](https://cdn.plyr.io/static/plyr.png)](http://plyr.io)
+
 ## Why?
 We wanted a lightweight, accessible and customisable media player that just supports *modern* browsers. Sure, there are many other players out there but we wanted to keep things simple, using the right elements for the job. 
 
 ## Features
 - **Accessible** - full support for captions and screen readers.
-- **Lightweight** - just 4.8KB minified and gzipped.
+- **Lightweight** - just 5.3KB minified and gzipped.
 - **Customisable** - make the player look how you want with the markup you want.
-- **Semantic** - uses HTML5 form inputs for volume (range) and progress element for playback progress.
-- **Responsive** - any screen size.
-- **No dependencies** - written in vanilla JavaScript.
-- **API** - easy to use API.
-- **Fallback** - if there's no support, the native players are used.
-- **Fullscreen** - options to run the player full browser or the user can toggle fullscreen.
+- **Semantic** - uses the *right* elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no `<span>` or `<a href="#">` button hacks.
+- **Responsive** - as you'd expect these days.
+- **Audio & Video** - support for both formats.
+- **API** - toggle playback, volume, seeking, and more.
+- **Fullscreen** - supports native fullscreen with fallback to "full window" modes.
+- **No dependencies** - written in vanilla JavaScript, no jQuery required.
 
 ## Changelog
 Check out [the changelog](changelog.md)
@@ -40,14 +42,14 @@ bower install plyr
 More info on setting up dependencies can be found in the [Bower Docs](http://bower.io/docs/creating-packages/#maintaining-dependencies)
 
 ### CDN 
-If you want to use our CDN, you can use the following. Currently it's HTTP only. 
+If you want to use our CDN, you can use the following. HTTPS (SSL) is supported.
 
 ```html
-<link rel="stylesheet" href="http://cdn.plyr.io/1.0.18/plyr.css">
-<script src="http://cdn.plyr.io/1.0.18/plyr.js"></script>
+<link rel="stylesheet" href="//cdn.plyr.io/1.0.19/plyr.css">
+<script src="//cdn.plyr.io/1.0.19/plyr.js"></script>
 ```
 
-You can also access the `sprite.svg` file at `http://cdn.plyr.io/1.0.18/sprite.svg`.
+You can also access the `sprite.svg` file at `//cdn.plyr.io/1.0.19/sprite.svg`.
 
 ### CSS
 If you want to use the default css, add the `plyr.css` file from /dist into your head, or even better use `plyr.less` or `plyr.sass` file included in `/src` in your build to save a request. 
@@ -129,12 +131,14 @@ Much of the behaviour of the player is configurable when initialising the librar
 <script src="dist/plyr.js"></script>
 <script>
 plyr.setup({
-	html: **your controls html**
+	*options*
 });
 </script>
 ```
 
 #### Options
+
+You can pass the following options to the setup method.
 
 <table class="table" width="100%">
 <thead>
@@ -155,8 +159,8 @@ plyr.setup({
   <tr>
     <td><code>html</code></td>
     <td>String</td>
-    <td><code>&mdash;</code></td>
-    <td>This is **required**. See <a href="controls.md">controls.md</a> for more info on how the html needs to be structured.</td>
+    <td><code><a href="controls.md">See controls.md</a></code></td>
+    <td>See <a href="controls.md">controls.md</a> for more info on how the html needs to be structured.</td>
   </tr>
   <tr>
     <td><code>debug</code></td>
@@ -174,7 +178,7 @@ plyr.setup({
     <td><code>volume</code></td>
     <td>Number</td>
     <td><code>5</code></td>
-    <td>A number, between 1 and 10, representing the inital volume of the player.</td>
+    <td>A number, between 1 and 10, representing the initial volume of the player.</td>
   </tr>
   <tr>
     <td><code>click</code></td>
@@ -262,7 +266,7 @@ Here's a list of the methods supported:
   <tr>
     <td><code>setVolume</code></td>
     <td>Number</td>
-    <td>Sets the player voume to the provided parameter. The value should be between 0 (muted) and 10 (loudest). If no parameter is provided, the default volume is used (5). Values over 10 are ignored.</td>
+    <td>Sets the player volume to the provided parameter. The value should be between 0 (muted) and 10 (loudest). If no parameter is provided, the default volume is used (5). Values over 10 are ignored.</td>
   </tr>
   <tr>
     <td><code>toggleMute</code></td>
@@ -333,7 +337,7 @@ If a User Agent is disabled but supports `<video>` and `<audio>` natively, it wi
 Any unsupported browsers will display links to download the media if the correct html is used.
 
 ## Issues
-If you find anything weird with Plyr, please let us know using the Github issues tracker.
+If you find anything weird with Plyr, please let us know using the GitHub issues tracker.
 
 ## Author
 Plyr is developed by Sam Potts ([@sam_potts](https://twitter.com/sam_potts)) ([sampotts.me](http://sampotts.me))
@@ -358,4 +362,4 @@ Also these links helped created Plyr:
 - [Styling the `<progress>` element - hongkiat.com](http://www.hongkiat.com/blog/html5-progress-bar/)
 
 ## Copyright and License
-Copyright 2014, Selz.com under [the BSD license](license.md).
+[The MIT license](license.md).

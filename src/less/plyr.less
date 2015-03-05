@@ -21,7 +21,6 @@
 @control-bg-hover: 			@blue;
 @control-color: 			@gray-light;
 @control-color-inactive: 	@gray;
-@control-color-focus: 		#fff;
 @control-color-hover: 		#fff;
 
 // Progress
@@ -29,13 +28,13 @@
 @progress-playing-bg: 		@blue;
 @progress-buffered-bg: 		@gray;
 
-// Range
-@range-track-height: 		6px;
-@range-track-bg: 			@gray;
-@range-thumb-height: 		(@range-track-height * 2);
-@range-thumb-width: 		(@range-track-height * 2);
-@range-thumb-bg: 			@control-color;
-@range-thumb-bg-focus: 		@control-bg-hover;
+// Volume
+@volume-track-height: 		6px;
+@volume-track-bg: 			@gray;
+@volume-thumb-height: 		(@volume-track-height * 2);
+@volume-thumb-width: 		(@volume-track-height * 2);
+@volume-thumb-bg: 			@control-color;
+@volume-thumb-bg-focus: 	@control-bg-hover;
 
 // Breakpoints
 @bp-control-split: 			560px; // When controls split into left/right
@@ -64,25 +63,35 @@
 // Tab focus styles
 .tab-focus() {
 	outline: thin dotted #000;
-	outline-offset: 1px;
+	outline-offset: 0;
 }
 
 // Range styling
 // ---------------------------------------
-.range-thumb() {
-	height: @range-thumb-height;
-	width: @range-thumb-width;
-	background: @range-thumb-bg;
+.volume-thumb() {
+	height: @volume-thumb-height;
+	width: @volume-thumb-width;
+	background: @volume-thumb-bg;
 	border: 0;
-	border-radius: (@range-thumb-height / 2);
+	border-radius: (@volume-thumb-height / 2);
 	transition: background .3s ease;
 	cursor: ew-resize;
 }
-.range-track() {
-	height: @range-track-height;
-	background: @range-track-bg;
+.volume-track() {
+	height: @volume-track-height;
+	background: @volume-track-bg;
 	border: 0;
-	border-radius: (@range-track-height / 2);
+	border-radius: (@volume-track-height / 2);
+}
+.seek-thumb() {
+	background: transparent;
+	border: 0;
+	width: 2px;
+	height: @control-spacing;
+}
+.seek-track() {
+	background: none;
+	border: 0;
 }
 
 // Font smoothing
@@ -196,13 +205,13 @@
 				transition: fill .3s ease;
 			}
 		}
-		input + label,
-		input.inverted:checked + label {
+		[type="checkbox"] + label,
+		.inverted:checked + label {
 			color: @control-color-inactive;
 		}
 		button, 
-		input.inverted + label,
-		input:checked + label {
+		.inverted + label,
+		[type="checkbox"]:checked + label {
 			color: @control-color;
 		}
 		button {
@@ -210,18 +219,21 @@
 			background: transparent;
 			overflow: hidden;
 		}
-		input:focus + label,
-		button:focus {
-			.tab-focus();
-			color: @control-color-focus;
-		}
+		
+		button:focus,
 		button:hover,
-		input + label:hover {
+		[type="checkbox"]:focus + label,
+		[type="checkbox"] + label:hover {
 			background: @control-bg-hover;
 			color: @control-color-hover;
 		}
+		button:focus,
+		[type="checkbox"]:focus + label {
+			outline: 0;
+		}
 		.icon-exit-fullscreen,
-		.icon-muted {
+		.icon-muted,
+		.icon-captions-on {
 			display: none;
 		}
 		.player-time {
@@ -247,42 +259,92 @@
 		background: @progress-bg;
 
 		&-buffer,
-		&-played {
+		&-played,
+		&-seek[type=range] {
 			position: absolute;
 			left: 0;
 			top: 0;
 			width: 100%;
-			height: 100%;
+			height: @control-spacing;
 			margin: 0;
+			padding: 0;
 			vertical-align: top;
-			
-			&[value] {
-				-webkit-appearance: none;
-				border: none;
+
+			-webkit-appearance: none;
+			-moz-appearance: none;
+			border: none;
+			background: transparent;
+		}
+		&-buffer,
+		&-played {	
+			&::-webkit-progress-bar {
 				background: transparent;
+			}
 
-				&::-webkit-progress-bar {
-					background: transparent;
-				}
-
-				// Inherit from currentColor;
-				&::-webkit-progress-value {
-					background: currentColor;
-				}
-				&::-moz-progress-bar {
-					background: currentColor;
-				}
+			// Inherit from currentColor;
+			&::-webkit-progress-value {
+				background: currentColor;
+			}
+			&::-moz-progress-bar {
+				background: currentColor;
 			}
 		}
 		&-played {
 			z-index: 2;
 		}
-		&-played[value] {
-			cursor: pointer;
+		&-played{
 			color: @progress-playing-bg;
 		}
-		&-buffer[value] {
+		&-buffer {
 			color: @progress-buffered-bg;
+		}
+
+		// Seek control
+		// <input[type='range']> element
+		// Specificity is for bootstrap compatibility
+		&-seek[type=range] {
+			z-index: 3;
+			cursor: pointer;
+			outline: 0;
+
+			// Webkit
+			&::-webkit-slider-runnable-track {
+				.seek-track();
+			}
+			&::-webkit-slider-thumb {
+				-webkit-appearance: none;
+				.seek-thumb();
+			}
+
+			// Mozilla
+			&::-moz-range-track {
+				.seek-track();
+			}
+			&::-moz-range-thumb {
+				-moz-appearance: none;
+				.seek-thumb();
+			}
+			
+			// Microsoft
+			&::-ms-track {
+				color: transparent;
+				.seek-track();
+			}
+			&::-ms-fill-lower,
+			&::-ms-fill-upper {
+				.seek-track();
+			}
+			&::-ms-thumb {
+				.seek-thumb();
+			}
+
+			&:focus {
+				//.tab-focus();
+				outline: 0;
+			}
+			&::-moz-focus-outer {
+				border: 0;
+			}
 		}
 	}
 
@@ -295,18 +357,9 @@
 		display: inline-block;
 	}
 
-	// Muted
-	&.muted .player-controls .icon-muted {
-		display: block;
-
-		& + svg {
-			display: none;
-		}
-	}
-
 	// Volume control
 	// <input[type='range']> element
-	// Specificty is for bootstrap compatibility
+	// Specificity is for bootstrap compatibility
 	&-volume[type=range] {
 		display: inline-block;
 		vertical-align: middle;
@@ -320,49 +373,49 @@
 		
 		// Webkit
 		&::-webkit-slider-runnable-track {
-			.range-track();
+			.volume-track();
 		}
 		&::-webkit-slider-thumb {
 			-webkit-appearance: none;
-			margin-top: -((@range-thumb-height - @range-track-height) / 2);
-			.range-thumb();
+			margin-top: -((@volume-thumb-height - @volume-track-height) / 2);
+			.volume-thumb();
 		}
 
 		// Mozilla
 		&::-moz-range-track {
-			.range-track();
+			.volume-track();
 		}
 		&::-moz-range-thumb {
-			.range-thumb();
+			.volume-thumb();
 		}
 		
 		// Microsoft
 		&::-ms-track {
-			height: @range-track-height;
+			height: @volume-track-height;
 			background: transparent;
 			border-color: transparent;
-			border-width: ((@range-thumb-height - @range-track-height) / 2) 0;
+			border-width: ((@volume-thumb-height - @volume-track-height) / 2) 0;
 			color: transparent;
 		}
 		&::-ms-fill-lower,
 		&::-ms-fill-upper {
-			.range-track();
+			.volume-track();
 		}
 		&::-ms-thumb {
-			.range-thumb();
+			.volume-thumb();
 		}
 
 		&:focus {
 			outline: 0;
 
 			&::-webkit-slider-thumb {
-				background: @range-thumb-bg-focus;
+				background: @volume-thumb-bg-focus;
 			}
 			&::-moz-range-thumb {
-				background: @range-thumb-bg-focus;
+				background: @volume-thumb-bg-focus;
 			}
 			&::-ms-thumb {
-				background: @range-thumb-bg-focus;
+				background: @volume-thumb-bg-focus;
 			}
 		}
 	}
@@ -407,8 +460,10 @@
 		}
 	}
 
-	// When true full screen, show exit fullscreen icon
-	&.fullscreen-active .icon-exit-fullscreen {
+	// Change icons on state change
+	&.fullscreen-active .icon-exit-fullscreen,
+	&.muted .player-controls .icon-muted,
+	&.captions-active .player-controls .icon-captions-on {
 		display: block;
 
 		& + svg {

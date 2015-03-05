@@ -2,6 +2,7 @@
 // Gulp build script
 // ==========================================================================
 /*global require, __dirname*/
+/*jshint -W079 */
 
 var fs 			= require("fs"),
 	path 		= require("path"),
@@ -20,7 +21,8 @@ var fs 			= require("fs"),
 	rename 		= require("gulp-rename"),
 	s3 			= require("gulp-s3"),
 	gzip 		= require("gulp-gzip"),
-	replace  	= require("gulp-replace");
+	replace  	= require("gulp-replace"),
+	open 		= require("gulp-open");
 
 var root = __dirname,
 paths = {
@@ -190,13 +192,12 @@ gulp.task("watch", function () {
 	gulp.watch(paths.docs.src.templates, "js");
 });
 
-// Publish the docs site
-try {
-	var aws = loadJSON(path.join(root, "aws.json"));
-}
-catch (e) { }
+// Publish a version to CDN and docs
+// --------------------------------------------
 
-var version = package.version,
+// Some options
+var aws = loadJSON(path.join(root, "aws.json")),
+version = package.version,
 maxAge 	= 31536000, // seconds 1 year
 options = {
 	cdn: {
@@ -216,6 +217,7 @@ options = {
 },
 cdnpath = new RegExp(aws.cdn.bucket + "\/(\\d+\\.)?(\\d+\\.)?(\\*|\\d+)","gi");
 
+// Publish version to CDN bucket
 gulp.task("cdn", function () {
 	console.log("Uploading " + version + " to " + aws.cdn.bucket);
 
@@ -228,16 +230,37 @@ gulp.task("cdn", function () {
 		.pipe(s3(aws.cdn, options.cdn));
 });
 
+// Publish to Docs bucket
 gulp.task("docs", function () {
 	console.log("Uploading " + version + " docs to " + aws.docs.bucket);
 
-	// Replace versioned files in index.html
-	gulp.src([paths.docs.root + "index.html"])
+	// Replace versioned files in *.html
+	gulp.src([paths.docs.root + "*.html"])
 		.pipe(replace(cdnpath, aws.cdn.bucket + "/" + version))
+		.pipe(gulp.dest(paths.docs.root))
 		.pipe(gzip())
 		.pipe(s3(aws.docs, options.docs));
+
+	// Upload error.html to cdn using docs options
+	gulp.src([paths.docs.root + "error.html"])
+		.pipe(gzip())
+		.pipe(s3(aws.cdn, options.docs));
 });
 
+// Open the docs site to check it's sweet
+gulp.task("open", function () {
+	console.log("Opening " + aws.docs.bucket + "...");
+
+	// A file must be specified or gulp will skip the task
+	// Doesn't matter which file since we set the URL above
+	// Weird, I know...
+	gulp.src([paths.docs.root + "index.html"])
+		.pipe(open("", {
+			url: "http://" + aws.docs.bucket
+		}));
+});
+
+// Do everything 
 gulp.task("publish", function () {
-	run("templates", tasks.js, tasks.less, "sprite", "cdn", "docs");
+	run("templates", tasks.js, tasks.less, "sprite", "cdn", "docs", "open");
 });
