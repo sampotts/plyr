@@ -66,7 +66,7 @@
 	outline-offset: 0;
 }
 
-// Range styling
+// <input type="range"> styling
 // ---------------------------------------
 .volume-thumb() {
 	height: @volume-thumb-height;
@@ -205,13 +205,13 @@
 				transition: fill .3s ease;
 			}
 		}
-		[type="checkbox"] + label,
+		input + label,
 		.inverted:checked + label {
 			color: @control-color-inactive;
 		}
 		button, 
 		.inverted + label,
-		[type="checkbox"]:checked + label {
+		input:checked + label {
 			color: @control-color;
 		}
 		button {
@@ -222,13 +222,13 @@
 		
 		button:focus,
 		button:hover,
-		[type="checkbox"]:focus + label,
-		[type="checkbox"] + label:hover {
+		input:focus + label,
+		input + label:hover {
 			background: @control-bg-hover;
 			color: @control-color-hover;
 		}
 		button:focus,
-		[type="checkbox"]:focus + label {
+		input:focus + label {
 			outline: 0;
 		}
 		.icon-exit-fullscreen,
@@ -258,8 +258,8 @@
 		height: @control-spacing;
 		background: @progress-bg;
 
-		&-buffer,
-		&-played,
+		&-buffer[value],
+		&-played[value],
 		&-seek[type=range] {
 			position: absolute;
 			left: 0;
@@ -275,8 +275,8 @@
 			border: none;
 			background: transparent;
 		}
-		&-buffer,
-		&-played {	
+		&-buffer[value],
+		&-played[value] {	
 			&::-webkit-progress-bar {
 				background: transparent;
 			}
@@ -284,18 +284,18 @@
 			// Inherit from currentColor;
 			&::-webkit-progress-value {
 				background: currentColor;
+				transition: width .1s ease;
 			}
 			&::-moz-progress-bar {
 				background: currentColor;
+				transition: width .1s ease;
 			}
 		}
-		&-played {
+		&-played[value] {
 			z-index: 2;
-		}
-		&-played{
 			color: @progress-playing-bg;
 		}
-		&-buffer {
+		&-buffer[value] {
 			color: @progress-buffered-bg;
 		}
 
@@ -339,7 +339,6 @@
 			}
 
 			&:focus {
-				//.tab-focus();
 				outline: 0;
 			}
 			&::-moz-focus-outer {

@@ -274,7 +274,7 @@
 
     // Get percentage
     function _getPercentage(current, max) {
-        return Math.floor((current / max) * 100);
+        return ((current / max) * 100).toFixed(2);
     }
 
     // Deep extend/merge two Objects
@@ -781,19 +781,7 @@
             if(typeof seekTime !== "number") {
                 seekTime = config.seekTime;
             }
-
-            var targetTime = player.media.currentTime - seekTime;
-
-            if (targetTime < 0) {
-                player.media.currentTime = 0;
-            }
-            else {
-                player.media.currentTime = targetTime;
-            }
-            // Special handling for "manual" captions
-            if (!player.isTextTracks && player.type === "video") {
-                _adjustManualCaptions(player);
-            }
+            _seek(player.media.currentTime - seekTime);
         }
 
         // Fast forward
@@ -802,15 +790,43 @@
             if(typeof seekTime !== "number") {
                 seekTime = config.seekTime;
             }
+            _seek(player.media.currentTime + seekTime);
+        }
 
-            var targetTime = player.media.currentTime + seekTime;
+        // Seek to time
+        var _seek = function(input) {
+            //var value = config.seekTime;
+            var targetTime = 0;
 
+            // If no event or time is passed, bail
+            if (typeof input === "undefined") {
+                return;
+            }
+            // Explicit position
+            else if (typeof input === "number") {
+                targetTime = input;
+            }
+            // Event
+            else if (input.type === "change" || input.type === "input") {
+                // It's the seek slider
+                // Seek to the selected time
+                targetTime = ((this.value / this.max) * player.media.duration).toFixed(1);
+            }
+
+            // Handle min and max values
             if (targetTime > player.media.duration) {
                 player.media.currentTime = player.media.duration;
+            }
+            else if (targetTime < 0) {
+                player.media.currentTime = 0;
             }
             else {
                 player.media.currentTime = targetTime;
             }
+
+            // Logging
+            _log("Seeking to " + player.media.currentTime + " seconds");
+
             // Special handling for "manual" captions
             if (!player.isTextTracks && player.type === "video") {
                 _adjustManualCaptions(player);
@@ -939,16 +955,19 @@
             switch(event.type) {
                 // Video playing
                 case "timeupdate":
+                case "seeking":
                     progress    = player.progress.played.bar;
                     text        = player.progress.played.text;
                     value       = _getPercentage(player.media.currentTime, player.media.duration);
 
-                    // Set seeking value
-                    player.buttons.seek.value = value;
-
+                    // Set seek range value only if it's a "natural" time event
+                    if(event.type == "timeupdate") {
+                        player.buttons.seek.value = value;
+                    }
+                    
                     break;
 
-                // Seeking
+                // Events from seek range
                 case "change":
                 case "input":
                     progress    = player.progress.played.bar;
@@ -993,6 +1012,13 @@
 
             // Render
             player.duration.innerHTML = player.mins + ":" + player.secs;
+        }
+
+        function _timeUpdate(event) {
+            // Duration
+            _updateTimeDisplay();
+            // Playing progress
+            _updateProgress(event);
         }
 
         // Listen for events
@@ -1051,29 +1077,26 @@
             }
             
             // Time change on media
-            _on(player.media, "timeupdate", function(event) {
-                // Duration
-                _updateTimeDisplay();
-                // Playing progress
-                _updateProgress(event);
+            _on(player.media, "timeupdate seeking", _timeUpdate);
+
+            // Pause and resume while seeking
+            /*_on(player.media, "seeking", function() {
+                if(!player.media.paused && !player.seekPaused) {
+                    player.seekPaused = true;
+                    _pause();
+                }
+                _log("Seeking")
             });
+            _on(player.media, "seeked", function() {
+                if(player.seekPaused) {
+                    player.seekPaused = false;
+                    _play();
+                }
+                _log("Seeked")
+            });*/
 
             // Seek 
-            _on(player.buttons.seek, "change input", function(event) {
-                // Update progress elements
-                _updateProgress(event);
-
-                // Update the text label
-                _updateTimeDisplay();
-
-                // Seek to the selected time
-                player.media.currentTime = ((this.value / this.max) * player.media.duration);
-
-                // Special handling for "manual" captions
-                if (!player.isTextTracks && player.type === "video") {
-                    _adjustManualCaptions(player);
-                }
-            });
+            _on(player.buttons.seek, "change input", _seek);
 
             // Captions
             _on(player.buttons.captions, "click", function() { 
@@ -1159,6 +1182,7 @@
             restart:            _restart,
             rewind:             _rewind,
             forward:            _forward,
+            seek:               _seek,
             setVolume:          _setVolume,
             toggleMute:         _toggleMute,
             toggleCaptions:     _toggleCaptions
