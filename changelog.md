@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.0.21
+- Added an <input type="range"> for seeking to improve experience (and support dragging)
+- Icons for restart and captions improved (and some IDs changed)
+
 ## v1.0.20
 - Default controls included (Fixes #45)
 - Volume changes on `input` as well as `change` (Fixes #43)

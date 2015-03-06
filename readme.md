@@ -3,7 +3,7 @@ A simple, accessible HTML5 media player.
 
 [Checkout the demo](http://plyr.io)
 
-[![Image of Plyr](https://cdn.plyr.io/static/plyr.png)](http://plyr.io)
+[![Image of Plyr](https://cdn.plyr.io/static/plyr.png?1)](http://plyr.io)
 
 ## Why?
 We wanted a lightweight, accessible and customisable media player that just supports *modern* browsers. Sure, there are many other players out there but we wanted to keep things simple, using the right elements for the job. 
@@ -49,11 +49,11 @@ More info on setting up dependencies can be found in the [Bower Docs](http://bow
 If you want to use our CDN, you can use the following. HTTPS (SSL) is supported.
 
 ```html
-<link rel="stylesheet" href="//cdn.plyr.io/1.0.19/plyr.css">
-<script src="//cdn.plyr.io/1.0.19/plyr.js"></script>
+<link rel="stylesheet" href="//cdn.plyr.io/1.0.21/plyr.css">
+<script src="//cdn.plyr.io/1.0.21/plyr.js"></script>
 ```
 
-You can also access the `sprite.svg` file at `//cdn.plyr.io/1.0.19/sprite.svg`.
+You can also access the `sprite.svg` file at `//cdn.plyr.io/1.0.21/sprite.svg`.
 
 ### CSS
 If you want to use the default css, add the `plyr.css` file from /dist into your head, or even better use `plyr.less` or `plyr.sass` file included in `/src` in your build to save a request. 
