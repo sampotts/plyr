@@ -1065,7 +1065,6 @@
 
             // Remove each
             for (var i = sources.length - 1; i >= 0; i--) {
-                _log(sources[i]);
                 _remove(sources[i]);
             }
 
