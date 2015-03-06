@@ -204,6 +204,36 @@
         // Return data
         return [browserName, majorVersion];
     }
+
+    // Check for mime type support against a player instance
+    // Credits: http://diveintohtml5.info/everything.html 
+    // Related: http://www.leanbackplayer.com/test/h5mt.html
+    function _support(player, mimeType) {    
+        var media = player.media;
+
+        // Only check video types for video players
+        if(player.type == "video") {
+            // Check type
+            switch(mimeType) {
+                case "video/webm":   return !!(media.canPlayType && media.canPlayType("video/webm; codecs=\"vp8, vorbis\"").replace(/no/, ""));
+                case "video/mp4":    return !!(media.canPlayType && media.canPlayType("video/mp4; codecs=\"avc1.42E01E, mp4a.40.2\"").replace(/no/, ""));
+                case "video/ogg":    return !!(media.canPlayType && media.canPlayType("video/ogg; codecs=\"theora\"").replace(/no/, ""));
+            }
+        }
+
+        // Only check audio types for audio players
+        else if(player.type == "audio") {
+            // Check type
+            switch(mimeType) {
+                case "audio/mpeg":   return !!(media.canPlayType && media.canPlayType("audio/mpeg;").replace(/no/, ""));
+                case "audio/ogg":    return !!(media.canPlayType && media.canPlayType("audio/ogg; codecs=\"vorbis\"").replace(/no/, ""));
+                case "audio/wav":    return !!(media.canPlayType && media.canPlayType("audio/wav; codecs=\"1\"").replace(/no/, ""));
+            }
+        }        
+
+        // If we got this far, we're stuffed
+        return false;
+    }
     
     // Replace all
     function _replaceAll(string, find, replace) {
@@ -242,6 +272,11 @@
         }
     }
 
+    // Remove an element
+    function _remove(element) {
+        element.parentNode.removeChild(element);
+    }
+
     // Toggle class on an element
     function _toggleClass(element, name, state) {
         if(element){
@@ -262,18 +297,6 @@
         for (var i = 0; i < events.length; i++) {
             element[toggle ? "addEventListener" : "removeEventListener"](events[i], callback, false);
         }
-    }
-
-    // Set attributes
-    function _setAttributes(element, attributes) {
-        for(var key in attributes) {
-            element.setAttribute(key, attributes[key]);
-        }
-    }
-
-    // Prepend child
-    function _prependChild(parent, element) {
-        parent.insertBefore(element, parent.firstChild);
     }
 
     // Bind event
@@ -404,19 +427,45 @@
         player.container = container;
 
         // Captions functions
-        // Credits: http://paypal.github.io/accessible-html5-video-player/
+        // Seek the manual caption time and update UI
+        function _seekManualCaptions(time) {
+            // If it's not video, or we're using textTracks, bail.
+            if (player.usingTextTracks || player.type !== "video") {
+                return;
+            }
 
-        // For "manual" captions, adjust caption position when play time changed (via rewind, clicking progress bar, etc.)
-        function _adjustManualCaptions() {
+            // Reset subcount
             player.subcount = 0;
-            while (_timecodeMax(player.captions[player.subcount][0]) < player.media.currentTime.toFixed(1)) {
+
+            // Check time is a number, if not use currentTime
+            // IE has a bug where currentTime doesn't go to 0
+            // https://twitter.com/Sam_Potts/status/573715746506731521
+            time = typeof time === "number" ? time : player.media.currentTime;
+
+            while (_timecodeMax(player.captions[player.subcount][0]) < time.toFixed(1)) {
                 player.subcount++;
                 if (player.subcount > player.captions.length-1) {
                     player.subcount = player.captions.length-1;
                     break;
                 }
             }
+
+            // Check if the next caption is in the current time range
+            if (player.media.currentTime.toFixed(1) >= _timecodeMin(player.captions[player.subcount][0]) && 
+                player.media.currentTime.toFixed(1) <= _timecodeMax(player.captions[player.subcount][0])) {
+                    player.currentCaption = player.captions[player.subcount][1];
+            }
+
+            // Is there a next timecode?
+            if (player.media.currentTime.toFixed(1) > _timecodeMax(player.captions[player.subcount][0]) && 
+                player.subcount < (player.captions.length-1)) {
+                    player.subcount++;
+            }
+
+            // Render the caption
+            player.captionsContainer.innerHTML = player.currentCaption;
         }
+
         // Display captions container and button (for initialization)
         function _showCaptions() {
             _toggleClass(player.container, config.classes.captions.enabled, true);
@@ -426,6 +475,7 @@
                 player.buttons.captions.setAttribute("checked", "checked");
             }
         }
+
         // Utilities for caption time codes
         function _timecodeMin(tc) {
             var tcpair = [];
@@ -600,9 +650,9 @@
                 player.captionsContainer = _getElement(config.selectors.captions);
 
                 // Determine if HTML5 textTracks is supported
-                player.isTextTracks = false;
+                player.usingTextTracks = false;
                 if (player.media.textTracks) {
-                    player.isTextTracks = true;
+                    player.usingTextTracks = true;
                 }
 
                 // Get URL of caption file if exists
@@ -654,12 +704,12 @@
                         _log("Detected IE 10/11 or Firefox 31+ or Safari 7+.");
 
                         // Set to false so skips to "manual" captioning
-                        player.isTextTracks = false;
+                        player.usingTextTracks = false;
                     }
 
                     // Rendering caption tracks
                     // Native support required - http://caniuse.com/webvtt
-                    if (player.isTextTracks) {
+                    if (player.usingTextTracks) {
                         _log("TextTracks supported.");
             
                         for (var y=0; y < tracks.length; y++) {
@@ -684,21 +734,6 @@
                         player.currentCaption = "";
                         player.subcount = 0;
                         player.captions = [];
-
-                        _on(player.media, "timeupdate", function() {
-                            // Check if the next caption is in the current time range
-                            if (player.media.currentTime.toFixed(1) > _timecodeMin(player.captions[player.subcount][0]) && 
-                                player.media.currentTime.toFixed(1) < _timecodeMax(player.captions[player.subcount][0])) {
-                                    player.currentCaption = player.captions[player.subcount][1];
-                            }
-                            // Is there a next timecode?
-                            if (player.media.currentTime.toFixed(1) > _timecodeMax(player.captions[player.subcount][0]) && 
-                                player.subcount < (player.captions.length-1)) {
-                                    player.subcount++;
-                            }
-                            // Render the caption
-                            player.captionsContainer.innerHTML = player.currentCaption;
-                        });
 
                         if (captionSrc !== "") {
                             // Create XMLHttpRequest Object
@@ -780,17 +815,6 @@
             player.media.pause();
         }
 
-        // Restart playback
-        function _restart() {
-            // Move to beginning
-            player.media.currentTime = 0;
-
-            // Special handling for "manual" captions
-            if (!player.isTextTracks) {
-                player.subcount = 0;
-            }
-        }
-
         // Rewind
         function _rewind(seekTime) {
             // Use default if needed
@@ -810,8 +834,8 @@
         }
 
         // Seek to time
+        // The parameter can be an event or a number
         var _seek = function(input) {
-            //var value = config.seekTime;
             var targetTime = 0;
 
             // If no event or time is passed, bail
@@ -826,19 +850,25 @@
             else if (input.type === "change" || input.type === "input") {
                 // It's the seek slider
                 // Seek to the selected time
-                targetTime = ((this.value / this.max) * player.media.duration).toFixed(1);
+                targetTime = ((this.value / this.max) * player.media.duration);
+            }
+
+            // Normalise targetTime
+            if (targetTime < 0) {
+                targetTime = 0;
+            }
+            else if (targetTime > player.media.duration) {
+                targetTime = player.media.duration;
             }
 
             // Set the current time
-            player.media.currentTime = targetTime;
+            player.media.currentTime = targetTime.toFixed(1);
 
             // Logging
             _log("Seeking to " + player.media.currentTime + " seconds");
 
             // Special handling for "manual" captions
-            if (!player.isTextTracks && player.type === "video") {
-                _adjustManualCaptions(player);
-            }
+            _seekManualCaptions(targetTime);
         }
 
         // Check playing state
@@ -958,53 +988,52 @@
 
         // Update <progress> elements
         function _updateProgress(event) {
-            var progress, text, value = 0;
+            var progress    = player.progress.played.bar, 
+                text        = player.progress.played.text, 
+                value       = 0;
 
-            switch(event.type) {
-                // Video playing
-                case "timeupdate":
-                case "seeking":
-                    progress    = player.progress.played.bar;
-                    text        = player.progress.played.text;
-                    value       = _getPercentage(player.media.currentTime, player.media.duration);
+            if(event) {
+                switch(event.type) {
+                    // Video playing
+                    case "timeupdate":
+                    case "seeking":
+                        value       = _getPercentage(player.media.currentTime, player.media.duration);
 
-                    // Set seek range value only if it's a "natural" time event
-                    if(event.type == "timeupdate") {
-                        player.buttons.seek.value = value;
-                    }
-                    
-                    break;
+                        // Set seek range value only if it's a "natural" time event
+                        if(event.type == "timeupdate") {
+                            player.buttons.seek.value = value;
+                        }
+                        
+                        break;
 
-                // Events from seek range
-                case "change":
-                case "input":
-                    progress    = player.progress.played.bar;
-                    text        = player.progress.played.text;
-                    value       = event.target.value;
-                    break;
+                    // Events from seek range
+                    case "change":
+                    case "input":
+                        value       = event.target.value;
+                        break;
 
 
-                // Check buffer status
-                case "playing":
-                case "progress":
-                    progress    = player.progress.buffer.bar;
-                    text        = player.progress.buffer.text;
-                    value       = (function() { 
-                                    var buffered = player.media.buffered;
+                    // Check buffer status
+                    case "playing":
+                    case "progress":
+                        progress    = player.progress.buffer.bar;
+                        text        = player.progress.buffer.text;
+                        value       = (function() { 
+                                        var buffered = player.media.buffered;
 
-                                    if(buffered.length) {
-                                        return _getPercentage(buffered.end(0), player.media.duration);
-                                    }
+                                        if(buffered.length) {
+                                            return _getPercentage(buffered.end(0), player.media.duration);
+                                        }
 
-                                    return 0;                                   
-                                })();
-                    break;
+                                        return 0;                                   
+                                    })();
+                        break;
+                }
             }
 
-            if (progress && value > 0) {
-                progress.value = value;
-                text.innerHTML = value;
-            }
+            // Set values
+            progress.value = value;
+            text.innerHTML = value;
         }
 
         // Update the displayed play time
@@ -1024,20 +1053,19 @@
         function _timeUpdate(event) {
             // Duration
             _updateTimeDisplay();
+
             // Playing progress
             _updateProgress(event);
         }
 
-        // Remove an element
-        function _remove(element) {
-            element.parentNode.removeChild(element);
-        }
-
-        // Remove sources
+        // Remove <source> children and src attribute
         function _removeSources() {
-            // Remove child <source> elements
+            // Find child <source> elements
             var sources = player.media.querySelectorAll("source");
+
+            // Remove each
             for (var i = sources.length - 1; i >= 0; i--) {
+                _log(sources[i]);
                 _remove(sources[i]);
             }
 
@@ -1045,51 +1073,60 @@
             player.media.removeAttribute("src");
         }   
 
-        // Inject a source
-        function _addSource(attributes) {
-            // Create a new <source>
-            var element = document.createElement("source");
+        // Set source
+        function _setSource(source) {
+            if(source.type && source.src) {
+                // Check if it's supported first
+                if(_support(player, source.type)) {
+                    // Pause playback (webkit freaks out)
+                    _pause();
 
-            // Set all passed attributes
-            _setAttributes(element, attributes);
+                    // Update the UI
+                    _checkPlaying();
 
-            // Inject the new source
-            _prependChild(player.media, element);
+                    // Remove current sources
+                    _removeSources();
+
+                    // Set the src attribute
+                    player.media.setAttribute("src", source.src);
+
+                    // Restart
+                    _seek();
+
+                    // Reset time display
+                    _timeUpdate();
+
+                    // Play if autoplay attribute is present
+                    if(player.media.getAttribute("autoplay") !== null) {
+                        _play();
+                    }
+                }
+                else {
+                    _log("No support for: " + source.src + " [" + source.type + "]");
+                }
+            }
         }
 
         // Update source
-        function _updateSource(sources) {
-            // Pause on update 
-            // Play automatically if autoplay set or already playing
-
-            // Remove current sources
-            _removeSources();
-
-            // If a single source is provided
-            // ("path/to/src.mp4")
-            if(typeof sources === "string") {
+        function _parseSource(sources) {
+            // If a single source object is provided
+            // ({ src: "//cdn.selz.com/plyr/1.0/movie.webm", type: "video/webm" })
+            if(typeof sources === "object" && sources.constructor !== Array) {
                 // Set src attribute on the element
-                player.media.setAttribute("src", sources);
+                _setSource(sources);
             }
-            // Single source but using object to pass attributes
-            // ({ src: "path/to/src.mp4", type: "video/mp4" })
-            else if (typeof sources === "object") {
-                _addSource(sources);   
-            }
-            // Array of source objects to pass attributes
-            // ([{ src: "path/to/src.mp4", type: "video/mp4" },{ src: "path/to/src.webm", type: "video/webm" }])
+
+            // An array of source objects
+            // Check if a source exists, use that or set the "src" attribute?
+            // [{ src: "path/to/src.mp4", type: "video/mp4" },{ src: "path/to/src.webm", type: "video/webm" }]
             else if (sources.constructor === Array) {
-                for (var key in sources) { 
-                    _addSource(sources[key]);   
+                for (var index in sources) { 
+                    _setSource(sources[index]);
                 }
             }
-
-            // Restart
-            _restart();
-
-            // Play if autoplay attribute is present
-            if(player.media.getAttribute("autoplay") !== null) {
-                _play();
+            // Not an object or an array
+            else {
+                _log("Bad source format...");
             }
         }
 
@@ -1115,7 +1152,7 @@
             });
 
             // Restart
-            _on(player.buttons.restart, "click", _restart);
+            _on(player.buttons.restart, "click", _seek);
 
             // Rewind
             _on(player.buttons.rewind, "click", _rewind);
@@ -1147,7 +1184,7 @@
                         _play();
                     }
                     else if(player.media.ended) {
-                        _restart();
+                        _seek();
                         _play();
                     }
                     else {
@@ -1158,6 +1195,9 @@
             
             // Time change on media
             _on(player.media, "timeupdate seeking", _timeUpdate);
+
+            // Update manual captions
+            _on(player.media, "timeupdate", _seekManualCaptions);
 
             // Seek 
             _on(player.buttons.seek, "change input", _seek);
@@ -1243,15 +1283,16 @@
             media:              player.media,
             play:               _play,
             pause:              _pause,
-            restart:            _restart,
+            restart:            _seek,
             rewind:             _rewind,
             forward:            _forward,
             seek:               _seek,
             setVolume:          _setVolume,
             toggleMute:         _toggleMute,
             toggleCaptions:     _toggleCaptions,
-            source:             _updateSource,
-            poster:             _updatePoster
+            source:             _parseSource,
+            poster:             _updatePoster,
+            support:            _support
         }
     }
 
