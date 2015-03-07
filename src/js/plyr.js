@@ -277,6 +277,18 @@
         element.parentNode.removeChild(element);
     }
 
+    // Prepend child
+    function _prependChild(parent, element) {
+        parent.insertBefore(element, parent.firstChild);
+    }
+
+    // Set attributes
+    function _setAttributes(element, attributes) {
+        for(var key in attributes) {
+            element.setAttribute(key, attributes[key]);
+        }
+    }
+
     // Toggle class on an element
     function _toggleClass(element, name, state) {
         if(element){
@@ -311,6 +323,9 @@
 
     // Get percentage
     function _getPercentage(current, max) {
+        if(current === 0 || max === 0 || isNaN(current) || isNaN(max)) {
+            return 0;
+        }
         return ((current / max) * 100).toFixed(2);
     }
 
@@ -838,12 +853,8 @@
         var _seek = function(input) {
             var targetTime = 0;
 
-            // If no event or time is passed, bail
-            if (typeof input === "undefined") {
-                return;
-            }
             // Explicit position
-            else if (typeof input === "number") {
+            if (typeof input === "number") {
                 targetTime = input;
             }
             // Event
@@ -868,7 +879,7 @@
             _log("Seeking to " + player.media.currentTime + " seconds");
 
             // Special handling for "manual" captions
-            _seekManualCaptions(targetTime);
+            _seekManualCaptions(0);
         }
 
         // Check playing state
@@ -997,19 +1008,19 @@
                     // Video playing
                     case "timeupdate":
                     case "seeking":
-                        value       = _getPercentage(player.media.currentTime, player.media.duration);
+                        value = _getPercentage(player.media.currentTime, player.media.duration);
 
                         // Set seek range value only if it's a "natural" time event
                         if(event.type == "timeupdate") {
                             player.buttons.seek.value = value;
                         }
-                        
+            
                         break;
 
                     // Events from seek range
                     case "change":
                     case "input":
-                        value       = event.target.value;
+                        value = event.target.value;
                         break;
 
 
@@ -1070,11 +1081,27 @@
 
             // Remove src attribute
             player.media.removeAttribute("src");
-        }   
+        }
+
+        // Inject a source
+        function _addSource(attributes) {
+            // Create a new <source>
+            var element = document.createElement("source");
+
+            // Set all passed attributes
+            _setAttributes(element, attributes);
+
+            // Inject the new source
+            _prependChild(player.media, element);
+        }
 
         // Set source
         function _setSource(source) {
             if(source.type && source.src) {
+                _addSource(source);
+            }
+
+            /*if(source.type && source.src) {
                 // Check if it's supported first
                 if(_support(player, source.type)) {
                     // Pause playback (webkit freaks out)
@@ -1103,11 +1130,27 @@
                 else {
                     _log("No support for: " + source.src + " [" + source.type + "]");
                 }
-            }
+            }*/
+
+
         }
 
         // Update source
         function _parseSource(sources) {
+            // Pause playback (webkit freaks out)
+            _pause();
+
+            // Restart
+            _seek();
+
+            // Update the UI
+            _checkPlaying();
+
+            // Remove current sources
+            _removeSources();
+
+
+
             // If a single source object is provided
             // ({ src: "//cdn.selz.com/plyr/1.0/movie.webm", type: "video/webm" })
             if(typeof sources === "object" && sources.constructor !== Array) {
@@ -1117,15 +1160,24 @@
 
             // An array of source objects
             // Check if a source exists, use that or set the "src" attribute?
-            // [{ src: "path/to/src.mp4", type: "video/mp4" },{ src: "path/to/src.webm", type: "video/webm" }]
+            // ([{ src: "path/to/src.mp4", type: "video/mp4" },{ src: "path/to/src.webm", type: "video/webm" }])
             else if (sources.constructor === Array) {
                 for (var index in sources) { 
                     _setSource(sources[index]);
                 }
             }
-            // Not an object or an array
-            else {
-                _log("Bad source format...");
+            
+
+
+            // Reset time display
+            _timeUpdate();
+
+            // Re-load sources
+            player.media.load();
+
+            // Play if autoplay attribute is present
+            if(player.media.getAttribute("autoplay") !== null) {
+                _play();
             }
         }
 
