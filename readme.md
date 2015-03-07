@@ -190,13 +190,13 @@ You can pass the following options to the setup method.
     <td><code>click</code></td>
     <td>Boolean</td>
     <td><code>true</code></td>
-    <td>Click (or tap) will toggle pause/play of a `<video>`.</td>
+    <td>Click (or tap) will toggle pause/play of a <code>&lt;video&gt;</code>.</td>
   </tr>
   <tr>
     <td><code>selectors</code></td>
     <td>Object</td>
     <td>&mdash;</td>
-    <td>See `plyr.js` in `/src` for more info. The only option you might want to change is `player` which is the hook used for Plyr, the default is `.player`.</td>
+    <td>See <code>plyr.js</code> in <code>/src</code> for more info. The only option you might want to change is <code>player</code> which is the hook used for Plyr, the default is <code>.player</code>.</td>
   </tr>
   <tr>
     <td><code>classes</code></td>
@@ -208,13 +208,13 @@ You can pass the following options to the setup method.
     <td><code>captions</code></td>
     <td>Object</td>
     <td>&mdash;</td>
-    <td>This currently contains one property `defaultActive` which toggles if captions should be on by default. The default value is `false`.</td>
+    <td>This currently contains one property `defaultActive` which toggles if captions should be on by default. The default value is <code>false</code>.</td>
   </tr>
   <tr>
     <td><code>fullscreen</code></td>
     <td>Object</td>
     <td>&mdash;</td>
-    <td>This currently contains two properties; `enabled` which toggles if fullscreen should be enabled (if the browser supports it). The default value is `true`. Also an extra property called `fallback` which will enable a 'full window' view for older browsers. The default value is `true`.</td>
+    <td>This currently contains two properties;<code>enabled</code> which toggles if fullscreen should be enabled (if the browser supports it). The default value is <code>true</code>. Also an extra property called <code>fallback</code> which will enable a full window view for older browsers. The default value is <code>true</code>.</td>
   </tr>
   <tr>
     <td><code>storage</code></td>
@@ -301,18 +301,18 @@ Here's a list of the methods supported:
       Set the media source.
       <br><br> 
       <strong>string</strong><br>
-      `.source("/path/to/video.mp4")`<br>
-      This will set the "src" attribute on the `video` or `audio` element.
+      <code>.source("/path/to/video.mp4")</code><br>
+      This will set the <code>src</code> attribute on the <code>video</code> or <code>audio</code> element.
       <br><br>
       <strong>array</strong><br>
-      `.source([{ src: "/path/to/video.webm", type: "video/webm", ...more attributes... }, { src: "/path/to/video.mp4", type: "video/mp4", ...more attributes... }])`<br>
+      <code>.source([{ src: "/path/to/video.webm", type: "video/webm", ...more attributes... }, { src: "/path/to/video.mp4", type: "video/mp4", ...more attributes... }])`<c/ode><br>
       This will inject a child `source` element for every element in the array with the specified attributes. `src` is the only required attribute although adding `type` is recommended as it helps the browser decide which file to download and play. 
     </td>
   </tr>
     <tr>
     <td><code>poster(...)</code></td>
     <td>String</td>
-    <td>Set the poster url. This is supported for the `video` element only.</td>
+    <td>Set the poster url. This is supported for the <code>video</code> element only.</td>
   </tr>
  </tbody>
 </table>
