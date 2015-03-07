@@ -296,7 +296,7 @@ Here's a list of the methods supported:
   </tr>
   <tr>
     <td><code>source(...)</code></td>
-    <td>String, Object or Array</td>
+    <td>String or Array</td>
     <td>
       Set the media source.
       <br><br> 
