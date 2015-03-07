@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.0.22
+// plyr.js v1.0.23
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -50,6 +50,7 @@
             stopped:            "stopped",
             playing:            "playing",
             muted:              "muted",
+            loading:            "loading",
             captions: {
                 enabled:        "captions-enabled",
                 active:         "captions-active"
@@ -626,7 +627,7 @@
             player.media.removeAttribute("controls");
 
             // Set media type
-            player.type = (player.media.tagName.toLowerCase() == "video" ? "video" : "audio");
+            player.type = (player.media.tagName == "VIDEO" ? "video" : "audio");
 
             // Add type class
             _toggleClass(player.container, config.classes[player.type], true);
@@ -994,6 +995,19 @@
             _toggleClass(player.container, config.classes.muted, (player.media.volume === 0 || player.media.muted));
         }
 
+        // Check if media is loading
+        function _checkLoading(event) {
+            var loading = (event.type === "waiting");
+
+            // Clear timer
+            clearTimeout(player.loadingTimer);
+
+            // Timer to prevent flicker when seeking
+            player.loadingTimer = setTimeout(function() {
+                _toggleClass(player.container, config.classes.loading, loading);
+            }, (loading ? 250 : 0));
+        }
+
         // Update <progress> elements
         function _updateProgress(event) {
             var progress    = player.progress.played.bar, 
@@ -1232,6 +1246,9 @@
 
             // Handle native play/pause
             _on(player.media, "play pause", _checkPlaying);
+
+            // Loading
+            _on(player.media, "waiting canplay seeked", _checkLoading);
         }
 
         function _init() {
@@ -1320,6 +1337,13 @@
         for (var i = elements.length - 1; i >= 0; i--) {
             // Get the current element
             var element = elements[i];
+
+            // Disabled for <video> for iPhone
+            // Since it doesn't allow customisation
+            if (element.querySelectorAll("audio, video")[0].tagName === "VIDEO" 
+                && /iPhone/i.test(navigator.userAgent)) {
+                continue;
+            }
 
             // Setup a player instance and add to the element
             if(typeof element.plyr === "undefined") { 

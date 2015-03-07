@@ -21,13 +21,14 @@ $controls-bg: 				$gray-dark;
 $control-bg-hover: 			$blue;
 $control-color: 			$gray-light;
 $control-color-inactive: 	$gray;
-$control-color-focus: 		#fff;
 $control-color-hover: 		#fff;
 
 // Progress
 $progress-bg: 				lighten($gray, 10%);
 $progress-playing-bg: 		$blue;
 $progress-buffered-bg: 		$gray;
+$progress-loading-size: 	40px;
+$progress-loading-bg: 		rgba(0,0,0, .15);
 
 // Range
 $volume-track-height: 		6px;
@@ -61,12 +62,17 @@ $bp-captions-large: 		768px; // When captions jump to the larger font size
 	&:after { content: ""; display: table; }
 	&:after { clear: both; }
 }
-
 // Tab focus styles
 @mixin tab-focus()
 {
 	outline: thin dotted #000;
 	outline-offset: 0;
+}
+
+// Animation
+// ---------------------------------------
+@keyframes progress {
+	to { background-position: @progress-loading-size 0; }
 }
 
 // <input type="range"> styling
@@ -91,7 +97,7 @@ $bp-captions-large: 		768px; // When captions jump to the larger font size
 @mixin seek-thumb() {
 	background: transparent;
 	border: 0;
-	width: 2px;
+	width: ($control-spacing * 2);
 	height: $control-spacing;
 }
 @mixin seek-track() {
@@ -348,6 +354,24 @@ $bp-captions-large: 		768px; // When captions jump to the larger font size
 				border: 0;
 			}
 		}
+	}
+
+	// Loading state
+	&.loading .player-progress-buffer {
+		animation: progress 1s linear infinite;
+		background-size: $progress-loading-size $progress-loading-size;
+		background-repeat: repeat-x;
+		background-color: $progress-buffered-bg;
+		background-image: linear-gradient(
+			-45deg, 
+			$progress-loading-bg 25%, 
+			transparent 25%, 
+			transparent 50%, 
+			$progress-loading-bg 50%, 
+			$progress-loading-bg 75%,
+			transparent 75%, 
+			transparent);
+	    color: transparent;
 	}
 
 	// States

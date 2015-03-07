@@ -38,7 +38,7 @@ If you have any cool ideas or features, please let me know by [creating an issue
 
 Check `docs/index.html` and `docs/dist/docs.js` for an example setup. 
 
-**Heads up**, the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.0.21/plyr.js` to `https://cdn.plyr.io/1.0.21/plyr.js`
+**Heads up**, the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.0.23/plyr.js` to `https://cdn.plyr.io/1.0.23/plyr.js`
 
 ### Bower
 If bower is your thang, you can grab Plyr using:
@@ -51,11 +51,11 @@ More info on setting up dependencies can be found in the [Bower Docs](http://bow
 If you want to use our CDN, you can use the following. HTTPS (SSL) is supported.
 
 ```html
-<link rel="stylesheet" href="//cdn.plyr.io/1.0.21/plyr.css">
-<script src="//cdn.plyr.io/1.0.21/plyr.js"></script>
+<link rel="stylesheet" href="//cdn.plyr.io/1.0.23/plyr.css">
+<script src="//cdn.plyr.io/1.0.23/plyr.js"></script>
 ```
 
-You can also access the `sprite.svg` file at `//cdn.plyr.io/1.0.21/sprite.svg`.
+You can also access the `sprite.svg` file at `//cdn.plyr.io/1.0.23/sprite.svg`.
 
 ### CSS
 If you want to use the default css, add the `plyr.css` file from /dist into your head, or even better use `plyr.less` or `plyr.sass` file included in `/src` in your build to save a request. 
@@ -349,19 +349,21 @@ Fullscreen in Plyr is supported for all browsers that [currently support it](htt
   </thead>
   <tbody>
     <tr>
+      <td>✔&sup1;</td>
       <td>✔</td>
       <td>✔</td>
       <td>✔</td>
-      <td>✔</td>
-      <td>✖&sup1;</td>
-      <td>✔&sup2;</td>
+      <td>✖&sup2;</td>
+      <td>✔&sup3;</td>
     </tr>
   </tbody>
 </table>
 
-&sup1; Native player used (no support for `<progress>` or `<input type="range">`)
+&sup1; iPhone forces the native player for `<video>` so no customisation possible
 
-&sup2; IE10 has no native fullscreen support, fallback can be used (see options)
+&sup2; Native player used (no support for `<progress>` or `<input type="range">`)
+
+&sup3; IE10 has no native fullscreen support, fallback can be used (see options)
 
 The `enabled` option can be used to disable certain User Agents. For example, if you don't want to use Plyr for smartphones, you could use: 
 

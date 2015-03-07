@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.0.23
+- Handling loading states in the UI
+
 ## v1.0.22
 - Added support() API method for checking mimetype support
 - Added source() API method for setting media source(s)
