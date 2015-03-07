@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.0.22
+- Added support() API method for checking mimetype support
+- Added source() API method for setting media source(s)
+- Added poster() API method for setting poster source
+- Refactored captions logic for manual captions
+
 ## v1.0.21
 - Added an <input type="range"> for seeking to improve experience (and support dragging)
 - Icons for restart and captions improved (and some IDs changed)

@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.0.21
+// plyr.js v1.0.22
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -142,7 +142,7 @@
     }
 
     // Credits: http://paypal.github.io/accessible-html5-video-player/
-    // Unfortunately, due to scattered support, browser sniffing is required
+    // Unfortunately, due to mixed support, UA sniffing is required
     function _browserSniff() {
         var nAgt = navigator.userAgent,
             browserName = navigator.appName,
@@ -469,16 +469,14 @@
             if (player.media.currentTime.toFixed(1) >= _timecodeMin(player.captions[player.subcount][0]) && 
                 player.media.currentTime.toFixed(1) <= _timecodeMax(player.captions[player.subcount][0])) {
                     player.currentCaption = player.captions[player.subcount][1];
-            }
 
-            // Is there a next timecode?
-            if (player.media.currentTime.toFixed(1) > _timecodeMax(player.captions[player.subcount][0]) && 
-                player.subcount < (player.captions.length-1)) {
-                    player.subcount++;
+                // Render the caption
+                player.captionsContainer.innerHTML = player.currentCaption;
             }
-
-            // Render the caption
-            player.captionsContainer.innerHTML = player.currentCaption;
+            else {
+                // Clear the caption
+                player.captionsContainer.innerHTML = "";
+            }
         }
 
         // Display captions container and button (for initialization)
@@ -747,7 +745,6 @@
 
                         // Render captions from array at appropriate time
                         player.currentCaption = "";
-                        player.subcount = 0;
                         player.captions = [];
 
                         if (captionSrc !== "") {
@@ -849,8 +846,8 @@
         }
 
         // Seek to time
-        // The parameter can be an event or a number
-        var _seek = function(input) {
+        // The input parameter can be an event or a number
+        function _seek(input) {
             var targetTime = 0;
 
             // Explicit position
@@ -858,10 +855,10 @@
                 targetTime = input;
             }
             // Event
-            else if (input.type === "change" || input.type === "input") {
+            else if (typeof input === "object" && (input.type === "change" || input.type === "input")) {
                 // It's the seek slider
                 // Seek to the selected time
-                targetTime = ((this.value / this.max) * player.media.duration);
+                targetTime = ((input.target.value / input.target.max) * player.media.duration);
             }
 
             // Normalise targetTime
@@ -879,7 +876,7 @@
             _log("Seeking to " + player.media.currentTime + " seconds");
 
             // Special handling for "manual" captions
-            _seekManualCaptions(0);
+            _seekManualCaptions(targetTime);
         }
 
         // Check playing state
@@ -1085,57 +1082,20 @@
 
         // Inject a source
         function _addSource(attributes) {
-            // Create a new <source>
-            var element = document.createElement("source");
+            if(attributes.src) {
+                // Create a new <source>
+                var element = document.createElement("source");
 
-            // Set all passed attributes
-            _setAttributes(element, attributes);
+                // Set all passed attributes
+                _setAttributes(element, attributes);
 
-            // Inject the new source
-            _prependChild(player.media, element);
-        }
-
-        // Set source
-        function _setSource(source) {
-            if(source.type && source.src) {
-                _addSource(source);
+                // Inject the new source
+                _prependChild(player.media, element);
             }
-
-            /*if(source.type && source.src) {
-                // Check if it's supported first
-                if(_support(player, source.type)) {
-                    // Pause playback (webkit freaks out)
-                    _pause();
-
-                    // Update the UI
-                    _checkPlaying();
-
-                    // Remove current sources
-                    _removeSources();
-
-                    // Set the src attribute
-                    player.media.setAttribute("src", source.src);
-
-                    // Restart
-                    _seek();
-
-                    // Reset time display
-                    _timeUpdate();
-
-                    // Play if autoplay attribute is present
-                    if(player.media.getAttribute("autoplay") !== null) {
-                        _play();
-                    }
-                }
-                else {
-                    _log("No support for: " + source.src + " [" + source.type + "]");
-                }
-            }*/
-
-
         }
 
         // Update source
+        // Sources are not checked for support so be careful
         function _parseSource(sources) {
             // Pause playback (webkit freaks out)
             _pause();
@@ -1149,25 +1109,20 @@
             // Remove current sources
             _removeSources();
 
-
-
-            // If a single source object is provided
-            // ({ src: "//cdn.selz.com/plyr/1.0/movie.webm", type: "video/webm" })
-            if(typeof sources === "object" && sources.constructor !== Array) {
-                // Set src attribute on the element
-                _setSource(sources);
+            // If a single source is passed
+            // .source("path/to/video.mp4")
+            if(typeof sources === "string") {
+                player.media.setAttribute("src", sources);
             }
 
             // An array of source objects
             // Check if a source exists, use that or set the "src" attribute?
-            // ([{ src: "path/to/src.mp4", type: "video/mp4" },{ src: "path/to/src.webm", type: "video/webm" }])
+            // .source([{ src: "path/to/video.mp4", type: "video/mp4" },{ src: "path/to/video.webm", type: "video/webm" }])
             else if (sources.constructor === Array) {
                 for (var index in sources) { 
-                    _setSource(sources[index]);
+                    _addSource(sources[index]);
                 }
             }
-            
-
 
             // Reset time display
             _timeUpdate();
@@ -1343,7 +1298,7 @@
             toggleCaptions:     _toggleCaptions,
             source:             _parseSource,
             poster:             _updatePoster,
-            support:            _support
+            support:            function(mimeType) { return _support(player, mimeType); }
         }
     }
 

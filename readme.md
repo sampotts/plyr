@@ -245,49 +245,74 @@ Here's a list of the methods supported:
   </thead>
   <tbody>
   <tr>
-    <td><code>play</code></td>
+    <td><code>play()</code></td>
     <td>&mdash;</td>
     <td>Plays the media</td>
   </tr>
   <tr>
-    <td><code>pause</code></td>
+    <td><code>pause()</code></td>
     <td>&mdash;</td>
     <td>Pauses the media</td>
   </tr>
     <tr>
-    <td><code>restart</code></td>
+    <td><code>restart()</code></td>
     <td>&mdash;</td>
     <td>Restarts playback</td>
   </tr>
   <tr>
-    <td><code>rewind</code></td>
+    <td><code>rewind(...)</code></td>
     <td>Number</td>
     <td>Rewinds by the provided parameter, in seconds. If no parameter is provided, the default seekInterval is used (10 seconds).</td>
   </tr>
   <tr>
-    <td><code>forward</code></td>
+    <td><code>forward(...)</code></td>
     <td>Number</td>
     <td>Fast forwards by the provided parameter, in seconds. If no parameter is provided, the default seekInterval is used (10 seconds).</td>
   </tr>
   <tr>
-    <td><code>seek</code></td>
+    <td><code>seek(...)</code></td>
     <td>Number</td>
     <td>Seeks the media to the provided parameter, time in seconds.</td>
   </tr>
   <tr>
-    <td><code>setVolume</code></td>
+    <td><code>setVolume(...)</code></td>
     <td>Number</td>
     <td>Sets the player volume to the provided parameter. The value should be between 0 (muted) and 10 (loudest). If no parameter is provided, the default volume is used (5). Values over 10 are ignored.</td>
   </tr>
   <tr>
-    <td><code>toggleMute</code></td>
+    <td><code>toggleMute()</code></td>
     <td>&mdash;</td>
     <td>Toggles mute for the player.</td>
   </tr>
   <tr>
-    <td><code>toggleCaptions</code></td>
+    <td><code>toggleCaptions()</code></td>
     <td>&mdash;</td>
     <td>Toggles whether captions are enabled.</td>
+  </tr>
+  <tr>
+    <td><code>support(...)</code></td>
+    <td>String</td>
+    <td>Determine if a player supports a certain MIME type.</td>
+  </tr>
+  <tr>
+    <td><code>source(...)</code></td>
+    <td>String, Object or Array</td>
+    <td>
+      Set the media source.
+      <br><br> 
+      <strong>string</strong><br>
+      <em>.source("/path/to/video.mp4")</em><br>
+      This will set the "src" attribute on the `video` or `audio` element.
+      <br><br>
+      <strong>array</strong><br>
+      <em>.source([{ src: "/path/to/video.webm", type: "video/webm", ...more attributes... }, { src: "/path/to/video.mp4", type: "video/mp4", ...more attributes... }])</em><br>
+      This will inject a child `source` element for every element in the array with the specified attributes. `src` is the only required attribute although adding `type` is recommended as it helps the browser decide which file to download and play. 
+    </td>
+  </tr>
+    <tr>
+    <td><code>poster(...)</code></td>
+    <td>String</td>
+    <td>Set the poster url. This is supported for the `video` element only.</td>
   </tr>
  </tbody>
 </table>
