@@ -305,7 +305,7 @@ Here's a list of the methods supported:
       This will set the <code>src</code> attribute on the <code>video</code> or <code>audio</code> element.
       <br><br>
       <strong>array</strong><br>
-      <code>.source([{ src: "/path/to/video.webm", type: "video/webm", ...more attributes... }, { src: "/path/to/video.mp4", type: "video/mp4", ...more attributes... }])`<c/ode><br>
+      <code>.source([{ src: "/path/to/video.webm", type: "video/webm", ...more attributes... }, { src: "/path/to/video.mp4", type: "video/mp4", ...more attributes... }])`</code><br>
       This will inject a child `source` element for every element in the array with the specified attributes. `src` is the only required attribute although adding `type` is recommended as it helps the browser decide which file to download and play. 
     </td>
   </tr>
