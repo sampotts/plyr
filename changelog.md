@@ -1,17 +1,20 @@
 # Changelog
 
+## v1.0.24
+- Added tooltip option to display labels as tooltips (Fixes #50)
+
 ## v1.0.23
-- Handling loading states in the UI
+- Handling loading states in the UI (Fixes #36)
 
 ## v1.0.22
 - Added support() API method for checking mimetype support
-- Added source() API method for setting media source(s)
+- Added source() API method for setting media source(s) (Fixes #44)
 - Added poster() API method for setting poster source
 - Refactored captions logic for manual captions
 
 ## v1.0.21
-- Added an <input type="range"> for seeking to improve experience (and support dragging)
-- Icons for restart and captions improved (and some IDs changed)
+- Added an <input type="range"> for seeking to improve experience (and support dragging) (Fixes #40, #42)
+- Icons for restart and captions improved (and some IDs changed) (Fixes #49)
 
 ## v1.0.20
 - Default controls included (Fixes #45)
@@ -20,7 +23,7 @@
 - License changed to MIT
 
 ## v1.0.19
-- Fixed firefox fullscreen issue (#38)
+- Fixed firefox fullscreen issue (Fixes #38)
 
 ## v1.0.18
 - Added CDN references

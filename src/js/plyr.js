@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.0.23
+// plyr.js v1.0.24
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -20,9 +20,11 @@
         seekTime:               10,
         volume:                 5,
         click:                  true,
+        tooltips:               false,
         selectors: {
             container:          ".player",
             controls:           ".player-controls",
+            labels:             "[data-player] .sr-only, label .sr-only",
             buttons: {
                 seek:           "[data-player='seek']",
                 play:           "[data-player='play']",
@@ -51,6 +53,8 @@
             playing:            "playing",
             muted:              "muted",
             loading:            "loading",
+            tooltip:            "player-tooltip",
+            hidden:             "sr-only",
             captions: {
                 enabled:        "captions-enabled",
                 active:         "captions-active"
@@ -68,7 +72,8 @@
             fallback:           true
         },
         storage: {
-            enabled:            true
+            enabled:            true,
+            key:                "plyr_volume"
         },
         html: (function() {
             return [
@@ -90,7 +95,7 @@
                         "</button>",
                         "<button type='button' data-player='rewind'>",
                             "<svg><use xlink:href='#icon-rewind'></use></svg>",
-                            "<span class='sr-only'>Rewind {seektime} seconds</span>",
+                            "<span class='sr-only'>Rewind {seektime} secs</span>",
                         "</button>",
                         "<button type='button' data-player='play'>",
                             "<svg><use xlink:href='#icon-play'></use></svg>",
@@ -102,7 +107,7 @@
                         "</button>",
                         "<button type='button' data-player='fast-forward'>",
                             "<svg><use xlink:href='#icon-fast-forward'></use></svg>",
-                            "<span class='sr-only'>Fast forward {seektime} seconds</span>",
+                            "<span class='sr-only'>Forward {seektime} secs</span>",
                         "</button>",
                         "<span class='player-time'>",
                             "<span class='sr-only'>Time</span>",
@@ -127,7 +132,7 @@
                         "<button type='button' data-player='fullscreen'>",
                             "<svg class='icon-exit-fullscreen'><use xlink:href='#icon-exit-fullscreen'></use></svg>",
                             "<svg><use xlink:href='#icon-enter-fullscreen'></use></svg>",
-                            "<span class='sr-only'>Toggle fullscreen</span>",
+                            "<span class='sr-only'>Toggle Fullscreen</span>",
                         "</button>",
                     "</span>",
                 "</div>"
@@ -553,6 +558,18 @@
 
             // Inject into the container
             player.container.insertAdjacentHTML("beforeend", html);
+
+            // Setup tooltips
+            if(config.tooltips) {
+                var labels = _getElements(config.selectors.labels);
+
+                for (var i = labels.length - 1; i >= 0; i--) {
+                    var label = labels[i];
+
+                    _toggleClass(label, config.classes.hidden, false);
+                    _toggleClass(label, config.classes.tooltip, true);
+                }
+            }
         }
 
         // Find the UI controls and store references
@@ -941,7 +958,7 @@
             // Use default if needed
             if(typeof volume === "undefined") {
                 if(config.storage.enabled && _storage().supported) {
-                    volume = window.localStorage.plyr_volume || config.volume;
+                    volume = window.localStorage[config.storage.key] || config.volume;
                 }
                 else {
                     volume = config.volume;

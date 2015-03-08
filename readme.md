@@ -38,7 +38,7 @@ If you have any cool ideas or features, please let me know by [creating an issue
 
 Check `docs/index.html` and `docs/dist/docs.js` for an example setup. 
 
-**Heads up**, the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.0.23/plyr.js` to `https://cdn.plyr.io/1.0.23/plyr.js`
+**Heads up**, the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.0.24/plyr.js` to `https://cdn.plyr.io/1.0.24/plyr.js`
 
 ### Bower
 If bower is your thang, you can grab Plyr using:
@@ -51,11 +51,11 @@ More info on setting up dependencies can be found in the [Bower Docs](http://bow
 If you want to use our CDN, you can use the following. HTTPS (SSL) is supported.
 
 ```html
-<link rel="stylesheet" href="//cdn.plyr.io/1.0.23/plyr.css">
-<script src="//cdn.plyr.io/1.0.23/plyr.js"></script>
+<link rel="stylesheet" href="//cdn.plyr.io/1.0.24/plyr.css">
+<script src="//cdn.plyr.io/1.0.24/plyr.js"></script>
 ```
 
-You can also access the `sprite.svg` file at `//cdn.plyr.io/1.0.23/sprite.svg`.
+You can also access the `sprite.svg` file at `//cdn.plyr.io/1.0.24/sprite.svg`.
 
 ### CSS
 If you want to use the default css, add the `plyr.css` file from /dist into your head, or even better use `plyr.less` or `plyr.sass` file included in `/src` in your build to save a request. 
@@ -193,6 +193,12 @@ You can pass the following options to the setup method.
     <td>Click (or tap) will toggle pause/play of a <code>&lt;video&gt;</code>.</td>
   </tr>
   <tr>
+    <td><code>tooltips</code></td>
+    <td>Boolean</td>
+    <td><code>false</code></td>
+    <td>Display control labels as tooltips on :hover &amp; :focus (by default, the labels are screen reader only).</td>
+  </tr>
+  <tr>
     <td><code>selectors</code></td>
     <td>Object</td>
     <td>&mdash;</td>
@@ -208,19 +214,19 @@ You can pass the following options to the setup method.
     <td><code>captions</code></td>
     <td>Object</td>
     <td>&mdash;</td>
-    <td>This currently contains one property `defaultActive` which toggles if captions should be on by default. The default value is <code>false</code>.</td>
+    <td>One property <code>defaultActive</code> which toggles if captions should be on by default. The default value is <code>false</code>.</td>
   </tr>
   <tr>
     <td><code>fullscreen</code></td>
     <td>Object</td>
     <td>&mdash;</td>
-    <td>This currently contains two properties;<code>enabled</code> which toggles if fullscreen should be enabled (if the browser supports it). The default value is <code>true</code>. Also an extra property called <code>fallback</code> which will enable a full window view for older browsers. The default value is <code>true</code>.</td>
+    <td>Two properties; <code>enabled</code> which toggles if fullscreen should be enabled (if the browser supports it). The default value is <code>true</code>. Also an extra property called <code>fallback</code> which will enable a full window view for older browsers. The default value is <code>true</code>.</td>
   </tr>
   <tr>
     <td><code>storage</code></td>
     <td>Object</td>
     <td>&mdash;</td>
-    <td>This currently contains one property `enabled` which toggles if local storage should be enabled (if the browser supports it). The default value is `true`. This enables storing user settings, currently it only stores volume but more will be added later.</td>
+    <td>Two properties; <code>enabled</code> which toggles if local storage should be enabled (if the browser supports it). The default value is `true`. This enables storing user settings, currently it only stores volume but more will be added later. The second property <code>key</code> is the key used for the local storage. The default is <code>plyr_volume</code> until more settings are stored.</td>
   </tr>
  </tbody>
 </table>

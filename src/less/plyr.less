@@ -23,6 +23,13 @@
 @control-color-inactive: 	@gray;
 @control-color-hover: 		#fff;
 
+// Tooltips
+@tooltip-bg: 				@controls-bg;
+@tooltip-color: 			#fff;
+@tooltip-padding: 			@control-spacing; 	
+@tooltip-arrow-size: 		5px;
+@tooltip-radius: 			3px;
+
 // Progress
 @progress-bg: 				lighten(@gray, 10%);
 @progress-playing-bg: 		@blue;
@@ -119,7 +126,6 @@
 	position: relative;
 	max-width: 100%;
 	min-width: 290px;
-	overflow: hidden; // For the controls
 
 	// border-box everything
 	// http://paulirish.com/2012/box-sizing-border-box-ftw/
@@ -227,10 +233,11 @@
 			overflow: hidden;
 		}
 		
+		// Specificity for overriding .inverted
 		button:focus,
 		button:hover,
-		input:focus + label,
-		input + label:hover {
+		[type="checkbox"]:focus + label,
+		[type="checkbox"] + label:hover {
 			background: @control-bg-hover;
 			color: @control-color-hover;
 		}
@@ -252,6 +259,54 @@
 			font-size: @font-size-small;
 			.font-smoothing();
 		}
+	}
+
+	// Tooltips
+	&-tooltip {
+		visibility: hidden;
+		position: absolute;
+		z-index: 2;
+		bottom: 100%;
+		margin-bottom: @tooltip-padding;
+		padding: @tooltip-padding (@tooltip-padding * 1.5);
+
+        opacity: 0;
+		background: @tooltip-bg;
+		border-radius: @tooltip-radius;
+		color: @tooltip-color;
+		font-size: @font-size-small;
+		line-height: 1.5;
+		font-weight: 600;
+
+		transform: translate(-50%, (@tooltip-padding * 3));
+        transition: transform .2s .2s ease, opacity .2s .2s ease;
+
+		&::after {
+			content: "";
+			display: block;
+			position: absolute;
+			left: 50%;
+			bottom: -@tooltip-arrow-size;
+			margin-left: -@tooltip-arrow-size;
+			width: 0;
+			height: 0;
+			transition: inherit;
+			border-style: solid;
+			border-width: @tooltip-arrow-size @tooltip-arrow-size 0 @tooltip-arrow-size;
+			border-color: @controls-bg transparent transparent;
+		}
+	}
+	label:hover .player-tooltip,
+	input:focus + label .player-tooltip, 
+	button:hover .player-tooltip,
+	button:focus .player-tooltip {
+		visibility: visible;
+		opacity: 1;
+		transform: translate(-50%, 0);
+	}
+	label:hover .player-tooltip,
+	button:hover .player-tooltip {
+		z-index: 3;
 	}
 
 	// Player progress
@@ -308,7 +363,7 @@
 		// <input[type='range']> element
 		// Specificity is for bootstrap compatibility
 		&-seek[type=range] {
-			z-index: 3;
+			z-index: 4;
 			cursor: pointer;
 			outline: 0;
 
