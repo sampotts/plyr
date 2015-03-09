@@ -644,7 +644,7 @@
             player.media.removeAttribute("controls");
 
             // Set media type
-            player.type = (player.media.tagName == "VIDEO" ? "video" : "audio");
+            player.type = player.media.tagName.toLowerCase();
 
             // Add type class
             _toggleClass(player.container, config.classes[player.type], true);
@@ -1357,7 +1357,7 @@
 
             // Disabled for <video> for iPhone
             // Since it doesn't allow customisation
-            if (element.querySelectorAll("audio, video")[0].tagName === "VIDEO" 
+            if (element.querySelectorAll("audio, video")[0].tagName.toLowerCase() === "video"
                 && /iPhone/i.test(navigator.userAgent)) {
                 continue;
             }
