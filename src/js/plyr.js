@@ -1,7 +1,7 @@
 // ==========================================================================
 // Plyr
 // plyr.js v1.0.24
-// https://github.com/sampotts/plyr
+// https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
 // Credits: http://paypal.github.io/accessible-html5-video-player/
