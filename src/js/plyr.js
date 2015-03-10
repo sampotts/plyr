@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.0.24
+// plyr.js v1.0.25
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -88,7 +88,7 @@
                             "<span>0</span>% buffered",
                         "</progress>",
                     "</div>",
-                    "<span class='player-controls-playback'>",
+                    "<span class='player-controls-left'>",
                         "<button type='button' data-player='restart'>",
                             "<svg><use xlink:href='#icon-restart'></use></svg>",
                             "<span class='sr-only'>Restart</span>",
@@ -114,7 +114,7 @@
                             "<span class='player-duration'>00:00</span>",
                         "</span>",
                     "</span>",
-                    "<span class='player-controls-sound'>",
+                    "<span class='player-controls-right'>",
                         "<input class='inverted sr-only' id='mute{id}' type='checkbox' data-player='mute'>",
                         "<label id='mute{id}' for='mute{id}'>",
                             "<svg class='icon-muted'><use xlink:href='#icon-muted'></use></svg>",
@@ -137,7 +137,7 @@
                     "</span>",
                 "</div>"
             ].join("\n");
-    })()
+        })()
     };
 
     // Debugging
@@ -151,7 +151,7 @@
     // Unfortunately, due to mixed support, UA sniffing is required
     function _browserSniff() {
         var nAgt = navigator.userAgent,
-            browserName = navigator.appName,
+            name = navigator.appName,
             fullVersion = ""+parseFloat(navigator.appVersion),
             majorVersion = parseInt(navigator.appVersion,10),
             nameOffset,
@@ -160,22 +160,22 @@
 
         // MSIE 11
         if ((navigator.appVersion.indexOf("Windows NT") !== -1) && (navigator.appVersion.indexOf("rv:11") !== -1)) {
-            browserName = "IE";
+            name = "IE";
             fullVersion = "11;";
         }
         // MSIE
         else if ((verOffset=nAgt.indexOf("MSIE")) !== -1) {
-            browserName = "IE";
+            name = "IE";
             fullVersion = nAgt.substring(verOffset+5);
         }
         // Chrome
         else if ((verOffset=nAgt.indexOf("Chrome")) !== -1) {
-            browserName = "Chrome";
+            name = "Chrome";
             fullVersion = nAgt.substring(verOffset+7);
         }
         // Safari
         else if ((verOffset=nAgt.indexOf("Safari")) !== -1) {
-            browserName = "Safari";
+            name = "Safari";
             fullVersion = nAgt.substring(verOffset+7);
             if ((verOffset=nAgt.indexOf("Version")) !== -1) {
                 fullVersion = nAgt.substring(verOffset+8);
@@ -183,15 +183,15 @@
         }
         // Firefox
         else if ((verOffset=nAgt.indexOf("Firefox")) !== -1) {
-            browserName = "Firefox";
+            name = "Firefox";
             fullVersion = nAgt.substring(verOffset+8);
         }
         // In most other browsers, "name/version" is at the end of userAgent 
         else if ( (nameOffset=nAgt.lastIndexOf(" ")+1) < (verOffset=nAgt.lastIndexOf("/")) ) {
-            browserName = nAgt.substring(nameOffset,verOffset);
+            name = nAgt.substring(nameOffset,verOffset);
             fullVersion = nAgt.substring(verOffset+1);
-            if (browserName.toLowerCase()==browserName.toUpperCase()) {
-                browserName = navigator.appName;
+            if (name.toLowerCase()==name.toUpperCase()) {
+                name = navigator.appName;
             }
         }
         // Trim the fullVersion string at semicolon/space if present
@@ -207,8 +207,13 @@
             fullVersion = ""+parseFloat(navigator.appVersion); 
             majorVersion = parseInt(navigator.appVersion,10);
         }
+
         // Return data
-        return [browserName, majorVersion];
+        return {
+            name:       name, 
+            version:    majorVersion, 
+            ios:        /(iPad|iPhone|iPod)/g.test(navigator.platform)
+        };
     }
 
     // Check for mime type support against a player instance
@@ -614,6 +619,7 @@
             }
             catch(e) {
                 _log("It looks like there's a problem with your controls html. Bailing.", true);
+
                 return false;
             }
         }
@@ -651,6 +657,11 @@
 
             // If there's no autoplay attribute, assume the video is stopped and add state class
             _toggleClass(player.container, config.classes.stopped, (player.media.getAttribute("autoplay") === null));
+
+            // Add iOS class
+            if(player.browser.ios) {
+                _toggleClass(player.container, "ios", true);
+            }
 
             // Inject the player wrapper
             if(player.type === "video") {
@@ -727,10 +738,10 @@
                     _showCaptions(player);
 
                     // If IE 10/11 or Firefox 31+ or Safari 7+, don"t use native captioning (still doesn"t work although they claim it"s now supported)
-                    if ((player.browserName === "IE" && player.browserMajorVersion === 10) || 
-                            (player.browserName === "IE" && player.browserMajorVersion === 11) || 
-                            (player.browserName === "Firefox" && player.browserMajorVersion >= 31) || 
-                            (player.browserName === "Safari" && player.browserMajorVersion >= 7)) {
+                    if ((player.browser.name === "IE" && player.browser.version === 10) || 
+                            (player.browser.name === "IE" && player.browser.version === 11) || 
+                            (player.browser.name === "Firefox" && player.browser.version >= 31) || 
+                            (player.browser.name === "Safari" && player.browser.version >= 7)) {
                         // Debugging
                         _log("Detected IE 10/11 or Firefox 31+ or Safari 7+.");
 
@@ -802,7 +813,7 @@
                     }
 
                     // If Safari 7+, removing track from DOM [see "turn off native caption rendering" above]
-                    if (player.browserName === "Safari" && player.browserMajorVersion >= 7) {
+                    if (player.browser.name === "Safari" && player.browser.version >= 7) {
                         _log("Safari 7+ detected; removing track from DOM.");
 
                         // Find all <track> elements
@@ -1273,16 +1284,14 @@
             fullscreen = _fullscreen();
 
             // Sniff 
-            player.browserInfo = _browserSniff();
-            player.browserName = player.browserInfo[0];
-            player.browserMajorVersion = player.browserInfo[1];
+            player.browser = _browserSniff();
 
             // Debug info
-            _log(player.browserName + " " + player.browserMajorVersion);
+            _log(player.browser.name + " " + player.browser.version);
 
             // If IE8, stop customization (use fallback)
             // If IE9, stop customization (use native controls)
-            if (player.browserName === "IE" && (player.browserMajorVersion === 8 || player.browserMajorVersion === 9) ) {
+            if (player.browser.name === "IE" && (player.browser.version === 8 || player.browser.version === 9) ) {
                 _log("Browser not suppported.", true);
                 return false;
             }

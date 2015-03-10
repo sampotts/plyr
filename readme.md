@@ -38,7 +38,7 @@ If you have any cool ideas or features, please let me know by [creating an issue
 
 Check `docs/index.html` and `docs/dist/docs.js` for an example setup. 
 
-**Heads up**, the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.0.24/plyr.js` to `https://cdn.plyr.io/1.0.24/plyr.js`
+**Heads up**, the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.0.25/plyr.js` to `https://cdn.plyr.io/1.0.25/plyr.js`
 
 ### Bower
 If bower is your thang, you can grab Plyr using:
@@ -51,11 +51,11 @@ More info on setting up dependencies can be found in the [Bower Docs](http://bow
 If you want to use our CDN, you can use the following. HTTPS (SSL) is supported.
 
 ```html
-<link rel="stylesheet" href="//cdn.plyr.io/1.0.24/plyr.css">
-<script src="//cdn.plyr.io/1.0.24/plyr.js"></script>
+<link rel="stylesheet" href="//cdn.plyr.io/1.0.25/plyr.css">
+<script src="//cdn.plyr.io/1.0.25/plyr.js"></script>
 ```
 
-You can also access the `sprite.svg` file at `//cdn.plyr.io/1.0.24/sprite.svg`.
+You can also access the `sprite.svg` file at `//cdn.plyr.io/1.0.25/sprite.svg`.
 
 ### CSS
 If you want to use the default css, add the `plyr.css` file from /dist into your head, or even better use `plyr.less` or `plyr.sass` file included in `/src` in your build to save a request. 
@@ -365,7 +365,7 @@ Fullscreen in Plyr is supported for all browsers that [currently support it](htt
   </tbody>
 </table>
 
-&sup1; iPhone forces the native player for `<video>` so no customisation possible
+&sup1; iPhone forces the native player for `<video>` so no customisation possible. `<audio>` elements have volume controls disabled.
 
 &sup2; Native player used (no support for `<progress>` or `<input type="range">`)
 

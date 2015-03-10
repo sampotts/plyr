@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.0.25
+- Fixes for iOS volume controls (hidden)
+- Classnames for left/right controls changed
+
 ## v1.0.24
 - Added tooltip option to display labels as tooltips (Fixes #50)
 

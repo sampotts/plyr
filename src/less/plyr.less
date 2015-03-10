@@ -185,15 +185,15 @@
 		text-align: center;
 
 		// Layout
-		&-sound {
+		&-right {
 			display: block;
 			margin: @control-spacing auto 0;
 		}
 		@media (min-width: @bp-control-split) {
-			&-playback {
+			&-left {
 				float: left;
 			}
-			&-sound {
+			&-right {
 				float: right;
 				margin-top: 0;
 			}
@@ -495,6 +495,20 @@
 				background: @volume-thumb-bg-focus;
 			}
 		}
+	}
+
+	// Hide sound controls on iOS
+	// It's not supported to change volume using JavaScript:
+	// https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html
+	&.ios &-volume,
+	&.ios [data-player='mute'],
+	&.ios [data-player='mute'] + label,
+	&-audio.ios &-controls-right {
+		display: none;
+	}
+	// Center buttons so it looks less odd
+	&-audio.ios &-controls-left {
+		float: none;
 	}
 
 	// Full screen mode

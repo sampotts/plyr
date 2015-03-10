@@ -11,8 +11,7 @@ plyr.setup({
 	html: 	templates.controls.render({}),
 	captions: {
 		defaultActive: true
-	},
-	tooltips: true
+	}
 });
 
 // Google analytics 
