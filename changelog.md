@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.0.26
+- Fixes for SASS (cheers @brunowego)
+- Indentation reset to 4 spaces
+
 ## v1.0.25
 - Fixes for iOS volume controls (hidden)
 - Classnames for left/right controls changed
