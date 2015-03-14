@@ -5,588 +5,588 @@
 // Variables
 // -------------------------------
 // Colors
-$blue:                #3498DB;
-$gray-dark:           #343f4a;
-$gray:                #565d64;
-$gray-light:          #cbd0d3;
+$blue:                    #3498DB;
+$gray-dark:               #343f4a;
+$gray:                    #565d64;
+$gray-light:              #cbd0d3;
 
 // Font sizes
-$font-size-small:     14px;
-$font-size-base:      16px;
-$font-size-large:     ceil(($font-size-base * 1.5));
+$font-size-small:         14px;
+$font-size-base:          16px;
+$font-size-large:         ceil(($font-size-base * 1.5));
 
 // Controls
-$control-spacing:     10px;
-$controls-bg:         $gray-dark;
-$control-bg-hover:    $blue;
-$control-color:       $gray-light;
-$control-color-inactive: $gray;
-$control-color-hover: #fff;
+$control-spacing:         10px;
+$controls-bg:             $gray-dark;
+$control-bg-hover:        $blue;
+$control-color:           $gray-light;
+$control-color-inactive:  $gray;
+$control-color-hover:     #fff;
 
 // Tooltips
-$tooltip-bg:          $controls-bg;
-$tooltip-color:       #fff;
-$tooltip-padding:     $control-spacing;
-$tooltip-arrow-size:  5px;
-$tooltip-radius:      3px;
+$tooltip-bg:              $controls-bg;
+$tooltip-color:           #fff;
+$tooltip-padding:         $control-spacing;
+$tooltip-arrow-size:      5px;
+$tooltip-radius:          3px;
 
 // Progress
-$progress-bg:         lighten($gray, 10%);
-$progress-playing-bg: $blue;
-$progress-buffered-bg: $gray;
-$progress-loading-size: 40px;
-$progress-loading-bg: rgba(0,0,0, .15);
+$progress-bg:             lighten($gray, 10%);
+$progress-playing-bg:     $blue;
+$progress-buffered-bg:    $gray;
+$progress-loading-size:   40px;
+$progress-loading-bg:     rgba(0,0,0, .15);
 
 // Volume
-$volume-track-height: 6px;
-$volume-track-bg:     $gray;
-$volume-thumb-height: ($volume-track-height * 2);
-$volume-thumb-width:  ($volume-track-height * 2);
-$volume-thumb-bg:     $control-color;
-$volume-thumb-bg-focus: $control-bg-hover;
+$volume-track-height:     6px;
+$volume-track-bg:         $gray;
+$volume-thumb-height:     ($volume-track-height * 2);
+$volume-thumb-width:      ($volume-track-height * 2);
+$volume-thumb-bg:         $control-color;
+$volume-thumb-bg-focus:   $control-bg-hover;
 
 // Breakpoints
-$bp-control-split:    560px; // When controls split into left/right
-$bp-captions-large:   768px; // When captions jump to the larger font size
+$bp-control-split:        560px; // When controls split into left/right
+$bp-captions-large:       768px; // When captions jump to the larger font size
 
 // Utility classes & mixins
 // -------------------------------
 // Screen reader only
 .sr-only {
-  position: absolute !important;
-  clip: rect(1px, 1px, 1px, 1px);
-  padding: 0 !important;
-  border: 0 !important;
-  height: 1px !important;
-  width: 1px !important;
-  overflow: hidden;
+    position: absolute !important;
+    clip: rect(1px, 1px, 1px, 1px);
+    padding: 0 !important;
+    border: 0 !important;
+    height: 1px !important;
+    width: 1px !important;
+    overflow: hidden;
 }
 // Contain floats: nicolasgallagher.com/micro-clearfix-hack/
 @mixin clearfix()
 {
-  zoom: 1;
-  &:before,
-  &:after { content: ""; display: table; }
-  &:after { clear: both; }
+    zoom: 1;
+    &:before,
+    &:after { content: ""; display: table; }
+    &:after { clear: both; }
 }
 // Tab focus styles
 @mixin tab-focus()
 {
-  outline: thin dotted #000;
-  outline-offset: 0;
+    outline: thin dotted #000;
+    outline-offset: 0;
 }
 
 // Animation
 // ---------------------------------------
 @keyframes progress {
-  to { background-position: $progress-loading-size 0; }
+    to { background-position: $progress-loading-size 0; }
 }
 
 // <input type="range"> styling
 // ---------------------------------------
 @mixin volume-thumb()
 {
-  height: $volume-thumb-height;
-  width: $volume-thumb-width;
-  background: $volume-thumb-bg;
-  border: 0;
-  border-radius: ($volume-thumb-height / 2);
-  transition: background .3s ease;
-  cursor: ew-resize;
+    height: $volume-thumb-height;
+    width: $volume-thumb-width;
+    background: $volume-thumb-bg;
+    border: 0;
+    border-radius: ($volume-thumb-height / 2);
+    transition: background .3s ease;
+    cursor: ew-resize;
 }
 @mixin volume-track()
 {
-  height: $volume-track-height;
-  background: $volume-track-bg;
-  border: 0;
-  border-radius: ($volume-track-height / 2);
+    height: $volume-track-height;
+    background: $volume-track-bg;
+    border: 0;
+    border-radius: ($volume-track-height / 2);
 }
 @mixin seek-thumb()
 {
-  background: transparent;
-  border: 0;
-  width: ($control-spacing * 2);
-  height: $control-spacing;
+    background: transparent;
+    border: 0;
+    width: ($control-spacing * 2);
+    height: $control-spacing;
 }
 @mixin seek-track()
 {
-  background: none;
-  border: 0;
+    background: none;
+    border: 0;
 }
 
 // Font smoothing
 // ---------------------------------------
 @mixin font-smoothing($mode: on)
 {
-  @if $mode == 'on' {
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-  } @else if $mode == 'off' {
-    -moz-osx-font-smoothing: auto;
-    -webkit-font-smoothing: subpixel-antialiased;
-  }
+    @if $mode == 'on' {
+        -moz-osx-font-smoothing: grayscale;
+        -webkit-font-smoothing: antialiased;
+    } @else if $mode == 'off' {
+        -moz-osx-font-smoothing: auto;
+        -webkit-font-smoothing: subpixel-antialiased;
+    }
 }
 
 // Styles
 // -------------------------------
 // Base
 .player {
-  position: relative;
-  max-width: 100%;
-  min-width: 290px;
-
-  // border-box everything
-  // http://paulirish.com/2012/box-sizing-border-box-ftw/
-  &,
-  *,
-  *::after,
-  *::before {
-    box-sizing: border-box;
-  }
-
-  // For video
-  &-video-wrapper {
     position: relative;
-  }
-  video {
-    width: 100%;
-    height: auto;
-    vertical-align: middle;
-  }
+    max-width: 100%;
+    min-width: 290px;
 
-  // Captions
-  &-captions {
-    display: none;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    padding: 20px;
-    min-height: 2.5em;
-    color: #fff;
-    font-size: $font-size-base;
-    font-weight: 600;
-    text-shadow:
-    -1px -1px 0 $gray,
-    1px -1px 0 $gray,
-    -1px 1px 0 $gray,
-    1px 1px 0 $gray;
-    text-align: center;
-    @include font-smoothing();
-
-    @media (min-width: $bp-captions-large) {
-      font-size: $font-size-large;
-    }
-  }
-  &.captions-active &-captions {
-    display: block;
-  }
-
-  // Player controls
-  &-controls {
-    @include clearfix();
-    @include font-smoothing();
-    position: relative;
-    padding: ($control-spacing * 2) $control-spacing $control-spacing;
-    background: $controls-bg;
-    line-height: 1;
-    text-align: center;
-
-    // Layout
-    &-right {
-      display: block;
-      margin: $control-spacing auto 0;
-    }
-    @media (min-width: $bp-control-split) {
-      &-left {
-        float: left;
-      }
-      &-right {
-        float: right;
-        margin-top: 0;
-      }
+    // border-box everything
+    // http://paulirish.com/2012/box-sizing-border-box-ftw/
+    &,
+    *,
+    *::after,
+    *::before {
+        box-sizing: border-box;
     }
 
-    input + label,
-    button {
-      display: inline-block;
-      vertical-align: middle;
-      margin: 0 2px;
-      padding: ($control-spacing / 2) $control-spacing;
+    // For video
+    &-video-wrapper {
+        position: relative;
+    }
+    video {
+        width: 100%;
+        height: auto;
+        vertical-align: middle;
+    }
 
-      transition: background .3s ease;
-      border-radius: 3px;
-      cursor: pointer;
+    // Captions
+    &-captions {
+        display: none;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        padding: 20px;
+        min-height: 2.5em;
+        color: #fff;
+        font-size: $font-size-base;
+        font-weight: 600;
+        text-shadow:
+        -1px -1px 0 $gray,
+        1px -1px 0 $gray,
+        -1px 1px 0 $gray,
+        1px 1px 0 $gray;
+        text-align: center;
+        @include font-smoothing();
 
-      svg {
-        width: 18px;
-        height: 18px;
+        @media (min-width: $bp-captions-large) {
+            font-size: $font-size-large;
+        }
+    }
+    &.captions-active &-captions {
         display: block;
-        fill: currentColor;
-        transition: fill .3s ease;
-      }
-    }
-    input + label,
-    .inverted:checked + label {
-      color: $control-color-inactive;
-    }
-    button,
-    .inverted + label,
-    input:checked + label {
-      color: $control-color;
-    }
-    button {
-      border: 0;
-      background: transparent;
-      overflow: hidden;
     }
 
-    // Specificity for overriding .inverted
-    button:focus,
-    button:hover,
-    [type="checkbox"]:focus + label,
-    [type="checkbox"] + label:hover {
-      background: $control-bg-hover;
-      color: $control-color-hover;
-    }
-    button:focus,
-    input:focus + label {
-      outline: 0;
-    }
-    .icon-exit-fullscreen,
-    .icon-muted,
-    .icon-captions-on {
-      display: none;
-    }
-    .player-time {
-      display: inline-block;
-      vertical-align: middle;
-      margin-left: $control-spacing;
-      color: $control-color;
-      font-weight: 600;
-      font-size: $font-size-small;
-      @include font-smoothing();
-    }
-  }
+    // Player controls
+    &-controls {
+        @include clearfix();
+        @include font-smoothing();
+        position: relative;
+        padding: ($control-spacing * 2) $control-spacing $control-spacing;
+        background: $controls-bg;
+        line-height: 1;
+        text-align: center;
 
-  // Tooltips
-  &-tooltip {
-    visibility: hidden;
-    position: absolute;
-    z-index: 2;
-    bottom: 100%;
-    margin-bottom: $tooltip-padding;
-    padding: $tooltip-padding ($tooltip-padding * 1.5);
+        // Layout
+        &-right {
+            display: block;
+            margin: $control-spacing auto 0;
+        }
+        @media (min-width: $bp-control-split) {
+            &-left {
+                float: left;
+            }
+            &-right {
+                float: right;
+                margin-top: 0;
+            }
+        }
 
-        opacity: 0;
-    background: $tooltip-bg;
-    border-radius: $tooltip-radius;
-    color: $tooltip-color;
-    font-size: $font-size-small;
-    line-height: 1.5;
-    font-weight: 600;
+        input + label,
+        button {
+            display: inline-block;
+            vertical-align: middle;
+            margin: 0 2px;
+            padding: ($control-spacing / 2) $control-spacing;
 
-    transform: translate(-50%, ($tooltip-padding * 3));
-        transition: transform .2s .2s ease, opacity .2s .2s ease;
+            transition: background .3s ease;
+            border-radius: 3px;
+            cursor: pointer;
 
-    &::after {
-      content: "";
-      display: block;
-      position: absolute;
-      left: 50%;
-      bottom: -$tooltip-arrow-size;
-      margin-left: -$tooltip-arrow-size;
-      width: 0;
-      height: 0;
-      transition: inherit;
-      border-style: solid;
-      border-width: $tooltip-arrow-size $tooltip-arrow-size 0 $tooltip-arrow-size;
-      border-color: $controls-bg transparent transparent;
-    }
-  }
-  label:hover .player-tooltip,
-  input:focus + label .player-tooltip,
-  button:hover .player-tooltip,
-  button:focus .player-tooltip {
-    visibility: visible;
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
-  label:hover .player-tooltip,
-  button:hover .player-tooltip {
-    z-index: 3;
-  }
+            svg {
+                width: 18px;
+                height: 18px;
+                display: block;
+                fill: currentColor;
+                transition: fill .3s ease;
+            }
+        }
+        input + label,
+        .inverted:checked + label {
+            color: $control-color-inactive;
+        }
+        button,
+        .inverted + label,
+        input:checked + label {
+            color: $control-color;
+        }
+        button {
+            border: 0;
+            background: transparent;
+            overflow: hidden;
+        }
 
-  // Player progress
-  // <progress> element
-  &-progress {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    height: $control-spacing;
-    background: $progress-bg;
-
-    &-buffer[value],
-    &-played[value],
-    &-seek[type=range] {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: $control-spacing;
-      margin: 0;
-      padding: 0;
-      vertical-align: top;
-
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      border: none;
-      background: transparent;
-    }
-    &-buffer[value],
-    &-played[value] {
-      &::-webkit-progress-bar {
-        background: transparent;
-      }
-
-      // Inherit from currentColor;
-      &::-webkit-progress-value {
-        background: currentColor;
-      }
-      &::-moz-progress-bar {
-        background: currentColor;
-      }
-    }
-    &-played[value] {
-      z-index: 2;
-      color: $progress-playing-bg;
-    }
-    &-buffer[value] {
-      color: $progress-buffered-bg;
+        // Specificity for overriding .inverted
+        button:focus,
+        button:hover,
+        [type="checkbox"]:focus + label,
+        [type="checkbox"] + label:hover {
+            background: $control-bg-hover;
+            color: $control-color-hover;
+        }
+        button:focus,
+        input:focus + label {
+            outline: 0;
+        }
+        .icon-exit-fullscreen,
+        .icon-muted,
+        .icon-captions-on {
+            display: none;
+        }
+        .player-time {
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: $control-spacing;
+            color: $control-color;
+            font-weight: 600;
+            font-size: $font-size-small;
+            @include font-smoothing();
+        }
     }
 
-    // Seek control
+    // Tooltips
+    &-tooltip {
+        visibility: hidden;
+        position: absolute;
+        z-index: 2;
+        bottom: 100%;
+        margin-bottom: $tooltip-padding;
+        padding: $tooltip-padding ($tooltip-padding * 1.5);
+
+                opacity: 0;
+        background: $tooltip-bg;
+        border-radius: $tooltip-radius;
+        color: $tooltip-color;
+        font-size: $font-size-small;
+        line-height: 1.5;
+        font-weight: 600;
+
+        transform: translate(-50%, ($tooltip-padding * 3));
+                transition: transform .2s .2s ease, opacity .2s .2s ease;
+
+        &::after {
+            content: "";
+            display: block;
+            position: absolute;
+            left: 50%;
+            bottom: -$tooltip-arrow-size;
+            margin-left: -$tooltip-arrow-size;
+            width: 0;
+            height: 0;
+            transition: inherit;
+            border-style: solid;
+            border-width: $tooltip-arrow-size $tooltip-arrow-size 0 $tooltip-arrow-size;
+            border-color: $controls-bg transparent transparent;
+        }
+    }
+    label:hover .player-tooltip,
+    input:focus + label .player-tooltip,
+    button:hover .player-tooltip,
+    button:focus .player-tooltip {
+        visibility: visible;
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+    label:hover .player-tooltip,
+    button:hover .player-tooltip {
+        z-index: 3;
+    }
+
+    // Player progress
+    // <progress> element
+    &-progress {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: $control-spacing;
+        background: $progress-bg;
+
+        &-buffer[value],
+        &-played[value],
+        &-seek[type=range] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: $control-spacing;
+            margin: 0;
+            padding: 0;
+            vertical-align: top;
+
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            border: none;
+            background: transparent;
+        }
+        &-buffer[value],
+        &-played[value] {
+            &::-webkit-progress-bar {
+                background: transparent;
+            }
+
+            // Inherit from currentColor;
+            &::-webkit-progress-value {
+                background: currentColor;
+            }
+            &::-moz-progress-bar {
+                background: currentColor;
+            }
+        }
+        &-played[value] {
+            z-index: 2;
+            color: $progress-playing-bg;
+        }
+        &-buffer[value] {
+            color: $progress-buffered-bg;
+        }
+
+        // Seek control
+        // <input[type='range']> element
+        // Specificity is for bootstrap compatibility
+        &-seek[type=range] {
+            z-index: 4;
+            cursor: pointer;
+            outline: 0;
+
+            // Webkit
+            &::-webkit-slider-runnable-track {
+                @include seek-track();
+            }
+            &::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                @include seek-thumb();
+            }
+
+            // Mozilla
+            &::-moz-range-track {
+                @include seek-track();
+            }
+            &::-moz-range-thumb {
+                -moz-appearance: none;
+                @include seek-thumb();
+            }
+
+            // Microsoft
+            &::-ms-track {
+                color: transparent;
+                @include seek-track();
+            }
+            &::-ms-fill-lower,
+            &::-ms-fill-upper {
+                @include seek-track();
+            }
+            &::-ms-thumb {
+                @include seek-thumb();
+            }
+
+            &:focus {
+                outline: 0;
+            }
+            &::-moz-focus-outer {
+                border: 0;
+            }
+        }
+    }
+
+    // Loading state
+    &.loading .player-progress-buffer {
+        animation: progress 1s linear infinite;
+        background-size: $progress-loading-size $progress-loading-size;
+        background-repeat: repeat-x;
+        background-color: $progress-buffered-bg;
+        background-image: linear-gradient(
+            -45deg,
+            $progress-loading-bg 25%,
+            transparent 25%,
+            transparent 50%,
+            $progress-loading-bg 50%,
+            $progress-loading-bg 75%,
+            transparent 75%,
+            transparent);
+            color: transparent;
+    }
+
+    // States
+    &-controls [data-player='pause'],
+    &.playing .player-controls [data-player='play'] {
+        display: none;
+    }
+    &.playing .player-controls [data-player='pause'] {
+        display: inline-block;
+    }
+
+    // Volume control
     // <input[type='range']> element
     // Specificity is for bootstrap compatibility
-    &-seek[type=range] {
-      z-index: 4;
-      cursor: pointer;
-      outline: 0;
-
-      // Webkit
-      &::-webkit-slider-runnable-track {
-        @include seek-track();
-      }
-      &::-webkit-slider-thumb {
+    &-volume[type=range] {
+        display: inline-block;
+        vertical-align: middle;
         -webkit-appearance: none;
-        @include seek-thumb();
-      }
-
-      // Mozilla
-      &::-moz-range-track {
-        @include seek-track();
-      }
-      &::-moz-range-thumb {
         -moz-appearance: none;
-        @include seek-thumb();
-      }
+        width: 100px;
+        margin: 0 $control-spacing 0 0;
+        padding: 0;
+        cursor: pointer;
+        background: none;
 
-      // Microsoft
-      &::-ms-track {
-        color: transparent;
-        @include seek-track();
-      }
-      &::-ms-fill-lower,
-      &::-ms-fill-upper {
-        @include seek-track();
-      }
-      &::-ms-thumb {
-        @include seek-thumb();
-      }
+        // Webkit
+        &::-webkit-slider-runnable-track {
+            @include volume-track();
+        }
+        &::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            margin-top: -(($volume-thumb-height - $volume-track-height) / 2);
+            @include volume-thumb();
+        }
 
-      &:focus {
-        outline: 0;
-      }
-      &::-moz-focus-outer {
-        border: 0;
-      }
-    }
-  }
+        // Mozilla
+        &::-moz-range-track {
+            @include volume-track();
+        }
+        &::-moz-range-thumb {
+            @include volume-thumb();
+        }
 
-  // Loading state
-  &.loading .player-progress-buffer {
-    animation: progress 1s linear infinite;
-    background-size: $progress-loading-size $progress-loading-size;
-    background-repeat: repeat-x;
-    background-color: $progress-buffered-bg;
-    background-image: linear-gradient(
-      -45deg,
-      $progress-loading-bg 25%,
-      transparent 25%,
-      transparent 50%,
-      $progress-loading-bg 50%,
-      $progress-loading-bg 75%,
-      transparent 75%,
-      transparent);
-      color: transparent;
-  }
+        // Microsoft
+        &::-ms-track {
+            height: $volume-track-height;
+            background: transparent;
+            border-color: transparent;
+            border-width: (($volume-thumb-height - $volume-track-height) / 2) 0;
+            color: transparent;
+        }
+        &::-ms-fill-lower,
+        &::-ms-fill-upper {
+            @include volume-track();
+        }
+        &::-ms-thumb {
+            @include volume-thumb();
+        }
 
-  // States
-  &-controls [data-player='pause'],
-  &.playing .player-controls [data-player='play'] {
-    display: none;
-  }
-  &.playing .player-controls [data-player='pause'] {
-    display: inline-block;
-  }
+        &:focus {
+            outline: 0;
 
-  // Volume control
-  // <input[type='range']> element
-  // Specificity is for bootstrap compatibility
-  &-volume[type=range] {
-    display: inline-block;
-    vertical-align: middle;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    width: 100px;
-    margin: 0 $control-spacing 0 0;
-    padding: 0;
-    cursor: pointer;
-    background: none;
-
-    // Webkit
-    &::-webkit-slider-runnable-track {
-      @include volume-track();
-    }
-    &::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      margin-top: -(($volume-thumb-height - $volume-track-height) / 2);
-      @include volume-thumb();
+            &::-webkit-slider-thumb {
+                background: $volume-thumb-bg-focus;
+            }
+            &::-moz-range-thumb {
+                background: $volume-thumb-bg-focus;
+            }
+            &::-ms-thumb {
+                background: $volume-thumb-bg-focus;
+            }
+        }
     }
 
-    // Mozilla
-    &::-moz-range-track {
-      @include volume-track();
+    // Hide sound controls on iOS
+    // It's not supported to change volume using JavaScript:
+    // https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html
+    &.ios &-volume,
+    &.ios [data-player='mute'],
+    &.ios [data-player='mute'] + label,
+    &-audio.ios &-controls-right {
+        display: none;
     }
-    &::-moz-range-thumb {
-      @include volume-thumb();
-    }
-
-    // Microsoft
-    &::-ms-track {
-      height: $volume-track-height;
-      background: transparent;
-      border-color: transparent;
-      border-width: (($volume-thumb-height - $volume-track-height) / 2) 0;
-      color: transparent;
-    }
-    &::-ms-fill-lower,
-    &::-ms-fill-upper {
-      @include volume-track();
-    }
-    &::-ms-thumb {
-      @include volume-thumb();
+    // Center buttons so it looks less odd
+    &-audio.ios &-controls-left {
+        float: none;
     }
 
-    &:focus {
-      outline: 0;
-
-      &::-webkit-slider-thumb {
-        background: $volume-thumb-bg-focus;
-      }
-      &::-moz-range-thumb {
-        background: $volume-thumb-bg-focus;
-      }
-      &::-ms-thumb {
-        background: $volume-thumb-bg-focus;
-      }
-    }
-  }
-
-  // Hide sound controls on iOS
-  // It's not supported to change volume using JavaScript:
-  // https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html
-  &.ios &-volume,
-  &.ios [data-player='mute'],
-  &.ios [data-player='mute'] + label,
-  &-audio.ios &-controls-right {
-    display: none;
-  }
-  // Center buttons so it looks less odd
-  &-audio.ios &-controls-left {
-    float: none;
-  }
-
-  // Full screen mode
-  &-fullscreen,
-  &.fullscreen-active {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 100%;
-    width: 100%;
-    z-index: 10000000;
-    background: #000;
-
-    .player-video-wrapper {
-      height: 100%;
-      width: 100%;
-
-      video {
+    // Full screen mode
+    &-fullscreen,
+    &.fullscreen-active {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
         height: 100%;
-      }
-      .player-captions {
-        top: auto;
-        bottom: 90px;
+        width: 100%;
+        z-index: 10000000;
+        background: #000;
 
-        @media (min-width: $bp-control-split) and (max-width: ($bp-captions-large - 1)) {
-          bottom: 60px;
+        .player-video-wrapper {
+            height: 100%;
+            width: 100%;
+
+            video {
+                height: 100%;
+            }
+            .player-captions {
+                top: auto;
+                bottom: 90px;
+
+                @media (min-width: $bp-control-split) and (max-width: ($bp-captions-large - 1)) {
+                    bottom: 60px;
+                }
+                @media (min-width: $bp-captions-large) {
+                    bottom: 80px;
+                }
+            }
         }
-        @media (min-width: $bp-captions-large) {
-          bottom: 80px;
+        .player-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
         }
-      }
     }
-    .player-controls {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
+
+    // Change icons on state change
+    &.fullscreen-active .icon-exit-fullscreen,
+    &.muted .player-controls .icon-muted,
+    &.captions-active .player-controls .icon-captions-on {
+        display: block;
+
+        & + svg {
+            display: none;
+        }
     }
-  }
 
-  // Change icons on state change
-  &.fullscreen-active .icon-exit-fullscreen,
-  &.muted .player-controls .icon-muted,
-  &.captions-active .player-controls .icon-captions-on {
-    display: block;
-
-    & + svg {
-      display: none;
+    // Some options are hidden by default
+    [data-player='captions'],
+    [data-player='captions'] + label,
+    [data-player='fullscreen'],
+    [data-player='fullscreen'] + label {
+        display: none;
     }
-  }
+    &.captions-enabled [data-player='captions'],
+    &.captions-enabled [data-player='captions'] + label,
+    &.fullscreen-enabled [data-player='fullscreen'],
+    &.fullscreen-enabled [data-player='fullscreen'] + label {
+        display: inline-block;
+    }
 
-  // Some options are hidden by default
-  [data-player='captions'],
-  [data-player='captions'] + label,
-  [data-player='fullscreen'],
-  [data-player='fullscreen'] + label {
-    display: none;
-  }
-  &.captions-enabled [data-player='captions'],
-  &.captions-enabled [data-player='captions'] + label,
-  &.fullscreen-enabled [data-player='fullscreen'],
-  &.fullscreen-enabled [data-player='fullscreen'] + label {
-    display: inline-block;
-  }
-
-  // Full browser view hides toggle
-  &-fullscreen [data-player='fullscreen'],
-  &-fullscreen [data-player='fullscreen'] + label {
-    display: none !important;
-  }
+    // Full browser view hides toggle
+    &-fullscreen [data-player='fullscreen'],
+    &-fullscreen [data-player='fullscreen'] + label {
+        display: none !important;
+    }
 }

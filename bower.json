@@ -1,33 +1,33 @@
 {
-  "name": "plyr",
-  "description": "A simple HTML5 media player using custom controls",
-  "homepage": "http://plyr.io",
-  "keywords": [
-    "Audio",
-    "Video",
-    "HTML5 Audio",
-    "HTml5 Video"
-  ],
-  "authors": [
-    "Sam Potts <me@sampotts.me>"
-  ],
-  "dependencies": {},
-  "main": [
-    "dist/plyr.css",
-    "dist/plyr.js",
-    "dist/sprite.svg",
-    "src/less/plyr.less",
-    "src/sass/plyr.sass",
-    "src/js/plyr.js"
-  ],
-  "ignore": [
-    "node_modules",
-    "bower_components",
-    ".gitignore"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/selz/plyr.git"
-  },
-  "license": "MIT"
+    "name": "plyr",
+    "description": "A simple HTML5 media player using custom controls",
+    "homepage": "http://plyr.io",
+    "keywords": [
+        "Audio",
+        "Video",
+        "HTML5 Audio",
+        "HTml5 Video"
+    ],
+    "authors": [
+        "Sam Potts <me@sampotts.me>"
+    ],
+    "dependencies": {},
+    "main": [
+        "dist/plyr.css",
+        "dist/plyr.js",
+        "dist/sprite.svg",
+        "src/less/plyr.less",
+        "src/sass/plyr.sass",
+        "src/js/plyr.js"
+    ],
+    "ignore": [
+        "node_modules",
+        "bower_components",
+        ".gitignore"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/selz/plyr.git"
+    },
+    "license": "MIT"
 }
