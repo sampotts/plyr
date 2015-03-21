@@ -1,43 +1,44 @@
 {
-    "name": "plyr",
-    "version": "1.0.26",
-    "description": "A simple HTML5 media player using custom controls",
-    "homepage": "http://plyr.io",
-    "main": "gulpfile.js",
-    "dependencies": {},
-    "devDependencies": {
-        "gulp": "~3.8.6",
-        "gulp-autoprefixer": "^0.0.8",
-        "gulp-concat": "~2.3.3",
-        "gulp-gzip": "^1.0.0",
-        "gulp-hogan-compile": "^0.4.1",
-        "gulp-less": "~1.3.1",
-        "gulp-minify-css": "~0.3.6",
-        "gulp-open": "^0.3.2",
-        "gulp-rename": "^1.2.0",
-        "gulp-replace": "^0.5.3",
-        "gulp-s3": "^0.3.0",
-        "gulp-sass": "^1.3.3",
-        "gulp-svgmin": "^1.0.0",
-        "gulp-svgstore": "^5.0.0",
-        "gulp-uglify": "~0.3.1",
-        "gulp-util": "~2.2.20",
-        "run-sequence": "^0.3.6"
-    },
-    "scripts": {
-        "preinstall": "npm install -g gulp"
-    },
-    "keywords": [
-        "HTML5 Video",
-        "HTML5 Audio",
-        "Media Player"
-    ],
-    "repository": {
-        "type": "git",
-        "url": "git://github.com/selz/plyr.git"
-    },
-    "authors": [
-        "Sam Potts <me@sampotts.me>"
-    ],
-    "license": "MIT"
+  "name": "plyr",
+  "version": "1.0.27",
+  "description": "A simple HTML5 media player using custom controls",
+  "homepage": "http://plyr.io",
+  "main": "gulpfile.js",
+  "dependencies": {},
+  "devDependencies": {
+    "gulp": "~3.8.6",
+    "gulp-autoprefixer": "^0.0.8",
+    "gulp-concat": "~2.3.3",
+    "gulp-gzip": "^1.0.0",
+    "gulp-hogan-compile": "^0.4.1",
+    "gulp-less": "~1.3.1",
+    "gulp-minify-css": "~0.3.6",
+    "gulp-open": "^0.3.2",
+    "gulp-rename": "^1.2.0",
+    "gulp-replace": "^0.5.3",
+    "gulp-s3": "^0.3.0",
+    "gulp-sass": "^1.3.3",
+    "gulp-size": "^1.2.1",
+    "gulp-svgmin": "^1.0.0",
+    "gulp-svgstore": "^5.0.0",
+    "gulp-uglify": "~0.3.1",
+    "gulp-util": "~2.2.20",
+    "run-sequence": "^0.3.6"
+  },
+  "scripts": {
+    "preinstall": "npm install -g gulp"
+  },
+  "keywords": [
+    "HTML5 Video",
+    "HTML5 Audio",
+    "Media Player"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/selz/plyr.git"
+  },
+  "authors": [
+    "Sam Potts <me@sampotts.me>"
+  ],
+  "license": "MIT"
 }

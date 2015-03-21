@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.0.25
+// plyr.js v1.0.27
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -317,6 +317,17 @@
     function _toggleHandler(element, events, callback, toggle) {
         events = events.split(" ");
 
+        // If a nodelist is passed, call itself on each node
+        if(element instanceof NodeList) {
+            for (var x = 0; x < element.length; x++) {
+                if (element[x] instanceof Node) {
+                    _toggleHandler(element[x], arguments[1], arguments[2], arguments[3]);
+                }
+            }
+            return;
+        }
+
+        // If a single node is passed, bind the event listener
         for (var i = 0; i < events.length; i++) {
             element[toggle ? "addEventListener" : "removeEventListener"](events[i], callback, false);
         }
@@ -330,6 +341,35 @@
     // Unbind event
     function _off(element, events, callback) {
         _toggleHandler(element, events, callback, false);
+    }
+
+    // Trigger event
+    function _triggerEvent(element, event) {
+        // Create faux event
+        var fauxEvent = document.createEvent("MouseEvents");
+
+        // Set the event type
+        fauxEvent.initEvent(event, true, true);
+
+        // Dispatch the event
+        element.dispatchEvent(fauxEvent);
+    }
+
+    // Toggle checkbox
+    function _toggleCheckbox(event) {
+        // Only listen for return key
+        if(event.keyCode && event.keyCode != 13) {
+            return true;
+        }
+
+        // Toggle the checkbox
+        event.target.checked = !event.target.checked;
+
+        // Set the attribute for CSS hooks
+        event.target[event.target.checked ? "setAttribute" : "removeAttribute"]("checked", "");
+
+        // Trigger change event
+        _triggerEvent(event.target, "change");
     }
 
     // Get percentage
@@ -496,7 +536,7 @@
 
             if (config.captions.defaultActive) {
                 _toggleClass(player.container, config.classes.captions.active, true);
-                player.buttons.captions.setAttribute("checked", "checked");
+                player.buttons.captions.setAttribute("checked", "");
             }
         }
 
@@ -590,9 +630,12 @@
                 player.buttons.restart          = _getElement(config.selectors.buttons.restart);
                 player.buttons.rewind           = _getElement(config.selectors.buttons.rewind);
                 player.buttons.forward          = _getElement(config.selectors.buttons.forward);
+                player.buttons.fullscreen       = _getElement(config.selectors.buttons.fullscreen);
+
+                // Inputs
                 player.buttons.mute             = _getElement(config.selectors.buttons.mute);
                 player.buttons.captions         = _getElement(config.selectors.buttons.captions);
-                player.buttons.fullscreen       = _getElement(config.selectors.buttons.fullscreen);
+                player.checkboxes               = _getElements("[type='checkbox']");
 
                 // Progress
                 player.progress = {};
@@ -899,7 +942,11 @@
             }
 
             // Set the current time
-            player.media.currentTime = targetTime.toFixed(1);
+            // Try/catch incase the media isn't set and we're calling seek() from source() and IE moans
+            try {
+                player.media.currentTime = targetTime.toFixed(1);
+            }
+            catch(e) {}
 
             // Logging
             _log("Seeking to " + player.media.currentTime + " seconds");
@@ -1224,22 +1271,6 @@
 
             // Handle user exiting fullscreen by escaping etc
             _on(document, fullscreen.fullScreenEventName, _toggleFullscreen);
-
-            // Click video
-            if(player.type === "video" && config.click) {
-                _on(player.videoContainer, "click", function() {
-                    if(player.media.paused) {
-                        _play();
-                    }
-                    else if(player.media.ended) {
-                        _seek();
-                        _play();
-                    }
-                    else {
-                        _pause();
-                    }
-                });
-            }
             
             // Time change on media
             _on(player.media, "timeupdate seeking", _timeUpdate);
@@ -1251,15 +1282,18 @@
             _on(player.buttons.seek, "change input", _seek);
 
             // Captions
-            _on(player.buttons.captions, "click", function() { 
+            _on(player.buttons.captions, "change", function() { 
                 _toggleCaptions(this.checked);
             });
 
-            // Clear captions at end of video
+            // Handle the media finishing
             _on(player.media, "ended", function() {
+                // Clear 
                 if(player.type === "video") {
                     player.captionsContainer.innerHTML = "";
                 }
+
+                // Reset UI
                 _checkPlaying();
             });
 
@@ -1277,6 +1311,25 @@
 
             // Loading
             _on(player.media, "waiting canplay seeked", _checkLoading);
+
+            // Toggle checkboxes on return key (as they look like buttons)
+            _on(player.checkboxes, "keyup", _toggleCheckbox);
+
+            // Click video
+            if(player.type === "video" && config.click) {
+                _on(player.videoContainer, "click", function() {
+                    if(player.media.paused) {
+                        _play();
+                    }
+                    else if(player.media.ended) {
+                        _seek();
+                        _play();
+                    }
+                    else {
+                        _pause();
+                    }
+                });
+            }
         }
 
         function _init() {
@@ -1324,9 +1377,14 @@
 
             // Listeners
             _listeners();
+
+            // Successful setup
+            return true;
         }
 
-        _init();
+        if(!_init()) {
+            return {};
+        }
 
         return {
             media:              player.media,
@@ -1357,7 +1415,8 @@
         }
 
         // Get the players 
-        var elements = document.querySelectorAll(config.selectors.container), players = [];
+        var elements    = document.querySelectorAll(config.selectors.container), 
+            players     = [];
 
         // Create a player instance for each element
         for (var i = elements.length - 1; i >= 0; i--) {
@@ -1373,7 +1432,11 @@
 
             // Setup a player instance and add to the element
             if(typeof element.plyr === "undefined") { 
-                element.plyr = new Plyr(element);
+                // Create new instance
+                var instance = new Plyr(element);
+
+                // Set plyr to false if setup failed
+                element.plyr = (Object.keys(instance).length ? instance : false);
             }
 
             // Add to return array

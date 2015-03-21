@@ -22,7 +22,8 @@ var fs          = require("fs"),
     s3          = require("gulp-s3"),
     gzip        = require("gulp-gzip"),
     replace     = require("gulp-replace"),
-    open        = require("gulp-open");
+    open        = require("gulp-open"),
+    size        = require("gulp-size");
 
 var root = __dirname,
 paths = {
@@ -223,6 +224,10 @@ gulp.task("cdn", function () {
 
     // Upload to CDN 
     gulp.src(paths.upload)
+        .pipe(size({
+            showFiles: true,
+            gzip: true
+        }))
         .pipe(rename(function (path) {
             path.dirname = path.dirname.replace(".", version);
         }))
@@ -233,6 +238,11 @@ gulp.task("cdn", function () {
 // Publish to Docs bucket
 gulp.task("docs", function () {
     console.log("Uploading " + version + " docs to " + aws.docs.bucket);
+
+    // Replace versioned files in readme.md
+    gulp.src([root + "/readme.md"])
+        .pipe(replace(cdnpath, aws.cdn.bucket + "/" + version))
+        .pipe(gulp.dest(root));
 
     // Replace versioned files in *.html
     gulp.src([paths.docs.root + "*.html"])
