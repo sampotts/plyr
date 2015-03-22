@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.0.28
+- Added API support for browsers that don't have full plyr support (pretty much <=IE9 and `<video>` on iPhone/iPod)
+
+## v1.0.27
+- Keyboard accessibility improvements (Fixes #66)
+
 ## v1.0.26
 - Fixes for SASS (cheers @brunowego)
 - Indentation reset to 4 spaces

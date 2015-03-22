@@ -10,7 +10,7 @@ We wanted a lightweight, accessible and customisable media player that just supp
 
 ## Features
 - **Accessible** - full support for captions and screen readers.
-- **Lightweight** - just 5.7KB minified and gzipped.
+- **Lightweight** - just 6KB minified and gzipped.
 - **Customisable** - make the player look how you want with the markup you want.
 - **Semantic** - uses the *right* elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no `<span>` or `<a href="#">` button hacks.
 - **Responsive** - as you'd expect these days.
@@ -38,7 +38,7 @@ If you have any cool ideas or features, please let me know by [creating an issue
 
 Check `docs/index.html` and `docs/dist/docs.js` for an example setup. 
 
-**Heads up**, the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.0.27/plyr.js` to `https://cdn.plyr.io/1.0.27/plyr.js`
+**Heads up**, the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.0.28/plyr.js` to `https://cdn.plyr.io/1.0.28/plyr.js`
 
 ### Bower
 If bower is your thang, you can grab Plyr using:
@@ -51,11 +51,11 @@ More info on setting up dependencies can be found in the [Bower Docs](http://bow
 If you want to use our CDN, you can use the following. HTTPS (SSL) is supported.
 
 ```html
-<link rel="stylesheet" href="//cdn.plyr.io/1.0.27/plyr.css">
-<script src="//cdn.plyr.io/1.0.27/plyr.js"></script>
+<link rel="stylesheet" href="//cdn.plyr.io/1.0.28/plyr.css">
+<script src="//cdn.plyr.io/1.0.28/plyr.js"></script>
 ```
 
-You can also access the `sprite.svg` file at `//cdn.plyr.io/1.0.27/sprite.svg`.
+You can also access the `sprite.svg` file at `//cdn.plyr.io/1.0.28/sprite.svg`.
 
 ### CSS
 If you want to use the default css, add the `plyr.css` file from /dist into your head, or even better use `plyr.less` or `plyr.sass` file included in `/src` in your build to save a request. 
@@ -359,15 +359,15 @@ Fullscreen in Plyr is supported for all browsers that [currently support it](htt
       <td>✔</td>
       <td>✔</td>
       <td>✔</td>
-      <td>✖&sup2;</td>
+      <td>API&sup2;</td>
       <td>✔&sup3;</td>
     </tr>
   </tbody>
 </table>
 
-&sup1; iPhone forces the native player for `<video>` so no customisation possible. `<audio>` elements have volume controls disabled.
+&sup1; Mobile Safari on the iPhone forces the native player for `<video>` so no useful customisation is possible. `<audio>` elements have volume controls disabled.
 
-&sup2; Native player used (no support for `<progress>` or `<input type="range">`)
+&sup2; Native player used (no support for `<progress>` or `<input type="range">`) but the API is supported (v1.0.28+)
 
 &sup3; IE10 has no native fullscreen support, fallback can be used (see options)
 

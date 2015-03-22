@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.0.27
+// plyr.js v1.0.28
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -219,7 +219,7 @@
     // Check for mime type support against a player instance
     // Credits: http://diveintohtml5.info/everything.html 
     // Related: http://www.leanbackplayer.com/test/h5mt.html
-    function _support(player, mimeType) {    
+    function _supportMime(player, mimeType) {    
         var media = player.media;
 
         // Only check video types for video players
@@ -496,7 +496,7 @@
         // Seek the manual caption time and update UI
         function _seekManualCaptions(time) {
             // If it's not video, or we're using textTracks, bail.
-            if (player.usingTextTracks || player.type !== "video") {
+            if (player.usingTextTracks || player.type !== "video" || !player.supported.full) {
                 return;
             }
 
@@ -681,8 +681,6 @@
 
         // Setup media
         function _setupMedia() {
-            player.media = player.container.querySelectorAll("audio, video")[0];
-
             // If there's no media, bail
             if(!player.media) {
                 _log("No audio or video element found!", true);
@@ -690,10 +688,9 @@
             }
 
             // Remove native video controls
-            player.media.removeAttribute("controls");
-
-            // Set media type
-            player.type = player.media.tagName.toLowerCase();
+            if(player.supported.full) {
+                player.media.removeAttribute("controls");
+            }
 
             // Add type class
             _toggleClass(player.container, config.classes[player.type], true);
@@ -707,7 +704,7 @@
             }
 
             // Inject the player wrapper
-            if(player.type === "video") {
+            if(player.type === "video" && player.supported.full) {
                 // Create the wrapper div
                 var wrapper = document.createElement("div");
                 wrapper.setAttribute("class", config.classes.videoWrapper);
@@ -1027,8 +1024,15 @@
                 volume = 10;
             }
 
-            player.volume.value = volume;
+            // If the controls are there
+            if(player.supported.full) {
+                player.volume.value = volume;
+            }
+
+            // Set the player volume
             player.media.volume = parseFloat(volume / 10);
+
+            // Update the UI
             _checkMute();
 
             // Store the volume in storage
@@ -1040,24 +1044,35 @@
         // Mute
         function _toggleMute(muted) {
             // If the method is called without parameter, toggle based on current value
-            if(typeof active === "undefined") {
+            if(typeof muted === "undefined") {
                 muted = !player.media.muted;
+            }
+
+            // If the controls are there
+            if(player.supported.full) {
                 player.buttons.mute.checked = muted;
             }
 
+            // Set mute on the player
             player.media.muted = muted;
+
+            // Update UI
             _checkMute();
         }
 
         // Toggle captions
-        function _toggleCaptions(active) { 
-            // If the method is called without parameter, toggle based on current value
-            if(typeof active === "undefined") {
-                active = (player.container.className.indexOf(config.classes.captions.active) === -1);
-                player.buttons.captions.checked = active;
+        function _toggleCaptions(show) { 
+            if(!player.supported.plyr) {
+                return;
             }
 
-            if (active) {
+            // If the method is called without parameter, toggle based on current value
+            if(typeof active === "undefined") {
+                show = (player.container.className.indexOf(config.classes.captions.active) === -1);
+                player.buttons.captions.checked = show;
+            }
+
+            if (show) {
                 _toggleClass(player.container, config.classes.captions.active, true);
             } 
             else {
@@ -1214,7 +1229,9 @@
             }
 
             // Reset time display
-            _timeUpdate();
+            if(player.supported.full) {
+                _timeUpdate();
+            }
 
             // Re-load sources
             player.media.load();
@@ -1270,7 +1287,9 @@
             _on(player.buttons.fullscreen, "click", _toggleFullscreen);
 
             // Handle user exiting fullscreen by escaping etc
-            _on(document, fullscreen.fullScreenEventName, _toggleFullscreen);
+            if(fullscreen.supportsFullScreen) {
+                _on(document, fullscreen.fullScreenEventName, _toggleFullscreen);
+            }
             
             // Time change on media
             _on(player.media, "timeupdate seeking", _timeUpdate);
@@ -1336,18 +1355,30 @@
             // Setup the fullscreen api 
             fullscreen = _fullscreen();
 
-            // Sniff 
+            // Sniff out the browser
             player.browser = _browserSniff();
+
+            // Check for full support
+            player.supported = api.supported();
+
+            // If no native support, bail
+            if(!player.supported.basic) {
+                return false;
+            }
+
+            // Get the media element
+            player.media = player.container.querySelectorAll("audio, video")[0];
+
+            // Set media type
+            player.type = player.media.tagName.toLowerCase();
+
+            // If iPhone/iPod and video, customisation support is limited
+            if(/iPhone|iPod/i.test(navigator.userAgent) && player.type === "video") {
+                player.supported.full = false;
+            }
 
             // Debug info
             _log(player.browser.name + " " + player.browser.version);
-
-            // If IE8, stop customization (use fallback)
-            // If IE9, stop customization (use native controls)
-            if (player.browser.name === "IE" && (player.browser.version === 8 || player.browser.version === 9) ) {
-                _log("Browser not suppported.", true);
-                return false;
-            }
 
             // Setup media
             _setupMedia();
@@ -1355,28 +1386,31 @@
             // Generate random number for id/for attribute values for controls
             player.random = Math.floor(Math.random() * (10000));
 
-            // Inject custom controls
-            _injectControls();
+            // If there's full support
+            if(player.supported.full) {
+                // Inject custom controls
+                _injectControls();
 
-            // Find the elements
-            if(!_findElements()) {
-                return false;
+                // Find the elements
+                if(!_findElements()) {
+                    return false;
+                }
+
+                // Set up aria-label for Play button with the title option
+                _setupAria();
+
+                // Captions
+                _setupCaptions();
+
+                // Set volume
+                _setVolume();
+
+                // Setup fullscreen
+                _setupFullscreen();
+
+                // Listeners
+                _listeners();
             }
-
-            // Set up aria-label for Play button with the title option
-            _setupAria();
-
-            // Captions
-            _setupCaptions();
-
-            // Set volume
-            _setVolume();
-
-            // Setup fullscreen
-            _setupFullscreen();
-
-            // Listeners
-            _listeners();
 
             // Successful setup
             return true;
@@ -1399,8 +1433,19 @@
             toggleCaptions:     _toggleCaptions,
             source:             _parseSource,
             poster:             _updatePoster,
-            support:            function(mimeType) { return _support(player, mimeType); }
+            support:            function(mimeType) { return _supportMime(player, mimeType); }
         }
+    }
+
+    // Check for support 
+    api.supported = function() {
+        var browser = _browserSniff(),
+            basic  = (!!document.createElement("audio").canPlayType && !!document.createElement("video").canPlayType);
+
+        return {
+            basic:  basic,
+            full:   basic && !(browser.name === "IE" && (browser.version <= 9))
+        };
     }
 
     // Expose setup function
@@ -1410,7 +1455,7 @@
 
         // If enabled carry on
         // You may want to disable certain UAs etc
-        if(!config.enabled) {
+        if(!config.enabled || !api.supported().basic) {
             return false;
         }
 
@@ -1422,13 +1467,6 @@
         for (var i = elements.length - 1; i >= 0; i--) {
             // Get the current element
             var element = elements[i];
-
-            // Disabled for <video> for iPhone
-            // Since it doesn't allow customisation
-            if (element.querySelectorAll("audio, video")[0].tagName.toLowerCase() === "video"
-                && /iPhone/i.test(navigator.userAgent)) {
-                continue;
-            }
 
             // Setup a player instance and add to the element
             if(typeof element.plyr === "undefined") { 
@@ -1445,4 +1483,5 @@
 
         return players;
     }
+
 }(this.plyr = this.plyr || {}));
