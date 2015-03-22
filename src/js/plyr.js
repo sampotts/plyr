@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.0.28
+// plyr.js v1.0.29
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -55,13 +55,15 @@
             loading:            "loading",
             tooltip:            "player-tooltip",
             hidden:             "sr-only",
+            hover:              "hover",
             captions: {
                 enabled:        "captions-enabled",
                 active:         "captions-active"
             },
             fullscreen: {
                 enabled:        "fullscreen-enabled",
-                active:         "fullscreen-active"
+                active:         "fullscreen-active",
+                hideControls:   "fullscreen-hide-controls"
             }
         },
         captions: {
@@ -69,7 +71,8 @@
         },
         fullscreen: {
             enabled:            true,
-            fallback:           true
+            fallback:           true,
+            hideControls:       true
         },
         storage: {
             enabled:            true,
@@ -365,9 +368,6 @@
         // Toggle the checkbox
         event.target.checked = !event.target.checked;
 
-        // Set the attribute for CSS hooks
-        event.target[event.target.checked ? "setAttribute" : "removeAttribute"]("checked", "");
-
         // Trigger change event
         _triggerEvent(event.target, "change");
     }
@@ -536,7 +536,7 @@
 
             if (config.captions.defaultActive) {
                 _toggleClass(player.container, config.classes.captions.active, true);
-                player.buttons.captions.setAttribute("checked", "");
+                player.buttons.captions.checked = true;
             }
         }
 
@@ -687,33 +687,34 @@
                 return false;
             }
 
-            // Remove native video controls
+            
             if(player.supported.full) {
+                // Remove native video controls
                 player.media.removeAttribute("controls");
-            }
+        
+                // Add type class
+                _toggleClass(player.container, config.classes[player.type], true);
 
-            // Add type class
-            _toggleClass(player.container, config.classes[player.type], true);
+                // If there's no autoplay attribute, assume the video is stopped and add state class
+                _toggleClass(player.container, config.classes.stopped, (player.media.getAttribute("autoplay") === null));
+            
+                // Add iOS class
+                if(player.browser.ios) {
+                    _toggleClass(player.container, "ios", true);
+                }
 
-            // If there's no autoplay attribute, assume the video is stopped and add state class
-            _toggleClass(player.container, config.classes.stopped, (player.media.getAttribute("autoplay") === null));
+                // Inject the player wrapper
+                if(player.type === "video") {
+                    // Create the wrapper div
+                    var wrapper = document.createElement("div");
+                    wrapper.setAttribute("class", config.classes.videoWrapper);
 
-            // Add iOS class
-            if(player.browser.ios) {
-                _toggleClass(player.container, "ios", true);
-            }
+                    // Wrap the video in a container
+                    _wrap(player.media, wrapper);
 
-            // Inject the player wrapper
-            if(player.type === "video" && player.supported.full) {
-                // Create the wrapper div
-                var wrapper = document.createElement("div");
-                wrapper.setAttribute("class", config.classes.videoWrapper);
-
-                // Wrap the video in a container
-                _wrap(player.media, wrapper);
-
-                // Cache the container
-                player.videoContainer = wrapper;
+                    // Cache the container
+                    player.videoContainer = wrapper;
+                }
             }
 
             // Autoplay
@@ -882,6 +883,11 @@
                 }
                 else {
                     _log("Fullscreen not supported and fallback disabled.");
+                }
+
+                // Set control hide class hook
+                if(config.fullscreen.hideControls) {
+                    _toggleClass(player.container, config.classes.fullscreen.hideControls, true);
                 }
             }   
         }
@@ -1062,22 +1068,17 @@
 
         // Toggle captions
         function _toggleCaptions(show) { 
-            if(!player.supported.plyr) {
+            if(!player.supported.full) {
                 return;
             }
 
             // If the method is called without parameter, toggle based on current value
-            if(typeof active === "undefined") {
+            if(typeof show === "undefined") {
                 show = (player.container.className.indexOf(config.classes.captions.active) === -1);
                 player.buttons.captions.checked = show;
             }
 
-            if (show) {
-                _toggleClass(player.container, config.classes.captions.active, true);
-            } 
-            else {
-                _toggleClass(player.container, config.classes.captions.active);
-            }
+            _toggleClass(player.container, config.classes.captions.active, show);
         }
 
         // Check mute state
@@ -1207,9 +1208,6 @@
             // Restart
             _seek();
 
-            // Update the UI
-            _checkPlaying();
-
             // Remove current sources
             _removeSources();
 
@@ -1228,9 +1226,12 @@
                 }
             }
 
-            // Reset time display
             if(player.supported.full) {
+                // Reset time display
                 _timeUpdate();
+
+                // Update the UI
+                _checkPlaying();
             }
 
             // Re-load sources
@@ -1302,6 +1303,7 @@
 
             // Captions
             _on(player.buttons.captions, "change", function() { 
+                console.log(this.checked);
                 _toggleCaptions(this.checked);
             });
 
@@ -1349,6 +1351,13 @@
                     }
                 });
             }
+
+            // Bind to mouse hover 
+            if(config.fullscreen.hideControls) {
+                _on(player.controls, "mouseenter mouseleave", function(event) {
+                    _toggleClass(player.controls, config.classes.hover, (event.type === "mouseenter"));
+                })
+            }
         }
 
         function _init() {
@@ -1358,23 +1367,18 @@
             // Sniff out the browser
             player.browser = _browserSniff();
 
-            // Check for full support
-            player.supported = api.supported();
-
-            // If no native support, bail
-            if(!player.supported.basic) {
-                return false;
-            }
-
             // Get the media element
             player.media = player.container.querySelectorAll("audio, video")[0];
 
             // Set media type
             player.type = player.media.tagName.toLowerCase();
 
-            // If iPhone/iPod and video, customisation support is limited
-            if(/iPhone|iPod/i.test(navigator.userAgent) && player.type === "video") {
-                player.supported.full = false;
+            // Check for full support
+            player.supported = api.supported(player.type);
+
+            // If no native support, bail
+            if(!player.supported.basic) {
+                return false;
             }
 
             // Debug info
@@ -1438,13 +1442,34 @@
     }
 
     // Check for support 
-    api.supported = function() {
+    api.supported = function(type) {
         var browser = _browserSniff(),
-            basic  = (!!document.createElement("audio").canPlayType && !!document.createElement("video").canPlayType);
+            oldIE   = (browser.name === "IE" && browser.version <= 9),
+            iPhone  = /iPhone|iPod/i.test(navigator.userAgent),
+            audio   = !!document.createElement("audio").canPlayType,
+            video   = !!document.createElement("video").canPlayType,
+            basic, full;
+
+        switch (type) {
+            case "video": 
+                basic = video;
+                full  = (basic && (!oldIE && !iPhone));
+                break;
+
+            case "audio": 
+                basic = audio;
+                full  = (basic && !oldIE);
+                break; 
+
+            default:
+                basic = (audio && video);
+                full  = (basic && !oldIE);
+                break;                
+        }
 
         return {
             basic:  basic,
-            full:   basic && !(browser.name === "IE" && (browser.version <= 9))
+            full:   full
         };
     }
 

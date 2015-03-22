@@ -31,9 +31,9 @@ $tooltip-arrow-size:      5px;
 $tooltip-radius:          3px;
 
 // Progress
-$progress-bg:             lighten($gray, 10%);
+$progress-bg:             rgba(red($gray), green($gray), blue($gray), .2);
 $progress-playing-bg:     $blue;
-$progress-buffered-bg:    $gray;
+$progress-buffered-bg:    rgba(red($gray), green($gray), blue($gray), .25);
 $progress-loading-size:   40px;
 $progress-loading-bg:     rgba(0,0,0, .15);
 
@@ -187,7 +187,7 @@ $bp-captions-large:       768px; // When captions jump to the larger font size
         @include clearfix();
         @include font-smoothing();
         position: relative;
-        padding: ($control-spacing * 2) $control-spacing $control-spacing;
+        padding: $control-spacing;
         background: $controls-bg;
         line-height: 1;
         text-align: center;
@@ -321,7 +321,7 @@ $bp-captions-large:       768px; // When captions jump to the larger font size
     // <progress> element
     &-progress {
         position: absolute;
-        top: 0;
+        bottom: 100%;
         left: 0;
         right: 0;
         width: 100%;
@@ -556,6 +556,17 @@ $bp-captions-large:       768px; // When captions jump to the larger font size
             bottom: 0;
             left: 0;
             right: 0;
+        }
+
+        // Hide controls when playing in full screen
+        &.fullscreen-hide-controls.playing .player-controls {
+            transform: translateY(100%) translateY($control-spacing / 2);
+            transition: transform .3s 1s ease;
+
+            &.hover {
+                transform: translateY(0);
+                transition-delay: 0;
+            }
         }
     }
 
