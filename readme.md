@@ -393,6 +393,7 @@ Plyr is developed by Sam Potts ([@sam_potts](https://twitter.com/sam_potts)) ([s
 - [Hacker News](https://news.ycombinator.com/item?id=9136774)
 - [Web Platform Daily](http://webplatformdaily.org/releases/2015-03-04)
 - [LayerVault Designer News](https://news.layervault.com/stories/45394-plyr--a-simple-html5-media-player)
+- [The Treehouse Show #131](https://teamtreehouse.com/library/episode-131-origami-react-responsive-hero-images)
 
 ## Used by
 - [Selz.com](https://selz.com)
