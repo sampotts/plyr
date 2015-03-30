@@ -202,7 +202,7 @@ You can pass the following options to the setup method.
     <td><code>displayDuration</code></td>
     <td>Boolean</td>
     <td><code>true</code></td>
-    <td>Displays the duration of the media on the "metadataloaded" event. This will only work if the `preload` attribute is not set to `none`. It is `auto` by default (if the attribute is not present).</td>
+    <td>Displays the duration of the media on the "metadataloaded" event (on startup). This will only work if the `preload` attribute is not set to `none`. It is `auto` by default (if the attribute is not present).</td>
   </tr>
   <tr>
     <td><code>selectors</code></td>
