@@ -43,7 +43,8 @@
                 played:         ".player-progress-played"
             },
             captions:           ".player-captions",
-            duration:           ".player-duration"
+            duration:           ".player-duration",
+            fullDuration:       ".player-full-duration"
         },
         classes: {
             video:              "player-video",
@@ -115,6 +116,10 @@
                         "<span class='player-time'>",
                             "<span class='sr-only'>Time</span>",
                             "<span class='player-duration'>00:00</span>",
+                        "</span>",
+                        "<span class='player-time'>",
+                            "<span class='sr-only'>Time</span>",
+                            "<span class='player-full-duration'>00:00</span>",
                         "</span>",
                     "</span>",
                     "<span class='player-controls-right'>",
@@ -656,6 +661,7 @@
 
                 // Timing
                 player.duration                 = _getElement(config.selectors.duration);
+                player.fullDuration             = _getElement(config.selectors.fullDuration);
                 player.seekTime                 = _getElements(config.selectors.seekTime);
 
                 return true;
@@ -1149,6 +1155,19 @@
             text.innerHTML = value;
         }
 
+        // Set full duration
+        function _setFullDuration() {
+            player.duration_secs = parseInt(player.media.duration % 60);
+            player.duration_mins = parseInt((player.media.duration / 60) % 60);
+
+            // Ensure it"s two digits. For example, 03 rather than 3.
+            player.duration_secs = ("0" + player.duration_secs).slice(-2);
+            player.duration_mins = ("0" + player.duration_mins).slice(-2);
+
+            // Render
+            player.fullDuration.innerHTML = player.duration_mins + ":" + player.duration_secs;
+        }
+
         // Update the displayed play time
         function _updateTimeDisplay() {
             player.secs = parseInt(player.media.currentTime % 60);
@@ -1358,6 +1377,8 @@
                     _toggleClass(player.controls, config.classes.hover, (event.type === "mouseenter"));
                 })
             }
+            
+            _on(player.media, "loadedmetadata", _setFullDuration)
         }
 
         function _init() {
