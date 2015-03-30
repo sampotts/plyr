@@ -1153,13 +1153,14 @@
         function _updateTimeDisplay() {
             player.secs = parseInt(player.media.currentTime % 60);
             player.mins = parseInt((player.media.currentTime / 60) % 60);
+            player.hours = parseInt(((player.media.currentTime / 60) / 60) % 60);
             
             // Ensure it"s two digits. For example, 03 rather than 3.
             player.secs = ("0" + player.secs).slice(-2);
             player.mins = ("0" + player.mins).slice(-2);
 
             // Render
-            player.duration.innerHTML = player.mins + ":" + player.secs;
+            player.duration.innerHTML = (player.hours > 0 ? player.hours + ":" : "") + player.mins + ":" + player.secs;
         }
 
         // Handle time change event
@@ -1303,7 +1304,6 @@
 
             // Captions
             _on(player.buttons.captions, "change", function() { 
-                console.log(this.checked);
                 _toggleCaptions(this.checked);
             });
 

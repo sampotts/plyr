@@ -4,3 +4,4 @@ node_modules
 .DS_Store
 aws.json
 docs/index.dev.html
+*.mp4

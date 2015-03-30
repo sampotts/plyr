@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.0.30
+- Fixed bug with media longer than 60 minutes (Fixes #69)
+
 ## v1.0.29
 - Added option to hide controls on fullscreen (default `true`) while palying, after 1s. Pause, mouse hover on progress, or focus on a child control re-shows the controls. On touch a tap of the video (which plays/pauses the video by default) is required. (Fixes #47)
 - Fixed a bug with caption toggle in 1.0.28

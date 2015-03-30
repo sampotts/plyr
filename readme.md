@@ -38,7 +38,7 @@ If you have any cool ideas or features, please let me know by [creating an issue
 
 Check `docs/index.html` and `docs/dist/docs.js` for an example setup. 
 
-**Heads up**, the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.0.29/plyr.js` to `https://cdn.plyr.io/1.0.29/plyr.js`
+**Heads up**, the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.0.30/plyr.js` to `https://cdn.plyr.io/1.0.30/plyr.js`
 
 ### Bower
 If bower is your thang, you can grab Plyr using:
@@ -51,11 +51,11 @@ More info on setting up dependencies can be found in the [Bower Docs](http://bow
 If you want to use our CDN, you can use the following. HTTPS (SSL) is supported.
 
 ```html
-<link rel="stylesheet" href="//cdn.plyr.io/1.0.29/plyr.css">
-<script src="//cdn.plyr.io/1.0.29/plyr.js"></script>
+<link rel="stylesheet" href="//cdn.plyr.io/1.0.30/plyr.css">
+<script src="//cdn.plyr.io/1.0.30/plyr.js"></script>
 ```
 
-You can also access the `sprite.svg` file at `//cdn.plyr.io/1.0.29/sprite.svg`.
+You can also access the `sprite.svg` file at `//cdn.plyr.io/1.0.30/sprite.svg`.
 
 ### CSS
 If you want to use the default css, add the `plyr.css` file from /dist into your head, or even better use `plyr.less` or `plyr.sass` file included in `/src` in your build to save a request. 
@@ -389,6 +389,7 @@ Plyr is developed by Sam Potts ([@sam_potts](https://twitter.com/sam_potts)) ([s
 ## Mentions
 - [The Changelog](http://thechangelog.com/plyr-simple-html5-media-player-custom-controls-webvtt-captions/)
 - [HTML5 Weekly #177](http://html5weekly.com/issues/177)
+- [Responsive Design #149](http://us4.campaign-archive2.com/?u=559bc631fe5294fc66f5f7f89&id=451a61490f)
 - [Web Design Weekly #174](https://web-design-weekly.com/2015/02/24/web-design-weekly-174/)
 - [Hacker News](https://news.ycombinator.com/item?id=9136774)
 - [Web Platform Daily](http://webplatformdaily.org/releases/2015-03-04)
