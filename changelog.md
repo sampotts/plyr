@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.0.31
+- Display duration on metadataloaded
+
 ## v1.0.30
 - Fixed bug with media longer than 60 minutes (Fixes #69)
 

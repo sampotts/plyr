@@ -38,7 +38,7 @@ If you have any cool ideas or features, please let me know by [creating an issue
 
 Check `docs/index.html` and `docs/dist/docs.js` for an example setup. 
 
-**Heads up**, the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.0.30/plyr.js` to `https://cdn.plyr.io/1.0.30/plyr.js`
+**Heads up**, the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.0.31/plyr.js` to `https://cdn.plyr.io/1.0.31/plyr.js`
 
 ### Bower
 If bower is your thang, you can grab Plyr using:
@@ -51,11 +51,11 @@ More info on setting up dependencies can be found in the [Bower Docs](http://bow
 If you want to use our CDN, you can use the following. HTTPS (SSL) is supported.
 
 ```html
-<link rel="stylesheet" href="//cdn.plyr.io/1.0.30/plyr.css">
-<script src="//cdn.plyr.io/1.0.30/plyr.js"></script>
+<link rel="stylesheet" href="//cdn.plyr.io/1.0.31/plyr.css">
+<script src="//cdn.plyr.io/1.0.31/plyr.js"></script>
 ```
 
-You can also access the `sprite.svg` file at `//cdn.plyr.io/1.0.30/sprite.svg`.
+You can also access the `sprite.svg` file at `//cdn.plyr.io/1.0.31/sprite.svg`.
 
 ### CSS
 If you want to use the default css, add the `plyr.css` file from /dist into your head, or even better use `plyr.less` or `plyr.sass` file included in `/src` in your build to save a request. 
@@ -197,6 +197,12 @@ You can pass the following options to the setup method.
     <td>Boolean</td>
     <td><code>false</code></td>
     <td>Display control labels as tooltips on :hover &amp; :focus (by default, the labels are screen reader only).</td>
+  </tr>
+    <tr>
+    <td><code>displayDuration</code></td>
+    <td>Boolean</td>
+    <td><code>true</code></td>
+    <td>Displays the duration of the media on the "metadataloaded" event. This will only work if the `preload` attribute is not set to `none`. It is `auto` by default (if the attribute is not present).</td>
   </tr>
   <tr>
     <td><code>selectors</code></td>

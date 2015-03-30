@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.0.29
+// plyr.js v1.0.31
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -21,6 +21,7 @@
         volume:                 5,
         click:                  true,
         tooltips:               false,
+        displayDuration:        true,
         selectors: {
             container:          ".player",
             controls:           ".player-controls",
@@ -687,7 +688,6 @@
                 return false;
             }
 
-            
             if(player.supported.full) {
                 // Remove native video controls
                 player.media.removeAttribute("controls");
@@ -800,10 +800,12 @@
 
                             if (track.kind === "captions") {
                                 _on(track, "cuechange", function() {
-                                    if (this.activeCues[0]) {
-                                        if (this.activeCues[0].hasOwnProperty("text")) {
-                                            player.captionsContainer.innerHTML = this.activeCues[0].text;
-                                        }
+                                    // Clear container
+                                    player.captionsContainer.innerHTML = "";
+
+                                    // Display a cue, if there is one
+                                    if (this.activeCues[0] && this.activeCues[0].hasOwnProperty("text")) {
+                                        player.captionsContainer.appendChild(this.activeCues[0].getCueAsHTML());
                                     }
                                 });
                             }
@@ -1149,24 +1151,34 @@
             text.innerHTML = value;
         }
 
-        // Update the displayed play time
-        function _updateTimeDisplay() {
-            player.secs = parseInt(player.media.currentTime % 60);
-            player.mins = parseInt((player.media.currentTime / 60) % 60);
-            player.hours = parseInt(((player.media.currentTime / 60) / 60) % 60);
+        // Update the displayed time
+        function _updateTimeDisplay(time) {
+            player.secs = parseInt(time % 60);
+            player.mins = parseInt((time / 60) % 60);
+            player.hours = parseInt(((time / 60) / 60) % 60);
+
+            // Do we need to display hours?
+            var displayHours = (parseInt(((player.media.duration / 60) / 60) % 60) > 0)
             
             // Ensure it"s two digits. For example, 03 rather than 3.
             player.secs = ("0" + player.secs).slice(-2);
             player.mins = ("0" + player.mins).slice(-2);
 
             // Render
-            player.duration.innerHTML = (player.hours > 0 ? player.hours + ":" : "") + player.mins + ":" + player.secs;
+            player.duration.innerHTML = (displayHours ? player.hours + ":" : "") + player.mins + ":" + player.secs;
+        }
+
+        // Show the duration on metadataloaded
+        function _displayDuration() {
+            if(player.media.paused) {
+                _updateTimeDisplay(player.media.duration || 0);
+            }
         }
 
         // Handle time change event
         function _timeUpdate(event) {
             // Duration
-            _updateTimeDisplay();
+            _updateTimeDisplay(player.media.currentTime);
 
             // Playing progress
             _updateProgress(event);
@@ -1299,6 +1311,11 @@
             // Update manual captions
             _on(player.media, "timeupdate", _seekManualCaptions);
 
+            // Display duration
+            if(config.displayDuration) {
+                _on(player.media, "loadedmetadata", _displayDuration);
+            }
+
             // Seek 
             _on(player.buttons.seek, "change input", _seek);
 
@@ -1398,6 +1415,11 @@
                 // Find the elements
                 if(!_findElements()) {
                     return false;
+                }
+
+                // Display duration if available
+                if(config.displayDuration) {
+                    _displayDuration();
                 }
 
                 // Set up aria-label for Play button with the title option
