@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.1.0
+// plyr.js v1.1.1
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -84,7 +84,7 @@
     };
 
     // Build the default HTML
-    defaults.html = (function() {
+    function _buildControls() {
         // Open and add the progress and seek elements
         var html = [
         "<div class='player-controls'>",
@@ -101,7 +101,7 @@
             "<span class='player-controls-left'>"];
 
         // Restart button
-        if(_inArray(defaults.controls, "restart")) {
+        if(_inArray(config.controls, "restart")) {
             html.push(
                 "<button type='button' data-player='restart'>",
                     "<svg><use xlink:href='#icon-restart'></use></svg>",
@@ -111,7 +111,7 @@
         }
 
         // Rewind button
-        if(_inArray(defaults.controls, "rewind")) {
+        if(_inArray(config.controls, "rewind")) {
             html.push(
                 "<button type='button' data-player='rewind'>",
                     "<svg><use xlink:href='#icon-rewind'></use></svg>",
@@ -121,7 +121,7 @@
         }
 
         // Play/pause button
-        if(_inArray(defaults.controls, "play")) {
+        if(_inArray(config.controls, "play")) {
             html.push(
                 "<button type='button' data-player='play'>",
                     "<svg><use xlink:href='#icon-play'></use></svg>",
@@ -135,7 +135,7 @@
         }
 
         // Fast forward button
-        if(_inArray(defaults.controls, "fast-forward")) {
+        if(_inArray(config.controls, "fast-forward")) {
             html.push(
                 "<button type='button' data-player='fast-forward'>",
                     "<svg><use xlink:href='#icon-fast-forward'></use></svg>",
@@ -145,7 +145,7 @@
         }
 
         // Media current time display
-        if(_inArray(defaults.controls, "current-time")) {
+        if(_inArray(config.controls, "current-time")) {
             html.push(
                 "<span class='player-time'>",
                     "<span class='sr-only'>Current time</span>",
@@ -155,7 +155,7 @@
         }
 
         // Media duration display
-        if(_inArray(defaults.controls, "duration")) {
+        if(_inArray(config.controls, "duration")) {
             html.push(
                 "<span class='player-time'>",
                     "<span class='sr-only'>Duration</span>",
@@ -171,7 +171,7 @@
         );
 
         // Toggle mute button
-        if(_inArray(defaults.controls, "mute")) {
+        if(_inArray(config.controls, "mute")) {
             html.push(
                 "<input class='inverted sr-only' id='mute{id}' type='checkbox' data-player='mute'>",
                 "<label id='mute{id}' for='mute{id}'>",
@@ -183,7 +183,7 @@
         }
 
         // Volume range control
-        if(_inArray(defaults.controls, "volume")) {
+        if(_inArray(config.controls, "volume")) {
             html.push(
                 "<label for='volume{id}' class='sr-only'>Volume</label>",
                 "<input id='volume{id}' class='player-volume' type='range' min='0' max='10' value='5' data-player='volume'>"
@@ -191,7 +191,7 @@
         }
 
         // Toggle captions button
-        if(_inArray(defaults.controls, "captions")) {
+        if(_inArray(config.controls, "captions")) {
             html.push(
                 "<input class='sr-only' id='captions{id}' type='checkbox' data-player='captions'>",
                 "<label for='captions{id}'>",
@@ -203,7 +203,7 @@
         }
 
         // Toggle fullscreen button
-        if(_inArray(defaults.controls, "fullscreen")) {
+        if(_inArray(config.controls, "fullscreen")) {
             html.push(
                 "<button type='button' data-player='fullscreen'>",
                     "<svg class='icon-exit-fullscreen'><use xlink:href='#icon-exit-fullscreen'></use></svg>",
@@ -220,7 +220,7 @@
         );
 
         return html.join("");
-    })();
+    }
 
     // Debugging
     function _log(text, error) {
@@ -330,7 +330,7 @@
 
     // Element exists in an array
     function _inArray(haystack, needle) {
-        return (haystack.indexOf(needle) != -1);
+        return Array.prototype.indexOf && (haystack.indexOf(needle) != -1);
     }
     
     // Replace all
@@ -684,9 +684,9 @@
             // Insert custom video controls
             _log("Injecting custom controls.");
 
-            // If no controls are specified, bail
+            // If no controls are specified, create default
             if(!config.html) {
-                return;
+                config.html = _buildControls();
             }
 
             // Replace seek time instances
@@ -1624,7 +1624,7 @@
         // Extend the default options with user specified
         config = _extend(defaults, options);
 
-        // If enabled carry on
+        // Bail if disabled or no basic support
         // You may want to disable certain UAs etc
         if(!config.enabled || !api.supported().basic) {
             return false;

@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.1.1
+- Fix for unsupported browser handling
+- Fix for config.controls having no effect
+
 ## v1.1.0
 - Added config option to set which controls are shown (if using the default controls html) and better handling of missing controls
 
