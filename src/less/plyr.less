@@ -259,6 +259,22 @@
             font-size: @font-size-small;
             .font-smoothing();
         }
+
+        // Media duration hidden on small screens
+        .player-time + .player-time {
+            display: none;
+
+            @media (min-width: @bp-control-split) {
+                display: inline-block;
+            }
+
+            // Add a slash in before
+            &::before {
+                content: "\2044";
+                margin-right: @control-spacing;
+                color: darken(@control-color, 30%);
+            }
+        }
     }
 
     // Tooltips

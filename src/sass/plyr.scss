@@ -267,6 +267,22 @@ $bp-captions-large:       768px; // When captions jump to the larger font size
             font-size: $font-size-small;
             @include font-smoothing();
         }
+
+        // Media duration hidden on small screens
+        .player-time + .player-time {
+            display: none;
+
+            @media (min-width: $bp-control-split) {
+                display: inline-block;
+            }
+
+            // Add a slash in before
+            &::before {
+                content: "\2044";
+                margin-right: $control-spacing;
+                color: darken($control-color, 30%);
+            }
+        }
     }
 
     // Tooltips
@@ -278,7 +294,7 @@ $bp-captions-large:       768px; // When captions jump to the larger font size
         margin-bottom: $tooltip-padding;
         padding: $tooltip-padding ($tooltip-padding * 1.5);
 
-                opacity: 0;
+        opacity: 0;
         background: $tooltip-bg;
         border-radius: $tooltip-radius;
         color: $tooltip-color;
@@ -287,7 +303,7 @@ $bp-captions-large:       768px; // When captions jump to the larger font size
         font-weight: 600;
 
         transform: translate(-50%, ($tooltip-padding * 3));
-                transition: transform .2s .2s ease, opacity .2s .2s ease;
+        transition: transform .2s .2s ease, opacity .2s .2s ease;
 
         &::after {
             content: "";
@@ -593,11 +609,5 @@ $bp-captions-large:       768px; // When captions jump to the larger font size
     &.fullscreen-enabled [data-player='fullscreen'],
     &.fullscreen-enabled [data-player='fullscreen'] + label {
         display: inline-block;
-    }
-
-    // Full browser view hides toggle
-    &-fullscreen [data-player='fullscreen'],
-    &-fullscreen [data-player='fullscreen'] + label {
-        display: none !important;
     }
 }

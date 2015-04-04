@@ -38,7 +38,7 @@ If you have any cool ideas or features, please let me know by [creating an issue
 
 Check `docs/index.html` and `docs/dist/docs.js` for an example setup. 
 
-**Heads up**, the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.0.31/plyr.js` to `https://cdn.plyr.io/1.0.31/plyr.js`
+**Heads up**, the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.1.0/plyr.js` to `https://cdn.plyr.io/1.1.0/plyr.js`
 
 ### Bower
 If bower is your thang, you can grab Plyr using:
@@ -51,11 +51,11 @@ More info on setting up dependencies can be found in the [Bower Docs](http://bow
 If you want to use our CDN, you can use the following. HTTPS (SSL) is supported.
 
 ```html
-<link rel="stylesheet" href="//cdn.plyr.io/1.0.31/plyr.css">
-<script src="//cdn.plyr.io/1.0.31/plyr.js"></script>
+<link rel="stylesheet" href="//cdn.plyr.io/1.1.0/plyr.css">
+<script src="//cdn.plyr.io/1.1.0/plyr.js"></script>
 ```
 
-You can also access the `sprite.svg` file at `//cdn.plyr.io/1.0.31/sprite.svg`.
+You can also access the `sprite.svg` file at `//cdn.plyr.io/1.1.0/sprite.svg`.
 
 ### CSS
 If you want to use the default css, add the `plyr.css` file from /dist into your head, or even better use `plyr.less` or `plyr.sass` file included in `/src` in your build to save a request. 
@@ -169,6 +169,12 @@ You can pass the following options to the setup method.
     <td>See <a href="controls.md">controls.md</a> for more info on how the html needs to be structured.</td>
   </tr>
   <tr>
+    <td><code>controls</code></td>
+    <td>Array</td>
+    <td><code>["restart", "rewind", "play", "fast-forward", "current-time", "duration", "mute", "volume", "captions", "fullscreen"]</code></td>
+    <td>Toggle which control elements you would like to display when using the default controls html. If you specify a <code>html</code> option, this is redundant. The default value is to display everything.</td>
+  </tr>
+  <tr>
     <td><code>debug</code></td>
     <td>Boolean</td>
     <td><code>false</code></td>
@@ -202,7 +208,7 @@ You can pass the following options to the setup method.
     <td><code>displayDuration</code></td>
     <td>Boolean</td>
     <td><code>true</code></td>
-    <td>Displays the duration of the media on the "metadataloaded" event (on startup). This will only work if the `preload` attribute is not set to `none`. It is `auto` by default (if the attribute is not present).</td>
+    <td>Displays the duration of the media on the "metadataloaded" event (on startup) in the current time display. This will only work if the `preload` attribute is not set to `none` (or is not set at all) and you choose not to display the duration (see <code>controls</code> option).</td>
   </tr>
   <tr>
     <td><code>selectors</code></td>

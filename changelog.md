@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.1.0
+- Added config option to set which controls are shown (if using the default controls html) and better handling of missing controls
+
 ## v1.0.31
 - Display duration on metadataloaded
 

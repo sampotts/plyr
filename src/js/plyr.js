@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.0.31
+// plyr.js v1.1.0
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -44,6 +44,7 @@
                 played:         ".player-progress-played"
             },
             captions:           ".player-captions",
+            currentTime:        ".player-current-time",
             duration:           ".player-duration"
         },
         classes: {
@@ -79,70 +80,147 @@
             enabled:            true,
             key:                "plyr_volume"
         },
-        html: (function() {
-            return [
-                "<div class='player-controls'>",
-                    "<div class='player-progress'>",
-                        "<label for='seek{id}' class='sr-only'>Seek</label>",
-                        "<input id='seek{id}' class='player-progress-seek' type='range' min='0' max='100' step='0.5' value='0' data-player='seek'>",
-                        "<progress class='player-progress-played' max='100' value='0'>",
-                            "<span>0</span>% played",
-                        "</progress>",
-                        "<progress class='player-progress-buffer' max='100' value='0'>",
-                            "<span>0</span>% buffered",
-                        "</progress>",
-                    "</div>",
-                    "<span class='player-controls-left'>",
-                        "<button type='button' data-player='restart'>",
-                            "<svg><use xlink:href='#icon-restart'></use></svg>",
-                            "<span class='sr-only'>Restart</span>",
-                        "</button>",
-                        "<button type='button' data-player='rewind'>",
-                            "<svg><use xlink:href='#icon-rewind'></use></svg>",
-                            "<span class='sr-only'>Rewind {seektime} secs</span>",
-                        "</button>",
-                        "<button type='button' data-player='play'>",
-                            "<svg><use xlink:href='#icon-play'></use></svg>",
-                            "<span class='sr-only'>Play</span>",
-                        "</button>",
-                        "<button type='button' data-player='pause'>",
-                            "<svg><use xlink:href='#icon-pause'></use></svg>",
-                            "<span class='sr-only'>Pause</span>",
-                        "</button>",
-                        "<button type='button' data-player='fast-forward'>",
-                            "<svg><use xlink:href='#icon-fast-forward'></use></svg>",
-                            "<span class='sr-only'>Forward {seektime} secs</span>",
-                        "</button>",
-                        "<span class='player-time'>",
-                            "<span class='sr-only'>Time</span>",
-                            "<span class='player-duration'>00:00</span>",
-                        "</span>",
-                    "</span>",
-                    "<span class='player-controls-right'>",
-                        "<input class='inverted sr-only' id='mute{id}' type='checkbox' data-player='mute'>",
-                        "<label id='mute{id}' for='mute{id}'>",
-                            "<svg class='icon-muted'><use xlink:href='#icon-muted'></use></svg>",
-                            "<svg><use xlink:href='#icon-volume'></use></svg>",
-                            "<span class='sr-only'>Toggle Mute</span>",
-                        "</label>",
-                        "<label for='volume{id}' class='sr-only'>Volume</label>",
-                        "<input id='volume{id}' class='player-volume' type='range' min='0' max='10' value='5' data-player='volume'>",
-                        "<input class='sr-only' id='captions{id}' type='checkbox' data-player='captions'>",
-                        "<label for='captions{id}'>",
-                            "<svg class='icon-captions-on'><use xlink:href='#icon-captions-on'></use></svg>",
-                            "<svg><use xlink:href='#icon-captions-off'></use></svg>",
-                            "<span class='sr-only'>Toggle Captions</span>",
-                        "</label>",
-                        "<button type='button' data-player='fullscreen'>",
-                            "<svg class='icon-exit-fullscreen'><use xlink:href='#icon-exit-fullscreen'></use></svg>",
-                            "<svg><use xlink:href='#icon-enter-fullscreen'></use></svg>",
-                            "<span class='sr-only'>Toggle Fullscreen</span>",
-                        "</button>",
-                    "</span>",
-                "</div>"
-            ].join("\n");
-        })()
+        controls:               ["restart", "rewind", "play", "fast-forward", "current-time", "duration", "mute", "volume", "captions", "fullscreen"]
     };
+
+    // Build the default HTML
+    defaults.html = (function() {
+        // Open and add the progress and seek elements
+        var html = [
+        "<div class='player-controls'>",
+            "<div class='player-progress'>",
+                "<label for='seek{id}' class='sr-only'>Seek</label>",
+                "<input id='seek{id}' class='player-progress-seek' type='range' min='0' max='100' step='0.5' value='0' data-player='seek'>",
+                "<progress class='player-progress-played' max='100' value='0'>",
+                    "<span>0</span>% played",
+                "</progress>",
+                "<progress class='player-progress-buffer' max='100' value='0'>",
+                    "<span>0</span>% buffered",
+                "</progress>",
+            "</div>",
+            "<span class='player-controls-left'>"];
+
+        // Restart button
+        if(_inArray(defaults.controls, "restart")) {
+            html.push(
+                "<button type='button' data-player='restart'>",
+                    "<svg><use xlink:href='#icon-restart'></use></svg>",
+                    "<span class='sr-only'>Restart</span>",
+                "</button>"
+            );
+        }
+
+        // Rewind button
+        if(_inArray(defaults.controls, "rewind")) {
+            html.push(
+                "<button type='button' data-player='rewind'>",
+                    "<svg><use xlink:href='#icon-rewind'></use></svg>",
+                    "<span class='sr-only'>Rewind {seektime} secs</span>",
+                "</button>"
+            );
+        }
+
+        // Play/pause button
+        if(_inArray(defaults.controls, "play")) {
+            html.push(
+                "<button type='button' data-player='play'>",
+                    "<svg><use xlink:href='#icon-play'></use></svg>",
+                    "<span class='sr-only'>Play</span>",
+                "</button>",
+                "<button type='button' data-player='pause'>",
+                    "<svg><use xlink:href='#icon-pause'></use></svg>",
+                    "<span class='sr-only'>Pause</span>",
+                "</button>"
+            );
+        }
+
+        // Fast forward button
+        if(_inArray(defaults.controls, "fast-forward")) {
+            html.push(
+                "<button type='button' data-player='fast-forward'>",
+                    "<svg><use xlink:href='#icon-fast-forward'></use></svg>",
+                    "<span class='sr-only'>Forward {seektime} secs</span>",
+                "</button>"
+            );
+        }
+
+        // Media current time display
+        if(_inArray(defaults.controls, "current-time")) {
+            html.push(
+                "<span class='player-time'>",
+                    "<span class='sr-only'>Current time</span>",
+                    "<span class='player-current-time'>00:00</span>",
+                "</span>"
+            );
+        }
+
+        // Media duration display
+        if(_inArray(defaults.controls, "duration")) {
+            html.push(
+                "<span class='player-time'>",
+                    "<span class='sr-only'>Duration</span>",
+                    "<span class='player-duration'>00:00</span>",
+                "</span>"
+            );
+        }
+
+        // Close left controls
+        html.push(
+            "</span>",
+            "<span class='player-controls-right'>"
+        );
+
+        // Toggle mute button
+        if(_inArray(defaults.controls, "mute")) {
+            html.push(
+                "<input class='inverted sr-only' id='mute{id}' type='checkbox' data-player='mute'>",
+                "<label id='mute{id}' for='mute{id}'>",
+                    "<svg class='icon-muted'><use xlink:href='#icon-muted'></use></svg>",
+                    "<svg><use xlink:href='#icon-volume'></use></svg>",
+                    "<span class='sr-only'>Toggle Mute</span>",
+                "</label>"
+            );
+        }
+
+        // Volume range control
+        if(_inArray(defaults.controls, "volume")) {
+            html.push(
+                "<label for='volume{id}' class='sr-only'>Volume</label>",
+                "<input id='volume{id}' class='player-volume' type='range' min='0' max='10' value='5' data-player='volume'>"
+            );
+        }
+
+        // Toggle captions button
+        if(_inArray(defaults.controls, "captions")) {
+            html.push(
+                "<input class='sr-only' id='captions{id}' type='checkbox' data-player='captions'>",
+                "<label for='captions{id}'>",
+                    "<svg class='icon-captions-on'><use xlink:href='#icon-captions-on'></use></svg>",
+                    "<svg><use xlink:href='#icon-captions-off'></use></svg>",
+                    "<span class='sr-only'>Toggle Captions</span>",
+                "</label>"
+            );
+        }
+
+        // Toggle fullscreen button
+        if(_inArray(defaults.controls, "fullscreen")) {
+            html.push(
+                "<button type='button' data-player='fullscreen'>",
+                    "<svg class='icon-exit-fullscreen'><use xlink:href='#icon-exit-fullscreen'></use></svg>",
+                    "<svg><use xlink:href='#icon-enter-fullscreen'></use></svg>",
+                    "<span class='sr-only'>Toggle Fullscreen</span>",
+                "</button>"
+            );
+        }
+
+        // Close everything
+        html.push(
+            "</span>",
+        "</div>"
+        );
+
+        return html.join("");
+    })();
 
     // Debugging
     function _log(text, error) {
@@ -249,6 +327,11 @@
         // If we got this far, we're stuffed
         return false;
     }
+
+    // Element exists in an array
+    function _inArray(haystack, needle) {
+        return (haystack.indexOf(needle) != -1);
+    }
     
     // Replace all
     function _replaceAll(string, find, replace) {
@@ -339,12 +422,16 @@
 
     // Bind event
     function _on(element, events, callback) {
-        _toggleHandler(element, events, callback, true);
+        if(element) {
+            _toggleHandler(element, events, callback, true);
+        }
     }
 
     // Unbind event
     function _off(element, events, callback) {
-        _toggleHandler(element, events, callback, false);
+        if(element) {
+            _toggleHandler(element, events, callback, false);
+        }
     }
 
     // Trigger event
@@ -533,6 +620,11 @@
 
         // Display captions container and button (for initialization)
         function _showCaptions() {
+            // If there's no caption toggle, bail
+            if(!player.buttons.captions) {
+                return;
+            }
+
             _toggleClass(player.container, config.classes.captions.enabled, true);
 
             if (config.captions.defaultActive) {
@@ -592,18 +684,19 @@
             // Insert custom video controls
             _log("Injecting custom controls.");
 
-            // Use specified html 
-            // Need to do a default?
-            var html = config.html;
+            // If no controls are specified, bail
+            if(!config.html) {
+                return;
+            }
 
             // Replace seek time instances
-            html = _replaceAll(html, "{seektime}", config.seekTime);
+            config.html = _replaceAll(config.html, "{seektime}", config.seekTime);
 
             // Replace all id references
-            html = _replaceAll(html, "{id}", player.random);
+            config.html = _replaceAll(config.html, "{id}", player.random);
 
             // Inject into the container
-            player.container.insertAdjacentHTML("beforeend", html);
+            player.container.insertAdjacentHTML("beforeend", config.html);
 
             // Setup tooltips
             if(config.tooltips) {
@@ -645,18 +738,19 @@
                 // Progress - Buffering
                 player.progress.buffer          = {};
                 player.progress.buffer.bar      = _getElement(config.selectors.progress.buffer);
-                player.progress.buffer.text     = player.progress.buffer.bar.getElementsByTagName("span")[0];
+                player.progress.buffer.text     = player.progress.buffer.bar && player.progress.buffer.bar.getElementsByTagName("span")[0];
 
                 // Progress - Played
                 player.progress.played          = {};
                 player.progress.played.bar      = _getElement(config.selectors.progress.played);
-                player.progress.played.text     = player.progress.played.bar.getElementsByTagName("span")[0];
+                player.progress.played.text     = player.progress.played.bar && player.progress.played.bar.getElementsByTagName("span")[0];
 
                 // Volume
                 player.volume                   = _getElement(config.selectors.buttons.volume);
 
                 // Timing
                 player.duration                 = _getElement(config.selectors.duration);
+                player.currentTime              = _getElement(config.selectors.currentTime);
                 player.seekTime                 = _getElements(config.selectors.seekTime);
 
                 return true;
@@ -664,12 +758,21 @@
             catch(e) {
                 _log("It looks like there's a problem with your controls html. Bailing.", true);
 
+                // Restore native video controls
+                player.media.setAttribute("controls", "");
+
                 return false;
             }
         }
 
         // Setup aria attributes
         function _setupAria() {
+            // If there's no play button, bail
+            if(!player.buttons.play) {
+                return;
+            }
+
+            // Find the current text
             var label = player.buttons.play.innerText || "Play";
 
             // If there's a media title set, use that for the label
@@ -1018,6 +1121,11 @@
 
         // Set volume
         function _setVolume(volume) {
+            // Bail if there's no volume element
+            if(!player.volume) {
+                return;
+            }
+
             // Use default if needed
             if(typeof volume === "undefined") {
                 if(config.storage.enabled && _storage().supported) {
@@ -1070,7 +1178,8 @@
 
         // Toggle captions
         function _toggleCaptions(show) { 
-            if(!player.supported.full) {
+            // If there's no full support, or there's no caption toggle
+            if(!player.supported.full || !player.buttons.captions) {
                 return;
             }
 
@@ -1115,7 +1224,7 @@
                         value = _getPercentage(player.media.currentTime, player.media.duration);
 
                         // Set seek range value only if it's a "natural" time event
-                        if(event.type == "timeupdate") {
+                        if(event.type == "timeupdate" && player.buttons.seek) {
                             player.buttons.seek.value = value;
                         }
             
@@ -1147,12 +1256,21 @@
             }
 
             // Set values
-            progress.value = value;
-            text.innerHTML = value;
+            if(progress) {
+                progress.value = value;
+            }
+            if(text) {
+                text.innerHTML = value;
+            }
         }
 
         // Update the displayed time
-        function _updateTimeDisplay(time) {
+        function _updateTimeDisplay(time, element) {
+            // Bail if there's no duration display
+            if(!element) {
+                return;
+            }
+
             player.secs = parseInt(time % 60);
             player.mins = parseInt((time / 60) % 60);
             player.hours = parseInt(((time / 60) / 60) % 60);
@@ -1165,20 +1283,28 @@
             player.mins = ("0" + player.mins).slice(-2);
 
             // Render
-            player.duration.innerHTML = (displayHours ? player.hours + ":" : "") + player.mins + ":" + player.secs;
+            element.innerHTML = (displayHours ? player.hours + ":" : "") + player.mins + ":" + player.secs;
         }
 
         // Show the duration on metadataloaded
         function _displayDuration() {
-            if(player.media.paused) {
-                _updateTimeDisplay(player.media.duration || 0);
+            var duration = player.media.duration || 0;
+
+            // If there's only one time display, display duration there
+            if(!player.duration && config.displayDuration && player.media.paused) {
+                _updateTimeDisplay(duration, player.currentTime);
+            }
+
+            // If there's a duration element, update content
+            if(player.duration) {
+                _updateTimeDisplay(duration, player.duration);
             }
         }
 
         // Handle time change event
         function _timeUpdate(event) {
             // Duration
-            _updateTimeDisplay(player.media.currentTime);
+            _updateTimeDisplay(player.media.currentTime, player.currentTime);
 
             // Playing progress
             _updateProgress(event);
@@ -1312,9 +1438,7 @@
             _on(player.media, "timeupdate", _seekManualCaptions);
 
             // Display duration
-            if(config.displayDuration) {
-                _on(player.media, "loadedmetadata", _displayDuration);
-            }
+            _on(player.media, "loadedmetadata", _displayDuration);
 
             // Seek 
             _on(player.buttons.seek, "change input", _seek);
