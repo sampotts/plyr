@@ -1045,7 +1045,7 @@
 
             // Store the volume in storage
             if(config.storage.enabled && _storage().supported) {
-                window.localStorage.plyr_volume = volume;
+                window.localStorage.setItem(config.storage.key, volume);
             }
         }
 
