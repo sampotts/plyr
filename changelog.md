@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.1.4
+- Minor bug fixes
+
 ## v1.1.3
 - Fixes for random id used in controls with multiple instances and one call to setup
 - Audio player UI improvements

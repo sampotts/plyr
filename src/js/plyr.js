@@ -1111,6 +1111,11 @@
 
             // Set class hook
             _toggleClass(player.container, config.classes.fullscreen.active, player.isFullscreen);
+            
+            // Remove hover class because mouseleave doesn't occur
+            if (player.isFullscreen) {
+                _toggleClass(player.controls, config.classes.hover, false);
+            }
         }
 
         // Bail from faux-fullscreen 
@@ -1485,14 +1490,14 @@
             if(player.type === "video" && config.click) {
                 _on(player.videoContainer, "click", function() {
                     if(player.media.paused) {
-                        _play();
+                        _triggerEvent(player.buttons.play, "click");
                     }
                     else if(player.media.ended) {
                         _seek();
-                        _play();
+                        _triggerEvent(player.buttons.play, "click");
                     }
                     else {
-                        _pause();
+                        _triggerEvent(player.buttons.pause, "click");
                     }
                 });
             }
@@ -1501,7 +1506,7 @@
             if(config.fullscreen.hideControls) {
                 _on(player.controls, "mouseenter mouseleave", function(event) {
                     _toggleClass(player.controls, config.classes.hover, (event.type === "mouseenter"));
-                })
+                });
             }
         }
 
