@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.1.2
+- Added an onSetup callback option
+- Added fullscreen API methods toggleFullscreen() (must be user iniated), and isFullscreen()
+
 ## v1.1.1
 - Fix for unsupported browser handling
 - Fix for config.controls having no effect

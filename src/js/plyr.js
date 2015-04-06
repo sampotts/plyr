@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.1.1
+// plyr.js v1.1.2
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -80,7 +80,8 @@
             enabled:            true,
             key:                "plyr_volume"
         },
-        controls:               ["restart", "rewind", "play", "fast-forward", "current-time", "duration", "mute", "volume", "captions", "fullscreen"]
+        controls:               ["restart", "rewind", "play", "fast-forward", "current-time", "duration", "mute", "volume", "captions", "fullscreen"],
+        onSetup:                function() {}, 
     };
 
     // Build the default HTML
@@ -234,8 +235,8 @@
     function _browserSniff() {
         var nAgt = navigator.userAgent,
             name = navigator.appName,
-            fullVersion = ""+parseFloat(navigator.appVersion),
-            majorVersion = parseInt(navigator.appVersion,10),
+            fullVersion = "" + parseFloat(navigator.appVersion),
+            majorVersion = parseInt(navigator.appVersion, 10),
             nameOffset,
             verOffset,
             ix;
@@ -248,46 +249,47 @@
         // MSIE
         else if ((verOffset=nAgt.indexOf("MSIE")) !== -1) {
             name = "IE";
-            fullVersion = nAgt.substring(verOffset+5);
+            fullVersion = nAgt.substring(verOffset + 5);
         }
         // Chrome
         else if ((verOffset=nAgt.indexOf("Chrome")) !== -1) {
             name = "Chrome";
-            fullVersion = nAgt.substring(verOffset+7);
+            fullVersion = nAgt.substring(verOffset + 7);
         }
         // Safari
         else if ((verOffset=nAgt.indexOf("Safari")) !== -1) {
             name = "Safari";
-            fullVersion = nAgt.substring(verOffset+7);
+            fullVersion = nAgt.substring(verOffset + 7);
             if ((verOffset=nAgt.indexOf("Version")) !== -1) {
-                fullVersion = nAgt.substring(verOffset+8);
+                fullVersion = nAgt.substring(verOffset + 8);
             }
         }
         // Firefox
         else if ((verOffset=nAgt.indexOf("Firefox")) !== -1) {
             name = "Firefox";
-            fullVersion = nAgt.substring(verOffset+8);
+            fullVersion = nAgt.substring(verOffset + 8);
         }
         // In most other browsers, "name/version" is at the end of userAgent 
-        else if ( (nameOffset=nAgt.lastIndexOf(" ")+1) < (verOffset=nAgt.lastIndexOf("/")) ) {
+        else if ((nameOffset=nAgt.lastIndexOf(" ") + 1) < (verOffset=nAgt.lastIndexOf("/"))) {
             name = nAgt.substring(nameOffset,verOffset);
-            fullVersion = nAgt.substring(verOffset+1);
-            if (name.toLowerCase()==name.toUpperCase()) {
+            fullVersion = nAgt.substring(verOffset + 1);
+
+            if (name.toLowerCase() == name.toUpperCase()) {
                 name = navigator.appName;
             }
         }
         // Trim the fullVersion string at semicolon/space if present
-        if ((ix=fullVersion.indexOf(";")) !== -1) {
-            fullVersion=fullVersion.substring(0,ix);
+        if ((ix = fullVersion.indexOf(";")) !== -1) {
+            fullVersion = fullVersion.substring(0, ix);
         }
-        if ((ix=fullVersion.indexOf(" ")) !== -1) {
-            fullVersion=fullVersion.substring(0,ix);
+        if ((ix = fullVersion.indexOf(" ")) !== -1) {
+            fullVersion = fullVersion.substring(0, ix);
         }
         // Get major version
-        majorVersion = parseInt(""+fullVersion,10);
+        majorVersion = parseInt("" + fullVersion, 10);
         if (isNaN(majorVersion)) {
-            fullVersion = ""+parseFloat(navigator.appVersion); 
-            majorVersion = parseInt(navigator.appVersion,10);
+            fullVersion = "" + parseFloat(navigator.appVersion); 
+            majorVersion = parseInt(navigator.appVersion, 10);
         }
 
         // Return data
@@ -340,7 +342,7 @@
 
     // Wrap an element
     function _wrap(elements, wrapper) {
-        // Convert `elms` to an array, if necessary.
+        // Convert `elements` to an array, if necessary.
         if (!elements.length) {
             elements = [elements];
         } 
@@ -348,16 +350,16 @@
         // Loops backwards to prevent having to clone the wrapper on the
         // first element (see `child` below).
         for (var i = elements.length - 1; i >= 0; i--) {
-            var child = (i > 0) ? wrapper.cloneNode(true) : wrapper;
-            var el    = elements[i];
+            var child   = (i > 0) ? wrapper.cloneNode(true) : wrapper;
+            var element = elements[i];
             
             // Cache the current parent and sibling.
-            var parent  = el.parentNode;
-            var sibling = el.nextSibling;
+            var parent  = element.parentNode;
+            var sibling = element.nextSibling;
             
             // Wrap the element (is automatically removed from its current
             // parent).
-            child.appendChild(el);
+            child.appendChild(element);
             
             // If the element had a sibling, insert the wrapper before
             // the sibling to maintain the HTML structure; otherwise, just
@@ -519,7 +521,7 @@
             }
         }
 
-        // Safari doesn't support the ALLOW_KEYBOARD_INPUT flag so set it to not supported
+        // Safari doesn't support the ALLOW_KEYBOARD_INPUT flag (for security) so set it to not supported
         // https://bugs.webkit.org/show_bug.cgi?id=121496
         if(fullscreen.prefix === "webkit" && !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/)) {
              fullscreen.supportsFullScreen = false;
@@ -531,19 +533,16 @@
             // Sometimes the prefix is "ms", sometimes "MS" to keep you on your toes
             fullscreen.fullScreenEventName = (fullscreen.prefix == "ms" ? "MSFullscreenChange" : fullscreen.prefix + "fullscreenchange");
 
-            fullscreen.isFullScreen = function() {
+            fullscreen.isFullScreen = function(element) {
+                if(typeof element == "undefined") {
+                    element = document;
+                }
+
                 switch (this.prefix) {
                     case "":
-                        return document.fullScreen;
-                    case "webkit":
-                        return document.webkitIsFullScreen;
-                    case "ms":
-                        // Docs say document.msFullScreenElement returns undefined
-                        // if no element is full screem but it returns null, cheers
-                        // https://msdn.microsoft.com/en-us/library/ie/dn265028%28v=vs.85%29.aspx
-                        return (document.msFullscreenElement !== null);
+                        return document.fullscreenElement == element;
                     default:
-                        return document[this.prefix + "FullScreen"];
+                        return document[this.prefix + "FullscreenElement"] == element;
                 }
             };
             fullscreen.requestFullScreen = function(element) {
@@ -1035,7 +1034,7 @@
                 targetTime = input;
             }
             // Event
-            else if (typeof input === "object" && (input.type === "change" || input.type === "input")) {
+            else if (typeof input === "object" && (input.type === "input" || input.type === "change")) {
                 // It's the seek slider
                 // Seek to the selected time
                 targetTime = ((input.target.value / input.target.max) * player.media.duration);
@@ -1072,17 +1071,18 @@
         // Toggle fullscreen
         function _toggleFullscreen(event) {
             // Check for native support
-            var nativeSupport = fullscreen.supportsFullScreen;
+            var nativeSupport = fullscreen.supportsFullScreen,
+                container = player.container;
 
             // If it's a fullscreen change event, it's probably a native close
             if(event && event.type === fullscreen.fullScreenEventName) {
-                config.fullscreen.active = fullscreen.isFullScreen();
+                player.isFullscreen = fullscreen.isFullScreen(container);
             }
             // If there's native support, use it
             else if(nativeSupport) {
                 // Request fullscreen
-                if(!fullscreen.isFullScreen()) {
-                    fullscreen.requestFullScreen(player.container);
+                if(!fullscreen.isFullScreen(container)) {
+                    fullscreen.requestFullScreen(container);
                 }
                 // Bail from fullscreen
                 else {
@@ -1090,14 +1090,14 @@
                 }
 
                 // Check if we're actually full screen (it could fail)
-                config.fullscreen.active = fullscreen.isFullScreen();
+                player.isFullscreen = fullscreen.isFullScreen(container);
             }
             else {
                 // Otherwise, it's a simple toggle
-                config.fullscreen.active = !config.fullscreen.active;
+                player.isFullscreen = !player.isFullscreen;
 
                 // Bind/unbind escape key
-                if(config.fullscreen.active) {
+                if(player.isFullscreen) {
                     _on(document, "keyup", _handleEscapeFullscreen);
                     document.body.style.overflow = "hidden";
                 }
@@ -1108,13 +1108,13 @@
             }
 
             // Set class hook
-            _toggleClass(player.container, config.classes.fullscreen.active, config.fullscreen.active);
+            _toggleClass(container, config.classes.fullscreen.active, player.isFullscreen);
         }
 
         // Bail from faux-fullscreen 
         function _handleEscapeFullscreen(event) {
             // If it's a keypress and not escape, bail
-            if((event.which || event.charCode || event.keyCode) === 27 && config.fullscreen.active) {
+            if((event.which || event.charCode || event.keyCode) === 27 && player.isFullscreen) {
                 _toggleFullscreen();                
             }
         }
@@ -1391,6 +1391,9 @@
 
         // Listen for events
         function _listeners() {
+            // IE doesn't support input event, so we fallback to change
+            var inputEvent = (player.browser.name == "IE" ? "change" : "input");
+
             // Play
             _on(player.buttons.play, "click", function() { 
                 _play(); 
@@ -1412,9 +1415,11 @@
             // Fast forward
             _on(player.buttons.forward, "click", _forward);
 
-            // Get the HTML5 range input element and append audio volume adjustment on change/input
-            // IE10 doesn't support the "input" event so they have to wait for change
-            _on(player.volume, "change input", function() {
+            // Seek 
+            _on(player.buttons.seek, inputEvent, _seek);
+
+            // Set volume
+            _on(player.volume, inputEvent, function() {
                 _setVolume(this.value);
             });
 
@@ -1439,9 +1444,6 @@
 
             // Display duration
             _on(player.media, "loadedmetadata", _displayDuration);
-
-            // Seek 
-            _on(player.buttons.seek, "change input", _seek);
 
             // Captions
             _on(player.buttons.captions, "change", function() { 
@@ -1578,11 +1580,13 @@
             rewind:             _rewind,
             forward:            _forward,
             seek:               _seek,
+            source:             _parseSource,
+            poster:             _updatePoster,
             setVolume:          _setVolume,
             toggleMute:         _toggleMute,
             toggleCaptions:     _toggleCaptions,
-            source:             _parseSource,
-            poster:             _updatePoster,
+            toggleFullscreen:   _toggleFullscreen,
+            isFullscreen:       function() { return player.isFullscreen || false; },
             support:            function(mimeType) { return _supportMime(player, mimeType); }
         }
     }
@@ -1646,9 +1650,12 @@
 
                 // Set plyr to false if setup failed
                 element.plyr = (Object.keys(instance).length ? instance : false);
+
+                // Callback
+                config.onSetup.apply(element.plyr);
             }
 
-            // Add to return array
+            // Add to return array even if it's already setup
             players.push(element.plyr);
         }
 

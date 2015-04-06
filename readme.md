@@ -10,7 +10,7 @@ We wanted a lightweight, accessible and customisable media player that just supp
 
 ## Features
 - **Accessible** - full support for captions and screen readers.
-- **Lightweight** - just 6KB minified and gzipped.
+- **Lightweight** - just 6.4KB minified and gzipped.
 - **Customisable** - make the player look how you want with the markup you want.
 - **Semantic** - uses the *right* elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no `<span>` or `<a href="#">` button hacks.
 - **Responsive** - as you'd expect these days.
@@ -38,7 +38,7 @@ If you have any cool ideas or features, please let me know by [creating an issue
 
 Check `docs/index.html` and `docs/dist/docs.js` for an example setup. 
 
-**Heads up**, the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.1.1/plyr.js` to `https://cdn.plyr.io/1.1.1/plyr.js`
+**Heads up**, the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.1.2/plyr.js` to `https://cdn.plyr.io/1.1.2/plyr.js`
 
 ### Bower
 If bower is your thang, you can grab Plyr using:
@@ -47,15 +47,22 @@ bower install plyr
 ```
 More info on setting up dependencies can be found in the [Bower Docs](http://bower.io/docs/creating-packages/#maintaining-dependencies)
 
+### Ember
+The awesome [@louisrudner](https://twitter.com/louisrudner) has created an ember component, available by running:
+```
+ember addon:install ember-cli-plyr
+```
+More info is on [npm](https://www.npmjs.com/package/ember-cli-plyr) and [GitHub](https://github.com/louisrudner/ember-cli-plyr)
+
 ### CDN 
 If you want to use our CDN, you can use the following. HTTPS (SSL) is supported.
 
 ```html
-<link rel="stylesheet" href="//cdn.plyr.io/1.1.1/plyr.css">
-<script src="//cdn.plyr.io/1.1.1/plyr.js"></script>
+<link rel="stylesheet" href="//cdn.plyr.io/1.1.2/plyr.css">
+<script src="//cdn.plyr.io/1.1.2/plyr.js"></script>
 ```
 
-You can also access the `sprite.svg` file at `//cdn.plyr.io/1.1.1/sprite.svg`.
+You can also access the `sprite.svg` file at `//cdn.plyr.io/1.1.2/sprite.svg`.
 
 ### CSS
 If you want to use the default css, add the `plyr.css` file from /dist into your head, or even better use `plyr.less` or `plyr.sass` file included in `/src` in your build to save a request. 
@@ -130,7 +137,7 @@ You'll notice the `crossorigin` attribute on the example `<video>` and `<audio>`
 More info on CORS here:
 [https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS)
 
-###JavaScript
+### JavaScript
 Much of the behaviour of the player is configurable when initialising the library. Below is an example of a default instance.
 
 ```html
@@ -240,6 +247,12 @@ You can pass the following options to the setup method.
     <td>&mdash;</td>
     <td>Two properties; <code>enabled</code> which toggles if local storage should be enabled (if the browser supports it). The default value is `true`. This enables storing user settings, currently it only stores volume but more will be added later. The second property <code>key</code> is the key used for the local storage. The default is <code>plyr_volume</code> until more settings are stored.</td>
   </tr>
+  <tr>
+    <td><code>onSetup</code></td>
+    <td>Function</td>
+    <td>&mdash;</td>
+    <td>This callback function is called on every new plyr instance created. The context (<code>this</code>) is the plyr instance itself.</td>
+  </tr>
  </tbody>
 </table>
 
@@ -308,6 +321,16 @@ Here's a list of the methods supported:
     <td>Toggles whether captions are enabled.</td>
   </tr>
   <tr>
+    <td><code>toggleFullscreen()</code></td>
+    <td>&mdash;</td>
+    <td>Toggles fullscreen. This can only be initiated by a user gesture due to browser security, i.e. a user event such as click.</td>
+  </tr>
+  <tr>
+    <td><code>isFullscreen()</code></td>
+    <td>&mdash;</td>
+    <td>Boolean returned if the player is in fullscreen.</td>
+  </tr>
+  <tr>
     <td><code>support(...)</code></td>
     <td>String</td>
     <td>Determine if a player supports a certain MIME type.</td>
@@ -327,7 +350,7 @@ Here's a list of the methods supported:
       This will inject a child `source` element for every element in the array with the specified attributes. `src` is the only required attribute although adding `type` is recommended as it helps the browser decide which file to download and play. 
     </td>
   </tr>
-    <tr>
+  <tr>
     <td><code>poster(...)</code></td>
     <td>String</td>
     <td>Set the poster url. This is supported for the <code>video</code> element only.</td>
@@ -350,11 +373,12 @@ A complete list of events can be found here:
 [Media Events - W3.org](http://www.w3.org/2010/05/video/mediaevents.html)
 
 ## Fullscreen
+
 Fullscreen in Plyr is supported for all browsers that [currently support it](http://caniuse.com/#feat=fullscreen). If you're using the default CSS, you can also use a "full browser" mode which will use the full browser window by adding the `player-fullscreen` class to your container.
 
 ## Browser support
 
-<table width="100%" style="text-align: center;">
+<table width="100%" style="text-align: center">
   <thead>
     <tr>
       <td>Safari</td>
@@ -392,11 +416,14 @@ If a User Agent is disabled but supports `<video>` and `<audio>` natively, it wi
 
 Any unsupported browsers will display links to download the media if the correct html is used.
 
+### Checking for support
+There's an API method for checking support. You can call `plyr.supported()` and optionally pass a type to it, e.g. `plyr.supported("video")`. It will return an object with two keys; `basic` meaning there's basic support for that media type (or both if no type is passed) and `full` meaning there's full support for plyr. 
+
 ## Issues
 If you find anything weird with Plyr, please let us know using the GitHub issues tracker.
 
 ## Author
-Plyr is developed by Sam Potts ([@sam_potts](https://twitter.com/sam_potts)) ([sampotts.me](http://sampotts.me))
+Plyr is developed by [@sam_potts](https://twitter.com/sam_potts) / [sampotts.me](http://sampotts.me)
 
 ## Mentions
 - [The Changelog](http://thechangelog.com/plyr-simple-html5-media-player-custom-controls-webvtt-captions/)
