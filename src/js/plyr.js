@@ -680,22 +680,25 @@
 
         // Insert controls
         function _injectControls() {
+            // Make a copy of the html
+            var html = config.html;
+
             // Insert custom video controls
             _log("Injecting custom controls.");
 
             // If no controls are specified, create default
-            if(!config.html) {
-                config.html = _buildControls();
+            if(!html) {
+                html = _buildControls();
             }
 
             // Replace seek time instances
-            config.html = _replaceAll(config.html, "{seektime}", config.seekTime);
+            html = _replaceAll(html, "{seektime}", config.seekTime);
 
-            // Replace all id references
-            config.html = _replaceAll(config.html, "{id}", player.random);
+            // Replace all id references with random numbers
+            html = _replaceAll(html, "{id}", Math.floor(Math.random() * (10000)));
 
             // Inject into the container
-            player.container.insertAdjacentHTML("beforeend", config.html);
+            player.container.insertAdjacentHTML("beforeend", html);
 
             // Setup tooltips
             if(config.tooltips) {
@@ -1071,18 +1074,17 @@
         // Toggle fullscreen
         function _toggleFullscreen(event) {
             // Check for native support
-            var nativeSupport = fullscreen.supportsFullScreen,
-                container = player.container;
+            var nativeSupport = fullscreen.supportsFullScreen;
 
             // If it's a fullscreen change event, it's probably a native close
             if(event && event.type === fullscreen.fullScreenEventName) {
-                player.isFullscreen = fullscreen.isFullScreen(container);
+                player.isFullscreen = fullscreen.isFullScreen(player.container);
             }
             // If there's native support, use it
             else if(nativeSupport) {
                 // Request fullscreen
-                if(!fullscreen.isFullScreen(container)) {
-                    fullscreen.requestFullScreen(container);
+                if(!fullscreen.isFullScreen(player.container)) {
+                    fullscreen.requestFullScreen(player.container);
                 }
                 // Bail from fullscreen
                 else {
@@ -1090,7 +1092,7 @@
                 }
 
                 // Check if we're actually full screen (it could fail)
-                player.isFullscreen = fullscreen.isFullScreen(container);
+                player.isFullscreen = fullscreen.isFullScreen(player.container);
             }
             else {
                 // Otherwise, it's a simple toggle
@@ -1108,7 +1110,7 @@
             }
 
             // Set class hook
-            _toggleClass(container, config.classes.fullscreen.active, player.isFullscreen);
+            _toggleClass(player.container, config.classes.fullscreen.active, player.isFullscreen);
         }
 
         // Bail from faux-fullscreen 
@@ -1529,9 +1531,6 @@
 
             // Setup media
             _setupMedia();
-
-            // Generate random number for id/for attribute values for controls
-            player.random = Math.floor(Math.random() * (10000));
 
             // If there's full support
             if(player.supported.full) {

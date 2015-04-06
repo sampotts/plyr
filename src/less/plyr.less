@@ -9,6 +9,7 @@
 @gray-dark:                 #343f4a;
 @gray:                      #565d64;
 @gray-light:                #cbd0d3;
+@off-white:                 #f9fafb;
 
 // Font sizes
 @font-size-small:           14px;
@@ -525,6 +526,17 @@
     // Center buttons so it looks less odd
     &-audio.ios &-controls-left {
         float: none;
+    }
+
+    // Audio specific styles
+    // Position the progress within the container
+    &-audio .player-controls {
+        padding-top: (@control-spacing * 2);
+    }
+    &-audio .player-progress {
+        bottom: auto;
+        top: 0;
+        background: @off-white;
     }
 
     // Full screen mode

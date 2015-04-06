@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.1.3
+- Fixes for random id used in controls with multiple instances and one call to setup
+- Audio player UI improvements
+
 ## v1.1.2
 - Added an onSetup callback option
 - Added fullscreen API methods toggleFullscreen() (must be user iniated), and isFullscreen()
