@@ -322,7 +322,7 @@ Here's a list of the methods supported:
   </tr>
   <tr>
     <td><code>toggleFullscreen()</code></td>
-    <td>&mdash;</td>
+    <td>Event</td>
     <td>Toggles fullscreen. This can only be initiated by a user gesture due to browser security, i.e. a user event such as click.</td>
   </tr>
   <tr>
