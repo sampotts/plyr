@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.1.5
+- Fix for incorrect `isFullscreen()` return value in Mozilla (Fixes #38)
+
 ## v1.1.4
 - Minor bug fixes
 
@@ -9,7 +12,7 @@
 
 ## v1.1.2
 - Added an onSetup callback option
-- Added fullscreen API methods toggleFullscreen() (must be user iniated), and isFullscreen()
+- Added fullscreen API methods `toggleFullscreen()` (must be user iniated), and `isFullscreen()`
 
 ## v1.1.1
 - Fix for unsupported browser handling
@@ -19,7 +22,7 @@
 - Added config option to set which controls are shown (if using the default controls html) and better handling of missing controls
 
 ## v1.0.31
-- Display duration on metadataloaded
+- Display duration on `metadataloaded`
 
 ## v1.0.30
 - Fixed bug with media longer than 60 minutes (Fixes #69)

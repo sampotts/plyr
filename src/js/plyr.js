@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.1.2
+// plyr.js v1.1.5
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -541,6 +541,8 @@
                 switch (this.prefix) {
                     case "":
                         return document.fullscreenElement == element;
+                    case "moz":
+                        return document.mozFullScreenElement == element;
                     default:
                         return document[this.prefix + "FullscreenElement"] == element;
                 }
