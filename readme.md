@@ -143,13 +143,13 @@ Much of the behaviour of the player is configurable when initialising the librar
 ```html
 <script src="dist/plyr.js"></script>
 <script>
-plyr.setup({...});
+plyr.setup();
 </script>
 ```
 
 #### Options
 
-You can pass the following options to the setup method.
+You can pass the following options to the setup method using `plyr.setup({...})`.
 
 <table class="table" width="100%">
 <thead>
