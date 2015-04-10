@@ -138,13 +138,11 @@ More info on CORS here:
 [https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS)
 
 ### JavaScript
-Much of the behaviour of the player is configurable when initialising the library. Below is an example of a default instance.
+Much of the behaviour of the player is configurable when initialising the library. Here's an example of a default setup:
 
 ```html
 <script src="dist/plyr.js"></script>
-<script>
-plyr.setup();
-</script>
+<script>plyr.setup();</script>
 ```
 
 #### Options
