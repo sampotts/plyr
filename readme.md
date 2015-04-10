@@ -143,9 +143,7 @@ Much of the behaviour of the player is configurable when initialising the librar
 ```html
 <script src="dist/plyr.js"></script>
 <script>
-plyr.setup({
-	*options*
-});
+plyr.setup({...});
 </script>
 ```
 
