@@ -419,7 +419,7 @@ There's an API method for checking support. You can call `plyr.supported()` and 
 If you find anything weird with Plyr, please let us know using the GitHub issues tracker.
 
 ## Author
-Plyr is developed by [@sam_potts](https://twitter.com/sam_potts) / [sampotts.me](http://sampotts.me)
+Plyr is developed by [@sam_potts](https://twitter.com/sam_potts) / [sampotts.me](http://sampotts.me) with help from the awesome [contributors](https://github.com/Selz/plyr/graphs/contributors) 
 
 ## Mentions
 - [The Changelog](http://thechangelog.com/plyr-simple-html5-media-player-custom-controls-webvtt-captions/)
