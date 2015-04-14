@@ -25,11 +25,10 @@ Oh and yes, it works with Bootstrap.
 Check out [the changelog](changelog.md)
 
 ## Planned development
+- Playlists (audio and video)
+- YouTube and Vimeo support
 - Accept a string selector, a node, or a nodelist for the `container` property of `selectors`.
 - Multiple language captions (with selection)
-- Playlists (audio and video)
-- Set source by API
-- Tooltip option (for seeking and controls)
 ... and whatever else has been raised in [issues](https://github.com/Selz/plyr/issues)
 
 If you have any cool ideas or features, please let me know by [creating an issue](https://github.com/Selz/plyr/issues/new) or of course, forking and sending a pull request.
