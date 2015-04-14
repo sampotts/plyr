@@ -27,7 +27,7 @@ Check out [the changelog](changelog.md)
 ## Planned development
 - Playlists (audio and video)
 - YouTube and Vimeo support
-- Accept a string selector, a node, or a nodelist for the `container` property of `selectors`.
+- Playback speed
 - Multiple language captions (with selection)
 ... and whatever else has been raised in [issues](https://github.com/Selz/plyr/issues)
 
