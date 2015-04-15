@@ -9,6 +9,7 @@
 
 (function (api) {
     "use strict";
+    /*global YT*/
 
     // Globals
     var fullscreen, config;
@@ -50,6 +51,7 @@
         classes: {
             video:              "player-video",
             videoWrapper:       "player-video-wrapper",
+            embedWrapper:       "player-video-embed",
             audio:              "player-audio",
             stopped:            "stopped",
             playing:            "playing",
@@ -82,6 +84,9 @@
         },
         controls:               ["restart", "rewind", "play", "fast-forward", "current-time", "duration", "mute", "volume", "captions", "fullscreen"],
         onSetup:                function() {}, 
+        youtube: {
+            regex:              /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/
+        }
     };
 
     // Build the default HTML
@@ -328,6 +333,18 @@
 
         // If we got this far, we're stuffed
         return false;
+    }
+
+    // Inject a script
+    function _injectScript(source) {
+        if(document.querySelectorAll("script[src='" + source + "']").length) {
+            return;
+        }
+
+        var tag = document.createElement("script");
+        tag.src = source;
+        var firstScriptTag = document.getElementsByTagName("script")[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
     }
 
     // Element exists in an array
@@ -821,12 +838,62 @@
 
                     // Cache the container
                     player.videoContainer = wrapper;
+
+                    // YouTube
+                    var firstSource = player.media.querySelectorAll("source")[0],
+                        matches = firstSource.src.match(config.youtube.regex);
+
+                    if(firstSource.type == "video/youtube" && matches && matches[2].length == 11) {
+                        _setupYouTube(matches[2]);
+                    }
                 }
             }
 
             // Autoplay
             if(player.media.getAttribute("autoplay") !== null) {
                 _play();
+            }
+        }
+
+        // Setup YouTube
+        function _setupYouTube(id) {
+            player.embed = true; 
+
+            // Hide the <video> element
+            player.media.style.display = "none";
+
+            // Create the YouTube iframe
+            var iframe = document.createElement("iframe");
+            iframe.src = "https://www.youtube.com/embed/"+ id + "?rel=0&vq=hd720&iv_load_policy=3&controls=0&autoplay=0&showinfo=0&wmode=transparent&?enablejsapi=1";
+            iframe.id = "youtube" + Math.floor(Math.random() * (10000));
+
+            // Add embed class for responsive
+            _toggleClass(player.videoContainer, config.classes.embedWrapper, true);
+
+            // Append the iframe
+            player.videoContainer.appendChild(iframe);
+
+            // Add the API
+            _injectScript("https://www.youtube.com/iframe_api");
+
+            // Setup callback for the API
+            window.onYouTubeIframeAPIReady = function() {
+                _log("YouTube API Ready");
+                _log(iframe.id);
+                _log(id);
+
+                player.youtube = new YT.Player(iframe.id, {
+                    events: {
+                        onReady: function() {
+                            console.log("ready");
+                        },
+                        onStateChange: function(e) {
+                            console.log(e);
+                        }
+                    }
+                });
+
+                _log(player.youtube);
             }
         }
 
@@ -1558,7 +1625,9 @@
                 _setupAria();
 
                 // Captions
-                _setupCaptions();
+                if(!player.embed) {
+                    _setupCaptions();
+                }
 
                 // Set volume
                 _setVolume();
@@ -1568,17 +1637,6 @@
 
                 // Listeners
                 _listeners();
-            }
-
-            var plugins = Object.keys(api.plugins);
-
-            for (var i = plugins.length - 1; i >= 0; i--) {
-                var key = plugins[i];
-
-                _log("Setting up " + key + " plugin");
-
-                // Call setup and pass plyr instance
-                api.plugins[key].setup.apply(player);
             }
 
             // Successful setup
@@ -1678,8 +1736,5 @@
 
         return players;
     }
-
-    // Setup plugins 
-    api.plugins = {};
 
 }(this.plyr = this.plyr || {}));
