@@ -1,7 +1,7 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.0.24
-// https://github.com/sampotts/plyr
+// plyr.js v1.1.4
+// https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
 // Credits: http://paypal.github.io/accessible-html5-video-player/
@@ -21,6 +21,7 @@
         volume:                 5,
         click:                  true,
         tooltips:               false,
+        displayDuration:        true,
         selectors: {
             container:          ".player",
             controls:           ".player-controls",
@@ -43,6 +44,7 @@
                 played:         ".player-progress-played"
             },
             captions:           ".player-captions",
+            currentTime:        ".player-current-time",
             duration:           ".player-duration"
         },
         classes: {
@@ -55,13 +57,15 @@
             loading:            "loading",
             tooltip:            "player-tooltip",
             hidden:             "sr-only",
+            hover:              "hover",
             captions: {
                 enabled:        "captions-enabled",
                 active:         "captions-active"
             },
             fullscreen: {
                 enabled:        "fullscreen-enabled",
-                active:         "fullscreen-active"
+                active:         "fullscreen-active",
+                hideControls:   "fullscreen-hide-controls"
             }
         },
         captions: {
@@ -69,76 +73,155 @@
         },
         fullscreen: {
             enabled:            true,
-            fallback:           true
+            fallback:           true,
+            hideControls:       true
         },
         storage: {
             enabled:            true,
             key:                "plyr_volume"
         },
-        html: (function() {
-            return [
-                "<div class='player-controls'>",
-                    "<div class='player-progress'>",
-                        "<label for='seek{id}' class='sr-only'>Seek</label>",
-                        "<input id='seek{id}' class='player-progress-seek' type='range' min='0' max='100' step='0.5' value='0' data-player='seek'>",
-                        "<progress class='player-progress-played' max='100' value='0'>",
-                            "<span>0</span>% played",
-                        "</progress>",
-                        "<progress class='player-progress-buffer' max='100' value='0'>",
-                            "<span>0</span>% buffered",
-                        "</progress>",
-                    "</div>",
-                    "<span class='player-controls-playback'>",
-                        "<button type='button' data-player='restart'>",
-                            "<svg><use xlink:href='#icon-restart'></use></svg>",
-                            "<span class='sr-only'>Restart</span>",
-                        "</button>",
-                        "<button type='button' data-player='rewind'>",
-                            "<svg><use xlink:href='#icon-rewind'></use></svg>",
-                            "<span class='sr-only'>Rewind {seektime} secs</span>",
-                        "</button>",
-                        "<button type='button' data-player='play'>",
-                            "<svg><use xlink:href='#icon-play'></use></svg>",
-                            "<span class='sr-only'>Play</span>",
-                        "</button>",
-                        "<button type='button' data-player='pause'>",
-                            "<svg><use xlink:href='#icon-pause'></use></svg>",
-                            "<span class='sr-only'>Pause</span>",
-                        "</button>",
-                        "<button type='button' data-player='fast-forward'>",
-                            "<svg><use xlink:href='#icon-fast-forward'></use></svg>",
-                            "<span class='sr-only'>Forward {seektime} secs</span>",
-                        "</button>",
-                        "<span class='player-time'>",
-                            "<span class='sr-only'>Time</span>",
-                            "<span class='player-duration'>00:00</span>",
-                        "</span>",
-                    "</span>",
-                    "<span class='player-controls-sound'>",
-                        "<input class='inverted sr-only' id='mute{id}' type='checkbox' data-player='mute'>",
-                        "<label id='mute{id}' for='mute{id}'>",
-                            "<svg class='icon-muted'><use xlink:href='#icon-muted'></use></svg>",
-                            "<svg><use xlink:href='#icon-volume'></use></svg>",
-                            "<span class='sr-only'>Toggle Mute</span>",
-                        "</label>",
-                        "<label for='volume{id}' class='sr-only'>Volume</label>",
-                        "<input id='volume{id}' class='player-volume' type='range' min='0' max='10' value='5' data-player='volume'>",
-                        "<input class='sr-only' id='captions{id}' type='checkbox' data-player='captions'>",
-                        "<label for='captions{id}'>",
-                            "<svg class='icon-captions-on'><use xlink:href='#icon-captions-on'></use></svg>",
-                            "<svg><use xlink:href='#icon-captions-off'></use></svg>",
-                            "<span class='sr-only'>Toggle Captions</span>",
-                        "</label>",
-                        "<button type='button' data-player='fullscreen'>",
-                            "<svg class='icon-exit-fullscreen'><use xlink:href='#icon-exit-fullscreen'></use></svg>",
-                            "<svg><use xlink:href='#icon-enter-fullscreen'></use></svg>",
-                            "<span class='sr-only'>Toggle Fullscreen</span>",
-                        "</button>",
-                    "</span>",
-                "</div>"
-            ].join("\n");
-    })()
+        controls:               ["restart", "rewind", "play", "fast-forward", "current-time", "duration", "mute", "volume", "captions", "fullscreen"],
+        onSetup:                function() {}, 
     };
+
+    // Build the default HTML
+    function _buildControls() {
+        // Open and add the progress and seek elements
+        var html = [
+        "<div class='player-controls'>",
+            "<div class='player-progress'>",
+                "<label for='seek{id}' class='sr-only'>Seek</label>",
+                "<input id='seek{id}' class='player-progress-seek' type='range' min='0' max='100' step='0.5' value='0' data-player='seek'>",
+                "<progress class='player-progress-played' max='100' value='0'>",
+                    "<span>0</span>% played",
+                "</progress>",
+                "<progress class='player-progress-buffer' max='100' value='0'>",
+                    "<span>0</span>% buffered",
+                "</progress>",
+            "</div>",
+            "<span class='player-controls-left'>"];
+
+        // Restart button
+        if(_inArray(config.controls, "restart")) {
+            html.push(
+                "<button type='button' data-player='restart'>",
+                    "<svg><use xlink:href='#icon-restart'></use></svg>",
+                    "<span class='sr-only'>Restart</span>",
+                "</button>"
+            );
+        }
+
+        // Rewind button
+        if(_inArray(config.controls, "rewind")) {
+            html.push(
+                "<button type='button' data-player='rewind'>",
+                    "<svg><use xlink:href='#icon-rewind'></use></svg>",
+                    "<span class='sr-only'>Rewind {seektime} secs</span>",
+                "</button>"
+            );
+        }
+
+        // Play/pause button
+        if(_inArray(config.controls, "play")) {
+            html.push(
+                "<button type='button' data-player='play'>",
+                    "<svg><use xlink:href='#icon-play'></use></svg>",
+                    "<span class='sr-only'>Play</span>",
+                "</button>",
+                "<button type='button' data-player='pause'>",
+                    "<svg><use xlink:href='#icon-pause'></use></svg>",
+                    "<span class='sr-only'>Pause</span>",
+                "</button>"
+            );
+        }
+
+        // Fast forward button
+        if(_inArray(config.controls, "fast-forward")) {
+            html.push(
+                "<button type='button' data-player='fast-forward'>",
+                    "<svg><use xlink:href='#icon-fast-forward'></use></svg>",
+                    "<span class='sr-only'>Forward {seektime} secs</span>",
+                "</button>"
+            );
+        }
+
+        // Media current time display
+        if(_inArray(config.controls, "current-time")) {
+            html.push(
+                "<span class='player-time'>",
+                    "<span class='sr-only'>Current time</span>",
+                    "<span class='player-current-time'>00:00</span>",
+                "</span>"
+            );
+        }
+
+        // Media duration display
+        if(_inArray(config.controls, "duration")) {
+            html.push(
+                "<span class='player-time'>",
+                    "<span class='sr-only'>Duration</span>",
+                    "<span class='player-duration'>00:00</span>",
+                "</span>"
+            );
+        }
+
+        // Close left controls
+        html.push(
+            "</span>",
+            "<span class='player-controls-right'>"
+        );
+
+        // Toggle mute button
+        if(_inArray(config.controls, "mute")) {
+            html.push(
+                "<input class='inverted sr-only' id='mute{id}' type='checkbox' data-player='mute'>",
+                "<label id='mute{id}' for='mute{id}'>",
+                    "<svg class='icon-muted'><use xlink:href='#icon-muted'></use></svg>",
+                    "<svg><use xlink:href='#icon-volume'></use></svg>",
+                    "<span class='sr-only'>Toggle Mute</span>",
+                "</label>"
+            );
+        }
+
+        // Volume range control
+        if(_inArray(config.controls, "volume")) {
+            html.push(
+                "<label for='volume{id}' class='sr-only'>Volume</label>",
+                "<input id='volume{id}' class='player-volume' type='range' min='0' max='10' value='5' data-player='volume'>"
+            );
+        }
+
+        // Toggle captions button
+        if(_inArray(config.controls, "captions")) {
+            html.push(
+                "<input class='sr-only' id='captions{id}' type='checkbox' data-player='captions'>",
+                "<label for='captions{id}'>",
+                    "<svg class='icon-captions-on'><use xlink:href='#icon-captions-on'></use></svg>",
+                    "<svg><use xlink:href='#icon-captions-off'></use></svg>",
+                    "<span class='sr-only'>Toggle Captions</span>",
+                "</label>"
+            );
+        }
+
+        // Toggle fullscreen button
+        if(_inArray(config.controls, "fullscreen")) {
+            html.push(
+                "<button type='button' data-player='fullscreen'>",
+                    "<svg class='icon-exit-fullscreen'><use xlink:href='#icon-exit-fullscreen'></use></svg>",
+                    "<svg><use xlink:href='#icon-enter-fullscreen'></use></svg>",
+                    "<span class='sr-only'>Toggle Fullscreen</span>",
+                "</button>"
+            );
+        }
+
+        // Close everything
+        html.push(
+            "</span>",
+        "</div>"
+        );
+
+        return html.join("");
+    }
 
     // Debugging
     function _log(text, error) {
@@ -151,70 +234,76 @@
     // Unfortunately, due to mixed support, UA sniffing is required
     function _browserSniff() {
         var nAgt = navigator.userAgent,
-            browserName = navigator.appName,
-            fullVersion = ""+parseFloat(navigator.appVersion),
-            majorVersion = parseInt(navigator.appVersion,10),
+            name = navigator.appName,
+            fullVersion = "" + parseFloat(navigator.appVersion),
+            majorVersion = parseInt(navigator.appVersion, 10),
             nameOffset,
             verOffset,
             ix;
 
         // MSIE 11
         if ((navigator.appVersion.indexOf("Windows NT") !== -1) && (navigator.appVersion.indexOf("rv:11") !== -1)) {
-            browserName = "IE";
+            name = "IE";
             fullVersion = "11;";
         }
         // MSIE
         else if ((verOffset=nAgt.indexOf("MSIE")) !== -1) {
-            browserName = "IE";
-            fullVersion = nAgt.substring(verOffset+5);
+            name = "IE";
+            fullVersion = nAgt.substring(verOffset + 5);
         }
         // Chrome
         else if ((verOffset=nAgt.indexOf("Chrome")) !== -1) {
-            browserName = "Chrome";
-            fullVersion = nAgt.substring(verOffset+7);
+            name = "Chrome";
+            fullVersion = nAgt.substring(verOffset + 7);
         }
         // Safari
         else if ((verOffset=nAgt.indexOf("Safari")) !== -1) {
-            browserName = "Safari";
-            fullVersion = nAgt.substring(verOffset+7);
+            name = "Safari";
+            fullVersion = nAgt.substring(verOffset + 7);
             if ((verOffset=nAgt.indexOf("Version")) !== -1) {
-                fullVersion = nAgt.substring(verOffset+8);
+                fullVersion = nAgt.substring(verOffset + 8);
             }
         }
         // Firefox
         else if ((verOffset=nAgt.indexOf("Firefox")) !== -1) {
-            browserName = "Firefox";
-            fullVersion = nAgt.substring(verOffset+8);
+            name = "Firefox";
+            fullVersion = nAgt.substring(verOffset + 8);
         }
         // In most other browsers, "name/version" is at the end of userAgent 
-        else if ( (nameOffset=nAgt.lastIndexOf(" ")+1) < (verOffset=nAgt.lastIndexOf("/")) ) {
-            browserName = nAgt.substring(nameOffset,verOffset);
-            fullVersion = nAgt.substring(verOffset+1);
-            if (browserName.toLowerCase()==browserName.toUpperCase()) {
-                browserName = navigator.appName;
+        else if ((nameOffset=nAgt.lastIndexOf(" ") + 1) < (verOffset=nAgt.lastIndexOf("/"))) {
+            name = nAgt.substring(nameOffset,verOffset);
+            fullVersion = nAgt.substring(verOffset + 1);
+
+            if (name.toLowerCase() == name.toUpperCase()) {
+                name = navigator.appName;
             }
         }
         // Trim the fullVersion string at semicolon/space if present
-        if ((ix=fullVersion.indexOf(";")) !== -1) {
-            fullVersion=fullVersion.substring(0,ix);
+        if ((ix = fullVersion.indexOf(";")) !== -1) {
+            fullVersion = fullVersion.substring(0, ix);
         }
-        if ((ix=fullVersion.indexOf(" ")) !== -1) {
-            fullVersion=fullVersion.substring(0,ix);
+        if ((ix = fullVersion.indexOf(" ")) !== -1) {
+            fullVersion = fullVersion.substring(0, ix);
         }
         // Get major version
-        majorVersion = parseInt(""+fullVersion,10);
+        majorVersion = parseInt("" + fullVersion, 10);
         if (isNaN(majorVersion)) {
-            fullVersion = ""+parseFloat(navigator.appVersion); 
-            majorVersion = parseInt(navigator.appVersion,10);
+            fullVersion = "" + parseFloat(navigator.appVersion); 
+            majorVersion = parseInt(navigator.appVersion, 10);
         }
+
         // Return data
-        return [browserName, majorVersion];
+        return {
+            name:       name, 
+            version:    majorVersion, 
+            ios:        /(iPad|iPhone|iPod)/g.test(navigator.platform)
+        };
     }
 
     // Check for mime type support against a player instance
     // Credits: http://diveintohtml5.info/everything.html 
     // Related: http://www.leanbackplayer.com/test/h5mt.html
-    function _support(player, mimeType) {    
+    function _supportMime(player, mimeType) {    
         var media = player.media;
 
         // Only check video types for video players
@@ -240,6 +329,11 @@
         // If we got this far, we're stuffed
         return false;
     }
+
+    // Element exists in an array
+    function _inArray(haystack, needle) {
+        return Array.prototype.indexOf && (haystack.indexOf(needle) != -1);
+    }
     
     // Replace all
     function _replaceAll(string, find, replace) {
@@ -248,7 +342,7 @@
 
     // Wrap an element
     function _wrap(elements, wrapper) {
-        // Convert `elms` to an array, if necessary.
+        // Convert `elements` to an array, if necessary.
         if (!elements.length) {
             elements = [elements];
         } 
@@ -256,16 +350,16 @@
         // Loops backwards to prevent having to clone the wrapper on the
         // first element (see `child` below).
         for (var i = elements.length - 1; i >= 0; i--) {
-            var child = (i > 0) ? wrapper.cloneNode(true) : wrapper;
-            var el    = elements[i];
+            var child   = (i > 0) ? wrapper.cloneNode(true) : wrapper;
+            var element = elements[i];
             
             // Cache the current parent and sibling.
-            var parent  = el.parentNode;
-            var sibling = el.nextSibling;
+            var parent  = element.parentNode;
+            var sibling = element.nextSibling;
             
             // Wrap the element (is automatically removed from its current
             // parent).
-            child.appendChild(el);
+            child.appendChild(element);
             
             // If the element had a sibling, insert the wrapper before
             // the sibling to maintain the HTML structure; otherwise, just
@@ -312,6 +406,17 @@
     function _toggleHandler(element, events, callback, toggle) {
         events = events.split(" ");
 
+        // If a nodelist is passed, call itself on each node
+        if(element instanceof NodeList) {
+            for (var x = 0; x < element.length; x++) {
+                if (element[x] instanceof Node) {
+                    _toggleHandler(element[x], arguments[1], arguments[2], arguments[3]);
+                }
+            }
+            return;
+        }
+
+        // If a single node is passed, bind the event listener
         for (var i = 0; i < events.length; i++) {
             element[toggle ? "addEventListener" : "removeEventListener"](events[i], callback, false);
         }
@@ -319,12 +424,42 @@
 
     // Bind event
     function _on(element, events, callback) {
-        _toggleHandler(element, events, callback, true);
+        if(element) {
+            _toggleHandler(element, events, callback, true);
+        }
     }
 
     // Unbind event
     function _off(element, events, callback) {
-        _toggleHandler(element, events, callback, false);
+        if(element) {
+            _toggleHandler(element, events, callback, false);
+        }
+    }
+
+    // Trigger event
+    function _triggerEvent(element, event) {
+        // Create faux event
+        var fauxEvent = document.createEvent("MouseEvents");
+
+        // Set the event type
+        fauxEvent.initEvent(event, true, true);
+
+        // Dispatch the event
+        element.dispatchEvent(fauxEvent);
+    }
+
+    // Toggle checkbox
+    function _toggleCheckbox(event) {
+        // Only listen for return key
+        if(event.keyCode && event.keyCode != 13) {
+            return true;
+        }
+
+        // Toggle the checkbox
+        event.target.checked = !event.target.checked;
+
+        // Trigger change event
+        _triggerEvent(event.target, "change");
     }
 
     // Get percentage
@@ -386,7 +521,7 @@
             }
         }
 
-        // Safari doesn't support the ALLOW_KEYBOARD_INPUT flag so set it to not supported
+        // Safari doesn't support the ALLOW_KEYBOARD_INPUT flag (for security) so set it to not supported
         // https://bugs.webkit.org/show_bug.cgi?id=121496
         if(fullscreen.prefix === "webkit" && !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/)) {
              fullscreen.supportsFullScreen = false;
@@ -398,19 +533,16 @@
             // Sometimes the prefix is "ms", sometimes "MS" to keep you on your toes
             fullscreen.fullScreenEventName = (fullscreen.prefix == "ms" ? "MSFullscreenChange" : fullscreen.prefix + "fullscreenchange");
 
-            fullscreen.isFullScreen = function() {
+            fullscreen.isFullScreen = function(element) {
+                if(typeof element == "undefined") {
+                    element = document;
+                }
+
                 switch (this.prefix) {
                     case "":
-                        return document.fullScreen;
-                    case "webkit":
-                        return document.webkitIsFullScreen;
-                    case "ms":
-                        // Docs say document.msFullScreenElement returns undefined
-                        // if no element is full screem but it returns null, cheers
-                        // https://msdn.microsoft.com/en-us/library/ie/dn265028%28v=vs.85%29.aspx
-                        return (document.msFullscreenElement !== null);
+                        return document.fullscreenElement == element;
                     default:
-                        return document[this.prefix + "FullScreen"];
+                        return document[this.prefix + "FullscreenElement"] == element;
                 }
             };
             fullscreen.requestFullScreen = function(element) {
@@ -451,7 +583,7 @@
         // Seek the manual caption time and update UI
         function _seekManualCaptions(time) {
             // If it's not video, or we're using textTracks, bail.
-            if (player.usingTextTracks || player.type !== "video") {
+            if (player.usingTextTracks || player.type !== "video" || !player.supported.full) {
                 return;
             }
 
@@ -487,11 +619,16 @@
 
         // Display captions container and button (for initialization)
         function _showCaptions() {
+            // If there's no caption toggle, bail
+            if(!player.buttons.captions) {
+                return;
+            }
+
             _toggleClass(player.container, config.classes.captions.enabled, true);
 
             if (config.captions.defaultActive) {
                 _toggleClass(player.container, config.classes.captions.active, true);
-                player.buttons.captions.setAttribute("checked", "checked");
+                player.buttons.captions.checked = true;
             }
         }
 
@@ -543,18 +680,22 @@
 
         // Insert controls
         function _injectControls() {
+            // Make a copy of the html
+            var html = config.html;
+
             // Insert custom video controls
             _log("Injecting custom controls.");
 
-            // Use specified html 
-            // Need to do a default?
-            var html = config.html;
+            // If no controls are specified, create default
+            if(!html) {
+                html = _buildControls();
+            }
 
             // Replace seek time instances
             html = _replaceAll(html, "{seektime}", config.seekTime);
 
-            // Replace all id references
-            html = _replaceAll(html, "{id}", player.random);
+            // Replace all id references with random numbers
+            html = _replaceAll(html, "{id}", Math.floor(Math.random() * (10000)));
 
             // Inject into the container
             player.container.insertAdjacentHTML("beforeend", html);
@@ -585,9 +726,12 @@
                 player.buttons.restart          = _getElement(config.selectors.buttons.restart);
                 player.buttons.rewind           = _getElement(config.selectors.buttons.rewind);
                 player.buttons.forward          = _getElement(config.selectors.buttons.forward);
+                player.buttons.fullscreen       = _getElement(config.selectors.buttons.fullscreen);
+
+                // Inputs
                 player.buttons.mute             = _getElement(config.selectors.buttons.mute);
                 player.buttons.captions         = _getElement(config.selectors.buttons.captions);
-                player.buttons.fullscreen       = _getElement(config.selectors.buttons.fullscreen);
+                player.checkboxes               = _getElements("[type='checkbox']");
 
                 // Progress
                 player.progress = {};
@@ -596,30 +740,41 @@
                 // Progress - Buffering
                 player.progress.buffer          = {};
                 player.progress.buffer.bar      = _getElement(config.selectors.progress.buffer);
-                player.progress.buffer.text     = player.progress.buffer.bar.getElementsByTagName("span")[0];
+                player.progress.buffer.text     = player.progress.buffer.bar && player.progress.buffer.bar.getElementsByTagName("span")[0];
 
                 // Progress - Played
                 player.progress.played          = {};
                 player.progress.played.bar      = _getElement(config.selectors.progress.played);
-                player.progress.played.text     = player.progress.played.bar.getElementsByTagName("span")[0];
+                player.progress.played.text     = player.progress.played.bar && player.progress.played.bar.getElementsByTagName("span")[0];
 
                 // Volume
                 player.volume                   = _getElement(config.selectors.buttons.volume);
 
                 // Timing
                 player.duration                 = _getElement(config.selectors.duration);
+                player.currentTime              = _getElement(config.selectors.currentTime);
                 player.seekTime                 = _getElements(config.selectors.seekTime);
 
                 return true;
             }
             catch(e) {
                 _log("It looks like there's a problem with your controls html. Bailing.", true);
+
+                // Restore native video controls
+                player.media.setAttribute("controls", "");
+
                 return false;
             }
         }
 
         // Setup aria attributes
         function _setupAria() {
+            // If there's no play button, bail
+            if(!player.buttons.play) {
+                return;
+            }
+
+            // Find the current text
             var label = player.buttons.play.innerText || "Play";
 
             // If there's a media title set, use that for the label
@@ -632,37 +787,39 @@
 
         // Setup media
         function _setupMedia() {
-            player.media = player.container.querySelectorAll("audio, video")[0];
-
             // If there's no media, bail
             if(!player.media) {
                 _log("No audio or video element found!", true);
                 return false;
             }
 
-            // Remove native video controls
-            player.media.removeAttribute("controls");
+            if(player.supported.full) {
+                // Remove native video controls
+                player.media.removeAttribute("controls");
+        
+                // Add type class
+                _toggleClass(player.container, config.classes[player.type], true);
 
-            // Set media type
-            player.type = (player.media.tagName == "VIDEO" ? "video" : "audio");
+                // If there's no autoplay attribute, assume the video is stopped and add state class
+                _toggleClass(player.container, config.classes.stopped, (player.media.getAttribute("autoplay") === null));
+            
+                // Add iOS class
+                if(player.browser.ios) {
+                    _toggleClass(player.container, "ios", true);
+                }
 
-            // Add type class
-            _toggleClass(player.container, config.classes[player.type], true);
+                // Inject the player wrapper
+                if(player.type === "video") {
+                    // Create the wrapper div
+                    var wrapper = document.createElement("div");
+                    wrapper.setAttribute("class", config.classes.videoWrapper);
 
-            // If there's no autoplay attribute, assume the video is stopped and add state class
-            _toggleClass(player.container, config.classes.stopped, (player.media.getAttribute("autoplay") === null));
+                    // Wrap the video in a container
+                    _wrap(player.media, wrapper);
 
-            // Inject the player wrapper
-            if(player.type === "video") {
-                // Create the wrapper div
-                var wrapper = document.createElement("div");
-                wrapper.setAttribute("class", config.classes.videoWrapper);
-
-                // Wrap the video in a container
-                _wrap(player.media, wrapper);
-
-                // Cache the container
-                player.videoContainer = wrapper;
+                    // Cache the container
+                    player.videoContainer = wrapper;
+                }
             }
 
             // Autoplay
@@ -727,10 +884,10 @@
                     _showCaptions(player);
 
                     // If IE 10/11 or Firefox 31+ or Safari 7+, don"t use native captioning (still doesn"t work although they claim it"s now supported)
-                    if ((player.browserName === "IE" && player.browserMajorVersion === 10) || 
-                            (player.browserName === "IE" && player.browserMajorVersion === 11) || 
-                            (player.browserName === "Firefox" && player.browserMajorVersion >= 31) || 
-                            (player.browserName === "Safari" && player.browserMajorVersion >= 7)) {
+                    if ((player.browser.name === "IE" && player.browser.version === 10) || 
+                            (player.browser.name === "IE" && player.browser.version === 11) || 
+                            (player.browser.name === "Firefox" && player.browser.version >= 31) || 
+                            (player.browser.name === "Safari" && player.browser.version >= 7)) {
                         // Debugging
                         _log("Detected IE 10/11 or Firefox 31+ or Safari 7+.");
 
@@ -748,10 +905,12 @@
 
                             if (track.kind === "captions") {
                                 _on(track, "cuechange", function() {
-                                    if (this.activeCues[0]) {
-                                        if (this.activeCues[0].hasOwnProperty("text")) {
-                                            player.captionsContainer.innerHTML = this.activeCues[0].text;
-                                        }
+                                    // Clear container
+                                    player.captionsContainer.innerHTML = "";
+
+                                    // Display a cue, if there is one
+                                    if (this.activeCues[0] && this.activeCues[0].hasOwnProperty("text")) {
+                                        player.captionsContainer.appendChild(this.activeCues[0].getCueAsHTML());
                                     }
                                 });
                             }
@@ -802,7 +961,7 @@
                     }
 
                     // If Safari 7+, removing track from DOM [see "turn off native caption rendering" above]
-                    if (player.browserName === "Safari" && player.browserMajorVersion >= 7) {
+                    if (player.browser.name === "Safari" && player.browser.version >= 7) {
                         _log("Safari 7+ detected; removing track from DOM.");
 
                         // Find all <track> elements
@@ -831,6 +990,11 @@
                 }
                 else {
                     _log("Fullscreen not supported and fallback disabled.");
+                }
+
+                // Set control hide class hook
+                if(config.fullscreen.hideControls) {
+                    _toggleClass(player.container, config.classes.fullscreen.hideControls, true);
                 }
             }   
         }
@@ -873,7 +1037,7 @@
                 targetTime = input;
             }
             // Event
-            else if (typeof input === "object" && (input.type === "change" || input.type === "input")) {
+            else if (typeof input === "object" && (input.type === "input" || input.type === "change")) {
                 // It's the seek slider
                 // Seek to the selected time
                 targetTime = ((input.target.value / input.target.max) * player.media.duration);
@@ -888,7 +1052,11 @@
             }
 
             // Set the current time
-            player.media.currentTime = targetTime.toFixed(1);
+            // Try/catch incase the media isn't set and we're calling seek() from source() and IE moans
+            try {
+                player.media.currentTime = targetTime.toFixed(1);
+            }
+            catch(e) {}
 
             // Logging
             _log("Seeking to " + player.media.currentTime + " seconds");
@@ -910,12 +1078,12 @@
 
             // If it's a fullscreen change event, it's probably a native close
             if(event && event.type === fullscreen.fullScreenEventName) {
-                config.fullscreen.active = fullscreen.isFullScreen();
+                player.isFullscreen = fullscreen.isFullScreen(player.container);
             }
             // If there's native support, use it
             else if(nativeSupport) {
                 // Request fullscreen
-                if(!fullscreen.isFullScreen()) {
+                if(!fullscreen.isFullScreen(player.container)) {
                     fullscreen.requestFullScreen(player.container);
                 }
                 // Bail from fullscreen
@@ -924,14 +1092,14 @@
                 }
 
                 // Check if we're actually full screen (it could fail)
-                config.fullscreen.active = fullscreen.isFullScreen();
+                player.isFullscreen = fullscreen.isFullScreen(player.container);
             }
             else {
                 // Otherwise, it's a simple toggle
-                config.fullscreen.active = !config.fullscreen.active;
+                player.isFullscreen = !player.isFullscreen;
 
                 // Bind/unbind escape key
-                if(config.fullscreen.active) {
+                if(player.isFullscreen) {
                     _on(document, "keyup", _handleEscapeFullscreen);
                     document.body.style.overflow = "hidden";
                 }
@@ -942,19 +1110,29 @@
             }
 
             // Set class hook
-            _toggleClass(player.container, config.classes.fullscreen.active, config.fullscreen.active);
+            _toggleClass(player.container, config.classes.fullscreen.active, player.isFullscreen);
+            
+            // Remove hover class because mouseleave doesn't occur
+            if (player.isFullscreen) {
+                _toggleClass(player.controls, config.classes.hover, false);
+            }
         }
 
         // Bail from faux-fullscreen 
         function _handleEscapeFullscreen(event) {
             // If it's a keypress and not escape, bail
-            if((event.which || event.charCode || event.keyCode) === 27 && config.fullscreen.active) {
+            if((event.which || event.charCode || event.keyCode) === 27 && player.isFullscreen) {
                 _toggleFullscreen();                
             }
         }
 
         // Set volume
         function _setVolume(volume) {
+            // Bail if there's no volume element
+            if(!player.volume) {
+                return;
+            }
+
             // Use default if needed
             if(typeof volume === "undefined") {
                 if(config.storage.enabled && _storage().supported) {
@@ -969,42 +1147,56 @@
                 volume = 10;
             }
 
-            player.volume.value = volume;
+            // If the controls are there
+            if(player.supported.full) {
+                player.volume.value = volume;
+            }
+
+            // Set the player volume
             player.media.volume = parseFloat(volume / 10);
+
+            // Update the UI
             _checkMute();
 
             // Store the volume in storage
             if(config.storage.enabled && _storage().supported) {
-                window.localStorage.plyr_volume = volume;
+                window.localStorage.setItem(config.storage.key, volume);
             }
         }
 
         // Mute
         function _toggleMute(muted) {
             // If the method is called without parameter, toggle based on current value
-            if(typeof active === "undefined") {
+            if(typeof muted === "undefined") {
                 muted = !player.media.muted;
+            }
+
+            // If the controls are there
+            if(player.supported.full) {
                 player.buttons.mute.checked = muted;
             }
 
+            // Set mute on the player
             player.media.muted = muted;
+
+            // Update UI
             _checkMute();
         }
 
         // Toggle captions
-        function _toggleCaptions(active) { 
-            // If the method is called without parameter, toggle based on current value
-            if(typeof active === "undefined") {
-                active = (player.container.className.indexOf(config.classes.captions.active) === -1);
-                player.buttons.captions.checked = active;
+        function _toggleCaptions(show) { 
+            // If there's no full support, or there's no caption toggle
+            if(!player.supported.full || !player.buttons.captions) {
+                return;
             }
 
-            if (active) {
-                _toggleClass(player.container, config.classes.captions.active, true);
-            } 
-            else {
-                _toggleClass(player.container, config.classes.captions.active);
+            // If the method is called without parameter, toggle based on current value
+            if(typeof show === "undefined") {
+                show = (player.container.className.indexOf(config.classes.captions.active) === -1);
+                player.buttons.captions.checked = show;
             }
+
+            _toggleClass(player.container, config.classes.captions.active, show);
         }
 
         // Check mute state
@@ -1039,7 +1231,7 @@
                         value = _getPercentage(player.media.currentTime, player.media.duration);
 
                         // Set seek range value only if it's a "natural" time event
-                        if(event.type == "timeupdate") {
+                        if(event.type == "timeupdate" && player.buttons.seek) {
                             player.buttons.seek.value = value;
                         }
             
@@ -1071,27 +1263,55 @@
             }
 
             // Set values
-            progress.value = value;
-            text.innerHTML = value;
+            if(progress) {
+                progress.value = value;
+            }
+            if(text) {
+                text.innerHTML = value;
+            }
         }
 
-        // Update the displayed play time
-        function _updateTimeDisplay() {
-            player.secs = parseInt(player.media.currentTime % 60);
-            player.mins = parseInt((player.media.currentTime / 60) % 60);
+        // Update the displayed time
+        function _updateTimeDisplay(time, element) {
+            // Bail if there's no duration display
+            if(!element) {
+                return;
+            }
+
+            player.secs = parseInt(time % 60);
+            player.mins = parseInt((time / 60) % 60);
+            player.hours = parseInt(((time / 60) / 60) % 60);
+
+            // Do we need to display hours?
+            var displayHours = (parseInt(((player.media.duration / 60) / 60) % 60) > 0)
             
             // Ensure it"s two digits. For example, 03 rather than 3.
             player.secs = ("0" + player.secs).slice(-2);
             player.mins = ("0" + player.mins).slice(-2);
 
             // Render
-            player.duration.innerHTML = player.mins + ":" + player.secs;
+            element.innerHTML = (displayHours ? player.hours + ":" : "") + player.mins + ":" + player.secs;
+        }
+
+        // Show the duration on metadataloaded
+        function _displayDuration() {
+            var duration = player.media.duration || 0;
+
+            // If there's only one time display, display duration there
+            if(!player.duration && config.displayDuration && player.media.paused) {
+                _updateTimeDisplay(duration, player.currentTime);
+            }
+
+            // If there's a duration element, update content
+            if(player.duration) {
+                _updateTimeDisplay(duration, player.duration);
+            }
         }
 
         // Handle time change event
         function _timeUpdate(event) {
             // Duration
-            _updateTimeDisplay();
+            _updateTimeDisplay(player.media.currentTime, player.currentTime);
 
             // Playing progress
             _updateProgress(event);
@@ -1134,9 +1354,6 @@
             // Restart
             _seek();
 
-            // Update the UI
-            _checkPlaying();
-
             // Remove current sources
             _removeSources();
 
@@ -1155,8 +1372,13 @@
                 }
             }
 
-            // Reset time display
-            _timeUpdate();
+            if(player.supported.full) {
+                // Reset time display
+                _timeUpdate();
+
+                // Update the UI
+                _checkPlaying();
+            }
 
             // Re-load sources
             player.media.load();
@@ -1176,6 +1398,9 @@
 
         // Listen for events
         function _listeners() {
+            // IE doesn't support input event, so we fallback to change
+            var inputEvent = (player.browser.name == "IE" ? "change" : "input");
+
             // Play
             _on(player.buttons.play, "click", function() { 
                 _play(); 
@@ -1197,9 +1422,11 @@
             // Fast forward
             _on(player.buttons.forward, "click", _forward);
 
-            // Get the HTML5 range input element and append audio volume adjustment on change/input
-            // IE10 doesn't support the "input" event so they have to wait for change
-            _on(player.volume, "change input", function() {
+            // Seek 
+            _on(player.buttons.seek, inputEvent, _seek);
+
+            // Set volume
+            _on(player.volume, inputEvent, function() {
                 _setVolume(this.value);
             });
 
@@ -1212,22 +1439,8 @@
             _on(player.buttons.fullscreen, "click", _toggleFullscreen);
 
             // Handle user exiting fullscreen by escaping etc
-            _on(document, fullscreen.fullScreenEventName, _toggleFullscreen);
-
-            // Click video
-            if(player.type === "video" && config.click) {
-                _on(player.videoContainer, "click", function() {
-                    if(player.media.paused) {
-                        _play();
-                    }
-                    else if(player.media.ended) {
-                        _seek();
-                        _play();
-                    }
-                    else {
-                        _pause();
-                    }
-                });
+            if(fullscreen.supportsFullScreen) {
+                _on(document, fullscreen.fullScreenEventName, _toggleFullscreen);
             }
             
             // Time change on media
@@ -1236,19 +1449,22 @@
             // Update manual captions
             _on(player.media, "timeupdate", _seekManualCaptions);
 
-            // Seek 
-            _on(player.buttons.seek, "change input", _seek);
+            // Display duration
+            _on(player.media, "loadedmetadata", _displayDuration);
 
             // Captions
-            _on(player.buttons.captions, "click", function() { 
+            _on(player.buttons.captions, "change", function() { 
                 _toggleCaptions(this.checked);
             });
 
-            // Clear captions at end of video
+            // Handle the media finishing
             _on(player.media, "ended", function() {
+                // Clear 
                 if(player.type === "video") {
                     player.captionsContainer.innerHTML = "";
                 }
+
+                // Reset UI
                 _checkPlaying();
             });
 
@@ -1266,58 +1482,110 @@
 
             // Loading
             _on(player.media, "waiting canplay seeked", _checkLoading);
+
+            // Toggle checkboxes on return key (as they look like buttons)
+            _on(player.checkboxes, "keyup", _toggleCheckbox);
+
+            // Click video
+            if(player.type === "video" && config.click) {
+                _on(player.videoContainer, "click", function() {
+                    if(player.media.paused) {
+                        _triggerEvent(player.buttons.play, "click");
+                    }
+                    else if(player.media.ended) {
+                        _seek();
+                        _triggerEvent(player.buttons.play, "click");
+                    }
+                    else {
+                        _triggerEvent(player.buttons.pause, "click");
+                    }
+                });
+            }
+
+            // Bind to mouse hover 
+            if(config.fullscreen.hideControls) {
+                _on(player.controls, "mouseenter mouseleave", function(event) {
+                    _toggleClass(player.controls, config.classes.hover, (event.type === "mouseenter"));
+                });
+            }
         }
 
         function _init() {
             // Setup the fullscreen api 
             fullscreen = _fullscreen();
 
-            // Sniff 
-            player.browserInfo = _browserSniff();
-            player.browserName = player.browserInfo[0];
-            player.browserMajorVersion = player.browserInfo[1];
+            // Sniff out the browser
+            player.browser = _browserSniff();
 
-            // Debug info
-            _log(player.browserName + " " + player.browserMajorVersion);
+            // Get the media element
+            player.media = player.container.querySelectorAll("audio, video")[0];
 
-            // If IE8, stop customization (use fallback)
-            // If IE9, stop customization (use native controls)
-            if (player.browserName === "IE" && (player.browserMajorVersion === 8 || player.browserMajorVersion === 9) ) {
-                _log("Browser not suppported.", true);
+            // Set media type
+            player.type = player.media.tagName.toLowerCase();
+
+            // Check for full support
+            player.supported = api.supported(player.type);
+
+            // If no native support, bail
+            if(!player.supported.basic) {
                 return false;
             }
+
+            // Debug info
+            _log(player.browser.name + " " + player.browser.version);
 
             // Setup media
             _setupMedia();
 
-            // Generate random number for id/for attribute values for controls
-            player.random = Math.floor(Math.random() * (10000));
+            // If there's full support
+            if(player.supported.full) {
+                // Inject custom controls
+                _injectControls();
 
-            // Inject custom controls
-            _injectControls();
+                // Find the elements
+                if(!_findElements()) {
+                    return false;
+                }
 
-            // Find the elements
-            if(!_findElements()) {
-                return false;
+                // Display duration if available
+                if(config.displayDuration) {
+                    _displayDuration();
+                }
+
+                // Set up aria-label for Play button with the title option
+                _setupAria();
+
+                // Captions
+                _setupCaptions();
+
+                // Set volume
+                _setVolume();
+
+                // Setup fullscreen
+                _setupFullscreen();
+
+                // Listeners
+                _listeners();
             }
 
-            // Set up aria-label for Play button with the title option
-            _setupAria();
+            var plugins = Object.keys(api.plugins);
 
-            // Captions
-            _setupCaptions();
+            for (var i = plugins.length - 1; i >= 0; i--) {
+                var key = plugins[i];
 
-            // Set volume
-            _setVolume();
+                _log("Setting up " + key + " plugin");
 
-            // Setup fullscreen
-            _setupFullscreen();
+                // Call setup and pass plyr instance
+                api.plugins[key].setup.apply(player);
+            }
 
-            // Listeners
-            _listeners();
+            // Successful setup
+            return true;
         }
 
-        _init();
+        if(!_init()) {
+            return {};
+        }
 
         return {
             media:              player.media,
@@ -1327,13 +1595,47 @@
             rewind:             _rewind,
             forward:            _forward,
             seek:               _seek,
+            source:             _parseSource,
+            poster:             _updatePoster,
             setVolume:          _setVolume,
             toggleMute:         _toggleMute,
             toggleCaptions:     _toggleCaptions,
-            source:             _parseSource,
-            poster:             _updatePoster,
-            support:            function(mimeType) { return _support(player, mimeType); }
+            toggleFullscreen:   _toggleFullscreen,
+            isFullscreen:       function() { return player.isFullscreen || false; },
+            support:            function(mimeType) { return _supportMime(player, mimeType); }
         }
+    }
+
+    // Check for support 
+    api.supported = function(type) {
+        var browser = _browserSniff(),
+            oldIE   = (browser.name === "IE" && browser.version <= 9),
+            iPhone  = /iPhone|iPod/i.test(navigator.userAgent),
+            audio   = !!document.createElement("audio").canPlayType,
+            video   = !!document.createElement("video").canPlayType,
+            basic, full;
+
+        switch (type) {
+            case "video": 
+                basic = video;
+                full  = (basic && (!oldIE && !iPhone));
+                break;
+
+            case "audio": 
+                basic = audio;
+                full  = (basic && !oldIE);
+                break; 
+
+            default:
+                basic = (audio && video);
+                full  = (basic && !oldIE);
+                break;                
+        }
+
+        return {
+            basic:  basic,
+            full:   full
+        };
     }
 
     // Expose setup function
@@ -1341,36 +1643,41 @@
         // Extend the default options with user specified
         config = _extend(defaults, options);
 
-        // If enabled carry on
+        // Bail if disabled or no basic support
         // You may want to disable certain UAs etc
-        if(!config.enabled) {
+        if(!config.enabled || !api.supported().basic) {
             return false;
         }
 
         // Get the players 
-        var elements = document.querySelectorAll(config.selectors.container), players = [];
+        var elements    = document.querySelectorAll(config.selectors.container), 
+            players     = [];
 
         // Create a player instance for each element
         for (var i = elements.length - 1; i >= 0; i--) {
             // Get the current element
             var element = elements[i];
 
-            // Disabled for <video> for iPhone
-            // Since it doesn't allow customisation
-            if (element.querySelectorAll("audio, video")[0].tagName === "VIDEO" 
-                && /iPhone/i.test(navigator.userAgent)) {
-                continue;
-            }
-
             // Setup a player instance and add to the element
             if(typeof element.plyr === "undefined") { 
-                element.plyr = new Plyr(element);
+                // Create new instance
+                var instance = new Plyr(element);
+
+                // Set plyr to false if setup failed
+                element.plyr = (Object.keys(instance).length ? instance : false);
+
+                // Callback
+                config.onSetup.apply(element.plyr);
             }
 
-            // Add to return array
+            // Add to return array even if it's already setup
             players.push(element.plyr);
         }
 
         return players;
     }
+
+    // Setup plugins 
+    api.plugins = {};
+
 }(this.plyr = this.plyr || {}));
