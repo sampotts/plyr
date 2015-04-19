@@ -54,14 +54,14 @@ ember addon:install ember-cli-plyr
 More info is on [npm](https://www.npmjs.com/package/ember-cli-plyr) and [GitHub](https://github.com/louisrudner/ember-cli-plyr)
 
 ### CDN 
-If you want to use our CDN, you can use the following. HTTPS (SSL) is supported.
+If you want to use our CDN, you can use the following:
 
 ```html
-<link rel="stylesheet" href="//cdn.plyr.io/1.1.5/plyr.css">
-<script src="//cdn.plyr.io/1.1.5/plyr.js"></script>
+<link rel="stylesheet" href="https://cdn.plyr.io/1.1.5/plyr.css">
+<script src="https://cdn.plyr.io/1.1.5/plyr.js"></script>
 ```
 
-You can also access the `sprite.svg` file at `//cdn.plyr.io/1.1.5/sprite.svg`.
+You can also access the `sprite.svg` file at `https://cdn.plyr.io/1.1.5/sprite.svg`.
 
 ### CSS
 If you want to use the default css, add the `plyr.css` file from /dist into your head, or even better use `plyr.less` or `plyr.sass` file included in `/src` in your build to save a request. 
@@ -98,18 +98,16 @@ and the AJAX technique here:
 The only extra markup that's needed to use plyr is a `<div>` wrapper. Replace the source, poster and captions with urls for your media.
 ```html
 <div class="player">
-	<video poster="//cdn.selz.com/plyr/1.0/poster.jpg" controls crossorigin>
+	<video poster="https://cdn.selz.com/plyr/1.0/poster.jpg" controls crossorigin>
 		<!-- Video files -->
-		<source src="//cdn.selz.com/plyr/1.0/movie.mp4" type="video/mp4">
-		<source src="//cdn.selz.com/plyr/1.0/movie.webm" type="video/webm">
+		<source src="https://cdn.selz.com/plyr/1.0/movie.mp4" type="video/mp4">
+		<source src="https://cdn.selz.com/plyr/1.0/movie.webm" type="video/webm">
 		
 		<!-- Text track file -->
-		<track kind="captions" label="English captions" src="//cdn.selz.com/plyr/1.0/movie_captions_en.vtt" srclang="en" default>
+		<track kind="captions" label="English captions" src="https://cdn.selz.com/plyr/1.0/movie_captions_en.vtt" srclang="en" default>
 		
 		<!-- Fallback for browsers that don't support the <video> element -->
-		<div>
-			<a href="//cdn.selz.com/plyr/1.0/movie.mp4">Download</a>
-		</div>
+		<a href="https://cdn.selz.com/plyr/1.0/movie.mp4">Download</a>
 	</video>
 </div>
 ```
@@ -119,13 +117,11 @@ And the same for `<audio>`
 <div class="player">
 	<audio controls>
 		<!-- Audio files -->
-		<source src="//cdn.selz.com/plyr/1.0/logistics-96-sample.mp3" type="audio/mp3">
-    <source src="//cdn.selz.com/plyr/1.0/logistics-96-sample.ogg" type="audio/ogg">
+		<source src="https://cdn.selz.com/plyr/1.0/logistics-96-sample.mp3" type="audio/mp3">
+		<source src="https://cdn.selz.com/plyr/1.0/logistics-96-sample.ogg" type="audio/ogg">
 		
 		<!-- Fallback for browsers that don't support the <audio> element -->
-		<div>
-			<a href="//cdn.selz.com/plyr/1.0/logistics-96-sample.mp3">Download</a>
-		</div>
+		<a href="https://cdn.selz.com/plyr/1.0/logistics-96-sample.mp3">Download</a>
 	</audio>
 </div>
 ```	
