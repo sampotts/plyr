@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.1.6
+// plyr.js v1.1.7
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -1534,6 +1534,9 @@
             if(!player.init) {
                 return null;
             }
+
+            // Reset container classname
+            player.container.setAttribute("class", config.selectors.container.replace(".", ""));
 
             // Event listeners are removed when elements are removed
             // http://stackoverflow.com/questions/12528049/if-a-dom-element-is-removed-are-its-listeners-also-removed-from-memory
