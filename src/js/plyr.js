@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.1.5
+// plyr.js v1.1.6
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -366,10 +366,26 @@
             // append it to the parent.
             if (sibling) {
                 parent.insertBefore(child, sibling);
-            } else {
+            } 
+            else {
                 parent.appendChild(child);
             }
         }
+    }
+
+    // Unwrap an element
+    // http://plainjs.com/javascript/manipulation/unwrap-a-dom-element-35/
+    function _unwrap(wrapper) {
+        // Get the element's parent node
+        var parent = wrapper.parentNode;
+
+        // Move all children out of the element
+        while (wrapper.firstChild) {
+            parent.insertBefore(wrapper.firstChild, wrapper);
+        }
+
+        // Remove the empty element
+        parent.removeChild(wrapper);
     }
 
     // Remove an element
@@ -404,7 +420,7 @@
 
     // Toggle event
     function _toggleHandler(element, events, callback, toggle) {
-        events = events.split(" ");
+        var eventList = events.split(" ");
 
         // If a nodelist is passed, call itself on each node
         if(element instanceof NodeList) {
@@ -417,8 +433,8 @@
         }
 
         // If a single node is passed, bind the event listener
-        for (var i = 0; i < events.length; i++) {
-            element[toggle ? "addEventListener" : "removeEventListener"](events[i], callback, false);
+        for (var i = 0; i < eventList.length; i++) {
+            element[toggle ? "addEventListener" : "removeEventListener"](eventList[i], callback, false);
         }
     }
 
@@ -1512,7 +1528,47 @@
             }
         }
 
+        // Destroy an instance
+        function _destroy() {
+            // Bail if the element is not initialized
+            if(!player.init) {
+                return null;
+            }
+
+            // Event listeners are removed when elements are removed
+            // http://stackoverflow.com/questions/12528049/if-a-dom-element-is-removed-are-its-listeners-also-removed-from-memory
+
+            // Remove controls
+            _remove(_getElement(config.selectors.controls));
+
+            // If video, we need to remove some more
+            if(player.type === "video") {
+                // Remove captions
+                _remove(_getElement(config.selectors.captions));
+
+                // Remove video wrapper
+                _unwrap(player.videoContainer);
+            }
+
+            // Restore native video controls
+            player.media.setAttribute("controls", "");
+
+            // Clone the media element to remove listeners
+            // http://stackoverflow.com/questions/19469881/javascript-remove-all-event-listeners-of-specific-type
+            var clone = player.media.cloneNode(true);
+            player.media.parentNode.replaceChild(clone, player.media);
+
+            // Remove init flag
+            player.init = false;
+        }
+
+        // Setup a player
         function _init() {
+            // Bail if the element is initialized
+            if(player.init) {
+                return null;
+            }
+
             // Setup the fullscreen api 
             fullscreen = _fullscreen();
 
@@ -1571,10 +1627,14 @@
             }
 
             // Successful setup
-            return true;
+            player.init = true;
         }
 
-        if(!_init()) {
+        // Initialize instance 
+        _init();
+
+        // If init failed, return an empty object
+        if(!player.init) {
             return {};
         }
 
@@ -1593,7 +1653,9 @@
             toggleCaptions:     _toggleCaptions,
             toggleFullscreen:   _toggleFullscreen,
             isFullscreen:       function() { return player.isFullscreen || false; },
-            support:            function(mimeType) { return _supportMime(player, mimeType); }
+            support:            function(mimeType) { return _supportMime(player, mimeType); },
+            destroy:            _destroy,
+            restore:            _init
         }
     }
 

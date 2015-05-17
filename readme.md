@@ -37,7 +37,7 @@ If you have any cool ideas or features, please let me know by [creating an issue
 
 Check `docs/index.html` and `docs/dist/docs.js` for an example setup. 
 
-**Heads up**, the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.1.5/plyr.js` to `https://cdn.plyr.io/1.1.5/plyr.js`
+**Heads up**, the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.1.6/plyr.js` to `https://cdn.plyr.io/1.1.6/plyr.js`
 
 ### Bower
 If bower is your thang, you can grab Plyr using:
@@ -57,11 +57,11 @@ More info is on [npm](https://www.npmjs.com/package/ember-cli-plyr) and [GitHub]
 If you want to use our CDN, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/1.1.5/plyr.css">
-<script src="https://cdn.plyr.io/1.1.5/plyr.js"></script>
+<link rel="stylesheet" href="https://cdn.plyr.io/1.1.6/plyr.css">
+<script src="https://cdn.plyr.io/1.1.6/plyr.js"></script>
 ```
 
-You can also access the `sprite.svg` file at `https://cdn.plyr.io/1.1.5/sprite.svg`.
+You can also access the `sprite.svg` file at `https://cdn.plyr.io/1.1.6/sprite.svg`.
 
 ### CSS
 If you want to use the default css, add the `plyr.css` file from /dist into your head, or even better use `plyr.less` or `plyr.sass` file included in `/src` in your build to save a request. 
@@ -345,6 +345,16 @@ Here's a list of the methods supported:
     <td><code>poster(...)</code></td>
     <td>String</td>
     <td>Set the poster url. This is supported for the <code>video</code> element only.</td>
+  </tr>
+  <tr>
+    <td><code>destroy()</code></td>
+    <td>&mdash;</td>
+    <td>Destroys the plyr UI and any media event listeners, effectively restoring to the previous state before <code>setup()</code> was called.</td>
+  </tr>
+  <tr>
+    <td><code>restore()</code></td>
+    <td>&mdash;</td>
+    <td>Reverses the effects of the <code>destroy()</code> method, restoring the UI and listeners.</td>
   </tr>
  </tbody>
 </table>
