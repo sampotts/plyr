@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.1.7
+// plyr.js v1.1.8
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -1146,40 +1146,27 @@
 
         // Set volume
         function _setVolume(volume) {
-            // Bail if there's no volume element
-            if(!player.volume) {
-                return;
-            }
-
-            // Use default if needed
+            // Use default if no value specified
             if(typeof volume === "undefined") {
                 if(config.storage.enabled && _storage().supported) {
                     volume = window.localStorage[config.storage.key] || config.volume;
                 }
                 else {
                     volume = config.volume;
-                }
+                }                
             }
+
             // Maximum is 10
             if(volume > 10) {
                 volume = 10;
             }
-
-            // If the controls are there
-            if(player.supported.full) {
-                player.volume.value = volume;
+            // Minimum is 0
+            if(volume < 0) {
+                volume = 0;
             }
 
             // Set the player volume
             player.media.volume = parseFloat(volume / 10);
-
-            // Update the UI
-            _checkMute();
-
-            // Store the volume in storage
-            if(config.storage.enabled && _storage().supported) {
-                window.localStorage.setItem(config.storage.key, volume);
-            }
         }
 
         // Mute
@@ -1189,16 +1176,31 @@
                 muted = !player.media.muted;
             }
 
-            // If the controls are there
-            if(player.supported.full) {
-                player.buttons.mute.checked = muted;
-            }
-
             // Set mute on the player
             player.media.muted = muted;
+        }
 
-            // Update UI
-            _checkMute();
+        // Update volume UI and storage
+        function _updateVolume() {
+            // Get the current volume
+            var volume = player.media.muted ? 0 : (player.media.volume * 10);
+
+            // Update the <input type="range"> if present
+            if(player.supported.full && player.volume) {
+                player.volume.value = volume;
+            }
+            // Update mute button state
+            if(player.supported.full && player.buttons.mute) {
+                player.buttons.mute.checked = player.media.muted;
+            }
+
+            // Store the volume in storage
+            if(config.storage.enabled && _storage().supported) {
+                window.localStorage.setItem(config.storage.key, volume);
+            }
+
+            // Toggle class if muted
+            _toggleClass(player.container, config.classes.muted, volume === 0);
         }
 
         // Toggle captions
@@ -1215,11 +1217,6 @@
             }
 
             _toggleClass(player.container, config.classes.captions.active, show);
-        }
-
-        // Check mute state
-        function _checkMute() {
-            _toggleClass(player.container, config.classes.muted, (player.media.volume === 0 || player.media.muted));
         }
 
         // Check if media is loading
@@ -1493,7 +1490,7 @@
             _on(player.media, "playing", _updateProgress);
 
             // Handle native mute
-            _on(player.media, "volumechange", _checkMute);
+            _on(player.media, "volumechange", _updateVolume);
 
             // Handle native play/pause
             _on(player.media, "play pause", _checkPlaying);
