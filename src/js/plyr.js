@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.1.9
+// plyr.js v1.1.10
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -1156,6 +1156,8 @@
                 }                
             }
 
+            _log(volume);
+
             // Maximum is 10
             if(volume > 10) {
                 volume = 10;
@@ -1624,6 +1626,7 @@
 
                 // Set volume
                 _setVolume();
+                _updateVolume();
 
                 // Setup fullscreen
                 _setupFullscreen();

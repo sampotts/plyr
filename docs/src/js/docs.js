@@ -7,6 +7,7 @@
 // Setup the player
 plyr.setup({
 	debug: 	true,
+	volume: 9,
 	title: 	"Video demo",
 	html: 	templates.controls.render({}),
 	captions: {
