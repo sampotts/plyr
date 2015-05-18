@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.1.8
+// plyr.js v1.1.9
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -1167,6 +1167,11 @@
 
             // Set the player volume
             player.media.volume = parseFloat(volume / 10);
+
+            // Toggle muted state
+            if(player.media.muted && volume > 0) {
+                _toggleMute();
+            } 
         }
 
         // Mute
@@ -1189,10 +1194,6 @@
             if(player.supported.full && player.volume) {
                 player.volume.value = volume;
             }
-            // Update mute button state
-            if(player.supported.full && player.buttons.mute) {
-                player.buttons.mute.checked = player.media.muted;
-            }
 
             // Store the volume in storage
             if(config.storage.enabled && _storage().supported) {
@@ -1200,7 +1201,8 @@
             }
 
             // Toggle class if muted
-            _toggleClass(player.container, config.classes.muted, volume === 0);
+            _toggleClass(player.container, config.classes.muted, (volume === 0));
+            player.buttons.mute.checked = (volume === 0);
         }
 
         // Toggle captions
