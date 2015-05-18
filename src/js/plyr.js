@@ -1202,7 +1202,11 @@
 
             // Toggle class if muted
             _toggleClass(player.container, config.classes.muted, (volume === 0));
-            player.buttons.mute.checked = (volume === 0);
+            
+            // Update checkbox for mute state
+            if(player.supported.full && player.buttons.mute) {
+                player.buttons.mute.checked = (volume === 0);
+            }
         }
 
         // Toggle captions
