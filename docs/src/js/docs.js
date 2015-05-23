@@ -12,8 +12,19 @@ plyr.setup({
 	captions: {
 		defaultActive: true
 	},
-	tooltips: true
+	onSetup: function() {
+		var player 	= this,
+			type 	= player.media.tagName.toLowerCase(),
+			toggle 	= document.querySelector("[data-toggle='fullscreen']");
+
+		console.log("✓ Setup done for <" + type + ">");
+
+		if(type === "video" && toggle) {
+			toggle.addEventListener("click", player.toggleFullscreen, false);
+		}
+	}
 });
+
 
 // Google analytics 
 // For demo site (http://[www.]plyr.io) only

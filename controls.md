@@ -2,7 +2,7 @@
 
 This is the markup that is rendered for the Plyr controls. You can use the default controls or provide a customized version of markup based on your needs. 
 
-The demo Plyr setup uses a Hogan template. This purely to allow for localization at a later date. Check out `controls.html` in `/src/templates` to get an idea of how the default html is structured. Alternatively check out the `plyr.js` source.
+The demo Plyr setup uses a Hogan template. This purely to allow for localization at a later date. Check out `controls.html` in `/src/templates` to get an idea of how the default html is structured.
 
 ## Requirements
 
@@ -13,11 +13,11 @@ You need to add several placeholders to your html template that are replaced whe
 - `{id}` - the dynamically generated ID for the player (for form controls)
 - `{seektime}` - the seek time specified in options for fast forward and rewind
 
-Currently all buttons and inputs need to be present for Plyr to work but later we'll make it more dynamic so if you omit a button or input, it'll still work. 
+You can include only the controls you need when specifying custom html. 
 
-## Default
+## Example
 
-This is the default `html` option from `plyr.js`.
+This is an example `html` option with all controls.
 
 ```javascript
 ["<div class='player-controls'>",
@@ -31,7 +31,7 @@ This is the default `html` option from `plyr.js`.
             "<span>0</span>% buffered",
         "</progress>",
     "</div>",
-    "<span class='player-controls-playback'>",
+    "<span class='player-controls-left'>",
         "<button type='button' data-player='restart'>",
             "<svg><use xlink:href='#icon-restart'></use></svg>",
             "<span class='sr-only'>Restart</span>",
@@ -53,11 +53,15 @@ This is the default `html` option from `plyr.js`.
             "<span class='sr-only'>Forward {seektime} secs</span>",
         "</button>",
         "<span class='player-time'>",
-            "<span class='sr-only'>Time</span>",
+            "<span class='sr-only'>Current time</span>",
+            "<span class='player-current-time'>00:00</span>",
+        "</span>",
+        "<span class='player-time'>",
+            "<span class='sr-only'>Duration</span>",
             "<span class='player-duration'>00:00</span>",
         "</span>",
     "</span>",
-    "<span class='player-controls-sound'>",
+    "<span class='player-controls-right'>",
         "<input class='inverted sr-only' id='mute{id}' type='checkbox' data-player='mute'>",
         "<label id='mute{id}' for='mute{id}'>",
             "<svg class='icon-muted'><use xlink:href='#icon-muted'></use></svg>",

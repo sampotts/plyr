@@ -1,5 +1,50 @@
 # Changelog
 
+## v1.1.5
+- Fix for incorrect `isFullscreen()` return value in Mozilla (Fixes #38)
+
+## v1.1.4
+- Minor bug fixes
+
+## v1.1.3
+- Fixes for random id used in controls with multiple instances and one call to setup
+- Audio player UI improvements
+
+## v1.1.2
+- Added an onSetup callback option
+- Added fullscreen API methods `toggleFullscreen()` (must be user iniated), and `isFullscreen()`
+
+## v1.1.1
+- Fix for unsupported browser handling
+- Fix for config.controls having no effect
+
+## v1.1.0
+- Added config option to set which controls are shown (if using the default controls html) and better handling of missing controls
+
+## v1.0.31
+- Display duration on `metadataloaded`
+
+## v1.0.30
+- Fixed bug with media longer than 60 minutes (Fixes #69)
+
+## v1.0.29
+- Added option to hide controls on fullscreen (default `true`) while palying, after 1s. Pause, mouse hover on progress, or focus on a child control re-shows the controls. On touch a tap of the video (which plays/pauses the video by default) is required. (Fixes #47)
+- Fixed a bug with caption toggle in 1.0.28
+
+## v1.0.28
+- Added API support for browsers that don't have full plyr support (pretty much <=IE9 and `<video>` on iPhone/iPod)
+
+## v1.0.27
+- Keyboard accessibility improvements (Fixes #66)
+
+## v1.0.26
+- Fixes for SASS (cheers @brunowego)
+- Indentation reset to 4 spaces
+
+## v1.0.25
+- Fixes for iOS volume controls (hidden)
+- Classnames for left/right controls changed
+
 ## v1.0.24
 - Added tooltip option to display labels as tooltips (Fixes #50)
 
