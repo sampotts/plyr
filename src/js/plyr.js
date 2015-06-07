@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.1.10
+// plyr.js v1.1.11
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -901,13 +901,14 @@
                     // Enable UI
                     _showCaptions(player);
 
-                    // If IE 10/11 or Firefox 31+ or Safari 7+, don"t use native captioning (still doesn"t work although they claim it"s now supported)
+                    // Disable unsupported browsers than report false positive
                     if ((player.browser.name === "IE" && player.browser.version === 10) || 
                             (player.browser.name === "IE" && player.browser.version === 11) || 
                             (player.browser.name === "Firefox" && player.browser.version >= 31) || 
+                            (player.browser.name === "Chrome" && player.browser.version === 43) || 
                             (player.browser.name === "Safari" && player.browser.version >= 7)) {
                         // Debugging
-                        _log("Detected IE 10/11 or Firefox 31+ or Safari 7+.");
+                        _log("Detected unsupported browser for HTML5 captions. Using fallback.");
 
                         // Set to false so skips to "manual" captioning
                         player.usingTextTracks = false;
@@ -1025,6 +1026,22 @@
         // Pause media
         function _pause() {
             player.media.pause();
+        }
+
+        // Toggle playback
+        function _togglePlay(toggle) {
+            // Play
+            if(toggle === true) {
+                _play();
+            }
+            // Pause
+            else if(toggle === false) {
+                _pause();
+            }
+            // True toggle
+            else {
+                player.media[player.media.paused ? "play" : "pause"]();
+            }
         }
 
         // Rewind
@@ -1658,6 +1675,7 @@
             source:             _parseSource,
             poster:             _updatePoster,
             setVolume:          _setVolume,
+            togglePlay:         _togglePlay,
             toggleMute:         _toggleMute,
             toggleCaptions:     _toggleCaptions,
             toggleFullscreen:   _toggleFullscreen,

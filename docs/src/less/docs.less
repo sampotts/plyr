@@ -20,6 +20,7 @@
 // Elements
 @link-color:                @blue;
 @padding-base:              20px;
+@arrow-size:                8px;
 
 // Breakpoints
 @screen-md:                 768px;
@@ -102,6 +103,22 @@ section {
 }
 
 // Links & Buttons
+.actions {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 0;
+
+    li {
+        display: inline-block;
+        margin-top: (@padding-base / 2);
+        .font-size();
+        white-space: nowrap;
+    }
+    li + li {
+        margin-left: @padding-base;
+    }
+}
 a {
     text-decoration: none;
     color: @link-color;
@@ -119,40 +136,92 @@ a {
         border: 0;
     }
 }
-.btn {
+.btn,
+.btn-count {
     display: inline-block;
-    padding: (@padding-base / 2) (@padding-base * 1.5);
+    vertical-align: middle;
+    border-radius: 3px;
+    .font-smoothing(on);
+    font-weight: 600;
+    user-select: none;
+}
+.btn {
+    padding: (@padding-base / 2) @padding-base;
     background: @link-color;
     border: 0;
     color: #fff;
-    .font-smoothing(on);
-    font-weight: 600;
-    border-radius: 3px;
-    user-select: none;
     
     &:hover,
     &:focus {
         color: #fff;
         background: darken(@link-color, 5%);
     }
+
+    &-twitter {
+        background: #8799A2;
+
+        &:hover,
+        &:focus {
+            background: darken(#8799A2, 5%);
+        }
+    }
+}
+.btn-count {
+    position: relative;
+    margin-left: 6px;
+    padding: ((@padding-base / 2) - 1px);
+    background: #fff;
+    border: 1px solid @gray-light;
+
+    &::before {
+        content: "";
+        position: absolute;
+        display: block;
+        width: @arrow-size;
+        height: @arrow-size;
+        left: 1px;
+        top: 50%;
+        margin-top: -(@arrow-size / 2);
+
+        background: inherit;
+        border: inherit;
+        border-width: 1px 0 0 1px;
+        transform: rotate(-45deg) translate(-50%, -50%);
+    }
 }
 
-// Players
-.example-audio .player {
-    max-width: 520px;
-}
-.example-video .player {
-    max-width: 1200px;
-}
+// Example players
 .example-audio .player,
 .example-video .player {
     margin: 0 auto @padding-base;
 
+    &-controls {
+        border-radius: 0 0 4px 4px;
+    }
+}
+.example-audio .player {
+    max-width: 520px;
+
+    &-controls {
+        border-radius: 4px;
+    }
+    &-progress {
+        border-radius: 4px 4px 0 0;
+        overflow: hidden;
+    }
+}
+.example-video .player {
+    max-width: 1200px;
+
+    video {
+        border-radius: 4px 4px 0 0;
+    }
     &-fullscreen,
     &.fullscreen-active {
         max-width: none;
     }
 }
+
 
 // Footer
 footer {
