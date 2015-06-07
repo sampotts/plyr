@@ -272,5 +272,5 @@ gulp.task("open", function () {
 
 // Do everything 
 gulp.task("publish", function () {
-    run("templates", tasks.js, tasks.less, "sprite", "cdn", "docs", "open");
+    run("templates", tasks.js, tasks.less, "sprite", "cdn", "docs");
 });

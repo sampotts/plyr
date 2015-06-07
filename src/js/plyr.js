@@ -905,7 +905,7 @@
                     if ((player.browser.name === "IE" && player.browser.version === 10) || 
                             (player.browser.name === "IE" && player.browser.version === 11) || 
                             (player.browser.name === "Firefox" && player.browser.version >= 31) || 
-                            (player.browser.name === "Chrome" && player.browser.version === 43) || 
+                            (player.browser.name === "Chrome" && player.browser.version >= 43) || 
                             (player.browser.name === "Safari" && player.browser.version >= 7)) {
                         // Debugging
                         _log("Detected unsupported browser for HTML5 captions. Using fallback.");
