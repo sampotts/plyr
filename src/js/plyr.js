@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.1.11
+// plyr.js v1.1.13
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -902,11 +902,10 @@
                     _showCaptions(player);
 
                     // Disable unsupported browsers than report false positive
-                    if ((player.browser.name === "IE" && player.browser.version === 10) || 
-                            (player.browser.name === "IE" && player.browser.version === 11) || 
-                            (player.browser.name === "Firefox" && player.browser.version >= 31) || 
-                            (player.browser.name === "Chrome" && player.browser.version >= 43) || 
-                            (player.browser.name === "Safari" && player.browser.version >= 7)) {
+                    if ((player.browser.name === "IE" && player.browser.version >= 10) || 
+                        (player.browser.name === "Firefox" && player.browser.version >= 31) || 
+                        (player.browser.name === "Chrome" && player.browser.version >= 43) || 
+                        (player.browser.name === "Safari" && player.browser.version >= 7)) {
                         // Debugging
                         _log("Detected unsupported browser for HTML5 captions. Using fallback.");
 
@@ -1147,9 +1146,39 @@
             // Set class hook
             _toggleClass(player.container, config.classes.fullscreen.active, player.isFullscreen);
             
-            // Remove hover class because mouseleave doesn't occur
-            if (player.isFullscreen) {
+            // Toggle controls visibility based on mouse movement and location
+            var hoverTimer, isMouseOver = false;
+
+            // Show the player controls
+            function _showControls() {
+                // Set shown class
+                _toggleClass(player.controls, config.classes.hover, true);
+
+                // Clear timer every movement
+                window.clearTimeout(hoverTimer);
+
+                // If the mouse is not over the controls, set a timeout to hide them
+                if(!isMouseOver) {
+                    hoverTimer = window.setTimeout(function() {
+                        _toggleClass(player.controls, config.classes.hover, false);
+                    }, 2000);
+                }
+            }
+
+            // Check mouse is over the controls
+            function _setMouseOver (event) {
+                isMouseOver = (event.type === "mouseenter");
+            }
+
+            if(config.fullscreen.hideControls) {           
+                // Hide on entering full screen
                 _toggleClass(player.controls, config.classes.hover, false);
+
+                // Keep an eye on the mouse location in relation to controls
+                _toggleHandler(player.controls, "mouseenter mouseleave", _setMouseOver, player.isFullscreen);
+
+                // Show the controls on mouse move
+                _toggleHandler(player.container, "mousemove", _showControls, player.isFullscreen);
             }
         }
 
@@ -1539,13 +1568,6 @@
                     else {
                         _triggerEvent(player.buttons.pause, "click");
                     }
-                });
-            }
-
-            // Bind to mouse hover 
-            if(config.fullscreen.hideControls) {
-                _on(player.controls, "mouseenter mouseleave", function(event) {
-                    _toggleClass(player.controls, config.classes.hover, (event.type === "mouseenter"));
                 });
             }
         }
