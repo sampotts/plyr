@@ -1202,8 +1202,6 @@
                 }                
             }
 
-            _log(volume);
-
             // Maximum is 10
             if(volume > 10) {
                 volume = 10;
