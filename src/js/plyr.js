@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.1.5
+// plyr.js v1.1.13
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -383,10 +383,26 @@
             // append it to the parent.
             if (sibling) {
                 parent.insertBefore(child, sibling);
-            } else {
+            } 
+            else {
                 parent.appendChild(child);
             }
         }
+    }
+
+    // Unwrap an element
+    // http://plainjs.com/javascript/manipulation/unwrap-a-dom-element-35/
+    function _unwrap(wrapper) {
+        // Get the element's parent node
+        var parent = wrapper.parentNode;
+
+        // Move all children out of the element
+        while (wrapper.firstChild) {
+            parent.insertBefore(wrapper.firstChild, wrapper);
+        }
+
+        // Remove the empty element
+        parent.removeChild(wrapper);
     }
 
     // Remove an element
@@ -421,7 +437,7 @@
 
     // Toggle event
     function _toggleHandler(element, events, callback, toggle) {
-        events = events.split(" ");
+        var eventList = events.split(" ");
 
         // If a nodelist is passed, call itself on each node
         if(element instanceof NodeList) {
@@ -434,8 +450,8 @@
         }
 
         // If a single node is passed, bind the event listener
-        for (var i = 0; i < events.length; i++) {
-            element[toggle ? "addEventListener" : "removeEventListener"](events[i], callback, false);
+        for (var i = 0; i < eventList.length; i++) {
+            element[toggle ? "addEventListener" : "removeEventListener"](eventList[i], callback, false);
         }
     }
 
@@ -952,13 +968,13 @@
                     // Enable UI
                     _showCaptions(player);
 
-                    // If IE 10/11 or Firefox 31+ or Safari 7+, don"t use native captioning (still doesn"t work although they claim it"s now supported)
-                    if ((player.browser.name === "IE" && player.browser.version === 10) || 
-                            (player.browser.name === "IE" && player.browser.version === 11) || 
-                            (player.browser.name === "Firefox" && player.browser.version >= 31) || 
-                            (player.browser.name === "Safari" && player.browser.version >= 7)) {
+                    // Disable unsupported browsers than report false positive
+                    if ((player.browser.name === "IE" && player.browser.version >= 10) || 
+                        (player.browser.name === "Firefox" && player.browser.version >= 31) || 
+                        (player.browser.name === "Chrome" && player.browser.version >= 43) || 
+                        (player.browser.name === "Safari" && player.browser.version >= 7)) {
                         // Debugging
-                        _log("Detected IE 10/11 or Firefox 31+ or Safari 7+.");
+                        _log("Detected unsupported browser for HTML5 captions. Using fallback.");
 
                         // Set to false so skips to "manual" captioning
                         player.usingTextTracks = false;
@@ -1078,6 +1094,22 @@
             player.media.pause();
         }
 
+        // Toggle playback
+        function _togglePlay(toggle) {
+            // Play
+            if(toggle === true) {
+                _play();
+            }
+            // Pause
+            else if(toggle === false) {
+                _pause();
+            }
+            // True toggle
+            else {
+                player.media[player.media.paused ? "play" : "pause"]();
+            }
+        }
+
         // Rewind
         function _rewind(seekTime) {
             // Use default if needed
@@ -1181,9 +1213,39 @@
             // Set class hook
             _toggleClass(player.container, config.classes.fullscreen.active, player.isFullscreen);
             
-            // Remove hover class because mouseleave doesn't occur
-            if (player.isFullscreen) {
+            // Toggle controls visibility based on mouse movement and location
+            var hoverTimer, isMouseOver = false;
+
+            // Show the player controls
+            function _showControls() {
+                // Set shown class
+                _toggleClass(player.controls, config.classes.hover, true);
+
+                // Clear timer every movement
+                window.clearTimeout(hoverTimer);
+
+                // If the mouse is not over the controls, set a timeout to hide them
+                if(!isMouseOver) {
+                    hoverTimer = window.setTimeout(function() {
+                        _toggleClass(player.controls, config.classes.hover, false);
+                    }, 2000);
+                }
+            }
+
+            // Check mouse is over the controls
+            function _setMouseOver (event) {
+                isMouseOver = (event.type === "mouseenter");
+            }
+
+            if(config.fullscreen.hideControls) {           
+                // Hide on entering full screen
                 _toggleClass(player.controls, config.classes.hover, false);
+
+                // Keep an eye on the mouse location in relation to controls
+                _toggleHandler(player.controls, "mouseenter mouseleave", _setMouseOver, player.isFullscreen);
+
+                // Show the controls on mouse move
+                _toggleHandler(player.container, "mousemove", _showControls, player.isFullscreen);
             }
         }
 
@@ -1197,40 +1259,32 @@
 
         // Set volume
         function _setVolume(volume) {
-            // Bail if there's no volume element
-            if(!player.volume) {
-                return;
-            }
-
-            // Use default if needed
+            // Use default if no value specified
             if(typeof volume === "undefined") {
                 if(config.storage.enabled && _storage().supported) {
                     volume = window.localStorage[config.storage.key] || config.volume;
                 }
                 else {
                     volume = config.volume;
-                }
+                }                
             }
+
             // Maximum is 10
             if(volume > 10) {
                 volume = 10;
             }
-
-            // If the controls are there
-            if(player.supported.full) {
-                player.volume.value = volume;
+            // Minimum is 0
+            if(volume < 0) {
+                volume = 0;
             }
 
             // Set the player volume
             player.media.volume = parseFloat(volume / 10);
 
-            // Update the UI
-            _checkMute();
-
-            // Store the volume in storage
-            if(config.storage.enabled && _storage().supported) {
-                window.localStorage.setItem(config.storage.key, volume);
-            }
+            // Toggle muted state
+            if(player.media.muted && volume > 0) {
+                _toggleMute();
+            } 
         }
 
         // Mute
@@ -1240,16 +1294,32 @@
                 muted = !player.media.muted;
             }
 
-            // If the controls are there
-            if(player.supported.full) {
-                player.buttons.mute.checked = muted;
-            }
-
             // Set mute on the player
             player.media.muted = muted;
+        }
 
-            // Update UI
-            _checkMute();
+        // Update volume UI and storage
+        function _updateVolume() {
+            // Get the current volume
+            var volume = player.media.muted ? 0 : (player.media.volume * 10);
+
+            // Update the <input type="range"> if present
+            if(player.supported.full && player.volume) {
+                player.volume.value = volume;
+            }
+
+            // Store the volume in storage
+            if(config.storage.enabled && _storage().supported) {
+                window.localStorage.setItem(config.storage.key, volume);
+            }
+
+            // Toggle class if muted
+            _toggleClass(player.container, config.classes.muted, (volume === 0));
+            
+            // Update checkbox for mute state
+            if(player.supported.full && player.buttons.mute) {
+                player.buttons.mute.checked = (volume === 0);
+            }
         }
 
         // Toggle captions
@@ -1266,11 +1336,6 @@
             }
 
             _toggleClass(player.container, config.classes.captions.active, show);
-        }
-
-        // Check mute state
-        function _checkMute() {
-            _toggleClass(player.container, config.classes.muted, (player.media.volume === 0 || player.media.muted));
         }
 
         // Check if media is loading
@@ -1544,7 +1609,7 @@
             _on(player.media, "playing", _updateProgress);
 
             // Handle native mute
-            _on(player.media, "volumechange", _checkMute);
+            _on(player.media, "volumechange", _updateVolume);
 
             // Handle native play/pause
             _on(player.media, "play pause", _checkPlaying);
@@ -1570,16 +1635,52 @@
                     }
                 });
             }
-
-            // Bind to mouse hover 
-            if(config.fullscreen.hideControls) {
-                _on(player.controls, "mouseenter mouseleave", function(event) {
-                    _toggleClass(player.controls, config.classes.hover, (event.type === "mouseenter"));
-                });
-            }
         }
 
+        // Destroy an instance
+        function _destroy() {
+            // Bail if the element is not initialized
+            if(!player.init) {
+                return null;
+            }
+
+            // Reset container classname
+            player.container.setAttribute("class", config.selectors.container.replace(".", ""));
+
+            // Event listeners are removed when elements are removed
+            // http://stackoverflow.com/questions/12528049/if-a-dom-element-is-removed-are-its-listeners-also-removed-from-memory
+
+            // Remove controls
+            _remove(_getElement(config.selectors.controls));
+
+            // If video, we need to remove some more
+            if(player.type === "video") {
+                // Remove captions
+                _remove(_getElement(config.selectors.captions));
+
+                // Remove video wrapper
+                _unwrap(player.videoContainer);
+            }
+
+            // Restore native video controls
+            player.media.setAttribute("controls", "");
+
+            // Clone the media element to remove listeners
+            // http://stackoverflow.com/questions/19469881/javascript-remove-all-event-listeners-of-specific-type
+            var clone = player.media.cloneNode(true);
+            player.media.parentNode.replaceChild(clone, player.media);
+
+            // Remove init flag
+            player.init = false;
+        }
+
+        // Setup a player
         function _init() {
+            // Bail if the element is initialized
+            if(player.init) {
+                return null;
+            }
+
             // Setup the fullscreen api 
             fullscreen = _fullscreen();
 
@@ -1631,6 +1732,7 @@
 
                 // Set volume
                 _setVolume();
+                _updateVolume();
 
                 // Setup fullscreen
                 _setupFullscreen();
@@ -1640,10 +1742,14 @@
             }
 
             // Successful setup
-            return true;
+            player.init = true;
         }
 
-        if(!_init()) {
+        // Initialize instance 
+        _init();
+
+        // If init failed, return an empty object
+        if(!player.init) {
             return {};
         }
 
@@ -1658,11 +1764,14 @@
             source:             _parseSource,
             poster:             _updatePoster,
             setVolume:          _setVolume,
+            togglePlay:         _togglePlay,
             toggleMute:         _toggleMute,
             toggleCaptions:     _toggleCaptions,
             toggleFullscreen:   _toggleFullscreen,
             isFullscreen:       function() { return player.isFullscreen || false; },
-            support:            function(mimeType) { return _supportMime(player, mimeType); }
+            support:            function(mimeType) { return _supportMime(player, mimeType); },
+            destroy:            _destroy,
+            restore:            _init
         }
     }
 

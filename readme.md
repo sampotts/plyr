@@ -37,7 +37,7 @@ If you have any cool ideas or features, please let me know by [creating an issue
 
 Check `docs/index.html` and `docs/dist/docs.js` for an example setup. 
 
-**Heads up**, the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.1.5/plyr.js` to `https://cdn.plyr.io/1.1.5/plyr.js`
+**Heads up**, the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.1.13/plyr.js` to `https://cdn.plyr.io/1.1.13/plyr.js`
 
 ### Bower
 If bower is your thang, you can grab Plyr using:
@@ -54,14 +54,14 @@ ember addon:install ember-cli-plyr
 More info is on [npm](https://www.npmjs.com/package/ember-cli-plyr) and [GitHub](https://github.com/louisrudner/ember-cli-plyr)
 
 ### CDN 
-If you want to use our CDN, you can use the following. HTTPS (SSL) is supported.
+If you want to use our CDN, you can use the following:
 
 ```html
-<link rel="stylesheet" href="//cdn.plyr.io/1.1.5/plyr.css">
-<script src="//cdn.plyr.io/1.1.5/plyr.js"></script>
+<link rel="stylesheet" href="https://cdn.plyr.io/1.1.13/plyr.css">
+<script src="https://cdn.plyr.io/1.1.13/plyr.js"></script>
 ```
 
-You can also access the `sprite.svg` file at `//cdn.plyr.io/1.1.5/sprite.svg`.
+You can also access the `sprite.svg` file at `https://cdn.plyr.io/1.1.13/sprite.svg`.
 
 ### CSS
 If you want to use the default css, add the `plyr.css` file from /dist into your head, or even better use `plyr.less` or `plyr.sass` file included in `/src` in your build to save a request. 
@@ -98,18 +98,16 @@ and the AJAX technique here:
 The only extra markup that's needed to use plyr is a `<div>` wrapper. Replace the source, poster and captions with urls for your media.
 ```html
 <div class="player">
-	<video poster="//cdn.selz.com/plyr/1.0/poster.jpg" controls crossorigin>
+	<video poster="https://cdn.selz.com/plyr/1.0/poster.jpg" controls crossorigin>
 		<!-- Video files -->
-		<source src="//cdn.selz.com/plyr/1.0/movie.mp4" type="video/mp4">
-		<source src="//cdn.selz.com/plyr/1.0/movie.webm" type="video/webm">
+		<source src="https://cdn.selz.com/plyr/1.0/movie.mp4" type="video/mp4">
+		<source src="https://cdn.selz.com/plyr/1.0/movie.webm" type="video/webm">
 		
 		<!-- Text track file -->
-		<track kind="captions" label="English captions" src="//cdn.selz.com/plyr/1.0/movie_captions_en.vtt" srclang="en" default>
+		<track kind="captions" label="English captions" src="https://cdn.selz.com/plyr/1.0/movie_captions_en.vtt" srclang="en" default>
 		
 		<!-- Fallback for browsers that don't support the <video> element -->
-		<div>
-			<a href="//cdn.selz.com/plyr/1.0/movie.mp4">Download</a>
-		</div>
+		<a href="https://cdn.selz.com/plyr/1.0/movie.mp4">Download</a>
 	</video>
 </div>
 ```
@@ -119,13 +117,11 @@ And the same for `<audio>`
 <div class="player">
 	<audio controls>
 		<!-- Audio files -->
-		<source src="//cdn.selz.com/plyr/1.0/logistics-96-sample.mp3" type="audio/mp3">
-    <source src="//cdn.selz.com/plyr/1.0/logistics-96-sample.ogg" type="audio/ogg">
+		<source src="https://cdn.selz.com/plyr/1.0/logistics-96-sample.mp3" type="audio/mp3">
+		<source src="https://cdn.selz.com/plyr/1.0/logistics-96-sample.ogg" type="audio/ogg">
 		
 		<!-- Fallback for browsers that don't support the <audio> element -->
-		<div>
-			<a href="//cdn.selz.com/plyr/1.0/logistics-96-sample.mp3">Download</a>
-		</div>
+		<a href="https://cdn.selz.com/plyr/1.0/logistics-96-sample.mp3">Download</a>
 	</audio>
 </div>
 ```	
@@ -306,6 +302,11 @@ Here's a list of the methods supported:
     <td>Sets the player volume to the provided parameter. The value should be between 0 (muted) and 10 (loudest). If no parameter is provided, the default volume is used (5). Values over 10 are ignored.</td>
   </tr>
   <tr>
+    <td><code>togglePlay()</code></td>
+    <td>Boolean</td>
+    <td>Toggles playback for the player based on either the boolean argument or it's current state.</td>
+  </tr>
+  <tr>
     <td><code>toggleMute()</code></td>
     <td>&mdash;</td>
     <td>Toggles mute for the player.</td>
@@ -349,6 +350,16 @@ Here's a list of the methods supported:
     <td><code>poster(...)</code></td>
     <td>String</td>
     <td>Set the poster url. This is supported for the <code>video</code> element only.</td>
+  </tr>
+  <tr>
+    <td><code>destroy()</code></td>
+    <td>&mdash;</td>
+    <td>Destroys the plyr UI and any media event listeners, effectively restoring to the previous state before <code>setup()</code> was called.</td>
+  </tr>
+  <tr>
+    <td><code>restore()</code></td>
+    <td>&mdash;</td>
+    <td>Reverses the effects of the <code>destroy()</code> method, restoring the UI and listeners.</td>
   </tr>
  </tbody>
 </table>

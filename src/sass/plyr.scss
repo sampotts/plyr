@@ -471,7 +471,8 @@ $bp-captions-large:       768px !default; // When captions jump to the larger fo
         margin: 0 $control-spacing 0 0;
         padding: 0;
         cursor: pointer;
-        background: none;
+        background: transparent;
+        border: none;
 
         // Webkit
         &::-webkit-slider-runnable-track {
@@ -571,11 +572,8 @@ $bp-captions-large:       768px !default; // When captions jump to the larger fo
                 top: auto;
                 bottom: 90px;
 
-                @media (min-width: $bp-control-split) and (max-width: ($bp-captions-large - 1)) {
+                @media (min-width: $bp-control-split) {
                     bottom: 60px;
-                }
-                @media (min-width: $bp-captions-large) {
-                    bottom: 80px;
                 }
             }
         }
@@ -589,11 +587,10 @@ $bp-captions-large:       768px !default; // When captions jump to the larger fo
         // Hide controls when playing in full screen
         &.fullscreen-hide-controls.playing .player-controls {
             transform: translateY(100%) translateY($control-spacing / 2);
-            transition: transform .3s 1s ease;
+            transition: transform .3s .2s ease;
 
             &.hover {
                 transform: translateY(0);
-                transition-delay: 0;
             }
         }
     }
