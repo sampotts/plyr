@@ -866,19 +866,16 @@
 
         // Setup YouTube
         function _setupYouTube(id) {
-            // Create the YouTube iframe
-            var iframe = document.createElement("iframe");
-            iframe.src = "https://www.youtube.com/embed/"+ id + "?rel=0&vq=hd720&iv_load_policy=3&controls=0&autoplay=0&showinfo=0&wmode=transparent&enablejsapi=1";
-            iframe.id = "youtube" + Math.floor(Math.random() * (10000));
+            // Create the YouTube container
+            var div = document.createElement("div");
+            div.setAttribute("id", "youtube" + Math.floor(Math.random() * (10000)));
+            player.media.appendChild(div);
 
             // Add embed class for responsive
             _toggleClass(player.media, config.classes.videoWrapper, true);
             _toggleClass(player.media, config.classes.embedWrapper, true);
 
-            // Append the iframe
-            player.media.appendChild(iframe);
-
-            // Add the API
+            // Load the API
             _injectScript("https://www.youtube.com/iframe_api");
 
             // Setup callback for the API
@@ -890,9 +887,20 @@
                 player.timer = {};
 
                 // Setup instance
-                player.embed = new YT.Player(iframe.id, {
+                // https://developers.google.com/youtube/iframe_api_reference
+                player.embed = new YT.Player(div.id, {
                     videoId: id,
-                    iv_load_policy: 3,
+                    playerVars: {
+                        autoplay: 0,
+                        controls: 0,
+                        vq: "hd720",
+                        rel: 0,
+                        showinfo: 0,
+                        iv_load_policy: 3,
+                        cc_lang_pref: "en",
+                        wmode: "transparent",
+                        modestbranding: 1
+                    },
                     events: {
                         onReady: function(event) {
                             // Get the instance
@@ -919,7 +927,7 @@
                                 if(player.media.buffered === 1) {
                                     window.clearInterval(player.timer.buffering);
                                 }
-                            }, 100);
+                            }, 200);
 
                             _setupInterface();
                         },
@@ -975,8 +983,6 @@
                         }
                     }
                 });
-
-                _log(player.embed);
             }
         }
 
