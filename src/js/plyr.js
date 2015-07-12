@@ -1584,6 +1584,17 @@
         // Update source
         // Sources are not checked for support so be careful
         function _parseSource(sources) {
+            // YouTube
+            if(player.type === "youtube" && typeof sources === "string") {
+                if(sources.indexOf("http") === 0) {
+                    player.embed.loadVideoByUrl(sources);
+                }
+                else {
+                    player.embed.loadVideoById(sources);
+                }
+                return;
+            }
+
             // Pause playback (webkit freaks out)
             _pause();
 
