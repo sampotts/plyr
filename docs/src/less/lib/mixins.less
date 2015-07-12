@@ -17,7 +17,6 @@
     // Default
     outline: thin dotted @gray-dark;
     // Webkit
-    //outline: 5px auto -webkit-focus-ring-color;
     outline-offset: 1px;
 }
 
@@ -25,7 +24,7 @@
 // Leave <body> at 100%/16px
 // ---------------------------------------
 .font-size(@font-size: 16){
-    @rem: round((@font-size / 16), 1);
+    @rem: round((@font-size / 16), 3);
     font-size: (@font-size * 1px);
     font-size: ~"@{rem}rem";
 }

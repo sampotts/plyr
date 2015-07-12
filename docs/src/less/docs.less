@@ -33,12 +33,16 @@
 }
 
 // Base
+html {
+    font-size: 100%;
+}
 body {
     font-family: "Avenir", "Helvetica Neue", Helvetica, Arial, sans-serif;
     background: @off-white;
     line-height: 1.5;
     text-align: center;
     color: @gray;
+    .font-smoothing(on);
 }
 
 // Error page
@@ -142,7 +146,6 @@ a {
     display: inline-block;
     vertical-align: middle;
     border-radius: 3px;
-    .font-smoothing(on);
     font-weight: 600;
     user-select: none;
 }
@@ -214,15 +217,18 @@ a {
 .example-video .player {
     max-width: 1200px;
 
-    video {
+    video,
+    iframe {
         border-radius: 4px 4px 0 0;
+    }
+    iframe {
+        -webkit-mask-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC);
     }
     &-fullscreen,
     &.fullscreen-active {
         max-width: none;
     }
 }
-
 
 // Footer
 footer {

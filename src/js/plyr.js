@@ -49,10 +49,9 @@
             duration:           ".player-duration"
         },
         classes: {
-            video:              "player-video",
             videoWrapper:       "player-video-wrapper",
             embedWrapper:       "player-video-embed",
-            audio:              "player-audio",
+            type:               "player-{0}",
             stopped:            "stopped",
             playing:            "playing",
             muted:              "muted",
@@ -83,10 +82,7 @@
             key:                "plyr_volume"
         },
         controls:               ["restart", "rewind", "play", "fast-forward", "current-time", "duration", "mute", "volume", "captions", "fullscreen"],
-        onSetup:                function() {}, 
-        youtube: {
-            regex:              /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/
-        }
+        onSetup:                function() {}
     };
 
     // Build the default HTML
@@ -833,7 +829,7 @@
                 player.media.removeAttribute("controls");
         
                 // Add type class
-                _toggleClass(player.container, config.classes[player.type], true);
+                _toggleClass(player.container, config.classes.type.replace("{0}", player.type), true);
 
                 // If there's no autoplay attribute, assume the video is stopped and add state class
                 _toggleClass(player.container, config.classes.stopped, (player.media.getAttribute("autoplay") === null));
@@ -854,14 +850,11 @@
 
                     // Cache the container
                     player.videoContainer = wrapper;
+                }
 
-                    // YouTube
-                    var firstSource = player.media.querySelectorAll("source")[0],
-                        matches = firstSource.src.match(config.youtube.regex);
-
-                    if(firstSource.type == "video/youtube" && matches && matches[2].length == 11) {
-                        _setupYouTube(matches[2]);
-                    }
+                // YouTube
+                if(player.type == "youtube") {
+                    _setupYouTube(player.media.getAttribute("data-video-id"));
                 }
             }
 
@@ -873,21 +866,17 @@
 
         // Setup YouTube
         function _setupYouTube(id) {
-            player.embed = true; 
-
-            // Hide the <video> element
-            player.media.style.display = "none";
-
             // Create the YouTube iframe
             var iframe = document.createElement("iframe");
-            iframe.src = "https://www.youtube.com/embed/"+ id + "?rel=0&vq=hd720&iv_load_policy=3&controls=0&autoplay=0&showinfo=0&wmode=transparent&?enablejsapi=1";
+            iframe.src = "https://www.youtube.com/embed/"+ id + "?rel=0&vq=hd720&iv_load_policy=3&controls=0&autoplay=0&showinfo=0&wmode=transparent&enablejsapi=1";
             iframe.id = "youtube" + Math.floor(Math.random() * (10000));
 
             // Add embed class for responsive
-            _toggleClass(player.videoContainer, config.classes.embedWrapper, true);
+            _toggleClass(player.media, config.classes.videoWrapper, true);
+            _toggleClass(player.media, config.classes.embedWrapper, true);
 
             // Append the iframe
-            player.videoContainer.appendChild(iframe);
+            player.media.appendChild(iframe);
 
             // Add the API
             _injectScript("https://www.youtube.com/iframe_api");
@@ -895,21 +884,99 @@
             // Setup callback for the API
             window.onYouTubeIframeAPIReady = function() {
                 _log("YouTube API Ready");
-                _log(iframe.id);
-                _log(id);
 
-                player.youtube = new YT.Player(iframe.id, {
+                // Setup timers object
+                // We have to poll YouTube for updates
+                player.timer = {};
+
+                // Setup instance
+                player.embed = new YT.Player(iframe.id, {
+                    videoId: id,
+                    iv_load_policy: 3,
                     events: {
-                        onReady: function() {
-                            console.log("ready");
+                        onReady: function(event) {
+                            // Get the instance
+                            var instance = event.target;
+
+                            // Create a faux HTML5 API using the YouTube API
+                            player.media.play = function() { instance.playVideo(); };
+                            player.media.pause = function() { instance.pauseVideo(); };
+                            player.media.stop = function() { instance.stopVideo(); };
+                            player.media.duration = instance.getDuration();
+                            player.media.paused = (instance.getPlayerState() == 2);
+                            player.media.currentTime = instance.getCurrentTime();
+                            player.media.muted = instance.isMuted();
+
+                            // Setup buffering
+                            player.timer.buffering = window.setInterval(function() { 
+                                // Get loaded % from YouTube
+                                player.media.buffered = instance.getVideoLoadedFraction();
+                                
+                                // Trigger timeupdate
+                                _triggerEvent(player.media, "progress");
+
+                                // Bail if we're at 100%
+                                if(player.media.buffered === 1) {
+                                    window.clearInterval(player.timer.buffering);
+                                }
+                            }, 100);
+
+                            _setupInterface();
                         },
-                        onStateChange: function(e) {
-                            console.log(e);
+                        onStateChange: function(event) {
+                            // Get the instance
+                            var instance = event.target;
+
+                            // Reset timer
+                            window.clearInterval(player.timer.playing);
+
+                            // Handle event
+                            switch(event.data) {
+                                // Unstarted
+                                case -1: 
+                                    break;
+
+                                // Ended
+                                case 0: 
+                                    player.media.paused = true;
+                                    _triggerEvent(player.media, "ended");
+                                    break;
+
+                                // Playing
+                                case 1:
+                                    player.media.paused = false;
+                                    _triggerEvent(player.media, "play");
+
+                                    // Poll to get playback progress
+                                    player.timer.playing = window.setInterval(function() {
+                                        // Set the current time
+                                        player.media.currentTime = instance.getCurrentTime();
+
+                                        // Trigger timeupdate
+                                        _triggerEvent(player.media, "timeupdate");
+                                    }, 200);
+
+                                    break;
+
+                                // Paused
+                                case 2:
+                                    player.media.paused = true;
+                                    _triggerEvent(player.media, "pause");
+                                    break;
+
+                                // Buffering 
+                                case 3:
+                                    break;
+
+                                // Video cued
+                                case 5:
+                                    break;
+                            }
                         }
                     }
                 });
 
-                _log(player.youtube);
+                _log(player.embed);
             }
         }
 
@@ -1063,7 +1130,7 @@
 
         // Setup fullscreen
         function _setupFullscreen() {
-            if(player.type === "video" && config.fullscreen.enabled) {
+            if(player.type != "audio" && config.fullscreen.enabled) {
                 // Check for native support
                 var nativeSupport = fullscreen.supportsFullScreen;
 
@@ -1158,6 +1225,14 @@
                 player.media.currentTime = targetTime.toFixed(1);
             }
             catch(e) {}
+
+            // YouTube
+            if(player.type == "youtube") {
+                player.embed.seekTo(player.media.currentTime);
+
+                // Trigger timeupdate
+                _triggerEvent(player.media, "timeupdate");
+            }
 
             // Logging
             _log("Seeking to " + player.media.currentTime + " seconds");
@@ -1281,6 +1356,14 @@
             // Set the player volume
             player.media.volume = parseFloat(volume / 10);
 
+            // YouTube
+            if(player.type == "youtube") {
+                player.embed.setVolume(player.media.volume * 100);
+
+                // Trigger timeupdate
+                _triggerEvent(player.media, "volumechange");
+            }
+
             // Toggle muted state
             if(player.media.muted && volume > 0) {
                 _toggleMute();
@@ -1296,6 +1379,14 @@
 
             // Set mute on the player
             player.media.muted = muted;
+
+            // YouTube
+            if(player.type === "youtube") {
+                player.embed[player.media.muted ? "mute" : "unMute"]();
+
+                // Trigger timeupdate
+                _triggerEvent(player.media, "volumechange");
+            }
         }
 
         // Update volume UI and storage
@@ -1386,8 +1477,13 @@
                         value       = (function() { 
                                         var buffered = player.media.buffered;
 
-                                        if(buffered.length) {
+                                        // HTML5
+                                        if(buffered && buffered.length) {
                                             return _getPercentage(buffered.end(0), player.media.duration);
+                                        }
+                                        // YouTube returns between 0 and 1
+                                        else if(typeof buffered == "number") {
+                                            return (buffered * 100);
                                         }
 
                                         return 0;                                   
@@ -1603,10 +1699,7 @@
             });
 
             // Check for buffer progress
-            _on(player.media, "progress", _updateProgress);
-
-            // Also check on start of playing
-            _on(player.media, "playing", _updateProgress);
+            _on(player.media, "progress playing", _updateProgress);
 
             // Handle native mute
             _on(player.media, "volumechange", _updateVolume);
@@ -1688,11 +1781,20 @@
             player.browser = _browserSniff();
 
             // Get the media element
-            player.media = player.container.querySelectorAll("audio, video")[0];
+            player.media = player.container.querySelectorAll("audio, video, div")[0];
 
             // Set media type
-            player.type = player.media.tagName.toLowerCase();
+            var tagName = player.media.tagName.toLowerCase();
+            switch(tagName) {
+                case "div":
+                    player.type = player.media.getAttribute("data-type");
+                    break;
 
+                default:
+                    player.type = tagName;
+                    break;
+            }
+        
             // Check for full support
             player.supported = api.supported(player.type);
 
@@ -1707,6 +1809,16 @@
             // Setup media
             _setupMedia();
 
+            // Setup interface
+            if(player.type == "video" || player.type == "audio") {
+                _setupInterface();
+            }
+
+            // Successful setup
+            player.init = true;
+        }
+
+        function _setupInterface() {
             // If there's full support
             if(player.supported.full) {
                 // Inject custom controls
@@ -1726,9 +1838,7 @@
                 _setupAria();
 
                 // Captions
-                if(!player.embed) {
-                    _setupCaptions();
-                }
+                _setupCaptions();
 
                 // Set volume
                 _setVolume();
@@ -1740,9 +1850,6 @@
                 // Listeners
                 _listeners();
             }
-
-            // Successful setup
-            player.init = true;
         }
 
         // Initialize instance 
