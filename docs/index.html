@@ -11,7 +11,7 @@
         <link rel="stylesheet" href="https://cdn.plyr.io/1.2.0/plyr.css?1">
 
         <!-- Docs styles -->
-        <link rel="stylesheet" href="https://cdn.plyr.io/1.2.0/docs.css?2">
+        <link rel="stylesheet" href="https://cdn.plyr.io/1.2.0/docs.css?3">
     </head>
     <body>
         <header>
@@ -92,7 +92,7 @@
                 a.send();
                 a.onload = function(){
                     var c = d.createElement("div");
-                    c.style.display="none";
+                    c.setAttribute("hidden", "");
                     c.innerHTML = a.responseText;
                     b.insertBefore(c, b.childNodes[0]);
                 }

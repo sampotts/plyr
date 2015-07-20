@@ -8,13 +8,19 @@
     box-sizing: border-box; 
 }
 
+// Hidden
+[hidden] {
+    display: none;
+}
+
 // Base
 html {
+    height: 100%;
     font-size: 100%;
+    background: linear-gradient(#fff, @body-background);
 }
 body {
     font-family: "Avenir", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    background: @body-background;
     line-height: 1.5;
     text-align: center;
     color: @gray;
