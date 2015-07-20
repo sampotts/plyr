@@ -39,7 +39,7 @@ If you have any cool ideas or features, please let me know by [creating an issue
 
 Check `docs/index.html` and `docs/dist/docs.js` for an example setup. 
 
-**Heads up**, the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.1.13/plyr.js` to `https://cdn.plyr.io/1.1.13/plyr.js`
+**Heads up**, the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.1.14/plyr.js` to `https://cdn.plyr.io/1.1.14/plyr.js`
 
 ### Bower
 If bower is your thang, you can grab Plyr using:
@@ -59,11 +59,11 @@ More info is on [npm](https://www.npmjs.com/package/ember-cli-plyr) and [GitHub]
 If you want to use our CDN, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/1.1.13/plyr.css">
-<script src="https://cdn.plyr.io/1.1.13/plyr.js"></script>
+<link rel="stylesheet" href="https://cdn.plyr.io/1.1.14/plyr.css">
+<script src="https://cdn.plyr.io/1.1.14/plyr.js"></script>
 ```
 
-You can also access the `sprite.svg` file at `https://cdn.plyr.io/1.1.13/sprite.svg`.
+You can also access the `sprite.svg` file at `https://cdn.plyr.io/1.1.14/sprite.svg`.
 
 ### CSS
 If you want to use the default css, add the `plyr.css` file from /dist into your head, or even better use `plyr.less` or `plyr.sass` file included in `/src` in your build to save a request. 
@@ -181,6 +181,12 @@ You can pass the following options to the setup method using `plyr.setup({...})`
     <td>Array</td>
     <td><code>["restart", "rewind", "play", "fast-forward", "current-time", "duration", "mute", "volume", "captions", "fullscreen"]</code></td>
     <td>Toggle which control elements you would like to display when using the default controls html. If you specify a <code>html</code> option, this is redundant. The default value is to display everything.</td>
+  </tr>
+  <tr>
+    <td><code>iconPrefix</code></td>
+    <td>String</td>
+    <td><code>icon</code></td>
+    <td>Specify the id prefix for the icons used in the default controls (e.g. "icon-play" would be "icon"). This is to prevent clashes if you're using your own SVG defs file but with the default controls. Most people can ignore this option.</td>
   </tr>
   <tr>
     <td><code>debug</code></td>

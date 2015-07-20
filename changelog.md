@@ -3,6 +3,33 @@
 ## v1.2.0
 - Added YouTube support.
 
+## v1.1.13
+- Added icon prefix option for when using default controls
+
+## v1.1.13
+- Logic tweaks for hiding controls in fullscreen
+
+## v1.1.12
+- Bug fix for Chrome Canary
+
+## v1.1.11
+- Bug fix 
+
+## v1.1.10
+- Bug fix 
+
+## v1.1.9
+- Bug fix for 1.1.8
+
+## v1.1.8
+- setVolume API method improvements (Fixes #83)
+
+## v1.1.7
+- Restore classname on destroy()
+
+## v1.1.6
+- New API methods (fixes #77), Fix for non strict mode (fixes #78)
+
 ## v1.1.5
 - Fix for incorrect `isFullscreen()` return value in Mozilla (Fixes #38)
 

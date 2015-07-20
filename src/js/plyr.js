@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.1.13
+// plyr.js v1.1.14
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -23,6 +23,7 @@
         click:                  true,
         tooltips:               false,
         displayDuration:        true,
+        iconPrefix:             "icon",
         selectors: {
             container:          ".player",
             controls:           ".player-controls",
@@ -106,7 +107,7 @@
         if(_inArray(config.controls, "restart")) {
             html.push(
                 "<button type='button' data-player='restart'>",
-                    "<svg><use xlink:href='#icon-restart'></use></svg>",
+                    "<svg><use xlink:href='#" + config.iconPrefix + "-restart'></use></svg>",
                     "<span class='sr-only'>Restart</span>",
                 "</button>"
             );
@@ -116,7 +117,7 @@
         if(_inArray(config.controls, "rewind")) {
             html.push(
                 "<button type='button' data-player='rewind'>",
-                    "<svg><use xlink:href='#icon-rewind'></use></svg>",
+                    "<svg><use xlink:href='#" + config.iconPrefix + "-rewind'></use></svg>",
                     "<span class='sr-only'>Rewind {seektime} secs</span>",
                 "</button>"
             );
@@ -126,11 +127,11 @@
         if(_inArray(config.controls, "play")) {
             html.push(
                 "<button type='button' data-player='play'>",
-                    "<svg><use xlink:href='#icon-play'></use></svg>",
+                    "<svg><use xlink:href='#" + config.iconPrefix + "-play'></use></svg>",
                     "<span class='sr-only'>Play</span>",
                 "</button>",
                 "<button type='button' data-player='pause'>",
-                    "<svg><use xlink:href='#icon-pause'></use></svg>",
+                    "<svg><use xlink:href='#" + config.iconPrefix + "-pause'></use></svg>",
                     "<span class='sr-only'>Pause</span>",
                 "</button>"
             );
@@ -140,7 +141,7 @@
         if(_inArray(config.controls, "fast-forward")) {
             html.push(
                 "<button type='button' data-player='fast-forward'>",
-                    "<svg><use xlink:href='#icon-fast-forward'></use></svg>",
+                    "<svg><use xlink:href='#" + config.iconPrefix + "-fast-forward'></use></svg>",
                     "<span class='sr-only'>Forward {seektime} secs</span>",
                 "</button>"
             );
@@ -177,8 +178,8 @@
             html.push(
                 "<input class='inverted sr-only' id='mute{id}' type='checkbox' data-player='mute'>",
                 "<label id='mute{id}' for='mute{id}'>",
-                    "<svg class='icon-muted'><use xlink:href='#icon-muted'></use></svg>",
-                    "<svg><use xlink:href='#icon-volume'></use></svg>",
+                    "<svg class='icon-muted'><use xlink:href='#" + config.iconPrefix + "-muted'></use></svg>",
+                    "<svg><use xlink:href='#" + config.iconPrefix + "-volume'></use></svg>",
                     "<span class='sr-only'>Toggle Mute</span>",
                 "</label>"
             );
@@ -197,8 +198,8 @@
             html.push(
                 "<input class='sr-only' id='captions{id}' type='checkbox' data-player='captions'>",
                 "<label for='captions{id}'>",
-                    "<svg class='icon-captions-on'><use xlink:href='#icon-captions-on'></use></svg>",
-                    "<svg><use xlink:href='#icon-captions-off'></use></svg>",
+                    "<svg class='icon-captions-on'><use xlink:href='#" + config.iconPrefix + "-captions-on'></use></svg>",
+                    "<svg><use xlink:href='#" + config.iconPrefix + "-captions-off'></use></svg>",
                     "<span class='sr-only'>Toggle Captions</span>",
                 "</label>"
             );
@@ -208,8 +209,8 @@
         if(_inArray(config.controls, "fullscreen")) {
             html.push(
                 "<button type='button' data-player='fullscreen'>",
-                    "<svg class='icon-exit-fullscreen'><use xlink:href='#icon-exit-fullscreen'></use></svg>",
-                    "<svg><use xlink:href='#icon-enter-fullscreen'></use></svg>",
+                    "<svg class='icon-exit-fullscreen'><use xlink:href='#" + config.iconPrefix + "-exit-fullscreen'></use></svg>",
+                    "<svg><use xlink:href='#" + config.iconPrefix + "-enter-fullscreen'></use></svg>",
                     "<span class='sr-only'>Toggle Fullscreen</span>",
                 "</button>"
             );
