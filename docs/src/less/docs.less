@@ -2,239 +2,33 @@
 // HTML5 Video Player Demo Page
 // ==========================================================================
 
-// Reset
+// CSS Reset
 @import "lib/normalize.less";
+
 // Mixins
 @import "lib/mixins.less";
-// Fonts - docs only!
-@import "lib/fontface.less";
 
 // Variables
-// ---------------------------------------
-// Colors
-@blue:                      #3498db;
-@gray-dark:                 #343f4a;
-@gray:                      #565d64;
-@gray-light:                #cbd0d3;
-@off-white:                 #f2f5f7;
+@import "variables.less";
 
-// Elements
-@link-color:                @blue;
-@padding-base:              20px;
-@arrow-size:                8px;
+// Animation
+@import "lib/animation.less";
 
-// Breakpoints
-@screen-md:                 768px;
-
-// BORDER-BOX ALL THE THINGS! 
-// http://paulirish.com/2012/box-sizing-border-box-ftw/
-*, *::after, *::before {  
-    box-sizing: border-box; 
-}
-
-// Base
-html {
-    font-size: 100%;
-}
-body {
-    font-family: "Avenir", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    background: @off-white;
-    line-height: 1.5;
-    text-align: center;
-    color: @gray;
-    .font-smoothing(on);
-}
-
-// Error page
-html.error,
-.error body {
-    height: 100%;
-}
-.error body {
-    width: 100%;
-    display: table;
-    table-layout: fixed;
-}
-.error main {
-    display: table-cell;
-    width: 100%;
-    vertical-align: middle;
-}
+// Base layout
+@import "components/base.less";
 
 // Type
-h1,
-h2 {
-    letter-spacing: -.025em;
-    color: #2E3C44;
-    margin: 0 0 (@padding-base / 2);
-    line-height: 1.2;
-    .font-smoothing();
-}
-h1 {
-    .font-size(64);
-    color: #3498DB;
-}
-p,
-small {
-    margin: 0 0 @padding-base;
-}
-small {
-    display: block;
-    padding: 0 (@padding-base / 2);
-    .font-size(14);
-}
+@import "lib/fontface.less";
+@import "components/type.less";
 
-// Header
-header {
-    padding: @padding-base;
-    margin-bottom: @padding-base;
+// Buttons
+@import "components/buttons.less";
 
-    p {
-        .font-size(18);
-    }
-    @media (min-width: 560px) {
-        padding-top: (@padding-base * 3);
-        padding-bottom: (@padding-base * 3);
-    }
-}
+// Panels
+@import "components/panels.less";
 
-// Sections
-section {
-    padding-bottom: @padding-base;
+// Error
+@import "components/error.less";
 
-    @media (min-width: 560px) {
-        padding-bottom: (@padding-base * 2);
-    }
-}
-
-// Links & Buttons
-.actions {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    font-size: 0;
-
-    li {
-        display: inline-block;
-        margin-top: (@padding-base / 2);
-        .font-size();
-        white-space: nowrap;
-    }
-    li + li {
-        margin-left: @padding-base;
-    }
-}
-a {
-    text-decoration: none;
-    color: @link-color;
-    border-bottom: 1px solid currentColor;
-    transition: all .3s ease;
-
-    &:hover,
-    &:focus {
-        color: #000;
-    }
-    &:focus {
-        .tab-focus();
-    }
-    &.logo {
-        border: 0;
-    }
-}
-.btn,
-.btn-count {
-    display: inline-block;
-    vertical-align: middle;
-    border-radius: 3px;
-    font-weight: 600;
-    user-select: none;
-}
-.btn {
-    padding: (@padding-base / 2) @padding-base;
-    background: @link-color;
-    border: 0;
-    color: #fff;
-    
-    &:hover,
-    &:focus {
-        color: #fff;
-        background: darken(@link-color, 5%);
-    }
-
-    &-twitter {
-        background: #8799A2;
-
-        &:hover,
-        &:focus {
-            background: darken(#8799A2, 5%);
-        }
-    }
-}
-.btn-count {
-    position: relative;
-    margin-left: 6px;
-    padding: ((@padding-base / 2) - 1px);
-    background: #fff;
-    border: 1px solid @gray-light;
-
-    &::before {
-        content: "";
-        position: absolute;
-        display: block;
-        width: @arrow-size;
-        height: @arrow-size;
-        left: 1px;
-        top: 50%;
-        margin-top: -(@arrow-size / 2);
-
-        background: inherit;
-        border: inherit;
-        border-width: 1px 0 0 1px;
-        transform: rotate(-45deg) translate(-50%, -50%);
-    }
-}
-
-// Example players
-.example-audio .player,
-.example-video .player {
-    margin: 0 auto @padding-base;
-
-    &-controls {
-        border-radius: 0 0 4px 4px;
-    }
-}
-.example-audio .player {
-    max-width: 520px;
-
-    &-controls {
-        border-radius: 4px;
-    }
-    &-progress {
-        border-radius: 4px 4px 0 0;
-        overflow: hidden;
-    }
-}
-.example-video .player {
-    max-width: 1200px;
-
-    video,
-    iframe {
-        border-radius: 4px 4px 0 0;
-    }
-    iframe {
-        -webkit-mask-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC);
-    }
-    &-fullscreen,
-    &.fullscreen-active {
-        max-width: none;
-    }
-}
-
-// Footer
-footer {
-    margin-bottom: @padding-base;
-
-    p {
-        margin-bottom: (@padding-base / 2);
-    }
-}
+// Examples
+@import "components/examples.less";

@@ -866,124 +866,145 @@
 
         // Setup YouTube
         function _setupYouTube(id) {
+            // Remove old containers
+            var containers = _getElements("[id^='youtube']");
+            for (var i = containers.length - 1; i >= 0; i--) {
+                _remove(containers[i]);
+            }
+
             // Create the YouTube container
-            var div = document.createElement("div");
-            div.setAttribute("id", "youtube" + Math.floor(Math.random() * (10000)));
-            player.media.appendChild(div);
+            var container = document.createElement("div");
+            container.setAttribute("id", "youtube-" + Math.floor(Math.random() * (10000)));
+            player.media.appendChild(container);
 
             // Add embed class for responsive
             _toggleClass(player.media, config.classes.videoWrapper, true);
             _toggleClass(player.media, config.classes.embedWrapper, true);
 
-            // Load the API
-            _injectScript("https://www.youtube.com/iframe_api");
+            if(typeof YT === "object") {
+                _YTReady(id, container);
+            }
+            else {
+                // Load the API
+                _injectScript("https://www.youtube.com/iframe_api");
 
-            // Setup callback for the API
-            window.onYouTubeIframeAPIReady = function() {
-                _log("YouTube API Ready");
+                // Setup callback for the API
+                window.onYouTubeIframeAPIReady = function () { _YTReady(id, container); }
+            }
+        }
 
-                // Setup timers object
-                // We have to poll YouTube for updates
+        // Handle API ready
+        function _YTReady(id, container) {
+            _log("YouTube API Ready");
+
+            // Setup timers object
+            // We have to poll YouTube for updates
+            if(!("timer" in player)) {
                 player.timer = {};
+            }
 
-                // Setup instance
-                // https://developers.google.com/youtube/iframe_api_reference
-                player.embed = new YT.Player(div.id, {
-                    videoId: id,
-                    playerVars: {
-                        autoplay: 0,
-                        controls: 0,
-                        vq: "hd720",
-                        rel: 0,
-                        showinfo: 0,
-                        iv_load_policy: 3,
-                        cc_lang_pref: "en",
-                        wmode: "transparent",
-                        modestbranding: 1
-                    },
-                    events: {
-                        onReady: function(event) {
-                            // Get the instance
-                            var instance = event.target;
+            // Setup instance
+            // https://developers.google.com/youtube/iframe_api_reference
+            player.embed = new YT.Player(container.id, {
+                videoId: id,
+                playerVars: {
+                    autoplay: 0,
+                    controls: 0,
+                    vq: "hd720",
+                    rel: 0,
+                    showinfo: 0,
+                    iv_load_policy: 3,
+                    cc_lang_pref: "en",
+                    wmode: "transparent",
+                    modestbranding: 1
+                },
+                events: {
+                    onReady: function(event) {
+                        // Get the instance
+                        var instance = event.target;
 
-                            // Create a faux HTML5 API using the YouTube API
-                            player.media.play = function() { instance.playVideo(); };
-                            player.media.pause = function() { instance.pauseVideo(); };
-                            player.media.stop = function() { instance.stopVideo(); };
-                            player.media.duration = instance.getDuration();
-                            player.media.paused = (instance.getPlayerState() == 2);
-                            player.media.currentTime = instance.getCurrentTime();
-                            player.media.muted = instance.isMuted();
+                        // Create a faux HTML5 API using the YouTube API
+                        player.media.play = function() { instance.playVideo(); };
+                        player.media.pause = function() { instance.pauseVideo(); };
+                        player.media.stop = function() { instance.stopVideo(); };
+                        player.media.duration = instance.getDuration();
+                        player.media.paused = (instance.getPlayerState() == 2);
+                        player.media.currentTime = instance.getCurrentTime();
+                        player.media.muted = instance.isMuted();
 
-                            // Setup buffering
-                            player.timer.buffering = window.setInterval(function() { 
-                                // Get loaded % from YouTube
-                                player.media.buffered = instance.getVideoLoadedFraction();
-                                
-                                // Trigger timeupdate
-                                _triggerEvent(player.media, "progress");
+                        // Trigger timeupdate
+                        _triggerEvent(player.media, "timeupdate");
 
-                                // Bail if we're at 100%
-                                if(player.media.buffered === 1) {
-                                    window.clearInterval(player.timer.buffering);
-                                }
-                            }, 200);
+                        // Reset timer
+                        window.clearInterval(player.timer.buffering);
 
-                            _setupInterface();
-                        },
-                        onStateChange: function(event) {
-                            // Get the instance
-                            var instance = event.target;
+                        // Setup buffering
+                        player.timer.buffering = window.setInterval(function() { 
+                            // Get loaded % from YouTube
+                            player.media.buffered = instance.getVideoLoadedFraction();
+                            
+                            // Trigger progress
+                            _triggerEvent(player.media, "progress");
 
-                            // Reset timer
-                            window.clearInterval(player.timer.playing);
-
-                            // Handle event
-                            switch(event.data) {
-                                // Unstarted
-                                case -1: 
-                                    break;
-
-                                // Ended
-                                case 0: 
-                                    player.media.paused = true;
-                                    _triggerEvent(player.media, "ended");
-                                    break;
-
-                                // Playing
-                                case 1:
-                                    player.media.paused = false;
-                                    _triggerEvent(player.media, "play");
-
-                                    // Poll to get playback progress
-                                    player.timer.playing = window.setInterval(function() {
-                                        // Set the current time
-                                        player.media.currentTime = instance.getCurrentTime();
-
-                                        // Trigger timeupdate
-                                        _triggerEvent(player.media, "timeupdate");
-                                    }, 200);
-
-                                    break;
-
-                                // Paused
-                                case 2:
-                                    player.media.paused = true;
-                                    _triggerEvent(player.media, "pause");
-                                    break;
-
-                                // Buffering 
-                                case 3:
-                                    break;
-
-                                // Video cued
-                                case 5:
-                                    break;
+                            // Bail if we're at 100%
+                            if(player.media.buffered === 1) {
+                                window.clearInterval(player.timer.buffering);
                             }
+                        }, 200);
+
+                        // Only setup controls once
+                        if(!player.container.querySelectorAll(config.selectors.controls).length) {
+                            _setupInterface();
+                        }
+
+                        // Display duration if available
+                        if(config.displayDuration) {
+                            _displayDuration();
+                        }
+                    },
+                    onStateChange: function(event) {
+                        // Get the instance
+                        var instance = event.target;
+
+                        // Reset timer
+                        window.clearInterval(player.timer.playing);
+
+                        // Handle events
+                        // -1   Unstarted
+                        // 0    Ended
+                        // 1    Playing
+                        // 2    Paused
+                        // 3    Buffering
+                        // 5    Video cued    
+                        switch(event.data) {
+                            case 0: 
+                                player.media.paused = true;
+                                _triggerEvent(player.media, "ended");
+                                break;
+
+                            case 1:
+                                player.media.paused = false;
+                                _triggerEvent(player.media, "play");
+
+                                // Poll to get playback progress
+                                player.timer.playing = window.setInterval(function() {
+                                    // Set the current time
+                                    player.media.currentTime = instance.getCurrentTime();
+
+                                    // Trigger timeupdate
+                                    _triggerEvent(player.media, "timeupdate");
+                                }, 200);
+
+                                break;
+
+                            case 2:
+                                player.media.paused = true;
+                                _triggerEvent(player.media, "pause");
+                                break;
                         }
                     }
-                });
-            }
+                }
+            });
         }
 
         // Setup captions
@@ -1586,12 +1607,17 @@
         function _parseSource(sources) {
             // YouTube
             if(player.type === "youtube" && typeof sources === "string") {
-                if(sources.indexOf("http") === 0) {
-                    player.embed.loadVideoByUrl(sources);
-                }
-                else {
-                    player.embed.loadVideoById(sources);
-                }
+                // Destroy YouTube instance
+                player.embed.destroy();
+
+                // Re-setup YouTube
+                // We don't use loadVideoBy[x] here since it has issues
+                _setupYouTube(sources);
+
+                // Update times
+                _timeUpdate();
+
+                // Bail
                 return;
             }
 
@@ -1748,6 +1774,8 @@
         }
 
         // Destroy an instance
+        // Event listeners are removed when elements are removed
+        // http://stackoverflow.com/questions/12528049/if-a-dom-element-is-removed-are-its-listeners-also-removed-from-memory
         function _destroy() {
             // Bail if the element is not initialized
             if(!player.init) {
@@ -1757,11 +1785,17 @@
             // Reset container classname
             player.container.setAttribute("class", config.selectors.container.replace(".", ""));
 
-            // Event listeners are removed when elements are removed
-            // http://stackoverflow.com/questions/12528049/if-a-dom-element-is-removed-are-its-listeners-also-removed-from-memory
+            // Remove init flag
+            player.init = false;
 
             // Remove controls
             _remove(_getElement(config.selectors.controls));
+
+            // YouTube
+            if(player.type === "youtube") {
+                player.embed.destroy();
+                return;
+            }
 
             // If video, we need to remove some more
             if(player.type === "video") {
@@ -1779,9 +1813,6 @@
             // http://stackoverflow.com/questions/19469881/javascript-remove-all-event-listeners-of-specific-type
             var clone = player.media.cloneNode(true);
             player.media.parentNode.replaceChild(clone, player.media);
-
-            // Remove init flag
-            player.init = false;
         }
 
         // Setup a player
@@ -1828,23 +1859,13 @@
 
             // Setup interface
             if(player.type == "video" || player.type == "audio") {
-                _setupInterface();
-            }
-
-            // Successful setup
-            player.init = true;
-        }
-
-        function _setupInterface() {
-            // If there's full support
-            if(player.supported.full) {
-                // Inject custom controls
-                _injectControls();
-
-                // Find the elements
-                if(!_findElements()) {
-                    return false;
+                // Bail if no support
+                if(!player.supported.full) {
+                    return;
                 }
+
+                // Setup UI
+                _setupInterface();
 
                 // Display duration if available
                 if(config.displayDuration) {
@@ -1853,20 +1874,33 @@
 
                 // Set up aria-label for Play button with the title option
                 _setupAria();
-
-                // Captions
-                _setupCaptions();
-
-                // Set volume
-                _setVolume();
-                _updateVolume();
-
-                // Setup fullscreen
-                _setupFullscreen();
-
-                // Listeners
-                _listeners();
             }
+
+            // Successful setup
+            player.init = true;
+        }
+
+        function _setupInterface() {
+            // Inject custom controls
+            _injectControls();
+
+            // Find the elements
+            if(!_findElements()) {
+                return false;
+            }
+
+            // Captions
+            _setupCaptions();
+
+            // Set volume
+            _setVolume();
+            _updateVolume();
+
+            // Setup fullscreen
+            _setupFullscreen();
+
+            // Listeners
+            _listeners();
         }
 
         // Initialize instance 
@@ -1917,6 +1951,11 @@
             case "audio": 
                 basic = audio;
                 full  = (basic && !oldIE);
+                break; 
+
+            case "youtube": 
+                basic = true;
+                full  = !oldIE;
                 break; 
 
             default:

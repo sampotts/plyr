@@ -4,12 +4,14 @@
 
 // Variables
 // -------------------------------
+
 // Colors
 @blue:                      #3498DB;
-@gray-dark:                 #343f4a;
-@gray:                      #565d64;
-@gray-light:                #cbd0d3;
-@off-white:                 #d6dadd;
+@gray-dark:                 #343F4A;
+@gray:                      #565D64;
+@gray-light:                #6B7D86;
+@gray-lighter:              #CBD0D3;
+@off-white:                 #D6DADD;
 
 // Font sizes
 @font-size-small:           14px;
@@ -18,11 +20,10 @@
 
 // Controls
 @control-spacing:           10px;
-@controls-bg:               @gray-dark;
+@controls-bg:               #fff;
 @control-bg-hover:          @blue;
-@control-color:             @gray-light;
-@control-color-inactive:    @gray;
-@control-color-hover:       #fff;
+.contrast-control-color(@controls-bg);
+.contrast-control-color-hover(@control-bg-hover);
 
 // Tooltips
 @tooltip-bg:                @controls-bg;
@@ -40,7 +41,7 @@
 
 // Volume
 @volume-track-height:       6px;
-@volume-track-bg:           @gray;
+@volume-track-bg:           darken(@controls-bg, 10%);
 @volume-thumb-height:       (@volume-track-height * 2);
 @volume-thumb-width:        (@volume-track-height * 2);
 @volume-thumb-bg:           @control-color;
@@ -50,18 +51,40 @@
 @bp-control-split:          560px; // When controls split into left/right
 @bp-captions-large:         768px; // When captions jump to the larger font size
 
-// Utility classes & mixins
-// -------------------------------
-// Screen reader only
-.sr-only {
-    position: absolute !important;
-    clip: rect(1px, 1px, 1px, 1px);
-    padding: 0 !important;
-    border: 0 !important;
-    height: 1px !important;
-    width: 1px !important;
-    overflow: hidden;
+// Animation
+// ---------------------------------------
+
+@keyframes progress {
+    to { background-position: @progress-loading-size 0; }
 }
+
+// Mixins
+// -------------------------------
+
+// Contrast
+.contrast-control-color(@color: "") when (lightness(@color) >= 65%) {
+    @control-color: @gray-light;
+}
+.contrast-control-color(@color: "") when (lightness(@color) < 65%) {
+    @control-color: @gray-lighter;
+}
+.contrast-control-color-hover(@color: "") when (lightness(@color) >= 65%) {
+    @control-color-hover: @gray;
+}
+.contrast-control-color-hover(@color: "") when (lightness(@color) < 65%) {
+    @control-color-hover: #fff;
+}
+
+// Font smoothing
+.font-smoothing(@mode: on) when (@mode = on) {
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+}
+.font-smoothing(@mode: on) when (@mode = off) {
+    -moz-osx-font-smoothing: auto;
+    -webkit-font-smoothing: subpixel-antialiased;
+}
+
 // Contain floats: nicolasgallagher.com/micro-clearfix-hack/
 .clearfix() {
     zoom: 1;
@@ -75,14 +98,7 @@
     outline-offset: 0;
 }
 
-// Animation
-// ---------------------------------------
-@keyframes progress {
-    to { background-position: @progress-loading-size 0; }
-}
-
 // <input type="range"> styling
-// ---------------------------------------
 .volume-thumb() {
     height: @volume-thumb-height;
     width: @volume-thumb-width;
@@ -109,15 +125,16 @@
     border: 0;
 }
 
-// Font smoothing
-// ---------------------------------------
-.font-smoothing(@mode: on) when (@mode = on) {
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-}
-.font-smoothing(@mode: on) when (@mode = off) {
-    -moz-osx-font-smoothing: auto;
-    -webkit-font-smoothing: subpixel-antialiased;
+// Screen reader only
+// -------------------------------
+.sr-only {
+    position: absolute !important;
+    clip: rect(1px, 1px, 1px, 1px);
+    padding: 0 !important;
+    border: 0 !important;
+    height: 1px !important;
+    width: 1px !important;
+    overflow: hidden;
 }
 
 // Styles
@@ -141,7 +158,8 @@
     &-video-wrapper {
         position: relative;
     }
-    video {
+    video,
+    audio {
         width: 100%;
         height: auto;
         vertical-align: middle;
@@ -199,6 +217,7 @@
         background: @controls-bg;
         line-height: 1;
         text-align: center;
+        box-shadow: 0 1px 1px rgba(red(@gray-dark), green(@gray-dark), blue(@gray-dark), .2);
 
         // Layout
         &-right {
@@ -222,7 +241,7 @@
             margin: 0 2px;
             padding: (@control-spacing / 2) @control-spacing;
             
-            transition: background .3s ease;
+            transition: background .3s ease, color .3s ease, opacity .3s ease;
             border-radius: 3px;
             cursor: pointer;
 
@@ -236,12 +255,13 @@
         }
         input + label,
         .inverted:checked + label {
-            color: @control-color-inactive;
+            opacity: .5;
         }
         button, 
         .inverted + label,
         input:checked + label {
             color: @control-color;
+            opacity: 1;
         }
         button {
             border: 0;
@@ -256,6 +276,7 @@
         [type="checkbox"] + label:hover {
             background: @control-bg-hover;
             color: @control-color-hover;
+            opacity: 1;
         }
         button:focus,
         input:focus + label {
@@ -288,7 +309,6 @@
             &::before {
                 content: "\2044";
                 margin-right: @control-spacing;
-                color: darken(@control-color, 30%);
             }
         }
     }

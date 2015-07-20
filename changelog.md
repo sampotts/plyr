@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.2.0
+- Added YouTube support.
+
 ## v1.1.5
 - Fix for incorrect `isFullscreen()` return value in Mozilla (Fixes #38)
 

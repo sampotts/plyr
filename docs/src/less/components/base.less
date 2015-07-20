@@ -1,0 +1,45 @@
+// ==========================================================================
+// Base layout
+// ==========================================================================
+
+// BORDER-BOX ALL THE THINGS! 
+// http://paulirish.com/2012/box-sizing-border-box-ftw/
+*, *::after, *::before {  
+    box-sizing: border-box; 
+}
+
+// Base
+html {
+    font-size: 100%;
+}
+body {
+    font-family: "Avenir", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background: @body-background;
+    line-height: 1.5;
+    text-align: center;
+    color: @gray;
+    .font-smoothing(on);
+}
+
+// Header
+header {
+    padding: @padding-base;
+    margin-bottom: @padding-base;
+
+    p {
+        .font-size(18);
+    }
+    @media (min-width: @screen-sm) {
+        padding-top: (@padding-base * 3);
+        padding-bottom: (@padding-base * 3);
+    }
+}
+
+// Sections
+section {
+    padding-bottom: @padding-base;
+
+    @media (min-width: @screen-sm) {
+        padding-bottom: (@padding-base * 2);
+    }
+}

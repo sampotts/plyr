@@ -1,0 +1,144 @@
+// ==========================================================================
+// Buttons
+// ==========================================================================
+
+nav {
+	ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		font-size: 0;
+	}
+	li {
+		display: inline-block;
+		margin-top: (@padding-base / 2);
+		.font-size();
+		white-space: nowrap;
+	}
+	li + li {
+		margin-left: @padding-base;
+	}
+}
+
+// Tabs
+.btn-bar {
+	position: relative;
+	margin: 0 auto @padding-base;
+	max-width: @example-width-video;
+
+	&::before {
+		content: "";
+		position: absolute;
+		top: 50%;
+		left: 0;
+		right: 0;
+		height: 1px;
+		background: @gray-lighter;
+	}
+
+	ul {
+		position: relative;
+		z-index: 1;
+		display: inline-block;
+		user-select: none;
+	}
+	li {
+		margin: 0;
+
+		&:first-child .btn {
+			border-radius: 4px 0 0 4px;
+		}
+		&:last-child .btn {
+			border-radius: 0 4px 4px 0;
+		}
+		& + li .btn {
+			margin-left: -1px;
+		}
+	}
+	.btn {
+		display: block;
+		border-radius: 0;
+	}
+	.active {
+		&:extend(.btn-primary);
+	}
+	.btn.active {
+		box-shadow: inset 0 1px 1px rgba(0,0,0, .2);
+		position: relative;
+		z-index: 1;
+	}
+
+	@media (min-width: 560px) {
+		margin-bottom: (@padding-base * 2);
+	}
+}
+
+// Shared 
+.btn,
+.btn-count {
+	display: inline-block;
+	vertical-align: middle;
+	border-radius: @border-radius-base;
+	font-weight: 600;
+	user-select: none;
+}
+
+// Buttons 
+.btn {
+	padding: (@padding-base / 2) @padding-base;
+	background: @body-background;
+	border: 1px solid @gray-light;
+	box-shadow: inset 0 1px 0 #fff, 0 1px 1px rgba(0,0,0, .05);
+	text-shadow: 0 1px 1px #fff;
+	color: @gray;
+
+	&:hover,
+	&:focus {
+		background-color: #fff;
+		border-color: darken(@gray-light, 5%);
+		color: @link-color;
+		outline: 0;
+	}
+}
+.btn-primary {
+	background: linear-gradient(@link-color, darken(@link-color, 3%));
+	border-color: darken(@link-color, 10%);
+	box-shadow: 0 1px 1px rgba(0,0,0, .15);
+	text-shadow: 0 1px 1px rgba(0,0,0, .1);
+	color: #fff;
+	
+	&:hover,
+	&:focus {
+		color: #fff;
+		border-color: darken(@link-color, 20%);
+	}
+}
+.btn-small {
+	padding-top: ceil(@padding-base / 3);
+	padding-bottom: ceil(@padding-base / 3);
+}
+
+// Count bubble
+.btn-count {
+	position: relative;
+	margin-left: 6px;
+	padding: ((@padding-base / 2) - 1px);
+	background: @body-background;
+	border: 1px solid @gray-light;
+
+	&::before {
+		content: "";
+		position: absolute;
+		display: block;
+		width: @arrow-size;
+		height: @arrow-size;
+		left: 1px;
+		top: 50%;
+		margin-top: -(@arrow-size / 2);
+
+		background: inherit;
+		border: inherit;
+		border-width: 1px 0 0 1px;
+		transform: rotate(-45deg) translate(-50%, -50%);
+	}
+}

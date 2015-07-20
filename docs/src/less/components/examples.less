@@ -1,0 +1,39 @@
+// ==========================================================================
+// Examples
+// ==========================================================================
+
+// Example players
+.example-audio .player,
+.example-video .player {
+    margin: 0 auto @padding-base;
+
+    &-controls {
+        border-radius: 0 0 @border-radius-base @border-radius-base;
+    }
+}
+.example-audio .player {
+    max-width: @example-width-audio;
+
+    &-controls {
+        border-radius: @border-radius-base;
+    }
+    &-progress {
+        border-radius: @border-radius-base @border-radius-base 0 0;
+        overflow: hidden;
+    }
+}
+.example-video .player {
+    max-width: @example-width-video;
+
+    video,
+    iframe {
+        border-radius: @border-radius-base @border-radius-base 0 0;
+    }
+    iframe {
+        -webkit-mask-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC);
+    }
+    &-fullscreen,
+    &.fullscreen-active {
+        max-width: none;
+    }
+}

@@ -11,12 +11,13 @@ We wanted a lightweight, accessible and customisable media player that just supp
 ## Features
 - **Accessible** - full support for captions and screen readers.
 - **Lightweight** - just 6.4KB minified and gzipped.
-- **Customisable** - make the player look how you want with the markup you want.
+- **[Customisable](#html)** - make the player look how you want with the markup you want.
 - **Semantic** - uses the *right* elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no `<span>` or `<a href="#">` button hacks.
 - **Responsive** - as you'd expect these days.
 - **Audio & Video** - support for both formats.
-- **API** - toggle playback, volume, seeking, and more.
-- **Fullscreen** - supports native fullscreen with fallback to "full window" modes.
+- **[Embed](#embed)** - support for YouTube (Vimeo soon).
+- **[API](#api)** - toggle playback, volume, seeking, and more.
+- **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes.
 - **No dependencies** - written in vanilla JavaScript, no jQuery required. 
 
 Oh and yes, it works with Bootstrap. 
@@ -25,10 +26,11 @@ Oh and yes, it works with Bootstrap.
 Check out [the changelog](changelog.md)
 
 ## Planned development
-- Playlists (audio and video)
-- YouTube and Vimeo support
+- Playlists
+- ~~YouTube~~ and Vimeo support
 - Playback speed
 - Multiple language captions (with selection)
+- Audio captions
 ... and whatever else has been raised in [issues](https://github.com/Selz/plyr/issues)
 
 If you have any cool ideas or features, please let me know by [creating an issue](https://github.com/Selz/plyr/issues/new) or of course, forking and sending a pull request.
@@ -75,18 +77,18 @@ The SVG sprite for the controls icons is loaded in by AJAX to help with performa
 
 ```html
 <script>
-(function(d,p){
-	var a=new XMLHttpRequest(),
-		b=d.body;
-	a.open("GET",p,!0);
+(function(d, p){
+	var a = new XMLHttpRequest(),
+		b = d.body;
+	a.open("GET", p, true);
 	a.send();
-	a.onload=function(){
-		var c=d.createElement("div");
-		c.style.display="none";
-		c.innerHTML=a.responseText;
-		b.insertBefore(c,b.childNodes[0])
+	a.onload = function(){
+		var c = d.createElement("div");
+		c.style.display = "none";
+		c.innerHTML = a.responseText;
+		b.insertBefore(c, b.childNodes[0]);
 	}
-})(document,"dist/sprite.svg");
+})(document, "dist/sprite.svg");
 </script>
 ```
 More info on SVG sprites here:
@@ -125,6 +127,14 @@ And the same for `<audio>`
 	</audio>
 </div>
 ```	
+
+For YouTube, Plyr uses the standard YouTube API markup (an empty `<div>`):
+
+```html
+<div class="player">
+	<div data-video-id="L1h9xxCU20g" data-type="youtube"></div>
+</div>
+```
 
 #### Cross Origin (CORS)
 You'll notice the `crossorigin` attribute on the example `<video>` and `<audio>` elements. This is because the media is loaded from another domain. If your media is hosted on another domain, you may need to add this attribute. 
@@ -329,7 +339,7 @@ Here's a list of the methods supported:
   <tr>
     <td><code>support(...)</code></td>
     <td>String</td>
-    <td>Determine if a player supports a certain MIME type.</td>
+    <td>Determine if a player supports a certain MIME type. This is not supported for embedded content (YouTube).</td>
   </tr>
   <tr>
     <td><code>source(...)</code></td>
@@ -377,6 +387,26 @@ media.addEventListener("playing", function() {
 ```
 A complete list of events can be found here:
 [Media Events - W3.org](http://www.w3.org/2010/05/video/mediaevents.html)
+
+## Embeds
+
+Currently only YouTube is supported. Vimeo will be coming soon. Some HTML5 media events are triggered on the `media` property of the `plyr` object:
+- `play`
+- `pause`
+- `timeupdate`
+- `progress`
+
+Due to the way the YouTube API works, the `timeupdate` and `progress` events are triggered by polling every 200ms so the event may trigger without an actual value change. Buffering progress is `media.buffered` in the `plyr` object. It is a a number between 0 and 1 that specifies the percentage of the video that the player shows as buffered.
+
+```javascript
+document.querySelector(".player").plyr.media.addEventListener("play", function() { 
+	console.log("play");
+});
+``` 
+
+The `.source()` API method can also be used but the video id must be passed as the argument. 
+
+Currently caption control is not supported but I will work on this. 
 
 ## Fullscreen
 
