@@ -15,7 +15,7 @@ We wanted a lightweight, accessible and customisable media player that just supp
 - **Semantic** - uses the *right* elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no `<span>` or `<a href="#">` button hacks.
 - **Responsive** - as you'd expect these days.
 - **Audio & Video** - support for both formats.
-- **[Embed](#embed)** - support for YouTube (Vimeo soon).
+- **[Embedded Video](#embeds)** - support for YouTube (Vimeo soon).
 - **[API](#api)** - toggle playback, volume, seeking, and more.
 - **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes.
 - **No dependencies** - written in vanilla JavaScript, no jQuery required. 
