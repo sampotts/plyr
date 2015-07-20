@@ -173,6 +173,12 @@ You can pass the following options to the setup method using `plyr.setup({...})`
     <td>Toggle which control elements you would like to display when using the default controls html. If you specify a <code>html</code> option, this is redundant. The default value is to display everything.</td>
   </tr>
   <tr>
+    <td><code>iconPrefix</code></td>
+    <td>String</td>
+    <td><code>icon</code></td>
+    <td>Specify the id prefix for the icons used in the default controls (e.g. "icon-play" would be "icon"). This is to prevent clashes if you're using your own SVG defs file but with the default controls. Most people can ignore this option.</td>
+  </tr>
+  <tr>
     <td><code>debug</code></td>
     <td>Boolean</td>
     <td><code>false</code></td>

@@ -185,12 +185,12 @@ gulp.task("watch", function () {
     // Plyr core
     gulp.watch(paths.plyr.src.js, tasks.js);
     gulp.watch(paths.plyr.src.less, tasks.less);
-    gulp.watch(paths.plyr.src.sprite, "sprite");
+    gulp.watch(paths.plyr.src.sprite, ["sprite"]);
 
     // Docs
     gulp.watch(paths.docs.src.js, tasks.js);
     gulp.watch(paths.docs.src.less, tasks.less);
-    gulp.watch(paths.docs.src.templates, "js");
+    gulp.watch(paths.docs.src.templates, ["js"]);
 });
 
 // Publish a version to CDN and docs
