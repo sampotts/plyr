@@ -28,7 +28,7 @@ $control-bg-hover:        @blue !default;
 
 // Tooltips
 $tooltip-bg:              $controls-bg !default;
-$tooltip-color:           #fff !default;
+$tooltip-color:           $control-color !default;
 $tooltip-padding:         $control-spacing !default;
 $tooltip-arrow-size:      5px !default;
 $tooltip-radius:          3px !default;
@@ -329,8 +329,9 @@ $bp-captions-large:       768px !default; // When captions jump to the larger fo
         line-height: 1.5;
         font-weight: 600;
 
-        transform: translate(-50%, ($tooltip-padding * 3));
-        transition: transform .2s .2s ease, opacity .2s .2s ease;
+        transform: translate(-50%, ($tooltip-padding * 3)) scale(0);
+        transform-origin: 50% 100%;
+        transition: transform .2s .1s ease, opacity .2s .1s ease;
 
         &::after {
             content: "";
@@ -353,7 +354,7 @@ $bp-captions-large:       768px !default; // When captions jump to the larger fo
     button:focus .player-tooltip {
         visibility: visible;
         opacity: 1;
-        transform: translate(-50%, 0);
+        transform: translate(-50%, 0) scale(1);
     }
     label:hover .player-tooltip,
     button:hover .player-tooltip {

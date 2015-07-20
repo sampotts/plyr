@@ -28,7 +28,7 @@
 
 // Tooltips
 @tooltip-bg:                @controls-bg;
-@tooltip-color:             #fff;
+@tooltip-color:             @control-color;
 @tooltip-padding:           @control-spacing;   
 @tooltip-arrow-size:        5px;
 @tooltip-radius:            3px;
@@ -331,8 +331,9 @@
         line-height: 1.5;
         font-weight: 600;
 
-        transform: translate(-50%, (@tooltip-padding * 3));
-        transition: transform .2s .2s ease, opacity .2s .2s ease;
+        transform: translate(-50%, (@tooltip-padding * 3)) scale(0);
+        transform-origin: 50% 100%;
+        transition: transform .2s .1s ease, opacity .2s .1s ease;
 
         &::after {
             content: "";
@@ -355,7 +356,7 @@
     button:focus .player-tooltip {
         visibility: visible;
         opacity: 1;
-        transform: translate(-50%, 0);
+        transform: translate(-50%, 0) scale(1);
     }
     label:hover .player-tooltip,
     button:hover .player-tooltip {
