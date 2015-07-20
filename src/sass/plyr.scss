@@ -1,5 +1,6 @@
 // ==========================================================================
-// HTML5 Media Player
+// Plyr styles
+// https://github.com/selz/plyr
 // ==========================================================================
 
 // Variables
@@ -51,6 +52,13 @@ $volume-thumb-bg-focus:   $control-bg-hover !default;
 $bp-control-split:        560px !default; // When controls split into left/right
 $bp-captions-large:       768px !default; // When captions jump to the larger font size
 
+// Animation
+// ---------------------------------------
+
+@keyframes progress {
+    to { background-position: $progress-loading-size 0; }
+}
+
 // Mixins
 // -------------------------------
 
@@ -100,13 +108,7 @@ $bp-captions-large:       768px !default; // When captions jump to the larger fo
     outline-offset: 0;
 }
 
-// Animation
-// ---------------------------------------
-@keyframes progress {
-    to { background-position: $progress-loading-size 0; }
-}
-
-// <input type="range"> styling
+// Range mixins
 @mixin volume-thumb()
 {
     height: $volume-thumb-height;
