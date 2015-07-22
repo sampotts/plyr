@@ -10,7 +10,7 @@ We wanted a lightweight, accessible and customisable media player that just supp
 
 ## Features
 - **Accessible** - full support for captions and screen readers.
-- **Lightweight** - just 6.4KB minified and gzipped.
+- **Lightweight** - just 7.5KB minified and gzipped.
 - **[Customisable](#html)** - make the player look how you want with the markup you want.
 - **Semantic** - uses the *right* elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no `<span>` or `<a href="#">` button hacks.
 - **Responsive** - as you'd expect these days.
