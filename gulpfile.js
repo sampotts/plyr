@@ -165,11 +165,6 @@ build.templates();
 build.less(bundles.docs.less, "docs");
 build.js(bundles.docs.js, "docs");
 
-// Default gulp task
-gulp.task("default", function(){
-    run("templates", tasks.js, tasks.less, "sprite", "watch");
-});
-
 // Build all JS (inc. templates)
 gulp.task("js", function(){
     run("templates", tasks.js);
@@ -191,6 +186,11 @@ gulp.task("watch", function () {
     gulp.watch(paths.docs.src.js, tasks.js);
     gulp.watch(paths.docs.src.less, tasks.less);
     gulp.watch(paths.docs.src.templates, ["js"]);
+});
+
+// Default gulp task
+gulp.task("default", function(){
+    run("templates", tasks.js, tasks.less, "sprite", "watch");
 });
 
 // Publish a version to CDN and docs
