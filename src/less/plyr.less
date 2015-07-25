@@ -28,6 +28,7 @@
 
 // Tooltips
 @tooltip-bg:                @controls-bg;
+@tooltip-border-color:      @off-white;
 @tooltip-color:             @control-color;
 @tooltip-padding:           @control-spacing;   
 @tooltip-arrow-size:        5px;
@@ -316,8 +317,6 @@
 
     // Tooltips
     &-tooltip {
-        @border-base: darken(@tooltip-bg, 8%);
-
         visibility: hidden;
         position: absolute;
         z-index: 2;
@@ -327,7 +326,7 @@
 
         opacity: 0;
         background: @tooltip-bg;
-        border: 1px solid @border-base;
+        border: 1px solid @tooltip-border-color;
         border-radius: @tooltip-radius;
         color: @tooltip-color;
         font-size: @font-size-small;
@@ -349,10 +348,8 @@
             width: 10px;
             height: 10px;
             background: @tooltip-bg;
-            transform: translate(-50%, -50%) rotate(45deg) translateY(2px);
-            
-            @arrow-border-color: darken(@border-base, 5%);
-            border: 1px solid rgba(red(@arrow-border-color), green(@arrow-border-color), blue(@arrow-border-color), .8);
+            transform: translate(-50%, -50%) rotate(45deg) translateY(1px);
+            border: 1px solid @tooltip-border-color;
             border-width: 0 1px 1px 0;
         }
     }
