@@ -559,9 +559,8 @@
 
             fullscreen.isFullScreen = function(element) {
                 if(typeof element == "undefined") {
-                    element = document;
+                    element = document.body;
                 }
-
                 switch (this.prefix) {
                     case "":
                         return document.fullscreenElement == element;
@@ -572,6 +571,9 @@
                 }
             };
             fullscreen.requestFullScreen = function(element) {
+                if(typeof element == "undefined") {
+                    element = document.body;
+                }
                 return (this.prefix === "") ? element.requestFullScreen() : element[this.prefix + (this.prefix == "ms" ? "RequestFullscreen" : "RequestFullScreen")]();
             };
             fullscreen.cancelFullScreen = function() {
