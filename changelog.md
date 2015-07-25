@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.2.4
+- Fix for omitted kind attribute on <track> (fixes #88)
+
 ## v1.2.3
 - Fix for YouTube on iPhone or unsupported browsers (fallback to YouTube native)
 - Docs tidy up

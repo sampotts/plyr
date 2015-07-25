@@ -167,7 +167,7 @@ build.js(bundles.docs.js, "docs");
 
 // Default gulp task
 gulp.task("default", function(){
-    run("templates", tasks.js, tasks.less, "sprite");
+    run("templates", tasks.js, tasks.less, "sprite", "watch");
 });
 
 // Build all JS (inc. templates)

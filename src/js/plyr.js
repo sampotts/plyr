@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.2.3
+// plyr.js v1.2.4
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -1028,8 +1028,8 @@
 
                 for (var i = 0; i < children.length; i++) {
                     if (children[i].nodeName.toLowerCase() === "track") {
-                        kind = children[i].getAttribute("kind");
-                        if (kind === "captions") {
+                        kind = children[i].kind;
+                        if (kind === "captions" || kind === "subtitles") {
                             captionSrc = children[i].getAttribute("src");
                         }
                     }
@@ -1081,7 +1081,7 @@
                         for (var y=0; y < tracks.length; y++) {
                             var track = tracks[y];
 
-                            if (track.kind === "captions") {
+                            if (track.kind === "captions" || track.kind === "subtitles") {
                                 _on(track, "cuechange", function() {
                                     // Clear container
                                     player.captionsContainer.innerHTML = "";
