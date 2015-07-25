@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.2.2
+// plyr.js v1.2.3
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -529,12 +529,12 @@
             },
             browserPrefixes = "webkit moz o ms khtml".split(" ");
 
-        // check for native support
+        // Check for native support
         if (typeof document.cancelFullScreen != "undefined") {
             fullscreen.supportsFullScreen = true;
         }
         else {
-            // check for fullscreen support by vendor prefix
+            // Check for fullscreen support by vendor prefix
             for (var i = 0, il = browserPrefixes.length; i < il; i++ ) {
                 fullscreen.prefix = browserPrefixes[i];
 
@@ -549,12 +549,6 @@
                     break;
                 }
             }
-        }
-
-        // Safari doesn't support the ALLOW_KEYBOARD_INPUT flag (for security) so set it to not supported
-        // https://bugs.webkit.org/show_bug.cgi?id=121496
-        if(fullscreen.prefix === "webkit" && !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/)) {
-             fullscreen.supportsFullScreen = false;
         }
 
         // Update methods to do something useful
@@ -578,7 +572,7 @@
                 }
             };
             fullscreen.requestFullScreen = function(element) {
-                return (this.prefix === "") ? element.requestFullScreen() : element[this.prefix + (this.prefix == "ms" ? "RequestFullscreen" : "RequestFullScreen")](this.prefix === "webkit" ? element.ALLOW_KEYBOARD_INPUT : null);
+                return (this.prefix === "") ? element.requestFullScreen() : element[this.prefix + (this.prefix == "ms" ? "RequestFullscreen" : "RequestFullScreen")]();
             };
             fullscreen.cancelFullScreen = function() {
                 return (this.prefix === "") ? document.cancelFullScreen() : document[this.prefix + (this.prefix == "ms" ? "ExitFullscreen" : "CancelFullScreen")]();
@@ -852,11 +846,11 @@
                     // Cache the container
                     player.videoContainer = wrapper;
                 }
+            }
 
-                // YouTube
-                if(player.type == "youtube") {
-                    _setupYouTube(player.media.getAttribute("data-video-id"));
-                }
+            // YouTube
+            if(player.type == "youtube") {
+                _setupYouTube(player.media.getAttribute("data-video-id"));
             }
 
             // Autoplay
@@ -910,7 +904,7 @@
                 videoId: id,
                 playerVars: {
                     autoplay: 0,
-                    controls: 0,
+                    controls: (player.supported.full ? 0 : 1),
                     vq: "hd720",
                     rel: 0,
                     showinfo: 0,
@@ -953,14 +947,16 @@
                             }
                         }, 200);
 
-                        // Only setup controls once
-                        if(!player.container.querySelectorAll(config.selectors.controls).length) {
-                            _setupInterface();
-                        }
+                        if(player.supported.full) {
+                            // Only setup controls once
+                            if(!player.container.querySelectorAll(config.selectors.controls).length) {
+                                _setupInterface();
+                            }
 
-                        // Display duration if available
-                        if(config.displayDuration) {
-                            _displayDuration();
+                            // Display duration if available
+                            if(config.displayDuration) {
+                                _displayDuration();
+                            }
                         }
                     },
                     onStateChange: function(event) {
@@ -1692,10 +1688,12 @@
             }
             _on(window, "keyup", function(event) {
                 var code = (event.keyCode ? event.keyCode : event.which);
+
                 if(code == 9) { checkFocus(); }
             });
             for (var button in player.buttons) {
                 var element = player.buttons[button];
+
                 _on(element, "blur", function() {
                     _toggleClass(element, "tab-focus", false);
                 });
@@ -1982,7 +1980,7 @@
 
             case "youtube": 
                 basic = true;
-                full  = !oldIE;
+                full  = (!oldIE && !iPhone);
                 break; 
 
             default:

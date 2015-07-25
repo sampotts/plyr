@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.2.3
+- Fix for YouTube on iPhone or unsupported browsers (fallback to YouTube native)
+- Docs tidy up
+- Fullscreen for Safari fix (Fixes #96)
+
 ## v1.2.2
 - Fix for :focus keyboard vs mouse (Fixes #61)
 - Fix for caption positioning in full screen (Fixes #92)

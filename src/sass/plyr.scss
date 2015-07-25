@@ -314,6 +314,8 @@ $bp-captions-large:       768px !default; // When captions jump to the larger fo
 
     // Tooltips
     &-tooltip {
+        $border-base: darken($tooltip-bg, 8%);
+
         visibility: hidden;
         position: absolute;
         z-index: 2;
@@ -323,6 +325,7 @@ $bp-captions-large:       768px !default; // When captions jump to the larger fo
 
         opacity: 0;
         background: $tooltip-bg;
+        border: 1px solid $border-base;
         border-radius: $tooltip-radius;
         color: $tooltip-color;
         font-size: $font-size-small;
@@ -333,25 +336,28 @@ $bp-captions-large:       768px !default; // When captions jump to the larger fo
         transform-origin: 50% 100%;
         transition: transform .2s .1s ease, opacity .2s .1s ease;
 
+        // Arrow
         &::after {
             content: "";
-            display: block;
             position: absolute;
+            z-index: 1;
+            top: 100%;
             left: 50%;
-            bottom: -$tooltip-arrow-size;
-            margin-left: -$tooltip-arrow-size;
-            width: 0;
-            height: 0;
-            transition: inherit;
-            border-style: solid;
-            border-width: $tooltip-arrow-size $tooltip-arrow-size 0 $tooltip-arrow-size;
-            border-color: $controls-bg transparent transparent;
+            display: block;
+            width: 10px;
+            height: 10px;
+            background: $tooltip-bg;
+            transform: translate(-50%, -50%) rotate(45deg) translateY(2px);
+            
+            $arrow-border-color: darken($border-base, 5%);
+            border: 1px solid rgba(red($arrow-border-color), green($arrow-border-color), blue($arrow-border-color), .8);
+            border-width: 0 1px 1px 0;
         }
     }
     label:hover .player-tooltip,
-    input:focus + label .player-tooltip,
+    input.tab-focus:focus + label .player-tooltip, 
     button:hover .player-tooltip,
-    button:focus .player-tooltip {
+    button.tab-focus:focus .player-tooltip {
         visibility: visible;
         opacity: 1;
         transform: translate(-50%, 0) scale(1);

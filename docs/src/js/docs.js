@@ -108,7 +108,7 @@ plyr.setup({
 
 	// Add star
 	function formatGitHubCount(count) {
-		return "&bigstar; " + count;
+		return "&#9733; " + count;
 	}
 
 	// Check if it's in session storage first
