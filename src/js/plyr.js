@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.2.1
+// plyr.js v1.2.2
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -59,7 +59,7 @@
             loading:            "loading",
             tooltip:            "player-tooltip",
             hidden:             "sr-only",
-            hover:              "hover",
+            hover:              "player-hover",
             captions: {
                 enabled:        "captions-enabled",
                 active:         "captions-active"
@@ -1322,7 +1322,7 @@
             // Show the player controls
             function _showControls() {
                 // Set shown class
-                _toggleClass(player.controls, config.classes.hover, true);
+                _toggleClass(player.container, config.classes.hover, true);
 
                 // Clear timer every movement
                 window.clearTimeout(hoverTimer);
@@ -1330,7 +1330,7 @@
                 // If the mouse is not over the controls, set a timeout to hide them
                 if(!isMouseOver) {
                     hoverTimer = window.setTimeout(function() {
-                        _toggleClass(player.controls, config.classes.hover, false);
+                        _toggleClass(player.container, config.classes.hover, false);
                     }, 2000);
                 }
             }
@@ -1674,6 +1674,32 @@
         function _listeners() {
             // IE doesn't support input event, so we fallback to change
             var inputEvent = (player.browser.name == "IE" ? "change" : "input");
+
+            // Detect tab focus
+            function checkFocus() {
+                var focused = document.activeElement;
+                if (!focused || focused == document.body) {
+                    focused = null;
+                }
+                else if (document.querySelector){
+                    focused = document.querySelector(":focus");
+                }
+                for (var button in player.buttons) {
+                    var element = player.buttons[button];
+
+                    _toggleClass(element, "tab-focus", (element === focused));
+                }
+            }
+            _on(window, "keyup", function(event) {
+                var code = (event.keyCode ? event.keyCode : event.which);
+                if(code == 9) { checkFocus(); }
+            });
+            for (var button in player.buttons) {
+                var element = player.buttons[button];
+                _on(element, "blur", function() {
+                    _toggleClass(element, "tab-focus", false);
+                });
+            }
 
             // Play
             _on(player.buttons.play, "click", function() { 

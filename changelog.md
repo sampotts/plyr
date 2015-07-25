@@ -1,7 +1,14 @@
 # Changelog
 
+## v1.2.2
+- Fix for :focus keyboard vs mouse (Fixes #61)
+- Fix for caption positioning in full screen (Fixes #92)
+
+## v1.2.1
+- Tooltip bug fix
+
 ## v1.2.0
-- Added YouTube support.
+- Added YouTube support
 
 ## v1.1.13
 - Added icon prefix option for when using default controls

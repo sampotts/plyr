@@ -351,9 +351,9 @@
         }
     }
     label:hover .player-tooltip,
-    input:focus + label .player-tooltip, 
+    input.tab-focus:focus + label .player-tooltip, 
     button:hover .player-tooltip,
-    button:focus .player-tooltip {
+    button.tab-focus:focus .player-tooltip {
         visibility: visible;
         opacity: 1;
         transform: translate(-50%, 0) scale(1);
@@ -596,16 +596,7 @@
         .player-video-wrapper {
             height: 100%;
             width: 100%;
-
-            .player-captions {
-                top: auto;
-                bottom: 90px;
-
-                @media (min-width: @bp-control-split) {
-                    bottom: 60px;
-                }
-            }
-        }
+        }  
         .player-controls {
             position: absolute;
             bottom: 0;
@@ -614,12 +605,28 @@
         }
 
         // Hide controls when playing in full screen
-        &.fullscreen-hide-controls.playing .player-controls {
-            transform: translateY(100%) translateY(@control-spacing / 2);
-            transition: transform .3s .2s ease;
-
-            &.hover {
+        &.fullscreen-hide-controls.playing {
+            .player-controls {
+                transform: translateY(100%) translateY(@control-spacing / 2);
+                transition: transform .3s .2s ease;
+            }
+            &.player-hover .player-controls {
                 transform: translateY(0);
+            }
+            .player-captions {
+                bottom: (@control-spacing / 2);
+                transition: bottom .3s .2s ease;
+            }
+        }
+
+        // Captions
+        .player-captions,
+        &.fullscreen-hide-controls.playing.player-hover .player-captions {
+            top: auto;
+            bottom: 90px;
+
+            @media (min-width: @bp-control-split) {
+                bottom: 60px;
             }
         }
     }

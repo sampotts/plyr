@@ -10,6 +10,7 @@ plyr.setup({
 	volume: 9,
 	title: 	"Video demo",
 	html: 	templates.controls.render({}),
+	tooltips: true,
 	captions: {
 		defaultActive: true
 	},
