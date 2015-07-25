@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.2.5
+- Fix for YouTube quality (let them decide quality)
+
 ## v1.2.4
 - Fix for omitted kind attribute on <track> (fixes #88)
 

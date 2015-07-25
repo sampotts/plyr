@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.2.4
+// plyr.js v1.2.5
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -907,7 +907,6 @@
                 playerVars: {
                     autoplay: 0,
                     controls: (player.supported.full ? 0 : 1),
-                    vq: "hd720",
                     rel: 0,
                     showinfo: 0,
                     iv_load_policy: 3,
