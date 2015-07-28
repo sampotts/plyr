@@ -7,22 +7,22 @@
 // -------------------------------
 
 // Colors
-$blue:                      #3498DB;
-$gray-dark:                 #343F4A;
-$gray:                      #565D64;
-$gray-light:                #6B7D86;
-$gray-lighter:              #CBD0D3;
-$off-white:                 #D6DADD;
+$blue:                      #3498DB !default;
+$gray-dark:                 #343F4A !default;
+$gray:                      #565D64 !default;
+$gray-light:                #6B7D86 !default;
+$gray-lighter:              #CBD0D3 !default;
+$off-white:                 #D6DADD !default;
 
 // Font sizes
-$font-size-small:           14px;
-$font-size-base:            16px;
-$font-size-large:           ceil(($font-size-base * 1.5)); 
+$font-size-small:           14px !default;
+$font-size-base:            16px !default;
+$font-size-large:           ceil(($font-size-base * 1.5)) !default; 
 
 // Controls
-$control-spacing:           10px;
-$controls-bg:               #fff;
-$control-bg-hover:          $blue;
+$control-spacing:           10px !default;
+$controls-bg:               #fff !default;
+$control-bg-hover:          $blue !default; !default
 
 // Contrast
 @mixin contrast-control-color($color: "") {
@@ -46,30 +46,30 @@ $control-bg-hover:          $blue;
 @include contrast-control-color-hover($control-bg-hover);
 
 // Tooltips
-$tooltip-bg:                $controls-bg;
-$tooltip-color:             $control-color;
-$tooltip-padding:           $control-spacing;   
-$tooltip-arrow-size:        5px;
-$tooltip-radius:            3px;
+$tooltip-bg:                $controls-bg !default;
+$tooltip-color:             $control-color !default;
+$tooltip-padding:           $control-spacing !default;   
+$tooltip-arrow-size:        5px !default;
+$tooltip-radius:            3px !default;
 
 // Progress
-$progress-bg:               rgba(red($gray), green($gray), blue($gray), .2);
-$progress-playing-bg:       $blue;
-$progress-buffered-bg:      rgba(red($gray), green($gray), blue($gray), .25);
-$progress-loading-size:     40px;
-$progress-loading-bg:       rgba(0,0,0, .15);
+$progress-bg:               rgba(red($gray), green($gray), blue($gray), .2) !default;
+$progress-playing-bg:       $blue !default;
+$progress-buffered-bg:      rgba(red($gray), green($gray), blue($gray), .25) !default;
+$progress-loading-size:     40px !default
+$progress-loading-bg:       rgba(0,0,0, .15) !default;
 
 // Volume
-$volume-track-height:       6px;
-$volume-track-bg:           darken($controls-bg, 10%);
-$volume-thumb-height:       ($volume-track-height * 2);
-$volume-thumb-width:        ($volume-track-height * 2);
-$volume-thumb-bg:           $control-color;
-$volume-thumb-bg-focus:     $control-bg-hover;
+$volume-track-height:       6px !default;
+$volume-track-bg:           darken($controls-bg, 10%) !default;
+$volume-thumb-height:       ($volume-track-height * 2) !default;
+$volume-thumb-width:        ($volume-track-height * 2) !default;
+$volume-thumb-bg:           $control-color !default;
+$volume-thumb-bg-focus:     $control-bg-hover !default;
 
 // Breakpoints
-$bp-control-split:          560px; // When controls split into left/right
-$bp-captions-large:         768px; // When captions jump to the larger font size
+$bp-control-split:          560px !default; // When controls split into left/right
+$bp-captions-large:         768px !default; // When captions jump to the larger font size
 
 // Animation
 // ---------------------------------------
@@ -607,15 +607,6 @@ $bp-captions-large:         768px; // When captions jump to the larger font size
         .player-video-wrapper {
             height: 100%;
             width: 100%;
-
-            .player-captions {
-                top: auto;
-                bottom: 90px;
-
-                @media (min-width: $bp-control-split) {
-                    bottom: 60px;
-                }
-            }
         }
         .player-controls {
             position: absolute;
@@ -625,12 +616,28 @@ $bp-captions-large:         768px; // When captions jump to the larger font size
         }
 
         // Hide controls when playing in full screen
-        &.fullscreen-hide-controls.playing .player-controls {
-            transform: translateY(100%) translateY($control-spacing / 2);
-            transition: transform .3s .2s ease;
-
-            &.hover {
+        &.fullscreen-hide-controls.playing {
+            .player-controls {
+                transform: translateY(100%) translateY($control-spacing / 2);
+                transition: transform .3s .2s ease;
+            }
+            &.player-hover .player-controls {
                 transform: translateY(0);
+            }
+            .player-captions {
+                bottom: ($control-spacing / 2);
+                transition: bottom .3s .2s ease;
+            }
+        }
+
+        // Captions
+        .player-captions,
+        &.fullscreen-hide-controls.playing.player-hover .player-captions {
+            top: auto;
+            bottom: 90px;
+
+            @media (min-width: $bp-control-split) {
+                bottom: 60px;
             }
         }
     }
