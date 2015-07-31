@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.2.6
+- SASS updates and fixes (cheers @ChristianPV)
+
 ## v1.2.5
 - Fix for YouTube quality (let them decide quality)
 

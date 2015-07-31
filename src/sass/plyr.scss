@@ -7,51 +7,69 @@
 // -------------------------------
 
 // Colors
-$blue:                    #3498DB !default;
-$gray-dark:               #343F4A !default;
-$gray:                    #565D64 !default;
-$gray-light:              #6B7D86 !default;
-$gray-lighter:            #CBD0D3 !default;
-$off-white:               #D6DADD !default;
+$blue:                      #3498DB !default;
+$gray-dark:                 #343F4A !default;
+$gray:                      #565D64 !default;
+$gray-light:                #6B7D86 !default;
+$gray-lighter:              #CBD0D3 !default;
+$off-white:                 #D6DADD !default;
 
 // Font sizes
-$font-size-small:         14px !default;
-$font-size-base:          16px !default;
-$font-size-large:         ceil(($font-size-base * 1.5)) !default;
+$font-size-small:           14px !default;
+$font-size-base:            16px !default;
+$font-size-large:           ceil(($font-size-base * 1.5)) !default; 
 
 // Controls
-$control-spacing:         10px !default;
-$controls-bg:             #fff !default;
-$control-bg-hover:        @blue !default;
-.contrast-control-color($controls-bg);
-.contrast-control-color-hover($control-bg-hover);
+$control-spacing:           10px !default;
+$controls-bg:               #fff !default;
+$control-bg-hover:          $blue !default; !default
+
+// Contrast
+@mixin contrast-control-color($color: "") {
+  $control-color: null !global;
+  @if lightness($color) >= 65% {
+    $control-color: $gray-light;
+  } @else if(lightness($color) < 65%) {
+    $control-color: $gray-lighter;
+  }
+}
+@mixin contrast-control-color-hover($color: "") {
+  $control-color-hover: null !global;
+  @if lightness($color) >= 65% {
+    $control-color-hover: $gray;
+  } @else if lightness($color) < 65% {
+    $control-color-hover: #fff;
+  }
+}
+
+@include contrast-control-color($controls-bg);
+@include contrast-control-color-hover($control-bg-hover);
 
 // Tooltips
-$tooltip-bg:              $controls-bg !default;
-$tooltip-border-color:    $off-white !default;
-$tooltip-color:           $control-color !default;
-$tooltip-padding:         $control-spacing !default;
-$tooltip-arrow-size:      5px !default;
-$tooltip-radius:          3px !default;
+$tooltip-bg:                $controls-bg !default;
+$tooltip-color:             $control-color !default;
+$tooltip-padding:           $control-spacing !default;   
+$tooltip-arrow-size:        5px !default;
+$tooltip-radius:            3px !default;
 
 // Progress
-$progress-bg:             rgba(red($gray), green($gray), blue($gray), .2) !default;
-$progress-playing-bg:     $blue !default;
-$progress-buffered-bg:    rgba(red($gray), green($gray), blue($gray), .25) !default;
-$progress-loading-size:   40px !default;
-$progress-loading-bg:     rgba(0,0,0, .15) !default;
+$progress-bg:               rgba(red($gray), green($gray), blue($gray), .2) !default;
+$progress-playing-bg:       $blue !default;
+$progress-buffered-bg:      rgba(red($gray), green($gray), blue($gray), .25) !default;
+$progress-loading-size:     40px !default
+$progress-loading-bg:       rgba(0,0,0, .15) !default;
 
 // Volume
-$volume-track-height:     6px !default;
-$volume-track-bg:         darken($controls-bg, 10%) !default;
-$volume-thumb-height:     ($volume-track-height * 2) !default;
-$volume-thumb-width:      ($volume-track-height * 2) !default;
-$volume-thumb-bg:         $control-color !default;
-$volume-thumb-bg-focus:   $control-bg-hover !default;
+$volume-track-height:       6px !default;
+$volume-track-bg:           darken($controls-bg, 10%) !default;
+$volume-thumb-height:       ($volume-track-height * 2) !default;
+$volume-thumb-width:        ($volume-track-height * 2) !default;
+$volume-thumb-bg:           $control-color !default;
+$volume-thumb-bg-focus:     $control-bg-hover !default;
 
 // Breakpoints
-$bp-control-split:        560px !default; // When controls split into left/right
-$bp-captions-large:       768px !default; // When captions jump to the larger font size
+$bp-control-split:          560px !default; // When controls split into left/right
+$bp-captions-large:         768px !default; // When captions jump to the larger font size
 
 // Animation
 // ---------------------------------------
@@ -60,45 +78,24 @@ $bp-captions-large:       768px !default; // When captions jump to the larger fo
     to { background-position: $progress-loading-size 0; }
 }
 
-// Mixins
-// -------------------------------
-
-// Contrast
-@mixin contrast-control-color($color: "") {
-    @if (lightness($color) >= 65%) {
-        $control-color: $gray-light;
-    }
-    @else if(lightness(@color) < 65%) {
-        $control-color: $gray-lighter;
-    }
-}
-@mixin contrast-control-color-hover($color: "") {
-    @if (lightness($color) >= 65%) {
-        $control-color-hover: $gray;
-    }
-    @else if (lightness($color) < 65%) {
-        $control-color-hover: #fff;
-    }
-}
-
 // Font smoothing
 @mixin font-smoothing($mode: on)
 {
-    @if ($mode == 'on') {
-        -moz-osx-font-smoothing: grayscale;
-        -webkit-font-smoothing: antialiased;
-    } 
-    @else if ($mode == 'off') {
-        -moz-osx-font-smoothing: auto;
-        -webkit-font-smoothing: subpixel-antialiased;
-    }
+  @if ($mode == 'on') {
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+  }
+  @else if ($mode == 'off') {
+    -moz-osx-font-smoothing: auto;
+    -webkit-font-smoothing: subpixel-antialiased;
+  }
 }
 
 // Contain floats: nicolasgallagher.com/micro-clearfix-hack/
 @mixin clearfix()
 {
     zoom: 1;
-    &:before,
+    &:before, 
     &:after { content: ""; display: table; }
     &:after { clear: both; }
 }
@@ -109,7 +106,7 @@ $bp-captions-large:       768px !default; // When captions jump to the larger fo
     outline-offset: 0;
 }
 
-// Range mixins
+// <input type="range"> styling
 @mixin volume-thumb()
 {
     height: $volume-thumb-height;
@@ -154,7 +151,7 @@ $bp-captions-large:       768px !default; // When captions jump to the larger fo
 
 // Styles
 // -------------------------------
-// Base
+// Base 
 .player {
     position: relative;
     max-width: 100%;
@@ -165,8 +162,8 @@ $bp-captions-large:       768px !default; // When captions jump to the larger fo
     &,
     *,
     *::after,
-    *::before {
-        box-sizing: border-box;
+    *::before { 
+        box-sizing: border-box; 
     }
 
     // For video
@@ -178,6 +175,21 @@ $bp-captions-large:       768px !default; // When captions jump to the larger fo
         width: 100%;
         height: auto;
         vertical-align: middle;
+    }
+
+    // For embeds
+    &-video-embed {
+        padding-bottom: 56.25%; /* 16:9 */
+        height: 0;
+        
+        iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
     }
 
     // Captions
@@ -192,10 +204,10 @@ $bp-captions-large:       768px !default; // When captions jump to the larger fo
         color: #fff;
         font-size: $font-size-base;
         font-weight: 600;
-        text-shadow:
-        -1px -1px 0 $gray,
-        1px -1px 0 $gray,
-        -1px 1px 0 $gray,
+        text-shadow: 
+        -1px -1px 0 $gray, 
+        1px -1px 0 $gray, 
+        -1px 1px 0 $gray, 
         1px 1px 0 $gray;
         text-align: center;
         @include font-smoothing();
@@ -233,15 +245,15 @@ $bp-captions-large:       768px !default; // When captions jump to the larger fo
                 margin-top: 0;
             }
         }
-
-        input + label,
+        
+        input + label, 
         button {
             display: inline-block;
             vertical-align: middle;
             margin: 0 2px;
             padding: ($control-spacing / 2) $control-spacing;
-
-            background .3s ease, color .3s ease, opacity .3s ease;
+            
+            transition: background .3s ease, color .3s ease, opacity .3s ease;
             border-radius: 3px;
             cursor: pointer;
 
@@ -257,7 +269,7 @@ $bp-captions-large:       768px !default; // When captions jump to the larger fo
         .inverted:checked + label {
             opacity: .5;
         }
-        button,
+        button, 
         .inverted + label,
         input:checked + label {
             color: $control-color;
@@ -268,7 +280,7 @@ $bp-captions-large:       768px !default; // When captions jump to the larger fo
             background: transparent;
             overflow: hidden;
         }
-
+        
         // Specificity for overriding .inverted
         button:focus,
         button:hover,
@@ -323,7 +335,6 @@ $bp-captions-large:       768px !default; // When captions jump to the larger fo
 
         opacity: 0;
         background: $tooltip-bg;
-        border: 1px solid $tooltip-border-color;
         border-radius: $tooltip-radius;
         color: $tooltip-color;
         font-size: $font-size-small;
@@ -334,26 +345,25 @@ $bp-captions-large:       768px !default; // When captions jump to the larger fo
         transform-origin: 50% 100%;
         transition: transform .2s .1s ease, opacity .2s .1s ease;
 
-        // Arrow
         &::after {
             content: "";
-            position: absolute;
-            z-index: 1;
-            top: 100%;
-            left: 50%;
             display: block;
-            width: 10px;
-            height: 10px;
-            background: $tooltip-bg;
-            transform: translate(-50%, -50%) rotate(45deg) translateY(2px);
-            border: 1px solid $tooltip-border-color;
-            border-width: 0 1px 1px 0;
+            position: absolute;
+            left: 50%;
+            bottom: -$tooltip-arrow-size;
+            margin-left: -$tooltip-arrow-size;
+            width: 0;
+            height: 0;
+            transition: inherit;
+            border-style: solid;
+            border-width: $tooltip-arrow-size $tooltip-arrow-size 0 $tooltip-arrow-size;
+            border-color: $controls-bg transparent transparent;
         }
     }
     label:hover .player-tooltip,
-    input.tab-focus:focus + label .player-tooltip, 
+    input:focus + label .player-tooltip, 
     button:hover .player-tooltip,
-    button.tab-focus:focus .player-tooltip {
+    button:focus .player-tooltip {
         opacity: 1;
         transform: translate(-50%, 0) scale(1);
     }
@@ -391,7 +401,7 @@ $bp-captions-large:       768px !default; // When captions jump to the larger fo
             background: transparent;
         }
         &-buffer[value],
-        &-played[value] {
+        &-played[value] {   
             &::-webkit-progress-bar {
                 background: transparent;
             }
@@ -437,7 +447,7 @@ $bp-captions-large:       768px !default; // When captions jump to the larger fo
                 -moz-appearance: none;
                 @include seek-thumb();
             }
-
+            
             // Microsoft
             &::-ms-track {
                 color: transparent;
@@ -467,15 +477,15 @@ $bp-captions-large:       768px !default; // When captions jump to the larger fo
         background-repeat: repeat-x;
         background-color: $progress-buffered-bg;
         background-image: linear-gradient(
-            -45deg,
-            $progress-loading-bg 25%,
-            transparent 25%,
-            transparent 50%,
-            $progress-loading-bg 50%,
+            -45deg, 
+            $progress-loading-bg 25%, 
+            transparent 25%, 
+            transparent 50%, 
+            $progress-loading-bg 50%, 
             $progress-loading-bg 75%,
-            transparent 75%,
+            transparent 75%, 
             transparent);
-            color: transparent;
+        color: transparent;
     }
 
     // States
@@ -490,18 +500,18 @@ $bp-captions-large:       768px !default; // When captions jump to the larger fo
     // Volume control
     // <input[type='range']> element
     // Specificity is for bootstrap compatibility
-    &-volume[type="range"] {
+    &-volume[type=range] {
         display: inline-block;
         vertical-align: middle;
         -webkit-appearance: none;
         -moz-appearance: none;
         width: 100px;
         margin: 0 $control-spacing 0 0;
-        padding: 0;
+        padding: 0;     
         cursor: pointer;
         background: transparent;
         border: none;
-
+        
         // Webkit
         &::-webkit-slider-runnable-track {
             @include volume-track();
@@ -519,7 +529,7 @@ $bp-captions-large:       768px !default; // When captions jump to the larger fo
         &::-moz-range-thumb {
             @include volume-thumb();
         }
-
+        
         // Microsoft
         &::-ms-track {
             height: $volume-track-height;
@@ -613,7 +623,7 @@ $bp-captions-large:       768px !default; // When captions jump to the larger fo
                 transform: translateY(0);
             }
             .player-captions {
-                bottom: (@control-spacing / 2);
+                bottom: ($control-spacing / 2);
                 transition: bottom .3s .2s ease;
             }
         }
