@@ -23,27 +23,20 @@ $font-size-large:           ceil(($font-size-base * 1.5)) !default;
 $control-spacing:           10px !default;
 $controls-bg:               #fff !default;
 $control-bg-hover:          $blue !default; !default
+$control-color:             null !default;
+$control-color-hover:       null !default;
 
 // Contrast
-@mixin contrast-control-color($color: "") {
-  $control-color: null !global;
-  @if lightness($color) >= 65% {
-    $control-color: $gray-light;
-  } @else if(lightness($color) < 65%) {
-    $control-color: $gray-lighter;
-  }
+@if lightness($controls-bg) >= 65% {
+  $control-color: $gray-light;
+} @else {
+  $control-color: $gray-lighter;
 }
-@mixin contrast-control-color-hover($color: "") {
-  $control-color-hover: null !global;
-  @if lightness($color) >= 65% {
-    $control-color-hover: $gray;
-  } @else if lightness($color) < 65% {
-    $control-color-hover: #fff;
-  }
+@if lightness($control-bg-hover) >= 65% {
+  $control-color-hover: $gray;
+} @else {
+  $control-color-hover: #fff;
 }
-
-@include contrast-control-color($controls-bg);
-@include contrast-control-color-hover($control-bg-hover);
 
 // Tooltips
 $tooltip-bg:                $controls-bg !default;
