@@ -203,7 +203,7 @@ maxAge  = 31536000, // seconds 1 year
 options = {
     cdn: {
         headers: {
-            "Cache-Control": "max-age=" + maxAge + ", no-transform, public",
+            "Cache-Control": "max-age=" + maxAge,
             "Vary": "Accept-Encoding"
         },
         gzippedOnly: true
