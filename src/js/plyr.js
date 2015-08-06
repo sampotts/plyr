@@ -1253,7 +1253,7 @@
 
             // YouTube
             if(player.type == "youtube") {
-                player.embed.seekTo(player.media.currentTime);
+                player.embed.seekTo(targetTime);
 
                 // Trigger timeupdate
                 _triggerEvent(player.media, "timeupdate");
