@@ -915,7 +915,7 @@
                     modestbranding: 1
                 },
                 events: {
-                    onReady: function(event) {
+                    'onReady': function(event) {
                         // Get the instance
                         var instance = event.target;
 
@@ -960,7 +960,7 @@
                             }
                         }
                     },
-                    onStateChange: function(event) {
+                    'onStateChange': function(event) {
                         // Get the instance
                         var instance = event.target;
 
