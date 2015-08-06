@@ -1245,16 +1245,15 @@
                 targetTime = player.media.duration;
             }
 
-			// Set the current time
-            if(player.type == "video" || player.type == "audio") {
-            	// Try/catch incase the media isn't set and we're calling seek() from source() and IE moans
-            	try {
-					player.media.currentTime = targetTime.toFixed(1);
-				}
-				catch(e) {}
-			}
+            // Set the current time
+            // Try/catch incase the media isn't set and we're calling seek() from source() and IE moans
+            try {
+                player.media.currentTime = targetTime.toFixed(1);
+            }
+            catch(e) {}
+
             // YouTube
-            else if(player.type == "youtube") {
+            if(player.type == "youtube") {
                 player.embed.seekTo(targetTime);
 
                 // Trigger timeupdate
