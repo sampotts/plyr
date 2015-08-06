@@ -912,7 +912,8 @@
                     iv_load_policy: 3,
                     cc_lang_pref: "en",
                     wmode: "transparent",
-                    modestbranding: 1
+                    modestbranding: 1,
+					disablekb: 1
                 },
                 events: {
                     'onReady': function(event) {
