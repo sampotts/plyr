@@ -22,7 +22,7 @@ $font-size-large:           ceil(($font-size-base * 1.5)) !default;
 // Controls
 $control-spacing:           10px !default;
 $controls-bg:               #fff !default;
-$control-bg-hover:          $blue !default; !default
+$control-bg-hover:          $blue !default;
 $control-color:             null !default;
 $control-color-hover:       null !default;
 
@@ -49,7 +49,7 @@ $tooltip-radius:            3px !default;
 $progress-bg:               rgba(red($gray), green($gray), blue($gray), .2) !default;
 $progress-playing-bg:       $blue !default;
 $progress-buffered-bg:      rgba(red($gray), green($gray), blue($gray), .25) !default;
-$progress-loading-size:     40px !default
+$progress-loading-size:     40px !default;
 $progress-loading-bg:       rgba(0,0,0, .15) !default;
 
 // Volume
