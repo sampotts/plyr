@@ -9,8 +9,8 @@ A simple, accessible HTML5 media player.
 We wanted a lightweight, accessible and customisable media player that just supports [*modern*](#browser-support) browsers. Sure, there are many other players out there but we wanted to keep things simple, using the right elements for the job. 
 
 ## Features
-- **Accessible** - full support for captions and screen readers.
-- **Lightweight** - just 7.5KB minified and gzipped.
+- **Accessible** - full support for VTT captions and screen readers.
+- **Lightweight** - just 8KB minified and gzipped.
 - **[Customisable](#html)** - make the player look how you want with the markup you want.
 - **Semantic** - uses the *right* elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no `<span>` or `<a href="#">` button hacks.
 - **Responsive** - as you'd expect these days.
@@ -18,6 +18,7 @@ We wanted a lightweight, accessible and customisable media player that just supp
 - **[Embedded Video](#embeds)** - support for YouTube (Vimeo soon).
 - **[API](#api)** - toggle playback, volume, seeking, and more.
 - **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes.
+- **i18n support** - support for internationalization of controls.
 - **No dependencies** - written in vanilla JavaScript, no jQuery required. 
 
 Oh and yes, it works with Bootstrap. 
