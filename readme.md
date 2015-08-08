@@ -27,9 +27,9 @@ Oh and yes, it works with Bootstrap.
 Check out [the changelog](changelog.md)
 
 ## Planned development
-- Playlists
-- ~~YouTube~~ and Vimeo support
+- Vimeo support
 - Playback speed
+- Playlists
 - Multiple language captions (with selection)
 - Audio captions
 ... and whatever else has been raised in [issues](https://github.com/Selz/plyr/issues)
