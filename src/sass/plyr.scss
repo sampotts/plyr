@@ -22,28 +22,21 @@ $font-size-large:           ceil(($font-size-base * 1.5)) !default;
 // Controls
 $control-spacing:           10px !default;
 $controls-bg:               #fff !default;
-$control-bg-hover:          $blue !default; !default
+$control-bg-hover:          $blue !default;
+$control-color:             null !default;
+$control-color-hover:       null !default;
 
 // Contrast
-@mixin contrast-control-color($color: "") {
-  $control-color: null !global;
-  @if lightness($color) >= 65% {
-    $control-color: $gray-light;
-  } @else if(lightness($color) < 65%) {
-    $control-color: $gray-lighter;
-  }
+@if lightness($controls-bg) >= 65% {
+  $control-color: $gray-light;
+} @else {
+  $control-color: $gray-lighter;
 }
-@mixin contrast-control-color-hover($color: "") {
-  $control-color-hover: null !global;
-  @if lightness($color) >= 65% {
-    $control-color-hover: $gray;
-  } @else if lightness($color) < 65% {
-    $control-color-hover: #fff;
-  }
+@if lightness($control-bg-hover) >= 65% {
+  $control-color-hover: $gray;
+} @else {
+  $control-color-hover: #fff;
 }
-
-@include contrast-control-color($controls-bg);
-@include contrast-control-color-hover($control-bg-hover);
 
 // Tooltips
 $tooltip-bg:                $controls-bg !default;
@@ -56,7 +49,7 @@ $tooltip-radius:            3px !default;
 $progress-bg:               rgba(red($gray), green($gray), blue($gray), .2) !default;
 $progress-playing-bg:       $blue !default;
 $progress-buffered-bg:      rgba(red($gray), green($gray), blue($gray), .25) !default;
-$progress-loading-size:     40px !default
+$progress-loading-size:     40px !default;
 $progress-loading-bg:       rgba(0,0,0, .15) !default;
 
 // Volume
