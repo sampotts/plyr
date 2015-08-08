@@ -1,5 +1,11 @@
 # Changelog
 
+# v1.3.0
+- Internationalization support (i18n) using default controls (required markup changes to controls)
+- ARIA enhancements for controls (required markup changes to controls)
+- Captions legibility improvements
+- YouTube bug fixes
+
 ## v1.2.6
 - SASS updates and fixes (cheers @ChristianPV)
 
@@ -21,7 +27,7 @@
 ## v1.2.1
 - Tooltip bug fix
 
-## v1.2.0
+# v1.2.0
 - Added YouTube support
 
 ## v1.1.13

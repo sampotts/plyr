@@ -40,23 +40,18 @@
         </span>
     </span>
     <span class="player-controls-right">
-        <input class="inverted sr-only" id="mute{id}" type="checkbox" data-player="mute">
-        <label id="mute{id}" for="mute{id}">
+        <button type="button" data-player="mute">
             <svg class="icon-muted"><use xlink:href="#icon-muted"></use></svg>
             <svg><use xlink:href="#icon-volume"></use></svg>
             <span class="sr-only">Toggle Mute</span>
-        </label>
-
+        </button>
         <label for="volume{id}" class="sr-only">Volume</label>
         <input id="volume{id}" class="player-volume" type="range" min="0" max="10" step="0.5" value="0" data-player="volume">
-
-        <input class="sr-only" id="captions{id}" type="checkbox" data-player="captions">
-        <label for="captions{id}">
+        <button type="button" data-player="captions">
             <svg class="icon-captions-on"><use xlink:href="#icon-captions-on"></use></svg>
             <svg><use xlink:href="#icon-captions-off"></use></svg>
             <span class="sr-only">Toggle Captions</span>
-        </label>
-
+        </button>
         <button type="button" data-player="fullscreen">
             <svg class="icon-exit-fullscreen"><use xlink:href="#icon-exit-fullscreen"></use></svg>
             <svg><use xlink:href="#icon-enter-fullscreen"></use></svg>

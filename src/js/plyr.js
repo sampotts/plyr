@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.2.6
+// plyr.js v1.3.0
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -83,7 +83,21 @@
             key:                "plyr_volume"
         },
         controls:               ["restart", "rewind", "play", "fast-forward", "current-time", "duration", "mute", "volume", "captions", "fullscreen"],
-        onSetup:                function() {}
+        i18n: {
+            restart:            "Restart",
+            rewind:             "Rewind {seektime} secs",
+            play:               "Play",
+            pause:              "Pause",
+            forward:            "Forward {seektime} secs",
+            played:             "played",
+            buffered:           "buffered",
+            currentTime:        "Current time",
+            duration:           "Duration",
+            volume:             "Volume",
+            toggleMute:         "Toggle Mute",
+            toggleCaptions:     "Toggle Captions",
+            toggleFullscreen:   "Toggle Fullscreen"
+        }
     };
 
     // Build the default HTML
@@ -95,10 +109,10 @@
                 "<label for='seek{id}' class='sr-only'>Seek</label>",
                 "<input id='seek{id}' class='player-progress-seek' type='range' min='0' max='100' step='0.5' value='0' data-player='seek'>",
                 "<progress class='player-progress-played' max='100' value='0'>",
-                    "<span>0</span>% played",
+                    "<span>0</span>% " + config.i18n.played,
                 "</progress>",
                 "<progress class='player-progress-buffer' max='100' value='0'>",
-                    "<span>0</span>% buffered",
+                    "<span>0</span>% " + config.i18n.buffered,
                 "</progress>",
             "</div>",
             "<span class='player-controls-left'>"];
@@ -108,7 +122,7 @@
             html.push(
                 "<button type='button' data-player='restart'>",
                     "<svg><use xlink:href='#" + config.iconPrefix + "-restart'></use></svg>",
-                    "<span class='sr-only'>Restart</span>",
+                    "<span class='sr-only'>" + config.i18n.restart + "</span>",
                 "</button>"
             );
         }
@@ -118,7 +132,7 @@
             html.push(
                 "<button type='button' data-player='rewind'>",
                     "<svg><use xlink:href='#" + config.iconPrefix + "-rewind'></use></svg>",
-                    "<span class='sr-only'>Rewind {seektime} secs</span>",
+                    "<span class='sr-only'>" + config.i18n.rewind + "</span>",
                 "</button>"
             );
         }
@@ -128,11 +142,11 @@
             html.push(
                 "<button type='button' data-player='play'>",
                     "<svg><use xlink:href='#" + config.iconPrefix + "-play'></use></svg>",
-                    "<span class='sr-only'>Play</span>",
+                    "<span class='sr-only'>" + config.i18n.play + "</span>",
                 "</button>",
                 "<button type='button' data-player='pause'>",
                     "<svg><use xlink:href='#" + config.iconPrefix + "-pause'></use></svg>",
-                    "<span class='sr-only'>Pause</span>",
+                    "<span class='sr-only'>" + config.i18n.pause + "</span>",
                 "</button>"
             );
         }
@@ -142,7 +156,7 @@
             html.push(
                 "<button type='button' data-player='fast-forward'>",
                     "<svg><use xlink:href='#" + config.iconPrefix + "-fast-forward'></use></svg>",
-                    "<span class='sr-only'>Forward {seektime} secs</span>",
+                    "<span class='sr-only'>" + config.i18n.forward + "</span>",
                 "</button>"
             );
         }
@@ -151,7 +165,7 @@
         if(_inArray(config.controls, "current-time")) {
             html.push(
                 "<span class='player-time'>",
-                    "<span class='sr-only'>Current time</span>",
+                    "<span class='sr-only'>" + config.i18n.currentTime + "</span>",
                     "<span class='player-current-time'>00:00</span>",
                 "</span>"
             );
@@ -161,7 +175,7 @@
         if(_inArray(config.controls, "duration")) {
             html.push(
                 "<span class='player-time'>",
-                    "<span class='sr-only'>Duration</span>",
+                    "<span class='sr-only'>" + config.i18n.duration + "</span>",
                     "<span class='player-duration'>00:00</span>",
                 "</span>"
             );
@@ -176,19 +190,18 @@
         // Toggle mute button
         if(_inArray(config.controls, "mute")) {
             html.push(
-                "<input class='inverted sr-only' id='mute{id}' type='checkbox' data-player='mute'>",
-                "<label id='mute{id}' for='mute{id}'>",
+                "<button type='button' data-player='mute'>",
                     "<svg class='icon-muted'><use xlink:href='#" + config.iconPrefix + "-muted'></use></svg>",
                     "<svg><use xlink:href='#" + config.iconPrefix + "-volume'></use></svg>",
-                    "<span class='sr-only'>Toggle Mute</span>",
-                "</label>"
+                    "<span class='sr-only'>" + config.i18n.toggleMute + "</span>",
+                "</button>"
             );
         }
 
         // Volume range control
         if(_inArray(config.controls, "volume")) {
             html.push(
-                "<label for='volume{id}' class='sr-only'>Volume</label>",
+                "<label for='volume{id}' class='sr-only'>" + config.i18n.volume + "</label>",
                 "<input id='volume{id}' class='player-volume' type='range' min='0' max='10' value='5' data-player='volume'>"
             );
         }
@@ -196,12 +209,11 @@
         // Toggle captions button
         if(_inArray(config.controls, "captions")) {
             html.push(
-                "<input class='sr-only' id='captions{id}' type='checkbox' data-player='captions'>",
-                "<label for='captions{id}'>",
+                "<button type='button' data-player='captions'>",
                     "<svg class='icon-captions-on'><use xlink:href='#" + config.iconPrefix + "-captions-on'></use></svg>",
                     "<svg><use xlink:href='#" + config.iconPrefix + "-captions-off'></use></svg>",
-                    "<span class='sr-only'>Toggle Captions</span>",
-                "</label>"
+                    "<span class='sr-only'>" + config.i18n.toggleCaptions + "</span>",
+                "</button>"
             );
         }
 
@@ -211,7 +223,7 @@
                 "<button type='button' data-player='fullscreen'>",
                     "<svg class='icon-exit-fullscreen'><use xlink:href='#" + config.iconPrefix + "-exit-fullscreen'></use></svg>",
                     "<svg><use xlink:href='#" + config.iconPrefix + "-enter-fullscreen'></use></svg>",
-                    "<span class='sr-only'>Toggle Fullscreen</span>",
+                    "<span class='sr-only'>" + config.i18n.toggleFullscreen + "</span>",
                 "</button>"
             );
         }
@@ -478,18 +490,15 @@
         element.dispatchEvent(fauxEvent);
     }
 
-    // Toggle checkbox
-    function _toggleCheckbox(event) {
-        // Only listen for return key
-        if(event.keyCode && event.keyCode != 13) {
-            return true;
-        }
-
-        // Toggle the checkbox
-        event.target.checked = !event.target.checked;
-
-        // Trigger change event
-        _triggerEvent(event.target, "change");
+    // Toggle aria-pressed state on a toggle button
+    function _toggleState(target, state) {
+        // Get state
+        state = (typeof state === "boolean" ? state : !target.getAttribute("aria-pressed"));
+        
+        // Set the attribute on target
+        target.setAttribute("aria-pressed", state);
+        
+        return state;
     }
 
     // Get percentage
@@ -637,7 +646,7 @@
                     player.currentCaption = player.captions[player.subcount][1];
 
                 // Render the caption
-                player.captionsContainer.innerHTML = player.currentCaption;
+                player.captionsContainer.innerHTML = player.currentCaption.trim();
             }
             else {
                 // Clear the caption
@@ -656,7 +665,7 @@
 
             if (config.captions.defaultActive) {
                 _toggleClass(player.container, config.classes.captions.active, true);
-                player.buttons.captions.checked = true;
+                _toggleState(player.buttons.captions, true);
             }
         }
 
@@ -795,15 +804,15 @@
             }
         }
 
-        // Setup aria attributes
-        function _setupAria() {
+        // Setup aria attribute for play
+        function _setupPlayAria() {
             // If there's no play button, bail
             if(!player.buttons.play) {
                 return;
             }
 
             // Find the current text
-            var label = player.buttons.play.innerText || "Play";
+            var label = player.buttons.play.innerText || config.i18n.play;
 
             // If there's a media title set, use that for the label
             if (typeof(config.title) !== "undefined" && config.title.length) {
@@ -913,10 +922,10 @@
                     cc_lang_pref: "en",
                     wmode: "transparent",
                     modestbranding: 1,
-					disablekb: 1
+                    disablekb: 1
                 },
                 events: {
-                    'onReady': function(event) {
+                    "onReady": function(event) {
                         // Get the instance
                         var instance = event.target;
 
@@ -925,7 +934,7 @@
                         player.media.pause = function() { instance.pauseVideo(); };
                         player.media.stop = function() { instance.stopVideo(); };
                         player.media.duration = instance.getDuration();
-                        player.media.paused = (instance.getPlayerState() == 2);
+                        player.media.paused = true;
                         player.media.currentTime = instance.getCurrentTime();
                         player.media.muted = instance.isMuted();
 
@@ -961,7 +970,7 @@
                             }
                         }
                     },
-                    'onStateChange': function(event) {
+                    "onStateChange": function(event) {
                         // Get the instance
                         var instance = event.target;
 
@@ -1010,10 +1019,10 @@
         function _setupCaptions() {
             if(player.type === "video") {
                 // Inject the container
-                player.videoContainer.insertAdjacentHTML("afterbegin", "<div class='" + config.selectors.captions.replace(".", "") + "'></div>");
+                player.videoContainer.insertAdjacentHTML("afterbegin", "<div class='" + config.selectors.captions.replace(".", "") + "' aria-live='assertive'><span></span></div>");
 
                 // Cache selector
-                player.captionsContainer = _getElement(config.selectors.captions);
+                player.captionsContainer = _getElement(config.selectors.captions).querySelector("span");
 
                 // Determine if HTML5 textTracks is supported
                 player.usingTextTracks = false;
@@ -1088,7 +1097,7 @@
 
                                     // Display a cue, if there is one
                                     if (this.activeCues[0] && this.activeCues[0].hasOwnProperty("text")) {
-                                        player.captionsContainer.appendChild(this.activeCues[0].getCueAsHTML());
+                                        player.captionsContainer.appendChild(this.activeCues[0].getCueAsHTML().trim());
                                     }
                                 });
                             }
@@ -1170,6 +1179,9 @@
                     _log("Fullscreen not supported and fallback disabled.");
                 }
 
+                // Toggle state
+                _toggleState(player.buttons.fullscreen, false);
+
                 // Set control hide class hook
                 if(config.fullscreen.hideControls) {
                     _toggleClass(player.container, config.classes.fullscreen.hideControls, true);
@@ -1224,7 +1236,8 @@
         // Seek to time
         // The input parameter can be an event or a number
         function _seek(input) {
-            var targetTime = 0;
+            var targetTime = 0,
+                paused = player.media.paused;
 
             // Explicit position
             if (typeof input === "number") {
@@ -1255,6 +1268,10 @@
             // YouTube
             if(player.type == "youtube") {
                 player.embed.seekTo(targetTime);
+
+                if(paused) {
+                    _pause();
+                }
 
                 // Trigger timeupdate
                 _triggerEvent(player.media, "timeupdate");
@@ -1313,6 +1330,9 @@
 
             // Set class hook
             _toggleClass(player.container, config.classes.fullscreen.active, player.isFullscreen);
+
+            // Set button state
+            _toggleState(player.buttons.fullscreen, player.isFullscreen);
             
             // Toggle controls visibility based on mouse movement and location
             var hoverTimer, isMouseOver = false;
@@ -1399,9 +1419,12 @@
         // Mute
         function _toggleMute(muted) {
             // If the method is called without parameter, toggle based on current value
-            if(typeof muted === "undefined") {
+            if(typeof muted !== "boolean") {
                 muted = !player.media.muted;
             }
+
+            // Set button state
+            _toggleState(player.buttons.mute, muted);
 
             // Set mute on the player
             player.media.muted = muted;
@@ -1435,7 +1458,7 @@
             
             // Update checkbox for mute state
             if(player.supported.full && player.buttons.mute) {
-                player.buttons.mute.checked = (volume === 0);
+                _toggleState(player.buttons.mute, (volume === 0));
             }
         }
 
@@ -1447,11 +1470,14 @@
             }
 
             // If the method is called without parameter, toggle based on current value
-            if(typeof show === "undefined") {
+            if(typeof show !== "boolean") {
                 show = (player.container.className.indexOf(config.classes.captions.active) === -1);
-                player.buttons.captions.checked = show;
             }
 
+            // Toggle state
+            _toggleState(player.buttons.captions, show);
+
+            // Add class hook
             _toggleClass(player.container, config.classes.captions.active, show);
         }
 
@@ -1731,9 +1757,7 @@
             });
 
             // Mute
-            _on(player.buttons.mute, "change", function() {
-                _toggleMute(this.checked);
-            });
+            _on(player.buttons.mute, "click", _toggleMute);
 
             // Fullscreen
             _on(player.buttons.fullscreen, "click", _toggleFullscreen);
@@ -1753,9 +1777,7 @@
             _on(player.media, "loadedmetadata", _displayDuration);
 
             // Captions
-            _on(player.buttons.captions, "change", function() { 
-                _toggleCaptions(this.checked);
-            });
+            _on(player.buttons.captions, "click", _toggleCaptions);
 
             // Handle the media finishing
             _on(player.media, "ended", function() {
@@ -1779,9 +1801,6 @@
 
             // Loading
             _on(player.media, "waiting canplay seeked", _checkLoading);
-
-            // Toggle checkboxes on return key (as they look like buttons)
-            _on(player.checkboxes, "keyup", _toggleCheckbox);
 
             // Click video
             if(player.type === "video" && config.click) {
@@ -1900,7 +1919,7 @@
                 }
 
                 // Set up aria-label for Play button with the title option
-                _setupAria();
+                _setupPlayAria();
             }
 
             // Successful setup
@@ -2026,7 +2045,9 @@
                 element.plyr = (Object.keys(instance).length ? instance : false);
 
                 // Callback
-                config.onSetup.apply(element.plyr);
+                if(typeof config.onSetup === "function") {
+                    config.onSetup.apply(element.plyr);
+                }
             }
 
             // Add to return array even if it's already setup

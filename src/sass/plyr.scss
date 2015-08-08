@@ -17,7 +17,11 @@ $off-white:                 #D6DADD !default;
 // Font sizes
 $font-size-small:           14px !default;
 $font-size-base:            16px !default;
-$font-size-large:           ceil(($font-size-base * 1.5)) !default; 
+
+// Captions
+$font-size-captions-base:   ceil(@font-size-base * 1.25) !default;
+$font-size-captions-medium: ceil(@font-size-base * 1.5) !default;
+$font-size-captions-large:  (@font-size-base * 2) !default;
 
 // Controls
 $control-spacing:           10px !default;
@@ -89,7 +93,7 @@ $bp-captions-large:         768px !default; // When captions jump to the larger 
 {
     zoom: 1;
     &:before, 
-    &:after { content: ""; display: table; }
+    &:after { content: ''; display: table; }
     &:after { clear: both; }
 }
 // Tab focus styles
@@ -192,25 +196,30 @@ $bp-captions-large:         768px !default; // When captions jump to the larger 
         bottom: 0;
         left: 0;
         width: 100%;
-        padding: 20px;
-        min-height: 2.5em;
+        padding: ($control-spacing * 2) ($control-spacing * 2) ($control-spacing * 3);
         color: #fff;
-        font-size: $font-size-base;
-        font-weight: 600;
-        text-shadow: 
-        -1px -1px 0 $gray, 
-        1px -1px 0 $gray, 
-        -1px 1px 0 $gray, 
-        1px 1px 0 $gray;
+        font-size: $font-size-captions-base;
         text-align: center;
         @include font-smoothing();
 
-        @media (min-width: $bp-captions-large) {
-            font-size: $font-size-large;
+        span {
+            border-radius: 2px;
+            padding: 3px 10px;
+            background: rgba(0,0,0, .9);
+        }
+        span:empty {
+            display: none;
+        }
+
+        @media (min-width: @bp-captions-large) {
+            font-size: $font-size-captions-medium;
         }
     }
     &.captions-active &-captions {
         display: block;
+    }
+    &.fullscreen-active &-captions {
+        font-size: $font-size-captions-large;
     }
 
     // Player controls
@@ -239,17 +248,20 @@ $bp-captions-large:         768px !default; // When captions jump to the larger 
             }
         }
         
-        input + label, 
+        // Buttons
         button {
             display: inline-block;
             vertical-align: middle;
             margin: 0 2px;
             padding: ($control-spacing / 2) $control-spacing;
-            
-            transition: background .3s ease, color .3s ease, opacity .3s ease;
+            overflow: hidden;
+            border: 0;
+            background: transparent;
             border-radius: 3px;
             cursor: pointer;
-
+            color: $control-color;
+            transition: background .3s ease, color .3s ease, opacity .3s ease;
+            
             svg {
                 width: 18px;
                 height: 18px;
@@ -257,41 +269,27 @@ $bp-captions-large:         768px !default; // When captions jump to the larger 
                 fill: currentColor;
                 transition: fill .3s ease;
             }
-        }
-        input + label,
-        .inverted:checked + label {
-            opacity: .5;
-        }
-        button, 
-        .inverted + label,
-        input:checked + label {
-            color: $control-color;
-            opacity: 1;
-        }
-        button {
-            border: 0;
-            background: transparent;
-            overflow: hidden;
+        
+            // Hover and tab focus
+            &.tab-focus,
+            &:hover {
+                background: $control-bg-hover;
+                color: $control-color-hover;
+            }
+            // Default focus
+            &:focus {
+                outline: 0;
+            }
         }
         
-        // Specificity for overriding .inverted
-        button:focus,
-        button:hover,
-        [type="checkbox"]:focus + label,
-        [type="checkbox"] + label:hover {
-            background: $control-bg-hover;
-            color: $control-color-hover;
-            opacity: 1;
-        }
-        button:focus,
-        input:focus + label {
-            outline: 0;
-        }
+        // Hide toggle icons by default
         .icon-exit-fullscreen,
         .icon-muted,
         .icon-captions-on {
             display: none;
         }
+        
+        // Time display
         .player-time {
             display: inline-block;
             vertical-align: middle;
@@ -312,7 +310,7 @@ $bp-captions-large:         768px !default; // When captions jump to the larger 
 
             // Add a slash in before
             &::before {
-                content: "\2044";
+                content: '\2044';
                 margin-right: $control-spacing;
             }
         }
@@ -339,7 +337,7 @@ $bp-captions-large:         768px !default; // When captions jump to the larger 
         transition: transform .2s .1s ease, opacity .2s .1s ease;
 
         &::after {
-            content: "";
+            content: '';
             display: block;
             position: absolute;
             left: 50%;
@@ -353,14 +351,11 @@ $bp-captions-large:         768px !default; // When captions jump to the larger 
             border-color: $controls-bg transparent transparent;
         }
     }
-    label:hover .player-tooltip,
-    input:focus + label .player-tooltip, 
     button:hover .player-tooltip,
     button:focus .player-tooltip {
         opacity: 1;
         transform: translate(-50%, 0) scale(1);
     }
-    label:hover .player-tooltip,
     button:hover .player-tooltip {
         z-index: 3;
     }
@@ -378,7 +373,7 @@ $bp-captions-large:         768px !default; // When captions jump to the larger 
 
         &-buffer[value],
         &-played[value],
-        &-seek[type=range] {
+        &-seek[type='range'] {
             position: absolute;
             left: 0;
             top: 0;
@@ -418,7 +413,7 @@ $bp-captions-large:         768px !default; // When captions jump to the larger 
         // Seek control
         // <input[type='range']> element
         // Specificity is for bootstrap compatibility
-        &-seek[type=range] {
+        &-seek[type='range'] {
             z-index: 4;
             cursor: pointer;
             outline: 0;
@@ -493,7 +488,7 @@ $bp-captions-large:         768px !default; // When captions jump to the larger 
     // Volume control
     // <input[type='range']> element
     // Specificity is for bootstrap compatibility
-    &-volume[type=range] {
+    &-volume[type='range'] {
         display: inline-block;
         vertical-align: middle;
         -webkit-appearance: none;
@@ -559,7 +554,6 @@ $bp-captions-large:         768px !default; // When captions jump to the larger 
     // https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html
     &.ios &-volume,
     &.ios [data-player='mute'],
-    &.ios [data-player='mute'] + label,
     &-audio.ios &-controls-right {
         display: none;
     }
@@ -646,15 +640,11 @@ $bp-captions-large:         768px !default; // When captions jump to the larger 
 
     // Some options are hidden by default
     [data-player='captions'],
-    [data-player='captions'] + label,
-    [data-player='fullscreen'],
-    [data-player='fullscreen'] + label {
+    [data-player='fullscreen'] {
         display: none;
     }
     &.captions-enabled [data-player='captions'],
-    &.captions-enabled [data-player='captions'] + label,
-    &.fullscreen-enabled [data-player='fullscreen'],
-    &.fullscreen-enabled [data-player='fullscreen'] + label {
+    &.fullscreen-enabled [data-player='fullscreen'] {
         display: inline-block;
     }
 }
