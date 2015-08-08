@@ -1,5 +1,8 @@
 # Changelog
 
+# v1.3.1 
+- ARIA improvements for captions being read
+
 # v1.3.0
 - Internationalization support (i18n) using default controls (required markup changes to controls)
 - ARIA enhancements for controls (required markup changes to controls)

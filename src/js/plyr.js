@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.3.0
+// plyr.js v1.3.1
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -640,17 +640,19 @@
                 }
             }
 
+            // Clear the caption
+            player.captionsContainer.innerHTML = "";
+
             // Check if the next caption is in the current time range
             if (player.media.currentTime.toFixed(1) >= _timecodeMin(player.captions[player.subcount][0]) && 
                 player.media.currentTime.toFixed(1) <= _timecodeMax(player.captions[player.subcount][0])) {
                     player.currentCaption = player.captions[player.subcount][1];
 
-                // Render the caption
-                player.captionsContainer.innerHTML = player.currentCaption.trim();
-            }
-            else {
-                // Clear the caption
-                player.captionsContainer.innerHTML = "";
+                // Render the caption (only if changed)
+                var content = player.currentCaption.trim();
+                if(player.captionsContainer.innerHTML != content) {
+                    player.captionsContainer.innerHTML = content;
+                }
             }
         }
 
@@ -1019,7 +1021,7 @@
         function _setupCaptions() {
             if(player.type === "video") {
                 // Inject the container
-                player.videoContainer.insertAdjacentHTML("afterbegin", "<div class='" + config.selectors.captions.replace(".", "") + "' aria-live='assertive'><span></span></div>");
+                player.videoContainer.insertAdjacentHTML("afterbegin", "<div class='" + config.selectors.captions.replace(".", "") + "' aria-live='assertive' aria-relevant='additions text'><span></span></div>");
 
                 // Cache selector
                 player.captionsContainer = _getElement(config.selectors.captions).querySelector("span");
