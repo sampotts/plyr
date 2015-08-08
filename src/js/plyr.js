@@ -640,19 +640,26 @@
                 }
             }
 
-            // Clear the caption
-            player.captionsContainer.innerHTML = "";
-
             // Check if the next caption is in the current time range
             if (player.media.currentTime.toFixed(1) >= _timecodeMin(player.captions[player.subcount][0]) && 
                 player.media.currentTime.toFixed(1) <= _timecodeMax(player.captions[player.subcount][0])) {
                     player.currentCaption = player.captions[player.subcount][1];
 
-                // Render the caption (only if changed)
+                // Trim caption text
                 var content = player.currentCaption.trim();
+
+                // Render the caption (only if changed)
                 if(player.captionsContainer.innerHTML != content) {
+                    // Empty caption
+                    // Otherwise NVDA reads it twice
+                    player.captionsContainer.innerHTML = "";
+
+                    // Set new caption text
                     player.captionsContainer.innerHTML = content;
                 }
+            }
+            else {
+                player.captionsContainer.innerHTML = "";
             }
         }
 

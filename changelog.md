@@ -1,5 +1,8 @@
 # Changelog
 
+# v1.3.2
+- Voiceover fix for captions
+
 # v1.3.1 
 - ARIA improvements for captions being read
 
