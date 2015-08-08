@@ -912,10 +912,11 @@
                     iv_load_policy: 3,
                     cc_lang_pref: "en",
                     wmode: "transparent",
-                    modestbranding: 1
+                    modestbranding: 1,
+					disablekb: 1
                 },
                 events: {
-                    onReady: function(event) {
+                    'onReady': function(event) {
                         // Get the instance
                         var instance = event.target;
 
@@ -960,7 +961,7 @@
                             }
                         }
                     },
-                    onStateChange: function(event) {
+                    'onStateChange': function(event) {
                         // Get the instance
                         var instance = event.target;
 
@@ -1253,7 +1254,7 @@
 
             // YouTube
             if(player.type == "youtube") {
-                player.embed.seekTo(player.media.currentTime);
+                player.embed.seekTo(targetTime);
 
                 // Trigger timeupdate
                 _triggerEvent(player.media, "timeupdate");
