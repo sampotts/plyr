@@ -1,6 +1,6 @@
 {
   "name": "plyr",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "A simple HTML5 media player using custom controls",
   "homepage": "http://plyr.io",
   "main": "gulpfile.js",

@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.3.2
+// plyr.js v1.3.3
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -928,6 +928,7 @@
                     rel: 0,
                     showinfo: 0,
                     iv_load_policy: 3,
+                    cc_load_policy: (config.captions.defaultActive ? 1 : 0),
                     cc_lang_pref: "en",
                     wmode: "transparent",
                     modestbranding: 1,
@@ -1028,7 +1029,7 @@
         function _setupCaptions() {
             if(player.type === "video") {
                 // Inject the container
-                player.videoContainer.insertAdjacentHTML("afterbegin", "<div class='" + config.selectors.captions.replace(".", "") + "' aria-live='assertive' aria-relevant='additions text'><span></span></div>");
+                player.videoContainer.insertAdjacentHTML("afterbegin", "<div class='" + config.selectors.captions.replace(".", "") + "'><span></span></div>");
 
                 // Cache selector
                 player.captionsContainer = _getElement(config.selectors.captions).querySelector("span");

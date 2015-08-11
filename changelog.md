@@ -1,5 +1,8 @@
 # Changelog
 
+# v1.3.3
+- Removed captions being read by screen readers
+
 # v1.3.2
 - Voiceover fix for captions
 
