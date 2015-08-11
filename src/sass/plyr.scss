@@ -19,9 +19,9 @@ $font-size-small:           14px !default;
 $font-size-base:            16px !default;
 
 // Captions
-$font-size-captions-base:   ceil(@font-size-base * 1.25) !default;
-$font-size-captions-medium: ceil(@font-size-base * 1.5) !default;
-$font-size-captions-large:  (@font-size-base * 2) !default;
+$font-size-captions-base:   ceil($font-size-base * 1.25) !default;
+$font-size-captions-medium: ceil($font-size-base * 1.5) !default;
+$font-size-captions-large:  ($font-size-base * 2) !default;
 
 // Controls
 $control-spacing:           10px !default;
@@ -211,7 +211,7 @@ $bp-captions-large:         768px !default; // When captions jump to the larger 
             display: none;
         }
 
-        @media (min-width: @bp-captions-large) {
+        @media (min-width: $bp-captions-large) {
             font-size: $font-size-captions-medium;
         }
     }
