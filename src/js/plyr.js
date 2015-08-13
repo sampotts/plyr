@@ -323,7 +323,7 @@
         // Only check video types for video players
         if (player.type == "video") {
             // Check type
-            switch(mimeType) {
+            switch (mimeType) {
                 case "video/webm":   return !!(media.canPlayType && media.canPlayType("video/webm; codecs=\"vp8, vorbis\"").replace(/no/, ""));
                 case "video/mp4":    return !!(media.canPlayType && media.canPlayType("video/mp4; codecs=\"avc1.42E01E, mp4a.40.2\"").replace(/no/, ""));
                 case "video/ogg":    return !!(media.canPlayType && media.canPlayType("video/ogg; codecs=\"theora\"").replace(/no/, ""));
@@ -333,7 +333,7 @@
         // Only check audio types for audio players
         else if (player.type == "audio") {
             // Check type
-            switch(mimeType) {
+            switch (mimeType) {
                 case "audio/mpeg":   return !!(media.canPlayType && media.canPlayType("audio/mpeg;").replace(/no/, ""));
                 case "audio/ogg":    return !!(media.canPlayType && media.canPlayType("audio/ogg; codecs=\"vorbis\"").replace(/no/, ""));
                 case "audio/wav":    return !!(media.canPlayType && media.canPlayType("audio/wav; codecs=\"1\"").replace(/no/, ""));
@@ -363,7 +363,7 @@
     
     // Replace all
     function _replaceAll(string, find, replace) {
-        return string.replace(new RegExp(find.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1"), "g"), replace);
+        return string.replace(new RegExp(find.replace(/([.*+?\^=!:${}()|\[\]\/\\])/g, "\\$1"), "g"), replace);
     }
 
     // Wrap an element
@@ -994,7 +994,7 @@
                         // 2    Paused
                         // 3    Buffering
                         // 5    Video cued    
-                        switch(event.data) {
+                        switch (event.data) {
                             case 0: 
                                 player.media.paused = true;
                                 _triggerEvent(player.media, "ended");
@@ -1510,7 +1510,7 @@
                 value       = 0;
 
             if (event) {
-                switch(event.type) {
+                switch (event.type) {
                     // Video playing
                     case "timeupdate":
                     case "seeking":
@@ -1889,13 +1889,11 @@
 
             // Set media type
             var tagName = player.media.tagName.toLowerCase();
-            switch(tagName) {
-                case "div":
-                    player.type = player.media.getAttribute("data-type");
-                    break;
-
-                default:
-                    player.type = tagName;
+            if (tagName === "div") {
+                player.type = player.media.getAttribute("data-type");
+            }
+            else {
+                player.type = tagName;
             }
         
             // Check for full support
