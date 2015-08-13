@@ -1,5 +1,8 @@
 # Changelog
 
+# v1.3.4
+- Code cleanup by @calvintam236
+
 # v1.3.3
 - Removed captions being read by screen readers
 
