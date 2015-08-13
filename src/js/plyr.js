@@ -1018,7 +1018,6 @@
                             case 2:
                                 player.media.paused = true;
                                 _triggerEvent(player.media, "pause");
-                                break;
                         }
                     }
                 }
@@ -1550,7 +1549,6 @@
 
                                         return 0;
                                     })();
-                        break;
                 }
             }
 
@@ -1898,7 +1896,6 @@
 
                 default:
                     player.type = tagName;
-                    break;
             }
         
             // Check for full support
@@ -2019,7 +2016,6 @@
             default:
                 basic = (audio && video);
                 full  = (basic && !oldIE);
-                break;                
         }
 
         return {
