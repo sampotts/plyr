@@ -607,7 +607,7 @@
                     return false;
                 }
             })()
-        }
+        };
         return storage;
     }
 
@@ -904,7 +904,7 @@
                 _injectScript("https://www.youtube.com/iframe_api");
 
                 // Setup callback for the API
-                window.onYouTubeIframeAPIReady = function () { _YTReady(id, container); }
+                window.onYouTubeIframeAPIReady = function () { _YTReady(id, container); };
             }
         }
 
@@ -1148,7 +1148,7 @@
                                         _log("There was a problem loading the caption file via AJAX.", true);
                                     }
                                 }
-                            }
+                            };
                             
                             xhr.open("get", captionSrc, true);
 
@@ -1573,7 +1573,7 @@
             player.hours = parseInt(((time / 60) / 60) % 60);
 
             // Do we need to display hours?
-            var displayHours = (parseInt(((player.media.duration / 60) / 60) % 60) > 0)
+            var displayHours = (parseInt(((player.media.duration / 60) / 60) % 60) > 0);
             
             // Ensure it"s two digits. For example, 03 rather than 3.
             player.secs = ("0" + player.secs).slice(-2);
@@ -1985,7 +1985,7 @@
             support:            function(mimeType) { return _supportMime(player, mimeType); },
             destroy:            _destroy,
             restore:            _init
-        }
+        };
     }
 
     // Check for support 
@@ -2022,7 +2022,7 @@
             basic:  basic,
             full:   full
         };
-    }
+    };
 
     // Expose setup function
     api.setup = function(options) {
@@ -2063,6 +2063,6 @@
         }
 
         return players;
-    }
+    };
 
 }(this.plyr = this.plyr || {}));
