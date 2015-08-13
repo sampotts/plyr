@@ -121,7 +121,7 @@
         if (_inArray(config.controls, "restart")) {
             html.push(
                 '<button type="button" data-player="restart">',
-                    '<svg><use xlink:href="#' + config.iconPrefix + '-restart"></use></svg>',
+                    '<svg><use xlink:href="#' + config.iconPrefix + '-restart" /></svg>',
                     '<span class="sr-only">' + config.i18n.restart + '</span>',
                 '</button>'
             );
@@ -131,7 +131,7 @@
         if (_inArray(config.controls, "rewind")) {
             html.push(
                 '<button type="button" data-player="rewind">',
-                    '<svg><use xlink:href="#' + config.iconPrefix + '-rewind"></use></svg>',
+                    '<svg><use xlink:href="#' + config.iconPrefix + '-rewind" /></svg>',
                     '<span class="sr-only">' + config.i18n.rewind + '</span>',
                 '</button>'
             );
@@ -141,11 +141,11 @@
         if (_inArray(config.controls, "play")) {
             html.push(
                 '<button type="button" data-player="play">',
-                    '<svg><use xlink:href="#' + config.iconPrefix + '-play"></use></svg>',
+                    '<svg><use xlink:href="#' + config.iconPrefix + '-play" /></svg>',
                     '<span class="sr-only">' + config.i18n.play + '</span>',
                 '</button>',
                 '<button type="button" data-player="pause">',
-                    '<svg><use xlink:href="#' + config.iconPrefix + '-pause"></use></svg>',
+                    '<svg><use xlink:href="#' + config.iconPrefix + '-pause" /></svg>',
                     '<span class="sr-only">' + config.i18n.pause + '</span>',
                 '</button>'
             );
@@ -155,7 +155,7 @@
         if (_inArray(config.controls, "fast-forward")) {
             html.push(
                 '<button type="button" data-player="fast-forward">',
-                    '<svg><use xlink:href="#' + config.iconPrefix + '-fast-forward"></use></svg>',
+                    '<svg><use xlink:href="#' + config.iconPrefix + '-fast-forward" /></svg>',
                     '<span class="sr-only">' + config.i18n.forward + '</span>',
                 '</button>'
             );
@@ -191,8 +191,8 @@
         if (_inArray(config.controls, "mute")) {
             html.push(
                 '<button type="button" data-player="mute">',
-                    '<svg class="icon-muted"><use xlink:href="#' + config.iconPrefix + '-muted"></use></svg>',
-                    '<svg><use xlink:href="#' + config.iconPrefix + '-volume"></use></svg>',
+                    '<svg class="icon-muted"><use xlink:href="#' + config.iconPrefix + '-muted" /></svg>',
+                    '<svg><use xlink:href="#' + config.iconPrefix + '-volume" /></svg>',
                     '<span class="sr-only">' + config.i18n.toggleMute + '</span>',
                 '</button>'
             );
@@ -210,8 +210,8 @@
         if (_inArray(config.controls, "captions")) {
             html.push(
                 '<button type="button" data-player="captions">',
-                    '<svg class="icon-captions-on"><use xlink:href="#' + config.iconPrefix + '-captions-on"></use></svg>',
-                    '<svg><use xlink:href="#' + config.iconPrefix + '-captions-off"></use></svg>',
+                    '<svg class="icon-captions-on"><use xlink:href="#' + config.iconPrefix + '-captions-on" /></svg>',
+                    '<svg><use xlink:href="#' + config.iconPrefix + '-captions-off" /></svg>',
                     '<span class="sr-only">' + config.i18n.toggleCaptions + '</span>',
                 '</button>'
             );
@@ -221,8 +221,8 @@
         if (_inArray(config.controls, "fullscreen")) {
             html.push(
                 '<button type="button" data-player="fullscreen">',
-                    '<svg class="icon-exit-fullscreen"><use xlink:href="#' + config.iconPrefix + '-exit-fullscreen"></use></svg>',
-                    '<svg><use xlink:href="#' + config.iconPrefix + '-enter-fullscreen"></use></svg>',
+                    '<svg class="icon-exit-fullscreen"><use xlink:href="#' + config.iconPrefix + '-exit-fullscreen" /></svg>',
+                    '<svg><use xlink:href="#' + config.iconPrefix + '-enter-fullscreen" /></svg>',
                     '<span class="sr-only">' + config.i18n.toggleFullscreen + '</span>',
                 '</button>'
             );
