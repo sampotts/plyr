@@ -539,7 +539,7 @@
             browserPrefixes = 'webkit moz o ms khtml'.split(' ');
 
         // Check for native support
-        if (typeof document.cancelFullScreen != 'undefined') {
+        if (typeof document.cancelFullScreen !== 'undefined') {
             fullscreen.supportsFullScreen = true;
         }
         else {
@@ -547,12 +547,12 @@
             for (var i = 0, il = browserPrefixes.length; i < il; i++ ) {
                 fullscreen.prefix = browserPrefixes[i];
 
-                if (typeof document[fullscreen.prefix + 'CancelFullScreen'] != 'undefined') {
+                if (typeof document[fullscreen.prefix + 'CancelFullScreen'] !== 'undefined') {
                     fullscreen.supportsFullScreen = true;
                     break;
                 }
                 // Special case for MS (when isn't it?)
-                else if (typeof document.msExitFullscreen != 'undefined' && document.msFullscreenEnabled) {
+                else if (typeof document.msExitFullscreen !== 'undefined' && document.msFullscreenEnabled) {
                     fullscreen.prefix = 'ms';
                     fullscreen.supportsFullScreen = true;
                     break;
@@ -567,7 +567,7 @@
             fullscreen.fullScreenEventName = (fullscreen.prefix == 'ms' ? 'MSFullscreenChange' : fullscreen.prefix + 'fullscreenchange');
 
             fullscreen.isFullScreen = function(element) {
-                if (typeof element == 'undefined') {
+                if (typeof element === 'undefined') {
                     element = document.body;
                 }
                 switch (this.prefix) {
@@ -580,7 +580,7 @@
                 }
             };
             fullscreen.requestFullScreen = function(element) {
-                if (typeof element == 'undefined') {
+                if (typeof element === 'undefined') {
                     element = document.body;
                 }
                 return (this.prefix === '') ? element.requestFullScreen() : element[this.prefix + (this.prefix == 'ms' ? 'RequestFullscreen' : 'RequestFullScreen')]();
@@ -1543,7 +1543,7 @@
                                             return _getPercentage(buffered.end(0), player.media.duration);
                                         }
                                         // YouTube returns between 0 and 1
-                                        else if (typeof buffered == 'number') {
+                                        else if (typeof buffered === 'number') {
                                             return (buffered * 100);
                                         }
 
