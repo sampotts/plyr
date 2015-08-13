@@ -29,16 +29,16 @@
             controls:           ".player-controls",
             labels:             "[data-player] .sr-only, label .sr-only",
             buttons: {
-                seek:           "[data-player='seek']",
-                play:           "[data-player='play']",
-                pause:          "[data-player='pause']",
-                restart:        "[data-player='restart']",
-                rewind:         "[data-player='rewind']",
-                forward:        "[data-player='fast-forward']",
-                mute:           "[data-player='mute']",
-                volume:         "[data-player='volume']",
-                captions:       "[data-player='captions']",
-                fullscreen:     "[data-player='fullscreen']"
+                seek:           '[data-player="seek"]',
+                play:           '[data-player="play"]',
+                pause:          '[data-player="pause"]',
+                restart:        '[data-player="restart"]',
+                rewind:         '[data-player="rewind"]',
+                forward:        '[data-player="fast-forward"]',
+                mute:           '[data-player="mute"]',
+                volume:         '[data-player="volume"]',
+                captions:       '[data-player="captions"]',
+                fullscreen:     '[data-player="fullscreen"]'
             },
             progress: {
                 container:      ".player-progress",
@@ -104,134 +104,134 @@
     function _buildControls() {
         // Open and add the progress and seek elements
         var html = [
-        "<div class='player-controls'>",
-            "<div class='player-progress'>",
-                "<label for='seek{id}' class='sr-only'>Seek</label>",
-                "<input id='seek{id}' class='player-progress-seek' type='range' min='0' max='100' step='0.5' value='0' data-player='seek'>",
-                "<progress class='player-progress-played' max='100' value='0'>",
-                    "<span>0</span>% " + config.i18n.played,
-                "</progress>",
-                "<progress class='player-progress-buffer' max='100' value='0'>",
-                    "<span>0</span>% " + config.i18n.buffered,
-                "</progress>",
-            "</div>",
-            "<span class='player-controls-left'>"];
+        '<div class="player-controls">',
+            '<div class="player-progress">',
+                '<label for="seek{id}" class="sr-only">Seek</label>',
+                '<input id="seek{id}" class="player-progress-seek" type="range" min="0" max="100" step="0.5" value="0" data-player="seek">',
+                '<progress class="player-progress-played" max="100" value="0">',
+                    '<span>0</span>% ' + config.i18n.played,
+                '</progress>',
+                '<progress class="player-progress-buffer" max="100" value="0">',
+                    '<span>0</span>% ' + config.i18n.buffered,
+                '</progress>',
+            '</div>',
+            '<span class="player-controls-left">'];
 
         // Restart button
         if (_inArray(config.controls, "restart")) {
             html.push(
-                "<button type='button' data-player='restart'>",
-                    "<svg><use xlink:href='#" + config.iconPrefix + "-restart'></use></svg>",
-                    "<span class='sr-only'>" + config.i18n.restart + "</span>",
-                "</button>"
+                '<button type="button" data-player="restart">',
+                    '<svg><use xlink:href="#' + config.iconPrefix + '-restart"></use></svg>',
+                    '<span class="sr-only">' + config.i18n.restart + '</span>',
+                '</button>'
             );
         }
 
         // Rewind button
         if (_inArray(config.controls, "rewind")) {
             html.push(
-                "<button type='button' data-player='rewind'>",
-                    "<svg><use xlink:href='#" + config.iconPrefix + "-rewind'></use></svg>",
-                    "<span class='sr-only'>" + config.i18n.rewind + "</span>",
-                "</button>"
+                '<button type="button" data-player="rewind">',
+                    '<svg><use xlink:href="#' + config.iconPrefix + '-rewind"></use></svg>',
+                    '<span class="sr-only">' + config.i18n.rewind + '</span>',
+                '</button>'
             );
         }
 
         // Play/pause button
         if (_inArray(config.controls, "play")) {
             html.push(
-                "<button type='button' data-player='play'>",
-                    "<svg><use xlink:href='#" + config.iconPrefix + "-play'></use></svg>",
-                    "<span class='sr-only'>" + config.i18n.play + "</span>",
-                "</button>",
-                "<button type='button' data-player='pause'>",
-                    "<svg><use xlink:href='#" + config.iconPrefix + "-pause'></use></svg>",
-                    "<span class='sr-only'>" + config.i18n.pause + "</span>",
-                "</button>"
+                '<button type="button" data-player="play">',
+                    '<svg><use xlink:href="#' + config.iconPrefix + '-play"></use></svg>',
+                    '<span class="sr-only">' + config.i18n.play + '</span>',
+                '</button>',
+                '<button type="button" data-player="pause">',
+                    '<svg><use xlink:href="#' + config.iconPrefix + '-pause"></use></svg>',
+                    '<span class="sr-only">' + config.i18n.pause + '</span>',
+                '</button>'
             );
         }
 
         // Fast forward button
         if (_inArray(config.controls, "fast-forward")) {
             html.push(
-                "<button type='button' data-player='fast-forward'>",
-                    "<svg><use xlink:href='#" + config.iconPrefix + "-fast-forward'></use></svg>",
-                    "<span class='sr-only'>" + config.i18n.forward + "</span>",
-                "</button>"
+                '<button type="button" data-player="fast-forward">',
+                    '<svg><use xlink:href="#' + config.iconPrefix + '-fast-forward"></use></svg>',
+                    '<span class="sr-only">' + config.i18n.forward + '</span>',
+                '</button>'
             );
         }
 
         // Media current time display
         if (_inArray(config.controls, "current-time")) {
             html.push(
-                "<span class='player-time'>",
-                    "<span class='sr-only'>" + config.i18n.currentTime + "</span>",
-                    "<span class='player-current-time'>00:00</span>",
-                "</span>"
+                '<span class="player-time">',
+                    '<span class="sr-only">' + config.i18n.currentTime + '</span>',
+                    '<span class="player-current-time">00:00</span>',
+                '</span>'
             );
         }
 
         // Media duration display
         if (_inArray(config.controls, "duration")) {
             html.push(
-                "<span class='player-time'>",
-                    "<span class='sr-only'>" + config.i18n.duration + "</span>",
-                    "<span class='player-duration'>00:00</span>",
-                "</span>"
+                '<span class="player-time">',
+                    '<span class="sr-only">' + config.i18n.duration + '</span>',
+                    '<span class="player-duration">00:00</span>',
+                '</span>'
             );
         }
 
         // Close left controls
         html.push(
-            "</span>",
-            "<span class='player-controls-right'>"
+            '</span>',
+            '<span class="player-controls-right">'
         );
 
         // Toggle mute button
         if (_inArray(config.controls, "mute")) {
             html.push(
-                "<button type='button' data-player='mute'>",
-                    "<svg class='icon-muted'><use xlink:href='#" + config.iconPrefix + "-muted'></use></svg>",
-                    "<svg><use xlink:href='#" + config.iconPrefix + "-volume'></use></svg>",
-                    "<span class='sr-only'>" + config.i18n.toggleMute + "</span>",
-                "</button>"
+                '<button type="button" data-player="mute">',
+                    '<svg class="icon-muted"><use xlink:href="#' + config.iconPrefix + '-muted"></use></svg>',
+                    '<svg><use xlink:href="#' + config.iconPrefix + '-volume"></use></svg>',
+                    '<span class="sr-only">' + config.i18n.toggleMute + '</span>',
+                '</button>'
             );
         }
 
         // Volume range control
         if (_inArray(config.controls, "volume")) {
             html.push(
-                "<label for='volume{id}' class='sr-only'>" + config.i18n.volume + "</label>",
-                "<input id='volume{id}' class='player-volume' type='range' min='0' max='10' value='5' data-player='volume'>"
+                '<label for="volume{id}" class="sr-only">' + config.i18n.volume + '</label>',
+                '<input id="volume{id}" class="player-volume" type="range" min="0" max="10" value="5" data-player="volume">'
             );
         }
 
         // Toggle captions button
         if (_inArray(config.controls, "captions")) {
             html.push(
-                "<button type='button' data-player='captions'>",
-                    "<svg class='icon-captions-on'><use xlink:href='#" + config.iconPrefix + "-captions-on'></use></svg>",
-                    "<svg><use xlink:href='#" + config.iconPrefix + "-captions-off'></use></svg>",
-                    "<span class='sr-only'>" + config.i18n.toggleCaptions + "</span>",
-                "</button>"
+                '<button type="button" data-player="captions">',
+                    '<svg class="icon-captions-on"><use xlink:href="#' + config.iconPrefix + '-captions-on"></use></svg>',
+                    '<svg><use xlink:href="#' + config.iconPrefix + '-captions-off"></use></svg>',
+                    '<span class="sr-only">' + config.i18n.toggleCaptions + '</span>',
+                '</button>'
             );
         }
 
         // Toggle fullscreen button
         if (_inArray(config.controls, "fullscreen")) {
             html.push(
-                "<button type='button' data-player='fullscreen'>",
-                    "<svg class='icon-exit-fullscreen'><use xlink:href='#" + config.iconPrefix + "-exit-fullscreen'></use></svg>",
-                    "<svg><use xlink:href='#" + config.iconPrefix + "-enter-fullscreen'></use></svg>",
-                    "<span class='sr-only'>" + config.i18n.toggleFullscreen + "</span>",
-                "</button>"
+                '<button type="button" data-player="fullscreen">',
+                    '<svg class="icon-exit-fullscreen"><use xlink:href="#' + config.iconPrefix + '-exit-fullscreen"></use></svg>',
+                    '<svg><use xlink:href="#' + config.iconPrefix + '-enter-fullscreen"></use></svg>',
+                    '<span class="sr-only">' + config.i18n.toggleFullscreen + '</span>',
+                '</button>'
             );
         }
 
         // Close everything
         html.push(
-            "</span>",
-        "</div>"
+            '</span>',
+        '</div>'
         );
 
         return html.join("");
@@ -346,7 +346,7 @@
 
     // Inject a script
     function _injectScript(source) {
-        if (document.querySelectorAll("script[src='" + source + "']").length) {
+        if (document.querySelectorAll('script[src="' + source + '"]').length) {
             return;
         }
 
@@ -777,7 +777,7 @@
                 // Inputs
                 player.buttons.mute             = _getElement(config.selectors.buttons.mute);
                 player.buttons.captions         = _getElement(config.selectors.buttons.captions);
-                player.checkboxes               = _getElements("[type='checkbox']");
+                player.checkboxes               = _getElements('[type="checkbox"]');
 
                 // Progress
                 player.progress = {};
@@ -882,7 +882,7 @@
         // Setup YouTube
         function _setupYouTube(id) {
             // Remove old containers
-            var containers = _getElements("[id^='youtube']");
+            var containers = _getElements('[id^="youtube"]');
             for (var i = containers.length - 1; i >= 0; i--) {
                 _remove(containers[i]);
             }
@@ -1028,7 +1028,7 @@
         function _setupCaptions() {
             if (player.type === "video") {
                 // Inject the container
-                player.videoContainer.insertAdjacentHTML("afterbegin", "<div class='" + config.selectors.captions.replace(".", "") + "'><span></span></div>");
+                player.videoContainer.insertAdjacentHTML("afterbegin", '<div class="' + config.selectors.captions.replace(".", "") + '"><span></span></div>');
 
                 // Cache selector
                 player.captionsContainer = _getElement(config.selectors.captions).querySelector("span");
