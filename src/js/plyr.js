@@ -118,7 +118,7 @@
             "<span class='player-controls-left'>"];
 
         // Restart button
-        if(_inArray(config.controls, "restart")) {
+        if (_inArray(config.controls, "restart")) {
             html.push(
                 "<button type='button' data-player='restart'>",
                     "<svg><use xlink:href='#" + config.iconPrefix + "-restart'></use></svg>",
@@ -128,7 +128,7 @@
         }
 
         // Rewind button
-        if(_inArray(config.controls, "rewind")) {
+        if (_inArray(config.controls, "rewind")) {
             html.push(
                 "<button type='button' data-player='rewind'>",
                     "<svg><use xlink:href='#" + config.iconPrefix + "-rewind'></use></svg>",
@@ -138,7 +138,7 @@
         }
 
         // Play/pause button
-        if(_inArray(config.controls, "play")) {
+        if (_inArray(config.controls, "play")) {
             html.push(
                 "<button type='button' data-player='play'>",
                     "<svg><use xlink:href='#" + config.iconPrefix + "-play'></use></svg>",
@@ -152,7 +152,7 @@
         }
 
         // Fast forward button
-        if(_inArray(config.controls, "fast-forward")) {
+        if (_inArray(config.controls, "fast-forward")) {
             html.push(
                 "<button type='button' data-player='fast-forward'>",
                     "<svg><use xlink:href='#" + config.iconPrefix + "-fast-forward'></use></svg>",
@@ -162,7 +162,7 @@
         }
 
         // Media current time display
-        if(_inArray(config.controls, "current-time")) {
+        if (_inArray(config.controls, "current-time")) {
             html.push(
                 "<span class='player-time'>",
                     "<span class='sr-only'>" + config.i18n.currentTime + "</span>",
@@ -172,7 +172,7 @@
         }
 
         // Media duration display
-        if(_inArray(config.controls, "duration")) {
+        if (_inArray(config.controls, "duration")) {
             html.push(
                 "<span class='player-time'>",
                     "<span class='sr-only'>" + config.i18n.duration + "</span>",
@@ -188,7 +188,7 @@
         );
 
         // Toggle mute button
-        if(_inArray(config.controls, "mute")) {
+        if (_inArray(config.controls, "mute")) {
             html.push(
                 "<button type='button' data-player='mute'>",
                     "<svg class='icon-muted'><use xlink:href='#" + config.iconPrefix + "-muted'></use></svg>",
@@ -199,7 +199,7 @@
         }
 
         // Volume range control
-        if(_inArray(config.controls, "volume")) {
+        if (_inArray(config.controls, "volume")) {
             html.push(
                 "<label for='volume{id}' class='sr-only'>" + config.i18n.volume + "</label>",
                 "<input id='volume{id}' class='player-volume' type='range' min='0' max='10' value='5' data-player='volume'>"
@@ -207,7 +207,7 @@
         }
 
         // Toggle captions button
-        if(_inArray(config.controls, "captions")) {
+        if (_inArray(config.controls, "captions")) {
             html.push(
                 "<button type='button' data-player='captions'>",
                     "<svg class='icon-captions-on'><use xlink:href='#" + config.iconPrefix + "-captions-on'></use></svg>",
@@ -218,7 +218,7 @@
         }
 
         // Toggle fullscreen button
-        if(_inArray(config.controls, "fullscreen")) {
+        if (_inArray(config.controls, "fullscreen")) {
             html.push(
                 "<button type='button' data-player='fullscreen'>",
                     "<svg class='icon-exit-fullscreen'><use xlink:href='#" + config.iconPrefix + "-exit-fullscreen'></use></svg>",
@@ -239,7 +239,7 @@
 
     // Debugging
     function _log(text, error) {
-        if(config.debug && window.console) {
+        if (config.debug && window.console) {
             console[(error ? "error" : "log")](text);
         }
     }
@@ -321,7 +321,7 @@
         var media = player.media;
 
         // Only check video types for video players
-        if(player.type == "video") {
+        if (player.type == "video") {
             // Check type
             switch(mimeType) {
                 case "video/webm":   return !!(media.canPlayType && media.canPlayType("video/webm; codecs=\"vp8, vorbis\"").replace(/no/, ""));
@@ -331,7 +331,7 @@
         }
 
         // Only check audio types for audio players
-        else if(player.type == "audio") {
+        else if (player.type == "audio") {
             // Check type
             switch(mimeType) {
                 case "audio/mpeg":   return !!(media.canPlayType && media.canPlayType("audio/mpeg;").replace(/no/, ""));
@@ -346,7 +346,7 @@
 
     // Inject a script
     function _injectScript(source) {
-        if(document.querySelectorAll("script[src='" + source + "']").length) {
+        if (document.querySelectorAll("script[src='" + source + "']").length) {
             return;
         }
 
@@ -426,15 +426,15 @@
 
     // Set attributes
     function _setAttributes(element, attributes) {
-        for(var key in attributes) {
+        for (var key in attributes) {
             element.setAttribute(key, attributes[key]);
         }
     }
 
     // Toggle class on an element
     function _toggleClass(element, name, state) {
-        if(element){
-            if(element.classList) {
+        if (element) {
+            if (element.classList) {
                 element.classList[state ? "add" : "remove"](name);
             }
             else {
@@ -449,7 +449,7 @@
         var eventList = events.split(" ");
 
         // If a nodelist is passed, call itself on each node
-        if(element instanceof NodeList) {
+        if (element instanceof NodeList) {
             for (var x = 0; x < element.length; x++) {
                 if (element[x] instanceof Node) {
                     _toggleHandler(element[x], arguments[1], arguments[2], arguments[3]);
@@ -466,14 +466,14 @@
 
     // Bind event
     function _on(element, events, callback) {
-        if(element) {
+        if (element) {
             _toggleHandler(element, events, callback, true);
         }
     }
 
     // Unbind event
     function _off(element, events, callback) {
-        if(element) {
+        if (element) {
             _toggleHandler(element, events, callback, false);
         }
     }
@@ -503,7 +503,7 @@
 
     // Get percentage
     function _getPercentage(current, max) {
-        if(current === 0 || max === 0 || isNaN(current) || isNaN(max)) {
+        if (current === 0 || max === 0 || isNaN(current) || isNaN(max)) {
             return 0;
         }
         return ((current / max) * 100).toFixed(2);
@@ -567,7 +567,7 @@
             fullscreen.fullScreenEventName = (fullscreen.prefix == "ms" ? "MSFullscreenChange" : fullscreen.prefix + "fullscreenchange");
 
             fullscreen.isFullScreen = function(element) {
-                if(typeof element == "undefined") {
+                if (typeof element == "undefined") {
                     element = document.body;
                 }
                 switch (this.prefix) {
@@ -580,7 +580,7 @@
                 }
             };
             fullscreen.requestFullScreen = function(element) {
-                if(typeof element == "undefined") {
+                if (typeof element == "undefined") {
                     element = document.body;
                 }
                 return (this.prefix === "") ? element.requestFullScreen() : element[this.prefix + (this.prefix == "ms" ? "RequestFullscreen" : "RequestFullScreen")]();
@@ -649,7 +649,7 @@
                 var content = player.currentCaption.trim();
 
                 // Render the caption (only if changed)
-                if(player.captionsContainer.innerHTML != content) {
+                if (player.captionsContainer.innerHTML != content) {
                     // Empty caption
                     // Otherwise NVDA reads it twice
                     player.captionsContainer.innerHTML = "";
@@ -666,7 +666,7 @@
         // Display captions container and button (for initialization)
         function _showCaptions() {
             // If there's no caption toggle, bail
-            if(!player.buttons.captions) {
+            if (!player.buttons.captions) {
                 return;
             }
 
@@ -733,7 +733,7 @@
             _log("Injecting custom controls.");
 
             // If no controls are specified, create default
-            if(!html) {
+            if (!html) {
                 html = _buildControls();
             }
 
@@ -747,7 +747,7 @@
             player.container.insertAdjacentHTML("beforeend", html);
 
             // Setup tooltips
-            if(config.tooltips) {
+            if (config.tooltips) {
                 var labels = _getElements(config.selectors.labels);
 
                 for (var i = labels.length - 1; i >= 0; i--) {
@@ -816,7 +816,7 @@
         // Setup aria attribute for play
         function _setupPlayAria() {
             // If there's no play button, bail
-            if(!player.buttons.play) {
+            if (!player.buttons.play) {
                 return;
             }
 
@@ -834,12 +834,12 @@
         // Setup media
         function _setupMedia() {
             // If there's no media, bail
-            if(!player.media) {
+            if (!player.media) {
                 _log("No audio or video element found!", true);
                 return false;
             }
 
-            if(player.supported.full) {
+            if (player.supported.full) {
                 // Remove native video controls
                 player.media.removeAttribute("controls");
         
@@ -850,12 +850,12 @@
                 _toggleClass(player.container, config.classes.stopped, (player.media.getAttribute("autoplay") === null));
             
                 // Add iOS class
-                if(player.browser.ios) {
+                if (player.browser.ios) {
                     _toggleClass(player.container, "ios", true);
                 }
 
                 // Inject the player wrapper
-                if(player.type === "video") {
+                if (player.type === "video") {
                     // Create the wrapper div
                     var wrapper = document.createElement("div");
                     wrapper.setAttribute("class", config.classes.videoWrapper);
@@ -869,12 +869,12 @@
             }
 
             // YouTube
-            if(player.type == "youtube") {
+            if (player.type == "youtube") {
                 _setupYouTube(player.media.getAttribute("data-video-id"));
             }
 
             // Autoplay
-            if(player.media.getAttribute("autoplay") !== null) {
+            if (player.media.getAttribute("autoplay") !== null) {
                 _play();
             }
         }
@@ -896,7 +896,7 @@
             _toggleClass(player.media, config.classes.videoWrapper, true);
             _toggleClass(player.media, config.classes.embedWrapper, true);
 
-            if(typeof YT === "object") {
+            if (typeof YT === "object") {
                 _YTReady(id, container);
             }
             else {
@@ -914,7 +914,7 @@
 
             // Setup timers object
             // We have to poll YouTube for updates
-            if(!("timer" in player)) {
+            if (!("timer" in player)) {
                 player.timer = {};
             }
 
@@ -963,19 +963,19 @@
                             _triggerEvent(player.media, "progress");
 
                             // Bail if we're at 100%
-                            if(player.media.buffered === 1) {
+                            if (player.media.buffered === 1) {
                                 window.clearInterval(player.timer.buffering);
                             }
                         }, 200);
 
-                        if(player.supported.full) {
+                        if (player.supported.full) {
                             // Only setup controls once
-                            if(!player.container.querySelectorAll(config.selectors.controls).length) {
+                            if (!player.container.querySelectorAll(config.selectors.controls).length) {
                                 _setupInterface();
                             }
 
                             // Display duration if available
-                            if(config.displayDuration) {
+                            if (config.displayDuration) {
                                 _displayDuration();
                             }
                         }
@@ -1027,7 +1027,7 @@
 
         // Setup captions
         function _setupCaptions() {
-            if(player.type === "video") {
+            if (player.type === "video") {
                 // Inject the container
                 player.videoContainer.insertAdjacentHTML("afterbegin", "<div class='" + config.selectors.captions.replace(".", "") + "'><span></span></div>");
 
@@ -1073,7 +1073,7 @@
                     // Turn off native caption rendering to avoid double captions 
                     // This doesn't seem to work in Safari 7+, so the <track> elements are removed from the dom below
                     var tracks = player.media.textTracks;
-                    for (var x=0; x < tracks.length; x++) {
+                    for (var x = 0; x < tracks.length; x++) {
                         tracks[x].mode = "hidden";
                     }
 
@@ -1097,7 +1097,7 @@
                     if (player.usingTextTracks) {
                         _log("TextTracks supported.");
             
-                        for (var y=0; y < tracks.length; y++) {
+                        for (var y = 0; y < tracks.length; y++) {
                             var track = tracks[y];
 
                             if (track.kind === "captions" || track.kind === "subtitles") {
@@ -1134,7 +1134,7 @@
 
                                         records = req.split("\n\n");
 
-                                        for (var r=0; r < records.length; r++) {
+                                        for (var r = 0; r < records.length; r++) {
                                             record = records[r];
                                             player.captions[r] = [];
                                             player.captions[r] = record.split("\n");
@@ -1165,7 +1165,7 @@
                         tracks = player.media.getElementsByTagName("track");
                         
                         // Loop through and remove one by one
-                        for (var t=0; t < tracks.length; t++) {
+                        for (var t = 0; t < tracks.length; t++) {
                             player.media.removeChild(tracks[t]);
                         }
                     }
@@ -1175,11 +1175,11 @@
 
         // Setup fullscreen
         function _setupFullscreen() {
-            if(player.type != "audio" && config.fullscreen.enabled) {
+            if (player.type != "audio" && config.fullscreen.enabled) {
                 // Check for native support
                 var nativeSupport = fullscreen.supportsFullScreen;
 
-                if(nativeSupport || (config.fullscreen.fallback && !_inFrame())) {
+                if (nativeSupport || (config.fullscreen.fallback && !_inFrame())) {
                     _log((nativeSupport ? "Native" : "Fallback") + " fullscreen enabled.");
 
                     // Add styling hook
@@ -1193,7 +1193,7 @@
                 _toggleState(player.buttons.fullscreen, false);
 
                 // Set control hide class hook
-                if(config.fullscreen.hideControls) {
+                if (config.fullscreen.hideControls) {
                     _toggleClass(player.container, config.classes.fullscreen.hideControls, true);
                 }
             }   
@@ -1212,11 +1212,11 @@
         // Toggle playback
         function _togglePlay(toggle) {
             // Play
-            if(toggle === true) {
+            if (toggle === true) {
                 _play();
             }
             // Pause
-            else if(toggle === false) {
+            else if (toggle === false) {
                 _pause();
             }
             // True toggle
@@ -1228,7 +1228,7 @@
         // Rewind
         function _rewind(seekTime) {
             // Use default if needed
-            if(typeof seekTime !== "number") {
+            if (typeof seekTime !== "number") {
                 seekTime = config.seekTime;
             }
             _seek(player.media.currentTime - seekTime);
@@ -1237,7 +1237,7 @@
         // Fast forward
         function _forward(seekTime) {
             // Use default if needed
-            if(typeof seekTime !== "number") {
+            if (typeof seekTime !== "number") {
                 seekTime = config.seekTime;
             }
             _seek(player.media.currentTime + seekTime);
@@ -1276,10 +1276,10 @@
             catch(e) {}
 
             // YouTube
-            if(player.type == "youtube") {
+            if (player.type == "youtube") {
                 player.embed.seekTo(targetTime);
 
-                if(paused) {
+                if (paused) {
                     _pause();
                 }
 
@@ -1306,13 +1306,13 @@
             var nativeSupport = fullscreen.supportsFullScreen;
 
             // If it's a fullscreen change event, it's probably a native close
-            if(event && event.type === fullscreen.fullScreenEventName) {
+            if (event && event.type === fullscreen.fullScreenEventName) {
                 player.isFullscreen = fullscreen.isFullScreen(player.container);
             }
             // If there's native support, use it
-            else if(nativeSupport) {
+            else if (nativeSupport) {
                 // Request fullscreen
-                if(!fullscreen.isFullScreen(player.container)) {
+                if (!fullscreen.isFullScreen(player.container)) {
                     fullscreen.requestFullScreen(player.container);
                 }
                 // Bail from fullscreen
@@ -1328,7 +1328,7 @@
                 player.isFullscreen = !player.isFullscreen;
 
                 // Bind/unbind escape key
-                if(player.isFullscreen) {
+                if (player.isFullscreen) {
                     _on(document, "keyup", _handleEscapeFullscreen);
                     document.body.style.overflow = "hidden";
                 }
@@ -1356,7 +1356,7 @@
                 window.clearTimeout(hoverTimer);
 
                 // If the mouse is not over the controls, set a timeout to hide them
-                if(!isMouseOver) {
+                if (!isMouseOver) {
                     hoverTimer = window.setTimeout(function() {
                         _toggleClass(player.container, config.classes.hover, false);
                     }, 2000);
@@ -1368,7 +1368,7 @@
                 isMouseOver = (event.type === "mouseenter");
             }
 
-            if(config.fullscreen.hideControls) {           
+            if (config.fullscreen.hideControls) {           
                 // Hide on entering full screen
                 _toggleClass(player.controls, config.classes.hover, false);
 
@@ -1383,7 +1383,7 @@
         // Bail from faux-fullscreen 
         function _handleEscapeFullscreen(event) {
             // If it's a keypress and not escape, bail
-            if((event.which || event.charCode || event.keyCode) === 27 && player.isFullscreen) {
+            if ((event.which || event.charCode || event.keyCode) === 27 && player.isFullscreen) {
                 _toggleFullscreen();                
             }
         }
@@ -1391,8 +1391,8 @@
         // Set volume
         function _setVolume(volume) {
             // Use default if no value specified
-            if(typeof volume === "undefined") {
-                if(config.storage.enabled && _storage().supported) {
+            if (typeof volume === "undefined") {
+                if (config.storage.enabled && _storage().supported) {
                     volume = window.localStorage[config.storage.key] || config.volume;
                 }
                 else {
@@ -1401,11 +1401,11 @@
             }
 
             // Maximum is 10
-            if(volume > 10) {
+            if (volume > 10) {
                 volume = 10;
             }
             // Minimum is 0
-            if(volume < 0) {
+            if (volume < 0) {
                 volume = 0;
             }
 
@@ -1413,7 +1413,7 @@
             player.media.volume = parseFloat(volume / 10);
 
             // YouTube
-            if(player.type == "youtube") {
+            if (player.type == "youtube") {
                 player.embed.setVolume(player.media.volume * 100);
 
                 // Trigger timeupdate
@@ -1421,7 +1421,7 @@
             }
 
             // Toggle muted state
-            if(player.media.muted && volume > 0) {
+            if (player.media.muted && volume > 0) {
                 _toggleMute();
             } 
         }
@@ -1429,7 +1429,7 @@
         // Mute
         function _toggleMute(muted) {
             // If the method is called without parameter, toggle based on current value
-            if(typeof muted !== "boolean") {
+            if (typeof muted !== "boolean") {
                 muted = !player.media.muted;
             }
 
@@ -1440,7 +1440,7 @@
             player.media.muted = muted;
 
             // YouTube
-            if(player.type === "youtube") {
+            if (player.type === "youtube") {
                 player.embed[player.media.muted ? "mute" : "unMute"]();
 
                 // Trigger timeupdate
@@ -1454,12 +1454,12 @@
             var volume = player.media.muted ? 0 : (player.media.volume * 10);
 
             // Update the <input type="range"> if present
-            if(player.supported.full && player.volume) {
+            if (player.supported.full && player.volume) {
                 player.volume.value = volume;
             }
 
             // Store the volume in storage
-            if(config.storage.enabled && _storage().supported) {
+            if (config.storage.enabled && _storage().supported) {
                 window.localStorage.setItem(config.storage.key, volume);
             }
 
@@ -1467,7 +1467,7 @@
             _toggleClass(player.container, config.classes.muted, (volume === 0));
             
             // Update checkbox for mute state
-            if(player.supported.full && player.buttons.mute) {
+            if (player.supported.full && player.buttons.mute) {
                 _toggleState(player.buttons.mute, (volume === 0));
             }
         }
@@ -1475,12 +1475,12 @@
         // Toggle captions
         function _toggleCaptions(show) { 
             // If there's no full support, or there's no caption toggle
-            if(!player.supported.full || !player.buttons.captions) {
+            if (!player.supported.full || !player.buttons.captions) {
                 return;
             }
 
             // If the method is called without parameter, toggle based on current value
-            if(typeof show !== "boolean") {
+            if (typeof show !== "boolean") {
                 show = (player.container.className.indexOf(config.classes.captions.active) === -1);
             }
 
@@ -1510,7 +1510,7 @@
                 text        = player.progress.played.text, 
                 value       = 0;
 
-            if(event) {
+            if (event) {
                 switch(event.type) {
                     // Video playing
                     case "timeupdate":
@@ -1518,7 +1518,7 @@
                         value = _getPercentage(player.media.currentTime, player.media.duration);
 
                         // Set seek range value only if it's a "natural" time event
-                        if(event.type == "timeupdate" && player.buttons.seek) {
+                        if (event.type == "timeupdate" && player.buttons.seek) {
                             player.buttons.seek.value = value;
                         }
             
@@ -1540,11 +1540,11 @@
                                         var buffered = player.media.buffered;
 
                                         // HTML5
-                                        if(buffered && buffered.length) {
+                                        if (buffered && buffered.length) {
                                             return _getPercentage(buffered.end(0), player.media.duration);
                                         }
                                         // YouTube returns between 0 and 1
-                                        else if(typeof buffered == "number") {
+                                        else if (typeof buffered == "number") {
                                             return (buffered * 100);
                                         }
 
@@ -1555,10 +1555,10 @@
             }
 
             // Set values
-            if(progress) {
+            if (progress) {
                 progress.value = value;
             }
-            if(text) {
+            if (text) {
                 text.innerHTML = value;
             }
         }
@@ -1566,7 +1566,7 @@
         // Update the displayed time
         function _updateTimeDisplay(time, element) {
             // Bail if there's no duration display
-            if(!element) {
+            if (!element) {
                 return;
             }
 
@@ -1590,12 +1590,12 @@
             var duration = player.media.duration || 0;
 
             // If there's only one time display, display duration there
-            if(!player.duration && config.displayDuration && player.media.paused) {
+            if (!player.duration && config.displayDuration && player.media.paused) {
                 _updateTimeDisplay(duration, player.currentTime);
             }
 
             // If there's a duration element, update content
-            if(player.duration) {
+            if (player.duration) {
                 _updateTimeDisplay(duration, player.duration);
             }
         }
@@ -1625,7 +1625,7 @@
 
         // Inject a source
         function _addSource(attributes) {
-            if(attributes.src) {
+            if (attributes.src) {
                 // Create a new <source>
                 var element = document.createElement("source");
 
@@ -1641,7 +1641,7 @@
         // Sources are not checked for support so be careful
         function _parseSource(sources) {
             // YouTube
-            if(player.type === "youtube" && typeof sources === "string") {
+            if (player.type === "youtube" && typeof sources === "string") {
                 // Destroy YouTube instance
                 player.embed.destroy();
 
@@ -1667,7 +1667,7 @@
 
             // If a single source is passed
             // .source("path/to/video.mp4")
-            if(typeof sources === "string") {
+            if (typeof sources === "string") {
                 player.media.setAttribute("src", sources);
             }
 
@@ -1680,7 +1680,7 @@
                 }
             }
 
-            if(player.supported.full) {
+            if (player.supported.full) {
                 // Reset time display
                 _timeUpdate();
 
@@ -1692,14 +1692,14 @@
             player.media.load();
 
             // Play if autoplay attribute is present
-            if(player.media.getAttribute("autoplay") !== null) {
+            if (player.media.getAttribute("autoplay") !== null) {
                 _play();
             }
         }
 
         // Update poster
         function _updatePoster(source) {
-            if(player.type === "video") {
+            if (player.type === "video") {
                 player.media.setAttribute("poster", source);
             }
         }
@@ -1715,7 +1715,7 @@
                 if (!focused || focused == document.body) {
                     focused = null;
                 }
-                else if (document.querySelector){
+                else if (document.querySelector) {
                     focused = document.querySelector(":focus");
                 }
                 for (var button in player.buttons) {
@@ -1727,7 +1727,9 @@
             _on(window, "keyup", function(event) {
                 var code = (event.keyCode ? event.keyCode : event.which);
 
-                if(code == 9) { checkFocus(); }
+                if (code == 9) {
+                    checkFocus();
+                }
             });
             for (var button in player.buttons) {
                 var element = player.buttons[button];
@@ -1773,7 +1775,7 @@
             _on(player.buttons.fullscreen, "click", _toggleFullscreen);
 
             // Handle user exiting fullscreen by escaping etc
-            if(fullscreen.supportsFullScreen) {
+            if (fullscreen.supportsFullScreen) {
                 _on(document, fullscreen.fullScreenEventName, _toggleFullscreen);
             }
             
@@ -1792,7 +1794,7 @@
             // Handle the media finishing
             _on(player.media, "ended", function() {
                 // Clear 
-                if(player.type === "video") {
+                if (player.type === "video") {
                     player.captionsContainer.innerHTML = "";
                 }
 
@@ -1813,12 +1815,12 @@
             _on(player.media, "waiting canplay seeked", _checkLoading);
 
             // Click video
-            if(player.type === "video" && config.click) {
+            if (player.type === "video" && config.click) {
                 _on(player.videoContainer, "click", function() {
-                    if(player.media.paused) {
+                    if (player.media.paused) {
                         _triggerEvent(player.buttons.play, "click");
                     }
-                    else if(player.media.ended) {
+                    else if (player.media.ended) {
                         _seek();
                         _triggerEvent(player.buttons.play, "click");
                     }
@@ -1834,7 +1836,7 @@
         // http://stackoverflow.com/questions/12528049/if-a-dom-element-is-removed-are-its-listeners-also-removed-from-memory
         function _destroy() {
             // Bail if the element is not initialized
-            if(!player.init) {
+            if (!player.init) {
                 return null;
             }
 
@@ -1848,13 +1850,13 @@
             _remove(_getElement(config.selectors.controls));
 
             // YouTube
-            if(player.type === "youtube") {
+            if (player.type === "youtube") {
                 player.embed.destroy();
                 return;
             }
 
             // If video, we need to remove some more
-            if(player.type === "video") {
+            if (player.type === "video") {
                 // Remove captions
                 _remove(_getElement(config.selectors.captions));
 
@@ -1874,7 +1876,7 @@
         // Setup a player
         function _init() {
             // Bail if the element is initialized
-            if(player.init) {
+            if (player.init) {
                 return null;
             }
 
@@ -1903,7 +1905,7 @@
             player.supported = api.supported(player.type);
 
             // If no native support, bail
-            if(!player.supported.basic) {
+            if (!player.supported.basic) {
                 return false;
             }
 
@@ -1914,9 +1916,9 @@
             _setupMedia();
 
             // Setup interface
-            if(player.type == "video" || player.type == "audio") {
+            if (player.type == "video" || player.type == "audio") {
                 // Bail if no support
-                if(!player.supported.full) {
+                if (!player.supported.full) {
                     return;
                 }
 
@@ -1924,7 +1926,7 @@
                 _setupInterface();
 
                 // Display duration if available
-                if(config.displayDuration) {
+                if (config.displayDuration) {
                     _displayDuration();
                 }
 
@@ -1941,7 +1943,7 @@
             _injectControls();
 
             // Find the elements
-            if(!_findElements()) {
+            if (!_findElements()) {
                 return false;
             }
 
@@ -1963,7 +1965,7 @@
         _init();
 
         // If init failed, return an empty object
-        if(!player.init) {
+        if (!player.init) {
             return {};
         }
 
@@ -2027,13 +2029,13 @@
     }
 
     // Expose setup function
-    api.setup = function(options){
+    api.setup = function(options) {
         // Extend the default options with user specified
         config = _extend(defaults, options);
 
         // Bail if disabled or no basic support
         // You may want to disable certain UAs etc
-        if(!config.enabled || !api.supported().basic) {
+        if (!config.enabled || !api.supported().basic) {
             return false;
         }
 
@@ -2047,7 +2049,7 @@
             var element = elements[i];
 
             // Setup a player instance and add to the element
-            if(typeof element.plyr === "undefined") { 
+            if (typeof element.plyr === "undefined") { 
                 // Create new instance
                 var instance = new Plyr(element);
 
@@ -2055,7 +2057,7 @@
                 element.plyr = (Object.keys(instance).length ? instance : false);
 
                 // Callback
-                if(typeof config.onSetup === "function") {
+                if (typeof config.onSetup === "function") {
                     config.onSetup.apply(element.plyr);
                 }
             }
