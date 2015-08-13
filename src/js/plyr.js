@@ -8,7 +8,7 @@
 // ==========================================================================
 
 (function (api) {
-    "use strict";
+    'use strict';
     /*global YT*/
 
     // Globals
@@ -23,11 +23,11 @@
         click:                  true,
         tooltips:               false,
         displayDuration:        true,
-        iconPrefix:             "icon",
+        iconPrefix:             'icon',
         selectors: {
-            container:          ".player",
-            controls:           ".player-controls",
-            labels:             "[data-player] .sr-only, label .sr-only",
+            container:          '.player',
+            controls:           '.player-controls',
+            labels:             '[data-player] .sr-only, label .sr-only',
             buttons: {
                 seek:           '[data-player="seek"]',
                 play:           '[data-player="play"]',
@@ -41,33 +41,33 @@
                 fullscreen:     '[data-player="fullscreen"]'
             },
             progress: {
-                container:      ".player-progress",
-                buffer:         ".player-progress-buffer",
-                played:         ".player-progress-played"
+                container:      '.player-progress',
+                buffer:         '.player-progress-buffer',
+                played:         '.player-progress-played'
             },
-            captions:           ".player-captions",
-            currentTime:        ".player-current-time",
-            duration:           ".player-duration"
+            captions:           '.player-captions',
+            currentTime:        '.player-current-time',
+            duration:           '.player-duration'
         },
         classes: {
-            videoWrapper:       "player-video-wrapper",
-            embedWrapper:       "player-video-embed",
-            type:               "player-{0}",
-            stopped:            "stopped",
-            playing:            "playing",
-            muted:              "muted",
-            loading:            "loading",
-            tooltip:            "player-tooltip",
-            hidden:             "sr-only",
-            hover:              "player-hover",
+            videoWrapper:       'player-video-wrapper',
+            embedWrapper:       'player-video-embed',
+            type:               'player-{0}',
+            stopped:            'stopped',
+            playing:            'playing',
+            muted:              'muted',
+            loading:            'loading',
+            tooltip:            'player-tooltip',
+            hidden:             'sr-only',
+            hover:              'player-hover',
             captions: {
-                enabled:        "captions-enabled",
-                active:         "captions-active"
+                enabled:        'captions-enabled',
+                active:         'captions-active'
             },
             fullscreen: {
-                enabled:        "fullscreen-enabled",
-                active:         "fullscreen-active",
-                hideControls:   "fullscreen-hide-controls"
+                enabled:        'fullscreen-enabled',
+                active:         'fullscreen-active',
+                hideControls:   'fullscreen-hide-controls'
             }
         },
         captions: {
@@ -80,23 +80,23 @@
         },
         storage: {
             enabled:            true,
-            key:                "plyr_volume"
+            key:                'plyr_volume'
         },
-        controls:               ["restart", "rewind", "play", "fast-forward", "current-time", "duration", "mute", "volume", "captions", "fullscreen"],
+        controls:               ['restart', 'rewind', 'play', 'fast-forward', 'current-time', 'duration', 'mute', 'volume', 'captions', 'fullscreen'],
         i18n: {
-            restart:            "Restart",
-            rewind:             "Rewind {seektime} secs",
-            play:               "Play",
-            pause:              "Pause",
-            forward:            "Forward {seektime} secs",
-            played:             "played",
-            buffered:           "buffered",
-            currentTime:        "Current time",
-            duration:           "Duration",
-            volume:             "Volume",
-            toggleMute:         "Toggle Mute",
-            toggleCaptions:     "Toggle Captions",
-            toggleFullscreen:   "Toggle Fullscreen"
+            restart:            'Restart',
+            rewind:             'Rewind {seektime} secs',
+            play:               'Play',
+            pause:              'Pause',
+            forward:            'Forward {seektime} secs',
+            played:             'played',
+            buffered:           'buffered',
+            currentTime:        'Current time',
+            duration:           'Duration',
+            volume:             'Volume',
+            toggleMute:         'Toggle Mute',
+            toggleCaptions:     'Toggle Captions',
+            toggleFullscreen:   'Toggle Fullscreen'
         }
     };
 
@@ -118,7 +118,7 @@
             '<span class="player-controls-left">'];
 
         // Restart button
-        if (_inArray(config.controls, "restart")) {
+        if (_inArray(config.controls, 'restart')) {
             html.push(
                 '<button type="button" data-player="restart">',
                     '<svg><use xlink:href="#' + config.iconPrefix + '-restart" /></svg>',
@@ -128,7 +128,7 @@
         }
 
         // Rewind button
-        if (_inArray(config.controls, "rewind")) {
+        if (_inArray(config.controls, 'rewind')) {
             html.push(
                 '<button type="button" data-player="rewind">',
                     '<svg><use xlink:href="#' + config.iconPrefix + '-rewind" /></svg>',
@@ -138,7 +138,7 @@
         }
 
         // Play/pause button
-        if (_inArray(config.controls, "play")) {
+        if (_inArray(config.controls, 'play')) {
             html.push(
                 '<button type="button" data-player="play">',
                     '<svg><use xlink:href="#' + config.iconPrefix + '-play" /></svg>',
@@ -152,7 +152,7 @@
         }
 
         // Fast forward button
-        if (_inArray(config.controls, "fast-forward")) {
+        if (_inArray(config.controls, 'fast-forward')) {
             html.push(
                 '<button type="button" data-player="fast-forward">',
                     '<svg><use xlink:href="#' + config.iconPrefix + '-fast-forward" /></svg>',
@@ -162,7 +162,7 @@
         }
 
         // Media current time display
-        if (_inArray(config.controls, "current-time")) {
+        if (_inArray(config.controls, 'current-time')) {
             html.push(
                 '<span class="player-time">',
                     '<span class="sr-only">' + config.i18n.currentTime + '</span>',
@@ -172,7 +172,7 @@
         }
 
         // Media duration display
-        if (_inArray(config.controls, "duration")) {
+        if (_inArray(config.controls, 'duration')) {
             html.push(
                 '<span class="player-time">',
                     '<span class="sr-only">' + config.i18n.duration + '</span>',
@@ -188,7 +188,7 @@
         );
 
         // Toggle mute button
-        if (_inArray(config.controls, "mute")) {
+        if (_inArray(config.controls, 'mute')) {
             html.push(
                 '<button type="button" data-player="mute">',
                     '<svg class="icon-muted"><use xlink:href="#' + config.iconPrefix + '-muted" /></svg>',
@@ -199,7 +199,7 @@
         }
 
         // Volume range control
-        if (_inArray(config.controls, "volume")) {
+        if (_inArray(config.controls, 'volume')) {
             html.push(
                 '<label for="volume{id}" class="sr-only">' + config.i18n.volume + '</label>',
                 '<input id="volume{id}" class="player-volume" type="range" min="0" max="10" value="5" data-player="volume">'
@@ -207,7 +207,7 @@
         }
 
         // Toggle captions button
-        if (_inArray(config.controls, "captions")) {
+        if (_inArray(config.controls, 'captions')) {
             html.push(
                 '<button type="button" data-player="captions">',
                     '<svg class="icon-captions-on"><use xlink:href="#' + config.iconPrefix + '-captions-on" /></svg>',
@@ -218,7 +218,7 @@
         }
 
         // Toggle fullscreen button
-        if (_inArray(config.controls, "fullscreen")) {
+        if (_inArray(config.controls, 'fullscreen')) {
             html.push(
                 '<button type="button" data-player="fullscreen">',
                     '<svg class="icon-exit-fullscreen"><use xlink:href="#' + config.iconPrefix + '-exit-fullscreen" /></svg>',
@@ -234,13 +234,13 @@
         '</div>'
         );
 
-        return html.join("");
+        return html.join('');
     }
 
     // Debugging
     function _log(text, error) {
         if (config.debug && window.console) {
-            console[(error ? "error" : "log")](text);
+            console[(error ? 'error' : 'log')](text);
         }
     }
 
@@ -249,42 +249,42 @@
     function _browserSniff() {
         var nAgt = navigator.userAgent,
             name = navigator.appName,
-            fullVersion = "" + parseFloat(navigator.appVersion),
+            fullVersion = '' + parseFloat(navigator.appVersion),
             majorVersion = parseInt(navigator.appVersion, 10),
             nameOffset,
             verOffset,
             ix;
 
         // MSIE 11
-        if ((navigator.appVersion.indexOf("Windows NT") !== -1) && (navigator.appVersion.indexOf("rv:11") !== -1)) {
-            name = "IE";
-            fullVersion = "11;";
+        if ((navigator.appVersion.indexOf('Windows NT') !== -1) && (navigator.appVersion.indexOf('rv:11') !== -1)) {
+            name = 'IE';
+            fullVersion = '11;';
         }
         // MSIE
-        else if ((verOffset=nAgt.indexOf("MSIE")) !== -1) {
-            name = "IE";
+        else if ((verOffset=nAgt.indexOf('MSIE')) !== -1) {
+            name = 'IE';
             fullVersion = nAgt.substring(verOffset + 5);
         }
         // Chrome
-        else if ((verOffset=nAgt.indexOf("Chrome")) !== -1) {
-            name = "Chrome";
+        else if ((verOffset=nAgt.indexOf('Chrome')) !== -1) {
+            name = 'Chrome';
             fullVersion = nAgt.substring(verOffset + 7);
         }
         // Safari
-        else if ((verOffset=nAgt.indexOf("Safari")) !== -1) {
-            name = "Safari";
+        else if ((verOffset=nAgt.indexOf('Safari')) !== -1) {
+            name = 'Safari';
             fullVersion = nAgt.substring(verOffset + 7);
-            if ((verOffset=nAgt.indexOf("Version")) !== -1) {
+            if ((verOffset=nAgt.indexOf('Version')) !== -1) {
                 fullVersion = nAgt.substring(verOffset + 8);
             }
         }
         // Firefox
-        else if ((verOffset=nAgt.indexOf("Firefox")) !== -1) {
-            name = "Firefox";
+        else if ((verOffset=nAgt.indexOf('Firefox')) !== -1) {
+            name = 'Firefox';
             fullVersion = nAgt.substring(verOffset + 8);
         }
-        // In most other browsers, "name/version" is at the end of userAgent 
-        else if ((nameOffset=nAgt.lastIndexOf(" ") + 1) < (verOffset=nAgt.lastIndexOf("/"))) {
+        // In most other browsers, 'name/version' is at the end of userAgent 
+        else if ((nameOffset=nAgt.lastIndexOf(' ') + 1) < (verOffset=nAgt.lastIndexOf('/'))) {
             name = nAgt.substring(nameOffset,verOffset);
             fullVersion = nAgt.substring(verOffset + 1);
 
@@ -293,16 +293,16 @@
             }
         }
         // Trim the fullVersion string at semicolon/space if present
-        if ((ix = fullVersion.indexOf(";")) !== -1) {
+        if ((ix = fullVersion.indexOf(';')) !== -1) {
             fullVersion = fullVersion.substring(0, ix);
         }
-        if ((ix = fullVersion.indexOf(" ")) !== -1) {
+        if ((ix = fullVersion.indexOf(' ')) !== -1) {
             fullVersion = fullVersion.substring(0, ix);
         }
         // Get major version
-        majorVersion = parseInt("" + fullVersion, 10);
+        majorVersion = parseInt('' + fullVersion, 10);
         if (isNaN(majorVersion)) {
-            fullVersion = "" + parseFloat(navigator.appVersion);
+            fullVersion = '' + parseFloat(navigator.appVersion);
             majorVersion = parseInt(navigator.appVersion, 10);
         }
 
@@ -321,22 +321,22 @@
         var media = player.media;
 
         // Only check video types for video players
-        if (player.type == "video") {
+        if (player.type == 'video') {
             // Check type
             switch (mimeType) {
-                case "video/webm":   return !!(media.canPlayType && media.canPlayType("video/webm; codecs=\"vp8, vorbis\"").replace(/no/, ""));
-                case "video/mp4":    return !!(media.canPlayType && media.canPlayType("video/mp4; codecs=\"avc1.42E01E, mp4a.40.2\"").replace(/no/, ""));
-                case "video/ogg":    return !!(media.canPlayType && media.canPlayType("video/ogg; codecs=\"theora\"").replace(/no/, ""));
+                case 'video/webm':   return !!(media.canPlayType && media.canPlayType('video/webm; codecs="vp8, vorbis"').replace(/no/, ''));
+                case 'video/mp4':    return !!(media.canPlayType && media.canPlayType('video/mp4; codecs="avc1.42E01E, mp4a.40.2"').replace(/no/, ''));
+                case 'video/ogg':    return !!(media.canPlayType && media.canPlayType('video/ogg; codecs="theora"').replace(/no/, ''));
             }
         }
 
         // Only check audio types for audio players
-        else if (player.type == "audio") {
+        else if (player.type == 'audio') {
             // Check type
             switch (mimeType) {
-                case "audio/mpeg":   return !!(media.canPlayType && media.canPlayType("audio/mpeg;").replace(/no/, ""));
-                case "audio/ogg":    return !!(media.canPlayType && media.canPlayType("audio/ogg; codecs=\"vorbis\"").replace(/no/, ""));
-                case "audio/wav":    return !!(media.canPlayType && media.canPlayType("audio/wav; codecs=\"1\"").replace(/no/, ""));
+                case 'audio/mpeg':   return !!(media.canPlayType && media.canPlayType('audio/mpeg;').replace(/no/, ''));
+                case 'audio/ogg':    return !!(media.canPlayType && media.canPlayType('audio/ogg; codecs="vorbis"').replace(/no/, ''));
+                case 'audio/wav':    return !!(media.canPlayType && media.canPlayType('audio/wav; codecs="1"').replace(/no/, ''));
             }
         }        
 
@@ -350,9 +350,9 @@
             return;
         }
 
-        var tag = document.createElement("script");
+        var tag = document.createElement('script');
         tag.src = source;
-        var firstScriptTag = document.getElementsByTagName("script")[0];
+        var firstScriptTag = document.getElementsByTagName('script')[0];
         firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
     }
 
@@ -363,7 +363,7 @@
     
     // Replace all
     function _replaceAll(string, find, replace) {
-        return string.replace(new RegExp(find.replace(/([.*+?\^=!:${}()|\[\]\/\\])/g, "\\$1"), "g"), replace);
+        return string.replace(new RegExp(find.replace(/([.*+?\^=!:${}()|\[\]\/\\])/g, '\\$1'), 'g'), replace);
     }
 
     // Wrap an element
@@ -435,18 +435,18 @@
     function _toggleClass(element, name, state) {
         if (element) {
             if (element.classList) {
-                element.classList[state ? "add" : "remove"](name);
+                element.classList[state ? 'add' : 'remove'](name);
             }
             else {
-                var className = (" " + element.className + " ").replace(/\s+/g, " ").replace(" " + name + " ", "");
-                element.className = className + (state ? " " + name : "");
+                var className = (' ' + element.className + ' ').replace(/\s+/g, ' ').replace(' ' + name + ' ', '');
+                element.className = className + (state ? ' ' + name : '');
             }
         }
     }
 
     // Toggle event
     function _toggleHandler(element, events, callback, toggle) {
-        var eventList = events.split(" ");
+        var eventList = events.split(' ');
 
         // If a nodelist is passed, call itself on each node
         if (element instanceof NodeList) {
@@ -460,7 +460,7 @@
 
         // If a single node is passed, bind the event listener
         for (var i = 0; i < eventList.length; i++) {
-            element[toggle ? "addEventListener" : "removeEventListener"](eventList[i], callback, false);
+            element[toggle ? 'addEventListener' : 'removeEventListener'](eventList[i], callback, false);
         }
     }
 
@@ -481,7 +481,7 @@
     // Trigger event
     function _triggerEvent(element, event) {
         // Create faux event
-        var fauxEvent = document.createEvent("MouseEvents");
+        var fauxEvent = document.createEvent('MouseEvents');
 
         // Set the event type
         fauxEvent.initEvent(event, true, true);
@@ -493,10 +493,10 @@
     // Toggle aria-pressed state on a toggle button
     function _toggleState(target, state) {
         // Get state
-        state = (typeof state === "boolean" ? state : !target.getAttribute("aria-pressed"));
+        state = (typeof state === 'boolean' ? state : !target.getAttribute('aria-pressed'));
         
         // Set the attribute on target
-        target.setAttribute("aria-pressed", state);
+        target.setAttribute('aria-pressed', state);
         
         return state;
     }
@@ -532,14 +532,14 @@
                 isFullScreen: function() { return false; },
                 requestFullScreen: function() {},
                 cancelFullScreen: function() {},
-                fullScreenEventName: "",
+                fullScreenEventName: '',
                 element: null,
-                prefix: ""
+                prefix: ''
             },
-            browserPrefixes = "webkit moz o ms khtml".split(" ");
+            browserPrefixes = 'webkit moz o ms khtml'.split(' ');
 
         // Check for native support
-        if (typeof document.cancelFullScreen != "undefined") {
+        if (typeof document.cancelFullScreen != 'undefined') {
             fullscreen.supportsFullScreen = true;
         }
         else {
@@ -547,13 +547,13 @@
             for (var i = 0, il = browserPrefixes.length; i < il; i++ ) {
                 fullscreen.prefix = browserPrefixes[i];
 
-                if (typeof document[fullscreen.prefix + "CancelFullScreen"] != "undefined") {
+                if (typeof document[fullscreen.prefix + 'CancelFullScreen'] != 'undefined') {
                     fullscreen.supportsFullScreen = true;
                     break;
                 }
                 // Special case for MS (when isn't it?)
-                else if (typeof document.msExitFullscreen != "undefined" && document.msFullscreenEnabled) {
-                    fullscreen.prefix = "ms";
+                else if (typeof document.msExitFullscreen != 'undefined' && document.msFullscreenEnabled) {
+                    fullscreen.prefix = 'ms';
                     fullscreen.supportsFullScreen = true;
                     break;
                 }
@@ -563,33 +563,33 @@
         // Update methods to do something useful
         if (fullscreen.supportsFullScreen) {
             // Yet again Microsoft awesomeness,
-            // Sometimes the prefix is "ms", sometimes "MS" to keep you on your toes
-            fullscreen.fullScreenEventName = (fullscreen.prefix == "ms" ? "MSFullscreenChange" : fullscreen.prefix + "fullscreenchange");
+            // Sometimes the prefix is 'ms', sometimes 'MS' to keep you on your toes
+            fullscreen.fullScreenEventName = (fullscreen.prefix == 'ms' ? 'MSFullscreenChange' : fullscreen.prefix + 'fullscreenchange');
 
             fullscreen.isFullScreen = function(element) {
-                if (typeof element == "undefined") {
+                if (typeof element == 'undefined') {
                     element = document.body;
                 }
                 switch (this.prefix) {
-                    case "":
+                    case '':
                         return document.fullscreenElement == element;
-                    case "moz":
+                    case 'moz':
                         return document.mozFullScreenElement == element;
                     default:
-                        return document[this.prefix + "FullscreenElement"] == element;
+                        return document[this.prefix + 'FullscreenElement'] == element;
                 }
             };
             fullscreen.requestFullScreen = function(element) {
-                if (typeof element == "undefined") {
+                if (typeof element == 'undefined') {
                     element = document.body;
                 }
-                return (this.prefix === "") ? element.requestFullScreen() : element[this.prefix + (this.prefix == "ms" ? "RequestFullscreen" : "RequestFullScreen")]();
+                return (this.prefix === '') ? element.requestFullScreen() : element[this.prefix + (this.prefix == 'ms' ? 'RequestFullscreen' : 'RequestFullScreen')]();
             };
             fullscreen.cancelFullScreen = function() {
-                return (this.prefix === "") ? document.cancelFullScreen() : document[this.prefix + (this.prefix == "ms" ? "ExitFullscreen" : "CancelFullScreen")]();
+                return (this.prefix === '') ? document.cancelFullScreen() : document[this.prefix + (this.prefix == 'ms' ? 'ExitFullscreen' : 'CancelFullScreen')]();
             };
             fullscreen.element = function() {
-                return (this.prefix === "") ? document.fullscreenElement : document[this.prefix + "FullscreenElement"];
+                return (this.prefix === '') ? document.fullscreenElement : document[this.prefix + 'FullscreenElement'];
             };
         }
 
@@ -601,7 +601,7 @@
         var storage = {
             supported: (function() {
                 try {
-                    return "localStorage" in window && window.localStorage !== null;
+                    return 'localStorage' in window && window.localStorage !== null;
                 } 
                 catch(e) {
                     return false;
@@ -620,7 +620,7 @@
         // Seek the manual caption time and update UI
         function _seekManualCaptions(time) {
             // If it's not video, or we're using textTracks, bail.
-            if (player.usingTextTracks || player.type !== "video" || !player.supported.full) {
+            if (player.usingTextTracks || player.type !== 'video' || !player.supported.full) {
                 return;
             }
 
@@ -630,7 +630,7 @@
             // Check time is a number, if not use currentTime
             // IE has a bug where currentTime doesn't go to 0
             // https://twitter.com/Sam_Potts/status/573715746506731521
-            time = typeof time === "number" ? time : player.media.currentTime;
+            time = typeof time === 'number' ? time : player.media.currentTime;
 
             while (_timecodeMax(player.captions[player.subcount][0]) < time.toFixed(1)) {
                 player.subcount++;
@@ -652,14 +652,14 @@
                 if (player.captionsContainer.innerHTML != content) {
                     // Empty caption
                     // Otherwise NVDA reads it twice
-                    player.captionsContainer.innerHTML = "";
+                    player.captionsContainer.innerHTML = '';
 
                     // Set new caption text
                     player.captionsContainer.innerHTML = content;
                 }
             }
             else {
-                player.captionsContainer.innerHTML = "";
+                player.captionsContainer.innerHTML = '';
             }
         }
 
@@ -681,12 +681,12 @@
         // Utilities for caption time codes
         function _timecodeMin(tc) {
             var tcpair = [];
-            tcpair = tc.split(" --> ");
+            tcpair = tc.split(' --> ');
             return _subTcSecs(tcpair[0]);
         }
         function _timecodeMax(tc) {
             var tcpair = [];
-            tcpair = tc.split(" --> ");
+            tcpair = tc.split(' --> ');
             return _subTcSecs(tcpair[1]);
         }
         function _subTcSecs(tc) {
@@ -697,8 +697,8 @@
                 var tc1 = [],
                     tc2 = [],
                     seconds;
-                tc1 = tc.split(",");
-                tc2 = tc1[0].split(":");
+                tc1 = tc.split(',');
+                tc2 = tc1[0].split(':');
                 seconds = Math.floor(tc2[0]*60*60) + Math.floor(tc2[1]*60) + Math.floor(tc2[2]);
                 return seconds;
             }
@@ -730,7 +730,7 @@
             var html = config.html;
 
             // Insert custom video controls
-            _log("Injecting custom controls.");
+            _log('Injecting custom controls.');
 
             // If no controls are specified, create default
             if (!html) {
@@ -738,13 +738,13 @@
             }
 
             // Replace seek time instances
-            html = _replaceAll(html, "{seektime}", config.seekTime);
+            html = _replaceAll(html, '{seektime}', config.seekTime);
 
             // Replace all id references with random numbers
-            html = _replaceAll(html, "{id}", Math.floor(Math.random() * (10000)));
+            html = _replaceAll(html, '{id}', Math.floor(Math.random() * (10000)));
 
             // Inject into the container
-            player.container.insertAdjacentHTML("beforeend", html);
+            player.container.insertAdjacentHTML('beforeend', html);
 
             // Setup tooltips
             if (config.tooltips) {
@@ -786,12 +786,12 @@
                 // Progress - Buffering
                 player.progress.buffer          = {};
                 player.progress.buffer.bar      = _getElement(config.selectors.progress.buffer);
-                player.progress.buffer.text     = player.progress.buffer.bar && player.progress.buffer.bar.getElementsByTagName("span")[0];
+                player.progress.buffer.text     = player.progress.buffer.bar && player.progress.buffer.bar.getElementsByTagName('span')[0];
 
                 // Progress - Played
                 player.progress.played          = {};
                 player.progress.played.bar      = _getElement(config.selectors.progress.played);
-                player.progress.played.text     = player.progress.played.bar && player.progress.played.bar.getElementsByTagName("span")[0];
+                player.progress.played.text     = player.progress.played.bar && player.progress.played.bar.getElementsByTagName('span')[0];
 
                 // Volume
                 player.volume                   = _getElement(config.selectors.buttons.volume);
@@ -804,10 +804,10 @@
                 return true;
             }
             catch(e) {
-                _log("It looks like there's a problem with your controls html. Bailing.", true);
+                _log('It looks like there\'s a problem with your controls html. Bailing.', true);
 
                 // Restore native video controls
-                player.media.setAttribute("controls", "");
+                player.media.setAttribute('controls', '');
 
                 return false;
             }
@@ -824,41 +824,41 @@
             var label = player.buttons.play.innerText || config.i18n.play;
 
             // If there's a media title set, use that for the label
-            if (typeof(config.title) !== "undefined" && config.title.length) {
-                label += ", " + config.title;
+            if (typeof(config.title) !== 'undefined' && config.title.length) {
+                label += ', ' + config.title;
             }
 
-            player.buttons.play.setAttribute("aria-label", label);
+            player.buttons.play.setAttribute('aria-label', label);
         }
 
         // Setup media
         function _setupMedia() {
             // If there's no media, bail
             if (!player.media) {
-                _log("No audio or video element found!", true);
+                _log('No audio or video element found!', true);
                 return false;
             }
 
             if (player.supported.full) {
                 // Remove native video controls
-                player.media.removeAttribute("controls");
+                player.media.removeAttribute('controls');
         
                 // Add type class
-                _toggleClass(player.container, config.classes.type.replace("{0}", player.type), true);
+                _toggleClass(player.container, config.classes.type.replace('{0}', player.type), true);
 
                 // If there's no autoplay attribute, assume the video is stopped and add state class
-                _toggleClass(player.container, config.classes.stopped, (player.media.getAttribute("autoplay") === null));
+                _toggleClass(player.container, config.classes.stopped, (player.media.getAttribute('autoplay') === null));
             
                 // Add iOS class
                 if (player.browser.ios) {
-                    _toggleClass(player.container, "ios", true);
+                    _toggleClass(player.container, 'ios', true);
                 }
 
                 // Inject the player wrapper
-                if (player.type === "video") {
+                if (player.type === 'video') {
                     // Create the wrapper div
-                    var wrapper = document.createElement("div");
-                    wrapper.setAttribute("class", config.classes.videoWrapper);
+                    var wrapper = document.createElement('div');
+                    wrapper.setAttribute('class', config.classes.videoWrapper);
 
                     // Wrap the video in a container
                     _wrap(player.media, wrapper);
@@ -869,12 +869,12 @@
             }
 
             // YouTube
-            if (player.type == "youtube") {
-                _setupYouTube(player.media.getAttribute("data-video-id"));
+            if (player.type == 'youtube') {
+                _setupYouTube(player.media.getAttribute('data-video-id'));
             }
 
             // Autoplay
-            if (player.media.getAttribute("autoplay") !== null) {
+            if (player.media.getAttribute('autoplay') !== null) {
                 _play();
             }
         }
@@ -888,20 +888,20 @@
             }
 
             // Create the YouTube container
-            var container = document.createElement("div");
-            container.setAttribute("id", "youtube-" + Math.floor(Math.random() * (10000)));
+            var container = document.createElement('div');
+            container.setAttribute('id', 'youtube-' + Math.floor(Math.random() * (10000)));
             player.media.appendChild(container);
 
             // Add embed class for responsive
             _toggleClass(player.media, config.classes.videoWrapper, true);
             _toggleClass(player.media, config.classes.embedWrapper, true);
 
-            if (typeof YT === "object") {
+            if (typeof YT === 'object') {
                 _YTReady(id, container);
             }
             else {
                 // Load the API
-                _injectScript("https://www.youtube.com/iframe_api");
+                _injectScript('https://www.youtube.com/iframe_api');
 
                 // Setup callback for the API
                 window.onYouTubeIframeAPIReady = function () { _YTReady(id, container); };
@@ -910,11 +910,11 @@
 
         // Handle API ready
         function _YTReady(id, container) {
-            _log("YouTube API Ready");
+            _log('YouTube API Ready');
 
             // Setup timers object
             // We have to poll YouTube for updates
-            if (!("timer" in player)) {
+            if (!('timer' in player)) {
                 player.timer = {};
             }
 
@@ -929,13 +929,13 @@
                     showinfo: 0,
                     iv_load_policy: 3,
                     cc_load_policy: (config.captions.defaultActive ? 1 : 0),
-                    cc_lang_pref: "en",
-                    wmode: "transparent",
+                    cc_lang_pref: 'en',
+                    wmode: 'transparent',
                     modestbranding: 1,
                     disablekb: 1
                 },
                 events: {
-                    "onReady": function(event) {
+                    'onReady': function(event) {
                         // Get the instance
                         var instance = event.target;
 
@@ -949,7 +949,7 @@
                         player.media.muted = instance.isMuted();
 
                         // Trigger timeupdate
-                        _triggerEvent(player.media, "timeupdate");
+                        _triggerEvent(player.media, 'timeupdate');
 
                         // Reset timer
                         window.clearInterval(player.timer.buffering);
@@ -960,7 +960,7 @@
                             player.media.buffered = instance.getVideoLoadedFraction();
                             
                             // Trigger progress
-                            _triggerEvent(player.media, "progress");
+                            _triggerEvent(player.media, 'progress');
 
                             // Bail if we're at 100%
                             if (player.media.buffered === 1) {
@@ -980,7 +980,7 @@
                             }
                         }
                     },
-                    "onStateChange": function(event) {
+                    'onStateChange': function(event) {
                         // Get the instance
                         var instance = event.target;
 
@@ -997,12 +997,12 @@
                         switch (event.data) {
                             case 0: 
                                 player.media.paused = true;
-                                _triggerEvent(player.media, "ended");
+                                _triggerEvent(player.media, 'ended');
                                 break;
 
                             case 1:
                                 player.media.paused = false;
-                                _triggerEvent(player.media, "play");
+                                _triggerEvent(player.media, 'play');
 
                                 // Poll to get playback progress
                                 player.timer.playing = window.setInterval(function() {
@@ -1010,14 +1010,14 @@
                                     player.media.currentTime = instance.getCurrentTime();
 
                                     // Trigger timeupdate
-                                    _triggerEvent(player.media, "timeupdate");
+                                    _triggerEvent(player.media, 'timeupdate');
                                 }, 200);
 
                                 break;
 
                             case 2:
                                 player.media.paused = true;
-                                _triggerEvent(player.media, "pause");
+                                _triggerEvent(player.media, 'pause');
                         }
                     }
                 }
@@ -1026,12 +1026,12 @@
 
         // Setup captions
         function _setupCaptions() {
-            if (player.type === "video") {
+            if (player.type === 'video') {
                 // Inject the container
-                player.videoContainer.insertAdjacentHTML("afterbegin", '<div class="' + config.selectors.captions.replace(".", "") + '"><span></span></div>');
+                player.videoContainer.insertAdjacentHTML('afterbegin', '<div class="' + config.selectors.captions.replace('.', '') + '"><span></span></div>');
 
                 // Cache selector
-                player.captionsContainer = _getElement(config.selectors.captions).querySelector("span");
+                player.captionsContainer = _getElement(config.selectors.captions).querySelector('span');
 
                 // Determine if HTML5 textTracks is supported
                 player.usingTextTracks = false;
@@ -1040,27 +1040,27 @@
                 }
 
                 // Get URL of caption file if exists
-                var captionSrc = "",
+                var captionSrc = '',
                     kind,
                     children = player.media.childNodes;
 
                 for (var i = 0; i < children.length; i++) {
-                    if (children[i].nodeName.toLowerCase() === "track") {
+                    if (children[i].nodeName.toLowerCase() === 'track') {
                         kind = children[i].kind;
-                        if (kind === "captions" || kind === "subtitles") {
-                            captionSrc = children[i].getAttribute("src");
+                        if (kind === 'captions' || kind === 'subtitles') {
+                            captionSrc = children[i].getAttribute('src');
                         }
                     }
                 }
 
                 // Record if caption file exists or not
                 player.captionExists = true;
-                if (captionSrc === "") {
+                if (captionSrc === '') {
                     player.captionExists = false;
-                    _log("No caption track found.");
+                    _log('No caption track found.');
                 }
                 else {
-                    _log("Caption track found; URI: " + captionSrc);
+                    _log('Caption track found; URI: ' + captionSrc);
                 }
 
                 // If no caption file exists, hide container for caption text
@@ -1073,39 +1073,39 @@
                     // This doesn't seem to work in Safari 7+, so the <track> elements are removed from the dom below
                     var tracks = player.media.textTracks;
                     for (var x = 0; x < tracks.length; x++) {
-                        tracks[x].mode = "hidden";
+                        tracks[x].mode = 'hidden';
                     }
 
                     // Enable UI
                     _showCaptions(player);
 
                     // Disable unsupported browsers than report false positive
-                    if ((player.browser.name === "IE" && player.browser.version >= 10) || 
-                        (player.browser.name === "Firefox" && player.browser.version >= 31) || 
-                        (player.browser.name === "Chrome" && player.browser.version >= 43) || 
-                        (player.browser.name === "Safari" && player.browser.version >= 7)) {
+                    if ((player.browser.name === 'IE' && player.browser.version >= 10) || 
+                        (player.browser.name === 'Firefox' && player.browser.version >= 31) || 
+                        (player.browser.name === 'Chrome' && player.browser.version >= 43) || 
+                        (player.browser.name === 'Safari' && player.browser.version >= 7)) {
                         // Debugging
-                        _log("Detected unsupported browser for HTML5 captions. Using fallback.");
+                        _log('Detected unsupported browser for HTML5 captions. Using fallback.');
 
-                        // Set to false so skips to "manual" captioning
+                        // Set to false so skips to 'manual' captioning
                         player.usingTextTracks = false;
                     }
 
                     // Rendering caption tracks
                     // Native support required - http://caniuse.com/webvtt
                     if (player.usingTextTracks) {
-                        _log("TextTracks supported.");
+                        _log('TextTracks supported.');
             
                         for (var y = 0; y < tracks.length; y++) {
                             var track = tracks[y];
 
-                            if (track.kind === "captions" || track.kind === "subtitles") {
-                                _on(track, "cuechange", function() {
+                            if (track.kind === 'captions' || track.kind === 'subtitles') {
+                                _on(track, 'cuechange', function() {
                                     // Clear container
-                                    player.captionsContainer.innerHTML = "";
+                                    player.captionsContainer.innerHTML = '';
 
                                     // Display a cue, if there is one
-                                    if (this.activeCues[0] && this.activeCues[0].hasOwnProperty("text")) {
+                                    if (this.activeCues[0] && this.activeCues[0].hasOwnProperty('text')) {
                                         player.captionsContainer.appendChild(this.activeCues[0].getCueAsHTML().trim());
                                     }
                                 });
@@ -1114,13 +1114,13 @@
                     }
                     // Caption tracks not natively supported
                     else {
-                        _log("TextTracks not supported so rendering captions manually.");
+                        _log('TextTracks not supported so rendering captions manually.');
 
                         // Render captions from array at appropriate time
-                        player.currentCaption = "";
+                        player.currentCaption = '';
                         player.captions = [];
 
-                        if (captionSrc !== "") {
+                        if (captionSrc !== '') {
                             // Create XMLHttpRequest Object
                             var xhr = new XMLHttpRequest();
 
@@ -1131,37 +1131,37 @@
                                             record,
                                             req = xhr.responseText;
 
-                                        records = req.split("\n\n");
+                                        records = req.split('\n\n');
 
                                         for (var r = 0; r < records.length; r++) {
                                             record = records[r];
                                             player.captions[r] = [];
-                                            player.captions[r] = record.split("\n");
+                                            player.captions[r] = record.split('\n');
                                         }
 
-                                        // Remove first element ("VTT")
+                                        // Remove first element ('VTT')
                                         player.captions.shift();
 
-                                        _log("Successfully loaded the caption file via AJAX.");
+                                        _log('Successfully loaded the caption file via AJAX.');
                                     } 
                                     else {
-                                        _log("There was a problem loading the caption file via AJAX.", true);
+                                        _log('There was a problem loading the caption file via AJAX.', true);
                                     }
                                 }
                             };
                             
-                            xhr.open("get", captionSrc, true);
+                            xhr.open('get', captionSrc, true);
 
                             xhr.send();
                         }
                     }
 
-                    // If Safari 7+, removing track from DOM [see "turn off native caption rendering" above]
-                    if (player.browser.name === "Safari" && player.browser.version >= 7) {
-                        _log("Safari 7+ detected; removing track from DOM.");
+                    // If Safari 7+, removing track from DOM [see 'turn off native caption rendering' above]
+                    if (player.browser.name === 'Safari' && player.browser.version >= 7) {
+                        _log('Safari 7+ detected; removing track from DOM.');
 
                         // Find all <track> elements
-                        tracks = player.media.getElementsByTagName("track");
+                        tracks = player.media.getElementsByTagName('track');
                         
                         // Loop through and remove one by one
                         for (var t = 0; t < tracks.length; t++) {
@@ -1174,18 +1174,18 @@
 
         // Setup fullscreen
         function _setupFullscreen() {
-            if (player.type != "audio" && config.fullscreen.enabled) {
+            if (player.type != 'audio' && config.fullscreen.enabled) {
                 // Check for native support
                 var nativeSupport = fullscreen.supportsFullScreen;
 
                 if (nativeSupport || (config.fullscreen.fallback && !_inFrame())) {
-                    _log((nativeSupport ? "Native" : "Fallback") + " fullscreen enabled.");
+                    _log((nativeSupport ? 'Native' : 'Fallback') + ' fullscreen enabled.');
 
                     // Add styling hook
                     _toggleClass(player.container, config.classes.fullscreen.enabled, true);
                 }
                 else {
-                    _log("Fullscreen not supported and fallback disabled.");
+                    _log('Fullscreen not supported and fallback disabled.');
                 }
 
                 // Toggle state
@@ -1220,14 +1220,14 @@
             }
             // True toggle
             else {
-                player.media[player.media.paused ? "play" : "pause"]();
+                player.media[player.media.paused ? 'play' : 'pause']();
             }
         }
 
         // Rewind
         function _rewind(seekTime) {
             // Use default if needed
-            if (typeof seekTime !== "number") {
+            if (typeof seekTime !== 'number') {
                 seekTime = config.seekTime;
             }
             _seek(player.media.currentTime - seekTime);
@@ -1236,7 +1236,7 @@
         // Fast forward
         function _forward(seekTime) {
             // Use default if needed
-            if (typeof seekTime !== "number") {
+            if (typeof seekTime !== 'number') {
                 seekTime = config.seekTime;
             }
             _seek(player.media.currentTime + seekTime);
@@ -1249,11 +1249,11 @@
                 paused = player.media.paused;
 
             // Explicit position
-            if (typeof input === "number") {
+            if (typeof input === 'number') {
                 targetTime = input;
             }
             // Event
-            else if (typeof input === "object" && (input.type === "input" || input.type === "change")) {
+            else if (typeof input === 'object' && (input.type === 'input' || input.type === 'change')) {
                 // It's the seek slider
                 // Seek to the selected time
                 targetTime = ((input.target.value / input.target.max) * player.media.duration);
@@ -1275,7 +1275,7 @@
             catch(e) {}
 
             // YouTube
-            if (player.type == "youtube") {
+            if (player.type == 'youtube') {
                 player.embed.seekTo(targetTime);
 
                 if (paused) {
@@ -1283,13 +1283,13 @@
                 }
 
                 // Trigger timeupdate
-                _triggerEvent(player.media, "timeupdate");
+                _triggerEvent(player.media, 'timeupdate');
             }
 
             // Logging
-            _log("Seeking to " + player.media.currentTime + " seconds");
+            _log('Seeking to ' + player.media.currentTime + ' seconds');
 
-            // Special handling for "manual" captions
+            // Special handling for 'manual' captions
             _seekManualCaptions(targetTime);
         }
 
@@ -1328,12 +1328,12 @@
 
                 // Bind/unbind escape key
                 if (player.isFullscreen) {
-                    _on(document, "keyup", _handleEscapeFullscreen);
-                    document.body.style.overflow = "hidden";
+                    _on(document, 'keyup', _handleEscapeFullscreen);
+                    document.body.style.overflow = 'hidden';
                 }
                 else {
-                    _off(document, "keyup", _handleEscapeFullscreen);
-                    document.body.style.overflow = "";
+                    _off(document, 'keyup', _handleEscapeFullscreen);
+                    document.body.style.overflow = '';
                 }
             }
 
@@ -1364,7 +1364,7 @@
 
             // Check mouse is over the controls
             function _setMouseOver (event) {
-                isMouseOver = (event.type === "mouseenter");
+                isMouseOver = (event.type === 'mouseenter');
             }
 
             if (config.fullscreen.hideControls) {
@@ -1372,10 +1372,10 @@
                 _toggleClass(player.controls, config.classes.hover, false);
 
                 // Keep an eye on the mouse location in relation to controls
-                _toggleHandler(player.controls, "mouseenter mouseleave", _setMouseOver, player.isFullscreen);
+                _toggleHandler(player.controls, 'mouseenter mouseleave', _setMouseOver, player.isFullscreen);
 
                 // Show the controls on mouse move
-                _toggleHandler(player.container, "mousemove", _showControls, player.isFullscreen);
+                _toggleHandler(player.container, 'mousemove', _showControls, player.isFullscreen);
             }
         }
 
@@ -1390,7 +1390,7 @@
         // Set volume
         function _setVolume(volume) {
             // Use default if no value specified
-            if (typeof volume === "undefined") {
+            if (typeof volume === 'undefined') {
                 if (config.storage.enabled && _storage().supported) {
                     volume = window.localStorage[config.storage.key] || config.volume;
                 }
@@ -1412,11 +1412,11 @@
             player.media.volume = parseFloat(volume / 10);
 
             // YouTube
-            if (player.type == "youtube") {
+            if (player.type == 'youtube') {
                 player.embed.setVolume(player.media.volume * 100);
 
                 // Trigger timeupdate
-                _triggerEvent(player.media, "volumechange");
+                _triggerEvent(player.media, 'volumechange');
             }
 
             // Toggle muted state
@@ -1428,7 +1428,7 @@
         // Mute
         function _toggleMute(muted) {
             // If the method is called without parameter, toggle based on current value
-            if (typeof muted !== "boolean") {
+            if (typeof muted !== 'boolean') {
                 muted = !player.media.muted;
             }
 
@@ -1439,11 +1439,11 @@
             player.media.muted = muted;
 
             // YouTube
-            if (player.type === "youtube") {
-                player.embed[player.media.muted ? "mute" : "unMute"]();
+            if (player.type === 'youtube') {
+                player.embed[player.media.muted ? 'mute' : 'unMute']();
 
                 // Trigger timeupdate
-                _triggerEvent(player.media, "volumechange");
+                _triggerEvent(player.media, 'volumechange');
             }
         }
 
@@ -1479,7 +1479,7 @@
             }
 
             // If the method is called without parameter, toggle based on current value
-            if (typeof show !== "boolean") {
+            if (typeof show !== 'boolean') {
                 show = (player.container.className.indexOf(config.classes.captions.active) === -1);
             }
 
@@ -1492,7 +1492,7 @@
 
         // Check if media is loading
         function _checkLoading(event) {
-            var loading = (event.type === "waiting");
+            var loading = (event.type === 'waiting');
 
             // Clear timer
             clearTimeout(player.loadingTimer);
@@ -1512,27 +1512,27 @@
             if (event) {
                 switch (event.type) {
                     // Video playing
-                    case "timeupdate":
-                    case "seeking":
+                    case 'timeupdate':
+                    case 'seeking':
                         value = _getPercentage(player.media.currentTime, player.media.duration);
 
-                        // Set seek range value only if it's a "natural" time event
-                        if (event.type == "timeupdate" && player.buttons.seek) {
+                        // Set seek range value only if it's a 'natural' time event
+                        if (event.type == 'timeupdate' && player.buttons.seek) {
                             player.buttons.seek.value = value;
                         }
             
                         break;
 
                     // Events from seek range
-                    case "change":
-                    case "input":
+                    case 'change':
+                    case 'input':
                         value = event.target.value;
                         break;
 
 
                     // Check buffer status
-                    case "playing":
-                    case "progress":
+                    case 'playing':
+                    case 'progress':
                         progress    = player.progress.buffer.bar;
                         text        = player.progress.buffer.text;
                         value       = (function() {
@@ -1543,7 +1543,7 @@
                                             return _getPercentage(buffered.end(0), player.media.duration);
                                         }
                                         // YouTube returns between 0 and 1
-                                        else if (typeof buffered == "number") {
+                                        else if (typeof buffered == 'number') {
                                             return (buffered * 100);
                                         }
 
@@ -1575,12 +1575,12 @@
             // Do we need to display hours?
             var displayHours = (parseInt(((player.media.duration / 60) / 60) % 60) > 0);
             
-            // Ensure it"s two digits. For example, 03 rather than 3.
-            player.secs = ("0" + player.secs).slice(-2);
-            player.mins = ("0" + player.mins).slice(-2);
+            // Ensure it's two digits. For example, 03 rather than 3.
+            player.secs = ('0' + player.secs).slice(-2);
+            player.mins = ('0' + player.mins).slice(-2);
 
             // Render
-            element.innerHTML = (displayHours ? player.hours + ":" : "") + player.mins + ":" + player.secs;
+            element.innerHTML = (displayHours ? player.hours + ':' : '') + player.mins + ':' + player.secs;
         }
 
         // Show the duration on metadataloaded
@@ -1610,7 +1610,7 @@
         // Remove <source> children and src attribute
         function _removeSources() {
             // Find child <source> elements
-            var sources = player.media.querySelectorAll("source");
+            var sources = player.media.querySelectorAll('source');
 
             // Remove each
             for (var i = sources.length - 1; i >= 0; i--) {
@@ -1618,14 +1618,14 @@
             }
 
             // Remove src attribute
-            player.media.removeAttribute("src");
+            player.media.removeAttribute('src');
         }
 
         // Inject a source
         function _addSource(attributes) {
             if (attributes.src) {
                 // Create a new <source>
-                var element = document.createElement("source");
+                var element = document.createElement('source');
 
                 // Set all passed attributes
                 _setAttributes(element, attributes);
@@ -1639,7 +1639,7 @@
         // Sources are not checked for support so be careful
         function _parseSource(sources) {
             // YouTube
-            if (player.type === "youtube" && typeof sources === "string") {
+            if (player.type === 'youtube' && typeof sources === 'string') {
                 // Destroy YouTube instance
                 player.embed.destroy();
 
@@ -1664,14 +1664,14 @@
             _removeSources();
 
             // If a single source is passed
-            // .source("path/to/video.mp4")
-            if (typeof sources === "string") {
+            // .source('path/to/video.mp4')
+            if (typeof sources === 'string') {
                 _addSource({ src: sources });
             }
 
             // An array of source objects
-            // Check if a source exists, use that or set the "src" attribute?
-            // .source([{ src: "path/to/video.mp4", type: "video/mp4" },{ src: "path/to/video.webm", type: "video/webm" }])
+            // Check if a source exists, use that or set the 'src' attribute?
+            // .source([{ src: 'path/to/video.mp4', type: 'video/mp4' },{ src: 'path/to/video.webm', type: 'video/webm' }])
             else if (sources.constructor === Array) {
                 for (var index in sources) {
                     _addSource(sources[index]);
@@ -1690,22 +1690,22 @@
             player.media.load();
 
             // Play if autoplay attribute is present
-            if (player.media.getAttribute("autoplay") !== null) {
+            if (player.media.getAttribute('autoplay') !== null) {
                 _play();
             }
         }
 
         // Update poster
         function _updatePoster(source) {
-            if (player.type === "video") {
-                player.media.setAttribute("poster", source);
+            if (player.type === 'video') {
+                player.media.setAttribute('poster', source);
             }
         }
 
         // Listen for events
         function _listeners() {
             // IE doesn't support input event, so we fallback to change
-            var inputEvent = (player.browser.name == "IE" ? "change" : "input");
+            var inputEvent = (player.browser.name == 'IE' ? 'change' : 'input');
 
             // Detect tab focus
             function checkFocus() {
@@ -1714,15 +1714,15 @@
                     focused = null;
                 }
                 else if (document.querySelector) {
-                    focused = document.querySelector(":focus");
+                    focused = document.querySelector(':focus');
                 }
                 for (var button in player.buttons) {
                     var element = player.buttons[button];
 
-                    _toggleClass(element, "tab-focus", (element === focused));
+                    _toggleClass(element, 'tab-focus', (element === focused));
                 }
             }
-            _on(window, "keyup", function(event) {
+            _on(window, 'keyup', function(event) {
                 var code = (event.keyCode ? event.keyCode : event.which);
 
                 if (code == 9) {
@@ -1732,31 +1732,31 @@
             for (var button in player.buttons) {
                 var element = player.buttons[button];
 
-                _on(element, "blur", function() {
-                    _toggleClass(element, "tab-focus", false);
+                _on(element, 'blur', function() {
+                    _toggleClass(element, 'tab-focus', false);
                 });
             }
 
             // Play
-            _on(player.buttons.play, "click", function() {
+            _on(player.buttons.play, 'click', function() {
                 _play();
                 setTimeout(function() { player.buttons.pause.focus(); }, 100);
             });
 
             // Pause
-            _on(player.buttons.pause, "click", function() {
+            _on(player.buttons.pause, 'click', function() {
                 _pause();
                 setTimeout(function() { player.buttons.play.focus(); }, 100);
             });
 
             // Restart
-            _on(player.buttons.restart, "click", _seek);
+            _on(player.buttons.restart, 'click', _seek);
 
             // Rewind
-            _on(player.buttons.rewind, "click", _rewind);
+            _on(player.buttons.rewind, 'click', _rewind);
 
             // Fast forward
-            _on(player.buttons.forward, "click", _forward);
+            _on(player.buttons.forward, 'click', _forward);
 
             // Seek 
             _on(player.buttons.seek, inputEvent, _seek);
@@ -1767,10 +1767,10 @@
             });
 
             // Mute
-            _on(player.buttons.mute, "click", _toggleMute);
+            _on(player.buttons.mute, 'click', _toggleMute);
 
             // Fullscreen
-            _on(player.buttons.fullscreen, "click", _toggleFullscreen);
+            _on(player.buttons.fullscreen, 'click', _toggleFullscreen);
 
             // Handle user exiting fullscreen by escaping etc
             if (fullscreen.supportsFullScreen) {
@@ -1778,22 +1778,22 @@
             }
             
             // Time change on media
-            _on(player.media, "timeupdate seeking", _timeUpdate);
+            _on(player.media, 'timeupdate seeking', _timeUpdate);
 
             // Update manual captions
-            _on(player.media, "timeupdate", _seekManualCaptions);
+            _on(player.media, 'timeupdate', _seekManualCaptions);
 
             // Display duration
-            _on(player.media, "loadedmetadata", _displayDuration);
+            _on(player.media, 'loadedmetadata', _displayDuration);
 
             // Captions
-            _on(player.buttons.captions, "click", _toggleCaptions);
+            _on(player.buttons.captions, 'click', _toggleCaptions);
 
             // Handle the media finishing
-            _on(player.media, "ended", function() {
+            _on(player.media, 'ended', function() {
                 // Clear 
-                if (player.type === "video") {
-                    player.captionsContainer.innerHTML = "";
+                if (player.type === 'video') {
+                    player.captionsContainer.innerHTML = '';
                 }
 
                 // Reset UI
@@ -1801,29 +1801,29 @@
             });
 
             // Check for buffer progress
-            _on(player.media, "progress playing", _updateProgress);
+            _on(player.media, 'progress playing', _updateProgress);
 
             // Handle native mute
-            _on(player.media, "volumechange", _updateVolume);
+            _on(player.media, 'volumechange', _updateVolume);
 
             // Handle native play/pause
-            _on(player.media, "play pause", _checkPlaying);
+            _on(player.media, 'play pause', _checkPlaying);
 
             // Loading
-            _on(player.media, "waiting canplay seeked", _checkLoading);
+            _on(player.media, 'waiting canplay seeked', _checkLoading);
 
             // Click video
-            if (player.type === "video" && config.click) {
-                _on(player.videoContainer, "click", function() {
+            if (player.type === 'video' && config.click) {
+                _on(player.videoContainer, 'click', function() {
                     if (player.media.paused) {
-                        _triggerEvent(player.buttons.play, "click");
+                        _triggerEvent(player.buttons.play, 'click');
                     }
                     else if (player.media.ended) {
                         _seek();
-                        _triggerEvent(player.buttons.play, "click");
+                        _triggerEvent(player.buttons.play, 'click');
                     }
                     else {
-                        _triggerEvent(player.buttons.pause, "click");
+                        _triggerEvent(player.buttons.pause, 'click');
                     }
                 });
             }
@@ -1839,7 +1839,7 @@
             }
 
             // Reset container classname
-            player.container.setAttribute("class", config.selectors.container.replace(".", ""));
+            player.container.setAttribute('class', config.selectors.container.replace('.', ''));
 
             // Remove init flag
             player.init = false;
@@ -1848,13 +1848,13 @@
             _remove(_getElement(config.selectors.controls));
 
             // YouTube
-            if (player.type === "youtube") {
+            if (player.type === 'youtube') {
                 player.embed.destroy();
                 return;
             }
 
             // If video, we need to remove some more
-            if (player.type === "video") {
+            if (player.type === 'video') {
                 // Remove captions
                 _remove(_getElement(config.selectors.captions));
 
@@ -1863,7 +1863,7 @@
             }
 
             // Restore native video controls
-            player.media.setAttribute("controls", "");
+            player.media.setAttribute('controls', '');
 
             // Clone the media element to remove listeners
             // http://stackoverflow.com/questions/19469881/javascript-remove-all-event-listeners-of-specific-type
@@ -1885,12 +1885,12 @@
             player.browser = _browserSniff();
 
             // Get the media element
-            player.media = player.container.querySelectorAll("audio, video, div")[0];
+            player.media = player.container.querySelectorAll('audio, video, div')[0];
 
             // Set media type
             var tagName = player.media.tagName.toLowerCase();
-            if (tagName === "div") {
-                player.type = player.media.getAttribute("data-type");
+            if (tagName === 'div') {
+                player.type = player.media.getAttribute('data-type');
             }
             else {
                 player.type = tagName;
@@ -1905,13 +1905,13 @@
             }
 
             // Debug info
-            _log(player.browser.name + " " + player.browser.version);
+            _log(player.browser.name + ' ' + player.browser.version);
 
             // Setup media
             _setupMedia();
 
             // Setup interface
-            if (player.type == "video" || player.type == "audio") {
+            if (player.type == 'video' || player.type == 'audio') {
                 // Bail if no support
                 if (!player.supported.full) {
                     return;
@@ -1989,24 +1989,24 @@
     // Check for support 
     api.supported = function(type) {
         var browser = _browserSniff(),
-            oldIE   = (browser.name === "IE" && browser.version <= 9),
+            oldIE   = (browser.name === 'IE' && browser.version <= 9),
             iPhone  = /iPhone|iPod/i.test(navigator.userAgent),
-            audio   = !!document.createElement("audio").canPlayType,
-            video   = !!document.createElement("video").canPlayType,
+            audio   = !!document.createElement('audio').canPlayType,
+            video   = !!document.createElement('video').canPlayType,
             basic, full;
 
         switch (type) {
-            case "video": 
+            case 'video': 
                 basic = video;
                 full  = (basic && (!oldIE && !iPhone));
                 break;
 
-            case "audio": 
+            case 'audio': 
                 basic = audio;
                 full  = (basic && !oldIE);
                 break;
 
-            case "youtube": 
+            case 'youtube': 
                 basic = true;
                 full  = (!oldIE && !iPhone);
                 break;
@@ -2043,7 +2043,7 @@
             var element = elements[i];
 
             // Setup a player instance and add to the element
-            if (typeof element.plyr === "undefined") {
+            if (typeof element.plyr === 'undefined') {
                 // Create new instance
                 var instance = new Plyr(element);
 
@@ -2051,7 +2051,7 @@
                 element.plyr = (Object.keys(instance).length ? instance : false);
 
                 // Callback
-                if (typeof config.onSetup === "function") {
+                if (typeof config.onSetup === 'function') {
                     config.onSetup.apply(element.plyr);
                 }
             }
