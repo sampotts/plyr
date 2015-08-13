@@ -16,7 +16,7 @@
 
     // Default config
     var defaults = {
-        enabled:                true, 
+        enabled:                true,
         debug:                  false,
         seekTime:               10,
         volume:                 5,
@@ -302,14 +302,14 @@
         // Get major version
         majorVersion = parseInt("" + fullVersion, 10);
         if (isNaN(majorVersion)) {
-            fullVersion = "" + parseFloat(navigator.appVersion); 
+            fullVersion = "" + parseFloat(navigator.appVersion);
             majorVersion = parseInt(navigator.appVersion, 10);
         }
 
         // Return data
         return {
-            name:       name, 
-            version:    majorVersion, 
+            name:       name,
+            version:    majorVersion,
             ios:        /(iPad|iPhone|iPod)/g.test(navigator.platform)
         };
     }
@@ -317,7 +317,7 @@
     // Check for mime type support against a player instance
     // Credits: http://diveintohtml5.info/everything.html 
     // Related: http://www.leanbackplayer.com/test/h5mt.html
-    function _supportMime(player, mimeType) {    
+    function _supportMime(player, mimeType) {
         var media = player.media;
 
         // Only check video types for video players
@@ -562,7 +562,7 @@
 
         // Update methods to do something useful
         if (fullscreen.supportsFullScreen) {
-            // Yet again Microsoft awesomeness, 
+            // Yet again Microsoft awesomeness,
             // Sometimes the prefix is "ms", sometimes "MS" to keep you on your toes
             fullscreen.fullScreenEventName = (fullscreen.prefix == "ms" ? "MSFullscreenChange" : fullscreen.prefix + "fullscreenchange");
 
@@ -588,7 +588,7 @@
             fullscreen.cancelFullScreen = function() {
                 return (this.prefix === "") ? document.cancelFullScreen() : document[this.prefix + (this.prefix == "ms" ? "ExitFullscreen" : "CancelFullScreen")]();
             };
-            fullscreen.element = function() { 
+            fullscreen.element = function() {
                 return (this.prefix === "") ? document.fullscreenElement : document[this.prefix + "FullscreenElement"];
             };
         }
@@ -955,7 +955,7 @@
                         window.clearInterval(player.timer.buffering);
 
                         // Setup buffering
-                        player.timer.buffering = window.setInterval(function() { 
+                        player.timer.buffering = window.setInterval(function() {
                             // Get loaded % from YouTube
                             player.media.buffered = instance.getVideoLoadedFraction();
                             
@@ -1128,7 +1128,7 @@
                             xhr.onreadystatechange = function() {
                                 if (xhr.readyState === 4) {
                                     if (xhr.status === 200) {
-                                        var records = [], 
+                                        var records = [],
                                             record,
                                             req = xhr.responseText;
 
@@ -1368,7 +1368,7 @@
                 isMouseOver = (event.type === "mouseenter");
             }
 
-            if (config.fullscreen.hideControls) {           
+            if (config.fullscreen.hideControls) {
                 // Hide on entering full screen
                 _toggleClass(player.controls, config.classes.hover, false);
 
@@ -1384,7 +1384,7 @@
         function _handleEscapeFullscreen(event) {
             // If it's a keypress and not escape, bail
             if ((event.which || event.charCode || event.keyCode) === 27 && player.isFullscreen) {
-                _toggleFullscreen();                
+                _toggleFullscreen();
             }
         }
 
@@ -1473,7 +1473,7 @@
         }
 
         // Toggle captions
-        function _toggleCaptions(show) { 
+        function _toggleCaptions(show) {
             // If there's no full support, or there's no caption toggle
             if (!player.supported.full || !player.buttons.captions) {
                 return;
@@ -1506,8 +1506,8 @@
 
         // Update <progress> elements
         function _updateProgress(event) {
-            var progress    = player.progress.played.bar, 
-                text        = player.progress.played.text, 
+            var progress    = player.progress.played.bar,
+                text        = player.progress.played.text,
                 value       = 0;
 
             if (event) {
@@ -1536,7 +1536,7 @@
                     case "progress":
                         progress    = player.progress.buffer.bar;
                         text        = player.progress.buffer.text;
-                        value       = (function() { 
+                        value       = (function() {
                                         var buffered = player.media.buffered;
 
                                         // HTML5
@@ -1548,7 +1548,7 @@
                                             return (buffered * 100);
                                         }
 
-                                        return 0;                                   
+                                        return 0;
                                     })();
                         break;
                 }
@@ -1675,7 +1675,7 @@
             // Check if a source exists, use that or set the "src" attribute?
             // .source([{ src: "path/to/video.mp4", type: "video/mp4" },{ src: "path/to/video.webm", type: "video/webm" }])
             else if (sources.constructor === Array) {
-                for (var index in sources) { 
+                for (var index in sources) {
                     _addSource(sources[index]);
                 }
             }
@@ -1740,14 +1740,14 @@
             }
 
             // Play
-            _on(player.buttons.play, "click", function() { 
-                _play(); 
+            _on(player.buttons.play, "click", function() {
+                _play();
                 setTimeout(function() { player.buttons.pause.focus(); }, 100);
             });
 
             // Pause
-            _on(player.buttons.pause, "click", function() { 
-                _pause(); 
+            _on(player.buttons.pause, "click", function() {
+                _pause();
                 setTimeout(function() { player.buttons.play.focus(); }, 100);
             });
 
@@ -2009,12 +2009,12 @@
             case "audio": 
                 basic = audio;
                 full  = (basic && !oldIE);
-                break; 
+                break;
 
             case "youtube": 
                 basic = true;
                 full  = (!oldIE && !iPhone);
-                break; 
+                break;
 
             default:
                 basic = (audio && video);
@@ -2040,7 +2040,7 @@
         }
 
         // Get the players 
-        var elements    = document.querySelectorAll(config.selectors.container), 
+        var elements    = document.querySelectorAll(config.selectors.container),
             players     = [];
 
         // Create a player instance for each element
@@ -2049,7 +2049,7 @@
             var element = elements[i];
 
             // Setup a player instance and add to the element
-            if (typeof element.plyr === "undefined") { 
+            if (typeof element.plyr === "undefined") {
                 // Create new instance
                 var instance = new Plyr(element);
 
