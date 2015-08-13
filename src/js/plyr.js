@@ -1666,7 +1666,7 @@
             // If a single source is passed
             // .source("path/to/video.mp4")
             if (typeof sources === "string") {
-                player.media.setAttribute("src", sources);
+                _addSource({ src: sources });
             }
 
             // An array of source objects
