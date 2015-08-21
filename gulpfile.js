@@ -66,7 +66,12 @@ package = loadJSON(path.join(root, "package.json"));
 
 // Load json
 function loadJSON(path) {
-    return JSON.parse(fs.readFileSync(path));
+    try {
+        return JSON.parse(fs.readFileSync(path));
+    }
+    catch(err) {
+        return {};
+    }
 }
 
 var build = {
@@ -215,8 +220,12 @@ options = {
         },
         gzippedOnly: true
     }
-},
-cdnpath = new RegExp(aws.cdn.bucket + "\/(\\d+\\.)?(\\d+\\.)?(\\*|\\d+)","gi");
+};
+
+// If aws is setup
+if("cdn" in aws) {
+    var cdnpath = new RegExp(aws.cdn.bucket + "\/(\\d+\\.)?(\\d+\\.)?(\\*|\\d+)","gi");
+}
 
 // Publish version to CDN bucket
 gulp.task("cdn", function () {

@@ -1,5 +1,8 @@
 # Changelog
 
+# v1.3.5
+- Fixed bug with API use on basic supported browsers
+
 # v1.3.4
 - Code cleanup by @calvintam236
 

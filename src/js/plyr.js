@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.3.4
+// plyr.js v1.3.5
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -1914,6 +1914,10 @@
             if (player.type == 'video' || player.type == 'audio') {
                 // Bail if no support
                 if (!player.supported.full) {
+                    // Successful setup
+                    player.init = true;
+
+                    // Don't inject controls if no full support
                     return;
                 }
 
