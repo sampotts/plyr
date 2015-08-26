@@ -25,6 +25,7 @@ nav {
 	position: relative;
 	margin: 0 auto @padding-base;
 	max-width: @example-width-video;
+	white-space: nowrap;
 
 	&::before {
 		content: "";
@@ -101,7 +102,8 @@ nav {
 	}
 }
 .btn-primary {
-	background: linear-gradient(@link-color, darken(@link-color, 3%));
+	background-image: linear-gradient(@link-color, darken(@link-color, 3%));
+	background-color: @link-color;
 	border-color: darken(@link-color, 10%);
 	box-shadow: 0 1px 1px rgba(0,0,0, .15);
 	text-shadow: 0 1px 1px rgba(0,0,0, .1);
@@ -123,7 +125,7 @@ nav {
 	position: relative;
 	margin-left: 6px;
 	padding: ((@padding-base / 2) - 1px);
-	background: @body-background;
+	background: #fff;
 	border: 1px solid @gray-light;
 
 	&::before {

@@ -66,7 +66,12 @@ package = loadJSON(path.join(root, "package.json"));
 
 // Load json
 function loadJSON(path) {
-    return JSON.parse(fs.readFileSync(path));
+    try {
+        return JSON.parse(fs.readFileSync(path));
+    }
+    catch(err) {
+        return {};
+    }
 }
 
 var build = {
@@ -165,11 +170,6 @@ build.templates();
 build.less(bundles.docs.less, "docs");
 build.js(bundles.docs.js, "docs");
 
-// Default gulp task
-gulp.task("default", function(){
-    run("templates", tasks.js, tasks.less, "sprite");
-});
-
 // Build all JS (inc. templates)
 gulp.task("js", function(){
     run("templates", tasks.js);
@@ -193,6 +193,11 @@ gulp.task("watch", function () {
     gulp.watch(paths.docs.src.templates, ["js"]);
 });
 
+// Default gulp task
+gulp.task("default", function(){
+    run("templates", tasks.js, tasks.less, "sprite", "watch");
+});
+
 // Publish a version to CDN and docs
 // --------------------------------------------
 
@@ -203,7 +208,7 @@ maxAge  = 31536000, // seconds 1 year
 options = {
     cdn: {
         headers: {
-            "Cache-Control": "max-age=" + maxAge + ", no-transform, public",
+            "Cache-Control": "max-age=" + maxAge,
             "Vary": "Accept-Encoding"
         },
         gzippedOnly: true
@@ -215,8 +220,12 @@ options = {
         },
         gzippedOnly: true
     }
-},
-cdnpath = new RegExp(aws.cdn.bucket + "\/(\\d+\\.)?(\\d+\\.)?(\\*|\\d+)","gi");
+};
+
+// If aws is setup
+if("cdn" in aws) {
+    var cdnpath = new RegExp(aws.cdn.bucket + "\/(\\d+\\.)?(\\d+\\.)?(\\*|\\d+)","gi");
+}
 
 // Publish version to CDN bucket
 gulp.task("cdn", function () {

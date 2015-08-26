@@ -1,7 +1,49 @@
 # Changelog
 
-## v1.2.0
-- Added YouTube support.
+# v1.3.5
+- Fixed bug with API use on basic supported browsers
+
+# v1.3.4
+- Code cleanup by @calvintam236
+
+# v1.3.3
+- Removed captions being read by screen readers
+
+# v1.3.2
+- Voiceover fix for captions
+
+# v1.3.1 
+- ARIA improvements for captions being read
+
+# v1.3.0
+- Internationalization support (i18n) using default controls (required markup changes to controls)
+- ARIA enhancements for controls (required markup changes to controls)
+- Captions legibility improvements
+- YouTube bug fixes
+
+## v1.2.6
+- SASS updates and fixes (cheers @ChristianPV)
+
+## v1.2.5
+- Fix for YouTube quality (let them decide quality)
+
+## v1.2.4
+- Fix for omitted kind attribute on <track> (fixes #88)
+
+## v1.2.3
+- Fix for YouTube on iPhone or unsupported browsers (fallback to YouTube native)
+- Docs tidy up
+- Fullscreen for Safari fix (Fixes #96)
+
+## v1.2.2
+- Fix for :focus keyboard vs mouse (Fixes #61)
+- Fix for caption positioning in full screen (Fixes #92)
+
+## v1.2.1
+- Tooltip bug fix
+
+# v1.2.0
+- Added YouTube support
 
 ## v1.1.13
 - Added icon prefix option for when using default controls

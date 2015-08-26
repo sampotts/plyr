@@ -10,6 +10,7 @@ plyr.setup({
 	volume: 9,
 	title: 	"Video demo",
 	html: 	templates.controls.render({}),
+	tooltips: true,
 	captions: {
 		defaultActive: true
 	},
@@ -107,7 +108,7 @@ plyr.setup({
 
 	// Add star
 	function formatGitHubCount(count) {
-		return "&bigstar; " + count;
+		return "&#9733; " + count;
 	}
 
 	// Check if it's in session storage first

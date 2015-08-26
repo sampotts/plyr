@@ -17,7 +17,11 @@
 // Font sizes
 @font-size-small:           14px;
 @font-size-base:            16px;
-@font-size-large:           ceil((@font-size-base * 1.5)); 
+
+// Captions
+@font-size-captions-base:   ceil(@font-size-base * 1.25);
+@font-size-captions-medium: ceil(@font-size-base * 1.5);
+@font-size-captions-large:  (@font-size-base * 2); 
 
 // Controls
 @control-spacing:           10px;
@@ -28,7 +32,8 @@
 
 // Tooltips
 @tooltip-bg:                @controls-bg;
-@tooltip-color:             #fff;
+@tooltip-border-color:      @off-white;
+@tooltip-color:             @control-color;
 @tooltip-padding:           @control-spacing;   
 @tooltip-arrow-size:        5px;
 @tooltip-radius:            3px;
@@ -197,25 +202,30 @@
         bottom: 0;
         left: 0;
         width: 100%;
-        padding: 20px;
-        min-height: 2.5em;
+        padding: (@control-spacing * 2) (@control-spacing * 2) (@control-spacing * 3);
         color: #fff;
-        font-size: @font-size-base;
-        font-weight: 600;
-        text-shadow: 
-        -1px -1px 0 @gray, 
-        1px -1px 0 @gray, 
-        -1px 1px 0 @gray, 
-        1px 1px 0 @gray;
+        font-size: @font-size-captions-base;
         text-align: center;
         .font-smoothing();
 
+        span {
+            border-radius: 2px;
+            padding: 3px 10px;
+            background: rgba(0,0,0, .9);
+        }
+        span:empty {
+            display: none;
+        }
+
         @media (min-width: @bp-captions-large) {
-            font-size: @font-size-large;
+            font-size: @font-size-captions-medium;
         }
     }
     &.captions-active &-captions {
         display: block;
+    }
+    &.fullscreen-active &-captions {
+        font-size: @font-size-captions-large;
     }
 
     // Player controls
@@ -244,17 +254,20 @@
             }
         }
         
-        input + label, 
+        // Buttons
         button {
             display: inline-block;
             vertical-align: middle;
             margin: 0 2px;
             padding: (@control-spacing / 2) @control-spacing;
-            
-            transition: background .3s ease, color .3s ease, opacity .3s ease;
+            overflow: hidden;
+            border: 0;
+            background: transparent;
             border-radius: 3px;
             cursor: pointer;
-
+            color: @control-color;
+            transition: background .3s ease, color .3s ease, opacity .3s ease;
+            
             svg {
                 width: 18px;
                 height: 18px;
@@ -262,41 +275,27 @@
                 fill: currentColor;
                 transition: fill .3s ease;
             }
-        }
-        input + label,
-        .inverted:checked + label {
-            opacity: .5;
-        }
-        button, 
-        .inverted + label,
-        input:checked + label {
-            color: @control-color;
-            opacity: 1;
-        }
-        button {
-            border: 0;
-            background: transparent;
-            overflow: hidden;
-        }
         
-        // Specificity for overriding .inverted
-        button:focus,
-        button:hover,
-        [type="checkbox"]:focus + label,
-        [type="checkbox"] + label:hover {
-            background: @control-bg-hover;
-            color: @control-color-hover;
-            opacity: 1;
+            // Hover and tab focus
+            &.tab-focus,
+            &:hover {
+                background: @control-bg-hover;
+                color: @control-color-hover;
+            }
+            // Default focus
+            &:focus {
+                outline: 0;
+            }
         }
-        button:focus,
-        input:focus + label {
-            outline: 0;
-        }
+
+        // Hide toggle icons by default
         .icon-exit-fullscreen,
         .icon-muted,
         .icon-captions-on {
             display: none;
         }
+
+        // Player time
         .player-time {
             display: inline-block;
             vertical-align: middle;
@@ -317,7 +316,7 @@
 
             // Add a slash in before
             &::before {
-                content: "\2044";
+                content: '\2044';
                 margin-right: @control-spacing;
             }
         }
@@ -325,7 +324,6 @@
 
     // Tooltips
     &-tooltip {
-        visibility: hidden;
         position: absolute;
         z-index: 2;
         bottom: 100%;
@@ -334,39 +332,38 @@
 
         opacity: 0;
         background: @tooltip-bg;
+        border: 1px solid @tooltip-border-color;
         border-radius: @tooltip-radius;
         color: @tooltip-color;
         font-size: @font-size-small;
         line-height: 1.5;
         font-weight: 600;
 
-        transform: translate(-50%, (@tooltip-padding * 3));
-        transition: transform .2s .2s ease, opacity .2s .2s ease;
-
+        transform: translate(-50%, (@tooltip-padding * 3)) scale(0);
+        transform-origin: 50% 100%;
+        transition: transform .2s .1s ease, opacity .2s .1s ease;
+      
+        // Arrow
         &::after {
-            content: "";
-            display: block;
+            content: '';
             position: absolute;
+            z-index: 1;
+            top: 100%;
             left: 50%;
-            bottom: -@tooltip-arrow-size;
-            margin-left: -@tooltip-arrow-size;
-            width: 0;
-            height: 0;
-            transition: inherit;
-            border-style: solid;
-            border-width: @tooltip-arrow-size @tooltip-arrow-size 0 @tooltip-arrow-size;
-            border-color: @controls-bg transparent transparent;
+            display: block;
+            width: 10px;
+            height: 10px;
+            background: @tooltip-bg;
+            transform: translate(-50%, -50%) rotate(45deg) translateY(1px);
+            border: 1px solid @tooltip-border-color;
+            border-width: 0 1px 1px 0;
         }
     }
-    label:hover .player-tooltip,
-    input:focus + label .player-tooltip, 
     button:hover .player-tooltip,
-    button:focus .player-tooltip {
-        visibility: visible;
+    button.tab-focus:focus .player-tooltip {
         opacity: 1;
-        transform: translate(-50%, 0);
+        transform: translate(-50%, 0) scale(1);
     }
-    label:hover .player-tooltip,
     button:hover .player-tooltip {
         z-index: 3;
     }
@@ -384,7 +381,7 @@
 
         &-buffer[value],
         &-played[value],
-        &-seek[type=range] {
+        &-seek[type='range'] {
             position: absolute;
             left: 0;
             top: 0;
@@ -424,7 +421,7 @@
         // Seek control
         // <input[type='range']> element
         // Specificity is for bootstrap compatibility
-        &-seek[type=range] {
+        &-seek[type='range'] {
             z-index: 4;
             cursor: pointer;
             outline: 0;
@@ -499,7 +496,7 @@
     // Volume control
     // <input[type='range']> element
     // Specificity is for bootstrap compatibility
-    &-volume[type=range] {
+    &-volume[type='range'] {
         display: inline-block;
         vertical-align: middle;
         -webkit-appearance: none;
@@ -565,7 +562,6 @@
     // https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html
     &.ios &-volume,
     &.ios [data-player='mute'],
-    &.ios [data-player='mute'] + label,
     &-audio.ios &-controls-right {
         display: none;
     }
@@ -604,16 +600,7 @@
         .player-video-wrapper {
             height: 100%;
             width: 100%;
-
-            .player-captions {
-                top: auto;
-                bottom: 90px;
-
-                @media (min-width: @bp-control-split) {
-                    bottom: 60px;
-                }
-            }
-        }
+        }  
         .player-controls {
             position: absolute;
             bottom: 0;
@@ -622,12 +609,28 @@
         }
 
         // Hide controls when playing in full screen
-        &.fullscreen-hide-controls.playing .player-controls {
-            transform: translateY(100%) translateY(@control-spacing / 2);
-            transition: transform .3s .2s ease;
-
-            &.hover {
+        &.fullscreen-hide-controls.playing {
+            .player-controls {
+                transform: translateY(100%) translateY(@control-spacing / 2);
+                transition: transform .3s .2s ease;
+            }
+            &.player-hover .player-controls {
                 transform: translateY(0);
+            }
+            .player-captions {
+                bottom: (@control-spacing / 2);
+                transition: bottom .3s .2s ease;
+            }
+        }
+
+        // Captions
+        .player-captions,
+        &.fullscreen-hide-controls.playing.player-hover .player-captions {
+            top: auto;
+            bottom: 90px;
+
+            @media (min-width: @bp-control-split) {
+                bottom: 60px;
             }
         }
     }
@@ -645,15 +648,11 @@
 
     // Some options are hidden by default
     [data-player='captions'],
-    [data-player='captions'] + label,
-    [data-player='fullscreen'],
-    [data-player='fullscreen'] + label {
+    [data-player='fullscreen'] {
         display: none;
     }
     &.captions-enabled [data-player='captions'],
-    &.captions-enabled [data-player='captions'] + label,
-    &.fullscreen-enabled [data-player='fullscreen'],
-    &.fullscreen-enabled [data-player='fullscreen'] + label {
+    &.fullscreen-enabled [data-player='fullscreen'] {
         display: inline-block;
     }
 }

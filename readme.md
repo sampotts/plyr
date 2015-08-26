@@ -3,21 +3,22 @@ A simple, accessible HTML5 media player.
 
 [Checkout the demo](http://plyr.io)
 
-[![Image of Plyr](https://cdn.plyr.io/static/plyr.png?2)](http://plyr.io)
+[![Image of Plyr](https://cdn.plyr.io/static/plyr.jpg)](http://plyr.io)
 
 ## Why?
-We wanted a lightweight, accessible and customisable media player that just supports *modern* browsers. Sure, there are many other players out there but we wanted to keep things simple, using the right elements for the job. 
+We wanted a lightweight, accessible and customisable media player that just supports [*modern*](#browser-support) browsers. Sure, there are many other players out there but we wanted to keep things simple, using the right elements for the job. 
 
 ## Features
-- **Accessible** - full support for captions and screen readers.
-- **Lightweight** - just 6.4KB minified and gzipped.
+- **Accessible** - full support for VTT captions and screen readers.
+- **Lightweight** - just 8KB minified and gzipped.
 - **[Customisable](#html)** - make the player look how you want with the markup you want.
 - **Semantic** - uses the *right* elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no `<span>` or `<a href="#">` button hacks.
 - **Responsive** - as you'd expect these days.
 - **Audio & Video** - support for both formats.
-- **[Embed](#embed)** - support for YouTube (Vimeo soon).
+- **[Embedded Video](#embeds)** - support for YouTube (Vimeo soon).
 - **[API](#api)** - toggle playback, volume, seeking, and more.
 - **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes.
+- **i18n support** - support for internationalization of controls.
 - **No dependencies** - written in vanilla JavaScript, no jQuery required. 
 
 Oh and yes, it works with Bootstrap. 
@@ -26,9 +27,9 @@ Oh and yes, it works with Bootstrap.
 Check out [the changelog](changelog.md)
 
 ## Planned development
-- Playlists
-- ~~YouTube~~ and Vimeo support
+- Vimeo support
 - Playback speed
+- Playlists
 - Multiple language captions (with selection)
 - Audio captions
 ... and whatever else has been raised in [issues](https://github.com/Selz/plyr/issues)
@@ -39,7 +40,7 @@ If you have any cool ideas or features, please let me know by [creating an issue
 
 Check `docs/index.html` and `docs/dist/docs.js` for an example setup. 
 
-**Heads up**, the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.1.14/plyr.js` to `https://cdn.plyr.io/1.1.14/plyr.js`
+**Heads up**, the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.3.5/plyr.js` to `https://cdn.plyr.io/1.3.5/plyr.js`
 
 ### Bower
 If bower is your thang, you can grab Plyr using:
@@ -59,11 +60,11 @@ More info is on [npm](https://www.npmjs.com/package/ember-cli-plyr) and [GitHub]
 If you want to use our CDN, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/1.1.14/plyr.css">
-<script src="https://cdn.plyr.io/1.1.14/plyr.js"></script>
+<link rel="stylesheet" href="https://cdn.plyr.io/1.3.5/plyr.css">
+<script src="https://cdn.plyr.io/1.3.5/plyr.js"></script>
 ```
 
-You can also access the `sprite.svg` file at `https://cdn.plyr.io/1.1.14/sprite.svg`.
+You can also access the `sprite.svg` file at `https://cdn.plyr.io/1.3.5/sprite.svg`.
 
 ### CSS
 If you want to use the default css, add the `plyr.css` file from /dist into your head, or even better use `plyr.less` or `plyr.sass` file included in `/src` in your build to save a request. 
@@ -181,6 +182,12 @@ You can pass the following options to the setup method using `plyr.setup({...})`
     <td>Array</td>
     <td><code>["restart", "rewind", "play", "fast-forward", "current-time", "duration", "mute", "volume", "captions", "fullscreen"]</code></td>
     <td>Toggle which control elements you would like to display when using the default controls html. If you specify a <code>html</code> option, this is redundant. The default value is to display everything.</td>
+  </tr>
+  <tr>
+    <td><code>i18n</code></td>
+    <td>Object</td>
+    <td><code><a href="controls.md">See controls.md</a></code></td>
+    <td>Used for internationalisation (i18n) of the tooltips/labels within the buttons.</td>
   </tr>
   <tr>
     <td><code>iconPrefix</code></td>
@@ -360,6 +367,9 @@ Here's a list of the methods supported:
       <strong>array</strong><br>
       <code>.source([{ src: "/path/to/video.webm", type: "video/webm", ...more attributes... }, { src: "/path/to/video.mp4", type: "video/mp4", ...more attributes... }])`</code><br>
       This will inject a child `source` element for every element in the array with the specified attributes. `src` is the only required attribute although adding `type` is recommended as it helps the browser decide which file to download and play. 
+      <br><br>
+      <strong>YouTube</strong><br>
+      Currently this API method only accepts a YouTube ID when used with a YouTube player. I will add URL support soon, along with being able to swap between types (e.g. YouTube to Audio or Video and vice versa.)
     </td>
   </tr>
   <tr>

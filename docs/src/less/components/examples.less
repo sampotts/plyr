@@ -6,7 +6,6 @@
 .example-audio .player,
 .example-video .player {
     margin: 0 auto @padding-base;
-    box-shadow: 0 1px 1px rgba(0,0,0, .1);
 
     &-controls {
         border-radius: 0 0 @border-radius-base @border-radius-base;
@@ -31,29 +30,31 @@
     iframe {
         border-radius: @border-radius-base;
     }
+    iframe {
+        -webkit-mask-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC);
+    }
 }
 
 // Style full supported player
 .example-video .player-video,
-.example-video .player-youtube,
-.example-video .player-vimeo {
+.example-video .player-youtube {
     video,
-    .player-video-wrapper {
+    iframe {
         border-radius: @border-radius-base @border-radius-base 0 0;
     }
-    .player-video-wrapper {
+    iframe {
         -webkit-mask-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC);
     }
     &-fullscreen,
     &.fullscreen-active {
         max-width: none;
 
-        video,
         .player-controls,
-        .player-video-wrapper {
+        video,
+        iframe {
             border-radius: 0;
         }
-        .player-video-wrapper {
+        iframe {
             -webkit-mask-image: none;
         }
     }
