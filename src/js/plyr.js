@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.3.5
+// plyr.js v1.3.6
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -12,7 +12,7 @@
     /*global YT*/
 
     // Globals
-    var fullscreen, config;
+    var fullscreen, config, callbacks = { youtube: [] };
 
     // Default config
     var defaults = {
@@ -903,8 +903,19 @@
                 // Load the API
                 _injectScript('https://www.youtube.com/iframe_api');
 
+                // Add callback to queue
+                callbacks.youtube.push(function() { _YTReady(id, container); });
+
                 // Setup callback for the API
-                window.onYouTubeIframeAPIReady = function () { _YTReady(id, container); };
+                window.onYouTubeIframeAPIReady = function () { 
+                    for (var i = callbacks.youtube.length - 1; i >= 0; i--) {
+                        // Fire callback
+                        callbacks.youtube[i]();
+
+                        // Remove from queue
+                        callbacks.youtube.splice(i, 1);
+                    }
+                };
             }
         }
 
