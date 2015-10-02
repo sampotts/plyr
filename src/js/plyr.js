@@ -18,6 +18,7 @@
     var defaults = {
         enabled:                true,
         debug:                  false,
+        autoplay:               false,
         seekTime:               10,
         volume:                 5,
         click:                  true,
@@ -847,7 +848,7 @@
                 _toggleClass(player.container, config.classes.type.replace('{0}', player.type), true);
 
                 // If there's no autoplay attribute, assume the video is stopped and add state class
-                _toggleClass(player.container, config.classes.stopped, (player.media.getAttribute('autoplay') === null));
+                _toggleClass(player.container, config.classes.stopped, ((player.media.getAttribute('autoplay') === null) && !config.autoplay));
             
                 // Add iOS class
                 if (player.browser.ios) {
@@ -874,7 +875,7 @@
             }
 
             // Autoplay
-            if (player.media.getAttribute('autoplay') !== null) {
+            if (player.media.getAttribute('autoplay') !== null || config.autoplay) {
                 _play();
             }
         }
@@ -934,7 +935,7 @@
             player.embed = new YT.Player(container.id, {
                 videoId: id,
                 playerVars: {
-                    autoplay: 0,
+                    autoplay: (config.autoplay ? 1 : 0),
                     controls: (player.supported.full ? 0 : 1),
                     rel: 0,
                     showinfo: 0,
@@ -1701,7 +1702,7 @@
             player.media.load();
 
             // Play if autoplay attribute is present
-            if (player.media.getAttribute('autoplay') !== null) {
+            if (player.media.getAttribute('autoplay') !== null || config.autoplay) {
                 _play();
             }
         }
@@ -1724,7 +1725,7 @@
                 if (!focused || focused == document.body) {
                     focused = null;
                 }
-                else if (document.querySelector) {
+                else {
                     focused = document.querySelector(':focus');
                 }
                 for (var button in player.buttons) {
