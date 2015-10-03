@@ -918,6 +918,7 @@
                     window.onYouTubeIframeAPIReady = function () { _YouTubeReady(videoId, container); };
                 }
             }
+            // Vimeo
             else if (type === 1) {
                 // Inject the iframe
                 var iframe = document.createElement('iframe');

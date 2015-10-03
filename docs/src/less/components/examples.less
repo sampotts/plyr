@@ -42,9 +42,6 @@
     iframe {
         border-radius: @border-radius-base @border-radius-base 0 0;
     }
-    iframe {
-        -webkit-mask-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC);
-    }
     &-fullscreen,
     &.fullscreen-active {
         max-width: none;
@@ -58,4 +55,8 @@
             -webkit-mask-image: none;
         }
     }
+}
+.example-video .player-vimeo .player-video-embed {
+    border-radius: @border-radius-base @border-radius-base 0 0;
+    -webkit-mask-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC);
 }
