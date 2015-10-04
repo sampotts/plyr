@@ -2,32 +2,18 @@
 // Docs example
 // ==========================================================================
 
-/*global plyr, shr, templates */
+/*global plyr, shr */
 
 // Setup the player
 plyr.setup({
-	debug: 	true,
-	volume: 9,
-	title: 	'Video demo',
-	html: 	templates.controls.render({}),
-	tooltips: true,
+	debug: 		true,
+	title: 		'Video demo',
+	tooltips: 	true,
 	captions: {
 		defaultActive: true
 	},
 	onSetup: function() {
-		if(!('media' in this)) {
-			return;
-		}
-
-		var player 	= this,
-			type 	= player.media.tagName.toLowerCase(),
-			toggle 	= document.querySelector('[data-toggle="fullscreen"]');
-
-		console.log('✓ Setup done for <' + type + '>');
-
-		if(type === 'video' && toggle) {
-			toggle.addEventListener('click', player.toggleFullscreen, false);
-		}
+		console.log('✓ Setup done');
 	}
 });
 
@@ -42,79 +28,79 @@ shr.setup({
 (function() { 
 	var buttons = document.querySelectorAll('[data-source]');
 
-    // Bind to each button
-    for (var i = buttons.length - 1; i >= 0; i--) {
-        buttons[i].addEventListener('click', newSource);
-    }
+	// Bind to each button
+	for (var i = buttons.length - 1; i >= 0; i--) {
+		buttons[i].addEventListener('click', newSource);
+	}
 
-    // Set a new source
-    function newSource() {
-        var trigger = this,
-        type        = trigger.getAttribute('data-source'),
-        player      = document.querySelector('.player').plyr;
+	// Set a new source
+	function newSource() {
+		var trigger = this,
+		type        = trigger.getAttribute('data-source'),
+		player      = document.querySelector('.player').plyr;
 
-        switch(type) {
-            case 'video':
-                player.source({
-                    type:       'video',
-                    title: 		'Bug Buck Bunny',
-                    sources: [{ 
-                        src:    'https://cdn.selz.com/plyr/1.0/movie.mp4',
-                        type:   'video/mp4'
-                    },
-                    {
-                        src:    'https://cdn.selz.com/plyr/1.0/movie.webm',
-                        type:   'video/webm'
-                    }],
-                    poster:     'https://cdn.selz.com/plyr/1.0/poster.jpg',
-                    tracks:     [{
-                        kind:   'captions',
-                        label:  'English',
-                        srclang:'en',
-                        src:    'https://cdn.selz.com/plyr/1.0/example_captions_en.vtt',
-                        default: true
-                    }]
-                });
-                break;
+		switch(type) {
+			case 'video':
+				player.source({
+					type:       'video',
+					title: 		'Bug Buck Bunny',
+					sources: [{ 
+						src:    'https://cdn.selz.com/plyr/1.0/movie.mp4',
+						type:   'video/mp4'
+					},
+					{
+						src:    'https://cdn.selz.com/plyr/1.0/movie.webm',
+						type:   'video/webm'
+					}],
+					poster:     'https://cdn.selz.com/plyr/1.0/poster.jpg',
+					tracks:     [{
+						kind:   'captions',
+						label:  'English',
+						srclang:'en',
+						src:    'https://cdn.selz.com/plyr/1.0/example_captions_en.vtt',
+						default: true
+					}]
+				});
+				break;
 
-            case 'audio':
-                player.source({
-                    type:       'audio',
-                    title: 		'96 by Logistics',
-                    sources: [{ 
-                        src:    'https://cdn.selz.com/plyr/1.0/logistics-96-sample.mp3',
-                        type:   'audio/mp3'
-                    },
-                    {
-                        src:    'https://cdn.selz.com/plyr/1.0/logistics-96-sample.ogg',
-                        type:   'audio/ogg'
-                    }]
-                });
-                break;
+			case 'audio':
+				player.source({
+					type:       'audio',
+					title: 		'96 by Logistics',
+					sources: [{ 
+						src:    'https://cdn.selz.com/plyr/1.0/logistics-96-sample.mp3',
+						type:   'audio/mp3'
+					},
+					{
+						src:    'https://cdn.selz.com/plyr/1.0/logistics-96-sample.ogg',
+						type:   'audio/ogg'
+					}]
+				});
+				break;
 
-            case 'youtube':
-                player.source({
-                    type:       'youtube',
-                    title: 		'Introducing Apple Pencil',
-                    sources:    'iicnVez5U7M'
-                });
-                break;
+			case 'youtube':
+				player.source({
+					type:       'youtube',
+					title: 		'Introducing Apple Pencil',
+					sources:    'iicnVez5U7M'
+				});
+				break;
 
-            case 'vimeo':
-                player.source({
-                    type:       'vimeo',
-                    title: 		'The Beaten Track',
-                    sources:    '125220818'
-                });
-                break;
-        }
+			case 'vimeo':
+				player.source({
+					type:       'vimeo',
+					title: 		'The Beaten Track',
+					sources:    '125220818'
+				});
+				break;
+		}
 
-        for (var x = buttons.length - 1; x >= 0; x--) {
+		for (var x = buttons.length - 1; x >= 0; x--) {
 			buttons[x].classList.remove('active');
 		}
 
 		event.target.classList.add('active');
-    }
+	}
 })();
 
 // Google analytics 
