@@ -39,9 +39,9 @@
 @tooltip-radius:            3px;
 
 // Progress
-@progress-bg:               rgba(red(@gray), green(@gray), blue(@gray), .2);
+@progress-bg:               fade(@gray, 20%);
 @progress-playing-bg:       @blue;
-@progress-buffered-bg:      rgba(red(@gray), green(@gray), blue(@gray), .25);
+@progress-buffered-bg:      fade(@gray, 25%);
 @progress-loading-size:     40px;
 @progress-loading-bg:       rgba(0,0,0, .15);
 
@@ -59,14 +59,12 @@
 
 // Animation
 // ---------------------------------------
-
 @keyframes progress {
     to { background-position: @progress-loading-size 0; }
 }
 
 // Mixins
 // -------------------------------
-
 // Contrast
 .contrast-control-color(@color: "") when (lightness(@color) >= 65%) {
     @control-color: @gray-light;
@@ -176,6 +174,7 @@
         padding-bottom: 56.25%; /* 16:9 */
         height: 0;
         overflow: hidden;
+        background: #000;
         
         iframe {
             position: absolute;

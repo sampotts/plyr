@@ -70,7 +70,6 @@ $bp-captions-large:         768px !default; // When captions jump to the larger 
 
 // Animation
 // ---------------------------------------
-
 @keyframes progress {
     to { background-position: $progress-loading-size 0; }
 }
@@ -178,6 +177,8 @@ $bp-captions-large:         768px !default; // When captions jump to the larger 
     &-video-embed {
         padding-bottom: 56.25%; /* 16:9 */
         height: 0;
+        overflow: hidden;
+        background: #000;
         
         iframe {
             position: absolute;
@@ -186,6 +187,13 @@ $bp-captions-large:         768px !default; // When captions jump to the larger 
             width: 100%;
             height: 100%;
             border: 0;
+        }
+
+        // Vimeo hack
+        > div {
+            position: relative;
+            padding-bottom: 200%;
+            transform: translateY(-35.95%);
         }
     }
 

@@ -67,6 +67,10 @@ nav {
 		box-shadow: inset 0 1px 1px rgba(0,0,0, .2);
 		position: relative;
 		z-index: 1;
+
+		.icon {
+			color: inherit;
+		}
 	}
 
 	@media (min-width: 560px) {
@@ -92,6 +96,7 @@ nav {
 	box-shadow: inset 0 1px 0 #fff, 0 1px 1px rgba(0,0,0, .05);
 	text-shadow: 0 1px 1px #fff;
 	color: @gray;
+	transition: all .3s ease;
 
 	&:hover,
 	&:focus {
@@ -99,6 +104,15 @@ nav {
 		border-color: darken(@gray-light, 5%);
 		color: @link-color;
 		outline: 0;
+	}
+	&-youtube .icon {
+		color: @color-youtube;
+	}
+	&-vimeo .icon {
+		color: @color-vimeo;
+	}
+	&-twitter .icon {
+		color: @color-twitter;
 	}
 }
 .btn-primary {
@@ -123,8 +137,8 @@ nav {
 // Count bubble
 .btn-count {
 	position: relative;
-	margin-left: 6px;
-	padding: ((@padding-base / 2) - 1px);
+	margin-left: (@padding-base / 2);
+	padding: (@padding-base / 2) (@padding-base * .75);
 	background: #fff;
 	border: 1px solid @gray-light;
 

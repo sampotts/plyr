@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.3.5
+// plyr.js v1.4.0
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -18,6 +18,8 @@
     var defaults = {
         enabled:                true,
         debug:                  false,
+        autoplay:               false,
+        loop:                   false,
         seekTime:               10,
         volume:                 5,
         click:                  true,
@@ -97,6 +99,10 @@
             toggleMute:         'Toggle Mute',
             toggleCaptions:     'Toggle Captions',
             toggleFullscreen:   'Toggle Fullscreen'
+        },
+        types: {
+            embed:              ['youtube','vimeo'],
+            html5:              ['video', 'audio'] 
         }
     };
 
@@ -427,8 +433,25 @@
     // Set attributes
     function _setAttributes(element, attributes) {
         for (var key in attributes) {
-            element.setAttribute(key, attributes[key]);
+            element.setAttribute(key, (typeof attributes[key] === 'boolean' && attributes[key]) ? '' : attributes[key]);
         }
+    }
+
+    // Insert a HTML element
+    function _insertElement(type, parent, attributes) {
+        // Create a new <element>
+        var element = document.createElement(type);
+
+        // Set all passed attributes
+        _setAttributes(element, attributes);
+
+        // Inject the new element
+        _prependChild(parent, element);
+    }
+
+    // Get a classname from selector
+    function _getClassname(selector) {
+        return selector.replace('.', '');
     }
 
     // Toggle class on an element
@@ -631,6 +654,11 @@
             // IE has a bug where currentTime doesn't go to 0
             // https://twitter.com/Sam_Potts/status/573715746506731521
             time = typeof time === 'number' ? time : player.media.currentTime;
+
+            // If there's no subs available, bail
+            if(!player.captions[player.subcount]) {
+                return;
+            }
 
             while (_timecodeMax(player.captions[player.subcount][0]) < time.toFixed(1)) {
                 player.subcount++;
@@ -847,7 +875,7 @@
                 _toggleClass(player.container, config.classes.type.replace('{0}', player.type), true);
 
                 // If there's no autoplay attribute, assume the video is stopped and add state class
-                _toggleClass(player.container, config.classes.stopped, (player.media.getAttribute('autoplay') === null));
+                _toggleClass(player.container, config.classes.stopped, config.autoplay);
             
                 // Add iOS class
                 if (player.browser.ios) {
@@ -868,94 +896,113 @@
                 }
             }
 
-            // YouTube
-            if (player.type == 'youtube') {
-                _setupEmbed(player.media.getAttribute('data-video-id'), 0);
-            }
+            // Embeds
+            if (_inArray(config.types.embed, player.type)) {
+                _setupEmbed(player.embedId, player.type);
 
-            // Vimeo
-            if (player.type == 'vimeo') {
-                _setupEmbed(player.media.getAttribute('data-video-id'), 1);
+                // Clean up
+                player.embedId = null;
             }
-
-            // Autoplay
-            if (player.media.getAttribute('autoplay') !== null) {
-                _play();
+            else {
+                // Autoplay
+                if (config.autoplay) {
+                    _play();
+                }
             }
         }
 
         // Setup YouTube/Vimeo
-        function _setupEmbed(videoId, type) {
+        function _setupEmbed(videoId) {
             var container = document.createElement('div'),
-                providers = ['youtube', 'vimeo'],
-                id = providers[type] + '-' + Math.floor(Math.random() * (10000));
+                id = player.type + '-' + Math.floor(Math.random() * (10000));
 
             // Remove old containers
-            var containers = _getElements('[id^="' + providers[type] + '-"]');
+            var containers = _getElements('[id^="' + player.type + '-"]');
             for (var i = containers.length - 1; i >= 0; i--) {
                 _remove(containers[i]);
             }
+
+            // Set ID
+            container.setAttribute('id', id);
 
             // Add embed class for responsive
             _toggleClass(player.media, config.classes.videoWrapper, true);
             _toggleClass(player.media, config.classes.embedWrapper, true);
 
             // YouTube
-            if (type === 0) {
+            if (player.type === 'youtube') {
                 // Create the YouTube container
-                container.setAttribute('id', id);
                 player.media.appendChild(container);
 
                 // Setup API
                 if (typeof YT === 'object') {
-                    _YouTubeReady(videoId, container);
+                    _youTubeReady(videoId, container);
                 }
                 else {
                     // Load the API
                     _injectScript('https://www.youtube.com/iframe_api');
 
                     // Setup callback for the API
-                    window.onYouTubeIframeAPIReady = function () { _YouTubeReady(videoId, container); };
+                    window.onYouTubeIframeAPIReady = function () { _youTubeReady(videoId, container); };
                 }
             }
             // Vimeo
-            else if (type === 1) {
+            else if (player.type === 'vimeo') {
                 // Inject the iframe
                 var iframe = document.createElement('iframe');
-                iframe.src = 'https://player.vimeo.com/video/' + videoId + '?player_id=' + id + '&api=1&badge=0&byline=0&portrait=0&title=0';
+
+                // Watch for iframe load
+                iframe.loaded = false;
+                _on(iframe, 'load', function() { iframe.loaded = true; });
+
                 _setAttributes(iframe, {
-                    'id': id,
-                    'webkitallowfullscreen': '',
-                    'mozallowfullscreen': '',
-                    'allowfullscreen': '',
-                    'frameborder': 0
+                    'src':                      'https://player.vimeo.com/video/' + videoId + '?player_id=' + id + '&api=1&badge=0&byline=0&portrait=0&title=0',
+                    'id':                       id,
+                    'webkitallowfullscreen':    '',
+                    'mozallowfullscreen':       '',
+                    'allowfullscreen':          '',
+                    'frameborder':              0
                 });
                 container.appendChild(iframe);
                 player.media.appendChild(container);
-
+                
                 // Setup API
                 if (typeof Froogaloop === 'function') {
-                    _VimeoReady(id, iframe);
+                    _on(iframe, 'load', _vimeoReady);
                 }
                 else {
                     // Load the API
-                    _injectScript('https://f.vimeocdn.com/js/froogaloop2.min.js');
+                    _injectScript('https://rawgit.com/vimeo/player-api/master/javascript/froogaloop.js');
 
                     // Wait for fragaloop load
                     var timer = window.setInterval(function() {
-                        if('$f' in window) {
+                        if('$f' in window && iframe.loaded) {
                             window.clearInterval(timer);
-                            _VimeoReady(id, iframe);
+
+                            _vimeoReady.call(iframe);
                         }
-                    }, 50); 
+                    }, 50);
                 }
             }
         }
 
-        // Handle YouTube API ready
-        function _YouTubeReady(videoId, container) {
-            _log('YouTube API Ready');
+        // When embeds are ready
+        function _embedReady() {
+            // Inject and update UI
+            if (player.supported.full) {
+                // Only setup controls once
+                if (!player.container.querySelectorAll(config.selectors.controls).length) {
+                    _setupInterface();
+                }
+            }
 
+            // Set the volume
+            _setVolume();
+            _updateVolume();
+        }
+
+        // Handle YouTube API ready
+        function _youTubeReady(videoId, container) {
             // Setup timers object
             // We have to poll YouTube for updates
             if (!('timer' in player)) {
@@ -967,7 +1014,7 @@
             player.embed = new YT.Player(container.id, {
                 videoId: videoId,
                 playerVars: {
-                    autoplay: 0,
+                    autoplay: (config.autoplay ? 1 : 0),
                     controls: (player.supported.full ? 0 : 1),
                     rel: 0,
                     showinfo: 0,
@@ -988,7 +1035,7 @@
                         player.media.pause = function() { instance.pauseVideo(); };
                         player.media.stop = function() { instance.stopVideo(); };
                         player.media.duration = instance.getDuration();
-                        player.media.paused = true;
+                        player.media.paused = !config.autoplay;
                         player.media.currentTime = instance.getCurrentTime();
                         player.media.muted = instance.isMuted();
 
@@ -1012,16 +1059,12 @@
                             }
                         }, 200);
 
-                        if (player.supported.full) {
-                            // Only setup controls once
-                            if (!player.container.querySelectorAll(config.selectors.controls).length) {
-                                _setupInterface();
-                            }
+                        // Update UI
+                        _embedReady();
 
-                            // Display duration if available
-                            if (config.displayDuration) {
-                                _displayDuration();
-                            }
+                        // Display duration if available
+                        if (config.displayDuration) {
+                            _displayDuration();
                         }
                     },
                     'onStateChange': function(event) {
@@ -1069,24 +1112,22 @@
         }
 
         // Vimeo ready
-        function _VimeoReady(id, iframe) {
-            player.embed = $f(iframe);
+        function _vimeoReady() {
+            /* jshint validthis: true */
+            // Get the frame with fragaloop lib
+            player.embed = $f(this);
 
+            // Setup on ready
             player.embed.addEvent('ready', function() {
                 // Create a faux HTML5 API using the Vimeo API
                 player.media.play = function() { player.embed.api('play'); };
                 player.media.pause = function() { player.embed.api('pause'); };
                 player.media.stop = function() { player.embed.api('stop') };
-                player.media.paused = true;
+                player.media.paused = !config.autoplay;
                 player.media.currentTime = 0;
-                player.media.muted = false;
 
-                if (player.supported.full) {
-                    // Only setup controls once
-                    if (!player.container.querySelectorAll(config.selectors.controls).length) {
-                        _setupInterface();
-                    }
-                }
+                // Update UI
+                _embedReady();
 
                 player.embed.api('getCurrentTime', function (value) {
                     player.media.currentTime = value;
@@ -1105,28 +1146,24 @@
                 });
 
                 player.embed.addEvent('play', function() {
+                    console.log('play');
                     player.media.paused = false;
                     _triggerEvent(player.media, 'play');
                 });
 
                 player.embed.addEvent('pause', function() {
+                    console.log('pause');
                     player.media.paused = true;
                     _triggerEvent(player.media, 'pause');
                 });
 
                 player.embed.addEvent('playProgress', function(data) {
-                    // Set the current time
                     player.media.currentTime = data.seconds;
-
-                    // Trigger timeupdate
                     _triggerEvent(player.media, 'timeupdate');
                 });
 
                 player.embed.addEvent('loadProgress', function(data) {
-                    // Get loaded %
                     player.media.buffered = data.percent;
-                    
-                    // Trigger progress
                     _triggerEvent(player.media, 'progress');
                 });
 
@@ -1134,6 +1171,14 @@
                     player.media.paused = true;
                     _triggerEvent(player.media, 'ended');
                 });
+
+                /*// Always seek to 0
+                player.embed.api('seekTo', 0);
+
+                // Prevent autoplay if needed (seek will play)
+                if (!config.autoplay) {
+                    player.embed.api('pause');
+                }*/                
             });
         }
 
@@ -1141,7 +1186,9 @@
         function _setupCaptions() {
             if (player.type === 'video') {
                 // Inject the container
-                player.videoContainer.insertAdjacentHTML('afterbegin', '<div class="' + config.selectors.captions.replace('.', '') + '"><span></span></div>');
+                if(!_getElement(config.selectors.captions)) {
+                    player.videoContainer.insertAdjacentHTML('afterbegin', '<div class="' + _getClassname(config.selectors.captions) + '"><span></span></div>');
+                }
 
                 // Cache selector
                 player.captionsContainer = _getElement(config.selectors.captions).querySelector('span');
@@ -1508,6 +1555,28 @@
             }
         }
 
+        // Mute
+        function _toggleMute(muted) {
+            // If the method is called without parameter, toggle based on current value
+            if (typeof muted !== 'boolean') {
+                muted = !player.media.muted;
+            }
+
+            // Set button state
+            _toggleState(player.buttons.mute, muted);
+
+            // Set mute on the player
+            player.media.muted = muted;
+
+            // YouTube
+            if (player.type === 'youtube') {
+                player.embed[player.media.muted ? 'mute' : 'unMute']();
+
+                // Trigger timeupdate
+                _triggerEvent(player.media, 'volumechange');
+            }
+        }
+
         // Set volume
         function _setVolume(volume) {
             // Use default if no value specified
@@ -1532,6 +1601,9 @@
             // Set the player volume
             player.media.volume = parseFloat(volume / 10);
 
+            // Store in config
+            config.volume = volume;
+
             // YouTube
             if (player.type === 'youtube') {
                 player.embed.setVolume(player.media.volume * 100);
@@ -1551,28 +1623,6 @@
             if (player.media.muted && volume > 0) {
                 _toggleMute();
             } 
-        }
-
-        // Mute
-        function _toggleMute(muted) {
-            // If the method is called without parameter, toggle based on current value
-            if (typeof muted !== 'boolean') {
-                muted = !player.media.muted;
-            }
-
-            // Set button state
-            _toggleState(player.buttons.mute, muted);
-
-            // Set mute on the player
-            player.media.muted = muted;
-
-            // YouTube
-            if (player.type === 'youtube') {
-                player.embed[player.media.muted ? 'mute' : 'unMute']();
-
-                // Trigger timeupdate
-                _triggerEvent(player.media, 'volumechange');
-            }
         }
 
         // Update volume UI and storage
@@ -1696,6 +1746,11 @@
                 return;
             }
 
+            // Fallback to 0
+            if(isNaN(time)) {
+                time = 0;
+            }
+
             player.secs = parseInt(time % 60);
             player.mins = parseInt((time / 60) % 60);
             player.hours = parseInt(((time / 60) / 60) % 60);
@@ -1736,7 +1791,7 @@
         }
 
         // Remove <source> children and src attribute
-        function _removeSources() {
+        /*function _removeSources() {
             // Find child <source> elements
             var sources = player.media.querySelectorAll('source');
 
@@ -1747,87 +1802,154 @@
 
             // Remove src attribute
             player.media.removeAttribute('src');
+        }*/
+
+        // Add a source element
+        function _addSource(attributes) {
+            _insertElement('source', player.media, attributes);
         }
 
-        // Inject a source
-        function _addSource(attributes) {
-            if (attributes.src) {
-                // Create a new <source>
-                var element = document.createElement('source');
+        // Add a source element
+        function _addTracks(tracks) {
+            for (var i = tracks.length - 1; i >= 0; i--) {
+                _insertElement('track', player.media, tracks[i]);
+            }
+        }
 
-                // Set all passed attributes
-                _setAttributes(element, attributes);
-
-                // Inject the new source
-                _prependChild(player.media, element);
+        // Add sources to HTML5 media
+        function _addSources(sources) {
+            // Set new sources
+            if(typeof sources === 'string') {
+                _addSource({ src: sources });
+            }
+            else if(sources.constructor === Array) {
+                for (var i = sources.length - 1; i >= 0; i--) {
+                    _addSource(sources[i]);
+                }
             }
         }
 
         // Update source
         // Sources are not checked for support so be careful
-        function _parseSource(sources) {
-            // Embed
-            if('embed' in player && typeof sources === 'string') {
-                // YouTube
-                if (player.type === 'youtube') {
-                    // Destroy YouTube instance
-                    player.embed.destroy();
-
-                    // Re-setup YouTube
-                    _setupEmbed(sources, 0);
-                }
-
-                // Vimeo
-                if(player.type === 'vimeo') {
-                    _setupEmbed(sources, 1);
-                }
-
-                // Reset time display
-                _timeUpdate();
-
-                // Bail
+        function _updateSource(source) {
+            if(typeof source === 'undefined') {
                 return;
             }
 
-            // Pause playback (webkit freaks out)
+            // Pause playback
             _pause();
 
-            // Restart
-            _seek();
+            // Clean up YouTube stuff
+            if(player.type === 'youtube') {
+                // Destroy the embed instance
+                player.embed.destroy();
 
-            // Remove current sources
-            _removeSources();
+                // Clear timer
+                window.clearInterval(player.timer.buffering);
+                window.clearInterval(player.timer.playing);
+            }
+            else if (player.type === 'video') {
+                // Remove video wrapper
+                _remove(player.videoContainer);
+            }
+            
+            // Remove the old media
+            _remove(player.media);
 
-            // If a single source is passed
-            // .source('path/to/video.mp4')
-            if (typeof sources === 'string') {
-                _addSource({ src: sources });
+            // Set the new type
+            if('type' in source && source.type !== player.type) {
+                player.type = source.type;
             }
 
-            // An array of source objects
-            // Check if a source exists, use that or set the 'src' attribute?
-            // .source([{ src: 'path/to/video.mp4', type: 'video/mp4' },{ src: 'path/to/video.webm', type: 'video/webm' }])
-            else if (sources.constructor === Array) {
-                for (var index in sources) {
-                    _addSource(sources[index]);
+            // Create new markup
+            switch(player.type) {
+                case 'video':
+                    player.media = document.createElement('video');
+                    break;
+
+                case 'audio':
+                    player.media = document.createElement('audio');
+                    break;
+
+                case 'youtube':
+                case 'vimeo':
+                    player.media = document.createElement('div');
+                    player.embedId = source.sources;
+                    break;
+            }
+
+            // Inject the new element
+            _prependChild(player.container, player.media);
+
+            // Set attributes for audio video
+            if(_inArray(config.types.html5, player.type)) {
+                if(config.crossorigin) {
+                    player.media.setAttribute('crossorigin', '');
+                }
+                if (config.autoplay) {
+                    player.media.setAttribute('autoplay', '');
+                }
+                if ('poster' in source) {
+                    player.media.setAttribute('poster', source.poster);
+                }
+                if (config.loop) {
+                    player.media.setAttribute('loop', '');
                 }
             }
 
-            if (player.supported.full) {
-                // Reset time display
-                _timeUpdate();
+            // Classname reset
+            player.container.className = _getClassname(config.selectors.container);
 
-                // Update the UI
-                _checkPlaying();
+            // Autoplay the new source?
+            config.autoplay = (source.autoplay || config.autoplay);
+               
+            // Set media id for embeds
+            if(_inArray(config.types.embed, player.type)) {
+                player.embedId = source.sources; 
             }
 
-            // Re-load sources
-            player.media.load();
-
-            // Play if autoplay attribute is present
-            if (player.media.getAttribute('autoplay') !== null) {
-                _play();
+            // Set new sources and tracks for html5
+            if(_inArray(config.types.html5, player.type)) {
+                _addSources(source.sources);
             }
+
+            // Set up from scratch
+            _setupMedia();            
+
+            // Trigger media updated
+            _mediaUpdated();
+
+            // HTML5 stuff
+            if(_inArray(config.types.html5, player.type)) {
+                // Set volume
+                _setVolume();
+                _updateVolume();
+
+                // UI updates
+                if(player.supported.full) {
+                    // Reset time display
+                    _timeUpdate();
+
+                    // Update the UI
+                    _checkPlaying();
+                }
+
+                // Setup captions
+                if('tracks' in source) {
+                    _addTracks(source.tracks);
+
+                    // Captions
+                    _setupCaptions();
+                }
+
+                // Load HTML5 sources
+                player.media.load();
+
+                // Play if autoplay attribute is present
+                if (config.autoplay) {
+                    _play();
+                } 
+            }        
         }
 
         // Update poster
@@ -1974,7 +2096,7 @@
             }
 
             // Reset container classname
-            player.container.setAttribute('class', config.selectors.container.replace('.', ''));
+            player.container.setAttribute('class', _getClassname(config.selectors.container));
 
             // Remove init flag
             player.init = false;
@@ -2022,13 +2144,22 @@
             // Get the media element
             player.media = player.container.querySelectorAll('audio, video, div')[0];
 
-            // Set media type
+            // Set media type based on tag or data attribute
+            // Supported: video, audio, vimeo, youtube
             var tagName = player.media.tagName.toLowerCase();
             if (tagName === 'div') {
-                player.type = player.media.getAttribute('data-type');
+                player.type     = player.media.getAttribute('data-type');
+                player.embedId  = player.media.getAttribute('data-video-id');
+
+                // Clean up
+                player.media.removeAttribute('data-type');
+                player.media.removeAttribute('data-video-id');
             }
             else {
-                player.type = tagName;
+                player.type         = tagName;
+                config.crossorigin  = (player.media.getAttribute('crossorigin') !== null);
+                config.autoplay     = (config.autoplay || (player.media.getAttribute('autoplay') !== null));
+                config.loop         = (config.loop || (player.media.getAttribute('loop') !== null));
             }
         
             // Check for full support
@@ -2084,10 +2215,15 @@
             // Captions
             _setupCaptions();
 
+            // Media updated
+            _mediaUpdated();
+
             // Set volume
             _setVolume();
             _updateVolume();
+        }
 
+        function _mediaUpdated() {
             // Setup fullscreen
             _setupFullscreen();
 
@@ -2111,7 +2247,7 @@
             rewind:             _rewind,
             forward:            _forward,
             seek:               _seek,
-            source:             _parseSource,
+            source:             _updateSource,
             poster:             _updatePoster,
             setVolume:          _setVolume,
             togglePlay:         _togglePlay,

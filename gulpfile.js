@@ -43,7 +43,8 @@ paths = {
         src: {
             less:       path.join(root, "docs/src/less/**/*"),
             js:         path.join(root, "docs/src/js/**/*"),
-            templates:  path.join(root, "docs/src/templates/*.html")
+            templates:  path.join(root, "docs/src/templates/*.html"),
+            sprite:     path.join(root, "docs/src/sprite/*.svg")
         },
         // Output paths
         output:         path.join(root, "docs/dist/"),
@@ -129,18 +130,18 @@ var build = {
             })(key);
         }
     },
-    sprite: function() {
+    sprite: function(bundle) {
         // Process Icons
-        gulp.task("sprite", function () {
+        gulp.task("sprite-" + bundle, function () {
             return gulp
-                .src(paths.plyr.src.sprite)
+                .src(paths[bundle].src.sprite)
                 .pipe(svgmin({
                     plugins: [{
                         removeDesc: true
                     }]
                 }))
                 .pipe(svgstore())
-                .pipe(gulp.dest(paths.plyr.output));
+                .pipe(gulp.dest(paths[bundle].output));
         });
     },
     templates: function() {
@@ -163,12 +164,13 @@ var build = {
 build.js(bundles.plyr.js, "plyr");
 build.less(bundles.plyr.less, "plyr");
 build.sass(bundles.plyr.sass, "plyr");
-build.sprite();
+build.sprite("plyr");
 
 // Docs files
 build.templates();
 build.less(bundles.docs.less, "docs");
 build.js(bundles.docs.js, "docs");
+build.sprite("docs");
 
 // Build all JS (inc. templates)
 gulp.task("js", function(){
@@ -185,17 +187,18 @@ gulp.task("watch", function () {
     // Plyr core
     gulp.watch(paths.plyr.src.js, tasks.js);
     gulp.watch(paths.plyr.src.less, tasks.less);
-    gulp.watch(paths.plyr.src.sprite, ["sprite"]);
+    gulp.watch(paths.plyr.src.sprite, ["sprite-plyr"]);
 
     // Docs
     gulp.watch(paths.docs.src.js, tasks.js);
     gulp.watch(paths.docs.src.less, tasks.less);
     gulp.watch(paths.docs.src.templates, ["js"]);
+    gulp.watch(paths.docs.src.sprite, ["sprite-docs"]);
 });
 
 // Default gulp task
 gulp.task("default", function(){
-    run("templates", tasks.js, tasks.less, "sprite", "watch");
+    run("templates", tasks.js, tasks.less, "sprite-plyr", "sprite-docs", "watch");
 });
 
 // Publish a version to CDN and docs

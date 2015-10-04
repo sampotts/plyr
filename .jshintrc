@@ -9,8 +9,7 @@
     "rhino"         : false,
     "couch"         : false,
     "wsh"           : true,   // Windows Scripting Host.
-    "jquery"        : true,
-    "predef"        : [ "jQuery", "$" ],
+    "jquery"        : false,
 
     // Development.
     "debug"         : false,  // Allow debugger statements e.g. browser breakpoints.
@@ -51,6 +50,6 @@
     "plusplus"      : false,  // Prohibit use of `++` & `--`.
     "sub"           : false,  // Tolerate all forms of subscript notation besides dot notation e.g. `dict['key']` instead of `dict.key`.
     "trailing"      : true,   // Prohibit trailing whitespaces.
-    "white"         : false,  // Check against strict whitespace and indentation rules.
-    "indent"        : 2       // Specify indentation spacing
+    "white"         : true,  // Check against strict whitespace and indentation rules.
+    "indent"        : 4       // Specify indentation spacing
 }

@@ -3,46 +3,46 @@
 // ==========================================================================
 
 // Example players
-.example-audio .player,
-.example-video .player {
+.player {
     margin: 0 auto @padding-base;
 
     &-controls {
         border-radius: 0 0 @border-radius-base @border-radius-base;
     }
 }
-.example-audio .player {
+.player-audio {
     max-width: @example-width-audio;
 
-    &-controls {
+    .player-controls {
         border-radius: @border-radius-base;
     }
-    &-progress {
+    .player-progress {
         border-radius: @border-radius-base @border-radius-base 0 0;
         overflow: hidden;
     }
 }
-// Base styles
-.example-video .player {
+.player-video,
+.player-youtube,
+.player-vimeo {
     max-width: @example-width-video;
-
-    video,
-    iframe {
-        border-radius: @border-radius-base;
-    }
-    iframe {
-        -webkit-mask-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC);
-    }
+}
+video,
+.player-video-embed {
+    border-radius: @border-radius-base;
+}
+.player-video-embed {
+    -webkit-mask-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC);
 }
 
 // Style full supported player
-.example-video .player-video,
-.example-video .player-youtube {
+.player-video,
+.player-youtube,
+.player-vimeo {
     video,
-    iframe {
+    .player-video-embed {
         border-radius: @border-radius-base @border-radius-base 0 0;
     }
-    &-fullscreen,
+    &.player-fullscreen,
     &.fullscreen-active {
         max-width: none;
 
@@ -55,8 +55,4 @@
             -webkit-mask-image: none;
         }
     }
-}
-.example-video .player-vimeo .player-video-embed {
-    border-radius: @border-radius-base @border-radius-base 0 0;
-    -webkit-mask-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC);
 }
