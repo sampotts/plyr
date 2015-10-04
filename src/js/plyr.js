@@ -1790,20 +1790,6 @@
             _updateProgress(event);
         }
 
-        // Remove <source> children and src attribute
-        /*function _removeSources() {
-            // Find child <source> elements
-            var sources = player.media.querySelectorAll('source');
-
-            // Remove each
-            for (var i = sources.length - 1; i >= 0; i--) {
-                _remove(sources[i]);
-            }
-
-            // Remove src attribute
-            player.media.removeAttribute('src');
-        }*/
-
         // Add a source element
         function _addSource(attributes) {
             _insertElement('source', player.media, attributes);
@@ -1949,7 +1935,12 @@
                 if (config.autoplay) {
                     _play();
                 } 
-            }        
+            } 
+
+            if('title' in source) {
+                config.title = source.title;
+                _setupPlayAria();
+            }       
         }
 
         // Update poster

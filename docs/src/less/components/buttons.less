@@ -96,13 +96,12 @@ nav {
 	box-shadow: inset 0 1px 0 #fff, 0 1px 1px rgba(0,0,0, .05);
 	text-shadow: 0 1px 1px #fff;
 	color: @gray;
-	transition: all .3s ease;
+	transition: background .3s ease, border .3s ease, color .3s ease;
 
 	&:hover,
 	&:focus {
-		background-color: #fff;
-		border-color: darken(@gray-light, 5%);
-		color: @link-color;
+		border-color: darken(@gray-light, 8%);
+		color: @gray;
 		outline: 0;
 	}
 	&-youtube .icon {

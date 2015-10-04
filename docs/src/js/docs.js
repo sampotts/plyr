@@ -57,6 +57,7 @@ shr.setup({
             case 'video':
                 player.source({
                     type:       'video',
+                    title: 		'Bug Buck Bunny',
                     sources: [{ 
                         src:    'https://cdn.selz.com/plyr/1.0/movie.mp4',
                         type:   'video/mp4'
@@ -79,6 +80,7 @@ shr.setup({
             case 'audio':
                 player.source({
                     type:       'audio',
+                    title: 		'96 by Logistics',
                     sources: [{ 
                         src:    'https://cdn.selz.com/plyr/1.0/logistics-96-sample.mp3',
                         type:   'audio/mp3'
@@ -93,6 +95,7 @@ shr.setup({
             case 'youtube':
                 player.source({
                     type:       'youtube',
+                    title: 		'Introducing Apple Pencil',
                     sources:    'iicnVez5U7M'
                 });
                 break;
@@ -100,6 +103,7 @@ shr.setup({
             case 'vimeo':
                 player.source({
                     type:       'vimeo',
+                    title: 		'The Beaten Track',
                     sources:    '125220818'
                 });
                 break;
