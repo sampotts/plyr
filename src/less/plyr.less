@@ -144,7 +144,7 @@
 // Styles
 // -------------------------------
 // Base 
-.player {
+.plyr {
     position: relative;
     max-width: 100%;
     min-width: 290px;
@@ -227,7 +227,7 @@
         font-size: @font-size-captions-large;
     }
 
-    // Player controls
+    // Plyr controls
     &-controls {
         .clearfix();
         .font-smoothing();
@@ -294,8 +294,8 @@
             display: none;
         }
 
-        // Player time
-        .player-time {
+        // plyr time
+        .plyr-time {
             display: inline-block;
             vertical-align: middle;
             margin-left: @control-spacing;
@@ -306,7 +306,7 @@
         }
 
         // Media duration hidden on small screens
-        .player-time + .player-time {
+        .plyr-time + .plyr-time {
             display: none;
 
             @media (min-width: @bp-control-split) {
@@ -358,16 +358,16 @@
             border-width: 0 1px 1px 0;
         }
     }
-    button:hover .player-tooltip,
-    button.tab-focus:focus .player-tooltip {
+    button:hover .plyr-tooltip,
+    button.tab-focus:focus .plyr-tooltip {
         opacity: 1;
         transform: translate(-50%, 0) scale(1);
     }
-    button:hover .player-tooltip {
+    button:hover .plyr-tooltip {
         z-index: 3;
     }
 
-    // Player progress
+    // Playback progress
     // <progress> element
     &-progress {
         position: absolute;
@@ -466,7 +466,7 @@
     }
 
     // Loading state
-    &.loading .player-progress-buffer {
+    &.loading .plyr-progress-buffer {
         animation: progress 1s linear infinite;
         background-size: @progress-loading-size @progress-loading-size;
         background-repeat: repeat-x;
@@ -484,11 +484,11 @@
     }
 
     // States
-    &-controls [data-player='pause'],
-    &.playing .player-controls [data-player='play'] {
+    &-controls [data-plyr='pause'],
+    &.playing .plyr-controls [data-plyr='play'] {
         display: none;
     }
-    &.playing .player-controls [data-player='pause'] {
+    &.playing .plyr-controls [data-plyr='pause'] {
         display: inline-block;
     }
 
@@ -560,7 +560,7 @@
     // It's not supported to change volume using JavaScript:
     // https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html
     &.ios &-volume,
-    &.ios [data-player='mute'],
+    &.ios [data-plyr='mute'],
     &-audio.ios &-controls-right {
         display: none;
     }
@@ -571,10 +571,10 @@
 
     // Audio specific styles
     // Position the progress within the container
-    &-audio .player-controls {
+    &-audio .plyr-controls {
         padding-top: (@control-spacing * 2);
     }
-    &-audio .player-progress {
+    &-audio .plyr-progress {
         bottom: auto;
         top: 0;
         background: @off-white;
@@ -596,11 +596,11 @@
         video {
             height: 100%;
         }
-        .player-video-wrapper {
+        .plyr-video-wrapper {
             height: 100%;
             width: 100%;
         }  
-        .player-controls {
+        .plyr-controls {
             position: absolute;
             bottom: 0;
             left: 0;
@@ -609,22 +609,22 @@
 
         // Hide controls when playing in full screen
         &.fullscreen-hide-controls.playing {
-            .player-controls {
+            .plyr-controls {
                 transform: translateY(100%) translateY(@control-spacing / 2);
                 transition: transform .3s .2s ease;
             }
-            &.player-hover .player-controls {
+            &.plyr-hover .plyr-controls {
                 transform: translateY(0);
             }
-            .player-captions {
+            .plyr-captions {
                 bottom: (@control-spacing / 2);
                 transition: bottom .3s .2s ease;
             }
         }
 
         // Captions
-        .player-captions,
-        &.fullscreen-hide-controls.playing.player-hover .player-captions {
+        .plyr-captions,
+        &.fullscreen-hide-controls.playing.plyr-hover .plyr-captions {
             top: auto;
             bottom: 90px;
 
@@ -636,8 +636,8 @@
 
     // Change icons on state change
     &.fullscreen-active .icon-exit-fullscreen,
-    &.muted .player-controls .icon-muted,
-    &.captions-active .player-controls .icon-captions-on {
+    &.muted .plyr-controls .icon-muted,
+    &.captions-active .plyr-controls .icon-captions-on {
         display: block;
 
         & + svg {
@@ -646,12 +646,12 @@
     }
 
     // Some options are hidden by default
-    [data-player='captions'],
-    [data-player='fullscreen'] {
+    [data-plyr='captions'],
+    [data-plyr='fullscreen'] {
         display: none;
     }
-    &.captions-enabled [data-player='captions'],
-    &.fullscreen-enabled [data-player='fullscreen'] {
+    &.captions-enabled [data-plyr='captions'],
+    &.fullscreen-enabled [data-plyr='fullscreen'] {
         display: inline-block;
     }
 }

@@ -26,17 +26,24 @@ small {
     padding: 0 (@padding-base / 2);
     .font-size(14);
 }
+ul
+li {
+    list-style: none;
+    margin: 0; 
+    padding: 0;
+}
 
 // Links
 a {
     text-decoration: none;
     color: @link-color;
-    border-bottom: 1px solid currentColor;
-    transition: background .3s ease, color .3s ease;
+    border-bottom: 1px dotted currentColor;
+    transition: background .3s ease, color .3s ease, border .3s ease;
 
     &:hover,
     &:focus {
         color: @gray-dark;
+        border-bottom-color: rgba(0,0,0,0);
     }
     &:focus {
         .tab-focus();
@@ -44,4 +51,11 @@ a {
     &.logo {
         border: 0;
     }
+}
+
+.color-vimeo {
+    color: @color-vimeo;
+}
+.color-youtube {
+    color: @color-youtube;
 }

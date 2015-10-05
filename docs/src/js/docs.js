@@ -37,7 +37,7 @@ shr.setup({
 	function newSource() {
 		var trigger = this,
 		type        = trigger.getAttribute('data-source'),
-		player      = document.querySelector('.player').plyr;
+		player      = document.querySelector('.plyr').plyr;
 
 		switch(type) {
 			case 'video':
@@ -81,16 +81,16 @@ shr.setup({
 			case 'youtube':
 				player.source({
 					type:       'youtube',
-					title: 		'Introducing Apple Pencil',
-					sources:    'iicnVez5U7M'
+					title: 		'Enovato interview of Dan Cederholm for Made By',
+					sources:    'Au87oAJ2jeE'
 				});
 				break;
 
 			case 'vimeo':
 				player.source({
 					type:       'vimeo',
-					title: 		'The Beaten Track',
-					sources:    '125220818'
+					title: 		'Yosemite HD II',
+					sources:    '87701971'
 				});
 				break;
 		}

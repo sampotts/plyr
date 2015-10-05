@@ -100,7 +100,7 @@ and the AJAX technique here:
 ### HTML
 The only extra markup that's needed to use plyr is a `<div>` wrapper. Replace the source, poster and captions with urls for your media.
 ```html
-<div class="player">
+<div class="plyr">
 	<video poster="https://cdn.selz.com/plyr/1.0/poster.jpg" controls crossorigin>
 		<!-- Video files -->
 		<source src="https://cdn.selz.com/plyr/1.0/movie.mp4" type="video/mp4">
@@ -117,7 +117,7 @@ The only extra markup that's needed to use plyr is a `<div>` wrapper. Replace th
 And the same for `<audio>`
 
 ```html
-<div class="player">
+<div class="plyr">
 	<audio controls>
 		<!-- Audio files -->
 		<source src="https://cdn.selz.com/plyr/1.0/logistics-96-sample.mp3" type="audio/mp3">
@@ -132,7 +132,7 @@ And the same for `<audio>`
 For YouTube, Plyr uses the standard YouTube API markup (an empty `<div>`):
 
 ```html
-<div class="player">
+<div class="plyr">
 	<div data-video-id="L1h9xxCU20g" data-type="youtube"></div>
 </div>
 ```
@@ -144,16 +144,43 @@ More info on CORS here:
 [https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS)
 
 ### JavaScript
-Much of the behaviour of the player is configurable when initialising the library. Here's an example of a default setup:
+
+#### Quick setup
+
+Here's an example of a default setup:
 
 ```html
-<script src="dist/plyr.js"></script>
+<script src="https://cdn.plyr.io/1.3.5/plyr.js"></script>
 <script>plyr.setup();</script>
+```
+
+This will look for all elements with the `plyr` classname and setup plyr on each element found. You can specify other options, including a different selector hook below. 
+
+You can initialise the player a few other ways: 
+
+Passing a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList):
+```javascript
+plyr.setup(document.querySelectorAll('.js-plyr'), options);
+```
+
+Passing a [HTMLElement](https://developer.mozilla.org/en/docs/Web/API/HTMLElement):
+```javascript
+plyr.setup(document.querySelector('.js-plyr'), options);
+```
+
+Passing a [string selector](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelectorAll):
+```javascript
+plyr.setup('.js-plyr', options);
+```
+
+Passing just the options object:
+```javascript
+plyr.setup(options);
 ```
 
 #### Options
 
-You can pass the following options to the setup method using `plyr.setup({...})`.
+Options must be passed as an object to the `setup()` method as above.
 
 <table class="table" width="100%">
 <thead>
@@ -235,7 +262,7 @@ You can pass the following options to the setup method using `plyr.setup({...})`
     <td><code>selectors</code></td>
     <td>Object</td>
     <td>&mdash;</td>
-    <td>See <code>plyr.js</code> in <code>/src</code> for more info. The only option you might want to change is <code>player</code> which is the hook used for Plyr, the default is <code>.player</code>.</td>
+    <td>See <code>plyr.js</code> in <code>/src</code> for more info. The only option you might want to change is <code>container</code> which is the hook used for `setup()`, the default is <code>.plyr</code>.</td>
   </tr>
   <tr>
     <td><code>classes</code></td>
@@ -272,10 +299,27 @@ You can pass the following options to the setup method using `plyr.setup({...})`
 
 ## API
 
-A `plyr` object is added to any element that Plyr is initialised on. You can then control the player by accessing methods in the `plyr` object. For example if you wanted to pause Plyr:
+#### Fetching the plyr instance
+A `plyr` object is added to any element that Plyr is initialised on. You can then control the player by accessing methods in the `plyr` object.
+
+There are two ways to access the instance, firstly you re-query the element container you used for setup (e.g. `.js-plyr`) like so:
 
 ```javascript
-document.querySelectorAll(".player")[0].plyr.pause();
+var player = document.querySelector('.js-plyr');
+```
+
+Or you can use the returned object from your call to the setup method:
+
+```javascript
+var player = plyr.setup('.js-plyr')[0];
+```
+
+This will return an array of plyr instances setup, so you need to specify the index of the instance you want. This is less useful if you are setting up mutliple instances. You can also use the `onSetup` callback documented below which will return each instance one by one, as they are setup.
+
+Once you have your instance, you can use the API methods below on it. For example to pause it:
+
+```javascript
+player.pause();
 ```
 
 Here's a list of the methods supported:
@@ -395,7 +439,7 @@ Here's a list of the methods supported:
 The `plyr` object on the player element also contains a `media` property which is a reference to the `<audio>` or `<video>` element within the player which you can use to listen for events. Here's an example:
 
 ```javascript
-var media = document.querySelectorAll(".player")[0].plyr.media;
+var media = document.querySelector(".plyr").plyr.media;
 
 media.addEventListener("playing", function() { 
   console.log("playing");
@@ -415,7 +459,7 @@ Currently only YouTube is supported. Vimeo will be coming soon. Some HTML5 media
 Due to the way the YouTube API works, the `timeupdate` and `progress` events are triggered by polling every 200ms so the event may trigger without an actual value change. Buffering progress is `media.buffered` in the `plyr` object. It is a a number between 0 and 1 that specifies the percentage of the video that the player shows as buffered.
 
 ```javascript
-document.querySelector(".player").plyr.media.addEventListener("play", function() { 
+document.querySelector(".plyr").plyr.media.addEventListener("play", function() { 
 	console.log("play");
 });
 ``` 
@@ -426,7 +470,7 @@ Currently caption control is not supported but I will work on this.
 
 ## Fullscreen
 
-Fullscreen in Plyr is supported for all browsers that [currently support it](http://caniuse.com/#feat=fullscreen). If you're using the default CSS, you can also use a "full browser" mode which will use the full browser window by adding the `player-fullscreen` class to your container.
+Fullscreen in Plyr is supported for all browsers that [currently support it](http://caniuse.com/#feat=fullscreen). If you're using the default CSS, you can also use a "full browser" mode which will use the full browser window by adding the `plyr-fullscreen` class to your container.
 
 ## Browser support
 
