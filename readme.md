@@ -262,7 +262,7 @@ Options must be passed as an object to the `setup()` method as above.
     <td><code>selectors</code></td>
     <td>Object</td>
     <td>&mdash;</td>
-    <td>See <code>plyr.js</code> in <code>/src</code> for more info. The only option you might want to change is <code>container</code> which is the hook used for `setup()`, the default is <code>.plyr</code>.</td>
+    <td>See <code>plyr.js</code> in <code>/src</code> for more info. You probably don't need to change any of these.</td>
   </tr>
   <tr>
     <td><code>classes</code></td>
@@ -280,7 +280,7 @@ Options must be passed as an object to the `setup()` method as above.
     <td><code>fullscreen</code></td>
     <td>Object</td>
     <td>&mdash;</td>
-    <td>Three properties; <code>enabled</code> which toggles if fullscreen should be enabled (if the browser supports it). The default value is <code>true</code>. A <code>fallback</code> property which will enable a full window view for older browsers. The default value is <code>true</code>. A <code>hideControls</code> property which will hide the controls when fullscreen is active and the video is playing, after 1s. The controls reappear on hover of the progress bar (mouse), focusing a child control or pausing the video (by tap/click of video if `click` is `true`). The default value is <code>true</code>.</td>
+    <td>See <a href="#fullscreen-options">below</a></td>
   </tr>
   <tr>
     <td><code>storage</code></td>
@@ -295,6 +295,45 @@ Options must be passed as an object to the `setup()` method as above.
     <td>This callback function is called on every new plyr instance created. The context (<code>this</code>) is the plyr instance itself.</td>
   </tr>
  </tbody>
+</table>
+
+#### Fullscreen options
+
+<table class="table" width="100%" id="fullscreen-options">
+<thead>
+  <tr>
+    <th width="20%">Option</th>
+    <th width="15%">Type</th>
+    <th width="15%">Default</th>
+    <th width="50%">Description</th>
+  </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>enabled</code></td>
+      <td>Boolean</td>
+      <td><code>true</code></td>
+      <td>Toggles if fullscreen should be enabled (if the browser supports it).</td>
+    </tr>
+    <tr>
+      <td><code>fallback</code></td>
+      <td>Boolean</td>
+      <td><code>true</code></td>
+      <td>Enable a full viewport view for older browsers.</td>
+    </tr>
+    <tr>
+      <td><code>hideControls</code></td>
+      <td>Boolean</td>
+      <td><code>true</code></td>
+      <td>Hide the controls when fullscreen is active and the video is playing, after 1s. The controls reappear on hover of the progress bar (mouse), focusing a child control or pausing the video (by tap/click of video if `click` is `true`).</td>
+    </tr>
+    <tr>
+      <td><code>allowAudio</code></td>
+      <td>Boolean</td>
+      <td><code>false</code></td>
+      <td>Allow audio play to toggle fullscreen. This will be more useful later when posters are supported.</td>
+    </tr>
+  </tbody>
 </table>
 
 ## API
@@ -331,8 +370,8 @@ Here's a list of the methods supported:
     <th width="15%">Parameters</th>
     <th width="65%">Description</th>
   </tr>
-  </thead>
-  <tbody>
+</thead>
+<tbody>
   <tr>
     <td><code>play()</code></td>
     <td>&mdash;</td>
@@ -400,7 +439,7 @@ Here's a list of the methods supported:
   </tr>
   <tr>
     <td><code>source(...)</code></td>
-    <td>String or Array</td>
+    <td>Array</td>
     <td>
       Set the media source.
       <br><br> 
@@ -433,6 +472,112 @@ Here's a list of the methods supported:
   </tr>
  </tbody>
 </table>
+
+#### .source() method
+
+This allows changing the plyr source and type on the fly. 
+
+Video example:
+
+```javascript
+player.source({
+  type:       'video',
+  title:      'Bug Buck Bunny',
+  sources: [{ 
+      src:    'https://cdn.selz.com/plyr/1.0/movie.mp4',
+      type:   'video/mp4'
+  },
+  {
+      src:    'https://cdn.selz.com/plyr/1.0/movie.webm',
+      type:   'video/webm'
+  }],
+  poster:     'https://cdn.selz.com/plyr/1.0/poster.jpg',
+  tracks:     [{
+      kind:   'captions',
+      label:  'English',
+      srclang:'en',
+      src:    'https://cdn.selz.com/plyr/1.0/example_captions_en.vtt',
+      default: true
+  }]
+});
+```
+
+Audio example:
+
+```javascript
+player.source({
+  type:       'audio',
+  title:      '96 by Logistics',
+  sources: [{ 
+    src:      'https://cdn.selz.com/plyr/1.0/logistics-96-sample.mp3',
+    type:     'audio/mp3'
+  },
+  {
+    src:      'https://cdn.selz.com/plyr/1.0/logistics-96-sample.ogg',
+    type:     'audio/ogg'
+  }]
+});
+```
+
+YouTube example:
+
+```javascript
+player.source({
+  type:       'youtube',
+  title:      'Enovato interview of Dan Cederholm for Made By',
+  sources:    'Au87oAJ2jeE'
+});
+```
+
+Vimeo example
+
+```javascript
+player.source({
+  type:       'vimeo',
+  title:      'Yosemite HD II',
+  sources:    '87701971'
+});
+```
+
+Some more details on the object parameters
+
+<table class="table" width="100%">
+  <thead>
+    <tr>
+      <th width="20%">Key</th>
+      <th width="15%">Type</th>
+      <th width="65%">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>type</code></td>
+      <td>String</td>
+      <td>Options are <code>video</code>, <code>audio</code>, <code>youtube</code> and <code>vimeo</code></td>
+    </tr>
+    <tr>
+      <td><code>title</code></td>
+      <td>String</td>
+      <td>Title of the new media. Used for the aria labelling.</td>
+    </tr>
+    <tr>
+      <td><code>sources</code></td>
+      <td>Array or String</td>
+      <td>This is an array of sources or optionally a string for embedded players (YouTube and Vimeo). `type` is also optional for YouTube and Vimeo when specifying an array. For YouTube and Vimeo media, only the video ID must be passed as the source as shown above. The keys of this object are mapped directly to HTML attributes so more can be added to the object if required.</td>
+    </tr>
+    <tr>
+      <td><code>poster</code></td>
+      <td>String</td>
+      <td>URL for the poster image (video only).</td>
+    </tr>
+    <tr>
+      <td><code>tracks</code></td>
+      <td>Array</td>
+      <td>An array of track objects. Each element in the array is mapped directly to a track element and any keys mapped directly to HTML attributes so as in the example above, it will render as `<track kind="captions" label="English" srclang="en" src="https://cdn.selz.com/plyr/1.0/example_captions_en.vtt" default>`. Booleans are converted to HTML5 value-less attributes.</td>
+    </tr>
+  </tbody>
+</table>
+
 
 ## Events/Callbacks
 

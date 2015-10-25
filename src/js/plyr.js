@@ -78,7 +78,8 @@
         fullscreen: {
             enabled:            true,
             fallback:           true,
-            hideControls:       true
+            hideControls:       true,
+            allowAudio:         false
         },
         storage: {
             enabled:            true,
@@ -664,7 +665,7 @@
             time = typeof time === 'number' ? time : plyr.media.currentTime;
 
             // If there's no subs available, bail
-            if(!plyr.captions[plyr.subcount]) {
+            if (!plyr.captions[plyr.subcount]) {
                 return;
             }
 
@@ -930,9 +931,6 @@
                 _remove(containers[i]);
             }
 
-            // Set ID
-            container.setAttribute('id', id);
-
             // Add embed class for responsive
             _toggleClass(plyr.media, config.classes.videoWrapper, true);
             _toggleClass(plyr.media, config.classes.embedWrapper, true);
@@ -941,6 +939,9 @@
             if (plyr.type === 'youtube') {
                 // Create the YouTube container
                 plyr.media.appendChild(container);
+
+                // Set ID
+                container.setAttribute('id', id);
 
                 // Setup API
                 if (typeof YT === 'object') {
@@ -984,7 +985,7 @@
 
                     // Wait for fragaloop load
                     var timer = window.setInterval(function() {
-                        if('$f' in window && iframe.loaded) {
+                        if ('$f' in window && iframe.loaded) {
                             window.clearInterval(timer);
 
                             _vimeoReady.call(iframe);
@@ -1122,11 +1123,11 @@
         // Vimeo ready
         function _vimeoReady() {
             /* jshint validthis: true */
-            // Get the frame with fragaloop lib
             plyr.embed = $f(this);
 
             // Setup on ready
             plyr.embed.addEvent('ready', function() {
+
                 // Create a faux HTML5 API using the Vimeo API
                 plyr.media.play = function() { plyr.embed.api('play'); };
                 plyr.media.pause = function() { plyr.embed.api('pause'); };
@@ -1178,13 +1179,13 @@
                     _triggerEvent(plyr.media, 'ended');
                 });
 
-                /*// Always seek to 0
-                plyr.embed.api('seekTo', 0);
+                // Always seek to 0
+                //plyr.embed.api('seekTo', 0);
 
                 // Prevent autoplay if needed (seek will play)
-                if (!config.autoplay) {
-                    plyr.embed.api('pause');
-                }*/                
+                //if (!config.autoplay) {
+                //    plyr.embed.api('pause');
+                //}                
             });
         }
 
@@ -1192,7 +1193,7 @@
         function _setupCaptions() {
             if (plyr.type === 'video') {
                 // Inject the container
-                if(!_getElement(config.selectors.captions)) {
+                if (!_getElement(config.selectors.captions)) {
                     plyr.videoContainer.insertAdjacentHTML('afterbegin', '<div class="' + _getClassname(config.selectors.captions) + '"><span></span></div>');
                 }
 
@@ -1340,7 +1341,7 @@
 
         // Setup fullscreen
         function _setupFullscreen() {
-            if (plyr.type != 'audio' && config.fullscreen.enabled) {
+            if ((plyr.type != 'audio' || config.fullscreen.allowAudio) && config.fullscreen.enabled) {
                 // Check for native support
                 var nativeSupport = fullscreen.supportsFullScreen;
 
@@ -1660,18 +1661,21 @@
             // If there's no full support, or there's no caption toggle
             if (!plyr.supported.full || !plyr.buttons.captions) {
                 return;
-            }
+            }          
 
             // If the method is called without parameter, toggle based on current value
             if (typeof show !== 'boolean') {
                 show = (plyr.container.className.indexOf(config.classes.captions.active) === -1);
             }
 
+            // Set global
+            plyr.captionsEnabled = show;
+
             // Toggle state
-            _toggleState(plyr.buttons.captions, show);
+            _toggleState(plyr.buttons.captions, plyr.captionsEnabled);
 
             // Add class hook
-            _toggleClass(plyr.container, config.classes.captions.active, show);
+            _toggleClass(plyr.container, config.classes.captions.active, plyr.captionsEnabled);
         }
 
         // Check if media is loading
@@ -1753,7 +1757,7 @@
             }
 
             // Fallback to 0
-            if(isNaN(time)) {
+            if (isNaN(time)) {
                 time = 0;
             }
 
@@ -1798,10 +1802,10 @@
 
         // Add elements to HTML5 media (source, tracks, etc)
         function _insertChildElements(type, attributes) {
-            if(typeof attributes === 'string') {
+            if (typeof attributes === 'string') {
                _insertElement(type, plyr.media, { src: attributes });
             }
-            else if(attributes.constructor === Array) {
+            else if (attributes.constructor === Array) {
                 for (var i = attributes.length - 1; i >= 0; i--) {
                     _insertElement(type, plyr.media, attributes[i]);
                 }
@@ -1811,7 +1815,7 @@
         // Update source
         // Sources are not checked for support so be careful
         function _updateSource(source) {
-            if(typeof source === 'undefined') {
+            if (typeof source === 'undefined') {
                 return;
             }
 
@@ -1819,7 +1823,7 @@
             _pause();
 
             // Clean up YouTube stuff
-            if(plyr.type === 'youtube') {
+            if (plyr.type === 'youtube') {
                 // Destroy the embed instance
                 plyr.embed.destroy();
 
@@ -1836,7 +1840,7 @@
             _remove(plyr.media);
 
             // Set the new type
-            if('type' in source && source.type !== plyr.type) {
+            if ('type' in source && source.type !== plyr.type) {
                 plyr.type = source.type;
             }
 
@@ -1853,7 +1857,7 @@
                 case 'youtube':
                 case 'vimeo':
                     plyr.media = document.createElement('div');
-                    plyr.embedId = source.sources;
+                    plyr.embedId = (typeof source.sources === 'string' ? source.sources : source.sources[0].src);
                     break;
             }
 
@@ -1861,8 +1865,8 @@
             _prependChild(plyr.container, plyr.media);
 
             // Set attributes for audio video
-            if(_inArray(config.types.html5, plyr.type)) {
-                if(config.crossorigin) {
+            if (_inArray(config.types.html5, plyr.type)) {
+                if (config.crossorigin) {
                     plyr.media.setAttribute('crossorigin', '');
                 }
                 if (config.autoplay) {
@@ -1879,16 +1883,20 @@
             // Classname reset
             plyr.container.className = plyr.originalClassName;
 
+            // Restore class hooks
+            _toggleClass(plyr.container, config.classes.fullscreen.active, plyr.isFullscreen);
+            _toggleClass(plyr.container, config.classes.captions.active, plyr.captionsEnabled);
+
             // Autoplay the new source?
             config.autoplay = (source.autoplay || config.autoplay);
                
             // Set media id for embeds
-            if(_inArray(config.types.embed, plyr.type)) {
+            if (_inArray(config.types.embed, plyr.type)) {
                 plyr.embedId = source.sources; 
             }
 
             // Set new sources for html5
-            if(_inArray(config.types.html5, plyr.type)) {
+            if (_inArray(config.types.html5, plyr.type)) {
                 _insertChildElements('source', source.sources);
             }
 
@@ -1899,13 +1907,13 @@
             _mediaUpdated();
 
             // HTML5 stuff
-            if(_inArray(config.types.html5, plyr.type)) {
+            if (_inArray(config.types.html5, plyr.type)) {
                 // Set volume
                 _setVolume();
                 _updateVolume();
 
                 // UI updates
-                if(plyr.supported.full) {
+                if (plyr.supported.full) {
                     // Reset time display
                     _timeUpdate();
 
@@ -1914,7 +1922,7 @@
                 }
 
                 // Setup captions
-                if('tracks' in source) {
+                if ('tracks' in source) {
                     _insertChildElements('track', source.tracks);
 
                     // Captions
@@ -1930,7 +1938,7 @@
                 } 
             } 
 
-            if('title' in source) {
+            if ('title' in source) {
                 config.title = source.title;
                 _setupPlayAria();
             }       
@@ -2292,17 +2300,17 @@
 
         // Select the elements
         // Assume elements is a NodeList by default
-        if(typeof elements === 'string') {
+        if (typeof elements === 'string') {
             elements = document.querySelectorAll(elements);
         }
         // Single HTMLElement passed
-        else if(elements instanceof HTMLElement) {
+        else if (elements instanceof HTMLElement) {
             elements = [elements];
         }
         // No selector passed, possibly options as first argument
         else if (!(elements instanceof NodeList) && typeof elements !== 'string')  {
             // If options are the first argument
-            if(typeof options === 'undefined' && typeof elements === 'object') {
+            if (typeof options === 'undefined' && typeof elements === 'object') {
                 options = elements;
             }
 

@@ -32,10 +32,12 @@
 
 // Tooltips
 @tooltip-bg:                @controls-bg;
-@tooltip-border-color:      @off-white;
+@tooltip-border-color:      fade(@gray-dark, 10%);
+@tooltip-border-width:      1px;
+@tooltip-shadow:            0 0 5px @tooltip-border-color, 0 0 0 @tooltip-border-width @tooltip-border-color;
 @tooltip-color:             @control-color;
 @tooltip-padding:           @control-spacing;   
-@tooltip-arrow-size:        5px;
+@tooltip-arrow-size:        6px;
 @tooltip-radius:            3px;
 
 // Progress
@@ -331,32 +333,45 @@
 
         opacity: 0;
         background: @tooltip-bg;
-        border: 1px solid @tooltip-border-color;
+        box-shadow: @tooltip-shadow;
         border-radius: @tooltip-radius;
         color: @tooltip-color;
         font-size: @font-size-small;
         line-height: 1.5;
         font-weight: 600;
 
-        transform: translate(-50%, (@tooltip-padding * 3)) scale(0);
+        transform: translate(-50%, (@tooltip-padding * 3)) scale(.8);
         transform-origin: 50% 100%;
         transition: transform .2s .1s ease, opacity .2s .1s ease;
       
-        // Arrow
-        &::after {
+        // Arrows
+        &::after,
+        &::before {
             content: '';
             position: absolute;
-            z-index: 1;
+            width: 0;
+            height: 0;
             top: 100%;
             left: 50%;
-            display: block;
-            width: 10px;
-            height: 10px;
-            background: @tooltip-bg;
-            transform: translate(-50%, -50%) rotate(45deg) translateY(1px);
-            border: 1px solid @tooltip-border-color;
-            border-width: 0 1px 1px 0;
+            transform: translateX(-50%);
         }
+        // The border triangle
+        &::after {
+            @border-arrow-size: (@tooltip-arrow-size + (@tooltip-border-width * 1));
+            bottom: -(@border-arrow-size + @tooltip-border-width);
+            border-right: @border-arrow-size solid transparent;
+            border-top: @border-arrow-size solid @tooltip-border-color;
+            border-left: @border-arrow-size solid transparent;
+            z-index: 1;
+        } 
+        // The background triangle  
+        &::before {
+            bottom: -@tooltip-arrow-size;
+            border-right: @tooltip-arrow-size solid transparent;
+            border-top: @tooltip-arrow-size solid @tooltip-bg;
+            border-left: @tooltip-arrow-size solid transparent;
+            z-index: 2;
+        } 
     }
     button:hover .plyr-tooltip,
     button.tab-focus:focus .plyr-tooltip {

@@ -44,15 +44,18 @@ $control-color-hover:       null !default;
 
 // Tooltips
 $tooltip-bg:                $controls-bg !default;
+$tooltip-border-color:      transparentize(@gray-dark, .1) !default;
+$tooltip-border-width:      1px;
+$tooltip-shadow:            0 0 5px $tooltip-border-color, 0 0 0 $tooltip-border-width $tooltip-border-color;
 $tooltip-color:             $control-color !default;
 $tooltip-padding:           $control-spacing !default;   
-$tooltip-arrow-size:        5px !default;
+$tooltip-arrow-size:        6px !default;
 $tooltip-radius:            3px !default;
 
 // Progress
-$progress-bg:               rgba(red($gray), green($gray), blue($gray), .2) !default;
+$progress-bg:               transparentize($gray, .2) !default;
 $progress-playing-bg:       $blue !default;
-$progress-buffered-bg:      rgba(red($gray), green($gray), blue($gray), .25) !default;
+$progress-buffered-bg:      transparentize($gray, .25) !default;
 $progress-loading-size:     40px !default;
 $progress-loading-bg:       rgba(0,0,0, .15) !default;
 
@@ -334,29 +337,44 @@ $bp-captions-large:         768px !default; // When captions jump to the larger 
 
         opacity: 0;
         background: $tooltip-bg;
+        box-shadow: $tooltip-shadow;
         border-radius: $tooltip-radius;
         color: $tooltip-color;
         font-size: $font-size-small;
         line-height: 1.5;
         font-weight: 600;
 
-        transform: translate(-50%, ($tooltip-padding * 3)) scale(0);
+        transform: translate(-50%, ($tooltip-padding * 3)) scale(.8);
         transform-origin: 50% 100%;
         transition: transform .2s .1s ease, opacity .2s .1s ease;
 
-        &::after {
+        // Arrows
+        &::after,
+        &::before {
             content: '';
-            display: block;
             position: absolute;
-            left: 50%;
-            bottom: -$tooltip-arrow-size;
-            margin-left: -$tooltip-arrow-size;
             width: 0;
             height: 0;
-            transition: inherit;
-            border-style: solid;
-            border-width: $tooltip-arrow-size $tooltip-arrow-size 0 $tooltip-arrow-size;
-            border-color: $controls-bg transparent transparent;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        // The border triangle
+        &::after {
+            $border-arrow-size: ($tooltip-arrow-size + ($tooltip-border-width * 1));
+            bottom: -($border-arrow-size + $tooltip-border-width);
+            border-right: $border-arrow-size solid transparent;
+            border-top: $border-arrow-size solid $tooltip-border-color;
+            border-left: $border-arrow-size solid transparent;
+            z-index: 1;
+        } 
+        // The background triangle  
+        &::before {
+            bottom: -$tooltip-arrow-size;
+            border-right: $tooltip-arrow-size solid transparent;
+            border-top: $tooltip-arrow-size solid $tooltip-bg;
+            border-left: $tooltip-arrow-size solid transparent;
+            z-index: 2;
         }
     }
     button:hover .plyr-tooltip,

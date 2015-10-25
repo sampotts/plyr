@@ -2,26 +2,6 @@
 // Examples
 // ==========================================================================
 
-// Example players
-.plyr {
-    margin: 0 auto @padding-base;
-    max-width: @example-width-video;
-
-    &-controls {
-        border-radius: 0 0 @border-radius-base @border-radius-base;
-    }
-}
-.plyr-audio {
-    max-width: @example-width-audio;
-
-    .plyr-controls {
-        border-radius: @border-radius-base;
-    }
-    .plyr-progress {
-        border-radius: @border-radius-base @border-radius-base 0 0;
-        overflow: hidden;
-    }
-}
 video,
 .plyr-video-embed {
     border-radius: @border-radius-base;
@@ -30,15 +10,19 @@ video,
     -webkit-mask-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC);
 }
 
-// Style full supported player
-.plyr-video,
-.plyr-youtube,
-.plyr-vimeo {
+// Example players
+.plyr {
+    margin: 0 auto @padding-base;
+    max-width: @example-width-video;
+
+    &-controls {
+        border-radius: 0 0 @border-radius-base @border-radius-base;
+    }
     video,
     .plyr-video-embed {
         border-radius: @border-radius-base @border-radius-base 0 0;
     }
-    &.plyr-fullscreen,
+    &-fullscreen,
     &.fullscreen-active {
         max-width: none;
 
@@ -52,7 +36,19 @@ video,
         }
     }
 }
+.plyr-audio {
+    max-width: @example-width-audio;
 
+    .plyr-controls {
+        border-radius: @border-radius-base;
+    }
+    .plyr-progress {
+        border-radius: @border-radius-base @border-radius-base 0 0;
+        overflow: hidden;
+    }
+}
+
+// Style full supported player
 .cite {
     display: none;
 
