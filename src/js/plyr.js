@@ -1582,6 +1582,19 @@
                 // Trigger timeupdate
                 _triggerEvent(plyr.media, 'volumechange');
             }
+
+            // Vimeo
+            if (plyr.type === 'vimeo') {
+                if (plyr.media.muted) {
+                    plyr.embed.api('setVolume', 0);
+                }
+                else {
+                    plyr.embed.api('setVolume', parseFloat(config.volume / 10));
+                }
+
+                // Trigger timeupdate
+                _triggerEvent(plyr.media, 'volumechange');
+            }
         }
 
         // Set volume
