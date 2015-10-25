@@ -107,7 +107,7 @@
         },
         urls: {
             vimeo: {
-                api:            'https://cdn.rawgit.com/vimeo/player-api/master/javascript/froogaloop.js'
+                api:            'https://f.vimeocdn.com/js/froogaloop2.min.js'
             },
             youtube: {
                 api:            'https://www.youtube.com/iframe_api'
