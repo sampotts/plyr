@@ -24,7 +24,7 @@ We wanted a lightweight, accessible and customisable media player that just supp
 Oh and yes, it works with Bootstrap. 
 
 ## Changelog
-Check out the[changelog](changelog.md).
+Check out the [changelog](changelog.md).
 
 ## Planned Development
 - Vimeo support
