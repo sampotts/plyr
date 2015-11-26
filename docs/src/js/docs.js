@@ -32,12 +32,12 @@ plyr.setup({
 });
 
 // General functions
-(function() { 
+(function() {
 	// Popup
 	function popup(event) {
 		// Prevent the link opening
 		if(event.target.nodeName.toLowerCase() == "a") {
-			if(event.preventDefault) { 
+			if(event.preventDefault) {
 				event.preventDefault();
 			}
 			else {
@@ -75,74 +75,6 @@ plyr.setup({
 	// Trigger popups
 	document.querySelector(".js-popup").addEventListener("click", popup);
 
-	// Get JSONP
-	function getJSONP(url, callback) {
-	    var name = "jsonp_callback_" + Math.round(100000 * Math.random());
-
-	    // Cleanup to prevent memory leaks and hit original callback
-	    window[name] = function(data) {
-	        delete window[name];
-	        document.body.removeChild(script);
-	        callback(data);
-	    };
-
-	    // Create a faux script
-	    var script = document.createElement("script");
-	    script.setAttribute("src", url + (url.indexOf("?") >= 0 ? "&" : "?") + "callback=" + name);
-
-	    // Inject to the body
-	    document.body.appendChild(script);
-	}
-
-	// Get star count
-	var storageSupported = ("sessionStorage" in window),
-		selectors = {
-			github: 	".js-stargazers-count",
-			twitter: 	".js-tweet-count"
-		};
-
-	// Display the count next to the button
-	function displayCount(selector, count) {
-		document.querySelector(selector).innerHTML = count;
-	}
-
-	// Add star
-	function formatGitHubCount(count) {
-		return "&#9733; " + count;
-	}
-
-	// Check if it's in session storage first
-	if(storageSupported && "github_stargazers" in window.sessionStorage) {
-		displayCount(selectors.github, formatGitHubCount(window.sessionStorage.github_stargazers));
-	}
-	else {
-		getJSONP("https://api.github.com/repos/selz/plyr?access_token=a46ac653210ba6a6be44260c29c333470c3fbbf5", function (json) {
-			if (json && typeof json.data.stargazers_count !== "undefined") {
-				// Update UI 
-				displayCount(selectors.github, formatGitHubCount(json.data.stargazers_count));
-
-				// Store in session storage
-				window.sessionStorage.github_stargazers = json.data.stargazers_count;
-			}
-		});
-	}
-
-	// Get tweet count
-	if(storageSupported && "tweets" in window.sessionStorage) {
-		displayCount(selectors.twitter, window.sessionStorage.tweets);
-	}
-	else {
-		getJSONP("https://cdn.api.twitter.com/1/urls/count.json?url=plyr.io", function (json) {
-			if (json && typeof json.count !== "undefined") {
-				// Update UI 
-				displayCount(selectors.twitter, json.count);
-
-				// Store in session storage
-				window.sessionStorage.tweets = json.count;
-			}
-		});
-	}
-
 	// Tabs
 	var tabs = document.querySelectorAll(".nav-panel a"),
 		panels = document.querySelectorAll(".panels > .panel"),
@@ -171,7 +103,7 @@ plyr.setup({
 	}
 })();
 
-// Google analytics 
+// Google analytics
 // For demo site (http://[www.]plyr.io) only
 if(document.domain.indexOf("plyr.io") > -1) {
 	(function(i,s,o,g,r,a,m){i.GoogleAnalyticsObject=r;i[r]=i[r]||function(){
