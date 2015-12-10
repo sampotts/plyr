@@ -1,7 +1,7 @@
 # Plyr
 A simple, accessible HTML5 media player. 
 
-[Checkout the demo](http://plyr.io)
+Checkout the [demo](http://plyr.io).
 
 [![Image of Plyr](https://cdn.plyr.io/static/plyr.jpg)](http://plyr.io)
 
@@ -24,9 +24,9 @@ We wanted a lightweight, accessible and customisable media player that just supp
 Oh and yes, it works with Bootstrap. 
 
 ## Changelog
-Check out [the changelog](changelog.md)
+Check out the [changelog](changelog.md).
 
-## Planned development
+## Planned Development
 - Vimeo support
 - Playback speed
 - Playlists
@@ -34,13 +34,13 @@ Check out [the changelog](changelog.md)
 - Audio captions
 ... and whatever else has been raised in [issues](https://github.com/Selz/plyr/issues)
 
-If you have any cool ideas or features, please let me know by [creating an issue](https://github.com/Selz/plyr/issues/new) or of course, forking and sending a pull request.
+If you have any cool ideas or features, please let me know by [creating an issue](https://github.com/Selz/plyr/issues/new) or, of course, forking and sending a pull request.
 
 ## Implementation
 
 Check `docs/index.html` and `docs/dist/docs.js` for an example setup. 
 
-**Heads up**, the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.3.6/plyr.js` to `https://cdn.plyr.io/1.3.6/plyr.js`
+**Heads up:** the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.3.6/plyr.js` to `https://cdn.plyr.io/1.3.6/plyr.js`
 
 ### Bower
 If bower is your thang, you can grab Plyr using:
@@ -67,7 +67,7 @@ If you want to use our CDN, you can use the following:
 You can also access the `sprite.svg` file at `https://cdn.plyr.io/1.3.6/sprite.svg`.
 
 ### CSS
-If you want to use the default css, add the `plyr.css` file from /dist into your head, or even better use `plyr.less` or `plyr.sass` file included in `/src` in your build to save a request. 
+If you want to use the default css, add the `plyr.css` file from `/dist` into your head, or even better use `plyr.less` or `plyr.sass` file included in `/src` in your build to save a request. 
 
 ```html
 <link rel="stylesheet" href="dist/plyr.css">
