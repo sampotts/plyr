@@ -1,0 +1,22 @@
+// ==========================================================================
+// Icons
+// ==========================================================================
+
+// Base size icon styles
+.icon {
+	fill: currentColor;
+	width: @icon-size;
+	height: @icon-size;
+	vertical-align: -3px;
+}
+
+// Within elements
+a svg,
+button svg,
+label svg {
+	pointer-events: none;
+}
+a .icon,
+.btn .icon {
+	margin-right: (@padding-base / 2);
+}

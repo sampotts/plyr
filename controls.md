@@ -1,10 +1,10 @@
 # Controls
 
-This is the markup that is rendered for the Plyr controls. You can use the default controls or provide a customized version of markup based on your needs. 
+This is the markup that is rendered for the Plyr controls. You can use the default controls or provide a customized version of markup based on your needs.
 
 ## Internationalization using default controls
 
-You can provide an `i18n` object as one of your options when initialising the plugin which we be used when rendering the controls. 
+You can provide an `i18n` object as one of your options when initialising the plugin which we be used when rendering the controls.
 
 ### Example
 
@@ -30,16 +30,16 @@ Note: `{seektime}` will be replaced with your configured seek time or the defaul
 
 ## Using custom HTML
 
-The example on [plyr.io](http://plyr.io) setup uses a Hogan template. Check out `controls.html` in `/src/templates` to get an idea of how the default html is structured.
+You can specify the HTML for the controls using the `html` option.
 
-The classes and data attributes used in your template should match the `selectors` option. 
+The classes and data attributes used in your template should match the `selectors` option.
 
 You need to add several placeholders to your html template that are replaced when rendering:
 
 - `{id}` - the dynamically generated ID for the player (for form controls)
 - `{seektime}` - the seek time specified in options for fast forward and rewind
 
-You can include only the controls you need when specifying custom html. 
+You can include only the controls you need when specifying custom html.
 
 ### Example
 

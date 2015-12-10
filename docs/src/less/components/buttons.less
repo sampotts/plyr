@@ -67,6 +67,10 @@ nav {
 		box-shadow: inset 0 1px 1px rgba(0,0,0, .2);
 		position: relative;
 		z-index: 1;
+
+		.icon {
+			color: inherit;
+		}
 	}
 
 	@media (min-width: 560px) {
@@ -74,7 +78,7 @@ nav {
 	}
 }
 
-// Shared 
+// Shared
 .btn,
 .btn-count {
 	display: inline-block;
@@ -84,7 +88,7 @@ nav {
 	user-select: none;
 }
 
-// Buttons 
+// Buttons
 .btn {
 	padding: (@padding-base / 2) @padding-base;
 	background: @body-background;
@@ -92,13 +96,22 @@ nav {
 	box-shadow: inset 0 1px 0 #fff, 0 1px 1px rgba(0,0,0, .05);
 	text-shadow: 0 1px 1px #fff;
 	color: @gray;
+	transition: background .3s ease, border .3s ease, color .3s ease;
 
 	&:hover,
 	&:focus {
-		background-color: #fff;
-		border-color: darken(@gray-light, 5%);
-		color: @link-color;
+		border-color: darken(@gray-light, 8%);
+		color: @gray;
 		outline: 0;
+	}
+	&-youtube .icon {
+		color: @color-youtube;
+	}
+	&-vimeo .icon {
+		color: @color-vimeo;
+	}
+	&-twitter .icon {
+		color: @color-twitter;
 	}
 }
 .btn-primary {
@@ -108,7 +121,7 @@ nav {
 	box-shadow: 0 1px 1px rgba(0,0,0, .15);
 	text-shadow: 0 1px 1px rgba(0,0,0, .1);
 	color: #fff;
-	
+
 	&:hover,
 	&:focus {
 		color: #fff;
@@ -123,8 +136,8 @@ nav {
 // Count bubble
 .btn-count {
 	position: relative;
-	margin-left: 6px;
-	padding: ((@padding-base / 2) - 1px);
+	margin-left: (@padding-base / 2);
+	padding: (@padding-base / 2) (@padding-base * .75);
 	background: #fff;
 	border: 1px solid @gray-light;
 

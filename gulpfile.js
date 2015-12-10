@@ -17,7 +17,6 @@ var fs          = require("fs"),
     prefix      = require("gulp-autoprefixer"),
     svgstore    = require("gulp-svgstore"),
     svgmin      = require("gulp-svgmin"),
-    hogan       = require("gulp-hogan-compile"),
     rename      = require("gulp-rename"),
     s3          = require("gulp-s3"),
     gzip        = require("gulp-gzip"),
@@ -42,8 +41,7 @@ paths = {
         // Source paths
         src: {
             less:       path.join(root, "docs/src/less/**/*"),
-            js:         path.join(root, "docs/src/js/**/*"),
-            templates:  path.join(root, "docs/src/templates/*.html")
+            js:         path.join(root, "docs/src/js/**/*")
         },
         // Output paths
         output:         path.join(root, "docs/dist/"),
@@ -54,7 +52,7 @@ paths = {
 },
 
 // Task arrays
-tasks = {    
+tasks = {
     less:   [],
     sass:   [],
     js:     []
@@ -93,7 +91,7 @@ var build = {
     },
     less: function(files, bundle) {
         for (var key in files) {
-            (function (key) {       
+            (function (key) {
                 var name = "less-" + key;
                 tasks.less.push(name);
 
@@ -112,7 +110,7 @@ var build = {
     },
     sass: function(files, bundle) {
         for (var key in files) {
-            (function (key) {       
+            (function (key) {
                 var name = "sass-" + key;
                 tasks.sass.push(name);
 
@@ -142,20 +140,6 @@ var build = {
                 .pipe(svgstore())
                 .pipe(gulp.dest(paths.plyr.output));
         });
-    },
-    templates: function() {
-        // Build templates
-        gulp.task("templates", function () {
-            return gulp
-                .src(paths.docs.src.templates)
-                .pipe(hogan("templates.js", {
-                    wrapper: false,
-                    templateName: function (file) {
-                        return path.basename(file.relative.replace(/\\/g, "-"), path.extname(file.relative));
-                    }
-                }))
-                .pipe(gulp.dest(paths.docs.output));
-        });
     }
 };
 
@@ -166,13 +150,12 @@ build.sass(bundles.plyr.sass, "plyr");
 build.sprite();
 
 // Docs files
-build.templates();
 build.less(bundles.docs.less, "docs");
 build.js(bundles.docs.js, "docs");
 
-// Build all JS (inc. templates)
+// Build all JS
 gulp.task("js", function(){
-    run("templates", tasks.js);
+    run(tasks.js);
 });
 
 // Build SASS (for testing, default is LESS)
@@ -190,12 +173,11 @@ gulp.task("watch", function () {
     // Docs
     gulp.watch(paths.docs.src.js, tasks.js);
     gulp.watch(paths.docs.src.less, tasks.less);
-    gulp.watch(paths.docs.src.templates, ["js"]);
 });
 
 // Default gulp task
 gulp.task("default", function(){
-    run("templates", tasks.js, tasks.less, "sprite", "watch");
+    run(tasks.js, tasks.less, "sprite", "watch");
 });
 
 // Publish a version to CDN and docs
@@ -231,7 +213,7 @@ if("cdn" in aws) {
 gulp.task("cdn", function () {
     console.log("Uploading " + version + " to " + aws.cdn.bucket);
 
-    // Upload to CDN 
+    // Upload to CDN
     gulp.src(paths.upload)
         .pipe(size({
             showFiles: true,
@@ -279,7 +261,7 @@ gulp.task("open", function () {
         }));
 });
 
-// Do everything 
+// Do everything
 gulp.task("publish", function () {
-    run("templates", tasks.js, tasks.less, "sprite", "cdn", "docs");
+    run(tasks.js, tasks.less, "sprite", "cdn", "docs");
 });

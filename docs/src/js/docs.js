@@ -2,14 +2,13 @@
 // Docs example
 // ==========================================================================
 
-/*global plyr, templates */
+/*global plyr, shr*/
 
 // Setup the player
 plyr.setup({
 	debug: 	true,
 	volume: 9,
 	title: 	"Video demo",
-	html: 	templates.controls.render({}),
 	tooltips: true,
 	captions: {
 		defaultActive: true
@@ -31,50 +30,15 @@ plyr.setup({
 	}
 });
 
+// Setup shr
+shr.setup({
+	count: {
+		classname: "btn-count"
+	}
+});
+
 // General functions
 (function() {
-	// Popup
-	function popup(event) {
-		// Prevent the link opening
-		if(event.target.nodeName.toLowerCase() == "a") {
-			if(event.preventDefault) {
-				event.preventDefault();
-			}
-			else {
-				event.returnValue = false;
-			}
-		}
-
-		var link 	= event.target,
-			url		= link.href,
-			width 	= link.getAttribute("data-window-width") || 600,
-			height 	= link.getAttribute("data-window-height") || 600,
-			name 	= link.getAttribute("data-window-name") || "popup";
-
-		// If window exists, just focus it
-		if(window["window-"+name] && !window["window-"+name].closed) {
-			window["window-"+name].focus();
-		}
-		else {
-			// Get position
-			var left = window.screenLeft !== undefined ? window.screenLeft : screen.left;
-			var top = window.screenTop !== undefined ? window.screenTop : screen.top;
-
-			// Open in the centre of the screen
-			var x = (screen.width / 2) - (width / 2) + left,
-				y = (screen.height / 2) - (height / 2) + top;
-
-			// Open that window
-			window["window-"+name] = window.open(url, name, "top=" + y +",left="+ x +",width=" + width + ",height=" + height);
-
-			// Focus new window
-			window["window-"+name].focus();
-		}
-	}
-
-	// Trigger popups
-	document.querySelector(".js-popup").addEventListener("click", popup);
-
 	// Tabs
 	var tabs = document.querySelectorAll(".nav-panel a"),
 		panels = document.querySelectorAll(".panels > .panel"),
