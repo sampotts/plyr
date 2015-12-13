@@ -2,7 +2,7 @@
 // Docs example
 // ==========================================================================
 
-/*global plyr, shr */
+/*global plyr, shr*/
 
 // Setup the player
 plyr.setup({
@@ -25,7 +25,7 @@ shr.setup({
 });
 
 // General functions
-(function() { 
+(function() {
 	var buttons = document.querySelectorAll('[data-source]');
 
 	// Bind to each button
@@ -103,7 +103,7 @@ shr.setup({
 	}
 })();
 
-// Google analytics 
+// Google analytics
 // For demo site (http://[www.]plyr.io) only
 if(document.domain.indexOf('plyr.io') > -1) {
 	(function(i,s,o,g,r,a,m){i.GoogleAnalyticsObject=r;i[r]=i[r]||function(){

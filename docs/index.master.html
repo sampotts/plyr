@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Plyr - A simple HTML5 media player</title>
+        <meta name="description" content="A simple HTML5 media player with custom controls and WebVTT captions.">
+        <meta name="author" content="Sam Potts">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- Styles -->
+        <link rel="stylesheet" href="../dist/plyr.css">
+
+        <!-- Docs styles -->
+        <link rel="stylesheet" href="dist/docs.css">
+    </head>
+    <body>
+        <header>
+            <h1>Plyr</h1>
+            <p>A simple HTML5 media player with custom controls and WebVTT captions by <a href="https://twitter.com/sam_potts" target="_blank">@sam_potts</a> from <a href="https://twitter.com/selz" target="_blank">@selz</a></p>
+            <nav>
+                <ul>
+                    <li>
+                        <a href="https://github.com/selz/plyr" target="_blank" class="btn btn-primary" data-shr-network="github">
+                            <svg class="icon"><use xlink:href="#shr-github"/></svg>Download on GitHub
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://twitter.com/intent/tweet?text=A+simple+HTML5+media+player+with+custom+controls+and+WebVTT+captions.&url=http%3A%2F%2Fplyr.io&via=Sam_Potts" target="_blank" class="btn btn-twitter" data-shr-network="twitter">
+                            <svg class="icon"><use xlink:href="#shr-twitter"/></svg>Tweet
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+
+        <main role="main" id="main">
+            <nav class="btn-bar nav-panel">
+                <ul>
+                    <li><a href="#video" class="btn active btn-small">Video</a></li>
+                    <li><a href="#youtube" class="btn btn-small">YouTube</a></li>
+                    <li><a href="#audio" class="btn btn-small">Audio</a></li>
+                </ul>
+            </nav>
+            <div class="panels">
+                <section class="panel example-video active" id="video">
+                    <div class="player">
+                        <video poster="poster.jpg" controls crossorigin>
+                            <!-- Video files -->
+                            <source src="https://cdn.selz.com/plyr/1.0/movie.mp4" type="video/mp4">
+                            <source src="https://cdn.selz.com/plyr/1.0/movie.webm" type="video/webm">
+
+                            <!-- Text track file -->
+                            <track kind="captions" label="English" srclang="en" src="https://cdn.selz.com/plyr/1.0/example_captions_en.vtt" default>
+
+                            <!-- Fallback for browsers that don't support the <video> element -->
+                            <a href="https://cdn.selz.com/plyr/1.0/movie.mp4">Download</a>
+                        </video>
+                    </div>
+                    <small>Big Buck Bunny. More info can be found at <a href="https://peach.blender.org" target="_blank">peach.blender.org</a>.</small>
+                </section>
+                <section class="panel example-video" id="youtube">
+                    <div class="player">
+                        <div data-video-id="Au87oAJ2jeE" data-type="youtube"></div>
+                    </div>
+                    <small>Envato's "Made By" interview of <a href="https://www.youtube.com/watch?v=Au87oAJ2jeE" target="_blank">Dan Cederholm</a> from <a href="https://dribbble.com" target="_blank">Dribbble</a>.</small>
+                </section>
+                <section class="panel example-audio" id="audio">
+                    <div class="player">
+                        <audio controls>
+                            <!-- Audio files -->
+                            <source src="//cdn.selz.com/plyr/1.0/logistics-96-sample.mp3" type="audio/mp3">
+                            <source src="//cdn.selz.com/plyr/1.0/logistics-96-sample.ogg" type="audio/ogg">
+
+                            <!-- Fallback for browsers that don't support the <audio> element -->
+                            <a href="//cdn.selz.com/plyr/1.0/logistics-96-sample.mp3">Download</a>
+                        </audio>
+                    </div>
+                    <small>"96" by Logistics, which can be purchased from <a href="https://www.hospitalrecords.com/shop/artist/logistics" target="_blank">Hospital Records</a>.</small>
+                </section>
+            </div>
+        </main>
+
+        <!-- Load SVG defs -->
+        <!-- You should bundle all SVG/Icons into one file using a build tool such as gulp and svg store -->
+        <script>
+        (function() {
+            [
+                "https://cdn.shr.one/0.1.9/sprite.svg",
+                "../dist/sprite.svg"
+            ]
+            .forEach(function(u) {
+                var x = new XMLHttpRequest(),
+                    b = document.body;
+
+                // Check for CORS support
+                // If you're loading from same domain, you can remove the if statement
+                // XHR for Chrome/Firefox/Opera/Safari
+                if ("withCredentials" in x) {
+                    x.open("GET", u, true);
+                }
+                // XDomainRequest for older IE
+                else if (typeof XDomainRequest != "undefined") {
+                    x = new XDomainRequest();
+                    x.open("GET", u);
+                }
+                else {
+                    return;
+                }
+
+                x.send();
+                x.onload = function() {
+                    var c = document.createElement("div");
+                    c.setAttribute("hidden", "");
+                    c.innerHTML = x.responseText;
+                    b.insertBefore(c, b.childNodes[0]);
+                }
+            });
+        })();
+        </script>
+
+        <!-- Plyr core script -->
+        <script src="../src/js/plyr.js"></script>
+
+        <!-- Shr core script -->
+        <script src="https://cdn.shr.one/0.1.9/shr.js"></script>
+
+        <!-- Docs script -->
+        <script src="dist/docs.js"></script>
+    </body>
+</html>

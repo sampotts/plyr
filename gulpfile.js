@@ -41,8 +41,7 @@ paths = {
         // Source paths
         src: {
             less:       path.join(root, "docs/src/less/**/*"),
-            js:         path.join(root, "docs/src/js/**/*"),
-            sprite:     path.join(root, "docs/src/sprite/*.svg")
+            js:         path.join(root, "docs/src/js/**/*")
         },
         // Output paths
         output:         path.join(root, "docs/dist/"),
@@ -53,7 +52,7 @@ paths = {
 },
 
 // Task arrays
-tasks = {    
+tasks = {
     less:   [],
     sass:   [],
     js:     []
@@ -92,7 +91,7 @@ var build = {
     },
     less: function(files, bundle) {
         for (var key in files) {
-            (function (key) {       
+            (function (key) {
                 var name = "less-" + key;
                 tasks.less.push(name);
 
@@ -111,7 +110,7 @@ var build = {
     },
     sass: function(files, bundle) {
         for (var key in files) {
-            (function (key) {       
+            (function (key) {
                 var name = "sass-" + key;
                 tasks.sass.push(name);
 
@@ -130,16 +129,16 @@ var build = {
     },
     sprite: function(bundle) {
         // Process Icons
-        gulp.task("sprite-" + bundle, function () {
+        gulp.task("sprite", function () {
             return gulp
-                .src(paths[bundle].src.sprite)
+                .src(paths.plyr.src.sprite)
                 .pipe(svgmin({
                     plugins: [{
                         removeDesc: true
                     }]
                 }))
                 .pipe(svgstore())
-                .pipe(gulp.dest(paths[bundle].output));
+                .pipe(gulp.dest(paths.plyr.output));
         });
     }
 };
@@ -148,12 +147,16 @@ var build = {
 build.js(bundles.plyr.js, "plyr");
 build.less(bundles.plyr.less, "plyr");
 build.sass(bundles.plyr.sass, "plyr");
-build.sprite("plyr");
+build.sprite();
 
 // Docs files
 build.less(bundles.docs.less, "docs");
 build.js(bundles.docs.js, "docs");
-build.sprite("docs");
+
+// Build all JS
+gulp.task("js", function(){
+    run(tasks.js);
+});
 
 // Build SASS (for testing, default is LESS)
 gulp.task("sass", function(){
@@ -170,12 +173,11 @@ gulp.task("watch", function () {
     // Docs
     gulp.watch(paths.docs.src.js, tasks.js);
     gulp.watch(paths.docs.src.less, tasks.less);
-    gulp.watch(paths.docs.src.sprite, ["sprite-docs"]);
 });
 
 // Default gulp task
 gulp.task("default", function(){
-    run(tasks.js, tasks.less, "sprite-plyr", "sprite-docs", "watch");
+    run(tasks.js, tasks.less, "sprite", "watch");
 });
 
 // Publish a version to CDN and docs
@@ -211,7 +213,7 @@ if("cdn" in aws) {
 gulp.task("cdn", function () {
     console.log("Uploading " + version + " to " + aws.cdn.bucket);
 
-    // Upload to CDN 
+    // Upload to CDN
     gulp.src(paths.upload)
         .pipe(size({
             showFiles: true,
@@ -259,7 +261,7 @@ gulp.task("open", function () {
         }));
 });
 
-// Do everything 
+// Do everything
 gulp.task("publish", function () {
-    run(tasks.js, tasks.less, "sprite-plyr", "sprite-docs", "cdn", "docs");
+    run(tasks.js, tasks.less, "sprite", "cdn", "docs");
 });
