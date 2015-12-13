@@ -44,7 +44,7 @@ shr.setup({
 				player.source({
 					type:       'video',
 					title: 		'Bug Buck Bunny',
-					sources: [{ 
+					sources: [{
 						src:    'https://cdn.selz.com/plyr/1.0/movie.mp4',
 						type:   'video/mp4'
 					},
@@ -67,7 +67,7 @@ shr.setup({
 				player.source({
 					type:       'audio',
 					title: 		'96 by Logistics',
-					sources: [{ 
+					sources: [{
 						src:    'https://cdn.selz.com/plyr/1.0/logistics-96-sample.mp3',
 						type:   'audio/mp3'
 					},
@@ -89,8 +89,8 @@ shr.setup({
 			case 'vimeo':
 				player.source({
 					type:       'vimeo',
-					title: 		'Yosemite HD II',
-					sources:    '87701971'
+					title: 		'View from a blue moon',
+					sources:    '143418951'
 				});
 				break;
 		}
