@@ -1104,9 +1104,18 @@
                         var instance = event.target;
 
                         // Create a faux HTML5 API using the YouTube API
-                        plyr.media.play = function() { instance.playVideo(); };
-                        plyr.media.pause = function() { instance.pauseVideo(); };
-                        plyr.media.stop = function() { instance.stopVideo(); };
+                        plyr.media.play = function() {
+                            instance.playVideo();
+                            plyr.media.paused = false;
+                        };
+                        plyr.media.pause = function() {
+                            instance.pauseVideo();
+                            plyr.media.paused = true;
+                        };
+                        plyr.media.stop = function() {
+                            instance.stopVideo();
+                            plyr.media.paused = true;
+                        };
                         plyr.media.duration = instance.getDuration();
                         plyr.media.paused = !config.autoplay;
                         plyr.media.currentTime = instance.getCurrentTime();
@@ -1193,9 +1202,18 @@
             plyr.embed.addEvent('ready', function() {
 
                 // Create a faux HTML5 API using the Vimeo API
-                plyr.media.play = function() { plyr.embed.api('play'); };
-                plyr.media.pause = function() { plyr.embed.api('pause'); };
-                plyr.media.stop = function() { plyr.embed.api('stop') };
+                plyr.media.play = function() {
+                    plyr.embed.api('play');
+                    plyr.media.paused = false;
+                };
+                plyr.media.pause = function() {
+                    plyr.embed.api('pause');
+                    plyr.media.paused = true;
+                };
+                plyr.media.stop = function() {
+                    plyr.embed.api('stop');
+                    plyr.media.paused = true;
+                };
                 plyr.media.paused = !config.autoplay;
                 plyr.media.currentTime = 0;
 
