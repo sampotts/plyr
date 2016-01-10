@@ -1,21 +1,26 @@
 # Changelog
 
-# v1.3.5
+# v1.5.0
+- *Beta* Vimeo support (please report bugs)
+- New options for initialization (see docs)
+- 
+
+## v1.3.5
 - Fixed bug with API use on basic supported browsers
 
-# v1.3.4
+## v1.3.4
 - Code cleanup by @calvintam236
 
-# v1.3.3
+## v1.3.3
 - Removed captions being read by screen readers
 
-# v1.3.2
+## v1.3.2
 - Voiceover fix for captions
 
-# v1.3.1 
+## v1.3.1
 - ARIA improvements for captions being read
 
-# v1.3.0
+## v1.3.0
 - Internationalization support (i18n) using default controls (required markup changes to controls)
 - ARIA enhancements for controls (required markup changes to controls)
 - Captions legibility improvements
@@ -55,10 +60,10 @@
 - Bug fix for Chrome Canary
 
 ## v1.1.11
-- Bug fix 
+- Bug fix
 
 ## v1.1.10
-- Bug fix 
+- Bug fix
 
 ## v1.1.9
 - Bug fix for 1.1.8

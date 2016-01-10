@@ -21,7 +21,7 @@
 // Captions
 @font-size-captions-base:   ceil(@font-size-base * 1.25);
 @font-size-captions-medium: ceil(@font-size-base * 1.5);
-@font-size-captions-large:  (@font-size-base * 2); 
+@font-size-captions-large:  (@font-size-base * 2);
 
 // Controls
 @control-spacing:           10px;
@@ -36,7 +36,7 @@
 @tooltip-border-width:      1px;
 @tooltip-shadow:            0 0 5px @tooltip-border-color, 0 0 0 @tooltip-border-width @tooltip-border-color;
 @tooltip-color:             @control-color;
-@tooltip-padding:           @control-spacing;   
+@tooltip-padding:           @control-spacing;
 @tooltip-arrow-size:        6px;
 @tooltip-radius:            3px;
 
@@ -94,7 +94,7 @@
 // Contain floats: nicolasgallagher.com/micro-clearfix-hack/
 .clearfix() {
     zoom: 1;
-    &:before, 
+    &:before,
     &:after { content: ""; display: table; }
     &:after { clear: both; }
 }
@@ -110,9 +110,19 @@
     width: @volume-thumb-width;
     background: @volume-thumb-bg;
     border: 0;
-    border-radius: (@volume-thumb-height / 2);
-    transition: background .3s ease;
+    border-radius: 100%;
+    transition: background .3s ease, transform .2s ease;
     cursor: ew-resize;
+
+    &:hover {
+        transform: scale(110%);
+    }
+    &:active {
+        height: @volume-thumb-height + 3;
+        width: @volume-thumb-width + 3;
+        border: 2px solid @control-bg-hover;
+        background: #fff !important;
+    }
 }
 .volume-track() {
     height: @volume-track-height;
@@ -145,7 +155,7 @@
 
 // Styles
 // -------------------------------
-// Base 
+// Base
 .plyr {
     position: relative;
     max-width: 100%;
@@ -156,8 +166,8 @@
     &,
     *,
     *::after,
-    *::before { 
-        box-sizing: border-box; 
+    *::before {
+        box-sizing: border-box;
     }
 
     // For video
@@ -177,7 +187,7 @@
         height: 0;
         overflow: hidden;
         background: #000;
-        
+
         iframe {
             position: absolute;
             top: 0;
@@ -254,7 +264,7 @@
                 margin-top: 0;
             }
         }
-        
+
         // Buttons
         button {
             display: inline-block;
@@ -268,7 +278,7 @@
             cursor: pointer;
             color: @control-color;
             transition: background .3s ease, color .3s ease, opacity .3s ease;
-            
+
             svg {
                 width: 18px;
                 height: 18px;
@@ -276,7 +286,7 @@
                 fill: currentColor;
                 transition: fill .3s ease;
             }
-        
+
             // Hover and tab focus
             &.tab-focus,
             &:hover {
@@ -343,7 +353,7 @@
         transform: translate(-50%, (@tooltip-padding * 3)) scale(.8);
         transform-origin: 50% 100%;
         transition: transform .2s .1s ease, opacity .2s .1s ease;
-      
+
         // Arrows
         &::after,
         &::before {
@@ -363,15 +373,15 @@
             border-top: @border-arrow-size solid @tooltip-border-color;
             border-left: @border-arrow-size solid transparent;
             z-index: 1;
-        } 
-        // The background triangle  
+        }
+        // The background triangle
         &::before {
             bottom: -@tooltip-arrow-size;
             border-right: @tooltip-arrow-size solid transparent;
             border-top: @tooltip-arrow-size solid @tooltip-bg;
             border-left: @tooltip-arrow-size solid transparent;
             z-index: 2;
-        } 
+        }
     }
     button:hover .plyr-tooltip,
     button.tab-focus:focus .plyr-tooltip {
@@ -411,7 +421,7 @@
             background: transparent;
         }
         &-buffer[value],
-        &-played[value] {   
+        &-played[value] {
             &::-webkit-progress-bar {
                 background: transparent;
             }
@@ -457,7 +467,7 @@
                 -moz-appearance: none;
                 .seek-thumb();
             }
-            
+
             // Microsoft
             &::-ms-track {
                 color: transparent;
@@ -487,13 +497,13 @@
         background-repeat: repeat-x;
         background-color: @progress-buffered-bg;
         background-image: linear-gradient(
-            -45deg, 
-            @progress-loading-bg 25%, 
-            transparent 25%, 
-            transparent 50%, 
-            @progress-loading-bg 50%, 
+            -45deg,
+            @progress-loading-bg 25%,
+            transparent 25%,
+            transparent 50%,
+            @progress-loading-bg 50%,
             @progress-loading-bg 75%,
-            transparent 75%, 
+            transparent 75%,
             transparent);
         color: transparent;
     }
@@ -517,11 +527,11 @@
         -moz-appearance: none;
         width: 100px;
         margin: 0 @control-spacing 0 0;
-        padding: 0;     
+        padding: 0;
         cursor: pointer;
         background: transparent;
         border: none;
-        
+
         // Webkit
         &::-webkit-slider-runnable-track {
             .volume-track();
@@ -530,6 +540,10 @@
             -webkit-appearance: none;
             margin-top: -((@volume-thumb-height - @volume-track-height) / 2);
             .volume-thumb();
+
+            &:active {
+                margin-top: -(((@volume-thumb-height - @volume-track-height) / 2) + 1);
+            }
         }
 
         // Mozilla
@@ -539,7 +553,7 @@
         &::-moz-range-thumb {
             .volume-thumb();
         }
-        
+
         // Microsoft
         &::-ms-track {
             height: @volume-track-height;
@@ -614,7 +628,7 @@
         .plyr-video-wrapper {
             height: 100%;
             width: 100%;
-        }  
+        }
         .plyr-controls {
             position: absolute;
             bottom: 0;
