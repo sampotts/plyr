@@ -624,41 +624,42 @@
         video {
             height: 100%;
         }
-        .plyr-video-wrapper {
+        .plyr__video-wrapper {
             height: 100%;
             width: 100%;
         }
-        .plyr-controls {
+        .plyr__controls {
             position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
         }
+    }
 
-        // Hide controls when playing in full screen
-        &--fullscreen--hide-controls.plyr--playing {
-            .plyr__controls {
-                transform: translateY(100%) translateY(@control-spacing / 2);
-                transition: transform .3s .2s ease;
-            }
-            &.plyr--hover .plyr__controls {
-                transform: translateY(0);
-            }
-            .plyr__captions {
-                bottom: (@control-spacing / 2);
-                transition: bottom .3s .2s ease;
-            }
+    // Hide controls when playing in full screen
+    &--fullscreen--hide-controls.plyr--playing {
+        .plyr__controls {
+            transform: translateY(100%) translateY(@control-spacing / 2);
+            transition: transform .3s .2s ease;
         }
+        &.plyr--hover .plyr__controls {
+            transform: translateY(0);
+        }
+        .plyr__captions {
+            bottom: (@control-spacing / 2);
+            transition: bottom .3s .2s ease;
+        }
+    }
 
-        // Captions
-        .plyr__captions,
-        &--fullscreen--hide-controls.plyr--playing.plyr--hover .plyr__captions {
-            top: auto;
-            bottom: 90px;
+    // Captions
+    &--fullscreen .plyr__captions,
+    &--fullscreen-active .plyr__captions,
+    &--fullscreen--hide-controls.plyr--playing.plyr--hover .plyr__captions {
+        top: auto;
+        bottom: 90px;
 
-            @media (min-width: @bp-control-split) {
-                bottom: 60px;
-            }
+        @media (min-width: @bp-control-split) {
+            bottom: 60px;
         }
     }
 

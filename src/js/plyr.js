@@ -1431,12 +1431,16 @@
 
         // Play media
         function _play() {
-            plyr.media.play();
+            if('play' in plyr.media) {
+                plyr.media.play();
+            }
         }
 
         // Pause media
         function _pause() {
-            plyr.media.pause();
+            if('pause' in plyr.media) {
+                plyr.media.pause();
+            }
         }
 
         // Toggle playback
