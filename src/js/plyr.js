@@ -952,9 +952,18 @@
                         var instance = event.target;
 
                         // Create a faux HTML5 API using the YouTube API
-                        player.media.play = function() { instance.playVideo(); };
-                        player.media.pause = function() { instance.pauseVideo(); };
-                        player.media.stop = function() { instance.stopVideo(); };
+                        player.media.play = function() {
+                            instance.playVideo();
+                            player.media.paused = false;
+                        };
+                        player.media.pause = function() {
+                            instance.pauseVideo();
+                            player.media.paused = true;
+                        };
+                        player.media.stop = function() {
+                            instance.stopVideo();
+                            player.media.paused = true
+                        };
                         player.media.duration = instance.getDuration();
                         player.media.paused = true;
                         player.media.currentTime = instance.getCurrentTime();
