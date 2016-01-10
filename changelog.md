@@ -1,9 +1,14 @@
 # Changelog
 
 # v1.5.0
-- *Beta* Vimeo support (please report bugs)
-- New options for initialization (see docs)
-- 
+- *Beta* Vimeo support (please report bugs) (fixes #8)
+- New options for initialization (you can now pass a selector, HTMLElement or NodeList) (fixes #118)
+- Switched to BEM methodology (you will need to change CSS and probably HTML)
+- Decoupled CSS and JS hooks (fixes #129)
+- Custom controls container (fixes #98)
+- Fix for private/incognito mode local storage bug (fixes #131)
+- UMD module setup (fixes #121)
+- Specify iframe title for Vimeo and YouTube (fixes #124)
 
 ## v1.3.5
 - Fixed bug with API use on basic supported browsers

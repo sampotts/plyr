@@ -21,7 +21,7 @@ nav {
 }
 
 // Tabs
-.btn-bar {
+.btn__bar {
 	position: relative;
 	margin: 0 auto @padding-base;
 	max-width: @example-width-video;
@@ -60,10 +60,8 @@ nav {
 		display: block;
 		border-radius: 0;
 	}
-	.active {
-		&:extend(.btn-primary);
-	}
-	.btn.active {
+	.btn--active {
+		&:extend(.btn--primary);
 		box-shadow: inset 0 1px 1px rgba(0,0,0, .2);
 		position: relative;
 		z-index: 1;
@@ -80,7 +78,7 @@ nav {
 
 // Shared
 .btn,
-.btn-count {
+.btn__count {
 	display: inline-block;
 	vertical-align: middle;
 	border-radius: @border-radius-base;
@@ -91,12 +89,12 @@ nav {
 // Buttons
 .btn {
 	padding: (@padding-base / 2) @padding-base;
-	background: @body-background;
+	background: linear-gradient(lighten(@body-background, 2%), darken(@body-background, 3%));
 	border: 1px solid @gray-light;
-	box-shadow: inset 0 1px 0 #fff, 0 1px 1px rgba(0,0,0, .05);
+	box-shadow: 0 1px 1px rgba(0,0,0, .05);
 	text-shadow: 0 1px 1px #fff;
 	color: @gray;
-	transition: background .3s ease, border .3s ease, color .3s ease;
+	transition: background .1s ease, color .1s ease;
 
 	&:hover,
 	&:focus {
@@ -104,18 +102,18 @@ nav {
 		color: @gray;
 		outline: 0;
 	}
-	&-youtube .icon {
+	&--youtube .icon {
 		color: @color-youtube;
 	}
-	&-vimeo .icon {
+	&--vimeo .icon {
 		color: @color-vimeo;
 	}
-	&-twitter .icon {
+	&--twitter .icon {
 		color: @color-twitter;
 	}
 }
-.btn-primary {
-	background-image: linear-gradient(@link-color, darken(@link-color, 3%));
+.btn--primary {
+	background-image: linear-gradient(@link-color, darken(@link-color, 5%));
 	background-color: @link-color;
 	border-color: darken(@link-color, 10%);
 	box-shadow: 0 1px 1px rgba(0,0,0, .15);
@@ -128,13 +126,13 @@ nav {
 		border-color: darken(@link-color, 20%);
 	}
 }
-.btn-small {
+.btn--small {
 	padding-top: ceil(@padding-base / 3);
 	padding-bottom: ceil(@padding-base / 3);
 }
 
 // Count bubble
-.btn-count {
+.btn__count {
 	position: relative;
 	margin-left: (@padding-base / 2);
 	padding: (@padding-base / 2) (@padding-base * .75);

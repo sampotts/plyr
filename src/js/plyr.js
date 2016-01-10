@@ -7,25 +7,26 @@
 // Credits: http://paypal.github.io/accessible-html5-video-player/
 // ==========================================================================
 
-(function (root, factory) {
+(function(root, factory) {
+    'use strict';
+    /*global define,module*/
+
     if (typeof define === 'function' && define.amd) {
         // AMD
         define(null, factory);
-    } else if (typeof exports === 'object') {
+    } else if (typeof module === 'object') {
         // Node, CommonJS-like
         module.exports = factory();
     } else {
         // Browser globals (root is window)
         root.plyr = factory();
     }
-}(this, function () {
-    var api = {};
-
+}(this, function() {
     'use strict';
     /*global YT,$f*/
 
     // Globals
-    var fullscreen, config;
+    var fullscreen, config, api = {};
 
     // Default config
     var defaults = {
@@ -41,7 +42,10 @@
         iconPrefix:             'icon',
         selectors: {
             container:          '.plyr',
-            controls:           '.plyr-controls',
+            controls: {
+                container:      null,
+                wrapper:        '.plyr__controls'
+            },
             labels:             '[data-plyr] .sr-only, label .sr-only',
             buttons: {
                 seek:           '[data-plyr="seek"]',
@@ -56,33 +60,35 @@
                 fullscreen:     '[data-plyr="fullscreen"]'
             },
             progress: {
-                container:      '.plyr-progress',
-                buffer:         '.plyr-progress-buffer',
-                played:         '.plyr-progress-played'
+                container:      '.plyr__progress',
+                buffer:         '.plyr__progress--buffer',
+                played:         '.plyr__progress--played'
             },
-            captions:           '.plyr-captions',
-            currentTime:        '.plyr-current-time',
-            duration:           '.plyr-duration'
+            captions:           '.plyr__captions',
+            currentTime:        '.plyr__time--current',
+            duration:           '.plyr__time--duration'
         },
         classes: {
-            videoWrapper:       'plyr-video-wrapper',
-            embedWrapper:       'plyr-video-embed',
-            type:               'plyr-{0}',
-            stopped:            'stopped',
-            playing:            'playing',
-            muted:              'muted',
-            loading:            'loading',
-            tooltip:            'plyr-tooltip',
-            hidden:             'sr-only',
-            hover:              'plyr-hover',
+            videoWrapper:       'plyr__video-wrapper',
+            embedWrapper:       'plyr__video-embed',
+            type:               'plyr--{0}',
+            stopped:            'plyr--stopped',
+            playing:            'plyr--playing',
+            muted:              'plyr--muted',
+            loading:            'plyr--loading',
+            hover:              'plyr--hover',
+            tooltip:            'plyr__tooltip',
+            hidden:             'plyr__sr-only',
+            isIos:              'plyr--is-ios',
+            isTouch:            'plyr--is-touch',
             captions: {
-                enabled:        'captions-enabled',
-                active:         'captions-active'
+                enabled:        'plyr--captions-enabled',
+                active:         'plyr--captions-active'
             },
             fullscreen: {
-                enabled:        'fullscreen-enabled',
-                active:         'fullscreen-active',
-                hideControls:   'fullscreen-hide-controls'
+                enabled:        'plyr--fullscreen-enabled',
+                active:         'plyr--fullscreen-active',
+                hideControls:   'plyr--fullscreen--hide-controls'
             }
         },
         captions: {
@@ -112,10 +118,11 @@
             volume:             'Volume',
             toggleMute:         'Toggle Mute',
             toggleCaptions:     'Toggle Captions',
-            toggleFullscreen:   'Toggle Fullscreen'
+            toggleFullscreen:   'Toggle Fullscreen',
+            frameTitle:         'Player for {title}'
         },
         types: {
-            embed:              ['youtube','vimeo'],
+            embed:              ['youtube', 'vimeo'],
             html5:              ['video', 'audio']
         },
         urls: {
@@ -132,25 +139,25 @@
     function _buildControls() {
         // Open and add the progress and seek elements
         var html = [
-        '<div class="plyr-controls">',
-            '<div class="plyr-progress">',
-                '<label for="seek{id}" class="sr-only">Seek</label>',
-                '<input id="seek{id}" class="plyr-progress-seek" type="range" min="0" max="100" step="0.5" value="0" data-plyr="seek">',
-                '<progress class="plyr-progress-played" max="100" value="0">',
+        '<div class="plyr__controls">',
+            '<div class="plyr__progress">',
+                '<label for="seek{id}" class="plyr__sr-only">Seek</label>',
+                '<input id="seek{id}" class="plyr__progress--seek" type="range" min="0" max="100" step="0.5" value="0" data-plyr="seek">',
+                '<progress class="plyr__progress--played" max="100" value="0">',
                     '<span>0</span>% ' + config.i18n.played,
                 '</progress>',
-                '<progress class="plyr-progress-buffer" max="100" value="0">',
+                '<progress class="plyr__progress--buffer" max="100" value="0">',
                     '<span>0</span>% ' + config.i18n.buffered,
                 '</progress>',
             '</div>',
-            '<span class="plyr-controls-left">'];
+            '<span class="plyr__controls--left">'];
 
         // Restart button
         if (_inArray(config.controls, 'restart')) {
             html.push(
                 '<button type="button" data-plyr="restart">',
                     '<svg><use xlink:href="#' + config.iconPrefix + '-restart" /></svg>',
-                    '<span class="sr-only">' + config.i18n.restart + '</span>',
+                    '<span class="plyr__sr-only">' + config.i18n.restart + '</span>',
                 '</button>'
             );
         }
@@ -160,7 +167,7 @@
             html.push(
                 '<button type="button" data-plyr="rewind">',
                     '<svg><use xlink:href="#' + config.iconPrefix + '-rewind" /></svg>',
-                    '<span class="sr-only">' + config.i18n.rewind + '</span>',
+                    '<span class="plyr__sr-only">' + config.i18n.rewind + '</span>',
                 '</button>'
             );
         }
@@ -170,11 +177,11 @@
             html.push(
                 '<button type="button" data-plyr="play">',
                     '<svg><use xlink:href="#' + config.iconPrefix + '-play" /></svg>',
-                    '<span class="sr-only">' + config.i18n.play + '</span>',
+                    '<span class="plyr__sr-only">' + config.i18n.play + '</span>',
                 '</button>',
                 '<button type="button" data-plyr="pause">',
                     '<svg><use xlink:href="#' + config.iconPrefix + '-pause" /></svg>',
-                    '<span class="sr-only">' + config.i18n.pause + '</span>',
+                    '<span class="plyr__sr-only">' + config.i18n.pause + '</span>',
                 '</button>'
             );
         }
@@ -184,7 +191,7 @@
             html.push(
                 '<button type="button" data-plyr="fast-forward">',
                     '<svg><use xlink:href="#' + config.iconPrefix + '-fast-forward" /></svg>',
-                    '<span class="sr-only">' + config.i18n.forward + '</span>',
+                    '<span class="plyr__sr-only">' + config.i18n.forward + '</span>',
                 '</button>'
             );
         }
@@ -192,9 +199,9 @@
         // Media current time display
         if (_inArray(config.controls, 'current-time')) {
             html.push(
-                '<span class="plyr-time">',
-                    '<span class="sr-only">' + config.i18n.currentTime + '</span>',
-                    '<span class="plyr-current-time">00:00</span>',
+                '<span class="plyr__time">',
+                    '<span class="plyr__sr-only">' + config.i18n.currentTime + '</span>',
+                    '<span class="plyr__time--current">00:00</span>',
                 '</span>'
             );
         }
@@ -202,9 +209,9 @@
         // Media duration display
         if (_inArray(config.controls, 'duration')) {
             html.push(
-                '<span class="plyr-time">',
-                    '<span class="sr-only">' + config.i18n.duration + '</span>',
-                    '<span class="plyr-duration">00:00</span>',
+                '<span class="plyr__time">',
+                    '<span class="plyr__sr-only">' + config.i18n.duration + '</span>',
+                    '<span class="plyr__time--duration">00:00</span>',
                 '</span>'
             );
         }
@@ -212,16 +219,16 @@
         // Close left controls
         html.push(
             '</span>',
-            '<span class="plyr-controls-right">'
+            '<span class="plyr__controls--right">'
         );
 
         // Toggle mute button
         if (_inArray(config.controls, 'mute')) {
             html.push(
                 '<button type="button" data-plyr="mute">',
-                    '<svg class="icon-muted"><use xlink:href="#' + config.iconPrefix + '-muted" /></svg>',
+                    '<svg class="icon--muted"><use xlink:href="#' + config.iconPrefix + '-muted" /></svg>',
                     '<svg><use xlink:href="#' + config.iconPrefix + '-volume" /></svg>',
-                    '<span class="sr-only">' + config.i18n.toggleMute + '</span>',
+                    '<span class="plyr__sr-only">' + config.i18n.toggleMute + '</span>',
                 '</button>'
             );
         }
@@ -229,8 +236,8 @@
         // Volume range control
         if (_inArray(config.controls, 'volume')) {
             html.push(
-                '<label for="volume{id}" class="sr-only">' + config.i18n.volume + '</label>',
-                '<input id="volume{id}" class="plyr-volume" type="range" min="0" max="10" value="5" data-plyr="volume">'
+                '<label for="volume{id}" class="plyr__sr-only">' + config.i18n.volume + '</label>',
+                '<input id="volume{id}" class="plyr__volume" type="range" min="0" max="10" value="5" data-plyr="volume">'
             );
         }
 
@@ -238,9 +245,9 @@
         if (_inArray(config.controls, 'captions')) {
             html.push(
                 '<button type="button" data-plyr="captions">',
-                    '<svg class="icon-captions-on"><use xlink:href="#' + config.iconPrefix + '-captions-on" /></svg>',
+                    '<svg class="icon--captions-on"><use xlink:href="#' + config.iconPrefix + '-captions-on" /></svg>',
                     '<svg><use xlink:href="#' + config.iconPrefix + '-captions-off" /></svg>',
-                    '<span class="sr-only">' + config.i18n.toggleCaptions + '</span>',
+                    '<span class="plyr__sr-only">' + config.i18n.toggleCaptions + '</span>',
                 '</button>'
             );
         }
@@ -249,9 +256,9 @@
         if (_inArray(config.controls, 'fullscreen')) {
             html.push(
                 '<button type="button" data-plyr="fullscreen">',
-                    '<svg class="icon-exit-fullscreen"><use xlink:href="#' + config.iconPrefix + '-exit-fullscreen" /></svg>',
+                    '<svg class="icon--exit-fullscreen"><use xlink:href="#' + config.iconPrefix + '-exit-fullscreen" /></svg>',
                     '<svg><use xlink:href="#' + config.iconPrefix + '-enter-fullscreen" /></svg>',
-                    '<span class="sr-only">' + config.i18n.toggleFullscreen + '</span>',
+                    '<span class="plyr__sr-only">' + config.i18n.toggleFullscreen + '</span>',
                 '</button>'
             );
         }
@@ -338,7 +345,8 @@
         return {
             name:       name,
             version:    majorVersion,
-            ios:        /(iPad|iPhone|iPod)/g.test(navigator.platform)
+            ios:        /(iPad|iPhone|iPod)/g.test(navigator.platform),
+            touch:      'ontouchstart' in document.documentElement
         };
     }
 
@@ -477,14 +485,14 @@
     }
 
     // Toggle class on an element
-    function _toggleClass(element, name, state) {
+    function _toggleClass(element, className, state) {
         if (element) {
             if (element.classList) {
-                element.classList[state ? 'add' : 'remove'](name);
+                element.classList[state ? 'add' : 'remove'](className);
             }
             else {
-                var className = (' ' + element.className + ' ').replace(/\s+/g, ' ').replace(' ' + name + ' ', '');
-                element.className = className + (state ? ' ' + name : '');
+                var current = (' ' + element.className + ' ').replace(/\s+/g, ' ').replace(' ' + className + ' ', '');
+                element.className = current + (state ? ' ' + className : '');
             }
         }
     }
@@ -645,12 +653,30 @@
     function _storage() {
         var storage = {
             supported: (function() {
-                try {
-                    return 'localStorage' in window && window.localStorage !== null;
-                }
-                catch(e) {
-                    return false;
-                }
+                if(!('localStorage' in window)) {
+    				return false;
+    			}
+
+    			// Try to use it (it might be disabled, e.g. user is in private/porn mode)
+                // see: https://github.com/Selz/plyr/issues/131
+    			try {
+                    // Add test item
+    				window.localStorage.setItem('___test', 'OK');
+
+                    // Get the test item
+                    var result = window.localStorage.getItem('___test');
+
+                    // Clean up
+                    window.localStorage.removeItem('___test');
+
+                    // Check if value matches
+                    return (result === 'OK');
+    			}
+    			catch (e) {
+    				return false;
+    			}
+
+    			return false;
             })()
         };
         return storage;
@@ -793,8 +819,25 @@
             // Replace all id references with random numbers
             html = _replaceAll(html, '{id}', Math.floor(Math.random() * (10000)));
 
-            // Inject into the container
-            plyr.container.insertAdjacentHTML('beforeend', html);
+            // Controls container
+            var container;
+
+            // Inject to custom location
+            if (config.selectors.controls.container !== null) {
+                container = config.selectors.controls.container;
+
+                if(typeof selector === 'string') {
+                    container = document.querySelector(container);
+                }
+            }
+
+            // Inject into the container by default
+            if (!(container instanceof HTMLElement)) {
+                container = plyr.container
+            }
+
+            // Inject controls HTML
+            container.insertAdjacentHTML('beforeend', html);
 
             // Setup tooltips
             if (config.tooltips) {
@@ -812,7 +855,7 @@
         // Find the UI controls and store references
         function _findElements() {
             try {
-                plyr.controls                 = _getElement(config.selectors.controls);
+                plyr.controls                 = _getElement(config.selectors.controls.wrapper);
 
                 // Buttons
                 plyr.buttons = {};
@@ -863,13 +906,8 @@
             }
         }
 
-        // Setup aria attribute for play
-        function _setupPlayAria() {
-            // If there's no play button, bail
-            if (!plyr.buttons.play) {
-                return;
-            }
-
+        // Setup aria attribute for play and iframe title
+        function _setTitle(iframe) {
             // Find the current text
             var label = plyr.buttons.play.innerText || config.i18n.play;
 
@@ -878,7 +916,16 @@
                 label += ', ' + config.title;
             }
 
-            plyr.buttons.play.setAttribute('aria-label', label);
+            // If there's no play button, bail
+            if (plyr.buttons.play) {
+                plyr.buttons.play.setAttribute('aria-label', label);
+            }
+
+            // Set iframe title
+            // https://github.com/Selz/plyr/issues/124
+            if (iframe instanceof HTMLElement) {
+                iframe.setAttribute('title', config.i18n.frameTitle.replace('{title}', config.title));
+            }
         }
 
         // Setup media
@@ -900,9 +947,10 @@
                 _toggleClass(plyr.container, config.classes.stopped, config.autoplay);
 
                 // Add iOS class
-                if (plyr.browser.ios) {
-                    _toggleClass(plyr.container, 'ios', true);
-                }
+                _toggleClass(plyr.container, config.classes.isIos, plyr.browser.ios);
+
+                // Add touch class
+                _toggleClass(plyr.container, config.classes.isTouch, plyr.browser.touch);
 
                 // Inject the player wrapper
                 if (plyr.type === 'video') {
@@ -1013,10 +1061,13 @@
             // Inject and update UI
             if (plyr.supported.full) {
                 // Only setup controls once
-                if (!plyr.container.querySelectorAll(config.selectors.controls).length) {
+                if (!plyr.container.querySelectorAll(config.selectors.controls.wrapper).length) {
                     _setupInterface();
                 }
             }
+
+            // Set title
+            _setTitle(_getElement('iframe'));
 
             // Set the volume
             _setVolume();
@@ -1966,7 +2017,7 @@
 
             if ('title' in source) {
                 config.title = source.title;
-                _setupPlayAria();
+                _setTitle();
             }
         }
 
@@ -2120,7 +2171,7 @@
             plyr.init = false;
 
             // Remove controls
-            _remove(_getElement(config.selectors.controls));
+            _remove(_getElement(config.selectors.controls.wrapper));
 
             // YouTube
             if (plyr.type === 'youtube') {
@@ -2162,6 +2213,9 @@
             // Get the media element
             plyr.media = plyr.container.querySelectorAll('audio, video, div')[0];
 
+            // Add style hook
+            _toggleClass(plyr.container, defaults.selectors.container.replace('.', ''), true);
+
             // Get original classname
             plyr.originalClassName = plyr.container.className;
 
@@ -2177,7 +2231,7 @@
                 plyr.media.removeAttribute('data-video-id');
             }
             else {
-                plyr.type         = tagName;
+                plyr.type           = tagName;
                 config.crossorigin  = (plyr.media.getAttribute('crossorigin') !== null);
                 config.autoplay     = (config.autoplay || (plyr.media.getAttribute('autoplay') !== null));
                 config.loop         = (config.loop || (plyr.media.getAttribute('loop') !== null));
@@ -2216,8 +2270,8 @@
                     _displayDuration();
                 }
 
-                // Set up aria-label for Play button with the title option
-                _setupPlayAria();
+                // Set title on button and frame
+                _setTitle();
             }
 
             // Successful setup
@@ -2322,7 +2376,7 @@
     // Expose setup function
     api.setup = function(elements, options) {
         // Get the players
-        var instances = [], elements = [];
+        var instances = [];
 
         // Select the elements
         // Assume elements is a NodeList by default

@@ -141,18 +141,6 @@
     border: 0;
 }
 
-// Screen reader only
-// -------------------------------
-.sr-only {
-    position: absolute !important;
-    clip: rect(1px, 1px, 1px, 1px);
-    padding: 0 !important;
-    border: 0 !important;
-    height: 1px !important;
-    width: 1px !important;
-    overflow: hidden;
-}
-
 // Styles
 // -------------------------------
 // Base
@@ -170,8 +158,19 @@
         box-sizing: border-box;
     }
 
+    // Screen reader only elements
+    &__sr-only {
+        position: absolute !important;
+        clip: rect(1px, 1px, 1px, 1px);
+        padding: 0 !important;
+        border: 0 !important;
+        height: 1px !important;
+        width: 1px !important;
+        overflow: hidden;
+    }
+
     // For video
-    &-video-wrapper {
+    &__video-wrapper {
         position: relative;
     }
     video,
@@ -181,8 +180,8 @@
         vertical-align: middle;
     }
 
-    // For embeds
-    &-video-embed {
+    // Container for embeds
+    &__video-embed {
         padding-bottom: 56.25%; /* 16:9 */
         height: 0;
         overflow: hidden;
@@ -207,7 +206,7 @@
     }
 
     // Captions
-    &-captions {
+    &__captions {
         display: none;
         position: absolute;
         bottom: 0;
@@ -232,15 +231,15 @@
             font-size: @font-size-captions-medium;
         }
     }
-    &.captions-active &-captions {
+    &--captions-active &__captions {
         display: block;
     }
-    &.fullscreen-active &-captions {
+    &--fullscreen-active &__captions {
         font-size: @font-size-captions-large;
     }
 
     // Playback controls
-    &-controls {
+    &__controls {
         .clearfix();
         .font-smoothing();
         position: relative;
@@ -251,15 +250,15 @@
         box-shadow: 0 1px 1px rgba(red(@gray-dark), green(@gray-dark), blue(@gray-dark), .2);
 
         // Layout
-        &-right {
+        &--right {
             display: block;
             margin: @control-spacing auto 0;
         }
         @media (min-width: @bp-control-split) {
-            &-left {
+            &--left {
                 float: left;
             }
-            &-right {
+            &--right {
                 float: right;
                 margin-top: 0;
             }
@@ -300,14 +299,14 @@
         }
 
         // Hide toggle icons by default
-        .icon-exit-fullscreen,
-        .icon-muted,
-        .icon-captions-on {
+        .icon--exit-fullscreen,
+        .icon--muted,
+        .icon--captions-on {
             display: none;
         }
 
         // plyr time
-        .plyr-time {
+        .plyr__time {
             display: inline-block;
             vertical-align: middle;
             margin-left: @control-spacing;
@@ -318,7 +317,7 @@
         }
 
         // Media duration hidden on small screens
-        .plyr-time + .plyr-time {
+        .plyr__time + .plyr__time {
             display: none;
 
             @media (min-width: @bp-control-split) {
@@ -334,7 +333,7 @@
     }
 
     // Tooltips
-    &-tooltip {
+    &__tooltip {
         position: absolute;
         z-index: 2;
         bottom: 100%;
@@ -383,18 +382,18 @@
             z-index: 2;
         }
     }
-    button:hover .plyr-tooltip,
-    button.tab-focus:focus .plyr-tooltip {
+    button:hover .plyr__tooltip,
+    button.tab-focus:focus .plyr__tooltip {
         opacity: 1;
         transform: translate(-50%, 0) scale(1);
     }
-    button:hover .plyr-tooltip {
+    button:hover .plyr__tooltip {
         z-index: 3;
     }
 
     // Playback progress
     // <progress> element
-    &-progress {
+    &__progress {
         position: absolute;
         bottom: 100%;
         left: 0;
@@ -403,9 +402,9 @@
         height: @control-spacing;
         background: @progress-bg;
 
-        &-buffer[value],
-        &-played[value],
-        &-seek[type='range'] {
+        &--buffer[value],
+        &--played[value],
+        &--seek[type='range'] {
             position: absolute;
             left: 0;
             top: 0;
@@ -420,8 +419,8 @@
             border: none;
             background: transparent;
         }
-        &-buffer[value],
-        &-played[value] {
+        &--buffer[value],
+        &--played[value] {
             &::-webkit-progress-bar {
                 background: transparent;
             }
@@ -434,18 +433,18 @@
                 background: currentColor;
             }
         }
-        &-played[value] {
+        &--played[value] {
             z-index: 2;
             color: @progress-playing-bg;
         }
-        &-buffer[value] {
+        &--buffer[value] {
             color: @progress-buffered-bg;
         }
 
         // Seek control
         // <input[type='range']> element
         // Specificity is for bootstrap compatibility
-        &-seek[type='range'] {
+        &--seek[type='range'] {
             z-index: 4;
             cursor: pointer;
             outline: 0;
@@ -491,7 +490,7 @@
     }
 
     // Loading state
-    &.loading .plyr-progress-buffer {
+    &--loading .plyr__progress--buffer {
         animation: progress 1s linear infinite;
         background-size: @progress-loading-size @progress-loading-size;
         background-repeat: repeat-x;
@@ -509,18 +508,18 @@
     }
 
     // States
-    &-controls [data-plyr='pause'],
-    &.playing .plyr-controls [data-plyr='play'] {
+    &__controls [data-plyr='pause'],
+    &--playing .plyr__controls [data-plyr='play'] {
         display: none;
     }
-    &.playing .plyr-controls [data-plyr='pause'] {
+    &--playing .plyr__controls [data-plyr='pause'] {
         display: inline-block;
     }
 
     // Volume control
     // <input[type='range']> element
     // Specificity is for bootstrap compatibility
-    &-volume[type='range'] {
+    &__volume[type='range'] {
         display: inline-block;
         vertical-align: middle;
         -webkit-appearance: none;
@@ -588,30 +587,30 @@
     // Hide sound controls on iOS
     // It's not supported to change volume using JavaScript:
     // https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html
-    &.ios &-volume,
-    &.ios [data-plyr='mute'],
-    &-audio.ios &-controls-right {
+    &--is-ios &-volume,
+    &--is-ios [data-plyr='mute'],
+    &--is-ios.plyr--audio &__controls--right {
         display: none;
     }
     // Center buttons so it looks less odd
-    &-audio.ios &-controls-left {
+    &--is-ios.plyr--audio &__controls--left {
         float: none;
     }
 
     // Audio specific styles
     // Position the progress within the container
-    &-audio .plyr-controls {
+    &--audio .plyr__controls {
         padding-top: (@control-spacing * 2);
     }
-    &-audio .plyr-progress {
+    &--audio .plyr__progress {
         bottom: auto;
         top: 0;
         background: @off-white;
     }
 
     // Full screen mode
-    &-fullscreen,
-    &.fullscreen-active {
+    &--fullscreen,
+    &--fullscreen-active {
         position: fixed;
         top: 0;
         left: 0;
@@ -637,23 +636,23 @@
         }
 
         // Hide controls when playing in full screen
-        &.fullscreen-hide-controls.playing {
-            .plyr-controls {
+        &--fullscreen--hide-controls.plyr--playing {
+            .plyr__controls {
                 transform: translateY(100%) translateY(@control-spacing / 2);
                 transition: transform .3s .2s ease;
             }
-            &.plyr-hover .plyr-controls {
+            &.plyr--hover .plyr__controls {
                 transform: translateY(0);
             }
-            .plyr-captions {
+            .plyr__captions {
                 bottom: (@control-spacing / 2);
                 transition: bottom .3s .2s ease;
             }
         }
 
         // Captions
-        .plyr-captions,
-        &.fullscreen-hide-controls.playing.plyr-hover .plyr-captions {
+        .plyr__captions,
+        &--fullscreen--hide-controls.plyr--playing.plyr--hover .plyr__captions {
             top: auto;
             bottom: 90px;
 
@@ -664,9 +663,9 @@
     }
 
     // Change icons on state change
-    &.fullscreen-active .icon-exit-fullscreen,
-    &.muted .plyr-controls .icon-muted,
-    &.captions-active .plyr-controls .icon-captions-on {
+    &--fullscreen-active .icon--exit-fullscreen,
+    &--muted .plyr__controls .icon--muted,
+    &--captions-active .plyr__controls .icon--captions-on {
         display: block;
 
         & + svg {
@@ -679,8 +678,8 @@
     [data-plyr='fullscreen'] {
         display: none;
     }
-    &.captions-enabled [data-plyr='captions'],
-    &.fullscreen-enabled [data-plyr='fullscreen'] {
+    &--captions-enabled [data-plyr='captions'],
+    &--fullscreen-enabled [data-plyr='fullscreen'] {
         display: inline-block;
     }
 }

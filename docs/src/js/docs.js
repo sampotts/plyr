@@ -5,7 +5,7 @@
 /*global plyr, shr*/
 
 // Setup the player
-plyr.setup({
+plyr.setup('.js-media-player', {
 	debug: 		true,
 	title: 		'Video demo',
 	tooltips: 	true,
@@ -20,7 +20,7 @@ plyr.setup({
 // Setup shr
 shr.setup({
 	count: {
-		classname: 'btn-count'
+		classname: 'btn__count'
 	}
 });
 
@@ -37,22 +37,22 @@ shr.setup({
 	function newSource() {
 		var trigger = this,
 		type        = trigger.getAttribute('data-source'),
-		player      = document.querySelector('.plyr').plyr;
+		player      = document.querySelector('.js-media-player').plyr;
 
 		switch(type) {
 			case 'video':
 				player.source({
 					type:       'video',
-					title: 		'Bug Buck Bunny',
+					title: 		'View From A Blue Moon',
 					sources: [{
-						src:    'https://cdn.selz.com/plyr/1.0/movie.mp4',
+						src:    'https://cdn.selz.com/plyr/1.5/View_From_A_Blue_Moon_Trailer-HD.mp4',
 						type:   'video/mp4'
 					},
 					{
-						src:    'https://cdn.selz.com/plyr/1.0/movie.webm',
+						src:    'https://cdn.selz.com/plyr/1.5/View_From_A_Blue_Moon_Trailer-HD.webm',
 						type:   'video/webm'
 					}],
-					poster:     'https://cdn.selz.com/plyr/1.0/poster.jpg',
+					poster:     'https://cdn.selz.com/plyr/1.5/View_From_A_Blue_Moon_Trailer-HD.jpg',
 					tracks:     [{
 						kind:   'captions',
 						label:  'English',
@@ -66,13 +66,13 @@ shr.setup({
 			case 'audio':
 				player.source({
 					type:       'audio',
-					title: 		'96 by Logistics',
+					title: 		'Kishi Bashi &ndash; &ldquo;It All Began With A Burst&rdquo;',
 					sources: [{
-						src:    'https://cdn.selz.com/plyr/1.0/logistics-96-sample.mp3',
+						src:    'https://cdn.selz.com/plyr/1.5/Kishi_Bashi_-_It_All_Began_With_a_Burst.mp3',
 						type:   'audio/mp3'
 					},
 					{
-						src:    'https://cdn.selz.com/plyr/1.0/logistics-96-sample.ogg',
+						src:    'https://cdn.selz.com/plyr/1.5/Kishi_Bashi_-_It_All_Began_With_a_Burst.ogg',
 						type:   'audio/ogg'
 					}]
 				});
@@ -81,25 +81,25 @@ shr.setup({
 			case 'youtube':
 				player.source({
 					type:       'youtube',
-					title: 		'Enovato interview of Dan Cederholm for Made By',
-					sources:    'Au87oAJ2jeE'
+					title: 		'View From A Blue Moon',
+					sources:    'bTqVqk7FSmY'
 				});
 				break;
 
 			case 'vimeo':
 				player.source({
 					type:       'vimeo',
-					title: 		'View from a blue moon',
+					title: 		'View From A Blue Moon',
 					sources:    '143418951'
 				});
 				break;
 		}
 
 		for (var x = buttons.length - 1; x >= 0; x--) {
-			buttons[x].classList.remove('active');
+			buttons[x].classList.remove('btn--active');
 		}
 
-		event.target.classList.add('active');
+		event.target.classList.add('btn--active');
 	}
 })();
 

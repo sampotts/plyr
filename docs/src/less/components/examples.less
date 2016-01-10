@@ -3,10 +3,10 @@
 // ==========================================================================
 
 video,
-.plyr-video-embed {
+.plyr__video-embed {
     border-radius: @border-radius-base;
 }
-.plyr-video-embed {
+.plyr__video-embed {
     -webkit-mask-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC);
 }
 
@@ -15,15 +15,15 @@ video,
     margin: 0 auto @padding-base;
     max-width: @example-width-video;
 
-    &-controls {
+    &__controls {
         border-radius: 0 0 @border-radius-base @border-radius-base;
     }
     video,
-    .plyr-video-embed {
+    .plyr__video-embed {
         border-radius: @border-radius-base @border-radius-base 0 0;
     }
-    &-fullscreen,
-    &.fullscreen-active {
+    &--fullscreen,
+    &--fullscreen-active {
         max-width: none;
 
         .plyr-controls,
@@ -36,20 +36,20 @@ video,
         }
     }
 }
-.plyr-audio {
+.plyr--audio {
     max-width: @example-width-audio;
 
-    .plyr-controls {
+    .plyr__controls {
         border-radius: @border-radius-base;
     }
-    .plyr-progress {
+    .plyr__progress {
         border-radius: @border-radius-base @border-radius-base 0 0;
         overflow: hidden;
     }
 }
 
 // Style full supported player
-.cite {
+.plyr__cite {
     display: none;
 
     .icon {
@@ -57,9 +57,9 @@ video,
     }
 }
 
-.plyr-video ~ ul .cite-video,
-.plyr-audio ~ ul .cite-audio,
-.plyr-youtube ~ ul .cite-youtube,
-.plyr-vimeo ~ ul .cite-vimeo {
+.plyr--video ~ ul .plyr__cite--video,
+.plyr--audio ~ ul .plyr__cite--audio,
+.plyr--youtube ~ ul .plyr__cite--youtube,
+.plyr--vimeo ~ ul .plyr__cite--vimeo {
     display: block;
 }

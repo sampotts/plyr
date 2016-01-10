@@ -13,20 +13,20 @@
         <!-- Docs styles -->
         <link rel="stylesheet" href="https://cdn.plyr.io/1.3.7/docs.css">
     </head>
-    <body>
+    <<body>
         <header>
             <h1>Plyr</h1>
             <p>A simple, accessible HTML5 media player by <a href="https://twitter.com/sam_potts" target="_blank">@sam_potts</a> from <a href="https://twitter.com/selz" target="_blank">@selz</a></p>
             <nav>
                 <ul>
                     <li>
-                        <a href="https://github.com/selz/plyr" target="_blank" class="btn btn-primary" data-shr-network="github">
-                            <svg class="icon"><use xlink:href="#shr-github"/></svg>Download on GitHub
+                        <a href="https://github.com/selz/plyr" target="_blank" class="btn btn--primary" data-shr-network="github">
+                            <svg class="icon"><use xlink:href="#icon-github"/></svg>Download on GitHub
                         </a>
                     </li>
                     <li>
-                        <a href="https://twitter.com/intent/tweet?text=A+simple+HTML5+media+player+with+custom+controls+and+WebVTT+captions.&url=http%3A%2F%2Fplyr.io&via=Sam_Potts" target="_blank" class="btn btn-twitter" data-shr-network="twitter">
-                            <svg class="icon"><use xlink:href="#shr-twitter"/></svg>Tweet
+                        <a href="https://twitter.com/intent/tweet?text=A+simple+HTML5+media+player+with+custom+controls+and+WebVTT+captions.&url=http%3A%2F%2Fplyr.io&via=Sam_Potts" target="_blank" class="btn btn--twitter" data-shr-network="twitter">
+                            <svg class="icon"><use xlink:href="#icon-twitter"/></svg>Tweet
                         </a>
                     </li>
                 </ul>
@@ -34,44 +34,42 @@
         </header>
 
         <main role="main" id="main">
-            <nav class="btn-bar nav-panel">
+            <nav class="btn__bar">
                 <ul>
                     <li>
-                        <button type="button" class="btn active" data-source="video">Video</button>
+                        <button type="button" class="btn btn--active" data-source="video">Video</button>
                     </li>
-                    <li> 
+                    <li>
                         <button type="button" class="btn" data-source="audio">Audio</button>
                     </li>
                     <li>
-                        <button type="button" class="btn btn-youtube" data-source="youtube"><svg class="icon"><use xlink:href="#icon-youtube"/></svg>YouTube</button>
+                        <button type="button" class="btn btn--youtube" data-source="youtube"><svg class="icon"><use xlink:href="#icon-youtube"/></svg>YouTube</button>
                     </li>
                     <li>
-                        <button type="button" class="btn btn-vimeo" data-source="vimeo"><svg class="icon"><use xlink:href="#icon-vimeo"/></svg>Vimeo</button>
+                        <button type="button" class="btn btn--vimeo" data-source="vimeo"><svg class="icon"><use xlink:href="#icon-vimeo"/></svg>Vimeo <sup>BETA</sup></button>
                     </li>
                 </ul>
             </nav>
             <section>
-                <div class="plyr">
-                    <video poster="https://cdn.selz.com/plyr/1.0/poster.jpg" controls crossorigin>
+                <div class="js-media-player">
+                    <video poster="https://cdn.selz.com/plyr/1.5/View_From_A_Blue_Moon_Trailer-HD.jpg" controls crossorigin>
                         <!-- Video files -->
-                        <source src="https://cdn.selz.com/plyr/1.0/movie.mp4" type="video/mp4">
-                        <source src="https://cdn.selz.com/plyr/1.0/movie.webm" type="video/webm">
+                        <source src="https://cdn.selz.com/plyr/1.5/View_From_A_Blue_Moon_Trailer-HD.mp4" type="video/mp4">
+                        <source src="https://cdn.selz.com/plyr/1.5/View_From_A_Blue_Moon_Trailer-HD.webm" type="video/webm">
 
-                        
                         <!-- Text track file -->
                         <track kind="captions" label="English" srclang="en" src="https://cdn.selz.com/plyr/1.0/example_captions_en.vtt" default>
 
-                        
                         <!-- Fallback for browsers that don't support the <video> element -->
                         <a href="https://cdn.selz.com/plyr/1.0/movie.mp4">Download</a>
                     </video>
-                </div>   
+                </div>
 
-                <ul> 
-                    <li class="cite cite-video"><small><a href="https://www.bigbuckbunny.org" target="_blank">Big Buck Bunny</a> &copy; Copyright 2008, Blender Foundation</small></li>
-                    <li class="cite cite-audio"><small><a href="https://www.hospitalrecords.com/shop/artist/logistics" target="_blank">96 by Logistics</a> &copy; Copyright, Hospital Records</small></li> 
-                    <li class="cite cite-youtube"><small><a href="https://www.youtube.com/watch?v=Au87oAJ2jeE" target="_blank">Envato's "Made By" interview of Dan Cederholm</a> on <span class="color-youtube"><svg class="icon"><use xlink:href="#icon-youtube"/></svg>YouTube</span></small>
-                    <li class="cite cite-vimeo"><small><a href="https://vimeo.com/87701971" target="_blank">Yosemite HD II</a> on <span class="color-vimeo"><svg class="icon"><use xlink:href="#icon-vimeo"/></svg>Vimeo</span></small>
+                <ul>
+                    <li class="plyr__cite plyr__cite--video"><small><a href="http://viewfromabluemoon.com/" target="_blank">View From A Blue Moon</a> &copy; Brainfarm</small></li>
+                    <li class="plyr__cite plyr__cite--audio"><small><a href="http://www.kishibashi.com/" target="_blank">Kishi Bashi &ndash; &ldquo;It All Began With A Burst&rdquo;</a> &copy; Kishi Bashi</small></li>
+                    <li class="plyr__cite plyr__cite--youtube"><small><a href="https://www.youtube.com/watch?v=bTqVqk7FSmY" target="_blank">View From A Blue Moon</a> on <span class="color--youtube"><svg class="icon"><use xlink:href="#icon-youtube"/></svg>YouTube</span></small>
+                    <li class="plyr__cite plyr__cite--vimeo"><small><a href="https://vimeo.com/ondemand/viewfromabluemoon4k" target="_blank">View From A Blue Moon</a> on <span class="color--vimeo"><svg class="icon"><use xlink:href="#icon-vimeo"/></svg>Vimeo</span></small>
                 </ul>
             </section>
         </main>
