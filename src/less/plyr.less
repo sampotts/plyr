@@ -637,7 +637,7 @@
     }
 
     // Hide controls when playing in full screen
-    &--fullscreen--hide-controls.plyr--playing {
+    &--fullscreen--hide-controls&--fullscreen-active.plyr--playing {
         .plyr__controls {
             transform: translateY(100%) translateY(@control-spacing / 2);
             transition: transform .3s .2s ease;
@@ -654,7 +654,7 @@
     // Captions
     &--fullscreen .plyr__captions,
     &--fullscreen-active .plyr__captions,
-    &--fullscreen--hide-controls.plyr--playing.plyr--hover .plyr__captions {
+    &--fullscreen--hide-controls&--fullscreen-active&--playing&--hover .plyr__captions {
         top: auto;
         bottom: 90px;
 
