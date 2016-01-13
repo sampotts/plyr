@@ -444,7 +444,7 @@ Here's a list of the methods supported:
   </tr>
   <tr>
     <td><code>source(...)</code></td>
-    <td>Array or (null|undefined)</td>
+    <td>Array or undefined</td>
     <td>
       Get/Set the media source.
       <br><br>
@@ -459,8 +459,8 @@ Here's a list of the methods supported:
       <strong>YouTube</strong><br>
       Currently this API method only accepts a YouTube ID when used with a YouTube player. I will add URL support soon, along with being able to swap between types (e.g. YouTube to Audio or Video and vice versa.)
       <br><br>
-      <strong> null or undefined </strong><br>
-      Returns the current media source. Works for both native videos and embeds.
+      <strong>undefined</strong><br>
+      Returns the current media source url. Works for both native videos and embeds.
     </td>
   </tr>
   <tr>
@@ -707,4 +707,3 @@ Also these links helped created Plyr:
 
 ## Copyright and License
 [The MIT license](license.md).
-

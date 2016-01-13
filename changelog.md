@@ -12,6 +12,7 @@
 - Better handling of mission controls (fixes #132)
 - Retain classname on source change (fixes #120)
 - Increased thumb size on seek (partially fixes #130)
+- Passing no argument to `source` api method, now returns current source
 
 ## v1.3.5
 - Fixed bug with API use on basic supported browsers

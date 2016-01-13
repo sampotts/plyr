@@ -1930,6 +1930,35 @@
             }
         }
 
+        // Add common function to retrieve media source
+        function _source(source) {
+            // If not null or undefined, parse it
+            if(typeof source !== 'undefined') {
+                _updateSource(source);
+                return;
+            }
+
+            // Return the current source
+            var url;
+            switch(plyr.type) {
+                case 'youtube':
+                    url = plyr.embed.getVideoUrl();
+                    break;
+
+                case 'vimeo':
+                    plyr.embed.api('getVideoUrl', function (value) {
+                        url = value;
+                    });
+                    break;
+
+                default:
+                    url = plyr.media.currentSrc;
+                    break;
+            }
+
+            return url || '';
+        }
+
         // Update source
         // Sources are not checked for support so be careful
         function _updateSource(source) {
@@ -2394,7 +2423,7 @@
             rewind:             _rewind,
             forward:            _forward,
             seek:               _seek,
-            source:             _updateSource,
+            source:             _source,
             poster:             _updatePoster,
             setVolume:          _setVolume,
             togglePlay:         _togglePlay,
