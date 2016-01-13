@@ -1917,6 +1917,24 @@
                 player.type = tagName;
             }
         
+            // Add common function to retrieve media source
+            player.media.source = function() {
+                if(player.type === "youtube") {
+                    try {
+                        return player.embed.getVideoUrl();
+                    } catch(e) {
+                        return "";
+                    }
+                }
+                else {
+                    /* The following line may fail.
+                     * Not sure whether to bubble exception up or
+                     * return a default value or log to console.
+                     */
+                    return player.media.getElementsByTagName("source")[0].src;
+                }
+            };
+
             // Check for full support
             player.supported = api.supported(player.type);
 
