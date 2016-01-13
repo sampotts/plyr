@@ -55,19 +55,29 @@ nav {
 		& + li .btn {
 			margin-left: -1px;
 		}
+
+		&.active .btn {
+			&:extend(.btn--primary);
+			box-shadow: inset 0 1px 1px rgba(0,0,0, .2);
+			position: relative;
+			z-index: 1;
+
+			.icon {
+				color: inherit;
+			}
+		}
+		&.active + li .btn:hover {
+			z-index: 0;
+		}
 	}
 	.btn {
+		position: relative;
 		display: block;
 		border-radius: 0;
-	}
-	.btn--active {
-		&:extend(.btn--primary);
-		box-shadow: inset 0 1px 1px rgba(0,0,0, .2);
-		position: relative;
-		z-index: 1;
 
-		.icon {
-			color: inherit;
+		&:hover,
+		&:focus {
+			z-index: 1;
 		}
 	}
 

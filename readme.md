@@ -487,21 +487,21 @@ Video example:
 ```javascript
 player.source({
   type:       'video',
-  title:      'Bug Buck Bunny',
+  title:      'Example title',
   sources: [{
-      src:    'https://cdn.selz.com/plyr/1.0/movie.mp4',
+      src:    '/path/to/movie.mp4',
       type:   'video/mp4'
   },
   {
-      src:    'https://cdn.selz.com/plyr/1.0/movie.webm',
+      src:    '/path/to/movie.webm',
       type:   'video/webm'
   }],
-  poster:     'https://cdn.selz.com/plyr/1.0/poster.jpg',
+  poster:     '/path/to/poster.jpg',
   tracks:     [{
       kind:   'captions',
       label:  'English',
       srclang:'en',
-      src:    'https://cdn.selz.com/plyr/1.0/example_captions_en.vtt',
+      src:    '/path/to/captions.vtt',
       default: true
   }]
 });
@@ -512,13 +512,13 @@ Audio example:
 ```javascript
 player.source({
   type:       'audio',
-  title:      '96 by Logistics',
+  title:      'Example title',
   sources: [{
-    src:      'https://cdn.selz.com/plyr/1.0/logistics-96-sample.mp3',
+    src:      '/path/to/audio.mp3',
     type:     'audio/mp3'
   },
   {
-    src:      'https://cdn.selz.com/plyr/1.0/logistics-96-sample.ogg',
+    src:      '/path/to/audio.ogg',
     type:     'audio/ogg'
   }]
 });
@@ -528,9 +528,12 @@ YouTube example:
 
 ```javascript
 player.source({
-  type:       'youtube',
-  title:      'Enovato interview of Dan Cederholm for Made By',
-  sources:    'Au87oAJ2jeE'
+  type:       'video',
+  title:      'Example title',
+  sources: [{
+      src:    'bTqVqk7FSmY',
+      type:   'youtube'
+  }]
 });
 ```
 
@@ -539,8 +542,11 @@ Vimeo example
 ```javascript
 player.source({
   type:       'vimeo',
-  title:      'Yosemite HD II',
-  sources:    '87701971'
+  title:      'Example title',
+  sources: [{
+      src:    '143418951',
+      type:   'vimeo'
+  }]
 });
 ```
 

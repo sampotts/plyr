@@ -13,7 +13,7 @@
         <!-- Docs styles -->
         <link rel="stylesheet" href="https://cdn.plyr.io/1.3.7/docs.css">
     </head>
-    <<body>
+    <body>
         <header>
             <h1>Plyr</h1>
             <p>A simple, accessible HTML5 media player by <a href="https://twitter.com/sam_potts" target="_blank">@sam_potts</a> from <a href="https://twitter.com/selz" target="_blank">@selz</a></p>
@@ -36,8 +36,8 @@
         <main role="main" id="main">
             <nav class="btn__bar">
                 <ul>
-                    <li>
-                        <button type="button" class="btn btn--active" data-source="video">Video</button>
+                    <li class="active">
+                        <button type="button" class="btn" data-source="video">Video</button>
                     </li>
                     <li>
                         <button type="button" class="btn" data-source="audio">Audio</button>
@@ -79,42 +79,23 @@
         <script>
         (function() {
             [
-                "https://cdn.shr.one/0.1.9/sprite.svg",
-                "https://cdn.plyr.io/1.3.7/sprite.svg"
+                'https://cdn.plyr.io/1.3.7/sprite.svg',
+                'https://cdn.plyr.io/1.3.7/docs.svg'
             ]
             .forEach(function(u) {
-                var x = new XMLHttpRequest(),
-                    b = document.body;
-
+                var x = new XMLHttpRequest(), b = document.body;
                 // Check for CORS support
-                // If you're loading from same domain, you can remove the if statement
+                // If you're loading from same domain, you can remove the whole if/else statement
                 // XHR for Chrome/Firefox/Opera/Safari
-                if ("withCredentials" in x) {
-                    x.open("GET", u, true);
-                }
+                if ('withCredentials' in x) { x.open('GET', u, true); }
                 // XDomainRequest for older IE
-                else if (typeof XDomainRequest != "undefined") {
-                    x = new XDomainRequest();
-                    x.open("GET", u);
-                }
-                else {
-                    return;
-                }
+                else if (typeof XDomainRequest != 'undefined') { x = new XDomainRequest(); x.open('GET', u); }
+                else { return; }
 
                 x.send();
-                x.onload = function() {
-                    var c = document.createElement("div");
-                    c.setAttribute("hidden", "");
-                    c.innerHTML = x.responseText;
-                    b.insertBefore(c, b.childNodes[0]);
-                }
+                x.onload = function() { var c = document.createElement('div'); c.setAttribute('hidden', ''); c.innerHTML = x.responseText; b.insertBefore(c, b.childNodes[0]); }
             });
         })();
-        // Load the plyr sprite
-        loadSprite(document, "../dist/sprite.svg");
-
-        // This is for the docs only
-        loadSprite(document, "dist/sprite.svg");
         </script>
 
         <!-- Plyr core script -->

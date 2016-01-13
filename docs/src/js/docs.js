@@ -80,26 +80,32 @@ shr.setup({
 
 			case 'youtube':
 				player.source({
-					type:       'youtube',
+					type:       'video',
 					title: 		'View From A Blue Moon',
-					sources:    'bTqVqk7FSmY'
+					sources: [{
+				        src:    'bTqVqk7FSmY',
+				        type:   'youtube'
+				    }]
 				});
 				break;
 
 			case 'vimeo':
 				player.source({
-					type:       'vimeo',
+					type:       'video',
 					title: 		'View From A Blue Moon',
-					sources:    '143418951'
+					sources: [{
+				        src:    '143418951',
+				        type:   'vimeo'
+				    }]
 				});
 				break;
 		}
 
 		for (var x = buttons.length - 1; x >= 0; x--) {
-			buttons[x].classList.remove('btn--active');
+			buttons[x].parentElement.classList.remove('active');
 		}
 
-		event.target.classList.add('btn--active');
+		event.target.parentElement.classList.add('active');
 	}
 })();
 

@@ -41,7 +41,8 @@ paths = {
         // Source paths
         src: {
             less:       path.join(root, "docs/src/less/**/*"),
-            js:         path.join(root, "docs/src/js/**/*")
+            js:         path.join(root, "docs/src/js/**/*"),
+            sprite:     path.join(root, "docs/src/sprite/**/*")
         },
         // Output paths
         output:         path.join(root, "docs/dist/"),
@@ -55,7 +56,8 @@ paths = {
 tasks = {
     less:   [],
     sass:   [],
-    js:     []
+    js:     [],
+    sprite: []
 },
 
 // Fetch bundles from JSON
@@ -128,17 +130,21 @@ var build = {
         }
     },
     sprite: function(bundle) {
+        var name = "sprite-" + bundle;
+        tasks.sprite.push(name);
+
         // Process Icons
-        gulp.task("sprite", function () {
+        gulp.task(name, function () {
             return gulp
-                .src(paths.plyr.src.sprite)
+                .src(paths[bundle].src.sprite)
                 .pipe(svgmin({
                     plugins: [{
                         removeDesc: true
                     }]
                 }))
                 .pipe(svgstore())
-                .pipe(gulp.dest(paths.plyr.output));
+                .pipe(rename({ basename: (bundle == "plyr" ? "sprite" : bundle) }))
+                .pipe(gulp.dest(paths[bundle].output));
         });
     }
 };
@@ -147,11 +153,12 @@ var build = {
 build.js(bundles.plyr.js, "plyr");
 build.less(bundles.plyr.less, "plyr");
 build.sass(bundles.plyr.sass, "plyr");
-build.sprite();
+build.sprite("plyr");
 
 // Docs files
 build.less(bundles.docs.less, "docs");
 build.js(bundles.docs.js, "docs");
+build.sprite("docs");
 
 // Build all JS
 gulp.task("js", function(){
@@ -168,16 +175,17 @@ gulp.task("watch", function () {
     // Plyr core
     gulp.watch(paths.plyr.src.js, tasks.js);
     gulp.watch(paths.plyr.src.less, tasks.less);
-    gulp.watch(paths.plyr.src.sprite, ["sprite-plyr"]);
+    gulp.watch(paths.plyr.src.sprite, tasks.sprite);
 
     // Docs
     gulp.watch(paths.docs.src.js, tasks.js);
     gulp.watch(paths.docs.src.less, tasks.less);
+    gulp.watch(paths.docs.src.sprite, tasks.sprite);
 });
 
 // Default gulp task
 gulp.task("default", function(){
-    run(tasks.js, tasks.less, "sprite", "watch");
+    run(tasks.js, tasks.less, tasks.sprite, "watch");
 });
 
 // Publish a version to CDN and docs
@@ -263,5 +271,5 @@ gulp.task("open", function () {
 
 // Do everything
 gulp.task("publish", function () {
-    run(tasks.js, tasks.less, "sprite", "cdn", "docs");
+    run(tasks.js, tasks.less, tasks.sprite, "cdn", "docs");
 });

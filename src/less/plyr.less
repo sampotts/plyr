@@ -158,6 +158,11 @@
         box-sizing: border-box;
     }
 
+    // Fix 300ms delay
+    a, button, input, label {
+        touch-action: manipulation;
+    }
+
     // Screen reader only elements
     &__sr-only {
         position: absolute !important;
@@ -637,7 +642,7 @@
     }
 
     // Hide controls when playing in full screen
-    &--fullscreen--hide-controls&--fullscreen-active.plyr--playing {
+    &--fullscreen--hide-controls&--fullscreen-active&--playing {
         .plyr__controls {
             transform: translateY(100%) translateY(@control-spacing / 2);
             transition: transform .3s .2s ease;
@@ -654,7 +659,7 @@
     // Captions
     &--fullscreen .plyr__captions,
     &--fullscreen-active .plyr__captions,
-    &--fullscreen--hide-controls&--fullscreen-active&--playing&--hover .plyr__captions {
+    &--fullscreen--hide-controls&--fullscreen-active&--playing&--hover &__captions {
         top: auto;
         bottom: 90px;
 

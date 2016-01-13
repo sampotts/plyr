@@ -127,7 +127,7 @@
         },
         urls: {
             vimeo: {
-                api:            'https://f.vimeocdn.com/js/froogaloop2.min.js'
+                api:            'http://cdn.plyr.io/froogaloop/1.0.0/plyr.froogaloop.js',
             },
             youtube: {
                 api:            'https://www.youtube.com/iframe_api'
@@ -968,7 +968,7 @@
 
             // Embeds
             if (_inArray(config.types.embed, plyr.type)) {
-                _setupEmbed(plyr.embedId, plyr.type);
+                _setupEmbed();
 
                 // Clean up
                 plyr.embedId = null;
@@ -982,8 +982,9 @@
         }
 
         // Setup YouTube/Vimeo
-        function _setupEmbed(videoId) {
+        function _setupEmbed() {
             var container = document.createElement('div'),
+                videoId = plyr.embedId,
                 id = plyr.type + '-' + Math.floor(Math.random() * (10000));
 
             // Remove old containers
@@ -1013,7 +1014,15 @@
                     _injectScript(config.urls.youtube.api);
 
                     // Setup callback for the API
-                    window.onYouTubeIframeAPIReady = function () { _youTubeReady(videoId, container); };
+                    window.onYouTubeReadyCallbacks = window.onYouTubeReadyCallbacks || [];
+
+                    // Add to queue
+                    window.onYouTubeReadyCallbacks.push(function() { _youTubeReady(videoId, container) });
+
+                    // Set callback to process queue
+                    window.onYouTubeIframeAPIReady = function () {
+                        window.onYouTubeReadyCallbacks.forEach(function(callback) { callback(); });
+                    };
                 }
             }
             // Vimeo
@@ -1036,23 +1045,18 @@
                 container.appendChild(iframe);
                 plyr.media.appendChild(container);
 
-                // Setup API
-                if (typeof Froogaloop === 'function') {
-                    _on(iframe, 'load', _vimeoReady);
-                }
-                else {
-                    // Load the API
+                // Load the API
+                if (!('$f' in window)) {
                     _injectScript(config.urls.vimeo.api);
-
-                    // Wait for fragaloop load
-                    var timer = window.setInterval(function() {
-                        if ('$f' in window && iframe.loaded) {
-                            window.clearInterval(timer);
-
-                            _vimeoReady.call(iframe);
-                        }
-                    }, 50);
                 }
+
+                // Wait for fragaloop load
+                var timer = window.setInterval(function() {
+                    if ('$f' in window && iframe.loaded) {
+                        window.clearInterval(timer);
+                        _vimeoReady.call(iframe);
+                    }
+                }, 50);
             }
         }
 
@@ -1096,7 +1100,8 @@
                     cc_lang_pref: 'en',
                     wmode: 'transparent',
                     modestbranding: 1,
-                    disablekb: 1
+                    disablekb: 1,
+                    origin: '*' // https://code.google.com/p/gdata-issues/issues/detail?id=5788#c45
                 },
                 events: {
                     'onReady': function(event) {
@@ -1914,7 +1919,8 @@
         // Update source
         // Sources are not checked for support so be careful
         function _updateSource(source) {
-            if (typeof source === 'undefined') {
+            if (typeof source === 'undefined' || !('sources' in source) || !source.sources.length) {
+                _log('Invalid source format', true);
                 return;
             }
 
@@ -1938,9 +1944,18 @@
             // Remove the old media
             _remove(plyr.media);
 
-            // Set the new type
-            if ('type' in source && source.type !== plyr.type) {
+            // Set the type
+            if ('type' in source) {
                 plyr.type = source.type;
+
+                // Get child type for video (it might be an embed)
+                if(plyr.type === 'video') {
+                    var firstSource = source.sources[0];
+
+                    if('type' in firstSource && _inArray(config.types.embed, firstSource.type)) {
+                        plyr.type = firstSource.type;
+                    }
+                }
             }
 
             // Create new markup
@@ -1956,7 +1971,7 @@
                 case 'youtube':
                 case 'vimeo':
                     plyr.media = document.createElement('div');
-                    plyr.embedId = (typeof source.sources === 'string' ? source.sources : source.sources[0].src);
+                    plyr.embedId = source.sources[0].src;
                     break;
             }
 
@@ -1988,11 +2003,6 @@
 
             // Autoplay the new source?
             config.autoplay = (source.autoplay || config.autoplay);
-
-            // Set media id for embeds
-            if (_inArray(config.types.embed, plyr.type)) {
-                plyr.embedId = source.sources;
-            }
 
             // Set new sources for html5
             if (_inArray(config.types.html5, plyr.type)) {
@@ -2084,6 +2094,11 @@
                     _toggleClass(element, 'tab-focus', false);
                 });
             }
+
+            // Messages
+            /*_on(window, 'message', function(event) {
+                _log(event);
+            });*/
 
             // Play
             _on(plyr.buttons.play, 'click', function() {
