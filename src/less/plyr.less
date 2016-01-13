@@ -113,16 +113,6 @@
     border-radius: 100%;
     transition: background .3s ease, transform .2s ease;
     cursor: ew-resize;
-
-    &:hover {
-        transform: scale(110%);
-    }
-    &:active {
-        height: @volume-thumb-height + 3;
-        width: @volume-thumb-width + 3;
-        border: 2px solid @control-bg-hover;
-        background: #fff !important;
-    }
 }
 .volume-track() {
     height: @volume-track-height;
@@ -133,8 +123,9 @@
 .seek-thumb() {
     background: transparent;
     border: 0;
-    width: (@control-spacing * 2);
+    width: (@control-spacing * 4);
     height: @control-spacing;
+    transform: translateX(-50%);
 }
 .seek-track() {
     background: none;
@@ -544,10 +535,6 @@
             -webkit-appearance: none;
             margin-top: -((@volume-thumb-height - @volume-track-height) / 2);
             .volume-thumb();
-
-            &:active {
-                margin-top: -(((@volume-thumb-height - @volume-track-height) / 2) + 1);
-            }
         }
 
         // Mozilla

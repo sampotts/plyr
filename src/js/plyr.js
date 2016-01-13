@@ -533,6 +533,11 @@
 
     // Trigger event
     function _triggerEvent(element, event) {
+        // Bail if no element
+        if(!element || !event) {
+            return;
+        }
+
         // Create faux event
         var fauxEvent = document.createEvent('MouseEvents');
 
@@ -545,6 +550,11 @@
 
     // Toggle aria-pressed state on a toggle button
     function _toggleState(target, state) {
+        // Bail if no target
+        if(!target) {
+            return;
+        }
+
         // Get state
         state = (typeof state === 'boolean' ? state : !target.getAttribute('aria-pressed'));
 
@@ -909,14 +919,14 @@
         // Setup aria attribute for play and iframe title
         function _setTitle(iframe) {
             // Find the current text
-            var label = plyr.buttons.play.innerText || config.i18n.play;
+            var label = config.i18n.play;
 
             // If there's a media title set, use that for the label
             if (typeof(config.title) !== 'undefined' && config.title.length) {
                 label += ', ' + config.title;
             }
 
-            // If there's no play button, bail
+            // If there's a play button, set label
             if (plyr.buttons.play) {
                 plyr.buttons.play.setAttribute('aria-label', label);
             }
@@ -2065,6 +2075,24 @@
             // IE doesn't support input event, so we fallback to change
             var inputEvent = (plyr.browser.name == 'IE' ? 'change' : 'input');
 
+            // Click play/pause helpers
+            function _onPlay() {
+                _play();
+                setTimeout(function() {
+                    if(plyr.buttons.pause) {
+                        plyr.buttons.pause.focus();
+                    }
+                }, 100);
+            }
+            function _onPause() {
+                _pause();
+                setTimeout(function() {
+                    if(plyr.buttons.play) {
+                        plyr.buttons.play.focus();
+                    }
+                }, 100);
+            }
+
             // Detect tab focus
             function checkFocus() {
                 var focused = document.activeElement;
@@ -2095,22 +2123,11 @@
                 });
             }
 
-            // Messages
-            /*_on(window, 'message', function(event) {
-                _log(event);
-            });*/
-
             // Play
-            _on(plyr.buttons.play, 'click', function() {
-                _play();
-                setTimeout(function() { plyr.buttons.pause.focus(); }, 100);
-            });
+            _on(plyr.buttons.play, 'click', _onPlay);
 
             // Pause
-            _on(plyr.buttons.pause, 'click', function() {
-                _pause();
-                setTimeout(function() { plyr.buttons.play.focus(); }, 100);
-            });
+            _on(plyr.buttons.pause, 'click', _onPause);
 
             // Restart
             _on(plyr.buttons.restart, 'click', _seek);
@@ -2179,14 +2196,14 @@
             if (plyr.type === 'video' && config.click) {
                 _on(plyr.videoContainer, 'click', function() {
                     if (plyr.media.paused) {
-                        _triggerEvent(plyr.buttons.play, 'click');
+                        _onPlay();
                     }
                     else if (plyr.media.ended) {
                         _seek();
-                        _triggerEvent(plyr.buttons.play, 'click');
+                        _onPlay();
                     }
                     else {
-                        _triggerEvent(plyr.buttons.pause, 'click');
+                        _onPause();
                     }
                 });
             }

@@ -9,6 +9,9 @@
 - Fix for private/incognito mode local storage bug (fixes #131)
 - UMD module setup (fixes #121)
 - Specify iframe title for Vimeo and YouTube (fixes #124)
+- Better handling of mission controls (fixes #132)
+- Retain classname on source change (fixes #120)
+- Increased thumb size on seek (partially fixes #130)
 
 ## v1.3.5
 - Fixed bug with API use on basic supported browsers

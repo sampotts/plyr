@@ -541,7 +541,7 @@ Vimeo example
 
 ```javascript
 player.source({
-  type:       'vimeo',
+  type:       'video',
   title:      'Example title',
   sources: [{
       src:    '143418951',
