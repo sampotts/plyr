@@ -1716,6 +1716,27 @@
             }
         }
 
+        // Add common function to retrieve media source
+        function _source(args) {
+            // If not null or undefined, parse it
+            if(args !== null && args !== undefined) {
+                return _parseSource(args);
+            }
+
+            // Return the current source
+
+            // The following lines inside if/else may fail.
+            // Not sure whether to bubble exception up or
+            // return a default value or log to console.
+            if(player.type === "youtube") {
+                return player.embed.getVideoUrl();
+            }
+            else {
+                return player.media.currentSrc;
+            }
+        }
+
+
         // Update poster
         function _updatePoster(source) {
             if (player.type === 'video') {
@@ -1997,7 +2018,7 @@
             rewind:             _rewind,
             forward:            _forward,
             seek:               _seek,
-            source:             _parseSource,
+            source:             _source,
             poster:             _updatePoster,
             setVolume:          _setVolume,
             togglePlay:         _togglePlay,
