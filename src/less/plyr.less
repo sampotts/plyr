@@ -100,8 +100,8 @@
 }
 // Tab focus styles
 .tab-focus() {
-    outline: thin dotted #000;
-    outline-offset: 0;
+    outline: 1px dotted fade(@gray-dark, 80%);
+    outline-offset: 3px;
 }
 
 // <input type="range"> styling
@@ -385,6 +385,11 @@
     }
     button:hover .plyr__tooltip {
         z-index: 3;
+    }
+
+    // Common range styles
+    input[type='range'].tab-focus {
+        .tab-focus();
     }
 
     // Playback progress

@@ -89,7 +89,8 @@
                 enabled:        'plyr--fullscreen-enabled',
                 active:         'plyr--fullscreen-active',
                 hideControls:   'plyr--fullscreen--hide-controls'
-            }
+            },
+            tabFocus:           'tab-focus'
         },
         captions: {
             defaultActive:      false
@@ -487,14 +488,16 @@
     // Toggle class on an element
     function _toggleClass(element, className, state) {
         if (element) {
-            if (element.classList) {
-                element.classList[state ? 'add' : 'remove'](className);
-            }
-            else {
-                var current = (' ' + element.className + ' ').replace(/\s+/g, ' ').replace(' ' + className + ' ', '');
-                element.className = current + (state ? ' ' + className : '');
-            }
+            element.classList[state ? 'add' : 'remove'](className);
         }
+    }
+
+    // Has class name
+    function _hasClass(element, className) {
+        if (element) {
+            return element.classList.contains(className);
+        }
+        return false;
     }
 
     // Toggle event
@@ -878,6 +881,7 @@
                 plyr.buttons.fullscreen       = _getElement(config.selectors.buttons.fullscreen);
 
                 // Inputs
+                plyr.buttons.volume           = _getElement(config.selectors.buttons.volume);
                 plyr.buttons.mute             = _getElement(config.selectors.buttons.mute);
                 plyr.buttons.captions         = _getElement(config.selectors.buttons.captions);
                 plyr.checkboxes               = _getElements('[type="checkbox"]');
@@ -2075,22 +2079,33 @@
             // IE doesn't support input event, so we fallback to change
             var inputEvent = (plyr.browser.name == 'IE' ? 'change' : 'input');
 
-            // Click play/pause helpers
-            function _onPlay() {
-                _play();
-                setTimeout(function() {
-                    if(plyr.buttons.pause) {
-                        plyr.buttons.pause.focus();
-                    }
-                }, 100);
-            }
-            function _onPause() {
-                _pause();
-                setTimeout(function() {
-                    if(plyr.buttons.play) {
-                        plyr.buttons.play.focus();
-                    }
-                }, 100);
+            // Click play/pause helper
+            function _togglePlay(play) {
+                // Toggle playback
+                if (play) {
+                    _play();
+                }
+                else {
+                    _pause();
+                }
+
+                // Determine which buttons
+                var trigger = plyr.buttons[play ? "play" : "pause"],
+                    target = plyr.buttons[play ? "pause" : "play"];
+
+                // Setup focus and tab focus
+                if(target) {
+                    var hadTabFocus = _hasClass(trigger, config.classes.tabFocus);
+
+                    setTimeout(function() {
+                        target.focus();
+
+                        if(hadTabFocus) {
+                            _toggleClass(trigger, config.classes.tabFocus, false);
+                            _toggleClass(target, config.classes.tabFocus, true);
+                        }
+                    }, 100);
+                }
             }
 
             // Detect tab focus
@@ -2105,7 +2120,7 @@
                 for (var button in plyr.buttons) {
                     var element = plyr.buttons[button];
 
-                    _toggleClass(element, 'tab-focus', (element === focused));
+                    _toggleClass(element, config.classes.tabFocus, (element === focused));
                 }
             }
             _on(window, 'keyup', function(event) {
@@ -2115,19 +2130,13 @@
                     checkFocus();
                 }
             });
-            for (var button in plyr.buttons) {
-                var element = plyr.buttons[button];
-
-                _on(element, 'blur', function() {
-                    _toggleClass(element, 'tab-focus', false);
-                });
-            }
+            _on(document.body, 'click', checkFocus);
 
             // Play
-            _on(plyr.buttons.play, 'click', _onPlay);
+            _on(plyr.buttons.play, 'click', function() { _togglePlay(true); });
 
             // Pause
-            _on(plyr.buttons.pause, 'click', _onPause);
+            _on(plyr.buttons.pause, 'click', function() { _togglePlay(); });
 
             // Restart
             _on(plyr.buttons.restart, 'click', _seek);
@@ -2196,14 +2205,14 @@
             if (plyr.type === 'video' && config.click) {
                 _on(plyr.videoContainer, 'click', function() {
                     if (plyr.media.paused) {
-                        _onPlay();
+                        _play();
                     }
                     else if (plyr.media.ended) {
                         _seek();
-                        _onPlay();
+                        _play();
                     }
                     else {
-                        _onPause();
+                        _pause();
                     }
                 });
             }
