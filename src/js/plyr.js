@@ -13,15 +13,15 @@
 
     if (typeof define === 'function' && define.amd) {
         // AMD
-        define(null, factory);
+        define(null, function() { factory(root, document) });
     } else if (typeof module === 'object') {
         // Node, CommonJS-like
-        module.exports = factory();
+        module.exports = factory(root, document);
     } else {
         // Browser globals (root is window)
-        root.plyr = factory();
+        root.plyr = factory(root, document);
     }
-}(this, function() {
+}(this, function(window, document) {
     'use strict';
     /*global YT,$f*/
 
