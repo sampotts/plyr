@@ -2130,7 +2130,16 @@
                     checkFocus();
                 }
             });
-            _on(document.body, 'click', checkFocus);
+            _on(document.body, 'click', function() {
+                _toggleClass(_getElement('.' + config.classes.tabFocus), config.classes.tabFocus, false);
+            });
+            for (var button in plyr.buttons) {
+                var element = plyr.buttons[button];
+
+                _on(element, 'blur', function() {
+                    _toggleClass(element, 'tab-focus', false);
+                });
+            }
 
             // Play
             _on(plyr.buttons.play, 'click', function() { _togglePlay(true); });
