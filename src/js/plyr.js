@@ -1992,6 +1992,12 @@
             _updateProgress(event);
         }
 
+        // Add track
+        function _track(tracks) {
+            _insertChildElements('track', tracks);
+            _setupCaptions();
+        }
+
         // Add common function to retrieve media source
         function _source(source) {
             // If not null or undefined, parse it
@@ -2486,6 +2492,7 @@
             forward:            _forward,
             seek:               _seek,
             source:             _source,
+            track:              _track,
             poster:             _updatePoster,
             setVolume:          _setVolume,
             togglePlay:         _togglePlay,
