@@ -98,13 +98,14 @@ nav {
 
 // Buttons
 .btn {
-	padding: (@padding-base / 2) @padding-base;
+	padding: (@padding-base / 2) ((@padding-base / 2) + 2);
 	background: linear-gradient(lighten(@body-background, 2%), darken(@body-background, 3%));
 	border: 1px solid @gray-light;
 	box-shadow: 0 1px 1px rgba(0,0,0, .05);
 	text-shadow: 0 1px 1px #fff;
 	color: @gray;
 	transition: background .1s ease, color .1s ease;
+	.font-size(@font-size-small);
 
 	&:hover,
 	&:focus {
@@ -112,16 +113,15 @@ nav {
 		color: @gray;
 		outline: 0;
 	}
-	&--youtube .icon {
-		color: @color-youtube;
-	}
-	&--vimeo .icon {
-		color: @color-vimeo;
-	}
-	&--twitter .icon {
-		color: @color-twitter;
-	}
 }
+
+// Sizes
+.btn--large {
+	padding: (@padding-base / 2) @padding-base;
+	.font-size();
+}
+
+// Styles
 .btn--primary {
 	background-image: linear-gradient(@link-color, darken(@link-color, 5%));
 	background-color: @link-color;
@@ -136,9 +136,14 @@ nav {
 		border-color: darken(@link-color, 20%);
 	}
 }
-.btn--small {
-	padding-top: ceil(@padding-base / 3);
-	padding-bottom: ceil(@padding-base / 3);
+.btn--youtube .icon {
+	color: @color-youtube;
+}
+.btn--vimeo .icon {
+	color: @color-vimeo;
+}
+.btn--twitter .icon {
+	color: @color-twitter;
 }
 
 // Count bubble

@@ -980,6 +980,11 @@
             }
         }
 
+        // Toggle style hook
+        function _toggleStyleHook() {
+            _toggleClass(plyr.container, defaults.selectors.container.replace('.', ''), plyr.supported.full);
+        }
+
         // Setup aria attribute for play and iframe title
         function _setTitle(iframe) {
             // Find the current text
@@ -1136,20 +1141,11 @@
 
         // When embeds are ready
         function _embedReady() {
-            // Inject and update UI
-            if (plyr.supported.full) {
-                // Only setup controls once
-                if (!plyr.container.querySelectorAll(config.selectors.controls.wrapper).length) {
-                    _setupInterface();
-                }
-            }
+            // Setup the UI
+            _setupInterface();
 
             // Set title
             _setTitle(_getElement('iframe'));
-
-            // Set the volume
-            _setVolume();
-            _updateVolume();
         }
 
         // Handle YouTube API ready
@@ -1165,7 +1161,7 @@
             plyr.embed = new YT.Player(container.id, {
                 videoId: videoId,
                 playerVars: {
-                    autoplay: (config.autoplay ? 1 : 0),
+                    autoplay: 0,
                     controls: (plyr.supported.full ? 0 : 1),
                     rel: 0,
                     showinfo: 0,
@@ -1196,7 +1192,7 @@
                             plyr.media.paused = true;
                         };
                         plyr.media.duration = instance.getDuration();
-                        plyr.media.paused = !config.autoplay;
+                        plyr.media.paused = true;
                         plyr.media.currentTime = instance.getCurrentTime();
                         plyr.media.muted = instance.isMuted();
 
@@ -1224,9 +1220,7 @@
                         _embedReady();
 
                         // Display duration if available
-                        if (config.displayDuration) {
-                            _displayDuration();
-                        }
+                        _displayDuration();
                     },
                     'onStateChange': function(event) {
                         // Get the instance
@@ -1250,6 +1244,7 @@
 
                             case 1:
                                 plyr.media.paused = false;
+                                plyr.media.seeking = false;
                                 _triggerEvent(plyr.media, 'play');
 
                                 // Poll to get playback progress
@@ -1259,7 +1254,7 @@
 
                                     // Trigger timeupdate
                                     _triggerEvent(plyr.media, 'timeupdate');
-                                }, 200);
+                                }, 100);
 
                                 break;
 
@@ -1293,7 +1288,7 @@
                     plyr.embed.api('stop');
                     plyr.media.paused = true;
                 };
-                plyr.media.paused = !config.autoplay;
+                plyr.media.paused = true;
                 plyr.media.currentTime = 0;
 
                 // Update UI
@@ -1310,9 +1305,7 @@
                     plyr.media.duration = value;
 
                     // Display duration if available
-                    if (plyr.supported.full && config.displayDuration) {
-                        _displayDuration();
-                    }
+                    _displayDuration();
                 });
 
                 plyr.embed.addEvent('play', function() {
@@ -1326,6 +1319,7 @@
                 });
 
                 plyr.embed.addEvent('playProgress', function(data) {
+                    plyr.media.seeking = false;
                     plyr.media.currentTime = data.seconds;
                     _triggerEvent(plyr.media, 'timeupdate');
                 });
@@ -1352,149 +1346,151 @@
 
         // Setup captions
         function _setupCaptions() {
-            if (plyr.type === 'video') {
-                // Inject the container
-                if (!_getElement(config.selectors.captions)) {
-                    plyr.videoContainer.insertAdjacentHTML('afterbegin', '<div class="' + _getClassname(config.selectors.captions) + '"><span></span></div>');
-                }
+            if (plyr.type !== 'video') {
+                return;
+            }
 
-                // Cache selector
-                plyr.captionsContainer = _getElement(config.selectors.captions).querySelector('span');
+            // Inject the container
+            if (!_getElement(config.selectors.captions)) {
+                plyr.videoContainer.insertAdjacentHTML('afterbegin', '<div class="' + _getClassname(config.selectors.captions) + '"><span></span></div>');
+            }
 
-                // Determine if HTML5 textTracks is supported
-                plyr.usingTextTracks = false;
-                if (plyr.media.textTracks) {
-                    plyr.usingTextTracks = true;
-                }
+            // Cache selector
+            plyr.captionsContainer = _getElement(config.selectors.captions).querySelector('span');
 
-                // Get URL of caption file if exists
-                var captionSrc = '',
-                    kind,
-                    children = plyr.media.childNodes;
+            // Determine if HTML5 textTracks is supported
+            plyr.usingTextTracks = false;
+            if (plyr.media.textTracks) {
+                plyr.usingTextTracks = true;
+            }
 
-                for (var i = 0; i < children.length; i++) {
-                    if (children[i].nodeName.toLowerCase() === 'track') {
-                        kind = children[i].kind;
-                        if (kind === 'captions' || kind === 'subtitles') {
-                            captionSrc = children[i].getAttribute('src');
-                        }
+            // Get URL of caption file if exists
+            var captionSrc = '',
+                kind,
+                children = plyr.media.childNodes;
+
+            for (var i = 0; i < children.length; i++) {
+                if (children[i].nodeName.toLowerCase() === 'track') {
+                    kind = children[i].kind;
+                    if (kind === 'captions' || kind === 'subtitles') {
+                        captionSrc = children[i].getAttribute('src');
                     }
                 }
+            }
 
-                // Record if caption file exists or not
-                plyr.captionExists = true;
-                if (captionSrc === '') {
-                    plyr.captionExists = false;
-                    _log('No caption track found.');
+            // Record if caption file exists or not
+            plyr.captionExists = true;
+            if (captionSrc === '') {
+                plyr.captionExists = false;
+                _log('No caption track found.');
+            }
+            else {
+                _log('Caption track found; URI: ' + captionSrc);
+            }
+
+            // If no caption file exists, hide container for caption text
+            if (!plyr.captionExists) {
+                _toggleClass(plyr.container, config.classes.captions.enabled);
+            }
+            // If caption file exists, process captions
+            else {
+                // Turn off native caption rendering to avoid double captions
+                // This doesn't seem to work in Safari 7+, so the <track> elements are removed from the dom below
+                var tracks = plyr.media.textTracks;
+                for (var x = 0; x < tracks.length; x++) {
+                    tracks[x].mode = 'hidden';
                 }
-                else {
-                    _log('Caption track found; URI: ' + captionSrc);
+
+                // Enable UI
+                _showCaptions(plyr);
+
+                // Disable unsupported browsers than report false positive
+                if ((plyr.browser.name === 'IE' && plyr.browser.version >= 10) ||
+                    (plyr.browser.name === 'Firefox' && plyr.browser.version >= 31) ||
+                    (plyr.browser.name === 'Chrome' && plyr.browser.version >= 43) ||
+                    (plyr.browser.name === 'Safari' && plyr.browser.version >= 7)) {
+                    // Debugging
+                    _log('Detected unsupported browser for HTML5 captions. Using fallback.');
+
+                    // Set to false so skips to 'manual' captioning
+                    plyr.usingTextTracks = false;
                 }
 
-                // If no caption file exists, hide container for caption text
-                if (!plyr.captionExists) {
-                    _toggleClass(plyr.container, config.classes.captions.enabled);
-                }
-                // If caption file exists, process captions
-                else {
-                    // Turn off native caption rendering to avoid double captions
-                    // This doesn't seem to work in Safari 7+, so the <track> elements are removed from the dom below
-                    var tracks = plyr.media.textTracks;
-                    for (var x = 0; x < tracks.length; x++) {
-                        tracks[x].mode = 'hidden';
-                    }
+                // Rendering caption tracks
+                // Native support required - http://caniuse.com/webvtt
+                if (plyr.usingTextTracks) {
+                    _log('TextTracks supported.');
 
-                    // Enable UI
-                    _showCaptions(plyr);
+                    for (var y = 0; y < tracks.length; y++) {
+                        var track = tracks[y];
 
-                    // Disable unsupported browsers than report false positive
-                    if ((plyr.browser.name === 'IE' && plyr.browser.version >= 10) ||
-                        (plyr.browser.name === 'Firefox' && plyr.browser.version >= 31) ||
-                        (plyr.browser.name === 'Chrome' && plyr.browser.version >= 43) ||
-                        (plyr.browser.name === 'Safari' && plyr.browser.version >= 7)) {
-                        // Debugging
-                        _log('Detected unsupported browser for HTML5 captions. Using fallback.');
+                        if (track.kind === 'captions' || track.kind === 'subtitles') {
+                            _on(track, 'cuechange', function() {
+                                // Clear container
+                                plyr.captionsContainer.innerHTML = '';
 
-                        // Set to false so skips to 'manual' captioning
-                        plyr.usingTextTracks = false;
-                    }
-
-                    // Rendering caption tracks
-                    // Native support required - http://caniuse.com/webvtt
-                    if (plyr.usingTextTracks) {
-                        _log('TextTracks supported.');
-
-                        for (var y = 0; y < tracks.length; y++) {
-                            var track = tracks[y];
-
-                            if (track.kind === 'captions' || track.kind === 'subtitles') {
-                                _on(track, 'cuechange', function() {
-                                    // Clear container
-                                    plyr.captionsContainer.innerHTML = '';
-
-                                    // Display a cue, if there is one
-                                    if (this.activeCues[0] && this.activeCues[0].hasOwnProperty('text')) {
-                                        plyr.captionsContainer.appendChild(this.activeCues[0].getCueAsHTML().trim());
-                                    }
-                                });
-                            }
-                        }
-                    }
-                    // Caption tracks not natively supported
-                    else {
-                        _log('TextTracks not supported so rendering captions manually.');
-
-                        // Render captions from array at appropriate time
-                        plyr.currentCaption = '';
-                        plyr.captions = [];
-
-                        if (captionSrc !== '') {
-                            // Create XMLHttpRequest Object
-                            var xhr = new XMLHttpRequest();
-
-                            xhr.onreadystatechange = function() {
-                                if (xhr.readyState === 4) {
-                                    if (xhr.status === 200) {
-                                        var records = [],
-                                            record,
-                                            req = xhr.responseText;
-
-                                        records = req.split('\n\n');
-
-                                        for (var r = 0; r < records.length; r++) {
-                                            record = records[r];
-                                            plyr.captions[r] = [];
-                                            plyr.captions[r] = record.split('\n');
-                                        }
-
-                                        // Remove first element ('VTT')
-                                        plyr.captions.shift();
-
-                                        _log('Successfully loaded the caption file via AJAX.');
-                                    }
-                                    else {
-                                        _log('There was a problem loading the caption file via AJAX.', true);
-                                    }
+                                // Display a cue, if there is one
+                                if (this.activeCues[0] && this.activeCues[0].hasOwnProperty('text')) {
+                                    plyr.captionsContainer.appendChild(this.activeCues[0].getCueAsHTML().trim());
                                 }
-                            };
-
-                            xhr.open('get', captionSrc, true);
-
-                            xhr.send();
+                            });
                         }
                     }
+                }
+                // Caption tracks not natively supported
+                else {
+                    _log('TextTracks not supported so rendering captions manually.');
 
-                    // If Safari 7+, removing track from DOM [see 'turn off native caption rendering' above]
-                    if (plyr.browser.name === 'Safari' && plyr.browser.version >= 7) {
-                        _log('Safari 7+ detected; removing track from DOM.');
+                    // Render captions from array at appropriate time
+                    plyr.currentCaption = '';
+                    plyr.captions = [];
 
-                        // Find all <track> elements
-                        tracks = plyr.media.getElementsByTagName('track');
+                    if (captionSrc !== '') {
+                        // Create XMLHttpRequest Object
+                        var xhr = new XMLHttpRequest();
 
-                        // Loop through and remove one by one
-                        for (var t = 0; t < tracks.length; t++) {
-                            plyr.media.removeChild(tracks[t]);
-                        }
+                        xhr.onreadystatechange = function() {
+                            if (xhr.readyState === 4) {
+                                if (xhr.status === 200) {
+                                    var records = [],
+                                        record,
+                                        req = xhr.responseText;
+
+                                    records = req.split('\n\n');
+
+                                    for (var r = 0; r < records.length; r++) {
+                                        record = records[r];
+                                        plyr.captions[r] = [];
+                                        plyr.captions[r] = record.split('\n');
+                                    }
+
+                                    // Remove first element ('VTT')
+                                    plyr.captions.shift();
+
+                                    _log('Successfully loaded the caption file via AJAX.');
+                                }
+                                else {
+                                    _log('There was a problem loading the caption file via AJAX.', true);
+                                }
+                            }
+                        };
+
+                        xhr.open('get', captionSrc, true);
+
+                        xhr.send();
+                    }
+                }
+
+                // If Safari 7+, removing track from DOM [see 'turn off native caption rendering' above]
+                if (plyr.browser.name === 'Safari' && plyr.browser.version >= 7) {
+                    _log('Safari 7+ detected; removing track from DOM.');
+
+                    // Find all <track> elements
+                    tracks = plyr.media.getElementsByTagName('track');
+
+                    // Loop through and remove one by one
+                    for (var t = 0; t < tracks.length; t++) {
+                        plyr.media.removeChild(tracks[t]);
                     }
                 }
             }
@@ -1502,6 +1498,10 @@
 
         // Setup fullscreen
         function _setupFullscreen() {
+            if (!plyr.supported.full) {
+                return;
+            }
+
             if ((plyr.type != 'audio' || config.fullscreen.allowAudio) && config.fullscreen.enabled) {
                 // Check for native support
                 var nativeSupport = fullscreen.supportsFullScreen;
@@ -1609,24 +1609,28 @@
             }
             catch(e) {}
 
-            // Trigger timeupdate for embed and restore pause state
-            if ('embed' in plyr) {
+            // Embeds
+            if(_inArray(config.types.embed, plyr.type)) {
                 // YouTube
-                if (plyr.type === 'youtube') {
-                    plyr.embed.seekTo(targetTime);
-                }
+                switch(plyr.type) {
+                    case 'youtube':
+                        plyr.embed.seekTo(targetTime);
+                        break;
 
-                // Vimeo
-                if (plyr.type === 'vimeo') {
-                    plyr.embed.api('seekTo', targetTime);
+                    case 'vimeo':
+                        plyr.embed.api('seekTo', targetTime);
+                        break;
                 }
-
-                // Trigger timeupdate
-                _triggerEvent(plyr.media, 'timeupdate');
 
                 if (paused) {
                     _pause();
                 }
+
+                // Trigger timeupdate for embeds
+                _triggerEvent(plyr.media, 'timeupdate');
+
+                // Set seeking flag
+                plyr.media.seeking = true;
             }
 
             // Logging
@@ -1754,24 +1758,20 @@
             // Set mute on the player
             plyr.media.muted = muted;
 
-            // YouTube
-            if (plyr.type === 'youtube') {
-                plyr.embed[plyr.media.muted ? 'mute' : 'unMute']();
+            // Embeds
+            if(_inArray(config.types.embed, plyr.type)) {
+                // YouTube
+                switch(plyr.type) {
+                    case 'youtube':
+                        plyr.embed[plyr.media.muted ? 'mute' : 'unMute']();
+                        break;
 
-                // Trigger timeupdate
-                _triggerEvent(plyr.media, 'volumechange');
-            }
-
-            // Vimeo
-            if (plyr.type === 'vimeo') {
-                if (plyr.media.muted) {
-                    plyr.embed.api('setVolume', 0);
-                }
-                else {
-                    plyr.embed.api('setVolume', parseFloat(config.volume / 10));
+                    case 'vimeo':
+                        plyr.embed.api('setVolume', plyr.media.muted ? 0 : parseFloat(config.volume / 10));
+                        break;
                 }
 
-                // Trigger timeupdate
+                // Trigger volumechange for embeds
                 _triggerEvent(plyr.media, 'volumechange');
             }
         }
@@ -1803,18 +1803,20 @@
             // Store in config
             config.volume = volume;
 
-            // YouTube
-            if (plyr.type === 'youtube') {
-                plyr.embed.setVolume(plyr.media.volume * 100);
-            }
+            // Embeds
+            if(_inArray(config.types.embed, plyr.type)) {
+                // YouTube
+                switch(plyr.type) {
+                    case 'youtube':
+                        plyr.embed.setVolume(plyr.media.volume * 100);
+                        break;
 
-            // Vimeo
-            if (plyr.type === 'vimeo') {
-                plyr.embed.api('setVolume', plyr.media.volume);
-            }
+                    case 'vimeo':
+                        plyr.embed.api('setVolume', plyr.media.volume);
+                        break;
+                }
 
-            // Trigger volumechange for embeds
-            if ('embed' in plyr) {
+                // Trigger volumechange for embeds
                 _triggerEvent(plyr.media, 'volumechange');
             }
 
@@ -1970,6 +1972,10 @@
 
         // Show the duration on metadataloaded
         function _displayDuration() {
+            if (!plyr.supported.full) {
+                return;
+            }
+
             var duration = plyr.media.duration || 0;
 
             // If there's only one time display, display duration there
@@ -1987,6 +1993,11 @@
         function _timeUpdate(event) {
             // Duration
             _updateTimeDisplay(plyr.media.currentTime, plyr.currentTime);
+
+            // Ignore updates while seeking
+            if(event && event.type == 'timeupdate' && plyr.media.seeking) {
+                return;
+            }
 
             // Playing progress
             _updateProgress(event);
@@ -2041,7 +2052,7 @@
                 window.clearInterval(plyr.timer.buffering);
                 window.clearInterval(plyr.timer.playing);
             }
-            else if (plyr.type === 'video') {
+            else if (plyr.type === 'video' && plyr.videoContainer) {
                 // Remove video wrapper
                 _remove(plyr.videoContainer);
             }
@@ -2105,6 +2116,7 @@
             // Restore class hooks
             _toggleClass(plyr.container, config.classes.fullscreen.active, plyr.isFullscreen);
             _toggleClass(plyr.container, config.classes.captions.active, plyr.captionsEnabled);
+            _toggleStyleHook();
 
             // Autoplay the new source?
             config.autoplay = (source.autoplay || config.autoplay);
@@ -2117,41 +2129,29 @@
             // Set up from scratch
             _setupMedia();
 
-            // Trigger media updated
-            _mediaUpdated();
-
             // HTML5 stuff
             if (_inArray(config.types.html5, plyr.type)) {
-                // Set volume
-                _setVolume();
-                _updateVolume();
-
-                // UI updates
-                if (plyr.supported.full) {
-                    // Reset time display
-                    _timeUpdate();
-
-                    // Update the UI
-                    _checkPlaying();
-                }
-
                 // Setup captions
                 if ('tracks' in source) {
                     _insertChildElements('track', source.tracks);
-
-                    // Captions
-                    _setupCaptions();
                 }
 
                 // Load HTML5 sources
                 plyr.media.load();
 
-                // Play if autoplay attribute is present
-                if (config.autoplay) {
-                    _play();
-                }
+                // Display duration if available
+                _displayDuration();
+
+                // Setup interface
+                _setupInterface();
             }
 
+            // Play if autoplay attribute is present
+            if (config.autoplay) {
+                _play();
+            }
+
+            // Set aria title and iframe title
             if ('title' in source) {
                 config.title = source.title;
                 _setTitle();
@@ -2376,9 +2376,6 @@
             // Get the media element
             plyr.media = plyr.container.querySelectorAll('audio, video, div')[0];
 
-            // Add style hook
-            _toggleClass(plyr.container, defaults.selectors.container.replace('.', ''), true);
-
             // Get original classname
             plyr.originalClassName = plyr.container.className;
 
@@ -2403,6 +2400,9 @@
             // Check for full support
             plyr.supported = api.supported(plyr.type);
 
+            // Add style hook
+            _toggleStyleHook();
+
             // If no native support, bail
             if (!plyr.supported.basic) {
                 return false;
@@ -2415,7 +2415,7 @@
             _setupMedia();
 
             // Setup interface
-            if (plyr.type == 'video' || plyr.type == 'audio') {
+            if (_inArray(config.types.html5, plyr.type)) {
                 // Bail if no support
                 if (!plyr.supported.full) {
                     // Successful setup
@@ -2428,11 +2428,6 @@
                 // Setup UI
                 _setupInterface();
 
-                // Display duration if available
-                if (config.displayDuration) {
-                    _displayDuration();
-                }
-
                 // Set title on button and frame
                 _setTitle();
             }
@@ -2442,31 +2437,40 @@
         }
 
         function _setupInterface() {
+            // Don't setup interface if no support
+            if (!plyr.supported.full) {
+                return;
+            }
+
             // Inject custom controls
-            _injectControls();
+            if (!plyr.container.querySelectorAll(config.selectors.controls.wrapper).length) {
+                // Inject custom controls
+                _injectControls();
+            }
 
             // Find the elements
             if (!_findElements()) {
-                return false;
+                return;
             }
 
-            // Captions
-            _setupCaptions();
-
-            // Media updated
-            _mediaUpdated();
-
-            // Set volume
-            _setVolume();
-            _updateVolume();
-        }
-
-        function _mediaUpdated() {
             // Setup fullscreen
             _setupFullscreen();
 
             // Listeners
             _listeners();
+
+            // Captions
+            _setupCaptions();
+
+            // Set volume
+            _setVolume();
+            _updateVolume();
+
+            // Reset time display
+            _timeUpdate();
+
+            // Update the UI
+            _checkPlaying();
         }
 
         // Initialize instance

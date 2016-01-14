@@ -1,7 +1,7 @@
 # Changelog
 
 # v1.5.0
-- *Beta* Vimeo support (please report bugs) (fixes #8)
+- Vimeo support (fixes #8)
 - New options for initialization (you can now pass a selector, HTMLElement or NodeList) (fixes #118)
 - Switched to BEM methodology (you will need to change CSS and probably HTML)
 - Decoupled CSS and JS hooks (fixes #129)
