@@ -111,7 +111,7 @@
     background: @volume-thumb-bg;
     border: 0;
     border-radius: 100%;
-    transition: background .3s ease, transform .2s ease;
+    transition: background .3s ease;
     cursor: ew-resize;
 }
 .volume-track() {
@@ -243,7 +243,7 @@
         background: @controls-bg;
         line-height: 1;
         text-align: center;
-        box-shadow: 0 1px 1px rgba(red(@gray-dark), green(@gray-dark), blue(@gray-dark), .2);
+        box-shadow: 0 1px 1px fade(@gray-dark, 20%);
 
         // Layout
         &--right {
@@ -283,7 +283,7 @@
             }
 
             // Hover and tab focus
-            &.tab-focus,
+            &.tab-focus:focus,
             &:hover {
                 background: @control-bg-hover;
                 color: @control-color-hover;
@@ -309,7 +309,6 @@
             color: @control-color;
             font-weight: 600;
             font-size: @font-size-small;
-            .font-smoothing();
         }
 
         // Media duration hidden on small screens
@@ -388,7 +387,7 @@
     }
 
     // Common range styles
-    input[type='range'].tab-focus {
+    input[type='range'].tab-focus:focus {
         .tab-focus();
     }
 

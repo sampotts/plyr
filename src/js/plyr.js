@@ -835,6 +835,44 @@
             }
         }
 
+        // Trap focus inside container
+        function _focusTrap() {
+            var tabbables   = _getElements('input:not([disabled]), button:not([disabled])'),
+                first       = tabbables[0],
+                last        = tabbables[tabbables.length - 1];
+
+            function _checkFocus(event) {
+                // If it is TAB
+                if (event.which === 9 && plyr.isFullscreen) {
+                    // Move focus to first element that can be tabbed if Shift isn't used
+                    if (event.target === last && !event.shiftKey) {
+                        event.preventDefault();
+                        first.focus();
+                    }
+                    // Move focus to last element that can be tabbed if Shift is used
+                    else if (event.target === first && event.shiftKey) {
+                        event.preventDefault();
+                        last.focus();
+                    }
+                }
+            }
+
+            // Bind the handler
+            _on(plyr.container, 'keydown', _checkFocus);
+        }
+
+        // Add elements to HTML5 media (source, tracks, etc)
+        function _insertChildElements(type, attributes) {
+            if (typeof attributes === 'string') {
+               _insertElement(type, plyr.media, { src: attributes });
+            }
+            else if (attributes.constructor === Array) {
+                for (var i = attributes.length - 1; i >= 0; i--) {
+                    _insertElement(type, plyr.media, attributes[i]);
+                }
+            }
+        }
+
         // Insert controls
         function _injectControls() {
             // Make a copy of the html
@@ -1481,6 +1519,9 @@
                 // Toggle state
                 _toggleState(plyr.buttons.fullscreen, false);
 
+                // Setup focus trap
+                _focusTrap();
+
                 // Set control hide class hook
                 if (config.fullscreen.hideControls) {
                     _toggleClass(plyr.container, config.classes.fullscreen.hideControls, true);
@@ -1641,6 +1682,17 @@
 
             // Set class hook
             _toggleClass(plyr.container, config.classes.fullscreen.active, plyr.isFullscreen);
+
+            // Trap focus
+            if(plyr.isFullscreen) {
+                plyr.container.setAttribute('tabindex', '-1');
+            }
+            else {
+                plyr.container.removeAttribute('tabindex');
+            }
+
+            // Trap focus
+            _focusTrap(plyr.isFullscreen);
 
             // Set button state
             _toggleState(plyr.buttons.fullscreen, plyr.isFullscreen);
@@ -1938,18 +1990,6 @@
 
             // Playing progress
             _updateProgress(event);
-        }
-
-        // Add elements to HTML5 media (source, tracks, etc)
-        function _insertChildElements(type, attributes) {
-            if (typeof attributes === 'string') {
-               _insertElement(type, plyr.media, { src: attributes });
-            }
-            else if (attributes.constructor === Array) {
-                for (var i = attributes.length - 1; i >= 0; i--) {
-                    _insertElement(type, plyr.media, attributes[i]);
-                }
-            }
         }
 
         // Add common function to retrieve media source

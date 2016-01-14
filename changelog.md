@@ -12,7 +12,9 @@
 - Better handling of mission controls (fixes #132)
 - Retain classname on source change (fixes #120)
 - Increased thumb size on seek (partially fixes #130)
-- Passing no argument to `source` api method, now returns current source
+- Passing no argument to `source` api method, now returns current source (by @gurupras)
+- Ability to add custom handlers to controls prior to Plyr bindings (by @gurupras)
+- Keyboard navigation improvements (focus on seek, focus trap in fullscreen) (fixes #135)
 
 ## v1.3.5
 - Fixed bug with API use on basic supported browsers
