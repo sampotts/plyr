@@ -68,18 +68,6 @@
             currentTime:        '.plyr__time--current',
             duration:           '.plyr__time--duration'
         },
-        handlers: {
-            seek:           null,
-            play:           null,
-            pause:          null,
-            restart:        null,
-            rewind:         null,
-            forward:        null,
-            mute:           null,
-            volume:         null,
-            captions:       null,
-            fullscreen:     null
-        },
         classes: {
             videoWrapper:       'plyr__video-wrapper',
             embedWrapper:       'plyr__video-embed',
@@ -103,6 +91,18 @@
                 hideControls:   'plyr--fullscreen--hide-controls'
             },
             tabFocus:           'tab-focus'
+        },
+        handlers: {
+            seek:               null,
+            play:               null,
+            pause:              null,
+            restart:            null,
+            rewind:             null,
+            forward:            null,
+            mute:               null,
+            volume:             null,
+            captions:           null,
+            fullscreen:         null
         },
         captions: {
             defaultActive:      false
@@ -512,7 +512,31 @@
         return false;
     }
 
-    // Toggle event
+    // Bind event
+    function _on(element, events, callback) {
+        if (element) {
+            _toggleHandler(element, events, callback, true);
+        }
+    }
+
+    // Unbind event
+    function _off(element, events, callback) {
+        if (element) {
+            _toggleHandler(element, events, callback, false);
+        }
+    }
+
+    // Bind along with custom handler
+    function _proxyHandler(element, eventName, userHandler, defaultHandler) {
+        _on(element, eventName, function(event) {
+            if(userHandler) {
+                userHandler.apply(element, [event]);
+            }
+            defaultHandler.apply(element, [event]);
+        });
+    }
+
+    // Toggle event handler
     function _toggleHandler(element, events, callback, toggle) {
         var eventList = events.split(' ');
 
@@ -529,20 +553,6 @@
         // If a single node is passed, bind the event listener
         for (var i = 0; i < eventList.length; i++) {
             element[toggle ? 'addEventListener' : 'removeEventListener'](eventList[i], callback, false);
-        }
-    }
-
-    // Bind event
-    function _on(element, events, callback) {
-        if (element) {
-            _toggleHandler(element, events, callback, true);
-        }
-    }
-
-    // Unbind event
-    function _off(element, events, callback) {
-        if (element) {
-            _toggleHandler(element, events, callback, false);
         }
     }
 
@@ -2182,43 +2192,34 @@
                 });
             }
 
-            function _registerHandler(element, event, userHandler, defaultHandler) {
-                _on(element, event, function(e) {
-                    if(userHandler) {
-                        userHandler(e);
-                    }
-                    defaultHandler(e);
-                });
-            }
-
             // Play
-            _registerHandler(plyr.buttons.play, 'click', config.handlers.play, function() { _togglePlay(true); });
+            _proxyHandler(plyr.buttons.play, 'click', config.handlers.play, function() { _togglePlay(true); });
 
             // Pause
-            _registerHandler(plyr.buttons.pause, 'click', config.handlers.pause, function() { _togglePlay(); });
+            _proxyHandler(plyr.buttons.pause, 'click', config.handlers.pause, function() { _togglePlay(); });
 
             // Restart
-            _registerHandler(plyr.buttons.restart, 'click', config.handlers.restart, _seek);
+            _proxyHandler(plyr.buttons.restart, 'click', config.handlers.restart, _seek);
 
             // Rewind
-            _registerHandler(plyr.buttons.rewind, 'click', config.handlers.rewind, _rewind);
+            _proxyHandler(plyr.buttons.rewind, 'click', config.handlers.rewind, _rewind);
 
             // Fast forward
-            _registerHandler(plyr.buttons.forward, 'click', config.handlers.forward, _forward);
+            _proxyHandler(plyr.buttons.forward, 'click', config.handlers.forward, _forward);
 
             // Seek
-            _registerHandler(plyr.buttons.seek, inputEvent, config.handlers.seek, _seek);
+            _proxyHandler(plyr.buttons.seek, inputEvent, config.handlers.seek, _seek);
 
             // Set volume
-            _registerHandler(plyr.volume, inputEvent, config.handlers.volume, function() {
+            _proxyHandler(plyr.volume, inputEvent, config.handlers.volume, function() {
                 _setVolume(plyr.volume.value);
             });
 
             // Mute
-            _registerHandler(plyr.buttons.mute, 'click', config.handlers.mute, _toggleMute);
+            _proxyHandler(plyr.buttons.mute, 'click', config.handlers.mute, _toggleMute);
 
             // Fullscreen
-            _registerHandler(plyr.buttons.fullscreen, 'click', config.handlers.fullscreen, _toggleFullscreen);
+            _proxyHandler(plyr.buttons.fullscreen, 'click', config.handlers.fullscreen, _toggleFullscreen);
 
             // Handle user exiting fullscreen by escaping etc
             if (fullscreen.supportsFullScreen) {
