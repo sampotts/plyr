@@ -270,6 +270,12 @@ Options must be passed as an object to the `setup()` method as above.
     <td>See <code>plyr.js</code> in <code>/src</code> for more info. You probably don't need to change any of these.</td>
   </tr>
   <tr>
+    <td><code>handlers</code></td>
+    <td>Object</td>
+    <td>&mdash;</td>
+    <td>Allows early binding of handlers to Plyr's controls. See <code>controls</code> above for list of controls and see <code>plyr.js</code> in <code>/src</code> for more info.</td>
+  </tr>
+  <tr>
     <td><code>classes</code></td>
     <td>Object</td>
     <td>&mdash;</td>

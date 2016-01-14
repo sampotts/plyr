@@ -68,6 +68,18 @@
             currentTime:        '.plyr__time--current',
             duration:           '.plyr__time--duration'
         },
+        handlers: {
+            seek:           null,
+            play:           null,
+            pause:          null,
+            restart:        null,
+            rewind:         null,
+            forward:        null,
+            mute:           null,
+            volume:         null,
+            captions:       null,
+            fullscreen:     null
+        },
         classes: {
             videoWrapper:       'plyr__video-wrapper',
             embedWrapper:       'plyr__video-embed',
@@ -2170,34 +2182,43 @@
                 });
             }
 
+            function _registerHandler(element, event, userHandler, defaultHandler) {
+                _on(element, event, function(e) {
+                    if(userHandler) {
+                        userHandler(e);
+                    }
+                    defaultHandler(e);
+                });
+            }
+
             // Play
-            _on(plyr.buttons.play, 'click', function() { _togglePlay(true); });
+            _registerHandler(plyr.buttons.play, 'click', config.handlers.play, function() { _togglePlay(true); });
 
             // Pause
-            _on(plyr.buttons.pause, 'click', function() { _togglePlay(); });
+            _registerHandler(plyr.buttons.pause, 'click', config.handlers.pause, function() { _togglePlay(); });
 
             // Restart
-            _on(plyr.buttons.restart, 'click', _seek);
+            _registerHandler(plyr.buttons.restart, 'click', config.handlers.restart, _seek);
 
             // Rewind
-            _on(plyr.buttons.rewind, 'click', _rewind);
+            _registerHandler(plyr.buttons.rewind, 'click', config.handlers.rewind, _rewind);
 
             // Fast forward
-            _on(plyr.buttons.forward, 'click', _forward);
+            _registerHandler(plyr.buttons.forward, 'click', config.handlers.forward, _forward);
 
             // Seek
-            _on(plyr.buttons.seek, inputEvent, _seek);
+            _registerHandler(plyr.buttons.seek, inputEvent, config.handlers.seek, _seek);
 
             // Set volume
-            _on(plyr.volume, inputEvent, function() {
-                _setVolume(this.value);
+            _registerHandler(plyr.volume, inputEvent, config.handlers.volume, function() {
+                _setVolume(plyr.volume.value);
             });
 
             // Mute
-            _on(plyr.buttons.mute, 'click', _toggleMute);
+            _registerHandler(plyr.buttons.mute, 'click', config.handlers.mute, _toggleMute);
 
             // Fullscreen
-            _on(plyr.buttons.fullscreen, 'click', _toggleFullscreen);
+            _registerHandler(plyr.buttons.fullscreen, 'click', config.handlers.fullscreen, _toggleFullscreen);
 
             // Handle user exiting fullscreen by escaping etc
             if (fullscreen.supportsFullScreen) {
