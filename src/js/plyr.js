@@ -1125,7 +1125,7 @@
                     'frameborder':              0
                 });
 
-                // If full support, we can use custom controls, if not, use Vimeo
+                // If full support, we can use custom controls (hiding Vimeos), if not, use Vimeo
                 if(plyr.supported.full) {
                     container.appendChild(iframe);
                     plyr.media.appendChild(container);
