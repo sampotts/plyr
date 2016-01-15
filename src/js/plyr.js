@@ -286,9 +286,9 @@
     }
 
     // Debugging
-    function _log(text, error) {
+    function _log(text, warn) {
         if (config.debug && window.console) {
-            console[(error ? 'error' : 'log')](text);
+            console[(warn ? 'warn' : 'log')](text);
         }
     }
 
@@ -465,6 +465,9 @@
 
     // Remove an element
     function _remove(element) {
+        if(!element) {
+            return;
+        }
         element.parentNode.removeChild(element);
     }
 
@@ -879,7 +882,7 @@
             var html = config.html;
 
             // Insert custom video controls
-            _log('Injecting custom controls.');
+            _log('Injecting custom controls');
 
             // If no controls are specified, create default
             if (!html) {
@@ -971,7 +974,7 @@
                 return true;
             }
             catch(e) {
-                _log('It looks like there\'s a problem with your controls html. Bailing.', true);
+                _log('It looks like there is a problem with your controls html', true);
 
                 // Restore native video controls
                 plyr.media.setAttribute('controls', '');
@@ -996,7 +999,7 @@
             }
 
             // If there's a play button, set label
-            if (plyr.buttons.play) {
+            if (plyr.supported.full && plyr.buttons.play) {
                 plyr.buttons.play.setAttribute('aria-label', label);
             }
 
@@ -1011,7 +1014,7 @@
         function _setupMedia() {
             // If there's no media, bail
             if (!plyr.media) {
-                _log('No audio or video element found!', true);
+                _log('No audio or video element found', true);
                 return false;
             }
 
@@ -1382,7 +1385,7 @@
             plyr.captionExists = true;
             if (captionSrc === '') {
                 plyr.captionExists = false;
-                _log('No caption track found.');
+                _log('No caption track found');
             }
             else {
                 _log('Caption track found; URI: ' + captionSrc);
@@ -1410,7 +1413,7 @@
                     (plyr.browser.name === 'Chrome' && plyr.browser.version >= 43) ||
                     (plyr.browser.name === 'Safari' && plyr.browser.version >= 7)) {
                     // Debugging
-                    _log('Detected unsupported browser for HTML5 captions. Using fallback.');
+                    _log('Detected unsupported browser for HTML5 captions - using fallback');
 
                     // Set to false so skips to 'manual' captioning
                     plyr.usingTextTracks = false;
@@ -1419,7 +1422,7 @@
                 // Rendering caption tracks
                 // Native support required - http://caniuse.com/webvtt
                 if (plyr.usingTextTracks) {
-                    _log('TextTracks supported.');
+                    _log('TextTracks supported');
 
                     for (var y = 0; y < tracks.length; y++) {
                         var track = tracks[y];
@@ -1439,7 +1442,7 @@
                 }
                 // Caption tracks not natively supported
                 else {
-                    _log('TextTracks not supported so rendering captions manually.');
+                    _log('TextTracks not supported so rendering captions manually');
 
                     // Render captions from array at appropriate time
                     plyr.currentCaption = '';
@@ -1467,10 +1470,10 @@
                                     // Remove first element ('VTT')
                                     plyr.captions.shift();
 
-                                    _log('Successfully loaded the caption file via AJAX.');
+                                    _log('Successfully loaded the caption file via AJAX');
                                 }
                                 else {
-                                    _log('There was a problem loading the caption file via AJAX.', true);
+                                    _log('There was a problem loading the caption file via AJAX', true);
                                 }
                             }
                         };
@@ -1483,7 +1486,7 @@
 
                 // If Safari 7+, removing track from DOM [see 'turn off native caption rendering' above]
                 if (plyr.browser.name === 'Safari' && plyr.browser.version >= 7) {
-                    _log('Safari 7+ detected; removing track from DOM.');
+                    _log('Safari 7+ detected; removing track from DOM');
 
                     // Find all <track> elements
                     tracks = plyr.media.getElementsByTagName('track');
@@ -1507,13 +1510,13 @@
                 var nativeSupport = fullscreen.supportsFullScreen;
 
                 if (nativeSupport || (config.fullscreen.fallback && !_inFrame())) {
-                    _log((nativeSupport ? 'Native' : 'Fallback') + ' fullscreen enabled.');
+                    _log((nativeSupport ? 'Native' : 'Fallback') + ' fullscreen enabled');
 
                     // Add styling hook
                     _toggleClass(plyr.container, config.classes.fullscreen.enabled, true);
                 }
                 else {
-                    _log('Fullscreen not supported and fallback disabled.');
+                    _log('Fullscreen not supported and fallback disabled');
                 }
 
                 // Toggle state
@@ -2074,6 +2077,9 @@
                 }
             }
 
+            // Check for support
+            plyr.supported = api.supported(plyr.type);
+
             // Create new markup
             switch(plyr.type) {
                 case 'video':
@@ -2397,7 +2403,7 @@
                 config.loop         = (config.loop || (plyr.media.getAttribute('loop') !== null));
             }
 
-            // Check for full support
+            // Check for support
             plyr.supported = api.supported(plyr.type);
 
             // Add style hook
@@ -2439,11 +2445,16 @@
         function _setupInterface() {
             // Don't setup interface if no support
             if (!plyr.supported.full) {
+                _log("No full support for this media type (" + plyr.type + ")", true);
+
+                // Remove controls
+                _remove(_getElement(config.selectors.controls.wrapper));
+
                 return;
             }
 
             // Inject custom controls
-            if (!plyr.container.querySelectorAll(config.selectors.controls.wrapper).length) {
+            if (!_getElements(config.selectors.controls.wrapper).length) {
                 // Inject custom controls
                 _injectControls();
             }
