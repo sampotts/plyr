@@ -1124,8 +1124,15 @@
                     'allowfullscreen':          '',
                     'frameborder':              0
                 });
-                container.appendChild(iframe);
-                plyr.media.appendChild(container);
+
+                // If full support, we can use custom controls, if not, use Vimeo
+                if(plyr.supported.full) {
+                    container.appendChild(iframe);
+                    plyr.media.appendChild(container);
+                }
+                else {
+                    plyr.media.appendChild(iframe);
+                }
 
                 // Load the API
                 if (!('$f' in window)) {
