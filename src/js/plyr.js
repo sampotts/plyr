@@ -1910,6 +1910,12 @@
             // Clone the media element to remove listeners
             // http://stackoverflow.com/questions/19469881/javascript-remove-all-event-listeners-of-specific-type
             var clone = player.media.cloneNode(true);
+
+            // Cancel open requests
+            player.media.pause();
+            player.media.setAttribute('src','');
+            player.media.load();
+
             player.media.parentNode.replaceChild(clone, player.media);
         }
 
