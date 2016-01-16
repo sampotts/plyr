@@ -6,20 +6,20 @@ A simple, accessible and customizable HTML5, YouTube and Vimeo media player.
 [![Image of Plyr](https://cdn.plyr.io/static/plyr-v1.5.jpg)](http://plyr.io)
 
 ## Why?
-We wanted a lightweight, accessible and customizable media player that just supports [*modern*](#browser-support) browsers. Sure, there are many other players out there but we wanted to keep things simple, using the right elements for the job.
+We wanted a lightweight, accessible and customizable media player that supports [*modern*](#browser-support) browsers. Sure, there are many other players out there but we wanted to keep things simple, using the right elements for the job.
 
 ## Features
-- **Accessible** - full support for VTT captions and screen readers.
-- **Lightweight** - just 8KB minified and gzipped.
-- **[Customisable](#html)** - make the player look how you want with the markup you want.
-- **Semantic** - uses the *right* elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no `<span>` or `<a href="#">` button hacks.
-- **Responsive** - as you'd expect these days.
-- **Audio & Video** - support for both formats.
-- **[Embedded Video](#embeds)** - support for YouTube and Vimeo (beta).
-- **[API](#api)** - toggle playback, volume, seeking, and more.
-- **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes.
-- **i18n support** - support for internationalization of controls.
-- **No dependencies** - written in vanilla JavaScript, no jQuery required.
+- **Accessible** - full support for VTT captions and screen readers
+- **Lightweight** - under 10KB minified and gzipped
+- **[Customisable](#html)** - make the player look how you want with the markup you want
+- **Semantic** - uses the *right* elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no `<span>` or `<a href="#">` button hacks
+- **Responsive** - as you'd expect these days
+- **HTML Video & Audio** - support for both formats
+- **[Embedded Video](#embeds)** - support for YouTube and Vimeo (beta)
+- **[API](#api)** - toggle playback, volume, seeking, and more
+- **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes
+- **i18n support** - support for internationalization of controls
+- **No dependencies** - written in "vanilla" JavaScript, no jQuery required
 
 Oh and yes, it works with Bootstrap.
 
