@@ -82,15 +82,15 @@ The SVG sprite for the controls icons is loaded in by AJAX to help with performa
 (function(d, p){
 	var a = new XMLHttpRequest(),
 		b = d.body;
-	a.open("GET", p, true);
+	a.open('GET', p, true);
 	a.send();
-	a.onload = function(){
-		var c = d.createElement("div");
-		c.style.display = "none";
+	a.onload = function() {
+		var c = d.createElement('div');
+		c.setAttribute('hidden', '');
 		c.innerHTML = a.responseText;
 		b.insertBefore(c, b.childNodes[0]);
-	}
-})(document, "dist/sprite.svg");
+	};
+})(document, 'path/to/sprite.svg');
 </script>
 ```
 
@@ -604,7 +604,7 @@ Some more details on the object parameters
 The `plyr` object on the player element also contains a `media` property which is a reference to the `<audio>` or `<video>` element within the player which you can use to listen for events. Here's an example:
 
 ```javascript
-var media = document.querySelector(".plyr").plyr.media;
+var media = document.querySelector(".js-plyr").plyr.media;
 
 media.addEventListener("playing", function() {
   console.log("playing");
@@ -624,7 +624,7 @@ Currently only YouTube is supported. Vimeo will be coming soon. Some HTML5 media
 Due to the way the YouTube API works, the `timeupdate` and `progress` events are triggered by polling every 200ms so the event may trigger without an actual value change. Buffering progress is `media.buffered` in the `plyr` object. It is a a number between 0 and 1 that specifies the percentage of the video that the player shows as buffered.
 
 ```javascript
-document.querySelector(".plyr").plyr.media.addEventListener("play", function() {
+document.querySelector(".js-plyr").plyr.media.addEventListener("play", function() {
 	console.log("play");
 });
 ```

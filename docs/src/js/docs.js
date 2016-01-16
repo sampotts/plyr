@@ -33,6 +33,18 @@ shr.setup({
 		buttons[i].addEventListener('click', newSource);
 	}
 
+	function toggleClass(element, className, state) {
+        if (element) {
+            if (element.classList) {
+                element.classList[state ? 'add' : 'remove'](className);
+            }
+            else {
+                var name = (' ' + element.className + ' ').replace(/\s+/g, ' ').replace(' ' + className + ' ', '');
+                element.className = name + (state ? ' ' + className : '');
+            }
+        }
+    }
+
 	// Set a new source
 	function newSource() {
 		var trigger = this,
@@ -102,10 +114,10 @@ shr.setup({
 		}
 
 		for (var x = buttons.length - 1; x >= 0; x--) {
-			buttons[x].parentElement.classList.remove('active');
+			toggleClass(buttons[x].parentElement, 'active', false);
 		}
 
-		event.target.parentElement.classList.add('active');
+		toggleClass((event.target || event.srcElement).parentElement, 'active', true);
 	}
 })();
 

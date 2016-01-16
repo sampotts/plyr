@@ -503,14 +503,25 @@
     // Toggle class on an element
     function _toggleClass(element, className, state) {
         if (element) {
-            element.classList[state ? 'add' : 'remove'](className);
+            if (element.classList) {
+                element.classList[state ? 'add' : 'remove'](className);
+            }
+            else {
+                var name = (' ' + element.className + ' ').replace(/\s+/g, ' ').replace(' ' + className + ' ', '');
+                element.className = name + (state ? ' ' + className : '');
+            }
         }
     }
 
     // Has class name
     function _hasClass(element, className) {
         if (element) {
-            return element.classList.contains(className);
+            if (element.classList) {
+                return element.classList.contains(className);
+            }
+            else {
+                return new RegExp('(\\s|^)' + className + '(\\s|$)').test(element.className);
+            }
         }
         return false;
     }
@@ -977,7 +988,7 @@
                 _log('It looks like there is a problem with your controls html', true);
 
                 // Restore native video controls
-                plyr.media.setAttribute('controls', '');
+                _toggleControls(true);
 
                 return false;
             }
@@ -986,6 +997,16 @@
         // Toggle style hook
         function _toggleStyleHook() {
             _toggleClass(plyr.container, defaults.selectors.container.replace('.', ''), plyr.supported.full);
+        }
+
+        // Toggle native controls
+        function _toggleControls(toggle) {
+            if(toggle) {
+                plyr.media.setAttribute('controls', '');
+            }
+            else {
+                plyr.media.removeAttribute('controls');
+            }
         }
 
         // Setup aria attribute for play and iframe title
@@ -1019,9 +1040,6 @@
             }
 
             if (plyr.supported.full) {
-                // Remove native video controls
-                plyr.media.removeAttribute('controls');
-
                 // Add type class
                 _toggleClass(plyr.container, config.classes.type.replace('{0}', plyr.type), true);
 
@@ -2365,7 +2383,7 @@
             }
 
             // Restore native video controls
-            plyr.media.setAttribute('controls', '');
+            _toggleControls(true);
 
             // Clone the media element to remove listeners
             // http://stackoverflow.com/questions/19469881/javascript-remove-all-event-listeners-of-specific-type
@@ -2457,6 +2475,10 @@
                 // Remove controls
                 _remove(_getElement(config.selectors.controls.wrapper));
 
+                // Restore native controls
+                _toggleControls(true);
+
+                // Bail
                 return;
             }
 
@@ -2465,6 +2487,9 @@
                 // Inject custom controls
                 _injectControls();
             }
+
+            // Remove native controls
+            _toggleControls();
 
             // Find the elements
             if (!_findElements()) {

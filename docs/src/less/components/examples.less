@@ -2,6 +2,11 @@
 // Examples
 // ==========================================================================
 
+section {
+    margin: 0 auto @padding-base;
+    max-width: @example-width-video;
+}
+
 video,
 .plyr__video-embed {
     border-radius: @border-radius-base;
@@ -14,8 +19,7 @@ video,
 
 // Example players
 .plyr {
-    margin: 0 auto @padding-base;
-    max-width: @example-width-video;
+    margin: 0 auto;
 
     &__controls {
         border-radius: 0 0 @border-radius-base @border-radius-base;
@@ -53,6 +57,7 @@ video,
 // Style full supported player
 .plyr__cite {
     display: none;
+    margin-top: @padding-base;
 
     .icon {
         margin-right: (@padding-base / 4);
