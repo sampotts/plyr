@@ -26,16 +26,48 @@ shr.setup({
 
 // General functions
 (function() {
-	var buttons = document.querySelectorAll('[data-source]');
+	var buttons = document.querySelectorAll('[data-source]'),
+		types = {
+			video: 0,
+			audio: 1,
+			youtube: 2,
+			vimeo: 3
+		},
+		currentType = window.location.hash.replace('#', ''),
+		historySupport = (window.history && window.history.pushState);
 
 	// Bind to each button
 	for (var i = buttons.length - 1; i >= 0; i--) {
-		buttons[i].addEventListener('click', newSource);
+		buttons[i].addEventListener('click', function() {
+			var type = this.getAttribute('data-source');
+
+			newSource(type);
+
+			if (historySupport) {
+				history.pushState({ 'type': type }, '', '#' + type);
+			}
+		});
 	}
 
-	/*window.addEventListener('popstate', function(event) {
-		console.log(event);
-	});*/
+	// List for backwards/forwards
+	window.addEventListener('popstate', function(event) {
+		if(event.state && 'type' in event.state) {
+			newSource(event.state.type);
+		}
+	});
+
+	// On load
+	if(historySupport) {
+		if(!currentType.length) {
+			currentType = 'video';
+		}
+		if(currentType in types) {
+			history.replaceState({ 'type': currentType }, '', '#' + currentType);
+		}
+		if(currentType != 'video') {
+			newSource(currentType);
+		}
+	}
 
 	function toggleClass(element, className, state) {
         if (element) {
@@ -50,10 +82,12 @@ shr.setup({
     }
 
 	// Set a new source
-	function newSource() {
-		var trigger = this,
-		type        = trigger.getAttribute('data-source'),
-		player      = document.querySelector('.js-media-player').plyr;
+	function newSource(type) {
+		if(!(type in types)) {
+			return;
+		}
+
+		var player = document.querySelector('.js-media-player').plyr;
 
 		switch(type) {
 			case 'video':
@@ -117,15 +151,13 @@ shr.setup({
 				break;
 		}
 
-		/*if (window.history && window.history.pushState) {
-			history.pushState({ 'type': type }, '', '#' + type);
-		}*/
+		currentType = type;
 
 		for (var x = buttons.length - 1; x >= 0; x--) {
 			toggleClass(buttons[x].parentElement, 'active', false);
 		}
 
-		toggleClass((event.target || event.srcElement).parentElement, 'active', true);
+		toggleClass(document.querySelector('[data-source="'+ type +'"]').parentElement, 'active', true);
 	}
 })();
 
