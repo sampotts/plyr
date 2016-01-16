@@ -1,5 +1,7 @@
 # Plyr
-A simple, accessible and customizable HTML5, YouTube and Vimeo media player. [Checkout the demo](http://plyr.io)
+A simple, accessible and customizable HTML5, YouTube and Vimeo media player. 
+
+[Checkout the demo](http://plyr.io)
 
 [![Image of Plyr](https://cdn.plyr.io/static/plyr_v1.5.0.jpg)](http://plyr.io)
 
