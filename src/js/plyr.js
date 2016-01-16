@@ -2196,13 +2196,15 @@
             }
         }
 
-        // Listen for events
-        function _listeners() {
+        // Listen for control events
+        function _controlListeners() {
             // IE doesn't support input event, so we fallback to change
             var inputEvent = (plyr.browser.name == 'IE' ? 'change' : 'input');
 
             // Click play/pause helper
-            function _togglePlay(play) {
+            function _togglePlay() {
+                var play = plyr.media.paused;
+
                 // Toggle playback
                 if (play) {
                     _play();
@@ -2264,10 +2266,10 @@
             }
 
             // Play
-            _proxyHandler(plyr.buttons.play, 'click', config.handlers.play, function() { _togglePlay(true); });
+            _proxyHandler(plyr.buttons.play, 'click', config.handlers.play, _togglePlay);
 
             // Pause
-            _proxyHandler(plyr.buttons.pause, 'click', config.handlers.pause, function() { _togglePlay(); });
+            _proxyHandler(plyr.buttons.pause, 'click', config.handlers.pause, _togglePlay);
 
             // Restart
             _proxyHandler(plyr.buttons.restart, 'click', config.handlers.restart, _seek);
@@ -2297,6 +2299,28 @@
                 _on(document, fullscreen.fullScreenEventName, _toggleFullscreen);
             }
 
+            // Captions
+            _on(plyr.buttons.captions, 'click', _toggleCaptions);
+
+            // Click video
+            if (plyr.type === 'video' && config.click) {
+                _on(plyr.videoContainer, 'click', function() {
+                    if (plyr.media.paused) {
+                        _play();
+                    }
+                    else if (plyr.media.ended) {
+                        _seek();
+                        _play();
+                    }
+                    else {
+                        _pause();
+                    }
+                });
+            }
+        }
+
+        // Listen for media events
+        function _mediaListeners() {
             // Time change on media
             _on(plyr.media, 'timeupdate seeking', _timeUpdate);
 
@@ -2305,9 +2329,6 @@
 
             // Display duration
             _on(plyr.media, 'loadedmetadata', _displayDuration);
-
-            // Captions
-            _on(plyr.buttons.captions, 'click', _toggleCaptions);
 
             // Handle the media finishing
             _on(plyr.media, 'ended', function() {
@@ -2331,22 +2352,6 @@
 
             // Loading
             _on(plyr.media, 'waiting canplay seeked', _checkLoading);
-
-            // Click video
-            if (plyr.type === 'video' && config.click) {
-                _on(plyr.videoContainer, 'click', function() {
-                    if (plyr.media.paused) {
-                        _play();
-                    }
-                    else if (plyr.media.ended) {
-                        _seek();
-                        _play();
-                    }
-                    else {
-                        _pause();
-                    }
-                });
-            }
         }
 
         // Destroy an instance
@@ -2482,25 +2487,31 @@
                 return;
             }
 
-            // Inject custom controls
-            if (!_getElements(config.selectors.controls.wrapper).length) {
+            // Inject custom controls if not present
+            var controlsMissing = !_getElements(config.selectors.controls.wrapper).length;
+            if (controlsMissing) {
                 // Inject custom controls
                 _injectControls();
             }
-
-            // Remove native controls
-            _toggleControls();
 
             // Find the elements
             if (!_findElements()) {
                 return;
             }
 
+            // If the controls are injected, re-bind listeners for controls
+            if (controlsMissing) {
+                _controlListeners();
+            }
+
+            // Media element listeners
+            _mediaListeners();
+
+            // Remove native controls
+            _toggleControls();
+
             // Setup fullscreen
             _setupFullscreen();
-
-            // Listeners
-            _listeners();
 
             // Captions
             _setupCaptions();

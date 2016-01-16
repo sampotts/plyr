@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.5.1
+- Fix for event listeners being duplicated on source change 
+
 # v1.5.0
 - Vimeo support (fixes #8)
 - New options for initialization (you can now pass a selector, HTMLElement or NodeList) (fixes #118)
