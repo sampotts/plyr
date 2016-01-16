@@ -140,7 +140,7 @@
         },
         urls: {
             vimeo: {
-                api:            'http://cdn.plyr.io/froogaloop/1.0.0/plyr.froogaloop.js',
+                api:            'https://cdn.plyr.io/froogaloop/1.0.0/plyr.froogaloop.js',
             },
             youtube: {
                 api:            'https://www.youtube.com/iframe_api'
