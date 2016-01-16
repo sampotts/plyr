@@ -469,6 +469,21 @@ Here's a list of the methods supported:
       Returns the current media source url. Works for both native videos and embeds.
     </td>
   </tr>
+    <td><code>track(...)</code></td>
+    <td>Object or Array</td>
+    <td>
+      Get/Set the track source.
+      <br><br>
+      <strong>Object</strong><br>
+      <code>.track({src: "/captions.vtt", srclang: "en"})</code><br>
+      This will add a new <code>track</code> element to the current media.
+      <br><br>
+      <strong>array</strong><br>
+      <code>.source([{ src: "/path/to/cap1.vtt", srclang: "en", ...more attributes... }, { src: "/path/to/cap2.vtt", srclang: "de", ...more attributes... }])</code><br>
+      This will inject a child <code>track</code> element for every element in the array with the specified attributes. <code>src</code> is the only required attribute although adding <code>label</code> helps. <code>default</code>, <code>srclang</code> are also recommended as it helps the browser decide which file to download and play.
+      <br><br>
+    </td>
+  </tr>
   <tr>
     <td><code>poster(...)</code></td>
     <td>String</td>
