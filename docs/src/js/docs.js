@@ -58,13 +58,14 @@ shr.setup({
 
 	// On load
 	if(historySupport) {
-		if(!currentType.length) {
+		var video = !currentType.length;
+		if(video) {
 			currentType = 'video';
 		}
 		if(currentType in types) {
-			history.replaceState({ 'type': currentType }, '', '#' + currentType);
+			history.replaceState({ 'type': currentType }, '', (video ? '' : '#' + currentType));
 		}
-		if(currentType != 'video') {
+		if(!video) {
 			newSource(currentType);
 		}
 	}
