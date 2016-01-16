@@ -33,9 +33,9 @@ shr.setup({
 		buttons[i].addEventListener('click', newSource);
 	}
 
-	window.addEventListener('popstate', function(event) {
+	/*window.addEventListener('popstate', function(event) {
 		console.log(event);
-	});
+	});*/
 
 	function toggleClass(element, className, state) {
         if (element) {
@@ -117,9 +117,9 @@ shr.setup({
 				break;
 		}
 
-		if (window.history && window.history.pushState) {
+		/*if (window.history && window.history.pushState) {
 			history.pushState({ 'type': type }, '', '#' + type);
-		}
+		}*/
 
 		for (var x = buttons.length - 1; x >= 0; x--) {
 			toggleClass(buttons[x].parentElement, 'active', false);
