@@ -7,76 +7,76 @@
 // -------------------------------
 
 // Colors
-$blue:                      #3498DB !default;
-$gray-dark:                 #343F4A !default;
-$gray:                      #565D64 !default;
-$gray-light:                #6B7D86 !default;
-$gray-lighter:              #CBD0D3 !default;
-$off-white:                 #D6DADD !default;
+$plyr-blue:                      #3498DB !default;
+$plyr-gray-dark:                 #343F4A !default;
+$plyr-gray:                      #565D64 !default;
+$plyr-gray-light:                #6B7D86 !default;
+$plyr-gray-lighter:              #CBD0D3 !default;
+$plyr-off-white:                 #D6DADD !default;
 
 // Font sizes
-$font-size-small:           14px !default;
-$font-size-base:            16px !default;
+$plyr-font-size-small:           14px !default;
+$plyr-font-size-base:            16px !default;
 
 // Captions
-$font-size-captions-base:   ceil($font-size-base * 1.25) !default;
-$font-size-captions-medium: ceil($font-size-base * 1.5) !default;
-$font-size-captions-large:  ($font-size-base * 2) !default;
+$plyr-font-size-captions-base:   ceil($plyr-font-size-base * 1.25) !default;
+$plyr-font-size-captions-medium: ceil($plyr-font-size-base * 1.5) !default;
+$plyr-font-size-captions-large:  ($plyr-font-size-base * 2) !default;
 
 // Controls
-$control-spacing:           10px !default;
-$controls-bg:               #fff !default;
-$control-bg-hover:          $blue !default;
-$control-color:             null !default;
-$control-color-hover:       null !default;
+$plyr-control-spacing:           10px !default;
+$plyr-controls-bg:               #fff !default;
+$plyr-control-bg-hover:          $plyr-blue !default;
+$plyr-control-color:             null !default;
+$plyr-control-color-hover:       null !default;
 
 // Contrast
-@if lightness($controls-bg) >= 65% {
-    $control-color: $gray-light;
+@if lightness($plyr-controls-bg) >= 65% {
+    $plyr-control-color: $plyr-gray-light;
 }
 @else {
-    $control-color: $gray-lighter;
+    $plyr-control-color: $plyr-gray-lighter;
 }
-@if lightness($control-bg-hover) >= 65% {
-    $control-color-hover: $gray;
+@if lightness($plyr-control-bg-hover) >= 65% {
+    $plyr-control-color-hover: $plyr-gray;
 }
 @else {
-    $control-color-hover: #fff;
+    $plyr-control-color-hover: #fff;
 }
 
 // Tooltips
-$tooltip-bg:                $controls-bg !default;
-$tooltip-border-color:      transparentize(@gray-dark, .1) !default;
-$tooltip-border-width:      1px;
-$tooltip-shadow:            0 0 5px $tooltip-border-color, 0 0 0 $tooltip-border-width $tooltip-border-color;
-$tooltip-color:             $control-color !default;
-$tooltip-padding:           $control-spacing !default;
-$tooltip-arrow-size:        6px !default;
-$tooltip-radius:            3px !default;
+$plyr-tooltip-bg:                $plyr-controls-bg !default;
+$plyr-tooltip-border-color:      transparentize(@gray-dark, .1) !default;
+$plyr-tooltip-border-width:      1px;
+$plyr-tooltip-shadow:            0 0 5px $plyr-tooltip-border-color, 0 0 0 $plyr-tooltip-border-width $plyr-tooltip-border-color;
+$plyr-tooltip-color:             $plyr-control-color !default;
+$plyr-tooltip-padding:           $plyr-control-spacing !default;
+$plyr-tooltip-arrow-size:        6px !default;
+$plyr-tooltip-radius:            3px !default;
 
 // Progress
-$progress-bg:               transparentize($gray, .2) !default;
-$progress-playing-bg:       $blue !default;
-$progress-buffered-bg:      transparentize($gray, .25) !default;
-$progress-loading-size:     40px !default;
-$progress-loading-bg:       rgba(0,0,0, .15) !default;
+$plyr-progress-bg:               transparentize($plyr-gray, .2) !default;
+$plyr-progress-playing-bg:       $plyr-blue !default;
+$plyr-progress-buffered-bg:      transparentize($plyr-gray, .25) !default;
+$plyr-progress-loading-size:     40px !default;
+$plyr-progress-loading-bg:       transparentize(#000, .15); !default;
 
 // Volume
-$volume-track-height:       6px !default;
-$volume-track-bg:           darken($controls-bg, 10%) !default;
-$volume-thumb-height:       ($volume-track-height * 2) !default;
-$volume-thumb-width:        ($volume-track-height * 2) !default;
-$volume-thumb-bg:           $control-color !default;
-$volume-thumb-bg-focus:     $control-bg-hover !default;
+$plyr-volume-track-height:       6px !default;
+$plyr-volume-track-bg:           darken($plyr-controls-bg, 10%) !default;
+$plyr-volume-thumb-height:       ($plyr-volume-track-height * 2) !default;
+$plyr-volume-thumb-width:        ($plyr-volume-track-height * 2) !default;
+$plyr-volume-thumb-bg:           $plyr-control-color !default;
+$plyr-volume-thumb-bg-focus:     $plyr-control-bg-hover !default;
 
 // Breakpoints
-$bp-control-split:          560px !default; // When controls split into left/right
-$bp-captions-large:         768px !default; // When captions jump to the larger font size
+$plyr-bp-control-split:          560px !default; // When controls split into left/right
+$plyr-bp-captions-large:         768px !default; // When captions jump to the larger font size
 
 // Animation
 // ---------------------------------------
-@keyframes progress {
-    to { background-position: $progress-loading-size 0; }
+@keyframes plyr-progress {
+    to { background-position: $plyr-progress-loading-size 0; }
 }
 
 // Font smoothing
@@ -92,41 +92,27 @@ $bp-captions-large:         768px !default; // When captions jump to the larger 
     }
 }
 
-// Contain floats: nicolasgallagher.com/micro-clearfix-hack/
-@mixin clearfix()
-{
-    zoom: 1;
-    &:before,
-    &:after { content: ''; display: table; }
-    &:after { clear: both; }
-}
-// Tab focus styles
-@mixin tab-focus() {
-    outline: thin dotted transparentize($gray-dark, .8);
-    outline-offset: 3px;
-}
-
 // <input type="range"> styling
 @mixin volume-thumb() {
-    height: $volume-thumb-height;
-    width: $volume-thumb-width;
-    background: $volume-thumb-bg;
+    height: $plyr-volume-thumb-height;
+    width: $plyr-volume-thumb-width;
+    background: $plyr-volume-thumb-bg;
     border: 0;
     border-radius: 100%;
     transition: background .3s ease;
     cursor: ew-resize;
 }
 @mixin volume-track() {
-    height: $volume-track-height;
-    background: $volume-track-bg;
+    height: $plyr-volume-track-height;
+    background: $plyr-volume-track-bg;
     border: 0;
-    border-radius: ($volume-track-height / 2);
+    border-radius: ($plyr-volume-track-height / 2);
 }
 @mixin seek-thumb() {
     background: transparent;
     border: 0;
-    width: ($control-spacing * 4);
-    height: $control-spacing;
+    width: ($plyr-control-spacing * 4);
+    height: $plyr-control-spacing;
     transform: translateX(-50%);
 }
 @mixin seek-track() {
@@ -209,49 +195,55 @@ $bp-captions-large:         768px !default; // When captions jump to the larger 
         bottom: 0;
         left: 0;
         width: 100%;
-        padding: ($control-spacing * 2) ($control-spacing * 2) ($control-spacing * 3);
+        padding: ($plyr-control-spacing * 2) ($plyr-control-spacing * 2) ($plyr-control-spacing * 3);
         color: #fff;
-        font-size: $font-size-captions-base;
+        font-size: $plyr-font-size-captions-base;
         text-align: center;
         @include font-smoothing();
 
         span {
             border-radius: 2px;
             padding: 3px 10px;
-            background: rgba(0,0,0, .9);
+            background: transparentize(#000, .9);
         }
         span:empty {
             display: none;
         }
 
-        @media (min-width: $bp-captions-large) {
-            font-size: $font-size-captions-medium;
+        @media (min-width: $plyr-bp-captions-large) {
+            font-size: $plyr-font-size-captions-medium;
         }
     }
     &--captions-active &__captions {
         display: block;
     }
     &--fullscreen-active &__captions {
-        font-size: $font-size-captions-large;
+        font-size: $plyr-font-size-captions-large;
     }
 
     // Playback controls
     &__controls {
-        @include clearfix();
         @include font-smoothing();
         position: relative;
-        padding: $control-spacing;
-        background: $controls-bg;
+        padding: $plyr-control-spacing;
+        background: $plyr-controls-bg;
         line-height: 1;
         text-align: center;
-        box-shadow: 0 1px 1px transparentize($gray-dark, .2);
+        box-shadow: 0 1px 1px transparentize($plyr-gray-dark, .2);
+
+        // Clear floats
+        &::after {
+            content: '';
+            display: table;
+            clear: both;
+        }
 
         // Layout
         &--right {
             display: block;
-            margin: $control-spacing auto 0;
+            margin: $plyr-control-spacing auto 0;
         }
-        @media (min-width: $bp-control-split) {
+        @media (min-width: $plyr-bp-control-split) {
             &--left {
                 float: left;
             }
@@ -266,13 +258,13 @@ $bp-captions-large:         768px !default; // When captions jump to the larger 
             display: inline-block;
             vertical-align: middle;
             margin: 0 2px;
-            padding: ($control-spacing / 2) $control-spacing;
+            padding: ($plyr-control-spacing / 2) $plyr-control-spacing;
             overflow: hidden;
             border: 0;
             background: transparent;
             border-radius: 3px;
             cursor: pointer;
-            color: $control-color;
+            color: $plyr-control-color;
             transition: background .3s ease, color .3s ease, opacity .3s ease;
 
             svg {
@@ -286,8 +278,8 @@ $bp-captions-large:         768px !default; // When captions jump to the larger 
             // Hover and tab focus
             &.tab-focus:hover,
             &:hover {
-                background: $control-bg-hover;
-                color: $control-color-hover;
+                background: $plyr-control-bg-hover;
+                color: $plyr-control-color-hover;
             }
             // Default focus
             &:focus {
@@ -306,24 +298,24 @@ $bp-captions-large:         768px !default; // When captions jump to the larger 
         .plyr__time {
             display: inline-block;
             vertical-align: middle;
-            margin-left: $control-spacing;
-            color: $control-color;
+            margin-left: $plyr-control-spacing;
+            color: $plyr-control-color;
             font-weight: 600;
-            font-size: $font-size-small;
+            font-size: $plyr-font-size-small;
         }
 
         // Media duration hidden on small screens
         .plyr__time + .plyr__time {
             display: none;
 
-            @media (min-width: $bp-control-split) {
+            @media (min-width: $plyr-bp-control-split) {
                 display: inline-block;
             }
 
             // Add a slash in before
             &::before {
                 content: '\2044';
-                margin-right: $control-spacing;
+                margin-right: $plyr-control-spacing;
             }
         }
     }
@@ -333,19 +325,19 @@ $bp-captions-large:         768px !default; // When captions jump to the larger 
         position: absolute;
         z-index: 2;
         bottom: 100%;
-        margin-bottom: $tooltip-padding;
-        padding: $tooltip-padding ($tooltip-padding * 1.5);
+        margin-bottom: $plyr-tooltip-padding;
+        padding: $plyr-tooltip-padding ($plyr-tooltip-padding * 1.5);
 
         opacity: 0;
-        background: $tooltip-bg;
-        box-shadow: $tooltip-shadow;
-        border-radius: $tooltip-radius;
-        color: $tooltip-color;
-        font-size: $font-size-small;
+        background: $plyr-tooltip-bg;
+        box-shadow: $plyr-tooltip-shadow;
+        border-radius: $plyr-tooltip-radius;
+        color: $plyr-tooltip-color;
+        font-size: $plyr-font-size-small;
         line-height: 1.5;
         font-weight: 600;
 
-        transform: translate(-50%, ($tooltip-padding * 3)) scale(.8);
+        transform: translate(-50%, ($plyr-tooltip-padding * 3)) scale(.8);
         transform-origin: 50% 100%;
         transition: transform .2s .1s ease, opacity .2s .1s ease;
 
@@ -362,19 +354,19 @@ $bp-captions-large:         768px !default; // When captions jump to the larger 
         }
         // The border triangle
         &::after {
-            $border-arrow-size: ($tooltip-arrow-size + ($tooltip-border-width * 1));
-            bottom: -($border-arrow-size + $tooltip-border-width);
-            border-right: $border-arrow-size solid transparent;
-            border-top: $border-arrow-size solid $tooltip-border-color;
-            border-left: $border-arrow-size solid transparent;
+            $plyr-border-arrow-size: ($plyr-tooltip-arrow-size + ($plyr-tooltip-border-width * 1));
+            bottom: -($plyr-border-arrow-size + $plyr-tooltip-border-width);
+            border-right: $plyr-border-arrow-size solid transparent;
+            border-top: $plyr-border-arrow-size solid $plyr-tooltip-border-color;
+            border-left: $plyr-border-arrow-size solid transparent;
             z-index: 1;
         }
         // The background triangle
         &::before {
-            bottom: -$tooltip-arrow-size;
-            border-right: $tooltip-arrow-size solid transparent;
-            border-top: $tooltip-arrow-size solid $tooltip-bg;
-            border-left: $tooltip-arrow-size solid transparent;
+            bottom: -$plyr-tooltip-arrow-size;
+            border-right: $plyr-tooltip-arrow-size solid transparent;
+            border-top: $plyr-tooltip-arrow-size solid $plyr-tooltip-bg;
+            border-left: $plyr-tooltip-arrow-size solid transparent;
             z-index: 2;
         }
     }
@@ -389,7 +381,8 @@ $bp-captions-large:         768px !default; // When captions jump to the larger 
 
     // Common range styles
     input[type='range'].tab-focus:focus {
-        .tab-focus();
+        outline: thin dotted transparentize($plyr-gray-dark, .8);
+        outline-offset: 3px;
     }
 
     // Playback progress
@@ -400,8 +393,8 @@ $bp-captions-large:         768px !default; // When captions jump to the larger 
         left: 0;
         right: 0;
         width: 100%;
-        height: $control-spacing;
-        background: $progress-bg;
+        height: $plyr-control-spacing;
+        background: $plyr-progress-bg;
 
         &--buffer[value],
         &--played[value],
@@ -410,7 +403,7 @@ $bp-captions-large:         768px !default; // When captions jump to the larger 
             left: 0;
             top: 0;
             width: 100%;
-            height: $control-spacing;
+            height: $plyr-control-spacing;
             margin: 0;
             padding: 0;
             vertical-align: top;
@@ -436,10 +429,10 @@ $bp-captions-large:         768px !default; // When captions jump to the larger 
         }
         &--played[value] {
             z-index: 2;
-            color: $progress-playing-bg;
+            color: $plyr-progress-playing-bg;
         }
         &--buffer[value] {
-            color: $progress-buffered-bg;
+            color: $plyr-progress-buffered-bg;
         }
 
         // Seek control
@@ -492,17 +485,17 @@ $bp-captions-large:         768px !default; // When captions jump to the larger 
 
     // Loading state
     &--loading .plyr__progress--buffer {
-        animation: progress 1s linear infinite;
-        background-size: $progress-loading-size $progress-loading-size;
+        animation: plyr-progress 1s linear infinite;
+        background-size: $plyr-progress-loading-size $plyr-progress-loading-size;
         background-repeat: repeat-x;
-        background-color: $progress-buffered-bg;
+        background-color: $plyr-progress-buffered-bg;
         background-image: linear-gradient(
             -45deg,
-            $progress-loading-bg 25%,
+            $plyr-progress-loading-bg 25%,
             transparent 25%,
             transparent 50%,
-            $progress-loading-bg 50%,
-            $progress-loading-bg 75%,
+            $plyr-progress-loading-bg 50%,
+            $plyr-progress-loading-bg 75%,
             transparent 75%,
             transparent);
         color: transparent;
@@ -526,7 +519,7 @@ $bp-captions-large:         768px !default; // When captions jump to the larger 
         -webkit-appearance: none;
         -moz-appearance: none;
         width: 100px;
-        margin: 0 $control-spacing 0 0;
+        margin: 0 $plyr-control-spacing 0 0;
         padding: 0;
         cursor: pointer;
         background: transparent;
@@ -538,7 +531,7 @@ $bp-captions-large:         768px !default; // When captions jump to the larger 
         }
         &::-webkit-slider-thumb {
             -webkit-appearance: none;
-            margin-top: -(($volume-thumb-height - $volume-track-height) / 2);
+            margin-top: -(($plyr-volume-thumb-height - $plyr-volume-track-height) / 2);
             @include volume-thumb();
         }
 
@@ -552,10 +545,10 @@ $bp-captions-large:         768px !default; // When captions jump to the larger 
 
         // Microsoft
         &::-ms-track {
-            height: $volume-track-height;
+            height: $plyr-volume-track-height;
             background: transparent;
             border-color: transparent;
-            border-width: (($volume-thumb-height - $volume-track-height) / 2) 0;
+            border-width: (($plyr-volume-thumb-height - $plyr-volume-track-height) / 2) 0;
             color: transparent;
         }
         &::-ms-fill-lower,
@@ -570,13 +563,13 @@ $bp-captions-large:         768px !default; // When captions jump to the larger 
             outline: 0;
 
             &::-webkit-slider-thumb {
-                background: $volume-thumb-bg-focus;
+                background: $plyr-volume-thumb-bg-focus;
             }
             &::-moz-range-thumb {
-                background: $volume-thumb-bg-focus;
+                background: $plyr-volume-thumb-bg-focus;
             }
             &::-ms-thumb {
-                background: $volume-thumb-bg-focus;
+                background: $plyr-volume-thumb-bg-focus;
             }
         }
     }
@@ -597,12 +590,12 @@ $bp-captions-large:         768px !default; // When captions jump to the larger 
     // Audio specific styles
     // Position the progress within the container
     &--audio .plyr__controls {
-        padding-top: ($control-spacing * 2);
+        padding-top: ($plyr-control-spacing * 2);
     }
     &--audio .plyr__progress {
         bottom: auto;
         top: 0;
-        background: $off-white;
+        background: $plyr-off-white;
     }
 
     // Full screen mode
@@ -635,14 +628,14 @@ $bp-captions-large:         768px !default; // When captions jump to the larger 
         // Hide controls when playing in full screen
         &--fullscreen--hide-controls&--fullscreen-active&--playing {
             .plyr__controls {
-                transform: translateY(100%) translateY($control-spacing / 2);
+                transform: translateY(100%) translateY($plyr-control-spacing / 2);
                 transition: transform .3s .2s ease;
             }
             &.plyr--hover .plyr__controls {
                 transform: translateY(0);
             }
             .plyr__captions {
-                bottom: ($control-spacing / 2);
+                bottom: ($plyr-control-spacing / 2);
                 transition: bottom .3s .2s ease;
             }
         }
@@ -654,7 +647,7 @@ $bp-captions-large:         768px !default; // When captions jump to the larger 
             top: auto;
             bottom: 90px;
 
-            @media (min-width: $bp-control-split) {
+            @media (min-width: $plyr-bp-control-split) {
                 bottom: 60px;
             }
         }
