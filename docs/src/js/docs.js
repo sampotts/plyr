@@ -11,9 +11,6 @@ plyr.setup('.js-media-player', {
 	tooltips: 	true,
 	captions: {
 		defaultActive: true
-	},
-	onSetup: function() {
-		console.log('✓ Setup done');
 	}
 });
 
