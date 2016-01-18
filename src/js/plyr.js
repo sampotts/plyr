@@ -1646,7 +1646,8 @@
                         break;
 
                     case 'vimeo':
-                        plyr.embed.api('seekTo', targetTime);
+                        // Round to nearest second for vimeo
+                        plyr.embed.api('seekTo', targetTime.toFixed(0));
                         break;
                 }
 
@@ -2214,8 +2215,8 @@
                 }
 
                 // Determine which buttons
-                var trigger = plyr.buttons[play ? "play" : "pause"],
-                    target = plyr.buttons[play ? "pause" : "play"];
+                var trigger = plyr.buttons[play ? 'play' : 'pause'],
+                    target = plyr.buttons[play ? 'pause' : 'play'];
 
                 // Setup focus and tab focus
                 if(target) {
@@ -2475,7 +2476,7 @@
         function _setupInterface() {
             // Don't setup interface if no support
             if (!plyr.supported.full) {
-                _log("No full support for this media type (" + plyr.type + ")", true);
+                _log('No full support for this media type (' + plyr.type + ')', true);
 
                 // Remove controls
                 _remove(_getElement(config.selectors.controls.wrapper));

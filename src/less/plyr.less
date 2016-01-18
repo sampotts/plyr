@@ -7,78 +7,78 @@
 // -------------------------------
 
 // Colors
-@blue:                      #3498DB;
-@gray-dark:                 #343F4A;
-@gray:                      #565D64;
-@gray-light:                #6B7D86;
-@gray-lighter:              #CBD0D3;
-@off-white:                 #D6DADD;
+@plyr-blue:                      #3498DB;
+@plyr-gray-dark:                 #343F4A;
+@plyr-gray:                      #565D64;
+@plyr-gray-light:                #6B7D86;
+@plyr-gray-lighter:              #CBD0D3;
+@plyr-off-white:                 #D6DADD;
 
 // Font sizes
-@font-size-small:           14px;
-@font-size-base:            16px;
+@plyr-font-size-small:           14px;
+@plyr-font-size-base:            16px;
 
 // Captions
-@font-size-captions-base:   ceil(@font-size-base * 1.25);
-@font-size-captions-medium: ceil(@font-size-base * 1.5);
-@font-size-captions-large:  (@font-size-base * 2);
+@plyr-font-size-captions-base:   ceil(@plyr-font-size-base * 1.25);
+@plyr-font-size-captions-medium: ceil(@plyr-font-size-base * 1.5);
+@plyr-font-size-captions-large:  (@plyr-font-size-base * 2);
 
 // Controls
-@control-spacing:           10px;
-@controls-bg:               #fff;
-@control-bg-hover:          @blue;
-.contrast-control-color(@controls-bg);
-.contrast-control-color-hover(@control-bg-hover);
+@plyr-control-spacing:           10px;
+@plyr-controls-bg:               #fff;
+@plyr-control-bg-hover:          @plyr-blue;
+.contrast-control-color(@plyr-controls-bg);
+.contrast-control-color-hover(@plyr-control-bg-hover);
 
 // Tooltips
-@tooltip-bg:                @controls-bg;
-@tooltip-border-color:      fade(@gray-dark, 10%);
-@tooltip-border-width:      1px;
-@tooltip-shadow:            0 0 5px @tooltip-border-color, 0 0 0 @tooltip-border-width @tooltip-border-color;
-@tooltip-color:             @control-color;
-@tooltip-padding:           @control-spacing;
-@tooltip-arrow-size:        6px;
-@tooltip-radius:            3px;
+@plyr-tooltip-bg:                @plyr-controls-bg;
+@plyr-tooltip-border-color:      fade(@plyr-gray-dark, 10%);
+@plyr-tooltip-border-width:      1px;
+@plyr-tooltip-shadow:            0 0 5px @plyr-tooltip-border-color, 0 0 0 @plyr-tooltip-border-width @plyr-tooltip-border-color;
+@plyr-tooltip-color:             @plyr-control-color;
+@plyr-tooltip-padding:           @plyr-control-spacing;
+@plyr-tooltip-arrow-size:        6px;
+@plyr-tooltip-radius:            3px;
 
 // Progress
-@progress-bg:               fade(@gray, 20%);
-@progress-playing-bg:       @blue;
-@progress-buffered-bg:      fade(@gray, 25%);
-@progress-loading-size:     40px;
-@progress-loading-bg:       rgba(0,0,0, .15);
+@plyr-progress-bg:               fade(@plyr-gray, 20%);
+@plyr-progress-playing-bg:       @plyr-blue;
+@plyr-progress-buffered-bg:      fade(@plyr-gray, 25%);
+@plyr-progress-loading-size:     40px;
+@plyr-progress-loading-bg:       fade(#000, 15%);
 
 // Volume
-@volume-track-height:       6px;
-@volume-track-bg:           darken(@controls-bg, 10%);
-@volume-thumb-height:       (@volume-track-height * 2);
-@volume-thumb-width:        (@volume-track-height * 2);
-@volume-thumb-bg:           @control-color;
-@volume-thumb-bg-focus:     @control-bg-hover;
+@plyr-volume-track-height:       6px;
+@plyr-volume-track-bg:           darken(@plyr-controls-bg, 10%);
+@plyr-volume-thumb-height:       (@plyr-volume-track-height * 2);
+@plyr-volume-thumb-width:        (@plyr-volume-track-height * 2);
+@plyr-volume-thumb-bg:           @plyr-control-color;
+@plyr-volume-thumb-bg-focus:     @plyr-control-bg-hover;
 
 // Breakpoints
-@bp-control-split:          560px; // When controls split into left/right
-@bp-captions-large:         768px; // When captions jump to the larger font size
+@plyr-bp-control-split:          560px; // When controls split into left/right
+@plyr-bp-captions-large:         768px; // When captions jump to the larger font size
 
 // Animation
 // ---------------------------------------
-@keyframes progress {
-    to { background-position: @progress-loading-size 0; }
+@keyframes plyr-progress {
+    to { background-position: @plyr-progress-loading-size 0; }
 }
 
 // Mixins
 // -------------------------------
 // Contrast
-.contrast-control-color(@color: "") when (lightness(@color) >= 65%) {
-    @control-color: @gray-light;
+.contrast-control-color(@plyr-color: "") when (lightness(@plyr-color) >= 65%) {
+    @plyr-control-color: @plyr-gray-light;
 }
-.contrast-control-color(@color: "") when (lightness(@color) < 65%) {
-    @control-color: @gray-lighter;
+.contrast-control-color(@plyr-color: "") when (lightness(@plyr-color) < 65%) {
+    @plyr-control-color: @plyr-gray-lighter;
 }
-.contrast-control-color-hover(@color: "") when (lightness(@color) >= 65%) {
-    @control-color-hover: @gray;
+.contrast-control-color-hover(@plyr-color: "") when (lightness(@plyr-color) >= 65%) {
+    @plyr-control-color-hover: @plyr-gray;
 }
-.contrast-control-color-hover(@color: "") when (lightness(@color) < 65%) {
-    @control-color-hover: #fff;
+.contrast-control-color-hover(@plyr-color: "") when (lightness(@plyr-color) < 65%) {
+    @plyr-control-color-hover: #fff;
 }
 
 // Font smoothing
@@ -91,40 +91,27 @@
     -webkit-font-smoothing: subpixel-antialiased;
 }
 
-// Contain floats: nicolasgallagher.com/micro-clearfix-hack/
-.clearfix() {
-    zoom: 1;
-    &:before,
-    &:after { content: ""; display: table; }
-    &:after { clear: both; }
-}
-// Tab focus styles
-.tab-focus() {
-    outline: 1px dotted fade(@gray-dark, 80%);
-    outline-offset: 3px;
-}
-
 // <input type="range"> styling
 .volume-thumb() {
-    height: @volume-thumb-height;
-    width: @volume-thumb-width;
-    background: @volume-thumb-bg;
+    height: @plyr-volume-thumb-height;
+    width: @plyr-volume-thumb-width;
+    background: @plyr-volume-thumb-bg;
     border: 0;
     border-radius: 100%;
     transition: background .3s ease;
     cursor: ew-resize;
 }
 .volume-track() {
-    height: @volume-track-height;
-    background: @volume-track-bg;
+    height: @plyr-volume-track-height;
+    background: @plyr-volume-track-bg;
     border: 0;
-    border-radius: (@volume-track-height / 2);
+    border-radius: (@plyr-volume-track-height / 2);
 }
 .seek-thumb() {
     background: transparent;
     border: 0;
-    width: (@control-spacing * 4);
-    height: @control-spacing;
+    width: (@plyr-control-spacing * 4);
+    height: @plyr-control-spacing;
     transform: translateX(-50%);
 }
 .seek-track() {
@@ -208,49 +195,55 @@
         bottom: 0;
         left: 0;
         width: 100%;
-        padding: (@control-spacing * 2) (@control-spacing * 2) (@control-spacing * 3);
+        padding: (@plyr-control-spacing * 2) (@plyr-control-spacing * 2) (@plyr-control-spacing * 3);
         color: #fff;
-        font-size: @font-size-captions-base;
+        font-size: @plyr-font-size-captions-base;
         text-align: center;
         .font-smoothing();
 
         span {
             border-radius: 2px;
             padding: 3px 10px;
-            background: rgba(0,0,0, .9);
+            background: fade(#000, 90%);
         }
         span:empty {
             display: none;
         }
 
-        @media (min-width: @bp-captions-large) {
-            font-size: @font-size-captions-medium;
+        @media (min-width: @plyr-bp-captions-large) {
+            font-size: @plyr-font-size-captions-medium;
         }
     }
     &--captions-active &__captions {
         display: block;
     }
     &--fullscreen-active &__captions {
-        font-size: @font-size-captions-large;
+        font-size: @plyr-font-size-captions-large;
     }
 
     // Playback controls
     &__controls {
-        .clearfix();
         .font-smoothing();
         position: relative;
-        padding: @control-spacing;
-        background: @controls-bg;
+        padding: @plyr-control-spacing;
+        background: @plyr-controls-bg;
         line-height: 1;
         text-align: center;
-        box-shadow: 0 1px 1px fade(@gray-dark, 20%);
+        box-shadow: 0 1px 1px fade(@plyr-gray-dark, 20%);
+
+        // Clear floats
+        &::after {
+            content: '';
+            display: table;
+            clear: both;
+        }
 
         // Layout
         &--right {
             display: block;
-            margin: @control-spacing auto 0;
+            margin: @plyr-control-spacing auto 0;
         }
-        @media (min-width: @bp-control-split) {
+        @media (min-width: @plyr-bp-control-split) {
             &--left {
                 float: left;
             }
@@ -265,13 +258,13 @@
             display: inline-block;
             vertical-align: middle;
             margin: 0 2px;
-            padding: (@control-spacing / 2) @control-spacing;
+            padding: (@plyr-control-spacing / 2) @plyr-control-spacing;
             overflow: hidden;
             border: 0;
             background: transparent;
             border-radius: 3px;
             cursor: pointer;
-            color: @control-color;
+            color: @plyr-control-color;
             transition: background .3s ease, color .3s ease, opacity .3s ease;
 
             svg {
@@ -285,8 +278,8 @@
             // Hover and tab focus
             &.tab-focus:focus,
             &:hover {
-                background: @control-bg-hover;
-                color: @control-color-hover;
+                background: @plyr-control-bg-hover;
+                color: @plyr-control-color-hover;
             }
             // Default focus
             &:focus {
@@ -305,24 +298,24 @@
         .plyr__time {
             display: inline-block;
             vertical-align: middle;
-            margin-left: @control-spacing;
-            color: @control-color;
+            margin-left: @plyr-control-spacing;
+            color: @plyr-control-color;
             font-weight: 600;
-            font-size: @font-size-small;
+            font-size: @plyr-font-size-small;
         }
 
         // Media duration hidden on small screens
         .plyr__time + .plyr__time {
             display: none;
 
-            @media (min-width: @bp-control-split) {
+            @media (min-width: @plyr-bp-control-split) {
                 display: inline-block;
             }
 
             // Add a slash in before
             &::before {
                 content: '\2044';
-                margin-right: @control-spacing;
+                margin-right: @plyr-control-spacing;
             }
         }
     }
@@ -332,19 +325,19 @@
         position: absolute;
         z-index: 2;
         bottom: 100%;
-        margin-bottom: @tooltip-padding;
-        padding: @tooltip-padding (@tooltip-padding * 1.5);
+        margin-bottom: @plyr-tooltip-padding;
+        padding: @plyr-tooltip-padding (@plyr-tooltip-padding * 1.5);
 
         opacity: 0;
-        background: @tooltip-bg;
-        box-shadow: @tooltip-shadow;
-        border-radius: @tooltip-radius;
-        color: @tooltip-color;
-        font-size: @font-size-small;
+        background: @plyr-tooltip-bg;
+        box-shadow: @plyr-tooltip-shadow;
+        border-radius: @plyr-tooltip-radius;
+        color: @plyr-tooltip-color;
+        font-size: @plyr-font-size-small;
         line-height: 1.5;
         font-weight: 600;
 
-        transform: translate(-50%, (@tooltip-padding * 3)) scale(.8);
+        transform: translate(-50%, (@plyr-tooltip-padding * 3)) scale(.8);
         transform-origin: 50% 100%;
         transition: transform .2s .1s ease, opacity .2s .1s ease;
 
@@ -361,19 +354,19 @@
         }
         // The border triangle
         &::after {
-            @border-arrow-size: (@tooltip-arrow-size + (@tooltip-border-width * 1));
-            bottom: -(@border-arrow-size + @tooltip-border-width);
-            border-right: @border-arrow-size solid transparent;
-            border-top: @border-arrow-size solid @tooltip-border-color;
-            border-left: @border-arrow-size solid transparent;
+            @plyr-border-arrow-size: (@plyr-tooltip-arrow-size + (@plyr-tooltip-border-width * 1));
+            bottom: -(@plyr-border-arrow-size + @plyr-tooltip-border-width);
+            border-right: @plyr-border-arrow-size solid transparent;
+            border-top: @plyr-border-arrow-size solid @plyr-tooltip-border-color;
+            border-left: @plyr-border-arrow-size solid transparent;
             z-index: 1;
         }
         // The background triangle
         &::before {
-            bottom: -@tooltip-arrow-size;
-            border-right: @tooltip-arrow-size solid transparent;
-            border-top: @tooltip-arrow-size solid @tooltip-bg;
-            border-left: @tooltip-arrow-size solid transparent;
+            bottom: -@plyr-tooltip-arrow-size;
+            border-right: @plyr-tooltip-arrow-size solid transparent;
+            border-top: @plyr-tooltip-arrow-size solid @plyr-tooltip-bg;
+            border-left: @plyr-tooltip-arrow-size solid transparent;
             z-index: 2;
         }
     }
@@ -388,7 +381,8 @@
 
     // Common range styles
     input[type='range'].tab-focus:focus {
-        .tab-focus();
+        outline: 1px dotted fade(@plyr-gray-dark, 80%);
+        outline-offset: 3px;
     }
 
     // Playback progress
@@ -399,8 +393,8 @@
         left: 0;
         right: 0;
         width: 100%;
-        height: @control-spacing;
-        background: @progress-bg;
+        height: @plyr-control-spacing;
+        background: @plyr-progress-bg;
 
         &--buffer[value],
         &--played[value],
@@ -409,7 +403,7 @@
             left: 0;
             top: 0;
             width: 100%;
-            height: @control-spacing;
+            height: @plyr-control-spacing;
             margin: 0;
             padding: 0;
             vertical-align: top;
@@ -423,22 +417,25 @@
         &--played[value] {
             &::-webkit-progress-bar {
                 background: transparent;
+                transition: width .2s ease;
             }
 
             // Inherit from currentColor;
             &::-webkit-progress-value {
                 background: currentColor;
+                transition: width .2s ease;
             }
             &::-moz-progress-bar {
                 background: currentColor;
+                transition: width .2s ease;
             }
         }
         &--played[value] {
             z-index: 2;
-            color: @progress-playing-bg;
+            color: @plyr-progress-playing-bg;
         }
         &--buffer[value] {
-            color: @progress-buffered-bg;
+            color: @plyr-progress-buffered-bg;
         }
 
         // Seek control
@@ -491,17 +488,17 @@
 
     // Loading state
     &--loading .plyr__progress--buffer {
-        animation: progress 1s linear infinite;
-        background-size: @progress-loading-size @progress-loading-size;
+        animation: plyr-progress 1s linear infinite;
+        background-size: @plyr-progress-loading-size @plyr-progress-loading-size;
         background-repeat: repeat-x;
-        background-color: @progress-buffered-bg;
+        background-color: @plyr-progress-buffered-bg;
         background-image: linear-gradient(
             -45deg,
-            @progress-loading-bg 25%,
+            @plyr-progress-loading-bg 25%,
             transparent 25%,
             transparent 50%,
-            @progress-loading-bg 50%,
-            @progress-loading-bg 75%,
+            @plyr-progress-loading-bg 50%,
+            @plyr-progress-loading-bg 75%,
             transparent 75%,
             transparent);
         color: transparent;
@@ -525,7 +522,7 @@
         -webkit-appearance: none;
         -moz-appearance: none;
         width: 100px;
-        margin: 0 @control-spacing 0 0;
+        margin: 0 @plyr-control-spacing 0 0;
         padding: 0;
         cursor: pointer;
         background: transparent;
@@ -537,7 +534,7 @@
         }
         &::-webkit-slider-thumb {
             -webkit-appearance: none;
-            margin-top: -((@volume-thumb-height - @volume-track-height) / 2);
+            margin-top: -((@plyr-volume-thumb-height - @plyr-volume-track-height) / 2);
             .volume-thumb();
         }
 
@@ -551,10 +548,10 @@
 
         // Microsoft
         &::-ms-track {
-            height: @volume-track-height;
+            height: @plyr-volume-track-height;
             background: transparent;
             border-color: transparent;
-            border-width: ((@volume-thumb-height - @volume-track-height) / 2) 0;
+            border-width: ((@plyr-volume-thumb-height - @plyr-volume-track-height) / 2) 0;
             color: transparent;
         }
         &::-ms-fill-lower,
@@ -569,13 +566,13 @@
             outline: 0;
 
             &::-webkit-slider-thumb {
-                background: @volume-thumb-bg-focus;
+                background: @plyr-volume-thumb-bg-focus;
             }
             &::-moz-range-thumb {
-                background: @volume-thumb-bg-focus;
+                background: @plyr-volume-thumb-bg-focus;
             }
             &::-ms-thumb {
-                background: @volume-thumb-bg-focus;
+                background: @plyr-volume-thumb-bg-focus;
             }
         }
     }
@@ -596,16 +593,16 @@
     // Audio specific styles
     // Position the progress within the container
     &--audio .plyr__controls {
-        padding-top: (@control-spacing * 2);
+        padding-top: (@plyr-control-spacing * 2);
     }
     &--audio .plyr__progress {
         bottom: auto;
         top: 0;
-        background: @off-white;
+        background: @plyr-off-white;
     }
 
     // Full screen mode
-    &--fullscreen,
+    &.plyr--fullscreen,
     &--fullscreen-active {
         position: fixed;
         top: 0;
@@ -633,28 +630,29 @@
     }
 
     // Hide controls when playing in full screen
-    &--fullscreen--hide-controls&--fullscreen-active&--playing {
+    &--fullscreen-active.plyr--fullscreen--hide-controls.plyr--playing,
+    &.plyr--fullscreen.plyr--fullscreen--hide-controls.plyr--playing {
         .plyr__controls {
-            transform: translateY(100%) translateY(@control-spacing / 2);
+            transform: translateY(100%) translateY(@plyr-control-spacing / 2);
             transition: transform .3s .2s ease;
+        }
+        .plyr__captions {
+            bottom: (@plyr-control-spacing / 2);
+            transition: bottom .3s .2s ease;
         }
         &.plyr--hover .plyr__controls {
             transform: translateY(0);
         }
-        .plyr__captions {
-            bottom: (@control-spacing / 2);
-            transition: bottom .3s .2s ease;
-        }
     }
 
     // Captions
-    &--fullscreen .plyr__captions,
+    &.plyr--fullscreen .plyr__captions,
     &--fullscreen-active .plyr__captions,
-    &--fullscreen--hide-controls&--fullscreen-active&--playing&--hover &__captions {
+    &--fullscreen--hide-controls.plyr--fullscreen-active.plyr--playing.plyr--hover .plyr__captions {
         top: auto;
         bottom: 90px;
 
-        @media (min-width: @bp-control-split) {
+        @media (min-width: @plyr-bp-control-split) {
             bottom: 60px;
         }
     }
