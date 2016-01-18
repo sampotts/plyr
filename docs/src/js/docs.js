@@ -28,10 +28,10 @@ shr.setup({
 (function() {
 	var buttons = document.querySelectorAll('[data-source]'),
 		types = {
-			video: 0,
-			audio: 1,
-			youtube: 2,
-			vimeo: 3
+			video: 		'video',
+			audio: 		'audio',
+			youtube: 	'youtube',
+			vimeo: 		'vimeo'
 		},
 		currentType = window.location.hash.replace('#', ''),
 		historySupport = (window.history && window.history.pushState);
@@ -60,7 +60,7 @@ shr.setup({
 	if(historySupport) {
 		var video = !currentType.length;
 		if(video) {
-			currentType = 'video';
+			currentType = types.video;
 		}
 		if(currentType in types) {
 			history.replaceState({ 'type': currentType }, '', (video ? '' : '#' + currentType));
@@ -70,6 +70,7 @@ shr.setup({
 		}
 	}
 
+	// Toggle class on an element
 	function toggleClass(element, className, state) {
         if (element) {
             if (element.classList) {
@@ -91,7 +92,7 @@ shr.setup({
 		var player = document.querySelector('.js-media-player').plyr;
 
 		switch(type) {
-			case 'video':
+			case types.video:
 				player.source({
 					type:       'video',
 					title: 		'View From A Blue Moon',
@@ -114,7 +115,7 @@ shr.setup({
 				});
 				break;
 
-			case 'audio':
+			case types.audio:
 				player.source({
 					type:       'audio',
 					title: 		'Kishi Bashi &ndash; &ldquo;It All Began With A Burst&rdquo;',
@@ -129,7 +130,7 @@ shr.setup({
 				});
 				break;
 
-			case 'youtube':
+			case types.youtube:
 				player.source({
 					type:       'video',
 					title: 		'View From A Blue Moon',
@@ -140,7 +141,7 @@ shr.setup({
 				});
 				break;
 
-			case 'vimeo':
+			case types.vimeo:
 				player.source({
 					type:       'video',
 					title: 		'View From A Blue Moon',
