@@ -134,13 +134,19 @@ And the same for `<audio>`
 </div>
 ```
 
-For YouTube, Plyr uses the standard YouTube API markup (an empty `<div>`):
+For YouTube and Vimeo, Plyr uses the standard YouTube API markup (an empty `<div>`):
 
 ```html
 <div class="plyr">
-	<div data-video-id="L1h9xxCU20g" data-type="youtube"></div>
+	<div data-video-id="bTqVqk7FSmY" data-type="youtube"></div>
 </div>
 ```
+```html
+<div class="plyr">
+	<div data-video-id="143418951" data-type="vimeo"></div>
+</div>
+```
+
 
 #### Cross Origin (CORS)
 You'll notice the `crossorigin` attribute on the example `<video>` and `<audio>` elements. This is because the media is loaded from another domain. If your media is hosted on another domain, you may need to add this attribute.
