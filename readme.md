@@ -17,6 +17,7 @@ We wanted a lightweight, accessible and customizable media player that supports 
 - **HTML Video & Audio** - support for both formats
 - **[Embedded Video](#embeds)** - support for YouTube and Vimeo (beta)
 - **[API](#api)** - toggle playback, volume, seeking, and more
+- **[Universal events](#events)** - no messing around with Vimeo and YouTube APIs, all events are universal across formats 
 - **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes
 - **i18n support** - support for internationalization of controls
 - **No dependencies** - written in "vanilla" JavaScript, no jQuery required
