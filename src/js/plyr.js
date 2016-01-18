@@ -92,18 +92,6 @@
             },
             tabFocus:           'tab-focus'
         },
-        handlers: {
-            seek:               null,
-            play:               null,
-            pause:              null,
-            restart:            null,
-            rewind:             null,
-            forward:            null,
-            mute:               null,
-            volume:             null,
-            captions:           null,
-            fullscreen:         null
-        },
         captions: {
             defaultActive:      false
         },
@@ -138,6 +126,7 @@
             embed:              ['youtube', 'vimeo'],
             html5:              ['video', 'audio']
         },
+        // URLs
         urls: {
             vimeo: {
                 api:            'https://cdn.plyr.io/froogaloop/1.0.0/plyr.froogaloop.js',
@@ -145,7 +134,22 @@
             youtube: {
                 api:            'https://www.youtube.com/iframe_api'
             }
-        }
+        },
+        // Custom control listeners
+        listeners: {
+            seek:               null,
+            play:               null,
+            pause:              null,
+            restart:            null,
+            rewind:             null,
+            forward:            null,
+            mute:               null,
+            volume:             null,
+            captions:           null,
+            fullscreen:         null
+        },
+        // Events to watch on HTML5 media elements
+        events:                 ['ended', 'progress', 'stalled', 'playing', 'waiting', 'canplay', 'canplaythrough', 'loadstart', 'loadeddata', 'loadedmetadata', 'timeupdate', 'volumechange', 'play', 'pause', 'error', 'seeking', 'emptied']
     };
 
     // Build the default HTML
@@ -529,36 +533,36 @@
     // Bind event
     function _on(element, events, callback) {
         if (element) {
-            _toggleHandler(element, events, callback, true);
+            _toggleListener(element, events, callback, true);
         }
     }
 
     // Unbind event
     function _off(element, events, callback) {
         if (element) {
-            _toggleHandler(element, events, callback, false);
+            _toggleListener(element, events, callback, false);
         }
     }
 
     // Bind along with custom handler
-    function _proxyHandler(element, eventName, userHandler, defaultHandler) {
+    function _proxyListener(element, eventName, userListener, defaultListener) {
         _on(element, eventName, function(event) {
-            if(userHandler) {
-                userHandler.apply(element, [event]);
+            if(userListener) {
+                userListener.apply(element, [event]);
             }
-            defaultHandler.apply(element, [event]);
+            defaultListener.apply(element, [event]);
         });
     }
 
-    // Toggle event handler
-    function _toggleHandler(element, events, callback, toggle) {
+    // Toggle event listener
+    function _toggleListener(element, events, callback, toggle) {
         var eventList = events.split(' ');
 
         // If a nodelist is passed, call itself on each node
         if (element instanceof NodeList) {
             for (var x = 0; x < element.length; x++) {
                 if (element[x] instanceof Node) {
-                    _toggleHandler(element[x], arguments[1], arguments[2], arguments[3]);
+                    _toggleListener(element[x], arguments[1], arguments[2], arguments[3]);
                 }
             }
             return;
@@ -571,20 +575,17 @@
     }
 
     // Trigger event
-    function _triggerEvent(element, event) {
+    function _triggerEvent(element, eventName, properties) {
         // Bail if no element
-        if(!element || !event) {
+        if(!element || !eventName) {
             return;
         }
 
-        // Create faux event
-        var fauxEvent = document.createEvent('MouseEvents');
-
-        // Set the event type
-        fauxEvent.initEvent(event, true, true);
+        // create and dispatch the event
+        var event = new CustomEvent(eventName, properties);
 
         // Dispatch the event
-        element.dispatchEvent(fauxEvent);
+        element.dispatchEvent(event);
     }
 
     // Toggle aria-pressed state on a toggle button
@@ -1241,6 +1242,9 @@
                             // Bail if we're at 100%
                             if (plyr.media.buffered === 1) {
                                 window.clearInterval(plyr.timer.buffering);
+
+                                // Trigger event
+                                _triggerEvent(plyr.media, 'canplaythrough');
                             }
                         }, 200);
 
@@ -1274,6 +1278,7 @@
                                 plyr.media.paused = false;
                                 plyr.media.seeking = false;
                                 _triggerEvent(plyr.media, 'play');
+                                _triggerEvent(plyr.media, 'playing');
 
                                 // Poll to get playback progress
                                 plyr.timer.playing = window.setInterval(function() {
@@ -1289,6 +1294,7 @@
                             case 2:
                                 plyr.media.paused = true;
                                 _triggerEvent(plyr.media, 'pause');
+                                break;
                         }
                     }
                 }
@@ -1339,6 +1345,7 @@
                 plyr.embed.addEvent('play', function() {
                     plyr.media.paused = false;
                     _triggerEvent(plyr.media, 'play');
+                    _triggerEvent(plyr.media, 'playing');
                 });
 
                 plyr.embed.addEvent('pause', function() {
@@ -1355,6 +1362,11 @@
                 plyr.embed.addEvent('loadProgress', function(data) {
                     plyr.media.buffered = data.percent;
                     _triggerEvent(plyr.media, 'progress');
+
+                    if(parseInt(data.percent) === 1) {
+                        // Trigger event
+                        _triggerEvent(plyr.media, 'canplaythrough');
+                    }
                 });
 
                 plyr.embed.addEvent('finish', function() {
@@ -1759,11 +1771,14 @@
                 _toggleClass(plyr.controls, config.classes.hover, false);
 
                 // Keep an eye on the mouse location in relation to controls
-                _toggleHandler(plyr.controls, 'mouseenter mouseleave', _setMouseOver, plyr.isFullscreen);
+                _toggleListener(plyr.controls, 'mouseenter mouseleave', _setMouseOver, plyr.isFullscreen);
 
                 // Show the controls on mouse move
-                _toggleHandler(plyr.container, 'mousemove', _showControls, plyr.isFullscreen);
+                _toggleListener(plyr.container, 'mousemove', _showControls, plyr.isFullscreen);
             }
+
+            // Trigger an event
+            _triggerEvent(plyr.container, plyr.isFullscreen ? 'enterfullscreen' : 'exitfullscreen');
         }
 
         // Bail from faux-fullscreen
@@ -1899,6 +1914,9 @@
 
             // Add class hook
             _toggleClass(plyr.container, config.classes.captions.active, plyr.captionsEnabled);
+
+            // Trigger an event
+            _triggerEvent(plyr.container, plyr.captionsEnabled ? 'captionsenabled' : 'captionsdisabled');
         }
 
         // Check if media is loading
@@ -2267,33 +2285,33 @@
             }
 
             // Play
-            _proxyHandler(plyr.buttons.play, 'click', config.handlers.play, _togglePlay);
+            _proxyListener(plyr.buttons.play, 'click', config.listeners.play, _togglePlay);
 
             // Pause
-            _proxyHandler(plyr.buttons.pause, 'click', config.handlers.pause, _togglePlay);
+            _proxyListener(plyr.buttons.pause, 'click', config.listeners.pause, _togglePlay);
 
             // Restart
-            _proxyHandler(plyr.buttons.restart, 'click', config.handlers.restart, _seek);
+            _proxyListener(plyr.buttons.restart, 'click', config.listeners.restart, _seek);
 
             // Rewind
-            _proxyHandler(plyr.buttons.rewind, 'click', config.handlers.rewind, _rewind);
+            _proxyListener(plyr.buttons.rewind, 'click', config.listeners.rewind, _rewind);
 
             // Fast forward
-            _proxyHandler(plyr.buttons.forward, 'click', config.handlers.forward, _forward);
+            _proxyListener(plyr.buttons.forward, 'click', config.listeners.forward, _forward);
 
             // Seek
-            _proxyHandler(plyr.buttons.seek, inputEvent, config.handlers.seek, _seek);
+            _proxyListener(plyr.buttons.seek, inputEvent, config.listeners.seek, _seek);
 
             // Set volume
-            _proxyHandler(plyr.volume, inputEvent, config.handlers.volume, function() {
+            _proxyListener(plyr.volume, inputEvent, config.listeners.volume, function() {
                 _setVolume(plyr.volume.value);
             });
 
             // Mute
-            _proxyHandler(plyr.buttons.mute, 'click', config.handlers.mute, _toggleMute);
+            _proxyListener(plyr.buttons.mute, 'click', config.listeners.mute, _toggleMute);
 
             // Fullscreen
-            _proxyHandler(plyr.buttons.fullscreen, 'click', config.handlers.fullscreen, _toggleFullscreen);
+            _proxyListener(plyr.buttons.fullscreen, 'click', config.listeners.fullscreen, _toggleFullscreen);
 
             // Handle user exiting fullscreen by escaping etc
             if (fullscreen.supportsFullScreen) {
@@ -2353,6 +2371,11 @@
 
             // Loading
             _on(plyr.media, 'waiting canplay seeked', _checkLoading);
+
+            // Proxy events to container
+            _on(plyr.media, config.events.join(' '), function(event) {
+                _triggerEvent(plyr.container, event.type);
+            });
         }
 
         // Destroy an instance
@@ -2643,9 +2666,7 @@
                 element.plyr = (Object.keys(instance).length ? instance : false);
 
                 // Callback
-                if (typeof config.onSetup === 'function') {
-                    config.onSetup.apply(element.plyr);
-                }
+                _triggerEvent(element, 'setup', { plyr: element.plyr });
             }
 
             // Add to return array even if it's already setup
@@ -2657,3 +2678,20 @@
 
     return api;
 }));
+
+// Custom event polyfill
+//
+(function () {
+    function CustomEvent (event, params) {
+        params = params || { bubbles: false, cancelable: false, detail: undefined };
+        var evt = document.createEvent('CustomEvent');
+        evt.initCustomEvent( event, params.bubbles, params.cancelable, params.detail );
+        return evt;
+    }
+
+    CustomEvent.prototype = window.Event.prototype;
+
+    if(!('CustomEvent' in window)) {
+        window.CustomEvent = CustomEvent;
+    }
+})();

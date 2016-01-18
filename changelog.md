@@ -1,7 +1,15 @@
 # Changelog
 
+## v1.5.2
+- `handlers` option renamed to `listeners`
+- Added event listeners for all types to the plyr container (playback, fullscreen, captions etc - see docs)
+- Removed onSetup config option (use the 'setup' event instead, plyr element is event.plyr)
+- Style bug fixes
+- Vimeo seek bug fix (requires whole seconds when seeking)
+- Fix for fullscreen player (using class hook, not browser fullscreen)
+
 ## v1.5.1
-- Fix for event listeners being duplicated on source change 
+- Fix for event listeners being duplicated on source change
 
 # v1.5.0
 - Vimeo support (fixes #8)
