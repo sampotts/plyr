@@ -15,9 +15,9 @@ We wanted a lightweight, accessible and customizable media player that supports 
 - **Semantic** - uses the *right* elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no `<span>` or `<a href="#">` button hacks
 - **Responsive** - as you'd expect these days
 - **HTML Video & Audio** - support for both formats
-- **[Embedded Video](#embeds)** - support for YouTube and Vimeo (beta)
+- **[Embedded Video](#embeds)** - support for YouTube and Vimeo video playback
 - **[API](#api)** - toggle playback, volume, seeking, and more
-- **[Universal events](#events)** - no messing around with Vimeo and YouTube APIs, all events are universal across formats 
+- **[Universal events](#events)** - no messing around with Vimeo and YouTube APIs, all events are universal across formats
 - **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes
 - **i18n support** - support for internationalization of controls
 - **No dependencies** - written in "vanilla" JavaScript, no jQuery required
@@ -738,23 +738,7 @@ document.querySelector(".js-plyr").addEventListener("playing", function() {
 
 ## Embeds
 
-Currently only YouTube is supported. Vimeo will be coming soon. Some HTML5 media events are triggered on the `media` property of the `plyr` object:
-- `play`
-- `pause`
-- `timeupdate`
-- `progress`
-
-Due to the way the YouTube API works, the `timeupdate` and `progress` events are triggered by polling every 200ms so the event may trigger without an actual value change. Buffering progress is `media.buffered` in the `plyr` object. It is a a number between 0 and 1 that specifies the percentage of the video that the player shows as buffered.
-
-```javascript
-document.querySelector(".js-plyr").plyr.media.addEventListener("play", function() {
-	console.log("play");
-});
-```
-
-The `.source()` API method can also be used but the video id must be passed as the argument.
-
-Currently caption control is not supported but I will work on this.
+YouTube and Vimeo are currently supported and function much like a HTML5 video. Check the relevant documentation sections for any differences.
 
 ## Fullscreen
 
