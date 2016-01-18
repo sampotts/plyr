@@ -599,7 +599,7 @@
     }
 
     // Full screen mode
-    &--fullscreen,
+    &.plyr--fullscreen,
     &--fullscreen-active {
         position: fixed;
         top: 0;
@@ -627,24 +627,25 @@
     }
 
     // Hide controls when playing in full screen
-    &--fullscreen--hide-controls&--fullscreen-active&--playing {
+    &--fullscreen-active.plyr--fullscreen--hide-controls.plyr--playing,
+    &.plyr--fullscreen.plyr--fullscreen--hide-controls.plyr--playing {
         .plyr__controls {
             transform: translateY(100%) translateY(@plyr-control-spacing / 2);
             transition: transform .3s .2s ease;
-        }
-        &.plyr--hover .plyr__controls {
-            transform: translateY(0);
         }
         .plyr__captions {
             bottom: (@plyr-control-spacing / 2);
             transition: bottom .3s .2s ease;
         }
+        &.plyr--hover .plyr__controls {
+            transform: translateY(0);
+        }
     }
 
     // Captions
-    &--fullscreen .plyr__captions,
+    &.plyr--fullscreen .plyr__captions,
     &--fullscreen-active .plyr__captions,
-    &--fullscreen--hide-controls&--fullscreen-active&--playing&--hover &__captions {
+    &--fullscreen--hide-controls.plyr--fullscreen-active.plyr--playing.plyr--hover .plyr__captions {
         top: auto;
         bottom: 90px;
 
