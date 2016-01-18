@@ -613,19 +613,19 @@ You can listen for events on the element you setup Plyr on. Some events only app
   </thead>
   <tbody>
 	<tr>
-		<td><code><a href="/en-US/docs/Web/Events/canplay" title="/en-US/docs/Web/Events/canplay">canplay</a></code></td>
+		<td><code>canplay</code></td>
 		<td>✔</td>
-		<td>Sent when enough data is available that the media can be played, at least for a couple of frames.&nbsp; This corresponds to the <code>HAVE_ENOUGH_DATA</code>&nbsp;<code>readyState</code>.</td>
+		<td>Sent when enough data is available that the media can be played, at least for a couple of frames. This corresponds to the <code>HAVE_ENOUGH_DATA</code> <code>readyState</code>.</td>
 	</tr>
 	<tr>
-		<td><code><a href="/en-US/docs/Web/Events/canplaythrough" title="/en-US/docs/Web/Events/canplaythrough">canplaythrough</a></code></td>
+		<td><code>canplaythrough</code></td>
 		<td></td>
 		<td>Sent when the ready state changes to <code>CAN_PLAY_THROUGH</code>, indicating that the entire media can be played without interruption, assuming the download rate remains at least at the current level. <strong>Note</strong>: Manually setting the <code>currentTime</code> will eventually fire a <code>canplaythrough</code> event in firefox. Other browsers might not fire this event.</td>
 	</tr>
 	<tr>
-		<td><code><a href="/en-US/docs/Web/Events/emptied" title="/en-US/docs/Web/Events/emptied">emptied</a></code></td>
+		<td><code>emptied</code></td>
 		<td>✔</td>
-		<td>The media has become empty; for example, this event is sent if the media has already been loaded (or partially loaded), and the <a href="/En/XPCOM_Interface_Reference/NsIDOMHTMLMediaElement" class="internal" title="en/nsIDOMHTMLMediaElement"><code>load()</code></a>&nbsp;method is called to reload it.</td>
+		<td>The media has become empty; for example, this event is sent if the media has already been loaded (or partially loaded), and the <code>load()</code> method is called to reload it.</td>
 	</tr>
 	<tr>
 		<td><code>ended</code></td>
@@ -635,70 +635,70 @@ You can listen for events on the element you setup Plyr on. Some events only app
 	<tr>
 		<td><code>error</code></td>
 		<td>✔</td>
-		<td>Sent when an error occurs.&nbsp; The element's <code>error</code> attribute contains more information. See <a href="/en-US/docs/Web/Guide/HTML/Using_HTML5_audio_and_video#Error_handling">Error handling</a> for details.</td>
+		<td>Sent when an error occurs.&nbsp; The element's <code>error</code> attribute contains more information.</td>
 	</tr>
 	<tr>
-		<td><code><a href="/en-US/docs/Web/Events/loadeddata" title="/en-US/docs/Web/Events/loadeddata">loadeddata</a></code></td>
+		<td><code>loadeddata/code></td>
 		<td>✔</td>
 		<td>The first frame of the media has finished loading.</td>
 	</tr>
 	<tr>
-		<td><code><a href="/en-US/docs/Web/Events/loadedmetadata" title="/en-US/docs/Web/Events/loadedmetadata">loadedmetadata</a></code></td>
+		<td><code>loadedmetadata</code></td>
 		<td>✔</td>
 		<td>The media's metadata has finished loading; all attributes now contain as much useful information as they're going to.</td>
 	</tr>
 	<tr>
-		<td><code><a href="/en-US/docs/Web/Events/loadstart" title="/en-US/docs/Web/Events/loadstart">loadstart</a></code></td>
+		<td><code>loadstart</code></td>
 		<td>✔</td>
 		<td>Sent when loading of the media begins.</td>
 	</tr>
 	<tr>
-		<td><code><a href="/en-US/docs/Web/Events/pause" title="/en-US/docs/Web/Events/pause">pause</a></code></td>
+		<td><code>pause</code></td>
 		<td></td>
 		<td>Sent when playback is paused.</td>
 	</tr>
 	<tr>
-		<td><code><a href="/en-US/docs/Web/Events/play" title="/en-US/docs/Web/Events/play">play</a></code></td>
+		<td><code>play</code></td>
 		<td></td>
 		<td>Sent when playback of the media starts after having been paused; that is, when playback is resumed after a prior <code>pause</code> event.</td>
 	</tr>
 	<tr>
-		<td><code><a href="/en-US/docs/Web/Events/playing" title="/en-US/docs/Web/Events/playing">playing</a></code></td>
+		<td><code>playing</code></td>
 		<td></td>
 		<td>Sent when the media begins to play (either for the first time, after having been paused, or after ending and then restarting).</td>
 	</tr>
 	<tr>
-		<td><code><a href="/en-US/docs/Web/Events/progress" title="/en-US/docs/Web/Events/progress">progress</a></code></td>
+		<td><code>progress</code></td>
 		<td></td>
 		<td>Sent periodically to inform interested parties of progress downloading the media. Information about the current amount of the media that has been downloaded is available in the media element's <code>buffered</code> attribute.</td>
 	</tr>
 	<tr>
-		<td><code><a href="/en-US/docs/Web/Events/seeked" title="/en-US/docs/Web/Events/seeked">seeked</a></code></td>
+		<td><code>seeked</code></td>
 		<td>✔</td>
 		<td>Sent when a seek operation completes.</td>
 	</tr>
 	<tr>
-		<td><code><a href="/en-US/docs/Web/Events/seeking" title="/en-US/docs/Web/Events/seeking">seeking</a></code></td>
+		<td><code>seeking</code></td>
 		<td>✔</td>
 		<td>Sent when a seek operation begins.</td>
 	</tr>
 	<tr>
-		<td><code><a href="/en-US/docs/Web/Events/stalled" title="/en-US/docs/Web/Events/stalled">stalled</a></code></td>
+		<td><code>stalled</code></td>
 		<td>✔</td>
 		<td>Sent when the user agent is trying to fetch media data, but data is unexpectedly not forthcoming.</td>
 	</tr>
 	<tr>
-		<td><code><a href="/en-US/docs/Web/Events/timeupdate" title="/en-US/docs/Web/Events/timeupdate">timeupdate</a></code></td>
+		<td><code>timeupdate</code></td>
 		<td></td>
 		<td>The time indicated by the element's <code>currentTime</code> attribute has changed.</td>
 	</tr>
 	<tr>
-		<td><code><a href="/en-US/docs/Web/Events/volumechange" title="/en-US/docs/Web/Events/volumechange">volumechange</a></code></td>
+		<td><code>volumechange</code></td>
 		<td></td>
 		<td>Sent when the audio volume changes (both when the volume is set and when the <code>muted</code> attribute is changed).</td>
 	</tr>
 	<tr>
-		<td><code><a href="/en-US/docs/Web/Events/waiting" title="/en-US/docs/Web/Events/waiting">waiting</a></code></td>
+		<td><code>waiting</code></td>
 		<td>✔</td>
 		<td>Sent when the requested operation (such as playback) is delayed pending the completion of another operation (such as a seek).</td>
 	</tr>
@@ -724,6 +724,8 @@ You can listen for events on the element you setup Plyr on. Some events only app
 	</tr>
 	</tbody>
 </table>
+
+Details borrowed from: [https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events](https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events)
 
 Here's an example of binding an event listener:
 
