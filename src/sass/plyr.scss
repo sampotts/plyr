@@ -417,14 +417,17 @@ $plyr-bp-captions-large:         768px !default; // When captions jump to the la
         &--played[value] {
             &::-webkit-progress-bar {
                 background: transparent;
+                transition: width .2s ease;
             }
 
             // Inherit from currentColor;
             &::-webkit-progress-value {
                 background: currentColor;
+                transition: width .2s ease;
             }
             &::-moz-progress-bar {
                 background: currentColor;
+                transition: width .2s ease;
             }
         }
         &--played[value] {
