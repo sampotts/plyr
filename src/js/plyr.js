@@ -2347,7 +2347,7 @@
             _on(plyr.media, 'timeupdate', _seekManualCaptions);
 
             // Display duration
-            _on(plyr.media, 'loadedmetadata', _displayDuration);
+            _on(plyr.media, 'durationchange loadedmetadata', _displayDuration);
 
             // Handle the media finishing
             _on(plyr.media, 'ended', function() {
