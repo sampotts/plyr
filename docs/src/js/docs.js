@@ -82,10 +82,13 @@ shr.setup({
 
 	// Set a new source
 	function newSource(type) {
-		if(!(type in types)) {
+
+		// Bail if new type isn't known, it's the current type, or current type is empty (video is default) and new type is video
+		if(!(type in types) || type == currentType || (!currentType.length && type == types.video)) {
 			return;
 		}
 
+		// Get plyr instance
 		var player = document.querySelector('.js-media-player').plyr;
 
 		switch(type) {
@@ -106,7 +109,7 @@ shr.setup({
 						kind:   'captions',
 						label:  'English',
 						srclang:'en',
-						src:    'https://cdn.selz.com/plyr/1.0/example_captions_en.vtt',
+						src:    'https://cdn.selz.com/plyr/1.5/View_From_A_Blue_Moon_Trailer-HD.vtt',
 						default: true
 					}]
 				});
@@ -150,12 +153,15 @@ shr.setup({
 				break;
 		}
 
+		// Set the current type for next time
 		currentType = type;
 
+		// Remove active classes
 		for (var x = buttons.length - 1; x >= 0; x--) {
 			toggleClass(buttons[x].parentElement, 'active', false);
 		}
 
+		// Set active on parent
 		toggleClass(document.querySelector('[data-source="'+ type +'"]').parentElement, 'active', true);
 	}
 })();
