@@ -2320,22 +2320,6 @@
 
             // Captions
             _on(plyr.buttons.captions, 'click', _toggleCaptions);
-
-            // Click video
-            if (plyr.type === 'video' && config.click) {
-                _on(plyr.videoContainer, 'click', function() {
-                    if (plyr.media.paused) {
-                        _play();
-                    }
-                    else if (plyr.media.ended) {
-                        _seek();
-                        _play();
-                    }
-                    else {
-                        _pause();
-                    }
-                });
-            }
         }
 
         // Listen for media events
@@ -2371,6 +2355,22 @@
 
             // Loading
             _on(plyr.media, 'waiting canplay seeked', _checkLoading);
+
+            // Click video
+            if (plyr.type === 'video' && config.click) {
+                _on(plyr.videoContainer, 'click', function() {
+                    if (plyr.media.paused) {
+                        _play();
+                    }
+                    else if (plyr.media.ended) {
+                        _seek();
+                        _play();
+                    }
+                    else {
+                        _pause();
+                    }
+                });
+            }
 
             // Proxy events to container
             _on(plyr.media, config.events.join(' '), function(event) {
