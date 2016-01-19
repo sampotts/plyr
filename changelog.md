@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.5.4
+- Minor bug fix for clicking video to play/pause after source change
+
+## v1.5.3
+- Minor bug fix for occasional display of 0:00 as the media duration
+
 ## v1.5.2
 - `handlers` option renamed to `listeners`
 - Added event listeners for all types to the plyr container (playback, fullscreen, captions etc - see docs)
