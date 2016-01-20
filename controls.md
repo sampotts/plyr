@@ -46,7 +46,7 @@ You can include only the controls you need when specifying custom html.
 This is an example `html` option with all controls.
 
 ```javascript
-["<div class='plyr__controls'>",
+var controls = ["<div class='plyr__controls'>",
     "<div class='plyr__progress'>",
         "<label for='seek{id}' class='plyr__sr-only'>Seek</label>",
         "<input id='seek{id}' class='plyr__progress--seek' type='range' min='0' max='100' step='0.5' value='0' data-plyr='seek'>",
@@ -107,4 +107,9 @@ This is an example `html` option with all controls.
         "</button>",
     "</span>",
 "</div>"].join("\n");
+
+// Setup the player
+plyr.setup('.js-player', {
+    html: controls,
+});
 ```
