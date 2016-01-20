@@ -46,7 +46,7 @@
                 container:      null,
                 wrapper:        '.plyr__controls'
             },
-            labels:             '[data-plyr] .sr-only, label .sr-only',
+            labels:             '[data-plyr]',
             buttons: {
                 seek:           '[data-plyr="seek"]',
                 play:           '[data-plyr="play"]',
@@ -787,6 +787,9 @@
             else {
                 plyr.captionsContainer.innerHTML = '';
             }
+
+            // Force redraw
+            // var redraw = plyr.captionsContainer.offsetHeight;
         }
 
         // Display captions container and button (for initialization)
@@ -929,7 +932,7 @@
 
             // Setup tooltips
             if (config.tooltips) {
-                var labels = _getElements(config.selectors.labels);
+                var labels = _getElements(config.selectors.labels + ' .' + config.classes.hidden);
 
                 for (var i = labels.length - 1; i >= 0; i--) {
                     var label = labels[i];
@@ -1472,6 +1475,9 @@
                                 // Display a cue, if there is one
                                 if (this.activeCues[0] && this.activeCues[0].hasOwnProperty('text')) {
                                     plyr.captionsContainer.appendChild(this.activeCues[0].getCueAsHTML().trim());
+
+                                    // Force redraw
+                                    // var redraw = plyr.captionsContainer.offsetHeight;
                                 }
                             });
                         }

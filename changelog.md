@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.5.5
+- Fixed controls.md example
+- Bug fix for docs error page
+- Bug fix for controls tooltips
+
 ## v1.5.4
 - Minor bug fix for clicking video to play/pause after source change
 

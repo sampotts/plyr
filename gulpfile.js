@@ -253,6 +253,7 @@ gulp.task("docs", function () {
 
     // Upload error.html to cdn (as well as docs site)
     gulp.src([paths.docs.root + "error.html"])
+        .pipe(replace(localpath, "https://" + aws.cdn.bucket + "/" + version))
         .pipe(gzip())
         .pipe(s3(aws.cdn, options.docs));
 });
