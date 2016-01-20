@@ -4,7 +4,7 @@
             "plyr.css":     ["src/less/plyr.less"]
         },
         "sass": {
-            "plyr.css":     ["src/less/plyr.sass"]
+            "plyr.css":     ["src/sass/plyr.sass"]
         },
         "js": {
             "plyr.js":      ["src/js/plyr.js"]
