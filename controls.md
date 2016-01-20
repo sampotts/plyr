@@ -110,6 +110,6 @@ var controls = ["<div class='plyr__controls'>",
 
 // Setup the player
 plyr.setup('.js-player', {
-    html: controls,
+    html: controls
 });
 ```
