@@ -589,6 +589,7 @@
     }
 
     // Toggle aria-pressed state on a toggle button
+    // http://www.ssbbartgroup.com/blog/how-not-to-misuse-aria-states-properties-and-roles
     function _toggleState(target, state) {
         // Bail if no target
         if(!target) {
