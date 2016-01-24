@@ -40,7 +40,7 @@ If you have any cool ideas or features, please let me know by [creating an issue
 
 Check `docs/index.html` and `docs/dist/docs.js` for an example setup.
 
-**Heads up:** the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.5.5/plyr.js` to `https://cdn.plyr.io/1.5.5/plyr.js`
+**Heads up:** the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.5.6/plyr.js` to `https://cdn.plyr.io/1.5.6/plyr.js`
 
 ### Bower
 If bower is your thang, you can grab Plyr using:
@@ -60,11 +60,11 @@ More info is on [npm](https://www.npmjs.com/package/ember-cli-plyr) and [GitHub]
 If you want to use our CDN, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/1.5.5/plyr.css">
-<script src="https://cdn.plyr.io/1.5.5/plyr.js"></script>
+<link rel="stylesheet" href="https://cdn.plyr.io/1.5.6/plyr.css">
+<script src="https://cdn.plyr.io/1.5.6/plyr.js"></script>
 ```
 
-You can also access the `sprite.svg` file at `https://cdn.plyr.io/1.5.5/sprite.svg`.
+You can also access the `sprite.svg` file at `https://cdn.plyr.io/1.5.6/sprite.svg`.
 
 ### CSS & Styling
 If you want to use the default css, add the `plyr.css` file from `/dist` into your head, or even better use `plyr.less` or `plyr.sass` file included in `/src` in your build to save a request.
@@ -148,7 +148,6 @@ For YouTube and Vimeo, Plyr uses the standard YouTube API markup (an empty `<div
 </div>
 ```
 
-
 #### Cross Origin (CORS)
 You'll notice the `crossorigin` attribute on the example `<video>` and `<audio>` elements. This is because the media is loaded from another domain. If your media is hosted on another domain, you may need to add this attribute.
 
@@ -162,7 +161,7 @@ More info on CORS here:
 Here's an example of a default setup:
 
 ```html
-<script src="https://cdn.plyr.io/1.5.5/plyr.js"></script>
+<script src="https://cdn.plyr.io/1.5.6/plyr.js"></script>
 <script>plyr.setup();</script>
 ```
 
@@ -260,9 +259,13 @@ Options must be passed as an object to the `setup()` method as above.
   </tr>
   <tr>
     <td><code>tooltips</code></td>
-    <td>Boolean</td>
-    <td><code>false</code></td>
-    <td>Display control labels as tooltips on :hover &amp; :focus (by default, the labels are screen reader only).</td>
+    <td>Object</td>
+    <td><code>{ controls: false, seek: true }</code></td>
+    <td>
+		<strong>controls</strong>: Display control labels as tooltips on :hover &amp; :focus (by default, the labels are screen reader only).
+		<br><br>
+		<strong>seek</strong>: Display a seek tooltip to indicate on click where the media would seek to.
+	</td>
   </tr>
     <tr>
     <td><code>displayDuration</code></td>

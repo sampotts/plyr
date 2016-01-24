@@ -46,7 +46,7 @@ $plyr-control-color-hover:       null !default;
 
 // Tooltips
 $plyr-tooltip-bg:                $plyr-controls-bg !default;
-$plyr-tooltip-border-color:      transparentize(@gray-dark, .1) !default;
+$plyr-tooltip-border-color:      transparentize($plyr-gray-dark, .1) !default;
 $plyr-tooltip-border-width:      1px;
 $plyr-tooltip-shadow:            0 0 5px $plyr-tooltip-border-color, 0 0 0 $plyr-tooltip-border-width $plyr-tooltip-border-color;
 $plyr-tooltip-color:             $plyr-control-color !default;
@@ -59,7 +59,7 @@ $plyr-progress-bg:               transparentize($plyr-gray, .2) !default;
 $plyr-progress-playing-bg:       $plyr-blue !default;
 $plyr-progress-buffered-bg:      transparentize($plyr-gray, .25) !default;
 $plyr-progress-loading-size:     40px !default;
-$plyr-progress-loading-bg:       transparentize(#000, .15); !default;
+$plyr-progress-loading-bg:       transparentize(#000, .15) !default;
 
 // Volume
 $plyr-volume-track-height:       6px !default;
@@ -178,6 +178,8 @@ $plyr-bp-captions-large:         768px !default; // When captions jump to the la
             width: 100%;
             height: 100%;
             border: 0;
+            user-select: none;
+            pointer-events: none; // To allow mouse events to be captured
         }
 
         // Vimeo hack
@@ -322,6 +324,7 @@ $plyr-bp-captions-large:         768px !default; // When captions jump to the la
 
     // Tooltips
     &__tooltip {
+        visibility: hidden;
         position: absolute;
         z-index: 2;
         bottom: 100%;
@@ -337,9 +340,9 @@ $plyr-bp-captions-large:         768px !default; // When captions jump to the la
         line-height: 1.5;
         font-weight: 600;
 
-        transform: translate(-50%, ($plyr-tooltip-padding * 3)) scale(.8);
+        transform: translate(-50%, 10px) scale(.8);
         transform-origin: 50% 100%;
-        transition: transform .2s .1s ease, opacity .2s .1s ease;
+        transition: transform .2s .1s ease, opacity .2s .1s ease, visibility .3s ease;
 
         // Arrows
         &::after,
@@ -371,7 +374,9 @@ $plyr-bp-captions-large:         768px !default; // When captions jump to the la
         }
     }
     button:hover .plyr__tooltip,
-    button.tab-focus:focus .plyr__tooltip {
+    button.tab-focus:focus .plyr__tooltip,
+    &__tooltip--visible {
+        visibility: visible;
         opacity: 1;
         transform: translate(-50%, 0) scale(1);
     }
@@ -387,7 +392,7 @@ $plyr-bp-captions-large:         768px !default; // When captions jump to the la
 
     // Playback progress
     // <progress> element
-    &-progress {
+    &__progress {
         position: absolute;
         bottom: 100%;
         left: 0;
@@ -483,6 +488,11 @@ $plyr-bp-captions-large:         768px !default; // When captions jump to the la
             &::-moz-focus-outer {
                 border: 0;
             }
+        }
+
+        // Seek tooltip to show time
+        .plyr__tooltip {
+            left: 0;
         }
     }
 

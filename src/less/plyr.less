@@ -178,6 +178,7 @@
             height: 100%;
             border: 0;
             user-select: none;
+            pointer-events: none; // To allow mouse events to be captured
         }
 
         // Vimeo hack
@@ -322,6 +323,7 @@
 
     // Tooltips
     &__tooltip {
+        visibility: hidden;
         position: absolute;
         z-index: 2;
         bottom: 100%;
@@ -337,9 +339,9 @@
         line-height: 1.5;
         font-weight: 600;
 
-        transform: translate(-50%, (@plyr-tooltip-padding * 3)) scale(.8);
+        transform: translate(-50%, 10px) scale(.8);
         transform-origin: 50% 100%;
-        transition: transform .2s .1s ease, opacity .2s .1s ease;
+        transition: transform .2s .1s ease, opacity .2s .1s ease, visibility .3s ease;
 
         // Arrows
         &::after,
@@ -371,7 +373,9 @@
         }
     }
     button:hover .plyr__tooltip,
-    button.tab-focus:focus .plyr__tooltip {
+    button.tab-focus:focus .plyr__tooltip,
+    &__tooltip--visible {
+        visibility: visible;
         opacity: 1;
         transform: translate(-50%, 0) scale(1);
     }
@@ -483,6 +487,11 @@
             &::-moz-focus-outer {
                 border: 0;
             }
+        }
+
+        // Seek tooltip to show time
+        .plyr__tooltip {
+            left: 0;
         }
     }
 

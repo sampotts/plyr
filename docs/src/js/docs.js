@@ -6,11 +6,13 @@
 
 // Setup the player
 plyr.setup('.js-media-player', {
-	debug: 		true,
-	title: 		'Video demo',
-	tooltips: 	true,
+	debug: 				true,
+	title: 				'Video demo',
+	tooltips: 	{
+		controls: 		true
+	},
 	captions: {
-		defaultActive: true
+		defaultActive: 	true
 	}
 });
 
@@ -63,7 +65,7 @@ shr.setup({
 			history.replaceState({ 'type': currentType }, '', (video ? '' : '#' + currentType));
 		}
 		if(!video) {
-			newSource(currentType);
+			newSource(currentType, true);
 		}
 	}
 
@@ -81,10 +83,10 @@ shr.setup({
     }
 
 	// Set a new source
-	function newSource(type) {
-
+	function newSource(type, init) {
 		// Bail if new type isn't known, it's the current type, or current type is empty (video is default) and new type is video
-		if(!(type in types) || type == currentType || (!currentType.length && type == types.video)) {
+		if(!(type in types) || (!init && type == currentType) || (!currentType.length && type == types.video)) {
+			console.warn('Unregonized type.');
 			return;
 		}
 

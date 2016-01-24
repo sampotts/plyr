@@ -37,7 +37,10 @@
         seekTime:               10,
         volume:                 5,
         click:                  true,
-        tooltips:               false,
+        tooltips:               {
+            controls:           false,
+            seek:               true
+        },
         displayDuration:        true,
         iconPrefix:             'icon',
         selectors: {
@@ -165,9 +168,16 @@
                 '</progress>',
                 '<progress class="plyr__progress--buffer" max="100" value="0">',
                     '<span>0</span>% ' + config.i18n.buffered,
-                '</progress>',
-            '</div>',
-            '<span class="plyr__controls--left">'];
+                '</progress>'];
+
+        // Seek tooltip
+        if (config.tooltips.seek) {
+            html.push('<span class="plyr__tooltip">0:00</span>');
+        }
+
+        // Close progress
+        html.push('</div>',
+            '<span class="plyr__controls--left">');
 
         // Restart button
         if (_inArray(config.controls, 'restart')) {
@@ -736,7 +746,8 @@
     // Player instance
     function Plyr(container) {
         var plyr = this;
-        plyr.container = container;
+        plyr.container = container,
+        plyr.timers = {};
 
         // Captions functions
         // Seek the manual caption time and update UI
@@ -978,6 +989,9 @@
                 plyr.progress.played          = {};
                 plyr.progress.played.bar      = _getElement(config.selectors.progress.played);
                 plyr.progress.played.text     = plyr.progress.played.bar && plyr.progress.played.bar.getElementsByTagName('span')[0];
+
+                // Seek tooltip
+                plyr.progress.tooltip           = plyr.progress.container && plyr.progress.container.querySelector('.' + config.classes.tooltip);
 
                 // Volume
                 plyr.volume                   = _getElement(config.selectors.buttons.volume);
@@ -1749,39 +1763,10 @@
             // Set button state
             _toggleState(plyr.buttons.fullscreen, plyr.isFullscreen);
 
-            // Toggle controls visibility based on mouse movement and location
-            var hoverTimer, isMouseOver = false;
-
-            // Show the player controls
-            function _showControls() {
-                // Set shown class
-                _toggleClass(plyr.container, config.classes.hover, true);
-
-                // Clear timer every movement
-                window.clearTimeout(hoverTimer);
-
-                // If the mouse is not over the controls, set a timeout to hide them
-                if (!isMouseOver) {
-                    hoverTimer = window.setTimeout(function() {
-                        _toggleClass(plyr.container, config.classes.hover, false);
-                    }, 2000);
-                }
-            }
-
-            // Check mouse is over the controls
-            function _setMouseOver (event) {
-                isMouseOver = (event.type === 'mouseenter');
-            }
-
+            // Hide on entering full screen
             if (config.fullscreen.hideControls) {
-                // Hide on entering full screen
-                _toggleClass(plyr.controls, config.classes.hover, false);
-
-                // Keep an eye on the mouse location in relation to controls
-                _toggleListener(plyr.controls, 'mouseenter mouseleave', _setMouseOver, plyr.isFullscreen);
-
-                // Show the controls on mouse move
-                _toggleListener(plyr.container, 'mousemove', _showControls, plyr.isFullscreen);
+                //_toggleClass(plyr.controls, config.classes.hover, false);
+                _showControls(true);
             }
 
             // Trigger an event
@@ -1931,10 +1916,10 @@
             var loading = (event.type === 'waiting');
 
             // Clear timer
-            clearTimeout(plyr.loadingTimer);
+            clearTimeout(plyr.timers.loading);
 
             // Timer to prevent flicker when seeking
-            plyr.loadingTimer = setTimeout(function() {
+            plyr.timers.loading = setTimeout(function() {
                 _toggleClass(plyr.container, config.classes.loading, loading);
             }, (loading ? 250 : 0));
         }
@@ -2041,6 +2026,9 @@
             if (plyr.duration) {
                 _updateTimeDisplay(duration, plyr.duration);
             }
+
+            // Update the tooltip (if visible)
+            _updateSeekTooltip();
         }
 
         // Handle time change event
@@ -2055,6 +2043,73 @@
 
             // Playing progress
             _updateProgress(event);
+        }
+
+        // Update hover tooltip for seeking
+        function _updateSeekTooltip(event) {
+            // Bail if setting not true
+            if (!config.tooltips.seek) {
+                return;
+            }
+
+            // Calculate percentage
+            var clientRect  = plyr.progress.container.getBoundingClientRect(),
+                percent     = 0,
+                visible     = config.classes.tooltip + '--visible';
+
+            // Determine percentage, if already visible
+            if (!event) {
+                if(_hasClass(plyr.progress.tooltip, visible)) {
+                    percent = plyr.progress.tooltip.style.left.replace('%', '');
+                }
+                else {
+                    return;
+                }
+            }
+            else {
+                percent = ((100 / clientRect.width) * (event.pageX - clientRect.left));
+            }
+
+            // Set bounds
+            if (percent < 0) {
+                percent = 0;
+            }
+            else if (percent > 100) {
+                percent = 100;
+            }
+
+            // Display the time a click would seek to
+            _updateTimeDisplay(((plyr.media.duration / 100) * percent), plyr.progress.tooltip);
+
+            // Set position
+            plyr.progress.tooltip.style.left = percent + "%";
+
+            // Show/hide the tooltip
+            // If the event is a moues in/out and percentage is inside bounds
+            if(_inArray(['mouseenter', 'mouseleave'], event.type)) {
+                _toggleClass(plyr.progress.tooltip, visible, (event.type === 'mouseenter'));
+            }
+        }
+
+        // Show the player controls in fullscreen mode
+        function _showControls(force) {
+            // We're only worried about fullscreen
+            if (!plyr.isFullscreen) {
+                return;
+            }
+
+            // Set shown class
+            _toggleClass(plyr.container, config.classes.hover, true);
+
+            // Clear timer every movement
+            window.clearTimeout(plyr.timers.hover);
+
+            // If the mouse is not over the controls, set a timeout to hide them
+            plyr.timers.hover = window.setTimeout(function() {
+                if (!plyr.controls.mouseover || (force === true)) {
+                    _toggleClass(plyr.container, config.classes.hover, false);
+                }
+            }, 2000);
         }
 
         // Add common function to retrieve media source
@@ -2327,6 +2382,19 @@
 
             // Captions
             _on(plyr.buttons.captions, 'click', _toggleCaptions);
+
+            // Seek tooltip
+            _on(plyr.progress.container, 'mouseenter mouseleave mousemove', _updateSeekTooltip);
+
+            // Toggle controls visibility based on mouse movement and location
+            var hoverTimer, isMouseOver = false;
+
+            if (config.fullscreen.hideControls) {
+                // Keep an eye on the mouse location in relation to controls
+                _on(plyr.controls, 'mouseenter mouseleave', function() {
+                    plyr.controls.mouseover = (event.type === 'mouseenter');
+                });
+            }
         }
 
         // Listen for media events
@@ -2364,8 +2432,8 @@
             _on(plyr.media, 'waiting canplay seeked', _checkLoading);
 
             // Click video
-            if (plyr.type === 'video' && config.click) {
-                _on(plyr.videoContainer, 'click', function() {
+            if (config.click) {
+                _on(plyr.media, 'click', function() {
                     if (plyr.media.paused) {
                         _play();
                     }
@@ -2377,6 +2445,12 @@
                         _pause();
                     }
                 });
+            }
+
+            // Listen for mouse move to show controls
+            if (config.fullscreen.hideControls) {
+                // Show the controls on mouse move
+                _on(plyr.media, 'mousemove', _showControls);
             }
 
             // Proxy events to container

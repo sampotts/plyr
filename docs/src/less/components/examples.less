@@ -50,7 +50,12 @@ video,
     }
     .plyr__progress {
         border-radius: @border-radius-base @border-radius-base 0 0;
-        overflow: hidden;
+
+        progress,
+        [type='range'] {
+            border-radius: @border-radius-base @border-radius-base 0 0;
+            overflow: hidden;
+        }
     }
 }
 

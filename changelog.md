@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.5.6
+- Seek tooltip (option for tooltips changed, please check docs)
+- SASS compile error fixes (fixes #148)
+- Fullscreen fixes for controls not always hiding/showing (fixes #149)
+- Screen reader icon fixes (title was being read twice due to the tooltip/hidden label)
+
 ## v1.5.5
 - Fixed controls.md example
 - Bug fix for docs error page
