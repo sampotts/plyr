@@ -47,12 +47,15 @@ Using NPM, you can grab Plyr:
 ```
 npm install plyr
 ```
+[https://www.npmjs.com/package/plyr](https://www.npmjs.com/package/plyr)
 
 ### Bower
 If bower is your thang, you can grab Plyr using:
 ```
 bower install plyr
 ```
+[http://bower.io/search/?q=plyr](http://bower.io/search/?q=plyr)
+
 More info on setting up dependencies can be found in the [Bower Docs](http://bower.io/docs/creating-packages/#maintaining-dependencies)
 
 ### Ember
