@@ -42,6 +42,12 @@ Check `docs/index.html` and `docs/dist/docs.js` for an example setup.
 
 **Heads up:** the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.5.9/plyr.js` to `https://cdn.plyr.io/1.5.9/plyr.js`
 
+### Node Package Manager (NPM)
+Using NPM, you can grab Plyr:
+```
+npm install plyr
+```
+
 ### Bower
 If bower is your thang, you can grab Plyr using:
 ```

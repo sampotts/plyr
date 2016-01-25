@@ -33,8 +33,15 @@
     "type": "git",
     "url": "git://github.com/selz/plyr.git"
   },
-  "authors": [
-    "Sam Potts <me@sampotts.me>"
-  ],
-  "license": "MIT"
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/selz/plyr/issues"
+  },
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sam Potts <sam@selz.com> (selz.com)"
 }
