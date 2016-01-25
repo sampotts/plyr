@@ -24,9 +24,6 @@
     "gulp-util": "^3.0.7",
     "run-sequence": "^1.1.5"
   },
-  "scripts": {
-    "preinstall": "npm install -g gulp"
-  },
   "keywords": [
     "HTML5 Video",
     "HTML5 Audio",
