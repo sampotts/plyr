@@ -111,8 +111,11 @@ $plyr-bp-captions-large:         768px !default; // When captions jump to the la
 @mixin seek-thumb() {
     background: transparent;
     border: 0;
-    width: ($plyr-control-spacing * 4);
+    width: 1px;
     height: $plyr-control-spacing;
+}
+@mixin seek-thumb-touch() {
+    width: ($plyr-control-spacing * 4);
     transform: translateX(-50%);
 }
 @mixin seek-track() {
@@ -493,6 +496,21 @@ $plyr-bp-captions-large:         768px !default; // When captions jump to the la
         // Seek tooltip to show time
         .plyr__tooltip {
             left: 0;
+        }
+    }
+
+    // Touch seek wider handle
+    &--is-touch &--seek[type='range'] {
+        &::-webkit-slider-thumb {
+            @include seek-thumb-touch();
+        }
+        // Mozilla
+        &::-moz-range-thumb {
+            @include seek-thumb-touch();
+        }
+        // Microsoft
+        &::-ms-thumb {
+            @include seek-thumb-touch();
         }
     }
 

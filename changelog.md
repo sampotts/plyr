@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.5.8
+- Fix for touch device seek tooltip
+- Seek improvements
+
 ## v1.5.7
 - Fix for control tooltips always showing
 

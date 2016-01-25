@@ -110,8 +110,11 @@
 .seek-thumb() {
     background: transparent;
     border: 0;
-    width: (@plyr-control-spacing * 4);
+    width: 1px;
     height: @plyr-control-spacing;
+}
+.seek-thumb-touch() {
+    width: (@plyr-control-spacing * 4);
     transform: translateX(-50%);
 }
 .seek-track() {
@@ -492,6 +495,21 @@
         // Seek tooltip to show time
         .plyr__tooltip {
             left: 0;
+        }
+    }
+
+    // Touch seek wider handle
+    &--is-touch &--seek[type='range'] {
+        &::-webkit-slider-thumb {
+            .seek-thumb-touch();
+        }
+        // Mozilla
+        &::-moz-range-thumb {
+            .seek-thumb-touch();
+        }
+        // Microsoft
+        &::-ms-thumb {
+            .seek-thumb-touch();
         }
     }
 

@@ -2048,7 +2048,7 @@
         // Update hover tooltip for seeking
         function _updateSeekTooltip(event) {
             // Bail if setting not true
-            if (!config.tooltips.seek) {
+            if (!config.tooltips.seek || plyr.browser.touch) {
                 return;
             }
 
@@ -2251,11 +2251,11 @@
                 // Load HTML5 sources
                 plyr.media.load();
 
-                // Display duration if available
-                _displayDuration();
-
                 // Setup interface
                 _setupInterface();
+
+                // Display duration if available
+                _displayDuration();
             }
 
             // Play if autoplay attribute is present
