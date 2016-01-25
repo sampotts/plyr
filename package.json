@@ -1,7 +1,7 @@
 {
   "name": "plyr",
-  "version": "1.5.8",
-  "description": "A simple HTML5 media player using custom controls",
+  "version": "1.5.9",
+  "description": "A simple, accessible and customizable HTML5, YouTube and Vimeo media player",
   "homepage": "http://plyr.io",
   "main": "gulpfile.js",
   "dependencies": {},
