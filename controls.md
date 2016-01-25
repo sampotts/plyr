@@ -49,7 +49,7 @@ This is an example `html` option with all controls.
 var controls = ["<div class='plyr__controls'>",
     "<div class='plyr__progress'>",
         "<label for='seek{id}' class='plyr__sr-only'>Seek</label>",
-        "<input id='seek{id}' class='plyr__progress--seek' type='range' min='0' max='100' step='0.5' value='0' data-plyr='seek'>",
+        "<input id='seek{id}' class='plyr__progress--seek' type='range' min='0' max='100' step='0.1' value='0' data-plyr='seek'>",
         "<progress class='plyr__progress--played' max='100' value='0'>",
             "<span>0</span>% played",
         "</progress>",

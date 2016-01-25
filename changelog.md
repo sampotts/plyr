@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.5.7
+- Fix for control tooltips always showing
+
 ## v1.5.6
 - Seek tooltip (option for tooltips changed, please check docs)
 - SASS compile error fixes (fixes #148)
