@@ -3,7 +3,7 @@
   "version": "1.5.9",
   "description": "A simple, accessible and customizable HTML5, YouTube and Vimeo media player",
   "homepage": "http://plyr.io",
-  "main": "gulpfile.js",
+  "main": "src/js/plyr.js",
   "dependencies": {},
   "devDependencies": {
     "gulp": "^3.9.0",
