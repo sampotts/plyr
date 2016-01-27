@@ -21,7 +21,7 @@
         // Browser globals (root is window)
         root.plyr = factory(root, document);
     }
-}(this, function(window, document) {
+}(typeof window !== 'undefined' ? window : this, function(window, document) {
     'use strict';
     /*global YT,$f*/
 
