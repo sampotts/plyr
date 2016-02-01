@@ -105,7 +105,7 @@ The SVG sprite for the controls icons is loaded in by AJAX to help with performa
 ```
 
 If you're using the `<base>` tag on your site, you may need to use something like this:
-[https://gist.github.com/leonderijke/c5cf7c5b2e424c0061d2](svgfixer.js)
+[svgfixer.js](https://gist.github.com/leonderijke/c5cf7c5b2e424c0061d2)
 
 More info on SVG sprites here:
 [http://css-tricks.com/svg-sprites-use-better-icon-fonts/](http://css-tricks.com/svg-sprites-use-better-icon-fonts/)
