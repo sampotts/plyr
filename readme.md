@@ -249,6 +249,12 @@ Options must be passed as an object to the `setup()` method as above.
     <td>Display debugging information on what Plyr is doing.</td>
   </tr>
   <tr>
+    <td><code>autoplay</code></td>
+    <td>Boolean</td>
+    <td><code>false</code></td>
+    <td>Autoplay the media on load. This is generally advised against on UX grounds. It is also disabled on iOS (an Apple limitation).</td>
+  </tr>
+  <tr>
     <td><code>seekTime</code></td>
     <td>Number</td>
     <td><code>10</code></td>
