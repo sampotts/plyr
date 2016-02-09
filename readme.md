@@ -469,7 +469,7 @@ Here's a list of the methods supported:
   </tr>
   <tr>
     <td><code>source(...)</code></td>
-    <td>Array or undefined</td>
+    <td>Object or undefined</td>
     <td>
       Get/Set the media source.
       <br><br>
