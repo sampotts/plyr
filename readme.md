@@ -608,8 +608,8 @@ Some more details on the object parameters
     </tr>
     <tr>
       <td><code>sources</code></td>
-      <td>Array or String</td>
-      <td>This is an array of sources or optionally a string for embedded players (YouTube and Vimeo). <code>type</code> is also optional for YouTube and Vimeo when specifying an array. For YouTube and Vimeo media, only the video ID must be passed as the source as shown above. The keys of this object are mapped directly to HTML attributes so more can be added to the object if required.</td>
+      <td>Array</td>
+      <td>This is an array of sources. <code>type</code> is optional for YouTube and Vimeo when specifying an array. For YouTube and Vimeo media, only the video ID must be passed as the source as shown above. The keys of this object are mapped directly to HTML attributes so more can be added to the object if required.</td>
     </tr>
     <tr>
       <td><code>poster</code></td>
