@@ -27,21 +27,19 @@ $plyr-font-size-captions-large:  ($plyr-font-size-base * 2) !default;
 $plyr-control-spacing:           10px !default;
 $plyr-controls-bg:               #fff !default;
 $plyr-control-bg-hover:          $plyr-blue !default;
-$plyr-control-color:             null !default;
-$plyr-control-color-hover:       null !default;
 
 // Contrast
 @if lightness($plyr-controls-bg) >= 65% {
-    $plyr-control-color: $plyr-gray-light;
+    $plyr-control-color: $plyr-gray-light !default;
 }
 @else {
-    $plyr-control-color: $plyr-gray-lighter;
+    $plyr-control-color: $plyr-gray-lighter !default;
 }
 @if lightness($plyr-control-bg-hover) >= 65% {
-    $plyr-control-color-hover: $plyr-gray;
+    $plyr-control-color-hover: $plyr-gray !default;
 }
 @else {
-    $plyr-control-color-hover: #fff;
+    $plyr-control-color-hover: #fff !default;
 }
 
 // Tooltips
