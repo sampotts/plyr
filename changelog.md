@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.5.11
+- iOS embed bug fixes (fixes #166)
+- Hide IE/Edge <input type='range'> tooltip (since we have a styled one) (fixes #160)
+- SASS bug fix for default values (fixes #158)
+
+## v1.5.9 + v1.5.10
+- NPM bug fixes
+
 ## v1.5.8
 - Fix for touch device seek tooltip
 - Seek improvements
