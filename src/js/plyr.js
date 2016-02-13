@@ -11,17 +11,17 @@
     'use strict';
     /*global define,module*/
 
-    if (typeof define === 'function' && define.amd) {
-        // AMD
-        define(null, function() { factory(root, document) });
-    } else if (typeof module === 'object') {
+    if (typeof module === 'object' && typeof module.exports === 'object') {
         // Node, CommonJS-like
         module.exports = factory(root, document);
+    } else if (typeof define === 'function' && define.amd) {
+        // AMD
+        define(null, function() { factory(root, document) });
     } else {
         // Browser globals (root is window)
         root.plyr = factory(root, document);
     }
-}(this, function(window, document) {
+}(typeof window !== 'undefined' ? window : this, function(window, document) {
     'use strict';
     /*global YT,$f*/
 

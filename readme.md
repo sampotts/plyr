@@ -105,7 +105,7 @@ The SVG sprite for the controls icons is loaded in by AJAX to help with performa
 ```
 
 If you're using the `<base>` tag on your site, you may need to use something like this:
-[https://gist.github.com/leonderijke/c5cf7c5b2e424c0061d2](svgfixer.js)
+[svgfixer.js](https://gist.github.com/leonderijke/c5cf7c5b2e424c0061d2)
 
 More info on SVG sprites here:
 [http://css-tricks.com/svg-sprites-use-better-icon-fonts/](http://css-tricks.com/svg-sprites-use-better-icon-fonts/)
@@ -247,6 +247,12 @@ Options must be passed as an object to the `setup()` method as above.
     <td>Boolean</td>
     <td><code>false</code></td>
     <td>Display debugging information on what Plyr is doing.</td>
+  </tr>
+  <tr>
+    <td><code>autoplay</code></td>
+    <td>Boolean</td>
+    <td><code>false</code></td>
+    <td>Autoplay the media on load. This is generally advised against on UX grounds. It is also disabled on iOS (an Apple limitation).</td>
   </tr>
   <tr>
     <td><code>seekTime</code></td>
@@ -463,16 +469,23 @@ Here's a list of the methods supported:
   </tr>
   <tr>
     <td><code>source(...)</code></td>
-    <td>Array or undefined</td>
+    <td>Object or undefined</td>
     <td>
       Get/Set the media source.
       <br><br>
-      <strong>string</strong><br>
-      <code>.source("/path/to/video.mp4")</code><br>
-      This will set the <code>src</code> attribute on the <code>video</code> or <code>audio</code> element.
-      <br><br>
       <strong>array</strong><br>
-      <code>.source([{ src: "/path/to/video.webm", type: "video/webm", ...more attributes... }, { src: "/path/to/video.mp4", type: "video/mp4", ...more attributes... }])`</code><br>
+      <pre><code>.source([
+      	{ 
+      		src: "/path/to/video.webm", 
+      		type: "video/webm", 
+      		...more attributes... 
+      	}, 
+      	{ 
+      		src: "/path/to/video.mp4", 
+      		type: "video/mp4", 
+      		...more attributes... 
+      	}
+      ])`</code></pre><br>
       This will inject a child `source` element for every element in the array with the specified attributes. `src` is the only required attribute although adding `type` is recommended as it helps the browser decide which file to download and play.
       <br><br>
       <strong>YouTube</strong><br>
@@ -595,8 +608,8 @@ Some more details on the object parameters
     </tr>
     <tr>
       <td><code>sources</code></td>
-      <td>Array or String</td>
-      <td>This is an array of sources or optionally a string for embedded players (YouTube and Vimeo). `type` is also optional for YouTube and Vimeo when specifying an array. For YouTube and Vimeo media, only the video ID must be passed as the source as shown above. The keys of this object are mapped directly to HTML attributes so more can be added to the object if required.</td>
+      <td>Array</td>
+      <td>This is an array of sources. <code>type</code> is optional for YouTube and Vimeo when specifying an array. For YouTube and Vimeo media, only the video ID must be passed as the source as shown above. The keys of this object are mapped directly to HTML attributes so more can be added to the object if required.</td>
     </tr>
     <tr>
       <td><code>poster</code></td>
@@ -814,6 +827,7 @@ Plyr is developed by [@sam_potts](https://twitter.com/sam_potts) / [sampotts.me]
 - [Web Platform Daily](http://webplatformdaily.org/releases/2015-03-04)
 - [LayerVault Designer News](https://news.layervault.com/stories/45394-plyr--a-simple-html5-media-player)
 - [The Treehouse Show #131](https://teamtreehouse.com/library/episode-131-origami-react-responsive-hero-images)
+- [noupe.com](http://www.noupe.com/design/html5-plyr-is-a-responsive-and-accessible-video-player-94389.html)
 
 ## Used by
 - [Selz.com](https://selz.com)
