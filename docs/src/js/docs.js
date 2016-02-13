@@ -13,7 +13,8 @@ plyr.setup('.js-media-player', {
 	},
 	captions: {
 		defaultActive: 	true
-	}
+	},
+	duration: 100
 });
 
 // Setup shr
@@ -58,13 +59,19 @@ shr.setup({
 	// On load
 	if(historySupport) {
 		var video = !currentType.length;
+
+		// If there's no current type set, assume video
 		if(video) {
 			currentType = types.video;
 		}
+
+		// Replace current history state
 		if(currentType in types) {
 			history.replaceState({ 'type': currentType }, '', (video ? '' : '#' + currentType));
 		}
-		if(!video) {
+
+		// If it's not video, load the source
+		if(currentType !== types.video) {
 			newSource(currentType, true);
 		}
 	}
@@ -86,7 +93,6 @@ shr.setup({
 	function newSource(type, init) {
 		// Bail if new type isn't known, it's the current type, or current type is empty (video is default) and new type is video
 		if(!(type in types) || (!init && type == currentType) || (!currentType.length && type == types.video)) {
-			console.warn('Unregonized type.');
 			return;
 		}
 

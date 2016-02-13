@@ -27,21 +27,19 @@ $plyr-font-size-captions-large:  ($plyr-font-size-base * 2) !default;
 $plyr-control-spacing:           10px !default;
 $plyr-controls-bg:               #fff !default;
 $plyr-control-bg-hover:          $plyr-blue !default;
-$plyr-control-color:             null !default;
-$plyr-control-color-hover:       null !default;
 
 // Contrast
 @if lightness($plyr-controls-bg) >= 65% {
-    $plyr-control-color: $plyr-gray-light;
+    $plyr-control-color: $plyr-gray-light !default;
 }
 @else {
-    $plyr-control-color: $plyr-gray-lighter;
+    $plyr-control-color: $plyr-gray-lighter !default;
 }
 @if lightness($plyr-control-bg-hover) >= 65% {
-    $plyr-control-color-hover: $plyr-gray;
+    $plyr-control-color-hover: $plyr-gray !default;
 }
 @else {
-    $plyr-control-color-hover: #fff;
+    $plyr-control-color-hover: #fff !default;
 }
 
 // Tooltips
@@ -182,7 +180,6 @@ $plyr-bp-captions-large:         768px !default; // When captions jump to the la
             height: 100%;
             border: 0;
             user-select: none;
-            pointer-events: none; // To allow mouse events to be captured
         }
 
         // Vimeo hack
@@ -190,6 +187,11 @@ $plyr-bp-captions-large:         768px !default; // When captions jump to the la
             position: relative;
             padding-bottom: 200%;
             transform: translateY(-35.95%);
+        }
+
+        // To allow mouse events to be captured if full support
+        &.plyr iframe {
+            pointer-events: none;
         }
     }
 

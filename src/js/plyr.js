@@ -172,7 +172,7 @@
 
         // Seek tooltip
         if (config.tooltips.seek) {
-            html.push('<span class="plyr__tooltip">0:00</span>');
+            html.push('<span class="plyr__tooltip">--:--</span>');
         }
 
         // Close progress
@@ -238,7 +238,7 @@
             html.push(
                 '<span class="plyr__time">',
                     '<span class="plyr__sr-only">' + config.i18n.duration + '</span>',
-                    '<span class="plyr__time--duration">00:00</span>',
+                    '<span class="plyr__time--duration">--:--</span>',
                 '</span>'
             );
         }
@@ -746,7 +746,7 @@
     // Player instance
     function Plyr(container) {
         var plyr = this;
-        plyr.container = container,
+        plyr.container = container;
         plyr.timers = {};
 
         // Captions functions
@@ -1816,12 +1816,16 @@
         function _setVolume(volume) {
             // Use default if no value specified
             if (typeof volume === 'undefined') {
+                volume = config.volume;
+
                 if (config.storage.enabled && _storage().supported) {
-                    volume = window.localStorage[config.storage.key] || config.volume;
+                    volume = window.localStorage.getItem(config.storage.key);
                 }
-                else {
-                    volume = config.volume;
-                }
+            }
+
+            // Use config if all else fails
+            if(isNaN(volume)) {
+                volume = config.volume;
             }
 
             // Maximum is 10
@@ -1873,7 +1877,7 @@
             }
 
             // Store the volume in storage
-            if (config.storage.enabled && _storage().supported) {
+            if (config.storage.enabled && _storage().supported && !isNaN(volume)) {
                 window.localStorage.setItem(config.storage.key, volume);
             }
 
@@ -2015,6 +2019,7 @@
                 return;
             }
 
+            // Determine duration
             var duration = plyr.media.duration || 0;
 
             // If there's only one time display, display duration there
