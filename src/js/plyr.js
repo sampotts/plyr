@@ -1523,12 +1523,18 @@
                                         record,
                                         req = xhr.responseText;
 
-                                    records = req.split('\n\n');
-
+                                    var pattern = '\n';
+                                    records = req.split(pattern + pattern);
+                                    if(records.length === 1) {
+                                        // The '\n' pattern didn't work
+                                        // Try '\r\n'
+                                        pattern = '\r\n';
+                                        records = req.split(pattern + pattern);
+                                    }
                                     for (var r = 0; r < records.length; r++) {
                                         record = records[r];
                                         plyr.captions[r] = [];
-                                        plyr.captions[r] = record.split('\n');
+                                        plyr.captions[r] = record.split(pattern);
                                     }
 
                                     // Remove first element ('VTT')
