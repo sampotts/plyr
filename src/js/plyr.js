@@ -1043,7 +1043,7 @@
                 _setCaption(plyr.currentCaption);
             }
             else {
-                _setCaption('');
+                _setCaption();
             }
         }
 
@@ -2460,7 +2460,7 @@
             _on(plyr.media, 'ended', function() {
                 // Clear
                 if (plyr.type === 'video') {
-                    _setCaption('');
+                    _setCaption();
                 }
 
                 // Reset UI
