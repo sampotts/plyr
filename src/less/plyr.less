@@ -167,6 +167,11 @@
         vertical-align: middle;
     }
 
+    // Hide default captions
+    video::-webkit-media-text-track-container {
+        display: none;
+    }
+
     // Container for embeds
     &__video-embed {
         padding-bottom: 56.25%; /* 16:9 */

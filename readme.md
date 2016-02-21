@@ -198,9 +198,14 @@ Passing just the options object:
 plyr.setup(options);
 ```
 
+### Captions
+WebVTT captions are supported. To add a caption track, check the HTML example above and look for the `<track>` element.
+
+Be sure to [validate your caption files](https://quuz.org/webvtt/)
+
 #### Options
 
-Options must be passed as an object to the `setup()` method as above.
+Options must be passed as an object to the `setup()` method as above or as JSON in `data-plyr` attribute on each of your target elements (e.g. data-plyr='{ title: "testing" }') - note the single quotes encapsulating the JSON.
 
 <table class="table" width="100%">
 <thead>
@@ -282,7 +287,13 @@ Options must be passed as an object to the `setup()` method as above.
 		<strong>seek</strong>: Display a seek tooltip to indicate on click where the media would seek to.
 	</td>
   </tr>
-    <tr>
+  <tr>
+    <td><code>duration</code></td>
+    <td>Number</td>
+    <td><code>null</code></td>
+    <td>Specify a custom duration.</td>
+  </tr>
+  <tr>
     <td><code>displayDuration</code></td>
     <td>Boolean</td>
     <td><code>true</code></td>
@@ -475,15 +486,15 @@ Here's a list of the methods supported:
       <br><br>
       <strong>array</strong><br>
       <pre><code>.source([
-      	{ 
-      		src: "/path/to/video.webm", 
-      		type: "video/webm", 
-      		...more attributes... 
-      	}, 
-      	{ 
-      		src: "/path/to/video.mp4", 
-      		type: "video/mp4", 
-      		...more attributes... 
+      	{
+      		src: "/path/to/video.webm",
+      		type: "video/webm",
+      		...more attributes...
+      	},
+      	{
+      		src: "/path/to/video.mp4",
+      		type: "video/mp4",
+      		...more attributes...
       	}
       ])`</code></pre><br>
       This will inject a child `source` element for every element in the array with the specified attributes. `src` is the only required attribute although adding `type` is recommended as it helps the browser decide which file to download and play.

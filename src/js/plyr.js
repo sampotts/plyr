@@ -817,11 +817,8 @@
 
             // Inject the container
             if (!_getElement(config.selectors.captions)) {
-                plyr.videoContainer.insertAdjacentHTML('afterbegin', '<div class="' + _getClassname(config.selectors.captions) + '"><span></span></div>');
+                plyr.videoContainer.insertAdjacentHTML('afterbegin', '<div class="' + _getClassname(config.selectors.captions) + '"></div>');
             }
-
-            // Cache selector
-            plyr.captionsContainer = _getElement(config.selectors.captions).querySelector('span');
 
             // Determine if HTML5 textTracks is supported
             plyr.usingTextTracks = false;
@@ -870,14 +867,12 @@
                 _showCaptions(plyr);
 
                 // Disable unsupported browsers than report false positive
+                // Firefox bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1033144
                 if ((plyr.browser.name === 'IE' && plyr.browser.version >= 10) ||
                     (plyr.browser.name === 'Firefox' && plyr.browser.version >= 31)) {
-                        // ||
-                    //(plyr.browser.name === 'Chrome' && plyr.browser.version >= 43) ||
-                    //(plyr.browser.name === 'Safari' && plyr.browser.version >= 7)) {
 
                     // Debugging
-                    _log('Detected unsupported browser for HTML5 captions - using fallback');
+                    _log('Detected browser with known TextTrack issues - using manual fallback');
 
                     // Set to false so skips to 'manual' captioning
                     plyr.usingTextTracks = false;
@@ -893,20 +888,12 @@
 
                         if (track.kind === 'captions' || track.kind === 'subtitles') {
                             _on(track, 'cuechange', function() {
-                                console.log('cuechange');
-                                console.log(this);
-
-                                // Clear container
-                                plyr.captionsContainer.innerHTML = '';
-
                                 // Display a cue, if there is one
                                 if (this.activeCues[0] && 'text' in this.activeCues[0]) {
-                                    console.log(this.activeCues[0].getCueAsHTML());
-
-                                    plyr.captionsContainer.appendChild(this.activeCues[0].getCueAsHTML());
-
-                                    // Force redraw
-                                    var redraw = plyr.captionsContainer.offsetHeight;
+                                    _setCaption(this.activeCues[0].getCueAsHTML());
+                                }
+                                else {
+                                    _setCaption();
                                 }
                             });
                         }
@@ -955,25 +942,72 @@
                         xhr.send();
                     }
                 }
-
-                // If Safari 7+, removing track from DOM [see 'turn off native caption rendering' above]
-                /*if (plyr.browser.name === 'Safari' && plyr.browser.version >= 7) {
-                    _log('Safari 7+ detected; removing track from DOM');
-
-                    // Find all <track> elements
-                    tracks = plyr.media.getElementsByTagName('track');
-
-                    // Loop through and remove one by one
-                    for (var t = 0; t < tracks.length; t++) {
-                        plyr.media.removeChild(tracks[t]);
-                    }
-                }*/
             }
+        }
+
+        // Set the current caption
+        function _setCaption(caption) {
+            var container = _getElement(config.selectors.captions),
+                content = document.createElement('span');
+
+            // Empty the container
+            container.innerHTML = '';
+
+            // Default to empty
+            if(typeof caption === 'undefined') {
+                caption = '';
+            }
+
+            // Set the span content
+            if(typeof caption === 'string') {
+                content.innerHTML = caption.trim();
+            }
+            else {
+                content.appendChild(caption);
+            }
+
+            // Set new caption text
+            container.appendChild(content);
+
+            // Force redraw
+            var redraw = container.offsetHeight;
         }
 
         // Captions functions
         // Seek the manual caption time and update UI
         function _seekManualCaptions(time) {
+            // Utilities for caption time codes
+            function _timecodeCommon(tc, pos) {
+                var tcpair = [];
+                tcpair = tc.split(' --> ');
+                for(var i = 0; i < tcpair.length; i++) {
+                    // WebVTT allows for extra meta data after the timestamp line
+                    // So get rid of this if it exists
+                    tcpair[i] = tcpair[i].replace(/(\d+:\d+:\d+\.\d+).*/, "$1");
+                }
+                return _subTcSecs(tcpair[pos]);
+            }
+            function _timecodeMin(tc) {
+                return _timecodeCommon(tc, 0);
+            }
+            function _timecodeMax(tc) {
+                return _timecodeCommon(tc, 1);
+            }
+            function _subTcSecs(tc) {
+                if (tc === null || tc === undefined) {
+                    return 0;
+                }
+                else {
+                    var tc1 = [],
+                        tc2 = [],
+                        seconds;
+                    tc1 = tc.split(',');
+                    tc2 = tc1[0].split(':');
+                    seconds = Math.floor(tc2[0]*60*60) + Math.floor(tc2[1]*60) + Math.floor(tc2[2]);
+                    return seconds;
+                }
+            }
+
             // If it's not video, or we're using textTracks, bail.
             if (plyr.usingTextTracks || plyr.type !== 'video' || !plyr.supported.full) {
                 return;
@@ -1005,25 +1039,12 @@
                 plyr.media.currentTime.toFixed(1) <= _timecodeMax(plyr.captions[plyr.subcount][0])) {
                     plyr.currentCaption = plyr.captions[plyr.subcount][1];
 
-                // Trim caption text
-                var content = plyr.currentCaption.trim();
-
-                // Render the caption (only if changed)
-                if (plyr.captionsContainer.innerHTML != content) {
-                    // Empty caption
-                    // Otherwise NVDA reads it twice
-                    plyr.captionsContainer.innerHTML = '';
-
-                    // Set new caption text
-                    plyr.captionsContainer.innerHTML = content;
-                }
+                // Render the caption
+                _setCaption(plyr.currentCaption);
             }
             else {
-                plyr.captionsContainer.innerHTML = '';
+                _setCaption('');
             }
-
-            // Force redraw
-            // var redraw = plyr.captionsContainer.offsetHeight;
         }
 
         // Display captions container and button (for initialization)
@@ -1038,32 +1059,6 @@
             if (config.captions.defaultActive) {
                 _toggleClass(plyr.container, config.classes.captions.active, true);
                 _toggleState(plyr.buttons.captions, true);
-            }
-        }
-
-        // Utilities for caption time codes
-        function _timecodeMin(tc) {
-            var tcpair = [];
-            tcpair = tc.split(' --> ');
-            return _subTcSecs(tcpair[0]);
-        }
-        function _timecodeMax(tc) {
-            var tcpair = [];
-            tcpair = tc.split(' --> ');
-            return _subTcSecs(tcpair[1]);
-        }
-        function _subTcSecs(tc) {
-            if (tc === null || tc === undefined) {
-                return 0;
-            }
-            else {
-                var tc1 = [],
-                    tc2 = [],
-                    seconds;
-                tc1 = tc.split(',');
-                tc2 = tc1[0].split(':');
-                seconds = Math.floor(tc2[0]*60*60) + Math.floor(tc2[1]*60) + Math.floor(tc2[2]);
-                return seconds;
             }
         }
 
@@ -2444,7 +2439,7 @@
 
             if (config.fullscreen.hideControls) {
                 // Keep an eye on the mouse location in relation to controls
-                _on(plyr.controls, 'mouseenter mouseleave', function() {
+                _on(plyr.controls, 'mouseenter mouseleave', function(event) {
                     plyr.controls.mouseover = (event.type === 'mouseenter');
                 });
             }
@@ -2465,7 +2460,7 @@
             _on(plyr.media, 'ended', function() {
                 // Clear
                 if (plyr.type === 'video') {
-                    plyr.captionsContainer.innerHTML = '';
+                    _setCaption('');
                 }
 
                 // Reset UI

@@ -13,8 +13,7 @@ plyr.setup('.js-media-player', {
 	},
 	captions: {
 		defaultActive: 	true
-	},
-	duration: 100
+	}
 });
 
 // Setup shr

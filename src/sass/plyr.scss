@@ -167,6 +167,11 @@ $plyr-bp-captions-large:             768px !default; // When captions jump to th
         vertical-align: middle;
     }
 
+    // Hide default captions
+    video::-webkit-media-text-track-container {
+        display: none;
+    }
+
     // For embeds
     &__video-embed {
         padding-bottom: 56.25%; /* 16:9 */
