@@ -7,57 +7,58 @@
 // -------------------------------
 
 // Colors
-@plyr-blue:                      #3498DB;
-@plyr-gray-dark:                 #343F4A;
-@plyr-gray:                      #565D64;
-@plyr-gray-light:                #6B7D86;
-@plyr-gray-lighter:              #CBD0D3;
-@plyr-off-white:                 #D6DADD;
+@plyr-blue:                          #3498DB;
+@plyr-gray-dark:                     #343F4A;
+@plyr-gray:                          #565D64;
+@plyr-gray-light:                    #6B7D86;
+@plyr-gray-lighter:                 #CBD0D3;
+@plyr-off-white:                     #D6DADD;
 
 // Font sizes
-@plyr-font-size-small:           14px;
-@plyr-font-size-base:            16px;
+@plyr-font-size-small:               14px;
+@plyr-font-size-base:                16px;
 
 // Captions
-@plyr-font-size-captions-base:   ceil(@plyr-font-size-base * 1.25);
-@plyr-font-size-captions-medium: ceil(@plyr-font-size-base * 1.5);
-@plyr-font-size-captions-large:  (@plyr-font-size-base * 2);
+@plyr-font-size-captions-base:       ceil(@plyr-font-size-base * 1.25);
+@plyr-font-size-captions-medium:     ceil(@plyr-font-size-base * 1.5);
+@plyr-font-size-captions-large:      (@plyr-font-size-base * 2);
 
 // Controls
-@plyr-control-spacing:           10px;
-@plyr-controls-bg:               #fff;
-@plyr-control-bg-hover:          @plyr-blue;
+@plyr-control-spacing:               10px;
+@plyr-controls-bg:                   #fff;
+@plyr-control-bg-hover:              @plyr-blue;
 .contrast-control-color(@plyr-controls-bg);
 .contrast-control-color-hover(@plyr-control-bg-hover);
 
 // Tooltips
-@plyr-tooltip-bg:                @plyr-controls-bg;
-@plyr-tooltip-border-color:      fade(darken(@plyr-controls-bg, 5%), 10%);
-@plyr-tooltip-border-width:      1px;
-@plyr-tooltip-shadow:            0 0 5px @plyr-tooltip-border-color, 0 0 0 @plyr-tooltip-border-width @plyr-tooltip-border-color;
-@plyr-tooltip-color:             @plyr-control-color;
-@plyr-tooltip-padding:           @plyr-control-spacing;
-@plyr-tooltip-arrow-size:        6px;
-@plyr-tooltip-radius:            3px;
+@plyr-tooltip-bg:                    @plyr-controls-bg;
+@plyr-tooltip-border-color:          fade(darken(@plyr-controls-bg, 75%), 10%);
+@plyr-tooltip-arrow-border-color:    fade(darken(@plyr-controls-bg, 75%), 20%);
+@plyr-tooltip-border-width:          1px;
+@plyr-tooltip-shadow:                0 0 5px @plyr-tooltip-border-color, 0 0 0 @plyr-tooltip-border-width @plyr-tooltip-border-color;
+@plyr-tooltip-color:                 @plyr-control-color;
+@plyr-tooltip-padding:               @plyr-control-spacing;
+@plyr-tooltip-arrow-size:            6px;
+@plyr-tooltip-radius:                3px;
 
 // Progress
-@plyr-progress-bg:               fade(@plyr-gray, 20%);
-@plyr-progress-playing-bg:       @plyr-blue;
-@plyr-progress-buffered-bg:      fade(@plyr-gray, 25%);
-@plyr-progress-loading-size:     40px;
-@plyr-progress-loading-bg:       fade(#000, 15%);
+@plyr-progress-bg:                   fade(@plyr-gray, 20%);
+@plyr-progress-playing-bg:           @plyr-blue;
+@plyr-progress-buffered-bg:          fade(@plyr-gray, 25%);
+@plyr-progress-loading-size:         40px;
+@plyr-progress-loading-bg:           fade(#000, 15%);
 
 // Volume
-@plyr-volume-track-height:       6px;
-@plyr-volume-track-bg:           darken(@plyr-controls-bg, 10%);
-@plyr-volume-thumb-height:       (@plyr-volume-track-height * 2);
-@plyr-volume-thumb-width:        (@plyr-volume-track-height * 2);
-@plyr-volume-thumb-bg:           @plyr-control-color;
-@plyr-volume-thumb-bg-focus:     @plyr-control-bg-hover;
+@plyr-volume-track-height:           6px;
+@plyr-volume-track-bg:               darken(@plyr-controls-bg, 10%);
+@plyr-volume-thumb-height:           (@plyr-volume-track-height * 2);
+@plyr-volume-thumb-width:            (@plyr-volume-track-height * 2);
+@plyr-volume-thumb-bg:               @plyr-control-color;
+@plyr-volume-thumb-bg-focus:         @plyr-control-bg-hover;
 
 // Breakpoints
-@plyr-bp-control-split:          560px; // When controls split into left/right
-@plyr-bp-captions-large:         768px; // When captions jump to the larger font size
+@plyr-bp-control-split:              560px; // When controls split into left/right
+@plyr-bp-captions-large:             768px; // When captions jump to the larger font size
 
 // Animation
 // ---------------------------------------
@@ -366,7 +367,7 @@
             @plyr-border-arrow-size: (@plyr-tooltip-arrow-size + (@plyr-tooltip-border-width * 1));
             bottom: -(@plyr-border-arrow-size + @plyr-tooltip-border-width);
             border-right: @plyr-border-arrow-size solid transparent;
-            border-top: @plyr-border-arrow-size solid @plyr-tooltip-border-color;
+            border-top: @plyr-border-arrow-size solid @plyr-tooltip-arrow-border-color;
             border-left: @plyr-border-arrow-size solid transparent;
             z-index: 1;
         }
