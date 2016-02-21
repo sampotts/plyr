@@ -820,15 +820,21 @@
         }
 
         // Utilities for caption time codes
-        function _timecodeMin(tc) {
+        function _timecodeCommon(tc, pos) {
             var tcpair = [];
             tcpair = tc.split(' --> ');
-            return _subTcSecs(tcpair[0]);
+            for(var i = 0; i < tcpair.length; i++) {
+                // WebVTT allows for extra meta data after the timestamp line
+                // So get rid of this if it exists
+                tcpair[i] = tcpair[i].replace(/(\d+:\d+:\d+\.\d+).*/, "$1");
+            }
+            return _subTcSecs(tcpair[pos]);
+        }
+        function _timecodeMin(tc) {
+            return _timecodeCommon(tc, 0);
         }
         function _timecodeMax(tc) {
-            var tcpair = [];
-            tcpair = tc.split(' --> ');
-            return _subTcSecs(tcpair[1]);
+            return _timecodeCommon(tc, 1);
         }
         function _subTcSecs(tc) {
             if (tc === null || tc === undefined) {
@@ -1517,12 +1523,18 @@
                                         record,
                                         req = xhr.responseText;
 
-                                    records = req.split('\n\n');
-
+                                    var pattern = '\n';
+                                    records = req.split(pattern + pattern);
+                                    if(records.length === 1) {
+                                        // The '\n' pattern didn't work
+                                        // Try '\r\n'
+                                        pattern = '\r\n';
+                                        records = req.split(pattern + pattern);
+                                    }
                                     for (var r = 0; r < records.length; r++) {
                                         record = records[r];
                                         plyr.captions[r] = [];
-                                        plyr.captions[r] = record.split('\n');
+                                        plyr.captions[r] = record.split(pattern);
                                     }
 
                                     // Remove first element ('VTT')
