@@ -914,16 +914,26 @@
                         xhr.onreadystatechange = function() {
                             if (xhr.readyState === 4) {
                                 if (xhr.status === 200) {
-                                    var records = [],
-                                        record,
+                                    var captions = [],
+                                        caption,
                                         req = xhr.responseText;
 
-                                    records = req.split('\n\n');
+                                    captions = req.split('\n\n');
 
-                                    for (var r = 0; r < records.length; r++) {
-                                        record = records[r];
+                                    for (var r = 0; r < captions.length; r++) {
+                                        caption = captions[r];
                                         plyr.captions[r] = [];
-                                        plyr.captions[r] = record.split('\n');
+
+                                        // Get the parts of the captions
+                                        var parts = caption.split('\n'),
+                                            index = 0;
+
+                                        // Incase caption numbers are added
+                                        if(parts[index].indexOf(":") === -1) {
+                                            index = 1;
+                                        }
+
+                                        plyr.captions[r] = [parts[index], parts[index + 1]];
                                     }
 
                                     // Remove first element ('VTT')
