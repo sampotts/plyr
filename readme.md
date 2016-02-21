@@ -163,6 +163,11 @@ You'll notice the `crossorigin` attribute on the example `<video>` and `<audio>`
 More info on CORS here:
 [https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS)
 
+### Captions
+WebVTT captions are supported. To add a caption track, check the HTML example above and look for the `<track>` element.
+
+Be sure to [validate your caption files](https://quuz.org/webvtt/)
+
 ### JavaScript
 
 #### Quick setup
@@ -197,11 +202,6 @@ Passing just the options object:
 ```javascript
 plyr.setup(options);
 ```
-
-### Captions
-WebVTT captions are supported. To add a caption track, check the HTML example above and look for the `<track>` element.
-
-Be sure to [validate your caption files](https://quuz.org/webvtt/)
 
 #### Options
 
