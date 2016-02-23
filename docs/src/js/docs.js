@@ -116,7 +116,7 @@ shr.setup({
 						kind:   'captions',
 						label:  'English',
 						srclang:'en',
-						src:    'https://cdn.selz.com/plyr/1.5/View_From_A_Blue_Moon_Trailer-HD.vtt',
+						src:    'https://cdn.selz.com/plyr/1.5/View_From_A_Blue_Moon_Trailer-HD.en.vtt',
 						default: true
 					}]
 				});
