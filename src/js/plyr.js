@@ -107,7 +107,7 @@
         },
         storage: {
             enabled:            true,
-            key:                'plyr_volume'
+            key:                'plyr'
         },
         controls:               ['restart', 'rewind', 'play', 'fast-forward', 'current-time', 'duration', 'mute', 'volume', 'captions', 'fullscreen'],
         i18n: {
@@ -1869,11 +1869,15 @@
 
                 if (config.storage.enabled && _storage().supported) {
                     volume = window.localStorage.getItem(config.storage.key);
+
+                    // Clean up old volume
+                    // https://github.com/Selz/plyr/issues/171
+                    window.localStorage.removeItem('plyr-volume');
                 }
             }
 
             // Use config if all else fails
-            if(isNaN(volume)) {
+            if(volume === null || isNaN(volume)) {
                 volume = config.volume;
             }
 
