@@ -1,5 +1,23 @@
 # Changelog
 
+## v1.5.16
+- Cancel requests on source change (Fixes #174)
+
+## v1.5.15
+- Fix for CustomEvent polyfill and related bug (See #172)
+
+## v1.5.14
+- Volume storage fix (Fixes #171)
+
+## v1.5.13
+- Fix for manual caption rendering
+
+## v1.5.12
+- Added a duration option to pass the duration of the file
+- Added the ability to set options per element by setting a data-plyr attribute on the target elements (this might be useful for the duration option for example)
+- Fixes for Chrome and Safari caption rendering, they now use the default texttrack and cuechange events
+- Firefox bug fix for event not defined
+
 ## v1.5.11
 - iOS embed bug fixes (fixes #166)
 - Hide IE/Edge <input type='range'> tooltip (since we have a styled one) (fixes #160)

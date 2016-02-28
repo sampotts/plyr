@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.5.15
+// plyr.js v1.5.16
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -2225,6 +2225,9 @@
                 _remove(plyr.videoContainer);
             }
 
+            // Cancel current network requests
+            _cancelRequests();
+
             // Remove the old media
             _remove(plyr.media);
 
@@ -2521,6 +2524,31 @@
             });
         }
 
+        // Cancel current network requests
+        // See https://github.com/Selz/plyr/issues/174
+        function _cancelRequests() {
+            if(!_inArray(config.types.html5, plyr.type)) {
+                return;
+            }
+
+            // Set empty src attribute
+            plyr.media.setAttribute('src', '');
+
+            // Remove child sources
+            var sources = plyr.media.querySelectorAll('source');
+            for (var i = 0; i < sources.length; i++) {
+                _remove(sources[i]);
+            }
+
+            // Load the new empty source
+            // This will cancel existing requests
+            // See https://github.com/Selz/plyr/issues/174
+            plyr.media.load();
+
+            // Debugging
+            _log("Cancelled network requests for old media");
+        }
+
         // Destroy an instance
         // Event listeners are removed when elements are removed
         // http://stackoverflow.com/questions/12528049/if-a-dom-element-is-removed-are-its-listeners-also-removed-from-memory
@@ -2547,7 +2575,7 @@
 
             // If video, we need to remove some more
             if (plyr.type === 'video') {
-                // Remove captions
+                // Remove captions container
                 _remove(_getElement(config.selectors.captions));
 
                 // Remove video wrapper
