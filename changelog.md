@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.5.17
+- Expose YouTube and Vimeo API (docs update required) (Fixes #176)
+- Auto set title based on YouTube getVideoData() title property
+- Bug fix for Vimeo API change (Uncaught TypeError: Cannot read property 'value' of undefined) due to a change their end
+
 ## v1.5.16
 - Cancel requests on source change (Fixes #174)
 

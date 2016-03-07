@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.5.16
+// plyr.js v1.5.17
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -133,7 +133,7 @@
         // URLs
         urls: {
             vimeo: {
-                api:            'https://cdn.plyr.io/froogaloop/1.0.0/plyr.froogaloop.js',
+                api:            'https://cdn.plyr.io/froogaloop/1.0.1/plyr.froogaloop.js',
             },
             youtube: {
                 api:            'https://www.youtube.com/iframe_api'
@@ -1420,6 +1420,9 @@
 
             // Set title
             _setTitle(_getElement('iframe'));
+
+            // Store reference to API
+            plyr.container.plyr.embed = plyr.embed;
         }
 
         // Handle YouTube API ready
@@ -1469,6 +1472,9 @@
                         plyr.media.paused = true;
                         plyr.media.currentTime = instance.getCurrentTime();
                         plyr.media.muted = instance.isMuted();
+
+                        // Set title
+                        config.title = instance.getVideoData().title;
 
                         // Trigger timeupdate
                         _triggerEvent(plyr.media, 'timeupdate');
@@ -2225,6 +2231,9 @@
                 _remove(plyr.videoContainer);
             }
 
+            // Remove embed object
+            plyr.embed = null;
+
             // Cancel current network requests
             _cancelRequests();
 
@@ -2326,12 +2335,10 @@
             }
 
             // Set aria title and iframe title
-            if ('title' in source) {
-                config.title = source.title;
-                _setTitle();
-            }
+            config.title = source.title;
+            _setTitle();
 
-            // Reset media object
+            // Reset media objects
             plyr.container.plyr.media = plyr.media;
         }
 
