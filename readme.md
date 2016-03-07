@@ -842,6 +842,8 @@ Plyr is developed by [@sam_potts](https://twitter.com/sam_potts) / [sampotts.me]
 
 ## Used by
 - [Selz.com](https://selz.com)
+- [koel - A personal music streaming server that works.](http://koel.phanan.net/)
+- [Oscar Radio](http://oscar-radio.xyz/)
 
 Let me know on [Twitter](https://twitter.com/sam_potts) I can add you to the above list. It'd be awesome to see how you're using Plyr :-)
 
