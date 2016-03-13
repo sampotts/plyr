@@ -44,8 +44,8 @@ $plyr-control-bg-hover:              $plyr-blue !default;
 
 // Tooltips
 $plyr-tooltip-bg:                    $plyr-controls-bg !default;
-$plyr-tooltip-border-color:          transparentize(darken($plyr-controls-bg, 75%), .1) !default;
-$plyr-tooltip-arrow-border-color:    transparentize(darken($plyr-controls-bg, 75%), .2) !default;
+$plyr-tooltip-border-color:          transparentize(darken($plyr-controls-bg, 75%), .9) !default;
+$plyr-tooltip-arrow-border-color:    transparentize(darken($plyr-controls-bg, 75%), .8) !default;
 
 $plyr-tooltip-border-width:          1px;
 $plyr-tooltip-shadow:                0 0 5px $plyr-tooltip-border-color, 0 0 0 $plyr-tooltip-border-width $plyr-tooltip-border-color;
@@ -55,11 +55,11 @@ $plyr-tooltip-arrow-size:            6px !default;
 $plyr-tooltip-radius:                3px !default;
 
 // Progress
-$plyr-progress-bg:                   transparentize($plyr-gray, .2) !default;
+$plyr-progress-bg:                   transparentize($plyr-gray, .8) !default;
 $plyr-progress-playing-bg:           $plyr-blue !default;
-$plyr-progress-buffered-bg:          transparentize($plyr-gray, .25) !default;
+$plyr-progress-buffered-bg:          transparentize($plyr-gray, .75) !default;
 $plyr-progress-loading-size:         40px !default;
-$plyr-progress-loading-bg:           transparentize(#000, .15) !default;
+$plyr-progress-loading-bg:           transparentize(#000, .85) !default;
 
 // Volume
 $plyr-volume-track-height:           6px !default;
@@ -130,6 +130,7 @@ $plyr-bp-captions-large:             768px !default; // When captions jump to th
     position: relative;
     max-width: 100%;
     min-width: 290px;
+    font-family: Avenir, "Avenir Next", "Helvetica Neue", "Segoe UI", Helvetica, Arial, sans-serif;
 
     // border-box everything
     // http://paulirish.com/2012/box-sizing-border-box-ftw/
@@ -218,7 +219,7 @@ $plyr-bp-captions-large:             768px !default; // When captions jump to th
         span {
             border-radius: 2px;
             padding: 3px 10px;
-            background: transparentize(#000, .9);
+            background: transparentize(#000, .1);
         }
         span:empty {
             display: none;
@@ -243,7 +244,7 @@ $plyr-bp-captions-large:             768px !default; // When captions jump to th
         background: $plyr-controls-bg;
         line-height: 1;
         text-align: center;
-        box-shadow: 0 1px 1px transparentize($plyr-gray-dark, .2);
+        box-shadow: 0 1px 1px transparentize($plyr-gray-dark, .8);
 
         // Clear floats
         &::after {
