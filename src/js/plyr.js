@@ -1438,7 +1438,7 @@
             plyr.embed = new YT.Player(container.id, {
                 videoId: videoId,
                 playerVars: {
-                    autoplay: 0,
+                    autoplay: plyr.autoplay ? 1 : 0,
                     controls: (plyr.supported.full ? 0 : 1),
                     rel: 0,
                     showinfo: 0,
