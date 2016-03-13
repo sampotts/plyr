@@ -1,9 +1,6 @@
 # Plyr
 A simple, accessible and customizable HTML5, YouTube and Vimeo media player.
 
-[![npm version](https://badge.fury.io/js/plyr.svg)](https://badge.fury.io/js/plyr) 
-[![Bower version](https://badge.fury.io/bo/plyr.svg)](https://badge.fury.io/bo/plyr)
-
 [Checkout the demo](https://plyr.io)
 
 [![Image of Plyr](https://cdn.plyr.io/static/plyr-v1.5.jpg)](https://plyr.io)
@@ -31,6 +28,7 @@ Oh and yes, it works with Bootstrap.
 Check out the [changelog](changelog.md) to see what's new with Plyr.
 
 ## Planned Development
+- Streaming
 - Playback speed
 - Playlists
 - Multiple language captions (with selection)
@@ -40,12 +38,12 @@ Check out the [changelog](changelog.md) to see what's new with Plyr.
 If you have any cool ideas or features, please let me know by [creating an issue](https://github.com/Selz/plyr/issues/new) or, of course, forking and sending a pull request.
 
 ## Implementation
-
 Check `docs/index.html` and `docs/dist/docs.js` for an example setup.
 
 **Heads up:** the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.5.18/plyr.js` to `https://cdn.plyr.io/1.5.18/plyr.js`
 
 ### Node Package Manager (NPM)
+[![npm version](https://badge.fury.io/js/plyr.svg)](https://badge.fury.io/js/plyr) 
 Using NPM, you can grab Plyr:
 ```
 npm install plyr
@@ -53,6 +51,7 @@ npm install plyr
 [https://www.npmjs.com/package/plyr](https://www.npmjs.com/package/plyr)
 
 ### Bower
+[![Bower version](https://badge.fury.io/bo/plyr.svg)](https://badge.fury.io/bo/plyr)
 If bower is your thang, you can grab Plyr using:
 ```
 bower install plyr
