@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.5.18
+- Added 'ready' event for initial setup complete or source change occurs
+- Fixed SASS stylesheet references to transparentize
+- Added default font stack to controls 
+- Docs fixes inc controls HTML (fixes #180)
+
 ## v1.5.17
 - Expose YouTube and Vimeo API (docs update required) (Fixes #176)
 - Auto set title based on YouTube getVideoData() title property
