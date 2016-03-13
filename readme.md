@@ -44,6 +44,7 @@ Check `docs/index.html` and `docs/dist/docs.js` for an example setup.
 
 ### Node Package Manager (NPM)
 [![npm version](https://badge.fury.io/js/plyr.svg)](https://badge.fury.io/js/plyr) 
+
 Using NPM, you can grab Plyr:
 ```
 npm install plyr
@@ -52,6 +53,7 @@ npm install plyr
 
 ### Bower
 [![Bower version](https://badge.fury.io/bo/plyr.svg)](https://badge.fury.io/bo/plyr)
+
 If bower is your thang, you can grab Plyr using:
 ```
 bower install plyr
