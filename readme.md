@@ -1,9 +1,9 @@
 # Plyr
 A simple, accessible and customizable HTML5, YouTube and Vimeo media player.
 
-[Checkout the demo](http://plyr.io)
+[Checkout the demo](https://plyr.io)
 
-[![Image of Plyr](https://cdn.plyr.io/static/plyr-v1.5.jpg)](http://plyr.io)
+[![Image of Plyr](https://cdn.plyr.io/static/plyr-v1.5.jpg)](https://plyr.io)
 
 ## Why?
 We wanted a lightweight, accessible and customizable media player that supports [*modern*](#browser-support) browsers. Sure, there are many other players out there but we wanted to keep things simple, using the right elements for the job.
@@ -25,7 +25,7 @@ We wanted a lightweight, accessible and customizable media player that supports 
 Oh and yes, it works with Bootstrap.
 
 ## Changelog
-Check out the [changelog](changelog.md) to see what's been new with Plyr.
+Check out the [changelog](changelog.md) to see what's new with Plyr.
 
 ## Planned Development
 - Playback speed
@@ -842,6 +842,8 @@ Plyr is developed by [@sam_potts](https://twitter.com/sam_potts) / [sampotts.me]
 
 ## Used by
 - [Selz.com](https://selz.com)
+- [koel - A personal music streaming server that works.](http://koel.phanan.net/)
+- [Oscar Radio](http://oscar-radio.xyz/)
 
 Let me know on [Twitter](https://twitter.com/sam_potts) I can add you to the above list. It'd be awesome to see how you're using Plyr :-)
 
