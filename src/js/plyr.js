@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.5.18
+// plyr.js v1.5.19
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -1415,14 +1415,14 @@
 
         // When embeds are ready
         function _embedReady() {
-            // Setup the UI
-            _setupInterface();
-
             // Set title
             _setTitle(_getElement('iframe'));
 
             // Store reference to API
             plyr.container.plyr.embed = plyr.embed;
+
+            // Setup the UI
+            _setupInterface();
         }
 
         // Handle YouTube API ready

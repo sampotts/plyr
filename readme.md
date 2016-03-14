@@ -40,7 +40,7 @@ If you have any cool ideas or features, please let me know by [creating an issue
 
 Check `docs/index.html` and `docs/dist/docs.js` for an example setup.
 
-**Heads up:** the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.5.18/plyr.js` to `https://cdn.plyr.io/1.5.18/plyr.js`
+**Heads up:** the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.5.19/plyr.js` to `https://cdn.plyr.io/1.5.19/plyr.js`
 
 ### Node Package Manager (NPM)
 Using NPM, you can grab Plyr:
@@ -69,11 +69,11 @@ More info is on [npm](https://www.npmjs.com/package/ember-cli-plyr) and [GitHub]
 If you want to use our CDN, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/1.5.18/plyr.css">
-<script src="https://cdn.plyr.io/1.5.18/plyr.js"></script>
+<link rel="stylesheet" href="https://cdn.plyr.io/1.5.19/plyr.css">
+<script src="https://cdn.plyr.io/1.5.19/plyr.js"></script>
 ```
 
-You can also access the `sprite.svg` file at `https://cdn.plyr.io/1.5.18/sprite.svg`.
+You can also access the `sprite.svg` file at `https://cdn.plyr.io/1.5.19/sprite.svg`.
 
 ### CSS & Styling
 If you want to use the default css, add the `plyr.css` file from `/dist` into your head, or even better use `plyr.less` or `plyr.sass` file included in `/src` in your build to save a request.
@@ -175,7 +175,7 @@ Be sure to [validate your caption files](https://quuz.org/webvtt/)
 Here's an example of a default setup:
 
 ```html
-<script src="https://cdn.plyr.io/1.5.18/plyr.js"></script>
+<script src="https://cdn.plyr.io/1.5.19/plyr.js"></script>
 <script>plyr.setup();</script>
 ```
 
@@ -772,14 +772,36 @@ Details borrowed from: [https://developer.mozilla.org/en-US/docs/Web/Guide/Event
 Here's an example of binding an event listener:
 
 ```javascript
-document.querySelector(".js-plyr").addEventListener("ready", function() {
-  /* Magic happens */
+document.querySelector('.js-plyr').addEventListener('ready', function() {
+	var player = event.target.plyr;
 });
 ```
 
 ## Embeds
 
 YouTube and Vimeo are currently supported and function much like a HTML5 video. Check the relevant documentation sections for any differences.
+
+Plyr references a custom version of the Vimeo Froogaloop API as Vimeo have neglected to maintain the library and there were bugs with their version. You don't need to worry about including your own versions of the Vimeo or YouTube JavaScript APIs.
+
+The native API's can be accessed through the `embed` property of the plyr object. For example:
+
+```javascript
+document.querySelector('.js-plyr').addEventListener('ready', function() {
+	var player = event.target.plyr;
+
+	// YouTube
+	console.log(player.embed.getVideoData());
+
+	// Vimeo
+	console.log(player.embed.api('getColor'));
+});
+```
+
+More info on the respective API's here:
+[YouTube API Reference](https://developers.google.com/youtube/js_api_reference)
+[Vimeo API Reference](https://developer.vimeo.com/player/js-api#reference)
+
+*Please note*: not all API methods may work 100%. Your mileage may vary. It's better to use the universal plyr API where possible.
 
 ## Fullscreen
 
