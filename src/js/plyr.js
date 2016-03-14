@@ -1319,12 +1319,6 @@
                 // Clean up
                 plyr.embedId = null;
             }
-            else {
-                // Autoplay
-                if (config.autoplay) {
-                    _play();
-                }
-            }
         }
 
         // Setup YouTube/Vimeo
@@ -1438,7 +1432,7 @@
             plyr.embed = new YT.Player(container.id, {
                 videoId: videoId,
                 playerVars: {
-                    autoplay: plyr.autoplay ? 1 : 0,
+                    autoplay: (config.autoplay ? 1 : 0),
                     controls: (plyr.supported.full ? 0 : 1),
                     rel: 0,
                     showinfo: 0,
@@ -1626,12 +1620,12 @@
                 });
 
                 // Always seek to 0
-                //plyr.embed.api('seekTo', 0);
+                // plyr.embed.api('seekTo', 0);
 
-                // Prevent autoplay if needed (seek will play)
-                //if (!config.autoplay) {
-                //    plyr.embed.api('pause');
-                //}
+                // Autoplay
+                if (config.autoplay) {
+                    plyr.embed.api('play');
+                }
             });
         }
 
@@ -2277,6 +2271,11 @@
             // Inject the new element
             _prependChild(plyr.container, plyr.media);
 
+            // Autoplay the new source?
+            if (typeof source.autoplay !== 'undefined') {
+                config.autoplay = source.autoplay;
+            }
+
             // Set attributes for audio video
             if (_inArray(config.types.html5, plyr.type)) {
                 if (config.crossorigin) {
@@ -2301,9 +2300,6 @@
             _toggleClass(plyr.container, config.classes.captions.active, plyr.captionsEnabled);
             _toggleStyleHook();
 
-            // Autoplay the new source?
-            config.autoplay = (source.autoplay || config.autoplay);
-
             // Set new sources for html5
             if (_inArray(config.types.html5, plyr.type)) {
                 _insertChildElements('source', source.sources);
@@ -2327,11 +2323,6 @@
 
                 // Display duration if available
                 _displayDuration();
-            }
-
-            // Play if autoplay attribute is present
-            if (config.autoplay) {
-                _play();
             }
 
             // Set aria title and iframe title
@@ -2668,6 +2659,11 @@
 
                 // Set title on button and frame
                 _setTitle();
+
+                // Autoplay
+                if (config.autoplay) {
+                    _play();
+                }
             }
 
             // Successful setup
