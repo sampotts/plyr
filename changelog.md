@@ -1,9 +1,18 @@
 # Changelog
 
+## v1.5.21
+- Bug fix for embeds: `play` not being defined (fixes #185 and #186)
+
+## v1.5.20
+- Bug fix for autoplay option
+
+## v1.5.19
+- Fix for accessing `embed` property after `ready` event fired
+
 ## v1.5.18
 - Added 'ready' event for initial setup complete or source change occurs
 - Fixed SASS stylesheet references to transparentize
-- Added default font stack to controls 
+- Added default font stack to controls
 - Docs fixes inc controls HTML (fixes #180)
 
 ## v1.5.17

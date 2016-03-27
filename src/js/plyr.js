@@ -1,13 +1,13 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.5.20
+// plyr.js v1.5.21
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
 // Credits: http://paypal.github.io/accessible-html5-video-player/
 // ==========================================================================
 
-(function(root, factory) {
+;(function(root, factory) {
     'use strict';
     /*global define,module*/
 
@@ -1409,14 +1409,14 @@
 
         // When embeds are ready
         function _embedReady() {
-            // Set title
-            _setTitle(_getElement('iframe'));
-
             // Store reference to API
             plyr.container.plyr.embed = plyr.embed;
 
             // Setup the UI
             _setupInterface();
+
+            // Set title
+            _setTitle(_getElement('iframe'));
         }
 
         // Handle YouTube API ready
@@ -2830,7 +2830,7 @@
         }
 
         // Create a player instance for each element
-        for (var i = elements.length - 1; i >= 0; i--) {
+        for (var i = 0; i < elements.length; i++) {
             // Get the current element
             var element = elements[i];
 
