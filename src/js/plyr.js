@@ -127,7 +127,7 @@
             frameTitle:         'Player for {title}'
         },
         types: {
-            embed:              ['youtube', 'vimeo'],
+            embed:              ['youtube', 'vimeo', 'soundcloud'],
             html5:              ['video', 'audio']
         },
         // URLs
@@ -137,6 +137,9 @@
             },
             youtube: {
                 api:            'https://www.youtube.com/iframe_api'
+            },
+            soundcloud: {
+                api:            'https://w.soundcloud.com/player/api.js'
             }
         },
         // Custom control listeners
@@ -1405,6 +1408,35 @@
                     }
                 }, 50);
             }
+            // Soundcloud
+            else if (plyr.type === 'soundcloud') {
+                // Inject the iframe
+                var iframe = document.createElement('iframe');
+
+                // Watch for iframe load
+                iframe.loaded = false;
+                _on(iframe, 'load', function() { iframe.loaded = true; });
+
+                _setAttributes(iframe, {
+                    'src':  'https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/' + videoId,
+                    'id':   id
+                });
+
+                container.appendChild(iframe);
+                plyr.media.appendChild(container);
+
+                if (!window.SC) {
+                    _injectScript(config.urls.soundcloud.api);
+                }
+
+                // Wait for SC load
+                var timer = window.setInterval(function() {
+                    if (window.SC && iframe.loaded) {
+                        window.clearInterval(timer);
+                        _soundcloudReady.call(iframe);
+                    }
+                }, 50);
+            }
         }
 
         // When embeds are ready
@@ -1629,6 +1661,84 @@
             });
         }
 
+        // Soundcloud ready
+        function _soundcloudReady() {
+            plyr.embed = SC.Widget(this);
+
+            // Setup on ready
+            plyr.embed.bind(SC.Widget.Events.READY, function() {
+                // Create a faux HTML5 API using the Soundcloud API
+                plyr.media.play = function() {
+                    plyr.embed.play();
+                    plyr.media.paused = false;
+                };
+                plyr.media.pause = function() {
+                    plyr.embed.pause();
+                    plyr.media.paused = true;
+                };
+                plyr.media.stop = function() {
+                    plyr.embed.seekTo(0);
+                    plyr.embed.pause();
+                    plyr.media.paused = true;
+                };
+                plyr.media.paused = true;
+                plyr.media.currentTime = 0;
+
+                // Update UI
+                _embedReady();
+
+                plyr.embed.getPosition(function(value) {
+                    plyr.media.currentTime = value;
+
+                    // Trigger timeupdate
+                    _triggerEvent(plyr.media, 'timeupdate');
+                });
+
+                plyr.embed.getDuration(function(value) {
+                    plyr.media.duration = value/1000;
+                    // Display duration if available
+                    _displayDuration();
+                });
+
+                plyr.embed.bind(SC.Widget.Events.PLAY, function() {
+                    plyr.media.paused = false;
+                    _triggerEvent(plyr.media, 'play');
+                    _triggerEvent(plyr.media, 'playing');
+                });
+
+                plyr.embed.bind(SC.Widget.Events.PAUSE, function() {
+                    plyr.media.paused = true;
+                    _triggerEvent(plyr.media, 'pause');
+                });
+
+                plyr.embed.bind(SC.Widget.Events.PLAY_PROGRESS, function(data) {
+                    plyr.media.seeking = false;
+                    plyr.media.currentTime = data.currentPosition/1000;
+                    _triggerEvent(plyr.media, 'timeupdate');
+                });
+
+                plyr.embed.bind(SC.Widget.Events.LOAD_PROGRESS, function(data) {
+                    plyr.media.buffered = data.loadProgress;
+                    _triggerEvent(plyr.media, 'progress');
+
+                    if(parseInt(data.loadProgress) === 1) {
+                        // Trigger event
+                        _triggerEvent(plyr.media, 'canplaythrough');
+                    }
+                });
+
+                plyr.embed.bind(SC.Widget.Events.FINISH, function() {
+                    plyr.media.paused = true;
+                    _triggerEvent(plyr.media, 'ended');
+                });
+
+                // Autoplay
+                if (config.autoplay) {
+                    plyr.embed.play();
+                }
+            });
+        }
+
         // Play media
         function _play() {
             if('play' in plyr.media) {
@@ -1721,6 +1831,10 @@
                     case 'vimeo':
                         // Round to nearest second for vimeo
                         plyr.embed.api('seekTo', targetTime.toFixed(0));
+                        break;
+
+                    case 'soundcloud':
+                        plyr.embed.seekTo(targetTime*1000);
                         break;
                 }
 
@@ -1854,6 +1968,10 @@
                     case 'vimeo':
                         plyr.embed.api('setVolume', plyr.media.muted ? 0 : parseFloat(config.volume / 10));
                         break;
+
+                    case 'soundcloud':
+                        plyr.embed.setVolume(plyr.media.muted ? 0 : parseFloat(config.volume / 10));
+                        break;
                 }
 
                 // Trigger volumechange for embeds
@@ -1906,6 +2024,10 @@
 
                     case 'vimeo':
                         plyr.embed.api('setVolume', plyr.media.volume);
+                        break;
+
+                    case 'soundcloud':
+                        plyr.embed.setVolume(plyr.media.volume);
                         break;
                 }
 
@@ -2192,6 +2314,12 @@
                     });
                     break;
 
+                case 'soundcloud':
+                    plyr.embed.getCurrentSound(function(object) {
+                        url = object.permalink_url;
+                    });
+                    break;
+
                 default:
                     url = plyr.media.currentSrc;
                     break;
@@ -2263,6 +2391,7 @@
 
                 case 'youtube':
                 case 'vimeo':
+                case 'soundcloud':
                     plyr.media = document.createElement('div');
                     plyr.embedId = source.sources[0].src;
                     break;
@@ -2783,6 +2912,7 @@
 
             case 'vimeo':
             case 'youtube':
+            case 'soundcloud':
                 basic = true;
                 full  = (!oldIE && !iPhone);
                 break;
