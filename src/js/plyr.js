@@ -2188,7 +2188,6 @@
             if(typeof toggle !== "boolean") {
                 if(toggle && toggle.type) {
                     isMouseMove = toggle.type === 'mousemove';
-
                     toggle = _inArray(['mousemove','mouseenter'], toggle.type);
                 }
                 else {
@@ -2200,8 +2199,13 @@
             window.clearTimeout(plyr.timers.hover);
 
             // If the mouse is not over the controls, set a timeout to hide them
-            if(toggle) {
+            if(toggle || plyr.media.paused) {
                 _toggleClass(plyr.container, config.classes.hideControls, false);
+            }
+
+            // Always show controls when paused
+            if(plyr.media.paused) {
+                return;
             }
 
             // If toggle is false or if we're playing (regardless of toggle), then
@@ -2214,7 +2218,7 @@
                     }
 
                     _toggleClass(plyr.container, config.classes.hideControls, true);
-                }, isMouseMove ? 2000 : 500);
+                }, isMouseMove ? 2000 : 0);
             }
         }
 
@@ -2257,6 +2261,11 @@
 
             // Pause playback
             _pause();
+
+            // Set seek input to 0
+            if(plyr.buttons.seek) {
+                plyr.buttons.seek.value = 0;
+            }
 
             // Clean up YouTube stuff
             if (plyr.type === 'youtube') {
