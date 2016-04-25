@@ -1842,9 +1842,6 @@
             // Set button state
             _toggleState(plyr.buttons.fullscreen, plyr.isFullscreen);
 
-            // Hide on entering full screen
-            _toggleControls(false);
-
             // Trigger an event
             _triggerEvent(plyr.container, plyr.isFullscreen ? 'enterfullscreen' : 'exitfullscreen');
         }
@@ -2182,16 +2179,19 @@
             if (!config.hideControls) {
                 return;
             }
-            var isMouseMove = false;
+            var delay = false,
+                isEnterFullscreen = false,
+                show = toggle;
 
             // Default to false if no boolean
             if(typeof toggle !== "boolean") {
                 if(toggle && toggle.type) {
-                    isMouseMove = toggle.type === 'mousemove';
-                    toggle = _inArray(['mousemove','mouseenter'], toggle.type);
+                    delay = (toggle.type === 'mousemove');
+                    isEnterFullscreen = (toggle.type === 'enterfullscreen');
+                    show = _inArray(['mousemove','mouseenter'], toggle.type);
                 }
                 else {
-                    toggle = false;
+                    show = false;
                 }
             }
 
@@ -2199,26 +2199,26 @@
             window.clearTimeout(plyr.timers.hover);
 
             // If the mouse is not over the controls, set a timeout to hide them
-            if(toggle || plyr.media.paused) {
+            if(show || plyr.media.paused) {
                 _toggleClass(plyr.container, config.classes.hideControls, false);
-            }
 
-            // Always show controls when paused
-            if(plyr.media.paused) {
-                return;
+                // Always show controls when paused
+                if(plyr.media.paused) {
+                    return;
+                }
             }
 
             // If toggle is false or if we're playing (regardless of toggle), then
             // set the timer to hide the controls 
-            if(toggle === false || !plyr.media.paused) {
+            if(!show || !plyr.media.paused) {
                 plyr.timers.hover = window.setTimeout(function() {
                     // If the mouse is over the controls, bail
-                    if(plyr.controls.active) {
+                    if(plyr.controls.active && !isEnterFullscreen) {
                         return;
                     }
 
                     _toggleClass(plyr.container, config.classes.hideControls, true);
-                }, isMouseMove ? 2000 : 0);
+                }, delay ? 2000 : 0);
             }
         }
 
@@ -2507,8 +2507,9 @@
 
             // Toggle controls visibility based on mouse movement
             if (config.hideControls) {
-                _on(plyr.container, 'mouseenter mouseleave', _toggleControls);
-                _on(plyr.container, 'mousemove', _debounce(_toggleControls, 500, true));
+                _on(plyr.container, 'mouseenter mouseleave mousemove', _toggleControls);
+                //_on(plyr.container, 'mousemove', _debounce(_toggleControls, 200, true));
+                _on(plyr.container, 'enterfullscreen', _toggleControls);
 
                 // Watch for cursor over controls so they don't hide when trying to interact
                 _on(plyr.controls, 'mouseenter mouseleave', function(event) { 

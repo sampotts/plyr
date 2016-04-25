@@ -302,10 +302,10 @@
         font-size: @plyr-font-size-captions-medium;
     }
 }
-.plyr--captions-active &__captions {
+.plyr--captions-active .plyr__captions {
     display: block;
 }
-.plyr--fullscreen-active &__captions {
+.plyr--fullscreen-active .plyr__captions {
     font-size: @plyr-font-size-captions-large;
 }
 
@@ -426,7 +426,7 @@
 }
 
 // Hide controls 
-&.plyr--hide-controls .plyr__controls,
+.plyr--hide-controls .plyr__controls,
 .plyr--playing .plyr__play-large {
     visibility: hidden;
     opacity: 0;
@@ -444,8 +444,8 @@
 }
 
 // Some options are hidden by default
-[data-plyr='captions'],
-[data-plyr='fullscreen'] {
+.plyr [data-plyr='captions'],
+.plyr [data-plyr='fullscreen'] {
     display: none;
 }
 .plyr--captions-enabled [data-plyr='captions'],
@@ -621,7 +621,6 @@
         transparent);
     color: transparent;
 }
-
 
 // Time
 // --------------------------------------------------------------
