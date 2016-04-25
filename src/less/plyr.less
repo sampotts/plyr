@@ -7,129 +7,104 @@
 // -------------------------------
 
 // Colors
-@blue:                      #3498DB;
-@gray-dark:                 #343F4A;
-@gray:                      #565D64;
-@gray-light:                #6B7D86;
-@gray-lighter:              #CBD0D3;
-@off-white:                 #D6DADD;
+@plyr-color-main:                    #3498DB;
 
 // Font sizes
-@font-size-small:           14px;
-@font-size-base:            16px;
+@plyr-font-size-small:               14px;
+@plyr-font-size-base:                16px;
 
 // Captions
-@font-size-captions-base:   ceil(@font-size-base * 1.25);
-@font-size-captions-medium: ceil(@font-size-base * 1.5);
-@font-size-captions-large:  (@font-size-base * 2);
+@plyr-font-size-captions-base:       ceil(@plyr-font-size-base * 1.25);
+@plyr-font-size-captions-medium:     ceil(@plyr-font-size-base * 1.5);
+@plyr-font-size-captions-large:      (@plyr-font-size-base * 2);
 
 // Controls
-@control-spacing:           10px;
-@controls-bg:               #fff;
-@control-bg-hover:          @blue;
-.contrast-control-color(@controls-bg);
-.contrast-control-color-hover(@control-bg-hover);
+@plyr-controls-bg:                   #000;
+@plyr-control-color:                 #fff;
+@plyr-control-color-hover:           #fff;
+@plyr-control-spacing:               10px;
+@plyr-control-bg-hover:              @plyr-color-main;
+//.contrast-control-color(@plyr-controls-bg);
+//.contrast-control-color-hover(@plyr-control-bg-hover);
 
 // Tooltips
-@tooltip-bg:                @controls-bg;
-@tooltip-border-color:      fade(@gray-dark, 10%);
-@tooltip-border-width:      1px;
-@tooltip-shadow:            0 0 5px @tooltip-border-color, 0 0 0 @tooltip-border-width @tooltip-border-color;
-@tooltip-color:             @control-color;
-@tooltip-padding:           @control-spacing;
-@tooltip-arrow-size:        6px;
-@tooltip-radius:            3px;
+@plyr-tooltip-bg:                    @plyr-controls-bg;
+@plyr-tooltip-border-color:          fade(darken(@plyr-controls-bg, 75%), 10%);
+@plyr-tooltip-arrow-border-color:    fade(darken(@plyr-controls-bg, 75%), 20%);
+@plyr-tooltip-border-width:          1px;
+@plyr-tooltip-shadow:                0 0 5px @plyr-tooltip-border-color, 0 0 0 @plyr-tooltip-border-width @plyr-tooltip-border-color;
+@plyr-tooltip-color:                 @plyr-control-color;
+@plyr-tooltip-padding:               (@plyr-control-spacing / 2);
+@plyr-tooltip-arrow-size:            4px;
+@plyr-tooltip-radius:                3px;
 
 // Progress
-@progress-bg:               fade(@gray, 20%);
-@progress-playing-bg:       @blue;
-@progress-buffered-bg:      fade(@gray, 25%);
-@progress-loading-size:     40px;
-@progress-loading-bg:       rgba(0,0,0, .15);
+@plyr-progress-bg:                   fade(@plyr-control-color, 25%);
+@plyr-progress-playing-bg:           @plyr-color-main;
+@plyr-progress-buffered-bg:          fade(@plyr-control-color, 25%);
+@plyr-progress-loading-size:         25px;
+@plyr-progress-loading-bg:           fade(#000, 15%);
 
-// Volume
-@volume-track-height:       6px;
-@volume-track-bg:           darken(@controls-bg, 10%);
-@volume-thumb-height:       (@volume-track-height * 2);
-@volume-thumb-width:        (@volume-track-height * 2);
-@volume-thumb-bg:           @control-color;
-@volume-thumb-bg-focus:     @control-bg-hover;
+// Range sliders
+@range-track-height:                 8px;
+@range-track-bg:                     fade(#fff, 25%);
+@range-thumb-height:                 floor(@range-track-height * 2);
+@range-thumb-width:                  floor(@range-track-height * 2);
+@range-thumb-bg:                     #fff;
+@range-thumb-border:                 2px solid transparent;
+@range-thumb-active-border-color:    #fff;
+@range-thumb-active-bg:              @plyr-control-bg-hover;
+@range-thumb-shadow:                 0 1px 1px fade(@plyr-controls-bg, 15%);
 
 // Breakpoints
-@bp-control-split:          560px; // When controls split into left/right
-@bp-captions-large:         768px; // When captions jump to the larger font size
+@plyr-bp-control-split:              560px; // When controls split into left/right
+@plyr-bp-captions-large:             768px; // When captions jump to the larger font size
 
 // Animation
 // ---------------------------------------
-@keyframes progress {
-    to { background-position: @progress-loading-size 0; }
+@keyframes plyr-progress {
+    to { background-position: @plyr-progress-loading-size 0; }
 }
 
 // Mixins
 // -------------------------------
 // Contrast
-.contrast-control-color(@color: "") when (lightness(@color) >= 65%) {
-    @control-color: @gray-light;
+/*.contrast-control-color(@plyr-color: "") when (lightness(@plyr-color) >= 65%) {
+    @plyr-control-color: @plyr-gray-light;
 }
-.contrast-control-color(@color: "") when (lightness(@color) < 65%) {
-    @control-color: @gray-lighter;
+.contrast-control-color(@plyr-color: "") when (lightness(@plyr-color) < 65%) {
+    @plyr-control-color: @plyr-gray-lighter;
 }
-.contrast-control-color-hover(@color: "") when (lightness(@color) >= 65%) {
-    @control-color-hover: @gray;
+.contrast-control-color-hover(@plyr-color: "") when (lightness(@plyr-color) >= 65%) {
+    @plyr-control-color-hover: @plyr-gray;
 }
-.contrast-control-color-hover(@color: "") when (lightness(@color) < 65%) {
-    @control-color-hover: #fff;
-}
-
-// Font smoothing
-.font-smoothing(@mode: on) when (@mode = on) {
-    -moz-osx-font-smoothing: grayscale;
-    -webkit-font-smoothing: antialiased;
-}
-.font-smoothing(@mode: on) when (@mode = off) {
-    -moz-osx-font-smoothing: auto;
-    -webkit-font-smoothing: subpixel-antialiased;
-}
-
-// Contain floats: nicolasgallagher.com/micro-clearfix-hack/
-.clearfix() {
-    zoom: 1;
-    &:before,
-    &:after { content: ""; display: table; }
-    &:after { clear: both; }
-}
-// Tab focus styles
-.tab-focus() {
-    outline: 1px dotted fade(@gray-dark, 80%);
-    outline-offset: 3px;
-}
+.contrast-control-color-hover(@plyr-color: "") when (lightness(@plyr-color) < 65%) {
+    @plyr-control-color-hover: #fff;
+}*/
 
 // <input type="range"> styling
-.volume-thumb() {
-    height: @volume-thumb-height;
-    width: @volume-thumb-width;
-    background: @volume-thumb-bg;
+.range-track() {
+    height: @range-track-height;
+    background: @range-track-bg;
     border: 0;
+    border-radius: (@range-track-height / 2);
+    user-select: none;
+}
+.range-thumb() {
+    position: relative;
+    height: @range-thumb-height;
+    width: @range-thumb-width;
+    background: @range-thumb-bg;
+    border: @range-thumb-border;
     border-radius: 100%;
-    transition: background .3s ease;
-    cursor: ew-resize;
+    transition: background .2s ease, border .2s ease, transform .2s ease;
+    box-shadow: @range-thumb-shadow;
+    box-sizing: border-box;
 }
-.volume-track() {
-    height: @volume-track-height;
-    background: @volume-track-bg;
-    border: 0;
-    border-radius: (@volume-track-height / 2);
-}
-.seek-thumb() {
-    background: transparent;
-    border: 0;
-    width: (@control-spacing * 4);
-    height: @control-spacing;
-    transform: translateX(-50%);
-}
-.seek-track() {
-    background: none;
-    border: 0;
+.range-thumb-active() {
+    background: @range-thumb-active-bg;
+    border-color: @range-thumb-active-border-color;
+    transform: scale(1.25);
 }
 
 // Styles
@@ -139,6 +114,7 @@
     position: relative;
     max-width: 100%;
     min-width: 290px;
+    font-family: Avenir, "Avenir Next", "Helvetica Neue", "Segoe UI", Helvetica, Arial, sans-serif;
 
     // border-box everything
     // http://paulirish.com/2012/box-sizing-border-box-ftw/
@@ -168,12 +144,16 @@
     // For video
     &__video-wrapper {
         position: relative;
+        background: #000;
+        border-radius: inherit;
+        //overflow: hidden;
     }
     video,
     audio {
         width: 100%;
         height: auto;
         vertical-align: middle;
+        border-radius: inherit;
     }
 
     // Container for embeds
@@ -181,7 +161,7 @@
         padding-bottom: 56.25%; /* 16:9 */
         height: 0;
         overflow: hidden;
-        background: #000;
+        border-radius: inherit;
 
         iframe {
             position: absolute;
@@ -199,79 +179,215 @@
             padding-bottom: 200%;
             transform: translateY(-35.95%);
         }
+
+        // To allow mouse events to be captured if full support
+        &.plyr iframe {
+            pointer-events: none;
+        }
     }
 
     // Captions
+
+    // Hide default captions
+    video::-webkit-media-text-track-container {
+        display: none;
+    }
     &__captions {
         display: none;
         position: absolute;
         bottom: 0;
         left: 0;
         width: 100%;
-        padding: (@control-spacing * 2) (@control-spacing * 2) (@control-spacing * 3);
+        padding: (@plyr-control-spacing * 2) (@plyr-control-spacing * 2) (@plyr-control-spacing * 8);
         color: #fff;
-        font-size: @font-size-captions-base;
+        font-size: @plyr-font-size-captions-base;
         text-align: center;
-        .font-smoothing();
+        font-weight: 400;
 
         span {
             border-radius: 2px;
-            padding: 3px 10px;
-            background: rgba(0,0,0, .9);
+            padding: floor(@plyr-control-spacing / 3) @plyr-control-spacing;
+            background: fade(#000, 85%);
         }
         span:empty {
             display: none;
         }
 
-        @media (min-width: @bp-captions-large) {
-            font-size: @font-size-captions-medium;
+        @media (min-width: @plyr-bp-captions-large) {
+            font-size: @plyr-font-size-captions-medium;
         }
     }
     &--captions-active &__captions {
         display: block;
     }
     &--fullscreen-active &__captions {
-        font-size: @font-size-captions-large;
+        font-size: @plyr-font-size-captions-large;
+    }
+
+    // Common
+    // Specificity is for bootstrap compatibility
+    input[type='range'] {
+        display: block;
+        height: @range-thumb-height;
+        width: 100%;
+        margin: 0;
+        padding: 0; 
+        vertical-align: middle;
+        
+        appearance: none;
+        cursor: pointer;
+        border: none;
+        background: transparent;
+        
+        // Webkit
+        &::-webkit-slider-runnable-track {
+            .range-track();
+        }
+        &::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            margin-top: -((@range-thumb-height - @range-track-height) / 2);
+            .range-thumb();
+        }
+
+        // Mozilla
+        &::-moz-range-track {
+            .range-track();
+        }
+        &::-moz-range-thumb {
+            .range-thumb();
+        }
+        &::-moz-focus-outer {
+            border: 0;
+        }
+        
+        // Microsoft
+        &::-ms-track {
+            height: @range-track-height;
+            background: transparent;
+            border: 0;
+            color: transparent;
+        }
+        &::-ms-fill-lower,
+        &::-ms-fill-upper {
+            .range-track();
+        }
+        &::-ms-thumb {
+            .range-thumb();
+
+            // For some reason, Edge uses the -webkit margin above
+            margin-top: 0; 
+        }
+
+        &::-ms-tooltip {
+            display: none;
+        }
+
+        // Focus styles
+        &:focus {
+            outline: 0;
+        }
+        &::-moz-focus-outer {
+            border: 0;
+        }        
+        &.tab-focus:focus {
+            outline: 1px dotted fade(@plyr-control-color, 50%);
+            outline-offset: 3px;
+        }
+        
+        // Pressed styles
+        &:active {
+            &::-webkit-slider-thumb {
+                .range-thumb-active();
+            }
+            &::-moz-range-thumb {
+                .range-thumb-active();
+            }
+            &::-ms-thumb {
+                .range-thumb-active();
+            }
+        }
+    }
+
+    // Large play button
+    &__play-large {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        padding: @plyr-control-spacing;
+        background: @plyr-control-bg-hover;
+        border: 4px solid @plyr-control-color;
+        border-radius: 100%;
+        color: @plyr-control-color;
+
+        svg {
+            position: relative;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            display: block;
+            fill: currentColor;
+        }
+
+        &:focus {
+            outline: 1px dotted fade(@plyr-control-color, 50%);
+        }
+    }
+
+    // Shared
+    &__controls,
+    &__play-large {
+        transition: visibility .3s ease, opacity .3s ease;
+    }
+    &--playing &__play-large {
+        visibility: hidden;
+        opacity: 0;
     }
 
     // Playback controls
     &__controls {
-        .clearfix();
-        .font-smoothing();
-        position: relative;
-        padding: @control-spacing;
-        background: @controls-bg;
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center; 
+        padding: (@plyr-control-spacing * 5) @plyr-control-spacing @plyr-control-spacing;
+
+        background: linear-gradient(fade(@plyr-controls-bg, 0%), fade(@plyr-controls-bg, 25%));
+        border-bottom-left-radius: inherit;
+        border-bottom-right-radius: inherit;
+
         line-height: 1;
         text-align: center;
-        box-shadow: 0 1px 1px fade(@gray-dark, 20%);
 
-        // Layout
-        &--right {
-            display: block;
-            margin: @control-spacing auto 0;
+        // Spacing
+        > button,
+        .plyr__progress,
+        .plyr__time,
+        .plyr__volume[type="range"] {
+            margin-left: @plyr-control-spacing;
+
+            &::first-child {
+                margin-left: 0;
+            }
         }
-        @media (min-width: @bp-control-split) {
-            &--left {
-                float: left;
-            }
-            &--right {
-                float: right;
-                margin-top: 0;
-            }
+        [data-plyr="mute"] {
+            margin-left: 0;
         }
 
         // Buttons
         button {
+            position: relative;
             display: inline-block;
+            flex-shrink: 0;
             vertical-align: middle;
-            margin: 0 2px;
-            padding: (@control-spacing / 2) @control-spacing;
-            overflow: hidden;
+            padding: (@plyr-control-spacing / 2) @plyr-control-spacing;
             border: 0;
             background: transparent;
             border-radius: 3px;
             cursor: pointer;
-            color: @control-color;
+            color: @plyr-control-color;
             transition: background .3s ease, color .3s ease, opacity .3s ease;
 
             svg {
@@ -279,14 +395,13 @@
                 height: 18px;
                 display: block;
                 fill: currentColor;
-                transition: fill .3s ease;
             }
 
             // Hover and tab focus
             &.tab-focus:focus,
             &:hover {
-                background: @control-bg-hover;
-                color: @control-color-hover;
+                background: @plyr-control-bg-hover;
+                color: @plyr-control-color-hover;
             }
             // Default focus
             &:focus {
@@ -300,53 +415,30 @@
         .icon--captions-on {
             display: none;
         }
-
-        // plyr time
-        .plyr__time {
-            display: inline-block;
-            vertical-align: middle;
-            margin-left: @control-spacing;
-            color: @control-color;
-            font-weight: 600;
-            font-size: @font-size-small;
-        }
-
-        // Media duration hidden on small screens
-        .plyr__time + .plyr__time {
-            display: none;
-
-            @media (min-width: @bp-control-split) {
-                display: inline-block;
-            }
-
-            // Add a slash in before
-            &::before {
-                content: '\2044';
-                margin-right: @control-spacing;
-            }
-        }
     }
 
     // Tooltips
     &__tooltip {
+        visibility: hidden;
         position: absolute;
         z-index: 2;
         bottom: 100%;
-        margin-bottom: @tooltip-padding;
-        padding: @tooltip-padding (@tooltip-padding * 1.5);
+        margin-bottom: (@plyr-tooltip-padding * 2);
+        padding: @plyr-tooltip-padding (@plyr-tooltip-padding * 1.5);
+        pointer-events: none;
 
         opacity: 0;
-        background: @tooltip-bg;
-        box-shadow: @tooltip-shadow;
-        border-radius: @tooltip-radius;
-        color: @tooltip-color;
-        font-size: @font-size-small;
-        line-height: 1.5;
-        font-weight: 600;
+        background: @plyr-tooltip-bg;
+        box-shadow: @plyr-tooltip-shadow;
+        border-radius: @plyr-tooltip-radius;
 
-        transform: translate(-50%, (@tooltip-padding * 3)) scale(.8);
+        color: @plyr-tooltip-color;
+        font-size: @plyr-font-size-small;
+        line-height: 1.3;
+
+        transform: translate(-50%, 10px) scale(.8);
         transform-origin: 50% 100%;
-        transition: transform .2s .1s ease, opacity .2s .1s ease;
+        transition: transform .2s .1s ease, opacity .2s .1s ease, visibility .3s ease;
 
         // Arrows
         &::after,
@@ -361,24 +453,26 @@
         }
         // The border triangle
         &::after {
-            @border-arrow-size: (@tooltip-arrow-size + (@tooltip-border-width * 1));
-            bottom: -(@border-arrow-size + @tooltip-border-width);
-            border-right: @border-arrow-size solid transparent;
-            border-top: @border-arrow-size solid @tooltip-border-color;
-            border-left: @border-arrow-size solid transparent;
+            @plyr-border-arrow-size: (@plyr-tooltip-arrow-size + (@plyr-tooltip-border-width * 1));
+            bottom: -(@plyr-border-arrow-size + @plyr-tooltip-border-width);
+            border-right: @plyr-border-arrow-size solid transparent;
+            border-top: @plyr-border-arrow-size solid @plyr-tooltip-arrow-border-color;
+            border-left: @plyr-border-arrow-size solid transparent;
             z-index: 1;
         }
         // The background triangle
         &::before {
-            bottom: -@tooltip-arrow-size;
-            border-right: @tooltip-arrow-size solid transparent;
-            border-top: @tooltip-arrow-size solid @tooltip-bg;
-            border-left: @tooltip-arrow-size solid transparent;
+            bottom: -@plyr-tooltip-arrow-size;
+            border-right: @plyr-tooltip-arrow-size solid transparent;
+            border-top: @plyr-tooltip-arrow-size solid @plyr-tooltip-bg;
+            border-left: @plyr-tooltip-arrow-size solid transparent;
             z-index: 2;
         }
     }
     button:hover .plyr__tooltip,
-    button.tab-focus:focus .plyr__tooltip {
+    button.tab-focus:focus .plyr__tooltip,
+    &__tooltip--visible {
+        visibility: visible;
         opacity: 1;
         transform: translate(-50%, 0) scale(1);
     }
@@ -386,122 +480,116 @@
         z-index: 3;
     }
 
-    // Common range styles
-    input[type='range'].tab-focus:focus {
-        .tab-focus();
-    }
-
     // Playback progress
     // <progress> element
     &__progress {
-        position: absolute;
-        bottom: 100%;
-        left: 0;
-        right: 0;
-        width: 100%;
-        height: @control-spacing;
-        background: @progress-bg;
+        position: relative;
+        flex: 1;
 
-        &--buffer[value],
-        &--played[value],
-        &--seek[type='range'] {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: @control-spacing;
-            margin: 0;
-            padding: 0;
-            vertical-align: top;
+        input[type="range"] {
+            position: relative;
+            z-index: 2;
 
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            border: none;
-            background: transparent;
-        }
-        &--buffer[value],
-        &--played[value] {
-            &::-webkit-progress-bar {
+            &::-webkit-slider-runnable-track {
                 background: transparent;
             }
-
-            // Inherit from currentColor;
-            &::-webkit-progress-value {
-                background: currentColor;
-            }
-            &::-moz-progress-bar {
-                background: currentColor;
-            }
-        }
-        &--played[value] {
-            z-index: 2;
-            color: @progress-playing-bg;
-        }
-        &--buffer[value] {
-            color: @progress-buffered-bg;
-        }
-
-        // Seek control
-        // <input[type='range']> element
-        // Specificity is for bootstrap compatibility
-        &--seek[type='range'] {
-            z-index: 4;
-            cursor: pointer;
-            outline: 0;
-
-            // Webkit
-            &::-webkit-slider-runnable-track {
-                .seek-track();
-            }
-            &::-webkit-slider-thumb {
-                -webkit-appearance: none;
-                .seek-thumb();
-            }
-
-            // Mozilla
             &::-moz-range-track {
-                .seek-track();
-            }
-            &::-moz-range-thumb {
-                -moz-appearance: none;
-                .seek-thumb();
-            }
-
-            // Microsoft
-            &::-ms-track {
-                color: transparent;
-                .seek-track();
+                background: transparent;
             }
             &::-ms-fill-lower,
             &::-ms-fill-upper {
-                .seek-track();
+                background: transparent;
             }
-            &::-ms-thumb {
-                .seek-thumb();
-            }
+        }
 
-            &:focus {
-                outline: 0;
+        &--buffer[value],
+        &--played[value] {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 100%;
+            height: @range-track-height;
+            margin: -(@range-track-height / 2) 0 0;
+            padding: 0;
+            vertical-align: top;
+            appearance: none;
+            border: none;
+            border-radius: 100px;
+        
+            &::-webkit-progress-bar {
+                background: transparent;
             }
-            &::-moz-focus-outer {
-                border: 0;
+            &::-webkit-progress-value {
+                background: currentColor;
+                border-radius: 100px;
+                min-width: @range-track-height;
             }
+            &::-moz-progress-bar {
+                background: currentColor;
+                border-radius: 100px;
+                min-width: @range-track-height;
+            }
+            &::-ms-fill {
+                border-radius: 100px;
+            }
+        }
+        &--played[value] {
+            z-index: 1;
+            color: @plyr-progress-playing-bg;
+            background: transparent;
+
+            &::-webkit-progress-value {
+                background: currentColor;
+                min-width: @range-track-height;
+                border-top-right-radius: 0;
+                border-bottom-right-radius: 0;
+            }
+            &::-moz-progress-bar {
+                background: currentColor;
+                min-width: @range-track-height;
+                border-top-right-radius: 0;
+                border-bottom-right-radius: 0;
+            }
+            &::-ms-fill {
+                min-width: @range-track-height;
+                border-top-right-radius: 0;
+                border-bottom-right-radius: 0;
+            }
+        }
+        &--buffer[value] {
+            color: @plyr-progress-buffered-bg;
+            background: @range-track-bg;
+
+            &::-webkit-progress-value {
+                transition: width .2s ease;
+            }
+            &::-moz-progress-bar {
+                transition: width .2s ease;
+            }    
+            &::-ms-fill {
+                transition: width .2s ease;
+            }            
+        }
+
+        // Seek tooltip to show time
+        .plyr__tooltip {
+            left: 0;
         }
     }
 
     // Loading state
     &--loading .plyr__progress--buffer {
-        animation: progress 1s linear infinite;
-        background-size: @progress-loading-size @progress-loading-size;
+        animation: plyr-progress 1s linear infinite;
+        background-size: @plyr-progress-loading-size @plyr-progress-loading-size;
         background-repeat: repeat-x;
-        background-color: @progress-buffered-bg;
+        background-color: @plyr-progress-buffered-bg;
         background-image: linear-gradient(
             -45deg,
-            @progress-loading-bg 25%,
+            @plyr-progress-loading-bg 25%,
             transparent 25%,
             transparent 50%,
-            @progress-loading-bg 50%,
-            @progress-loading-bg 75%,
+            @plyr-progress-loading-bg 50%,
+            @plyr-progress-loading-bg 75%,
             transparent 75%,
             transparent);
         color: transparent;
@@ -516,68 +604,35 @@
         display: inline-block;
     }
 
+    // plyr time
+    &__time {
+        display: inline-block;
+        vertical-align: middle;
+        color: @plyr-control-color;
+        font-size: @plyr-font-size-small;
+        line-height: .95;
+    }
+
+    // Media duration hidden on small screens
+    &__time + &__time {
+        display: none;
+
+        @media (min-width: @plyr-bp-control-split) {
+            display: inline-block;
+        }
+
+        // Add a slash in before
+        &::before {
+            content: '\2044';
+            margin-right: @plyr-control-spacing;
+        }
+    }
+
     // Volume control
     // <input[type='range']> element
     // Specificity is for bootstrap compatibility
     &__volume[type='range'] {
-        display: inline-block;
-        vertical-align: middle;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        width: 100px;
-        margin: 0 @control-spacing 0 0;
-        padding: 0;
-        cursor: pointer;
-        background: transparent;
-        border: none;
-
-        // Webkit
-        &::-webkit-slider-runnable-track {
-            .volume-track();
-        }
-        &::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            margin-top: -((@volume-thumb-height - @volume-track-height) / 2);
-            .volume-thumb();
-        }
-
-        // Mozilla
-        &::-moz-range-track {
-            .volume-track();
-        }
-        &::-moz-range-thumb {
-            .volume-thumb();
-        }
-
-        // Microsoft
-        &::-ms-track {
-            height: @volume-track-height;
-            background: transparent;
-            border-color: transparent;
-            border-width: ((@volume-thumb-height - @volume-track-height) / 2) 0;
-            color: transparent;
-        }
-        &::-ms-fill-lower,
-        &::-ms-fill-upper {
-            .volume-track();
-        }
-        &::-ms-thumb {
-            .volume-thumb();
-        }
-
-        &:focus {
-            outline: 0;
-
-            &::-webkit-slider-thumb {
-                background: @volume-thumb-bg-focus;
-            }
-            &::-moz-range-thumb {
-                background: @volume-thumb-bg-focus;
-            }
-            &::-ms-thumb {
-                background: @volume-thumb-bg-focus;
-            }
-        }
+        max-width: 100px;
     }
 
     // Hide sound controls on iOS
@@ -596,16 +651,16 @@
     // Audio specific styles
     // Position the progress within the container
     &--audio .plyr__controls {
-        padding-top: (@control-spacing * 2);
+        padding-top: (@plyr-control-spacing * 2);
     }
     &--audio .plyr__progress {
         bottom: auto;
         top: 0;
-        background: @off-white;
+        background: #fff;
     }
 
     // Full screen mode
-    &--fullscreen,
+    &.plyr--fullscreen,
     &--fullscreen-active {
         position: fixed;
         top: 0;
@@ -633,29 +688,10 @@
     }
 
     // Hide controls when playing in full screen
-    &--fullscreen--hide-controls&--fullscreen-active&--playing {
+    &.plyr--hide-controls {
         .plyr__controls {
-            transform: translateY(100%) translateY(@control-spacing / 2);
-            transition: transform .3s .2s ease;
-        }
-        &.plyr--hover .plyr__controls {
-            transform: translateY(0);
-        }
-        .plyr__captions {
-            bottom: (@control-spacing / 2);
-            transition: bottom .3s .2s ease;
-        }
-    }
-
-    // Captions
-    &--fullscreen .plyr__captions,
-    &--fullscreen-active .plyr__captions,
-    &--fullscreen--hide-controls&--fullscreen-active&--playing&--hover &__captions {
-        top: auto;
-        bottom: 90px;
-
-        @media (min-width: @bp-control-split) {
-            bottom: 60px;
+            opacity: 0;
+            visibility: hidden;
         }
     }
 

@@ -1,32 +1,32 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.5.0
+// plyr.js v1.5.21
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
 // Credits: http://paypal.github.io/accessible-html5-video-player/
 // ==========================================================================
 
-(function(root, factory) {
+;(function(root, factory) {
     'use strict';
     /*global define,module*/
 
-    if (typeof define === 'function' && define.amd) {
-        // AMD
-        define(null, function() { factory(root, document) });
-    } else if (typeof module === 'object') {
+    if (typeof module === 'object' && typeof module.exports === 'object') {
         // Node, CommonJS-like
         module.exports = factory(root, document);
+    } else if (typeof define === 'function' && define.amd) {
+        // AMD
+        define(null, function() { factory(root, document) });
     } else {
         // Browser globals (root is window)
         root.plyr = factory(root, document);
     }
-}(this, function(window, document) {
+}(typeof window !== 'undefined' ? window : this, function(window, document) {
     'use strict';
     /*global YT,$f*/
 
     // Globals
-    var fullscreen, config, api = {};
+    var fullscreen, api = {};
 
     // Default config
     var defaults = {
@@ -36,17 +36,22 @@
         loop:                   false,
         seekTime:               10,
         volume:                 5,
-        click:                  true,
-        tooltips:               false,
+        duration:               null,
         displayDuration:        true,
         iconPrefix:             'icon',
+        clickToPlay:            true,
+        hideControls:           true,
+        tooltips: {
+            controls:           false,
+            seek:               true
+        },
         selectors: {
             container:          '.plyr',
             controls: {
                 container:      null,
                 wrapper:        '.plyr__controls'
             },
-            labels:             '[data-plyr] .sr-only, label .sr-only',
+            labels:             '[data-plyr]',
             buttons: {
                 seek:           '[data-plyr="seek"]',
                 play:           '[data-plyr="play"]',
@@ -79,6 +84,7 @@
             hover:              'plyr--hover',
             tooltip:            'plyr__tooltip',
             hidden:             'plyr__sr-only',
+            hideControls:       'plyr--hide-controls',
             isIos:              'plyr--is-ios',
             isTouch:            'plyr--is-touch',
             captions: {
@@ -87,22 +93,9 @@
             },
             fullscreen: {
                 enabled:        'plyr--fullscreen-enabled',
-                active:         'plyr--fullscreen-active',
-                hideControls:   'plyr--fullscreen--hide-controls'
+                active:         'plyr--fullscreen-active'
             },
             tabFocus:           'tab-focus'
-        },
-        handlers: {
-            seek:               null,
-            play:               null,
-            pause:              null,
-            restart:            null,
-            rewind:             null,
-            forward:            null,
-            mute:               null,
-            volume:             null,
-            captions:           null,
-            fullscreen:         null
         },
         captions: {
             defaultActive:      false
@@ -110,14 +103,13 @@
         fullscreen: {
             enabled:            true,
             fallback:           true,
-            hideControls:       true,
             allowAudio:         false
         },
         storage: {
             enabled:            true,
-            key:                'plyr_volume'
+            key:                'plyr'
         },
-        controls:               ['restart', 'rewind', 'play', 'fast-forward', 'current-time', 'duration', 'mute', 'volume', 'captions', 'fullscreen'],
+        controls:               ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'fullscreen'],
         i18n: {
             restart:            'Restart',
             rewind:             'Rewind {seektime} secs',
@@ -138,159 +130,31 @@
             embed:              ['youtube', 'vimeo'],
             html5:              ['video', 'audio']
         },
+        // URLs
         urls: {
             vimeo: {
-                api:            'https://cdn.plyr.io/froogaloop/1.0.0/plyr.froogaloop.js',
+                api:            'https://cdn.plyr.io/froogaloop/1.0.1/plyr.froogaloop.js',
             },
             youtube: {
                 api:            'https://www.youtube.com/iframe_api'
             }
-        }
+        },
+        // Custom control listeners
+        listeners: {
+            seek:               null,
+            play:               null,
+            pause:              null,
+            restart:            null,
+            rewind:             null,
+            forward:            null,
+            mute:               null,
+            volume:             null,
+            captions:           null,
+            fullscreen:         null
+        },
+        // Events to watch on HTML5 media elements
+        events:                 ['ended', 'progress', 'stalled', 'playing', 'waiting', 'canplay', 'canplaythrough', 'loadstart', 'loadeddata', 'loadedmetadata', 'timeupdate', 'volumechange', 'play', 'pause', 'error', 'seeking', 'emptied']
     };
-
-    // Build the default HTML
-    function _buildControls() {
-        // Open and add the progress and seek elements
-        var html = [
-        '<div class="plyr__controls">',
-            '<div class="plyr__progress">',
-                '<label for="seek{id}" class="plyr__sr-only">Seek</label>',
-                '<input id="seek{id}" class="plyr__progress--seek" type="range" min="0" max="100" step="0.5" value="0" data-plyr="seek">',
-                '<progress class="plyr__progress--played" max="100" value="0">',
-                    '<span>0</span>% ' + config.i18n.played,
-                '</progress>',
-                '<progress class="plyr__progress--buffer" max="100" value="0">',
-                    '<span>0</span>% ' + config.i18n.buffered,
-                '</progress>',
-            '</div>',
-            '<span class="plyr__controls--left">'];
-
-        // Restart button
-        if (_inArray(config.controls, 'restart')) {
-            html.push(
-                '<button type="button" data-plyr="restart">',
-                    '<svg><use xlink:href="#' + config.iconPrefix + '-restart" /></svg>',
-                    '<span class="plyr__sr-only">' + config.i18n.restart + '</span>',
-                '</button>'
-            );
-        }
-
-        // Rewind button
-        if (_inArray(config.controls, 'rewind')) {
-            html.push(
-                '<button type="button" data-plyr="rewind">',
-                    '<svg><use xlink:href="#' + config.iconPrefix + '-rewind" /></svg>',
-                    '<span class="plyr__sr-only">' + config.i18n.rewind + '</span>',
-                '</button>'
-            );
-        }
-
-        // Play/pause button
-        if (_inArray(config.controls, 'play')) {
-            html.push(
-                '<button type="button" data-plyr="play">',
-                    '<svg><use xlink:href="#' + config.iconPrefix + '-play" /></svg>',
-                    '<span class="plyr__sr-only">' + config.i18n.play + '</span>',
-                '</button>',
-                '<button type="button" data-plyr="pause">',
-                    '<svg><use xlink:href="#' + config.iconPrefix + '-pause" /></svg>',
-                    '<span class="plyr__sr-only">' + config.i18n.pause + '</span>',
-                '</button>'
-            );
-        }
-
-        // Fast forward button
-        if (_inArray(config.controls, 'fast-forward')) {
-            html.push(
-                '<button type="button" data-plyr="fast-forward">',
-                    '<svg><use xlink:href="#' + config.iconPrefix + '-fast-forward" /></svg>',
-                    '<span class="plyr__sr-only">' + config.i18n.forward + '</span>',
-                '</button>'
-            );
-        }
-
-        // Media current time display
-        if (_inArray(config.controls, 'current-time')) {
-            html.push(
-                '<span class="plyr__time">',
-                    '<span class="plyr__sr-only">' + config.i18n.currentTime + '</span>',
-                    '<span class="plyr__time--current">00:00</span>',
-                '</span>'
-            );
-        }
-
-        // Media duration display
-        if (_inArray(config.controls, 'duration')) {
-            html.push(
-                '<span class="plyr__time">',
-                    '<span class="plyr__sr-only">' + config.i18n.duration + '</span>',
-                    '<span class="plyr__time--duration">00:00</span>',
-                '</span>'
-            );
-        }
-
-        // Close left controls
-        html.push(
-            '</span>',
-            '<span class="plyr__controls--right">'
-        );
-
-        // Toggle mute button
-        if (_inArray(config.controls, 'mute')) {
-            html.push(
-                '<button type="button" data-plyr="mute">',
-                    '<svg class="icon--muted"><use xlink:href="#' + config.iconPrefix + '-muted" /></svg>',
-                    '<svg><use xlink:href="#' + config.iconPrefix + '-volume" /></svg>',
-                    '<span class="plyr__sr-only">' + config.i18n.toggleMute + '</span>',
-                '</button>'
-            );
-        }
-
-        // Volume range control
-        if (_inArray(config.controls, 'volume')) {
-            html.push(
-                '<label for="volume{id}" class="plyr__sr-only">' + config.i18n.volume + '</label>',
-                '<input id="volume{id}" class="plyr__volume" type="range" min="0" max="10" value="5" data-plyr="volume">'
-            );
-        }
-
-        // Toggle captions button
-        if (_inArray(config.controls, 'captions')) {
-            html.push(
-                '<button type="button" data-plyr="captions">',
-                    '<svg class="icon--captions-on"><use xlink:href="#' + config.iconPrefix + '-captions-on" /></svg>',
-                    '<svg><use xlink:href="#' + config.iconPrefix + '-captions-off" /></svg>',
-                    '<span class="plyr__sr-only">' + config.i18n.toggleCaptions + '</span>',
-                '</button>'
-            );
-        }
-
-        // Toggle fullscreen button
-        if (_inArray(config.controls, 'fullscreen')) {
-            html.push(
-                '<button type="button" data-plyr="fullscreen">',
-                    '<svg class="icon--exit-fullscreen"><use xlink:href="#' + config.iconPrefix + '-exit-fullscreen" /></svg>',
-                    '<svg><use xlink:href="#' + config.iconPrefix + '-enter-fullscreen" /></svg>',
-                    '<span class="plyr__sr-only">' + config.i18n.toggleFullscreen + '</span>',
-                '</button>'
-            );
-        }
-
-        // Close everything
-        html.push(
-            '</span>',
-        '</div>'
-        );
-
-        return html.join('');
-    }
-
-    // Debugging
-    function _log(text, warn) {
-        if (config.debug && window.console) {
-            console[(warn ? 'warn' : 'log')](text);
-        }
-    }
 
     // Credits: http://paypal.github.io/accessible-html5-video-player/
     // Unfortunately, due to mixed support, UA sniffing is required
@@ -526,39 +390,63 @@
         return false;
     }
 
+    // Debounce
+    // deBouncer by hnldesign.nl
+    // based on code by Paul Irish and the original debouncing function from John Hann
+    // http://unscriptable.com/index.php/2009/03/20/debouncing-javascript-methods/
+    function _debounce(func, threshold, execAsap) {
+        var timeout;
+        return function debounced () {
+            var obj = this, args = arguments;
+            function delayed () {
+                if (!execAsap) {
+                    func.apply(obj, args);
+                }
+                timeout = null;
+            }
+            if (timeout) {
+                clearTimeout(timeout);
+            }
+            else if (execAsap) {
+                func.apply(obj, args);
+            }
+            timeout = setTimeout(delayed, threshold || 100);
+        };
+    }
+
     // Bind event
     function _on(element, events, callback) {
         if (element) {
-            _toggleHandler(element, events, callback, true);
+            _toggleListener(element, events, callback, true);
         }
     }
 
     // Unbind event
     function _off(element, events, callback) {
         if (element) {
-            _toggleHandler(element, events, callback, false);
+            _toggleListener(element, events, callback, false);
         }
     }
 
     // Bind along with custom handler
-    function _proxyHandler(element, eventName, userHandler, defaultHandler) {
+    function _proxyListener(element, eventName, userListener, defaultListener) {
         _on(element, eventName, function(event) {
-            if(userHandler) {
-                userHandler.apply(element, [event]);
+            if(userListener) {
+                userListener.apply(element, [event]);
             }
-            defaultHandler.apply(element, [event]);
+            defaultListener.apply(element, [event]);
         });
     }
 
-    // Toggle event handler
-    function _toggleHandler(element, events, callback, toggle) {
+    // Toggle event listener
+    function _toggleListener(element, events, callback, toggle) {
         var eventList = events.split(' ');
 
         // If a nodelist is passed, call itself on each node
         if (element instanceof NodeList) {
             for (var x = 0; x < element.length; x++) {
                 if (element[x] instanceof Node) {
-                    _toggleHandler(element[x], arguments[1], arguments[2], arguments[3]);
+                    _toggleListener(element[x], arguments[1], arguments[2], arguments[3]);
                 }
             }
             return;
@@ -571,23 +459,21 @@
     }
 
     // Trigger event
-    function _triggerEvent(element, event) {
+    function _triggerEvent(element, eventName, properties) {
         // Bail if no element
-        if(!element || !event) {
+        if(!element || !eventName) {
             return;
         }
 
-        // Create faux event
-        var fauxEvent = document.createEvent('MouseEvents');
-
-        // Set the event type
-        fauxEvent.initEvent(event, true, true);
+        // create and dispatch the event
+        var event = new CustomEvent(eventName, properties);
 
         // Dispatch the event
-        element.dispatchEvent(fauxEvent);
+        element.dispatchEvent(event);
     }
 
     // Toggle aria-pressed state on a toggle button
+    // http://www.ssbbartgroup.com/blog/how-not-to-misuse-aria-states-properties-and-roles
     function _toggleState(target, state) {
         // Bail if no target
         if(!target) {
@@ -611,19 +497,42 @@
         return ((current / max) * 100).toFixed(2);
     }
 
-    // Deep extend/merge two Objects
+    // Deep extend/merge destination object with N more objects
     // http://andrewdupont.net/2009/08/28/deep-extending-objects-in-javascript/
     // Removed call to arguments.callee (used explicit function name instead)
-    function _extend(destination, source) {
-        for (var property in source) {
-            if (source[property] && source[property].constructor && source[property].constructor === Object) {
-                destination[property] = destination[property] || {};
-                _extend(destination[property], source[property]);
-            }
-            else {
-                destination[property] = source[property];
+    function _extend() {
+        // Get arguments
+		var objects = arguments;
+
+        // Bail if nothing to merge
+        if(!objects.length) {
+            return;
+        }
+
+        // Return first if specified but nothing to merge
+        if(objects.lenth == 1) {
+            return objects[0];
+        }
+
+        // First object is the destination
+        var destination = Array.prototype.shift.call(objects),
+            length      = objects.length;
+
+        // Loop through all objects to merge
+        for (var i = 0; i < length; i++) {
+            var source = objects[i];
+
+            for (var property in source) {
+                if (source[property] && source[property].constructor && source[property].constructor === Object) {
+                    destination[property] = destination[property] || {};
+                    _extend(destination[property], source[property]);
+                }
+                else {
+                    destination[property] = source[property];
+                }
             }
         }
+
         return destination;
     }
 
@@ -732,13 +641,409 @@
     }
 
     // Player instance
-    function Plyr(container) {
+    function Plyr(container, config) {
         var plyr = this;
         plyr.container = container;
+        plyr.timers = {};
+
+        // Log config options
+        _log(config);
+
+        // Debugging
+        function _log(text, warn) {
+            if (config.debug && window.console) {
+                console[(warn ? 'warn' : 'log')](text);
+            }
+        }
+
+        // Build the default HTML
+        function _buildControls() {
+            // Create html array
+            var html = [];
+
+            // Larger overlaid play button
+            if (_inArray(config.controls, 'play-large')) {
+                html.push(
+                    '<button type="button" data-plyr="play" class="plyr__play-large">',
+                        '<svg><use xlink:href="#' + config.iconPrefix + '-play" /></svg>',
+                        '<span class="plyr__sr-only">' + config.i18n.play + '</span>',
+                    '</button>'
+                );
+            }
+
+            html.push('<div class="plyr__controls">');
+
+            // Restart button
+            if (_inArray(config.controls, 'restart')) {
+                html.push(
+                    '<button type="button" data-plyr="restart">',
+                        '<svg><use xlink:href="#' + config.iconPrefix + '-restart" /></svg>',
+                        '<span class="plyr__sr-only">' + config.i18n.restart + '</span>',
+                    '</button>'
+                );
+            }
+
+            // Rewind button
+            if (_inArray(config.controls, 'rewind')) {
+                html.push(
+                    '<button type="button" data-plyr="rewind">',
+                        '<svg><use xlink:href="#' + config.iconPrefix + '-rewind" /></svg>',
+                        '<span class="plyr__sr-only">' + config.i18n.rewind + '</span>',
+                    '</button>'
+                );
+            }
+
+            // Play Pause button
+            // TODO: This should be a toggle button really?
+            if (_inArray(config.controls, 'play')) {
+                html.push(
+                    '<button type="button" data-plyr="play">',
+                        '<svg><use xlink:href="#' + config.iconPrefix + '-play" /></svg>',
+                        '<span class="plyr__sr-only">' + config.i18n.play + '</span>',
+                    '</button>',
+                    '<button type="button" data-plyr="pause">',
+                        '<svg><use xlink:href="#' + config.iconPrefix + '-pause" /></svg>',
+                        '<span class="plyr__sr-only">' + config.i18n.pause + '</span>',
+                    '</button>'
+                );
+            }
+
+            // Fast forward button
+            if (_inArray(config.controls, 'fast-forward')) {
+                html.push(
+                    '<button type="button" data-plyr="fast-forward">',
+                        '<svg><use xlink:href="#' + config.iconPrefix + '-fast-forward" /></svg>',
+                        '<span class="plyr__sr-only">' + config.i18n.forward + '</span>',
+                    '</button>'
+                );
+            }
+
+            // Progress
+            if (_inArray(config.controls, 'progress')) {
+                // Create progress
+                html.push('<span class="plyr__progress">',
+                    '<label for="seek{id}" class="plyr__sr-only">Seek</label>',
+                    '<input id="seek{id}" class="plyr__progress--seek" type="range" min="0" max="100" step="0.1" value="0" data-plyr="seek">',
+                    '<progress class="plyr__progress--played" max="100" value="0">',
+                        '<span>0</span>% ' + config.i18n.played,
+                    '</progress>',
+                    '<progress class="plyr__progress--buffer" max="100" value="0">',
+                        '<span>0</span>% ' + config.i18n.buffered,
+                    '</progress>');
+
+                // Seek tooltip
+                if (config.tooltips.seek) {
+                    html.push('<span class="plyr__tooltip">00:00</span>');
+                }
+
+                // Close
+                html.push('</span>');
+            }
+
+            // Media current time display
+            if (_inArray(config.controls, 'current-time')) {
+                html.push(
+                    '<span class="plyr__time">',
+                        '<span class="plyr__sr-only">' + config.i18n.currentTime + '</span>',
+                        '<span class="plyr__time--current">00:00</span>',
+                    '</span>'
+                );
+            }
+
+            // Media duration display
+            if (_inArray(config.controls, 'duration')) {
+                html.push(
+                    '<span class="plyr__time">',
+                        '<span class="plyr__sr-only">' + config.i18n.duration + '</span>',
+                        '<span class="plyr__time--duration">00:00</span>',
+                    '</span>'
+                );
+            }
+
+            // Toggle mute button
+            if (_inArray(config.controls, 'mute')) {
+                html.push(
+                    '<button type="button" data-plyr="mute">',
+                        '<svg class="icon--muted"><use xlink:href="#' + config.iconPrefix + '-muted" /></svg>',
+                        '<svg><use xlink:href="#' + config.iconPrefix + '-volume" /></svg>',
+                        '<span class="plyr__sr-only">' + config.i18n.toggleMute + '</span>',
+                    '</button>'
+                );
+            }
+
+            // Volume range control
+            if (_inArray(config.controls, 'volume')) {
+                html.push(
+                    '<label for="volume{id}" class="plyr__sr-only">' + config.i18n.volume + '</label>',
+                    '<input id="volume{id}" class="plyr__volume" type="range" min="0" max="10" value="5" data-plyr="volume">'
+                );
+            }
+
+            // Toggle captions button
+            if (_inArray(config.controls, 'captions')) {
+                html.push(
+                    '<button type="button" data-plyr="captions">',
+                        '<svg class="icon--captions-on"><use xlink:href="#' + config.iconPrefix + '-captions-on" /></svg>',
+                        '<svg><use xlink:href="#' + config.iconPrefix + '-captions-off" /></svg>',
+                        '<span class="plyr__sr-only">' + config.i18n.toggleCaptions + '</span>',
+                    '</button>'
+                );
+            }
+
+            // Toggle fullscreen button
+            if (_inArray(config.controls, 'fullscreen')) {
+                html.push(
+                    '<button type="button" data-plyr="fullscreen">',
+                        '<svg class="icon--exit-fullscreen"><use xlink:href="#' + config.iconPrefix + '-exit-fullscreen" /></svg>',
+                        '<svg><use xlink:href="#' + config.iconPrefix + '-enter-fullscreen" /></svg>',
+                        '<span class="plyr__sr-only">' + config.i18n.toggleFullscreen + '</span>',
+                    '</button>'
+                );
+            }
+
+            // Close everything
+            html.push('</div>');
+
+            return html.join('');
+        }
+
+        // Setup fullscreen
+        function _setupFullscreen() {
+            if (!plyr.supported.full) {
+                return;
+            }
+
+            if ((plyr.type != 'audio' || config.fullscreen.allowAudio) && config.fullscreen.enabled) {
+                // Check for native support
+                var nativeSupport = fullscreen.supportsFullScreen;
+
+                if (nativeSupport || (config.fullscreen.fallback && !_inFrame())) {
+                    _log((nativeSupport ? 'Native' : 'Fallback') + ' fullscreen enabled');
+
+                    // Add styling hook
+                    _toggleClass(plyr.container, config.classes.fullscreen.enabled, true);
+                }
+                else {
+                    _log('Fullscreen not supported and fallback disabled');
+                }
+
+                // Toggle state
+                _toggleState(plyr.buttons.fullscreen, false);
+
+                // Setup focus trap
+                _focusTrap();
+            }
+        }
+
+        // Setup captions
+        function _setupCaptions() {
+            if (plyr.type !== 'video') {
+                return;
+            }
+
+            // Inject the container
+            if (!_getElement(config.selectors.captions)) {
+                plyr.videoContainer.insertAdjacentHTML('afterbegin', '<div class="' + _getClassname(config.selectors.captions) + '"></div>');
+            }
+
+            // Determine if HTML5 textTracks is supported
+            plyr.usingTextTracks = false;
+            if (plyr.media.textTracks) {
+                plyr.usingTextTracks = true;
+            }
+
+            // Get URL of caption file if exists
+            var captionSrc = '',
+                kind,
+                children = plyr.media.childNodes;
+
+            for (var i = 0; i < children.length; i++) {
+                if (children[i].nodeName.toLowerCase() === 'track') {
+                    kind = children[i].kind;
+                    if (kind === 'captions' || kind === 'subtitles') {
+                        captionSrc = children[i].getAttribute('src');
+                    }
+                }
+            }
+
+            // Record if caption file exists or not
+            plyr.captionExists = true;
+            if (captionSrc === '') {
+                plyr.captionExists = false;
+                _log('No caption track found');
+            }
+            else {
+                _log('Caption track found; URI: ' + captionSrc);
+            }
+
+            // If no caption file exists, hide container for caption text
+            if (!plyr.captionExists) {
+                _toggleClass(plyr.container, config.classes.captions.enabled);
+            }
+            // If caption file exists, process captions
+            else {
+                // Turn off native caption rendering to avoid double captions
+                // This doesn't seem to work in Safari 7+, so the <track> elements are removed from the dom below
+                var tracks = plyr.media.textTracks;
+                for (var x = 0; x < tracks.length; x++) {
+                    tracks[x].mode = 'hidden';
+                }
+
+                // Enable UI
+                _showCaptions(plyr);
+
+                // Disable unsupported browsers than report false positive
+                // Firefox bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1033144
+                if ((plyr.browser.name === 'IE' && plyr.browser.version >= 10) ||
+                    (plyr.browser.name === 'Firefox' && plyr.browser.version >= 31)) {
+
+                    // Debugging
+                    _log('Detected browser with known TextTrack issues - using manual fallback');
+
+                    // Set to false so skips to 'manual' captioning
+                    plyr.usingTextTracks = false;
+                }
+
+                // Rendering caption tracks
+                // Native support required - http://caniuse.com/webvtt
+                if (plyr.usingTextTracks) {
+                    _log('TextTracks supported');
+
+                    for (var y = 0; y < tracks.length; y++) {
+                        var track = tracks[y];
+
+                        if (track.kind === 'captions' || track.kind === 'subtitles') {
+                            _on(track, 'cuechange', function() {
+                                // Display a cue, if there is one
+                                if (this.activeCues[0] && 'text' in this.activeCues[0]) {
+                                    _setCaption(this.activeCues[0].getCueAsHTML());
+                                }
+                                else {
+                                    _setCaption();
+                                }
+                            });
+                        }
+                    }
+                }
+                // Caption tracks not natively supported
+                else {
+                    _log('TextTracks not supported so rendering captions manually');
+
+                    // Render captions from array at appropriate time
+                    plyr.currentCaption = '';
+                    plyr.captions = [];
+
+                    if (captionSrc !== '') {
+                        // Create XMLHttpRequest Object
+                        var xhr = new XMLHttpRequest();
+
+                        xhr.onreadystatechange = function() {
+                            if (xhr.readyState === 4) {
+                                if (xhr.status === 200) {
+                                    var captions = [],
+                                        caption,
+                                        req = xhr.responseText;
+
+                                    captions = req.split('\n\n');
+
+                                    for (var r = 0; r < captions.length; r++) {
+                                        caption = captions[r];
+                                        plyr.captions[r] = [];
+
+                                        // Get the parts of the captions
+                                        var parts = caption.split('\n'),
+                                            index = 0;
+
+                                        // Incase caption numbers are added
+                                        if(parts[index].indexOf(":") === -1) {
+                                            index = 1;
+                                        }
+
+                                        plyr.captions[r] = [parts[index], parts[index + 1]];
+                                    }
+
+                                    // Remove first element ('VTT')
+                                    plyr.captions.shift();
+
+                                    _log('Successfully loaded the caption file via AJAX');
+                                }
+                                else {
+                                    _log('There was a problem loading the caption file via AJAX', true);
+                                }
+                            }
+                        };
+
+                        xhr.open('get', captionSrc, true);
+
+                        xhr.send();
+                    }
+                }
+            }
+        }
+
+        // Set the current caption
+        function _setCaption(caption) {
+            var container = _getElement(config.selectors.captions),
+                content = document.createElement('span');
+
+            // Empty the container
+            container.innerHTML = '';
+
+            // Default to empty
+            if(typeof caption === 'undefined') {
+                caption = '';
+            }
+
+            // Set the span content
+            if(typeof caption === 'string') {
+                content.innerHTML = caption.trim();
+            }
+            else {
+                content.appendChild(caption);
+            }
+
+            // Set new caption text
+            container.appendChild(content);
+
+            // Force redraw
+            var redraw = container.offsetHeight;
+        }
 
         // Captions functions
         // Seek the manual caption time and update UI
         function _seekManualCaptions(time) {
+            // Utilities for caption time codes
+            function _timecodeCommon(tc, pos) {
+                var tcpair = [];
+                tcpair = tc.split(' --> ');
+                for(var i = 0; i < tcpair.length; i++) {
+                    // WebVTT allows for extra meta data after the timestamp line
+                    // So get rid of this if it exists
+                    tcpair[i] = tcpair[i].replace(/(\d+:\d+:\d+\.\d+).*/, "$1");
+                }
+                return _subTcSecs(tcpair[pos]);
+            }
+            function _timecodeMin(tc) {
+                return _timecodeCommon(tc, 0);
+            }
+            function _timecodeMax(tc) {
+                return _timecodeCommon(tc, 1);
+            }
+            function _subTcSecs(tc) {
+                if (tc === null || tc === undefined) {
+                    return 0;
+                }
+                else {
+                    var tc1 = [],
+                        tc2 = [],
+                        seconds;
+                    tc1 = tc.split(',');
+                    tc2 = tc1[0].split(':');
+                    seconds = Math.floor(tc2[0]*60*60) + Math.floor(tc2[1]*60) + Math.floor(tc2[2]);
+                    return seconds;
+                }
+            }
+
             // If it's not video, or we're using textTracks, bail.
             if (plyr.usingTextTracks || plyr.type !== 'video' || !plyr.supported.full) {
                 return;
@@ -770,21 +1075,11 @@
                 plyr.media.currentTime.toFixed(1) <= _timecodeMax(plyr.captions[plyr.subcount][0])) {
                     plyr.currentCaption = plyr.captions[plyr.subcount][1];
 
-                // Trim caption text
-                var content = plyr.currentCaption.trim();
-
-                // Render the caption (only if changed)
-                if (plyr.captionsContainer.innerHTML != content) {
-                    // Empty caption
-                    // Otherwise NVDA reads it twice
-                    plyr.captionsContainer.innerHTML = '';
-
-                    // Set new caption text
-                    plyr.captionsContainer.innerHTML = content;
-                }
+                // Render the caption
+                _setCaption(plyr.currentCaption);
             }
             else {
-                plyr.captionsContainer.innerHTML = '';
+                _setCaption();
             }
         }
 
@@ -800,32 +1095,6 @@
             if (config.captions.defaultActive) {
                 _toggleClass(plyr.container, config.classes.captions.active, true);
                 _toggleState(plyr.buttons.captions, true);
-            }
-        }
-
-        // Utilities for caption time codes
-        function _timecodeMin(tc) {
-            var tcpair = [];
-            tcpair = tc.split(' --> ');
-            return _subTcSecs(tcpair[0]);
-        }
-        function _timecodeMax(tc) {
-            var tcpair = [];
-            tcpair = tc.split(' --> ');
-            return _subTcSecs(tcpair[1]);
-        }
-        function _subTcSecs(tc) {
-            if (tc === null || tc === undefined) {
-                return 0;
-            }
-            else {
-                var tc1 = [],
-                    tc2 = [],
-                    seconds;
-                tc1 = tc.split(',');
-                tc2 = tc1[0].split(':');
-                seconds = Math.floor(tc2[0]*60*60) + Math.floor(tc2[1]*60) + Math.floor(tc2[2]);
-                return seconds;
             }
         }
 
@@ -927,8 +1196,8 @@
             container.insertAdjacentHTML('beforeend', html);
 
             // Setup tooltips
-            if (config.tooltips) {
-                var labels = _getElements(config.selectors.labels);
+            if (config.tooltips.controls) {
+                var labels = _getElements([config.selectors.controls.wrapper, ' ', config.selectors.labels, ' .', config.classes.hidden].join(''));
 
                 for (var i = labels.length - 1; i >= 0; i--) {
                     var label = labels[i];
@@ -947,7 +1216,7 @@
                 // Buttons
                 plyr.buttons = {};
                 plyr.buttons.seek             = _getElement(config.selectors.buttons.seek);
-                plyr.buttons.play             = _getElement(config.selectors.buttons.play);
+                plyr.buttons.play             = _getElements(config.selectors.buttons.play);
                 plyr.buttons.pause            = _getElement(config.selectors.buttons.pause);
                 plyr.buttons.restart          = _getElement(config.selectors.buttons.restart);
                 plyr.buttons.rewind           = _getElement(config.selectors.buttons.rewind);
@@ -974,6 +1243,9 @@
                 plyr.progress.played.bar      = _getElement(config.selectors.progress.played);
                 plyr.progress.played.text     = plyr.progress.played.bar && plyr.progress.played.bar.getElementsByTagName('span')[0];
 
+                // Seek tooltip
+                plyr.progress.tooltip           = plyr.progress.container && plyr.progress.container.querySelector('.' + config.classes.tooltip);
+
                 // Volume
                 plyr.volume                   = _getElement(config.selectors.buttons.volume);
 
@@ -988,7 +1260,7 @@
                 _log('It looks like there is a problem with your controls html', true);
 
                 // Restore native video controls
-                _toggleControls(true);
+                _toggleNativeControls(true);
 
                 return false;
             }
@@ -996,11 +1268,11 @@
 
         // Toggle style hook
         function _toggleStyleHook() {
-            _toggleClass(plyr.container, defaults.selectors.container.replace('.', ''), plyr.supported.full);
+            _toggleClass(plyr.container, config.selectors.container.replace('.', ''), plyr.supported.full);
         }
 
         // Toggle native controls
-        function _toggleControls(toggle) {
+        function _toggleNativeControls(toggle) {
             if(toggle) {
                 plyr.media.setAttribute('controls', '');
             }
@@ -1021,7 +1293,9 @@
 
             // If there's a play button, set label
             if (plyr.supported.full && plyr.buttons.play) {
-                plyr.buttons.play.setAttribute('aria-label', label);
+                for (var i = plyr.buttons.play.length - 1; i >= 0; i--) {
+                    plyr.buttons.play[i].setAttribute('aria-label', label);
+                }
             }
 
             // Set iframe title
@@ -1072,12 +1346,6 @@
 
                 // Clean up
                 plyr.embedId = null;
-            }
-            else {
-                // Autoplay
-                if (config.autoplay) {
-                    _play();
-                }
             }
         }
 
@@ -1169,6 +1437,9 @@
 
         // When embeds are ready
         function _embedReady() {
+            // Store reference to API
+            plyr.container.plyr.embed = plyr.embed;
+
             // Setup the UI
             _setupInterface();
 
@@ -1189,7 +1460,7 @@
             plyr.embed = new YT.Player(container.id, {
                 videoId: videoId,
                 playerVars: {
-                    autoplay: 0,
+                    autoplay: (config.autoplay ? 1 : 0),
                     controls: (plyr.supported.full ? 0 : 1),
                     rel: 0,
                     showinfo: 0,
@@ -1224,6 +1495,9 @@
                         plyr.media.currentTime = instance.getCurrentTime();
                         plyr.media.muted = instance.isMuted();
 
+                        // Set title
+                        config.title = instance.getVideoData().title;
+
                         // Trigger timeupdate
                         _triggerEvent(plyr.media, 'timeupdate');
 
@@ -1241,6 +1515,9 @@
                             // Bail if we're at 100%
                             if (plyr.media.buffered === 1) {
                                 window.clearInterval(plyr.timer.buffering);
+
+                                // Trigger event
+                                _triggerEvent(plyr.media, 'canplaythrough');
                             }
                         }, 200);
 
@@ -1274,6 +1551,7 @@
                                 plyr.media.paused = false;
                                 plyr.media.seeking = false;
                                 _triggerEvent(plyr.media, 'play');
+                                _triggerEvent(plyr.media, 'playing');
 
                                 // Poll to get playback progress
                                 plyr.timer.playing = window.setInterval(function() {
@@ -1289,6 +1567,7 @@
                             case 2:
                                 plyr.media.paused = true;
                                 _triggerEvent(plyr.media, 'pause');
+                                break;
                         }
                     }
                 }
@@ -1339,6 +1618,7 @@
                 plyr.embed.addEvent('play', function() {
                     plyr.media.paused = false;
                     _triggerEvent(plyr.media, 'play');
+                    _triggerEvent(plyr.media, 'playing');
                 });
 
                 plyr.embed.addEvent('pause', function() {
@@ -1355,6 +1635,11 @@
                 plyr.embed.addEvent('loadProgress', function(data) {
                     plyr.media.buffered = data.percent;
                     _triggerEvent(plyr.media, 'progress');
+
+                    if(parseInt(data.percent) === 1) {
+                        // Trigger event
+                        _triggerEvent(plyr.media, 'canplaythrough');
+                    }
                 });
 
                 plyr.embed.addEvent('finish', function() {
@@ -1363,198 +1648,13 @@
                 });
 
                 // Always seek to 0
-                //plyr.embed.api('seekTo', 0);
+                // plyr.embed.api('seekTo', 0);
 
-                // Prevent autoplay if needed (seek will play)
-                //if (!config.autoplay) {
-                //    plyr.embed.api('pause');
-                //}
+                // Autoplay
+                if (config.autoplay) {
+                    plyr.embed.api('play');
+                }
             });
-        }
-
-        // Setup captions
-        function _setupCaptions() {
-            if (plyr.type !== 'video') {
-                return;
-            }
-
-            // Inject the container
-            if (!_getElement(config.selectors.captions)) {
-                plyr.videoContainer.insertAdjacentHTML('afterbegin', '<div class="' + _getClassname(config.selectors.captions) + '"><span></span></div>');
-            }
-
-            // Cache selector
-            plyr.captionsContainer = _getElement(config.selectors.captions).querySelector('span');
-
-            // Determine if HTML5 textTracks is supported
-            plyr.usingTextTracks = false;
-            if (plyr.media.textTracks) {
-                plyr.usingTextTracks = true;
-            }
-
-            // Get URL of caption file if exists
-            var captionSrc = '',
-                kind,
-                children = plyr.media.childNodes;
-
-            for (var i = 0; i < children.length; i++) {
-                if (children[i].nodeName.toLowerCase() === 'track') {
-                    kind = children[i].kind;
-                    if (kind === 'captions' || kind === 'subtitles') {
-                        captionSrc = children[i].getAttribute('src');
-                    }
-                }
-            }
-
-            // Record if caption file exists or not
-            plyr.captionExists = true;
-            if (captionSrc === '') {
-                plyr.captionExists = false;
-                _log('No caption track found');
-            }
-            else {
-                _log('Caption track found; URI: ' + captionSrc);
-            }
-
-            // If no caption file exists, hide container for caption text
-            if (!plyr.captionExists) {
-                _toggleClass(plyr.container, config.classes.captions.enabled);
-            }
-            // If caption file exists, process captions
-            else {
-                // Turn off native caption rendering to avoid double captions
-                // This doesn't seem to work in Safari 7+, so the <track> elements are removed from the dom below
-                var tracks = plyr.media.textTracks;
-                for (var x = 0; x < tracks.length; x++) {
-                    tracks[x].mode = 'hidden';
-                }
-
-                // Enable UI
-                _showCaptions(plyr);
-
-                // Disable unsupported browsers than report false positive
-                if ((plyr.browser.name === 'IE' && plyr.browser.version >= 10) ||
-                    (plyr.browser.name === 'Firefox' && plyr.browser.version >= 31) ||
-                    (plyr.browser.name === 'Chrome' && plyr.browser.version >= 43) ||
-                    (plyr.browser.name === 'Safari' && plyr.browser.version >= 7)) {
-                    // Debugging
-                    _log('Detected unsupported browser for HTML5 captions - using fallback');
-
-                    // Set to false so skips to 'manual' captioning
-                    plyr.usingTextTracks = false;
-                }
-
-                // Rendering caption tracks
-                // Native support required - http://caniuse.com/webvtt
-                if (plyr.usingTextTracks) {
-                    _log('TextTracks supported');
-
-                    for (var y = 0; y < tracks.length; y++) {
-                        var track = tracks[y];
-
-                        if (track.kind === 'captions' || track.kind === 'subtitles') {
-                            _on(track, 'cuechange', function() {
-                                // Clear container
-                                plyr.captionsContainer.innerHTML = '';
-
-                                // Display a cue, if there is one
-                                if (this.activeCues[0] && this.activeCues[0].hasOwnProperty('text')) {
-                                    plyr.captionsContainer.appendChild(this.activeCues[0].getCueAsHTML().trim());
-                                }
-                            });
-                        }
-                    }
-                }
-                // Caption tracks not natively supported
-                else {
-                    _log('TextTracks not supported so rendering captions manually');
-
-                    // Render captions from array at appropriate time
-                    plyr.currentCaption = '';
-                    plyr.captions = [];
-
-                    if (captionSrc !== '') {
-                        // Create XMLHttpRequest Object
-                        var xhr = new XMLHttpRequest();
-
-                        xhr.onreadystatechange = function() {
-                            if (xhr.readyState === 4) {
-                                if (xhr.status === 200) {
-                                    var records = [],
-                                        record,
-                                        req = xhr.responseText;
-
-                                    records = req.split('\n\n');
-
-                                    for (var r = 0; r < records.length; r++) {
-                                        record = records[r];
-                                        plyr.captions[r] = [];
-                                        plyr.captions[r] = record.split('\n');
-                                    }
-
-                                    // Remove first element ('VTT')
-                                    plyr.captions.shift();
-
-                                    _log('Successfully loaded the caption file via AJAX');
-                                }
-                                else {
-                                    _log('There was a problem loading the caption file via AJAX', true);
-                                }
-                            }
-                        };
-
-                        xhr.open('get', captionSrc, true);
-
-                        xhr.send();
-                    }
-                }
-
-                // If Safari 7+, removing track from DOM [see 'turn off native caption rendering' above]
-                if (plyr.browser.name === 'Safari' && plyr.browser.version >= 7) {
-                    _log('Safari 7+ detected; removing track from DOM');
-
-                    // Find all <track> elements
-                    tracks = plyr.media.getElementsByTagName('track');
-
-                    // Loop through and remove one by one
-                    for (var t = 0; t < tracks.length; t++) {
-                        plyr.media.removeChild(tracks[t]);
-                    }
-                }
-            }
-        }
-
-        // Setup fullscreen
-        function _setupFullscreen() {
-            if (!plyr.supported.full) {
-                return;
-            }
-
-            if ((plyr.type != 'audio' || config.fullscreen.allowAudio) && config.fullscreen.enabled) {
-                // Check for native support
-                var nativeSupport = fullscreen.supportsFullScreen;
-
-                if (nativeSupport || (config.fullscreen.fallback && !_inFrame())) {
-                    _log((nativeSupport ? 'Native' : 'Fallback') + ' fullscreen enabled');
-
-                    // Add styling hook
-                    _toggleClass(plyr.container, config.classes.fullscreen.enabled, true);
-                }
-                else {
-                    _log('Fullscreen not supported and fallback disabled');
-                }
-
-                // Toggle state
-                _toggleState(plyr.buttons.fullscreen, false);
-
-                // Setup focus trap
-                _focusTrap();
-
-                // Set control hide class hook
-                if (config.fullscreen.hideControls) {
-                    _toggleClass(plyr.container, config.classes.fullscreen.hideControls, true);
-                }
-            }
         }
 
         // Play media
@@ -1609,7 +1709,8 @@
         // The input parameter can be an event or a number
         function _seek(input) {
             var targetTime = 0,
-                paused = plyr.media.paused;
+                paused = plyr.media.paused,
+                duration = _getDuration();
 
             // Explicit position
             if (typeof input === 'number') {
@@ -1619,15 +1720,15 @@
             else if (typeof input === 'object' && (input.type === 'input' || input.type === 'change')) {
                 // It's the seek slider
                 // Seek to the selected time
-                targetTime = ((input.target.value / input.target.max) * plyr.media.duration);
+                targetTime = ((input.target.value / input.target.max) * duration);
             }
 
             // Normalise targetTime
             if (targetTime < 0) {
                 targetTime = 0;
             }
-            else if (targetTime > plyr.media.duration) {
-                targetTime = plyr.media.duration;
+            else if (targetTime > duration) {
+                targetTime = duration;
             }
 
             // Set the current time
@@ -1646,7 +1747,8 @@
                         break;
 
                     case 'vimeo':
-                        plyr.embed.api('seekTo', targetTime);
+                        // Round to nearest second for vimeo
+                        plyr.embed.api('seekTo', targetTime.toFixed(0));
                         break;
                 }
 
@@ -1668,10 +1770,21 @@
             _seekManualCaptions(targetTime);
         }
 
+        // Get the duration (or custom if set)
+        function _getDuration() {
+            // It should be a number, but parse it just incase
+            var duration = parseInt(config.duration);
+
+            // If custom duration is funky, use regular duration
+            return (isNaN(duration) ? plyr.media.duration : duration);
+        }
+
         // Check playing state
         function _checkPlaying() {
             _toggleClass(plyr.container, config.classes.playing, !plyr.media.paused);
             _toggleClass(plyr.container, config.classes.stopped, plyr.media.paused);
+
+            _toggleControls(plyr.media.paused);
         }
 
         // Toggle fullscreen
@@ -1729,40 +1842,11 @@
             // Set button state
             _toggleState(plyr.buttons.fullscreen, plyr.isFullscreen);
 
-            // Toggle controls visibility based on mouse movement and location
-            var hoverTimer, isMouseOver = false;
+            // Hide on entering full screen
+            _toggleControls(false);
 
-            // Show the player controls
-            function _showControls() {
-                // Set shown class
-                _toggleClass(plyr.container, config.classes.hover, true);
-
-                // Clear timer every movement
-                window.clearTimeout(hoverTimer);
-
-                // If the mouse is not over the controls, set a timeout to hide them
-                if (!isMouseOver) {
-                    hoverTimer = window.setTimeout(function() {
-                        _toggleClass(plyr.container, config.classes.hover, false);
-                    }, 2000);
-                }
-            }
-
-            // Check mouse is over the controls
-            function _setMouseOver (event) {
-                isMouseOver = (event.type === 'mouseenter');
-            }
-
-            if (config.fullscreen.hideControls) {
-                // Hide on entering full screen
-                _toggleClass(plyr.controls, config.classes.hover, false);
-
-                // Keep an eye on the mouse location in relation to controls
-                _toggleHandler(plyr.controls, 'mouseenter mouseleave', _setMouseOver, plyr.isFullscreen);
-
-                // Show the controls on mouse move
-                _toggleHandler(plyr.container, 'mousemove', _showControls, plyr.isFullscreen);
-            }
+            // Trigger an event
+            _triggerEvent(plyr.container, plyr.isFullscreen ? 'enterfullscreen' : 'exitfullscreen');
         }
 
         // Bail from faux-fullscreen
@@ -1808,12 +1892,20 @@
         function _setVolume(volume) {
             // Use default if no value specified
             if (typeof volume === 'undefined') {
+                volume = config.volume;
+
                 if (config.storage.enabled && _storage().supported) {
-                    volume = window.localStorage[config.storage.key] || config.volume;
+                    volume = window.localStorage.getItem(config.storage.key);
+
+                    // Clean up old volume
+                    // https://github.com/Selz/plyr/issues/171
+                    window.localStorage.removeItem('plyr-volume');
                 }
-                else {
-                    volume = config.volume;
-                }
+            }
+
+            // Use config if all else fails
+            if(volume === null || isNaN(volume)) {
+                volume = config.volume;
             }
 
             // Maximum is 10
@@ -1865,7 +1957,7 @@
             }
 
             // Store the volume in storage
-            if (config.storage.enabled && _storage().supported) {
+            if (config.storage.enabled && _storage().supported && !isNaN(volume)) {
                 window.localStorage.setItem(config.storage.key, volume);
             }
 
@@ -1898,6 +1990,9 @@
 
             // Add class hook
             _toggleClass(plyr.container, config.classes.captions.active, plyr.captionsEnabled);
+
+            // Trigger an event
+            _triggerEvent(plyr.container, plyr.captionsEnabled ? 'captionsenabled' : 'captionsdisabled');
         }
 
         // Check if media is loading
@@ -1905,10 +2000,10 @@
             var loading = (event.type === 'waiting');
 
             // Clear timer
-            clearTimeout(plyr.loadingTimer);
+            clearTimeout(plyr.timers.loading);
 
             // Timer to prevent flicker when seeking
-            plyr.loadingTimer = setTimeout(function() {
+            plyr.timers.loading = setTimeout(function() {
                 _toggleClass(plyr.container, config.classes.loading, loading);
             }, (loading ? 250 : 0));
         }
@@ -1917,14 +2012,15 @@
         function _updateProgress(event) {
             var progress    = plyr.progress.played.bar,
                 text        = plyr.progress.played.text,
-                value       = 0;
+                value       = 0,
+                duration    = _getDuration();
 
             if (event) {
                 switch (event.type) {
                     // Video playing
                     case 'timeupdate':
                     case 'seeking':
-                        value = _getPercentage(plyr.media.currentTime, plyr.media.duration);
+                        value = _getPercentage(plyr.media.currentTime, duration);
 
                         // Set seek range value only if it's a 'natural' time event
                         if (event.type == 'timeupdate' && plyr.buttons.seek) {
@@ -1950,7 +2046,7 @@
 
                                         // HTML5
                                         if (buffered && buffered.length) {
-                                            return _getPercentage(buffered.end(0), plyr.media.duration);
+                                            return _getPercentage(buffered.end(0), duration);
                                         }
                                         // YouTube returns between 0 and 1
                                         else if (typeof buffered === 'number') {
@@ -1988,7 +2084,7 @@
             plyr.hours = parseInt(((time / 60) / 60) % 60);
 
             // Do we need to display hours?
-            var displayHours = (parseInt(((plyr.media.duration / 60) / 60) % 60) > 0);
+            var displayHours = (parseInt(((_getDuration() / 60) / 60) % 60) > 0);
 
             // Ensure it's two digits. For example, 03 rather than 3.
             plyr.secs = ('0' + plyr.secs).slice(-2);
@@ -2004,7 +2100,8 @@
                 return;
             }
 
-            var duration = plyr.media.duration || 0;
+            // Determine duration
+            var duration = _getDuration() || 0;
 
             // If there's only one time display, display duration there
             if (!plyr.duration && config.displayDuration && plyr.media.paused) {
@@ -2015,6 +2112,9 @@
             if (plyr.duration) {
                 _updateTimeDisplay(duration, plyr.duration);
             }
+
+            // Update the tooltip (if visible)
+            _updateSeekTooltip();
         }
 
         // Handle time change event
@@ -2029,6 +2129,93 @@
 
             // Playing progress
             _updateProgress(event);
+        }
+
+        // Update hover tooltip for seeking
+        function _updateSeekTooltip(event) {
+            // Bail if setting not true
+            if (!config.tooltips.seek || plyr.browser.touch) {
+                return;
+            }
+
+            // Calculate percentage
+            var clientRect  = plyr.progress.container.getBoundingClientRect(),
+                percent     = 0,
+                visible     = config.classes.tooltip + '--visible';
+
+            // Determine percentage, if already visible
+            if (!event) {
+                if(_hasClass(plyr.progress.tooltip, visible)) {
+                    percent = plyr.progress.tooltip.style.left.replace('%', '');
+                }
+                else {
+                    return;
+                }
+            }
+            else {
+                percent = ((100 / clientRect.width) * (event.pageX - clientRect.left));
+            }
+
+            // Set bounds
+            if (percent < 0) {
+                percent = 0;
+            }
+            else if (percent > 100) {
+                percent = 100;
+            }
+
+            // Display the time a click would seek to
+            _updateTimeDisplay(((_getDuration() / 100) * percent), plyr.progress.tooltip);
+
+            // Set position
+            plyr.progress.tooltip.style.left = percent + "%";
+
+            // Show/hide the tooltip
+            // If the event is a moues in/out and percentage is inside bounds
+            if(event && _inArray(['mouseenter', 'mouseleave'], event.type)) {
+                _toggleClass(plyr.progress.tooltip, visible, (event.type === 'mouseenter'));
+            }
+        }
+
+        // Show the player controls in fullscreen mode
+        function _toggleControls(toggle) {
+            if (!config.hideControls) {
+                return;
+            }
+            var isMouseMove = false;
+
+            // Default to false if no boolean
+            if(typeof toggle !== "boolean") {
+                if(toggle && toggle.type) {
+                    isMouseMove = toggle.type === 'mousemove';
+
+                    toggle = _inArray(['mousemove','mouseenter'], toggle.type);
+                }
+                else {
+                    toggle = false;
+                }
+            }
+
+            // Clear timer every movement
+            window.clearTimeout(plyr.timers.hover);
+
+            // If the mouse is not over the controls, set a timeout to hide them
+            if(toggle) {
+                _toggleClass(plyr.container, config.classes.hideControls, false);
+            }
+
+            // If toggle is false or if we're playing (regardless of toggle), then
+            // set the timer to hide the controls 
+            if(toggle === false || !plyr.media.paused) {
+                plyr.timers.hover = window.setTimeout(function() {
+                    // If the mouse is over the controls, bail
+                    if(plyr.controls.active) {
+                        return;
+                    }
+
+                    _toggleClass(plyr.container, config.classes.hideControls, true);
+                }, isMouseMove ? 2000 : 500);
+            }
         }
 
         // Add common function to retrieve media source
@@ -2085,6 +2272,12 @@
                 _remove(plyr.videoContainer);
             }
 
+            // Remove embed object
+            plyr.embed = null;
+
+            // Cancel current network requests
+            _cancelRequests();
+
             // Remove the old media
             _remove(plyr.media);
 
@@ -2125,6 +2318,11 @@
             // Inject the new element
             _prependChild(plyr.container, plyr.media);
 
+            // Autoplay the new source?
+            if (typeof source.autoplay !== 'undefined') {
+                config.autoplay = source.autoplay;
+            }
+
             // Set attributes for audio video
             if (_inArray(config.types.html5, plyr.type)) {
                 if (config.crossorigin) {
@@ -2149,9 +2347,6 @@
             _toggleClass(plyr.container, config.classes.captions.active, plyr.captionsEnabled);
             _toggleStyleHook();
 
-            // Autoplay the new source?
-            config.autoplay = (source.autoplay || config.autoplay);
-
             // Set new sources for html5
             if (_inArray(config.types.html5, plyr.type)) {
                 _insertChildElements('source', source.sources);
@@ -2170,23 +2365,19 @@
                 // Load HTML5 sources
                 plyr.media.load();
 
-                // Display duration if available
-                _displayDuration();
-
                 // Setup interface
                 _setupInterface();
-            }
 
-            // Play if autoplay attribute is present
-            if (config.autoplay) {
-                _play();
+                // Display duration if available
+                _displayDuration();
             }
 
             // Set aria title and iframe title
-            if ('title' in source) {
-                config.title = source.title;
-                _setTitle();
-            }
+            config.title = source.title;
+            _setTitle();
+
+            // Reset media objects
+            plyr.container.plyr.media = plyr.media;
         }
 
         // Update poster
@@ -2196,13 +2387,15 @@
             }
         }
 
-        // Listen for events
-        function _listeners() {
+        // Listen for control events
+        function _controlListeners() {
             // IE doesn't support input event, so we fallback to change
             var inputEvent = (plyr.browser.name == 'IE' ? 'change' : 'input');
 
             // Click play/pause helper
-            function _togglePlay(play) {
+            function _togglePlay() {
+                var play = plyr.media.paused;
+
                 // Toggle playback
                 if (play) {
                     _play();
@@ -2212,8 +2405,8 @@
                 }
 
                 // Determine which buttons
-                var trigger = plyr.buttons[play ? "play" : "pause"],
-                    target = plyr.buttons[play ? "pause" : "play"];
+                var trigger = plyr.buttons[play ? 'play' : 'pause'],
+                    target = plyr.buttons[play ? 'pause' : 'play'];
 
                 // Setup focus and tab focus
                 if(target) {
@@ -2264,39 +2457,59 @@
             }
 
             // Play
-            _proxyHandler(plyr.buttons.play, 'click', config.handlers.play, function() { _togglePlay(true); });
+            _proxyListener(plyr.buttons.play, 'click', config.listeners.play, _togglePlay);
 
             // Pause
-            _proxyHandler(plyr.buttons.pause, 'click', config.handlers.pause, function() { _togglePlay(); });
+            _proxyListener(plyr.buttons.pause, 'click', config.listeners.pause, _togglePlay);
 
             // Restart
-            _proxyHandler(plyr.buttons.restart, 'click', config.handlers.restart, _seek);
+            _proxyListener(plyr.buttons.restart, 'click', config.listeners.restart, _seek);
 
             // Rewind
-            _proxyHandler(plyr.buttons.rewind, 'click', config.handlers.rewind, _rewind);
+            _proxyListener(plyr.buttons.rewind, 'click', config.listeners.rewind, _rewind);
 
             // Fast forward
-            _proxyHandler(plyr.buttons.forward, 'click', config.handlers.forward, _forward);
+            _proxyListener(plyr.buttons.forward, 'click', config.listeners.forward, _forward);
 
             // Seek
-            _proxyHandler(plyr.buttons.seek, inputEvent, config.handlers.seek, _seek);
+            _proxyListener(plyr.buttons.seek, inputEvent, config.listeners.seek, _seek);
 
             // Set volume
-            _proxyHandler(plyr.volume, inputEvent, config.handlers.volume, function() {
+            _proxyListener(plyr.volume, inputEvent, config.listeners.volume, function() {
                 _setVolume(plyr.volume.value);
             });
 
             // Mute
-            _proxyHandler(plyr.buttons.mute, 'click', config.handlers.mute, _toggleMute);
+            _proxyListener(plyr.buttons.mute, 'click', config.listeners.mute, _toggleMute);
 
             // Fullscreen
-            _proxyHandler(plyr.buttons.fullscreen, 'click', config.handlers.fullscreen, _toggleFullscreen);
+            _proxyListener(plyr.buttons.fullscreen, 'click', config.listeners.fullscreen, _toggleFullscreen);
 
             // Handle user exiting fullscreen by escaping etc
             if (fullscreen.supportsFullScreen) {
                 _on(document, fullscreen.fullScreenEventName, _toggleFullscreen);
             }
 
+            // Captions
+            _on(plyr.buttons.captions, 'click', _toggleCaptions);
+
+            // Seek tooltip
+            _on(plyr.progress.container, 'mouseenter mouseleave mousemove', _updateSeekTooltip);
+
+            // Toggle controls visibility based on mouse movement
+            if (config.hideControls) {
+                _on(plyr.container, 'mouseenter mouseleave', _toggleControls);
+                _on(plyr.container, 'mousemove', _debounce(_toggleControls, 500, true));
+
+                // Watch for cursor over controls so they don't hide when trying to interact
+                _on(plyr.controls, 'mouseenter mouseleave', function(event) { 
+                    plyr.controls.active = (event.type === 'mouseenter');
+                });
+            }
+        }
+
+        // Listen for media events
+        function _mediaListeners() {
             // Time change on media
             _on(plyr.media, 'timeupdate seeking', _timeUpdate);
 
@@ -2304,16 +2517,13 @@
             _on(plyr.media, 'timeupdate', _seekManualCaptions);
 
             // Display duration
-            _on(plyr.media, 'loadedmetadata', _displayDuration);
-
-            // Captions
-            _on(plyr.buttons.captions, 'click', _toggleCaptions);
+            _on(plyr.media, 'durationchange loadedmetadata', _displayDuration);
 
             // Handle the media finishing
             _on(plyr.media, 'ended', function() {
                 // Clear
                 if (plyr.type === 'video') {
-                    plyr.captionsContainer.innerHTML = '';
+                    _setCaption();
                 }
 
                 // Reset UI
@@ -2333,8 +2543,11 @@
             _on(plyr.media, 'waiting canplay seeked', _checkLoading);
 
             // Click video
-            if (plyr.type === 'video' && config.click) {
-                _on(plyr.videoContainer, 'click', function() {
+            if (config.clickToPlay) {
+                // Set cursor
+                plyr.videoContainer.style.cursor = "pointer";
+
+                _on(plyr.media, 'click', function() {
                     if (plyr.media.paused) {
                         _play();
                     }
@@ -2347,6 +2560,36 @@
                     }
                 });
             }
+
+            // Proxy events to container
+            _on(plyr.media, config.events.join(' '), function(event) {
+                _triggerEvent(plyr.container, event.type);
+            });
+        }
+
+        // Cancel current network requests
+        // See https://github.com/Selz/plyr/issues/174
+        function _cancelRequests() {
+            if(!_inArray(config.types.html5, plyr.type)) {
+                return;
+            }
+
+            // Set empty src attribute
+            plyr.media.setAttribute('src', '');
+
+            // Remove child sources
+            var sources = plyr.media.querySelectorAll('source');
+            for (var i = 0; i < sources.length; i++) {
+                _remove(sources[i]);
+            }
+
+            // Load the new empty source
+            // This will cancel existing requests
+            // See https://github.com/Selz/plyr/issues/174
+            plyr.media.load();
+
+            // Debugging
+            _log("Cancelled network requests for old media");
         }
 
         // Destroy an instance
@@ -2375,7 +2618,7 @@
 
             // If video, we need to remove some more
             if (plyr.type === 'video') {
-                // Remove captions
+                // Remove captions container
                 _remove(_getElement(config.selectors.captions));
 
                 // Remove video wrapper
@@ -2383,7 +2626,7 @@
             }
 
             // Restore native video controls
-            _toggleControls(true);
+            _toggleNativeControls(true);
 
             // Clone the media element to remove listeners
             // http://stackoverflow.com/questions/19469881/javascript-remove-all-event-listeners-of-specific-type
@@ -2461,6 +2704,11 @@
 
                 // Set title on button and frame
                 _setTitle();
+
+                // Autoplay
+                if (config.autoplay) {
+                    _play();
+                }
             }
 
             // Successful setup
@@ -2470,37 +2718,43 @@
         function _setupInterface() {
             // Don't setup interface if no support
             if (!plyr.supported.full) {
-                _log("No full support for this media type (" + plyr.type + ")", true);
+                _log('No full support for this media type (' + plyr.type + ')', true);
 
                 // Remove controls
                 _remove(_getElement(config.selectors.controls.wrapper));
 
                 // Restore native controls
-                _toggleControls(true);
+                _toggleNativeControls(true);
 
                 // Bail
                 return;
             }
 
-            // Inject custom controls
-            if (!_getElements(config.selectors.controls.wrapper).length) {
+            // Inject custom controls if not present
+            var controlsMissing = !_getElements(config.selectors.controls.wrapper).length;
+            if (controlsMissing) {
                 // Inject custom controls
                 _injectControls();
             }
-
-            // Remove native controls
-            _toggleControls();
 
             // Find the elements
             if (!_findElements()) {
                 return;
             }
 
+            // If the controls are injected, re-bind listeners for controls
+            if (controlsMissing) {
+                _controlListeners();
+            }
+
+            // Media element listeners
+            _mediaListeners();
+
+            // Remove native controls
+            _toggleNativeControls();
+
             // Setup fullscreen
             _setupFullscreen();
-
-            // Listeners
-            _listeners();
 
             // Captions
             _setupCaptions();
@@ -2514,6 +2768,12 @@
 
             // Update the UI
             _checkPlaying();
+
+            // Display duration
+            _displayDuration();
+
+            // Ready event
+            _triggerEvent(plyr.container, 'ready');
         }
 
         // Initialize instance
@@ -2608,32 +2868,35 @@
             elements = document.querySelectorAll(defaults.selectors.container);
         }
 
-        // Extend the default options with user specified
-        config = _extend(defaults, options);
-
         // Bail if disabled or no basic support
         // You may want to disable certain UAs etc
-        if (!config.enabled || !api.supported().basic || !elements.length) {
+        if (!api.supported().basic || !elements.length) {
             return false;
         }
 
         // Create a player instance for each element
-        for (var i = elements.length - 1; i >= 0; i--) {
+        for (var i = 0; i < elements.length; i++) {
             // Get the current element
             var element = elements[i];
 
             // Setup a player instance and add to the element
             if (typeof element.plyr === 'undefined') {
+                // Create instance-specific config
+                var config = _extend(defaults, options, JSON.parse(element.getAttribute("data-plyr")));
+
+                // Bail if not enabled
+                if(!config.enabled) {
+                    return;
+                }
+
                 // Create new instance
-                var instance = new Plyr(element);
+                var instance = new Plyr(element, config);
 
                 // Set plyr to false if setup failed
                 element.plyr = (Object.keys(instance).length ? instance : false);
 
                 // Callback
-                if (typeof config.onSetup === 'function') {
-                    config.onSetup.apply(element.plyr);
-                }
+                _triggerEvent(element, 'setup', { plyr: element.plyr });
             }
 
             // Add to return array even if it's already setup
@@ -2645,3 +2908,22 @@
 
     return api;
 }));
+
+// Custom event polyfill
+// https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent
+(function () {
+    if (typeof window.CustomEvent === 'function') {
+        return false;
+    }
+
+    function CustomEvent (event, params) {
+        params = params || { bubbles: false, cancelable: false, detail: undefined };
+        var evt = document.createEvent('CustomEvent');
+        evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
+        return evt;
+    }
+
+    CustomEvent.prototype = window.Event.prototype;
+
+    window.CustomEvent = CustomEvent;
+})();
