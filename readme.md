@@ -1,32 +1,34 @@
 # Plyr
-A simple, accessible HTML5 media player.
+A simple, accessible and customizable HTML5, YouTube and Vimeo media player.
 
-Checkout the [demo](http://plyr.io).
+[Checkout the demo](https://plyr.io)
 
-[![Image of Plyr](https://cdn.plyr.io/static/plyr.jpg)](http://plyr.io)
+[![Image of Plyr](https://cdn.plyr.io/static/plyr-v1.5.jpg)](https://plyr.io)
 
 ## Why?
-We wanted a lightweight, accessible and customizable media player that just supports [*modern*](#browser-support) browsers. Sure, there are many other players out there but we wanted to keep things simple, using the right elements for the job.
+We wanted a lightweight, accessible and customizable media player that supports [*modern*](#browser-support) browsers. Sure, there are many other players out there but we wanted to keep things simple, using the right elements for the job.
 
 ## Features
-- **Accessible** - full support for VTT captions and screen readers.
-- **Lightweight** - just 8KB minified and gzipped.
-- **[Customisable](#html)** - make the player look how you want with the markup you want.
-- **Semantic** - uses the *right* elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no `<span>` or `<a href="#">` button hacks.
-- **Responsive** - as you'd expect these days.
-- **Audio & Video** - support for both formats.
-- **[Embedded Video](#embeds)** - support for YouTube and Vimeo (beta).
-- **[API](#api)** - toggle playback, volume, seeking, and more.
-- **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes.
-- **i18n support** - support for internationalization of controls.
-- **No dependencies** - written in vanilla JavaScript, no jQuery required.
+- **Accessible** - full support for VTT captions and screen readers
+- **Lightweight** - under 10KB minified and gzipped
+- **[Customisable](#html)** - make the player look how you want with the markup you want
+- **Semantic** - uses the *right* elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no `<span>` or `<a href="#">` button hacks
+- **Responsive** - as you'd expect these days
+- **HTML Video & Audio** - support for both formats
+- **[Embedded Video](#embeds)** - support for YouTube and Vimeo video playback
+- **[API](#api)** - toggle playback, volume, seeking, and more
+- **[Universal events](#events)** - no messing around with Vimeo and YouTube APIs, all events are universal across formats
+- **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes
+- **i18n support** - support for internationalization of controls
+- **No dependencies** - written in "vanilla" JavaScript, no jQuery required
 
 Oh and yes, it works with Bootstrap.
 
 ## Changelog
-Check out the [changelog](changelog.md) to see what's been new with Plyr.
+Check out the [changelog](changelog.md) to see what's new with Plyr.
 
 ## Planned Development
+- Streaming
 - Playback speed
 - Playlists
 - Multiple language captions (with selection)
@@ -36,16 +38,28 @@ Check out the [changelog](changelog.md) to see what's been new with Plyr.
 If you have any cool ideas or features, please let me know by [creating an issue](https://github.com/Selz/plyr/issues/new) or, of course, forking and sending a pull request.
 
 ## Implementation
-
 Check `docs/index.html` and `docs/dist/docs.js` for an example setup.
 
-**Heads up:** the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.5.0/plyr.js` to `https://cdn.plyr.io/1.5.0/plyr.js`
+**Heads up:** the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.5.21/plyr.js` to `https://cdn.plyr.io/1.5.21/plyr.js`
+
+### Node Package Manager (NPM)
+[![npm version](https://badge.fury.io/js/plyr.svg)](https://badge.fury.io/js/plyr) 
+
+Using NPM, you can grab Plyr:
+```
+npm install plyr
+```
+[https://www.npmjs.com/package/plyr](https://www.npmjs.com/package/plyr)
 
 ### Bower
+[![Bower version](https://badge.fury.io/bo/plyr.svg)](https://badge.fury.io/bo/plyr)
+
 If bower is your thang, you can grab Plyr using:
 ```
 bower install plyr
 ```
+[http://bower.io/search/?q=plyr](http://bower.io/search/?q=plyr)
+
 More info on setting up dependencies can be found in the [Bower Docs](http://bower.io/docs/creating-packages/#maintaining-dependencies)
 
 ### Ember
@@ -59,11 +73,11 @@ More info is on [npm](https://www.npmjs.com/package/ember-cli-plyr) and [GitHub]
 If you want to use our CDN, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/1.5.0/plyr.css">
-<script src="https://cdn.plyr.io/1.5.0/plyr.js"></script>
+<link rel="stylesheet" href="https://cdn.plyr.io/1.5.21/plyr.css">
+<script src="https://cdn.plyr.io/1.5.21/plyr.js"></script>
 ```
 
-You can also access the `sprite.svg` file at `https://cdn.plyr.io/1.5.0/sprite.svg`.
+You can also access the `sprite.svg` file at `https://cdn.plyr.io/1.5.21/sprite.svg`.
 
 ### CSS & Styling
 If you want to use the default css, add the `plyr.css` file from `/dist` into your head, or even better use `plyr.less` or `plyr.sass` file included in `/src` in your build to save a request.
@@ -95,7 +109,7 @@ The SVG sprite for the controls icons is loaded in by AJAX to help with performa
 ```
 
 If you're using the `<base>` tag on your site, you may need to use something like this:
-[https://gist.github.com/leonderijke/c5cf7c5b2e424c0061d2](svgfixer.js)
+[svgfixer.js](https://gist.github.com/leonderijke/c5cf7c5b2e424c0061d2)
 
 More info on SVG sprites here:
 [http://css-tricks.com/svg-sprites-use-better-icon-fonts/](http://css-tricks.com/svg-sprites-use-better-icon-fonts/)
@@ -134,11 +148,16 @@ And the same for `<audio>`
 </div>
 ```
 
-For YouTube, Plyr uses the standard YouTube API markup (an empty `<div>`):
+For YouTube and Vimeo, Plyr uses the standard YouTube API markup (an empty `<div>`):
 
 ```html
 <div class="plyr">
-	<div data-video-id="L1h9xxCU20g" data-type="youtube"></div>
+	<div data-video-id="bTqVqk7FSmY" data-type="youtube"></div>
+</div>
+```
+```html
+<div class="plyr">
+	<div data-video-id="143418951" data-type="vimeo"></div>
 </div>
 ```
 
@@ -148,6 +167,11 @@ You'll notice the `crossorigin` attribute on the example `<video>` and `<audio>`
 More info on CORS here:
 [https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS)
 
+### Captions
+WebVTT captions are supported. To add a caption track, check the HTML example above and look for the `<track>` element.
+
+Be sure to [validate your caption files](https://quuz.org/webvtt/)
+
 ### JavaScript
 
 #### Quick setup
@@ -155,7 +179,7 @@ More info on CORS here:
 Here's an example of a default setup:
 
 ```html
-<script src="https://cdn.plyr.io/1.5.0/plyr.js"></script>
+<script src="https://cdn.plyr.io/1.5.21/plyr.js"></script>
 <script>plyr.setup();</script>
 ```
 
@@ -185,7 +209,7 @@ plyr.setup(options);
 
 #### Options
 
-Options must be passed as an object to the `setup()` method as above.
+Options must be passed as an object to the `setup()` method as above or as JSON in `data-plyr` attribute on each of your target elements (e.g. data-plyr='{ title: "testing" }') - note the single quotes encapsulating the JSON.
 
 <table class="table" width="100%">
 <thead>
@@ -234,6 +258,12 @@ Options must be passed as an object to the `setup()` method as above.
     <td>Display debugging information on what Plyr is doing.</td>
   </tr>
   <tr>
+    <td><code>autoplay</code></td>
+    <td>Boolean</td>
+    <td><code>false</code></td>
+    <td>Autoplay the media on load. This is generally advised against on UX grounds. It is also disabled on iOS (an Apple limitation).</td>
+  </tr>
+  <tr>
     <td><code>seekTime</code></td>
     <td>Number</td>
     <td><code>10</code></td>
@@ -253,11 +283,21 @@ Options must be passed as an object to the `setup()` method as above.
   </tr>
   <tr>
     <td><code>tooltips</code></td>
-    <td>Boolean</td>
-    <td><code>false</code></td>
-    <td>Display control labels as tooltips on :hover &amp; :focus (by default, the labels are screen reader only).</td>
+    <td>Object</td>
+    <td><code>{ controls: false, seek: true }</code></td>
+    <td>
+		<strong>controls</strong>: Display control labels as tooltips on :hover &amp; :focus (by default, the labels are screen reader only).
+		<br><br>
+		<strong>seek</strong>: Display a seek tooltip to indicate on click where the media would seek to.
+	</td>
   </tr>
-    <tr>
+  <tr>
+    <td><code>duration</code></td>
+    <td>Number</td>
+    <td><code>null</code></td>
+    <td>Specify a custom duration.</td>
+  </tr>
+  <tr>
     <td><code>displayDuration</code></td>
     <td>Boolean</td>
     <td><code>true</code></td>
@@ -270,10 +310,10 @@ Options must be passed as an object to the `setup()` method as above.
     <td>See <code>plyr.js</code> in <code>/src</code> for more info. You probably don't need to change any of these.</td>
   </tr>
   <tr>
-    <td><code>handlers</code></td>
+    <td><code>listeners</code></td>
     <td>Object</td>
     <td>&mdash;</td>
-    <td>Allows early binding of handlers to Plyr's controls. See <code>controls</code> above for list of controls and see <code>plyr.js</code> in <code>/src</code> for more info.</td>
+    <td>Allows early binding of event listeners to the controls. See <code>controls</code> above for list of controls and see <code>plyr.js</code> in <code>/src</code> for more info.</td>
   </tr>
   <tr>
     <td><code>classes</code></td>
@@ -298,12 +338,6 @@ Options must be passed as an object to the `setup()` method as above.
     <td>Object</td>
     <td>&mdash;</td>
     <td>Two properties; <code>enabled</code> which toggles if local storage should be enabled (if the browser supports it). The default value is `true`. This enables storing user settings, currently it only stores volume but more will be added later. The second property <code>key</code> is the key used for the local storage. The default is <code>plyr_volume</code> until more settings are stored.</td>
-  </tr>
-  <tr>
-    <td><code>onSetup</code></td>
-    <td>Function</td>
-    <td>&mdash;</td>
-    <td>This callback function is called on every new plyr instance created. The context (<code>this</code>) is the plyr instance itself.</td>
   </tr>
  </tbody>
 </table>
@@ -364,7 +398,7 @@ Or you can use the returned object from your call to the setup method:
 var player = plyr.setup('.js-plyr')[0];
 ```
 
-This will return an array of plyr instances setup, so you need to specify the index of the instance you want. This is less useful if you are setting up mutliple instances. You can also use the `onSetup` callback documented below which will return each instance one by one, as they are setup.
+This will return an array of plyr instances setup, so you need to specify the index of the instance you want. This is less useful if you are setting up mutliple instances. You can listen for the `setup` [event](#events) documented below which will return each instance one by one, as they are setup (in the `plyr` key of the event object).
 
 Once you have your instance, you can use the API methods below on it. For example to pause it:
 
@@ -450,16 +484,23 @@ Here's a list of the methods supported:
   </tr>
   <tr>
     <td><code>source(...)</code></td>
-    <td>Array or undefined</td>
+    <td>Object or undefined</td>
     <td>
       Get/Set the media source.
       <br><br>
-      <strong>string</strong><br>
-      <code>.source("/path/to/video.mp4")</code><br>
-      This will set the <code>src</code> attribute on the <code>video</code> or <code>audio</code> element.
-      <br><br>
       <strong>array</strong><br>
-      <code>.source([{ src: "/path/to/video.webm", type: "video/webm", ...more attributes... }, { src: "/path/to/video.mp4", type: "video/mp4", ...more attributes... }])`</code><br>
+      <pre><code>.source([
+      	{
+      		src: "/path/to/video.webm",
+      		type: "video/webm",
+      		...more attributes...
+      	},
+      	{
+      		src: "/path/to/video.mp4",
+      		type: "video/mp4",
+      		...more attributes...
+      	}
+      ])`</code></pre><br>
       This will inject a child `source` element for every element in the array with the specified attributes. `src` is the only required attribute although adding `type` is recommended as it helps the browser decide which file to download and play.
       <br><br>
       <strong>YouTube</strong><br>
@@ -582,8 +623,8 @@ Some more details on the object parameters
     </tr>
     <tr>
       <td><code>sources</code></td>
-      <td>Array or String</td>
-      <td>This is an array of sources or optionally a string for embedded players (YouTube and Vimeo). `type` is also optional for YouTube and Vimeo when specifying an array. For YouTube and Vimeo media, only the video ID must be passed as the source as shown above. The keys of this object are mapped directly to HTML attributes so more can be added to the object if required.</td>
+      <td>Array</td>
+      <td>This is an array of sources. <code>type</code> is optional for YouTube and Vimeo when specifying an array. For YouTube and Vimeo media, only the video ID must be passed as the source as shown above. The keys of this object are mapped directly to HTML attributes so more can be added to the object if required.</td>
     </tr>
     <tr>
       <td><code>poster</code></td>
@@ -599,39 +640,172 @@ Some more details on the object parameters
 </table>
 
 
-## Events/Callbacks
+## Events
 
-The `plyr` object on the player element also contains a `media` property which is a reference to the `<audio>` or `<video>` element within the player which you can use to listen for events. Here's an example:
+You can listen for events on the element you setup Plyr on. Some events only apply to HTML5 audio and video.
+
+<table class="table" width="100%">
+  <thead>
+    <tr>
+      <th width="20%">Event name</th>
+	  <th width="20%">HTML5 only</th>
+      <th width="60%">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+	<tr>
+		<td><code>canplay</code></td>
+		<td>✔</td>
+		<td>Sent when enough data is available that the media can be played, at least for a couple of frames. This corresponds to the <code>HAVE_ENOUGH_DATA</code> <code>readyState</code>.</td>
+	</tr>
+	<tr>
+		<td><code>canplaythrough</code></td>
+		<td></td>
+		<td>Sent when the ready state changes to <code>CAN_PLAY_THROUGH</code>, indicating that the entire media can be played without interruption, assuming the download rate remains at least at the current level. <strong>Note</strong>: Manually setting the <code>currentTime</code> will eventually fire a <code>canplaythrough</code> event in firefox. Other browsers might not fire this event.</td>
+	</tr>
+	<tr>
+		<td><code>emptied</code></td>
+		<td>✔</td>
+		<td>The media has become empty; for example, this event is sent if the media has already been loaded (or partially loaded), and the <code>load()</code> method is called to reload it.</td>
+	</tr>
+	<tr>
+		<td><code>ended</code></td>
+		<td></td>
+		<td>Sent when playback completes.</td>
+	</tr>
+	<tr>
+		<td><code>error</code></td>
+		<td>✔</td>
+		<td>Sent when an error occurs.&nbsp; The element's <code>error</code> attribute contains more information.</td>
+	</tr>
+	<tr>
+		<td><code>loadeddata</code></td>
+		<td>✔</td>
+		<td>The first frame of the media has finished loading.</td>
+	</tr>
+	<tr>
+		<td><code>loadedmetadata</code></td>
+		<td>✔</td>
+		<td>The media's metadata has finished loading; all attributes now contain as much useful information as they're going to.</td>
+	</tr>
+	<tr>
+		<td><code>loadstart</code></td>
+		<td>✔</td>
+		<td>Sent when loading of the media begins.</td>
+	</tr>
+	<tr>
+		<td><code>pause</code></td>
+		<td></td>
+		<td>Sent when playback is paused.</td>
+	</tr>
+	<tr>
+		<td><code>play</code></td>
+		<td></td>
+		<td>Sent when playback of the media starts after having been paused; that is, when playback is resumed after a prior <code>pause</code> event.</td>
+	</tr>
+	<tr>
+		<td><code>playing</code></td>
+		<td></td>
+		<td>Sent when the media begins to play (either for the first time, after having been paused, or after ending and then restarting).</td>
+	</tr>
+	<tr>
+		<td><code>progress</code></td>
+		<td></td>
+		<td>Sent periodically to inform interested parties of progress downloading the media. Information about the current amount of the media that has been downloaded is available in the media element's <code>buffered</code> attribute.</td>
+	</tr>
+	<tr>
+		<td><code>seeked</code></td>
+		<td>✔</td>
+		<td>Sent when a seek operation completes.</td>
+	</tr>
+	<tr>
+		<td><code>seeking</code></td>
+		<td>✔</td>
+		<td>Sent when a seek operation begins.</td>
+	</tr>
+	<tr>
+		<td><code>stalled</code></td>
+		<td>✔</td>
+		<td>Sent when the user agent is trying to fetch media data, but data is unexpectedly not forthcoming.</td>
+	</tr>
+	<tr>
+		<td><code>timeupdate</code></td>
+		<td></td>
+		<td>The time indicated by the element's <code>currentTime</code> attribute has changed.</td>
+	</tr>
+	<tr>
+		<td><code>volumechange</code></td>
+		<td></td>
+		<td>Sent when the audio volume changes (both when the volume is set and when the <code>muted</code> attribute is changed).</td>
+	</tr>
+	<tr>
+		<td><code>waiting</code></td>
+		<td>✔</td>
+		<td>Sent when the requested operation (such as playback) is delayed pending the completion of another operation (such as a seek).</td>
+	</tr>
+	<tr>
+		<td><code>enterfullscreen</code></td>
+		<td></td>
+		<td>User enters fullscreen (either the proper fullscreen or full-window fallback for older browsers)</td>
+	</tr>
+	<tr>
+		<td><code>exitfullscreen</code></td>
+		<td></td>
+		<td>User exits fullscreen</td>
+	</tr>
+	<tr>
+		<td><code>captionsenabled</code></td>
+		<td></td>
+		<td>Captions toggled on</td>
+	</tr>
+	<tr>
+		<td><code>captionsdisabled</code></td>
+		<td></td>
+		<td>Captions toggled off</td>
+	</tr>
+	<tr>
+		<td><code>ready</code></td>
+		<td></td>
+		<td>Triggered when initial setup is done or a source change has occurred.</td>
+	</tr>
+	</tbody>
+</table>
+
+Details borrowed from: [https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events](https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events)
+
+Here's an example of binding an event listener:
 
 ```javascript
-var media = document.querySelector(".js-plyr").plyr.media;
-
-media.addEventListener("playing", function() {
-  console.log("playing");
+document.querySelector('.js-plyr').addEventListener('ready', function() {
+	var player = event.target.plyr;
 });
 ```
-A complete list of events can be found here:
-[Media Events - W3.org](http://www.w3.org/2010/05/video/mediaevents.html)
 
 ## Embeds
 
-Currently only YouTube is supported. Vimeo will be coming soon. Some HTML5 media events are triggered on the `media` property of the `plyr` object:
-- `play`
-- `pause`
-- `timeupdate`
-- `progress`
+YouTube and Vimeo are currently supported and function much like a HTML5 video. Check the relevant documentation sections for any differences.
 
-Due to the way the YouTube API works, the `timeupdate` and `progress` events are triggered by polling every 200ms so the event may trigger without an actual value change. Buffering progress is `media.buffered` in the `plyr` object. It is a a number between 0 and 1 that specifies the percentage of the video that the player shows as buffered.
+Plyr references a custom version of the Vimeo Froogaloop API as Vimeo have neglected to maintain the library and there were bugs with their version. You don't need to worry about including your own versions of the Vimeo or YouTube JavaScript APIs.
+
+The native API's can be accessed through the `embed` property of the plyr object. For example:
 
 ```javascript
-document.querySelector(".js-plyr").plyr.media.addEventListener("play", function() {
-	console.log("play");
+document.querySelector('.js-plyr').addEventListener('ready', function() {
+	var player = event.target.plyr;
+
+	// YouTube
+	console.log(player.embed.getVideoData());
+
+	// Vimeo
+	console.log(player.embed.api('getColor'));
 });
 ```
 
-The `.source()` API method can also be used but the video id must be passed as the argument.
+More info on the respective API's here:
+[YouTube API Reference](https://developers.google.com/youtube/js_api_reference)
+[Vimeo API Reference](https://developer.vimeo.com/player/js-api#reference)
 
-Currently caption control is not supported but I will work on this.
+*Please note*: not all API methods may work 100%. Your mileage may vary. It's better to use the universal plyr API where possible.
 
 ## Fullscreen
 
@@ -695,9 +869,12 @@ Plyr is developed by [@sam_potts](https://twitter.com/sam_potts) / [sampotts.me]
 - [Web Platform Daily](http://webplatformdaily.org/releases/2015-03-04)
 - [LayerVault Designer News](https://news.layervault.com/stories/45394-plyr--a-simple-html5-media-player)
 - [The Treehouse Show #131](https://teamtreehouse.com/library/episode-131-origami-react-responsive-hero-images)
+- [noupe.com](http://www.noupe.com/design/html5-plyr-is-a-responsive-and-accessible-video-player-94389.html)
 
 ## Used by
 - [Selz.com](https://selz.com)
+- [koel - A personal music streaming server that works.](http://koel.phanan.net/)
+- [Oscar Radio](http://oscar-radio.xyz/)
 
 Let me know on [Twitter](https://twitter.com/sam_potts) I can add you to the above list. It'd be awesome to see how you're using Plyr :-)
 

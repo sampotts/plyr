@@ -1,9 +1,9 @@
 {
   "name": "plyr",
-  "version": "1.5.0",
-  "description": "A simple HTML5 media player using custom controls",
+  "version": "1.5.21",
+  "description": "A simple, accessible and customizable HTML5, YouTube and Vimeo media player",
   "homepage": "http://plyr.io",
-  "main": "gulpfile.js",
+  "main": "src/js/plyr.js",
   "dependencies": {},
   "devDependencies": {
     "gulp": "^3.9.0",
@@ -24,9 +24,6 @@
     "gulp-util": "^3.0.7",
     "run-sequence": "^1.1.5"
   },
-  "scripts": {
-    "preinstall": "npm install -g gulp"
-  },
   "keywords": [
     "HTML5 Video",
     "HTML5 Audio",
@@ -36,8 +33,15 @@
     "type": "git",
     "url": "git://github.com/selz/plyr.git"
   },
-  "authors": [
-    "Sam Potts <me@sampotts.me>"
-  ],
-  "license": "MIT"
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/selz/plyr/issues"
+  },
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sam Potts <sam@selz.com> (selz.com)"
 }

@@ -214,8 +214,10 @@ options = {
 
 // If aws is setup
 if("cdn" in aws) {
-    var cdnpath = new RegExp(aws.cdn.bucket + "\/(\\d+\\.)?(\\d+\\.)?(\\*|\\d+)","gi"),
-    localpath   = new RegExp("(\.\.\/)?dist", "gi");
+    var regex       = "(\\d+\\.)?(\\d+\\.)?(\\*|\\d+)",
+    cdnpath         = new RegExp(aws.cdn.bucket + "\/" + regex, "gi"),
+    semver          = new RegExp("v" + regex, "gi"),
+    localpath       = new RegExp("(\.\.\/)?dist", "gi");
 }
 
 // Publish version to CDN bucket
@@ -244,6 +246,11 @@ gulp.task("docs", function () {
         .pipe(replace(cdnpath, aws.cdn.bucket + "/" + version))
         .pipe(gulp.dest(root));
 
+    // Replace versioned files in plyr.js
+    gulp.src(path.join(root, "src/js/plyr.js"))
+        .pipe(replace(semver, "v" + version))
+        .pipe(gulp.dest(path.join(root, "src/js/")));
+
     // Replace local file paths with remote paths in docs
     // e.g. "../dist/plyr.js" to "https://cdn.plyr.io/x.x.x/plyr.js"
     gulp.src([paths.docs.root + "*.html"])
@@ -253,6 +260,7 @@ gulp.task("docs", function () {
 
     // Upload error.html to cdn (as well as docs site)
     gulp.src([paths.docs.root + "error.html"])
+        .pipe(replace(localpath, "https://" + aws.cdn.bucket + "/" + version))
         .pipe(gzip())
         .pipe(s3(aws.cdn, options.docs));
 });

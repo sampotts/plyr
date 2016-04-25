@@ -1,5 +1,86 @@
 # Changelog
 
+## v1.5.21
+- Bug fix for embeds: `play` not being defined (fixes #185 and #186)
+
+## v1.5.20
+- Bug fix for autoplay option
+
+## v1.5.19
+- Fix for accessing `embed` property after `ready` event fired
+
+## v1.5.18
+- Added 'ready' event for initial setup complete or source change occurs
+- Fixed SASS stylesheet references to transparentize
+- Added default font stack to controls
+- Docs fixes inc controls HTML (fixes #180)
+
+## v1.5.17
+- Expose YouTube and Vimeo API (docs update required) (Fixes #176)
+- Auto set title based on YouTube getVideoData() title property
+- Bug fix for Vimeo API change (Uncaught TypeError: Cannot read property 'value' of undefined) due to a change their end
+
+## v1.5.16
+- Cancel requests on source change (Fixes #174)
+
+## v1.5.15
+- Fix for CustomEvent polyfill and related bug (See #172)
+
+## v1.5.14
+- Volume storage fix (Fixes #171)
+
+## v1.5.13
+- Fix for manual caption rendering
+
+## v1.5.12
+- Added a duration option to pass the duration of the file
+- Added the ability to set options per element by setting a data-plyr attribute on the target elements (this might be useful for the duration option for example)
+- Fixes for Chrome and Safari caption rendering, they now use the default texttrack and cuechange events
+- Firefox bug fix for event not defined
+
+## v1.5.11
+- iOS embed bug fixes (fixes #166)
+- Hide IE/Edge <input type='range'> tooltip (since we have a styled one) (fixes #160)
+- SASS bug fix for default values (fixes #158)
+
+## v1.5.9 + v1.5.10
+- NPM bug fixes
+
+## v1.5.8
+- Fix for touch device seek tooltip
+- Seek improvements
+
+## v1.5.7
+- Fix for control tooltips always showing
+
+## v1.5.6
+- Seek tooltip (option for tooltips changed, please check docs)
+- SASS compile error fixes (fixes #148)
+- Fullscreen fixes for controls not always hiding/showing (fixes #149)
+- Screen reader icon fixes (title was being read twice due to the tooltip/hidden label)
+
+## v1.5.5
+- Fixed controls.md example
+- Bug fix for docs error page
+- Bug fix for controls tooltips
+
+## v1.5.4
+- Minor bug fix for clicking video to play/pause after source change
+
+## v1.5.3
+- Minor bug fix for occasional display of 0:00 as the media duration
+
+## v1.5.2
+- `handlers` option renamed to `listeners`
+- Added event listeners for all types to the plyr container (playback, fullscreen, captions etc - see docs)
+- Removed onSetup config option (use the 'setup' event instead, plyr element is event.plyr)
+- Style bug fixes
+- Vimeo seek bug fix (requires whole seconds when seeking)
+- Fix for fullscreen player (using class hook, not browser fullscreen)
+
+## v1.5.1
+- Fix for event listeners being duplicated on source change
+
 # v1.5.0
 - Vimeo support (fixes #8)
 - New options for initialization (you can now pass a selector, HTMLElement or NodeList) (fixes #118)

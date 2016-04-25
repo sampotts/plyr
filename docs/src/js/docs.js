@@ -6,26 +6,69 @@
 
 // Setup the player
 plyr.setup('.js-media-player', {
-	debug: 		true,
-	title: 		'Video demo',
-	tooltips: 	true,
-	captions: {
-		defaultActive: true
+	debug: 				true,
+	title: 				'Video demo',
+	tooltips: 	{
+		controls: 		true
 	},
-	onSetup: function() {
-		console.log('✓ Setup done');
+	captions: {
+		defaultActive: 	true
 	}
 });
 
 // General functions
 (function() {
-	var buttons = document.querySelectorAll('[data-source]');
+	var buttons = document.querySelectorAll('[data-source]'),
+		types = {
+			video: 		'video',
+			audio: 		'audio',
+			youtube: 	'youtube',
+			vimeo: 		'vimeo'
+		},
+		currentType = window.location.hash.replace('#', ''),
+		historySupport = (window.history && window.history.pushState);
 
 	// Bind to each button
 	for (var i = buttons.length - 1; i >= 0; i--) {
-		buttons[i].addEventListener('click', newSource);
+		buttons[i].addEventListener('click', function() {
+			var type = this.getAttribute('data-source');
+
+			newSource(type);
+
+			if (historySupport) {
+				history.pushState({ 'type': type }, '', '#' + type);
+			}
+		});
 	}
 
+	// List for backwards/forwards
+	window.addEventListener('popstate', function(event) {
+		if(event.state && 'type' in event.state) {
+			newSource(event.state.type);
+		}
+	});
+
+	// On load
+	if(historySupport) {
+		var video = !currentType.length;
+
+		// If there's no current type set, assume video
+		if(video) {
+			currentType = types.video;
+		}
+
+		// Replace current history state
+		if(currentType in types) {
+			history.replaceState({ 'type': currentType }, '', (video ? '' : '#' + currentType));
+		}
+
+		// If it's not video, load the source
+		if(currentType !== types.video) {
+			newSource(currentType, true);
+		}
+	}
+
+	// Toggle class on an element
 	function toggleClass(element, className, state) {
         if (element) {
             if (element.classList) {
@@ -39,13 +82,17 @@ plyr.setup('.js-media-player', {
     }
 
 	// Set a new source
-	function newSource() {
-		var trigger = this,
-		type        = trigger.getAttribute('data-source'),
-		player      = document.querySelector('.js-media-player').plyr;
+	function newSource(type, init) {
+		// Bail if new type isn't known, it's the current type, or current type is empty (video is default) and new type is video
+		if(!(type in types) || (!init && type == currentType) || (!currentType.length && type == types.video)) {
+			return;
+		}
+
+		// Get plyr instance
+		var player = document.querySelector('.js-media-player').plyr;
 
 		switch(type) {
-			case 'video':
+			case types.video:
 				player.source({
 					type:       'video',
 					title: 		'View From A Blue Moon',
@@ -62,13 +109,13 @@ plyr.setup('.js-media-player', {
 						kind:   'captions',
 						label:  'English',
 						srclang:'en',
-						src:    'https://cdn.selz.com/plyr/1.0/example_captions_en.vtt',
+						src:    'https://cdn.selz.com/plyr/1.5/View_From_A_Blue_Moon_Trailer-HD.en.vtt',
 						default: true
 					}]
 				});
 				break;
 
-			case 'audio':
+			case types.audio:
 				player.source({
 					type:       'audio',
 					title: 		'Kishi Bashi &ndash; &ldquo;It All Began With A Burst&rdquo;',
@@ -83,7 +130,7 @@ plyr.setup('.js-media-player', {
 				});
 				break;
 
-			case 'youtube':
+			case types.youtube:
 				player.source({
 					type:       'video',
 					title: 		'View From A Blue Moon',
@@ -94,7 +141,7 @@ plyr.setup('.js-media-player', {
 				});
 				break;
 
-			case 'vimeo':
+			case types.vimeo:
 				player.source({
 					type:       'video',
 					title: 		'View From A Blue Moon',
@@ -106,11 +153,16 @@ plyr.setup('.js-media-player', {
 				break;
 		}
 
+		// Set the current type for next time
+		currentType = type;
+
+		// Remove active classes
 		for (var x = buttons.length - 1; x >= 0; x--) {
 			toggleClass(buttons[x].parentElement, 'active', false);
 		}
 
-		toggleClass((event.target || event.srcElement).parentElement, 'active', true);
+		// Set active on parent
+		toggleClass(document.querySelector('[data-source="'+ type +'"]').parentElement, 'active', true);
 	}
 })();
 
