@@ -1317,6 +1317,12 @@
                 // Add type class
                 _toggleClass(plyr.container, config.classes.type.replace('{0}', plyr.type), true);
 
+                // Add video class for embeds
+                // This will require changes if audio embeds are added
+                if (_inArray(config.types.embed, plyr.type)) {
+                    _toggleClass(plyr.container, config.classes.type.replace('{0}', 'video'), true);
+                }
+
                 // If there's no autoplay attribute, assume the video is stopped and add state class
                 _toggleClass(plyr.container, config.classes.stopped, config.autoplay);
 
@@ -2176,7 +2182,7 @@
 
         // Show the player controls in fullscreen mode
         function _toggleControls(toggle) {
-            if (!config.hideControls) {
+            if (!config.hideControls || plyr.type === 'audio') {
                 return;
             }
             var delay = false,
