@@ -1,7 +1,8 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg viewBox="0 0 18 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <g transform="translate(2.000000, 2.000000)">
-        <path d="M0,2 L0,12 C5.24848613e-17,14 2,14 2,14 L4,14 C4,14 6,14 6,12 C6,11.786438 6,11.572876 6,11 L6,2 C6,3.17446247e-09 4,0 4,0 L2,0 C2,0 0,0 0,2 Z M2,2 L4,2 L4,12 L2,12 L2,2 Z"></path>
-        <path d="M8,2 L8,12 C8,14 10,14 10,14 L12,14 C12,14 14,14 14,12 C14,11.786438 14,11.572876 14,11 L14,2 C14,3.17446247e-09 12,0 12,0 L10,0 C10,0 8,0 8,2 Z M10,2 L12,2 L12,12 L10,12 L10,2 Z"></path>
-    </g>
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 19.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="16px" height="16px" viewBox="0 0 16 16" enable-background="new 0 0 16 16" xml:space="preserve">
+<path d="M5,1H2C1.4,1,1,1.4,1,2v12c0,0.6,0.4,1,1,1h3c0.6,0,1-0.4,1-1V2C6,1.4,5.6,1,5,1z"/>
+<path d="M14,1h-3c-0.6,0-1,0.4-1,1v12c0,0.6,0.4,1,1,1h3c0.6,0,1-0.4,1-1V2C15,1.4,14.6,1,14,1z"/>
 </svg>

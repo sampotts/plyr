@@ -2,7 +2,7 @@
 // Docs example
 // ==========================================================================
 
-/*global plyr, shr*/
+/*global plyr*/
 
 // Setup the player
 plyr.setup('.js-media-player', {
@@ -13,13 +13,6 @@ plyr.setup('.js-media-player', {
 	},
 	captions: {
 		defaultActive: 	true
-	}
-});
-
-// Setup shr
-shr.setup({
-	count: {
-		classname: 'btn__count'
 	}
 });
 

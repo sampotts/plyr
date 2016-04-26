@@ -39,8 +39,9 @@
         duration:               null,
         displayDuration:        true,
         iconPrefix:             'icon',
-        click:                  true,
-        tooltips:               {
+        clickToPlay:            true,
+        hideControls:           true,
+        tooltips: {
             controls:           false,
             seek:               true
         },
@@ -83,6 +84,7 @@
             hover:              'plyr--hover',
             tooltip:            'plyr__tooltip',
             hidden:             'plyr__sr-only',
+            hideControls:       'plyr--hide-controls',
             isIos:              'plyr--is-ios',
             isTouch:            'plyr--is-touch',
             captions: {
@@ -91,8 +93,7 @@
             },
             fullscreen: {
                 enabled:        'plyr--fullscreen-enabled',
-                active:         'plyr--fullscreen-active',
-                hideControls:   'plyr--fullscreen--hide-controls'
+                active:         'plyr--fullscreen-active'
             },
             tabFocus:           'tab-focus'
         },
@@ -102,14 +103,13 @@
         fullscreen: {
             enabled:            true,
             fallback:           true,
-            hideControls:       true,
             allowAudio:         false
         },
         storage: {
             enabled:            true,
             key:                'plyr'
         },
-        controls:               ['restart', 'rewind', 'play', 'fast-forward', 'current-time', 'duration', 'mute', 'volume', 'captions', 'fullscreen'],
+        controls:               ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'fullscreen'],
         i18n: {
             restart:            'Restart',
             rewind:             'Rewind {seektime} secs',
@@ -393,6 +393,30 @@
         return false;
     }
 
+    // Debounce
+    // deBouncer by hnldesign.nl
+    // based on code by Paul Irish and the original debouncing function from John Hann
+    // http://unscriptable.com/index.php/2009/03/20/debouncing-javascript-methods/
+    function _debounce(func, threshold, execAsap) {
+        var timeout;
+        return function debounced () {
+            var obj = this, args = arguments;
+            function delayed () {
+                if (!execAsap) {
+                    func.apply(obj, args);
+                }
+                timeout = null;
+            }
+            if (timeout) {
+                clearTimeout(timeout);
+            }
+            else if (execAsap) {
+                func.apply(obj, args);
+            }
+            timeout = setTimeout(delayed, threshold || 100);
+        };
+    }
+
     // Bind event
     function _on(element, events, callback) {
         if (element) {
@@ -637,27 +661,20 @@
 
         // Build the default HTML
         function _buildControls() {
-            // Open and add the progress and seek elements
-            var html = [
-            '<div class="plyr__controls">',
-                '<div class="plyr__progress">',
-                    '<label for="seek{id}" class="plyr__sr-only">Seek</label>',
-                    '<input id="seek{id}" class="plyr__progress--seek" type="range" min="0" max="100" step="0.1" value="0" data-plyr="seek">',
-                    '<progress class="plyr__progress--played" max="100" value="0">',
-                        '<span>0</span>% ' + config.i18n.played,
-                    '</progress>',
-                    '<progress class="plyr__progress--buffer" max="100" value="0">',
-                        '<span>0</span>% ' + config.i18n.buffered,
-                    '</progress>'];
+            // Create html array
+            var html = [];
 
-            // Seek tooltip
-            if (config.tooltips.seek) {
-                html.push('<span class="plyr__tooltip">00:00</span>');
+            // Larger overlaid play button
+            if (_inArray(config.controls, 'play-large')) {
+                html.push(
+                    '<button type="button" data-plyr="play" class="plyr__play-large">',
+                        '<svg><use xlink:href="#' + config.iconPrefix + '-play" /></svg>',
+                        '<span class="plyr__sr-only">' + config.i18n.play + '</span>',
+                    '</button>'
+                );
             }
 
-            // Close progress
-            html.push('</div>',
-                '<span class="plyr__controls--left">');
+            html.push('<div class="plyr__controls">');
 
             // Restart button
             if (_inArray(config.controls, 'restart')) {
@@ -679,7 +696,8 @@
                 );
             }
 
-            // Play/pause button
+            // Play Pause button
+            // TODO: This should be a toggle button really?
             if (_inArray(config.controls, 'play')) {
                 html.push(
                     '<button type="button" data-plyr="play">',
@@ -703,6 +721,28 @@
                 );
             }
 
+            // Progress
+            if (_inArray(config.controls, 'progress')) {
+                // Create progress
+                html.push('<span class="plyr__progress">',
+                    '<label for="seek{id}" class="plyr__sr-only">Seek</label>',
+                    '<input id="seek{id}" class="plyr__progress--seek" type="range" min="0" max="100" step="0.1" value="0" data-plyr="seek">',
+                    '<progress class="plyr__progress--played" max="100" value="0">',
+                        '<span>0</span>% ' + config.i18n.played,
+                    '</progress>',
+                    '<progress class="plyr__progress--buffer" max="100" value="0">',
+                        '<span>0</span>% ' + config.i18n.buffered,
+                    '</progress>');
+
+                // Seek tooltip
+                if (config.tooltips.seek) {
+                    html.push('<span class="plyr__tooltip">00:00</span>');
+                }
+
+                // Close
+                html.push('</span>');
+            }
+
             // Media current time display
             if (_inArray(config.controls, 'current-time')) {
                 html.push(
@@ -722,12 +762,6 @@
                     '</span>'
                 );
             }
-
-            // Close left controls
-            html.push(
-                '</span>',
-                '<span class="plyr__controls--right">'
-            );
 
             // Toggle mute button
             if (_inArray(config.controls, 'mute')) {
@@ -771,10 +805,7 @@
             }
 
             // Close everything
-            html.push(
-                '</span>',
-            '</div>'
-            );
+            html.push('</div>');
 
             return html.join('');
         }
@@ -804,11 +835,6 @@
 
                 // Setup focus trap
                 _focusTrap();
-
-                // Set control hide class hook
-                if (config.fullscreen.hideControls) {
-                    _toggleClass(plyr.container, config.classes.fullscreen.hideControls, true);
-                }
             }
         }
 
@@ -1174,7 +1200,7 @@
 
             // Setup tooltips
             if (config.tooltips.controls) {
-                var labels = _getElements(config.selectors.labels + ' .' + config.classes.hidden);
+                var labels = _getElements([config.selectors.controls.wrapper, ' ', config.selectors.labels, ' .', config.classes.hidden].join(''));
 
                 for (var i = labels.length - 1; i >= 0; i--) {
                     var label = labels[i];
@@ -1193,7 +1219,7 @@
                 // Buttons
                 plyr.buttons = {};
                 plyr.buttons.seek             = _getElement(config.selectors.buttons.seek);
-                plyr.buttons.play             = _getElement(config.selectors.buttons.play);
+                plyr.buttons.play             = _getElements(config.selectors.buttons.play);
                 plyr.buttons.pause            = _getElement(config.selectors.buttons.pause);
                 plyr.buttons.restart          = _getElement(config.selectors.buttons.restart);
                 plyr.buttons.rewind           = _getElement(config.selectors.buttons.rewind);
@@ -1237,7 +1263,7 @@
                 _log('It looks like there is a problem with your controls html', true);
 
                 // Restore native video controls
-                _toggleControls(true);
+                _toggleNativeControls(true);
 
                 return false;
             }
@@ -1249,7 +1275,7 @@
         }
 
         // Toggle native controls
-        function _toggleControls(toggle) {
+        function _toggleNativeControls(toggle) {
             if(toggle) {
                 plyr.media.setAttribute('controls', '');
             }
@@ -1270,7 +1296,9 @@
 
             // If there's a play button, set label
             if (plyr.supported.full && plyr.buttons.play) {
-                plyr.buttons.play.setAttribute('aria-label', label);
+                for (var i = plyr.buttons.play.length - 1; i >= 0; i--) {
+                    plyr.buttons.play[i].setAttribute('aria-label', label);
+                }
             }
 
             // Set iframe title
@@ -1291,6 +1319,12 @@
             if (plyr.supported.full) {
                 // Add type class
                 _toggleClass(plyr.container, config.classes.type.replace('{0}', plyr.type), true);
+
+                // Add video class for embeds
+                // This will require changes if audio embeds are added
+                if (_inArray(config.types.embed, plyr.type)) {
+                    _toggleClass(plyr.container, config.classes.type.replace('{0}', 'video'), true);
+                }
 
                 // If there's no autoplay attribute, assume the video is stopped and add state class
                 _toggleClass(plyr.container, config.classes.stopped, config.autoplay);
@@ -1869,6 +1903,8 @@
         function _checkPlaying() {
             _toggleClass(plyr.container, config.classes.playing, !plyr.media.paused);
             _toggleClass(plyr.container, config.classes.stopped, plyr.media.paused);
+
+            _toggleControls(plyr.media.paused);
         }
 
         // Toggle fullscreen
@@ -1925,12 +1961,6 @@
 
             // Set button state
             _toggleState(plyr.buttons.fullscreen, plyr.isFullscreen);
-
-            // Hide on entering full screen
-            if (config.fullscreen.hideControls) {
-                //_toggleClass(plyr.controls, config.classes.hover, false);
-                _showControls(true);
-            }
 
             // Trigger an event
             _triggerEvent(plyr.container, plyr.isFullscreen ? 'enterfullscreen' : 'exitfullscreen');
@@ -2273,24 +2303,51 @@
         }
 
         // Show the player controls in fullscreen mode
-        function _showControls(force) {
-            // We're only worried about fullscreen
-            if (!plyr.isFullscreen) {
+        function _toggleControls(toggle) {
+            if (!config.hideControls || plyr.type === 'audio') {
                 return;
             }
+            var delay = false,
+                isEnterFullscreen = false,
+                show = toggle;
 
-            // Set shown class
-            _toggleClass(plyr.container, config.classes.hover, true);
+            // Default to false if no boolean
+            if(typeof toggle !== "boolean") {
+                if(toggle && toggle.type) {
+                    delay = (toggle.type === 'mousemove');
+                    isEnterFullscreen = (toggle.type === 'enterfullscreen');
+                    show = _inArray(['mousemove','mouseenter'], toggle.type);
+                }
+                else {
+                    show = false;
+                }
+            }
 
             // Clear timer every movement
             window.clearTimeout(plyr.timers.hover);
 
             // If the mouse is not over the controls, set a timeout to hide them
-            plyr.timers.hover = window.setTimeout(function() {
-                if (!plyr.controls.mouseover || (force === true)) {
-                    _toggleClass(plyr.container, config.classes.hover, false);
+            if(show || plyr.media.paused) {
+                _toggleClass(plyr.container, config.classes.hideControls, false);
+
+                // Always show controls when paused
+                if(plyr.media.paused) {
+                    return;
                 }
-            }, 2000);
+            }
+
+            // If toggle is false or if we're playing (regardless of toggle), then
+            // set the timer to hide the controls 
+            if(!show || !plyr.media.paused) {
+                plyr.timers.hover = window.setTimeout(function() {
+                    // If the mouse is over the controls, bail
+                    if(plyr.controls.active && !isEnterFullscreen) {
+                        return;
+                    }
+
+                    _toggleClass(plyr.container, config.classes.hideControls, true);
+                }, delay ? 2000 : 0);
+            }
         }
 
         // Add common function to retrieve media source
@@ -2338,6 +2395,11 @@
 
             // Pause playback
             _pause();
+
+            // Set seek input to 0
+            if(plyr.buttons.seek) {
+                plyr.buttons.seek.value = 0;
+            }
 
             // Clean up YouTube stuff
             if (plyr.type === 'youtube') {
@@ -2578,13 +2640,15 @@
             // Seek tooltip
             _on(plyr.progress.container, 'mouseenter mouseleave mousemove', _updateSeekTooltip);
 
-            // Toggle controls visibility based on mouse movement and location
-            var hoverTimer, isMouseOver = false;
+            // Toggle controls visibility based on mouse movement
+            if (config.hideControls) {
+                _on(plyr.container, 'mouseenter mouseleave mousemove', _toggleControls);
+                //_on(plyr.container, 'mousemove', _debounce(_toggleControls, 200, true));
+                _on(plyr.container, 'enterfullscreen', _toggleControls);
 
-            if (config.fullscreen.hideControls) {
-                // Keep an eye on the mouse location in relation to controls
-                _on(plyr.controls, 'mouseenter mouseleave', function(event) {
-                    plyr.controls.mouseover = (event.type === 'mouseenter');
+                // Watch for cursor over controls so they don't hide when trying to interact
+                _on(plyr.controls, 'mouseenter mouseleave', function(event) { 
+                    plyr.controls.active = (event.type === 'mouseenter');
                 });
             }
         }
@@ -2624,7 +2688,10 @@
             _on(plyr.media, 'waiting canplay seeked', _checkLoading);
 
             // Click video
-            if (config.click) {
+            if (config.clickToPlay) {
+                // Set cursor
+                plyr.videoContainer.style.cursor = "pointer";
+
                 _on(plyr.media, 'click', function() {
                     if (plyr.media.paused) {
                         _play();
@@ -2637,12 +2704,6 @@
                         _pause();
                     }
                 });
-            }
-
-            // Listen for mouse move to show controls
-            if (config.fullscreen.hideControls) {
-                // Show the controls on mouse move
-                _on(plyr.media, 'mousemove', _showControls);
             }
 
             // Proxy events to container
@@ -2710,7 +2771,7 @@
             }
 
             // Restore native video controls
-            _toggleControls(true);
+            _toggleNativeControls(true);
 
             // Clone the media element to remove listeners
             // http://stackoverflow.com/questions/19469881/javascript-remove-all-event-listeners-of-specific-type
@@ -2808,7 +2869,7 @@
                 _remove(_getElement(config.selectors.controls.wrapper));
 
                 // Restore native controls
-                _toggleControls(true);
+                _toggleNativeControls(true);
 
                 // Bail
                 return;
@@ -2835,7 +2896,7 @@
             _mediaListeners();
 
             // Remove native controls
-            _toggleControls();
+            _toggleNativeControls();
 
             // Setup fullscreen
             _setupFullscreen();
