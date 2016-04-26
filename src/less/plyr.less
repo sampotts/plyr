@@ -7,7 +7,7 @@
 // -------------------------------
 
 // Colors
-@plyr-color-main:                    #63B4E1;
+@plyr-color-main:                    #3498DB;
 
 // Font sizes
 @plyr-font-size-small:               14px;
@@ -55,9 +55,10 @@
 @range-thumb-width:                  floor(@range-track-height * 2);
 @range-thumb-bg:                     #fff;
 @range-thumb-border:                 2px solid transparent;
+@range-thumb-shadow:                 0 1px 1px fade(@plyr-video-controls-bg, 15%);
 @range-thumb-active-border-color:    #fff;
 @range-thumb-active-bg:              @plyr-video-control-bg-hover;
-@range-thumb-shadow:                 0 1px 1px fade(@plyr-video-controls-bg, 15%);
+@range-thumb-active-scale:           1.25;
 
 // Breakpoints
 @plyr-bp-control-split:              560px; // When controls split into left/right
@@ -72,9 +73,9 @@
 // Mixins
 // -------------------------------
 // <input type="range"> styling
-.range-track() {
+.range-track(@background: @range-track-bg) {
     height: @range-track-height;
-    background: @range-track-bg;
+    background: @background;
     border: 0;
     border-radius: (@range-track-height / 2);
     user-select: none;
@@ -93,7 +94,7 @@
 .range-thumb-active() {
     background: @range-thumb-active-bg;
     border-color: @range-thumb-active-border-color;
-    transform: scale(1.25);
+    transform: scale(@range-thumb-active-scale);
 }
 
 // Styles
@@ -132,7 +133,7 @@
     // Specificity is for bootstrap compatibility
     input[type='range'] {
         display: block;
-        height: @range-thumb-height;
+        height: (@range-thumb-height * @range-thumb-active-scale);
         width: 100%;
         margin: 0;
         padding: 0; 
@@ -171,17 +172,17 @@
             border: 0;
             color: transparent;
         }
-        &::-ms-fill-lower,
         &::-ms-fill-upper {
             .range-track();
         }
+        &::-ms-fill-lower {
+            .range-track(@plyr-progress-playing-bg);
+        }
         &::-ms-thumb {
             .range-thumb();
-
             // For some reason, Edge uses the -webkit margin above
             margin-top: 0; 
         }
-
         &::-ms-tooltip {
             display: none;
         }
@@ -229,6 +230,9 @@
     position: relative;
     background: #000;
     border-radius: inherit;
+
+    // Cleaner radius, also forces iframe radius
+    -webkit-mask-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC);
 }
 
 // Container for embeds
@@ -277,6 +281,7 @@
     font-size: @plyr-font-size-captions-base;
     text-align: center;
     font-weight: 400;
+    -webkit-font-smoothing: subpixel-antialiased;
 
     span {
         border-radius: 2px;
@@ -488,6 +493,7 @@
     color: @plyr-tooltip-color;
     font-size: @plyr-font-size-small;
     line-height: 1.3;
+    -webkit-font-smoothing: subpixel-antialiased;
 
     transform: translate(-50%, 10px) scale(.8);
     transform-origin: 50% 100%;
@@ -539,7 +545,6 @@
         &::-moz-range-track {
             background: transparent;
         }
-        &::-ms-fill-lower,
         &::-ms-fill-upper {
             background: transparent;
         }
@@ -586,6 +591,7 @@
     z-index: 1;
     color: @plyr-progress-playing-bg;
     background: transparent;
+    transition: none;
 
     &::-webkit-progress-value {
         min-width: @range-track-height;
@@ -598,9 +604,7 @@
         border-bottom-right-radius: 0;
     }
     &::-ms-fill {
-        min-width: @range-track-height;
-        border-top-right-radius: 0;
-        border-bottom-right-radius: 0;
+        display: none;
     }
 }
 .plyr__progress--buffer[value] {
@@ -643,6 +647,7 @@
     vertical-align: middle;
     font-size: @plyr-font-size-small;
     line-height: .95;
+    -webkit-font-smoothing: subpixel-antialiased;
 }
 
 // Media duration hidden on small screens
@@ -671,14 +676,9 @@
 // Hide sound controls on iOS
 // It's not supported to change volume using JavaScript:
 // https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html
-.plyr--is-ios .plyr__volume,
-.plyr--is-ios [data-plyr='mute'],
-.plyr--is-ios.plyr--audio .plyr__controls--right {
+.plyr--is-ios .plyr__volume[type='range'],
+.plyr--is-ios [data-plyr='mute'] {
     display: none;
-}
-// Center buttons so it looks less odd
-.plyr--is-ios.plyr--audio .plyr__controls--left {
-    float: none;
 }
 
 // Fullscreen
@@ -694,6 +694,7 @@
     width: 100%;
     z-index: 10000000;
     background: #000;
+    border-radius: 0;
 
     video {
         height: 100%;

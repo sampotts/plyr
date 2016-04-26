@@ -2269,7 +2269,7 @@
             _pause();
 
             // Set seek input to 0
-            if(plyr.buttons.seek) {
+            if(plyr.buttons && plyr.buttons.seek) {
                 plyr.buttons.seek.value = 0;
             }
 
@@ -2559,11 +2559,20 @@
             _on(plyr.media, 'waiting canplay seeked', _checkLoading);
 
             // Click video
-            if (config.clickToPlay) {
-                // Set cursor
-                plyr.videoContainer.style.cursor = "pointer";
+            if (config.clickToPlay && plyr.type !== 'audio') {
+                // Re-fetch the wrapper
+                var wrapper = _getElement('.' + config.classes.videoWrapper);
 
-                _on(plyr.media, 'click', function() {
+                // Bail if there's no wrapper (this should never happen)
+                if(!wrapper) {
+                    return;
+                }
+
+                // Set cursor
+                wrapper.style.cursor = "pointer";
+
+                // On click play, pause ore restart
+                _on(wrapper, 'click', function() {
                     if (plyr.media.paused) {
                         _play();
                     }
