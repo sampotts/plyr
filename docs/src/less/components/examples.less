@@ -7,19 +7,24 @@ section {
     max-width: @example-width-video;
 }
 
-video,
-.plyr__video-embed {
-    max-width: 100%;
-    vertical-align: middle;
-}
-
 // Example players
 .plyr {
     margin: 0 auto;
-    border-radius: @border-radius-base;
+    border-radius: @border-radius-large;
 }
 .plyr--audio {
     max-width: @example-width-audio;
+}
+.plyr--video::after {
+    content: "";
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border: 1px solid fade(#000, 15%);
+    border-radius: inherit;
 }
 
 // Style full supported player
