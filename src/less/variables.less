@@ -1,0 +1,66 @@
+// ==========================================================================
+// Plyr variables
+// https://github.com/selz/plyr
+// ==========================================================================
+
+// Colors
+@plyr-color-main:                       #3498DB;
+
+// Font sizes
+@plyr-font-size-small:                  14px;
+@plyr-font-size-base:                   16px;
+
+// Captions
+@plyr-font-size-captions-base:          ceil(@plyr-font-size-base * 1.25);
+@plyr-font-size-captions-medium:        ceil(@plyr-font-size-base * 1.5);
+@plyr-font-size-captions-large:         (@plyr-font-size-base * 2);
+
+// Controls
+@plyr-control-spacing:                  10px;
+@plyr-video-controls-bg:                #000;
+@plyr-video-control-color:              #fff;
+@plyr-video-control-color-hover:        #fff;
+@plyr-video-control-bg-hover:           @plyr-color-main;
+@plyr-audio-controls-bg:                #fff;
+@plyr-audio-controls-border:            1px solid #dbe3e8;
+@plyr-audio-controls-box-shadow:        0 1px 1px fade(#000, 5%);
+@plyr-audio-control-color:              #565D64;
+@plyr-audio-control-color-hover:        #fff;
+@plyr-audio-control-bg-hover:           @plyr-color-main;
+
+// Tooltips
+@plyr-tooltip-bg:                       @plyr-video-controls-bg;
+@plyr-tooltip-border-color:             fade(darken(@plyr-video-controls-bg, 75%), 10%);
+@plyr-tooltip-arrow-border-color:       fade(darken(@plyr-video-controls-bg, 75%), 20%);
+@plyr-tooltip-border-width:             1px;
+@plyr-tooltip-shadow:                   0 0 5px @plyr-tooltip-border-color, 0 0 0 @plyr-tooltip-border-width @plyr-tooltip-border-color;
+@plyr-tooltip-color:                    @plyr-video-control-color;
+@plyr-tooltip-padding:                  (@plyr-control-spacing / 2);
+@plyr-tooltip-arrow-size:               4px;
+@plyr-tooltip-radius:                   3px;
+
+// Progress
+@plyr-progress-playing-bg:              @plyr-color-main;
+@plyr-progress-loading-size:            25px;
+@plyr-progress-loading-bg:              fade(#000, 15%);
+@plyr-video-progress-bg:                fade(#fff, 25%);
+@plyr-video-progress-buffered-bg:       @plyr-video-progress-bg;
+@plyr-audio-progress-bg:                fade(#C6D6DB, 66%);
+@plyr-audio-progress-buffered-bg:       @plyr-audio-progress-bg;
+
+// Range sliders
+@plyr-range-track-height:               8px;
+@plyr-range-thumb-height:               floor(@plyr-range-track-height * 2);
+@plyr-range-thumb-width:                floor(@plyr-range-track-height * 2);
+@plyr-range-thumb-bg:                   #fff;
+@plyr-range-thumb-border:               2px solid transparent;
+@plyr-range-thumb-shadow:               0 1px 1px fade(@plyr-video-controls-bg, 15%), 0 0 0 1px fade(#000, 15%);
+@plyr-range-thumb-active-border-color:  #fff;
+@plyr-range-thumb-active-bg:            @plyr-video-control-bg-hover;
+@plyr-range-thumb-active-scale:         1.25;
+@plyr-video-range-track-bg:             @plyr-video-progress-buffered-bg;
+@plyr-audio-range-track-bg:             @plyr-audio-progress-buffered-bg;
+
+// Breakpoints
+@plyr-bp-screen-sm:                     480px;
+@plyr-bp-screen-md:                     768px;

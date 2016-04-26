@@ -3,101 +3,13 @@
 // https://github.com/selz/plyr
 // ==========================================================================
 
-// Variables
-// -------------------------------
-
-// Colors
-@plyr-color-main:                       #3498DB;
-
-// Font sizes
-@plyr-font-size-small:                  14px;
-@plyr-font-size-base:                   16px;
-
-// Captions
-@plyr-font-size-captions-base:          ceil(@plyr-font-size-base * 1.25);
-@plyr-font-size-captions-medium:        ceil(@plyr-font-size-base * 1.5);
-@plyr-font-size-captions-large:         (@plyr-font-size-base * 2);
-
-// Controls
-// #C6D6DB
-@plyr-control-spacing:                  10px;
-@plyr-video-controls-bg:                #000;
-@plyr-video-control-color:              #fff;
-@plyr-video-control-color-hover:        #fff;
-@plyr-video-control-bg-hover:           @plyr-color-main;
-@plyr-audio-controls-bg:                transparent;
-@plyr-audio-control-color:              #565D64;
-@plyr-audio-control-color-hover:        #fff;
-@plyr-audio-control-bg-hover:           @plyr-color-main;
-
-// Tooltips
-@plyr-tooltip-bg:                       @plyr-video-controls-bg;
-@plyr-tooltip-border-color:             fade(darken(@plyr-video-controls-bg, 75%), 10%);
-@plyr-tooltip-arrow-border-color:       fade(darken(@plyr-video-controls-bg, 75%), 20%);
-@plyr-tooltip-border-width:             1px;
-@plyr-tooltip-shadow:                   0 0 5px @plyr-tooltip-border-color, 0 0 0 @plyr-tooltip-border-width @plyr-tooltip-border-color;
-@plyr-tooltip-color:                    @plyr-video-control-color;
-@plyr-tooltip-padding:                  (@plyr-control-spacing / 2);
-@plyr-tooltip-arrow-size:               4px;
-@plyr-tooltip-radius:                   3px;
-
-// Progress
-@plyr-progress-playing-bg:              @plyr-color-main;
-@plyr-progress-loading-size:            25px;
-@plyr-progress-loading-bg:              fade(#000, 15%);
-@plyr-video-progress-bg:                fade(#fff, 25%);
-@plyr-video-progress-buffered-bg:       @plyr-video-progress-bg;
-@plyr-audio-progress-bg:                fade(#C6D6DB, 66%);
-@plyr-audio-progress-buffered-bg:       @plyr-audio-progress-bg;
-
-// Range sliders
-@plyr-range-track-height:               8px;
-@plyr-range-thumb-height:               floor(@plyr-range-track-height * 2);
-@plyr-range-thumb-width:                floor(@plyr-range-track-height * 2);
-@plyr-range-thumb-bg:                   #fff;
-@plyr-range-thumb-border:               2px solid transparent;
-@plyr-range-thumb-shadow:               0 1px 1px fade(@plyr-video-controls-bg, 15%), 0 0 0 1px fade(#000, 15%);
-@plyr-range-thumb-active-border-color:  #fff;
-@plyr-range-thumb-active-bg:            @plyr-video-control-bg-hover;
-@plyr-range-thumb-active-scale:         1.25;
-@plyr-video-range-track-bg:             @plyr-video-progress-buffered-bg;
-@plyr-audio-range-track-bg:             @plyr-audio-progress-buffered-bg;
-
-// Breakpoints
-@plyr-bp-screen-sm:                     480px;
-@plyr-bp-screen-md:                     768px;
+@import "variables";
+@import "mixins";
 
 // Animation
 // ---------------------------------------
 @keyframes plyr-progress {
     to { background-position: @plyr-progress-loading-size 0; }
-}
-
-// Mixins
-// -------------------------------
-// <input type="range"> styling
-.range-track() {
-    height: @plyr-range-track-height;
-    background: currentColor;
-    border: 0;
-    border-radius: (@plyr-range-track-height / 2);
-    user-select: none;
-}
-.range-thumb() {
-    position: relative;
-    height: @plyr-range-thumb-height;
-    width: @plyr-range-thumb-width;
-    background: @plyr-range-thumb-bg;
-    border: @plyr-range-thumb-border;
-    border-radius: 100%;
-    transition: background .2s ease, border .2s ease, transform .2s ease;
-    box-shadow: @plyr-range-thumb-shadow;
-    box-sizing: border-box;
-}
-.range-thumb-active() {
-    background: @plyr-range-thumb-active-bg;
-    border-color: @plyr-range-thumb-active-border-color;
-    transform: scale(@plyr-range-thumb-active-scale);
 }
 
 // Styles
@@ -149,20 +61,20 @@
         
         // WebKit
         &::-webkit-slider-runnable-track {
-            .range-track();
+            .plyr-range-track();
         }
         &::-webkit-slider-thumb {
             -webkit-appearance: none;
             margin-top: -((@plyr-range-thumb-height - @plyr-range-track-height) / 2);
-            .range-thumb();
+            .plyr-range-thumb();
         }
 
         // Mozilla
         &::-moz-range-track {
-            .range-track();
+            .plyr-range-track();
         }
         &::-moz-range-thumb {
-            .range-thumb();
+            .plyr-range-thumb();
         }
         &::-moz-focus-outer {
             border: 0;
@@ -176,14 +88,14 @@
             color: transparent;
         }
         &::-ms-fill-upper {
-            .range-track();
+            .plyr-range-track();
         }
         &::-ms-fill-lower {
-            .range-track();
+            .plyr-range-track();
             background: @plyr-progress-playing-bg;
         }
         &::-ms-thumb {
-            .range-thumb();
+            .plyr-range-thumb();
             // For some reason, Edge uses the -webkit margin above
             margin-top: 0; 
         }
@@ -205,17 +117,19 @@
         // Pressed styles
         &:active {
             &::-webkit-slider-thumb {
-                .range-thumb-active();
+                .plyr-range-thumb-active();
             }
             &::-moz-range-thumb {
-                .range-thumb-active();
+                .plyr-range-thumb-active();
             }
             &::-ms-thumb {
-                .range-thumb-active();
+                .plyr-range-thumb-active();
             }
         }
     }
 }
+
+// Video range inputs
 .plyr--video input[type='range'] {
     color: @plyr-video-range-track-bg;
 
@@ -223,6 +137,8 @@
         outline: 1px dotted fade(@plyr-video-control-color, 50%);
     }
 }
+
+// Audio range inputs
 .plyr--audio input[type='range'] {
     color: @plyr-audio-range-track-bg;
 
@@ -425,10 +341,14 @@
         padding-right: (@plyr-control-spacing * 1.5);
     }
 }
+
+// Audio controls
 .plyr--audio .plyr__controls {
     padding: @plyr-control-spacing;
     border-radius: inherit;
     background: @plyr-audio-controls-bg;
+    border: @plyr-audio-controls-border;
+    box-shadow: @plyr-audio-controls-box-shadow;
     color: @plyr-audio-control-color;
 
     button {
@@ -441,7 +361,7 @@
     }
 }
 
-// Large play button
+// Large play button (video only)
 .plyr__play-large {
     position: absolute;
     top: 50%;

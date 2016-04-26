@@ -12,7 +12,7 @@ var fs          = require("fs"),
     uglify      = require("gulp-uglify"),
     less        = require("gulp-less"),
     sass        = require("gulp-sass"),
-    minify      = require("gulp-minify-css"),
+    cleanCSS    = require("gulp-clean-css"),
     run         = require("run-sequence"),
     prefix      = require("gulp-autoprefixer"),
     svgstore    = require("gulp-svgstore"),
@@ -104,7 +104,7 @@ var build = {
                         .on("error", gutil.log)
                         .pipe(concat(key))
                         .pipe(prefix(["last 2 versions"], { cascade: true }))
-                        .pipe(minify())
+                        .pipe(cleanCSS())
                         .pipe(gulp.dest(paths[bundle].output));
                 });
             })(key);
@@ -123,7 +123,7 @@ var build = {
                         .on("error", gutil.log)
                         .pipe(concat(key))
                         .pipe(prefix(["last 2 versions"], { cascade: true }))
-                        .pipe(minify())
+                        .pipe(cleanCSS())
                         .pipe(gulp.dest(paths[bundle].output));
                 });
             })(key);
