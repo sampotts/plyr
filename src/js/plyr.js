@@ -1855,6 +1855,11 @@
             // Set mute on the player
             plyr.media.muted = muted;
 
+            // If volume is 0 after unmuting, set to default
+            if(plyr.media.volume === 0) {
+                _setVolume(config.volume);
+            }
+
             // Embeds
             if(_inArray(config.types.embed, plyr.type)) {
                 // YouTube
@@ -1904,9 +1909,6 @@
 
             // Set the player volume
             plyr.media.volume = parseFloat(volume / 10);
-
-            // Store in config
-            config.volume = volume;
 
             // Embeds
             if(_inArray(config.types.embed, plyr.type)) {
