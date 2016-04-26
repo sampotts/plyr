@@ -7,62 +7,65 @@
 // -------------------------------
 
 // Colors
-@plyr-color-main:                    #3498DB;
+@plyr-color-main:                       #3498DB;
 
 // Font sizes
-@plyr-font-size-small:               14px;
-@plyr-font-size-base:                16px;
+@plyr-font-size-small:                  14px;
+@plyr-font-size-base:                   16px;
 
 // Captions
-@plyr-font-size-captions-base:       ceil(@plyr-font-size-base * 1.25);
-@plyr-font-size-captions-medium:     ceil(@plyr-font-size-base * 1.5);
-@plyr-font-size-captions-large:      (@plyr-font-size-base * 2);
+@plyr-font-size-captions-base:          ceil(@plyr-font-size-base * 1.25);
+@plyr-font-size-captions-medium:        ceil(@plyr-font-size-base * 1.5);
+@plyr-font-size-captions-large:         (@plyr-font-size-base * 2);
 
 // Controls
 // #C6D6DB
-@plyr-control-spacing:               10px;
-@plyr-video-controls-bg:             #000;
-@plyr-video-control-color:           #fff;
-@plyr-video-control-color-hover:     #fff;
-@plyr-video-control-bg-hover:        @plyr-color-main;
-@plyr-audio-controls-bg:             transparent;
-@plyr-audio-control-color:           #565D64;
-@plyr-audio-control-color-hover:     #fff;
-@plyr-audio-control-bg-hover:        @plyr-color-main;
+@plyr-control-spacing:                  10px;
+@plyr-video-controls-bg:                #000;
+@plyr-video-control-color:              #fff;
+@plyr-video-control-color-hover:        #fff;
+@plyr-video-control-bg-hover:           @plyr-color-main;
+@plyr-audio-controls-bg:                transparent;
+@plyr-audio-control-color:              #565D64;
+@plyr-audio-control-color-hover:        #fff;
+@plyr-audio-control-bg-hover:           @plyr-color-main;
 
 // Tooltips
-@plyr-tooltip-bg:                    @plyr-video-controls-bg;
-@plyr-tooltip-border-color:          fade(darken(@plyr-video-controls-bg, 75%), 10%);
-@plyr-tooltip-arrow-border-color:    fade(darken(@plyr-video-controls-bg, 75%), 20%);
-@plyr-tooltip-border-width:          1px;
-@plyr-tooltip-shadow:                0 0 5px @plyr-tooltip-border-color, 0 0 0 @plyr-tooltip-border-width @plyr-tooltip-border-color;
-@plyr-tooltip-color:                 @plyr-video-control-color;
-@plyr-tooltip-padding:               (@plyr-control-spacing / 2);
-@plyr-tooltip-arrow-size:            4px;
-@plyr-tooltip-radius:                3px;
+@plyr-tooltip-bg:                       @plyr-video-controls-bg;
+@plyr-tooltip-border-color:             fade(darken(@plyr-video-controls-bg, 75%), 10%);
+@plyr-tooltip-arrow-border-color:       fade(darken(@plyr-video-controls-bg, 75%), 20%);
+@plyr-tooltip-border-width:             1px;
+@plyr-tooltip-shadow:                   0 0 5px @plyr-tooltip-border-color, 0 0 0 @plyr-tooltip-border-width @plyr-tooltip-border-color;
+@plyr-tooltip-color:                    @plyr-video-control-color;
+@plyr-tooltip-padding:                  (@plyr-control-spacing / 2);
+@plyr-tooltip-arrow-size:               4px;
+@plyr-tooltip-radius:                   3px;
 
 // Progress
-@plyr-progress-bg:                   fade(@plyr-video-control-color, 25%);
-@plyr-progress-playing-bg:           @plyr-color-main;
-@plyr-progress-buffered-bg:          fade(@plyr-video-control-color, 25%);
-@plyr-progress-loading-size:         25px;
-@plyr-progress-loading-bg:           fade(#000, 15%);
+@plyr-progress-playing-bg:              @plyr-color-main;
+@plyr-progress-loading-size:            25px;
+@plyr-progress-loading-bg:              fade(#000, 15%);
+@plyr-video-progress-bg:                fade(#fff, 25%);
+@plyr-video-progress-buffered-bg:       @plyr-video-progress-bg;
+@plyr-audio-progress-bg:                fade(#C6D6DB, 66%);
+@plyr-audio-progress-buffered-bg:       @plyr-audio-progress-bg;
 
 // Range sliders
-@range-track-height:                 8px;
-@range-track-bg:                     fade(#fff, 25%);
-@range-thumb-height:                 floor(@range-track-height * 2);
-@range-thumb-width:                  floor(@range-track-height * 2);
-@range-thumb-bg:                     #fff;
-@range-thumb-border:                 2px solid transparent;
-@range-thumb-shadow:                 0 1px 1px fade(@plyr-video-controls-bg, 15%);
-@range-thumb-active-border-color:    #fff;
-@range-thumb-active-bg:              @plyr-video-control-bg-hover;
-@range-thumb-active-scale:           1.25;
+@plyr-range-track-height:               8px;
+@plyr-range-thumb-height:               floor(@plyr-range-track-height * 2);
+@plyr-range-thumb-width:                floor(@plyr-range-track-height * 2);
+@plyr-range-thumb-bg:                   #fff;
+@plyr-range-thumb-border:               2px solid transparent;
+@plyr-range-thumb-shadow:               0 1px 1px fade(@plyr-video-controls-bg, 15%), 0 0 0 1px fade(#000, 15%);
+@plyr-range-thumb-active-border-color:  #fff;
+@plyr-range-thumb-active-bg:            @plyr-video-control-bg-hover;
+@plyr-range-thumb-active-scale:         1.25;
+@plyr-video-range-track-bg:             @plyr-video-progress-buffered-bg;
+@plyr-audio-range-track-bg:             @plyr-audio-progress-buffered-bg;
 
 // Breakpoints
-@plyr-bp-control-split:              560px; // When controls split into left/right
-@plyr-bp-captions-large:             768px; // When captions jump to the larger font size
+@plyr-bp-screen-sm:                     480px;
+@plyr-bp-screen-md:                     768px;
 
 // Animation
 // ---------------------------------------
@@ -73,28 +76,28 @@
 // Mixins
 // -------------------------------
 // <input type="range"> styling
-.range-track(@background: @range-track-bg) {
-    height: @range-track-height;
-    background: @background;
+.range-track() {
+    height: @plyr-range-track-height;
+    background: currentColor;
     border: 0;
-    border-radius: (@range-track-height / 2);
+    border-radius: (@plyr-range-track-height / 2);
     user-select: none;
 }
 .range-thumb() {
     position: relative;
-    height: @range-thumb-height;
-    width: @range-thumb-width;
-    background: @range-thumb-bg;
-    border: @range-thumb-border;
+    height: @plyr-range-thumb-height;
+    width: @plyr-range-thumb-width;
+    background: @plyr-range-thumb-bg;
+    border: @plyr-range-thumb-border;
     border-radius: 100%;
     transition: background .2s ease, border .2s ease, transform .2s ease;
-    box-shadow: @range-thumb-shadow;
+    box-shadow: @plyr-range-thumb-shadow;
     box-sizing: border-box;
 }
 .range-thumb-active() {
-    background: @range-thumb-active-bg;
-    border-color: @range-thumb-active-border-color;
-    transform: scale(@range-thumb-active-scale);
+    background: @plyr-range-thumb-active-bg;
+    border-color: @plyr-range-thumb-active-border-color;
+    transform: scale(@plyr-range-thumb-active-scale);
 }
 
 // Styles
@@ -133,7 +136,7 @@
     // Specificity is for bootstrap compatibility
     input[type='range'] {
         display: block;
-        height: (@range-thumb-height * @range-thumb-active-scale);
+        height: (@plyr-range-thumb-height * @plyr-range-thumb-active-scale);
         width: 100%;
         margin: 0;
         padding: 0; 
@@ -144,13 +147,13 @@
         border: none;
         background: transparent;
         
-        // Webkit
+        // WebKit
         &::-webkit-slider-runnable-track {
             .range-track();
         }
         &::-webkit-slider-thumb {
             -webkit-appearance: none;
-            margin-top: -((@range-thumb-height - @range-track-height) / 2);
+            margin-top: -((@plyr-range-thumb-height - @plyr-range-track-height) / 2);
             .range-thumb();
         }
 
@@ -167,7 +170,7 @@
         
         // Microsoft
         &::-ms-track {
-            height: @range-track-height;
+            height: @plyr-range-track-height;
             background: transparent;
             border: 0;
             color: transparent;
@@ -176,7 +179,8 @@
             .range-track();
         }
         &::-ms-fill-lower {
-            .range-track(@plyr-progress-playing-bg);
+            .range-track();
+            background: @plyr-progress-playing-bg;
         }
         &::-ms-thumb {
             .range-thumb();
@@ -195,7 +199,6 @@
             border: 0;
         }        
         &.tab-focus:focus {
-            outline: 1px dotted fade(@plyr-video-control-color, 50%);
             outline-offset: 3px;
         }
         
@@ -211,6 +214,20 @@
                 .range-thumb-active();
             }
         }
+    }
+}
+.plyr--video input[type='range'] {
+    color: @plyr-video-range-track-bg;
+
+    &.tab-focus:focus {
+        outline: 1px dotted fade(@plyr-video-control-color, 50%);
+    }
+}
+.plyr--audio input[type='range'] {
+    color: @plyr-audio-range-track-bg;
+
+    &.tab-focus:focus {
+        outline: 1px dotted fade(@plyr-audio-control-color, 50%);
     }
 }
 
@@ -292,7 +309,7 @@
         display: none;
     }
 
-    @media (min-width: @plyr-bp-captions-large) {
+    @media (min-width: @plyr-bp-screen-md) {
         font-size: @plyr-font-size-captions-medium;
     }
 }
@@ -323,7 +340,7 @@
     > button,
     .plyr__progress,
     .plyr__time {
-        margin-left: @plyr-control-spacing;
+        margin-left: (@plyr-control-spacing / 2);
 
         &:first-child {
             margin-left: 0;
@@ -342,7 +359,7 @@
         display: inline-block;
         flex-shrink: 0;
         vertical-align: middle;
-        padding: (@plyr-control-spacing / 2) @plyr-control-spacing;
+        padding: (@plyr-control-spacing / 2);
         border: 0;
         background: transparent;
         border-radius: 3px;
@@ -369,6 +386,17 @@
     .icon--captions-on {
         display: none;
     }
+
+    @media (min-width: @plyr-bp-screen-sm) {
+        > button,
+        .plyr__progress,
+        .plyr__time {
+            margin-left: @plyr-control-spacing;
+        }
+        button {
+            padding: (@plyr-control-spacing / 2) @plyr-control-spacing;
+        }
+    }
 }
 
 // Video controls
@@ -377,7 +405,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    padding: (@plyr-control-spacing * 5) (@plyr-control-spacing * 1.5) @plyr-control-spacing;
+    padding: (@plyr-control-spacing * 5) @plyr-control-spacing @plyr-control-spacing;
     background: linear-gradient(fade(@plyr-video-controls-bg, 0%), fade(@plyr-video-controls-bg, 50%));
     border-bottom-left-radius: inherit;
     border-bottom-right-radius: inherit;
@@ -390,6 +418,11 @@
             background: @plyr-video-control-bg-hover;
             color: @plyr-video-control-color-hover;
         }
+    }
+
+    @media (min-width: @plyr-bp-screen-sm) {
+        padding-left: (@plyr-control-spacing * 1.5);
+        padding-right: (@plyr-control-spacing * 1.5);
     }
 }
 .plyr--audio .plyr__controls {
@@ -562,8 +595,8 @@
     left: 0;
     top: 50%;
     width: 100%;
-    height: @range-track-height;
-    margin: -(@range-track-height / 2) 0 0;
+    height: @plyr-range-track-height;
+    margin: -(@plyr-range-track-height / 2) 0 0;
     padding: 0;
     vertical-align: top;
     appearance: none;
@@ -576,12 +609,12 @@
     &::-webkit-progress-value {
         background: currentColor;
         border-radius: 100px;
-        min-width: @range-track-height;
+        min-width: @plyr-range-track-height;
     }
     &::-moz-progress-bar {
         background: currentColor;
         border-radius: 100px;
-        min-width: @range-track-height;
+        min-width: @plyr-range-track-height;
     }
     &::-ms-fill {
         border-radius: 100px;
@@ -594,12 +627,12 @@
     transition: none;
 
     &::-webkit-progress-value {
-        min-width: @range-track-height;
+        min-width: @plyr-range-track-height;
         border-top-right-radius: 0;
         border-bottom-right-radius: 0;
     }
     &::-moz-progress-bar {
-        min-width: @range-track-height;
+        min-width: @plyr-range-track-height;
         border-top-right-radius: 0;
         border-bottom-right-radius: 0;
     }
@@ -608,9 +641,6 @@
     }
 }
 .plyr__progress--buffer[value] {
-    color: @plyr-progress-buffered-bg;
-    background: @range-track-bg;
-
     &::-webkit-progress-value {
         transition: width .2s ease;
     }
@@ -621,13 +651,20 @@
         transition: width .2s ease;
     }            
 }
+.plyr--video .plyr__progress--buffer[value] { 
+    color: @plyr-video-progress-buffered-bg;
+    background: @plyr-video-range-track-bg;
+}
+.plyr--audio .plyr__progress--buffer[value] { 
+    color: @plyr-audio-progress-buffered-bg;
+    background: @plyr-audio-range-track-bg;
+}
 
 // Loading state
 .plyr--loading .plyr__progress--buffer {
     animation: plyr-progress 1s linear infinite;
     background-size: @plyr-progress-loading-size @plyr-progress-loading-size;
     background-repeat: repeat-x;
-    background-color: @plyr-progress-buffered-bg;
     background-image: linear-gradient(
         -45deg,
         @plyr-progress-loading-bg 25%,
@@ -638,6 +675,12 @@
         transparent 75%,
         transparent);
     color: transparent;
+}
+.plyr--video.plyr--loading .plyr__progress--buffer {
+    background-color: @plyr-video-progress-buffered-bg;
+}
+.plyr--audio.plyr--loading .plyr__progress--buffer {
+    background-color: @plyr-audio-progress-buffered-bg;
 }
 
 // Time
@@ -650,27 +693,20 @@
     -webkit-font-smoothing: subpixel-antialiased;
 }
 
-// Media duration hidden on small screens
-.plyr__time + .plyr__time {
-    display: none;
-
-    @media (min-width: @plyr-bp-control-split) {
-        display: inline-block;
-    }
-
-    // Add a slash in before
-    &::before {
-        content: '\2044';
-        margin-right: @plyr-control-spacing;
-    }
-}
-
 // Volume
 // --------------------------------------------------------------
 // <input[type='range']> element
 // Specificity is for bootstrap compatibility
-.plyr__volume[type='range'] {
-    max-width: 100px;
+.plyr .plyr__volume[type='range'] {
+    display: none;
+
+    @media (min-width: @plyr-bp-screen-sm) {
+        display: block;
+        max-width: 60px;
+    }
+    @media (min-width: @plyr-bp-screen-md) {
+        max-width: 100px;
+    }
 }
 
 // Hide sound controls on iOS
@@ -678,7 +714,7 @@
 // https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html
 .plyr--is-ios .plyr__volume[type='range'],
 .plyr--is-ios [data-plyr='mute'] {
-    display: none;
+    display: none !important;
 }
 
 // Fullscreen

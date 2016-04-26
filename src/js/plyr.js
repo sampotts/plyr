@@ -2423,6 +2423,11 @@
                 var trigger = plyr.buttons[play ? 'play' : 'pause'],
                     target = plyr.buttons[play ? 'pause' : 'play'];
 
+                // Get the last play button to account for the large play button
+                if(target && target.length > 1) {
+                    target = target[target.length - 1];
+                }
+
                 // Setup focus and tab focus
                 if(target) {
                     var hadTabFocus = _hasClass(trigger, config.classes.tabFocus);
