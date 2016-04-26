@@ -390,57 +390,39 @@
         return false;
     }
 
-    // Debounce
-    // deBouncer by hnldesign.nl
-    // based on code by Paul Irish and the original debouncing function from John Hann
-    // http://unscriptable.com/index.php/2009/03/20/debouncing-javascript-methods/
-    function _debounce(func, threshold, execAsap) {
-        var timeout;
-        return function debounced () {
-            var obj = this, args = arguments;
-            function delayed () {
-                if (!execAsap) {
-                    func.apply(obj, args);
-                }
-                timeout = null;
-            }
-            if (timeout) {
-                clearTimeout(timeout);
-            }
-            else if (execAsap) {
-                func.apply(obj, args);
-            }
-            timeout = setTimeout(delayed, threshold || 100);
-        };
-    }
-
     // Bind event
-    function _on(element, events, callback) {
+    function _on(element, events, callback, useCapture) {
         if (element) {
-            _toggleListener(element, events, callback, true);
+            _toggleListener(element, events, callback, true, useCapture);
         }
     }
 
     // Unbind event
-    function _off(element, events, callback) {
+    function _off(element, events, callback, useCapture) {
         if (element) {
-            _toggleListener(element, events, callback, false);
+            _toggleListener(element, events, callback, false, useCapture);
         }
     }
 
     // Bind along with custom handler
-    function _proxyListener(element, eventName, userListener, defaultListener) {
+    function _proxyListener(element, eventName, userListener, defaultListener, useCapture) {
         _on(element, eventName, function(event) {
             if(userListener) {
                 userListener.apply(element, [event]);
             }
             defaultListener.apply(element, [event]);
-        });
+        }, useCapture);
     }
 
     // Toggle event listener
-    function _toggleListener(element, events, callback, toggle) {
+    function _toggleListener(element, events, callback, toggle, useCapture) {
         var eventList = events.split(' ');
+
+        // Whether the listener is a capturing listener or not
+        // Default to false
+        if(typeof useCapture !== 'boolean') {
+            useCapture = false;
+        }
 
         // If a nodelist is passed, call itself on each node
         if (element instanceof NodeList) {
@@ -454,7 +436,7 @@
 
         // If a single node is passed, bind the event listener
         for (var i = 0; i < eventList.length; i++) {
-            element[toggle ? 'addEventListener' : 'removeEventListener'](eventList[i], callback, false);
+            element[toggle ? 'addEventListener' : 'removeEventListener'](eventList[i], callback, useCapture);
         }
     }
 
@@ -2185,16 +2167,28 @@
             if (!config.hideControls || plyr.type === 'audio') {
                 return;
             }
-            var delay = false,
+            var delay = 0,
                 isEnterFullscreen = false,
                 show = toggle;
 
             // Default to false if no boolean
             if(typeof toggle !== "boolean") {
                 if(toggle && toggle.type) {
-                    delay = (toggle.type === 'mousemove');
+                    // Is the enter fullscreen event
                     isEnterFullscreen = (toggle.type === 'enterfullscreen');
-                    show = _inArray(['mousemove','mouseenter'], toggle.type);
+
+                    // Whether to show controls
+                    show = _inArray(['mousemove', 'mouseenter', 'focus'], toggle.type);
+
+                    // Delay hiding on mousemove events
+                    if (toggle.type === 'mousemove') {
+                        delay = 2000;
+                    }
+
+                    // Delay a little more for keyboard users
+                    if (toggle.type === 'focus') {
+                        delay = 3000;
+                    }
                 }
                 else {
                     show = false;
@@ -2218,13 +2212,13 @@
             // set the timer to hide the controls 
             if(!show || !plyr.media.paused) {
                 plyr.timers.hover = window.setTimeout(function() {
-                    // If the mouse is over the controls, bail
+                    // If the mouse is over the controls (and not entering fullscreen), bail
                     if(plyr.controls.active && !isEnterFullscreen) {
                         return;
                     }
 
                     _toggleClass(plyr.container, config.classes.hideControls, true);
-                }, delay ? 2000 : 0);
+                }, delay);
             }
         }
 
@@ -2446,6 +2440,7 @@
             // Detect tab focus
             function checkFocus() {
                 var focused = document.activeElement;
+
                 if (!focused || focused == document.body) {
                     focused = null;
                 }
@@ -2455,7 +2450,14 @@
                 for (var button in plyr.buttons) {
                     var element = plyr.buttons[button];
 
-                    _toggleClass(element, config.classes.tabFocus, (element === focused));
+                    if (element instanceof NodeList) {
+                        for (var i = 0; i < element.length; i++) {
+                            _toggleClass(element[i], config.classes.tabFocus, (element[i] === focused));
+                        }
+                    }
+                    else {
+                        _toggleClass(element, config.classes.tabFocus, (element === focused));
+                    }
                 }
             }
             _on(window, 'keyup', function(event) {
@@ -2518,14 +2520,16 @@
 
             // Toggle controls visibility based on mouse movement
             if (config.hideControls) {
-                _on(plyr.container, 'mouseenter mouseleave mousemove', _toggleControls);
-                //_on(plyr.container, 'mousemove', _debounce(_toggleControls, 200, true));
-                _on(plyr.container, 'enterfullscreen', _toggleControls);
+                // Toggle controls on mouse events and entering fullscreen
+                _on(plyr.container, 'mouseenter mouseleave mousemove enterfullscreen', _toggleControls);
 
                 // Watch for cursor over controls so they don't hide when trying to interact
                 _on(plyr.controls, 'mouseenter mouseleave', function(event) { 
                     plyr.controls.active = (event.type === 'mouseenter');
                 });
+
+                // Focus in/out on controls
+                _on(plyr.controls, 'focus blur', _toggleControls, true);
             }
         }
 

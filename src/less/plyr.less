@@ -322,12 +322,6 @@
 
 // Controls
 // --------------------------------------------------------------
-// Shared
-.plyr__controls,
-.plyr__play-large {
-    transition: visibility .3s ease, opacity .3s ease;
-}
-
 // Playback controls
 .plyr__controls {
     display: flex;
@@ -335,6 +329,8 @@
 
     line-height: 1;
     text-align: center;
+
+    transition: opacity .3s ease;
 
     // Spacing
     > button,
@@ -398,6 +394,10 @@
         }
     }
 }
+// Hide controls 
+.plyr--hide-controls .plyr__controls {
+    opacity: 0;
+}
 
 // Video controls
 .plyr--video .plyr__controls {
@@ -452,6 +452,7 @@
     border: 4px solid @plyr-video-control-color;
     border-radius: 100%;
     color: @plyr-video-control-color;
+    transition: opacity .3s ease, visibility .3s ease;
 
     svg {
         position: relative;
@@ -469,6 +470,10 @@
 .plyr--audio .plyr__play-large {
     display: none;
 }
+.plyr--playing .plyr__play-large {
+    opacity: 0;
+    visibility: hidden;
+}
 
 // States
 .plyr__controls [data-plyr='pause'],
@@ -477,13 +482,6 @@
 }
 .plyr--playing .plyr__controls [data-plyr='pause'] {
     display: inline-block;
-}
-
-// Hide controls 
-.plyr--hide-controls .plyr__controls,
-.plyr--playing .plyr__play-large {
-    visibility: hidden;
-    opacity: 0;
 }
 
 // Change icons on state change
