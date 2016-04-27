@@ -1223,8 +1223,7 @@
                 plyr.progress.buffer.text     = plyr.progress.buffer.bar && plyr.progress.buffer.bar.getElementsByTagName('span')[0];
 
                 // Progress - Played
-                plyr.progress.played          = {};
-                plyr.progress.played.bar      = _getElement(config.selectors.progress.played);
+                plyr.progress.played          = _getElement(config.selectors.progress.played);
 
                 // Seek tooltip
                 plyr.progress.tooltip         = plyr.progress.container && plyr.progress.container.querySelector('.' + config.classes.tooltip);
@@ -1723,8 +1722,8 @@
             }
 
             // Update progress 
-            if(plyr.progress.played.bar) {
-                plyr.progress.played.bar.value = ((100 / duration) * targetTime);
+            if(plyr.progress && plyr.progress.played) {
+                plyr.progress.played.value = ((100 / duration) * targetTime);
             }
 
             // Set the current time
@@ -2015,7 +2014,7 @@
 
         // Update <progress> elements
         function _updateProgress(event) {
-            var progress    = plyr.progress.played.bar,
+            var progress    = plyr.progress.played,
                 text        = false,
                 value       = 0,
                 duration    = _getDuration();
@@ -2278,8 +2277,11 @@
             _pause();
 
             // Set seek input to 0
-            if(plyr.buttons && plyr.buttons.seek) {
+            if (plyr.buttons && plyr.buttons.seek) {
                 plyr.buttons.seek.value = 0;
+            }
+            if (plyr.progress && plyr.progress.played) {
+                plyr.progress.played.value = 0;
             }
 
             // Clean up YouTube stuff
@@ -2771,6 +2773,9 @@
 
                 // Remove controls
                 _remove(_getElement(config.selectors.controls.wrapper));
+
+                // Remove large play
+                _remove(_getElement(config.selectors.buttons.play));
 
                 // Restore native controls
                 _toggleNativeControls(true);

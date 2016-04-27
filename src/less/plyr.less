@@ -130,21 +130,13 @@
 }
 
 // Video range inputs
-.plyr--video input[type='range'] {
-    color: @plyr-video-range-track-bg;
-
-    &.tab-focus:focus {
-        outline: 1px dotted fade(@plyr-video-control-color, 50%);
-    }
+.plyr--video input[type='range'].tab-focus:focus {
+    outline: 1px dotted fade(@plyr-video-control-color, 50%);
 }
 
 // Audio range inputs
-.plyr--audio input[type='range'] {
-    color: @plyr-audio-range-track-bg;
-
-    &.tab-focus:focus {
-        outline: 1px dotted fade(@plyr-audio-control-color, 50%);
-    }
+.plyr--audio input[type='range'].tab-focus:focus {
+    outline: 1px dotted fade(@plyr-audio-control-color, 50%);
 }
 
 // Screen reader only elements
@@ -572,13 +564,19 @@
         transition: width .2s ease;
     }            
 }
-.plyr--video .plyr__progress--buffer[value] { 
-    color: @plyr-video-progress-buffered-bg;
+.plyr--video .plyr__progress--buffer[value],
+.plyr--video .plyr__volume--display[value] {
     background: @plyr-video-range-track-bg;
 }
-.plyr--audio .plyr__progress--buffer[value] { 
-    color: @plyr-audio-progress-buffered-bg;
+.plyr--video .plyr__progress--buffer[value] { 
+    color: @plyr-video-progress-buffered-bg;
+}
+.plyr--audio .plyr__progress--buffer[value],
+.plyr--audio .plyr__volume--display[value] {
     background: @plyr-audio-range-track-bg;
+}
+.plyr--audio .plyr__progress--buffer[value] {
+    color: @plyr-audio-progress-buffered-bg;
 }
 
 // Loading state
@@ -624,7 +622,6 @@
         position: relative;
         z-index: 2;
     }
-
     @media (min-width: @plyr-bp-screen-sm) {
         display: block;
         max-width: 60px;

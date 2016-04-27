@@ -7,6 +7,12 @@ section {
     max-width: @example-width-video;
 }
 
+// For non supported browsers
+video {
+    max-width: 100%;
+    vertical-align: middle;
+}
+
 // Example players
 .plyr {
     margin: 0 auto;
