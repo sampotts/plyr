@@ -39,6 +39,7 @@
         duration:               null,
         displayDuration:        true,
         iconPrefix:             'icon',
+        iconUrl:                '',
         clickToPlay:            true,
         hideControls:           true,
         tooltips: {
@@ -644,13 +645,14 @@
         // Build the default HTML
         function _buildControls() {
             // Create html array
-            var html = [];
+            var html = [],
+                iconPath = config.iconUrl + '#' + config.iconPrefix;
 
             // Larger overlaid play button
             if (_inArray(config.controls, 'play-large')) {
                 html.push(
                     '<button type="button" data-plyr="play" class="plyr__play-large">',
-                        '<svg><use xlink:href="#' + config.iconPrefix + '-play" /></svg>',
+                        '<svg><use xlink:href="' + iconPath + '-play" /></svg>',
                         '<span class="plyr__sr-only">' + config.i18n.play + '</span>',
                     '</button>'
                 );
@@ -662,7 +664,7 @@
             if (_inArray(config.controls, 'restart')) {
                 html.push(
                     '<button type="button" data-plyr="restart">',
-                        '<svg><use xlink:href="#' + config.iconPrefix + '-restart" /></svg>',
+                        '<svg><use xlink:href="' + iconPath + '-restart" /></svg>',
                         '<span class="plyr__sr-only">' + config.i18n.restart + '</span>',
                     '</button>'
                 );
@@ -672,7 +674,7 @@
             if (_inArray(config.controls, 'rewind')) {
                 html.push(
                     '<button type="button" data-plyr="rewind">',
-                        '<svg><use xlink:href="#' + config.iconPrefix + '-rewind" /></svg>',
+                        '<svg><use xlink:href="' + iconPath + '-rewind" /></svg>',
                         '<span class="plyr__sr-only">' + config.i18n.rewind + '</span>',
                     '</button>'
                 );
@@ -683,11 +685,11 @@
             if (_inArray(config.controls, 'play')) {
                 html.push(
                     '<button type="button" data-plyr="play">',
-                        '<svg><use xlink:href="#' + config.iconPrefix + '-play" /></svg>',
+                        '<svg><use xlink:href="' + iconPath + '-play" /></svg>',
                         '<span class="plyr__sr-only">' + config.i18n.play + '</span>',
                     '</button>',
                     '<button type="button" data-plyr="pause">',
-                        '<svg><use xlink:href="#' + config.iconPrefix + '-pause" /></svg>',
+                        '<svg><use xlink:href="' + iconPath + '-pause" /></svg>',
                         '<span class="plyr__sr-only">' + config.i18n.pause + '</span>',
                     '</button>'
                 );
@@ -697,7 +699,7 @@
             if (_inArray(config.controls, 'fast-forward')) {
                 html.push(
                     '<button type="button" data-plyr="fast-forward">',
-                        '<svg><use xlink:href="#' + config.iconPrefix + '-fast-forward" /></svg>',
+                        '<svg><use xlink:href="' + iconPath + '-fast-forward" /></svg>',
                         '<span class="plyr__sr-only">' + config.i18n.forward + '</span>',
                     '</button>'
                 );
@@ -747,8 +749,8 @@
             if (_inArray(config.controls, 'mute')) {
                 html.push(
                     '<button type="button" data-plyr="mute">',
-                        '<svg class="icon--muted"><use xlink:href="#' + config.iconPrefix + '-muted" /></svg>',
-                        '<svg><use xlink:href="#' + config.iconPrefix + '-volume" /></svg>',
+                        '<svg class="icon--muted"><use xlink:href="' + iconPath + '-muted" /></svg>',
+                        '<svg><use xlink:href="' + iconPath + '-volume" /></svg>',
                         '<span class="plyr__sr-only">' + config.i18n.toggleMute + '</span>',
                     '</button>'
                 );
@@ -769,8 +771,8 @@
             if (_inArray(config.controls, 'captions')) {
                 html.push(
                     '<button type="button" data-plyr="captions">',
-                        '<svg class="icon--captions-on"><use xlink:href="#' + config.iconPrefix + '-captions-on" /></svg>',
-                        '<svg><use xlink:href="#' + config.iconPrefix + '-captions-off" /></svg>',
+                        '<svg class="icon--captions-on"><use xlink:href="' + iconPath + '-captions-on" /></svg>',
+                        '<svg><use xlink:href="' + iconPath+ '-captions-off" /></svg>',
                         '<span class="plyr__sr-only">' + config.i18n.toggleCaptions + '</span>',
                     '</button>'
                 );
@@ -780,8 +782,8 @@
             if (_inArray(config.controls, 'fullscreen')) {
                 html.push(
                     '<button type="button" data-plyr="fullscreen">',
-                        '<svg class="icon--exit-fullscreen"><use xlink:href="#' + config.iconPrefix + '-exit-fullscreen" /></svg>',
-                        '<svg><use xlink:href="#' + config.iconPrefix + '-enter-fullscreen" /></svg>',
+                        '<svg class="icon--exit-fullscreen"><use xlink:href="' + iconPath + '-exit-fullscreen" /></svg>',
+                        '<svg><use xlink:href="' + iconPath + '-enter-fullscreen" /></svg>',
                         '<span class="plyr__sr-only">' + config.i18n.toggleFullscreen + '</span>',
                     '</button>'
                 );
