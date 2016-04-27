@@ -509,7 +509,8 @@
 }
 
 .plyr__progress--buffer[value],
-.plyr__progress--played[value] {
+.plyr__progress--played[value],
+.plyr__volume--display[value] {
     position: absolute;
     left: 0;
     top: 50%;
@@ -539,7 +540,8 @@
         border-radius: 100px;
     }
 }
-.plyr__progress--played[value] {
+.plyr__progress--played[value],
+.plyr__volume--display[value] {
     z-index: 1;
     color: @plyr-progress-playing-bg;
     background: transparent;
@@ -614,10 +616,14 @@
 
 // Volume
 // --------------------------------------------------------------
-// <input[type='range']> element
-// Specificity is for bootstrap compatibility
-.plyr .plyr__volume[type='range'] {
+.plyr .plyr__volume { 
     display: none;
+    position: relative;
+
+    input[type="range"] {
+        position: relative;
+        z-index: 2;
+    }
 
     @media (min-width: @plyr-bp-screen-sm) {
         display: block;
@@ -631,7 +637,7 @@
 // Hide sound controls on iOS
 // It's not supported to change volume using JavaScript:
 // https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html
-.plyr--is-ios .plyr__volume[type='range'],
+.plyr--is-ios .plyr__volume,
 .plyr--is-ios [data-plyr='mute'] {
     display: none !important;
 }

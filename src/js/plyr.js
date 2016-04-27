@@ -60,9 +60,12 @@
                 rewind:         '[data-plyr="rewind"]',
                 forward:        '[data-plyr="fast-forward"]',
                 mute:           '[data-plyr="mute"]',
-                volume:         '[data-plyr="volume"]',
                 captions:       '[data-plyr="captions"]',
                 fullscreen:     '[data-plyr="fullscreen"]'
+            },
+            volume: {
+                input:          '[data-plyr="volume"]',
+                display:        '.plyr__volume--display'
             },
             progress: {
                 container:      '.plyr__progress',
@@ -706,9 +709,7 @@
                 html.push('<span class="plyr__progress">',
                     '<label for="seek{id}" class="plyr__sr-only">Seek</label>',
                     '<input id="seek{id}" class="plyr__progress--seek" type="range" min="0" max="100" step="0.1" value="0" data-plyr="seek">',
-                    '<progress class="plyr__progress--played" max="100" value="0">',
-                        '<span>0</span>% ' + config.i18n.played,
-                    '</progress>',
+                    '<progress class="plyr__progress--played" max="100" value="0" role="presentation"></progress>',
                     '<progress class="plyr__progress--buffer" max="100" value="0">',
                         '<span>0</span>% ' + config.i18n.buffered,
                     '</progress>');
@@ -756,8 +757,11 @@
             // Volume range control
             if (_inArray(config.controls, 'volume')) {
                 html.push(
-                    '<label for="volume{id}" class="plyr__sr-only">' + config.i18n.volume + '</label>',
-                    '<input id="volume{id}" class="plyr__volume" type="range" min="0" max="10" value="5" data-plyr="volume">'
+                    '<span class="plyr__volume">',
+                        '<label for="volume{id}" class="plyr__sr-only">' + config.i18n.volume + '</label>',
+                        '<input id="volume{id}" class="plyr__volume--input" type="range" min="0" max="10" value="5" data-plyr="volume">',
+                        '<progress class="plyr__volume--display" max="10" value="0" role="presentation"></progress>',
+                    '</span>'
                 );
             }
 
@@ -1206,10 +1210,8 @@
                 plyr.buttons.fullscreen       = _getElement(config.selectors.buttons.fullscreen);
 
                 // Inputs
-                plyr.buttons.volume           = _getElement(config.selectors.buttons.volume);
                 plyr.buttons.mute             = _getElement(config.selectors.buttons.mute);
                 plyr.buttons.captions         = _getElement(config.selectors.buttons.captions);
-                plyr.checkboxes               = _getElements('[type="checkbox"]');
 
                 // Progress
                 plyr.progress = {};
@@ -1223,13 +1225,14 @@
                 // Progress - Played
                 plyr.progress.played          = {};
                 plyr.progress.played.bar      = _getElement(config.selectors.progress.played);
-                plyr.progress.played.text     = plyr.progress.played.bar && plyr.progress.played.bar.getElementsByTagName('span')[0];
 
                 // Seek tooltip
-                plyr.progress.tooltip           = plyr.progress.container && plyr.progress.container.querySelector('.' + config.classes.tooltip);
+                plyr.progress.tooltip         = plyr.progress.container && plyr.progress.container.querySelector('.' + config.classes.tooltip);
 
                 // Volume
-                plyr.volume                   = _getElement(config.selectors.buttons.volume);
+                plyr.volume                   = {};
+                plyr.volume.input             = _getElement(config.selectors.volume.input);
+                plyr.volume.display           = _getElement(config.selectors.volume.display);
 
                 // Timing
                 plyr.duration                 = _getElement(config.selectors.duration);
@@ -1719,6 +1722,11 @@
                 targetTime = duration;
             }
 
+            // Update progress 
+            if(plyr.progress.played.bar) {
+                plyr.progress.played.bar.value = ((100 / duration) * targetTime);
+            }
+
             // Set the current time
             // Try/catch incase the media isn't set and we're calling seek() from source() and IE moans
             try {
@@ -1910,6 +1918,11 @@
             // Set the player volume
             plyr.media.volume = parseFloat(volume / 10);
 
+            // Set the display
+            if (plyr.volume.display) {
+                plyr.volume.display.value = volume;
+            }
+
             // Embeds
             if(_inArray(config.types.embed, plyr.type)) {
                 // YouTube
@@ -1939,8 +1952,13 @@
             var volume = plyr.media.muted ? 0 : (plyr.media.volume * 10);
 
             // Update the <input type="range"> if present
-            if (plyr.supported.full && plyr.volume) {
-                plyr.volume.value = volume;
+            if (plyr.supported.full) {
+                if (plyr.volume.input) {
+                    plyr.volume.input.value = volume;
+                }
+                if (plyr.volume.display) {
+                    plyr.volume.display.value = volume;
+                }
             }
 
             // Store the volume in storage
@@ -1998,7 +2016,7 @@
         // Update <progress> elements
         function _updateProgress(event) {
             var progress    = plyr.progress.played.bar,
-                text        = plyr.progress.played.text,
+                text        = false,
                 value       = 0,
                 duration    = _getDuration();
 
@@ -2016,32 +2034,27 @@
 
                         break;
 
-                    // Events from seek range
-                    case 'change':
-                    case 'input':
-                        value = event.target.value;
-                        break;
-
-
                     // Check buffer status
                     case 'playing':
                     case 'progress':
                         progress    = plyr.progress.buffer.bar;
                         text        = plyr.progress.buffer.text;
                         value       = (function() {
-                                        var buffered = plyr.media.buffered;
+                            var buffered = plyr.media.buffered;
 
-                                        // HTML5
-                                        if (buffered && buffered.length) {
-                                            return _getPercentage(buffered.end(0), duration);
-                                        }
-                                        // YouTube returns between 0 and 1
-                                        else if (typeof buffered === 'number') {
-                                            return (buffered * 100);
-                                        }
+                            // HTML5
+                            if (buffered && buffered.length) {
+                                return _getPercentage(buffered.end(0), duration);
+                            }
+                            // YouTube returns between 0 and 1
+                            else if (typeof buffered === 'number') {
+                                return (buffered * 100);
+                            }
 
-                                        return 0;
-                                    })();
+                            return 0;
+                        })();
+
+                        break;
                 }
             }
 
@@ -2499,8 +2512,8 @@
             _proxyListener(plyr.buttons.seek, inputEvent, config.listeners.seek, _seek);
 
             // Set volume
-            _proxyListener(plyr.volume, inputEvent, config.listeners.volume, function() {
-                _setVolume(plyr.volume.value);
+            _proxyListener(plyr.volume.input, inputEvent, config.listeners.volume, function() {
+                _setVolume(plyr.volume.input.value);
             });
 
             // Mute
