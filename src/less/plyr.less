@@ -18,7 +18,7 @@
 .plyr {
     position: relative;
     max-width: 100%;
-    min-width: 290px;
+    min-width: 200px;
     font-family: Avenir, "Avenir Next", "Helvetica Neue", "Segoe UI", Helvetica, Arial, sans-serif;
 
     // border-box everything
@@ -92,7 +92,7 @@
         }
         &::-ms-fill-lower {
             .plyr-range-track();
-            background: @plyr-progress-playing-bg;
+            background: @plyr-range-selected-bg;
         }
         &::-ms-thumb {
             .plyr-range-thumb();
@@ -361,7 +361,7 @@
     transform: translate(-50%, -50%);
     padding: @plyr-control-spacing;
     background: @plyr-video-control-bg-hover;
-    border: 4px solid @plyr-video-control-color;
+    border: 4px solid currentColor;
     border-radius: 100%;
     box-shadow: 0 1px 1px fade(@plyr-video-controls-bg, 15%);
     color: @plyr-video-control-color;
@@ -535,7 +535,7 @@
 .plyr__progress--played[value],
 .plyr__volume--display[value] {
     z-index: 1;
-    color: @plyr-progress-playing-bg;
+    color: @plyr-range-selected-bg;
     background: transparent;
     transition: none;
 
