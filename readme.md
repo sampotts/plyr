@@ -90,7 +90,7 @@ The default setup uses the BEM methodology with `plyr` as the block, e.g. `.plyr
 
 ### SVG
 The SVG sprite for the controls icons can be loaded two ways:
-- By passing the path to the sprite as the `iconUrl` option; or
+- By passing the *relative* path to the sprite as the `iconUrl` option; or
 - Using AJAX, injecting the sprite into a hidden div. 
 
 #### Using the `iconUrl` option
