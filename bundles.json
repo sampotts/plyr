@@ -3,8 +3,8 @@
         "less": {
             "plyr.css":     ["src/less/plyr.less"]
         },
-        "sass": {
-            "plyr.css":     ["src/sass/plyr.sass"]
+        "scss": {
+            "plyr.css":     ["src/scss/plyr.scss"]
         },
         "js": {
             "plyr.js":      ["src/js/plyr.js"]

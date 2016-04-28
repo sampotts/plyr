@@ -17,7 +17,7 @@
         "dist/plyr.js",
         "dist/sprite.svg",
         "src/less/plyr.less",
-        "src/sass/plyr.scss",
+        "src/scss/plyr.scss",
         "src/js/plyr.js"
     ],
     "ignore": [

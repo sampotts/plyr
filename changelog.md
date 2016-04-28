@@ -1,5 +1,19 @@
 # Changelog
 
+## v1.6.0
+- New, cleaner, UI:
+	- Controls are now overlaid, maintaining the video's ratio and making sizing easier
+	- A large play button can now be overlaid over videos
+	- Default number of control buttons reduced 
+	- New play, pause, rewind and fast forward icons
+	- Flexbox all the things!
+- Tidied up the LESS (and SCSS) as part of the above, variables and mixins in seprate files amking customization and upgrades easier
+- Toggle mute bug fix; if a player was muted previously and the user refreshed, unmuting would have meant volume was still zero (effectively muted), now the config default value is used. Not ideal but good for now
+- New `iconUrl` option allowing specifying a same origin SVG sprite location. Loading this way means you don't need the AJAX sprite loading JavaScript
+- `click` option renamed to `clickToPlay` to make it a bit more self explanatory. Unfortunately cross origin SVG sprites is not supported in any browser yet :-(
+- `hideControls` is now a global option, rather than being exclusive to fullscreen. Controls are now hidden after 2 seconds of no mouse movement. Controls are always shown when media is paused or stopped. This is defaulted to true.
+- `sass` folder in `src` renamed from to `scss`
+
 ## v1.5.21
 - Bug fix for embeds: `play` not being defined (fixes #185 and #186)
 

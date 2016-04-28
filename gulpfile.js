@@ -30,7 +30,7 @@ paths = {
         // Source paths
         src: {
             less:       path.join(root, "src/less/**/*"),
-            sass:       path.join(root, "src/sass/**/*"),
+            scss:       path.join(root, "src/scss/**/*"),
             js:         path.join(root, "src/js/**/*"),
             sprite:     path.join(root, "src/sprite/*.svg")
         },
@@ -55,7 +55,7 @@ paths = {
 // Task arrays
 tasks = {
     less:   [],
-    sass:   [],
+    scss:   [],
     js:     [],
     sprite: []
 },
@@ -110,15 +110,15 @@ var build = {
             })(key);
         }
     },
-    sass: function(files, bundle) {
+    scss: function(files, bundle) {
         for (var key in files) {
             (function (key) {
-                var name = "sass-" + key;
-                tasks.sass.push(name);
+                var name = "scss-" + key;
+                tasks.scss.push(name);
 
                 gulp.task(name, function () {
                     return gulp
-                        .src(bundles[bundle].sass[key])
+                        .src(bundles[bundle].scss[key])
                         .pipe(sass())
                         .on("error", gutil.log)
                         .pipe(concat(key))
@@ -152,7 +152,7 @@ var build = {
 // Plyr core files
 build.js(bundles.plyr.js, "plyr");
 build.less(bundles.plyr.less, "plyr");
-build.sass(bundles.plyr.sass, "plyr");
+build.scss(bundles.plyr.scss, "plyr");
 build.sprite("plyr");
 
 // Docs files
@@ -165,9 +165,9 @@ gulp.task("js", function(){
     run(tasks.js);
 });
 
-// Build SASS (for testing, default is LESS)
-gulp.task("sass", function(){
-    run(tasks.sass);
+// Build SCSS (for testing, default is LESS)
+gulp.task("scss", function(){
+    run(tasks.scss);
 });
 
 // Watch for file changes
