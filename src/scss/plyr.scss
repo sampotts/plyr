@@ -421,7 +421,6 @@
 // Tooltips
 // --------------------------------------------------------------
 .plyr__tooltip {
-    visibility: hidden;
     position: absolute;
     z-index: 2;
     bottom: 100%;
@@ -441,7 +440,7 @@
 
     transform: translate(-50%, 10px) scale(.8);
     transform-origin: 50% 100%;
-    transition: transform .2s .1s ease, opacity .2s .1s ease, visibility .3s ease;
+    transition: transform .2s .1s ease, opacity .2s .1s ease;
 
     // Arrows
     &::before {
@@ -464,7 +463,6 @@
 .plyr button:hover .plyr__tooltip,
 .plyr button.tab-focus:focus .plyr__tooltip,
 .plyr__tooltip--visible {
-    visibility: visible;
     opacity: 1;
     transform: translate(-50%, 0) scale(1);
 }

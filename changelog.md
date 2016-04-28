@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.6.1
+- Tooltip changes for accessibility 
+
 ## v1.6.0
 - New, cleaner, UI:
 	- Controls are now overlaid, maintaining the video's ratio and making sizing easier
