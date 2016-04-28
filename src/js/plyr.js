@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.5.21
+// plyr.js v1.6.0
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -488,7 +488,7 @@
     // Removed call to arguments.callee (used explicit function name instead)
     function _extend() {
         // Get arguments
-		var objects = arguments;
+        var objects = arguments;
 
         // Bail if nothing to merge
         if(!objects.length) {
@@ -598,14 +598,14 @@
         var storage = {
             supported: (function() {
                 if(!('localStorage' in window)) {
-    				return false;
-    			}
+                    return false;
+                }
 
-    			// Try to use it (it might be disabled, e.g. user is in private/porn mode)
+                // Try to use it (it might be disabled, e.g. user is in private/porn mode)
                 // see: https://github.com/Selz/plyr/issues/131
-    			try {
+                try {
                     // Add test item
-    				window.localStorage.setItem('___test', 'OK');
+                    window.localStorage.setItem('___test', 'OK');
 
                     // Get the test item
                     var result = window.localStorage.getItem('___test');
@@ -615,12 +615,12 @@
 
                     // Check if value matches
                     return (result === 'OK');
-    			}
-    			catch (e) {
-    				return false;
-    			}
+                }
+                catch (e) {
+                    return false;
+                }
 
-    			return false;
+                return false;
             })()
         };
         return storage;
@@ -2135,7 +2135,7 @@
         // Update hover tooltip for seeking
         function _updateSeekTooltip(event) {
             // Bail if setting not true
-            if (!config.tooltips.seek || plyr.browser.touch) {
+            if (!config.tooltips.seek || plyr.browser.touch || !plyr.progress.container) {
                 return;
             }
 
@@ -2440,6 +2440,9 @@
                 if(target && target.length > 1) {
                     target = target[target.length - 1];
                 }
+                else {
+                    target = target[0];
+                }
 
                 // Setup focus and tab focus
                 if(target) {
@@ -2701,7 +2704,17 @@
             plyr.browser = _browserSniff();
 
             // Get the media element
-            plyr.media = plyr.container.querySelectorAll('audio, video, div')[0];
+            plyr.media = plyr.container.querySelectorAll('audio, video')[0];
+
+            // Get the div placeholder for YouTube and Vimeo
+            if(!plyr.media) {
+                plyr.media = plyr.container.querySelectorAll('div')[0];
+            }
+
+            // Bail if nothing to setup
+            if(!plyr.media) {
+                return;
+            }
 
             // Get original classname
             plyr.originalClassName = plyr.container.className;
