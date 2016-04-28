@@ -43,7 +43,6 @@ Check `docs/index.html` and `docs/dist/docs.js` for an example setup.
 **Heads up:** the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.6.1/plyr.js` to `https://cdn.plyr.io/1.6.1/plyr.js`
 
 ### Node Package Manager (NPM)
-[![npm version](https://badge.fury.io/js/plyr.svg)](https://badge.fury.io/js/plyr) 
 
 Using NPM, you can grab Plyr:
 ```
@@ -52,7 +51,6 @@ npm install plyr
 [https://www.npmjs.com/package/plyr](https://www.npmjs.com/package/plyr)
 
 ### Bower
-[![Bower version](https://badge.fury.io/bo/plyr.svg)](https://badge.fury.io/bo/plyr)
 
 If bower is your thang, you can grab Plyr using:
 ```
