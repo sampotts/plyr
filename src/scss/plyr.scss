@@ -206,7 +206,6 @@
     font-size: $plyr-font-size-captions-base;
     text-align: center;
     font-weight: 400;
-    -webkit-font-smoothing: subpixel-antialiased;
 
     span {
         border-radius: 2px;
@@ -436,7 +435,6 @@
     color: $plyr-tooltip-color;
     font-size: $plyr-font-size-small;
     line-height: 1.3;
-    -webkit-font-smoothing: subpixel-antialiased;
 
     transform: translate(-50%, 10px) scale(.8);
     transform-origin: 50% 100%;
@@ -498,9 +496,9 @@
     }
 }
 
-.plyr__progress--buffer[value],
-.plyr__progress--played[value],
-.plyr__volume--display[value] {
+.plyr__progress--buffer,
+.plyr__progress--played,
+.plyr__volume--display {
     position: absolute;
     left: 0;
     top: 50%;
@@ -530,8 +528,8 @@
         border-radius: 100px;
     }
 }
-.plyr__progress--played[value],
-.plyr__volume--display[value] {
+.plyr__progress--played,
+.plyr__volume--display {
     z-index: 1;
     color: $plyr-range-selected-bg;
     background: transparent;
@@ -553,7 +551,7 @@
         display: none;
     }
 }
-.plyr__progress--buffer[value] {
+.plyr__progress--buffer {
     &::-webkit-progress-value {
         transition: width .2s ease;
     }
@@ -564,18 +562,18 @@
         transition: width .2s ease;
     }            
 }
-.plyr--video .plyr__progress--buffer[value],
-.plyr--video .plyr__volume--display[value] {
+.plyr--video .plyr__progress--buffer,
+.plyr--video .plyr__volume--display {
     background: $plyr-video-range-track-bg;
 }
-.plyr--video .plyr__progress--buffer[value] { 
+.plyr--video .plyr__progress--buffer { 
     color: $plyr-video-progress-buffered-bg;
 }
-.plyr--audio .plyr__progress--buffer[value],
-.plyr--audio .plyr__volume--display[value] {
+.plyr--audio .plyr__progress--buffer,
+.plyr--audio .plyr__volume--display {
     background: $plyr-audio-range-track-bg;
 }
-.plyr--audio .plyr__progress--buffer[value] {
+.plyr--audio .plyr__progress--buffer {
     color: $plyr-audio-progress-buffered-bg;
 }
 
@@ -609,7 +607,6 @@
     vertical-align: middle;
     font-size: $plyr-font-size-small;
     line-height: .95;
-    -webkit-font-smoothing: subpixel-antialiased;
 }
 // Media duration hidden on small screens
 .plyr__time + .plyr__time {

@@ -42,6 +42,7 @@
         iconUrl:                '',
         clickToPlay:            true,
         hideControls:           true,
+        showPosterOnEnd:        true,
         tooltips: {
             controls:           false,
             seek:               true
@@ -1827,9 +1828,9 @@
         // Seek to time
         // The input parameter can be an event or a number
         function _seek(input) {
-            var targetTime = 0,
-                paused = plyr.media.paused,
-                duration = _getDuration();
+            var targetTime  = 0,
+                paused      = plyr.media.paused,
+                duration    = _getDuration();
 
             // Explicit position
             if (typeof input === 'number') {
@@ -1850,10 +1851,8 @@
                 targetTime = duration;
             }
 
-            // Update progress 
-            if (plyr.progress && plyr.progress.played) {
-                plyr.progress.played.value = ((100 / duration) * targetTime);
-            }
+            // Update seek range and progress 
+            _updateSeekDisplay(targetTime);
 
             // Set the current time
             // Try/catch incase the media isn't set and we're calling seek() from source() and IE moans
@@ -1901,10 +1900,18 @@
         // Get the duration (or custom if set)
         function _getDuration() {
             // It should be a number, but parse it just incase
-            var duration = parseInt(config.duration);
+            var duration = parseInt(config.duration),
+
+            // True duration
+            mediaDuration = 0;
+
+            // Only if duration available
+            if(plyr.media.duration !== null && !isNaN(plyr.media.duration)) {
+                mediaDuration = plyr.media.duration;
+            }
 
             // If custom duration is funky, use regular duration
-            return (isNaN(duration) ? plyr.media.duration : duration);
+            return (isNaN(duration) ? mediaDuration : duration);
         }
 
         // Check playing state
@@ -2271,10 +2278,33 @@
             _updateProgress(event);
         }
 
+        // Update seek range and progress 
+        function _updateSeekDisplay(time) {
+            // Default to 0
+            if (typeof time !== 'number') {
+                time = 0;
+            }
+
+            var duration    = _getDuration(),
+                value       = _getPercentage(time, duration);
+
+            // Update progress 
+            if (plyr.progress && plyr.progress.played) {
+                plyr.progress.played.value = value;
+            }
+
+            // Update seek range input
+            if (plyr.buttons && plyr.buttons.seek) {
+                plyr.buttons.seek.value = value;
+            }
+        }
+
         // Update hover tooltip for seeking
         function _updateSeekTooltip(event) {
+            var duration = _getDuration();
+
             // Bail if setting not true
-            if (!config.tooltips.seek || plyr.browser.touch || !plyr.progress.container) {
+            if (!config.tooltips.seek || !plyr.progress.container || duration === 0) {
                 return;
             }
 
@@ -2305,7 +2335,7 @@
             }
 
             // Display the time a click would seek to
-            _updateTimeDisplay(((_getDuration() / 100) * percent), plyr.progress.tooltip);
+            _updateTimeDisplay(((duration / 100) * percent), plyr.progress.tooltip);
 
             // Set position
             plyr.progress.tooltip.style.left = percent + "%";
@@ -2423,13 +2453,8 @@
             // Pause playback
             _pause();
 
-            // Set seek input to 0
-            if (plyr.buttons && plyr.buttons.seek) {
-                plyr.buttons.seek.value = 0;
-            }
-            if (plyr.progress && plyr.progress.played) {
-                plyr.progress.played.value = 0;
-            }
+            // Update seek range and progress
+            _updateSeekDisplay();
 
             // Cancel current network requests
             _cancelRequests();
@@ -2722,6 +2747,15 @@
 
                 // Reset UI
                 _checkPlaying();
+
+                // Show poster on end
+                if(config.showPosterOnEnd) {
+                    // Seek to 0
+                    _seek(0);
+
+                    // Re-load media
+                    plyr.media.load();
+                }
             });
 
             // Check for buffer progress

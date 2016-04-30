@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.6.2
+- Fix for tooltip displaying when duration is not set (fixes #177)
+- `showPosterOnEnd` option to show poster on video finish (fixes #59)
+- Error handler for YouTube (fixes #189)
+- Initial SoundCloud support (fixes #194)
+
 ## v1.6.1
 - Tooltip changes for accessibility 
 
