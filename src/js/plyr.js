@@ -448,14 +448,22 @@
     }
 
     // Trigger event
-    function _triggerEvent(element, eventName, properties) {
+    function _triggerEvent(element, eventName, bubbles, properties) {
         // Bail if no element
         if (!element || !eventName) {
             return;
         }
 
-        // create and dispatch the event
-        var event = new CustomEvent(eventName, properties);
+        // Default bubbles to false
+        if (typeof bubbles !== 'boolean') {
+            bubbles = false;
+        }
+
+        // Create and dispatch the event
+        var event = new CustomEvent(eventName, { 
+            bubbles:    bubbles,
+            detail:     properties 
+        });
 
         // Dispatch the event
         element.dispatchEvent(event);
@@ -974,6 +982,7 @@
 
         // Set the current caption
         function _setCaption(caption) {
+            /* jshint unused:false */
             var container = _getElement(config.selectors.captions),
                 content = document.createElement('span');
 
@@ -996,7 +1005,7 @@
             // Set new caption text
             container.appendChild(content);
 
-            // Force redraw
+            // Force redraw (for Safari)
             var redraw = container.offsetHeight;
         }
 
@@ -1347,7 +1356,7 @@
         // Setup YouTube/Vimeo
         function _setupEmbed() {
             var container = document.createElement('div'),
-                videoId = plyr.embedId,
+                mediaId = plyr.embedId,
                 id = plyr.type + '-' + Math.floor(Math.random() * (10000));
 
             // Remove old containers
@@ -1370,7 +1379,7 @@
 
                 // Setup API
                 if (typeof YT === 'object') {
-                    _youTubeReady(videoId, container);
+                    _youTubeReady(mediaId, container);
                 }
                 else {
                     // Load the API
@@ -1380,7 +1389,7 @@
                     window.onYouTubeReadyCallbacks = window.onYouTubeReadyCallbacks || [];
 
                     // Add to queue
-                    window.onYouTubeReadyCallbacks.push(function() { _youTubeReady(videoId, container) });
+                    window.onYouTubeReadyCallbacks.push(function() { _youTubeReady(mediaId, container) });
 
                     // Set callback to process queue
                     window.onYouTubeIframeAPIReady = function () {
@@ -1391,14 +1400,14 @@
             // Vimeo
             else if (plyr.type === 'vimeo') {
                 // Inject the iframe
-                var iframe = document.createElement('iframe');
+                var vimeo = document.createElement('iframe');
 
                 // Watch for iframe load
-                iframe.loaded = false;
-                _on(iframe, 'load', function() { iframe.loaded = true; });
+                vimeo.loaded = false;
+                _on(vimeo, 'load', function() { vimeo.loaded = true; });
 
-                _setAttributes(iframe, {
-                    'src':                      'https://player.vimeo.com/video/' + videoId + '?player_id=' + id + '&api=1&badge=0&byline=0&portrait=0&title=0',
+                _setAttributes(vimeo, {
+                    'src':                      'https://player.vimeo.com/video/' + mediaId + '?player_id=' + id + '&api=1&badge=0&byline=0&portrait=0&title=0',
                     'id':                       id,
                     'webkitallowfullscreen':    '',
                     'mozallowfullscreen':       '',
@@ -1408,52 +1417,53 @@
 
                 // If full support, we can use custom controls (hiding Vimeos), if not, use Vimeo
                 if (plyr.supported.full) {
-                    container.appendChild(iframe);
+                    container.appendChild(vimeo);
                     plyr.media.appendChild(container);
                 }
                 else {
-                    plyr.media.appendChild(iframe);
+                    plyr.media.appendChild(vimeo);
                 }
 
-                // Load the API
+                // Load the API if not already
                 if (!('$f' in window)) {
                     _injectScript(config.urls.vimeo.api);
                 }
 
                 // Wait for fragaloop load
-                var timer = window.setInterval(function() {
-                    if ('$f' in window && iframe.loaded) {
-                        window.clearInterval(timer);
-                        _vimeoReady.call(iframe);
+                var vimeoTimer = window.setInterval(function() {
+                    if ('$f' in window && vimeo.loaded) {
+                        window.clearInterval(vimeoTimer);
+                        _vimeoReady.call(vimeo);
                     }
                 }, 50);
             }
             // Soundcloud
             else if (plyr.type === 'soundcloud') {
                 // Inject the iframe
-                var iframe = document.createElement('iframe');
+                var soundCloud = document.createElement('iframe');
 
                 // Watch for iframe load
-                iframe.loaded = false;
-                _on(iframe, 'load', function() { iframe.loaded = true; });
+                soundCloud.loaded = false;
+                _on(soundCloud, 'load', function() { soundCloud.loaded = true; });
 
-                _setAttributes(iframe, {
-                    'src':  'https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/' + videoId,
+                _setAttributes(soundCloud, {
+                    'src':  'https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/' + mediaId,
                     'id':   id
                 });
 
-                container.appendChild(iframe);
+                container.appendChild(soundCloud);
                 plyr.media.appendChild(container);
 
+                // Load the API if not already
                 if (!window.SC) {
                     _injectScript(config.urls.soundcloud.api);
                 }
 
                 // Wait for SC load
-                var timer = window.setInterval(function() {
-                    if (window.SC && iframe.loaded) {
-                        window.clearInterval(timer);
-                        _soundcloudReady.call(iframe);
+                var soundCloudTimer = window.setInterval(function() {
+                    if (window.SC && soundCloud.loaded) {
+                        window.clearInterval(soundCloudTimer);
+                        _soundcloudReady.call(soundCloud);
                     }
                 }, 50);
             }
@@ -1484,19 +1494,25 @@
             plyr.embed = new YT.Player(container.id, {
                 videoId: videoId,
                 playerVars: {
-                    autoplay: (config.autoplay ? 1 : 0),
-                    controls: (plyr.supported.full ? 0 : 1),
-                    rel: 0,
-                    showinfo: 0,
+                    autoplay:       (config.autoplay ? 1 : 0),
+                    controls:       (plyr.supported.full ? 0 : 1),
+                    rel:            0,
+                    showinfo:       0,
                     iv_load_policy: 3,
                     cc_load_policy: (config.captions.defaultActive ? 1 : 0),
-                    cc_lang_pref: 'en',
-                    wmode: 'transparent',
+                    cc_lang_pref:   'en',
+                    wmode:          'transparent',
                     modestbranding: 1,
-                    disablekb: 1,
-                    origin: '*' // https://code.google.com/p/gdata-issues/issues/detail?id=5788#c45
+                    disablekb:      1,
+                    origin:         '*' // https://code.google.com/p/gdata-issues/issues/detail?id=5788#c45
                 },
                 events: {
+                    'onError': function(event) {
+                        _triggerEvent(plyr.container, 'error', true, {
+                            code:   event.data,
+                            embed:  event.target
+                        });
+                    },
                     'onReady': function(event) {
                         // Get the instance
                         var instance = event.target;
@@ -1683,10 +1699,11 @@
 
         // Soundcloud ready
         function _soundcloudReady() {
-            plyr.embed = SC.Widget(this);
+            /* jshint validthis: true */
+            plyr.embed = window.SC.Widget(this);
 
             // Setup on ready
-            plyr.embed.bind(SC.Widget.Events.READY, function() {
+            plyr.embed.bind(window.SC.Widget.Events.READY, function() {
                 // Create a faux HTML5 API using the Soundcloud API
                 plyr.media.play = function() {
                     plyr.embed.play();
@@ -1720,24 +1737,24 @@
                     _displayDuration();
                 });
 
-                plyr.embed.bind(SC.Widget.Events.PLAY, function() {
+                plyr.embed.bind(window.SC.Widget.Events.PLAY, function() {
                     plyr.media.paused = false;
                     _triggerEvent(plyr.media, 'play');
                     _triggerEvent(plyr.media, 'playing');
                 });
 
-                plyr.embed.bind(SC.Widget.Events.PAUSE, function() {
+                plyr.embed.bind(window.SC.Widget.Events.PAUSE, function() {
                     plyr.media.paused = true;
                     _triggerEvent(plyr.media, 'pause');
                 });
 
-                plyr.embed.bind(SC.Widget.Events.PLAY_PROGRESS, function(data) {
+                plyr.embed.bind(window.SC.Widget.Events.PLAY_PROGRESS, function(data) {
                     plyr.media.seeking = false;
                     plyr.media.currentTime = data.currentPosition/1000;
                     _triggerEvent(plyr.media, 'timeupdate');
                 });
 
-                plyr.embed.bind(SC.Widget.Events.LOAD_PROGRESS, function(data) {
+                plyr.embed.bind(window.SC.Widget.Events.LOAD_PROGRESS, function(data) {
                     plyr.media.buffered = data.loadProgress;
                     _triggerEvent(plyr.media, 'progress');
 
@@ -1747,7 +1764,7 @@
                     }
                 });
 
-                plyr.embed.bind(SC.Widget.Events.FINISH, function() {
+                plyr.embed.bind(window.SC.Widget.Events.FINISH, function() {
                     plyr.media.paused = true;
                     _triggerEvent(plyr.media, 'ended');
                 });
@@ -2414,6 +2431,9 @@
                 plyr.progress.played.value = 0;
             }
 
+            // Cancel current network requests
+            _cancelRequests();
+
             // Clean up YouTube stuff
             if (plyr.type === 'youtube') {
                 // Destroy the embed instance
@@ -2423,6 +2443,7 @@
                 window.clearInterval(plyr.timer.buffering);
                 window.clearInterval(plyr.timer.playing);
             }
+            // HTML5 Video
             else if (plyr.type === 'video' && plyr.videoContainer) {
                 // Remove video wrapper
                 _remove(plyr.videoContainer);
@@ -2430,9 +2451,6 @@
 
             // Remove embed object
             plyr.embed = null;
-
-            // Cancel current network requests
-            _cancelRequests();
 
             // Remove the old media
             _remove(plyr.media);
@@ -2748,7 +2766,7 @@
 
             // Proxy events to container
             _on(plyr.media, config.events.join(' '), function(event) {
-                _triggerEvent(plyr.container, event.type);
+                _triggerEvent(plyr.container, event.type, true);
             });
         }
 
@@ -2759,14 +2777,16 @@
                 return;
             }
 
-            // Set empty src attribute
-            plyr.media.setAttribute('src', '');
-
             // Remove child sources
             var sources = plyr.media.querySelectorAll('source');
             for (var i = 0; i < sources.length; i++) {
                 _remove(sources[i]);
             }
+
+            // Set blank video src attribute
+            // This is to prevent a MEDIA_ERR_SRC_NOT_SUPPORTED error
+            // Credit: https://github.com/mathiasbynens/small/blob/master/mp4.mp4
+            plyr.media.setAttribute('src', 'data:video/mp4;base64,AAAAHGZ0eXBpc29tAAACAGlzb21pc28ybXA0MQAAAAhmcmVlAAAAGm1kYXQAAAGzABAHAAABthBgUYI9t+8AAAMNbW9vdgAAAGxtdmhkAAAAAMXMvvrFzL76AAAD6AAAACoAAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAABhpb2RzAAAAABCAgIAHAE/////+/wAAAiF0cmFrAAAAXHRraGQAAAAPxcy++sXMvvoAAAABAAAAAAAAACoAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAgAAAAIAAAAAAG9bWRpYQAAACBtZGhkAAAAAMXMvvrFzL76AAAAGAAAAAEVxwAAAAAALWhkbHIAAAAAAAAAAHZpZGUAAAAAAAAAAAAAAABWaWRlb0hhbmRsZXIAAAABaG1pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAACRkaW5mAAAAHGRyZWYAAAAAAAAAAQAAAAx1cmwgAAAAAQAAAShzdGJsAAAAxHN0c2QAAAAAAAAAAQAAALRtcDR2AAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAgACABIAAAASAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGP//AAAAXmVzZHMAAAAAA4CAgE0AAQAEgICAPyARAAAAAAMNQAAAAAAFgICALQAAAbABAAABtYkTAAABAAAAASAAxI2IAMUARAEUQwAAAbJMYXZjNTMuMzUuMAaAgIABAgAAABhzdHRzAAAAAAAAAAEAAAABAAAAAQAAABxzdHNjAAAAAAAAAAEAAAABAAAAAQAAAAEAAAAUc3RzegAAAAAAAAASAAAAAQAAABRzdGNvAAAAAAAAAAEAAAAsAAAAYHVkdGEAAABYbWV0YQAAAAAAAAAhaGRscgAAAAAAAAAAbWRpcmFwcGwAAAAAAAAAAAAAAAAraWxzdAAAACOpdG9vAAAAG2RhdGEAAAABAAAAAExhdmY1My4yMS4x');
 
             // Load the new empty source
             // This will cancel existing requests
