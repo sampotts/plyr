@@ -131,7 +131,7 @@
             frameTitle:         'Player for {title}'
         },
         types: {
-            embed:              ['youtube', 'vimeo'],
+            embed:              ['youtube', 'vimeo', 'soundcloud'],
             html5:              ['video', 'audio']
         },
         // URLs
@@ -141,6 +141,9 @@
             },
             youtube: {
                 api:            'https://www.youtube.com/iframe_api'
+            },
+            soundcloud: {
+                api:            'https://w.soundcloud.com/player/api.js'
             }
         },
         // Custom control listeners
@@ -333,7 +336,7 @@
 
     // Remove an element
     function _remove(element) {
-        if(!element) {
+        if (!element) {
             return;
         }
         element.parentNode.removeChild(element);
@@ -411,7 +414,7 @@
     // Bind along with custom handler
     function _proxyListener(element, eventName, userListener, defaultListener, useCapture) {
         _on(element, eventName, function(event) {
-            if(userListener) {
+            if (userListener) {
                 userListener.apply(element, [event]);
             }
             defaultListener.apply(element, [event]);
@@ -424,7 +427,7 @@
 
         // Whether the listener is a capturing listener or not
         // Default to false
-        if(typeof useCapture !== 'boolean') {
+        if (typeof useCapture !== 'boolean') {
             useCapture = false;
         }
 
@@ -447,7 +450,7 @@
     // Trigger event
     function _triggerEvent(element, eventName, properties) {
         // Bail if no element
-        if(!element || !eventName) {
+        if (!element || !eventName) {
             return;
         }
 
@@ -462,7 +465,7 @@
     // http://www.ssbbartgroup.com/blog/how-not-to-misuse-aria-states-properties-and-roles
     function _toggleState(target, state) {
         // Bail if no target
-        if(!target) {
+        if (!target) {
             return;
         }
 
@@ -491,12 +494,12 @@
         var objects = arguments;
 
         // Bail if nothing to merge
-        if(!objects.length) {
+        if (!objects.length) {
             return;
         }
 
         // Return first if specified but nothing to merge
-        if(objects.lenth == 1) {
+        if (objects.lenth == 1) {
             return objects[0];
         }
 
@@ -597,7 +600,7 @@
     function _storage() {
         var storage = {
             supported: (function() {
-                if(!('localStorage' in window)) {
+                if (!('localStorage' in window)) {
                     return false;
                 }
 
@@ -943,7 +946,7 @@
                                             index = 0;
 
                                         // Incase caption numbers are added
-                                        if(parts[index].indexOf(":") === -1) {
+                                        if (parts[index].indexOf(":") === -1) {
                                             index = 1;
                                         }
 
@@ -978,12 +981,12 @@
             container.innerHTML = '';
 
             // Default to empty
-            if(typeof caption === 'undefined') {
+            if (typeof caption === 'undefined') {
                 caption = '';
             }
 
             // Set the span content
-            if(typeof caption === 'string') {
+            if (typeof caption === 'string') {
                 content.innerHTML = caption.trim();
             }
             else {
@@ -1170,7 +1173,7 @@
             if (config.selectors.controls.container !== null) {
                 container = config.selectors.controls.container;
 
-                if(typeof selector === 'string') {
+                if (typeof selector === 'string') {
                     container = document.querySelector(container);
                 }
             }
@@ -1259,7 +1262,7 @@
 
         // Toggle native controls
         function _toggleNativeControls(toggle) {
-            if(toggle) {
+            if (toggle) {
                 plyr.media.setAttribute('controls', '');
             }
             else {
@@ -1404,7 +1407,7 @@
                 });
 
                 // If full support, we can use custom controls (hiding Vimeos), if not, use Vimeo
-                if(plyr.supported.full) {
+                if (plyr.supported.full) {
                     container.appendChild(iframe);
                     plyr.media.appendChild(container);
                 }
@@ -1422,6 +1425,35 @@
                     if ('$f' in window && iframe.loaded) {
                         window.clearInterval(timer);
                         _vimeoReady.call(iframe);
+                    }
+                }, 50);
+            }
+            // Soundcloud
+            else if (plyr.type === 'soundcloud') {
+                // Inject the iframe
+                var iframe = document.createElement('iframe');
+
+                // Watch for iframe load
+                iframe.loaded = false;
+                _on(iframe, 'load', function() { iframe.loaded = true; });
+
+                _setAttributes(iframe, {
+                    'src':  'https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/' + videoId,
+                    'id':   id
+                });
+
+                container.appendChild(iframe);
+                plyr.media.appendChild(container);
+
+                if (!window.SC) {
+                    _injectScript(config.urls.soundcloud.api);
+                }
+
+                // Wait for SC load
+                var timer = window.setInterval(function() {
+                    if (window.SC && iframe.loaded) {
+                        window.clearInterval(timer);
+                        _soundcloudReady.call(iframe);
                     }
                 }, 50);
             }
@@ -1628,7 +1660,7 @@
                     plyr.media.buffered = data.percent;
                     _triggerEvent(plyr.media, 'progress');
 
-                    if(parseInt(data.percent) === 1) {
+                    if (parseInt(data.percent) === 1) {
                         // Trigger event
                         _triggerEvent(plyr.media, 'canplaythrough');
                     }
@@ -1649,16 +1681,94 @@
             });
         }
 
+        // Soundcloud ready
+        function _soundcloudReady() {
+            plyr.embed = SC.Widget(this);
+
+            // Setup on ready
+            plyr.embed.bind(SC.Widget.Events.READY, function() {
+                // Create a faux HTML5 API using the Soundcloud API
+                plyr.media.play = function() {
+                    plyr.embed.play();
+                    plyr.media.paused = false;
+                };
+                plyr.media.pause = function() {
+                    plyr.embed.pause();
+                    plyr.media.paused = true;
+                };
+                plyr.media.stop = function() {
+                    plyr.embed.seekTo(0);
+                    plyr.embed.pause();
+                    plyr.media.paused = true;
+                };
+                plyr.media.paused = true;
+                plyr.media.currentTime = 0;
+
+                // Update UI
+                _embedReady();
+
+                plyr.embed.getPosition(function(value) {
+                    plyr.media.currentTime = value;
+
+                    // Trigger timeupdate
+                    _triggerEvent(plyr.media, 'timeupdate');
+                });
+
+                plyr.embed.getDuration(function(value) {
+                    plyr.media.duration = value/1000;
+                    // Display duration if available
+                    _displayDuration();
+                });
+
+                plyr.embed.bind(SC.Widget.Events.PLAY, function() {
+                    plyr.media.paused = false;
+                    _triggerEvent(plyr.media, 'play');
+                    _triggerEvent(plyr.media, 'playing');
+                });
+
+                plyr.embed.bind(SC.Widget.Events.PAUSE, function() {
+                    plyr.media.paused = true;
+                    _triggerEvent(plyr.media, 'pause');
+                });
+
+                plyr.embed.bind(SC.Widget.Events.PLAY_PROGRESS, function(data) {
+                    plyr.media.seeking = false;
+                    plyr.media.currentTime = data.currentPosition/1000;
+                    _triggerEvent(plyr.media, 'timeupdate');
+                });
+
+                plyr.embed.bind(SC.Widget.Events.LOAD_PROGRESS, function(data) {
+                    plyr.media.buffered = data.loadProgress;
+                    _triggerEvent(plyr.media, 'progress');
+
+                    if (parseInt(data.loadProgress) === 1) {
+                        // Trigger event
+                        _triggerEvent(plyr.media, 'canplaythrough');
+                    }
+                });
+
+                plyr.embed.bind(SC.Widget.Events.FINISH, function() {
+                    plyr.media.paused = true;
+                    _triggerEvent(plyr.media, 'ended');
+                });
+
+                // Autoplay
+                if (config.autoplay) {
+                    plyr.embed.play();
+                }
+            });
+        }
+
         // Play media
         function _play() {
-            if('play' in plyr.media) {
+            if ('play' in plyr.media) {
                 plyr.media.play();
             }
         }
 
         // Pause media
         function _pause() {
-            if('pause' in plyr.media) {
+            if ('pause' in plyr.media) {
                 plyr.media.pause();
             }
         }
@@ -1724,7 +1834,7 @@
             }
 
             // Update progress 
-            if(plyr.progress && plyr.progress.played) {
+            if (plyr.progress && plyr.progress.played) {
                 plyr.progress.played.value = ((100 / duration) * targetTime);
             }
 
@@ -1736,7 +1846,7 @@
             catch(e) {}
 
             // Embeds
-            if(_inArray(config.types.embed, plyr.type)) {
+            if (_inArray(config.types.embed, plyr.type)) {
                 // YouTube
                 switch(plyr.type) {
                     case 'youtube':
@@ -1746,6 +1856,10 @@
                     case 'vimeo':
                         // Round to nearest second for vimeo
                         plyr.embed.api('seekTo', targetTime.toFixed(0));
+                        break;
+
+                    case 'soundcloud':
+                        plyr.embed.seekTo(targetTime * 1000);
                         break;
                 }
 
@@ -1826,7 +1940,7 @@
             _toggleClass(plyr.container, config.classes.fullscreen.active, plyr.isFullscreen);
 
             // Trap focus
-            if(plyr.isFullscreen) {
+            if (plyr.isFullscreen) {
                 plyr.container.setAttribute('tabindex', '-1');
             }
             else {
@@ -1865,12 +1979,12 @@
             plyr.media.muted = muted;
 
             // If volume is 0 after unmuting, set to default
-            if(plyr.media.volume === 0) {
+            if (plyr.media.volume === 0) {
                 _setVolume(config.volume);
             }
 
             // Embeds
-            if(_inArray(config.types.embed, plyr.type)) {
+            if (_inArray(config.types.embed, plyr.type)) {
                 // YouTube
                 switch(plyr.type) {
                     case 'youtube':
@@ -1879,6 +1993,10 @@
 
                     case 'vimeo':
                         plyr.embed.api('setVolume', plyr.media.muted ? 0 : parseFloat(config.volume / 10));
+                        break;
+
+                    case 'soundcloud':
+                        plyr.embed.setVolume(plyr.media.muted ? 0 : parseFloat(config.volume / 10));
                         break;
                 }
 
@@ -1903,7 +2021,7 @@
             }
 
             // Use config if all else fails
-            if(volume === null || isNaN(volume)) {
+            if (volume === null || isNaN(volume)) {
                 volume = config.volume;
             }
 
@@ -1925,7 +2043,7 @@
             }
 
             // Embeds
-            if(_inArray(config.types.embed, plyr.type)) {
+            if (_inArray(config.types.embed, plyr.type)) {
                 // YouTube
                 switch(plyr.type) {
                     case 'youtube':
@@ -1934,6 +2052,10 @@
 
                     case 'vimeo':
                         plyr.embed.api('setVolume', plyr.media.volume);
+                        break;
+
+                    case 'soundcloud':
+                        plyr.embed.setVolume(plyr.media.volume);
                         break;
                 }
 
@@ -2124,7 +2246,7 @@
             _updateTimeDisplay(plyr.media.currentTime, plyr.currentTime);
 
             // Ignore updates while seeking
-            if(event && event.type == 'timeupdate' && plyr.media.seeking) {
+            if (event && event.type == 'timeupdate' && plyr.media.seeking) {
                 return;
             }
 
@@ -2146,7 +2268,7 @@
 
             // Determine percentage, if already visible
             if (!event) {
-                if(_hasClass(plyr.progress.tooltip, visible)) {
+                if (_hasClass(plyr.progress.tooltip, visible)) {
                     percent = plyr.progress.tooltip.style.left.replace('%', '');
                 }
                 else {
@@ -2173,7 +2295,7 @@
 
             // Show/hide the tooltip
             // If the event is a moues in/out and percentage is inside bounds
-            if(event && _inArray(['mouseenter', 'mouseleave'], event.type)) {
+            if (event && _inArray(['mouseenter', 'mouseleave'], event.type)) {
                 _toggleClass(plyr.progress.tooltip, visible, (event.type === 'mouseenter'));
             }
         }
@@ -2188,8 +2310,8 @@
                 show = toggle;
 
             // Default to false if no boolean
-            if(typeof toggle !== "boolean") {
-                if(toggle && toggle.type) {
+            if (typeof toggle !== "boolean") {
+                if (toggle && toggle.type) {
                     // Is the enter fullscreen event
                     isEnterFullscreen = (toggle.type === 'enterfullscreen');
 
@@ -2215,21 +2337,21 @@
             window.clearTimeout(plyr.timers.hover);
 
             // If the mouse is not over the controls, set a timeout to hide them
-            if(show || plyr.media.paused) {
+            if (show || plyr.media.paused) {
                 _toggleClass(plyr.container, config.classes.hideControls, false);
 
                 // Always show controls when paused
-                if(plyr.media.paused) {
+                if (plyr.media.paused) {
                     return;
                 }
             }
 
             // If toggle is false or if we're playing (regardless of toggle), then
             // set the timer to hide the controls 
-            if(!show || !plyr.media.paused) {
+            if (!show || !plyr.media.paused) {
                 plyr.timers.hover = window.setTimeout(function() {
                     // If the mouse is over the controls (and not entering fullscreen), bail
-                    if(plyr.controls.active && !isEnterFullscreen) {
+                    if (plyr.controls.active && !isEnterFullscreen) {
                         return;
                     }
 
@@ -2241,7 +2363,7 @@
         // Add common function to retrieve media source
         function _source(source) {
             // If not null or undefined, parse it
-            if(typeof source !== 'undefined') {
+            if (typeof source !== 'undefined') {
                 _updateSource(source);
                 return;
             }
@@ -2256,6 +2378,12 @@
                 case 'vimeo':
                     plyr.embed.api('getVideoUrl', function (value) {
                         url = value;
+                    });
+                    break;
+
+                case 'soundcloud':
+                    plyr.embed.getCurrentSound(function(object) {
+                        url = object.permalink_url;
                     });
                     break;
 
@@ -2314,10 +2442,10 @@
                 plyr.type = source.type;
 
                 // Get child type for video (it might be an embed)
-                if(plyr.type === 'video') {
+                if (plyr.type === 'video') {
                     var firstSource = source.sources[0];
 
-                    if('type' in firstSource && _inArray(config.types.embed, firstSource.type)) {
+                    if ('type' in firstSource && _inArray(config.types.embed, firstSource.type)) {
                         plyr.type = firstSource.type;
                     }
                 }
@@ -2338,6 +2466,7 @@
 
                 case 'youtube':
                 case 'vimeo':
+                case 'soundcloud':
                     plyr.media = document.createElement('div');
                     plyr.embedId = source.sources[0].src;
                     break;
@@ -2437,7 +2566,7 @@
                     target = plyr.buttons[play ? 'pause' : 'play'];
 
                 // Get the last play button to account for the large play button
-                if(target && target.length > 1) {
+                if (target && target.length > 1) {
                     target = target[target.length - 1];
                 }
                 else {
@@ -2445,13 +2574,13 @@
                 }
 
                 // Setup focus and tab focus
-                if(target) {
+                if (target) {
                     var hadTabFocus = _hasClass(trigger, config.classes.tabFocus);
 
                     setTimeout(function() {
                         target.focus();
 
-                        if(hadTabFocus) {
+                        if (hadTabFocus) {
                             _toggleClass(trigger, config.classes.tabFocus, false);
                             _toggleClass(target, config.classes.tabFocus, true);
                         }
@@ -2595,7 +2724,7 @@
                 var wrapper = _getElement('.' + config.classes.videoWrapper);
 
                 // Bail if there's no wrapper (this should never happen)
-                if(!wrapper) {
+                if (!wrapper) {
                     return;
                 }
 
@@ -2626,7 +2755,7 @@
         // Cancel current network requests
         // See https://github.com/Selz/plyr/issues/174
         function _cancelRequests() {
-            if(!_inArray(config.types.html5, plyr.type)) {
+            if (!_inArray(config.types.html5, plyr.type)) {
                 return;
             }
 
@@ -2707,12 +2836,12 @@
             plyr.media = plyr.container.querySelectorAll('audio, video')[0];
 
             // Get the div placeholder for YouTube and Vimeo
-            if(!plyr.media) {
+            if (!plyr.media) {
                 plyr.media = plyr.container.querySelectorAll('div')[0];
             }
 
             // Bail if nothing to setup
-            if(!plyr.media) {
+            if (!plyr.media) {
                 return;
             }
 
@@ -2897,6 +3026,7 @@
 
             case 'vimeo':
             case 'youtube':
+            case 'soundcloud':
                 basic = true;
                 full  = (!oldIE && !iPhone);
                 break;
@@ -2954,7 +3084,7 @@
                 var config = _extend(defaults, options, JSON.parse(element.getAttribute("data-plyr")));
 
                 // Bail if not enabled
-                if(!config.enabled) {
+                if (!config.enabled) {
                     return;
                 }
 
