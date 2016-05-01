@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.6.4
+- Bug fix for undefined progress bar
+
 ## v1.6.3
 - Seek back to 0 for all media on ended
 - Check for HTML5 video on ended reload

@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.6.3
+// plyr.js v1.6.4
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -2218,7 +2218,7 @@
                 progress.value = value;
             }
             // Object of progress + text element
-            else {
+            else if (progress) {
                 if (progress.bar) {
                     progress.bar.value = value;
                 }
