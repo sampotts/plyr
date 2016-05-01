@@ -1610,6 +1610,10 @@
                                 _triggerEvent(plyr.media, 'pause');
                                 break;
                         }
+
+                        _triggerEvent(plyr.container, 'statechange', false, {
+                            code: event.data
+                        });
                     }
                 }
             });
