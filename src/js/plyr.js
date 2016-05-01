@@ -42,7 +42,6 @@
         iconUrl:                '',
         clickToPlay:            true,
         hideControls:           true,
-        showPosterOnEnd:        true,
         tooltips: {
             controls:           false,
             seek:               true
@@ -1828,9 +1827,9 @@
         // Seek to time
         // The input parameter can be an event or a number
         function _seek(input) {
-            var targetTime  = 0,
-                paused      = plyr.media.paused,
-                duration    = _getDuration();
+            var targetTime = 0,
+                paused = plyr.media.paused,
+                duration = _getDuration();
 
             // Explicit position
             if (typeof input === 'number') {
@@ -1851,8 +1850,10 @@
                 targetTime = duration;
             }
 
-            // Update seek range and progress 
-            _updateSeekDisplay(targetTime);
+            // Update progress 
+            if (plyr.progress && plyr.progress.played) {
+                plyr.progress.played.value = ((100 / duration) * targetTime);
+            }
 
             // Set the current time
             // Try/catch incase the media isn't set and we're calling seek() from source() and IE moans
@@ -1900,18 +1901,10 @@
         // Get the duration (or custom if set)
         function _getDuration() {
             // It should be a number, but parse it just incase
-            var duration = parseInt(config.duration),
-
-            // True duration
-            mediaDuration = 0;
-
-            // Only if duration available
-            if(plyr.media.duration !== null && !isNaN(plyr.media.duration)) {
-                mediaDuration = plyr.media.duration;
-            }
+            var duration = parseInt(config.duration);
 
             // If custom duration is funky, use regular duration
-            return (isNaN(duration) ? mediaDuration : duration);
+            return (isNaN(duration) ? plyr.media.duration : duration);
         }
 
         // Check playing state
@@ -2278,33 +2271,10 @@
             _updateProgress(event);
         }
 
-        // Update seek range and progress 
-        function _updateSeekDisplay(time) {
-            // Default to 0
-            if (typeof time !== 'number') {
-                time = 0;
-            }
-
-            var duration    = _getDuration(),
-                value       = _getPercentage(time, duration);
-
-            // Update progress 
-            if (plyr.progress && plyr.progress.played) {
-                plyr.progress.played.value = value;
-            }
-
-            // Update seek range input
-            if (plyr.buttons && plyr.buttons.seek) {
-                plyr.buttons.seek.value = value;
-            }
-        }
-
         // Update hover tooltip for seeking
         function _updateSeekTooltip(event) {
-            var duration = _getDuration();
-
             // Bail if setting not true
-            if (!config.tooltips.seek || !plyr.progress.container || duration === 0) {
+            if (!config.tooltips.seek || plyr.browser.touch || !plyr.progress.container) {
                 return;
             }
 
@@ -2335,7 +2305,7 @@
             }
 
             // Display the time a click would seek to
-            _updateTimeDisplay(((duration / 100) * percent), plyr.progress.tooltip);
+            _updateTimeDisplay(((_getDuration() / 100) * percent), plyr.progress.tooltip);
 
             // Set position
             plyr.progress.tooltip.style.left = percent + "%";
@@ -2453,8 +2423,13 @@
             // Pause playback
             _pause();
 
-            // Update seek range and progress
-            _updateSeekDisplay();
+            // Set seek input to 0
+            if (plyr.buttons && plyr.buttons.seek) {
+                plyr.buttons.seek.value = 0;
+            }
+            if (plyr.progress && plyr.progress.played) {
+                plyr.progress.played.value = 0;
+            }
 
             // Cancel current network requests
             _cancelRequests();
@@ -2747,15 +2722,6 @@
 
                 // Reset UI
                 _checkPlaying();
-
-                // Show poster on end
-                if(config.showPosterOnEnd) {
-                    // Seek to 0
-                    _seek(0);
-
-                    // Re-load media
-                    plyr.media.load();
-                }
             });
 
             // Check for buffer progress
@@ -2819,7 +2785,8 @@
 
             // Set blank video src attribute
             // This is to prevent a MEDIA_ERR_SRC_NOT_SUPPORTED error
-            // Credit: https://github.com/mathiasbynens/small/blob/master/mp4.mp4
+            // Small mp4: https://github.com/mathiasbynens/small/blob/master/mp4.mp4
+            // Info: http://stackoverflow.com/questions/32231579/how-to-properly-dispose-of-an-html5-video-and-close-socket-or-connection
             plyr.media.setAttribute('src', 'data:video/mp4;base64,AAAAHGZ0eXBpc29tAAACAGlzb21pc28ybXA0MQAAAAhmcmVlAAAAGm1kYXQAAAGzABAHAAABthBgUYI9t+8AAAMNbW9vdgAAAGxtdmhkAAAAAMXMvvrFzL76AAAD6AAAACoAAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAABhpb2RzAAAAABCAgIAHAE/////+/wAAAiF0cmFrAAAAXHRraGQAAAAPxcy++sXMvvoAAAABAAAAAAAAACoAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAgAAAAIAAAAAAG9bWRpYQAAACBtZGhkAAAAAMXMvvrFzL76AAAAGAAAAAEVxwAAAAAALWhkbHIAAAAAAAAAAHZpZGUAAAAAAAAAAAAAAABWaWRlb0hhbmRsZXIAAAABaG1pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAACRkaW5mAAAAHGRyZWYAAAAAAAAAAQAAAAx1cmwgAAAAAQAAAShzdGJsAAAAxHN0c2QAAAAAAAAAAQAAALRtcDR2AAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAgACABIAAAASAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGP//AAAAXmVzZHMAAAAAA4CAgE0AAQAEgICAPyARAAAAAAMNQAAAAAAFgICALQAAAbABAAABtYkTAAABAAAAASAAxI2IAMUARAEUQwAAAbJMYXZjNTMuMzUuMAaAgIABAgAAABhzdHRzAAAAAAAAAAEAAAABAAAAAQAAABxzdHNjAAAAAAAAAAEAAAABAAAAAQAAAAEAAAAUc3RzegAAAAAAAAASAAAAAQAAABRzdGNvAAAAAAAAAAEAAAAsAAAAYHVkdGEAAABYbWV0YQAAAAAAAAAhaGRscgAAAAAAAAAAbWRpcmFwcGwAAAAAAAAAAAAAAAAraWxzdAAAACOpdG9vAAAAG2RhdGEAAAABAAAAAExhdmY1My4yMS4x');
 
             // Load the new empty source
