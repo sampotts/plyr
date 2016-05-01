@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.6.2
+// plyr.js v1.6.3
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -2765,11 +2765,14 @@
                 // Reset UI
                 _checkPlaying();
 
-                // Show poster on end
-                if(config.showPosterOnEnd) {
-                    // Seek to 0
-                    _seek(0);
+                // Seek to 0
+                _seek(0);
 
+                // Reset duration display
+                _displayDuration();
+
+                // Show poster on end
+                if(plyr.type === 'video' && config.showPosterOnEnd) {
                     // Re-load media
                     plyr.media.load();
                 }

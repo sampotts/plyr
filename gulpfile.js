@@ -214,7 +214,7 @@ options = {
 
 // If aws is setup
 if("cdn" in aws) {
-    var regex       = "(\\d+\\.)?(\\d+\\.)?(\\*|\\d+)",
+    var regex       = "(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)(?:-[\\da-z\\-]+(?:\.[\\da-z\\-]+)*)?(?:\\+[\\da-z\\-]+(?:\.[\\da-z\\-]+)*)?",
     cdnpath         = new RegExp(aws.cdn.bucket + "\/" + regex, "gi"),
     semver          = new RegExp("v" + regex, "gi"),
     localpath       = new RegExp("(\.\.\/)?dist", "gi");

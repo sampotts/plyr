@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.6.3
+- Seek back to 0 for all media on ended
+- Check for HTML5 video on ended reload
+- Update to docs for `showPosterOnEnd` option
+
 ## v1.6.2
 - Fix for tooltip displaying when duration is not set (fixes #177)
 - `showPosterOnEnd` option to show poster when HTML5 video ended (fixes #59)
