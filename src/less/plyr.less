@@ -201,7 +201,9 @@
     bottom: 0;
     left: 0;
     width: 100%;
-    padding: (@plyr-control-spacing * 2) (@plyr-control-spacing * 2) (@plyr-control-spacing * 8);
+    padding: (@plyr-control-spacing * 2);
+    transform: translateY(-(@plyr-control-spacing * 6));
+    transition: transform .3s ease;
     color: #fff;
     font-size: @plyr-font-size-captions-base;
     text-align: center;
@@ -225,6 +227,9 @@
 }
 .plyr--fullscreen-active .plyr__captions {
     font-size: @plyr-font-size-captions-large;
+}
+.plyr--hide-controls .plyr__captions {
+    transform: translateY(-(@plyr-control-spacing * 2));
 }
 
 // Controls
