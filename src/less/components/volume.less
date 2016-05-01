@@ -1,0 +1,27 @@
+// Volume
+// --------------------------------------------------------------
+
+.plyr .plyr__volume { 
+    display: none;
+    position: relative;
+
+    input[type="range"] {
+        position: relative;
+        z-index: 2;
+    }
+    @media (min-width: @plyr-bp-screen-sm) {
+        display: block;
+        max-width: 60px;
+    }
+    @media (min-width: @plyr-bp-screen-md) {
+        max-width: 100px;
+    }
+}
+
+// Hide sound controls on iOS
+// It's not supported to change volume using JavaScript:
+// https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html
+.plyr--is-ios .plyr__volume,
+.plyr--is-ios [data-plyr='mute'] {
+    display: none !important;
+}

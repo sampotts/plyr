@@ -1,0 +1,32 @@
+// Base styles
+// --------------------------------------------------------------
+
+.plyr {
+    position: relative;
+    max-width: 100%;
+    min-width: 200px;
+    font-family: Avenir, "Avenir Next", "Helvetica Neue", "Segoe UI", Helvetica, Arial, sans-serif;
+
+    // border-box everything
+    // http://paulirish.com/2012/box-sizing-border-box-ftw/
+    &,
+    *,
+    *::after,
+    *::before {
+        box-sizing: border-box;
+    }
+
+    // Fix 300ms delay
+    a, button, input, label {
+        touch-action: manipulation;
+    }
+
+    // Media elements
+    video,
+    audio {
+        width: 100%;
+        height: auto;
+        vertical-align: middle;
+        border-radius: inherit;
+    }
+}

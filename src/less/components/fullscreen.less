@@ -1,0 +1,30 @@
+// Fullscreen mode
+// --------------------------------------------------------------
+
+.plyr--fullscreen,
+.plyr--fullscreen-active {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 10000000;
+    background: #000;
+    border-radius: 0;
+
+    video {
+        height: 100%;
+    }
+    .plyr__video-wrapper {
+        height: 100%;
+        width: 100%;
+    }
+    .plyr__controls {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+    }
+}

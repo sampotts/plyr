@@ -1,0 +1,43 @@
+// Captions
+// --------------------------------------------------------------
+
+// Hide default captions
+.plyr video::-webkit-media-text-track-container {
+    display: none;
+}
+.plyr__captions {
+    display: none;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: (@plyr-control-spacing * 2);
+    transform: translateY(-(@plyr-control-spacing * 6));
+    transition: transform .3s ease;
+    color: #fff;
+    font-size: @plyr-font-size-captions-base;
+    text-align: center;
+    font-weight: 400;
+
+    span {
+        border-radius: 2px;
+        padding: floor(@plyr-control-spacing / 3) @plyr-control-spacing;
+        background: fade(#000, 85%);
+    }
+    span:empty {
+        display: none;
+    }
+
+    @media (min-width: @plyr-bp-screen-md) {
+        font-size: @plyr-font-size-captions-medium;
+    }
+}
+.plyr--captions-active .plyr__captions {
+    display: block;
+}
+.plyr--fullscreen-active .plyr__captions {
+    font-size: @plyr-font-size-captions-large;
+}
+.plyr--hide-controls .plyr__captions {
+    transform: translateY(-(@plyr-control-spacing * 2));
+}
