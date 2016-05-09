@@ -76,9 +76,6 @@
         &::-moz-range-thumb {
             @include plyr-range-thumb();
         }
-        &::-moz-focus-outer {
-            border: 0;
-        }
         
         // Microsoft
         &::-ms-track {
@@ -445,17 +442,16 @@
     transform-origin: 50% 100%;
     transition: transform .2s .1s ease, opacity .2s .1s ease;
 
-    // Arrows
     &::before {
+        // Arrows
         content: '';
         position: absolute;
         width: 0;
         height: 0;
         left: 50%;
         transform: translateX(-50%);
-    }
-    // The background triangle
-    &::before {
+    
+        // The background triangle
         bottom: -$plyr-tooltip-arrow-size;
         border-right: $plyr-tooltip-arrow-size solid transparent;
         border-top: $plyr-tooltip-arrow-size solid $plyr-tooltip-bg;
