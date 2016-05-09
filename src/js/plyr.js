@@ -194,7 +194,7 @@
         else if ((verOffset=nAgt.indexOf('Safari')) !== -1) {
             name = 'Safari';
             fullVersion = nAgt.substring(verOffset + 7);
-            if ((verOffset=nAgt.indexOf('Version')) !== -1) {
+            if ((verOffset = nAgt.indexOf('Version')) !== -1) {
                 fullVersion = nAgt.substring(verOffset + 8);
             }
         }
@@ -1390,7 +1390,7 @@
                     window.onYouTubeReadyCallbacks = window.onYouTubeReadyCallbacks || [];
 
                     // Add to queue
-                    window.onYouTubeReadyCallbacks.push(function() { _youTubeReady(mediaId, container) });
+                    window.onYouTubeReadyCallbacks.push(function() { _youTubeReady(mediaId, container); });
 
                     // Set callback to process queue
                     window.onYouTubeIframeAPIReady = function () {
