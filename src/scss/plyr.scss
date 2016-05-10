@@ -636,7 +636,8 @@
         z-index: 2;
     }
     @media (min-width: $plyr-bp-screen-sm) {
-        display: block;
+        display: flex;
+        flex: 1;
         max-width: 60px;
     }
     @media (min-width: $plyr-bp-screen-md) {
