@@ -143,6 +143,9 @@
 // --------------------------------------------------------------
 .plyr__progress {
     position: relative;
+    // For IE10
+    // http://stackoverflow.com/questions/22008135/internet-explorer-10-does-not-apply-flexbox-on-inline-elements
+    display: inline-block;
     flex: 1;
 
     input[type="range"] {
