@@ -629,6 +629,7 @@
 // --------------------------------------------------------------
 .plyr .plyr__volume { 
     display: none;
+    flex: 1;
     position: relative;
 
     input[type="range"] {
