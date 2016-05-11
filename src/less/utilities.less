@@ -4,11 +4,22 @@
 
 // Screen reader only elements
 .plyr__sr-only {
-    position: absolute !important;
     clip: rect(1px, 1px, 1px, 1px);
-    padding: 0 !important;
-    border: 0 !important;
-    height: 1px !important;
-    width: 1px !important;
     overflow: hidden;
+
+	// !important is not always needed
+	& when (@plyr-sr-only-important = true) {
+		position: absolute !important;
+		padding: 0 !important;
+		border: 0 !important;
+		height: 1px !important;
+		width: 1px !important;
+	}
+	& when (@plyr-sr-only-important = false) {
+		position: absolute;
+		padding: 0;
+		border: 0;
+		height: 1px;
+		width: 1px;
+	}
 }
