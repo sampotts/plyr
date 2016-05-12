@@ -21,18 +21,22 @@
     min-width: 200px;
     font-family: Avenir, "Avenir Next", "Helvetica Neue", "Segoe UI", Helvetica, Arial, sans-serif;
 
-    // border-box everything
-    // http://paulirish.com/2012/box-sizing-border-box-ftw/
-    &,
-    *,
-    *::after,
-    *::before {
-        box-sizing: border-box;
+    & when (@plyr-border-box = true) {
+        // border-box everything
+        // http://paulirish.com/2012/box-sizing-border-box-ftw/
+        &,
+        *,
+        *::after,
+        *::before {
+            box-sizing: border-box;
+        }
     }
 
-    // Fix 300ms delay
-    a, button, input, label {
-        touch-action: manipulation;
+    & when (@plyr-touch-action = true) {
+        // Fix 300ms delay
+        a, button, input, label {
+            touch-action: manipulation;
+        }
     }
 
     // Media elements
@@ -138,13 +142,24 @@
 
 // Screen reader only elements
 .plyr__sr-only {
-    position: absolute !important;
     clip: rect(1px, 1px, 1px, 1px);
-    padding: 0 !important;
-    border: 0 !important;
-    height: 1px !important;
-    width: 1px !important;
     overflow: hidden;
+
+    // !important is not always needed
+    & when (@plyr-sr-only-important = true) {
+        position: absolute !important;
+        padding: 0 !important;
+        border: 0 !important;
+        height: 1px !important;
+        width: 1px !important;
+    }
+    & when (@plyr-sr-only-important = false) {
+        position: absolute;
+        padding: 0;
+        border: 0;
+        height: 1px;
+        width: 1px;
+    }
 }
 
 // Video
@@ -629,6 +644,7 @@
 // --------------------------------------------------------------
 .plyr .plyr__volume { 
     display: none;
+    flex: 1;
     position: relative;
 
     input[type="range"] {
