@@ -55,14 +55,14 @@
         height: ($plyr-range-thumb-height * $plyr-range-thumb-active-scale);
         width: 100%;
         margin: 0;
-        padding: 0; 
+        padding: 0;
         vertical-align: middle;
-        
+
         appearance: none;
         cursor: pointer;
         border: none;
         background: transparent;
-        
+
         // WebKit
         &::-webkit-slider-runnable-track {
             @include plyr-range-track();
@@ -80,7 +80,7 @@
         &::-moz-range-thumb {
             @include plyr-range-thumb();
         }
-        
+
         // Microsoft
         &::-ms-track {
             height: $plyr-range-track-height;
@@ -98,7 +98,7 @@
         &::-ms-thumb {
             @include plyr-range-thumb();
             // For some reason, Edge uses the -webkit margin above
-            margin-top: 0; 
+            margin-top: 0;
         }
         &::-ms-tooltip {
             display: none;
@@ -110,11 +110,11 @@
         }
         &::-moz-focus-outer {
             border: 0;
-        }        
+        }
         &.tab-focus:focus {
             outline-offset: 3px;
         }
-        
+
         // Pressed styles
         &:active {
             &::-webkit-slider-thumb {
@@ -248,7 +248,7 @@
 // Playback controls
 .plyr__controls {
     display: flex;
-    align-items: center; 
+    align-items: center;
 
     line-height: 1;
     text-align: center;
@@ -286,6 +286,7 @@
         cursor: pointer;
         transition: background .3s ease, color .3s ease, opacity .3s ease;
         color: inherit;
+        overflow: visible;
 
         svg {
             width: 18px;
@@ -315,7 +316,7 @@
         }
     }
 }
-// Hide controls 
+// Hide controls
 .plyr--hide-controls .plyr__controls {
     opacity: 0;
 }
@@ -456,7 +457,7 @@
         height: 0;
         left: 50%;
         transform: translateX(-50%);
-    
+
         // The background triangle
         bottom: -$plyr-tooltip-arrow-size;
         border-right: $plyr-tooltip-arrow-size solid transparent;
@@ -567,16 +568,16 @@
     }
     &::-moz-progress-bar {
         transition: width .2s ease;
-    }    
+    }
     &::-ms-fill {
         transition: width .2s ease;
-    }            
+    }
 }
 .plyr--video .plyr__progress--buffer,
 .plyr--video .plyr__volume--display {
     background: $plyr-video-range-track-bg;
 }
-.plyr--video .plyr__progress--buffer { 
+.plyr--video .plyr__progress--buffer {
     color: $plyr-video-progress-buffered-bg;
 }
 .plyr--audio .plyr__progress--buffer,
@@ -635,7 +636,7 @@
 
 // Volume
 // --------------------------------------------------------------
-.plyr .plyr__volume { 
+.plyr .plyr__volume {
     display: none;
     flex: 1;
     position: relative;
@@ -645,7 +646,8 @@
         z-index: 2;
     }
     @media (min-width: $plyr-bp-screen-sm) {
-        display: block;
+        display: flex;
+        flex: 1;
         max-width: 60px;
     }
     @media (min-width: $plyr-bp-screen-md) {
