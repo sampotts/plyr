@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.6.6
+- Icons cleaned up
+- IE11 button fix for tooltips (fixes #210)
+
+## v1.6.5
+- IE UI bug fixes
+
 ## v1.6.4
 - Bug fix for undefined progress bar
 

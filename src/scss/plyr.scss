@@ -201,7 +201,7 @@
     padding: ($plyr-control-spacing * 2);
     transform: translateY(-($plyr-control-spacing * 6));
     transition: transform .3s ease;
-    color: #fff;
+    color: $plyr-captions-color;
     font-size: $plyr-font-size-captions-base;
     text-align: center;
     font-weight: 400;
@@ -209,7 +209,7 @@
     span {
         border-radius: 2px;
         padding: floor($plyr-control-spacing / 3) $plyr-control-spacing;
-        background: transparentize(#000, .15);
+        background: $plyr-captions-bg;
     }
     span:empty {
         display: none;
@@ -263,8 +263,9 @@
         position: relative;
         display: inline-block;
         flex-shrink: 0;
+        overflow: visible; // IE11
         vertical-align: middle;
-        padding: ($plyr-control-spacing / 2);
+        padding: ($plyr-control-spacing * .7);
         border: 0;
         background: transparent;
         border-radius: 3px;
@@ -298,9 +299,6 @@
         .plyr__time {
             margin-left: $plyr-control-spacing;
         }
-        button {
-            padding: ($plyr-control-spacing / 2) $plyr-control-spacing;
-        }
     }
 }
 // Hide controls 
@@ -327,11 +325,6 @@
             background: $plyr-video-control-bg-hover;
             color: $plyr-video-control-color-hover;
         }
-    }
-
-    @media (min-width: $plyr-bp-screen-sm) {
-        padding-left: ($plyr-control-spacing * 1.5);
-        padding-right: ($plyr-control-spacing * 1.5);
     }
 }
 
@@ -431,7 +424,6 @@
 
     opacity: 0;
     background: $plyr-tooltip-bg;
-    box-shadow: $plyr-tooltip-shadow;
     border-radius: $plyr-tooltip-radius;
 
     color: $plyr-tooltip-color;
@@ -542,12 +534,14 @@
         max-width: 99%;
         border-top-right-radius: 0;
         border-bottom-right-radius: 0;
+        transition: none;
     }
     &::-moz-progress-bar {
         min-width: $plyr-range-track-height;
         max-width: 99%;
         border-top-right-radius: 0;
         border-bottom-right-radius: 0;
+        transition: none;
     }
     &::-ms-fill {
         display: none;

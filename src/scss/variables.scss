@@ -12,7 +12,9 @@ $plyr-font-size-small:                  14px !default;
 $plyr-font-size-base:                   16px !default;
 
 // Captions
-$plyr-font-size-captions-base:          ceil($plyr-font-size-base * 1.25) !default;
+$plyr-captions-bg: 						transparentize(#000, .3) !default;
+$plyr-captions-color: 					#fff !default;
+$plyr-font-size-captions-base:          $plyr-font-size-base !default;
 $plyr-font-size-captions-medium:        ceil($plyr-font-size-base * 1.5) !default;
 $plyr-font-size-captions-large:         ($plyr-font-size-base * 2) !default;
 
@@ -30,12 +32,8 @@ $plyr-audio-control-color-hover:        #fff !default;
 $plyr-audio-control-bg-hover:           $plyr-color-main;
 
 // Tooltips
-$plyr-tooltip-bg:                       $plyr-video-controls-bg !default;
-$plyr-tooltip-border-color:             transparentize(darken($plyr-video-controls-bg, 75%), .9) !default;
-$plyr-tooltip-arrow-border-color:       transparentize(darken($plyr-video-controls-bg, 75%), .8) !default;
-$plyr-tooltip-border-width:             1px !default;
-$plyr-tooltip-shadow:                   0 0 5px $plyr-tooltip-border-color, 0 0 0 $plyr-tooltip-border-width $plyr-tooltip-border-color !default;
-$plyr-tooltip-color:                    $plyr-video-control-color !default;
+$plyr-tooltip-bg:                       transparentize(#000, .3) !default;
+$plyr-tooltip-color:                    #fff !default;
 $plyr-tooltip-padding:                  ($plyr-control-spacing / 2) !default;
 $plyr-tooltip-arrow-size:               4px !default;
 $plyr-tooltip-radius:                   3px !default;
