@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.6.7
+// plyr.js v1.6.8
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -2222,7 +2222,7 @@
                 value = 0;
             }
             // Default to buffer
-            if (typeof progres === 'undefined') {
+            if (typeof progress === 'undefined') {
                 progress = plyr.progress.buffer;
             }
 

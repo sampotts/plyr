@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.6.8
+- Fix for bug introduced in v1.6.7
+
 ## v1.6.7
 - Fixes for using `source` API method on iOS
 

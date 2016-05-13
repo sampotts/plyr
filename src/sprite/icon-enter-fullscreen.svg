@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg width="18px" height="18px" viewBox="0 0 18 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <g>        
-        <path d="M3,7 L1,7 L1,2 C1,1.4 1.4,1 2,1 L7,1 L7,3 L3,3 L3,7 L3,7 Z"></path>
-        <path d="M17,7 L15,7 L15,3 L11,3 L11,1 L16,1 C16.6,1 17,1.4 17,2 L17,7 L17,7 Z"></path>
-        <path d="M16,17 L11,17 L11,15 L15,15 L15,11 L17,11 L17,16 C17,16.6 16.6,17 16,17 L16,17 Z"></path>
-        <path d="M7,17 L2,17 C1.4,17 1,16.6 1,16 L1,11 L3,11 L3,15 L7,15 L7,17 L7,17 Z"></path>
+    <g>
+        <polygon points="10 3 13.6 3 9.6 7 11 8.4 15 4.4 15 8 17 8 17 1 10 1"></polygon>
+        <polygon points="7 9.6 3 13.6 3 10 1 10 1 17 8 17 8 15 4.4 15 8.4 11"></polygon>
     </g>
 </svg>
