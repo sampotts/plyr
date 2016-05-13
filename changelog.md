@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.6.7
+- Fixes for using `source` API method on iOS
+
 ## v1.6.6
 - Icons cleaned up
 - IE11 button fix for tooltips (fixes #210)

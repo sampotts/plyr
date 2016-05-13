@@ -364,6 +364,7 @@
 
 // Large play button (video only)
 .plyr__play-large {
+    display: none;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -388,6 +389,9 @@
     &:focus {
         outline: 1px dotted fade(@plyr-video-control-color, 50%);
     }
+}
+.plyr .plyr__play-large {
+    display: inline-block;
 }
 .plyr--audio .plyr__play-large {
     display: none;
@@ -481,7 +485,7 @@
 // <progress> element
 .plyr__progress {
     position: relative;
-    display: inline-block;
+    display: none;
     flex: 1;
 
     input[type="range"] {
@@ -503,6 +507,9 @@
     .plyr__tooltip {
         left: 0;
     }
+}
+.plyr .plyr__progress {
+    display: inline-block;
 }
 
 .plyr__progress--buffer,
@@ -636,8 +643,10 @@
 
 // Volume
 // --------------------------------------------------------------
-.plyr .plyr__volume { 
+.plyr__volume {
     display: none;
+}
+.plyr .plyr__volume {
     flex: 1;
     position: relative;
 
