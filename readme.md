@@ -3,7 +3,7 @@ A simple, accessible and customizable HTML5, YouTube and Vimeo media player.
 
 [Checkout the demo](https://plyr.io)
 
-[![Image of Plyr](https://cdn.plyr.io/static/plyr_v1.6.0.png)](https://plyr.io)
+[![Image of Plyr](https://cdn.selz.com/plyr/1.5/plyr_v1.6.6.png)](https://plyr.io)
 
 ## Why?
 We wanted a lightweight, accessible and customizable media player that supports [*modern*](#browser-support) browsers. Sure, there are many other players out there but we wanted to keep things simple, using the right elements for the job.
