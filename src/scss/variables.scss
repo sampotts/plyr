@@ -4,6 +4,11 @@
 // https://robots.thoughtbot.com/sass-default
 // ==========================================================================
 
+// Settings
+$plyr-border-box:                       true !default;
+$plyr-touch-action:                     true !default;
+$plyr-sr-only-important:                true !default;
+
 // Colors
 $plyr-color-main:                       #3498db !default;
 
