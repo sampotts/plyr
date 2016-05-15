@@ -40,7 +40,7 @@ If you have any cool ideas or features, please let me know by [creating an issue
 ## Implementation
 Check `docs/index.html` and `docs/dist/docs.js` for an example setup.
 
-**Heads up:** the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.6.8/plyr.js` to `https://cdn.plyr.io/1.6.8/plyr.js`
+**Heads up:** the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.6.9/plyr.js` to `https://cdn.plyr.io/1.6.9/plyr.js`
 
 ### Node Package Manager (NPM)
 
@@ -71,11 +71,11 @@ More info is on [npm](https://www.npmjs.com/package/ember-cli-plyr) and [GitHub]
 If you want to use our CDN, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/1.6.8/plyr.css">
-<script src="https://cdn.plyr.io/1.6.8/plyr.js"></script>
+<link rel="stylesheet" href="https://cdn.plyr.io/1.6.9/plyr.css">
+<script src="https://cdn.plyr.io/1.6.9/plyr.js"></script>
 ```
 
-You can also access the `sprite.svg` file at `https://cdn.plyr.io/1.6.8/sprite.svg`.
+The SVG sprite/defs file can be found here: `https://cdn.plyr.io/1.6.9/plyr.svg`.
 
 ### CSS & Styling
 If you want to use the default css, add the `plyr.css` file from `/dist` into your head, or even better use `plyr.less` or `plyr.scss` file included in `/src` in your build to save a request.
@@ -94,7 +94,7 @@ The SVG sprite for the controls icons can be loaded two ways:
 #### Using the `iconUrl` option
 This method requires the SVG sprite to be hosted on the *same domain* as your page hosting the player. Currently no browser supports cross origin SVG sprites due to XSS issues. Fingers crossed this will come soon though. An example value for this option would be:
 ```
-/path/to/sprite.svg
+/path/to/plyr.svg
 ```
 
 #### Using AJAX
@@ -113,7 +113,7 @@ Using AJAX means you can load the sprite from a different origin. Avoiding the i
 		c.innerHTML = a.responseText;
 		b.insertBefore(c, b.childNodes[0]);
 	};
-})(document, 'https://cdn.plyr.io/1.6.8/sprite.svg');
+})(document, 'https://cdn.plyr.io/1.6.9/plyr.svg');
 </script>
 ```
 
@@ -188,7 +188,7 @@ Be sure to [validate your caption files](https://quuz.org/webvtt/)
 Here's an example of a default setup:
 
 ```html
-<script src="https://cdn.plyr.io/1.6.8/plyr.js"></script>
+<script src="https://cdn.plyr.io/1.6.9/plyr.js"></script>
 <script>plyr.setup();</script>
 ```
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.6.9
+- Added 'latest' CDN option
+- Renamed `sprite.svg` to `plyr.svg` to be inline with the other package files
+
 ## v1.6.8
 - Fix for bug introduced in v1.6.7
 
