@@ -234,6 +234,7 @@ options = {
     symlinks: function(version, filename) {
         return {
             headers: {
+                // http://stackoverflow.com/questions/2272835/amazon-s3-object-redirect
                 "X-Amz-Website-Redirect-Location": "/" + version + "/" + filename,
                 "Cache-Control": "no-cache, no-store, must-revalidate, max-age=0"
             }
