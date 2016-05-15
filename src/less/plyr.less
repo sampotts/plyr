@@ -214,9 +214,9 @@
     left: 0;
     width: 100%;
     padding: (@plyr-control-spacing * 2);
-    transform: translateY(-(@plyr-control-spacing * 6));
+    transform: translateY(-(@plyr-control-spacing * 4));
     transition: transform .3s ease;
-    color: #fff;
+    color: @plyr-captions-color;
     font-size: @plyr-font-size-captions-base;
     text-align: center;
     font-weight: 400;
@@ -224,7 +224,7 @@
     span {
         border-radius: 2px;
         padding: floor(@plyr-control-spacing / 3) @plyr-control-spacing;
-        background: fade(#000, 85%);
+        background: @plyr-captions-bg;
     }
     span:empty {
         display: none;
@@ -241,7 +241,7 @@
     font-size: @plyr-font-size-captions-large;
 }
 .plyr--hide-controls .plyr__captions {
-    transform: translateY(-(@plyr-control-spacing * 2));
+    transform: translateY(-(@plyr-control-spacing * 1.5));
 }
 
 // Controls
@@ -278,8 +278,9 @@
         position: relative;
         display: inline-block;
         flex-shrink: 0;
+        overflow: visible; // IE11
         vertical-align: middle;
-        padding: (@plyr-control-spacing / 2);
+        padding: (@plyr-control-spacing * .7);
         border: 0;
         background: transparent;
         border-radius: 3px;
@@ -313,9 +314,6 @@
         .plyr__time {
             margin-left: @plyr-control-spacing;
         }
-        button {
-            padding: (@plyr-control-spacing / 2) @plyr-control-spacing;
-        }
     }
 }
 // Hide controls 
@@ -343,11 +341,6 @@
             color: @plyr-video-control-color-hover;
         }
     }
-
-    @media (min-width: @plyr-bp-screen-sm) {
-        padding-left: (@plyr-control-spacing * 1.5);
-        padding-right: (@plyr-control-spacing * 1.5);
-    }
 }
 
 // Audio controls
@@ -371,6 +364,7 @@
 
 // Large play button (video only)
 .plyr__play-large {
+    display: none;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -395,6 +389,9 @@
     &:focus {
         outline: 1px dotted fade(@plyr-video-control-color, 50%);
     }
+}
+.plyr .plyr__play-large {
+    display: inline-block;
 }
 .plyr--audio .plyr__play-large {
     display: none;
@@ -488,7 +485,7 @@
 // <progress> element
 .plyr__progress {
     position: relative;
-    display: inline-block;
+    display: none;
     flex: 1;
 
     input[type="range"] {
@@ -510,6 +507,9 @@
     .plyr__tooltip {
         left: 0;
     }
+}
+.plyr .plyr__progress {
+    display: inline-block;
 }
 
 .plyr__progress--buffer,
@@ -556,12 +556,14 @@
         max-width: 99%;
         border-top-right-radius: 0;
         border-bottom-right-radius: 0;
+        transition: none;
     }
     &::-moz-progress-bar {
         min-width: @plyr-range-track-height;
         max-width: 99%;
         border-top-right-radius: 0;
         border-bottom-right-radius: 0;
+        transition: none;
     }
     &::-ms-fill {
         display: none;
@@ -641,8 +643,10 @@
 
 // Volume
 // --------------------------------------------------------------
-.plyr .plyr__volume { 
+.plyr__volume {
     display: none;
+}
+.plyr .plyr__volume {
     flex: 1;
     position: relative;
 

@@ -1,5 +1,22 @@
 # Changelog
 
+## v1.6.9
+- Added 'latest' CDN option
+- Renamed `sprite.svg` to `plyr.svg` to be inline with the other package files
+
+## v1.6.8
+- Fix for bug introduced in v1.6.7
+
+## v1.6.7
+- Fixes for using `source` API method on iOS
+
+## v1.6.6
+- Icons cleaned up
+- IE11 button fix for tooltips (fixes #210)
+
+## v1.6.5
+- IE UI bug fixes
+
 ## v1.6.4
 - Bug fix for undefined progress bar
 

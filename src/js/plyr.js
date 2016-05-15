@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.6.5
+// plyr.js v1.6.9
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -2162,6 +2162,10 @@
 
         // Update <progress> elements
         function _updateProgress(event) {
+            if (!plyr.supported.full) {
+                return;
+            }
+
             var progress    = plyr.progress.played,
                 value       = 0,
                 duration    = _getDuration();
@@ -2209,8 +2213,17 @@
 
         // Set <progress> value
         function _setProgress(progress, value) {
+            if (!plyr.supported.full) {
+                return;
+            }
+            
+            // Default to 0
             if (typeof value === 'undefined') {
                 value = 0;
+            }
+            // Default to buffer
+            if (typeof progress === 'undefined') {
+                progress = plyr.progress.buffer;
             }
 
             // One progress element passed
@@ -2471,7 +2484,7 @@
             _updateSeekDisplay();
 
             // Reset buffer progress
-            _setProgress(plyr.progress.buffer);
+            _setProgress();
 
             // Cancel current network requests
             _cancelRequests();

@@ -16,7 +16,9 @@
 @plyr-font-size-base:                   16px;
 
 // Captions
-@plyr-font-size-captions-base:          ceil(@plyr-font-size-base * 1.25);
+@plyr-captions-bg: 						fade(#000, 70%);
+@plyr-captions-color: 					#fff;
+@plyr-font-size-captions-base:          @plyr-font-size-base;
 @plyr-font-size-captions-medium:        ceil(@plyr-font-size-base * 1.5);
 @plyr-font-size-captions-large:         (@plyr-font-size-base * 2);
 
@@ -34,10 +36,8 @@
 @plyr-audio-control-bg-hover:           @plyr-color-main;
 
 // Tooltips
-@plyr-tooltip-bg:                       fade(#000, 60%);
-@plyr-tooltip-border-color:             fade(darken(@plyr-video-controls-bg, 75%), 10%);
-@plyr-tooltip-arrow-border-color:       fade(darken(@plyr-video-controls-bg, 75%), 20%);
-@plyr-tooltip-color:                    #fff;
+@plyr-tooltip-bg:                       fade(#000, 70%);
+@plyr-tooltip-color:                   	#fff;
 @plyr-tooltip-padding:                  (@plyr-control-spacing / 2);
 @plyr-tooltip-arrow-size:               4px;
 @plyr-tooltip-radius:                   3px;
