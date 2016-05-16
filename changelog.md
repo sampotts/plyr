@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.6.11
+- Fix for Vimeo fullscreen (fixes #214)
+
 ## v1.6.10
 - Changed default icon prefix from 'icon' to 'plyr' to avoid clashes
 
