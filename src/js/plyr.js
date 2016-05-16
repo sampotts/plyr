@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.6.9
+// plyr.js v1.6.10
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -38,7 +38,7 @@
         volume:                 5,
         duration:               null,
         displayDuration:        true,
-        iconPrefix:             'icon',
+        iconPrefix:             'plyr',
         iconUrl:                '',
         clickToPlay:            true,
         hideControls:           true,

@@ -40,7 +40,7 @@ If you have any cool ideas or features, please let me know by [creating an issue
 ## Implementation
 Check `docs/index.html` and `docs/dist/docs.js` for an example setup.
 
-**Heads up:** the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.6.9/plyr.js` to `https://cdn.plyr.io/1.6.9/plyr.js`
+**Heads up:** the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.6.10/plyr.js` to `https://cdn.plyr.io/1.6.10/plyr.js`
 
 ### Node Package Manager (NPM)
 
@@ -71,11 +71,11 @@ More info is on [npm](https://www.npmjs.com/package/ember-cli-plyr) and [GitHub]
 If you want to use our CDN, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/1.6.9/plyr.css">
-<script src="https://cdn.plyr.io/1.6.9/plyr.js"></script>
+<link rel="stylesheet" href="https://cdn.plyr.io/1.6.10/plyr.css">
+<script src="https://cdn.plyr.io/1.6.10/plyr.js"></script>
 ```
 
-The SVG sprite/defs file can be found here: `https://cdn.plyr.io/1.6.9/plyr.svg`.
+The SVG sprite/defs file can be found here: `https://cdn.plyr.io/1.6.10/plyr.svg`.
 
 ### CSS & Styling
 If you want to use the default css, add the `plyr.css` file from `/dist` into your head, or even better use `plyr.less` or `plyr.scss` file included in `/src` in your build to save a request.
@@ -113,7 +113,7 @@ Using AJAX means you can load the sprite from a different origin. Avoiding the i
 		c.innerHTML = a.responseText;
 		b.insertBefore(c, b.childNodes[0]);
 	};
-})(document, 'https://cdn.plyr.io/1.6.9/plyr.svg');
+})(document, 'https://cdn.plyr.io/1.6.10/plyr.svg');
 </script>
 ```
 
@@ -188,7 +188,7 @@ Be sure to [validate your caption files](https://quuz.org/webvtt/)
 Here's an example of a default setup:
 
 ```html
-<script src="https://cdn.plyr.io/1.6.9/plyr.js"></script>
+<script src="https://cdn.plyr.io/1.6.10/plyr.js"></script>
 <script>plyr.setup();</script>
 ```
 
@@ -260,8 +260,8 @@ Options must be passed as an object to the `setup()` method as above or as JSON 
   <tr>
     <td><code>iconPrefix</code></td>
     <td>String</td>
-    <td><code>icon</code></td>
-    <td>Specify the id prefix for the icons used in the default controls (e.g. "icon-play" would be "icon"). This is to prevent clashes if you're using your own SVG defs file but with the default controls. Most people can ignore this option.</td>
+    <td><code>plyr</code></td>
+    <td>Specify the id prefix for the icons used in the default controls (e.g. "plyr-play" would be "plyr"). This is to prevent clashes if you're using your own SVG defs file but with the default controls. Most people can ignore this option.</td>
   </tr>
   <tr>
     <td><code>iconUrl</code></td>
@@ -873,6 +873,7 @@ If you find anything weird with Plyr, please let us know using the GitHub issues
 Plyr is developed by [@sam_potts](https://twitter.com/sam_potts) / [sampotts.me](http://sampotts.me) with help from the awesome [contributors](https://github.com/Selz/plyr/graphs/contributors)
 
 ## Mentions
+- [ProductHunt](https://www.producthunt.com/tech/plyr)
 - [The Changelog](http://thechangelog.com/plyr-simple-html5-media-player-custom-controls-webvtt-captions/)
 - [HTML5 Weekly #177](http://html5weekly.com/issues/177)
 - [Responsive Design #149](http://us4.campaign-archive2.com/?u=559bc631fe5294fc66f5f7f89&id=451a61490f)

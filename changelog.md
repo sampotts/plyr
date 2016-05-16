@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.6.10
+- Changed default icon prefix from 'icon' to 'plyr' to avoid clashes
+
 ## v1.6.9
 - Added 'latest' CDN option
 - Renamed `sprite.svg` to `plyr.svg` to be inline with the other package files

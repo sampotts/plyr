@@ -235,7 +235,7 @@ options = {
         return {
             headers: {
                 // http://stackoverflow.com/questions/2272835/amazon-s3-object-redirect
-                "X-Amz-Website-Redirect-Location": "/" + version + "/" + filename,
+                "x-amz-website-redirect-location": "/" + version + "/" + filename,
                 "Cache-Control": "no-cache, no-store, must-revalidate, max-age=0"
             }
         }
@@ -247,8 +247,8 @@ if("cdn" in aws) {
     var regex       = "(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)(?:-[\\da-z\\-]+(?:\.[\\da-z\\-]+)*)?(?:\\+[\\da-z\\-]+(?:\.[\\da-z\\-]+)*)?",
     cdnpath         = new RegExp(aws.cdn.bucket + "\/" + regex, "gi"),
     semver          = new RegExp("v" + regex, "gi"),
-    localpath       = new RegExp("(\.\.\/)?dist", "gi"),
-    latest          = "https://" + aws.cdn.bucket + "/latest";
+    localPath       = new RegExp("(\.\.\/)?dist", "gi"),
+    versionPath     = "https://" + aws.cdn.bucket + "/" + version;
 }
 
 // Publish version to CDN bucket
@@ -284,12 +284,12 @@ gulp.task("docs", function () {
     // Replace local file paths with remote paths in docs
     // e.g. "../dist/plyr.js" to "https://cdn.plyr.io/x.x.x/plyr.js"
     gulp.src([paths.docs.root + "*.html"])
-        .pipe(replace(localpath, latest))
+        .pipe(replace(localPath, versionPath))
         .pipe(s3(aws.docs, options.docs));
 
     // Upload error.html to cdn (as well as docs site)
     return gulp.src([paths.docs.root + "error.html"])
-        .pipe(replace(localpath, latest))
+        .pipe(replace(localPath, versionPath))
         .pipe(s3(aws.cdn, options.docs));
 });
 
