@@ -42,7 +42,7 @@ Check `docs/index.html` and `docs/dist/docs.js` for an example setup.
 
 **Heads up:** the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.6.11/plyr.js` to `https://cdn.plyr.io/1.6.11/plyr.js`
 
-### `npm`
+### npm
 
 Using `npm`, you can grab Plyr:
 ```
