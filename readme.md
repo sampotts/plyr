@@ -788,7 +788,7 @@ Details borrowed from: [https://developer.mozilla.org/en-US/docs/Web/Guide/Event
 Here's an example of binding an event listener:
 
 ```javascript
-document.querySelector('.js-plyr').addEventListener('ready', function() {
+document.querySelector('.js-plyr').addEventListener('ready', function(event) {
 	var player = event.target.plyr;
 });
 ```
@@ -802,7 +802,7 @@ Plyr references a custom version of the Vimeo Froogaloop API as Vimeo have negle
 The native API's can be accessed through the `embed` property of the plyr object. For example:
 
 ```javascript
-document.querySelector('.js-plyr').addEventListener('ready', function() {
+document.querySelector('.js-plyr').addEventListener('ready', function(event) {
 	var player = event.target.plyr;
 
 	// YouTube
