@@ -36,6 +36,9 @@
         loop:                   false,
         seekTime:               10,
         volume:                 5,
+        volumeMin:              0, 
+        volumeMax:              10, 
+        volumeStep:             1,
         duration:               null,
         displayDuration:        true,
         iconPrefix:             'icon',
@@ -773,8 +776,8 @@
                 html.push(
                     '<span class="plyr__volume">',
                         '<label for="volume{id}" class="plyr__sr-only">' + config.i18n.volume + '</label>',
-                        '<input id="volume{id}" class="plyr__volume--input" type="range" min="0" max="10" value="5" data-plyr="volume">',
-                        '<progress class="plyr__volume--display" max="10" value="0" role="presentation"></progress>',
+                        '<input id="volume{id}" class="plyr__volume--input" type="range" min="' + config.volumeMin + '" max="' + config.volumeMax + '" value="' + config.volume + '" data-plyr="volume">',
+                        '<progress class="plyr__volume--display" max="' + config.volumeMax + '" value="' + config.volumeMin + '" role="presentation"></progress>',
                     '</span>'
                 );
             }
@@ -2020,11 +2023,11 @@
                         break;
 
                     case 'vimeo':
-                        plyr.embed.api('setVolume', plyr.media.muted ? 0 : parseFloat(config.volume / 10));
+                        plyr.embed.api('setVolume', plyr.media.muted ? 0 : parseFloat(config.volume / config.volumeMax));
                         break;
 
                     case 'soundcloud':
-                        plyr.embed.setVolume(plyr.media.muted ? 0 : parseFloat(config.volume / 10));
+                        plyr.embed.setVolume(plyr.media.muted ? 0 : parseFloat(config.volume / config.volumeMax));
                         break;
                 }
 
@@ -2035,6 +2038,9 @@
 
         // Set volume
         function _setVolume(volume) {
+            var max = config.volumeMax,
+                min = config.volumeMin;
+
             // Use default if no value specified
             if (typeof volume === 'undefined') {
                 volume = config.volume;
@@ -2053,17 +2059,17 @@
                 volume = config.volume;
             }
 
-            // Maximum is 10
-            if (volume > 10) {
-                volume = 10;
+            // Maximum is volumeMax
+            if (volume > max) {
+                volume = max;
             }
-            // Minimum is 0
-            if (volume < 0) {
-                volume = 0;
+            // Minimum is volumeMin
+            if (volume < min) {
+                volume = min;
             }
 
             // Set the player volume
-            plyr.media.volume = parseFloat(volume / 10);
+            plyr.media.volume = parseFloat(volume / max);
 
             // Set the display
             if (plyr.volume.display) {
@@ -2097,10 +2103,24 @@
             }
         }
 
+        // Increase volume
+        function _increaseVolume() {
+            var volume = plyr.media.muted ? 0 : (plyr.media.volume * config.volumeMax);
+
+            _setVolume(volume + config.volumeStep);
+        }
+
+        // Decrease volume
+        function _decreaseVolume() {
+            var volume = plyr.media.muted ? 0 : (plyr.media.volume * config.volumeMax);
+
+            _setVolume(volume - config.volumeStep);
+        }
+
         // Update volume UI and storage
         function _updateVolume() {
             // Get the current volume
-            var volume = plyr.media.muted ? 0 : (plyr.media.volume * 10);
+            var volume = plyr.media.muted ? 0 : (plyr.media.volume * config.volumeMax);
 
             // Update the <input type="range"> if present
             if (plyr.supported.full) {
@@ -2675,6 +2695,7 @@
                     }
                 }
             }
+
             _on(window, 'keyup', function(event) {
                 var code = (event.keyCode ? event.keyCode : event.which);
 
@@ -2746,6 +2767,18 @@
                 // Focus in/out on controls
                 _on(plyr.controls, 'focus blur', _toggleControls, true);
             }
+
+            _on(plyr.volume.input, 'wheel', function(event) {
+                event.preventDefault();
+
+                if (event.deltaY < 0 || event.deltaX > 0) {
+                    _increaseVolume();
+                }
+
+                if (event.deltaY > 0 || event.deltaX < 0) {
+                    _decreaseVolume();
+                }
+            });
         }
 
         // Listen for media events
