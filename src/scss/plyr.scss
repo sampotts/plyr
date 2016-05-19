@@ -374,7 +374,7 @@
     border-radius: 100%;
     box-shadow: 0 1px 1px transparentize($plyr-video-controls-bg, .85);
     color: $plyr-video-control-color;
-    transition: opacity .3s ease, visibility .3s ease;
+    transition: all .3s ease;
 
     svg {
         position: relative;

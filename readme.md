@@ -654,7 +654,7 @@ Some more details on the object parameters
 
 ## Events
 
-You can listen for events on the element you setup Plyr on. Some events only apply to HTML5 audio and video.
+You can listen for events on the target element you setup Plyr on (see example under the table). Some events only apply to HTML5 audio and video.
 
 <table class="table" width="100%">
   <thead>

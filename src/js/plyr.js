@@ -2245,9 +2245,14 @@
             if (typeof value === 'undefined') {
                 value = 0;
             }
-            // Default to buffer
+            // Default to buffer or bail
             if (typeof progress === 'undefined') {
-                progress = plyr.progress.buffer;
+                if (plyr.progress && plyr.progress.buffer) {
+                    progress = plyr.progress.buffer;
+                }
+                else {
+                    return;
+                }
             }
 
             // One progress element passed
