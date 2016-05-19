@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.6.13
+- Decreased sensitivity and inverted scroll on volume slider (scroll up to increase, down to decrease)
+
 ## v1.6.12
 - Fix for undefined buffer error 
 - Add scroll listener on volume slider (PR #227 bty @igoradamenko)

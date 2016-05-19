@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.6.12
+// plyr.js v1.6.13
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -2107,14 +2107,14 @@
         function _increaseVolume() {
             var volume = plyr.media.muted ? 0 : (plyr.media.volume * config.volumeMax);
 
-            _setVolume(volume + config.volumeStep);
+            _setVolume(volume + (config.volumeStep / 5));
         }
 
         // Decrease volume
         function _decreaseVolume() {
             var volume = plyr.media.muted ? 0 : (plyr.media.volume * config.volumeMax);
 
-            _setVolume(volume - config.volumeStep);
+            _setVolume(volume - (config.volumeStep / 5));
         }
 
         // Update volume UI and storage
@@ -2786,15 +2786,18 @@
                 _on(plyr.controls, 'focus blur', _toggleControls, true);
             }
 
+            // Adjust volume on scroll
             _on(plyr.volume.input, 'wheel', function(event) {
                 event.preventDefault();
 
+                // Scroll down to decrease
                 if (event.deltaY < 0 || event.deltaX > 0) {
-                    _increaseVolume();
+                    _decreaseVolume();
                 }
 
+                // Scroll up to increase
                 if (event.deltaY > 0 || event.deltaX < 0) {
-                    _decreaseVolume();
+                    _increaseVolume();
                 }
             });
         }
