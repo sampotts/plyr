@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.6.12
+- Fix for undefined buffer error 
+- Add scroll listener on volume slider (PR #227 bty @igoradamenko)
+
 ## v1.6.11
 - Fix for Vimeo fullscreen (fixes #214)
 
