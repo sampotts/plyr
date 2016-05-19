@@ -20,6 +20,11 @@
     transition: background .2s ease, border .2s ease, transform .2s ease;
     box-shadow: @plyr-range-thumb-shadow;
     box-sizing: border-box;
+
+    &:hover,
+    &:focus {
+        background: @plyr-range-thumb-hover-bg;
+    }
 }
 .plyr-range-thumb-active() {
     background: @plyr-range-thumb-active-bg;
