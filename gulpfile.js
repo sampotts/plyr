@@ -1,7 +1,7 @@
 // ==========================================================================
 // Gulp build script
 // ==========================================================================
-/*global require, __dirname*/
+/*global require, __dirname,Buffer*/
 /*jshint -W079 */
 
 var fs          = require("fs"),
@@ -19,10 +19,10 @@ var fs          = require("fs"),
     svgmin      = require("gulp-svgmin"),
     rename      = require("gulp-rename"),
     s3          = require("gulp-s3"),
-    gzip        = require("gulp-gzip"),
     replace     = require("gulp-replace"),
     open        = require("gulp-open"),
-    size        = require("gulp-size");
+    size        = require("gulp-size"),
+    through     = require("through2");
 
 var root = __dirname,
 paths = {
@@ -72,6 +72,29 @@ function loadJSON(path) {
     catch(err) {
         return {};
     }
+}
+
+// Create a file from a string
+// http://stackoverflow.com/questions/23230569/how-do-you-create-a-file-from-a-string-in-gulp
+function createFile(filename, string) {
+    var src = require('stream').Readable({ 
+        objectMode: true 
+    });
+    src._read = function () {
+        this.push(new gutil.File({ 
+            cwd: "", 
+            base: "", 
+            path: filename, 
+            contents: new Buffer(string),
+            // stats also required for some functions
+            // https://nodejs.org/api/fs.html#fs_class_fs_stats
+            stat: {
+                size: string.length
+            } 
+        }));
+        this.push(null);
+    }
+    return src
 }
 
 var build = {
@@ -143,7 +166,7 @@ var build = {
                     }]
                 }))
                 .pipe(svgstore())
-                .pipe(rename({ basename: (bundle == "plyr" ? "sprite" : bundle) }))
+                .pipe(rename({ basename: bundle }))
                 .pipe(gulp.dest(paths[bundle].output));
         });
     }
@@ -200,15 +223,22 @@ options = {
         headers: {
             "Cache-Control": "max-age=" + maxAge,
             "Vary": "Accept-Encoding"
-        },
-        gzippedOnly: true
+        }
     },
     docs: {
         headers: {
-            "Cache-Control": "public, must-revalidate, proxy-revalidate, max-age=0",
+            "Cache-Control": "no-cache, no-store, must-revalidate, max-age=0",
             "Vary": "Accept-Encoding"
-        },
-        gzippedOnly: true
+        }
+    },
+    symlinks: function(version, filename) {
+        return {
+            headers: {
+                // http://stackoverflow.com/questions/2272835/amazon-s3-object-redirect
+                "x-amz-website-redirect-location": "/" + version + "/" + filename,
+                "Cache-Control": "no-cache, no-store, must-revalidate, max-age=0"
+            }
+        }
     }
 };
 
@@ -217,15 +247,16 @@ if("cdn" in aws) {
     var regex       = "(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)(?:-[\\da-z\\-]+(?:\.[\\da-z\\-]+)*)?(?:\\+[\\da-z\\-]+(?:\.[\\da-z\\-]+)*)?",
     cdnpath         = new RegExp(aws.cdn.bucket + "\/" + regex, "gi"),
     semver          = new RegExp("v" + regex, "gi"),
-    localpath       = new RegExp("(\.\.\/)?dist", "gi");
+    localPath       = new RegExp("(\.\.\/)?dist", "gi"),
+    versionPath     = "https://" + aws.cdn.bucket + "/" + version;
 }
 
 // Publish version to CDN bucket
 gulp.task("cdn", function () {
-    console.log("Uploading " + version + " to " + aws.cdn.bucket);
+    console.log("Uploading " + version + " to " + aws.cdn.bucket + "...");
 
     // Upload to CDN
-    gulp.src(paths.upload)
+    return gulp.src(paths.upload)
         .pipe(size({
             showFiles: true,
             gzip: true
@@ -233,13 +264,12 @@ gulp.task("cdn", function () {
         .pipe(rename(function (path) {
             path.dirname = path.dirname.replace(".", version);
         }))
-        .pipe(gzip())
         .pipe(s3(aws.cdn, options.cdn));
 });
 
 // Publish to Docs bucket
 gulp.task("docs", function () {
-    console.log("Uploading " + version + " docs to " + aws.docs.bucket);
+    console.log("Uploading " + version + " docs to " + aws.docs.bucket + "...");
 
     // Replace versioned files in readme.md
     gulp.src([root + "/readme.md"])
@@ -254,15 +284,36 @@ gulp.task("docs", function () {
     // Replace local file paths with remote paths in docs
     // e.g. "../dist/plyr.js" to "https://cdn.plyr.io/x.x.x/plyr.js"
     gulp.src([paths.docs.root + "*.html"])
-        .pipe(replace(localpath, "https://" + aws.cdn.bucket + "/" + version))
-        .pipe(gzip())
+        .pipe(replace(localPath, versionPath))
         .pipe(s3(aws.docs, options.docs));
 
     // Upload error.html to cdn (as well as docs site)
-    gulp.src([paths.docs.root + "error.html"])
-        .pipe(replace(localpath, "https://" + aws.cdn.bucket + "/" + version))
-        .pipe(gzip())
+    return gulp.src([paths.docs.root + "error.html"])
+        .pipe(replace(localPath, versionPath))
         .pipe(s3(aws.cdn, options.docs));
+});
+
+// Open the docs site to check it's sweet
+gulp.task("symlinks", function () {
+    console.log("Updating symlinks...");
+
+    return gulp.src(paths.upload)
+        .pipe(through.obj(function (chunk, enc, callback) {
+            if (chunk.stat.isFile()) {
+                // Get the filename
+                var filename = chunk.path.split("/").reverse()[0];
+
+                // Create the 0 byte redirect files to upload
+                createFile(filename, "")
+                    .pipe(rename(function (path) {
+                        path.dirname = path.dirname.replace(".", "latest");
+                    }))
+                    // Upload to S3 with correct headers
+                    .pipe(s3(aws.cdn, options.symlinks(version, filename)));
+            }
+
+            callback(null, chunk);
+        }));
 });
 
 // Open the docs site to check it's sweet
@@ -272,7 +323,7 @@ gulp.task("open", function () {
     // A file must be specified or gulp will skip the task
     // Doesn't matter which file since we set the URL above
     // Weird, I know...
-    gulp.src([paths.docs.root + "index.html"])
+    return gulp.src([paths.docs.root + "index.html"])
         .pipe(open("", {
             url: "http://" + aws.docs.bucket
         }));
@@ -280,5 +331,5 @@ gulp.task("open", function () {
 
 // Do everything
 gulp.task("publish", function () {
-    run(tasks.js, tasks.less, tasks.sprite, "cdn", "docs");
+    run(tasks.js, tasks.less, tasks.sprite, "cdn", "docs", "symlinks");
 });

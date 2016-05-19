@@ -3,7 +3,7 @@ A simple, accessible and customizable HTML5, YouTube and Vimeo media player.
 
 [Checkout the demo](https://plyr.io)
 
-[![Image of Plyr](https://cdn.plyr.io/static/plyr_v1.6.0.png)](https://plyr.io)
+[![Image of Plyr](https://cdn.selz.com/plyr/1.5/plyr_v1.6.6.png)](https://plyr.io)
 
 ## Why?
 We wanted a lightweight, accessible and customizable media player that supports [*modern*](#browser-support) browsers. Sure, there are many other players out there but we wanted to keep things simple, using the right elements for the job.
@@ -40,11 +40,11 @@ If you have any cool ideas or features, please let me know by [creating an issue
 ## Implementation
 Check `docs/index.html` and `docs/dist/docs.js` for an example setup.
 
-**Heads up:** the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.6.5/plyr.js` to `https://cdn.plyr.io/1.6.5/plyr.js`
+**Heads up:** the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.6.11/plyr.js` to `https://cdn.plyr.io/1.6.11/plyr.js`
 
-### Node Package Manager (NPM)
+### npm
 
-Using NPM, you can grab Plyr:
+Using `npm`, you can grab Plyr:
 ```
 npm install plyr
 ```
@@ -71,11 +71,11 @@ More info is on [npm](https://www.npmjs.com/package/ember-cli-plyr) and [GitHub]
 If you want to use our CDN, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/1.6.5/plyr.css">
-<script src="https://cdn.plyr.io/1.6.5/plyr.js"></script>
+<link rel="stylesheet" href="https://cdn.plyr.io/1.6.11/plyr.css">
+<script src="https://cdn.plyr.io/1.6.11/plyr.js"></script>
 ```
 
-You can also access the `sprite.svg` file at `https://cdn.plyr.io/1.6.5/sprite.svg`.
+The SVG sprite/defs file can be found here: `https://cdn.plyr.io/1.6.11/plyr.svg`.
 
 ### CSS & Styling
 If you want to use the default css, add the `plyr.css` file from `/dist` into your head, or even better use `plyr.less` or `plyr.scss` file included in `/src` in your build to save a request.
@@ -94,7 +94,7 @@ The SVG sprite for the controls icons can be loaded two ways:
 #### Using the `iconUrl` option
 This method requires the SVG sprite to be hosted on the *same domain* as your page hosting the player. Currently no browser supports cross origin SVG sprites due to XSS issues. Fingers crossed this will come soon though. An example value for this option would be:
 ```
-/path/to/sprite.svg
+/path/to/plyr.svg
 ```
 
 #### Using AJAX
@@ -113,7 +113,7 @@ Using AJAX means you can load the sprite from a different origin. Avoiding the i
 		c.innerHTML = a.responseText;
 		b.insertBefore(c, b.childNodes[0]);
 	};
-})(document, 'https://cdn.plyr.io/1.6.5/sprite.svg');
+})(document, 'https://cdn.plyr.io/1.6.11/plyr.svg');
 </script>
 ```
 
@@ -188,7 +188,7 @@ Be sure to [validate your caption files](https://quuz.org/webvtt/)
 Here's an example of a default setup:
 
 ```html
-<script src="https://cdn.plyr.io/1.6.5/plyr.js"></script>
+<script src="https://cdn.plyr.io/1.6.11/plyr.js"></script>
 <script>plyr.setup();</script>
 ```
 
@@ -248,7 +248,7 @@ Options must be passed as an object to the `setup()` method as above or as JSON 
   <tr>
     <td><code>controls</code></td>
     <td>Array</td>
-    <td><code>["restart", "rewind", "play", "fast-forward", "current-time", "duration", "mute", "volume", "captions", "fullscreen"]</code></td>
+    <td><code>['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'fullscreen']</code></td>
     <td>Toggle which control elements you would like to display when using the default controls html. If you specify a <code>html</code> option, this is redundant. The default value is to display everything.</td>
   </tr>
   <tr>
@@ -260,8 +260,8 @@ Options must be passed as an object to the `setup()` method as above or as JSON 
   <tr>
     <td><code>iconPrefix</code></td>
     <td>String</td>
-    <td><code>icon</code></td>
-    <td>Specify the id prefix for the icons used in the default controls (e.g. "icon-play" would be "icon"). This is to prevent clashes if you're using your own SVG defs file but with the default controls. Most people can ignore this option.</td>
+    <td><code>plyr</code></td>
+    <td>Specify the id prefix for the icons used in the default controls (e.g. "plyr-play" would be "plyr"). This is to prevent clashes if you're using your own SVG defs file but with the default controls. Most people can ignore this option.</td>
   </tr>
   <tr>
     <td><code>iconUrl</code></td>
@@ -788,7 +788,7 @@ Details borrowed from: [https://developer.mozilla.org/en-US/docs/Web/Guide/Event
 Here's an example of binding an event listener:
 
 ```javascript
-document.querySelector('.js-plyr').addEventListener('ready', function() {
+document.querySelector('.js-plyr').addEventListener('ready', function(event) {
 	var player = event.target.plyr;
 });
 ```
@@ -802,7 +802,7 @@ Plyr references a custom version of the Vimeo Froogaloop API as Vimeo have negle
 The native API's can be accessed through the `embed` property of the plyr object. For example:
 
 ```javascript
-document.querySelector('.js-plyr').addEventListener('ready', function() {
+document.querySelector('.js-plyr').addEventListener('ready', function(event) {
 	var player = event.target.plyr;
 
 	// YouTube
@@ -873,6 +873,7 @@ If you find anything weird with Plyr, please let us know using the GitHub issues
 Plyr is developed by [@sam_potts](https://twitter.com/sam_potts) / [sampotts.me](http://sampotts.me) with help from the awesome [contributors](https://github.com/Selz/plyr/graphs/contributors)
 
 ## Mentions
+- [ProductHunt](https://www.producthunt.com/tech/plyr)
 - [The Changelog](http://thechangelog.com/plyr-simple-html5-media-player-custom-controls-webvtt-captions/)
 - [HTML5 Weekly #177](http://html5weekly.com/issues/177)
 - [Responsive Design #149](http://us4.campaign-archive2.com/?u=559bc631fe5294fc66f5f7f89&id=451a61490f)
