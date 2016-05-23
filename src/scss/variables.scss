@@ -17,14 +17,16 @@ $plyr-font-size-small:                  14px !default;
 $plyr-font-size-base:                   16px !default;
 
 // Captions
-$plyr-captions-bg: 						transparentize(#000, .3) !default;
-$plyr-captions-color: 					#fff !default;
+$plyr-captions-bg:                      transparentize(#000, .3) !default;
+$plyr-captions-color:                   #fff !default;
 $plyr-font-size-captions-base:          $plyr-font-size-base !default;
 $plyr-font-size-captions-medium:        ceil($plyr-font-size-base * 1.5) !default;
 $plyr-font-size-captions-large:         ($plyr-font-size-base * 2) !default;
 
 // Controls
+$plyr-control-icon-size:                18px !default;
 $plyr-control-spacing:                  10px !default;
+$plyr-control-padding:                  ($plyr-control-spacing * .7) !default;
 $plyr-video-controls-bg:                #000 !default;
 $plyr-video-control-color:              #fff !default;
 $plyr-video-control-color-hover:        #fff !default;
@@ -63,7 +65,7 @@ $plyr-range-thumb-active-bg:            $plyr-video-control-bg-hover !default;
 $plyr-range-thumb-active-scale:         1.25 !default;
 $plyr-video-range-track-bg:             $plyr-video-progress-buffered-bg !default;
 $plyr-audio-range-track-bg:             $plyr-audio-progress-buffered-bg !default;
-$plyr-range-selected-bg: 				$plyr-color-main !default;
+$plyr-range-selected-bg:                $plyr-color-main !default;
 
 // Breakpoints
 $plyr-bp-screen-sm:                     480px !default;

@@ -484,6 +484,40 @@
     z-index: 3;
 }
 
+// First tooltip
+.plyr__controls button:first-child .plyr__tooltip {
+    $tooltip-arrow-offset: ;
+    left: 0;
+    transform: translate(0, 10px) scale(.8);
+    transform-origin: 0 100%;
+
+    &::before {
+        left: ($plyr-control-icon-size / 2) + $plyr-control-padding;
+    }
+}
+
+// Last tooltip
+.plyr__controls button:last-child .plyr__tooltip {
+    right: 0;
+    transform: translate(0, 10px) scale(.8);
+    transform-origin: 100% 100%;
+
+    &::before {
+        left: auto;
+        right: ($plyr-control-icon-size / 2) + $plyr-control-padding;
+        transform: translateX(50%);
+    }
+}
+
+.plyr__controls button:first-child,
+.plyr__controls button:last-child {
+    &:hover .plyr__tooltip,
+    &.tab-focus:focus .plyr__tooltip,
+    .plyr__tooltip--visible {
+        transform: translate(0, 0) scale(1);
+    }
+}
+
 // Playback progress
 // --------------------------------------------------------------
 // <progress> element
