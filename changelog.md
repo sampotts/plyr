@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.6.15
+- Restore scroll position when exiting full screen (fixes #236)
+
 ## v1.6.14
 - SVG sprite loading automatically for an easier setup
 - Touch devices now show controls on touch rather than pausing playback

@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.6.14
+// plyr.js v1.6.15
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -26,10 +26,11 @@
     /*global YT,$f*/
 
     // Globals
-    var fullscreen;
+    var fullscreen, 
+    scroll = { x: 0, y: 0 },
 
     // Default config
-    var defaults = {
+    defaults = {
         enabled:                true,
         debug:                  false,
         autoplay:               false,
@@ -43,7 +44,7 @@
         displayDuration:        true,
         loadSprite:             true,
         iconPrefix:             'plyr',
-        iconUrl:                'https://cdn.plyr.io/1.6.14/plyr.svg',
+        iconUrl:                'https://cdn.plyr.io/1.6.15/plyr.svg',
         clickToPlay:            true,
         hideControls:           true,
         showPosterOnEnd:        false,
@@ -1953,6 +1954,19 @@
             _toggleControls(plyr.media.paused);
         }
 
+        // Save scroll position
+        function _saveScrollPosition() {
+            scroll = {
+                x: window.pageXOffset || 0,
+                y: window.pageYOffset || 0
+            };
+        }
+
+        // Restore scroll position
+        function _restoreScrollPosition() {
+            window.scrollTo(scroll.x, scroll.y);
+        }
+
         // Toggle fullscreen
         function _toggleFullscreen(event) {
             // Check for native support
@@ -1966,6 +1980,10 @@
             else if (nativeSupport) {
                 // Request fullscreen
                 if (!fullscreen.isFullScreen(plyr.container)) {
+                    // Save scroll position
+                    _saveScrollPosition();
+
+                    // Request full screen
                     fullscreen.requestFullScreen(plyr.container);
                 }
                 // Bail from fullscreen
@@ -2010,6 +2028,11 @@
 
             // Trigger an event
             _triggerEvent(plyr.container, plyr.isFullscreen ? 'enterfullscreen' : 'exitfullscreen');
+
+            // Restore scroll position
+            if (!plyr.isFullscreen && nativeSupport) {
+                _restoreScrollPosition();
+            }
         }
 
         // Bail from faux-fullscreen
