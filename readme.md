@@ -40,7 +40,7 @@ If you have any cool ideas or features, please let me know by [creating an issue
 ## Implementation
 Check `docs/index.html` and `docs/dist/docs.js` for an example setup.
 
-**Heads up:** the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.6.15/plyr.js` to `https://cdn.plyr.io/1.6.15/plyr.js`
+**Heads up:** the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.6.16/plyr.js` to `https://cdn.plyr.io/1.6.16/plyr.js`
 
 ### npm
 
@@ -71,11 +71,11 @@ More info is on [npm](https://www.npmjs.com/package/ember-cli-plyr) and [GitHub]
 If you want to use our CDN, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/1.6.15/plyr.css">
-<script src="https://cdn.plyr.io/1.6.15/plyr.js"></script>
+<link rel="stylesheet" href="https://cdn.plyr.io/1.6.16/plyr.css">
+<script src="https://cdn.plyr.io/1.6.16/plyr.js"></script>
 ```
 
-The SVG sprite/defs file can be found here: `https://cdn.plyr.io/1.6.15/plyr.svg`.
+The SVG sprite/defs file can be found here: `https://cdn.plyr.io/1.6.16/plyr.svg`.
 
 ### CSS & Styling
 If you want to use the default css, add the `plyr.css` file from `/dist` into your head, or even better use `plyr.less` or `plyr.scss` file included in `/src` in your build to save a request.
@@ -163,7 +163,7 @@ Be sure to [validate your caption files](https://quuz.org/webvtt/)
 Here's an example of a default setup:
 
 ```html
-<script src="https://cdn.plyr.io/1.6.15/plyr.js"></script>
+<script src="https://cdn.plyr.io/1.6.16/plyr.js"></script>
 <script>plyr.setup();</script>
 ```
 

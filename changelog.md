@@ -1,5 +1,9 @@
 # Changelog
 
+# v1.6.16
+- Always hide standard controls (Fixes #225)
+- Fix for Tooltips overflowing (fixes #230)
+
 ## v1.6.15
 - Restore scroll position when exiting full screen (fixes #236)
 
