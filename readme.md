@@ -21,7 +21,7 @@ We wanted a lightweight, accessible and customizable media player that supports 
 - **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes
 - **i18n support** - support for internationalization of controls
 - **No dependencies** - written in "vanilla" JavaScript, no jQuery required
-- **Sass and Less provided** - If you like _these_ over plain CSS
+- **SASS and LESS provided** - If you like _these_ over plain CSS
 
 Oh and yes, it works with Bootstrap.
 
