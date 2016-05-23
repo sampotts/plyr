@@ -264,6 +264,7 @@ gulp.task("cdn", function () {
         .pipe(rename(function (path) {
             path.dirname = path.dirname.replace(".", version);
         }))
+        .pipe(replace(localPath, versionPath))
         .pipe(s3(aws.cdn, options.cdn));
 });
 
@@ -279,9 +280,10 @@ gulp.task("docs", function () {
     // Replace versioned files in plyr.js
     gulp.src(path.join(root, "src/js/plyr.js"))
         .pipe(replace(semver, "v" + version))
+        .pipe(replace(cdnpath, aws.cdn.bucket + "/" + version))
         .pipe(gulp.dest(path.join(root, "src/js/")));
 
-    // Replace local file paths with remote paths in docs
+    // Replace local file paths with remote paths in docs HTML
     // e.g. "../dist/plyr.js" to "https://cdn.plyr.io/x.x.x/plyr.js"
     gulp.src([paths.docs.root + "*.html"])
         .pipe(replace(localPath, versionPath))

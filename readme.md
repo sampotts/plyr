@@ -40,7 +40,7 @@ If you have any cool ideas or features, please let me know by [creating an issue
 ## Implementation
 Check `docs/index.html` and `docs/dist/docs.js` for an example setup.
 
-**Heads up:** the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.6.13/plyr.js` to `https://cdn.plyr.io/1.6.13/plyr.js`
+**Heads up:** the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.6.14/plyr.js` to `https://cdn.plyr.io/1.6.14/plyr.js`
 
 ### npm
 
@@ -71,11 +71,11 @@ More info is on [npm](https://www.npmjs.com/package/ember-cli-plyr) and [GitHub]
 If you want to use our CDN, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/1.6.13/plyr.css">
-<script src="https://cdn.plyr.io/1.6.13/plyr.js"></script>
+<link rel="stylesheet" href="https://cdn.plyr.io/1.6.14/plyr.css">
+<script src="https://cdn.plyr.io/1.6.14/plyr.js"></script>
 ```
 
-The SVG sprite/defs file can be found here: `https://cdn.plyr.io/1.6.13/plyr.svg`.
+The SVG sprite/defs file can be found here: `https://cdn.plyr.io/1.6.14/plyr.svg`.
 
 ### CSS & Styling
 If you want to use the default css, add the `plyr.css` file from `/dist` into your head, or even better use `plyr.less` or `plyr.scss` file included in `/src` in your build to save a request.
@@ -87,35 +87,10 @@ If you want to use the default css, add the `plyr.css` file from `/dist` into yo
 The default setup uses the BEM methodology with `plyr` as the block, e.g. `.plyr__controls`. You can change the class hooks in the options. Check out the source for more on this.
 
 ### SVG
-The SVG sprite for the controls icons can be loaded two ways:
-- By passing the *relative* path to the sprite as the `iconUrl` option; or
-- Using AJAX, injecting the sprite into a hidden div. 
+The icons used in the Plyr controls are loaded in an SVG sprite. The icons can be used in your own SVG sprite build (see `/src/sprite` for source icons) or using the default settings which sprite from the CDN automatically for a hassle free setup. 
 
 #### Using the `iconUrl` option
-This method requires the SVG sprite to be hosted on the *same domain* as your page hosting the player. Currently no browser supports cross origin SVG sprites due to XSS issues. Fingers crossed this will come soon though. An example value for this option would be:
-```
-/path/to/plyr.svg
-```
-
-#### Using AJAX
-Using AJAX means you can load the sprite from a different origin. Avoiding the issues above. This is an example script to load an SVG sprite best added before the closing `</body>`, before any other scripts.
-
-```html
-<script>
-(function(d, p){
-	var a = new XMLHttpRequest(),
-		b = d.body;
-	a.open('GET', p, true);
-	a.send();
-	a.onload = function() {
-		var c = d.createElement('div');
-		c.setAttribute('hidden', '');
-		c.innerHTML = a.responseText;
-		b.insertBefore(c, b.childNodes[0]);
-	};
-})(document, 'https://cdn.plyr.io/1.6.13/plyr.svg');
-</script>
-```
+You can however specify your own `iconUrl` option and Plyr will determine if the url is absolute and requires loading by AJAX/CORS due to current browser limitations or if it's a relative path, just use the path directly. 
 
 If you're using the `<base>` tag on your site, you may need to use something like this:
 [svgfixer.js](https://gist.github.com/leonderijke/c5cf7c5b2e424c0061d2)
@@ -188,7 +163,7 @@ Be sure to [validate your caption files](https://quuz.org/webvtt/)
 Here's an example of a default setup:
 
 ```html
-<script src="https://cdn.plyr.io/1.6.13/plyr.js"></script>
+<script src="https://cdn.plyr.io/1.6.14/plyr.js"></script>
 <script>plyr.setup();</script>
 ```
 
@@ -258,16 +233,22 @@ Options must be passed as an object to the `setup()` method as above or as JSON 
     <td>Used for internationalization (i18n) of the tooltips/labels within the buttons.</td>
   </tr>
   <tr>
-    <td><code>iconPrefix</code></td>
-    <td>String</td>
-    <td><code>plyr</code></td>
-    <td>Specify the id prefix for the icons used in the default controls (e.g. "plyr-play" would be "plyr"). This is to prevent clashes if you're using your own SVG defs file but with the default controls. Most people can ignore this option.</td>
+    <td><code>loadSprite</code></td>
+    <td>Boolean</td>
+    <td><code>true</code></td>
+    <td>Load the SVG sprite specified as the <code>iconUrl</code> option (if a URL). If <code>false</code>, it is assumed you are handling sprite loading yourself.</td>
   </tr>
   <tr>
     <td><code>iconUrl</code></td>
     <td>String</td>
     <td><code>null</code></td>
-    <td>Specify a relative path to the SVG sprite, hosted on the *same domain* as the page the player is hosted on. Using this menthod means no requirement for the AJAX sprite loading script. See the <a href="#svg">SVG section</a> for more info.</td>
+    <td>Specify a URL or path to the SVG sprite. See the <a href="#svg">SVG section</a> for more info.</td>
+  </tr>
+  <tr>
+    <td><code>iconPrefix</code></td>
+    <td>String</td>
+    <td><code>plyr</code></td>
+    <td>Specify the id prefix for the icons used in the default controls (e.g. "plyr-play" would be "plyr"). This is to prevent clashes if you're using your own SVG sprite but with the default controls. Most people can ignore this option.</td>
   </tr>
   <tr>
     <td><code>debug</code></td>

@@ -8,6 +8,7 @@
 plyr.setup('.js-media-player', {
 	debug: 				true,
 	title: 				'Video demo',
+	iconUrl: 			'../dist/plyr.svg',
 	tooltips: 	{
 		controls: 		true
 	},
@@ -15,6 +16,7 @@ plyr.setup('.js-media-player', {
 		defaultActive: 	true
 	}
 });
+plyr.loadSprite('dist/docs.svg');
 
 // General functions
 (function() {

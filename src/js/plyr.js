@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.6.13
+// plyr.js v1.6.14
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -26,7 +26,7 @@
     /*global YT,$f*/
 
     // Globals
-    var fullscreen, api = {};
+    var fullscreen;
 
     // Default config
     var defaults = {
@@ -41,8 +41,9 @@
         volumeStep:             1,
         duration:               null,
         displayDuration:        true,
+        loadSprite:             true,
         iconPrefix:             'plyr',
-        iconUrl:                '',
+        iconUrl:                'https://cdn.plyr.io/1.6.14/plyr.svg',
         clickToPlay:            true,
         hideControls:           true,
         showPosterOnEnd:        false,
@@ -657,11 +658,20 @@
             }
         }
 
+        // Get icon URL
+        function _getIconUrl() {
+            return {
+                url:        config.iconUrl,
+                external:   (config.iconUrl.indexOf("http") === 0)
+            };
+        }
+
         // Build the default HTML
         function _buildControls() {
             // Create html array
-            var html = [],
-                iconPath = config.iconUrl + '#' + config.iconPrefix;
+            var html        = [],
+                iconUrl     = _getIconUrl(),
+                iconPath    = (!iconUrl.external ? iconUrl.url : '') + '#' + config.iconPrefix;
 
             // Larger overlaid play button
             if (_inArray(config.controls, 'play-large')) {
@@ -1162,6 +1172,20 @@
 
         // Insert controls
         function _injectControls() {
+            // Sprite
+            if (config.loadSprite) {
+                var iconUrl = _getIconUrl();
+
+                // Only load external sprite using AJAX
+                if (iconUrl.external) {
+                    _log('Loading external SVG sprite');
+                    loadSprite(iconUrl.url);
+                }
+                else {
+                    _log('Sprite will be used inline');
+                }
+            }
+
             // Make a copy of the html
             var html = config.html;
 
@@ -2432,7 +2456,7 @@
                     }
                 }
                 else {
-                    show = false;
+                    show = !_hasClass(plyr.container, config.classes.hideControls);
                 }
             }
 
@@ -2443,21 +2467,26 @@
             if (show || plyr.media.paused) {
                 _toggleClass(plyr.container, config.classes.hideControls, false);
 
-                // Always show controls when paused
+                // Always show controls when paused or if touch
                 if (plyr.media.paused) {
                     return;
                 }
+
+                // Delay for hiding on touch
+                if (plyr.browser.touch) {
+                    delay = 3000;
+                }
             }
 
-            // If toggle is false or if we're playing (regardless of toggle), then
-            // set the timer to hide the controls 
+            // If toggle is false or if we're playing (regardless of toggle), 
+            // then set the timer to hide the controls 
             if (!show || !plyr.media.paused) {
                 plyr.timers.hover = window.setTimeout(function() {
                     // If the mouse is over the controls (and not entering fullscreen), bail
                     if (plyr.controls.active && !isEnterFullscreen) {
                         return;
                     }
-
+                    
                     _toggleClass(plyr.container, config.classes.hideControls, true);
                 }, delay);
             }
@@ -2554,7 +2583,7 @@
             }
 
             // Check for support
-            plyr.supported = api.supported(plyr.type);
+            plyr.supported = supported(plyr.type);
 
             // Create new markup
             switch(plyr.type) {
@@ -2863,6 +2892,11 @@
 
                 // On click play, pause ore restart
                 _on(wrapper, 'click', function() {
+                    if (plyr.browser.touch && !plyr.media.paused) {
+                        _toggleControls(true);
+                        return;
+                    }
+
                     if (plyr.media.paused) {
                         _play();
                     }
@@ -3000,7 +3034,7 @@
             }
 
             // Check for support
-            plyr.supported = api.supported(plyr.type);
+            plyr.supported = supported(plyr.type);
 
             // Add style hook
             _toggleStyleHook();
@@ -3130,6 +3164,7 @@
             toggleMute:         _toggleMute,
             toggleCaptions:     _toggleCaptions,
             toggleFullscreen:   _toggleFullscreen,
+            toggleControls:     _toggleControls,
             isFullscreen:       function() { return plyr.isFullscreen || false; },
             support:            function(mimeType) { return _supportMime(plyr, mimeType); },
             destroy:            _destroy,
@@ -3137,8 +3172,31 @@
         };
     }
 
+    // Load a sprite
+    function loadSprite(url) {
+        var x = new XMLHttpRequest();
+
+        // Check for CORS support
+        if ('withCredentials' in x) {
+            x.open('GET', url, true);
+        }
+        else {
+            return;
+        }
+
+        // Inject hidden div with sprite on load
+        x.onload = function() {
+            var c = document.createElement('div');
+            c.setAttribute('hidden', '');
+            c.innerHTML = x.responseText;
+            document.body.insertBefore(c, document.body.childNodes[0]);
+        }
+
+        x.send();
+    }
+
     // Check for support
-    api.supported = function(type) {
+    function supported(type) {
         var browser = _browserSniff(),
             oldIE   = (browser.name === 'IE' && browser.version <= 9),
             iPhone  = /iPhone|iPod/i.test(navigator.userAgent),
@@ -3173,10 +3231,10 @@
             basic:  basic,
             full:   full
         };
-    };
+    }
 
-    // Expose setup function
-    api.setup = function(elements, options) {
+    // Setup function
+    function setup(elements, options) {
         // Get the players
         var instances = [];
 
@@ -3202,7 +3260,7 @@
 
         // Bail if disabled or no basic support
         // You may want to disable certain UAs etc
-        if (!api.supported().basic || !elements.length) {
+        if (!supported().basic || !elements.length) {
             return false;
         }
 
@@ -3236,9 +3294,13 @@
         }
 
         return instances;
-    };
+    }
 
-    return api;
+    return {
+        setup:      setup,
+        supported:  supported,
+        loadSprite: loadSprite
+    };
 }));
 
 // Custom event polyfill

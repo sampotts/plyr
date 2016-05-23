@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.6.14
+- SVG sprite loading automatically for an easier setup
+- Touch devices now show controls on touch rather than pausing playback
+
 ## v1.6.13
 - Decreased sensitivity and inverted scroll on volume slider (scroll up to increase, down to decrease)
 
