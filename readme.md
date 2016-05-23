@@ -87,7 +87,7 @@ If you want to use the default css, add the `plyr.css` file from `/dist` into yo
 The default setup uses the BEM methodology with `plyr` as the block, e.g. `.plyr__controls`. You can change the class hooks in the options. Check out the source for more on this.
 
 ### SVG
-The icons used in the Plyr controls are loaded in an SVG sprite. The icons can be used in your own SVG sprite build (see `/src/sprite` for source icons) or using the default settings which sprite from the CDN automatically for a hassle free setup. 
+The icons used in the Plyr controls are loaded in an SVG sprite. The sprite is automatically loaded from our CDN by default. If you already have an icon build system in place, you can include the source plyr icons (see `/src/sprite` for source icons).
 
 #### Using the `iconUrl` option
 You can however specify your own `iconUrl` option and Plyr will determine if the url is absolute and requires loading by AJAX/CORS due to current browser limitations or if it's a relative path, just use the path directly. 
