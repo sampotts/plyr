@@ -403,7 +403,7 @@ Or you can use the returned object from your call to the setup method:
 var player = plyr.setup('.js-plyr')[0];
 ```
 
-This will return an array of plyr instances setup, so you need to specify the index of the instance you want. This is less useful if you are setting up mutliple instances. You can listen for the `setup` [event](#events) documented below which will return each instance one by one, as they are setup (in the `plyr` key of the event object).
+This will return an array of plyr instances setup, so you need to specify the index of the instance you want. This is less useful if you are setting up multiple instances. You can listen for the `setup` [event](#events) documented below which will return each instance one by one, as they are setup (in the `plyr` key of the event object).
 
 Once you have your instance, you can use the API methods below on it. For example to pause it:
 
@@ -829,7 +829,7 @@ Fullscreen in Plyr is supported for all browsers that [currently support it](htt
   </tbody>
 </table>
 
-&sup1; Mobile Safari on the iPhone forces the native player for `<video>` so no useful customisation is possible. `<audio>` elements have volume controls disabled.
+&sup1; Mobile Safari on the iPhone forces the native player for `<video>` so no useful customization is possible. `<audio>` elements have volume controls disabled.
 
 &sup2; Native player used (no support for `<progress>` or `<input type="range">`) but the API is supported (v1.0.28+)
 
