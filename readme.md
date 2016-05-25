@@ -21,6 +21,7 @@ We wanted a lightweight, accessible and customizable media player that supports 
 - **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes
 - **i18n support** - support for internationalization of controls
 - **No dependencies** - written in "vanilla" JavaScript, no jQuery required
+- **SASS and LESS provided** - If you like _these_ over plain CSS
 
 Oh and yes, it works with Bootstrap.
 
@@ -52,7 +53,7 @@ npm install plyr
 
 ### Bower
 
-If bower is your thang, you can grab Plyr using:
+If bower is your thing, you can grab Plyr using:
 ```
 bower install plyr
 ```
