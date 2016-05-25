@@ -38,7 +38,7 @@ Check out the [changelog](changelog.md) to see what's new with Plyr.
 If you have any cool ideas or features, please let me know by [creating an issue](https://github.com/Selz/plyr/issues/new) or, of course, forking and sending a pull request.
 
 ## Implementation
-Check `docs/index.html` and `docs/dist/docs.js` for an example setup.
+Check `docs/index.html` and `docs/src/js/docs.js` for an example setup.
 
 **Heads up:** the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.6.16/plyr.js` to `https://cdn.plyr.io/1.6.16/plyr.js`
 
