@@ -21,6 +21,7 @@ We wanted a lightweight, accessible and customizable media player that supports 
 - **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes
 - **i18n support** - support for internationalization of controls
 - **No dependencies** - written in "vanilla" JavaScript, no jQuery required
+- **SASS and LESS provided** - If you like _these_ over plain CSS
 
 Oh and yes, it works with Bootstrap.
 
@@ -38,7 +39,7 @@ Check out the [changelog](changelog.md) to see what's new with Plyr.
 If you have any cool ideas or features, please let me know by [creating an issue](https://github.com/Selz/plyr/issues/new) or, of course, forking and sending a pull request.
 
 ## Implementation
-Check `docs/index.html` and `docs/dist/docs.js` for an example setup.
+Check `docs/index.html` and `docs/src/js/docs.js` for an example setup.
 
 **Heads up:** the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.6.17/plyr.js` to `https://cdn.plyr.io/1.6.17/plyr.js`
 
@@ -52,7 +53,7 @@ npm install plyr
 
 ### Bower
 
-If bower is your thang, you can grab Plyr using:
+If bower is your thing, you can grab Plyr using:
 ```
 bower install plyr
 ```
@@ -409,7 +410,7 @@ Or you can use the returned object from your call to the setup method:
 var player = plyr.setup('.js-plyr')[0];
 ```
 
-This will return an array of plyr instances setup, so you need to specify the index of the instance you want. This is less useful if you are setting up mutliple instances. You can listen for the `setup` [event](#events) documented below which will return each instance one by one, as they are setup (in the `plyr` key of the event object).
+This will return an array of plyr instances setup, so you need to specify the index of the instance you want. This is less useful if you are setting up multiple instances. You can listen for the `setup` [event](#events) documented below which will return each instance one by one, as they are setup (in the `plyr` key of the event object).
 
 Once you have your instance, you can use the API methods below on it. For example to pause it:
 
@@ -835,7 +836,7 @@ Fullscreen in Plyr is supported for all browsers that [currently support it](htt
   </tbody>
 </table>
 
-&sup1; Mobile Safari on the iPhone forces the native player for `<video>` so no useful customisation is possible. `<audio>` elements have volume controls disabled.
+&sup1; Mobile Safari on the iPhone forces the native player for `<video>` so no useful customization is possible. `<audio>` elements have volume controls disabled.
 
 &sup2; Native player used (no support for `<progress>` or `<input type="range">`) but the API is supported (v1.0.28+)
 
