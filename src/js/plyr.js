@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.6.16
+// plyr.js v1.6.17
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -44,10 +44,11 @@
         displayDuration:        true,
         loadSprite:             true,
         iconPrefix:             'plyr',
-        iconUrl:                'https://cdn.plyr.io/1.6.16/plyr.svg',
+        iconUrl:                'https://cdn.plyr.io/1.6.17/plyr.svg',
         clickToPlay:            true,
         hideControls:           true,
         showPosterOnEnd:        false,
+        disableContextMenu:     true,
         tooltips: {
             controls:           false,
             seek:               true
@@ -2931,6 +2932,11 @@
                         _pause();
                     }
                 });
+            }
+
+            // Disable right click
+            if (config.disableContextMenu) {
+                _on(plyr.media, 'contextmenu', function(event) { event.preventDefault(); });
             }
 
             // Proxy events to container
