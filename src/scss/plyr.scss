@@ -20,6 +20,7 @@
     max-width: 100%;
     min-width: 200px;
     font-family: Avenir, "Avenir Next", "Helvetica Neue", "Segoe UI", Helvetica, Arial, sans-serif;
+    direction: ltr;
 
     @if $plyr-border-box == true {
         // border-box everything
