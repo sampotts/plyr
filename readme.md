@@ -197,7 +197,13 @@ Some touch browsers (particularly Mobile Safari on iOS) seem to have issues with
 
 #### Options
 
-Options must be passed as an object to the `setup()` method as above or as JSON in `data-plyr` attribute on each of your target elements (e.g. data-plyr='{ title: "testing" }') - note the single quotes encapsulating the JSON.
+Options must be passed as an object to the `setup()` method as above or as JSON in `data-plyr` attribute on each of your target elements:
+
+```html
+<div class="plyr" data-plyr='{ title: "testing" }'>
+```
+
+Note the single quotes encapsulating the JSON and double quotes on the object keys.
 
 <table class="table" width="100%">
 <thead>
