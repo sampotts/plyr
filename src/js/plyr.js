@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.6.17
+// plyr.js v1.6.18
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -44,7 +44,7 @@
         displayDuration:        true,
         loadSprite:             true,
         iconPrefix:             'plyr',
-        iconUrl:                'https://cdn.plyr.io/1.6.17/plyr.svg',
+        iconUrl:                'https://cdn.plyr.io/1.6.18/plyr.svg',
         clickToPlay:            true,
         hideControls:           true,
         showPosterOnEnd:        false,
@@ -1890,7 +1890,7 @@
             // Set the current time
             // Try/catch incase the media isn't set and we're calling seek() from source() and IE moans
             try {
-                plyr.media.currentTime = targetTime.toFixed(1);
+                plyr.media.currentTime = targetTime.toFixed(4);
             }
             catch(e) {}
 

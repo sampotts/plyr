@@ -1,5 +1,8 @@
 # Changelog
 
+# v1.6.18
+- Reduced rounding of seek value from 1 decimal point to 4 (fixes #242)
+
 # v1.6.17
 - Added `disableContextMenu` option to hide the right click context menu (fixes #248 and #225)
 
