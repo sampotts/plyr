@@ -1382,7 +1382,7 @@
                 container.setAttribute('id', id);
 
                 // Setup API
-                if (typeof YT === 'object') {
+                if (typeof YT === 'object' && YT.loaded !== 0) {
                     _youTubeReady(mediaId, container);
                 }
                 else {
