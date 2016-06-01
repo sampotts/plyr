@@ -1,5 +1,8 @@
 # Changelog
 
+# v1.6.19
+- Fix for scroll direction issues on volume control (fixes #258)
+
 # v1.6.18
 - Reduced rounding of seek value from 1 decimal point to 4 (fixes #242)
 

@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.6.18
+// plyr.js v1.6.19
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -44,7 +44,7 @@
         displayDuration:        true,
         loadSprite:             true,
         iconPrefix:             'plyr',
-        iconUrl:                'https://cdn.plyr.io/1.6.18/plyr.svg',
+        iconUrl:                'https://cdn.plyr.io/1.6.19/plyr.svg',
         clickToPlay:            true,
         hideControls:           true,
         showPosterOnEnd:        false,
@@ -1439,8 +1439,6 @@
                 _setAttributes(vimeo, {
                     'src':                      'https://player.vimeo.com/video/' + mediaId + '?player_id=' + id + '&api=1&badge=0&byline=0&portrait=0&title=0',
                     'id':                       id,
-                    'webkitallowfullscreen':    '',
-                    'mozallowfullscreen':       '',
                     'allowfullscreen':          '',
                     'frameborder':              0
                 });
@@ -2843,14 +2841,28 @@
             _on(plyr.volume.input, 'wheel', function(event) {
                 event.preventDefault();
 
-                // Scroll down to decrease
+                // Detect "natural" scroll - suppored on OS X Safari only
+                // Other browsers on OS X will be inverted until support improves
+                var inverted = event.webkitDirectionInvertedFromDevice;
+
+                // Scroll down (or up on natural) to decrease
                 if (event.deltaY < 0 || event.deltaX > 0) {
-                    _decreaseVolume();
+                    if (inverted) {
+                        _decreaseVolume();
+                    }
+                    else {
+                        _increaseVolume();
+                    }
                 }
 
-                // Scroll up to increase
+                // Scroll up (or down on natural) to increase
                 if (event.deltaY > 0 || event.deltaX < 0) {
-                    _increaseVolume();
+                    if (inverted) {
+                        _increaseVolume();
+                    }
+                    else {
+                        _decreaseVolume();
+                    }
                 }
             });
         }
