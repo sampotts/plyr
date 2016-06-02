@@ -1181,7 +1181,7 @@
                 // Only load external sprite using AJAX
                 if (iconUrl.external) {
                     _log('Loading external SVG sprite');
-                    loadSprite(iconUrl.url);
+                    loadSprite(iconUrl.url, "sprite-plyr");
                 }
                 else {
                     _log('Sprite will be used inline');
@@ -3214,8 +3214,13 @@
     }
 
     // Load a sprite
-    function loadSprite(url) {
+    function loadSprite(url, id) {
         var x = new XMLHttpRequest();
+
+        // If the id is set and sprite exists, bail
+        if (typeof id === 'string' && document.querySelector('#' + id) !== null) {
+            return;
+        }
 
         // Check for CORS support
         if ('withCredentials' in x) {
@@ -3229,6 +3234,9 @@
         x.onload = function() {
             var c = document.createElement('div');
             c.setAttribute('hidden', '');
+            if (typeof id === 'string') {
+                c.setAttribute('id', id);
+            }
             c.innerHTML = x.responseText;
             document.body.insertBefore(c, document.body.childNodes[0]);
         }
@@ -3317,7 +3325,7 @@
 
                 // Bail if not enabled
                 if (!config.enabled) {
-                    return;
+                    return null;
                 }
 
                 // Create new instance

@@ -1,5 +1,8 @@
 # Changelog
 
+# v1.6.20
+- Fix for multiple sprites being requested (fixes #259)
+
 # v1.6.19
 - Fix for scroll direction issues on volume control (fixes #258)
 
