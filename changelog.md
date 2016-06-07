@@ -1,18 +1,25 @@
 # Changelog
 
-# v1.6.20
+# v1.7.0
+- SASS cleanup (fixes #265)
+- Docs tidy up to help quick start (fixes #253)
+- Fix for issues with data attribute options passing (fixes #257)
+- Removed the requirement for a wrapper div to setup Plyr and removed the dependency on the `plyr` classname as a JS hook. By default it will now look for `<video>`, `<audio>` and `[data-type]` elements. If you are just calling `setup()` with a `<div class="plyr">` you may want to give it a good test after upgrading. You can probably remove the wrapper div. The reason behind this is to make setup easier for newcomers and prevent the styling being used on unsupported players (because the plyr classname was used as a CSS and JS hook - which isn't ideal) 
+- Renamed the 'docs' folder to `demo` to avoid confusion. The readme is the docs after all.
+
+## v1.6.20
 - Fix for multiple sprites being requested (fixes #259)
 
-# v1.6.19
+## v1.6.19
 - Fix for scroll direction issues on volume control (fixes #258)
 
-# v1.6.18
+## v1.6.18
 - Reduced rounding of seek value from 1 decimal point to 4 (fixes #242)
 
-# v1.6.17
+## v1.6.17
 - Added `disableContextMenu` option to hide the right click context menu (fixes #248 and #225)
 
-# v1.6.16
+## v1.6.16
 - Always hide standard controls (fixes #225)
 - Fix for Tooltips overflowing (fixes #230)
 

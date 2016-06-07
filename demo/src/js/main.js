@@ -1,25 +1,32 @@
 // ==========================================================================
-// Docs example
+// Plyr.io demo
+// This code is purely for the plyr.io website
+// Please see readme.md in the root or github.com/selz/plyr
 // ==========================================================================
 
 /*global plyr*/
 
-// Setup the player
-plyr.setup('.js-media-player', {
-	debug: 				true,
-	title: 				'Video demo',
-	iconUrl: 			'../dist/plyr.svg',
-	tooltips: 	{
-		controls: 		true
-	},
-	captions: {
-		defaultActive: 	true
-	}
-});
-plyr.loadSprite('dist/docs.svg');
 
 // General functions
-(function() {
+;(function() {
+	// Setup the player
+	var instances = plyr.setup({
+		debug: 				true,
+		title: 				'Video demo',
+		iconUrl: 			'../dist/plyr.svg',
+		tooltips: 	{
+			controls: 		true
+		},
+		captions: {
+			defaultActive: 	true
+		}
+	});
+	plyr.loadSprite('dist/demo.svg');
+
+	// Plyr returns an array regardless
+	var player = instances[0];
+
+	// Setup type toggle
 	var buttons = document.querySelectorAll('[data-source]'),
 		types = {
 			video: 		'video',
@@ -89,9 +96,6 @@ plyr.loadSprite('dist/docs.svg');
 		if(!(type in types) || (!init && type == currentType) || (!currentType.length && type == types.video)) {
 			return;
 		}
-
-		// Get plyr instance
-		var player = document.querySelector('.js-media-player').plyr;
 
 		switch(type) {
 			case types.video:

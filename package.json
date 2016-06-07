@@ -1,6 +1,6 @@
 {
   "name": "plyr",
-  "version": "1.6.20",
+  "version": "1.7.0",
   "description": "A simple, accessible and customizable HTML5, YouTube and Vimeo media player",
   "homepage": "http://plyr.io",
   "main": "src/js/plyr.js",
@@ -38,7 +38,7 @@
     "url": "https://github.com/selz/plyr/issues"
   },
   "directories": {
-    "doc": "docs"
+    "doc": "readme.md"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

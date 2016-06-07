@@ -38,22 +38,15 @@ Check out the [changelog](changelog.md) to see what's new with Plyr.
 
 If you have any cool ideas or features, please let me know by [creating an issue](https://github.com/Selz/plyr/issues/new) or, of course, forking and sending a pull request.
 
-## Implementation
-Check `docs/index.html` and `docs/src/js/docs.js` for an example setup.
-
-**Heads up:** the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.6.20/plyr.js` to `https://cdn.plyr.io/1.6.20/plyr.js`
+## Using package managers
 
 ### npm
-
-Using `npm`, you can grab Plyr:
 ```
 npm install plyr
 ```
 [https://www.npmjs.com/package/plyr](https://www.npmjs.com/package/plyr)
 
 ### Bower
-
-If bower is your thing, you can grab Plyr using:
 ```
 bower install plyr
 ```
@@ -68,24 +61,81 @@ ember addon:install ember-cli-plyr
 ```
 More info is on [npm](https://www.npmjs.com/package/ember-cli-plyr) and [GitHub](https://github.com/louisrudner/ember-cli-plyr)
 
-### CDN
-If you want to use our CDN, you can use the following:
+
+## Quick setup
+Here's a quick run through on getting up and running.
+
+### HTML
+Plyr extends upon the standard HTML5 markup so that's all you need for those types.
+
+#### HTML5 Video
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/1.6.20/plyr.css">
-<script src="https://cdn.plyr.io/1.6.20/plyr.js"></script>
+<video poster="/path/to/poster.jpg" controls>
+  <source src="/path/to/video.mp4" type="video/mp4">
+  <source src="/path/to/video.webm" type="video/webm">
+  <!-- Captions are optional -->
+  <track kind="captions" label="English captions" src="/path/to/captions.vtt" srclang="en" default>
+</video>
 ```
 
-The SVG sprite/defs file can be found here: `https://cdn.plyr.io/1.6.20/plyr.svg`.
-
-### CSS & Styling
-If you want to use the default css, add the `plyr.css` file from `/dist` into your head, or even better use `plyr.less` or `plyr.scss` file included in `/src` in your build to save a request.
+#### HTML5 Audio
 
 ```html
-<link rel="stylesheet" href="dist/plyr.css">
+<audio controls>
+  <source src="/path/to/audio.mp3" type="audio/mp3">
+  <source src="/path/to/audio.ogg" type="audio/ogg">
+</audio>
 ```
 
-The default setup uses the BEM methodology with `plyr` as the block, e.g. `.plyr__controls`. You can change the class hooks in the options. Check out the source for more on this.
+For YouTube and Vimeo, Plyr uses the standard YouTube API markup (an empty `<div>`):
+
+#### YouTube embed
+
+```html
+<div data-type="youtube" data-video-id="bTqVqk7FSmY"></div>
+```
+
+#### Vimeo embed
+
+```html
+<div data-type="vimeo" data-video-id="143418951"></div>
+```
+
+### JavaScript 
+Include the `plyr.js` script before the closing `</body>` tag and then call `plyr.setup()`. More info on `setup()` can be found under [#initialising](initialising).
+
+```html
+<script src="path/to/plyr.js"></script>
+<script>plyr.setup();</script>
+```
+
+If you want to use our CDN for the JavaScript, you can use the following:
+
+```html
+<script src="https://cdn.plyr.io/1.7.0/plyr.js"></script>
+```
+
+### CSS
+Include the `plyr.css` stylsheet into your `<head>`
+
+```html
+<link rel="stylesheet" href="path/to/plyr.css">
+```
+
+If you want to use our CDN for the default CSS, you can use the following:
+
+```html
+<link rel="stylesheet" href="https://cdn.plyr.io/1.7.0/plyr.css">
+```
+
+### SVG Sprite
+The SVG sprite is loaded automatically from our CDN. To change this, see the [#options](Options) below. For reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/1.7.0/plyr.svg`.
+
+## Advanced
+
+### LESS & SASS/SCSS
+You can use `plyr.less` or `plyr.scss` file included in `/src` as part of your build and change variables to suit your design. The HTML markup uses the BEM methodology with `plyr` as the block, e.g. `.plyr__controls`. You can change the class hooks in the options to match any custom CSS you write. Check out the JavaScript source for more on this.
 
 ### SVG
 The icons used in the Plyr controls are loaded in an SVG sprite. The sprite is automatically loaded from our CDN by default. If you already have an icon build system in place, you can include the source plyr icons (see `/src/sprite` for source icons).
@@ -101,91 +151,36 @@ More info on SVG sprites here:
 and the AJAX technique here:
 [http://css-tricks.com/ajaxing-svg-sprite/](http://css-tricks.com/ajaxing-svg-sprite/)
 
-### HTML
-The only extra markup that's needed to use plyr is a `<div>` wrapper. Replace the source, poster and captions with urls for your media.
-```html
-<div class="plyr">
-	<video poster="/path/to/poster.jpg" controls>
-		<!-- Video files -->
-		<source src="/path/to/video.mp4" type="video/mp4">
-		<source src="/path/to/video.webm" type="video/webm">
-
-		<!-- Text track file -->
-		<track kind="captions" label="English captions" src="/path/to/captions.vtt" srclang="en" default>
-
-		<!-- Fallback for browsers that don't support the <video> element -->
-		<a href="/path/to/movie.mp4">Download</a>
-	</video>
-</div>
-```
-And the same for `<audio>`
-
-```html
-<div class="plyr">
-	<audio controls>
-		<!-- Audio files -->
-		<source src="/path/to/audio.mp3" type="audio/mp3">
-		<source src="/path/to/audio.ogg" type="audio/ogg">
-
-		<!-- Fallback for browsers that don't support the <audio> element -->
-		<a href="/path/to/audio.mp3">Download</a>
-	</audio>
-</div>
-```
-
-For YouTube and Vimeo, Plyr uses the standard YouTube API markup (an empty `<div>`):
-
-```html
-<div class="plyr">
-	<div data-video-id="bTqVqk7FSmY" data-type="youtube"></div>
-</div>
-```
-```html
-<div class="plyr">
-	<div data-video-id="143418951" data-type="vimeo"></div>
-</div>
-```
-
-#### Cross Origin (CORS)
-You'll notice the `crossorigin` attribute on the example `<video>` and `<audio>` elements. This is because the media is loaded from another domain. If your media is hosted on another domain, you may need to add this attribute.
-
-More info on CORS here:
+### Cross Origin (CORS)
+You'll notice the `crossorigin` attribute on the example `<video>` elements. This is because the TextTrack captions are loaded from another domain. If your TextTrack captions are also hosted on another domain, you will need to add this attribute and make sure your host has the correct headers setup. For more info on CORS checkout the MDN docs:
 [https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS)
 
 ### Captions
-WebVTT captions are supported. To add a caption track, check the HTML example above and look for the `<track>` element.
-
-Be sure to [validate your caption files](https://quuz.org/webvtt/)
+WebVTT captions are supported. To add a caption track, check the HTML example above and look for the `<track>` element. Be sure to [validate your caption files](https://quuz.org/webvtt/).
 
 ### JavaScript
 
-#### Quick setup
+#### Initialising
 
-Here's an example of a default setup:
-
-```html
-<script src="https://cdn.plyr.io/1.6.20/plyr.js"></script>
-<script>plyr.setup();</script>
-```
-
-This will look for all elements with the specified container classname (default is `plyr`) and setup plyr on each element found. You can specify other options, including a different selector hook below. The container classname will be added to the specified element(s) if it is not already present (for the CSS).
+By default, Plyr looks for all `<video>`, `<audio>` and `[data-type]` elements and initialises on any found. You can specify other options, including a different selector hook below. The container classname will be added to the specified element(s) if it is not already present (for the CSS).
 
 You can initialize the player a few other ways:
 
 Passing a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList):
 ```javascript
-plyr.setup(document.querySelectorAll('.js-plyr'), options);
+plyr.setup(document.querySelectorAll('.js-player'), options);
 ```
 
 Passing a [HTMLElement](https://developer.mozilla.org/en/docs/Web/API/HTMLElement):
 ```javascript
-plyr.setup(document.querySelector('.js-plyr'), options);
+plyr.setup(document.querySelector('.js-player'), options);
 ```
 
 Passing a [string selector](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelectorAll):
 ```javascript
-plyr.setup('.js-plyr', options);
+plyr.setup('.js-player', options);
 ```
+This can be the target `<video>`, `<audio>` or `[data-type]` elements or a container element. 
 
 Passing just the options object:
 ```javascript
@@ -200,7 +195,7 @@ Some touch browsers (particularly Mobile Safari on iOS) seem to have issues with
 Options must be passed as an object to the `setup()` method as above or as JSON in `data-plyr` attribute on each of your target elements:
 
 ```html
-<div class="plyr" data-plyr='{ title: "testing" }'>
+<video data-plyr='{ title: "testing" }'></video>
 ```
 
 Note the single quotes encapsulating the JSON and double quotes on the object keys.
@@ -404,16 +399,16 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
 #### Fetching the plyr instance
 A `plyr` object is added to any element that Plyr is initialized on. You can then control the player by accessing methods in the `plyr` object.
 
-There are two ways to access the instance, firstly you re-query the element container you used for setup (e.g. `.js-plyr`) like so:
+There are two ways to access the instance, firstly you re-query the element container you used for setup (e.g. `.js-player`) like so:
 
 ```javascript
-var player = document.querySelector('.js-plyr').plyr;
+var player = document.querySelector('.js-player').plyr;
 ```
 
-Or you can use the returned object from your call to the setup method:
+The other method is using the return value from the call to `setup()`. An array of instances is returned so you need to use an index:
 
 ```javascript
-var player = plyr.setup('.js-plyr')[0];
+var player = plyr.setup('.js-player')[0];
 ```
 
 This will return an array of plyr instances setup, so you need to specify the index of the instance you want. This is less useful if you are setting up multiple instances. You can listen for the `setup` [event](#events) documented below which will return each instance one by one, as they are setup (in the `plyr` key of the event object).

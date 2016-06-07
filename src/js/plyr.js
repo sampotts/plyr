@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.6.20
+// plyr.js v1.7.0
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -44,7 +44,7 @@
         displayDuration:        true,
         loadSprite:             true,
         iconPrefix:             'plyr',
-        iconUrl:                'https://cdn.plyr.io/1.6.20/plyr.svg',
+        iconUrl:                'https://cdn.plyr.io/1.7.0/plyr.svg',
         clickToPlay:            true,
         hideControls:           true,
         showPosterOnEnd:        false,
@@ -54,6 +54,8 @@
             seek:               true
         },
         selectors: {
+            html5:              'video, audio',
+            embed:              '[data-type]',
             container:          '.plyr',
             controls: {
                 container:      null,
@@ -323,6 +325,8 @@
             else {
                 parent.appendChild(child);
             }
+
+            return child;
         }
     }
 
@@ -402,6 +406,17 @@
             }
         }
         return false;
+    }
+
+    // Element matches selector
+    function _matches(element, selector) {
+        var p = Element.prototype;
+
+        var f = p.matches || p.webkitMatchesSelector || p.mozMatchesSelector || p.msMatchesSelector || function(s) {
+            return [].indexOf.call(document.querySelectorAll(s), this) !== -1;
+        };
+
+        return f.call(element, selector);
     }
 
     // Bind event
@@ -3045,7 +3060,7 @@
 
             // Get the div placeholder for YouTube and Vimeo
             if (!plyr.media) {
-                plyr.media = plyr.container.querySelectorAll('div')[0];
+                plyr.media = plyr.container.querySelectorAll('[data-type]')[0];
             }
 
             // Bail if nothing to setup
@@ -3285,7 +3300,8 @@
     // Setup function
     function setup(elements, options) {
         // Get the players
-        var instances = [];
+        var instances = [],
+            selector = [defaults.selectors.html5, defaults.selectors.embed].join(',');
 
         // Select the elements
         // Assume elements is a NodeList by default
@@ -3304,7 +3320,7 @@
             }
 
             // Use default selector
-            elements = document.querySelectorAll(defaults.selectors.container);
+            elements = document.querySelectorAll(selector);
         }
 
         // Bail if disabled or no basic support
@@ -3318,10 +3334,19 @@
             // Get the current element
             var element = elements[i];
 
+            // Custom settings passed as data attribute
+            var settings = element.getAttribute("data-plyr");
+
+            // Wrap each media element if needed
+            if (_matches(element, selector)) {
+                // Wrap in a <div>
+                element = _wrap(element, document.createElement('div'));
+            }
+
             // Setup a player instance and add to the element
             if (typeof element.plyr === 'undefined') {
                 // Create instance-specific config
-                var config = _extend(defaults, options, JSON.parse(element.getAttribute("data-plyr")));
+                var config = _extend({}, defaults, options, JSON.parse(settings));
 
                 // Bail if not enabled
                 if (!config.enabled) {
