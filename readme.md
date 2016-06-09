@@ -113,7 +113,7 @@ Include the `plyr.js` script before the closing `</body>` tag and then call `ply
 If you want to use our CDN for the JavaScript, you can use the following:
 
 ```html
-<script src="https://cdn.plyr.io/1.7.0/plyr.js"></script>
+<script src="https://cdn.plyr.io/1.8.0/plyr.js"></script>
 ```
 
 ### CSS
@@ -126,11 +126,11 @@ Include the `plyr.css` stylsheet into your `<head>`
 If you want to use our CDN for the default CSS, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/1.7.0/plyr.css">
+<link rel="stylesheet" href="https://cdn.plyr.io/1.8.0/plyr.css">
 ```
 
 ### SVG Sprite
-The SVG sprite is loaded automatically from our CDN. To change this, see the [#options](Options) below. For reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/1.7.0/plyr.svg`.
+The SVG sprite is loaded automatically from our CDN. To change this, see the [#options](Options) below. For reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/1.8.0/plyr.svg`.
 
 ## Advanced
 
@@ -162,9 +162,7 @@ WebVTT captions are supported. To add a caption track, check the HTML example ab
 
 #### Initialising
 
-By default, Plyr looks for all `<video>`, `<audio>` and `[data-type]` elements and initialises on any found. You can specify other options, including a different selector hook below. The container classname will be added to the specified element(s) if it is not already present (for the CSS).
-
-You can initialize the player a few other ways:
+By default, Plyr looks for all `<video>`, `<audio>` and `[data-type]` elements with the document and initialises on any found. You can specify other options, including a different NodeList, HTMLElement or string selector as below:
 
 Passing a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList):
 ```javascript
@@ -180,12 +178,15 @@ Passing a [string selector](https://developer.mozilla.org/en-US/docs/Web/API/Doc
 ```javascript
 plyr.setup('.js-player', options);
 ```
-This can be the target `<video>`, `<audio>` or `[data-type]` elements or a container element. 
+
+The NodeList, HTMLElement or string selector can be the target `<video>`, `<audio>` or `[data-type]` (for embeds) element or a container element. If a container has several media elements inside, each media element will be wrapped in a `<div>` and setup individually.
 
 Passing just the options object:
 ```javascript
 plyr.setup(options);
 ```
+
+`setup()` will return an array of all the elements Plyr was setup on. The `plyr` object can be accessed on these elements and used for the API.
 
 #### RangeTouch
 Some touch browsers (particularly Mobile Safari on iOS) seem to have issues with `<input type="range">` elements whereby touching the track to set the value doesn't work and sliding the thumb can be tricky. To combat this, I've created [RangeTouch](https://rangetouch.com) which I'd recommend including in your solution. It's a tiny script with a nice benefit for users on touch devices. 
@@ -396,7 +397,7 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
 
 ## API
 
-#### Fetching the plyr instance
+#### Getting the `plyr` instance
 A `plyr` object is added to any element that Plyr is initialized on. You can then control the player by accessing methods in the `plyr` object.
 
 There are two ways to access the instance, firstly you re-query the element container you used for setup (e.g. `.js-player`) like so:
@@ -405,13 +406,15 @@ There are two ways to access the instance, firstly you re-query the element cont
 var player = document.querySelector('.js-player').plyr;
 ```
 
+You can listen for the `setup` [event](#events) on the container, after which the `plyr` key will be available and also passed in the  to your callback (in the `plyr` key of the event object).
+
 The other method is using the return value from the call to `setup()`. An array of instances is returned so you need to use an index:
 
 ```javascript
-var player = plyr.setup('.js-player')[0];
+var player = plyr.setup('.js-player')[0].plyr;
 ```
 
-This will return an array of plyr instances setup, so you need to specify the index of the instance you want. This is less useful if you are setting up multiple instances. You can listen for the `setup` [event](#events) documented below which will return each instance one by one, as they are setup (in the `plyr` key of the event object).
+This will return an array of plyr instances that were setup, so you need to specify the index of the instance you want or loop through of course. This is less useful if you are setting up multiple instances.
 
 Once you have your instance, you can use the API methods below on it. For example to pause it:
 

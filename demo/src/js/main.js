@@ -6,7 +6,6 @@
 
 /*global plyr*/
 
-
 // General functions
 ;(function() {
 	// Setup the player
@@ -24,7 +23,7 @@
 	plyr.loadSprite('dist/demo.svg');
 
 	// Plyr returns an array regardless
-	var player = instances[0];
+	var player = instances[0].plyr;
 
 	// Setup type toggle
 	var buttons = document.querySelectorAll('[data-source]'),

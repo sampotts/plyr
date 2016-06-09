@@ -1,11 +1,15 @@
 # Changelog
 
+# v1.8.0
+- ***(Important)*** `setup()` now returns the element Plyr was setup on rather than the `plyr` object. This means `var player = plyr.setup()[0];` would now be `var player = plyr.setup()[0].plyr;`. This improves support for React and other virtual dom frameworks as mentioned in #254
+- Fixed using a relative URL for `iconUrl` in IE (fixes #269) 
+
 # v1.7.0
 - SASS cleanup (fixes #265)
 - Docs tidy up to help quick start (fixes #253)
 - Fix for issues with data attribute options passing (fixes #257)
-- Removed the requirement for a wrapper div to setup Plyr and removed the dependency on the `plyr` classname as a JS hook. By default it will now look for `<video>`, `<audio>` and `[data-type]` elements. If you are just calling `setup()` with a `<div class="plyr">` you may want to give it a good test after upgrading. You can probably remove the wrapper div. The reason behind this is to make setup easier for newcomers and prevent the styling being used on unsupported players (because the plyr classname was used as a CSS and JS hook - which isn't ideal) 
-- Renamed the 'docs' folder to `demo` to avoid confusion. The readme is the docs after all.
+- ***(Important)*** Removed the requirement for a wrapper div to setup Plyr and removed the dependency on the `plyr` classname as a JS hook. By default it will now look for `<video>`, `<audio>` and `[data-type]` elements. If you are just calling `setup()` with a `<div class="plyr">` you may want to give it a good test after upgrading. You can probably remove the wrapper div. The reason behind this is to make setup easier for newcomers and prevent the styling being used on unsupported players (because the plyr classname was used as a CSS and JS hook - which isn't ideal) 
+- Renamed the 'docs' folder to `demo` to avoid confusion - the readme is the docs after all
 
 ## v1.6.20
 - Fix for multiple sprites being requested (fixes #259)

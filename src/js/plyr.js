@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.7.0
+// plyr.js v1.8.0
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -44,7 +44,7 @@
         displayDuration:        true,
         loadSprite:             true,
         iconPrefix:             'plyr',
-        iconUrl:                'https://cdn.plyr.io/1.7.0/plyr.svg',
+        iconUrl:                'https://cdn.plyr.io/1.8.0/plyr.svg',
         clickToPlay:            true,
         hideControls:           true,
         showPosterOnEnd:        false,
@@ -175,51 +175,56 @@
     // Credits: http://paypal.github.io/accessible-html5-video-player/
     // Unfortunately, due to mixed support, UA sniffing is required
     function _browserSniff() {
-        var nAgt = navigator.userAgent,
+        var ua = navigator.userAgent,
             name = navigator.appName,
             fullVersion = '' + parseFloat(navigator.appVersion),
             majorVersion = parseInt(navigator.appVersion, 10),
             nameOffset,
             verOffset,
-            ix;
+            ix,
+            isIE = false,
+            isFirefox = false,
+            isChrome = false,
+            isSafari = false;
 
         // MSIE 11
         if ((navigator.appVersion.indexOf('Windows NT') !== -1) && (navigator.appVersion.indexOf('rv:11') !== -1)) {
-            name = 'IE';
+            isIE = true;
             fullVersion = '11;';
         }
         // MSIE
-        else if ((verOffset=nAgt.indexOf('MSIE')) !== -1) {
-            name = 'IE';
-            fullVersion = nAgt.substring(verOffset + 5);
+        else if ((verOffset = ua.indexOf('MSIE')) !== -1) {
+            isIE = true;
+            fullVersion = ua.substring(verOffset + 5);
         }
         // Chrome
-        else if ((verOffset=nAgt.indexOf('Chrome')) !== -1) {
-            name = 'Chrome';
-            fullVersion = nAgt.substring(verOffset + 7);
+        else if ((verOffset = ua.indexOf('Chrome')) !== -1) {
+            isChrome = true;
+            fullVersion = ua.substring(verOffset + 7);
         }
         // Safari
-        else if ((verOffset=nAgt.indexOf('Safari')) !== -1) {
-            name = 'Safari';
-            fullVersion = nAgt.substring(verOffset + 7);
-            if ((verOffset = nAgt.indexOf('Version')) !== -1) {
-                fullVersion = nAgt.substring(verOffset + 8);
+        else if ((verOffset = ua.indexOf('Safari')) !== -1) {
+            isSafari = true;
+            fullVersion = ua.substring(verOffset + 7);
+            if ((verOffset = ua.indexOf('Version')) !== -1) {
+                fullVersion = ua.substring(verOffset + 8);
             }
         }
         // Firefox
-        else if ((verOffset=nAgt.indexOf('Firefox')) !== -1) {
-            name = 'Firefox';
-            fullVersion = nAgt.substring(verOffset + 8);
+        else if ((verOffset = ua.indexOf('Firefox')) !== -1) {
+            isFirefox = true;
+            fullVersion = ua.substring(verOffset + 8);
         }
         // In most other browsers, 'name/version' is at the end of userAgent
-        else if ((nameOffset=nAgt.lastIndexOf(' ') + 1) < (verOffset=nAgt.lastIndexOf('/'))) {
-            name = nAgt.substring(nameOffset,verOffset);
-            fullVersion = nAgt.substring(verOffset + 1);
+        else if ((nameOffset = ua.lastIndexOf(' ') + 1) < (verOffset = ua.lastIndexOf('/'))) {
+            name = ua.substring(nameOffset,verOffset);
+            fullVersion = ua.substring(verOffset + 1);
 
             if (name.toLowerCase() == name.toUpperCase()) {
                 name = navigator.appName;
             }
         }
+
         // Trim the fullVersion string at semicolon/space if present
         if ((ix = fullVersion.indexOf(';')) !== -1) {
             fullVersion = fullVersion.substring(0, ix);
@@ -227,6 +232,7 @@
         if ((ix = fullVersion.indexOf(' ')) !== -1) {
             fullVersion = fullVersion.substring(0, ix);
         }
+
         // Get major version
         majorVersion = parseInt('' + fullVersion, 10);
         if (isNaN(majorVersion)) {
@@ -238,6 +244,10 @@
         return {
             name:       name,
             version:    majorVersion,
+            isIE:       isIE,
+            isFirefox:  isFirefox,
+            isChrome:   isChrome,
+            isSafari:   isSafari,
             ios:        /(iPad|iPhone|iPod)/g.test(navigator.platform),
             touch:      'ontouchstart' in document.documentElement
         };
@@ -924,8 +934,8 @@
 
                 // Disable unsupported browsers than report false positive
                 // Firefox bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1033144
-                if ((plyr.browser.name === 'IE' && plyr.browser.version >= 10) ||
-                    (plyr.browser.name === 'Firefox' && plyr.browser.version >= 31)) {
+                if ((plyr.browser.isIE && plyr.browser.version >= 10) ||
+                    (plyr.browser.isFirefox && plyr.browser.version >= 31)) {
 
                     // Debugging
                     _log('Detected browser with known TextTrack issues - using manual fallback');
@@ -1191,15 +1201,16 @@
         function _injectControls() {
             // Sprite
             if (config.loadSprite) {
-                var iconUrl = _getIconUrl();
+                var iconUrl = _getIconUrl(),
+                    isExternal = iconUrl.external;
 
                 // Only load external sprite using AJAX
-                if (iconUrl.external) {
-                    _log('Loading external SVG sprite');
+                if (isExternal || plyr.browser.isIE) {
+                    _log('AJAX loading external SVG sprite' + (plyr.browser.isIE ? ' (due to IE)' : ''));
                     loadSprite(iconUrl.url, "sprite-plyr");
                 }
                 else {
-                    _log('Sprite will be used inline');
+                    _log('Sprite will be used as external resource directly');
                 }
             }
 
@@ -2715,7 +2726,7 @@
         // Listen for control events
         function _controlListeners() {
             // IE doesn't support input event, so we fallback to change
-            var inputEvent = (plyr.browser.name == 'IE' ? 'change' : 'input');
+            var inputEvent = (plyr.browser.isIE ? 'change' : 'input');
 
             // Click play/pause helper
             function _togglePlay() {
@@ -3262,7 +3273,7 @@
     // Check for support
     function supported(type) {
         var browser = _browserSniff(),
-            oldIE   = (browser.name === 'IE' && browser.version <= 9),
+            oldIE   = (browser.isIE && browser.version <= 9),
             iPhone  = /iPhone|iPod/i.test(navigator.userAgent),
             audio   = !!document.createElement('audio').canPlayType,
             video   = !!document.createElement('video').canPlayType,
@@ -3298,55 +3309,82 @@
     }
 
     // Setup function
-    function setup(elements, options) {
+    function setup(targets, options) {
         // Get the players
-        var instances = [],
-            selector = [defaults.selectors.html5, defaults.selectors.embed].join(',');
+        var elements    = [],
+            containers  = [],
+            selector    = [defaults.selectors.html5, defaults.selectors.embed].join(',');
 
         // Select the elements
         // Assume elements is a NodeList by default
-        if (typeof elements === 'string') {
-            elements = document.querySelectorAll(elements);
+        if (typeof targets === 'string') {
+            targets = document.querySelectorAll(targets);
         }
         // Single HTMLElement passed
-        else if (elements instanceof HTMLElement) {
-            elements = [elements];
+        else if (targets instanceof HTMLElement) {
+            targets = [targets];
         }
         // No selector passed, possibly options as first argument
-        else if (!(elements instanceof NodeList) && typeof elements !== 'string')  {
+        else if (!(targets instanceof NodeList) && typeof targets !== 'string')  {
             // If options are the first argument
-            if (typeof options === 'undefined' && typeof elements === 'object') {
-                options = elements;
+            if (typeof options === 'undefined' && typeof targets === 'object') {
+                options = targets;
             }
 
             // Use default selector
-            elements = document.querySelectorAll(selector);
+            targets = document.querySelectorAll(selector);
         }
 
         // Bail if disabled or no basic support
         // You may want to disable certain UAs etc
-        if (!supported().basic || !elements.length) {
+        if (!supported().basic || !targets.length) {
             return false;
         }
 
+        // Convert NodeList to array
+        if (targets instanceof NodeList) {
+            targets = Array.prototype.slice.call(targets);
+        }
+
+        // Check if the targets have multiple media elements
+        for (var i = 0; i < targets.length; i++) {
+            var target = targets[i];
+
+            // Get children
+            var children = target.querySelectorAll(selector);
+
+            // If there's more than one media element, wrap them
+            if (children.length > 1) {
+                for (var x = 0; x < children.length; x++) {
+                    containers.push({
+                        element: _wrap(children[x], document.createElement('div')),
+                        original: target
+                    });
+                }
+            }
+            else {
+                containers.push({
+                    element: target
+                });
+            }
+        }
+
         // Create a player instance for each element
-        for (var i = 0; i < elements.length; i++) {
-            // Get the current element
-            var element = elements[i];
+        for (var key in containers) {
+            var element = containers[key].element,
+                original = containers[key].original || element;
 
-            // Custom settings passed as data attribute
-            var settings = element.getAttribute("data-plyr");
-
-            // Wrap each media element if needed
+            // Wrap each media element if is target is media element
+            // as opposed to a wrapper
             if (_matches(element, selector)) {
                 // Wrap in a <div>
                 element = _wrap(element, document.createElement('div'));
             }
 
             // Setup a player instance and add to the element
-            if (typeof element.plyr === 'undefined') {
+            if (!('plyr' in element)) {
                 // Create instance-specific config
-                var config = _extend({}, defaults, options, JSON.parse(settings));
+                var config = _extend({}, defaults, options, JSON.parse(original.getAttribute('data-plyr')));
 
                 // Bail if not enabled
                 if (!config.enabled) {
@@ -3360,14 +3398,16 @@
                 element.plyr = (Object.keys(instance).length ? instance : false);
 
                 // Callback
-                _triggerEvent(element, 'setup', { plyr: element.plyr });
+                _triggerEvent(original, 'setup', { 
+                    plyr: element.plyr 
+                });
             }
 
             // Add to return array even if it's already setup
-            instances.push(element.plyr);
+            elements.push(element);
         }
 
-        return instances;
+        return elements;
     }
 
     return {
