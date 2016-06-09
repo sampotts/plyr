@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.8.0
+// plyr.js v1.8.1
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -44,7 +44,7 @@
         displayDuration:        true,
         loadSprite:             true,
         iconPrefix:             'plyr',
-        iconUrl:                'https://cdn.plyr.io/1.8.0/plyr.svg',
+        iconUrl:                'https://cdn.plyr.io/1.8.1/plyr.svg',
         clickToPlay:            true,
         hideControls:           true,
         showPosterOnEnd:        false,
@@ -190,21 +190,25 @@
         // MSIE 11
         if ((navigator.appVersion.indexOf('Windows NT') !== -1) && (navigator.appVersion.indexOf('rv:11') !== -1)) {
             isIE = true;
+            name = 'IE';
             fullVersion = '11;';
         }
         // MSIE
         else if ((verOffset = ua.indexOf('MSIE')) !== -1) {
             isIE = true;
+            name = 'IE';
             fullVersion = ua.substring(verOffset + 5);
         }
         // Chrome
         else if ((verOffset = ua.indexOf('Chrome')) !== -1) {
             isChrome = true;
+            name = 'Chrome';
             fullVersion = ua.substring(verOffset + 7);
         }
         // Safari
         else if ((verOffset = ua.indexOf('Safari')) !== -1) {
             isSafari = true;
+            name = 'Safari';
             fullVersion = ua.substring(verOffset + 7);
             if ((verOffset = ua.indexOf('Version')) !== -1) {
                 fullVersion = ua.substring(verOffset + 8);
@@ -213,6 +217,7 @@
         // Firefox
         else if ((verOffset = ua.indexOf('Firefox')) !== -1) {
             isFirefox = true;
+            name = 'Firefox';
             fullVersion = ua.substring(verOffset + 8);
         }
         // In most other browsers, 'name/version' is at the end of userAgent

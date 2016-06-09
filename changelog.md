@@ -1,5 +1,8 @@
 # Changelog
 
+# v1.8.1
+- Fixed inaccurate log message
+
 # v1.8.0
 - ***(Important)*** `setup()` now returns the element Plyr was setup on rather than the `plyr` object. This means `var player = plyr.setup()[0];` would now be `var player = plyr.setup()[0].plyr;`. This improves support for React and other virtual dom frameworks as mentioned in #254
 - Fixed using a relative URL for `iconUrl` in IE (fixes #269) 
