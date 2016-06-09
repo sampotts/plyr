@@ -813,7 +813,7 @@ More info on the respective API's here:
 
 ## Fullscreen
 
-Fullscreen in Plyr is supported for all browsers that [currently support it](http://caniuse.com/#feat=fullscreen). If you're using the default CSS, you can also use a "full browser" mode which will use the full browser window by adding the `plyr-fullscreen` class to your container.
+Fullscreen in Plyr is supported by all browsers that [currently support it](http://caniuse.com/#feat=fullscreen). If you're using the default CSS, you can also use a "full browser" mode which will use the full browser window by adding the `plyr-fullscreen` class to your container.
 
 ## Browser support
 
