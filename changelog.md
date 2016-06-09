@@ -1,5 +1,8 @@
 # Changelog
 
+# v1.8.2
+- Fixed event bubbling 
+
 # v1.8.1
 - Fixed inaccurate log message
 

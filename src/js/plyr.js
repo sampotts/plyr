@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.8.1
+// plyr.js v1.8.2
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -44,7 +44,7 @@
         displayDuration:        true,
         loadSprite:             true,
         iconPrefix:             'plyr',
-        iconUrl:                'https://cdn.plyr.io/1.8.1/plyr.svg',
+        iconUrl:                'https://cdn.plyr.io/1.8.2/plyr.svg',
         clickToPlay:            true,
         hideControls:           true,
         showPosterOnEnd:        false,
@@ -2057,7 +2057,7 @@
             _toggleState(plyr.buttons.fullscreen, plyr.isFullscreen);
 
             // Trigger an event
-            _triggerEvent(plyr.container, plyr.isFullscreen ? 'enterfullscreen' : 'exitfullscreen');
+            _triggerEvent(plyr.container, plyr.isFullscreen ? 'enterfullscreen' : 'exitfullscreen', true);
 
             // Restore scroll position
             if (!plyr.isFullscreen && nativeSupport) {
@@ -2245,7 +2245,7 @@
             _toggleClass(plyr.container, config.classes.captions.active, plyr.captionsEnabled);
 
             // Trigger an event
-            _triggerEvent(plyr.container, plyr.captionsEnabled ? 'captionsenabled' : 'captionsdisabled');
+            _triggerEvent(plyr.container, plyr.captionsEnabled ? 'captionsenabled' : 'captionsdisabled', true);
         }
 
         // Check if media is loading
@@ -3210,7 +3210,7 @@
             _displayDuration();
 
             // Ready event
-            _triggerEvent(plyr.container, 'ready');
+            _triggerEvent(plyr.container, 'ready', true);
         }
 
         // Initialize instance
@@ -3403,7 +3403,7 @@
                 element.plyr = (Object.keys(instance).length ? instance : false);
 
                 // Callback
-                _triggerEvent(original, 'setup', { 
+                _triggerEvent(original, 'setup', true, { 
                     plyr: element.plyr 
                 });
             }
