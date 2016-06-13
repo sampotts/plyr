@@ -1351,7 +1351,7 @@
             }
 
             // If there's a play button, set label
-            if (plyr.supported.full && plyr.buttons.play) {
+            if (plyr.supported.full && plyr.buttons && plyr.buttons.play) {
                 for (var i = plyr.buttons.play.length - 1; i >= 0; i--) {
                     plyr.buttons.play[i].setAttribute('aria-label', label);
                 }
