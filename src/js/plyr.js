@@ -3280,6 +3280,8 @@
         var browser = _browserSniff(),
             oldIE   = (browser.isIE && browser.version <= 9),
             iPhone  = /iPhone|iPod/i.test(navigator.userAgent),
+            iPad    = /iPad/i.test(navigator.userAgent),
+            iOS     = iPhone || iPad,
             audio   = !!document.createElement('audio').canPlayType,
             video   = !!document.createElement('video').canPlayType,
             basic, full;
@@ -3299,7 +3301,7 @@
             case 'youtube':
             case 'soundcloud':
                 basic = true;
-                full  = (!oldIE && !iPhone);
+                full  = (!oldIE && !iOS);
                 break;
 
             default:
