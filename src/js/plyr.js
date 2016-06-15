@@ -3279,7 +3279,9 @@
     function supported(type) {
         var browser = _browserSniff(),
             oldIE   = (browser.isIE && browser.version <= 9),
-            iOS     = /iPhone|iPad|iPod/i.test(navigator.userAgent),
+            iPhone  = /iPhone|iPod/i.test(navigator.userAgent),
+            iPad    = /iPad/i.test(navigator.userAgent),
+            iOS     = iPhone || iPad,
             audio   = !!document.createElement('audio').canPlayType,
             video   = !!document.createElement('video').canPlayType,
             basic, full;
@@ -3287,7 +3289,7 @@
         switch (type) {
             case 'video':
                 basic = video;
-                full  = (basic && (!oldIE && !iOS));
+                full  = (basic && (!oldIE && !iPhone));
                 break;
 
             case 'audio':
