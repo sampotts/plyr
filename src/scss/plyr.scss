@@ -397,6 +397,7 @@
 }
 .plyr .plyr__play-large {
     display: inline-block;
+    z-index: 1;
 }
 .plyr--audio .plyr__play-large {
     display: none;
