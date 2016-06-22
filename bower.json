@@ -15,7 +15,7 @@
     "main": [
         "dist/plyr.css",
         "dist/plyr.js",
-        "dist/sprite.svg",
+        "dist/plyr.svg",
         "src/less/plyr.less",
         "src/scss/plyr.scss",
         "src/js/plyr.js"
