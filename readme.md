@@ -3,7 +3,7 @@ A simple, accessible and customizable HTML5, YouTube and Vimeo media player.
 
 [Checkout the demo](https://plyr.io)
 
-[![Image of Plyr](https://cdn.selz.com/plyr/1.5/plyr_v1.6.6.png)](https://plyr.io)
+[![Image of Plyr](https://cdn.selz.com/plyr/plyr_v1.8.png)](https://plyr.io)
 
 ## Why?
 We wanted a lightweight, accessible and customizable media player that supports [*modern*](#browser-support) browsers. Sure, there are many other players out there but we wanted to keep things simple, using the right elements for the job.
@@ -22,6 +22,7 @@ We wanted a lightweight, accessible and customizable media player that supports 
 - **i18n support** - support for internationalization of controls
 - **No dependencies** - written in "vanilla" JavaScript, no jQuery required
 - **SASS and LESS provided** - If you like _these_ over plain CSS
+- **[Streaming](#streaming)** - Support for hls.js, Shaka and dash.js streaming playback
 
 Oh and yes, it works with Bootstrap.
 
@@ -38,7 +39,18 @@ Check out the [changelog](changelog.md) to see what's new with Plyr.
 
 If you have any cool ideas or features, please let me know by [creating an issue](https://github.com/Selz/plyr/issues/new) or, of course, forking and sending a pull request.
 
+## CMS plugins
+
+### [WordPress](https://wordpress.org)
+Created and maintained by Ryan Anthony Drake ([@iamryandrake](https://github.com/iamryandrake))
+[Plyr on WordPress](https://wordpress.org/plugins/plyr/)
+
+### [Neos](https://www.neos.io/)
+Created and maintained by Jon Uhlmann ([@jonnitto](https://github.com/jonnitto))
+[Plyr.io for Neos.io](https://packagist.org/packages/jonnitto/plyr)
+
 ## Using package managers
+You can grab the source using one of the following package managers.
 
 ### npm
 ```
@@ -61,7 +73,6 @@ ember addon:install ember-cli-plyr
 ```
 More info is on [npm](https://www.npmjs.com/package/ember-cli-plyr) and [GitHub](https://github.com/louisrudner/ember-cli-plyr)
 
-
 ## Quick setup
 Here's a quick run through on getting up and running.
 
@@ -69,7 +80,6 @@ Here's a quick run through on getting up and running.
 Plyr extends upon the standard HTML5 markup so that's all you need for those types.
 
 #### HTML5 Video
-
 ```html
 <video poster="/path/to/poster.jpg" controls>
   <source src="/path/to/video.mp4" type="video/mp4">
@@ -80,7 +90,6 @@ Plyr extends upon the standard HTML5 markup so that's all you need for those typ
 ```
 
 #### HTML5 Audio
-
 ```html
 <audio controls>
   <source src="/path/to/audio.mp3" type="audio/mp3">
@@ -91,13 +100,11 @@ Plyr extends upon the standard HTML5 markup so that's all you need for those typ
 For YouTube and Vimeo, Plyr uses the standard YouTube API markup (an empty `<div>`):
 
 #### YouTube embed
-
 ```html
 <div data-type="youtube" data-video-id="bTqVqk7FSmY"></div>
 ```
 
 #### Vimeo embed
-
 ```html
 <div data-type="vimeo" data-video-id="143418951"></div>
 ```
@@ -113,7 +120,7 @@ Include the `plyr.js` script before the closing `</body>` tag and then call `ply
 If you want to use our CDN for the JavaScript, you can use the following:
 
 ```html
-<script src="https://cdn.plyr.io/1.8.2/plyr.js"></script>
+<script src="https://cdn.plyr.io/1.8.3/plyr.js"></script>
 ```
 
 ### CSS
@@ -126,11 +133,11 @@ Include the `plyr.css` stylsheet into your `<head>`
 If you want to use our CDN for the default CSS, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/1.8.2/plyr.css">
+<link rel="stylesheet" href="https://cdn.plyr.io/1.8.3/plyr.css">
 ```
 
 ### SVG Sprite
-The SVG sprite is loaded automatically from our CDN. To change this, see the [#options](Options) below. For reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/1.8.2/plyr.svg`.
+The SVG sprite is loaded automatically from our CDN. To change this, see the [#options](Options) below. For reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/1.8.3/plyr.svg`.
 
 ## Advanced
 
@@ -192,7 +199,6 @@ plyr.setup(options);
 Some touch browsers (particularly Mobile Safari on iOS) seem to have issues with `<input type="range">` elements whereby touching the track to set the value doesn't work and sliding the thumb can be tricky. To combat this, I've created [RangeTouch](https://rangetouch.com) which I'd recommend including in your solution. It's a tiny script with a nice benefit for users on touch devices. 
 
 #### Options
-
 Options must be passed as an object to the `setup()` method as above or as JSON in `data-plyr` attribute on each of your target elements:
 
 ```html
@@ -202,176 +208,176 @@ Options must be passed as an object to the `setup()` method as above or as JSON 
 Note the single quotes encapsulating the JSON and double quotes on the object keys.
 
 <table class="table" width="100%">
-<thead>
-  <tr>
-    <th width="20%">Option</th>
-    <th width="15%">Type</th>
-    <th width="15%">Default</th>
-    <th width="50%">Description</th>
-  </tr>
+  <thead>
+    <tr>
+      <th width="20%">Option</th>
+      <th width="15%">Type</th>
+      <th width="15%">Default</th>
+      <th width="50%">Description</th>
+    </tr>
   </thead>
   <tbody>
-  <tr>
-    <td><code>enabled</code></td>
-    <td>Boolean</td>
-    <td><code>true</code></td>
-    <td>Completely disable Plyr. This would allow you to do a User Agent check or similar to programmatically enable or disable Plyr for a certain UA. Example below.</td>
-  </tr>
-  <tr>
-    <td><code>html</code></td>
-    <td>String</td>
-    <td><code><a href="controls.md">See controls.md</a></code></td>
-    <td>See <a href="controls.md">controls.md</a> for more info on how the html needs to be structured.</td>
-  </tr>
-  <tr>
-    <td><code>controls</code></td>
-    <td>Array</td>
-    <td><code>['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'fullscreen']</code></td>
-    <td>Toggle which control elements you would like to display when using the default controls html. If you specify a <code>html</code> option, this is redundant. The default value is to display everything.</td>
-  </tr>
-  <tr>
-    <td><code>i18n</code></td>
-    <td>Object</td>
-    <td><code><a href="controls.md">See controls.md</a></code></td>
-    <td>Used for internationalization (i18n) of the tooltips/labels within the buttons.</td>
-  </tr>
-  <tr>
-    <td><code>loadSprite</code></td>
-    <td>Boolean</td>
-    <td><code>true</code></td>
-    <td>Load the SVG sprite specified as the <code>iconUrl</code> option (if a URL). If <code>false</code>, it is assumed you are handling sprite loading yourself.</td>
-  </tr>
-  <tr>
-    <td><code>iconUrl</code></td>
-    <td>String</td>
-    <td><code>null</code></td>
-    <td>Specify a URL or path to the SVG sprite. See the <a href="#svg">SVG section</a> for more info.</td>
-  </tr>
-  <tr>
-    <td><code>iconPrefix</code></td>
-    <td>String</td>
-    <td><code>plyr</code></td>
-    <td>Specify the id prefix for the icons used in the default controls (e.g. "plyr-play" would be "plyr"). This is to prevent clashes if you're using your own SVG sprite but with the default controls. Most people can ignore this option.</td>
-  </tr>
-  <tr>
-    <td><code>debug</code></td>
-    <td>Boolean</td>
-    <td><code>false</code></td>
-    <td>Display debugging information on what Plyr is doing.</td>
-  </tr>
-  <tr>
-    <td><code>autoplay</code></td>
-    <td>Boolean</td>
-    <td><code>false</code></td>
-    <td>Autoplay the media on load. This is generally advised against on UX grounds. It is also disabled on iOS (an Apple limitation).</td>
-  </tr>
-  <tr>
-    <td><code>seekTime</code></td>
-    <td>Number</td>
-    <td><code>10</code></td>
-    <td>The time, in seconds, to seek when a user hits fast forward or rewind.</td>
-  </tr>
-  <tr>
-    <td><code>volume</code></td>
-    <td>Number</td>
-    <td><code>5</code></td>
-    <td>A number, between 1 and 10, representing the initial volume of the player.</td>
-  </tr>
-  <tr>
-    <td><code>clickToPlay</code></td>
-    <td>Boolean</td>
-    <td><code>true</code></td>
-    <td>Click (or tap) of the video container will toggle pause/play.</td>
-  </tr>
-  <tr>
-    <td><code>disableContextMenu</code></td>
-    <td>Boolean</td>
-    <td><code>true</code></td>
-    <td>Disable right click menu on video to <em>help</em> as very primitive obfuscation to prevent downloads of content.</td>
-  </tr>
-  <tr>
-    <td><code>hideControls</code></td>
-    <td>Boolean</td>
-    <td><code>true</code></td>
-    <td>Hide video controls automatically after 2s of no mouse or focus movement, on control element blur (tab out), on playback start or entering fullscreen. As soon as the mouse is moved, a control element is focused or playback is paused, the controls reappear instantly.</td>
-  </tr>
-  <tr>
-    <td><code>showPosterOnEnd</code></td>
-    <td>Boolean</td>
-    <td><code>false</code></td>
-    <td>This will restore and *reload* HTML5 video once playback is complete. Note: depending on the browser caching, this may result in the video downloading again (or parts of it). Use with caution.</td>
-  </tr>
-  <tr>
-    <td><code>tooltips</code></td>
-    <td>Object</td>
-    <td><code>{ controls: false, seek: true }</code></td>
-    <td>
-		<strong>controls</strong>: Display control labels as tooltips on :hover &amp; :focus (by default, the labels are screen reader only).
-		<br><br>
-		<strong>seek</strong>: Display a seek tooltip to indicate on click where the media would seek to.
-	</td>
-  </tr>
-  <tr>
-    <td><code>duration</code></td>
-    <td>Number</td>
-    <td><code>null</code></td>
-    <td>Specify a custom duration.</td>
-  </tr>
-  <tr>
-    <td><code>displayDuration</code></td>
-    <td>Boolean</td>
-    <td><code>true</code></td>
-    <td>Displays the duration of the media on the "metadataloaded" event (on startup) in the current time display. This will only work if the `preload` attribute is not set to `none` (or is not set at all) and you choose not to display the duration (see <code>controls</code> option).</td>
-  </tr>
-  <tr>
-    <td><code>selectors</code></td>
-    <td>Object</td>
-    <td>&mdash;</td>
-    <td>See <code>plyr.js</code> in <code>/src</code> for more info. You probably don't need to change any of these.</td>
-  </tr>
-  <tr>
-    <td><code>listeners</code></td>
-    <td>Object</td>
-    <td>&mdash;</td>
-    <td>Allows early binding of event listeners to the controls. See <code>controls</code> above for list of controls and see <code>plyr.js</code> in <code>/src</code> for more info.</td>
-  </tr>
-  <tr>
-    <td><code>classes</code></td>
-    <td>Object</td>
-    <td>&mdash;</td>
-    <td>Similar to above, these are the classes added to the player when state changes occur.</td>
-  </tr>
-  <tr>
-    <td><code>captions</code></td>
-    <td>Object</td>
-    <td>&mdash;</td>
-    <td>One property <code>defaultActive</code> which toggles if captions should be on by default. The default value is <code>false</code>.</td>
-  </tr>
-  <tr>
-    <td><code>fullscreen</code></td>
-    <td>Object</td>
-    <td>&mdash;</td>
-    <td>See <a href="#fullscreen-options">below</a></td>
-  </tr>
-  <tr>
-    <td><code>storage</code></td>
-    <td>Object</td>
-    <td>&mdash;</td>
-    <td>Two properties; <code>enabled</code> which toggles if local storage should be enabled (if the browser supports it). The default value is `true`. This enables storing user settings, currently it only stores volume but more will be added later. The second property <code>key</code> is the key used for the local storage. The default is <code>plyr_volume</code> until more settings are stored.</td>
-  </tr>
- </tbody>
+    <tr>
+      <td><code>enabled</code></td>
+      <td>Boolean</td>
+      <td><code>true</code></td>
+      <td>Completely disable Plyr. This would allow you to do a User Agent check or similar to programmatically enable or disable Plyr for a certain UA. Example below.</td>
+    </tr>
+    <tr>
+      <td><code>html</code></td>
+      <td>String</td>
+      <td><code><a href="controls.md">See controls.md</a></code></td>
+      <td>See <a href="controls.md">controls.md</a> for more info on how the html needs to be structured.</td>
+    </tr>
+    <tr>
+      <td><code>controls</code></td>
+      <td>Array</td>
+      <td><code>['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'fullscreen']</code></td>
+      <td>Toggle which control elements you would like to display when using the default controls html. If you specify a <code>html</code> option, this is redundant. The default value is to display everything.</td>
+    </tr>
+    <tr>
+      <td><code>i18n</code></td>
+      <td>Object</td>
+      <td><code><a href="controls.md">See controls.md</a></code></td>
+      <td>Used for internationalization (i18n) of the tooltips/labels within the buttons.</td>
+    </tr>
+    <tr>
+      <td><code>loadSprite</code></td>
+      <td>Boolean</td>
+      <td><code>true</code></td>
+      <td>Load the SVG sprite specified as the <code>iconUrl</code> option (if a URL). If <code>false</code>, it is assumed you are handling sprite loading yourself.</td>
+    </tr>
+    <tr>
+      <td><code>iconUrl</code></td>
+      <td>String</td>
+      <td><code>null</code></td>
+      <td>Specify a URL or path to the SVG sprite. See the <a href="#svg">SVG section</a> for more info.</td>
+    </tr>
+    <tr>
+      <td><code>iconPrefix</code></td>
+      <td>String</td>
+      <td><code>plyr</code></td>
+      <td>Specify the id prefix for the icons used in the default controls (e.g. "plyr-play" would be "plyr"). This is to prevent clashes if you're using your own SVG sprite but with the default controls. Most people can ignore this option.</td>
+    </tr>
+    <tr>
+      <td><code>debug</code></td>
+      <td>Boolean</td>
+      <td><code>false</code></td>
+      <td>Display debugging information on what Plyr is doing.</td>
+    </tr>
+    <tr>
+      <td><code>autoplay</code></td>
+      <td>Boolean</td>
+      <td><code>false</code></td>
+      <td>Autoplay the media on load. This is generally advised against on UX grounds. It is also disabled on iOS (an Apple limitation).</td>
+    </tr>
+    <tr>
+      <td><code>seekTime</code></td>
+      <td>Number</td>
+      <td><code>10</code></td>
+      <td>The time, in seconds, to seek when a user hits fast forward or rewind.</td>
+    </tr>
+    <tr>
+      <td><code>volume</code></td>
+      <td>Number</td>
+      <td><code>5</code></td>
+      <td>A number, between 1 and 10, representing the initial volume of the player.</td>
+    </tr>
+    <tr>
+      <td><code>clickToPlay</code></td>
+      <td>Boolean</td>
+      <td><code>true</code></td>
+      <td>Click (or tap) of the video container will toggle pause/play.</td>
+    </tr>
+    <tr>
+      <td><code>disableContextMenu</code></td>
+      <td>Boolean</td>
+      <td><code>true</code></td>
+      <td>Disable right click menu on video to <em>help</em> as very primitive obfuscation to prevent downloads of content.</td>
+    </tr>
+    <tr>
+      <td><code>hideControls</code></td>
+      <td>Boolean</td>
+      <td><code>true</code></td>
+      <td>Hide video controls automatically after 2s of no mouse or focus movement, on control element blur (tab out), on playback start or entering fullscreen. As soon as the mouse is moved, a control element is focused or playback is paused, the controls reappear instantly.</td>
+    </tr>
+    <tr>
+      <td><code>showPosterOnEnd</code></td>
+      <td>Boolean</td>
+      <td><code>false</code></td>
+      <td>This will restore and *reload* HTML5 video once playback is complete. Note: depending on the browser caching, this may result in the video downloading again (or parts of it). Use with caution.</td>
+    </tr>
+    <tr>
+      <td><code>tooltips</code></td>
+      <td>Object</td>
+      <td><code>{ controls: false, seek: true }</code></td>
+      <td>
+  		<strong>controls</strong>: Display control labels as tooltips on :hover &amp; :focus (by default, the labels are screen reader only).
+  		<br><br>
+  		<strong>seek</strong>: Display a seek tooltip to indicate on click where the media would seek to.
+  	</td>
+    </tr>
+    <tr>
+      <td><code>duration</code></td>
+      <td>Number</td>
+      <td><code>null</code></td>
+      <td>Specify a custom duration.</td>
+    </tr>
+    <tr>
+      <td><code>displayDuration</code></td>
+      <td>Boolean</td>
+      <td><code>true</code></td>
+      <td>Displays the duration of the media on the "metadataloaded" event (on startup) in the current time display. This will only work if the `preload` attribute is not set to `none` (or is not set at all) and you choose not to display the duration (see <code>controls</code> option).</td>
+    </tr>
+    <tr>
+      <td><code>selectors</code></td>
+      <td>Object</td>
+      <td>&mdash;</td>
+      <td>See <code>plyr.js</code> in <code>/src</code> for more info. You probably don't need to change any of these.</td>
+    </tr>
+    <tr>
+      <td><code>listeners</code></td>
+      <td>Object</td>
+      <td>&mdash;</td>
+      <td>Allows early binding of event listeners to the controls. See <code>controls</code> above for list of controls and see <code>plyr.js</code> in <code>/src</code> for more info.</td>
+    </tr>
+    <tr>
+      <td><code>classes</code></td>
+      <td>Object</td>
+      <td>&mdash;</td>
+      <td>Similar to above, these are the classes added to the player when state changes occur.</td>
+    </tr>
+    <tr>
+      <td><code>captions</code></td>
+      <td>Object</td>
+      <td>&mdash;</td>
+      <td>One property <code>defaultActive</code> which toggles if captions should be on by default. The default value is <code>false</code>.</td>
+    </tr>
+    <tr>
+      <td><code>fullscreen</code></td>
+      <td>Object</td>
+      <td>&mdash;</td>
+      <td>See <a href="#fullscreen-options">below</a></td>
+    </tr>
+    <tr>
+      <td><code>storage</code></td>
+      <td>Object</td>
+      <td>&mdash;</td>
+      <td>Two properties; <code>enabled</code> which toggles if local storage should be enabled (if the browser supports it). The default value is `true`. This enables storing user settings, currently it only stores volume but more will be added later. The second property <code>key</code> is the key used for the local storage. The default is <code>plyr_volume</code> until more settings are stored.</td>
+    </tr>
+  </tbody>
 </table>
 
 #### Fullscreen options
 
 <table class="table" width="100%" id="fullscreen-options">
-<thead>
-  <tr>
-    <th width="20%">Option</th>
-    <th width="15%">Type</th>
-    <th width="15%">Default</th>
-    <th width="50%">Description</th>
-  </tr>
+  <thead>
+    <tr>
+      <th width="20%">Option</th>
+      <th width="15%">Type</th>
+      <th width="15%">Default</th>
+      <th width="50%">Description</th>
+    </tr>
   </thead>
   <tbody>
     <tr>
@@ -533,7 +539,6 @@ Here's a list of the methods supported:
 </table>
 
 #### .source() method
-
 This allows changing the plyr source and type on the fly.
 
 Video example:
@@ -643,9 +648,7 @@ Some more details on the object parameters
   </tbody>
 </table>
 
-
 ## Events
-
 You can listen for events on the target element you setup Plyr on (see example under the table). Some events only apply to HTML5 audio and video.
 
 <table class="table" width="100%">
@@ -788,7 +791,6 @@ document.querySelector('.js-plyr').addEventListener('ready', function(event) {
 These events also bubble up the DOM. 
 
 ## Embeds
-
 YouTube and Vimeo are currently supported and function much like a HTML5 video. Check the relevant documentation sections for any differences.
 
 Plyr references a custom version of the Vimeo Froogaloop API as Vimeo have neglected to maintain the library and there were bugs with their version. You don't need to worry about including your own versions of the Vimeo or YouTube JavaScript APIs.
@@ -813,8 +815,14 @@ More info on the respective API's here:
 
 *Please note*: not all API methods may work 100%. Your mileage may vary. It's better to use the universal plyr API where possible.
 
-## Fullscreen
+## Streaming 
+Because Plyr is an extension of the standard HTML5 video and audio elements, third party streaming plugins can be used with Plyr. Massive thanks to Matias Russitto ([@russitto](https://github.com/russitto)) for working on this. Here's a few examples:
 
+- Using [hls.js](https://github.com/dailymotion/hls.js) - [Demo](http://codepen.io/sampotts/pen/JKEMqB)
+- Using [Shaka](https://github.com/google/shaka-player) - [Demo](http://codepen.io/sampotts/pen/zBNpVR)
+- Using [dash.js](https://github.com/Dash-Industry-Forum/dash.js) - [Demo](http://codepen.io/sampotts/pen/BzpJXN)
+
+## Fullscreen
 Fullscreen in Plyr is supported by all browsers that [currently support it](http://caniuse.com/#feat=fullscreen). If you're using the default CSS, you can also use a "full browser" mode which will use the full browser window by adding the `plyr-fullscreen` class to your container.
 
 ## Browser support

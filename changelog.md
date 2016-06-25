@@ -1,5 +1,14 @@
 # Changelog
 
+# v1.8.3
+- Disabled iPad support for YouTube and Vimeo due to iOS limitations with iFrame playback
+- Fixed IE11 icon loading (fixes #269)
+- Updated screenshot (fixes #281)
+- Added WordPress plugin (fixes #239)
+- Added Neos plugin
+- Added HLS, Shaka and dash.js examples (see #235 for more)
+- Improvements for controls hiding and showing on touch devices
+
 # v1.8.2
 - Fixed event bubbling 
 

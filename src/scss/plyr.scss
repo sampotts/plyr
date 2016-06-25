@@ -19,6 +19,7 @@
     position: relative;
     max-width: 100%;
     min-width: 200px;
+    overflow: hidden;
     font-family: Avenir, "Avenir Next", "Helvetica Neue", "Segoe UI", Helvetica, Arial, sans-serif;
     direction: ltr;
 
@@ -203,8 +204,8 @@
 
 // Captions
 // --------------------------------------------------------------
-// Hide default captions (can't find -moz -ms prefixes)
-.plyr ::-webkit-media-text-track-container {
+// Hide default captions
+.plyr video::-webkit-media-text-track-container {
     display: none;
 }
 .plyr__captions {
@@ -246,9 +247,8 @@
 
 // Controls
 // --------------------------------------------------------------
-// Hide default controls (can't find -moz -ms prefixes)
-.plyr ::-webkit-media-controls,
-.plyr ::-webkit-media-controls-enclosure {
+// Hide native controls
+.plyr ::-webkit-media-controls {
     display: none;
 }
 
@@ -256,11 +256,8 @@
 .plyr__controls {
     display: flex;
     align-items: center; 
-
     line-height: 1;
     text-align: center;
-
-    transition: opacity .3s ease;
 
     // Spacing
     > button,
@@ -325,6 +322,7 @@
 // Hide controls 
 .plyr--hide-controls .plyr__controls {
     opacity: 0;
+    pointer-events: none;
 }
 
 // Video controls
@@ -338,6 +336,7 @@
     border-bottom-left-radius: inherit;
     border-bottom-right-radius: inherit;
     color: $plyr-video-control-color;
+    transition: opacity .3s ease;
 
     button {
         // Hover and tab focus
