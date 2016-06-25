@@ -371,6 +371,7 @@
 .plyr__play-large {
     display: none;
     position: absolute;
+    z-index: 1;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -397,7 +398,6 @@
 }
 .plyr .plyr__play-large {
     display: inline-block;
-    z-index: 1;
 }
 .plyr--audio .plyr__play-large {
     display: none;
