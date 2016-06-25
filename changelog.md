@@ -1,5 +1,8 @@
 # Changelog
 
+# v1.8.4
+- Fix for large play button on small videos
+
 # v1.8.3
 - Disabled iPad support for YouTube and Vimeo due to iOS limitations with iFrame playback
 - Fixed IE11 icon loading (fixes #269)
