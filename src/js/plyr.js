@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.8.4
+// plyr.js v1.8.5
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -44,7 +44,7 @@
         displayDuration:        true,
         loadSprite:             true,
         iconPrefix:             'plyr',
-        iconUrl:                'https://cdn.plyr.io/1.8.4/plyr.svg',
+        iconUrl:                'https://cdn.plyr.io/1.8.5/plyr.svg',
         clickToPlay:            true,
         hideControls:           true,
         showPosterOnEnd:        false,
@@ -191,7 +191,7 @@
         if ((navigator.appVersion.indexOf('Windows NT') !== -1) && (navigator.appVersion.indexOf('rv:11') !== -1)) {
             isIE = true;
             name = 'IE';
-            fullVersion = '11;';
+            fullVersion = '11';
         }
         // MSIE
         else if ((verOffset = ua.indexOf('MSIE')) !== -1) {

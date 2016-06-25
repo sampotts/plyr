@@ -1,9 +1,12 @@
 # Changelog
 
-# v1.8.4
+## v1.8.5
+- Fixed overflow issues (fixes #286)
+
+## v1.8.4
 - Fix for large play button on small videos
 
-# v1.8.3
+## v1.8.3
 - Disabled iPad support for YouTube and Vimeo due to iOS limitations with iFrame playback
 - Fixed IE11 icon loading (fixes #269)
 - Updated screenshot (fixes #281)
@@ -12,10 +15,10 @@
 - Added HLS, Shaka and dash.js examples (see #235 for more)
 - Improvements for controls hiding and showing on touch devices
 
-# v1.8.2
+## v1.8.2
 - Fixed event bubbling 
 
-# v1.8.1
+## v1.8.1
 - Fixed inaccurate log message
 
 # v1.8.0
