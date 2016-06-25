@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.8.6
+- Reverted font size change
+
 ## v1.8.5
 - Fixed overflow issues (fixes #286)
 
