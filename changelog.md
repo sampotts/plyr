@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.8.7
+- Line height fix
+
 ## v1.8.6
 - Reverted font size change
 
