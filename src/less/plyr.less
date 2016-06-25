@@ -203,8 +203,8 @@
 
 // Captions
 // --------------------------------------------------------------
-// Hide default captions
-.plyr video::-webkit-media-text-track-container {
+// Hide default captions (can't find -moz -ms prefixes)
+.plyr ::-webkit-media-text-track-container {
     display: none;
 }
 .plyr__captions {
@@ -246,6 +246,11 @@
 
 // Controls
 // --------------------------------------------------------------
+// Hide default controls (can't find -moz -ms prefixes)
+.plyr ::-webkit-media-controls,
+.plyr ::-webkit-media-controls-enclosure {
+    display: none;
+}
 // Playback controls
 .plyr__controls {
     display: flex;
