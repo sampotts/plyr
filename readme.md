@@ -21,6 +21,7 @@ We wanted a lightweight, accessible and customizable media player that supports 
 - **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes
 - **i18n support** - support for internationalization of controls
 - **No dependencies** - written in "vanilla" JavaScript, no jQuery required
+- **SASS and LESS provided** - If you like _these_ over plain CSS
 
 Oh and yes, it works with Bootstrap.
 
@@ -37,22 +38,15 @@ Check out the [changelog](changelog.md) to see what's new with Plyr.
 
 If you have any cool ideas or features, please let me know by [creating an issue](https://github.com/Selz/plyr/issues/new) or, of course, forking and sending a pull request.
 
-## Implementation
-Check `docs/index.html` and `docs/dist/docs.js` for an example setup.
-
-**Heads up:** the example `index.html` file needs to be served from a webserver (such as Apache, Nginx, IIS or similar) unless you change the file sources to include http or https. e.g. change `//cdn.plyr.io/1.6.13/plyr.js` to `https://cdn.plyr.io/1.6.13/plyr.js`
+## Using package managers
 
 ### npm
-
-Using `npm`, you can grab Plyr:
 ```
 npm install plyr
 ```
 [https://www.npmjs.com/package/plyr](https://www.npmjs.com/package/plyr)
 
 ### Bower
-
-If bower is your thang, you can grab Plyr using:
 ```
 bower install plyr
 ```
@@ -67,55 +61,87 @@ ember addon:install ember-cli-plyr
 ```
 More info is on [npm](https://www.npmjs.com/package/ember-cli-plyr) and [GitHub](https://github.com/louisrudner/ember-cli-plyr)
 
-### CDN
-If you want to use our CDN, you can use the following:
+
+## Quick setup
+Here's a quick run through on getting up and running.
+
+### HTML
+Plyr extends upon the standard HTML5 markup so that's all you need for those types.
+
+#### HTML5 Video
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/1.6.13/plyr.css">
-<script src="https://cdn.plyr.io/1.6.13/plyr.js"></script>
+<video poster="/path/to/poster.jpg" controls>
+  <source src="/path/to/video.mp4" type="video/mp4">
+  <source src="/path/to/video.webm" type="video/webm">
+  <!-- Captions are optional -->
+  <track kind="captions" label="English captions" src="/path/to/captions.vtt" srclang="en" default>
+</video>
 ```
 
-The SVG sprite/defs file can be found here: `https://cdn.plyr.io/1.6.13/plyr.svg`.
-
-### CSS & Styling
-If you want to use the default css, add the `plyr.css` file from `/dist` into your head, or even better use `plyr.less` or `plyr.scss` file included in `/src` in your build to save a request.
+#### HTML5 Audio
 
 ```html
-<link rel="stylesheet" href="dist/plyr.css">
+<audio controls>
+  <source src="/path/to/audio.mp3" type="audio/mp3">
+  <source src="/path/to/audio.ogg" type="audio/ogg">
+</audio>
 ```
 
-The default setup uses the BEM methodology with `plyr` as the block, e.g. `.plyr__controls`. You can change the class hooks in the options. Check out the source for more on this.
+For YouTube and Vimeo, Plyr uses the standard YouTube API markup (an empty `<div>`):
+
+#### YouTube embed
+
+```html
+<div data-type="youtube" data-video-id="bTqVqk7FSmY"></div>
+```
+
+#### Vimeo embed
+
+```html
+<div data-type="vimeo" data-video-id="143418951"></div>
+```
+
+### JavaScript 
+Include the `plyr.js` script before the closing `</body>` tag and then call `plyr.setup()`. More info on `setup()` can be found under [#initialising](initialising).
+
+```html
+<script src="path/to/plyr.js"></script>
+<script>plyr.setup();</script>
+```
+
+If you want to use our CDN for the JavaScript, you can use the following:
+
+```html
+<script src="https://cdn.plyr.io/1.8.2/plyr.js"></script>
+```
+
+### CSS
+Include the `plyr.css` stylsheet into your `<head>`
+
+```html
+<link rel="stylesheet" href="path/to/plyr.css">
+```
+
+If you want to use our CDN for the default CSS, you can use the following:
+
+```html
+<link rel="stylesheet" href="https://cdn.plyr.io/1.8.2/plyr.css">
+```
+
+### SVG Sprite
+The SVG sprite is loaded automatically from our CDN. To change this, see the [#options](Options) below. For reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/1.8.2/plyr.svg`.
+
+## Advanced
+
+### LESS & SASS/SCSS
+You can use `plyr.less` or `plyr.scss` file included in `/src` as part of your build and change variables to suit your design. The HTML markup uses the BEM methodology with `plyr` as the block, e.g. `.plyr__controls`. You can change the class hooks in the options to match any custom CSS you write. Check out the JavaScript source for more on this.
 
 ### SVG
-The SVG sprite for the controls icons can be loaded two ways:
-- By passing the *relative* path to the sprite as the `iconUrl` option; or
-- Using AJAX, injecting the sprite into a hidden div. 
+The icons used in the Plyr controls are loaded in an SVG sprite. The sprite is automatically loaded from our CDN by default. If you already have an icon build system in place, you can include the source plyr icons (see `/src/sprite` for source icons).
 
 #### Using the `iconUrl` option
-This method requires the SVG sprite to be hosted on the *same domain* as your page hosting the player. Currently no browser supports cross origin SVG sprites due to XSS issues. Fingers crossed this will come soon though. An example value for this option would be:
-```
-/path/to/plyr.svg
-```
-
-#### Using AJAX
-Using AJAX means you can load the sprite from a different origin. Avoiding the issues above. This is an example script to load an SVG sprite best added before the closing `</body>`, before any other scripts.
-
-```html
-<script>
-(function(d, p){
-	var a = new XMLHttpRequest(),
-		b = d.body;
-	a.open('GET', p, true);
-	a.send();
-	a.onload = function() {
-		var c = d.createElement('div');
-		c.setAttribute('hidden', '');
-		c.innerHTML = a.responseText;
-		b.insertBefore(c, b.childNodes[0]);
-	};
-})(document, 'https://cdn.plyr.io/1.6.13/plyr.svg');
-</script>
-```
+You can however specify your own `iconUrl` option and Plyr will determine if the url is absolute and requires loading by AJAX/CORS due to current browser limitations or if it's a relative path, just use the path directly. 
 
 If you're using the `<base>` tag on your site, you may need to use something like this:
 [svgfixer.js](https://gist.github.com/leonderijke/c5cf7c5b2e424c0061d2)
@@ -125,103 +151,55 @@ More info on SVG sprites here:
 and the AJAX technique here:
 [http://css-tricks.com/ajaxing-svg-sprite/](http://css-tricks.com/ajaxing-svg-sprite/)
 
-### HTML
-The only extra markup that's needed to use plyr is a `<div>` wrapper. Replace the source, poster and captions with urls for your media.
-```html
-<div class="plyr">
-	<video poster="/path/to/poster.jpg" controls>
-		<!-- Video files -->
-		<source src="/path/to/video.mp4" type="video/mp4">
-		<source src="/path/to/video.webm" type="video/webm">
-
-		<!-- Text track file -->
-		<track kind="captions" label="English captions" src="/path/to/captions.vtt" srclang="en" default>
-
-		<!-- Fallback for browsers that don't support the <video> element -->
-		<a href="/path/to/movie.mp4">Download</a>
-	</video>
-</div>
-```
-And the same for `<audio>`
-
-```html
-<div class="plyr">
-	<audio controls>
-		<!-- Audio files -->
-		<source src="/path/to/audio.mp3" type="audio/mp3">
-		<source src="/path/to/audio.ogg" type="audio/ogg">
-
-		<!-- Fallback for browsers that don't support the <audio> element -->
-		<a href="/path/to/audio.mp3">Download</a>
-	</audio>
-</div>
-```
-
-For YouTube and Vimeo, Plyr uses the standard YouTube API markup (an empty `<div>`):
-
-```html
-<div class="plyr">
-	<div data-video-id="bTqVqk7FSmY" data-type="youtube"></div>
-</div>
-```
-```html
-<div class="plyr">
-	<div data-video-id="143418951" data-type="vimeo"></div>
-</div>
-```
-
-#### Cross Origin (CORS)
-You'll notice the `crossorigin` attribute on the example `<video>` and `<audio>` elements. This is because the media is loaded from another domain. If your media is hosted on another domain, you may need to add this attribute.
-
-More info on CORS here:
+### Cross Origin (CORS)
+You'll notice the `crossorigin` attribute on the example `<video>` elements. This is because the TextTrack captions are loaded from another domain. If your TextTrack captions are also hosted on another domain, you will need to add this attribute and make sure your host has the correct headers setup. For more info on CORS checkout the MDN docs:
 [https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS)
 
 ### Captions
-WebVTT captions are supported. To add a caption track, check the HTML example above and look for the `<track>` element.
-
-Be sure to [validate your caption files](https://quuz.org/webvtt/)
+WebVTT captions are supported. To add a caption track, check the HTML example above and look for the `<track>` element. Be sure to [validate your caption files](https://quuz.org/webvtt/).
 
 ### JavaScript
 
-#### Quick setup
+#### Initialising
 
-Here's an example of a default setup:
-
-```html
-<script src="https://cdn.plyr.io/1.6.13/plyr.js"></script>
-<script>plyr.setup();</script>
-```
-
-This will look for all elements with the specified container classname (default is `plyr`) and setup plyr on each element found. You can specify other options, including a different selector hook below. The container classname will be added to the specified element(s) if it is not already present (for the CSS).
-
-You can initialize the player a few other ways:
+By default, Plyr looks for all `<video>`, `<audio>` and `[data-type]` elements with the document and initialises on any found. You can specify other options, including a different NodeList, HTMLElement or string selector as below:
 
 Passing a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList):
 ```javascript
-plyr.setup(document.querySelectorAll('.js-plyr'), options);
+plyr.setup(document.querySelectorAll('.js-player'), options);
 ```
 
 Passing a [HTMLElement](https://developer.mozilla.org/en/docs/Web/API/HTMLElement):
 ```javascript
-plyr.setup(document.querySelector('.js-plyr'), options);
+plyr.setup(document.querySelector('.js-player'), options);
 ```
 
 Passing a [string selector](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelectorAll):
 ```javascript
-plyr.setup('.js-plyr', options);
+plyr.setup('.js-player', options);
 ```
+
+The NodeList, HTMLElement or string selector can be the target `<video>`, `<audio>` or `[data-type]` (for embeds) element or a container element. If a container has several media elements inside, each media element will be wrapped in a `<div>` and setup individually.
 
 Passing just the options object:
 ```javascript
 plyr.setup(options);
 ```
 
+`setup()` will return an array of all the elements Plyr was setup on. The `plyr` object can be accessed on these elements and used for the API.
+
 #### RangeTouch
 Some touch browsers (particularly Mobile Safari on iOS) seem to have issues with `<input type="range">` elements whereby touching the track to set the value doesn't work and sliding the thumb can be tricky. To combat this, I've created [RangeTouch](https://rangetouch.com) which I'd recommend including in your solution. It's a tiny script with a nice benefit for users on touch devices. 
 
 #### Options
 
-Options must be passed as an object to the `setup()` method as above or as JSON in `data-plyr` attribute on each of your target elements (e.g. data-plyr='{ title: "testing" }') - note the single quotes encapsulating the JSON.
+Options must be passed as an object to the `setup()` method as above or as JSON in `data-plyr` attribute on each of your target elements:
+
+```html
+<video data-plyr='{ title: "testing" }'></video>
+```
+
+Note the single quotes encapsulating the JSON and double quotes on the object keys.
 
 <table class="table" width="100%">
 <thead>
@@ -258,16 +236,22 @@ Options must be passed as an object to the `setup()` method as above or as JSON 
     <td>Used for internationalization (i18n) of the tooltips/labels within the buttons.</td>
   </tr>
   <tr>
-    <td><code>iconPrefix</code></td>
-    <td>String</td>
-    <td><code>plyr</code></td>
-    <td>Specify the id prefix for the icons used in the default controls (e.g. "plyr-play" would be "plyr"). This is to prevent clashes if you're using your own SVG defs file but with the default controls. Most people can ignore this option.</td>
+    <td><code>loadSprite</code></td>
+    <td>Boolean</td>
+    <td><code>true</code></td>
+    <td>Load the SVG sprite specified as the <code>iconUrl</code> option (if a URL). If <code>false</code>, it is assumed you are handling sprite loading yourself.</td>
   </tr>
   <tr>
     <td><code>iconUrl</code></td>
     <td>String</td>
     <td><code>null</code></td>
-    <td>Specify a relative path to the SVG sprite, hosted on the *same domain* as the page the player is hosted on. Using this menthod means no requirement for the AJAX sprite loading script. See the <a href="#svg">SVG section</a> for more info.</td>
+    <td>Specify a URL or path to the SVG sprite. See the <a href="#svg">SVG section</a> for more info.</td>
+  </tr>
+  <tr>
+    <td><code>iconPrefix</code></td>
+    <td>String</td>
+    <td><code>plyr</code></td>
+    <td>Specify the id prefix for the icons used in the default controls (e.g. "plyr-play" would be "plyr"). This is to prevent clashes if you're using your own SVG sprite but with the default controls. Most people can ignore this option.</td>
   </tr>
   <tr>
     <td><code>debug</code></td>
@@ -298,6 +282,12 @@ Options must be passed as an object to the `setup()` method as above or as JSON 
     <td>Boolean</td>
     <td><code>true</code></td>
     <td>Click (or tap) of the video container will toggle pause/play.</td>
+  </tr>
+  <tr>
+    <td><code>disableContextMenu</code></td>
+    <td>Boolean</td>
+    <td><code>true</code></td>
+    <td>Disable right click menu on video to <em>help</em> as very primitive obfuscation to prevent downloads of content.</td>
   </tr>
   <tr>
     <td><code>hideControls</code></td>
@@ -407,22 +397,24 @@ Options must be passed as an object to the `setup()` method as above or as JSON 
 
 ## API
 
-#### Fetching the plyr instance
+#### Getting the `plyr` instance
 A `plyr` object is added to any element that Plyr is initialized on. You can then control the player by accessing methods in the `plyr` object.
 
-There are two ways to access the instance, firstly you re-query the element container you used for setup (e.g. `.js-plyr`) like so:
+There are two ways to access the instance, firstly you re-query the element container you used for setup (e.g. `.js-player`) like so:
 
 ```javascript
-var player = document.querySelector('.js-plyr').plyr;
+var player = document.querySelector('.js-player').plyr;
 ```
 
-Or you can use the returned object from your call to the setup method:
+You can listen for the `setup` [event](#events) on the container, after which the `plyr` key will be available and also passed in the  to your callback (in the `plyr` key of the event object).
+
+The other method is using the return value from the call to `setup()`. An array of instances is returned so you need to use an index:
 
 ```javascript
-var player = plyr.setup('.js-plyr')[0];
+var player = plyr.setup('.js-player')[0].plyr;
 ```
 
-This will return an array of plyr instances setup, so you need to specify the index of the instance you want. This is less useful if you are setting up mutliple instances. You can listen for the `setup` [event](#events) documented below which will return each instance one by one, as they are setup (in the `plyr` key of the event object).
+This will return an array of plyr instances that were setup, so you need to specify the index of the instance you want or loop through of course. This is less useful if you are setting up multiple instances.
 
 Once you have your instance, you can use the API methods below on it. For example to pause it:
 
@@ -793,6 +785,8 @@ document.querySelector('.js-plyr').addEventListener('ready', function(event) {
 });
 ```
 
+These events also bubble up the DOM. 
+
 ## Embeds
 
 YouTube and Vimeo are currently supported and function much like a HTML5 video. Check the relevant documentation sections for any differences.
@@ -821,7 +815,7 @@ More info on the respective API's here:
 
 ## Fullscreen
 
-Fullscreen in Plyr is supported for all browsers that [currently support it](http://caniuse.com/#feat=fullscreen). If you're using the default CSS, you can also use a "full browser" mode which will use the full browser window by adding the `plyr-fullscreen` class to your container.
+Fullscreen in Plyr is supported by all browsers that [currently support it](http://caniuse.com/#feat=fullscreen). If you're using the default CSS, you can also use a "full browser" mode which will use the full browser window by adding the `plyr-fullscreen` class to your container.
 
 ## Browser support
 
@@ -848,7 +842,7 @@ Fullscreen in Plyr is supported for all browsers that [currently support it](htt
   </tbody>
 </table>
 
-&sup1; Mobile Safari on the iPhone forces the native player for `<video>` so no useful customisation is possible. `<audio>` elements have volume controls disabled.
+&sup1; Mobile Safari on the iPhone forces the native player for `<video>` so no useful customization is possible. `<audio>` elements have volume controls disabled.
 
 &sup2; Native player used (no support for `<progress>` or `<input type="range">`) but the API is supported (v1.0.28+)
 

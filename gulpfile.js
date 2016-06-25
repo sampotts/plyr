@@ -37,19 +37,19 @@ paths = {
         // Output paths
         output:         path.join(root, "dist/")
     },
-    docs: {
+    demo: {
         // Source paths
         src: {
-            less:       path.join(root, "docs/src/less/**/*"),
-            js:         path.join(root, "docs/src/js/**/*"),
-            sprite:     path.join(root, "docs/src/sprite/**/*")
+            less:       path.join(root, "demo/src/less/**/*"),
+            js:         path.join(root, "demo/src/js/**/*"),
+            sprite:     path.join(root, "demo/src/sprite/**/*")
         },
         // Output paths
-        output:         path.join(root, "docs/dist/"),
-        // Docs
-        root:           path.join(root, "docs/")
+        output:         path.join(root, "demo/dist/"),
+        // Demo
+        root:           path.join(root, "demo/")
     },
-    upload: [path.join(root, "dist/**"), path.join(root, "docs/dist/**")]
+    upload: [path.join(root, "dist/**"), path.join(root, "demo/dist/**")]
 },
 
 // Task arrays
@@ -178,10 +178,10 @@ build.less(bundles.plyr.less, "plyr");
 build.scss(bundles.plyr.scss, "plyr");
 build.sprite("plyr");
 
-// Docs files
-build.less(bundles.docs.less, "docs");
-build.js(bundles.docs.js, "docs");
-build.sprite("docs");
+// Demo files
+build.less(bundles.demo.less, "demo");
+build.js(bundles.demo.js, "demo");
+build.sprite("demo");
 
 // Build all JS
 gulp.task("js", function(){
@@ -200,10 +200,10 @@ gulp.task("watch", function () {
     gulp.watch(paths.plyr.src.less, tasks.less);
     gulp.watch(paths.plyr.src.sprite, tasks.sprite);
 
-    // Docs
-    gulp.watch(paths.docs.src.js, tasks.js);
-    gulp.watch(paths.docs.src.less, tasks.less);
-    gulp.watch(paths.docs.src.sprite, tasks.sprite);
+    // Demo
+    gulp.watch(paths.demo.src.js, tasks.js);
+    gulp.watch(paths.demo.src.less, tasks.less);
+    gulp.watch(paths.demo.src.sprite, tasks.sprite);
 });
 
 // Default gulp task
@@ -211,7 +211,7 @@ gulp.task("default", function(){
     run(tasks.js, tasks.less, tasks.sprite, "watch");
 });
 
-// Publish a version to CDN and docs
+// Publish a version to CDN and demo
 // --------------------------------------------
 
 // Some options
@@ -225,7 +225,7 @@ options = {
             "Vary": "Accept-Encoding"
         }
     },
-    docs: {
+    demo: {
         headers: {
             "Cache-Control": "no-cache, no-store, must-revalidate, max-age=0",
             "Vary": "Accept-Encoding"
@@ -264,12 +264,13 @@ gulp.task("cdn", function () {
         .pipe(rename(function (path) {
             path.dirname = path.dirname.replace(".", version);
         }))
+        .pipe(replace(localPath, versionPath))
         .pipe(s3(aws.cdn, options.cdn));
 });
 
-// Publish to Docs bucket
-gulp.task("docs", function () {
-    console.log("Uploading " + version + " docs to " + aws.docs.bucket + "...");
+// Publish to demo bucket
+gulp.task("demo", function () {
+    console.log("Uploading " + version + " demo to " + aws.demo.bucket + "...");
 
     // Replace versioned files in readme.md
     gulp.src([root + "/readme.md"])
@@ -279,21 +280,22 @@ gulp.task("docs", function () {
     // Replace versioned files in plyr.js
     gulp.src(path.join(root, "src/js/plyr.js"))
         .pipe(replace(semver, "v" + version))
+        .pipe(replace(cdnpath, aws.cdn.bucket + "/" + version))
         .pipe(gulp.dest(path.join(root, "src/js/")));
 
-    // Replace local file paths with remote paths in docs
+    // Replace local file paths with remote paths in demo HTML
     // e.g. "../dist/plyr.js" to "https://cdn.plyr.io/x.x.x/plyr.js"
-    gulp.src([paths.docs.root + "*.html"])
+    gulp.src([paths.demo.root + "*.html"])
         .pipe(replace(localPath, versionPath))
-        .pipe(s3(aws.docs, options.docs));
+        .pipe(s3(aws.demo, options.demo));
 
-    // Upload error.html to cdn (as well as docs site)
-    return gulp.src([paths.docs.root + "error.html"])
+    // Upload error.html to cdn (as well as demo site)
+    return gulp.src([paths.demo.root + "error.html"])
         .pipe(replace(localPath, versionPath))
-        .pipe(s3(aws.cdn, options.docs));
+        .pipe(s3(aws.cdn, options.demo));
 });
 
-// Open the docs site to check it's sweet
+// Open the demo site to check it's sweet
 gulp.task("symlinks", function () {
     console.log("Updating symlinks...");
 
@@ -316,20 +318,20 @@ gulp.task("symlinks", function () {
         }));
 });
 
-// Open the docs site to check it's sweet
+// Open the demo site to check it's sweet
 gulp.task("open", function () {
-    console.log("Opening " + aws.docs.bucket + "...");
+    console.log("Opening " + aws.demo.bucket + "...");
 
     // A file must be specified or gulp will skip the task
     // Doesn't matter which file since we set the URL above
     // Weird, I know...
-    return gulp.src([paths.docs.root + "index.html"])
+    return gulp.src([paths.demo.root + "index.html"])
         .pipe(open("", {
-            url: "http://" + aws.docs.bucket
+            url: "http://" + aws.demo.bucket
         }));
 });
 
 // Do everything
 gulp.task("publish", function () {
-    run(tasks.js, tasks.less, tasks.sprite, "cdn", "docs", "symlinks");
+    run(tasks.js, tasks.less, tasks.sprite, "cdn", "demo", "symlinks");
 });

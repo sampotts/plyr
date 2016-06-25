@@ -20,6 +20,7 @@
     max-width: 100%;
     min-width: 200px;
     font-family: Avenir, "Avenir Next", "Helvetica Neue", "Segoe UI", Helvetica, Arial, sans-serif;
+    direction: ltr;
 
     & when (@plyr-border-box = true) {
         // border-box everything
@@ -177,7 +178,6 @@
     padding-bottom: 56.25%; /* 16:9 */
     height: 0;
     overflow: hidden;
-    border-radius: inherit;
 
     iframe {
         position: absolute;
@@ -251,6 +251,7 @@
 .plyr ::-webkit-media-controls-enclosure {
     display: none;
 }
+
 // Playback controls
 .plyr__controls {
     display: flex;
@@ -285,7 +286,7 @@
         flex-shrink: 0;
         overflow: visible; // IE11
         vertical-align: middle;
-        padding: (@plyr-control-spacing * .7);
+        padding: @plyr-control-padding;
         border: 0;
         background: transparent;
         border-radius: 3px;
@@ -294,8 +295,8 @@
         color: inherit;
 
         svg {
-            width: 18px;
-            height: 18px;
+            width: @plyr-control-icon-size;
+            height: @plyr-control-icon-size;
             display: block;
             fill: currentColor;
         }
@@ -484,6 +485,40 @@
 .plyr button:hover .plyr__tooltip {
     z-index: 3;
 }
+
+// First tooltip
+.plyr__controls button:first-child .plyr__tooltip {
+    left: 0;
+    transform: translate(0, 10px) scale(.8);
+    transform-origin: 0 100%;
+
+    &::before {
+        left: (@plyr-control-icon-size / 2) + @plyr-control-padding;
+    }
+}
+
+// Last tooltip
+.plyr__controls button:last-child .plyr__tooltip {
+    right: 0;
+    transform: translate(0, 10px) scale(.8);
+    transform-origin: 100% 100%;
+
+    &::before {
+        left: auto;
+        right: (@plyr-control-icon-size / 2) + @plyr-control-padding;
+        transform: translateX(50%);
+    }
+}
+
+.plyr__controls button:first-child,
+.plyr__controls button:last-child {
+    &:hover .plyr__tooltip,
+    &.tab-focus:focus .plyr__tooltip,
+    .plyr__tooltip--visible {
+        transform: translate(0, 0) scale(1);
+    }
+}
+
 
 // Playback progress
 // --------------------------------------------------------------

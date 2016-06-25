@@ -10,14 +10,14 @@
             "plyr.js":      ["src/js/plyr.js"]
         }
     },
-    "docs": {
+    "demo": {
         "less": {
-            "docs.css":     ["docs/src/less/docs.less"]
+            "demo.css":     ["demo/src/less/demo.less"]
         },
         "js": {
-            "docs.js": [
-                "docs/src/js/lib/classlist.js",
-                "docs/src/js/docs.js"
+            "demo.js": [
+                "demo/src/js/lib/classlist.js",
+                "demo/src/js/main.js"
             ]
         }
     }
