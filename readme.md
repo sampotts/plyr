@@ -41,13 +41,11 @@ If you have any cool ideas or features, please let me know by [creating an issue
 
 ## CMS plugins
 
-### [WordPress](https://wordpress.org)
+### [WordPress](https://wordpress.org/plugins/plyr/)
 Created and maintained by Ryan Anthony Drake ([@iamryandrake](https://github.com/iamryandrake))
-[Plyr on WordPress](https://wordpress.org/plugins/plyr/)
 
-### [Neos](https://www.neos.io/)
+### [Neos](https://packagist.org/packages/jonnitto/plyr)
 Created and maintained by Jon Uhlmann ([@jonnitto](https://github.com/jonnitto))
-[Plyr.io for Neos.io](https://packagist.org/packages/jonnitto/plyr)
 
 ## Using package managers
 You can grab the source using one of the following package managers.
