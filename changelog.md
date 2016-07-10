@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.8.8
+- Added getCurrentTime API method (fixes #292)
+- Fix for !hideControls on touch devices (fixes #303)
+
 ## v1.8.7
 - Line height fix
 
