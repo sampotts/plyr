@@ -3264,7 +3264,8 @@
             isFullscreen:       function() { return plyr.isFullscreen || false; },
             support:            function(mimeType) { return _supportMime(plyr, mimeType); },
             destroy:            _destroy,
-            restore:            _init
+            restore:            _init,
+            getCurrentTime:     function() { return plyr.media.currentTime; }
         };
     }
 

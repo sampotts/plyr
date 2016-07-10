@@ -535,6 +535,11 @@ Here's a list of the methods supported:
     <td>&mdash;</td>
     <td>Reverses the effects of the <code>destroy()</code> method, restoring the UI and listeners.</td>
   </tr>
+  <tr>
+    <td><code>getCurrentTime()</code></td>
+    <td>&mdash;</td>
+    <td>Will return a float with the current time in seconds.</td>
+  </tr>
  </tbody>
 </table>
 
