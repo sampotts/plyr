@@ -2979,8 +2979,8 @@
 
                 // On click play, pause ore restart
                 _on(wrapper, 'click', function() {
-                    // Touch devices will just show controls
-                    if (plyr.browser.isTouch && !plyr.media.paused) {
+                    // Touch devices will just show controls (if we're hiding controls)
+                    if (config.hideControls && plyr.browser.isTouch && !plyr.media.paused) {
                         return;
                     }
 
