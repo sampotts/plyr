@@ -353,7 +353,6 @@
     border-radius: inherit;
     background: $plyr-audio-controls-bg;
     border: $plyr-audio-controls-border;
-    box-shadow: $plyr-audio-controls-box-shadow;
     color: $plyr-audio-control-color;
 
     button {
@@ -378,7 +377,7 @@
     background: $plyr-video-control-bg-hover;
     border: 4px solid currentColor;
     border-radius: 100%;
-    box-shadow: 0 1px 1px transparentize($plyr-video-controls-bg, .85);
+    box-shadow: 0 1px 1px transparentize(#000, .85);
     color: $plyr-video-control-color;
     transition: all .3s ease;
 
