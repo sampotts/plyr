@@ -47,6 +47,9 @@ Created and maintained by Ryan Anthony Drake ([@iamryandrake](https://github.com
 ### [Neos](https://packagist.org/packages/jonnitto/plyr)
 Created and maintained by Jon Uhlmann ([@jonnitto](https://github.com/jonnitto))
 
+### [Kirby](https://github.com/dpschen/kirby-plyrtag)
+Created and maintained by Dominik Pschenitschni ([@dpschen](https://github.com/dpschen))
+
 ## Using package managers
 You can grab the source using one of the following package managers.
 
