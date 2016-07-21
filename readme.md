@@ -21,8 +21,8 @@ We wanted a lightweight, accessible and customizable media player that supports 
 - **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes
 - **i18n support** - support for internationalization of controls
 - **No dependencies** - written in "vanilla" JavaScript, no jQuery required
-- **SASS and LESS provided** - If you like _these_ over plain CSS
-- **[Streaming](#streaming)** - Support for hls.js, Shaka and dash.js streaming playback
+- **SASS and LESS source** - to include in your build process
+- **[Streaming](#streaming)** - support for hls.js, Shaka and dash.js streaming playback
 
 Oh and yes, it works with Bootstrap.
 
