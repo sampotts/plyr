@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.8.9
+// plyr.js v1.8.10
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -44,7 +44,7 @@
         displayDuration:        true,
         loadSprite:             true,
         iconPrefix:             'plyr',
-        iconUrl:                'https://cdn.plyr.io/1.8.9/plyr.svg',
+        iconUrl:                'https://cdn.plyr.io/1.8.10/plyr.svg',
         clickToPlay:            true,
         hideControls:           true,
         showPosterOnEnd:        false,
@@ -573,7 +573,7 @@
     // Check variable types
     var _is = {
         object: function(input) {
-            return input !== null && typeof(input) === 'object' && input.constructor === Object; 
+            return input !== null && typeof(input) === 'object'; 
         },
         array: function(input) {
             return input !== null && typeof(input) === 'object' && input.constructor === Array;

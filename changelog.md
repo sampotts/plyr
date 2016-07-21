@@ -1,5 +1,8 @@
 # Changelog
 
+## v1.8.10
+- Fix for seek issues introduced in v1.8.9
+
 ## v1.8.9
 - Fix for fullscreen not being defined (Fixes #295)
 - Fix for multiline captions (Fixes #314)
