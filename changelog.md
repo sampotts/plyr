@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.8.9
+- Fix for fullscreen not being defined (Fixes #295)
+- Fix for multiline captions (Fixes #314)
+- Clean up of type checks and fix for `restart()` (Fixes #315)
+- Fix for `MEDIA_ERR_SRC_NOT_SUPPORTED` when calling `.source()` API method
+
 ## v1.8.8
 - Added getCurrentTime API method (fixes #292)
 - Fix for !hideControls on touch devices (fixes #303)

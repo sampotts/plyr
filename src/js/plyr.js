@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.8.8
+// plyr.js v1.8.9
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -44,7 +44,7 @@
         displayDuration:        true,
         loadSprite:             true,
         iconPrefix:             'plyr',
-        iconUrl:                'https://cdn.plyr.io/1.8.8/plyr.svg',
+        iconUrl:                'https://cdn.plyr.io/1.8.9/plyr.svg',
         clickToPlay:            true,
         hideControls:           true,
         showPosterOnEnd:        false,
@@ -2084,7 +2084,9 @@
             _focusTrap(plyr.isFullscreen);
 
             // Set button state
-            _toggleState(plyr.buttons.fullscreen, plyr.isFullscreen);
+            if (plyr.buttons && plyr.buttons.fullscreen) {
+                _toggleState(plyr.buttons.fullscreen, plyr.isFullscreen);
+            }
 
             // Trigger an event
             _triggerEvent(plyr.container, plyr.isFullscreen ? 'enterfullscreen' : 'exitfullscreen', true);
