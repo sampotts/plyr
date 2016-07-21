@@ -3,7 +3,7 @@ A simple, accessible and customizable HTML5, YouTube and Vimeo media player.
 
 [Checkout the demo](https://plyr.io)
 
-[![Image of Plyr](https://cdn.selz.com/plyr/plyr_v1.8.png)](https://plyr.io)
+[![Image of Plyr](https://cdn.selz.com/plyr/plyr_v1.8.9.png)](https://plyr.io)
 
 ## Why?
 We wanted a lightweight, accessible and customizable media player that supports [*modern*](#browser-support) browsers. Sure, there are many other players out there but we wanted to keep things simple, using the right elements for the job.
@@ -21,8 +21,8 @@ We wanted a lightweight, accessible and customizable media player that supports 
 - **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes
 - **i18n support** - support for internationalization of controls
 - **No dependencies** - written in "vanilla" JavaScript, no jQuery required
-- **SASS and LESS provided** - If you like _these_ over plain CSS
-- **[Streaming](#streaming)** - Support for hls.js, Shaka and dash.js streaming playback
+- **SASS and LESS source** - to include in your build process
+- **[Streaming](#streaming)** - support for hls.js, Shaka and dash.js streaming playback
 
 Oh and yes, it works with Bootstrap.
 
