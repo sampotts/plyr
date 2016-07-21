@@ -376,7 +376,7 @@
     // Set attributes
     function _setAttributes(element, attributes) {
         for (var key in attributes) {
-            element.setAttribute(key, (typeof attributes[key] === 'boolean' && attributes[key]) ? '' : attributes[key]);
+            element.setAttribute(key, (_is.boolean(attributes[key]) && attributes[key]) ? '' : attributes[key]);
         }
     }
 
@@ -464,7 +464,7 @@
 
         // Whether the listener is a capturing listener or not
         // Default to false
-        if (typeof useCapture !== 'boolean') {
+        if (!_is.boolean(useCapture)) {
             useCapture = false;
         }
 
@@ -492,7 +492,7 @@
         }
 
         // Default bubbles to false
-        if (typeof bubbles !== 'boolean') {
+        if (!_is.boolean(bubbles)) {
             bubbles = false;
         }
 
@@ -515,7 +515,7 @@
         }
 
         // Get state
-        state = (typeof state === 'boolean' ? state : !target.getAttribute('aria-pressed'));
+        state = (_is.boolean(state) ? state : !target.getAttribute('aria-pressed'));
 
         // Set the attribute on target
         target.setAttribute('aria-pressed', state);
@@ -570,6 +570,28 @@
         return destination;
     }
 
+    // Check variable types
+    var _is = {
+        object: function(input) {
+            return input !== null && typeof(input) === 'object' && input.constructor === Object; 
+        },
+        array: function(input) {
+            return input !== null && typeof(input) === 'object' && input.constructor === Array;
+        },
+        number: function(input) {
+            return typeof(input) === 'number' && !isNaN(input - 0) || (typeof input == 'object' && input.constructor === Number);
+        },
+        string: function(input) {
+            return typeof input === 'string' || (typeof input == 'object' && input.constructor === String);
+        },
+        boolean: function(input) {
+            return typeof input === 'boolean';
+        },
+        undefined: function(input) {
+            return typeof input === 'undefined';
+        }
+    };
+
     // Fullscreen API
     function _fullscreen() {
         var fullscreen = {
@@ -584,7 +606,7 @@
             browserPrefixes = 'webkit moz o ms khtml'.split(' ');
 
         // Check for native support
-        if (typeof document.cancelFullScreen !== 'undefined') {
+        if (!_is.undefined(document.cancelFullScreen)) {
             fullscreen.supportsFullScreen = true;
         }
         else {
@@ -592,12 +614,12 @@
             for (var i = 0, il = browserPrefixes.length; i < il; i++ ) {
                 fullscreen.prefix = browserPrefixes[i];
 
-                if (typeof document[fullscreen.prefix + 'CancelFullScreen'] !== 'undefined') {
+                if (!_is.undefined(document[fullscreen.prefix + 'CancelFullScreen'])) {
                     fullscreen.supportsFullScreen = true;
                     break;
                 }
                 // Special case for MS (when isn't it?)
-                else if (typeof document.msExitFullscreen !== 'undefined' && document.msFullscreenEnabled) {
+                else if (!_is.undefined(document.msExitFullscreen) && document.msFullscreenEnabled) {
                     fullscreen.prefix = 'ms';
                     fullscreen.supportsFullScreen = true;
                     break;
@@ -612,7 +634,7 @@
             fullscreen.fullScreenEventName = (fullscreen.prefix == 'ms' ? 'MSFullscreenChange' : fullscreen.prefix + 'fullscreenchange');
 
             fullscreen.isFullScreen = function(element) {
-                if (typeof element === 'undefined') {
+                if (_is.undefined(element)) {
                     element = document.body;
                 }
                 switch (this.prefix) {
@@ -625,7 +647,7 @@
                 }
             };
             fullscreen.requestFullScreen = function(element) {
-                if (typeof element === 'undefined') {
+                if (_is.undefined(element)) {
                     element = document.body;
                 }
                 return (this.prefix === '') ? element.requestFullScreen() : element[this.prefix + (this.prefix == 'ms' ? 'RequestFullscreen' : 'RequestFullScreen')]();
@@ -1041,12 +1063,12 @@
             container.innerHTML = '';
 
             // Default to empty
-            if (typeof caption === 'undefined') {
+            if (_is.undefined(caption)) {
                 caption = '';
             }
 
             // Set the span content
-            if (typeof caption === 'string') {
+            if (_is.undefined(caption)) {
                 content.innerHTML = caption.trim();
             }
             else {
@@ -1106,7 +1128,7 @@
             // Check time is a number, if not use currentTime
             // IE has a bug where currentTime doesn't go to 0
             // https://twitter.com/Sam_Potts/status/573715746506731521
-            time = typeof time === 'number' ? time : plyr.media.currentTime;
+            time = _is.number(time) ? time : plyr.media.currentTime;
 
             // If there's no subs available, bail
             if (!plyr.captions[plyr.subcount]) {
@@ -1197,7 +1219,7 @@
 
         // Add elements to HTML5 media (source, tracks, etc)
         function _insertChildElements(type, attributes) {
-            if (typeof attributes === 'string') {
+            if (_is.string(attributes)) {
                _insertElement(type, plyr.media, { src: attributes });
             }
             else if (attributes.constructor === Array) {
@@ -1247,7 +1269,7 @@
             if (config.selectors.controls.container !== null) {
                 container = config.selectors.controls.container;
 
-                if (typeof selector === 'string') {
+                if (_is.string(selector)) {
                     container = document.querySelector(container);
                 }
             }
@@ -1350,7 +1372,7 @@
             var label = config.i18n.play;
 
             // If there's a media title set, use that for the label
-            if (typeof(config.title) !== 'undefined' && config.title.length) {
+            if (!_is.undefined(config.title) && config.title.length) {
                 label += ', ' + config.title;
             }
 
@@ -1443,7 +1465,7 @@
                 container.setAttribute('id', id);
 
                 // Setup API
-                if (typeof YT === 'object') {
+                if (_is.object(YT)) {
                     _youTubeReady(mediaId, container);
                 }
                 else {
@@ -1878,7 +1900,7 @@
         // Rewind
         function _rewind(seekTime) {
             // Use default if needed
-            if (typeof seekTime !== 'number') {
+            if (!_is.number(seekTime)) {
                 seekTime = config.seekTime;
             }
             _seek(plyr.media.currentTime - seekTime);
@@ -1887,7 +1909,7 @@
         // Fast forward
         function _forward(seekTime) {
             // Use default if needed
-            if (typeof seekTime !== 'number') {
+            if (!_is.number(seekTime)) {
                 seekTime = config.seekTime;
             }
             _seek(plyr.media.currentTime + seekTime);
@@ -1901,11 +1923,11 @@
                 duration    = _getDuration();
 
             // Explicit position
-            if (typeof input === 'number') {
+            if (_is.number(input)) {
                 targetTime = input;
             }
             // Event
-            else if (input.type && _inArray(['input', 'change'], input.type)) {
+            else if (_is.object(input) && _inArray(['input', 'change'], input.type)) {
                 // It's the seek slider
                 // Seek to the selected time
                 targetTime = ((input.target.value / input.target.max) * duration);
@@ -2082,7 +2104,7 @@
         // Mute
         function _toggleMute(muted) {
             // If the method is called without parameter, toggle based on current value
-            if (typeof muted !== 'boolean') {
+            if (!_is.boolean(muted)) {
                 muted = !plyr.media.muted;
             }
 
@@ -2125,7 +2147,7 @@
                 min = config.volumeMin;
 
             // Use default if no value specified
-            if (typeof volume === 'undefined') {
+            if (_is.undefined(volume)) {
                 volume = config.volume;
 
                 if (config.storage.enabled && _storage().supported) {
@@ -2237,7 +2259,7 @@
             }
 
             // If the method is called without parameter, toggle based on current value
-            if (typeof show !== 'boolean') {
+            if (!_is.boolean(show)) {
                 show = (plyr.container.className.indexOf(config.classes.captions.active) === -1);
             }
 
@@ -2307,7 +2329,7 @@
                                 return _getPercentage(buffered.end(0), duration);
                             }
                             // YouTube returns between 0 and 1
-                            else if (typeof buffered === 'number') {
+                            else if (_is.number(buffered)) {
                                 return (buffered * 100);
                             }
 
@@ -2329,11 +2351,11 @@
             }
             
             // Default to 0
-            if (typeof value === 'undefined') {
+            if (_is.undefined(value)) {
                 value = 0;
             }
             // Default to buffer or bail
-            if (typeof progress === 'undefined') {
+            if (_is.undefined(progress)) {
                 if (plyr.progress && plyr.progress.buffer) {
                     progress = plyr.progress.buffer;
                 }
@@ -2424,7 +2446,7 @@
         // Update seek range and progress 
         function _updateSeekDisplay(time) {
             // Default to 0
-            if (typeof time !== 'number') {
+            if (!_is.number(time)) {
                 time = 0;
             }
 
@@ -2501,7 +2523,7 @@
                 show = toggle;
 
             // Default to false if no boolean
-            if (typeof toggle !== 'boolean') {
+            if (!_is.boolean(toggle)) {
                 if (toggle && toggle.type) {
                     // Is the enter fullscreen event
                     isEnterFullscreen = (toggle.type === 'enterfullscreen');
@@ -2559,7 +2581,7 @@
         // Add common function to retrieve media source
         function _source(source) {
             // If not null or undefined, parse it
-            if (typeof source !== 'undefined') {
+            if (!_is.undefined(source)) {
                 _updateSource(source);
                 return;
             }
@@ -2594,7 +2616,7 @@
         // Update source
         // Sources are not checked for support so be careful
         function _updateSource(source) {
-            if (typeof source === 'undefined' || !('sources' in source) || !source.sources.length) {
+            if (!_is.object(source) || !('sources' in source) || !source.sources.length) {
                 _warn('Invalid source format');
                 return;
             }
@@ -2671,7 +2693,7 @@
             _prependChild(plyr.container, plyr.media);
 
             // Autoplay the new source?
-            if (typeof source.autoplay !== 'undefined') {
+            if (_is.boolean(source.autoplay)) {
                 config.autoplay = source.autoplay;
             }
 
@@ -3273,7 +3295,7 @@
         var x = new XMLHttpRequest();
 
         // If the id is set and sprite exists, bail
-        if (typeof id === 'string' && document.querySelector('#' + id) !== null) {
+        if (_is.string(id) && document.querySelector('#' + id) !== null) {
             return;
         }
 
@@ -3289,7 +3311,7 @@
         x.onload = function() {
             var c = document.createElement('div');
             c.setAttribute('hidden', '');
-            if (typeof id === 'string') {
+            if (_is.string(id)) {
                 c.setAttribute('id', id);
             }
             c.innerHTML = x.responseText;
@@ -3347,7 +3369,7 @@
 
         // Select the elements
         // Assume elements is a NodeList by default
-        if (typeof targets === 'string') {
+        if (_is.string(targets)) {
             targets = document.querySelectorAll(targets);
         }
         // Single HTMLElement passed
@@ -3355,9 +3377,9 @@
             targets = [targets];
         }
         // No selector passed, possibly options as first argument
-        else if (!(targets instanceof NodeList) && typeof targets !== 'string')  {
+        else if (!(targets instanceof NodeList) && !_is.string(targets))  {
             // If options are the first argument
-            if (typeof options === 'undefined' && typeof targets === 'object') {
+            if (_is.undefined(options) && _is.object(targets)) {
                 options = targets;
             }
 
