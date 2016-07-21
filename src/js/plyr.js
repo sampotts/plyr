@@ -900,7 +900,9 @@
                 }
 
                 // Toggle state
-                _toggleState(plyr.buttons.fullscreen, false);
+                if (plyr.buttons && plyr.buttons.fullscreen) {
+                    _toggleState(plyr.buttons.fullscreen, false);
+                }
 
                 // Setup focus trap
                 _focusTrap();
