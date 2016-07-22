@@ -1167,7 +1167,15 @@
 
             _toggleClass(plyr.container, config.classes.captions.enabled, true);
 
-            if (config.captions.defaultActive) {
+            // Try to load the value from storage
+            var active = plyr.storage.captionsEnabled;
+
+            // Otherwise fall back to the default config
+            if (!_is.boolean(active)) {
+                active = config.captions.defaultActive;
+            }
+
+            if (active) {
                 _toggleClass(plyr.container, config.classes.captions.active, true);
                 _toggleState(plyr.buttons.captions, true);
             }
@@ -1390,6 +1398,51 @@
             if (iframe instanceof HTMLElement) {
                 iframe.setAttribute('title', config.i18n.frameTitle.replace('{title}', config.title));
             }
+        }
+
+        // Setup localStorage
+        function _setupStorage() {
+          var value = null;
+          plyr.storage = {};
+
+          // Bail if we don't have localStorage support or it's disabled
+          if (!_storage().supported || !config.storage.enabled) {
+              return;
+          }
+
+          // Clean up old volume
+          // https://github.com/Selz/plyr/issues/171
+          window.localStorage.removeItem('plyr-volume');
+
+          // load value from the current key
+          value = window.localStorage.getItem(config.storage.key);
+
+          if (!value) {
+              // Key wasn't set (or had been cleared), move along
+              return;
+          } else if (/^\d+(\.\d+)?$/.test(value)) {
+              // If value is a number, it's probably volume from an older
+              // version of plyr. See: https://github.com/Selz/plyr/pull/313
+              // Update the key to be JSON
+              _updateStorage({volume: parseFloat(value)});
+          } else {
+              // Assume it's JSON from this or a later version of plyr
+              plyr.storage = JSON.parse(value);
+          }
+        }
+
+        // Save a value back to local storage
+        function _updateStorage(value) {
+          // Bail if we don't have localStorage support or it's disabled
+          if (!_storage().supported || !config.storage.enabled) {
+              return;
+          }
+
+          // Update the working copy of the values
+          _extend(plyr.storage, value);
+
+          window.localStorage.setItem(
+              config.storage.key, JSON.stringify(plyr.storage));
         }
 
         // Setup media
@@ -2150,17 +2203,9 @@
             var max = config.volumeMax,
                 min = config.volumeMin;
 
-            // Use default if no value specified
+            // Load volume from storage if no value specified
             if (_is.undefined(volume)) {
-                volume = config.volume;
-
-                if (config.storage.enabled && _storage().supported) {
-                    volume = window.localStorage.getItem(config.storage.key);
-
-                    // Clean up old volume
-                    // https://github.com/Selz/plyr/issues/171
-                    window.localStorage.removeItem('plyr-volume');
-                }
+                volume = plyr.storage.volume;
             }
 
             // Use config if all else fails
@@ -2242,9 +2287,7 @@
             }
 
             // Store the volume in storage
-            if (config.storage.enabled && _storage().supported && !isNaN(volume)) {
-                window.localStorage.setItem(config.storage.key, volume);
-            }
+            _updateStorage({volume: volume});
 
             // Toggle class if muted
             _toggleClass(plyr.container, config.classes.muted, (volume === 0));
@@ -2278,6 +2321,9 @@
 
             // Trigger an event
             _triggerEvent(plyr.container, plyr.captionsEnabled ? 'captionsenabled' : 'captionsdisabled', true);
+
+            // Save captions state to localStorage
+            _updateStorage({captionsEnabled: plyr.captionsEnabled});
         }
 
         // Check if media is loading
@@ -3128,6 +3174,9 @@
             if (!plyr.media) {
                 return;
             }
+
+            // Load saved settings from localStorage
+            _setupStorage();
 
             // Get original classname
             plyr.originalClassName = plyr.container.className;
