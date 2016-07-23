@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.8.11
+- Fix for keyboard navigation on Vimeo (Fixes #317)
+- Fix for bug introduced in v1.8.9 related to additional controls 
+- Vimeo API upgrade
+- Fix for YouTube bug introduced in v1.8.9
+- Added support for passing array to .setup() (Fixes #319)
+
 ## v1.8.10
 - Fix for seek issues introduced in v1.8.9
 

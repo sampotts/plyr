@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.8.10
+// plyr.js v1.8.11
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -23,7 +23,6 @@
     }
 }(typeof window !== 'undefined' ? window : this, function(window, document) {
     'use strict';
-    /*global YT,$f*/
 
     // Globals
     var fullscreen, 
@@ -44,7 +43,7 @@
         displayDuration:        true,
         loadSprite:             true,
         iconPrefix:             'plyr',
-        iconUrl:                'https://cdn.plyr.io/1.8.10/plyr.svg',
+        iconUrl:                'https://cdn.plyr.io/1.8.11/plyr.svg',
         clickToPlay:            true,
         hideControls:           true,
         showPosterOnEnd:        false,
@@ -146,7 +145,7 @@
         // URLs
         urls: {
             vimeo: {
-                api:            'https://cdn.plyr.io/froogaloop/1.0.1/plyr.froogaloop.js',
+                api:            'https://player.vimeo.com/api/player.js',
             },
             youtube: {
                 api:            'https://www.youtube.com/iframe_api'
@@ -587,6 +586,12 @@
         boolean: function(input) {
             return typeof input === 'boolean';
         },
+        nodeList: function(input) {
+            return input instanceof NodeList;
+        },
+        htmlElement: function(input) {
+            return input instanceof HTMLElement;
+        },
         undefined: function(input) {
             return typeof input === 'undefined';
         }
@@ -911,6 +916,7 @@
 
         // Setup captions
         function _setupCaptions() {
+            // Bail if not HTML5 video
             if (plyr.type !== 'video') {
                 return;
             }
@@ -1271,13 +1277,13 @@
             if (config.selectors.controls.container !== null) {
                 container = config.selectors.controls.container;
 
-                if (_is.string(selector)) {
+                if (_is.string(container)) {
                     container = document.querySelector(container);
                 }
             }
 
             // Inject into the container by default
-            if (!(container instanceof HTMLElement)) {
+            if (!_is.htmlElement(container)) {
                 container = plyr.container
             }
 
@@ -1387,7 +1393,7 @@
 
             // Set iframe title
             // https://github.com/Selz/plyr/issues/124
-            if (iframe instanceof HTMLElement) {
+            if (_is.htmlElement(iframe)) {
                 iframe.setAttribute('title', config.i18n.frameTitle.replace('{title}', config.title));
             }
         }
@@ -1467,7 +1473,7 @@
                 container.setAttribute('id', id);
 
                 // Setup API
-                if (_is.object(YT)) {
+                if (_is.object(window.YT)) {
                     _youTubeReady(mediaId, container);
                 }
                 else {
@@ -1488,41 +1494,27 @@
             }
             // Vimeo
             else if (plyr.type === 'vimeo') {
-                // Inject the iframe
-                var vimeo = document.createElement('iframe');
+                // Create the YouTube container
+                plyr.media.appendChild(container);
 
-                // Watch for iframe load
-                vimeo.loaded = false;
-                _on(vimeo, 'load', function() { vimeo.loaded = true; });
-
-                _setAttributes(vimeo, {
-                    'src':                      'https://player.vimeo.com/video/' + mediaId + '?player_id=' + id + '&api=1&badge=0&byline=0&portrait=0&title=0',
-                    'id':                       id,
-                    'allowfullscreen':          '',
-                    'frameborder':              0
-                });
-
-                // If full support, we can use custom controls (hiding Vimeos), if not, use Vimeo
-                if (plyr.supported.full) {
-                    container.appendChild(vimeo);
-                    plyr.media.appendChild(container);
-                }
-                else {
-                    plyr.media.appendChild(vimeo);
-                }
+                // Set ID
+                container.setAttribute('id', id);
 
                 // Load the API if not already
-                if (!('$f' in window)) {
+                if (!_is.object(window.Vimeo)) {
                     _injectScript(config.urls.vimeo.api);
-                }
 
-                // Wait for fragaloop load
-                var vimeoTimer = window.setInterval(function() {
-                    if ('$f' in window && vimeo.loaded) {
-                        window.clearInterval(vimeoTimer);
-                        _vimeoReady.call(vimeo);
-                    }
-                }, 50);
+                    // Wait for fragaloop load
+                    var vimeoTimer = window.setInterval(function() {
+                        if (_is.object(window.Vimeo)) {
+                            window.clearInterval(vimeoTimer);
+                            _vimeoReady(mediaId, container);
+                        }
+                    }, 50);
+                }
+                else {
+                    _vimeoReady(mediaId, container);
+                }
             }
             // Soundcloud
             else if (plyr.type === 'soundcloud') {
@@ -1580,7 +1572,7 @@
 
             // Setup instance
             // https://developers.google.com/youtube/iframe_api_reference
-            plyr.embed = new YT.Player(container.id, {
+            plyr.embed = new window.YT.Player(container.id, {
                 videoId: videoId,
                 playerVars: {
                     autoplay:       (config.autoplay ? 1 : 0),
@@ -1708,85 +1700,85 @@
         }
 
         // Vimeo ready
-        function _vimeoReady() {
-            /* jshint validthis: true */
-            plyr.embed = $f(this);
+        function _vimeoReady(mediaId, container) {
+            // Setup player
+            plyr.embed = new window.Vimeo.Player(container.id, {
+                id:         mediaId,
+                loop:       config.loop,
+                autoplay:   config.autoplay,
+                byline:     false,
+                portrait:   false,
+                title:      false
+            });
 
-            // Setup on ready
-            plyr.embed.addEvent('ready', function() {
-
-                // Create a faux HTML5 API using the Vimeo API
-                plyr.media.play = function() {
-                    plyr.embed.api('play');
-                    plyr.media.paused = false;
-                };
-                plyr.media.pause = function() {
-                    plyr.embed.api('pause');
-                    plyr.media.paused = true;
-                };
-                plyr.media.stop = function() {
-                    plyr.embed.api('stop');
-                    plyr.media.paused = true;
-                };
+            // Create a faux HTML5 API using the Vimeo API
+            plyr.media.play = function() {
+                plyr.embed.play();
+                plyr.media.paused = false;
+            };
+            plyr.media.pause = function() {
+                plyr.embed.pause();
                 plyr.media.paused = true;
-                plyr.media.currentTime = 0;
+            };
+            plyr.media.stop = function() {
+                plyr.embed.stop();
+                plyr.media.paused = true;
+            };
+            plyr.media.paused = true;
+            plyr.media.currentTime = 0;
 
-                // Update UI
-                _embedReady();
+            // Update UI
+            _embedReady();
 
-                plyr.embed.api('getCurrentTime', function (value) {
-                    plyr.media.currentTime = value;
+            plyr.embed.getCurrentTime().then(function (value) {
+                plyr.media.currentTime = value;
 
-                    // Trigger timeupdate
-                    _triggerEvent(plyr.media, 'timeupdate');
-                });
+                // Trigger timeupdate
+                _triggerEvent(plyr.media, 'timeupdate');
+            });
 
-                plyr.embed.api('getDuration', function(value) {
-                    plyr.media.duration = value;
+            plyr.embed.getDuration().then(function(value) {
+                plyr.media.duration = value;
 
-                    // Display duration if available
-                    _displayDuration();
-                });
+                // Display duration if available
+                _displayDuration();
+            });
 
-                plyr.embed.addEvent('play', function() {
-                    plyr.media.paused = false;
-                    _triggerEvent(plyr.media, 'play');
-                    _triggerEvent(plyr.media, 'playing');
-                });
+            // Captions
+            if (config.captions.defaultActive) {
+                plyr.embed.enableTextTrack('en');
+            }
 
-                plyr.embed.addEvent('pause', function() {
-                    plyr.media.paused = true;
-                    _triggerEvent(plyr.media, 'pause');
-                });
+            plyr.embed.on('play', function() {
+                plyr.media.paused = false;
+                _triggerEvent(plyr.media, 'play');
+                _triggerEvent(plyr.media, 'playing');
+            });
 
-                plyr.embed.addEvent('playProgress', function(data) {
-                    plyr.media.seeking = false;
-                    plyr.media.currentTime = data.seconds;
-                    _triggerEvent(plyr.media, 'timeupdate');
-                });
+            plyr.embed.on('pause', function() {
+                plyr.media.paused = true;
+                _triggerEvent(plyr.media, 'pause');
+            });
 
-                plyr.embed.addEvent('loadProgress', function(data) {
-                    plyr.media.buffered = data.percent;
-                    _triggerEvent(plyr.media, 'progress');
+            plyr.embed.on('timeupdate', function(data) {
+                plyr.media.seeking = false;
+                plyr.media.currentTime = data.seconds;
+                _triggerEvent(plyr.media, 'timeupdate');
+            });
 
-                    if (parseInt(data.percent) === 1) {
-                        // Trigger event
-                        _triggerEvent(plyr.media, 'canplaythrough');
-                    }
-                });
+            plyr.embed.on('progress', function(data) {
+                plyr.media.buffered = data.percent;
+                _triggerEvent(plyr.media, 'progress');
 
-                plyr.embed.addEvent('finish', function() {
-                    plyr.media.paused = true;
-                    _triggerEvent(plyr.media, 'ended');
-                });
-
-                // Always seek to 0
-                // plyr.embed.api('seekTo', 0);
-
-                // Autoplay
-                if (config.autoplay) {
-                    plyr.embed.api('play');
+                if (parseInt(data.percent) === 1) {
+                    // Trigger event
+                    _triggerEvent(plyr.media, 'canplaythrough');
                 }
+            });
+
+            plyr.embed.on('ended', function() {
+                plyr.media.paused = true;
+                _triggerEvent(plyr.media, 'ended');
             });
         }
 
@@ -1963,7 +1955,7 @@
 
                     case 'vimeo':
                         // Round to nearest second for vimeo
-                        plyr.embed.api('seekTo', targetTime.toFixed(0));
+                        plyr.embed.setCurrentTime(targetTime.toFixed(0));
                         break;
 
                     case 'soundcloud':
@@ -2132,9 +2124,6 @@
                         break;
 
                     case 'vimeo':
-                        plyr.embed.api('setVolume', plyr.media.muted ? 0 : parseFloat(config.volume / config.volumeMax));
-                        break;
-
                     case 'soundcloud':
                         plyr.embed.setVolume(plyr.media.muted ? 0 : parseFloat(config.volume / config.volumeMax));
                         break;
@@ -2187,16 +2176,12 @@
 
             // Embeds
             if (_inArray(config.types.embed, plyr.type)) {
-                // YouTube
                 switch(plyr.type) {
                     case 'youtube':
                         plyr.embed.setVolume(plyr.media.volume * 100);
                         break;
 
                     case 'vimeo':
-                        plyr.embed.api('setVolume', plyr.media.volume);
-                        break;
-
                     case 'soundcloud':
                         plyr.embed.setVolume(plyr.media.volume);
                         break;
@@ -2369,7 +2354,7 @@
             }
 
             // One progress element passed
-            if (progress instanceof HTMLElement) {
+            if (_is.htmlElement(progress)) {
                 progress.value = value;
             }
             // Object of progress + text element
@@ -2598,7 +2583,7 @@
                     break;
 
                 case 'vimeo':
-                    plyr.embed.api('getVideoUrl', function (value) {
+                    plyr.embed.getVideoUrl.then(function (value) {
                         url = value;
                     });
                     break;
@@ -2826,7 +2811,7 @@
                 for (var button in plyr.buttons) {
                     var element = plyr.buttons[button];
 
-                    if (element instanceof NodeList) {
+                    if (_is.nodeList(element)) {
                         for (var i = 0; i < element.length; i++) {
                             _toggleClass(element[i], config.classes.tabFocus, (element[i] === focused));
                         }
@@ -3377,11 +3362,11 @@
             targets = document.querySelectorAll(targets);
         }
         // Single HTMLElement passed
-        else if (targets instanceof HTMLElement) {
+        else if (_is.htmlElement(targets)) {
             targets = [targets];
         }
         // No selector passed, possibly options as first argument
-        else if (!(targets instanceof NodeList) && !_is.string(targets))  {
+        else if (!_is.nodeList(targets) && !_is.array(targets) && !_is.string(targets))  {
             // If options are the first argument
             if (_is.undefined(options) && _is.object(targets)) {
                 options = targets;
@@ -3391,15 +3376,15 @@
             targets = document.querySelectorAll(selector);
         }
 
+        // Convert NodeList to array
+        if (_is.nodeList(targets)) {
+            targets = Array.prototype.slice.call(targets);
+        }
+
         // Bail if disabled or no basic support
         // You may want to disable certain UAs etc
         if (!supported().basic || !targets.length) {
             return false;
-        }
-
-        // Convert NodeList to array
-        if (targets instanceof NodeList) {
-            targets = Array.prototype.slice.call(targets);
         }
 
         // Check if the targets have multiple media elements
