@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.8.12
+- Vimeo keyboard focus fix (Fixes #317)
+- Fix for Vimeo on basic support devices
+
 ## v1.8.11
 - Fix for keyboard navigation on Vimeo (Fixes #317)
 - Fix for bug introduced in v1.8.9 related to additional controls 

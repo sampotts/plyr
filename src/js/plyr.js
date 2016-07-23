@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.8.11
+// plyr.js v1.8.12
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -43,7 +43,7 @@
         displayDuration:        true,
         loadSprite:             true,
         iconPrefix:             'plyr',
-        iconUrl:                'https://cdn.plyr.io/1.8.11/plyr.svg',
+        iconUrl:                'https://cdn.plyr.io/1.8.12/plyr.svg',
         clickToPlay:            true,
         hideControls:           true,
         showPosterOnEnd:        false,
@@ -1494,8 +1494,13 @@
             }
             // Vimeo
             else if (plyr.type === 'vimeo') {
-                // Create the YouTube container
-                plyr.media.appendChild(container);
+                // Vimeo needs an extra div to hide controls on desktop (which has full support)
+                if (plyr.supported.full) {
+                    plyr.media.appendChild(container);
+                }
+                else {
+                    container = plyr.media;
+                }
 
                 // Set ID
                 container.setAttribute('id', id);
@@ -1517,6 +1522,7 @@
                 }
             }
             // Soundcloud
+            // TODO: Currently unsupported and undocumented
             else if (plyr.type === 'soundcloud') {
                 // Inject the iframe
                 var soundCloud = document.createElement('iframe');
@@ -1744,10 +1750,18 @@
                 _displayDuration();
             });
 
-            // Captions
-            if (config.captions.defaultActive) {
+            // TODO: Captions
+            /*if (config.captions.defaultActive) {
                 plyr.embed.enableTextTrack('en');
-            }
+            }*/
+
+            // Fix keyboard focus issues
+            // https://github.com/Selz/plyr/issues/317
+            plyr.embed.on('loaded', function() {
+                if(_is.htmlElement(plyr.embed.element)) {
+                    plyr.embed.element.setAttribute('tabindex', '-1');
+                }
+            });
 
             plyr.embed.on('play', function() {
                 plyr.media.paused = false;
