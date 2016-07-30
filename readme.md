@@ -111,7 +111,7 @@ For YouTube and Vimeo, Plyr uses the standard YouTube API markup (an empty `<div
 ```
 
 ### JavaScript 
-Include the `plyr.js` script before the closing `</body>` tag and then call `plyr.setup()`. More info on `setup()` can be found under [#initialising](initialising).
+Include the `plyr.js` script before the closing `</body>` tag and then call `plyr.setup()`. More info on `setup()` can be found under [initialising](#initialising).
 
 ```html
 <script src="path/to/plyr.js"></script>
@@ -138,7 +138,7 @@ If you want to use our CDN for the default CSS, you can use the following:
 ```
 
 ### SVG Sprite
-The SVG sprite is loaded automatically from our CDN. To change this, see the [#options](Options) below. For reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/1.8.12/plyr.svg`.
+The SVG sprite is loaded automatically from our CDN. To change this, see the [options](#Options) below. For reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/1.8.12/plyr.svg`.
 
 ## Advanced
 
