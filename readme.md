@@ -537,9 +537,13 @@ Here's a list of the methods supported:
     <td>Set the poster url. This is supported for the <code>video</code> element only.</td>
   </tr>
   <tr>
-    <td><code>destroy()</code></td>
-    <td>&mdash;</td>
-    <td>Destroys the plyr UI and any media event listeners, effectively restoring to the previous state before <code>setup()</code> was called.</td>
+    <td><code>destroy(...)</code></td>
+    <td>Function</td>
+    <td>
+      Destroys the plyr UI and any media event listeners, effectively restoring to the previous state before <code>setup()</code> was called.<br><br>
+
+      The (optional) callback will be called once the DOM has been cleaned up. This will happen asynchronously since some destroy handlers (such as Vimeo's) are async.
+    </td>
   </tr>
   <tr>
     <td><code>restore()</code></td>
