@@ -16,7 +16,7 @@
         module.exports = factory(root, document);
     } else if (typeof define === 'function' && define.amd) {
         // AMD
-        define([], function () { return factory(root, document); });
+        define(null, function() { factory(root, document) });
     } else {
         // Browser globals (root is window)
         root.plyr = factory(root, document);
