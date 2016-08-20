@@ -40,6 +40,11 @@
       }
     }
 
+    // Focus
+    &:focus {
+        outline: 0;
+    }
+
     // Media elements
     video,
     audio {

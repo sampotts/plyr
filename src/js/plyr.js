@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v1.8.12
+// plyr.js v1.9.0
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -48,6 +48,7 @@
         hideControls:           true,
         showPosterOnEnd:        false,
         disableContextMenu:     true,
+        keyboardShorcuts:       true,
         tooltips: {
             controls:           false,
             seek:               true
@@ -481,11 +482,11 @@
     }
 
     // Unbind event
-    function _off(element, events, callback, useCapture) {
+    /*function _off(element, events, callback, useCapture) {
         if (element) {
             _toggleListener(element, events, callback, false, useCapture);
         }
-    }
+    }*/
 
     // Trigger event
     function _triggerEvent(element, eventName, bubbles, properties) {
@@ -1155,8 +1156,8 @@
 
             while (_timecodeMax(plyr.captions[plyr.subcount][0]) < time.toFixed(1)) {
                 plyr.subcount++;
-                if (plyr.subcount > plyr.captions.length-1) {
-                    plyr.subcount = plyr.captions.length-1;
+                if (plyr.subcount > plyr.captions.length - 1) {
+                    plyr.subcount = plyr.captions.length - 1;
                     break;
                 }
             }
@@ -1394,8 +1395,11 @@
             var label = config.i18n.play;
 
             // If there's a media title set, use that for the label
-            if (!_is.undefined(config.title) && config.title.length) {
+            if (_is.string(config.title) && config.title.length) {
                 label += ', ' + config.title;
+
+                // Set container label
+                plyr.container.setAttribute('aria-label', config.title);
             }
 
             // If there's a play button, set label
@@ -1614,9 +1618,10 @@
 
         // When embeds are ready
         function _embedReady() {
-            // Setup the UI if full support
+            // Setup the UI and call ready if full support
             if (plyr.supported.full) {
                 _setupInterface();
+                _ready();
             }
 
             // Set title
@@ -1673,6 +1678,11 @@
 
                         // Set title
                         config.title = instance.getVideoData().title;
+
+                        // Set the tabindex
+                        if (plyr.supported.full) {
+                            plyr.media.querySelector('iframe').setAttribute('tabindex', '-1');
+                        }
 
                         // Update UI
                         _embedReady();
@@ -1817,8 +1827,6 @@
                 if(_is.htmlElement(plyr.embed.element) && plyr.supported.full) {
                     plyr.embed.element.setAttribute('tabindex', '-1');
                 }
-
-                //console.log(plyr.embed);
             });
 
             plyr.embed.on('play', function() {
@@ -1950,18 +1958,21 @@
 
         // Toggle playback
         function _togglePlay(toggle) {
+            // True toggle
+            if (!_is.boolean(toggle)) {
+                toggle = plyr.media.paused;
+            }
+
             // Play
-            if (toggle === true) {
+            if (toggle) {
                 _play();
             }
             // Pause
-            else if (toggle === false) {
+            else {
                 _pause();
             }
-            // True toggle
-            else {
-                plyr.media[plyr.media.paused ? 'play' : 'pause']();
-            }
+
+            return toggle;
         }
 
         // Rewind
@@ -2097,53 +2108,43 @@
             // Check for native support
             var nativeSupport = fullscreen.supportsFullScreen;
 
-            // If it's a fullscreen change event, it's probably a native close
-            if (event && event.type === fullscreen.fullScreenEventName) {
-                plyr.isFullscreen = fullscreen.isFullScreen(plyr.container);
-            }
-            // If there's native support, use it
-            else if (nativeSupport) {
-                // Request fullscreen
-                if (!fullscreen.isFullScreen(plyr.container)) {
-                    // Save scroll position
-                    _saveScrollPosition();
-
-                    // Request full screen
-                    fullscreen.requestFullScreen(plyr.container);
+            
+            if (nativeSupport) {
+                // If it's a fullscreen change event, update the UI
+                if (event && event.type === fullscreen.fullScreenEventName) {
+                    plyr.isFullscreen = fullscreen.isFullScreen(plyr.container);
                 }
-                // Bail from fullscreen
-                else {
-                    fullscreen.cancelFullScreen();
-                }
+                // Else it's a user request to enter or exit
+                else  {
+                    // Request fullscreen
+                    if (!fullscreen.isFullScreen(plyr.container)) {
+                        // Save scroll position
+                        _saveScrollPosition();
 
-                // Check if we're actually full screen (it could fail)
-                plyr.isFullscreen = fullscreen.isFullScreen(plyr.container);
+                        // Request full screen
+                        fullscreen.requestFullScreen(plyr.container);
+                    }
+                    // Bail from fullscreen
+                    else {
+                        fullscreen.cancelFullScreen();
+                    }
+
+                    // Check if we're actually full screen (it could fail)
+                    // plyr.isFullscreen = fullscreen.isFullScreen(plyr.container);
+
+                    return;
+                }
             }
             else {
                 // Otherwise, it's a simple toggle
                 plyr.isFullscreen = !plyr.isFullscreen;
 
                 // Bind/unbind escape key
-                if (plyr.isFullscreen) {
-                    _on(document, 'keyup', _handleEscapeFullscreen);
-                    document.body.style.overflow = 'hidden';
-                }
-                else {
-                    _off(document, 'keyup', _handleEscapeFullscreen);
-                    document.body.style.overflow = '';
-                }
+                document.body.style.overflow = plyr.isFullscreen ? 'hidden' : '';
             }
 
             // Set class hook
             _toggleClass(plyr.container, config.classes.fullscreen.active, plyr.isFullscreen);
-
-            // Trap focus
-            if (plyr.isFullscreen) {
-                plyr.container.setAttribute('tabindex', '-1');
-            }
-            else {
-                plyr.container.removeAttribute('tabindex');
-            }
 
             // Trap focus
             _focusTrap(plyr.isFullscreen);
@@ -2159,14 +2160,6 @@
             // Restore scroll position
             if (!plyr.isFullscreen && nativeSupport) {
                 _restoreScrollPosition();
-            }
-        }
-
-        // Bail from faux-fullscreen
-        function _handleEscapeFullscreen(event) {
-            // If it's a keypress and not escape, bail
-            if ((event.which || event.charCode || event.keyCode) === 27 && plyr.isFullscreen) {
-                _toggleFullscreen();
             }
         }
 
@@ -2263,17 +2256,25 @@
         }
 
         // Increase volume
-        function _increaseVolume() {
+        function _increaseVolume(step) {
             var volume = plyr.media.muted ? 0 : (plyr.media.volume * config.volumeMax);
 
-            _setVolume(volume + (config.volumeStep / 5));
+            if (!_is.number(step)) {
+                step = config.volumeStep;
+            }
+
+            _setVolume(volume + step);
         }
 
         // Decrease volume
-        function _decreaseVolume() {
+        function _decreaseVolume(step) {
             var volume = plyr.media.muted ? 0 : (plyr.media.volume * config.volumeMax);
 
-            _setVolume(volume - (config.volumeStep / 5));
+            if (!_is.number(step)) {
+                step = config.volumeStep;
+            }
+
+            _setVolume(volume - step);
         }
 
         // Update volume UI and storage
@@ -2689,6 +2690,9 @@
             // Cancel current network requests
             _cancelRequests();
 
+            // Remove ready class hook
+            _toggleClass(plyr.container, config.classes.ready, false);
+
             // Setup new source
             function setup() {
                 // Remove embed object
@@ -2794,10 +2798,14 @@
 
                     // Display duration if available
                     _displayDuration();
+
+                    // Call ready
+                    _ready();
                 }
-                // If embed but not fully supported, setupInterface now
+                // If embed but not fully supported, setupInterface and call ready now
                 else if (_inArray(config.types.embed, plyr.type) && !plyr.supported.full) {
                     _setupInterface();
+                    _ready();
                 }
 
                 // Set aria title and iframe title
@@ -2823,16 +2831,8 @@
             var inputEvent = (plyr.browser.isIE ? 'change' : 'input');
 
             // Click play/pause helper
-            function _togglePlay() {
-                var play = plyr.media.paused;
-
-                // Toggle playback
-                if (play) {
-                    _play();
-                }
-                else {
-                    _pause();
-                }
+            function togglePlay() {
+                var play = _togglePlay();
 
                 // Determine which buttons
                 var trigger = plyr.buttons[play ? 'play' : 'pause'],
@@ -2861,16 +2861,27 @@
                 }
             }
 
-            // Detect tab focus
-            function checkFocus() {
+            // Get the focused element
+            function getFocusElement() {
                 var focused = document.activeElement;
 
                 if (!focused || focused === document.body) {
                     focused = null;
                 }
-                else if (document.querySelector) {
+                else {
                     focused = document.querySelector(':focus');
                 }
+
+                return focused;
+            }
+
+            // Get the key code for an event
+            function getKeyCode(event) {
+                return event.keyCode ? event.keyCode : event.which;
+            }
+
+            // Detect tab focus
+            function checkTabFocus(focused) {
                 for (var button in plyr.buttons) {
                     var element = plyr.buttons[button];
 
@@ -2885,11 +2896,67 @@
                 }
             }
 
+            // Keyboard shortcuts
+            if (config.keyboardShorcuts) {
+                //var held = false;
+
+                _on(plyr.container, 'keyup keydown', function(event) {
+                    var code = getKeyCode(event),
+                        down = event.type === 'keydown',
+                        first = true,
+                        timer;
+
+                    function handleKey() {
+                        switch(code) {
+                            // Space and K key
+                            case 32: 
+                            case 75: if (first) { _togglePlay(); } break;
+                            // Arrow up
+                            case 38: _increaseVolume(); break;
+                            // Arrow down
+                            case 40: _decreaseVolume(); break;
+                            // M key
+                            case 77: if (first) { _toggleMute(); } break;
+                            // Arrow forward
+                            case 39: _forward(); break;
+                            // Arrow back
+                            case 37: _rewind(); break;
+                            // F key
+                            case 70: if (first) { _toggleFullscreen(); } break;
+                            // C key
+                            case 67: if (first) { _toggleCaptions(); } break;
+                        }
+
+                        // Escape is handle natively when in full screen 
+                        // So we only need to worry about non native
+                        if (!fullscreen.supportsFullScreen && plyr.isFullscreen && code === 27) {
+                            _toggleFullscreen();
+                        }
+
+                        // First run completed
+                        first = false;
+                    }
+
+                    if (down) {
+                        handleKey();
+
+                        // If a key is held for 200ms, run again
+                        // Handy for volume and skip 
+                        timer = setTimeout(handleKey, 200); 
+                    }
+                    else {
+                        clearTimeout(timer);
+                    }
+                });
+            }
+
+            // Focus/tab management
             _on(window, 'keyup', function(event) {
-                var code = (event.keyCode ? event.keyCode : event.which);
+                var code = getKeyCode(event),
+                    focused = getFocusElement();
 
                 if (code === 9) {
-                    checkFocus();
+                    checkTabFocus(focused);
                 }
             });
             _on(document.body, 'click', function() {
@@ -2904,10 +2971,10 @@
             }
 
             // Play
-            _proxyListener(plyr.buttons.play, 'click', config.listeners.play, _togglePlay);
+            _proxyListener(plyr.buttons.play, 'click', config.listeners.play, togglePlay);
 
             // Pause
-            _proxyListener(plyr.buttons.pause, 'click', config.listeners.pause, _togglePlay);
+            _proxyListener(plyr.buttons.pause, 'click', config.listeners.pause, togglePlay);
 
             // Restart
             _proxyListener(plyr.buttons.restart, 'click', config.listeners.restart, _seek);
@@ -2968,25 +3035,26 @@
 
                 // Detect "natural" scroll - suppored on OS X Safari only
                 // Other browsers on OS X will be inverted until support improves
-                var inverted = event.webkitDirectionInvertedFromDevice;
+                var inverted = event.webkitDirectionInvertedFromDevice,
+                    step = (config.volumeStep / 5);
 
                 // Scroll down (or up on natural) to decrease
                 if (event.deltaY < 0 || event.deltaX > 0) {
                     if (inverted) {
-                        _decreaseVolume();
+                        _decreaseVolume(step);
                     }
                     else {
-                        _increaseVolume();
+                        _increaseVolume(step);
                     }
                 }
 
                 // Scroll up (or down on natural) to increase
                 if (event.deltaY > 0 || event.deltaX < 0) {
                     if (inverted) {
-                        _increaseVolume();
+                        _increaseVolume(step);
                     }
                     else {
-                        _decreaseVolume();
+                        _decreaseVolume(step);
                     }
                 }
             });
@@ -3231,6 +3299,9 @@
             // Wrap media
             plyr.container = _wrap(media, document.createElement('div'));
 
+            // Allow focus to be captured
+            plyr.container.setAttribute('tabindex', 0);
+
             // Add style hook
             _toggleStyleHook();
 
@@ -3252,16 +3323,21 @@
                 if (config.autoplay) {
                     _play();
                 }
+
+                // Call ready
+                _ready();
             }
-            // If embed but not fully supported, setupInterface now (to avoid flash of controls)
+            // If embed but not fully supported, setupInterface (to avoid flash of controls) and call ready now
             else if (_inArray(config.types.embed, plyr.type) && !plyr.supported.full) {
                 _setupInterface();
+                _ready();
             }
 
             // Successful setup
             plyr.init = true;
         }
 
+        // Setup the UI
         function _setupInterface() {
             // Don't setup interface if no support
             if (!plyr.supported.full) {
@@ -3321,23 +3397,9 @@
 
             // Display duration
             _displayDuration();
-
-            // Ready event
-            _triggerEvent(plyr.container, 'ready', true);
-
-            // Class
-            _toggleClass(plyr.container, config.classes.ready, true);
         }
 
-        // Initialize instance
-        _init();
-
-        // If init failed, return an empty object
-        if (!plyr.init) {
-            return {};
-        }
-
-        return {
+        var api = {
             getOriginal:        function() { return original; },
             getContainer:       function() { return plyr.container },
             getEmbed:           function() { return plyr.embed; },
@@ -3365,6 +3427,31 @@
             destroy:            _destroy,
             getCurrentTime:     function() { return media.currentTime; }
         };
+
+        // Everything done
+        function _ready() {
+            // Ready event
+            _triggerEvent(plyr.container, 'ready', true);
+
+            // Set class hook on media element
+            _toggleClass(plyr.media, defaults.classes.setup, true);
+
+            // Set container class for ready
+            _toggleClass(plyr.container, config.classes.ready, true);
+
+            // Store a refernce to instance
+            plyr.media.plyr = api;
+        }
+
+        // Initialize instance
+        _init();
+
+        // If init failed, return null
+        if (!plyr.init) {
+            return null;
+        }
+
+        return api;
     }
 
     // Load a sprite
@@ -3543,14 +3630,6 @@
             if (!_is.object(instance)) {
                 return;
             }
-
-            // Set plyr to false if setup failed
-            // Maybe we remove this and add a .get() function to get the instance 
-            // If passed a media element or container?
-            media.plyr = instance;
-
-            // Set class hook
-            _toggleClass(media, defaults.classes.setup, true);
 
             // Listen for events if debugging
             if (config.debug) {

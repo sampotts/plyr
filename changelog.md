@@ -25,6 +25,7 @@ And some other changes and bug fixes:
 - Sprite is only loaded once (fixes #259)
 - Fixes for Vimeo post message bugs on source change or destroy (fixes #318)
 - Save caption state in storage (fixes #311)
+- Added keyboard shortcuts to the current focused player (with option to disable) (fixes #309)
 
 ## v1.8.12
 - Vimeo keyboard focus fix (Fixes #317)
