@@ -25,7 +25,7 @@
     'use strict';
 
     // Globals
-    var fullscreen, 
+    var fullscreen,
     scroll = { x: 0, y: 0 },
 
     // Default config
@@ -36,8 +36,8 @@
         loop:                   false,
         seekTime:               10,
         volume:                 5,
-        volumeMin:              0, 
-        volumeMax:              10, 
+        volumeMin:              0,
+        volumeMax:              10,
         volumeStep:             1,
         duration:               null,
         displayDuration:        true,
@@ -496,9 +496,9 @@
         }
 
         // Create and dispatch the event
-        var event = new CustomEvent(eventName, { 
+        var event = new CustomEvent(eventName, {
             bubbles:    bubbles,
-            detail:     properties 
+            detail:     properties
         });
 
         // Dispatch the event
@@ -572,7 +572,7 @@
     // Check variable types
     var _is = {
         object: function(input) {
-            return input !== null && typeof(input) === 'object'; 
+            return input !== null && typeof(input) === 'object';
         },
         array: function(input) {
             return input !== null && typeof(input) === 'object' && input.constructor === Array;
@@ -2005,7 +2005,7 @@
                 targetTime = duration;
             }
 
-            // Update seek range and progress 
+            // Update seek range and progress
             _updateSeekDisplay(targetTime);
 
             // Set the current time
@@ -2401,7 +2401,7 @@
             if (!plyr.supported.full) {
                 return;
             }
-            
+
             // Default to 0
             if (_is.undefined(value)) {
                 value = 0;
@@ -2495,7 +2495,7 @@
             _updateProgress(event);
         }
 
-        // Update seek range and progress 
+        // Update seek range and progress
         function _updateSeekDisplay(time) {
             // Default to 0
             if (!_is.number(time)) {
@@ -2505,7 +2505,7 @@
             var duration    = _getDuration(),
                 value       = _getPercentage(time, duration);
 
-            // Update progress 
+            // Update progress
             if (plyr.progress && plyr.progress.played) {
                 plyr.progress.played.value = value;
             }
@@ -2616,15 +2616,15 @@
                 }
             }
 
-            // If toggle is false or if we're playing (regardless of toggle), 
-            // then set the timer to hide the controls 
+            // If toggle is false or if we're playing (regardless of toggle),
+            // then set the timer to hide the controls
             if (!show || !plyr.media.paused) {
                 plyr.timers.hover = window.setTimeout(function() {
                     // If the mouse is over the controls (and not entering fullscreen), bail
                     if ((plyr.controls.pressed || plyr.controls.hover) && !isEnterFullscreen) {
                         return;
                     }
-                    
+
                     _toggleClass(plyr.container, config.classes.hideControls, true);
                 }, delay);
             }
@@ -2949,12 +2949,12 @@
                 _on(plyr.container, 'mouseenter mouseleave mousemove touchstart touchend touchcancel touchmove enterfullscreen', _toggleControls);
 
                 // Watch for cursor over controls so they don't hide when trying to interact
-                _on(plyr.controls, 'mouseenter mouseleave', function(event) { 
+                _on(plyr.controls, 'mouseenter mouseleave', function(event) {
                     plyr.controls.hover = event.type === 'mouseenter';
                 });
 
                  // Watch for cursor over controls so they don't hide when trying to interact
-                _on(plyr.controls, 'mousedown mouseup touchstart touchend touchcancel', function(event) { 
+                _on(plyr.controls, 'mousedown mouseup touchstart touchend touchcancel', function(event) {
                     plyr.controls.pressed = _inArray(['mousedown', 'touchstart'], event.type);
                 });
 
@@ -3477,42 +3477,42 @@
         }
 
         // Create a player instance for each element
-        for (var key in containers) {
-            var element = containers[key].element,
-                original = containers[key].original || element;
+        containers.forEach(function(container) {
+          var element = container.element,
+              original = container.original || element;
 
-            // Wrap each media element if is target is media element
-            // as opposed to a wrapper
-            if (_matches(element, selector)) {
-                // Wrap in a <div>
-                element = _wrap(element, document.createElement('div'));
+          // Wrap each media element if is target is media element
+          // as opposed to a wrapper
+          if (_matches(element, selector)) {
+            // Wrap in a <div>
+            element = _wrap(element, document.createElement('div'));
+          }
+
+          // Setup a player instance and add to the element
+          if (!('plyr' in element)) {
+            // Create instance-specific config
+            var config = _extend({}, defaults, options, JSON.parse(original.getAttribute('data-plyr')));
+
+            // Bail if not enabled
+            if (!config.enabled) {
+              return null;
             }
 
-            // Setup a player instance and add to the element
-            if (!('plyr' in element)) {
-                // Create instance-specific config
-                var config = _extend({}, defaults, options, JSON.parse(original.getAttribute('data-plyr')));
+            // Create new instance
+            var instance = new Plyr(element, config);
 
-                // Bail if not enabled
-                if (!config.enabled) {
-                    return null;
-                }
+            // Set plyr to false if setup failed
+            element.plyr = (Object.keys(instance).length ? instance : false);
 
-                // Create new instance
-                var instance = new Plyr(element, config);
+            // Callback
+            _triggerEvent(original, 'setup', true, {
+              plyr: element.plyr
+            });
+          }
 
-                // Set plyr to false if setup failed
-                element.plyr = (Object.keys(instance).length ? instance : false);
-
-                // Callback
-                _triggerEvent(original, 'setup', true, { 
-                    plyr: element.plyr 
-                });
-            }
-
-            // Add to return array even if it's already setup
-            elements.push(element);
-        }
+          // Add to return array even if it's already setup
+          elements.push(element);
+        });
 
         return elements;
     }
