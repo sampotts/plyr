@@ -228,7 +228,7 @@
             name = ua.substring(nameOffset,verOffset);
             fullVersion = ua.substring(verOffset + 1);
 
-            if (name.toLowerCase() == name.toUpperCase()) {
+            if (name.toLowerCase() === name.toUpperCase()) {
                 name = navigator.appName;
             }
         }
@@ -268,7 +268,7 @@
         var media = plyr.media;
 
         // Only check video types for video players
-        if (plyr.type == 'video') {
+        if (plyr.type === 'video') {
             // Check type
             switch (mimeType) {
                 case 'video/webm':   return !!(media.canPlayType && media.canPlayType('video/webm; codecs="vp8, vorbis"').replace(/no/, ''));
@@ -278,7 +278,7 @@
         }
 
         // Only check audio types for audio players
-        else if (plyr.type == 'audio') {
+        else if (plyr.type === 'audio') {
             // Check type
             switch (mimeType) {
                 case 'audio/mpeg':   return !!(media.canPlayType && media.canPlayType('audio/mpeg;').replace(/no/, ''));
@@ -305,7 +305,7 @@
 
     // Element exists in an array
     function _inArray(haystack, needle) {
-        return Array.prototype.indexOf && (haystack.indexOf(needle) != -1);
+        return Array.prototype.indexOf && (haystack.indexOf(needle) !== -1);
     }
 
     // Replace all
@@ -437,20 +437,6 @@
         return f.call(element, selector);
     }
 
-    // Bind event
-    function _on(element, events, callback, useCapture) {
-        if (element) {
-            _toggleListener(element, events, callback, true, useCapture);
-        }
-    }
-
-    // Unbind event
-    function _off(element, events, callback, useCapture) {
-        if (element) {
-            _toggleListener(element, events, callback, false, useCapture);
-        }
-    }
-
     // Bind along with custom handler
     function _proxyListener(element, eventName, userListener, defaultListener, useCapture) {
         _on(element, eventName, function(event) {
@@ -484,6 +470,20 @@
         // If a single node is passed, bind the event listener
         for (var i = 0; i < eventList.length; i++) {
             element[toggle ? 'addEventListener' : 'removeEventListener'](eventList[i], callback, useCapture);
+        }
+    }
+
+    // Bind event
+    function _on(element, events, callback, useCapture) {
+        if (element) {
+            _toggleListener(element, events, callback, true, useCapture);
+        }
+    }
+
+    // Unbind event
+    function _off(element, events, callback, useCapture) {
+        if (element) {
+            _toggleListener(element, events, callback, false, useCapture);
         }
     }
 
@@ -547,7 +547,7 @@
         }
 
         // Return first if specified but nothing to merge
-        if (objects.lenth == 1) {
+        if (objects.length === 1) {
             return objects[0];
         }
 
@@ -582,10 +582,10 @@
             return input !== null && (typeof(input) === 'object' && input.constructor === Array);
         },
         number: function(input) {
-            return input !== null && (typeof(input) === 'number' && !isNaN(input - 0) || (typeof input == 'object' && input.constructor === Number));
+            return input !== null && (typeof(input) === 'number' && !isNaN(input - 0) || (typeof input === 'object' && input.constructor === Number));
         },
         string: function(input) {
-            return input !== null && (typeof input === 'string' || (typeof input == 'object' && input.constructor === String));
+            return input !== null && (typeof input === 'string' || (typeof input === 'object' && input.constructor === String));
         },
         boolean: function(input) {
             return input !== null && typeof input === 'boolean';
@@ -643,7 +643,7 @@
         if (fullscreen.supportsFullScreen) {
             // Yet again Microsoft awesomeness,
             // Sometimes the prefix is 'ms', sometimes 'MS' to keep you on your toes
-            fullscreen.fullScreenEventName = (fullscreen.prefix == 'ms' ? 'MSFullscreenChange' : fullscreen.prefix + 'fullscreenchange');
+            fullscreen.fullScreenEventName = (fullscreen.prefix === 'ms' ? 'MSFullscreenChange' : fullscreen.prefix + 'fullscreenchange');
 
             fullscreen.isFullScreen = function(element) {
                 if (_is.undefined(element)) {
@@ -651,21 +651,21 @@
                 }
                 switch (this.prefix) {
                     case '':
-                        return document.fullscreenElement == element;
+                        return document.fullscreenElement === element;
                     case 'moz':
-                        return document.mozFullScreenElement == element;
+                        return document.mozFullScreenElement === element;
                     default:
-                        return document[this.prefix + 'FullscreenElement'] == element;
+                        return document[this.prefix + 'FullscreenElement'] === element;
                 }
             };
             fullscreen.requestFullScreen = function(element) {
                 if (_is.undefined(element)) {
                     element = document.body;
                 }
-                return (this.prefix === '') ? element.requestFullScreen() : element[this.prefix + (this.prefix == 'ms' ? 'RequestFullscreen' : 'RequestFullScreen')]();
+                return (this.prefix === '') ? element.requestFullScreen() : element[this.prefix + (this.prefix === 'ms' ? 'RequestFullscreen' : 'RequestFullScreen')]();
             };
             fullscreen.cancelFullScreen = function() {
-                return (this.prefix === '') ? document.cancelFullScreen() : document[this.prefix + (this.prefix == 'ms' ? 'ExitFullscreen' : 'CancelFullScreen')]();
+                return (this.prefix === '') ? document.cancelFullScreen() : document[this.prefix + (this.prefix === 'ms' ? 'ExitFullscreen' : 'CancelFullScreen')]();
             };
             fullscreen.element = function() {
                 return (this.prefix === '') ? document.fullscreenElement : document[this.prefix + 'FullscreenElement'];
@@ -676,37 +676,34 @@
     }
 
     // Local storage
-    function _storage() {
-        var storage = {
-            supported: (function() {
-                if (!('localStorage' in window)) {
-                    return false;
-                }
-
-                // Try to use it (it might be disabled, e.g. user is in private/porn mode)
-                // see: https://github.com/Selz/plyr/issues/131
-                try {
-                    // Add test item
-                    window.localStorage.setItem('___test', 'OK');
-
-                    // Get the test item
-                    var result = window.localStorage.getItem('___test');
-
-                    // Clean up
-                    window.localStorage.removeItem('___test');
-
-                    // Check if value matches
-                    return (result === 'OK');
-                }
-                catch (e) {
-                    return false;
-                }
-
+    var _storage = {
+        supported: (function() {
+            if (!('localStorage' in window)) {
                 return false;
-            })()
-        };
-        return storage;
-    }
+            }
+
+            // Try to use it (it might be disabled, e.g. user is in private/porn mode)
+            // see: https://github.com/Selz/plyr/issues/131
+            try {
+                // Add test item
+                window.localStorage.setItem('___test', 'OK');
+
+                // Get the test item
+                var result = window.localStorage.getItem('___test');
+
+                // Clean up
+                window.localStorage.removeItem('___test');
+
+                // Check if value matches
+                return (result === 'OK');
+            }
+            catch (e) {
+                return false;
+            }
+
+            return false;
+        })()
+    };
 
     // Player instance
     function Plyr(media, config) {
@@ -903,7 +900,7 @@
                 return;
             }
 
-            if ((plyr.type != 'audio' || config.fullscreen.allowAudio) && config.fullscreen.enabled) {
+            if ((plyr.type !== 'audio' || config.fullscreen.allowAudio) && config.fullscreen.enabled) {
                 // Check for native support
                 var nativeSupport = fullscreen.supportsFullScreen;
 
@@ -1421,7 +1418,7 @@
             plyr.storage = {};
 
             // Bail if we don't have localStorage support or it's disabled
-            if (!_storage().supported || !config.storage.enabled) {
+            if (!_storage.supported || !config.storage.enabled) {
                 return;
             }
 
@@ -1450,16 +1447,16 @@
 
         // Save a value back to local storage
         function _updateStorage(value) {
-          // Bail if we don't have localStorage support or it's disabled
-          if (!_storage().supported || !config.storage.enabled) {
-              return;
-          }
+            // Bail if we don't have localStorage support or it's disabled
+            if (!_storage.supported || !config.storage.enabled) {
+                return;
+            }
 
-          // Update the working copy of the values
-          _extend(plyr.storage, value);
+            // Update the working copy of the values
+            _extend(plyr.storage, value);
 
-          window.localStorage.setItem(
-              config.storage.key, JSON.stringify(plyr.storage));
+            // Update storage
+            window.localStorage.setItem(config.storage.key, JSON.stringify(plyr.storage));
         }
 
         // Setup media
@@ -2369,7 +2366,7 @@
                         value = _getPercentage(plyr.media.currentTime, duration);
 
                         // Set seek range value only if it's a 'natural' time event
-                        if (event.type == 'timeupdate' && plyr.buttons.seek) {
+                        if (event.type === 'timeupdate' && plyr.buttons.seek) {
                             plyr.buttons.seek.value = value;
                         }
 
@@ -2493,7 +2490,7 @@
             _updateTimeDisplay(plyr.media.currentTime, plyr.currentTime);
 
             // Ignore updates while seeking
-            if (event && event.type == 'timeupdate' && plyr.media.seeking) {
+            if (event && event.type === 'timeupdate' && plyr.media.seeking) {
                 return;
             }
 
@@ -2692,10 +2689,6 @@
             // Cancel current network requests
             _cancelRequests();
 
-            // Destroy instance adn wait for callback
-            // Vimeo throws a wobbly if you don't wait
-            _destroy(setup, false);
-
             // Setup new source
             function setup() {
                 // Remove embed object
@@ -2811,6 +2804,10 @@
                 config.title = source.title;
                 _setTitle();
             }
+
+            // Destroy instance adn wait for callback
+            // Vimeo throws a wobbly if you don't wait
+            _destroy(setup, false);
         }
 
         // Update poster
@@ -2868,7 +2865,7 @@
             function checkFocus() {
                 var focused = document.activeElement;
 
-                if (!focused || focused == document.body) {
+                if (!focused || focused === document.body) {
                     focused = null;
                 }
                 else if (document.querySelector) {
@@ -2891,7 +2888,7 @@
             _on(window, 'keyup', function(event) {
                 var code = (event.keyCode ? event.keyCode : event.which);
 
-                if (code == 9) {
+                if (code === 9) {
                     checkFocus();
                 }
             });
@@ -3341,6 +3338,7 @@
         }
 
         return {
+            getOriginal:        function() { return original; },
             getContainer:       function() { return plyr.container },
             getEmbed:           function() { return plyr.embed; },
             getMedia:           function() { return plyr.media; },
@@ -3379,12 +3377,12 @@
         }
 
         // Create placeholder (to prevent loading twice)
-        var c = document.createElement('div');
-        c.setAttribute('hidden', '');
+        var container = document.createElement('div');
+        container.setAttribute('hidden', '');
         if (_is.string(id)) {
-            c.setAttribute('id', id);
+            container.setAttribute('id', id);
         }
-        document.body.insertBefore(c, document.body.childNodes[0]);
+        document.body.insertBefore(container, document.body.childNodes[0]);
 
         // Check for CORS support
         if ('withCredentials' in x) {
@@ -3396,7 +3394,7 @@
 
         // Inject hidden div with sprite on load
         x.onload = function() {
-            c.innerHTML = x.responseText;
+            container.innerHTML = x.responseText;
         }
 
         x.send();

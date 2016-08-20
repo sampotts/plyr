@@ -8,11 +8,11 @@
     "node"          : false,
     "rhino"         : false,
     "couch"         : false,
-    "wsh"           : true,   // Windows Scripting Host.
+    "wsh"           : false,   // Windows Scripting Host.
     "jquery"        : false,
 
     // Development.
-    "debug"         : false,  // Allow debugger statements e.g. browser breakpoints.
+    "debug"         : true,  // Allow debugger statements e.g. browser breakpoints.
     "devel"         : true,   // Allow developments statements e.g. `console.log();`.
 
     // ECMAScript 5.
@@ -25,7 +25,7 @@
     "bitwise"       : false,  // Prohibit bitwise operators (&, |, ^, etc.).
     "boss"          : false,  // Tolerate assignments inside if, for & while. Usually conditions & loops are for comparison, not assignments.
     "curly"         : true,   // Require {} for every new block or scope.
-    "eqeqeq"        : false,  // Require triple equals i.e. `===`.
+    "eqeqeq"        : true,  // Require triple equals i.e. `===`.
     "eqnull"        : false,  // Tolerate use of `== null`.
     "evil"          : false,  // Tolerate use of `eval`.
     "expr"          : false,  // Tolerate `ExpressionStatement` as Programs.
