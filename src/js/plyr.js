@@ -139,7 +139,7 @@
             frameTitle:         'Player for {title}'
         },
         types: {
-            embed:              ['youtube', 'vimeo', 'soundcloud'],
+            embed:              ['youtube', 'vimeo', 'soundcloud', 'deezer'],
             html5:              ['video', 'audio']
         },
         // URLs
@@ -152,6 +152,9 @@
             },
             soundcloud: {
                 api:            'https://w.soundcloud.com/player/api.js'
+            },
+            deezer: {
+                api:            'http://e-cdn-files.deezer.com/js/min/dz.js'
             }
         },
         // Custom control listeners
@@ -1607,6 +1610,60 @@
                     }
                 }, 50);
             }
+            // Deezer
+            else if (plyr.type === 'deezer') {
+
+                // Setup API
+                if (_is.object(window.DZ)) {
+                    _deezerReady(mediaId);
+                }
+                else {
+                    plyr.media.appendChild(container);
+                    var dzRoot = document.createElement('div');
+                    // Set ID
+                    dzRoot.setAttribute('id', 'dz-root');
+                    document.body.appendChild(dzRoot);
+                    // Load the API
+                    _injectScript(config.urls.deezer.api);
+
+                    window.dzAsyncInit = function() {
+                        DZ.init({
+                            appId: 'APP_ID',
+                            channelUrl: window.location.href + 'channel.html',
+                            player: {
+                                onload : function(){
+                                    _deezerReady(mediaId);
+                                }
+                            }
+                        });
+                        DZ.Event.subscribe('player_play', function() {
+                            plyr.media.paused = false;
+                            _triggerEvent(plyr.media, 'play');
+                            _triggerEvent(plyr.media, 'playing');
+                        });
+                        DZ.Event.subscribe('player_paused', function() {
+                            plyr.media.paused = true;
+                            _triggerEvent(plyr.media, 'pause');
+                        });
+                        DZ.Event.subscribe('player_buffering', function(percent) {
+                            percent = percent / 100;
+                            plyr.media.buffered = percent;
+                            _triggerEvent(plyr.media, 'progress');
+
+                            if (parseInt(percent) === 1) {
+                                // Trigger event
+                                _triggerEvent(plyr.media, 'canplaythrough');
+                            }
+                        });
+
+                        DZ.Event.subscribe('player_position', function(arg){
+                            plyr.media.seeking = false;
+                            plyr.media.currentTime = arg[0];
+                            _triggerEvent(plyr.media, 'timeupdate');
+                        });
+                    }
+                }
+            }
         }
 
         // When embeds are ready
@@ -1931,6 +1988,34 @@
             });
         }
 
+        function _deezerReady(musicId) {
+            plyr.embed = DZ.player;
+            plyr.embed.playTracks([musicId], function(res) {
+                plyr.media.duration = res.tracks[0].duration;
+                plyr.embed.setVolume(100);
+                _displayDuration();
+                config.autoplay && plyr.media.play();
+            });
+
+            plyr.media.play = function() {
+                plyr.embed.play();
+                plyr.media.paused = false;
+            };
+            plyr.media.pause = function() {
+                plyr.embed.pause();
+                plyr.media.paused = true;
+            };
+            plyr.media.stop = function() {
+                plyr.embed.stop();
+                plyr.media.paused = true;
+            };
+
+            plyr.media.paused = true;
+            plyr.media.currentTime = 0;
+            
+            _embedReady();
+        }
+
         // Play media
         function _play() {
             if ('play' in plyr.media) {
@@ -2030,6 +2115,9 @@
 
                     case 'soundcloud':
                         plyr.embed.seekTo(targetTime * 1000);
+                        break;
+                    case 'deezer':
+                        plyr.embed.seek((targetTime / duration) * 100);
                         break;
                 }
 
@@ -2195,6 +2283,7 @@
 
                     case 'vimeo':
                     case 'soundcloud':
+                    case 'deezer':
                         plyr.embed.setVolume(plyr.media.muted ? 0 : parseFloat(config.volume / config.volumeMax));
                         break;
                 }
@@ -2245,6 +2334,7 @@
 
                     case 'vimeo':
                     case 'soundcloud':
+                    case 'deezer':
                         plyr.embed.setVolume(plyr.media.volume);
                         break;
                 }
@@ -2656,7 +2746,8 @@
                         url = object.permalink_url;
                     });
                     break;
-
+                case 'deezer':
+                    break;
                 default:
                     url = plyr.media.currentSrc;
                     break;
@@ -2736,6 +2827,7 @@
                 case 'youtube':
                 case 'vimeo':
                 case 'soundcloud':
+                case 'deezer':
                     plyr.media = document.createElement('div');
                     plyr.embedId = source.sources[0].src;
                     break;
@@ -3400,6 +3492,7 @@
             case 'vimeo':
             case 'youtube':
             case 'soundcloud':
+            case 'deezer':
                 basic = true;
                 full  = (!isOldIE && !isIos);
                 break;
