@@ -139,7 +139,7 @@
             frameTitle:         'Player for {title}'
         },
         types: {
-            embed:              ['youtube', 'vimeo', 'soundcloud'],
+            embed:              ['youtube', 'vimeo', 'soundcloud', 'deezer'],
             html5:              ['video', 'audio']
         },
         // URLs
@@ -152,6 +152,9 @@
             },
             soundcloud: {
                 api:            'https://w.soundcloud.com/player/api.js'
+            },
+            deezer: {
+                api:            'http://e-cdn-files.deezer.com/js/min/dz.js'
             }
         },
         // Custom control listeners
@@ -1607,6 +1610,32 @@
                     }
                 }, 50);
             }
+            // Deezer
+            else if (plyr.type === 'deezer') {
+
+                // Setup API
+                if (_is.object(window.DZ)) {
+                    _deezerReady(mediaId);
+                }
+                else {
+                    plyr.media.appendChild(container);
+
+                    // Set ID
+                    container.setAttribute('id', 'dz-root');
+                    // Load the API
+                    _injectScript(config.urls.deezer.api);
+
+                    DZ.init({
+                        appId: 'APP_ID',
+                        channelUrl: window.location.href + 'channel.html',
+                        player: {
+                            onload : function(){
+                                _deezerReady(mediaId);
+                            }
+                        }
+                    });
+                }
+            }
         }
 
         // When embeds are ready
@@ -1931,6 +1960,58 @@
             });
         }
 
+        function _deezerReady(musicId) {
+            plyr.embed = DZ.player;
+            plyr.embed.playTracks([musicId], false);
+
+            plyr.media.play = function() {
+                plyr.embed.play();
+                plyr.media.paused = false;
+            };
+            plyr.media.pause = function() {
+                plyr.embed.pause();
+                plyr.media.paused = true;
+            };
+            plyr.media.stop = function() {
+                plyr.embed.stop();
+                plyr.media.paused = true;
+            };
+            plyr.media.paused = true;
+            plyr.media.currentTime = 0;
+
+            _embedReady();
+            DZ.Event.subscribe('player_loaded', function() {
+                plyr.media.duration = Number(plyr.embed.getCurrentTrack().duration);
+                _displayDuration();
+            });
+            
+            DZ.Event.subscribe('player_play', function() {
+                plyr.media.paused = false;
+                _triggerEvent(plyr.media, 'play');
+                _triggerEvent(plyr.media, 'playing');
+            });
+            DZ.Event.subscribe('player_paused', function() {
+                plyr.media.paused = true;
+                _triggerEvent(plyr.media, 'pause');
+            });
+            DZ.Event.subscribe('player_buffering', function(percent) {
+                percent = percent / 100;
+                plyr.media.buffered = percent;
+                _triggerEvent(plyr.media, 'progress');
+
+                if (parseInt(percent) === 1) {
+                    // Trigger event
+                    _triggerEvent(plyr.media, 'canplaythrough');
+                }
+            });
+
+            DZ.Event.subscribe('player_position', function(arg){
+                plyr.media.seeking = false;
+                plyr.media.currentTime = arg[0];
+                _triggerEvent(plyr.media, 'timeupdate');
+            });
+        }
+
         // Play media
         function _play() {
             if ('play' in plyr.media) {
@@ -2030,6 +2111,9 @@
 
                     case 'soundcloud':
                         plyr.embed.seekTo(targetTime * 1000);
+                        break;
+                    case 'deezer':
+                        plyr.embed.seek(targetTime);
                         break;
                 }
 
@@ -2195,6 +2279,7 @@
 
                     case 'vimeo':
                     case 'soundcloud':
+                    case 'deezer':
                         plyr.embed.setVolume(plyr.media.muted ? 0 : parseFloat(config.volume / config.volumeMax));
                         break;
                 }
@@ -2245,6 +2330,7 @@
 
                     case 'vimeo':
                     case 'soundcloud':
+                    case 'deezer':
                         plyr.embed.setVolume(plyr.media.volume);
                         break;
                 }
@@ -2656,7 +2742,8 @@
                         url = object.permalink_url;
                     });
                     break;
-
+                case 'deezer':
+                    break;
                 default:
                     url = plyr.media.currentSrc;
                     break;
@@ -2736,6 +2823,7 @@
                 case 'youtube':
                 case 'vimeo':
                 case 'soundcloud':
+                case 'deezer':
                     plyr.media = document.createElement('div');
                     plyr.embedId = source.sources[0].src;
                     break;
@@ -3400,6 +3488,7 @@
             case 'vimeo':
             case 'youtube':
             case 'soundcloud':
+            case 'deezer':
                 basic = true;
                 full  = (!isOldIE && !isIos);
                 break;
