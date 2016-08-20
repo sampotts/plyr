@@ -1619,9 +1619,10 @@
                 }
                 else {
                     plyr.media.appendChild(container);
-
+                    var dzRoot = document.createElement('div');
                     // Set ID
-                    container.setAttribute('id', 'dz-root');
+                    dzRoot.setAttribute('id', 'dz-root');
+                    document.body.appendChild(dzRoot);
                     // Load the API
                     _injectScript(config.urls.deezer.api);
 
@@ -1634,6 +1635,31 @@
                                     _deezerReady(mediaId);
                                 }
                             }
+                        });
+                        DZ.Event.subscribe('player_play', function() {
+                            plyr.media.paused = false;
+                            _triggerEvent(plyr.media, 'play');
+                            _triggerEvent(plyr.media, 'playing');
+                        });
+                        DZ.Event.subscribe('player_paused', function() {
+                            plyr.media.paused = true;
+                            _triggerEvent(plyr.media, 'pause');
+                        });
+                        DZ.Event.subscribe('player_buffering', function(percent) {
+                            percent = percent / 100;
+                            plyr.media.buffered = percent;
+                            _triggerEvent(plyr.media, 'progress');
+
+                            if (parseInt(percent) === 1) {
+                                // Trigger event
+                                _triggerEvent(plyr.media, 'canplaythrough');
+                            }
+                        });
+
+                        DZ.Event.subscribe('player_position', function(arg){
+                            plyr.media.seeking = false;
+                            plyr.media.currentTime = arg[0];
+                            _triggerEvent(plyr.media, 'timeupdate');
                         });
                     }
                 }
@@ -1988,32 +2014,6 @@
             plyr.media.currentTime = 0;
             
             _embedReady();
-
-            DZ.Event.subscribe('player_play', function() {
-                plyr.media.paused = false;
-                _triggerEvent(plyr.media, 'play');
-                _triggerEvent(plyr.media, 'playing');
-            });
-            DZ.Event.subscribe('player_paused', function() {
-                plyr.media.paused = true;
-                _triggerEvent(plyr.media, 'pause');
-            });
-            DZ.Event.subscribe('player_buffering', function(percent) {
-                percent = percent / 100;
-                plyr.media.buffered = percent;
-                _triggerEvent(plyr.media, 'progress');
-
-                if (parseInt(percent) === 1) {
-                    // Trigger event
-                    _triggerEvent(plyr.media, 'canplaythrough');
-                }
-            });
-
-            DZ.Event.subscribe('player_position', function(arg){
-                plyr.media.seeking = false;
-                plyr.media.currentTime = arg[0];
-                _triggerEvent(plyr.media, 'timeupdate');
-            });
         }
 
         // Play media
