@@ -1964,7 +1964,13 @@
 
         function _deezerReady(musicId) {
             plyr.embed = DZ.player;
-            plyr.embed.playTracks([musicId], false);
+            plyr.embed.playTracks([musicId], function(tracks) {
+                plyr.media.duration = Number(res.tracks[0].duration);
+                config.title = res.tracks[0].title;
+                plyr.embed.setVolume(100);
+                _displayDuration();
+                config.autoplay && plyr.media.play();
+            });
 
             plyr.media.play = function() {
                 plyr.embed.play();
@@ -1978,15 +1984,12 @@
                 plyr.embed.stop();
                 plyr.media.paused = true;
             };
+
             plyr.media.paused = true;
             plyr.media.currentTime = 0;
-
-            _embedReady();
-            DZ.Event.subscribe('player_loaded', function() {
-                plyr.media.duration = Number(plyr.embed.getCurrentTrack().duration);
-                _displayDuration();
-            });
             
+            _embedReady();
+
             DZ.Event.subscribe('player_play', function() {
                 plyr.media.paused = false;
                 _triggerEvent(plyr.media, 'play');
