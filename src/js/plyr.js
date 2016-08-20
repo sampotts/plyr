@@ -1625,15 +1625,17 @@
                     // Load the API
                     _injectScript(config.urls.deezer.api);
 
-                    DZ.init({
-                        appId: 'APP_ID',
-                        channelUrl: window.location.href + 'channel.html',
-                        player: {
-                            onload : function(){
-                                _deezerReady(mediaId);
+                    window.dzAsyncInit = function() {
+                        DZ.init({
+                            appId: 'APP_ID',
+                            channelUrl: window.location.href + 'channel.html',
+                            player: {
+                                onload : function(){
+                                    _deezerReady(mediaId);
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
                 }
             }
         }
