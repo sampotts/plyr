@@ -39,9 +39,10 @@ header {
 
 // Sections
 section {
-    padding-bottom: @padding-base;
+    max-width: @example-width-video;
+    margin: 0 auto @padding-base;
 
     @media (min-width: @screen-sm) {
-        padding-bottom: (@padding-base * 2);
+        margin-bottom: (@padding-base * 2);
     }
 }

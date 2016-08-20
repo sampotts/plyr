@@ -8,7 +8,7 @@
 
 // General functions
 ;(function() {
-    document.body.addEventListener('ready', function(event) { console.log(event); });
+    //document.body.addEventListener('ready', function(event) { console.log(event); });
     
     // Setup the player
     var instances = plyr.setup({
@@ -25,7 +25,7 @@
     plyr.loadSprite('dist/demo.svg');
 
     // Plyr returns an array regardless
-    var player = instances[0].plyr;
+    var player = instances[0];
 
     // Setup type toggle
     var buttons = document.querySelectorAll('[data-source]'),

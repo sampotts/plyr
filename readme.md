@@ -542,11 +542,6 @@ Here's a list of the methods supported:
     <td>Destroys the plyr UI and any media event listeners, effectively restoring to the previous state before <code>setup()</code> was called.</td>
   </tr>
   <tr>
-    <td><code>restore()</code></td>
-    <td>&mdash;</td>
-    <td>Reverses the effects of the <code>destroy()</code> method, restoring the UI and listeners.</td>
-  </tr>
-  <tr>
     <td><code>getCurrentTime()</code></td>
     <td>&mdash;</td>
     <td>Will return a float with the current time in seconds.</td>
