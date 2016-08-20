@@ -3112,9 +3112,16 @@
         // Destroy an instance
         // Event listeners are removed when elements are removed
         // http://stackoverflow.com/questions/12528049/if-a-dom-element-is-removed-are-its-listeners-also-removed-from-memory
-        function _destroy() {
+        function _destroy(callback) {
+            var done = function() {
+                if (callback) {
+                  setTimeout(callback);
+                }
+            }
+
             // Bail if the element is not initialized
             if (!plyr.init) {
+                done();
                 return null;
             }
 
@@ -3130,6 +3137,15 @@
             // YouTube
             if (plyr.type === 'youtube') {
                 plyr.embed.destroy();
+                done();
+                return;
+            }
+
+            // Vimeo
+            if (plyr.type === 'vimeo') {
+                return plyr.embed.unload().then(function() {
+                    done();
+                });
                 return;
             }
 
@@ -3149,6 +3165,8 @@
             // http://stackoverflow.com/questions/19469881/javascript-remove-all-event-listeners-of-specific-type
             var clone = plyr.media.cloneNode(true);
             plyr.media.parentNode.replaceChild(clone, plyr.media);
+
+            done();
         }
 
         // Setup a player
