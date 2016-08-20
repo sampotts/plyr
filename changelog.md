@@ -1,5 +1,97 @@
 # Changelog
 
+## v1.8.12
+- Vimeo keyboard focus fix (Fixes #317)
+- Fix for Vimeo on basic support devices
+
+## v1.8.11
+- Fix for keyboard navigation on Vimeo (Fixes #317)
+- Fix for bug introduced in v1.8.9 related to additional controls 
+- Vimeo API upgrade
+- Fix for YouTube bug introduced in v1.8.9
+- Added support for passing array to .setup() (Fixes #319)
+
+## v1.8.10
+- Fix for seek issues introduced in v1.8.9
+
+## v1.8.9
+- Fix for fullscreen not being defined (Fixes #295)
+- Fix for multiline captions (Fixes #314)
+- Clean up of type checks and fix for `restart()` (Fixes #315)
+- Fix for `MEDIA_ERR_SRC_NOT_SUPPORTED` when calling `.source()` API method
+
+## v1.8.8
+- Added getCurrentTime API method (fixes #292)
+- Fix for !hideControls on touch devices (fixes #303)
+
+## v1.8.7
+- Line height fix
+
+## v1.8.6
+- Reverted font size change
+
+## v1.8.5
+- Fixed overflow issues (fixes #286)
+
+## v1.8.4
+- Fix for large play button on small videos
+
+## v1.8.3
+- Disabled iPad support for YouTube and Vimeo due to iOS limitations with iFrame playback
+- Fixed IE11 icon loading (fixes #269)
+- Updated screenshot (fixes #281)
+- Added WordPress plugin (fixes #239)
+- Added Neos plugin
+- Added HLS, Shaka and dash.js examples (see #235 for more)
+- Improvements for controls hiding and showing on touch devices
+
+## v1.8.2
+- Fixed event bubbling 
+
+## v1.8.1
+- Fixed inaccurate log message
+
+# v1.8.0
+- ***(Important)*** `setup()` now returns the element Plyr was setup on rather than the `plyr` object. This means `var player = plyr.setup()[0];` would now be `var player = plyr.setup()[0].plyr;`. This improves support for React and other virtual dom frameworks as mentioned in #254
+- Fixed using a relative URL for `iconUrl` in IE (fixes #269) 
+
+# v1.7.0
+- SASS cleanup (fixes #265)
+- Docs tidy up to help quick start (fixes #253)
+- Fix for issues with data attribute options passing (fixes #257)
+- ***(Important)*** Removed the requirement for a wrapper div to setup Plyr and removed the dependency on the `plyr` classname as a JS hook. By default it will now look for `<video>`, `<audio>` and `[data-type]` elements. If you are just calling `setup()` with a `<div class="plyr">` you may want to give it a good test after upgrading. You can probably remove the wrapper div. The reason behind this is to make setup easier for newcomers and prevent the styling being used on unsupported players (because the plyr classname was used as a CSS and JS hook - which isn't ideal) 
+- Renamed the 'docs' folder to `demo` to avoid confusion - the readme is the docs after all
+
+## v1.6.20
+- Fix for multiple sprites being requested (fixes #259)
+
+## v1.6.19
+- Fix for scroll direction issues on volume control (fixes #258)
+
+## v1.6.18
+- Reduced rounding of seek value from 1 decimal point to 4 (fixes #242)
+
+## v1.6.17
+- Added `disableContextMenu` option to hide the right click context menu (fixes #248 and #225)
+
+## v1.6.16
+- Always hide standard controls (fixes #225)
+- Fix for Tooltips overflowing (fixes #230)
+
+## v1.6.15
+- Restore scroll position when exiting full screen (fixes #236)
+
+## v1.6.14
+- SVG sprite loading automatically for an easier setup
+- Touch devices now show controls on touch rather than pausing playback
+
+## v1.6.13
+- Decreased sensitivity and inverted scroll on volume slider (scroll up to increase, down to decrease)
+
+## v1.6.12
+- Fix for undefined buffer error 
+- Add scroll listener on volume slider (PR #227 bty @igoradamenko)
+
 ## v1.6.11
 - Fix for Vimeo fullscreen (fixes #214)
 
@@ -71,18 +163,18 @@
 - Docs fixes inc controls HTML (fixes #180)
 
 ## v1.5.17
-- Expose YouTube and Vimeo API (docs update required) (Fixes #176)
+- Expose YouTube and Vimeo API (docs update required) (fixes #176)
 - Auto set title based on YouTube getVideoData() title property
 - Bug fix for Vimeo API change (Uncaught TypeError: Cannot read property 'value' of undefined) due to a change their end
 
 ## v1.5.16
-- Cancel requests on source change (Fixes #174)
+- Cancel requests on source change (fixes #174)
 
 ## v1.5.15
-- Fix for CustomEvent polyfill and related bug (See #172)
+- Fix for CustomEvent polyfill and related bug (see #172)
 
 ## v1.5.14
-- Volume storage fix (Fixes #171)
+- Volume storage fix (fixes #171)
 
 ## v1.5.13
 - Fix for manual caption rendering
@@ -185,11 +277,11 @@
 ## v1.2.3
 - Fix for YouTube on iPhone or unsupported browsers (fallback to YouTube native)
 - Docs tidy up
-- Fullscreen for Safari fix (Fixes #96)
+- Fullscreen for Safari fix (fixes #96)
 
 ## v1.2.2
-- Fix for :focus keyboard vs mouse (Fixes #61)
-- Fix for caption positioning in full screen (Fixes #92)
+- Fix for :focus keyboard vs mouse (fixes #61)
+- Fix for caption positioning in full screen (fixes #92)
 
 ## v1.2.1
 - Tooltip bug fix
@@ -216,7 +308,7 @@
 - Bug fix for 1.1.8
 
 ## v1.1.8
-- setVolume API method improvements (Fixes #83)
+- setVolume API method improvements (fixes #83)
 
 ## v1.1.7
 - Restore classname on destroy()
@@ -225,7 +317,7 @@
 - New API methods (fixes #77), Fix for non strict mode (fixes #78)
 
 ## v1.1.5
-- Fix for incorrect `isFullscreen()` return value in Mozilla (Fixes #38)
+- Fix for incorrect `isFullscreen()` return value in Mozilla (fixes #38)
 
 ## v1.1.4
 - Minor bug fixes
@@ -249,17 +341,17 @@
 - Display duration on `metadataloaded`
 
 ## v1.0.30
-- Fixed bug with media longer than 60 minutes (Fixes #69)
+- Fixed bug with media longer than 60 minutes (fixes #69)
 
 ## v1.0.29
-- Added option to hide controls on fullscreen (default `true`) while palying, after 1s. Pause, mouse hover on progress, or focus on a child control re-shows the controls. On touch a tap of the video (which plays/pauses the video by default) is required. (Fixes #47)
+- Added option to hide controls on fullscreen (default `true`) while palying, after 1s. Pause, mouse hover on progress, or focus on a child control re-shows the controls. On touch a tap of the video (which plays/pauses the video by default) is required. (fixes #47)
 - Fixed a bug with caption toggle in 1.0.28
 
 ## v1.0.28
 - Added API support for browsers that don't have full plyr support (pretty much <=IE9 and `<video>` on iPhone/iPod)
 
 ## v1.0.27
-- Keyboard accessibility improvements (Fixes #66)
+- Keyboard accessibility improvements (fixes #66)
 
 ## v1.0.26
 - Fixes for SASS (cheers @brunowego)
@@ -270,29 +362,29 @@
 - Classnames for left/right controls changed
 
 ## v1.0.24
-- Added tooltip option to display labels as tooltips (Fixes #50)
+- Added tooltip option to display labels as tooltips (fixes #50)
 
 ## v1.0.23
-- Handling loading states in the UI (Fixes #36)
+- Handling loading states in the UI (fixes #36)
 
 ## v1.0.22
 - Added support() API method for checking mimetype support
-- Added source() API method for setting media source(s) (Fixes #44)
+- Added source() API method for setting media source(s) (fixes #44)
 - Added poster() API method for setting poster source
 - Refactored captions logic for manual captions
 
 ## v1.0.21
-- Added an <input type="range"> for seeking to improve experience (and support dragging) (Fixes #40, #42)
-- Icons for restart and captions improved (and some IDs changed) (Fixes #49)
+- Added an <input type="range"> for seeking to improve experience (and support dragging) (fixes #40, #42)
+- Icons for restart and captions improved (and some IDs changed) (fixes #49)
 
 ## v1.0.20
 - Default controls included (Fixes #45)
-- Volume changes on `input` as well as `change` (Fixes #43)
+- Volume changes on `input` as well as `change` (fixes #43)
 - Fix for undefined Play text
 - License changed to MIT
 
 ## v1.0.19
-- Fixed firefox fullscreen issue (Fixes #38)
+- Fixed firefox fullscreen issue (fixes #38)
 
 ## v1.0.18
 - Added CDN references
@@ -316,7 +408,7 @@
 - Minor tweaks
 
 ## v1.0.12
-- Handle native events (Issue #34)
+- Handle native events (issue #34)
 
 ## v1.0.11
 - Bug fixes for fullscreen mode

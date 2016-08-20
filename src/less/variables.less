@@ -11,33 +11,35 @@
 // Colors
 @plyr-color-main:                       #3498db;
 
-// Font sizes
+// Font
+@plyr-font-family:                      'San Francisco', -apple-system, BlinkMacSystemFont, '.SFNSText-Regular', Avenir, 'Avenir Next', 'Helvetica Neue', 'Segoe UI', Helvetica, Arial, sans-serif;
 @plyr-font-size-small:                  14px;
 @plyr-font-size-base:                   16px;
 
 // Captions
-@plyr-captions-bg: 						fade(#000, 70%);
-@plyr-captions-color: 					#fff;
+@plyr-captions-bg:                      fade(#000, 70%);
+@plyr-captions-color:                   #fff;
 @plyr-font-size-captions-base:          @plyr-font-size-base;
 @plyr-font-size-captions-medium:        ceil(@plyr-font-size-base * 1.5);
 @plyr-font-size-captions-large:         (@plyr-font-size-base * 2);
 
 // Controls
+@plyr-control-icon-size:                18px;
 @plyr-control-spacing:                  10px;
+@plyr-control-padding:                  (@plyr-control-spacing * .7);
 @plyr-video-controls-bg:                #000;
 @plyr-video-control-color:              #fff;
 @plyr-video-control-color-hover:        #fff;
 @plyr-video-control-bg-hover:           @plyr-color-main;
 @plyr-audio-controls-bg:                #fff;
 @plyr-audio-controls-border:            1px solid #dbe3e8;
-@plyr-audio-controls-box-shadow:        0 1px 1px fade(#000, 5%);
 @plyr-audio-control-color:              #565D64;
 @plyr-audio-control-color-hover:        #fff;
 @plyr-audio-control-bg-hover:           @plyr-color-main;
 
 // Tooltips
 @plyr-tooltip-bg:                       fade(#000, 70%);
-@plyr-tooltip-color:                   	#fff;
+@plyr-tooltip-color:                    #fff;
 @plyr-tooltip-padding:                  (@plyr-control-spacing / 2);
 @plyr-tooltip-arrow-size:               4px;
 @plyr-tooltip-radius:                   3px;
@@ -62,7 +64,7 @@
 @plyr-range-thumb-active-scale:         1.25;
 @plyr-video-range-track-bg:             @plyr-video-progress-buffered-bg;
 @plyr-audio-range-track-bg:             @plyr-audio-progress-buffered-bg;
-@plyr-range-selected-bg: 				@plyr-color-main;
+@plyr-range-selected-bg:                @plyr-color-main;
 
 // Breakpoints
 @plyr-bp-screen-sm:                     480px;
