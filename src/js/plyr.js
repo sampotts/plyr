@@ -1966,7 +1966,6 @@
             plyr.embed = DZ.player;
             plyr.embed.playTracks([musicId], function(res) {
                 plyr.media.duration = res.tracks[0].duration;
-                config.title = res.tracks[0].title;
                 plyr.embed.setVolume(100);
                 _displayDuration();
                 config.autoplay && plyr.media.play();
