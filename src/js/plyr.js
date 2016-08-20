@@ -1965,7 +1965,7 @@
         function _deezerReady(musicId) {
             plyr.embed = DZ.player;
             plyr.embed.playTracks([musicId], function(tracks) {
-                plyr.media.duration = Number(res.tracks[0].duration);
+                plyr.media.duration = res.tracks[0].duration;
                 config.title = res.tracks[0].title;
                 plyr.embed.setVolume(100);
                 _displayDuration();
@@ -2118,7 +2118,7 @@
                         plyr.embed.seekTo(targetTime * 1000);
                         break;
                     case 'deezer':
-                        plyr.embed.seek(targetTime);
+                        plyr.embed.seek((targetTime / duration) * 100);
                         break;
                 }
 
