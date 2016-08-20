@@ -1611,9 +1611,6 @@
 
         // When embeds are ready
         function _embedReady() {
-            // Store reference to API
-            plyr.container.plyr.embed = plyr.embed;
-
             // Setup the UI if full support
             if (plyr.supported.full) {
                 _setupInterface();
@@ -2805,9 +2802,6 @@
             // Set aria title and iframe title
             config.title = source.title;
             _setTitle();
-
-            // Reset media objects
-            plyr.container.plyr.media = plyr.media;
         }
 
         // Update poster
