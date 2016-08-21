@@ -20,12 +20,12 @@ And some other changes and bug fixes:
 	- `on()` to provide an easy way to listen to events
 	- `stop()` to, you guessed it, stop the player
 - `destroy()` now works correctly for YouTube and Vimeo (fixes #272)
-- New `destroyed` event when original element is restored (original element passed as event target)
+- New `destroyed` event when `destroy()` has completed (original element is passed as event.target)
 - Default volume is now 10 (max) rather than 5
 - Sprite is only loaded once (fixes #259)
 - Fixes for Vimeo post message bugs on source change or destroy (fixes #318)
 - Save caption state in storage (fixes #311)
-- Added keyboard shortcuts to the current focused player (with option to disable) (fixes #309)
+- Added keyboard shortcuts to the current focused player (with `keyboardShortcuts` boolean option to disable) (fixes #309)
 - Fix for captions bug (fixes #332)
 - Change to AMD (fixes #298)
 

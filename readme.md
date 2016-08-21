@@ -13,16 +13,16 @@ We wanted a lightweight, accessible and customizable media player that supports 
 - **Lightweight** - under 10KB minified and gzipped
 - **[Customisable](#html)** - make the player look how you want with the markup you want
 - **Semantic** - uses the *right* elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no `<span>` or `<a href="#">` button hacks
-- **Responsive** - as you'd expect these days
+- **Responsive** - works with any screen size
 - **HTML Video & Audio** - support for both formats
 - **[Embedded Video](#embeds)** - support for YouTube and Vimeo video playback
+- **[Streaming](#streaming)** - support for hls.js, Shaka and dash.js streaming playback
 - **[API](#api)** - toggle playback, volume, seeking, and more
-- **[Universal events](#events)** - no messing around with Vimeo and YouTube APIs, all events are universal across formats
+- **[Events](#events)** - no messing around with Vimeo and YouTube APIs, all events are standardized across formats
 - **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes
 - **i18n support** - support for internationalization of controls
 - **No dependencies** - written in "vanilla" JavaScript, no jQuery required
-- **SASS and LESS source** - to include in your build process
-- **[Streaming](#streaming)** - support for hls.js, Shaka and dash.js streaming playback
+- **SASS and LESS** - to include in your build processes
 
 Oh and yes, it works with Bootstrap.
 
@@ -78,7 +78,7 @@ More info is on [npm](https://www.npmjs.com/package/ember-cli-plyr) and [GitHub]
 Here's a quick run through on getting up and running.
 
 ### HTML
-Plyr extends upon the standard HTML5 markup so that's all you need for those types.
+Plyr extends upon the standard HTML5 markup so that's all you need for those types. More info on advanced HTML markup can be found under [initialising](#initialising).
 
 #### HTML5 Video
 ```html
@@ -172,7 +172,7 @@ WebVTT captions are supported. To add a caption track, check the HTML example ab
 
 #### Initialising
 
-By default, Plyr looks for all `<video>`, `<audio>` and `[data-type]` elements with the document and initialises on any found. You can specify other options, including a different NodeList, HTMLElement, Array of HTMLElements or string selector as below:
+By default, `setup()` will find all `<video>`, `<audio>` and `[data-type]` elements with the document and initialises on any found. Each target media element found will be wrapped in a `<div>` for styling and setup individually. You can specify a variety of arguments to `setup()` to use, including a different NodeList, HTMLElement, Array of HTMLElements or string selector as below:
 
 Passing a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList):
 ```javascript
@@ -197,14 +197,14 @@ Passing a [string selector](https://developer.mozilla.org/en-US/docs/Web/API/Doc
 plyr.setup('.js-player', options);
 ```
 
-The NodeList, HTMLElement or string selector can be the target `<video>`, `<audio>` or `[data-type]` (for embeds) element or a container element. If a container has several media elements inside, each media element will be wrapped in a `<div>` and setup individually.
+The NodeList, HTMLElement or string selector can be the target `<video>`, `<audio>` or `[data-type]` (for embeds) element itself or a container element. 
 
 Passing just the options object:
 ```javascript
 plyr.setup(options);
 ```
 
-`setup()` will return an array of instances that can be used with the [#API](API) methods. See the [#API](API) section for more.
+`setup()` will return an array of *instances* that can be used with the [API](#api) methods. See the [API](#api) section for more info.
 
 #### RangeTouch
 Some touch browsers (particularly Mobile Safari on iOS) seem to have issues with `<input type="range">` elements whereby touching the track to set the value doesn't work and sliding the thumb can be tricky. To combat this, I've created [RangeTouch](https://rangetouch.com) which I'd recommend including in your solution. It's a tiny script with a nice benefit for users on touch devices. 
@@ -476,7 +476,7 @@ Here's a list of the methods supported:
   <tr>
     <td><code>getEmbed()</code></td>
     <td>&mdash;</td>
-    <td>Get the embed API to access those methods - either YouTube or Vimeo.</td>
+    <td>Get the [embed](#embed) API to access those methods - either YouTube or Vimeo.</td>
   </tr>
   <tr>
     <td><code>getType()</code></td>
@@ -486,12 +486,12 @@ Here's a list of the methods supported:
   <tr>
     <td><code>isReady()</code></td>
     <td>&mdash;</td>
-    <td>Determine if the player is ready to accept API calls - this is because HTML5 is ready instantly but YouTube and Vimeo can take some time to load their APIs.</td>
+    <td>Determine if the player is loaded and UI ready - this is because HTML5 is ready instantly but YouTube and Vimeo can take some time to load their APIs.</td>
   </tr>
   <tr>
     <td><code>on()</code></td>
     <td>String, Function</td>
-    <td>Watch for an event (first argument) and run a callback function (second argument). This saves you doing your own <code>addEventListner</code>s.</td>
+    <td>Watch for an event (first argument) and run a callback function (second argument). This saves you doing your own <code>addEventListner</code> code.</td>
   </tr>
   <tr>
     <td><code>play()</code></td>
@@ -587,7 +587,7 @@ Here's a list of the methods supported:
   <tr>
     <td><code>destroy()</code></td>
     <td>&mdash;</td>
-    <td>Destroys the plyr UI and any media event listeners, effectively restoring to the previous state before <code>setup()</code> was called.</td>
+    <td>Restores the original element, reversing the effects of <code>setup()</code>.</td>
   </tr>
   <tr>
     <td><code>getCurrentTime()</code></td>
@@ -687,7 +687,7 @@ Some more details on the object parameters
     <tr>
       <td><code>title</code></td>
       <td>String</td>
-      <td>Title of the new media. Used for the aria labelling.</td>
+      <td>Title of the new media. Used for the `aria-label` attribute on the play button, and outer container.</td>
     </tr>
     <tr>
       <td><code>sources</code></td>
@@ -850,7 +850,7 @@ These events also bubble up the DOM. The event target will be the container elem
     <tr>
       <td><code>destroyed</code></td>
       <td></td>
-      <td>When an instance is destroyed. The original element that replaced the container will be the event target.</td>
+      <td>When an instance is destroyed. The original element that replaced the container will be returned to your handler as the event target.</td>
     </tr>
 	</tbody>
 </table>

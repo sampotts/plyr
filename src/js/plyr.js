@@ -616,7 +616,7 @@
                 element: null,
                 prefix: ''
             },
-            browserPrefixes = 'webkit moz o ms khtml'.split(' ');
+            browserPrefixes = 'webkit o ms khtml'.split(' ');
 
         // Check for native support
         if (!_is.undefined(document.cancelFullScreen)) {
@@ -653,8 +653,6 @@
                 switch (this.prefix) {
                     case '':
                         return document.fullscreenElement === element;
-                    case 'moz':
-                        return document.mozFullScreenElement === element;
                     default:
                         return document[this.prefix + 'FullscreenElement'] === element;
                 }
@@ -1657,7 +1655,7 @@
                 },
                 events: {
                     'onError': function(event) {
-                        _triggerEvent(container, 'error', true, {
+                        _triggerEvent(plyr.container, 'error', true, {
                             code:   event.data,
                             embed:  event.target
                         });
@@ -1681,7 +1679,7 @@
                         };
                         plyr.media.duration = instance.getDuration();
                         plyr.media.paused = true;
-                        plyr.media.currentTime = instance.getCurrentTime();
+                        plyr.media.currentTime = 0;
                         plyr.media.muted = instance.isMuted();
 
                         // Set title
@@ -1697,6 +1695,9 @@
 
                         // Trigger timeupdate
                         _triggerEvent(plyr.media, 'timeupdate');
+
+                        // Trigger timeupdate
+                        _triggerEvent(plyr.media, 'durationchange');
 
                         // Reset timer
                         window.clearInterval(timers.buffering);
@@ -1722,9 +1723,6 @@
                                 _triggerEvent(plyr.media, 'canplaythrough');
                             }
                         }, 200);
-
-                        // Display duration if available
-                        _displayDuration();
                     },
                     'onStateChange': function(event) {
                         // Get the instance
@@ -1769,7 +1767,7 @@
                                 break;
                         }
 
-                        _triggerEvent(container, 'statechange', false, {
+                        _triggerEvent(plyr.container, 'statechange', false, {
                             code: event.data
                         });
                     }
@@ -1819,9 +1817,9 @@
 
             plyr.embed.getDuration().then(function(value) {
                 plyr.media.duration = value;
-
-                // Display duration if available
-                _displayDuration();
+                
+                // Trigger timeupdate
+                _triggerEvent(plyr.media, 'durationchange');
             });
 
             // TODO: Captions
@@ -1895,20 +1893,18 @@
                 plyr.media.paused = true;
                 plyr.media.currentTime = 0;
 
-                // Update UI
-                _embedReady();
+                plyr.embed.getDuration(function(value) {
+                    plyr.media.duration = value/1000;
+
+                    // Update UI
+                    _embedReady();
+                });
 
                 plyr.embed.getPosition(function(value) {
                     plyr.media.currentTime = value;
 
                     // Trigger timeupdate
                     _triggerEvent(plyr.media, 'timeupdate');
-                });
-
-                plyr.embed.getDuration(function(value) {
-                    plyr.media.duration = value/1000;
-                    // Display duration if available
-                    _displayDuration();
                 });
 
                 plyr.embed.bind(window.SC.Widget.Events.PLAY, function() {
@@ -1942,11 +1938,6 @@
                     plyr.media.paused = true;
                     _triggerEvent(plyr.media, 'ended');
                 });
-
-                // Autoplay
-                if (config.autoplay) {
-                    plyr.embed.play();
-                }
             });
         }
 
@@ -2093,6 +2084,7 @@
         // Check playing state
         function _checkPlaying() {
             _toggleClass(plyr.container, config.classes.playing, !plyr.media.paused);
+
             _toggleClass(plyr.container, config.classes.stopped, plyr.media.paused);
 
             _toggleControls(plyr.media.paused);
@@ -2115,7 +2107,6 @@
         function _toggleFullscreen(event) {
             // Check for native support
             var nativeSupport = fullscreen.supportsFullScreen;
-
             
             if (nativeSupport) {
                 // If it's a fullscreen change event, update the UI
@@ -2138,7 +2129,7 @@
                     }
 
                     // Check if we're actually full screen (it could fail)
-                    // plyr.isFullscreen = fullscreen.isFullScreen(plyr.container);
+                    plyr.isFullscreen = fullscreen.isFullScreen(plyr.container);
 
                     return;
                 }
@@ -2349,7 +2340,11 @@
 
             // Timer to prevent flicker when seeking
             timers.loading = setTimeout(function() {
+                // Toggle container class hook
                 _toggleClass(plyr.container, config.classes.loading, loading);
+
+                // Show controls if loading, hide if done
+                _toggleControls(loading);
             }, (loading ? 250 : 0));
         }
 
@@ -2578,14 +2573,15 @@
 
         // Show the player controls in fullscreen mode
         function _toggleControls(toggle) {
-            // Don't hide if config says not to, it's audio, or not loaded/ready
-            if (!config.hideControls || plyr.type === 'audio' || !_hasClass(plyr.container, config.classes.ready)) {
+            // Don't hide if config says not to, it's audio, or not ready or loading
+            if (!config.hideControls || plyr.type === 'audio') {
                 return;
             }
 
             var delay = 0,
                 isEnterFullscreen = false,
-                show = toggle;
+                show = toggle,
+                loading = _hasClass(plyr.container, config.classes.loading);
 
             // Default to false if no boolean
             if (!_is.boolean(toggle)) {
@@ -2615,11 +2611,11 @@
             window.clearTimeout(timers.hover);
 
             // If the mouse is not over the controls, set a timeout to hide them
-            if (show || plyr.media.paused) {
+            if (show || plyr.media.paused || loading) {
                 _toggleClass(plyr.container, config.classes.hideControls, false);
 
                 // Always show controls when paused or if touch
-                if (plyr.media.paused) {
+                if (plyr.media.paused || loading) {
                     return;
                 }
 
@@ -2686,6 +2682,9 @@
                 return;
             }
 
+            // Remove ready class hook
+            _toggleClass(plyr.container, config.classes.ready, false);
+
             // Pause playback
             _pause();
 
@@ -2698,21 +2697,18 @@
             // Cancel current network requests
             _cancelRequests();
 
-            // Remove ready class hook
-            _toggleClass(plyr.container, config.classes.ready, false);
-
             // Setup new source
             function setup() {
                 // Remove embed object
                 plyr.embed = null;
 
+                // Remove the old media
+                _remove(plyr.media);
+
                 // Remove video container
                 if (plyr.type === 'video' && plyr.videoContainer) {
                     _remove(plyr.videoContainer);
                 }
-
-                // Remove the old media
-                _remove(plyr.media);
 
                 // Reset class name 
                 if (plyr.container) {
@@ -2800,19 +2796,14 @@
 
                     // Load HTML5 sources
                     plyr.media.load();
+                }
 
+                // If HTML5 or embed but not fully supported, setupInterface and call ready now
+                if (_inArray(config.types.html5, plyr.type) || (_inArray(config.types.embed, plyr.type) && !plyr.supported.full)) {
                     // Setup interface
                     _setupInterface();
 
-                    // Display duration if available
-                    _displayDuration();
-
                     // Call ready
-                    _ready();
-                }
-                // If embed but not fully supported, setupInterface and call ready now
-                else if (_inArray(config.types.embed, plyr.type) && !plyr.supported.full) {
-                    _setupInterface();
                     _ready();
                 }
 
@@ -2906,13 +2897,11 @@
 
             // Keyboard shortcuts
             if (config.keyboardShorcuts) {
-                //var held = false;
+                var first = true;
 
-                _on(plyr.container, 'keyup keydown', function(event) {
+                _on(plyr.container, 'keydown keyup', function(event) {
                     var code = getKeyCode(event),
-                        down = event.type === 'keydown',
-                        first = true,
-                        timer;
+                        pressed = event.type === 'keydown';
 
                     // Seek by the number keys
                     function seekByKey() {
@@ -2928,9 +2917,9 @@
                         _seek((duration / 10) * (code - 48));
                     }
 
-                    function handleKey() {
-                        console.log(code);
-
+                    // Handle the key on keydown
+                    // Reset on keyup
+                    if (pressed) {
                         switch(code) {
                             // 0-9
                             case 48: 
@@ -2945,7 +2934,7 @@
                             case 57: if (first) { seekByKey() } break;
                             // Space and K key
                             case 32: 
-                            case 75: if (first) { _togglePlay() } break;
+                            case 75: if (first) { _togglePlay(); } break;
                             // Arrow up
                             case 38: _increaseVolume(); break;
                             // Arrow down
@@ -2971,16 +2960,8 @@
                         // First run completed
                         first = false;
                     }
-
-                    if (down) {
-                        handleKey();
-
-                        // If a key is held for 200ms, run again
-                        // Handy for volume and skip 
-                        timer = setTimeout(handleKey, 200); 
-                    }
                     else {
-                        clearTimeout(timer);
+                        first = true;
                     }
                 });
             }
@@ -3108,22 +3089,16 @@
 
             // Handle the media finishing
             _on(plyr.media, 'ended', function() {
-                // Clear
-                if (plyr.type === 'video') {
-                    _setCaption();
-                }
-
-                // Reset UI
-                _checkPlaying();
-
-                // Seek to 0
-                _seek(0);
-
-                // Reset duration display
-                _displayDuration();
-
                 // Show poster on end
                 if(plyr.type === 'video' && config.showPosterOnEnd) {
+                    // Clear
+                    if (plyr.type === 'video') {
+                        _setCaption();
+                    }
+                    
+                    // Restart
+                    _seek();
+
                     // Re-load media
                     plyr.media.load();
                 }
@@ -3136,7 +3111,7 @@
             _on(plyr.media, 'volumechange', _updateVolume);
 
             // Handle native play/pause
-            _on(plyr.media, 'play pause', _checkPlaying);
+            _on(plyr.media, 'play pause ended', _checkPlaying);
 
             // Loading
             _on(plyr.media, 'waiting canplay seeked', _checkLoading);
@@ -3180,7 +3155,7 @@
             }
 
             // Proxy events to container
-            _on(plyr.media, config.events.join(' '), function(event) {
+            _on(plyr.media, config.events.concat(['keyup', 'keydown']).join(' '), function(event) {
                 _triggerEvent(plyr.container, event.type, true);
             });
         }
@@ -3209,7 +3184,7 @@
             plyr.media.load();
 
             // Debugging
-            _log('Cancelled network requests for old media');
+            _log('Cancelled network requests');
         }
 
         // Destroy an instance
@@ -3347,25 +3322,16 @@
             _setupMedia();
 
             // Setup interface
-            if (_inArray(config.types.html5, plyr.type)) {
+            // If embed but not fully supported, setupInterface (to avoid flash of controls) and call ready now
+            if (_inArray(config.types.html5, plyr.type) || (_inArray(config.types.embed, plyr.type) && !plyr.supported.full)) {
                 // Setup UI
                 _setupInterface();
 
-                // Set title on button and frame
-                _setTitle();
-
-                // Autoplay
-                if (config.autoplay) {
-                    _play();
-                }
-
                 // Call ready
                 _ready();
-            }
-            // If embed but not fully supported, setupInterface (to avoid flash of controls) and call ready now
-            else if (_inArray(config.types.embed, plyr.type) && !plyr.supported.full) {
-                _setupInterface();
-                _ready();
+
+                // Set title on button and frame
+                _setTitle();
             }
 
             // Successful setup
@@ -3429,9 +3395,6 @@
 
             // Update the UI
             _checkPlaying();
-
-            // Display duration
-            _displayDuration();
         }
 
         api = {
@@ -3441,6 +3404,7 @@
             getMedia:           function() { return plyr.media; },
             getType:            function() { return plyr.type; },
             isReady:            function() { return _hasClass(plyr.container, config.classes.ready); },
+            isLoading:          function() { return _hasClass(plyr.container, config.classes.loading); },
             on:                 function(event, callback) { _on(plyr.container, event, callback); },
             play:               _play,
             pause:              _pause,
@@ -3476,6 +3440,11 @@
 
             // Store a refernce to instance
             plyr.media.plyr = api;
+
+            // Autoplay
+            if (config.autoplay) {
+                _play();
+            }
         }
 
         // Initialize instance
@@ -3670,7 +3639,7 @@
             if (config.debug) {
                 var events = config.events.concat(['setup', 'ready', 'statechange', 'enterfullscreen', 'exitfullscreen', 'captionsenabled', 'captionsdisabled']);
                 
-                _on(instance.getContainer(), events.join(' '), function() { 
+                _on(instance.getContainer(), events.join(' '), function(event) { 
                     console.log([config.logPrefix, 'event:', event.type].join(' '), event.detail.plyr);
                 });
             }
@@ -3704,7 +3673,9 @@
                 instances = [];
 
             Array.prototype.slice.call(elements).forEach(function(element) {
-                instances.push(element.plyr);
+                if (_is.object(element.plyr)) {
+                    instances.push(element.plyr);
+                }
             });
 
             return instances; 
