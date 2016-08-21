@@ -893,7 +893,7 @@ By default, a focused player will bind the following keyboard shortcuts:
     </tr>
     <tr>
       <td><code>&larr;</code></td>
-      <td>Seek backwards by the <code>seekTime</code> option</td>
+      <td>Seek backward by the <code>seekTime</code> option</td>
     </tr>
     <tr>
       <td><code>&rarr;</code></td>
@@ -995,6 +995,11 @@ Plyr is developed by [@sam_potts](https://twitter.com/sam_potts) / [sampotts.me]
 
 ## Used by
 - [Selz.com](https://selz.com)
+- [Peugeot.fr](http://www.peugeot.fr/marque-et-technologie/technologies/peugeot-i-cockpit.html)
+- [Peugeot.dr](http://www.peugeot.de/modelle/modellberater/208-3-turer/fotos-videos.html)
+- [TomTom.com](http://prioritydriving.tomtom.com/)
+- [DIGBMX](http://digbmx.com/)
+- [Grime Archive](https://grimearchive.com/)
 - [koel - A personal music streaming server that works.](http://koel.phanan.net/)
 - [Oscar Radio](http://oscar-radio.xyz/)
 
