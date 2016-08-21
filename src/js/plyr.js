@@ -2903,6 +2903,12 @@
                     var code = getKeyCode(event),
                         pressed = event.type === 'keydown';
 
+                    // If the event is bubbled from the media element
+                    // Firefox doesn't get the keycode for whatever reason
+                    if (!_is.number(code)) {
+                        return;
+                    }
+
                     // Seek by the number keys
                     function seekByKey() {
                         // Get current duration
@@ -2920,6 +2926,14 @@
                     // Handle the key on keydown
                     // Reset on keyup
                     if (pressed) {
+                        // Which keycodes should we prevent default
+                        var preventDefault = [48,49,50,51,52,53,54,56,57,32,75,38,40,77,39,37,70,67];
+
+                        // If the code is found prevent default (e.g. prevent scrolling for arrows)
+                        if (_inArray(preventDefault, code)) {
+                            event.preventDefault();
+                        }
+
                         switch(code) {
                             // 0-9
                             case 48: 
@@ -3155,6 +3169,7 @@
             }
 
             // Proxy events to container
+            // Bubble up key events for Edge
             _on(plyr.media, config.events.concat(['keyup', 'keydown']).join(' '), function(event) {
                 _triggerEvent(plyr.container, event.type, true);
             });

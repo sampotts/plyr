@@ -6,6 +6,7 @@ This version contains several ***breaking changes***:
 - `setup()` has been reverted to pre v1.8.0 behaviour; meaning it will return the *instance* rather than the *element*. This is because the reference to the instance is no longer added to the original element (see below).
 - The reference to the `plyr` instance is now added to the media element rather than original container. This is because if a container with multiple children was passed to `setup()` the references to all instances would have been added to the container, creating issues. I would recommend using the return value from `setup()` or the new `get()` method to access the instance.
 - Players will always be wrapped in their own div now - this makes `setup()` and `destroy()` cleaner. This *may* break any custom styling based on DOM position. 
+- Players no longer seek to 0 on 'ended' - this is to fix a bug with Microsoft Edge as it triggers 'ended' on media change for whatever reason. They'll never change ;-) 
 
 And some other changes and bug fixes:
 
