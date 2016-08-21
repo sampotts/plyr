@@ -76,7 +76,7 @@ ember addon:install ember-cli-plyr
 More info is on [npm](https://www.npmjs.com/package/ember-cli-plyr) and [GitHub](https://github.com/louisrudner/ember-cli-plyr)
 
 ## Quick setup
-Here's a quick run through on getting up and running.
+Here's a quick run through on getting up and running. There's also a [demo on Codepen](http://codepen.io/sampotts/pen/jARJYp).
 
 ### HTML
 Plyr extends upon the standard HTML5 markup so that's all you need for those types. More info on advanced HTML markup can be found under [initialising](#initialising).
