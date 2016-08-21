@@ -20,6 +20,7 @@ We wanted a lightweight, accessible and customizable media player that supports 
 - **[API](#api)** - toggle playback, volume, seeking, and more
 - **[Events](#events)** - no messing around with Vimeo and YouTube APIs, all events are standardized across formats
 - **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes
+- **[Shortcuts](#shortcuts)** - supports keyboard shortcuts
 - **i18n support** - support for internationalization of controls
 - **No dependencies** - written in "vanilla" JavaScript, no jQuery required
 - **SASS and LESS** - to include in your build processes
@@ -889,6 +890,10 @@ By default, a focused player will bind the following keyboard shortcuts:
     <tr>
       <td><code>space</code> or <code>K</code></td>
       <td>Toggle playback</td>
+    </tr>
+    <tr>
+      <td><code>&larr;</code></td>
+      <td>Seek backwards by the <code>seekTime</code> option</td>
     </tr>
     <tr>
       <td><code>&rarr;</code></td>
