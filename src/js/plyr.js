@@ -489,9 +489,9 @@
     }*/
 
     // Trigger event
-    function _triggerEvent(element, eventName, bubbles, properties) {
+    function _event(element, type, bubbles, properties) {
         // Bail if no element
-        if (!element || !eventName) {
+        if (!element || !type) {
             return;
         }
 
@@ -501,7 +501,7 @@
         }
 
         // Create and dispatch the event
-        var event = new CustomEvent(eventName, { 
+        var event = new CustomEvent(type, { 
             bubbles:    bubbles,
             detail:     properties 
         });
@@ -709,11 +709,19 @@
     // Player instance
     function Plyr(media, config) {
         var plyr = this,
-        timers = {};
+        timers = {},
+        api;
 
         // Set media 
         plyr.media = media;
         var original = media.cloneNode(true);
+
+        // Trigger events, with plyr instance passed
+        function _triggerEvent(element, type, bubbles, properties) {
+            _event(element, type, bubbles, _extend({}, properties, {
+                plyr: api
+            }));
+        }
 
         // Debugging
         function _console(type, args) {
@@ -2906,25 +2914,52 @@
                         first = true,
                         timer;
 
+                    // Seek by the number keys
+                    function seekByKey() {
+                        // Get current duration
+                        var duration = plyr.media.duration;
+
+                        // Bail if we have no duration set
+                        if (!_is.number(duration)) {
+                            return;
+                        }
+
+                        // Divide the max duration into 10th's and times by the number value 
+                        _seek((duration / 10) * (code - 48));
+                    }
+
                     function handleKey() {
+                        console.log(code);
+
                         switch(code) {
+                            // 0-9
+                            case 48: 
+                            case 49: 
+                            case 50: 
+                            case 51: 
+                            case 52: 
+                            case 53: 
+                            case 54: 
+                            case 55: 
+                            case 56:
+                            case 57: if (first) { seekByKey() } break;
                             // Space and K key
                             case 32: 
-                            case 75: if (first) { _togglePlay(); } break;
+                            case 75: if (first) { _togglePlay() } break;
                             // Arrow up
                             case 38: _increaseVolume(); break;
                             // Arrow down
                             case 40: _decreaseVolume(); break;
                             // M key
-                            case 77: if (first) { _toggleMute(); } break;
+                            case 77: if (first) { _toggleMute() } break;
                             // Arrow forward
                             case 39: _forward(); break;
                             // Arrow back
                             case 37: _rewind(); break;
                             // F key
-                            case 70: if (first) { _toggleFullscreen(); } break;
+                            case 70: if (first) { _toggleFullscreen() } break;
                             // C key
-                            case 67: if (first) { _toggleCaptions(); } break;
+                            case 67: if (first) { _toggleCaptions() } break;
                         }
 
                         // Escape is handle natively when in full screen 
@@ -3399,7 +3434,7 @@
             _displayDuration();
         }
 
-        var api = {
+        api = {
             getOriginal:        function() { return original; },
             getContainer:       function() { return plyr.container },
             getEmbed:           function() { return plyr.embed; },
@@ -3636,12 +3671,12 @@
                 var events = config.events.concat(['setup', 'ready', 'statechange', 'enterfullscreen', 'exitfullscreen', 'captionsenabled', 'captionsdisabled']);
                 
                 _on(instance.getContainer(), events.join(' '), function() { 
-                    console.log([config.logPrefix, 'event:', event.type].join(' '));
+                    console.log([config.logPrefix, 'event:', event.type].join(' '), event.detail.plyr);
                 });
             }
 
             // Callback
-            _triggerEvent(instance.getContainer(), 'setup', true, { 
+            _event(instance.getContainer(), 'setup', true, { 
                 plyr: instance 
             });
 
