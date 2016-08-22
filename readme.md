@@ -20,6 +20,7 @@ We wanted a lightweight, accessible and customizable media player that supports 
 - **[API](#api)** - toggle playback, volume, seeking, and more
 - **[Events](#events)** - no messing around with Vimeo and YouTube APIs, all events are standardized across formats
 - **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes
+- **[Shortcuts](#shortcuts)** - supports keyboard shortcuts
 - **i18n support** - support for internationalization of controls
 - **No dependencies** - written in "vanilla" JavaScript, no jQuery required
 - **SASS and LESS** - to include in your build processes
@@ -75,7 +76,7 @@ ember addon:install ember-cli-plyr
 More info is on [npm](https://www.npmjs.com/package/ember-cli-plyr) and [GitHub](https://github.com/louisrudner/ember-cli-plyr)
 
 ## Quick setup
-Here's a quick run through on getting up and running.
+Here's a quick run through on getting up and running. There's also a [demo on Codepen](http://codepen.io/sampotts/pen/jARJYp).
 
 ### HTML
 Plyr extends upon the standard HTML5 markup so that's all you need for those types. More info on advanced HTML markup can be found under [initialising](#initialising).
@@ -891,6 +892,10 @@ By default, a focused player will bind the following keyboard shortcuts:
       <td>Toggle playback</td>
     </tr>
     <tr>
+      <td><code>&larr;</code></td>
+      <td>Seek backward by the <code>seekTime</code> option</td>
+    </tr>
+    <tr>
       <td><code>&rarr;</code></td>
       <td>Seek forward by the <code>seekTime</code> option</td>
     </tr>
@@ -925,7 +930,7 @@ Because Plyr is an extension of the standard HTML5 video and audio elements, thi
 - Using [dash.js](https://github.com/Dash-Industry-Forum/dash.js) - [Demo](http://codepen.io/sampotts/pen/BzpJXN)
 
 ## Fullscreen
-Fullscreen in Plyr is supported by all browsers that [currently support it](http://caniuse.com/#feat=fullscreen). If you're using the default CSS, you can also use a "full browser" mode which will use the full browser window by adding the `plyr-fullscreen` class to your container.
+Fullscreen in Plyr is supported by all browsers that [currently support it](http://caniuse.com/#feat=fullscreen). 
 
 ## Browser support
 
@@ -990,6 +995,11 @@ Plyr is developed by [@sam_potts](https://twitter.com/sam_potts) / [sampotts.me]
 
 ## Used by
 - [Selz.com](https://selz.com)
+- [Peugeot.fr](http://www.peugeot.fr/marque-et-technologie/technologies/peugeot-i-cockpit.html)
+- [Peugeot.de](http://www.peugeot.de/modelle/modellberater/208-3-turer/fotos-videos.html)
+- [TomTom.com](http://prioritydriving.tomtom.com/)
+- [DIGBMX](http://digbmx.com/)
+- [Grime Archive](https://grimearchive.com/)
 - [koel - A personal music streaming server that works.](http://koel.phanan.net/)
 - [Oscar Radio](http://oscar-radio.xyz/)
 
