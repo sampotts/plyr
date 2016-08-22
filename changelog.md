@@ -1,5 +1,8 @@
 # Changelog
 
+# v2.0.2
+- Added 'global' keyboard shortcut option
+
 # v2.0.1
 - Version bump for NPM
 

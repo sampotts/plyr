@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v2.0.1
+// plyr.js v2.0.2
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -43,12 +43,15 @@
         displayDuration:        true,
         loadSprite:             true,
         iconPrefix:             'plyr',
-        iconUrl:                'https://cdn.plyr.io/2.0.1/plyr.svg',
+        iconUrl:                'https://cdn.plyr.io/2.0.2/plyr.svg',
         clickToPlay:            true,
         hideControls:           true,
         showPosterOnEnd:        false,
         disableContextMenu:     true,
-        keyboardShorcuts:       true,
+        keyboardShorcuts:       {
+            focused:            true,
+            global:             true
+        },
         tooltips: {
             controls:           false,
             seek:               true
@@ -56,6 +59,7 @@
         selectors: {
             html5:              'video, audio',
             embed:              '[data-type]',
+            editable:           'input, select, [contenteditable]',
             container:          '.plyr',
             controls: {
                 container:      null,
@@ -2896,88 +2900,111 @@
             }
 
             // Keyboard shortcuts
-            if (config.keyboardShorcuts) {
-                var first = true;
+            if (config.keyboardShorcuts.focused) {
+                var last = null;
 
-                _on(plyr.container, 'keydown keyup', function(event) {
-                    var code = getKeyCode(event),
-                        pressed = event.type === 'keydown';
+                // Handle global presses
+                if (config.keyboardShorcuts.global) {
+                    _on(window, 'keydown keyup', function(event) {
+                        var code = getKeyCode(event),
+                        focused = getFocusElement(),
+                        allowed = [48,49,50,51,52,53,54,56,57,75,77,70,67],
+                        count   = get().length;
 
-                    // If the event is bubbled from the media element
-                    // Firefox doesn't get the keycode for whatever reason
-                    if (!_is.number(code)) {
+                        // Only handle global key press if there's only one player
+                        // and the key is in the allowed keys 
+                        // and if the focused element is not editable (e.g. text input)
+                        // and any that accept key input http://webaim.org/techniques/keyboard/
+                        if (count === 1 && _inArray(allowed, code) && (!_is.htmlElement(focused) || !_matches(focused, config.selectors.editable))) {
+                            handleKey(event);
+                        }
+                    });
+                }
+
+                // Handle presses on focused
+                _on(plyr.container, 'keydown keyup', handleKey);
+            }
+
+            function handleKey(event) {
+                var code = getKeyCode(event),
+                    pressed = event.type === 'keydown',
+                    held = pressed && code === last;
+
+                // If the event is bubbled from the media element
+                // Firefox doesn't get the keycode for whatever reason
+                if (!_is.number(code)) {
+                    return;
+                }
+
+                // Seek by the number keys
+                function seekByKey() {
+                    // Get current duration
+                    var duration = plyr.media.duration;
+
+                    // Bail if we have no duration set
+                    if (!_is.number(duration)) {
                         return;
                     }
 
-                    // Seek by the number keys
-                    function seekByKey() {
-                        // Get current duration
-                        var duration = plyr.media.duration;
+                    // Divide the max duration into 10th's and times by the number value 
+                    _seek((duration / 10) * (code - 48));
+                }
 
-                        // Bail if we have no duration set
-                        if (!_is.number(duration)) {
-                            return;
-                        }
+                // Handle the key on keydown
+                // Reset on keyup
+                if (pressed) {
+                    // Which keycodes should we prevent default
+                    var preventDefault = [48,49,50,51,52,53,54,56,57,32,75,38,40,77,39,37,70,67];
 
-                        // Divide the max duration into 10th's and times by the number value 
-                        _seek((duration / 10) * (code - 48));
+                    // If the code is found prevent default (e.g. prevent scrolling for arrows)
+                    if (_inArray(preventDefault, code)) {
+                        event.preventDefault();
+                        event.stopPropagation();
                     }
 
-                    // Handle the key on keydown
-                    // Reset on keyup
-                    if (pressed) {
-                        // Which keycodes should we prevent default
-                        var preventDefault = [48,49,50,51,52,53,54,56,57,32,75,38,40,77,39,37,70,67];
-
-                        // If the code is found prevent default (e.g. prevent scrolling for arrows)
-                        if (_inArray(preventDefault, code)) {
-                            event.preventDefault();
-                        }
-
-                        switch(code) {
-                            // 0-9
-                            case 48: 
-                            case 49: 
-                            case 50: 
-                            case 51: 
-                            case 52: 
-                            case 53: 
-                            case 54: 
-                            case 55: 
-                            case 56:
-                            case 57: if (first) { seekByKey() } break;
-                            // Space and K key
-                            case 32: 
-                            case 75: if (first) { _togglePlay(); } break;
-                            // Arrow up
-                            case 38: _increaseVolume(); break;
-                            // Arrow down
-                            case 40: _decreaseVolume(); break;
-                            // M key
-                            case 77: if (first) { _toggleMute() } break;
-                            // Arrow forward
-                            case 39: _forward(); break;
-                            // Arrow back
-                            case 37: _rewind(); break;
-                            // F key
-                            case 70: if (first) { _toggleFullscreen() } break;
-                            // C key
-                            case 67: if (first) { _toggleCaptions() } break;
-                        }
-
-                        // Escape is handle natively when in full screen 
-                        // So we only need to worry about non native
-                        if (!fullscreen.supportsFullScreen && plyr.isFullscreen && code === 27) {
-                            _toggleFullscreen();
-                        }
-
-                        // First run completed
-                        first = false;
+                    switch(code) {
+                        // 0-9
+                        case 48: 
+                        case 49: 
+                        case 50: 
+                        case 51: 
+                        case 52: 
+                        case 53: 
+                        case 54: 
+                        case 55: 
+                        case 56:
+                        case 57: if (!held) { seekByKey(); } break;
+                        // Space and K key
+                        case 32: 
+                        case 75: if (!held) { _togglePlay(); } break;
+                        // Arrow up
+                        case 38: _increaseVolume(); break;
+                        // Arrow down
+                        case 40: _decreaseVolume(); break;
+                        // M key
+                        case 77: if (!held) { _toggleMute() } break;
+                        // Arrow forward
+                        case 39: _forward(); break;
+                        // Arrow back
+                        case 37: _rewind(); break;
+                        // F key
+                        case 70: _toggleFullscreen(); break;
+                        // C key
+                        case 67: if (!held) { _toggleCaptions(); } break;
                     }
-                    else {
-                        first = true;
+
+                    // Escape is handle natively when in full screen 
+                    // So we only need to worry about non native
+                    if (!fullscreen.supportsFullScreen && plyr.isFullscreen && code === 27) {
+                        _toggleFullscreen();
                     }
-                });
+
+                    // Store last code for next cycle
+                    last = code;
+                }
+                else {
+                    last = null;
+                }
             }
 
             // Focus/tab management

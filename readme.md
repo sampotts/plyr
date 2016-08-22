@@ -122,7 +122,7 @@ Include the `plyr.js` script before the closing `</body>` tag and then call `ply
 If you want to use our CDN for the JavaScript, you can use the following:
 
 ```html
-<script src="https://cdn.plyr.io/2.0.1/plyr.js"></script>
+<script src="https://cdn.plyr.io/2.0.2/plyr.js"></script>
 ```
 
 ### CSS
@@ -135,11 +135,11 @@ Include the `plyr.css` stylsheet into your `<head>`
 If you want to use our CDN for the default CSS, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/2.0.1/plyr.css">
+<link rel="stylesheet" href="https://cdn.plyr.io/2.0.2/plyr.css">
 ```
 
 ### SVG Sprite
-The SVG sprite is loaded automatically from our CDN. To change this, see the [options](#Options) below. For reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/2.0.1/plyr.svg`.
+The SVG sprite is loaded automatically from our CDN. To change this, see the [options](#Options) below. For reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/2.0.2/plyr.svg`.
 
 ## Advanced
 
@@ -321,9 +321,9 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
     </tr>
     <tr>
       <td><code>keyboardShortcuts</code></td>
-      <td>Boolean</td>
-      <td><code>true</code></td>
-      <td>Enable <a href="#shortcuts">keyboard shortcuts</a></td>
+      <td>Object</td>
+      <td><code>{ focused: true, global: true }</code></td>
+      <td>Enable <a href="#shortcuts">keyboard shortcuts</a> for focused players only or global as well (if there's only one player in the document)</td>
     </tr>
     <tr>
       <td><code>tooltips</code></td>
@@ -873,50 +873,65 @@ More info on the respective API's here:
 *Please note*: not all API methods may work 100%. Your mileage may vary. It's better to use the universal plyr API where possible.
 
 ## Shortcuts
-By default, a focused player will bind the following keyboard shortcuts:
+By default, a player will bind the following keyboard shortcuts when it has focus. If you have the `global` option to `true` and there's only one player in the document then the shortcuts will work when any element has focus, apart from an element that requires input (such as an `<input>`, `<select>` or `[contenteditable]`). 
 
 <table class="table" width="100%">
   <thead>
     <tr>
       <th width="25%">Key</th>
-      <th width="75%">Action</th>
+      <th width="25%">Global</th>
+      <th width="50%">Action</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <td><code>0</code> to <code>9</code></td>
+      <td>✔</td>
       <td>Seek from 0 to 90% respectively</td>
     </tr> 
     <tr>
-      <td><code>space</code> or <code>K</code></td>
+      <td><code>space</code></td>
+      <td></td>
+      <td>Toggle playback</td>
+    </tr>
+    <tr>
+      <td><code>K</code></td>
+      <td>✔</td>
       <td>Toggle playback</td>
     </tr>
     <tr>
       <td><code>&larr;</code></td>
+      <td></td>
       <td>Seek backward by the <code>seekTime</code> option</td>
     </tr>
     <tr>
       <td><code>&rarr;</code></td>
+      <td></td>
       <td>Seek forward by the <code>seekTime</code> option</td>
     </tr>
     <tr>
       <td><code>&uarr;</code></td>
+      <td></td>
       <td>Increase volume</td>
     </tr>
     <tr>
       <td><code>&darr;</code></td>
+      <td></td>
       <td>Decrease volume</td>
     </tr>
     <tr>
       <td><code>M</code></td>
+      <td>✔</td>
       <td>Toggle mute</td>
     </tr>
     <tr>
       <td><code>F</code></td>
+      <td>✔</td>
       <td>Toggle fullscreen</td>
     </tr>
     <tr>
       <td><code>C</code></td>
+      <td>✔</td>
       <td>Toggle captions</td>
     </tr>
   </tbody>
