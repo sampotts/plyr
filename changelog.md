@@ -1,5 +1,8 @@
 # Changelog
 
+## v2.0.4
+- Fix for Firefox full screen (fixes #343)
+
 ## v2.0.3
 - Set 'global' keyboard shortcut option to false as default, added `<textarea>` to editable elements to be ignored.
 
