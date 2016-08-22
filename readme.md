@@ -122,7 +122,7 @@ Include the `plyr.js` script before the closing `</body>` tag and then call `ply
 If you want to use our CDN for the JavaScript, you can use the following:
 
 ```html
-<script src="https://cdn.plyr.io/2.0.2/plyr.js"></script>
+<script src="https://cdn.plyr.io/2.0.3/plyr.js"></script>
 ```
 
 ### CSS
@@ -135,11 +135,11 @@ Include the `plyr.css` stylsheet into your `<head>`
 If you want to use our CDN for the default CSS, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/2.0.2/plyr.css">
+<link rel="stylesheet" href="https://cdn.plyr.io/2.0.3/plyr.css">
 ```
 
 ### SVG Sprite
-The SVG sprite is loaded automatically from our CDN. To change this, see the [options](#Options) below. For reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/2.0.2/plyr.svg`.
+The SVG sprite is loaded automatically from our CDN. To change this, see the [options](#Options) below. For reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/2.0.3/plyr.svg`.
 
 ## Advanced
 
@@ -322,8 +322,8 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
     <tr>
       <td><code>keyboardShortcuts</code></td>
       <td>Object</td>
-      <td><code>{ focused: true, global: true }</code></td>
-      <td>Enable <a href="#shortcuts">keyboard shortcuts</a> for focused players only or global as well (if there's only one player in the document)</td>
+      <td><code>{ focused: true, global: false }</code></td>
+      <td>Enable <a href="#shortcuts">keyboard shortcuts</a> for focused players only or globally as well (this will only work if there's one player in the document)</td>
     </tr>
     <tr>
       <td><code>tooltips</code></td>
@@ -873,7 +873,7 @@ More info on the respective API's here:
 *Please note*: not all API methods may work 100%. Your mileage may vary. It's better to use the universal plyr API where possible.
 
 ## Shortcuts
-By default, a player will bind the following keyboard shortcuts when it has focus. If you have the `global` option to `true` and there's only one player in the document then the shortcuts will work when any element has focus, apart from an element that requires input (such as an `<input>`, `<select>` or `[contenteditable]`). 
+By default, a player will bind the following keyboard shortcuts when it has focus. If you have the `global` option to `true` and there's only one player in the document then the shortcuts will work when any element has focus, apart from an element that requires input. 
 
 <table class="table" width="100%">
   <thead>

@@ -1,5 +1,8 @@
 # Changelog
 
+# v2.0.3
+- Set 'global' keyboard shortcut option to false as default, added `<textarea>` to editable elements to be ignored.
+
 # v2.0.2
 - Added 'global' keyboard shortcut option
 
