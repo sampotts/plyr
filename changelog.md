@@ -1,5 +1,8 @@
 # Changelog
 
+# v2.0.1
+- Version bump for NPM
+
 # v2.0.0
 This version contains several potential ***breaking changes***:
 
