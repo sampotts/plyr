@@ -1,6 +1,6 @@
 # Changelog
 
-# v1.9.0
+# v2.0.0
 This version contains several potential ***breaking changes***:
 
 - `setup()` has been reverted to pre v1.8.0 behaviour; meaning it will return the *instance* rather than the *element*. This is because the reference to the instance is no longer added to the original element (see below).
