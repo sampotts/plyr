@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v2.0.5
+// plyr.js v2.0.6
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -16,7 +16,7 @@
         module.exports = factory(root, document);
     } else if (typeof define === 'function' && define.amd) {
         // AMD
-        define(null, function() { factory(root, document) });
+        define([], function () { return factory(root, document); });
     } else {
         // Browser globals (root is window)
         root.plyr = factory(root, document);
@@ -43,7 +43,7 @@
         displayDuration:        true,
         loadSprite:             true,
         iconPrefix:             'plyr',
-        iconUrl:                'https://cdn.plyr.io/2.0.5/plyr.svg',
+        iconUrl:                'https://cdn.plyr.io/2.0.6/plyr.svg',
         clickToPlay:            true,
         hideControls:           true,
         showPosterOnEnd:        false,
@@ -195,41 +195,36 @@
             isChrome = false,
             isSafari = false;
 
-        // MSIE 11
         if ((navigator.appVersion.indexOf('Windows NT') !== -1) && (navigator.appVersion.indexOf('rv:11') !== -1)) {
+            // MSIE 11
             isIE = true;
             name = 'IE';
             fullVersion = '11';
-        }
-        // MSIE
-        else if ((verOffset = ua.indexOf('MSIE')) !== -1) {
+        } else if ((verOffset = ua.indexOf('MSIE')) !== -1) {
+            // MSIE
             isIE = true;
             name = 'IE';
             fullVersion = ua.substring(verOffset + 5);
-        }
-        // Chrome
-        else if ((verOffset = ua.indexOf('Chrome')) !== -1) {
+        } else if ((verOffset = ua.indexOf('Chrome')) !== -1) {
+            // Chrome
             isChrome = true;
             name = 'Chrome';
             fullVersion = ua.substring(verOffset + 7);
-        }
-        // Safari
-        else if ((verOffset = ua.indexOf('Safari')) !== -1) {
+        } else if ((verOffset = ua.indexOf('Safari')) !== -1) {
+            // Safari
             isSafari = true;
             name = 'Safari';
             fullVersion = ua.substring(verOffset + 7);
             if ((verOffset = ua.indexOf('Version')) !== -1) {
                 fullVersion = ua.substring(verOffset + 8);
             }
-        }
-        // Firefox
-        else if ((verOffset = ua.indexOf('Firefox')) !== -1) {
+        } else if ((verOffset = ua.indexOf('Firefox')) !== -1) {
+            // Firefox
             isFirefox = true;
             name = 'Firefox';
             fullVersion = ua.substring(verOffset + 8);
-        }
-        // In most other browsers, 'name/version' is at the end of userAgent
-        else if ((nameOffset = ua.lastIndexOf(' ') + 1) < (verOffset = ua.lastIndexOf('/'))) {
+        } else if ((nameOffset = ua.lastIndexOf(' ') + 1) < (verOffset = ua.lastIndexOf('/'))) {
+            // In most other browsers, 'name/version' is at the end of userAgent
             name = ua.substring(nameOffset,verOffset);
             fullVersion = ua.substring(verOffset + 1);
 
@@ -272,7 +267,6 @@
     function _supportMime(plyr, mimeType) {
         var media = plyr.media;
 
-        // Only check video types for video players
         if (plyr.type === 'video') {
             // Check type
             switch (mimeType) {
@@ -280,10 +274,7 @@
                 case 'video/mp4':    return !!(media.canPlayType && media.canPlayType('video/mp4; codecs="avc1.42E01E, mp4a.40.2"').replace(/no/, ''));
                 case 'video/ogg':    return !!(media.canPlayType && media.canPlayType('video/ogg; codecs="theora"').replace(/no/, ''));
             }
-        }
-
-        // Only check audio types for audio players
-        else if (plyr.type === 'audio') {
+        } else if (plyr.type === 'audio') {
             // Check type
             switch (mimeType) {
                 case 'audio/mpeg':   return !!(media.canPlayType && media.canPlayType('audio/mpeg;').replace(/no/, ''));
@@ -344,8 +335,7 @@
             // append it to the parent.
             if (sibling) {
                 parent.insertBefore(child, sibling);
-            }
-            else {
+            } else {
                 parent.appendChild(child);
             }
 
@@ -410,8 +400,7 @@
         if (element) {
             if (element.classList) {
                 element.classList[state ? 'add' : 'remove'](className);
-            }
-            else {
+            } else {
                 var name = (' ' + element.className + ' ').replace(/\s+/g, ' ').replace(' ' + className + ' ', '');
                 element.className = name + (state ? ' ' + className : '');
             }
@@ -423,8 +412,7 @@
         if (element) {
             if (element.classList) {
                 return element.classList.contains(className);
-            }
-            else {
+            } else {
                 return new RegExp('(\\s|^)' + className + '(\\s|$)').test(element.className);
             }
         }
@@ -568,8 +556,7 @@
                 if (source[property] && source[property].constructor && source[property].constructor === Object) {
                     destination[property] = destination[property] || {};
                     _extend(destination[property], source[property]);
-                }
-                else {
+                } else {
                     destination[property] = source[property];
                 }
             }
@@ -625,8 +612,7 @@
         // Check for native support
         if (!_is.undefined(document.cancelFullScreen)) {
             fullscreen.supportsFullScreen = true;
-        }
-        else {
+        } else {
             // Check for fullscreen support by vendor prefix
             for (var i = 0, il = browserPrefixes.length; i < il; i++ ) {
                 fullscreen.prefix = browserPrefixes[i];
@@ -634,9 +620,8 @@
                 if (!_is.undefined(document[fullscreen.prefix + 'CancelFullScreen'])) {
                     fullscreen.supportsFullScreen = true;
                     break;
-                }
-                // Special case for MS (when isn't it?)
-                else if (!_is.undefined(document.msExitFullscreen) && document.msFullscreenEnabled) {
+                } else if (!_is.undefined(document.msExitFullscreen) && document.msFullscreenEnabled) {
+                    // Special case for MS (when isn't it?)
                     fullscreen.prefix = 'ms';
                     fullscreen.supportsFullScreen = true;
                     break;
@@ -922,8 +907,7 @@
 
                     // Add styling hook
                     _toggleClass(plyr.container, config.classes.fullscreen.enabled, true);
-                }
-                else {
+                } else {
                     _log('Fullscreen not supported and fallback disabled');
                 }
 
@@ -974,17 +958,14 @@
             if (captionSrc === '') {
                 plyr.captionExists = false;
                 _log('No caption track found');
-            }
-            else {
+            } else {
                 _log('Caption track found; URI: ' + captionSrc);
             }
 
             // If no caption file exists, hide container for caption text
             if (!plyr.captionExists) {
                 _toggleClass(plyr.container, config.classes.captions.enabled);
-            }
-            // If caption file exists, process captions
-            else {
+            } else {
                 // Turn off native caption rendering to avoid double captions
                 // This doesn't seem to work in Safari 7+, so the <track> elements are removed from the dom below
                 var tracks = plyr.media.textTracks;
@@ -1020,16 +1001,14 @@
                                 // Display a cue, if there is one
                                 if (this.activeCues[0] && 'text' in this.activeCues[0]) {
                                     _setCaption(this.activeCues[0].getCueAsHTML());
-                                }
-                                else {
+                                } else {
                                     _setCaption();
                                 }
                             });
                         }
                     }
-                }
-                // Caption tracks not natively supported
-                else {
+                } else {
+                    // Caption tracks not natively supported
                     _log('TextTracks not supported so rendering captions manually');
 
                     // Render captions from array at appropriate time
@@ -1069,8 +1048,7 @@
                                     plyr.captions.shift();
 
                                     _log('Successfully loaded the caption file via AJAX');
-                                }
-                                else {
+                                } else {
                                     _warn(config.logPrefix + 'There was a problem loading the caption file via AJAX');
                                 }
                             }
@@ -1101,8 +1079,7 @@
             // Set the span content
             if (_is.string(caption)) {
                 content.innerHTML = caption.trim();
-            }
-            else {
+            } else {
                 content.appendChild(caption);
             }
 
@@ -1136,8 +1113,7 @@
             function _subTcSecs(tc) {
                 if (tc === null || tc === undefined) {
                     return 0;
-                }
-                else {
+                } else {
                     var tc1 = [],
                         tc2 = [],
                         seconds;
@@ -1181,8 +1157,7 @@
 
                 // Render the caption
                 _setCaption(plyr.currentCaption);
-            }
-            else {
+            } else {
                 _setCaption();
             }
         }
@@ -1239,13 +1214,12 @@
             function _checkFocus(event) {
                 // If it is TAB
                 if (event.which === 9 && plyr.isFullscreen) {
-                    // Move focus to first element that can be tabbed if Shift isn't used
                     if (event.target === last && !event.shiftKey) {
+                        // Move focus to first element that can be tabbed if Shift isn't used
                         event.preventDefault();
                         first.focus();
-                    }
-                    // Move focus to last element that can be tabbed if Shift is used
-                    else if (event.target === first && event.shiftKey) {
+                    } else if (event.target === first && event.shiftKey) {
+                        // Move focus to last element that can be tabbed if Shift is used
                         event.preventDefault();
                         last.focus();
                     }
@@ -1260,8 +1234,7 @@
         function _insertChildElements(type, attributes) {
             if (_is.string(attributes)) {
                _insertElement(type, plyr.media, { src: attributes });
-            }
-            else if (attributes.constructor === Array) {
+            } else if (attributes.constructor === Array) {
                 for (var i = attributes.length - 1; i >= 0; i--) {
                     _insertElement(type, plyr.media, attributes[i]);
                 }
@@ -1278,8 +1251,7 @@
                 if (iconUrl.absolute) {
                     _log('AJAX loading absolute SVG sprite' + (plyr.browser.isIE ? ' (due to IE)' : ''));
                     loadSprite(iconUrl.url, "sprite-plyr");
-                }
-                else {
+                } else {
                     _log('Sprite will be used as external resource directly');
                 }
             }
@@ -1395,8 +1367,7 @@
         function _toggleNativeControls(toggle) {
             if (toggle && _inArray(config.types.html5, plyr.type)) {
                 plyr.media.setAttribute('controls', '');
-            }
-            else {
+            } else {
                 plyr.media.removeAttribute('controls');
             }
         }
@@ -1448,14 +1419,12 @@
             if (!value) {
                 // Key wasn't set (or had been cleared), move along
                 return;
-            } 
-            else if (/^\d+(\.\d+)?$/.test(value)) {
+            } else if (/^\d+(\.\d+)?$/.test(value)) {
                 // If value is a number, it's probably volume from an older
                 // version of plyr. See: https://github.com/Selz/plyr/pull/313
                 // Update the key to be JSON
                 _updateStorage({volume: parseFloat(value)});
-            } 
-            else {
+            } else {
                 // Assume it's JSON from this or a later version of plyr
                 plyr.storage = JSON.parse(value);
             }
@@ -1538,7 +1507,6 @@
             _toggleClass(plyr.media, config.classes.videoWrapper, true);
             _toggleClass(plyr.media, config.classes.embedWrapper, true);
 
-            // YouTube
             if (plyr.type === 'youtube') {
                 // Create the YouTube container
                 plyr.media.appendChild(container);
@@ -1549,8 +1517,7 @@
                 // Setup API
                 if (_is.object(window.YT)) {
                     _youTubeReady(mediaId, container);
-                }
-                else {
+                } else {
                     // Load the API
                     _injectScript(config.urls.youtube.api);
 
@@ -1565,14 +1532,11 @@
                         window.onYouTubeReadyCallbacks.forEach(function(callback) { callback(); });
                     };
                 }
-            }
-            // Vimeo
-            else if (plyr.type === 'vimeo') {
+            } else if (plyr.type === 'vimeo') {
                 // Vimeo needs an extra div to hide controls on desktop (which has full support)
                 if (plyr.supported.full) {
                     plyr.media.appendChild(container);
-                }
-                else {
+                } else {
                     container = plyr.media;
                 }
 
@@ -1590,14 +1554,11 @@
                             _vimeoReady(mediaId, container);
                         }
                     }, 50);
-                }
-                else {
+                } else {
                     _vimeoReady(mediaId, container);
                 }
-            }
-            // Soundcloud
-            // TODO: Currently unsupported and undocumented
-            else if (plyr.type === 'soundcloud') {
+            } else if (plyr.type === 'soundcloud') {
+                // TODO: Currently unsupported and undocumented
                 // Inject the iframe
                 var soundCloud = document.createElement('iframe');
 
@@ -1836,7 +1797,7 @@
             plyr.embed.on('loaded', function() {
                 // Fix keyboard focus issues
                 // https://github.com/Selz/plyr/issues/317
-                if(_is.htmlElement(plyr.embed.element) && plyr.supported.full) {
+                if (_is.htmlElement(plyr.embed.element) && plyr.supported.full) {
                     plyr.embed.element.setAttribute('tabindex', '-1');
                 }
             });
@@ -1968,12 +1929,9 @@
                 toggle = plyr.media.paused;
             }
 
-            // Play
             if (toggle) {
                 _play();
-            }
-            // Pause
-            else {
+            } else {
                 _pause();
             }
 
@@ -2005,12 +1963,9 @@
                 paused      = plyr.media.paused,
                 duration    = _getDuration();
 
-            // Explicit position
             if (_is.number(input)) {
                 targetTime = input;
-            }
-            // Event
-            else if (_is.object(input) && _inArray(['input', 'change'], input.type)) {
+            } else if (_is.object(input) && _inArray(['input', 'change'], input.type)) {
                 // It's the seek slider
                 // Seek to the selected time
                 targetTime = ((input.target.value / input.target.max) * duration);
@@ -2019,8 +1974,7 @@
             // Normalise targetTime
             if (targetTime < 0) {
                 targetTime = 0;
-            }
-            else if (targetTime > duration) {
+            } else if (targetTime > duration) {
                 targetTime = duration;
             }
 
@@ -2079,7 +2033,7 @@
             mediaDuration = 0;
 
             // Only if duration available
-            if(plyr.media.duration !== null && !isNaN(plyr.media.duration)) {
+            if (plyr.media.duration !== null && !isNaN(plyr.media.duration)) {
                 mediaDuration = plyr.media.duration;
             }
 
@@ -2118,19 +2072,16 @@
                 // If it's a fullscreen change event, update the UI
                 if (event && event.type === fullscreen.fullScreenEventName) {
                     plyr.isFullscreen = fullscreen.isFullScreen(plyr.container);
-                }
-                // Else it's a user request to enter or exit
-                else  {
-                    // Request fullscreen
+                } else {
+                    // Else it's a user request to enter or exit
                     if (!fullscreen.isFullScreen(plyr.container)) {
                         // Save scroll position
                         _saveScrollPosition();
 
                         // Request full screen
                         fullscreen.requestFullScreen(plyr.container);
-                    }
-                    // Bail from fullscreen
-                    else {
+                    } else {
+                        // Bail from fullscreen
                         fullscreen.cancelFullScreen();
                     }
 
@@ -2139,8 +2090,7 @@
 
                     return;
                 }
-            }
-            else {
+            } else {
                 // Otherwise, it's a simple toggle
                 plyr.isFullscreen = !plyr.isFullscreen;
 
@@ -2389,12 +2339,11 @@
                         value       = (function() {
                             var buffered = plyr.media.buffered;
 
-                            // HTML5
                             if (buffered && buffered.length) {
+                                // HTML5
                                 return _getPercentage(buffered.end(0), duration);
-                            }
-                            // YouTube returns between 0 and 1
-                            else if (_is.number(buffered)) {
+                            } else if (_is.number(buffered)) {
+                                // YouTube returns between 0 and 1
                                 return (buffered * 100);
                             }
 
@@ -2423,8 +2372,7 @@
             if (_is.undefined(progress)) {
                 if (plyr.progress && plyr.progress.buffer) {
                     progress = plyr.progress.buffer;
-                }
-                else {
+                } else {
                     return;
                 }
             }
@@ -2432,9 +2380,8 @@
             // One progress element passed
             if (_is.htmlElement(progress)) {
                 progress.value = value;
-            }
-            // Object of progress + text element
-            else if (progress) {
+            } else if (progress) {
+                // Object of progress + text element
                 if (progress.bar) {
                     progress.bar.value = value;
                 }
@@ -2547,20 +2494,17 @@
             if (!event) {
                 if (_hasClass(plyr.progress.tooltip, visible)) {
                     percent = plyr.progress.tooltip.style.left.replace('%', '');
-                }
-                else {
+                } else {
                     return;
                 }
-            }
-            else {
+            } else {
                 percent = ((100 / clientRect.width) * (event.pageX - clientRect.left));
             }
 
             // Set bounds
             if (percent < 0) {
                 percent = 0;
-            }
-            else if (percent > 100) {
+            } else if (percent > 100) {
                 percent = 100;
             }
 
@@ -2607,8 +2551,7 @@
                     if (toggle.type === 'focus') {
                         delay = 3000;
                     }
-                }
-                else {
+                } else {
                     show = _hasClass(plyr.container, config.classes.hideControls);
                 }
             }
@@ -2846,8 +2789,7 @@
                 // Get the last play button to account for the large play button
                 if (target && target.length > 1) {
                     target = target[target.length - 1];
-                }
-                else {
+                } else {
                     target = target[0];
                 }
 
@@ -2872,8 +2814,7 @@
 
                 if (!focused || focused === document.body) {
                     focused = null;
-                }
-                else {
+                } else {
                     focused = document.querySelector(':focus');
                 }
 
@@ -2894,8 +2835,7 @@
                         for (var i = 0; i < element.length; i++) {
                             _toggleClass(element[i], config.classes.tabFocus, (element[i] === focused));
                         }
-                    }
-                    else {
+                    } else {
                         _toggleClass(element, config.classes.tabFocus, (element === focused));
                     }
                 }
@@ -3003,8 +2943,7 @@
 
                     // Store last code for next cycle
                     last = code;
-                }
-                else {
+                } else {
                     last = null;
                 }
             }
@@ -3101,8 +3040,7 @@
                 if (event.deltaY < 0 || event.deltaX > 0) {
                     if (inverted) {
                         _decreaseVolume(step);
-                    }
-                    else {
+                    } else {
                         _increaseVolume(step);
                     }
                 }
@@ -3111,8 +3049,7 @@
                 if (event.deltaY > 0 || event.deltaX < 0) {
                     if (inverted) {
                         _increaseVolume(step);
-                    }
-                    else {
+                    } else {
                         _decreaseVolume(step);
                     }
                 }
@@ -3133,7 +3070,7 @@
             // Handle the media finishing
             _on(plyr.media, 'ended', function() {
                 // Show poster on end
-                if(plyr.type === 'video' && config.showPosterOnEnd) {
+                if (plyr.type === 'video' && config.showPosterOnEnd) {
                     // Clear
                     if (plyr.type === 'video') {
                         _setCaption();
@@ -3181,12 +3118,10 @@
 
                     if (plyr.media.paused) {
                         _play();
-                    }
-                    else if (plyr.media.ended) {
+                    } else if (plyr.media.ended) {
                         _seek();
                         _play();
-                    }
-                    else {
+                    } else {
                         _pause();
                     }
                 });
@@ -3334,8 +3269,7 @@
                 // Clean up
                 media.removeAttribute('data-type');
                 media.removeAttribute('data-video-id');
-            }
-            else {
+            } else {
                 plyr.type           = tagName;
                 config.crossorigin  = (media.getAttribute('crossorigin') !== null);
                 config.autoplay     = (config.autoplay || (media.getAttribute('autoplay') !== null));
@@ -3524,8 +3458,7 @@
         // Check for CORS support
         if ('withCredentials' in x) {
             x.open('GET', url, true);
-        }
-        else {
+        } else {
             return;
         }
 
@@ -3584,16 +3517,14 @@
             selector    = [defaults.selectors.html5, defaults.selectors.embed].join(',');
 
         // Select the elements
-        // Assume elements is a NodeList by default
         if (_is.string(targets)) {
+            // String selector passed
             targets = document.querySelectorAll(targets);
-        }
-        // Single HTMLElement passed
-        else if (_is.htmlElement(targets)) {
+        }  else if (_is.htmlElement(targets)) {
+            // Single HTMLElement passed
             targets = [targets];
-        }
-        // No selector passed, possibly options as first argument
-        else if (!_is.nodeList(targets) && !_is.array(targets) && !_is.string(targets))  {
+        }  else if (!_is.nodeList(targets) && !_is.array(targets) && !_is.string(targets))  {
+            // No selector passed, possibly options as first argument
             // If options are the first argument
             if (_is.undefined(options) && _is.object(targets)) {
                 options = targets;
@@ -3640,9 +3571,8 @@
                 for (var x = 0; x < children.length; x++) {
                     add(target, children[x]);
                 }
-            }
-            // Wrap target if it's a media element
-            else if (_matches(target, selector)) {
+            } else if (_matches(target, selector)) {
+                // Target is media element
                 add(target, target);
             }
         }
@@ -3704,12 +3634,11 @@
 
     // Get all instances within a provided container
     function get(container) {
-        // Get selector if string passed
         if (_is.string(container)) {
+            // Get selector if string passed
             container = document.querySelector(container);
-        }
-        // Use body by default to get all on page
-        else if (_is.undefined(container)) {
+        } else if (_is.undefined(container)) {
+            // Use body by default to get all on page
             container = document.body;
         }
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.0.6
+- Fixed merge issue with `Updated define to work with AMD imports #326` PR
+- Code formatting 
+
 ## v2.0.5
 - Fix for Vimeo in IE9 & IE10 
 - Fix for HTML5 elements not firing `ready` event
