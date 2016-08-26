@@ -1,16 +1,20 @@
 # Changelog
 
+## v2.0.5
+- Fix for Vimeo in IE9 & IE10 
+- Fix for HTML5 elements not firing `ready` event
+
 ## v2.0.4
 - Fix for Firefox full screen (fixes #343)
 
 ## v2.0.3
-- Set 'global' keyboard shortcut option to false as default, added `<textarea>` to editable elements to be ignored.
+- Set 'global' keyboard shortcut option to false as default, added `<textarea>` to editable elements to be ignored
 
 ## v2.0.2
 - Added 'global' keyboard shortcut option
 
 ## v2.0.1
-- Version bump for NPM
+- Version bump for NPM (sorry for folks who upgraded to the now deleted v1.9.0 through NPM)
 
 # v2.0.0
 This version contains several potential ***breaking changes***:

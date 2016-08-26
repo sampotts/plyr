@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v2.0.4
+// plyr.js v2.0.5
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -43,7 +43,7 @@
         displayDuration:        true,
         loadSprite:             true,
         iconPrefix:             'plyr',
-        iconUrl:                'https://cdn.plyr.io/2.0.4/plyr.svg',
+        iconUrl:                'https://cdn.plyr.io/2.0.5/plyr.svg',
         clickToPlay:            true,
         hideControls:           true,
         showPosterOnEnd:        false,
@@ -175,7 +175,7 @@
             fullscreen:         null
         },
         // Events to watch on HTML5 media elements
-        events:                 ['ended', 'progress', 'stalled', 'playing', 'waiting', 'canplay', 'canplaythrough', 'loadstart', 'loadeddata', 'loadedmetadata', 'timeupdate', 'volumechange', 'play', 'pause', 'error', 'seeking', 'emptied'],
+        events:                 ['ready', 'ended', 'progress', 'stalled', 'playing', 'waiting', 'canplay', 'canplaythrough', 'loadstart', 'loadeddata', 'loadedmetadata', 'timeupdate', 'volumechange', 'play', 'pause', 'error', 'seeking', 'emptied'],
         // Logging
         logPrefix:              '[Plyr]'
     };
@@ -1785,8 +1785,8 @@
         function _vimeoReady(mediaId, container) {
             // Setup instance
             // https://github.com/vimeo/player.js
-            plyr.embed = new window.Vimeo.Player(container.id, {
-                id:         mediaId,
+            plyr.embed = new window.Vimeo.Player(container, {
+                id:         parseInt(mediaId),
                 loop:       config.loop,
                 autoplay:   config.autoplay,
                 byline:     false,
@@ -3473,8 +3473,10 @@
 
         // Everything done
         function _ready() {
-            // Ready event
-            _triggerEvent(plyr.container, 'ready', true);
+            // Ready event at end of execution stack
+            window.setTimeout(function() { 
+                _triggerEvent(plyr.media, 'ready');
+            }, 0);
 
             // Set class hook on media element
             _toggleClass(plyr.media, defaults.classes.setup, true);
@@ -3681,7 +3683,7 @@
 
             // Listen for events if debugging
             if (config.debug) {
-                var events = config.events.concat(['setup', 'ready', 'statechange', 'enterfullscreen', 'exitfullscreen', 'captionsenabled', 'captionsdisabled']);
+                var events = config.events.concat(['setup', 'statechange', 'enterfullscreen', 'exitfullscreen', 'captionsenabled', 'captionsdisabled']);
                 
                 _on(instance.getContainer(), events.join(' '), function(event) { 
                     console.log([config.logPrefix, 'event:', event.type].join(' '), event.detail.plyr);

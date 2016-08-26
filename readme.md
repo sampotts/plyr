@@ -122,7 +122,7 @@ Include the `plyr.js` script before the closing `</body>` tag and then call `ply
 If you want to use our CDN for the JavaScript, you can use the following:
 
 ```html
-<script src="https://cdn.plyr.io/2.0.4/plyr.js"></script>
+<script src="https://cdn.plyr.io/2.0.5/plyr.js"></script>
 ```
 
 ### CSS
@@ -135,11 +135,11 @@ Include the `plyr.css` stylsheet into your `<head>`
 If you want to use our CDN for the default CSS, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/2.0.4/plyr.css">
+<link rel="stylesheet" href="https://cdn.plyr.io/2.0.5/plyr.css">
 ```
 
 ### SVG Sprite
-The SVG sprite is loaded automatically from our CDN. To change this, see the [options](#Options) below. For reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/2.0.4/plyr.svg`.
+The SVG sprite is loaded automatically from our CDN. To change this, see the [options](#Options) below. For reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/2.0.5/plyr.svg`.
 
 ## Advanced
 
@@ -487,7 +487,7 @@ Here's a list of the methods supported:
   <tr>
     <td><code>isReady()</code></td>
     <td>&mdash;</td>
-    <td>Determine if the player is loaded and UI ready - this is because HTML5 is ready instantly but YouTube and Vimeo can take some time to load their APIs.</td>
+    <td>Determine if the player is loaded and UI ready.</td>
   </tr>
   <tr>
     <td><code>on()</code></td>
@@ -736,7 +736,7 @@ These events also bubble up the DOM. The event target will be the container elem
     <tr>
       <td><code>ready</code></td>
       <td></td>
-      <td>Triggered when the instance is ready for API use and external APIs are ready (YouTube and Vimeo).</td>
+      <td>Triggered when the instance is ready for API use and external APIs are ready (in the case of YouTube and Vimeo).</td>
     </tr>
   	<tr>
   		<td><code>canplay</code></td>
