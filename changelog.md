@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.0.7
+- Fixed `getCurrentTime()` method (fixes #351)
+- Added `getVolume()` , `isMuted()` and `getDuration()` API methods (fixes #346)
+
 ## v2.0.6
 - Fixed merge issue with `Updated define to work with AMD imports #326` PR
 - Code formatting 

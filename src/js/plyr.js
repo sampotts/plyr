@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v2.0.6
+// plyr.js v2.0.7
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -43,7 +43,7 @@
         displayDuration:        true,
         loadSprite:             true,
         iconPrefix:             'plyr',
-        iconUrl:                'https://cdn.plyr.io/2.0.6/plyr.svg',
+        iconUrl:                'https://cdn.plyr.io/2.0.7/plyr.svg',
         clickToPlay:            true,
         hideControls:           true,
         showPosterOnEnd:        false,
@@ -2205,7 +2205,9 @@
             }
 
             // Toggle muted state
-            if (plyr.media.muted && volume > 0) {
+            if (volume === 0) {
+                plyr.media.muted = true;
+            } else if (plyr.media.muted && volume > 0) {
                 _toggleMute();
             }
         }
@@ -3381,6 +3383,10 @@
             getEmbed:           function() { return plyr.embed; },
             getMedia:           function() { return plyr.media; },
             getType:            function() { return plyr.type; },
+            getDuration:        _getDuration,
+            getCurrentTime:     function() { return plyr.media.currentTime; },
+            getVolume:          function() { return plyr.media.volume; },
+            isMuted:            function() { return plyr.media.muted; },
             isReady:            function() { return _hasClass(plyr.container, config.classes.ready); },
             isLoading:          function() { return _hasClass(plyr.container, config.classes.loading); },
             on:                 function(event, callback) { _on(plyr.container, event, callback); },
@@ -3401,8 +3407,7 @@
             toggleControls:     _toggleControls,
             isFullscreen:       function() { return plyr.isFullscreen || false; },
             support:            function(mimeType) { return _supportMime(plyr, mimeType); },
-            destroy:            _destroy,
-            getCurrentTime:     function() { return media.currentTime; }
+            destroy:            _destroy
         };
 
         // Everything done

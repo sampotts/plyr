@@ -122,7 +122,7 @@ Include the `plyr.js` script before the closing `</body>` tag and then call `ply
 If you want to use our CDN for the JavaScript, you can use the following:
 
 ```html
-<script src="https://cdn.plyr.io/2.0.6/plyr.js"></script>
+<script src="https://cdn.plyr.io/2.0.7/plyr.js"></script>
 ```
 
 ### CSS
@@ -135,11 +135,11 @@ Include the `plyr.css` stylsheet into your `<head>`
 If you want to use our CDN for the default CSS, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/2.0.6/plyr.css">
+<link rel="stylesheet" href="https://cdn.plyr.io/2.0.7/plyr.css">
 ```
 
 ### SVG Sprite
-The SVG sprite is loaded automatically from our CDN. To change this, see the [options](#Options) below. For reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/2.0.6/plyr.svg`.
+The SVG sprite is loaded automatically from our CDN. To change this, see the [options](#Options) below. For reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/2.0.7/plyr.svg`.
 
 ## Advanced
 
@@ -530,6 +530,26 @@ Here's a list of the methods supported:
     <td>Seeks the media to the provided parameter, time in seconds.</td>
   </tr>
   <tr>
+    <td><code>getCurrentTime()</code></td>
+    <td>&mdash;</td>
+    <td>Will return a float with the current time in seconds.</td>
+  </tr>
+  <tr>
+    <td><code>getDuration()</code></td>
+    <td>&mdash;</td>
+    <td>Will return a float with the duration in seconds.</td>
+  </tr>
+  <tr>
+    <td><code>getVolume()</code></td>
+    <td>&mdash;</td>
+    <td>Will return a float between 0 and 1 for the current volume level.</td>
+  </tr>
+  <tr>
+    <td><code>isMuted()</code></td>
+    <td>&mdash;</td>
+    <td>Will return a boolean for whether the media is currently muted.</td>
+  </tr>
+  <tr>
     <td><code>setVolume(...)</code></td>
     <td>Number</td>
     <td>Sets the player volume to the provided parameter. The value should be between 0 (muted) and 10 (loudest). If no parameter is provided, the default volume is used (5). Values over 10 are ignored.</td>
@@ -589,11 +609,6 @@ Here's a list of the methods supported:
     <td><code>destroy()</code></td>
     <td>&mdash;</td>
     <td>Restores the original element, reversing the effects of <code>setup()</code>.</td>
-  </tr>
-  <tr>
-    <td><code>getCurrentTime()</code></td>
-    <td>&mdash;</td>
-    <td>Will return a float with the current time in seconds.</td>
   </tr>
  </tbody>
 </table>
