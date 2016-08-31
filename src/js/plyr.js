@@ -2001,6 +2001,9 @@
             plyr.media.playbackRate = speed;
 
             _updateSpeedupTooltip(speed);
+
+            // Save speed to localStorage
+            _updateStorage({speed: speed});
         }
 
         // Seek to time
@@ -2568,6 +2571,16 @@
             if (event && _inArray(['mouseenter', 'mouseleave'], event.type)) {
                 _toggleClass(plyr.progress.tooltip, visible, (event.type === 'mouseenter'));
             }
+        }
+
+        // Set playback speed
+        function _setSpeedup(speed) {
+            // Load speed from storage or default value
+            if (_is.undefined(speed)) {
+                speed = plyr.storage.speed || config.defaultSpeed;
+            }
+
+            _speedup(speed);
         }
 
         // Update hover tooltip for playback speed changed
@@ -3437,6 +3450,9 @@
             // Set volume
             _setVolume();
             _updateVolume();
+
+            // Set playback speed
+            _setSpeedup();
 
             // Reset time display
             _timeUpdate();
