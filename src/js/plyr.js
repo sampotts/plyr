@@ -39,6 +39,14 @@
         volumeMin:              0, 
         volumeMax:              10, 
         volumeStep:             1,
+        defaultSpeed:           1.0,
+        currentSpeed:           1.0,
+        speeds:                 [
+            1.0,
+            1.5,
+            2.0,
+            0.5
+        ],
         duration:               null,
         displayDuration:        true,
         loadSprite:             true,
@@ -75,7 +83,8 @@
                 forward:        '[data-plyr="fast-forward"]',
                 mute:           '[data-plyr="mute"]',
                 captions:       '[data-plyr="captions"]',
-                fullscreen:     '[data-plyr="fullscreen"]'
+                fullscreen:     '[data-plyr="fullscreen"]',
+                speedup:        '[data-plyr="speed-up"]'
             },
             volume: {
                 input:          '[data-plyr="volume"]',
@@ -143,7 +152,8 @@
             toggleMute:         'Toggle Mute',
             toggleCaptions:     'Toggle Captions',
             toggleFullscreen:   'Toggle Fullscreen',
-            frameTitle:         'Player for {title}'
+            frameTitle:         'Player for {title}',
+            speedup:            'Speed x{speed}'
         },
         types: {
             embed:              ['youtube', 'vimeo', 'soundcloud'],
@@ -172,7 +182,8 @@
             mute:               null,
             volume:             null,
             captions:           null,
-            fullscreen:         null
+            fullscreen:         null,
+            speedup:            null
         },
         // Events to watch on HTML5 media elements
         events:                 ['ready', 'ended', 'progress', 'stalled', 'playing', 'waiting', 'canplay', 'canplaythrough', 'loadstart', 'loadeddata', 'loadedmetadata', 'timeupdate', 'volumechange', 'play', 'pause', 'error', 'seeking', 'emptied'],
@@ -802,6 +813,16 @@
                 );
             }
 
+            // Speed-up button
+            if (_inArray(config.controls, 'speed-up')) {
+                html.push(
+                    '<button type="button" data-plyr="speed-up">',
+                        '<svg><use xlink:href="' + iconPath + '-fast-forward" /></svg>',
+                        '<span class="plyr__sr-only">' + config.i18n.speedup + '</span>',
+                    '</button>'
+                );
+            }
+
             // Progress
             if (_inArray(config.controls, 'progress')) {
                 // Create progress
@@ -1270,6 +1291,9 @@
             // Replace seek time instances
             html = _replaceAll(html, '{seektime}', config.seekTime);
 
+            // Replace seek time instances
+            html = _replaceAll(html, '{speed}', config.currentSpeed);
+
             // Replace all id references with random numbers
             html = _replaceAll(html, '{id}', Math.floor(Math.random() * (10000)));
 
@@ -1316,6 +1340,7 @@
                 plyr.buttons.rewind           = _getElement(config.selectors.buttons.rewind);
                 plyr.buttons.forward          = _getElement(config.selectors.buttons.forward);
                 plyr.buttons.fullscreen       = _getElement(config.selectors.buttons.fullscreen);
+                plyr.buttons.speedup          = _getElement(config.selectors.buttons.speedup);
 
                 // Inputs
                 plyr.buttons.mute             = _getElement(config.selectors.buttons.mute);
@@ -1956,6 +1981,28 @@
             _seek(plyr.media.currentTime + seekTime);
         }
 
+        // Speed-up
+        function _speedup(speed) {
+            if (!_is.number(speed)) {
+                var index = config.speeds.indexOf(config.currentSpeed);
+                if (index !== -1) {
+                    var nextIndex = index + 1;
+                    if (nextIndex >= config.speeds.length) {
+                        nextIndex = 0;
+                    }
+                    speed = config.speeds[nextIndex];
+                } else {
+                    speed = config.defaultSpeed;
+                }
+            }
+
+            config.currentSpeed = speed;
+
+            plyr.media.playbackRate = speed;
+
+            _updateSpeedupTooltip(speed);
+        }
+
         // Seek to time
         // The input parameter can be an event or a number
         function _seek(input) {
@@ -2523,6 +2570,24 @@
             }
         }
 
+        // Update hover tooltip for playback speed changed
+        function _updateSpeedupTooltip(speed) {
+            if (!isNaN(speed)) {
+                speed = config.currentSpeed;
+            }
+
+            var button = plyr.buttons.speedup;
+            var template = config.i18n.speedup;
+
+            var elements= button.getElementsByClassName(config.classes.tooltip);
+            if (elements.length === 0){
+                return;
+            }
+
+            var tooltip = elements[0];
+            tooltip.innerHTML = _replaceAll(template, '{speed}', speed);
+        }
+
         // Show the player controls in fullscreen mode
         function _toggleControls(toggle) {
             // Don't hide if config says not to, it's audio, or not ready or loading
@@ -2984,6 +3049,9 @@
 
             // Fast forward
             _proxyListener(plyr.buttons.forward, 'click', config.listeners.forward, _forward);
+
+            // Speed-up
+            _proxyListener(plyr.buttons.speedup, 'click', config.listeners.speedup, _speedup);
 
             // Seek
             _proxyListener(plyr.buttons.seek, inputEvent, config.listeners.seek, _seek);
