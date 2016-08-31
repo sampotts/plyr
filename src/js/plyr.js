@@ -1983,6 +1983,10 @@
 
         // Speed-up
         function _speedup(speed) {
+            if (!_is.array(config.speeds)) {
+                _warn('Invalid speeds format');
+                return;
+            }
             if (!_is.number(speed)) {
                 var index = config.speeds.indexOf(config.currentSpeed);
                 if (index !== -1) {
