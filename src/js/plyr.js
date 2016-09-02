@@ -122,7 +122,8 @@
         fullscreen: {
             enabled:            true,
             fallback:           true,
-            allowAudio:         false
+            allowAudio:         false,
+            container:          null
         },
         storage: {
             enabled:            true,
@@ -896,6 +897,14 @@
         function _setupFullscreen() {
             if (!plyr.supported.full) {
                 return;
+            }
+
+            // Setup specified fullscreen container from config (default is plyr.container)
+            if (_is.string(config.selectors.fullscreen.container)) {
+                plyr.fullscreenContainer = document.querySelector(config.selectors.fullscreen.container);
+            }
+            if (!_is.htmlElement(plyr.fullscreenContainer)) {
+                plyr.fullscreenContainer = plyr.container;
             }
 
             if ((plyr.type !== 'audio' || config.fullscreen.allowAudio) && config.fullscreen.enabled) {
@@ -2071,22 +2080,22 @@
             if (nativeSupport) {
                 // If it's a fullscreen change event, update the UI
                 if (event && event.type === fullscreen.fullScreenEventName) {
-                    plyr.isFullscreen = fullscreen.isFullScreen(plyr.container);
+                    plyr.isFullscreen = fullscreen.isFullScreen(plyr.fullscreenContainer);
                 } else {
                     // Else it's a user request to enter or exit
-                    if (!fullscreen.isFullScreen(plyr.container)) {
+                    if (!fullscreen.isFullScreen(plyr.fullscreenContainer)) {
                         // Save scroll position
                         _saveScrollPosition();
 
                         // Request full screen
-                        fullscreen.requestFullScreen(plyr.container);
+                        fullscreen.requestFullScreen(plyr.fullscreenContainer);
                     } else {
                         // Bail from fullscreen
                         fullscreen.cancelFullScreen();
                     }
 
                     // Check if we're actually full screen (it could fail)
-                    plyr.isFullscreen = fullscreen.isFullScreen(plyr.container);
+                    plyr.isFullscreen = fullscreen.isFullScreen(plyr.fullscreenContainer);
 
                     return;
                 }
