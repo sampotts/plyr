@@ -42,10 +42,10 @@
         defaultSpeed:           1.0,
         currentSpeed:           1.0,
         speeds:                 [
+            0.5,
             1.0,
             1.5,
-            2.0,
-            0.5
+            2.0
         ],
         duration:               null,
         displayDuration:        true,
