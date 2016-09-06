@@ -244,7 +244,7 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
     <tr>
       <td><code>controls</code></td>
       <td>Array</td>
-      <td><code>['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'fullscreen']</code></td>
+      <td><code>['play-large', 'play', 'speed-up', 'progress', 'current-time', 'mute', 'volume', 'captions', 'fullscreen']</code></td>
       <td>Toggle which control elements you would like to display when using the default controls html. If you specify a <code>html</code> option, this is redundant. The default value is to display everything.</td>
     </tr>
     <tr>
@@ -382,6 +382,12 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
       <td>Object</td>
       <td>&mdash;</td>
       <td>Two properties; <code>enabled</code> which toggles if local storage should be enabled (if the browser supports it). The default value is `true`. This enables storing user settings, currently it only stores volume but more will be added later. The second property <code>key</code> is the key used for the local storage. The default is <code>plyr_volume</code> until more settings are stored.</td>
+    </tr>
+    <tr>
+      <td><code>speeds</code></td>
+      <td>Array</td>
+      <td>[1.0, 1.5, 2.0, 0.5]</td>
+      <td>Playback speed list.</td>
     </tr>
   </tbody>
 </table>
