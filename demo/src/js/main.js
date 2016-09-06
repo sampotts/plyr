@@ -20,7 +20,8 @@
         },
         captions: {
             defaultActive:  true
-        }
+        },
+        controls:           ['play-large', 'play', 'speed-up', 'progress', 'current-time', 'mute', 'volume', 'captions', 'fullscreen']
     });
     plyr.loadSprite('dist/demo.svg');
 
