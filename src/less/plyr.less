@@ -11,6 +11,16 @@
 @keyframes plyr-progress {
     to { background-position: @plyr-progress-loading-size 0; }
 }
+@keyframes plyr-popup {
+    from { 
+        transform: translateY(10px); 
+        opacity: .5; 
+    }
+    to { 
+        transform: translateY(0); 
+        opacity: 1; 
+    }
+}
 
 // Styles
 // -------------------------------
@@ -38,6 +48,11 @@
         a, button, input, label {
             touch-action: manipulation;
         }
+    }
+
+    // ARIA
+    [aria-hidden='true'] {
+        display: none;
     }
 
     // Focus
@@ -268,7 +283,8 @@
     // Spacing
     > button,
     .plyr__progress,
-    .plyr__time {
+    .plyr__time,
+    .plyr__menu {
         margin-left: (@plyr-control-spacing / 2);
 
         &:first-child {
@@ -320,8 +336,15 @@
     @media (min-width: @plyr-bp-screen-sm) {
         > button,
         .plyr__progress,
-        .plyr__time {
+        .plyr__time,
+        .plyr__menu {
             margin-left: @plyr-control-spacing;
+        }
+
+        > button + button,
+        .plyr__menu + button,
+        > button + .plyr__menu {
+            margin-left: (@plyr-control-spacing / 2);
         }
     }
 }
@@ -338,7 +361,7 @@
     right: 0;
     bottom: 0;
     padding: (@plyr-control-spacing * 5) @plyr-control-spacing @plyr-control-spacing;
-    background: linear-gradient(fade(@plyr-video-controls-bg, 0%), fade(@plyr-video-controls-bg, 50%));
+    background: linear-gradient(fade(@plyr-video-controls-bg, 0%), fade(@plyr-video-controls-bg, 70%));
     border-bottom-left-radius: inherit;
     border-bottom-right-radius: inherit;
     color: @plyr-video-control-color;
@@ -442,6 +465,78 @@
     display: inline-block;
 }
 
+// Menus
+// --------------------------------------------------------------
+.plyr__menu {
+    position: relative;
+
+    // Hide tooltip
+    button[aria-expanded='true'] .plyr__tooltip {
+        display: none;
+    }
+    
+    // The actual menu container
+    &__container {
+        position: absolute;
+        bottom: 100%;
+        right: -5px;
+        margin-bottom: 10px;
+        animation: plyr-popup .2s ease;
+        background: fade(@plyr-video-controls-bg, 90%);
+        box-shadow: 0 1px 0 fade(#000, 20%);
+        border-radius: 4px;
+        white-space: nowrap;
+        text-align: left;
+        color: @plyr-video-control-color;
+        font-size: @plyr-font-size-small;
+
+        ul {
+            margin: 0;
+            padding: 5px;
+            list-style: none;
+        }
+
+        button {
+            display: flex;
+            width: 100%;
+            padding: 10px 30px 10px 12px;
+            color: @plyr-video-control-color;
+            font-weight: 600;
+
+            // Arrow
+            &::after {
+                content: "";
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                right: 5px;
+                border: 5px solid transparent;
+                border-left-color: fade(@plyr-video-control-color, 80%);
+            }
+        }
+
+        // Option value
+        .plyr__menu__value {
+            margin-left: auto;
+            padding-left: 25px;
+            font-weight: 400;
+            color: fade(@plyr-video-control-color, 80%);
+        }
+
+        // Arrow
+        &::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            right: 15px;
+            height: 0;
+            width: 0;
+            border: 6px solid transparent;
+            border-top-color: fade(@plyr-video-controls-bg, 90%);
+        }
+    }
+}
+
 // Tooltips
 // --------------------------------------------------------------
 .plyr__tooltip {
@@ -492,7 +587,7 @@
 }
 
 // First tooltip
-.plyr__controls button:first-child .plyr__tooltip {
+.plyr__controls > button:first-child .plyr__tooltip {
     left: 0;
     transform: translate(0, 10px) scale(.8);
     transform-origin: 0 100%;
@@ -503,7 +598,7 @@
 }
 
 // Last tooltip
-.plyr__controls button:last-child .plyr__tooltip {
+.plyr__controls > button:last-child .plyr__tooltip {
     right: 0;
     transform: translate(0, 10px) scale(.8);
     transform-origin: 100% 100%;
@@ -515,8 +610,8 @@
     }
 }
 
-.plyr__controls button:first-child,
-.plyr__controls button:last-child {
+.plyr__controls > button:first-child,
+.plyr__controls > button:last-child {
     &:hover .plyr__tooltip,
     &.tab-focus:focus .plyr__tooltip,
     .plyr__tooltip--visible {

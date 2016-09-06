@@ -21,7 +21,7 @@
         captions: {
             defaultActive:  true
         },
-        controls:           ['play-large', 'play', 'speed-up', 'progress', 'current-time', 'mute', 'volume', 'captions', 'fullscreen']
+        controls:           ['play-large', 'play', 'speed-up', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'fullscreen']
     });
     plyr.loadSprite('dist/demo.svg');
 
@@ -95,7 +95,7 @@
     // Set a new source
     function newSource(type, init) {
         // Bail if new type isn't known, it's the current type, or current type is empty (video is default) and new type is video
-        if(!(type in types) || (!init && type == currentType) || (!currentType.length && type == types.video)) {
+        if(!(type in types) || (!init && type === currentType) || (!currentType.length && type === types.video)) {
             return;
         }
 
