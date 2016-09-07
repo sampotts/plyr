@@ -150,7 +150,8 @@
             frameTitle:         'Player for {title}',
             captions:           'Captions',
             settings:           'Settings',
-            speed:              'Speed'
+            speed:              'Speed',
+            quality:            'Quality'
         },
         types: {
             embed:              ['youtube', 'vimeo', 'soundcloud'],
@@ -884,6 +885,11 @@
                                 '<li>',
                                     '<button type="button" data-plyr="slide-speed">',
                                         config.i18n.speed + ' <span class="plyr__menu__value">{speed}</span>',
+                                    '</button>',
+                                '</li>',
+                                '<li>',
+                                    '<button type="button" data-plyr="slide-speed">',
+                                        config.i18n.quality + ' <span class="plyr__menu__value">Auto</span>',
                                     '</button>',
                                 '</li>',
                             '</ul>',

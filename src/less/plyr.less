@@ -482,12 +482,12 @@
         right: -5px;
         margin-bottom: 10px;
         animation: plyr-popup .2s ease;
-        background: fade(@plyr-video-controls-bg, 90%);
+        background: @plyr-menu-bg;
         box-shadow: 0 1px 0 fade(#000, 20%);
         border-radius: 4px;
         white-space: nowrap;
         text-align: left;
-        color: @plyr-video-control-color;
+        color: @plyr-menu-color;
         font-size: @plyr-font-size-small;
 
         ul {
@@ -500,7 +500,7 @@
             display: flex;
             width: 100%;
             padding: 10px 30px 10px 12px;
-            color: @plyr-video-control-color;
+            color: @plyr-menu-color;
             font-weight: 600;
 
             // Arrow
@@ -511,7 +511,7 @@
                 transform: translateY(-50%);
                 right: 5px;
                 border: 5px solid transparent;
-                border-left-color: fade(@plyr-video-control-color, 80%);
+                border-left-color: fade(@plyr-menu-color, 80%);
             }
         }
 
@@ -520,7 +520,7 @@
             margin-left: auto;
             padding-left: 25px;
             font-weight: 400;
-            color: fade(@plyr-video-control-color, 80%);
+            color: fade(@plyr-menu-color, 80%);
         }
 
         // Arrow
@@ -532,7 +532,7 @@
             height: 0;
             width: 0;
             border: 6px solid transparent;
-            border-top-color: fade(@plyr-video-controls-bg, 90%);
+            border-top-color: @plyr-menu-bg;
         }
     }
 }
