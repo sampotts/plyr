@@ -3086,8 +3086,6 @@
                     target = document.querySelector('#' + toggle.getAttribute('aria-controls')),
                     show = (toggle.getAttribute('aria-expanded') === 'false');
 
-                console.log(target, toggle);
-
                 toggle.setAttribute('aria-expanded', show);
                 target.setAttribute('aria-hidden', !show);
             });

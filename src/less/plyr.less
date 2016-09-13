@@ -370,7 +370,8 @@
     button {
         // Hover and tab focus
         &.tab-focus:focus,
-        &:hover {
+        &:hover,
+        &[aria-expanded='true'] {
             background: @plyr-video-control-bg-hover;
             color: @plyr-video-control-color-hover;
         }
@@ -388,7 +389,8 @@
     button {
         // Hover and tab focus
         &.tab-focus:focus,
-        &:hover {
+        &:hover,
+        &[aria-expanded='true'] {
             background: @plyr-audio-control-bg-hover;
             color: @plyr-audio-control-color-hover;
         }
