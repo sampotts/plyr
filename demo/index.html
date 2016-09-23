@@ -73,16 +73,69 @@
         </main>
 
         <!-- Plyr core script -->
-        <script src="../dist/plyr.js"></script>
-
-        <!-- Docs script -->
-        <script src="dist/demo.js"></script>
+        <script src="../src/js/plyr.js"></script>
 
         <!-- Rangetouch to fix <input type="range"> on touch devices (see https://rangetouch.com) -->
         <script src="https://cdn.rangetouch.com/0.0.9/rangetouch.js" async></script>
 
         <!-- Sharing libary (https://shr.one) -->
         <script src="https://cdn.shr.one/0.1.9/shr.js"></script>
-        <script>if(window.shr) { window.shr.setup({ count: { classname: 'btn__count' } }); }</script>
+        <script>if(window.shr) { window.shr.setup({ count: { classname: 'btn__count' } }); }
+
+            var instances = plyr.setup({
+                debug:              true,
+                title:              'Video demo',
+                showThumbnails:     false,
+                tooltips: {
+                    controls:       true
+                },
+                captions: {
+                    defaultActive:  true
+                },
+            });
+
+            // Plyr returns an array regardless
+            var player = instances[0];
+            player.on('ready', function(event) {
+                console.log('ready');
+            });
+
+            var urls = ["http://stg-ec-ore-u.uplynk.com/slices/52a/e2cb36cb397f47a18371e18f40ec01b7/52ab86c3f6c74d6abf7f162204d51609/00000014.jpg",
+                        "http://stg-ec-ore-u.uplynk.com/slices/52a/e2cb36cb397f47a18371e18f40ec01b7/52ab86c3f6c74d6abf7f162204d51609/00000024.jpg",
+                        "http://stg-ec-ore-u.uplynk.com/slices/52a/e2cb36cb397f47a18371e18f40ec01b7/52ab86c3f6c74d6abf7f162204d51609/00000034.jpg",
+                        "http://stg-ec-ore-u.uplynk.com/slices/52a/e2cb36cb397f47a18371e18f40ec01b7/52ab86c3f6c74d6abf7f162204d51609/00000044.jpg",
+                        "http://stg-ec-ore-u.uplynk.com/slices/52a/e2cb36cb397f47a18371e18f40ec01b7/52ab86c3f6c74d6abf7f162204d51609/00000054.jpg",
+                        "http://stg-ec-ore-u.uplynk.com/slices/52a/e2cb36cb397f47a18371e18f40ec01b7/52ab86c3f6c74d6abf7f162204d51609/00000064.jpg",
+                        "http://stg-ec-ore-u.uplynk.com/slices/52a/e2cb36cb397f47a18371e18f40ec01b7/52ab86c3f6c74d6abf7f162204d51609/00000074.jpg",
+                        "http://stg-ec-ore-u.uplynk.com/slices/52a/e2cb36cb397f47a18371e18f40ec01b7/52ab86c3f6c74d6abf7f162204d51609/00000084.jpg",                        
+                        "http://stg-ec-ore-u.uplynk.com/slices/52a/e2cb36cb397f47a18371e18f40ec01b7/52ab86c3f6c74d6abf7f162204d51609/00000094.jpg"];
+            var count = 0;                        
+
+            player.on('thumbnail', function(event, props) {
+                var plyr = event.detail.plyr;
+                var time = event.detail.time;
+                var img = event.detail.img;
+                
+                var secs = parseInt(time % 60);
+                var mins = parseInt((time / 60) % 60);
+                var hours = parseInt(((time / 60) / 60) % 60);
+
+                // Do we need to display hours?
+                var displayHours = hours > 0;
+
+                // Ensure it's two digits. For example, 03 rather than 3.
+                secs = ('0' + secs).slice(-2);
+                mins = ('0' + mins).slice(-2);
+
+                // Render
+                var disp = (displayHours ? hours + ':' : '') + mins + ':' + secs;
+
+                img.width = 120;
+                img.height = 80;
+                img.src = urls[count % urls.length];
+                count++;
+            });
+
+        </script>
     </body>
 </html>

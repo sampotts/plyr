@@ -47,6 +47,7 @@
         clickToPlay:            true,
         hideControls:           true,
         showPosterOnEnd:        false,
+        showThumbnails:         false,
         disableContextMenu:     true,
         keyboardShorcuts:       {
             focused:            true,
@@ -690,8 +691,6 @@
             catch (e) {
                 return false;
             }
-
-            return false;
         })()
     };
 
@@ -700,6 +699,7 @@
         var plyr = this,
         timers = {},
         api;
+        plyr.toolTipTime = -1;
 
         // Set media 
         plyr.media = media;
@@ -815,7 +815,14 @@
 
                 // Seek tooltip
                 if (config.tooltips.seek) {
-                    html.push('<span class="plyr__tooltip">00:00</span>');
+                    if(config.showThumbnails) {
+                        html.push('<div class="plyr__tooltip">',
+                            '<span>00:00</span>',
+                            '<img src="" />',
+                            '</div>');
+                    } else {
+                        html.push('<span class="plyr__tooltip">00:00</span>');
+                    }
                 }
 
                 // Close
@@ -888,6 +895,8 @@
 
             // Close everything
             html.push('</div>');
+
+            console.log(html.join(''));
 
             return html.join('');
         }
@@ -1334,7 +1343,14 @@
                 plyr.progress.played          = _getElement(config.selectors.progress.played);
 
                 // Seek tooltip
-                plyr.progress.tooltip         = plyr.progress.container && plyr.progress.container.querySelector('.' + config.classes.tooltip);
+                plyr.progress.seek            = {};
+                plyr.progress.seek.container  = plyr.progress.container && plyr.progress.container.querySelector('.' + config.classes.tooltip);
+                plyr.progress.seek.tooltip    = plyr.progress.seek.container && config.showThumbnails && plyr.progress.seek.container.getElementsByTagName('span')[0];
+                plyr.progress.seek.thumbnail  = plyr.progress.seek.container && config.showThumbnails && plyr.progress.seek.container.getElementsByTagName('img')[0];
+
+                if(!config.showThumbnails) {
+                    plyr.progress.seek.tooltip     = plyr.progress.seek.container
+                }
 
                 // Volume
                 plyr.volume                   = {};
@@ -2494,8 +2510,8 @@
 
             // Determine percentage, if already visible
             if (!event) {
-                if (_hasClass(plyr.progress.tooltip, visible)) {
-                    percent = plyr.progress.tooltip.style.left.replace('%', '');
+                if (_hasClass(plyr.progress.seek.container, visible)) {
+                    percent = plyr.progress.seek.container.style.left.replace('%', '');
                 } else {
                     return;
                 }
@@ -2510,16 +2526,26 @@
                 percent = 100;
             }
 
-            // Display the time a click would seek to
-            _updateTimeDisplay(((duration / 100) * percent), plyr.progress.tooltip);
+            var time = parseInt(((duration / 100) * percent));
+            if(plyr.toolTipTime !== time) {
+
+                if(config.showThumbnails) {
+                    _triggerEvent(plyr.media, 'thumbnail', true, {'time': time, 'img': plyr.progress.seek.thumbnail});
+                }
+
+                // Display the time a click would seek to
+                _updateTimeDisplay(time, plyr.progress.seek.tooltip);
+            }
+
+            plyr.toolTipTime = time;
 
             // Set position
-            plyr.progress.tooltip.style.left = percent + "%";
+            plyr.progress.seek.container.style.left = percent + "%";
 
             // Show/hide the tooltip
             // If the event is a moues in/out and percentage is inside bounds
             if (event && _inArray(['mouseenter', 'mouseleave'], event.type)) {
-                _toggleClass(plyr.progress.tooltip, visible, (event.type === 'mouseenter'));
+                _toggleClass(plyr.progress.seek.container, visible, (event.type === 'mouseenter'));
             }
         }
 
@@ -3601,7 +3627,12 @@
             try { data = JSON.parse(element.getAttribute('data-plyr')); }
             catch(e) { }
 
+            //console.log("defaults.showThumbnails: " + defaults.showThumbnails);
+            //console.log("options.showThumbnails: " + options.showThumbnails);
+
             var config = _extend({}, defaults, options, data);
+
+            //console.log("config.showThumbnails: " + config.showThumbnails);
 
             // Bail if not enabled
             if (!config.enabled) {
@@ -3620,9 +3651,9 @@
             if (config.debug) {
                 var events = config.events.concat(['setup', 'statechange', 'enterfullscreen', 'exitfullscreen', 'captionsenabled', 'captionsdisabled']);
                 
-                _on(instance.getContainer(), events.join(' '), function(event) { 
+                /*_on(instance.getContainer(), events.join(' '), function(event) { 
                     console.log([config.logPrefix, 'event:', event.type].join(' '), event.detail.plyr);
-                });
+                });*/
             }
 
             // Callback
