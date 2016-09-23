@@ -896,8 +896,6 @@
             // Close everything
             html.push('</div>');
 
-            console.log(html.join(''));
-
             return html.join('');
         }
 
@@ -3653,9 +3651,9 @@
             if (config.debug) {
                 var events = config.events.concat(['setup', 'statechange', 'enterfullscreen', 'exitfullscreen', 'captionsenabled', 'captionsdisabled']);
                 
-                /*_on(instance.getContainer(), events.join(' '), function(event) { 
+                _on(instance.getContainer(), events.join(' '), function(event) { 
                     console.log([config.logPrefix, 'event:', event.type].join(' '), event.detail.plyr);
-                });*/
+                });
             }
 
             // Callback
