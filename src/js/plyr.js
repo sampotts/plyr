@@ -699,7 +699,6 @@
         var plyr = this,
         timers = {},
         api;
-        plyr.toolTipTime = -1;
 
         // Set media 
         plyr.media = media;
@@ -817,8 +816,8 @@
                 if (config.tooltips.seek) {
                     if(config.showThumbnails) {
                         html.push('<div class="plyr__tooltip">',
-                            '<span>00:00</span>',
-                            '<img src="" />',
+                            '<img />',
+                            '<div>00:00</div>',
                             '</div>');
                     } else {
                         html.push('<span class="plyr__tooltip">00:00</span>');
@@ -1343,7 +1342,7 @@
                 // Seek tooltip
                 plyr.progress.seek            = {};
                 plyr.progress.seek.container  = plyr.progress.container && plyr.progress.container.querySelector('.' + config.classes.tooltip);
-                plyr.progress.seek.tooltip    = plyr.progress.seek.container && config.showThumbnails && plyr.progress.seek.container.getElementsByTagName('span')[0];
+                plyr.progress.seek.tooltip    = plyr.progress.seek.container && config.showThumbnails && plyr.progress.seek.container.getElementsByTagName('div')[0];
                 plyr.progress.seek.thumbnail  = plyr.progress.seek.container && config.showThumbnails && plyr.progress.seek.container.getElementsByTagName('img')[0];
 
                 if(!config.showThumbnails) {
@@ -3627,12 +3626,7 @@
             try { data = JSON.parse(element.getAttribute('data-plyr')); }
             catch(e) { }
 
-            //console.log("defaults.showThumbnails: " + defaults.showThumbnails);
-            //console.log("options.showThumbnails: " + options.showThumbnails);
-
             var config = _extend({}, defaults, options, data);
-
-            //console.log("config.showThumbnails: " + config.showThumbnails);
 
             // Bail if not enabled
             if (!config.enabled) {
