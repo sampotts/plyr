@@ -2527,7 +2527,9 @@
             }
 
             var time = parseInt(((duration / 100) * percent));
-            if(plyr.toolTipTime !== time) {
+
+            // Only send thumbnail event on time change
+            if(plyr.time !== time) {
 
                 if(config.showThumbnails) {
                     _triggerEvent(plyr.media, 'thumbnail', true, {'time': time, 'img': plyr.progress.seek.thumbnail});
@@ -2537,7 +2539,7 @@
                 _updateTimeDisplay(time, plyr.progress.seek.tooltip);
             }
 
-            plyr.toolTipTime = time;
+            plyr.time = time;
 
             // Set position
             plyr.progress.seek.container.style.left = percent + "%";

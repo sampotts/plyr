@@ -320,6 +320,12 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
       <td>This will restore and *reload* HTML5 video once playback is complete. Note: depending on the browser caching, this may result in the video downloading again (or parts of it). Use with caution.</td>
     </tr>
     <tr>
+      <td><code>showThumbnails</code></td>
+      <td>Boolean</td>
+      <td><code>false</code></td>
+      <td>Show thumbnail image above the seek tooltip.  See the <code>thumbnail</code> event for more information. Note: the seek tooltip option must be set to <code>true</code>.</td>
+    </tr>
+    <tr>
       <td><code>keyboardShortcuts</code></td>
       <td>Object</td>
       <td><code>{ focused: true, global: false }</code></td>
@@ -868,7 +874,12 @@ These events also bubble up the DOM. The event target will be the container elem
       <td></td>
       <td>When an instance is destroyed. The original element that replaced the container will be returned to your handler as the event target.</td>
     </tr>
-	</tbody>
+    <tr>
+      <td><code>thumbnail</code></td>
+      <td></td>
+      <td>Sent when the seek tooltip is shown and the <code>showThumbnails</code> option is <code>true</code>. And image and the seek time is sent along with this event.</td>
+    </tr>
+  </tbody>
 </table>
 
 Details borrowed from: [https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events](https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events)
