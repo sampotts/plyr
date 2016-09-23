@@ -877,7 +877,7 @@ These events also bubble up the DOM. The event target will be the container elem
     <tr>
       <td><code>thumbnail</code></td>
       <td></td>
-      <td>Sent when the seek tooltip is shown and the <code>showThumbnails</code> option is <code>true</code>. And image and the seek time is sent along with this event.</td>
+      <td>Sent when the seek tooltip is shown and the <code>showThumbnails</code> option is <code>true</code>.  The thumbnail image and the seek time is sent along with this event.</td>
     </tr>
   </tbody>
 </table>
