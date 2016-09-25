@@ -532,10 +532,10 @@
     // Check variable types
     var _is = {
         object: function(input) {
-            return input !== null && typeof(input) === 'object'; 
+            return input !== null && typeof(input) === 'object' && input.constructor === Object; 
         },
         array: function(input) {
-            return input !== null && (typeof(input) === 'object' && input.constructor === Array);
+            return input !== null && typeof(input) === 'object' && input.constructor === Array;
         },
         number: function(input) {
             return input !== null && (typeof(input) === 'number' && !isNaN(input - 0) || (typeof input === 'object' && input.constructor === Number));
@@ -554,6 +554,9 @@
         },
         function: function(input) {
             return input !== null && typeof input === 'function';
+        },
+        event: function(input) {
+            return input !== null && typeof input === 'object' && (input.constructor === Event || input.constructor === CustomEvent);
         },
         undefined: function(input) {
             return input !== null && typeof input === 'undefined';
@@ -876,32 +879,91 @@
                 );
             }
 
-            // Settings button
+            // Settings button / menu
             if (_inArray(config.controls, 'settings')) {
                 html.push(
-                    '<div class="plyr__menu">',
-                        '<button type="button" id="plyr-settings-toggle-{id}" data-plyr="settings" aria-haspopup="true" aria-controls="plyr-settings-{id}" aria-expanded="false">',
+                    '<div class="plyr__menu" data-plyr="settings">',
+                        '<button type="button" id="plyr-settings-toggle-{id}" aria-haspopup="true" aria-controls="plyr-settings-{id}" aria-expanded="false">',
                             '<svg><use xlink:href="' + iconPath + '-settings" /></svg>',
                             '<span class="plyr__sr-only">' + config.i18n.settings + '</span>',
                         '</button>',
-                        '<div class="plyr__menu__container" id="plyr-settings-{id}" aria-hidden="true" aria-labelled-by="plyr-settings-toggle-{id}">',
-                            '<ul>',
-                                '<li>',
-                                    '<button type="button" data-plyr="slide-captions">',
-                                        config.i18n.captions + ' <span class="plyr__menu__value">{lang}</span>',
-                                    '</button>',
-                                '</li>',
-                                '<li>',
-                                    '<button type="button" data-plyr="slide-speed">',
-                                        config.i18n.speed + ' <span class="plyr__menu__value">{speed}</span>',
-                                    '</button>',
-                                '</li>',
-                                '<li>',
-                                    '<button type="button" data-plyr="slide-quality">',
-                                        config.i18n.quality + ' <span class="plyr__menu__value">Auto</span>',
-                                    '</button>',
-                                '</li>',
-                            '</ul>',
+                        '<div class="plyr__menu__container" id="plyr-settings-{id}" aria-hidden="true" aria-labelled-by="plyr-settings-toggle-{id}" role="tablist" tabindex="-1">',
+                            '<div class="plyr__menu__primary" id="plyr-settings-{id}-primary" aria-hidden="false" aria-labelled-by="plyr-settings-toggle-{id}" role="tabpanel" tabindex="-1">',
+                                '<ul>',
+                                    '<li role="tab">',
+                                        '<button type="button" class="plyr__menu__btn plyr__menu__btn--forward" id="plyr-settings-{id}-captions-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-captions" aria-expanded="false">',
+                                            config.i18n.captions + ' <span class="plyr__menu__btn__value">{lang}</span>',
+                                        '</button>',
+                                    '</li>',
+                                    '<li role="tab">',
+                                        '<button type="button" class="plyr__menu__btn plyr__menu__btn--forward" id="plyr-settings-{id}-speed-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-speed" aria-expanded="false">',
+                                            config.i18n.speed + ' <span class="plyr__menu__btn__value">{speed}</span>',
+                                        '</button>',
+                                    '</li>',
+                                    '<li role="tab">',
+                                        '<button type="button" class="plyr__menu__btn plyr__menu__btn--forward" id="plyr-settings-{id}-quality-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-quality" aria-expanded="false">',
+                                            config.i18n.quality + ' <span class="plyr__menu__btn__value">Auto</span>',
+                                        '</button>',
+                                    '</li>',
+                                '</ul>',
+                            '</div>',
+                            '<div class="plyr__menu__secondary" id="plyr-settings-{id}-captions" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-captions-toggle" role="tabpanel" tabindex="-1">',
+                                '<ul>',
+                                    '<li role="tab">',
+                                        '<button type="button" class="plyr__menu__btn plyr__menu__btn--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
+                                            config.i18n.captions,
+                                        '</button>',
+                                    '</li>',
+                                    '<li>',
+                                        '<button type="button">English</button>',
+                                    '</li>',
+                                    '<li>',
+                                        '<button type="button">Off</button>',
+                                    '</li>',
+                                    '</ul>',
+                            '</div>',
+                            '<div class="plyr__menu__secondary" id="plyr-settings-{id}-speed" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-speed-toggle" role="tabpanel" tabindex="-1">',
+                                '<ul>',
+                                    '<li role="tab">',
+                                        '<button type="button" class="plyr__menu__btn plyr__menu__btn--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
+                                            config.i18n.speed,
+                                        '</button>',
+                                    '</li>',
+                                    '<li>',
+                                        '<button type="button">2&times;</button>',
+                                    '</li>',
+                                    '<li>',
+                                        '<button type="button">1.5&times;</button>',
+                                    '</li>',
+                                    '<li>',
+                                        '<button type="button">1&times;</button>',
+                                    '</li>',
+                                    '<li>',
+                                        '<button type="button">0.5&times;</button>',
+                                    '</li>',
+                                    '</ul>',
+                            '</div>',
+                            '<div class="plyr__menu__secondary" id="plyr-settings-{id}-quality" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-quality-toggle" role="tabpanel" tabindex="-1">',
+                                '<ul>',
+                                    '<li role="tab">',
+                                        '<button type="button" class="plyr__menu__btn plyr__menu__btn--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
+                                            config.i18n.quality,
+                                        '</button>',
+                                    '</li>',
+                                    '<li>',
+                                        '<button type="button">1080P <span class="plyr__menu__btn__badge"><span>HD</span></span></button>',
+                                    '</li>',
+                                    '<li>',
+                                        '<button type="button">720P <span class="plyr__menu__btn__badge"><span>HD</span></span></button>',
+                                    '</li>',
+                                    '<li>',
+                                        '<button type="button">480P</button>',
+                                    '</li>',
+                                    '<li>',
+                                        '<button type="button">320P</button>',
+                                    '</li>',
+                                    '</ul>',
+                            '</div>',
                         '</div>',
                     '</div>'
                 );
@@ -1303,7 +1365,7 @@
             html = _replaceAll(html, '{seektime}', config.seekTime);
 
             // Replace seek time instances
-            html = _replaceAll(html, '{speed}', config.currentSpeed === 1 ? 'Normal' : config.currentSpeed.toFixed(1) + 'x');
+            html = _replaceAll(html, '{speed}', config.currentSpeed.toFixed(1).toString().replace('.0', '') + '&times;');
 
             // Replace current captions language
             html = _replaceAll(html, '{lang}', 'English');
@@ -2037,7 +2099,7 @@
 
             if (_is.number(input)) {
                 targetTime = input;
-            } else if (_is.object(input) && _inArray(['input', 'change'], input.type)) {
+            } else if (_is.event(input) && _inArray(['input', 'change'], input.type)) {
                 // It's the seek slider
                 // Seek to the selected time
                 targetTime = ((input.target.value / input.target.max) * duration);
@@ -3092,15 +3154,35 @@
             // Captions
             _on(plyr.buttons.captions, 'click', _toggleCaptions);
 
-            // Menus
-            _on(plyr.controls.querySelectorAll('[aria-haspopup="true"]'), 'click', function() { 
-                var toggle = this,
-                    target = document.querySelector('#' + toggle.getAttribute('aria-controls')),
+            // Settings
+            /*_on(plyr.buttons.settings, 'click', function(event) { 
+                var menu = this,
+                    toggle = event.target,
+                    target = document.getElementById(toggle.getAttribute('aria-controls')),
+                    tabs = menu.querySelectorAll('[role="tabpanel"]'),
                     show = (toggle.getAttribute('aria-expanded') === 'false');
+
+                // Nothing to show, bail
+                if (!_is.htmlElement(target)) {
+                    return;
+                }
+
+                // Hide all other tabs
+                if (target.getAttribute('role') === 'tabpanel') {
+                    [].forEach.call(tabs, function(tab) {
+                        tab.setAttribute('aria-hidden', true);
+                        tab.setAttribute('tabindex', -1);
+
+                        [].forEach.call(menu.querySelectorAll('[aria-controls="' + tab.getAttribute('id') + '"]'), function(toggle) {
+                            toggle.setAttribute('aria-expanded', false);
+                        });
+                    });
+                }
 
                 toggle.setAttribute('aria-expanded', show);
                 target.setAttribute('aria-hidden', !show);
-            });
+                target.setAttribute('tabindex', 0);
+            });*/
 
             // Seek tooltip
             _on(plyr.progress.container, 'mouseenter mouseleave mousemove', _updateSeekTooltip);

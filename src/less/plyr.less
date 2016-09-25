@@ -473,8 +473,16 @@
     position: relative;
 
     // Hide tooltip
-    button[aria-expanded='true'] .plyr__tooltip {
-        display: none;
+    button svg {
+        transition: transform .3s ease;
+    }
+    button[aria-expanded='true'] {
+        svg {
+            transform: rotate(45deg);
+        }
+        .plyr__tooltip {
+            display: none;
+        }
     }
     
     // The actual menu container
@@ -492,39 +500,6 @@
         color: @plyr-menu-color;
         font-size: @plyr-font-size-small;
 
-        ul {
-            margin: 0;
-            padding: 5px;
-            list-style: none;
-        }
-
-        button {
-            display: flex;
-            width: 100%;
-            padding: 10px 30px 10px 12px;
-            color: @plyr-menu-color;
-            font-weight: 600;
-
-            // Arrow
-            &::after {
-                content: "";
-                position: absolute;
-                top: 50%;
-                transform: translateY(-50%);
-                right: 5px;
-                border: 5px solid transparent;
-                border-left-color: fade(@plyr-menu-color, 80%);
-            }
-        }
-
-        // Option value
-        .plyr__menu__value {
-            margin-left: auto;
-            padding-left: 25px;
-            font-weight: 500;
-            color: fade(@plyr-menu-color, 80%);
-        }
-
         // Arrow
         &::after {
             content: "";
@@ -535,6 +510,86 @@
             width: 0;
             border: 6px solid transparent;
             border-top-color: @plyr-menu-bg;
+        }
+
+        ul {
+            margin: 0;
+            padding: 5px;
+            list-style: none;
+        }
+        button {
+            display: flex;
+            width: 100%;
+            padding: @plyr-control-padding (@plyr-control-padding * 2);
+            color: @plyr-menu-color;
+            font-weight: 600;
+            user-select: none;
+        }
+
+        // Buttons 
+        .plyr__menu__btn::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 5px solid transparent;
+        }
+        .plyr__menu__btn--forward {
+            padding-right: ceil(@plyr-control-padding * 4);
+
+            &::after {
+                right: 5px;
+                border-left-color: fade(@plyr-menu-color, 80%);
+            }
+        }
+        .plyr__menu__btn--back {
+            position: relative;
+            padding-top: floor(@plyr-control-padding * .7);
+            padding-bottom: floor(@plyr-control-padding * .7);
+            padding-left: ceil(@plyr-control-padding * 4);
+            margin-bottom: ceil(@plyr-control-padding * 1.3);
+            font-weight: 500;
+
+            &::after {
+                left: 5px;
+                border-right-color: fade(@plyr-menu-color, 80%);
+            }
+            &::before {
+                content: "";
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                height: 1px;
+                overflow: hidden;
+                margin-top: ceil(@plyr-control-padding / 2);
+                background: fade(#000, 15%);
+                box-shadow: 0 1px 0 fade(#fff, 10%);
+            }
+        }
+
+        // Option value
+        .plyr__menu__btn__value,
+        .plyr__menu__btn__badge {
+            display: inherit;
+            margin-left: auto;
+            padding-left: ceil(@plyr-control-padding * 3.5);
+            pointer-events: none;
+        }
+
+        // Option value
+        .plyr__menu__btn__value {
+            font-weight: 500;
+            color: fade(@plyr-menu-color, 80%);
+        }
+
+        // Option value
+        .plyr__menu__btn__badge span {
+            padding: 2px 4px;
+            border-radius: 2px;
+            background: @plyr-menu-color;
+            color: @plyr-menu-bg;
+            font-size: 10px;
         }
     }
 }
