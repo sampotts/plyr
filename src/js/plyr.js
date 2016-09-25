@@ -3155,7 +3155,7 @@
             _on(plyr.buttons.captions, 'click', _toggleCaptions);
 
             // Settings
-            /*_on(plyr.buttons.settings, 'click', function(event) { 
+            _on(plyr.buttons.settings, 'click', function(event) { 
                 var menu = this,
                     toggle = event.target,
                     target = document.getElementById(toggle.getAttribute('aria-controls')),
@@ -3182,7 +3182,7 @@
                 toggle.setAttribute('aria-expanded', show);
                 target.setAttribute('aria-hidden', !show);
                 target.setAttribute('tabindex', 0);
-            });*/
+            });
 
             // Seek tooltip
             _on(plyr.progress.container, 'mouseenter mouseleave mousemove', _updateSeekTooltip);
