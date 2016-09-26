@@ -888,81 +888,83 @@
                             '<span class="plyr__sr-only">' + config.i18n.settings + '</span>',
                         '</button>',
                         '<div class="plyr__menu__container" id="plyr-settings-{id}" aria-hidden="true" aria-labelled-by="plyr-settings-toggle-{id}" role="tablist" tabindex="-1">',
-                            '<div class="plyr__menu__primary" id="plyr-settings-{id}-primary" aria-hidden="false" aria-labelled-by="plyr-settings-toggle-{id}" role="tabpanel" tabindex="-1">',
-                                '<ul>',
-                                    '<li role="tab">',
-                                        '<button type="button" class="plyr__menu__btn plyr__menu__btn--forward" id="plyr-settings-{id}-captions-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-captions" aria-expanded="false">',
-                                            config.i18n.captions + ' <span class="plyr__menu__btn__value">{lang}</span>',
-                                        '</button>',
-                                    '</li>',
-                                    '<li role="tab">',
-                                        '<button type="button" class="plyr__menu__btn plyr__menu__btn--forward" id="plyr-settings-{id}-speed-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-speed" aria-expanded="false">',
-                                            config.i18n.speed + ' <span class="plyr__menu__btn__value">{speed}</span>',
-                                        '</button>',
-                                    '</li>',
-                                    '<li role="tab">',
-                                        '<button type="button" class="plyr__menu__btn plyr__menu__btn--forward" id="plyr-settings-{id}-quality-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-quality" aria-expanded="false">',
-                                            config.i18n.quality + ' <span class="plyr__menu__btn__value">Auto</span>',
-                                        '</button>',
-                                    '</li>',
-                                '</ul>',
-                            '</div>',
-                            '<div class="plyr__menu__secondary" id="plyr-settings-{id}-captions" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-captions-toggle" role="tabpanel" tabindex="-1">',
-                                '<ul>',
-                                    '<li role="tab">',
-                                        '<button type="button" class="plyr__menu__btn plyr__menu__btn--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
-                                            config.i18n.captions,
-                                        '</button>',
-                                    '</li>',
-                                    '<li>',
-                                        '<button type="button">English</button>',
-                                    '</li>',
-                                    '<li>',
-                                        '<button type="button">Off</button>',
-                                    '</li>',
+                            '<div>',
+                                '<div class="plyr__menu__primary" id="plyr-settings-{id}-primary" aria-hidden="false" aria-labelled-by="plyr-settings-toggle-{id}" role="tabpanel" tabindex="-1">',
+                                    '<ul>',
+                                        '<li role="tab">',
+                                            '<button type="button" class="plyr__menu__btn plyr__menu__btn--forward" id="plyr-settings-{id}-captions-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-captions" aria-expanded="false">',
+                                                config.i18n.captions + ' <span class="plyr__menu__btn__value">{lang}</span>',
+                                            '</button>',
+                                        '</li>',
+                                        '<li role="tab">',
+                                            '<button type="button" class="plyr__menu__btn plyr__menu__btn--forward" id="plyr-settings-{id}-speed-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-speed" aria-expanded="false">',
+                                                config.i18n.speed + ' <span class="plyr__menu__btn__value">{speed}</span>',
+                                            '</button>',
+                                        '</li>',
+                                        '<li role="tab">',
+                                            '<button type="button" class="plyr__menu__btn plyr__menu__btn--forward" id="plyr-settings-{id}-quality-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-quality" aria-expanded="false">',
+                                                config.i18n.quality + ' <span class="plyr__menu__btn__value">Auto</span>',
+                                            '</button>',
+                                        '</li>',
                                     '</ul>',
-                            '</div>',
-                            '<div class="plyr__menu__secondary" id="plyr-settings-{id}-speed" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-speed-toggle" role="tabpanel" tabindex="-1">',
-                                '<ul>',
-                                    '<li role="tab">',
-                                        '<button type="button" class="plyr__menu__btn plyr__menu__btn--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
-                                            config.i18n.speed,
-                                        '</button>',
-                                    '</li>',
-                                    '<li>',
-                                        '<button type="button">2&times;</button>',
-                                    '</li>',
-                                    '<li>',
-                                        '<button type="button">1.5&times;</button>',
-                                    '</li>',
-                                    '<li>',
-                                        '<button type="button">1&times;</button>',
-                                    '</li>',
-                                    '<li>',
-                                        '<button type="button">0.5&times;</button>',
-                                    '</li>',
-                                    '</ul>',
-                            '</div>',
-                            '<div class="plyr__menu__secondary" id="plyr-settings-{id}-quality" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-quality-toggle" role="tabpanel" tabindex="-1">',
-                                '<ul>',
-                                    '<li role="tab">',
-                                        '<button type="button" class="plyr__menu__btn plyr__menu__btn--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
-                                            config.i18n.quality,
-                                        '</button>',
-                                    '</li>',
-                                    '<li>',
-                                        '<button type="button">1080P <span class="plyr__menu__btn__badge"><span>HD</span></span></button>',
-                                    '</li>',
-                                    '<li>',
-                                        '<button type="button">720P <span class="plyr__menu__btn__badge"><span>HD</span></span></button>',
-                                    '</li>',
-                                    '<li>',
-                                        '<button type="button">480P</button>',
-                                    '</li>',
-                                    '<li>',
-                                        '<button type="button">320P</button>',
-                                    '</li>',
-                                    '</ul>',
+                                '</div>',
+                                '<div class="plyr__menu__secondary" id="plyr-settings-{id}-captions" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-captions-toggle" role="tabpanel" tabindex="-1">',
+                                    '<ul>',
+                                        '<li role="tab">',
+                                            '<button type="button" class="plyr__menu__btn plyr__menu__btn--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
+                                                config.i18n.captions,
+                                            '</button>',
+                                        '</li>',
+                                        '<li>',
+                                            '<button type="button">English</button>',
+                                        '</li>',
+                                        '<li>',
+                                            '<button type="button">Off</button>',
+                                        '</li>',
+                                        '</ul>',
+                                '</div>',
+                                '<div class="plyr__menu__secondary" id="plyr-settings-{id}-speed" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-speed-toggle" role="tabpanel" tabindex="-1">',
+                                    '<ul>',
+                                        '<li role="tab">',
+                                            '<button type="button" class="plyr__menu__btn plyr__menu__btn--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
+                                                config.i18n.speed,
+                                            '</button>',
+                                        '</li>',
+                                        '<li>',
+                                            '<button type="button">2&times;</button>',
+                                        '</li>',
+                                        '<li>',
+                                            '<button type="button">1.5&times;</button>',
+                                        '</li>',
+                                        '<li>',
+                                            '<button type="button">1&times;</button>',
+                                        '</li>',
+                                        '<li>',
+                                            '<button type="button">0.5&times;</button>',
+                                        '</li>',
+                                        '</ul>',
+                                '</div>',
+                                '<div class="plyr__menu__secondary" id="plyr-settings-{id}-quality" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-quality-toggle" role="tabpanel" tabindex="-1">',
+                                    '<ul>',
+                                        '<li role="tab">',
+                                            '<button type="button" class="plyr__menu__btn plyr__menu__btn--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
+                                                config.i18n.quality,
+                                            '</button>',
+                                        '</li>',
+                                        '<li>',
+                                            '<button type="button">1080P <span class="plyr__menu__btn__badge"><span>HD</span></span></button>',
+                                        '</li>',
+                                        '<li>',
+                                            '<button type="button">720P <span class="plyr__menu__btn__badge"><span>HD</span></span></button>',
+                                        '</li>',
+                                        '<li>',
+                                            '<button type="button">480P</button>',
+                                        '</li>',
+                                        '<li>',
+                                            '<button type="button">320P</button>',
+                                        '</li>',
+                                        '</ul>',
+                                '</div>',
                             '</div>',
                         '</div>',
                     '</div>'
@@ -3159,7 +3161,6 @@
                 var menu = this,
                     toggle = event.target,
                     target = document.getElementById(toggle.getAttribute('aria-controls')),
-                    tabs = menu.querySelectorAll('[role="tabpanel"]'),
                     show = (toggle.getAttribute('aria-expanded') === 'false');
 
                 // Nothing to show, bail
@@ -3167,21 +3168,52 @@
                     return;
                 }
 
+                // Are we targetting a tab?
+                var isTab = target.getAttribute('role') === 'tabpanel',
+                    targetWidth, 
+                    targetHeight,
+                    container;
+
                 // Hide all other tabs
-                if (target.getAttribute('role') === 'tabpanel') {
-                    [].forEach.call(tabs, function(tab) {
-                        tab.setAttribute('aria-hidden', true);
-                        tab.setAttribute('tabindex', -1);
+                if (isTab) {
+                    // Get other tabs
+                    var current = menu.querySelector('[role="tabpanel"][aria-hidden="false"]');                        
+                    container = current.parentNode;
 
-                        [].forEach.call(menu.querySelectorAll('[aria-controls="' + tab.getAttribute('id') + '"]'), function(toggle) {
-                            toggle.setAttribute('aria-expanded', false);
-                        });
+                    [].forEach.call(menu.querySelectorAll('[aria-controls="' + current.getAttribute('id') + '"]'), function(toggle) {
+                        toggle.setAttribute('aria-expanded', false);
                     });
-                }
 
-                toggle.setAttribute('aria-expanded', show);
+                    container.style.width = current.scrollWidth + 'px'; 
+                    container.style.height = current.scrollHeight + 'px'; 
+
+                    current.setAttribute('aria-hidden', true);
+                    current.setAttribute('tabindex', -1);
+
+                    // Get the natural element size
+                    var clone = target.cloneNode(true);
+                    clone.style.position = "absolute";
+                    clone.style.opacity = 0;
+                    clone.setAttribute('aria-hidden', false);
+                    container.appendChild(clone);
+                    targetWidth = clone.scrollWidth;
+                    targetHeight = clone.scrollHeight;
+                    _remove(clone);                
+                }
+                
                 target.setAttribute('aria-hidden', !show);
+                toggle.setAttribute('aria-expanded', show);
                 target.setAttribute('tabindex', 0);
+
+                if (isTab) {
+                    container.style.width = targetWidth + 'px';
+                    container.style.height = targetHeight + 'px';
+
+                    window.setTimeout(function() {
+                        container.style.width = '';
+                        container.style.height = '';
+                    }, 300);
+                }
             });
 
             // Seek tooltip

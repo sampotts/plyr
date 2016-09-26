@@ -492,13 +492,20 @@
         right: -5px;
         margin-bottom: 10px;
         animation: plyr-popup .2s ease;
+
         background: @plyr-menu-bg;
         box-shadow: 0 1px 0 fade(#000, 20%);
         border-radius: 4px;
+
         white-space: nowrap;
         text-align: left;
         color: @plyr-menu-color;
         font-size: @plyr-font-size-small;
+
+        > div {
+            overflow: hidden;
+            transition: height .35s cubic-bezier(.4,0,.2,1), width .35s cubic-bezier(.4,0,.2,1);
+        }
 
         // Arrow
         &::after {
@@ -516,6 +523,7 @@
             margin: 0;
             padding: 5px;
             list-style: none;
+            overflow: hidden;
         }
         button {
             display: flex;
@@ -575,6 +583,7 @@
             margin-left: auto;
             padding-left: ceil(@plyr-control-padding * 3.5);
             pointer-events: none;
+            overflow: hidden;
         }
 
         // Option value
@@ -590,6 +599,16 @@
             background: @plyr-menu-color;
             color: @plyr-menu-bg;
             font-size: 10px;
+        }
+
+        // When animating between menus
+        &.is-resizing {
+            overflow: hidden;
+            transition: height .35s cubic-bezier(.4,0,.2,1), width .35s cubic-bezier(.4,0,.2,1);
+
+            ul {
+                //opacity: 0;
+            }
         }
     }
 }
