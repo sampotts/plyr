@@ -35,11 +35,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git://github.com/selz/plyr.git"
+    "url": "git://github.com/hahow/plyr.git"
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/selz/plyr/issues"
+    "url": "https://github.com/hahow/plyr/issues"
   },
   "directories": {
     "doc": "readme.md"
