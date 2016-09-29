@@ -7,5 +7,6 @@ docs/index.dev.html
 *.mp4
 index-dev.html
 notes.txt
-*.vtt
+#*.vtt
 docs/index.dev.php
+.idea
