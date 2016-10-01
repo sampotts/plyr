@@ -1132,7 +1132,7 @@
                         if (track.activeCues && track.activeCues.length > 0) {
                             _setActiveCueForTrack(track);
                         }
-                     }
+                    }
                 } else {
                     // Caption tracks not natively supported
                     _log('TextTracks not supported so rendering captions manually');
@@ -2456,17 +2456,15 @@
         }
 
         // Select active caption
-        function _setCaptionIndex(index){
-
-            //save active caption
+        function _setCaptionIndex(index) {
+            // Save active caption
             config.captions.selectedIndex = index;
 
-            // clear caption
+            // Clear caption
             _setCaption();
 
-            // re-run setup
+            // Re-run setup
             _setupCaptions();
-
         }
 
         // Check if media is loading
