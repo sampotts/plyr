@@ -3119,9 +3119,6 @@
                     return;
                 }
 
-                // Set cursor
-                wrapper.style.cursor = "pointer";
-
                 // On click play, pause ore restart
                 _on(wrapper, 'click', function() {
                     // Touch devices will just show controls (if we're hiding controls)
