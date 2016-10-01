@@ -369,7 +369,7 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
       <td><code>captions</code></td>
       <td>Object</td>
       <td>&mdash;</td>
-      <td>One property <code>defaultActive</code> which toggles if captions should be on by default. The default value is <code>false</code>.</td>
+      <td>Two properties: <code>defaultActive</code> which toggles if captions should be on by default. The default value is <code>false</code>. The <code>selectedIndex</code> property sets the default starting index for the caption tracks.</td>
     </tr>
     <tr>
       <td><code>fullscreen</code></td>
@@ -574,6 +574,11 @@ Here's a list of the methods supported:
     <td><code>toggleCaptions()</code></td>
     <td>&mdash;</td>
     <td>Toggles whether captions are enabled.</td>
+  </tr>
+  <tr>
+    <td><code>setCaptionIndex()</code></td>
+    <td>Number</td>
+    <td>Set the active track to the provided number. Index starts with 0.</td>
   </tr>
   <tr>
     <td><code>toggleFullscreen()</code></td>
