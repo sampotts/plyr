@@ -1025,7 +1025,7 @@
                                     var captions = [],
                                         caption,
                                         req = xhr.responseText;
-
+                                    
                                     //According to webvtt spec, line terminator consists of one of the following
                                     // CRLF (U+000D U+000A), LF (U+000A) or CR (U+000D)
                                     var lineSeparator = '\r\n';
@@ -1036,7 +1036,7 @@
                                             lineSeparator = '\n';
                                         }
                                     }
-
+                                    
                                     captions = req.split(lineSeparator+lineSeparator);
 
                                     for (var r = 0; r < captions.length; r++) {
