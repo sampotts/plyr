@@ -296,7 +296,7 @@ gulp.task("demo", function () {
 });
 
 // Open the demo site to check it's sweet
-gulp.task("symlinks", function () {
+/*gulp.task("symlinks", function () {
     console.log("Updating symlinks...");
 
     return gulp.src(paths.upload)
@@ -316,7 +316,7 @@ gulp.task("symlinks", function () {
 
             callback(null, chunk);
         }));
-});
+});*/
 
 // Open the demo site to check it's sweet
 gulp.task("open", function () {
@@ -333,5 +333,5 @@ gulp.task("open", function () {
 
 // Do everything
 gulp.task("publish", function () {
-    run(tasks.js, tasks.less, tasks.sprite, "cdn", "demo", "symlinks");
+    run(tasks.js, tasks.less, tasks.sprite, "cdn", "demo");
 });
