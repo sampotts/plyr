@@ -1026,14 +1026,25 @@
                                         caption,
                                         req = xhr.responseText;
 
-                                    captions = req.split('\n\n');
+                                    //According to webvtt spec, line terminator consists of one of the following
+                                    // CRLF (U+000D U+000A), LF (U+000A) or CR (U+000D)
+                                    var lineSeparator = '\r\n';
+                                    if(req.indexOf(lineSeparator+lineSeparator) === -1) {
+                                        if(req.indexOf('\r\r') !== -1){
+                                            lineSeparator = '\r';
+                                        } else {
+                                            lineSeparator = '\n';
+                                        }
+                                    }
+
+                                    captions = req.split(lineSeparator+lineSeparator);
 
                                     for (var r = 0; r < captions.length; r++) {
                                         caption = captions[r];
                                         plyr.captions[r] = [];
 
                                         // Get the parts of the captions
-                                        var parts = caption.split('\n'),
+                                        var parts = caption.split(lineSeparator),
                                             index = 0;
 
                                         // Incase caption numbers are added
