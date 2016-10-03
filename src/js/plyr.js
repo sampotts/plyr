@@ -1059,30 +1059,19 @@
             }
 
             // Get URL of caption file if exists
-            var captionSources = [],
-                captionSrc = '',
-                kind,
-                children = plyr.media.childNodes;
-
-            for (var i = 0; i < children.length; i++) {
-                if (children[i].nodeName.toLowerCase() === 'track') {
-                    kind = children[i].kind;
-                    if (kind === 'captions' || kind === 'subtitles') {
-                        captionSources.push(children[i].getAttribute('src'));
-                    }
-                }
-            }
-
+            var captionSrc = '',
+                captions = _getCaptionTracks();
+            
             // Record if caption file exists or not
             plyr.captionExists = true;
-            if (captionSources.length === 0) {
+            if (captions.length === 0) {
                 plyr.captionExists = false;
                 _log('No caption track found');
-            } else if ((config.captions.selectedIndex + 1) > captionSources.length) {
+            } else if ((config.captions.selectedIndex + 1) > captions.length) {
                 plyr.captionExists = false;
                 _log('Caption index out of bound');
             } else {
-                captionSrc = captionSources[config.captions.selectedIndex];
+                captionSrc = captions[config.captions.selectedIndex].src;
                 _log('Caption track found; URI: ' + captionSrc);
             }
 
@@ -2477,6 +2466,38 @@
             _setupCaptions();
         }
 
+        // Return all available caption tracks
+        function _getCaptionTracks(){
+
+            var kind,
+                tracks = [],
+                index = 0,
+                children = plyr.media.childNodes;
+
+            for (var i = 0; i < children.length; i++) {
+                if (children[i].nodeName.toLowerCase() === 'track') {
+
+                    kind = children[i].kind;
+
+                    if (kind === 'captions' || kind === 'subtitles') {
+
+                        tracks.push({
+                            track   : children[i],
+                            index   : index++,
+                            kind    : kind,
+                            src     : children[i].getAttribute('src'),
+                            lang    : children[i].getAttribute('srclang'),
+                            label   : children[i].getAttribute('label')
+                        });
+
+                    }
+                }
+            }
+
+            return tracks;
+
+        }
+
         // Check if media is loading
         function _checkLoading(event) {
             var loading = (event.type === 'waiting');
@@ -3668,6 +3689,7 @@
             toggleFullscreen:   _toggleFullscreen,
             toggleControls:     _toggleControls,
             setCaptionIndex:    _setCaptionIndex,
+            getCaptionTracks:   _getCaptionTracks,
             isFullscreen:       function() { return plyr.isFullscreen || false; },
             support:            function(mimeType) { return _support.mime(plyr, mimeType); },
             destroy:            _destroy
