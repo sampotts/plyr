@@ -440,14 +440,14 @@
 
     // Bind event handler
     function _on(element, events, callback, useCapture) {
-        if (_is.htmlElement(element)) {
+        if (!_is.undefined(element)) {
             _toggleListener(element, events, callback, true, useCapture);
         }
     }
 
     // Unbind event handler
     function _off(element, events, callback, useCapture) {
-        if (_is.htmlElement(element)) {
+        if (!_is.undefined(element)) {
             _toggleListener(element, events, callback, false, useCapture);
         }
     }
@@ -1025,13 +1025,9 @@
             }
         }
 
-        // Caption cue change helper event
-        /*function _captionCueChange() {
-            _setActiveCueForTrack(this);
-        }*/
-
         // Display active caption if it contains text
-        function _setActiveCueForTrack(track) {
+        function _setActiveCue(track) {
+            // Get the track from the event if needed
             if (_is.event(track)) {
                 track = track.target;
             }
@@ -1094,14 +1090,17 @@
             if (!plyr.captionExists) {
                 _toggleClass(plyr.container, config.classes.captions.enabled);
             } else {
+                var tracks = plyr.media.textTracks;
+
                 // Turn off native caption rendering to avoid double captions
                 // This doesn't seem to work in Safari 7+, so the <track> elements are removed from the dom below
-                var tracks = plyr.media.textTracks;
-                for (var x = 0; x < tracks.length; x++) {
+                [].forEach.call(tracks, function(track) {
                     // Remove the listener to prevent event overlapping
-                    _off(tracks[x], 'cuechange', _setActiveCueForTrack);
-                    tracks[x].mode = 'hidden';
-                }
+                    _off(track, 'cuechange', _setActiveCue);
+
+                    // Hide captions
+                    track.mode = 'hidden';
+                });
 
                 // Enable UI
                 _showCaptions(plyr);
@@ -1126,11 +1125,11 @@
                     var track = tracks[config.captions.selectedIndex];
 
                     if (track.kind === 'captions' || track.kind === 'subtitles') {
-                        _on(track, 'cuechange', _setActiveCueForTrack);
+                        _on(track, 'cuechange', _setActiveCue);
 
-                        // if we change the active track while a cue is already displayed we need to update it
+                        // If we change the active track while a cue is already displayed we need to update it
                         if (track.activeCues && track.activeCues.length > 0) {
-                            _setActiveCueForTrack(track);
+                            _setActiveCue(track);
                         }
                     }
                 } else {
@@ -1155,15 +1154,15 @@
                                     //According to webvtt spec, line terminator consists of one of the following
                                     // CRLF (U+000D U+000A), LF (U+000A) or CR (U+000D)
                                     var lineSeparator = '\r\n';
-                                    if(req.indexOf(lineSeparator+lineSeparator) === -1) {
-                                        if(req.indexOf('\r\r') !== -1){
+                                    if (req.indexOf(lineSeparator + lineSeparator) === -1) {
+                                        if (req.indexOf('\r\r') !== -1) {
                                             lineSeparator = '\r';
                                         } else {
                                             lineSeparator = '\n';
                                         }
                                     }
                                     
-                                    captions = req.split(lineSeparator+lineSeparator);
+                                    captions = req.split(lineSeparator + lineSeparator);
 
                                     for (var r = 0; r < captions.length; r++) {
                                         caption = captions[r];
