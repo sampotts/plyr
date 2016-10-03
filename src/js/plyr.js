@@ -65,6 +65,9 @@
                 container:      null,
                 wrapper:        '.plyr__controls'
             },
+            fullscreen: {
+                container:      null,
+            },
             labels:             '[data-plyr]',
             buttons: {
                 seek:           '[data-plyr="seek"]',
@@ -122,8 +125,7 @@
         fullscreen: {
             enabled:            true,
             fallback:           true,
-            allowAudio:         false,
-            container:          null
+            allowAudio:         false
         },
         storage: {
             enabled:            true,
@@ -2108,7 +2110,7 @@
             }
 
             // Set class hook
-            _toggleClass(plyr.container, config.classes.fullscreen.active, plyr.isFullscreen);
+            _toggleClass(plyr.fullscreenContainer, config.classes.fullscreen.active, plyr.isFullscreen);
 
             // Trap focus
             _focusTrap(plyr.isFullscreen);
@@ -2119,7 +2121,7 @@
             }
 
             // Trigger an event
-            _triggerEvent(plyr.container, plyr.isFullscreen ? 'enterfullscreen' : 'exitfullscreen', true);
+            _triggerEvent(plyr.fullscreenContainer, plyr.isFullscreen ? 'enterfullscreen' : 'exitfullscreen', true);
 
             // Restore scroll position
             if (!plyr.isFullscreen && nativeSupport) {
