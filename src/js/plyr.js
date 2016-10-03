@@ -41,12 +41,7 @@
         volumeStep:             1,
         defaultSpeed:           1.0,
         currentSpeed:           1.0,
-        speeds:                 [
-            0.5,
-            1.0,
-            1.5,
-            2.0
-        ],
+        speeds:                 [ 0.5, 1.0, 1.5, 2.0 ],
         duration:               null,
         displayDuration:        true,
         loadSprite:             true,
@@ -84,7 +79,7 @@
                 mute:           '[data-plyr="mute"]',
                 captions:       '[data-plyr="captions"]',
                 fullscreen:     '[data-plyr="fullscreen"]',
-                speedup:        '[data-plyr="speed-up"]'
+                settings:       '[data-plyr="settings"]'
             },
             volume: {
                 input:          '[data-plyr="volume"]',
@@ -137,7 +132,7 @@
             enabled:            true,
             key:                'plyr'
         },
-        controls:               ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'fullscreen'],
+        controls:               ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen'],
         i18n: {
             restart:            'Restart',
             rewind:             'Rewind {seektime} secs',
@@ -153,7 +148,10 @@
             toggleCaptions:     'Toggle Captions',
             toggleFullscreen:   'Toggle Fullscreen',
             frameTitle:         'Player for {title}',
-            speedup:            'Speed x{speed}'
+            captions:           'Captions',
+            settings:           'Settings',
+            speed:              'Speed',
+            quality:            'Quality'
         },
         types: {
             embed:              ['youtube', 'vimeo', 'soundcloud'],
@@ -183,7 +181,7 @@
             volume:             null,
             captions:           null,
             fullscreen:         null,
-            speedup:            null
+            speed:              null
         },
         // Events to watch on HTML5 media elements
         events:                 ['ready', 'ended', 'progress', 'stalled', 'playing', 'waiting', 'canplay', 'canplaythrough', 'loadstart', 'loadeddata', 'loadedmetadata', 'timeupdate', 'volumechange', 'play', 'pause', 'error', 'seeking', 'emptied'],
@@ -354,21 +352,6 @@
         }
     }
 
-    // Unwrap an element
-    // http://plainjs.com/javascript/manipulation/unwrap-a-dom-element-35/
-    /*function _unwrap(wrapper) {
-        // Get the element's parent node
-        var parent = wrapper.parentNode;
-
-        // Move all children out of the element
-        while (wrapper.firstChild) {
-            parent.insertBefore(wrapper.firstChild, wrapper);
-        }
-
-        // Remove the empty element
-        parent.removeChild(wrapper);
-    }*/
-
     // Remove an element
     function _remove(element) {
         if (!element) {
@@ -452,7 +435,7 @@
     }
 
     // Toggle event listener
-    function _toggleListener(element, events, callback, toggle, useCapture) {
+    function _toggleListener(elements, events, callback, toggle, useCapture) {
         var eventList = events.split(' ');
 
         // Whether the listener is a capturing listener or not
@@ -462,10 +445,10 @@
         }
 
         // If a nodelist is passed, call itself on each node
-        if (element instanceof NodeList) {
-            for (var x = 0; x < element.length; x++) {
-                if (element[x] instanceof Node) {
-                    _toggleListener(element[x], arguments[1], arguments[2], arguments[3]);
+        if (elements instanceof NodeList) {
+            for (var x = 0; x < elements.length; x++) {
+                if (elements[x] instanceof Node) {
+                    _toggleListener(elements[x], arguments[1], arguments[2], arguments[3]);
                 }
             }
             return;
@@ -473,7 +456,7 @@
 
         // If a single node is passed, bind the event listener
         for (var i = 0; i < eventList.length; i++) {
-            element[toggle ? 'addEventListener' : 'removeEventListener'](eventList[i], callback, useCapture);
+            elements[toggle ? 'addEventListener' : 'removeEventListener'](eventList[i], callback, useCapture);
         }
     }
 
@@ -483,13 +466,6 @@
             _toggleListener(element, events, callback, true, useCapture);
         }
     }
-
-    // Unbind event
-    /*function _off(element, events, callback, useCapture) {
-        if (element) {
-            _toggleListener(element, events, callback, false, useCapture);
-        }
-    }*/
 
     // Trigger event
     function _event(element, type, bubbles, properties) {
@@ -604,6 +580,9 @@
         },
         undefined: function(input) {
             return input !== null && typeof input === 'undefined';
+        },
+        empty: function(input) {
+            return input === null || this.undefined(input) || ((this.string(input) || this.array(input) || this.nodeList(input)) && input.length === 0) || (this.object(input) && Object.keys(input).length === 0);
         }
     };
 
@@ -813,22 +792,12 @@
                 );
             }
 
-            // Speed-up button
-            if (_inArray(config.controls, 'speed-up')) {
-                html.push(
-                    '<button type="button" data-plyr="speed-up">',
-                        '<svg><use xlink:href="' + iconPath + '-fast-forward" /></svg>',
-                        '<span class="plyr__sr-only">' + config.i18n.speedup + '</span>',
-                    '</button>'
-                );
-            }
-
             // Progress
             if (_inArray(config.controls, 'progress')) {
                 // Create progress
                 html.push('<span class="plyr__progress">',
-                    '<label for="seek{id}" class="plyr__sr-only">Seek</label>',
-                    '<input id="seek{id}" class="plyr__progress--seek" type="range" min="0" max="100" step="0.1" value="0" data-plyr="seek">',
+                    '<label for="seek-{id}" class="plyr__sr-only">Seek</label>',
+                    '<input id="seek-{id}" class="plyr__progress--seek" type="range" min="0" max="100" step="0.1" value="0" data-plyr="seek">',
                     '<progress class="plyr__progress--played" max="100" value="0" role="presentation"></progress>',
                     '<progress class="plyr__progress--buffer" max="100" value="0">',
                         '<span>0</span>% ' + config.i18n.buffered,
@@ -878,8 +847,8 @@
             if (_inArray(config.controls, 'volume')) {
                 html.push(
                     '<span class="plyr__volume">',
-                        '<label for="volume{id}" class="plyr__sr-only">' + config.i18n.volume + '</label>',
-                        '<input id="volume{id}" class="plyr__volume--input" type="range" min="' + config.volumeMin + '" max="' + config.volumeMax + '" value="' + config.volume + '" data-plyr="volume">',
+                        '<label for="volume-{id}" class="plyr__sr-only">' + config.i18n.volume + '</label>',
+                        '<input id="volume-{id}" class="plyr__volume--input" type="range" min="' + config.volumeMin + '" max="' + config.volumeMax + '" value="' + config.volume + '" data-plyr="volume">',
                         '<progress class="plyr__volume--display" max="' + config.volumeMax + '" value="' + config.volumeMin + '" role="presentation"></progress>',
                     '</span>'
                 );
@@ -893,6 +862,39 @@
                         '<svg><use xlink:href="' + iconPath+ '-captions-off" /></svg>',
                         '<span class="plyr__sr-only">' + config.i18n.toggleCaptions + '</span>',
                     '</button>'
+                );
+            }
+
+            // Settings button
+            if (_inArray(config.controls, 'settings')) {
+
+
+                html.push(
+                    '<div class="plyr__menu">',
+                        '<button type="button" id="plyr-settings-toggle-{id}" data-plyr="settings" aria-haspopup="true" aria-controls="plyr-settings-{id}" aria-expanded="false">',
+                            '<svg><use xlink:href="' + iconPath + '-settings" /></svg>',
+                            '<span class="plyr__sr-only">' + config.i18n.settings + '</span>',
+                        '</button>',
+                        '<div class="plyr__menu__container" id="plyr-settings-{id}" aria-hidden="true" aria-labelled-by="plyr-settings-toggle-{id}">',
+                            '<ul>',
+                                '<li>',
+                                    '<button type="button" data-plyr="slide-captions">',
+                                        config.i18n.captions + ' <span class="plyr__menu__value">{lang}</span>',
+                                    '</button>',
+                                '</li>',
+                                '<li>',
+                                    '<button type="button" data-plyr="slide-speed">',
+                                        config.i18n.speed + ' <span class="plyr__menu__value">{speed}</span>',
+                                    '</button>',
+                                '</li>',
+                                '<li>',
+                                    '<button type="button" data-plyr="slide-speed">',
+                                        config.i18n.quality + ' <span class="plyr__menu__value">Auto</span>',
+                                    '</button>',
+                                '</li>',
+                            '</ul>',
+                        '</div>',
+                    '</div>'
                 );
             }
 
@@ -1292,7 +1294,10 @@
             html = _replaceAll(html, '{seektime}', config.seekTime);
 
             // Replace seek time instances
-            html = _replaceAll(html, '{speed}', config.currentSpeed);
+            html = _replaceAll(html, '{speed}', config.currentSpeed === 1 ? 'Normal' : config.currentSpeed.toFixed(1) + 'x');
+
+            // Replace current captions language
+            html = _replaceAll(html, '{lang}', 'English');
 
             // Replace all id references with random numbers
             html = _replaceAll(html, '{id}', Math.floor(Math.random() * (10000)));
@@ -1340,7 +1345,7 @@
                 plyr.buttons.rewind           = _getElement(config.selectors.buttons.rewind);
                 plyr.buttons.forward          = _getElement(config.selectors.buttons.forward);
                 plyr.buttons.fullscreen       = _getElement(config.selectors.buttons.fullscreen);
-                plyr.buttons.speedup          = _getElement(config.selectors.buttons.speedup);
+                plyr.buttons.settings         = _getElement(config.selectors.buttons.settings);
 
                 // Inputs
                 plyr.buttons.mute             = _getElement(config.selectors.buttons.mute);
@@ -1982,13 +1987,14 @@
         }
 
         // Speed-up
-        function _speedup(speed) {
+        function _speed(speed) {
             if (!_is.array(config.speeds)) {
                 _warn('Invalid speeds format');
                 return;
             }
             if (!_is.number(speed)) {
                 var index = config.speeds.indexOf(config.currentSpeed);
+
                 if (index !== -1) {
                     var nextIndex = index + 1;
                     if (nextIndex >= config.speeds.length) {
@@ -2000,11 +2006,11 @@
                 }
             }
 
+            // Store current speed
             config.currentSpeed = speed;
 
+            // Set HTML5 speed
             plyr.media.playbackRate = speed;
-
-            _updateSpeedupTooltip(speed);
 
             // Save speed to localStorage
             _updateStorage({speed: speed});
@@ -2578,31 +2584,13 @@
         }
 
         // Set playback speed
-        function _setSpeedup(speed) {
+        function _setSpeed(speed) {
             // Load speed from storage or default value
             if (_is.undefined(speed)) {
                 speed = plyr.storage.speed || config.defaultSpeed;
             }
 
-            _speedup(speed);
-        }
-
-        // Update hover tooltip for playback speed changed
-        function _updateSpeedupTooltip(speed) {
-            if (!isNaN(speed)) {
-                speed = config.currentSpeed;
-            }
-
-            var button = plyr.buttons.speedup;
-            var template = config.i18n.speedup;
-
-            var elements= button.getElementsByClassName(config.classes.tooltip);
-            if (elements.length === 0){
-                return;
-            }
-
-            var tooltip = elements[0];
-            tooltip.innerHTML = _replaceAll(template, '{speed}', speed);
+            _speed(speed);
         }
 
         // Show the player controls in fullscreen mode
@@ -3068,7 +3056,7 @@
             _proxyListener(plyr.buttons.forward, 'click', config.listeners.forward, _forward);
 
             // Speed-up
-            _proxyListener(plyr.buttons.speedup, 'click', config.listeners.speedup, _speedup);
+            _proxyListener(plyr.buttons.speed, 'click', config.listeners.speed, _speed);
 
             // Seek
             _proxyListener(plyr.buttons.seek, inputEvent, config.listeners.seek, _seek);
@@ -3091,6 +3079,16 @@
 
             // Captions
             _on(plyr.buttons.captions, 'click', _toggleCaptions);
+
+            // Menus
+            _on(plyr.controls.querySelectorAll('[aria-haspopup="true"]'), 'click', function() { 
+                var toggle = this,
+                    target = document.querySelector('#' + toggle.getAttribute('aria-controls')),
+                    show = (toggle.getAttribute('aria-expanded') === 'false');
+
+                toggle.setAttribute('aria-expanded', show);
+                target.setAttribute('aria-hidden', !show);
+            });
 
             // Seek tooltip
             _on(plyr.progress.container, 'mouseenter mouseleave mousemove', _updateSeekTooltip);
@@ -3456,7 +3454,7 @@
             _updateVolume();
 
             // Set playback speed
-            _setSpeedup();
+            _setSpeed();
 
             // Reset time display
             _timeUpdate();
@@ -3488,6 +3486,7 @@
             source:             _source,
             poster:             _updatePoster,
             setVolume:          _setVolume,
+            setSpeed:           _setSpeed,
             togglePlay:         _togglePlay,
             toggleMute:         _toggleMute,
             toggleCaptions:     _toggleCaptions,
