@@ -117,8 +117,7 @@
             tabFocus:           'tab-focus'
         },
         captions: {
-            defaultActive:      false,
-            selectedIndex:      0
+            defaultActive:      false
         },
         fullscreen: {
             enabled:            true,
@@ -475,11 +474,11 @@
     }
 
     // Unbind event
-    function _off(element, events, callback, useCapture) {
+    /*function _off(element, events, callback, useCapture) {
         if (element) {
             _toggleListener(element, events, callback, false, useCapture);
         }
-    }
+    }*/
 
     // Trigger event
     function _event(element, type, bubbles, properties) {
@@ -922,23 +921,6 @@
             }
         }
 
-        // Caption cue change helper event
-        function _captionCueChange (){
-            _setActiveCueForTrack(this);
-        }
-
-        // Display active caption if it contains text
-        function _setActiveCueForTrack(track){
-
-            // Display a cue, if there is one
-            if (track.activeCues[0] && 'text' in track.activeCues[0]) {
-                _setCaption(track.activeCues[0].getCueAsHTML());
-            } else {
-                _setCaption();
-            }
-
-        }
-
         // Setup captions
         function _setupCaptions() {
             // Bail if not HTML5 video
@@ -958,8 +940,7 @@
             }
 
             // Get URL of caption file if exists
-            var captionSources = [],
-                captionSrc = '',
+            var captionSrc = '',
                 kind,
                 children = plyr.media.childNodes;
 
@@ -967,21 +948,17 @@
                 if (children[i].nodeName.toLowerCase() === 'track') {
                     kind = children[i].kind;
                     if (kind === 'captions' || kind === 'subtitles') {
-                        captionSources.push(children[i].getAttribute('src'));
+                        captionSrc = children[i].getAttribute('src');
                     }
                 }
             }
 
             // Record if caption file exists or not
             plyr.captionExists = true;
-            if(captionSources.length==0) {
+            if (captionSrc === '') {
                 plyr.captionExists = false;
                 _log('No caption track found');
-            }else if( (config.captions.selectedIndex+1) > captionSources.length){
-                plyr.captionExists = false;
-                _log('Caption index out of bound');
-            }else{
-                captionSrc = captionSources[config.captions.selectedIndex];
+            } else {
                 _log('Caption track found; URI: ' + captionSrc);
             }
 
@@ -993,8 +970,6 @@
                 // This doesn't seem to work in Safari 7+, so the <track> elements are removed from the dom below
                 var tracks = plyr.media.textTracks;
                 for (var x = 0; x < tracks.length; x++) {
-                    // remove the listener to prevent event overlapping
-                    _off(tracks[x], 'cuechange', _captionCueChange);
                     tracks[x].mode = 'hidden';
                 }
 
@@ -1018,18 +993,20 @@
                 if (plyr.usingTextTracks) {
                     _log('TextTracks supported');
 
-                    var track = tracks[config.captions.selectedIndex];
+                    for (var y = 0; y < tracks.length; y++) {
+                        var track = tracks[y];
 
-                    if (track.kind === 'captions' || track.kind === 'subtitles') {
-
-                        _on(track, 'cuechange', _captionCueChange);
-
-                        // if we change the active track while a cue is already displayed we need to update it
-                        if(track.activeCues && track.activeCues.length>0){
-                            _setActiveCueForTrack(track);
+                        if (track.kind === 'captions' || track.kind === 'subtitles') {
+                            _on(track, 'cuechange', function() {
+                                // Display a cue, if there is one
+                                if (this.activeCues[0] && 'text' in this.activeCues[0]) {
+                                    _setCaption(this.activeCues[0].getCueAsHTML());
+                                } else {
+                                    _setCaption();
+                                }
+                            });
                         }
-
-                     }
+                    }
                 } else {
                     // Caption tracks not natively supported
                     _log('TextTracks not supported so rendering captions manually');
@@ -2323,20 +2300,6 @@
             _updateStorage({captionsEnabled: plyr.captionsEnabled});
         }
 
-        // Select active caption
-        function _setCaptionIndex(index){
-
-            //save active caption
-            config.captions.selectedIndex = index;
-
-            // clear caption
-            _setCaption();
-
-            // re-run setup
-            _setupCaptions();
-
-        }
-
         // Check if media is loading
         function _checkLoading(event) {
             var loading = (event.type === 'waiting');
@@ -3453,7 +3416,6 @@
             toggleCaptions:     _toggleCaptions,
             toggleFullscreen:   _toggleFullscreen,
             toggleControls:     _toggleControls,
-            setCaptionIndex:    _setCaptionIndex,
             isFullscreen:       function() { return plyr.isFullscreen || false; },
             support:            function(mimeType) { return _supportMime(plyr, mimeType); },
             destroy:            _destroy
