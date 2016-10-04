@@ -66,7 +66,7 @@
                 wrapper:        '.plyr__controls'
             },
             fullscreen: {
-                container:      null,
+                container:      null
             },
             labels:             '[data-plyr]',
             buttons: {
@@ -917,7 +917,7 @@
                     _log((nativeSupport ? 'Native' : 'Fallback') + ' fullscreen enabled');
 
                     // Add styling hook
-                    _toggleClass(plyr.container, config.classes.fullscreen.enabled, true);
+                    _toggleClass(plyr.fullscreenContainer, config.classes.fullscreen.enabled, true);
                 } else {
                     _log('Fullscreen not supported and fallback disabled');
                 }
