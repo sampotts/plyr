@@ -2737,7 +2737,7 @@
                 }
 
                 // Restore class hooks
-                _toggleClass(plyr.container, config.classes.fullscreen.active, plyr.isFullscreen);
+                _toggleClass(plyr.fullscreenContainer, config.classes.fullscreen.active, plyr.isFullscreen);
                 _toggleClass(plyr.container, config.classes.captions.active, plyr.captionsEnabled);
                 _toggleStyleHook();
 
