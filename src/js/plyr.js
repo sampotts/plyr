@@ -73,6 +73,9 @@
                 container:      null,
                 wrapper:        '.plyr__controls'
             },
+            fullscreen: {
+                container:      null
+            },
             labels:             '[data-plyr]',
             buttons: {
                 seek:           '[data-plyr="seek"]',
@@ -919,6 +922,14 @@
                 return;
             }
 
+            // Setup specified fullscreen container from config (default is plyr.container)
+            if (_is.string(config.selectors.fullscreen.container)) {
+                plyr.fullscreenContainer = document.querySelector(config.selectors.fullscreen.container);
+            }
+            if (!_is.htmlElement(plyr.fullscreenContainer)) {
+                plyr.fullscreenContainer = plyr.container;
+            }
+
             if ((plyr.type !== 'audio' || config.fullscreen.allowAudio) && config.fullscreen.enabled) {
                 // Check for native support
                 var nativeSupport = fullscreen.supportsFullScreen;
@@ -927,7 +938,7 @@
                     _log((nativeSupport ? 'Native' : 'Fallback') + ' fullscreen enabled');
 
                     // Add styling hook
-                    _toggleClass(plyr.container, config.classes.fullscreen.enabled, true);
+                    _toggleClass(plyr.fullscreenContainer, config.classes.fullscreen.enabled, true);
                 } else {
                     _log('Fullscreen not supported and fallback disabled');
                 }
@@ -2125,22 +2136,22 @@
             if (nativeSupport) {
                 // If it's a fullscreen change event, update the UI
                 if (event && event.type === fullscreen.fullScreenEventName) {
-                    plyr.isFullscreen = fullscreen.isFullScreen(plyr.container);
+                    plyr.isFullscreen = fullscreen.isFullScreen(plyr.fullscreenContainer);
                 } else {
                     // Else it's a user request to enter or exit
-                    if (!fullscreen.isFullScreen(plyr.container)) {
+                    if (!fullscreen.isFullScreen(plyr.fullscreenContainer)) {
                         // Save scroll position
                         _saveScrollPosition();
 
                         // Request full screen
-                        fullscreen.requestFullScreen(plyr.container);
+                        fullscreen.requestFullScreen(plyr.fullscreenContainer);
                     } else {
                         // Bail from fullscreen
                         fullscreen.cancelFullScreen();
                     }
 
                     // Check if we're actually full screen (it could fail)
-                    plyr.isFullscreen = fullscreen.isFullScreen(plyr.container);
+                    plyr.isFullscreen = fullscreen.isFullScreen(plyr.fullscreenContainer);
 
                     return;
                 }
@@ -2153,7 +2164,7 @@
             }
 
             // Set class hook
-            _toggleClass(plyr.container, config.classes.fullscreen.active, plyr.isFullscreen);
+            _toggleClass(plyr.fullscreenContainer, config.classes.fullscreen.active, plyr.isFullscreen);
 
             // Trap focus
             _focusTrap(plyr.isFullscreen);
@@ -2164,7 +2175,7 @@
             }
 
             // Trigger an event
-            _triggerEvent(plyr.container, plyr.isFullscreen ? 'enterfullscreen' : 'exitfullscreen', true);
+            _triggerEvent(plyr.fullscreenContainer, plyr.isFullscreen ? 'enterfullscreen' : 'exitfullscreen', true);
 
             // Restore scroll position
             if (!plyr.isFullscreen && nativeSupport) {
@@ -2808,7 +2819,7 @@
                 }
 
                 // Restore class hooks
-                _toggleClass(plyr.container, config.classes.fullscreen.active, plyr.isFullscreen);
+                _toggleClass(plyr.fullscreenContainer, config.classes.fullscreen.active, plyr.isFullscreen);
                 _toggleClass(plyr.container, config.classes.captions.active, plyr.captionsEnabled);
                 _toggleStyleHook();
 
