@@ -946,19 +946,17 @@
                                             '<button type="button" class="plyr__menu__btn plyr__menu__btn--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
                                                 config.i18n.speed,
                                             '</button>',
-                                        '</li>',
+                                        '</li>');
+
+                                config.speeds.forEach(function(speed) {
+                                    html.push(
                                         '<li>',
-                                            '<button type="button">2&times;</button>',
-                                        '</li>',
-                                        '<li>',
-                                            '<button type="button">1.5&times;</button>',
-                                        '</li>',
-                                        '<li>',
-                                            '<button type="button">1&times;</button>',
-                                        '</li>',
-                                        '<li>',
-                                            '<button type="button">0.5&times;</button>',
-                                        '</li>',
+                                            '<button type="button" data-plyr="speed" data-plyr-speed="' + speed + '">' + speed + '&times;</button>',
+                                        '</li>'
+                                    );
+                                });
+
+                                html.push(
                                         '</ul>',
                                 '</div>',
                                 '<div class="plyr__menu__secondary" id="plyr-settings-{id}-quality" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-quality-toggle" role="tabpanel" tabindex="-1">',
@@ -1410,7 +1408,8 @@
             }
 
             // Make a copy of the html
-            var html = config.html;
+            var html = config.html,
+                id = Math.floor(Math.random() * (10000));
 
             // Insert custom video controls
             _log('Injecting custom controls');
@@ -1423,14 +1422,11 @@
             // Replace seek time instances
             html = _replaceAll(html, '{seektime}', config.seekTime);
 
-            // Replace seek time instances
-            html = _replaceAll(html, '{speed}', config.currentSpeed.toFixed(1).toString().replace('.0', '') + '&times;');
-
             // Replace current captions language
             html = _replaceAll(html, '{lang}', 'English');
 
             // Replace all id references with random numbers
-            html = _replaceAll(html, '{id}', Math.floor(Math.random() * (10000)));
+            html = _replaceAll(html, '{id}', id);
 
             // Controls container
             var target;
@@ -1458,6 +1454,18 @@
                     _toggleClass(label, config.classes.hidden, false);
                     _toggleClass(label, config.classes.tooltip, true);
                 }
+            }
+
+            // Binding speed value for menu
+            var speedMenuButton = getMenuButton('speed');
+            config.currentSpeed = new DataBind(speedMenuButton, 'textContent', config.currentSpeed, '{value}×');
+
+            function getMenuButton(setting) {
+                var queryTempalte = '#plyr-settings-{id}-{setting}-toggle .plyr__menu__btn__value';
+                var query = queryTempalte.replace('{id}', id).replace('{setting}', setting);
+                var menuButton = document.querySelector(query);
+
+                return menuButton;
             }
         }
 
@@ -2127,21 +2135,11 @@
                 return;
             }
             if (!_is.number(speed)) {
-                var index = config.speeds.indexOf(config.currentSpeed);
-
-                if (index !== -1) {
-                    var nextIndex = index + 1;
-                    if (nextIndex >= config.speeds.length) {
-                        nextIndex = 0;
-                    }
-                    speed = config.speeds[nextIndex];
-                } else {
-                    speed = config.defaultSpeed;
-                }
+                speed = Number(speed);
             }
 
             // Store current speed
-            config.currentSpeed = speed;
+            config.currentSpeed.change(speed);
 
             // Set HTML5 speed
             plyr.media.playbackRate = speed;
@@ -3244,8 +3242,22 @@
                     target = document.getElementById(toggle.getAttribute('aria-controls')),
                     show = (toggle.getAttribute('aria-expanded') === 'false');
 
-                // Nothing to show, bail
+                // Handle menu item
                 if (!_is.htmlElement(target)) {
+                    var settingsObj = {
+                        'data-plyr-speed': _speed
+                    };
+                    var setting = toggle.getAttribute('data-plyr');
+                    var settingAttr = 'data-plyr-' + setting;
+
+                    if (settingAttr in settingsObj) {
+                        if (toggle.hasAttribute(settingAttr)) {
+                            var settingFunc = settingsObj[settingAttr];
+                            var settingVal = toggle.getAttribute(settingAttr);
+                            settingFunc(settingVal);
+                        }
+                    }
+
                     return;
                 }
 
@@ -3983,4 +3995,33 @@
     CustomEvent.prototype = window.Event.prototype;
 
     window.CustomEvent = CustomEvent;
+})();
+
+// http://stackoverflow.com/a/16484266/754377
+(function () {
+    if (typeof window.DataBind === 'function') {
+        return;
+    }
+
+    function DataBind(element, attr, data, template) {
+        this.template = template || '{value}';
+        this.data = data;
+        this.attr = attr;
+        this.element = element;
+        element[attr] = this.template.replace('{value}', data);
+        element.addEventListener('change', this, false);
+    }
+
+    DataBind.prototype.handleEvent = function(event) {
+        switch (event.type) {
+            case 'change': this.change(this.element[this.attr]);
+        }
+    };
+
+    DataBind.prototype.change = function(value) {
+        this.data = value;
+        this.element[this.attr] = this.template.replace('{value}', value);
+    }
+
+    window.DataBind = DataBind;
 })();
