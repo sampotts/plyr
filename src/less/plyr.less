@@ -259,6 +259,7 @@
 .plyr--captions-active .plyr__captions {
     display: block;
 }
+.plyr--zoom-active .plyr__captions,
 .plyr--fullscreen-active .plyr__captions {
     font-size: @plyr-font-size-captions-large;
 }
@@ -327,6 +328,7 @@
     }
 
     // Hide toggle icons by default
+    .icon--exit-zoom,
     .icon--exit-fullscreen,
     .icon--muted,
     .icon--captions-on {
@@ -447,6 +449,7 @@
 }
 
 // Change icons on state change
+.plyr--zoom-active .icon--exit-zoom,
 .plyr--fullscreen-active .icon--exit-fullscreen,
 .plyr--muted .plyr__controls .icon--muted,
 .plyr--captions-active .plyr__controls .icon--captions-on {
@@ -459,10 +462,12 @@
 
 // Some options are hidden by default
 .plyr [data-plyr='captions'],
+.plyr [data-plyr='zoom'],
 .plyr [data-plyr='fullscreen'] {
     display: none;
 }
 .plyr--captions-enabled [data-plyr='captions'],
+.plyr--zoom-enabled [data-plyr='zoom'],
 .plyr--fullscreen-enabled [data-plyr='fullscreen'] {
     display: inline-block;
 }
@@ -889,7 +894,7 @@
 
 // Fullscreen
 // --------------------------------------------------------------
-.plyr--fullscreen-active {
+.plyr--zoom-active, .plyr--fullscreen-active {
     position: fixed;
     top: 0;
     left: 0;

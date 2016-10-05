@@ -27,7 +27,7 @@
     ],
     "repository": {
         "type": "git",
-        "url": "git://github.com/selz/plyr.git"
+        "url": "git://github.com/hahow/plyr.git"
     },
     "license": "MIT"
 }
