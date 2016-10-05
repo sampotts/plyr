@@ -571,22 +571,23 @@
     (function() {
         // Determine the prefix
         var prefix = (function() { 
+            var result = '';
             if (!_is.undefined(document.cancelFullScreen)) {
-                return '';
+                return result;
             } else {
                 // Check for fullscreen support by vendor prefix
                 ['webkit', 'o', 'moz', 'ms', 'khtml'].forEach(function(prefix) {
                     if (!_is.undefined(document[prefix + 'CancelFullScreen'])) {
-                        return prefix;
+                        result = prefix;
                     } else if (!_is.undefined(document.msExitFullscreen) && document.msFullscreenEnabled) {
                         // Special case for MS (when isn't it?)
-                        return 'ms';
+                        result = 'ms';
                     }
                 });
             }
 
             // If we got this far, there's no support
-            return false;
+            return result;
         })();
 
         _fullscreen = {
