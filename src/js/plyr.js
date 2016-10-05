@@ -1071,7 +1071,12 @@
                 plyr.captionExists = false;
                 _log('Caption index out of bound');
             } else {
+                
+                // Trigger event
+                _triggerEvent(plyr.media, 'captionselected',true,captions[config.captions.selectedIndex]);
+                
                 captionSrc = captions[config.captions.selectedIndex].src;
+                
                 _log('Caption track found; URI: ' + captionSrc);
             }
 
@@ -3903,7 +3908,7 @@
 
             // Listen for events if debugging
             if (config.debug) {
-                var events = config.events.concat(['setup', 'statechange', 'enterfullscreen', 'exitfullscreen', 'captionsenabled', 'captionsdisabled']);
+                var events = config.events.concat(['setup', 'statechange', 'enterfullscreen', 'exitfullscreen', 'captionsenabled', 'captionsdisabled', 'captionselected']);
                 
                 _on(instance.getContainer(), events.join(' '), function(event) { 
                     console.log([config.logPrefix, 'event:', event.type].join(' '), event.detail.plyr);

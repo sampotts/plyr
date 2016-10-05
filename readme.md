@@ -874,6 +874,11 @@ These events also bubble up the DOM. The event target will be the container elem
   		<td></td>
   		<td>Captions toggled off</td>
   	</tr>
+  	<tr>
+      	<td><code>captionselected</code></td>
+      	<td></td>
+      	<td>Selected a different caption track</td>
+    </tr>
     <tr>
       <td><code>destroyed</code></td>
       <td></td>
