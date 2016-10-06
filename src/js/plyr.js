@@ -3400,6 +3400,7 @@
             isMuted:            function() { return plyr.media.muted; },
             isReady:            function() { return _hasClass(plyr.container, config.classes.ready); },
             isLoading:          function() { return _hasClass(plyr.container, config.classes.loading); },
+            isPaused:           function() { return plyr.media.paused; }, 
             on:                 function(event, callback) { _on(plyr.container, event, callback); },
             play:               _play,
             pause:              _pause,
