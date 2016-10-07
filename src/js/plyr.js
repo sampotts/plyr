@@ -938,12 +938,20 @@
                                             '<button type="button" class="plyr__menu__btn plyr__menu__btn--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
                                                 config.i18n.captions,
                                             '</button>',
-                                        '</li>',
+                                        '</li>');
+
+                                var tracks = plyr.media.textTracks;
+                                for (var i = 0; i < tracks.length; i++) {
+                                    html.push(
                                         '<li>',
-                                            '<button type="button">English</button>',
-                                        '</li>',
+                                            '<button type="button" data-plyr="caption" data-plyr-caption="' + i + '">' + tracks[i].label + '</button>',
+                                        '</li>'
+                                    );
+                                }
+
+                                html.push(
                                         '<li>',
-                                            '<button type="button">Off</button>',
+                                            '<button type="button" data-plyr="caption" data-plyr-caption="false">Off</button>',
                                         '</li>',
                                         '</ul>',
                                 '</div>',
@@ -1366,6 +1374,14 @@
             if (active) {
                 _toggleClass(plyr.container, config.classes.captions.active, true);
                 _toggleState(plyr.buttons.captions, true);
+
+                // Update captions menu text
+                var track = _getCaptionTrack(config.captions.selectedIndex);
+                if (track) {
+                    plyr.currentCaptionLabel.change(track.label);
+                }
+            } else {
+                plyr.currentCaptionLabel.change('Off');
             }
         }
 
@@ -1455,9 +1471,6 @@
             // Replace seek time instances
             html = _replaceAll(html, '{seektime}', config.seekTime);
 
-            // Replace current captions language
-            html = _replaceAll(html, '{lang}', 'English');
-
             // Replace all id references with random numbers
             html = _replaceAll(html, '{id}', id);
 
@@ -1492,6 +1505,10 @@
             // Binding speed value for menu
             var speedMenuButton = getMenuButton('speed');
             plyr.currentSpeed = new DataBind(speedMenuButton, 'textContent', config.defaultSpeed, '{value}×');
+
+            // Binding captions value for menu
+            var captionMenuButton = getMenuButton('captions');
+            plyr.currentCaptionLabel = new DataBind(captionMenuButton, 'textContent', config.defaultSpeed);
 
             function getMenuButton(setting) {
                 var queryTempalte = '#plyr-settings-{id}-{setting}-toggle .plyr__menu__btn__value';
@@ -2528,6 +2545,15 @@
 
             // Save captions state to localStorage
             _updateStorage({captionsEnabled: plyr.captionsEnabled});
+
+            // Update captions menu text
+            var track = _getCaptionTrack(config.captions.selectedIndex);
+            if (show && track) {
+                plyr.currentCaptionLabel.change(track.label);
+            } else {
+                plyr.currentCaptionLabel.change('Off');
+            }
+
         }
 
         // Select active caption
@@ -2572,6 +2598,32 @@
 
             return tracks;
 
+        }
+
+        // Return caption by index
+        function _getCaptionTrack(index) {
+
+            var tracks = _getCaptionTracks();
+
+            if (index < tracks.length) {
+                return tracks[index];
+            }
+
+            return null;
+        }
+
+        // Toggle captions by selected text track index
+        function _toggleCaptionIndex(index) {
+            if (_is.number(index)) {
+                // Update capiton
+                _setCaptionIndex(index);
+
+                // Enable caption
+                _toggleCaptions(true);
+            } else {
+                // Disable caption
+                _toggleCaptions(false);
+            }
         }
 
         // Check if media is loading
@@ -3322,6 +3374,7 @@
                 // Handle menu item
                 if (!_is.htmlElement(target)) {
                     var settingsObj = {
+                        'data-plyr-caption': _toggleCaptionIndex,
                         'data-plyr-speed': _speed
                     };
                     var setting = toggle.getAttribute('data-plyr');
@@ -3331,6 +3384,11 @@
                         if (toggle.hasAttribute(settingAttr)) {
                             var settingFunc = settingsObj[settingAttr];
                             var settingVal = toggle.getAttribute(settingAttr);
+
+                            // String to Boolean or Number,
+                            // ex: 'true' -> true, '1.5' -> 1.5
+                            settingVal = JSON.parse(settingVal);
+
                             settingFunc(settingVal);
                         }
                     }
