@@ -134,7 +134,8 @@
             tabFocus:           'tab-focus'
         },
         captions: {
-            defaultActive:      false
+            defaultActive:      false,
+            selectedIndex:      0
         },
         zoom: {
             enabled:            true
@@ -452,10 +453,17 @@
         }
     }
 
-    // Bind event
+    // Bind event handler
     function _on(element, events, callback, useCapture) {
-        if (element) {
+        if (!_is.undefined(element)) {
             _toggleListener(element, events, callback, true, useCapture);
+        }
+    }
+
+    // Unbind event handler
+    function _off(element, events, callback, useCapture) {
+        if (!_is.undefined(element)) {
+            _toggleListener(element, events, callback, false, useCapture);
         }
     }
 
@@ -1071,6 +1079,21 @@
             }
         }
 
+        // Display active caption if it contains text
+        function _setActiveCue(track) {
+            // Get the track from the event if needed
+            if (_is.event(track)) {
+                track = track.target;
+            }
+
+            // Display a cue, if there is one
+            if (track.activeCues[0] && 'text' in track.activeCues[0]) {
+                _setCaption(track.activeCues[0].getCueAsHTML());
+            } else {
+                _setCaption();
+            }
+        }
+
         // Setup captions
         function _setupCaptions() {
             // Bail if not HTML5 video
@@ -1091,24 +1114,23 @@
 
             // Get URL of caption file if exists
             var captionSrc = '',
-                kind,
-                children = plyr.media.childNodes;
-
-            for (var i = 0; i < children.length; i++) {
-                if (children[i].nodeName.toLowerCase() === 'track') {
-                    kind = children[i].kind;
-                    if (kind === 'captions' || kind === 'subtitles') {
-                        captionSrc = children[i].getAttribute('src');
-                    }
-                }
-            }
-
+                captions = _getCaptionTracks();
+            
             // Record if caption file exists or not
             plyr.captionExists = true;
-            if (captionSrc === '') {
+            if (captions.length === 0) {
                 plyr.captionExists = false;
                 _log('No caption track found');
+            } else if ((config.captions.selectedIndex + 1) > captions.length) {
+                plyr.captionExists = false;
+                _log('Caption index out of bound');
             } else {
+                
+                // Trigger event
+                _triggerEvent(plyr.media, 'captionselected',true,captions[config.captions.selectedIndex]);
+                
+                captionSrc = captions[config.captions.selectedIndex].src;
+                
                 _log('Caption track found; URI: ' + captionSrc);
             }
 
@@ -1116,12 +1138,17 @@
             if (!plyr.captionExists) {
                 _toggleClass(plyr.container, config.classes.captions.enabled);
             } else {
+                var tracks = plyr.media.textTracks;
+
                 // Turn off native caption rendering to avoid double captions
                 // This doesn't seem to work in Safari 7+, so the <track> elements are removed from the dom below
-                var tracks = plyr.media.textTracks;
-                for (var x = 0; x < tracks.length; x++) {
-                    tracks[x].mode = 'hidden';
-                }
+                [].forEach.call(tracks, function(track) {
+                    // Remove the listener to prevent event overlapping
+                    _off(track, 'cuechange', _setActiveCue);
+
+                    // Hide captions
+                    track.mode = 'hidden';
+                });
 
                 // Enable UI
                 _showCaptions(plyr);
@@ -1143,18 +1170,14 @@
                 if (plyr.usingTextTracks) {
                     _log('TextTracks supported');
 
-                    for (var y = 0; y < tracks.length; y++) {
-                        var track = tracks[y];
+                    var track = tracks[config.captions.selectedIndex];
 
-                        if (track.kind === 'captions' || track.kind === 'subtitles') {
-                            _on(track, 'cuechange', function() {
-                                // Display a cue, if there is one
-                                if (this.activeCues[0] && 'text' in this.activeCues[0]) {
-                                    _setCaption(this.activeCues[0].getCueAsHTML());
-                                } else {
-                                    _setCaption();
-                                }
-                            });
+                    if (track.kind === 'captions' || track.kind === 'subtitles') {
+                        _on(track, 'cuechange', _setActiveCue);
+
+                        // If we change the active track while a cue is already displayed we need to update it
+                        if (track.activeCues && track.activeCues.length > 0) {
+                            _setActiveCue(track);
                         }
                     }
                 } else {
@@ -1175,15 +1198,26 @@
                                     var captions = [],
                                         caption,
                                         req = xhr.responseText;
-
-                                    captions = req.split('\n\n');
+                                    
+                                    //According to webvtt spec, line terminator consists of one of the following
+                                    // CRLF (U+000D U+000A), LF (U+000A) or CR (U+000D)
+                                    var lineSeparator = '\r\n';
+                                    if (req.indexOf(lineSeparator + lineSeparator) === -1) {
+                                        if (req.indexOf('\r\r') !== -1) {
+                                            lineSeparator = '\r';
+                                        } else {
+                                            lineSeparator = '\n';
+                                        }
+                                    }
+                                    
+                                    captions = req.split(lineSeparator + lineSeparator);
 
                                     for (var r = 0; r < captions.length; r++) {
                                         caption = captions[r];
                                         plyr.captions[r] = [];
 
                                         // Get the parts of the captions
-                                        var parts = caption.split('\n'),
+                                        var parts = caption.split(lineSeparator),
                                             index = 0;
 
                                         // Incase caption numbers are added
@@ -2496,6 +2530,50 @@
             _updateStorage({captionsEnabled: plyr.captionsEnabled});
         }
 
+        // Select active caption
+        function _setCaptionIndex(index) {
+            // Save active caption
+            config.captions.selectedIndex = index;
+
+            // Clear caption
+            _setCaption();
+
+            // Re-run setup
+            _setupCaptions();
+        }
+
+        // Return all available caption tracks
+        function _getCaptionTracks(){
+
+            var kind,
+                tracks = [],
+                index = 0,
+                children = plyr.media.childNodes;
+
+            for (var i = 0; i < children.length; i++) {
+                if (children[i].nodeName.toLowerCase() === 'track') {
+
+                    kind = children[i].kind;
+
+                    if (kind === 'captions' || kind === 'subtitles') {
+
+                        tracks.push({
+                            track   : children[i],
+                            index   : index++,
+                            kind    : kind,
+                            src     : children[i].getAttribute('src'),
+                            lang    : children[i].getAttribute('srclang'),
+                            label   : children[i].getAttribute('label')
+                        });
+
+                    }
+                }
+            }
+
+            return tracks;
+
+        }
+
         // Check if media is loading
         function _checkLoading(event) {
             var loading = (event.type === 'waiting');
@@ -3710,6 +3788,8 @@
             toggleCaptions:     _toggleCaptions,
             toggleFullscreen:   _toggleFullscreen,
             toggleControls:     _toggleControls,
+            setCaptionIndex:    _setCaptionIndex,
+            getCaptionTracks:   _getCaptionTracks,
             isFullscreen:       function() { return plyr.isFullscreen || false; },
             support:            function(mimeType) { return _support.mime(plyr, mimeType); },
             destroy:            _destroy
@@ -3923,7 +4003,7 @@
 
             // Listen for events if debugging
             if (config.debug) {
-                var events = config.events.concat(['setup', 'statechange', 'enterfullscreen', 'exitfullscreen', 'captionsenabled', 'captionsdisabled']);
+                var events = config.events.concat(['setup', 'statechange', 'enterfullscreen', 'exitfullscreen', 'captionsenabled', 'captionsdisabled', 'captionselected']);
                 
                 _on(instance.getContainer(), events.join(' '), function(event) { 
                     console.log([config.logPrefix, 'event:', event.type].join(' '), event.detail.plyr);
