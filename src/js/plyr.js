@@ -9,7 +9,7 @@
 
 ;(function(root, factory) {
     'use strict';
-    /*global define,module*/
+    /* global define,module */
 
     if (typeof module === 'object' && typeof module.exports === 'object') {
         // Node, CommonJS-like
@@ -25,8 +25,7 @@
     'use strict';
 
     // Globals
-    var fullscreen, 
-    scroll = { x: 0, y: 0 },
+    var scroll = { x: 0, y: 0 },
 
     // Default config
     defaults = {
@@ -129,6 +128,10 @@
                 enabled:        'plyr--fullscreen-enabled',
                 active:         'plyr--fullscreen-active'
             },
+            pip: {
+                enabled:        'plyr--pip-enabled',
+                active:         'plyr--pip-active'
+            },
             tabFocus:           'tab-focus'
         },
         captions: {
@@ -207,7 +210,7 @@
 
     // Credits: http://paypal.github.io/accessible-html5-video-player/
     // Unfortunately, due to mixed support, UA sniffing is required
-    function _browserSniff() {
+    function _getBrowser() {
         var ua = navigator.userAgent,
             name = navigator.appName,
             fullVersion = '' + parseFloat(navigator.appVersion),
@@ -284,32 +287,6 @@
             isIos:      /(iPad|iPhone|iPod)/g.test(navigator.platform),
             isTouch:    'ontouchstart' in document.documentElement
         };
-    }
-
-    // Check for mime type support against a player instance
-    // Credits: http://diveintohtml5.info/everything.html
-    // Related: http://www.leanbackplyr.com/test/h5mt.html
-    function _supportMime(plyr, mimeType) {
-        var media = plyr.media;
-
-        if (plyr.type === 'video') {
-            // Check type
-            switch (mimeType) {
-                case 'video/webm':   return !!(media.canPlayType && media.canPlayType('video/webm; codecs="vp8, vorbis"').replace(/no/, ''));
-                case 'video/mp4':    return !!(media.canPlayType && media.canPlayType('video/mp4; codecs="avc1.42E01E, mp4a.40.2"').replace(/no/, ''));
-                case 'video/ogg':    return !!(media.canPlayType && media.canPlayType('video/ogg; codecs="theora"').replace(/no/, ''));
-            }
-        } else if (plyr.type === 'audio') {
-            // Check type
-            switch (mimeType) {
-                case 'audio/mpeg':   return !!(media.canPlayType && media.canPlayType('audio/mpeg;').replace(/no/, ''));
-                case 'audio/ogg':    return !!(media.canPlayType && media.canPlayType('audio/ogg; codecs="vorbis"').replace(/no/, ''));
-                case 'audio/wav':    return !!(media.canPlayType && media.canPlayType('audio/wav; codecs="1"').replace(/no/, ''));
-            }
-        }
-
-        // If we got this far, we're stuffed
-        return false;
     }
 
     // Inject a script
@@ -571,10 +548,10 @@
     // Check variable types
     var _is = {
         object: function(input) {
-            return input !== null && typeof(input) === 'object'; 
+            return input !== null && typeof(input) === 'object' && input.constructor === Object; 
         },
         array: function(input) {
-            return input !== null && (typeof(input) === 'object' && input.constructor === Array);
+            return input !== null && typeof(input) === 'object' && input.constructor === Array;
         },
         number: function(input) {
             return input !== null && (typeof(input) === 'number' && !isNaN(input - 0) || (typeof input === 'object' && input.constructor === Number));
@@ -594,6 +571,9 @@
         function: function(input) {
             return input !== null && typeof input === 'function';
         },
+        event: function(input) {
+            return input !== null && typeof input === 'object' && (input.constructor === Event || input.constructor === CustomEvent);
+        },
         undefined: function(input) {
             return input !== null && typeof input === 'undefined';
         },
@@ -603,45 +583,39 @@
     };
 
     // Fullscreen API
-    function _fullscreen() {
-        var fullscreen = {
-                supportsFullScreen: false,
-                isFullScreen: function() { return false; },
-                requestFullScreen: function() {},
-                cancelFullScreen: function() {},
-                fullScreenEventName: '',
-                element: null,
-                prefix: ''
-            },
-            browserPrefixes = 'webkit o moz ms khtml'.split(' ');
-
-        // Check for native support
-        if (!_is.undefined(document.cancelFullScreen)) {
-            fullscreen.supportsFullScreen = true;
-        } else {
-            // Check for fullscreen support by vendor prefix
-            for (var i = 0, il = browserPrefixes.length; i < il; i++ ) {
-                fullscreen.prefix = browserPrefixes[i];
-
-                if (!_is.undefined(document[fullscreen.prefix + 'CancelFullScreen'])) {
-                    fullscreen.supportsFullScreen = true;
-                    break;
-                } else if (!_is.undefined(document.msExitFullscreen) && document.msFullscreenEnabled) {
-                    // Special case for MS (when isn't it?)
-                    fullscreen.prefix = 'ms';
-                    fullscreen.supportsFullScreen = true;
-                    break;
-                }
+    var _fullscreen;
+    (function() {
+        // Determine the prefix
+        var prefix = (function() { 
+            var result = '';
+            if (!_is.undefined(document.cancelFullScreen)) {
+                return result;
+            } else {
+                // Check for fullscreen support by vendor prefix
+                ['webkit', 'o', 'moz', 'ms', 'khtml'].forEach(function(prefix) {
+                    if (!_is.undefined(document[prefix + 'CancelFullScreen'])) {
+                        result = prefix;
+                    } else if (!_is.undefined(document.msExitFullscreen) && document.msFullscreenEnabled) {
+                        // Special case for MS (when isn't it?)
+                        result = 'ms';
+                    }
+                });
             }
-        }
 
-        // Update methods to do something useful
-        if (fullscreen.supportsFullScreen) {
+            // If we got this far, there's no support
+            return result;
+        })();
+
+        _fullscreen = {
             // Yet again Microsoft awesomeness,
             // Sometimes the prefix is 'ms', sometimes 'MS' to keep you on your toes
-            fullscreen.fullScreenEventName = (fullscreen.prefix === 'ms' ? 'MSFullscreenChange' : fullscreen.prefix + 'fullscreenchange');
+            eventType: (prefix === 'ms' ? 'MSFullscreenChange' : prefix + 'fullscreenchange'),
 
-            fullscreen.isFullScreen = function(element) {
+            // Is an element fullscreen
+            isFullScreen: function(element) {
+                if (!_support.fullscreen) {
+                    return false;
+                }
                 if (_is.undefined(element)) {
                     element = document.body;
                 }
@@ -651,29 +625,40 @@
                     case 'moz':
                         return document.mozFullScreenElement === element;
                     default:
-                        return document[this.prefix + 'FullscreenElement'] === element;
+                        return document[prefix + 'FullscreenElement'] === element;
                 }
-            };
-            fullscreen.requestFullScreen = function(element) {
+            },
+            requestFullScreen: function(element) {
+                if (!_support.fullscreen) {
+                    return false;
+                }
                 if (_is.undefined(element)) {
                     element = document.body;
                 }
-                return (this.prefix === '') ? element.requestFullScreen() : element[this.prefix + (this.prefix === 'ms' ? 'RequestFullscreen' : 'RequestFullScreen')]();
-            };
-            fullscreen.cancelFullScreen = function() {
-                return (this.prefix === '') ? document.cancelFullScreen() : document[this.prefix + (this.prefix === 'ms' ? 'ExitFullscreen' : 'CancelFullScreen')]();
-            };
-            fullscreen.element = function() {
-                return (this.prefix === '') ? document.fullscreenElement : document[this.prefix + 'FullscreenElement'];
-            };
-        }
+                return (prefix === '') ? element.requestFullScreen() : element[prefix + (prefix === 'ms' ? 'RequestFullscreen' : 'RequestFullScreen')]();
+            },
+            cancelFullScreen: function() {
+                if (!_support.fullscreen) {
+                    return false;
+                }
+                return (prefix === '') ? document.cancelFullScreen() : document[prefix + (prefix === 'ms' ? 'ExitFullscreen' : 'CancelFullScreen')]();
+            },
+            element: function() {
+                if (!_support.fullscreen) {
+                    return null;
+                }
+                return (prefix === '') ? document.fullscreenElement : document[prefix + 'FullscreenElement'];
+            } 
+        };
+    })();
 
-        return fullscreen;
-    }
-
-    // Local storage
-    var _storage = {
-        supported: (function() {
+    // Check for support
+    var _support = {
+        // Fullscreen support and set prefix
+        fullscreen: _fullscreen.prefix !== false,
+        // Local storage mode
+        // We can't assume if local storage is present that we can use it
+        storage: (function() {
             if (!('localStorage' in window)) {
                 return false;
             }
@@ -698,7 +683,37 @@
             }
 
             return false;
-        })()
+        })(),
+        // Picture-in-picture support
+        // Safari only currently 
+        pip: function(plyr) {
+            return _is.function(plyr.media.webkitSetPresentationMode);
+        },
+        // Check for mime type support against a player instance
+        // Credits: http://diveintohtml5.info/everything.html
+        // Related: http://www.leanbackplyr.com/test/h5mt.html
+        mime: function(plyr, type) {
+            var media = plyr.media;
+
+            if (plyr.type === 'video') {
+                // Check type
+                switch (type) {
+                    case 'video/webm':   return !!(media.canPlayType && media.canPlayType('video/webm; codecs="vp8, vorbis"').replace(/no/, ''));
+                    case 'video/mp4':    return !!(media.canPlayType && media.canPlayType('video/mp4; codecs="avc1.42E01E, mp4a.40.2"').replace(/no/, ''));
+                    case 'video/ogg':    return !!(media.canPlayType && media.canPlayType('video/ogg; codecs="theora"').replace(/no/, ''));
+                }
+            } else if (plyr.type === 'audio') {
+                // Check type
+                switch (type) {
+                    case 'audio/mpeg':   return !!(media.canPlayType && media.canPlayType('audio/mpeg;').replace(/no/, ''));
+                    case 'audio/ogg':    return !!(media.canPlayType && media.canPlayType('audio/ogg; codecs="vorbis"').replace(/no/, ''));
+                    case 'audio/wav':    return !!(media.canPlayType && media.canPlayType('audio/wav; codecs="1"').replace(/no/, ''));
+                }
+            }
+
+            // If we got this far, we're stuffed
+            return false;
+        }
     };
 
     // Player instance
@@ -881,34 +896,93 @@
                 );
             }
 
-            // Settings button
+            // Settings button / menu
             if (_inArray(config.controls, 'settings')) {
-
-
                 html.push(
-                    '<div class="plyr__menu">',
-                        '<button type="button" id="plyr-settings-toggle-{id}" data-plyr="settings" aria-haspopup="true" aria-controls="plyr-settings-{id}" aria-expanded="false">',
+                    '<div class="plyr__menu" data-plyr="settings">',
+                        '<button type="button" id="plyr-settings-toggle-{id}" aria-haspopup="true" aria-controls="plyr-settings-{id}" aria-expanded="false">',
                             '<svg><use xlink:href="' + iconPath + '-settings" /></svg>',
                             '<span class="plyr__sr-only">' + config.i18n.settings + '</span>',
                         '</button>',
-                        '<div class="plyr__menu__container" id="plyr-settings-{id}" aria-hidden="true" aria-labelled-by="plyr-settings-toggle-{id}">',
-                            '<ul>',
-                                '<li>',
-                                    '<button type="button" data-plyr="slide-captions">',
-                                        config.i18n.captions + ' <span class="plyr__menu__value">{lang}</span>',
-                                    '</button>',
-                                '</li>',
-                                '<li>',
-                                    '<button type="button" data-plyr="slide-speed">',
-                                        config.i18n.speed + ' <span class="plyr__menu__value">{speed}</span>',
-                                    '</button>',
-                                '</li>',
-                                '<li>',
-                                    '<button type="button" data-plyr="slide-speed">',
-                                        config.i18n.quality + ' <span class="plyr__menu__value">Auto</span>',
-                                    '</button>',
-                                '</li>',
-                            '</ul>',
+                        '<div class="plyr__menu__container" id="plyr-settings-{id}" aria-hidden="true" aria-labelled-by="plyr-settings-toggle-{id}" role="tablist" tabindex="-1">',
+                            '<div>',
+                                '<div class="plyr__menu__primary" id="plyr-settings-{id}-primary" aria-hidden="false" aria-labelled-by="plyr-settings-toggle-{id}" role="tabpanel" tabindex="-1">',
+                                    '<ul>',
+                                        '<li role="tab">',
+                                            '<button type="button" class="plyr__menu__btn plyr__menu__btn--forward" id="plyr-settings-{id}-captions-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-captions" aria-expanded="false">',
+                                                config.i18n.captions + ' <span class="plyr__menu__btn__value">{lang}</span>',
+                                            '</button>',
+                                        '</li>',
+                                        '<li role="tab">',
+                                            '<button type="button" class="plyr__menu__btn plyr__menu__btn--forward" id="plyr-settings-{id}-speed-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-speed" aria-expanded="false">',
+                                                config.i18n.speed + ' <span class="plyr__menu__btn__value">{speed}</span>',
+                                            '</button>',
+                                        '</li>',
+                                        '<li role="tab">',
+                                            '<button type="button" class="plyr__menu__btn plyr__menu__btn--forward" id="plyr-settings-{id}-quality-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-quality" aria-expanded="false">',
+                                                config.i18n.quality + ' <span class="plyr__menu__btn__value">Auto</span>',
+                                            '</button>',
+                                        '</li>',
+                                    '</ul>',
+                                '</div>',
+                                '<div class="plyr__menu__secondary" id="plyr-settings-{id}-captions" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-captions-toggle" role="tabpanel" tabindex="-1">',
+                                    '<ul>',
+                                        '<li role="tab">',
+                                            '<button type="button" class="plyr__menu__btn plyr__menu__btn--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
+                                                config.i18n.captions,
+                                            '</button>',
+                                        '</li>',
+                                        '<li>',
+                                            '<button type="button">English</button>',
+                                        '</li>',
+                                        '<li>',
+                                            '<button type="button">Off</button>',
+                                        '</li>',
+                                        '</ul>',
+                                '</div>',
+                                '<div class="plyr__menu__secondary" id="plyr-settings-{id}-speed" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-speed-toggle" role="tabpanel" tabindex="-1">',
+                                    '<ul>',
+                                        '<li role="tab">',
+                                            '<button type="button" class="plyr__menu__btn plyr__menu__btn--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
+                                                config.i18n.speed,
+                                            '</button>',
+                                        '</li>',
+                                        '<li>',
+                                            '<button type="button">2&times;</button>',
+                                        '</li>',
+                                        '<li>',
+                                            '<button type="button">1.5&times;</button>',
+                                        '</li>',
+                                        '<li>',
+                                            '<button type="button">1&times;</button>',
+                                        '</li>',
+                                        '<li>',
+                                            '<button type="button">0.5&times;</button>',
+                                        '</li>',
+                                        '</ul>',
+                                '</div>',
+                                '<div class="plyr__menu__secondary" id="plyr-settings-{id}-quality" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-quality-toggle" role="tabpanel" tabindex="-1">',
+                                    '<ul>',
+                                        '<li role="tab">',
+                                            '<button type="button" class="plyr__menu__btn plyr__menu__btn--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
+                                                config.i18n.quality,
+                                            '</button>',
+                                        '</li>',
+                                        '<li>',
+                                            '<button type="button">1080P <span class="plyr__menu__btn__badge"><span>HD</span></span></button>',
+                                        '</li>',
+                                        '<li>',
+                                            '<button type="button">720P <span class="plyr__menu__btn__badge"><span>HD</span></span></button>',
+                                        '</li>',
+                                        '<li>',
+                                            '<button type="button">480P</button>',
+                                        '</li>',
+                                        '<li>',
+                                            '<button type="button">320P</button>',
+                                        '</li>',
+                                        '</ul>',
+                                '</div>',
+                            '</div>',
                         '</div>',
                     '</div>'
                 );
@@ -979,7 +1053,7 @@
 
             if ((plyr.type !== 'audio' || config.fullscreen.allowAudio) && config.fullscreen.enabled) {
                 // Check for native support
-                var nativeSupport = fullscreen.supportsFullScreen;
+                var nativeSupport = _support.fullscreen;
 
                 if (nativeSupport || (config.fullscreen.fallback && !_inFrame())) {
                     _log((nativeSupport ? 'Native' : 'Fallback') + ' fullscreen enabled');
@@ -1350,7 +1424,7 @@
             html = _replaceAll(html, '{seektime}', config.seekTime);
 
             // Replace seek time instances
-            html = _replaceAll(html, '{speed}', config.currentSpeed === 1 ? 'Normal' : config.currentSpeed.toFixed(1) + 'x');
+            html = _replaceAll(html, '{speed}', config.currentSpeed.toFixed(1).toString().replace('.0', '') + '&times;');
 
             // Replace current captions language
             html = _replaceAll(html, '{lang}', 'English');
@@ -1492,7 +1566,7 @@
             plyr.storage = {};
 
             // Bail if we don't have localStorage support or it's disabled
-            if (!_storage.supported || !config.storage.enabled) {
+            if (!_support.storage || !config.storage.enabled) {
                 return;
             }
 
@@ -1520,7 +1594,7 @@
         // Save a value back to local storage
         function _updateStorage(value) {
             // Bail if we don't have localStorage support or it's disabled
-            if (!_storage.supported || !config.storage.enabled) {
+            if (!_support.storage || !config.storage.enabled) {
                 return;
             }
 
@@ -1548,6 +1622,9 @@
                 if (_inArray(config.types.embed, plyr.type)) {
                     _toggleClass(plyr.container, config.classes.type.replace('{0}', 'video'), true);
                 }
+
+                // Check for picture-in-picture support
+                _toggleClass(plyr.container, config.classes.pip.enabled, _support.pip(plyr));
 
                 // If there's no autoplay attribute, assume the video is stopped and add state class
                 _toggleClass(plyr.container, config.classes.stopped, config.autoplay);
@@ -2082,7 +2159,7 @@
 
             if (_is.number(input)) {
                 targetTime = input;
-            } else if (_is.object(input) && _inArray(['input', 'change'], input.type)) {
+            } else if (_is.event(input) && _inArray(['input', 'change'], input.type)) {
                 // It's the seek slider
                 // Seek to the selected time
                 targetTime = ((input.target.value / input.target.max) * duration);
@@ -2199,27 +2276,27 @@
         // Toggle fullscreen
         function _toggleFullscreen(event) {
             // Check for native support
-            var nativeSupport = fullscreen.supportsFullScreen;
+            var nativeSupport = _support.fullscreen;
             
             if (nativeSupport) {
                 // If it's a fullscreen change event, update the UI
-                if (event && event.type === fullscreen.fullScreenEventName) {
-                    plyr.isFullscreen = fullscreen.isFullScreen(plyr.fullscreenContainer);
+                if (event && event.type === _fullscreen.eventType) {
+                    plyr.isFullscreen = _fullscreen.isFullScreen(plyr.fullscreenContainer);
                 } else {
                     // Else it's a user request to enter or exit
-                    if (!fullscreen.isFullScreen(plyr.fullscreenContainer)) {
+                    if (!_fullscreen.isFullScreen(plyr.fullscreenContainer)) {
                         // Save scroll position
                         _saveScrollPosition();
 
                         // Request full screen
-                        fullscreen.requestFullScreen(plyr.fullscreenContainer);
+                        _fullscreen.requestFullScreen(plyr.fullscreenContainer);
                     } else {
                         // Bail from fullscreen
-                        fullscreen.cancelFullScreen();
+                        _fullscreen.cancelFullScreen();
                     }
 
                     // Check if we're actually full screen (it could fail)
-                    plyr.isFullscreen = fullscreen.isFullScreen(plyr.fullscreenContainer);
+                    plyr.isFullscreen = _fullscreen.isFullScreen(plyr.fullscreenContainer);
 
                     return;
                 }
@@ -3083,7 +3160,7 @@
 
                     // Escape is handle natively when in full screen or zoom
                     // So we only need to worry about non native
-                    if (!fullscreen.supportsFullScreen && plyr.isFullscreen && code === 27) {
+                    if (!_support.fullscreen && plyr.isFullscreen && code === 27) {
                         _toggleFullscreen();
                     }
                     if (plyr.isZoom && code === 27) {
@@ -3153,21 +3230,71 @@
             _proxyListener(plyr.buttons.fullscreen, 'click', config.listeners.fullscreen, _toggleFullscreen);
 
             // Handle user exiting fullscreen by escaping etc
-            if (fullscreen.supportsFullScreen) {
-                _on(document, fullscreen.fullScreenEventName, _toggleFullscreen);
+            if (_support.fullscreen) {
+                _on(document, _fullscreen.eventType, _toggleFullscreen);
             }
 
             // Captions
             _on(plyr.buttons.captions, 'click', _toggleCaptions);
 
-            // Menus
-            _on(plyr.controls.querySelectorAll('[aria-haspopup="true"]'), 'click', function() { 
-                var toggle = this,
-                    target = document.querySelector('#' + toggle.getAttribute('aria-controls')),
+            // Settings
+            _on(plyr.buttons.settings, 'click', function(event) { 
+                var menu = this,
+                    toggle = event.target,
+                    target = document.getElementById(toggle.getAttribute('aria-controls')),
                     show = (toggle.getAttribute('aria-expanded') === 'false');
 
-                toggle.setAttribute('aria-expanded', show);
+                // Nothing to show, bail
+                if (!_is.htmlElement(target)) {
+                    return;
+                }
+
+                // Are we targetting a tab?
+                var isTab = target.getAttribute('role') === 'tabpanel',
+                    targetWidth, 
+                    targetHeight,
+                    container;
+
+                // Hide all other tabs
+                if (isTab) {
+                    // Get other tabs
+                    var current = menu.querySelector('[role="tabpanel"][aria-hidden="false"]');                        
+                    container = current.parentNode;
+
+                    [].forEach.call(menu.querySelectorAll('[aria-controls="' + current.getAttribute('id') + '"]'), function(toggle) {
+                        toggle.setAttribute('aria-expanded', false);
+                    });
+
+                    container.style.width = current.scrollWidth + 'px'; 
+                    container.style.height = current.scrollHeight + 'px'; 
+
+                    current.setAttribute('aria-hidden', true);
+                    current.setAttribute('tabindex', -1);
+
+                    // Get the natural element size
+                    var clone = target.cloneNode(true);
+                    clone.style.position = "absolute";
+                    clone.style.opacity = 0;
+                    clone.setAttribute('aria-hidden', false);
+                    container.appendChild(clone);
+                    targetWidth = clone.scrollWidth;
+                    targetHeight = clone.scrollHeight;
+                    _remove(clone);                
+                }
+                
                 target.setAttribute('aria-hidden', !show);
+                toggle.setAttribute('aria-expanded', show);
+                target.setAttribute('tabindex', 0);
+
+                if (isTab) {
+                    container.style.width = targetWidth + 'px';
+                    container.style.height = targetHeight + 'px';
+
+                    window.setTimeout(function() {
+                        container.style.width = '';
+                        container.style.height = '';
+                    }, 300);
+                }
             });
 
             // Seek tooltip
@@ -3410,11 +3537,8 @@
                 return null;
             }
 
-            // Setup the fullscreen api
-            fullscreen = _fullscreen();
-
             // Sniff out the browser
-            plyr.browser = _browserSniff();
+            plyr.browser = _getBrowser();
 
             // Bail if nothing to setup
             if (!_is.htmlElement(plyr.media)) {
@@ -3576,7 +3700,7 @@
             toggleFullscreen:   _toggleFullscreen,
             toggleControls:     _toggleControls,
             isFullscreen:       function() { return plyr.isFullscreen || false; },
-            support:            function(mimeType) { return _supportMime(plyr, mimeType); },
+            support:            function(mimeType) { return _support.mime(plyr, mimeType); },
             destroy:            _destroy
         };
 
@@ -3647,7 +3771,7 @@
 
     // Check for support
     function supported(type) {
-        var browser     = _browserSniff(),
+        var browser     = _getBrowser(),
             isOldIE     = (browser.isIE && browser.version <= 9),
             isIos       = browser.isIos,
             isIphone    = /iPhone|iPod/i.test(navigator.userAgent),
