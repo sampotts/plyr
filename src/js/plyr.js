@@ -39,7 +39,6 @@
         volumeMax:              10, 
         volumeStep:             1,
         defaultSpeed:           1.0,
-        currentSpeed:           1.0,
         speeds:                 [ 0.5, 1.0, 1.5, 2.0 ],
         duration:               null,
         displayDuration:        true,
@@ -1458,7 +1457,7 @@
 
             // Binding speed value for menu
             var speedMenuButton = getMenuButton('speed');
-            config.currentSpeed = new DataBind(speedMenuButton, 'textContent', config.currentSpeed, '{value}×');
+            plyr.currentSpeed = new DataBind(speedMenuButton, 'textContent', config.defaultSpeed, '{value}×');
 
             function getMenuButton(setting) {
                 var queryTempalte = '#plyr-settings-{id}-{setting}-toggle .plyr__menu__btn__value';
@@ -2139,7 +2138,7 @@
             }
 
             // Store current speed
-            config.currentSpeed.change(speed);
+            plyr.currentSpeed.change(speed);
 
             // Set HTML5 speed
             plyr.media.playbackRate = speed;
