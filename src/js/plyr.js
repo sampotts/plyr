@@ -45,6 +45,8 @@
         loadSprite:             true,
         iconPrefix:             'plyr',
         iconUrl:                'https://cdn.plyr.io/2.0.7/plyr.svg',
+        logoLink:               null,
+        logoImgUrl:             null,
         clickToPlay:            true,
         hideControls:           true,
         showPosterOnEnd:        false,
@@ -772,6 +774,17 @@
             var html        = [],
                 iconUrl     = _getIconUrl(),
                 iconPath    = (!iconUrl.absolute ? iconUrl.url : '') + '#' + config.iconPrefix;
+
+            // Logo
+            if (_inArray(config.controls, 'logo')) {
+                html.push(
+                    '<div class="plyr__logo">',
+                        (config.logoLink) ? '<a href="' + config.logoLink + '">' : '',
+                            (config.logoImgUrl) ? '<image src="' + config.logoImgUrl + '">' : '',
+                        (config.logoLink) ? '</a>' : '',
+                    '</div>'
+                );
+            }
 
             // Larger overlaid play button
             if (_inArray(config.controls, 'play-large')) {
