@@ -277,12 +277,32 @@
 // Playback controls
 .plyr__controls {
     display: flex;
-    align-items: center; 
-    line-height: 1;
-    text-align: center;
+    flex-direction: column;
+
+    // Layout
+    .plyr__controls-top-container {
+        display: flex;
+    }
+    .plyr__controls-bottom-container {
+        display: flex;
+        justify-content: space-between;
+        z-index: 3;
+    }
+    .plyr__controls-left-container,
+    .plyr__controls-right-container {
+        display: flex;
+        align-items: center;
+
+        > button {
+            margin-left: (@plyr-control-spacing / 2);
+
+            &:first-child {
+                margin-left: 0;
+            }
+        }
+    }
 
     // Spacing
-    > button,
     .plyr__progress,
     .plyr__time,
     .plyr__menu {
@@ -336,16 +356,25 @@
     }
 
     @media (min-width: @plyr-bp-screen-sm) {
-        > button,
+        .plyr__controls-left-container,
+        .plyr__controls-right-container {
+            > button {
+                margin-left: @plyr-control-spacing;
+            }
+            > button + button,
+            > button + .plyr__menu {
+                margin-left: (@plyr-control-spacing / 2);
+            }
+        }
+
         .plyr__progress,
         .plyr__time,
         .plyr__menu {
             margin-left: @plyr-control-spacing;
         }
 
-        > button + button,
-        .plyr__menu + button,
-        > button + .plyr__menu {
+
+        .plyr__menu + button {
             margin-left: (@plyr-control-spacing / 2);
         }
     }

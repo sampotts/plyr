@@ -798,6 +798,33 @@
 
             html.push('<div class="plyr__controls">');
 
+            // Progress
+            if (_inArray(config.controls, 'progress')) {
+
+                html.push('');
+
+                // Create progress
+                html.push('<div class="plyr__controls-top-container">',
+                    '<span class="plyr__progress">',
+                        '<label for="seek-{id}" class="plyr__sr-only">Seek</label>',
+                        '<input id="seek-{id}" class="plyr__progress--seek" type="range" min="0" max="100" step="0.1" value="0" data-plyr="seek">',
+                        '<progress class="plyr__progress--played" max="100" value="0" role="presentation"></progress>',
+                        '<progress class="plyr__progress--buffer" max="100" value="0">',
+                            '<span>0</span>% ' + config.i18n.buffered,
+                        '</progress>');
+
+                // Seek tooltip
+                if (config.tooltips.seek) {
+                    html.push('<span class="plyr__tooltip">00:00</span>');
+                }
+
+                // Close
+                html.push('</span>', '</div>');
+            }
+
+            html.push('<div class="plyr__controls-bottom-container">',
+                '<div class="plyr__controls-left-container">');
+
             // Restart button
             if (_inArray(config.controls, 'restart')) {
                 html.push(
@@ -843,26 +870,6 @@
                 );
             }
 
-            // Progress
-            if (_inArray(config.controls, 'progress')) {
-                // Create progress
-                html.push('<span class="plyr__progress">',
-                    '<label for="seek-{id}" class="plyr__sr-only">Seek</label>',
-                    '<input id="seek-{id}" class="plyr__progress--seek" type="range" min="0" max="100" step="0.1" value="0" data-plyr="seek">',
-                    '<progress class="plyr__progress--played" max="100" value="0" role="presentation"></progress>',
-                    '<progress class="plyr__progress--buffer" max="100" value="0">',
-                        '<span>0</span>% ' + config.i18n.buffered,
-                    '</progress>');
-
-                // Seek tooltip
-                if (config.tooltips.seek) {
-                    html.push('<span class="plyr__tooltip">00:00</span>');
-                }
-
-                // Close
-                html.push('</span>');
-            }
-
             // Media current time display
             if (_inArray(config.controls, 'current-time')) {
                 html.push(
@@ -882,6 +889,8 @@
                     '</span>'
                 );
             }
+
+            html.push('</div>', '<div class="plyr__controls-right-container">');
 
             // Toggle mute button
             if (_inArray(config.controls, 'mute')) {
@@ -1051,7 +1060,7 @@
             }
 
             // Close everything
-            html.push('</div>');
+            html.push('</div></div>');
 
             return html.join('');
         }
