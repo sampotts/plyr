@@ -45,7 +45,7 @@
         loadSprite:             true,
         iconPrefix:             'plyr',
         iconUrl:                'https://cdn.plyr.io/2.0.7/plyr.svg',
-        logoUrl:                null,
+        logoLink:               null,
         logoImgUrl:             null,
         clickToPlay:            true,
         hideControls:           true,
@@ -779,9 +779,9 @@
             if (_inArray(config.controls, 'logo')) {
                 html.push(
                     '<div class="plyr__logo">',
-                        (config.logoUrl) ? '<a href="' + config.logoUrl + '">' : '',
+                        (config.logoLink) ? '<a href="' + config.logoLink + '">' : '',
                             (config.logoImgUrl) ? '<image src="' + config.logoImgUrl + '">' : '',
-                        (config.logoUrl) ? '</a>' : '',
+                        (config.logoLink) ? '</a>' : '',
                     '</div>'
                 );
             }
