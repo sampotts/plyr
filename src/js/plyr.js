@@ -171,7 +171,8 @@
             captions:           'Captions',
             settings:           'Settings',
             speed:              'Speed',
-            quality:            'Quality'
+            quality:            'Quality',
+            disableCaptions:    'Off'
         },
         types: {
             embed:              ['youtube', 'vimeo', 'soundcloud'],
@@ -1429,7 +1430,7 @@
                     plyr.currentCaptionLabel.change(track.label);
                 }
             } else {
-                plyr.currentCaptionLabel.change('Off');
+                plyr.currentCaptionLabel.change(config.i18n.disableCaptions);
             }
         }
 
@@ -1551,16 +1552,22 @@
             }
 
             // Binding speed value for menu
-            var speedMenuButton = getMenuButton('speed');
-            plyr.currentSpeed = new DataBind(speedMenuButton, 'textContent', config.defaultSpeed, '{value}×');
+            if (_inArray(config.controls, 'speed')) {
+                var speedMenuButton = getMenuButton('speed');
+                plyr.currentSpeed = new DataBind(speedMenuButton, 'textContent', config.defaultSpeed, '{value}×');
+            }
 
             // Binding captions value for menu
-            var captionMenuButton = getMenuButton('captions');
-            plyr.currentCaptionLabel = new DataBind(captionMenuButton, 'textContent', config.defaultSpeed);
+            if (_inArray(config.controls, 'captions')) {
+                var captionMenuButton = getMenuButton('captions');
+                plyr.currentCaptionLabel = new DataBind(captionMenuButton, 'textContent', config.i18n.disableCaptions);
+            }
 
             // Binding quality value for menu
-            var qualityMenuButton = getMenuButton('quality');
-            plyr.currentQualityLabel = new DataBind(qualityMenuButton, 'textContent', _getCurrentQuality());
+            if (_inArray(config.controls, 'quality')) {
+                var qualityMenuButton = getMenuButton('quality');
+                plyr.currentQualityLabel = new DataBind(qualityMenuButton, 'textContent', _getCurrentQuality());
+            }
 
             function getMenuButton(setting) {
                 var queryTempalte = '#plyr-settings-{id}-{setting}-toggle .plyr__menu__btn__value';
@@ -2232,6 +2239,9 @@
 
         // Speed-up
         function _speed(speed) {
+            if (!_inArray(config.controls, 'speed')) {
+                return;
+            }
             if (!_is.array(config.speeds)) {
                 _warn('Invalid speeds format');
                 return;
@@ -2603,7 +2613,7 @@
             if (show && track) {
                 plyr.currentCaptionLabel.change(track.label);
             } else {
-                plyr.currentCaptionLabel.change('Off');
+                plyr.currentCaptionLabel.change(config.i18n.disableCaptions);
             }
 
         }
@@ -3034,6 +3044,41 @@
             }
 
             return sources[0].getAttribute('label');
+        }
+
+        // Get fit resolution quality object
+        function _getFitQuality() {
+            var i,
+                sources = Array.prototype.slice.call(_getElements('source')),
+                elementHeight = plyr.media.clientHeight,
+                // ex: sortedSources = [360, 720, 1080, ...]
+                sortedSources = sources
+                    .map(function(source) {
+                        return source.getAttribute('res');
+                    })
+                    .sort(sortNumber),
+                // ex: elementHeight = 480, fitIndex = 1
+                fitIndex = Math.min(
+                    [elementHeight]
+                        .concat(sortedSources)
+                        .sort(sortNumber)
+                        .indexOf(elementHeight),
+                    sortedSources.length - 1),
+                // ex: fitResolution = 720
+                fitResolution = sortedSources[fitIndex],
+                // ex: fitSource = { label: '720p', res: 720 }
+                fitSource = sources.filter(function(source) {
+                    return source.getAttribute('res') === fitResolution;
+                })[0];
+
+            return {
+                label: fitSource.getAttribute('label'),
+                res: +fitSource.getAttribute('res')
+            };
+
+            function sortNumber(a, b) {
+                return a - b;
+            }
         }
 
         // Show the player controls in fullscreen mode
@@ -3553,6 +3598,19 @@
                             var settingVal = toggle.getAttribute(settingAttr);
 
                             settingFunc(settingVal);
+
+                            // Toggle selected menu item style
+                            var i,
+                                query = '[data-plyr=' + setting + ']',
+                                buttons = menu.querySelectorAll(query);
+                            for (i=0; i<buttons.length; i++) {
+                                var button = buttons[i];
+                                if (button === toggle) {
+                                    button.setAttribute('class', 'plyr__menu__btn--active');
+                                } else {
+                                    button.setAttribute('class', '');
+                                }
+                            }
                         }
                     }
 
@@ -3913,6 +3971,10 @@
 
             // Successful setup
             plyr.init = true;
+
+            // Switch video quality
+            var fitQuality = _getFitQuality();
+            _setQuality(fitQuality.label);
         }
 
         // Setup the UI
