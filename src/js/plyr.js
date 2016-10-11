@@ -205,7 +205,7 @@
             fullscreen:         null
         },
         // Events to watch on HTML5 media elements
-        events:                 ['ready', 'ended', 'progress', 'stalled', 'playing', 'waiting', 'canplay', 'canplaythrough', 'loadstart', 'loadeddata', 'loadedmetadata', 'timeupdate', 'volumechange', 'play', 'pause', 'error', 'seeking', 'emptied'],
+        events:                 ['ready', 'ended', 'progress', 'stalled', 'playing', 'waiting', 'canplay', 'canplaythrough', 'loadstart', 'loadeddata', 'loadedmetadata', 'timeupdate', 'volumechange', 'play', 'pause', 'error', 'seeking', 'emptied', 'qualitychanged'],
         // Logging
         logPrefix:              '[Plyr]'
     };
@@ -940,7 +940,7 @@
                                         '</li>',
                                         '<li role="tab">',
                                             '<button type="button" class="plyr__menu__btn plyr__menu__btn--forward" id="plyr-settings-{id}-quality-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-quality" aria-expanded="false">',
-                                                config.i18n.quality + ' <span class="plyr__menu__btn__value">Auto</span>',
+                                                config.i18n.quality + ' <span class="plyr__menu__btn__value"></span>',
                                             '</button>',
                                         '</li>',
                                     '</ul>',
@@ -993,19 +993,33 @@
                                             '<button type="button" class="plyr__menu__btn plyr__menu__btn--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
                                                 config.i18n.quality,
                                             '</button>',
-                                        '</li>',
-                                        '<li>',
-                                            '<button type="button">1080P <span class="plyr__menu__btn__badge"><span>HD</span></span></button>',
-                                        '</li>',
-                                        '<li>',
-                                            '<button type="button">720P <span class="plyr__menu__btn__badge"><span>HD</span></span></button>',
-                                        '</li>',
-                                        '<li>',
-                                            '<button type="button">480P</button>',
-                                        '</li>',
-                                        '<li>',
-                                            '<button type="button">320P</button>',
-                                        '</li>',
+                                        '</li>');
+
+                                var HD_RESOLUTION = 720;
+                                Array.prototype.slice.call(_getElements('source'))
+                                    .map(function(source) {
+                                        return {
+                                            label: source.getAttribute('label'),
+                                            res: +source.getAttribute('res')
+                                        };
+                                    })
+                                    // Sort array by 'res'
+                                    .sort(function(a, b) {
+                                        if (!a.res || !b.res) { return 0; }
+                                        return b.res - a.res;
+                                    })
+                                    .forEach(function(source) {
+                                        html.push(
+                                            '<li>',
+                                                '<button type="button" data-plyr="quality" data-plyr-quality="' + source.label + '">' + source.label +
+                                                    ((source.res >= HD_RESOLUTION) ?
+                                                        '<span class="plyr__menu__btn__badge"><span>HD</span></span>' : '') +
+                                                '</button>',
+                                            '</li>'
+                                        );
+                                    });
+
+                                    html.push(
                                         '</ul>',
                                 '</div>',
                             '</div>',
@@ -1522,6 +1536,10 @@
             // Binding captions value for menu
             var captionMenuButton = getMenuButton('captions');
             plyr.currentCaptionLabel = new DataBind(captionMenuButton, 'textContent', config.defaultSpeed);
+
+            // Binding quality value for menu
+            var qualityMenuButton = getMenuButton('quality');
+            plyr.currentQualityLabel = new DataBind(qualityMenuButton, 'textContent', _getCurrentQuality());
 
             function getMenuButton(setting) {
                 var queryTempalte = '#plyr-settings-{id}-{setting}-toggle .plyr__menu__btn__value';
@@ -2627,6 +2645,10 @@
 
         // Toggle captions by selected text track index
         function _toggleCaptionIndex(index) {
+            // convert string to number,
+            // ex: '0' -> 0
+            index = Number(index);
+
             if (_is.number(index)) {
                 // Update capiton
                 _setCaptionIndex(index);
@@ -2634,6 +2656,8 @@
                 // Enable caption
                 _toggleCaptions(true);
             } else {
+                // NaN, ex: 'off'
+                //
                 // Disable caption
                 _toggleCaptions(false);
             }
@@ -2881,6 +2905,114 @@
             }
 
             _speed(speed);
+        }
+
+        // Set video quality
+        function _setQuality(quality) {
+            var isPlaying = !plyr.media.paused,
+                currentTime = plyr.media.currentTime,
+                sources = Array.prototype.slice.call(_getElements('source')),
+                tracks = Array.prototype.slice.call(_getElements('track')),
+                qualities = sources.map(function(source) {
+                    return {
+                        label: source.getAttribute('label'),
+                        res: +source.getAttribute('res')
+                    };
+                });
+
+            // Source hasn't any quality label
+            if (!sources.length || !qualities.length) {
+                return;
+            }
+
+            // Pause current playback
+            if (isPlaying) {
+                _pause();
+            }
+
+            // Find source index by label
+            var i, index = -1;
+            for (i = 0; i < sources.length; i++) {
+                index ++;
+                var label = sources[i].getAttribute('label');
+                if (label === quality) {
+                    break;
+                }
+            }
+
+            // Don't need to switching source,
+            // Because source is on first
+            if (index === 0) {
+                return;
+            }
+
+            // Moving found source to the first
+            if (index > -1) {
+                var matchItem = sources.splice(index, 1);
+                sources.unshift(matchItem[0])
+            } else {
+                _warn('Can not found ' + quality + ' label');
+                return;
+            }
+
+            // Update source
+            _updateSource({
+                type: 'video',
+                title: plyr.media.title,
+                poster: plyr.media.poster,
+                tracks: tracks.map(function(track) {
+                    return {
+                        kind: track.kind,
+                        label: track.label,
+                        srclang: track.srclang,
+                        src: track.src,
+                        default: track.default
+                    };
+                }),
+                sources: sources.map(function(source) {
+                    return {
+                        src: source.src,
+                        type: source.type
+                    };
+                })
+            });
+
+            var onCanplay = function(event) {
+                _seek(currentTime);
+
+                if (isPlaying) {
+                    _play();
+                }
+
+                // Trigger quality changed event
+                _triggerEvent(plyr.media, 'qualitychanged');
+
+                // Remove event
+                _toggleListener(plyr.media, 'canplay', onCanplay, false);
+            }
+
+            // Play playback from lastest time
+            _on(plyr.media, 'canplay', onCanplay);
+
+            // Update menu text
+            plyr.currentQualityLabel.change(quality);
+        }
+
+        // Get current quality label
+        function _getCurrentQuality() {
+            var sources = Array.prototype.slice.call(_getElements('source'));
+
+            if (!sources.length) {
+                _warn('<source> not found');
+                return;
+            }
+
+            if (!sources[0].hasAttribute('label')) {
+                _warn('<source> label attribute not found');
+                return;
+            }
+
+            return sources[0].getAttribute('label');
         }
 
         // Show the player controls in fullscreen mode
@@ -3388,7 +3520,8 @@
                 if (!_is.htmlElement(target)) {
                     var settingsObj = {
                         'data-plyr-caption': _toggleCaptionIndex,
-                        'data-plyr-speed': _speed
+                        'data-plyr-speed': _speed,
+                        'data-plyr-quality': _setQuality
                     };
                     var setting = toggle.getAttribute('data-plyr');
                     var settingAttr = 'data-plyr-' + setting;
@@ -3397,10 +3530,6 @@
                         if (toggle.hasAttribute(settingAttr)) {
                             var settingFunc = settingsObj[settingAttr];
                             var settingVal = toggle.getAttribute(settingAttr);
-
-                            // String to Boolean or Number,
-                            // ex: 'true' -> true, '1.5' -> 1.5
-                            settingVal = JSON.parse(settingVal);
 
                             settingFunc(settingVal);
                         }
@@ -4074,9 +4203,9 @@
 
             // Listen for events if debugging
             if (config.debug) {
-                var events = config.events.concat(['setup', 'statechange', 'enterfullscreen', 'exitfullscreen', 'captionsenabled', 'captionsdisabled', 'captionselected']);
                 
                 _on(instance.getContainer(), events.join(' '), function(event) { 
+                var events = config.events.concat(['setup', 'statechange', 'enterfullscreen', 'exitfullscreen', 'captionsenabled', 'captionsdisabled', 'captionselected', 'qualitychanged']);
                     console.log([config.logPrefix, 'event:', event.type].join(' '), event.detail.plyr);
                 });
             }
