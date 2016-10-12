@@ -1049,34 +1049,7 @@
                                                     '</li>'
             );
 
-            var HD_RESOLUTION = 720,
-                fitQuality = _getFitQuality();
-            Array.prototype.slice.call(_getElements('source'))
-                .map(function(source) {
-                    return {
-                        label: source.getAttribute('label'),
-                        res: +source.getAttribute('res')
-                    };
-                })
-                // Sort array by 'res'
-                .sort(function(a, b) {
-                    if (!a.res || !b.res) { return 0; }
-                    return b.res - a.res;
-                })
-                .forEach(function(source, index) {
-                    html.push(
-                                                    '<li>',
-                                                        '<button type="button" class="',
-                                                            ((source.res === fitQuality.res) ? 'plyr__menu__btn--active' : ''),
-                                                            '" data-plyr="quality" data-plyr-quality="' + source.label + '">' + source.label,
-                                                            ((source.res >= HD_RESOLUTION) ?
-                                                                '<span class="plyr__menu__btn__badge"><span>HD</span></span>' : ''),
-                                                        '</button>',
-                                                    '</li>'
-                    );
-                });
-
-                html.push(
+            html.push(
                                                 '</ul>',
                                             '</div>', // End of .plyr__menu__secondary
                                         '</div>',
@@ -1547,6 +1520,8 @@
             var html = config.html,
                 id = Math.floor(Math.random() * (10000));
 
+            plyr.controlsId = id;
+
             // Insert custom video controls
             _log('Injecting custom controls');
 
@@ -1614,6 +1589,9 @@
 
                 return menuButton;
             }
+
+            // Inject quality menu item
+            _buildQualityControl();
         }
 
         // Find the UI controls and store references
@@ -2981,66 +2959,33 @@
             var isPlaying = !plyr.media.paused,
                 currentTime = plyr.media.currentTime,
                 sources = Array.prototype.slice.call(_getElements('source')),
-                tracks = Array.prototype.slice.call(_getElements('track')),
-                qualities = sources.map(function(source) {
-                    return {
-                        label: source.getAttribute('label'),
-                        res: +source.getAttribute('res')
-                    };
-                });
-
-            // Source hasn't any quality label
-            if (!sources.length || !qualities.length) {
-                return;
-            }
+                tracks = Array.prototype.slice.call(_getElements('track'));
 
             // Pause current playback
             if (isPlaying) {
                 _pause();
             }
 
-            // Find source index by label
-            var i, index = -1;
-            for (i = 0; i < sources.length; i++) {
-                index ++;
-                var label = sources[i].getAttribute('label');
-                if (label === quality) {
-                    break;
-                }
-            }
-
-            // Don't need to switching source,
-            // Because source is on first
-            if (index === 0) {
-                return;
-            }
-
-            // Moving found source to the first
-            if (index > -1) {
-                var matchItem = sources.splice(index, 1);
-                sources.unshift(matchItem[0])
-            } else {
-                _warn('Can not found ' + quality + ' label');
-                return;
-            }
+            var sortedSources = _sortSourceByQuality(sources, quality);
 
             // Update source
             _updateSource({
                 type: 'video',
                 title: plyr.media.title,
-                poster: plyr.media.poster,
+                poster: (currentTime === 0) ? plyr.media.poster : '',
                 tracks: tracks.map(function(track) {
                     return {
-                        kind: track.getAttribute('kind'),
-                        label: track.getAttribute('label'),
-                        srclang: track.getAttribute('srclang'),
-                        src: track.getAttribute('src')
+                        kind: track.kind,
+                        label: track.label,
+                        srclang: track.srclang,
+                        src: track.src,
+                        default: track.default
                     };
                 }),
-                sources: sources.map(function(source) {
+                sources: sortedSources.map(function(source) {
                     return {
-                        src: source.getAttribute('src'),
-                        type: source.getAttribute('type'),
+                        src: source.src,
+                        type: source.type,
                         label: source.getAttribute('label'),
                         res: source.getAttribute('res')
                     };
@@ -3048,7 +2993,9 @@
             });
 
             var onCanplay = function(event) {
-                _seek(currentTime);
+                if (currentTime !== 0) {
+                    _seek(currentTime);
+                }
 
                 if (isPlaying) {
                     _play();
@@ -3066,6 +3013,9 @@
 
             // Update menu text
             plyr.currentQualityLabel.change(quality);
+
+            // Save current quality to localStorage
+            _updateStorage({quality: quality});
         }
 
         // Get current quality label
@@ -3083,6 +3033,21 @@
             }
 
             return sources[0].getAttribute('label');
+        }
+
+        // Return fit label when quality not found
+        function _findInQuality(quality) {
+            var sources = Array.prototype.slice.call(_getElements('source'));
+            var foundSources = sources.filter(function(source) {
+                return source.getAttribute('label') === quality;
+            });
+
+
+            if (foundSources.length) {
+                return foundSources[0].getAttribute('label');
+            } else {
+                return _getFitQuality().label;
+            }
         }
 
         // Get fit resolution quality object
@@ -3118,6 +3083,99 @@
             function sortNumber(a, b) {
                 return a - b;
             }
+        }
+
+        // Return a Sorted sources array with quality
+        function _sortSourceByQuality(sources, qualityLabel) {
+            // Source hasn't any quality label
+            if (!sources.length) {
+                return sources;
+            }
+
+            // Find source index by label
+            var i, index = -1;
+            for (i = 0; i < sources.length; i++) {
+                index ++;
+                var label = sources[i].label || sources[i].getAttribute('label');
+                if (label === qualityLabel) {
+                    break;
+                }
+            }
+
+            // Don't need to switching source,
+            // Because source is on first
+            if (index === 0) {
+                return sources;
+            }
+
+            // Moving found source to the first
+            if (index > -1) {
+                var matchItem = sources.splice(index, 1);
+                sources.unshift(matchItem[0])
+            } else {
+                return sources;
+            }
+
+            return sources;
+        }
+
+        // Build quality menu items
+        function _buildQualityControl() {
+            var HD_RESOLUTION = 720,
+            // Remove exist quality menu items
+                i,
+                buttons = _getElements('li > button[data-plyr=quality]');
+            for (i=0; i<buttons.length; i++) {
+                buttons[i].parentNode.remove();
+            }
+            // Build HTML
+            var query = '#plyr-settings-' + plyr.controlsId + '-quality > ul',
+                ul = _getElement(query),
+                html = [];
+            Array.prototype.slice.call(_getElements('source'))
+                // ex: [{ label: '720p', res: 720 }, { label: '1080p', res: 1080 }, ...]
+                .map(function(source) {
+                    return {
+                        label: source.getAttribute('label'),
+                        res: +source.getAttribute('res')
+                    };
+                })
+                // Sort array by 'res'
+                // ex: [{ label: '1080p', res: 1080 }, { label: '720p', res: 720 }, ...]
+                .sort(function(a, b) {
+                    if (!a.res || !b.res) { return 0; }
+                    return b.res - a.res;
+                })
+                .forEach(function(source, index) {
+                    var quality = _findInQuality(plyr.storage.quality);
+                    html.push(
+                        '<li>',
+                            '<button type="button" class="'
+                    );
+                    if (source.label === quality) {
+                        // Add acive style
+                        html.push(
+                            'plyr__menu__btn--active'
+                        );
+
+                        // Update menu text
+                        plyr.currentQualityLabel.change(quality);
+
+                        // Save current quality to localStorage
+                        _updateStorage({quality: quality});
+                    }
+                    html.push(
+                            '" data-plyr="quality" data-plyr-quality="' + source.label + '">' + source.label, ((source.res >= HD_RESOLUTION) ? '<span class="plyr__menu__btn__badge"><span>HD</span></span>' : ''),
+                            '</button>',
+                        '</li>'
+                    );
+                });
+
+            // To string
+            html = html.join('');
+
+            // Inser HTML
+            ul.insertAdjacentHTML('beforeend', html);
         }
 
         // Show the player controls in fullscreen mode
@@ -3188,10 +3246,17 @@
         }
 
         // Add common function to retrieve media source
-        function _source(source) {
+        function _source(source, useQuality) {
+            // Update source with quality
+            if (useQuality) {
+                var quality = plyr.storage.quality || _getFitQuality().label;
+                source.sources = _sortSourceByQuality(source.sources, quality);
+            }
+
             // If not null or undefined, parse it
             if (!_is.undefined(source)) {
                 _updateSource(source);
+                _buildQualityControl();
                 return;
             }
 
@@ -4012,8 +4077,9 @@
             plyr.init = true;
 
             // Switch video quality
-            var fitQuality = _getFitQuality();
-            _setQuality(fitQuality.label);
+
+            var quality = _findInQuality(plyr.storage.quality);
+            _setQuality(quality);
         }
 
         // Setup the UI
