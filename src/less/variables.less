@@ -9,7 +9,7 @@
 @plyr-sr-only-important:                true;
 
 // Colors
-@plyr-color-main:                       #3498db;
+@plyr-color-main:                       #00bea4;
 
 // Font
 @plyr-font-family:                      Avenir, 'Avenir Next', 'Helvetica Neue', 'Segoe UI', Helvetica, Arial, sans-serif;
@@ -26,7 +26,7 @@
 // Controls
 @plyr-control-icon-size:                18px;
 @plyr-control-spacing:                  10px;
-@plyr-control-padding:                  (@plyr-control-spacing * .7);
+@plyr-control-padding:                  @plyr-control-spacing;
 @plyr-video-controls-bg:                #343f4a;
 @plyr-video-control-color:              #fff;
 @plyr-video-control-color-hover:        #fff;
@@ -38,16 +38,16 @@
 @plyr-audio-control-bg-hover:           @plyr-color-main;
 
 // Tooltips
-@plyr-tooltip-bg:                       fade(#343f4a, 90%);
+@plyr-tooltip-bg:                       fade(#000, 75%);
 @plyr-tooltip-color:                    #fff;
 @plyr-tooltip-padding:                  (@plyr-control-spacing / 2);
 @plyr-tooltip-arrow-size:               4px;
-@plyr-tooltip-radius:                   3px;
+@plyr-tooltip-radius:                   0px;
 
 // Menus
-@plyr-menu-bg: 							@plyr-tooltip-bg;
-@plyr-menu-color:                    	@plyr-tooltip-color;
-@plyr-menu-arrow-size: 					6px;
+@plyr-menu-bg:                          @plyr-tooltip-bg;
+@plyr-menu-color:                       @plyr-tooltip-color;
+@plyr-menu-arrow-size:                  6px;
 
 // Progress
 @plyr-progress-loading-size:            25px;

@@ -277,12 +277,32 @@
 // Playback controls
 .plyr__controls {
     display: flex;
-    align-items: center; 
-    line-height: 1;
-    text-align: center;
+    flex-direction: column;
+
+    // Layout
+    .plyr__controls-top-container {
+        display: flex;
+    }
+    .plyr__controls-bottom-container {
+        display: flex;
+        justify-content: space-between;
+        z-index: 3;
+    }
+    .plyr__controls-left-container,
+    .plyr__controls-right-container {
+        display: flex;
+        align-items: center;
+
+        > button {
+            margin-left: (@plyr-control-spacing / 2);
+
+            &:first-child {
+                margin-left: 0;
+            }
+        }
+    }
 
     // Spacing
-    > button,
     .plyr__progress,
     .plyr__time,
     .plyr__menu {
@@ -309,7 +329,7 @@
         padding: @plyr-control-padding;
         border: 0;
         background: transparent;
-        border-radius: 3px;
+        border-radius: 0;
         cursor: pointer;
         transition: background .3s ease, color .3s ease, opacity .3s ease;
         color: inherit;
@@ -336,16 +356,25 @@
     }
 
     @media (min-width: @plyr-bp-screen-sm) {
-        > button,
+        .plyr__controls-left-container,
+        .plyr__controls-right-container {
+            > button {
+                margin-left: @plyr-control-spacing;
+            }
+            > button + button,
+            > button + .plyr__menu {
+                margin-left: (@plyr-control-spacing / 2);
+            }
+        }
+
         .plyr__progress,
         .plyr__time,
         .plyr__menu {
             margin-left: @plyr-control-spacing;
         }
 
-        > button + button,
-        .plyr__menu + button,
-        > button + .plyr__menu {
+
+        .plyr__menu + button {
             margin-left: (@plyr-control-spacing / 2);
         }
     }
@@ -511,7 +540,6 @@
 
         background: @plyr-menu-bg;
         box-shadow: 0 1px 0 fade(#000, 20%);
-        border-radius: 4px;
 
         white-space: nowrap;
         text-align: left;
@@ -537,20 +565,46 @@
 
         ul {
             margin: 0;
-            padding: 5px;
             list-style: none;
             overflow: hidden;
         }
         button {
             display: flex;
             width: 100%;
-            padding: @plyr-control-padding (@plyr-control-padding * 2);
+            padding: @plyr-control-padding (@plyr-control-padding * 1.5);
             color: @plyr-menu-color;
             font-weight: 600;
             user-select: none;
         }
 
-        // Buttons 
+        .plyr__menu__primary {
+            ul {
+                padding: 0;
+            }
+            ul li:not(:last-child) {
+                border-bottom: 2px solid fade(@plyr-menu-color, 43%);
+            }
+        }
+
+        .plyr__menu__secondary {
+            ul li[role=tab] {
+                border-bottom: 2px solid fade(@plyr-menu-color, 43%);
+            }
+            button {
+                padding-left: ceil(@plyr-control-padding * 2.5);
+            }
+            button.plyr__menu__btn--active::before {
+                content: "";
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                left: 10px;
+                border: 3px solid fade(@plyr-menu-color, 80%);
+                border-radius: 5px;
+            }
+        }
+
+        // Buttons
         .plyr__menu__btn::after {
             content: "";
             position: absolute;
@@ -559,7 +613,7 @@
             border: 5px solid transparent;
         }
         .plyr__menu__btn--forward {
-            padding-right: ceil(@plyr-control-padding * 4);
+            padding-right: ceil(@plyr-control-padding * 2.5);
 
             &::after {
                 right: 5px;
@@ -568,27 +622,14 @@
         }
         .plyr__menu__btn--back {
             position: relative;
-            padding-top: floor(@plyr-control-padding * .7);
-            padding-bottom: floor(@plyr-control-padding * .7);
-            padding-left: ceil(@plyr-control-padding * 4);
-            margin-bottom: ceil(@plyr-control-padding * 1.3);
+            padding-top: @plyr-control-padding;
+            padding-bottom: @plyr-control-padding;
+            padding-left: ceil(@plyr-control-padding * 2.5);
             font-weight: 500;
 
             &::after {
                 left: 5px;
                 border-right-color: fade(@plyr-menu-color, 80%);
-            }
-            &::before {
-                content: "";
-                position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                height: 1px;
-                overflow: hidden;
-                margin-top: ceil(@plyr-control-padding / 2);
-                background: fade(#000, 15%);
-                box-shadow: 0 1px 0 fade(#fff, 10%);
             }
         }
 
