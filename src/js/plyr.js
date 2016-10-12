@@ -796,52 +796,60 @@
                 );
             }
 
-            html.push('<div class="plyr__controls">');
+            html.push(
+                '<div class="plyr__controls">'
+            );
 
             // Progress
             if (_inArray(config.controls, 'progress')) {
 
-                html.push('');
-
                 // Create progress
-                html.push('<div class="plyr__controls-top-container">',
-                    '<span class="plyr__progress">',
-                        '<label for="seek-{id}" class="plyr__sr-only">Seek</label>',
-                        '<input id="seek-{id}" class="plyr__progress--seek" type="range" min="0" max="100" step="0.1" value="0" data-plyr="seek">',
-                        '<progress class="plyr__progress--played" max="100" value="0" role="presentation"></progress>',
-                        '<progress class="plyr__progress--buffer" max="100" value="0">',
-                            '<span>0</span>% ' + config.i18n.buffered,
-                        '</progress>');
+                html.push(
+                        '<div class="plyr__controls-top-container">',
+                            '<span class="plyr__progress">',
+                                '<label for="seek-{id}" class="plyr__sr-only">Seek</label>',
+                                '<input id="seek-{id}" class="plyr__progress--seek" type="range" min="0" max="100" step="0.1" value="0" data-plyr="seek">',
+                                '<progress class="plyr__progress--played" max="100" value="0" role="presentation"></progress>',
+                                '<progress class="plyr__progress--buffer" max="100" value="0">',
+                                    '<span>0</span>% ' + config.i18n.buffered,
+                                '</progress>');
 
                 // Seek tooltip
                 if (config.tooltips.seek) {
-                    html.push('<span class="plyr__tooltip">00:00</span>');
+                    html.push(
+                                '<span class="plyr__tooltip">00:00</span>'
+                    );
                 }
 
                 // Close
-                html.push('</span>', '</div>');
+                html.push(
+                            '</span>', // End of .plyr__progress
+                        '</div>' // End of .plyr__controls-top-container
+                );
             }
 
-            html.push('<div class="plyr__controls-bottom-container">',
-                '<div class="plyr__controls-left-container">');
+            html.push(
+                        '<div class="plyr__controls-bottom-container">',
+                            '<div class="plyr__controls-left-container">'
+            );
 
             // Restart button
             if (_inArray(config.controls, 'restart')) {
                 html.push(
-                    '<button type="button" data-plyr="restart">',
-                        '<svg><use xlink:href="' + iconPath + '-restart" /></svg>',
-                        '<span class="plyr__sr-only">' + config.i18n.restart + '</span>',
-                    '</button>'
+                                '<button type="button" data-plyr="restart">',
+                                    '<svg><use xlink:href="' + iconPath + '-restart" /></svg>',
+                                    '<span class="plyr__sr-only">' + config.i18n.restart + '</span>',
+                                '</button>'
                 );
             }
 
             // Rewind button
             if (_inArray(config.controls, 'rewind')) {
                 html.push(
-                    '<button type="button" data-plyr="rewind">',
-                        '<svg><use xlink:href="' + iconPath + '-rewind" /></svg>',
-                        '<span class="plyr__sr-only">' + config.i18n.rewind + '</span>',
-                    '</button>'
+                                '<button type="button" data-plyr="rewind">',
+                                    '<svg><use xlink:href="' + iconPath + '-rewind" /></svg>',
+                                    '<span class="plyr__sr-only">' + config.i18n.rewind + '</span>',
+                                '</button>'
                 );
             }
 
@@ -849,218 +857,222 @@
             // TODO: This should be a toggle button really?
             if (_inArray(config.controls, 'play')) {
                 html.push(
-                    '<button type="button" data-plyr="play">',
-                        '<svg><use xlink:href="' + iconPath + '-play" /></svg>',
-                        '<span class="plyr__sr-only">' + config.i18n.play + '</span>',
-                    '</button>',
-                    '<button type="button" data-plyr="pause">',
-                        '<svg><use xlink:href="' + iconPath + '-pause" /></svg>',
-                        '<span class="plyr__sr-only">' + config.i18n.pause + '</span>',
-                    '</button>'
+                                '<button type="button" data-plyr="play">',
+                                    '<svg><use xlink:href="' + iconPath + '-play" /></svg>',
+                                    '<span class="plyr__sr-only">' + config.i18n.play + '</span>',
+                                '</button>',
+                                '<button type="button" data-plyr="pause">',
+                                    '<svg><use xlink:href="' + iconPath + '-pause" /></svg>',
+                                    '<span class="plyr__sr-only">' + config.i18n.pause + '</span>',
+                                '</button>'
                 );
             }
 
             // Fast forward button
             if (_inArray(config.controls, 'fast-forward')) {
                 html.push(
-                    '<button type="button" data-plyr="fast-forward">',
-                        '<svg><use xlink:href="' + iconPath + '-fast-forward" /></svg>',
-                        '<span class="plyr__sr-only">' + config.i18n.forward + '</span>',
-                    '</button>'
+                                '<button type="button" data-plyr="fast-forward">',
+                                    '<svg><use xlink:href="' + iconPath + '-fast-forward" /></svg>',
+                                    '<span class="plyr__sr-only">' + config.i18n.forward + '</span>',
+                                '</button>'
                 );
             }
 
             // Media current time display
             if (_inArray(config.controls, 'current-time')) {
                 html.push(
-                    '<span class="plyr__time">',
-                        '<span class="plyr__sr-only">' + config.i18n.currentTime + '</span>',
-                        '<span class="plyr__time--current">00:00</span>',
-                    '</span>'
+                                '<span class="plyr__time">',
+                                    '<span class="plyr__sr-only">' + config.i18n.currentTime + '</span>',
+                                    '<span class="plyr__time--current">00:00</span>',
+                                '</span>'
                 );
             }
 
             // Media duration display
             if (_inArray(config.controls, 'duration')) {
                 html.push(
-                    '<span class="plyr__time">',
-                        '<span class="plyr__sr-only">' + config.i18n.duration + '</span>',
-                        '<span class="plyr__time--duration">00:00</span>',
-                    '</span>'
+                                '<span class="plyr__time">',
+                                    '<span class="plyr__sr-only">' + config.i18n.duration + '</span>',
+                                    '<span class="plyr__time--duration">00:00</span>',
+                                '</span>'
                 );
             }
 
-            html.push('</div>', '<div class="plyr__controls-right-container">');
+            html.push(
+                            '</div>', // End of .plyr__controls-left-container
+                            '<div class="plyr__controls-right-container">'
+            );
 
             // Toggle mute button
             if (_inArray(config.controls, 'mute')) {
                 html.push(
-                    '<button type="button" data-plyr="mute">',
-                        '<svg class="icon--muted"><use xlink:href="' + iconPath + '-muted" /></svg>',
-                        '<svg><use xlink:href="' + iconPath + '-volume" /></svg>',
-                        '<span class="plyr__sr-only">' + config.i18n.toggleMute + '</span>',
-                    '</button>'
+                                '<button type="button" data-plyr="mute">',
+                                    '<svg class="icon--muted"><use xlink:href="' + iconPath + '-muted" /></svg>',
+                                    '<svg><use xlink:href="' + iconPath + '-volume" /></svg>',
+                                    '<span class="plyr__sr-only">' + config.i18n.toggleMute + '</span>',
+                                '</button>'
                 );
             }
 
             // Volume range control
             if (_inArray(config.controls, 'volume')) {
                 html.push(
-                    '<span class="plyr__volume">',
-                        '<label for="volume-{id}" class="plyr__sr-only">' + config.i18n.volume + '</label>',
-                        '<input id="volume-{id}" class="plyr__volume--input" type="range" min="' + config.volumeMin + '" max="' + config.volumeMax + '" value="' + config.volume + '" data-plyr="volume">',
-                        '<progress class="plyr__volume--display" max="' + config.volumeMax + '" value="' + config.volumeMin + '" role="presentation"></progress>',
-                    '</span>'
+                                '<span class="plyr__volume">',
+                                    '<label for="volume-{id}" class="plyr__sr-only">' + config.i18n.volume + '</label>',
+                                    '<input id="volume-{id}" class="plyr__volume--input" type="range" min="' + config.volumeMin + '" max="' + config.volumeMax + '" value="' + config.volume + '" data-plyr="volume">',
+                                    '<progress class="plyr__volume--display" max="' + config.volumeMax + '" value="' + config.volumeMin + '" role="presentation"></progress>',
+                                '</span>'
                 );
             }
 
             // Toggle captions button
             if (_inArray(config.controls, 'captions')) {
                 html.push(
-                    '<button type="button" data-plyr="captions">',
-                        '<svg class="icon--captions-on"><use xlink:href="' + iconPath + '-captions-on" /></svg>',
-                        '<svg><use xlink:href="' + iconPath+ '-captions-off" /></svg>',
-                        '<span class="plyr__sr-only">' + config.i18n.toggleCaptions + '</span>',
-                    '</button>'
+                                '<button type="button" data-plyr="captions">',
+                                    '<svg class="icon--captions-on"><use xlink:href="' + iconPath + '-captions-on" /></svg>',
+                                    '<svg><use xlink:href="' + iconPath+ '-captions-off" /></svg>',
+                                    '<span class="plyr__sr-only">' + config.i18n.toggleCaptions + '</span>',
+                                '</button>'
                 );
             }
 
             // Settings button / menu
             if (_inArray(config.controls, 'settings')) {
                 html.push(
-                    '<div class="plyr__menu" data-plyr="settings">',
-                        '<button type="button" id="plyr-settings-toggle-{id}" aria-haspopup="true" aria-controls="plyr-settings-{id}" aria-expanded="false">',
-                            '<svg><use xlink:href="' + iconPath + '-settings" /></svg>',
-                            '<span class="plyr__sr-only">' + config.i18n.settings + '</span>',
-                        '</button>',
-                        '<div class="plyr__menu__container" id="plyr-settings-{id}" aria-hidden="true" aria-labelled-by="plyr-settings-toggle-{id}" role="tablist" tabindex="-1">',
-                            '<div>',
-                                '<div class="plyr__menu__primary" id="plyr-settings-{id}-primary" aria-hidden="false" aria-labelled-by="plyr-settings-toggle-{id}" role="tabpanel" tabindex="-1">',
-                                    '<ul>',
-                                        '<li role="tab">',
-                                            '<button type="button" class="plyr__menu__btn plyr__menu__btn--forward" id="plyr-settings-{id}-captions-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-captions" aria-expanded="false">',
-                                                config.i18n.captions + ' <span class="plyr__menu__btn__value">{lang}</span>',
-                                            '</button>',
-                                        '</li>',
-                                        '<li role="tab">',
-                                            '<button type="button" class="plyr__menu__btn plyr__menu__btn--forward" id="plyr-settings-{id}-speed-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-speed" aria-expanded="false">',
-                                                config.i18n.speed + ' <span class="plyr__menu__btn__value">{speed}</span>',
-                                            '</button>',
-                                        '</li>',
-                                        '<li role="tab">',
-                                            '<button type="button" class="plyr__menu__btn plyr__menu__btn--forward" id="plyr-settings-{id}-quality-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-quality" aria-expanded="false">',
-                                                config.i18n.quality + ' <span class="plyr__menu__btn__value"></span>',
-                                            '</button>',
-                                        '</li>',
-                                    '</ul>',
-                                '</div>',
-                                '<div class="plyr__menu__secondary" id="plyr-settings-{id}-captions" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-captions-toggle" role="tabpanel" tabindex="-1">',
-                                    '<ul>',
-                                        '<li role="tab">',
-                                            '<button type="button" class="plyr__menu__btn plyr__menu__btn--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
-                                                config.i18n.captions,
-                                            '</button>',
-                                        '</li>');
+                                '<div class="plyr__menu" data-plyr="settings">',
 
-                                var tracks = plyr.media.textTracks;
-                                for (var i = 0; i < tracks.length; i++) {
-                                    html.push(
-                                        '<li>',
-                                            '<button type="button" data-plyr="caption" data-plyr-caption="' + i + '">' + tracks[i].label + '</button>',
-                                        '</li>'
-                                    );
-                                }
+                                    '<button type="button" id="plyr-settings-toggle-{id}" aria-haspopup="true" aria-controls="plyr-settings-{id}" aria-expanded="false">',
+                                        '<svg><use xlink:href="' + iconPath + '-settings" /></svg>',
+                                        '<span class="plyr__sr-only">' + config.i18n.settings + '</span>',
+                                    '</button>',
 
-                                html.push(
-                                        '<li>',
-                                            '<button type="button" data-plyr="caption" data-plyr-caption="false">Off</button>',
-                                        '</li>',
-                                        '</ul>',
-                                '</div>',
-                                '<div class="plyr__menu__secondary" id="plyr-settings-{id}-speed" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-speed-toggle" role="tabpanel" tabindex="-1">',
-                                    '<ul>',
-                                        '<li role="tab">',
-                                            '<button type="button" class="plyr__menu__btn plyr__menu__btn--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
-                                                config.i18n.speed,
-                                            '</button>',
-                                        '</li>');
+                                    '<div class="plyr__menu__container" id="plyr-settings-{id}" aria-hidden="true" aria-labelled-by="plyr-settings-toggle-{id}" role="tablist" tabindex="-1">',
+                                        '<div>',
+                                            '<div class="plyr__menu__primary" id="plyr-settings-{id}-primary" aria-hidden="false" aria-labelled-by="plyr-settings-toggle-{id}" role="tabpanel" tabindex="-1">',
+                                                '<ul>',
+                                                    '<li role="tab">',
+                                                        '<button type="button" class="plyr__menu__btn plyr__menu__btn--forward" id="plyr-settings-{id}-captions-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-captions" aria-expanded="false">', config.i18n.captions + ' <span class="plyr__menu__btn__value">{lang}</span>',
+                                                        '</button>',
+                                                    '</li>',
+                                                    '<li role="tab">',
+                                                        '<button type="button" class="plyr__menu__btn plyr__menu__btn--forward" id="plyr-settings-{id}-speed-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-speed" aria-expanded="false">', config.i18n.speed + ' <span class="plyr__menu__btn__value">{speed}</span>',
+                                                        '</button>',
+                                                    '</li>',
+                                                    '<li role="tab">',
+                                                        '<button type="button" class="plyr__menu__btn plyr__menu__btn--forward" id="plyr-settings-{id}-quality-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-quality" aria-expanded="false">', config.i18n.quality + ' <span class="plyr__menu__btn__value"></span>',
+                                                        '</button>',
+                                                    '</li>',
+                                                '</ul>',
+                                            '</div>', // End of .plyr__menu__primary
 
-                                config.speeds.forEach(function(speed) {
-                                    html.push(
-                                        '<li>',
-                                            '<button type="button" data-plyr="speed" data-plyr-speed="' + speed + '">' + speed + '&times;</button>',
-                                        '</li>'
-                                    );
-                                });
+                                            '<div class="plyr__menu__secondary" id="plyr-settings-{id}-captions" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-captions-toggle" role="tabpanel" tabindex="-1">',
+                                                '<ul>',
+                                                    '<li role="tab">',
+                                                        '<button type="button" class="plyr__menu__btn plyr__menu__btn--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">', config.i18n.captions,
+                                                        '</button>',
+                                                    '</li>');
 
-                                html.push(
-                                        '</ul>',
-                                '</div>',
-                                '<div class="plyr__menu__secondary" id="plyr-settings-{id}-quality" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-quality-toggle" role="tabpanel" tabindex="-1">',
-                                    '<ul>',
-                                        '<li role="tab">',
-                                            '<button type="button" class="plyr__menu__btn plyr__menu__btn--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
-                                                config.i18n.quality,
-                                            '</button>',
-                                        '</li>');
+            var tracks = plyr.media.textTracks;
+            for (var i = 0; i < tracks.length; i++) {
+                html.push(
+                                                    '<li>',
+                                                        '<button type="button" data-plyr="caption" data-plyr-caption="' + i + '">' + tracks[i].label + '</button>',
+                                                    '</li>'
+                );
+            }
 
-                                var HD_RESOLUTION = 720;
-                                Array.prototype.slice.call(_getElements('source'))
-                                    .map(function(source) {
-                                        return {
-                                            label: source.getAttribute('label'),
-                                            res: +source.getAttribute('res')
-                                        };
-                                    })
-                                    // Sort array by 'res'
-                                    .sort(function(a, b) {
-                                        if (!a.res || !b.res) { return 0; }
-                                        return b.res - a.res;
-                                    })
-                                    .forEach(function(source) {
-                                        html.push(
-                                            '<li>',
-                                                '<button type="button" data-plyr="quality" data-plyr-quality="' + source.label + '">' + source.label +
-                                                    ((source.res >= HD_RESOLUTION) ?
-                                                        '<span class="plyr__menu__btn__badge"><span>HD</span></span>' : '') +
-                                                '</button>',
-                                            '</li>'
-                                        );
-                                    });
+            html.push(
+                                                    '<li>',
+                                                        '<button type="button" data-plyr="caption" data-plyr-caption="false">Off</button>',
+                                                    '</li>',
+                                                '</ul>',
+                                            '</div>', // End of .plyr__menu__secondary
 
-                                    html.push(
-                                        '</ul>',
-                                '</div>',
-                            '</div>',
-                        '</div>',
-                    '</div>'
+                                            '<div class="plyr__menu__secondary" id="plyr-settings-{id}-speed" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-speed-toggle" role="tabpanel" tabindex="-1">',
+                                                '<ul>',
+                                                    '<li role="tab">',
+                                                        '<button type="button" class="plyr__menu__btn plyr__menu__btn--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">', config.i18n.speed,
+                                                        '</button>',
+                                                    '</li>');
+
+            config.speeds.forEach(function(speed) {
+                html.push(
+                                                    '<li>',
+                                                        '<button type="button" data-plyr="speed" data-plyr-speed="' + speed + '">' + speed + '&times;</button>',
+                                                    '</li>'
+                );
+            });
+
+            html.push(
+                                                '</ul>',
+                                            '</div>', // End of .plyr__menu__secondary
+
+                                            '<div class="plyr__menu__secondary" id="plyr-settings-{id}-quality" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-quality-toggle" role="tabpanel" tabindex="-1">',
+                                                '<ul>',
+                                                    '<li role="tab">',
+                                                        '<button type="button" class="plyr__menu__btn plyr__menu__btn--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
+                                                            config.i18n.quality,
+                                                        '</button>',
+                                                    '</li>');
+
+            var HD_RESOLUTION = 720;
+            Array.prototype.slice.call(_getElements('source'))
+                .map(function(source) {
+                    return {
+                        label: source.getAttribute('label'),
+                        res: +source.getAttribute('res')
+                    };
+                })
+                // Sort array by 'res'
+                .sort(function(a, b) {
+                    if (!a.res || !b.res) { return 0; }
+                    return b.res - a.res;
+                })
+                .forEach(function(source) {
+                    html.push(
+                                                    '<li>',
+                                                        '<button type="button" data-plyr="quality" data-plyr-quality="' + source.label + '">', source.label + ((source.res >= HD_RESOLUTION) ? '<span class="plyr__menu__btn__badge"><span>HD</span></span>' : ''),
+                                                        '</button>',
+                                                    '</li>'
+                    );
+                });
+
+                html.push(
+                                                '</ul>',
+                                            '</div>', // End of .plyr__menu__secondary
+                                        '</div>',
+                                    '</div>', // End of .plyr__menu__container
+                                '</div>' // End of .plyr__menu
                 );
             }
 
             // Toggle zoom button
             if (_inArray(config.controls, 'zoom')) {
                 html.push(
-                    '<button type="button" data-plyr="zoom">',
-                        '<svg class="icon--exit-zoom"><use xlink:href="' + iconPath + '-exit-zoom" /></svg>',
-                        '<svg><use xlink:href="' + iconPath + '-enter-zoom" /></svg>',
-                        '<span class="plyr__sr-only">' + config.i18n.toggleZoom + '</span>',
-                    '</button>'
+                                '<button type="button" data-plyr="zoom">',
+                                    '<svg class="icon--exit-zoom"><use xlink:href="' + iconPath + '-exit-zoom" /></svg>',
+                                    '<svg><use xlink:href="' + iconPath + '-enter-zoom" /></svg>',
+                                    '<span class="plyr__sr-only">' + config.i18n.toggleZoom + '</span>',
+                                '</button>'
                 );
             }
 
             // Toggle fullscreen button
             if (_inArray(config.controls, 'fullscreen')) {
                 html.push(
-                    '<button type="button" data-plyr="fullscreen">',
-                        '<svg class="icon--exit-fullscreen"><use xlink:href="' + iconPath + '-exit-fullscreen" /></svg>',
-                        '<svg><use xlink:href="' + iconPath + '-enter-fullscreen" /></svg>',
-                        '<span class="plyr__sr-only">' + config.i18n.toggleFullscreen + '</span>',
-                    '</button>'
+                                '<button type="button" data-plyr="fullscreen">',
+                                    '<svg class="icon--exit-fullscreen"><use xlink:href="' + iconPath + '-exit-fullscreen" /></svg>',
+                                    '<svg><use xlink:href="' + iconPath + '-enter-fullscreen" /></svg>',
+                                    '<span class="plyr__sr-only">' + config.i18n.toggleFullscreen + '</span>',
+                                '</button>'
                 );
             }
 
             // Close everything
-            html.push('</div></div>');
+            html.push(
+                            '</div>', // End of .plyr__controls-right-container
+                        '</div>' // End of .plyr__controls-bottom-container
+            );
 
             return html.join('');
         }
