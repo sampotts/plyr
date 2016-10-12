@@ -3031,17 +3031,18 @@
                 poster: plyr.media.poster,
                 tracks: tracks.map(function(track) {
                     return {
-                        kind: track.kind,
-                        label: track.label,
-                        srclang: track.srclang,
-                        src: track.src,
-                        default: track.default
+                        kind: track.getAttribute('kind'),
+                        label: track.getAttribute('label'),
+                        srclang: track.getAttribute('srclang'),
+                        src: track.getAttribute('src')
                     };
                 }),
                 sources: sources.map(function(source) {
                     return {
-                        src: source.src,
-                        type: source.type
+                        src: source.getAttribute('src'),
+                        type: source.getAttribute('type'),
+                        label: source.getAttribute('label'),
+                        res: source.getAttribute('res')
                     };
                 })
             });
