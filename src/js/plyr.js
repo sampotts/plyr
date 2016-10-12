@@ -4286,9 +4286,9 @@
 
             // Listen for events if debugging
             if (config.debug) {
-                
-                _on(instance.getContainer(), events.join(' '), function(event) { 
                 var events = config.events.concat(['setup', 'statechange', 'enterfullscreen', 'exitfullscreen', 'captionsenabled', 'captionsdisabled', 'captionselected', 'qualitychanged']);
+
+                _on(instance.getContainer(), events.join(' '), function(event) {
                     console.log([config.logPrefix, 'event:', event.type].join(' '), event.detail.plyr);
                 });
             }
