@@ -261,6 +261,8 @@
 }
 .plyr--zoom-active .plyr__captions,
 .plyr--fullscreen-active .plyr__captions {
+    // fix captions can not show on zoom mode
+    z-index: 1;
     font-size: @plyr-font-size-captions-large;
 }
 .plyr--hide-controls .plyr__captions {
