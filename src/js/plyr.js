@@ -1580,6 +1580,9 @@
             if (_inArray(config.controls, 'quality')) {
                 var qualityMenuButton = getMenuButton('quality');
                 plyr.currentQualityLabel = new DataBind(qualityMenuButton, 'textContent', _getCurrentQuality());
+
+                // Inject quality menu item
+                _buildQualityControl();
             }
 
             function getMenuButton(setting) {
@@ -1589,9 +1592,6 @@
 
                 return menuButton;
             }
-
-            // Inject quality menu item
-            _buildQualityControl();
         }
 
         // Find the UI controls and store references
