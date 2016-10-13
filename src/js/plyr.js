@@ -3046,7 +3046,8 @@
             if (foundSources.length) {
                 return foundSources[0].getAttribute('label');
             } else {
-                return _getFitQuality().label;
+                var fitQuality = _getFitQuality();
+                return (fitQuality) ? fitQuality.label : null;
             }
         }
 
@@ -3054,9 +3055,14 @@
         function _getFitQuality() {
             var i,
                 sources = Array.prototype.slice.call(_getElements('source')),
-                elementHeight = plyr.media.clientHeight,
+                elementHeight = plyr.media.clientHeight;
+
+            if (sources.length === 0) {
+                return;
+            }
+
                 // ex: sortedSources = [360, 720, 1080, ...]
-                sortedSources = sources
+            var sortedSources = sources
                     .map(function(source) {
                         return source.getAttribute('res');
                     })
@@ -3148,27 +3154,29 @@
                 })
                 .forEach(function(source, index) {
                     var quality = _findInQuality(plyr.storage.quality);
-                    html.push(
-                        '<li>',
-                            '<button type="button" class="'
-                    );
-                    if (source.label === quality) {
-                        // Add acive style
+                    if (quality) {
                         html.push(
-                            'plyr__menu__btn--active'
+                            '<li>',
+                                '<button type="button" class="'
                         );
+                        if (source.label === quality) {
+                            // Add acive style
+                            html.push(
+                                'plyr__menu__btn--active'
+                            );
 
-                        // Update menu text
-                        plyr.currentQualityLabel.change(quality);
+                            // Update menu text
+                            plyr.currentQualityLabel.change(quality);
 
-                        // Save current quality to localStorage
-                        _updateStorage({quality: quality});
+                            // Save current quality to localStorage
+                            _updateStorage({quality: quality});
+                        }
+                        html.push(
+                                '" data-plyr="quality" data-plyr-quality="' + source.label + '">' + source.label, ((source.res >= HD_RESOLUTION) ? '<span class="plyr__menu__btn__badge"><span>HD</span></span>' : ''),
+                                '</button>',
+                            '</li>'
+                        );
                     }
-                    html.push(
-                            '" data-plyr="quality" data-plyr-quality="' + source.label + '">' + source.label, ((source.res >= HD_RESOLUTION) ? '<span class="plyr__menu__btn__badge"><span>HD</span></span>' : ''),
-                            '</button>',
-                        '</li>'
-                    );
                 });
 
             // To string
@@ -4079,7 +4087,9 @@
             // Switch video quality
 
             var quality = _findInQuality(plyr.storage.quality);
-            _setQuality(quality);
+            if (quality) {
+                _setQuality(quality);
+            }
         }
 
         // Setup the UI
