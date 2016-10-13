@@ -35,8 +35,8 @@
         loop:                   false,
         seekTime:               10,
         volume:                 10,
-        volumeMin:              0, 
-        volumeMax:              10, 
+        volumeMin:              0,
+        volumeMax:              10,
         volumeStep:             1,
         defaultSpeed:           1.0,
         speeds:                 [ 0.5, 1.0, 1.5, 2.0 ],
@@ -483,9 +483,9 @@
         }
 
         // Create and dispatch the event
-        var event = new CustomEvent(type, { 
+        var event = new CustomEvent(type, {
             bubbles:    bubbles,
-            detail:     properties 
+            detail:     properties
         });
 
         // Dispatch the event
@@ -558,7 +558,7 @@
     // Check variable types
     var _is = {
         object: function(input) {
-            return input !== null && typeof(input) === 'object' && input.constructor === Object; 
+            return input !== null && typeof(input) === 'object' && input.constructor === Object;
         },
         array: function(input) {
             return input !== null && typeof(input) === 'object' && input.constructor === Array;
@@ -596,7 +596,7 @@
     var _fullscreen;
     (function() {
         // Determine the prefix
-        var prefix = (function() { 
+        var prefix = (function() {
             var result = '';
             if (!_is.undefined(document.cancelFullScreen)) {
                 return result;
@@ -658,7 +658,7 @@
                     return null;
                 }
                 return (prefix === '') ? document.fullscreenElement : document[prefix + 'FullscreenElement'];
-            } 
+            }
         };
     })();
 
@@ -695,7 +695,7 @@
             return false;
         })(),
         // Picture-in-picture support
-        // Safari only currently 
+        // Safari only currently
         pip: function(plyr) {
             return _is.function(plyr.media.webkitSetPresentationMode);
         },
@@ -732,7 +732,7 @@
         timers = {},
         api;
 
-        // Set media 
+        // Set media
         plyr.media = media;
         var original = media.cloneNode(true);
 
@@ -751,7 +751,7 @@
                 if (_is.string(config.logPrefix) && config.logPrefix.length) {
                     args.unshift(config.logPrefix);
                 }
-                
+
                 console[type].apply(console, args);
             }
         }
@@ -1183,7 +1183,7 @@
             // Get URL of caption file if exists
             var captionSrc = '',
                 captions = _getCaptionTracks();
-            
+
             // Record if caption file exists or not
             plyr.captionExists = true;
             if (captions.length === 0) {
@@ -1193,12 +1193,12 @@
                 plyr.captionExists = false;
                 _log('Caption index out of bound');
             } else {
-                
+
                 // Trigger event
                 _triggerEvent(plyr.media, 'captionselected',true,captions[config.captions.selectedIndex]);
-                
+
                 captionSrc = captions[config.captions.selectedIndex].src;
-                
+
                 _log('Caption track found; URI: ' + captionSrc);
             }
 
@@ -1266,7 +1266,7 @@
                                     var captions = [],
                                         caption,
                                         req = xhr.responseText;
-                                    
+
                                     //According to webvtt spec, line terminator consists of one of the following
                                     // CRLF (U+000D U+000A), LF (U+000A) or CR (U+000D)
                                     var lineSeparator = '\r\n';
@@ -1277,7 +1277,7 @@
                                             lineSeparator = '\n';
                                         }
                                     }
-                                    
+
                                     captions = req.split(lineSeparator + lineSeparator);
 
                                     for (var r = 0; r < captions.length; r++) {
@@ -2065,7 +2065,7 @@
                 plyr.embed.stop();
                 plyr.media.paused = true;
             };
-            
+
             plyr.media.paused = true;
             plyr.media.currentTime = 0;
 
@@ -2081,7 +2081,7 @@
 
             plyr.embed.getDuration().then(function(value) {
                 plyr.media.duration = value;
-                
+
                 // Trigger timeupdate
                 _triggerEvent(plyr.media, 'durationchange');
             });
@@ -2138,7 +2138,7 @@
             plyr.embed = window.SC.Widget(this);
 
             // Setup on ready
-            plyr.embed.bind(window.SC.Widget.Events.READY, function() {             
+            plyr.embed.bind(window.SC.Widget.Events.READY, function() {
                 // Create a faux HTML5 API using the Soundcloud API
                 plyr.media.play = function() {
                     plyr.embed.play();
@@ -2298,7 +2298,7 @@
                 targetTime = duration;
             }
 
-            // Update seek range and progress 
+            // Update seek range and progress
             _updateSeekDisplay(targetTime);
 
             // Set the current time
@@ -2403,7 +2403,7 @@
         function _toggleFullscreen(event) {
             // Check for native support
             var nativeSupport = _support.fullscreen;
-            
+
             if (nativeSupport) {
                 // If it's a fullscreen change event, update the UI
                 if (event && event.type === _fullscreen.eventType) {
@@ -2786,7 +2786,7 @@
             if (!plyr.supported.full) {
                 return;
             }
-            
+
             // Default to 0
             if (_is.undefined(value)) {
                 value = 0;
@@ -2878,7 +2878,7 @@
             _updateProgress(event);
         }
 
-        // Update seek range and progress 
+        // Update seek range and progress
         function _updateSeekDisplay(time) {
             // Default to 0
             if (!_is.number(time)) {
@@ -2888,7 +2888,7 @@
             var duration    = _getDuration(),
                 value       = _getPercentage(time, duration);
 
-            // Update progress 
+            // Update progress
             if (plyr.progress && plyr.progress.played) {
                 plyr.progress.played.value = value;
             }
@@ -3239,15 +3239,15 @@
                 }
             }
 
-            // If toggle is false or if we're playing (regardless of toggle), 
-            // then set the timer to hide the controls 
+            // If toggle is false or if we're playing (regardless of toggle),
+            // then set the timer to hide the controls
             if (!show || !plyr.media.paused) {
                 timers.hover = window.setTimeout(function() {
                     // If the mouse is over the controls (and not entering fullscreen), bail
                     if ((plyr.controls.pressed || plyr.controls.hover) && !isEnterFullscreen) {
                         return;
                     }
-                    
+
                     _toggleClass(plyr.container, config.classes.hideControls, true);
                 }, delay);
             }
@@ -3331,7 +3331,7 @@
                     _remove(plyr.videoContainer);
                 }
 
-                // Reset class name 
+                // Reset class name
                 if (plyr.container) {
                     plyr.container.removeAttribute('class');
                 }
@@ -3527,7 +3527,7 @@
                         count   = get().length;
 
                         // Only handle global key press if there's only one player
-                        // and the key is in the allowed keys 
+                        // and the key is in the allowed keys
                         // and if the focused element is not editable (e.g. text input)
                         // and any that accept key input http://webaim.org/techniques/keyboard/
                         if (count === 1 && _inArray(allowed, code) && (!_is.htmlElement(focused) || !_matches(focused, config.selectors.editable))) {
@@ -3561,7 +3561,7 @@
                         return;
                     }
 
-                    // Divide the max duration into 10th's and times by the number value 
+                    // Divide the max duration into 10th's and times by the number value
                     _seek((duration / 10) * (code - 48));
                 }
 
@@ -3579,18 +3579,18 @@
 
                     switch(code) {
                         // 0-9
-                        case 48: 
-                        case 49: 
-                        case 50: 
-                        case 51: 
-                        case 52: 
-                        case 53: 
-                        case 54: 
-                        case 55: 
+                        case 48:
+                        case 49:
+                        case 50:
+                        case 51:
+                        case 52:
+                        case 53:
+                        case 54:
+                        case 55:
                         case 56:
                         case 57: if (!held) { seekByKey(); } break;
                         // Space and K key
-                        case 32: 
+                        case 32:
                         case 75: if (!held) { _togglePlay(); } break;
                         // Arrow up
                         case 38: _increaseVolume(); break;
@@ -3688,7 +3688,7 @@
             _on(plyr.buttons.captions, 'click', _toggleCaptions);
 
             // Settings
-            _on(plyr.buttons.settings, 'click', function(event) { 
+            _on(plyr.buttons.settings, 'click', function(event) {
                 var menu = this,
                     toggle = event.target,
                     target = document.getElementById(toggle.getAttribute('aria-controls')),
@@ -3731,22 +3731,22 @@
 
                 // Are we targetting a tab?
                 var isTab = target.getAttribute('role') === 'tabpanel',
-                    targetWidth, 
+                    targetWidth,
                     targetHeight,
                     container;
 
                 // Hide all other tabs
                 if (isTab) {
                     // Get other tabs
-                    var current = menu.querySelector('[role="tabpanel"][aria-hidden="false"]');                        
+                    var current = menu.querySelector('[role="tabpanel"][aria-hidden="false"]');
                     container = current.parentNode;
 
                     [].forEach.call(menu.querySelectorAll('[aria-controls="' + current.getAttribute('id') + '"]'), function(toggle) {
                         toggle.setAttribute('aria-expanded', false);
                     });
 
-                    container.style.width = current.scrollWidth + 'px'; 
-                    container.style.height = current.scrollHeight + 'px'; 
+                    container.style.width = current.scrollWidth + 'px';
+                    container.style.height = current.scrollHeight + 'px';
 
                     current.setAttribute('aria-hidden', true);
                     current.setAttribute('tabindex', -1);
@@ -3759,9 +3759,9 @@
                     container.appendChild(clone);
                     targetWidth = clone.scrollWidth;
                     targetHeight = clone.scrollHeight;
-                    _remove(clone);                
+                    _remove(clone);
                 }
-                
+
                 target.setAttribute('aria-hidden', !show);
                 toggle.setAttribute('aria-expanded', show);
                 target.setAttribute('tabindex', 0);
@@ -3786,12 +3786,12 @@
                 _on(plyr.container, 'mouseenter mouseleave mousemove touchstart touchend touchcancel touchmove enterfullscreen', _toggleControls);
 
                 // Watch for cursor over controls so they don't hide when trying to interact
-                _on(plyr.controls, 'mouseenter mouseleave', function(event) { 
+                _on(plyr.controls, 'mouseenter mouseleave', function(event) {
                     plyr.controls.hover = event.type === 'mouseenter';
                 });
 
                  // Watch for cursor over controls so they don't hide when trying to interact
-                _on(plyr.controls, 'mousedown mouseup touchstart touchend touchcancel', function(event) { 
+                _on(plyr.controls, 'mousedown mouseup touchstart touchend touchcancel', function(event) {
                     plyr.controls.pressed = _inArray(['mousedown', 'touchstart'], event.type);
                 });
 
@@ -3847,7 +3847,7 @@
                     if (plyr.type === 'video') {
                         _setCaption();
                     }
-                    
+
                     // Restart
                     _seek();
 
@@ -3949,7 +3949,7 @@
 
             // Type specific stuff
             switch (plyr.type) {
-                case 'youtube': 
+                case 'youtube':
                     // Clear timers
                     window.clearInterval(timers.buffering);
                     window.clearInterval(timers.playing);
@@ -3959,11 +3959,11 @@
 
                     // Clean up
                     cleanUp();
-                    
+
                     break;
 
                 case 'vimeo':
-                    // Destroy Vimeo API 
+                    // Destroy Vimeo API
                     // then clean up (wait, to prevent postmessage errors)
                     plyr.embed.unload().then(cleanUp);
 
@@ -4196,7 +4196,7 @@
         // Everything done
         function _ready() {
             // Ready event at end of execution stack
-            window.setTimeout(function() { 
+            window.setTimeout(function() {
                 _triggerEvent(plyr.media, 'ready');
             }, 0);
 
@@ -4409,8 +4409,8 @@
             }
 
             // Callback
-            _event(instance.getContainer(), 'setup', true, { 
-                plyr: instance 
+            _event(instance.getContainer(), 'setup', true, {
+                plyr: instance
             });
 
             // Add to return array even if it's already setup
@@ -4441,7 +4441,7 @@
                 }
             });
 
-            return instances; 
+            return instances;
         }
 
         return [];
