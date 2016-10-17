@@ -927,17 +927,6 @@
                 );
             }
 
-            // Toggle captions button
-            if (_inArray(config.controls, 'captions')) {
-                html.push(
-                                '<button type="button" data-plyr="captions">',
-                                    '<svg class="icon--captions-on"><use xlink:href="' + iconPath + '-captions-on" /></svg>',
-                                    '<svg><use xlink:href="' + iconPath+ '-captions-off" /></svg>',
-                                    '<span class="plyr__sr-only">' + config.i18n.toggleCaptions + '</span>',
-                                '</button>'
-                );
-            }
-
             // Settings button / menu
             if (_inArray(config.controls, 'settings')) {
                 html.push(
