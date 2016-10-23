@@ -3401,7 +3401,7 @@
             isReady:            function() { return _hasClass(plyr.container, config.classes.ready); },
             isLoading:          function() { return _hasClass(plyr.container, config.classes.loading); },
             isPaused:           function() { return plyr.media.paused; }, 
-            on:                 function(event, callback) { _on(plyr.container, event, callback); },
+            on:                 function(event, callback) { _on(plyr.container, event, callback); return this; },
             play:               _play,
             pause:              _pause,
             stop:               function() { _pause(); _seek(); },
