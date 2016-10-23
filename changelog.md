@@ -1,5 +1,8 @@
 # Changelog
 
+## v2.0.9
+- Temporary patch for the YouTube API issues with `getDuration()` (relates to #374)
+
 ## v2.0.8
 - Added `isPaused()` API method (thanks to @darrena092)
 - Allowed `.on()` API method to be chainable (thanks to @gurupras) (fixes #357)
