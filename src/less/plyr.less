@@ -189,9 +189,6 @@
     position: relative;
     background: #000;
     border-radius: inherit;
-
-    // Cleaner radius, also forces iframe radius
-    -webkit-mask-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAA5JREFUeNpiYGBgAAgwAAAEAAGbA+oJAAAAAElFTkSuQmCC);
 }
 
 // Container for embeds
@@ -199,6 +196,9 @@
     padding-bottom: 56.25%; /* 16:9 */
     height: 0;
     overflow: hidden;
+
+    // Require z-index to force border-radius
+    z-index: 0;
 
     iframe {
         position: absolute;
@@ -208,6 +208,7 @@
         height: 100%;
         border: 0;
         user-select: none;
+        z-index: 1;
     }
 
     // Vimeo hack
@@ -259,11 +260,14 @@
 .plyr--captions-active .plyr__captions {
     display: block;
 }
-.plyr--fullscreen-active .plyr__captions {
-    font-size: @plyr-font-size-captions-large;
-}
 .plyr--hide-controls .plyr__captions {
     transform: translateY(-(@plyr-control-spacing * 1.5));
+}
+// Large captions in full screen on larger screens
+@media (min-width: @plyr-bp-screen-lg) {
+    .plyr--fullscreen-active .plyr__captions {
+        font-size: @plyr-font-size-captions-large;
+    }
 }
 
 // Controls

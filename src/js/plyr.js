@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v2.0.7
+// plyr.js v2.0.9
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -45,7 +45,7 @@
         displayDuration:        true,
         loadSprite:             true,
         iconPrefix:             'plyr',
-        iconUrl:                'https://cdn.plyr.io/2.0.7/plyr.svg',
+        iconUrl:                'https://cdn.plyr.io/2.0.9/plyr.svg',
         clickToPlay:            true,
         hideControls:           true,
         showPosterOnEnd:        false,
@@ -440,14 +440,14 @@
 
     // Bind event handler
     function _on(element, events, callback, useCapture) {
-        if (_is.htmlElement(element)) {
+        if (!_is.undefined(element)) {
             _toggleListener(element, events, callback, true, useCapture);
         }
     }
 
     // Unbind event handler
     function _off(element, events, callback, useCapture) {
-        if (_is.htmlElement(element)) {
+        if (!_is.undefined(element)) {
             _toggleListener(element, events, callback, false, useCapture);
         }
     }
@@ -1025,13 +1025,9 @@
             }
         }
 
-        // Caption cue change helper event
-        /*function _captionCueChange() {
-            _setActiveCueForTrack(this);
-        }*/
-
         // Display active caption if it contains text
-        function _setActiveCueForTrack(track) {
+        function _setActiveCue(track) {
+            // Get the track from the event if needed
             if (_is.event(track)) {
                 track = track.target;
             }
@@ -1091,14 +1087,17 @@
             if (!plyr.captionExists) {
                 _toggleClass(plyr.container, config.classes.captions.enabled);
             } else {
+                var tracks = plyr.media.textTracks;
+
                 // Turn off native caption rendering to avoid double captions
                 // This doesn't seem to work in Safari 7+, so the <track> elements are removed from the dom below
-                var tracks = plyr.media.textTracks;
-                for (var x = 0; x < tracks.length; x++) {
+                [].forEach.call(tracks, function(track) {
                     // Remove the listener to prevent event overlapping
-                    _off(tracks[x], 'cuechange', _setActiveCueForTrack);
-                    tracks[x].mode = 'hidden';
-                }
+                    _off(track, 'cuechange', _setActiveCue);
+
+                    // Hide captions
+                    track.mode = 'hidden';
+                });
 
                 // Enable UI
                 _showCaptions(plyr);
@@ -1123,11 +1122,11 @@
                     var track = tracks[config.captions.selectedIndex];
 
                     if (track.kind === 'captions' || track.kind === 'subtitles') {
-                        _on(track, 'cuechange', _setActiveCueForTrack);
+                        _on(track, 'cuechange', _setActiveCue);
 
-                        // if we change the active track while a cue is already displayed we need to update it
+                        // If we change the active track while a cue is already displayed we need to update it
                         if (track.activeCues && track.activeCues.length > 0) {
-                            _setActiveCueForTrack(track);
+                            _setActiveCue(track);
                         }
                     }
                 } else {
@@ -1153,7 +1152,7 @@
                                     // CRLF (U+000D U+000A), LF (U+000A) or CR (U+000D)
                                     var lineSeparator = '\r\n';
                                     if (req.indexOf(lineSeparator + lineSeparator) === -1) {
-                                        if (req.indexOf('\r\r') !== -1){
+                                        if (req.indexOf('\r\r') !== -1) {
                                             lineSeparator = '\r';
                                         } else {
                                             lineSeparator = '\n';
@@ -1869,6 +1868,14 @@
                                     // Trigger timeupdate
                                     _triggerEvent(plyr.media, 'timeupdate');
                                 }, 100);
+
+                                // Check duration again due to YouTube bug
+                                // https://github.com/Selz/plyr/issues/374
+                                // https://code.google.com/p/gdata-issues/issues/detail?id=8690
+                                if (plyr.media.duration !== instance.getDuration()) {
+                                    plyr.media.duration = instance.getDuration();
+                                    _triggerEvent(plyr.media, 'durationchange');
+                                }
 
                                 break;
 
@@ -3648,7 +3655,8 @@
             isMuted:            function() { return plyr.media.muted; },
             isReady:            function() { return _hasClass(plyr.container, config.classes.ready); },
             isLoading:          function() { return _hasClass(plyr.container, config.classes.loading); },
-            on:                 function(event, callback) { _on(plyr.container, event, callback); },
+            isPaused:           function() { return plyr.media.paused; }, 
+            on:                 function(event, callback) { _on(plyr.container, event, callback); return this; },
             play:               _play,
             pause:              _pause,
             stop:               function() { _pause(); _seek(); },
