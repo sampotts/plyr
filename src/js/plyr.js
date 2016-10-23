@@ -1064,18 +1064,15 @@
 
             // Get URL of caption file if exists
             var captionSources = [],
-                captionSrc = '',
-                kind,
-                children = plyr.media.childNodes;
+                captionSrc = '';
 
-            for (var i = 0; i < children.length; i++) {
-                if (children[i].nodeName.toLowerCase() === 'track') {
-                    kind = children[i].kind;
-                    if (kind === 'captions' || kind === 'subtitles') {
-                        captionSources.push(children[i].getAttribute('src'));
+            plyr.media.childNodes.forEach(function(child) {
+                if (child.nodeName.toLowerCase() === 'track') {
+                    if (child.kind === 'captions' || child.kind === 'subtitles') {
+                        captionSources.push(child.getAttribute('src'));
                     }
                 }
-            }
+            });
 
             // Record if caption file exists or not
             plyr.captionExists = true;
@@ -1152,18 +1149,18 @@
                                         caption,
                                         req = xhr.responseText;
                                     
-                                    //According to webvtt spec, line terminator consists of one of the following
+                                    // According to webvtt spec, line terminator consists of one of the following
                                     // CRLF (U+000D U+000A), LF (U+000A) or CR (U+000D)
                                     var lineSeparator = '\r\n';
-                                    if(req.indexOf(lineSeparator+lineSeparator) === -1) {
-                                        if(req.indexOf('\r\r') !== -1){
+                                    if (req.indexOf(lineSeparator + lineSeparator) === -1) {
+                                        if (req.indexOf('\r\r') !== -1){
                                             lineSeparator = '\r';
                                         } else {
                                             lineSeparator = '\n';
                                         }
                                     }
                                     
-                                    captions = req.split(lineSeparator+lineSeparator);
+                                    captions = req.split(lineSeparator + lineSeparator);
 
                                     for (var r = 0; r < captions.length; r++) {
                                         caption = captions[r];
