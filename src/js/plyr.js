@@ -1737,6 +1737,14 @@
                                     _triggerEvent(plyr.media, 'timeupdate');
                                 }, 100);
 
+                                // Check duration again due to YouTube bug
+                                // https://github.com/Selz/plyr/issues/374
+                                // https://code.google.com/p/gdata-issues/issues/detail?id=8690
+                                if (plyr.media.duration !== instance.getDuration()) {
+                                    plyr.media.duration = instance.getDuration();
+                                    _triggerEvent(plyr.media, 'durationchange');
+                                }
+
                                 break;
 
                             case 2:
