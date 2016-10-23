@@ -581,22 +581,25 @@
     (function() {
         // Determine the prefix
         var prefix = (function() { 
-            if (!_is.undefined(document.cancelFullScreen)) {
-                return '';
+            var value = false;
+
+            if (_is.function(document.cancelFullScreen)) {
+                value = '';
             } else {
                 // Check for fullscreen support by vendor prefix
-                ['webkit', 'o', 'moz', 'ms', 'khtml'].forEach(function(prefix) {
-                    if (!_is.undefined(document[prefix + 'CancelFullScreen'])) {
-                        return prefix;
-                    } else if (!_is.undefined(document.msExitFullscreen) && document.msFullscreenEnabled) {
+                ['webkit', 'o', 'moz', 'ms', 'khtml'].some(function(prefix) {
+                    if (_is.function(document[prefix + 'CancelFullScreen'])) {
+                        value = prefix;
+                        return true;
+                    } else if (_is.function(document.msExitFullscreen) && document.msFullscreenEnabled) {
                         // Special case for MS (when isn't it?)
-                        return 'ms';
+                        value = 'ms';
+                        return true;
                     }
                 });
             }
 
-            // If we got this far, there's no support
-            return false;
+            return value;
         })();
 
         _fullscreen = {
@@ -625,9 +628,12 @@
                 if (!_support.fullscreen) {
                     return false;
                 }
-                if (_is.undefined(element)) {
+                if (!_is.htmlElement(element)) {
                     element = document.body;
                 }
+
+                console.log(prefix);
+
                 return (prefix === '') ? element.requestFullScreen() : element[prefix + (prefix === 'ms' ? 'RequestFullscreen' : 'RequestFullScreen')]();
             },
             cancelFullScreen: function() {
@@ -988,7 +994,6 @@
             }
 
             // Picture in picture button
-            console.log(_support.pip);
             if (_inArray(config.controls, 'pip') && _support.pip) {
                 html.push(
                     '<button type="button" data-plyr="pip">',
@@ -3315,7 +3320,7 @@
             _on(plyr.buttons.pip, 'click', function() { 
                 //if ()
 
-                plyr.media.webkitSetPresentationMode(plyr.media.webkitPresentationMode === 'optimized' ? 'inline' : 'optimized');
+                plyr.media.webkitSetPresentationMode(plyr.media.webkitPresentationMode === 'picture-in-picture' ? 'inline' : 'picture-in-picture');
             });
 
             // Seek tooltip

@@ -172,6 +172,9 @@
     position: relative;
     background: #000;
     border-radius: inherit;
+    // Require z-index to force border-radius
+    z-index: 0;
+    overflow: hidden;
 }
 
 // Container for embeds
@@ -180,9 +183,6 @@
     height: 0;
     overflow: hidden;
     border-radius: inherit;
-
-    // Require z-index to force border-radius
-    z-index: 0;
 
     iframe {
         position: absolute;
