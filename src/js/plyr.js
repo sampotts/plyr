@@ -78,7 +78,9 @@
                 mute:           '[data-plyr="mute"]',
                 captions:       '[data-plyr="captions"]',
                 fullscreen:     '[data-plyr="fullscreen"]',
-                settings:       '[data-plyr="settings"]'
+                settings:       '[data-plyr="settings"]',
+                pip:            '[data-plyr="pip"]',
+                airplay:        '[data-plyr="airplay"]'
             },
             volume: {
                 input:          '[data-plyr="volume"]',
@@ -136,7 +138,7 @@
             enabled:            true,
             key:                'plyr'
         },
-        controls:               ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen'],
+        controls:               ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'pip', 'airplay', 'fullscreen'],
         i18n: {
             restart:            'Restart',
             rewind:             'Rewind {seektime} secs',
@@ -677,9 +679,15 @@
         })(),
         // Picture-in-picture support
         // Safari only currently 
-        pip: function(plyr) {
-            return _is.function(plyr.media.webkitSetPresentationMode);
-        },
+        pip: (function() {
+            var video = document.createElement('video');
+            return _is.function(video.webkitSetPresentationMode);
+        })(),
+        // Airplay support
+        // Safari only currently 
+        airplay: (function() {
+            return _is.function(window.WebKitPlaybackTargetAvailabilityEvent);
+        })(),
         // Check for mime type support against a player instance
         // Credits: http://diveintohtml5.info/everything.html
         // Related: http://www.leanbackplyr.com/test/h5mt.html
@@ -976,6 +984,27 @@
                             '</div>',
                         '</div>',
                     '</div>'
+                );
+            }
+
+            // Picture in picture button
+            console.log(_support.pip);
+            if (_inArray(config.controls, 'pip') && _support.pip) {
+                html.push(
+                    '<button type="button" data-plyr="pip">',
+                        '<svg><use xlink:href="' + iconPath + '-pip" /></svg>',
+                        '<span class="plyr__sr-only">PIP</span>',
+                    '</button>'
+                );
+            }
+
+            // Airplay button
+            if (_inArray(config.controls, 'airplay') && _support.airplay) {
+                html.push(
+                    '<button type="button" data-plyr="airplay">',
+                        '<svg><use xlink:href="' + iconPath + '-airplay" /></svg>',
+                        '<span class="plyr__sr-only">AirPlay</span>',
+                    '</button>'
                 );
             }
 
@@ -1444,52 +1473,61 @@
         // Find the UI controls and store references
         function _findElements() {
             try {
-                plyr.controls                 = _getElement(config.selectors.controls.wrapper);
+                plyr.controls           = _getElement(config.selectors.controls.wrapper);
 
                 // Buttons
-                plyr.buttons = {};
-                plyr.buttons.seek             = _getElement(config.selectors.buttons.seek);
-                plyr.buttons.play             = _getElements(config.selectors.buttons.play);
-                plyr.buttons.pause            = _getElement(config.selectors.buttons.pause);
-                plyr.buttons.restart          = _getElement(config.selectors.buttons.restart);
-                plyr.buttons.rewind           = _getElement(config.selectors.buttons.rewind);
-                plyr.buttons.forward          = _getElement(config.selectors.buttons.forward);
-                plyr.buttons.fullscreen       = _getElement(config.selectors.buttons.fullscreen);
-                plyr.buttons.settings         = _getElement(config.selectors.buttons.settings);
+                plyr.buttons = {
+                    seek:               _getElement(config.selectors.buttons.seek),
+                    play:               _getElements(config.selectors.buttons.play),
+                    pause:              _getElement(config.selectors.buttons.pause),
+                    restart:            _getElement(config.selectors.buttons.restart),
+                    rewind:             _getElement(config.selectors.buttons.rewind),
+                    forward:            _getElement(config.selectors.buttons.forward),
+                    fullscreen:         _getElement(config.selectors.buttons.fullscreen),
+                    settings:           _getElement(config.selectors.buttons.settings),
+                    pip:                _getElement(config.selectors.buttons.pip)
+                };
 
                 // Inputs
-                plyr.buttons.mute             = _getElement(config.selectors.buttons.mute);
-                plyr.buttons.captions         = _getElement(config.selectors.buttons.captions);
+                plyr.buttons.mute       = _getElement(config.selectors.buttons.mute);
+                plyr.buttons.captions   = _getElement(config.selectors.buttons.captions);
 
                 // Progress
-                plyr.progress = {};
-                plyr.progress.container       = _getElement(config.selectors.progress.container);
+                plyr.progress = {
+                    container:          _getElement(config.selectors.progress.container)
+                };
 
                 // Progress - Buffering
-                plyr.progress.buffer          = {};
-                plyr.progress.buffer.bar      = _getElement(config.selectors.progress.buffer);
-                plyr.progress.buffer.text     = plyr.progress.buffer.bar && plyr.progress.buffer.bar.getElementsByTagName('span')[0];
+                plyr.progress.buffer = (function() {
+                    var bar = _getElement(config.selectors.progress.buffer);
+
+                    return {
+                        bar:            bar,
+                        text:           _is.htmlElement(bar) && bar.getElementsByTagName('span')[0]
+                    };
+                })();
 
                 // Progress - Played
-                plyr.progress.played          = _getElement(config.selectors.progress.played);
+                plyr.progress.played    = _getElement(config.selectors.progress.played);
 
                 // Seek tooltip
-                plyr.progress.tooltip         = plyr.progress.container && plyr.progress.container.querySelector('.' + config.classes.tooltip);
+                plyr.progress.tooltip   = plyr.progress.container && plyr.progress.container.querySelector('.' + config.classes.tooltip);
 
                 // Volume
-                plyr.volume                   = {};
-                plyr.volume.input             = _getElement(config.selectors.volume.input);
-                plyr.volume.display           = _getElement(config.selectors.volume.display);
+                plyr.volume = {
+                    input:              _getElement(config.selectors.volume.input),
+                    display:            _getElement(config.selectors.volume.display)
+                };
 
                 // Timing
-                plyr.duration                 = _getElement(config.selectors.duration);
-                plyr.currentTime              = _getElement(config.selectors.currentTime);
-                plyr.seekTime                 = _getElements(config.selectors.seekTime);
+                plyr.duration           = _getElement(config.selectors.duration);
+                plyr.currentTime        = _getElement(config.selectors.currentTime);
+                plyr.seekTime           = _getElements(config.selectors.seekTime);
 
                 return true;
             }
             catch(e) {
-                _warn('It looks like there is a problem with your controls HTML');
+                _warn('It looks like there is a problem with your controls HTML', e);
 
                 // Restore native video controls
                 _toggleNativeControls(true);
@@ -1603,7 +1641,7 @@
                 }
 
                 // Check for picture-in-picture support
-                _toggleClass(plyr.container, config.classes.pip.enabled, _support.pip(plyr));
+                _toggleClass(plyr.container, config.classes.pip.enabled, _support.pip);
 
                 // If there's no autoplay attribute, assume the video is stopped and add state class
                 _toggleClass(plyr.container, config.classes.stopped, config.autoplay);
@@ -3271,6 +3309,13 @@
                         container.style.height = '';
                     }, 300);
                 }
+            });
+
+            // Picture in picture
+            _on(plyr.buttons.pip, 'click', function() { 
+                //if ()
+
+                plyr.media.webkitSetPresentationMode(plyr.media.webkitPresentationMode === 'optimized' ? 'inline' : 'optimized');
             });
 
             // Seek tooltip
