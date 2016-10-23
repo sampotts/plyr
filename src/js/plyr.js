@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v2.0.7
+// plyr.js v2.0.9
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -45,7 +45,7 @@
         displayDuration:        true,
         loadSprite:             true,
         iconPrefix:             'plyr',
-        iconUrl:                'https://cdn.plyr.io/2.0.7/plyr.svg',
+        iconUrl:                'https://cdn.plyr.io/2.0.9/plyr.svg',
         clickToPlay:            true,
         hideControls:           true,
         showPosterOnEnd:        false,
@@ -1872,6 +1872,14 @@
                                     _triggerEvent(plyr.media, 'timeupdate');
                                 }, 100);
 
+                                // Check duration again due to YouTube bug
+                                // https://github.com/Selz/plyr/issues/374
+                                // https://code.google.com/p/gdata-issues/issues/detail?id=8690
+                                if (plyr.media.duration !== instance.getDuration()) {
+                                    plyr.media.duration = instance.getDuration();
+                                    _triggerEvent(plyr.media, 'durationchange');
+                                }
+
                                 break;
 
                             case 2:
@@ -3650,7 +3658,8 @@
             isMuted:            function() { return plyr.media.muted; },
             isReady:            function() { return _hasClass(plyr.container, config.classes.ready); },
             isLoading:          function() { return _hasClass(plyr.container, config.classes.loading); },
-            on:                 function(event, callback) { _on(plyr.container, event, callback); },
+            isPaused:           function() { return plyr.media.paused; }, 
+            on:                 function(event, callback) { _on(plyr.container, event, callback); return this; },
             play:               _play,
             pause:              _pause,
             stop:               function() { _pause(); _seek(); },

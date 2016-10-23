@@ -1,0 +1,11 @@
+{
+    "html": {
+        "allowed_file_extensions": []
+    },
+    "css": {
+        "allowed_file_extensions": []
+    },
+    "js": {
+        "allowed_file_extensions": []
+    }
+}
