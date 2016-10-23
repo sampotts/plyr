@@ -245,15 +245,15 @@ options = {
 // If aws is setup
 if("cdn" in aws) {
     var regex       = "(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)(?:-[\\da-z\\-]+(?:\.[\\da-z\\-]+)*)?(?:\\+[\\da-z\\-]+(?:\.[\\da-z\\-]+)*)?",
-    cdnpath         = new RegExp(aws.cdn.bucket + "\/" + regex, "gi"),
+    cdnpath         = new RegExp(aws.cdn.domain + "\/" + regex, "gi"),
     semver          = new RegExp("v" + regex, "gi"),
     localPath       = new RegExp("(\.\.\/)?dist", "gi"),
-    versionPath     = "https://" + aws.cdn.bucket + "/" + version;
+    versionPath     = "https://" + aws.cdn.domain + "/" + version;
 }
 
 // Publish version to CDN bucket
 gulp.task("cdn", function () {
-    console.log("Uploading " + version + " to " + aws.cdn.bucket + "...");
+    console.log("Uploading " + version + " to " + aws.cdn.domain + "...");
 
     // Upload to CDN
     return gulp.src(paths.upload)
@@ -270,17 +270,17 @@ gulp.task("cdn", function () {
 
 // Publish to demo bucket
 gulp.task("demo", function () {
-    console.log("Uploading " + version + " demo to " + aws.demo.bucket + "...");
+    console.log("Uploading " + version + " demo to " + aws.demo.domain + "...");
 
     // Replace versioned files in readme.md
     gulp.src([root + "/readme.md"])
-        .pipe(replace(cdnpath, aws.cdn.bucket + "/" + version))
+        .pipe(replace(cdnpath, aws.cdn.domain + "/" + version))
         .pipe(gulp.dest(root));
 
     // Replace versioned files in plyr.js
     gulp.src(path.join(root, "src/js/plyr.js"))
         .pipe(replace(semver, "v" + version))
-        .pipe(replace(cdnpath, aws.cdn.bucket + "/" + version))
+        .pipe(replace(cdnpath, aws.cdn.domain + "/" + version))
         .pipe(gulp.dest(path.join(root, "src/js/")));
 
     // Replace local file paths with remote paths in demo HTML
@@ -320,14 +320,14 @@ gulp.task("symlinks", function () {
 
 // Open the demo site to check it's sweet
 gulp.task("open", function () {
-    console.log("Opening " + aws.demo.bucket + "...");
+    console.log("Opening " + aws.demo.domain + "...");
 
     // A file must be specified or gulp will skip the task
     // Doesn't matter which file since we set the URL above
     // Weird, I know...
     return gulp.src([paths.demo.root + "index.html"])
         .pipe(open("", {
-            url: "http://" + aws.demo.bucket
+            url: "http://" + aws.demo.domain
         }));
 });
 

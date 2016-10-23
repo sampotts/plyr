@@ -1,5 +1,13 @@
 # Changelog
 
+## v2.0.8
+- Added `isPaused()` API method (thanks to @darrena092)
+- Allowed `.on()` API method to be chainable (thanks to @gurupras) (fixes #357)
+- Improved the "awful" rendering of captions on small screens in fullscreen mode (fixes #390)
+- Fix for Firefox VTT compatibility (thanks to @magourex)
+- Fix for Firefox Developer Edition blank video due to `-webkit-mask-image` issue (fixes #392)
+- Added Issue and PR templates with the aim of reducing duplicate or duff issues
+
 ## v2.0.7
 - Fixed `getCurrentTime()` method (fixes #351)
 - Added `getVolume()` , `isMuted()` and `getDuration()` API methods (fixes #346)

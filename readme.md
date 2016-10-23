@@ -122,7 +122,7 @@ Include the `plyr.js` script before the closing `</body>` tag and then call `ply
 If you want to use our CDN for the JavaScript, you can use the following:
 
 ```html
-<script src="https://cdn.plyr.io/2.0.7/plyr.js"></script>
+<script src="https://cdn.plyr.io/2.0.8/plyr.js"></script>
 ```
 
 ### CSS
@@ -135,11 +135,11 @@ Include the `plyr.css` stylsheet into your `<head>`
 If you want to use our CDN for the default CSS, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/2.0.7/plyr.css">
+<link rel="stylesheet" href="https://cdn.plyr.io/2.0.8/plyr.css">
 ```
 
 ### SVG Sprite
-The SVG sprite is loaded automatically from our CDN. To change this, see the [options](#Options) below. For reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/2.0.7/plyr.svg`.
+The SVG sprite is loaded automatically from our CDN. To change this, see the [options](#Options) below. For reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/2.0.8/plyr.svg`.
 
 ## Advanced
 
@@ -492,7 +492,7 @@ Here's a list of the methods supported:
   <tr>
     <td><code>on()</code></td>
     <td>String, Function</td>
-    <td>Watch for an event (first argument) and run a callback function (second argument). This saves you doing your own <code>addEventListner</code> code.</td>
+    <td>Watch for an event (first argument) and run a callback function (second argument). This saves you doing your own <code>addEventListner</code> code. This is chainable.</td>
   </tr>
   <tr>
     <td><code>play()</code></td>
@@ -558,6 +558,11 @@ Here's a list of the methods supported:
     <td><code>togglePlay()</code></td>
     <td>Boolean</td>
     <td>Toggles playback for the player based on either the boolean argument or it's current state.</td>
+  </tr>
+  <tr>
+    <td><code>isPaused()</code></td>
+    <td>&mdash;</td>
+    <td>Will return a boolean for whether the media is currently paused.</td>
   </tr>
   <tr>
     <td><code>toggleMute()</code></td>
