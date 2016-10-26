@@ -1614,10 +1614,16 @@
 
         // Handle YouTube API ready
         function _youTubeReady(videoId, container) {
+            // XXX: specifying start in playerVars appears to be insufficient
+            // in getting instance to begin playing from the specified start point
+            // So we explicitly do cueVideoById once the player is ready.
+            var start = Number(plyr.media.getAttribute('data-start')) || 0;
+            var end = Number(plyr.media.getAttribute('data-end'));
+
             // Setup instance
             // https://developers.google.com/youtube/iframe_api_reference
             plyr.embed = new window.YT.Player(container.id, {
-                videoId: videoId,
+                videoId: '',
                 playerVars: {
                     autoplay:       (config.autoplay ? 1 : 0),
                     controls:       (plyr.supported.full ? 0 : 1),
@@ -1629,7 +1635,9 @@
                     wmode:          'transparent',
                     modestbranding: 1,
                     disablekb:      1,
-                    origin:         '*' // https://code.google.com/p/gdata-issues/issues/detail?id=5788#c45
+                    origin:         '*', // https://code.google.com/p/gdata-issues/issues/detail?id=5788#c45
+                    start:          start, // XXX: This does not work, but the API claims to support it
+                    end:            end, // XXX: This does not work, but the API claims to support it
                 },
                 events: {
                     'onError': function(event) {
@@ -1657,7 +1665,7 @@
                         };
                         plyr.media.duration = instance.getDuration();
                         plyr.media.paused = true;
-                        plyr.media.currentTime = 0;
+                        plyr.media.currentTime = plyr.start;
                         plyr.media.muted = instance.isMuted();
 
                         // Set title
@@ -1667,6 +1675,13 @@
                         if (plyr.supported.full) {
                             plyr.media.querySelector('iframe').setAttribute('tabindex', '-1');
                         }
+
+                        // Cue the real video.
+                        instance.cueVideoById({
+                            videoId: videoId,
+                            startSeconds: start,
+                            endSeconds: end,
+                        });
 
                         // Update UI
                         _embedReady();
