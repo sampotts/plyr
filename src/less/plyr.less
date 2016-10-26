@@ -786,6 +786,11 @@
 }
 .plyr .plyr__progress {
     display: inline-block;
+
+    // Hoverd styles
+    &:hover {
+        .plyr-progress-range-track-hover();
+    }
 }
 
 .plyr__progress--buffer,
@@ -845,7 +850,13 @@
         display: none;
     }
 }
+.plyr__progress--buffer,
+.plyr__progress--played {
+    .plyr-progress-range-track();
+}
 .plyr__progress--buffer {
+    opacity: @plyr-progress-range-track-opacity;
+
     &::-webkit-progress-value {
         transition: width .2s ease;
     }
