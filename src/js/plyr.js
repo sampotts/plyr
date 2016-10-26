@@ -2571,7 +2571,7 @@
         // Toggle captions
         function _toggleCaptions(show) {
             // If there's no full support, or there's no caption toggle
-            if (!plyr.supported.full || !plyr.buttons.captions) {
+            if (!plyr.supported.full || !_inArray(config.controls, 'captions')) {
                 return;
             }
 
