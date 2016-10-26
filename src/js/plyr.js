@@ -942,6 +942,7 @@
                                                 '<ul>'
                 );
 
+            // Captions menu button
             if (_inArray(config.controls, 'captions')) {
                 html.push(
                                                     '<li role="tab">',
@@ -951,6 +952,7 @@
                 );
             }
 
+            // Speeds menu button
             if (_inArray(config.controls, 'speed')) {
                 html.push(
                                                     '<li role="tab">',
@@ -960,6 +962,7 @@
                 );
             }
 
+            // Qualities menu button
             if (_inArray(config.controls, 'quality')) {
                 html.push(
                                                     '<li role="tab">',
@@ -971,8 +974,11 @@
 
             html.push(
                                                 '</ul>',
-                                            '</div>', // End of .plyr__menu__primary
+                                            '</div>' // End of .plyr__menu__primary
+            );
 
+            // Captions menu item
+            html.push(
                                             '<div class="plyr__menu__secondary" id="plyr-settings-{id}-captions" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-captions-toggle" role="tabpanel" tabindex="-1">',
                                                 '<ul>',
                                                     '<li role="tab">',
@@ -980,8 +986,11 @@
                                                         '</button>',
                                                     '</li>',
                                                 '</ul>',
-                                            '</div>', // End of .plyr__menu__secondary
+                                            '</div>' // End of .plyr__menu__secondary
+            );
 
+            // Speeds menu item
+            html.push(
                                             '<div class="plyr__menu__secondary" id="plyr-settings-{id}-speed" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-speed-toggle" role="tabpanel" tabindex="-1">',
                                                 '<ul>',
                                                     '<li role="tab">',
@@ -991,6 +1000,7 @@
                                                     '</li>'
             );
 
+            // Inject speeds menu item
             config.speeds.forEach(function(speed) {
                 html.push(
                                                     '<li>',
@@ -1002,10 +1012,14 @@
                 );
             });
 
+            // Close menu button
             html.push(
                                                 '</ul>',
-                                            '</div>', // End of .plyr__menu__secondary
+                                            '</div>' // End of .plyr__menu__secondary
+            );
 
+            // Qualities menu item
+            html.push(
                                             '<div class="plyr__menu__secondary" id="plyr-settings-{id}-quality" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-quality-toggle" role="tabpanel" tabindex="-1">',
                                                 '<ul>',
                                                     '<li role="tab">',
@@ -1548,7 +1562,6 @@
             if (_inArray(config.controls, 'quality')) {
                 var qualityMenuButton = getMenuButton('quality');
                 plyr.currentQualityLabel = new DataBind(qualityMenuButton, 'textContent', _getCurrentQuality());
-
                 // Inject quality menu item
                 _buildQualityControl();
             }
@@ -3154,16 +3167,19 @@
         // Build quality menu items
         function _buildQualityControl() {
             var HD_RESOLUTION = 720,
-            // Remove exist quality menu items
                 i,
                 buttons = _getElements('li > button[data-plyr=quality]');
+
+            // Remove exist quality menu items
             for (i=0; i<buttons.length; i++) {
                 buttons[i].parentNode.remove();
             }
+
             // Build HTML
             var query = '#plyr-settings-' + plyr.controlsId + '-quality > ul',
                 ul = _getElement(query),
                 html = [];
+
             Array.prototype.slice.call(_getElements('source'))
                 // ex: [{ label: '720p', res: 720 }, { label: '1080p', res: 1080 }, ...]
                 .map(function(source) {
