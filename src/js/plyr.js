@@ -978,29 +978,6 @@
                                                     '<li role="tab">',
                                                         '<button type="button" class="plyr__menu__btn plyr__menu__btn--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">', config.i18n.captions,
                                                         '</button>',
-                                                    '</li>'
-            );
-
-            var tracks = plyr.media.textTracks;
-            for (var i = 0; i < tracks.length; i++) {
-                html.push(
-                                                    '<li>',
-                                                        '<button type="button" class="',
-                                                            (((plyr.storage.captionsEnabled === true || plyr.storage.captionsEnabled === undefined) && i === 0) ? 'plyr__menu__btn--active' : ''),
-                                                            '" data-plyr="caption" data-plyr-caption="' + i + '">' + tracks[i].label,
-                                                        '</button>',
-                                                    '</li>'
-                );
-            }
-
-            html.push(
-                                                    '<li>',
-                                                        '<button type="button" class="',
-                                                            ((plyr.storage.captionsEnabled === false) ?
-                                                                'plyr__menu__btn--active' : ''),
-                                                            '" data-plyr="caption" data-plyr-caption="false">',
-                                                                config.i18n.disableCaptions,
-                                                        '</button>',
                                                     '</li>',
                                                 '</ul>',
                                             '</div>', // End of .plyr__menu__secondary
@@ -1563,6 +1540,8 @@
             if (_inArray(config.controls, 'captions')) {
                 var captionMenuButton = getMenuButton('captions');
                 plyr.currentCaptionLabel = new DataBind(captionMenuButton, 'textContent', config.i18n.disableCaptions);
+                // Inject caption menu item
+                _buildCaptionControl();
             }
 
             // Binding quality value for menu
@@ -3121,6 +3100,57 @@
             return sources;
         }
 
+        // Build caption menu items
+        function _buildCaptionControl() {
+            var i,
+                buttons = _getElements('li > button[data-plyr=captions]');
+
+            // Remove exist captions menu items
+            for (i=0; i<buttons.length; i++) {
+                buttons[i].parentNode.remove();
+            }
+
+            // Build HTML
+            var query = '#plyr-settings-' + plyr.controlsId + '-captions > ul',
+                ul = _getElement(query),
+                html = [];
+
+            var tracks = plyr.media.textTracks,
+                j;
+            for (j = 0; j < tracks.length; j++) {
+                var hasCaption = ((plyr.storage.captionsEnabled === true || plyr.storage.captionsEnabled === undefined) && j === 0);
+                html.push(
+                    '<li>',
+                        '<button type="button" class="',
+                            (hasCaption ? 'plyr__menu__btn--active' : ''),
+                            '" data-plyr="caption" data-plyr-caption="' + j + '">' + tracks[j].label,
+                        '</button>',
+                    '</li>'
+                );
+                // Update menu button text
+                if (hasCaption) {
+                    plyr.currentCaptionLabel.change(tracks[j].label);
+                }
+            }
+
+            html.push(
+                    '<li>',
+                        '<button type="button" class="',
+                            ((plyr.storage.captionsEnabled === false) ?
+                                'plyr__menu__btn--active' : ''),
+                            '" data-plyr="caption" data-plyr-caption="false">',
+                                config.i18n.disableCaptions,
+                        '</button>',
+                    '</li>'
+            );
+
+            // To string
+            html = html.join('');
+
+            // Inser HTML
+            ul.insertAdjacentHTML('beforeend', html);
+        }
+
         // Build quality menu items
         function _buildQualityControl() {
             var HD_RESOLUTION = 720,
@@ -3264,6 +3294,7 @@
             // If not null or undefined, parse it
             if (!_is.undefined(source)) {
                 _updateSource(source);
+                _buildCaptionControl();
                 _buildQualityControl();
                 return;
             }
