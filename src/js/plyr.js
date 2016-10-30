@@ -3259,6 +3259,19 @@
             }
         }
 
+        // Taken from https://gist.github.com/takien/4077195
+        function parseYoutubeVideoId(url) {
+            var videoId;
+            url = url.replace(/(>|<)/gi,'').split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
+            if(url[2] !== undefined) {
+                videoId = url[2].split(/[^0-9a-z_\-]/i);
+                videoId = videoId[0];
+            } else {
+                videoId = url;
+            }
+            return videoId;
+        }
+
         // Setup a player
         function _init() {
             // Bail if the element is initialized
@@ -3286,6 +3299,12 @@
             if (tagName === 'div') {
                 plyr.type     = media.getAttribute('data-type');
                 plyr.embedId  = media.getAttribute('data-video-id');
+
+                switch(plyr.type) {
+                    case 'youtube':
+                        plyr.embedId = parseYoutubeVideoId(plyr.embedId);
+                        break;
+                }
 
                 // Clean up
                 media.removeAttribute('data-type');
