@@ -2350,6 +2350,32 @@
             _updateStorage({captionsEnabled: plyr.captionsEnabled});
         }
 
+        // Toggle cast
+        function _toggleCast(show) {
+            // If there's no full support, or there's no caption toggle
+            if (!plyr.supported.full || !plyr.buttons.cast) {
+                return;
+            }
+
+            // If the method is called without parameter, toggle based on current value
+            if (!_is.boolean(show)) {
+                show = (plyr.container.className.indexOf(config.classes.cast.active) === -1);
+            }
+
+            // Set global
+            plyr.castEnabled = show;
+
+            // Toggle state
+            _toggleState(plyr.buttons.cast, plyr.castEnabled);
+
+            // Add class hook
+            _toggleClass(plyr.container, config.classes.cast.active, plyr.castEnabled);
+
+            // Trigger an event
+            _triggerEvent(plyr.container, plyr.castEnabled ? 'castenabled' : 'castdisabled', true);
+
+        }
+
         // Check if media is loading
         function _checkLoading(event) {
             var loading = (event.type === 'waiting');
@@ -3067,6 +3093,9 @@
 
             // Captions
             _on(plyr.buttons.captions, 'click', _toggleCaptions);
+
+            // Cast
+            _on(plyr.buttons.cast, 'click', _toggleCast);
 
             // Seek tooltip
             _on(plyr.progress.container, 'mouseenter mouseleave mousemove', _updateSeekTooltip);

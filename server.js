@@ -28,9 +28,8 @@ app.get('/cast', function(req, res) {
 
 app.use('/src', express.static('./src'));
 app.use('/dist', express.static('./dist'));
-
+app.use('/demo', express.static('./demo'));
 
 http.listen(HTTP_PORT, function () {
 	console.log('HTTP listening on port ' + HTTP_PORT);
 });
-
