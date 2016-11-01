@@ -668,7 +668,8 @@
 }
 
 // First tooltip
-.plyr__controls > button:first-child .plyr__tooltip {
+.plyr__controls > button:first-child .plyr__tooltip,
+.plyr__controls > button:first-child + button .plyr__tooltip {
     left: 0;
     transform: translate(0, 10px) scale(.8);
     transform-origin: 0 100%;
@@ -692,6 +693,7 @@
 }
 
 .plyr__controls > button:first-child,
+.plyr__controls > button:first-child + button,
 .plyr__controls > button:last-child {
     &:hover .plyr__tooltip,
     &.tab-focus:focus .plyr__tooltip,

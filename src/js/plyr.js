@@ -686,8 +686,7 @@
         // Picture-in-picture support
         // Safari only currently 
         pip: (function() {
-            var video = document.createElement('video');
-            return _is.function(video.webkitSetPresentationMode);
+            return _is.function(document.createElement('video').webkitSetPresentationMode);
         })(),
         // Airplay support
         // Safari only currently 
@@ -700,20 +699,29 @@
         mime: function(plyr, type) {
             var media = plyr.media;
 
-            if (plyr.type === 'video') {
-                // Check type
-                switch (type) {
-                    case 'video/webm':   return !!(media.canPlayType && media.canPlayType('video/webm; codecs="vp8, vorbis"').replace(/no/, ''));
-                    case 'video/mp4':    return !!(media.canPlayType && media.canPlayType('video/mp4; codecs="avc1.42E01E, mp4a.40.2"').replace(/no/, ''));
-                    case 'video/ogg':    return !!(media.canPlayType && media.canPlayType('video/ogg; codecs="theora"').replace(/no/, ''));
+            try {
+                // Bail if no checking function 
+                if (!_is.function(media.canPlayType)) {
+                    return false;
                 }
-            } else if (plyr.type === 'audio') {
-                // Check type
-                switch (type) {
-                    case 'audio/mpeg':   return !!(media.canPlayType && media.canPlayType('audio/mpeg;').replace(/no/, ''));
-                    case 'audio/ogg':    return !!(media.canPlayType && media.canPlayType('audio/ogg; codecs="vorbis"').replace(/no/, ''));
-                    case 'audio/wav':    return !!(media.canPlayType && media.canPlayType('audio/wav; codecs="1"').replace(/no/, ''));
+
+                // Type specific checks
+                if (plyr.type === 'video') {
+                    switch (type) {
+                        case 'video/webm':   return media.canPlayType('video/webm; codecs="vp8, vorbis"').replace(/no/, '');
+                        case 'video/mp4':    return media.canPlayType('video/mp4; codecs="avc1.42E01E, mp4a.40.2"').replace(/no/, '');
+                        case 'video/ogg':    return media.canPlayType('video/ogg; codecs="theora"').replace(/no/, '');
+                    }
+                } else if (plyr.type === 'audio') {
+                    switch (type) {
+                        case 'audio/mpeg':   return media.canPlayType('audio/mpeg;').replace(/no/, '');
+                        case 'audio/ogg':    return media.canPlayType('audio/ogg; codecs="vorbis"').replace(/no/, '');
+                        case 'audio/wav':    return media.canPlayType('audio/wav; codecs="1"').replace(/no/, '');
+                    }
                 }
+            }
+            catch(e) {
+                return false;
             }
 
             // If we got this far, we're stuffed
