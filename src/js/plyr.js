@@ -2435,7 +2435,7 @@
             }
 
             // Trigger an event
-            _triggerEvent(plyr.fullscreenContainer, plyr.isFullscreen ? 'enterfullscreen' : 'exitfullscreen', true);
+            _triggerEvent(plyr.container, plyr.isFullscreen ? 'enterfullscreen' : 'exitfullscreen', true);
 
             // Restore scroll position
             if (!plyr.isFullscreen && nativeSupport) {
