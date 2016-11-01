@@ -88,6 +88,7 @@
                 played:         '.plyr__progress--played'
             },
             captions:           '.plyr__captions',
+            cast:                '.plyr__cast',
             currentTime:        '.plyr__time--current',
             duration:           '.plyr__time--duration'
         },
@@ -114,6 +115,10 @@
             fullscreen: {
                 enabled:        'plyr--fullscreen-enabled',
                 active:         'plyr--fullscreen-active'
+            },
+            cast: {
+              enabled:          'plyr--cast-enabled',
+              active:           'plyr--cast-active',
             },
             tabFocus:           'tab-focus'
         },
@@ -882,7 +887,7 @@
                 html.push(
                     '<button type="button" data-plyr="cast">',
                         '<svg class="icon--cast-on"><use xlink:href="' + iconPath + '-cast-on" /></svg>',
-                        '<svg><use xlink:href="' + iconPath + '-cast-off" /></svg>',
+                        '<svg><use xlink:href="' + iconPath+ '-cast-off" /></svg>',
                         '<span class="plyr__sr-only">' + config.i18n.toggleCast + '</span>',
                     '</button>'
                 );
@@ -932,6 +937,20 @@
                 // Setup focus trap
                 _focusTrap();
             }
+        }
+
+        // Setup cast
+        function _setupCast() {
+          // Bail if not HTML5 video
+          if (plyr.type !== 'video') {
+              return;
+          }
+
+          // Inject the container
+          if (!_getElement(config.selectors.cast)) {
+              plyr.videoContainer.insertAdjacentHTML('afterbegin', '<div class="' + _getClassname(config.selectors.cast) + '"></div>');
+          }
+          _showCast(plyr);
         }
 
         // Setup captions
@@ -1209,6 +1228,15 @@
             }
         }
 
+        function _showCast() {
+          if (!plyr.buttons.cast) {
+            return;
+          }
+
+          _toggleClass(plyr.container, config.classes.cast.enabled, true);
+          _toggleState(plyr.buttons.cast, true);
+        }
+
         // Find all elements
         function _getElements(selector) {
             return plyr.container.querySelectorAll(selector);
@@ -1344,6 +1372,7 @@
                 // Inputs
                 plyr.buttons.mute             = _getElement(config.selectors.buttons.mute);
                 plyr.buttons.captions         = _getElement(config.selectors.buttons.captions);
+                plyr.buttons.cast             = _getElement(config.selectors.buttons.cast);
 
                 // Progress
                 plyr.progress = {};
@@ -3397,6 +3426,9 @@
 
             // Captions
             _setupCaptions();
+
+            // Cast
+            _setupCast();
 
             // Set volume
             _setVolume();

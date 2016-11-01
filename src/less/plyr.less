@@ -255,6 +255,9 @@
     }
 }
 
+
+
+
 // Controls
 // --------------------------------------------------------------
 // Hide native controls
@@ -317,7 +320,7 @@
     // Hide toggle icons by default
     .icon--exit-fullscreen,
     .icon--muted,
-    .icon-cast-off,
+    .icon--cast-on,
     .icon--captions-on {
         display: none;
     }
@@ -429,6 +432,7 @@
 // Change icons on state change
 .plyr--fullscreen-active .icon--exit-fullscreen,
 .plyr--muted .plyr__controls .icon--muted,
+.plyr--cast-active .plyr__controls .icon--cast-on,
 .plyr--captions-active .plyr__controls .icon--captions-on {
     display: block;
 
@@ -439,11 +443,13 @@
 
 // Some options are hidden by default
 .plyr [data-plyr='captions'],
-.plyr [data-plyr='fullscreen'] {
+.plyr [data-plyr='fullscreen'],
+.plyr [data-plyr='cast'] {
     display: none;
 }
 .plyr--captions-enabled [data-plyr='captions'],
-.plyr--fullscreen-enabled [data-plyr='fullscreen'] {
+.plyr--fullscreen-enabled [data-plyr='fullscreen'],
+.plyr--cast-enabled [data-plyr='cast'] {
     display: inline-block;
 }
 
