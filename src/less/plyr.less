@@ -432,9 +432,17 @@
 // Change icons on state change
 .plyr--fullscreen-active .icon--exit-fullscreen,
 .plyr--muted .plyr__controls .icon--muted,
-.plyr--cast-active .plyr__controls .icon--cast-on,
 .plyr--captions-active .plyr__controls .icon--captions-on {
     display: block;
+
+    & + svg {
+        display: none;
+    }
+}
+
+.plyr--cast-active .plyr__controls .icon--cast-on {
+    display: block;
+    color: #2243f9;
 
     & + svg {
         display: none;
