@@ -2365,15 +2365,18 @@
             // Set global
             plyr.castEnabled = show;
 
-            // Toggle state
-            _toggleState(plyr.buttons.cast, plyr.castEnabled);
+            function callback() {
+              // Toggle state
+              _toggleState(plyr.buttons.cast, plyr.castEnabled);
 
-            // Add class hook
-            _toggleClass(plyr.container, config.classes.cast.active, plyr.castEnabled);
+              // Add class hook
+              _toggleClass(plyr.container, config.classes.cast.active, plyr.castEnabled);
 
-            // Trigger an event
-            _triggerEvent(plyr.container, plyr.castEnabled ? 'castenabled' : 'castdisabled', true);
+              // Trigger an event
+              _triggerEvent(plyr.container, plyr.castEnabled ? 'castenabled' : 'castdisabled', true);
+            }
 
+            GoogleCast.requestSession(callback);
         }
 
         // Check if media is loading
@@ -3615,6 +3618,10 @@
             instances   = [],
             selector    = [defaults.selectors.html5, defaults.selectors.embed].join(',');
 
+        // XXX: Move this
+        // Setup google cast
+        GoogleCast.setup();
+
         // Select the elements
         if (_is.string(targets)) {
             // String selector passed
@@ -3791,18 +3798,27 @@ var GoogleCast = (function () {
   var defaults = {};
 
 
-
   var initializeCastApi = function(config, root) {
     cast.framework.CastContext.getInstance().setOptions(config.options);
 
     root.remotePlayer = new cast.framework.RemotePlayer();
     root.remotePlayerController = new cast.framework.RemotePlayerController(root.remotePlayer);
-    root.remotePlayerController.addEventListener(
-        cast.framework.RemotePlayerEventType.IS_CONNECTED_CHANGED,
-        root.switchPlayer.bind(this)
-    );
+    // root.remotePlayerController.addEventListener(
+    //     cast.framework.RemotePlayerEventType.IS_CONNECTED_CHANGED,
+    //     root.switchPlayer.bind(this)
+    // );
+
+    // Set up event handlers
+    cast.framework.CastContext.getInstance().addEventListener(cast.framework.CastContext.CAST_STATE_CHANGED, function(data) {
+      console.log("Cast State Changed: " + JSON.stringify(data));
+    });
+    cast.framework.CastContext.getInstance().addEventListener(cast.framework.CastContext.SESSION_STATE_CHANGED, function(data) {
+      console.log("Session State Changed: " + JSON.stringify(data));
+    });
+
     console.log("Initialized google cast");
   };
+
   function _extend() {
       // Get arguments
       var objects = arguments;
@@ -3855,7 +3871,46 @@ var GoogleCast = (function () {
     }
   }
 
+  function _bindSessionListeners() {
+      var sessionEventType = cast.framework.SessionEventType;
+      var session = GoogleCast.session;
+
+      session.addEventListener(sessionEventType.APPLICATION_STATUS_CHANGED, function(data) {
+        console.log("Session APPLICATION_STATUS_CHANGED: " + JSON.stringify(data));
+      });
+      session.addEventListener(sessionEventType.APPLICATION_METADATA_CHANGED, function(data) {
+        console.log("Session APPLICATION_METADATA_CHANGED: " + JSON.stringify(data));
+      });
+      session.addEventListener(sessionEventType.ACTIVE_INPUT_STATE_CHANGED, function(data) {
+        console.log("Session ACTIVE_INPUT_STATE_CHANGED: " + JSON.stringify(data));
+      });
+      session.addEventListener(sessionEventType.VOLUME_CHANGED, function(data) {
+        console.log("Session VOLUME_CHANGED: " + JSON.stringify(data));
+      });
+      session.addEventListener(sessionEventType.MEDIA_SESSION, function(data) {
+        console.log("Session MEDIA_SESSION: " + JSON.stringify(data));
+      });
+  }
+
+  function _requestSession(successCallback) {
+
+    function onRequestSuccess(e) {
+      GoogleCast.session = cast.framework.CastContext.getInstance().getCurrentSession();
+
+      console.log("Request success");
+      _bindSessionListeners();
+      //successCallback();
+    }
+
+    function onError(e) {
+      console.log("Failed to request session: " + JSON.stringify(e));
+    }
+    var promise = cast.framework.CastContext.getInstance().requestSession(onRequestSuccess, onError);
+    promise.then(onRequestSuccess, onError);
+  }
+
   return {
-    setup: _setup
+    setup: _setup,
+    requestSession: _requestSession,
   }
 })();
