@@ -1,0 +1,65 @@
+<html>
+	<head>
+		<script
+			src="https://code.jquery.com/jquery-3.1.1.min.js"
+			integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+			crossorigin="anonymous">
+		</script>
+		<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/css/materialize.min.css">
+		<link rel="stylesheet" type="text/css" href="dist/plyr.css">
+		<script src="src/js/plyr.js"></script>
+
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.7/js/materialize.min.js"></script>
+	</head>
+
+	<body>
+		<div class="container">
+			<div id="row" class="row" style="height: 60%">
+				<div class="col s12">
+					<div id="player" class="video player">
+						<video id="video">
+							<source src='https://cdn.selz.com/plyr/1.0/movie.mp4'>
+						</video>
+						<!--
+						<div data-type="youtube" data-video-id="bTqVqk7FSmY"></div>
+						-->
+					</div>
+				</div>
+				<div class="col s4"></div>
+			</div>
+		</div>
+		<script>
+var player;
+window.onload = function() {
+	player = plyr.setup({
+		iconUrl: 'dist/plyr.svg',
+		listeners: {
+			play: onPlay,
+			pause: onPause,
+			seek: onSeek,
+		}
+	})[0];
+
+	function onPlay(e) {
+		console.log("play");
+	}
+
+	function onPause(e) {
+		console.log("pause");
+	}
+
+	function onSeek(e) {
+		console.log("seek");
+	}
+
+	player.on('play', function() {
+		console.log("on play");
+	}).on('pause', function() {
+		console.log("on pause");
+	});
+}
+
+/* Google cast stuff */
+		</script>
+	</body>
+</html>
