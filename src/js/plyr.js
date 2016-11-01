@@ -3762,7 +3762,8 @@
         setup:      setup,
         supported:  supported,
         loadSprite: loadSprite,
-        get:        get
+        get:        get,
+        injectScript: _injectScript,
     };
 }));
 
@@ -3783,4 +3784,78 @@
     CustomEvent.prototype = window.Event.prototype;
 
     window.CustomEvent = CustomEvent;
+})();
+
+var GoogleCast = (function () {
+  'use strict';
+  var defaults = {};
+
+
+
+  var initializeCastApi = function(config, root) {
+    cast.framework.CastContext.getInstance().setOptions(config.options);
+
+    root.remotePlayer = new cast.framework.RemotePlayer();
+    root.remotePlayerController = new cast.framework.RemotePlayerController(root.remotePlayer);
+    root.remotePlayerController.addEventListener(
+        cast.framework.RemotePlayerEventType.IS_CONNECTED_CHANGED,
+        root.switchPlayer.bind(this)
+    );
+    console.log("Initialized google cast");
+  };
+  function _extend() {
+      // Get arguments
+      var objects = arguments;
+
+      // Bail if nothing to merge
+      if (!objects.length) {
+          return;
+      }
+
+      // Return first if specified but nothing to merge
+      if (objects.length === 1) {
+          return objects[0];
+      }
+
+      // First object is the destination
+      var destination = Array.prototype.shift.call(objects),
+          length      = objects.length;
+
+      // Loop through all objects to merge
+      for (var i = 0; i < length; i++) {
+          var source = objects[i];
+
+          for (var property in source) {
+              if (source[property] && source[property].constructor && source[property].constructor === Object) {
+                  destination[property] = destination[property] || {};
+                  _extend(destination[property], source[property]);
+              } else {
+                  destination[property] = source[property];
+              }
+          }
+      }
+
+      return destination;
+  }
+
+  function _setup(config) {
+    plyr.injectScript('//www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1');
+
+    if (!chrome.cast || !chrome.cast.isAvailable) {
+      setTimeout(function() {
+        defaults = {
+          options: {
+            receiverApplicationId:  chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
+            autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED,
+          },
+        };
+        config = _extend({}, defaults, config);
+        initializeCastApi(config, plyr);
+      }, 1000);
+    }
+  }
+
+  return {
+    setup: _setup
+  }
 })();
