@@ -3823,7 +3823,7 @@ var GoogleCast = (function () {
     console.log("Initialized google cast");
   };
 
-  function _setup(config) {
+  function setup(config) {
     PlyrUtils.injectScript('//www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1');
 
     if (!chrome.cast || !chrome.cast.isAvailable) {
@@ -3846,9 +3846,9 @@ var GoogleCast = (function () {
     if(!session) {
       return;
     }
-    
-    plyr.remotePlayer = new cast.framework.RemotePlayer();
-    plyr.remotePlayerController = new cast.framework.RemotePlayerController(plyr.remotePlayer);
+
+    plyr.remotePlayer = plyr.remotePlayer === undefined ? new cast.framework.RemotePlayer() : plyr.remotePlayer;
+    plyr.remotePlayerController = plyr.remotePlayerController === undefined ? new cast.framework.RemotePlayerController(plyr.remotePlayer) : plyr.remotePlayerController;
 
     function _loadMedia(plyr) {
       var defaults = {
@@ -3863,6 +3863,7 @@ var GoogleCast = (function () {
         },
         loadRequest: {
           autoplay: false,
+          currentTime: plyr.getCurrentTime(),
         }
       };
       var options = PlyrUtils.extend({}, defaults, options);
@@ -3875,13 +3876,14 @@ var GoogleCast = (function () {
 
       var loadRequest = new chrome.cast.media.LoadRequest(mediaInfo);
       loadRequest.autoplay = options.loadRequest.autoplay;
+      loadRequest.currentTime = options.loadRequest.currentTime;
 
       session.loadMedia(loadRequest).then(
         function() {
           console.log('Successfully loaded media');
         },
         function (errorCode) {
-          console.log('Remote media load error: ' + _getErrorMessage(errorCode));
+          console.log('Remote media load error: ' + getErrorMessage(errorCode));
         }
       );
     };
@@ -3902,7 +3904,7 @@ var GoogleCast = (function () {
     _loadMedia(plyr);
   }
 
-  function _getErrorMessage(error) {
+  function getErrorMessage(error) {
     switch (error.code) {
         case chrome.cast.ErrorCode.API_NOT_INITIALIZED:
             return 'The API is not initialized.' +
@@ -3931,7 +3933,7 @@ var GoogleCast = (function () {
     };
   }
 
-  function _bindSessionListeners() {
+  function bindSessionListeners() {
       var sessionEventType = cast.framework.SessionEventType;
       var session = GoogleCast.session;
 
@@ -3952,26 +3954,26 @@ var GoogleCast = (function () {
       });
   }
 
-  function _requestSession(successCallback) {
+  function requestSession(successCallback) {
 
-    function onRequestSuccess(e) {
+    function _onRequestSuccess(e) {
       GoogleCast.session = cast.framework.CastContext.getInstance().getCurrentSession();
 
       console.log("Request success");
-      _bindSessionListeners();
+      bindSessionListeners();
       successCallback();
     }
 
-    function onError(e) {
+    function _onError(e) {
       console.log("Failed to request session: " + JSON.stringify(e));
     }
-    var promise = cast.framework.CastContext.getInstance().requestSession(onRequestSuccess, onError);
-    promise.then(onRequestSuccess, onError);
+    var promise = cast.framework.CastContext.getInstance().requestSession();
+    promise.then(_onRequestSuccess, _onError);
   }
 
   return {
-    setup: _setup,
-    requestSession: _requestSession,
+    setup: setup,
+    requestSession: requestSession,
     bindPlyr: bindPlyr,
   }
 })();
