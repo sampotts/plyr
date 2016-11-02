@@ -175,7 +175,7 @@
             fullscreen:         null
         },
         // Events to watch on HTML5 media elements
-        events:                 ['ready', 'ended', 'progress', 'stalled', 'playing', 'waiting', 'canplay', 'canplaythrough', 'loadstart', 'loadeddata', 'loadedmetadata', 'timeupdate', 'volumechange', 'play', 'pause', 'error', 'seeking', 'emptied'],
+        events:                 ['ready', 'ended', 'progress', 'stalled', 'playing', 'waiting', 'canplay', 'canplaythrough', 'loadstart', 'loadeddata', 'loadedmetadata', 'timeupdate', 'volumechange', 'play', 'pause', 'error', 'seeking', 'seeked', 'emptied'],
         // Logging
         logPrefix:              '[Plyr]'
     };
@@ -595,6 +595,18 @@
             return input !== null && typeof input === 'undefined';
         }
     };
+
+    // Parse YouTube ID from url
+    function _parseYouTubeId(url) {
+        var regex = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        return (url.match(regex)) ? RegExp.$2 : url;
+    }
+
+    // Parse Vimeo ID from url
+    function _parseVimeoId(url) {
+        var regex = /^.*(vimeo.com\/|video\/)(\d+).*/;
+        return (url.match(regex)) ? RegExp.$2 : url;
+    }
 
     // Fullscreen API
     function _fullscreen() {
@@ -1505,8 +1517,22 @@
         // Setup YouTube/Vimeo
         function _setupEmbed() {
             var container = document.createElement('div'),
-                mediaId = plyr.embedId,
+                mediaId,
                 id = plyr.type + '-' + Math.floor(Math.random() * (10000));
+
+            // Parse IDs from URLs if supplied
+            switch (plyr.type) {
+                case 'youtube':
+                    mediaId = _parseYouTubeId(plyr.embedId);
+                    break;
+
+                case 'vimeo':
+                    mediaId = _parseVimeoId(plyr.embedId);
+                    break;
+
+                default: 
+                    mediaId = plyr.embedId;
+            }
 
             // Remove old containers
             var containers = _getElements('[id^="' + plyr.type + '-"]');
@@ -1724,6 +1750,12 @@
 
                             case 1:
                                 plyr.media.paused = false;
+
+                                // If we were seeking, fire seeked event
+                                if (plyr.media.seeking) {
+                                    _triggerEvent(plyr.media, 'seeked');
+                                }
+
                                 plyr.media.seeking = false;
                                 _triggerEvent(plyr.media, 'play');
                                 _triggerEvent(plyr.media, 'playing');
@@ -1846,6 +1878,12 @@
                     // Trigger event
                     _triggerEvent(plyr.media, 'canplaythrough');
                 }
+            });
+
+            plyr.embed.on('seeked', function() {
+                plyr.media.seeking = false;
+                _triggerEvent(plyr.media, 'seeked');
+                _triggerEvent(plyr.media, 'play');
             });
 
             plyr.embed.on('ended', function() {
@@ -2009,7 +2047,6 @@
 
             // Embeds
             if (_inArray(config.types.embed, plyr.type)) {
-                // YouTube
                 switch(plyr.type) {
                     case 'youtube':
                         plyr.embed.seekTo(targetTime);
@@ -2029,11 +2066,14 @@
                     _pause();
                 }
 
-                // Trigger timeupdate for embeds
+                // Trigger timeupdate
                 _triggerEvent(plyr.media, 'timeupdate');
 
                 // Set seeking flag
                 plyr.media.seeking = true;
+
+                // Trigger seeking
+                _triggerEvent(plyr.media, 'seeking');
             }
 
             // Logging
@@ -3259,19 +3299,6 @@
             }
         }
 
-        // Taken from https://gist.github.com/takien/4077195
-        function parseYoutubeVideoId(url) {
-            var videoId;
-            url = url.replace(/(>|<)/gi,'').split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
-            if(url[2] !== undefined) {
-                videoId = url[2].split(/[^0-9a-z_\-]/i);
-                videoId = videoId[0];
-            } else {
-                videoId = url;
-            }
-            return videoId;
-        }
-
         // Setup a player
         function _init() {
             // Bail if the element is initialized
@@ -3299,12 +3326,6 @@
             if (tagName === 'div') {
                 plyr.type     = media.getAttribute('data-type');
                 plyr.embedId  = media.getAttribute('data-video-id');
-
-                switch(plyr.type) {
-                    case 'youtube':
-                        plyr.embedId = parseYoutubeVideoId(plyr.embedId);
-                        break;
-                }
 
                 // Clean up
                 media.removeAttribute('data-type');
