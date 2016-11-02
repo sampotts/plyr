@@ -1665,7 +1665,7 @@
                         };
                         plyr.media.duration = instance.getDuration();
                         plyr.media.paused = true;
-                        plyr.media.currentTime = plyr.start;
+                        plyr.media.currentTime = start;
                         plyr.media.muted = instance.isMuted();
 
                         // Set title
