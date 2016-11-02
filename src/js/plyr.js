@@ -294,18 +294,6 @@
         return false;
     }
 
-    // Inject a script
-    function _injectScript(source) {
-        if (document.querySelectorAll('script[src="' + source + '"]').length) {
-            return;
-        }
-
-        var tag = document.createElement('script');
-        tag.src = source;
-        var firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-    }
-
     // Element exists in an array
     function _inArray(haystack, needle) {
         return Array.prototype.indexOf && (haystack.indexOf(needle) !== -1);
@@ -534,44 +522,6 @@
         return ((current / max) * 100).toFixed(2);
     }
 
-    // Deep extend/merge destination object with N more objects
-    // http://andrewdupont.net/2009/08/28/deep-extending-objects-in-javascript/
-    // Removed call to arguments.callee (used explicit function name instead)
-    function _extend() {
-        // Get arguments
-        var objects = arguments;
-
-        // Bail if nothing to merge
-        if (!objects.length) {
-            return;
-        }
-
-        // Return first if specified but nothing to merge
-        if (objects.length === 1) {
-            return objects[0];
-        }
-
-        // First object is the destination
-        var destination = Array.prototype.shift.call(objects),
-            length      = objects.length;
-
-        // Loop through all objects to merge
-        for (var i = 0; i < length; i++) {
-            var source = objects[i];
-
-            for (var property in source) {
-                if (source[property] && source[property].constructor && source[property].constructor === Object) {
-                    destination[property] = destination[property] || {};
-                    _extend(destination[property], source[property]);
-                } else {
-                    destination[property] = source[property];
-                }
-            }
-        }
-
-        return destination;
-    }
-
     // Check variable types
     var _is = {
         object: function(input) {
@@ -714,7 +664,7 @@
 
         // Trigger events, with plyr instance passed
         function _triggerEvent(element, type, bubbles, properties) {
-            _event(element, type, bubbles, _extend({}, properties, {
+            _event(element, type, bubbles, PlyrUtils.extend({}, properties, {
                 plyr: api
             }));
         }
@@ -1491,7 +1441,7 @@
             }
 
             // Update the working copy of the values
-            _extend(plyr.storage, value);
+            PlyrUtils.extend(plyr.storage, value);
 
             // Update storage
             window.localStorage.setItem(config.storage.key, JSON.stringify(plyr.storage));
@@ -1572,7 +1522,7 @@
                     _youTubeReady(mediaId, container);
                 } else {
                     // Load the API
-                    _injectScript(config.urls.youtube.api);
+                    PlyrUtils.injectScript(config.urls.youtube.api);
 
                     // Setup callback for the API
                     window.onYouTubeReadyCallbacks = window.onYouTubeReadyCallbacks || [];
@@ -1598,7 +1548,7 @@
 
                 // Load the API if not already
                 if (!_is.object(window.Vimeo)) {
-                    _injectScript(config.urls.vimeo.api);
+                    PlyrUtils.injectScript(config.urls.vimeo.api);
 
                     // Wait for fragaloop load
                     var vimeoTimer = window.setInterval(function() {
@@ -1629,7 +1579,7 @@
 
                 // Load the API if not already
                 if (!window.SC) {
-                    _injectScript(config.urls.soundcloud.api);
+                    PlyrUtils.injectScript(config.urls.soundcloud.api);
                 }
 
                 // Wait for SC load
@@ -2374,6 +2324,8 @@
 
               // Trigger an event
               _triggerEvent(plyr.container, plyr.castEnabled ? 'castenabled' : 'castdisabled', true);
+
+              GoogleCast.bindPlyr(api);
             }
 
             GoogleCast.requestSession(callback);
@@ -3702,7 +3654,7 @@
             try { data = JSON.parse(element.getAttribute('data-plyr')); }
             catch(e) { }
 
-            var config = _extend({}, defaults, options, data);
+            var config = PlyrUtils.extend({}, defaults, options, data);
 
             // Bail if not enabled
             if (!config.enabled) {
@@ -3770,7 +3722,6 @@
         supported:  supported,
         loadSprite: loadSprite,
         get:        get,
-        injectScript: _injectScript,
     };
 }));
 
@@ -3793,32 +3744,10 @@
     window.CustomEvent = CustomEvent;
 })();
 
-var GoogleCast = (function () {
-  'use strict';
-  var defaults = {};
-
-
-  var initializeCastApi = function(config, root) {
-    cast.framework.CastContext.getInstance().setOptions(config.options);
-
-    root.remotePlayer = new cast.framework.RemotePlayer();
-    root.remotePlayerController = new cast.framework.RemotePlayerController(root.remotePlayer);
-    // root.remotePlayerController.addEventListener(
-    //     cast.framework.RemotePlayerEventType.IS_CONNECTED_CHANGED,
-    //     root.switchPlayer.bind(this)
-    // );
-
-    // Set up event handlers
-    cast.framework.CastContext.getInstance().addEventListener(cast.framework.CastContext.CAST_STATE_CHANGED, function(data) {
-      console.log("Cast State Changed: " + JSON.stringify(data));
-    });
-    cast.framework.CastContext.getInstance().addEventListener(cast.framework.CastContext.SESSION_STATE_CHANGED, function(data) {
-      console.log("Session State Changed: " + JSON.stringify(data));
-    });
-
-    console.log("Initialized google cast");
-  };
-
+var PlyrUtils = (function () {
+  // Deep extend/merge destination object with N more objects
+  // http://andrewdupont.net/2009/08/28/deep-extending-objects-in-javascript/
+  // Removed call to arguments.callee (used explicit function name instead)
   function _extend() {
       // Get arguments
       var objects = arguments;
@@ -3850,12 +3779,52 @@ var GoogleCast = (function () {
               }
           }
       }
-
       return destination;
   }
 
+  // Inject a script
+  function _injectScript(source) {
+      if (document.querySelectorAll('script[src="' + source + '"]').length) {
+          return;
+      }
+
+      var tag = document.createElement('script');
+      tag.src = source;
+      var firstScriptTag = document.getElementsByTagName('script')[0];
+      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+  }
+
+  return {
+    extend: _extend,
+    injectScript: _injectScript
+  };
+})();
+
+var GoogleCast = (function () {
+  'use strict';
+  var defaults = {};
+
+  function initializeCastApi(config) {
+    cast.framework.CastContext.getInstance().setOptions(config.options);
+
+    // root.remotePlayerController.addEventListener(
+    //     cast.framework.RemotePlayerEventType.IS_CONNECTED_CHANGED,
+    //     root.switchPlayer.bind(this)
+    // );
+
+    // Set up event handlers
+    cast.framework.CastContext.getInstance().addEventListener(cast.framework.CastContext.CAST_STATE_CHANGED, function(data) {
+      console.log("Cast State Changed: " + JSON.stringify(data));
+    });
+    cast.framework.CastContext.getInstance().addEventListener(cast.framework.CastContext.SESSION_STATE_CHANGED, function(data) {
+      console.log("Session State Changed: " + JSON.stringify(data));
+    });
+
+    console.log("Initialized google cast");
+  };
+
   function _setup(config) {
-    plyr.injectScript('//www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1');
+    PlyrUtils.injectScript('//www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1');
 
     if (!chrome.cast || !chrome.cast.isAvailable) {
       setTimeout(function() {
@@ -3865,10 +3834,101 @@ var GoogleCast = (function () {
             autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED,
           },
         };
-        config = _extend({}, defaults, config);
-        initializeCastApi(config, plyr);
+        config = PlyrUtils.extend({}, defaults, config);
+        initializeCastApi(config);
       }, 1000);
     }
+  }
+
+  function bindPlyr(plyr, options) {
+    // Check for valid session. Short-circuit otherwise
+    var session = cast.framework.CastContext.getInstance().getCurrentSession();
+    if(!session) {
+      return;
+    }
+    
+    plyr.remotePlayer = new cast.framework.RemotePlayer();
+    plyr.remotePlayerController = new cast.framework.RemotePlayerController(plyr.remotePlayer);
+
+    function _loadMedia(plyr) {
+      var defaults = {
+        mediaInfo: {
+          source: plyr.source(),
+          type: 'video/mp4'
+        },
+        metadata: {
+          metadataType: chrome.cast.media.MetadataType.GENERIC,
+          title: plyr.source(),
+          images: [{}],
+        },
+        loadRequest: {
+          autoplay: false,
+        }
+      };
+      var options = PlyrUtils.extend({}, defaults, options);
+
+      var mediaInfo = new chrome.cast.media.MediaInfo(options.mediaInfo.source, options.mediaInfo.type);
+      mediaInfo.metadata = new chrome.cast.media.GenericMediaMetadata();
+      mediaInfo.metadata.metadataType = options.metadata.metadataType;
+      mediaInfo.metadata.title = options.metadata.title;
+      mediaInfo.metadata.images = options.metadata.images;
+
+      var loadRequest = new chrome.cast.media.LoadRequest(mediaInfo);
+      loadRequest.autoplay = options.loadRequest.autoplay;
+
+      session.loadMedia(loadRequest).then(
+        function() {
+          console.log('Successfully loaded media');
+        },
+        function (errorCode) {
+          console.log('Remote media load error: ' + _getErrorMessage(errorCode));
+        }
+      );
+    };
+
+    plyr.on('play', function() {
+      console.log('Asking remote player to play');
+      plyr.remotePlayerController.playOrPause();
+    });
+    plyr.on('pause', function() {
+      console.log('Asking remote player to pause');
+      plyr.remotePlayerController.playOrPause();
+    });
+
+    plyr.on('ready', function() {
+      _loadMedia(plyr);
+    });
+
+    _loadMedia(plyr);
+  }
+
+  function _getErrorMessage(error) {
+    switch (error.code) {
+        case chrome.cast.ErrorCode.API_NOT_INITIALIZED:
+            return 'The API is not initialized.' +
+                (error.description ? ' :' + error.description : '');
+        case chrome.cast.ErrorCode.CANCEL:
+            return 'The operation was canceled by the user' +
+                (error.description ? ' :' + error.description : '');
+        case chrome.cast.ErrorCode.CHANNEL_ERROR:
+            return 'A channel to the receiver is not available.' +
+                (error.description ? ' :' + error.description : '');
+        case chrome.cast.ErrorCode.EXTENSION_MISSING:
+            return 'The Cast extension is not available.' +
+                (error.description ? ' :' + error.description : '');
+        case chrome.cast.ErrorCode.INVALID_PARAMETER:
+            return 'The parameters to the operation were not valid.' +
+                (error.description ? ' :' + error.description : '');
+        case chrome.cast.ErrorCode.RECEIVER_UNAVAILABLE:
+            return 'No receiver was compatible with the session request.' +
+                (error.description ? ' :' + error.description : '');
+        case chrome.cast.ErrorCode.SESSION_ERROR:
+            return 'A session could not be created, or a session was invalid.' +
+                (error.description ? ' :' + error.description : '');
+        case chrome.cast.ErrorCode.TIMEOUT:
+            return 'The operation timed out.' +
+                (error.description ? ' :' + error.description : '');
+    };
   }
 
   function _bindSessionListeners() {
@@ -3899,7 +3959,7 @@ var GoogleCast = (function () {
 
       console.log("Request success");
       _bindSessionListeners();
-      //successCallback();
+      successCallback();
     }
 
     function onError(e) {
@@ -3912,5 +3972,6 @@ var GoogleCast = (function () {
   return {
     setup: _setup,
     requestSession: _requestSession,
+    bindPlyr: bindPlyr,
   }
 })();
