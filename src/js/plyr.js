@@ -1949,20 +1949,7 @@
             // Set global
             plyr.castEnabled = show;
 
-            function callback() {
-              // Toggle state
-              PlyrUtils.toggleState(plyr.buttons.cast, plyr.castEnabled);
-
-              // Add class hook
-              PlyrUtils.toggleClass(plyr.container, config.classes.cast.active, plyr.castEnabled);
-
-              // Trigger an event
-              _triggerEvent(plyr.container, plyr.castEnabled ? 'castenabled' : 'castdisabled', true);
-
-              GoogleCast.bindPlyr(api);
-            }
-
-            GoogleCast.requestSession(callback);
+            GoogleCast.requestSession(api);
         }
 
         // Check if media is loading
@@ -2818,6 +2805,29 @@
             PlyrUtils.on(plyr.media, config.events.concat(['keyup', 'keydown']).join(' '), function(event) {
                 _triggerEvent(plyr.container, event.type, true);
             });
+
+            // Cast events
+            PlyrUtils.on(plyr.container, 'castenabled', function() {
+              // Toggle state
+              if(!PlyrUtils.hasClass(plyr.buttons.cast, plyr.castEnabled)) {
+                PlyrUtils.toggleState(plyr.buttons.cast, plyr.castEnabled);
+              }
+              // Add class hook
+              if(!PlyrUtils.hasClass(plyr.container, config.classes.cast.active, plyr.castEnabled)) {
+                PlyrUtils.toggleClass(plyr.container, config.classes.cast.active, plyr.castEnabled);
+              }
+            });
+            PlyrUtils.on(plyr.container, 'castdisabled', function() {
+              // Toggle state
+              if(PlyrUtils.hasClass(plyr.buttons.cast, plyr.castEnabled)) {
+                PlyrUtils.toggleState(plyr.buttons.cast, plyr.castEnabled);
+              }
+              // Add class hook
+              if(PlyrUtils.hasClass(plyr.container, config.classes.cast.active, plyr.castEnabled)) {
+                PlyrUtils.toggleClass(plyr.container, config.classes.cast.active, plyr.castEnabled);
+              }
+            });
+
         }
 
         // Cancel current network requests
@@ -3305,7 +3315,7 @@
 
             // Listen for events if debugging
             if (config.debug) {
-                var events = config.events.concat(['setup', 'statechange', 'enterfullscreen', 'exitfullscreen', 'captionsenabled', 'captionsdisabled']);
+                var events = config.events.concat(['setup', 'statechange', 'enterfullscreen', 'exitfullscreen', 'captionsenabled', 'captionsdisabled', 'castenabled', 'castdisabled']);
 
                 PlyrUtils.on(instance.getContainer(), events.join(' '), function(event) {
                     console.log([config.logPrefix, 'event:', event.type].join(' '), event.detail.plyr);
@@ -3712,11 +3722,11 @@ var PlyrUtils = (function () {
   }
 
   // Unbind event
-  /*function _off(element, events, callback, useCapture) {
+  function _off(element, events, callback, useCapture) {
       if (element) {
           _toggleListener(element, events, callback, false, useCapture);
       }
-  }*/
+  }
 
   // Trigger event
   function _event(element, type, bubbles, properties) {
@@ -3815,6 +3825,7 @@ var PlyrUtils = (function () {
     proxyListener:         _proxyListener,
     toggleListener:        _toggleListener,
     on:                    _on,
+    off:                   _off,
     event:                 _event,
     toggleState:           _toggleState,
     getPercentage:         _getPercentage,
@@ -3830,7 +3841,12 @@ var GoogleCast = (function () {
 
   function initializeCastApi(config) {
     cast.framework.CastContext.getInstance().setOptions(config.options);
+
+    // Set up event handlers
+    cast.framework.CastContext.getInstance().addEventListener(cast.framework.CastContextEventType.CAST_STATE_CHANGED, _castStateListener);
+    cast.framework.CastContext.getInstance().addEventListener(cast.framework.CastContextEventType.SESSION_STATE_CHANGED, _sessionStateListener);
     console.log("Initialized google cast");
+
   };
 
   function setup(config) {
@@ -3850,17 +3866,50 @@ var GoogleCast = (function () {
     }
   }
 
-  function bindPlyr(plyr, options) {
-    // Check for valid session. Short-circuit otherwise
-    var session = cast.framework.CastContext.getInstance().getCurrentSession();
-    if(!session) {
-      return;
+  function getCurrentSession() {
+    return cast.framework.CastContext.getInstance().getCurrentSession();
+  }
+
+  function getCurrentPlyr() {
+    var cc = cast.framework.CastContext.getInstance();
+    var plyr;
+
+    if(!cc) {
+      return undefined;
     }
+    plyr = cc.plyr;
+    return plyr;
+  }
+
+  function _onPlay() {
+    var plyr = getCurrentPlyr();
+
+    console.log('Asking remote player to play');
+    plyr.remotePlayerController.playOrPause();
+  }
+  function _onPause() {
+    var plyr = getCurrentPlyr();
+    console.log('Asking remote player to pause');
+    plyr.remotePlayerController.playOrPause();
+  }
+  function _onReady() {
+    var plyr = getCurrentPlyr();
+    _loadMedia(plyr);
+  }
+
+  function bindPlyr(plyr, options) {
+    var cc = cast.framework.CastContext.getInstance();
+    cc.plyr = plyr;
 
     plyr.remotePlayer = new cast.framework.RemotePlayer();
     plyr.remotePlayerController = new cast.framework.RemotePlayerController(plyr.remotePlayer);
 
     function _loadMedia(plyr) {
+      var session = getCurrentSession();
+      if(!session) {
+        return;
+      }
+      
       var defaults = {
         mediaInfo: {
           source: plyr.source(),
@@ -3898,51 +3947,23 @@ var GoogleCast = (function () {
       );
     };
 
-    plyr.on('play', function() {
-      console.log('Asking remote player to play');
-      plyr.remotePlayerController.playOrPause();
-    });
-    plyr.on('pause', function() {
-      console.log('Asking remote player to pause');
-      plyr.remotePlayerController.playOrPause();
-    });
+    plyr.on('play', _onPlay);
+    plyr.on('pause', _onPause);
 
-    plyr.on('ready', function() {
+    if(plyr.isReady()) {
       _loadMedia(plyr);
-    });
-
-    _loadMedia(plyr);
-
-    function _castStateListener(data) {
-      console.log("Cast State Changed: " + JSON.stringify(data));
     }
+    plyr.on('ready', _onReady);
+    console.log("Plyr bound");
+  }
 
-    function _sessionStateListener(data) {
-      //console.log("Session State Changed: " + JSON.stringify(data));
-      var ss = cast.framework.SessionState;
-      switch(data.sessionState) {
-      case ss.NO_SESSION:
-        break;
-      case ss.SESSION_STARTING:
-        break;
-      case ss.SESSION_STARTED:
-
-        break;
-      case ss.SESSION_START_FAILED:
-        break;
-      case ss.SESSION_ENDING:
-        break;
-      case ss.SESSION_ENDED:
-        break;
-      case ss.SESSION_RESUMED:
-        break;
-      }
+  function unbindPlyr(plyr) {
+    var currentPlyr = getCurrentPlyr();
+    if(currentPlyr === plyr) {
+      plyr.off('play', _onPlay);
+      plyr.off('pause', _onPause);
+      plyr.off('ready', _onReady);
     }
-
-    // Set up event handlers
-    cast.framework.CastContext.getInstance().addEventListener(cast.framework.CastContextEventType.CAST_STATE_CHANGED, _castStateListener);
-    cast.framework.CastContext.getInstance().addEventListener(cast.framework.CastContextEventType.SESSION_STATE_CHANGED, _sessionStateListener);
-
   }
 
   function getErrorMessage(error) {
@@ -3974,47 +3995,80 @@ var GoogleCast = (function () {
     };
   }
 
-  function bindSessionListeners() {
-      var sessionEventType = cast.framework.SessionEventType;
-      var session = GoogleCast.session;
+  function _castStateListener(data) {
+    console.log("Cast State Changed: " + JSON.stringify(data));
 
-      session.addEventListener(sessionEventType.APPLICATION_STATUS_CHANGED, function(data) {
-        console.log("Session APPLICATION_STATUS_CHANGED: " + JSON.stringify(data));
-      });
-      session.addEventListener(sessionEventType.APPLICATION_METADATA_CHANGED, function(data) {
-        console.log("Session APPLICATION_METADATA_CHANGED: " + JSON.stringify(data));
-      });
-      session.addEventListener(sessionEventType.ACTIVE_INPUT_STATE_CHANGED, function(data) {
-        console.log("Session ACTIVE_INPUT_STATE_CHANGED: " + JSON.stringify(data));
-      });
-      session.addEventListener(sessionEventType.VOLUME_CHANGED, function(data) {
-        console.log("Session VOLUME_CHANGED: " + JSON.stringify(data));
-      });
-      session.addEventListener(sessionEventType.MEDIA_SESSION, function(data) {
-        console.log("Session MEDIA_SESSION: " + JSON.stringify(data));
-      });
+    var plyr = getCurrentPlyr();
+    var cs = cast.framework.CastState;
+
+    switch(data.castState) {
+      case cs.NO_DEVICES_AVAILABLE:
+      case cs.NOT_CONNECTED:
+        console.log("NOT CONNECTED");
+        if(plyr) {
+          PlyrUtils.event(plyr.getContainer(), 'castdisabled', true);
+        }
+        break;
+      case cs.CONNECTING:
+        break;
+      case cs.CONNECTED:
+        if(plyr) {
+          PlyrUtils.event(plyr.getContainer(), 'castenabled', true);
+        }
+        break;
+    }
   }
 
-  function requestSession(successCallback) {
+  function _sessionStateListener(data) {
+    var plyr = getCurrentPlyr();
+    if(!plyr) {
+      return;
+    }
+    //console.log("Session State Changed: " + JSON.stringify(data));
+    var ss = cast.framework.SessionState;
 
+    switch(data.sessionState) {
+    case ss.NO_SESSION:
+      break;
+    case ss.SESSION_STARTING:
+      break;
+    case ss.SESSION_STARTED:
+      PlyrUtils.event(plyr.getContainer(), 'castenabled', true);
+      break;
+    case ss.SESSION_START_FAILED:
+      PlyrUtils.event(plyr.getContainer(), 'castdisabled', true);
+      break;
+    case ss.SESSION_ENDING:
+      break;
+    case ss.SESSION_ENDED:
+      PlyrUtils.event(plyr.getContainer(), 'castdisabled', true);
+      break;
+    case ss.SESSION_RESUMED:
+      PlyrUtils.event(plyr.getContainer(), 'castenabled', true);
+      break;
+    }
+  }
+
+  function requestSession(plyr) {
     function _onRequestSuccess(e) {
-      GoogleCast.session = cast.framework.CastContext.getInstance().getCurrentSession();
+      cast.framework.CastContext.getInstance().getCurrentSession();
 
       console.log("Request success");
-      bindSessionListeners();
-      successCallback();
     }
 
     function _onError(e) {
       console.log("Failed to request session: " + JSON.stringify(e));
     }
+
+    bindPlyr(plyr);
     var promise = cast.framework.CastContext.getInstance().requestSession();
     promise.then(_onRequestSuccess, _onError);
   }
 
   return {
-    setup: setup,
+    setup:          setup,
     requestSession: requestSession,
-    bindPlyr: bindPlyr,
+    bindPlyr:       bindPlyr,
+    unbindPlyr:     unbindPlyr,
   }
 })();
