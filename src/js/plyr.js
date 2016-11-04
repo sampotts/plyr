@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v2.0.9
+// plyr.js v2.0.10
 // https://github.com/selz/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -43,7 +43,7 @@
         displayDuration:        true,
         loadSprite:             true,
         iconPrefix:             'plyr',
-        iconUrl:                'https://cdn.plyr.io/2.0.9/plyr.svg',
+        iconUrl:                'https://cdn.plyr.io/2.0.10/plyr.svg',
         clickToPlay:            true,
         hideControls:           true,
         showPosterOnEnd:        false,
@@ -182,10 +182,23 @@
             fullscreen:         null
         },
         // Events to watch on HTML5 media elements
-        events:                 ['ready', 'ended', 'progress', 'stalled', 'playing', 'waiting', 'canplay', 'canplaythrough', 'loadstart', 'loadeddata', 'loadedmetadata', 'timeupdate', 'volumechange', 'play', 'pause', 'error', 'seeking', 'emptied'],
+        events:                 ['ready', 'ended', 'progress', 'stalled', 'playing', 'waiting', 'canplay', 'canplaythrough', 'loadstart', 'loadeddata', 'loadedmetadata', 'timeupdate', 'volumechange', 'play', 'pause', 'error', 'seeking', 'seeked', 'emptied'],
         // Logging
         logPrefix:              '[Plyr]'
     };
+
+    // Parse YouTube ID from url
+    function _parseYouTubeId(url) {
+        var regex = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        return (url.match(regex)) ? RegExp.$2 : url;
+    }
+
+    // Parse Vimeo ID from url
+    function _parseVimeoId(url) {
+        var regex = /^.*(vimeo.com\/|video\/)(\d+).*/;
+        return (url.match(regex)) ? RegExp.$2 : url;
+    }
+
 
     // Fullscreen API
     function _fullscreen() {
@@ -1131,8 +1144,22 @@
         // Setup YouTube/Vimeo
         function _setupEmbed() {
             var container = document.createElement('div'),
-                mediaId = plyr.embedId,
+                mediaId,
                 id = plyr.type + '-' + Math.floor(Math.random() * (10000));
+
+            // Parse IDs from URLs if supplied
+            switch (plyr.type) {
+                case 'youtube':
+                    mediaId = _parseYouTubeId(plyr.embedId);
+                    break;
+
+                case 'vimeo':
+                    mediaId = _parseVimeoId(plyr.embedId);
+                    break;
+
+                default:
+                    mediaId = plyr.embedId;
+            }
 
             // Remove old containers
             var containers = _getElements('[id^="' + plyr.type + '-"]');
@@ -1350,6 +1377,12 @@
 
                             case 1:
                                 plyr.media.paused = false;
+
+                                // If we were seeking, fire seeked event
+                                if (plyr.media.seeking) {
+                                    _triggerEvent(plyr.media, 'seeked');
+                                }
+
                                 plyr.media.seeking = false;
                                 _triggerEvent(plyr.media, 'play');
                                 _triggerEvent(plyr.media, 'playing');
@@ -1472,6 +1505,12 @@
                     // Trigger event
                     _triggerEvent(plyr.media, 'canplaythrough');
                 }
+            });
+
+            plyr.embed.on('seeked', function() {
+                plyr.media.seeking = false;
+                _triggerEvent(plyr.media, 'seeked');
+                _triggerEvent(plyr.media, 'play');
             });
 
             plyr.embed.on('ended', function() {
@@ -1635,7 +1674,6 @@
 
             // Embeds
             if (PlyrUtils.inArray(config.types.embed, plyr.type)) {
-                // YouTube
                 switch(plyr.type) {
                     case 'youtube':
                         plyr.embed.seekTo(targetTime);
@@ -1655,11 +1693,14 @@
                     _pause();
                 }
 
-                // Trigger timeupdate for embeds
+                // Trigger timeupdate
                 _triggerEvent(plyr.media, 'timeupdate');
 
                 // Set seeking flag
                 plyr.media.seeking = true;
+
+                // Trigger seeking
+                _triggerEvent(plyr.media, 'seeking');
             }
 
             // Logging
