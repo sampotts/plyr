@@ -3083,6 +3083,7 @@
             isLoading:          function() { return PlyrUtils.hasClass(plyr.container, config.classes.loading); },
             isPaused:           function() { return plyr.media.paused; },
             on:                 function(event, callback) { PlyrUtils.on(plyr.container, event, callback); return this; },
+            off:                function(event, callback) { PlyrUtils.off(plyr.container, event, callback); return this; },
             play:               _play,
             pause:              _pause,
             stop:               function() { _pause(); _seek(); },
@@ -3897,73 +3898,75 @@ var GoogleCast = (function () {
     _loadMedia(plyr);
   }
 
+  function _loadMedia(plyr) {
+    console.log('load media called');
+    var session = getCurrentSession();
+    if(!session) {
+      return;
+    }
+
+    var defaults = {
+      mediaInfo: {
+        source: plyr.source(),
+        type: 'video/mp4'
+      },
+      metadata: {
+        metadataType: chrome.cast.media.MetadataType.GENERIC,
+        title: plyr.source(),
+        images: [{}],
+      },
+      loadRequest: {
+        autoplay: false,
+        currentTime: plyr.getCurrentTime(),
+      }
+    };
+    var options = cast.framework.CastContext.getInstance().options;
+    options = PlyrUtils.extend({}, defaults, options);
+
+    var mediaInfo = new chrome.cast.media.MediaInfo(options.mediaInfo.source, options.mediaInfo.type);
+    mediaInfo.metadata = new chrome.cast.media.GenericMediaMetadata();
+    mediaInfo.metadata.metadataType = options.metadata.metadataType;
+    mediaInfo.metadata.title = options.metadata.title;
+    mediaInfo.metadata.images = options.metadata.images;
+
+    var loadRequest = new chrome.cast.media.LoadRequest(mediaInfo);
+    loadRequest.autoplay = options.loadRequest.autoplay;
+    loadRequest.currentTime = options.loadRequest.currentTime;
+
+    session.loadMedia(loadRequest).then(
+      function() {
+        console.log('Successfully loaded media');
+      },
+      function (errorCode) {
+        console.log('Remote media load error: ' + getErrorMessage(errorCode));
+      }
+    );
+  };
+
   function bindPlyr(plyr, options) {
     var cc = cast.framework.CastContext.getInstance();
     cc.plyr = plyr;
+    cc.options = options;
 
     plyr.remotePlayer = new cast.framework.RemotePlayer();
     plyr.remotePlayerController = new cast.framework.RemotePlayerController(plyr.remotePlayer);
 
-    function _loadMedia(plyr) {
-      var session = getCurrentSession();
-      if(!session) {
-        return;
-      }
-      
-      var defaults = {
-        mediaInfo: {
-          source: plyr.source(),
-          type: 'video/mp4'
-        },
-        metadata: {
-          metadataType: chrome.cast.media.MetadataType.GENERIC,
-          title: plyr.source(),
-          images: [{}],
-        },
-        loadRequest: {
-          autoplay: false,
-          currentTime: plyr.getCurrentTime(),
-        }
-      };
-      var options = PlyrUtils.extend({}, defaults, options);
-
-      var mediaInfo = new chrome.cast.media.MediaInfo(options.mediaInfo.source, options.mediaInfo.type);
-      mediaInfo.metadata = new chrome.cast.media.GenericMediaMetadata();
-      mediaInfo.metadata.metadataType = options.metadata.metadataType;
-      mediaInfo.metadata.title = options.metadata.title;
-      mediaInfo.metadata.images = options.metadata.images;
-
-      var loadRequest = new chrome.cast.media.LoadRequest(mediaInfo);
-      loadRequest.autoplay = options.loadRequest.autoplay;
-      loadRequest.currentTime = options.loadRequest.currentTime;
-
-      session.loadMedia(loadRequest).then(
-        function() {
-          console.log('Successfully loaded media');
-        },
-        function (errorCode) {
-          console.log('Remote media load error: ' + getErrorMessage(errorCode));
-        }
-      );
-    };
-
     plyr.on('play', _onPlay);
     plyr.on('pause', _onPause);
 
-    if(plyr.isReady()) {
-      _loadMedia(plyr);
-    }
     plyr.on('ready', _onReady);
     console.log("Plyr bound");
   }
 
   function unbindPlyr(plyr) {
-    var currentPlyr = getCurrentPlyr();
+    var cc = cast.framework.CastContext.getInstance();
+    var currentPlyr = cc.plyr;
     if(currentPlyr === plyr) {
       plyr.off('play', _onPlay);
       plyr.off('pause', _onPause);
       plyr.off('ready', _onReady);
     }
+    cc.plyr = undefined;
   }
 
   function getErrorMessage(error) {
@@ -4033,36 +4036,62 @@ var GoogleCast = (function () {
     case ss.SESSION_STARTING:
       break;
     case ss.SESSION_STARTED:
-      PlyrUtils.event(plyr.getContainer(), 'castenabled', true);
+    case ss.SESSION_RESUMED:
+      // run on ready
+      _onReady();
       break;
     case ss.SESSION_START_FAILED:
-      PlyrUtils.event(plyr.getContainer(), 'castdisabled', true);
+    case ss.SESSION_ENDED:
       break;
     case ss.SESSION_ENDING:
-      break;
-    case ss.SESSION_ENDED:
-      PlyrUtils.event(plyr.getContainer(), 'castdisabled', true);
-      break;
-    case ss.SESSION_RESUMED:
-      PlyrUtils.event(plyr.getContainer(), 'castenabled', true);
       break;
     }
   }
 
   function requestSession(plyr) {
-    function _onRequestSuccess(e) {
-      cast.framework.CastContext.getInstance().getCurrentSession();
+    // Check if a session already exists, if it does, just use it
+    var session = getCurrentSession();
 
-      console.log("Request success");
+    var wasPlyrAlreadyBound = true;
+    var existingPlyr = getCurrentPlyr();
+    if(existingPlyr !== undefined && existingPlyr !== plyr) {
+        unbindPlyr(existingPlyr);
+    }
+    if(existingPlyr !== plyr) {
+      bindPlyr(plyr);
+      wasPlyrAlreadyBound = false;
+    }
+
+    function _onRequestSuccess(e) {
+      // This only triggers when a new session is created.
+      // It does not trigger on successfully showing the drop down and
+      // requesting stop session.
     }
 
     function _onError(e) {
-      console.log("Failed to request session: " + JSON.stringify(e));
+      unbindPlyr(getCurrentPlyr());
     }
 
-    bindPlyr(plyr);
-    var promise = cast.framework.CastContext.getInstance().requestSession();
-    promise.then(_onRequestSuccess, _onError);
+
+    // We need to show the cast drop down if:
+    // 1) There was no session
+    // 2) There was a session and the current plyr was already bound
+    // (2) is needed since we need a way to disable cast via the current
+    // plyr instance
+    if(session === null || wasPlyrAlreadyBound) {
+      var promise = cast.framework.CastContext.getInstance().requestSession();
+      promise.then(_onRequestSuccess, _onError);
+    } else {
+      // We have a session and we're just looking to bind plyr which we've
+      // done already. Just load media and change icon based on session state.
+      var cs = cast.framework.CastContext.getInstance().getCastState();
+      var castStateEventData = new cast.framework.CastStateEventData(cs);
+      _castStateListener(castStateEventData);
+
+      var ss = cast.framework.CastContext.getInstance().getSessionState();
+      var sessionStateEventData = new cast.framework.SessionStateEventData(session, ss, 0);
+      _sessionStateListener(sessionStateEventData);
+    }
   }
 
   return {
