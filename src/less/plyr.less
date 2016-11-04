@@ -785,7 +785,11 @@
     }
 }
 .plyr .plyr__progress {
-    display: inline-block;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: @plyr-progress-range-track-hover-height;
+    margin-bottom: @plyr-control-padding;
 
     // Hoverd styles
     &:hover {
