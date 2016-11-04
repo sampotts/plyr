@@ -3136,7 +3136,7 @@
                     '<li>',
                         '<button type="button" class="',
                             (hasCaption ? 'plyr__menu__btn--active' : ''),
-                            '" data-plyr="caption" data-plyr-caption="' + j + '">' + tracks[j].label,
+                            '" data-plyr="captions" data-plyr-caption="' + j + '">' + tracks[j].label,
                         '</button>',
                     '</li>'
                 );
@@ -3151,7 +3151,7 @@
                         '<button type="button" class="',
                             ((plyr.storage.captionsEnabled === false) ?
                                 'plyr__menu__btn--active' : ''),
-                            '" data-plyr="caption" data-plyr-caption="false">',
+                            '" data-plyr="captions" data-plyr-caption="false">',
                                 config.i18n.disableCaptions,
                         '</button>',
                     '</li>'
