@@ -2386,6 +2386,9 @@
             if (plyr.buttons && plyr.buttons.zoom) {
                 _toggleState(plyr.buttons.zoom, plyr.isZoom);
             }
+
+            // Trigger an event
+            _triggerEvent(plyr.container, plyr.isZoom ? 'enterzoom' : 'exitzoom', true);
         }
 
         // Toggle fullscreen
@@ -2435,7 +2438,7 @@
             }
 
             // Trigger an event
-            _triggerEvent(plyr.fullscreenContainer, plyr.isFullscreen ? 'enterfullscreen' : 'exitfullscreen', true);
+            _triggerEvent(plyr.container, plyr.isFullscreen ? 'enterfullscreen' : 'exitfullscreen', true);
 
             // Restore scroll position
             if (!plyr.isFullscreen && nativeSupport) {
@@ -3184,6 +3187,7 @@
 
             var delay = 0,
                 isEnterFullscreen = false,
+                isEnterZoom = false,
                 show = toggle,
                 loading = _hasClass(plyr.container, config.classes.loading);
 
@@ -3192,6 +3196,9 @@
                 if (toggle && toggle.type) {
                     // Is the enter fullscreen event
                     isEnterFullscreen = (toggle.type === 'enterfullscreen');
+
+                    // Is the enter zoom event
+                    isEnterZoom = (toggle.type === 'enterzoom');
 
                     // Whether to show controls
                     show = _inArray(['mousemove', 'touchstart', 'mouseenter', 'focus'], toggle.type);
@@ -3233,7 +3240,7 @@
             if (!show || !plyr.media.paused) {
                 timers.hover = window.setTimeout(function() {
                     // If the mouse is over the controls (and not entering fullscreen), bail
-                    if ((plyr.controls.pressed || plyr.controls.hover) && !isEnterFullscreen) {
+                    if ((plyr.controls.pressed || plyr.controls.hover) && !isEnterFullscreen && !isEnterZoom) {
                         return;
                     }
 
@@ -3772,7 +3779,7 @@
             // Toggle controls visibility based on mouse movement
             if (config.hideControls) {
                 // Toggle controls on mouse events and entering fullscreen
-                _on(plyr.container, 'mouseenter mouseleave mousemove touchstart touchend touchcancel touchmove enterfullscreen', _toggleControls);
+                _on(plyr.container, 'mouseenter mouseleave mousemove touchstart touchend touchcancel touchmove enterfullscreen enterzoom', _toggleControls);
 
                 // Watch for cursor over controls so they don't hide when trying to interact
                 _on(plyr.controls, 'mouseenter mouseleave', function(event) {
@@ -4390,7 +4397,7 @@
 
             // Listen for events if debugging
             if (config.debug) {
-                var events = config.events.concat(['setup', 'statechange', 'enterfullscreen', 'exitfullscreen', 'captionsenabled', 'captionsdisabled', 'captionselected', 'qualitychanged']);
+                var events = config.events.concat(['setup', 'statechange', 'enterfullscreen', 'exitfullscreen', 'captionsenabled', 'captionsdisabled', 'captionselected', 'qualitychanged', 'enterzoom','exitzoom']);
 
                 _on(instance.getContainer(), events.join(' '), function(event) {
                     console.log([config.logPrefix, 'event:', event.type].join(' '), event.detail.plyr);
