@@ -4095,9 +4095,9 @@ var GoogleCast = (function () {
   }
 
   return {
-    setup:          setup,
-    requestSession: requestSession,
-    bindPlyr:       bindPlyr,
-    unbindPlyr:     unbindPlyr,
+    setup:             setup,
+    requestSession:    requestSession,
+    getCurrentSession: getCurrentSession,
+    getCurrentPlyr:    getCurrentPlyr,
   }
 })();
