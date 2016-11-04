@@ -1949,7 +1949,7 @@
             // Set global
             plyr.castEnabled = show;
 
-            GoogleCast.requestSession(api);
+            PlyrCast.requestSession(api);
         }
 
         // Check if media is loading
@@ -3215,9 +3215,8 @@
             instances   = [],
             selector    = [defaults.selectors.html5, defaults.selectors.embed].join(',');
 
-        // XXX: Move this
         // Setup google cast
-        GoogleCast.setup();
+        PlyrCast.setup();
 
         // Select the elements
         if (PlyrUtils.is.string(targets)) {
@@ -3836,7 +3835,7 @@ var PlyrUtils = (function () {
 
 
 
-var GoogleCast = (function () {
+var PlyrCast = (function () {
   'use strict';
   var defaults = {};
 
