@@ -26,9 +26,9 @@ app.get('/cast', function(req, res) {
 });
 /* -------------------- END OF TEST URLS --------------------*/
 
-app.use('/src', express.static('./src'));
-app.use('/dist', express.static('./dist'));
-app.use('/demo', express.static('./demo'));
+app.use('/src', express.static('../src'));
+app.use('/dist', express.static('../dist'));
+app.use('/demo', express.static('./'));
 
 http.listen(HTTP_PORT, function () {
 	console.log('HTTP listening on port ' + HTTP_PORT);
