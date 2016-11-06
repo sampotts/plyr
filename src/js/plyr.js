@@ -40,7 +40,7 @@
         volumeStep:             1,
         defaultSpeed:           1.0,
         currentSpeed:           1.0,
-        speeds:                 [ 0.5, 1.0, 1.5, 2.0 ],
+        speeds:                 [0.5, 1.0, 1.5, 2.0],
         duration:               null,
         displayDuration:        true,
         loadSprite:             true,
@@ -806,7 +806,7 @@
             // Restart button
             if (_inArray(config.controls, 'restart')) {
                 html.push(
-                    '<button type="button" data-plyr="restart">',
+                    '<button type="button" class="plyr__control" data-plyr="restart">',
                         '<svg><use xlink:href="' + iconPath + '-restart" /></svg>',
                         '<span class="plyr__sr-only">' + config.i18n.restart + '</span>',
                     '</button>'
@@ -816,7 +816,7 @@
             // Rewind button
             if (_inArray(config.controls, 'rewind')) {
                 html.push(
-                    '<button type="button" data-plyr="rewind">',
+                    '<button type="button" class="plyr__control" data-plyr="rewind">',
                         '<svg><use xlink:href="' + iconPath + '-rewind" /></svg>',
                         '<span class="plyr__sr-only">' + config.i18n.rewind + '</span>',
                     '</button>'
@@ -827,11 +827,11 @@
             // TODO: This should be a toggle button really?
             if (_inArray(config.controls, 'play')) {
                 html.push(
-                    '<button type="button" data-plyr="play">',
+                    '<button type="button" class="plyr__control" data-plyr="play">',
                         '<svg><use xlink:href="' + iconPath + '-play" /></svg>',
                         '<span class="plyr__sr-only">' + config.i18n.play + '</span>',
                     '</button>',
-                    '<button type="button" data-plyr="pause">',
+                    '<button type="button" class="plyr__control" data-plyr="pause">',
                         '<svg><use xlink:href="' + iconPath + '-pause" /></svg>',
                         '<span class="plyr__sr-only">' + config.i18n.pause + '</span>',
                     '</button>'
@@ -841,7 +841,7 @@
             // Fast forward button
             if (_inArray(config.controls, 'fast-forward')) {
                 html.push(
-                    '<button type="button" data-plyr="fast-forward">',
+                    '<button type="button" class="plyr__control" data-plyr="fast-forward">',
                         '<svg><use xlink:href="' + iconPath + '-fast-forward" /></svg>',
                         '<span class="plyr__sr-only">' + config.i18n.forward + '</span>',
                     '</button>'
@@ -891,7 +891,7 @@
             // Toggle mute button
             if (_inArray(config.controls, 'mute')) {
                 html.push(
-                    '<button type="button" data-plyr="mute">',
+                    '<button type="button" class="plyr__control" data-plyr="mute">',
                         '<svg class="icon--muted"><use xlink:href="' + iconPath + '-muted" /></svg>',
                         '<svg><use xlink:href="' + iconPath + '-volume" /></svg>',
                         '<span class="plyr__sr-only">' + config.i18n.toggleMute + '</span>',
@@ -913,7 +913,7 @@
             // Toggle captions button
             if (_inArray(config.controls, 'captions')) {
                 html.push(
-                    '<button type="button" data-plyr="captions">',
+                    '<button type="button" class="plyr__control" data-plyr="captions">',
                         '<svg class="icon--captions-on"><use xlink:href="' + iconPath + '-captions-on" /></svg>',
                         '<svg><use xlink:href="' + iconPath+ '-captions-off" /></svg>',
                         '<span class="plyr__sr-only">' + config.i18n.toggleCaptions + '</span>',
@@ -925,7 +925,7 @@
             if (_inArray(config.controls, 'settings')) {
                 html.push(
                     '<div class="plyr__menu" data-plyr="settings">',
-                        '<button type="button" id="plyr-settings-toggle-{id}" aria-haspopup="true" aria-controls="plyr-settings-{id}" aria-expanded="false">',
+                        '<button type="button" id="plyr-settings-toggle-{id}" class="plyr__control" aria-haspopup="true" aria-controls="plyr-settings-{id}" aria-expanded="false">',
                             '<svg><use xlink:href="' + iconPath + '-settings" /></svg>',
                             '<span class="plyr__sr-only">' + config.i18n.settings + '</span>',
                         '</button>',
@@ -934,18 +934,18 @@
                                 '<div class="plyr__menu__primary" id="plyr-settings-{id}-primary" aria-hidden="false" aria-labelled-by="plyr-settings-toggle-{id}" role="tabpanel" tabindex="-1">',
                                     '<ul>',
                                         '<li role="tab">',
-                                            '<button type="button" class="plyr__menu__btn plyr__menu__btn--forward" id="plyr-settings-{id}-captions-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-captions" aria-expanded="false">',
-                                                config.i18n.captions + ' <span class="plyr__menu__btn__value">{lang}</span>',
+                                            '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-captions-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-captions" aria-expanded="false">',
+                                                config.i18n.captions + ' <span class="plyr__menu__value">{lang}</span>',
                                             '</button>',
                                         '</li>',
                                         '<li role="tab">',
-                                            '<button type="button" class="plyr__menu__btn plyr__menu__btn--forward" id="plyr-settings-{id}-speed-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-speed" aria-expanded="false">',
-                                                config.i18n.speed + ' <span class="plyr__menu__btn__value">{speed}</span>',
+                                            '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-speed-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-speed" aria-expanded="false">',
+                                                config.i18n.speed + ' <span class="plyr__menu__value">{speed}</span>',
                                             '</button>',
                                         '</li>',
                                         '<li role="tab">',
-                                            '<button type="button" class="plyr__menu__btn plyr__menu__btn--forward" id="plyr-settings-{id}-quality-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-quality" aria-expanded="false">',
-                                                config.i18n.quality + ' <span class="plyr__menu__btn__value">Auto</span>',
+                                            '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-quality-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-quality" aria-expanded="false">',
+                                                config.i18n.quality + ' <span class="plyr__menu__value">Auto</span>',
                                             '</button>',
                                         '</li>',
                                     '</ul>',
@@ -953,59 +953,95 @@
                                 '<div class="plyr__menu__secondary" id="plyr-settings-{id}-captions" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-captions-toggle" role="tabpanel" tabindex="-1">',
                                     '<ul>',
                                         '<li role="tab">',
-                                            '<button type="button" class="plyr__menu__btn plyr__menu__btn--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
+                                            '<button type="button" class="plyr__control plyr__control--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
                                                 config.i18n.captions,
                                             '</button>',
                                         '</li>',
                                         '<li>',
-                                            '<button type="button">English</button>',
+                                            '<button type="button" class="plyr__control">English</button>',
                                         '</li>',
                                         '<li>',
-                                            '<button type="button">Off</button>',
+                                            '<button type="button" class="plyr__control">Off</button>',
                                         '</li>',
                                         '</ul>',
                                 '</div>',
                                 '<div class="plyr__menu__secondary" id="plyr-settings-{id}-speed" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-speed-toggle" role="tabpanel" tabindex="-1">',
                                     '<ul>',
                                         '<li role="tab">',
-                                            '<button type="button" class="plyr__menu__btn plyr__menu__btn--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
+                                            '<button type="button" class="plyr__control plyr__control--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
                                                 config.i18n.speed,
                                             '</button>',
                                         '</li>',
                                         '<li>',
-                                            '<button type="button">2&times;</button>',
+                                            '<button type="button" class="plyr__control">2&times;</button>',
                                         '</li>',
                                         '<li>',
-                                            '<button type="button">1.5&times;</button>',
+                                            '<button type="button" class="plyr__control">1.5&times;</button>',
                                         '</li>',
                                         '<li>',
-                                            '<button type="button">1&times;</button>',
+                                            '<button type="button" class="plyr__control">1&times;</button>',
                                         '</li>',
                                         '<li>',
-                                            '<button type="button">0.5&times;</button>',
+                                            '<button type="button" class="plyr__control">0.5&times;</button>',
                                         '</li>',
                                         '</ul>',
                                 '</div>',
                                 '<div class="plyr__menu__secondary" id="plyr-settings-{id}-quality" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-quality-toggle" role="tabpanel" tabindex="-1">',
                                     '<ul>',
                                         '<li role="tab">',
-                                            '<button type="button" class="plyr__menu__btn plyr__menu__btn--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
+                                            '<button type="button" class="plyr__control plyr__control--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
                                                 config.i18n.quality,
                                             '</button>',
                                         '</li>',
                                         '<li>',
-                                            '<button type="button">1080P <span class="plyr__menu__btn__badge"><span>HD</span></span></button>',
+                                            '<label class="plyr__control">',
+                                                '<input type="radio" name="quality">',
+                                                '2160P',
+                                                '<span class="plyr__menu__value">',
+                                                    '<span class="plyr__badge">4K</span>',
+                                                '</span>',
+                                            '</label>',
                                         '</li>',
                                         '<li>',
-                                            '<button type="button">720P <span class="plyr__menu__btn__badge"><span>HD</span></span></button>',
+                                            '<label class="plyr__control">',
+                                                '<input type="radio" name="quality">',
+                                                '1440P',
+                                                '<span class="plyr__menu__value">',
+                                                    '<span class="plyr__badge">WQHD</span>',
+                                                '</span>',
+                                            '</label>',
                                         '</li>',
                                         '<li>',
-                                            '<button type="button">480P</button>',
+                                            '<label class="plyr__control">',
+                                                '<input type="radio" name="quality">',
+                                                '1080P',
+                                                '<span class="plyr__menu__value">',
+                                                    '<span class="plyr__badge">HD</span>',
+                                                '</span>',
+                                            '</label>',
                                         '</li>',
                                         '<li>',
-                                            '<button type="button">320P</button>',
+                                            '<label class="plyr__control">',
+                                                '<input type="radio" name="quality">',
+                                                '720P',
+                                                '<span class="plyr__menu__value">',
+                                                    '<span class="plyr__badge">HD</span>',
+                                                '</span>',
+                                            '</label>',
                                         '</li>',
-                                        '</ul>',
+                                        '<li>',
+                                            '<label class="plyr__control">',
+                                                '<input type="radio" name="quality">',
+                                                '480P',
+                                            '</label>',
+                                        '</li>',
+                                        '<li>',
+                                            '<label class="plyr__control">',
+                                                '<input type="radio" name="quality">',
+                                                '360P',
+                                            '</label>',
+                                        '</li>',
+                                    '</ul>',
                                 '</div>',
                             '</div>',
                         '</div>',
@@ -1016,7 +1052,7 @@
             // Picture in picture button
             if (_inArray(config.controls, 'pip') && _support.pip) {
                 html.push(
-                    '<button type="button" data-plyr="pip">',
+                    '<button type="button" class="plyr__control" data-plyr="pip">',
                         '<svg><use xlink:href="' + iconPath + '-pip" /></svg>',
                         '<span class="plyr__sr-only">PIP</span>',
                     '</button>'
@@ -1026,7 +1062,7 @@
             // Airplay button
             if (_inArray(config.controls, 'airplay') && _support.airplay) {
                 html.push(
-                    '<button type="button" data-plyr="airplay">',
+                    '<button type="button" class="plyr__control" data-plyr="airplay">',
                         '<svg><use xlink:href="' + iconPath + '-airplay" /></svg>',
                         '<span class="plyr__sr-only">AirPlay</span>',
                     '</button>'
@@ -1036,7 +1072,7 @@
             // Toggle fullscreen button
             if (_inArray(config.controls, 'fullscreen')) {
                 html.push(
-                    '<button type="button" data-plyr="fullscreen">',
+                    '<button type="button" class="plyr__control" data-plyr="fullscreen">',
                         '<svg class="icon--exit-fullscreen"><use xlink:href="' + iconPath + '-exit-fullscreen" /></svg>',
                         '<svg><use xlink:href="' + iconPath + '-enter-fullscreen" /></svg>',
                         '<span class="plyr__sr-only">' + config.i18n.toggleFullscreen + '</span>',
@@ -1847,6 +1883,15 @@
                             embed:  event.target
                         });
                     },
+                    'onPlaybackQualityChange': function(event) {
+                        // Get the instance
+                        var instance = event.target;
+
+                        var quality = instance.getPlaybackQuality();
+                        
+                        // var set = instance.setPlaybackQuality();
+                        console.warn(quality);
+                    },
                     'onReady': function(event) {
                         // Get the instance
                         var instance = event.target;
@@ -1868,6 +1913,12 @@
                         plyr.media.paused = true;
                         plyr.media.currentTime = 0;
                         plyr.media.muted = instance.isMuted();
+
+                        // Get available speeds
+                        var speed = instance.getPlaybackRate();
+                        var speedOptions = instance.getAvailablePlaybackRates();
+                        //var set = instance.setPlaybackRate();
+                        console.warn(speed, speedOptions);
 
                         // Set title
                         config.title = instance.getVideoData().title;
@@ -1959,6 +2010,10 @@
                                     plyr.media.duration = instance.getDuration();
                                     _triggerEvent(plyr.media, 'durationchange');
                                 }
+
+                                // Get quality
+                                var qualityOptions = instance.getAvailableQualityLevels();
+                                console.warn(qualityOptions, event.data);
 
                                 break;
 
@@ -3193,6 +3248,15 @@
                 if (pressed) {
                     // Which keycodes should we prevent default
                     var preventDefault = [48,49,50,51,52,53,54,56,57,32,75,38,40,77,39,37,70,67];
+                    var checkFocus = [38,40];
+
+                    if (_inArray(checkFocus, code)) {
+                        var focused = getFocusElement();
+
+                        if (_is.htmlElement(focused) && getFocusElement().type === "radio") {
+                            return;
+                        }
+                    }
 
                     // If the code is found prevent default (e.g. prevent scrolling for arrows)
                     if (_inArray(preventDefault, code)) {

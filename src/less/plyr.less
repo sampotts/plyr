@@ -285,7 +285,7 @@
     text-align: center;
 
     // Spacing
-    > button,
+    > .plyr__control,
     .plyr__progress,
     .plyr__time,
     .plyr__menu {
@@ -302,52 +302,19 @@
         margin-left: 0;
     }
 
-    // Buttons
-    button {
-        position: relative;
-        display: inline-block;
-        flex-shrink: 0;
-        overflow: visible; // IE11
-        vertical-align: middle;
-        padding: @plyr-control-padding;
-        border: 0;
-        background: transparent;
-        border-radius: 3px;
-        cursor: pointer;
-        transition: background .3s ease, color .3s ease, opacity .3s ease;
-        color: inherit;
 
-        svg {
-            width: @plyr-control-icon-size;
-            height: @plyr-control-icon-size;
-            display: block;
-            fill: currentColor;
-        }
-
-        // Default focus
-        &:focus {
-            outline: 0;
-        }
-    }
-
-    // Hide toggle icons by default
-    .icon--exit-fullscreen,
-    .icon--muted,
-    .icon--captions-on {
-        display: none;
-    }
 
     @media (min-width: @plyr-bp-screen-sm) {
-        > button,
+        > .plyr__control,
         .plyr__progress,
         .plyr__time,
         .plyr__menu {
             margin-left: @plyr-control-spacing;
         }
 
-        > button + button,
-        .plyr__menu + button,
-        > button + .plyr__menu {
+        > .plyr__control + .plyr__control,
+        .plyr__menu + .plyr__control,
+        > .plyr__control + .plyr__menu {
             margin-left: (@plyr-control-spacing / 2);
         }
     }
@@ -356,6 +323,40 @@
 .plyr--hide-controls .plyr__controls {
     opacity: 0;
     pointer-events: none;
+}
+
+// Buttons
+.plyr__control {
+    position: relative;
+    display: inline-block;
+    flex-shrink: 0;
+    overflow: visible; // IE11
+    vertical-align: middle;
+    padding: @plyr-control-padding;
+    border: 0;
+    background: transparent;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background .3s ease, color .3s ease, opacity .3s ease;
+    color: inherit;
+
+    svg {
+        width: @plyr-control-icon-size;
+        height: @plyr-control-icon-size;
+        display: block;
+        fill: currentColor;
+    }
+    // Hide toggle icons by default
+    .icon--exit-fullscreen,
+    .icon--muted,
+    .icon--captions-on {
+        display: none;
+    }
+
+    // Default focus
+    &:focus {
+        outline: 0;
+    }
 }
 
 // Video controls
@@ -371,7 +372,7 @@
     color: @plyr-video-control-color;
     transition: opacity .3s ease;
 
-    button {
+    .plyr__control {
         // Hover and tab focus
         &.tab-focus:focus,
         &:hover,
@@ -390,7 +391,7 @@
     border: @plyr-audio-controls-border;
     color: @plyr-audio-control-color;
 
-    button {
+    .plyr__control {
         // Hover and tab focus
         &.tab-focus:focus,
         &:hover,
@@ -451,9 +452,9 @@
 }
 
 // Change icons on state change
-.plyr--fullscreen-active .icon--exit-fullscreen,
-.plyr--muted .plyr__controls .icon--muted,
-.plyr--captions-active .plyr__controls .icon--captions-on {
+.plyr--fullscreen-active .plyr__control .icon--exit-fullscreen,
+.plyr--muted .plyr__control .icon--muted,
+.plyr--captions-active .plyr__control .icon--captions-on {
     display: block;
 
     & + svg {
@@ -477,10 +478,10 @@
     position: relative;
 
     // Hide tooltip
-    button svg {
+    .plyr__control svg {
         transition: transform .3s ease;
     }
-    button[aria-expanded='true'] {
+    .plyr__control[aria-expanded='true'] {
         svg {
             transform: rotate(45deg);
         }
@@ -529,92 +530,100 @@
             list-style: none;
             overflow: hidden;
         }
-        button {
+        
+        // Options 
+        .plyr__control {
             display: flex;
             width: 100%;
             padding: @plyr-control-padding (@plyr-control-padding * 2);
             color: @plyr-menu-color;
             font-weight: 600;
             user-select: none;
-        }
-
-        // Buttons 
-        .plyr__menu__btn::after {
-            content: "";
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            border: 5px solid transparent;
-        }
-        .plyr__menu__btn--forward {
-            padding-right: ceil(@plyr-control-padding * 4);
 
             &::after {
-                right: 5px;
-                border-left-color: fade(@plyr-menu-color, 80%);
-            }
-        }
-        .plyr__menu__btn--back {
-            position: relative;
-            padding-top: floor(@plyr-control-padding * .7);
-            padding-bottom: floor(@plyr-control-padding * .7);
-            padding-left: ceil(@plyr-control-padding * 4);
-            margin-bottom: ceil(@plyr-control-padding * 1.3);
-            font-weight: 500;
-
-            &::after {
-                left: 5px;
-                border-right-color: fade(@plyr-menu-color, 80%);
-            }
-            &::before {
                 content: "";
                 position: absolute;
-                top: 100%;
-                left: 0;
-                right: 0;
-                height: 1px;
-                overflow: hidden;
-                margin-top: ceil(@plyr-control-padding / 2);
-                background: fade(#000, 15%);
-                box-shadow: 0 1px 0 fade(#fff, 10%);
+                top: 50%;
+                transform: translateY(-50%);
+                border: 5px solid transparent;
+            }
+            
+            &--forward {
+                padding-right: ceil(@plyr-control-padding * 4);
+
+                &::after {
+                    right: 5px;
+                    border-left-color: fade(@plyr-menu-color, 80%);
+                }
+            }
+            
+            &--back {
+                position: relative;
+                padding-top: floor(@plyr-control-padding * .7);
+                padding-bottom: floor(@plyr-control-padding * .7);
+                padding-left: ceil(@plyr-control-padding * 4);
+                margin-bottom: ceil(@plyr-control-padding * 1.3);
+                font-weight: 500;
+
+                &::after {
+                    left: 5px;
+                    border-right-color: fade(@plyr-menu-color, 80%);
+                }
+                &::before {
+                    content: "";
+                    position: absolute;
+                    top: 100%;
+                    left: 0;
+                    right: 0;
+                    height: 1px;
+                    overflow: hidden;
+                    margin-top: ceil(@plyr-control-padding / 2);
+                    background: fade(#000, 15%);
+                    box-shadow: 0 1px 0 fade(#fff, 10%);
+                }
+            }
+        }
+
+        label.plyr__control {
+            padding-left: ceil(@plyr-control-padding * 2.5);
+
+            input[type="radio"] {
+                position: relative;
+                left: -@plyr-control-padding;
             }
         }
 
         // Option value
-        .plyr__menu__btn__value,
-        .plyr__menu__btn__badge {
+        .plyr__menu__value {
             display: inherit;
             margin-left: auto;
             padding-left: ceil(@plyr-control-padding * 3.5);
             pointer-events: none;
             overflow: hidden;
-        }
-
-        // Option value
-        .plyr__menu__btn__value {
             font-weight: 500;
             color: fade(@plyr-menu-color, 80%);
-        }
 
-        // Option value
-        .plyr__menu__btn__badge span {
-            padding: 2px 4px;
-            border-radius: 2px;
-            background: @plyr-menu-color;
-            color: @plyr-menu-bg;
-            font-size: 10px;
+            .plyr__badge {
+                font-weight: 600;
+            }
         }
 
         // When animating between menus
         &.is-resizing {
             overflow: hidden;
             transition: height .35s cubic-bezier(.4,0,.2,1), width .35s cubic-bezier(.4,0,.2,1);
-
-            ul {
-                //opacity: 0;
-            }
         }
     }
+}
+
+// Badge
+// --------------------------------------------------------------
+.plyr__badge {
+    padding: 2px 4px;
+    border-radius: 2px;
+    background: @plyr-menu-color;
+    color: @plyr-menu-bg;
+    font-size: 10px;
 }
 
 // Tooltips
@@ -657,19 +666,19 @@
         z-index: 2;
     }
 }
-.plyr button:hover .plyr__tooltip,
-.plyr button.tab-focus:focus .plyr__tooltip,
+.plyr .plyr__control:hover .plyr__tooltip,
+.plyr .plyr__control.tab-focus:focus .plyr__tooltip,
 .plyr__tooltip--visible {
     opacity: 1;
     transform: translate(-50%, 0) scale(1);
 }
-.plyr button:hover .plyr__tooltip {
+.plyr .plyr__control:hover .plyr__tooltip {
     z-index: 3;
 }
 
 // First tooltip
-.plyr__controls > button:first-child .plyr__tooltip,
-.plyr__controls > button:first-child + button .plyr__tooltip {
+.plyr__controls > .plyr__control:first-child .plyr__tooltip,
+.plyr__controls > .plyr__control:first-child + .plyr__control .plyr__tooltip {
     left: 0;
     transform: translate(0, 10px) scale(.8);
     transform-origin: 0 100%;
@@ -680,7 +689,7 @@
 }
 
 // Last tooltip
-.plyr__controls > button:last-child .plyr__tooltip {
+.plyr__controls > .plyr__control:last-child .plyr__tooltip {
     right: 0;
     transform: translate(0, 10px) scale(.8);
     transform-origin: 100% 100%;
@@ -692,9 +701,9 @@
     }
 }
 
-.plyr__controls > button:first-child,
-.plyr__controls > button:first-child + button,
-.plyr__controls > button:last-child {
+.plyr__controls > .plyr__control:first-child,
+.plyr__controls > .plyr__control:first-child + .plyr__control,
+.plyr__controls > .plyr__control:last-child {
     &:hover .plyr__tooltip,
     &.tab-focus:focus .plyr__tooltip,
     .plyr__tooltip--visible {
