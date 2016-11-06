@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.0.10
+- Added seek event fixes for Vimeo and YouTube (fixes #409)
+- Added support for embed URLs rather than ID only (fixes #345)
+
 ## v2.0.9
 - Temporary patch for the YouTube API issues with `getDuration()` (relates to #374)
 
