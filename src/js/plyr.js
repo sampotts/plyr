@@ -3136,7 +3136,7 @@
                     '<li>',
                         '<button type="button" class="',
                             (hasCaption ? 'plyr__menu__btn--active' : ''),
-                            '" data-plyr="captions" data-plyr-caption="' + j + '">' + tracks[j].label,
+                            '" data-plyr="captions" data-plyr-captions="' + j + '">' + tracks[j].label,
                         '</button>',
                     '</li>'
                 );
@@ -3151,7 +3151,7 @@
                         '<button type="button" class="',
                             ((plyr.storage.captionsEnabled === false) ?
                                 'plyr__menu__btn--active' : ''),
-                            '" data-plyr="captions" data-plyr-caption="false">',
+                            '" data-plyr="captions" data-plyr-captions="false">',
                                 config.i18n.disableCaptions,
                         '</button>',
                     '</li>'
@@ -3744,7 +3744,7 @@
                 // Handle menu item
                 if (!_is.htmlElement(target)) {
                     var settingsObj = {
-                        'data-plyr-caption': _toggleCaptionIndex,
+                        'data-plyr-captions': _toggleCaptionIndex,
                         'data-plyr-speed': _speed,
                         'data-plyr-quality': _setQuality
                     };
