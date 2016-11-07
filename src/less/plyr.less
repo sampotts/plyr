@@ -785,7 +785,16 @@
     }
 }
 .plyr .plyr__progress {
-    display: inline-block;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: @plyr-progress-range-track-hover-height;
+    margin-bottom: @plyr-control-padding;
+
+    // Hoverd styles
+    &:hover {
+        .plyr-progress-range-track-hover();
+    }
 }
 
 .plyr__progress--buffer,
@@ -845,7 +854,13 @@
         display: none;
     }
 }
+.plyr__progress--buffer,
+.plyr__progress--played {
+    .plyr-progress-range-track();
+}
 .plyr__progress--buffer {
+    opacity: @plyr-progress-range-track-opacity;
+
     &::-webkit-progress-value {
         transition: width .2s ease;
     }

@@ -27,3 +27,32 @@
     border-color: @plyr-range-thumb-active-border-color;
     transform: scale(@plyr-range-thumb-active-scale);
 }
+.plyr-progress-range-track() {
+    transform: scaleY(unit(@plyr-progress-range-track-height/@plyr-progress-range-track-hover-height));
+    transition: transform .1s ease;
+
+    &::-webkit-progress-value {
+        min-width: @plyr-progress-range-track-height;
+        transition: transform .1s ease;
+    }
+    &::-moz-progress-bar {
+        min-width: @plyr-progress-range-track-height;
+        transition: transform .1s ease;
+    }
+}
+.plyr-progress-range-track-hover() {
+    .plyr__progress--buffer,
+    .plyr__progress--played {
+        transform: none;
+
+        &::-webkit-progress-value {
+            min-width: @plyr-progress-range-track-hover-height;
+        }
+        &::-moz-progress-bar {
+            min-width: @plyr-progress-range-track-hover-height;
+        }
+    }
+    .plyr__progress--buffer {
+        opacity: @plyr-progress-range-track-hover-height;
+    }
+}
