@@ -3000,7 +3000,9 @@
             _on(plyr.media, 'canplay', onCanplay);
 
             // Update menu text
-            plyr.currentQualityLabel.change(quality);
+            if (plyr.currentQualityLabel) {
+                plyr.currentQualityLabel.change(quality);
+            }
 
             // Save current quality to localStorage
             _updateStorage({quality: quality});
@@ -3141,7 +3143,7 @@
                     '</li>'
                 );
                 // Update menu button text
-                if (hasCaption) {
+                if (hasCaption && plyr.currentCaptionLabel) {
                     plyr.currentCaptionLabel.change(tracks[j].label);
                 }
             }
@@ -3161,7 +3163,9 @@
             html = html.join('');
 
             // Inser HTML
-            ul.insertAdjacentHTML('beforeend', html);
+            if (ul) {
+                ul.insertAdjacentHTML('beforeend', html);
+            }
         }
 
         // Build quality menu items
@@ -3208,7 +3212,9 @@
                             );
 
                             // Update menu text
-                            plyr.currentQualityLabel.change(quality);
+                            if (plyr.currentQualityLabel) {
+                                plyr.currentQualityLabel.change(quality);
+                            }
 
                             // Save current quality to localStorage
                             _updateStorage({quality: quality});
@@ -3225,7 +3231,9 @@
             html = html.join('');
 
             // Inser HTML
-            ul.insertAdjacentHTML('beforeend', html);
+            if (ul) {
+                ul.insertAdjacentHTML('beforeend', html);
+            }
         }
 
         // Show the player controls in fullscreen mode
