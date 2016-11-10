@@ -152,7 +152,7 @@
         // URLs
         urls: {
             vimeo: {
-                api:            'https://player.vimeo.com/api/player.js',
+                api:            'https://cdn.rawgit.com/JodiWarren/plyr/master/vimeo/player.min.js',
             },
             youtube: {
                 api:            'https://www.youtube.com/iframe_api'
@@ -295,8 +295,9 @@
 
         var tag = document.createElement('script');
         tag.src = source;
-        var firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        var scripts = document.getElementsByTagName('script');
+        var lastScriptTag = document.getElementsByTagName('script')[scripts.length - 1];
+        lastScriptTag.parentNode.insertBefore(tag, lastScriptTag.nextSibling);
     }
 
     // Element exists in an array
