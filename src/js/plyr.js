@@ -296,7 +296,7 @@
         var tag = document.createElement('script');
         tag.src = source;
         var scripts = document.getElementsByTagName('script');
-        var lastScriptTag = document.getElementsByTagName('script')[scripts.length - 1];
+        var lastScriptTag = scripts[scripts.length - 1];
         lastScriptTag.parentNode.insertBefore(tag, lastScriptTag.nextSibling);
     }
 
