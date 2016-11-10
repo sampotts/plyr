@@ -1042,7 +1042,7 @@
             }
 
             // Toggle zoom button
-            if (_inArray(config.controls, 'zoom')) {
+            if (_inArray(config.controls, 'zoom') && _support.fullscreen) {
                 html.push(
                                 '<button type="button" data-plyr="zoom">',
                                     '<svg class="icon--exit-zoom"><use xlink:href="' + iconPath + '-exit-zoom" /></svg>',
