@@ -1067,7 +1067,7 @@ Also these links helped created Plyr:
 - [Media Events - W3.org](http://www.w3.org/2010/05/video/mediaevents.html)
 - [Styling the `<progress>` element - hongkiat.com](http://www.hongkiat.com/blog/html5-progress-bar/)
 
-Thanks for [Fastly](https://www.fastly.com/) for providing the CDN services. 
+Thanks to [Fastly](https://www.fastly.com/) for providing the CDN services. 
 
 ## Copyright and License
 [The MIT license](license.md).
