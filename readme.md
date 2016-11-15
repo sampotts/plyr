@@ -132,7 +132,7 @@ Include the `plyr.js` script before the closing `</body>` tag and then call `ply
 <script>plyr.setup();</script>
 ```
 
-If you want to use our CDN for the JavaScript, you can use the following:
+If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for the JavaScript, you can use the following:
 
 ```html
 <script src="https://cdn.plyr.io/2.0.10/plyr.js"></script>
@@ -145,14 +145,14 @@ Include the `plyr.css` stylsheet into your `<head>`
 <link rel="stylesheet" href="path/to/plyr.css">
 ```
 
-If you want to use our CDN for the default CSS, you can use the following:
+If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for the default CSS, you can use the following:
 
 ```html
 <link rel="stylesheet" href="https://cdn.plyr.io/2.0.10/plyr.css">
 ```
 
 ### SVG Sprite
-The SVG sprite is loaded automatically from our CDN. To change this, see the [options](#Options) below. For reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/2.0.10/plyr.svg`.
+The SVG sprite is loaded automatically from our CDN (provided by [Fastly](https://www.fastly.com/)). To change this, see the [options](#Options) below. For reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/2.0.10/plyr.svg`.
 
 ## Advanced
 
@@ -1066,6 +1066,8 @@ Credit to the PayPal HTML5 Video player from which Plyr's caption functionality 
 Also these links helped created Plyr:
 - [Media Events - W3.org](http://www.w3.org/2010/05/video/mediaevents.html)
 - [Styling the `<progress>` element - hongkiat.com](http://www.hongkiat.com/blog/html5-progress-bar/)
+
+Thanks for [Fastly](https://www.fastly.com/) for providing the CDN services. 
 
 ## Copyright and License
 [The MIT license](license.md).
