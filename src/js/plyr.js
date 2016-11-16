@@ -597,26 +597,29 @@
     (function() {
         // Determine the prefix
         var prefix = (function() {
-            var result = '';
-            if (!_is.undefined(document.cancelFullScreen)) {
-                return result;
+            var value = false;
+
+            if (_is.function(document.cancelFullScreen)) {
+                value = '';
             } else {
                 // Check for fullscreen support by vendor prefix
-                ['webkit', 'o', 'moz', 'ms', 'khtml'].forEach(function(prefix) {
-                    if (!_is.undefined(document[prefix + 'CancelFullScreen'])) {
-                        result = prefix;
-                    } else if (!_is.undefined(document.msExitFullscreen) && document.msFullscreenEnabled) {
+                ['webkit', 'o', 'moz', 'ms', 'khtml'].some(function(prefix) {
+                    if (_is.function(document[prefix + 'CancelFullScreen'])) {
+                        value = prefix;
+                        return true;
+                    } else if (_is.function(document.msExitFullscreen) && document.msFullscreenEnabled) {
                         // Special case for MS (when isn't it?)
-                        result = 'ms';
+                        value = 'ms';
+                        return true;
                     }
                 });
             }
 
-            // If we got this far, there's no support
-            return result;
+            return value;
         })();
 
         _fullscreen = {
+            prefix: prefix,
             // Yet again Microsoft awesomeness,
             // Sometimes the prefix is 'ms', sometimes 'MS' to keep you on your toes
             eventType: (prefix === 'ms' ? 'MSFullscreenChange' : prefix + 'fullscreenchange'),
@@ -1039,7 +1042,7 @@
             }
 
             // Toggle zoom button
-            if (_inArray(config.controls, 'zoom')) {
+            if (_inArray(config.controls, 'zoom') && _support.fullscreen) {
                 html.push(
                                 '<button type="button" data-plyr="zoom">',
                                     '<svg class="icon--exit-zoom"><use xlink:href="' + iconPath + '-exit-zoom" /></svg>',
