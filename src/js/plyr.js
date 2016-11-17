@@ -25,7 +25,7 @@
     'use strict';
 
     // Globals
-    var fullscreen, 
+    var fullscreen,
     scroll = { x: 0, y: 0 },
 
     // Default config
@@ -36,8 +36,8 @@
         loop:                   false,
         seekTime:               10,
         volume:                 10,
-        volumeMin:              0, 
-        volumeMax:              10, 
+        volumeMin:              0,
+        volumeMax:              10,
         volumeStep:             1,
         duration:               null,
         displayDuration:        true,
@@ -493,9 +493,9 @@
         }
 
         // Create and dispatch the event
-        var event = new CustomEvent(type, { 
+        var event = new CustomEvent(type, {
             bubbles:    bubbles,
-            detail:     properties 
+            detail:     properties
         });
 
         // Dispatch the event
@@ -568,7 +568,7 @@
     // Check variable types
     var _is = {
         object: function(input) {
-            return input !== null && typeof(input) === 'object'; 
+            return input !== null && typeof(input) === 'object';
         },
         array: function(input) {
             return input !== null && (typeof(input) === 'object' && input.constructor === Array);
@@ -713,7 +713,7 @@
         timers = {},
         api;
 
-        // Set media 
+        // Set media
         plyr.media = media;
         var original = media.cloneNode(true);
 
@@ -732,7 +732,7 @@
                 if (_is.string(config.logPrefix) && config.logPrefix.length) {
                     args.unshift(config.logPrefix);
                 }
-                
+
                 console[type].apply(console, args);
             }
         }
@@ -1037,7 +1037,7 @@
                                     var captions = [],
                                         caption,
                                         req = xhr.responseText;
-                                    
+
                                     //According to webvtt spec, line terminator consists of one of the following
                                     // CRLF (U+000D U+000A), LF (U+000A) or CR (U+000D)
                                     var lineSeparator = '\r\n';
@@ -1048,7 +1048,7 @@
                                             lineSeparator = '\n';
                                         }
                                     }
-                                    
+
                                     captions = req.split(lineSeparator+lineSeparator);
 
                                     for (var r = 0; r < captions.length; r++) {
@@ -1530,7 +1530,7 @@
                     mediaId = _parseVimeoId(plyr.embedId);
                     break;
 
-                default: 
+                default:
                     mediaId = plyr.embedId;
             }
 
@@ -1819,7 +1819,7 @@
                 plyr.embed.stop();
                 plyr.media.paused = true;
             };
-            
+
             plyr.media.paused = true;
             plyr.media.currentTime = 0;
 
@@ -1835,7 +1835,7 @@
 
             plyr.embed.getDuration().then(function(value) {
                 plyr.media.duration = value;
-                
+
                 // Trigger timeupdate
                 _triggerEvent(plyr.media, 'durationchange');
             });
@@ -1898,7 +1898,7 @@
             plyr.embed = window.SC.Widget(this);
 
             // Setup on ready
-            plyr.embed.bind(window.SC.Widget.Events.READY, function() {             
+            plyr.embed.bind(window.SC.Widget.Events.READY, function() {
                 // Create a faux HTML5 API using the Soundcloud API
                 plyr.media.play = function() {
                     plyr.embed.play();
@@ -2035,7 +2035,7 @@
                 targetTime = duration;
             }
 
-            // Update seek range and progress 
+            // Update seek range and progress
             _updateSeekDisplay(targetTime);
 
             // Set the current time
@@ -2126,7 +2126,7 @@
         function _toggleFullscreen(event) {
             // Check for native support
             var nativeSupport = fullscreen.supportsFullScreen;
-            
+
             if (nativeSupport) {
                 // If it's a fullscreen change event, update the UI
                 if (event && event.type === fullscreen.fullScreenEventName) {
@@ -2424,7 +2424,7 @@
             if (!plyr.supported.full) {
                 return;
             }
-            
+
             // Default to 0
             if (_is.undefined(value)) {
                 value = 0;
@@ -2516,7 +2516,7 @@
             _updateProgress(event);
         }
 
-        // Update seek range and progress 
+        // Update seek range and progress
         function _updateSeekDisplay(time) {
             // Default to 0
             if (!_is.number(time)) {
@@ -2526,7 +2526,7 @@
             var duration    = _getDuration(),
                 value       = _getPercentage(time, duration);
 
-            // Update progress 
+            // Update progress
             if (plyr.progress && plyr.progress.played) {
                 plyr.progress.played.value = value;
             }
@@ -2635,15 +2635,15 @@
                 }
             }
 
-            // If toggle is false or if we're playing (regardless of toggle), 
-            // then set the timer to hide the controls 
+            // If toggle is false or if we're playing (regardless of toggle),
+            // then set the timer to hide the controls
             if (!show || !plyr.media.paused) {
                 timers.hover = window.setTimeout(function() {
                     // If the mouse is over the controls (and not entering fullscreen), bail
                     if ((plyr.controls.pressed || plyr.controls.hover) && !isEnterFullscreen) {
                         return;
                     }
-                    
+
                     _toggleClass(plyr.container, config.classes.hideControls, true);
                 }, delay);
             }
@@ -2720,7 +2720,7 @@
                     _remove(plyr.videoContainer);
                 }
 
-                // Reset class name 
+                // Reset class name
                 if (plyr.container) {
                     plyr.container.removeAttribute('class');
                 }
@@ -2915,7 +2915,7 @@
                         count   = get().length;
 
                         // Only handle global key press if there's only one player
-                        // and the key is in the allowed keys 
+                        // and the key is in the allowed keys
                         // and if the focused element is not editable (e.g. text input)
                         // and any that accept key input http://webaim.org/techniques/keyboard/
                         if (count === 1 && _inArray(allowed, code) && (!_is.htmlElement(focused) || !_matches(focused, config.selectors.editable))) {
@@ -2949,7 +2949,7 @@
                         return;
                     }
 
-                    // Divide the max duration into 10th's and times by the number value 
+                    // Divide the max duration into 10th's and times by the number value
                     _seek((duration / 10) * (code - 48));
                 }
 
@@ -2967,18 +2967,18 @@
 
                     switch(code) {
                         // 0-9
-                        case 48: 
-                        case 49: 
-                        case 50: 
-                        case 51: 
-                        case 52: 
-                        case 53: 
-                        case 54: 
-                        case 55: 
+                        case 48:
+                        case 49:
+                        case 50:
+                        case 51:
+                        case 52:
+                        case 53:
+                        case 54:
+                        case 55:
                         case 56:
                         case 57: if (!held) { seekByKey(); } break;
                         // Space and K key
-                        case 32: 
+                        case 32:
                         case 75: if (!held) { _togglePlay(); } break;
                         // Arrow up
                         case 38: _increaseVolume(); break;
@@ -2996,7 +2996,7 @@
                         case 67: if (!held) { _toggleCaptions(); } break;
                     }
 
-                    // Escape is handle natively when in full screen 
+                    // Escape is handle natively when in full screen
                     // So we only need to worry about non native
                     if (!fullscreen.supportsFullScreen && plyr.isFullscreen && code === 27) {
                         _toggleFullscreen();
@@ -3075,12 +3075,12 @@
                 _on(plyr.container, 'mouseenter mouseleave mousemove touchstart touchend touchcancel touchmove enterfullscreen', _toggleControls);
 
                 // Watch for cursor over controls so they don't hide when trying to interact
-                _on(plyr.controls, 'mouseenter mouseleave', function(event) { 
+                _on(plyr.controls, 'mouseenter mouseleave', function(event) {
                     plyr.controls.hover = event.type === 'mouseenter';
                 });
 
                  // Watch for cursor over controls so they don't hide when trying to interact
-                _on(plyr.controls, 'mousedown mouseup touchstart touchend touchcancel', function(event) { 
+                _on(plyr.controls, 'mousedown mouseup touchstart touchend touchcancel', function(event) {
                     plyr.controls.pressed = _inArray(['mousedown', 'touchstart'], event.type);
                 });
 
@@ -3136,7 +3136,7 @@
                     if (plyr.type === 'video') {
                         _setCaption();
                     }
-                    
+
                     // Restart
                     _seek();
 
@@ -3238,7 +3238,7 @@
 
             // Type specific stuff
             switch (plyr.type) {
-                case 'youtube': 
+                case 'youtube':
                     // Clear timers
                     window.clearInterval(timers.buffering);
                     window.clearInterval(timers.playing);
@@ -3248,16 +3248,16 @@
 
                     // Clean up
                     cleanUp();
-                    
+
                     break;
 
                 case 'vimeo':
-                    // Destroy Vimeo API 
+                    // Destroy Vimeo API
                     // then clean up (wait, to prevent postmessage errors)
                     plyr.embed.unload().then(cleanUp);
 
                     // Vimeo does not always return
-                    window.setTimeout(cleanUp, 200);
+                    timers.cleanUp = window.setTimeout(cleanUp, 200);
 
                     break;
 
@@ -3273,6 +3273,8 @@
             }
 
             function cleanUp() {
+                clearTimeout(timers.cleanUp);
+
                 // Default to restore original element
                 if (!_is.boolean(restore)) {
                     restore = true;
@@ -3448,7 +3450,7 @@
             isMuted:            function() { return plyr.media.muted; },
             isReady:            function() { return _hasClass(plyr.container, config.classes.ready); },
             isLoading:          function() { return _hasClass(plyr.container, config.classes.loading); },
-            isPaused:           function() { return plyr.media.paused; }, 
+            isPaused:           function() { return plyr.media.paused; },
             on:                 function(event, callback) { _on(plyr.container, event, callback); return this; },
             play:               _play,
             pause:              _pause,
@@ -3473,7 +3475,7 @@
         // Everything done
         function _ready() {
             // Ready event at end of execution stack
-            window.setTimeout(function() { 
+            window.setTimeout(function() {
                 _triggerEvent(plyr.media, 'ready');
             }, 0);
 
@@ -3679,15 +3681,15 @@
             // Listen for events if debugging
             if (config.debug) {
                 var events = config.events.concat(['setup', 'statechange', 'enterfullscreen', 'exitfullscreen', 'captionsenabled', 'captionsdisabled']);
-                
-                _on(instance.getContainer(), events.join(' '), function(event) { 
+
+                _on(instance.getContainer(), events.join(' '), function(event) {
                     console.log([config.logPrefix, 'event:', event.type].join(' '), event.detail.plyr);
                 });
             }
 
             // Callback
-            _event(instance.getContainer(), 'setup', true, { 
-                plyr: instance 
+            _event(instance.getContainer(), 'setup', true, {
+                plyr: instance
             });
 
             // Add to return array even if it's already setup
@@ -3718,7 +3720,7 @@
                 }
             });
 
-            return instances; 
+            return instances;
         }
 
         return [];
