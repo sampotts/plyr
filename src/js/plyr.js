@@ -615,6 +615,7 @@
         })();
 
         _fullscreen = {
+            prefix: prefix,
             // Yet again Microsoft awesomeness,
             // Sometimes the prefix is 'ms', sometimes 'MS' to keep you on your toes
             eventType: (prefix === 'ms' ? 'MSFullscreenChange' : prefix + 'fullscreenchange'),
