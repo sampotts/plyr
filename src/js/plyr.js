@@ -3603,6 +3603,12 @@
                     pressed = event.type === 'keydown',
                     held = pressed && code === last;
 
+                // Prevent trigger by other client's' shortcut
+                // ex: Chrome switch tab
+                if (event.ctrlKey || event.metaKey) {
+                    return;
+                }
+
                 // If the event is bubbled from the media element
                 // Firefox doesn't get the keycode for whatever reason
                 if (!_is.number(code)) {
