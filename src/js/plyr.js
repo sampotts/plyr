@@ -4082,6 +4082,9 @@
                 // Replace the container with the original element provided
                 plyr.container.parentNode.replaceChild(original, plyr.container);
 
+                // unbind escape key
+                document.body.style.overflow = '';
+
                 // Event
                 _triggerEvent(original, 'destroyed', true);
             }
