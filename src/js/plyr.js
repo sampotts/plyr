@@ -172,7 +172,8 @@
             settings:           'Settings',
             speed:              'Speed',
             quality:            'Quality',
-            disableCaptions:    'Off'
+            disableCaptions:    'Off',
+            noCaptions:         'No Captions'
         },
         types: {
             embed:              ['youtube', 'vimeo', 'soundcloud'],
@@ -3134,9 +3135,11 @@
                 html = [];
 
             var tracks = plyr.media.textTracks,
+                captionsEnabled = (plyr.storage.captionsEnabled === true || plyr.storage.captionsEnabled === undefined),
                 j;
             for (j = 0; j < tracks.length; j++) {
-                var hasCaption = ((plyr.storage.captionsEnabled === true || plyr.storage.captionsEnabled === undefined) && j === 0);
+                var isFirst = (j === 0),
+                    hasCaption = (captionsEnabled && isFirst);
                 html.push(
                     '<li>',
                         '<button type="button" class="',
@@ -3151,7 +3154,8 @@
                 }
             }
 
-            html.push(
+            if (tracks.length > 0) {
+                html.push(
                     '<li>',
                         '<button type="button" class="',
                             ((plyr.storage.captionsEnabled === false) ?
@@ -3160,7 +3164,16 @@
                                 config.i18n.disableCaptions,
                         '</button>',
                     '</li>'
-            );
+                );
+            } else {
+                html.push(
+                    '<li>',
+                        '<button type="button">',
+                            config.i18n.noCaptions,
+                        '</button>',
+                    '</li>'
+                );
+            }
 
             // To string
             html = html.join('');
