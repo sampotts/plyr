@@ -3258,7 +3258,7 @@
                     plyr.embed.unload().then(cleanUp);
 
                     // Vimeo does not always return
-                    window.setTimeout(cleanUp, 200);
+                    timers.cleanUp = window.setTimeout(cleanUp, 200);
 
                     break;
 
@@ -3274,6 +3274,8 @@
             }
 
             function cleanUp() {
+                clearTimeout(timers.cleanUp);
+
                 // Default to restore original element
                 if (!_is.boolean(restore)) {
                     restore = true;
