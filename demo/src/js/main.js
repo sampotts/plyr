@@ -9,7 +9,7 @@
 // General functions
 ;(function() {
     //document.body.addEventListener('ready', function(event) { console.log(event); });
-    
+
     // Setup the player
     var instances = plyr.setup({
         debug:              true,

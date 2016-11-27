@@ -61,14 +61,14 @@
         height: (@plyr-range-thumb-height * @plyr-range-thumb-active-scale);
         width: 100%;
         margin: 0;
-        padding: 0; 
+        padding: 0;
         vertical-align: middle;
-        
+
         appearance: none;
         cursor: pointer;
         border: none;
         background: transparent;
-        
+
         // WebKit
         &::-webkit-slider-runnable-track {
             .plyr-range-track();
@@ -86,7 +86,7 @@
         &::-moz-range-thumb {
             .plyr-range-thumb();
         }
-        
+
         // Microsoft
         &::-ms-track {
             height: @plyr-range-track-height;
@@ -104,7 +104,7 @@
         &::-ms-thumb {
             .plyr-range-thumb();
             // For some reason, Edge uses the -webkit margin above
-            margin-top: 0; 
+            margin-top: 0;
         }
         &::-ms-tooltip {
             display: none;
@@ -116,11 +116,11 @@
         }
         &::-moz-focus-outer {
             border: 0;
-        }        
+        }
         &.tab-focus:focus {
             outline-offset: 3px;
         }
-        
+
         // Pressed styles
         &:active {
             &::-webkit-slider-thumb {
@@ -179,9 +179,10 @@
 .plyr__video-embed {
     padding-bottom: 56.25%; /* 16:9 */
     height: 0;
-    overflow: hidden;
+    border-radius: inherit;
 
-    // Require z-index to force border-radius
+    // Require overflow and z-index to force border-radius
+    overflow: hidden;
     z-index: 0;
 
     iframe {
@@ -192,7 +193,6 @@
         height: 100%;
         border: 0;
         user-select: none;
-        z-index: 1;
     }
 
     // Vimeo hack
@@ -265,7 +265,7 @@
 // Playback controls
 .plyr__controls {
     display: flex;
-    align-items: center; 
+    align-items: center;
     line-height: 1;
     text-align: center;
 
@@ -329,7 +329,7 @@
         }
     }
 }
-// Hide controls 
+// Hide controls
 .plyr--hide-controls .plyr__controls {
     opacity: 0;
     pointer-events: none;
@@ -341,6 +341,7 @@
     left: 0;
     right: 0;
     bottom: 0;
+    z-index: 2;
     padding: (@plyr-control-spacing * 5) @plyr-control-spacing @plyr-control-spacing;
     background: linear-gradient(fade(@plyr-video-controls-bg, 0%), fade(@plyr-video-controls-bg, 50%));
     border-bottom-left-radius: inherit;
@@ -476,7 +477,7 @@
         height: 0;
         left: 50%;
         transform: translateX(-50%);
-    
+
         // The background triangle
         bottom: -@plyr-tooltip-arrow-size;
         border-right: @plyr-tooltip-arrow-size solid transparent;
@@ -624,16 +625,16 @@
     }
     &::-moz-progress-bar {
         transition: width .2s ease;
-    }    
+    }
     &::-ms-fill {
         transition: width .2s ease;
-    }            
+    }
 }
 .plyr--video .plyr__progress--buffer,
 .plyr--video .plyr__volume--display {
     background: @plyr-video-range-track-bg;
 }
-.plyr--video .plyr__progress--buffer { 
+.plyr--video .plyr__progress--buffer {
     color: @plyr-video-progress-buffered-bg;
 }
 .plyr--audio .plyr__progress--buffer,
@@ -739,6 +740,10 @@
     .plyr__video-wrapper {
         height: 100%;
         width: 100%;
+    }
+    .plyr__video-embed {
+        // Revert overflow change
+        overflow: visible;
     }
     .plyr__controls {
         position: absolute;
