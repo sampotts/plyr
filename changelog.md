@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.0.11
+- Fix for `cleanUp` being called twice (thanks to @sebastiancarlsson)
+- Fix for YouTube controls on iPad (fixes #391)
+
 ## v2.0.10
 - Added seek event fixes for Vimeo and YouTube (fixes #409)
 - Added support for embed URLs rather than ID only (fixes #345)
@@ -21,10 +25,10 @@
 
 ## v2.0.6
 - Fixed merge issue with `Updated define to work with AMD imports #326` PR
-- Code formatting 
+- Code formatting
 
 ## v2.0.5
-- Fix for Vimeo in IE9 & IE10 
+- Fix for Vimeo in IE9 & IE10
 - Fix for HTML5 elements not firing `ready` event
 
 ## v2.0.4
@@ -44,8 +48,8 @@ This version contains several potential ***breaking changes***:
 
 - `setup()` has been reverted to pre v1.8.0 behaviour; meaning it will return the *instance* rather than the *element*. This is because the reference to the instance is no longer added to the original element (see below).
 - The reference to the `plyr` instance is now added to the media element rather than original container. This is because if a container with multiple children was passed to `setup()` the references to all instances would have been added to the container, creating issues. I would recommend using the return value from `setup()` or the new `get()` method to access the instance.
-- Players will always be wrapped in their own div now - this makes `setup()` and `destroy()` cleaner. This *may* break any custom styling based on DOM position. 
-- Players no longer seek to 0 on 'ended' - this is to fix a bug with Microsoft Edge as it triggers 'ended' on media change for whatever reason. They'll never change ;-) 
+- Players will always be wrapped in their own div now - this makes `setup()` and `destroy()` cleaner. This *may* break any custom styling based on DOM position.
+- Players no longer seek to 0 on 'ended' - this is to fix a bug with Microsoft Edge as it triggers 'ended' on media change for whatever reason. They'll never change ;-)
 
 And some other changes and bug fixes:
 
@@ -75,7 +79,7 @@ And some other changes and bug fixes:
 
 ## v1.8.11
 - Fix for keyboard navigation on Vimeo (Fixes #317)
-- Fix for bug introduced in v1.8.9 related to additional controls 
+- Fix for bug introduced in v1.8.9 related to additional controls
 - Vimeo API upgrade
 - Fix for YouTube bug introduced in v1.8.9
 - Added support for passing array to .setup() (Fixes #319)
@@ -115,20 +119,20 @@ And some other changes and bug fixes:
 - Improvements for controls hiding and showing on touch devices
 
 ## v1.8.2
-- Fixed event bubbling 
+- Fixed event bubbling
 
 ## v1.8.1
 - Fixed inaccurate log message
 
 # v1.8.0
 - ***(Important)*** `setup()` now returns the element Plyr was setup on rather than the `plyr` object. This means `var player = plyr.setup()[0];` would now be `var player = plyr.setup()[0].plyr;`. This improves support for React and other virtual dom frameworks as mentioned in #254
-- Fixed using a relative URL for `iconUrl` in IE (fixes #269) 
+- Fixed using a relative URL for `iconUrl` in IE (fixes #269)
 
 # v1.7.0
 - SASS cleanup (fixes #265)
 - Docs tidy up to help quick start (fixes #253)
 - Fix for issues with data attribute options passing (fixes #257)
-- ***(Important)*** Removed the requirement for a wrapper div to setup Plyr and removed the dependency on the `plyr` classname as a JS hook. By default it will now look for `<video>`, `<audio>` and `[data-type]` elements. If you are just calling `setup()` with a `<div class="plyr">` you may want to give it a good test after upgrading. You can probably remove the wrapper div. The reason behind this is to make setup easier for newcomers and prevent the styling being used on unsupported players (because the plyr classname was used as a CSS and JS hook - which isn't ideal) 
+- ***(Important)*** Removed the requirement for a wrapper div to setup Plyr and removed the dependency on the `plyr` classname as a JS hook. By default it will now look for `<video>`, `<audio>` and `[data-type]` elements. If you are just calling `setup()` with a `<div class="plyr">` you may want to give it a good test after upgrading. You can probably remove the wrapper div. The reason behind this is to make setup easier for newcomers and prevent the styling being used on unsupported players (because the plyr classname was used as a CSS and JS hook - which isn't ideal)
 - Renamed the 'docs' folder to `demo` to avoid confusion - the readme is the docs after all
 
 ## v1.6.20
@@ -158,7 +162,7 @@ And some other changes and bug fixes:
 - Decreased sensitivity and inverted scroll on volume slider (scroll up to increase, down to decrease)
 
 ## v1.6.12
-- Fix for undefined buffer error 
+- Fix for undefined buffer error
 - Add scroll listener on volume slider (PR #227 bty @igoradamenko)
 
 ## v1.6.11
@@ -200,13 +204,13 @@ And some other changes and bug fixes:
 - Other minor bug fixes
 
 ## v1.6.1
-- Tooltip changes for accessibility 
+- Tooltip changes for accessibility
 
 ## v1.6.0
 - New, cleaner, UI:
 	- Controls are now overlaid, maintaining the video's ratio and making sizing easier
 	- A large play button can now be overlaid over videos
-	- Default number of control buttons reduced 
+	- Default number of control buttons reduced
 	- New play, pause, rewind and fast forward icons
 	- Flexbox all the things!
 - Tidied up the LESS (and SCSS) as part of the above, variables and mixins in seprate files amking customization and upgrades easier
