@@ -1557,7 +1557,7 @@
             // Binding captions value for menu
             if (_inArray(config.controls, 'captions')) {
                 var captionMenuButton = getMenuButton('captions');
-                plyr.currentCaptionLabel = new DataBind(captionMenuButton, 'textContent', config.i18n.disableCaptions);
+                plyr.currentCaptionLabel = new DataBind(captionMenuButton, 'textContent', config.i18n.noCaptions);
                 // Inject caption menu item
                 _buildCaptionControl();
             }
@@ -3168,11 +3168,12 @@
             } else {
                 html.push(
                     '<li>',
-                        '<button type="button">',
+                        '<button type="button" data-plyr="captions">',
                             config.i18n.noCaptions,
                         '</button>',
                     '</li>'
                 );
+                plyr.currentCaptionLabel.change(config.i18n.noCaptions);
             }
 
             // To string
