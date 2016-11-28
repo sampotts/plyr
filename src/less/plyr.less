@@ -501,7 +501,6 @@
 }
 
 // Some options are hidden by default
-.plyr [data-plyr='captions'],
 .plyr [data-plyr='zoom'],
 .plyr [data-plyr='fullscreen'] {
     display: none;
@@ -594,6 +593,7 @@
             }
             button {
                 padding-left: ceil(@plyr-control-padding * 2.5);
+                text-align: left;
             }
             button.plyr__menu__btn--active::before {
                 content: "";
