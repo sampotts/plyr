@@ -1340,10 +1340,14 @@
                 } else {
                     var tc1 = [],
                         tc2 = [],
-                        seconds;
+                        seconds = 0;
                     tc1 = tc.split(',');
                     tc2 = tc1[0].split(':');
-                    seconds = Math.floor(tc2[0]*60*60) + Math.floor(tc2[1]*60) + Math.floor(tc2[2]);
+
+                    for (var i = 0, len = tc2.length; i < len; i++) {
+                        seconds += Math.floor(tc2[i]*(Math.pow(60, len-(i+1))));
+                    }
+                    
                     return seconds;
                 }
             }
