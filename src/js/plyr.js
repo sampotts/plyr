@@ -1252,24 +1252,21 @@
                                     
                                     captions = req.split(lineSeparator + lineSeparator);
 
+                                    var numOfAvailableCaptions = 0;
+                                    
                                     for (var r = 0; r < captions.length; r++) {
                                         caption = captions[r];
-                                        plyr.captions[r] = [];
 
                                         // Get the parts of the captions
                                         var parts = caption.split(lineSeparator),
                                             index = 0;
 
                                         // Incase caption numbers are added
-                                        if (parts[index].indexOf(":") === -1) {
-                                            index = 1;
+                                        if (parts[index].indexOf(":") !== -1) {
+                                            plyr.captions[numOfAvailableCaptions] = [parts[index], parts[index + 1]];
+                                            numOfAvailableCaptions ++;
                                         }
-
-                                        plyr.captions[r] = [parts[index], parts[index + 1]];
                                     }
-
-                                    // Remove first element ('VTT')
-                                    plyr.captions.shift();
 
                                     _log('Successfully loaded the caption file via AJAX');
                                 } else {
