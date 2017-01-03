@@ -266,6 +266,14 @@
 .plyr--hide-controls .plyr__captions {
     transform: translateY(-(@plyr-control-spacing * 1.5));
 }
+// 字幕置頂
+.plyr--captions-top .plyr__captions {
+    // 將字幕置頂
+    top: 0;
+    // 因為字幕在上方的情況下，不需要再根據控制介面的顯示與否來調整 Y 值，
+    // 所以 reset translateY 值。
+    transform: translateY(0);
+}
 
 // Controls
 // --------------------------------------------------------------

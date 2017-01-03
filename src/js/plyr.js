@@ -119,7 +119,9 @@
             isTouch:            'plyr--is-touch',
             captions: {
                 enabled:        'plyr--captions-enabled',
-                active:         'plyr--captions-active'
+                active:         'plyr--captions-active',
+                // 字幕置頂的 Modifier
+                top:            'plyr--captions-top'
             },
             zoom: {
                 enabled:        'plyr--zoom-enabled',
@@ -153,27 +155,30 @@
         },
         controls:               ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'settings', 'fullscreen'],
         i18n: {
-            restart:            'Restart',
-            rewind:             'Rewind {seektime} secs',
-            play:               'Play',
-            pause:              'Pause',
-            forward:            'Forward {seektime} secs',
-            played:             'played',
-            buffered:           'buffered',
-            currentTime:        'Current time',
-            duration:           'Duration',
-            volume:             'Volume',
-            toggleMute:         'Toggle Mute',
-            toggleCaptions:     'Toggle Captions',
-            toggleZoom:         'Toggle Zoom',
-            toggleFullscreen:   'Toggle Fullscreen',
-            frameTitle:         'Player for {title}',
-            captions:           'Captions',
-            settings:           'Settings',
-            speed:              'Speed',
-            quality:            'Quality',
-            disableCaptions:    'Off',
-            noCaptions:         'No Captions'
+            restart:                'Restart',
+            rewind:                 'Rewind {seektime} secs',
+            play:                   'Play',
+            pause:                  'Pause',
+            forward:                'Forward {seektime} secs',
+            played:                 'played',
+            buffered:               'buffered',
+            currentTime:            'Current time',
+            duration:               'Duration',
+            volume:                 'Volume',
+            toggleMute:             'Toggle Mute',
+            toggleCaptions:         'Toggle Captions',
+            toggleZoom:             'Toggle Zoom',
+            toggleFullscreen:       'Toggle Fullscreen',
+            frameTitle:             'Player for {title}',
+            captions:               'Captions',
+            settings:               'Settings',
+            speed:                  'Speed',
+            quality:                'Quality',
+            disableCaptions:        'Off',
+            noCaptions:             'No Captions',
+            captionsPositionTitle:  'Captions Position',
+            captionsPositionBottom: 'Bottom',
+            captionsPositionTop:    'Top'
         },
         types: {
             embed:              ['youtube', 'vimeo', 'soundcloud'],
@@ -956,6 +961,16 @@
                 );
             }
 
+            // Captions position menu button
+            if (_inArray(config.controls, 'captions')) {
+                html.push(
+                                                    '<li role="tab">',
+                                                        '<button type="button" class="plyr__menu__btn plyr__menu__btn--forward" id="plyr-settings-{id}-captions-position-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-captions-position" aria-expanded="false">', config.i18n.captionsPositionTitle + ' <span class="plyr__menu__btn__value">' + config.i18n.captionsPositionBottom + '</span>',
+                                                        '</button>',
+                                                    '</li>'
+                );
+            }
+
             // Speeds menu button
             if (_inArray(config.controls, 'speed')) {
                 html.push(
@@ -987,6 +1002,18 @@
                                                 '<ul>',
                                                     '<li role="tab">',
                                                         '<button type="button" class="plyr__menu__btn plyr__menu__btn--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">', config.i18n.captions,
+                                                        '</button>',
+                                                    '</li>',
+                                                '</ul>',
+                                            '</div>' // End of .plyr__menu__secondary
+            );
+
+            // Captions position menu item
+            html.push(
+                                            '<div class="plyr__menu__secondary" id="plyr-settings-{id}-captions-position" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-captions-position-toggle" role="tabpanel" tabindex="-1">',
+                                                '<ul>',
+                                                    '<li role="tab">',
+                                                        '<button type="button" class="plyr__menu__btn plyr__menu__btn--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">', config.i18n.captionsPositionTitle,
                                                         '</button>',
                                                     '</li>',
                                                 '</ul>',
@@ -1563,8 +1590,15 @@
             if (_inArray(config.controls, 'captions')) {
                 var captionMenuButton = getMenuButton('captions');
                 plyr.currentCaptionLabel = new DataBind(captionMenuButton, 'textContent', config.i18n.noCaptions);
+
+                // Binding captions position menu button's textContent
+                var captionPositionMenuButton = getMenuButton('captions-position');
+                plyr.currentCaptionPositionLabel = new DataBind(captionPositionMenuButton, 'textContent', config.i18n.captionsPositionBottom);
+
                 // Inject caption menu item
                 _buildCaptionControl();
+                // Inject caption position menu item
+                _buildCaptionPositionControl();
             }
 
             // Binding quality value for menu
@@ -2703,6 +2737,23 @@
             }
         }
 
+        /**
+         * 設定字幕位置
+         * 
+         * @param {string} position 'top' 置頂，其它預設置底
+         */
+        function _setCaptionPosition(position) {
+            if (position === 'top') {
+                _toggleClass(plyr.container, config.classes.captions.top, true);
+                
+                plyr.currentCaptionPositionLabel.change(config.i18n.captionsPositionTop);
+            } else {
+                _toggleClass(plyr.container, config.classes.captions.top, false);
+
+                plyr.currentCaptionPositionLabel.change(config.i18n.captionsPositionBottom)
+            }
+        }
+
         // Check if media is loading
         function _checkLoading(event) {
             var loading = (event.type === 'waiting');
@@ -3190,6 +3241,43 @@
             }
         }
 
+        // Build caption position menu items
+        function _buildCaptionPositionControl() {
+            var i,
+                buttons = _getElements('li > button[data-plyr=captions-position]');
+
+            // Remove exist captions position menu items
+            for (i=0; i<buttons.length; i++) {
+                buttons[i].parentNode.remove();
+            }
+
+            // Build HTML
+            var query = '#plyr-settings-' + plyr.controlsId + '-captions-position > ul',
+                ul = _getElement(query),
+                html = [];
+
+            html.push(
+                '<li>',
+                    '<button type="button" class="" data-plyr="captions-position" data-plyr-captions-position="top">',
+                        config.i18n.captionsPositionTop,
+                    '</button>',
+                '</li>',
+                '<li>',
+                    '<button type="button" class="plyr__menu__btn--active" data-plyr="captions-position" data-plyr-captions-position="bottom">',
+                        config.i18n.captionsPositionBottom,
+                    '</button>',
+                '</li>'
+            );
+
+            html = html.join('');
+
+            if (ul) {
+                ul.insertAdjacentHTML('beforeend', html);
+            }
+
+            plyr.currentCaptionPositionLabel.change(config.i18n.captionsPositionBottom);
+        }
+
         // Build quality menu items
         function _buildQualityControl() {
             var HD_RESOLUTION = 720,
@@ -3341,6 +3429,7 @@
             if (!_is.undefined(source)) {
                 _updateSource(source);
                 _buildCaptionControl();
+                _buildCaptionPositionControl();
                 _buildQualityControl();
                 return;
             }
@@ -3782,7 +3871,8 @@
                     var settingsObj = {
                         'data-plyr-captions': _toggleCaptionIndex,
                         'data-plyr-speed': _speed,
-                        'data-plyr-quality': _setQuality
+                        'data-plyr-quality': _setQuality,
+                        'data-plyr-captions-position': _setCaptionPosition
                     };
                     var setting = toggle.getAttribute('data-plyr');
                     var settingAttr = 'data-plyr-' + setting;
