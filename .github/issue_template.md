@@ -16,7 +16,7 @@ Please use this issue template as it makes replicating and fixing the issue easi
 - Operating System:
 - Version: 
 
-Players effected:
+Players affected:
 - [ ] HTML5 Video
 - [ ] HTML5 Audio
 - [ ] YouTube
