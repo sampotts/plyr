@@ -197,23 +197,23 @@
             // Events to watch on HTML5 media elements
             events: ['ready', 'ended', 'progress', 'stalled', 'playing', 'waiting', 'canplay', 'canplaythrough', 'loadstart', 'loadeddata', 'loadedmetadata', 'timeupdate', 'volumechange', 'play', 'pause', 'error', 'seeking', 'seeked', 'emptied'],
             // Logging
-            logPrefix: ''
+            logPrefix: '[Plyr]'
         };
 
     // Credits: http://paypal.github.io/accessible-html5-video-player/
     // Unfortunately, due to mixed support, UA sniffing is required
-    function getBrowser() {
-        var ua = navigator.userAgent,
-            name = navigator.appName,
-            fullVersion = '' + parseFloat(navigator.appVersion),
-            majorVersion = parseInt(navigator.appVersion, 10),
-            nameOffset,
-            verOffset,
-            ix,
-            isIE = false,
-            isFirefox = false,
-            isChrome = false,
-            isSafari = false;
+    function _getBrowser() {
+        var ua = navigator.userAgent;
+        var name = navigator.appName;
+        var fullVersion = '' + parseFloat(navigator.appVersion);
+        var majorVersion = parseInt(navigator.appVersion, 10);
+        var nameOffset;
+        var verOffset;
+        var ix;
+        var isIE = false;
+        var isFirefox = false;
+        var isChrome = false;
+        var isSafari = false;
 
         if ((navigator.appVersion.indexOf('Windows NT') !== -1) && (navigator.appVersion.indexOf('rv:11') !== -1)) {
             // MSIE 11
@@ -235,6 +235,7 @@
             isSafari = true;
             name = 'Safari';
             fullVersion = ua.substring(verOffset + 7);
+
             if ((verOffset = ua.indexOf('Version')) !== -1) {
                 fullVersion = ua.substring(verOffset + 8);
             }
@@ -282,29 +283,30 @@
     }
 
     // Inject a script
-    function injectScript(source) {
+    function _injectScript(source) {
         if (document.querySelectorAll('script[src="' + source + '"]').length) {
             return;
         }
 
         var tag = document.createElement('script');
         tag.src = source;
+
         var firstScriptTag = document.getElementsByTagName('script')[0];
         firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
     }
 
     // Element exists in an array
-    function inArray(haystack, needle) {
+    function _inArray(haystack, needle) {
         return Array.prototype.indexOf && (haystack.indexOf(needle) !== -1);
     }
 
     // Replace all
-    function replaceAll(string, find, replace) {
+    function _replaceAll(string, find, replace) {
         return string.replace(new RegExp(find.replace(/([.*+?\^=!:${}()|\[\]\/\\])/g, '\\$1'), 'g'), replace);
     }
 
     // Wrap an element
-    function wrap(elements, wrapper) {
+    function _wrap(elements, wrapper) {
         // Convert `elements` to an array, if necessary.
         if (!elements.length) {
             elements = [elements];
@@ -338,7 +340,7 @@
     }
 
     // Remove an element
-    function remove(element) {
+    function _remove(element) {
         if (!element) {
             return;
         }
@@ -346,36 +348,36 @@
     }
 
     // Prepend child
-    function prependChild(parent, element) {
+    function _prependChild(parent, element) {
         parent.insertBefore(element, parent.firstChild);
     }
 
     // Set attributes
-    function setAttributes(element, attributes) {
+    function _setAttributes(element, attributes) {
         for (var key in attributes) {
-            element.setAttribute(key, (is.boolean(attributes[key]) && attributes[key]) ? '' : attributes[key]);
+            element.setAttribute(key, (_is.boolean(attributes[key]) && attributes[key]) ? '' : attributes[key]);
         }
     }
 
     // Insert a HTML element
-    function insertElement(type, parent, attributes) {
+    function _insertElement(type, parent, attributes) {
         // Create a new <element>
         var element = document.createElement(type);
 
         // Set all passed attributes
-        setAttributes(element, attributes);
+        _setAttributes(element, attributes);
 
         // Inject the new element
-        prependChild(parent, element);
+        _prependChild(parent, element);
     }
 
     // Get a classname from selector
-    function getClassname(selector) {
+    function _getClassname(selector) {
         return selector.replace('.', '');
     }
 
     // Toggle class on an element
-    function toggleClass(element, className, state) {
+    function _toggleClass(element, className, state) {
         if (element) {
             if (element.classList) {
                 element.classList[state ? 'add' : 'remove'](className);
@@ -387,7 +389,7 @@
     }
 
     // Has class name
-    function hasClass(element, className) {
+    function _hasClass(element, className) {
         if (element) {
             if (element.classList) {
                 return element.classList.contains(className);
@@ -399,19 +401,23 @@
     }
 
     // Element matches selector
-    function matches(element, selector) {
-        var p = Element.prototype;
+    function _matches(element, selector) {
+        var prototype = Element.prototype;
 
-        var f = p.matches || p.webkitMatchesSelector || p.mozMatchesSelector || p.msMatchesSelector || function(s) {
-            return [].indexOf.call(document.querySelectorAll(s), this) !== -1;
-        };
+        var matches = prototype.matches ||
+            prototype.webkitMatchesSelector ||
+            prototype.mozMatchesSelector ||
+            prototype.msMatchesSelector ||
+            function(s) {
+                return [].indexOf.call(document.querySelectorAll(s), this) !== -1;
+            };
 
-        return f.call(element, selector);
+        return matches.call(element, selector);
     }
 
     // Bind along with custom handler
-    function proxyListener(element, eventName, userListener, defaultListener, useCapture) {
-        on(element, eventName, function(event) {
+    function _proxyListener(element, eventName, userListener, defaultListener, useCapture) {
+        _on(element, eventName, function(event) {
             if (userListener) {
                 userListener.apply(element, [event]);
             }
@@ -420,12 +426,12 @@
     }
 
     // Toggle event listener
-    function toggleListener(elements, events, callback, toggle, useCapture) {
+    function _toggleListener(elements, events, callback, toggle, useCapture) {
         var eventList = events.split(' ');
 
         // Whether the listener is a capturing listener or not
         // Default to false
-        if (!is.boolean(useCapture)) {
+        if (!_is.boolean(useCapture)) {
             useCapture = false;
         }
 
@@ -433,7 +439,7 @@
         if (elements instanceof NodeList) {
             for (var x = 0; x < elements.length; x++) {
                 if (elements[x] instanceof Node) {
-                    toggleListener(elements[x], arguments[1], arguments[2], arguments[3]);
+                    _toggleListener(elements[x], arguments[1], arguments[2], arguments[3]);
                 }
             }
             return;
@@ -446,28 +452,28 @@
     }
 
     // Bind event handler
-    function on(element, events, callback, useCapture) {
-        if (!is.undefined(element)) {
-            toggleListener(element, events, callback, true, useCapture);
+    function _on(element, events, callback, useCapture) {
+        if (!_is.undefined(element)) {
+            _toggleListener(element, events, callback, true, useCapture);
         }
     }
 
     // Unbind event handler
-    function off(element, events, callback, useCapture) {
-        if (!is.undefined(element)) {
-            toggleListener(element, events, callback, false, useCapture);
+    function _off(element, events, callback, useCapture) {
+        if (!_is.undefined(element)) {
+            _toggleListener(element, events, callback, false, useCapture);
         }
     }
 
     // Trigger event
-    function event(element, type, bubbles, properties) {
+    function _event(element, type, bubbles, properties) {
         // Bail if no element
         if (!element || !type) {
             return;
         }
 
         // Default bubbles to false
-        if (!is.boolean(bubbles)) {
+        if (!_is.boolean(bubbles)) {
             bubbles = false;
         }
 
@@ -483,14 +489,14 @@
 
     // Toggle aria-pressed state on a toggle button
     // http://www.ssbbartgroup.com/blog/how-not-to-misuse-aria-states-properties-and-roles
-    function toggleState(target, state) {
+    function _toggleState(target, state) {
         // Bail if no target
         if (!target) {
             return;
         }
 
         // Get state
-        state = (is.boolean(state) ? state : !target.getAttribute('aria-pressed'));
+        state = (_is.boolean(state) ? state : !target.getAttribute('aria-pressed'));
 
         // Set the attribute on target
         target.setAttribute('aria-pressed', state);
@@ -499,7 +505,7 @@
     }
 
     // Get percentage
-    function getPercentage(current, max) {
+    function _getPercentage(current, max) {
         if (current === 0 || max === 0 || isNaN(current) || isNaN(max)) {
             return 0;
         }
@@ -509,7 +515,7 @@
     // Deep extend/merge destination object with N more objects
     // http://andrewdupont.net/2009/08/28/deep-extending-objects-in-javascript/
     // Removed call to arguments.callee (used explicit function name instead)
-    function extend() {
+    function _extend() {
         // Get arguments
         var objects = arguments;
 
@@ -534,7 +540,7 @@
             for (var property in source) {
                 if (source[property] && source[property].constructor && source[property].constructor === Object) {
                     destination[property] = destination[property] || {};
-                    extend(destination[property], source[property]);
+                    _extend(destination[property], source[property]);
                 } else {
                     destination[property] = source[property];
                 }
@@ -544,26 +550,8 @@
         return destination;
     }
 
-    // Loop through an object or array
-    function each(variable, callback) {
-        if (is.object(variable)) {
-            for (var key in variable) {
-                if (variable.hasOwnProperty(key)) {
-                    var element = variable[key];
-                    callback.call(element, key, element);
-                }
-            }
-        } else if (is.array(variable)) {
-            var length = variable.length;
-            for (var index = 0; index < length; index++) {
-                var item = variable[index];
-                callback.call(item, index, item);
-            }
-        }
-    }
-
     // Check variable types
-    var is = {
+    var _is = {
         object: function(input) {
             return input !== null && typeof(input) === 'object' && input.constructor === Object;
         },
@@ -600,89 +588,97 @@
     };
 
     // Parse YouTube ID from url
-    function parseYouTubeId(url) {
+    function _parseYouTubeId(url) {
         var regex = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
         return (url.match(regex)) ? RegExp.$2 : url;
     }
 
     // Parse Vimeo ID from url
-    function parseVimeoId(url) {
+    function _parseVimeoId(url) {
         var regex = /^.*(vimeo.com\/|video\/)(\d+).*/;
         return (url.match(regex)) ? RegExp.$2 : url;
     }
 
     // Fullscreen API
-    // Determine the prefix
-    var prefix = false;
+    var _fullscreen;
+    (function() {
+        // Determine the prefix
+        var prefix = (function() {
+            var value = false;
 
-    if (is.function(document.cancelFullScreen)) {
-        prefix = '';
-    } else {
-        // Check for fullscreen support by vendor prefix
-        ['webkit', 'o', 'moz', 'ms', 'khtml'].some(function(test) {
-            if (is.function(document[test + 'CancelFullScreen'])) {
-                prefix = test;
-                return true;
-            } else if (is.function(document.msExitFullscreen) && document.msFullscreenEnabled) {
-                // Special case for MS (when isn't it?)
-                prefix = 'ms';
-                return true;
-            }
-        });
-    }
-
-    var fullscreen = {
-        prefix: prefix,
-
-        // Yet again Microsoft awesomeness,
-        // Sometimes the prefix is 'ms', sometimes 'MS' to keep you on your toes
-        eventType: (prefix === 'ms' ? 'MSFullscreenChange' : prefix + 'fullscreenchange'),
-
-        // Is an element fullscreen
-        isFullScreen: function(element) {
-            if (!support.fullscreen) {
-                return false;
-            }
-            if (is.undefined(element)) {
-                element = document.body;
-            }
-            switch (this.prefix) {
-                case '':
-                    return document.fullscreenElement === element;
-                case 'moz':
-                    return document.mozFullScreenElement === element;
-                default:
-                    return document[prefix + 'FullscreenElement'] === element;
-            }
-        },
-        requestFullScreen: function(element) {
-            if (!support.fullscreen) {
-                return false;
-            }
-            if (!is.htmlElement(element)) {
-                element = document.body;
+            if (_is.function(document.cancelFullScreen)) {
+                value = '';
+            } else {
+                // Check for fullscreen support by vendor prefix
+                ['webkit', 'o', 'moz', 'ms', 'khtml'].some(function(prefix) {
+                    if (_is.function(document[prefix + 'CancelFullScreen'])) {
+                        value = prefix;
+                        return true;
+                    } else if (_is.function(document.msExitFullscreen) && document.msFullscreenEnabled) {
+                        // Special case for MS (when isn't it?)
+                        value = 'ms';
+                        return true;
+                    }
+                });
             }
 
-            return (prefix === '') ? element.requestFullScreen() : element[prefix + (prefix === 'ms' ? 'RequestFullscreen' : 'RequestFullScreen')]();
-        },
-        cancelFullScreen: function() {
-            if (!support.fullscreen) {
-                return false;
+            return value;
+        })();
+
+        _fullscreen = {
+            prefix: prefix,
+            // Yet again Microsoft awesomeness,
+            // Sometimes the prefix is 'ms', sometimes 'MS' to keep you on your toes
+            eventType: (prefix === 'ms' ? 'MSFullscreenChange' : prefix + 'fullscreenchange'),
+
+            // Is an element fullscreen
+            isFullScreen: function(element) {
+                if (!_support.fullscreen) {
+                    return false;
+                }
+                if (_is.undefined(element)) {
+                    element = document.body;
+                }
+                switch (this.prefix) {
+                    case '':
+                        return document.fullscreenElement === element;
+                    case 'moz':
+                        return document.mozFullScreenElement === element;
+                    default:
+                        return document[prefix + 'FullscreenElement'] === element;
+                }
+            },
+            requestFullScreen: function(element) {
+                if (!_support.fullscreen) {
+                    return false;
+                }
+                if (!_is.htmlElement(element)) {
+                    element = document.body;
+                }
+
+                console.log(prefix);
+
+                return (prefix === '') ? element.requestFullScreen() : element[prefix + (prefix === 'ms' ? 'RequestFullscreen' : 'RequestFullScreen')]();
+            },
+            cancelFullScreen: function() {
+                if (!_support.fullscreen) {
+                    return false;
+                }
+                return (prefix === '') ? document.cancelFullScreen() : document[prefix + (prefix === 'ms' ? 'ExitFullscreen' : 'CancelFullScreen')]();
+            },
+            element: function() {
+                if (!_support.fullscreen) {
+                    return null;
+                }
+                return (prefix === '') ? document.fullscreenElement : document[prefix + 'FullscreenElement'];
             }
-            return (prefix === '') ? document.cancelFullScreen() : document[prefix + (prefix === 'ms' ? 'ExitFullscreen' : 'CancelFullScreen')]();
-        },
-        element: function() {
-            if (!support.fullscreen) {
-                return null;
-            }
-            return (prefix === '') ? document.fullscreenElement : document[prefix + 'FullscreenElement'];
-        }
-    };
+        };
+    })();
 
     // Check for support
-    var support = {
+    var _support = {
         // Fullscreen support and set prefix
-        fullscreen: fullscreen.prefix !== false,
+        fullscreen: _fullscreen.prefix !== false,
         // Local storage mode
         // We can't assume if local storage is present that we can use it
         storage: (function() {
@@ -713,12 +709,12 @@
         // Picture-in-picture support
         // Safari only currently
         pip: (function() {
-            return is.function(document.createElement('video').webkitSetPresentationMode);
+            return _is.function(document.createElement('video').webkitSetPresentationMode);
         })(),
         // Airplay support
         // Safari only currently
         airplay: (function() {
-            return is.function(window.WebKitPlaybackTargetAvailabilityEvent);
+            return _is.function(window.WebKitPlaybackTargetAvailabilityEvent);
         })(),
         // Check for mime type support against a player instance
         // Credits: http://diveintohtml5.info/everything.html
@@ -728,7 +724,7 @@
 
             try {
                 // Bail if no checking function
-                if (!is.function(media.canPlayType)) {
+                if (!_is.function(media.canPlayType)) {
                     return false;
                 }
 
@@ -763,46 +759,45 @@
 
     // Player instance
     function Plyr(media, config) {
-        var plyr = this,
-            timers = {},
-            api;
+        var plyr = this;
+        var timers = {};
+        var api;
 
         // Set media
         plyr.media = media;
         var original = media.cloneNode(true);
 
         // Trigger events, with plyr instance passed
-        function triggerEvent(element, type, bubbles, properties) {
-            event(element, type, bubbles, extend({}, properties, {
+        function _triggerEvent(element, type, bubbles, properties) {
+            _event(element, type, bubbles, _extend({}, properties, {
                 plyr: api
             }));
         }
 
-        // Debugging proxy
-        function debug(type, args) {
+        // Debugging
+        function _console(type, args) {
             if (config.debug && window.console) {
                 args = Array.prototype.slice.call(args);
 
-                // Add a logging prefix if set
-                if (!is.empty(config.logPrefix)) {
+                if (_is.string(config.logPrefix) && config.logPrefix.length) {
                     args.unshift(config.logPrefix);
                 }
 
                 console[type].apply(console, args);
             }
         }
-        var log = function() {
-            debug('log', arguments);
+        var _log = function() {
+            _console('log', arguments)
         };
-        var warn = function() {
-            debug('warn', arguments);
+        var _warn = function() {
+            _console('warn', arguments)
         };
 
         // Log config options
-        log('Config', config);
+        _log('Config', config);
 
         // Get icon URL
-        function getIconUrl() {
+        function _getIconUrl() {
             return {
                 url: config.iconUrl,
                 absolute: (config.iconUrl.indexOf("http") === 0) || plyr.browser.isIE
@@ -810,79 +805,93 @@
         }
 
         // Build the default HTML
-        function buildControls() {
+        function _buildControls() {
             // Create html array
-            var html = [],
-                iconUrl = getIconUrl(),
-                iconPath = (!iconUrl.absolute ? iconUrl.url : '') + '#' + config.iconPrefix;
+            var html = [];
+            var iconUrl = _getIconUrl();
+            var iconPath = (!iconUrl.absolute ? iconUrl.url : '') + '#' + config.iconPrefix;
 
             // Larger overlaid play button
-            if (inArray(config.controls, 'play-large')) {
+            if (_inArray(config.controls, 'play-large')) {
+                /* beautify ignore:start */
                 html.push(
                     '<button type="button" data-plyr="play" class="plyr__play-large">',
-                    '<svg><use xlink:href="' + iconPath + '-play" /></svg>',
-                    '<span class="plyr__sr-only">' + config.i18n.play + '</span>',
+                        '<svg><use xlink:href="' + iconPath + '-play" /></svg>',
+                        '<span class="plyr__sr-only">' + config.i18n.play + '</span>',
                     '</button>'
                 );
+                /* beautify ignore:end */
             }
 
             html.push('<div class="plyr__controls">');
 
             // Restart button
-            if (inArray(config.controls, 'restart')) {
+            if (_inArray(config.controls, 'restart')) {
+                /* beautify ignore:start */
                 html.push(
                     '<button type="button" class="plyr__control" data-plyr="restart">',
-                    '<svg><use xlink:href="' + iconPath + '-restart" /></svg>',
-                    '<span class="plyr__sr-only">' + config.i18n.restart + '</span>',
+                        '<svg><use xlink:href="' + iconPath + '-restart" /></svg>',
+                        '<span class="plyr__sr-only">' + config.i18n.restart + '</span>',
                     '</button>'
                 );
+                /* beautify ignore:end */
             }
 
             // Rewind button
-            if (inArray(config.controls, 'rewind')) {
+            if (_inArray(config.controls, 'rewind')) {
+                /* beautify ignore:start */
                 html.push(
                     '<button type="button" class="plyr__control" data-plyr="rewind">',
-                    '<svg><use xlink:href="' + iconPath + '-rewind" /></svg>',
-                    '<span class="plyr__sr-only">' + config.i18n.rewind + '</span>',
+                        '<svg><use xlink:href="' + iconPath + '-rewind" /></svg>',
+                        '<span class="plyr__sr-only">' + config.i18n.rewind + '</span>',
                     '</button>'
                 );
+                /* beautify ignore:end */
             }
 
             // Play Pause button
             // TODO: This should be a toggle button really?
-            if (inArray(config.controls, 'play')) {
+            if (_inArray(config.controls, 'play')) {
+                /* beautify ignore:start */
                 html.push(
                     '<button type="button" class="plyr__control" data-plyr="play">',
-                    '<svg><use xlink:href="' + iconPath + '-play" /></svg>',
-                    '<span class="plyr__sr-only">' + config.i18n.play + '</span>',
+                        '<svg><use xlink:href="' + iconPath + '-play" /></svg>',
+                        '<span class="plyr__sr-only">' + config.i18n.play + '</span>',
                     '</button>',
                     '<button type="button" class="plyr__control" data-plyr="pause">',
-                    '<svg><use xlink:href="' + iconPath + '-pause" /></svg>',
-                    '<span class="plyr__sr-only">' + config.i18n.pause + '</span>',
+                        '<svg><use xlink:href="' + iconPath + '-pause" /></svg>',
+                        '<span class="plyr__sr-only">' + config.i18n.pause + '</span>',
                     '</button>'
                 );
+                /* beautify ignore:end */
             }
 
             // Fast forward button
-            if (inArray(config.controls, 'fast-forward')) {
+            if (_inArray(config.controls, 'fast-forward')) {
+                /* beautify ignore:start */
                 html.push(
                     '<button type="button" class="plyr__control" data-plyr="fast-forward">',
-                    '<svg><use xlink:href="' + iconPath + '-fast-forward" /></svg>',
-                    '<span class="plyr__sr-only">' + config.i18n.forward + '</span>',
+                        '<svg><use xlink:href="' + iconPath + '-fast-forward" /></svg>',
+                        '<span class="plyr__sr-only">' + config.i18n.forward + '</span>',
                     '</button>'
                 );
+                /* beautify ignore:end */
             }
 
             // Progress
-            if (inArray(config.controls, 'progress')) {
+            if (_inArray(config.controls, 'progress')) {
                 // Create progress
-                html.push('<span class="plyr__progress">',
-                    '<label for="seek-{id}" class="plyr__sr-only">Seek</label>',
-                    '<input id="seek-{id}" class="plyr__progress--seek" type="range" min="0" max="100" step="0.1" value="0" data-plyr="seek">',
-                    '<progress class="plyr__progress--played" max="100" value="0" role="presentation"></progress>',
-                    '<progress class="plyr__progress--buffer" max="100" value="0">',
-                    '<span>0</span>% ' + config.i18n.buffered,
-                    '</progress>');
+                /* beautify ignore:start */
+                html.push(
+                    '<span class="plyr__progress">',
+                        '<label for="seek-{id}" class="plyr__sr-only">Seek</label>',
+                        '<input id="seek-{id}" class="plyr__progress--seek" type="range" min="0" max="100" step="0.1" value="0" data-plyr="seek">',
+                        '<progress class="plyr__progress--played" max="100" value="0" role="presentation"></progress>',
+                        '<progress class="plyr__progress--buffer" max="100" value="0">',
+                        '<span>0</span>% ' + config.i18n.buffered,
+                    '</progress>'
+                );
+                /* beautify ignore:end */
 
                 // Seek tooltip
                 if (config.tooltips.seek) {
@@ -894,227 +903,236 @@
             }
 
             // Media current time display
-            if (inArray(config.controls, 'current-time')) {
+            if (_inArray(config.controls, 'current-time')) {
+                /* beautify ignore:start */
                 html.push(
                     '<span class="plyr__time">',
-                    '<span class="plyr__sr-only">' + config.i18n.currentTime + '</span>',
-                    '<span class="plyr__time--current">00:00</span>',
+                        '<span class="plyr__sr-only">' + config.i18n.currentTime + '</span>',
+                        '<span class="plyr__time--current">00:00</span>',
                     '</span>'
                 );
+                /* beautify ignore:end */
             }
 
             // Media duration display
-            if (inArray(config.controls, 'duration')) {
+            if (_inArray(config.controls, 'duration')) {
+                /* beautify ignore:start */
                 html.push(
                     '<span class="plyr__time">',
-                    '<span class="plyr__sr-only">' + config.i18n.duration + '</span>',
-                    '<span class="plyr__time--duration">00:00</span>',
+                        '<span class="plyr__sr-only">' + config.i18n.duration + '</span>',
+                        '<span class="plyr__time--duration">00:00</span>',
                     '</span>'
                 );
+                /* beautify ignore:end */
             }
 
             // Toggle mute button
-            if (inArray(config.controls, 'mute')) {
+            if (_inArray(config.controls, 'mute')) {
+                /* beautify ignore:start */
                 html.push(
                     '<button type="button" class="plyr__control" data-plyr="mute">',
-                    '<svg class="icon--muted"><use xlink:href="' + iconPath + '-muted" /></svg>',
-                    '<svg><use xlink:href="' + iconPath + '-volume" /></svg>',
-                    '<span class="plyr__sr-only">' + config.i18n.toggleMute + '</span>',
+                        '<svg class="icon--muted"><use xlink:href="' + iconPath + '-muted" /></svg>',
+                        '<svg><use xlink:href="' + iconPath + '-volume" /></svg>',
+                        '<span class="plyr__sr-only">' + config.i18n.toggleMute + '</span>',
                     '</button>'
                 );
+                /* beautify ignore:end */
             }
 
             // Volume range control
-            if (inArray(config.controls, 'volume')) {
+            if (_inArray(config.controls, 'volume')) {
+                /* beautify ignore:start */
                 html.push(
                     '<span class="plyr__volume">',
-                    '<label for="volume-{id}" class="plyr__sr-only">' + config.i18n.volume + '</label>',
-                    '<input id="volume-{id}" class="plyr__volume--input" type="range" min="' + config.volumeMin + '" max="' + config.volumeMax + '" value="' + config.volume + '" data-plyr="volume">',
-                    '<progress class="plyr__volume--display" max="' + config.volumeMax + '" value="' + config.volumeMin + '" role="presentation"></progress>',
+                        '<label for="volume-{id}" class="plyr__sr-only">' + config.i18n.volume + '</label>',
+                        '<input id="volume-{id}" class="plyr__volume--input" type="range" min="' + config.volumeMin + '" max="' + config.volumeMax + '" value="' + config.volume + '" data-plyr="volume">',
+                        '<progress class="plyr__volume--display" max="' + config.volumeMax + '" value="' + config.volumeMin + '" role="presentation"></progress>',
                     '</span>'
                 );
+                /* beautify ignore:end */
             }
 
             // Toggle captions button
-            if (inArray(config.controls, 'captions')) {
+            if (_inArray(config.controls, 'captions')) {
+                /* beautify ignore:start */
                 html.push(
                     '<button type="button" class="plyr__control" data-plyr="captions">',
-                    '<svg class="icon--captions-on"><use xlink:href="' + iconPath + '-captions-on" /></svg>',
-                    '<svg><use xlink:href="' + iconPath + '-captions-off" /></svg>',
-                    '<span class="plyr__sr-only">' + config.i18n.toggleCaptions + '</span>',
+                        '<svg class="icon--captions-on"><use xlink:href="' + iconPath + '-captions-on" /></svg>',
+                        '<svg><use xlink:href="' + iconPath + '-captions-off" /></svg>',
+                        '<span class="plyr__sr-only">' + config.i18n.toggleCaptions + '</span>',
                     '</button>'
                 );
+                /* beautify ignore:end */
             }
 
             // Settings button / menu
-            if (inArray(config.controls, 'settings')) {
+            if (_inArray(config.controls, 'settings')) {
+                /* beautify ignore:start */
                 html.push(
                     '<div class="plyr__menu" data-plyr="settings">',
-                    '<button type="button" id="plyr-settings-toggle-{id}" class="plyr__control" aria-haspopup="true" aria-controls="plyr-settings-{id}" aria-expanded="false">',
-                    '<svg><use xlink:href="' + iconPath + '-settings" /></svg>',
-                    '<span class="plyr__sr-only">' + config.i18n.settings + '</span>',
-                    '</button>',
-                    '<div class="plyr__menu__container" id="plyr-settings-{id}" aria-hidden="true" aria-labelled-by="plyr-settings-toggle-{id}" role="tablist" tabindex="-1">',
-                    '<div>',
-                    '<div class="plyr__menu__primary" id="plyr-settings-{id}-primary" aria-hidden="false" aria-labelled-by="plyr-settings-toggle-{id}" role="tabpanel" tabindex="-1">',
-                    '<ul>',
-                    '<li role="tab">',
-                    '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-captions-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-captions" aria-expanded="false">',
-                    config.i18n.captions + ' <span class="plyr__menu__value">{lang}</span>',
-                    '</button>',
-                    '</li>',
-                    '<li role="tab">',
-                    '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-speed-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-speed" aria-expanded="false">',
-                    config.i18n.speed + ' <span class="plyr__menu__value">{speed}</span>',
-                    '</button>',
-                    '</li>',
-                    '<li role="tab">',
-                    '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-quality-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-quality" aria-expanded="false">',
-                    config.i18n.quality + ' <span class="plyr__menu__value">Auto</span>',
-                    '</button>',
-                    '</li>',
-                    '</ul>',
-                    '</div>',
-                    '<div class="plyr__menu__secondary" id="plyr-settings-{id}-captions" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-captions-toggle" role="tabpanel" tabindex="-1">',
-                    '<ul>',
-                    '<li role="tab">',
-                    '<button type="button" class="plyr__control plyr__control--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
-                    config.i18n.captions,
-                    '</button>',
-                    '</li>',
-                    '<li>',
-                    '<button type="button" class="plyr__control">English</button>',
-                    '</li>',
-                    '<li>',
-                    '<button type="button" class="plyr__control">Off</button>',
-                    '</li>',
-                    '</ul>',
-                    '</div>',
-                    '<div class="plyr__menu__secondary" id="plyr-settings-{id}-speed" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-speed-toggle" role="tabpanel" tabindex="-1">',
-                    '<ul>',
-                    '<li role="tab">',
-                    '<button type="button" class="plyr__control plyr__control--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
-                    config.i18n.speed,
-                    '</button>',
-                    '</li>',
-                    '<li>',
-                    '<label class="plyr__control">',
-                    '<input type="radio" name="speed">',
-                    '2&times;',
-                    '</label>',
-                    '</li>',
-                    '<li>',
-                    '<label class="plyr__control">',
-                    '<input type="radio" name="speed">',
-                    '1.5&times;',
-                    '</label>',
-                    '</li>',
-                    '<li>',
-                    '<label class="plyr__control">',
-                    '<input type="radio" name="speed" checked>',
-                    '1&times;',
-                    '</label>',
-                    '</li>',
-                    '<li>',
-                    '<label class="plyr__control">',
-                    '<input type="radio" name="speed">',
-                    '0.5&times;',
-                    '</label>',
-                    '</li>',
-                    '</ul>',
-                    '</div>',
-                    '<div class="plyr__menu__secondary" id="plyr-settings-{id}-quality" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-quality-toggle" role="tabpanel" tabindex="-1">',
-                    '<ul>',
-                    '<li role="tab">',
-                    '<button type="button" class="plyr__control plyr__control--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
-                    config.i18n.quality,
-                    '</button>',
-                    '</li>',
-                    '<li>',
-                    '<label class="plyr__control">',
-                    '<input type="radio" name="quality">',
-                    '2160P',
-                    '<span class="plyr__menu__value">',
-                    '<span class="plyr__badge">4K</span>',
-                    '</span>',
-                    '</label>',
-                    '</li>',
-                    '<li>',
-                    '<label class="plyr__control">',
-                    '<input type="radio" name="quality">',
-                    '1440P',
-                    '<span class="plyr__menu__value">',
-                    '<span class="plyr__badge">WQHD</span>',
-                    '</span>',
-                    '</label>',
-                    '</li>',
-                    '<li>',
-                    '<label class="plyr__control">',
-                    '<input type="radio" name="quality">',
-                    '1080P',
-                    '<span class="plyr__menu__value">',
-                    '<span class="plyr__badge">HD</span>',
-                    '</span>',
-                    '</label>',
-                    '</li>',
-                    '<li>',
-                    '<label class="plyr__control">',
-                    '<input type="radio" name="quality" checked>',
-                    '720P',
-                    '<span class="plyr__menu__value">',
-                    '<span class="plyr__badge">HD</span>',
-                    '</span>',
-                    '</label>',
-                    '</li>',
-                    '<li>',
-                    '<label class="plyr__control">',
-                    '<input type="radio" name="quality">',
-                    '480P',
-                    '</label>',
-                    '</li>',
-                    '<li>',
-                    '<label class="plyr__control">',
-                    '<input type="radio" name="quality">',
-                    '360P',
-                    '</label>',
-                    '</li>',
-                    '</ul>',
-                    '</div>',
-                    '</div>',
-                    '</div>',
+                        '<button type="button" id="plyr-settings-toggle-{id}" class="plyr__control" aria-haspopup="true" aria-controls="plyr-settings-{id}" aria-expanded="false">',
+                            '<svg><use xlink:href="' + iconPath + '-settings" /></svg>',
+                            '<span class="plyr__sr-only">' + config.i18n.settings + '</span>',
+                        '</button>',
+                        '<div class="plyr__menu__container" id="plyr-settings-{id}" aria-hidden="true" aria-labelled-by="plyr-settings-toggle-{id}" role="tablist" tabindex="-1">',
+                            '<div>',
+                                '<div class="plyr__menu__primary" id="plyr-settings-{id}-primary" aria-hidden="false" aria-labelled-by="plyr-settings-toggle-{id}" role="tabpanel" tabindex="-1">',
+                                    '<ul>',
+                                        '<li role="tab">',
+                                            '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-captions-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-captions" aria-expanded="false">',
+                                                config.i18n.captions +
+                                                '<span class="plyr__menu__value">{lang}</span>',
+                                            '</button>',
+                                        '</li>',
+                                        '<li role="tab">',
+                                            '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-speed-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-speed" aria-expanded="false">',
+                                                config.i18n.speed +
+                                                '<span class="plyr__menu__value">{speed}</span>',
+                                            '</button>',
+                                        '</li>',
+                                        '<li role="tab">',
+                                            '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-quality-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-quality" aria-expanded="false">',
+                                                config.i18n.quality +
+                                                '<span class="plyr__menu__value">Auto</span>',
+                                            '</button>',
+                                        '</li>',
+                                    '</ul>',
+                                '</div>',
+                                '<div class="plyr__menu__secondary" id="plyr-settings-{id}-captions" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-captions-toggle" role="tabpanel" tabindex="-1">',
+                                    '<ul>',
+                                        '<li role="tab">',
+                                            '<button type="button" class="plyr__control plyr__control--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
+                                                config.i18n.captions,
+                                            '</button>',
+                                        '</li>',
+                                        '<li>',
+                                            '<button type="button" class="plyr__control">English</button>',
+                                        '</li>',
+                                        '<li>',
+                                            '<button type="button" class="plyr__control">Off</button>',
+                                        '</li>',
+                                    '</ul>',
+                                '</div>',
+                                '<div class="plyr__menu__secondary" id="plyr-settings-{id}-speed" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-speed-toggle" role="tabpanel" tabindex="-1">',
+                                    '<ul>',
+                                        '<li role="tab">',
+                                            '<button type="button" class="plyr__control plyr__control--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
+                                                config.i18n.speed,
+                                            '</button>',
+                                        '</li>',
+                                        '<li>',
+                                            '<button type="button" class="plyr__control">2&times;</button>',
+                                        '</li>',
+                                        '<li>',
+                                            '<button type="button" class="plyr__control">1.5&times;</button>',
+                                        '</li>',
+                                        '<li>',
+                                            '<button type="button" class="plyr__control">1&times;</button>',
+                                        '</li>',
+                                        '<li>',
+                                            '<button type="button" class="plyr__control">0.5&times;</button>',
+                                        '</li>',
+                                    '</ul>',
+                                '</div>',
+                                '<div class="plyr__menu__secondary" id="plyr-settings-{id}-quality" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-quality-toggle" role="tabpanel" tabindex="-1">',
+                                    '<ul>',
+                                        '<li role="tab">',
+                                            '<button type="button" class="plyr__control plyr__control--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
+                                                config.i18n.quality,
+                                            '</button>',
+                                        '</li>',
+                                        '<li>',
+                                            '<label class="plyr__control">',
+                                                '<input type="radio" name="quality">',
+                                                '2160P',
+                                                '<span class="plyr__menu__value">',
+                                                    '<span class="plyr__badge">4K</span>',
+                                                '</span>',
+                                            '</label>',
+                                        '</li>',
+                                        '<li>',
+                                            '<label class="plyr__control">',
+                                                '<input type="radio" name="quality">',
+                                                '1440P',
+                                                '<span class="plyr__menu__value">',
+                                                    '<span class="plyr__badge">WQHD</span>',
+                                                '</span>',
+                                            '</label>',
+                                        '</li>',
+                                        '<li>',
+                                            '<label class="plyr__control">',
+                                                '<input type="radio" name="quality">',
+                                                '1080P',
+                                                '<span class="plyr__menu__value">',
+                                                    '<span class="plyr__badge">HD</span>',
+                                                '</span>',
+                                            '</label>',
+                                        '</li>',
+                                        '<li>',
+                                            '<label class="plyr__control">',
+                                                '<input type="radio" name="quality">',
+                                                '720P',
+                                                '<span class="plyr__menu__value">',
+                                                    '<span class="plyr__badge">HD</span>',
+                                                '</span>',
+                                            '</label>',
+                                        '</li>',
+                                        '<li>',
+                                            '<label class="plyr__control">',
+                                                '<input type="radio" name="quality">',
+                                                '480P',
+                                            '</label>',
+                                        '</li>',
+                                        '<li>',
+                                            '<label class="plyr__control">',
+                                                '<input type="radio" name="quality">',
+                                                '360P',
+                                            '</label>',
+                                        '</li>',
+                                    '</ul>',
+                                '</div>',
+                            '</div>',
+                        '</div>',
                     '</div>'
                 );
+                /* beautify ignore:end */
             }
 
             // Picture in picture button
-            if (inArray(config.controls, 'pip') && support.pip) {
+            if (_inArray(config.controls, 'pip') && _support.pip) {
+                /* beautify ignore:start */
                 html.push(
                     '<button type="button" class="plyr__control" data-plyr="pip">',
-                    '<svg><use xlink:href="' + iconPath + '-pip" /></svg>',
-                    '<span class="plyr__sr-only">PIP</span>',
+                        '<svg><use xlink:href="' + iconPath + '-pip" /></svg>',
+                        '<span class="plyr__sr-only">PIP</span>',
                     '</button>'
                 );
+                /* beautify ignore:end */
             }
 
             // Airplay button
-            if (inArray(config.controls, 'airplay') && support.airplay) {
+            if (_inArray(config.controls, 'airplay') && _support.airplay) {
+                /* beautify ignore:start */
                 html.push(
                     '<button type="button" class="plyr__control" data-plyr="airplay">',
-                    '<svg><use xlink:href="' + iconPath + '-airplay" /></svg>',
-                    '<span class="plyr__sr-only">AirPlay</span>',
+                        '<svg><use xlink:href="' + iconPath + '-airplay" /></svg>',
+                        '<span class="plyr__sr-only">AirPlay</span>',
                     '</button>'
                 );
+                /* beautify ignore:end */
             }
 
             // Toggle fullscreen button
-            if (inArray(config.controls, 'fullscreen')) {
+            if (_inArray(config.controls, 'fullscreen')) {
+                /* beautify ignore:start */
                 html.push(
                     '<button type="button" class="plyr__control" data-plyr="fullscreen">',
-                    '<svg class="icon--exit-fullscreen"><use xlink:href="' + iconPath + '-exit-fullscreen" /></svg>',
-                    '<svg><use xlink:href="' + iconPath + '-enter-fullscreen" /></svg>',
-                    '<span class="plyr__sr-only">' + config.i18n.toggleFullscreen + '</span>',
+                        '<svg class="icon--exit-fullscreen"><use xlink:href="' + iconPath + '-exit-fullscreen" /></svg>',
+                        '<svg><use xlink:href="' + iconPath + '-enter-fullscreen" /></svg>',
+                        '<span class="plyr__sr-only">' + config.i18n.toggleFullscreen + '</span>',
                     '</button>'
                 );
+                /* beautify ignore:end */
             }
 
             // Close everything
@@ -1124,59 +1142,59 @@
         }
 
         // Setup fullscreen
-        function setupFullscreen() {
+        function _setupFullscreen() {
             if (!plyr.supported.full) {
                 return;
             }
 
             if ((plyr.type !== 'audio' || config.fullscreen.allowAudio) && config.fullscreen.enabled) {
                 // Check for native support
-                var nativeSupport = support.fullscreen;
+                var nativeSupport = _support.fullscreen;
 
-                if (nativeSupport || (config.fullscreen.fallback && !inFrame())) {
-                    log((nativeSupport ? 'Native' : 'Fallback') + ' fullscreen enabled');
+                if (nativeSupport || (config.fullscreen.fallback && !_inFrame())) {
+                    _log((nativeSupport ? 'Native' : 'Fallback') + ' fullscreen enabled');
 
                     // Add styling hook
-                    toggleClass(plyr.container, config.classes.fullscreen.enabled, true);
+                    _toggleClass(plyr.container, config.classes.fullscreen.enabled, true);
                 } else {
-                    log('Fullscreen not supported and fallback disabled');
+                    _log('Fullscreen not supported and fallback disabled');
                 }
 
                 // Toggle state
                 if (plyr.buttons && plyr.buttons.fullscreen) {
-                    toggleState(plyr.buttons.fullscreen, false);
+                    _toggleState(plyr.buttons.fullscreen, false);
                 }
 
                 // Setup focus trap
-                focusTrap();
+                _focusTrap();
             }
         }
 
         // Display active caption if it contains text
-        function setActiveCue(track) {
+        function _setActiveCue(track) {
             // Get the track from the event if needed
-            if (is.event(track)) {
+            if (_is.event(track)) {
                 track = track.target;
             }
 
             // Display a cue, if there is one
             if (track.activeCues[0] && 'text' in track.activeCues[0]) {
-                setCaption(track.activeCues[0].getCueAsHTML());
+                _setCaption(track.activeCues[0].getCueAsHTML());
             } else {
-                setCaption();
+                _setCaption();
             }
         }
 
         // Setup captions
-        function setupCaptions() {
+        function _setupCaptions() {
             // Bail if not HTML5 video
             if (plyr.type !== 'video') {
                 return;
             }
 
             // Inject the container
-            if (!getElement(config.selectors.captions)) {
-                plyr.videoContainer.insertAdjacentHTML('afterbegin', '<div class="' + getClassname(config.selectors.captions) + '"></div>');
+            if (!_getElement(config.selectors.captions)) {
+                plyr.videoContainer.insertAdjacentHTML('afterbegin', '<div class="' + _getClassname(config.selectors.captions) + '"></div>');
             }
 
             // Determine if HTML5 textTracks is supported
@@ -1201,18 +1219,18 @@
             plyr.captionExists = true;
             if (captionSources.length === 0) {
                 plyr.captionExists = false;
-                log('No caption track found');
+                _log('No caption track found');
             } else if ((config.captions.selectedIndex + 1) > captionSources.length) {
                 plyr.captionExists = false;
-                log('Caption index out of bound');
+                _log('Caption index out of bound');
             } else {
                 captionSrc = captionSources[config.captions.selectedIndex];
-                log('Caption track found; URI: ' + captionSrc);
+                _log('Caption track found; URI: ' + captionSrc);
             }
 
             // If no caption file exists, hide container for caption text
             if (!plyr.captionExists) {
-                toggleClass(plyr.container, config.classes.captions.enabled);
+                _toggleClass(plyr.container, config.classes.captions.enabled);
             } else {
                 var tracks = plyr.media.textTracks;
 
@@ -1220,14 +1238,14 @@
                 // This doesn't seem to work in Safari 7+, so the <track> elements are removed from the dom below
                 [].forEach.call(tracks, function(track) {
                     // Remove the listener to prevent event overlapping
-                    off(track, 'cuechange', setActiveCue);
+                    _off(track, 'cuechange', _setActiveCue);
 
                     // Hide captions
                     track.mode = 'hidden';
                 });
 
                 // Enable UI
-                showCaptions(plyr);
+                _showCaptions(plyr);
 
                 // Disable unsupported browsers than report false positive
                 // Firefox bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1033144
@@ -1235,7 +1253,7 @@
                     (plyr.browser.isFirefox && plyr.browser.version >= 31)) {
 
                     // Debugging
-                    log('Detected browser with known TextTrack issues - using manual fallback');
+                    _log('Detected browser with known TextTrack issues - using manual fallback');
 
                     // Set to false so skips to 'manual' captioning
                     plyr.usingTextTracks = false;
@@ -1244,21 +1262,21 @@
                 // Rendering caption tracks
                 // Native support required - http://caniuse.com/webvtt
                 if (plyr.usingTextTracks) {
-                    log('TextTracks supported');
+                    _log('TextTracks supported');
 
                     var track = tracks[config.captions.selectedIndex];
 
                     if (track.kind === 'captions' || track.kind === 'subtitles') {
-                        on(track, 'cuechange', setActiveCue);
+                        _on(track, 'cuechange', _setActiveCue);
 
                         // If we change the active track while a cue is already displayed we need to update it
                         if (track.activeCues && track.activeCues.length > 0) {
-                            setActiveCue(track);
+                            _setActiveCue(track);
                         }
                     }
                 } else {
                     // Caption tracks not natively supported
-                    log('TextTracks not supported so rendering captions manually');
+                    _log('TextTracks not supported so rendering captions manually');
 
                     // Render captions from array at appropriate time
                     plyr.currentCaption = '';
@@ -1288,28 +1306,25 @@
 
                                     captions = req.split(lineSeparator + lineSeparator);
 
+                                    var numOfAvailableCaptions = 0;
+
                                     for (var r = 0; r < captions.length; r++) {
                                         caption = captions[r];
-                                        plyr.captions[r] = [];
 
                                         // Get the parts of the captions
                                         var parts = caption.split(lineSeparator),
                                             index = 0;
 
                                         // Incase caption numbers are added
-                                        if (parts[index].indexOf(":") === -1) {
-                                            index = 1;
+                                        if (parts[index].indexOf(":") !== -1) {
+                                            plyr.captions[numOfAvailableCaptions] = [parts[index], parts[index + 1]];
+                                            numOfAvailableCaptions++;
                                         }
-
-                                        plyr.captions[r] = [parts[index], parts[index + 1]];
                                     }
 
-                                    // Remove first element ('VTT')
-                                    plyr.captions.shift();
-
-                                    log('Successfully loaded the caption file via AJAX');
+                                    _log('Successfully loaded the caption file via AJAX');
                                 } else {
-                                    warn(config.logPrefix + 'There was a problem loading the caption file via AJAX');
+                                    _warn(config.logPrefix + 'There was a problem loading the caption file via AJAX');
                                 }
                             }
                         };
@@ -1323,21 +1338,21 @@
         }
 
         // Set the current caption
-        function setCaption(caption) {
+        function _setCaption(caption) {
             /* jshint unused:false */
-            var container = getElement(config.selectors.captions),
+            var container = _getElement(config.selectors.captions),
                 content = document.createElement('span');
 
             // Empty the container
             container.innerHTML = '';
 
             // Default to empty
-            if (is.undefined(caption)) {
+            if (_is.undefined(caption)) {
                 caption = '';
             }
 
             // Set the span content
-            if (is.string(caption)) {
+            if (_is.string(caption)) {
                 content.innerHTML = caption.trim();
             } else {
                 content.appendChild(caption);
@@ -1352,9 +1367,9 @@
 
         // Captions functions
         // Seek the manual caption time and update UI
-        function seekManualCaptions(time) {
+        function _seekManualCaptions(time) {
             // Utilities for caption time codes
-            function timecodeCommon(tc, pos) {
+            function _timecodeCommon(tc, pos) {
                 var tcpair = [];
                 tcpair = tc.split(' --> ');
                 for (var i = 0; i < tcpair.length; i++) {
@@ -1362,27 +1377,31 @@
                     // So get rid of this if it exists
                     tcpair[i] = tcpair[i].replace(/(\d+:\d+:\d+\.\d+).*/, "$1");
                 }
-                return subTcSecs(tcpair[pos]);
+                return _subTcSecs(tcpair[pos]);
             }
 
-            function timecodeMin(tc) {
-                return timecodeCommon(tc, 0);
+            function _timecodeMin(tc) {
+                return _timecodeCommon(tc, 0);
             }
 
-            function timecodeMax(tc) {
-                return timecodeCommon(tc, 1);
+            function _timecodeMax(tc) {
+                return _timecodeCommon(tc, 1);
             }
 
-            function subTcSecs(tc) {
+            function _subTcSecs(tc) {
                 if (tc === null || tc === undefined) {
                     return 0;
                 } else {
                     var tc1 = [],
                         tc2 = [],
-                        seconds;
+                        seconds = 0;
                     tc1 = tc.split(',');
                     tc2 = tc1[0].split(':');
-                    seconds = Math.floor(tc2[0] * 60 * 60) + Math.floor(tc2[1] * 60) + Math.floor(tc2[2]);
+
+                    for (var i = 0, len = tc2.length; i < len; i++) {
+                        seconds += Math.floor(tc2[i] * (Math.pow(60, len - (i + 1))));
+                    }
+
                     return seconds;
                 }
             }
@@ -1398,14 +1417,14 @@
             // Check time is a number, if not use currentTime
             // IE has a bug where currentTime doesn't go to 0
             // https://twitter.com/Sam_Potts/status/573715746506731521
-            time = is.number(time) ? time : plyr.media.currentTime;
+            time = _is.number(time) ? time : plyr.media.currentTime;
 
             // If there's no subs available, bail
             if (!plyr.captions[plyr.subcount]) {
                 return;
             }
 
-            while (timecodeMax(plyr.captions[plyr.subcount][0]) < time.toFixed(1)) {
+            while (_timecodeMax(plyr.captions[plyr.subcount][0]) < time.toFixed(1)) {
                 plyr.subcount++;
                 if (plyr.subcount > plyr.captions.length - 1) {
                     plyr.subcount = plyr.captions.length - 1;
@@ -1414,52 +1433,52 @@
             }
 
             // Check if the next caption is in the current time range
-            if (plyr.media.currentTime.toFixed(1) >= timecodeMin(plyr.captions[plyr.subcount][0]) &&
-                plyr.media.currentTime.toFixed(1) <= timecodeMax(plyr.captions[plyr.subcount][0])) {
+            if (plyr.media.currentTime.toFixed(1) >= _timecodeMin(plyr.captions[plyr.subcount][0]) &&
+                plyr.media.currentTime.toFixed(1) <= _timecodeMax(plyr.captions[plyr.subcount][0])) {
                 plyr.currentCaption = plyr.captions[plyr.subcount][1];
 
                 // Render the caption
-                setCaption(plyr.currentCaption);
+                _setCaption(plyr.currentCaption);
             } else {
-                setCaption();
+                _setCaption();
             }
         }
 
         // Display captions container and button (for initialization)
-        function showCaptions() {
+        function _showCaptions() {
             // If there's no caption toggle, bail
             if (!plyr.buttons.captions) {
                 return;
             }
 
-            toggleClass(plyr.container, config.classes.captions.enabled, true);
+            _toggleClass(plyr.container, config.classes.captions.enabled, true);
 
             // Try to load the value from storage
             var active = plyr.storage.captionsEnabled;
 
             // Otherwise fall back to the default config
-            if (!is.boolean(active)) {
+            if (!_is.boolean(active)) {
                 active = config.captions.defaultActive;
             }
 
             if (active) {
-                toggleClass(plyr.container, config.classes.captions.active, true);
-                toggleState(plyr.buttons.captions, true);
+                _toggleClass(plyr.container, config.classes.captions.active, true);
+                _toggleState(plyr.buttons.captions, true);
             }
         }
 
         // Find all elements
-        function getElements(selector) {
+        function _getElements(selector) {
             return plyr.container.querySelectorAll(selector);
         }
 
         // Find a single element
-        function getElement(selector) {
-            return getElements(selector)[0];
+        function _getElement(selector) {
+            return _getElements(selector)[0];
         }
 
         // Determine if we're in an iframe
-        function inFrame() {
+        function _inFrame() {
             try {
                 return window.self !== window.top;
             } catch (e) {
@@ -1468,12 +1487,12 @@
         }
 
         // Trap focus inside container
-        function focusTrap() {
-            var tabbables = getElements('input:not([disabled]), button:not([disabled])'),
+        function _focusTrap() {
+            var tabbables = _getElements('input:not([disabled]), button:not([disabled])'),
                 first = tabbables[0],
                 last = tabbables[tabbables.length - 1];
 
-            function checkFocus(event) {
+            function _checkFocus(event) {
                 // If it is TAB
                 if (event.which === 9 && plyr.isFullscreen) {
                     if (event.target === last && !event.shiftKey) {
@@ -1489,34 +1508,34 @@
             }
 
             // Bind the handler
-            on(plyr.container, 'keydown', checkFocus);
+            _on(plyr.container, 'keydown', _checkFocus);
         }
 
         // Add elements to HTML5 media (source, tracks, etc)
-        function insertChildElements(type, attributes) {
-            if (is.string(attributes)) {
-                insertElement(type, plyr.media, {
+        function _insertChildElements(type, attributes) {
+            if (_is.string(attributes)) {
+                _insertElement(type, plyr.media, {
                     src: attributes
                 });
             } else if (attributes.constructor === Array) {
                 for (var i = attributes.length - 1; i >= 0; i--) {
-                    insertElement(type, plyr.media, attributes[i]);
+                    _insertElement(type, plyr.media, attributes[i]);
                 }
             }
         }
 
         // Insert controls
-        function injectControls() {
+        function _injectControls() {
             // Sprite
             if (config.loadSprite) {
-                var iconUrl = getIconUrl();
+                var iconUrl = _getIconUrl();
 
                 // Only load external sprite using AJAX
                 if (iconUrl.absolute) {
-                    log('AJAX loading absolute SVG sprite' + (plyr.browser.isIE ? ' (due to IE)' : ''));
+                    _log('AJAX loading absolute SVG sprite' + (plyr.browser.isIE ? ' (due to IE)' : ''));
                     loadSprite(iconUrl.url, "sprite-plyr");
                 } else {
-                    log('Sprite will be used as external resource directly');
+                    _log('Sprite will be used as external resource directly');
                 }
             }
 
@@ -1524,35 +1543,35 @@
             var html = config.html;
 
             // Insert custom video controls
-            log('Injecting custom controls');
+            _log('Injecting custom controls');
 
             // If no controls are specified, create default
             if (!html) {
-                html = buildControls();
+                html = _buildControls();
             }
 
             // Replace seek time instances
-            html = replaceAll(html, '{seektime}', config.seekTime);
+            html = _replaceAll(html, '{seektime}', config.seekTime);
 
             // Replace seek time instances
-            html = replaceAll(html, '{speed}', config.currentSpeed.toFixed(1).toString().replace('.0', '') + '&times;');
+            html = _replaceAll(html, '{speed}', config.currentSpeed.toFixed(1).toString().replace('.0', '') + '&times;');
 
             // Replace current captions language
-            html = replaceAll(html, '{lang}', 'English');
+            html = _replaceAll(html, '{lang}', 'English');
 
             // Replace all id references with random numbers
-            html = replaceAll(html, '{id}', Math.floor(Math.random() * (10000)));
+            html = _replaceAll(html, '{id}', Math.floor(Math.random() * (10000)));
 
             // Controls container
             var target;
 
             // Inject to custom location
-            if (is.string(config.selectors.controls.container)) {
+            if (_is.string(config.selectors.controls.container)) {
                 target = document.querySelector(config.selectors.controls.container);
             }
 
             // Inject into the container by default
-            if (!is.htmlElement(target)) {
+            if (!_is.htmlElement(target)) {
                 target = plyr.container
             }
 
@@ -1561,90 +1580,90 @@
 
             // Setup tooltips
             if (config.tooltips.controls) {
-                var labels = getElements([config.selectors.controls.wrapper, ' ', config.selectors.labels, ' .', config.classes.hidden].join(''));
+                var labels = _getElements([config.selectors.controls.wrapper, ' ', config.selectors.labels, ' .', config.classes.hidden].join(''));
 
                 for (var i = labels.length - 1; i >= 0; i--) {
                     var label = labels[i];
 
-                    toggleClass(label, config.classes.hidden, false);
-                    toggleClass(label, config.classes.tooltip, true);
+                    _toggleClass(label, config.classes.hidden, false);
+                    _toggleClass(label, config.classes.tooltip, true);
                 }
             }
         }
 
         // Find the UI controls and store references
-        function findElements() {
+        function _findElements() {
             try {
-                plyr.controls = getElement(config.selectors.controls.wrapper);
+                plyr.controls = _getElement(config.selectors.controls.wrapper);
 
                 // Buttons
                 plyr.buttons = {
-                    seek: getElement(config.selectors.buttons.seek),
-                    play: getElements(config.selectors.buttons.play),
-                    pause: getElement(config.selectors.buttons.pause),
-                    restart: getElement(config.selectors.buttons.restart),
-                    rewind: getElement(config.selectors.buttons.rewind),
-                    forward: getElement(config.selectors.buttons.forward),
-                    fullscreen: getElement(config.selectors.buttons.fullscreen),
-                    settings: getElement(config.selectors.buttons.settings),
-                    pip: getElement(config.selectors.buttons.pip)
+                    seek: _getElement(config.selectors.buttons.seek),
+                    play: _getElements(config.selectors.buttons.play),
+                    pause: _getElement(config.selectors.buttons.pause),
+                    restart: _getElement(config.selectors.buttons.restart),
+                    rewind: _getElement(config.selectors.buttons.rewind),
+                    forward: _getElement(config.selectors.buttons.forward),
+                    fullscreen: _getElement(config.selectors.buttons.fullscreen),
+                    settings: _getElement(config.selectors.buttons.settings),
+                    pip: _getElement(config.selectors.buttons.pip)
                 };
 
                 // Inputs
-                plyr.buttons.mute = getElement(config.selectors.buttons.mute);
-                plyr.buttons.captions = getElement(config.selectors.buttons.captions);
+                plyr.buttons.mute = _getElement(config.selectors.buttons.mute);
+                plyr.buttons.captions = _getElement(config.selectors.buttons.captions);
 
                 // Progress
                 plyr.progress = {
-                    container: getElement(config.selectors.progress.container)
+                    container: _getElement(config.selectors.progress.container)
                 };
 
                 // Progress - Buffering
                 plyr.progress.buffer = (function() {
-                    var bar = getElement(config.selectors.progress.buffer);
+                    var bar = _getElement(config.selectors.progress.buffer);
 
                     return {
                         bar: bar,
-                        text: is.htmlElement(bar) && bar.getElementsByTagName('span')[0]
+                        text: _is.htmlElement(bar) && bar.getElementsByTagName('span')[0]
                     };
                 })();
 
                 // Progress - Played
-                plyr.progress.played = getElement(config.selectors.progress.played);
+                plyr.progress.played = _getElement(config.selectors.progress.played);
 
                 // Seek tooltip
                 plyr.progress.tooltip = plyr.progress.container && plyr.progress.container.querySelector('.' + config.classes.tooltip);
 
                 // Volume
                 plyr.volume = {
-                    input: getElement(config.selectors.volume.input),
-                    display: getElement(config.selectors.volume.display)
+                    input: _getElement(config.selectors.volume.input),
+                    display: _getElement(config.selectors.volume.display)
                 };
 
                 // Timing
-                plyr.duration = getElement(config.selectors.duration);
-                plyr.currentTime = getElement(config.selectors.currentTime);
-                plyr.seekTime = getElements(config.selectors.seekTime);
+                plyr.duration = _getElement(config.selectors.duration);
+                plyr.currentTime = _getElement(config.selectors.currentTime);
+                plyr.seekTime = _getElements(config.selectors.seekTime);
 
                 return true;
             } catch (e) {
-                warn('It looks like there is a problem with your controls HTML', e);
+                _warn('It looks like there is a problem with your controls HTML', e);
 
                 // Restore native video controls
-                toggleNativeControls(true);
+                _toggleNativeControls(true);
 
                 return false;
             }
         }
 
         // Toggle style hook
-        function toggleStyleHook() {
-            toggleClass(plyr.container, config.selectors.container.replace('.', ''), plyr.supported.full);
+        function _toggleStyleHook() {
+            _toggleClass(plyr.container, config.selectors.container.replace('.', ''), plyr.supported.full);
         }
 
         // Toggle native controls
-        function toggleNativeControls(toggle) {
-            if (toggle && inArray(config.types.html5, plyr.type)) {
+        function _toggleNativeControls(toggle) {
+            if (toggle && _inArray(config.types.html5, plyr.type)) {
                 plyr.media.setAttribute('controls', '');
             } else {
                 plyr.media.removeAttribute('controls');
@@ -1652,12 +1671,12 @@
         }
 
         // Setup aria attribute for play and iframe title
-        function setTitle(iframe) {
+        function _setTitle(iframe) {
             // Find the current text
             var label = config.i18n.play;
 
             // If there's a media title set, use that for the label
-            if (is.string(config.title) && config.title.length) {
+            if (_is.string(config.title) && config.title.length) {
                 label += ', ' + config.title;
 
                 // Set container label
@@ -1673,18 +1692,18 @@
 
             // Set iframe title
             // https://github.com/Selz/plyr/issues/124
-            if (is.htmlElement(iframe)) {
+            if (_is.htmlElement(iframe)) {
                 iframe.setAttribute('title', config.i18n.frameTitle.replace('{title}', config.title));
             }
         }
 
         // Setup localStorage
-        function setupStorage() {
+        function _setupStorage() {
             var value = null;
             plyr.storage = {};
 
             // Bail if we don't have localStorage support or it's disabled
-            if (!support.storage || !config.storage.enabled) {
+            if (!_support.storage || !config.storage.enabled) {
                 return;
             }
 
@@ -1702,7 +1721,7 @@
                 // If value is a number, it's probably volume from an older
                 // version of plyr. See: https://github.com/Selz/plyr/pull/313
                 // Update the key to be JSON
-                updateStorage({
+                _updateStorage({
                     volume: parseFloat(value)
                 });
             } else {
@@ -1712,48 +1731,48 @@
         }
 
         // Save a value back to local storage
-        function updateStorage(value) {
+        function _updateStorage(value) {
             // Bail if we don't have localStorage support or it's disabled
-            if (!support.storage || !config.storage.enabled) {
+            if (!_support.storage || !config.storage.enabled) {
                 return;
             }
 
             // Update the working copy of the values
-            extend(plyr.storage, value);
+            _extend(plyr.storage, value);
 
             // Update storage
             window.localStorage.setItem(config.storage.key, JSON.stringify(plyr.storage));
         }
 
         // Setup media
-        function setupMedia() {
+        function _setupMedia() {
             // If there's no media, bail
             if (!plyr.media) {
-                warn('No media element found!');
+                _warn('No media element found!');
                 return;
             }
 
             if (plyr.supported.full) {
                 // Add type class
-                toggleClass(plyr.container, config.classes.type.replace('{0}', plyr.type), true);
+                _toggleClass(plyr.container, config.classes.type.replace('{0}', plyr.type), true);
 
                 // Add video class for embeds
                 // This will require changes if audio embeds are added
-                if (inArray(config.types.embed, plyr.type)) {
-                    toggleClass(plyr.container, config.classes.type.replace('{0}', 'video'), true);
+                if (_inArray(config.types.embed, plyr.type)) {
+                    _toggleClass(plyr.container, config.classes.type.replace('{0}', 'video'), true);
                 }
 
                 // Check for picture-in-picture support
-                toggleClass(plyr.container, config.classes.pip.enabled, support.pip);
+                _toggleClass(plyr.container, config.classes.pip.enabled, _support.pip);
 
                 // If there's no autoplay attribute, assume the video is stopped and add state class
-                toggleClass(plyr.container, config.classes.stopped, config.autoplay);
+                _toggleClass(plyr.container, config.classes.stopped, config.autoplay);
 
                 // Add iOS class
-                toggleClass(plyr.ontainer, config.classes.isIos, plyr.browser.isIos);
+                _toggleClass(plyr.container, config.classes.isIos, plyr.browser.isIos);
 
                 // Add touch class
-                toggleClass(plyr.container, config.classes.isTouch, plyr.browser.isTouch);
+                _toggleClass(plyr.container, config.classes.isTouch, plyr.browser.isTouch);
 
                 // Inject the player wrapper
                 if (plyr.type === 'video') {
@@ -1762,7 +1781,7 @@
                     wrapper.setAttribute('class', config.classes.videoWrapper);
 
                     // Wrap the video in a container
-                    wrap(plyr.media, wrapper);
+                    _wrap(plyr.media, wrapper);
 
                     // Cache the container
                     plyr.videoContainer = wrapper;
@@ -1770,13 +1789,13 @@
             }
 
             // Embeds
-            if (inArray(config.types.embed, plyr.type)) {
-                setupEmbed();
+            if (_inArray(config.types.embed, plyr.type)) {
+                _setupEmbed();
             }
         }
 
         // Setup YouTube/Vimeo
-        function setupEmbed() {
+        function _setupEmbed() {
             var container = document.createElement('div'),
                 mediaId,
                 id = plyr.type + '-' + Math.floor(Math.random() * (10000));
@@ -1784,11 +1803,11 @@
             // Parse IDs from URLs if supplied
             switch (plyr.type) {
                 case 'youtube':
-                    mediaId = parseYouTubeId(plyr.embedId);
+                    mediaId = _parseYouTubeId(plyr.embedId);
                     break;
 
                 case 'vimeo':
-                    mediaId = parseVimeoId(plyr.embedId);
+                    mediaId = _parseVimeoId(plyr.embedId);
                     break;
 
                 default:
@@ -1796,14 +1815,14 @@
             }
 
             // Remove old containers
-            var containers = getElements('[id^="' + plyr.type + '-"]');
+            var containers = _getElements('[id^="' + plyr.type + '-"]');
             for (var i = containers.length - 1; i >= 0; i--) {
-                remove(containers[i]);
+                _remove(containers[i]);
             }
 
             // Add embed class for responsive
-            toggleClass(plyr.media, config.classes.videoWrapper, true);
-            toggleClass(plyr.media, config.classes.embedWrapper, true);
+            _toggleClass(plyr.media, config.classes.videoWrapper, true);
+            _toggleClass(plyr.media, config.classes.embedWrapper, true);
 
             if (plyr.type === 'youtube') {
                 // Create the YouTube container
@@ -1813,18 +1832,18 @@
                 container.setAttribute('id', id);
 
                 // Setup API
-                if (is.object(window.YT)) {
-                    youTubeReady(mediaId, container);
+                if (_is.object(window.YT)) {
+                    _youTubeReady(mediaId, container);
                 } else {
                     // Load the API
-                    injectScript(config.urls.youtube.api);
+                    _injectScript(config.urls.youtube.api);
 
                     // Setup callback for the API
                     window.onYouTubeReadyCallbacks = window.onYouTubeReadyCallbacks || [];
 
                     // Add to queue
                     window.onYouTubeReadyCallbacks.push(function() {
-                        youTubeReady(mediaId, container);
+                        _youTubeReady(mediaId, container);
                     });
 
                     // Set callback to process queue
@@ -1846,18 +1865,18 @@
                 container.setAttribute('id', id);
 
                 // Load the API if not already
-                if (!is.object(window.Vimeo)) {
-                    injectScript(config.urls.vimeo.api);
+                if (!_is.object(window.Vimeo)) {
+                    _injectScript(config.urls.vimeo.api);
 
                     // Wait for fragaloop load
                     var vimeoTimer = window.setInterval(function() {
-                        if (is.object(window.Vimeo)) {
+                        if (_is.object(window.Vimeo)) {
                             window.clearInterval(vimeoTimer);
-                            vimeoReady(mediaId, container);
+                            _vimeoReady(mediaId, container);
                         }
                     }, 50);
                 } else {
-                    vimeoReady(mediaId, container);
+                    _vimeoReady(mediaId, container);
                 }
             } else if (plyr.type === 'soundcloud') {
                 // TODO: Currently unsupported and undocumented
@@ -1866,11 +1885,11 @@
 
                 // Watch for iframe load
                 soundCloud.loaded = false;
-                on(soundCloud, 'load', function() {
+                _on(soundCloud, 'load', function() {
                     soundCloud.loaded = true;
                 });
 
-                setAttributes(soundCloud, {
+                _setAttributes(soundCloud, {
                     'src': 'https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/' + mediaId,
                     'id': id
                 });
@@ -1880,33 +1899,33 @@
 
                 // Load the API if not already
                 if (!window.SC) {
-                    injectScript(config.urls.soundcloud.api);
+                    _injectScript(config.urls.soundcloud.api);
                 }
 
                 // Wait for SC load
                 var soundCloudTimer = window.setInterval(function() {
                     if (window.SC && soundCloud.loaded) {
                         window.clearInterval(soundCloudTimer);
-                        soundCloudReady.call(soundCloud);
+                        _soundcloudReady.call(soundCloud);
                     }
                 }, 50);
             }
         }
 
         // When embeds are ready
-        function embedReady() {
+        function _embedReady() {
             // Setup the UI and call ready if full support
             if (plyr.supported.full) {
-                setupInterface();
-                ready();
+                _setupInterface();
+                _ready();
             }
 
             // Set title
-            setTitle(getElement('iframe'));
+            _setTitle(_getElement('iframe'));
         }
 
         // Handle YouTube API ready
-        function youTubeReady(videoId, container) {
+        function _youTubeReady(videoId, container) {
             // Setup instance
             // https://developers.google.com/youtube/iframe_api_reference
             plyr.embed = new window.YT.Player(container.id, {
@@ -1926,7 +1945,7 @@
                 },
                 events: {
                     'onError': function(event) {
-                        triggerEvent(plyr.container, 'error', true, {
+                        _triggerEvent(plyr.container, 'error', true, {
                             code: event.data,
                             embed: event.target
                         });
@@ -1977,13 +1996,13 @@
                         }
 
                         // Update UI
-                        embedReady();
+                        _embedReady();
 
                         // Trigger timeupdate
-                        triggerEvent(plyr.media, 'timeupdate');
+                        _triggerEvent(plyr.media, 'timeupdate');
 
                         // Trigger timeupdate
-                        triggerEvent(plyr.media, 'durationchange');
+                        _triggerEvent(plyr.media, 'durationchange');
 
                         // Reset timer
                         window.clearInterval(timers.buffering);
@@ -1995,7 +2014,7 @@
 
                             // Trigger progress only when we actually buffer something
                             if (plyr.media.lastBuffered === null || plyr.media.lastBuffered < plyr.media.buffered) {
-                                triggerEvent(plyr.media, 'progress');
+                                _triggerEvent(plyr.media, 'progress');
                             }
 
                             // Set last buffer point
@@ -2006,7 +2025,7 @@
                                 window.clearInterval(timers.buffering);
 
                                 // Trigger event
-                                triggerEvent(plyr.media, 'canplaythrough');
+                                _triggerEvent(plyr.media, 'canplaythrough');
                             }
                         }, 200);
                     },
@@ -2027,7 +2046,7 @@
                         switch (event.data) {
                             case 0:
                                 plyr.media.paused = true;
-                                triggerEvent(plyr.media, 'ended');
+                                _triggerEvent(plyr.media, 'ended');
                                 break;
 
                             case 1:
@@ -2035,12 +2054,12 @@
 
                                 // If we were seeking, fire seeked event
                                 if (plyr.media.seeking) {
-                                    triggerEvent(plyr.media, 'seeked');
+                                    _triggerEvent(plyr.media, 'seeked');
                                 }
 
                                 plyr.media.seeking = false;
-                                triggerEvent(plyr.media, 'play');
-                                triggerEvent(plyr.media, 'playing');
+                                _triggerEvent(plyr.media, 'play');
+                                _triggerEvent(plyr.media, 'playing');
 
                                 // Poll to get playback progress
                                 timers.playing = window.setInterval(function() {
@@ -2048,7 +2067,7 @@
                                     plyr.media.currentTime = instance.getCurrentTime();
 
                                     // Trigger timeupdate
-                                    triggerEvent(plyr.media, 'timeupdate');
+                                    _triggerEvent(plyr.media, 'timeupdate');
                                 }, 100);
 
                                 // Check duration again due to YouTube bug
@@ -2056,7 +2075,7 @@
                                 // https://code.google.com/p/gdata-issues/issues/detail?id=8690
                                 if (plyr.media.duration !== instance.getDuration()) {
                                     plyr.media.duration = instance.getDuration();
-                                    triggerEvent(plyr.media, 'durationchange');
+                                    _triggerEvent(plyr.media, 'durationchange');
                                 }
 
                                 // Get quality
@@ -2067,11 +2086,11 @@
 
                             case 2:
                                 plyr.media.paused = true;
-                                triggerEvent(plyr.media, 'pause');
+                                _triggerEvent(plyr.media, 'pause');
                                 break;
                         }
 
-                        triggerEvent(plyr.container, 'statechange', false, {
+                        _triggerEvent(plyr.container, 'statechange', false, {
                             code: event.data
                         });
                     }
@@ -2080,7 +2099,7 @@
         }
 
         // Vimeo ready
-        function vimeoReady(mediaId, container) {
+        function _vimeoReady(mediaId, container) {
             // Setup instance
             // https://github.com/vimeo/player.js
             plyr.embed = new window.Vimeo.Player(container, {
@@ -2110,20 +2129,20 @@
             plyr.media.currentTime = 0;
 
             // Update UI
-            embedReady();
+            _embedReady();
 
             plyr.embed.getCurrentTime().then(function(value) {
                 plyr.media.currentTime = value;
 
                 // Trigger timeupdate
-                triggerEvent(plyr.media, 'timeupdate');
+                _triggerEvent(plyr.media, 'timeupdate');
             });
 
             plyr.embed.getDuration().then(function(value) {
                 plyr.media.duration = value;
 
                 // Trigger timeupdate
-                triggerEvent(plyr.media, 'durationchange');
+                _triggerEvent(plyr.media, 'durationchange');
             });
 
             // TODO: Captions
@@ -2134,58 +2153,58 @@
             plyr.embed.on('loaded', function() {
                 // Fix keyboard focus issues
                 // https://github.com/Selz/plyr/issues/317
-                if (is.htmlElement(plyr.embed.element) && plyr.supported.full) {
+                if (_is.htmlElement(plyr.embed.element) && plyr.supported.full) {
                     plyr.embed.element.setAttribute('tabindex', '-1');
                 }
             });
 
             plyr.embed.on('play', function() {
                 plyr.media.paused = false;
-                triggerEvent(plyr.media, 'play');
-                triggerEvent(plyr.media, 'playing');
+                _triggerEvent(plyr.media, 'play');
+                _triggerEvent(plyr.media, 'playing');
             });
 
             plyr.embed.on('pause', function() {
                 plyr.media.paused = true;
-                triggerEvent(plyr.media, 'pause');
+                _triggerEvent(plyr.media, 'pause');
             });
 
             plyr.embed.on('timeupdate', function(data) {
                 plyr.media.seeking = false;
                 plyr.media.currentTime = data.seconds;
-                triggerEvent(plyr.media, 'timeupdate');
+                _triggerEvent(plyr.media, 'timeupdate');
             });
 
             plyr.embed.on('progress', function(data) {
                 plyr.media.buffered = data.percent;
-                triggerEvent(plyr.media, 'progress');
+                _triggerEvent(plyr.media, 'progress');
 
                 if (parseInt(data.percent) === 1) {
                     // Trigger event
-                    triggerEvent(plyr.media, 'canplaythrough');
+                    _triggerEvent(plyr.media, 'canplaythrough');
                 }
             });
 
             plyr.embed.on('seeked', function() {
                 plyr.media.seeking = false;
-                triggerEvent(plyr.media, 'seeked');
-                triggerEvent(plyr.media, 'play');
+                _triggerEvent(plyr.media, 'seeked');
+                _triggerEvent(plyr.media, 'play');
             });
 
             plyr.embed.on('ended', function() {
                 plyr.media.paused = true;
-                triggerEvent(plyr.media, 'ended');
+                _triggerEvent(plyr.media, 'ended');
             });
         }
 
-        // SoundCloud ready
-        function soundCloudReady() {
+        // Soundcloud ready
+        function _soundcloudReady() {
             /* jshint validthis: true */
             plyr.embed = window.SC.Widget(this);
 
             // Setup on ready
             plyr.embed.bind(window.SC.Widget.Events.READY, function() {
-                // Create a faux HTML5 API using the SoundCloud API
+                // Create a faux HTML5 API using the Soundcloud API
                 plyr.media.play = function() {
                     plyr.embed.play();
                     plyr.media.paused = false;
@@ -2207,105 +2226,105 @@
                     plyr.media.duration = value / 1000;
 
                     // Update UI
-                    embedReady();
+                    _embedReady();
                 });
 
                 plyr.embed.getPosition(function(value) {
                     plyr.media.currentTime = value;
 
                     // Trigger timeupdate
-                    triggerEvent(plyr.media, 'timeupdate');
+                    _triggerEvent(plyr.media, 'timeupdate');
                 });
 
                 plyr.embed.bind(window.SC.Widget.Events.PLAY, function() {
                     plyr.media.paused = false;
-                    triggerEvent(plyr.media, 'play');
-                    triggerEvent(plyr.media, 'playing');
+                    _triggerEvent(plyr.media, 'play');
+                    _triggerEvent(plyr.media, 'playing');
                 });
 
                 plyr.embed.bind(window.SC.Widget.Events.PAUSE, function() {
                     plyr.media.paused = true;
-                    triggerEvent(plyr.media, 'pause');
+                    _triggerEvent(plyr.media, 'pause');
                 });
 
                 plyr.embed.bind(window.SC.Widget.Events.PLAY_PROGRESS, function(data) {
                     plyr.media.seeking = false;
                     plyr.media.currentTime = data.currentPosition / 1000;
-                    triggerEvent(plyr.media, 'timeupdate');
+                    _triggerEvent(plyr.media, 'timeupdate');
                 });
 
                 plyr.embed.bind(window.SC.Widget.Events.LOAD_PROGRESS, function(data) {
                     plyr.media.buffered = data.loadProgress;
-                    triggerEvent(plyr.media, 'progress');
+                    _triggerEvent(plyr.media, 'progress');
 
                     if (parseInt(data.loadProgress) === 1) {
                         // Trigger event
-                        triggerEvent(plyr.media, 'canplaythrough');
+                        _triggerEvent(plyr.media, 'canplaythrough');
                     }
                 });
 
                 plyr.embed.bind(window.SC.Widget.Events.FINISH, function() {
                     plyr.media.paused = true;
-                    triggerEvent(plyr.media, 'ended');
+                    _triggerEvent(plyr.media, 'ended');
                 });
             });
         }
 
         // Play media
-        function play() {
+        function _play() {
             if ('play' in plyr.media) {
                 plyr.media.play();
             }
         }
 
         // Pause media
-        function pause() {
+        function _pause() {
             if ('pause' in plyr.media) {
                 plyr.media.pause();
             }
         }
 
         // Toggle playback
-        function togglePlay(toggle) {
+        function _togglePlay(toggle) {
             // True toggle
-            if (!is.boolean(toggle)) {
+            if (!_is.boolean(toggle)) {
                 toggle = plyr.media.paused;
             }
 
             if (toggle) {
-                play();
+                _play();
             } else {
-                pause();
+                _pause();
             }
 
             return toggle;
         }
 
         // Rewind
-        function rewind(seekTime) {
+        function _rewind(seekTime) {
             // Use default if needed
-            if (!is.number(seekTime)) {
+            if (!_is.number(seekTime)) {
                 seekTime = config.seekTime;
             }
-            seek(plyr.media.currentTime - seekTime);
+            _seek(plyr.media.currentTime - seekTime);
         }
 
         // Fast forward
-        function forward(seekTime) {
+        function _forward(seekTime) {
             // Use default if needed
-            if (!is.number(seekTime)) {
+            if (!_is.number(seekTime)) {
                 seekTime = config.seekTime;
             }
-            seek(plyr.media.currentTime + seekTime);
+            _seek(plyr.media.currentTime + seekTime);
         }
 
         // Speed-up
-        function speed(speed) {
-            if (!is.array(config.speeds)) {
-                warn('Invalid speeds format');
+        function _speed(speed) {
+            if (!_is.array(config.speeds)) {
+                _warn('Invalid speeds format');
                 return;
             }
-            if (!is.number(speed)) {
+            if (!_is.number(speed)) {
                 var index = config.speeds.indexOf(config.currentSpeed);
 
                 if (index !== -1) {
@@ -2326,21 +2345,21 @@
             plyr.media.playbackRate = speed;
 
             // Save speed to localStorage
-            updateStorage({
+            _updateStorage({
                 speed: speed
             });
         }
 
         // Seek to time
         // The input parameter can be an event or a number
-        function seek(input) {
+        function _seek(input) {
             var targetTime = 0,
                 paused = plyr.media.paused,
-                duration = getDuration();
+                duration = _getDuration();
 
-            if (is.number(input)) {
+            if (_is.number(input)) {
                 targetTime = input;
-            } else if (is.event(input) && inArray(['input', 'change'], input.type)) {
+            } else if (_is.event(input) && _inArray(['input', 'change'], input.type)) {
                 // It's the seek slider
                 // Seek to the selected time
                 targetTime = ((input.target.value / input.target.max) * duration);
@@ -2354,7 +2373,7 @@
             }
 
             // Update seek range and progress
-            updateSeekDisplay(targetTime);
+            _updateSeekDisplay(targetTime);
 
             // Set the current time
             // Try/catch incase the media isn't set and we're calling seek() from source() and IE moans
@@ -2363,7 +2382,7 @@
             } catch (e) {}
 
             // Embeds
-            if (inArray(config.types.embed, plyr.type)) {
+            if (_inArray(config.types.embed, plyr.type)) {
                 switch (plyr.type) {
                     case 'youtube':
                         plyr.embed.seekTo(targetTime);
@@ -2380,28 +2399,28 @@
                 }
 
                 if (paused) {
-                    pause();
+                    _pause();
                 }
 
                 // Trigger timeupdate
-                triggerEvent(plyr.media, 'timeupdate');
+                _triggerEvent(plyr.media, 'timeupdate');
 
                 // Set seeking flag
                 plyr.media.seeking = true;
 
                 // Trigger seeking
-                triggerEvent(plyr.media, 'seeking');
+                _triggerEvent(plyr.media, 'seeking');
             }
 
             // Logging
-            log('Seeking to ' + plyr.media.currentTime + ' seconds');
+            _log('Seeking to ' + plyr.media.currentTime + ' seconds');
 
             // Special handling for 'manual' captions
-            seekManualCaptions(targetTime);
+            _seekManualCaptions(targetTime);
         }
 
         // Get the duration (or custom if set)
-        function getDuration() {
+        function _getDuration() {
             // It should be a number, but parse it just incase
             var duration = parseInt(config.duration),
 
@@ -2418,16 +2437,16 @@
         }
 
         // Check playing state
-        function checkPlaying() {
-            toggleClass(plyr.container, config.classes.playing, !plyr.media.paused);
+        function _checkPlaying() {
+            _toggleClass(plyr.container, config.classes.playing, !plyr.media.paused);
 
-            toggleClass(plyr.container, config.classes.stopped, plyr.media.paused);
+            _toggleClass(plyr.container, config.classes.stopped, plyr.media.paused);
 
-            toggleControls(plyr.media.paused);
+            _toggleControls(plyr.media.paused);
         }
 
         // Save scroll position
-        function saveScrollPosition() {
+        function _saveScrollPosition() {
             scroll = {
                 x: window.pageXOffset || 0,
                 y: window.pageYOffset || 0
@@ -2435,34 +2454,34 @@
         }
 
         // Restore scroll position
-        function restoreScrollPosition() {
+        function _restoreScrollPosition() {
             window.scrollTo(scroll.x, scroll.y);
         }
 
         // Toggle fullscreen
-        function toggleFullscreen(event) {
+        function _toggleFullscreen(event) {
             // Check for native support
-            var nativeSupport = support.fullscreen;
+            var nativeSupport = _support.fullscreen;
 
             if (nativeSupport) {
                 // If it's a fullscreen change event, update the UI
-                if (event && event.type === fullscreen.eventType) {
-                    plyr.isFullscreen = fullscreen.isFullScreen(plyr.container);
+                if (event && event.type === _fullscreen.eventType) {
+                    plyr.isFullscreen = _fullscreen.isFullScreen(plyr.container);
                 } else {
                     // Else it's a user request to enter or exit
-                    if (!fullscreen.isFullScreen(plyr.container)) {
+                    if (!_fullscreen.isFullScreen(plyr.container)) {
                         // Save scroll position
-                        saveScrollPosition();
+                        _saveScrollPosition();
 
                         // Request full screen
-                        fullscreen.requestFullScreen(plyr.container);
+                        _fullscreen.requestFullScreen(plyr.container);
                     } else {
                         // Bail from fullscreen
-                        fullscreen.cancelFullScreen();
+                        _fullscreen.cancelFullScreen();
                     }
 
                     // Check if we're actually full screen (it could fail)
-                    plyr.isFullscreen = fullscreen.isFullScreen(plyr.container);
+                    plyr.isFullscreen = _fullscreen.isFullScreen(plyr.container);
 
                     return;
                 }
@@ -2475,45 +2494,45 @@
             }
 
             // Set class hook
-            toggleClass(plyr.container, config.classes.fullscreen.active, plyr.isFullscreen);
+            _toggleClass(plyr.container, config.classes.fullscreen.active, plyr.isFullscreen);
 
             // Trap focus
-            focusTrap(plyr.isFullscreen);
+            _focusTrap(plyr.isFullscreen);
 
             // Set button state
             if (plyr.buttons && plyr.buttons.fullscreen) {
-                toggleState(plyr.buttons.fullscreen, plyr.isFullscreen);
+                _toggleState(plyr.buttons.fullscreen, plyr.isFullscreen);
             }
 
             // Trigger an event
-            triggerEvent(plyr.container, plyr.isFullscreen ? 'enterfullscreen' : 'exitfullscreen', true);
+            _triggerEvent(plyr.container, plyr.isFullscreen ? 'enterfullscreen' : 'exitfullscreen', true);
 
             // Restore scroll position
             if (!plyr.isFullscreen && nativeSupport) {
-                restoreScrollPosition();
+                _restoreScrollPosition();
             }
         }
 
         // Mute
-        function toggleMute(muted) {
+        function _toggleMute(muted) {
             // If the method is called without parameter, toggle based on current value
-            if (!is.boolean(muted)) {
+            if (!_is.boolean(muted)) {
                 muted = !plyr.media.muted;
             }
 
             // Set button state
-            toggleState(plyr.buttons.mute, muted);
+            _toggleState(plyr.buttons.mute, muted);
 
             // Set mute on the player
             plyr.media.muted = muted;
 
             // If volume is 0 after unmuting, set to default
             if (plyr.media.volume === 0) {
-                setVolume(config.volume);
+                _setVolume(config.volume);
             }
 
             // Embeds
-            if (inArray(config.types.embed, plyr.type)) {
+            if (_inArray(config.types.embed, plyr.type)) {
                 // YouTube
                 switch (plyr.type) {
                     case 'youtube':
@@ -2527,17 +2546,17 @@
                 }
 
                 // Trigger volumechange for embeds
-                triggerEvent(plyr.media, 'volumechange');
+                _triggerEvent(plyr.media, 'volumechange');
             }
         }
 
         // Set volume
-        function setVolume(volume) {
+        function _setVolume(volume) {
             var max = config.volumeMax,
                 min = config.volumeMin;
 
             // Load volume from storage if no value specified
-            if (is.undefined(volume)) {
+            if (_is.undefined(volume)) {
                 volume = plyr.storage.volume;
             }
 
@@ -2564,7 +2583,7 @@
             }
 
             // Embeds
-            if (inArray(config.types.embed, plyr.type)) {
+            if (_inArray(config.types.embed, plyr.type)) {
                 switch (plyr.type) {
                     case 'youtube':
                         plyr.embed.setVolume(plyr.media.volume * 100);
@@ -2577,41 +2596,41 @@
                 }
 
                 // Trigger volumechange for embeds
-                triggerEvent(plyr.media, 'volumechange');
+                _triggerEvent(plyr.media, 'volumechange');
             }
 
             // Toggle muted state
             if (volume === 0) {
                 plyr.media.muted = true;
             } else if (plyr.media.muted && volume > 0) {
-                toggleMute();
+                _toggleMute();
             }
         }
 
         // Increase volume
-        function increaseVolume(step) {
+        function _increaseVolume(step) {
             var volume = plyr.media.muted ? 0 : (plyr.media.volume * config.volumeMax);
 
-            if (!is.number(step)) {
+            if (!_is.number(step)) {
                 step = config.volumeStep;
             }
 
-            setVolume(volume + step);
+            _setVolume(volume + step);
         }
 
         // Decrease volume
-        function decreaseVolume(step) {
+        function _decreaseVolume(step) {
             var volume = plyr.media.muted ? 0 : (plyr.media.volume * config.volumeMax);
 
-            if (!is.number(step)) {
+            if (!_is.number(step)) {
                 step = config.volumeStep;
             }
 
-            setVolume(volume - step);
+            _setVolume(volume - step);
         }
 
         // Update volume UI and storage
-        function updateVolume() {
+        function _updateVolume() {
             // Get the current volume
             var volume = plyr.media.muted ? 0 : (plyr.media.volume * config.volumeMax);
 
@@ -2626,28 +2645,28 @@
             }
 
             // Update the volume in storage
-            updateStorage({
+            _updateStorage({
                 volume: volume
             });
 
             // Toggle class if muted
-            toggleClass(plyr.container, config.classes.muted, (volume === 0));
+            _toggleClass(plyr.container, config.classes.muted, (volume === 0));
 
             // Update checkbox for mute state
             if (plyr.supported.full && plyr.buttons.mute) {
-                toggleState(plyr.buttons.mute, (volume === 0));
+                _toggleState(plyr.buttons.mute, (volume === 0));
             }
         }
 
         // Toggle captions
-        function toggleCaptions(show) {
+        function _toggleCaptions(show) {
             // If there's no full support, or there's no caption toggle
             if (!plyr.supported.full || !plyr.buttons.captions) {
                 return;
             }
 
             // If the method is called without parameter, toggle based on current value
-            if (!is.boolean(show)) {
+            if (!_is.boolean(show)) {
                 show = (plyr.container.className.indexOf(config.classes.captions.active) === -1);
             }
 
@@ -2655,34 +2674,34 @@
             plyr.captionsEnabled = show;
 
             // Toggle state
-            toggleState(plyr.buttons.captions, plyr.captionsEnabled);
+            _toggleState(plyr.buttons.captions, plyr.captionsEnabled);
 
             // Add class hook
-            toggleClass(plyr.container, config.classes.captions.active, plyr.captionsEnabled);
+            _toggleClass(plyr.container, config.classes.captions.active, plyr.captionsEnabled);
 
             // Trigger an event
-            triggerEvent(plyr.container, plyr.captionsEnabled ? 'captionsenabled' : 'captionsdisabled', true);
+            _triggerEvent(plyr.container, plyr.captionsEnabled ? 'captionsenabled' : 'captionsdisabled', true);
 
             // Save captions state to localStorage
-            updateStorage({
+            _updateStorage({
                 captionsEnabled: plyr.captionsEnabled
             });
         }
 
         // Select active caption
-        function setCaptionIndex(index) {
+        function _setCaptionIndex(index) {
             // Save active caption
             config.captions.selectedIndex = index;
 
             // Clear caption
-            setCaption();
+            _setCaption();
 
             // Re-run setup
-            setupCaptions();
+            _setupCaptions();
         }
 
         // Check if media is loading
-        function checkLoading(event) {
+        function _checkLoading(event) {
             var loading = (event.type === 'waiting');
 
             // Clear timer
@@ -2691,22 +2710,22 @@
             // Timer to prevent flicker when seeking
             timers.loading = setTimeout(function() {
                 // Toggle container class hook
-                toggleClass(plyr.container, config.classes.loading, loading);
+                _toggleClass(plyr.container, config.classes.loading, loading);
 
                 // Show controls if loading, hide if done
-                toggleControls(loading);
+                _toggleControls(loading);
             }, (loading ? 250 : 0));
         }
 
         // Update <progress> elements
-        function updateProgress(event) {
+        function _updateProgress(event) {
             if (!plyr.supported.full) {
                 return;
             }
 
             var progress = plyr.progress.played,
                 value = 0,
-                duration = getDuration();
+                duration = _getDuration();
 
             if (event) {
                 switch (event.type) {
@@ -2717,7 +2736,7 @@
                             return;
                         }
 
-                        value = getPercentage(plyr.media.currentTime, duration);
+                        value = _getPercentage(plyr.media.currentTime, duration);
 
                         // Set seek range value only if it's a 'natural' time event
                         if (event.type === 'timeupdate' && plyr.buttons.seek) {
@@ -2735,8 +2754,8 @@
 
                             if (buffered && buffered.length) {
                                 // HTML5
-                                return getPercentage(buffered.end(0), duration);
-                            } else if (is.number(buffered)) {
+                                return _getPercentage(buffered.end(0), duration);
+                            } else if (_is.number(buffered)) {
                                 // YouTube returns between 0 and 1
                                 return (buffered * 100);
                             }
@@ -2749,21 +2768,21 @@
             }
 
             // Set values
-            setProgress(progress, value);
+            _setProgress(progress, value);
         }
 
         // Set <progress> value
-        function setProgress(progress, value) {
+        function _setProgress(progress, value) {
             if (!plyr.supported.full) {
                 return;
             }
 
             // Default to 0
-            if (is.undefined(value)) {
+            if (_is.undefined(value)) {
                 value = 0;
             }
             // Default to buffer or bail
-            if (is.undefined(progress)) {
+            if (_is.undefined(progress)) {
                 if (plyr.progress && plyr.progress.buffer) {
                     progress = plyr.progress.buffer;
                 } else {
@@ -2772,7 +2791,7 @@
             }
 
             // One progress element passed
-            if (is.htmlElement(progress)) {
+            if (_is.htmlElement(progress)) {
                 progress.value = value;
             } else if (progress) {
                 // Object of progress + text element
@@ -2786,7 +2805,7 @@
         }
 
         // Update the displayed time
-        function updateTimeDisplay(time, element) {
+        function _updateTimeDisplay(time, element) {
             // Bail if there's no duration display
             if (!element) {
                 return;
@@ -2802,7 +2821,7 @@
             plyr.hours = parseInt(((time / 60) / 60) % 60);
 
             // Do we need to display hours?
-            var displayHours = (parseInt(((getDuration() / 60) / 60) % 60) > 0);
+            var displayHours = (parseInt(((_getDuration() / 60) / 60) % 60) > 0);
 
             // Ensure it's two digits. For example, 03 rather than 3.
             plyr.secs = ('0' + plyr.secs).slice(-2);
@@ -2813,32 +2832,32 @@
         }
 
         // Show the duration on metadataloaded
-        function displayDuration() {
+        function _displayDuration() {
             if (!plyr.supported.full) {
                 return;
             }
 
             // Determine duration
-            var duration = getDuration() || 0;
+            var duration = _getDuration() || 0;
 
             // If there's only one time display, display duration there
             if (!plyr.duration && config.displayDuration && plyr.media.paused) {
-                updateTimeDisplay(duration, plyr.currentTime);
+                _updateTimeDisplay(duration, plyr.currentTime);
             }
 
             // If there's a duration element, update content
             if (plyr.duration) {
-                updateTimeDisplay(duration, plyr.duration);
+                _updateTimeDisplay(duration, plyr.duration);
             }
 
             // Update the tooltip (if visible)
-            updateSeekTooltip();
+            _updateSeekTooltip();
         }
 
         // Handle time change event
-        function timeUpdate(event) {
+        function _timeUpdate(event) {
             // Duration
-            updateTimeDisplay(plyr.media.currentTime, plyr.currentTime);
+            _updateTimeDisplay(plyr.media.currentTime, plyr.currentTime);
 
             // Ignore updates while seeking
             if (event && event.type === 'timeupdate' && plyr.media.seeking) {
@@ -2846,18 +2865,18 @@
             }
 
             // Playing progress
-            updateProgress(event);
+            _updateProgress(event);
         }
 
         // Update seek range and progress
-        function updateSeekDisplay(time) {
+        function _updateSeekDisplay(time) {
             // Default to 0
-            if (!is.number(time)) {
+            if (!_is.number(time)) {
                 time = 0;
             }
 
-            var duration = getDuration(),
-                value = getPercentage(time, duration);
+            var duration = _getDuration(),
+                value = _getPercentage(time, duration);
 
             // Update progress
             if (plyr.progress && plyr.progress.played) {
@@ -2871,8 +2890,8 @@
         }
 
         // Update hover tooltip for seeking
-        function updateSeekTooltip(event) {
-            var duration = getDuration();
+        function _updateSeekTooltip(event) {
+            var duration = _getDuration();
 
             // Bail if setting not true
             if (!config.tooltips.seek || !plyr.progress.container || duration === 0) {
@@ -2886,7 +2905,7 @@
 
             // Determine percentage, if already visible
             if (!event) {
-                if (hasClass(plyr.progress.tooltip, visible)) {
+                if (_hasClass(plyr.progress.tooltip, visible)) {
                     percent = plyr.progress.tooltip.style.left.replace('%', '');
                 } else {
                     return;
@@ -2903,30 +2922,30 @@
             }
 
             // Display the time a click would seek to
-            updateTimeDisplay(((duration / 100) * percent), plyr.progress.tooltip);
+            _updateTimeDisplay(((duration / 100) * percent), plyr.progress.tooltip);
 
             // Set position
             plyr.progress.tooltip.style.left = percent + "%";
 
             // Show/hide the tooltip
             // If the event is a moues in/out and percentage is inside bounds
-            if (event && inArray(['mouseenter', 'mouseleave'], event.type)) {
-                toggleClass(plyr.progress.tooltip, visible, (event.type === 'mouseenter'));
+            if (event && _inArray(['mouseenter', 'mouseleave'], event.type)) {
+                _toggleClass(plyr.progress.tooltip, visible, (event.type === 'mouseenter'));
             }
         }
 
         // Set playback speed
-        function setSpeed(value) {
+        function _setSpeed(speed) {
             // Load speed from storage or default value
-            if (is.undefined(value)) {
-                value = plyr.storage.speed || config.defaultSpeed;
+            if (_is.undefined(speed)) {
+                speed = plyr.storage.speed || config.defaultSpeed;
             }
 
-            speed(value);
+            _speed(speed);
         }
 
         // Show the player controls in fullscreen mode
-        function toggleControls(toggle) {
+        function _toggleControls(toggle) {
             // Don't hide if config says not to, it's audio, or not ready or loading
             if (!config.hideControls || plyr.type === 'audio') {
                 return;
@@ -2935,19 +2954,19 @@
             var delay = 0,
                 isEnterFullscreen = false,
                 show = toggle,
-                loading = hasClass(plyr.container, config.classes.loading);
+                loading = _hasClass(plyr.container, config.classes.loading);
 
             // Default to false if no boolean
-            if (!is.boolean(toggle)) {
+            if (!_is.boolean(toggle)) {
                 if (toggle && toggle.type) {
                     // Is the enter fullscreen event
                     isEnterFullscreen = (toggle.type === 'enterfullscreen');
 
                     // Whether to show controls
-                    show = inArray(['mousemove', 'touchstart', 'mouseenter', 'focus'], toggle.type);
+                    show = _inArray(['mousemove', 'touchstart', 'mouseenter', 'focus'], toggle.type);
 
                     // Delay hiding on move events
-                    if (inArray(['mousemove', 'touchmove'], toggle.type)) {
+                    if (_inArray(['mousemove', 'touchmove'], toggle.type)) {
                         delay = 2000;
                     }
 
@@ -2956,7 +2975,7 @@
                         delay = 3000;
                     }
                 } else {
-                    show = hasClass(plyr.container, config.classes.hideControls);
+                    show = _hasClass(plyr.container, config.classes.hideControls);
                 }
             }
 
@@ -2965,7 +2984,7 @@
 
             // If the mouse is not over the controls, set a timeout to hide them
             if (show || plyr.media.paused || loading) {
-                toggleClass(plyr.container, config.classes.hideControls, false);
+                _toggleClass(plyr.container, config.classes.hideControls, false);
 
                 // Always show controls when paused or if touch
                 if (plyr.media.paused || loading) {
@@ -2987,16 +3006,16 @@
                         return;
                     }
 
-                    toggleClass(plyr.container, config.classes.hideControls, true);
+                    _toggleClass(plyr.container, config.classes.hideControls, true);
                 }, delay);
             }
         }
 
         // Add common function to retrieve media source
-        function source(source) {
+        function _source(source) {
             // If not null or undefined, parse it
-            if (!is.undefined(source)) {
-                updateSource(source);
+            if (!_is.undefined(source)) {
+                _updateSource(source);
                 return;
             }
 
@@ -3029,26 +3048,26 @@
 
         // Update source
         // Sources are not checked for support so be careful
-        function updateSource(source) {
-            if (!is.object(source) || !('sources' in source) || !source.sources.length) {
-                warn('Invalid source format');
+        function _updateSource(source) {
+            if (!_is.object(source) || !('sources' in source) || !source.sources.length) {
+                _warn('Invalid source format');
                 return;
             }
 
             // Remove ready class hook
-            toggleClass(plyr.container, config.classes.ready, false);
+            _toggleClass(plyr.container, config.classes.ready, false);
 
             // Pause playback
-            pause();
+            _pause();
 
             // Update seek range and progress
-            updateSeekDisplay();
+            _updateSeekDisplay();
 
             // Reset buffer progress
-            setProgress();
+            _setProgress();
 
             // Cancel current network requests
-            cancelRequests();
+            _cancelRequests();
 
             // Setup new source
             function setup() {
@@ -3056,11 +3075,11 @@
                 plyr.embed = null;
 
                 // Remove the old media
-                remove(plyr.media);
+                _remove(plyr.media);
 
                 // Remove video container
                 if (plyr.type === 'video' && plyr.videoContainer) {
-                    remove(plyr.videoContainer);
+                    _remove(plyr.videoContainer);
                 }
 
                 // Reset class name
@@ -3076,7 +3095,7 @@
                     if (plyr.type === 'video') {
                         var firstSource = source.sources[0];
 
-                        if ('type' in firstSource && inArray(config.types.embed, firstSource.type)) {
+                        if ('type' in firstSource && _inArray(config.types.embed, firstSource.type)) {
                             plyr.type = firstSource.type;
                         }
                     }
@@ -3104,15 +3123,15 @@
                 }
 
                 // Inject the new element
-                prependChild(plyr.container, plyr.media);
+                _prependChild(plyr.container, plyr.media);
 
                 // Autoplay the new source?
-                if (is.boolean(source.autoplay)) {
+                if (_is.boolean(source.autoplay)) {
                     config.autoplay = source.autoplay;
                 }
 
                 // Set attributes for audio and video
-                if (inArray(config.types.html5, plyr.type)) {
+                if (_inArray(config.types.html5, plyr.type)) {
                     if (config.crossorigin) {
                         plyr.media.setAttribute('crossorigin', '');
                     }
@@ -3128,23 +3147,23 @@
                 }
 
                 // Restore class hooks
-                toggleClass(plyr.container, config.classes.fullscreen.active, plyr.isFullscreen);
-                toggleClass(plyr.container, config.classes.captions.active, plyr.captionsEnabled);
-                toggleStyleHook();
+                _toggleClass(plyr.container, config.classes.fullscreen.active, plyr.isFullscreen);
+                _toggleClass(plyr.container, config.classes.captions.active, plyr.captionsEnabled);
+                _toggleStyleHook();
 
                 // Set new sources for html5
-                if (inArray(config.types.html5, plyr.type)) {
-                    insertChildElements('source', source.sources);
+                if (_inArray(config.types.html5, plyr.type)) {
+                    _insertChildElements('source', source.sources);
                 }
 
                 // Set up from scratch
-                setupMedia();
+                _setupMedia();
 
                 // HTML5 stuff
-                if (inArray(config.types.html5, plyr.type)) {
+                if (_inArray(config.types.html5, plyr.type)) {
                     // Setup captions
                     if ('tracks' in source) {
-                        insertChildElements('track', source.tracks);
+                        _insertChildElements('track', source.tracks);
                     }
 
                     // Load HTML5 sources
@@ -3152,39 +3171,39 @@
                 }
 
                 // If HTML5 or embed but not fully supported, setupInterface and call ready now
-                if (inArray(config.types.html5, plyr.type) || (inArray(config.types.embed, plyr.type) && !plyr.supported.full)) {
+                if (_inArray(config.types.html5, plyr.type) || (_inArray(config.types.embed, plyr.type) && !plyr.supported.full)) {
                     // Setup interface
-                    setupInterface();
+                    _setupInterface();
 
                     // Call ready
-                    ready();
+                    _ready();
                 }
 
                 // Set aria title and iframe title
                 config.title = source.title;
-                setTitle();
+                _setTitle();
             }
 
             // Destroy instance adn wait for callback
             // Vimeo throws a wobbly if you don't wait
-            destroy(setup, false);
+            _destroy(setup, false);
         }
 
         // Update poster
-        function updatePoster(source) {
+        function _updatePoster(source) {
             if (plyr.type === 'video') {
                 plyr.media.setAttribute('poster', source);
             }
         }
 
         // Listen for control events
-        function controlListeners() {
+        function _controlListeners() {
             // IE doesn't support input event, so we fallback to change
             var inputEvent = (plyr.browser.isIE ? 'change' : 'input');
 
             // Click play/pause helper
-            function _togglePlay() {
-                var play = togglePlay();
+            function togglePlay() {
+                var play = _togglePlay();
 
                 // Determine which buttons
                 var trigger = plyr.buttons[play ? 'play' : 'pause'],
@@ -3199,14 +3218,14 @@
 
                 // Setup focus and tab focus
                 if (target) {
-                    var hadTabFocus = hasClass(trigger, config.classes.tabFocus);
+                    var hadTabFocus = _hasClass(trigger, config.classes.tabFocus);
 
                     setTimeout(function() {
                         target.focus();
 
                         if (hadTabFocus) {
-                            toggleClass(trigger, config.classes.tabFocus, false);
-                            toggleClass(target, config.classes.tabFocus, true);
+                            _toggleClass(trigger, config.classes.tabFocus, false);
+                            _toggleClass(target, config.classes.tabFocus, true);
                         }
                     }, 100);
                 }
@@ -3235,12 +3254,12 @@
                 for (var button in plyr.buttons) {
                     var element = plyr.buttons[button];
 
-                    if (is.nodeList(element)) {
+                    if (_is.nodeList(element)) {
                         for (var i = 0; i < element.length; i++) {
-                            toggleClass(element[i], config.classes.tabFocus, (element[i] === focused));
+                            _toggleClass(element[i], config.classes.tabFocus, (element[i] === focused));
                         }
                     } else {
-                        toggleClass(element, config.classes.tabFocus, (element === focused));
+                        _toggleClass(element, config.classes.tabFocus, (element === focused));
                     }
                 }
             }
@@ -3251,7 +3270,7 @@
 
                 // Handle global presses
                 if (config.keyboardShorcuts.global) {
-                    on(window, 'keydown keyup', function(event) {
+                    _on(window, 'keydown keyup', function(event) {
                         var code = getKeyCode(event),
                             focused = getFocusElement(),
                             allowed = [48, 49, 50, 51, 52, 53, 54, 56, 57, 75, 77, 70, 67],
@@ -3261,14 +3280,14 @@
                         // and the key is in the allowed keys
                         // and if the focused element is not editable (e.g. text input)
                         // and any that accept key input http://webaim.org/techniques/keyboard/
-                        if (count === 1 && inArray(allowed, code) && (!is.htmlElement(focused) || !matches(focused, config.selectors.editable))) {
+                        if (count === 1 && _inArray(allowed, code) && (!_is.htmlElement(focused) || !_matches(focused, config.selectors.editable))) {
                             handleKey(event);
                         }
                     });
                 }
 
                 // Handle presses on focused
-                on(plyr.container, 'keydown keyup', handleKey);
+                _on(plyr.container, 'keydown keyup', handleKey);
             }
 
             function handleKey(event) {
@@ -3278,7 +3297,7 @@
 
                 // If the event is bubbled from the media element
                 // Firefox doesn't get the keycode for whatever reason
-                if (!is.number(code)) {
+                if (!_is.number(code)) {
                     return;
                 }
 
@@ -3288,12 +3307,12 @@
                     var duration = plyr.media.duration;
 
                     // Bail if we have no duration set
-                    if (!is.number(duration)) {
+                    if (!_is.number(duration)) {
                         return;
                     }
 
                     // Divide the max duration into 10th's and times by the number value
-                    seek((duration / 10) * (code - 48));
+                    _seek((duration / 10) * (code - 48));
                 }
 
                 // Handle the key on keydown
@@ -3303,16 +3322,16 @@
                     var preventDefault = [48, 49, 50, 51, 52, 53, 54, 56, 57, 32, 75, 38, 40, 77, 39, 37, 70, 67];
                     var checkFocus = [38, 40];
 
-                    if (inArray(checkFocus, code)) {
+                    if (_inArray(checkFocus, code)) {
                         var focused = getFocusElement();
 
-                        if (is.htmlElement(focused) && getFocusElement().type === "radio") {
+                        if (_is.htmlElement(focused) && getFocusElement().type === "radio") {
                             return;
                         }
                     }
 
                     // If the code is found prevent default (e.g. prevent scrolling for arrows)
-                    if (inArray(preventDefault, code)) {
+                    if (_inArray(preventDefault, code)) {
                         event.preventDefault();
                         event.stopPropagation();
                     }
@@ -3337,47 +3356,47 @@
                         case 32:
                         case 75:
                             if (!held) {
-                                togglePlay();
+                                _togglePlay();
                             }
                             break;
                             // Arrow up
                         case 38:
-                            increaseVolume();
+                            _increaseVolume();
                             break;
                             // Arrow down
                         case 40:
-                            decreaseVolume();
+                            _decreaseVolume();
                             break;
                             // M key
                         case 77:
                             if (!held) {
-                                toggleMute()
+                                _toggleMute()
                             }
                             break;
                             // Arrow forward
                         case 39:
-                            forward();
+                            _forward();
                             break;
                             // Arrow back
                         case 37:
-                            rewind();
+                            _rewind();
                             break;
                             // F key
                         case 70:
-                            toggleFullscreen();
+                            _toggleFullscreen();
                             break;
                             // C key
                         case 67:
                             if (!held) {
-                                toggleCaptions();
+                                _toggleCaptions();
                             }
                             break;
                     }
 
                     // Escape is handle natively when in full screen
                     // So we only need to worry about non native
-                    if (!support.fullscreen && plyr.isFullscreen && code === 27) {
-                        toggleFullscreen();
+                    if (!_support.fullscreen && plyr.isFullscreen && code === 27) {
+                        _toggleFullscreen();
                     }
 
                     // Store last code for next cycle
@@ -3388,7 +3407,7 @@
             }
 
             // Focus/tab management
-            on(window, 'keyup', function(event) {
+            _on(window, 'keyup', function(event) {
                 var code = getKeyCode(event),
                     focused = getFocusElement();
 
@@ -3396,66 +3415,66 @@
                     checkTabFocus(focused);
                 }
             });
-            on(document.body, 'click', function() {
-                toggleClass(getElement('.' + config.classes.tabFocus), config.classes.tabFocus, false);
+            _on(document.body, 'click', function() {
+                _toggleClass(_getElement('.' + config.classes.tabFocus), config.classes.tabFocus, false);
             });
             for (var button in plyr.buttons) {
                 var element = plyr.buttons[button];
 
-                on(element, 'blur', function() {
-                    toggleClass(element, 'tab-focus', false);
+                _on(element, 'blur', function() {
+                    _toggleClass(element, 'tab-focus', false);
                 });
             }
 
             // Play
-            proxyListener(plyr.buttons.play, 'click', config.listeners.play, _togglePlay);
+            _proxyListener(plyr.buttons.play, 'click', config.listeners.play, togglePlay);
 
             // Pause
-            proxyListener(plyr.buttons.pause, 'click', config.listeners.pause, _togglePlay);
+            _proxyListener(plyr.buttons.pause, 'click', config.listeners.pause, togglePlay);
 
             // Restart
-            proxyListener(plyr.buttons.restart, 'click', config.listeners.restart, seek);
+            _proxyListener(plyr.buttons.restart, 'click', config.listeners.restart, _seek);
 
             // Rewind
-            proxyListener(plyr.buttons.rewind, 'click', config.listeners.rewind, rewind);
+            _proxyListener(plyr.buttons.rewind, 'click', config.listeners.rewind, _rewind);
 
             // Fast forward
-            proxyListener(plyr.buttons.forward, 'click', config.listeners.forward, forward);
+            _proxyListener(plyr.buttons.forward, 'click', config.listeners.forward, _forward);
 
             // Speed-up
-            proxyListener(plyr.buttons.speed, 'click', config.listeners.speed, speed);
+            _proxyListener(plyr.buttons.speed, 'click', config.listeners.speed, _speed);
 
             // Seek
-            proxyListener(plyr.buttons.seek, inputEvent, config.listeners.seek, seek);
+            _proxyListener(plyr.buttons.seek, inputEvent, config.listeners.seek, _seek);
 
             // Set volume
-            proxyListener(plyr.volume.input, inputEvent, config.listeners.volume, function() {
-                setVolume(plyr.volume.input.value);
+            _proxyListener(plyr.volume.input, inputEvent, config.listeners.volume, function() {
+                _setVolume(plyr.volume.input.value);
             });
 
             // Mute
-            proxyListener(plyr.buttons.mute, 'click', config.listeners.mute, toggleMute);
+            _proxyListener(plyr.buttons.mute, 'click', config.listeners.mute, _toggleMute);
 
             // Fullscreen
-            proxyListener(plyr.buttons.fullscreen, 'click', config.listeners.fullscreen, toggleFullscreen);
+            _proxyListener(plyr.buttons.fullscreen, 'click', config.listeners.fullscreen, _toggleFullscreen);
 
             // Handle user exiting fullscreen by escaping etc
-            if (support.fullscreen) {
-                on(document, fullscreen.eventType, toggleFullscreen);
+            if (_support.fullscreen) {
+                _on(document, _fullscreen.eventType, _toggleFullscreen);
             }
 
             // Captions
-            on(plyr.buttons.captions, 'click', toggleCaptions);
+            _on(plyr.buttons.captions, 'click', _toggleCaptions);
 
             // Settings
-            on(plyr.buttons.settings, 'click', function(event) {
+            _on(plyr.buttons.settings, 'click', function(event) {
                 var menu = this,
                     toggle = event.target,
                     target = document.getElementById(toggle.getAttribute('aria-controls')),
                     show = (toggle.getAttribute('aria-expanded') === 'false');
 
                 // Nothing to show, bail
-                if (!is.htmlElement(target)) {
+                if (!_is.htmlElement(target)) {
                     return;
                 }
 
@@ -3489,7 +3508,7 @@
                     container.appendChild(clone);
                     targetWidth = clone.scrollWidth;
                     targetHeight = clone.scrollHeight;
-                    remove(clone);
+                    _remove(clone);
                 }
 
                 target.setAttribute('aria-hidden', !show);
@@ -3508,36 +3527,36 @@
             });
 
             // Picture in picture
-            on(plyr.buttons.pip, 'click', function() {
+            _on(plyr.buttons.pip, 'click', function() {
                 //if ()
 
                 plyr.media.webkitSetPresentationMode(plyr.media.webkitPresentationMode === 'picture-in-picture' ? 'inline' : 'picture-in-picture');
             });
 
             // Seek tooltip
-            on(plyr.progress.container, 'mouseenter mouseleave mousemove', updateSeekTooltip);
+            _on(plyr.progress.container, 'mouseenter mouseleave mousemove', _updateSeekTooltip);
 
             // Toggle controls visibility based on mouse movement
             if (config.hideControls) {
                 // Toggle controls on mouse events and entering fullscreen
-                on(plyr.container, 'mouseenter mouseleave mousemove touchstart touchend touchcancel touchmove enterfullscreen', toggleControls);
+                _on(plyr.container, 'mouseenter mouseleave mousemove touchstart touchend touchcancel touchmove enterfullscreen', _toggleControls);
 
                 // Watch for cursor over controls so they don't hide when trying to interact
-                on(plyr.controls, 'mouseenter mouseleave', function(event) {
+                _on(plyr.controls, 'mouseenter mouseleave', function(event) {
                     plyr.controls.hover = event.type === 'mouseenter';
                 });
 
                 // Watch for cursor over controls so they don't hide when trying to interact
-                on(plyr.controls, 'mousedown mouseup touchstart touchend touchcancel', function(event) {
-                    plyr.controls.pressed = inArray(['mousedown', 'touchstart'], event.type);
+                _on(plyr.controls, 'mousedown mouseup touchstart touchend touchcancel', function(event) {
+                    plyr.controls.pressed = _inArray(['mousedown', 'touchstart'], event.type);
                 });
 
                 // Focus in/out on controls
-                on(plyr.controls, 'focus blur', toggleControls, true);
+                _on(plyr.controls, 'focus blur', _toggleControls, true);
             }
 
             // Adjust volume on scroll
-            on(plyr.volume.input, 'wheel', function(event) {
+            _on(plyr.volume.input, 'wheel', function(event) {
                 event.preventDefault();
 
                 // Detect "natural" scroll - suppored on OS X Safari only
@@ -3548,45 +3567,45 @@
                 // Scroll down (or up on natural) to decrease
                 if (event.deltaY < 0 || event.deltaX > 0) {
                     if (inverted) {
-                        decreaseVolume(step);
+                        _decreaseVolume(step);
                     } else {
-                        increaseVolume(step);
+                        _increaseVolume(step);
                     }
                 }
 
                 // Scroll up (or down on natural) to increase
                 if (event.deltaY > 0 || event.deltaX < 0) {
                     if (inverted) {
-                        increaseVolume(step);
+                        _increaseVolume(step);
                     } else {
-                        decreaseVolume(step);
+                        _decreaseVolume(step);
                     }
                 }
             });
         }
 
         // Listen for media events
-        function mediaListeners() {
+        function _mediaListeners() {
             // Time change on media
-            on(plyr.media, 'timeupdate seeking', timeUpdate);
+            _on(plyr.media, 'timeupdate seeking', _timeUpdate);
 
             // Update manual captions
-            on(plyr.media, 'timeupdate', seekManualCaptions);
+            _on(plyr.media, 'timeupdate', _seekManualCaptions);
 
             // Display duration
-            on(plyr.media, 'durationchange loadedmetadata', displayDuration);
+            _on(plyr.media, 'durationchange loadedmetadata', _displayDuration);
 
             // Handle the media finishing
-            on(plyr.media, 'ended', function() {
+            _on(plyr.media, 'ended', function() {
                 // Show poster on end
                 if (plyr.type === 'video' && config.showPosterOnEnd) {
                     // Clear
                     if (plyr.type === 'video') {
-                        setCaption();
+                        _setCaption();
                     }
 
                     // Restart
-                    seek();
+                    _seek();
 
                     // Re-load media
                     plyr.media.load();
@@ -3594,21 +3613,21 @@
             });
 
             // Check for buffer progress
-            on(plyr.media, 'progress playing', updateProgress);
+            _on(plyr.media, 'progress playing', _updateProgress);
 
             // Handle native mute
-            on(plyr.media, 'volumechange', updateVolume);
+            _on(plyr.media, 'volumechange', _updateVolume);
 
             // Handle native play/pause
-            on(plyr.media, 'play pause ended', checkPlaying);
+            _on(plyr.media, 'play pause ended', _checkPlaying);
 
             // Loading
-            on(plyr.media, 'waiting canplay seeked', checkLoading);
+            _on(plyr.media, 'waiting canplay seeked', _checkLoading);
 
             // Click video
             if (config.clickToPlay && plyr.type !== 'audio') {
                 // Re-fetch the wrapper
-                var wrapper = getElement('.' + config.classes.videoWrapper);
+                var wrapper = _getElement('.' + config.classes.videoWrapper);
 
                 // Bail if there's no wrapper (this should never happen)
                 if (!wrapper) {
@@ -3619,52 +3638,52 @@
                 wrapper.style.cursor = "pointer";
 
                 // On click play, pause ore restart
-                on(wrapper, 'click', function() {
+                _on(wrapper, 'click', function() {
                     // Touch devices will just show controls (if we're hiding controls)
                     if (config.hideControls && plyr.browser.isTouch && !plyr.media.paused) {
                         return;
                     }
 
                     if (plyr.media.paused) {
-                        play();
+                        _play();
                     } else if (plyr.media.ended) {
-                        seek();
-                        play();
+                        _seek();
+                        _play();
                     } else {
-                        pause();
+                        _pause();
                     }
                 });
             }
 
             // Disable right click
             if (config.disableContextMenu) {
-                on(plyr.media, 'contextmenu', function(event) {
+                _on(plyr.media, 'contextmenu', function(event) {
                     event.preventDefault();
                 });
             }
 
             // Proxy events to container
             // Bubble up key events for Edge
-            on(plyr.media, config.events.concat(['keyup', 'keydown']).join(' '), function(event) {
-                triggerEvent(plyr.container, event.type, true);
+            _on(plyr.media, config.events.concat(['keyup', 'keydown']).join(' '), function(event) {
+                _triggerEvent(plyr.container, event.type, true);
             });
         }
 
         // Cancel current network requests
         // See https://github.com/Selz/plyr/issues/174
-        function cancelRequests() {
-            if (!inArray(config.types.html5, plyr.type)) {
+        function _cancelRequests() {
+            if (!_inArray(config.types.html5, plyr.type)) {
                 return;
             }
 
             // Remove child sources
             var sources = plyr.media.querySelectorAll('source');
             for (var i = 0; i < sources.length; i++) {
-                remove(sources[i]);
+                _remove(sources[i]);
             }
 
             // Set blank video src attribute
-            // This is to prevent a MEDIA_ERR_SRC_NOTsupportED error
+            // This is to prevent a MEDIA_ERR_SRC_NOT_SUPPORTED error
             // Info: http://stackoverflow.com/questions/32231579/how-to-properly-dispose-of-an-html5-video-and-close-socket-or-connection
             plyr.media.setAttribute('src', 'https://cdn.selz.com/plyr/blank.mp4');
 
@@ -3674,13 +3693,13 @@
             plyr.media.load();
 
             // Debugging
-            log('Cancelled network requests');
+            _log('Cancelled network requests');
         }
 
         // Destroy an instance
         // Event listeners are removed when elements are removed
         // http://stackoverflow.com/questions/12528049/if-a-dom-element-is-removed-are-its-listeners-also-removed-from-memory
-        function destroy(callback, restore) {
+        function _destroy(callback, restore) {
             // Bail if the element is not initialized
             if (!plyr.init) {
                 return null;
@@ -3714,7 +3733,7 @@
                 case 'video':
                 case 'audio':
                     // Restore native video controls
-                    toggleNativeControls(true);
+                    _toggleNativeControls(true);
 
                     // Clean up
                     cleanUp();
@@ -3724,12 +3743,12 @@
 
             function cleanUp() {
                 // Default to restore original element
-                if (!is.boolean(restore)) {
+                if (!_is.boolean(restore)) {
                     restore = true;
                 }
 
                 // Callback
-                if (is.function(callback)) {
+                if (_is.function(callback)) {
                     callback.call(original);
                 }
 
@@ -3748,27 +3767,27 @@
                 document.body.style.overflow = '';
 
                 // Event
-                triggerEvent(original, 'destroyed', true);
+                _triggerEvent(original, 'destroyed', true);
             }
         }
 
         // Setup a player
-        function init() {
+        function _init() {
             // Bail if the element is initialized
             if (plyr.init) {
                 return null;
             }
 
             // Sniff out the browser
-            plyr.browser = getBrowser();
+            plyr.browser = _getBrowser();
 
             // Bail if nothing to setup
-            if (!is.htmlElement(plyr.media)) {
+            if (!_is.htmlElement(plyr.media)) {
                 return;
             }
 
             // Load saved settings from localStorage
-            setupStorage();
+            _setupStorage();
 
             // Set media type based on tag or data attribute
             // Supported: video, audio, vimeo, youtube
@@ -3796,31 +3815,31 @@
             }
 
             // Wrap media
-            plyr.container = wrap(media, document.createElement('div'));
+            plyr.container = _wrap(media, document.createElement('div'));
 
             // Allow focus to be captured
             plyr.container.setAttribute('tabindex', 0);
 
             // Add style hook
-            toggleStyleHook();
+            _toggleStyleHook();
 
             // Debug info
-            log('' + plyr.browser.name + ' ' + plyr.browser.version);
+            _log('' + plyr.browser.name + ' ' + plyr.browser.version);
 
             // Setup media
-            setupMedia();
+            _setupMedia();
 
             // Setup interface
             // If embed but not fully supported, setupInterface (to avoid flash of controls) and call ready now
-            if (inArray(config.types.html5, plyr.type) || (inArray(config.types.embed, plyr.type) && !plyr.supported.full)) {
+            if (_inArray(config.types.html5, plyr.type) || (_inArray(config.types.embed, plyr.type) && !plyr.supported.full)) {
                 // Setup UI
-                setupInterface();
+                _setupInterface();
 
                 // Call ready
-                ready();
+                _ready();
 
                 // Set title on button and frame
-                setTitle();
+                _setTitle();
             }
 
             // Successful setup
@@ -3828,65 +3847,65 @@
         }
 
         // Setup the UI
-        function setupInterface() {
+        function _setupInterface() {
             // Don't setup interface if no support
             if (!plyr.supported.full) {
-                warn('Basic support only', plyr.type);
+                _warn('Basic support only', plyr.type);
 
                 // Remove controls
-                remove(getElement(config.selectors.controls.wrapper));
+                _remove(_getElement(config.selectors.controls.wrapper));
 
                 // Remove large play
-                remove(getElement(config.selectors.buttons.play));
+                _remove(_getElement(config.selectors.buttons.play));
 
                 // Restore native controls
-                toggleNativeControls(true);
+                _toggleNativeControls(true);
 
                 // Bail
                 return;
             }
 
             // Inject custom controls if not present
-            var controlsMissing = !getElements(config.selectors.controls.wrapper).length;
+            var controlsMissing = !_getElements(config.selectors.controls.wrapper).length;
             if (controlsMissing) {
                 // Inject custom controls
-                injectControls();
+                _injectControls();
             }
 
             // Find the elements
-            if (!findElements()) {
+            if (!_findElements()) {
                 return;
             }
 
             // If the controls are injected, re-bind listeners for controls
             if (controlsMissing) {
-                controlListeners();
+                _controlListeners();
             }
 
             // Media element listeners
-            mediaListeners();
+            _mediaListeners();
 
             // Remove native controls
-            toggleNativeControls();
+            _toggleNativeControls();
 
             // Setup fullscreen
-            setupFullscreen();
+            _setupFullscreen();
 
             // Captions
-            setupCaptions();
+            _setupCaptions();
 
             // Set volume
-            setVolume();
-            updateVolume();
+            _setVolume();
+            _updateVolume();
 
             // Set playback speed
-            setSpeed();
+            _setSpeed();
 
             // Reset time display
-            timeUpdate();
+            _timeUpdate();
 
             // Update the UI
-            checkPlaying();
+            _checkPlaying();
         }
 
         api = {
@@ -3905,7 +3924,7 @@
             getType: function() {
                 return plyr.type;
             },
-            getDuration: getDuration,
+            getDuration: _getDuration,
             getCurrentTime: function() {
                 return plyr.media.currentTime;
             },
@@ -3916,71 +3935,71 @@
                 return plyr.media.muted;
             },
             isReady: function() {
-                return hasClass(plyr.container, config.classes.ready);
+                return _hasClass(plyr.container, config.classes.ready);
             },
             isLoading: function() {
-                return hasClass(plyr.container, config.classes.loading);
+                return _hasClass(plyr.container, config.classes.loading);
             },
             isPaused: function() {
                 return plyr.media.paused;
             },
             on: function(event, callback) {
-                on(plyr.container, event, callback);
+                _on(plyr.container, event, callback);
                 return this;
             },
-            play: play,
-            pause: pause,
+            play: _play,
+            pause: _pause,
             stop: function() {
-                pause();
-                seek();
+                _pause();
+                _seek();
             },
-            restart: seek,
-            rewind: rewind,
-            forward: forward,
-            seek: seek,
-            source: source,
-            poster: updatePoster,
-            setVolume: setVolume,
-            setSpeed: setSpeed,
-            togglePlay: togglePlay,
-            toggleMute: toggleMute,
-            toggleCaptions: toggleCaptions,
-            toggleFullscreen: toggleFullscreen,
-            toggleControls: toggleControls,
-            setCaptionIndex: setCaptionIndex,
+            restart: _seek,
+            rewind: _rewind,
+            forward: _forward,
+            seek: _seek,
+            source: _source,
+            poster: _updatePoster,
+            setVolume: _setVolume,
+            setSpeed: _setSpeed,
+            togglePlay: _togglePlay,
+            toggleMute: _toggleMute,
+            toggleCaptions: _toggleCaptions,
+            toggleFullscreen: _toggleFullscreen,
+            toggleControls: _toggleControls,
+            setCaptionIndex: _setCaptionIndex,
             isFullscreen: function() {
                 return plyr.isFullscreen || false;
             },
             support: function(mimeType) {
-                return support.mime(plyr, mimeType);
+                return _support.mime(plyr, mimeType);
             },
-            destroy: destroy
+            destroy: _destroy
         };
 
         // Everything done
-        function ready() {
+        function _ready() {
             // Ready event at end of execution stack
             window.setTimeout(function() {
-                triggerEvent(plyr.media, 'ready');
+                _triggerEvent(plyr.media, 'ready');
             }, 0);
 
             // Set class hook on media element
-            toggleClass(plyr.media, defaults.classes.setup, true);
+            _toggleClass(plyr.media, defaults.classes.setup, true);
 
             // Set container class for ready
-            toggleClass(plyr.container, config.classes.ready, true);
+            _toggleClass(plyr.container, config.classes.ready, true);
 
             // Store a refernce to instance
             plyr.media.plyr = api;
 
             // Autoplay
             if (config.autoplay) {
-                play();
+                _play();
             }
         }
 
         // Initialize instance
-        init();
+        _init();
 
         // If init failed, return null
         if (!plyr.init) {
@@ -3995,14 +4014,14 @@
         var x = new XMLHttpRequest();
 
         // If the id is set and sprite exists, bail
-        if (is.string(id) && is.htmlElement(document.querySelector('#' + id))) {
+        if (_is.string(id) && _is.htmlElement(document.querySelector('#' + id))) {
             return;
         }
 
         // Create placeholder (to prevent loading twice)
         var container = document.createElement('div');
         container.setAttribute('hidden', '');
-        if (is.string(id)) {
+        if (_is.string(id)) {
             container.setAttribute('id', id);
         }
         document.body.insertBefore(container, document.body.childNodes[0]);
@@ -4024,7 +4043,7 @@
 
     // Check for support
     function supported(type) {
-        var browser = getBrowser(),
+        var browser = _getBrowser(),
             isOldIE = (browser.isIE && browser.version <= 9),
             isIos = browser.isIos,
             isIphone = /iPhone|iPod/i.test(navigator.userAgent),
@@ -4069,16 +4088,16 @@
             selector = [defaults.selectors.html5, defaults.selectors.embed].join(',');
 
         // Select the elements
-        if (is.string(targets)) {
+        if (_is.string(targets)) {
             // String selector passed
             targets = document.querySelectorAll(targets);
-        } else if (is.htmlElement(targets)) {
+        } else if (_is.htmlElement(targets)) {
             // Single HTMLElement passed
             targets = [targets];
-        } else if (!is.nodeList(targets) && !is.array(targets) && !is.string(targets)) {
+        } else if (!_is.nodeList(targets) && !_is.array(targets) && !_is.string(targets)) {
             // No selector passed, possibly options as first argument
             // If options are the first argument
-            if (is.undefined(options) && is.object(targets)) {
+            if (_is.undefined(options) && _is.object(targets)) {
                 options = targets;
             }
 
@@ -4087,7 +4106,7 @@
         }
 
         // Convert NodeList to array
-        if (is.nodeList(targets)) {
+        if (_is.nodeList(targets)) {
             targets = Array.prototype.slice.call(targets);
         }
 
@@ -4099,10 +4118,10 @@
 
         // Add to container list
         function add(target, media) {
-            if (!hasClass(media, defaults.classes.hook)) {
+            if (!_hasClass(media, defaults.classes.hook)) {
                 players.push({
                     // Always wrap in a <div> for styling
-                    //container:  wrap(media, document.createElement('div')),
+                    //container:  _wrap(media, document.createElement('div')),
                     // Could be a container or the media itself
                     target: target,
                     // This should be the <video>, <audio> or <div> (YouTube/Vimeo)
@@ -4123,7 +4142,7 @@
                 for (var x = 0; x < children.length; x++) {
                     add(target, children[x]);
                 }
-            } else if (matches(target, selector)) {
+            } else if (_matches(target, selector)) {
                 // Target is media element
                 add(target, target);
             }
@@ -4149,7 +4168,7 @@
                 data = JSON.parse(element.getAttribute('data-plyr'));
             } catch (e) {}
 
-            var config = extend({}, defaults, options, data);
+            var config = _extend({}, defaults, options, data);
 
             // Bail if not enabled
             if (!config.enabled) {
@@ -4160,7 +4179,7 @@
             var instance = new Plyr(media, config);
 
             // Go to next if setup failed
-            if (!is.object(instance)) {
+            if (!_is.object(instance)) {
                 return;
             }
 
@@ -4168,13 +4187,13 @@
             if (config.debug) {
                 var events = config.events.concat(['setup', 'statechange', 'enterfullscreen', 'exitfullscreen', 'captionsenabled', 'captionsdisabled']);
 
-                on(instance.getContainer(), events.join(' '), function(event) {
+                _on(instance.getContainer(), events.join(' '), function(event) {
                     console.log([config.logPrefix, 'event:', event.type].join(' '), event.detail.plyr);
                 });
             }
 
             // Callback
-            event(instance.getContainer(), 'setup', true, {
+            _event(instance.getContainer(), 'setup', true, {
                 plyr: instance
             });
 
@@ -4187,21 +4206,21 @@
 
     // Get all instances within a provided container
     function get(container) {
-        if (is.string(container)) {
+        if (_is.string(container)) {
             // Get selector if string passed
             container = document.querySelector(container);
-        } else if (is.undefined(container)) {
+        } else if (_is.undefined(container)) {
             // Use body by default to get all on page
             container = document.body;
         }
 
         // If we have a HTML element
-        if (is.htmlElement(container)) {
+        if (_is.htmlElement(container)) {
             var elements = container.querySelectorAll('.' + defaults.classes.setup),
                 instances = [];
 
             Array.prototype.slice.call(elements).forEach(function(element) {
-                if (is.object(element.plyr)) {
+                if (_is.object(element.plyr)) {
                     instances.push(element.plyr);
                 }
             });
