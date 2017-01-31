@@ -85,7 +85,8 @@
                     fullscreen: '[data-plyr="fullscreen"]',
                     settings: '[data-plyr="settings"]',
                     pip: '[data-plyr="pip"]',
-                    airplay: '[data-plyr="airplay"]'
+                    airplay: '[data-plyr="airplay"]',
+                    speed: '[data-plyr="speed"]'
                 },
                 volume: {
                     input: '[data-plyr="volume"]',
@@ -987,7 +988,7 @@
                                         '<li role="tab">',
                                             '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-speed-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-speed" aria-expanded="false">',
                                                 config.i18n.speed +
-                                                '<span class="plyr__menu__value">{speed}</span>',
+                                                '<span class="plyr__menu__value" data-menu="speed">{speed}</span>',
                                             '</button>',
                                         '</li>',
                                         '<li role="tab">',
@@ -1013,7 +1014,7 @@
                                         '</li>',
                                     '</ul>',
                                 '</div>',
-                                '<div class="plyr__menu__secondary" id="plyr-settings-{id}-speed" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-speed-toggle" role="tabpanel" tabindex="-1">',
+                                '<form class="plyr__menu__secondary" id="plyr-settings-{id}-speed" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-speed-toggle" role="tabpanel" tabindex="-1">',
                                     '<ul>',
                                         '<li role="tab">',
                                             '<button type="button" class="plyr__control plyr__control--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
@@ -1021,19 +1022,31 @@
                                             '</button>',
                                         '</li>',
                                         '<li>',
-                                            '<button type="button" class="plyr__control">2&times;</button>',
+                                            '<label class="plyr__control">',
+                                                '<input type="radio" name="speed" data-plyr="speed" value="2.0" '+ (config.currentSpeed === 2 ? 'checked' : '') +'>',
+                                                '2.0&times;',
+                                            '</label>',
                                         '</li>',
                                         '<li>',
-                                            '<button type="button" class="plyr__control">1.5&times;</button>',
+                                            '<label class="plyr__control">',
+                                                '<input type="radio" name="speed" data-plyr="speed"  value="1.5" '+ (config.currentSpeed === 1.5 ? 'checked' : '') +'>',
+                                                '1.5&times;',
+                                            '</label>',
                                         '</li>',
                                         '<li>',
-                                            '<button type="button" class="plyr__control">1&times;</button>',
+                                            '<label class="plyr__control">',
+                                                '<input type="radio" name="speed" data-plyr="speed"  value="1.0" '+ (config.currentSpeed === 1 ? 'checked' : '') +'>',
+                                                '1.0&times;',
+                                            '</label>',
                                         '</li>',
                                         '<li>',
-                                            '<button type="button" class="plyr__control">0.5&times;</button>',
+                                            '<label class="plyr__control">',
+                                                '<input type="radio" name="speed" data-plyr="speed"  value="0.5" '+ (config.currentSpeed === 0.5 ? 'checked' : '') +'>',
+                                                '0.5&times;',
+                                            '</label>',
                                         '</li>',
                                     '</ul>',
-                                '</div>',
+                                '</form>',
                                 '<div class="plyr__menu__secondary" id="plyr-settings-{id}-quality" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-quality-toggle" role="tabpanel" tabindex="-1">',
                                     '<ul>',
                                         '<li role="tab">',
@@ -1643,8 +1656,8 @@
             // Replace seek time instances
             html = replaceAll(html, '{seektime}', config.seekTime);
 
-            // Replace seek time instances
-            html = replaceAll(html, '{speed}', config.currentSpeed.toFixed(1).toString().replace('.0', '') + '&times;');
+            // Replace speed time instances
+            html = replaceAll(html, '{speed}', getSpeedDisplayValue());
 
             // Replace current captions language
             html = replaceAll(html, '{lang}', 'English');
@@ -1682,6 +1695,10 @@
             }
         }
 
+        function getSpeedDisplayValue() {
+           return config.currentSpeed.toFixed(1).toString().replace('.0', '') + '&times;'
+        }
+
         // Find the UI controls and store references
         function findElements() {
             try {
@@ -1697,7 +1714,8 @@
                     forward: getElement(config.selectors.buttons.forward),
                     fullscreen: getElement(config.selectors.buttons.fullscreen),
                     settings: getElement(config.selectors.buttons.settings),
-                    pip: getElement(config.selectors.buttons.pip)
+                    pip: getElement(config.selectors.buttons.pip),
+                    speed: document.querySelectorAll(config.selectors.buttons.speed)
                 };
 
                 // Inputs
@@ -2427,6 +2445,9 @@
             updateStorage({
                 speed: speed
             });
+
+            //Update current value of menu
+            document.querySelector('[data-menu="speed"]').innerHTML = getSpeedDisplayValue();
         }
 
         // Rewind
@@ -3537,7 +3558,10 @@
             proxy(plyr.buttons.forward, 'click', config.listeners.forward, forward);
 
             // Speed-up
-            proxy(plyr.buttons.speed, 'click', config.listeners.speed, setSpeed);
+            proxy(plyr.buttons.speed, 'click', config.listeners.speed, function () {
+              var speedValue = document.querySelector('[data-plyr="speed"]:checked').value;
+              setSpeed(Number(speedValue));
+            });
 
             // Seek
             proxy(plyr.buttons.seek, inputEvent, config.listeners.seek, seek);
