@@ -89,10 +89,7 @@
                     pip: '[data-plyr="pip"]',
                     airplay: '[data-plyr="airplay"]',
                     speed: '[data-plyr="speed"]',
-                    loopin: '[data-plyr="loopin"]',
-                    loopout: '[data-plyr="loopout"]',
-                    loopall: '[data-plyr="loopall"]',
-                    loopclear: '[data-plyr="loopclear"]',
+                    loop: '[data-plyr="loop"]'
                 },
                 volume: {
                     input: '[data-plyr="volume"]',
@@ -205,10 +202,7 @@
                 captions: null,
                 fullscreen: null,
                 speed: null,
-                loopin: null,
-                loopout: null,
-                loopall: null,
-                loopclear: null
+                loop: null
             },
             // Events to watch on HTML5 media elements
             events: ['ready', 'ended', 'progress', 'stalled', 'playing', 'waiting', 'canplay', 'canplaythrough', 'loadstart', 'loadeddata', 'loadedmetadata', 'timeupdate', 'volumechange', 'play', 'pause', 'error', 'seeking', 'seeked', 'emptied'],
@@ -1133,25 +1127,25 @@
                                             '</button>',
                                         '</li>',
                                         '<li>',
-                                            '<button type="button" class="plyr__control" data-plyr="loopall">',
+                                            '<button type="button" class="plyr__control" data-plyr="loop" data-loop__type="loopall">',
                                                 config.i18n.loopall,
                                                 '<span data-loop__value="loopall"></span>',
                                             '</button>',
                                         '</li>',
                                         '<li>',
-                                            '<button type="button" class="plyr__control" data-plyr="loopin">',
+                                            '<button type="button" class="plyr__control" data-plyr="loop" data-loop__type="loopin">',
                                                 config.i18n.loopin + ':&nbsp;',
                                                 '<span data-loop__value="loopin"></span>',
                                             '</button>',
                                         '</li>',
                                         '<li>',
-                                            '<button type="button" class="plyr__control" data-plyr="loopout">',
+                                            '<button type="button" class="plyr__control" data-plyr="loop" data-loop__type="loopout">',
                                                 config.i18n.loopout + ':&nbsp;',
                                                 '<span data-loop__value="loopout"></span>',
                                             '</button>',
                                         '</li>',
                                         '<li>',
-                                            '<button type="button" class="plyr__control" data-plyr="loopclear">',
+                                            '<button type="button" class="plyr__control" data-plyr="loop" data-loop__type="loopclear">',
                                                 config.i18n.loopclear,
                                             '</button>',
                                         '</li>',
@@ -1798,10 +1792,7 @@
                     settings: getElement(config.selectors.buttons.settings),
                     pip: getElement(config.selectors.buttons.pip),
                     speed: document.querySelectorAll(config.selectors.buttons.speed),
-                    loopin: document.querySelectorAll(config.selectors.buttons.loopin),
-                    loopout: document.querySelectorAll(config.selectors.buttons.loopout),
-                    loopall: document.querySelectorAll(config.selectors.buttons.loopall),
-                    loopclear: document.querySelectorAll(config.selectors.buttons.loopclear)
+                    loop: document.querySelectorAll(config.selectors.buttons.loop)
                 };
 
                 // Inputs
@@ -2529,9 +2520,8 @@
 
             //check if can loop
             config.loop = is.number(config.loopin) && is.number(config.loopout);
-
             var loopin = updateTimeDisplay(config.loopin, document.querySelector('[data-loop__value="loopin"]'));
-            var loopout = is.number(config.loopout) ? updateTimeDisplay(config.loopout, document.querySelector('[data-loop__value="loopout"]')) : null;
+            var loopout = is.number(config.loopout) ? updateTimeDisplay(config.loopout + 2, document.querySelector('[data-loop__value="loopout"]')) : document.querySelector('[data-loop__value="loopout"]').innerHTML = '';
             if (config.loop) {
               document.querySelector('[data-menu="loop"]').innerHTML = loopin + ' - ' + loopout;
             } else {
@@ -3743,17 +3733,11 @@
             proxy(plyr.buttons.fullscreen, 'click', config.listeners.fullscreen, toggleFullscreen);
 
             // Loop
-            proxy(plyr.buttons.loopall, 'click', config.listeners.loopall, function () {
-                toggleLoop('loopall');
-            });
-            proxy(plyr.buttons.loopin, 'click', config.listeners.loopin, function(){
-                toggleLoop('loopin');
-            });
-            proxy(plyr.buttons.loopout, 'click', config.listeners.loopout, function () {
-                toggleLoop('loopout');
-            });
-            proxy(plyr.buttons.loopclear, 'click', config.listeners.loopclear, function () {
-                toggleLoop('loopclear');
+            proxy(plyr.buttons.loop, 'click', config.listeners.loop, function (event) {
+                var loopValue = event.target.getAttribute('data-loop__value') || event.target.getAttribute('data-loop__type');
+                if (['loopin', 'loopout', 'loopall', 'loopclear'].indexOf(loopValue) > -1) {
+                    toggleLoop(loopValue);
+                }
             });
 
             // Handle user exiting fullscreen by escaping etc
