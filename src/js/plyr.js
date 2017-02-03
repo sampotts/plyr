@@ -46,7 +46,7 @@
             volumeMax: 10,
             volumeStep: 1,
             defaultSpeed: 1.0,
-            currentSpeed: 1.0,
+            currentSpeed: 1,
             speeds: [0.5, 1.0, 1.5, 2.0],
             duration: null,
             displayDuration: true,
@@ -1322,35 +1322,6 @@
 
                 // Setup focus trap
                 focusTrap();
-            }
-        }
-
-        // Setup Loop
-        function setupLoop() {
-            if (!plyr.supported.full) {
-              return;
-            }
-
-            if ((plyr.type !== 'audio' || config.fullscreen.allowAudio) && config.fullscreen.enabled) {
-              // Check for native support
-              var nativeSupport = support.fullscreen;
-
-              if (nativeSupport || (config.fullscreen.fallback && !inFrame())) {
-                log((nativeSupport ? 'Native' : 'Fallback') + ' fullscreen enabled');
-
-                // Add styling hook
-                toggleClass(plyr.container, config.classes.fullscreen.enabled, true);
-              } else {
-                log('Fullscreen not supported and fallback disabled');
-              }
-
-              // Toggle state
-              if (plyr.buttons && plyr.buttons.fullscreen) {
-                toggleState(plyr.buttons.fullscreen, false);
-              }
-
-              // Setup focus trap
-              focusTrap();
             }
         }
 
@@ -2893,36 +2864,6 @@
             // Update checkbox for mute state
             if (plyr.supported.full && plyr.buttons.mute) {
                 toggleState(plyr.buttons.mute, (volume === 0));
-            }
-        }
-
-
-        // Update volume UI and storage
-        function updateLoop() {
-            // Get the current volume
-            var volume = plyr.media.muted ? 0 : (plyr.media.volume * config.volumeMax);
-
-            // Update the <input type="range"> if present
-            if (plyr.supported.full) {
-              if (plyr.volume.input) {
-                plyr.volume.input.value = volume;
-              }
-              if (plyr.volume.display) {
-                plyr.volume.display.value = volume;
-              }
-            }
-
-            // Update the volume in storage
-            updateStorage({
-              volume: volume
-            });
-
-            // Toggle class if muted
-            toggleClass(plyr.container, config.classes.muted, (volume === 0));
-
-            // Update checkbox for mute state
-            if (plyr.supported.full && plyr.buttons.mute) {
-              toggleState(plyr.buttons.mute, (volume === 0));
             }
         }
 

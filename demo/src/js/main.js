@@ -21,7 +21,7 @@
         captions: {
             defaultActive: true
         },
-        controls: ['play', 'progress', 'volume', 'captions', 'settings', 'fullscreen', 'fast-forward']
+        controls: ['play-large', 'play', 'speed-up', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'fullscreen']
     });
     plyr.loadSprite('dist/demo.svg');
 
