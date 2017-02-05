@@ -98,7 +98,10 @@
                 },
                 captions: '.plyr__captions',
                 currentTime: '.plyr__time--current',
-                duration: '.plyr__time--duration'
+                duration: '.plyr__time--duration',
+                menu: {
+                    quality: '.js-plyr__menu__list--quality'
+                }
             },
             classes: {
                 setup: 'plyr--setup',
@@ -976,7 +979,7 @@
                         '</button>',
                         '<div class="plyr__menu__container" id="plyr-settings-{id}" aria-hidden="true" aria-labelled-by="plyr-settings-toggle-{id}" role="tablist" tabindex="-1">',
                             '<div>',
-                                '<div class="plyr__menu__primary" id="plyr-settings-{id}-primary" aria-hidden="false" aria-labelled-by="plyr-settings-toggle-{id}" role="tabpanel" tabindex="-1">',
+                                '<div id="plyr-settings-{id}-primary" aria-hidden="false" aria-labelled-by="plyr-settings-toggle-{id}" role="tabpanel" tabindex="-1">',
                                     '<ul>',
                                         '<li role="tab">',
                                             '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-captions-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-captions" aria-expanded="false">',
@@ -998,7 +1001,7 @@
                                         '</li>',
                                     '</ul>',
                                 '</div>',
-                                '<div class="plyr__menu__secondary" id="plyr-settings-{id}-captions" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-captions-toggle" role="tabpanel" tabindex="-1">',
+                                '<div id="plyr-settings-{id}-captions" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-captions-toggle" role="tabpanel" tabindex="-1">',
                                     '<ul>',
                                         '<li role="tab">',
                                             '<button type="button" class="plyr__control plyr__control--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
@@ -1013,7 +1016,7 @@
                                         '</li>',
                                     '</ul>',
                                 '</div>',
-                                '<div class="plyr__menu__secondary" id="plyr-settings-{id}-speed" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-speed-toggle" role="tabpanel" tabindex="-1">',
+                                '<div id="plyr-settings-{id}-speed" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-speed-toggle" role="tabpanel" tabindex="-1">',
                                     '<ul>',
                                         '<li role="tab">',
                                             '<button type="button" class="plyr__control plyr__control--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
@@ -1034,8 +1037,8 @@
                                         '</li>',
                                     '</ul>',
                                 '</div>',
-                                '<div class="plyr__menu__secondary" id="plyr-settings-{id}-quality" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-quality-toggle" role="tabpanel" tabindex="-1">',
-                                    '<ul>',
+                                '<div id="plyr-settings-{id}-quality" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-quality-toggle" role="tabpanel" tabindex="-1">',
+                                    '<ul class="js-plyr__menu__list--quality">',
                                         '<li role="tab">',
                                             '<button type="button" class="plyr__control plyr__control--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
                                                 config.i18n.quality,
@@ -1216,7 +1219,7 @@
                     return [
                         '<li>',
                             '<label class="plyr__control">',
-                                '<input type="radio" name="quality" value="' + quality + '"' + (quality === current ? ' checked' : '') + '>',
+                                '<input type="radio" name="quality" value="' + quality + '"' + (quality === plyr.quality.current ? ' checked' : '') + '>',
                                 getLabel(quality),
                                 getBadge(quality),
                             '</label>',
@@ -1232,7 +1235,7 @@
                     '</li>'
                 ].join(''));
 
-                console.warn(list);
+                getElement(config.selectors.menu.quality).innerHTML = list.join('');
             }
         }
 
