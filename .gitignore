@@ -6,3 +6,6 @@ aws.json
 *.mp4
 index-*.html
 notes.txt
+.idea
+.DS_Store
+npm-debug.log
