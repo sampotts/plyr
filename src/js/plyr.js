@@ -38,13 +38,15 @@
             debug: false,
             autoplay: false,
             loop: false,
+            loopin: 0,
+            loopout: null,
             seekTime: 10,
             volume: 10,
             volumeMin: 0,
             volumeMax: 10,
             volumeStep: 1,
             defaultSpeed: 1.0,
-            currentSpeed: 1.0,
+            currentSpeed: 1,
             speeds: [0.5, 1.0, 1.5, 2.0],
             duration: null,
             displayDuration: true,
@@ -85,7 +87,9 @@
                     fullscreen: '[data-plyr="fullscreen"]',
                     settings: '[data-plyr="settings"]',
                     pip: '[data-plyr="pip"]',
-                    airplay: '[data-plyr="airplay"]'
+                    airplay: '[data-plyr="airplay"]',
+                    speed: '[data-plyr="speed"]',
+                    loop: '[data-plyr="loop"]'
                 },
                 volume: {
                     input: '[data-plyr="volume"]',
@@ -162,7 +166,12 @@
                 captions: 'Captions',
                 settings: 'Settings',
                 speed: 'Speed',
-                quality: 'Quality'
+                quality: 'Quality',
+                loop: 'Loop',
+                loopin: 'Loop in',
+                loopout: 'Loop out',
+                loopall: 'Loop all',
+                loopclear: 'No Loop',
             },
             types: {
                 embed: ['youtube', 'vimeo', 'soundcloud'],
@@ -192,7 +201,8 @@
                 volume: null,
                 captions: null,
                 fullscreen: null,
-                speed: null
+                speed: null,
+                loop: null
             },
             // Events to watch on HTML5 media elements
             events: ['ready', 'ended', 'progress', 'stalled', 'playing', 'waiting', 'canplay', 'canplaythrough', 'loadstart', 'loadeddata', 'loadedmetadata', 'timeupdate', 'volumechange', 'play', 'pause', 'error', 'seeking', 'seeked', 'emptied'],
@@ -987,13 +997,19 @@
                                         '<li role="tab">',
                                             '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-speed-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-speed" aria-expanded="false">',
                                                 config.i18n.speed +
-                                                '<span class="plyr__menu__value">{speed}</span>',
+                                                '<span class="plyr__menu__value" data-menu="speed">{speed}</span>',
                                             '</button>',
                                         '</li>',
                                         '<li role="tab">',
                                             '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-quality-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-quality" aria-expanded="false">',
                                                 config.i18n.quality +
                                                 '<span class="plyr__menu__value">Auto</span>',
+                                            '</button>',
+                                        '</li>',
+                                        '<li role="tab">',
+                                            '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-loop-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-loop" aria-expanded="false">',
+                                            config.i18n.loop +
+                                                '<span class="plyr__menu__value" data-menu="loop"></span>',
                                             '</button>',
                                         '</li>',
                                     '</ul>',
@@ -1013,7 +1029,7 @@
                                         '</li>',
                                     '</ul>',
                                 '</div>',
-                                '<div class="plyr__menu__secondary" id="plyr-settings-{id}-speed" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-speed-toggle" role="tabpanel" tabindex="-1">',
+                                '<form class="plyr__menu__secondary" id="plyr-settings-{id}-speed" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-speed-toggle" role="tabpanel" tabindex="-1">',
                                     '<ul>',
                                         '<li role="tab">',
                                             '<button type="button" class="plyr__control plyr__control--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
@@ -1021,19 +1037,31 @@
                                             '</button>',
                                         '</li>',
                                         '<li>',
-                                            '<button type="button" class="plyr__control">2&times;</button>',
+                                            '<label class="plyr__control">',
+                                                '<input type="radio" name="speed" data-plyr="speed" value="2.0" '+ (config.currentSpeed === 2 ? 'checked' : '') +'>',
+                                                '2.0&times;',
+                                            '</label>',
                                         '</li>',
                                         '<li>',
-                                            '<button type="button" class="plyr__control">1.5&times;</button>',
+                                            '<label class="plyr__control">',
+                                                '<input type="radio" name="speed" data-plyr="speed"  value="1.5" '+ (config.currentSpeed === 1.5 ? 'checked' : '') +'>',
+                                                '1.5&times;',
+                                            '</label>',
                                         '</li>',
                                         '<li>',
-                                            '<button type="button" class="plyr__control">1&times;</button>',
+                                            '<label class="plyr__control">',
+                                                '<input type="radio" name="speed" data-plyr="speed"  value="1.0" '+ (config.currentSpeed === 1 ? 'checked' : '') +'>',
+                                                '1.0&times;',
+                                            '</label>',
                                         '</li>',
                                         '<li>',
-                                            '<button type="button" class="plyr__control">0.5&times;</button>',
+                                            '<label class="plyr__control">',
+                                                '<input type="radio" name="speed" data-plyr="speed"  value="0.5" '+ (config.currentSpeed === 0.5 ? 'checked' : '') +'>',
+                                                '0.5&times;',
+                                            '</label>',
                                         '</li>',
                                     '</ul>',
-                                '</div>',
+                                '</form>',
                                 '<div class="plyr__menu__secondary" id="plyr-settings-{id}-quality" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-quality-toggle" role="tabpanel" tabindex="-1">',
                                     '<ul>',
                                         '<li role="tab">',
@@ -1088,6 +1116,38 @@
                                                 '<input type="radio" name="quality">',
                                                 '360P',
                                             '</label>',
+                                        '</li>',
+                                    '</ul>',
+                                '</div>',
+                                '<div class="plyr__menu__secondary" id="plyr-settings-{id}-loop" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-loop-toggle" role="tabpanel" tabindex="-1">',
+                                    '<ul>',
+                                        '<li role="tab">',
+                                            '<button type="button" class="plyr__control plyr__control--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
+                                                config.i18n.loop,
+                                            '</button>',
+                                        '</li>',
+                                        '<li>',
+                                            '<button type="button" class="plyr__control" data-plyr="loop" data-loop__type="loopall">',
+                                                config.i18n.loopall,
+                                                '<span data-loop__value="loopall"></span>',
+                                            '</button>',
+                                        '</li>',
+                                        '<li>',
+                                            '<button type="button" class="plyr__control" data-plyr="loop" data-loop__type="loopin">',
+                                                config.i18n.loopin + ':&nbsp;',
+                                                '<span data-loop__value="loopin"></span>',
+                                            '</button>',
+                                        '</li>',
+                                        '<li>',
+                                            '<button type="button" class="plyr__control" data-plyr="loop" data-loop__type="loopout">',
+                                                config.i18n.loopout + ':&nbsp;',
+                                                '<span data-loop__value="loopout"></span>',
+                                            '</button>',
+                                        '</li>',
+                                        '<li>',
+                                            '<button type="button" class="plyr__control" data-plyr="loop" data-loop__type="loopclear">',
+                                                config.i18n.loopclear,
+                                            '</button>',
                                         '</li>',
                                     '</ul>',
                                 '</div>',
@@ -1643,8 +1703,8 @@
             // Replace seek time instances
             html = replaceAll(html, '{seektime}', config.seekTime);
 
-            // Replace seek time instances
-            html = replaceAll(html, '{speed}', config.currentSpeed.toFixed(1).toString().replace('.0', '') + '&times;');
+            // Replace speed time instances
+            html = replaceAll(html, '{speed}', getSpeedDisplayValue());
 
             // Replace current captions language
             html = replaceAll(html, '{lang}', 'English');
@@ -1682,6 +1742,10 @@
             }
         }
 
+        function getSpeedDisplayValue() {
+           return config.currentSpeed.toFixed(1).toString().replace('.0', '') + '&times;'
+        }
+
         // Find the UI controls and store references
         function findElements() {
             try {
@@ -1697,7 +1761,9 @@
                     forward: getElement(config.selectors.buttons.forward),
                     fullscreen: getElement(config.selectors.buttons.fullscreen),
                     settings: getElement(config.selectors.buttons.settings),
-                    pip: getElement(config.selectors.buttons.pip)
+                    pip: getElement(config.selectors.buttons.pip),
+                    speed: document.querySelectorAll(config.selectors.buttons.speed),
+                    loop: document.querySelectorAll(config.selectors.buttons.loop)
                 };
 
                 // Inputs
@@ -2392,6 +2458,49 @@
             return toggle;
         }
 
+        // Toggle loop
+        function toggleLoop(toggle) {
+            if (['loopin', 'loopout', 'loopall'].indexOf(toggle) === -1) {
+                toggle = 'loopclear';
+            }
+
+            var currentTime = Number(plyr.media.currentTime);
+
+            switch(toggle) {
+              case 'loopin':
+                if (config.loopout && config.loopout <= currentTime) {
+                    config.loopout = null;
+                }
+                config.loopin = currentTime;
+                break;
+              case 'loopout':
+                if (config.loopin >= currentTime) {
+                  return;
+                }
+                config.loopout = currentTime;
+                break;
+              case 'loopall':
+                config.loopin = 0;
+                config.loopout = plyr.media.duration - 2;
+                break;
+              default:
+                config.loopin = 0;
+                config.loopout = null;
+                break;
+            }
+
+            //check if can loop
+            config.loop = is.number(config.loopin) && is.number(config.loopout);
+            var loopin = updateTimeDisplay(config.loopin, document.querySelector('[data-loop__value="loopin"]'));
+            var loopout = is.number(config.loopout) ? updateTimeDisplay(config.loopout + 2, document.querySelector('[data-loop__value="loopout"]')) : document.querySelector('[data-loop__value="loopout"]').innerHTML = '';
+            if (config.loop) {
+              document.querySelector('[data-menu="loop"]').innerHTML = loopin + ' - ' + loopout;
+            } else {
+              document.querySelector('[data-menu="loop"]').innerHTML = config.i18n.loopclear;
+            }
+
+        }
+
         // Speed-up
         function setSpeed(speed) {
             // Load speed from storage or default value
@@ -2427,6 +2536,9 @@
             updateStorage({
                 speed: speed
             });
+
+            //Update current value of menu
+            document.querySelector('[data-menu="speed"]').innerHTML = getSpeedDisplayValue();
         }
 
         // Rewind
@@ -2864,7 +2976,10 @@
                 }
             }
 
-            // Set values
+            if (is.number(config.loopin) && is.number(config.loopout) && plyr.media.currentTime >= config.loopout) {
+                seek(config.loopin);
+            }
+
             setProgress(progress, value);
         }
 
@@ -2924,8 +3039,10 @@
             plyr.secs = ('0' + plyr.secs).slice(-2);
             plyr.mins = ('0' + plyr.mins).slice(-2);
 
+            var txt = (displayHours ? plyr.hours + ':' : '') + plyr.mins + ':' + plyr.secs;
             // Render
-            element.innerHTML = (displayHours ? plyr.hours + ':' : '') + plyr.mins + ':' + plyr.secs;
+            element.innerHTML = txt;
+            return txt;
         }
 
         // Show the duration on metadataloaded
@@ -3537,7 +3654,10 @@
             proxy(plyr.buttons.forward, 'click', config.listeners.forward, forward);
 
             // Speed-up
-            proxy(plyr.buttons.speed, 'click', config.listeners.speed, setSpeed);
+            proxy(plyr.buttons.speed, 'click', config.listeners.speed, function () {
+              var speedValue = document.querySelector('[data-plyr="speed"]:checked').value;
+              setSpeed(Number(speedValue));
+            });
 
             // Seek
             proxy(plyr.buttons.seek, inputEvent, config.listeners.seek, seek);
@@ -3552,6 +3672,14 @@
 
             // Fullscreen
             proxy(plyr.buttons.fullscreen, 'click', config.listeners.fullscreen, toggleFullscreen);
+
+            // Loop
+            proxy(plyr.buttons.loop, 'click', config.listeners.loop, function (event) {
+                var loopValue = event.target.getAttribute('data-loop__value') || event.target.getAttribute('data-loop__type');
+                if (['loopin', 'loopout', 'loopall', 'loopclear'].indexOf(loopValue) > -1) {
+                    toggleLoop(loopValue);
+                }
+            });
 
             // Handle user exiting fullscreen by escaping etc
             if (support.fullscreen) {
@@ -3995,6 +4123,10 @@
             // Set playback speed
             setSpeed();
 
+
+            // Set loop
+            toggleLoop();
+
             // Reset time display
             timeUpdate();
 
@@ -4037,12 +4169,16 @@
             isPaused: function() {
                 return plyr.media.paused;
             },
+            isLooping: function() {
+                return config.loopin && config.loopout;
+            },
             on: function(event, callback) {
                 on(plyr.container, event, callback);
                 return this;
             },
             play: play,
             pause: pause,
+            loop: toggleLoop,
             stop: function() {
                 pause();
                 seek();

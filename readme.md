@@ -257,7 +257,7 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
     <tr>
       <td><code>controls</code></td>
       <td>Array</td>
-      <td><code>['play-large', 'play', 'speed-up', 'progress', 'current-time', 'mute', 'volume', 'captions', 'fullscreen']</code></td>
+      <td><code>['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'fullscreen']</code></td>
       <td>Toggle which control elements you would like to display when using the default controls html. If you specify a <code>html</code> option, this is redundant. The default value is to display everything.</td>
     </tr>
     <tr>
@@ -401,6 +401,12 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
       <td>Array</td>
       <td>[1.0, 1.5, 2.0, 0.5]</td>
       <td>Playback speed list.</td>
+    </tr>
+    <tr>
+      <td><code>loops</code></td>
+      <td>Array</td>
+      <td>[Loop All, Loop in, Loop out, No Loop]</td>
+      <td>Playback loop list.</td>
     </tr>
   </tbody>
 </table>
