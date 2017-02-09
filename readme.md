@@ -1036,7 +1036,7 @@ If you find anything weird with Plyr, please let us know using the GitHub issues
 Plyr is developed by [@sam_potts](https://twitter.com/sam_potts) / [sampotts.me](http://sampotts.me) with help from the awesome [contributors](https://github.com/Selz/plyr/graphs/contributors)
 
 ## Donate
-Plyr costs money to run, not my time - I donate that for free but domains, cdn hosting and more. Any help is appreciated...
+Plyr costs money to run, not my time - I donate that for free but domains, CDN hosting and more. Any help is appreciated...
 [Donate to support Plyr](https://www.paypal.me/pottsy/20usd)
 
 ## Mentions
