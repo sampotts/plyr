@@ -1,6 +1,8 @@
 # Plyr
 A simple, accessible and customizable HTML5, YouTube and Vimeo media player.
 
+[Donate to support Plyr](#donate)
+
 [Checkout the demo](https://plyr.io)
 
 [![Image of Plyr](https://cdn.selz.com/plyr/plyr_v1.8.9.png)](https://plyr.io)
@@ -1032,6 +1034,10 @@ If you find anything weird with Plyr, please let us know using the GitHub issues
 
 ## Author
 Plyr is developed by [@sam_potts](https://twitter.com/sam_potts) / [sampotts.me](http://sampotts.me) with help from the awesome [contributors](https://github.com/Selz/plyr/graphs/contributors)
+
+## Donate
+Plyr costs money to run, not my time - I donate that for free but domains, cdn hosting and more. Any help is appreciated...
+[Donate to support Plyr](https://www.paypal.me/pottsy/20usd)
 
 ## Mentions
 - [ProductHunt](https://www.producthunt.com/tech/plyr)
