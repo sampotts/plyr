@@ -1075,6 +1075,7 @@ Also these links helped created Plyr:
 
 ## Thanks
 [![Fastly](https://www.fastly.com/sites/all/themes/custom/fastly2016/logo.png)](https://www.fastly.com/)
+
 Thanks to [Fastly](https://www.fastly.com/) for providing the CDN services. 
 
 ## Copyright and License
