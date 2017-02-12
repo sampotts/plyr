@@ -287,6 +287,12 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
       <td>Specify the id prefix for the icons used in the default controls (e.g. "plyr-play" would be "plyr"). This is to prevent clashes if you're using your own SVG sprite but with the default controls. Most people can ignore this option.</td>
     </tr>
     <tr>
+      <td><code>blankUrl</code></td>
+      <td>String</td>
+      <td><code>https://cdn.selz.com/plyr/blank.mp4</code></td>
+      <td>Specify a URL or path to a blank video file used to properly cancel network requests. See <a href="https://github.com/Selz/plyr/issues/174">issue #174</a> for more info.</td>
+    </tr>
+    <tr>
       <td><code>debug</code></td>
       <td>Boolean</td>
       <td><code>false</code></td>
