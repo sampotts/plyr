@@ -57,7 +57,7 @@
             hideControls: true,
             showPosterOnEnd: false,
             disableContextMenu: true,
-            keyboardShorcuts: {
+            keyboardShortcuts: {
                 focused: true,
                 global: false
             },
@@ -3472,11 +3472,11 @@
             }
 
             // Keyboard shortcuts
-            if (config.keyboardShorcuts.focused) {
+            if (config.keyboardShortcuts.focused) {
                 var last = null;
 
                 // Handle global presses
-                if (config.keyboardShorcuts.global) {
+                if (config.keyboardShortcuts.global) {
                     on(window, 'keydown keyup', function(event) {
                         var code = getKeyCode(event),
                             focused = getFocusElement(),
