@@ -40,6 +40,11 @@
             loop: false,
             loopin: 0,
             loopout: null,
+            loopKeyEvents: {
+                toggleLoop:  76,
+                loopin:      73,
+                loopout:     79
+            },
             seekTime: 10,
             volume: 10,
             volumeMin: 0,
@@ -2463,7 +2468,7 @@
 
         // Toggle loop
         function toggleLoop(toggle) {
-            if (['loopin', 'loopout', 'loopall'].indexOf(toggle) === -1) {
+            if (['loopin', 'loopout', 'loopall', 'toggle'].indexOf(toggle) === -1) {
                 toggle = 'loopclear';
             }
 
@@ -2485,6 +2490,15 @@
                 case 'loopall':
                     config.loopin = 0;
                     config.loopout = plyr.media.duration - 2;
+                    break;
+                case 'toggle':
+                    if (config.loop) {
+                      config.loopin = 0;
+                      config.loopout = null;
+                    } else {
+                      config.loopin = 0;
+                      config.loopout = plyr.media.duration - 2;
+                    }
                     break;
                 default:
                     config.loopin = 0;
@@ -3528,8 +3542,9 @@
                     // Which keycodes should we prevent default
                     var preventDefault = [48, 49, 50, 51, 52, 53, 54, 56, 57, 32, 75, 38, 40, 77, 39, 37, 70, 67];
                     var checkFocus = [38, 40];
+                    var loopKeyEventsValues = Object.values(config.loopKeyEvents);
 
-                    if (inArray(checkFocus, code)) {
+                    if (inArray(checkFocus, code) || inArray(loopKeyEventsValues, code)) {
                         var focused = getFocusElement();
 
                         if (is.htmlElement(focused) && getFocusElement().type === "radio") {
@@ -3606,6 +3621,29 @@
                                 toggleCaptions();
                             }
                             break;
+                    }
+
+                    //Loop events
+                    var loopKeyBindings = config.loopKeyEvents;
+                    var hasBindedKey = loopKeyEventsValues.filter(function(el) {
+                        return preventDefault.indexOf(el) > -1;
+                      }).length >= 1;
+
+                    if (hasBindedKey) {
+                        loopKeyBindings = defaults.loopKeyEvents;
+                    }
+                    console.log(loopKeyBindings,'~~~loopKeyBindings')
+
+                    switch (code) {
+                        case loopKeyBindings.toggleLoop:
+                          toggleLoop('toggle');
+                          break;
+                        case loopKeyBindings.loopin:
+                          toggleLoop('loopin');
+                          break;
+                        case loopKeyBindings.loopout:
+                          toggleLoop('loopout');
+                          break;
                     }
 
                     // Escape is handle natively when in full screen
