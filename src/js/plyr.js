@@ -3497,6 +3497,9 @@
                             allowed = [48, 49, 50, 51, 52, 53, 54, 56, 57, 75, 77, 70, 67],
                             count = get().length;
 
+                        //add also to allowed the keys of looping events
+                        allowed = allowed.concat(Object.values(config.loopKeyEvents));
+
                         // Only handle global key press if there's only one player
                         // and the key is in the allowed keys
                         // and if the focused element is not editable (e.g. text input)
