@@ -40,6 +40,8 @@
             loop: false,
             loopin: 0,
             loopout: null,
+            loopinPositionPercentage: 0,
+            loopoutPositionPercentage: 0,
             seekTime: 10,
             volume: 10,
             volumeMin: 0,
@@ -98,7 +100,8 @@
                 progress: {
                     container: '.plyr__progress',
                     buffer: '.plyr__progress--buffer',
-                    played: '.plyr__progress--played'
+                    played: '.plyr__progress--played',
+                    looped: '.plyr__progress-loop'
                 },
                 captions: '.plyr__captions',
                 currentTime: '.plyr__time--current',
@@ -897,6 +900,7 @@
                 /* beautify ignore:start */
                 html.push(
                     '<span class="plyr__progress">',
+                        '<div class="plyr__progress-loop"></div>',
                         '<label for="seek-{id}" class="plyr__sr-only">Seek</label>',
                         '<input id="seek-{id}" class="plyr__progress--seek" type="range" min="0" max="100" step="0.1" value="0" data-plyr="seek">',
                         '<progress class="plyr__progress--played" max="100" value="0" role="presentation"></progress>',
@@ -2475,16 +2479,20 @@
                         config.loopout = null;
                     }
                     config.loopin = currentTime;
+                    config.loopinPositionPercentage = plyr.progress.played.value;
                     break;
                 case 'loopout':
                     if (config.loopin >= currentTime) {
                         return;
                     }
                     config.loopout = currentTime;
+                    config.loopoutPositionPercentage = plyr.progress.played.value;
                     break;
                 case 'loopall':
                     config.loopin = 0;
                     config.loopout = plyr.media.duration - 2;
+                    config.loopinPositionPercentage = 0;
+                    config.loopoutPositionPercentage = 100;
                     break;
                 default:
                     config.loopin = 0;
@@ -2502,6 +2510,22 @@
                 document.querySelector('[data-menu="loop"]').innerHTML = config.i18n.loopclear;
             }
 
+            displayLoopBar();
+
+        }
+
+        function displayLoopBar() {
+            if (config.loop) {
+                getElement(config.selectors.progress.looped).style.position = 'absolute';
+                getElement(config.selectors.progress.looped).style.left = config.loopinPositionPercentage + '%';
+                getElement(config.selectors.progress.looped).style.width = (config.loopoutPositionPercentage - config.loopinPositionPercentage) + '%';
+                getElement(config.selectors.progress.looped).style.background = '#ffbb00';
+                getElement(config.selectors.progress.looped).style.height = '3px';
+                getElement(config.selectors.progress.looped).style.top = '3px';
+                getElement(config.selectors.progress.looped).style['border-radius'] = '100px';
+            } else {
+                getElement(config.selectors.progress.looped).style.width = '0px';
+            }
         }
 
         // Speed-up
