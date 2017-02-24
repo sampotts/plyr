@@ -84,6 +84,8 @@
                     forward: '[data-plyr="fast-forward"]',
                     mute: '[data-plyr="mute"]',
                     captions: '[data-plyr="captions"]',
+                    captions_menu: '[data-plyr="captions_menu"]',
+                    captions_lang: '[data-plyr="captions_lang"]',
                     fullscreen: '[data-plyr="fullscreen"]',
                     settings: '[data-plyr="settings"]',
                     pip: '[data-plyr="pip"]',
@@ -200,6 +202,7 @@
                 mute: null,
                 volume: null,
                 captions: null,
+                captions_lang: null,
                 fullscreen: null,
                 speed: null,
                 loop: null
@@ -814,6 +817,19 @@
             };
         }
 
+        function buildCaptionsMenu() {
+            var trackSubs = '';
+            if (Array.isArray(config.tracks) && config.tracks.length > 0) {
+              for (var i in config.tracks) {
+                var track = config.tracks[i];
+                if (typeof track == 'function') continue;
+                trackSubs += '<button type="button" class="plyr__control" data-plyr="captionslang" data-lang="'+track.srclang+'" data-index="'+i+'">'+track.label+'</button>';
+              }
+            }
+
+            return trackSubs;
+        }
+
         // Build the default HTML
         function buildControls() {
             // Create html array
@@ -978,6 +994,16 @@
             // Settings button / menu
             if (inArray(config.controls, 'settings')) {
                 /* beautify ignore:start */
+                var captionsMenuItem = '';
+                if (inArray(config.controls, 'captions')) {
+                captionsMenuItem = '<li role="tab">'+
+                        '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-captions-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-captions" aria-expanded="false">'+
+                            config.i18n.captions +
+                            '<span class="plyr__menu__value" data-captions="settings">{lang}</span>'+
+                        '</button>'+
+                    '</li>';
+                }
+
                 html.push(
                     '<div class="plyr__menu" data-plyr="settings">',
                         '<button type="button" id="plyr-settings-toggle-{id}" class="plyr__control" aria-haspopup="true" aria-controls="plyr-settings-{id}" aria-expanded="false">',
@@ -988,12 +1014,7 @@
                             '<div>',
                                 '<div class="plyr__menu__primary" id="plyr-settings-{id}-primary" aria-hidden="false" aria-labelled-by="plyr-settings-toggle-{id}" role="tabpanel" tabindex="-1">',
                                     '<ul>',
-                                        '<li role="tab">',
-                                            '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-captions-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-captions" aria-expanded="false">',
-                                                config.i18n.captions +
-                                                '<span class="plyr__menu__value">{lang}</span>',
-                                            '</button>',
-                                        '</li>',
+                                        captionsMenuItem,
                                         '<li role="tab">',
                                             '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-speed-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-speed" aria-expanded="false">',
                                                 config.i18n.speed +
@@ -1021,11 +1042,11 @@
                                                 config.i18n.captions,
                                             '</button>',
                                         '</li>',
-                                        '<li>',
-                                            '<button type="button" class="plyr__control">English</button>',
+                                        '<li data-captions="langs">',
+                                            buildCaptionsMenu(),
                                         '</li>',
                                         '<li>',
-                                            '<button type="button" class="plyr__control">Off</button>',
+                                            '<button type="button" class="plyr__control" data-plyr="captions_menu">Off</button>',
                                         '</li>',
                                     '</ul>',
                                 '</div>',
@@ -1763,12 +1784,14 @@
                     settings: getElement(config.selectors.buttons.settings),
                     pip: getElement(config.selectors.buttons.pip),
                     speed: document.querySelectorAll(config.selectors.buttons.speed),
-                    loop: document.querySelectorAll(config.selectors.buttons.loop)
+                    loop: document.querySelectorAll(config.selectors.buttons.loop),
+                    captions_lang: getElements(config.selectors.buttons.captions_lang)
                 };
 
                 // Inputs
                 plyr.buttons.mute = getElement(config.selectors.buttons.mute);
                 plyr.buttons.captions = getElement(config.selectors.buttons.captions);
+                plyr.buttons.captions_menu = getElement(config.selectors.buttons.captions_menu);
 
                 // Progress
                 plyr.progress = {
@@ -2881,6 +2904,8 @@
 
             // Set global
             plyr.captionsEnabled = show;
+            plyr.buttons.captions_menu.innerHTML = show ? 'Off' : 'On';
+            getElement('[data-captions="settings"]').innerHTML = getSubsLangValue();
 
             // Toggle state
             toggleState(plyr.buttons.captions, plyr.captionsEnabled);
@@ -2900,13 +2925,27 @@
         // Select active caption
         function setCaptionIndex(index) {
             // Save active caption
-            config.captions.selectedIndex = index;
+            config.captions.selectedIndex = index || config.captions.selectedIndex;
 
             // Clear caption
             setCaption();
 
             // Re-run setup
             setupCaptions();
+
+            getElement('[data-captions="settings"]').innerHTML = getSubsLangValue();
+        }
+
+        function getSubsLangValue() {
+            if (config.tracks.length === 0) {
+              return 'No Subs';
+            }
+
+            if (plyr.captionsEnabled || !is.boolean(plyr.captionsEnabled) && plyr.storage.captionsEnabled) {
+              return config.tracks[config.captions.selectedIndex].label;
+            } else {
+              return 'Disabled';
+            }
         }
 
         // Check if media is loading
@@ -3688,6 +3727,12 @@
 
             // Captions
             on(plyr.buttons.captions, 'click', toggleCaptions);
+            on(plyr.buttons.captions_menu, 'click', toggleCaptions);
+            // Captions language
+            proxy(plyr.buttons.captions_lang, 'click', config.listeners.captions_lang, function(e) {
+                var langIndex = e.target.attributes.getNamedItem("data-index").value;
+                setCaptionIndex(langIndex);
+            });
 
             // Settings
             on(plyr.buttons.settings, 'click', function(event) {
@@ -4115,6 +4160,7 @@
 
             // Captions
             setupCaptions();
+            setCaptionIndex();
 
             // Set volume
             setVolume();
