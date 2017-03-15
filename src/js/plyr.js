@@ -1517,27 +1517,30 @@
         function setCaption(caption) {
             var captions = getElement(config.selectors.captions);
             var content = document.createElement('span');
+            if(captions) {
 
-            // Empty the container
-            captions.innerHTML = '';
+              // Empty the container
+              captions.innerHTML = '';
 
-            // Default to empty
-            if (is.undefined(caption)) {
+              // Default to empty
+              if (is.undefined(caption)) {
                 caption = '';
-            }
+              }
 
-            // Set the span content
-            if (is.string(caption)) {
+              // Set the span content
+              if (is.string(caption)) {
                 content.innerHTML = caption.trim();
-            } else {
+              } else {
                 content.appendChild(caption);
+              }
+
+              // Set new caption text
+              captions.appendChild(content);
+
+              // Force redraw (for Safari)
+              var redraw = captions.offsetHeight;
             }
 
-            // Set new caption text
-            captions.appendChild(content);
-
-            // Force redraw (for Safari)
-            var redraw = captions.offsetHeight;
         }
 
         // Captions functions
