@@ -827,7 +827,7 @@
               for (var i in config.tracks) {
                 var track = config.tracks[i];
                 if (typeof track == 'function') continue;
-                trackSubs += '<button type="button" class="plyr__control" data-plyr="captionslang" data-lang="'+track.srclang+'" data-index="'+i+'">'+track.label+'</button>';
+                trackSubs += '<button type="button" class="plyr__control" data-plyr="captions_lang" data-lang="'+track.srclang+'" data-index="'+i+'">'+track.label+'</button>';
               }
             }
 
