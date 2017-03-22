@@ -1401,7 +1401,7 @@
                 plyr.captionExists = false;
                 log('No caption track found');
             } else if ((config.captions.selectedIndex + 1) > captionSources.length) {
-                plyr.captionExists = false;
+                plyr.captionExists = true;
                 log('Caption index out of bound');
             } else {
                 captionSrc = captionSources[config.captions.selectedIndex];
