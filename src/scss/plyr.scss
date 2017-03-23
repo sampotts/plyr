@@ -274,15 +274,12 @@
     .plyr__time {
         margin-left: ($plyr-control-spacing / 2);
 
-        &:first-child {
+        &:first-child, &:first-child + [data-plyr="pause"] {
             margin-left: 0;
         }
     }
     .plyr__volume {
         margin-left: ($plyr-control-spacing / 2);
-    }
-    [data-plyr="pause"] {
-        margin-left: 0;
     }
 
     // Buttons
