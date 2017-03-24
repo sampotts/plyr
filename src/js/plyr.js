@@ -44,6 +44,7 @@
         loadSprite:             true,
         iconPrefix:             'plyr',
         iconUrl:                'https://cdn.plyr.io/2.0.11/plyr.svg',
+        blankUrl:               'https://cdn.selz.com/plyr/blank.mp4',
         clickToPlay:            true,
         hideControls:           true,
         showPosterOnEnd:        false,
@@ -3217,7 +3218,7 @@
             // Set blank video src attribute
             // This is to prevent a MEDIA_ERR_SRC_NOT_SUPPORTED error
             // Info: http://stackoverflow.com/questions/32231579/how-to-properly-dispose-of-an-html5-video-and-close-socket-or-connection
-            plyr.media.setAttribute('src', 'https://cdn.selz.com/plyr/blank.mp4');
+            plyr.media.setAttribute('src', config.blankUrl);
 
             // Load the new empty source
             // This will cancel existing requests
