@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.0.12
+- Ability to set custom `blankUrl` for source changes (https://github.com/Selz/plyr/pull/504)
+- Ability to set caption button listener (https://github.com/Selz/plyr/pull/468)
+
 ## v2.0.11
 - Fix for `cleanUp` being called twice (thanks to @sebastiancarlsson)
 - Fix for YouTube controls on iPad (fixes #391)
