@@ -3066,7 +3066,7 @@
             }
 
             // Captions
-            _on(plyr.buttons.captions, 'click', _toggleCaptions);
+            _proxyListener(plyr.buttons.captions, 'click', config.listeners.captions, _toggleCaptions);
 
             // Seek tooltip
             _on(plyr.progress.container, 'mouseenter mouseleave mousemove', _updateSeekTooltip);
