@@ -38,10 +38,10 @@
             debug: false,
             autoplay: false,
             loop: {
-                enabled: false,
+                active: false,
                 start: 0,
                 end: null,
-                inidicator: {
+                indicator: {
                     start: 0,
                     end: 0
                 }
@@ -2273,7 +2273,7 @@
             // https://github.com/vimeo/player.js
             plyr.embed = new window.Vimeo.Player(container, {
                 id: parseInt(mediaId),
-                loop: config.loop.enabled,
+                loop: config.loop.active,
                 autoplay: config.autoplay,
                 byline: false,
                 portrait: false,
@@ -2470,9 +2470,11 @@
         }
 
         // Toggle loop
+        // TODO: Set the indicator on load as user may pass loop as config
         function toggleLoop(type) {
-            if (!inArray(['start', 'end', 'all', 'toggle'], type)) {
-                type = 'none';
+            // Set default to be a true toggle
+            if (!inArray(['start', 'end', 'all', 'none', 'toggle'], type)) {
+                type = 'toggle';
             }
 
             var currentTime = Number(plyr.media.currentTime);
@@ -2502,15 +2504,15 @@
                     break;
 
                 case 'toggle':
-                    if (config.loop) {
-                      config.loop.start = 0;
-                      config.loop.end = null;
+                    if (config.loop.active) {
+                        config.loop.start = 0;
+                        config.loop.end = null;
                     } else {
-                      config.loop.start = 0;
-                      config.loop.end = plyr.media.duration - 2;
+                        config.loop.start = 0;
+                        config.loop.end = plyr.media.duration - 2;
                     }
                     break;
-                
+
                 default:
                     config.loop.start = 0;
                     config.loop.end = null;
@@ -2518,7 +2520,7 @@
             }
 
             // Check if can loop
-            config.loop = is.number(config.loop.start) && is.number(config.loop.end);
+            config.loop.active = is.number(config.loop.start) && is.number(config.loop.end);
             var start = updateTimeDisplay(config.loop.start, getElement('[data-plyr-loop="start"]'));
             var end = null;
 
@@ -2530,19 +2532,19 @@
                 //end = document.querySelector('[data-loop__value="loopout"]').innerHTML = '';
             }
 
-            if (config.loop) {
+            if (config.loop.active) {
                 // TODO: Improve the design of the loop indicator and put styling in CSS where it's meant to be
                 //getElement('[data-menu="loop"]').innerHTML = start + ' - ' + end;
-                getElement(config.selectors.progress.looped).style.position = 'absolute';
-                getElement(config.selectors.progress.looped).style.left = config.loopinPositionPercentage + '%';
-                getElement(config.selectors.progress.looped).style.width = (config.loopoutPositionPercentage - config.loopinPositionPercentage) + '%';
-                getElement(config.selectors.progress.looped).style.background = '#ffbb00';
-                getElement(config.selectors.progress.looped).style.height = '3px';
-                getElement(config.selectors.progress.looped).style.top = '3px';
-                getElement(config.selectors.progress.looped).style['border-radius'] = '100px';
+                //getElement(config.selectors.progress.looped).style.position = 'absolute';
+                //getElement(config.selectors.progress.looped).style.left = config.loopinPositionPercentage + '%';
+                //getElement(config.selectors.progress.looped).style.width = (config.loopoutPositionPercentage - config.loopinPositionPercentage) + '%';
+                //getElement(config.selectors.progress.looped).style.background = '#ffbb00';
+                //getElement(config.selectors.progress.looped).style.height = '3px';
+                //getElement(config.selectors.progress.looped).style.top = '3px';
+                //getElement(config.selectors.progress.looped).style['border-radius'] = '100px';
             } else {
                 //getElement('[data-menu="loop"]').innerHTML = config.i18n.loopNone;
-                getElement(config.selectors.progress.looped).style.width = '0px';
+                //getElement(config.selectors.progress.looped).style.width = '0px';
             }
         }
 
@@ -3022,8 +3024,8 @@
                 }
             }
 
-            if (is.number(config.loopin) && is.number(config.loopout) && plyr.media.currentTime >= config.loopout) {
-                seek(config.loopin);
+            if (is.number(config.loop.start) && is.number(config.loop.end) && plyr.media.currentTime >= config.loop.end) {
+                seek(config.loop.start);
             }
 
             setProgress(progress, value);
@@ -3395,7 +3397,7 @@
                     if ('poster' in source) {
                         plyr.media.setAttribute('poster', source.poster);
                     }
-                    if (config.loop) {
+                    if (config.loop.active) {
                         plyr.media.setAttribute('loop', '');
                     }
                 }
@@ -3527,11 +3529,8 @@
                     on(window, 'keydown keyup', function(event) {
                         var code = getKeyCode(event);
                         var focused = getFocusElement();
-                        var allowed = [48, 49, 50, 51, 52, 53, 54, 56, 57, 75, 77, 70, 67];
+                        var allowed = [48, 49, 50, 51, 52, 53, 54, 56, 57, 75, 77, 70, 67, 73, 76, 79];
                         var count = get().length;
-
-                        //add also to allowed the keys of looping events
-                        allowed = allowed.concat(Object.values(config.loopKeyEvents));
 
                         // Only handle global key press if there's only one player
                         // and the key is in the allowed keys
@@ -3576,11 +3575,10 @@
                 // Reset on keyup
                 if (pressed) {
                     // Which keycodes should we prevent default
-                    var preventDefault = [48, 49, 50, 51, 52, 53, 54, 56, 57, 32, 75, 38, 40, 77, 39, 37, 70, 67];
+                    var preventDefault = [48, 49, 50, 51, 52, 53, 54, 56, 57, 32, 75, 38, 40, 77, 39, 37, 70, 67, 73, 76, 79];
                     var checkFocus = [38, 40];
-                    var loopKeyEventsValues = Object.values(config.loopKeyEvents);
 
-                    if (inArray(checkFocus, code) || inArray(loopKeyEventsValues, code)) {
+                    if (inArray(checkFocus, code)) {
                         var focused = getFocusElement();
 
                         if (is.htmlElement(focused) && getFocusElement().type === "radio") {
@@ -3657,28 +3655,18 @@
                                 toggleCaptions();
                             }
                             break;
-                    }
 
-                    //Loop events
-                    var loopKeyBindings = config.loopKeyEvents;
-                    var hasBindedKey = loopKeyEventsValues.filter(function(el) {
-                        return preventDefault.indexOf(el) > -1;
-                      }).length >= 1;
+                        case 73:
+                            toggleLoop('start');
+                            break;
 
-                    if (hasBindedKey) {
-                        loopKeyBindings = defaults.loopKeyEvents;
-                    }
+                        case 76:
+                            toggleLoop();
+                            break;
 
-                    switch (code) {
-                        case loopKeyBindings.toggleLoop:
-                          toggleLoop('toggle');
-                          break;
-                        case loopKeyBindings.loopin:
-                          toggleLoop('loopin');
-                          break;
-                        case loopKeyBindings.loopout:
-                          toggleLoop('loopout');
-                          break;
+                        case 79:
+                            toggleLoop('end');
+                            break;
                     }
 
                     // Escape is handle natively when in full screen
@@ -4246,7 +4234,7 @@
                 return plyr.media.paused;
             },
             isLooping: function() {
-                return config.loopin && config.loopout;
+                return config.loop.active;
             },
             on: function(event, callback) {
                 on(plyr.container, event, callback);
