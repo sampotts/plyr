@@ -672,7 +672,12 @@ player.source({
       srclang:'en',
       src:    '/path/to/captions.vtt',
       default: true
-  }]
+  }],
+  loopKeyEvents: {
+      toggleLoop: 76,
+      loopin:     73,
+      loopout:    79
+  }
 });
 ```
 
@@ -987,6 +992,21 @@ By default, a player will bind the following keyboard shortcuts when it has focu
       <td><code>C</code></td>
       <td>✔</td>
       <td>Toggle captions</td>
+    </tr>
+    <tr>
+      <td><code>l</code></td>
+      <td></td>
+      <td>Toggle Loop All/No Loop</td>
+    </tr>
+    <tr>
+      <td><code>i</code></td>
+      <td></td>
+      <td>Set the start marker of the loop</td>
+    </tr>
+    <tr>
+      <td><code>o</code></td>
+      <td></td>
+      <td>Set the end marker of the loop</td>
     </tr>
   </tbody>
 </table>

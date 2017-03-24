@@ -2471,7 +2471,7 @@
 
         // Toggle loop
         function toggleLoop(type) {
-            if (!inArray(['start', 'end', 'all'], type)) {
+            if (!inArray(['start', 'end', 'all', 'toggle'], type)) {
                 type = 'none';
             }
 
@@ -2496,11 +2496,21 @@
 
                 case 'all':
                     config.loop.start = 0;
-                    config.loop.end = plyr.media.duration;
+                    config.loop.end = plyr.media.duration - 2;
                     config.loop.indicator.start = 0;
                     config.loop.indicator.end = 100;
                     break;
 
+                case 'toggle':
+                    if (config.loop) {
+                      config.loop.start = 0;
+                      config.loop.end = null;
+                    } else {
+                      config.loop.start = 0;
+                      config.loop.end = plyr.media.duration - 2;
+                    }
+                    break;
+                
                 default:
                     config.loop.start = 0;
                     config.loop.end = null;
@@ -3520,6 +3530,9 @@
                         var allowed = [48, 49, 50, 51, 52, 53, 54, 56, 57, 75, 77, 70, 67];
                         var count = get().length;
 
+                        //add also to allowed the keys of looping events
+                        allowed = allowed.concat(Object.values(config.loopKeyEvents));
+
                         // Only handle global key press if there's only one player
                         // and the key is in the allowed keys
                         // and if the focused element is not editable (e.g. text input)
@@ -3565,8 +3578,9 @@
                     // Which keycodes should we prevent default
                     var preventDefault = [48, 49, 50, 51, 52, 53, 54, 56, 57, 32, 75, 38, 40, 77, 39, 37, 70, 67];
                     var checkFocus = [38, 40];
+                    var loopKeyEventsValues = Object.values(config.loopKeyEvents);
 
-                    if (inArray(checkFocus, code)) {
+                    if (inArray(checkFocus, code) || inArray(loopKeyEventsValues, code)) {
                         var focused = getFocusElement();
 
                         if (is.htmlElement(focused) && getFocusElement().type === "radio") {
@@ -3643,6 +3657,28 @@
                                 toggleCaptions();
                             }
                             break;
+                    }
+
+                    //Loop events
+                    var loopKeyBindings = config.loopKeyEvents;
+                    var hasBindedKey = loopKeyEventsValues.filter(function(el) {
+                        return preventDefault.indexOf(el) > -1;
+                      }).length >= 1;
+
+                    if (hasBindedKey) {
+                        loopKeyBindings = defaults.loopKeyEvents;
+                    }
+
+                    switch (code) {
+                        case loopKeyBindings.toggleLoop:
+                          toggleLoop('toggle');
+                          break;
+                        case loopKeyBindings.loopin:
+                          toggleLoop('loopin');
+                          break;
+                        case loopKeyBindings.loopout:
+                          toggleLoop('loopout');
+                          break;
                     }
 
                     // Escape is handle natively when in full screen
