@@ -40,7 +40,11 @@
             loop: {
                 enabled: false,
                 start: 0,
-                end: null
+                end: null,
+                inidicator: {
+                    start: 0,
+                    end: 0
+                }
             },
             seekTime: 10,
             volume: 10,
@@ -100,7 +104,8 @@
                 progress: {
                     container: '.plyr__progress',
                     buffer: '.plyr__progress--buffer',
-                    played: '.plyr__progress--played'
+                    played: '.plyr__progress--played',
+                    looped: '.plyr__progress-loop'
                 },
                 captions: '.plyr__captions',
                 currentTime: '.plyr__time--current',
@@ -899,6 +904,7 @@
                 /* beautify ignore:start */
                 html.push(
                     '<span class="plyr__progress">',
+                        '<div class="plyr__progress-loop"></div>',
                         '<label for="seek-{id}" class="plyr__sr-only">Seek</label>',
                         '<input id="seek-{id}" class="plyr__progress--seek" type="range" min="0" max="100" step="0.1" value="0" data-plyr="seek">',
                         '<progress class="plyr__progress--played" max="100" value="0" role="presentation"></progress>',
@@ -2476,7 +2482,8 @@
                     if (config.loop.end && config.loop.end <= currentTime) {
                         config.loop.end = null;
                     }
-                    config.loop.start = plyr.media.currentTime;
+                    config.loop.start = currentTime;
+                    config.loop.indicator.start = plyr.progress.played.value;
                     break;
 
                 case 'end':
@@ -2484,11 +2491,14 @@
                         return;
                     }
                     config.loop.end = currentTime;
+                    config.loop.indicator.end = plyr.progress.played.value;
                     break;
 
                 case 'all':
                     config.loop.start = 0;
                     config.loop.end = plyr.media.duration;
+                    config.loop.indicator.start = 0;
+                    config.loop.indicator.end = 100;
                     break;
 
                 default:
@@ -2511,9 +2521,18 @@
             }
 
             if (config.loop) {
+                // TODO: Improve the design of the loop indicator and put styling in CSS where it's meant to be
                 //getElement('[data-menu="loop"]').innerHTML = start + ' - ' + end;
+                getElement(config.selectors.progress.looped).style.position = 'absolute';
+                getElement(config.selectors.progress.looped).style.left = config.loopinPositionPercentage + '%';
+                getElement(config.selectors.progress.looped).style.width = (config.loopoutPositionPercentage - config.loopinPositionPercentage) + '%';
+                getElement(config.selectors.progress.looped).style.background = '#ffbb00';
+                getElement(config.selectors.progress.looped).style.height = '3px';
+                getElement(config.selectors.progress.looped).style.top = '3px';
+                getElement(config.selectors.progress.looped).style['border-radius'] = '100px';
             } else {
                 //getElement('[data-menu="loop"]').innerHTML = config.i18n.loopNone;
+                getElement(config.selectors.progress.looped).style.width = '0px';
             }
         }
 
