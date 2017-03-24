@@ -37,9 +37,11 @@
             enabled: true,
             debug: false,
             autoplay: false,
-            loop: false,
-            loopin: 0,
-            loopout: null,
+            loop: {
+                enabled: false,
+                start: 0,
+                end: null
+            },
             seekTime: 10,
             volume: 10,
             volumeMin: 0,
@@ -171,10 +173,10 @@
                 speed: 'Speed',
                 quality: 'Quality',
                 loop: 'Loop',
-                loopin: 'Loop in',
-                loopout: 'Loop out',
-                loopall: 'Loop all',
-                loopclear: 'No Loop',
+                loopStart: 'Loop start',
+                loopEnd: 'Loop end',
+                loopAll: 'Loop all',
+                loopNone: 'No Loop',
             },
             types: {
                 embed: ['youtube', 'vimeo', 'soundcloud'],
@@ -1006,13 +1008,13 @@
                                         '<li role="tab">',
                                             '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-quality-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-quality" aria-expanded="false">',
                                                 config.i18n.quality +
-                                                '<span class="plyr__menu__value">Auto</span>',
+                                                '<span class="plyr__menu__value">{quality}</span>',
                                             '</button>',
                                         '</li>',
                                         '<li role="tab">',
                                             '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-loop-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-loop" aria-expanded="false">',
-                                            config.i18n.loop +
-                                                '<span class="plyr__menu__value" data-menu="loop"></span>',
+                                                config.i18n.loop +
+                                                '<span class="plyr__menu__value" data-menu="loop">{loop}</span>',
                                             '</button>',
                                         '</li>',
                                     '</ul>',
@@ -1130,26 +1132,26 @@
                                             '</button>',
                                         '</li>',
                                         '<li>',
-                                            '<button type="button" class="plyr__control" data-plyr="loop" data-loop__type="loopall">',
-                                                config.i18n.loopall,
-                                                '<span data-loop__value="loopall"></span>',
+                                            '<button type="button" class="plyr__control" data-plyr="loop" data-plyr-loop="all">',
+                                                config.i18n.loopAll,
+                                                '<span></span>',
                                             '</button>',
                                         '</li>',
                                         '<li>',
-                                            '<button type="button" class="plyr__control" data-plyr="loop" data-loop__type="loopin">',
-                                                config.i18n.loopin + ':&nbsp;',
-                                                '<span data-loop__value="loopin"></span>',
+                                            '<button type="button" class="plyr__control" data-plyr="loop" data-plyr-loop="start">',
+                                                config.i18n.loopStart,
+                                                '<span></span>',
                                             '</button>',
                                         '</li>',
                                         '<li>',
-                                            '<button type="button" class="plyr__control" data-plyr="loop" data-loop__type="loopout">',
-                                                config.i18n.loopout + ':&nbsp;',
-                                                '<span data-loop__value="loopout"></span>',
+                                            '<button type="button" class="plyr__control" data-plyr="loop" data-plyr-loop="end">',
+                                                config.i18n.loopEnd,
+                                                '<span></span>',
                                             '</button>',
                                         '</li>',
                                         '<li>',
-                                            '<button type="button" class="plyr__control" data-plyr="loop" data-loop__type="loopclear">',
-                                                config.i18n.loopclear,
+                                            '<button type="button" class="plyr__control" data-plyr="loop" data-plyr-loop="none">',
+                                                config.i18n.loopNone,
                                             '</button>',
                                         '</li>',
                                     '</ul>',
@@ -1765,8 +1767,8 @@
                     fullscreen: getElement(config.selectors.buttons.fullscreen),
                     settings: getElement(config.selectors.buttons.settings),
                     pip: getElement(config.selectors.buttons.pip),
-                    speed: document.querySelectorAll(config.selectors.buttons.speed),
-                    loop: document.querySelectorAll(config.selectors.buttons.loop)
+                    speed: getElement(config.selectors.buttons.speed),
+                    loop: getElement(config.selectors.buttons.loop)
                 };
 
                 // Inputs
@@ -2265,7 +2267,7 @@
             // https://github.com/vimeo/player.js
             plyr.embed = new window.Vimeo.Player(container, {
                 id: parseInt(mediaId),
-                loop: config.loop,
+                loop: config.loop.enabled,
                 autoplay: config.autoplay,
                 byline: false,
                 portrait: false,
@@ -2462,46 +2464,57 @@
         }
 
         // Toggle loop
-        function toggleLoop(toggle) {
-            if (['loopin', 'loopout', 'loopall'].indexOf(toggle) === -1) {
-                toggle = 'loopclear';
+        function toggleLoop(type) {
+            if (!inArray(['start', 'end', 'all'], type)) {
+                type = 'none';
             }
 
             var currentTime = Number(plyr.media.currentTime);
 
-            switch (toggle) {
-                case 'loopin':
-                    if (config.loopout && config.loopout <= currentTime) {
-                        config.loopout = null;
+            switch (type) {
+                case 'start':
+                    if (config.loop.end && config.loop.end <= currentTime) {
+                        config.loop.end = null;
                     }
-                    config.loopin = currentTime;
+                    config.loop.start = plyr.media.currentTime;
                     break;
-                case 'loopout':
-                    if (config.loopin >= currentTime) {
+
+                case 'end':
+                    if (config.loop.start >= currentTime) {
                         return;
                     }
-                    config.loopout = currentTime;
+                    config.loop.end = currentTime;
                     break;
-                case 'loopall':
-                    config.loopin = 0;
-                    config.loopout = plyr.media.duration - 2;
+
+                case 'all':
+                    config.loop.start = 0;
+                    config.loop.end = plyr.media.duration;
                     break;
+
                 default:
-                    config.loopin = 0;
-                    config.loopout = null;
+                    config.loop.start = 0;
+                    config.loop.end = null;
                     break;
             }
 
-            //check if can loop
-            config.loop = is.number(config.loopin) && is.number(config.loopout);
-            var loopin = updateTimeDisplay(config.loopin, document.querySelector('[data-loop__value="loopin"]'));
-            var loopout = is.number(config.loopout) ? updateTimeDisplay(config.loopout + 2, document.querySelector('[data-loop__value="loopout"]')) : document.querySelector('[data-loop__value="loopout"]').innerHTML = '';
-            if (config.loop) {
-                document.querySelector('[data-menu="loop"]').innerHTML = loopin + ' - ' + loopout;
+            // Check if can loop
+            config.loop = is.number(config.loop.start) && is.number(config.loop.end);
+            var start = updateTimeDisplay(config.loop.start, getElement('[data-plyr-loop="start"]'));
+            var end = null;
+
+            if (is.number(config.loop.end)) {
+                // Find the <span> inside button
+                end = updateTimeDisplay(config.loop.end, document.querySelector('[data-loop__value="loopout"]'));
             } else {
-                document.querySelector('[data-menu="loop"]').innerHTML = config.i18n.loopclear;
+                // Find the <span> inside button
+                //end = document.querySelector('[data-loop__value="loopout"]').innerHTML = '';
             }
 
+            if (config.loop) {
+                //getElement('[data-menu="loop"]').innerHTML = start + ' - ' + end;
+            } else {
+                //getElement('[data-menu="loop"]').innerHTML = config.i18n.loopNone;
+            }
         }
 
         // Speed-up
@@ -2515,6 +2528,7 @@
                 warn('Invalid speeds format');
                 return;
             }
+
             if (!is.number(speed)) {
                 var index = config.speeds.indexOf(config.currentSpeed);
 
@@ -3042,10 +3056,14 @@
             plyr.secs = ('0' + plyr.secs).slice(-2);
             plyr.mins = ('0' + plyr.mins).slice(-2);
 
-            var txt = (displayHours ? plyr.hours + ':' : '') + plyr.mins + ':' + plyr.secs;
+            // Generate display
+            var display = (displayHours ? plyr.hours + ':' : '') + plyr.mins + ':' + plyr.secs;
+
             // Render
-            element.innerHTML = txt;
-            return txt;
+            element.innerHTML = display;
+
+            // Return for looping
+            return display;
         }
 
         // Show the duration on metadataloaded
@@ -3676,11 +3694,12 @@
             // Fullscreen
             proxy(plyr.buttons.fullscreen, 'click', config.listeners.fullscreen, toggleFullscreen);
 
-            // Loop
+            // Looping
             proxy(plyr.buttons.loop, 'click', config.listeners.loop, function(event) {
-                var loopValue = event.target.getAttribute('data-loop__value') || event.target.getAttribute('data-loop__type');
-                if (['loopin', 'loopout', 'loopall', 'loopclear'].indexOf(loopValue) > -1) {
-                    toggleLoop(loopValue);
+                var value = event.target.getAttribute('data-loop__value') || event.target.getAttribute('data-loop__type');
+
+                if (inArray(['start', 'end', 'all', 'none'], value)) {
+                    toggleLoop(value);
                 }
             });
 
