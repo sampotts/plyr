@@ -3515,10 +3515,10 @@
                 // Handle global presses
                 if (config.keyboardShortcuts.global) {
                     on(window, 'keydown keyup', function(event) {
-                        var code = getKeyCode(event),
-                            focused = getFocusElement(),
-                            allowed = [48, 49, 50, 51, 52, 53, 54, 56, 57, 75, 77, 70, 67],
-                            count = get().length;
+                        var code = getKeyCode(event);
+                        var focused = getFocusElement();
+                        var allowed = [48, 49, 50, 51, 52, 53, 54, 56, 57, 75, 77, 70, 67];
+                        var count = get().length;
 
                         // Only handle global key press if there's only one player
                         // and the key is in the allowed keys
@@ -3535,9 +3535,9 @@
             }
 
             function handleKey(event) {
-                var code = getKeyCode(event),
-                    pressed = event.type === 'keydown',
-                    held = pressed && code === last;
+                var code = getKeyCode(event);
+                var pressed = event.type === 'keydown';
+                var held = pressed && code === last;
 
                 // If the event is bubbled from the media element
                 // Firefox doesn't get the keycode for whatever reason
@@ -3618,7 +3618,7 @@
                         case 77:
                             // M key
                             if (!held) {
-                                toggleMute()
+                                toggleMute();
                             }
                             break;
 
