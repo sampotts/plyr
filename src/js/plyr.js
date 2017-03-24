@@ -1010,10 +1010,9 @@
                 }
 
                 if(config.qualityOptions){
-                  var showQuality = '';
-                   showQuality = '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-quality-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-quality" aria-expanded="false">'+
+                   var showQuality = '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-quality-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-quality" aria-expanded="false">'+
                                         config.i18n.quality +'<span class="plyr__menu__value">Auto</span>'+
-                                    '</button>';
+                                     '</button>';
                 }
 
                 html.push(
@@ -1035,10 +1034,6 @@
                                         '</li>',
                                         '<li role="tab">',
                                             showQuality,
-                                            // '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-quality-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-quality" aria-expanded="false">',
-                                            //     config.i18n.quality +
-                                            //     '<span class="plyr__menu__value">Auto</span>',
-                                            // '</button>',
                                         '</li>',
                                         '<li role="tab">',
                                             '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-loop-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-loop" aria-expanded="false">',
