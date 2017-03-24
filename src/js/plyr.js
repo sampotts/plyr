@@ -57,6 +57,7 @@
             hideControls: true,
             showPosterOnEnd: false,
             disableContextMenu: true,
+            qualityOptions: false,
             keyboardShorcuts: {
                 focused: true,
                 global: false
@@ -1008,6 +1009,13 @@
                     '</li>';
                 }
 
+                if(config.qualityOptions){
+                  var showQuality = '';
+                   showQuality = '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-quality-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-quality" aria-expanded="false">'+
+                                        config.i18n.quality +'<span class="plyr__menu__value">Auto</span>'+
+                                    '</button>';
+                }
+
                 html.push(
                     '<div class="plyr__menu" data-plyr="settings">',
                         '<button type="button" id="plyr-settings-toggle-{id}" class="plyr__control" aria-haspopup="true" aria-controls="plyr-settings-{id}" aria-expanded="false">',
@@ -1026,10 +1034,11 @@
                                             '</button>',
                                         '</li>',
                                         '<li role="tab">',
-                                            '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-quality-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-quality" aria-expanded="false">',
-                                                config.i18n.quality +
-                                                '<span class="plyr__menu__value">Auto</span>',
-                                            '</button>',
+                                            showQuality,
+                                            // '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-quality-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-quality" aria-expanded="false">',
+                                            //     config.i18n.quality +
+                                            //     '<span class="plyr__menu__value">Auto</span>',
+                                            // '</button>',
                                         '</li>',
                                         '<li role="tab">',
                                             '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-loop-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-loop" aria-expanded="false">',
