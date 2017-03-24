@@ -304,6 +304,7 @@
             height: $plyr-control-icon-size;
             display: block;
             fill: currentColor;
+            pointer-events: none;
         }
 
         // Default focus
@@ -397,6 +398,7 @@
         height: 20px;
         display: block;
         fill: currentColor;
+        pointer-events: none;
     }
 
     &:focus {
