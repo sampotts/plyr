@@ -3752,7 +3752,7 @@
             }
 
             // Captions
-            on(plyr.buttons.captions, 'click', toggleCaptions);
+            proxy(plyr.buttons.captions, 'click', config.listeners.captions, toggleCaptions);
 
             // Settings
             on(plyr.buttons.settings, 'click', function(event) {

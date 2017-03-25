@@ -1,6 +1,8 @@
 # Plyr
 A simple, accessible and customizable HTML5, YouTube and Vimeo media player.
 
+[Donate to support Plyr](#donate)
+
 [Checkout the demo](https://plyr.io)
 
 [![Image of Plyr](https://cdn.selz.com/plyr/plyr_v1.8.9.png)](https://plyr.io)
@@ -132,10 +134,10 @@ Include the `plyr.js` script before the closing `</body>` tag and then call `ply
 <script>plyr.setup();</script>
 ```
 
-If you want to use our CDN for the JavaScript, you can use the following:
+If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for the JavaScript, you can use the following:
 
 ```html
-<script src="https://cdn.plyr.io/2.0.10/plyr.js"></script>
+<script src="https://cdn.plyr.io/2.0.12/plyr.js"></script>
 ```
 
 ### CSS
@@ -145,14 +147,14 @@ Include the `plyr.css` stylsheet into your `<head>`
 <link rel="stylesheet" href="path/to/plyr.css">
 ```
 
-If you want to use our CDN for the default CSS, you can use the following:
+If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for the default CSS, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/2.0.10/plyr.css">
+<link rel="stylesheet" href="https://cdn.plyr.io/2.0.12/plyr.css">
 ```
 
 ### SVG Sprite
-The SVG sprite is loaded automatically from our CDN. To change this, see the [options](#Options) below. For reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/2.0.10/plyr.svg`.
+The SVG sprite is loaded automatically from our CDN (provided by [Fastly](https://www.fastly.com/)). To change this, see the [options](#options) below. For reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/2.0.12/plyr.svg`.
 
 ## Advanced
 
@@ -283,6 +285,12 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
       <td>String</td>
       <td><code>plyr</code></td>
       <td>Specify the id prefix for the icons used in the default controls (e.g. "plyr-play" would be "plyr"). This is to prevent clashes if you're using your own SVG sprite but with the default controls. Most people can ignore this option.</td>
+    </tr>
+    <tr>
+      <td><code>blankUrl</code></td>
+      <td>String</td>
+      <td><code>https://cdn.selz.com/plyr/blank.mp4</code></td>
+      <td>Specify a URL or path to a blank video file used to properly cancel network requests. See <a href="https://github.com/Selz/plyr/issues/174">issue #174</a> for more info.</td>
     </tr>
     <tr>
       <td><code>debug</code></td>
@@ -1050,7 +1058,7 @@ Fullscreen in Plyr is supported by all browsers that [currently support it](http
 
 &sup2; Native player used (no support for `<progress>` or `<input type="range">`) but the API is supported (v1.0.28+)
 
-&sup3; IE10 has no native fullscreen support, fallback can be used (see options)
+&sup3; IE10 has no native fullscreen support, fallback can be used (see [options](#options))
 
 The `enabled` option can be used to disable certain User Agents. For example, if you don't want to use Plyr for smartphones, you could use:
 
@@ -1069,6 +1077,10 @@ If you find anything weird with Plyr, please let us know using the GitHub issues
 
 ## Author
 Plyr is developed by [@sam_potts](https://twitter.com/sam_potts) / [sampotts.me](http://sampotts.me) with help from the awesome [contributors](https://github.com/Selz/plyr/graphs/contributors)
+
+## Donate
+Plyr costs money to run, not my time - I donate that for free but domains, hosting and more. Any help is appreciated...
+[Donate to support Plyr](https://www.paypal.me/pottsy/20usd)
 
 ## Mentions
 - [ProductHunt](https://www.producthunt.com/tech/plyr)
@@ -1103,6 +1115,11 @@ Credit to the PayPal HTML5 Video player from which Plyr's caption functionality 
 Also these links helped created Plyr:
 - [Media Events - W3.org](http://www.w3.org/2010/05/video/mediaevents.html)
 - [Styling the `<progress>` element - hongkiat.com](http://www.hongkiat.com/blog/html5-progress-bar/)
+
+## Thanks
+[![Fastly](https://www.fastly.com/sites/all/themes/custom/fastly2016/logo.png)](https://www.fastly.com/)
+
+Thanks to [Fastly](https://www.fastly.com/) for providing the CDN services. 
 
 ## Copyright and License
 [The MIT license](license.md).

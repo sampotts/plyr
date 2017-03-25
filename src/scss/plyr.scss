@@ -181,8 +181,11 @@
 .plyr__video-embed {
     padding-bottom: 56.25%; /* 16:9 */
     height: 0;
-    overflow: hidden;
     border-radius: inherit;
+
+    // Require overflow and z-index to force border-radius
+    overflow: hidden;
+    z-index: 0;
 
     iframe {
         position: absolute;
@@ -740,6 +743,10 @@
     .plyr__video-wrapper {
         height: 100%;
         width: 100%;
+    }
+    .plyr__video-embed {
+        // Revert overflow change
+        overflow: visible;
     }
     .plyr__controls {
         position: absolute;
