@@ -198,7 +198,11 @@
 .plyr__video-embed {
     padding-bottom: 56.25%; /* 16:9 */
     height: 0;
+    border-radius: inherit;
+    // Require overflow and z-index to force border-radius
     overflow: hidden;
+    z-index: 0;
+
 
     iframe {
         position: absolute;
@@ -208,7 +212,6 @@
         height: 100%;
         border: 0;
         user-select: none;
-        z-index: 1;
     }
 
     // Vimeo hack
@@ -291,15 +294,13 @@
     .plyr__menu {
         margin-left: (@plyr-control-spacing / 2);
 
-        &:first-child {
+        &:first-child,
+        &:first-child + [data-plyr="pause"] {
             margin-left: 0;
         }
     }
     .plyr__volume {
         margin-left: (@plyr-control-spacing / 2);
-    }
-    [data-plyr="pause"] {
-        margin-left: 0;
     }
 
     @media (min-width: @plyr-bp-screen-sm) {
@@ -343,6 +344,7 @@
         height: @plyr-control-icon-size;
         display: block;
         fill: currentColor;
+        pointer-events: none;
     }
     // Hide toggle icons by default
     .icon--exit-fullscreen,
@@ -363,6 +365,7 @@
     left: 0;
     right: 0;
     bottom: 0;
+    z-index: 2;
     padding: (@plyr-control-spacing * 5) @plyr-control-spacing @plyr-control-spacing;
     background: linear-gradient(fade(@plyr-video-controls-bg, 0%), fade(@plyr-video-controls-bg, 70%));
     border-bottom-left-radius: inherit;
@@ -423,6 +426,7 @@
         height: 20px;
         display: block;
         fill: currentColor;
+        pointer-events: none;
     }
 
     &:focus {
@@ -920,6 +924,10 @@
     .plyr__video-wrapper {
         height: 100%;
         width: 100%;
+    }
+    .plyr__video-embed {
+        // Revert overflow change
+        overflow: visible;
     }
     .plyr__controls {
         position: absolute;
