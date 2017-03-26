@@ -104,16 +104,14 @@
                 volume: '[data-plyr="volume"]'
             },
             display: {
-                volume: '.plyr__volume--display',
                 currentTime: '.plyr__time--current',
-                duration: '.plyr__time--duration'
-            },
-            progress: {
-                container: '.plyr__progress',
+                duration: '.plyr__time--duration',
                 buffer: '.plyr__progress--buffer',
                 played: '.plyr__progress--played',
-                loop: '.plyr__progress-loop'
+                loop: '.plyr__progress--loop',
+                volume: '.plyr__volume--display',
             },
+            progress: '.plyr__progress',
             captions: '.plyr__captions',
             menu: {
                 quality: '.js-plyr__menu__list--quality'
@@ -483,7 +481,7 @@
     }
 
     // Create a DocumentFragment
-    function createElement(type, attributes) {
+    function createElement(type, attributes, text) {
         // Create a new <element>
         var element = document.createElement(type);
 
@@ -492,14 +490,19 @@
             setAttributes(element, attributes);
         }
 
+        // Add text node
+        if (is.string(text)) {
+            element.appendChild(document.createTextNode(text));
+        }
+
         // Return built element
         return element;
     }
 
     // Insert a DocumentFragment
-    function insertElement(type, parent, attributes) {
+    function insertElement(type, parent, attributes, text) {
         // Create a new <element>
-        var element = createElement(type, attributes);
+        var element = createElement(type, attributes, text);
 
         // Inject the new element
         prependChild(parent, element);
@@ -665,11 +668,19 @@
 
         // First object is the destination
         var destination = Array.prototype.shift.call(objects);
+        if (!is.object(destination)) {
+            destination = {};
+        }
+
         var length = objects.length;
 
         // Loop through all objects to merge
         for (var i = 0; i < length; i++) {
             var source = objects[i];
+
+            if (!is.object(source)) {
+                source = {};
+            }
 
             for (var property in source) {
                 if (source[property] && source[property].constructor && source[property].constructor === Object) {
@@ -900,6 +911,63 @@
         log('Config', config);
         log('Support', support);
 
+        // Find all elements
+        function getElements(selector) {
+            return plyr.container.querySelectorAll(selector);
+        }
+
+        // Find a single element
+        function getElement(selector) {
+            return getElements(selector)[0];
+        }
+
+        // Determine if we're in an iframe
+        function inFrame() {
+            try {
+                return window.self !== window.top;
+            } catch (e) {
+                return true;
+            }
+        }
+
+        // Trap focus inside container
+        function focusTrap() {
+            var tabbables = getElements('input:not([disabled]), button:not([disabled])'),
+                first = tabbables[0],
+                last = tabbables[tabbables.length - 1];
+
+            function checkFocus(event) {
+                // If it is TAB
+                if (event.which === 9 && plyr.isFullscreen) {
+                    if (event.target === last && !event.shiftKey) {
+                        // Move focus to first element that can be tabbed if Shift isn't used
+                        event.preventDefault();
+                        first.focus();
+                    } else if (event.target === first && event.shiftKey) {
+                        // Move focus to last element that can be tabbed if Shift is used
+                        event.preventDefault();
+                        last.focus();
+                    }
+                }
+            }
+
+            // Bind the handler
+            on(plyr.container, 'keydown', checkFocus);
+        }
+
+        // Add elements to HTML5 media (source, tracks, etc)
+        function insertElements(type, attributes) {
+            if (is.string(attributes)) {
+                insertElement(type, plyr.media, {
+                    src: attributes
+                });
+            } else if (attributes.constructor === Array) {
+                for (var i = attributes.length - 1; i >= 0; i--) {
+                    insertElement(type, plyr.media, attributes[i]);
+                }
+            }
+        }
+
         // Get icon URL
         function getIconUrl() {
             return {
@@ -925,16 +993,16 @@
         }
 
         // Create <svg> icon
-        function createIcon(type) {
+        function createIcon(type, attributes) {
             var namespace = 'http://www.w3.org/2000/svg';
             var iconUrl = getIconUrl();
             var iconPath = (!iconUrl.absolute ? iconUrl.url : '') + '#' + config.iconPrefix;
 
             // Create <svg>
             var icon = document.createElementNS(namespace, 'svg');
-            setAttributes(icon, {
+            setAttributes(icon, extend(attributes, {
                 role: 'presentation'
-            });
+            }));
 
             // Create the <use> to reference sprite
             var use = document.createElementNS(namespace, 'use');
@@ -948,15 +1016,21 @@
 
         // Create hidden text label
         function createLabel(type) {
-            var label = createElement('span', {
+            var text = config.i18n[type];
+
+            switch (type) {
+                case 'pip':
+                    text = 'PIP';
+                    break;
+
+                case 'airplay':
+                    text = 'AirPlay';
+                    break;
+            }
+
+            return createElement('span', {
                 class: config.classes.hidden
-            });
-
-            var text = document.createTextNode(config.i18n[type]);
-
-            label.appendChild(text);
-
-            return label;
+            }, text);
         }
 
         // Create a <button>
@@ -964,23 +1038,58 @@
             var button = createElement('button');
             var attributes = {
                 class: 'plyr__control'
-            }
+            };
+            var iconDefault;
+            var iconToggled;
+            var labelKey;
 
             // Large play button
-            // TODO: use config
-            if (type === 'play-large') {
-                attributes.class = 'plyr__play-large';
-                type = 'play';
+            switch (type) {
+                case 'mute':
+                    labelKey = 'toggleMute';
+                    iconDefault = 'volume';
+                    iconToggled = 'muted';
+                    break;
+
+                case 'captions':
+                    labelKey = 'toggleCaptions';
+                    iconDefault = 'captions-off';
+                    iconToggled = 'captions-on';
+                    break;
+
+                case 'fullscreen':
+                    labelKey = 'toggleFullscreen';
+                    iconDefault = 'enter-fullscreen';
+                    iconToggled = 'exit-fullscreen';
+                    break;
+
+                case 'play-large':
+                    attributes.class = 'plyr__play-large';
+                    type = 'play';
+                    labelKey = 'play';
+                    iconDefault = 'play';
+                    break;
+
+                default:
+                    labelKey = type;
+                    iconDefault = type;
             }
 
             // Merge attributes
             extend(attributes, getAttributesFromSelector(config.selectors.buttons[type], attributes));
 
+            // Add toggle icon if needed
+            if (is.string(iconToggled)) {
+                button.appendChild(createIcon(iconToggled, {
+                    class: 'icon--' + iconToggled
+                }));
+            }
+
             // Add the icon
-            button.appendChild(createIcon(type));
+            button.appendChild(createIcon(iconDefault));
 
             // Add the label
-            button.appendChild(createLabel(type));
+            button.appendChild(createLabel(labelKey));
 
             // Set element attributes
             setAttributes(button, attributes);
@@ -990,37 +1099,79 @@
             return button;
         }
 
+        // Create an <input type='range'>
+        function createRange(type, attributes) {
+            var id = 'plyr-' + type + (is.object(attributes) && 'id' in attributes ? '-' + attributes.id : '');
+
+            // Seek label
+            var label = createElement('label', {
+                for: id,
+                class: config.classes.hidden
+            }, config.i18n[type]);
+
+            // Seek input
+            var input = createElement('input', extend(getAttributesFromSelector(config.selectors.inputs[type]), {
+                id: id,
+                type: 'range',
+                min: 0,
+                max: 100,
+                step: 0.1,
+                value: 0
+            }, attributes));
+
+            elements.inputs[type] = input;
+
+            return {
+                label: label,
+                input: input
+            }
+        }
+
         // Create a <progress>
-        function createProgress(type) {
-            var progress = createElement('progress', extend(getAttributesFromSelector(config.selectors.progress[type]), {
+        function createProgress(type, attributes) {
+            var progress = createElement('progress', extend(getAttributesFromSelector(config.selectors.display[type]), {
                 min: 0,
                 max: 100,
                 value: 0
-            }));
+            }, attributes));
 
             // Create the label inside
-            var value = createElement('span');
-            var text = document.createTextNode('0');
-            value.appendChild(text);
-            progress.appendChild(value);
+            if (type !== 'volume') {
+                progress.appendChild(createElement('span', null, '0'));
 
-            var suffix = '';
-            switch (type) {
-                case 'played':
-                    suffix = config.i18n.played;
-                    break;
+                var suffix = '';
+                switch (type) {
+                    case 'played':
+                        suffix = config.i18n.played;
+                        break;
 
-                case 'buffer':
-                    suffix = config.i18n.buffered;
-                    break;
+                    case 'buffer':
+                        suffix = config.i18n.buffered;
+                        break;
+                }
+
+                var label = document.createTextNode('% ' + suffix.toLowerCase());
+                progress.appendChild(label);
             }
 
-            var label = document.createTextNode('% ' + suffix.toLowerCase());
-            progress.appendChild(label);
-
-            elements.progress[type] = [progress];
+            elements.display[type] = progress;
 
             return progress;
+        }
+
+        // Create time display
+        function createTime(type) {
+            var container = createElement('span', {
+                class: 'plyr__time'
+            });
+
+            container.appendChild(createElement('span', {
+                class: config.classes.hidden
+            }, config.i18n[type]));
+
+            container.appendChild(createElement('span', getAttributesFromSelector(config.selectors.display[type]), '00:00'));
+
+            return container;
         }
 
         // Build the default HTML
@@ -1052,55 +1203,22 @@
 
             // Progress
             if (inArray(config.controls, 'progress')) {
-                var container = createElement('span', getAttributesFromSelector(config.selectors.progress.container));
+                var container = createElement('span', getAttributesFromSelector(config.selectors.progress));
+
+                // Seek range slider
+                var seek = createRange('seek', {
+                    id: data.id
+                });
+                container.appendChild(seek.label);
+                container.appendChild(seek.input);
 
                 // TODO: Add loop display indicator
 
-                // Seeking
-                var seek = {
-                    id: "seek-" + data.id,
-                    label: createElement('label'),
-                    input: createElement('input')
-                };
-
-                // Seek label
-                setAttributes(seek.label, {
-                    for: seek.id,
-                    class: config.classes.hidden
-                });
-                container.appendChild(seek.label);
-
-                // Seek input
-                setAttributes(seek.input, extend(getAttributesFromSelector(config.selectors.inputs.seek), {
-                    id: seek.id,
-                    type: 'range',
-                    min: 0,
-                    max: 100,
-                    step: 0.1,
-                    value: 0
-                }));
-                extend(elements.inputs, {
-                    seek: seek.input
-                });
-                container.appendChild(elements.inputs.seek);
-
+                // Played progress
                 container.appendChild(createProgress('played'));
 
+                // Buffer progress
                 container.appendChild(createProgress('buffer'));
-
-                // Create progress
-                /* beautify ignore:start */
-                /*html.push(
-                    '<span class="plyr__progress">',
-                        //'<div class="plyr__progress-loop"></div>',
-                        '<label for="seek-{id}" class="plyr__sr-only">Seek</label>',
-                        '<input id="seek-{id}" class="plyr__progress--seek" type="range" min="0" max="100" step="0.1" value="0" data-plyr="seek">',
-                        '<progress class="plyr__progress--played" max="100" value="0" role="presentation"></progress>',
-                        '<progress class="plyr__progress--buffer" max="100" value="0">',
-                        '<span>0</span>% ' + config.i18n.buffered,
-                    '</progress>'
-                );&/
-                /* beautify ignore:end */
 
                 // Seek tooltip
                 if (config.tooltips.seek) {
@@ -1115,80 +1233,58 @@
                     container.appendChild(tooltip);
                 }
 
-                // Close
-                //html.push('</span>');
-                elements.progress.container = container;
-                controls.appendChild(elements.progress.container);
+                elements.progress = container;
+                controls.appendChild(elements.progress);
             }
-
-            return controls;
 
             // Media current time display
             if (inArray(config.controls, 'current-time')) {
-                /* beautify ignore:start */
-                html.push(
-                    '<span class="plyr__time">',
-                        '<span class="plyr__sr-only">' + config.i18n.currentTime + '</span>',
-                        '<span class="plyr__time--current">00:00</span>',
-                    '</span>'
-                );
-                /* beautify ignore:end */
+                controls.appendChild(createTime('currentTime'));
             }
 
             // Media duration display
             if (inArray(config.controls, 'duration')) {
-                /* beautify ignore:start */
-                html.push(
-                    '<span class="plyr__time">',
-                        '<span class="plyr__sr-only">' + config.i18n.duration + '</span>',
-                        '<span class="plyr__time--duration">00:00</span>',
-                    '</span>'
-                );
-                /* beautify ignore:end */
+                controls.appendChild(createTime('duration'));
             }
 
             // Toggle mute button
             if (inArray(config.controls, 'mute')) {
-                /* beautify ignore:start */
-                html.push(
-                    '<button type="button" class="plyr__control" data-plyr="mute">',
-                        '<svg class="icon--muted"><use xlink:href="' + iconPath + '-muted" /></svg>',
-                        '<svg><use xlink:href="' + iconPath + '-volume" /></svg>',
-                        '<span class="plyr__sr-only">' + config.i18n.toggleMute + '</span>',
-                    '</button>'
-                );
-                /* beautify ignore:end */
+                controls.appendChild(createButton('mute'));
             }
 
             // Volume range control
             if (inArray(config.controls, 'volume')) {
-                /* beautify ignore:start */
-                html.push(
-                    '<span class="plyr__volume">',
-                        '<label for="volume-{id}" class="plyr__sr-only">' + config.i18n.volume + '</label>',
-                        '<input id="volume-{id}" class="plyr__volume--input" type="range" min="' + 0 + '" max="' + 10 + '" value="' + config.volume + '" data-plyr="volume">',
-                        '<progress class="plyr__volume--display" max="' + 10 + '" value="' + 0 + '" role="presentation"></progress>',
-                    '</span>'
-                );
-                /* beautify ignore:end */
+                var volume = createElement('span', {
+                    class: 'plyr__volume'
+                });
+
+                // Set the attributes
+                var attributes = {
+                    id: data.id,
+                    max: 10,
+                    value: config.volume
+                };
+
+                // Create the volume range slider
+                var range = createRange('volume', attributes);
+                volume.appendChild(range.label);
+                volume.appendChild(range.input);
+
+                // Create the display progress
+                var progress = createProgress('volume', attributes);
+                volume.appendChild(progress);
+
+                controls.appendChild(volume);
             }
 
             // Toggle captions button
             if (inArray(config.controls, 'captions')) {
-                /* beautify ignore:start */
-                html.push(
-                    '<button type="button" class="plyr__control" data-plyr="captions">',
-                        '<svg class="icon--captions-on"><use xlink:href="' + iconPath + '-captions-on" /></svg>',
-                        '<svg><use xlink:href="' + iconPath + '-captions-off" /></svg>',
-                        '<span class="plyr__sr-only">' + config.i18n.toggleCaptions + '</span>',
-                    '</button>'
-                );
-                /* beautify ignore:end */
+                controls.appendChild(createButton('captions'));
             }
 
             // Settings button / menu
             if (inArray(config.controls, 'settings')) {
-                /* beautify ignore:start */
+                /*
                 var captionsMenuItem = '';
                 if (inArray(config.controls, 'captions')) {
                 captionsMenuItem = '<li role="tab">'+
@@ -1380,51 +1476,25 @@
                             '</div>',
                         '</form>',
                     '</div>'
-                );
-                /* beautify ignore:end */
+                ); */
             }
 
             // Picture in picture button
             if (inArray(config.controls, 'pip') && support.pip) {
-                /* beautify ignore:start */
-                html.push(
-                    '<button type="button" class="plyr__control" data-plyr="pip">',
-                        '<svg><use xlink:href="' + iconPath + '-pip" /></svg>',
-                        '<span class="plyr__sr-only">PIP</span>',
-                    '</button>'
-                );
-                /* beautify ignore:end */
+                controls.appendChild(createButton('pip'));
             }
 
             // Airplay button
             if (inArray(config.controls, 'airplay') && support.airplay) {
-                /* beautify ignore:start */
-                html.push(
-                    '<button type="button" class="plyr__control" data-plyr="airplay">',
-                        '<svg><use xlink:href="' + iconPath + '-airplay" /></svg>',
-                        '<span class="plyr__sr-only">AirPlay</span>',
-                    '</button>'
-                );
-                /* beautify ignore:end */
+                controls.appendChild(createButton('airplay'));
             }
 
             // Toggle fullscreen button
             if (inArray(config.controls, 'fullscreen')) {
-                /* beautify ignore:start */
-                html.push(
-                    '<button type="button" class="plyr__control" data-plyr="fullscreen">',
-                        '<svg class="icon--exit-fullscreen"><use xlink:href="' + iconPath + '-exit-fullscreen" /></svg>',
-                        '<svg><use xlink:href="' + iconPath + '-enter-fullscreen" /></svg>',
-                        '<span class="plyr__sr-only">' + config.i18n.toggleFullscreen + '</span>',
-                    '</button>'
-                );
-                /* beautify ignore:end */
+                controls.appendChild(createButton('fullscreen'));
             }
 
-            // Close everything
-            html.push('</div>');
-
-            return html.join('');
+            return controls;
         }
 
         // Set the YouTube quality menu
@@ -1714,6 +1784,33 @@
             }
         }
 
+        // Select active caption
+        function setCaptionIndex(index) {
+            // Save active caption
+            config.captions.selectedIndex = index || config.captions.selectedIndex;
+
+            // Clear caption
+            setCaption();
+
+            // Re-run setup
+            setupCaptions();
+
+            //getElement('[data-captions="settings"]').innerHTML = getSelectedLanguage();
+        }
+
+        // Get current selected caption language
+        function getSelectedLanguage() {
+            if (config.tracks.length === 0) {
+                return 'No Subs';
+            }
+
+            if (plyr.captionsEnabled || !is.boolean(plyr.captionsEnabled) && plyr.storage.captionsEnabled) {
+                return config.tracks[config.captions.selectedIndex].label;
+            } else {
+                return 'Disabled';
+            }
+        }
+
         // Set the current caption
         function setCaption(caption) {
             var captions = getElement(config.selectors.captions);
@@ -1846,61 +1943,36 @@
             }
         }
 
-        // Find all elements
-        function getElements(selector) {
-            return plyr.container.querySelectorAll(selector);
-        }
-
-        // Find a single element
-        function getElement(selector) {
-            return getElements(selector)[0];
-        }
-
-        // Determine if we're in an iframe
-        function inFrame() {
-            try {
-                return window.self !== window.top;
-            } catch (e) {
-                return true;
-            }
-        }
-
-        // Trap focus inside container
-        function focusTrap() {
-            var tabbables = getElements('input:not([disabled]), button:not([disabled])'),
-                first = tabbables[0],
-                last = tabbables[tabbables.length - 1];
-
-            function checkFocus(event) {
-                // If it is TAB
-                if (event.which === 9 && plyr.isFullscreen) {
-                    if (event.target === last && !event.shiftKey) {
-                        // Move focus to first element that can be tabbed if Shift isn't used
-                        event.preventDefault();
-                        first.focus();
-                    } else if (event.target === first && event.shiftKey) {
-                        // Move focus to last element that can be tabbed if Shift is used
-                        event.preventDefault();
-                        last.focus();
-                    }
-                }
+        // Toggle captions
+        function toggleCaptions(show) {
+            // If there's no full support, or there's no caption toggle
+            if (!plyr.supported.full || !elements.buttons.captions) {
+                return;
             }
 
-            // Bind the handler
-            on(plyr.container, 'keydown', checkFocus);
-        }
-
-        // Add elements to HTML5 media (source, tracks, etc)
-        function insertChildElements(type, attributes) {
-            if (is.string(attributes)) {
-                insertElement(type, plyr.media, {
-                    src: attributes
-                });
-            } else if (attributes.constructor === Array) {
-                for (var i = attributes.length - 1; i >= 0; i--) {
-                    insertElement(type, plyr.media, attributes[i]);
-                }
+            // If the method is called without parameter, toggle based on current value
+            if (!is.boolean(show)) {
+                show = (plyr.container.className.indexOf(config.classes.captions.active) === -1);
             }
+
+            // Set global
+            plyr.captionsEnabled = show;
+            elements.buttons.captions_menu.innerHTML = show ? 'Off' : 'On';
+            getElement('[data-captions="settings"]').innerHTML = getSubsLangValue();
+
+            // Toggle state
+            toggleState(elements.buttons.captions, plyr.captionsEnabled);
+
+            // Add class hook
+            toggleClass(plyr.container, config.classes.captions.active, plyr.captionsEnabled);
+
+            // Trigger an event
+            trigger(plyr.container, plyr.captionsEnabled ? 'captionsenabled' : 'captionsdisabled', true);
+
+            // Save captions state to localStorage
+            updateStorage({
+                captionsEnabled: plyr.captionsEnabled
+            });
         }
 
         // Insert controls
@@ -1966,10 +2038,6 @@
             }
         }
 
-        function getSpeedDisplayValue() {
-            return config.currentSpeed.toFixed(1).toString().replace('.0', '') + '&times;'
-        }
-
         // Find the UI controls and store references
         function findElements() {
             try {
@@ -1992,22 +2060,8 @@
                     captions: getElement(config.selectors.buttons.captions)
                 };
 
-                // Inputs
-                // TODO: ??
-                // elements.buttons.captions_menu = getElement(config.selectors.buttons.captions_menu);
-
                 // Progress
-                // TODO: text for played?
-                elements.progress = {
-                    container: getElement(config.selectors.progress.container),
-                    buffer: getElement(config.selectors.progress.buffer),
-                    played: getElement(config.selectors.progress.played)
-                };
-
-                // Seek tooltip
-                if (is.htmlElement(elements.progress.container)) {
-                    elements.progress.tooltip = elements.progress.container.querySelector('.' + config.classes.tooltip);
-                }
+                elements.progress = getElement(config.selectors.progress);
 
                 // Inputs
                 elements.inputs = {
@@ -2017,10 +2071,17 @@
 
                 // Display
                 elements.display = {
+                    buffer: getElement(config.selectors.display.buffer),
+                    played: getElement(config.selectors.display.played),
                     volume: getElement(config.selectors.display.volume),
                     duration: getElement(config.selectors.display.duration),
                     currentTime: getElement(config.selectors.display.currentTime),
                 };
+
+                // Seek tooltip
+                if (is.htmlElement(elements.progress)) {
+                    elements.display.seekTooltip = elements.progress.querySelector('.' + config.classes.tooltip);
+                }
 
                 return true;
             } catch (error) {
@@ -2697,7 +2758,7 @@
                         config.loop.end = null;
                     }
                     config.loop.start = currentTime;
-                    config.loop.indicator.start = elements.progress.played.value;
+                    config.loop.indicator.start = elements.display.played.value;
                     break;
 
                 case 'end':
@@ -2705,7 +2766,7 @@
                         return;
                     }
                     config.loop.end = currentTime;
-                    config.loop.indicator.end = elements.progress.played.value;
+                    config.loop.indicator.end = elements.display.played.value;
                     break;
 
                 case 'all':
@@ -2797,8 +2858,13 @@
                 speed: speed
             });
 
-            //Update current value of menu
-            document.querySelector('[data-menu="speed"]').innerHTML = getSpeedDisplayValue();
+            // Update current value of menu
+            // document.querySelector('[data-menu="speed"]').innerHTML = getSpeedDisplayValue();
+        }
+
+        // Get the current speed value
+        function getSpeedDisplayValue() {
+            return config.currentSpeed.toFixed(1).toString().replace('.0', '') + '&times;'
         }
 
         // Rewind
@@ -3127,64 +3193,6 @@
             }
         }
 
-        // Toggle captions
-        function toggleCaptions(show) {
-            // If there's no full support, or there's no caption toggle
-            if (!plyr.supported.full || !elements.buttons.captions) {
-                return;
-            }
-
-            // If the method is called without parameter, toggle based on current value
-            if (!is.boolean(show)) {
-                show = (plyr.container.className.indexOf(config.classes.captions.active) === -1);
-            }
-
-            // Set global
-            plyr.captionsEnabled = show;
-            elements.buttons.captions_menu.innerHTML = show ? 'Off' : 'On';
-            getElement('[data-captions="settings"]').innerHTML = getSubsLangValue();
-
-            // Toggle state
-            toggleState(elements.buttons.captions, plyr.captionsEnabled);
-
-            // Add class hook
-            toggleClass(plyr.container, config.classes.captions.active, plyr.captionsEnabled);
-
-            // Trigger an event
-            trigger(plyr.container, plyr.captionsEnabled ? 'captionsenabled' : 'captionsdisabled', true);
-
-            // Save captions state to localStorage
-            updateStorage({
-                captionsEnabled: plyr.captionsEnabled
-            });
-        }
-
-        // Select active caption
-        function setCaptionIndex(index) {
-            // Save active caption
-            config.captions.selectedIndex = index || config.captions.selectedIndex;
-
-            // Clear caption
-            setCaption();
-
-            // Re-run setup
-            setupCaptions();
-
-            getElement('[data-captions="settings"]').innerHTML = getSubsLangValue();
-        }
-
-        function getSubsLangValue() {
-            if (config.tracks.length === 0) {
-                return 'No Subs';
-            }
-
-            if (plyr.captionsEnabled || !is.boolean(plyr.captionsEnabled) && plyr.storage.captionsEnabled) {
-                return config.tracks[config.captions.selectedIndex].label;
-            } else {
-                return 'Disabled';
-            }
-        }
-
         // Check if media is loading
         function checkLoading(event) {
             var loading = (event.type === 'waiting');
@@ -3208,7 +3216,7 @@
                 return;
             }
 
-            var progress = elements.progress.played,
+            var progress = elements.display.played,
                 value = 0,
                 duration = getDuration();
 
@@ -3233,7 +3241,7 @@
                         // Check buffer status
                     case 'playing':
                     case 'progress':
-                        progress = elements.progress.buffer;
+                        progress = elements.display.buffer;
                         value = (function() {
                             var buffered = plyr.media.buffered;
 
@@ -3271,8 +3279,8 @@
             }
             // Default to buffer or bail
             if (is.undefined(progress)) {
-                if (is.htmlElement(elements.progress.buffer)) {
-                    progress = elements.progress.buffer;
+                if (is.htmlElement(elements.display.buffer)) {
+                    progress = elements.display.buffer;
                 } else {
                     return;
                 }
@@ -3371,8 +3379,8 @@
                 value = getPercentage(time, duration);
 
             // Update progress
-            if (elements.progress && elements.progress.played) {
-                elements.progress.played.value = value;
+            if (elements.progress && elements.display.played) {
+                elements.display.played.value = value;
             }
 
             // Update seek range input
@@ -3397,8 +3405,8 @@
 
             // Determine percentage, if already visible
             if (!event) {
-                if (hasClass(elements.progress.tooltip, visible)) {
-                    percent = elements.progress.tooltip.style.left.replace('%', '');
+                if (hasClass(elements.display.seekTooltip, visible)) {
+                    percent = elements.display.seekTooltip.style.left.replace('%', '');
                 } else {
                     return;
                 }
@@ -3414,15 +3422,15 @@
             }
 
             // Display the time a click would seek to
-            updateTimeDisplay(((duration / 100) * percent), elements.progress.tooltip);
+            updateTimeDisplay(((duration / 100) * percent), elements.display.seekTooltip);
 
             // Set position
-            elements.progress.tooltip.style.left = percent + "%";
+            elements.display.seekTooltip.style.left = percent + "%";
 
             // Show/hide the tooltip
             // If the event is a moues in/out and percentage is inside bounds
             if (event && inArray(['mouseenter', 'mouseleave'], event.type)) {
-                toggleClass(elements.progress.tooltip, visible, (event.type === 'mouseenter'));
+                toggleClass(elements.display.seekTooltip, visible, (event.type === 'mouseenter'));
             }
         }
 
@@ -3635,7 +3643,7 @@
 
                 // Set new sources for html5
                 if (inArray(config.types.html5, plyr.type)) {
-                    insertChildElements('source', source.sources);
+                    insertElements('source', source.sources);
                 }
 
                 // Set up from scratch
@@ -3645,7 +3653,7 @@
                 if (inArray(config.types.html5, plyr.type)) {
                     // Setup captions
                     if ('tracks' in source) {
-                        insertChildElements('track', source.tracks);
+                        insertElements('track', source.tracks);
                     }
 
                     // Load HTML5 sources
@@ -3946,8 +3954,8 @@
 
             // Speed-up
             proxy(elements.buttons.speed, 'click', config.listeners.speed, function() {
-                var speedValue = document.querySelector('[data-plyr="speed"]:checked').value;
-                setSpeed(Number(speedValue));
+                //var speedValue = document.querySelector('[data-plyr="speed"]:checked').value;
+                //setSpeed(Number(speedValue));
             });
 
             // Seek
