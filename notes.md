@@ -16,3 +16,11 @@
 
 #### Bugs
 - Fix audio setup bug when calling .setup() again
+
+#### Breaking changes
+- Custom controls HTML removed (temporarily, will return)
+- Selectors changes (new `input` and `display` object) - DOCUMENT
+
+## Added
+- Seek i8n label
+- Loop i8n labels
