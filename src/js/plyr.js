@@ -417,7 +417,7 @@
     // Set attributes
     function setAttributes(element, attributes) {
         for (var key in attributes) {
-            element.setAttribute(key, (is.boolean(attributes[key]) && attributes[key]) ? '' : attributes[key]);
+            element.setAttribute(key, attributes[key]);
         }
     }
 
@@ -825,7 +825,7 @@
         // Picture-in-picture support
         // Safari only currently
         pip: (function() {
-            return is.function(document.createElement('video').webkitSetPresentationMode);
+            return is.function(createElement('video').webkitSetPresentationMode);
         })(),
         // Airplay support
         // Safari only currently
@@ -878,12 +878,18 @@
         var plyr = this;
         var timers = {};
         var api;
+
+        // Elements cache
         var elements = {
             buttons: {},
             display: {},
             progress: {},
-            inputs: {}
+            inputs: {},
+            settings: {
+                tabs: {},
+                panes: {}
         }
+        };
 
         // Set media
         plyr.media = media;
@@ -909,10 +915,10 @@
             }
         }
         var log = function() {
-            logger('log', arguments)
+            logger('log', arguments);
         };
         var warn = function() {
-            logger('warn', arguments)
+            logger('warn', arguments);
         };
 
         // Log config options and support
@@ -969,12 +975,12 @@
                 insertElement(type, plyr.media, {
                     src: attributes
                 });
-            } else if (attributes.constructor === Array) {
-                for (var i = attributes.length - 1; i >= 0; i--) {
-                    insertElement(type, plyr.media, attributes[i]);
+            } else if (is.array(attributes)) {
+                attributes.forEach(function(attribute) {
+                    insertElement(type, plyr.media, attribute);
+                });
                 }
             }
-        }
 
         // Get icon URL
         function getIconUrl() {
@@ -982,22 +988,6 @@
                 url: config.iconUrl,
                 absolute: (config.iconUrl.indexOf("http") === 0) || plyr.browser.isIE
             };
-        }
-
-        // Build a list of available captions
-        function buildCaptionsMenu() {
-            var trackSubs = '';
-
-            if (is.array(config.tracks) && !is.empty(config.tracks)) {
-                config.tracks.forEach(function(track, index) {
-                    if (is.function(track)) {
-                        return;
-                    }
-                    trackSubs += '<button type="button" class="plyr__control" data-plyr="captions-lang" data-lang="' + track.srclang + '" data-index="' + index + '">' + track.label + '</button>';
-                });
-            }
-
-            return trackSubs;
         }
 
         // Create <svg> icon
@@ -1042,14 +1032,23 @@
         }
 
         // Create a <button>
-        function createButton(type) {
+        function createButton(type, attributes) {
             var button = createElement('button');
-            var attributes = {
-                class: 'plyr__control'
-            };
             var iconDefault;
             var iconToggled;
             var labelKey;
+
+            if (!is.object(attributes)) {
+                attributes = {};
+            }
+
+            if ('class' in attributes) {
+                if (attributes.class.indexOf('plyr__control') === -1) {
+                    attributes.class += ' plyr__control';
+                }
+            } else {
+                attributes.class = 'plyr__control';
+            }
 
             // Large play button
             switch (type) {
@@ -1178,6 +1177,8 @@
 
             container.appendChild(createElement('span', getAttributesFromSelector(config.selectors.display[type]), '00:00'));
 
+            elements.display[type] = container;
+
             return container;
         }
 
@@ -1229,13 +1230,11 @@
 
                 // Seek tooltip
                 if (config.tooltips.seek) {
-                    //html.push('<span class="plyr__tooltip">00:00</span>');
                     var tooltip = createElement('span', {
                         role: 'tooltip',
                         class: config.classes.tooltip
-                    });
+                    }, '00:00');
 
-                    tooltip.textContent = '00:00';
                     container.appendChild(tooltip);
                 }
 
@@ -1290,24 +1289,132 @@
 
             // Settings button / menu
             if (inArray(config.controls, 'settings')) {
-                /*
-                var captionsMenuItem = '';
-                if (inArray(config.controls, 'captions')) {
-                captionsMenuItem = '<li role="tab">'+
-                        '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-captions-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-captions" aria-expanded="false">'+
-                            config.i18n.captions +
-                            '<span class="plyr__menu__value" data-captions="settings">{lang}</span>'+
-                        '</button>'+
-                    '</li>';
+                var wrapper = createElement('span', extend(getAttributesFromSelector(config.selectors.buttons.settings), {
+                    class: 'plyr__menu'
+                }));
+
+                wrapper.appendChild(createButton('settings', {
+                    id: 'plyr-settings-toggle-' + data.id,
+                    'aria-haspopup': true,
+                    'aria-controls': 'plyr-settings-' + data.id,
+                    'aria-expanded': false
+                }));
+
+                var form = createElement('form', {
+                    class: 'plyr__menu__container',
+                    id: 'plyr-settings-' + data.id,
+                    'aria-hidden': true,
+                    'aria-labelled-by': 'plyr-settings-toggle-' + data.id,
+                    role: 'tablist',
+                    tabindex: -1
+                });
+
+                var inner = createElement('div');
+
+                var home = createElement('div', {
+                    id: 'plyr-settings-' + data.id + '-home',
+                    'aria-hidden': false,
+                    'aria-labelled-by': 'plyr-settings-toggle-' + data.id,
+                    role: 'tabpanel',
+                    tabindex: -1
+                });
+
+                var tabs = createElement('ul', {
+                    role: 'tablist'
+                });
+
+                ['captions', 'quality', 'speed', 'loop'].forEach(function(type) {
+                    var tab = createElement('li', {
+                        role: 'tab'
+                    });
+
+                    var button = createElement('button', extend(getAttributesFromSelector(config.selectors.buttons.settings), {
+                        type: 'button',
+                        class: 'plyr__control plyr__control--forward',
+                        id: 'plyr-settings-' + data.id + '-' + type + '-tab',
+                        'aria-haspopup': true,
+                        'aria-controls': 'plyr-settings-' + data.id + '-' + type,
+                        'aria-expanded': false
+                    }), config.i18n[type]);
+
+                    var value = createElement('span', {
+                        class: 'plyr__menu__value'
+                    });
+
+                    // Speed contains HTML entities
+                    value.innerHTML = data[type];
+
+                    button.appendChild(value);
+
+                    tab.appendChild(button);
+
+                    tabs.appendChild(tab);
+                });
+
+                home.appendChild(tabs);
+
+                inner.appendChild(home);
+
+                ['captions', 'quality', 'speed', 'loop'].forEach(function(type) {
+                    var pane = createElement('div', {
+                        id: 'plyr-settings-' + data.id + '-' + type,
+                        'aria-hidden': true,
+                        'aria-labelled-by': 'plyr-settings-tab-' + data.id,
+                        role: 'tabpanel',
+                        tabindex: -1
+                    });
+
+                    var options = createElement('ul');
+
+                    var option = createElement('li');
+
+                    var back = createElement('button', {
+                        type: 'button',
+                        class: 'plyr__control plyr__control--back',
+                        'aria-haspopup': true,
+                        'aria-controls': 'plyr-settings-' + data.id + '-home',
+                        'aria-expanded': false
+                    }, config.i18n.back);
+
+                    option.appendChild(back);
+
+                    options.appendChild(option);
+
+                    switch (type) {
+                        case 'captions':
+                            if (is.array(config.tracks)) {
+                                config.tracks.forEach(function(track, index) {
+                                    if (is.function(track)) {
+                                        return;
                 }
 
-                if (is.array(config.quality.options)) {
-                   var showQuality = '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-quality-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-quality" aria-expanded="false">'+
-                                        config.i18n.quality +'<span class="plyr__menu__value">Auto</span>'+
-                                     '</button>';
+                                    var option = createElement('li');
+
+                                    var button = createButton('language', {
+                                        'data-language': track.srclang,
+                                        'data-index': index
+                                    }, track.label);
+
+                                    option.appendChild(button);
+
+                                    options.appendChild(options);
+                                });
+                            }
+                            break;
                 }
 
-                html.push(
+                    pane.appendChild(options);
+
+                    inner.appendChild(pane);
+                });
+
+                form.appendChild(inner);
+
+                wrapper.appendChild(form);
+
+                controls.appendChild(wrapper);
+
+                /*html.push(
                     '<div class="plyr__menu" data-plyr="settings">',
                         '<button type="button" id="plyr-settings-toggle-{id}" class="plyr__control" aria-haspopup="true" aria-controls="plyr-settings-{id}" aria-expanded="false">',
                             '<svg><use xlink:href="' + iconPath + '-settings" /></svg>',
@@ -1499,6 +1606,8 @@
             if (inArray(config.controls, 'fullscreen')) {
                 controls.appendChild(createButton('fullscreen'));
             }
+
+            elements.controls = controls;
 
             return controls;
         }
@@ -1963,6 +2072,8 @@
 
             // Set global
             plyr.captionsEnabled = show;
+            elements.buttons.captions_menu.innerHTML = show ? 'Off' : 'On';
+            //TODO: display lang getElement('[data-captions="settings"]').innerHTML = getSubsLangValue();
 
             // Set current language etc
             //elements.buttons.captions_menu.innerHTML = show ? 'Off' : 'On';
@@ -2005,15 +2116,19 @@
             }
 
             // Create a unique ID
-            plyr.id = Math.floor(Math.random() * (10000));
+            plyr.id = Math.floor(Math.random() * 10000);
 
             // Create controls
             var controls = createControls({
                 id: plyr.id,
                 seektime: config.seekTime,
                 speed: getSpeedDisplayValue(),
+                // TODO: Get current quality
+                quality: 'HD',
                 // TODO: Set language automatically based on UA?
-                language: 'English'
+                captions: 'English',
+                // TODO: Get loop
+                loop: 'None'
             });
 
             // Controls container
@@ -2047,7 +2162,8 @@
         }
 
         // Find the UI controls and store references
-        function findElements() {
+        // TODO: Restore when re-enabling custom HTML
+        /*function findElements() {
             try {
                 elements.controls = getElement(config.selectors.controls.wrapper);
 
@@ -2100,7 +2216,7 @@
 
                 return false;
             }
-        }
+        }*/
 
         // Toggle style hook
         function toggleStyleHook() {
@@ -2226,7 +2342,7 @@
                 // Inject the player wrapper
                 if (plyr.type === 'video') {
                     // Create the wrapper div
-                    var wrapper = document.createElement('div');
+                    var wrapper = createElement('div');
                     wrapper.setAttribute('class', config.classes.videoWrapper);
 
                     // Wrap the video in a container
@@ -2245,9 +2361,9 @@
 
         // Setup YouTube/Vimeo
         function setupEmbed() {
-            var container = document.createElement('div'),
-                mediaId,
-                id = plyr.type + '-' + Math.floor(Math.random() * (10000));
+            var container = createElement('div');
+            var mediaId;
+            var id = plyr.type + '-' + Math.floor(Math.random() * (10000));
 
             // Parse IDs from URLs if supplied
             switch (plyr.type) {
@@ -2330,7 +2446,7 @@
             } else if (plyr.type === 'soundcloud') {
                 // TODO: Currently unsupported and undocumented
                 // Inject the iframe
-                var soundCloud = document.createElement('iframe');
+                var soundCloud = createElement('iframe');
 
                 // Watch for iframe load
                 soundCloud.loaded = false;
@@ -2965,10 +3081,10 @@
         // Get the duration (or custom if set)
         function getDuration() {
             // It should be a number, but parse it just incase
-            var duration = parseInt(config.duration),
+            var duration = parseInt(config.duration);
 
                 // True duration
-                mediaDuration = 0;
+            var mediaDuration = 0;
 
             // Only if duration available
             if (plyr.media.duration !== null && !isNaN(plyr.media.duration)) {
@@ -3605,17 +3721,17 @@
                 // Create new markup
                 switch (plyr.type) {
                     case 'video':
-                        plyr.media = document.createElement('video');
+                        plyr.media = createElement('video');
                         break;
 
                     case 'audio':
-                        plyr.media = document.createElement('audio');
+                        plyr.media = createElement('audio');
                         break;
 
                     case 'youtube':
                     case 'vimeo':
                     case 'soundcloud':
-                        plyr.media = document.createElement('div');
+                        plyr.media = createElement('div');
                         plyr.embedId = source.sources[0].src;
                         break;
                 }
@@ -4006,10 +4122,10 @@
 
             // Settings
             on(elements.buttons.settings, 'click', function(event) {
-                var menu = this,
-                    toggle = event.target,
-                    target = document.getElementById(toggle.getAttribute('aria-controls')),
-                    show = (toggle.getAttribute('aria-expanded') === 'false');
+                var menu = this;
+                var toggle = event.target;
+                var target = document.getElementById(toggle.getAttribute('aria-controls'));
+                var show = (toggle.getAttribute('aria-expanded') === 'false');
 
                 // Nothing to show, bail
                 if (!is.htmlElement(target)) {
@@ -4017,10 +4133,10 @@
                 }
 
                 // Are we targetting a tab?
-                var isTab = target.getAttribute('role') === 'tabpanel',
-                    targetWidth,
-                    targetHeight,
-                    container;
+                var isTab = target.getAttribute('role') === 'tabpanel';
+                var targetWidth;
+                var targetHeight;
+                var container;
 
                 // Hide all other tabs
                 if (isTab) {
@@ -4352,7 +4468,7 @@
             }
 
             // Wrap media
-            plyr.container = wrap(media, document.createElement('div'));
+            plyr.container = wrap(media, createElement('div'));
 
             // Allow focus to be captured
             plyr.container.setAttribute('tabindex', 0);
@@ -4403,21 +4519,17 @@
             }
 
             // Inject custom controls if not present
-            var controlsMissing = !getElements(config.selectors.controls.wrapper).length;
-            if (controlsMissing) {
+            if (!is.htmlElement(getElement(config.selectors.controls.wrapper))) {
                 // Inject custom controls
                 injectControls();
+                controlListeners();
             }
 
             // Find the elements
-            if (!findElements()) {
+            // TODO: re-enable when custom HTML is restored
+            /*if (!findElements()) {
                 return;
-            }
-
-            // If the controls are injected, re-bind listeners for controls
-            if (controlsMissing) {
-                controlListeners();
-            }
+            }*/
 
             // Media element listeners
             mediaListeners();
@@ -4564,7 +4676,7 @@
         }
 
         // Create placeholder (to prevent loading twice)
-        var container = document.createElement('div');
+        var container = createElement('div');
         container.setAttribute('hidden', '');
         if (is.string(id)) {
             container.setAttribute('id', id);
@@ -4592,8 +4704,8 @@
             isOldIE = (browser.isIE && browser.version <= 9),
             isIos = browser.isIos,
             isIphone = /iPhone|iPod/i.test(navigator.userAgent),
-            audio = !!document.createElement('audio').canPlayType,
-            video = !!document.createElement('video').canPlayType,
+            audio = !!createElement('audio').canPlayType,
+            video = !!createElement('video').canPlayType,
             basic, full;
 
         switch (type) {
