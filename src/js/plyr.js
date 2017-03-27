@@ -492,7 +492,7 @@
 
         // Add text node
         if (is.string(text)) {
-            element.appendChild(document.createTextNode(text));
+            element.textContent = text;
         }
 
         // Return built element
@@ -506,6 +506,14 @@
 
         // Inject the new element
         prependChild(parent, element);
+    }
+
+    // Remove all child elements
+    function emptyElement(element) {
+        var length = element.childNodes.length;
+        while (length--) {
+            element.removeChild(element.lastChild);
+        }
     }
 
     // Get a classname from selector
@@ -1150,8 +1158,7 @@
                         break;
                 }
 
-                var label = document.createTextNode('% ' + suffix.toLowerCase());
-                progress.appendChild(label);
+                progress.textContent = '% ' + suffix.toLowerCase();
             }
 
             elements.display[type] = progress;
@@ -1228,8 +1235,7 @@
                         class: config.classes.tooltip
                     });
 
-                    var value = document.createTextNode('00:00');
-                    tooltip.appendChild(value);
+                    tooltip.textContent = '00:00';
                     container.appendChild(tooltip);
                 }
 
@@ -1819,7 +1825,7 @@
                 var content = createElement('span');
 
                 // Empty the container
-                captions.innerHTML = '';
+                emptyElement(captions);
 
                 // Default to empty
                 if (is.undefined(caption)) {
@@ -1837,7 +1843,7 @@
                 captions.appendChild(content);
 
                 // Force redraw (for Safari)
-                var redraw = captions.offsetHeight;
+                // var redraw = captions.offsetHeight;
             }
         }
 
@@ -1957,8 +1963,10 @@
 
             // Set global
             plyr.captionsEnabled = show;
-            elements.buttons.captions_menu.innerHTML = show ? 'Off' : 'On';
-            getElement('[data-captions="settings"]').innerHTML = getSubsLangValue();
+
+            // Set current language etc
+            //elements.buttons.captions_menu.innerHTML = show ? 'Off' : 'On';
+            //getElement('[data-captions="settings"]').innerHTML = getSubsLangValue();
 
             // Toggle state
             toggleState(elements.buttons.captions, plyr.captionsEnabled);
@@ -3321,14 +3329,14 @@
             plyr.secs = ('0' + plyr.secs).slice(-2);
             plyr.mins = ('0' + plyr.mins).slice(-2);
 
-            // Generate display
-            var display = (displayHours ? plyr.hours + ':' : '') + plyr.mins + ':' + plyr.secs;
+            // Generate label
+            var label = (displayHours ? plyr.hours + ':' : '') + plyr.mins + ':' + plyr.secs;
 
             // Render
-            element.innerHTML = display;
+            element.textContent = label;
 
             // Return for looping
-            return display;
+            return label;
         }
 
         // Show the duration on metadataloaded
