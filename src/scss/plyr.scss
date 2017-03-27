@@ -172,6 +172,9 @@
     position: relative;
     background: #000;
     border-radius: inherit;
+    // Require z-index to force border-radius
+    z-index: 0;
+    overflow: hidden;
 }
 
 // Container for embeds
@@ -269,12 +272,14 @@
     text-align: center;
 
     // Spacing
-    > button,
+    > .plyr__control,
     .plyr__progress,
-    .plyr__time {
+    .plyr__time,
+    .plyr__menu {
         margin-left: ($plyr-control-spacing / 2);
 
-        &:first-child, &:first-child + [data-plyr="pause"] {
+        &:first-child,
+        &:first-child + [data-plyr="pause"] {
             margin-left: 0;
         }
     }
@@ -302,6 +307,7 @@
             height: $plyr-control-icon-size;
             display: block;
             fill: currentColor;
+            pointer-events: none;
         }
 
         // Default focus
@@ -395,6 +401,7 @@
         height: 20px;
         display: block;
         fill: currentColor;
+        pointer-events: none;
     }
 
     &:focus {
@@ -492,7 +499,8 @@
 }
 
 // First tooltip
-.plyr__controls button:first-child .plyr__tooltip {
+.plyr__controls > button:first-child .plyr__tooltip,
+.plyr__controls > button:first-child + button .plyr__tooltip {
     left: 0;
     transform: translate(0, 10px) scale(.8);
     transform-origin: 0 100%;
@@ -503,7 +511,7 @@
 }
 
 // Last tooltip
-.plyr__controls button:last-child .plyr__tooltip {
+.plyr__controls > button:last-child .plyr__tooltip {
     right: 0;
     transform: translate(0, 10px) scale(.8);
     transform-origin: 100% 100%;
@@ -515,8 +523,9 @@
     }
 }
 
-.plyr__controls button:first-child,
-.plyr__controls button:last-child {
+.plyr__controls > button:first-child,
+.plyr__controls > button:first-child + button,
+.plyr__controls > button:last-child {
     &:hover .plyr__tooltip,
     &.tab-focus:focus .plyr__tooltip,
     .plyr__tooltip--visible {
