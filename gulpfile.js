@@ -32,10 +32,14 @@ paths = {
             less:       path.join(root, "src/less/**/*"),
             scss:       path.join(root, "src/scss/**/*"),
             js:         path.join(root, "src/js/**/*"),
-            sprite:     path.join(root, "src/sprite/*.svg")
+            sprite:     [
+                            path.join(root, "src/sprite/*.svg"),
+                            '!' + path.join(root, "src/sprite/plyr.svg")
+                        ],
         },
         // Output paths
-        output:         path.join(root, "dist/")
+        output:         path.join(root, "dist/"),
+        spriteOutput:   path.join(root, "src/sprite/")
     },
     demo: {
         // Source paths
@@ -46,6 +50,7 @@ paths = {
         },
         // Output paths
         output:         path.join(root, "demo/dist/"),
+        spriteOutput:   path.join(root, "demo/dist/"),
         // Demo
         root:           path.join(root, "demo/")
     },
@@ -106,7 +111,7 @@ var build = {
 
                 function inlineIcon() {
                     return fs.readFileSync(
-                        path.join(paths[bundle].output, bundle + '.svg'),
+                        path.join(paths[bundle].spriteOutput, bundle + '.svg'),
                         'utf8'
                     ).replace("'", "\\'");
                 }
@@ -175,7 +180,7 @@ var build = {
                 }))
                 .pipe(svgstore())
                 .pipe(rename({ basename: bundle }))
-                .pipe(gulp.dest(paths[bundle].output));
+                .pipe(gulp.dest(paths[bundle].spriteOutput));
         });
     }
 };
