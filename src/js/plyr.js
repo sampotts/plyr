@@ -492,7 +492,7 @@
 
         // Add text node
         if (is.string(text)) {
-            element.appendChild(document.createTextNode(text));
+            element.textContent = text;
         }
 
         // Return built element
@@ -506,6 +506,14 @@
 
         // Inject the new element
         prependChild(parent, element);
+    }
+
+    // Remove all child elements
+    function emptyElement(element) {
+        var length = element.childNodes.length;
+        while (length--) {
+            element.removeChild(element.lastChild);
+        }
     }
 
     // Get a classname from selector
@@ -981,8 +989,8 @@
                 attributes.forEach(function(attribute) {
                     insertElement(type, player.elements.media, attribute);
                 });
+                }
             }
-        }
 
         // Get icon URL
         function getIconUrl() {
@@ -1159,8 +1167,7 @@
                         break;
                 }
 
-                var label = document.createTextNode('% ' + suffix.toLowerCase());
-                progress.appendChild(label);
+                progress.textContent = '% ' + suffix.toLowerCase();
             }
 
             player.elements.display[type] = progress;
@@ -1389,7 +1396,7 @@
                                 config.tracks.forEach(function(track, index) {
                                     if (is.function(track)) {
                                         return;
-                                    }
+                }
 
                                     var option = createElement('li');
 
@@ -1404,7 +1411,7 @@
                                 });
                             }
                             break;
-                    }
+                }
 
                     pane.appendChild(options);
 
@@ -1937,7 +1944,7 @@
                 var content = createElement('span');
 
                 // Empty the container
-                captions.innerHTML = '';
+                emptyElement(captions);
 
                 // Default to empty
                 if (is.undefined(caption)) {
@@ -2078,6 +2085,10 @@
             player.captions.enabled = show;
             //player.elements.buttons.captions_menu.innerHTML = show ? 'Off' : 'On';
             //TODO: display lang getElement('[data-captions="settings"]').innerHTML = getSubsLangValue();
+
+            // Set current language etc
+            //elements.buttons.captions_menu.innerHTML = show ? 'Off' : 'On';
+            //getElement('[data-captions="settings"]').innerHTML = getSubsLangValue();
 
             // Toggle state
             toggleState(player.elements.buttons.captions, player.captions.enabled);
@@ -3083,7 +3094,7 @@
             // It should be a number, but parse it just incase
             var duration = parseInt(config.duration);
 
-            // True duration
+                // True duration
             var mediaDuration = 0;
 
             // Only if duration available
@@ -3449,10 +3460,10 @@
             var display = (displayHours ? hours + ':' : '') + mins + ':' + secs;
 
             // Render
-            element.innerHTML = display;
+            element.textContent = label;
 
             // Return for looping
-            return display;
+            return label;
         }
 
         // Show the duration on metadataloaded
