@@ -43,7 +43,7 @@
         displayDuration:        true,
         loadSprite:             true,
         iconPrefix:             'plyr',
-        icon:                   '<INLINE-ICON>',
+        icon:                   '<INLINE-ICON>', // This will be replace with plyr.svg
         iconUrl:                '',
         blankUrl:               'https://cdn.selz.com/plyr/blank.mp4',
         clickToPlay:            true,
