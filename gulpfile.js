@@ -104,9 +104,17 @@ var build = {
                 var name = "js-" + key;
                 tasks.js.push(name);
 
+                function inlineIcon() {
+                    return fs.readFileSync(
+                        path.join(paths[bundle].output, bundle + '.svg'),
+                        'utf8'
+                    ).replace("'", "\\'");
+                }
+
                 gulp.task(name, function () {
                     return gulp
                         .src(bundles[bundle].js[key])
+                        .pipe(replace('<INLINE-ICON>', inlineIcon))
                         .pipe(concat(key))
                         .pipe(uglify())
                         .pipe(gulp.dest(paths[bundle].output));

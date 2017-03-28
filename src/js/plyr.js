@@ -43,7 +43,8 @@
         displayDuration:        true,
         loadSprite:             true,
         iconPrefix:             'plyr',
-        iconUrl:                'https://cdn.plyr.io/2.0.12/plyr.svg',
+        icon:                   '<INLINE-ICON>',
+        iconUrl:                '',
         blankUrl:               'https://cdn.selz.com/plyr/blank.mp4',
         clickToPlay:            true,
         hideControls:           true,
@@ -1270,14 +1271,18 @@
         function _injectControls() {
             // Sprite
             if (config.loadSprite) {
-                var iconUrl = _getIconUrl();
-
-                // Only load external sprite using AJAX
-                if (iconUrl.absolute) {
-                    _log('AJAX loading absolute SVG sprite' + (plyr.browser.isIE ? ' (due to IE)' : ''));
-                    loadSprite(iconUrl.url, "sprite-plyr");
+                if (config.iconUrl === '') {
+                    createSpriteElement(config.icon, "sprite-plyr");
                 } else {
-                    _log('Sprite will be used as external resource directly');
+                    var iconUrl = _getIconUrl();
+
+                    // Only load external sprite using AJAX
+                    if (iconUrl.absolute) {
+                        _log('AJAX loading absolute SVG sprite' + (plyr.browser.isIE ? ' (due to IE)' : ''));
+                        loadSprite(iconUrl.url, "sprite-plyr");
+                    } else {
+                        _log('Sprite will be used as external resource directly');
+                    }
                 }
             }
 
@@ -3510,10 +3515,7 @@
         return api;
     }
 
-    // Load a sprite
-    function loadSprite(url, id) {
-        var x = new XMLHttpRequest();
-
+    function createSpriteElement(xml, id) {
         // If the id is set and sprite exists, bail
         if (_is.string(id) && _is.htmlElement(document.querySelector('#' + id))) {
             return;
@@ -3526,6 +3528,12 @@
             container.setAttribute('id', id);
         }
         document.body.insertBefore(container, document.body.childNodes[0]);
+        container.innerHTML = xml;
+    }
+
+    // Load a sprite
+    function loadSprite(url, id) {
+        var x = new XMLHttpRequest();
 
         // Check for CORS support
         if ('withCredentials' in x) {
@@ -3536,7 +3544,7 @@
 
         // Inject hidden div with sprite on load
         x.onload = function() {
-            container.innerHTML = x.responseText;
+            createSpriteElement(x.responseText, id);
         }
 
         x.send();

@@ -14,7 +14,6 @@
     var instances = plyr.setup({
         debug:              true,
         title:              'Video demo',
-        iconUrl:            '../dist/plyr.svg',
         tooltips: {
             controls:       true
         },
