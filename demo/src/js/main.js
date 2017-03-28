@@ -108,12 +108,8 @@
                     type: 'video',
                     title: 'View From A Blue Moon',
                     sources: [{
-                            src: 'https://cdn.selz.com/plyr/1.5/View_From_A_Blue_Moon_Trailer-HD.mp4',
-                            type: 'video/mp4'
-                    },
-                        {
-                            src: 'https://cdn.selz.com/plyr/1.5/View_From_A_Blue_Moon_Trailer-HD.webm',
-                            type: 'video/webm'
+                        src: 'https://cdn.selz.com/plyr/1.5/View_From_A_Blue_Moon_Trailer-HD.mp4',
+                        type: 'video/mp4'
                     }],
                     poster: 'https://cdn.selz.com/plyr/1.5/View_From_A_Blue_Moon_Trailer-HD.jpg',
                     tracks: [{
