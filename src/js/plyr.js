@@ -1272,7 +1272,10 @@
             // Sprite
             if (config.loadSprite) {
                 if (config.iconUrl === '') {
-                    createSpriteElement(config.icon, "sprite-plyr");
+                    // Check is this a inline version
+                    if (config.icon !== '<!-- Inline Sprite -->') {
+                        createSpriteElement(config.icon, "sprite-plyr");
+                    }
                 } else {
                     var iconUrl = _getIconUrl();
 
