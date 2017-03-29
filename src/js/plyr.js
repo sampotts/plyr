@@ -1034,6 +1034,14 @@
                 case 'airplay':
                     text = 'AirPlay';
                     break;
+
+                case 'forward':
+                    text = text.replace('{seektime}', config.seekTime)
+                    break;
+
+                case 'rewind':
+                    text = text.replace('{seektime}', config.seekTime)
+                    break;
             }
 
             return createElement('span', {
@@ -1085,6 +1093,13 @@
                     type = 'play';
                     labelKey = 'play';
                     iconDefault = 'play';
+                    break;
+
+                case 'fast-forward':
+                    labelKey = type;
+                    iconDefault = type;
+                    labelKey = 'forward';
+                    type = 'forward';
                     break;
 
                 default:
