@@ -32,10 +32,11 @@ paths = {
             less:       path.join(root, "src/less/**/*"),
             scss:       path.join(root, "src/scss/**/*"),
             js:         path.join(root, "src/js/**/*"),
-            sprite:     path.join(root, "src/sprite/*.svg")
+            sprite:     path.join(root, "src/sprite/*.svg"),
+            jsInline:   path.join(root, "dist/plyr.js")
         },
         // Output paths
-        output:         path.join(root, "dist/")
+        output:         path.join(root, "dist/"),
     },
     demo: {
         // Source paths
@@ -169,6 +170,37 @@ var build = {
                 .pipe(rename({ basename: bundle }))
                 .pipe(gulp.dest(paths[bundle].output));
         });
+    },
+    inlineSprite: function (bundle) {
+        var name = "inline-" + bundle;
+        tasks.js.push(name);
+
+        function inlineIcon() {
+            var sprite = fs.readFileSync(
+                path.join(paths[bundle].output, bundle + '.svg'),
+                'utf8'
+            );
+
+            return sprite
+                .replace(/'/g, "\\'")
+                .replace(/"/g, '\\"');
+        }
+
+        var deps = [
+            "js-plyr.js", // TODO: How to get this instead hard code ?
+            "sprite-" + bundle
+        ];
+
+        // Inline Icons
+        gulp.task(name, deps, function () {
+            return gulp
+                .src(path.join(paths[bundle].output, bundle + '.js'))
+                // Remove default sprite URL will lead to use inline icon
+                .pipe(replace('https://cdn.plyr.io/2.0.12/plyr.svg', ''))
+                .pipe(replace(/<!-- Inline Sprite -->/, inlineIcon))
+                .pipe(rename({ basename: bundle + '-with-sprite' }))
+                .pipe(gulp.dest(paths[bundle].output));
+        });
     }
 };
 
@@ -177,6 +209,7 @@ build.js(bundles.plyr.js, "plyr");
 build.less(bundles.plyr.less, "plyr");
 build.scss(bundles.plyr.scss, "plyr");
 build.sprite("plyr");
+build.inlineSprite("plyr");
 
 // Demo files
 build.less(bundles.demo.less, "demo");
