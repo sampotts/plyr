@@ -197,7 +197,7 @@ var build = {
                 .src(path.join(paths[bundle].output, bundle + '.js'))
                 // Remove default sprite URL will lead to use inline icon
                 .pipe(replace('https://cdn.plyr.io/2.0.12/plyr.svg', ''))
-                .pipe(replace('<!-- Inline Sprite -->', inlineIcon))
+                .pipe(replace(/<!-- Inline Sprite -->/, inlineIcon))
                 .pipe(rename({ basename: bundle + '-with-sprite' }))
                 .pipe(gulp.dest(paths[bundle].output));
         });
