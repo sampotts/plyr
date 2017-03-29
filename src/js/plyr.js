@@ -43,8 +43,8 @@
         displayDuration:        true,
         loadSprite:             true,
         iconPrefix:             'plyr',
-        icon:                   '<INLINE-ICON>', // This will be replace with plyr.svg
-        iconUrl:                '',
+        icon:                   '<!-- Inline Sprite -->', // Will be replace with plyr.svg in inline version
+        iconUrl:                'https://cdn.plyr.io/2.0.12/plyr.svg',
         blankUrl:               'https://cdn.selz.com/plyr/blank.mp4',
         clickToPlay:            true,
         hideControls:           true,
@@ -3515,6 +3515,7 @@
         return api;
     }
 
+    // Inject hidden div with sprite
     function createSpriteElement(xml, id) {
         // If the id is set and sprite exists, bail
         if (_is.string(id) && _is.htmlElement(document.querySelector('#' + id))) {
@@ -3542,7 +3543,6 @@
             return;
         }
 
-        // Inject hidden div with sprite on load
         x.onload = function() {
             createSpriteElement(x.responseText, id);
         }
