@@ -4,7 +4,8 @@
             "plyr.css":     ["src/less/plyr.less"]
         },
         "scss": {
-            "plyr.css":     ["src/scss/plyr.scss"]
+            "plyr.css":     ["src/scss/plyr.scss"],
+            "skin.css":     ["src/scss/skin_qubit.scss"]
         },
         "js": {
             "plyr.js":      ["src/js/plyr.js"]

@@ -1886,15 +1886,7 @@
                                     var captions = response.split(lineSeparator + lineSeparator);
 
                                     plyr.captions = captions.map(function(caption) {
-                                        var parts = caption.split(lineSeparator);
-                                        var index = 0;
-
-                                        // Incase caption numbers are added
-                                        if (parts[index].indexOf(":") !== -1) {
-                                            index = 1;
-                                        }
-
-                                        return [parts[index], parts[index + 1]];
+                                        return caption.split(lineSeparator);
                                     });
 
                                     plyr.captions.shift();
@@ -2042,6 +2034,9 @@
             if (plyr.media.currentTime.toFixed(1) >= timecodeMin(plyr.captions[plyr.subcount][0]) &&
                 plyr.media.currentTime.toFixed(1) <= timecodeMax(plyr.captions[plyr.subcount][0])) {
                 plyr.currentCaption = plyr.captions[plyr.subcount][1];
+                if (plyr.captions[plyr.subcount].length > 2) {
+                  plyr.currentCaption += '\n' + plyr.captions[plyr.subcount][2];
+                }
 
                 // Render the caption
                 setCaption(plyr.currentCaption);
@@ -2087,7 +2082,7 @@
 
             // Set global
             plyr.captionsEnabled = show;
-            elements.buttons.captions_menu.innerHTML = show ? 'Off' : 'On';
+            // elements.buttons.captions_menu.innerHTML = show ? 'Off' : 'On';
             //TODO: display lang getElement('[data-captions="settings"]').innerHTML = getSubsLangValue();
 
             // Set current language etc

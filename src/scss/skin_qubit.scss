@@ -1,0 +1,86 @@
+// BEGIN Qubit Colors
+$clr--scooter:                 rgb(38,198,218);            //#26C6DA cyan400
+$clr--blaze-orange:            rgb(255,109,0);             //#FF6D00 orangeA700 link
+$clr--trinidad:                rgb(230,81,0);              //#E65100 link press
+$clr--pizazz:                  rgb(255,145,0);             //#FF9100 link hover
+$clr--tundora:                 rgb(66,66,66);              //#424242 disabled
+$clr--seance:                  rgb(142,36,170);            //#8E24AA alquiler
+$clr--seance-shadow:           rgb(106,27,154);            //#6A1B9A alquiler sombra
+$clr--guardsman-red:           rgb(213,0,0);               //#D50000 error
+$clr--malachite:               rgb(0,200,83);              //#00C853 success
+$clr--prussian-blue:           rgb(0,33,71);               //#002147 color de fondo
+$clr--midnight:                rgb(0,20,40);               //#001428 color de fondo 2
+// END Qubit Colors
+
+$plyr-color-main:                       $clr--pizazz !default;
+$plyr-captions-bg:                      transparentize(#000, 1) !default;
+$plyr-video-progress-bg:                transparentize($clr--midnight, .25) !default;
+$plyr-video-progress-buffered-bg:       transparentize($clr--scooter, .75) !default;
+
+.plyr__progress--buffer {
+  &::-webkit-progress-value {
+    background: $plyr-video-progress-bg;
+  }
+  &::-moz-progress-bar {
+    background: $plyr-video-progress-bg;
+  }
+  &::-ms-fill {
+    background: $plyr-video-progress-bg;
+  }
+}
+
+.plyr__captions {
+  text-shadow: 2px 2px #000;
+  span {
+    background: none;
+  }
+}
+
+.plyr--video .plyr__controls button.tab-focus:focus,
+.plyr--video .plyr__controls button:hover,
+.plyr--audio .plyr__controls button.tab-focus:focus,
+.plyr--audio .plyr__controls button:hover,
+.plyr--video .plyr__controls .plyr__control.tab-focus:focus,
+.plyr--video .plyr__controls .plyr__control:hover,
+.plyr--audio .plyr__controls .plyr__control.tab-focus:focus,
+.plyr--audio .plyr__controls .plyr__control:hover,
+.plyr--video .plyr__controls .plyr__control[aria-expanded="true"],
+.plyr--audio .plyr__controls .plyr__control[aria-expanded="true"],
+.plyr__play-large,
+.plyr__volume--display {
+  background: $clr--pizazz;
+}
+
+.plyr input[type='range'] {
+  &::-ms-fill-lower {
+    background: $clr--pizazz;
+  }
+  &:active::-webkit-slider-thumb {
+    background: $clr--pizazz;
+  }
+  &:active::-moz-range-thumb {
+    background: $clr--pizazz;
+  }
+  &:active::-ms-thumb {
+    background: $clr--pizazz;
+  }
+}
+
+.plyr__progress--played,
+.plyr__volume--display {
+  color: $clr--pizazz;
+}
+
+.plyr--video .plyr__progress--buffer,
+.plyr--audio .plyr__progress--buffer {
+  color: $plyr-video-progress-buffered-bg;
+}
+
+.plyr--video.plyr--loading .plyr__progress--buffer,
+.plyr--audio.plyr--loading .plyr__progress--buffer {
+  background-color: $plyr-video-progress-buffered-bg;
+}
+
+.plyr__menu .plyr__control[aria-expanded="true"] svg {
+  transform: rotate(360deg);
+}
