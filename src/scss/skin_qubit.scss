@@ -16,6 +16,7 @@ $plyr-color-main:                       $clr--pizazz !default;
 $plyr-captions-bg:                      transparentize(#000, 1) !default;
 $plyr-video-progress-bg:                transparentize($clr--midnight, .25) !default;
 $plyr-video-progress-buffered-bg:       transparentize($clr--scooter, .75) !default;
+$plyr-progress-loading-bg:              transparentize($clr--pizazz, .65) !default;
 
 .plyr__progress--buffer {
   &::-webkit-progress-value {
@@ -83,4 +84,17 @@ $plyr-video-progress-buffered-bg:       transparentize($clr--scooter, .75) !defa
 
 .plyr__menu .plyr__control[aria-expanded="true"] svg {
   transform: rotate(360deg);
+}
+
+.plyr--loading .plyr__progress--buffer {
+    background-image: linear-gradient(
+        -45deg,
+        $plyr-progress-loading-bg 25%,
+        transparent 25%,
+        transparent 50%,
+        $plyr-progress-loading-bg 50%,
+        $plyr-progress-loading-bg 75%,
+        transparent 75%,
+        transparent);
+    color: transparent;
 }
