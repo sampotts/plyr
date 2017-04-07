@@ -1251,6 +1251,7 @@
                     }, '00:00');
 
                     container.appendChild(tooltip);
+                    elements.display.seekTooltip = tooltip;
                 }
 
                 elements.progress = container;
@@ -3528,12 +3529,12 @@
             var duration = getDuration();
 
             // Bail if setting not true
-            if (!config.tooltips.seek || !elements.progress.container || duration === 0) {
+            if (!config.tooltips.seek || !elements.progress || duration === 0) {
                 return;
             }
 
             // Calculate percentage
-            var clientRect = elements.progress.container.getBoundingClientRect(),
+            var clientRect = elements.progress.getBoundingClientRect(),
                 percent = 0,
                 visible = config.classes.tooltip + '--visible';
 
@@ -4197,7 +4198,7 @@
             });
 
             // Seek tooltip
-            on(elements.progress.container, 'mouseenter mouseleave mousemove', updateSeekTooltip);
+            on(elements.progress, 'mouseenter mouseleave mousemove', updateSeekTooltip);
 
             // Toggle controls visibility based on mouse movement
             if (config.hideControls) {
@@ -4627,6 +4628,7 @@
             source: source,
             poster: updatePoster,
             setVolume: setVolume,
+            displayDuration: displayDuration,
             setSpeed: setSpeed,
             togglePlay: togglePlay,
             toggleMute: toggleMute,
