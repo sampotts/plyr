@@ -989,8 +989,8 @@
                 attributes.forEach(function(attribute) {
                     insertElement(type, player.elements.media, attribute);
                 });
-                }
             }
+        }
 
         // Get icon URL
         function getIconUrl() {
@@ -1396,7 +1396,7 @@
                                 config.tracks.forEach(function(track, index) {
                                     if (is.function(track)) {
                                         return;
-                }
+                                    }
 
                                     var option = createElement('li');
 
@@ -1411,7 +1411,7 @@
                                 });
                             }
                             break;
-                }
+                    }
 
                     pane.appendChild(options);
 
@@ -1780,8 +1780,8 @@
             }
 
             // Get URL of caption file if exists
-            var captionSources = [],
-                captionSrc = '';
+            var captionSources = [];
+            var captionSrc = '';
 
             player.elements.media.childNodes.forEach(function(child) {
                 if (child.nodeName.toLowerCase() === 'track') {
@@ -3094,7 +3094,7 @@
             // It should be a number, but parse it just incase
             var duration = parseInt(config.duration);
 
-                // True duration
+            // True duration
             var mediaDuration = 0;
 
             // Only if duration available
@@ -3457,7 +3457,7 @@
             mins = ('0' + mins).slice(-2);
 
             // Generate display
-            var display = (displayHours ? hours + ':' : '') + mins + ':' + secs;
+            var label = (displayHours ? hours + ':' : '') + mins + ':' + secs;
 
             // Render
             element.textContent = label;
