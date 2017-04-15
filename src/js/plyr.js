@@ -220,7 +220,27 @@
             loop: null
         },
         // Events to watch on HTML5 media elements
-        events: ['ready', 'ended', 'progress', 'stalled', 'playing', 'waiting', 'canplay', 'canplaythrough', 'loadstart', 'loadeddata', 'loadedmetadata', 'timeupdate', 'volumechange', 'play', 'pause', 'error', 'seeking', 'seeked', 'emptied'],
+        events: [
+            'ready',
+            'ended',
+            'progress',
+            'stalled',
+            'playing',
+            'waiting',
+            'canplay',
+            'canplaythrough',
+            'loadstart',
+            'loadeddata',
+            'loadedmetadata',
+            'timeupdate',
+            'volumechange',
+            'play',
+            'pause',
+            'error',
+            'seeking',
+            'seeked',
+            'emptied'
+        ],
         // Logging
         logPrefix: ''
     };
@@ -716,8 +736,7 @@
     }
 
     // Fullscreen API
-    var fullscreen;
-    (function() {
+    var fullscreen = (function() {
         // Determine the prefix
         var prefix = (function() {
             var value = false;
@@ -741,7 +760,7 @@
             return value;
         })();
 
-        fullscreen = {
+        return {
             prefix: prefix,
             // Yet again Microsoft awesomeness,
             // Sometimes the prefix is 'ms', sometimes 'MS' to keep you on your toes
@@ -989,8 +1008,8 @@
                 attributes.forEach(function(attribute) {
                     insertElement(type, player.elements.media, attribute);
                 });
-                }
             }
+        }
 
         // Get icon URL
         function getIconUrl() {
@@ -1396,7 +1415,7 @@
                                 config.tracks.forEach(function(track, index) {
                                     if (is.function(track)) {
                                         return;
-                }
+                                    }
 
                                     var option = createElement('li');
 
@@ -1411,7 +1430,7 @@
                                 });
                             }
                             break;
-                }
+                    }
 
                     pane.appendChild(options);
 
@@ -3094,7 +3113,7 @@
             // It should be a number, but parse it just incase
             var duration = parseInt(config.duration);
 
-                // True duration
+            // True duration
             var mediaDuration = 0;
 
             // Only if duration available
@@ -3460,10 +3479,10 @@
             var display = (displayHours ? hours + ':' : '') + mins + ':' + secs;
 
             // Render
-            element.textContent = label;
+            element.textContent = display;
 
             // Return for looping
-            return label;
+            return display;
         }
 
         // Show the duration on metadataloaded
