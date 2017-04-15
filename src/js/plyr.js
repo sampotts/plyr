@@ -1799,8 +1799,8 @@
             }
 
             // Get URL of caption file if exists
-            var captionSources = [],
-                captionSrc = '';
+            var captionSources = [];
+            var captionSrc = '';
 
             player.elements.media.childNodes.forEach(function(child) {
                 if (child.nodeName.toLowerCase() === 'track') {
@@ -3476,7 +3476,7 @@
             mins = ('0' + mins).slice(-2);
 
             // Generate display
-            var display = (displayHours ? hours + ':' : '') + mins + ':' + secs;
+            var label = (displayHours ? hours + ':' : '') + mins + ':' + secs;
 
             // Render
             element.textContent = display;
