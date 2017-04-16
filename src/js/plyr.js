@@ -89,15 +89,15 @@
                 rewind: '[data-plyr="rewind"]',
                 forward: '[data-plyr="fast-forward"]',
                 mute: '[data-plyr="mute"]',
+                captions: '[data-plyr="captions"]',
                 fullscreen: '[data-plyr="fullscreen"]',
-                settings: '[data-plyr="settings"]',
                 pip: '[data-plyr="pip"]',
                 airplay: '[data-plyr="airplay"]',
+                settings: '[data-plyr="settings"]',
                 speed: '[data-plyr="speed"]',
                 loop: '[data-plyr="loop"]',
-                captions: '[data-plyr="captions"]',
-                //captions_menu: '[data-plyr="captions_menu"]',
-                //captions_lang: '[data-plyr="captions_lang"]',
+                language: '[data-plyr="language"]',
+                quality: '[data-plyr="quality"]'
             },
             inputs: {
                 seek: '[data-plyr="seek"]',
@@ -160,7 +160,19 @@
             enabled: true,
             key: 'plyr'
         },
-        controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen'],
+        controls: [
+            'play-large',
+            'play',
+            'progress',
+            'current-time',
+            'mute',
+            'volume',
+            'captions',
+            'settings',
+            'pip',
+            'airplay',
+            'fullscreen'
+        ],
         i18n: {
             restart: 'Restart',
             rewind: 'Rewind {seektime} secs',
@@ -214,10 +226,13 @@
             mute: null,
             volume: null,
             captions: null,
-            //captions_lang: null,
             fullscreen: null,
+            pip: null,
+            airplay: null,
             speed: null,
-            loop: null
+            quality: null,
+            loop: null,
+            language: null
         },
         // Events to watch on HTML5 media elements
         events: [
@@ -272,7 +287,7 @@
             return input !== null && typeof input === 'function';
         },
         event: function(input) {
-            return input !== null && typeof input === 'object' && (input.constructor === Event || input.constructor === CustomEvent);
+            return input !== null && input instanceof Event;
         },
         undefined: function(input) {
             return input !== null && typeof input === 'undefined';
@@ -581,10 +596,10 @@
     }
 
     // Bind along with custom handler
-    function proxy(element, eventName, userListener, defaultListener, useCapture) {
+    function proxy(element, eventName, customListener, defaultListener, useCapture) {
         on(element, eventName, function(event) {
-            if (userListener) {
-                userListener.apply(element, [event]);
+            if (customListener) {
+                customListener.apply(element, [event]);
             }
             defaultListener.apply(element, [event]);
         }, useCapture);
@@ -909,8 +924,9 @@
             progress: {},
             inputs: {},
             settings: {
-                tabs: {},
-                panes: {}
+                menu: null,
+                panes: {},
+                tabs: {}
             },
             media: media
         };
@@ -1265,6 +1281,7 @@
                     }, '00:00');
 
                     container.appendChild(tooltip);
+                    player.elements.display.seekTooltip = tooltip;
                 }
 
                 player.elements.progress = container;
@@ -1318,11 +1335,11 @@
 
             // Settings button / menu
             if (inArray(config.controls, 'settings')) {
-                var wrapper = createElement('span', extend(getAttributesFromSelector(config.selectors.buttons.settings), {
+                var menu = createElement('span', extend(getAttributesFromSelector(config.selectors.buttons.settings), {
                     class: 'plyr__menu'
                 }));
 
-                wrapper.appendChild(createButton('settings', {
+                menu.appendChild(createButton('settings', {
                     id: 'plyr-settings-toggle-' + data.id,
                     'aria-haspopup': true,
                     'aria-controls': 'plyr-settings-' + data.id,
@@ -1378,6 +1395,8 @@
                     tab.appendChild(button);
 
                     tabs.appendChild(tab);
+
+                    player.elements.settings.tabs[type] = tab;
                 });
 
                 home.appendChild(tabs);
@@ -1435,13 +1454,17 @@
                     pane.appendChild(options);
 
                     inner.appendChild(pane);
+
+                    player.elements.settings.panes[type] = pane;
                 });
 
                 form.appendChild(inner);
 
-                wrapper.appendChild(form);
+                menu.appendChild(form);
 
-                controls.appendChild(wrapper);
+                controls.appendChild(menu);
+
+                player.elements.settings.menu = menu;
 
                 /*html.push(
                     '<div class="plyr__menu" data-plyr="settings">',
@@ -1732,7 +1755,7 @@
                     '</li>'
                 ].join(''));
 
-                getElement(config.selectors.menu.quality).innerHTML = list.join('');
+                player.elements.settings.panes.quality.innerHTML = list.join('');
             }
         }
 
@@ -2549,7 +2572,8 @@
                         // Get the instance
                         var instance = event.target;
 
-                        var quality = player.getPlaybackQuality();
+                        // Get current quality
+                        var quality = instance.getPlaybackQuality();
 
                         // var set = player.setPlaybackQuality();
                         console.warn(quality);
@@ -2560,30 +2584,30 @@
 
                         // Create a faux HTML5 API using the YouTube API
                         player.elements.media.play = function() {
-                            player.playVideo();
+                            instance.playVideo();
                             player.elements.media.paused = false;
                         };
                         player.elements.media.pause = function() {
-                            player.pauseVideo();
+                            instance.pauseVideo();
                             player.elements.media.paused = true;
                         };
                         player.elements.media.stop = function() {
-                            player.stopVideo();
+                            instance.stopVideo();
                             player.elements.media.paused = true;
                         };
-                        player.elements.media.duration = player.getDuration();
+                        player.elements.media.duration = instance.getDuration();
                         player.elements.media.paused = true;
                         player.elements.media.currentTime = 0;
-                        player.elements.media.muted = player.isMuted();
+                        player.elements.media.muted = instance.isMuted();
 
                         // Get available speeds
-                        var speed = player.getPlaybackRate();
-                        var speedOptions = player.getAvailablePlaybackRates();
-                        //var set = player.setPlaybackRate();
+                        var speed = instance.getPlaybackRate();
+                        var speedOptions = instance.getAvailablePlaybackRates();
+                        //var set = instance.setPlaybackRate();
                         console.warn(speed, speedOptions);
 
                         // Set title
-                        config.title = player.getVideoData().title;
+                        config.title = instance.getVideoData().title;
 
                         // Set the tabindex
                         if (player.supported.full) {
@@ -2605,7 +2629,7 @@
                         // Setup buffering
                         timers.buffering = window.setInterval(function() {
                             // Get loaded % from YouTube
-                            player.elements.media.buffered = player.getVideoLoadedFraction();
+                            player.elements.media.buffered = instance.getVideoLoadedFraction();
 
                             // Trigger progress only when we actually buffer something
                             if (player.elements.media.lastBuffered === null || player.elements.media.lastBuffered < player.elements.media.buffered) {
@@ -2659,7 +2683,7 @@
                                 // Poll to get playback progress
                                 timers.playing = window.setInterval(function() {
                                     // Set the current time
-                                    player.elements.media.currentTime = player.getCurrentTime();
+                                    player.elements.media.currentTime = instance.getCurrentTime();
 
                                     // Trigger timeupdate
                                     trigger(player.elements.media, 'timeupdate');
@@ -2668,14 +2692,14 @@
                                 // Check duration again due to YouTube bug
                                 // https://github.com/Selz/plyr/issues/374
                                 // https://code.google.com/p/gdata-issues/issues/detail?id=8690
-                                if (player.elements.media.duration !== player.getDuration()) {
-                                    player.elements.media.duration = player.getDuration();
+                                if (player.elements.media.duration !== instance.getDuration()) {
+                                    player.elements.media.duration = instance.getDuration();
                                     trigger(player.elements.media, 'durationchange');
                                 }
 
                                 // Get quality
-                                var qualityOptions = player.getAvailableQualityLevels();
-                                var quality = player.getPlaybackQuality();
+                                var qualityOptions = instance.getAvailableQualityLevels();
+                                var quality = instance.getPlaybackQuality();
                                 setQualityMenu(qualityOptions, quality);
 
                                 break;
@@ -2975,7 +2999,7 @@
             }
         }
 
-        // Speed-up
+        // Set playback speed
         function setSpeed(speed) {
             // Load speed from storage or default value
             if (is.undefined(speed)) {
@@ -3042,9 +3066,9 @@
         // Seek to time
         // The input parameter can be an event or a number
         function seek(input) {
-            var targetTime = 0,
-                paused = player.elements.media.paused,
-                duration = getDuration();
+            var targetTime = 0;
+            var paused = player.elements.media.paused;
+            var duration = getDuration();
 
             if (is.number(input)) {
                 targetTime = input;
@@ -3243,6 +3267,11 @@
         function setVolume(volume) {
             var max = 10;
             var min = 0;
+
+            // If volume is event, get from input
+            if (is.event(volume)) {
+                volume = volume.target.value;
+            }
 
             // Load volume from storage if no value specified
             if (is.undefined(volume)) {
@@ -3476,7 +3505,7 @@
             mins = ('0' + mins).slice(-2);
 
             // Generate display
-            var label = (displayHours ? hours + ':' : '') + mins + ':' + secs;
+            var display = (displayHours ? hours + ':' : '') + mins + ':' + secs;
 
             // Render
             element.textContent = display;
@@ -3548,24 +3577,24 @@
             var duration = getDuration();
 
             // Bail if setting not true
-            if (!config.tooltips.seek || !player.elements.progress.container || duration === 0) {
+            if (!config.tooltips.seek || !is.htmlElement(player.elements.inputs.seek) || !is.htmlElement(player.elements.display.seekTooltip) || duration === 0) {
                 return;
             }
 
             // Calculate percentage
-            var clientRect = player.elements.progress.container.getBoundingClientRect(),
-                percent = 0,
-                visible = config.classes.tooltip + '--visible';
+            var clientRect = player.elements.inputs.seek.getBoundingClientRect();
+            var percent = 0;
+            var visible = config.classes.tooltip + '--visible';
 
             // Determine percentage, if already visible
-            if (!event) {
+            if (is.event(event)) {
+                percent = ((100 / clientRect.width) * (event.pageX - clientRect.left));
+            } else {
                 if (hasClass(player.elements.display.seekTooltip, visible)) {
                     percent = player.elements.display.seekTooltip.style.left.replace('%', '');
                 } else {
                     return;
                 }
-            } else {
-                percent = ((100 / clientRect.width) * (event.pageX - clientRect.left));
             }
 
             // Set bounds
@@ -3583,7 +3612,7 @@
 
             // Show/hide the tooltip
             // If the event is a moues in/out and percentage is inside bounds
-            if (event && inArray(['mouseenter', 'mouseleave'], event.type)) {
+            if (is.event(event) && inArray(['mouseenter', 'mouseleave'], event.type)) {
                 toggleClass(player.elements.display.seekTooltip, visible, (event.type === 'mouseenter'));
             }
         }
@@ -3595,10 +3624,10 @@
                 return;
             }
 
-            var delay = 0,
-                isEnterFullscreen = false,
-                show = toggle,
-                loading = hasClass(player.elements.container, config.classes.loading);
+            var delay = 0;
+            var isEnterFullscreen = false;
+            var show = toggle;
+            var loading = hasClass(player.elements.container, config.classes.loading);
 
             // Default to false if no boolean
             if (!is.boolean(toggle)) {
@@ -4072,8 +4101,8 @@
 
             // Focus/tab management
             on(window, 'keyup', function(event) {
-                var code = getKeyCode(event),
-                    focused = getFocusElement();
+                var code = getKeyCode(event);
+                var focused = getFocusElement();
 
                 if (code === 9) {
                     checkTabFocus(focused);
@@ -4090,6 +4119,16 @@
                 });
             }
 
+            // Trigger custom and default handlers
+            var handlerProxy = function(event, customHandler, defaultHandler) {
+                if (is.function(customHandler)) {
+                    customHandler.call(this, event);
+                }
+                if (is.function(defaultHandler)) {
+                    defaultHandler.call(this, event);
+                }
+            }
+
             // Play
             proxy(player.elements.buttons.play, 'click', config.listeners.play, _togglePlay);
             proxy(player.elements.buttons.playLarge, 'click', config.listeners.play, _togglePlay);
@@ -4097,61 +4136,33 @@
             // Pause
             proxy(player.elements.buttons.pause, 'click', config.listeners.pause, _togglePlay);
 
-            // Restart
+            // Pause
             proxy(player.elements.buttons.restart, 'click', config.listeners.restart, seek);
 
             // Rewind
             proxy(player.elements.buttons.rewind, 'click', config.listeners.rewind, rewind);
 
-            // Fast forward
+            // Rewind
             proxy(player.elements.buttons.forward, 'click', config.listeners.forward, forward);
-
-            // Speed-up
-            proxy(player.elements.buttons.speed, 'click', config.listeners.speed, function() {
-                //var speedValue = document.querySelector('[data-plyr="speed"]:checked').value;
-                //setSpeed(Number(speedValue));
-            });
-
-            // Seek
-            proxy(player.elements.inputs.seek, inputEvent, config.listeners.seek, seek);
-
-            // Set volume
-            proxy(player.elements.inputs.volume, inputEvent, config.listeners.volume, function() {
-                setVolume(player.elements.inputs.volume.value);
-            });
 
             // Mute
             proxy(player.elements.buttons.mute, 'click', config.listeners.mute, toggleMute);
 
+            // Captions
+            proxy(player.elements.buttons.captions, 'click', config.listeners.captions, toggleCaptions);
+
             // Fullscreen
             proxy(player.elements.buttons.fullscreen, 'click', config.listeners.fullscreen, toggleFullscreen);
 
-            // Looping
-            proxy(player.elements.buttons.loop, 'click', config.listeners.loop, function(event) {
-                var value = event.target.getAttribute('data-loop__value') || event.target.getAttribute('data-loop__type');
-
-                if (inArray(['start', 'end', 'all', 'none'], value)) {
-                    toggleLoop(value);
-                }
+            // Picture-in-Picture
+            proxy(player.elements.buttons.pip, 'click', config.listeners.pip, function(event) {
+                // TODO: Check support here
+                player.elements.media.webkitSetPresentationMode(player.elements.media.webkitPresentationMode === 'picture-in-picture' ? 'inline' : 'picture-in-picture');
             });
 
-            // Handle user exiting fullscreen by escaping etc
-            if (support.fullscreen) {
-                on(document, fullscreen.eventType, toggleFullscreen);
-            }
-
-            // Captions
-            proxy(player.elements.buttons.captions, 'click', config.listeners.captions, toggleCaptions);
-            // TODO: ??
-            // on(player.elements.buttons.captions_menu, 'click', toggleCaptions);
-            // Language
-            proxy(player.elements.buttons.lang, 'click', config.listeners.lang, function(e) {
-                var langIndex = e.target.attributes.getNamedItem("data-index").value;
-                setCaptionIndex(langIndex);
-            });
-
-            // Settings
-            on(player.elements.buttons.settings, 'click', function(event) {
+            // Settings menu
+            on(player.elements.settings.menu, 'click', function(event) {
+                // Settings menu
                 var menu = this;
                 var toggle = event.target;
                 var target = document.getElementById(toggle.getAttribute('aria-controls'));
@@ -4210,14 +4221,53 @@
                 }
             });
 
-            // Picture in picture
-            on(player.elements.buttons.pip, 'click', function() {
-                // TODO: Check support here
-                player.elements.media.webkitSetPresentationMode(player.elements.media.webkitPresentationMode === 'picture-in-picture' ? 'inline' : 'picture-in-picture');
+            // Settings menu items - use event delegation as items are added/removed
+            on(player.elements.settings.menu, 'click', function(event) {
+                // Settings - Speed
+                if (matches(event.target, config.selectors.buttons.speed)) {
+                    handlerProxy.call(this, event, config.listeners.speed, function() {
+                        //var speedValue = document.querySelector('[data-plyr="speed"]:checked').value;
+                        //setSpeed(Number(speedValue));
+                    });
+                }
+
+                // Settings - Quality
+                else if (matches(event.target, config.selectors.buttons.quality)) {
+                    handlerProxy.call(this, event, config.listeners.quality, function() {
+                        console.warn("Set quality");
+                    });
+                }
+
+                // Settings - Looping
+                else if (matches(event.target, config.selectors.buttons.loop)) {
+                    handlerProxy.call(this, event, config.listeners.loop, function() {
+                        // TODO: This should be done in the method itself I think
+                        var value = event.target.getAttribute('data-loop__value') || event.target.getAttribute('data-loop__type');
+
+                        if (inArray(['start', 'end', 'all', 'none'], value)) {
+                            toggleLoop(value);
+                        }
+                    });
+                }
+
+                // Settings - Language
+                else if (matches(event.target, config.selectors.buttons.language)) {
+                    handlerProxy.call(this, event, config.listeners.language, function(event) {
+                        // TODO: This should be done in the method itself I think
+                        var index = event.target.attributes.getNamedItem("data-index").value;
+                        setCaptionIndex(index);
+                    });
+                }
             });
 
+            // Seek
+            proxy(player.elements.inputs.seek, inputEvent, config.listeners.seek, seek);
+
+            // Seek
+            proxy(player.elements.inputs.volume, inputEvent, config.listeners.volume, setVolume);
+
             // Seek tooltip
-            on(player.elements.progress.container, 'mouseenter mouseleave mousemove', updateSeekTooltip);
+            on(player.elements.progress, 'mouseenter mouseleave mousemove', updateSeekTooltip);
 
             // Toggle controls visibility based on mouse movement
             if (config.hideControls) {
@@ -4238,21 +4288,22 @@
                 on(player.elements.controls, 'focus blur', toggleControls, true);
             }
 
-            // Adjust volume on scroll
-            on(player.elements.inputs.volume, 'wheel', function(event) {
-                event.preventDefault();
-
+            // Mouse wheel for volume
+            proxy(player.elements.inputs.volume, 'wheel', config.listeners.volume, function(event) {
                 // Detect "natural" scroll - suppored on OS X Safari only
                 // Other browsers on OS X will be inverted until support improves
-                var inverted = event.webkitDirectionInvertedFromDevice,
-                    step = (1 / 5);
+                var inverted = event.webkitDirectionInvertedFromDevice;
+                var step = (1 / 5);
+                var direction = 0;
 
                 // Scroll down (or up on natural) to decrease
                 if (event.deltaY < 0 || event.deltaX > 0) {
                     if (inverted) {
                         decreaseVolume(step);
+                        direction = -1;
                     } else {
                         increaseVolume(step);
+                        direction = 1;
                     }
                 }
 
@@ -4260,11 +4311,24 @@
                 if (event.deltaY > 0 || event.deltaX < 0) {
                     if (inverted) {
                         increaseVolume(step);
+                        direction = 1;
                     } else {
                         decreaseVolume(step);
+                        direction = -1;
                     }
                 }
+
+                // Don't break page scrolling at max and min
+                if ((direction === 1 && player.elements.media.volume < 1) ||
+                    (direction === -1 && player.elements.media.volume > 0)) {
+                    event.preventDefault();
+                }
             });
+
+            // Handle user exiting fullscreen by escaping etc
+            if (support.fullscreen) {
+                on(document, fullscreen.eventType, toggleFullscreen);
+            }
         }
 
         // Listen for media events
