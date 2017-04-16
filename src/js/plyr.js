@@ -122,6 +122,7 @@
             ready: 'plyr--ready',
             videoWrapper: 'plyr__video-wrapper',
             embedWrapper: 'plyr__video-embed',
+            control: 'plyr__control',
             type: 'plyr--{0}',
             stopped: 'plyr--stopped',
             playing: 'plyr--playing',
@@ -133,6 +134,10 @@
             hideControls: 'plyr--hide-controls',
             isIos: 'plyr--is-ios',
             isTouch: 'plyr--is-touch',
+            menu: {
+                value: 'plyr__menu__value',
+                badge: 'plyr__badge'
+            },
             captions: {
                 enabled: 'plyr--captions-enabled',
                 active: 'plyr--captions-active'
@@ -1076,6 +1081,19 @@
             }, text);
         }
 
+        // Create a badge
+        function createBadge(text) {
+            var badge = createElement('span', {
+                class: config.classes.menu.value
+            });
+
+            badge.appendChild(createElement('span', {
+                class: config.classes.menu.badge
+            }, text));
+
+            return badge;
+        }
+
         // Create a <button>
         function createButton(type, attributes) {
             var button = createElement('button');
@@ -1088,11 +1106,11 @@
             }
 
             if ('class' in attributes) {
-                if (attributes.class.indexOf('plyr__control') === -1) {
-                    attributes.class += ' plyr__control';
+                if (attributes.class.indexOf(config.classes.control) === -1) {
+                    attributes.class += ' ' + config.classes.control;
                 }
             } else {
-                attributes.class = 'plyr__control';
+                attributes.class = config.classes.control;
             }
 
             // Large play button
@@ -1376,7 +1394,7 @@
 
                     var button = createElement('button', extend(getAttributesFromSelector(config.selectors.buttons.settings), {
                         type: 'button',
-                        class: 'plyr__control plyr__control--forward',
+                        class: config.classes.control + ' ' + config.classes.control + '--forward',
                         id: 'plyr-settings-' + data.id + '-' + type + '-tab',
                         'aria-haspopup': true,
                         'aria-controls': 'plyr-settings-' + data.id + '-' + type,
@@ -1384,7 +1402,7 @@
                     }), config.i18n[type]);
 
                     var value = createElement('span', {
-                        class: 'plyr__menu__value'
+                        class: config.classes.menu.value
                     });
 
                     // Speed contains HTML entities
@@ -1412,23 +1430,19 @@
                         tabindex: -1
                     });
 
-                    var options = createElement('ul');
-
-                    var option = createElement('li');
-
                     var back = createElement('button', {
                         type: 'button',
-                        class: 'plyr__control plyr__control--back',
+                        class: config.classes.control + ' ' + config.classes.control + '--back',
                         'aria-haspopup': true,
                         'aria-controls': 'plyr-settings-' + data.id + '-home',
                         'aria-expanded': false
-                    }, config.i18n.back);
+                    }, config.i18n[type]);
 
-                    option.appendChild(back);
+                    pane.appendChild(back);
 
-                    options.appendChild(option);
+                    var options = createElement('ul');
 
-                    switch (type) {
+                    /*switch (type) {
                         case 'captions':
                             if (is.array(config.tracks)) {
                                 config.tracks.forEach(function(track, index) {
@@ -1449,7 +1463,7 @@
                                 });
                             }
                             break;
-                    }
+                    }*/
 
                     pane.appendChild(options);
 
@@ -1697,14 +1711,10 @@
                 }
 
                 if (!label.length) {
-                    return "";
+                    return null;
                 }
 
-                return [
-                    '<span class="plyr__menu__value">',
-                        '<span class="plyr__badge">' + label + '</span>',
-                    '</span>'
-                ].join('');
+                return createBadge(label);
             }
 
             // Translate the quality key into a nice label
@@ -1735,27 +1745,37 @@
                     return ['tiny', 'small'].indexOf(quality) === -1;
                 });
 
-                var list = filtered.map(function(quality) {
-                    return [
-                        '<li>',
-                            '<label class="plyr__control">',
-                                '<input type="radio" name="quality" value="' + quality + '"' + (quality === player.quality.current ? ' checked' : '') + '>',
-                                getLabel(quality),
-                                getBadge(quality),
-                            '</label>',
-                        '</li>'
-                    ].join('');
+                var list = player.elements.settings.panes.quality.querySelector('ul');
+
+                filtered.forEach(function(quality) {
+                    var item = createElement('li');
+
+                    var label = createElement('label', {
+                        class: config.classes.control
+                    });
+
+                    var radio = createElement('input', {
+                        type: 'radio',
+                        name: 'quality',
+                        value: quality,
+                    });
+
+                    if (quality === player.quality.current) {
+                        radio.setAttribute('checked', '');
+                    }
+
+                    label.appendChild(radio);
+                    label.appendChild(document.createTextNode(getLabel(quality)));
+
+                    var badge = getBadge(quality);
+                    if (is.htmlElement(badge)) {
+                        label.appendChild(badge);
+                    }
+
+                    item.appendChild(label);
+
+                    list.appendChild(item);
                 });
-
-                list.unshift([
-                    '<li role="tab">',
-                        '<button type="button" class="plyr__control plyr__control--back" aria-haspopup="true" aria-controls="plyr-settings-' + player.id + '-primary" aria-expanded="false">',
-                            config.i18n.quality,
-                        '</button>',
-                    '</li>'
-                ].join(''));
-
-                player.elements.settings.panes.quality.innerHTML = list.join('');
             }
         }
 
