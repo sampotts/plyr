@@ -150,6 +150,10 @@
                 enabled: 'plyr--pip-enabled',
                 active: 'plyr--pip-active'
             },
+            airplay: {
+                enabled: 'plyr--airplay-enabled',
+                active: 'plyr--airplay-active'
+            },
             tabFocus: 'tab-focus'
         },
         captions: {
@@ -607,6 +611,19 @@
             };
 
         return matches.call(element, selector);
+    }
+
+    // Get the focused element
+    function getFocusElement() {
+        var focused = document.activeElement;
+
+        if (!focused || focused === document.body) {
+            focused = null;
+        } else {
+            focused = document.querySelector(':focus');
+        }
+
+        return focused;
     }
 
     // Bind along with custom handler
@@ -2399,7 +2416,10 @@
                 }
 
                 // Check for picture-in-picture support
-                toggleClass(player.elements.container, config.classes.pip.enabled, support.pip);
+                toggleClass(player.elements.container, config.classes.pip.enabled, support.pip && player.type === 'video');
+
+                // Check for airplay support
+                toggleClass(player.elements.container, config.classes.airplay.enabled, support.airplay && player.type === 'video');
 
                 // If there's no autoplay attribute, assume the video is stopped and add state class
                 toggleClass(player.elements.container, config.classes.stopped, config.autoplay);
@@ -3922,19 +3942,6 @@
                 }
             }
 
-            // Get the focused element
-            function getFocusElement() {
-                var focused = document.activeElement;
-
-                if (!focused || focused === document.body) {
-                    focused = null;
-                } else {
-                    focused = document.querySelector(':focus');
-                }
-
-                return focused;
-            }
-
             // Get the key code for an event
             function getKeyCode(event) {
                 return event.keyCode ? event.keyCode : event.which;
@@ -4174,8 +4181,18 @@
 
             // Picture-in-Picture
             proxy(player.elements.buttons.pip, 'click', config.listeners.pip, function(event) {
-                // TODO: Check support here
+                if (!support.pip) {
+                    return;
+                }
                 player.elements.media.webkitSetPresentationMode(player.elements.media.webkitPresentationMode === 'picture-in-picture' ? 'inline' : 'picture-in-picture');
+            });
+
+            // Airplay
+            proxy(player.elements.buttons.airplay, 'click', config.listeners.airplay, function(event) {
+                if (!support.airplay) {
+                    return;
+                }
+                player.elements.media.webkitShowPlaybackTargetPicker();
             });
 
             // Settings menu

@@ -30,7 +30,9 @@
             'volume',
             'captions',
             'settings',
-            'fullscreen'
+            'fullscreen',
+            'pip',
+            'airplay'
         ]
     });
     plyr.loadSprite('dist/demo.svg');

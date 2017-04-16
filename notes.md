@@ -2,23 +2,26 @@
 
 #### To build
 - Get list of subtitles/captions available (HTML5)
-- Add preferred quality option
-- Update quality options on YouTube play
+- Add preferred quality option into config
+- Update quality options on YouTube play (can't get up front?!)
 - Update speed options on YouTube load
 
 - Get quality options for HTML5 somehow (multi source?)
 - Build templating for controls somehow
-- Finish PiP
-- Finish AirPlay
+- Finish and test PiP (need Sierra VM)
+- Finish and test AirPlay (need Sierra VM)
 
+# Notes
+- No quality HTML5 support (yet)
 - No Vimeo quality support
 - No Vimeo or YouTube caption support
+- No PiP or AirPlay for Vimeo/YouTube
 
 #### Bugs
 - Fix audio setup bug when calling .setup() again
 
 #### Breaking changes
-- Custom controls HTML removed (temporarily, will return)
+- Custom controls HTML removed (temporarily, will return) - perhaps can re-instate but no options UI
 - Selectors changes (new `input` and `display` object) - DOCUMENT
 
 ## Added

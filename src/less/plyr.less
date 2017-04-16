@@ -466,11 +466,15 @@
 
 // Some options are hidden by default
 .plyr [data-plyr='captions'],
-.plyr [data-plyr='fullscreen'] {
+.plyr [data-plyr='fullscreen'],
+.plyr [data-plyr='pip'],
+.plyr [data-plyr='airplay'] {
     display: none;
 }
 .plyr--captions-enabled [data-plyr='captions'],
-.plyr--fullscreen-enabled [data-plyr='fullscreen'] {
+.plyr--fullscreen-enabled [data-plyr='fullscreen'],
+.plyr--pip-enabled [data-plyr='pip'],
+.plyr--airplay-enabled [data-plyr='airplay'] {
     display: inline-block;
 }
 
@@ -502,7 +506,6 @@
         animation: plyr-popup .2s ease;
 
         background: @plyr-menu-bg;
-        box-shadow: 0 1px 0 fade(#000, 20%);
         border-radius: 4px;
 
         white-space: nowrap;
