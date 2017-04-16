@@ -397,6 +397,15 @@
         firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
     }
 
+    // Determine if we're in an iframe
+    function inFrame() {
+        try {
+            return window.self !== window.top;
+        } catch (e) {
+            return true;
+        }
+    }
+
     // Element exists in an array
     function inArray(haystack, needle) {
         return Array.prototype.indexOf && (haystack.indexOf(needle) !== -1);
@@ -985,15 +994,6 @@
             return getElements(selector)[0];
         }
 
-        // Determine if we're in an iframe
-        function inFrame() {
-            try {
-                return window.self !== window.top;
-            } catch (e) {
-                return true;
-            }
-        }
-
         // Trap focus inside container
         function focusTrap() {
             var tabbables = getElements('input:not([disabled]), button:not([disabled])');
@@ -1171,17 +1171,14 @@
 
         // Create an <input type='range'>
         function createRange(type, attributes) {
-            var id = 'plyr-' + type + (is.object(attributes) && 'id' in attributes ? '-' + attributes.id : '');
-
             // Seek label
             var label = createElement('label', {
-                for: id,
+                for: attributes.id,
                 class: config.classes.hidden
             }, config.i18n[type]);
 
             // Seek input
             var input = createElement('input', extend(getAttributesFromSelector(config.selectors.inputs[type]), {
-                id: id,
                 type: 'range',
                 min: 0,
                 max: 100,
@@ -1278,7 +1275,7 @@
 
                 // Seek range slider
                 var seek = createRange('seek', {
-                    id: data.id
+                    id: 'plyr-seek-' + data.id
                 });
                 container.appendChild(seek.label);
                 container.appendChild(seek.input);
@@ -1329,13 +1326,14 @@
 
                 // Set the attributes
                 var attributes = {
-                    id: data.id,
                     max: 10,
                     value: config.volume
                 };
 
                 // Create the volume range slider
-                var range = createRange('volume', attributes);
+                var range = createRange('volume', extend(attributes, {
+                    id: 'plyr-volume-' + data.id
+                }));
                 volume.appendChild(range.label);
                 volume.appendChild(range.input);
 
