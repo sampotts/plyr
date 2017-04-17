@@ -2419,7 +2419,7 @@
                 toggleClass(player.elements.container, config.classes.pip.enabled, support.pip && player.type === 'video');
 
                 // Check for airplay support
-                toggleClass(player.elements.container, config.classes.airplay.enabled, support.airplay && player.type === 'video');
+                toggleClass(player.elements.container, config.classes.airplay.enabled, support.airplay && inArray(config.types.html5, player.type));
 
                 // If there's no autoplay attribute, assume the video is stopped and add state class
                 toggleClass(player.elements.container, config.classes.stopped, config.autoplay);
@@ -3261,6 +3261,66 @@
             // Restore scroll position
             if (!player.fullscreen.active && nativeSupport) {
                 restoreScrollPosition();
+            }
+        }
+
+        // Toggle Menu
+        function toggleMenu(event) {
+            var menu = player.elements.settings.menu.parentNode;
+            var toggle = event.target;
+            var target = document.getElementById(toggle.getAttribute('aria-controls'));
+            var show = (toggle.getAttribute('aria-expanded') === 'false');
+
+            // Nothing to show, bail
+            if (!is.htmlElement(target)) {
+                return;
+            }
+
+            // Are we targetting a tab?
+            var isTab = target.getAttribute('role') === 'tabpanel';
+            var targetWidth;
+            var targetHeight;
+            var container;
+
+            // Hide all other tabs
+            if (isTab) {
+                // Get other tabs
+                var current = menu.querySelector('[role="tabpanel"][aria-hidden="false"]');
+                container = current.parentNode;
+
+                [].forEach.call(menu.querySelectorAll('[aria-controls="' + current.getAttribute('id') + '"]'), function(toggle) {
+                    toggle.setAttribute('aria-expanded', false);
+                });
+
+                container.style.width = current.scrollWidth + 'px';
+                container.style.height = current.scrollHeight + 'px';
+
+                current.setAttribute('aria-hidden', true);
+                current.setAttribute('tabindex', -1);
+
+                // Get the natural element size
+                var clone = target.cloneNode(true);
+                clone.style.position = "absolute";
+                clone.style.opacity = 0;
+                clone.setAttribute('aria-hidden', false);
+                container.appendChild(clone);
+                targetWidth = clone.scrollWidth;
+                targetHeight = clone.scrollHeight;
+                remove(clone);
+            }
+
+            target.setAttribute('aria-hidden', !show);
+            toggle.setAttribute('aria-expanded', show);
+            target.setAttribute('tabindex', 0);
+
+            if (isTab) {
+                container.style.width = targetWidth + 'px';
+                container.style.height = targetHeight + 'px';
+
+                window.setTimeout(function() {
+                    container.style.width = '';
+                    container.style.height = '';
+                }, 300);
             }
         }
 
@@ -4196,64 +4256,19 @@
             });
 
             // Settings menu
-            on(player.elements.settings.menu, 'click', function(event) {
-                // Settings menu
-                var menu = this;
-                var toggle = event.target;
-                var target = document.getElementById(toggle.getAttribute('aria-controls'));
-                var show = (toggle.getAttribute('aria-expanded') === 'false');
+            on(player.elements.settings.menu, 'click', toggleMenu);
 
-                // Nothing to show, bail
-                if (!is.htmlElement(target)) {
+            // Click anywhere closes menu
+            on(document.body, 'click', function(event) {
+                var menu = player.elements.settings.menu;
+                var form = menu.querySelector('form');
+
+                if (form.getAttribute('aria-hidden') === 'true' || menu.contains(event.target)) {
                     return;
                 }
 
-                // Are we targetting a tab?
-                var isTab = target.getAttribute('role') === 'tabpanel';
-                var targetWidth;
-                var targetHeight;
-                var container;
-
-                // Hide all other tabs
-                if (isTab) {
-                    // Get other tabs
-                    var current = menu.querySelector('[role="tabpanel"][aria-hidden="false"]');
-                    container = current.parentNode;
-
-                    [].forEach.call(menu.querySelectorAll('[aria-controls="' + current.getAttribute('id') + '"]'), function(toggle) {
-                        toggle.setAttribute('aria-expanded', false);
-                    });
-
-                    container.style.width = current.scrollWidth + 'px';
-                    container.style.height = current.scrollHeight + 'px';
-
-                    current.setAttribute('aria-hidden', true);
-                    current.setAttribute('tabindex', -1);
-
-                    // Get the natural element size
-                    var clone = target.cloneNode(true);
-                    clone.style.position = "absolute";
-                    clone.style.opacity = 0;
-                    clone.setAttribute('aria-hidden', false);
-                    container.appendChild(clone);
-                    targetWidth = clone.scrollWidth;
-                    targetHeight = clone.scrollHeight;
-                    remove(clone);
-                }
-
-                target.setAttribute('aria-hidden', !show);
-                toggle.setAttribute('aria-expanded', show);
-                target.setAttribute('tabindex', 0);
-
-                if (isTab) {
-                    container.style.width = targetWidth + 'px';
-                    container.style.height = targetHeight + 'px';
-
-                    window.setTimeout(function() {
-                        container.style.width = '';
-                        container.style.height = '';
-                    }, 300);
-                }
+                // TODO: This should call some sort of menuToggle function?
+                form.setAttribute('aria-hidden', true);
             });
 
             // Settings menu items - use event delegation as items are added/removed
@@ -4263,6 +4278,7 @@
                     handlerProxy.call(this, event, config.listeners.speed, function() {
                         //var speedValue = document.querySelector('[data-plyr="speed"]:checked').value;
                         //setSpeed(Number(speedValue));
+                        console.warn("Set speed");
                     });
                 }
 

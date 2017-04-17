@@ -6,7 +6,7 @@
         "allowed_file_extensions": []
     },
     "js": {
-        "allowed_file_extensions": ["js", "json", "jshintrc", "jsbeautifyrc"],
+        "allowed_file_extensions": ["js", "json", "jsbeautifyrc"],
         "brace_style": "collapse",
         "break_chained_methods": false,
         "e4x": false,

@@ -11,6 +11,8 @@
 - Finish and test PiP (need Sierra VM)
 - Finish and test AirPlay (need Sierra VM)
 
+- Click outside of menu closes it
+
 # Notes
 - No quality HTML5 support (yet)
 - No Vimeo quality support
