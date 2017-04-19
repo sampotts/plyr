@@ -604,12 +604,6 @@
         return (url.match(regex)) ? RegExp.$2 : url;
     }
 
-    // Parse Vimeo ID from url
-    function _parseVimeoId(url) {
-        var regex = /^.*(vimeo.com\/|video\/)(\d+).*/;
-        return (url.match(regex)) ? RegExp.$2 : url;
-    }
-
     // Fullscreen API
     function _fullscreen() {
         var fullscreen = {
@@ -1528,10 +1522,6 @@
                     mediaId = _parseYouTubeId(plyr.embedId);
                     break;
 
-                case 'vimeo':
-                    mediaId = _parseVimeoId(plyr.embedId);
-                    break;
-
                 default:
                     mediaId = plyr.embedId;
             }
@@ -1800,7 +1790,7 @@
             // Setup instance
             // https://github.com/vimeo/player.js
             plyr.embed = new window.Vimeo.Player(container, {
-                id:         parseInt(mediaId),
+                id:         mediaId,
                 loop:       config.loop,
                 autoplay:   config.autoplay,
                 byline:     false,
