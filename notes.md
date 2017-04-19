@@ -21,6 +21,9 @@
 
 #### Bugs
 - Fix audio setup bug when calling .setup() again
+- Fix events on unsupported devices (iOS)
+- Investigate iOS inline playback
+- Look at Vimeo's "background" option
 
 #### Breaking changes
 - Custom controls HTML removed (temporarily, will return) - perhaps can re-instate but no options UI
