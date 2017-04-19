@@ -203,10 +203,10 @@
             speed: 'Speed',
             quality: 'Quality',
             loop: 'Loop',
-            loopStart: 'Loop start',
-            loopEnd: 'Loop end',
-            loopAll: 'Loop all',
-            loopNone: 'No Loop',
+            start: 'Start',
+            end: 'End',
+            all: 'All',
+            reset: 'Reset',
         },
         types: {
             embed: ['youtube', 'vimeo', 'soundcloud'],
@@ -981,7 +981,7 @@
                     args.unshift(config.logPrefix);
                 }
 
-                console[type].apply(console, args);
+                window.console[type].apply(window.console, args);
             }
         }
         var log = function() {
@@ -1690,11 +1690,13 @@
 
             player.elements.controls = controls;
 
+            setLoopMenu();
+
             return controls;
         }
 
         // Set the YouTube quality menu
-        // Later this will work for HTML5 also
+        // TODO: Support for HTML5
         // YouTube: "hd2160", "hd1440", "hd1080", "hd720", "large", "medium", "small", "tiny", "auto"
         function setQualityMenu(available, current) {
             if (is.object(player.quality)) {
@@ -1792,6 +1794,32 @@
                     list.appendChild(item);
                 });
             }
+        }
+
+        // Set the looping options
+        function setLoopMenu() {
+            var options = ['start', 'end', 'all', 'reset'];
+            var list = player.elements.settings.panes.loop.querySelector('ul');
+
+            options.forEach(function(option) {
+                var item = createElement('li');
+
+                var button = createElement('button', {
+                    type: 'button',
+                    class: config.classes.control,
+                    'data-plyr': 'loop',
+                    'data-plyr-loop-action': option
+                }, config.i18n[option]);
+
+                if (inArray(['start', 'end'], option)) {
+                    var badge = createBadge('0:00');
+                    button.appendChild(badge);
+                }
+
+                item.appendChild(button);
+
+                list.appendChild(item);
+            });
         }
 
         // Setup fullscreen
@@ -3979,13 +4007,6 @@
                 // Determine which buttons
                 var trigger = player.elements.buttons[play ? 'play' : 'pause'];
                 var target = player.elements.buttons[play ? 'pause' : 'play'];
-
-                // Get the last play button to account for the large play button
-                if (target && target.length > 1) {
-                    target = target[target.length - 1];
-                } else {
-                    target = target[0];
-                }
 
                 // Setup focus and tab focus
                 if (target) {
