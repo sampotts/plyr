@@ -533,6 +533,20 @@
     }
 }
 
+.plyr__thumbnail {
+  position: absolute;
+  opacity: 0;
+  transition: opacity .6s ease;
+  img {
+    position: absolute;
+  }
+}
+
+.plyr__tooltip--visible +
+.plyr__thumbnail {
+  opacity: 1;
+}
+
 // Playback progress
 // --------------------------------------------------------------
 // <progress> element

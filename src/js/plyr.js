@@ -37,6 +37,7 @@
         enabled: true,
         debug: false,
         autoplay: false,
+        thumbnails: false,
         loop: {
             active: false,
             start: 0,
@@ -1252,6 +1253,46 @@
 
                     container.appendChild(tooltip);
                     elements.display.seekTooltip = tooltip;
+                    if (config.thumbnails) {
+                      if ((typeof config.thumbnails).toLowerCase() == 'string') {
+                        config.thumbnails = {
+                          url: config.thumbnails
+                        };
+                      }
+                      var sprite = {
+                        startAt: 1,
+                        columns: 10,
+                        rows: 10,
+                        width: 2400,
+                        height: 1360,
+                        zeroFill: 3,
+                        duration: 240, // 240 seconds == 4 min
+                        fpsDiv: 101
+                      };
+                      if (config.thumbnails.sprite) {
+                        for (var key in config.thumbnails.sprite) {
+                          sprite[key] = config.thumbnails.sprite[key];
+                        }
+                      }
+                      sprite.multiplier = (sprite.duration / sprite.fpsDiv) * sprite.columns * sprite.rows;
+                      sprite.thumbW = sprite.width / sprite.columns;
+                      sprite.thumbH = sprite.height / sprite.rows;
+                      config.thumbnails.sprite = sprite;
+                      if (!config.thumbnails.cssClass) {
+                        config.thumbnails.cssClass = 'plyr__thumbnail';
+                      }
+                      var thumbnail = createElement('div', {
+                        role: 'thumbnail',
+                        class: config.thumbnails.cssClass
+                      });
+                      container.appendChild(thumbnail);
+                      var img = createElement('img', {
+                        width: sprite.width,
+                        height: sprite.height
+                      });
+                      thumbnail.appendChild(img);
+                      elements.display.thumbnail = thumbnail;
+                    }
                 }
 
                 elements.progress = container;
@@ -1429,183 +1470,6 @@
                 wrapper.appendChild(form);
 
                 controls.appendChild(wrapper);
-
-                /*html.push(
-                    '<div class="plyr__menu" data-plyr="settings">',
-                        '<button type="button" id="plyr-settings-toggle-{id}" class="plyr__control" aria-haspopup="true" aria-controls="plyr-settings-{id}" aria-expanded="false">',
-                            '<svg><use xlink:href="' + iconPath + '-settings" /></svg>',
-                            '<span class="plyr__sr-only">' + config.i18n.settings + '</span>',
-                        '</button>',
-                        '<form class="plyr__menu__container" id="plyr-settings-{id}" aria-hidden="true" aria-labelled-by="plyr-settings-toggle-{id}" role="tablist" tabindex="-1">',
-                            '<div>',
-                                '<div id="plyr-settings-{id}-primary" aria-hidden="false" aria-labelled-by="plyr-settings-toggle-{id}" role="tabpanel" tabindex="-1">',
-                                    '<ul>',
-                                        captionsMenuItem,
-                                        '<li role="tab">',
-                                            '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-speed-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-speed" aria-expanded="false">',
-                                                config.i18n.speed +
-                                                '<span class="plyr__menu__value" data-menu="speed">{speed}</span>',
-                                            '</button>',
-                                        '</li>',
-                                        '<li role="tab">',
-
-                                            //showQuality,
-
-                                            '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-quality-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-quality" aria-expanded="false">',
-                                                config.i18n.quality,
-                                                '<span class="plyr__menu__value">{quality}</span>',
-                                            '</button>',
-
-                                        '</li>',
-                                        '<li role="tab">',
-                                            '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-loop-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-loop" aria-expanded="false">',
-                                                config.i18n.loop +
-                                                '<span class="plyr__menu__value" data-menu="loop">{loop}</span>',
-                                            '</button>',
-                                        '</li>',
-                                    '</ul>',
-                                '</div>',
-                                '<div id="plyr-settings-{id}-captions" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-captions-toggle" role="tabpanel" tabindex="-1">',
-                                    '<ul>',
-                                        '<li role="tab">',
-                                            '<button type="button" class="plyr__control plyr__control--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
-                                                config.i18n.captions,
-                                            '</button>',
-                                        '</li>',
-                                        '<li data-captions="langs">',
-                                            buildCaptionsMenu(),
-                                        '</li>',
-                                        '<li>',
-                                            '<button type="button" class="plyr__control" data-plyr="captions_menu">Off</button>',
-                                        '</li>',
-                                    '</ul>',
-                                '</div>',
-                                '<div id="plyr-settings-{id}-speed" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-speed-toggle" role="tabpanel" tabindex="-1">',
-                                    '<ul>',
-                                        '<li role="tab">',
-                                            '<button type="button" class="plyr__control plyr__control--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
-                                                config.i18n.speed,
-                                            '</button>',
-                                        '</li>',
-                                        '<li>',
-                                            '<label class="plyr__control">',
-                                                '<input type="radio" name="speed" data-plyr="speed" value="2.0" '+ (config.currentSpeed === 2 ? 'checked' : '') +'>',
-                                                '2.0&times;',
-                                            '</label>',
-                                        '</li>',
-                                        '<li>',
-                                            '<label class="plyr__control">',
-                                                '<input type="radio" name="speed" data-plyr="speed"  value="1.5" '+ (config.currentSpeed === 1.5 ? 'checked' : '') +'>',
-                                                '1.5&times;',
-                                            '</label>',
-                                        '</li>',
-                                        '<li>',
-                                            '<label class="plyr__control">',
-                                                '<input type="radio" name="speed" data-plyr="speed"  value="1.0" '+ (config.currentSpeed === 1 ? 'checked' : '') +'>',
-                                                '1.0&times;',
-                                            '</label>',
-                                        '</li>',
-                                        '<li>',
-                                            '<label class="plyr__control">',
-                                                '<input type="radio" name="speed" data-plyr="speed"  value="0.5" '+ (config.currentSpeed === 0.5 ? 'checked' : '') +'>',
-                                                '0.5&times;',
-                                            '</label>',
-                                        '</li>',
-                                    '</ul>',
-                                '</div>',
-                                '<div id="plyr-settings-{id}-quality" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-quality-toggle" role="tabpanel" tabindex="-1">',
-                                    '<ul>',
-                                        '<li role="tab">',
-                                            '<button type="button" class="plyr__control plyr__control--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
-                                                config.i18n.quality,
-                                            '</button>',
-                                        '</li>',
-                                        '<li>',
-                                            '<label class="plyr__control">',
-                                                '<input type="radio" name="quality">',
-                                                '2160P',
-                                                '<span class="plyr__menu__value">',
-                                                    '<span class="plyr__badge">4K</span>',
-                                                '</span>',
-                                            '</label>',
-                                        '</li>',
-                                        '<li>',
-                                            '<label class="plyr__control">',
-                                                '<input type="radio" name="quality">',
-                                                '1440P',
-                                                '<span class="plyr__menu__value">',
-                                                    '<span class="plyr__badge">WQHD</span>',
-                                                '</span>',
-                                            '</label>',
-                                        '</li>',
-                                        '<li>',
-                                            '<label class="plyr__control">',
-                                                '<input type="radio" name="quality">',
-                                                '1080P',
-                                                '<span class="plyr__menu__value">',
-                                                    '<span class="plyr__badge">HD</span>',
-                                                '</span>',
-                                            '</label>',
-                                        '</li>',
-                                        '<li>',
-                                            '<label class="plyr__control">',
-                                                '<input type="radio" name="quality">',
-                                                '720P',
-                                                '<span class="plyr__menu__value">',
-                                                    '<span class="plyr__badge">HD</span>',
-                                                '</span>',
-                                            '</label>',
-                                        '</li>',
-                                        '<li>',
-                                            '<label class="plyr__control">',
-                                                '<input type="radio" name="quality">',
-                                                '480P',
-                                            '</label>',
-                                        '</li>',
-                                        '<li>',
-                                            '<label class="plyr__control">',
-                                                '<input type="radio" name="quality">',
-                                                '360P',
-                                            '</label>',
-                                        '</li>',
-                                    '</ul>',
-                                '</div>',
-                                '<div id="plyr-settings-{id}-loop" aria-hidden="true" aria-labelled-by="plyr-settings-{id}-loop-toggle" role="tabpanel" tabindex="-1">',
-                                    '<ul>',
-                                        '<li role="tab">',
-                                            '<button type="button" class="plyr__control plyr__control--back" aria-haspopup="true" aria-controls="plyr-settings-{id}-primary" aria-expanded="false">',
-                                                config.i18n.loop,
-                                            '</button>',
-                                        '</li>',
-                                        '<li>',
-                                            '<button type="button" class="plyr__control" data-plyr="loop" data-plyr-loop="all">',
-                                                config.i18n.loopAll,
-                                                '<span></span>',
-                                            '</button>',
-                                        '</li>',
-                                        '<li>',
-                                            '<button type="button" class="plyr__control" data-plyr="loop" data-plyr-loop="start">',
-                                                config.i18n.loopStart,
-                                                '<span></span>',
-                                            '</button>',
-                                        '</li>',
-                                        '<li>',
-                                            '<button type="button" class="plyr__control" data-plyr="loop" data-plyr-loop="end">',
-                                                config.i18n.loopEnd,
-                                                '<span></span>',
-                                            '</button>',
-                                        '</li>',
-                                        '<li>',
-                                            '<button type="button" class="plyr__control" data-plyr="loop" data-plyr-loop="none">',
-                                                config.i18n.loopNone,
-                                            '</button>',
-                                        '</li>',
-                                    '</ul>',
-                                '</div>',
-                            '</div>',
-                        '</form>',
-                    '</div>'
-                ); */
             }
 
             // Picture in picture button
@@ -3557,10 +3421,14 @@
             }
 
             // Display the time a click would seek to
-            updateTimeDisplay(((duration / 100) * percent), elements.display.seekTooltip);
+            var current = (duration / 100) * percent;
+            updateTimeDisplay(current, elements.display.seekTooltip);
 
             // Set position
             elements.display.seekTooltip.style.left = percent + "%";
+            if (config.thumbnails) {
+              showThumbnail(current, duration, percent);
+            }
 
             // Show/hide the tooltip
             // If the event is a moues in/out and percentage is inside bounds
@@ -4570,6 +4438,47 @@
 
             // Update the UI
             checkPlaying();
+        }
+
+        function showThumbnail(current, duration, percent) {
+          var url = config.thumbnails.url;
+          var where = current / config.thumbnails.sprite.multiplier;
+          var img = parseInt(where) + config.thumbnails.sprite.startAt;
+          var idx = where % 1;
+
+          var rows = config.thumbnails.sprite.rows;
+          var cols = config.thumbnails.sprite.columns;
+          var row = parseInt(idx * cols);
+          var col = parseInt(idx * rows * cols) % cols;
+
+          var thumbW = config.thumbnails.sprite.thumbW;
+          var thumbH = config.thumbnails.sprite.thumbH;
+
+          var left = thumbW * col;
+          var top = thumbH * row;
+          var right = left + thumbW;
+          var bottom = top + thumbH;
+
+          var elem = elements.display.thumbnail.querySelector('img');
+          img = zeroFill(img, config.thumbnails.sprite.zeroFill);
+          var newSrc = url.replace('__num__', img);
+          if (newSrc != elem.src) {
+            elem.removeAttribute('src');
+            elem.src = url.replace('__num__', img);
+          }
+          elem.style.clip = 'rect('+top+'px, '+right+'px, '+bottom+'px, '+left+'px)';
+          elem.style.top = '-'+(bottom+30)+'px';
+          elem.style.left = '-'+(left+(thumbW>>1))+'px';
+          elements.display.thumbnail.style.left = percent+'%';
+        }
+
+        function zeroFill(num, count) { 
+          var zeros = '';
+          for (var i = 0; i < count; i++) {
+            zeros+='0';
+          }
+          var out = (zeros + num).slice(-1*zeros.length);
+          return out;
         }
 
         api = {
