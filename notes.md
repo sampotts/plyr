@@ -11,8 +11,6 @@
 - Finish and test PiP (need Sierra VM)
 - Finish and test AirPlay (need Sierra VM)
 
-- Click outside of menu closes it
-
 # Notes
 - No quality HTML5 support (yet)
 - No Vimeo quality support
@@ -31,4 +29,4 @@
 
 ## Added
 - Seek i8n label
-- Loop i8n labels
+- Loop related i8n labels
