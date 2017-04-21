@@ -8,7 +8,7 @@
 [![Plyr图像](https://cdn.selz.com/plyr/plyr_v1.8.9.png)](https://plyr.io)
 
 ## 初衷
-我们想要一个轻量级，触手可及和可定制的媒体播放器，支持[*现代*](#browser-support)浏览器。当然，还有很多其他的播放器，但是我们希望保持简洁的风格，使用正确的元素来完成播放工作。
+我们想要一个轻量级，触手可及和可定制的媒体播放器，支持[*现代*](#浏览器支持)浏览器。当然，还有很多其他的播放器，但是我们希望保持简洁的风格，使用正确的元素来完成播放工作。
 
 ## 特征
 - **触手可及** - 完全支持VTT字幕和屏幕阅读器
@@ -127,7 +127,7 @@ Plyr 是标准的HTML5标记语言的拓展，所以它有你对于这些类型�
 注意：data-video-id 的值现在是视频的ID或URL。此属性名称将在以后的版本中更改以反映此更改。
 
 ### JavaScript 
-在闭合`</body>`标签之前包含`plyr.js`script文件，然后调用`plyr.setup()`方法。有关`setup()`的更多信息参见[初始化](#initialising)。
+在闭合`</body>`标签之前包含`plyr.js`script文件，然后调用`plyr.setup()`方法。有关`setup()`的更多信息参见[初始化](#初始化)。
 
 ```html
 <script src="path/to/plyr.js"></script>
@@ -154,7 +154,7 @@ Plyr 是标准的HTML5标记语言的拓展，所以它有你对于这些类型�
 ```
 
 ### SVG 子画面
-SVG 子画面是从我们的CDN(由 [Fastly]提供(https://www.fastly.com/))中自动加载的。为了更改这个，详见下面的[参数](#options)。作为参考，CDN托管的SVG子画面可以在这里找到：`https://cdn.plyr.io/2.0.12/plyr.svg`。
+SVG 子画面是从我们的CDN(由 [Fastly]提供(https://www.fastly.com/))中自动加载的。为了更改这个，详见下面的[参数](#参数)。作为参考，CDN托管的SVG子画面可以在这里找到：`https://cdn.plyr.io/2.0.12/plyr.svg`。
 ## 高级
 
 ### LESS & SASS/SCSS
