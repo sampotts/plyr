@@ -24,7 +24,7 @@
 - **[全屏](#全屏)** - 支持本机全屏，进入“全窗口”模式
 - **[快捷键](#快捷键)** - 支持键盘快捷键
 - **支持i18n** - 支持标准化控制器
-- **无依赖库** - 写在“vanilla”JavaScript文件中，不需要jQuery
+- **无依赖库** - 使用原生JavaScript（Vanilla JS）编写，不需要jQuery
 - **SASS和LESS** - 包含在您的构建过程中
 
 是的，它是与Bootstrap一起运行。
@@ -50,7 +50,7 @@
 - 音频字幕
 ...以及其他任何[问题](https://github.com/Selz/plyr/issues)
 
-如果您有任何比较酷的想法或功能设计的构想，请通过[创建问题](https://github.com/Selz/plyr/issues/new)或者分配和发送拉取请求来通知我。
+如果您有任何比较酷的想法或功能设计的构想，请通过[创建问题](https://github.com/Selz/plyr/issues/new)或者配置和发送pull请求来通知我。
 
 ## CMS 插件
 
@@ -63,8 +63,8 @@
 ### [Kirby](https://github.com/dpschen/kirby-plyrtag)
 由Dominik Pschenitschni 创建和维护 ([@dpschen](https://github.com/dpschen))
 
-## Using package managers
-您可以使用以下软件包管理器之一来获取源代码。
+## 使用包管理器
+您可以使用以下包管理器之一来获取源代码。
 
 ### npm
 ```
@@ -81,7 +81,7 @@ bower install plyr
 有关设置依赖关系的更多信息可以在这里找到 [Bower文档](http://bower.io/docs/creating-packages/#maintaining-dependencies)
 
 ### Ember
-The awesome [@louisrudner](https://twitter.com/louisrudner) has created an ember component, available by running:
+很棒的 [@louisrudner](https://twitter.com/louisrudner) 已经创建了一个ember组件，运行以下指令可以使用：
 ```
 ember addon:install ember-cli-plyr
 ```
@@ -134,7 +134,7 @@ Plyr 是标准的HTML5标记语言的拓展，所以它有你对于这些类型�
 <script>plyr.setup();</script>
 ```
 
-如果你想使用我们的 CDN (由[Fastly](https://www.fastly.com/)提供)来获取JavaScript文件，你可以使用一下代码：
+如果你想使用我们的 CDN (由[Fastly](https://www.fastly.com/)提供)来获取JavaScript文件，你可以使用以下代码：
 
 ```html
 <script src="https://cdn.plyr.io/2.0.12/plyr.js"></script>
@@ -147,14 +147,14 @@ Plyr 是标准的HTML5标记语言的拓展，所以它有你对于这些类型�
 <link rel="stylesheet" href="path/to/plyr.css">
 ```
 
-如果你想使用我们的 CDN (由[Fastly](https://www.fastly.com/)提供)来获取默认的CSS文件，你可以使用一下代码：
+如果你想使用我们的 CDN (由[Fastly](https://www.fastly.com/)提供)来获取默认的CSS文件，你可以使用以下代码：
 
 ```html
 <link rel="stylesheet" href="https://cdn.plyr.io/2.0.12/plyr.css">
 ```
 
-### SVG 子画面
-SVG 子画面是从我们的CDN(由 [Fastly](https://www.fastly.com/)提供)中自动加载的。为了更改这个，详见下面的[参数](#参数)。作为参考，CDN托管的SVG子画面可以在这里找到：`https://cdn.plyr.io/2.0.12/plyr.svg`。
+### SVG 精灵图像
+SVG 精灵图像是从我们的CDN(由 [Fastly](https://www.fastly.com/)提供)中自动加载的。为了更改这个，详见下面的[参数](#参数)。作为参考，CDN托管的SVG精灵图像可以在这里找到：`https://cdn.plyr.io/2.0.12/plyr.svg`。
 ## 高级
 
 ### LESS & SASS/SCSS
@@ -163,15 +163,15 @@ SVG 子画面是从我们的CDN(由 [Fastly](https://www.fastly.com/)提供)中�
 HTML标记语言使用BEM方法使`plyr`作为块状元素，例如，`.plyr__controls`。你可以更改选项中的类钩子函数以匹配您编写的任何自定义CSS。查看JavaScript源代码了解更多有关信息。
 
 ### SVG
-Plyr控制器使用的icon图标是从SVG子图像中加载的。这个子图像默认地是从我们的CDN上自动加载的。如果你已经有自己的一套icon图标，你可以将它包含在Plyr图标源目录中(详见用于源图标的 `/src/sprite` 目录)。
+Plyr控制器使用的icon图标是从SVG精灵图像中加载的。这个精灵图像默认地是从我们的CDN上自动加载的。如果你已经有自己的一套icon图标，你可以将它包含在Plyr图标源目录中(详见用于源图标的 `/src/sprite` 目录)。
 
 #### 使用 `iconUrl` 参数
-你可以指定自己的`iconUrl`参数。如果这个URL是绝对路径，由于当前浏览器的限制，Plyr将确定由AJAX / CORS加载；或者是相对路径，只需直接使用该路径。
+你可以指定自己的`iconUrl`参数。如果这个URL是绝对路径，由于当前浏览器的限制，Plyr将确定由 AJAX/CORS 加载；或者是相对路径，只需直接使用该路径。
 
 如果你在网站上使用`<base>` 标签，则可能需要使用以下内容：
 [svgfixer.js](https://gist.github.com/leonderijke/c5cf7c5b2e424c0061d2)
 
-更多有关SVG子图像的信息参考这里：
+更多有关SVG精灵图像的信息参考这里：
 [http://css-tricks.com/svg-sprites-use-better-icon-fonts/](http://css-tricks.com/svg-sprites-use-better-icon-fonts/)
 AJAX 技术参考这里：
 [http://css-tricks.com/ajaxing-svg-sprite/](http://css-tricks.com/ajaxing-svg-sprite/)
@@ -270,19 +270,19 @@ plyr.setup(options);
       <td><code>loadSprite</code></td>
       <td>Boolean</td>
       <td><code>true</code></td>
-      <td>加载<code>iconUrl</code>参数（如果是一个URL地址）指定SVG子图像。如果设置为<code>false</code>，它会假设你自己控制图像加载。</td>
+      <td>加载<code>iconUrl</code>参数（如果是一个URL地址）指定SVG精灵图像。如果设置为<code>false</code>，它会假设你自己控制图像加载。</td>
     </tr>
     <tr>
       <td><code>iconUrl</code></td>
       <td>String</td>
       <td><code>null</code></td>
-      <td>指定 SVG 图像的一个URL地址或者路径。更多信息详见<a href="#svg">SVG 章节</a>。</td>
+      <td>指定 SVG 精灵图像的一个URL地址或者路径。更多信息详见<a href="#svg">SVG 章节</a>。</td>
     </tr>
     <tr>
       <td><code>iconPrefix</code></td>
       <td>String</td>
       <td><code>plyr</code></td>
-      <td>为默认控件中使用的图标指定ID前缀（例如“plyr-play”将为“plyr”）。这是为了防止你使用自己的SVG图像但使用默认控件产生冲突。大多数人可以忽略此参数。</td>
+      <td>为默认控件中使用的图标指定ID前缀（例如“plyr-play”将为“plyr”）。这是为了防止你使用自己的SVG精灵图像但使用默认控件而产生冲突。大多数人可以忽略此参数。</td>
     </tr>
     <tr>
       <td><code>blankUrl</code></td>
