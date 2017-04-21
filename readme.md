@@ -1,70 +1,70 @@
 # Plyr
-A simple, accessible and customizable HTML5, YouTube and Vimeo media player.
+一个简单、触手可及、可定制的HTML5、YouTube、VIMEO媒体播放器。
 
-[Donate to support Plyr](#donate)
+[捐献支持Plyr](#donate)
 
-[Checkout the demo](https://plyr.io)
+[检测演示](https://plyr.io)
 
-[![Image of Plyr](https://cdn.selz.com/plyr/plyr_v1.8.9.png)](https://plyr.io)
+[![Plyr图像](https://cdn.selz.com/plyr/plyr_v1.8.9.png)](https://plyr.io)
 
-## Why?
-We wanted a lightweight, accessible and customizable media player that supports [*modern*](#browser-support) browsers. Sure, there are many other players out there but we wanted to keep things simple, using the right elements for the job.
+## 初衷
+我们想要一个轻量级，触手可及和可定制的媒体播放器，支持[*现代*](#browser-support)浏览器。当然，还有很多其他的播放器，但是我们希望保持简洁的风格，使用正确的元素来完成播放工作。
 
-## Features
-- **Accessible** - full support for VTT captions and screen readers
-- **Lightweight** - under 10KB minified and gzipped
-- **[Customisable](#html)** - make the player look how you want with the markup you want
-- **Semantic** - uses the *right* elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no `<span>` or `<a href="#">` button hacks
-- **Responsive** - works with any screen size
-- **HTML Video & Audio** - support for both formats
-- **[Embedded Video](#embeds)** - support for YouTube and Vimeo video playback
-- **[Streaming](#streaming)** - support for hls.js, Shaka and dash.js streaming playback
-- **[API](#api)** - toggle playback, volume, seeking, and more
-- **[Events](#events)** - no messing around with Vimeo and YouTube APIs, all events are standardized across formats
-- **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes
-- **[Shortcuts](#shortcuts)** - supports keyboard shortcuts
-- **i18n support** - support for internationalization of controls
-- **No dependencies** - written in "vanilla" JavaScript, no jQuery required
-- **SASS and LESS** - to include in your build processes
+## 特征
+- **触手可及** - 完全支持VTT字幕和屏幕阅读器
+- **轻量级** - 缩小并压缩后小于10KB
+- **[可定制](#html)** - 让播放器拥有您想要的标签
+- **语义化** - 使用 *正确* 的元素。'<input type="range">'用于音量，'<progress>'用于进度，以及'<button>'用于按钮。没有'<span>'或'<a href="#">'按钮
+- **响应式** - 可在任何尺寸屏幕下运行
+- **HTML音频和视频** - 支持这两种格式
+- **[嵌入式视频](#embeds)** - 支持YouTube和Vimeo视频播放
+- **[流式传输](#streaming)** - 支持hls.js，Shaka和dash.js流式回放
+- **[API接口](#api)** - 切换回放，音量，搜索等功能
+- **[支持事件](#events)** - 不要混淆Vimeo和YouTube API，所有事件都跨格式标准化
+- **[全屏](#fullscreen)** - 支持本机全屏，进入“全窗口”模式
+- **[快捷键](#shortcuts)** - 支持键盘快捷键
+- **支持i18n** - 支持标准化控制器
+- **无依赖库** - 写在“vanilla”JavaScript文件中，不需要jQuery
+- **SASS和LESS** - 包含在您的构建过程中
 
-Oh and yes, it works with Bootstrap.
+是的，它是与Bootstrap一起运行。
 
-## Changelog
-Check out the [changelog](changelog.md) to see what's new with Plyr.
+## 修改日志
+查看[修改日志](changelog.md)，了解Plyr的新功能。
 
-## Features currently being developed
-- Playback speed selection
-- Quality selection 
-- Caption language selection
-- AirPlay
-- Picture in Picture (MacOS Sierra + Safari)
+## 目前正在开发的功能
+- 播放速度选择
+- 质量选择
+- 字幕语言选择
+- AirPlay（音乐播放器）
+- 画中画 (MacOS Sierra + Safari)
 
-[more info](https://github.com/Selz/plyr/issues?q=is%3Aissue+is%3Aopen+label%3A%22In+Development%22)
+[更多信息](https://github.com/Selz/plyr/issues?q=is%3Aissue+is%3Aopen+label%3A%22In+Development%22)
 
-## Planned features
-- Playlists
+## 计划功能
+- 播放列表
 - Google cast
-- Facebook video support
-- Wistia video support
-- YouTube and Vimeo audio support
-- Audio captions
-...and whatever else has been raised in [issues](https://github.com/Selz/plyr/issues)
+- 支持脸书视频
+- 支持Wistia视频
+- 支持YouTube 和 Vimeo 音频
+- 音频字幕
+...以及其他任何[问题](https://github.com/Selz/plyr/issues)
 
-If you have any cool ideas or features, please let me know by [creating an issue](https://github.com/Selz/plyr/issues/new) or, of course, forking and sending a pull request.
+如果您有任何比较酷的想法或功能设计的构想，请通过[创建问题](https://github.com/Selz/plyr/issues/new)或者分配和发送拉取请求来通知我。
 
-## CMS plugins
+## CMS 插件
 
 ### [WordPress](https://wordpress.org/plugins/plyr/)
-Created and maintained by Ryan Anthony Drake ([@iamryandrake](https://github.com/iamryandrake))
+由Ryan Anthony Drake创建并维护（[@iamryandrake](https://github.com/iamryandrake)）
 
 ### [Neos](https://packagist.org/packages/jonnitto/plyr)
-Created and maintained by Jon Uhlmann ([@jonnitto](https://github.com/jonnitto))
+由Jon Uhlmann创建和维护 ([@jonnitto](https://github.com/jonnitto))
 
 ### [Kirby](https://github.com/dpschen/kirby-plyrtag)
-Created and maintained by Dominik Pschenitschni ([@dpschen](https://github.com/dpschen))
+由Dominik Pschenitschni 创建和维护 ([@dpschen](https://github.com/dpschen))
 
 ## Using package managers
-You can grab the source using one of the following package managers.
+您可以使用以下软件包管理器之一来获取源代码。
 
 ### npm
 ```
@@ -78,22 +78,22 @@ bower install plyr
 ```
 [http://bower.io/search/?q=plyr](http://bower.io/search/?q=plyr)
 
-More info on setting up dependencies can be found in the [Bower Docs](http://bower.io/docs/creating-packages/#maintaining-dependencies)
+有关设置依赖关系的更多信息可以在这里找到 [Bower文档](http://bower.io/docs/creating-packages/#maintaining-dependencies)
 
 ### Ember
 The awesome [@louisrudner](https://twitter.com/louisrudner) has created an ember component, available by running:
 ```
 ember addon:install ember-cli-plyr
 ```
-More info is on [npm](https://www.npmjs.com/package/ember-cli-plyr) and [GitHub](https://github.com/louisrudner/ember-cli-plyr)
+更多信息，参见 [npm](https://www.npmjs.com/package/ember-cli-plyr) 和 [GitHub](https://github.com/louisrudner/ember-cli-plyr)
 
-## Quick setup
-Here's a quick run through on getting up and running. There's also a [demo on Codepen](http://codepen.io/sampotts/pen/jARJYp).
+## 快速创建
+这是一个快速创建的起步和运行。这里还有一个[Codepen上的演示案例](http://codepen.io/sampotts/pen/jARJYp).
 
 ### HTML
-Plyr extends upon the standard HTML5 markup so that's all you need for those types. More info on advanced HTML markup can be found under [initialising](#initialising).
+Plyr 是标准的HTML5标记语言的拓展，所以它有你对于这些类型所需要的一切。有关高级HTML标记的更多信息，请参见 [初始化](#initialising)。
 
-#### HTML5 Video
+#### HTML5 视频
 ```html
 <video poster="/path/to/poster.jpg" controls>
   <source src="/path/to/video.mp4" type="video/mp4">
@@ -103,7 +103,7 @@ Plyr extends upon the standard HTML5 markup so that's all you need for those typ
 </video>
 ```
 
-#### HTML5 Audio
+#### HTML5 音频
 ```html
 <audio controls>
   <source src="/path/to/audio.mp3" type="audio/mp3">
@@ -111,96 +111,95 @@ Plyr extends upon the standard HTML5 markup so that's all you need for those typ
 </audio>
 ```
 
-For YouTube and Vimeo, Plyr uses the standard YouTube API markup (an empty `<div>`):
+对于 YouTube 和 Vimeo，Plyr 使用标准的 YouTube API 标记语言（一个空的`<div>`）：
 
-#### YouTube embed
+#### YouTube 嵌入
 ```html
 <div data-type="youtube" data-video-id="bTqVqk7FSmY"></div>
 ```
 
-Note: `data-video-id` value can now be the ID or URL for the video. This attribute name will change in a future release to reflect this change.
+注意：data-video-id 的值现在是视频的ID或URL。此属性名称将在以后的版本中更改以反映此更改。
 
-#### Vimeo embed
+#### Vimeo 嵌入
 ```html
 <div data-type="vimeo" data-video-id="143418951"></div>
 ```
-Note: `data-video-id` value can now be the ID or URL for the video. This attribute name will change in a future release to reflect this change.
+注意：data-video-id 的值现在是视频的ID或URL。此属性名称将在以后的版本中更改以反映此更改。
 
 ### JavaScript 
-Include the `plyr.js` script before the closing `</body>` tag and then call `plyr.setup()`. More info on `setup()` can be found under [initialising](#initialising).
+在闭合`</body>`标签之前包含`plyr.js`script文件，然后调用`plyr.setup()`方法。有关`setup()`的更多信息参见[初始化](#initialising)。
 
 ```html
 <script src="path/to/plyr.js"></script>
 <script>plyr.setup();</script>
 ```
 
-If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for the JavaScript, you can use the following:
+如果你想使用我们的 CDN (由[Fastly]提供(https://www.fastly.com/))来获取JavaScript文件，你可以使用一下代码：
 
 ```html
 <script src="https://cdn.plyr.io/2.0.12/plyr.js"></script>
 ```
 
 ### CSS
-Include the `plyr.css` stylsheet into your `<head>`
+在你的`<head>`头文件中包含 `plyr.css` CSS文件。
 
 ```html
 <link rel="stylesheet" href="path/to/plyr.css">
 ```
 
-If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for the default CSS, you can use the following:
+如果你想使用我们的 CDN (由[Fastly]提供(https://www.fastly.com/))来获取默认的CSS文件，你可以使用一下代码：
 
 ```html
 <link rel="stylesheet" href="https://cdn.plyr.io/2.0.12/plyr.css">
 ```
 
-### SVG Sprite
-The SVG sprite is loaded automatically from our CDN (provided by [Fastly](https://www.fastly.com/)). To change this, see the [options](#options) below. For reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/2.0.12/plyr.svg`.
-
-## Advanced
+### SVG 子画面
+SVG 子画面是从我们的CDN(由 [Fastly]提供(https://www.fastly.com/))中自动加载的。为了更改这个，详见下面的[参数](#options)。作为参考，CDN托管的SVG子画面可以在这里找到：`https://cdn.plyr.io/2.0.12/plyr.svg`。
+## 高级
 
 ### LESS & SASS/SCSS
-You can use `plyr.less` or `plyr.scss` file included in `/src` as part of your build and change variables to suit your design. The LESS and SASS require you to use the [autoprefixer](https://www.npmjs.com/package/gulp-autoprefixer) plugin (you should already) as all declerations use the W3C definitions - e.g. `appearance: none;` will be prefixed to `-webkit-appearance: none;` by autoprefixer. 
+您可以使用`plyr.less`或`plyr.scss`文件包含在`/src`目录中作为你的构建的一部分，并根据你的设计更改变量。LESS和SASS要求您使用[autoprefixer插件](https://www.npmjs.com/package/gulp-autoprefixer)（你应该准备），因为所有declerations都使用W3C标准 - 例如，`appearance: none;`会通过autoprefixer被加上前缀`-webkit-appearance: none;`。
 
-The HTML markup uses the BEM methodology with `plyr` as the block, e.g. `.plyr__controls`. You can change the class hooks in the options to match any custom CSS you write. Check out the JavaScript source for more on this.
+HTML标记语言使用BEM方法使`plyr`作为块状元素，例如，`.plyr__controls`。你可以更改选项中的类钩子函数以匹配您编写的任何自定义CSS。查看JavaScript源代码了解更多有关信息。
 
 ### SVG
-The icons used in the Plyr controls are loaded in an SVG sprite. The sprite is automatically loaded from our CDN by default. If you already have an icon build system in place, you can include the source plyr icons (see `/src/sprite` for source icons).
+Plyr控制器使用的icon图标是从SVG子图像中加载的。这个子图像默认地是从我们的CDN上自动加载的。如果你已经有自己的一套icon图标，你可以将它包含在Plyr图标源目录中(详见用于源图标的 `/src/sprite` 目录)。
 
-#### Using the `iconUrl` option
-You can however specify your own `iconUrl` option and Plyr will determine if the url is absolute and requires loading by AJAX/CORS due to current browser limitations or if it's a relative path, just use the path directly. 
+#### 使用 `iconUrl` 参数
+你可以指定自己的`iconUrl`参数。如果这个URL是绝对路径，由于当前浏览器的限制，Plyr将确定由AJAX / CORS加载；或者是相对路径，只需直接使用该路径。
 
-If you're using the `<base>` tag on your site, you may need to use something like this:
+如果你在网站上使用`<base>` 标签，则可能需要使用以下内容：
 [svgfixer.js](https://gist.github.com/leonderijke/c5cf7c5b2e424c0061d2)
 
-More info on SVG sprites here:
+更多有关SVG子图像的信息参考这里：
 [http://css-tricks.com/svg-sprites-use-better-icon-fonts/](http://css-tricks.com/svg-sprites-use-better-icon-fonts/)
-and the AJAX technique here:
+AJAX 技术参考这里：
 [http://css-tricks.com/ajaxing-svg-sprite/](http://css-tricks.com/ajaxing-svg-sprite/)
 
-### Cross Origin (CORS)
-You'll notice the `crossorigin` attribute on the example `<video>` elements. This is because the TextTrack captions are loaded from another domain. If your TextTrack captions are also hosted on another domain, you will need to add this attribute and make sure your host has the correct headers setup. For more info on CORS checkout the MDN docs:
+### 跨域问题 (CORS)
+您会注意到示例中`<video>`元素的`crossorigin`属性。这是因为TextTrack字幕是从另一个域加载的。如果您的TextTrack字幕也托管在另一个域上，则需要添加此属性，并确保您的主机具有正确的文件头设置。有关CORS检查MDN文档的更多信息，请访问：
 [https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS)
 
-### Captions
-WebVTT captions are supported. To add a caption track, check the HTML example above and look for the `<track>` element. Be sure to [validate your caption files](https://quuz.org/webvtt/).
+### 字幕
+支持WebVTT字幕。添加字幕轨，请参照上面的HTML示例并查看`<track>`元素。确保[验证你的字幕文件](https://quuz.org/webvtt/)。
 
 ### JavaScript
 
-#### Initialising
+#### 初始化
 
-By default, `setup()` will find all `<video>`, `<audio>` and `[data-type]` elements with the document and initialises on any found. Each target media element found will be wrapped in a `<div>` for styling and setup individually. You can specify a variety of arguments to `setup()` to use, including a different NodeList, HTMLElement, Array of HTMLElements or string selector as below:
+默认情况下，`setup()`会找到document中所有`<video>`， `<audio>`和`[data-type]`元素，并初始化找到的元素。找到的每个目标媒体元素将被包装在一个单独`<div>`中设置样式和创建。您可以指定`setup()`的各种参数来使用，包括不同的NodeList，HTMLElement，HTMLElements数组或字符串选择器，如下所示：
 
-Passing a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList):
+传入一个[NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList):
 ```javascript
 plyr.setup(document.querySelectorAll('.js-player'), options);
 ```
 
-Passing a [HTMLElement](https://developer.mozilla.org/en/docs/Web/API/HTMLElement):
+传入一个 [HTMLElement](https://developer.mozilla.org/en/docs/Web/API/HTMLElement):
 ```javascript
 plyr.setup(document.querySelector('.js-player'), options);
 ```
 
-Passing an [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array) of [HTMLElement](https://developer.mozilla.org/en/docs/Web/API/HTMLElement)s:
+传入一个 [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array) of [HTMLElement](https://developer.mozilla.org/en/docs/Web/API/HTMLElement)s:
 ```javascript
 plyr.setup([
 	document.querySelector('.js-player-1'),
@@ -208,39 +207,38 @@ plyr.setup([
 ], options);
 ```
 
-Passing a [string selector](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelectorAll):
+传入一个 [string selector](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelectorAll):
 ```javascript
 plyr.setup('.js-player', options);
 ```
 
-The NodeList, HTMLElement or string selector can be the target `<video>`, `<audio>` or `[data-type]` (for embeds) element itself or a container element. 
+NodeList, HTMLElement 或者字符选择器可以是 `<video>`标签，`<audio>`标签或者 `[data-type]` （用于嵌入）元素本身或者一个容器元素。
 
-Passing just the options object:
+只传入参数对象：
 ```javascript
 plyr.setup(options);
 ```
 
-`setup()` will return an array of *instances* that can be used with the [API](#api) methods. See the [API](#api) section for more info.
+`setup()` 会返回一个*实例*数组，实例可以使用 [API](#api)方法。更多信息详见[API](#api)这一节。
+#### 触摸范围
+一些触摸浏览器（尤其是iOS上的移动Safari浏览器）似乎有一些`<input type="range">`元素的问题，触摸轨迹设置值不起作用，滑动拇指可能会很棘手。为了解决这个问题，我创建了[RangeTouch](https://rangetouch.com)，我建议你包括在你的解决方案中。这是一个很小的脚本，对于触摸设备上的用户来说，这是非常有益的。
 
-#### RangeTouch
-Some touch browsers (particularly Mobile Safari on iOS) seem to have issues with `<input type="range">` elements whereby touching the track to set the value doesn't work and sliding the thumb can be tricky. To combat this, I've created [RangeTouch](https://rangetouch.com) which I'd recommend including in your solution. It's a tiny script with a nice benefit for users on touch devices. 
-
-#### Options
-Options must be passed as an object to the `setup()` method as above or as JSON in `data-plyr` attribute on each of your target elements:
+#### 参数
+参数必须像上面介绍的那样作为一个对象传入`setup()`方法，或者作为一个JSON数据传入你的每个标签元素中`data-plyr`属性中：
 
 ```html
 <video data-plyr='{ title: "testing" }'></video>
 ```
 
-Note the single quotes encapsulating the JSON and double quotes on the object keys.
+注意，单引号封装JSON，双引号封装对象的键。
 
 <table class="table" width="100%">
   <thead>
     <tr>
-      <th width="20%">Option</th>
-      <th width="15%">Type</th>
-      <th width="15%">Default</th>
-      <th width="50%">Description</th>
+      <th width="20%">参数</th>
+      <th width="15%">类型</th>
+      <th width="15%">默认值</th>
+      <th width="50%">描述</th>
     </tr>
   </thead>
   <tbody>
@@ -248,174 +246,174 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
       <td><code>enabled</code></td>
       <td>Boolean</td>
       <td><code>true</code></td>
-      <td>Completely disable Plyr. This would allow you to do a User Agent check or similar to programmatically enable or disable Plyr for a certain UA. Example below.</td>
+      <td>完全禁用Plyr。这将允许您执行用户代理检查或类似操作以编程方式启用或禁用某个确定用户代理的Plyr。例子如下。</td>
     </tr>
     <tr>
       <td><code>html</code></td>
       <td>String</td>
-      <td><code><a href="controls.md">See controls.md</a></code></td>
-      <td>See <a href="controls.md">controls.md</a> for more info on how the html needs to be structured.</td>
+      <td><code><a href="controls.md">详见 controls.md</a></code></td>
+      <td>更多关于如何搭建<code>html</code>的信息详见 <a href="controls.md">controls.md</a> 。</td>
     </tr>
     <tr>
       <td><code>controls</code></td>
       <td>Array</td>
       <td><code>['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'fullscreen']</code></td>
-      <td>Toggle which control elements you would like to display when using the default controls html. If you specify a <code>html</code> option, this is redundant. The default value is to display everything.</td>
+      <td>切换使用默认控件html时要显示的控件元素。如果指定一个<code>html</code>选项，这是多余的。默认值是显示所有内容。</td>
     </tr>
     <tr>
       <td><code>i18n</code></td>
       <td>Object</td>
       <td><code><a href="controls.md">See controls.md</a></code></td>
-      <td>Used for internationalization (i18n) of the tooltips/labels within the buttons.</td>
+      <td>按钮中使用国际化（internationalization，缩写为i18n）的工具提示/标签。</td>
     </tr>
     <tr>
       <td><code>loadSprite</code></td>
       <td>Boolean</td>
       <td><code>true</code></td>
-      <td>Load the SVG sprite specified as the <code>iconUrl</code> option (if a URL). If <code>false</code>, it is assumed you are handling sprite loading yourself.</td>
+      <td>加载<code>iconUrl</code>参数（如果是一个URL地址）指定SVG子图像。如果设置为<code>false</code>，它会假设你自己控制图像加载。</td>
     </tr>
     <tr>
       <td><code>iconUrl</code></td>
       <td>String</td>
       <td><code>null</code></td>
-      <td>Specify a URL or path to the SVG sprite. See the <a href="#svg">SVG section</a> for more info.</td>
+      <td>指定 SVG 图像的一个URL地址或者路径。更多信息详见<a href="#svg">SVG 章节</a>。</td>
     </tr>
     <tr>
       <td><code>iconPrefix</code></td>
       <td>String</td>
       <td><code>plyr</code></td>
-      <td>Specify the id prefix for the icons used in the default controls (e.g. "plyr-play" would be "plyr"). This is to prevent clashes if you're using your own SVG sprite but with the default controls. Most people can ignore this option.</td>
+      <td>为默认控件中使用的图标指定ID前缀（例如“plyr-play”将为“plyr”）。这是为了防止你使用自己的SVG图像但使用默认控件产生冲突。大多数人可以忽略此参数。</td>
     </tr>
     <tr>
       <td><code>blankUrl</code></td>
       <td>String</td>
       <td><code>https://cdn.selz.com/plyr/blank.mp4</code></td>
-      <td>Specify a URL or path to a blank video file used to properly cancel network requests. See <a href="https://github.com/Selz/plyr/issues/174">issue #174</a> for more info.</td>
+      <td>指定一个空白视频文件的URL地址或者路径，用来正确得取消网络请求。更多信息详见<a href="https://github.com/Selz/plyr/issues/174">174号问题</a> 。</td>
     </tr>
     <tr>
       <td><code>debug</code></td>
       <td>Boolean</td>
       <td><code>false</code></td>
-      <td>Display debugging information on what Plyr is doing.</td>
+      <td>显示Plyr正在运行的调试信息。</td>
     </tr>
     <tr>
       <td><code>autoplay</code></td>
       <td>Boolean</td>
       <td><code>false</code></td>
-      <td>Autoplay the media on load. This is generally advised against on UX grounds. It is also disabled on iOS (an Apple limitation).</td>
+      <td>自动播放载入媒体。这通常是建议基于用户体验来设置。它也在iOS上禁用（苹果限制）。</td>
     </tr>
     <tr>
       <td><code>seekTime</code></td>
       <td>Number</td>
       <td><code>10</code></td>
-      <td>The time, in seconds, to seek when a user hits fast forward or rewind.</td>
+      <td>当用户快速前进或快退时，以秒为单位的寻找时间。</td>
     </tr>
     <tr>
       <td><code>volume</code></td>
       <td>Number</td>
       <td><code>5</code></td>
-      <td>A number, between 1 and 10, representing the initial volume of the player.</td>
+      <td>1到10之间的数字，表示播放器的初始音量。</td>
     </tr>
     <tr>
       <td><code>clickToPlay</code></td>
       <td>Boolean</td>
       <td><code>true</code></td>
-      <td>Click (or tap) of the video container will toggle pause/play.</td>
+      <td>单击（或点击）视频容器将切换暂停/播放。</td>
     </tr>
     <tr>
       <td><code>disableContextMenu</code></td>
       <td>Boolean</td>
       <td><code>true</code></td>
-      <td>Disable right click menu on video to <em>help</em> as very primitive obfuscation to prevent downloads of content.</td>
+      <td>禁用视频上的右键菜单，以帮助您进行非常原始的模糊处理，以防止内容下载。</td>
     </tr>
     <tr>
       <td><code>hideControls</code></td>
       <td>Boolean</td>
       <td><code>true</code></td>
-      <td>Hide video controls automatically after 2s of no mouse or focus movement, on control element blur (tab out), on playback start or entering fullscreen. As soon as the mouse is moved, a control element is focused or playback is paused, the controls reappear instantly.</td>
+      <td>当 鼠标没有对焦移动，播放开始，进入全屏，控制元素模糊（标签输出）两秒后，自动隐藏播放控件。一旦鼠标移动，控制元素被聚焦或播放暂停，控件立即重新出现。</td>
     </tr>
     <tr>
       <td><code>showPosterOnEnd</code></td>
       <td>Boolean</td>
       <td><code>false</code></td>
-      <td>This will restore and *reload* HTML5 video once playback is complete. Note: depending on the browser caching, this may result in the video downloading again (or parts of it). Use with caution.</td>
+      <td>一旦播放完成，将恢复和*重新加载* HTML5视频。注意：根据浏览器缓存，这可能会导致视频再次下载（或其中的一部分）。谨慎使用。</td>
     </tr>
     <tr>
       <td><code>keyboardShortcuts</code></td>
       <td>Object</td>
       <td><code>{ focused: true, global: false }</code></td>
-      <td>Enable <a href="#shortcuts">keyboard shortcuts</a> for focused players only or globally as well (this will only work if there's one player in the document)</td>
+      <td>对指定的播放器单独或者全局激活<a href="#shortcuts">键盘快捷键</a>(只有当document中只有一个播放器时才有效)。</td>
     </tr>
     <tr>
       <td><code>tooltips</code></td>
       <td>Object</td>
       <td><code>{ controls: false, seek: true }</code></td>
       <td>
-  		<strong>controls</strong>: Display control labels as tooltips on :hover &amp; :focus (by default, the labels are screen reader only).
+  		<strong>controls</strong>: 在:hover和:focus时显示控件的文本标签作为工具提示（默认地，文本标签只是屏幕阅读器）。
   		<br><br>
-  		<strong>seek</strong>: Display a seek tooltip to indicate on click where the media would seek to.
+  		<strong>seek</strong>: 显示寻找工具提示，以便在点击媒体将指出寻求的地方。
   	</td>
     </tr>
     <tr>
       <td><code>duration</code></td>
       <td>Number</td>
       <td><code>null</code></td>
-      <td>Specify a custom duration.</td>
+      <td>指定自定义持续时间。</td>
     </tr>
     <tr>
       <td><code>displayDuration</code></td>
       <td>Boolean</td>
       <td><code>true</code></td>
-      <td>Displays the duration of the media on the "metadataloaded" event (on startup) in the current time display. This will only work if the `preload` attribute is not set to `none` (or is not set at all) and you choose not to display the duration (see <code>controls</code> option).</td>
+      <td>在当前时间显示中显示“metadataloaded”事件（启动时）媒体的持续时间。如果`preload`属性未设置为`none`（或根本不设置），并且您选择不显示持续时间，它将起作用。详见<code>controls</code> 参数).</td>
     </tr>
     <tr>
       <td><code>selectors</code></td>
       <td>Object</td>
       <td>&mdash;</td>
-      <td>See <code>plyr.js</code> in <code>/src</code> for more info. You probably don't need to change any of these.</td>
+      <td>更多信息参考<code>/src</code>目录下的 <code>plyr.js</code> 文件， 你可能不需要改变这些。</td>
     </tr>
     <tr>
       <td><code>listeners</code></td>
       <td>Object</td>
       <td>&mdash;</td>
-      <td>Allows early binding of event listeners to the controls. See <code>controls</code> above for list of controls and see <code>plyr.js</code> in <code>/src</code> for more info.</td>
+      <td>允许事件监听器提前绑定到控件上。 参考上面的<code>controls</code>了解控件列表，更多信息参考<code>/src</code>目录下的<code>plyr.js</code>。</td>
     </tr>
     <tr>
       <td><code>classes</code></td>
       <td>Object</td>
       <td>&mdash;</td>
-      <td>Similar to above, these are the classes added to the player when state changes occur.</td>
+      <td>和上面相似，这些是当状态更改发生时添加到播放器的类。</td>
     </tr>
     <tr>
       <td><code>captions</code></td>
       <td>Object</td>
       <td>&mdash;</td>
-      <td>One property <code>defaultActive</code> which toggles if captions should be on by default. The default value is <code>false</code>.</td>
+      <td>具有一个属性值<code>defaultActive</code>，如果字幕开启默认切换。 默认值为<code>false</code>。</td>
     </tr>
     <tr>
       <td><code>fullscreen</code></td>
       <td>Object</td>
       <td>&mdash;</td>
-      <td>See <a href="#fullscreen-options">below</a></td>
+      <td>详见 <a href="#fullscreen-options">下面介绍</a></td>
     </tr>
     <tr>
       <td><code>storage</code></td>
       <td>Object</td>
       <td>&mdash;</td>
-      <td>Two properties; <code>enabled</code> which toggles if local storage should be enabled (if the browser supports it). The default value is `true`. This enables storing user settings, currently it only stores volume but more will be added later. The second property <code>key</code> is the key used for the local storage. The default is <code>plyr_volume</code> until more settings are stored.</td>
+      <td>两个属性值；<code>enabled</code> 来回切换，如果本地存储应该启用（如果该浏览器支持的话）。默认值为“true”。这使得存储用户的设置，目前它只存储量，但更多的将在以后添加。 第二个属性 <code>key</code> 是用于本地存储的id。默认值为<code>plyr_volume</code>，直到更多的设置被存储。</td>
     </tr>
   </tbody>
 </table>
 
-#### Fullscreen options
+#### 全屏参数
 
 <table class="table" width="100%" id="fullscreen-options">
   <thead>
     <tr>
-      <th width="20%">Option</th>
-      <th width="15%">Type</th>
-      <th width="15%">Default</th>
-      <th width="50%">Description</th>
+      <th width="20%">参数</th>
+      <th width="15%">类型</th>
+      <th width="15%">默认值</th>
+      <th width="50%">描述</th>
     </tr>
   </thead>
   <tbody>
@@ -423,42 +421,43 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
       <td><code>enabled</code></td>
       <td>Boolean</td>
       <td><code>true</code></td>
-      <td>Toggles if fullscreen should be enabled (if the browser supports it).</td>
+      <td>如果全屏应该启用（如果浏览器支持），则开启。</td>
     </tr>
     <tr>
       <td><code>fallback</code></td>
       <td>Boolean</td>
       <td><code>true</code></td>
-      <td>Enable a full viewport view for older browsers.</td>
+      <td>启用旧版浏览器的全屏视图。</td>
     </tr>
     <tr>
       <td><code>allowAudio</code></td>
       <td>Boolean</td>
       <td><code>false</code></td>
-      <td>Allow audio play to toggle fullscreen. This will be more useful later when posters are supported.</td>
+      <td>允许音频播放切换全屏。稍后在支持海报时，这将更有用。</td>
     </tr>
   </tbody>
 </table>
 
 ## API
 
-### Instance
+### 播放器实例
 
-The easiest way to access the plyr instances is to store the return value from your call to `setup()`:
+获取plyr播放器实例的最简单方法是存储你调用的`setup()`的返回值：
 
 ```javascript
 var players = plyr.setup('.js-player');
 ```
 
-This will return an array of all instances that were setup. Another way is to use `plyr.get()` to get all instances within a given container, for example:
+这将返回设置的所有播放器实例的数组。
+另一种方法是使用`plyr.get()`方法来获取给定容器中的所有播放器实例，例如：
 
 ```javascript
 var players = plyr.get('.js-player');
 ```
 
-If no argument is passed, it will find all instances in the current document. This will return an array of all instances that were found in the given selector. 
+如果没有传入参数，它会返回当前document中找到的所有播放器实例。 它会返回在给定选择器中找到的所有播放器实例的数组。
 
-A final option is to access the instance through the event handlers:
+最后一个方法是通过事件处理程序得到播放器实例：
 
 ```javascript
 instance.on('ready', function(event) {
@@ -466,183 +465,183 @@ instance.on('ready', function(event) {
 });
 ```
 
-### Methods
+### 方法
 
-Once you have your instances, you can use the API methods below on it. For example to pause the first player:
+一旦你得到了播放器实例，你就可以对它使用下面的API方法了。举例来暂停第一个播放器：
 
 ```javascript
 players[0].pause();
 ```
 
-Here's a list of the methods supported:
+以下是当前支持的方法的列表：
 
 <table class="table" width="100%">
 <thead>
   <tr>
-    <th width="20%">Method</th>
-    <th width="15%">Parameters</th>
-    <th width="65%">Description</th>
+    <th width="20%">方法</th>
+    <th width="15%">参数</th>
+    <th width="65%">描述</th>
   </tr>
 </thead>
 <tbody>
   <tr>
     <td><code>getContainer()</code></td>
     <td>&mdash;</td>
-    <td>Get the players outer container element that is automatically injected.</td>
+    <td>获取脚本自动生成的播放器外层容器元素。</td>
   </tr>
   <tr>
     <td><code>getMedia()</code></td>
     <td>&mdash;</td>
-    <td>Get the media element (<code>&gt;video&lt;</code>, <code>&gt;audio&lt;</code> or <code>&gt;div&lt;</code> for YouTube or Vimeo).</td>
+    <td>获取多媒体元素(<code>&gt;video&lt;</code>, <code>&gt;audio&lt;</code> 或者用于 YouTube 和 Vimeo嵌入的 <code>&gt;div&lt;</code> )。</td>
   </tr>
   <tr>
     <td><code>getEmbed()</code></td>
     <td>&mdash;</td>
-    <td>Get the [embed](#embed) API to access those methods - either YouTube or Vimeo.</td>
+    <td>获取 [embed](#embed) API 来访问这些方法 - 无论是 YouTube 还是 Vimeo。</td>
   </tr>
   <tr>
     <td><code>getType()</code></td>
     <td>&mdash;</td>
-    <td>Get the type - 'video', 'audio', 'youtube' or 'vimeo'.</td>
+    <td>获取类型 - 'video', 'audio', 'youtube' 或者 'vimeo'。</td>
   </tr>
   <tr>
     <td><code>isReady()</code></td>
     <td>&mdash;</td>
-    <td>Determine if the player is loaded and UI ready.</td>
+    <td>确定播放器是否已加载并且UI准备就绪。</td>
   </tr>
   <tr>
     <td><code>on()</code></td>
     <td>String, Function</td>
-    <td>Watch for an event (first argument) and run a callback function (second argument). This saves you doing your own <code>addEventListner</code> code. This is chainable.</td>
+    <td>监听一个事件（第一个参数）并运行一个回调函数（第二个参数）。这样做可以节省你自己使用<code>addEventListner</code>编写代码。这是可链接的。 </td>
   </tr>
   <tr>
     <td><code>play()</code></td>
     <td>&mdash;</td>
-    <td>Plays the media</td>
+    <td>播放多媒体。</td>
   </tr>
   <tr>
     <td><code>pause()</code></td>
     <td>&mdash;</td>
-    <td>Pauses the media</td>
+    <td>暂停多媒体播放。</td>
   </tr>
   <tr>
     <td><code>stop()</code></td>
     <td>&mdash;</td>
-    <td>Stops the media</td>
+    <td>停止多媒体播放。</td>
   </tr>
   <tr>
     <td><code>restart()</code></td>
     <td>&mdash;</td>
-    <td>Restarts playback</td>
+    <td>重新开始播放</td>
   </tr>
   <tr>
     <td><code>rewind(...)</code></td>
     <td>Number</td>
-    <td>Rewinds by the provided parameter, in seconds. If no parameter is provided, the default seekInterval is used (10 seconds).</td>
+    <td>通过提供的参数回放，以秒为单位。如果没有提供参数，则使用默认的seekInterval（10秒）。</td>
   </tr>
   <tr>
     <td><code>forward(...)</code></td>
     <td>Number</td>
-    <td>Fast forwards by the provided parameter, in seconds. If no parameter is provided, the default seekInterval is used (10 seconds).</td>
+    <td>通过提供的参数快进，以秒为单位。如果没有提供参数，则使用默认的seekInterval（10秒）。</td>
   </tr>
   <tr>
     <td><code>seek(...)</code></td>
     <td>Number</td>
-    <td>Seeks the media to the provided parameter, time in seconds.</td>
+    <td>根据提供的参数搜索多媒体提供的参数，时间（秒）。</td>
   </tr>
   <tr>
     <td><code>getCurrentTime()</code></td>
     <td>&mdash;</td>
-    <td>Will return a float with the current time in seconds.</td>
+    <td>将以秒为单位返回当前时间的浮点数。</td>
   </tr>
   <tr>
     <td><code>getDuration()</code></td>
     <td>&mdash;</td>
-    <td>Will return a float with the duration in seconds.</td>
+    <td>将以秒为单位返回一个时间段时长浮点数。</td>
   </tr>
   <tr>
     <td><code>getVolume()</code></td>
     <td>&mdash;</td>
-    <td>Will return a float between 0 and 1 for the current volume level.</td>
+    <td>会返回一个0到1之间说明音量程度的浮点数。</td>
   </tr>
   <tr>
     <td><code>isMuted()</code></td>
     <td>&mdash;</td>
-    <td>Will return a boolean for whether the media is currently muted.</td>
+    <td>将返回一个布尔值，多媒体当前是否被静音。</td>
   </tr>
   <tr>
     <td><code>setVolume(...)</code></td>
     <td>Number</td>
-    <td>Sets the player volume to the provided parameter. The value should be between 0 (muted) and 10 (loudest). If no parameter is provided, the default volume is used (5). Values over 10 are ignored.</td>
+    <td>用提供的参数设置播放器音量。该值应在0（静音）和10（最大）之间。如果没有提供参数，则使用默认音量（5）。超过10的值将被忽略。</td>
   </tr>
   <tr>
     <td><code>togglePlay()</code></td>
     <td>Boolean</td>
-    <td>Toggles playback for the player based on either the boolean argument or it's current state.</td>
+    <td>根据布尔参数或当前状态来切换播放器的播放状态。</td>
   </tr>
   <tr>
     <td><code>isPaused()</code></td>
     <td>&mdash;</td>
-    <td>Will return a boolean for whether the media is currently paused.</td>
+    <td>将返回一个布尔值，以确定多媒体当前是否已暂停。</td>
   </tr>
   <tr>
     <td><code>toggleMute()</code></td>
     <td>&mdash;</td>
-    <td>Toggles mute for the player.</td>
+    <td>为播放器切换静音。</td>
   </tr>
   <tr>
     <td><code>toggleCaptions()</code></td>
     <td>&mdash;</td>
-    <td>Toggles whether captions are enabled.</td>
+    <td>切换是否启用字幕。</td>
   </tr>
   <tr>
     <td><code>toggleFullscreen()</code></td>
     <td>Event</td>
-    <td>Toggles fullscreen. This can only be initiated by a user gesture due to browser security, i.e. a user event such as click.</td>
+    <td>切换全屏。由于浏览器安全性，这只能由用户手势启动，即用户事件（如点击）。</td>
   </tr>
   <tr>
     <td><code>isFullscreen()</code></td>
     <td>&mdash;</td>
-    <td>Boolean returned if the player is in fullscreen.</td>
+    <td>播放器是否处于全屏状态</td>
   </tr>
   <tr>
     <td><code>support(...)</code></td>
     <td>String</td>
-    <td>Determine if a player supports a certain MIME type. This is not supported for embedded content (YouTube).</td>
+    <td>确定播放器是否支持某种MIME类型。嵌入式内容（YouTube）不支持此功能。</td>
   </tr>
   <tr>
     <td><code>source(...)</code></td>
     <td>Object or undefined</td>
     <td>
-      Get/Set the media source.
+      获取/设置媒体源。
       <br><br>
       <strong>Object</strong><br>
-      See <a href="#source-method">below</a>
+      详见 <a href="#source-method">下文</a>
       <br><br>
       <strong>YouTube</strong><br>
-      Currently this API method only accepts a YouTube ID when used with a YouTube player. I will add URL support soon, along with being able to swap between types (e.g. YouTube to Audio or Video and vice versa.)
+      目前，此API方法仅在与YouTube播放器一起使用时才接受YouTube ID。我将尽快添加URL支持，以及能够在类型之间进行交换（例如YouTube到Audio或Video，反之亦然） 
       <br><br>
       <strong>undefined</strong><br>
-      Returns the current media source url. Works for both native videos and embeds.
+      返回当前媒体源URL。适用于本机视频和嵌入。
     </td>
   </tr>
   <tr>
     <td><code>poster(...)</code></td>
     <td>String</td>
-    <td>Set the poster url. This is supported for the <code>video</code> element only.</td>
+    <td>设置海报网址。仅video元素支持该方法。</td>
   </tr>
   <tr>
     <td><code>destroy()</code></td>
     <td>&mdash;</td>
-    <td>Restores the original element, reversing the effects of <code>setup()</code>.</td>
+    <td>恢复原始元素，扭转<code>setup()</code>的影响。</td>
   </tr>
  </tbody>
 </table>
 
-#### .source() method
-This allows changing the plyr source and type on the fly.
+#### .source() 方法
+它允许即时更改plyr媒体源和类型。
 
-Video example:
+视频样本代码：
 
 ```javascript
 player.source({
@@ -667,7 +666,7 @@ player.source({
 });
 ```
 
-Audio example:
+音频样本代码：
 
 ```javascript
 player.source({
@@ -684,7 +683,7 @@ player.source({
 });
 ```
 
-YouTube example:
+YouTube样本代码：
 
 ```javascript
 player.source({
@@ -697,9 +696,9 @@ player.source({
 });
 ```
 
-Note: `src` can be the video ID or URL
+注意：`src`可以是视频ID或URL地址
 
-Vimeo example
+Vimeo 样本代码：
 
 ```javascript
 player.source({
@@ -712,49 +711,49 @@ player.source({
 });
 ```
 
-Note: `src` can be the video ID or URL
+注意：`src`可以是视频ID或URL地址
 
-More details on the object parameters
+有关对象参数的更多细节
 
 <table class="table" width="100%">
   <thead>
     <tr>
       <th width="20%">Key</th>
-      <th width="15%">Type</th>
-      <th width="65%">Description</th>
+      <th width="15%">类型</th>
+      <th width="65%">描述</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <td><code>type</code></td>
       <td>String</td>
-      <td>Options are <code>video</code>, <code>audio</code>, <code>youtube</code> and <code>vimeo</code></td>
+      <td>选项是<code>video</code>, <code>audio</code>, <code>youtube</code> and <code>vimeo</code></td>
     </tr>
     <tr>
       <td><code>title</code></td>
       <td>String</td>
-      <td>Title of the new media. Used for the `aria-label` attribute on the play button, and outer container.</td>
+      <td>新的多媒体的标题。用于播放按钮上的“aria-label”属性，也用于外部容器。</td>
     </tr>
     <tr>
       <td><code>sources</code></td>
       <td>Array</td>
-      <td>This is an array of sources. <code>type</code> is optional for YouTube and Vimeo when specifying an array. For YouTube and Vimeo media, the video ID or URL must be passed as the source as shown above. The keys of this object are mapped directly to HTML attributes so more can be added to the object if required.</td>
+      <td>这是一组的多媒体源。当指定数组时<code>type</code>对于YouTube和Vimeo是可选的。对于YouTube和Vimeo多媒体，视频ID或URL地址必须作为如上所示的媒体源传递。该对象的键被直接映射到HTML属性，因此如果需要，可以将更多的属性添加到对象。</td>
     </tr>
     <tr>
       <td><code>poster</code></td>
       <td>String</td>
-      <td>URL for the poster image (video only).</td>
+      <td>封面图片的URL地址（仅限视频）。</td>
     </tr>
     <tr>
       <td><code>tracks</code></td>
       <td>Array</td>
-      <td>An array of track objects. Each element in the array is mapped directly to a track element and any keys mapped directly to HTML attributes so as in the example above, it will render as `<track kind="captions" label="English" srclang="en" src="https://cdn.selz.com/plyr/1.0/example_captions_en.vtt" default>`. Booleans are converted to HTML5 value-less attributes.</td>
+      <td>一组轨道对象。像在上面的示例中一样，队列中的每个元素都直接映射到轨道元素，并将任何键直接映射到HTML属性，它将呈现为`<track kind="captions" label="English" srclang="en" src="https://cdn.selz.com/plyr/1.0/example_captions_en.vtt" default>`。布尔值将转换为HTML5的无价值属性。</td>
     </tr>
   </tbody>
 </table>
 
-## Events
-You can listen for events on the target element you setup Plyr on (see example under the table). Some events only apply to HTML5 audio and video. Using your reference to the instance, you can use the `on()` API method or `addEventListener()`. Access to the API can be obtained this way through the `event.detail.plyr` property. Here's an example:
+## 事件
+您可以在设置Plyr的目标元素上绑定监听事件（请参见下表中的示例）。某些事件仅适用于HTML5音频和视频。使用你对实例的引用（对象），可以使用`on()` API方法或addEventListener()方法。可以通过`event.detail.plyr`属性来获取实例访问API方法 。以下是一个例子：
 
 ```javascript
 instance.on('ready', function(event) {
@@ -762,237 +761,238 @@ instance.on('ready', function(event) {
 });
 ```
 
-These events also bubble up the DOM. The event target will be the container element.
+这些事件也绑定DOM元素。事件标签可能是容器元素。
 
 <table class="table" width="100%">
   <thead>
     <tr>
-      <th width="20%">Event name</th>
-	    <th width="20%">HTML5 only</th>
-      <th width="60%">Description</th>
+      <th width="20%">事件名称</th>
+      <th width="20%">仅限HTML5</th>
+      <th width="60%">描述</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <td><code>setup</code></td>
       <td></td>
-      <td>When an initial setup has completed</td>
+      <td>初始设置完成后触发</td>
     </tr>
     <tr>
       <td><code>ready</code></td>
       <td></td>
-      <td>Triggered when the instance is ready for API use and external APIs are ready (in the case of YouTube and Vimeo).</td>
+      <td>当实例准备好使用API方法和外部API（在YouTube和Vimeo的情况下）准备就绪时触发。</td>
     </tr>
-  	<tr>
-  		<td><code>canplay</code></td>
-  		<td>✔</td>
-  		<td>Sent when enough data is available that the media can be played, at least for a couple of frames. This corresponds to the <code>HAVE_ENOUGH_DATA</code> <code>readyState</code>.</td>
-  	</tr>
-  	<tr>
-  		<td><code>canplaythrough</code></td>
+    <tr>
+       <td><code>canplay</code></td>
+       <td>✔</td>
+       <td>当有足够的数据可以播放媒体时，至少有一定帧数时触发。这对应于<code>HAVE_ENOUGH_DATA</code> <code>准备状态r</code>。
+       </td>
+    </tr>
+    <tr>
+  	<td><code>canplaythrough</code></td>
   		<td></td>
-  		<td>Sent when the ready state changes to <code>CAN_PLAY_THROUGH</code>, indicating that the entire media can be played without interruption, assuming the download rate remains at least at the current level. <strong>Note</strong>: Manually setting the <code>currentTime</code> will eventually fire a <code>canplaythrough</code> event in firefox. Other browsers might not fire this event.</td>
-  	</tr>
+  		<td>当准备状态改变为<code>CAN_PLAY_THROUGH</code>时触发，表明整个媒体可以播放不间断，假定下载速率至少保持在当前级别。 <strong>注意</strong>：手动设置<code>currentTime</code> 在火狐浏览器中会触发<code>canplaythrough</code>事件。其他浏览器可能不会触发此事件。</td>
+     </tr>
   	<tr>
   		<td><code>emptied</code></td>
   		<td>✔</td>
-  		<td>The media has become empty; for example, this event is sent if the media has already been loaded (or partially loaded), and the <code>load()</code> method is called to reload it.</td>
+  		<td>多媒体变为空了；举例来说，如果多媒体已经被加载（或部分加载）和使用<code>load()</code>方法重新加载时这个事件会被触发。</td>
   	</tr>
   	<tr>
   		<td><code>ended</code></td>
   		<td></td>
-  		<td>Sent when playback completes. Note: with Vimeo this does not occur if `loop` is enabled.</td>
+  		<td>播放完成时触发。注意：对于Vimeo，如果`loop`启用了则不会触发此事件。</td>
   	</tr>
   	<tr>
   		<td><code>error</code></td>
   		<td>✔</td>
-  		<td>Sent when an error occurs.&nbsp; The element's <code>error</code> attribute contains more information.</td>
+  		<td>有异常发生时触发事件。&nbsp; element元素的 <code>error</code> 属性包含很多信息。</td>
   	</tr>
   	<tr>
   		<td><code>loadeddata</code></td>
   		<td>✔</td>
-  		<td>The first frame of the media has finished loading.</td>
+  		<td>多媒体的第一帧已经完成加载。</td>
   	</tr>
   	<tr>
   		<td><code>loadedmetadata</code></td>
   		<td>✔</td>
-  		<td>The media's metadata has finished loading; all attributes now contain as much useful information as they're going to.</td>
+  		<td>媒体的元数据已经完成加载;所有属性像它未来发展趋势一样现在包含尽可能多的有用的信息。</td>
   	</tr>
   	<tr>
   		<td><code>loadstart</code></td>
   		<td>✔</td>
-  		<td>Sent when loading of the media begins.</td>
+  		<td>当多媒体加载开始时触发。</td>
   	</tr>
   	<tr>
   		<td><code>pause</code></td>
   		<td></td>
-  		<td>Sent when playback is paused.</td>
+  		<td>播放暂停时触发。</td>
   	</tr>
   	<tr>
   		<td><code>play</code></td>
   		<td></td>
-  		<td>Sent when playback of the media starts after having been paused; that is, when playback is resumed after a prior <code>pause</code> event.</td>
+  		<td>当多媒体暂停后再开始播放时触发事件；也就是说，当在之前的暂停中恢复播放事件。</td>
   	</tr>
   	<tr>
   		<td><code>playing</code></td>
   		<td></td>
-  		<td>Sent when the media begins to play (either for the first time, after having been paused, or after ending and then restarting).</td>
+  		<td>媒体开始播放时触发（无论是第一次播放、暂停后再播放还是停止后从新播放 都算）。</td>
   	</tr>
   	<tr>
   		<td><code>progress</code></td>
   		<td></td>
-  		<td>Sent periodically to inform interested parties of progress downloading the media. Information about the current amount of the media that has been downloaded is available in the media element's <code>buffered</code> attribute.</td>
+  		<td>定期触发，通知有关方面下载媒体的进度。关于当前已下载的媒体大小的信息可在媒体元素的buffered属性中找到。</td>
   	</tr>
   	<tr>
   		<td><code>seeked</code></td>
   		<td></td>
-  		<td>Sent when a seek operation completes.</td>
+  		<td>当搜索跳转完成后触发。</td>
   	</tr>
   	<tr>
   		<td><code>seeking</code></td>
   		<td></td>
-  		<td>Sent when a seek operation begins.</td>
+  		<td>当搜索跳转开始时触发。</td>
   	</tr>
   	<tr>
   		<td><code>stalled</code></td>
   		<td>✔</td>
-  		<td>Sent when the user agent is trying to fetch media data, but data is unexpectedly not forthcoming.</td>
+  		<td>当用户代理尝试获取媒体数据，数据还没有传输时触发。</td>
   	</tr>
   	<tr>
   		<td><code>timeupdate</code></td>
   		<td></td>
-  		<td>The time indicated by the element's <code>currentTime</code> attribute has changed.</td>
+  		<td>element元素currentTime属性指示的时间已更改时。</td>
   	</tr>
   	<tr>
   		<td><code>volumechange</code></td>
   		<td></td>
-  		<td>Sent when the audio volume changes (both when the volume is set and when the <code>muted</code> attribute is changed).</td>
+  		<td>当音量发生变化（音量设置和muted属性更改时都会触发）时触发。</td>
   	</tr>
   	<tr>
   		<td><code>waiting</code></td>
   		<td>✔</td>
-  		<td>Sent when the requested operation (such as playback) is delayed pending the completion of another operation (such as a seek).</td>
+  		<td>当所请求的操作（如播放）被延迟等待完成另一个操作（如搜索）时触发。</td>
   	</tr>
   	<tr>
   		<td><code>enterfullscreen</code></td>
   		<td></td>
-  		<td>User enters fullscreen (either the proper fullscreen or full-window fallback for older browsers)</td>
+  		<td>用户进入全屏（适用于旧版浏览器的全屏或全窗口回退）时</td>
   	</tr>
   	<tr>
   		<td><code>exitfullscreen</code></td>
   		<td></td>
-  		<td>User exits fullscreen</td>
+  		<td>用户退出全屏时</td>
   	</tr>
   	<tr>
   		<td><code>captionsenabled</code></td>
   		<td></td>
-  		<td>Captions toggled on</td>
+  		<td>字幕切换时触发</td>
   	</tr>
   	<tr>
   		<td><code>captionsdisabled</code></td>
   		<td></td>
-  		<td>Captions toggled off</td>
+  		<td>字幕切换完成后触发</td>
   	</tr>
     <tr>
       <td><code>destroyed</code></td>
       <td></td>
-      <td>When an instance is destroyed. The original element that replaced the container will be returned to your handler as the event target.</td>
+      <td>当一个实例被销毁后触发。 替换容器的原始元素将作为事件标签返回到你的处理程序中。</td>
     </tr>
 	</tbody>
 </table>
 
-Details borrowed from: [https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events](https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events)
+细节借阅资料：[https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events](https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events)
 
-## Embeds
-YouTube and Vimeo are currently supported and function much like a HTML5 video. Check the relevant documentation sections for any differences.
+## 嵌入功能
+YouTube和Vimeo目前受支持，功能非常像HTML5视频。检查相关文档部分，了解部分差异。
 
-Plyr references a custom version of the Vimeo Froogaloop API as Vimeo have neglected to maintain the library and there were bugs with their version. You don't need to worry about including your own versions of the Vimeo or YouTube JavaScript APIs.
+Plyr引用了一个Vimeo Froogaloop API的自定义版本，因为Vimeo忽略了维护库，并且其版本存在bug。你不必担心包含你自己的Vimeo或YouTube JavaScript API版本。
 
-The embed third party API's can be accessed through the `getEmbed()` API method. 
+嵌入第三方API可以通过`getEmbed()`API方法访问。
 
-More info on the respective API's here:
+有关各API的更多信息，请访问：
 
 - [YouTube API Reference](https://developers.google.com/youtube/js_api_reference)
 - [Vimeo API Reference](https://developer.vimeo.com/player/js-api#reference)
 
-*Please note*: not all API methods may work 100%. Your mileage may vary. It's better to use the universal plyr API where possible.
+*请注意*：并不是所有API方法都100％可以运行。你的mileage 可能会改变。最好在可能的情况下使用通用plyr API。
 
-## Shortcuts
-By default, a player will bind the following keyboard shortcuts when it has focus. If you have the `global` option to `true` and there's only one player in the document then the shortcuts will work when any element has focus, apart from an element that requires input. 
+## 快捷键
+默认情况下，播放器在聚焦状态下会绑定以下键盘快捷键。如果你有`全局`选项设为true，并且document中只有一个播放器，那么快捷方式在任何element元素处于聚焦状态的情况下都会起作用。
 
 <table class="table" width="100%">
   <thead>
     <tr>
-      <th width="25%">Key</th>
-      <th width="25%">Global</th>
-      <th width="50%">Action</th>
+      <th width="25%">快捷键</th>
+      <th width="25%">全局</th>
+      <th width="50%">行为</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <td><code>0</code> to <code>9</code></td>
       <td>✔</td>
-      <td>Seek from 0 to 90% respectively</td>
+      <td>分别寻求跳转到0到90％</td>
     </tr> 
     <tr>
       <td><code>space</code></td>
       <td></td>
-      <td>Toggle playback</td>
+      <td>切换播放</td>
     </tr>
     <tr>
       <td><code>K</code></td>
       <td>✔</td>
-      <td>Toggle playback</td>
+      <td>切换播放</td>
     </tr>
     <tr>
       <td><code>&larr;</code></td>
       <td></td>
-      <td>Seek backward by the <code>seekTime</code> option</td>
+      <td>通过seekTime选项向后搜索</td>
     </tr>
     <tr>
       <td><code>&rarr;</code></td>
       <td></td>
-      <td>Seek forward by the <code>seekTime</code> option</td>
+      <td>通过seekTime选项向前搜索</td>
     </tr>
     <tr>
       <td><code>&uarr;</code></td>
       <td></td>
-      <td>Increase volume</td>
+      <td>增大音量</td>
     </tr>
     <tr>
       <td><code>&darr;</code></td>
       <td></td>
-      <td>Decrease volume</td>
+      <td>减小音量</td>
     </tr>
     <tr>
       <td><code>M</code></td>
       <td>✔</td>
-      <td>Toggle mute</td>
+      <td>切换静音</td>
     </tr>
     <tr>
       <td><code>F</code></td>
       <td>✔</td>
-      <td>Toggle fullscreen</td>
+      <td>切换全屏</td>
     </tr>
     <tr>
       <td><code>C</code></td>
       <td>✔</td>
-      <td>Toggle captions</td>
+      <td>切换字幕</td>
     </tr>
   </tbody>
 </table>
 
-## Streaming 
-Because Plyr is an extension of the standard HTML5 video and audio elements, third party streaming plugins can be used with Plyr. Massive thanks to Matias Russitto ([@russitto](https://github.com/russitto)) for working on this. Here's a few examples:
+## 流媒体
+由于Plyr是标准HTML5视频和音频元素的扩展库，因此第三方流式多媒体插件可与Plyr一起使用。非常感谢Matias Russitto([@russitto](https://github.com/russitto))为此工作。以下是几个例子：
 
-- Using [hls.js](https://github.com/dailymotion/hls.js) - [Demo](http://codepen.io/sampotts/pen/JKEMqB)
-- Using [Shaka](https://github.com/google/shaka-player) - [Demo](http://codepen.io/sampotts/pen/zBNpVR)
-- Using [dash.js](https://github.com/Dash-Industry-Forum/dash.js) - [Demo](http://codepen.io/sampotts/pen/BzpJXN)
+- 使用 [hls.js](https://github.com/dailymotion/hls.js) - [演示](http://codepen.io/sampotts/pen/JKEMqB)
+- 使用 [Shaka](https://github.com/google/shaka-player) - [演示](http://codepen.io/sampotts/pen/zBNpVR)
+- 使用 [dash.js](https://github.com/Dash-Industry-Forum/dash.js) - [演示](http://codepen.io/sampotts/pen/BzpJXN)
 
-## Fullscreen
-Fullscreen in Plyr is supported by all browsers that [currently support it](http://caniuse.com/#feat=fullscreen). 
+## 全屏
+所有[目前支持Plyr](http://caniuse.com/#feat=fullscreen)的浏览器都支持 Plyr中的全屏功能。
 
-## Browser support
+## 浏览器支持
 
 <table width="100%" style="text-align: center">
   <thead>
@@ -1017,47 +1017,46 @@ Fullscreen in Plyr is supported by all browsers that [currently support it](http
   </tbody>
 </table>
 
-&sup1; Mobile Safari on the iPhone forces the native player for `<video>` so no useful customization is possible. `<audio>` elements have volume controls disabled.
+&sup1; iPhone上的Mobile Safari对`<video>`强制使用原生播放器，所以无法定制播放器。`<audio>` 元素禁用音量控制。
 
-&sup2; Native player used (no support for `<progress>` or `<input type="range">`) but the API is supported (v1.0.28+)
+&sup2; 原生播放器（不支持`<progress>`，并且不支持`<input type="range">`），但支持API（v1.0.28 +）
 
-&sup3; IE10 has no native fullscreen support, fallback can be used (see [options](#options))
+&sup3; IE10没有原生的全屏支持，可以使用后备(详见[选项](#options))
 
-The `enabled` option can be used to disable certain User Agents. For example, if you don't want to use Plyr for smartphones, you could use:
-
+`enabled` 参数可用于禁用某些用户代理。举例来说，如果你不想将Plyr用于智能手机，你可以使用：
 ```javascript
 enabled: /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent)
 ```
-If a User Agent is disabled but supports `<video>` and `<audio>` natively, it will use the native player.
+如果用户代理被禁用但本地支持`<video>`和`<audio>`，它将使用本地播放器。
 
-Any unsupported browsers will display links to download the media if the correct html is used.
+如果使用正确的html，任何不受支持的浏览器将显示下载媒体的链接。
 
-### Checking for support
-There's an API method for checking support. You can call `plyr.supported()` and optionally pass a type to it, e.g. `plyr.supported("video")`. It will return an object with two keys; `basic` meaning there's basic support for that media type (or both if no type is passed) and `full` meaning there's full support for plyr.
+### 检查支持
+这里有一个 API 方法检查支持。你可以调用`plyr.supported()` 方法并给他传一个类型参数，例如，`plyr.supported("video")`。它会返回一个包含两个键的对象；`basic` 表示对该媒体类型有基本的支持（或者如果没有类型被传递的话），`full`表示完全支持plyr。
 
-## Issues
-If you find anything weird with Plyr, please let us know using the GitHub issues tracker.
+## 问题
+如果你发现Plyr有什么疑问的，请使用GitHub问题跟踪器告知我们。
 
-## Author
-Plyr is developed by [@sam_potts](https://twitter.com/sam_potts) / [sampotts.me](http://sampotts.me) with help from the awesome [contributors](https://github.com/Selz/plyr/graphs/contributors)
+## 作者
+Plyr 是由[@sam_potts](https://twitter.com/sam_potts) / [sampotts.me](http://sampotts.me) 在各位[贡献者](https://github.com/Selz/plyr/graphs/contributors)的帮助下开发的。
 
-## Donate
-Plyr costs money to run, not my time - I donate that for free but domains, hosting and more. Any help is appreciated...
-[Donate to support Plyr](https://www.paypal.me/pottsy/20usd)
+## 捐献
+Plyr 是花钱运维的，不算作者的时间（作者是自愿花时间来做这个工作的），可是域名、托管还有其他一些东西都是烧钱的！任何帮助是赞赏。。。
+[捐献来支持Plyr](https://www.paypal.me/pottsy/20usd)
 
-## Mentions
-- [ProductHunt](https://www.producthunt.com/tech/plyr)
-- [The Changelog](http://thechangelog.com/plyr-simple-html5-media-player-custom-controls-webvtt-captions/)
-- [HTML5 Weekly #177](http://html5weekly.com/issues/177)
-- [Responsive Design #149](http://us4.campaign-archive2.com/?u=559bc631fe5294fc66f5f7f89&id=451a61490f)
-- [Web Design Weekly #174](https://web-design-weekly.com/2015/02/24/web-design-weekly-174/)
-- [Hacker News](https://news.ycombinator.com/item?id=9136774)
-- [Web Platform Daily](http://webplatformdaily.org/releases/2015-03-04)
-- [LayerVault Designer News](https://news.layervault.com/stories/45394-plyr--a-simple-html5-media-player)
-- [The Treehouse Show #131](https://teamtreehouse.com/library/episode-131-origami-react-responsive-hero-images)
-- [noupe.com](http://www.noupe.com/design/html5-plyr-is-a-responsive-and-accessible-video-player-94389.html)
+## 涉及
+- [产品猎人](https://www.producthunt.com/tech/plyr)
+- [修改日志](http://thechangelog.com/plyr-simple-html5-media-player-custom-controls-webvtt-captions/)
+- [HTML5 周刊 #177](http://html5weekly.com/issues/177)
+- [响应式设计 #149](http://us4.campaign-archive2.com/?u=559bc631fe5294fc66f5f7f89&id=451a61490f)
+- [网页设计周刊 #174](https://web-design-weekly.com/2015/02/24/web-design-weekly-174/)
+- [骇客新闻](https://news.ycombinator.com/item?id=9136774)
+- [网页平台日报y](http://webplatformdaily.org/releases/2015-03-04)
+- [LayerVault设计师新闻](https://news.layervault.com/stories/45394-plyr--a-simple-html5-media-player)
+- [树屋秀 #131](https://teamtreehouse.com/library/episode-131-origami-react-responsive-hero-images)
+- [noupe分享平台](http://www.noupe.com/design/html5-plyr-is-a-responsive-and-accessible-video-player-94389.html)
 
-## Used by
+## 使用
 - [Selz.com](https://selz.com)
 - [Peugeot.fr](http://www.peugeot.fr/marque-et-technologie/technologies/peugeot-i-cockpit.html)
 - [Peugeot.de](http://www.peugeot.de/modelle/modellberater/208-3-turer/fotos-videos.html)
@@ -1067,22 +1066,22 @@ Plyr costs money to run, not my time - I donate that for free but domains, hosti
 - [koel - A personal music streaming server that works.](http://koel.phanan.net/)
 - [Oscar Radio](http://oscar-radio.xyz/)
 
-Let me know on [Twitter](https://twitter.com/sam_potts) I can add you to the above list. It'd be awesome to see how you're using Plyr :-)
+让我通过[Twitter](https://twitter.com/sam_potts) 知道怎么把你加紧上述列表中。看看你使用Plyr会有多棒:-)
 
-## Useful links and credits
-Credit to the PayPal HTML5 Video player from which Plyr's caption functionality is ported from:
-- [PayPal's Accessible HTML5 Video Player](https://github.com/paypal/accessible-html5-video-player)
+## 有用的连接和credits
+归功于PayPal HTML5视频播放器，从其中移植了Plyr的字幕功能：
+- [贝宝的无障碍HTML5视频播放器](https://github.com/paypal/accessible-html5-video-player)
 - The icons used in Plyr are [Vicons](https://dribbble.com/shots/1663443-60-Vicons-Free-Icon-Set) plus some ones I made
-- [An awesome guide for Plyr in Japanese!](http://syncer.jp/how-to-use-plyr-io) by [@arayutw](https://twitter.com/arayutw)
+- [Plyr在日本的指南！](http://syncer.jp/how-to-use-plyr-io) by [@arayutw](https://twitter.com/arayutw)
 
-Also these links helped created Plyr:
-- [Media Events - W3.org](http://www.w3.org/2010/05/video/mediaevents.html)
-- [Styling the `<progress>` element - hongkiat.com](http://www.hongkiat.com/blog/html5-progress-bar/)
+此外，这些链接帮助创建了Plyr：
+- [多媒体事件- W3.org](http://www.w3.org/2010/05/video/mediaevents.html)
+- [对 `<progress>` 元素进行样式设计 - hongkiat.com](http://www.hongkiat.com/blog/html5-progress-bar/)
 
-## Thanks
+## 致谢
 [![Fastly](https://www.fastly.com/sites/all/themes/custom/fastly2016/logo.png)](https://www.fastly.com/)
 
-Thanks to [Fastly](https://www.fastly.com/) for providing the CDN services. 
+感谢 [Fastly](https://www.fastly.com/) 提供了CDN 服务。
 
-## Copyright and License
+## 版权和许可证
 [The MIT license](license.md).
