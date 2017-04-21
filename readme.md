@@ -17,12 +17,12 @@
 - **语义化** - 使用 *正确* 的元素。`<input type="range">`用于音量，`<progress>`用于进度，以及`<button>`用于按钮。没有`<span>`或`<a href="#">`按钮
 - **响应式** - 可在任何尺寸屏幕下运行
 - **HTML音频和视频** - 支持这两种格式
-- **[嵌入式视频](#embeds)** - 支持YouTube和Vimeo视频播放
-- **[流式传输](#streaming)** - 支持hls.js，Shaka和dash.js流式回放
+- **[嵌入式视频](#嵌入功能)** - 支持YouTube和Vimeo视频播放
+- **[流式传输](#流媒体)** - 支持hls.js，Shaka和dash.js流式回放
 - **[API接口](#api)** - 切换回放，音量，搜索等功能
-- **[支持事件](#events)** - 不要混淆Vimeo和YouTube API，所有事件都跨格式标准化
-- **[全屏](#fullscreen)** - 支持本机全屏，进入“全窗口”模式
-- **[快捷键](#shortcuts)** - 支持键盘快捷键
+- **[支持事件](#事件)** - 不要混淆Vimeo和YouTube API，所有事件都跨格式标准化
+- **[全屏](#全屏)** - 支持本机全屏，进入“全窗口”模式
+- **[快捷键](#快捷键)** - 支持键盘快捷键
 - **支持i18n** - 支持标准化控制器
 - **无依赖库** - 写在“vanilla”JavaScript文件中，不需要jQuery
 - **SASS和LESS** - 包含在您的构建过程中
@@ -88,10 +88,10 @@ ember addon:install ember-cli-plyr
 更多信息，参见 [npm](https://www.npmjs.com/package/ember-cli-plyr) 和 [GitHub](https://github.com/louisrudner/ember-cli-plyr)
 
 ## 快速创建
-这是一个快速创建的起步和运行。这里还有一个[Codepen上的演示案例](http://codepen.io/sampotts/pen/jARJYp).
+这是一个快速创建的起步和运行说明。这里还有一个[Codepen上的在线演示案例](http://codepen.io/sampotts/pen/jARJYp).
 
 ### HTML
-Plyr 是标准的HTML5标记语言的拓展，所以它有你对于这些类型所需要的一切。有关高级HTML标记的更多信息，请参见 [初始化](#initialising)。
+Plyr 是标准的HTML5标记语言的拓展，所以它有你对于这些类型所需要的一切。有关高级HTML标记的更多信息，请参见 [初始化](#初始化)。
 
 #### HTML5 视频
 ```html
@@ -342,7 +342,7 @@ plyr.setup(options);
       <td><code>keyboardShortcuts</code></td>
       <td>Object</td>
       <td><code>{ focused: true, global: false }</code></td>
-      <td>对指定的播放器单独或者全局激活<a href="#shortcuts">键盘快捷键</a>(只有当document中只有一个播放器时才有效)。</td>
+      <td>对指定的播放器单独或者全局激活<a href="#快捷键">键盘快捷键</a>(只有当document中只有一个播放器时才有效)。</td>
     </tr>
     <tr>
       <td><code>tooltips</code></td>
