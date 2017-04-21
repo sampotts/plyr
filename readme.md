@@ -1,7 +1,7 @@
 # Plyr
 一个简单、触手可及、可定制的HTML5、YouTube、VIMEO媒体播放器。
 
-[捐献支持Plyr](#donate)
+[捐献支持](#捐献)
 
 [检测演示](https://plyr.io)
 
@@ -96,18 +96,18 @@ Plyr 是标准的HTML5标记语言的拓展，所以它有你对于这些类型�
 #### HTML5 视频
 ```html
 <video poster="/path/to/poster.jpg" controls>
-  <source src="/path/to/video.mp4" type="video/mp4">
-  <source src="/path/to/video.webm" type="video/webm">
-  <!-- Captions are optional -->
-  <track kind="captions" label="English captions" src="/path/to/captions.vtt" srclang="en" default>
+	<source src="/path/to/video.mp4" type="video/mp4">
+  	<source src="/path/to/video.webm" type="video/webm">
+  	<!-- Captions are optional -->
+  	<track kind="captions" label="English captions" src="/path/to/captions.vtt" srclang="en" default>
 </video>
 ```
 
 #### HTML5 音频
 ```html
 <audio controls>
-  <source src="/path/to/audio.mp3" type="audio/mp3">
-  <source src="/path/to/audio.ogg" type="audio/ogg">
+  	<source src="/path/to/audio.mp3" type="audio/mp3">
+  	<source src="/path/to/audio.ogg" type="audio/ogg">
 </audio>
 ```
 
@@ -199,7 +199,7 @@ plyr.setup(document.querySelectorAll('.js-player'), options);
 plyr.setup(document.querySelector('.js-player'), options);
 ```
 
-传入一个 [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array) of [HTMLElement](https://developer.mozilla.org/en/docs/Web/API/HTMLElement)s:
+传入一个 [HTMLElement](https://developer.mozilla.org/en/docs/Web/API/HTMLElement)的[数组](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)：
 ```javascript
 plyr.setup([
 	document.querySelector('.js-player-1'),
@@ -645,24 +645,24 @@ players[0].pause();
 
 ```javascript
 player.source({
-  type:       'video',
-  title:      'Example title',
-  sources: [{
-      src:    '/path/to/movie.mp4',
-      type:   'video/mp4'
-  },
-  {
-      src:    '/path/to/movie.webm',
-      type:   'video/webm'
-  }],
-  poster:     '/path/to/poster.jpg',
-  tracks:     [{
-      kind:   'captions',
-      label:  'English',
-      srclang:'en',
-      src:    '/path/to/captions.vtt',
-      default: true
-  }]
+  	type:       'video',
+  	title:      'Example title',
+  	sources: [{
+      		src:    '/path/to/movie.mp4',
+      		type:   'video/mp4'
+  	},
+  	{
+      		src:    '/path/to/movie.webm',
+      		type:   'video/webm'
+  	}],
+  	poster:     '/path/to/poster.jpg',
+  	tracks:     [{
+     		kind:   'captions',
+      		label:  'English',
+      		srclang:'en',
+      		src:    '/path/to/captions.vtt',
+      		default: true
+  	}]
 });
 ```
 
@@ -670,16 +670,16 @@ player.source({
 
 ```javascript
 player.source({
-  type:       'audio',
-  title:      'Example title',
-  sources: [{
-    src:      '/path/to/audio.mp3',
-    type:     'audio/mp3'
-  },
-  {
-    src:      '/path/to/audio.ogg',
-    type:     'audio/ogg'
-  }]
+  	type:       'audio',
+  	title:      'Example title',
+  	sources: [{
+    		src:      '/path/to/audio.mp3',
+    		type:     'audio/mp3'
+  	},
+  	{
+    		src:      '/path/to/audio.ogg',
+    		type:     'audio/ogg'
+  	}]
 });
 ```
 
@@ -687,12 +687,12 @@ YouTube样本代码：
 
 ```javascript
 player.source({
-  type:       'video',
-  title:      'Example title',
-  sources: [{
-      src:    'bTqVqk7FSmY',
-      type:   'youtube'
-  }]
+  	type:       'video',
+  	title:      'Example title',
+  	sources: [{
+      		src:    'bTqVqk7FSmY',
+      		type:   'youtube'
+  	}]
 });
 ```
 
@@ -702,12 +702,12 @@ Vimeo 样本代码：
 
 ```javascript
 player.source({
-  type:       'video',
-  title:      'Example title',
-  sources: [{
-      src:    '143418951',
-      type:   'vimeo'
-  }]
+  	type:       'video',
+  	title:      'Example title',
+  	sources: [{
+      		src:    '143418951',
+      		type:   'vimeo'
+  	}]
 });
 ```
 
@@ -757,7 +757,7 @@ player.source({
 
 ```javascript
 instance.on('ready', function(event) {
-  var instance = event.detail.plyr;
+  	var instance = event.detail.plyr;
 });
 ```
 
