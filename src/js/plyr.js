@@ -247,6 +247,10 @@
             },
             soundcloud: {
                 api: 'https://w.soundcloud.com/player/api.js'
+            },
+            wistia: {
+                api:   'https://fast.wistia.com/assets/external/E-v1.js',
+                video: 'https://fast.wistia.com/embed/iframe/'
             }
         },
 
@@ -809,6 +813,12 @@
     function parseYouTubeId(url) {
         var regex = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
         return url.match(regex) ? RegExp.$2 : url;
+    }
+
+    // Parse Wistia ID from url
+    function _parseWistiaId(url) {
+        var regex = /^.*(wistia.(com|net)\/embed\/iframe\/)([^#\&\?]*).*/;
+        return (url.match(regex)) ? RegExp.$3 : url;
     }
 
     // Fullscreen API
@@ -2279,6 +2289,10 @@
                     mediaId = parseYouTubeId(player.embedId);
                     break;
 
+                case 'wistia':
+                    mediaId = _parseWistiaId(plyr.embedId);
+                    break;
+
                 default:
                     mediaId = player.embedId;
             }
@@ -2346,6 +2360,31 @@
                     }, 50);
                 } else {
                     vimeoReady(mediaId, container);
+                }
+            } else if (player.type === 'wistia') {
+                // Create the Wistia container
+                plyr.media.appendChild(container);
+
+                // Set ID
+                container.setAttribute('id', id);
+
+                // Set Class
+                container.className = 'wistia_embed wistia_async_' + mediaId + ' videoFoam=true chromeless=true';
+
+                // Load the API if not already
+                if (!_is.object(window.Wistia)) {
+                    window._wq = window._wq || [];
+                    _injectScript(config.urls.wistia.api);
+
+                    window.wistiaInit = function(W) {
+                        window._wq.push({ id: id, onReady: function(video) {
+                            _wistiaReady(mediaId, container, video);
+                        }});
+                    };
+                } else {
+                    window._wq.push({ id: id, onReady: function(video) {
+                        _wistiaReady(mediaId, container, video);
+                    }});
                 }
             } else if (player.type === 'soundcloud') {
                 // TODO: Currently unsupported and undocumented
@@ -2682,6 +2721,78 @@
             });
         }
 
+        // Wistia ready
+        function _wistiaReady(mediaId, container, wistiaPlayer) {
+            // Setup instance
+            // https://wistia.com/doc/player-api
+            plyr.embed = wistiaPlayer;
+
+            // Create a faux HTML5 API using the Wistia API
+            plyr.media.play = function() {
+                plyr.embed.play();
+                plyr.media.paused = false;
+            };
+            plyr.media.pause = function() {
+                plyr.embed.pause();
+                plyr.media.paused = true;
+            };
+
+            // No stop() on Wistia API
+            plyr.media.stop = plyr.media.pause;
+
+            plyr.media.duration = plyr.embed.duration();
+            plyr.media.paused = true;
+            plyr.media.currentTime = plyr.embed.time();
+
+            // Set title
+            config.title = plyr.embed.name();
+
+            // Set the tabindex
+            // if (plyr.supported.full) {
+            //     plyr.media.querySelector('iframe').setAttribute('tabindex', '-1');
+            // }
+
+            // Update UI
+            _embedReady();
+
+            // Trigger timeupdate
+            _triggerEvent(plyr.media, 'timeupdate');
+
+            // Trigger durationchange
+            _triggerEvent(plyr.media, 'durationchange');
+
+            plyr.embed.bind('play', function() {
+                plyr.media.paused = false;
+                _triggerEvent(plyr.media, 'play');
+                _triggerEvent(plyr.media, 'playing');
+            });
+
+            plyr.embed.bind('pause', function() {
+                plyr.media.paused = true;
+                _triggerEvent(plyr.media, 'pause');
+            });
+
+            // Wistia offers a couple of options for time change events:
+            // https://wistia.com/doc/player-api#secondchange
+            // https://wistia.com/doc/player-api#timechange
+            plyr.embed.bind('secondchange', function(seconds) {
+                plyr.media.seeking = false;
+                plyr.media.currentTime = seconds;
+                _triggerEvent(plyr.media, 'timeupdate');
+            });
+
+            plyr.embed.bind('seek', function() {
+                plyr.media.seeking = false;
+                _triggerEvent(plyr.media, 'seeked');
+                _triggerEvent(plyr.media, 'play');
+            });
+
+            plyr.embed.bind('end', function() {
+                plyr.media.paused = true;
+                _triggerEvent(plyr.media, 'ended');
+            });
+        }
+
         // Soundcloud ready
         function soundcloudReady() {
             /* jshint validthis: true */
@@ -2965,6 +3076,11 @@
                         player.embed.setCurrentTime(targetTime.toFixed(0));
                         break;
 
+                    case 'wistia':
+                        // Round to nearest second for Wistia
+                        plyr.embed.time(targetTime.toFixed(0));
+                        break;
+
                     case 'soundcloud':
                         player.embed.seekTo(targetTime * 1000);
                         break;
@@ -3168,6 +3284,10 @@
                         player.embed[player.elements.media.muted ? 'mute' : 'unMute']();
                         break;
 
+                    case 'wistia':
+                        plyr.embed.volume(plyr.media.muted ? 0 : parseFloat(config.volume / config.volumeMax));
+                        break;
+
                     case 'vimeo':
                     case 'soundcloud':
                         player.embed.setVolume(player.elements.media.muted ? 0 : parseFloat(config.volume / 10));
@@ -3221,6 +3341,10 @@
                 switch (player.type) {
                     case 'youtube':
                         player.embed.setVolume(player.elements.media.volume * 100);
+                        break;
+
+                    case 'wistia':
+                        plyr.embed.volume(plyr.media.volume);
                         break;
 
                     case 'vimeo':
@@ -3621,6 +3745,10 @@
                     });
                     break;
 
+                case 'wistia':
+                    url = config.urls.wistia.video + plyr.embed.hashedId();
+                    break;
+
                 case 'soundcloud':
                     player.embed.getCurrentSound(function(object) {
                         url = object.permalink_url;
@@ -3705,6 +3833,7 @@
 
                     case 'youtube':
                     case 'vimeo':
+                    case 'wistia':
                     case 'soundcloud':
                         player.elements.media = createElement('div');
                         player.embedId = source.sources[0].src;
@@ -4323,6 +4452,15 @@
 
                     break;
 
+                case 'wistia':
+                    // Destroy Wistia API
+                    plyr.embed.remove();
+
+                    // Clean up
+                    cleanUp();
+
+                    break;
+
                 case 'video':
                 case 'audio':
                     // Restore native video controls
@@ -4383,7 +4521,7 @@
             setupStorage();
 
             // Set media type based on tag or data attribute
-            // Supported: video, audio, vimeo, youtube
+            // Supported: video, audio, vimeo, youtube, wistia
             var tagName = media.tagName.toLowerCase();
             if (tagName === 'div') {
                 player.type = media.getAttribute('data-type');
@@ -4662,6 +4800,7 @@
 
             case 'vimeo':
             case 'youtube':
+            case 'wistia':
             case 'soundcloud':
                 basic = true;
                 full = (!isOldIE && !isIos);
@@ -4722,7 +4861,7 @@
                     // container: wrap(media, document.createElement('div')),
                     // Could be a container or the media itself
                     target: target,
-                    // This should be the <video>, <audio> or <div> (YouTube/Vimeo)
+                    // This should be the <video>, <audio> or <div> (YouTube/Vimeo/Wistia)
                     media: media
                 });
             }
