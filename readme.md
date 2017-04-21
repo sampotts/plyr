@@ -134,7 +134,7 @@ Plyr 是标准的HTML5标记语言的拓展，所以它有你对于这些类型�
 <script>plyr.setup();</script>
 ```
 
-如果你想使用我们的 CDN (由[Fastly]提供(https://www.fastly.com/))来获取JavaScript文件，你可以使用一下代码：
+如果你想使用我们的 CDN (由[Fastly](https://www.fastly.com/)提供)来获取JavaScript文件，你可以使用一下代码：
 
 ```html
 <script src="https://cdn.plyr.io/2.0.12/plyr.js"></script>
