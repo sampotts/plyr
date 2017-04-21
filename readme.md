@@ -1069,10 +1069,10 @@ Plyr 是花钱运维的，不算作者的时间（作者是自愿花时间来做
 让我通过[Twitter](https://twitter.com/sam_potts) 知道怎么把你加紧上述列表中。看看你使用Plyr会有多棒:-)
 
 ## 有用的连接和credits
-归功于PayPal HTML5视频播放器，从其中移植了Plyr的字幕功能：
+归功于贝宝 HTML5视频播放器，从其中移植了Plyr的字幕功能：
 - [贝宝的无障碍HTML5视频播放器](https://github.com/paypal/accessible-html5-video-player)
-- The icons used in Plyr are [Vicons](https://dribbble.com/shots/1663443-60-Vicons-Free-Icon-Set) plus some ones I made
-- [Plyr在日本的指南！](http://syncer.jp/how-to-use-plyr-io) by [@arayutw](https://twitter.com/arayutw)
+- 使用的图标是[Vicons](https://dribbble.com/shots/1663443-60-Vicons-Free-Icon-Set) 加上一些自主制作
+- [Plyr在日本的指南！](http://syncer.jp/how-to-use-plyr-io) 由 [@arayutw]提供(https://twitter.com/arayutw)
 
 此外，这些链接帮助创建了Plyr：
 - [多媒体事件- W3.org](http://www.w3.org/2010/05/video/mediaevents.html)
