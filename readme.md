@@ -930,7 +930,7 @@ Plyr引用了一个Vimeo Froogaloop API的自定义版本，因为Vimeo忽略了
   </thead>
   <tbody>
     <tr>
-      <td><code>0</code> to <code>9</code></td>
+      <td><code>0</code> 到 <code>9</code></td>
       <td>✔</td>
       <td>分别寻求跳转到0到90％</td>
     </tr> 
