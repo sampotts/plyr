@@ -147,14 +147,14 @@ Plyr 是标准的HTML5标记语言的拓展，所以它有你对于这些类型�
 <link rel="stylesheet" href="path/to/plyr.css">
 ```
 
-如果你想使用我们的 CDN (由[Fastly]提供(https://www.fastly.com/))来获取默认的CSS文件，你可以使用一下代码：
+如果你想使用我们的 CDN (由[Fastly](https://www.fastly.com/)提供)来获取默认的CSS文件，你可以使用一下代码：
 
 ```html
 <link rel="stylesheet" href="https://cdn.plyr.io/2.0.12/plyr.css">
 ```
 
 ### SVG 子画面
-SVG 子画面是从我们的CDN(由 [Fastly]提供(https://www.fastly.com/))中自动加载的。为了更改这个，详见下面的[参数](#参数)。作为参考，CDN托管的SVG子画面可以在这里找到：`https://cdn.plyr.io/2.0.12/plyr.svg`。
+SVG 子画面是从我们的CDN(由 [Fastly](https://www.fastly.com/)提供)中自动加载的。为了更改这个，详见下面的[参数](#参数)。作为参考，CDN托管的SVG子画面可以在这里找到：`https://cdn.plyr.io/2.0.12/plyr.svg`。
 ## 高级
 
 ### LESS & SASS/SCSS
