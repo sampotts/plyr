@@ -11,6 +11,8 @@
 - Finish and test PiP (need Sierra VM)
 - Finish and test AirPlay (need Sierra VM)
 
+- Download button - grab first <source> or src attribute (or maybe use currentSrc?) for HTML5 and links for embedded players
+
 # Notes
 - No quality HTML5 support (yet)
 - No Vimeo quality support
