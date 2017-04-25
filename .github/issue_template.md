@@ -21,6 +21,7 @@ Players affected:
 - [ ] HTML5 Audio
 - [ ] YouTube
 - [ ] Vimeo
+- [ ] Wistia
 
 ### Steps to reproduce 
 - 

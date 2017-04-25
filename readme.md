@@ -1,5 +1,5 @@
 # Plyr
-A simple, accessible and customizable HTML5, YouTube and Vimeo media player.
+A simple, accessible and customizable HTML5, YouTube, Vimeo and Wistia media player.
 
 [Donate to support Plyr](#donate)
 
@@ -17,10 +17,10 @@ We wanted a lightweight, accessible and customizable media player that supports 
 - **Semantic** - uses the *right* elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no `<span>` or `<a href="#">` button hacks
 - **Responsive** - works with any screen size
 - **HTML Video & Audio** - support for both formats
-- **[Embedded Video](#embeds)** - support for YouTube and Vimeo video playback
+- **[Embedded Video](#embeds)** - support for YouTube, Vimeo and Wistia video playback
 - **[Streaming](#streaming)** - support for hls.js, Shaka and dash.js streaming playback
 - **[API](#api)** - toggle playback, volume, seeking, and more
-- **[Events](#events)** - no messing around with Vimeo and YouTube APIs, all events are standardized across formats
+- **[Events](#events)** - no messing around with Youtube, Vimeo and Wistia APIs, all events are standardized across formats
 - **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes
 - **[Shortcuts](#shortcuts)** - supports keyboard shortcuts
 - **i18n support** - support for internationalization of controls
@@ -45,7 +45,6 @@ Check out the [changelog](changelog.md) to see what's new with Plyr.
 - Playlists
 - Google cast
 - Facebook video support
-- Wistia video support
 - YouTube and Vimeo audio support
 - Audio captions
 ...and whatever else has been raised in [issues](https://github.com/Selz/plyr/issues)
@@ -111,7 +110,7 @@ Plyr extends upon the standard HTML5 markup so that's all you need for those typ
 </audio>
 ```
 
-For YouTube and Vimeo, Plyr uses the standard YouTube API markup (an empty `<div>`):
+For YouTube, Vimeo and Wistia, Plyr uses the standard YouTube API markup (an empty `<div>`):
 
 #### YouTube embed
 ```html
@@ -493,17 +492,17 @@ Here's a list of the methods supported:
   <tr>
     <td><code>getMedia()</code></td>
     <td>&mdash;</td>
-    <td>Get the media element (<code>&gt;video&lt;</code>, <code>&gt;audio&lt;</code> or <code>&gt;div&lt;</code> for YouTube or Vimeo).</td>
+    <td>Get the media element (<code>&gt;video&lt;</code>, <code>&gt;audio&lt;</code> or <code>&gt;div&lt;</code> for YouTube, Vimeo or Wistia).</td>
   </tr>
   <tr>
     <td><code>getEmbed()</code></td>
     <td>&mdash;</td>
-    <td>Get the [embed](#embed) API to access those methods - either YouTube or Vimeo.</td>
+    <td>Get the [embed](#embed) API to access those methods - either YouTube, Vimeo or Wistia.</td>
   </tr>
   <tr>
     <td><code>getType()</code></td>
     <td>&mdash;</td>
-    <td>Get the type - 'video', 'audio', 'youtube' or 'vimeo'.</td>
+    <td>Get the type - 'video', 'audio', 'youtube', 'vimeo' or 'wistia'.</td>
   </tr>
   <tr>
     <td><code>isReady()</code></td>
@@ -613,7 +612,7 @@ Here's a list of the methods supported:
   <tr>
     <td><code>support(...)</code></td>
     <td>String</td>
-    <td>Determine if a player supports a certain MIME type. This is not supported for embedded content (YouTube).</td>
+    <td>Determine if a player supports a certain MIME type. This is not supported for embedded content (YouTube, Vimeo, Wistia).</td>
   </tr>
   <tr>
     <td><code>source(...)</code></td>
@@ -738,7 +737,7 @@ More details on the object parameters
     <tr>
       <td><code>type</code></td>
       <td>String</td>
-      <td>Options are <code>video</code>, <code>audio</code>, <code>youtube</code> and <code>vimeo</code></td>
+      <td>Options are <code>video</code>, <code>audio</code>, <code>youtube</code>, <code>vimeo</code> and <code>wistia</code>.</td>
     </tr>
     <tr>
       <td><code>title</code></td>
@@ -748,7 +747,7 @@ More details on the object parameters
     <tr>
       <td><code>sources</code></td>
       <td>Array</td>
-      <td>This is an array of sources. <code>type</code> is optional for YouTube and Vimeo when specifying an array. For YouTube and Vimeo media, the video ID or URL must be passed as the source as shown above. The keys of this object are mapped directly to HTML attributes so more can be added to the object if required.</td>
+      <td>This is an array of sources. <code>type</code> is optional for YouTube, Vimeo and Wistia when specifying an array. For YouTube, Vimeo and Wistia media, the video ID or URL must be passed as the source as shown above. The keys of this object are mapped directly to HTML attributes so more can be added to the object if required.</td>
     </tr>
     <tr>
       <td><code>poster</code></td>
@@ -791,7 +790,7 @@ These events also bubble up the DOM. The event target will be the container elem
     <tr>
       <td><code>ready</code></td>
       <td></td>
-      <td>Triggered when the instance is ready for API use and external APIs are ready (in the case of YouTube and Vimeo).</td>
+      <td>Triggered when the instance is ready for API use and external APIs are ready (in the case of YouTube, Vimeo and Wistia).</td>
     </tr>
   	<tr>
   		<td><code>canplay</code></td>
@@ -914,9 +913,9 @@ These events also bubble up the DOM. The event target will be the container elem
 Details borrowed from: [https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events](https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events)
 
 ## Embeds
-YouTube and Vimeo are currently supported and function much like a HTML5 video. Check the relevant documentation sections for any differences.
+YouTube, Vimeo and Wistia are currently supported and function much like a HTML5 video. Check the relevant documentation sections for any differences.
 
-Plyr references a custom version of the Vimeo Froogaloop API as Vimeo have neglected to maintain the library and there were bugs with their version. You don't need to worry about including your own versions of the Vimeo or YouTube JavaScript APIs.
+Plyr references a custom version of the Vimeo Froogaloop API as Vimeo have neglected to maintain the library and there were bugs with their version. You don't need to worry about including your own versions of the Vimeo, YouTube or Wistia JavaScript APIs.
 
 The embed third party API's can be accessed through the `getEmbed()` API method.
 
@@ -924,8 +923,9 @@ More info on the respective API's here:
 
 - [YouTube API Reference](https://developers.google.com/youtube/js_api_reference)
 - [Vimeo API Reference](https://developer.vimeo.com/player/js-api#reference)
+- [Wistia API Reference](https://wistia.com/doc/player-api)
 
-*Please note*: not all API methods may work 100%. Your mileage may vary. It's better to use the universal plyr API where possible.
+*Please note*: not all API methods may work 100%. Your mileage may vary. It's better to use the universal Plyr API where possible.
 
 ## Shortcuts
 By default, a player will bind the following keyboard shortcuts when it has focus. If you have the `global` option to `true` and there's only one player in the document then the shortcuts will work when any element has focus, apart from an element that requires input.
