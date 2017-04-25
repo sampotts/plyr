@@ -2530,12 +2530,12 @@
             // Setup instance
             // https://github.com/vimeo/player.js
             plyr.embed = new window.Vimeo.Player(container, {
-                id:         mediaId,
-                loop:       config.loop,
-                autoplay:   config.autoplay,
-                byline:     false,
-                portrait:   false,
-                title:      false
+                id: mediaId,
+                loop: config.loop,
+                autoplay: config.autoplay,
+                byline: false,
+                portrait: false,
+                title: false
             });
 
             // Create a faux HTML5 API using the Vimeo API
@@ -2815,23 +2815,17 @@
                 speed = parseFloat(player.storage.speed || config.speed.selected);
             }
 
+            // Set min/max
+            if (speed < 0.1) {
+                speed = 0.1;
+            }
+            if (speed > 2.0) {
+                speed = 2.0;
+            }
+
             if (!is.array(config.speed.options)) {
                 warn('Invalid speeds format');
                 return;
-            }
-
-            if (!is.number(speed)) {
-                var index = config.speed.options.indexOf(config.speed.selected);
-
-                if (index !== -1) {
-                    var next = index + 1;
-                    if (next >= config.speeds.length) {
-                        next = 0;
-                    }
-                    speed = config.speed.options[next];
-                } else {
-                    speed = config.speed.selected;
-                }
             }
 
             // Store current speed
@@ -4026,16 +4020,21 @@
 
             // Settings menu items - use event delegation as items are added/removed
             on(player.elements.settings.menu, 'click', function(event) {
-                // Settings - Speed
-                if (matches(event.target, config.selectors.inputs.speed)) {
-                    handlerProxy.call(this, event, config.listeners.speed, setSpeed);
+                // Settings - Language
+                if (matches(event.target, config.selectors.inputs.language)) {
+                    handlerProxy.call(this, event, config.listeners.language, setLanguage);
                 }
 
                 // Settings - Quality
                 else if (matches(event.target, config.selectors.inputs.quality)) {
                     handlerProxy.call(this, event, config.listeners.quality, function() {
-                        console.warn("Set quality");
+                        warn("Set quality");
                     });
+                }
+
+                // Settings - Speed
+                else if (matches(event.target, config.selectors.inputs.speed)) {
+                    handlerProxy.call(this, event, config.listeners.speed, setSpeed);
                 }
 
                 // Settings - Looping
@@ -4049,11 +4048,6 @@
                             toggleLoop(value);
                         }
                     });
-                }
-
-                // Settings - Language
-                else if (matches(event.target, config.selectors.inputs.language)) {
-                    handlerProxy.call(this, event, config.listeners.language, setLanguage);
                 }
             });
 
