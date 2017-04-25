@@ -154,7 +154,7 @@
                     type: 'video',
                     title: 'View From A Blue Moon',
                     sources: [{
-                        src: 'bTqVqk7FSmY',
+                        src: 'https://www.youtube.com/watch?v=bTqVqk7FSmY',
                         type: 'youtube'
                     }]
                 });
@@ -165,7 +165,7 @@
                     type: 'video',
                     title: 'View From A Blue Moon',
                     sources: [{
-                        src: '143418951',
+                        src: 'https://vimeo.com/147860358',
                         type: 'vimeo'
                     }]
                 });

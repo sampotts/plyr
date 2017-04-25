@@ -35,6 +35,7 @@
     // Default config
     var defaults = {
         enabled: true,
+        title: '',
         debug: false,
         autoplay: false,
         seekTime: 10,
@@ -233,6 +234,7 @@
             end: 'End',
             all: 'All',
             reset: 'Reset',
+            none: 'None'
         },
 
         // URLs
@@ -806,7 +808,7 @@
     // Parse YouTube ID from url
     function parseYouTubeId(url) {
         var regex = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-        return (url.match(regex)) ? RegExp.$2 : url;
+        return url.match(regex) ? RegExp.$2 : url;
     }
 
     // Fullscreen API
@@ -1663,11 +1665,23 @@
                 return;
             }
 
-            [].forEach.call(player.captions.tracks, function(track) {
-                if (is.function(track)) {
-                    return;
+            // Re-map the tracks into just the data we need
+            var tracks = [].map.call(player.captions.tracks, function(track) {
+                return {
+                    language: track.language,
+                    badge: true,
+                    label: !is.empty(track.label) ? track.label : track.language.toUpperCase()
                 }
+            });
 
+            // Add the "None" option to turn off captions
+            tracks.unshift({
+                language: 'off',
+                label: config.i18n.none
+            });
+
+            // Generate options
+            tracks.forEach(function(track) {
                 var item = createElement('li');
 
                 var label = createElement('label', {
@@ -1688,7 +1702,10 @@
 
                 label.appendChild(radio);
                 label.appendChild(document.createTextNode(track.label || track.language));
-                label.appendChild(createBadge(track.language.toUpperCase()));
+
+                if (track.badge) {
+                    label.appendChild(createBadge(track.language.toUpperCase()));
+                }
 
                 item.appendChild(label);
 
@@ -2099,7 +2116,7 @@
             var label = config.i18n.play;
 
             // If there's a media title set, use that for the label
-            if (is.string(config.title) && config.title.length) {
+            if (is.string(config.title) && !is.empty(config.title)) {
                 label += ', ' + config.title;
 
                 // Set container label
@@ -2119,7 +2136,8 @@
             // Set iframe title
             // https://github.com/Selz/plyr/issues/124
             if (is.htmlElement(iframe)) {
-                iframe.setAttribute('title', config.i18n.frameTitle.replace('{title}', config.title));
+                var title = is.string(config.title) && !is.empty(config.title) ? config.title : 'video';
+                iframe.setAttribute('title', config.i18n.frameTitle.replace('{title}', title));
             }
         }
 
@@ -2529,9 +2547,9 @@
         function vimeoReady(mediaId, container) {
             // Setup instance
             // https://github.com/vimeo/player.js
-            plyr.embed = new window.Vimeo.Player(container, {
+            player.embed = new window.Vimeo.Player(container, {
                 id: mediaId,
-                loop: config.loop,
+                loop: config.loop.active,
                 autoplay: config.autoplay,
                 byline: false,
                 portrait: false,
