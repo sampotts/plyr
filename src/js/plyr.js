@@ -1783,9 +1783,9 @@
         }
 
         // Setup captions
-        function setupCaptions() {
-            // Bail if not HTML5 video or textTracks not supported
-            if (player.type !== 'video' || !support.textTracks) {
+        function setupCaptions(tracks) {
+            // Only Vimeo and HTML5 video supported at this point
+            if (!inArray(['video', 'vimeo'], player.type) || (player.type === 'video' && !support.textTracks)) {
                 return;
             }
 
@@ -1796,12 +1796,20 @@
             }
 
             // Get tracks
-            player.captions.tracks = player.elements.media.textTracks;
+            player.captions.tracks = is.array(tracks) ? tracks : player.elements.media.textTracks;
+
+            // Set the class hook
+            toggleClass(player.elements.container, config.classes.captions.enabled, !is.empty(player.captions.tracks));
 
             // If no caption file exists, hide container for caption text
             if (is.empty(player.captions.tracks)) {
-                toggleClass(player.elements.container, config.classes.captions.enabled);
-            } else {
+                return;
+            }
+
+            // Enable UI
+            showCaptions();
+
+            if (player.type === 'video') {
                 var language = config.captions.language.toLowerCase();
 
                 // Turn off native caption rendering to avoid double captions
@@ -1824,9 +1832,6 @@
                     player.captions.currentTrack = player.captions.tracks[0];
                 }
 
-                // Enable UI
-                showCaptions(player);
-
                 // If it's a caption or subtitle, render it
                 var track = player.captions.currentTrack;
                 if (is.track(track) && inArray(['captions', 'subtitles'], track.kind)) {
@@ -1837,10 +1842,10 @@
                         setActiveCue(track);
                     }
                 }
-
-                // Set available languages in list
-                setCaptionsMenu();
             }
+
+            // Set available languages in list
+            setCaptionsMenu();
         }
 
         // Get current selected caption language
@@ -1891,13 +1896,11 @@
 
         // Set the current caption
         function setCaption(caption) {
-            var captions = getElement(config.selectors.captions);
-
-            if (is.htmlElement(captions)) {
+            if (is.htmlElement(player.elements.captions)) {
                 var content = createElement('span');
 
                 // Empty the container
-                emptyElement(captions);
+                emptyElement(player.elements.captions);
 
                 // Default to empty
                 if (is.undefined(caption)) {
@@ -1912,10 +1915,12 @@
                 }
 
                 // Set new caption text
-                captions.appendChild(content);
+                player.elements.captions.appendChild(content);
 
                 // Force redraw (for Safari)
                 // var redraw = captions.offsetHeight;
+            } else {
+                warn('No captions element to render to');
             }
         }
 
@@ -1925,8 +1930,6 @@
             if (!player.elements.buttons.captions) {
                 return;
             }
-
-            toggleClass(player.elements.container, config.classes.captions.enabled, true);
 
             // Try to load the value from storage
             var active = player.storage.captions;
@@ -1998,18 +2001,34 @@
             // Create a unique ID
             player.id = Math.floor(Math.random() * 10000);
 
+            // Null by default
+            var controls = null;
+
+            // HTML passed as the option
+            if (is.string(config.controls)) {
+                controls = config.controls;
+            }
+            // A custom function to build controls
+            // The function can return a HTMLElement or String
+            else if (is.function(config.controls)) {
+                controls = config.controls({
+                    id: player.id,
+                    seektime: config.seekTime
+                });
+            }
             // Create controls
-            var controls = createControls({
-                id: player.id,
-                seektime: config.seekTime,
-                speed: getSpeed(),
-                // TODO: Get current quality
-                quality: 'HD',
-                // TODO: Set language automatically based on UA?
-                captions: getLanguage(),
-                // TODO: Get loop
-                loop: 'None'
-            });
+            else {
+                controls = createControls({
+                    id: player.id,
+                    seektime: config.seekTime,
+                    speed: getSpeed(),
+                    // TODO: Get current quality
+                    quality: 'HD',
+                    captions: getLanguage(),
+                    // TODO: Get loop
+                    loop: 'None'
+                });
+            }
 
             // Controls container
             var target;
@@ -2025,8 +2044,16 @@
             }
 
             // Inject controls HTML
-            // target.insertAdjacentHTML('beforeend', html);
-            target.appendChild(controls);
+            if (is.htmlElement(controls)) {
+                target.appendChild(controls);
+            } else {
+                target.insertAdjacentHTML('beforeend', controls);
+            }
+
+            // Find the elements if need be
+            if (is.htmlElement(player.elements.controls)) {
+                findElements();
+            }
 
             // Setup tooltips
             if (config.tooltips.controls) {
@@ -2041,9 +2068,9 @@
             }
         }
 
-        // Find the UI controls and store references
-        // TODO: Re-configure for new elements
-        /*function findElements() {
+        // Find the UI controls and store references in custom controls
+        // TODO: Allow settings menus with custom controls (coming soon!)
+        function findElements() {
             try {
                 player.elements.controls = getElement(config.selectors.controls.wrapper);
 
@@ -2054,14 +2081,12 @@
                     restart: getElement(config.selectors.buttons.restart),
                     rewind: getElement(config.selectors.buttons.rewind),
                     forward: getElement(config.selectors.buttons.forward),
-                    fullscreen: getElement(config.selectors.buttons.fullscreen),
-                    settings: getElement(config.selectors.buttons.settings),
-                    pip: getElement(config.selectors.buttons.pip),
-                    //lang: getElement(config.selectors.buttons.captions_lang),
-                    speed: getElement(config.selectors.buttons.speed),
-                    loop: getElement(config.selectors.buttons.loop),
                     mute: getElement(config.selectors.buttons.mute),
-                    captions: getElement(config.selectors.buttons.captions)
+                    pip: getElement(config.selectors.buttons.pip),
+                    airplay: getElement(config.selectors.buttons.airplay),
+                    settings: getElement(config.selectors.buttons.settings),
+                    captions: getElement(config.selectors.buttons.captions),
+                    fullscreen: getElement(config.selectors.buttons.fullscreen)
                 };
 
                 // Progress
@@ -2070,7 +2095,7 @@
                 // Inputs
                 player.elements.inputs = {
                     seek: getElement(config.selectors.inputs.seek),
-                    volume: getElement(config.selectors.inputs.volume)
+                    volume: getElement(config.selectors.inputs.volume),
                 };
 
                 // Display
@@ -2089,6 +2114,7 @@
 
                 return true;
             } catch (error) {
+                // Log it
                 warn('It looks like there is a problem with your custom controls HTML', error);
 
                 // Restore native video controls
@@ -2096,7 +2122,7 @@
 
                 return false;
             }
-        }*/
+        }
 
         // Toggle style hook
         function toggleStyleHook() {
@@ -2226,14 +2252,12 @@
                 // Inject the player wrapper
                 if (player.type === 'video') {
                     // Create the wrapper div
-                    var wrapper = createElement('div');
-                    wrapper.setAttribute('class', config.classes.videoWrapper);
+                    player.elements.wrapper = createElement('div', {
+                        class: config.classes.videoWrapper
+                    });
 
                     // Wrap the video in a container
-                    wrap(player.elements.media, wrapper);
-
-                    // Cache the container
-                    player.elements.wrapper = wrapper;
+                    wrap(player.elements.media, player.elements.wrapper);
                 }
             }
 
@@ -2595,10 +2619,7 @@
             // Get captions
             player.embed.getTextTracks().then(function(tracks) {
                 // tracks = an array of track objects
-                player.captions.tracks = tracks;
-
-                // Populate the menu
-                setCaptionsMenu();
+                setupCaptions(tracks);
 
                 // TODO: Captions
                 if (config.captions.active) {
@@ -2608,6 +2629,10 @@
 
             player.embed.on('cuechange', function(data) {
                 log(data);
+
+                var track = data.cues[0].html;
+
+                setCaption(track);
             });
 
             player.embed.on('loaded', function() {
@@ -4434,17 +4459,18 @@
             }
 
             // Inject custom controls if not present
-            if (!is.htmlElement(getElement(config.selectors.controls.wrapper))) {
+            if (!is.htmlElement(player.elements.controls)) {
                 // Inject custom controls
                 injectControls();
+
+                // Re-attach listeners
                 controlListeners();
             }
 
-            // Find the elements
-            // TODO: re-enable when custom HTML is restored
-            /*if (!findElements()) {
+            // If there's no controls, bail
+            if (!is.htmlElement(player.elements.controls)) {
                 return;
-            }*/
+            }
 
             // Media element listeners
             mediaListeners();

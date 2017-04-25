@@ -10,6 +10,7 @@
 [ ] Finish and test AirPlay (need Sierra VM)
 [ ] Download button - grab first <source> or src attribute (or maybe use currentSrc?) for HTML5 and links for embedded players
 [ ] Controls hide/show events
+[ ] Test custom controls still works
 
 #### Bugs
 [ ] Fix audio setup bug when calling .setup() again
@@ -28,6 +29,7 @@
 #### Breaking changes
 - New config options for loop
 - Selectors changes (new `input` and `display` object) - DOCUMENT
+- Custom HTML option now `controls` which accepts a string (HTML), a function (your own template engine) or array (use built in controls)
 
 ## Added
 - Seek i8n label
