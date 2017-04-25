@@ -165,7 +165,7 @@
                     type: 'video',
                     title: 'View From A Blue Moon',
                     sources: [{
-                        src: 'https://vimeo.com/147860358',
+                        src: 'https://vimeo.com/76979871',
                         type: 'vimeo'
                     }]
                 });

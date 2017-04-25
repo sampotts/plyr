@@ -176,7 +176,7 @@
 
         // Captions settings
         captions: {
-            defaultActive: false,
+            active: false,
             language: window.navigator.language.split("-")[0]
         },
 
@@ -1933,7 +1933,9 @@
 
             // Otherwise fall back to the default config
             if (!is.boolean(active)) {
-                active = config.captions.defaultActive;
+                active = config.captions.active;
+            } else {
+                config.captions.active = active;
             }
 
             if (active) {
@@ -2379,7 +2381,7 @@
                     rel: 0,
                     showinfo: 0,
                     iv_load_policy: 3,
-                    cc_load_policy: (config.captions.defaultActive ? 1 : 0),
+                    cc_load_policy: (config.captions.active ? 1 : 0),
                     cc_lang_pref: 'en',
                     wmode: 'transparent',
                     modestbranding: 1,
@@ -2590,10 +2592,23 @@
                 trigger(player.elements.media, 'durationchange');
             });
 
-            // TODO: Captions
-            /*if (config.captions.defaultActive) {
-                player.embed.enableTextTrack('en');
-            }*/
+            // Get captions
+            player.embed.getTextTracks().then(function(tracks) {
+                // tracks = an array of track objects
+                player.captions.tracks = tracks;
+
+                // Populate the menu
+                setCaptionsMenu();
+
+                // TODO: Captions
+                if (config.captions.active) {
+                    player.embed.enableTextTrack(config.captions.language.toLowerCase());
+                }
+            });
+
+            player.embed.on('cuechange', function(data) {
+                log(data);
+            });
 
             player.embed.on('loaded', function() {
                 // Fix keyboard focus issues
