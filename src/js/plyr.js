@@ -775,12 +775,6 @@
         return (url.match(regex)) ? RegExp.$2 : url;
     }
 
-    // Parse Vimeo ID from url
-    function parseVimeoId(url) {
-        var regex = /^.*(vimeo.com\/|video\/)(\d+).*/;
-        return (url.match(regex)) ? RegExp.$2 : url;
-    }
-
     // Fullscreen API
     var fullscreen = (function() {
         // Determine the prefix
@@ -2490,10 +2484,6 @@
                     mediaId = parseYouTubeId(player.embedId);
                     break;
 
-                case 'vimeo':
-                    mediaId = parseVimeoId(player.embedId);
-                    break;
-
                 default:
                     mediaId = player.embedId;
             }
@@ -2788,13 +2778,13 @@
         function vimeoReady(mediaId, container) {
             // Setup instance
             // https://github.com/vimeo/player.js
-            player.embed = new window.Vimeo.Player(container, {
-                id: parseInt(mediaId),
-                loop: config.loop.active,
-                autoplay: config.autoplay,
-                byline: false,
-                portrait: false,
-                title: false
+            plyr.embed = new window.Vimeo.Player(container, {
+                id:         mediaId,
+                loop:       config.loop,
+                autoplay:   config.autoplay,
+                byline:     false,
+                portrait:   false,
+                title:      false
             });
 
             // Create a faux HTML5 API using the Vimeo API
