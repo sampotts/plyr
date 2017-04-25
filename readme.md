@@ -34,7 +34,7 @@ Check out the [changelog](changelog.md) to see what's new with Plyr.
 
 ## Features currently being developed
 - Playback speed selection
-- Quality selection 
+- Quality selection
 - Caption language selection
 - AirPlay
 - Picture in Picture (MacOS Sierra + Safari)
@@ -126,7 +126,7 @@ Note: `data-video-id` value can now be the ID or URL for the video. This attribu
 ```
 Note: `data-video-id` value can now be the ID or URL for the video. This attribute name will change in a future release to reflect this change.
 
-### JavaScript 
+### JavaScript
 Include the `plyr.js` script before the closing `</body>` tag and then call `plyr.setup()`. More info on `setup()` can be found under [initialising](#initialising).
 
 ```html
@@ -159,7 +159,7 @@ The SVG sprite is loaded automatically from our CDN (provided by [Fastly](https:
 ## Advanced
 
 ### LESS & SASS/SCSS
-You can use `plyr.less` or `plyr.scss` file included in `/src` as part of your build and change variables to suit your design. The LESS and SASS require you to use the [autoprefixer](https://www.npmjs.com/package/gulp-autoprefixer) plugin (you should already) as all declerations use the W3C definitions - e.g. `appearance: none;` will be prefixed to `-webkit-appearance: none;` by autoprefixer. 
+You can use `plyr.less` or `plyr.scss` file included in `/src` as part of your build and change variables to suit your design. The LESS and SASS require you to use the [autoprefixer](https://www.npmjs.com/package/gulp-autoprefixer) plugin (you should already) as all declerations use the W3C definitions - e.g. `appearance: none;` will be prefixed to `-webkit-appearance: none;` by autoprefixer.
 
 The HTML markup uses the BEM methodology with `plyr` as the block, e.g. `.plyr__controls`. You can change the class hooks in the options to match any custom CSS you write. Check out the JavaScript source for more on this.
 
@@ -167,7 +167,7 @@ The HTML markup uses the BEM methodology with `plyr` as the block, e.g. `.plyr__
 The icons used in the Plyr controls are loaded in an SVG sprite. The sprite is automatically loaded from our CDN by default. If you already have an icon build system in place, you can include the source plyr icons (see `/src/sprite` for source icons).
 
 #### Using the `iconUrl` option
-You can however specify your own `iconUrl` option and Plyr will determine if the url is absolute and requires loading by AJAX/CORS due to current browser limitations or if it's a relative path, just use the path directly. 
+You can however specify your own `iconUrl` option and Plyr will determine if the url is absolute and requires loading by AJAX/CORS due to current browser limitations or if it's a relative path, just use the path directly.
 
 If you're using the `<base>` tag on your site, you may need to use something like this:
 [svgfixer.js](https://gist.github.com/leonderijke/c5cf7c5b2e424c0061d2)
@@ -213,7 +213,7 @@ Passing a [string selector](https://developer.mozilla.org/en-US/docs/Web/API/Doc
 plyr.setup('.js-player', options);
 ```
 
-The NodeList, HTMLElement or string selector can be the target `<video>`, `<audio>` or `[data-type]` (for embeds) element itself or a container element. 
+The NodeList, HTMLElement or string selector can be the target `<video>`, `<audio>` or `[data-type]` (for embeds) element itself or a container element.
 
 Passing just the options object:
 ```javascript
@@ -223,7 +223,7 @@ plyr.setup(options);
 `setup()` will return an array of *instances* that can be used with the [API](#api) methods. See the [API](#api) section for more info.
 
 #### RangeTouch
-Some touch browsers (particularly Mobile Safari on iOS) seem to have issues with `<input type="range">` elements whereby touching the track to set the value doesn't work and sliding the thumb can be tricky. To combat this, I've created [RangeTouch](https://rangetouch.com) which I'd recommend including in your solution. It's a tiny script with a nice benefit for users on touch devices. 
+Some touch browsers (particularly Mobile Safari on iOS) seem to have issues with `<input type="range">` elements whereby touching the track to set the value doesn't work and sliding the thumb can be tricky. To combat this, I've created [RangeTouch](https://rangetouch.com) which I'd recommend including in your solution. It's a tiny script with a nice benefit for users on touch devices.
 
 #### Options
 Options must be passed as an object to the `setup()` method as above or as JSON in `data-plyr` attribute on each of your target elements:
@@ -369,28 +369,16 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
       <td>Displays the duration of the media on the "metadataloaded" event (on startup) in the current time display. This will only work if the `preload` attribute is not set to `none` (or is not set at all) and you choose not to display the duration (see <code>controls</code> option).</td>
     </tr>
     <tr>
-      <td><code>selectors</code></td>
-      <td>Object</td>
-      <td>&mdash;</td>
-      <td>See <code>plyr.js</code> in <code>/src</code> for more info. You probably don't need to change any of these.</td>
-    </tr>
-    <tr>
       <td><code>listeners</code></td>
       <td>Object</td>
       <td>&mdash;</td>
       <td>Allows early binding of event listeners to the controls. See <code>controls</code> above for list of controls and see <code>plyr.js</code> in <code>/src</code> for more info.</td>
     </tr>
     <tr>
-      <td><code>classes</code></td>
-      <td>Object</td>
-      <td>&mdash;</td>
-      <td>Similar to above, these are the classes added to the player when state changes occur.</td>
-    </tr>
-    <tr>
       <td><code>captions</code></td>
       <td>Object</td>
       <td>&mdash;</td>
-      <td>One property <code>defaultActive</code> which toggles if captions should be on by default. The default value is <code>false</code>.</td>
+      <td>Two properties: <code>defaultActive</code> which toggles if captions should be on by default. The default value is <code>false</code>. The <code>selectedIndex</code> property sets the default starting index for the caption tracks.</td>
     </tr>
     <tr>
       <td><code>fullscreen</code></td>
@@ -403,6 +391,18 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
       <td>Object</td>
       <td>&mdash;</td>
       <td>Two properties; <code>enabled</code> which toggles if local storage should be enabled (if the browser supports it). The default value is `true`. This enables storing user settings, currently it only stores volume but more will be added later. The second property <code>key</code> is the key used for the local storage. The default is <code>plyr_volume</code> until more settings are stored.</td>
+    </tr>
+    <tr>
+      <td><code>speeds</code></td>
+      <td>Array</td>
+      <td>[1.0, 1.5, 2.0, 0.5]</td>
+      <td>Playback speed list.</td>
+    </tr>
+    <tr>
+      <td><code>loops</code></td>
+      <td>Array</td>
+      <td>[Loop All, Loop in, Loop out, No Loop]</td>
+      <td>Playback loop list.</td>
     </tr>
   </tbody>
 </table>
@@ -456,7 +456,7 @@ This will return an array of all instances that were setup. Another way is to us
 var players = plyr.get('.js-player');
 ```
 
-If no argument is passed, it will find all instances in the current document. This will return an array of all instances that were found in the given selector. 
+If no argument is passed, it will find all instances in the current document. This will return an array of all instances that were found in the given selector.
 
 A final option is to access the instance through the event handlers:
 
@@ -596,6 +596,11 @@ Here's a list of the methods supported:
     <td>Toggles whether captions are enabled.</td>
   </tr>
   <tr>
+    <td><code>setCaptionIndex()</code></td>
+    <td>Number</td>
+    <td>Set the active track to the provided number. Index starts with 0.</td>
+  </tr>
+  <tr>
     <td><code>toggleFullscreen()</code></td>
     <td>Event</td>
     <td>Toggles fullscreen. This can only be initiated by a user gesture due to browser security, i.e. a user event such as click.</td>
@@ -663,7 +668,12 @@ player.source({
       srclang:'en',
       src:    '/path/to/captions.vtt',
       default: true
-  }]
+  }],
+  loopKeyEvents: {
+      toggleLoop: 76,
+      loopin:     73,
+      loopout:    79
+  }
 });
 ```
 
@@ -908,7 +918,7 @@ YouTube and Vimeo are currently supported and function much like a HTML5 video. 
 
 Plyr references a custom version of the Vimeo Froogaloop API as Vimeo have neglected to maintain the library and there were bugs with their version. You don't need to worry about including your own versions of the Vimeo or YouTube JavaScript APIs.
 
-The embed third party API's can be accessed through the `getEmbed()` API method. 
+The embed third party API's can be accessed through the `getEmbed()` API method.
 
 More info on the respective API's here:
 
@@ -918,7 +928,7 @@ More info on the respective API's here:
 *Please note*: not all API methods may work 100%. Your mileage may vary. It's better to use the universal plyr API where possible.
 
 ## Shortcuts
-By default, a player will bind the following keyboard shortcuts when it has focus. If you have the `global` option to `true` and there's only one player in the document then the shortcuts will work when any element has focus, apart from an element that requires input. 
+By default, a player will bind the following keyboard shortcuts when it has focus. If you have the `global` option to `true` and there's only one player in the document then the shortcuts will work when any element has focus, apart from an element that requires input.
 
 <table class="table" width="100%">
   <thead>
@@ -933,7 +943,7 @@ By default, a player will bind the following keyboard shortcuts when it has focu
       <td><code>0</code> to <code>9</code></td>
       <td>✔</td>
       <td>Seek from 0 to 90% respectively</td>
-    </tr> 
+    </tr>
     <tr>
       <td><code>space</code></td>
       <td></td>
@@ -979,10 +989,25 @@ By default, a player will bind the following keyboard shortcuts when it has focu
       <td>✔</td>
       <td>Toggle captions</td>
     </tr>
+    <tr>
+      <td><code>l</code></td>
+      <td></td>
+      <td>Toggle Loop All/No Loop</td>
+    </tr>
+    <tr>
+      <td><code>i</code></td>
+      <td></td>
+      <td>Set the start marker of the loop</td>
+    </tr>
+    <tr>
+      <td><code>o</code></td>
+      <td></td>
+      <td>Set the end marker of the loop</td>
+    </tr>
   </tbody>
 </table>
 
-## Streaming 
+## Streaming
 Because Plyr is an extension of the standard HTML5 video and audio elements, third party streaming plugins can be used with Plyr. Massive thanks to Matias Russitto ([@russitto](https://github.com/russitto)) for working on this. Here's a few examples:
 
 - Using [hls.js](https://github.com/dailymotion/hls.js) - [Demo](http://codepen.io/sampotts/pen/JKEMqB)
@@ -990,7 +1015,7 @@ Because Plyr is an extension of the standard HTML5 video and audio elements, thi
 - Using [dash.js](https://github.com/Dash-Industry-Forum/dash.js) - [Demo](http://codepen.io/sampotts/pen/BzpJXN)
 
 ## Fullscreen
-Fullscreen in Plyr is supported by all browsers that [currently support it](http://caniuse.com/#feat=fullscreen). 
+Fullscreen in Plyr is supported by all browsers that [currently support it](http://caniuse.com/#feat=fullscreen).
 
 ## Browser support
 
@@ -1082,7 +1107,7 @@ Also these links helped created Plyr:
 ## Thanks
 [![Fastly](https://www.fastly.com/sites/all/themes/custom/fastly2016/logo.png)](https://www.fastly.com/)
 
-Thanks to [Fastly](https://www.fastly.com/) for providing the CDN services. 
+Thanks to [Fastly](https://www.fastly.com/) for providing the CDN services.
 
 ## Copyright and License
 [The MIT license](license.md).
