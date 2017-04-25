@@ -1,9 +1,9 @@
 // ==========================================================================
 // Gulp build script
 // ==========================================================================
-/*global require, __dirname,Buffer*/
-/*jshint -W079 */
-
+/* global require, __dirname,Buffer */
+/* jshint -W079 */
+/* beautify ignore:start */
 var fs          = require("fs"),
     path        = require("path"),
     gulp        = require("gulp"),
@@ -77,20 +77,20 @@ function loadJSON(path) {
 // Create a file from a string
 // http://stackoverflow.com/questions/23230569/how-do-you-create-a-file-from-a-string-in-gulp
 function createFile(filename, string) {
-    var src = require('stream').Readable({ 
-        objectMode: true 
+    var src = require('stream').Readable({
+        objectMode: true
     });
     src._read = function () {
-        this.push(new gutil.File({ 
-            cwd: "", 
-            base: "", 
-            path: filename, 
+        this.push(new gutil.File({
+            cwd: "",
+            base: "",
+            path: filename,
             contents: new Buffer(string),
             // stats also required for some functions
             // https://nodejs.org/api/fs.html#fs_class_fs_stats
             stat: {
                 size: string.length
-            } 
+            }
         }));
         this.push(null);
     }
@@ -296,7 +296,7 @@ gulp.task("demo", function () {
 });
 
 // Open the demo site to check it's sweet
-gulp.task("symlinks", function () {
+/*gulp.task("symlinks", function () {
     console.log("Updating symlinks...");
 
     return gulp.src(paths.upload)
@@ -316,7 +316,7 @@ gulp.task("symlinks", function () {
 
             callback(null, chunk);
         }));
-});
+});*/
 
 // Open the demo site to check it's sweet
 gulp.task("open", function () {
@@ -333,5 +333,7 @@ gulp.task("open", function () {
 
 // Do everything
 gulp.task("publish", function () {
-    run(tasks.js, tasks.less, tasks.sprite, "cdn", "demo", "symlinks");
+    run(tasks.js, tasks.less, tasks.sprite, "cdn", "demo");
 });
+
+/* beautify ignore:end */

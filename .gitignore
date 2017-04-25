@@ -3,10 +3,10 @@ node_modules
 *.sublime-workspace
 .DS_Store
 aws.json
-docs/index.dev.html
 *.mp4
 !dist/blank.mp4
-index-dev.html
+index-*.html
 notes.txt
-*.vtt
-docs/index.dev.php
+.idea
+.DS_Store
+npm-debug.log

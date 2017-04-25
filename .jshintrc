@@ -12,8 +12,8 @@
     "jquery"        : false,
 
     // Development.
-    "debug"         : true,  // Allow debugger statements e.g. browser breakpoints.
-    "devel"         : true,   // Allow developments statements e.g. `console.log();`.
+    "debug"         : false,  // Allow debugger statements e.g. browser breakpoints.
+    "devel"         : false,   // Allow developments statements e.g. `console.log();`.
 
     // ECMAScript 5.
     "strict"        : false,  // Require `use strict` pragma  in every file.
