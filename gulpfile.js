@@ -126,7 +126,7 @@ var build = {
                         .pipe(less())
                         .on("error", gutil.log)
                         .pipe(concat(key))
-                        .pipe(prefix(["last 2 versions"], { cascade: true }))
+                        .pipe(prefix(["last 2 versions"], { cascade: false }))
                         .pipe(cleanCSS())
                         .pipe(gulp.dest(paths[bundle].output));
                 });
@@ -145,7 +145,7 @@ var build = {
                         .pipe(sass())
                         .on("error", gutil.log)
                         .pipe(concat(key))
-                        .pipe(prefix(["last 2 versions"], { cascade: true }))
+                        .pipe(prefix(["last 2 versions"], { cascade: false }))
                         .pipe(cleanCSS())
                         .pipe(gulp.dest(paths[bundle].output));
                 });
