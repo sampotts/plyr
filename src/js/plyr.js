@@ -212,7 +212,7 @@
             fullscreen:         null
         },
         // Events to watch on HTML5 media elements
-        events:                 ['ready', 'ended', 'progress', 'stalled', 'playing', 'waiting', 'canplay', 'canplaythrough', 'loadstart', 'loadeddata', 'loadedmetadata', 'timeupdate', 'volumechange', 'play', 'pause', 'error', 'seeking', 'emptied', 'qualitychanged'],
+        events:                 ['ready', 'ended', 'progress', 'stalled', 'playing', 'waiting', 'canplay', 'canplaythrough', 'loadstart', 'loadeddata', 'loadedmetadata', 'timeupdate', 'volumechange', 'play', 'pause', 'error', 'seeking', 'seeked', 'emptied', 'qualitychanged'],
         // Logging
         logPrefix:              '[Plyr]'
     };
@@ -2034,6 +2034,12 @@
 
                             case 1:
                                 plyr.media.paused = false;
+
+                                // If we were seeking, fire seeked event
+                                if (plyr.media.seeking) {
+                                    _triggerEvent(plyr.media, 'seeked');
+                                }
+ 
                                 plyr.media.seeking = false;
                                 _triggerEvent(plyr.media, 'play');
                                 _triggerEvent(plyr.media, 'playing');
@@ -2148,6 +2154,12 @@
                     // Trigger event
                     _triggerEvent(plyr.media, 'canplaythrough');
                 }
+            });
+
+            plyr.embed.on('seeked', function() {
+                plyr.media.seeking = false;
+                _triggerEvent(plyr.media, 'seeked');
+                _triggerEvent(plyr.media, 'play');
             });
 
             plyr.embed.on('ended', function() {
@@ -2359,6 +2371,9 @@
 
                 // Set seeking flag
                 plyr.media.seeking = true;
+
+                // Trigger seeking
+                _triggerEvent(plyr.media, 'seeking');
             }
 
             // Logging
