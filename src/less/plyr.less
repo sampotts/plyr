@@ -251,6 +251,11 @@
         background: @plyr-captions-bg;
         box-decoration-break: clone;
         line-height: 150%;
+
+        // Firefox adds a <div> when using getCueAsHTML()
+        div {
+            display: inline;
+        }
     }
     span:empty {
         display: none;
