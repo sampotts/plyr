@@ -49,7 +49,6 @@
         hideControls:           true,
         showPosterOnEnd:        false,
         disableContextMenu:     true,
-        svg4everybodyFix:       false,
         keyboardShorcuts:       {
             focused:            true,
             global:             false
@@ -749,7 +748,7 @@
         function _getIconUrl() {
             return {
                 url:        config.iconUrl,
-                absolute:   (config.iconUrl.indexOf("http") === 0) || (plyr.browser.isIE && !config.svg4everybodyFix) // If you're using svg4everybody you don't need absolute paths
+                absolute:   (config.iconUrl.indexOf("http") === 0) || (plyr.browser.isIE && !window.svg4everybody) // If you're using svg4everybody you don't need absolute paths
             };
         }
 
