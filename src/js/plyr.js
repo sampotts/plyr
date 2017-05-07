@@ -2533,6 +2533,13 @@
                         // 5    Video cued
                         switch (event.data) {
                             case 0:
+                                // YouTube doesn't support loop for a single video, so mimick it.
+                                if (config.loop.active) {
+                                    // YouTube needs a call to `stopVideo` before playing again
+                                    instance.stopVideo();
+                                    instance.playVideo();
+                                    break;
+                                }
                                 player.elements.media.paused = true;
                                 trigger(player.elements.media, 'ended');
                                 break;
