@@ -309,7 +309,7 @@
             return input !== null && typeof(input) === 'object' && input.constructor === Object;
         },
         array: function(input) {
-            return input !== null && typeof(input) === 'object' && input.constructor === Array;
+            return input !== null && Array.isArray(input);
         },
         number: function(input) {
             return input !== null && (typeof(input) === 'number' && !isNaN(input - 0) || (typeof input === 'object' && input.constructor === Number));
@@ -346,470 +346,473 @@
         }
     };
 
-    // Credits: http://paypal.github.io/accessible-html5-video-player/
-    // Unfortunately, due to mixed support, UA sniffing is required
-    function getBrowser() {
-        var ua = navigator.userAgent;
-        var name = navigator.appName;
-        var fullVersion = '' + parseFloat(navigator.appVersion);
-        var majorVersion = parseInt(navigator.appVersion, 10);
-        var nameOffset;
-        var verOffset;
-        var ix;
-        var isIE = false;
-        var isFirefox = false;
-        var isChrome = false;
-        var isSafari = false;
+    var utils = {
+        // Credits: http://paypal.github.io/accessible-html5-video-player/
+        // Unfortunately, due to mixed support, UA sniffing is required
+        getBrowser: function() {
+            var ua = navigator.userAgent;
+            var name = navigator.appName;
+            var fullVersion = '' + parseFloat(navigator.appVersion);
+            var majorVersion = parseInt(navigator.appVersion, 10);
+            var nameOffset;
+            var verOffset;
+            var ix;
+            var isIE = false;
+            var isFirefox = false;
+            var isChrome = false;
+            var isSafari = false;
 
-        if ((navigator.appVersion.indexOf('Windows NT') !== -1) && (navigator.appVersion.indexOf('rv:11') !== -1)) {
-            // MSIE 11
-            isIE = true;
-            name = 'IE';
-            fullVersion = '11';
-        } else if ((verOffset = ua.indexOf('MSIE')) !== -1) {
-            // MSIE
-            isIE = true;
-            name = 'IE';
-            fullVersion = ua.substring(verOffset + 5);
-        } else if ((verOffset = ua.indexOf('Chrome')) !== -1) {
-            // Chrome
-            isChrome = true;
-            name = 'Chrome';
-            fullVersion = ua.substring(verOffset + 7);
-        } else if ((verOffset = ua.indexOf('Safari')) !== -1) {
-            // Safari
-            isSafari = true;
-            name = 'Safari';
-            fullVersion = ua.substring(verOffset + 7);
+            if ((navigator.appVersion.indexOf('Windows NT') !== -1) && (navigator.appVersion.indexOf('rv:11') !== -1)) {
+                // MSIE 11
+                isIE = true;
+                name = 'IE';
+                fullVersion = '11';
+            } else if ((verOffset = ua.indexOf('MSIE')) !== -1) {
+                // MSIE
+                isIE = true;
+                name = 'IE';
+                fullVersion = ua.substring(verOffset + 5);
+            } else if ((verOffset = ua.indexOf('Chrome')) !== -1) {
+                // Chrome
+                isChrome = true;
+                name = 'Chrome';
+                fullVersion = ua.substring(verOffset + 7);
+            } else if ((verOffset = ua.indexOf('Safari')) !== -1) {
+                // Safari
+                isSafari = true;
+                name = 'Safari';
+                fullVersion = ua.substring(verOffset + 7);
 
-            if ((verOffset = ua.indexOf('Version')) !== -1) {
+                if ((verOffset = ua.indexOf('Version')) !== -1) {
+                    fullVersion = ua.substring(verOffset + 8);
+                }
+            } else if ((verOffset = ua.indexOf('Firefox')) !== -1) {
+                // Firefox
+                isFirefox = true;
+                name = 'Firefox';
                 fullVersion = ua.substring(verOffset + 8);
-            }
-        } else if ((verOffset = ua.indexOf('Firefox')) !== -1) {
-            // Firefox
-            isFirefox = true;
-            name = 'Firefox';
-            fullVersion = ua.substring(verOffset + 8);
-        } else if ((nameOffset = ua.lastIndexOf(' ') + 1) < (verOffset = ua.lastIndexOf('/'))) {
-            // In most other browsers, 'name/version' is at the end of userAgent
-            name = ua.substring(nameOffset, verOffset);
-            fullVersion = ua.substring(verOffset + 1);
+            } else if ((nameOffset = ua.lastIndexOf(' ') + 1) < (verOffset = ua.lastIndexOf('/'))) {
+                // In most other browsers, 'name/version' is at the end of userAgent
+                name = ua.substring(nameOffset, verOffset);
+                fullVersion = ua.substring(verOffset + 1);
 
-            if (name.toLowerCase() === name.toUpperCase()) {
-                name = navigator.appName;
-            }
-        }
-
-        // Trim the fullVersion string at semicolon/space if present
-        if ((ix = fullVersion.indexOf(';')) !== -1) {
-            fullVersion = fullVersion.substring(0, ix);
-        }
-        if ((ix = fullVersion.indexOf(' ')) !== -1) {
-            fullVersion = fullVersion.substring(0, ix);
-        }
-
-        // Get major version
-        majorVersion = parseInt('' + fullVersion, 10);
-        if (isNaN(majorVersion)) {
-            fullVersion = '' + parseFloat(navigator.appVersion);
-            majorVersion = parseInt(navigator.appVersion, 10);
-        }
-
-        // Return data
-        return {
-            name: name,
-            version: majorVersion,
-            isIE: isIE,
-            isFirefox: isFirefox,
-            isChrome: isChrome,
-            isSafari: isSafari,
-            isIos: /(iPad|iPhone|iPod)/g.test(navigator.platform),
-            isTouch: 'ontouchstart' in document.documentElement
-        };
-    }
-
-    // Inject a script
-    function injectScript(url) {
-        // Check script is not already referenced
-        if (document.querySelectorAll('script[src="' + url + '"]').length) {
-            return;
-        }
-
-        var tag = document.createElement('script');
-        tag.src = url;
-
-        var firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-    }
-
-    // Determine if we're in an iframe
-    function inFrame() {
-        try {
-            return window.self !== window.top;
-        } catch (e) {
-            return true;
-        }
-    }
-
-    // Element exists in an array
-    function inArray(haystack, needle) {
-        return Array.prototype.indexOf && (haystack.indexOf(needle) !== -1);
-    }
-
-    // Replace all
-    function replaceAll(string, find, replace) {
-        return string.replace(new RegExp(find.replace(/([.*+?\^=!:${}()|\[\]\/\\])/g, '\\$1'), 'g'), replace);
-    }
-
-    // Wrap an element
-    function wrap(elements, wrapper) {
-        // Convert `elements` to an array, if necessary.
-        if (!elements.length) {
-            elements = [elements];
-        }
-
-        // Loops backwards to prevent having to clone the wrapper on the
-        // first element (see `child` below).
-        for (var i = elements.length - 1; i >= 0; i--) {
-            var child = (i > 0) ? wrapper.cloneNode(true) : wrapper;
-            var element = elements[i];
-
-            // Cache the current parent and sibling.
-            var parent = element.parentNode;
-            var sibling = element.nextSibling;
-
-            // Wrap the element (is automatically removed from its current
-            // parent).
-            child.appendChild(element);
-
-            // If the element had a sibling, insert the wrapper before
-            // the sibling to maintain the HTML structure; otherwise, just
-            // append it to the parent.
-            if (sibling) {
-                parent.insertBefore(child, sibling);
-            } else {
-                parent.appendChild(child);
+                if (name.toLowerCase() === name.toUpperCase()) {
+                    name = navigator.appName;
+                }
             }
 
-            return child;
-        }
-    }
-
-    // Remove an element
-    function remove(element) {
-        if (!element) {
-            return;
-        }
-        element.parentNode.removeChild(element);
-    }
-
-    // Prepend child
-    function prependChild(parent, element) {
-        parent.insertBefore(element, parent.firstChild);
-    }
-
-    // Set attributes
-    function setAttributes(element, attributes) {
-        for (var key in attributes) {
-            element.setAttribute(key, attributes[key]);
-        }
-    }
-
-    // Get an attribute object from a string selector
-    function getAttributesFromSelector(selector, existingAttributes) {
-        // For example:
-        // '.test' to { class: 'test' }
-        // '#test' to { id: 'test' }
-        // '[data-test="test"]' to { 'data-test': 'test' }
-
-        if (!is.string(selector) || is.empty(selector)) {
-            return {};
-        }
-
-        var attributes = {};
-
-        selector.split(',').forEach(function(selector) {
-            // Remove whitespace
-            selector = selector.trim();
-
-            // Get the first character
-            var start = selector.charAt(0);
-
-            switch (start) {
-                case '.':
-                    // Classname selector
-                    var className = selector.replace('.', '');
-
-                    // Add to existing classname
-                    if (is.object(existingAttributes) && is.string(existingAttributes.class)) {
-                        existingAttributes.class += ' ' + className;
-                    }
-
-                    attributes.class = className;
-                    break;
-
-                case '#':
-                    // ID selector
-                    attributes.id = selector.replace('#', '');
-                    break;
-
-                case '[':
-                    // Strip the []
-                    selector = selector.replace(/[\[\]]/g, '');
-
-                    // Get the parts if
-                    var parts = selector.split('=');
-                    var key = parts[0];
-
-                    // Get the value if provided
-                    var value = parts.length > 1 ? parts[1].replace(/[\"\']/g, '') : '';
-
-                    // Attribute selector
-                    attributes[key] = value;
-
-                    break;
+            // Trim the fullVersion string at semicolon/space if present
+            if ((ix = fullVersion.indexOf(';')) !== -1) {
+                fullVersion = fullVersion.substring(0, ix);
             }
-        });
-
-        return attributes;
-    }
-
-    // Create a DocumentFragment
-    function createElement(type, attributes, text) {
-        // Create a new <element>
-        var element = document.createElement(type);
-
-        // Set all passed attributes
-        if (is.object(attributes)) {
-            setAttributes(element, attributes);
-        }
-
-        // Add text node
-        if (is.string(text)) {
-            element.textContent = text;
-        }
-
-        // Return built element
-        return element;
-    }
-
-    // Insert a DocumentFragment
-    function insertElement(type, parent, attributes, text) {
-        // Create a new <element>
-        var element = createElement(type, attributes, text);
-
-        // Inject the new element
-        prependChild(parent, element);
-    }
-
-    // Remove all child elements
-    function emptyElement(element) {
-        var length = element.childNodes.length;
-        while (length--) {
-            element.removeChild(element.lastChild);
-        }
-    }
-
-    // Toggle class on an element
-    function toggleClass(element, className, state) {
-        if (element) {
-            if (element.classList) {
-                element.classList[state ? 'add' : 'remove'](className);
-            } else {
-                var name = (' ' + element.className + ' ').replace(/\s+/g, ' ').replace(' ' + className + ' ', '');
-                element.className = name + (state ? ' ' + className : '');
+            if ((ix = fullVersion.indexOf(' ')) !== -1) {
+                fullVersion = fullVersion.substring(0, ix);
             }
-        }
-    }
 
-    // Has class name
-    function hasClass(element, className) {
-        if (element) {
-            if (element.classList) {
-                return element.classList.contains(className);
-            } else {
-                return new RegExp('(\\s|^)' + className + '(\\s|$)').test(element.className);
+            // Get major version
+            majorVersion = parseInt('' + fullVersion, 10);
+            if (isNaN(majorVersion)) {
+                fullVersion = '' + parseFloat(navigator.appVersion);
+                majorVersion = parseInt(navigator.appVersion, 10);
             }
-        }
-        return false;
-    }
 
-    // Element matches selector
-    function matches(element, selector) {
-        var prototype = Element.prototype;
-
-        var matches = prototype.matches ||
-            prototype.webkitMatchesSelector ||
-            prototype.mozMatchesSelector ||
-            prototype.msMatchesSelector ||
-            function(s) {
-                return [].indexOf.call(document.querySelectorAll(s), this) !== -1;
+            // Return data
+            return {
+                name: name,
+                version: majorVersion,
+                isIE: isIE,
+                isFirefox: isFirefox,
+                isChrome: isChrome,
+                isSafari: isSafari,
+                isIos: /(iPad|iPhone|iPod)/g.test(navigator.platform),
+                isTouch: 'ontouchstart' in document.documentElement
             };
+        },
 
-        return matches.call(element, selector);
-    }
-
-    // Get the focused element
-    function getFocusElement() {
-        var focused = document.activeElement;
-
-        if (!focused || focused === document.body) {
-            focused = null;
-        } else {
-            focused = document.querySelector(':focus');
-        }
-
-        return focused;
-    }
-
-    // Bind along with custom handler
-    function proxy(element, eventName, customListener, defaultListener, useCapture) {
-        on(element, eventName, function(event) {
-            if (customListener) {
-                customListener.apply(element, [event]);
-            }
-            defaultListener.apply(element, [event]);
-        }, useCapture);
-    }
-
-    // Toggle event listener
-    function toggleListener(elements, events, callback, toggle, useCapture) {
-        var eventList = events.split(' ');
-
-        // Whether the listener is a capturing listener or not
-        // Default to false
-        if (!is.boolean(useCapture)) {
-            useCapture = false;
-        }
-
-        // If a nodelist is passed, call itself on each node
-        if (elements instanceof NodeList) {
-            for (var x = 0; x < elements.length; x++) {
-                if (elements[x] instanceof Node) {
-                    toggleListener(elements[x], arguments[1], arguments[2], arguments[3]);
-                }
-            }
-            return;
-        }
-
-        // If a single node is passed, bind the event listener
-        for (var i = 0; i < eventList.length; i++) {
-            elements[toggle ? 'addEventListener' : 'removeEventListener'](eventList[i], callback, useCapture);
-        }
-    }
-
-    // Bind event handler
-    function on(element, events, callback, useCapture) {
-        if (!is.undefined(element)) {
-            toggleListener(element, events, callback, true, useCapture);
-        }
-    }
-
-    // Unbind event handler
-    function off(element, events, callback, useCapture) {
-        if (!is.undefined(element)) {
-            toggleListener(element, events, callback, false, useCapture);
-        }
-    }
-
-    // Trigger event
-    function event(element, type, bubbles, properties) {
-        // Bail if no element
-        if (!element || !type) {
-            return;
-        }
-
-        // Default bubbles to false
-        if (!is.boolean(bubbles)) {
-            bubbles = false;
-        }
-
-        // Create and dispatch the event
-        var event = new CustomEvent(type, {
-            bubbles: bubbles,
-            detail: properties
-        });
-
-        // Dispatch the event
-        element.dispatchEvent(event);
-    }
-
-    // Toggle aria-pressed state on a toggle button
-    // http://www.ssbbartgroup.com/blog/how-not-to-misuse-aria-states-properties-and-roles
-    function toggleState(target, state) {
-        // Bail if no target
-        if (!target) {
-            return;
-        }
-
-        // Get state
-        state = (is.boolean(state) ? state : !target.getAttribute('aria-pressed'));
-
-        // Set the attribute on target
-        target.setAttribute('aria-pressed', state);
-
-        return state;
-    }
-
-    // Get percentage
-    function getPercentage(current, max) {
-        if (current === 0 || max === 0 || isNaN(current) || isNaN(max)) {
-            return 0;
-        }
-        return ((current / max) * 100).toFixed(2);
-    }
-
-    // Deep extend/merge destination object with N more objects
-    // http://andrewdupont.net/2009/08/28/deep-extending-objects-in-javascript/
-    // Removed call to arguments.callee (used explicit function name instead)
-    function extend() {
-        // Get arguments
-        var objects = arguments;
-
-        // Bail if nothing to merge
-        if (!objects.length) {
-            return;
-        }
-
-        // Return first if specified but nothing to merge
-        if (objects.length === 1) {
-            return objects[0];
-        }
-
-        // First object is the destination
-        var destination = Array.prototype.shift.call(objects);
-        if (!is.object(destination)) {
-            destination = {};
-        }
-
-        var length = objects.length;
-
-        // Loop through all objects to merge
-        for (var i = 0; i < length; i++) {
-            var source = objects[i];
-
-            if (!is.object(source)) {
-                source = {};
+        // Inject a script
+        injectScript: function(url) {
+            // Check script is not already referenced
+            if (document.querySelectorAll('script[src="' + url + '"]').length) {
+                return;
             }
 
-            for (var property in source) {
-                if (source[property] && source[property].constructor && source[property].constructor === Object) {
-                    destination[property] = destination[property] || {};
-                    extend(destination[property], source[property]);
+            var tag = document.createElement('script');
+            tag.src = url;
+
+            var firstScriptTag = document.getElementsByTagName('script')[0];
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        },
+
+        // Determine if we're in an iframe
+        inFrame: function() {
+            try {
+                return window.self !== window.top;
+            } catch (e) {
+                return true;
+            }
+        },
+
+        // Element exists in an array
+        inArray: function(haystack, needle) {
+            return is.array(haystack) && haystack.indexOf(needle) !== -1;
+        },
+
+        // Replace all
+        replaceAll: function(string, find, replace) {
+            return string.replace(new RegExp(find.replace(/([.*+?\^=!:${}()|\[\]\/\\])/g, '\\$1'), 'g'), replace);
+        },
+
+        // Wrap an element
+        wrap: function(elements, wrapper) {
+            // Convert `elements` to an array, if necessary.
+            if (!elements.length) {
+                elements = [elements];
+            }
+
+            // Loops backwards to prevent having to clone the wrapper on the
+            // first element (see `child` below).
+            for (var i = elements.length - 1; i >= 0; i--) {
+                var child = (i > 0) ? wrapper.cloneNode(true) : wrapper;
+                var element = elements[i];
+
+                // Cache the current parent and sibling.
+                var parent = element.parentNode;
+                var sibling = element.nextSibling;
+
+                // Wrap the element (is automatically removed from its current
+                // parent).
+                child.appendChild(element);
+
+                // If the element had a sibling, insert the wrapper before
+                // the sibling to maintain the HTML structure; otherwise, just
+                // append it to the parent.
+                if (sibling) {
+                    parent.insertBefore(child, sibling);
                 } else {
-                    destination[property] = source[property];
+                    parent.appendChild(child);
+                }
+
+                return child;
+            }
+        },
+
+        // Remove an element
+        removeElement: function(element) {
+            if (!is.htmlElement(element)) {
+                return;
+            }
+
+            element.parentNode.removeChild(element);
+        },
+
+        // Prepend child
+        prependChild: function(parent, element) {
+            parent.insertBefore(element, parent.firstChild);
+        },
+
+        // Set attributes
+        setAttributes: function(element, attributes) {
+            for (var key in attributes) {
+                element.setAttribute(key, attributes[key]);
+            }
+        },
+
+        // Get an attribute object from a string selector
+        getAttributesFromSelector: function(selector, existingAttributes) {
+            // For example:
+            // '.test' to { class: 'test' }
+            // '#test' to { id: 'test' }
+            // '[data-test="test"]' to { 'data-test': 'test' }
+
+            if (!is.string(selector) || is.empty(selector)) {
+                return {};
+            }
+
+            var attributes = {};
+
+            selector.split(',').forEach(function(selector) {
+                // Remove whitespace
+                selector = selector.trim();
+
+                // Get the first character
+                var start = selector.charAt(0);
+
+                switch (start) {
+                    case '.':
+                        // Classname selector
+                        var className = selector.replace('.', '');
+
+                        // Add to existing classname
+                        if (is.object(existingAttributes) && is.string(existingAttributes.class)) {
+                            existingAttributes.class += ' ' + className;
+                        }
+
+                        attributes.class = className;
+                        break;
+
+                    case '#':
+                        // ID selector
+                        attributes.id = selector.replace('#', '');
+                        break;
+
+                    case '[':
+                        // Strip the []
+                        selector = selector.replace(/[\[\]]/g, '');
+
+                        // Get the parts if
+                        var parts = selector.split('=');
+                        var key = parts[0];
+
+                        // Get the value if provided
+                        var value = parts.length > 1 ? parts[1].replace(/[\"\']/g, '') : '';
+
+                        // Attribute selector
+                        attributes[key] = value;
+
+                        break;
+                }
+            });
+
+            return attributes;
+        },
+
+        // Create a DocumentFragment
+        createElement: function(type, attributes, text) {
+            // Create a new <element>
+            var element = document.createElement(type);
+
+            // Set all passed attributes
+            if (is.object(attributes)) {
+                utils.setAttributes(element, attributes);
+            }
+
+            // Add text node
+            if (is.string(text)) {
+                element.textContent = text;
+            }
+
+            // Return built element
+            return element;
+        },
+
+        // Insert a DocumentFragment
+        insertElement: function(type, parent, attributes, text) {
+            // Create a new <element>
+            var element = utils.createElement(type, attributes, text);
+
+            // Inject the new element
+            utils.prependChild(parent, element);
+        },
+
+        // Remove all child elements
+        emptyElement: function(element) {
+            var length = element.childNodes.length;
+            while (length--) {
+                element.removeChild(element.lastChild);
+            }
+        },
+
+        // Toggle class on an element
+        toggleClass: function(element, className, state) {
+            if (element) {
+                if (element.classList) {
+                    element.classList[state ? 'add' : 'remove'](className);
+                } else {
+                    var name = (' ' + element.className + ' ').replace(/\s+/g, ' ').replace(' ' + className + ' ', '');
+                    element.className = name + (state ? ' ' + className : '');
                 }
             }
+        },
+
+        // Has class name
+        hasClass: function(element, className) {
+            if (element) {
+                if (element.classList) {
+                    return element.classList.contains(className);
+                } else {
+                    return new RegExp('(\\s|^)' + className + '(\\s|$)').test(element.className);
+                }
+            }
+            return false;
+        },
+
+        // Element matches selector
+        matches: function(element, selector) {
+            var prototype = Element.prototype;
+
+            var matches = prototype.matches ||
+                prototype.webkitMatchesSelector ||
+                prototype.mozMatchesSelector ||
+                prototype.msMatchesSelector ||
+                function(s) {
+                    return [].indexOf.call(document.querySelectorAll(s), this) !== -1;
+                };
+
+            return matches.call(element, selector);
+        },
+
+        // Get the focused element
+        getFocusElement: function() {
+            var focused = document.activeElement;
+
+            if (!focused || focused === document.body) {
+                focused = null;
+            } else {
+                focused = document.querySelector(':focus');
+            }
+
+            return focused;
+        },
+
+        // Bind along with custom handler
+        proxy: function(element, eventName, customListener, defaultListener, useCapture) {
+            utils.on(element, eventName, function(event) {
+                if (customListener) {
+                    customListener.apply(element, [event]);
+                }
+                defaultListener.apply(element, [event]);
+            }, useCapture);
+        },
+
+        // Toggle event listener
+        toggleListener: function(elements, events, callback, toggle, useCapture) {
+            var eventList = events.split(' ');
+
+            // Whether the listener is a capturing listener or not
+            // Default to false
+            if (!is.boolean(useCapture)) {
+                useCapture = false;
+            }
+
+            // If a nodelist is passed, call itself on each node
+            if (elements instanceof NodeList) {
+                for (var x = 0; x < elements.length; x++) {
+                    if (elements[x] instanceof Node) {
+                        utils.toggleListener(elements[x], arguments[1], arguments[2], arguments[3]);
+                    }
+                }
+                return;
+            }
+
+            // If a single node is passed, bind the event listener
+            for (var i = 0; i < eventList.length; i++) {
+                elements[toggle ? 'addEventListener' : 'removeEventListener'](eventList[i], callback, useCapture);
+            }
+        },
+
+        // Bind event handler
+        on: function(element, events, callback, useCapture) {
+            if (!is.undefined(element)) {
+                utils.toggleListener(element, events, callback, true, useCapture);
+            }
+        },
+
+        // Unbind event handler
+        off: function(element, events, callback, useCapture) {
+            if (!is.undefined(element)) {
+                utils.toggleListener(element, events, callback, false, useCapture);
+            }
+        },
+
+        // Trigger event
+        event: function(element, type, bubbles, properties) {
+            // Bail if no element
+            if (!element || !type) {
+                return;
+            }
+
+            // Default bubbles to false
+            if (!is.boolean(bubbles)) {
+                bubbles = false;
+            }
+
+            // Create and dispatch the event
+            var event = new CustomEvent(type, {
+                bubbles: bubbles,
+                detail: properties
+            });
+
+            // Dispatch the event
+            element.dispatchEvent(event);
+        },
+
+        // Toggle aria-pressed state on a toggle button
+        // http://www.ssbbartgroup.com/blog/how-not-to-misuse-aria-states-properties-and-roles
+        toggleState: function(target, state) {
+            // Bail if no target
+            if (!target) {
+                return;
+            }
+
+            // Get state
+            state = (is.boolean(state) ? state : !target.getAttribute('aria-pressed'));
+
+            // Set the attribute on target
+            target.setAttribute('aria-pressed', state);
+
+            return state;
+        },
+
+        // Get percentage
+        getPercentage: function(current, max) {
+            if (current === 0 || max === 0 || isNaN(current) || isNaN(max)) {
+                return 0;
+            }
+            return ((current / max) * 100).toFixed(2);
+        },
+
+        // Deep extend/merge destination object with N more objects
+        // http://andrewdupont.net/2009/08/28/deep-extending-objects-in-javascript/
+        // Removed call to arguments.callee (used explicit function name instead)
+        extend: function() {
+            // Get arguments
+            var objects = arguments;
+
+            // Bail if nothing to merge
+            if (!objects.length) {
+                return;
+            }
+
+            // Return first if specified but nothing to merge
+            if (objects.length === 1) {
+                return objects[0];
+            }
+
+            // First object is the destination
+            var destination = Array.prototype.shift.call(objects);
+            if (!is.object(destination)) {
+                destination = {};
+            }
+
+            var length = objects.length;
+
+            // Loop through all objects to merge
+            for (var i = 0; i < length; i++) {
+                var source = objects[i];
+
+                if (!is.object(source)) {
+                    source = {};
+                }
+
+                for (var property in source) {
+                    if (source[property] && source[property].constructor && source[property].constructor === Object) {
+                        destination[property] = destination[property] || {};
+                        utils.extend(destination[property], source[property]);
+                    } else {
+                        destination[property] = source[property];
+                    }
+                }
+            }
+
+            return destination;
+        },
+
+        // Parse YouTube ID from url
+        parseYouTubeId: function(url) {
+            var regex = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            return url.match(regex) ? RegExp.$2 : url;
         }
-
-        return destination;
-    }
-
-    // Parse YouTube ID from url
-    function parseYouTubeId(url) {
-        var regex = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-        return url.match(regex) ? RegExp.$2 : url;
-    }
+    };
 
     // Fullscreen API
     var fullscreen = (function() {
@@ -866,9 +869,6 @@
                 if (!is.htmlElement(element)) {
                     element = document.body;
                 }
-
-                console.log(prefix);
-
                 return (prefix === '') ? element.requestFullScreen() : element[prefix + (prefix === 'ms' ? 'RequestFullscreen' : 'RequestFullScreen')]();
             },
             cancelFullScreen: function() {
@@ -922,7 +922,7 @@
         // Picture-in-picture support
         // Safari only currently
         pip: (function() {
-            return is.function(createElement('video').webkitSetPresentationMode);
+            return is.function(utils.createElement('video').webkitSetPresentationMode);
         })(),
 
         // Airplay support
@@ -1028,7 +1028,7 @@
 
         // Trigger events, with plyr instance passed
         function trigger(element, type, bubbles, properties) {
-            event(element, type, bubbles, extend({}, properties, {
+            utils.event(element, type, bubbles, utils.extend({}, properties, {
                 plyr: api
             }));
         }
@@ -1041,6 +1041,16 @@
         // Find a single element
         function getElement(selector) {
             return getElements(selector)[0];
+        }
+
+        function removeElement(element) {
+            // Remove reference from player.elements cache
+            if (is.string(element)) {
+                utils.removeElement(player.elements[element]);
+                player.elements[element] = null;
+            } else {
+                utils.removeElement(element);
+            }
         }
 
         // Trap focus inside container
@@ -1065,18 +1075,18 @@
             }
 
             // Bind the handler
-            on(player.elements.container, 'keydown', checkFocus);
+            utils.on(player.elements.container, 'keydown', checkFocus);
         }
 
         // Add elements to HTML5 media (source, tracks, etc)
         function insertElements(type, attributes) {
             if (is.string(attributes)) {
-                insertElement(type, player.elements.media, {
+                utils.insertElement(type, player.elements.media, {
                     src: attributes
                 });
             } else if (is.array(attributes)) {
                 attributes.forEach(function(attribute) {
-                    insertElement(type, player.elements.media, attribute);
+                    utils.insertElement(type, player.elements.media, attribute);
                 });
             }
         }
@@ -1097,7 +1107,7 @@
 
             // Create <svg>
             var icon = document.createElementNS(namespace, 'svg');
-            setAttributes(icon, extend(attributes, {
+            utils.setAttributes(icon, utils.extend(attributes, {
                 role: 'presentation'
             }));
 
@@ -1125,18 +1135,18 @@
                     break;
             }
 
-            return createElement('span', {
+            return utils.createElement('span', {
                 class: config.classes.hidden
             }, text);
         }
 
         // Create a badge
         function createBadge(text) {
-            var badge = createElement('span', {
+            var badge = utils.createElement('span', {
                 class: config.classes.menu.value
             });
 
-            badge.appendChild(createElement('span', {
+            badge.appendChild(utils.createElement('span', {
                 class: config.classes.menu.badge
             }, text));
 
@@ -1145,7 +1155,7 @@
 
         // Create a <button>
         function createButton(type, attributes) {
-            var button = createElement('button');
+            var button = utils.createElement('button');
             var iconDefault;
             var iconToggled;
             var labelKey;
@@ -1195,7 +1205,7 @@
             }
 
             // Merge attributes
-            extend(attributes, getAttributesFromSelector(config.selectors.buttons[type], attributes));
+            utils.extend(attributes, utils.getAttributesFromSelector(config.selectors.buttons[type], attributes));
 
             // Add toggle icon if needed
             if (is.string(iconToggled)) {
@@ -1211,7 +1221,7 @@
             button.appendChild(createLabel(labelKey));
 
             // Set element attributes
-            setAttributes(button, attributes);
+            utils.setAttributes(button, attributes);
 
             player.elements.buttons[type] = button;
 
@@ -1221,13 +1231,13 @@
         // Create an <input type='range'>
         function createRange(type, attributes) {
             // Seek label
-            var label = createElement('label', {
+            var label = utils.createElement('label', {
                 for: attributes.id,
                 class: config.classes.hidden
             }, config.i18n[type]);
 
             // Seek input
-            var input = createElement('input', extend(getAttributesFromSelector(config.selectors.inputs[type]), {
+            var input = utils.createElement('input', utils.extend(utils.getAttributesFromSelector(config.selectors.inputs[type]), {
                 type: 'range',
                 min: 0,
                 max: 100,
@@ -1246,7 +1256,7 @@
 
         // Create a <progress>
         function createProgress(type, attributes) {
-            var progress = createElement('progress', extend(getAttributesFromSelector(config.selectors.display[type]), {
+            var progress = utils.createElement('progress', utils.extend(utils.getAttributesFromSelector(config.selectors.display[type]), {
                 min: 0,
                 max: 100,
                 value: 0
@@ -1254,7 +1264,7 @@
 
             // Create the label inside
             if (type !== 'volume') {
-                progress.appendChild(createElement('span', null, '0'));
+                progress.appendChild(utils.createElement('span', null, '0'));
 
                 var suffix = '';
                 switch (type) {
@@ -1277,15 +1287,15 @@
 
         // Create time display
         function createTime(type) {
-            var container = createElement('span', {
+            var container = utils.createElement('span', {
                 class: 'plyr__time'
             });
 
-            container.appendChild(createElement('span', {
+            container.appendChild(utils.createElement('span', {
                 class: config.classes.hidden
             }, config.i18n[type]));
 
-            container.appendChild(createElement('span', getAttributesFromSelector(config.selectors.display[type]), '00:00'));
+            container.appendChild(utils.createElement('span', utils.getAttributesFromSelector(config.selectors.display[type]), '00:00'));
 
             player.elements.display[type] = container;
 
@@ -1295,33 +1305,33 @@
         // Build the default HTML
         function createControls(data) {
             // Create the container
-            var controls = createElement('div', getAttributesFromSelector(config.selectors.controls.wrapper));
+            var controls = utils.createElement('div', utils.getAttributesFromSelector(config.selectors.controls.wrapper));
 
             // Restart button
-            if (inArray(config.controls, 'restart')) {
+            if (utils.inArray(config.controls, 'restart')) {
                 controls.appendChild(createButton('restart'));
             }
 
             // Rewind button
-            if (inArray(config.controls, 'rewind')) {
+            if (utils.inArray(config.controls, 'rewind')) {
                 controls.appendChild(createButton('rewind'));
             }
 
             // Play Pause button
             // TODO: This should be a toggle button really?
-            if (inArray(config.controls, 'play')) {
+            if (utils.inArray(config.controls, 'play')) {
                 controls.appendChild(createButton('play'));
                 controls.appendChild(createButton('pause'));
             }
 
             // Fast forward button
-            if (inArray(config.controls, 'fast-forward')) {
+            if (utils.inArray(config.controls, 'fast-forward')) {
                 controls.appendChild(createButton('fast-forward'));
             }
 
             // Progress
-            if (inArray(config.controls, 'progress')) {
-                var container = createElement('span', getAttributesFromSelector(config.selectors.progress));
+            if (utils.inArray(config.controls, 'progress')) {
+                var container = utils.createElement('span', utils.getAttributesFromSelector(config.selectors.progress));
 
                 // Seek range slider
                 var seek = createRange('seek', {
@@ -1340,7 +1350,7 @@
 
                 // Seek tooltip
                 if (config.tooltips.seek) {
-                    var tooltip = createElement('span', {
+                    var tooltip = utils.createElement('span', {
                         role: 'tooltip',
                         class: config.classes.tooltip
                     }, '00:00');
@@ -1354,23 +1364,23 @@
             }
 
             // Media current time display
-            if (inArray(config.controls, 'current-time')) {
+            if (utils.inArray(config.controls, 'current-time')) {
                 controls.appendChild(createTime('currentTime'));
             }
 
             // Media duration display
-            if (inArray(config.controls, 'duration')) {
+            if (utils.inArray(config.controls, 'duration')) {
                 controls.appendChild(createTime('duration'));
             }
 
             // Toggle mute button
-            if (inArray(config.controls, 'mute')) {
+            if (utils.inArray(config.controls, 'mute')) {
                 controls.appendChild(createButton('mute'));
             }
 
             // Volume range control
-            if (inArray(config.controls, 'volume')) {
-                var volume = createElement('span', {
+            if (utils.inArray(config.controls, 'volume')) {
+                var volume = utils.createElement('span', {
                     class: 'plyr__volume'
                 });
 
@@ -1381,7 +1391,7 @@
                 };
 
                 // Create the volume range slider
-                var range = createRange('volume', extend(attributes, {
+                var range = createRange('volume', utils.extend(attributes, {
                     id: 'plyr-volume-' + data.id
                 }));
                 volume.appendChild(range.label);
@@ -1395,13 +1405,13 @@
             }
 
             // Toggle captions button
-            if (inArray(config.controls, 'captions')) {
+            if (utils.inArray(config.controls, 'captions')) {
                 controls.appendChild(createButton('captions'));
             }
 
             // Settings button / menu
-            if (inArray(config.controls, 'settings')) {
-                var menu = createElement('span', extend(getAttributesFromSelector(config.selectors.buttons.settings), {
+            if (utils.inArray(config.controls, 'settings')) {
+                var menu = utils.createElement('span', utils.extend(utils.getAttributesFromSelector(config.selectors.buttons.settings), {
                     class: 'plyr__menu'
                 }));
 
@@ -1412,7 +1422,7 @@
                     'aria-expanded': false
                 }));
 
-                var form = createElement('form', {
+                var form = utils.createElement('form', {
                     class: 'plyr__menu__container',
                     id: 'plyr-settings-' + data.id,
                     'aria-hidden': true,
@@ -1421,25 +1431,25 @@
                     tabindex: -1
                 });
 
-                var inner = createElement('div');
+                var inner = utils.createElement('div');
 
-                var home = createElement('div', {
+                var home = utils.createElement('div', {
                     id: 'plyr-settings-' + data.id + '-home',
                     'aria-hidden': false,
                     'aria-labelled-by': 'plyr-settings-toggle-' + data.id,
                     role: 'tabpanel'
                 });
 
-                var tabs = createElement('ul', {
+                var tabs = utils.createElement('ul', {
                     role: 'tablist'
                 });
 
                 ['captions', 'quality', 'speed', 'loop'].forEach(function(type) {
-                    var tab = createElement('li', {
+                    var tab = utils.createElement('li', {
                         role: 'tab'
                     });
 
-                    var button = createElement('button', extend(getAttributesFromSelector(config.selectors.buttons.settings), {
+                    var button = utils.createElement('button', utils.extend(utils.getAttributesFromSelector(config.selectors.buttons.settings), {
                         type: 'button',
                         class: config.classes.control + ' ' + config.classes.control + '--forward',
                         id: 'plyr-settings-' + data.id + '-' + type + '-tab',
@@ -1448,7 +1458,7 @@
                         'aria-expanded': false
                     }), config.i18n[type]);
 
-                    var value = createElement('span', {
+                    var value = utils.createElement('span', {
                         class: config.classes.menu.value
                     });
 
@@ -1469,7 +1479,7 @@
                 inner.appendChild(home);
 
                 ['captions', 'quality', 'speed', 'loop'].forEach(function(type) {
-                    var pane = createElement('div', {
+                    var pane = utils.createElement('div', {
                         id: 'plyr-settings-' + data.id + '-' + type,
                         'aria-hidden': true,
                         'aria-labelled-by': 'plyr-settings-' + data.id + '-' + type + '-tab',
@@ -1477,7 +1487,7 @@
                         tabindex: -1
                     });
 
-                    var back = createElement('button', {
+                    var back = utils.createElement('button', {
                         type: 'button',
                         class: config.classes.control + ' ' + config.classes.control + '--back',
                         'aria-haspopup': true,
@@ -1487,7 +1497,7 @@
 
                     pane.appendChild(back);
 
-                    var options = createElement('ul');
+                    var options = utils.createElement('ul');
 
                     pane.appendChild(options);
 
@@ -1506,17 +1516,17 @@
             }
 
             // Picture in picture button
-            if (inArray(config.controls, 'pip') && support.pip) {
+            if (utils.inArray(config.controls, 'pip') && support.pip) {
                 controls.appendChild(createButton('pip'));
             }
 
             // Airplay button
-            if (inArray(config.controls, 'airplay') && support.airplay) {
+            if (utils.inArray(config.controls, 'airplay') && support.airplay) {
                 controls.appendChild(createButton('airplay'));
             }
 
             // Toggle fullscreen button
-            if (inArray(config.controls, 'fullscreen')) {
+            if (utils.inArray(config.controls, 'fullscreen')) {
                 controls.appendChild(createButton('fullscreen'));
             }
 
@@ -1535,7 +1545,7 @@
             var list = player.elements.settings.panes.quality.querySelector('ul');
 
             // Empty the menu
-            emptyElement(list);
+            utils.emptyElement(list);
 
             // Get the badge HTML for HD, 4K etc
             function getBadge(quality) {
@@ -1592,14 +1602,14 @@
                 });
 
                 filtered.forEach(function(quality) {
-                    var item = createElement('li');
+                    var item = utils.createElement('li');
 
-                    var label = createElement('label', {
+                    var label = utils.createElement('label', {
                         class: config.classes.control,
                         for: 'plyr-quality-' + quality
                     });
 
-                    var radio = createElement('input', extend(getAttributesFromSelector(config.selectors.inputs.quality), {
+                    var radio = utils.createElement('input', utils.extend(utils.getAttributesFromSelector(config.selectors.inputs.quality), {
                         type: 'radio',
                         id: 'plyr-quality-' + quality,
                         name: 'plyr-quality',
@@ -1631,18 +1641,18 @@
             var list = player.elements.settings.panes.loop.querySelector('ul');
 
             // Empty the menu
-            emptyElement(list);
+            utils.emptyElement(list);
 
             options.forEach(function(option) {
-                var item = createElement('li');
+                var item = utils.createElement('li');
 
-                var button = createElement('button', extend(getAttributesFromSelector(config.selectors.buttons.loop), {
+                var button = utils.createElement('button', utils.extend(utils.getAttributesFromSelector(config.selectors.buttons.loop), {
                     type: 'button',
                     class: config.classes.control,
                     'data-plyr-loop-action': option
                 }), config.i18n[option]);
 
-                if (inArray(['start', 'end'], option)) {
+                if (utils.inArray(['start', 'end'], option)) {
                     var badge = createBadge('0:00');
                     button.appendChild(badge);
                 }
@@ -1658,7 +1668,7 @@
             var list = player.elements.settings.panes.captions.querySelector('ul');
 
             // Empty the menu
-            emptyElement(list);
+            utils.emptyElement(list);
 
             // If there's no captions, bail
             if (is.empty(player.captions.tracks)) {
@@ -1682,14 +1692,14 @@
 
             // Generate options
             tracks.forEach(function(track) {
-                var item = createElement('li');
+                var item = utils.createElement('li');
 
-                var label = createElement('label', {
+                var label = utils.createElement('label', {
                     class: config.classes.control,
                     for: 'plyr-language-' + track.language
                 });
 
-                var radio = createElement('input', extend(getAttributesFromSelector(config.selectors.inputs.language), {
+                var radio = utils.createElement('input', utils.extend(utils.getAttributesFromSelector(config.selectors.inputs.language), {
                     type: 'radio',
                     id: 'plyr-language-' + track.language,
                     name: 'plyr-language',
@@ -1718,7 +1728,7 @@
             var list = player.elements.settings.panes.speed.querySelector('ul');
 
             // Empty the menu
-            emptyElement(list);
+            utils.emptyElement(list);
 
             // If there's no captions, bail
             if (!is.array(options)) {
@@ -1726,14 +1736,14 @@
             }
 
             options.forEach(function(speed) {
-                var item = createElement('li');
+                var item = utils.createElement('li');
 
-                var label = createElement('label', {
+                var label = utils.createElement('label', {
                     class: config.classes.control,
                     for: 'plyr-speed-' + speed.toString().replace('.', '-')
                 });
 
-                var radio = createElement('input', extend(getAttributesFromSelector(config.selectors.inputs.speed), {
+                var radio = utils.createElement('input', utils.extend(utils.getAttributesFromSelector(config.selectors.inputs.speed), {
                     type: 'radio',
                     id: 'plyr-speed-' + speed.toString().replace('.', '-'),
                     name: 'plyr-speed',
@@ -1763,18 +1773,18 @@
                 // Check for native support
                 var nativeSupport = support.fullscreen;
 
-                if (nativeSupport || (config.fullscreen.fallback && !inFrame())) {
+                if (nativeSupport || (config.fullscreen.fallback && !utils.inFrame())) {
                     log((nativeSupport ? 'Native' : 'Fallback') + ' fullscreen enabled');
 
                     // Add styling hook
-                    toggleClass(player.elements.container, config.classes.fullscreen.enabled, true);
+                    utils.toggleClass(player.elements.container, config.classes.fullscreen.enabled, true);
                 } else {
                     log('Fullscreen not supported and fallback disabled');
                 }
 
                 // Toggle state
                 if (player.elements.buttons && player.elements.buttons.fullscreen) {
-                    toggleState(player.elements.buttons.fullscreen, false);
+                    utils.toggleState(player.elements.buttons.fullscreen, false);
                 }
 
                 // Setup focus trap
@@ -1785,21 +1795,29 @@
         // Setup captions
         function setupCaptions(tracks) {
             // Only Vimeo and HTML5 video supported at this point
-            if (!inArray(['video', 'vimeo'], player.type) || (player.type === 'video' && !support.textTracks)) {
+            if (!utils.inArray(['video', 'vimeo'], player.type) || (player.type === 'video' && !support.textTracks)) {
                 return;
             }
 
             // Inject the container
             if (!is.htmlElement(player.elements.captions)) {
-                player.elements.captions = createElement('div', getAttributesFromSelector(config.selectors.captions));
-                player.elements.wrapper.appendChild(player.elements.captions);
+                player.elements.captions = utils.createElement('div', utils.getAttributesFromSelector(config.selectors.captions));
+
+                console.warn(player.type);
+
+                if (player.type === 'video') {
+                    player.elements.wrapper.appendChild(player.elements.captions);
+                } else {
+                    console.warn(player.elements.media);
+                    player.elements.media.appendChild(player.elements.captions);
+                }
             }
 
             // Get tracks
             player.captions.tracks = is.array(tracks) ? tracks : player.elements.media.textTracks;
 
             // Set the class hook
-            toggleClass(player.elements.container, config.classes.captions.enabled, !is.empty(player.captions.tracks));
+            utils.toggleClass(player.elements.container, config.classes.captions.enabled, !is.empty(player.captions.tracks));
 
             // If no caption file exists, hide container for caption text
             if (is.empty(player.captions.tracks)) {
@@ -1815,7 +1833,7 @@
                 // Turn off native caption rendering to avoid double captions
                 [].forEach.call(player.captions.tracks, function(track) {
                     // Remove previous bindings (if we've changed source or language)
-                    off(track, 'cuechange', setActiveCue);
+                    utils.off(track, 'cuechange', setActiveCue);
 
                     // Hide captions
                     track.mode = 'hidden';
@@ -1834,8 +1852,8 @@
 
                 // If it's a caption or subtitle, render it
                 var track = player.captions.currentTrack;
-                if (is.track(track) && inArray(['captions', 'subtitles'], track.kind)) {
-                    on(track, 'cuechange', setActiveCue);
+                if (is.track(track) && utils.inArray(['captions', 'subtitles'], track.kind)) {
+                    utils.on(track, 'cuechange', setActiveCue);
 
                     // If we change the active track while a cue is already displayed we need to update it
                     if (track.activeCues && track.activeCues.length > 0) {
@@ -1897,10 +1915,10 @@
         // Set the current caption
         function setCaption(caption) {
             if (is.htmlElement(player.elements.captions)) {
-                var content = createElement('span');
+                var content = utils.createElement('span');
 
                 // Empty the container
-                emptyElement(player.elements.captions);
+                utils.emptyElement(player.elements.captions);
 
                 // Default to empty
                 if (is.undefined(caption)) {
@@ -1942,8 +1960,8 @@
             }
 
             if (active) {
-                toggleClass(player.elements.container, config.classes.captions.active, true);
-                toggleState(player.elements.buttons.captions, true);
+                utils.toggleClass(player.elements.container, config.classes.captions.active, true);
+                utils.toggleState(player.elements.buttons.captions, true);
             }
         }
 
@@ -1963,10 +1981,10 @@
             player.captions.enabled = show;
 
             // Toggle state
-            toggleState(player.elements.buttons.captions, player.captions.enabled);
+            utils.toggleState(player.elements.buttons.captions, player.captions.enabled);
 
             // Add class hook
-            toggleClass(player.elements.container, config.classes.captions.active, player.captions.enabled);
+            utils.toggleClass(player.elements.container, config.classes.captions.active, player.captions.enabled);
 
             // Trigger an event
             trigger(player.elements.container, player.captions.enabled ? 'captionsenabled' : 'captionsdisabled', true);
@@ -1993,7 +2011,7 @@
             }
 
             // Larger overlaid play button
-            if (inArray(config.controls, 'play-large')) {
+            if (utils.inArray(config.controls, 'play-large')) {
                 player.elements.buttons.playLarge = createButton('play-large');
                 player.elements.container.appendChild(player.elements.buttons.playLarge);
             }
@@ -2062,8 +2080,8 @@
                 for (var i = labels.length - 1; i >= 0; i--) {
                     var label = labels[i];
 
-                    toggleClass(label, config.classes.hidden, false);
-                    toggleClass(label, config.classes.tooltip, true);
+                    utils.toggleClass(label, config.classes.hidden, false);
+                    utils.toggleClass(label, config.classes.tooltip, true);
                 }
             }
         }
@@ -2126,12 +2144,12 @@
 
         // Toggle style hook
         function toggleStyleHook() {
-            toggleClass(player.elements.container, config.selectors.container.replace('.', ''), player.supported.full);
+            utils.toggleClass(player.elements.container, config.selectors.container.replace('.', ''), player.supported.full);
         }
 
         // Toggle native controls
         function toggleNativeControls(toggle) {
-            if (toggle && inArray(types.html5, player.type)) {
+            if (toggle && utils.inArray(types.html5, player.type)) {
                 player.elements.media.setAttribute('controls', '');
             } else {
                 player.elements.media.removeAttribute('controls');
@@ -2210,7 +2228,7 @@
             }
 
             // Update the working copy of the values
-            extend(player.storage, value);
+            utils.extend(player.storage, value);
 
             // Update storage
             window.localStorage.setItem(config.storage.key, JSON.stringify(player.storage));
@@ -2226,57 +2244,57 @@
 
             if (player.supported.full) {
                 // Add type class
-                toggleClass(player.elements.container, config.classes.type.replace('{0}', player.type), true);
+                utils.toggleClass(player.elements.container, config.classes.type.replace('{0}', player.type), true);
 
                 // Add video class for embeds
                 // This will require changes if audio embeds are added
-                if (inArray(types.embed, player.type)) {
-                    toggleClass(player.elements.container, config.classes.type.replace('{0}', 'video'), true);
+                if (utils.inArray(types.embed, player.type)) {
+                    utils.toggleClass(player.elements.container, config.classes.type.replace('{0}', 'video'), true);
                 }
 
                 // Check for picture-in-picture support
-                toggleClass(player.elements.container, config.classes.pip.enabled, support.pip && player.type === 'video');
+                utils.toggleClass(player.elements.container, config.classes.pip.enabled, support.pip && player.type === 'video');
 
                 // Check for airplay support
-                toggleClass(player.elements.container, config.classes.airplay.enabled, support.airplay && inArray(types.html5, player.type));
+                utils.toggleClass(player.elements.container, config.classes.airplay.enabled, support.airplay && utils.inArray(types.html5, player.type));
 
                 // If there's no autoplay attribute, assume the video is stopped and add state class
-                toggleClass(player.elements.container, config.classes.stopped, config.autoplay);
+                utils.toggleClass(player.elements.container, config.classes.stopped, config.autoplay);
 
                 // Add iOS class
-                toggleClass(player.elements.container, config.classes.isIos, player.browser.isIos);
+                utils.toggleClass(player.elements.container, config.classes.isIos, player.browser.isIos);
 
                 // Add touch class
-                toggleClass(player.elements.container, config.classes.isTouch, player.browser.isTouch);
+                utils.toggleClass(player.elements.container, config.classes.isTouch, player.browser.isTouch);
 
                 // Inject the player wrapper
                 if (player.type === 'video') {
                     // Create the wrapper div
-                    player.elements.wrapper = createElement('div', {
+                    player.elements.wrapper = utils.createElement('div', {
                         class: config.classes.videoWrapper
                     });
 
                     // Wrap the video in a container
-                    wrap(player.elements.media, player.elements.wrapper);
+                    utils.wrap(player.elements.media, player.elements.wrapper);
                 }
             }
 
             // Embeds
-            if (inArray(types.embed, player.type)) {
+            if (utils.inArray(types.embed, player.type)) {
                 setupEmbed();
             }
         }
 
         // Setup YouTube/Vimeo
         function setupEmbed() {
-            var container = createElement('div');
+            var container = utils.createElement('div');
             var mediaId;
             var id = player.type + '-' + Math.floor(Math.random() * (10000));
 
             // Parse IDs from URLs if supplied
             switch (player.type) {
                 case 'youtube':
-                    mediaId = parseYouTubeId(player.embedId);
+                    mediaId = utils.parseYouTubeId(player.embedId);
                     break;
 
                 default:
@@ -2286,12 +2304,12 @@
             // Remove old containers
             var containers = getElements('[id^="' + player.type + '-"]');
             for (var i = containers.length - 1; i >= 0; i--) {
-                remove(containers[i]);
+                utils.removeElement(containers[i]);
             }
 
             // Add embed class for responsive
-            toggleClass(player.elements.media, config.classes.videoWrapper, true);
-            toggleClass(player.elements.media, config.classes.embedWrapper, true);
+            utils.toggleClass(player.elements.media, config.classes.videoWrapper, true);
+            utils.toggleClass(player.elements.media, config.classes.embedWrapper, true);
 
             if (player.type === 'youtube') {
                 // Create the YouTube container
@@ -2305,7 +2323,7 @@
                     youTubeReady(mediaId, container);
                 } else {
                     // Load the API
-                    injectScript(config.urls.youtube.api);
+                    utils.injectScript(config.urls.youtube.api);
 
                     // Setup callback for the API
                     window.onYouTubeReadyCallbacks = window.onYouTubeReadyCallbacks || [];
@@ -2335,7 +2353,7 @@
 
                 // Load the API if not already
                 if (!is.object(window.Vimeo)) {
-                    injectScript(config.urls.vimeo.api);
+                    utils.injectScript(config.urls.vimeo.api);
 
                     // Wait for fragaloop load
                     var vimeoTimer = window.setInterval(function() {
@@ -2350,15 +2368,15 @@
             } else if (player.type === 'soundcloud') {
                 // TODO: Currently unsupported and undocumented
                 // Inject the iframe
-                var soundCloud = createElement('iframe');
+                var soundCloud = utils.createElement('iframe');
 
                 // Watch for iframe load
                 soundCloud.loaded = false;
-                on(soundCloud, 'load', function() {
+                utils.on(soundCloud, 'load', function() {
                     soundCloud.loaded = true;
                 });
 
-                setAttributes(soundCloud, {
+                utils.setAttributes(soundCloud, {
                     'src': 'https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/' + mediaId,
                     'id': id
                 });
@@ -2368,7 +2386,7 @@
 
                 // Load the API if not already
                 if (!window.SC) {
-                    injectScript(config.urls.soundcloud.api);
+                    utils.injectScript(config.urls.soundcloud.api);
                 }
 
                 // Wait for SC load
@@ -2410,7 +2428,7 @@
                     wmode: 'transparent',
                     modestbranding: 1,
                     disablekb: 1,
-                    origin: 'https://plyr.io'
+                    origin: window.location.href
                 },
                 events: {
                     'onError': function(event) {
@@ -2446,7 +2464,7 @@
                             instance.stopVideo();
                             player.elements.media.paused = true;
                         };
-                        player.elements.media.duration = instance.getDuration();
+                        player.elements.media.duration = instance.getDuratiutils.on();
                         player.elements.media.paused = true;
                         player.elements.media.currentTime = 0;
                         player.elements.media.muted = instance.isMuted();
@@ -2789,7 +2807,7 @@
         // TODO: Set the indicator on load as user may pass loop as config
         function toggleLoop(type) {
             // Set default to be a true toggle
-            if (!inArray(['start', 'end', 'all', 'none', 'toggle'], type)) {
+            if (!utils.inArray(['start', 'end', 'all', 'none', 'toggle'], type)) {
                 type = 'toggle';
             }
 
@@ -2931,7 +2949,7 @@
 
             if (is.number(input)) {
                 targetTime = input;
-            } else if (is.event(input) && inArray(['input', 'change'], input.type)) {
+            } else if (is.event(input) && utils.inArray(['input', 'change'], input.type)) {
                 // It's the seek slider
                 // Seek to the selected time
                 targetTime = ((input.target.value / input.target.max) * duration);
@@ -2954,7 +2972,7 @@
             } catch (e) {}
 
             // Embeds
-            if (inArray(types.embed, player.type)) {
+            if (utils.inArray(types.embed, player.type)) {
                 switch (player.type) {
                     case 'youtube':
                         player.embed.seekTo(targetTime);
@@ -3007,9 +3025,9 @@
 
         // Check playing state
         function checkPlaying() {
-            toggleClass(player.elements.container, config.classes.playing, !player.elements.media.paused);
+            utils.toggleClass(player.elements.container, config.classes.playing, !player.elements.media.paused);
 
-            toggleClass(player.elements.container, config.classes.stopped, player.elements.media.paused);
+            utils.toggleClass(player.elements.container, config.classes.stopped, player.elements.media.paused);
 
             toggleControls(player.elements.media.paused);
         }
@@ -3063,14 +3081,14 @@
             }
 
             // Set class hook
-            toggleClass(player.elements.container, config.classes.fullscreen.active, player.fullscreen.active);
+            utils.toggleClass(player.elements.container, config.classes.fullscreen.active, player.fullscreen.active);
 
             // Trap focus
             focusTrap(player.fullscreen.active);
 
             // Set button state
             if (player.elements.buttons && player.elements.buttons.fullscreen) {
-                toggleState(player.elements.buttons.fullscreen, player.fullscreen.active);
+                utils.toggleState(player.elements.buttons.fullscreen, player.fullscreen.active);
             }
 
             // Trigger an event
@@ -3124,7 +3142,7 @@
                 container.appendChild(clone);
                 targetWidth = clone.scrollWidth;
                 targetHeight = clone.scrollHeight;
-                remove(clone);
+                utils.removeElement(clone);
             }
 
             target.setAttribute('aria-hidden', !show);
@@ -3150,7 +3168,7 @@
             }
 
             // Set button state
-            toggleState(player.elements.buttons.mute, muted);
+            utils.toggleState(player.elements.buttons.mute, muted);
 
             // Set mute on the player
             player.elements.media.muted = muted;
@@ -3161,7 +3179,7 @@
             }
 
             // Embeds
-            if (inArray(types.embed, player.type)) {
+            if (utils.inArray(types.embed, player.type)) {
                 // YouTube
                 switch (player.type) {
                     case 'youtube':
@@ -3217,7 +3235,7 @@
             }
 
             // Embeds
-            if (inArray(types.embed, player.type)) {
+            if (utils.inArray(types.embed, player.type)) {
                 switch (player.type) {
                     case 'youtube':
                         player.embed.setVolume(player.elements.media.volume * 100);
@@ -3284,11 +3302,11 @@
             });
 
             // Toggle class if muted
-            toggleClass(player.elements.container, config.classes.muted, (volume === 0));
+            utils.toggleClass(player.elements.container, config.classes.muted, (volume === 0));
 
             // Update checkbox for mute state
             if (player.supported.full && player.elements.buttons.mute) {
-                toggleState(player.elements.buttons.mute, (volume === 0));
+                utils.toggleState(player.elements.buttons.mute, (volume === 0));
             }
         }
 
@@ -3302,7 +3320,7 @@
             // Timer to prevent flicker when seeking
             timers.loading = setTimeout(function() {
                 // Toggle container class hook
-                toggleClass(player.elements.container, config.classes.loading, loading);
+                utils.toggleClass(player.elements.container, config.classes.loading, loading);
 
                 // Show controls if loading, hide if done
                 toggleControls(loading);
@@ -3328,7 +3346,7 @@
                             return;
                         }
 
-                        value = getPercentage(player.elements.media.currentTime, duration);
+                        value = utils.getPercentage(player.elements.media.currentTime, duration);
 
                         // Set seek range value only if it's a 'natural' time event
                         if (event.type === 'timeupdate' && player.elements.inputs.seek) {
@@ -3346,7 +3364,7 @@
 
                             if (buffered && buffered.length) {
                                 // HTML5
-                                return getPercentage(buffered.end(0), duration);
+                                return utils.getPercentage(buffered.end(0), duration);
                             } else if (is.number(buffered)) {
                                 // YouTube returns between 0 and 1
                                 return (buffered * 100);
@@ -3475,7 +3493,7 @@
             }
 
             var duration = getDuration(),
-                value = getPercentage(time, duration);
+                value = utils.getPercentage(time, duration);
 
             // Update progress
             if (player.elements.progress && player.elements.display.played) {
@@ -3506,7 +3524,7 @@
             if (is.event(event)) {
                 percent = ((100 / clientRect.width) * (event.pageX - clientRect.left));
             } else {
-                if (hasClass(player.elements.display.seekTooltip, visible)) {
+                if (utils.hasClass(player.elements.display.seekTooltip, visible)) {
                     percent = player.elements.display.seekTooltip.style.left.replace('%', '');
                 } else {
                     return;
@@ -3528,8 +3546,8 @@
 
             // Show/hide the tooltip
             // If the event is a moues in/out and percentage is inside bounds
-            if (is.event(event) && inArray(['mouseenter', 'mouseleave'], event.type)) {
-                toggleClass(player.elements.display.seekTooltip, visible, (event.type === 'mouseenter'));
+            if (is.event(event) && utils.inArray(['mouseenter', 'mouseleave'], event.type)) {
+                utils.toggleClass(player.elements.display.seekTooltip, visible, (event.type === 'mouseenter'));
             }
         }
 
@@ -3543,7 +3561,7 @@
             var delay = 0;
             var isEnterFullscreen = false;
             var show = toggle;
-            var loading = hasClass(player.elements.container, config.classes.loading);
+            var loading = utils.hasClass(player.elements.container, config.classes.loading);
 
             // Default to false if no boolean
             if (!is.boolean(toggle)) {
@@ -3552,10 +3570,10 @@
                     isEnterFullscreen = (toggle.type === 'enterfullscreen');
 
                     // Whether to show controls
-                    show = inArray(['mousemove', 'touchstart', 'mouseenter', 'focus'], toggle.type);
+                    show = utils.inArray(['mousemove', 'touchstart', 'mouseenter', 'focus'], toggle.type);
 
                     // Delay hiding on move events
-                    if (inArray(['mousemove', 'touchmove'], toggle.type)) {
+                    if (utils.inArray(['mousemove', 'touchmove'], toggle.type)) {
                         delay = 2000;
                     }
 
@@ -3564,7 +3582,7 @@
                         delay = 3000;
                     }
                 } else {
-                    show = hasClass(player.elements.container, config.classes.hideControls);
+                    show = utils.hasClass(player.elements.container, config.classes.hideControls);
                 }
             }
 
@@ -3573,7 +3591,7 @@
 
             // If the mouse is not over the controls, set a timeout to hide them
             if (show || player.elements.media.paused || loading) {
-                toggleClass(player.elements.container, config.classes.hideControls, false);
+                utils.toggleClass(player.elements.container, config.classes.hideControls, false);
 
                 // Always show controls when paused or if touch
                 if (player.elements.media.paused || loading) {
@@ -3595,7 +3613,7 @@
                         return;
                     }
 
-                    toggleClass(player.elements.container, config.classes.hideControls, true);
+                    utils.toggleClass(player.elements.container, config.classes.hideControls, true);
                 }, delay);
             }
         }
@@ -3644,7 +3662,7 @@
             }
 
             // Remove ready class hook
-            toggleClass(player.elements.container, config.classes.ready, false);
+            utils.toggleClass(player.elements.container, config.classes.ready, false);
 
             // Pause playback
             pause();
@@ -3664,11 +3682,14 @@
                 player.embed = null;
 
                 // Remove the old media
-                remove(player.elements.media);
+                removeElement('media');
+
+                // Remove the old captions
+                removeElement('captions');
 
                 // Remove video container
                 if (player.type === 'video' && player.elements.wrapper) {
-                    remove(player.elements.wrapper);
+                    removeElement('wrapper');
                 }
 
                 // Reset class name
@@ -3684,7 +3705,7 @@
                     if (player.type === 'video') {
                         var firstSource = source.sources[0];
 
-                        if ('type' in firstSource && inArray(types.embed, firstSource.type)) {
+                        if ('type' in firstSource && utils.inArray(types.embed, firstSource.type)) {
                             player.type = firstSource.type;
                         }
                     }
@@ -3696,23 +3717,23 @@
                 // Create new markup
                 switch (player.type) {
                     case 'video':
-                        player.elements.media = createElement('video');
+                        player.elements.media = utils.createElement('video');
                         break;
 
                     case 'audio':
-                        player.elements.media = createElement('audio');
+                        player.elements.media = utils.createElement('audio');
                         break;
 
                     case 'youtube':
                     case 'vimeo':
                     case 'soundcloud':
-                        player.elements.media = createElement('div');
+                        player.elements.media = utils.createElement('div');
                         player.embedId = source.sources[0].src;
                         break;
                 }
 
                 // Inject the new element
-                prependChild(player.elements.container, player.elements.media);
+                utils.prependChild(player.elements.container, player.elements.media);
 
                 // Autoplay the new source?
                 if (is.boolean(source.autoplay)) {
@@ -3720,7 +3741,7 @@
                 }
 
                 // Set attributes for audio and video
-                if (inArray(types.html5, player.type)) {
+                if (utils.inArray(types.html5, player.type)) {
                     if (config.crossorigin) {
                         player.elements.media.setAttribute('crossorigin', '');
                     }
@@ -3736,12 +3757,12 @@
                 }
 
                 // Restore class hooks
-                toggleClass(player.elements.container, config.classes.fullscreen.active, player.fullscreen.active);
-                toggleClass(player.elements.container, config.classes.captions.active, player.captions.enabled);
+                utils.toggleClass(player.elements.container, config.classes.fullscreen.active, player.fullscreen.active);
+                utils.toggleClass(player.elements.container, config.classes.captions.active, player.captions.enabled);
                 toggleStyleHook();
 
                 // Set new sources for html5
-                if (inArray(types.html5, player.type)) {
+                if (utils.inArray(types.html5, player.type)) {
                     insertElements('source', source.sources);
                 }
 
@@ -3749,7 +3770,7 @@
                 setupMedia();
 
                 // HTML5 stuff
-                if (inArray(types.html5, player.type)) {
+                if (utils.inArray(types.html5, player.type)) {
                     // Setup captions
                     if ('tracks' in source) {
                         insertElements('track', source.tracks);
@@ -3760,7 +3781,7 @@
                 }
 
                 // If HTML5 or embed but not fully supported, setupInterface and call ready now
-                if (inArray(types.html5, player.type) || (inArray(types.embed, player.type) && !player.supported.full)) {
+                if (utils.inArray(types.html5, player.type) || (utils.inArray(types.embed, player.type) && !player.supported.full)) {
                     // Setup interface
                     setupInterface();
 
@@ -3800,14 +3821,14 @@
 
                 // Setup focus and tab focus
                 if (target) {
-                    var hadTabFocus = hasClass(trigger, config.classes.tabFocus);
+                    var hadTabFocus = utils.hasClass(trigger, config.classes.tabFocus);
 
                     setTimeout(function() {
                         target.focus();
 
                         if (hadTabFocus) {
-                            toggleClass(trigger, config.classes.tabFocus, false);
-                            toggleClass(target, config.classes.tabFocus, true);
+                            utils.toggleClass(trigger, config.classes.tabFocus, false);
+                            utils.toggleClass(target, config.classes.tabFocus, true);
                         }
                     }, 100);
                 }
@@ -3820,10 +3841,10 @@
 
             // Detect tab focus
             function checkTabFocus(focused) {
-                toggleClass(getElements('.' + config.classes.tabFocus), config.classes.tabFocus, false);
+                utils.toggleClass(getElements('.' + config.classes.tabFocus), config.classes.tabFocus, false);
 
                 if (player.elements.container.contains(focused)) {
-                    toggleClass(focused, config.classes.tabFocus, true);
+                    utils.toggleClass(focused, config.classes.tabFocus, true);
                 }
             }
 
@@ -3833,9 +3854,9 @@
 
                 // Handle global presses
                 if (config.keyboardShortcuts.global) {
-                    on(window, 'keydown keyup', function(event) {
+                    utils.on(window, 'keydown keyup', function(event) {
                         var code = getKeyCode(event);
-                        var focused = getFocusElement();
+                        var focused = utils.getFocusElement();
                         var allowed = [48, 49, 50, 51, 52, 53, 54, 56, 57, 75, 77, 70, 67, 73, 76, 79];
                         var count = get().length;
 
@@ -3843,14 +3864,14 @@
                         // and the key is in the allowed keys
                         // and if the focused element is not editable (e.g. text input)
                         // and any that accept key input http://webaim.org/techniques/keyboard/
-                        if (count === 1 && inArray(allowed, code) && (!is.htmlElement(focused) || !matches(focused, config.selectors.editable))) {
+                        if (count === 1 && utils.inArray(allowed, code) && (!is.htmlElement(focused) || !utils.matches(focused, config.selectors.editable))) {
                             handleKey(event);
                         }
                     });
                 }
 
                 // Handle presses on focused
-                on(player.elements.container, 'keydown keyup', handleKey);
+                utils.on(player.elements.container, 'keydown keyup', handleKey);
             }
 
             function handleKey(event) {
@@ -3885,16 +3906,16 @@
                     var preventDefault = [48, 49, 50, 51, 52, 53, 54, 56, 57, 32, 75, 38, 40, 77, 39, 37, 70, 67, 73, 76, 79];
                     var checkFocus = [38, 40];
 
-                    if (inArray(checkFocus, code)) {
-                        var focused = getFocusElement();
+                    if (utils.inArray(checkFocus, code)) {
+                        var focused = utils.getFocusElement();
 
-                        if (is.htmlElement(focused) && getFocusElement().type === "radio") {
+                        if (is.htmlElement(focused) && utils.getFocusElement().type === "radio") {
                             return;
                         }
                     }
 
                     // If the code is found prevent default (e.g. prevent scrolling for arrows)
-                    if (inArray(preventDefault, code)) {
+                    if (utils.inArray(preventDefault, code)) {
                         event.preventDefault();
                         event.stopPropagation();
                     }
@@ -3990,22 +4011,22 @@
             }
 
             // Focus/tab management
-            on(window, 'keyup', function(event) {
+            utils.on(window, 'keyup', function(event) {
                 var code = getKeyCode(event);
-                var focused = getFocusElement();
+                var focused = utils.getFocusElement();
 
                 if (code === 9) {
                     checkTabFocus(focused);
                 }
             });
-            on(document.body, 'click', function() {
-                toggleClass(getElement('.' + config.classes.tabFocus), config.classes.tabFocus, false);
+            utils.on(document.body, 'click', function() {
+                utils.toggleClass(getElement('.' + config.classes.tabFocus), config.classes.tabFocus, false);
             });
             for (var button in player.elements.buttons) {
                 var element = player.elements.buttons[button];
 
-                on(element, 'blur', function() {
-                    toggleClass(element, 'tab-focus', false);
+                utils.on(element, 'blur', function() {
+                    utils.toggleClass(element, 'tab-focus', false);
                 });
             }
 
@@ -4020,32 +4041,32 @@
             }
 
             // Play
-            proxy(player.elements.buttons.play, 'click', config.listeners.play, _togglePlay);
-            proxy(player.elements.buttons.playLarge, 'click', config.listeners.play, _togglePlay);
+            utils.proxy(player.elements.buttons.play, 'click', config.listeners.play, _togglePlay);
+            utils.proxy(player.elements.buttons.playLarge, 'click', config.listeners.play, _togglePlay);
 
             // Pause
-            proxy(player.elements.buttons.pause, 'click', config.listeners.pause, _togglePlay);
+            utils.proxy(player.elements.buttons.pause, 'click', config.listeners.pause, _togglePlay);
 
             // Pause
-            proxy(player.elements.buttons.restart, 'click', config.listeners.restart, seek);
+            utils.proxy(player.elements.buttons.restart, 'click', config.listeners.restart, seek);
 
             // Rewind
-            proxy(player.elements.buttons.rewind, 'click', config.listeners.rewind, rewind);
+            utils.proxy(player.elements.buttons.rewind, 'click', config.listeners.rewind, rewind);
 
             // Rewind
-            proxy(player.elements.buttons.forward, 'click', config.listeners.forward, forward);
+            utils.proxy(player.elements.buttons.forward, 'click', config.listeners.forward, forward);
 
             // Mute
-            proxy(player.elements.buttons.mute, 'click', config.listeners.mute, toggleMute);
+            utils.proxy(player.elements.buttons.mute, 'click', config.listeners.mute, toggleMute);
 
             // Captions
-            proxy(player.elements.buttons.captions, 'click', config.listeners.captions, toggleCaptions);
+            utils.proxy(player.elements.buttons.captions, 'click', config.listeners.captions, toggleCaptions);
 
             // Fullscreen
-            proxy(player.elements.buttons.fullscreen, 'click', config.listeners.fullscreen, toggleFullscreen);
+            utils.proxy(player.elements.buttons.fullscreen, 'click', config.listeners.fullscreen, toggleFullscreen);
 
             // Picture-in-Picture
-            proxy(player.elements.buttons.pip, 'click', config.listeners.pip, function(event) {
+            utils.proxy(player.elements.buttons.pip, 'click', config.listeners.pip, function(event) {
                 if (!support.pip) {
                     return;
                 }
@@ -4053,7 +4074,7 @@
             });
 
             // Airplay
-            proxy(player.elements.buttons.airplay, 'click', config.listeners.airplay, function(event) {
+            utils.proxy(player.elements.buttons.airplay, 'click', config.listeners.airplay, function(event) {
                 if (!support.airplay) {
                     return;
                 }
@@ -4061,10 +4082,10 @@
             });
 
             // Settings menu
-            on(player.elements.settings.menu, 'click', toggleMenu);
+            utils.on(player.elements.settings.menu, 'click', toggleMenu);
 
             // Click anywhere closes menu
-            on(document.body, 'click', function(event) {
+            utils.on(document.body, 'click', function(event) {
                 var menu = player.elements.settings.menu;
                 var form = menu.querySelector('form');
 
@@ -4077,32 +4098,32 @@
             });
 
             // Settings menu items - use event delegation as items are added/removed
-            on(player.elements.settings.menu, 'click', function(event) {
+            utils.on(player.elements.settings.menu, 'click', function(event) {
                 // Settings - Language
-                if (matches(event.target, config.selectors.inputs.language)) {
+                if (utils.matches(event.target, config.selectors.inputs.language)) {
                     handlerProxy.call(this, event, config.listeners.language, setLanguage);
                 }
 
                 // Settings - Quality
-                else if (matches(event.target, config.selectors.inputs.quality)) {
+                else if (utils.matches(event.target, config.selectors.inputs.quality)) {
                     handlerProxy.call(this, event, config.listeners.quality, function() {
                         warn("Set quality");
                     });
                 }
 
                 // Settings - Speed
-                else if (matches(event.target, config.selectors.inputs.speed)) {
+                else if (utils.matches(event.target, config.selectors.inputs.speed)) {
                     handlerProxy.call(this, event, config.listeners.speed, setSpeed);
                 }
 
                 // Settings - Looping
                 // TODO: use toggle buttons
-                else if (matches(event.target, config.selectors.buttons.loop)) {
+                else if (utils.matches(event.target, config.selectors.buttons.loop)) {
                     handlerProxy.call(this, event, config.listeners.loop, function() {
                         // TODO: This should be done in the method itself I think
                         var value = event.target.getAttribute('data-loop__value') || event.target.getAttribute('data-loop__type');
 
-                        if (inArray(['start', 'end', 'all', 'none'], value)) {
+                        if (utils.inArray(['start', 'end', 'all', 'none'], value)) {
                             toggleLoop(value);
                         }
                     });
@@ -4110,35 +4131,35 @@
             });
 
             // Seek
-            proxy(player.elements.inputs.seek, inputEvent, config.listeners.seek, seek);
+            utils.proxy(player.elements.inputs.seek, inputEvent, config.listeners.seek, seek);
 
             // Seek
-            proxy(player.elements.inputs.volume, inputEvent, config.listeners.volume, setVolume);
+            utils.proxy(player.elements.inputs.volume, inputEvent, config.listeners.volume, setVolume);
 
             // Seek tooltip
-            on(player.elements.progress, 'mouseenter mouseleave mousemove', updateSeekTooltip);
+            utils.on(player.elements.progress, 'mouseenter mouseleave mousemove', updateSeekTooltip);
 
             // Toggle controls visibility based on mouse movement
             if (config.hideControls) {
                 // Toggle controls on mouse events and entering fullscreen
-                on(player.elements.container, 'mouseenter mouseleave mousemove touchstart touchend touchcancel touchmove enterfullscreen', toggleControls);
+                utils.on(player.elements.container, 'mouseenter mouseleave mousemove touchstart touchend touchcancel touchmove enterfullscreen', toggleControls);
 
                 // Watch for cursor over controls so they don't hide when trying to interact
-                on(player.elements.controls, 'mouseenter mouseleave', function(event) {
+                utils.on(player.elements.controls, 'mouseenter mouseleave', function(event) {
                     player.elements.controls.hover = event.type === 'mouseenter';
                 });
 
                 // Watch for cursor over controls so they don't hide when trying to interact
-                on(player.elements.controls, 'mousedown mouseup touchstart touchend touchcancel', function(event) {
-                    player.elements.controls.pressed = inArray(['mousedown', 'touchstart'], event.type);
+                utils.on(player.elements.controls, 'mousedown mouseup touchstart touchend touchcancel', function(event) {
+                    player.elements.controls.pressed = utils.inArray(['mousedown', 'touchstart'], event.type);
                 });
 
                 // Focus in/out on controls
-                on(player.elements.controls, 'focus blur', toggleControls, true);
+                utils.on(player.elements.controls, 'focus blur', toggleControls, true);
             }
 
             // Mouse wheel for volume
-            proxy(player.elements.inputs.volume, 'wheel', config.listeners.volume, function(event) {
+            utils.proxy(player.elements.inputs.volume, 'wheel', config.listeners.volume, function(event) {
                 // Detect "natural" scroll - suppored on OS X Safari only
                 // Other browsers on OS X will be inverted until support improves
                 var inverted = event.webkitDirectionInvertedFromDevice;
@@ -4176,20 +4197,20 @@
 
             // Handle user exiting fullscreen by escaping etc
             if (support.fullscreen) {
-                on(document, fullscreen.eventType, toggleFullscreen);
+                utils.on(document, fullscreen.eventType, toggleFullscreen);
             }
         }
 
         // Listen for media events
         function mediaListeners() {
             // Time change on media
-            on(player.elements.media, 'timeupdate seeking', timeUpdate);
+            utils.on(player.elements.media, 'timeupdate seeking', timeUpdate);
 
             // Display duration
-            on(player.elements.media, 'durationchange loadedmetadata', displayDuration);
+            utils.on(player.elements.media, 'durationchange loadedmetadata', displayDuration);
 
             // Handle the media finishing
-            on(player.elements.media, 'ended', function() {
+            utils.on(player.elements.media, 'ended', function() {
                 // Show poster on end
                 if (player.type === 'video' && config.showPosterOnEnd) {
                     // Clear
@@ -4206,16 +4227,16 @@
             });
 
             // Check for buffer progress
-            on(player.elements.media, 'progress playing', updateProgress);
+            utils.on(player.elements.media, 'progress playing', updateProgress);
 
             // Handle native mute
-            on(player.elements.media, 'volumechange', updateVolume);
+            utils.on(player.elements.media, 'volumechange', updateVolume);
 
             // Handle native play/pause
-            on(player.elements.media, 'play pause ended', checkPlaying);
+            utils.on(player.elements.media, 'play pause ended', checkPlaying);
 
             // Loading
-            on(player.elements.media, 'waiting canplay seeked', checkLoading);
+            utils.on(player.elements.media, 'waiting canplay seeked', checkLoading);
 
             // Click video
             if (config.clickToPlay && player.type !== 'audio') {
@@ -4231,7 +4252,7 @@
                 wrapper.style.cursor = "pointer";
 
                 // On click play, pause ore restart
-                on(wrapper, 'click', function() {
+                utils.on(wrapper, 'click', function() {
                     // Touch devices will just show controls (if we're hiding controls)
                     if (config.hideControls && player.browser.isTouch && !player.elements.media.paused) {
                         return;
@@ -4250,14 +4271,14 @@
 
             // Disable right click
             if (config.disableContextMenu) {
-                on(player.elements.media, 'contextmenu', function(event) {
+                utils.on(player.elements.media, 'contextmenu', function(event) {
                     event.preventDefault();
                 });
             }
 
             // Proxy events to container
             // Bubble up key events for Edge
-            on(player.elements.media, config.events.concat(['keyup', 'keydown']).join(' '), function(event) {
+            utils.on(player.elements.media, config.events.concat(['keyup', 'keydown']).join(' '), function(event) {
                 trigger(player.elements.container, event.type, true);
             });
         }
@@ -4265,14 +4286,14 @@
         // Cancel current network requests
         // See https://github.com/Selz/plyr/issues/174
         function cancelRequests() {
-            if (!inArray(types.html5, player.type)) {
+            if (!utils.inArray(types.html5, player.type)) {
                 return;
             }
 
             // Remove child sources
             var sources = player.elements.media.querySelectorAll('source');
             for (var i = 0; i < sources.length; i++) {
-                remove(sources[i]);
+                utils.removeElement(sources[i]);
             }
 
             // Set blank video src attribute
@@ -4372,7 +4393,7 @@
             }
 
             // Sniff out the browser
-            player.browser = getBrowser();
+            player.browser = utils.getBrowser();
 
             // Bail if nothing to setup
             if (!is.htmlElement(player.elements.media)) {
@@ -4408,7 +4429,7 @@
             }
 
             // Wrap media
-            player.elements.container = wrap(media, createElement('div'));
+            player.elements.container = utils.wrap(media, utils.createElement('div'));
 
             // Allow focus to be captured
             player.elements.container.setAttribute('tabindex', 0);
@@ -4424,7 +4445,7 @@
 
             // Setup interface
             // If embed but not fully supported, setupInterface (to avoid flash of controls) and call ready now
-            if (inArray(types.html5, player.type) || (inArray(types.embed, player.type) && !player.supported.full)) {
+            if (utils.inArray(types.html5, player.type) || (utils.inArray(types.embed, player.type) && !player.supported.full)) {
                 // Setup UI
                 setupInterface();
 
@@ -4446,10 +4467,10 @@
                 warn('Basic support only', player.type);
 
                 // Remove controls
-                remove(getElement(config.selectors.controls.wrapper));
+                removeElement('controls');
 
                 // Remove large play
-                remove(getElement(config.selectors.buttons.play));
+                removeElement('buttons.play');
 
                 // Restore native controls
                 toggleNativeControls(true);
@@ -4528,10 +4549,10 @@
                 return player.elements.media.muted;
             },
             isReady: function() {
-                return hasClass(player.elements.container, config.classes.ready);
+                return utils.hasClass(player.elements.container, config.classes.ready);
             },
             isLoading: function() {
-                return hasClass(player.elements.container, config.classes.loading);
+                return utils.hasClass(player.elements.container, config.classes.loading);
             },
             isPaused: function() {
                 return player.elements.media.paused;
@@ -4540,7 +4561,7 @@
                 return config.loop.active;
             },
             on: function(event, callback) {
-                on(player.elements.container, event, callback);
+                utils.on(player.elements.container, event, callback);
                 return this;
             },
             play: play,
@@ -4581,10 +4602,10 @@
             }, 0);
 
             // Set class hook on media element
-            toggleClass(player.elements.media, defaults.classes.setup, true);
+            utils.toggleClass(player.elements.media, defaults.classes.setup, true);
 
             // Set container class for ready
-            toggleClass(player.elements.container, config.classes.ready, true);
+            utils.toggleClass(player.elements.container, config.classes.ready, true);
 
             // Store a refernce to instance
             player.elements.media.plyr = api;
@@ -4616,7 +4637,7 @@
         }
 
         // Create placeholder (to prevent loading twice)
-        var container = createElement('div');
+        var container = utils.createElement('div');
         container.setAttribute('hidden', '');
         if (is.string(id)) {
             container.setAttribute('id', id);
@@ -4640,12 +4661,12 @@
 
     // Check for support
     function checkSupport(type) {
-        var browser = getBrowser();
+        var browser = utils.getBrowser();
         var isOldIE = (browser.isIE && browser.version <= 9);
         var isIos = browser.isIos;
         var isIphone = /iPhone|iPod/i.test(navigator.userAgent);
-        var audio = !!createElement('audio').canPlayType;
-        var video = !!createElement('video').canPlayType;
+        var audio = !!utils.createElement('audio').canPlayType;
+        var video = !!utils.createElement('video').canPlayType;
         var basic;
         var full;
 
@@ -4716,10 +4737,10 @@
 
         // Add to container list
         function add(target, media) {
-            if (!hasClass(media, defaults.classes.hook)) {
+            if (!utils.hasClass(media, defaults.classes.hook)) {
                 players.push({
                     // Always wrap in a <div> for styling
-                    // container: wrap(media, document.createElement('div')),
+                    // container: utils.wrap(media, document.createElement('div')),
                     // Could be a container or the media itself
                     target: target,
                     // This should be the <video>, <audio> or <div> (YouTube/Vimeo)
@@ -4740,7 +4761,7 @@
                 for (var x = 0; x < children.length; x++) {
                     add(target, children[x]);
                 }
-            } else if (matches(target, selector)) {
+            } else if (utils.matches(target, selector)) {
                 // Target is media element
                 add(target, target);
             }
@@ -4766,7 +4787,7 @@
                 data = JSON.parse(element.getAttribute('data-plyr'));
             } catch (e) {}
 
-            var config = extend({}, defaults, options, data);
+            var config = utils.extend({}, defaults, options, data);
 
             // Bail if not enabled
             if (!config.enabled) {
@@ -4785,13 +4806,13 @@
             if (config.debug) {
                 var events = config.events.concat(['setup', 'statechange', 'enterfullscreen', 'exitfullscreen', 'captionsenabled', 'captionsdisabled']);
 
-                on(instance.getContainer(), events.join(' '), function(event) {
+                utils.on(instance.getContainer(), events.join(' '), function(event) {
                     console.log([config.logPrefix, 'event:', event.type].join(' '), event.detail.plyr);
                 });
             }
 
             // Callback
-            event(instance.getContainer(), 'setup', true, {
+            utils.event(instance.getContainer(), 'setup', true, {
                 plyr: instance
             });
 
