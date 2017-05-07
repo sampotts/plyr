@@ -510,6 +510,47 @@
             parent.insertBefore(element, parent.firstChild);
         },
 
+        // Inaert an element after another
+        insertAfter: function(element, target) {
+            target.parentNode.insertBefore(element, target.nextSibling);
+        },
+
+        // Create a DocumentFragment
+        createElement: function(type, attributes, text) {
+            // Create a new <element>
+            var element = document.createElement(type);
+
+            // Set all passed attributes
+            if (is.object(attributes)) {
+                utils.setAttributes(element, attributes);
+            }
+
+            // Add text node
+            if (is.string(text)) {
+                element.textContent = text;
+            }
+
+            // Return built element
+            return element;
+        },
+
+        // Insert a DocumentFragment
+        insertElement: function(type, parent, attributes, text) {
+            // Create a new <element>
+            var element = utils.createElement(type, attributes, text);
+
+            // Inject the new element
+            utils.prependChild(parent, element);
+        },
+
+        // Remove all child elements
+        emptyElement: function(element) {
+            var length = element.childNodes.length;
+            while (length--) {
+                element.removeChild(element.lastChild);
+            }
+        },
+
         // Set attributes
         setAttributes: function(element, attributes) {
             for (var key in attributes) {
@@ -574,42 +615,6 @@
             });
 
             return attributes;
-        },
-
-        // Create a DocumentFragment
-        createElement: function(type, attributes, text) {
-            // Create a new <element>
-            var element = document.createElement(type);
-
-            // Set all passed attributes
-            if (is.object(attributes)) {
-                utils.setAttributes(element, attributes);
-            }
-
-            // Add text node
-            if (is.string(text)) {
-                element.textContent = text;
-            }
-
-            // Return built element
-            return element;
-        },
-
-        // Insert a DocumentFragment
-        insertElement: function(type, parent, attributes, text) {
-            // Create a new <element>
-            var element = utils.createElement(type, attributes, text);
-
-            // Inject the new element
-            utils.prependChild(parent, element);
-        },
-
-        // Remove all child elements
-        emptyElement: function(element) {
-            var length = element.childNodes.length;
-            while (length--) {
-                element.removeChild(element.lastChild);
-            }
         },
 
         // Toggle class on an element
@@ -811,6 +816,15 @@
         parseYouTubeId: function(url) {
             var regex = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
             return url.match(regex) ? RegExp.$2 : url;
+        },
+
+        // Remove HTML from a string
+        stripHTML: function(source) {
+            var fragment = document.createDocumentFragment();
+            var element = document.createElement('div');
+            fragment.appendChild(element);
+            element.innerHTML = source;
+            return fragment.firstChild.innerText;
         }
     };
 
@@ -1596,12 +1610,10 @@
             }
 
             if (is.array(options) && !is.empty(options)) {
-                // Remove any unwanted quality levels
-                var filtered = options.filter(function(quality) {
-                    return ['tiny', 'small'].indexOf(quality) === -1;
-                });
-
-                filtered.forEach(function(quality) {
+                options.filter(function(quality) {
+                    // Remove any unwanted quality levels
+                    return !utils.inArray(['tiny', 'small'], quality);
+                }).forEach(function(quality) {
                     var item = utils.createElement('li');
 
                     var label = utils.createElement('label', {
@@ -1802,15 +1814,7 @@
             // Inject the container
             if (!is.htmlElement(player.elements.captions)) {
                 player.elements.captions = utils.createElement('div', utils.getAttributesFromSelector(config.selectors.captions));
-
-                console.warn(player.type);
-
-                if (player.type === 'video') {
-                    player.elements.wrapper.appendChild(player.elements.captions);
-                } else {
-                    console.warn(player.elements.media);
-                    player.elements.media.appendChild(player.elements.captions);
-                }
+                utils.insertAfter(player.elements.captions, player.elements.wrapper);
             }
 
             // Get tracks
@@ -2268,7 +2272,7 @@
                 utils.toggleClass(player.elements.container, config.classes.isTouch, player.browser.isTouch);
 
                 // Inject the player wrapper
-                if (player.type === 'video') {
+                if (utils.inArray(['video', 'youtube', 'vimeo'], player.type)) {
                     // Create the wrapper div
                     player.elements.wrapper = utils.createElement('div', {
                         class: config.classes.videoWrapper
@@ -2287,7 +2291,7 @@
 
         // Setup YouTube/Vimeo
         function setupEmbed() {
-            var container = utils.createElement('div');
+            //var container = utils.createElement('div');
             var mediaId;
             var id = player.type + '-' + Math.floor(Math.random() * (10000));
 
@@ -2308,19 +2312,15 @@
             }
 
             // Add embed class for responsive
-            utils.toggleClass(player.elements.media, config.classes.videoWrapper, true);
-            utils.toggleClass(player.elements.media, config.classes.embedWrapper, true);
+            utils.toggleClass(player.elements.wrapper, config.classes.embedWrapper, true);
 
             if (player.type === 'youtube') {
-                // Create the YouTube container
-                player.elements.media.appendChild(container);
-
                 // Set ID
-                container.setAttribute('id', id);
+                player.elements.media.setAttribute('id', id);
 
                 // Setup API
                 if (is.object(window.YT)) {
-                    youTubeReady(mediaId, container);
+                    youTubeReady(mediaId);
                 } else {
                     // Load the API
                     utils.injectScript(config.urls.youtube.api);
@@ -2330,7 +2330,7 @@
 
                     // Add to queue
                     window.onYouTubeReadyCallbacks.push(function() {
-                        youTubeReady(mediaId, container);
+                        youTubeReady(mediaId);
                     });
 
                     // Set callback to process queue
@@ -2342,14 +2342,10 @@
                 }
             } else if (player.type === 'vimeo') {
                 // Vimeo needs an extra div to hide controls on desktop (which has full support)
-                if (player.supported.full) {
-                    player.elements.media.appendChild(container);
-                } else {
-                    container = player.elements.media;
-                }
+                utils.wrap(player.elements.media, utils.createElement('div'));
 
                 // Set ID
-                container.setAttribute('id', id);
+                player.elements.media.setAttribute('id', id);
 
                 // Load the API if not already
                 if (!is.object(window.Vimeo)) {
@@ -2359,11 +2355,11 @@
                     var vimeoTimer = window.setInterval(function() {
                         if (is.object(window.Vimeo)) {
                             window.clearInterval(vimeoTimer);
-                            vimeoReady(mediaId, container);
+                            vimeoReady(mediaId);
                         }
                     }, 50);
                 } else {
-                    vimeoReady(mediaId, container);
+                    vimeoReady(mediaId);
                 }
             } else if (player.type === 'soundcloud') {
                 // TODO: Currently unsupported and undocumented
@@ -2381,8 +2377,7 @@
                     'id': id
                 });
 
-                container.appendChild(soundCloud);
-                player.elements.media.appendChild(container);
+                player.elements.media.appendChild(soundCloud);
 
                 // Load the API if not already
                 if (!window.SC) {
@@ -2412,10 +2407,10 @@
         }
 
         // Handle YouTube API ready
-        function youTubeReady(videoId, container) {
+        function youTubeReady(videoId) {
             // Setup instance
             // https://developers.google.com/youtube/iframe_api_reference
-            player.embed = new window.YT.Player(container.id, {
+            player.embed = new window.YT.Player(player.elements.media.id, {
                 videoId: videoId,
                 playerVars: {
                     autoplay: (config.autoplay ? 1 : 0),
@@ -2464,7 +2459,7 @@
                             instance.stopVideo();
                             player.elements.media.paused = true;
                         };
-                        player.elements.media.duration = instance.getDuratiutils.on();
+                        player.elements.media.duration = instance.getDuration();
                         player.elements.media.paused = true;
                         player.elements.media.currentTime = 0;
                         player.elements.media.muted = instance.isMuted();
@@ -2480,7 +2475,7 @@
 
                         // Set the tabindex
                         if (player.supported.full) {
-                            player.elements.media.querySelector('iframe').setAttribute('tabindex', -1);
+                            player.elements.media.setAttribute('tabindex', -1);
                         }
 
                         // Update UI
@@ -2595,10 +2590,10 @@
         }
 
         // Vimeo ready
-        function vimeoReady(mediaId, container) {
+        function vimeoReady(mediaId) {
             // Setup instance
             // https://github.com/vimeo/player.js
-            player.embed = new window.Vimeo.Player(container, {
+            player.embed = new window.Vimeo.Player(player.elements.media, {
                 id: mediaId,
                 loop: config.loop.active,
                 autoplay: config.autoplay,
@@ -2653,11 +2648,13 @@
             });
 
             player.embed.on('cuechange', function(data) {
-                log(data);
+                var cue = null;
 
-                var track = data.cues[0].html;
+                if (data.cues.length) {
+                    cue = utils.stripHTML(data.cues[0].text);
+                }
 
-                setCaption(track);
+                setCaption(cue);
             });
 
             player.embed.on('loaded', function() {
@@ -3685,19 +3682,17 @@
 
             // Setup new source
             function setup() {
-                // Remove embed object
+                // Reset embed object
                 player.embed = null;
 
-                // Remove the old media
+                // Remove media
                 removeElement('media');
 
                 // Remove the old captions
                 removeElement('captions');
 
                 // Remove video container
-                if (player.type === 'video' && player.elements.wrapper) {
-                    removeElement('wrapper');
-                }
+                removeElement('wrapper');
 
                 // Reset class name
                 if (player.elements.container) {
@@ -3831,7 +3826,9 @@
                     var hadTabFocus = utils.hasClass(trigger, config.classes.tabFocus);
 
                     setTimeout(function() {
-                        target.focus();
+                        if (is.htmlElement(target)) {
+                            target.focus();
+                        }
 
                         if (hadTabFocus) {
                             utils.toggleClass(trigger, config.classes.tabFocus, false);
