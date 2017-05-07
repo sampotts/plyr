@@ -498,7 +498,8 @@
 
         // Remove an element
         removeElement: function(element) {
-            if (!is.htmlElement(element)) {
+            if (!is.htmlElement(element) ||
+                !is.htmlElement(element.parentNode)) {
                 return;
             }
 
@@ -2341,9 +2342,6 @@
                     };
                 }
             } else if (player.type === 'vimeo') {
-                // Vimeo needs an extra div to hide controls on desktop (which has full support)
-                utils.wrap(player.elements.media, utils.createElement('div'));
-
                 // Set ID
                 player.elements.media.setAttribute('id', id);
 
