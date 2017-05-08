@@ -421,10 +421,12 @@
                 name: name,
                 version: majorVersion,
                 isIE: isIE,
+                isOldIE: (isIE && majorVersion <= 9),
                 isFirefox: isFirefox,
                 isChrome: isChrome,
                 isSafari: isSafari,
-                isIos: /(iPad|iPhone|iPod)/g.test(navigator.platform),
+                isIPhone: /(iPhone|iPod)/gi.test(navigator.platform),
+                isIos: /(iPad|iPhone|iPod)/gi.test(navigator.platform),
                 isTouch: 'ontouchstart' in document.documentElement
             };
         },
@@ -930,6 +932,14 @@
 
     // Check for support
     var support = {
+        // Basic support
+        audio: (function() {
+            return 'canPlayType' in document.createElement('video');
+        })(),
+        video: (function() {
+            return 'canPlayType' in document.createElement('video');
+        })(),
+
         // Fullscreen support and set prefix
         fullscreen: fullscreen.prefix !== false,
 
@@ -964,13 +974,20 @@
         // Picture-in-picture support
         // Safari only currently
         pip: (function() {
-            return is.function(utils.createElement('video').webkitSetPresentationMode);
+            var browser = utils.getBrowser();
+            return !browser.isIPhone && is.function(utils.createElement('video').webkitSetPresentationMode);
         })(),
 
         // Airplay support
         // Safari only currently
         airplay: (function() {
             return is.function(window.WebKitPlaybackTargetAvailabilityEvent);
+        })(),
+
+        // Inline playback support
+        // https://webkit.org/blog/6784/new-video-policies-for-ios/
+        inline: (function() {
+            return 'playsInline' in document.createElement('video');
         })(),
 
         // Check for mime type support against a player instance
@@ -2316,17 +2333,17 @@
 
                 // Add touch class
                 utils.toggleClass(player.elements.container, config.classes.isTouch, player.browser.isTouch);
+            }
 
-                // Inject the player wrapper
-                if (utils.inArray(['video', 'youtube', 'vimeo'], player.type)) {
-                    // Create the wrapper div
-                    player.elements.wrapper = utils.createElement('div', {
-                        class: config.classes.videoWrapper
-                    });
+            // Inject the player wrapper
+            if (utils.inArray(['video', 'youtube', 'vimeo'], player.type)) {
+                // Create the wrapper div
+                player.elements.wrapper = utils.createElement('div', {
+                    class: config.classes.videoWrapper
+                });
 
-                    // Wrap the video in a container
-                    utils.wrap(player.elements.media, player.elements.wrapper);
-                }
+                // Wrap the video in a container
+                utils.wrap(player.elements.media, player.elements.wrapper);
             }
 
             // Embeds
@@ -2466,6 +2483,7 @@
                     wmode: 'transparent',
                     modestbranding: 1,
                     disablekb: 1,
+                    playsinline: 1,
                     origin: window.location.href
                 },
                 events: {
@@ -3757,7 +3775,7 @@
                 }
 
                 // Check for support
-                player.supported = checkSupport(player.type);
+                player.supported = getSupport(player.type, config.inline);
 
                 // Create new markup
                 switch (player.type) {
@@ -3798,6 +3816,9 @@
                     }
                     if (config.loop.active) {
                         player.elements.media.setAttribute('loop', '');
+                    }
+                    if (config.inline) {
+                        player.elements.media.setAttribute('playsinline', '');
                     }
                 }
 
@@ -4463,13 +4484,14 @@
                 media.removeAttribute('data-video-id');
             } else {
                 player.type = tagName;
-                config.crossorigin = (media.getAttribute('crossorigin') !== null);
-                config.autoplay = (config.autoplay || (media.getAttribute('autoplay') !== null));
-                config.loop = (config.loop || (media.getAttribute('loop') !== null));
+                config.crossorigin = media.getAttribute('crossorigin') !== null;
+                config.autoplay = config.autoplay || (media.getAttribute('autoplay') !== null);
+                config.inline = media.getAttribute('playsinline') !== null;
+                config.loop.active = config.loop || (media.getAttribute('loop') !== null);
             }
 
             // Check for support
-            player.supported = checkSupport(player.type);
+            player.supported = getSupport(player.type, config.inline);
 
             // If no native support, bail
             if (!player.supported.basic) {
@@ -4708,37 +4730,38 @@
     }
 
     // Check for support
-    function checkSupport(type) {
+    // Basic functionality vs full UI
+    function getSupport(type, inline) {
+        var basic = false;
+        var full = false;
         var browser = utils.getBrowser();
-        var isOldIE = (browser.isIE && browser.version <= 9);
-        var isIos = browser.isIos;
-        var isIphone = /iPhone|iPod/i.test(navigator.userAgent);
-        var audio = !!utils.createElement('audio').canPlayType;
-        var video = !!utils.createElement('video').canPlayType;
-        var basic;
-        var full;
+        var playsInline = (browser.isIPhone && inline && support.inline);
 
         switch (type) {
             case 'video':
-                basic = video;
-                full = (basic && (!isOldIE && !isIphone));
+                basic = support.video;
+                full = basic && !browser.isOldIE && (!browser.isIPhone || playsInline);
                 break;
 
             case 'audio':
-                basic = audio;
-                full = (basic && !isOldIE);
+                basic = support.audio;
+                full = basic && !browser.isOldIE;
+                break;
+
+            case 'youtube':
+                basic = support.video;
+                full = basic && !browser.isOldIE && (!browser.isIPhone || playsInline);
                 break;
 
             case 'vimeo':
-            case 'youtube':
             case 'soundcloud':
                 basic = true;
-                full = (!isOldIE && !isIos);
+                full = (!browser.isOldIE && !browser.isIos);
                 break;
 
             default:
-                basic = (audio && video);
-                full = (basic && !isOldIE);
+                basic = (support.audio && support.video);
+                full = (basic && !browser.isOldIE);
         }
 
         return {
@@ -4779,7 +4802,7 @@
 
         // Bail if disabled or no basic support
         // You may want to disable certain UAs etc
-        if (!checkSupport().basic || !targets.length) {
+        if (!getSupport().basic || !targets.length) {
             return false;
         }
 
@@ -4900,7 +4923,7 @@
 
     return {
         setup: setup,
-        supported: checkSupport,
+        supported: getSupport,
         loadSprite: loadSprite,
         get: get
     };
