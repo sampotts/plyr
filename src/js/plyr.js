@@ -671,52 +671,79 @@
         },
 
         // Bind along with custom handler
-        proxy: function(element, eventName, customListener, defaultListener, useCapture) {
+        proxy: function(element, eventName, customListener, defaultListener, passive, capture) {
             utils.on(element, eventName, function(event) {
                 if (customListener) {
                     customListener.apply(element, [event]);
                 }
                 defaultListener.apply(element, [event]);
-            }, useCapture);
+            }, passive, capture);
         },
 
         // Toggle event listener
-        toggleListener: function(elements, events, callback, toggle, useCapture) {
-            var eventList = events.split(' ');
+        toggleListener: function(elements, events, callback, toggle, passive, capture) {
+            events = events.split(' ');
 
             // Whether the listener is a capturing listener or not
             // Default to false
-            if (!is.boolean(useCapture)) {
-                useCapture = false;
+            if (!is.boolean(capture)) {
+                capture = false;
+            }
+
+            // Whether the listener can be passive (i.e. default never prevented)
+            // Default to true
+            if (!is.boolean(passive)) {
+                passive = true;
             }
 
             // If a nodelist is passed, call itself on each node
             if (elements instanceof NodeList) {
-                for (var x = 0; x < elements.length; x++) {
-                    if (elements[x] instanceof Node) {
-                        utils.toggleListener(elements[x], arguments[1], arguments[2], arguments[3]);
+                // Convert arguments to Array
+                // https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Functions/arguments
+                var args = arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments);
+
+                // Remove the first argument (elements) as we replace it
+                args.shift();
+
+                // Create listener for each node
+                [].forEach.call(elements, function(element) {
+                    if (element instanceof Node) {
+                        utils.toggleListener.apply(null, [element].concat(args));
                     }
-                }
+                });
+
                 return;
             }
 
-            // If a single node is passed, bind the event listener
-            for (var i = 0; i < eventList.length; i++) {
-                elements[toggle ? 'addEventListener' : 'removeEventListener'](eventList[i], callback, useCapture);
+            // Build options
+            // Default to just capture boolean
+            var options = capture;
+
+            // If passive events listeners are supported
+            if (support.passiveListeners) {
+                options = {
+                    passive: passive,
+                    capture: capture
+                };
             }
+
+            // If a single node is passed, bind the event listener
+            events.forEach(function(event) {
+                elements[toggle ? 'addEventListener' : 'removeEventListener'](event, callback, options);
+            });
         },
 
         // Bind event handler
-        on: function(element, events, callback, useCapture) {
+        on: function(element, events, callback, passive, capture) {
             if (!is.undefined(element)) {
-                utils.toggleListener(element, events, callback, true, useCapture);
+                utils.toggleListener(element, events, callback, true, passive, capture);
             }
         },
 
         // Unbind event handler
-        off: function(element, events, callback, useCapture) {
+        off: function(element, events, callback, passive, capture) {
             if (!is.undefined(element)) {
-                utils.toggleListener(element, events, callback, false, useCapture);
+                utils.toggleListener(element, events, callback, false, passive, capture);
             }
         },
 
@@ -989,6 +1016,24 @@
         // Check for textTracks support
         textTracks: (function() {
             return 'textTracks' in document.createElement('video');
+        })(),
+
+        // Check for passive event listener support
+        // https://github.com/WICG/EventListenerOptions/blob/gh-pages/explainer.md
+        // https://www.youtube.com/watch?v=NPM6172J22g
+        passiveListeners: (function() {
+            // Test via a getter in the options object to see if the passive property is accessed
+            var supported = false;
+            try {
+                var options = Object.defineProperty({}, 'passive', {
+                    get: function() {
+                        supported = true;
+                    }
+                });
+                window.addEventListener("test", null, options);
+            } catch (e) {}
+
+            return supported;
         })()
     };
 
@@ -1090,7 +1135,7 @@
             }
 
             // Bind the handler
-            utils.on(player.elements.container, 'keydown', checkFocus);
+            utils.on(player.elements.container, 'keydown', checkFocus, false);
         }
 
         // Add elements to HTML5 media (source, tracks, etc)
@@ -3869,11 +3914,11 @@
                         if (count === 1 && utils.inArray(allowed, code) && (!is.htmlElement(focused) || !utils.matches(focused, config.selectors.editable))) {
                             handleKey(event);
                         }
-                    });
+                    }, false);
                 }
 
                 // Handle presses on focused
-                utils.on(player.elements.container, 'keydown keyup', handleKey);
+                utils.on(player.elements.container, 'keydown keyup', handleKey, false);
             }
 
             function handleKey(event) {
@@ -4157,7 +4202,8 @@
                 });
 
                 // Focus in/out on controls
-                utils.on(player.elements.controls, 'focus blur', toggleControls, true);
+                // TODO: Check we need capture here
+                utils.on(player.elements.controls, 'focus blur', toggleControls, true, true);
             }
 
             // Mouse wheel for volume
@@ -4195,7 +4241,7 @@
                     (direction === -1 && player.elements.media.volume > 0)) {
                     event.preventDefault();
                 }
-            });
+            }, false);
 
             // Handle user exiting fullscreen by escaping etc
             if (support.fullscreen) {
@@ -4275,7 +4321,7 @@
             if (config.disableContextMenu) {
                 utils.on(player.elements.media, 'contextmenu', function(event) {
                     event.preventDefault();
-                });
+                }, false);
             }
 
             // Proxy events to container
