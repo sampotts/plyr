@@ -13,18 +13,18 @@
 [ ] Test custom controls still works
 
 #### Bugs
-[ ] Fix audio setup bug when calling .setup() again
-[ ] Fix events on unsupported devices (iOS)
-[ ] Investigate iOS inline playback
-[ ] Look at Vimeo's "background" option
+[ ] Fix audio setup bug when calling `.setup()` again
+[ ] Fix events on unsupported devices (iOS, old IE)
 [ ] Fix YouTube rights blocking (origin perhaps?)
 
 # Notes
 - No quality HTML5 support (yet)
 - No Vimeo quality support
-- No Vimeo or YouTube caption support
+- No YouTube caption support
+- Added Vimeo captions support
 - No PiP or AirPlay for Vimeo/YouTube
 - Settings won't be supported for custom controls (coming soon, need to work on templating)
+- Added `playsinline` support for iOS 10
 
 #### Breaking changes
 - New config options for loop
