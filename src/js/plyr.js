@@ -426,8 +426,7 @@
                 isChrome: isChrome,
                 isSafari: isSafari,
                 isIPhone: /(iPhone|iPod)/gi.test(navigator.platform),
-                isIos: /(iPad|iPhone|iPod)/gi.test(navigator.platform),
-                isTouch: 'ontouchstart' in document.documentElement
+                isIos: /(iPad|iPhone|iPod)/gi.test(navigator.platform)
             };
         },
 
@@ -933,12 +932,8 @@
     // Check for support
     var support = {
         // Basic support
-        audio: (function() {
-            return 'canPlayType' in document.createElement('video');
-        })(),
-        video: (function() {
-            return 'canPlayType' in document.createElement('video');
-        })(),
+        audio: 'canPlayType' in document.createElement('audio'),
+        video: 'canPlayType' in document.createElement('video'),
 
         // Fullscreen support and set prefix
         fullscreen: fullscreen.prefix !== false,
@@ -980,15 +975,11 @@
 
         // Airplay support
         // Safari only currently
-        airplay: (function() {
-            return is.function(window.WebKitPlaybackTargetAvailabilityEvent);
-        })(),
+        airplay: is.function(window.WebKitPlaybackTargetAvailabilityEvent),
 
         // Inline playback support
         // https://webkit.org/blog/6784/new-video-policies-for-ios/
-        inline: (function() {
-            return 'playsInline' in document.createElement('video');
-        })(),
+        inline: 'playsInline' in document.createElement('video'),
 
         // Check for mime type support against a player instance
         // Credits: http://diveintohtml5.info/everything.html
@@ -1031,9 +1022,7 @@
         },
 
         // Check for textTracks support
-        textTracks: (function() {
-            return 'textTracks' in document.createElement('video');
-        })(),
+        textTracks: 'textTracks' in document.createElement('video'),
 
         // Check for passive event listener support
         // https://github.com/WICG/EventListenerOptions/blob/gh-pages/explainer.md
@@ -1051,7 +1040,11 @@
             } catch (e) {}
 
             return supported;
-        })()
+        })(),
+
+        // Touch
+        // Remember a device can be moust + touch enabled
+        touch: 'ontouchstart' in document.documentElement
     };
 
     // Player instance
@@ -2332,7 +2325,7 @@
                 utils.toggleClass(player.elements.container, config.classes.isIos, player.browser.isIos);
 
                 // Add touch class
-                utils.toggleClass(player.elements.container, config.classes.isTouch, player.browser.isTouch);
+                utils.toggleClass(player.elements.container, config.classes.isTouch, support.touch);
             }
 
             // Inject the player wrapper
@@ -3664,7 +3657,7 @@
                 }
 
                 // Delay for hiding on touch
-                if (player.browser.isTouch) {
+                if (support.touch) {
                     delay = 3000;
                 }
             }
@@ -4323,7 +4316,7 @@
                 // On click play, pause ore restart
                 utils.on(wrapper, 'click', function() {
                     // Touch devices will just show controls (if we're hiding controls)
-                    if (config.hideControls && player.browser.isTouch && !player.elements.media.paused) {
+                    if (config.hideControls && support.touch && !player.elements.media.paused) {
                         return;
                     }
 
@@ -4666,11 +4659,6 @@
 
         // Everything done
         function ready() {
-            // Ready event at end of execution stack
-            window.setTimeout(function() {
-                trigger(player.elements.media, 'ready');
-            }, 0);
-
             // Set class hook on media element
             utils.toggleClass(player.elements.media, defaults.classes.setup, true);
 
@@ -4679,6 +4667,11 @@
 
             // Store a refernce to instance
             player.elements.media.plyr = api;
+
+            // Ready event at end of execution stack
+            window.setTimeout(function() {
+                trigger(player.elements.media, 'ready');
+            }, 0);
 
             // Autoplay
             if (config.autoplay) {
@@ -4878,7 +4871,7 @@
                 var events = config.events.concat(['setup', 'statechange', 'enterfullscreen', 'exitfullscreen', 'captionsenabled', 'captionsdisabled']);
 
                 utils.on(instance.getContainer(), events.join(' '), function(event) {
-                    console.log([config.logPrefix, 'event:', event.type].join(' '), event.detail.plyr);
+                    window.console.log([config.logPrefix, 'event:', event.type].join(' ').trim());
                 });
             }
 
