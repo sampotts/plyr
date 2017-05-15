@@ -784,14 +784,9 @@ These events also bubble up the DOM. The event target will be the container elem
   </thead>
   <tbody>
     <tr>
-      <td><code>setup</code></td>
-      <td></td>
-      <td>When an initial setup has completed</td>
-    </tr>
-    <tr>
       <td><code>ready</code></td>
       <td></td>
-      <td>Triggered when the instance is ready for API use and external APIs are ready (in the case of YouTube and Vimeo).</td>
+      <td>Triggered when the instance is ready for API calls.</td>
     </tr>
   	<tr>
   		<td><code>canplay</code></td>
@@ -1056,9 +1051,6 @@ enabled: /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent)
 If a User Agent is disabled but supports `<video>` and `<audio>` natively, it will use the native player.
 
 Any unsupported browsers will display links to download the media if the correct html is used.
-
-### Checking for support
-There's an API method for checking support. You can call `plyr.supported()` and optionally pass a type to it, e.g. `plyr.supported("video")`. It will return an object with two keys; `basic` meaning there's basic support for that media type (or both if no type is passed) and `full` meaning there's full support for plyr.
 
 ## Issues
 If you find anything weird with Plyr, please let us know using the GitHub issues tracker.

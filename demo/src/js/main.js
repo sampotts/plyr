@@ -4,16 +4,18 @@
 // Please see readme.md in the root or github.com/selz/plyr
 // ==========================================================================
 
-/*global plyr*/
+/*global Plyr*/
 
 // General functions
 (function() {
-    //document.body.addEventListener('ready', function(event) { console.log(event); });
+    document.body.addEventListener('ready', function(event) {
+        console.log(event);
+    });
 
     // Setup the player
-    var instances = plyr.setup({
+    var player = new Plyr('#player', {
         debug: true,
-        title: 'Video demo',
+        title: 'View From A Blue Moon',
         iconUrl: '../dist/plyr.svg',
         tooltips: {
             controls: true
@@ -35,25 +37,22 @@
             'airplay'
         ]
     });
-    plyr.loadSprite('dist/demo.svg');
-
-    // Plyr returns an array regardless
-    var player = instances[0];
+    window.loadSprite('dist/demo.svg', 'demo-sprite');
 
     // Setup type toggle
-    var buttons = document.querySelectorAll('[data-source]'),
-        types = {
-            video: 'video',
-            audio: 'audio',
-            youtube: 'youtube',
-            vimeo: 'vimeo'
-        },
-        currentType = window.location.hash.replace('#', ''),
-        historySupport = (window.history && window.history.pushState);
+    var buttons = document.querySelectorAll('[data-source]');
+    var types = {
+        video: 'video',
+        audio: 'audio',
+        youtube: 'youtube',
+        vimeo: 'vimeo'
+    };
+    var currentType = window.location.hash.replace('#', '');
+    var historySupport = (window.history && window.history.pushState);
 
     // Bind to each button
-    for (var i = buttons.length - 1; i >= 0; i--) {
-        buttons[i].addEventListener('click', function() {
+    [].forEach.call(buttons, function(button) {
+        button.addEventListener('click', function() {
             var type = this.getAttribute('data-source');
 
             newSource(type);
@@ -64,7 +63,7 @@
                 }, '', '#' + type);
             }
         });
-    }
+    });
 
     // List for backwards/forwards
     window.addEventListener('popstate', function(event) {
@@ -199,6 +198,6 @@ if (document.domain.indexOf('plyr.io') > -1) {
         a.src = g;
         m.parentNode.insertBefore(a, m)
     })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
-    ga('create', 'UA-40881672-11', 'auto');
-    ga('send', 'pageview');
+    window.ga('create', 'UA-40881672-11', 'auto');
+    window.ga('send', 'pageview');
 }
