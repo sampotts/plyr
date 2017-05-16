@@ -39,7 +39,7 @@ Check out the [changelog](changelog.md) to see what's new with Plyr.
 - AirPlay
 - Picture in Picture (MacOS Sierra + Safari)
 
-[more info](https://github.com/Selz/plyr/issues?q=is%3Aissue+is%3Aopen+label%3A%22In+Development%22)
+[more info](https://github.com/sampotts/plyr/issues?q=is%3Aissue+is%3Aopen+label%3A%22In+Development%22)
 
 ## Planned features
 - Playlists
@@ -48,9 +48,9 @@ Check out the [changelog](changelog.md) to see what's new with Plyr.
 - Wistia video support
 - YouTube and Vimeo audio support
 - Audio captions
-...and whatever else has been raised in [issues](https://github.com/Selz/plyr/issues)
+...and whatever else has been raised in [issues](https://github.com/sampotts/plyr/issues)
 
-If you have any cool ideas or features, please let me know by [creating an issue](https://github.com/Selz/plyr/issues/new) or, of course, forking and sending a pull request.
+If you have any cool ideas or features, please let me know by [creating an issue](https://github.com/sampotts/plyr/issues/new) or, of course, forking and sending a pull request.
 
 ## CMS plugins
 
@@ -137,7 +137,7 @@ Include the `plyr.js` script before the closing `</body>` tag and then call `ply
 If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for the JavaScript, you can use the following:
 
 ```html
-<script src="https://cdn.plyr.io/2.0.12/plyr.js"></script>
+<script src="https://cdn.plyr.io/2.0.13/plyr.js"></script>
 ```
 
 ### CSS
@@ -150,11 +150,11 @@ Include the `plyr.css` stylsheet into your `<head>`
 If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for the default CSS, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/2.0.12/plyr.css">
+<link rel="stylesheet" href="https://cdn.plyr.io/2.0.13/plyr.css">
 ```
 
 ### SVG Sprite
-The SVG sprite is loaded automatically from our CDN (provided by [Fastly](https://www.fastly.com/)). To change this, see the [options](#options) below. For reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/2.0.12/plyr.svg`.
+The SVG sprite is loaded automatically from our CDN (provided by [Fastly](https://www.fastly.com/)). To change this, see the [options](#options) below. For reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/2.0.13/plyr.svg`.
 
 ## Advanced
 
@@ -290,7 +290,7 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
       <td><code>blankUrl</code></td>
       <td>String</td>
       <td><code>https://cdn.selz.com/plyr/blank.mp4</code></td>
-      <td>Specify a URL or path to a blank video file used to properly cancel network requests. See <a href="https://github.com/Selz/plyr/issues/174">issue #174</a> for more info.</td>
+      <td>Specify a URL or path to a blank video file used to properly cancel network requests. See <a href="https://github.com/sampotts/plyr/issues/174">issue #174</a> for more info.</td>
     </tr>
     <tr>
       <td><code>debug</code></td>
@@ -1056,7 +1056,7 @@ Any unsupported browsers will display links to download the media if the correct
 If you find anything weird with Plyr, please let us know using the GitHub issues tracker.
 
 ## Author
-Plyr is developed by [@sam_potts](https://twitter.com/sam_potts) / [sampotts.me](http://sampotts.me) with help from the awesome [contributors](https://github.com/Selz/plyr/graphs/contributors)
+Plyr is developed by [@sam_potts](https://twitter.com/sam_potts) / [sampotts.me](http://sampotts.me) with help from the awesome [contributors](https://github.com/sampotts/plyr/graphs/contributors)
 
 ## Donate
 Plyr costs money to run, not my time - I donate that for free but domains, hosting and more. Any help is appreciated...
