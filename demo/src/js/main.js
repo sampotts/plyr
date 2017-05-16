@@ -7,7 +7,7 @@
 /*global plyr*/
 
 // General functions
-;(function() {
+(function() {
     //document.body.addEventListener('ready', function(event) { console.log(event); });
 
     // Setup the player
@@ -153,7 +153,7 @@
                     type:       'video',
                     title:      'View From A Blue Moon',
                     sources: [{
-                        src:    '143418951',
+                        src:    '147865858',
                         type:   'vimeo'
                     }]
                 });
