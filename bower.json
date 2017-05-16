@@ -9,7 +9,7 @@
         "HTml5 Video"
     ],
     "authors": [
-        "Sam Potts <me@sampotts.me>"
+        "Sam Potts <sam@potts.es>"
     ],
     "dependencies": {},
     "main": [
@@ -27,7 +27,7 @@
     ],
     "repository": {
         "type": "git",
-        "url": "git://github.com/selz/plyr.git"
+        "url": "git://github.com/sampotts/plyr.git"
     },
     "license": "MIT"
 }

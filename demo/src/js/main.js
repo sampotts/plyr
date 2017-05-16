@@ -1,16 +1,16 @@
 // ==========================================================================
 // Plyr.io demo
 // This code is purely for the plyr.io website
-// Please see readme.md in the root or github.com/selz/plyr
+// Please see readme.md in the root or github.com/sampotts/plyr
 // ==========================================================================
 
 /*global Plyr*/
 
 // General functions
 (function() {
-    document.body.addEventListener('ready', function(event) {
+    /*document.body.addEventListener('ready', function(event) {
         console.log(event);
-    });
+    });*/
 
     // Setup the player
     var player = new Plyr('#player', {
