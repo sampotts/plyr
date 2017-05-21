@@ -68,8 +68,8 @@
 
         // Speed up/down
         speed: {
-            selected: 1.0,
-            options: [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 2.0]
+            selected: 1,
+            options: [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2]
         },
 
         // Keyboard shortcut settings
@@ -203,6 +203,12 @@
             'pip',
             'airplay',
             'fullscreen'
+        ],
+        settings: [
+            'captions',
+            'quality',
+            'speed',
+            'loop'
         ],
 
         // Localisation
@@ -1442,13 +1448,9 @@
                 }));
             }
 
-            // Add the icon
             button.appendChild(createIcon(iconDefault));
-
-            // Add the label
             button.appendChild(createLabel(labelKey));
 
-            // Set element attributes
             utils.setAttributes(button, attributes);
 
             player.elements.buttons[type] = button;
@@ -1668,13 +1670,16 @@
                     role: 'tabpanel'
                 });
 
+                // Create the tab list
                 var tabs = utils.createElement('ul', {
                     role: 'tablist'
                 });
 
-                ['captions', 'quality', 'speed', 'loop'].forEach(function(type) {
+                // Build the tabs
+                config.settings.forEach(function(type) {
                     var tab = utils.createElement('li', {
-                        role: 'tab'
+                        role: 'tab',
+                        hidden: ''
                     });
 
                     var button = utils.createElement('button', utils.extend(utils.getAttributesFromSelector(config.selectors.buttons.settings), {
@@ -1694,25 +1699,24 @@
                     value.innerHTML = data[type];
 
                     button.appendChild(value);
-
                     tab.appendChild(button);
-
                     tabs.appendChild(tab);
 
                     player.elements.settings.tabs[type] = tab;
                 });
 
                 home.appendChild(tabs);
-
                 inner.appendChild(home);
 
-                ['captions', 'quality', 'speed', 'loop'].forEach(function(type) {
+                // Build the panes
+                config.settings.forEach(function(type) {
                     var pane = utils.createElement('div', {
                         id: 'plyr-settings-' + data.id + '-' + type,
                         'aria-hidden': true,
                         'aria-labelled-by': 'plyr-settings-' + data.id + '-' + type + '-tab',
                         role: 'tabpanel',
-                        tabindex: -1
+                        tabindex: -1,
+                        hidden: ''
                     });
 
                     var back = utils.createElement('button', {
@@ -1728,20 +1732,16 @@
                     var options = utils.createElement('ul');
 
                     pane.appendChild(options);
-
                     inner.appendChild(pane);
 
                     player.elements.settings.panes[type] = pane;
                 });
 
                 form.appendChild(inner);
-
                 menu.appendChild(form);
-
                 controls.appendChild(menu);
 
                 player.elements.settings.form = form;
-
                 player.elements.settings.menu = menu;
             }
 
@@ -1773,6 +1773,10 @@
         // YouTube: "hd2160", "hd1440", "hd1080", "hd720", "large", "medium", "small", "tiny", "auto"
         function setQualityMenu(options, current) {
             var list = player.elements.settings.panes.quality.querySelector('ul');
+
+            // Show the pane and tab
+            player.elements.settings.tabs.quality.removeAttribute('hidden');
+            player.elements.settings.panes.quality.removeAttribute('hidden');
 
             // Empty the menu
             utils.emptyElement(list);
@@ -1833,19 +1837,17 @@
                     var item = utils.createElement('li');
 
                     var label = utils.createElement('label', {
-                        class: config.classes.control,
-                        for: 'plyr-quality-' + quality
+                        class: config.classes.control
                     });
 
                     var radio = utils.createElement('input', utils.extend(utils.getAttributesFromSelector(config.selectors.inputs.quality), {
                         type: 'radio',
-                        id: 'plyr-quality-' + quality,
                         name: 'plyr-quality',
                         value: quality,
                     }));
 
                     if (quality === config.quality.selected) {
-                        radio.setAttribute('checked', '');
+                        radio.checked = true;
                     }
 
                     label.appendChild(radio);
@@ -1857,7 +1859,6 @@
                     }
 
                     item.appendChild(label);
-
                     list.appendChild(item);
                 });
             }
@@ -1867,6 +1868,10 @@
         function setLoopMenu() {
             var options = ['start', 'end', 'all', 'reset'];
             var list = player.elements.settings.panes.loop.querySelector('ul');
+
+            // Show the pane and tab
+            player.elements.settings.tabs.loop.removeAttribute('hidden');
+            player.elements.settings.panes.loop.removeAttribute('hidden');
 
             // Empty the menu
             utils.emptyElement(list);
@@ -1881,12 +1886,11 @@
                 }), config.i18n[option]);
 
                 if (utils.inArray(['start', 'end'], option)) {
-                    var badge = createBadge('0:00');
+                    var badge = createBadge('00:00');
                     button.appendChild(badge);
                 }
 
                 item.appendChild(button);
-
                 list.appendChild(item);
             });
         }
@@ -1894,6 +1898,10 @@
         // Set a list of available captions languages
         function setCaptionsMenu() {
             var list = player.elements.settings.panes.captions.querySelector('ul');
+
+            // Show the pane and tab
+            player.elements.settings.tabs.captions.removeAttribute('hidden');
+            player.elements.settings.panes.captions.removeAttribute('hidden');
 
             // Empty the menu
             utils.emptyElement(list);
@@ -1923,19 +1931,17 @@
                 var item = utils.createElement('li');
 
                 var label = utils.createElement('label', {
-                    class: config.classes.control,
-                    for: 'plyr-language-' + track.language
+                    class: config.classes.control
                 });
 
                 var radio = utils.createElement('input', utils.extend(utils.getAttributesFromSelector(config.selectors.inputs.language), {
                     type: 'radio',
-                    id: 'plyr-language-' + track.language,
                     name: 'plyr-language',
                     value: track.language,
                 }));
 
-                if (track.language === config.captions.language.toLowerCase()) {
-                    radio.setAttribute('checked', '');
+                if (track.language.toLowerCase() === config.captions.language.toLowerCase()) {
+                    radio.checked = true;
                 }
 
                 label.appendChild(radio);
@@ -1946,7 +1952,6 @@
                 }
 
                 item.appendChild(label);
-
                 list.appendChild(item);
             });
         }
@@ -1954,6 +1959,10 @@
         // Set a list of available captions languages
         function setSpeedMenu(options) {
             var list = player.elements.settings.panes.speed.querySelector('ul');
+
+            // Show the pane and tab
+            player.elements.settings.tabs.speed.removeAttribute('hidden');
+            player.elements.settings.panes.speed.removeAttribute('hidden');
 
             // Empty the menu
             utils.emptyElement(list);
@@ -1967,26 +1976,22 @@
                 var item = utils.createElement('li');
 
                 var label = utils.createElement('label', {
-                    class: config.classes.control,
-                    for: 'plyr-speed-' + speed.toString().replace('.', '-')
+                    class: config.classes.control
                 });
 
                 var radio = utils.createElement('input', utils.extend(utils.getAttributesFromSelector(config.selectors.inputs.speed), {
                     type: 'radio',
-                    id: 'plyr-speed-' + speed.toString().replace('.', '-'),
                     name: 'plyr-speed',
                     value: speed,
                 }));
 
                 if (speed === config.speed.selected) {
-                    radio.setAttribute('checked', '');
+                    radio.checked = true;
                 }
 
                 label.appendChild(radio);
-                label.insertAdjacentHTML('beforeend', '&times;' + speed);
-
+                label.insertAdjacentHTML('beforeend', getSpeedLabel(speed));
                 item.appendChild(label);
-
                 list.appendChild(item);
             });
         }
@@ -2259,7 +2264,7 @@
                 controls = createControls({
                     id: player.id,
                     seektime: config.seekTime,
-                    speed: getSpeed(),
+                    speed: getSpeedLabel(),
                     // TODO: Get current quality
                     quality: 'HD',
                     captions: getLanguage(),
@@ -3136,8 +3141,16 @@
         }
 
         // Get the current speed value
-        function getSpeed() {
-            return config.speed.selected.toFixed(1).toString().replace('.0', '') + '&times;'
+        function getSpeedLabel(speed) {
+            if (!utils.is.number(speed)) {
+                speed = config.speed.selected;
+            }
+
+            if (speed === 1) {
+                return 'Normal';
+            }
+
+            return speed + '&times;';
         }
 
         // Rewind
@@ -3322,19 +3335,24 @@
         function toggleMenu(event) {
             var form = player.elements.settings.form;
             var button = player.elements.buttons.settings;
+            var show = utils.is.boolean(event) ? event : form.getAttribute('aria-hidden') === 'true';
 
-            // If the click was inside the form, do nothing
-            if (form.contains(event.target)) {
-                return;
+            if (utils.is.event(event)) {
+                var isMenuItem = form.contains(event.target);
+                var isButton = event.target === player.elements.buttons.settings;
+
+                // If the click was inside the form or if the click
+                // wasn't the button or menu item and we're trying to
+                // show the menu (a doc click shouldn't show the menu)
+                if (isMenuItem || (!isMenuItem && !isButton && show)) {
+                    return;
+                }
+
+                // Prevent the toggle being caught by the doc listener
+                if (isButton) {
+                    event.stopPropagation();
+                }
             }
-
-            // Prevent the toggleMenu being fired twice
-            if (event.target === player.elements.buttons.settings) {
-                event.stopPropagation();
-            }
-
-            // Do we need to show it?
-            var show = form.getAttribute('aria-hidden') === 'true';
 
             // Set form and button attributes
             form.setAttribute('aria-hidden', !show);
@@ -3345,6 +3363,38 @@
             } else {
                 form.setAttribute('tabindex', -1);
             }
+        }
+
+        // Get the natural size of a tab
+        function getTabSize(tab) {
+            var width;
+            var height;
+
+            var clone = tab.cloneNode(true);
+            clone.style.position = "absolute";
+            clone.style.opacity = 0;
+            clone.setAttribute('aria-hidden', false);
+
+            // Prevent input's being unchecked due to the name being identical
+            [].forEach.call(clone.querySelectorAll('input[name]'), function(input) {
+                var name = input.getAttribute('name');
+                input.setAttribute('name', name + '-clone');
+            });
+
+            // Append to parent so we get the "real" size
+            tab.parentNode.appendChild(clone);
+
+            // Get the sizes before we remove
+            width = clone.scrollWidth;
+            height = clone.scrollHeight;
+
+            // Remove from the DOM
+            utils.removeElement(clone);
+
+            return {
+                width: width,
+                height: height
+            };
         }
 
         // Toggle Menu
@@ -3365,14 +3415,10 @@
                 return;
             }
 
-            var targetWidth;
-            var targetHeight;
-            var container;
-
             // Hide all other tabs
             // Get other tabs
             var current = menu.querySelector('[role="tabpanel"][aria-hidden="false"]');
-            container = current.parentNode;
+            var container = current.parentNode;
 
             // Set other toggles to be expanded false
             [].forEach.call(menu.querySelectorAll('[aria-controls="' + current.getAttribute('id') + '"]'), function(toggle) {
@@ -3385,15 +3431,8 @@
                 container.style.width = current.scrollWidth + 'px';
                 container.style.height = current.scrollHeight + 'px';
 
-                // Get the natural element size of the target pane
-                var clone = pane.cloneNode(true);
-                clone.style.position = "absolute";
-                clone.style.opacity = 0;
-                clone.setAttribute('aria-hidden', false);
-                container.appendChild(clone);
-                targetWidth = clone.scrollWidth;
-                targetHeight = clone.scrollHeight;
-                utils.removeElement(clone);
+                // Get potential sizes
+                var size = getTabSize(pane);
 
                 // Restore auto height/width
                 var restore = function(event) {
@@ -3415,8 +3454,8 @@
                 utils.on(container, utils.transitionEnd, restore);
 
                 // Set dimensions to target
-                container.style.width = targetWidth + 'px';
-                container.style.height = targetHeight + 'px';
+                container.style.width = size.width + 'px';
+                container.style.height = size.height + 'px';
             }
 
             // Set attributes on current tab
@@ -4355,7 +4394,7 @@
             utils.on(player.elements.buttons.settings, 'click', toggleMenu);
 
             // Click anywhere closes menu
-            utils.on(document.body, 'click', toggleMenu);
+            utils.on(document.documentElement, 'click', toggleMenu);
 
             // Show tab in menu
             utils.on(player.elements.settings.form, 'click', showTab);

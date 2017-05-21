@@ -503,7 +503,7 @@
         position: absolute;
         z-index: 1;
         bottom: 100%;
-        right: -5px;
+        right: -3px;
         margin-bottom: 10px;
         animation: plyr-popup .2s ease;
 
@@ -529,7 +529,7 @@
             right: 15px;
             height: 0;
             width: 0;
-            border: 6px solid transparent;
+            border: 4px solid transparent;
             border-top-color: @plyr-menu-bg;
         }
 
@@ -554,7 +554,7 @@
                 position: absolute;
                 top: 50%;
                 transform: translateY(-50%);
-                border: 5px solid transparent;
+                border: 4px solid transparent;
             }
 
             &--forward {
@@ -576,7 +576,7 @@
                 font-weight: 500;
 
                 &::after {
-                    left: 5px;
+                    left: @plyr-control-padding;
                     border-right-color: fade(@plyr-menu-color, 80%);
                 }
                 &::before {
@@ -616,12 +616,6 @@
             .plyr__badge {
                 font-weight: 600;
             }
-        }
-
-        // When animating between menus
-        &.is-resizing {
-            overflow: hidden;
-            transition: height .35s cubic-bezier(.4,0,.2,1), width .35s cubic-bezier(.4,0,.2,1);
         }
     }
 }

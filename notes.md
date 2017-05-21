@@ -1,20 +1,27 @@
 ### Todo
 
-#### To build
+#### To finish
 [x] Get list of subtitles/captions available (HTML5, Vimeo)
 [x] Add preferred quality option into config
 [ ] Update quality options on YouTube play
 [ ] Update speed options on YouTube load
-[ ] Hide unsupported menu items
+[ ] Handle quality change for YouTube
+[ ] Handle speed change for YouTube
+[ ] Set quality when loading YouTube vid
+[ ] Set "home" values
+[ ] Hide unsupported menu items (+ on source change)
 [ ] Test PiP (need MacOS Sierra)
 [ ] Test AirPlay (need MacOS Sierra)
-[ ] Add controlshidden controlsshown events
+[ ] Add `controlshidden` and `controlsshown` events
 [ ] Test custom controls (with settings support for now)
 [ ] Tidy up small UI for iOS inline
 [ ] Finish new loop setup and display in seek bar
 [ ] Update docs for removal of setup
 
 #### Later
+[ ] Wistia player
+[ ] Inlined sprite option
+[ ] Start / end options for all players?
 [ ] Get quality options for HTML5 somehow (multi source?)
 [ ] Download button - grab first <source> or src attribute (or maybe use currentSrc?) for HTML5 and links for embedded players
 
@@ -23,7 +30,7 @@
 [ ] Fix events on unsupported devices (iOS, old IE)
 [x] Fix YouTube rights blocking (origin perhaps?)
 
-# Notes
+### Release notes
 - No quality HTML5 support (yet)
 - No Vimeo quality support
 - No YouTube caption support
@@ -39,6 +46,6 @@
 - Custom HTML option now `controls` which accepts a string (HTML), a function (your own template engine) or array (use built in controls)
 - .setup() is removed in favour of a constructor
 
-## Added
+#### Added
 - Seek i8n label
 - Loop related i8n labels
