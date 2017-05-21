@@ -1,28 +1,17 @@
-<!--- 
-Please use this issue template as it makes replicating and fixing the issue easier! 
+<!---
+Please use this issue template as it makes replicating and fixing the issue easier!
 --->
 
-- [ ] Issue does not already exist
-- [ ] Issue observed on https://plyr.io
-
-### Expected behaviour 
+### Expected behaviour
 
 ### Actual behaviour
 
 ### Environment
 
 - Browser:
-- Version:  
+- Version:
 - Operating System:
-- Version: 
+- Version:
 
-Players affected:
-- [ ] HTML5 Video
-- [ ] HTML5 Audio
-- [ ] YouTube
-- [ ] Vimeo
-
-### Steps to reproduce 
-- 
-
-### Relevant links
+### Steps to reproduce
+-

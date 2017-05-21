@@ -37,6 +37,7 @@
             'airplay'
         ]
     });
+
     window.loadSprite('dist/demo.svg', 'demo-sprite');
 
     // Setup type toggle

@@ -3,15 +3,16 @@
 #### To build
 [x] Get list of subtitles/captions available (HTML5, Vimeo)
 [x] Add preferred quality option into config
-[ ] Update quality options on YouTube play (can't get up front?!)
+[ ] Update quality options on YouTube play
 [ ] Update speed options on YouTube load
-[ ] Finish and test PiP (need MacOS Sierra)
-[ ] Finish and test AirPlay (need MacOS Sierra)
-[ ] Controls hide/show events
-[ ] Test custom controls still works
+[ ] Hide unsupported menu items
+[ ] Test PiP (need MacOS Sierra)
+[ ] Test AirPlay (need MacOS Sierra)
+[ ] Add controlshidden controlsshown events
+[ ] Test custom controls (with settings support for now)
 [ ] Tidy up small UI for iOS inline
-[ ] Finish new loop setup and UI
-[ ] Toggle settings menu
+[ ] Finish new loop setup and display in seek bar
+[ ] Update docs for removal of setup
 
 #### Later
 [ ] Get quality options for HTML5 somehow (multi source?)

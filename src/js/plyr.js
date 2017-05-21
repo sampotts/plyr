@@ -977,7 +977,27 @@
 
                 xhr.send();
             }
-        }
+        },
+
+        // Get the transition end event
+        transitionEnd: (function() {
+            var element = document.createElement('span');
+
+            var events = {
+                WebkitTransition: 'webkitTransitionEnd',
+                MozTransition: 'transitionend',
+                OTransition: 'oTransitionEnd otransitionend',
+                transition: 'transitionend'
+            }
+
+            for (var type in events) {
+                if (element.style[type] !== undefined) {
+                    return events[type];
+                }
+            }
+
+            return false;
+        })()
     };
 
     // Fullscreen API
@@ -1160,7 +1180,11 @@
 
         // Touch
         // Remember a device can be moust + touch enabled
-        touch: 'ontouchstart' in document.documentElement
+        touch: 'ontouchstart' in document.documentElement,
+
+        // Detect transitions and if user has iOS & MacOS "Reduced motion" setting off
+        // https://webkit.org/blog/7551/responsive-design-for-motion/
+        transitions: utils.transitionEnd !== false && (!('matchMedia' in window) || !window.matchMedia('(prefers-reduced-motion)').matches)
     };
 
     // Player instance
@@ -1615,9 +1639,9 @@
 
             // Settings button / menu
             if (utils.inArray(config.controls, 'settings')) {
-                var menu = utils.createElement('span', utils.extend(utils.getAttributesFromSelector(config.selectors.buttons.settings), {
+                var menu = utils.createElement('div', {
                     class: 'plyr__menu'
-                }));
+                });
 
                 menu.appendChild(createButton('settings', {
                     id: 'plyr-settings-toggle-' + data.id,
@@ -1715,6 +1739,8 @@
                 menu.appendChild(form);
 
                 controls.appendChild(menu);
+
+                player.elements.settings.form = form;
 
                 player.elements.settings.menu = menu;
             }
@@ -3292,42 +3318,75 @@
             }
         }
 
-        // Toggle Menu
+        // Show/hide menu
         function toggleMenu(event) {
-            var menu = player.elements.settings.menu.parentNode;
-            var toggle = event.target;
-            var target = document.getElementById(toggle.getAttribute('aria-controls'));
-            var show = (toggle.getAttribute('aria-expanded') === 'false');
+            var form = player.elements.settings.form;
+            var button = player.elements.buttons.settings;
 
-            // Nothing to show, bail
-            if (!utils.is.htmlElement(target)) {
+            // If the click was inside the form, do nothing
+            if (form.contains(event.target)) {
                 return;
             }
 
-            // Are we targetting a tab?
-            var isTab = target.getAttribute('role') === 'tabpanel';
+            // Prevent the toggleMenu being fired twice
+            if (event.target === player.elements.buttons.settings) {
+                event.stopPropagation();
+            }
+
+            // Do we need to show it?
+            var show = form.getAttribute('aria-hidden') === 'true';
+
+            // Set form and button attributes
+            form.setAttribute('aria-hidden', !show);
+            button.setAttribute('aria-expanded', show);
+
+            if (show) {
+                form.removeAttribute('tabindex');
+            } else {
+                form.setAttribute('tabindex', -1);
+            }
+        }
+
+        // Toggle Menu
+        function showTab(event) {
+            var menu = player.elements.settings.menu;
+            var tab = event.target;
+            var show = tab.getAttribute('aria-expanded') === 'false';
+            var pane = document.getElementById(tab.getAttribute('aria-controls'));
+
+            // Nothing to show, bail
+            if (!utils.is.htmlElement(pane)) {
+                return;
+            }
+
+            // Are we targetting a tab? If not, bail
+            var isTab = pane.getAttribute('role') === 'tabpanel';
+            if (!isTab) {
+                return;
+            }
+
             var targetWidth;
             var targetHeight;
             var container;
 
             // Hide all other tabs
-            if (isTab) {
-                // Get other tabs
-                var current = menu.querySelector('[role="tabpanel"][aria-hidden="false"]');
-                container = current.parentNode;
+            // Get other tabs
+            var current = menu.querySelector('[role="tabpanel"][aria-hidden="false"]');
+            container = current.parentNode;
 
-                [].forEach.call(menu.querySelectorAll('[aria-controls="' + current.getAttribute('id') + '"]'), function(toggle) {
-                    toggle.setAttribute('aria-expanded', false);
-                });
+            // Set other toggles to be expanded false
+            [].forEach.call(menu.querySelectorAll('[aria-controls="' + current.getAttribute('id') + '"]'), function(toggle) {
+                toggle.setAttribute('aria-expanded', false);
+            });
 
+            // If we can do fancy animations, we'll animate the height/width
+            if (support.transitions) {
+                // Set the current width as a base
                 container.style.width = current.scrollWidth + 'px';
                 container.style.height = current.scrollHeight + 'px';
 
-                current.setAttribute('aria-hidden', true);
-                current.setAttribute('tabindex', -1);
-
-                // Get the natural element size
-                var clone = target.cloneNode(true);
+                // Get the natural element size of the target pane
+                var clone = pane.cloneNode(true);
                 clone.style.position = "absolute";
                 clone.style.opacity = 0;
                 clone.setAttribute('aria-hidden', false);
@@ -3335,21 +3394,39 @@
                 targetWidth = clone.scrollWidth;
                 targetHeight = clone.scrollHeight;
                 utils.removeElement(clone);
-            }
 
-            target.setAttribute('aria-hidden', !show);
-            toggle.setAttribute('aria-expanded', show);
-            target.removeAttribute('tabindex');
+                // Restore auto height/width
+                var restore = function(event) {
+                    // We're only bothered about height and width on the container
+                    if (event.target !== container ||
+                        !utils.inArray(['width', 'height'], event.propertyName)) {
+                        return;
+                    }
 
-            if (isTab) {
-                container.style.width = targetWidth + 'px';
-                container.style.height = targetHeight + 'px';
-
-                window.setTimeout(function() {
+                    // Revert back to auto
                     container.style.width = '';
                     container.style.height = '';
-                }, 300);
+
+                    // Only listen once
+                    utils.off(container, utils.transitionEnd, restore)
+                }
+
+                // Listen for the transtion finishing and restore auto height/width
+                utils.on(container, utils.transitionEnd, restore);
+
+                // Set dimensions to target
+                container.style.width = targetWidth + 'px';
+                container.style.height = targetHeight + 'px';
             }
+
+            // Set attributes on current tab
+            current.setAttribute('aria-hidden', true);
+            current.setAttribute('tabindex', -1);
+
+            // Set attributes on target
+            pane.setAttribute('aria-hidden', !show);
+            tab.setAttribute('aria-expanded', show);
+            pane.removeAttribute('tabindex');
         }
 
         // Mute
@@ -4275,23 +4352,16 @@
             });
 
             // Settings menu
-            utils.on(player.elements.settings.menu, 'click', toggleMenu);
+            utils.on(player.elements.buttons.settings, 'click', toggleMenu);
 
             // Click anywhere closes menu
-            utils.on(document.body, 'click', function(event) {
-                var menu = player.elements.settings.menu;
-                var form = menu.querySelector('form');
+            utils.on(document.body, 'click', toggleMenu);
 
-                if (form.getAttribute('aria-hidden') === 'true' || menu.contains(event.target)) {
-                    return;
-                }
-
-                // TODO: This should call some sort of menuToggle function?
-                form.setAttribute('aria-hidden', true);
-            });
+            // Show tab in menu
+            utils.on(player.elements.settings.form, 'click', showTab);
 
             // Settings menu items - use event delegation as items are added/removed
-            utils.on(player.elements.settings.menu, 'click', function(event) {
+            utils.on(player.elements.settings.form, 'click', function(event) {
                 // Settings - Language
                 if (utils.matches(event.target, config.selectors.inputs.language)) {
                     handlerProxy.call(this, event, config.listeners.language, setLanguage);
