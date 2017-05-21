@@ -1188,9 +1188,12 @@
         // Remember a device can be moust + touch enabled
         touch: 'ontouchstart' in document.documentElement,
 
-        // Detect transitions and if user has iOS & MacOS "Reduced motion" setting off
+        // Detect transitions support
+        transitions: utils.transitionEnd !== false,
+
+        // Reduced motion iOS & MacOS setting
         // https://webkit.org/blog/7551/responsive-design-for-motion/
-        transitions: utils.transitionEnd !== false && (!('matchMedia' in window) || !window.matchMedia('(prefers-reduced-motion)').matches)
+        reducedMotion: 'matchMedia' in window && window.matchMedia('(prefers-reduced-motion)').matches
     };
 
     // Player instance
@@ -3426,7 +3429,7 @@
             });
 
             // If we can do fancy animations, we'll animate the height/width
-            if (support.transitions) {
+            if (support.transitions && !support.reducedMotion) {
                 // Set the current width as a base
                 container.style.width = current.scrollWidth + 'px';
                 container.style.height = current.scrollHeight + 'px';
