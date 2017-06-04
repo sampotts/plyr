@@ -1,3 +1,5 @@
+# This branch is not production ready. There will be bugs.
+
 # Plyr
 A simple, accessible and customizable HTML5, YouTube and Vimeo media player.
 
