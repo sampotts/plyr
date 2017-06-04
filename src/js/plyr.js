@@ -721,6 +721,12 @@
 
         // Toggle event listener
         toggleListener: function(elements, events, callback, toggle, passive, capture) {
+            // Bail if no elements
+            if (elements === null || utils.is.undefined(elements)) {
+                return;
+            }
+
+            // Allow multiple events
             events = events.split(' ');
 
             // Whether the listener is a capturing listener or not
@@ -774,16 +780,12 @@
 
         // Bind event handler
         on: function(element, events, callback, passive, capture) {
-            if (!utils.is.undefined(element)) {
-                utils.toggleListener(element, events, callback, true, passive, capture);
-            }
+            utils.toggleListener(element, events, callback, true, passive, capture);
         },
 
         // Unbind event handler
         off: function(element, events, callback, passive, capture) {
-            if (!utils.is.undefined(element)) {
-                utils.toggleListener(element, events, callback, false, passive, capture);
-            }
+            utils.toggleListener(element, events, callback, false, passive, capture);
         },
 
         // Trigger event
@@ -1189,8 +1191,8 @@
         reducedMotion: 'matchMedia' in window && window.matchMedia('(prefers-reduced-motion)').matches
     };
 
-    // Player instance
-    function Player(media, options) {
+    // Plyr instance
+    function Plyr(media, options) {
         var player = this;
         var timers = {};
         var api = {};
@@ -3403,9 +3405,6 @@
 
             // Setup new source
             function setup() {
-                // Reset embed object
-                player.embed = null;
-
                 // Remove media
                 removeElement(player.media);
 
@@ -4111,7 +4110,9 @@
             player.ready = true;
 
             // Ready event at end of execution stack
-            trigger(player.elements.container, 'ready', true);
+            window.setTimeout(function() {
+                trigger(player.elements.container, 'ready', true);
+            }, 0);
 
             // Autoplay
             if (player.config.autoplay) {
@@ -4120,10 +4121,17 @@
         }
 
         // Setup a player
-        function setup(target) {
+        function setup(media) {
             // We need an element to setup
-            if (target === null || utils.is.undefined(target) || !utils.is.htmlElement(target)) {
+            if (media === null || utils.is.undefined(media) || !utils.is.htmlElement(media)) {
                 error('Setup failed: no suitable element passed');
+                return;
+            }
+
+            // Bail if the element is initialized
+            if (media.plyr) {
+                warn('Target already setup');
+                player = media.plyr;
                 return;
             }
 
@@ -4140,21 +4148,18 @@
                 return;
             }
 
-            // Bail if the element is initialized
-            if (target.plyr) {
-                log('Target already setup');
-                return target.plyr;
-            }
+            // Cache original element state for .destroy()
+            player.elements.original = media.cloneNode(true);
 
             // Set media type based on tag or data attribute
             // Supported: video, audio, vimeo, youtube
-            var type = target.tagName.toLowerCase();
+            var type = media.tagName.toLowerCase();
 
             // Different setup based on type
             switch (type) {
                 case 'div':
-                    player.type = target.getAttribute('data-type');
-                    player.embedId = target.getAttribute('data-video-id');
+                    player.type = media.getAttribute('data-type');
+                    player.embedId = media.getAttribute('data-video-id');
 
                     if (utils.is.empty(player.type)) {
                         error('Setup failed: embed type missing');
@@ -4167,26 +4172,26 @@
                     }
 
                     // Clean up
-                    target.removeAttribute('data-type');
-                    target.removeAttribute('data-video-id');
+                    media.removeAttribute('data-type');
+                    media.removeAttribute('data-video-id');
                     break;
 
                 case 'iframe':
-                    // Do something with the iframe
+                    // TODO: Handle passing an iframe for true progressive enhancement
                     break;
 
                 case 'video':
                 case 'audio':
                     player.type = type;
-                    player.config.crossorigin = target.getAttribute('crossorigin') !== null;
-                    player.config.autoplay = player.config.autoplay || (target.getAttribute('autoplay') !== null);
-                    player.config.inline = target.getAttribute('playsinline') !== null;
-                    player.config.loop.active = player.config.loop || (target.getAttribute('loop') !== null);
+                    player.config.crossorigin = media.getAttribute('crossorigin') !== null;
+                    player.config.autoplay = player.config.autoplay || (media.getAttribute('autoplay') !== null);
+                    player.config.inline = media.getAttribute('playsinline') !== null;
+                    player.config.loop.active = player.config.loop || (media.getAttribute('loop') !== null);
                     break;
 
                 default:
                     error('Setup failed: unsupported type');
-                    return false;
+                    return;
             }
 
             // Sniff out the browser
@@ -4201,14 +4206,14 @@
             // If no native support, bail
             if (!player.supported.basic) {
                 error('Setup failed: no support');
-                return false;
+                return;
             }
 
-            // Wrap media
-            player.elements.container = utils.wrap(target, utils.createElement('div'));
+            // Store reference
+            media.plyr = player;
 
-            // Cache original element state for .destroy()
-            player.elements.original = target.cloneNode(true);
+            // Wrap media
+            player.elements.container = utils.wrap(media, utils.createElement('div'));
 
             // Allow focus to be captured
             player.elements.container.setAttribute('tabindex', 0);
@@ -4227,7 +4232,7 @@
                 var events = player.config.events.concat(['setup', 'statechange', 'enterfullscreen', 'exitfullscreen', 'captionsenabled', 'captionsdisabled']);
 
                 utils.on(player.elements.container, events.join(' '), function(event) {
-                    log(['event:', event.type].join(' ').trim());
+                    log('event: ' + event.type);
                 });
             }
 
@@ -4273,7 +4278,7 @@
     // API
     // ---------------------------------------
     // Play
-    Player.prototype.play = function() {
+    Plyr.prototype.play = function() {
         var player = this;
 
         if ('play' in player.media) {
@@ -4285,7 +4290,7 @@
     };
 
     // Pause
-    Player.prototype.pause = function() {
+    Plyr.prototype.pause = function() {
         var player = this;
 
         if ('pause' in player.media) {
@@ -4297,7 +4302,7 @@
     };
 
     // Toggle playback
-    Player.prototype.togglePlay = function(toggle) {
+    Plyr.prototype.togglePlay = function(toggle) {
         var player = this;
 
         // True toggle if nothing passed
@@ -4315,7 +4320,7 @@
     };
 
     // Stop
-    Player.prototype.stop = function() {
+    Plyr.prototype.stop = function() {
         var player = this;
 
         player.restart();
@@ -4326,7 +4331,7 @@
     };
 
     // Restart
-    Player.prototype.restart = function() {
+    Plyr.prototype.restart = function() {
         var player = this;
 
         // Seek to 0
@@ -4337,7 +4342,7 @@
     };
 
     // Rewind
-    Player.prototype.rewind = function(seekTime) {
+    Plyr.prototype.rewind = function(seekTime) {
         var player = this;
 
         // Use default if needed
@@ -4352,7 +4357,7 @@
     };
 
     // Fast forward
-    Player.prototype.forward = function(seekTime) {
+    Plyr.prototype.forward = function(seekTime) {
         var player = this;
 
         // Use default if needed
@@ -4368,7 +4373,7 @@
 
     // Seek to time
     // The input parameter can be an event or a number
-    Player.prototype.seek = function(input) {
+    Plyr.prototype.seek = function(input) {
         var player = this;
         var targetTime = 0;
         var paused = player.media.paused;
@@ -4389,11 +4394,6 @@
         player.core.updateSeekDisplay(targetTime);
 
         // Set the current time
-        // Try/catch incase the media isn't set and we're calling seek() from source() and IE moans
-        try {
-            player.media.currentTime = targetTime.toFixed(4);
-        } catch (e) {}
-
         // Embeds
         if (utils.inArray(types.embed, player.type)) {
             switch (player.type) {
@@ -4423,6 +4423,8 @@
 
             // Trigger seeking
             player.core.trigger(player.media, 'seeking');
+        } else {
+            player.media.currentTime = targetTime.toFixed(4);
         }
 
         // Logging
@@ -4433,7 +4435,7 @@
     };
 
     // Set volume
-    Player.prototype.setVolume = function(volume) {
+    Plyr.prototype.setVolume = function(volume) {
         var player = this;
         var max = 10;
         var min = 0;
@@ -4494,7 +4496,7 @@
     };
 
     // Increase volume
-    Player.prototype.increaseVolume = function(step) {
+    Plyr.prototype.increaseVolume = function(step) {
         var player = this;
         var volume = player.media.muted ? 0 : (player.media.volume * 10);
 
@@ -4509,7 +4511,7 @@
     };
 
     // Decrease volume
-    Player.prototype.decreaseVolume = function(step) {
+    Plyr.prototype.decreaseVolume = function(step) {
         var player = this;
         var volume = player.media.muted ? 0 : (player.media.volume * 10);
 
@@ -4524,7 +4526,7 @@
     };
 
     // Toggle mute
-    Player.prototype.toggleMute = function(muted) {
+    Plyr.prototype.toggleMute = function(muted) {
         var player = this;
 
         // If the method is called without parameter, toggle based on current value
@@ -4566,7 +4568,7 @@
     };
 
     // Set playback speed
-    Player.prototype.setSpeed = function(speed) {
+    Plyr.prototype.setSpeed = function(speed) {
         var player = this;
 
         // Load speed from storage or default value
@@ -4606,7 +4608,7 @@
     // Toggle loop
     // TODO: Finish logic
     // TODO: Set the indicator on load as user may pass loop as config
-    Player.prototype.loop = function(type) {
+    Plyr.prototype.loop = function(type) {
         var player = this;
 
         // Set default to be a true toggle
@@ -4689,7 +4691,7 @@
     };
 
     // Add common function to retrieve media source
-    Player.prototype.source = function(source) {
+    Plyr.prototype.source = function(source) {
         var player = this;
 
         // If object or string, parse it
@@ -4727,7 +4729,7 @@
     };
 
     // Set or get poster
-    Player.prototype.poster = function(source) {
+    Plyr.prototype.poster = function(source) {
         var player = this;
 
         if (!utils.is.string(source)) {
@@ -4743,7 +4745,7 @@
     };
 
     // Toggle captions
-    Player.prototype.toggleCaptions = function(show) {
+    Plyr.prototype.toggleCaptions = function(show) {
         var player = this;
 
         // If there's no full support, or there's no caption toggle
@@ -4778,7 +4780,7 @@
     };
 
     // Select active caption
-    Player.prototype.language = function(language) {
+    Plyr.prototype.language = function(language) {
         var player = this;
 
         if (utils.is.string(language)) {
@@ -4801,7 +4803,7 @@
 
     // Toggle fullscreen
     // Requires user input event
-    Player.prototype.toggleFullscreen = function(event) {
+    Plyr.prototype.toggleFullscreen = function(event) {
         var player = this;
 
         // Save scroll position
@@ -4873,7 +4875,7 @@
     // Toggle picture-in-picture
     // TODO: update player with state, support, enabled
     // TODO: detect outside changes
-    Player.prototype.togglePictureInPicture = function(toggle) {
+    Plyr.prototype.togglePictureInPicture = function(toggle) {
         var player = this;
         var states = {
             pip: 'picture-in-picture',
@@ -4899,7 +4901,7 @@
 
     // Trigger airplay
     // TODO: update player with state, support, enabled
-    Player.prototype.airPlay = function() {
+    Plyr.prototype.airPlay = function() {
         var player = this;
 
         // Bail if no support
@@ -4915,7 +4917,7 @@
     };
 
     // Show the player controls in fullscreen mode
-    Player.prototype.toggleControls = function(toggle) {
+    Plyr.prototype.toggleControls = function(toggle) {
         var player = this;
 
         // Don't hide if config says not to, it's audio, or not ready or loading
@@ -4987,9 +4989,10 @@
     };
 
     // Event listener
-    Player.prototype.on = function(event, callback) {
+    Plyr.prototype.on = function(event, callback) {
         var player = this;
 
+        // Listen for events on container
         utils.on(player.elements.container, event, callback);
 
         // Allow chaining
@@ -4997,14 +5000,14 @@
     };
 
     // Check for support
-    Player.prototype.supports = function(mimeType) {
+    Plyr.prototype.supports = function(mimeType) {
         return support.mime(this, mimeType);
     };
 
     // Destroy an instance
     // Event listeners are removed when elements are removed
     // http://stackoverflow.com/questions/12528049/if-a-dom-element-is-removed-are-its-listeners-also-removed-from-memory
-    Player.prototype.destroy = function(callback, restore) {
+    Plyr.prototype.destroy = function(callback, restore) {
         var player = this;
 
         // Type specific stuff
@@ -5045,7 +5048,7 @@
 
         function done() {
             // Bail if already destroyed
-            if (!player.ready) {
+            if (player === null) {
                 return;
             }
 
@@ -5066,9 +5069,6 @@
                 }
             }
 
-            // Remove ready state
-            player.ready = false;
-
             // Event
             player.core.trigger(player.elements.original, 'destroyed', true);
 
@@ -5076,14 +5076,14 @@
             if (utils.is.function(callback)) {
                 callback.call(player.elements.original);
             }
-        }
 
-        // Allow chaining
-        return player;
+            // Allow chaining
+            player = null;
+        }
     };
 
     // Get the duration (or custom if set)
-    Player.prototype.getDuration = function() {
+    Plyr.prototype.getDuration = function() {
         var player = this;
 
         // It should be a number, but parse it just incase
@@ -5101,5 +5101,5 @@
         return (isNaN(duration) ? mediaDuration : duration);
     };
 
-    return Player;
+    return Plyr;
 });

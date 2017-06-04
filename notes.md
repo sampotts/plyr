@@ -24,6 +24,8 @@
 [ ] Start / end options for all players?
 [ ] Get quality options for HTML5 somehow (multi source?)
 [ ] Download button - grab first <source> or src attribute (or maybe use currentSrc?) for HTML5 and links for embedded players
+[ ] Scale captions size based on video size (in lieu of element queries)
+[ ] Allow passing YouTube/Vimeo iframe to setup
 
 #### Bugs
 [ ] Fix audio setup bug when calling `.setup()` again

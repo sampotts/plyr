@@ -51,20 +51,20 @@ li {
 a {
     text-decoration: none;
     color: @link-color;
-    border-bottom: 1px dotted currentColor;
-    transition: background .3s ease, color .3s ease, border .3s ease;
+    transition: color .3s ease;
 
     &:hover,
     &:focus {
         color: @gray-dark;
-        border-bottom-color: rgba(0,0,0,0);
-    }
-    &:focus {
-        .tab-focus();
     }
     &.logo {
         border: 0;
     }
+}
+
+a:focus,
+button:focus {
+    .tab-focus();
 }
 
 .color--vimeo {

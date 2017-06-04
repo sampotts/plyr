@@ -2,10 +2,10 @@
 // Base layout
 // ==========================================================================
 
-// BORDER-BOX ALL THE THINGS! 
+// BORDER-BOX ALL THE THINGS!
 // http://paulirish.com/2012/box-sizing-border-box-ftw/
-*, *::after, *::before {  
-    box-sizing: border-box; 
+*, *::after, *::before {
+    box-sizing: border-box;
 }
 
 // Hidden
@@ -15,11 +15,11 @@
 
 // Base
 html {
-    height: 100%;
-    background: @body-background fixed;
+    background: @body-background;
 }
 body {
-    margin: 0;
+    max-width: @container-width;
+    margin: auto;
     padding: (@padding-base / 2);
 }
 
@@ -31,6 +31,7 @@ header {
     p {
         .font-size(18);
     }
+
     @media (min-width: @screen-sm) {
         padding-top: (@padding-base * 3);
         padding-bottom: (@padding-base * 3);
@@ -39,8 +40,7 @@ header {
 
 // Sections
 section {
-    max-width: @example-width-video;
-    margin: 0 auto @padding-base;
+    margin-bottom: @padding-base;
 
     @media (min-width: @screen-sm) {
         margin-bottom: (@padding-base * 2);

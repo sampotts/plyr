@@ -185,6 +185,12 @@
 
         // Set active on parent
         toggleClass(document.querySelector('[data-source="' + type + '"]').parentElement, 'active', true);
+
+        // Show cite
+        [].forEach.call(document.querySelectorAll('.plyr__cite'), function(cite) {
+            cite.setAttribute('hidden', '');
+        });
+        document.querySelector('.plyr__cite--' + type).removeAttribute('hidden');
     }
 })();
 
