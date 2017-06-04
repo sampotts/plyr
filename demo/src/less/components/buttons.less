@@ -116,16 +116,14 @@ nav {
 
 // Styles
 .btn--primary {
-    @border-color: darken(@link-color, 5%);
-    background-image: linear-gradient(@link-color, @border-color);
     background-color: @link-color;
-    border-color: @border-color;
+    border-color: @link-color;
     color: #fff;
 
     &:hover,
     &:focus {
         color: #fff;
-        border-color: darken(@border-color, 5%);
+        border-color: darken(@link-color, 5%);
     }
 }
 .btn--youtube .icon {
