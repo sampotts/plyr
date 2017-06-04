@@ -1194,6 +1194,7 @@
         var player = this;
         var timers = {};
         var api = {};
+        player.ready = false;
 
         // Get the media element
         player.media = media;
@@ -1282,7 +1283,6 @@
             if (utils.is.string(element)) {
                 utils.removeElement(player.elements[element]);
                 player.elements[element] = null;
-
             } else {
                 utils.removeElement(element);
             }
@@ -3389,9 +3389,6 @@
                 return;
             }
 
-            // Remove ready class hook
-            player.ready = false;
-
             // Stop playback
             player.stop();
 
@@ -3410,7 +3407,7 @@
                 player.embed = null;
 
                 // Remove media
-                removeElement('media');
+                removeElement(player.media);
 
                 // Remove the old captions
                 removeElement('captions');
@@ -4111,6 +4108,8 @@
 
         // Everything done
         function ready() {
+            player.ready = true;
+
             // Ready event at end of execution stack
             trigger(player.elements.container, 'ready', true);
 
@@ -4209,7 +4208,7 @@
             player.elements.container = utils.wrap(target, utils.createElement('div'));
 
             // Cache original element state for .destroy()
-            player.original = target.cloneNode(true);
+            player.elements.original = target.cloneNode(true);
 
             // Allow focus to be captured
             player.elements.container.setAttribute('tabindex', 0);
@@ -5007,28 +5006,29 @@
     // http://stackoverflow.com/questions/12528049/if-a-dom-element-is-removed-are-its-listeners-also-removed-from-memory
     Player.prototype.destroy = function(callback, restore) {
         var player = this;
+
         // Type specific stuff
         switch (player.type) {
             case 'youtube':
                 // Clear timers
-                window.clearInterval(player.timers.buffering);
-                window.clearInterval(player.timers.playing);
+                window.clearInterval(player.core.timers.buffering);
+                window.clearInterval(player.core.timers.playing);
 
                 // Destroy YouTube API
                 player.embed.destroy();
 
                 // Clean up
-                cleanUp();
+                done();
 
                 break;
 
             case 'vimeo':
                 // Destroy Vimeo API
                 // then clean up (wait, to prevent postmessage errors)
-                player.embed.unload().then(cleanUp);
+                player.embed.unload().then(done);
 
                 // Vimeo does not always return
-                window.setTimeout(cleanUp, 200);
+                window.setTimeout(done, 200);
 
                 break;
 
@@ -5038,35 +5038,44 @@
                 player.core.toggleNativeControls(true);
 
                 // Clean up
-                cleanUp();
+                done();
 
                 break;
         }
 
-        function cleanUp() {
+        function done() {
+            // Bail if already destroyed
+            if (!player.ready) {
+                return;
+            }
+
             // Default to restore original element
             if (!utils.is.boolean(restore)) {
                 restore = true;
             }
 
-            // Callback
-            if (utils.is.function(callback)) {
-                callback.call(player.original);
-            }
-
-            // Bail if we don't need to restore the original element
-            if (!restore) {
-                return;
-            }
-
-            // Replace the container with the original element provided
-            player.elements.container.parentNode.replaceChild(player.original, player.elements.container);
-
-            // Reset overflow (incase destroyed while fullscreen)
+            // Reset overflow (incase destroyed while in fullscreen)
             document.body.style.overflow = '';
 
+            // Replace the container with the original element provided
+            if (restore) {
+                var parent = player.elements.container.parentNode;
+
+                if (utils.is.htmlElement(parent)) {
+                    parent.replaceChild(player.elements.original, player.elements.container);
+                }
+            }
+
+            // Remove ready state
+            player.ready = false;
+
             // Event
-            player.core.trigger(player.original, 'destroyed', true);
+            player.core.trigger(player.elements.original, 'destroyed', true);
+
+            // Callback
+            if (utils.is.function(callback)) {
+                callback.call(player.elements.original);
+            }
         }
 
         // Allow chaining
