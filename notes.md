@@ -40,7 +40,35 @@
 - Added `playsinline` support for iOS 10
 - Embed setup now accepts an <iframe> as the target element for true progressive enhancement
 
-#### Breaking changes
+## Changes
+
+### Config changes
+- videoWrapper -> video
+- embedWrapper -> embed
+- setup and ready classes removed
+
+### API changes
+- Can now chain most functions (need to document which can)
+- support -> supports
+- isFullscreen -> fullscreen.active
+- new 'language'
+- getType -> type
+- getEmbed -> embed
+- getContainer removed
+- getMedia -> media
+- getCurrentTime -> media.currentTime
+- getVolume -> media.volume
+- isMuted -> media.muted
+- isLoading -> media.loading
+- isPaused -> media.paused
+- updatePoster -> poster
+- setVolume -> volume
+- increaseVolume (new)
+- decreaseVolume (new)
+- togglePictureInPicture (new)
+- airPlay (new)
+
+#### Other breaking changes
 - New config options for loop
 - Selectors changes (new `input` and `display` object) - DOCUMENT
 - Custom HTML option now `controls` which accepts a string (HTML), a function (your own template engine) or array (use built in controls)
