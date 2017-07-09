@@ -30,7 +30,7 @@
     max-width: 100%;
     min-width: 200px;
     font-family: @plyr-font-family;
-    font-weight: 500;
+    font-weight: @plyr-font-weight-normal;
     direction: ltr;
 
     & when (@plyr-border-box = true) {
@@ -546,7 +546,7 @@
             width: 100%;
             padding: @plyr-control-padding (@plyr-control-padding * 2);
             color: @plyr-menu-color;
-            font-weight: 600;
+            font-weight: @plyr-font-weight-bold;
             user-select: none;
 
             &::after {
@@ -614,7 +614,7 @@
             color: fade(@plyr-menu-color, 80%);
 
             .plyr__badge {
-                font-weight: 600;
+                font-weight: @plyr-font-weight-bold;
             }
         }
     }

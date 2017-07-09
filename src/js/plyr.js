@@ -3094,7 +3094,7 @@
                     utils.off(container, utils.transitionEnd, restore)
                 }
 
-                // Listen for the transtion finishing and restore auto height/width
+                // Listen for the transition finishing and restore auto height/width
                 utils.on(container, utils.transitionEnd, restore);
 
                 // Set dimensions to target
@@ -3525,7 +3525,7 @@
         }
 
         // Listen for control events
-        function controlListeners() {
+        function listeners() {
             // IE doesn't support input event, so we fallback to change
             var inputEvent = (player.browser.isIE ? 'change' : 'input');
 
@@ -4068,7 +4068,7 @@
                 injectControls();
 
                 // Re-attach listeners
-                controlListeners();
+                listeners();
             }
 
             // If there's no controls, bail
