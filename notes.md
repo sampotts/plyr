@@ -13,7 +13,7 @@
 [ ] Test PiP (need MacOS Sierra)
 [ ] Test AirPlay (need MacOS Sierra)
 [ ] Add `controlshidden` and `controlsshown` events
-[ ] Test custom controls (with settings support for now)
+[ ] Test custom controls (without settings support for now)
 [ ] Tidy up small UI for iOS inline
 [ ] Finish new loop setup and display in seek bar
 [ ] Update docs for removal of setup
