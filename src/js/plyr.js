@@ -2850,10 +2850,12 @@
                     target = plyr.buttons[play ? 'pause' : 'play'];
 
                 // Get the last play button to account for the large play button
-                if (target && target.length > 1) {
-                    target = target[target.length - 1];
-                } else {
-                    target = target[0];
+                if (target) {
+                    if (target.length > 1) {
+                        target = target[target.length - 1];
+                    } else {
+                        target = target[0];
+                    }
                 }
 
                 // Setup focus and tab focus
