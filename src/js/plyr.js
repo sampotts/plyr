@@ -44,41 +44,6 @@
         showPosterOnEnd: false,
         disableContextMenu: true,
 
-        // Quality settings
-        quality: {
-            default: 'auto',
-            selected: 'auto'
-        },
-
-        // Set loops
-        loop: {
-            active: false,
-            start: 0,
-            end: null,
-            indicator: {
-                start: 0,
-                end: 0
-            }
-        },
-
-        // Speed up/down
-        speed: {
-            selected: 1,
-            options: [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2]
-        },
-
-        // Keyboard shortcut settings
-        keyboardShortcuts: {
-            focused: true,
-            global: false
-        },
-
-        // Display tooltips
-        tooltips: {
-            controls: false,
-            seek: true
-        },
-
         // Selectors
         // Change these to match your template if using custom HTML
         selectors: {
@@ -162,6 +127,41 @@
                 active: 'plyr--airplay-active'
             },
             tabFocus: 'tab-focus'
+        },
+
+        // Quality settings
+        quality: {
+            default: 'auto',
+            selected: 'auto'
+        },
+
+        // Set loops
+        loop: {
+            active: false,
+            start: 0,
+            end: null,
+            indicator: {
+                start: 0,
+                end: 0
+            }
+        },
+
+        // Speed up/down
+        speed: {
+            selected: 1,
+            options: [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2]
+        },
+
+        // Keyboard shortcut settings
+        keyboardShortcuts: {
+            focused: true,
+            global: false
+        },
+
+        // Display tooltips
+        tooltips: {
+            controls: false,
+            seek: true
         },
 
         // Captions settings
@@ -1290,6 +1290,19 @@
             }
         }
 
+        // Add elements to HTML5 media (source, tracks, etc)
+        function insertElements(type, attributes) {
+            if (utils.is.string(attributes)) {
+                utils.insertElement(type, player.media, {
+                    src: attributes
+                });
+            } else if (utils.is.array(attributes)) {
+                attributes.forEach(function(attribute) {
+                    utils.insertElement(type, player.media, attribute);
+                });
+            }
+        }
+
         // Trap focus inside container
         function focusTrap() {
             var tabbables = getElements('input:not([disabled]), button:not([disabled])');
@@ -1313,19 +1326,6 @@
 
             // Bind the handler
             utils.on(player.elements.container, 'keydown', checkFocus, false);
-        }
-
-        // Add elements to HTML5 media (source, tracks, etc)
-        function insertElements(type, attributes) {
-            if (utils.is.string(attributes)) {
-                utils.insertElement(type, player.media, {
-                    src: attributes
-                });
-            } else if (utils.is.array(attributes)) {
-                attributes.forEach(function(attribute) {
-                    utils.insertElement(type, player.media, attribute);
-                });
-            }
         }
 
         // Get icon URL
@@ -1536,7 +1536,13 @@
         }
 
         // Build the default HTML
+        // TODO: Set order based on order in the config.controls array?
         function createControls(data) {
+            // Do nothing if we want no controls
+            if (utils.is.empty(player.config.controls)) {
+                return;
+            }
+
             // Create the container
             var controls = utils.createElement('div', utils.getAttributesFromSelector(player.config.selectors.controls.wrapper));
 
@@ -1643,7 +1649,7 @@
             }
 
             // Settings button / menu
-            if (utils.inArray(player.config.controls, 'settings')) {
+            if (utils.inArray(player.config.controls, 'settings') && !utils.is.empty(player.config.settings)) {
                 var menu = utils.createElement('div', {
                     class: 'plyr__menu'
                 });
@@ -2269,7 +2275,7 @@
         }
 
         // Find the UI controls and store references in custom controls
-        // TODO: Allow settings menus with custom controls (coming soon!)
+        // TODO: Allow settings menus with custom controls
         function findElements() {
             try {
                 player.elements.controls = getElement(player.config.selectors.controls.wrapper);
@@ -2329,7 +2335,7 @@
             utils.toggleClass(player.elements.container, player.config.selectors.container.replace('.', ''), player.supported.full);
         }
 
-        // Toggle native controls
+        // Toggle native HTML5 media controls
         function toggleNativeControls(toggle) {
             if (toggle && utils.inArray(types.html5, player.type)) {
                 player.media.setAttribute('controls', '');
@@ -2709,10 +2715,14 @@
                                     // YouTube needs a call to `stopVideo` before playing again
                                     instance.stopVideo();
                                     instance.playVideo();
+
                                     break;
                                 }
+
                                 player.media.paused = true;
+
                                 trigger(player.media, 'ended');
+
                                 break;
 
                             case 1:
@@ -2724,6 +2734,7 @@
                                 }
 
                                 player.media.seeking = false;
+
                                 trigger(player.media, 'play');
                                 trigger(player.media, 'playing');
 
@@ -2753,7 +2764,9 @@
 
                             case 2:
                                 player.media.paused = true;
+
                                 trigger(player.media, 'pause');
+
                                 break;
                         }
 
@@ -3208,9 +3221,11 @@
                 }
             }
 
-            if (utils.is.number(player.config.loop.start) && utils.is.number(player.config.loop.end) && player.media.currentTime >= player.config.loop.end) {
+            // TODO: Loop - this shouldn't be here
+            /*if (utils.is.number(player.config.loop.start) && utils.is.number(player.config.loop.end) && player.media.currentTime >= player.config.loop.end) {
+                console.warn('Looping');
                 player.seek(player.config.loop.start);
-            }
+            }*/
 
             setProgress(progress, value);
         }
@@ -4988,12 +5003,22 @@
         return player;
     };
 
-    // Event listener
+    // Event listeners
     Plyr.prototype.on = function(event, callback) {
         var player = this;
 
         // Listen for events on container
         utils.on(player.elements.container, event, callback);
+
+        // Allow chaining
+        return player;
+    };
+
+    Plyr.prototype.off = function(event, callback) {
+        var player = this;
+
+        // Listen for events on container
+        utils.off(player.elements.container, event, callback);
 
         // Allow chaining
         return player;
