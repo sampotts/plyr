@@ -1270,6 +1270,31 @@
             }));
         }
 
+        // Trap focus inside container
+        function focusTrap() {
+            var tabbables = getElements('input:not([disabled]), button:not([disabled])');
+            var first = tabbables[0];
+            var last = tabbables[tabbables.length - 1];
+
+            function checkFocus(event) {
+                // If it is tab
+                if (event.which === 9 && player.fullscreen.active) {
+                    if (event.target === last && !event.shiftKey) {
+                        // Move focus to first element that can be tabbed if Shift isn't used
+                        event.preventDefault();
+                        first.focus();
+                    } else if (event.target === first && event.shiftKey) {
+                        // Move focus to last element that can be tabbed if Shift is used
+                        event.preventDefault();
+                        last.focus();
+                    }
+                }
+            }
+
+            // Bind the handler
+            utils.on(player.elements.container, 'keydown', checkFocus, false);
+        }
+
         // Find all elements
         function getElements(selector) {
             return player.elements.container.querySelectorAll(selector);
@@ -1280,6 +1305,7 @@
             return getElements(selector)[0];
         }
 
+        // Remove an element
         function removeElement(element) {
             // Remove reference from player.elements cache
             if (utils.is.string(element)) {
@@ -1301,31 +1327,6 @@
                     utils.insertElement(type, player.media, attribute);
                 });
             }
-        }
-
-        // Trap focus inside container
-        function focusTrap() {
-            var tabbables = getElements('input:not([disabled]), button:not([disabled])');
-            var first = tabbables[0];
-            var last = tabbables[tabbables.length - 1];
-
-            function checkFocus(event) {
-                // If it is TAB
-                if (event.which === 9 && player.fullscreen.active) {
-                    if (event.target === last && !event.shiftKey) {
-                        // Move focus to first element that can be tabbed if Shift isn't used
-                        event.preventDefault();
-                        first.focus();
-                    } else if (event.target === first && event.shiftKey) {
-                        // Move focus to last element that can be tabbed if Shift is used
-                        event.preventDefault();
-                        last.focus();
-                    }
-                }
-            }
-
-            // Bind the handler
-            utils.on(player.elements.container, 'keydown', checkFocus, false);
         }
 
         // Get icon URL
@@ -1972,7 +1973,7 @@
         }
 
         // Set a list of available captions languages
-        function setSpeedMenu(options) {
+        function setSpeedMenu() {
             var list = player.elements.settings.panes.speed.querySelector('ul');
 
             // Show the pane and tab
@@ -1982,12 +1983,8 @@
             // Empty the menu
             utils.emptyElement(list);
 
-            // If there's no captions, bail
-            if (!utils.is.array(options)) {
-                options = player.config.speed.options;
-            }
-
-            options.forEach(function(speed) {
+            // Create items
+            player.config.speed.options.forEach(function(speed) {
                 var item = utils.createElement('li');
 
                 var label = utils.createElement('label', {
@@ -2000,15 +1997,42 @@
                     value: speed,
                 }));
 
-                if (speed === player.config.speed.selected) {
-                    radio.checked = true;
-                }
-
                 label.appendChild(radio);
                 label.insertAdjacentHTML('beforeend', getSpeedLabel(speed));
                 item.appendChild(label);
                 list.appendChild(item);
             });
+
+            setSelectedSpeed(list);
+        }
+
+        // Update the UI
+        function setSelectedSpeed(list) {
+            var speed = player.config.speed.selected;
+
+            // Unsupported speed
+            if (!utils.inArray(player.config.speed.options, speed)) {
+                return;
+            }
+
+            // Get the list if we need to
+            if (!utils.is.htmlElement(list)) {
+                list = player.elements.settings.panes.speed.querySelector('ul');
+            }
+
+            // Find the radio option
+            var target = list.querySelector('[value="' + speed + '"]');
+
+            if (!utils.is.htmlElement(target)) {
+                return;
+            }
+
+            // Check it
+            target.checked = true;
+
+            // Find the label
+            var label = player.elements.settings.tabs.speed.querySelector('.' + player.config.classes.menu.value);
+            label.innerHTML = getSpeedLabel(speed);
         }
 
         // Setup fullscreen
@@ -2622,7 +2646,17 @@
                         var quality = instance.getPlaybackQuality();
 
                         // var set = player.setPlaybackQuality();
-                        console.warn(quality);
+                        console.warn('quality change', quality);
+                    },
+                    'onPlaybackRateChange': function(event) {
+                        // Get the instance
+                        var instance = event.target;
+
+                        // Get current speed
+                        player.media.playbackRate = instance.getPlaybackRate();
+
+                        // Trigger timeupdate
+                        trigger(player.media, 'ratechange');
                     },
                     'onReady': function(event) {
                         // Get the instance
@@ -2647,10 +2681,9 @@
                         player.media.muted = instance.isMuted();
 
                         // Get available speeds
-                        var speed = instance.getPlaybackRate();
-                        var speedOptions = instance.getAvailablePlaybackRates();
-                        //var set = instance.setPlaybackRate();
-                        console.warn(speed, speedOptions);
+                        player.config.speed.selected = instance.getPlaybackRate();
+                        player.config.speed.options = instance.getAvailablePlaybackRates();
+                        setSpeedMenu();
 
                         // Set title
                         player.config.title = instance.getVideoData().title;
@@ -3834,7 +3867,7 @@
                 // Settings - Language
                 if (utils.matches(event.target, player.config.selectors.inputs.language)) {
                     handlerProxy.call(this, event, player.config.listeners.language, function() {
-                        player.language(event.target.value.toLowerCase());
+                        player.setLanguage(event.target.value.toLowerCase());
                     });
                 }
 
@@ -4023,6 +4056,20 @@
                     event.preventDefault();
                 }, false);
             }
+
+            // Speed change
+            utils.on(player.media, 'ratechange', function(event) {
+                // Store current speed
+                player.config.speed.selected = player.media.playbackRate;
+
+                // Update UI
+                setSelectedSpeed();
+
+                // Save speed to localStorage
+                updateStorage({
+                    speed: player.config.speed.selected
+                });
+            });
 
             // Proxy events to container
             // Bubble up key events for Edge
@@ -4562,7 +4609,6 @@
 
         // Embeds
         if (utils.inArray(types.embed, player.type)) {
-            // YouTube
             switch (player.type) {
                 case 'youtube':
                     player.embed[player.media.muted ? 'mute' : 'unMute']();
@@ -4599,22 +4645,26 @@
             speed = 2.0;
         }
 
-        if (!utils.is.array(player.config.speed.options)) {
-            player.core.warn('Invalid speeds format');
+        if (!utils.inArray(player.config.speed.options, speed)) {
+            player.core.warn('Unsupported speed (' + speed + ')');
             return;
         }
 
-        // Store current speed
-        player.config.speed.selected = speed;
+        // Set media speed
+        switch (player.type) {
+            case 'youtube':
+                player.embed.setPlaybackRate(speed);
+                break;
 
-        // Set HTML5 speed
-        // TODO: set YouTube
-        player.media.playbackRate = speed;
+            case 'vimeo':
+                // Vimeo not supported (https://github.com/vimeo/player.js)
+                player.core.warn('Vimeo playback rate change is not supported');
+                break;
 
-        // Save speed to localStorage
-        player.core.updateStorage({
-            speed: speed
-        });
+            default:
+                player.media.playbackRate = speed;
+                break;
+        }
 
         // Allow chaining
         return player;
@@ -4794,17 +4844,18 @@
         return player;
     };
 
-    // Select active caption
-    Plyr.prototype.language = function(language) {
+    // Set caption language
+    Plyr.prototype.setLanguage = function(language) {
         var player = this;
 
-        if (utils.is.string(language)) {
-            // Update config
-            player.config.captions.language = language.toLowerCase();
-        } else {
-            // If no language passed, return current language
-            return player.config.captions.language;
+        // Nothing specified
+        if (!utils.is.string(language)) {
+            player.core.warn('Language is required');
+            return;
         }
+
+        // Update config
+        player.config.captions.language = language.toLowerCase();
 
         // Clear caption
         player.core.setCaption();
@@ -4814,6 +4865,11 @@
 
         // Allow chaining
         return player;
+    };
+
+    // Get current language
+    Plyr.prototype.getLanguage = function() {
+        return this.config.captions.language;
     };
 
     // Toggle fullscreen
