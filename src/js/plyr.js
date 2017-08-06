@@ -131,8 +131,8 @@
 
         // Quality settings
         quality: {
-            default: 'auto',
-            selected: 'auto'
+            selected: 'auto',
+            options: []
         },
 
         // Set loops
@@ -3863,7 +3863,7 @@
                 // Settings - Quality
                 else if (utils.matches(event.target, player.config.selectors.inputs.quality)) {
                     handlerProxy.call(this, event, player.config.listeners.quality, function() {
-                        warn("Set quality");
+                        player.setQuality(event.target.value);
                     });
                 }
 
@@ -3879,11 +3879,13 @@
                 else if (utils.matches(event.target, player.config.selectors.buttons.loop)) {
                     handlerProxy.call(this, event, player.config.listeners.loop, function() {
                         // TODO: This should be done in the method itself I think
-                        var value = event.target.getAttribute('data-loop__value') || event.target.getAttribute('data-loop__type');
+                        // var value = event.target.getAttribute('data-loop__value') || event.target.getAttribute('data-loop__type');
 
-                        if (utils.inArray(['start', 'end', 'all', 'none'], value)) {
+                        warn('Set loop');
+
+                        /*if (utils.inArray(['start', 'end', 'all', 'none'], value)) {
                             player.loop(value);
-                        }
+                        }*/
                     });
                 }
             });
@@ -4647,6 +4649,7 @@
                 break;
 
             case 'vimeo':
+                speed = null;
                 // Vimeo not supported (https://github.com/vimeo/player.js)
                 player.core.warn('Vimeo playback rate change is not supported');
                 break;
@@ -4655,6 +4658,45 @@
                 player.media.playbackRate = speed;
                 break;
         }
+
+        // Save speed to localStorage
+        player.core.updateStorage({
+            speed: speed
+        });
+
+        // Allow chaining
+        return player;
+    };
+
+    // Set playback quality
+    Plyr.prototype.setQuality = function(quality) {
+        var player = this;
+
+        // Load speed from storage or default value
+        if (!utils.is.string(quality)) {
+            quality = parseFloat(player.storage.quality || player.config.quality.selected);
+        }
+
+        if (!utils.inArray(player.config.quality.options, quality)) {
+            player.core.warn('Unsupported quality option (' + quality + ')');
+            return;
+        }
+
+        // Set media speed
+        switch (player.type) {
+            case 'youtube':
+                player.embed.setPlaybackQuality(quality);
+                break;
+
+            default:
+                player.core.warn('Quality options are only available for YouTube');
+                break;
+        }
+
+        // Save speed to localStorage
+        player.core.updateStorage({
+            quality: quality
+        });
 
         // Allow chaining
         return player;
