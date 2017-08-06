@@ -343,7 +343,7 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
       <td>This will restore and *reload* HTML5 video once playback is complete. Note: depending on the browser caching, this may result in the video downloading again (or parts of it). Use with caution.</td>
     </tr>
     <tr>
-      <td><code>keyboardShortcuts</code></td>
+      <td><code>keyboard</code></td>
       <td>Object</td>
       <td><code>{ focused: true, global: false }</code></td>
       <td>Enable <a href="#shortcuts">keyboard shortcuts</a> for focused players only or globally as well (this will only work if there's one player in the document)</td>

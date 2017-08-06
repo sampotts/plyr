@@ -153,7 +153,7 @@
         },
 
         // Keyboard shortcut settings
-        keyboardShortcuts: {
+        keyboard: {
             focused: true,
             global: false
         },
@@ -3439,9 +3439,6 @@
                 return;
             }
 
-            // Stop playback
-            player.stop();
-
             // Update seek range and progress
             updateSeekDisplay();
 
@@ -3451,15 +3448,11 @@
             // Cancel current network requests
             cancelRequests();
 
-            // Setup new source
-            function setup() {
-                // Remove media
+            // Destroy instance and re-setup
+            player.destroy(function() {
+                // Remove elements
                 removeElement(player.media);
-
-                // Remove the old captions
                 removeElement('captions');
-
-                // Remove video container
                 removeElement('wrapper');
 
                 // Reset class name
@@ -3565,11 +3558,7 @@
                 // Set aria title and iframe title
                 player.config.title = source.title;
                 setTitle();
-            }
-
-            // Destroy instance adn wait for callback
-            // Vimeo throws a wobbly if you don't wait
-            player.destroy(setup, false);
+            }, false);
         }
 
         // Listen for control events
@@ -3617,11 +3606,11 @@
             }
 
             // Keyboard shortcuts
-            if (player.config.keyboardShortcuts.focused) {
+            if (player.config.keyboard.focused) {
                 var last = null;
 
                 // Handle global presses
-                if (player.config.keyboardShortcuts.global) {
+                if (player.config.keyboard.global) {
                     utils.on(window, 'keydown keyup', function(event) {
                         var code = getKeyCode(event);
                         var focused = utils.getFocusElement();
@@ -4458,14 +4447,15 @@
         // Set the current time
         // Embeds
         if (utils.inArray(types.embed, player.type)) {
+            console.warn(player.type, typeof player.embed, typeof player.embed.seekTo);
+
             switch (player.type) {
                 case 'youtube':
                     player.embed.seekTo(targetTime);
                     break;
 
                 case 'vimeo':
-                    // Round to nearest second for vimeo
-                    player.embed.setCurrentTime(targetTime.toFixed(0));
+                    player.embed.setCurrentTime(targetTime);
                     break;
 
                 case 'soundcloud':
