@@ -904,16 +904,14 @@ These events also bubble up the DOM. The event target will be the container elem
 Details borrowed from: [https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events](https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events)
 
 ## Embeds
-YouTube and Vimeo are currently supported and function much like a HTML5 video. Check the relevant documentation sections for any differences.
-
-Plyr references a custom version of the Vimeo Froogaloop API as Vimeo have neglected to maintain the library and there were bugs with their version. You don't need to worry about including your own versions of the Vimeo or YouTube JavaScript APIs.
+YouTube and Vimeo are currently supported and function much like a HTML5 video. Check the relevant documentation sections for any differences. You don't need to worry about including your own versions of the Vimeo or YouTube JavaScript APIs. Plyr will automatically include them.
 
 The embed third party API's can be accessed through the `getEmbed()` API method.
 
 More info on the respective API's here:
 
 - [YouTube API Reference](https://developers.google.com/youtube/js_api_reference)
-- [Vimeo API Reference](https://developer.vimeo.com/player/js-api#reference)
+- [Vimeo API Reference](https://github.com/vimeo/player.js)
 
 *Please note*: not all API methods may work 100%. Your mileage may vary. It's better to use the universal plyr API where possible.
 
