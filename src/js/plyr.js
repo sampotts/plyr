@@ -1787,8 +1787,14 @@
         // Set the YouTube quality menu
         // TODO: Support for HTML5
         // YouTube: "hd2160", "hd1440", "hd1080", "hd720", "large", "medium", "small", "tiny", "auto"
-        function setQualityMenu(options, current) {
+        function setQualityMenu() {
             var list = player.elements.settings.panes.quality.querySelector('ul');
+
+            if (utils.is.empty(player.config.quality.options)) {
+                player.elements.settings.tabs.quality.setAttribute('hidden', '');
+                player.elements.settings.panes.quality.setAttribute('hidden', '');
+                return;
+            }
 
             // Show the pane and tab
             player.elements.settings.tabs.quality.removeAttribute('hidden');
