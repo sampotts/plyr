@@ -142,12 +142,11 @@
                     type: 'audio',
                     title: 'Kishi Bashi &ndash; &ldquo;It All Began With A Burst&rdquo;',
                     sources: [{
-                            src: 'https://cdn.selz.com/plyr/1.5/Kishi_Bashi_-_It_All_Began_With_a_Burst.mp3',
-                            type: 'audio/mp3'
-                    },
-                        {
-                            src: 'https://cdn.selz.com/plyr/1.5/Kishi_Bashi_-_It_All_Began_With_a_Burst.ogg',
-                            type: 'audio/ogg'
+                        src: 'https://cdn.selz.com/plyr/1.5/Kishi_Bashi_-_It_All_Began_With_a_Burst.mp3',
+                        type: 'audio/mp3'
+                    }, {
+                        src: 'https://cdn.selz.com/plyr/1.5/Kishi_Bashi_-_It_All_Began_With_a_Burst.ogg',
+                        type: 'audio/ogg'
                     }]
                 });
                 break;
@@ -200,14 +199,14 @@ if (window.location.host === 'plyr.io') {
     (function(i, s, o, g, r, a, m) {
         i.GoogleAnalyticsObject = r;
         i[r] = i[r] || function() {
-            (i[r].q = i[r].q || []).push(arguments)
+            (i[r].q = i[r].q || []).push(arguments);
         };
         i[r].l = 1 * new Date();
         a = s.createElement(o);
         m = s.getElementsByTagName(o)[0];
         a.async = 1;
         a.src = g;
-        m.parentNode.insertBefore(a, m)
+        m.parentNode.insertBefore(a, m);
     })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
     window.ga('create', 'UA-40881672-11', 'auto');
     window.ga('send', 'pageview');

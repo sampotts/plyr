@@ -15,12 +15,17 @@
 
 // Base
 html {
-    background: @body-background;
+    height: 100%;
+    background: @body-background fixed;
 }
 body {
-    max-width: @container-width;
-    margin: auto;
+    margin: 0 auto @padding-base;
     padding: (@padding-base / 2);
+    max-width: @example-width-video;
+
+    @media (min-width: @screen-sm) {
+        margin-bottom: (@padding-base * 2);
+    }
 }
 
 // Header
@@ -31,18 +36,8 @@ header {
     p {
         .font-size(18);
     }
-
     @media (min-width: @screen-sm) {
         padding-top: (@padding-base * 3);
         padding-bottom: (@padding-base * 3);
-    }
-}
-
-// Sections
-section {
-    margin-bottom: @padding-base;
-
-    @media (min-width: @screen-sm) {
-        margin-bottom: (@padding-base * 2);
     }
 }
