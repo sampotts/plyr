@@ -1080,14 +1080,18 @@
                 if (!support.fullscreen) {
                     return false;
                 }
+
                 if (utils.is.undefined(element)) {
                     element = document.body;
                 }
-                switch (this.prefix) {
+
+                switch (prefix) {
                     case '':
                         return document.fullscreenElement === element;
+
                     case 'moz':
                         return document.mozFullScreenElement === element;
+
                     default:
                         return document[prefix + 'FullscreenElement'] === element;
                 }
@@ -1096,22 +1100,26 @@
                 if (!support.fullscreen) {
                     return false;
                 }
+
                 if (!utils.is.htmlElement(element)) {
                     element = document.body;
                 }
-                return (prefix === '') ? element.requestFullScreen() : element[prefix + (prefix === 'ms' ? 'RequestFullscreen' : 'RequestFullScreen')]();
+
+                return !prefix.length ? element.requestFullScreen() : element[prefix + (prefix === 'ms' ? 'RequestFullscreen' : 'RequestFullScreen')]();
             },
             cancelFullScreen: function() {
                 if (!support.fullscreen) {
                     return false;
                 }
-                return (prefix === '') ? document.cancelFullScreen() : document[prefix + (prefix === 'ms' ? 'ExitFullscreen' : 'CancelFullScreen')]();
+
+                return !prefix.length ? document.cancelFullScreen() : document[prefix + (prefix === 'ms' ? 'ExitFullscreen' : 'CancelFullScreen')]();
             },
             element: function() {
                 if (!support.fullscreen) {
                     return null;
                 }
-                return (prefix === '') ? document.fullscreenElement : document[prefix + 'FullscreenElement'];
+
+                return !prefix.length ? document.fullscreenElement : document[prefix + 'FullscreenElement'];
             }
         };
     })();
