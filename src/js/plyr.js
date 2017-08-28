@@ -212,7 +212,7 @@
             fullscreen:         null
         },
         // Events to watch on HTML5 media elements
-        events:                 ['ready', 'ended', 'progress', 'stalled', 'playing', 'waiting', 'canplay', 'canplaythrough', 'loadstart', 'loadeddata', 'loadedmetadata', 'timeupdate', 'volumechange', 'play', 'pause', 'error', 'seeking', 'seeked', 'emptied', 'qualitychanged'],
+        events:                 ['ready', 'ended', 'progress', 'stalled', 'playing', 'waiting', 'canplay', 'canplaythrough', 'loadstart', 'loadeddata', 'loadedmetadata', 'timeupdate', 'volumechange', 'play', 'pause', 'error', 'beforeseeking', 'seeking', 'seeked', 'emptied', 'qualitychanged'],
         // Logging
         logPrefix:              '[Plyr]'
     };
@@ -2315,6 +2315,7 @@
         // Seek to time
         // The input parameter can be an event or a number
         function _seek(input) {
+            _triggerEvent(plyr.media, 'beforeseeking');
             var targetTime  = 0,
                 paused      = plyr.media.paused,
                 duration    = _getDuration();
