@@ -212,7 +212,7 @@
             fullscreen:         null
         },
         // Events to watch on HTML5 media elements
-        events:                 ['ready', 'ended', 'progress', 'stalled', 'playing', 'waiting', 'canplay', 'canplaythrough', 'loadstart', 'loadeddata', 'loadedmetadata', 'timeupdate', 'volumechange', 'play', 'pause', 'error', 'seeking', 'seeked', 'emptied', 'qualitychanged'],
+        events:                 ['ready', 'ended', 'progress', 'stalled', 'playing', 'waiting', 'canplay', 'canplaythrough', 'loadstart', 'loadeddata', 'loadedmetadata', 'timeupdate', 'volumechange', 'play', 'pause', 'error', 'beforeseeking', 'seeking', 'seeked', 'emptied', 'qualitychanged'],
         // Logging
         logPrefix:              '[Plyr]'
     };
@@ -2315,6 +2315,7 @@
         // Seek to time
         // The input parameter can be an event or a number
         function _seek(input) {
+            _triggerEvent(plyr.media, 'beforeseeking');
             var targetTime  = 0,
                 paused      = plyr.media.paused,
                 duration    = _getDuration();
@@ -3423,7 +3424,7 @@
             if (!show || !plyr.media.paused) {
                 timers.hover = window.setTimeout(function() {
                     // If the mouse is over the controls (and not entering fullscreen), bail
-                    if ((plyr.controls.pressed || plyr.controls.hover) && !isEnterFullscreen && !isEnterZoom) {
+                    if ((plyr.controls && (plyr.controls.pressed || plyr.controls.hover)) && !isEnterFullscreen && !isEnterZoom) {
                         return;
                     }
 
@@ -4318,9 +4319,6 @@
                 _controlListeners();
             }
 
-            // Media element listeners
-            _mediaListeners();
-
             // Remove native controls
             _toggleNativeControls();
 
@@ -4389,6 +4387,9 @@
             window.setTimeout(function() {
                 _triggerEvent(plyr.media, 'ready');
             }, 0);
+
+            // Media element listeners
+            _mediaListeners();
 
             // Set class hook on media element
             _toggleClass(plyr.media, defaults.classes.setup, true);
