@@ -3423,7 +3423,7 @@
             if (!show || !plyr.media.paused) {
                 timers.hover = window.setTimeout(function() {
                     // If the mouse is over the controls (and not entering fullscreen), bail
-                    if ((plyr.controls.pressed || plyr.controls.hover) && !isEnterFullscreen && !isEnterZoom) {
+                    if ((plyr.controls && (plyr.controls.pressed || plyr.controls.hover)) && !isEnterFullscreen && !isEnterZoom) {
                         return;
                     }
 
@@ -4318,9 +4318,6 @@
                 _controlListeners();
             }
 
-            // Media element listeners
-            _mediaListeners();
-
             // Remove native controls
             _toggleNativeControls();
 
@@ -4389,6 +4386,9 @@
             window.setTimeout(function() {
                 _triggerEvent(plyr.media, 'ready');
             }, 0);
+
+            // Media element listeners
+            _mediaListeners();
 
             // Set class hook on media element
             _toggleClass(plyr.media, defaults.classes.setup, true);
