@@ -9,7 +9,9 @@
 // Animation
 // ---------------------------------------
 @keyframes plyr-progress {
-    to { background-position: @plyr-progress-loading-size 0; }
+    to {
+        background-position: @plyr-progress-loading-size 0;
+    }
 }
 @keyframes plyr-popup {
     from {
@@ -46,7 +48,10 @@
 
     & when (@plyr-touch-action = true) {
         // Fix 300ms delay
-        a, button, input, label {
+        a,
+        button,
+        input,
+        label {
             touch-action: manipulation;
         }
     }
@@ -232,19 +237,20 @@
     bottom: 0;
     left: 0;
     width: 100%;
-    padding: (@plyr-control-spacing * 2);
+    padding: @plyr-control-spacing;
     transform: translateY(-(@plyr-control-spacing * 4));
     transition: transform .3s ease;
     color: @plyr-captions-color;
-    font-size: @plyr-font-size-captions-base;
+    font-size: @plyr-font-size-captions-small;
     text-align: center;
 
     span {
         border-radius: 2px;
-        padding: floor(@plyr-control-spacing / 3) @plyr-control-spacing;
+        padding: .2em .5em;
         background: @plyr-captions-bg;
         box-decoration-break: clone;
-        line-height: 150%;
+        line-height: 170%;
+        white-space: pre-wrap;
 
         // Firefox adds a <div> when using getCueAsHTML()
         div {
@@ -255,6 +261,10 @@
         display: none;
     }
 
+    @media (min-width: @plyr-bp-screen-sm) {
+        padding: (@plyr-control-spacing * 2);
+        font-size: @plyr-font-size-captions-base;
+    }
     @media (min-width: @plyr-bp-screen-md) {
         font-size: @plyr-font-size-captions-medium;
     }
@@ -335,9 +345,7 @@
     background: transparent;
     border-radius: 3px;
     cursor: pointer;
-    transition: background .3s ease,
-                color .3s ease,
-                opacity .3s ease;
+    transition: background .3s ease, color .3s ease, opacity .3s ease;
     color: inherit;
 
     svg {
@@ -346,7 +354,9 @@
         display: block;
         fill: currentColor;
         pointer-events: none;
+        filter: drop-shadow(0 1px 1px fade(#000, 15%));
     }
+
     // Hide toggle icons by default
     .icon--exit-fullscreen,
     .icon--muted,
@@ -367,8 +377,8 @@
     right: 0;
     bottom: 0;
     z-index: 2;
-    padding: (@plyr-control-spacing * 5) @plyr-control-spacing @plyr-control-spacing;
-    background: linear-gradient(fade(@plyr-video-controls-bg, 0%), fade(@plyr-video-controls-bg, 70%));
+    padding: (@plyr-control-spacing * 3.5) @plyr-control-spacing @plyr-control-spacing;
+    background: linear-gradient(fade(@plyr-video-controls-bg, 0%), fade(@plyr-video-controls-bg, 85%));
     border-bottom-left-radius: inherit;
     border-bottom-right-radius: inherit;
     color: @plyr-video-control-color;
@@ -521,8 +531,7 @@
 
         > div {
             overflow: hidden;
-            transition: height .35s cubic-bezier(.4, 0, .2, 1),
-                        width .35s cubic-bezier(.4, 0, .2, 1);
+            transition: height .35s cubic-bezier(.4, 0, .2, 1), width .35s cubic-bezier(.4, 0, .2, 1);
         }
 
         // Arrow
@@ -719,7 +728,6 @@
     }
 }
 
-
 // Playback progress
 // --------------------------------------------------------------
 // <progress> element
@@ -763,7 +771,7 @@
     margin: -(@plyr-range-track-height / 2) 0 0;
     padding: 0;
     vertical-align: top;
-    
+
     border: none;
     border-radius: 100px;
 
@@ -830,6 +838,7 @@
 .plyr--video .plyr__progress--buffer,
 .plyr--video .plyr__volume--display {
     background: @plyr-video-range-track-bg;
+    box-shadow: 0 1px 1px fade(#000, 15%);
 }
 .plyr--video .plyr__progress--buffer {
     color: @plyr-video-progress-buffered-bg;
@@ -855,7 +864,8 @@
         @plyr-progress-loading-bg 50%,
         @plyr-progress-loading-bg 75%,
         transparent 75%,
-        transparent);
+        transparent
+    );
     color: transparent;
 }
 .plyr--video.plyr--loading .plyr__progress--buffer {
@@ -885,6 +895,9 @@
         content: '\2044';
         margin-right: @plyr-control-spacing;
     }
+}
+.plyr--video .plyr__time {
+    text-shadow: 0 1px 1px fade(#000, 15%);
 }
 
 // Volume

@@ -52,7 +52,7 @@
         vimeo: 'vimeo'
     };
     var currentType = window.location.hash.replace('#', '');
-    var historySupport = (window.history && window.history.pushState);
+    var historySupport = window.history && window.history.pushState;
 
     // Bind to each button
     [].forEach.call(buttons, function(button) {
@@ -62,9 +62,13 @@
             newSource(type);
 
             if (historySupport) {
-                history.pushState({
-                    'type': type
-                }, '', '#' + type);
+                history.pushState(
+                    {
+                        type: type
+                    },
+                    '',
+                    '#' + type
+                );
             }
         });
     });
@@ -87,9 +91,13 @@
 
         // Replace current history state
         if (currentType in types) {
-            history.replaceState({
-                'type': currentType
-            }, '', (video ? '' : '#' + currentType));
+            history.replaceState(
+                {
+                    type: currentType
+                },
+                '',
+                video ? '' : '#' + currentType
+            );
         }
 
         // If it's not video, load the source
@@ -122,18 +130,28 @@
                 player.source({
                     type: 'video',
                     title: 'View From A Blue Moon',
-                    sources: [{
-                        src: 'https://cdn.selz.com/plyr/1.5/View_From_A_Blue_Moon_Trailer-HD.mp4',
-                        type: 'video/mp4'
-                    }],
+                    sources: [
+                        {
+                            src: 'https://cdn.selz.com/plyr/1.5/View_From_A_Blue_Moon_Trailer-HD.mp4',
+                            type: 'video/mp4'
+                        }
+                    ],
                     poster: 'https://cdn.selz.com/plyr/1.5/View_From_A_Blue_Moon_Trailer-HD.jpg',
-                    tracks: [{
-                        kind: 'captions',
-                        label: 'English',
-                        srclang: 'en',
-                        src: 'https://cdn.selz.com/plyr/1.5/View_From_A_Blue_Moon_Trailer-HD.en.vtt',
-                        default: true
-                    }]
+                    tracks: [
+                        {
+                            kind: 'captions',
+                            label: 'English',
+                            srclang: 'en',
+                            src: 'https://cdn.selz.com/plyr/1.5/View_From_A_Blue_Moon_Trailer-HD.en.vtt',
+                            default: true
+                        },
+                        {
+                            kind: 'captions',
+                            label: 'French',
+                            srclang: 'fr',
+                            src: 'https://cdn.selz.com/plyr/1.5/View_From_A_Blue_Moon_Trailer-HD.fr.vtt'
+                        }
+                    ]
                 });
                 break;
 
@@ -141,13 +159,16 @@
                 player.source({
                     type: 'audio',
                     title: 'Kishi Bashi &ndash; &ldquo;It All Began With A Burst&rdquo;',
-                    sources: [{
-                        src: 'https://cdn.selz.com/plyr/1.5/Kishi_Bashi_-_It_All_Began_With_a_Burst.mp3',
-                        type: 'audio/mp3'
-                    }, {
-                        src: 'https://cdn.selz.com/plyr/1.5/Kishi_Bashi_-_It_All_Began_With_a_Burst.ogg',
-                        type: 'audio/ogg'
-                    }]
+                    sources: [
+                        {
+                            src: 'https://cdn.selz.com/plyr/1.5/Kishi_Bashi_-_It_All_Began_With_a_Burst.mp3',
+                            type: 'audio/mp3'
+                        },
+                        {
+                            src: 'https://cdn.selz.com/plyr/1.5/Kishi_Bashi_-_It_All_Began_With_a_Burst.ogg',
+                            type: 'audio/ogg'
+                        }
+                    ]
                 });
                 break;
 
@@ -155,10 +176,12 @@
                 player.source({
                     type: 'video',
                     title: 'View From A Blue Moon',
-                    sources: [{
-                        src: 'https://www.youtube.com/watch?v=bTqVqk7FSmY',
-                        type: 'youtube'
-                    }]
+                    sources: [
+                        {
+                            src: 'https://www.youtube.com/watch?v=bTqVqk7FSmY',
+                            type: 'youtube'
+                        }
+                    ]
                 });
                 break;
 
@@ -166,10 +189,12 @@
                 player.source({
                     type: 'video',
                     title: 'View From A Blue Moon',
-                    sources: [{
-                        src: 'https://vimeo.com/76979871',
-                        type: 'vimeo'
-                    }]
+                    sources: [
+                        {
+                            src: 'https://vimeo.com/76979871',
+                            type: 'vimeo'
+                        }
+                    ]
                 });
                 break;
         }
@@ -198,9 +223,11 @@
 if (window.location.host === 'plyr.io') {
     (function(i, s, o, g, r, a, m) {
         i.GoogleAnalyticsObject = r;
-        i[r] = i[r] || function() {
-            (i[r].q = i[r].q || []).push(arguments);
-        };
+        i[r] =
+            i[r] ||
+            function() {
+                (i[r].q = i[r].q || []).push(arguments);
+            };
         i[r].l = 1 * new Date();
         a = s.createElement(o);
         m = s.getElementsByTagName(o)[0];
