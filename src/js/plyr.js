@@ -2448,7 +2448,7 @@
                 });
 
                 // Check if suported kind
-                var supported = utils.inArray(['captions', 'subtitles'], player.captions.currentTrack.kind);
+                var supported = utils.inArray(['captions', 'subtitles'], player.captions.currentTrack && player.captions.currentTrack.kind);
 
                 if (utils.is.track(player.captions.currentTrack) && supported) {
                     utils.on(player.captions.currentTrack, 'cuechange', setActiveCue);
