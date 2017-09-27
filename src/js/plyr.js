@@ -1511,6 +1511,10 @@
                 attributes = {};
             }
 
+            if (!('type' in attributes)) {
+                attributes.type = 'button';
+            }
+
             if ('class' in attributes) {
                 if (attributes.class.indexOf(player.config.classNames.control) === -1) {
                     attributes.class += ' ' + player.config.classNames.control;
