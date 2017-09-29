@@ -2072,10 +2072,19 @@
             });
         }
 
+        // Issue #331 - chrome raises exception if pause is called before media is playing
+        function catchChromeException (promise) {
+            if (promise) {
+                promise.catch((error) => {
+                  console && console.info(error)
+                })
+            }
+        }
+
         // Play media
         function _play() {
             if ('play' in plyr.media) {
-                plyr.media.play();
+                catchChromeException(plyr.media.play());
             }
         }
 
