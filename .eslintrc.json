@@ -10,9 +10,13 @@
         "no-unused-vars": "warn",
         "constructor-super": "warn",
         "valid-typeof": "warn",
-        "indent": ["error", 4, {
-            "SwitchCase": 1
-        }],
+        "indent": [
+            "error",
+            4,
+            {
+                "SwitchCase": 1
+            }
+        ],
         "quotes": ["error", "single"],
         "semi": ["error", "always"],
         "eqeqeq": ["error", "always"]

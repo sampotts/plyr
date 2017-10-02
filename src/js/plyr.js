@@ -2378,7 +2378,10 @@
                 player.captions.tracks = null;
 
                 // Clear menu and hide
-                if (utils.inArray(player.config.controls, 'settings') && utils.inArray(player.config.settings, 'captions')) {
+                if (
+                    utils.inArray(player.config.controls, 'settings') &&
+                    utils.inArray(player.config.settings, 'captions')
+                ) {
                     setCaptionsMenu();
                 }
 
@@ -2461,7 +2464,10 @@
                 });
 
                 // Check if suported kind
-                var supported = utils.inArray(['captions', 'subtitles'], player.captions.currentTrack && player.captions.currentTrack.kind);
+                var supported = utils.inArray(
+                    ['captions', 'subtitles'],
+                    player.captions.currentTrack && player.captions.currentTrack.kind
+                );
 
                 if (utils.is.track(player.captions.currentTrack) && supported) {
                     utils.on(player.captions.currentTrack, 'cuechange', setActiveCue);
@@ -2476,7 +2482,10 @@
             }
 
             // Set available languages in list
-            if (utils.inArray(player.config.controls, 'settings') && utils.inArray(player.config.settings, 'captions')) {
+            if (
+                utils.inArray(player.config.controls, 'settings') &&
+                utils.inArray(player.config.settings, 'captions')
+            ) {
                 setCaptionsMenu();
             }
         }
@@ -3065,7 +3074,10 @@
                         player.media.muted = instance.isMuted();
 
                         // Get available speeds
-                        if (utils.inArray(player.config.controls, 'settings') && utils.inArray(player.config.settings, 'speed')) {
+                        if (
+                            utils.inArray(player.config.controls, 'settings') &&
+                            utils.inArray(player.config.settings, 'speed')
+                        ) {
                             setSpeedMenu(instance.getAvailablePlaybackRates(), instance.getPlaybackRate());
                         }
 
@@ -3393,7 +3405,7 @@
         function toggleMenu(event) {
             var form = player.elements.settings.form;
             var button = player.elements.buttons.settings;
-            var show = utils.is.boolean(event) ? event : (form && form.getAttribute('aria-hidden') === 'true');
+            var show = utils.is.boolean(event) ? event : form && form.getAttribute('aria-hidden') === 'true';
 
             if (utils.is.event(event)) {
                 var isMenuItem = form && form.contains(event.target);
@@ -3960,20 +3972,15 @@
                 var trigger = player.elements.buttons[play ? 'play' : 'pause'];
                 var target = player.elements.buttons[play ? 'pause' : 'play'];
 
-                // Setup focus and tab focus
-                if (target) {
-                    var hadTabFocus = utils.hasClass(trigger, player.config.classNames.tabFocus);
-
-                    setTimeout(function() {
-                        if (utils.is.htmlElement(target)) {
+                // Transfer focus
+                if (target && trigger) {
+                    if (utils.hasClass(trigger, player.config.classNames.tabFocus)) {
+                        setTimeout(function() {
                             target.focus();
-                        }
-
-                        if (hadTabFocus) {
                             utils.toggleClass(trigger, player.config.classNames.tabFocus, false);
                             utils.toggleClass(target, player.config.classNames.tabFocus, true);
-                        }
-                    }, 100);
+                        }, 0);
+                    }
                 }
             }
 
@@ -4209,7 +4216,7 @@
             }
 
             function onBlur(event) {
-                utils.toggleClass(event.target, 'tab-focus', false);
+                utils.toggleClass(event.target, player.config.classNames.tabFocus, false);
             }
 
             // Trigger custom and default handlers
