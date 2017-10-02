@@ -1512,6 +1512,10 @@
                 attributes = {};
             }
 
+            if (!('type' in attributes)) {
+                attributes.type = 'button';
+            }
+
             if ('class' in attributes) {
                 if (attributes.class.indexOf(player.config.classNames.control) === -1) {
                     attributes.class += ' ' + player.config.classNames.control;
@@ -1949,7 +1953,9 @@
             player.elements.controls = controls;
 
             //setLoopMenu();
-            setSpeedMenu();
+            if (utils.inArray(player.config.controls, 'settings') && utils.inArray(player.config.settings, 'speed')) {
+                setSpeedMenu();
+            }
 
             return controls;
         }
@@ -2102,6 +2108,7 @@
 
         // Update the selected setting
         function updateSetting(setting, list) {
+            var pane = player.elements.settings.panes[setting];
             var value = null;
 
             switch (setting) {
@@ -2132,11 +2139,11 @@
 
             // Get the list if we need to
             if (!utils.is.htmlElement(list)) {
-                list = player.elements.settings.panes[setting].querySelector('ul');
+                list = pane && pane.querySelector('ul');
             }
 
             // Find the radio option
-            var target = list.querySelector('input[value="' + value + '"]');
+            var target = list && list.querySelector('input[value="' + value + '"]');
 
             if (!utils.is.htmlElement(target)) {
                 return;
@@ -2368,7 +2375,9 @@
                 player.captions.tracks = null;
 
                 // Clear menu and hide
-                setCaptionsMenu();
+                if (utils.inArray(player.config.controls, 'settings') && utils.inArray(player.config.settings, 'captions')) {
+                    setCaptionsMenu();
+                }
 
                 return;
             }
@@ -2449,7 +2458,7 @@
                 });
 
                 // Check if suported kind
-                var supported = utils.inArray(['captions', 'subtitles'], player.captions.currentTrack.kind);
+                var supported = utils.inArray(['captions', 'subtitles'], player.captions.currentTrack && player.captions.currentTrack.kind);
 
                 if (utils.is.track(player.captions.currentTrack) && supported) {
                     utils.on(player.captions.currentTrack, 'cuechange', setActiveCue);
@@ -2464,7 +2473,9 @@
             }
 
             // Set available languages in list
-            setCaptionsMenu();
+            if (utils.inArray(player.config.controls, 'settings') && utils.inArray(player.config.settings, 'captions')) {
+                setCaptionsMenu();
+            }
         }
 
         // Get current selected caption language
@@ -3051,7 +3062,9 @@
                         player.media.muted = instance.isMuted();
 
                         // Get available speeds
-                        setSpeedMenu(instance.getAvailablePlaybackRates(), instance.getPlaybackRate());
+                        if (utils.inArray(player.config.controls, 'settings') && utils.inArray(player.config.settings, 'speed')) {
+                            setSpeedMenu(instance.getAvailablePlaybackRates(), instance.getPlaybackRate());
+                        }
 
                         // Set title
                         player.config.title = instance.getVideoData().title;
@@ -3377,10 +3390,10 @@
         function toggleMenu(event) {
             var form = player.elements.settings.form;
             var button = player.elements.buttons.settings;
-            var show = utils.is.boolean(event) ? event : form.getAttribute('aria-hidden') === 'true';
+            var show = utils.is.boolean(event) ? event : (form && form.getAttribute('aria-hidden') === 'true');
 
             if (utils.is.event(event)) {
-                var isMenuItem = form.contains(event.target);
+                var isMenuItem = form && form.contains(event.target);
                 var isButton = event.target === player.elements.buttons.settings;
 
                 // If the click was inside the form or if the click
@@ -3397,13 +3410,16 @@
             }
 
             // Set form and button attributes
-            form.setAttribute('aria-hidden', !show);
-            button.setAttribute('aria-expanded', show);
-
-            if (show) {
-                form.removeAttribute('tabindex');
-            } else {
-                form.setAttribute('tabindex', -1);
+            if (button) {
+                button.setAttribute('aria-expanded', show);
+            }
+            if (form) {
+                form.setAttribute('aria-hidden', !show);
+                if (show) {
+                    form.removeAttribute('tabindex');
+                } else {
+                    form.setAttribute('tabindex', -1);
+                }
             }
         }
 
@@ -5585,7 +5601,9 @@
                 // Trigger event and close menu
                 if (toggled) {
                     player.core.trigger(player.media, 'controlshidden');
-                    player.core.toggleMenu(false);
+                    if (utils.inArray(player.config.controls, 'settings') && !utils.is.empty(player.config.settings)) {
+                        player.core.toggleMenu(false);
+                    }
                 }
             }, delay);
         }
