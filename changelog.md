@@ -1,5 +1,8 @@
 # Changelog
 
+## v2.0.15
+- Demo fix
+
 ## v2.0.14
 - CDN URL updates. Sorry, still working on V3 as hard as I can...
 
