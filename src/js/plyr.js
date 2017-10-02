@@ -68,6 +68,9 @@
         iconPrefix: 'plyr',
         iconUrl: 'https://cdn.plyr.io/2.0.10/plyr.svg',
 
+        // Blank video (used to prevent errors on source change)
+        blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
+
         // Pass a custom duration
         duration: null,
 
@@ -4562,7 +4565,7 @@
             // Set blank video src attribute
             // This is to prevent a MEDIA_ERR_SRC_NOT_SUPPORTED error
             // Info: http://stackoverflow.com/questions/32231579/how-to-properly-dispose-of-an-html5-video-and-close-socket-or-connection
-            player.media.setAttribute('src', 'https://cdn.selz.com/plyr/blank.mp4');
+            player.media.setAttribute('src', player.config.blankVideo);
 
             // Load the new empty source
             // This will cancel existing requests
