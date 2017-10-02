@@ -132,24 +132,24 @@
                     title: 'View From A Blue Moon',
                     sources: [
                         {
-                            src: 'https://cdn.selz.com/plyr/1.5/View_From_A_Blue_Moon_Trailer-HD.mp4',
+                            src: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.mp4',
                             type: 'video/mp4'
                         }
                     ],
-                    poster: 'https://cdn.selz.com/plyr/1.5/View_From_A_Blue_Moon_Trailer-HD.jpg',
+                    poster: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.jpg',
                     tracks: [
                         {
                             kind: 'captions',
                             label: 'English',
                             srclang: 'en',
-                            src: 'https://cdn.selz.com/plyr/1.5/View_From_A_Blue_Moon_Trailer-HD.en.vtt',
+                            src: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.en.vtt',
                             default: true
                         },
                         {
                             kind: 'captions',
                             label: 'French',
                             srclang: 'fr',
-                            src: 'https://cdn.selz.com/plyr/1.5/View_From_A_Blue_Moon_Trailer-HD.fr.vtt'
+                            src: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.fr.vtt'
                         }
                     ]
                 });
@@ -161,11 +161,11 @@
                     title: 'Kishi Bashi &ndash; &ldquo;It All Began With A Burst&rdquo;',
                     sources: [
                         {
-                            src: 'https://cdn.selz.com/plyr/1.5/Kishi_Bashi_-_It_All_Began_With_a_Burst.mp3',
+                            src: 'https://cdn.plyr.io/static/demo/Kishi_Bashi_-_It_All_Began_With_a_Burst.mp3',
                             type: 'audio/mp3'
                         },
                         {
-                            src: 'https://cdn.selz.com/plyr/1.5/Kishi_Bashi_-_It_All_Began_With_a_Burst.ogg',
+                            src: 'https://cdn.plyr.io/static/demo/Kishi_Bashi_-_It_All_Began_With_a_Burst.ogg',
                             type: 'audio/ogg'
                         }
                     ]
