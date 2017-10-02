@@ -13,6 +13,10 @@
 
     <!-- Docs styles -->
     <link rel="stylesheet" href="dist/demo.css">
+
+    <!-- Preload -->
+    <link rel="preload" as="font" crossorigin type="font/woff2" href="https://cdn.plyr.io/fonts/avenir-medium.woff2">
+    <link rel="preload" as="font" crossorigin type="font/woff2" href="https://cdn.plyr.io/fonts/avenir-bold.woff2">
 </head>
 
 <body>
@@ -23,12 +27,17 @@
             <ul>
                 <li>
                     <a href="https://github.com/sampotts/plyr" target="_blank" class="btn btn--large btn--primary" data-shr-network="github">
-                        <svg class="icon"><use xlink:href="#icon-github"/></svg>Download on GitHub
+                        <svg class="icon">
+                            <use xlink:href="#icon-github" />
+                        </svg>Download on GitHub
                     </a>
                 </li>
                 <li>
-                    <a href="https://twitter.com/intent/tweet?text=A+simple+HTML5+media+player+with+custom+controls+and+WebVTT+captions.&url=http%3A%2F%2Fplyr.io&via=Sam_Potts" target="_blank" class="btn btn--large btn--twitter" data-shr-network="twitter">
-                        <svg class="icon"><use xlink:href="#icon-twitter"/></svg>Tweet
+                    <a href="https://twitter.com/intent/tweet?text=A+simple+HTML5+media+player+with+custom+controls+and+WebVTT+captions.&url=http%3A%2F%2Fplyr.io&via=Sam_Potts"
+                        target="_blank" class="btn btn--large btn--twitter" data-shr-network="twitter">
+                        <svg class="icon">
+                            <use xlink:href="#icon-twitter" />
+                        </svg>Tweet
                     </a>
                 </li>
             </ul>
@@ -53,7 +62,8 @@
             </ul>
         </nav>
 
-        <video controls crossorigin playsinline poster="https://cdn.selz.com/plyr/1.5/View_From_A_Blue_Moon_Trailer-HD.jpg" id="player">
+        <video controls crossorigin playsinline loop poster="https://cdn.selz.com/plyr/1.5/View_From_A_Blue_Moon_Trailer-HD.jpg"
+            id="player">
             <!-- Video files -->
             <source src="https://cdn.selz.com/plyr/1.5/View_From_A_Blue_Moon_Trailer-HD.mp4" type="video/mp4">
 

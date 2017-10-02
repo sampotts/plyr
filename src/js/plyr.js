@@ -5,6 +5,7 @@
 // License: The MIT License (MIT)
 // ==========================================================================
 
+// UMD-Inspired JS Module from https://gist.github.com/wilmoore/3880415
 (function(name, context, definition) {
     /* global define,module,require */
     'use strict';
@@ -4843,6 +4844,11 @@
         }
 
         return toggle;
+    };
+
+    // Get playback status
+    Plyr.prototype.isPlaying = function() {
+        return !this.media.paused;
     };
 
     // Stop
