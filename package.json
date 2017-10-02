@@ -1,51 +1,43 @@
 {
-  "name": "plyr",
-  "version": "2.0.13",
-  "description": "A simple, accessible and customizable HTML5, YouTube and Vimeo media player",
-  "homepage": "http://plyr.io",
-  "main": "src/js/plyr.js",
-  "dependencies": {},
-  "devDependencies": {
-    "gulp": "^3.9.1",
-    "gulp-autoprefixer": "^3.1.0",
-    "gulp-clean-css": "^2.0.6",
-    "gulp-concat": "^2.3.3",
-    "gulp-less": "^3.0.5",
-    "gulp-open": "^2.0.0",
-    "gulp-rename": "^1.2.0",
-    "gulp-replace": "^0.5.3",
-    "gulp-s3": "^0.3.0",
-    "gulp-sass": "^2.3.1",
-    "gulp-size": "^2.1.0",
-    "gulp-svgmin": "^1.2.2",
-    "gulp-svgstore": "^5.0.5",
-    "gulp-uglify": "^1.5.3",
-    "gulp-util": "^3.0.7",
-    "run-sequence": "^1.1.5",
-    "through2": "^2.0.1"
-  },
-  "keywords": [
-    "HTML5 Video",
-    "HTML5 Audio",
-    "Media Player",
-    "DASH",
-    "Shaka",
-    "WordPress",
-    "HLS"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/sampotts/plyr.git"
-  },
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/sampotts/plyr/issues"
-  },
-  "directories": {
-    "doc": "readme.md"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "Sam Potts <sam@potts.es>"
+    "name": "plyr",
+    "version": "2.0.14",
+    "description": "A simple, accessible and customizable HTML5, YouTube and Vimeo media player",
+    "homepage": "http://plyr.io",
+    "main": "src/js/plyr.js",
+    "dependencies": {},
+    "devDependencies": {
+        "gulp": "^3.9.1",
+        "gulp-autoprefixer": "^3.1.0",
+        "gulp-clean-css": "^2.0.6",
+        "gulp-concat": "^2.3.3",
+        "gulp-less": "^3.0.5",
+        "gulp-open": "^2.0.0",
+        "gulp-rename": "^1.2.0",
+        "gulp-replace": "^0.5.3",
+        "gulp-s3": "^0.3.0",
+        "gulp-sass": "^2.3.1",
+        "gulp-size": "^2.1.0",
+        "gulp-svgmin": "^1.2.2",
+        "gulp-svgstore": "^5.0.5",
+        "gulp-uglify": "^1.5.3",
+        "gulp-util": "^3.0.7",
+        "run-sequence": "^1.1.5",
+        "through2": "^2.0.1"
+    },
+    "keywords": ["HTML5 Video", "HTML5 Audio", "Media Player", "DASH", "Shaka", "WordPress", "HLS"],
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/sampotts/plyr.git"
+    },
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/sampotts/plyr/issues"
+    },
+    "directories": {
+        "doc": "readme.md"
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "Sam Potts <sam@potts.es>"
 }
