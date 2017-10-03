@@ -2075,7 +2075,7 @@
         // Issue #331 - chrome raises exception if pause is called before media is playing
         function catchChromeException (promise) {
             if (promise) {
-                promise.catch((error) => {
+                promise.catch(function (error) {
                   console && console.info(error)
                 })
             }
