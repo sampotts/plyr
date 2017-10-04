@@ -4057,6 +4057,7 @@
 
             // Handle the media finishing
             _on(plyr.media, 'ended', function() {
+                console.log('media listener ended');
                 // Show poster on end
                 if (plyr.type === 'video' && config.showPosterOnEnd) {
                     // Clear
