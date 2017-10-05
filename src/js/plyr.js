@@ -114,6 +114,7 @@
                 },
                 fullscreen: {
                     enabled: "plyr--fullscreen-enabled",
+                    fallback: "plyr--fullscreen-fallback",
                     active: "plyr--fullscreen-active"
                 },
                 tabFocus: "tab-focus"
@@ -990,6 +991,11 @@
 
                 if (nativeSupport || (config.fullscreen.fallback && !_inFrame())) {
                     _log((nativeSupport ? "Native" : "Fallback") + " fullscreen enabled");
+
+                    // Add styling hook
+                    if (!nativeSupport) {
+                        _toggleClass(plyr.container, config.classes.fullscreen.fallback, true);
+                    }
 
                     // Add styling hook
                     _toggleClass(plyr.container, config.classes.fullscreen.enabled, true);

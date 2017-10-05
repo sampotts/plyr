@@ -9,7 +9,9 @@
 // Animation
 // ---------------------------------------
 @keyframes plyr-progress {
-    to { background-position: $plyr-progress-loading-size 0; }
+    to {
+        background-position: $plyr-progress-loading-size 0;
+    }
 }
 
 // Styles
@@ -34,10 +36,13 @@
     }
 
     @if $plyr-touch-action == true {
-      // Fix 300ms delay
-      a, button, input, label {
-        touch-action: manipulation;
-      }
+        // Fix 300ms delay
+        a,
+        button,
+        input,
+        label {
+            touch-action: manipulation;
+        }
     }
 
     // Focus
@@ -56,7 +61,7 @@
 
     // Range inputs
     // Specificity is for bootstrap compatibility
-    input[type='range'] {
+    input[type="range"] {
         display: block;
         height: ($plyr-range-thumb-height * $plyr-range-thumb-active-scale);
         width: 100%;
@@ -137,13 +142,13 @@
 }
 
 // Video range inputs
-.plyr--video input[type='range'].tab-focus:focus {
-    outline: 1px dotted transparentize($plyr-video-control-color, .5);
+.plyr--video input[type="range"].tab-focus:focus {
+    outline: 1px dotted transparentize($plyr-video-control-color, 0.5);
 }
 
 // Audio range inputs
-.plyr--audio input[type='range'].tab-focus:focus {
-    outline: 1px dotted transparentize($plyr-audio-control-color, .5);
+.plyr--audio input[type="range"].tab-focus:focus {
+    outline: 1px dotted transparentize($plyr-audio-control-color, 0.5);
 }
 
 // Screen reader only elements
@@ -220,7 +225,7 @@
     width: 100%;
     padding: ($plyr-control-spacing * 2);
     transform: translateY(-($plyr-control-spacing * 6));
-    transition: transform .3s ease;
+    transition: transform 0.3s ease;
     color: $plyr-captions-color;
     font-size: $plyr-font-size-captions-base;
     text-align: center;
@@ -292,12 +297,12 @@
         flex-shrink: 0;
         overflow: visible; // IE11
         vertical-align: middle;
-        padding: ($plyr-control-spacing * .7);
+        padding: ($plyr-control-spacing * 0.7);
         border: 0;
         background: transparent;
         border-radius: 3px;
         cursor: pointer;
-        transition: background .3s ease, color .3s ease, opacity .3s ease;
+        transition: background 0.3s ease, color 0.3s ease, opacity 0.3s ease;
         color: inherit;
 
         svg {
@@ -341,11 +346,14 @@
     right: 0;
     bottom: 0;
     padding: ($plyr-control-spacing * 5) $plyr-control-spacing $plyr-control-spacing;
-    background: linear-gradient(transparentize($plyr-video-controls-bg, 1), transparentize($plyr-video-controls-bg, .5));
+    background: linear-gradient(
+        transparentize($plyr-video-controls-bg, 1),
+        transparentize($plyr-video-controls-bg, 0.5)
+    );
     border-bottom-left-radius: inherit;
     border-bottom-right-radius: inherit;
     color: $plyr-video-control-color;
-    transition: opacity .3s ease;
+    transition: opacity 0.3s ease;
 
     button {
         // Hover and tab focus
@@ -387,9 +395,9 @@
     background: $plyr-video-control-bg-hover;
     border: 4px solid currentColor;
     border-radius: 100%;
-    box-shadow: 0 1px 1px transparentize(#000, .85);
+    box-shadow: 0 1px 1px transparentize(#000, 0.85);
     color: $plyr-video-control-color;
-    transition: all .3s ease;
+    transition: all 0.3s ease;
 
     svg {
         position: relative;
@@ -401,7 +409,7 @@
     }
 
     &:focus {
-        outline: 1px dotted transparentize($plyr-video-control-color, .5);
+        outline: 1px dotted transparentize($plyr-video-control-color, 0.5);
     }
 }
 .plyr .plyr__play-large {
@@ -416,11 +424,11 @@
 }
 
 // States
-.plyr__controls [data-plyr='pause'],
-.plyr--playing .plyr__controls [data-plyr='play'] {
+.plyr__controls [data-plyr="pause"],
+.plyr--playing .plyr__controls [data-plyr="play"] {
     display: none;
 }
-.plyr--playing .plyr__controls [data-plyr='pause'] {
+.plyr--playing .plyr__controls [data-plyr="pause"] {
     display: inline-block;
 }
 
@@ -436,12 +444,12 @@
 }
 
 // Some options are hidden by default
-.plyr [data-plyr='captions'],
-.plyr [data-plyr='fullscreen'] {
+.plyr [data-plyr="captions"],
+.plyr [data-plyr="fullscreen"] {
     display: none;
 }
-.plyr--captions-enabled [data-plyr='captions'],
-.plyr--fullscreen-enabled [data-plyr='fullscreen'] {
+.plyr--captions-enabled [data-plyr="captions"],
+.plyr--fullscreen-enabled [data-plyr="fullscreen"] {
     display: inline-block;
 }
 
@@ -463,13 +471,13 @@
     font-size: $plyr-font-size-small;
     line-height: 1.3;
 
-    transform: translate(-50%, 10px) scale(.8);
+    transform: translate(-50%, 10px) scale(0.8);
     transform-origin: 50% 100%;
-    transition: transform .2s .1s ease, opacity .2s .1s ease;
+    transition: transform 0.2s 0.1s ease, opacity 0.2s 0.1s ease;
 
     &::before {
         // Arrows
-        content: '';
+        content: "";
         position: absolute;
         width: 0;
         height: 0;
@@ -497,7 +505,7 @@
 // First tooltip
 .plyr__controls button:first-child .plyr__tooltip {
     left: 0;
-    transform: translate(0, 10px) scale(.8);
+    transform: translate(0, 10px) scale(0.8);
     transform-origin: 0 100%;
 
     &::before {
@@ -508,7 +516,7 @@
 // Last tooltip
 .plyr__controls button:last-child .plyr__tooltip {
     right: 0;
-    transform: translate(0, 10px) scale(.8);
+    transform: translate(0, 10px) scale(0.8);
     transform-origin: 100% 100%;
 
     &::before {
@@ -618,13 +626,13 @@
 }
 .plyr__progress--buffer {
     &::-webkit-progress-value {
-        transition: width .2s ease;
+        transition: width 0.2s ease;
     }
     &::-moz-progress-bar {
-        transition: width .2s ease;
+        transition: width 0.2s ease;
     }
     &::-ms-fill {
-        transition: width .2s ease;
+        transition: width 0.2s ease;
     }
 }
 .plyr--video .plyr__progress--buffer,
@@ -655,7 +663,8 @@
         $plyr-progress-loading-bg 50%,
         $plyr-progress-loading-bg 75%,
         transparent 75%,
-        transparent);
+        transparent
+    );
     color: transparent;
 }
 .plyr--video.plyr--loading .plyr__progress--buffer {
@@ -682,7 +691,7 @@
 
     // Add a slash in before
     &::before {
-        content: '\2044';
+        content: "\2044";
         margin-right: $plyr-control-spacing;
     }
 }
@@ -713,21 +722,15 @@
 // It's not supported to change volume using JavaScript:
 // https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html
 .plyr--is-ios .plyr__volume,
-.plyr--is-ios [data-plyr='mute'] {
+.plyr--is-ios [data-plyr="mute"] {
     display: none !important;
 }
 
 // Fullscreen
 // --------------------------------------------------------------
 .plyr--fullscreen-active {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
     height: 100%;
     width: 100%;
-    z-index: 10000000;
     background: #000;
     border-radius: 0 !important;
 
@@ -742,12 +745,6 @@
         // Revert overflow change
         overflow: visible;
     }
-    .plyr__controls {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-    }
 
     // Vimeo requires some different styling
     &.plyr--vimeo .plyr__video-wrapper {
@@ -755,4 +752,14 @@
         top: 50%;
         transform: translateY(-50%);
     }
+}
+
+// Fallback for unsupported browsers
+.plyr--fullscreen-fallback.plyr--fullscreen-active {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10000000;
 }

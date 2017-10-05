@@ -1,5 +1,8 @@
 # Changelog
 
+## v2.0.16
+- Fullscreen bug fix (fixes #664)
+
 ## v2.0.15
 - Demo fix
 
