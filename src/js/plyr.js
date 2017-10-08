@@ -24,7 +24,7 @@
     // Globals
     var scroll = {
         x: 0,
-        y: 0
+        y: 0,
     };
 
     // Default config
@@ -77,51 +77,51 @@
         // Quality default
         quality: {
             default: 'default',
-            options: ['hd2160', 'hd1440', 'hd1080', 'hd720', 'large', 'medium', 'small', 'tiny', 'default']
+            options: ['hd2160', 'hd1440', 'hd1080', 'hd720', 'large', 'medium', 'small', 'tiny', 'default'],
         },
 
         // Set loops
         loop: {
             active: false,
             start: null,
-            end: null
+            end: null,
         },
 
         // Speed default and options to display
         speed: {
             default: 1,
-            options: [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2]
+            options: [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2],
         },
 
         // Keyboard shortcut settings
         keyboard: {
             focused: true,
-            global: false
+            global: false,
         },
 
         // Display tooltips
         tooltips: {
             controls: false,
-            seek: true
+            seek: true,
         },
 
         // Captions settings
         captions: {
             active: false,
-            language: window.navigator.language.split('-')[0]
+            language: window.navigator.language.split('-')[0],
         },
 
         // Fullscreen settings
         fullscreen: {
             enabled: true,
             fallback: true,
-            allowAudio: false
+            allowAudio: false,
         },
 
         // Local storage
         storage: {
             enabled: true,
-            key: 'plyr'
+            key: 'plyr',
         },
 
         // Default controls
@@ -136,7 +136,7 @@
             'settings',
             'pip',
             'airplay',
-            'fullscreen'
+            'fullscreen',
         ],
         settings: ['captions', 'quality', 'speed', 'loop'],
 
@@ -167,20 +167,20 @@
             all: 'All',
             reset: 'Reset',
             none: 'None',
-            disabled: 'Disabled'
+            disabled: 'Disabled',
         },
 
         // URLs
         urls: {
             vimeo: {
-                api: 'https://player.vimeo.com/api/player.js'
+                api: 'https://player.vimeo.com/api/player.js',
             },
             youtube: {
-                api: 'https://www.youtube.com/iframe_api'
+                api: 'https://www.youtube.com/iframe_api',
             },
             soundcloud: {
-                api: 'https://w.soundcloud.com/player/api.js'
-            }
+                api: 'https://w.soundcloud.com/player/api.js',
+            },
         },
 
         // Custom control listeners
@@ -200,7 +200,7 @@
             speed: null,
             quality: null,
             loop: null,
-            language: null
+            language: null,
         },
 
         // Events to watch and bubble
@@ -240,7 +240,7 @@
             // YouTube
             'statechange',
             'qualitychange',
-            'qualityrequested'
+            'qualityrequested',
         ],
 
         // Selectors
@@ -250,7 +250,7 @@
             container: '.plyr',
             controls: {
                 container: null,
-                wrapper: '.plyr__controls'
+                wrapper: '.plyr__controls',
             },
             labels: '[data-plyr]',
             buttons: {
@@ -265,14 +265,14 @@
                 pip: '[data-plyr="pip"]',
                 airplay: '[data-plyr="airplay"]',
                 settings: '[data-plyr="settings"]',
-                loop: '[data-plyr="loop"]'
+                loop: '[data-plyr="loop"]',
             },
             inputs: {
                 seek: '[data-plyr="seek"]',
                 volume: '[data-plyr="volume"]',
                 speed: '[data-plyr="speed"]',
                 language: '[data-plyr="language"]',
-                quality: '[data-plyr="quality"]'
+                quality: '[data-plyr="quality"]',
             },
             display: {
                 currentTime: '.plyr__time--current',
@@ -280,13 +280,13 @@
                 buffer: '.plyr__progress--buffer',
                 played: '.plyr__progress--played',
                 loop: '.plyr__progress--loop',
-                volume: '.plyr__volume--display'
+                volume: '.plyr__volume--display',
             },
             progress: '.plyr__progress',
             captions: '.plyr__captions',
             menu: {
-                quality: '.js-plyr__menu__list--quality'
-            }
+                quality: '.js-plyr__menu__list--quality',
+            },
         },
 
         // Class hooks added to the player in different states
@@ -307,32 +307,32 @@
             isTouch: 'plyr--is-touch',
             menu: {
                 value: 'plyr__menu__value',
-                badge: 'plyr__badge'
+                badge: 'plyr__badge',
             },
             captions: {
                 enabled: 'plyr--captions-enabled',
-                active: 'plyr--captions-active'
+                active: 'plyr--captions-active',
             },
             fullscreen: {
                 enabled: 'plyr--fullscreen-enabled',
-                active: 'plyr--fullscreen-active'
+                active: 'plyr--fullscreen-active',
             },
             pip: {
                 enabled: 'plyr--pip-enabled',
-                active: 'plyr--pip-active'
+                active: 'plyr--pip-active',
             },
             airplay: {
                 enabled: 'plyr--airplay-enabled',
-                active: 'plyr--airplay-active'
+                active: 'plyr--airplay-active',
             },
-            tabFocus: 'tab-focus'
-        }
+            tabFocus: 'tab-focus',
+        },
     };
 
     // Types
     var types = {
         embed: ['youtube', 'vimeo', 'soundcloud'],
-        html5: ['video', 'audio']
+        html5: ['video', 'audio'],
     };
 
     // Utilities
@@ -389,7 +389,7 @@
                     ((this.string(input) || this.array(input) || this.nodeList(input)) && input.length === 0) ||
                     (this.object(input) && Object.keys(input).length === 0)
                 );
-            }
+            },
         },
 
         // Credits: http://paypal.github.io/accessible-html5-video-player/
@@ -471,7 +471,7 @@
                 isChrome: isChrome,
                 isSafari: isSafari,
                 isIPhone: /(iPhone|iPod)/gi.test(navigator.platform),
-                isIos: /(iPad|iPhone|iPod)/gi.test(navigator.platform)
+                isIos: /(iPad|iPhone|iPod)/gi.test(navigator.platform),
             };
         },
 
@@ -512,7 +512,7 @@
 
             return {
                 basic: basic,
-                full: full
+                full: full,
             };
         },
 
@@ -542,11 +542,6 @@
         // Element exists in an array
         inArray: function(haystack, needle) {
             return utils.is.array(haystack) && haystack.indexOf(needle) !== -1;
-        },
-
-        // Replace all
-        replaceAll: function(string, find, replace) {
-            return string.replace(new RegExp(find.replace(/([.*+?\^=!:${}()|\[\]\/\\])/g, '\\$1'), 'g'), replace);
         },
 
         // Wrap an element
@@ -678,14 +673,14 @@
 
                     case '[':
                         // Strip the []
-                        selector = selector.replace(/[\[\]]/g, '');
+                        selector = selector.replace(/[[\]]/g, '');
 
                         // Get the parts if
                         var parts = selector.split('=');
                         var key = parts[0];
 
                         // Get the value if provided
-                        var value = parts.length > 1 ? parts[1].replace(/[\"\']/g, '') : '';
+                        var value = parts.length > 1 ? parts[1].replace(/["']/g, '') : '';
 
                         // Attribute selector
                         attributes[key] = value;
@@ -823,7 +818,7 @@
             if (support.passiveListeners) {
                 options = {
                     passive: passive,
-                    capture: capture
+                    capture: capture,
                 };
             }
 
@@ -866,7 +861,7 @@
                     params = params || {
                         bubbles: false,
                         cancelable: false,
-                        detail: undefined
+                        detail: undefined,
                     };
                     var custom = document.createEvent('CustomEvent');
                     custom.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
@@ -878,7 +873,7 @@
             // Create and dispatch the event
             var event = new CustomEvent(type, {
                 bubbles: bubbles,
-                detail: properties
+                detail: properties,
             });
 
             // Dispatch the event
@@ -958,7 +953,7 @@
 
         // Parse YouTube ID from url
         parseYouTubeId: function(url) {
-            var regex = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            var regex = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
             return url.match(regex) ? RegExp.$2 : url;
         },
 
@@ -1026,7 +1021,7 @@
                         window.localStorage.setItem(
                             prefix + id,
                             JSON.stringify({
-                                content: xhr.responseText
+                                content: xhr.responseText,
                             })
                         );
                     }
@@ -1046,7 +1041,7 @@
                 WebkitTransition: 'webkitTransitionEnd',
                 MozTransition: 'transitionend',
                 OTransition: 'oTransitionEnd otransitionend',
-                transition: 'transitionend'
+                transition: 'transitionend',
             };
 
             for (var type in events) {
@@ -1056,7 +1051,7 @@
             }
 
             return false;
-        })()
+        })(),
     };
 
     // Fullscreen API
@@ -1139,7 +1134,7 @@
                 }
 
                 return !prefix.length ? document.fullscreenElement : document[prefix + 'FullscreenElement'];
-            }
+            },
         };
     })();
 
@@ -1239,10 +1234,12 @@
                 var options = Object.defineProperty({}, 'passive', {
                     get: function() {
                         supported = true;
-                    }
+                    },
                 });
                 window.addEventListener('test', null, options);
-            } catch (e) {}
+            } catch (e) {
+                // Do nothing
+            }
 
             return supported;
         })(),
@@ -1256,7 +1253,7 @@
 
         // Reduced motion iOS & MacOS setting
         // https://webkit.org/blog/7551/responsive-design-for-motion/
-        reducedMotion: 'matchMedia' in window && window.matchMedia('(prefers-reduced-motion)').matches
+        reducedMotion: 'matchMedia' in window && window.matchMedia('(prefers-reduced-motion)').matches,
     };
 
     // Plyr instance
@@ -1290,7 +1287,9 @@
             (function() {
                 try {
                     return JSON.parse(player.media.getAttribute('data-plyr'));
-                } catch (e) {}
+                } catch (e) {
+                    // Do nothing
+                }
             })()
         );
 
@@ -1304,41 +1303,41 @@
             settings: {
                 menu: null,
                 panes: {},
-                tabs: {}
+                tabs: {},
             },
-            captions: null
+            captions: null,
         };
 
         // Captions
         player.captions = {
             enabled: null,
             tracks: null,
-            currentTrack: null
+            currentTrack: null,
         };
 
         // Fullscreen
         player.fullscreen = {
-            active: false
+            active: false,
         };
 
         // Speed
         player.speed = {
             selected: null,
-            options: []
+            options: [],
         };
 
         // Quality
         player.quality = {
             selected: null,
-            options: []
+            options: [],
         };
 
         // Loop
         player.loop = {
             indicator: {
                 start: 0,
-                end: 0
-            }
+                end: 0,
+            },
         };
 
         // Debugging
@@ -1346,9 +1345,9 @@
         var warn = function() {};
         var error = function() {};
         if (player.config.debug && 'console' in window) {
-            log = console.log;
-            warn = console.warn;
-            error = console.error;
+            log = console.log; // eslint-disable-line
+            warn = console.warn; // eslint-disable-line
+            error = console.error; // eslint-disable-line
             log('Debugging enabled');
         }
 
@@ -1363,7 +1362,7 @@
                 type,
                 bubbles,
                 utils.extend({}, properties, {
-                    plyr: player
+                    plyr: player,
                 })
             );
         }
@@ -1418,7 +1417,7 @@
         function insertElements(type, attributes) {
             if (utils.is.string(attributes)) {
                 utils.insertElement(type, player.media, {
-                    src: attributes
+                    src: attributes,
                 });
             } else if (utils.is.array(attributes)) {
                 warn(attributes);
@@ -1433,7 +1432,7 @@
         function getIconUrl() {
             return {
                 url: player.config.iconUrl,
-                absolute: player.config.iconUrl.indexOf('http') === 0 || player.browser.isIE
+                absolute: player.config.iconUrl.indexOf('http') === 0 || player.browser.isIE,
             };
         }
 
@@ -1448,7 +1447,7 @@
             utils.setAttributes(
                 icon,
                 utils.extend(attributes, {
-                    role: 'presentation'
+                    role: 'presentation',
                 })
             );
 
@@ -1479,7 +1478,7 @@
             return utils.createElement(
                 'span',
                 {
-                    class: player.config.classNames.hidden
+                    class: player.config.classNames.hidden,
                 },
                 text
             );
@@ -1488,14 +1487,14 @@
         // Create a badge
         function createBadge(text) {
             var badge = utils.createElement('span', {
-                class: player.config.classNames.menu.value
+                class: player.config.classNames.menu.value,
             });
 
             badge.appendChild(
                 utils.createElement(
                     'span',
                     {
-                        class: player.config.classNames.menu.badge
+                        class: player.config.classNames.menu.badge,
                     },
                     text
                 )
@@ -1569,7 +1568,7 @@
             if (utils.is.string(iconToggled)) {
                 button.appendChild(
                     createIcon(iconToggled, {
-                        class: 'icon--' + iconToggled
+                        class: 'icon--' + iconToggled,
                     })
                 );
             }
@@ -1591,7 +1590,7 @@
                 'label',
                 {
                     for: attributes.id,
-                    class: player.config.classNames.hidden
+                    class: player.config.classNames.hidden,
                 },
                 player.config.i18n[type]
             );
@@ -1607,7 +1606,7 @@
                         max: 100,
                         step: 0.1,
                         value: 0,
-                        autocomplete: 'off'
+                        autocomplete: 'off',
                     },
                     attributes
                 )
@@ -1617,7 +1616,7 @@
 
             return {
                 label: label,
-                input: input
+                input: input,
             };
         }
 
@@ -1630,7 +1629,7 @@
                     {
                         min: 0,
                         max: 100,
-                        value: 0
+                        value: 0,
                     },
                     attributes
                 )
@@ -1662,14 +1661,14 @@
         // Create time display
         function createTime(type) {
             var container = utils.createElement('span', {
-                class: 'plyr__time'
+                class: 'plyr__time',
             });
 
             container.appendChild(
                 utils.createElement(
                     'span',
                     {
-                        class: player.config.classNames.hidden
+                        class: player.config.classNames.hidden,
                     },
                     player.config.i18n[type]
                 )
@@ -1733,7 +1732,7 @@
 
                 // Seek range slider
                 var seek = createRange('seek', {
-                    id: 'plyr-seek-' + data.id
+                    id: 'plyr-seek-' + data.id,
                 });
                 container.appendChild(seek.label);
                 container.appendChild(seek.input);
@@ -1752,7 +1751,7 @@
                         'span',
                         {
                             role: 'tooltip',
-                            class: player.config.classNames.tooltip
+                            class: player.config.classNames.tooltip,
                         },
                         '00:00'
                     );
@@ -1783,21 +1782,21 @@
             // Volume range control
             if (utils.inArray(player.config.controls, 'volume')) {
                 var volume = utils.createElement('span', {
-                    class: 'plyr__volume'
+                    class: 'plyr__volume',
                 });
 
                 // Set the attributes
                 var attributes = {
                     max: 1,
                     step: 0.05,
-                    value: player.config.volume
+                    value: player.config.volume,
                 };
 
                 // Create the volume range slider
                 var range = createRange(
                     'volume',
                     utils.extend(attributes, {
-                        id: 'plyr-volume-' + data.id
+                        id: 'plyr-volume-' + data.id,
                     })
                 );
                 volume.appendChild(range.label);
@@ -1818,7 +1817,7 @@
             // Settings button / menu
             if (utils.inArray(player.config.controls, 'settings') && !utils.is.empty(player.config.settings)) {
                 var menu = utils.createElement('div', {
-                    class: 'plyr__menu'
+                    class: 'plyr__menu',
                 });
 
                 menu.appendChild(
@@ -1826,7 +1825,7 @@
                         id: 'plyr-settings-toggle-' + data.id,
                         'aria-haspopup': true,
                         'aria-controls': 'plyr-settings-' + data.id,
-                        'aria-expanded': false
+                        'aria-expanded': false,
                     })
                 );
 
@@ -1836,7 +1835,7 @@
                     'aria-hidden': true,
                     'aria-labelled-by': 'plyr-settings-toggle-' + data.id,
                     role: 'tablist',
-                    tabindex: -1
+                    tabindex: -1,
                 });
 
                 var inner = utils.createElement('div');
@@ -1845,19 +1844,19 @@
                     id: 'plyr-settings-' + data.id + '-home',
                     'aria-hidden': false,
                     'aria-labelled-by': 'plyr-settings-toggle-' + data.id,
-                    role: 'tabpanel'
+                    role: 'tabpanel',
                 });
 
                 // Create the tab list
                 var tabs = utils.createElement('ul', {
-                    role: 'tablist'
+                    role: 'tablist',
                 });
 
                 // Build the tabs
                 player.config.settings.forEach(function(type) {
                     var tab = utils.createElement('li', {
                         role: 'tab',
-                        hidden: ''
+                        hidden: '',
                     });
 
                     var button = utils.createElement(
@@ -1869,13 +1868,13 @@
                             id: 'plyr-settings-' + data.id + '-' + type + '-tab',
                             'aria-haspopup': true,
                             'aria-controls': 'plyr-settings-' + data.id + '-' + type,
-                            'aria-expanded': false
+                            'aria-expanded': false,
                         }),
                         player.config.i18n[type]
                     );
 
                     var value = utils.createElement('span', {
-                        class: player.config.classNames.menu.value
+                        class: player.config.classNames.menu.value,
                     });
 
                     // Speed contains HTML entities
@@ -1899,7 +1898,7 @@
                         'aria-labelled-by': 'plyr-settings-' + data.id + '-' + type + '-tab',
                         role: 'tabpanel',
                         tabindex: -1,
-                        hidden: ''
+                        hidden: '',
                     });
 
                     var back = utils.createElement(
@@ -1909,7 +1908,7 @@
                             class: player.config.classNames.control + ' ' + player.config.classNames.control + '--back',
                             'aria-haspopup': true,
                             'aria-controls': 'plyr-settings-' + data.id + '-home',
-                            'aria-expanded': false
+                            'aria-expanded': false,
                         },
                         player.config.i18n[type]
                     );
@@ -2046,7 +2045,7 @@
                 var item = utils.createElement('li');
 
                 var label = utils.createElement('label', {
-                    class: player.config.classNames.control
+                    class: player.config.classNames.control,
                 });
 
                 var radio = utils.createElement(
@@ -2054,7 +2053,7 @@
                     utils.extend(utils.getAttributesFromSelector(player.config.selectors.inputs.quality), {
                         type: 'radio',
                         name: 'plyr-quality',
-                        value: quality
+                        value: quality,
                     })
                 );
 
@@ -2220,14 +2219,14 @@
                 return {
                     language: track.language,
                     badge: true,
-                    label: !utils.is.empty(track.label) ? track.label : track.language.toUpperCase()
+                    label: !utils.is.empty(track.label) ? track.label : track.language.toUpperCase(),
                 };
             });
 
             // Add the "None" option to turn off captions
             tracks.unshift({
                 language: '',
-                label: player.config.i18n.none
+                label: player.config.i18n.none,
             });
 
             // Generate options
@@ -2235,7 +2234,7 @@
                 var item = utils.createElement('li');
 
                 var label = utils.createElement('label', {
-                    class: player.config.classNames.control
+                    class: player.config.classNames.control,
                 });
 
                 var radio = utils.createElement(
@@ -2243,7 +2242,7 @@
                     utils.extend(utils.getAttributesFromSelector(player.config.selectors.inputs.language), {
                         type: 'radio',
                         name: 'plyr-language',
-                        value: track.language
+                        value: track.language,
                     })
                 );
 
@@ -2305,7 +2304,7 @@
                 var item = utils.createElement('li');
 
                 var label = utils.createElement('label', {
-                    class: player.config.classNames.control
+                    class: player.config.classNames.control,
                 });
 
                 var radio = utils.createElement(
@@ -2313,7 +2312,7 @@
                     utils.extend(utils.getAttributesFromSelector(player.config.selectors.inputs.speed), {
                         type: 'radio',
                         name: 'plyr-speed',
-                        value: speed
+                        value: speed,
                     })
                 );
 
@@ -2601,7 +2600,7 @@
                 // The function can return a HTMLElement or String
                 controls = player.config.controls({
                     id: player.id,
-                    seektime: player.config.seekTime
+                    seektime: player.config.seekTime,
                 });
             } else {
                 // Create controls
@@ -2613,7 +2612,7 @@
                     quality: '-',
                     captions: getLanguage(),
                     // TODO: Get loop
-                    loop: 'None'
+                    loop: 'None',
                 });
             }
 
@@ -2650,7 +2649,7 @@
                         ' ',
                         player.config.selectors.labels,
                         ' .',
-                        player.config.classNames.hidden
+                        player.config.classNames.hidden,
                     ].join('')
                 );
 
@@ -2681,7 +2680,7 @@
                     airplay: getElement(player.config.selectors.buttons.airplay),
                     settings: getElement(player.config.selectors.buttons.settings),
                     captions: getElement(player.config.selectors.buttons.captions),
-                    fullscreen: getElement(player.config.selectors.buttons.fullscreen)
+                    fullscreen: getElement(player.config.selectors.buttons.fullscreen),
                 };
 
                 // Progress
@@ -2690,7 +2689,7 @@
                 // Inputs
                 player.elements.inputs = {
                     seek: getElement(player.config.selectors.inputs.seek),
-                    volume: getElement(player.config.selectors.inputs.volume)
+                    volume: getElement(player.config.selectors.inputs.volume),
                 };
 
                 // Display
@@ -2699,7 +2698,7 @@
                     played: getElement(player.config.selectors.display.played),
                     volume: getElement(player.config.selectors.display.volume),
                     duration: getElement(player.config.selectors.display.duration),
-                    currentTime: getElement(player.config.selectors.display.currentTime)
+                    currentTime: getElement(player.config.selectors.display.currentTime),
                 };
 
                 // Seek tooltip
@@ -2798,7 +2797,7 @@
                 // version of player. See: https://github.com/sampotts/plyr/pull/313
                 // Update the key to be JSON
                 updateStorage({
-                    volume: parseFloat(value)
+                    volume: parseFloat(value),
                 });
             } else {
                 // Assume it's JSON from this or a later version of plyr
@@ -2874,7 +2873,7 @@
             if (utils.inArray(['video', 'youtube', 'vimeo'], player.type)) {
                 // Create the wrapper div
                 player.elements.wrapper = utils.createElement('div', {
-                    class: player.config.classNames.video
+                    class: player.config.classNames.video,
                 });
 
                 // Wrap the video in a container
@@ -2968,7 +2967,7 @@
 
                 utils.setAttributes(soundCloud, {
                     src: 'https://w.soundcloud.com/player/?url=https://api.soundcloud.com/tracks/' + mediaId,
-                    id: id
+                    id: id,
                 });
 
                 player.media.appendChild(soundCloud);
@@ -3018,7 +3017,7 @@
 
                     // Tracking for stats
                     origin: window.location.hostname,
-                    widget_referrer: window.location.href
+                    widget_referrer: window.location.href,
 
                     // Captions is flaky on YouTube
                     //cc_load_policy: (player.captions.active ? 1 : 0),
@@ -3028,7 +3027,7 @@
                     onError: function(event) {
                         trigger(player.elements.container, 'error', true, {
                             code: event.data,
-                            embed: event.target
+                            embed: event.target,
                         });
                     },
                     onPlaybackQualityChange: function(event) {
@@ -3201,10 +3200,10 @@
                         }
 
                         trigger(player.elements.container, 'statechange', false, {
-                            code: event.data
+                            code: event.data,
                         });
-                    }
-                }
+                    },
+                },
             });
         }
 
@@ -3218,7 +3217,7 @@
                 autoplay: player.config.autoplay,
                 byline: false,
                 portrait: false,
-                title: false
+                title: false,
             });
 
             // Create a faux HTML5 API using the Vimeo API
@@ -3466,7 +3465,7 @@
 
             return {
                 width: width,
-                height: height
+                height: height,
             };
         }
 
@@ -3558,7 +3557,7 @@
 
             // Update the volume in storage
             updateStorage({
-                volume: player.media.volume
+                volume: player.media.volume,
             });
 
             // Toggle class if muted
@@ -4085,7 +4084,7 @@
                         67,
                         73,
                         76,
-                        79
+                        79,
                     ];
                     var checkFocus = [38, 40];
 
@@ -4512,7 +4511,7 @@
 
                 // Save speed to localStorage
                 updateStorage({
-                    speed: player.speed.selected
+                    speed: player.speed.selected,
                 });
             });
 
@@ -4526,7 +4525,7 @@
 
                 // Save speed to localStorage
                 updateStorage({
-                    quality: player.quality.selected
+                    quality: player.quality.selected,
                 });
             });
 
@@ -4534,7 +4533,7 @@
             utils.on(player.media, 'captionchange', function() {
                 // Save speed to localStorage
                 updateStorage({
-                    language: player.captions.language
+                    language: player.captions.language,
                 });
             });
 
@@ -4545,7 +4544,7 @@
 
                 // Save speed to localStorage
                 updateStorage({
-                    captions: player.captions.enabled
+                    captions: player.captions.enabled,
                 });
             });
 
@@ -4821,7 +4820,7 @@
             // Debugging
             log: log,
             warn: warn,
-            error: error
+            error: error,
         };
 
         // Initialize instance
@@ -5184,7 +5183,7 @@
         switch (player.type) {
             case 'youtube':
                 player.core.trigger(player.media, 'qualityrequested', false, {
-                    quality: quality
+                    quality: quality,
                 });
 
                 player.embed.setPlaybackQuality(quality);
@@ -5425,7 +5424,7 @@
         function saveScrollPosition() {
             scroll = {
                 x: window.pageXOffset || 0,
-                y: window.pageYOffset || 0
+                y: window.pageYOffset || 0,
             };
         }
 
@@ -5498,7 +5497,7 @@
         var player = this;
         var states = {
             pip: 'picture-in-picture',
-            inline: 'inline'
+            inline: 'inline',
         };
 
         // Bail if no support

@@ -1,24 +1,34 @@
 {
+    "extends": ["eslint:recommended"],
     "env": {
         "browser": true
     },
+    "globals": {
+        "engine": true,
+        "Modernizr": false,
+        "ga": false,
+        "mixpanel": false,
+        "moment": false,
+        "fullscreen": false,
+        "Raven": false,
+        "templates": false,
+        "Hogan": false,
+        "locale_json": false,
+        "bootbox": false
+    },
     "rules": {
-        "no-const-assign": "warn",
-        "no-this-before-super": "warn",
-        "no-undef": "warn",
-        "no-unreachable": "warn",
-        "no-unused-vars": "warn",
-        "constructor-super": "warn",
-        "valid-typeof": "warn",
-        "indent": [
-            "error",
-            4,
-            {
-                "SwitchCase": 1
-            }
-        ],
-        "quotes": ["error", "single"],
-        "semi": ["error", "always"],
-        "eqeqeq": ["error", "always"]
+        "no-const-assign": 1,
+        "no-this-before-super": 1,
+        "no-undef": 1,
+        "no-unreachable": 1,
+        "no-unused-vars": 1,
+        "constructor-super": 1,
+        "valid-typeof": 1,
+        "indent": [2, 4, { "SwitchCase": 1 }],
+        "quotes": [2, "single", "avoid-escape"],
+        "semi": [2, "always"],
+        "eqeqeq": [2, "always"],
+        "one-var": [2, "never"],
+        "comma-dangle": [2, "always-multiline"]
     }
 }
