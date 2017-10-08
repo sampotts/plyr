@@ -3,8 +3,8 @@
 // https://github.com/sampotts/plyr
 // ==========================================================================
 
-@import "variables";
-@import "mixins";
+@import 'variables';
+@import 'mixins';
 
 // Animation
 // ---------------------------------------
@@ -16,7 +16,7 @@
 @keyframes plyr-popup {
     from {
         transform: translateY(10px);
-        opacity: .5;
+        opacity: 0.5;
     }
     to {
         transform: translateY(0);
@@ -239,14 +239,14 @@
     width: 100%;
     padding: @plyr-control-spacing;
     transform: translateY(-(@plyr-control-spacing * 4));
-    transition: transform .3s ease;
+    transition: transform 0.3s ease;
     color: @plyr-captions-color;
     font-size: @plyr-font-size-captions-small;
     text-align: center;
 
     span {
         border-radius: 2px;
-        padding: .2em .5em;
+        padding: 0.2em 0.5em;
         background: @plyr-captions-bg;
         box-decoration-break: clone;
         line-height: 170%;
@@ -304,7 +304,7 @@
         margin-left: (@plyr-control-spacing / 2);
 
         &:first-child,
-        &:first-child + [data-plyr="pause"] {
+        &:first-child + [data-plyr='pause'] {
             margin-left: 0;
         }
     }
@@ -345,7 +345,7 @@
     background: transparent;
     border-radius: 3px;
     cursor: pointer;
-    transition: background .3s ease, color .3s ease, opacity .3s ease;
+    transition: background 0.3s ease, color 0.3s ease, opacity 0.3s ease;
     color: inherit;
 
     svg {
@@ -382,7 +382,7 @@
     border-bottom-left-radius: inherit;
     border-bottom-right-radius: inherit;
     color: @plyr-video-control-color;
-    transition: opacity .3s ease;
+    transition: opacity 0.3s ease;
 
     .plyr__control {
         // Hover and tab focus
@@ -428,7 +428,7 @@
     border-radius: 100%;
     box-shadow: 0 1px 1px fade(#000, 15%);
     color: @plyr-video-control-color;
-    transition: all .3s ease;
+    transition: all 0.3s ease;
 
     svg {
         position: relative;
@@ -501,7 +501,7 @@
 
     // Hide tooltip
     .plyr__control svg {
-        transition: transform .3s ease;
+        transition: transform 0.3s ease;
     }
     .plyr__control[aria-expanded='true'] {
         svg {
@@ -519,7 +519,7 @@
         bottom: 100%;
         right: -3px;
         margin-bottom: 10px;
-        animation: plyr-popup .2s ease;
+        animation: plyr-popup 0.2s ease;
 
         background: @plyr-menu-bg;
         border-radius: 4px;
@@ -531,12 +531,12 @@
 
         > div {
             overflow: hidden;
-            transition: height .35s cubic-bezier(.4, 0, .2, 1), width .35s cubic-bezier(.4, 0, .2, 1);
+            transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1), width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         // Arrow
         &::after {
-            content: "";
+            content: '';
             position: absolute;
             top: 100%;
             right: 15px;
@@ -563,7 +563,7 @@
             user-select: none;
 
             &::after {
-                content: "";
+                content: '';
                 position: absolute;
                 top: 50%;
                 transform: translateY(-50%);
@@ -582,7 +582,7 @@
             &--back {
                 position: relative;
                 @horizontal-padding: (@plyr-control-padding * 2);
-                width: ~"calc(100% - @{horizontal-padding})";
+                width: ~'calc(100% - @{horizontal-padding})';
                 margin: @plyr-control-padding;
                 margin-bottom: floor(@plyr-control-padding / 2);
                 padding-left: ceil(@plyr-control-padding * 4);
@@ -593,7 +593,7 @@
                     border-right-color: fade(@plyr-menu-color, 80%);
                 }
                 &::before {
-                    content: "";
+                    content: '';
                     position: absolute;
                     top: 100%;
                     left: 0;
@@ -610,7 +610,7 @@
         label.plyr__control {
             padding-left: ceil(@plyr-control-padding * 2.5);
 
-            input[type="radio"] {
+            input[type='radio'] {
                 position: relative;
                 left: -@plyr-control-padding;
             }
@@ -662,9 +662,9 @@
     font-weight: 500;
     line-height: 1.3;
 
-    transform: translate(-50%, 10px) scale(.8);
+    transform: translate(-50%, 10px) scale(0.8);
     transform-origin: 50% 100%;
-    transition: transform .2s .1s ease, opacity .2s .1s ease;
+    transition: transform 0.2s 0.1s ease, opacity 0.2s 0.1s ease;
 
     &::before {
         // Arrows
@@ -697,7 +697,7 @@
 .plyr__controls > .plyr__control:first-child .plyr__tooltip,
 .plyr__controls > .plyr__control:first-child + .plyr__control .plyr__tooltip {
     left: 0;
-    transform: translate(0, 10px) scale(.8);
+    transform: translate(0, 10px) scale(0.8);
     transform-origin: 0 100%;
 
     &::before {
@@ -708,7 +708,7 @@
 // Last tooltip
 .plyr__controls > .plyr__control:last-child .plyr__tooltip {
     right: 0;
-    transform: translate(0, 10px) scale(.8);
+    transform: translate(0, 10px) scale(0.8);
     transform-origin: 100% 100%;
 
     &::before {
@@ -736,7 +736,7 @@
     display: none;
     flex: 1;
 
-    input[type="range"] {
+    input[type='range'] {
         position: relative;
         z-index: 2;
 
@@ -826,13 +826,13 @@
 }
 .plyr__progress--buffer {
     &::-webkit-progress-value {
-        transition: width .2s ease;
+        transition: width 0.2s ease;
     }
     &::-moz-progress-bar {
-        transition: width .2s ease;
+        transition: width 0.2s ease;
     }
     &::-ms-fill {
-        transition: width .2s ease;
+        transition: width 0.2s ease;
     }
 }
 .plyr--video .plyr__progress--buffer,
@@ -909,7 +909,7 @@
     flex: 1;
     position: relative;
 
-    input[type="range"] {
+    input[type='range'] {
         position: relative;
         z-index: 2;
     }
@@ -933,14 +933,8 @@
 // Fullscreen
 // --------------------------------------------------------------
 .plyr--fullscreen-active {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
     height: 100%;
     width: 100%;
-    z-index: 10000000;
     background: #000;
     border-radius: 0 !important;
 
@@ -955,12 +949,6 @@
         // Revert overflow change
         overflow: visible;
     }
-    .plyr__controls {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-    }
 
     // Vimeo requires some different styling
     &.plyr--vimeo .plyr__video-wrapper {
@@ -968,4 +956,14 @@
         top: 50%;
         transform: translateY(-50%);
     }
+}
+
+// Fallback for unsupported browsers
+.plyr--fullscreen-fallback.plyr--fullscreen-active {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10000000;
 }

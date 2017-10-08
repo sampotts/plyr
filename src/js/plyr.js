@@ -315,6 +315,7 @@
             },
             fullscreen: {
                 enabled: 'plyr--fullscreen-enabled',
+                fallback: 'plyr--fullscreen-fallback',
                 active: 'plyr--fullscreen-active',
             },
             pip: {
@@ -2337,6 +2338,11 @@
 
                 if (nativeSupport || (player.config.fullscreen.fallback && !utils.inFrame())) {
                     log((nativeSupport ? 'Native' : 'Fallback') + ' fullscreen enabled');
+
+                    // Add styling hook
+                    if (!nativeSupport) {
+                        utils.toggleClass(player.elements.container, player.config.classes.fullscreen.fallback, true);
+                    }
 
                     // Add styling hook
                     utils.toggleClass(player.elements.container, player.config.classNames.fullscreen.enabled, true);
