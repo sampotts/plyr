@@ -3974,37 +3974,17 @@
                 var play = player.togglePlay();
 
                 // Determine which buttons
-                var trigger = player.elements.buttons[play ? 'play' : 'pause'];
                 var target = player.elements.buttons[play ? 'pause' : 'play'];
 
                 // Transfer focus
-                if (target && trigger) {
-                    if (utils.hasClass(trigger, player.config.classNames.tabFocus)) {
-                        setTimeout(function() {
-                            target.focus();
-                            utils.toggleClass(trigger, player.config.classNames.tabFocus, false);
-                            utils.toggleClass(target, player.config.classNames.tabFocus, true);
-                        }, 0);
-                    }
+                if (target) {
+                    target.focus();
                 }
             }
 
             // Get the key code for an event
             function getKeyCode(event) {
                 return event.keyCode ? event.keyCode : event.which;
-            }
-
-            // Detect tab focus
-            function checkTabFocus(focused) {
-                utils.toggleClass(
-                    getElements('.' + player.config.classNames.tabFocus),
-                    player.config.classNames.tabFocus,
-                    false
-                );
-
-                if (player.elements.container.contains(focused)) {
-                    utils.toggleClass(focused, player.config.classNames.tabFocus, true);
-                }
             }
 
             // Keyboard shortcuts
@@ -4198,31 +4178,24 @@
                 }
             }
 
-            // Focus/tab management
-            utils.on(window, 'keyup', function(event) {
-                var code = getKeyCode(event);
-                var focused = utils.getFocusElement();
-
-                if (code === 9) {
-                    checkTabFocus(focused);
-                }
-            });
-
-            utils.on(document.body, 'click', function() {
-                utils.toggleClass(
-                    getElement('.' + player.config.classNames.tabFocus),
-                    player.config.classNames.tabFocus,
-                    false
-                );
-            });
-
-            for (var button in player.elements.buttons) {
-                utils.on(player.elements.buttons[button], 'blur', onBlur);
-            }
-
-            function onBlur(event) {
+            // Detect tab focus
+            // Remove class on blur/focusout
+            utils.on(player.elements.container, 'focusout', function(event) {
                 utils.toggleClass(event.target, player.config.classNames.tabFocus, false);
-            }
+            });
+
+            // Add classname to tabbed elements
+            utils.on(player.elements.container, 'keydown', function(event) {
+                if (event.keyCode !== 9) {
+                    return;
+                }
+
+                // Delay the adding of classname until the focus has changed
+                // This event fires before the focusin event
+                window.setTimeout(function () {
+                    utils.toggleClass(utils.getFocusElement(), player.config.classNames.tabFocus, true);
+                }, 0);
+            });
 
             // Trigger custom and default handlers
             var handlerProxy = function(event, customHandler, defaultHandler) {
@@ -4372,7 +4345,6 @@
                     function(event) {
                         player.toggleControls(event);
                     },
-                    true,
                     true
                 );
             }

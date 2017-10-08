@@ -35,7 +35,7 @@
     font-weight: @plyr-font-weight-normal;
     direction: ltr;
 
-    & when (@plyr-border-box = true) {
+    & when(@plyr-border-box = true) {
         // border-box everything
         // http://paulirish.com/2012/box-sizing-border-box-ftw/
         &,
@@ -46,7 +46,7 @@
         }
     }
 
-    & when (@plyr-touch-action = true) {
+    & when(@plyr-touch-action = true) {
         // Fix 300ms delay
         a,
         button,
@@ -57,7 +57,7 @@
     }
 
     // ARIA
-    [aria-hidden='true'] {
+    [aria-hidden="true"] {
         display: none;
     }
 
@@ -77,7 +77,7 @@
 
     // Range inputs
     // Specificity is for bootstrap compatibility
-    input[type='range'] {
+    input[type="range"] {
         display: block;
         height: (@plyr-range-thumb-height * @plyr-range-thumb-active-scale);
         width: 100%;
@@ -137,7 +137,7 @@
         &::-moz-focus-outer {
             border: 0;
         }
-        &.tab-focus:focus {
+        &.tab-focus {
             outline-offset: 3px;
         }
 
@@ -157,12 +157,12 @@
 }
 
 // Video range inputs
-.plyr--video input[type='range'].tab-focus:focus {
+.plyr--video input[type="range"].tab-focus {
     outline: 1px dotted fade(@plyr-video-control-color, 50%);
 }
 
 // Audio range inputs
-.plyr--audio input[type='range'].tab-focus:focus {
+.plyr--audio input[type="range"].tab-focus {
     outline: 1px dotted fade(@plyr-audio-control-color, 50%);
 }
 
@@ -172,14 +172,14 @@
     overflow: hidden;
 
     // !important is not always needed
-    & when (@plyr-sr-only-important = true) {
+    & when(@plyr-sr-only-important = true) {
         position: absolute !important;
         padding: 0 !important;
         border: 0 !important;
         height: 1px !important;
         width: 1px !important;
     }
-    & when (@plyr-sr-only-important = false) {
+    & when(@plyr-sr-only-important = false) {
         position: absolute;
         padding: 0;
         border: 0;
@@ -386,9 +386,9 @@
 
     .plyr__control {
         // Hover and tab focus
-        &.tab-focus:focus,
+        &.tab-focus,
         &:hover,
-        &[aria-expanded='true'] {
+        &[aria-expanded="true"] {
             background: @plyr-video-control-bg-hover;
             color: @plyr-video-control-color-hover;
         }
@@ -405,9 +405,9 @@
 
     .plyr__control {
         // Hover and tab focus
-        &.tab-focus:focus,
+        &.tab-focus,
         &:hover,
-        &[aria-expanded='true'] {
+        &[aria-expanded="true"] {
             background: @plyr-audio-control-bg-hover;
             color: @plyr-audio-control-color-hover;
         }
@@ -461,11 +461,11 @@
 }
 
 // States
-.plyr__controls [data-plyr='pause'],
-.plyr--playing .plyr__controls [data-plyr='play'] {
+.plyr__controls [data-plyr="pause"],
+.plyr--playing .plyr__controls [data-plyr="play"] {
     display: none;
 }
-.plyr--playing .plyr__controls [data-plyr='pause'] {
+.plyr--playing .plyr__controls [data-plyr="pause"] {
     display: inline-block;
 }
 
@@ -481,16 +481,16 @@
 }
 
 // Some options are hidden by default
-.plyr [data-plyr='captions'],
-.plyr [data-plyr='fullscreen'],
-.plyr [data-plyr='pip'],
-.plyr [data-plyr='airplay'] {
+.plyr [data-plyr="captions"],
+.plyr [data-plyr="fullscreen"],
+.plyr [data-plyr="pip"],
+.plyr [data-plyr="airplay"] {
     display: none;
 }
-.plyr--captions-enabled [data-plyr='captions'],
-.plyr--fullscreen-enabled [data-plyr='fullscreen'],
-.plyr--pip-enabled [data-plyr='pip'],
-.plyr--airplay-enabled [data-plyr='airplay'] {
+.plyr--captions-enabled [data-plyr="captions"],
+.plyr--fullscreen-enabled [data-plyr="fullscreen"],
+.plyr--pip-enabled [data-plyr="pip"],
+.plyr--airplay-enabled [data-plyr="airplay"] {
     display: inline-block;
 }
 
@@ -503,7 +503,7 @@
     .plyr__control svg {
         transition: transform 0.3s ease;
     }
-    .plyr__control[aria-expanded='true'] {
+    .plyr__control[aria-expanded="true"] {
         svg {
             transform: rotate(45deg);
         }
@@ -668,7 +668,7 @@
 
     &::before {
         // Arrows
-        content: '';
+        content: "";
         position: absolute;
         width: 0;
         height: 0;
@@ -684,7 +684,7 @@
     }
 }
 .plyr .plyr__control:hover .plyr__tooltip,
-.plyr .plyr__control.tab-focus:focus .plyr__tooltip,
+.plyr .plyr__control.tab-focus .plyr__tooltip,
 .plyr__tooltip--visible {
     opacity: 1;
     transform: translate(-50%, 0) scale(1);
@@ -722,7 +722,7 @@
 .plyr__controls > .plyr__control:first-child + .plyr__control,
 .plyr__controls > .plyr__control:last-child {
     &:hover .plyr__tooltip,
-    &.tab-focus:focus .plyr__tooltip,
+    &.tab-focus .plyr__tooltip,
     .plyr__tooltip--visible {
         transform: translate(0, 0) scale(1);
     }
@@ -892,7 +892,7 @@
 
     // Add a slash in before
     &::before {
-        content: '\2044';
+        content: "\2044";
         margin-right: @plyr-control-spacing;
     }
 }
@@ -926,7 +926,7 @@
 // It's not supported to change volume using JavaScript:
 // https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html
 .plyr--is-ios .plyr__volume,
-.plyr--is-ios [data-plyr='mute'] {
+.plyr--is-ios [data-plyr="mute"] {
     display: none !important;
 }
 
