@@ -20,6 +20,11 @@
         },
         captions: {
             defaultActive: true
+        },
+        marker: {
+            "36": "Big waves",
+            "61": "Cool lion",
+            "136": "Awesome surfer"
         }
     });
     plyr.loadSprite("dist/demo.svg");
