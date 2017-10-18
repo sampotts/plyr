@@ -2381,7 +2381,7 @@
 
                     // Add styling hook
                     if (!nativeSupport) {
-                        utils.toggleClass(player.elements.container, player.config.classes.fullscreen.fallback, true);
+                        utils.toggleClass(player.elements.container, player.config.classNames.fullscreen.fallback, true);
                     }
 
                     // Add styling hook
