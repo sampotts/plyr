@@ -113,9 +113,8 @@
 
         // Fullscreen settings
         fullscreen: {
-            enabled: true,
-            fallback: true,
-            allowAudio: false,
+            enabled: true, // Allow fullscreen?
+            fallback: true, // Fallback for vintage browsers
         },
 
         // Local storage
@@ -316,14 +315,13 @@
             fullscreen: {
                 enabled: 'plyr--fullscreen-enabled',
                 fallback: 'plyr--fullscreen-fallback',
-                active: 'plyr--fullscreen-active',
             },
             pip: {
-                enabled: 'plyr--pip-enabled',
+                supported: 'plyr--pip-supported',
                 active: 'plyr--pip-active',
             },
             airplay: {
-                enabled: 'plyr--airplay-enabled',
+                supported: 'plyr--airplay-supported',
                 active: 'plyr--airplay-active',
             },
             tabFocus: 'tab-focus',
@@ -2368,36 +2366,29 @@
 
         // Setup fullscreen
         function setupFullscreen() {
-            if (!player.supported.full) {
+            if (!player.supported.full || player.type === 'audio' || !player.config.fullscreen.enabled) {
                 return;
             }
 
-            if ((player.type !== 'audio' || player.config.fullscreen.allowAudio) && player.config.fullscreen.enabled) {
-                // Check for native support
-                var nativeSupport = support.fullscreen;
+            // Check for native support
+            var nativeSupport = support.fullscreen;
 
-                if (nativeSupport || (player.config.fullscreen.fallback && !utils.inFrame())) {
-                    log((nativeSupport ? 'Native' : 'Fallback') + ' fullscreen enabled');
+            if (nativeSupport || (player.config.fullscreen.fallback && !utils.inFrame())) {
+                log((nativeSupport ? 'Native' : 'Fallback') + ' fullscreen enabled');
 
-                    // Add styling hook
-                    if (!nativeSupport) {
-                        utils.toggleClass(player.elements.container, player.config.classNames.fullscreen.fallback, true);
-                    }
-
-                    // Add styling hook
-                    utils.toggleClass(player.elements.container, player.config.classNames.fullscreen.enabled, true);
-                } else {
-                    log('Fullscreen not supported and fallback disabled');
-                }
-
-                // Toggle state
-                if (player.elements.buttons && player.elements.buttons.fullscreen) {
-                    utils.toggleState(player.elements.buttons.fullscreen, false);
-                }
-
-                // Setup focus trap
-                focusTrap();
+                // Add styling hook to show button
+                utils.toggleClass(player.elements.container, player.config.classNames.fullscreen.enabled, true);
+            } else {
+                log('Fullscreen not supported and fallback disabled');
             }
+
+            // Toggle state
+            if (player.elements.buttons && player.elements.buttons.fullscreen) {
+                utils.toggleState(player.elements.buttons.fullscreen, false);
+            }
+
+            // Setup focus trap
+            focusTrap();
         }
 
         // Setup captions
@@ -2892,14 +2883,14 @@
                 // Check for picture-in-picture support
                 utils.toggleClass(
                     player.elements.container,
-                    player.config.classNames.pip.enabled,
+                    player.config.classNames.pip.supported,
                     support.pip && player.type === 'video'
                 );
 
                 // Check for airplay support
                 utils.toggleClass(
                     player.elements.container,
-                    player.config.classNames.airplay.enabled,
+                    player.config.classNames.airplay.supported,
                     support.airplay && utils.inArray(types.html5, player.type)
                 );
 
@@ -3916,11 +3907,6 @@
                 // Restore class hooks
                 utils.toggleClass(
                     player.elements.container,
-                    player.config.classNames.fullscreen.active,
-                    player.fullscreen.active
-                );
-                utils.toggleClass(
-                    player.elements.container,
                     player.config.classNames.captions.active,
                     player.captions.enabled
                 );
@@ -4239,10 +4225,8 @@
             });
 
             // Fullscreen
-            utils.proxy(player.elements.buttons.fullscreen, 'click', player.config.listeners.fullscreen, function(
-                event
-            ) {
-                player.toggleFullscreen(event);
+            utils.proxy(player.elements.buttons.fullscreen, 'click', player.config.listeners.fullscreen, function() {
+                player.toggleFullscreen();
             });
 
             // Picture-in-Picture
@@ -4398,9 +4382,7 @@
 
             // Handle user exiting fullscreen by escaping etc
             if (support.fullscreen) {
-                utils.on(document, fullscreen.eventType, function(event) {
-                    player.toggleFullscreen(event);
-                });
+                utils.on(document, fullscreen.eventType, function(event) { player.toggleFullscreen(event); });
             }
         }
 
@@ -5396,32 +5378,14 @@
     Plyr.prototype.toggleFullscreen = function(event) {
         var player = this;
 
-        // Save scroll position
-        function saveScrollPosition() {
-            scroll = {
-                x: window.pageXOffset || 0,
-                y: window.pageYOffset || 0,
-            };
-        }
-
-        // Restore scroll position
-        function restoreScrollPosition() {
-            window.scrollTo(scroll.x, scroll.y);
-        }
-
         // Check for native support
-        var nativeSupport = support.fullscreen;
-
-        if (nativeSupport) {
+        if (support.fullscreen) {
             // If it's a fullscreen change event, update the UI
             if (utils.is.event(event) && event.type === fullscreen.eventType) {
                 player.fullscreen.active = fullscreen.isFullScreen(player.elements.container);
             } else {
                 // Else it's a user request to enter or exit
-                if (!fullscreen.isFullScreen(player.elements.container)) {
-                    // Save scroll position
-                    saveScrollPosition();
-
+                if (!player.fullscreen.active) {
                     // Request full screen
                     fullscreen.requestFullScreen(player.elements.container);
                 } else {
@@ -5438,16 +5402,22 @@
             // Otherwise, it's a simple toggle
             player.fullscreen.active = !player.fullscreen.active;
 
+            // Add class hook
+            utils.toggleClass(player.elements.container, player.config.classNames.fullscreen.fallback, player.fullscreen.active);
+
+            // Make sure we don't lose scroll position
+            if (player.fullscreen.active) {
+                scroll = {
+                    x: window.pageXOffset || 0,
+                    y: window.pageYOffset || 0,
+                };
+            } else {
+                window.scrollTo(scroll.x, scroll.y);
+            }
+
             // Bind/unbind escape key
             document.body.style.overflow = player.fullscreen.active ? 'hidden' : '';
         }
-
-        // Set class hook
-        utils.toggleClass(
-            player.elements.container,
-            player.config.classNames.fullscreen.active,
-            player.fullscreen.active
-        );
 
         // Set button state
         if (player.elements.buttons && player.elements.buttons.fullscreen) {
@@ -5455,12 +5425,7 @@
         }
 
         // Trigger an event
-        player.core.trigger(player.media, player.fullscreen.active ? 'enterfullscreen' : 'exitfullscreen', true);
-
-        // Restore scroll position
-        if (!player.fullscreen.active && nativeSupport) {
-            restoreScrollPosition();
-        }
+        player.core.trigger(player.media, player.fullscreen.active ? 'enterfullscreen' : 'exitfullscreen');
 
         // Allow chaining
         return player;

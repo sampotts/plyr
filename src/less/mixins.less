@@ -27,3 +27,46 @@
     border-color: @plyr-range-thumb-active-border-color;
     transform: scale(@plyr-range-thumb-active-scale);
 }
+
+// Fullscreen styles
+.plyr-fullscreen-active() {
+    height: 100%;
+    width: 100%;
+    background: #000;
+    border-radius: 0 !important;
+
+    video {
+        height: 100%;
+    }
+    .plyr__video-wrapper {
+        height: 100%;
+        width: 100%;
+    }
+    .plyr__video-embed {
+        // Revert overflow change
+        overflow: visible;
+    }
+
+    // Vimeo requires some different styling
+    &.plyr--vimeo .plyr__video-wrapper {
+        height: 0;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    // Display correct icon
+    .plyr__control .icon--exit-fullscreen {
+        display: block;
+
+        + svg {
+            display: none;
+        }
+    }
+
+    // Large captions in full screen on larger screens
+    @media (min-width: @plyr-bp-screen-lg) {
+        .plyr__captions {
+            font-size: @plyr-font-size-captions-large;
+        }
+    }
+}

@@ -308,12 +308,6 @@
 .plyr--hide-controls .plyr__captions {
     transform: translateY(-(@plyr-control-spacing * 1.5));
 }
-// Large captions in full screen on larger screens
-@media (min-width: @plyr-bp-screen-lg) {
-    .plyr--fullscreen-active .plyr__captions {
-        font-size: @plyr-font-size-captions-large;
-    }
-}
 
 // Controls
 // --------------------------------------------------------------
@@ -409,7 +403,7 @@
     right: 0;
     bottom: 0;
     z-index: 2;
-    padding: (@plyr-control-spacing * 3.5) @plyr-control-spacing @plyr-control-spacing;
+    padding: (@plyr-control-spacing * 3.5) (@plyr-control-spacing + 2) @plyr-control-spacing;
     background: linear-gradient(fade(@plyr-video-controls-bg, 0%), fade(@plyr-video-controls-bg, 70%));
     border-bottom-left-radius: inherit;
     border-bottom-right-radius: inherit;
@@ -506,7 +500,6 @@
 }
 
 // Change icons on state change
-.plyr--fullscreen-active .plyr__control .icon--exit-fullscreen,
 .plyr--muted .plyr__control .icon--muted,
 .plyr--captions-active .plyr__control .icon--captions-on {
     display: block;
@@ -518,15 +511,15 @@
 
 // Some options are hidden by default
 .plyr [data-plyr='captions'],
-.plyr [data-plyr='fullscreen'],
 .plyr [data-plyr='pip'],
-.plyr [data-plyr='airplay'] {
+.plyr [data-plyr='airplay'],
+.plyr [data-plyr='fullscreen'] {
     display: none;
 }
 .plyr--captions-enabled [data-plyr='captions'],
-.plyr--fullscreen-enabled [data-plyr='fullscreen'],
-.plyr--pip-enabled [data-plyr='pip'],
-.plyr--airplay-enabled [data-plyr='airplay'] {
+.plyr--pip-supported [data-plyr='pip'],
+.plyr--airplay-supported [data-plyr='airplay'],
+.plyr--fullscreen-enabled [data-plyr='fullscreen'] {
     display: inline-block;
 }
 
@@ -922,34 +915,23 @@
 
 // Fullscreen
 // --------------------------------------------------------------
-.plyr--fullscreen-active {
-    height: 100%;
-    width: 100%;
-    background: #000;
-    border-radius: 0 !important;
-
-    video {
-        height: 100%;
-    }
-    .plyr__video-wrapper {
-        height: 100%;
-        width: 100%;
-    }
-    .plyr__video-embed {
-        // Revert overflow change
-        overflow: visible;
-    }
-
-    // Vimeo requires some different styling
-    &.plyr--vimeo .plyr__video-wrapper {
-        height: 0;
-        top: 50%;
-        transform: translateY(-50%);
-    }
+.plyr:fullscreen {
+    .plyr-fullscreen-active();
+}
+.plyr:-webkit-full-screen {
+    .plyr-fullscreen-active();
+}
+.plyr:-moz-full-screen {
+    .plyr-fullscreen-active();
+}
+.plyr:-ms-fullscreen {
+    .plyr-fullscreen-active();
 }
 
 // Fallback for unsupported browsers
-.plyr--fullscreen-fallback.plyr--fullscreen-active {
+.plyr--fullscreen-fallback {
+    .plyr-fullscreen-active();
+
     position: fixed;
     top: 0;
     left: 0;
