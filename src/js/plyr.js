@@ -471,6 +471,7 @@
                 isFirefox: isFirefox,
                 isChrome: isChrome,
                 isSafari: isSafari,
+                isWebkit: 'WebkitAppearance' in document.documentElement.style,
                 isIPhone: /(iPhone|iPod)/gi.test(navigator.platform),
                 isIos: /(iPad|iPhone|iPod)/gi.test(navigator.platform),
             };
@@ -1429,6 +1430,45 @@
             }
         }
 
+        // Webkit polyfill for lower fill range
+        function updateRangeFill(range) {
+            if (!player.browser.isWebkit) {
+                return;
+            }
+
+            if (!utils.is.htmlElement(range)) {
+                return;
+            }
+
+            // Inject the stylesheet if needed
+            if (!utils.is.htmlElement(player.elements.styleSheet)) {
+                player.elements.styleSheet = utils.createElement('style');
+                player.elements.container.appendChild(player.elements.styleSheet);
+            }
+
+            var styleSheet = player.elements.styleSheet.sheet;
+            var percentage = (range.value / range.max) * 100;
+            var selector = '#' + range.id + '::-webkit-slider-runnable-track';
+            var styles = '{ background-image: linear-gradient(to right, currentColor ' + percentage + '%, transparent ' + percentage + '%) }';
+            var index = -1;
+
+            // Find old rule if it exists
+            [].some.call(styleSheet.rules, function(rule, i) {
+                if (rule.selectorText === selector) {
+                    index = i;
+                    return true;
+                }
+            })[0];
+
+            // Remove old rule
+            if (index !== -1) {
+                styleSheet.deleteRule(index);
+            }
+
+            // Insert new one
+            styleSheet.insertRule([selector, styles].join(' '));
+        }
+
         // Get icon URL
         function getIconUrl() {
             return {
@@ -1605,7 +1645,7 @@
                         type: 'range',
                         min: 0,
                         max: 100,
-                        step: 0.1,
+                        step: 0.01,
                         value: 0,
                         autocomplete: 'off',
                     },
@@ -1738,13 +1778,10 @@
                 container.appendChild(seek.label);
                 container.appendChild(seek.input);
 
-                // TODO: Add loop display indicator
-
-                // Played progress
-                container.appendChild(createProgress('played'));
-
                 // Buffer progress
                 container.appendChild(createProgress('buffer'));
+
+                // TODO: Add loop display indicator
 
                 // Seek tooltip
                 if (player.config.tooltips.seek) {
@@ -1802,10 +1839,6 @@
                 );
                 volume.appendChild(range.label);
                 volume.appendChild(range.input);
-
-                // Create the display progress
-                var progress = createProgress('volume', attributes);
-                volume.appendChild(progress);
 
                 controls.appendChild(volume);
             }
@@ -2701,8 +2734,6 @@
                 // Display
                 player.elements.display = {
                     buffer: getElement(player.config.selectors.display.buffer),
-                    played: getElement(player.config.selectors.display.played),
-                    volume: getElement(player.config.selectors.display.volume),
                     duration: getElement(player.config.selectors.display.duration),
                     currentTime: getElement(player.config.selectors.display.currentTime),
                 };
@@ -3043,7 +3074,6 @@
                         // Get current quality
                         player.media.quality = instance.getPlaybackQuality();
 
-                        // Trigger timeupdate
                         trigger(player.media, 'qualitychange');
                     },
                     onPlaybackRateChange: function(event) {
@@ -3053,7 +3083,6 @@
                         // Get current speed
                         player.media.playbackRate = instance.getPlaybackRate();
 
-                        // Trigger timeupdate
                         trigger(player.media, 'ratechange');
                     },
                     onReady: function(event) {
@@ -3097,10 +3126,7 @@
                         // Update UI
                         embedReady();
 
-                        // Trigger timeupdate
                         trigger(player.media, 'timeupdate');
-
-                        // Trigger timeupdate
                         trigger(player.media, 'durationchange');
 
                         // Reset timer
@@ -3177,10 +3203,7 @@
 
                                 // Poll to get playback progress
                                 timers.playing = window.setInterval(function() {
-                                    // Set the current time
                                     player.media.currentTime = instance.getCurrentTime();
-
-                                    // Trigger timeupdate
                                     trigger(player.media, 'timeupdate');
                                 }, 100);
 
@@ -3248,15 +3271,11 @@
 
             player.embed.getCurrentTime().then(function(value) {
                 player.media.currentTime = value;
-
-                // Trigger timeupdate
                 trigger(player.media, 'timeupdate');
             });
 
             player.embed.getDuration().then(function(value) {
                 player.media.duration = value;
-
-                // Trigger timeupdate
                 trigger(player.media, 'durationchange');
             });
 
@@ -3358,8 +3377,6 @@
 
                 player.embed.getPosition(function(value) {
                     player.media.currentTime = value;
-
-                    // Trigger timeupdate
                     trigger(player.media, 'timeupdate');
                 });
 
@@ -3554,10 +3571,7 @@
                 var value = player.media.muted ? 0 : player.media.volume;
 
                 if (player.elements.inputs.volume) {
-                    player.elements.inputs.volume.value = value;
-                }
-                if (player.elements.display.volume) {
-                    player.elements.display.volume.value = value;
+                    setRange(player.elements.inputs.volume, value);
                 }
             }
 
@@ -3592,78 +3606,28 @@
             }, player.loading ? 250 : 0);
         }
 
-        // Update <progress> elements
-        function updateProgress(event) {
-            if (!player.supported.full) {
+        // Update seek value and lower fill
+        function setRange(range, value) {
+            if (!utils.is.htmlElement(range)) {
                 return;
             }
 
-            var progress = player.elements.display.played;
-            var value = 0;
-            var duration = player.getDuration();
+            range.value = value;
 
-            if (event) {
-                switch (event.type) {
-                    // Video playing
-                    case 'timeupdate':
-                    case 'seeking':
-                        value = utils.getPercentage(player.media.currentTime, duration);
-
-                        // Set seek range value only if it's a 'natural' time event
-                        if (event.type === 'timeupdate' && player.elements.inputs.seek) {
-                            player.elements.inputs.seek.value = value;
-                        }
-
-                        break;
-
-                    // Check buffer status
-                    case 'playing':
-                    case 'progress':
-                        progress = player.elements.display.buffer;
-                        value = (function() {
-                            var buffered = player.media.buffered;
-
-                            if (buffered && buffered.length) {
-                                // HTML5
-                                return utils.getPercentage(buffered.end(0), duration);
-                            } else if (utils.is.number(buffered)) {
-                                // YouTube returns between 0 and 1
-                                return buffered * 100;
-                            }
-
-                            return 0;
-                        })();
-
-                        break;
-                }
-            }
-
-            // TODO: Loop - this shouldn't be here
-            /*if (utils.is.number(player.config.loop.start) && utils.is.number(player.config.loop.end) && player.media.currentTime >= player.config.loop.end) {
-                console.warn('Looping');
-                player.seek(player.config.loop.start);
-            }*/
-
-            setProgress(progress, value);
+            // Webkit range fill
+            updateRangeFill(range);
         }
 
         // Set <progress> value
         function setProgress(progress, value) {
-            if (!player.supported.full) {
-                return;
-            }
-
             // Default to 0
             if (utils.is.undefined(value)) {
                 value = 0;
             }
+
             // Default to buffer or bail
             if (utils.is.undefined(progress)) {
-                if (utils.is.htmlElement(player.elements.display.buffer)) {
-                    progress = player.elements.display.buffer;
-                } else {
-                    return;
-                }
+                progress = player.elements.display.buffer;
             }
 
             // Update value and label
@@ -3678,10 +3642,63 @@
             }
         }
 
+        // Update <progress> elements
+        function updateProgress(event) {
+            if (!player.supported.full) {
+                return;
+            }
+
+            var value = 0;
+            var duration = player.getDuration();
+
+            if (event) {
+                switch (event.type) {
+                    // Video playing
+                    case 'timeupdate':
+                    case 'seeking':
+                        value = utils.getPercentage(player.media.currentTime, duration);
+
+                        // Set seek range value only if it's a 'natural' time event
+                        if (event.type === 'timeupdate') {
+                            setRange(player.elements.inputs.seek, value);
+                        }
+
+                        break;
+
+                    // Check buffer status
+                    case 'playing':
+                    case 'progress':
+                        value = (function() {
+                            var buffered = player.media.buffered;
+
+                            if (buffered && buffered.length) {
+                                // HTML5
+                                return utils.getPercentage(buffered.end(0), duration);
+                            } else if (utils.is.number(buffered)) {
+                                // YouTube returns between 0 and 1
+                                return buffered * 100;
+                            }
+
+                            return 0;
+                        })();
+
+                        setProgress(player.elements.display.buffer, value);
+
+                        break;
+                }
+            }
+
+            // TODO: Loop - this shouldn't be here
+            /*if (utils.is.number(player.config.loop.start) && utils.is.number(player.config.loop.end) && player.media.currentTime >= player.config.loop.end) {
+                console.warn('Looping');
+                player.seek(player.config.loop.start);
+            }*/
+        }
+
         // Update the displayed time
         function updateTimeDisplay(time, element) {
             // Bail if there's no duration display
-            if (!element) {
+            if (!utils.is.htmlElement(element)) {
                 return;
             }
 
@@ -3749,27 +3766,6 @@
             updateProgress(event);
         }
 
-        // Update seek range and progress
-        function updateSeekDisplay(time) {
-            // Default to 0
-            if (!utils.is.number(time)) {
-                time = 0;
-            }
-
-            var duration = player.getDuration();
-            var value = utils.getPercentage(time, duration);
-
-            // Update progress
-            if (player.elements.progress && player.elements.display.played) {
-                player.elements.display.played.value = value;
-            }
-
-            // Update seek range input
-            if (player.elements.buttons && player.elements.inputs.seek) {
-                player.elements.inputs.seek.value = value;
-            }
-        }
-
         // Update hover tooltip for seeking
         function updateSeekTooltip(event) {
             var duration = player.getDuration();
@@ -3828,17 +3824,13 @@
                 return;
             }
 
-            // Update seek range and progress
-            updateSeekDisplay();
-
-            // Reset buffer progress
-            setProgress();
-
             // Cancel current network requests
             cancelRequests();
 
             // Destroy instance and re-setup
             player.destroy(function() {
+                // TODO: Reset menus here
+
                 // Remove elements
                 removeElement(player.media);
                 removeElement('captions');
@@ -3977,7 +3969,7 @@
                 var target = player.elements.buttons[play ? 'pause' : 'play'];
 
                 // Transfer focus
-                if (target) {
+                if (utils.is.htmlElement(target)) {
                     target.focus();
                 }
             }
@@ -4262,11 +4254,12 @@
             // Click anywhere closes menu
             utils.on(document.documentElement, 'click', toggleMenu);
 
-            // Show tab in menu
-            utils.on(player.elements.settings.form, 'click', showTab);
-
-            // Settings menu items - use event delegation as items are added/removed
+            // Settings menu
             utils.on(player.elements.settings.form, 'click', function(event) {
+                // Show tab in menu
+                showTab(event);
+
+                // Settings menu items - use event delegation as items are added/removed
                 // Settings - Language
                 if (utils.matches(event.target, player.config.selectors.inputs.language)) {
                     handlerProxy.call(this, event, player.config.listeners.language, function() {
@@ -4306,10 +4299,17 @@
                 player.seek(event.target.value / event.target.max * duration);
             });
 
-            // Seek
+            // Volume
             utils.proxy(player.elements.inputs.volume, inputEvent, player.config.listeners.volume, function() {
                 player.setVolume(event.target.value);
             });
+
+            // Polyfill for lower fill in <input type="range"> for webkit
+            if (player.browser.isWebkit) {
+                utils.on(getElements('input[type="range"]'), [inputEvent, 'updated'].join(' '), function(event) {
+                    updateRangeFill(event.target);
+                });
+            }
 
             // Seek tooltip
             utils.on(player.elements.progress, 'mouseenter mouseleave mousemove', updateSeekTooltip);
@@ -4789,7 +4789,6 @@
             setupCaptions: setupCaptions,
             toggleNativeControls: toggleNativeControls,
             updateTimeDisplay: updateTimeDisplay,
-            updateSeekDisplay: updateSeekDisplay,
             updateSource: updateSource,
             toggleMenu: toggleMenu,
             timers: timers,
@@ -4925,9 +4924,6 @@
             targetTime = duration;
         }
 
-        // Update seek range and progress
-        player.core.updateSeekDisplay(targetTime);
-
         // Set the current time
         // Embeds
         if (utils.inArray(types.embed, player.type)) {
@@ -4948,9 +4944,6 @@
             if (paused) {
                 player.pause();
             }
-
-            // Trigger timeupdate
-            player.core.trigger(player.media, 'timeupdate');
 
             // Set seeking flag
             player.media.seeking = true;
@@ -5196,7 +5189,7 @@
                     player.config.loop.end = null;
                 }
                 player.config.loop.start = currentTime;
-                player.config.loop.indicator.start = player.elements.display.played.value;
+                //player.config.loop.indicator.start = player.elements.display.played.value;
                 break;
 
             case 'end':
@@ -5204,7 +5197,7 @@
                     return;
                 }
                 player.config.loop.end = currentTime;
-                player.config.loop.indicator.end = player.elements.display.played.value;
+                //player.config.loop.indicator.end = player.elements.display.played.value;
                 break;
 
             case 'all':

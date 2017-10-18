@@ -3,19 +3,7 @@
     "env": {
         "browser": true
     },
-    "globals": {
-        "engine": true,
-        "Modernizr": false,
-        "ga": false,
-        "mixpanel": false,
-        "moment": false,
-        "fullscreen": false,
-        "Raven": false,
-        "templates": false,
-        "Hogan": false,
-        "locale_json": false,
-        "bootbox": false
-    },
+    "globals": {},
     "rules": {
         "no-const-assign": 1,
         "no-this-before-super": 1,
