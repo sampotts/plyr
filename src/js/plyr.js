@@ -1432,11 +1432,18 @@
 
         // Webkit polyfill for lower fill range
         function updateRangeFill(range) {
+            // WebKit only
             if (!player.browser.isWebkit) {
                 return;
             }
 
-            if (!utils.is.htmlElement(range)) {
+            // Get target from event
+            if (utils.is.event(range)) {
+                range = range.target;
+            }
+
+            // Needs to be a valid <input type='range'>
+            if (!utils.is.htmlElement(range) || range.getAttribute('type') !== 'range') {
                 return;
             }
 
@@ -4306,9 +4313,7 @@
 
             // Polyfill for lower fill in <input type="range"> for webkit
             if (player.browser.isWebkit) {
-                utils.on(getElements('input[type="range"]'), [inputEvent, 'updated'].join(' '), function(event) {
-                    updateRangeFill(event.target);
-                });
+                utils.on(getElements('input[type="range"]'), 'input', updateRangeFill);
             }
 
             // Seek tooltip
