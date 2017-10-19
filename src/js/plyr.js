@@ -753,6 +753,9 @@
 
         // Trigger events, with plyr instance passed
         function _triggerEvent(element, type, bubbles, properties) {
+            if (type === 'ended' && _getDuration() === 0) {
+                return;
+            }
             _event(element, type, bubbles, _extend({}, properties, {
                 plyr: api
             }));
@@ -2036,7 +2039,6 @@
                         switch (event.data) {
                             case 0:
                                 plyr.media.paused = true;
-                                console.log('on state change ended');
                                 _triggerEvent(plyr.media, 'ended');
                                 break;
 
@@ -2171,7 +2173,6 @@
             });
 
             plyr.embed.on('ended', function() {
-                console.log('embed ended');
                 plyr.media.paused = true;
                 _triggerEvent(plyr.media, 'ended');
             });
@@ -2245,7 +2246,6 @@
 
                 plyr.embed.bind(window.SC.Widget.Events.FINISH, function() {
                     plyr.media.paused = true;
-                    console.log('window.SC.Widget.Events.FINISH');
                     _triggerEvent(plyr.media, 'ended');
                 });
             });
@@ -4057,7 +4057,6 @@
 
             // Handle the media finishing
             _on(plyr.media, 'ended', function() {
-                console.log('media listener ended');
                 // Show poster on end
                 if (plyr.type === 'video' && config.showPosterOnEnd) {
                     // Clear
@@ -4144,7 +4143,10 @@
             // Set blank video src attribute
             // This is to prevent a MEDIA_ERR_SRC_NOT_SUPPORTED error
             // Info: http://stackoverflow.com/questions/32231579/how-to-properly-dispose-of-an-html5-video-and-close-socket-or-connection
+            console.log(plyr.media);
             plyr.media.setAttribute('src', 'https://cdn.selz.com/plyr/blank.mp4');
+
+
 
             // Load the new empty source
             // This will cancel existing requests
