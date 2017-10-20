@@ -753,6 +753,12 @@
 
         // Trigger events, with plyr instance passed
         function _triggerEvent(element, type, bubbles, properties) {
+            // As _cancelRequest set empty video in source attribute
+            // this will trigger video ended in IE, Edge 
+            // cause unexpected behavior
+            if (type === 'ended' && _getDuration() === 0) {
+                return;
+            }
             _event(element, type, bubbles, _extend({}, properties, {
                 plyr: api
             }));
@@ -2036,7 +2042,6 @@
                         switch (event.data) {
                             case 0:
                                 plyr.media.paused = true;
-                                console.log('on state change ended');
                                 _triggerEvent(plyr.media, 'ended');
                                 break;
 
@@ -2171,7 +2176,6 @@
             });
 
             plyr.embed.on('ended', function() {
-                console.log('embed ended');
                 plyr.media.paused = true;
                 _triggerEvent(plyr.media, 'ended');
             });
@@ -2245,7 +2249,6 @@
 
                 plyr.embed.bind(window.SC.Widget.Events.FINISH, function() {
                     plyr.media.paused = true;
-                    console.log('window.SC.Widget.Events.FINISH');
                     _triggerEvent(plyr.media, 'ended');
                 });
             });
@@ -4057,7 +4060,6 @@
 
             // Handle the media finishing
             _on(plyr.media, 'ended', function() {
-                console.log('media listener ended');
                 // Show poster on end
                 if (plyr.type === 'video' && config.showPosterOnEnd) {
                     // Clear
