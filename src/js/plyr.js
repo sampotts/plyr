@@ -753,6 +753,7 @@
 
         // Trigger events, with plyr instance passed
         function _triggerEvent(element, type, bubbles, properties) {
+            // prevent ended event when _cancelRequest funciton set source attribute to empty video in IE, Edge
             if (type === 'ended' && _getDuration() === 0) {
                 return;
             }
@@ -4143,7 +4144,6 @@
             // Set blank video src attribute
             // This is to prevent a MEDIA_ERR_SRC_NOT_SUPPORTED error
             // Info: http://stackoverflow.com/questions/32231579/how-to-properly-dispose-of-an-html5-video-and-close-socket-or-connection
-            console.log(plyr.media);
             plyr.media.setAttribute('src', 'https://cdn.selz.com/plyr/blank.mp4');
 
 
