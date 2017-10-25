@@ -48,9 +48,6 @@
     // Expose for testing
     window.player = player;
 
-    // Load demo sprite
-    window.loadSprite('dist/demo.svg', 'demo-sprite');
-
     // Setup type toggle
     var buttons = document.querySelectorAll('[data-source]');
     var types = {

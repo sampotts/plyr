@@ -42,7 +42,6 @@ var paths = {
         src: {
             less: path.join(root, 'demo/src/less/**/*'),
             js: path.join(root, 'demo/src/js/**/*'),
-            sprite: path.join(root, 'demo/src/sprite/**/*'),
         },
 
         // Output paths
@@ -157,7 +156,6 @@ build.sprite('plyr');
 // Demo files
 build.less(bundles.demo.less, 'demo');
 build.js(bundles.demo.js, 'demo');
-build.sprite('demo');
 
 // Build all JS
 gulp.task('js', function() {
@@ -179,7 +177,6 @@ gulp.task('watch', function() {
     // Demo
     gulp.watch(paths.demo.src.js, tasks.js);
     gulp.watch(paths.demo.src.less, tasks.less);
-    gulp.watch(paths.demo.src.sprite, tasks.sprite);
 });
 
 // Default gulp task

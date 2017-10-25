@@ -15,12 +15,7 @@
             "demo.css": "demo/src/less/bundle.less"
         },
         "js": {
-            "demo.js": [
-                "demo/src/js/lib/classlist.js",
-                "demo/src/js/lib/tab-focus.js",
-                "demo/src/js/lib/sprite.js",
-                "demo/src/js/main.js"
-            ]
+            "demo.js": ["demo/src/js/lib/classlist.js", "demo/src/js/lib/tab-focus.js", "demo/src/js/main.js"]
         }
     }
 }

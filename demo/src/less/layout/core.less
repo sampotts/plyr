@@ -27,12 +27,24 @@ main {
 }
 
 aside {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 100%;
     padding: (@spacing-base * 0.75);
     background: #fff;
     text-align: center;
     color: @gray;
     text-shadow: none;
+
+    .icon {
+        margin-right: (@spacing-base / 2);
+        fill: @color-twitter;
+    }
+
+    p {
+        margin: 0;
+    }
 
     a {
         color: @color-twitter;
