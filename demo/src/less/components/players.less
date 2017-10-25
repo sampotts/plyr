@@ -11,13 +11,11 @@ video {
 // Example players
 .plyr {
     margin: 0 auto;
-    border-radius: @border-radius-large;
-}
-.plyr--audio {
-    max-width: @example-width-audio;
+    border-radius: @border-radius-base;
+    box-shadow: 0 2px 5px fade(#000, 20%);
 }
 .plyr__video-wrapper::after {
-    content: "";
+    content: '';
     pointer-events: none;
     position: absolute;
     top: 0;
@@ -31,10 +29,10 @@ video {
 // Style full supported player
 .plyr__cite {
     display: none;
-    margin-top: @padding-base;
+    margin-top: @spacing-base;
 
     .icon {
-        margin-right: (@padding-base / 4);
+        margin-right: (@spacing-base / 4);
     }
 }
 

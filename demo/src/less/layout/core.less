@@ -1,0 +1,44 @@
+// ==========================================================================
+// Core
+// ==========================================================================
+
+html {
+    background: @page-background;
+    background-attachment: fixed;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+main {
+    text-align: center;
+}
+
+.grid {
+    flex: 1;
+}
+
+aside {
+    width: 100%;
+    padding: (@spacing-base * 0.75);
+    background: #fff;
+    text-align: center;
+    color: @gray;
+    text-shadow: none;
+
+    a {
+        color: @color-twitter;
+
+        &.tab-focus {
+            .tab-focus(@color-twitter);
+        }
+    }
+}

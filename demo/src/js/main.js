@@ -7,6 +7,14 @@
 /*global Plyr*/
 
 (function() {
+    if (window.shr) {
+        window.shr.setup({
+            count: {
+                classname: 'button__count',
+            },
+        });
+    }
+
     /*document.body.addEventListener('ready', function(event) {
         console.log(event);
     });*/
@@ -17,10 +25,10 @@
         title: 'View From A Blue Moon',
         iconUrl: '../dist/plyr.svg',
         tooltips: {
-            controls: true
+            controls: true,
         },
         captions: {
-            defaultActive: true
+            defaultActive: true,
         },
         controls: [
             'play-large',
@@ -33,8 +41,8 @@
             'settings',
             'fullscreen',
             'pip',
-            'airplay'
-        ]
+            'airplay',
+        ],
     });
 
     // Expose for testing
@@ -49,7 +57,7 @@
         video: 'video',
         audio: 'audio',
         youtube: 'youtube',
-        vimeo: 'vimeo'
+        vimeo: 'vimeo',
     };
     var currentType = window.location.hash.replace('#', '');
     var historySupport = window.history && window.history.pushState;
@@ -64,7 +72,7 @@
             if (historySupport) {
                 history.pushState(
                     {
-                        type: type
+                        type: type,
                     },
                     '',
                     '#' + type
@@ -93,7 +101,7 @@
         if (currentType in types) {
             history.replaceState(
                 {
-                    type: currentType
+                    type: currentType,
                 },
                 '',
                 video ? '' : '#' + currentType
@@ -109,12 +117,7 @@
     // Toggle class on an element
     function toggleClass(element, className, state) {
         if (element) {
-            if (element.classList) {
-                element.classList[state ? 'add' : 'remove'](className);
-            } else {
-                var name = (' ' + element.className + ' ').replace(/\s+/g, ' ').replace(' ' + className + ' ', '');
-                element.className = name + (state ? ' ' + className : '');
-            }
+            element.classList[state ? 'add' : 'remove'](className);
         }
     }
 
@@ -133,8 +136,8 @@
                     sources: [
                         {
                             src: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.mp4',
-                            type: 'video/mp4'
-                        }
+                            type: 'video/mp4',
+                        },
                     ],
                     poster: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.jpg',
                     tracks: [
@@ -143,15 +146,15 @@
                             label: 'English',
                             srclang: 'en',
                             src: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.en.vtt',
-                            default: true
+                            default: true,
                         },
                         {
                             kind: 'captions',
                             label: 'French',
                             srclang: 'fr',
-                            src: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.fr.vtt'
-                        }
-                    ]
+                            src: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.fr.vtt',
+                        },
+                    ],
                 });
                 break;
 
@@ -162,13 +165,13 @@
                     sources: [
                         {
                             src: 'https://cdn.plyr.io/static/demo/Kishi_Bashi_-_It_All_Began_With_a_Burst.mp3',
-                            type: 'audio/mp3'
+                            type: 'audio/mp3',
                         },
                         {
                             src: 'https://cdn.plyr.io/static/demo/Kishi_Bashi_-_It_All_Began_With_a_Burst.ogg',
-                            type: 'audio/ogg'
-                        }
-                    ]
+                            type: 'audio/ogg',
+                        },
+                    ],
                 });
                 break;
 
@@ -179,9 +182,9 @@
                     sources: [
                         {
                             src: 'https://www.youtube.com/watch?v=bTqVqk7FSmY',
-                            type: 'youtube'
-                        }
-                    ]
+                            type: 'youtube',
+                        },
+                    ],
                 });
                 break;
 
@@ -192,9 +195,9 @@
                     sources: [
                         {
                             src: 'https://vimeo.com/76979871',
-                            type: 'vimeo'
-                        }
-                    ]
+                            type: 'vimeo',
+                        },
+                    ],
                 });
                 break;
         }
@@ -208,7 +211,7 @@
         }
 
         // Set active on parent
-        toggleClass(document.querySelector('[data-source="' + type + '"]').parentElement, 'active', true);
+        toggleClass(document.querySelector('[data-source="' + type + '"]'), 'active', true);
 
         // Show cite
         [].forEach.call(document.querySelectorAll('.plyr__cite'), function(cite) {

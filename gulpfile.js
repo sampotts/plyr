@@ -77,58 +77,52 @@ function loadJSON(path) {
 
 var build = {
     js: function(files, bundle) {
-        for (var key in files) {
-            (function(key) {
-                var name = 'js-' + key;
-                tasks.js.push(name);
+        Object.keys(files).forEach(function(key) {
+            var name = 'js-' + key;
+            tasks.js.push(name);
 
-                gulp.task(name, function() {
-                    return gulp
-                        .src(bundles[bundle].js[key])
-                        .pipe(concat(key))
-                        .pipe(uglify())
-                        .pipe(gulp.dest(paths[bundle].output));
-                });
-            })(key);
-        }
+            gulp.task(name, function() {
+                return gulp
+                    .src(bundles[bundle].js[key])
+                    .pipe(concat(key))
+                    .pipe(uglify())
+                    .pipe(gulp.dest(paths[bundle].output));
+            });
+        });
     },
     less: function(files, bundle) {
-        for (var key in files) {
-            (function(key) {
-                var name = 'less-' + key;
-                tasks.less.push(name);
+        Object.keys(files).forEach(function(key) {
+            var name = 'less-' + key;
+            tasks.less.push(name);
 
-                gulp.task(name, function() {
-                    return gulp
-                        .src(bundles[bundle].less[key])
-                        .pipe(less())
-                        .on('error', gutil.log)
-                        .pipe(concat(key))
-                        .pipe(prefix(['last 2 versions'], { cascade: false }))
-                        .pipe(cleanCSS())
-                        .pipe(gulp.dest(paths[bundle].output));
-                });
-            })(key);
-        }
+            gulp.task(name, function() {
+                return gulp
+                    .src(bundles[bundle].less[key])
+                    .pipe(less())
+                    .on('error', gutil.log)
+                    .pipe(concat(key))
+                    .pipe(prefix(['last 2 versions'], { cascade: false }))
+                    .pipe(cleanCSS())
+                    .pipe(gulp.dest(paths[bundle].output));
+            });
+        });
     },
     scss: function(files, bundle) {
-        for (var key in files) {
-            (function(key) {
-                var name = 'scss-' + key;
-                tasks.scss.push(name);
+        Object.keys(files).forEach(function(key) {
+            var name = 'scss-' + key;
+            tasks.scss.push(name);
 
-                gulp.task(name, function() {
-                    return gulp
-                        .src(bundles[bundle].scss[key])
-                        .pipe(sass())
-                        .on('error', gutil.log)
-                        .pipe(concat(key))
-                        .pipe(prefix(['last 2 versions'], { cascade: false }))
-                        .pipe(cleanCSS())
-                        .pipe(gulp.dest(paths[bundle].output));
-                });
-            })(key);
-        }
+            gulp.task(name, function() {
+                return gulp
+                    .src(bundles[bundle].scss[key])
+                    .pipe(sass())
+                    .on('error', gutil.log)
+                    .pipe(concat(key))
+                    .pipe(prefix(['last 2 versions'], { cascade: false }))
+                    .pipe(cleanCSS())
+                    .pipe(gulp.dest(paths[bundle].output));
+            });
+        });
     },
     sprite: function(bundle) {
         var name = 'sprite-' + bundle;

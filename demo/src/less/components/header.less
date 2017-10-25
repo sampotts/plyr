@@ -1,0 +1,24 @@
+// ==========================================================================
+// Header
+// ==========================================================================
+
+header {
+    padding: @spacing-base;
+    text-align: center;
+
+    p {
+        .font-size(18);
+        margin-bottom: @spacing-base * 1.5;
+    }
+
+    @media @mq-sm {
+        padding-top: (@spacing-base * 3);
+        padding-bottom: (@spacing-base * 3);
+    }
+
+    @media @mq-md {
+        max-width: 400px;
+        margin-right: (@spacing-base * 2);
+        text-align: left;
+    }
+}

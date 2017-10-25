@@ -4,23 +4,19 @@
 
 // Base size icon styles
 .icon {
-	fill: currentColor;
-	width: @icon-size;
-	height: @icon-size;
-	vertical-align: -3px;
+    fill: currentColor;
+    width: @icon-size;
+    height: @icon-size;
 }
 
 // Within elements
 a svg,
 button svg,
 label svg {
-	pointer-events: none;
+    pointer-events: none;
 }
+
 a .icon,
 .btn .icon {
-	margin-right: (@padding-base / 2);
-}
-.btn:not(.btn-large) .icon {
-	width: (@icon-size - 2);
-	height: (@icon-size - 2);
+    margin-right: (@spacing-base / 2);
 }

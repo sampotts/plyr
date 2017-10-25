@@ -19,7 +19,7 @@
     }
 }.call(this, 'Plyr', this, function() {
     'use strict';
-    /* global jQuery, console */
+    /* global jQuery */
 
     // Globals
     var scroll = {

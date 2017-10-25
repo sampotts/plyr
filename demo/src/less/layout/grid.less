@@ -1,0 +1,19 @@
+// ==========================================================================
+// Super basic grid
+// ==========================================================================
+
+.grid {
+    margin: 0 auto;
+    padding: @spacing-base;
+
+    @media @mq-md {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        max-width: @container-max-width;
+
+        > * {
+            flex: 1;
+        }
+    }
+}

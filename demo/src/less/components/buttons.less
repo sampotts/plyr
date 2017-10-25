@@ -2,171 +2,65 @@
 // Buttons
 // ==========================================================================
 
-nav {
-	ul {
-		list-style: none;
-		margin: 0;
-		padding: 0;
-		font-size: 0;
-	}
-	li {
-		display: inline-block;
-		margin-top: (@padding-base / 2);
-		.font-size();
-		white-space: nowrap;
-	}
-	li + li {
-		margin-left: @padding-base;
-	}
-}
-
-// Tabs
-.btn__bar {
-	position: relative;
-	margin: 0 auto @padding-base;
-	max-width: @example-width-video;
-	white-space: nowrap;
-
-	&::before {
-		content: "";
-		position: absolute;
-		top: 50%;
-		left: 0;
-		right: 0;
-		height: 1px;
-		background: @gray-lighter;
-	}
-
-	ul {
-		position: relative;
-		z-index: 1;
-		display: inline-block;
-		user-select: none;
-	}
-	li {
-		margin: 0;
-
-		&:first-child .btn {
-			border-radius: 4px 0 0 4px;
-		}
-		&:last-child .btn {
-			border-radius: 0 4px 4px 0;
-		}
-		& + li .btn {
-			margin-left: -1px;
-		}
-
-		&.active .btn {
-			&:extend(.btn--primary);
-			box-shadow: inset 0 1px 1px rgba(0,0,0, .2);
-			position: relative;
-			z-index: 1;
-
-			.icon {
-				color: inherit;
-			}
-		}
-		&.active + li .btn:hover {
-			z-index: 0;
-		}
-	}
-	.btn {
-		position: relative;
-		display: block;
-		border-radius: 0;
-
-		&:hover,
-		&:focus {
-			z-index: 1;
-		}
-	}
-
-	@media (min-width: 560px) {
-		margin-bottom: (@padding-base * 2);
-	}
-}
-
 // Shared
-.btn,
-.btn__count {
-	display: inline-block;
-	vertical-align: middle;
-	border-radius: @border-radius-base;
-	user-select: none;
-	font-weight: @font-weight-bold;
+.button,
+.button__count {
+    position: relative;
+    display: inline-flex;
+    vertical-align: middle;
+    align-items: center;
+    padding: (@spacing-base * 0.75);
+
+    border-radius: @border-radius-base;
+    box-shadow: 0 1px 1px fade(#000, 10%);
+    background: #fff;
+    border: 0;
+
+    color: @gray;
+    user-select: none;
+    font-weight: @font-weight-bold;
+    text-shadow: none;
 }
 
 // Buttons
-.btn {
-	padding: (@padding-base / 2) ((@padding-base / 2) + 2);
-	background: linear-gradient(lighten(@off-white, 2%), darken(@off-white, 3%));
-	border: 1px solid @gray-light;
-	box-shadow: 0 1px 1px rgba(0,0,0, .05);
-	text-shadow: 0 1px 1px #fff;
-	color: @gray;
-	transition: background .1s ease, color .1s ease;
-	.font-size(@font-size-small);
+.button {
+    padding-left: @spacing-base;
+    padding-right: @spacing-base;
+    transition: all 0.2s ease;
 
-	&:hover,
-	&:focus {
-		border-color: darken(@gray-light, 8%);
-		color: @gray;
-		outline: 0;
-	}
-}
+    &:hover,
+    &:focus {
+        color: @gray-dark;
+        outline: 0;
 
-// Sizes
-.btn--large {
-	padding: (@padding-base / 2) @padding-base;
-	.font-size();
-}
+        &::after {
+            display: none;
+        }
+    }
 
-// Styles
-.btn--primary {
-	background-image: linear-gradient(@link-color, darken(@link-color, 5%));
-	background-color: @link-color;
-	border-color: darken(@link-color, 10%);
-	box-shadow: 0 1px 1px rgba(0,0,0, .15);
-	text-shadow: 0 1px 1px rgba(0,0,0, .1);
-	color: #fff;
-
-	&:hover,
-	&:focus {
-		color: #fff;
-		border-color: darken(@link-color, 20%);
-	}
-}
-.btn--youtube .icon {
-	color: @color-youtube;
-}
-.btn--vimeo .icon {
-	color: @color-vimeo;
-}
-.btn--twitter .icon {
-	color: @color-twitter;
+    &.tab-focus {
+        .tab-focus();
+    }
 }
 
 // Count bubble
-.btn__count {
-	position: relative;
-	margin-left: (@padding-base / 2);
-	padding: (@padding-base / 2) (@padding-base * .75);
-	background: #fff;
-	border: 1px solid @gray-light;
+.button__count {
+    margin-left: (@spacing-base / 2);
+    animation: fadein 0.2s ease;
 
-	&::before {
-		content: "";
-		position: absolute;
-		display: block;
-		width: @arrow-size;
-		height: @arrow-size;
-		left: 1px;
-		top: 50%;
-		margin-top: -(@arrow-size / 2);
+    &::before {
+        content: '';
+        position: absolute;
+        display: block;
+        width: @arrow-size;
+        height: @arrow-size;
+        left: 1px;
+        top: 50%;
+        margin-top: -(@arrow-size / 2);
 
-		background: inherit;
-		border: inherit;
-		border-width: 1px 0 0 1px;
-		transform: rotate(-45deg) translate(-50%, -50%);
-	}
+        background: inherit;
+        border: inherit;
+        border-width: 1px 0 0 1px;
+        transform: rotate(-45deg) translate(-50%, -50%);
+    }
 }

@@ -1,13 +1,11 @@
 // ==========================================================================
-// Animations
+// Resets
 // ==========================================================================
 
-// Fade
-@keyframes fadein {
-    0% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 1;
-    }
+// BORDER-BOX ALL THE THINGS!
+// http://paulirish.com/2012/box-sizing-border-box-ftw/
+*,
+*::after,
+*::before {
+    box-sizing: border-box;
 }

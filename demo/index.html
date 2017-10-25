@@ -17,126 +17,92 @@
     <!-- Preload -->
     <link rel="preload" as="font" crossorigin type="font/woff2" href="https://cdn.plyr.io/static/fonts/avenir-medium.woff2">
     <link rel="preload" as="font" crossorigin type="font/woff2" href="https://cdn.plyr.io/static/fonts/avenir-bold.woff2">
+    <link rel="preload" as="font" crossorigin type="font/woff2" href="https://cdn.plyr.io/static/fonts/avenir-black.woff2?v=3">
 </head>
 
 <body>
-    <header>
-        <h1>Plyr</h1>
-        <p>A simple, accessible HTML5 media player by
-            <a href="https://twitter.com/sam_potts" target="_blank">@sam_potts</a>
-        </p>
-        <nav>
+    <div class="grid">
+        <header>
+            <h1>Plyr</h1>
+            <p>A simple, accessible HTML5
+                <button type="button" class="faux-link" data-source="video">Video</button>,
+                <button type="button" class="faux-link" data-source="audio">Audio</button>,
+                <button type="button" class="faux-link" data-source="youtube">YouTube</button> and
+                <button type="button" class="faux-link" data-source="vimeo">Vimeo</button> media player.
+            </p>
+
+            <a href="https://github.com/sampotts/plyr" target="_blank" class="button" data-shr-network="github">
+                <svg class="icon">
+                    <use xlink:href="#icon-github"></use>
+                </svg>Download on GitHub
+            </a>
+        </header>
+
+        <main>
+            <video controls crossorigin playsinline loop poster="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.jpg"
+                id="player">
+                <!-- Video files -->
+                <source src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.mp4" type="video/mp4">
+
+                <!-- Text track file -->
+                <track kind="captions" label="English" srclang="en" src="webvtt/View_From_A_Blue_Moon_Trailer-HD.en.vtt" default>
+                <track kind="captions" label="Français" srclang="fr" src="webvtt/View_From_A_Blue_Moon_Trailer-HD.fr.vtt">
+
+                <!-- Fallback for browsers that don't support the <video> element -->
+                <a href="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.mp4" download>Download</a>
+            </video>
+
             <ul>
-                <li>
-                    <a href="https://github.com/sampotts/plyr" target="_blank" class="btn btn--large btn--primary" data-shr-network="github">
-                        <svg class="icon">
-                            <use xlink:href="#icon-github"></use>
-                        </svg>Download on GitHub
-                    </a>
+                <li class="plyr__cite plyr__cite--video" hidden>
+                    <small>
+                        <a href="http://viewfromabluemoon.com/" target="_blank">View From A Blue Moon</a> &copy; Brainfarm
+                    </small>
                 </li>
-                <li>
-                    <a href="https://twitter.com/intent/tweet?text=A+simple+HTML5+media+player+with+custom+controls+and+WebVTT+captions.&url=http%3A%2F%2Fplyr.io&via=Sam_Potts"
-                        target="_blank" class="btn btn--large btn--twitter" data-shr-network="twitter">
-                        <svg class="icon">
-                            <use xlink:href="#icon-twitter"></use>
-                        </svg>Tweet
-                    </a>
+                <li class="plyr__cite plyr__cite--audio" hidden>
+                    <small>
+                        <a href="http://www.kishibashi.com/" target="_blank">Kishi Bashi &ndash; &ldquo;It All Began With A Burst&rdquo;</a> &copy; Kishi Bashi
+                    </small>
+                </li>
+                <li class="plyr__cite plyr__cite--youtube" hidden>
+                    <small>
+                        <a href="https://www.youtube.com/watch?v=bTqVqk7FSmY" target="_blank">View From A Blue Moon</a> on
+                        <span class="color--youtube">
+                            <svg class="icon">
+                                <use xlink:href="#icon-youtube"></use>
+                            </svg> YouTube
+                        </span>
+                    </small>
+                </li>
+                <li class="plyr__cite plyr__cite--vimeo" hidden>
+                    <small>
+                        <a href="https://vimeo.com/ondemand/viewfromabluemoon4k" target="_blank">View From A Blue Moon</a> on
+                        <span class="color--vimeo">
+                            <svg class="icon">
+                                <use xlink:href="#icon-vimeo"></use>
+                            </svg> Vimeo
+                        </span>
+                    </small>
                 </li>
             </ul>
-        </nav>
-    </header>
+        </main>
+    </div>
 
-    <main role="main" id="main">
-        <nav class="btn__bar">
-            <ul>
-                <li class="active">
-                    <button type="button" class="btn" data-source="video">Video</button>
-                </li>
-                <li>
-                    <button type="button" class="btn" data-source="audio">Audio</button>
-                </li>
-                <li>
-                    <button type="button" class="btn btn--youtube" data-source="youtube">
-                        <svg class="icon">
-                            <use xlink:href="#icon-youtube"></use>
-                        </svg>YouTube</button>
-                </li>
-                <li>
-                    <button type="button" class="btn btn--vimeo" data-source="vimeo">
-                        <svg class="icon">
-                            <use xlink:href="#icon-vimeo"></use>
-                        </svg>Vimeo</button>
-                </li>
-            </ul>
-        </nav>
-
-        <video controls crossorigin playsinline loop poster="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.jpg"
-            id="player">
-            <!-- Video files -->
-            <source src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.mp4" type="video/mp4">
-
-            <!-- Text track file -->
-            <track kind="captions" label="English" srclang="en" src="webvtt/View_From_A_Blue_Moon_Trailer-HD.en.vtt" default>
-            <track kind="captions" label="Français" srclang="fr" src="webvtt/View_From_A_Blue_Moon_Trailer-HD.fr.vtt">
-
-            <!-- Fallback for browsers that don't support the <video> element -->
-            <a href="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.mp4" download>Download</a>
-        </video>
-
-        <ul>
-            <li class="plyr__cite plyr__cite--video" hidden>
-                <small>
-                    <a href="http://viewfromabluemoon.com/" target="_blank">View From A Blue Moon</a> &copy; Brainfarm
-                </small>
-            </li>
-            <li class="plyr__cite plyr__cite--audio" hidden>
-                <small>
-                    <a href="http://www.kishibashi.com/" target="_blank">Kishi Bashi &ndash; &ldquo;It All Began With A Burst&rdquo;</a> &copy; Kishi Bashi
-                </small>
-            </li>
-            <li class="plyr__cite plyr__cite--youtube" hidden>
-                <small>
-                    <a href="https://www.youtube.com/watch?v=bTqVqk7FSmY" target="_blank">View From A Blue Moon</a> on
-                    <span class="color--youtube">
-                        <svg class="icon">
-                            <use xlink:href="#icon-youtube"></use>
-                        </svg> YouTube
-                    </span>
-                </small>
-            </li>
-            <li class="plyr__cite plyr__cite--vimeo" hidden>
-                <small>
-                    <a href="https://vimeo.com/ondemand/viewfromabluemoon4k" target="_blank">View From A Blue Moon</a> on
-                    <span class="color--vimeo">
-                        <svg class="icon">
-                            <use xlink:href="#icon-vimeo"></use>
-                        </svg> Vimeo
-                    </span>
-                </small>
-            </li>
-        </ul>
-    </main>
+    <aside>If you like Plyr, get the word out and
+        <a href="https://twitter.com/intent/tweet?text=A+simple+HTML5+media+player+with+custom+controls+and+WebVTT+captions.&url=http%3A%2F%2Fplyr.io&via=Sam_Potts"
+            target="_blank" data-shr-network="twitter">tweet it</a>
+    </aside>
 
     <!-- Plyr core script -->
     <script src="../src/js/plyr.js"></script>
 
-    <!-- Docs script -->
-    <script src="dist/demo.js"></script>
+    <!-- Sharing libary (https://shr.one) -->
+    <script src="https://cdn.shr.one/1.0.1/shr.js"></script>
 
     <!-- Rangetouch to fix <input type="range"> on touch devices (see https://rangetouch.com) -->
     <script src="https://cdn.rangetouch.com/1.0.1/rangetouch.js" async></script>
 
-    <!-- Sharing libary (https://shr.one) -->
-    <script src="https://cdn.shr.one/1.0.1/shr.js"></script>
-    <script>
-        if (window.shr) {
-            window.shr.setup({
-                count: {
-                    classname: 'btn__count'
-                }
-            });
-        }
-    </script>
+    <!-- Docs script -->
+    <script src="dist/demo.js"></script>
 </body>
 
 </html>
