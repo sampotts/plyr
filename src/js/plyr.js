@@ -373,10 +373,10 @@
                 return input !== null && input instanceof Event;
             },
             cue: function(input) {
-                return input !== null && (input instanceof window.TextTrackCue || input instanceof window.VTTCue);
+                this.instanceOf(input, window.TextTrackCue) || this.instanceOf(input, window.VTTCue);
             },
             track: function(input) {
-                return input !== null && (input instanceof window.TextTrack || typeof input.kind === 'string');
+                return input !== null && (this.instanceOf(input, window.TextTrack) || typeof input.kind === 'string');
             },
             undefined: function(input) {
                 return input !== null && typeof input === 'undefined';
@@ -388,6 +388,9 @@
                     ((this.string(input) || this.array(input) || this.nodeList(input)) && input.length === 0) ||
                     (this.object(input) && Object.keys(input).length === 0)
                 );
+            },
+            instanceOf: function(input, constructor) {
+                return Boolean(input && constructor && input instanceof constructor);
             },
         },
 
