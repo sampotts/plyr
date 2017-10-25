@@ -4100,12 +4100,12 @@
 
                         case 38:
                             // Arrow up
-                            player.increaseVolume();
+                            player.increaseVolume(0.1);
                             break;
 
                         case 40:
                             // Arrow down
-                            player.decreaseVolume();
+                            player.decreaseVolume(0.1);
                             break;
 
                         case 77:
