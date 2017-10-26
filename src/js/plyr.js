@@ -1907,7 +1907,8 @@
                 autoplay:   config.autoplay,
                 byline:     false,
                 portrait:   false,
-                title:      false
+                title:      false,
+                speed:      true
             };
 
             if (mediaId) {
