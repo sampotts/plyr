@@ -1899,7 +1899,8 @@
                 autoplay: config.autoplay,
                 byline: false,
                 portrait: false,
-                title: false
+                title: false,
+                speed: true
             });
 
             // Create a faux HTML5 API using the Vimeo API
