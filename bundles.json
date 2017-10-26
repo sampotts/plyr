@@ -12,7 +12,8 @@
     },
     "demo": {
         "less": {
-            "demo.css": "demo/src/less/bundle.less"
+            "demo.css": "demo/src/less/bundles/demo.less",
+            "error.css": "demo/src/less/bundles/error.less"
         },
         "js": {
             "demo.js": ["demo/src/js/lib/classlist.js", "demo/src/js/lib/tab-focus.js", "demo/src/js/main.js"]
