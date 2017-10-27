@@ -31,6 +31,7 @@
         scroll = { x: 0, y: 0 },
         // Default config
         defaults = {
+            defaultDelay: 0,
             enabled: true,
             debug: false,
             autoplay: false,
@@ -2702,7 +2703,7 @@
                 return;
             }
 
-            var delay = 0,
+            var delay = defaults.defaultDelay,
                 isEnterFullscreen = false,
                 show = toggle,
                 loading = _hasClass(plyr.container, config.classes.loading);
@@ -3483,10 +3484,12 @@
             if (tagName === "div") {
                 plyr.type = media.getAttribute("data-type");
                 plyr.embedId = media.getAttribute("data-video-id");
+                defaults.defaultDelay = media.getAttribute("data-default-delay");
 
                 // Clean up
                 media.removeAttribute("data-type");
                 media.removeAttribute("data-video-id");
+                media.removeAttribute("data-default-delay");
             } else {
                 plyr.type = tagName;
                 config.crossorigin = media.getAttribute("crossorigin") !== null;
