@@ -51,16 +51,14 @@
     &::before {
         content: '';
         position: absolute;
-        display: block;
-        width: @arrow-size;
-        height: @arrow-size;
-        left: 1px;
+        width: 0;
+        height: 0;
+        right: 100%;
         top: 50%;
-        margin-top: -(@arrow-size / 2);
+        transform: translateY(-50%);
 
-        background: inherit;
-        border: inherit;
-        border-width: 1px 0 0 1px;
-        transform: rotate(-45deg) translate(-50%, -50%);
+        border: @arrow-size solid transparent;
+        border-right-color: #fff;
+        border-left-width: 0;
     }
 }

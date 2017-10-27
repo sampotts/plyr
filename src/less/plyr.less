@@ -32,9 +32,11 @@
     position: relative;
     max-width: 100%;
     min-width: 200px;
+    overflow: hidden;
     font-family: @plyr-font-family;
     font-weight: @plyr-font-weight-normal;
     direction: ltr;
+    text-shadow: none;
 
     & when(@plyr-border-box = true) {
         // border-box everything
@@ -320,7 +322,6 @@
 .plyr__controls {
     display: flex;
     align-items: center;
-    line-height: 1;
     text-align: center;
 
     // Spacing
@@ -353,11 +354,6 @@
             margin-left: (@plyr-control-spacing / 2);
         }
     }
-}
-// Hide controls
-.plyr--hide-controls .plyr__controls {
-    opacity: 0;
-    pointer-events: none;
 }
 
 // Buttons
@@ -408,7 +404,7 @@
     border-bottom-left-radius: inherit;
     border-bottom-right-radius: inherit;
     color: @plyr-video-control-color;
-    transition: opacity 0.3s ease;
+    transition: all 0.4s ease-in-out;
 
     .plyr__control {
         svg {
@@ -423,6 +419,12 @@
             color: @plyr-video-control-color-hover;
         }
     }
+}
+// Hide controls
+.plyr--video.plyr--hide-controls .plyr__controls {
+    opacity: 0;
+    transform: translateY(100%);
+    pointer-events: none;
 }
 
 // Audio controls
@@ -552,6 +554,7 @@
 
         background: @plyr-menu-bg;
         border-radius: 4px;
+        box-shadow: 0 1px 2px fade(#000, 20%);
 
         white-space: nowrap;
         text-align: left;
@@ -585,8 +588,9 @@
         // Options
         .plyr__control {
             display: flex;
+            align-items: center;
             width: 100%;
-            padding: @plyr-control-padding (@plyr-control-padding * 2);
+            padding: ceil(@plyr-control-padding / 2) (@plyr-control-padding * 2);
             color: @plyr-menu-color;
             font-weight: @plyr-font-weight-bold;
             user-select: none;
@@ -597,6 +601,7 @@
                 top: 50%;
                 transform: translateY(-50%);
                 border: 4px solid transparent;
+                transition: border-color 0.2s ease;
             }
 
             &--forward {
@@ -605,6 +610,11 @@
                 &::after {
                     right: 5px;
                     border-left-color: fade(@plyr-menu-color, 80%);
+                }
+
+                &.tab-focus::after,
+                &:hover::after {
+                    border-left-color: currentColor;
                 }
             }
 
@@ -615,7 +625,7 @@
                 margin: @plyr-control-padding;
                 margin-bottom: floor(@plyr-control-padding / 2);
                 padding-left: ceil(@plyr-control-padding * 4);
-                font-weight: 500;
+                font-weight: @plyr-font-weight-normal;
 
                 &::after {
                     left: @plyr-control-padding;
@@ -633,6 +643,11 @@
                     background: fade(#000, 15%);
                     box-shadow: 0 1px 0 fade(#fff, 10%);
                 }
+
+                &.tab-focus::after,
+                &:hover::after {
+                    border-right-color: currentColor;
+                }
             }
         }
 
@@ -647,13 +662,13 @@
 
         // Option value
         .plyr__menu__value {
-            display: inherit;
+            display: flex;
+            align-items: center;
             margin-left: auto;
             padding-left: ceil(@plyr-control-padding * 3.5);
             pointer-events: none;
             overflow: hidden;
-            font-weight: 500;
-            color: fade(@plyr-menu-color, 80%);
+            font-weight: @plyr-font-weight-normal;
 
             .plyr__badge {
                 font-weight: @plyr-font-weight-bold;
@@ -665,7 +680,7 @@
 // Badge
 // --------------------------------------------------------------
 .plyr__badge {
-    padding: 2px 4px;
+    padding: 1px 4px;
     border-radius: 2px;
     background: @plyr-menu-color;
     color: @plyr-menu-bg;
@@ -685,10 +700,11 @@
     opacity: 0;
     background: @plyr-tooltip-bg;
     border-radius: @plyr-tooltip-radius;
+    box-shadow: 0 1px 2px fade(#000, 10%);
 
     color: @plyr-tooltip-color;
     font-size: @plyr-font-size-small;
-    font-weight: 500;
+    font-weight: @plyr-font-weight-normal;
     line-height: 1.3;
 
     transform: translate(-50%, 10px) scale(0.8);

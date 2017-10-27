@@ -90,7 +90,7 @@
         // Speed default and options to display
         speed: {
             default: 1,
-            options: [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2],
+            options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2],
         },
 
         // Keyboard shortcut settings

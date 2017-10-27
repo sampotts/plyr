@@ -3,22 +3,18 @@
 // ==========================================================================
 
 header {
-    padding: @spacing-base;
+    padding-bottom: @spacing-base;
     text-align: center;
 
     p {
         .font-size(@font-size-large);
-        margin-bottom: @spacing-base * 1.5;
-    }
-
-    @media @mq-sm {
-        padding-top: (@spacing-base * 3);
-        padding-bottom: (@spacing-base * 3);
+        margin-bottom: (@spacing-base * 1.5);
     }
 
     @media @mq-md {
         max-width: 400px;
         margin-right: (@spacing-base * 2);
+        padding-bottom: (@spacing-base * 2);
         text-align: left;
     }
 }

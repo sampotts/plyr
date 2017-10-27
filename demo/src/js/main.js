@@ -30,19 +30,7 @@
         captions: {
             defaultActive: true,
         },
-        controls: [
-            'play-large',
-            'play',
-            'progress',
-            'current-time',
-            'mute',
-            'volume',
-            'captions',
-            'settings',
-            'fullscreen',
-            'pip',
-            'airplay',
-        ],
+        controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'fullscreen', 'pip', 'airplay'],
     });
 
     // Expose for testing
@@ -67,13 +55,7 @@
             newSource(type);
 
             if (historySupport) {
-                history.pushState(
-                    {
-                        type: type,
-                    },
-                    '',
-                    '#' + type
-                );
+                history.pushState({ type: type }, '', '#' + type);
             }
         });
     });
