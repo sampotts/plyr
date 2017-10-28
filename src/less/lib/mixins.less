@@ -11,6 +11,7 @@
     border-radius: (@plyr-range-track-height / 2);
     user-select: none;
 }
+
 .plyr-range-thumb() {
     position: relative;
     height: @plyr-range-thumb-height;
@@ -22,6 +23,7 @@
     box-shadow: @plyr-range-thumb-shadow;
     box-sizing: border-box;
 }
+
 .plyr-range-thumb-active() {
     background: @plyr-range-thumb-active-bg;
     border-color: @plyr-range-thumb-active-border-color;
@@ -38,10 +40,12 @@
     video {
         height: 100%;
     }
+
     .plyr__video-wrapper {
         height: 100%;
         width: 100%;
     }
+
     .plyr__video-embed {
         // Revert overflow change
         overflow: visible;

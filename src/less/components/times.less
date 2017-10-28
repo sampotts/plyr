@@ -1,0 +1,28 @@
+// --------------------------------------------------------------
+// Time
+// --------------------------------------------------------------
+
+.plyr__time {
+    display: inline-block;
+    vertical-align: middle;
+    font-size: @plyr-font-size-small;
+}
+
+// Media duration hidden on small screens
+.plyr__time + .plyr__time {
+    display: none;
+
+    @media (min-width: @plyr-bp-screen-md) {
+        display: inline-block;
+    }
+
+    // Add a slash in before
+    &::before {
+        content: '\2044';
+        margin-right: @plyr-control-spacing;
+    }
+}
+
+.plyr--video .plyr__time {
+    text-shadow: 0 1px 1px fade(#000, 15%);
+}

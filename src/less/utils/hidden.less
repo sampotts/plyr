@@ -1,0 +1,33 @@
+// --------------------------------------------------------------
+// Hiding content nicely
+// --------------------------------------------------------------
+
+// Attributes
+.plyr--full-ui [hidden] {
+    display: none;
+}
+.plyr--full-ui [aria-hidden='true'] {
+    display: none;
+}
+
+// Screen reader only elements
+.plyr__sr-only {
+    clip: rect(1px, 1px, 1px, 1px);
+    overflow: hidden;
+
+    // !important is not always needed
+    & when(@plyr-sr-only-important = true) {
+        position: absolute !important;
+        padding: 0 !important;
+        border: 0 !important;
+        height: 1px !important;
+        width: 1px !important;
+    }
+    & when(@plyr-sr-only-important = false) {
+        position: absolute;
+        padding: 0;
+        border: 0;
+        height: 1px;
+        width: 1px;
+    }
+}

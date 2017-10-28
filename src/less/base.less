@@ -1,0 +1,48 @@
+// --------------------------------------------------------------
+// Base styling
+// --------------------------------------------------------------
+
+// Base
+.plyr {
+    position: relative;
+    max-width: 100%;
+    min-width: 200px;
+    overflow: hidden;
+    font-family: @plyr-font-family;
+    font-weight: @plyr-font-weight-normal;
+    direction: ltr;
+    text-shadow: none;
+
+    // Media elements
+    video,
+    audio {
+        width: 100%;
+        height: auto;
+        vertical-align: middle;
+        border-radius: inherit;
+    }
+}
+
+// Full UI only
+.plyr--full-ui {
+    & when(@plyr-border-box = true) {
+        // border-box everything
+        // http://paulirish.com/2012/box-sizing-border-box-ftw/
+        &,
+        *,
+        *::after,
+        *::before {
+            box-sizing: border-box;
+        }
+    }
+
+    & when(@plyr-touch-action = true) {
+        // Fix 300ms delay
+        a,
+        button,
+        input,
+        label {
+            touch-action: manipulation;
+        }
+    }
+}

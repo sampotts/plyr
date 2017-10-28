@@ -304,6 +304,7 @@
             hideControls: 'plyr--hide-controls',
             isIos: 'plyr--is-ios',
             isTouch: 'plyr--is-touch',
+            uiSupported: 'plyr--full-ui',
             menu: {
                 value: 'plyr__menu__value',
                 badge: 'plyr__badge',
@@ -468,54 +469,58 @@
                 name: name,
                 version: majorVersion,
                 isIE: isIE,
-                isOldIE: isIE && majorVersion <= 9,
                 isFirefox: isFirefox,
                 isChrome: isChrome,
                 isSafari: isSafari,
                 isWebkit: 'WebkitAppearance' in document.documentElement.style,
                 isIPhone: /(iPhone|iPod)/gi.test(navigator.platform),
                 isIos: /(iPad|iPhone|iPod)/gi.test(navigator.platform),
+                isSupported: !(isIE && majorVersion <= 9),
             };
         },
 
         // Check for support
         // Basic functionality vs full UI
         checkSupport: function(type, inline) {
-            var basic = false;
-            var full = false;
+            var api = false;
+            var ui = false;
             var browser = utils.getBrowser();
             var playsInline = browser.isIPhone && inline && support.inline;
 
             switch (type) {
                 case 'video':
-                    basic = support.video;
-                    full = basic && !browser.isOldIE && (!browser.isIPhone || playsInline);
+                    api = support.video;
+                    ui = api && browser.isSupported && (!browser.isIPhone || playsInline);
                     break;
 
                 case 'audio':
-                    basic = support.audio;
-                    full = basic && !browser.isOldIE;
+                    api = support.audio;
+                    ui = api && browser.isSupported;
                     break;
 
                 case 'youtube':
-                    basic = support.video;
-                    full = basic && !browser.isOldIE && (!browser.isIPhone || playsInline);
+                    api = true;
+                    ui = api && browser.isSupported && (!browser.isIPhone || playsInline);
                     break;
 
                 case 'vimeo':
+                    api = true;
+                    ui = false;
+                    break;
+
                 case 'soundcloud':
-                    basic = true;
-                    full = !browser.isOldIE && !browser.isIos;
+                    api = true;
+                    ui = browser.isSupported;
                     break;
 
                 default:
-                    basic = support.audio && support.video;
-                    full = basic && !browser.isOldIE;
+                    api = support.audio && support.video;
+                    ui = api && browser.isSupported;
             }
 
             return {
-                basic: basic,
-                full: full,
+                api: api,
+                ui: ui,
             };
         },
 
@@ -1371,7 +1376,7 @@
         }
 
         // Trap focus inside container
-        function focusTrap() {
+        function trapFocus() {
             var tabbables = getElements('input:not([disabled]), button:not([disabled])');
             var first = tabbables[0];
             var last = tabbables[tabbables.length - 1];
@@ -1455,9 +1460,14 @@
             }
 
             var styleSheet = player.elements.styleSheet.sheet;
-            var percentage = (range.value / range.max) * 100;
+            var percentage = range.value / range.max * 100;
             var selector = '#' + range.id + '::-webkit-slider-runnable-track';
-            var styles = '{ background-image: linear-gradient(to right, currentColor ' + percentage + '%, transparent ' + percentage + '%) }';
+            var styles =
+                '{ background-image: linear-gradient(to right, currentColor ' +
+                percentage +
+                '%, transparent ' +
+                percentage +
+                '%) }';
             var index = -1;
 
             // Find old rule if it exists
@@ -1761,7 +1771,6 @@
             }
 
             // Play Pause button
-            // TODO: This should be a toggle button really?
             if (utils.inArray(player.config.controls, 'play')) {
                 controls.appendChild(createButton('play'));
                 controls.appendChild(createButton('pause'));
@@ -2369,7 +2378,7 @@
 
         // Setup fullscreen
         function setupFullscreen() {
-            if (!player.supported.full || player.type === 'audio' || !player.config.fullscreen.enabled) {
+            if (!player.supported.ui || player.type === 'audio' || !player.config.fullscreen.enabled) {
                 return;
             }
 
@@ -2390,12 +2399,17 @@
                 utils.toggleState(player.elements.buttons.fullscreen, false);
             }
 
-            // Setup focus trap
-            focusTrap();
+            // Trap focus in container
+            trapFocus();
         }
 
         // Setup captions
         function setupCaptions() {
+            // Requires UI support
+            if (!player.supported.ui) {
+                return;
+            }
+
             // Set default language if not set
             if (!utils.is.empty(player.storage.language)) {
                 player.captions.language = player.storage.language;
@@ -2531,6 +2545,10 @@
 
         // Get current selected caption language
         function getLanguage() {
+            if (!player.supported.ui) {
+                return null;
+            }
+
             if (!support.textTracks || utils.is.empty(player.captions.tracks)) {
                 return player.config.i18n.none;
             }
@@ -2563,6 +2581,11 @@
 
         // Set the current caption
         function setCaption(caption) {
+            // Requires UI
+            if (!player.supported.ui) {
+                return;
+            }
+
             if (utils.is.htmlElement(player.elements.captions)) {
                 var content = utils.createElement('span');
 
@@ -2759,11 +2782,17 @@
         }
 
         // Toggle style hook
-        function toggleStyleHook() {
+        function addStyleHook() {
             utils.toggleClass(
                 player.elements.container,
                 player.config.selectors.container.replace('.', ''),
-                player.supported.full
+                true
+            );
+
+            utils.toggleClass(
+                player.elements.container,
+                player.config.classNames.uiSupported,
+                player.supported.ui
             );
         }
 
@@ -2790,7 +2819,7 @@
             }
 
             // If there's a play button, set label
-            if (player.supported.full) {
+            if (player.supported.ui) {
                 if (utils.is.htmlElement(player.elements.buttons.play)) {
                     player.elements.buttons.play.setAttribute('aria-label', label);
                 }
@@ -2865,24 +2894,24 @@
                 return;
             }
 
-            if (player.supported.full) {
-                // Add type class
+            // Add type class
+            utils.toggleClass(
+                player.elements.container,
+                player.config.classNames.type.replace('{0}', player.type),
+                true
+            );
+
+            // Add video class for embeds
+            // This will require changes if audio embeds are added
+            if (utils.inArray(types.embed, player.type)) {
                 utils.toggleClass(
                     player.elements.container,
-                    player.config.classNames.type.replace('{0}', player.type),
+                    player.config.classNames.type.replace('{0}', 'video'),
                     true
                 );
+            }
 
-                // Add video class for embeds
-                // This will require changes if audio embeds are added
-                if (utils.inArray(types.embed, player.type)) {
-                    utils.toggleClass(
-                        player.elements.container,
-                        player.config.classNames.type.replace('{0}', 'video'),
-                        true
-                    );
-                }
-
+            if (player.supported.ui) {
                 // Check for picture-in-picture support
                 utils.toggleClass(
                     player.elements.container,
@@ -3028,7 +3057,7 @@
         // When embeds are ready
         function embedReady() {
             // Setup the UI and call ready if full support
-            if (player.supported.full) {
+            if (player.supported.ui) {
                 setupInterface();
                 ready();
             }
@@ -3045,7 +3074,7 @@
                 videoId: videoId,
                 playerVars: {
                     autoplay: player.config.autoplay ? 1 : 0, // Autoplay
-                    controls: player.supported.full ? 0 : 1, // Only show controls if not fully supported
+                    controls: player.supported.ui ? 0 : 1, // Only show controls if not fully supported
                     rel: 0, // No related vids
                     showinfo: 0, // Hide info
                     iv_load_policy: 3, // Hide annotations
@@ -3120,7 +3149,7 @@
                         player.config.title = instance.getVideoData().title;
 
                         // Set the tabindex
-                        if (player.supported.full) {
+                        if (player.supported.ui) {
                             player.media.setAttribute('tabindex', -1);
                         }
 
@@ -3300,7 +3329,7 @@
             player.embed.on('loaded', function() {
                 // Fix keyboard focus issues
                 // https://github.com/sampotts/plyr/issues/317
-                if (utils.is.htmlElement(player.embed.element) && player.supported.full) {
+                if (utils.is.htmlElement(player.embed.element) && player.supported.ui) {
                     player.embed.element.setAttribute('tabindex', -1);
                 }
             });
@@ -3345,6 +3374,7 @@
         }
 
         // Soundcloud ready
+        // TODO: Document
         function soundcloudReady() {
             /* jshint validthis: true */
             player.embed = window.SC.Widget(this);
@@ -3568,7 +3598,7 @@
         // Update volume UI and storage
         function updateVolume() {
             // Update the <input type="range"> if present
-            if (player.supported.full) {
+            if (player.supported.ui) {
                 var value = player.media.muted ? 0 : player.media.volume;
 
                 if (player.elements.inputs.volume) {
@@ -3585,7 +3615,7 @@
             utils.toggleClass(player.elements.container, player.config.classNames.muted, player.media.muted);
 
             // Update checkbox for mute state
-            if (player.supported.full && player.elements.buttons.mute) {
+            if (player.supported.ui && player.elements.buttons.mute) {
                 utils.toggleState(player.elements.buttons.mute, player.media.muted);
             }
         }
@@ -3645,7 +3675,7 @@
 
         // Update <progress> elements
         function updateProgress(event) {
-            if (!player.supported.full) {
+            if (!player.supported.ui) {
                 return;
             }
 
@@ -3732,7 +3762,7 @@
 
         // Show the duration on metadataloaded
         function displayDuration() {
-            if (!player.supported.full) {
+            if (!player.supported.ui) {
                 return;
             }
 
@@ -3911,9 +3941,9 @@
                 utils.toggleClass(
                     player.elements.container,
                     player.config.classNames.captions.active,
-                    player.captions.enabled
+                    player.supported.ui && player.captions.enabled
                 );
-                toggleStyleHook();
+                addStyleHook();
 
                 // Set new sources for html5
                 if (utils.inArray(types.html5, player.type)) {
@@ -3937,7 +3967,7 @@
                 // If HTML5 or embed but not fully supported, setupInterface and call ready now
                 if (
                     utils.inArray(types.html5, player.type) ||
-                    (utils.inArray(types.embed, player.type) && !player.supported.full)
+                    (utils.inArray(types.embed, player.type) && !player.supported.ui)
                 ) {
                     // Setup interface
                     setupInterface();
@@ -4180,7 +4210,7 @@
 
                 // Delay the adding of classname until the focus has changed
                 // This event fires before the focusin event
-                window.setTimeout(function () {
+                window.setTimeout(function() {
                     utils.toggleClass(utils.getFocusElement(), player.config.classNames.tabFocus, true);
                 }, 0);
             });
@@ -4385,7 +4415,9 @@
 
             // Handle user exiting fullscreen by escaping etc
             if (support.fullscreen) {
-                utils.on(document, fullscreen.eventType, function(event) { player.toggleFullscreen(event); });
+                utils.on(document, fullscreen.eventType, function(event) {
+                    player.toggleFullscreen(event);
+                });
             }
         }
 
@@ -4427,7 +4459,7 @@
             utils.on(player.media, 'waiting canplay seeked', checkLoading);
 
             // Click video
-            if (player.config.clickToPlay && player.type !== 'audio') {
+            if (player.supported.ui && player.config.clickToPlay && player.type !== 'audio') {
                 // Re-fetch the wrapper
                 var wrapper = getElement('.' + player.config.classNames.video);
 
@@ -4552,8 +4584,12 @@
 
         // Setup the UI
         function setupInterface() {
+            // Re-attach media element listeners
+            // TODO: Use event bubbling
+            mediaListeners();
+
             // Don't setup interface if no support
-            if (!player.supported.full) {
+            if (!player.supported.ui) {
                 warn('Basic support only', player.type);
 
                 // Remove controls
@@ -4574,7 +4610,7 @@
                 // Inject custom controls
                 injectControls();
 
-                // Re-attach listeners
+                // Re-attach control listeners
                 listeners();
             }
 
@@ -4582,9 +4618,6 @@
             if (!utils.is.htmlElement(player.elements.controls)) {
                 return;
             }
-
-            // Media element listeners
-            mediaListeners();
 
             // Remove native controls
             toggleNativeControls();
@@ -4650,7 +4683,7 @@
 
             // Bail if disabled or no basic support
             // You may want to disable certain UAs etc
-            if (!utils.checkSupport().basic) {
+            if (!utils.checkSupport().api) {
                 error('Setup failed: no support');
                 return;
             }
@@ -4722,8 +4755,8 @@
             // Check for support again but with type
             player.supported = utils.checkSupport(player.type, player.config.inline);
 
-            // If no native support, bail
-            if (!player.supported.basic) {
+            // If no support for even API, bail
+            if (!player.supported.api) {
                 error('Setup failed: no support');
                 return;
             }
@@ -4735,10 +4768,10 @@
             player.elements.container = utils.wrap(media, utils.createElement('div'));
 
             // Allow focus to be captured
-            player.elements.container.setAttribute('tabindex', 0);
+            // player.elements.container.setAttribute('tabindex', 0);
 
             // Add style hook
-            toggleStyleHook();
+            addStyleHook();
 
             // Debug info
             log(player.browser.name + ' ' + player.browser.version);
@@ -4757,7 +4790,7 @@
             // If embed but not fully supported, setupInterface (to avoid flash of controls) and call ready now
             if (
                 utils.inArray(types.html5, player.type) ||
-                (utils.inArray(types.embed, player.type) && !player.supported.full)
+                (utils.inArray(types.embed, player.type) && !player.supported.ui)
             ) {
                 // Setup UI
                 setupInterface();
@@ -5304,7 +5337,7 @@
         var player = this;
 
         // If there's no full support, or there's no caption toggle
-        if (!player.supported.full || !player.elements.buttons.captions) {
+        if (!player.supported.ui || !player.elements.buttons.captions) {
             return;
         }
 
@@ -5406,7 +5439,11 @@
             player.fullscreen.active = !player.fullscreen.active;
 
             // Add class hook
-            utils.toggleClass(player.elements.container, player.config.classNames.fullscreen.fallback, player.fullscreen.active);
+            utils.toggleClass(
+                player.elements.container,
+                player.config.classNames.fullscreen.fallback,
+                player.fullscreen.active
+            );
 
             // Make sure we don't lose scroll position
             if (player.fullscreen.active) {
@@ -5483,7 +5520,7 @@
         var player = this;
 
         // Don't hide if config says not to, it's audio, or not ready or loading
-        if (!player.config.hideControls || player.type === 'audio') {
+        if (!player.supported.ui || !player.config.hideControls || player.type === 'audio') {
             return;
         }
 

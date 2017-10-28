@@ -1,0 +1,31 @@
+// --------------------------------------------------------------
+// Fullscreen
+// --------------------------------------------------------------
+
+.plyr:fullscreen {
+    .plyr-fullscreen-active();
+}
+
+.plyr:-webkit-full-screen {
+    .plyr-fullscreen-active();
+}
+
+.plyr:-moz-full-screen {
+    .plyr-fullscreen-active();
+}
+
+.plyr:-ms-fullscreen {
+    .plyr-fullscreen-active();
+}
+
+// Fallback for unsupported browsers
+.plyr--fullscreen-fallback {
+    .plyr-fullscreen-active();
+
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10000000;
+}

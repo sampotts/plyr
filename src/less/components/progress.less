@@ -1,0 +1,110 @@
+// --------------------------------------------------------------
+// Playback progress
+// --------------------------------------------------------------
+
+.plyr__progress {
+    position: relative;
+    display: none;
+    flex: 1;
+
+    input[type='range'] {
+        position: relative;
+        z-index: 2;
+    }
+
+    // Seek tooltip to show time
+    .plyr__tooltip {
+        left: 0;
+    }
+}
+
+.plyr .plyr__progress {
+    display: inline-block;
+}
+
+.plyr__progress--buffer {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 100%;
+    height: @plyr-range-track-height;
+    margin: -(@plyr-range-track-height / 2) 0 0;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 100px;
+
+    // WebKit
+    -webkit-appearance: none;
+
+    &::-webkit-progress-bar {
+        background: transparent;
+    }
+
+    &::-webkit-progress-value {
+        background: currentColor;
+        border-radius: 100px;
+        min-width: @plyr-range-track-height;
+    }
+
+    // Mozilla
+    &::-moz-progress-bar {
+        background: currentColor;
+        border-radius: 100px;
+        min-width: @plyr-range-track-height;
+    }
+
+    // Microsoft
+    &::-ms-fill {
+        border-radius: 100px;
+    }
+}
+
+.plyr__progress--buffer {
+    &::-webkit-progress-value {
+        transition: width 0.2s ease;
+    }
+
+    &::-moz-progress-bar {
+        transition: width 0.2s ease;
+    }
+
+    &::-ms-fill {
+        transition: width 0.2s ease;
+    }
+}
+
+.plyr--video .plyr__progress--buffer {
+    box-shadow: 0 1px 1px fade(#000, 15%);
+    color: @plyr-video-progress-buffered-bg;
+}
+
+.plyr--audio .plyr__progress--buffer {
+    color: @plyr-audio-progress-buffered-bg;
+}
+
+// Loading state
+.plyr--loading .plyr__progress--buffer {
+    animation: plyr-progress 1s linear infinite;
+    background-size: @plyr-progress-loading-size @plyr-progress-loading-size;
+    background-repeat: repeat-x;
+    background-image: linear-gradient(
+        -45deg,
+        @plyr-progress-loading-bg 25%,
+        transparent 25%,
+        transparent 50%,
+        @plyr-progress-loading-bg 50%,
+        @plyr-progress-loading-bg 75%,
+        transparent 75%,
+        transparent
+    );
+    color: transparent;
+}
+
+.plyr--video.plyr--loading .plyr__progress--buffer {
+    background-color: @plyr-video-progress-buffered-bg;
+}
+
+.plyr--audio.plyr--loading .plyr__progress--buffer {
+    background-color: @plyr-audio-progress-buffered-bg;
+}

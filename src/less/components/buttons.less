@@ -1,0 +1,89 @@
+.plyr__control {
+    position: relative;
+    display: inline-block;
+    flex-shrink: 0;
+    overflow: visible; // IE11
+    vertical-align: middle;
+    padding: @plyr-control-padding;
+    border: 0;
+    background: transparent;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background 0.3s ease, color 0.3s ease, opacity 0.3s ease;
+    color: inherit;
+
+    svg {
+        width: @plyr-control-icon-size;
+        height: @plyr-control-icon-size;
+        display: block;
+        fill: currentColor;
+        pointer-events: none;
+    }
+
+    // Hide toggle icons by default
+    .icon--exit-fullscreen,
+    .icon--muted,
+    .icon--captions-on {
+        display: none;
+    }
+
+    // Default focus
+    &:focus {
+        outline: 0;
+    }
+}
+
+// Audio styles
+.plyr--audio .plyr__control {
+    &.tab-focus,
+    &:hover,
+    &[aria-expanded='true'] {
+        background: @plyr-audio-control-bg-hover;
+        color: @plyr-audio-control-color-hover;
+    }
+}
+
+// Large play button (video only)
+.plyr__play-large {
+    display: none;
+    position: absolute;
+    z-index: 1;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: ceil(@plyr-control-spacing * 1.25);
+    background: fade(@plyr-video-control-bg-hover, 80%);
+    border: 3px solid currentColor;
+    border-radius: 100%;
+    box-shadow: 0 1px 1px fade(#000, 15%);
+    color: @plyr-video-control-color;
+    transition: all 0.3s ease;
+
+    svg {
+        position: relative;
+        left: 2px;
+        width: 20px;
+        height: 20px;
+        display: block;
+        fill: currentColor;
+        pointer-events: none;
+    }
+
+    &:hover,
+    &:focus {
+        background: @plyr-video-control-bg-hover;
+    }
+
+    &:focus {
+        outline: 1px dotted fade(@plyr-video-control-color, 50%);
+    }
+}
+
+.plyr--full-ui.plyr--video .plyr__play-large {
+    display: inline-block;
+}
+
+.plyr--playing .plyr__play-large {
+    opacity: 0;
+    visibility: hidden;
+}

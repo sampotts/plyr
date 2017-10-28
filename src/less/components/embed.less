@@ -1,0 +1,23 @@
+// --------------------------------------------------------------
+// Embedded players
+// YouTube, Vimeo, etc
+// --------------------------------------------------------------
+
+.plyr__video-embed {
+    padding-bottom: 56.25%; /* 16:9 */
+    height: 0;
+
+    iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: 0;
+        user-select: none;
+    }
+}
+// To allow mouse events to be captured if full support
+.plyr--full-ui .plyr__video-embed iframe {
+    pointer-events: none;
+}
