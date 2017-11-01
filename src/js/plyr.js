@@ -472,13 +472,21 @@
 
     // Bind along with custom handler
     function _proxyListener(element, eventName, userListener, defaultListener, useCapture) {
+        if(userListener) {
+            // Register this before defaultListener
+            _on(
+                element,
+                eventName,
+                function(event) {
+                    userListener.apply(element, [event]);
+                },
+                useCapture
+            );
+        }
         _on(
             element,
             eventName,
             function(event) {
-                if (userListener) {
-                    userListener.apply(element, [event]);
-                }
                 defaultListener.apply(element, [event]);
             },
             useCapture
