@@ -1942,10 +1942,14 @@
             }*/
 
             plyr.embed.on("loaded", function() {
-                // Fix keyboard focus issues
-                // https://github.com/sampotts/plyr/issues/317
                 if (_is.htmlElement(plyr.embed.element) && plyr.supported.full) {
-                    plyr.embed.element.setAttribute("tabindex", "-1");
+                    var element = plyr.embed.element;
+                    // Fix Vimeo controls issue
+                    // https://github.com/sampotts/plyr/issues/697
+                    element.src = element.src + '&transparent=0'
+                    // Fix keyboard focus issues
+                    // https://github.com/sampotts/plyr/issues/317
+                    element.setAttribute("tabindex", "-1");
                 }
             });
 
