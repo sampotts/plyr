@@ -5,7 +5,7 @@
         "browser": true,
         "es6": true
     },
-    "globals": { "Plyr": true },
+    "globals": { "Plyr": false, "jQuery": false },
     "rules": {
         "no-const-assign": 1,
         "no-this-before-super": 1,

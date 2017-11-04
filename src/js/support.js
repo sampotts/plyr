@@ -87,8 +87,8 @@ const support = {
     // Check for mime type support against a player instance
     // Credits: http://diveintohtml5.info/everything.html
     // Related: http://www.leanbackplayer.com/test/h5mt.html
-    mime(player, type) {
-        const media = { player };
+    mime(type) {
+        const { media } = this;
 
         try {
             // Bail if no checking function
@@ -97,25 +97,31 @@ const support = {
             }
 
             // Type specific checks
-            if (player.type === 'video') {
+            if (this.type === 'video') {
                 switch (type) {
                     case 'video/webm':
                         return media.canPlayType('video/webm; codecs="vp8, vorbis"').replace(/no/, '');
+
                     case 'video/mp4':
                         return media.canPlayType('video/mp4; codecs="avc1.42E01E, mp4a.40.2"').replace(/no/, '');
+
                     case 'video/ogg':
                         return media.canPlayType('video/ogg; codecs="theora"').replace(/no/, '');
+
                     default:
                         return false;
                 }
-            } else if (player.type === 'audio') {
+            } else if (this.type === 'audio') {
                 switch (type) {
                     case 'audio/mpeg':
                         return media.canPlayType('audio/mpeg;').replace(/no/, '');
+
                     case 'audio/ogg':
                         return media.canPlayType('audio/ogg; codecs="vorbis"').replace(/no/, '');
+
                     case 'audio/wav':
                         return media.canPlayType('audio/wav; codecs="1"').replace(/no/, '');
+
                     default:
                         return false;
                 }

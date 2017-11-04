@@ -7,7 +7,6 @@ import controls from './../controls';
 import ui from './../ui';
 
 const youtube = {
-    // Setup YouTube
     setup() {
         const videoId = utils.parseYouTubeId(this.embedId);
 
@@ -45,7 +44,7 @@ const youtube = {
         }
     },
 
-    // Handle YouTube API ready
+    // API ready
     ready(videoId) {
         const player = this;
 

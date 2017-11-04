@@ -5,8 +5,6 @@
 // License: The MIT License (MIT)
 // ==========================================================================
 
-/* global jQuery */
-
 import defaults from './defaults';
 import types from './types';
 import support from './support';
@@ -80,6 +78,7 @@ class Plyr {
         };
 
         // Captions
+        // TODO: captions.enabled should be in config?
         this.captions = {
             enabled: null,
             tracks: null,
@@ -647,8 +646,7 @@ class Plyr {
         const player = this;
 
         // Nothing specified
-        if (utils.is.empty(input)) {
-            this.toggleCaptions(false);
+        if (!utils.is.string(input)) {
             return player;
         }
 
@@ -886,8 +884,8 @@ class Plyr {
     }
 
     // Check for support
-    supports(mimeType) {
-        return support.mime(this, mimeType);
+    supports(type) {
+        return support.mime.call(this, type);
     }
 
     // Destroy an instance

@@ -7,7 +7,6 @@ import captions from './../captions';
 import ui from './../ui';
 
 const vimeo = {
-    // Setup YouTube
     setup() {
         // Remove old containers
         const containers = utils.getElements.call(this, `[id^="${this.type}-"]`);
@@ -34,7 +33,7 @@ const vimeo = {
         }
     },
 
-    // Ready
+    // API Ready
     ready() {
         const player = this;
 
