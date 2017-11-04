@@ -519,11 +519,11 @@
     }
 
     // Unbind event
-    /*function _off(element, events, callback, useCapture) {
+    function _off(element, events, callback, useCapture) {
         if (element) {
             _toggleListener(element, events, callback, false, useCapture);
         }
-    }*/
+    }
 
     // Trigger event
     function _event(element, type, bubbles, properties) {
@@ -2931,6 +2931,10 @@
             }
         }
 
+        function onBodyClick() {
+            _toggleClass(_getElement('.' + config.classes.tabFocus), config.classes.tabFocus, false);
+        }
+
         // Listen for control events
         function _controlListeners() {
             // IE doesn't support input event, so we fallback to change
@@ -3145,9 +3149,7 @@
                     checkTabFocus(focused);
                 }
             });
-            _on(document.body, "click", function() {
-                _toggleClass(_getElement("." + config.classes.tabFocus), config.classes.tabFocus, false);
-            });
+            _on(document.body, "click", onBodyClick);
             for (var button in plyr.buttons) {
                 var element = plyr.buttons[button];
 
@@ -3429,8 +3431,14 @@
                 // Replace the container with the original element provided
                 plyr.container.parentNode.replaceChild(original, plyr.container);
 
+                // Free container in order for GC to remove it and prevent memory leaks due to added events
+                plyr.container = null;
+
                 // Allow overflow (set on fullscreen)
                 document.body.style.overflow = "";
+
+                //remove events
+                _off(document.body, 'click', onBodyClick);
 
                 // Event
                 _triggerEvent(original, "destroyed", true);
