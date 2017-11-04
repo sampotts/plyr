@@ -1,0 +1,174 @@
+// ==========================================================================
+// Plyr support checks
+// ==========================================================================
+
+import utils from './utils';
+
+// Check for feature support
+const support = {
+    // Basic support
+    audio: 'canPlayType' in document.createElement('audio'),
+    video: 'canPlayType' in document.createElement('video'),
+
+    // Check for support
+    // Basic functionality vs full UI
+    check(type, inline) {
+        let api = false;
+        let ui = false;
+        const browser = utils.getBrowser();
+        const playsInline = browser.isIPhone && inline && support.inline;
+
+        switch (type) {
+            case 'video':
+                api = support.video;
+                ui = api && support.rangeInput && (!browser.isIPhone || playsInline);
+                break;
+
+            case 'audio':
+                api = support.audio;
+                ui = api && support.rangeInput;
+                break;
+
+            case 'youtube':
+                api = true;
+                ui = support.rangeInput && (!browser.isIPhone || playsInline);
+                break;
+
+            case 'vimeo':
+                api = true;
+                ui = support.rangeInput && !browser.isIPhone;
+                break;
+
+            default:
+                api = support.audio && support.video;
+                ui = api && support.rangeInput;
+        }
+
+        return {
+            api,
+            ui,
+        };
+    },
+
+    // Local storage
+    // We can't assume if local storage is present that we can use it
+    storage: (() => {
+        if (!('localStorage' in window)) {
+            return false;
+        }
+
+        // Try to use it (it might be disabled, e.g. user is in private/porn mode)
+        // see: https://github.com/sampotts/plyr/issues/131
+        const test = '___test';
+        try {
+            window.localStorage.setItem(test, test);
+            window.localStorage.removeItem(test);
+            return true;
+        } catch (e) {
+            return false;
+        }
+    })(),
+
+    // Picture-in-picture support
+    // Safari only currently
+    pip: (() => {
+        const browser = utils.getBrowser();
+        return !browser.isIPhone && utils.is.function(utils.createElement('video').webkitSetPresentationMode);
+    })(),
+
+    // Airplay support
+    // Safari only currently
+    airplay: utils.is.function(window.WebKitPlaybackTargetAvailabilityEvent),
+
+    // Inline playback support
+    // https://webkit.org/blog/6784/new-video-policies-for-ios/
+    inline: 'playsInline' in document.createElement('video'),
+
+    // Check for mime type support against a player instance
+    // Credits: http://diveintohtml5.info/everything.html
+    // Related: http://www.leanbackplayer.com/test/h5mt.html
+    mime(player, type) {
+        const media = { player };
+
+        try {
+            // Bail if no checking function
+            if (!utils.is.function(media.canPlayType)) {
+                return false;
+            }
+
+            // Type specific checks
+            if (player.type === 'video') {
+                switch (type) {
+                    case 'video/webm':
+                        return media.canPlayType('video/webm; codecs="vp8, vorbis"').replace(/no/, '');
+                    case 'video/mp4':
+                        return media.canPlayType('video/mp4; codecs="avc1.42E01E, mp4a.40.2"').replace(/no/, '');
+                    case 'video/ogg':
+                        return media.canPlayType('video/ogg; codecs="theora"').replace(/no/, '');
+                    default:
+                        return false;
+                }
+            } else if (player.type === 'audio') {
+                switch (type) {
+                    case 'audio/mpeg':
+                        return media.canPlayType('audio/mpeg;').replace(/no/, '');
+                    case 'audio/ogg':
+                        return media.canPlayType('audio/ogg; codecs="vorbis"').replace(/no/, '');
+                    case 'audio/wav':
+                        return media.canPlayType('audio/wav; codecs="1"').replace(/no/, '');
+                    default:
+                        return false;
+                }
+            }
+        } catch (e) {
+            return false;
+        }
+
+        // If we got this far, we're stuffed
+        return false;
+    },
+
+    // Check for textTracks support
+    textTracks: 'textTracks' in document.createElement('video'),
+
+    // Check for passive event listener support
+    // https://github.com/WICG/EventListenerOptions/blob/gh-pages/explainer.md
+    // https://www.youtube.com/watch?v=NPM6172J22g
+    passiveListeners: (() => {
+        // Test via a getter in the options object to see if the passive property is accessed
+        let supported = false;
+        try {
+            const options = Object.defineProperty({}, 'passive', {
+                get() {
+                    supported = true;
+                    return null;
+                },
+            });
+            window.addEventListener('test', null, options);
+        } catch (e) {
+            // Do nothing
+        }
+
+        return supported;
+    })(),
+
+    // <input type="range"> Sliders
+    rangeInput: (() => {
+        const range = document.createElement('input');
+        range.type = 'range';
+        return range.type === 'range';
+    })(),
+
+    // Touch
+    // Remember a device can be moust + touch enabled
+    touch: 'ontouchstart' in document.documentElement,
+
+    // Detect transitions support
+    transitions: utils.transitionEnd !== false,
+
+    // Reduced motion iOS & MacOS setting
+    // https://webkit.org/blog/7551/responsive-design-for-motion/
+    reducedMotion: 'matchMedia' in window && window.matchMedia('(prefers-reduced-motion)').matches,
+};
+
+export default support;

@@ -2,12 +2,21 @@
 // Core
 // ==========================================================================
 
-html {
-    background: @page-background;
-    background-attachment: fixed;
+*,
+*::after,
+*::before {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    display: flex;
+    width: 100%;
 }
 
 html {
+    background: @page-background;
+    background-attachment: fixed;
     height: 100%;
 }
 

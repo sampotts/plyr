@@ -16,6 +16,13 @@
         border: 0;
         user-select: none;
     }
+
+    // Vimeo hack
+    > div {
+        position: relative;
+        padding-bottom: 200%;
+        transform: translateY(-35.95%);
+    }
 }
 // To allow mouse events to be captured if full support
 .plyr--full-ui .plyr__video-embed iframe {

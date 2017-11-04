@@ -1,9 +1,11 @@
 {
-    "extends": ["eslint:recommended", "prettier"],
+    "parser": "babel-eslint",
+    "extends": ["airbnb", "prettier"],
     "env": {
-        "browser": true
+        "browser": true,
+        "es6": true
     },
-    "globals": {},
+    "globals": { "Plyr": true },
     "rules": {
         "no-const-assign": 1,
         "no-this-before-super": 1,
@@ -18,5 +20,8 @@
         "eqeqeq": [2, "always"],
         "one-var": [2, "never"],
         "comma-dangle": [2, "always-multiline"]
+    },
+    "parserOptions": {
+        "sourceType": "module"
     }
 }

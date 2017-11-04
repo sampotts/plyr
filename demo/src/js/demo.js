@@ -4,9 +4,7 @@
 // Please see readme.md in the root or github.com/sampotts/plyr
 // ==========================================================================
 
-/*global Plyr*/
-
-(function() {
+document.addEventListener('DOMContentLoaded', () => {
     if (window.shr) {
         window.shr.setup({
             count: {
@@ -15,12 +13,33 @@
         });
     }
 
-    /*document.body.addEventListener('ready', function(event) {
+    // Setup tab focus
+    const tabClassName = 'tab-focus';
+
+    // Remove class on blur
+    document.addEventListener('focusout', event => {
+        event.target.classList.remove(tabClassName);
+    });
+
+    // Add classname to tabbed elements
+    document.addEventListener('keydown', event => {
+        if (event.keyCode !== 9) {
+            return;
+        }
+
+        // Delay the adding of classname until the focus has changed
+        // This event fires before the focusin event
+        window.setTimeout(() => {
+            document.activeElement.classList.add(tabClassName);
+        }, 0);
+    });
+
+    /* document.body.addEventListener('ready', function(event) {
         console.log(event);
-    });*/
+    }); */
 
     // Setup the player
-    var player = new Plyr('#player', {
+    const player = new window.Plyr('#player', {
         debug: true,
         title: 'View From A Blue Moon',
         iconUrl: '../dist/plyr.svg',
@@ -28,70 +47,36 @@
             controls: true,
         },
         captions: {
-            defaultActive: true,
+            active: true,
         },
-        controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'fullscreen', 'pip', 'airplay'],
+        controls: [
+            'play-large',
+            'play',
+            'progress',
+            'current-time',
+            'mute',
+            'volume',
+            'captions',
+            'settings',
+            'fullscreen',
+            'pip',
+            'airplay',
+        ],
     });
 
     // Expose for testing
     window.player = player;
 
     // Setup type toggle
-    var buttons = document.querySelectorAll('[data-source]');
-    var types = {
+    const buttons = document.querySelectorAll('[data-source]');
+    const types = {
         video: 'video',
         audio: 'audio',
         youtube: 'youtube',
         vimeo: 'vimeo',
     };
-    var currentType = window.location.hash.replace('#', '');
-    var historySupport = window.history && window.history.pushState;
-
-    // Bind to each button
-    [].forEach.call(buttons, function(button) {
-        button.addEventListener('click', function() {
-            var type = this.getAttribute('data-source');
-
-            newSource(type);
-
-            if (historySupport) {
-                history.pushState({ type: type }, '', '#' + type);
-            }
-        });
-    });
-
-    // List for backwards/forwards
-    window.addEventListener('popstate', function(event) {
-        if (event.state && 'type' in event.state) {
-            newSource(event.state.type);
-        }
-    });
-
-    // On load
-    if (historySupport) {
-        var video = !currentType.length;
-
-        // If there's no current type set, assume video
-        if (video) {
-            currentType = types.video;
-        }
-
-        // Replace current history state
-        if (currentType in types) {
-            history.replaceState(
-                {
-                    type: currentType,
-                },
-                '',
-                video ? '' : '#' + currentType
-            );
-        }
-
-        // If it's not video, load the source
-        if (currentType !== types.video) {
-            newSource(currentType, true);
-        }
-    }
+    let currentType = window.location.hash.replace('#', '');
+    const historySupport = window.history && window.history.pushState;
 
     // Toggle class on an element
     function toggleClass(element, className, state) {
@@ -109,7 +94,7 @@
 
         switch (type) {
             case types.video:
-                player.source({
+                player.src = {
                     type: 'video',
                     title: 'View From A Blue Moon',
                     sources: [
@@ -134,11 +119,12 @@
                             src: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.fr.vtt',
                         },
                     ],
-                });
+                };
+
                 break;
 
             case types.audio:
-                player.source({
+                player.src = {
                     type: 'audio',
                     title: 'Kishi Bashi &ndash; &ldquo;It All Began With A Burst&rdquo;',
                     sources: [
@@ -151,11 +137,12 @@
                             type: 'audio/ogg',
                         },
                     ],
-                });
+                };
+
                 break;
 
             case types.youtube:
-                player.source({
+                player.src = {
                     type: 'video',
                     title: 'View From A Blue Moon',
                     sources: [
@@ -164,11 +151,12 @@
                             type: 'youtube',
                         },
                     ],
-                });
+                };
+
                 break;
 
             case types.vimeo:
-                player.source({
+                player.src = {
                     type: 'video',
                     title: 'View From A Blue Moon',
                     sources: [
@@ -177,7 +165,11 @@
                             type: 'vimeo',
                         },
                     ],
-                });
+                };
+
+                break;
+
+            default:
                 break;
         }
 
@@ -185,23 +177,68 @@
         currentType = type;
 
         // Remove active classes
-        for (var x = buttons.length - 1; x >= 0; x--) {
-            toggleClass(buttons[x].parentElement, 'active', false);
-        }
+        Array.from(buttons).forEach(button => toggleClass(button.parentElement, 'active', false));
 
         // Set active on parent
-        toggleClass(document.querySelector('[data-source="' + type + '"]'), 'active', true);
+        toggleClass(document.querySelector(`[data-source="${type}"]`), 'active', true);
 
         // Show cite
-        [].forEach.call(document.querySelectorAll('.plyr__cite'), function(cite) {
+        Array.from(document.querySelectorAll('.plyr__cite')).forEach(cite => {
             cite.setAttribute('hidden', '');
         });
-        document.querySelector('.plyr__cite--' + type).removeAttribute('hidden');
+        document.querySelector(`.plyr__cite--${type}`).removeAttribute('hidden');
     }
-})();
+
+    // Bind to each button
+    Array.from(buttons).forEach(button => {
+        button.addEventListener('click', () => {
+            const type = button.getAttribute('data-source');
+
+            newSource(type);
+
+            if (historySupport) {
+                window.history.pushState({ type }, '', `#${type}`);
+            }
+        });
+    });
+
+    // List for backwards/forwards
+    window.addEventListener('popstate', event => {
+        if (event.state && 'type' in event.state) {
+            newSource(event.state.type);
+        }
+    });
+
+    // On load
+    if (historySupport) {
+        const video = !currentType.length;
+
+        // If there's no current type set, assume video
+        if (video) {
+            currentType = types.video;
+        }
+
+        // Replace current history state
+        if (currentType in types) {
+            window.history.replaceState(
+                {
+                    type: currentType,
+                },
+                '',
+                video ? '' : `#${currentType}`
+            );
+        }
+
+        // If it's not video, load the source
+        if (currentType !== types.video) {
+            newSource(currentType, true);
+        }
+    }
+});
 
 // Google analytics
 // For demo site (https://plyr.io) only
+/* eslint-disable */
 if (window.location.host === 'plyr.io') {
     (function(i, s, o, g, r, a, m) {
         i.GoogleAnalyticsObject = r;
@@ -220,3 +257,4 @@ if (window.location.host === 'plyr.io') {
     window.ga('create', 'UA-40881672-11', 'auto');
     window.ga('send', 'pageview');
 }
+/* eslint-enable */
