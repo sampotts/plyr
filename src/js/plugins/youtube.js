@@ -118,6 +118,23 @@ const youtube = {
                     player.media.muted = instance.isMuted();
                     player.media.currentTime = 0;
 
+                    // Seeking
+                    Object.defineProperty(player.media, 'currentTime', {
+                        get() {
+                            return Number(instance.getCurrentTime());
+                        },
+                        set(time) {
+                            // Set seeking flag
+                            player.media.seeking = true;
+
+                            // Trigger seeking
+                            utils.dispatchEvent.call(player, player.media, 'seeking');
+
+                            // Seek after events sent
+                            instance.seekTo(time);
+                        },
+                    });
+
                     // Playback speed
                     Object.defineProperty(player.media, 'playbackRate', {
                         get() {
@@ -142,7 +159,7 @@ const youtube = {
                     }
 
                     // Rebuild UI
-                    ui.build.call(player);
+                    window.setTimeout(() => ui.build.call(player), 0);
 
                     utils.dispatchEvent.call(player, player.media, 'timeupdate');
                     utils.dispatchEvent.call(player, player.media, 'durationchange');
@@ -218,7 +235,7 @@ const youtube = {
 
                             // Poll to get playback progress
                             player.timers.playing = window.setInterval(() => {
-                                player.media.currentTime = instance.getCurrentTime();
+                                // player.media.currentTime = instance.getCurrentTime();
                                 utils.dispatchEvent.call(player, player.media, 'timeupdate');
                             }, 100);
 

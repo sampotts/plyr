@@ -323,7 +323,7 @@ class Plyr {
         // Set the current time
         // TODO: This should be included in the "adapters"
         // Embeds
-        if (this.isEmbed) {
+        /* if (this.isEmbed) {
             // Get current paused state
             const { paused } = this.media;
 
@@ -351,8 +351,10 @@ class Plyr {
             // Trigger seeking
             utils.dispatchEvent.call(this, this.media, 'seeking');
         } else {
-            this.media.currentTime = targetTime.toFixed(4);
-        }
+
+        } */
+
+        this.media.currentTime = targetTime.toFixed(4);
 
         // Logging
         this.log(`Seeking to ${this.currentTime} seconds`);
@@ -408,6 +410,7 @@ class Plyr {
         this.media.volume = volume;
 
         // Trigger volumechange for embeds
+        // TODO: Do in adapters
         if (this.isEmbed) {
             // Set media volume
             switch (this.type) {

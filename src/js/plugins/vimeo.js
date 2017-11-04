@@ -77,6 +77,34 @@ const vimeo = {
 
         player.media.paused = true;
         player.media.currentTime = 0;
+        let { currentTime } = player.media;
+
+        // Seeking
+        Object.defineProperty(player.media, 'currentTime', {
+            get() {
+                return currentTime;
+            },
+            set(time) {
+                // Get current paused state
+                const { paused } = player.media;
+
+                player.warn('called');
+
+                // Set seeking flag
+                player.media.seeking = true;
+
+                // Trigger seeking
+                utils.dispatchEvent.call(player, player.media, 'seeking');
+
+                // Seek after events
+                player.embed.setCurrentTime(time);
+
+                // Restore pause state
+                if (paused) {
+                    this.pause();
+                }
+            },
+        });
 
         // Playback speed
         // Not currently supported in Vimeo
@@ -88,10 +116,10 @@ const vimeo = {
         });
 
         // Rebuild UI
-        ui.build.call(player);
+        window.setTimeout(() => ui.build.call(player), 0);
 
         player.embed.getCurrentTime().then(value => {
-            player.media.currentTime = value;
+            currentTime = value;
             utils.dispatchEvent.call(this, this.media, 'timeupdate');
         });
 
@@ -103,7 +131,6 @@ const vimeo = {
         // Get captions
         player.embed.getTextTracks().then(tracks => {
             player.captions.tracks = tracks;
-
             captions.setup.call(player);
         });
 
@@ -120,10 +147,6 @@ const vimeo = {
         player.embed.on('loaded', () => {
             if (utils.is.htmlElement(player.embed.element) && player.supported.ui) {
                 const frame = player.embed.element;
-
-                // Fix Vimeo controls issue
-                // https://github.com/sampotts/plyr/issues/697
-                // frame.src = `${frame.src}&transparent=0`;
 
                 // Fix keyboard focus issues
                 // https://github.com/sampotts/plyr/issues/317
@@ -144,7 +167,7 @@ const vimeo = {
 
         this.embed.on('timeupdate', data => {
             this.media.seeking = false;
-            this.media.currentTime = data.seconds;
+            currentTime = data.seconds;
             utils.dispatchEvent.call(this, this.media, 'timeupdate');
         });
 

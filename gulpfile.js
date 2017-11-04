@@ -83,7 +83,7 @@ const pkg = loadJSON(path.join(root, 'package.json'));
 const sizeOptions = { showFiles: true, gzip: true };
 
 // Browserlist
-const browsers = ['> 1%', 'last 2 versions'];
+const browsers = ['> 1%'];
 
 // Babel config
 const babelrc = {

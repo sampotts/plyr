@@ -360,61 +360,81 @@ const listeners = {
         });
 
         // Trigger custom and default handlers
-        const handlerProxy = (event, customHandler, defaultHandler) => {
+        const proxy = (event, handlerKey, defaultHandler) => {
+            const customHandler = this.config.listeners[handleKey];
+
+            // Execute custom handler
             if (utils.is.function(customHandler)) {
                 customHandler.call(this, event);
             }
-            if (utils.is.function(defaultHandler)) {
+
+            // Only call default handler if not prevented in custom handler
+            if (!event.defaultPrevented && utils.is.function(defaultHandler)) {
                 defaultHandler.call(this, event);
             }
         };
 
         // Play
-        utils.proxy(this.elements.buttons.play, 'click', this.config.listeners.play, togglePlay);
-        utils.proxy(this.elements.buttons.playLarge, 'click', this.config.listeners.play, togglePlay);
+        utils.on(this.elements.buttons.play, 'click', event => proxy(event, 'play', togglePlay));
 
         // Pause
-        utils.proxy(this.elements.buttons.pause, 'click', this.config.listeners.pause, togglePlay);
+        utils.on(this.elements.buttons.pause, 'click', event => proxy(event, 'pause', togglePlay));
 
         // Pause
-        utils.proxy(this.elements.buttons.restart, 'click', this.config.listeners.restart, () => {
-            this.restart();
-        });
+        utils.on(this.elements.buttons.restart, 'click', event =>
+            proxy(event, 'restart', () => {
+                this.restart();
+            })
+        );
 
         // Rewind
-        utils.proxy(this.elements.buttons.rewind, 'click', this.config.listeners.rewind, () => {
-            this.rewind();
-        });
+        utils.on(this.elements.buttons.rewind, 'click', event =>
+            proxy(event, 'rewind', () => {
+                this.rewind();
+            })
+        );
 
         // Rewind
-        utils.proxy(this.elements.buttons.forward, 'click', this.config.listeners.forward, () => {
-            this.forward();
-        });
+        utils.on(this.elements.buttons.forward, 'click', event =>
+            proxy(event, 'forward', () => {
+                this.forward();
+            })
+        );
 
         // Mute
-        utils.proxy(this.elements.buttons.mute, 'click', this.config.listeners.mute, () => {
-            this.toggleMute();
-        });
+        utils.on(this.elements.buttons.mute, 'click', event =>
+            proxy(event, 'mute', () => {
+                this.toggleMute();
+            })
+        );
 
         // Captions
-        utils.proxy(this.elements.buttons.captions, 'click', this.config.listeners.captions, () => {
-            this.toggleCaptions();
-        });
+        utils.on(this.elements.buttons.captions, 'click', event =>
+            proxy(event, 'captions', () => {
+                this.toggleCaptions();
+            })
+        );
 
         // Fullscreen
-        utils.proxy(this.elements.buttons.fullscreen, 'click', this.config.listeners.fullscreen, () => {
-            this.toggleFullscreen();
-        });
+        utils.on(this.elements.buttons.fullscreen, 'click', event =>
+            proxy(event, 'fullscreen', () => {
+                this.toggleFullscreen();
+            })
+        );
 
         // Picture-in-Picture
-        utils.proxy(this.elements.buttons.pip, 'click', this.config.listeners.pip, () => {
-            this.togglePictureInPicture();
-        });
+        utils.on(this.elements.buttons.pip, 'click', event =>
+            proxy(event, 'pip', () => {
+                this.togglePictureInPicture();
+            })
+        );
 
         // Airplay
-        utils.proxy(this.elements.buttons.airplay, 'click', this.config.listeners.airplay, () => {
-            this.airPlay();
-        });
+        utils.on(this.elements.buttons.airplay, 'click', event =>
+            proxy(event, 'airplay', () => {
+                this.airPlay();
+            })
+        );
 
         // Settings menu
         utils.on(this.elements.buttons.settings, 'click', event => {
@@ -434,24 +454,24 @@ const listeners = {
             // Settings menu items - use event delegation as items are added/removed
             // Settings - Language
             if (utils.matches(event.target, this.config.selectors.inputs.language)) {
-                handlerProxy.call(this, event, this.config.listeners.language, () => {
+                proxy(event, 'language', () => {
                     this.toggleCaptions(true);
                     this.language = event.target.value.toLowerCase();
                 });
             } else if (utils.matches(event.target, this.config.selectors.inputs.quality)) {
                 // Settings - Quality
-                handlerProxy.call(this, event, this.config.listeners.quality, () => {
+                proxy(event, 'quality', () => {
                     this.quality = event.target.value;
                 });
             } else if (utils.matches(event.target, this.config.selectors.inputs.speed)) {
                 // Settings - Speed
-                handlerProxy.call(this, event, this.config.listeners.speed, () => {
+                proxy(event, 'speed', () => {
                     this.speed = parseFloat(event.target.value);
                 });
             } else if (utils.matches(event.target, this.config.selectors.buttons.loop)) {
                 // Settings - Looping
                 // TODO: use toggle buttons
-                handlerProxy.call(this, event, this.config.listeners.loop, () => {
+                proxy(event, 'loop', () => {
                     // TODO: This should be done in the method itself I think
                     // var value = event.target.getAttribute('data-loop__value') || event.target.getAttribute('data-loop__type');
 
@@ -461,14 +481,18 @@ const listeners = {
         });
 
         // Seek
-        utils.proxy(this.elements.inputs.seek, inputEvent, this.config.listeners.seek, event => {
-            this.currentTime = event.target.value / event.target.max * this.duration;
-        });
+        utils.on(this.elements.inputs.seek, inputEvent, event =>
+            proxy(event, 'seek', () => {
+                this.currentTime = event.target.value / event.target.max * this.duration;
+            })
+        );
 
         // Volume
-        utils.proxy(this.elements.inputs.volume, inputEvent, this.config.listeners.volume, event => {
-            this.volume = event.target.value;
-        });
+        utils.on(this.elements.inputs.volume, inputEvent, event =>
+            proxy(event, 'volume', () => {
+                this.volume = event.target.value;
+            })
+        );
 
         // Polyfill for lower fill in <input type="range"> for webkit
         if (this.browser.isWebkit) {
@@ -479,7 +503,7 @@ const listeners = {
 
         // Seek tooltip
         utils.on(this.elements.progress, 'mouseenter mouseleave mousemove', event =>
-            ui.updateSeekTooltip.call(this, event)
+            controls.updateSeekTooltip.call(this, event)
         );
 
         // Toggle controls visibility based on mouse movement
@@ -516,44 +540,44 @@ const listeners = {
         }
 
         // Mouse wheel for volume
-        utils.proxy(
+        utils.on(
             this.elements.inputs.volume,
             'wheel',
-            this.config.listeners.volume,
-            event => {
-                // Detect "natural" scroll - suppored on OS X Safari only
-                // Other browsers on OS X will be inverted until support improves
-                const inverted = event.webkitDirectionInvertedFromDevice;
-                const step = 1 / 50;
-                let direction = 0;
+            event =>
+                proxy(event, 'volume', () => {
+                    // Detect "natural" scroll - suppored on OS X Safari only
+                    // Other browsers on OS X will be inverted until support improves
+                    const inverted = event.webkitDirectionInvertedFromDevice;
+                    const step = 1 / 50;
+                    let direction = 0;
 
-                // Scroll down (or up on natural) to decrease
-                if (event.deltaY < 0 || event.deltaX > 0) {
-                    if (inverted) {
-                        this.decreaseVolume(step);
-                        direction = -1;
-                    } else {
-                        this.increaseVolume(step);
-                        direction = 1;
+                    // Scroll down (or up on natural) to decrease
+                    if (event.deltaY < 0 || event.deltaX > 0) {
+                        if (inverted) {
+                            this.decreaseVolume(step);
+                            direction = -1;
+                        } else {
+                            this.increaseVolume(step);
+                            direction = 1;
+                        }
                     }
-                }
 
-                // Scroll up (or down on natural) to increase
-                if (event.deltaY > 0 || event.deltaX < 0) {
-                    if (inverted) {
-                        this.increaseVolume(step);
-                        direction = 1;
-                    } else {
-                        this.decreaseVolume(step);
-                        direction = -1;
+                    // Scroll up (or down on natural) to increase
+                    if (event.deltaY > 0 || event.deltaX < 0) {
+                        if (inverted) {
+                            this.increaseVolume(step);
+                            direction = 1;
+                        } else {
+                            this.decreaseVolume(step);
+                            direction = -1;
+                        }
                     }
-                }
 
-                // Don't break page scrolling at max and min
-                if ((direction === 1 && this.media.volume < 1) || (direction === -1 && this.media.volume > 0)) {
-                    event.preventDefault();
-                }
-            },
+                    // Don't break page scrolling at max and min
+                    if ((direction === 1 && this.media.volume < 1) || (direction === -1 && this.media.volume > 0)) {
+                        event.preventDefault();
+                    }
+                }),
             false
         );
 

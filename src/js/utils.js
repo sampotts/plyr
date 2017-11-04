@@ -391,22 +391,6 @@ const utils = {
         );
     },
 
-    // Bind along with custom handler
-    proxy(element, eventName, customListener, defaultListener, passive, capture) {
-        utils.on(
-            element,
-            eventName,
-            event => {
-                if (customListener) {
-                    customListener.apply(element, [event]);
-                }
-                defaultListener.apply(element, [event]);
-            },
-            passive,
-            capture
-        );
-    },
-
     // Toggle event listener
     toggleListener(elements, event, callback, toggle, passive, capture) {
         // Bail if no elements
@@ -415,7 +399,7 @@ const utils = {
         }
 
         // If a nodelist is passed, call itself on each node
-        if (elements instanceof NodeList) {
+        if (utils.is.nodeList(elements)) {
             // Create listener for each node
             Array.from(elements).forEach(element => {
                 if (element instanceof Node) {

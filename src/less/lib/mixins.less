@@ -3,6 +3,17 @@
 // https://github.com/sampotts/plyr
 // ==========================================================================
 
+// Font smoothing
+// ---------------------------------------
+.plyr-font-smoothing(@mode: on) when(@mode = on) {
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+}
+.plyr-font-smoothing(@mode: on) when(@mode = off) {
+    -moz-osx-font-smoothing: auto;
+    -webkit-font-smoothing: subpixel-antialiased;
+}
+
 // <input type="range"> styling
 .plyr-range-track() {
     height: @plyr-range-track-height;

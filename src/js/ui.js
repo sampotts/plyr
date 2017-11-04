@@ -114,7 +114,7 @@ const ui = {
         }
 
         // Update the tooltip (if visible)
-        ui.updateSeekTooltip.call(this);
+        controls.updateSeekTooltip.call(this);
     },
 
     // Setup aria attribute for play and iframe title
@@ -329,52 +329,6 @@ const ui = {
 
         // Playing progress
         ui.updateProgress.call(this, event);
-    },
-
-    // Update hover tooltip for seeking
-    updateSeekTooltip(event) {
-        // Bail if setting not true
-        if (
-            !this.config.tooltips.seek ||
-            !utils.is.htmlElement(this.elements.inputs.seek) ||
-            !utils.is.htmlElement(this.elements.display.seekTooltip) ||
-            this.duration === 0
-        ) {
-            return;
-        }
-
-        // Calculate percentage
-        const clientRect = this.elements.inputs.seek.getBoundingClientRect();
-        let percent = 0;
-        const visible = `${this.config.classNames.tooltip}--visible`;
-
-        // Determine percentage, if already visible
-        if (utils.is.event(event)) {
-            percent = 100 / clientRect.width * (event.pageX - clientRect.left);
-        } else if (utils.hasClass(this.elements.display.seekTooltip, visible)) {
-            percent = this.elements.display.seekTooltip.style.left.replace('%', '');
-        } else {
-            return;
-        }
-
-        // Set bounds
-        if (percent < 0) {
-            percent = 0;
-        } else if (percent > 100) {
-            percent = 100;
-        }
-
-        // Display the time a click would seek to
-        ui.updateTimeDisplay.call(this, this.duration / 100 * percent, this.elements.display.seekTooltip);
-
-        // Set position
-        this.elements.display.seekTooltip.style.left = `${percent}%`;
-
-        // Show/hide the tooltip
-        // If the event is a moues in/out and percentage is inside bounds
-        if (utils.is.event(event) && ['mouseenter', 'mouseleave'].includes(event.type)) {
-            utils.toggleClass(this.elements.display.seekTooltip, visible, event.type === 'mouseenter');
-        }
     },
 };
 

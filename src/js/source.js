@@ -16,8 +16,6 @@ const source = {
                 src: attributes,
             });
         } else if (utils.is.array(attributes)) {
-            this.warn(attributes);
-
             attributes.forEach(attribute => {
                 utils.insertElement(type, this.media, attribute);
             });
