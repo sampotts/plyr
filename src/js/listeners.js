@@ -467,7 +467,7 @@ const listeners = {
 
         // Volume
         utils.proxy(this.elements.inputs.volume, inputEvent, this.config.listeners.volume, event => {
-            this.setVolume(event.target.value);
+            this.volume = event.target.value;
         });
 
         // Polyfill for lower fill in <input type="range"> for webkit

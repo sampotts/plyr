@@ -78,6 +78,15 @@ const vimeo = {
         player.media.paused = true;
         player.media.currentTime = 0;
 
+        // Playback speed
+        // Not currently supported in Vimeo
+        Object.defineProperty(player.media, 'playbackRate', {
+            get() {
+                return null;
+            },
+            set() {},
+        });
+
         // Rebuild UI
         ui.build.call(player);
 

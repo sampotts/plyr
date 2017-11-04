@@ -6,14 +6,6 @@ import utils from './../utils';
 import controls from './../controls';
 import ui from './../ui';
 
-/* Object.defineProperty(input, "value", {
-    get: function() {return this._value;},
-    set: function(v) {
-        // Do your stuff
-        this._value = v;
-    }
-}); */
-
 const youtube = {
     // Setup YouTube
     setup() {
@@ -125,6 +117,16 @@ const youtube = {
                     player.media.paused = true;
                     player.media.muted = instance.isMuted();
                     player.media.currentTime = 0;
+
+                    // Playback speed
+                    Object.defineProperty(player.media, 'playbackRate', {
+                        get() {
+                            return instance.getPlaybackRate();
+                        },
+                        set(speed) {
+                            instance.setPlaybackRate(speed);
+                        },
+                    });
 
                     // Get available speeds
                     if (player.config.controls.includes('settings') && player.config.settings.includes('speed')) {

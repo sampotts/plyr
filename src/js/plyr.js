@@ -513,39 +513,11 @@ class Plyr {
         }
 
         // Set media speed
-        // TODO: Should be in adapter
-        switch (this.type) {
-            case 'youtube':
-                this.embed.setPlaybackRate(speed);
-                break;
-
-            case 'vimeo':
-                speed = null;
-                // Vimeo not supported (https://github.com/vimeo/this.js)
-                this.warn('Vimeo playback rate change is not supported');
-                break;
-
-            default:
-                this.media.playbackRate = speed;
-                break;
-        }
+        this.media.playbackRate = speed;
     }
 
     get speed() {
-        // Set media speed
-        // TODO: Should be in adapter
-        switch (this.type) {
-            case 'youtube':
-                return this.embed.getPlaybackRate();
-
-            case 'vimeo':
-                // Vimeo not supported (https://github.com/vimeo/player.js)
-                this.warn('Vimeo playback rate change is not supported');
-                return null;
-
-            default:
-                return this.media.playbackRate;
-        }
+        return this.media.playbackRate;
     }
 
     // Set playback quality
@@ -592,7 +564,7 @@ class Plyr {
     // Toggle loop
     // TODO: Finish logic
     // TODO: Set the indicator on load as user may pass loop as config
-    loop(input) {
+    /* loop(input) {
         // Set default to be a true toggle
         const type = ['start', 'end', 'all', 'none', 'toggle'].includes(input) ? input : 'toggle';
 
@@ -638,7 +610,7 @@ class Plyr {
 
         // Allow chaining
         return this;
-    }
+    } */
 
     // Media source
     set src(input) {
