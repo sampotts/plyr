@@ -3,8 +3,8 @@
 // https://github.com/selz/plyr
 // ==========================================================================
 
-@import "variables";
-@import "mixins";
+@import 'variables';
+@import 'mixins';
 
 // Animation
 // ---------------------------------------
@@ -61,15 +61,15 @@
 
     // Range inputs
     // Specificity is for bootstrap compatibility
-    input[type="range"] {
+    input[type='range'] {
         display: block;
         height: (@plyr-range-thumb-height * @plyr-range-thumb-active-scale);
         width: 100%;
         margin: 0;
         padding: 0;
-        vertical-align: middle;
 
-        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
         cursor: pointer;
         border: none;
         background: transparent;
@@ -142,12 +142,12 @@
 }
 
 // Video range inputs
-.plyr--video input[type="range"].tab-focus:focus {
+.plyr--video input[type='range'].tab-focus:focus {
     outline: 1px dotted fade(@plyr-video-control-color, 50%);
 }
 
 // Audio range inputs
-.plyr--audio input[type="range"].tab-focus:focus {
+.plyr--audio input[type='range'].tab-focus:focus {
     outline: 1px dotted fade(@plyr-audio-control-color, 50%);
 }
 
@@ -274,7 +274,7 @@
     line-height: 1;
     text-align: center;
     pointer-events: none;
-    
+
     & > * {
         pointer-events: all;
     }
@@ -292,7 +292,7 @@
     .plyr__volume {
         margin-left: (@plyr-control-spacing / 2);
     }
-    [data-plyr="pause"] {
+    [data-plyr='pause'] {
         margin-left: 0;
     }
 
@@ -428,11 +428,11 @@
 }
 
 // States
-.plyr__controls [data-plyr="pause"],
-.plyr--playing .plyr__controls [data-plyr="play"] {
+.plyr__controls [data-plyr='pause'],
+.plyr--playing .plyr__controls [data-plyr='play'] {
     display: none;
 }
-.plyr--playing .plyr__controls [data-plyr="pause"] {
+.plyr--playing .plyr__controls [data-plyr='pause'] {
     display: inline-block;
 }
 
@@ -448,12 +448,12 @@
 }
 
 // Some options are hidden by default
-.plyr [data-plyr="captions"],
-.plyr [data-plyr="fullscreen"] {
+.plyr [data-plyr='captions'],
+.plyr [data-plyr='fullscreen'] {
     display: none;
 }
-.plyr--captions-enabled [data-plyr="captions"],
-.plyr--fullscreen-enabled [data-plyr="fullscreen"] {
+.plyr--captions-enabled [data-plyr='captions'],
+.plyr--fullscreen-enabled [data-plyr='fullscreen'] {
     display: inline-block;
 }
 
@@ -481,7 +481,7 @@
 
     &::before {
         // Arrows
-        content: "";
+        content: '';
         position: absolute;
         width: 0;
         height: 0;
@@ -547,7 +547,7 @@
     display: none;
     flex: 1;
 
-    input[type="range"] {
+    input[type='range'] {
         position: relative;
         z-index: 2;
 
@@ -582,7 +582,8 @@
     margin: -(@plyr-range-track-height / 2) 0 0;
     padding: 0;
     vertical-align: top;
-    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
     border: none;
     border-radius: 100px;
 
@@ -695,7 +696,7 @@
 
     // Add a slash in before
     &::before {
-        content: "\2044";
+        content: '\2044';
         margin-right: @plyr-control-spacing;
     }
 }
@@ -709,7 +710,7 @@
     flex: 1;
     position: relative;
 
-    input[type="range"] {
+    input[type='range'] {
         position: relative;
         z-index: 2;
     }
@@ -726,7 +727,7 @@
 // It's not supported to change volume using JavaScript:
 // https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html
 .plyr--is-ios .plyr__volume,
-.plyr--is-ios [data-plyr="mute"] {
+.plyr--is-ios [data-plyr='mute'] {
     display: none !important;
 }
 
