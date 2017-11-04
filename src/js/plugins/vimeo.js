@@ -77,9 +77,9 @@ const vimeo = {
 
         player.media.paused = true;
         player.media.currentTime = 0;
-        let { currentTime } = player.media;
 
         // Seeking
+        let { currentTime } = player.media;
         Object.defineProperty(player.media, 'currentTime', {
             get() {
                 return currentTime;
@@ -114,14 +114,34 @@ const vimeo = {
             set() {},
         });
 
+        // Volume
+        let { volume } = player.media;
+        Object.defineProperty(player.media, 'volume', {
+            get() {
+                return volume;
+            },
+            set(input) {
+                volume = input;
+                player.embed.setVolume(input);
+                utils.dispatchEvent.call(player, player.media, 'volumechange');
+            },
+        });
+
         // Rebuild UI
         window.setTimeout(() => ui.build.call(player), 0);
 
+        // Get title
+        player.embed.getVideoTitle().then(title => {
+            player.config.title = title;
+        });
+
+        // Get current time
         player.embed.getCurrentTime().then(value => {
             currentTime = value;
             utils.dispatchEvent.call(this, this.media, 'timeupdate');
         });
 
+        // Get duration
         player.embed.getDuration().then(value => {
             player.media.duration = value;
             utils.dispatchEvent.call(player, player.media, 'durationchange');

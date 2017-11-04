@@ -11,6 +11,14 @@ header {
         .font-size(@font-size-large);
     }
 
+    .action {
+        display: inline-flex;
+
+        .button .icon {
+            flex-shrink: 0;
+        }
+    }
+
     @media @mq-md {
         max-width: 400px;
         margin-right: (@spacing-base * 2);

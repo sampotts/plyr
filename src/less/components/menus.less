@@ -30,7 +30,7 @@
         animation: plyr-popup 0.2s ease;
         background: @plyr-menu-bg;
         border-radius: 4px;
-        box-shadow: 0 1px 2px fade(#000, 20%);
+        box-shadow: @plyr-menu-shadow;
         white-space: nowrap;
         text-align: left;
         color: @plyr-menu-color;
@@ -117,8 +117,8 @@
                     height: 1px;
                     overflow: hidden;
                     margin-top: ceil(@plyr-control-padding / 2);
-                    background: fade(#000, 15%);
-                    box-shadow: 0 1px 0 fade(#fff, 10%);
+                    background: @plyr-menu-border-color;
+                    box-shadow: 0 1px 0 @plyr-menu-border-shadow-color;
                 }
 
                 &.tab-focus::after,

@@ -320,40 +320,7 @@ class Plyr {
             targetTime = this.duration;
         }
 
-        // Set the current time
-        // TODO: This should be included in the "adapters"
-        // Embeds
-        /* if (this.isEmbed) {
-            // Get current paused state
-            const { paused } = this.media;
-
-            switch (this.type) {
-                case 'youtube':
-                    this.embed.seekTo(targetTime);
-                    break;
-
-                case 'vimeo':
-                    this.embed.setCurrentTime(targetTime);
-                    break;
-
-                default:
-                    break;
-            }
-
-            // Restore pause (some will play on seek)
-            if (paused) {
-                this.pause();
-            }
-
-            // Set seeking flag
-            this.media.seeking = true;
-
-            // Trigger seeking
-            utils.dispatchEvent.call(this, this.media, 'seeking');
-        } else {
-
-        } */
-
+        // Set
         this.media.currentTime = targetTime.toFixed(4);
 
         // Logging
@@ -364,7 +331,7 @@ class Plyr {
         return Number(this.media.currentTime);
     }
 
-    // Get the duration (or custom if set)
+    // Duration
     get duration() {
         // Faux duration set via config
         const fauxDuration = parseInt(this.config.duration, 10);
@@ -376,7 +343,7 @@ class Plyr {
         return !Number.isNaN(fauxDuration) ? fauxDuration : realDuration;
     }
 
-    // Set volume
+    // Volume
     set volume(value) {
         let volume = value;
         const max = 1;
@@ -408,26 +375,6 @@ class Plyr {
 
         // Set the player volume
         this.media.volume = volume;
-
-        // Trigger volumechange for embeds
-        // TODO: Do in adapters
-        if (this.isEmbed) {
-            // Set media volume
-            switch (this.type) {
-                case 'youtube':
-                    this.embed.setVolume(this.media.volume * 100);
-                    break;
-
-                case 'vimeo':
-                    this.embed.setVolume(this.media.volume);
-                    break;
-
-                default:
-                    break;
-            }
-
-            utils.dispatchEvent.call(this, this.media, 'volumechange');
-        }
 
         // Toggle muted state
         if (volume === 0) {

@@ -140,8 +140,19 @@ const youtube = {
                         get() {
                             return instance.getPlaybackRate();
                         },
-                        set(speed) {
-                            instance.setPlaybackRate(speed);
+                        set(input) {
+                            instance.setPlaybackRate(input);
+                        },
+                    });
+
+                    // Volume
+                    Object.defineProperty(player.media, 'volume', {
+                        get() {
+                            return instance.getVolume() / 100;
+                        },
+                        set(input) {
+                            instance.setVolume(input * 100);
+                            utils.dispatchEvent.call(player, player.media, 'volumechange');
                         },
                     });
 
@@ -235,9 +246,8 @@ const youtube = {
 
                             // Poll to get playback progress
                             player.timers.playing = window.setInterval(() => {
-                                // player.media.currentTime = instance.getCurrentTime();
                                 utils.dispatchEvent.call(player, player.media, 'timeupdate');
-                            }, 100);
+                            }, 50);
 
                             // Check duration again due to YouTube bug
                             // https://github.com/sampotts/plyr/issues/374
