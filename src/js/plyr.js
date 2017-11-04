@@ -662,10 +662,10 @@
         return url.match(regex) ? RegExp.$2 : url;
     }
 
-    // Parse Vimeo ID from url
-    function _parseVimeoId(url) {
+    // Is this a Vimeo url link?
+    function _isVimeoUrl(url) {
         var regex = /^.*(vimeo.com\/|video\/)(\d+).*/;
-        return url.match(regex) ? RegExp.$2 : url;
+        return url.match(regex);
     }
 
     // Fullscreen API
@@ -1616,6 +1616,7 @@
         function _setupEmbed() {
             var container = document.createElement("div"),
                 mediaId,
+                mediaUrl,
                 id = plyr.type + "-" + Math.floor(Math.random() * 10000);
 
             // Parse IDs from URLs if supplied
@@ -1625,7 +1626,14 @@
                     break;
 
                 case "vimeo":
-                    mediaId = _parseVimeoId(plyr.embedId);
+                    if (_isVimeoUrl(plyr.embedId)) {
+                        mediaId = null;
+                        mediaUrl = plyr.embedId;
+                    } else {
+                        mediaId = parseInt(plyr.embedId);
+                        mediaUrl = null;
+                    }
+
                     break;
 
                 default:
@@ -1690,11 +1698,11 @@
                     var vimeoTimer = window.setInterval(function() {
                         if (_is.object(window.Vimeo)) {
                             window.clearInterval(vimeoTimer);
-                            _vimeoReady(mediaId, container);
+                            _vimeoReady(mediaId, mediaUrl, container);
                         }
                     }, 50);
                 } else {
-                    _vimeoReady(mediaId, container);
+                    _vimeoReady(mediaId, mediaUrl, container);
                 }
             } else if (plyr.type === "soundcloud") {
                 // TODO: Currently unsupported and undocumented
@@ -1898,17 +1906,27 @@
         }
 
         // Vimeo ready
-        function _vimeoReady(mediaId, container) {
+        function _vimeoReady(mediaId, mediaUrl, container) {
             // Setup instance
             // https://github.com/vimeo/player.js
-            plyr.embed = new window.Vimeo.Player(container, {
-                id: parseInt(mediaId),
-                loop: config.loop,
-                autoplay: config.autoplay,
-                byline: false,
-                portrait: false,
-                title: false
-            });
+
+            var vimeoOptions = {
+                loop:       config.loop,
+                autoplay:   config.autoplay,
+                byline:     false,
+                portrait:   false,
+                title:      false
+            };
+
+            if (mediaId) {
+                vimeoOptions.id = mediaId;
+            }
+
+            if (mediaUrl) {
+                vimeoOptions.url = mediaUrl;
+            }
+
+            plyr.embed = new window.Vimeo.Player(container, vimeoOptions);
 
             // Create a faux HTML5 API using the Vimeo API
             plyr.media.play = function() {
