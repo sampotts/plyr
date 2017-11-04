@@ -49,7 +49,7 @@ const controls = {
     getIconUrl() {
         return {
             url: this.config.iconUrl,
-            absolute: this.config.iconUrl.indexOf('http') === 0 || this.browser.isIE,
+            absolute: this.config.iconUrl.indexOf('http') === 0 || (this.browser.isIE && !window.svg4everybody),
         };
     },
 
@@ -594,6 +594,7 @@ const controls = {
     },
 
     // Get current selected caption language
+    // TODO: rework this to user the getter in the API?
     getLanguage() {
         if (!this.supported.ui) {
             return null;
@@ -606,6 +607,7 @@ const controls = {
         if (this.captions.enabled) {
             return this.captions.currentTrack.label;
         }
+
         return this.config.i18n.disabled;
     },
 
@@ -1160,18 +1162,18 @@ const controls = {
             container = this.config.controls({
                 id: this.id,
                 seektime: this.config.seekTime,
+                title: this.config.title,
             });
         } else {
             // Create controls
             container = controls.create.call(this, {
                 id: this.id,
                 seektime: this.config.seekTime,
-                speed: '-',
-                // TODO: Get current quality
-                quality: '-',
+                speed: this.speed,
+                quality: this.quality,
                 captions: controls.getLanguage.call(this),
-                // TODO: Get loop
-                loop: 'None',
+                // TODO: Looping
+                // loop: 'None',
             });
         }
 
