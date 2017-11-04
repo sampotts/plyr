@@ -5,7 +5,7 @@ A simple, accessible and customizable HTML5, YouTube and Vimeo media player.
 
 [Checkout the demo](https://plyr.io)
 
-[![Image of Plyr](https://cdn.selz.com/plyr/plyr_v1.8.9.png)](https://plyr.io)
+[![Image of Plyr](https://cdn.plyr.io/static/demo/screenshot.png)](https://plyr.io)
 
 ## Why?
 We wanted a lightweight, accessible and customizable media player that supports [*modern*](#browser-support) browsers. Sure, there are many other players out there but we wanted to keep things simple, using the right elements for the job.
@@ -137,7 +137,7 @@ Include the `plyr.js` script before the closing `</body>` tag and then call `ply
 If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for the JavaScript, you can use the following:
 
 ```html
-<script src="https://cdn.plyr.io/2.0.13/plyr.js"></script>
+<script src="https://cdn.plyr.io/2.0.16/plyr.js"></script>
 ```
 
 ### CSS
@@ -150,11 +150,11 @@ Include the `plyr.css` stylsheet into your `<head>`
 If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for the default CSS, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/2.0.13/plyr.css">
+<link rel="stylesheet" href="https://cdn.plyr.io/2.0.16/plyr.css">
 ```
 
 ### SVG Sprite
-The SVG sprite is loaded automatically from our CDN (provided by [Fastly](https://www.fastly.com/)). To change this, see the [options](#options) below. For reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/2.0.13/plyr.svg`.
+The SVG sprite is loaded automatically from our CDN (provided by [Fastly](https://www.fastly.com/)). To change this, see the [options](#options) below. For reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/2.0.16/plyr.svg`.
 
 ## Advanced
 
