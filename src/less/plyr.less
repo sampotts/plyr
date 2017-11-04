@@ -273,6 +273,11 @@
     align-items: center;
     line-height: 1;
     text-align: center;
+    pointer-events: none;
+    
+    & > * {
+        pointer-events: all;
+    }
 
     // Spacing
     > button,
