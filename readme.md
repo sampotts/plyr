@@ -5,7 +5,7 @@ A simple, accessible and customizable HTML5, YouTube and Vimeo media player.
 
 [Checkout the demo](https://plyr.io)
 
-[![Image of Plyr](https://cdn.selz.com/plyr/plyr_v1.8.9.png)](https://plyr.io)
+[![Image of Plyr](https://cdn.plyr.io/static/demo/screenshot.png)](https://plyr.io)
 
 ## Why?
 We wanted a lightweight, accessible and customizable media player that supports [*modern*](#browser-support) browsers. Sure, there are many other players out there but we wanted to keep things simple, using the right elements for the job.
@@ -137,7 +137,7 @@ Include the `plyr.js` script before the closing `</body>` tag and then call `ply
 If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for the JavaScript, you can use the following:
 
 ```html
-<script src="https://cdn.plyr.io/2.0.13/plyr.js"></script>
+<script src="https://cdn.plyr.io/2.0.16/plyr.js"></script>
 ```
 
 ### CSS
@@ -150,11 +150,11 @@ Include the `plyr.css` stylsheet into your `<head>`
 If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for the default CSS, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/2.0.13/plyr.css">
+<link rel="stylesheet" href="https://cdn.plyr.io/2.0.16/plyr.css">
 ```
 
 ### SVG Sprite
-The SVG sprite is loaded automatically from our CDN (provided by [Fastly](https://www.fastly.com/)). To change this, see the [options](#options) below. For reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/2.0.13/plyr.svg`.
+The SVG sprite is loaded automatically from our CDN (provided by [Fastly](https://www.fastly.com/)). To change this, see the [options](#options) below. For reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/2.0.16/plyr.svg`.
 
 ## Advanced
 
@@ -904,16 +904,14 @@ These events also bubble up the DOM. The event target will be the container elem
 Details borrowed from: [https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events](https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events)
 
 ## Embeds
-YouTube and Vimeo are currently supported and function much like a HTML5 video. Check the relevant documentation sections for any differences.
-
-Plyr references a custom version of the Vimeo Froogaloop API as Vimeo have neglected to maintain the library and there were bugs with their version. You don't need to worry about including your own versions of the Vimeo or YouTube JavaScript APIs.
+YouTube and Vimeo are currently supported and function much like a HTML5 video. Check the relevant documentation sections for any differences. You don't need to worry about including your own versions of the Vimeo or YouTube JavaScript APIs. Plyr will automatically include them.
 
 The embed third party API's can be accessed through the `getEmbed()` API method.
 
 More info on the respective API's here:
 
 - [YouTube API Reference](https://developers.google.com/youtube/js_api_reference)
-- [Vimeo API Reference](https://developer.vimeo.com/player/js-api#reference)
+- [Vimeo API Reference](https://github.com/vimeo/player.js)
 
 *Please note*: not all API methods may work 100%. Your mileage may vary. It's better to use the universal plyr API where possible.
 

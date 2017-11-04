@@ -1,5 +1,17 @@
 # Changelog
 
+## v2.0.16
+- Fullscreen bug fix (fixes #664)
+
+## v2.0.15
+- Demo fix
+
+## v2.0.14
+- CDN URL updates. Sorry, still working on V3 as hard as I can...
+
+## v2.0.13
+- Repo moved and Vimeo demo fix
+
 ## v2.0.12
 - Ability to set custom `blankUrl` for source changes (https://github.com/sampotts/plyr/pull/504)
 - Ability to set caption button listener (https://github.com/sampotts/plyr/pull/468)
