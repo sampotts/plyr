@@ -37,6 +37,7 @@ You need to add several placeholders to your html template that are replaced whe
 
 - `{id}` - the dynamically generated ID for the player (for form controls)
 - `{seektime}` - the seek time specified in options for fast forward and rewind
+- `{title}` - the title of your media, if specified
 
 You can include only the controls you need when specifying custom html.
 

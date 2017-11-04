@@ -1389,6 +1389,11 @@
             // Replace all id references with random numbers
             html = _replaceAll(html, "{id}", Math.floor(Math.random() * 10000));
 
+            // Replace Title, if it exists
+            if (config.title){
+                html = _replaceAll(html, '{title}', config.title);
+            }
+
             // Controls container
             var target;
 
