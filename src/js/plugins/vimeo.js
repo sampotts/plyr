@@ -86,9 +86,8 @@ const vimeo = {
             },
             set(time) {
                 // Get current paused state
+                // Vimeo will automatically play on seek
                 const { paused } = player.media;
-
-                player.warn('called');
 
                 // Set seeking flag
                 player.media.seeking = true;
