@@ -129,7 +129,7 @@ const vimeo = {
         // Source
         let currentSrc;
 
-        player.embed.getVideoUrl.then(value => {
+        player.embed.getVideoUrl().then(value => {
             currentSrc = value;
         });
 
