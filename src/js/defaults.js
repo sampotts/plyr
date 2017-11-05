@@ -294,7 +294,7 @@ const defaults = {
             supported: 'plyr--airplay-supported',
             active: 'plyr--airplay-active',
         },
-        tabFocus: 'tab-focus',
+        tabFocus: 'plyr__tab-focus',
     },
 };
 

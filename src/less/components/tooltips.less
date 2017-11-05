@@ -41,7 +41,7 @@
 
 // Displaying
 .plyr .plyr__control:hover .plyr__tooltip,
-.plyr .plyr__control.tab-focus .plyr__tooltip,
+.plyr .plyr__control.plyr__tab-focus .plyr__tooltip,
 .plyr__tooltip--visible {
     opacity: 1;
     transform: translate(-50%, 0) scale(1);
@@ -80,7 +80,7 @@
 .plyr__controls > .plyr__control:first-child + .plyr__control,
 .plyr__controls > .plyr__control:last-child {
     &:hover .plyr__tooltip,
-    &.tab-focus .plyr__tooltip,
+    &.plyr__tab-focus .plyr__tooltip,
     .plyr__tooltip--visible {
         transform: translate(0, 0) scale(1);
     }
