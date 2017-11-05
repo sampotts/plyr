@@ -127,7 +127,7 @@ const captions = {
 
                 // If we change the active track while a cue is already displayed we need to update it
                 if (this.captions.currentTrack.activeCues && this.captions.currentTrack.activeCues.length > 0) {
-                    controls.setCue.call(this, this.captions.currentTrack);
+                    captions.setCue.call(this, this.captions.currentTrack);
                 }
             }
         } else if (this.type === 'vimeo' && this.captions.active) {
