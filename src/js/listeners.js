@@ -151,11 +151,9 @@ const listeners = {
         };
 
         // Get the key code for an event
-        function getKeyCode(event) {
-            return event.keyCode ? event.keyCode : event.which;
-        }
+        const getKeyCode = event => (event.keyCode ? event.keyCode : event.which);
 
-        function handleKey(event) {
+        const handleKey = event => {
             const code = getKeyCode(event);
             const pressed = event.type === 'keydown';
             const held = pressed && code === last;
@@ -167,10 +165,10 @@ const listeners = {
             }
 
             // Seek by the number keys
-            function seekByKey() {
+            const seekByKey = () => {
                 // Divide the max duration into 10th's and times by the number value
                 this.currentTime = this.duration / 10 * (code - 48);
-            }
+            };
 
             // Handle the key on keydown
             // Reset on keyup
@@ -306,7 +304,7 @@ const listeners = {
             } else {
                 last = null;
             }
-        }
+        };
 
         // Keyboard shortcuts
         if (this.config.keyboard.focused) {
