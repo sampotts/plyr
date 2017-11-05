@@ -189,7 +189,7 @@ const captions = {
     // Display captions container and button (for initialization)
     show() {
         // If there's no caption toggle, bail
-        if (!this.elements.buttons.captions) {
+        if (!utils.is.htmlElement(this.elements.buttons.captions)) {
             return;
         }
 
@@ -198,7 +198,7 @@ const captions = {
 
         // Otherwise fall back to the default config
         if (!utils.is.boolean(active)) {
-            ({ active } = this.captions);
+            ({ active } = this.config.captions);
         } else {
             this.captions.active = active;
         }

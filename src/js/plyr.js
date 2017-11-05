@@ -566,7 +566,7 @@ class Plyr {
     // Toggle captions
     toggleCaptions(input) {
         // If there's no full support, or there's no caption toggle
-        if (!this.supported.ui || !this.elements.buttons.captions) {
+        if (!this.supported.ui || !utils.is.htmlElement(this.elements.buttons.captions)) {
             return this;
         }
 
