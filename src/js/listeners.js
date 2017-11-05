@@ -253,7 +253,7 @@ const listeners = {
                     case 77:
                         // M key
                         if (!held) {
-                            this.toggleMute();
+                            this.muted = 'toggle';
                         }
                         break;
 
@@ -402,7 +402,7 @@ const listeners = {
         // Mute
         utils.on(this.elements.buttons.mute, 'click', event =>
             proxy(event, 'mute', () => {
-                this.toggleMute();
+                this.muted = 'toggle';
             })
         );
 
@@ -423,7 +423,7 @@ const listeners = {
         // Picture-in-Picture
         utils.on(this.elements.buttons.pip, 'click', event =>
             proxy(event, 'pip', () => {
-                this.togglePictureInPicture();
+                this.pip = 'toggle';
             })
         );
 

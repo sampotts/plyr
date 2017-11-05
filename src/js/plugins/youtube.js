@@ -145,12 +145,26 @@ const youtube = {
                     });
 
                     // Volume
+                    let volume = instance.getVolume() / 100;
                     Object.defineProperty(player.media, 'volume', {
                         get() {
-                            return instance.getVolume() / 100;
+                            return volume;
                         },
                         set(input) {
-                            instance.setVolume(input * 100);
+                            volume = input;
+                            instance.setVolume(volume * 100);
+                            utils.dispatchEvent.call(player, player.media, 'volumechange');
+                        },
+                    });
+
+                    // Muted
+                    Object.defineProperty(player.media, 'muted', {
+                        get() {
+                            return instance.isMuted();
+                        },
+                        set(input) {
+                            const toggle = utils.is.boolean(input) ? input : false;
+                            instance[toggle ? 'mute' : 'unMute']();
                             utils.dispatchEvent.call(player, player.media, 'volumechange');
                         },
                     });
@@ -174,9 +188,6 @@ const youtube = {
                     if (player.supported.ui) {
                         player.media.setAttribute('tabindex', -1);
                     }
-
-                    // Rebuild UI
-                    window.setTimeout(() => ui.build.call(player), 0);
 
                     utils.dispatchEvent.call(player, player.media, 'timeupdate');
                     utils.dispatchEvent.call(player, player.media, 'durationchange');
@@ -205,6 +216,9 @@ const youtube = {
                             utils.dispatchEvent.call(player, player.media, 'canplaythrough');
                         }
                     }, 200);
+
+                    // Rebuild UI
+                    window.setTimeout(() => ui.build.call(player), 50);
                 },
                 onStateChange(event) {
                     // Get the instance

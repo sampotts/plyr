@@ -347,7 +347,6 @@ class Plyr {
         let volume = value;
         const max = 1;
         const min = 0;
-        const isSet = !utils.is.undefined(volume);
 
         if (utils.is.string(volume)) {
             volume = Number(volume);
@@ -377,12 +376,8 @@ class Plyr {
 
         // Toggle muted state
         if (volume === 0) {
-            this.toggleMute(true);
-        } else if (this.media.muted && isSet) {
-            this.toggleMute();
+            this.muted = true;
         }
-
-        return this;
     }
 
     get volume() {
@@ -404,7 +399,7 @@ class Plyr {
     }
 
     // Toggle mute
-    toggleMute(mute) {
+    set muted(mute) {
         // If the method is called without parameter, toggle based on current value
         const toggle = utils.is.boolean(mute) ? mute : !this.media.muted;
 
@@ -413,32 +408,10 @@ class Plyr {
 
         // Set mute on the player
         this.media.muted = toggle;
+    }
 
-        // If volume is 0 after unmuting, restore default volume
-        if (!this.media.muted && this.media.volume === 0) {
-            this.setVolume(this.config.volume);
-        }
-
-        // Embeds
-        if (this.isEmbed) {
-            switch (this.type) {
-                case 'youtube':
-                    this.embed[this.media.muted ? 'mute' : 'unMute']();
-                    break;
-
-                case 'vimeo':
-                    this.embed.setVolume(this.media.muted ? 0 : this.config.volume);
-                    break;
-
-                default:
-                    break;
-            }
-
-            // Trigger volumechange for embeds
-            utils.dispatchEvent.call(this, this.media, 'volumechange');
-        }
-
-        return this;
+    get muted() {
+        return this.media.muted;
     }
 
     // Playback speed
@@ -625,11 +598,9 @@ class Plyr {
 
     // Caption language
     set language(input) {
-        const player = this;
-
         // Nothing specified
         if (!utils.is.string(input)) {
-            return player;
+            return;
         }
 
         // Normalize
@@ -637,7 +608,7 @@ class Plyr {
 
         // If nothing to change, bail
         if (this.captions.language === language) {
-            return player;
+            return;
         }
 
         // Reset UI
@@ -654,9 +625,6 @@ class Plyr {
 
         // Re-run setup
         captions.setup.call(this);
-
-        // Allow chaining
-        return this;
     }
 
     get language() {
@@ -725,8 +693,7 @@ class Plyr {
     // Toggle picture-in-picture
     // TODO: update player with state, support, enabled
     // TODO: detect outside changes
-    togglePictureInPicture(input) {
-        const player = this;
+    set pip(input) {
         const states = {
             pip: 'picture-in-picture',
             inline: 'inline',
@@ -734,21 +701,27 @@ class Plyr {
 
         // Bail if no support
         if (!support.pip) {
-            return player;
+            return;
         }
 
         // Toggle based on current state if not passed
-        const toggle = utils.is.boolean(input) ? input : this.media.webkitPresentationMode === states.inline;
+        const toggle = utils.is.boolean(input) ? input : this.pip === states.inline;
 
         // Toggle based on current state
         this.media.webkitSetPresentationMode(toggle ? states.pip : states.inline);
+    }
 
-        return this;
+    get pip() {
+        if (!support.pip) {
+            return null;
+        }
+
+        return this.media.webkitPresentationMode;
     }
 
     // Trigger airplay
     // TODO: update player with state, support, enabled
-    airPlay() {
+    airplay() {
         // Bail if no support
         if (!support.airplay) {
             return this;
