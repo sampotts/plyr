@@ -214,6 +214,9 @@ class Plyr {
         this.elements.container = utils.createElement('div');
         utils.wrap(this.media, this.elements.container);
 
+        // Allow focus to be captured
+        this.elements.container.setAttribute('tabindex', 0);
+
         // Add style hook
         ui.addStyleHook.call(this);
 
@@ -287,19 +290,13 @@ class Plyr {
 
     // Rewind
     rewind(seekTime) {
-        this.currentTime = Math.min(
-            this.currentTime - (utils.is.number(seekTime) ? seekTime : this.config.seekTime),
-            0
-        );
+        this.currentTime = this.currentTime - (utils.is.number(seekTime) ? seekTime : this.config.seekTime);
         return this;
     }
 
     // Fast forward
     forward(seekTime) {
-        this.currentTime = Math.max(
-            this.currentTime + (utils.is.number(seekTime) ? seekTime : this.config.seekTime),
-            this.duration
-        );
+        this.currentTime = this.currentTime + (utils.is.number(seekTime) ? seekTime : this.config.seekTime);
         return this;
     }
 
