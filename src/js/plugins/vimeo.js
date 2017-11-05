@@ -126,6 +126,19 @@ const vimeo = {
             },
         });
 
+        // Source
+        let currentSrc;
+
+        player.embed.getVideoUrl.then(value => {
+            currentSrc = value;
+        });
+
+        Object.defineProperty(player.media, 'currentSrc', {
+            get() {
+                return currentSrc;
+            },
+        });
+
         // Rebuild UI
         window.setTimeout(() => ui.build.call(player), 0);
 

@@ -176,11 +176,6 @@ const ui = {
             }
         }
 
-        // Update the volume in storage
-        storage.set.call(this, {
-            volume: this.media.volume,
-        });
-
         // Toggle class if muted
         utils.toggleClass(this.elements.container, this.config.classNames.muted, this.media.muted);
 

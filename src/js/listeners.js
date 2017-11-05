@@ -91,9 +91,7 @@ const listeners = {
             controls.updateSetting.call(this, 'speed');
 
             // Save speed to localStorage
-            storage.set.call(this, {
-                speed: this.speed,
-            });
+            storage.set.call(this, { speed: this.speed });
         });
 
         // Quality change
@@ -102,17 +100,19 @@ const listeners = {
             controls.updateSetting.call(this, 'quality');
 
             // Save speed to localStorage
-            storage.set.call(this, {
-                quality: this.quality,
-            });
+            storage.set.call(this, { quality: this.quality });
         });
 
         // Caption language change
         utils.on(this.media, 'captionchange', () => {
             // Save speed to localStorage
-            storage.set.call(this, {
-                language: this.captions.language,
-            });
+            storage.set.call(this, { language: this.language });
+        });
+
+        // Volume change
+        utils.on(this.media, 'volumechange', () => {
+            // Save speed to localStorage
+            storage.set.call(this, { volume: this.volume });
         });
 
         // Captions toggle
@@ -121,9 +121,7 @@ const listeners = {
             controls.updateSetting.call(this, 'captions');
 
             // Save speed to localStorage
-            storage.set.call(this, {
-                captions: this.captions.enabled,
-            });
+            storage.set.call(this, { captions: this.captions.enabled });
         });
 
         // Proxy events to container

@@ -196,7 +196,7 @@ class Plyr {
         this.browser = utils.getBrowser();
 
         // Load saved settings from localStorage
-        this.storage = storage.setup.call(this);
+        storage.setup.call(this);
 
         // Check for support again but with type
         this.supported = support.check(this.type, this.config.inline);
@@ -350,12 +350,12 @@ class Plyr {
         const isSet = !utils.is.undefined(volume);
 
         if (utils.is.string(volume)) {
-            volume = parseFloat(volume);
+            volume = Number(volume);
         }
 
         // Load volume from storage if no value specified
         if (!utils.is.number(volume)) {
-            ({ volume } = this.storage);
+            ({ volume } = storage.get.call(this));
         }
 
         // Use config if all else fails
@@ -446,7 +446,7 @@ class Plyr {
         // Load speed from storage or default value
         let speed = utils.is.number(input)
             ? input
-            : parseFloat(this.storage.speed || this.speed.selected || this.config.speed.default);
+            : parseFloat(storage.get.call(this).speed || this.speed.selected || this.config.speed.default);
 
         // Set min/max
         if (speed < 0.1) {
@@ -474,7 +474,7 @@ class Plyr {
         // Load speed from storage or default value
         const quality = utils.is.string(input)
             ? input
-            : parseFloat(this.storage.quality || this.config.quality.selected);
+            : parseFloat(storage.get.call(this).quality || this.config.quality.selected);
 
         if (!this.config.quality.options.includes(quality)) {
             this.warn(`Unsupported quality option (${quality})`);
@@ -567,25 +567,7 @@ class Plyr {
     }
 
     get src() {
-        let url;
-
-        switch (this.type) {
-            case 'youtube':
-                url = this.embed.getVideoUrl();
-                break;
-
-            case 'vimeo':
-                this.embed.getVideoUrl.then(value => {
-                    url = value;
-                });
-                break;
-
-            default:
-                url = this.media.currentSrc;
-                break;
-        }
-
-        return url;
+        return this.media.currentSrc;
     }
 
     // Poster image
@@ -668,7 +650,7 @@ class Plyr {
         utils.dispatchEvent.call(this, this.media, 'captionchange');
 
         // Clear caption
-        captions.setCaption.call(this);
+        captions.set.call(this);
 
         // Re-run setup
         captions.setup.call(this);

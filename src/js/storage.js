@@ -5,18 +5,37 @@
 import support from './support';
 import utils from './utils';
 
+// Get contents of local storage
+function get() {
+    const store = window.localStorage.getItem(this.config.storage.key);
+
+    if (utils.is.empty(store)) {
+        return {};
+    }
+
+    return JSON.parse(store);
+}
+
 // Save a value back to local storage
-function set(value) {
+function set(object) {
     // Bail if we don't have localStorage support or it's disabled
     if (!support.storage || !this.config.storage.enabled) {
         return;
     }
 
+    // Can only store objectst
+    if (!utils.is.object(object)) {
+        return;
+    }
+
+    // Get current storage
+    const storage = get.call(this);
+
     // Update the working copy of the values
-    utils.extend(this.storage, value);
+    utils.extend(storage, object);
 
     // Update storage
-    window.localStorage.setItem(this.config.storage.key, JSON.stringify(this.storage));
+    window.localStorage.setItem(this.config.storage.key, JSON.stringify(storage));
 }
 
 // Setup localStorage
@@ -53,4 +72,4 @@ function setup() {
     return storage;
 }
 
-export default { setup, set };
+export default { setup, set, get };

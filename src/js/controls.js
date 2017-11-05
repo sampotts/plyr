@@ -229,6 +229,9 @@ const controls = {
 
         this.elements.inputs[type] = input;
 
+        // Set the fill for webkit now
+        controls.updateRangeFill.call(this, input);
+
         return {
             label,
             input,

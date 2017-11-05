@@ -155,6 +155,13 @@ const youtube = {
                         },
                     });
 
+                    // Source
+                    Object.defineProperty(player.media, 'currentSrc', {
+                        get() {
+                            return instance.getVideoUrl();
+                        },
+                    });
+
                     // Get available speeds
                     if (player.config.controls.includes('settings') && player.config.settings.includes('speed')) {
                         controls.setSpeedMenu.call(player, instance.getAvailablePlaybackRates());
