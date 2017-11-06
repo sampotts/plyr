@@ -1886,6 +1886,7 @@
                 byline: false,
                 portrait: false,
                 title: false,
+                speed: true,
                 transparent: 0,
             };
 
