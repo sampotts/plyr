@@ -1,4 +1,6 @@
-# This branch is not production ready. There will be bugs.
+<aside class="notice">
+This branch is currently in beta and not production-ready.
+</aside>
 
 # Plyr
 A simple, accessible and customizable HTML5, YouTube and Vimeo media player.
@@ -7,26 +9,26 @@ A simple, accessible and customizable HTML5, YouTube and Vimeo media player.
 
 [Checkout the demo](https://plyr.io)
 
-[![Image of Plyr](https://cdn.selz.com/plyr/plyr_v1.8.9.png)](https://plyr.io)
+[![Image of Plyr](https://cdn.plyr.io/static/demo/screenshot.png)](https://plyr.io)
 
 ## Why?
 We wanted a lightweight, accessible and customizable media player that supports [*modern*](#browser-support) browsers. Sure, there are many other players out there but we wanted to keep things simple, using the right elements for the job.
 
 ## Features
 - **Accessible** - full support for VTT captions and screen readers
-- **Lightweight** - under 10KB minified and gzipped
+- **Lightweight** - just 18KB minified and gzipped
 - **[Customisable](#html)** - make the player look how you want with the markup you want
 - **Semantic** - uses the *right* elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no `<span>` or `<a href="#">` button hacks
 - **Responsive** - works with any screen size
 - **HTML Video & Audio** - support for both formats
 - **[Embedded Video](#embeds)** - support for YouTube and Vimeo video playback
 - **[Streaming](#streaming)** - support for hls.js, Shaka and dash.js streaming playback
-- **[API](#api)** - toggle playback, volume, seeking, and more
+- **[API](#api)** - toggle playback, volume, seeking, and more through a standardized API 
 - **[Events](#events)** - no messing around with Vimeo and YouTube APIs, all events are standardized across formats
 - **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes
 - **[Shortcuts](#shortcuts)** - supports keyboard shortcuts
 - **i18n support** - support for internationalization of controls
-- **No dependencies** - written in "vanilla" JavaScript, no jQuery required
+- **No dependencies** - written in "vanilla" ES6 JavaScript, no jQuery required
 - **SASS and LESS** - to include in your build processes
 
 Oh and yes, it works with Bootstrap.
@@ -35,17 +37,12 @@ Oh and yes, it works with Bootstrap.
 Check out the [changelog](changelog.md) to see what's new with Plyr.
 
 ## Features currently being developed
-- Playback speed selection
-- Quality selection
-- Caption language selection
-- AirPlay
-- Picture in Picture (MacOS Sierra + Safari)
-
-[more info](https://github.com/sampotts/plyr/issues?q=is%3Aissue+is%3Aopen+label%3A%22In+Development%22)
+- Support for VAST and VPAID ads
+- ...[and more](https://github.com/sampotts/plyr/issues?q=is%3Aissue+is%3Aopen+label%3A%22In+Development%22)
 
 ## Planned features
 - Playlists
-- Google cast
+- Google cast support
 - Facebook video support
 - Wistia video support
 - YouTube and Vimeo audio support
@@ -97,7 +94,7 @@ Plyr extends upon the standard HTML5 markup so that's all you need for those typ
 
 #### HTML5 Video
 ```html
-<video poster="/path/to/poster.jpg" controls>
+<video poster="/path/to/poster.jpg" id="player" controls>
   <source src="/path/to/video.mp4" type="video/mp4">
   <source src="/path/to/video.webm" type="video/webm">
   <!-- Captions are optional -->
@@ -107,7 +104,7 @@ Plyr extends upon the standard HTML5 markup so that's all you need for those typ
 
 #### HTML5 Audio
 ```html
-<audio controls>
+<audio id="player" controls>
   <source src="/path/to/audio.mp3" type="audio/mp3">
   <source src="/path/to/audio.ogg" type="audio/ogg">
 </audio>
@@ -117,14 +114,14 @@ For YouTube and Vimeo, Plyr uses the standard YouTube API markup (an empty `<div
 
 #### YouTube embed
 ```html
-<div data-type="youtube" data-video-id="bTqVqk7FSmY"></div>
+<div id="player" data-type="youtube" data-video-id="bTqVqk7FSmY"></div>
 ```
 
 Note: `data-video-id` value can now be the ID or URL for the video. This attribute name will change in a future release to reflect this change.
 
 #### Vimeo embed
 ```html
-<div data-type="vimeo" data-video-id="143418951"></div>
+<div id="player" data-type="vimeo" data-video-id="143418951"></div>
 ```
 Note: `data-video-id` value can now be the ID or URL for the video. This attribute name will change in a future release to reflect this change.
 
@@ -133,7 +130,7 @@ Include the `plyr.js` script before the closing `</body>` tag and then call `ply
 
 ```html
 <script src="path/to/plyr.js"></script>
-<script>plyr.setup();</script>
+<script>var player = new Plyr('#player')</script>
 ```
 
 If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for the JavaScript, you can use the following:
@@ -190,51 +187,51 @@ WebVTT captions are supported. To add a caption track, check the HTML example ab
 
 #### Initialising
 
-By default, `setup()` will find all `<video>`, `<audio>` and `[data-type]` elements with the document and initialises on any found. Each target media element found will be wrapped in a `<div>` for styling and setup individually. You can specify a variety of arguments to `setup()` to use, including a different NodeList, HTMLElement, Array of HTMLElements or string selector as below:
+You can specify a range of arguments for the constructor to use:
 
-Passing a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList):
+- A CSS string selector that's compatible with [`querySelector`](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector)
+- A [HTMLElement](https://developer.mozilla.org/en/docs/Web/API/HTMLElement)
+- A [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList) or Array of [HTMLElement](https://developer.mozilla.org/en/docs/Web/API/HTMLElement) - the first element will be used
+- A [jQuery](https://jquery.com) object - if multiple are passed, the first element will be used 
+
+Here's some examples
+
+Passing a [string selector](https://developer.mozilla.org/en-US/docs/Web/API/NodeList):
+
 ```javascript
-plyr.setup(document.querySelectorAll('.js-player'), options);
+const player = new Plyr('#player');
 ```
 
 Passing a [HTMLElement](https://developer.mozilla.org/en/docs/Web/API/HTMLElement):
+
 ```javascript
-plyr.setup(document.querySelector('.js-player'), options);
+const player = new Plyr(document.getElementById('player'));
 ```
 
-Passing an [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array) of [HTMLElement](https://developer.mozilla.org/en/docs/Web/API/HTMLElement)s:
-```javascript
-plyr.setup([
-	document.querySelector('.js-player-1'),
-	document.querySelector('.js-player-2')
-], options);
-```
+Passing a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList):
 
-Passing a [string selector](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelectorAll):
 ```javascript
-plyr.setup('.js-player', options);
+const player = new Plyr(document.querySelectorAll('.js-player'));
 ```
 
 The NodeList, HTMLElement or string selector can be the target `<video>`, `<audio>` or `[data-type]` (for embeds) element itself or a container element.
 
-Passing just the options object:
+The second argument for the constructor is the [#options](options) object:
+
 ```javascript
-plyr.setup(options);
+const player = new Plyr('#player', { /* options */ });
 ```
 
-`setup()` will return an array of *instances* that can be used with the [API](#api) methods. See the [API](#api) section for more info.
-
-#### RangeTouch
-Some touch browsers (particularly Mobile Safari on iOS) seem to have issues with `<input type="range">` elements whereby touching the track to set the value doesn't work and sliding the thumb can be tricky. To combat this, I've created [RangeTouch](https://rangetouch.com) which I'd recommend including in your solution. It's a tiny script with a nice benefit for users on touch devices.
+The constructor will return a Plyr object that can be used with the [API](#api) methods. See the [API](#api) section for more info.
 
 #### Options
-Options must be passed as an object to the `setup()` method as above or as JSON in `data-plyr` attribute on each of your target elements:
+Options can be passed as an object to the constructor as above or as JSON in `data-plyr` attribute on each of your target elements:
 
 ```html
-<video data-plyr='{ title: "testing" }'></video>
+<video data-plyr='{ "title": "This is an example" }'></video>
 ```
 
-Note the single quotes encapsulating the JSON and double quotes on the object keys.
+Note the single quotes encapsulating the JSON and double quotes on the object keys. Only string values need double quotes. 
 
 <table class="table" width="100%">
   <thead>
@@ -433,12 +430,6 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
       <td><code>true</code></td>
       <td>Enable a full viewport view for older browsers.</td>
     </tr>
-    <tr>
-      <td><code>allowAudio</code></td>
-      <td>Boolean</td>
-      <td><code>false</code></td>
-      <td>Allow audio play to toggle fullscreen. This will be more useful later when posters are supported.</td>
-    </tr>
   </tbody>
 </table>
 
@@ -446,25 +437,17 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
 
 ### Instance
 
-The easiest way to access the plyr instances is to store the return value from your call to `setup()`:
+The easiest way to access the plyr instances is to store the return value from your call to the constructor. For example:
 
 ```javascript
-var players = plyr.setup('.js-player');
+const player = new Plyr('#player', { /* options */ });
 ```
 
-This will return an array of all instances that were setup. Another way is to use `plyr.get()` to get all instances within a given container, for example:
+You can also access the instance through the event handlers:
 
 ```javascript
-var players = plyr.get('.js-player');
-```
-
-If no argument is passed, it will find all instances in the current document. This will return an array of all instances that were found in the given selector.
-
-A final option is to access the instance through the event handlers:
-
-```javascript
-instance.on('ready', function(event) {
-  var instance = event.detail.plyr;
+instance.on('ready', event => {
+  const instance = event.detail.plyr;
 });
 ```
 
@@ -1053,6 +1036,9 @@ enabled: /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent)
 If a User Agent is disabled but supports `<video>` and `<audio>` natively, it will use the native player.
 
 Any unsupported browsers will display links to download the media if the correct html is used.
+
+## RangeTouch
+Some touch browsers (particularly Mobile Safari on iOS) seem to have issues with `<input type="range">` elements whereby touching the track to set the value doesn't work and sliding the thumb can be tricky. To combat this, I've created [RangeTouch](https://rangetouch.com) which I'd recommend including in your solution. It's a tiny script with a nice benefit for users on touch devices.
 
 ## Issues
 If you find anything weird with Plyr, please let us know using the GitHub issues tracker.
