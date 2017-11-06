@@ -47,8 +47,8 @@ const vimeo = {
 
         // Get Vimeo params for the iframe
         const options = {
-            loop: this.config.loop.active,
-            autoplay: this.config.autoplay,
+            loop: player.config.loop.active,
+            autoplay: player.config.autoplay,
             byline: false,
             portrait: false,
             title: false,
@@ -56,7 +56,7 @@ const vimeo = {
             transparent: 0,
         };
         const params = utils.buildUrlParameters(options);
-        const id = utils.parseVimeoId(this.embedId);
+        const id = utils.parseVimeoId(player.embedId);
 
         // Build an iframe
         const iframe = utils.createElement('iframe');
@@ -66,7 +66,7 @@ const vimeo = {
         player.media.appendChild(iframe);
 
         // Setup instance
-        // https://github.com/vimeo/this.js
+        // https://github.com/vimeo/player.js
         player.embed = new window.Vimeo.Player(iframe);
 
         // Create a faux HTML5 API using the Vimeo API
@@ -108,7 +108,7 @@ const vimeo = {
 
                 // Restore pause state
                 if (paused) {
-                    this.pause();
+                    player.pause();
                 }
             },
         });
@@ -174,7 +174,7 @@ const vimeo = {
         // Get current time
         player.embed.getCurrentTime().then(value => {
             currentTime = value;
-            utils.dispatchEvent.call(this, this.media, 'timeupdate');
+            utils.dispatchEvent.call(player, player.media, 'timeupdate');
         });
 
         // Get duration
@@ -220,31 +220,31 @@ const vimeo = {
             utils.dispatchEvent.call(player, player.media, 'pause');
         });
 
-        this.embed.on('timeupdate', data => {
-            this.media.seeking = false;
+        player.embed.on('timeupdate', data => {
+            player.media.seeking = false;
             currentTime = data.seconds;
-            utils.dispatchEvent.call(this, this.media, 'timeupdate');
+            utils.dispatchEvent.call(player, player.media, 'timeupdate');
         });
 
-        this.embed.on('progress', data => {
-            this.media.buffered = data.percent;
-            utils.dispatchEvent.call(this, this.media, 'progress');
+        player.embed.on('progress', data => {
+            player.media.buffered = data.percent;
+            utils.dispatchEvent.call(player, player.media, 'progress');
 
             if (parseInt(data.percent, 10) === 1) {
                 // Trigger event
-                utils.dispatchEvent.call(this, this.media, 'canplaythrough');
+                utils.dispatchEvent.call(player, player.media, 'canplaythrough');
             }
         });
 
-        this.embed.on('seeked', () => {
-            this.media.seeking = false;
-            utils.dispatchEvent.call(this, this.media, 'seeked');
-            utils.dispatchEvent.call(this, this.media, 'play');
+        player.embed.on('seeked', () => {
+            player.media.seeking = false;
+            utils.dispatchEvent.call(player, player.media, 'seeked');
+            utils.dispatchEvent.call(player, player.media, 'play');
         });
 
-        this.embed.on('ended', () => {
-            this.media.paused = true;
-            utils.dispatchEvent.call(this, this.media, 'ended');
+        player.embed.on('ended', () => {
+            player.media.paused = true;
+            utils.dispatchEvent.call(player, player.media, 'ended');
         });
 
         // Rebuild UI
