@@ -15,6 +15,13 @@ const vimeo = {
         // Add embed class for responsive
         utils.toggleClass(this.elements.wrapper, this.config.classNames.embed, true);
 
+        // Set aspect ratio
+        const ratio = this.config.ratio.split(':');
+        const padding = 100 / ratio[0] * ratio[1];
+        const offset = (100 - padding) / 2;
+        this.elements.wrapper.style.paddingBottom = `${padding}%`;
+        this.media.style.transform = `translateY(-${offset}%)`;
+
         // Set ID
         this.media.setAttribute('id', utils.generateId(this.type));
 

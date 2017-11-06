@@ -17,6 +17,10 @@ const youtube = {
         // Add embed class for responsive
         utils.toggleClass(this.elements.wrapper, this.config.classNames.embed, true);
 
+        // Set aspect ratio
+        const ratio = this.config.ratio.split(':');
+        this.elements.wrapper.style.paddingBottom = `${100 / ratio[0] * ratio[1]}%`;
+
         // Set ID
         this.media.setAttribute('id', utils.generateId(this.type));
 

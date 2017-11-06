@@ -8,6 +8,9 @@ import youtube from './plugins/youtube';
 import vimeo from './plugins/vimeo';
 import ui from './ui';
 
+// Sniff out the browser
+const browser = utils.getBrowser();
+
 const media = {
     // Setup media
     setup() {
@@ -45,7 +48,7 @@ const media = {
             utils.toggleClass(this.elements.container, this.config.classNames.stopped, this.config.autoplay);
 
             // Add iOS class
-            utils.toggleClass(this.elements.container, this.config.classNames.isIos, this.browser.isIos);
+            utils.toggleClass(this.elements.container, this.config.classNames.isIos, browser.isIos);
 
             // Add touch class
             utils.toggleClass(this.elements.container, this.config.classNames.isTouch, support.touch);

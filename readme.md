@@ -34,13 +34,6 @@ Oh and yes, it works with Bootstrap.
 ## Changelog
 Check out the [changelog](changelog.md) to see what's new with Plyr.
 
-## Features currently being developed
-- Playback speed selection
-- Quality selection
-- Caption language selection
-- AirPlay
-- Picture in Picture (MacOS Sierra + Safari)
-
 [more info](https://github.com/sampotts/plyr/issues?q=is%3Aissue+is%3Aopen+label%3A%22In+Development%22)
 
 ## Planned features

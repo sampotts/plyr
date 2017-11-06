@@ -45,6 +45,9 @@ const defaults = {
     // Pass a custom duration
     duration: null,
 
+    // Aspect ratio (for embeds)
+    ratio: '16:9',
+
     // Quality default
     quality: {
         default: 'default',

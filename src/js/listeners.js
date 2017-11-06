@@ -9,6 +9,9 @@ import fullscreen from './fullscreen';
 import storage from './storage';
 import ui from './ui';
 
+// Sniff out the browser
+const browser = utils.getBrowser();
+
 const listeners = {
     // Listen for media events
     media() {
@@ -134,7 +137,7 @@ const listeners = {
     // Listen for control events
     controls() {
         // IE doesn't support input event, so we fallback to change
-        const inputEvent = this.browser.isIE ? 'change' : 'input';
+        const inputEvent = browser.isIE ? 'change' : 'input';
         let last = null;
 
         // Trigger custom and default handlers
@@ -468,7 +471,7 @@ const listeners = {
         );
 
         // Polyfill for lower fill in <input type="range"> for webkit
-        if (this.browser.isWebkit) {
+        if (browser.isWebkit) {
             utils.on(utils.getElements.call(this, 'input[type="range"]'), 'input', event => {
                 controls.updateRangeFill.call(this, event.target);
             });

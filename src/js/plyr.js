@@ -192,10 +192,7 @@ class Plyr {
                 return;
         }
 
-        // Sniff out the browser
-        this.browser = utils.getBrowser();
-
-        // Load saved settings from localStorage
+        // Setup local storage for user settings
         storage.setup.call(this);
 
         // Check for support again but with type
@@ -237,17 +234,27 @@ class Plyr {
         }
     }
 
+    // ---------------------------------------
     // API
     // ---------------------------------------
 
+    /**
+     * If the player is HTML5
+     */
     get isHTML5() {
         return types.html5.includes(this.type);
     }
+
+    /**
+     * If the player is an embed - e.g. YouTube or Vimeo
+     */
     get isEmbed() {
         return types.embed.includes(this.type);
     }
 
-    // Play
+    /**
+     * Play the media
+     */
     play() {
         if ('play' in this.media) {
             this.media.play();
@@ -257,7 +264,9 @@ class Plyr {
         return this;
     }
 
-    // Pause
+    /**
+     * Pause the media
+     */
     pause() {
         if ('pause' in this.media) {
             this.media.pause();
@@ -267,7 +276,10 @@ class Plyr {
         return this;
     }
 
-    // Toggle playback
+    /**
+     * Toggle playback based on current status
+     * @param {boolean} toggle
+     */
     togglePlay(toggle) {
         // True toggle if nothing passed
         if ((!utils.is.boolean(toggle) && this.media.paused) || toggle) {
@@ -277,31 +289,43 @@ class Plyr {
         return this.pause();
     }
 
-    // Stop
+    /**
+     * Stop playback
+     */
     stop() {
         return this.restart().pause();
     }
 
-    // Restart
+    /**
+     * Restart playback
+     */
     restart() {
         this.currentTime = 0;
         return this;
     }
 
-    // Rewind
+    /**
+     * Rewind
+     * @param {number} seekTime - how far to rewind in seconds. Defaults to the config.seekTime
+     */
     rewind(seekTime) {
         this.currentTime = this.currentTime - (utils.is.number(seekTime) ? seekTime : this.config.seekTime);
         return this;
     }
 
-    // Fast forward
+    /**
+     * Fast forward
+     * @param {number} seekTime - how far to fast forward in seconds. Defaults to the config.seekTime
+     */
     forward(seekTime) {
         this.currentTime = this.currentTime + (utils.is.number(seekTime) ? seekTime : this.config.seekTime);
         return this;
     }
 
-    // Seek to time
-    // The input parameter can be an event or a number
+    /**
+     * Seek to a time
+     * @param {number} input - where to seek to in seconds. Defaults to 0 (the start)
+     */
     set currentTime(input) {
         let targetTime = 0;
 
@@ -327,7 +351,9 @@ class Plyr {
         return Number(this.media.currentTime);
     }
 
-    // Duration
+    /**
+     * Get the duration of the current media
+     */
     get duration() {
         // Faux duration set via config
         const fauxDuration = parseInt(this.config.duration, 10);
@@ -339,7 +365,10 @@ class Plyr {
         return !Number.isNaN(fauxDuration) ? fauxDuration : realDuration;
     }
 
-    // Volume
+    /**
+     * Set the player volume
+     * @param {number} value - must be between 0 and 1. Defaults to the value from local storage and config.volume if not set in storage
+     */
     set volume(value) {
         let volume = value;
         const max = 1;
@@ -377,6 +406,9 @@ class Plyr {
         }
     }
 
+    /**
+     * Get the current player volume
+     */
     get volume() {
         return this.media.volume;
     }

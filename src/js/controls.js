@@ -6,11 +6,14 @@ import support from './support';
 import utils from './utils';
 import ui from './ui';
 
+// Sniff out the browser
+const browser = utils.getBrowser();
+
 const controls = {
     // Webkit polyfill for lower fill range
     updateRangeFill(target) {
         // WebKit only
-        if (!this.browser.isWebkit) {
+        if (!browser.isWebkit) {
             return;
         }
 
@@ -49,7 +52,7 @@ const controls = {
     getIconUrl() {
         return {
             url: this.config.iconUrl,
-            absolute: this.config.iconUrl.indexOf('http') === 0 || (this.browser.isIE && !window.svg4everybody),
+            absolute: this.config.iconUrl.indexOf('http') === 0 || (browser.isIE && !window.svg4everybody),
         };
     },
 
@@ -1139,14 +1142,11 @@ const controls = {
     inject() {
         // Sprite
         if (this.config.loadSprite) {
-            const iconUrl = controls.getIconUrl.call(this);
+            const icon = controls.getIconUrl.call(this);
 
             // Only load external sprite using AJAX
-            if (iconUrl.absolute) {
-                this.log(`AJAX loading absolute SVG sprite ${this.browser.isIE ? '(due to IE)' : ''}`);
-                utils.loadSprite(iconUrl.url, 'sprite-plyr');
-            } else {
-                this.log('Sprite will be used as external resource directly');
+            if (icon.absolute) {
+                utils.loadSprite(icon.url, 'sprite-plyr');
             }
         }
 

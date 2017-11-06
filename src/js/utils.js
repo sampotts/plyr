@@ -89,6 +89,73 @@ const utils = {
         firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
     },
 
+    // Load an external SVG sprite
+    loadSprite(url, id) {
+        if (typeof url !== 'string') {
+            return;
+        }
+
+        const prefix = 'cache-';
+        const hasId = typeof id === 'string';
+        let isCached = false;
+
+        function updateSprite(data) {
+            // Inject content
+            this.innerHTML = data;
+
+            // Inject the SVG to the body
+            document.body.insertBefore(this, document.body.childNodes[0]);
+        }
+
+        // Only load once
+        if (!hasId || !document.querySelectorAll(`#${id}`).length) {
+            // Create container
+            const container = document.createElement('div');
+            container.setAttribute('hidden', '');
+
+            if (hasId) {
+                container.setAttribute('id', id);
+            }
+
+            // Check in cache
+            if (support.storage) {
+                const cached = window.localStorage.getItem(prefix + id);
+                isCached = cached !== null;
+
+                if (isCached) {
+                    const data = JSON.parse(cached);
+                    updateSprite.call(container, data.content);
+                }
+            }
+
+            // ReSharper disable once InconsistentNaming
+            const xhr = new XMLHttpRequest();
+
+            // XHR for Chrome/Firefox/Opera/Safari
+            if ('withCredentials' in xhr) {
+                xhr.open('GET', url, true);
+            } else {
+                return;
+            }
+
+            // Once loaded, inject to container and body
+            xhr.onload = () => {
+                if (support.storage) {
+                    window.localStorage.setItem(
+                        prefix + id,
+                        JSON.stringify({
+                            content: xhr.responseText,
+                        })
+                    );
+                }
+
+                updateSprite.call(container, xhr.responseText);
+            };
+
+            xhr.send();
+        }
+    },
+
     // Generate a random ID
     generateId(prefix) {
         return `${prefix}-${Math.floor(Math.random() * 10000)}`;
@@ -562,73 +629,6 @@ const utils = {
         fragment.appendChild(element);
         element.innerHTML = source;
         return fragment.firstChild.innerText;
-    },
-
-    // Load an SVG sprite
-    loadSprite(url, id) {
-        if (typeof url !== 'string') {
-            return;
-        }
-
-        const prefix = 'cache-';
-        const hasId = typeof id === 'string';
-        let isCached = false;
-
-        function updateSprite(data) {
-            // Inject content
-            this.innerHTML = data;
-
-            // Inject the SVG to the body
-            document.body.insertBefore(this, document.body.childNodes[0]);
-        }
-
-        // Only load once
-        if (!hasId || !document.querySelectorAll(`#${id}`).length) {
-            // Create container
-            const container = document.createElement('div');
-            container.setAttribute('hidden', '');
-
-            if (hasId) {
-                container.setAttribute('id', id);
-            }
-
-            // Check in cache
-            if (support.storage) {
-                const cached = window.localStorage.getItem(prefix + id);
-                isCached = cached !== null;
-
-                if (isCached) {
-                    const data = JSON.parse(cached);
-                    updateSprite.call(container, data.content);
-                }
-            }
-
-            // ReSharper disable once InconsistentNaming
-            const xhr = new XMLHttpRequest();
-
-            // XHR for Chrome/Firefox/Opera/Safari
-            if ('withCredentials' in xhr) {
-                xhr.open('GET', url, true);
-            } else {
-                return;
-            }
-
-            // Once loaded, inject to container and body
-            xhr.onload = () => {
-                if (support.storage) {
-                    window.localStorage.setItem(
-                        prefix + id,
-                        JSON.stringify({
-                            content: xhr.responseText,
-                        })
-                    );
-                }
-
-                updateSprite.call(container, xhr.responseText);
-            };
-
-            xhr.send();
-        }
     },
 
     // Get the transition end event
