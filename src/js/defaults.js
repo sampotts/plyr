@@ -57,8 +57,8 @@ const defaults = {
     // Set loops
     loop: {
         active: false,
-        start: null,
-        end: null,
+        // start: null,
+        // end: null,
     },
 
     // Speed default and options to display

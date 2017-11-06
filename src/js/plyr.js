@@ -170,21 +170,22 @@ class Plyr {
             case 'audio':
                 this.type = type;
 
-                if (this.media.getAttribute('crossorigin') !== null) {
+                if (this.media.hasAttribute('crossorigin')) {
                     this.config.crossorigin = true;
                 }
-                if (this.media.getAttribute('autoplay') !== null) {
+                if (this.media.hasAttribute('autoplay')) {
                     this.config.autoplay = true;
                 }
-                if (this.media.getAttribute('playsinline') !== null) {
+                if (this.media.hasAttribute('playsinline')) {
                     this.config.inline = true;
                 }
-                if (this.media.getAttribute('muted') !== null) {
+                if (this.media.hasAttribute('muted')) {
                     this.config.muted = true;
                 }
-                if (this.media.getAttribute('loop') !== null) {
+                if (this.media.hasAttribute('loop')) {
                     this.config.loop.active = true;
                 }
+
                 break;
 
             default:
