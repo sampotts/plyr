@@ -1,5 +1,13 @@
 # Changelog
 
+## v2.0.17
+- Vimeo controls fix (fixes #697)
+- SVG4everybody compatibility fix
+- Allow Plyr.setup event listeners to be set up as separate event listeners (https://github.com/sampotts/plyr/pull/703)
+- Added title to the layer html template (for custom controls) (https://github.com/sampotts/plyr/pull/649)
+- Target is null bug fix (https://github.com/sampotts/plyr/pull/617)
+- fix #684 memory leaks issues after destroy (https://github.com/sampotts/plyr/pull/700)
+
 ## v2.0.16
 - Fullscreen bug fix (fixes #664)
 
