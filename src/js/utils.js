@@ -631,6 +631,13 @@ const utils = {
         return fragment.firstChild.innerText;
     },
 
+    // Get aspect ratio for dimensions
+    getAspectRatio(width, height) {
+        const getRatio = (w, h) => (h === 0 ? w : getRatio(h, w % h));
+        const ratio = getRatio(width, height);
+        return `${width / ratio}:${height / ratio}`;
+    },
+
     // Get the transition end event
     transitionEnd: (() => {
         const element = document.createElement('span');

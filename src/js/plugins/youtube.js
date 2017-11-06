@@ -18,8 +18,7 @@ const youtube = {
         utils.toggleClass(this.elements.wrapper, this.config.classNames.embed, true);
 
         // Set aspect ratio
-        const ratio = this.config.ratio.split(':');
-        this.elements.wrapper.style.paddingBottom = `${100 / ratio[0] * ratio[1]}%`;
+        youtube.setAspectRatio.call(this);
 
         // Set ID
         this.media.setAttribute('id', utils.generateId(this.type));
@@ -46,6 +45,12 @@ const youtube = {
                 });
             };
         }
+    },
+
+    // Set aspect ratio
+    setAspectRatio() {
+        const ratio = this.config.ratio.split(':');
+        this.elements.wrapper.style.paddingBottom = `${100 / ratio[0] * ratio[1]}%`;
     },
 
     // API ready

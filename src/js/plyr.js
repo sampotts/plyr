@@ -79,7 +79,6 @@ class Plyr {
         };
 
         // Captions
-        // TODO: captions.enabled should be in config?
         this.captions = {
             enabled: null,
             tracks: null,

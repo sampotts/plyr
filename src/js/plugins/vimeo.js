@@ -16,12 +16,8 @@ const vimeo = {
         // Add embed class for responsive
         utils.toggleClass(this.elements.wrapper, this.config.classNames.embed, true);
 
-        // Set aspect ratio
-        const ratio = this.config.ratio.split(':');
-        const padding = 100 / ratio[0] * ratio[1];
-        const offset = (300 - padding) / 6;
-        this.elements.wrapper.style.paddingBottom = `${padding}%`;
-        this.media.style.transform = `translateY(-${offset}%)`;
+        // Set intial ratio
+        vimeo.setAspectRatio.call(this);
 
         // Set ID
         this.media.setAttribute('id', utils.generateId(this.type));
@@ -39,6 +35,15 @@ const vimeo = {
         } else {
             vimeo.ready.call(this);
         }
+    },
+
+    // Set aspect ratio
+    setAspectRatio(input) {
+        const ratio = utils.is.string(input) ? input.split(':') : this.config.ratio.split(':');
+        const padding = 100 / ratio[0] * ratio[1];
+        const offset = (300 - padding) / 6;
+        this.elements.wrapper.style.paddingBottom = `${padding}%`;
+        this.media.style.transform = `translateY(-${offset}%)`;
     },
 
     // API Ready
@@ -159,6 +164,12 @@ const vimeo = {
             get() {
                 return currentSrc;
             },
+        });
+
+        // Set aspect ratio based on video size
+        Promise.all([player.embed.getVideoWidth(), player.embed.getVideoHeight()]).then(dimensions => {
+            const ratio = utils.getAspectRatio(dimensions[0], dimensions[1]);
+            vimeo.setAspectRatio.call(this, ratio);
         });
 
         // Get available speeds
