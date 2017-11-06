@@ -4,6 +4,7 @@
 
 import utils from './../utils';
 import captions from './../captions';
+import controls from './../controls';
 import ui from './../ui';
 
 const vimeo = {
@@ -51,6 +52,7 @@ const vimeo = {
             byline: false,
             portrait: false,
             title: false,
+            speed: true,
             transparent: 0,
         };
         const params = utils.buildUrlParameters(options);
@@ -112,12 +114,16 @@ const vimeo = {
         });
 
         // Playback speed
-        // Not currently supported in Vimeo
+        let { playbackRate } = player.media;
         Object.defineProperty(player.media, 'playbackRate', {
             get() {
-                return null;
+                return playbackRate;
             },
-            set() {},
+            set(input) {
+                playbackRate = input;
+                player.embed.setPlaybackRate(input);
+                utils.dispatchEvent.call(player, player.media, 'ratechange');
+            },
         });
 
         // Volume
@@ -154,6 +160,11 @@ const vimeo = {
                 return currentSrc;
             },
         });
+
+        // Get available speeds
+        if (player.config.controls.includes('settings') && player.config.settings.includes('speed')) {
+            controls.setSpeedMenu.call(player);
+        }
 
         // Get title
         player.embed.getVideoTitle().then(title => {
