@@ -19,7 +19,7 @@ const vimeo = {
         // Set aspect ratio
         const ratio = this.config.ratio.split(':');
         const padding = 100 / ratio[0] * ratio[1];
-        const offset = (400 - padding) / 8;
+        const offset = (300 - padding) / 6;
         this.elements.wrapper.style.paddingBottom = `${padding}%`;
         this.media.style.transform = `translateY(-${offset}%)`;
 
