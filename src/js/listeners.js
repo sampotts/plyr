@@ -325,10 +325,10 @@ const listeners = {
         };
 
         // Keyboard shortcuts
-        if (this.config.keyboard.focused) {
-            utils.on(this.elements.container, 'keydown keyup', handleKey, false);
-        } else if (this.config.keyboard.global) {
+        if (this.config.keyboard.global) {
             utils.on(window, 'keydown keyup', handleKey, false);
+        } else if (this.config.keyboard.focused) {
+            utils.on(this.elements.container, 'keydown keyup', handleKey, false);
         }
 
         // Detect tab focus

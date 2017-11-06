@@ -43,6 +43,9 @@ document.addEventListener('DOMContentLoaded', () => {
         debug: true,
         title: 'View From A Blue Moon',
         iconUrl: '../dist/plyr.svg',
+        keyboard: {
+            global: true,
+        },
         tooltips: {
             controls: true,
         },
