@@ -13,6 +13,214 @@ import ui from './ui';
 const browser = utils.getBrowser();
 
 const listeners = {
+    // Global listeners
+    global() {
+        let last = null;
+
+        // Get the key code for an event
+        const getKeyCode = event => (event.keyCode ? event.keyCode : event.which);
+
+        // Handle key press
+        const handleKey = event => {
+            const code = getKeyCode(event);
+            const pressed = event.type === 'keydown';
+            const held = pressed && code === last;
+
+            // If the event is bubbled from the media element
+            // Firefox doesn't get the keycode for whatever reason
+            if (!utils.is.number(code)) {
+                return;
+            }
+
+            // Seek by the number keys
+            const seekByKey = () => {
+                // Divide the max duration into 10th's and times by the number value
+                this.currentTime = this.duration / 10 * (code - 48);
+            };
+
+            // Handle the key on keydown
+            // Reset on keyup
+            if (pressed) {
+                // Which keycodes should we prevent default
+                const preventDefault = [
+                    48,
+                    49,
+                    50,
+                    51,
+                    52,
+                    53,
+                    54,
+                    56,
+                    57,
+                    32,
+                    75,
+                    38,
+                    40,
+                    77,
+                    39,
+                    37,
+                    70,
+                    67,
+                    73,
+                    76,
+                    79,
+                ];
+
+                // Check focused element
+                // and if the focused element is not editable (e.g. text input)
+                // and any that accept key input http://webaim.org/techniques/keyboard/
+                const focused = utils.getFocusElement();
+                if (utils.is.htmlElement(focused) && utils.matches(focused, this.config.selectors.editable)) {
+                    return;
+                }
+
+                // If the code is found prevent default (e.g. prevent scrolling for arrows)
+                if (preventDefault.includes(code)) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+
+                switch (code) {
+                    case 48:
+                    case 49:
+                    case 50:
+                    case 51:
+                    case 52:
+                    case 53:
+                    case 54:
+                    case 55:
+                    case 56:
+                    case 57:
+                        // 0-9
+                        if (!held) {
+                            seekByKey();
+                        }
+                        break;
+
+                    case 32:
+                    case 75:
+                        // Space and K key
+                        if (!held) {
+                            this.warn('togglePlay', event.type);
+                            this.togglePlay();
+                        }
+                        break;
+
+                    case 38:
+                        // Arrow up
+                        this.increaseVolume(0.1);
+                        break;
+
+                    case 40:
+                        // Arrow down
+                        this.decreaseVolume(0.1);
+                        break;
+
+                    case 77:
+                        // M key
+                        if (!held) {
+                            this.muted = 'toggle';
+                        }
+                        break;
+
+                    case 39:
+                        // Arrow forward
+                        this.forward();
+                        break;
+
+                    case 37:
+                        // Arrow back
+                        this.rewind();
+                        break;
+
+                    case 70:
+                        // F key
+                        this.toggleFullscreen();
+                        break;
+
+                    case 67:
+                        // C key
+                        if (!held) {
+                            this.toggleCaptions();
+                        }
+                        break;
+
+                    case 73:
+                        this.setLoop('start');
+                        break;
+
+                    case 76:
+                        this.setLoop();
+                        break;
+
+                    case 79:
+                        this.setLoop('end');
+                        break;
+
+                    default:
+                        break;
+                }
+
+                // Escape is handle natively when in full screen
+                // So we only need to worry about non native
+                if (!fullscreen.enabled && this.fullscreen.active && code === 27) {
+                    this.toggleFullscreen();
+                }
+
+                // Store last code for next cycle
+                last = code;
+            } else {
+                last = null;
+            }
+        };
+
+        // Keyboard shortcuts
+        if (this.config.keyboard.global) {
+            this.warn('bound');
+            utils.on(window, 'keydown keyup', handleKey, false);
+        } else if (this.config.keyboard.focused) {
+            utils.on(this.elements.container, 'keydown keyup', handleKey, false);
+        }
+
+        // Detect tab focus
+        // Remove class on blur/focusout
+        utils.on(this.elements.container, 'focusout', event => {
+            utils.toggleClass(event.target, this.config.classNames.tabFocus, false);
+        });
+
+        // Add classname to tabbed elements
+        utils.on(this.elements.container, 'keydown', event => {
+            if (event.keyCode !== 9) {
+                return;
+            }
+
+            // Delay the adding of classname until the focus has changed
+            // This event fires before the focusin event
+            window.setTimeout(() => {
+                utils.toggleClass(utils.getFocusElement(), this.config.classNames.tabFocus, true);
+            }, 0);
+        });
+
+        // Toggle controls visibility based on mouse movement
+        if (this.config.hideControls) {
+            // Toggle controls on mouse events and entering fullscreen
+            utils.on(
+                this.elements.container,
+                'mouseenter mouseleave mousemove touchstart touchend touchcancel touchmove enterfullscreen',
+                event => {
+                    this.toggleControls(event);
+                }
+            );
+        }
+
+        // Handle user exiting fullscreen by escaping etc
+        if (fullscreen.enabled) {
+            utils.on(document, fullscreen.eventType, event => {
+                this.toggleFullscreen(event);
+            });
+        }
+    },
+
     // Listen for media events
     media() {
         // Time change on media
@@ -138,7 +346,6 @@ const listeners = {
     controls() {
         // IE doesn't support input event, so we fallback to change
         const inputEvent = browser.isIE ? 'change' : 'input';
-        let last = null;
 
         // Trigger custom and default handlers
         const proxy = (event, handlerKey, defaultHandler) => {
@@ -167,188 +374,6 @@ const listeners = {
                 target.focus();
             }
         };
-
-        // Get the key code for an event
-        const getKeyCode = event => (event.keyCode ? event.keyCode : event.which);
-
-        // Handle key press
-        const handleKey = event => {
-            const code = getKeyCode(event);
-            const pressed = event.type === 'keydown';
-            const held = pressed && code === last;
-
-            // If the event is bubbled from the media element
-            // Firefox doesn't get the keycode for whatever reason
-            if (!utils.is.number(code)) {
-                return;
-            }
-
-            // Seek by the number keys
-            const seekByKey = () => {
-                // Divide the max duration into 10th's and times by the number value
-                this.currentTime = this.duration / 10 * (code - 48);
-            };
-
-            // Handle the key on keydown
-            // Reset on keyup
-            if (pressed) {
-                // Which keycodes should we prevent default
-                const preventDefault = [
-                    48,
-                    49,
-                    50,
-                    51,
-                    52,
-                    53,
-                    54,
-                    56,
-                    57,
-                    32,
-                    75,
-                    38,
-                    40,
-                    77,
-                    39,
-                    37,
-                    70,
-                    67,
-                    73,
-                    76,
-                    79,
-                ];
-
-                // Check focused element
-                // and if the focused element is not editable (e.g. text input)
-                // and any that accept key input http://webaim.org/techniques/keyboard/
-                const focused = utils.getFocusElement();
-                if (utils.is.htmlElement(focused) && utils.matches(focused, this.config.selectors.editable)) {
-                    return;
-                }
-
-                // If the code is found prevent default (e.g. prevent scrolling for arrows)
-                if (preventDefault.includes(code)) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-
-                switch (code) {
-                    case 48:
-                    case 49:
-                    case 50:
-                    case 51:
-                    case 52:
-                    case 53:
-                    case 54:
-                    case 55:
-                    case 56:
-                    case 57:
-                        // 0-9
-                        if (!held) {
-                            seekByKey();
-                        }
-                        break;
-
-                    case 32:
-                    case 75:
-                        // Space and K key
-                        if (!held) {
-                            this.togglePlay();
-                        }
-                        break;
-
-                    case 38:
-                        // Arrow up
-                        this.increaseVolume(0.1);
-                        break;
-
-                    case 40:
-                        // Arrow down
-                        this.decreaseVolume(0.1);
-                        break;
-
-                    case 77:
-                        // M key
-                        if (!held) {
-                            this.muted = 'toggle';
-                        }
-                        break;
-
-                    case 39:
-                        // Arrow forward
-                        this.forward();
-                        break;
-
-                    case 37:
-                        // Arrow back
-                        this.rewind();
-                        break;
-
-                    case 70:
-                        // F key
-                        this.toggleFullscreen();
-                        break;
-
-                    case 67:
-                        // C key
-                        if (!held) {
-                            this.toggleCaptions();
-                        }
-                        break;
-
-                    case 73:
-                        this.setLoop('start');
-                        break;
-
-                    case 76:
-                        this.setLoop();
-                        break;
-
-                    case 79:
-                        this.setLoop('end');
-                        break;
-
-                    default:
-                        break;
-                }
-
-                // Escape is handle natively when in full screen
-                // So we only need to worry about non native
-                if (!fullscreen.enabled && this.fullscreen.active && code === 27) {
-                    this.toggleFullscreen();
-                }
-
-                // Store last code for next cycle
-                last = code;
-            } else {
-                last = null;
-            }
-        };
-
-        // Keyboard shortcuts
-        if (this.config.keyboard.global) {
-            utils.on(window, 'keydown keyup', handleKey, false);
-        } else if (this.config.keyboard.focused) {
-            utils.on(this.elements.container, 'keydown keyup', handleKey, false);
-        }
-
-        // Detect tab focus
-        // Remove class on blur/focusout
-        utils.on(this.elements.container, 'focusout', event => {
-            utils.toggleClass(event.target, this.config.classNames.tabFocus, false);
-        });
-
-        // Add classname to tabbed elements
-        utils.on(this.elements.container, 'keydown', event => {
-            if (event.keyCode !== 9) {
-                return;
-            }
-
-            // Delay the adding of classname until the focus has changed
-            // This event fires before the focusin event
-            window.setTimeout(() => {
-                utils.toggleClass(utils.getFocusElement(), this.config.classNames.tabFocus, true);
-            }, 0);
-        });
 
         // Play
         utils.on(this.elements.buttons.play, 'click', event => proxy(event, 'play', togglePlay));
@@ -484,15 +509,6 @@ const listeners = {
 
         // Toggle controls visibility based on mouse movement
         if (this.config.hideControls) {
-            // Toggle controls on mouse events and entering fullscreen
-            utils.on(
-                this.elements.container,
-                'mouseenter mouseleave mousemove touchstart touchend touchcancel touchmove enterfullscreen',
-                event => {
-                    this.toggleControls(event);
-                }
-            );
-
             // Watch for cursor over controls so they don't hide when trying to interact
             utils.on(this.elements.controls, 'mouseenter mouseleave', event => {
                 this.elements.controls.hover = event.type === 'mouseenter';
@@ -556,13 +572,6 @@ const listeners = {
                 }),
             false
         );
-
-        // Handle user exiting fullscreen by escaping etc
-        if (fullscreen.enabled) {
-            utils.on(document, fullscreen.eventType, event => {
-                this.toggleFullscreen(event);
-            });
-        }
     },
 };
 

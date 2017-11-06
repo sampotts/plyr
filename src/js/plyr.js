@@ -13,6 +13,7 @@ import utils from './utils';
 import captions from './captions';
 import controls from './controls';
 import fullscreen from './fullscreen';
+import listeners from './listeners';
 import media from './media';
 import storage from './storage';
 import source from './source';
@@ -213,6 +214,9 @@ class Plyr {
 
         // Allow focus to be captured
         this.elements.container.setAttribute('tabindex', 0);
+
+        // Global listeners
+        listeners.global.call(this);
 
         // Add style hook
         ui.addStyleHook.call(this);
