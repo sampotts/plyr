@@ -6,7 +6,7 @@
 .plyr__video-embed {
     // Default to 16:9 ratio but this is set by JavaScript based on config
     @padding: ((100 / 16) * 9);
-    @offset: unit((100 - @padding) / 2, ~'%');
+    @offset: unit((400 - @padding) / 8, ~'%');
 
     padding-bottom: unit(@padding, ~'%');
     height: 0;
@@ -24,7 +24,7 @@
     // Vimeo hack
     > div {
         position: relative;
-        padding-bottom: 100%;
+        padding-bottom: 400%;
         transform: translateY(-@offset);
     }
 }
