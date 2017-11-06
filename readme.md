@@ -229,7 +229,7 @@ Some touch browsers (particularly Mobile Safari on iOS) seem to have issues with
 Options must be passed as an object to the `setup()` method as above or as JSON in `data-plyr` attribute on each of your target elements:
 
 ```html
-<video data-plyr='{ title: "testing" }'></video>
+<video data-plyr='{ "title": "testing", "volume": 10 }'></video>
 ```
 
 Note the single quotes encapsulating the JSON and double quotes on the object keys.
