@@ -73,7 +73,16 @@ const controls = {
 
         // Create the <use> to reference sprite
         const use = document.createElementNS(namespace, 'use');
-        use.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', `${iconPath}-${type}`);
+        const path = `${iconPath}-${type}`;
+
+        // If the new `href` attribute is supported, use that
+        // https://github.com/sampotts/plyr/issues/460
+        // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xlink:href
+        if ('href' in use) {
+            use.setAttribute('href', path);
+        } else {
+            use.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', path);
+        }
 
         // Add <use> to <svg>
         icon.appendChild(use);
@@ -1125,8 +1134,7 @@ const controls = {
 
         // Larger overlaid play button
         if (this.config.controls.includes('play-large')) {
-            this.elements.buttons.playLarge = controls.createButton.call(this, 'play-large');
-            this.elements.container.appendChild(this.elements.buttons.playLarge);
+            this.elements.container.appendChild(controls.createButton.call(this, 'play-large'));
         }
 
         this.elements.controls = container;

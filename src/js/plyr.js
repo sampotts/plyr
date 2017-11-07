@@ -170,21 +170,22 @@ class Plyr {
             case 'audio':
                 this.type = type;
 
-                if (this.media.getAttribute('crossorigin') !== null) {
+                if (this.media.hasAttribute('crossorigin')) {
                     this.config.crossorigin = true;
                 }
-                if (this.media.getAttribute('autoplay') !== null) {
+                if (this.media.hasAttribute('autoplay')) {
                     this.config.autoplay = true;
                 }
-                if (this.media.getAttribute('playsinline') !== null) {
+                if (this.media.hasAttribute('playsinline')) {
                     this.config.inline = true;
                 }
-                if (this.media.getAttribute('muted') !== null) {
+                if (this.media.hasAttribute('muted')) {
                     this.config.muted = true;
                 }
-                if (this.media.getAttribute('loop') !== null) {
+                if (this.media.hasAttribute('loop')) {
                     this.config.loop.active = true;
                 }
+
                 break;
 
             default:
@@ -889,12 +890,14 @@ class Plyr {
             // If it's a soft destroy, make minimal changes
             if (soft) {
                 utils.removeElement(this.elements.captions);
+                Array.from(this.elements.buttons.play).forEach(button => utils.removeElement(button));
                 utils.removeElement(this.elements.controls);
                 utils.removeElement(this.elements.wrapper);
 
                 // Clear for GC
                 this.elements.captions = null;
                 this.elements.controls = null;
+                this.elements.buttons.play = null;
                 this.elements.wrapper = null;
 
                 // Callback

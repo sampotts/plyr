@@ -433,7 +433,7 @@ const utils = {
 
     // Trap focus inside container
     trapFocus() {
-        const tabbables = utils.getElements.call(this, 'input:not([disabled]), button:not([disabled])');
+        const tabbables = utils.getElements.call(this, 'button:not(:disabled), input:not(:disabled), [tabindex]');
         const first = tabbables[0];
         const last = tabbables[tabbables.length - 1];
 
@@ -441,17 +441,22 @@ const utils = {
             this.elements.container,
             'keydown',
             event => {
-                // If it is tab
-                if (event.which === 9 && this.fullscreen.active) {
-                    if (event.target === last && !event.shiftKey) {
-                        // Move focus to first element that can be tabbed if Shift isn't used
-                        event.preventDefault();
-                        first.focus();
-                    } else if (event.target === first && event.shiftKey) {
-                        // Move focus to last element that can be tabbed if Shift is used
-                        event.preventDefault();
-                        last.focus();
-                    }
+                // Bail if not tab key or not fullscreen
+                if (event.key !== 'Tab' || event.keyCode !== 9 || !this.fullscreen.active) {
+                    return;
+                }
+
+                // Get the current focused element
+                const focused = utils.getFocusElement();
+
+                if (focused === last && !event.shiftKey) {
+                    // Move focus to first element that can be tabbed if Shift isn't used
+                    first.focus();
+                    event.preventDefault();
+                } else if (focused === first && event.shiftKey) {
+                    // Move focus to last element that can be tabbed if Shift is used
+                    last.focus();
+                    event.preventDefault();
                 }
             },
             false
