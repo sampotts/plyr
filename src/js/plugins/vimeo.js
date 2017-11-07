@@ -53,7 +53,7 @@ const vimeo = {
         // Get Vimeo params for the iframe
         const options = {
             loop: player.config.loop.active,
-            autoplay: player.config.autoplay,
+            autoplay: player.autoplay,
             byline: false,
             portrait: false,
             title: false,
@@ -152,6 +152,18 @@ const vimeo = {
             set(input) {
                 const toggle = utils.is.boolean(input) ? input : false;
                 player.volume = toggle ? 0 : player.config.volume;
+            },
+        });
+
+        // Loop
+        let { loop } = player.media;
+        Object.defineProperty(player.media, 'loop', {
+            get() {
+                return loop;
+            },
+            set(input) {
+                loop = utils.is.boolean(input) ? input : player.config.loop.active;
+                player.embed.setLoop(loop);
             },
         });
 

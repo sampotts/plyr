@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 // Plyr
 // plyr.js v3.0.0
 // https://github.com/sampotts/plyr
@@ -419,16 +419,16 @@ class Plyr {
 
     // Increase volume
     increaseVolume(step) {
-        const volume = this.media.muted ? 0 : this.media.volume;
-
-        return this.setVolume(volume + utils.is.number(step) ? step : 1);
+        const volume = this.media.muted ? 0 : this.volume;
+        this.volume = volume + utils.is.number(step) ? step : 1;
+        return this;
     }
 
     // Decrease volume
     decreaseVolume(step) {
-        const volume = this.media.muted ? 0 : this.media.volume;
-
-        return this.setVolume(volume - utils.is.number(step) ? step : 1);
+        const volume = this.media.muted ? 0 : this.volume;
+        this.volume = volume - utils.is.number(step) ? step : 1;
+        return this;
     }
 
     // Toggle mute
@@ -517,11 +517,14 @@ class Plyr {
     }
 
     // Toggle loop
-    // TODO: Finish logic
-    // TODO: Set the indicator on load as user may pass loop as config
-    /* loop(input) {
+    // TODO: Finish fancy new logic. Set the indicator on load as user may pass loop as config
+    set loop(input) {
+        const toggle = utils.is.boolean(input) ? input : this.config.loop.active;
+        this.config.loop.active = toggle;
+        this.media.loop = toggle;
+
         // Set default to be a true toggle
-        const type = ['start', 'end', 'all', 'none', 'toggle'].includes(input) ? input : 'toggle';
+        /* const type = ['start', 'end', 'all', 'none', 'toggle'].includes(input) ? input : 'toggle';
 
         switch (type) {
             case 'start':
@@ -561,11 +564,12 @@ class Plyr {
                 this.config.loop.start = 0;
                 this.config.loop.end = null;
                 break;
-        }
+        } */
+    }
 
-        // Allow chaining
-        return this;
-    } */
+    get loop() {
+        return this.media.loop;
+    }
 
     // Media source
     set src(input) {
@@ -594,6 +598,15 @@ class Plyr {
         }
 
         return this.media.getAttribute('poster');
+    }
+
+    // Autoplay
+    get autoplay() {
+        return this.config.autoplay;
+    }
+    set autoplay(input) {
+        const toggle = utils.is.boolean(input) ? input : this.config.autoplay;
+        this.config.autoplay = toggle;
     }
 
     // Toggle captions

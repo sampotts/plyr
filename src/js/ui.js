@@ -71,12 +71,13 @@ const ui = {
 
         // Set volume
         this.volume = null;
+        // this.muted = null;
 
         // Set playback speed
         this.speed = null;
 
         // Set loop
-        // this.setLoop();
+        this.loop = null;
 
         // Reset time display
         ui.timeUpdate.call(this);

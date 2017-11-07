@@ -76,7 +76,7 @@ const youtube = {
                 widget_referrer: window && window.location.href,
 
                 // Captions are flaky on YouTube
-                cc_load_policy: (this.captions.active ? 1 : 0),
+                cc_load_policy: this.captions.active ? 1 : 0,
                 cc_lang_pref: this.config.captions.language,
             },
             events: {
@@ -246,17 +246,14 @@ const youtube = {
                     switch (event.data) {
                         case 0:
                             // YouTube doesn't support loop for a single video, so mimick it.
-                            if (player.config.loop.active) {
+                            if (player.media.loop) {
                                 // YouTube needs a call to `stopVideo` before playing again
                                 instance.stopVideo();
                                 instance.playVideo();
-
-                                break;
+                            } else {
+                                utils.dispatchEvent.call(player, player.media, 'ended');
+                                player.media.paused = true;
                             }
-
-                            player.media.paused = true;
-
-                            utils.dispatchEvent.call(player, player.media, 'ended');
 
                             break;
 

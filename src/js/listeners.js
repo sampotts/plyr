@@ -145,7 +145,7 @@ const listeners = {
                         }
                         break;
 
-                    case 73:
+                    /* case 73:
                         this.setLoop('start');
                         break;
 
@@ -155,7 +155,7 @@ const listeners = {
 
                     case 79:
                         this.setLoop('end');
-                        break;
+                        break; */
 
                     default:
                         break;
