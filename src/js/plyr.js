@@ -890,12 +890,14 @@ class Plyr {
             // If it's a soft destroy, make minimal changes
             if (soft) {
                 utils.removeElement(this.elements.captions);
+                Array.from(this.elements.buttons.play).forEach(button => utils.removeElement(button));
                 utils.removeElement(this.elements.controls);
                 utils.removeElement(this.elements.wrapper);
 
                 // Clear for GC
                 this.elements.captions = null;
                 this.elements.controls = null;
+                this.elements.buttons.play = null;
                 this.elements.wrapper = null;
 
                 // Callback

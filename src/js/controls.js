@@ -1134,8 +1134,7 @@ const controls = {
 
         // Larger overlaid play button
         if (this.config.controls.includes('play-large')) {
-            this.elements.buttons.playLarge = controls.createButton.call(this, 'play-large');
-            this.elements.container.appendChild(this.elements.buttons.playLarge);
+            this.elements.container.appendChild(controls.createButton.call(this, 'play-large'));
         }
 
         this.elements.controls = container;
