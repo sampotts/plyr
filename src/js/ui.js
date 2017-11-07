@@ -84,15 +84,17 @@ const ui = {
         // Update the UI
         ui.checkPlaying.call(this);
 
+        // Ready for API calls
         this.ready = true;
 
         // Ready event at end of execution stack
         utils.dispatchEvent.call(this, this.media, 'ready');
 
         // Autoplay
-        if (this.config.autoplay) {
+        // TODO: check we still need this?
+        /* if (this.isEmbed && this.config.autoplay) {
             this.play();
-        }
+        } */
     },
 
     // Show the duration on metadataloaded

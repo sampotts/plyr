@@ -19,8 +19,17 @@ const defaults = {
     volume: 1,
     muted: false,
 
+    // Pass a custom duration
+    duration: null,
+
     // Display the media duration
     displayDuration: true,
+
+    // Aspect ratio (for embeds)
+    ratio: '16:9',
+
+    // Looping
+    loop: false,
 
     // Click video to play
     clickToPlay: true,
@@ -42,20 +51,10 @@ const defaults = {
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
 
-    // Pass a custom duration
-    duration: null,
-
     // Quality default
     quality: {
         default: 'default',
         options: ['hd2160', 'hd1440', 'hd1080', 'hd720', 'large', 'medium', 'small', 'tiny', 'default'],
-    },
-
-    // Set loops
-    loop: {
-        active: false,
-        start: null,
-        end: null,
     },
 
     // Speed default and options to display

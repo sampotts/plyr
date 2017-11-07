@@ -17,6 +17,9 @@ const youtube = {
         // Add embed class for responsive
         utils.toggleClass(this.elements.wrapper, this.config.classNames.embed, true);
 
+        // Set aspect ratio
+        youtube.setAspectRatio.call(this);
+
         // Set ID
         this.media.setAttribute('id', utils.generateId(this.type));
 
@@ -44,6 +47,12 @@ const youtube = {
         }
     },
 
+    // Set aspect ratio
+    setAspectRatio() {
+        const ratio = this.config.ratio.split(':');
+        this.elements.wrapper.style.paddingBottom = `${100 / ratio[0] * ratio[1]}%`;
+    },
+
     // API ready
     ready(videoId) {
         const player = this;
@@ -66,9 +75,9 @@ const youtube = {
                 origin: window && window.location.hostname,
                 widget_referrer: window && window.location.href,
 
-                // Captions is flaky on YouTube
-                // cc_load_policy: (this.captions.active ? 1 : 0),
-                // cc_lang_pref: 'en',
+                // Captions are flaky on YouTube
+                cc_load_policy: (this.captions.active ? 1 : 0),
+                cc_lang_pref: this.config.captions.language,
             },
             events: {
                 onError(event) {

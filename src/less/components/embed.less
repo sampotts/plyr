@@ -4,7 +4,11 @@
 // --------------------------------------------------------------
 
 .plyr__video-embed {
-    padding-bottom: 56.25%; /* 16:9 */
+    // Default to 16:9 ratio but this is set by JavaScript based on config
+    @padding: ((100 / 16) * 9);
+    @offset: unit((300 - @padding) / 6, ~'%');
+
+    padding-bottom: unit(@padding, ~'%');
     height: 0;
 
     iframe {
@@ -20,8 +24,8 @@
     // Vimeo hack
     > div {
         position: relative;
-        padding-bottom: 200%;
-        transform: translateY(-35.95%);
+        padding-bottom: 300%;
+        transform: translateY(-@offset);
     }
 }
 // To allow mouse events to be captured if full support
