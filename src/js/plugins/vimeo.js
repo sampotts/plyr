@@ -119,20 +119,20 @@ const vimeo = {
         });
 
         // Playback speed
-        let { playbackRate } = player.media;
+        let speed = player.config.speed.selected;
         Object.defineProperty(player.media, 'playbackRate', {
             get() {
-                return playbackRate;
+                return speed;
             },
             set(input) {
-                playbackRate = input;
+                speed = input;
                 player.embed.setPlaybackRate(input);
                 utils.dispatchEvent.call(player, player.media, 'ratechange');
             },
         });
 
         // Volume
-        let { volume } = player.media;
+        let { volume } = player.config;
         Object.defineProperty(player.media, 'volume', {
             get() {
                 return volume;
@@ -156,7 +156,7 @@ const vimeo = {
         });
 
         // Loop
-        let { loop } = player.media;
+        let { loop } = player.config;
         Object.defineProperty(player.media, 'loop', {
             get() {
                 return loop;

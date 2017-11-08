@@ -1,6 +1,6 @@
-<aside class="notice">
-This branch is currently in beta and not production-ready.
-</aside>
+---
+Beware: This branch is currently in beta and not production-ready
+---
 
 # Plyr
 A simple, accessible and customizable HTML5, YouTube and Vimeo media player.
@@ -23,7 +23,7 @@ We wanted a lightweight, accessible and customizable media player that supports 
 - **HTML Video & Audio** - support for both formats
 - **[Embedded Video](#embeds)** - support for YouTube and Vimeo video playback
 - **[Streaming](#streaming)** - support for hls.js, Shaka and dash.js streaming playback
-- **[API](#api)** - toggle playback, volume, seeking, and more through a standardized API 
+- **[API](#api)** - toggle playback, volume, seeking, and more through a standardized API
 - **[Events](#events)** - no messing around with Vimeo and YouTube APIs, all events are standardized across formats
 - **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes
 - **[Shortcuts](#shortcuts)** - supports keyboard shortcuts
@@ -192,7 +192,7 @@ You can specify a range of arguments for the constructor to use:
 - A CSS string selector that's compatible with [`querySelector`](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector)
 - A [HTMLElement](https://developer.mozilla.org/en/docs/Web/API/HTMLElement)
 - A [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList) or Array of [HTMLElement](https://developer.mozilla.org/en/docs/Web/API/HTMLElement) - the first element will be used
-- A [jQuery](https://jquery.com) object - if multiple are passed, the first element will be used 
+- A [jQuery](https://jquery.com) object - if multiple are passed, the first element will be used
 
 Here's some examples
 
@@ -231,7 +231,7 @@ Options can be passed as an object to the constructor as above or as JSON in `da
 <video data-plyr='{ "title": "This is an example" }'></video>
 ```
 
-Note the single quotes encapsulating the JSON and double quotes on the object keys. Only string values need double quotes. 
+Note the single quotes encapsulating the JSON and double quotes on the object keys. Only string values need double quotes.
 
 <table class="table" width="100%">
   <thead>

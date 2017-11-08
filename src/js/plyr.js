@@ -401,13 +401,14 @@ class Plyr {
             volume = min;
         }
 
+        // Update config
+        this.config.volume = volume;
+
         // Set the player volume
         this.media.volume = volume;
 
         // Toggle muted state
-        if (volume === 0) {
-            this.muted = true;
-        }
+        this.muted = volume === 0;
     }
 
     /**
@@ -434,10 +435,13 @@ class Plyr {
     // Toggle mute
     set muted(mute) {
         // If the method is called without parameter, toggle based on current value
-        const toggle = utils.is.boolean(mute) ? mute : !this.media.muted;
+        const toggle = utils.is.boolean(mute) ? mute : this.config.muted;
 
         // Set button state
         utils.toggleState(this.elements.buttons.mute, toggle);
+
+        // Update config
+        this.config.muted = toggle;
 
         // Set mute on the player
         this.media.muted = toggle;
@@ -449,10 +453,15 @@ class Plyr {
 
     // Playback speed
     set speed(input) {
-        // Load speed from storage or default value
-        let speed = utils.is.number(input)
-            ? input
-            : parseFloat(storage.get.call(this).speed || this.speed.selected || this.config.speed.default);
+        let speed = null;
+
+        if (utils.is.number(input)) {
+            speed = input;
+        } else if (utils.is.number(storage.get.call(this).speed)) {
+            ({ speed } = storage.get.call(this));
+        } else {
+            speed = this.config.speed.selected;
+        }
 
         // Set min/max
         if (speed < 0.1) {
@@ -467,6 +476,9 @@ class Plyr {
             return;
         }
 
+        // Update config
+        this.config.speed.selected = speed;
+
         // Set media speed
         this.media.playbackRate = speed;
     }
@@ -477,43 +489,30 @@ class Plyr {
 
     // Set playback quality
     set quality(input) {
-        // Load speed from storage or default value
-        const quality = utils.is.string(input)
-            ? input
-            : parseFloat(storage.get.call(this).quality || this.config.quality.selected);
+        let quality = null;
 
-        if (!this.config.quality.options.includes(quality)) {
+        if (utils.is.string(input)) {
+            quality = input;
+        } else if (utils.is.number(storage.get.call(this).speed)) {
+            ({ quality } = storage.get.call(this));
+        } else {
+            quality = this.config.quality.selected;
+        }
+
+        if (!this.options.quality.includes(quality)) {
             this.warn(`Unsupported quality option (${quality})`);
             return;
         }
 
-        // Set media speed
-        switch (this.type) {
-            case 'youtube':
-                this.utils.dispatchEvent.call(this, this.media, 'qualityrequested', false, {
-                    quality,
-                });
+        // Update config
+        this.config.quality.selected = quality;
 
-                this.embed.setPlaybackQuality(quality);
-
-                break;
-
-            default:
-                this.warn('Quality options are only available for YouTube');
-                break;
-        }
+        // Set quality
+        this.media.quality = quality;
     }
 
     get quality() {
-        // Set media speed
-        switch (this.type) {
-            case 'youtube':
-                return this.embed.getPlaybackQuality();
-
-            default:
-                this.warn('Quality options are only available for YouTube');
-                return null;
-        }
+        return this.media.quality;
     }
 
     // Toggle loop

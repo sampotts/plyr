@@ -63,7 +63,7 @@ const defaults = {
 
     // Speed default and options to display
     speed: {
-        default: 1,
+        selected: 1,
         options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2],
     },
 

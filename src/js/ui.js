@@ -69,15 +69,20 @@ const ui = {
         // Captions
         captions.setup.call(this);
 
-        // Set volume
+        // Reset volume
         this.volume = null;
-        // this.muted = null;
 
-        // Set playback speed
+        // Reset mute state
+        this.muted = null;
+
+        // Reset speed
         this.speed = null;
 
-        // Set loop
+        // Reset loop state
         this.loop = null;
+
+        // Reset quality options
+        this.options.quality = [];
 
         // Reset time display
         ui.timeUpdate.call(this);

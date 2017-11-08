@@ -123,10 +123,9 @@ const youtube = {
                     };
                     player.media.duration = instance.getDuration();
                     player.media.paused = true;
-                    player.media.muted = instance.isMuted();
-                    player.media.currentTime = 0;
 
                     // Seeking
+                    player.media.currentTime = 0;
                     Object.defineProperty(player.media, 'currentTime', {
                         get() {
                             return Number(instance.getCurrentTime());
@@ -153,6 +152,21 @@ const youtube = {
                         },
                     });
 
+                    // Quality
+                    Object.defineProperty(player.media, 'quality', {
+                        get() {
+                            return instance.getPlaybackQuality();
+                        },
+                        set(input) {
+                            // Trigger request event
+                            utils.dispatchEvent.call(player, player.media, 'qualityrequested', false, {
+                                quality: input,
+                            });
+
+                            instance.setPlaybackQuality(input);
+                        },
+                    });
+
                     // Volume
                     let volume = instance.getVolume() / 100;
                     Object.defineProperty(player.media, 'volume', {
@@ -167,6 +181,7 @@ const youtube = {
                     });
 
                     // Muted
+                    player.media.muted = instance.isMuted();
                     Object.defineProperty(player.media, 'muted', {
                         get() {
                             return instance.isMuted();

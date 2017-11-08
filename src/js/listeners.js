@@ -404,7 +404,7 @@ const listeners = {
         // Mute
         utils.on(this.elements.buttons.mute, 'click', event =>
             proxy(event, 'mute', () => {
-                this.muted = 'toggle';
+                this.muted = !this.muted;
             })
         );
 
