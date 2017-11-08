@@ -205,7 +205,7 @@ The constructor will return a Plyr object that can be used with the [API](#api) 
 Options can be passed as an object to the constructor as above or as JSON in `data-plyr` attribute on each of your target elements:
 
 ```html
-<video data-plyr='{ "title": "This is an example video", "volume": 1, "debug": true }'></video>
+<video src="/path/to/video.mp4" id="player" controls data-plyr='{ "title": "This is an example video", "volume": 1, "debug": true }'></video>
 ```
 
 Note the single quotes encapsulating the JSON and double quotes on the object keys. Only string values need double quotes.
@@ -213,6 +213,15 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
 Option | Type | Default | Description
 ------ | ---- | ------- | -----------
 `enabled` | Boolean | `true` | Completely disable Plyr. This would allow you to do a User Agent check or similar to programmatically enable or disable Plyr for a certain UA. Example below.
+`debug` | Boolean | `false` | Display debugging information in the console
+`controls` | Function or Array | ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen' ] | If a function is passed, it is assumed your method will return a string of HTML for the controls. Three arguments will be passed to your function; id (the unique id for the player), seektime (the seektime step in seconds), and title (the media title). See [controls.md](controls.md) for more info on how the html needs to be structured.
+`settings` | Array | ['captions', 'quality', 'speed', 'loop'] | If you're using the default controls are used then you can specify which settings to show in the menu
+`i18n` | Object | See [defaults.js](/src/js/defaults.js) | Used for internationalization (i18n) of the tooltips/labels within the buttons.
+`loadSprite` | Boolean | `true` | Load the SVG sprite specified as the `iconUrl` option (if a URL). If `false`, it is assumed you are handling sprite loading yourself.
+`iconUrl` | String | `null` | Specify a URL or path to the SVG sprite. See the [SVG section](#svg) for more info.
+`iconPrefix` | String | `plyr` | Specify the id prefix for the icons used in the default controls (e.g. "plyr-play" would be "plyr"). This is to prevent clashes if you're using your own SVG sprite but with the default controls. Most people can ignore this option.
+
+
 
 <table class="table" width="100%">
   <thead>
@@ -225,58 +234,10 @@ Option | Type | Default | Description
   </thead>
   <tbody>
     <tr>
-      <td><code>enabled</code></td>
-      <td>Boolean</td>
-      <td><code>true</code></td>
-      <td>Completely disable Plyr. This would allow you to do a User Agent check or similar to programmatically enable or disable Plyr for a certain UA. Example below.</td>
-    </tr>
-    <tr>
-      <td><code>html</code></td>
-      <td>String</td>
-      <td><code><a href="controls.md">See controls.md</a></code></td>
-      <td>See <a href="controls.md">controls.md</a> for more info on how the html needs to be structured.</td>
-    </tr>
-    <tr>
-      <td><code>controls</code></td>
-      <td>Array</td>
-      <td><code>['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'fullscreen']</code></td>
-      <td>Toggle which control elements you would like to display when using the default controls html. If you specify a <code>html</code> option, this is redundant. The default value is to display everything.</td>
-    </tr>
-    <tr>
-      <td><code>i18n</code></td>
-      <td>Object</td>
-      <td><code><a href="controls.md">See controls.md</a></code></td>
-      <td>Used for internationalization (i18n) of the tooltips/labels within the buttons.</td>
-    </tr>
-    <tr>
-      <td><code>loadSprite</code></td>
-      <td>Boolean</td>
-      <td><code>true</code></td>
-      <td>Load the SVG sprite specified as the <code>iconUrl</code> option (if a URL). If <code>false</code>, it is assumed you are handling sprite loading yourself.</td>
-    </tr>
-    <tr>
-      <td><code>iconUrl</code></td>
-      <td>String</td>
-      <td><code>null</code></td>
-      <td>Specify a URL or path to the SVG sprite. See the <a href="#svg">SVG section</a> for more info.</td>
-    </tr>
-    <tr>
-      <td><code>iconPrefix</code></td>
-      <td>String</td>
-      <td><code>plyr</code></td>
-      <td>Specify the id prefix for the icons used in the default controls (e.g. "plyr-play" would be "plyr"). This is to prevent clashes if you're using your own SVG sprite but with the default controls. Most people can ignore this option.</td>
-    </tr>
-    <tr>
       <td><code>blankUrl</code></td>
       <td>String</td>
       <td><code>https://cdn.selz.com/plyr/blank.mp4</code></td>
       <td>Specify a URL or path to a blank video file used to properly cancel network requests. See <a href="https://github.com/sampotts/plyr/issues/174">issue #174</a> for more info.</td>
-    </tr>
-    <tr>
-      <td><code>debug</code></td>
-      <td>Boolean</td>
-      <td><code>false</code></td>
-      <td>Display debugging information on what Plyr is doing.</td>
     </tr>
     <tr>
       <td><code>autoplay</code></td>
