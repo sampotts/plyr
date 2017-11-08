@@ -34,22 +34,8 @@ We wanted a lightweight, accessible and customizable media player that supports 
 Oh and yes, it works with Bootstrap.
 
 ## Changelog
+
 Check out the [changelog](changelog.md) to see what's new with Plyr.
-
-## Features currently being developed
-- Support for VAST and VPAID ads
-- ...[and more](https://github.com/sampotts/plyr/issues?q=is%3Aissue+is%3Aopen+label%3A%22In+Development%22)
-
-## Planned features
-- Playlists
-- Google cast support
-- Facebook video support
-- Wistia video support
-- YouTube and Vimeo audio support
-- Audio captions
-...and whatever else has been raised in [issues](https://github.com/sampotts/plyr/issues)
-
-If you have any cool ideas or features, please let me know by [creating an issue](https://github.com/sampotts/plyr/issues/new) or, of course, forking and sending a pull request.
 
 ## CMS plugins
 
@@ -70,21 +56,6 @@ You can grab the source using one of the following package managers.
 npm install plyr
 ```
 [https://www.npmjs.com/package/plyr](https://www.npmjs.com/package/plyr)
-
-### Bower
-```
-bower install plyr
-```
-[http://bower.io/search/?q=plyr](http://bower.io/search/?q=plyr)
-
-More info on setting up dependencies can be found in the [Bower Docs](http://bower.io/docs/creating-packages/#maintaining-dependencies)
-
-### Ember
-The awesome [@louisrudner](https://twitter.com/louisrudner) has created an ember component, available by running:
-```
-ember addon:install ember-cli-plyr
-```
-More info is on [npm](https://www.npmjs.com/package/ember-cli-plyr) and [GitHub](https://github.com/louisrudner/ember-cli-plyr)
 
 ## Quick setup
 Here's a quick run through on getting up and running. There's also a [demo on Codepen](http://codepen.io/sampotts/pen/jARJYp).
@@ -153,19 +124,23 @@ If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for t
 ```
 
 ### SVG Sprite
+
 The SVG sprite is loaded automatically from our CDN (provided by [Fastly](https://www.fastly.com/)). To change this, see the [options](#options) below. For reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/2.0.13/plyr.svg`.
 
 ## Advanced
 
 ### LESS & SASS/SCSS
+
 You can use `plyr.less` or `plyr.scss` file included in `/src` as part of your build and change variables to suit your design. The LESS and SASS require you to use the [autoprefixer](https://www.npmjs.com/package/gulp-autoprefixer) plugin (you should already) as all declerations use the W3C definitions - e.g. `appearance: none;` will be prefixed to `-webkit-appearance: none;` by autoprefixer.
 
 The HTML markup uses the BEM methodology with `plyr` as the block, e.g. `.plyr__controls`. You can change the class hooks in the options to match any custom CSS you write. Check out the JavaScript source for more on this.
 
 ### SVG
+
 The icons used in the Plyr controls are loaded in an SVG sprite. The sprite is automatically loaded from our CDN by default. If you already have an icon build system in place, you can include the source plyr icons (see `/src/sprite` for source icons).
 
 #### Using the `iconUrl` option
+
 You can however specify your own `iconUrl` option and Plyr will determine if the url is absolute and requires loading by AJAX/CORS due to current browser limitations or if it's a relative path, just use the path directly.
 
 If you're using the `<base>` tag on your site, you may need to use something like this:
@@ -177,10 +152,12 @@ and the AJAX technique here:
 [http://css-tricks.com/ajaxing-svg-sprite/](http://css-tricks.com/ajaxing-svg-sprite/)
 
 ### Cross Origin (CORS)
+
 You'll notice the `crossorigin` attribute on the example `<video>` elements. This is because the TextTrack captions are loaded from another domain. If your TextTrack captions are also hosted on another domain, you will need to add this attribute and make sure your host has the correct headers setup. For more info on CORS checkout the MDN docs:
 [https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS](https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS)
 
 ### Captions
+
 WebVTT captions are supported. To add a caption track, check the HTML example above and look for the `<track>` element. Be sure to [validate your caption files](https://quuz.org/webvtt/).
 
 ### JavaScript
@@ -228,10 +205,14 @@ The constructor will return a Plyr object that can be used with the [API](#api) 
 Options can be passed as an object to the constructor as above or as JSON in `data-plyr` attribute on each of your target elements:
 
 ```html
-<video data-plyr='{ "title": "This is an example" }'></video>
+<video data-plyr='{ "title": "This is an example video", "volume": 1, "debug": true }'></video>
 ```
 
 Note the single quotes encapsulating the JSON and double quotes on the object keys. Only string values need double quotes.
+
+Option | Type | Default | Description
+------ | ---- | ------- | -----------
+`enabled` | Boolean | `true` | Completely disable Plyr. This would allow you to do a User Agent check or similar to programmatically enable or disable Plyr for a certain UA. Example below.
 
 <table class="table" width="100%">
   <thead>
