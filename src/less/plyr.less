@@ -356,6 +356,14 @@
     }
 }
 
+// Header controls
+.plyr__header {
+    .plyr__controls;
+    position: absolute;
+    z-index: 1;
+}
+
+
 // Buttons
 .plyr__control {
     position: relative;
@@ -421,12 +429,18 @@
     }
 }
 // Hide controls
-.plyr--video.plyr--hide-controls .plyr__controls {
-    opacity: 0;
-    transform: translateY(100%);
-    pointer-events: none;
+.plyr--video.plyr--hide-controls {
+    .plyr__controls {
+        opacity: 0;
+        transform: translateY(100%);
+        pointer-events: none;
+    }
+    .plyr__header {
+        opacity: 0;
+        pointer-events: none;
+        transition: background 0.3s ease, color 0.3s ease, opacity 0.3s ease;
+    }
 }
-
 // Audio controls
 .plyr--audio .plyr__controls {
     padding: @plyr-control-spacing;

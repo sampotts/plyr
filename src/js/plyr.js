@@ -6,7 +6,7 @@
 // ==========================================================================
 
 // UMD-Inspired JS Module from https://gist.github.com/wilmoore/3880415
-(function(name, context, definition) {
+(function (name, context, definition) {
     /* global define,module,require */
     'use strict';
 
@@ -17,7 +17,7 @@
     } else {
         context[name] = definition();
     }
-}.call(this, 'Plyr', this, function() {
+}.call(this, 'Plyr', this, function () {
     'use strict';
     /* global jQuery */
 
@@ -250,6 +250,7 @@
             controls: {
                 container: null,
                 wrapper: '.plyr__controls',
+                header: ".plyr__header"
             },
             labels: '[data-plyr]',
             buttons: {
@@ -338,50 +339,50 @@
     var utils = {
         // Check variable types
         is: {
-            object: function(input) {
+            object: function (input) {
                 return input !== null && typeof input === 'object' && input.constructor === Object;
             },
-            array: function(input) {
+            array: function (input) {
                 return input !== null && Array.isArray(input);
             },
-            number: function(input) {
+            number: function (input) {
                 return (
                     input !== null &&
                     ((typeof input === 'number' && !isNaN(input - 0)) ||
                         (typeof input === 'object' && input.constructor === Number))
                 );
             },
-            string: function(input) {
+            string: function (input) {
                 return (
                     input !== null &&
                     (typeof input === 'string' || (typeof input === 'object' && input.constructor === String))
                 );
             },
-            boolean: function(input) {
+            boolean: function (input) {
                 return input !== null && typeof input === 'boolean';
             },
-            nodeList: function(input) {
+            nodeList: function (input) {
                 return input !== null && input instanceof NodeList;
             },
-            htmlElement: function(input) {
+            htmlElement: function (input) {
                 return input !== null && input instanceof HTMLElement;
             },
-            function: function(input) {
+            function: function (input) {
                 return input !== null && typeof input === 'function';
             },
-            event: function(input) {
+            event: function (input) {
                 return input !== null && input instanceof Event;
             },
-            cue: function(input) {
+            cue: function (input) {
                 this.instanceOf(input, window.TextTrackCue) || this.instanceOf(input, window.VTTCue);
             },
-            track: function(input) {
+            track: function (input) {
                 return input !== null && (this.instanceOf(input, window.TextTrack) || typeof input.kind === 'string');
             },
-            undefined: function(input) {
+            undefined: function (input) {
                 return input !== null && typeof input === 'undefined';
             },
-            empty: function(input) {
+            empty: function (input) {
                 return (
                     input === null ||
                     this.undefined(input) ||
@@ -389,14 +390,14 @@
                     (this.object(input) && Object.keys(input).length === 0)
                 );
             },
-            instanceOf: function(input, constructor) {
+            instanceOf: function (input, constructor) {
                 return Boolean(input && constructor && input instanceof constructor);
             },
         },
 
         // Credits: http://paypal.github.io/accessible-html5-video-player/
         // Unfortunately, due to mixed support, UA sniffing is required
-        getBrowser: function() {
+        getBrowser: function () {
             var ua = navigator.userAgent;
             var name = navigator.appName;
             var fullVersion = '' + parseFloat(navigator.appVersion);
@@ -480,7 +481,7 @@
 
         // Check for support
         // Basic functionality vs full UI
-        checkSupport: function(type, inline) {
+        checkSupport: function (type, inline) {
             var basic = false;
             var full = false;
             var browser = utils.getBrowser();
@@ -520,7 +521,7 @@
         },
 
         // Inject a script
-        injectScript: function(url) {
+        injectScript: function (url) {
             // Check script is not already referenced
             if (document.querySelectorAll('script[src="' + url + '"]').length) {
                 return;
@@ -534,7 +535,7 @@
         },
 
         // Determine if we're in an iframe
-        inFrame: function() {
+        inFrame: function () {
             try {
                 return window.self !== window.top;
             } catch (e) {
@@ -543,12 +544,12 @@
         },
 
         // Element exists in an array
-        inArray: function(haystack, needle) {
+        inArray: function (haystack, needle) {
             return utils.is.array(haystack) && haystack.indexOf(needle) !== -1;
         },
 
         // Wrap an element
-        wrap: function(elements, wrapper) {
+        wrap: function (elements, wrapper) {
             // Convert `elements` to an array, if necessary.
             if (!elements.length) {
                 elements = [elements];
@@ -582,7 +583,7 @@
         },
 
         // Remove an element
-        removeElement: function(element) {
+        removeElement: function (element) {
             if (!utils.is.htmlElement(element) || !utils.is.htmlElement(element.parentNode)) {
                 return;
             }
@@ -591,12 +592,12 @@
         },
 
         // Inaert an element after another
-        insertAfter: function(element, target) {
+        insertAfter: function (element, target) {
             target.parentNode.insertBefore(element, target.nextSibling);
         },
 
         // Create a DocumentFragment
-        createElement: function(type, attributes, text) {
+        createElement: function (type, attributes, text) {
             // Create a new <element>
             var element = document.createElement(type);
 
@@ -615,13 +616,13 @@
         },
 
         // Insert a DocumentFragment
-        insertElement: function(type, parent, attributes, text) {
+        insertElement: function (type, parent, attributes, text) {
             // Inject the new <element>
             parent.appendChild(utils.createElement(type, attributes, text));
         },
 
         // Remove all child elements
-        emptyElement: function(element) {
+        emptyElement: function (element) {
             var length = element.childNodes.length;
 
             while (length--) {
@@ -630,14 +631,14 @@
         },
 
         // Set attributes
-        setAttributes: function(element, attributes) {
+        setAttributes: function (element, attributes) {
             for (var key in attributes) {
                 element.setAttribute(key, attributes[key]);
             }
         },
 
         // Get an attribute object from a string selector
-        getAttributesFromSelector: function(selector, existingAttributes) {
+        getAttributesFromSelector: function (selector, existingAttributes) {
             // For example:
             // '.test' to { class: 'test' }
             // '#test' to { id: 'test' }
@@ -649,7 +650,7 @@
 
             var attributes = {};
 
-            selector.split(',').forEach(function(selector) {
+            selector.split(',').forEach(function (selector) {
                 // Remove whitespace
                 selector = selector.trim();
 
@@ -696,7 +697,7 @@
         },
 
         // Toggle class on an element
-        toggleClass: function(element, className, toggle) {
+        toggleClass: function (element, className, toggle) {
             if (utils.is.htmlElement(element)) {
                 var contains = false;
 
@@ -716,7 +717,7 @@
         },
 
         // Has class name
-        hasClass: function(element, className) {
+        hasClass: function (element, className) {
             if (element) {
                 if (element.classList) {
                     return element.classList.contains(className);
@@ -728,7 +729,7 @@
         },
 
         // Element matches selector
-        matches: function(element, selector) {
+        matches: function (element, selector) {
             var prototype = Element.prototype;
 
             var matches =
@@ -736,7 +737,7 @@
                 prototype.webkitMatchesSelector ||
                 prototype.mozMatchesSelector ||
                 prototype.msMatchesSelector ||
-                function(selector) {
+                function (selector) {
                     return [].indexOf.call(document.querySelectorAll(selector), this) !== -1;
                 };
 
@@ -744,7 +745,7 @@
         },
 
         // Get the focused element
-        getFocusElement: function() {
+        getFocusElement: function () {
             var focused = document.activeElement;
 
             if (!focused || focused === document.body) {
@@ -757,11 +758,11 @@
         },
 
         // Bind along with custom handler
-        proxy: function(element, eventName, customListener, defaultListener, passive, capture) {
+        proxy: function (element, eventName, customListener, defaultListener, passive, capture) {
             utils.on(
                 element,
                 eventName,
-                function(event) {
+                function (event) {
                     if (customListener) {
                         customListener.apply(element, [event]);
                     }
@@ -773,7 +774,7 @@
         },
 
         // Toggle event listener
-        toggleListener: function(elements, events, callback, toggle, passive, capture) {
+        toggleListener: function (elements, events, callback, toggle, passive, capture) {
             // Bail if no elements
             if (elements === null || utils.is.undefined(elements)) {
                 return;
@@ -804,7 +805,7 @@
                 args.shift();
 
                 // Create listener for each node
-                [].forEach.call(elements, function(element) {
+                [].forEach.call(elements, function (element) {
                     if (element instanceof Node) {
                         utils.toggleListener.apply(null, [element].concat(args));
                     }
@@ -826,23 +827,23 @@
             }
 
             // If a single node is passed, bind the event listener
-            events.forEach(function(event) {
+            events.forEach(function (event) {
                 elements[toggle ? 'addEventListener' : 'removeEventListener'](event, callback, options);
             });
         },
 
         // Bind event handler
-        on: function(element, events, callback, passive, capture) {
+        on: function (element, events, callback, passive, capture) {
             utils.toggleListener(element, events, callback, true, passive, capture);
         },
 
         // Unbind event handler
-        off: function(element, events, callback, passive, capture) {
+        off: function (element, events, callback, passive, capture) {
             utils.toggleListener(element, events, callback, false, passive, capture);
         },
 
         // Trigger event
-        dispatchEvent: function(element, type, bubbles, properties) {
+        dispatchEvent: function (element, type, bubbles, properties) {
             // Bail if no element
             if (!element || !type) {
                 return;
@@ -860,7 +861,7 @@
             } else {
                 // Polyfill CustomEvent
                 // https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent#Polyfill
-                CustomEvent = function(event, params) {
+                CustomEvent = function (event, params) {
                     params = params || {
                         bubbles: false,
                         cancelable: false,
@@ -885,7 +886,7 @@
 
         // Toggle aria-pressed state on a toggle button
         // http://www.ssbbartgroup.com/blog/how-not-to-misuse-aria-states-properties-and-roles
-        toggleState: function(target, state) {
+        toggleState: function (target, state) {
             // Bail if no target
             if (!target) {
                 return;
@@ -901,7 +902,7 @@
         },
 
         // Get percentage
-        getPercentage: function(current, max) {
+        getPercentage: function (current, max) {
             if (current === 0 || max === 0 || isNaN(current) || isNaN(max)) {
                 return 0;
             }
@@ -911,7 +912,7 @@
         // Deep extend/merge destination object with N more objects
         // http://andrewdupont.net/2009/08/28/deep-extending-objects-in-javascript/
         // Removed call to arguments.callee (used explicit function name instead)
-        extend: function() {
+        extend: function () {
             // Get arguments
             var objects = arguments;
 
@@ -955,13 +956,13 @@
         },
 
         // Parse YouTube ID from url
-        parseYouTubeId: function(url) {
+        parseYouTubeId: function (url) {
             var regex = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
             return url.match(regex) ? RegExp.$2 : url;
         },
 
         // Remove HTML from a string
-        stripHTML: function(source) {
+        stripHTML: function (source) {
             var fragment = document.createDocumentFragment();
             var element = document.createElement('div');
             fragment.appendChild(element);
@@ -970,7 +971,7 @@
         },
 
         // Load an SVG sprite
-        loadSprite: function(url, id) {
+        loadSprite: function (url, id) {
             if (typeof url !== 'string') {
                 return;
             }
@@ -1019,7 +1020,7 @@
                 }
 
                 // Once loaded, inject to container and body
-                xhr.onload = function() {
+                xhr.onload = function () {
                     if (support.storage) {
                         window.localStorage.setItem(
                             prefix + id,
@@ -1037,7 +1038,7 @@
         },
 
         // Get the transition end event
-        transitionEnd: (function() {
+        transitionEnd: (function () {
             var element = document.createElement('span');
 
             var events = {
@@ -1058,16 +1059,16 @@
     };
 
     // Fullscreen API
-    var fullscreen = (function() {
+    var fullscreen = (function () {
         // Determine the prefix
-        var prefix = (function() {
+        var prefix = (function () {
             var value = false;
 
             if (utils.is.function(document.cancelFullScreen)) {
                 value = '';
             } else {
                 // Check for fullscreen support by vendor prefix
-                ['webkit', 'o', 'moz', 'ms', 'khtml'].some(function(prefix) {
+                ['webkit', 'o', 'moz', 'ms', 'khtml'].some(function (prefix) {
                     if (utils.is.function(document[prefix + 'CancelFullScreen'])) {
                         value = prefix;
                         return true;
@@ -1089,7 +1090,7 @@
             eventType: prefix === 'ms' ? 'MSFullscreenChange' : prefix + 'fullscreenchange',
 
             // Is an element fullscreen
-            isFullScreen: function(element) {
+            isFullScreen: function (element) {
                 if (!support.fullscreen) {
                     return false;
                 }
@@ -1109,7 +1110,7 @@
                         return document[prefix + 'FullscreenElement'] === element;
                 }
             },
-            requestFullScreen: function(element) {
+            requestFullScreen: function (element) {
                 if (!support.fullscreen) {
                     return false;
                 }
@@ -1122,7 +1123,7 @@
                     ? element.requestFullScreen()
                     : element[prefix + (prefix === 'ms' ? 'RequestFullscreen' : 'RequestFullScreen')]();
             },
-            cancelFullScreen: function() {
+            cancelFullScreen: function () {
                 if (!support.fullscreen) {
                     return false;
                 }
@@ -1131,7 +1132,7 @@
                     ? document.cancelFullScreen()
                     : document[prefix + (prefix === 'ms' ? 'ExitFullscreen' : 'CancelFullScreen')]();
             },
-            element: function() {
+            element: function () {
                 if (!support.fullscreen) {
                     return null;
                 }
@@ -1152,7 +1153,7 @@
 
         // Local storage
         // We can't assume if local storage is present that we can use it
-        storage: (function() {
+        storage: (function () {
             if (!('localStorage' in window)) {
                 return false;
             }
@@ -1171,7 +1172,7 @@
 
         // Picture-in-picture support
         // Safari only currently
-        pip: (function() {
+        pip: (function () {
             var browser = utils.getBrowser();
             return !browser.isIPhone && utils.is.function(utils.createElement('video').webkitSetPresentationMode);
         })(),
@@ -1187,7 +1188,7 @@
         // Check for mime type support against a player instance
         // Credits: http://diveintohtml5.info/everything.html
         // Related: http://www.leanbackplayer.com/test/h5mt.html
-        mime: function(player, type) {
+        mime: function (player, type) {
             var media = player.media;
 
             try {
@@ -1230,12 +1231,12 @@
         // Check for passive event listener support
         // https://github.com/WICG/EventListenerOptions/blob/gh-pages/explainer.md
         // https://www.youtube.com/watch?v=NPM6172J22g
-        passiveListeners: (function() {
+        passiveListeners: (function () {
             // Test via a getter in the options object to see if the passive property is accessed
             var supported = false;
             try {
                 var options = Object.defineProperty({}, 'passive', {
-                    get: function() {
+                    get: function () {
                         supported = true;
                     },
                 });
@@ -1287,7 +1288,7 @@
             {},
             defaults,
             options,
-            (function() {
+            (function () {
                 try {
                     return JSON.parse(player.media.getAttribute('data-plyr'));
                 } catch (e) {
@@ -1344,9 +1345,9 @@
         };
 
         // Debugging
-        var log = function() {};
-        var warn = function() {};
-        var error = function() {};
+        var log = function () { };
+        var warn = function () { };
+        var error = function () { };
         if (player.config.debug && 'console' in window) {
             log = console.log; // eslint-disable-line
             warn = console.warn; // eslint-disable-line
@@ -1425,7 +1426,7 @@
             } else if (utils.is.array(attributes)) {
                 warn(attributes);
 
-                attributes.forEach(function(attribute) {
+                attributes.forEach(function (attribute) {
                     utils.insertElement(type, player.media, attribute);
                 });
             }
@@ -1461,7 +1462,7 @@
             var index = -1;
 
             // Find old rule if it exists
-            [].some.call(styleSheet.rules, function(rule, i) {
+            [].some.call(styleSheet.rules, function (rule, i) {
                 if (rule.selectorText === selector) {
                     index = i;
                     return true;
@@ -1895,7 +1896,7 @@
                 });
 
                 // Build the tabs
-                player.config.settings.forEach(function(type) {
+                player.config.settings.forEach(function (type) {
                     var tab = utils.createElement('li', {
                         role: 'tab',
                         hidden: '',
@@ -1906,7 +1907,7 @@
                         utils.extend(utils.getAttributesFromSelector(player.config.selectors.buttons.settings), {
                             type: 'button',
                             class:
-                                player.config.classNames.control + ' ' + player.config.classNames.control + '--forward',
+                            player.config.classNames.control + ' ' + player.config.classNames.control + '--forward',
                             id: 'plyr-settings-' + data.id + '-' + type + '-tab',
                             'aria-haspopup': true,
                             'aria-controls': 'plyr-settings-' + data.id + '-' + type,
@@ -1933,7 +1934,7 @@
                 inner.appendChild(home);
 
                 // Build the panes
-                player.config.settings.forEach(function(type) {
+                player.config.settings.forEach(function (type) {
                     var pane = utils.createElement('div', {
                         id: 'plyr-settings-' + data.id + '-' + type,
                         'aria-hidden': true,
@@ -2004,6 +2005,20 @@
             return controls;
         }
 
+        function createHeader() {
+            var html = [];
+            html.push('<div class="plyr__header">');
+            html.push(
+                "<div class='back-button'>",
+                "<button type='button' onclick='alert()'>",
+                "<i class='fa fa-arrow-left' aria-hidden='true'></i>",
+                "<span>BUTTON</span>",
+                "</button>"
+            );
+            html.push('</div>');
+            return html.join('');
+        }
+
         // Hide/show a tab
         function toggleTab(setting, toggle) {
             var tab = player.elements.settings.tabs[setting];
@@ -2033,7 +2048,7 @@
 
             // Set options if passed and filter based on config
             if (utils.is.array(options)) {
-                player.quality.options = options.filter(function(quality) {
+                player.quality.options = options.filter(function (quality) {
                     return utils.inArray(player.config.quality.options, quality);
                 });
             } else {
@@ -2083,7 +2098,7 @@
                 return createBadge(label);
             }
 
-            player.quality.options.forEach(function(quality) {
+            player.quality.options.forEach(function (quality) {
                 var item = utils.createElement('li');
 
                 var label = utils.createElement('label', {
@@ -2257,7 +2272,7 @@
             }
 
             // Re-map the tracks into just the data we need
-            var tracks = [].map.call(player.captions.tracks, function(track) {
+            var tracks = [].map.call(player.captions.tracks, function (track) {
                 return {
                     language: track.language,
                     badge: true,
@@ -2272,7 +2287,7 @@
             });
 
             // Generate options
-            tracks.forEach(function(track) {
+            tracks.forEach(function (track) {
                 var item = utils.createElement('li');
 
                 var label = utils.createElement('label', {
@@ -2310,7 +2325,7 @@
         function setSpeedMenu(options, selected) {
             // Set options if passed and filter based on config
             if (utils.is.array(options)) {
-                player.speed.options = options.filter(function(speed) {
+                player.speed.options = options.filter(function (speed) {
                     return utils.inArray(player.config.speed.options, speed);
                 });
             } else {
@@ -2342,7 +2357,7 @@
             utils.emptyElement(list);
 
             // Create items
-            player.speed.options.forEach(function(speed) {
+            player.speed.options.forEach(function (speed) {
                 var item = utils.createElement('li');
 
                 var label = utils.createElement('label', {
@@ -2462,7 +2477,7 @@
                 player.captions.currentTrack = null;
 
                 // Filter doesn't seem to work for a TextTrackList :-(
-                [].forEach.call(player.captions.tracks, function(track) {
+                [].forEach.call(player.captions.tracks, function (track) {
                     if (track.language === player.captions.language.toLowerCase()) {
                         player.captions.currentTrack = track;
                     }
@@ -2494,7 +2509,7 @@
             // Setup HTML5 track rendering
             if (player.type === 'video') {
                 // Turn off native caption rendering to avoid double captions
-                [].forEach.call(player.captions.tracks, function(track) {
+                [].forEach.call(player.captions.tracks, function (track) {
                     // Remove previous bindings (if we've changed source or language)
                     utils.off(track, 'cuechange', setActiveCue);
 
@@ -2672,8 +2687,10 @@
             // Inject controls HTML
             if (utils.is.htmlElement(controls)) {
                 target.appendChild(controls);
+                target.insertAdjacentHTML("afterbegin", createHeader())
             } else {
                 target.insertAdjacentHTML('beforeend', controls);
+                target.insertAdjacentHTML("afterbegin", createHeader())
             }
 
             // Find the elements if need be
@@ -2963,13 +2980,13 @@
                     window.onYouTubeReadyCallbacks = window.onYouTubeReadyCallbacks || [];
 
                     // Add to queue
-                    window.onYouTubeReadyCallbacks.push(function() {
+                    window.onYouTubeReadyCallbacks.push(function () {
                         youTubeReady(mediaId);
                     });
 
                     // Set callback to process queue
-                    window.onYouTubeIframeAPIReady = function() {
-                        window.onYouTubeReadyCallbacks.forEach(function(callback) {
+                    window.onYouTubeIframeAPIReady = function () {
+                        window.onYouTubeReadyCallbacks.forEach(function (callback) {
                             callback();
                         });
                     };
@@ -2983,7 +3000,7 @@
                     utils.injectScript(player.config.urls.vimeo.api);
 
                     // Wait for fragaloop load
-                    var vimeoTimer = window.setInterval(function() {
+                    var vimeoTimer = window.setInterval(function () {
                         if (utils.is.object(window.Vimeo)) {
                             window.clearInterval(vimeoTimer);
                             vimeoReady(mediaId);
@@ -2999,7 +3016,7 @@
 
                 // Watch for iframe load
                 soundCloud.loaded = false;
-                utils.on(soundCloud, 'load', function() {
+                utils.on(soundCloud, 'load', function () {
                     soundCloud.loaded = true;
                 });
 
@@ -3016,7 +3033,7 @@
                 }
 
                 // Wait for SC load
-                var soundCloudTimer = window.setInterval(function() {
+                var soundCloudTimer = window.setInterval(function () {
                     if (window.SC && soundCloud.loaded) {
                         window.clearInterval(soundCloudTimer);
                         soundcloudReady.call(soundCloud);
@@ -3062,13 +3079,13 @@
                     //cc_lang_pref: 'en',
                 },
                 events: {
-                    onError: function(event) {
+                    onError: function (event) {
                         trigger(player.elements.container, 'error', true, {
                             code: event.data,
                             embed: event.target,
                         });
                     },
-                    onPlaybackQualityChange: function(event) {
+                    onPlaybackQualityChange: function (event) {
                         // Get the instance
                         var instance = event.target;
 
@@ -3077,7 +3094,7 @@
 
                         trigger(player.media, 'qualitychange');
                     },
-                    onPlaybackRateChange: function(event) {
+                    onPlaybackRateChange: function (event) {
                         // Get the instance
                         var instance = event.target;
 
@@ -3086,20 +3103,20 @@
 
                         trigger(player.media, 'ratechange');
                     },
-                    onReady: function(event) {
+                    onReady: function (event) {
                         // Get the instance
                         var instance = event.target;
 
                         // Create a faux HTML5 API using the YouTube API
-                        player.media.play = function() {
+                        player.media.play = function () {
                             instance.playVideo();
                             player.media.paused = false;
                         };
-                        player.media.pause = function() {
+                        player.media.pause = function () {
                             instance.pauseVideo();
                             player.media.paused = true;
                         };
-                        player.media.stop = function() {
+                        player.media.stop = function () {
                             instance.stopVideo();
                             player.media.paused = true;
                         };
@@ -3134,7 +3151,7 @@
                         window.clearInterval(timers.buffering);
 
                         // Setup buffering
-                        timers.buffering = window.setInterval(function() {
+                        timers.buffering = window.setInterval(function () {
                             // Get loaded % from YouTube
                             player.media.buffered = instance.getVideoLoadedFraction();
 
@@ -3158,7 +3175,7 @@
                             }
                         }, 200);
                     },
-                    onStateChange: function(event) {
+                    onStateChange: function (event) {
                         // Get the instance
                         var instance = event.target;
 
@@ -3203,7 +3220,7 @@
                                 trigger(player.media, 'playing');
 
                                 // Poll to get playback progress
-                                timers.playing = window.setInterval(function() {
+                                timers.playing = window.setInterval(function () {
                                     player.media.currentTime = instance.getCurrentTime();
                                     trigger(player.media, 'timeupdate');
                                 }, 100);
@@ -3251,15 +3268,15 @@
             });
 
             // Create a faux HTML5 API using the Vimeo API
-            player.media.play = function() {
+            player.media.play = function () {
                 player.embed.play();
                 player.media.paused = false;
             };
-            player.media.pause = function() {
+            player.media.pause = function () {
                 player.embed.pause();
                 player.media.paused = true;
             };
-            player.media.stop = function() {
+            player.media.stop = function () {
                 player.embed.stop();
                 player.media.paused = true;
             };
@@ -3270,24 +3287,24 @@
             // Update UI
             embedReady();
 
-            player.embed.getCurrentTime().then(function(value) {
+            player.embed.getCurrentTime().then(function (value) {
                 player.media.currentTime = value;
                 trigger(player.media, 'timeupdate');
             });
 
-            player.embed.getDuration().then(function(value) {
+            player.embed.getDuration().then(function (value) {
                 player.media.duration = value;
                 trigger(player.media, 'durationchange');
             });
 
             // Get captions
-            player.embed.getTextTracks().then(function(tracks) {
+            player.embed.getTextTracks().then(function (tracks) {
                 player.captions.tracks = tracks;
 
                 setupCaptions();
             });
 
-            player.embed.on('cuechange', function(data) {
+            player.embed.on('cuechange', function (data) {
                 var cue = null;
 
                 if (data.cues.length) {
@@ -3297,7 +3314,7 @@
                 setCaption(cue);
             });
 
-            player.embed.on('loaded', function() {
+            player.embed.on('loaded', function () {
                 // Fix keyboard focus issues
                 // https://github.com/sampotts/plyr/issues/317
                 if (utils.is.htmlElement(player.embed.element) && player.supported.full) {
@@ -3305,24 +3322,24 @@
                 }
             });
 
-            player.embed.on('play', function() {
+            player.embed.on('play', function () {
                 player.media.paused = false;
                 trigger(player.media, 'play');
                 trigger(player.media, 'playing');
             });
 
-            player.embed.on('pause', function() {
+            player.embed.on('pause', function () {
                 player.media.paused = true;
                 trigger(player.media, 'pause');
             });
 
-            player.embed.on('timeupdate', function(data) {
+            player.embed.on('timeupdate', function (data) {
                 player.media.seeking = false;
                 player.media.currentTime = data.seconds;
                 trigger(player.media, 'timeupdate');
             });
 
-            player.embed.on('progress', function(data) {
+            player.embed.on('progress', function (data) {
                 player.media.buffered = data.percent;
                 trigger(player.media, 'progress');
 
@@ -3332,13 +3349,13 @@
                 }
             });
 
-            player.embed.on('seeked', function() {
+            player.embed.on('seeked', function () {
                 player.media.seeking = false;
                 trigger(player.media, 'seeked');
                 trigger(player.media, 'play');
             });
 
-            player.embed.on('ended', function() {
+            player.embed.on('ended', function () {
                 player.media.paused = true;
                 trigger(player.media, 'ended');
             });
@@ -3350,17 +3367,17 @@
             player.embed = window.SC.Widget(this);
 
             // Setup on ready
-            player.embed.bind(window.SC.Widget.Events.READY, function() {
+            player.embed.bind(window.SC.Widget.Events.READY, function () {
                 // Create a faux HTML5 API using the Soundcloud API
-                player.media.play = function() {
+                player.media.play = function () {
                     player.embed.play();
                     player.media.paused = false;
                 };
-                player.media.pause = function() {
+                player.media.pause = function () {
                     player.embed.pause();
                     player.media.paused = true;
                 };
-                player.media.stop = function() {
+                player.media.stop = function () {
                     player.embed.seekTo(0);
                     player.embed.pause();
                     player.media.paused = true;
@@ -3369,36 +3386,36 @@
                 player.media.paused = true;
                 player.media.currentTime = 0;
 
-                player.embed.getDuration(function(value) {
+                player.embed.getDuration(function (value) {
                     player.media.duration = value / 1000;
 
                     // Update UI
                     embedReady();
                 });
 
-                player.embed.getPosition(function(value) {
+                player.embed.getPosition(function (value) {
                     player.media.currentTime = value;
                     trigger(player.media, 'timeupdate');
                 });
 
-                player.embed.bind(window.SC.Widget.Events.PLAY, function() {
+                player.embed.bind(window.SC.Widget.Events.PLAY, function () {
                     player.media.paused = false;
                     trigger(player.media, 'play');
                     trigger(player.media, 'playing');
                 });
 
-                player.embed.bind(window.SC.Widget.Events.PAUSE, function() {
+                player.embed.bind(window.SC.Widget.Events.PAUSE, function () {
                     player.media.paused = true;
                     trigger(player.media, 'pause');
                 });
 
-                player.embed.bind(window.SC.Widget.Events.PLAY_PROGRESS, function(data) {
+                player.embed.bind(window.SC.Widget.Events.PLAY_PROGRESS, function (data) {
                     player.media.seeking = false;
                     player.media.currentTime = data.currentPosition / 1000;
                     trigger(player.media, 'timeupdate');
                 });
 
-                player.embed.bind(window.SC.Widget.Events.LOAD_PROGRESS, function(data) {
+                player.embed.bind(window.SC.Widget.Events.LOAD_PROGRESS, function (data) {
                     player.media.buffered = data.loadProgress;
                     trigger(player.media, 'progress');
 
@@ -3408,7 +3425,7 @@
                     }
                 });
 
-                player.embed.bind(window.SC.Widget.Events.FINISH, function() {
+                player.embed.bind(window.SC.Widget.Events.FINISH, function () {
                     player.media.paused = true;
                     trigger(player.media, 'ended');
                 });
@@ -3472,7 +3489,7 @@
             clone.setAttribute('aria-hidden', false);
 
             // Prevent input's being unchecked due to the name being identical
-            [].forEach.call(clone.querySelectorAll('input[name]'), function(input) {
+            [].forEach.call(clone.querySelectorAll('input[name]'), function (input) {
                 var name = input.getAttribute('name');
                 input.setAttribute('name', name + '-clone');
             });
@@ -3517,7 +3534,7 @@
             var container = current.parentNode;
 
             // Set other toggles to be expanded false
-            [].forEach.call(menu.querySelectorAll('[aria-controls="' + current.getAttribute('id') + '"]'), function(
+            [].forEach.call(menu.querySelectorAll('[aria-controls="' + current.getAttribute('id') + '"]'), function (
                 toggle
             ) {
                 toggle.setAttribute('aria-expanded', false);
@@ -3533,7 +3550,7 @@
                 var size = getTabSize(pane);
 
                 // Restore auto height/width
-                var restore = function(event) {
+                var restore = function (event) {
                     // We're only bothered about height and width on the container
                     if (event.target !== container || !utils.inArray(['width', 'height'], event.propertyName)) {
                         return;
@@ -3598,7 +3615,7 @@
             clearTimeout(timers.loading);
 
             // Timer to prevent flicker when seeking
-            timers.loading = setTimeout(function() {
+            timers.loading = setTimeout(function () {
                 // Toggle container class hook
                 utils.toggleClass(player.elements.container, player.config.classNames.loading, player.loading);
 
@@ -3669,7 +3686,7 @@
                     // Check buffer status
                     case 'playing':
                     case 'progress':
-                        value = (function() {
+                        value = (function () {
                             var buffered = player.media.buffered;
 
                             if (buffered && buffered.length) {
@@ -3829,7 +3846,7 @@
             cancelRequests();
 
             // Destroy instance and re-setup
-            player.destroy(function() {
+            player.destroy(function () {
                 // TODO: Reset menus here
 
                 // Remove elements
@@ -3984,7 +4001,7 @@
                     utils.on(
                         window,
                         'keydown keyup',
-                        function(event) {
+                        function (event) {
                             var code = getKeyCode(event);
                             var focused = utils.getFocusElement();
                             var allowed = [48, 49, 50, 51, 52, 53, 54, 56, 57, 75, 77, 70, 67, 73, 76, 79];
@@ -4168,12 +4185,12 @@
 
             // Detect tab focus
             // Remove class on blur/focusout
-            utils.on(player.elements.container, 'focusout', function(event) {
+            utils.on(player.elements.container, 'focusout', function (event) {
                 utils.toggleClass(event.target, player.config.classNames.tabFocus, false);
             });
 
             // Add classname to tabbed elements
-            utils.on(player.elements.container, 'keydown', function(event) {
+            utils.on(player.elements.container, 'keydown', function (event) {
                 if (event.keyCode !== 9) {
                     return;
                 }
@@ -4186,7 +4203,7 @@
             });
 
             // Trigger custom and default handlers
-            var handlerProxy = function(event, customHandler, defaultHandler) {
+            var handlerProxy = function (event, customHandler, defaultHandler) {
                 if (utils.is.function(customHandler)) {
                     customHandler.call(this, event);
                 }
@@ -4203,42 +4220,42 @@
             utils.proxy(player.elements.buttons.pause, 'click', player.config.listeners.pause, togglePlay);
 
             // Pause
-            utils.proxy(player.elements.buttons.restart, 'click', player.config.listeners.restart, function() {
+            utils.proxy(player.elements.buttons.restart, 'click', player.config.listeners.restart, function () {
                 player.restart();
             });
 
             // Rewind
-            utils.proxy(player.elements.buttons.rewind, 'click', player.config.listeners.rewind, function() {
+            utils.proxy(player.elements.buttons.rewind, 'click', player.config.listeners.rewind, function () {
                 player.rewind();
             });
 
             // Rewind
-            utils.proxy(player.elements.buttons.forward, 'click', player.config.listeners.forward, function() {
+            utils.proxy(player.elements.buttons.forward, 'click', player.config.listeners.forward, function () {
                 player.forward();
             });
 
             // Mute
-            utils.proxy(player.elements.buttons.mute, 'click', player.config.listeners.mute, function() {
+            utils.proxy(player.elements.buttons.mute, 'click', player.config.listeners.mute, function () {
                 player.toggleMute();
             });
 
             // Captions
-            utils.proxy(player.elements.buttons.captions, 'click', player.config.listeners.captions, function() {
+            utils.proxy(player.elements.buttons.captions, 'click', player.config.listeners.captions, function () {
                 player.toggleCaptions();
             });
 
             // Fullscreen
-            utils.proxy(player.elements.buttons.fullscreen, 'click', player.config.listeners.fullscreen, function() {
+            utils.proxy(player.elements.buttons.fullscreen, 'click', player.config.listeners.fullscreen, function () {
                 player.toggleFullscreen();
             });
 
             // Picture-in-Picture
-            utils.proxy(player.elements.buttons.pip, 'click', player.config.listeners.pip, function() {
+            utils.proxy(player.elements.buttons.pip, 'click', player.config.listeners.pip, function () {
                 player.togglePictureInPicture();
             });
 
             // Airplay
-            utils.proxy(player.elements.buttons.airplay, 'click', player.config.listeners.airplay, function() {
+            utils.proxy(player.elements.buttons.airplay, 'click', player.config.listeners.airplay, function () {
                 player.airPlay();
             });
 
@@ -4249,32 +4266,32 @@
             utils.on(document.documentElement, 'click', toggleMenu);
 
             // Settings menu
-            utils.on(player.elements.settings.form, 'click', function(event) {
+            utils.on(player.elements.settings.form, 'click', function (event) {
                 // Show tab in menu
                 showTab(event);
 
                 // Settings menu items - use event delegation as items are added/removed
                 // Settings - Language
                 if (utils.matches(event.target, player.config.selectors.inputs.language)) {
-                    handlerProxy.call(this, event, player.config.listeners.language, function() {
+                    handlerProxy.call(this, event, player.config.listeners.language, function () {
                         player.toggleCaptions(true);
 
                         player.setLanguage(event.target.value.toLowerCase());
                     });
                 } else if (utils.matches(event.target, player.config.selectors.inputs.quality)) {
                     // Settings - Quality
-                    handlerProxy.call(this, event, player.config.listeners.quality, function() {
+                    handlerProxy.call(this, event, player.config.listeners.quality, function () {
                         player.setQuality(event.target.value);
                     });
                 } else if (utils.matches(event.target, player.config.selectors.inputs.speed)) {
                     // Settings - Speed
-                    handlerProxy.call(this, event, player.config.listeners.speed, function() {
+                    handlerProxy.call(this, event, player.config.listeners.speed, function () {
                         player.setSpeed(parseFloat(event.target.value));
                     });
                 } else if (utils.matches(event.target, player.config.selectors.buttons.loop)) {
                     // Settings - Looping
                     // TODO: use toggle buttons
-                    handlerProxy.call(this, event, player.config.listeners.loop, function() {
+                    handlerProxy.call(this, event, player.config.listeners.loop, function () {
                         // TODO: This should be done in the method itself I think
                         // var value = event.target.getAttribute('data-loop__value') || event.target.getAttribute('data-loop__type');
 
@@ -4288,13 +4305,13 @@
             });
 
             // Seek
-            utils.proxy(player.elements.inputs.seek, inputEvent, player.config.listeners.seek, function(event) {
+            utils.proxy(player.elements.inputs.seek, inputEvent, player.config.listeners.seek, function (event) {
                 var duration = player.getDuration();
                 player.seek(event.target.value / event.target.max * duration);
             });
 
             // Volume
-            utils.proxy(player.elements.inputs.volume, inputEvent, player.config.listeners.volume, function() {
+            utils.proxy(player.elements.inputs.volume, inputEvent, player.config.listeners.volume, function () {
                 player.setVolume(event.target.value);
             });
 
@@ -4312,18 +4329,18 @@
                 utils.on(
                     player.elements.container,
                     'mouseenter mouseleave mousemove touchstart touchend touchcancel touchmove enterfullscreen',
-                    function(event) {
+                    function (event) {
                         player.toggleControls(event);
                     }
                 );
 
                 // Watch for cursor over controls so they don't hide when trying to interact
-                utils.on(player.elements.controls, 'mouseenter mouseleave', function(event) {
+                utils.on(player.elements.controls, 'mouseenter mouseleave', function (event) {
                     player.elements.controls.hover = event.type === 'mouseenter';
                 });
 
                 // Watch for cursor over controls so they don't hide when trying to interact
-                utils.on(player.elements.controls, 'mousedown mouseup touchstart touchend touchcancel', function(
+                utils.on(player.elements.controls, 'mousedown mouseup touchstart touchend touchcancel', function (
                     event
                 ) {
                     player.elements.controls.pressed = utils.inArray(['mousedown', 'touchstart'], event.type);
@@ -4334,7 +4351,7 @@
                 utils.on(
                     player.elements.controls,
                     'focus blur',
-                    function(event) {
+                    function (event) {
                         player.toggleControls(event);
                     },
                     true
@@ -4346,7 +4363,7 @@
                 player.elements.inputs.volume,
                 'wheel',
                 player.config.listeners.volume,
-                function(event) {
+                function (event) {
                     // Detect "natural" scroll - suppored on OS X Safari only
                     // Other browsers on OS X will be inverted until support improves
                     var inverted = event.webkitDirectionInvertedFromDevice;
@@ -4385,7 +4402,7 @@
 
             // Handle user exiting fullscreen by escaping etc
             if (support.fullscreen) {
-                utils.on(document, fullscreen.eventType, function(event) { player.toggleFullscreen(event); });
+                utils.on(document, fullscreen.eventType, function (event) { player.toggleFullscreen(event); });
             }
         }
 
@@ -4398,7 +4415,7 @@
             utils.on(player.media, 'durationchange loadedmetadata', displayDuration);
 
             // Handle the media finishing
-            utils.on(player.media, 'ended', function() {
+            utils.on(player.media, 'ended', function () {
                 // Show poster on end
                 if (player.type === 'video' && player.config.showPosterOnEnd) {
                     // Clear
@@ -4440,7 +4457,7 @@
                 wrapper.style.cursor = 'pointer';
 
                 // On click play, pause ore restart
-                utils.on(wrapper, 'click', function() {
+                utils.on(wrapper, 'click', function () {
                     // Touch devices will just show controls (if we're hiding controls)
                     if (player.config.hideControls && support.touch && !player.media.paused) {
                         return;
@@ -4462,7 +4479,7 @@
                 utils.on(
                     player.media,
                     'contextmenu',
-                    function(event) {
+                    function (event) {
                         event.preventDefault();
                     },
                     false
@@ -4470,7 +4487,7 @@
             }
 
             // Speed change
-            utils.on(player.media, 'ratechange', function() {
+            utils.on(player.media, 'ratechange', function () {
                 // Store current speed
                 player.speed.selected = player.media.playbackRate;
 
@@ -4484,7 +4501,7 @@
             });
 
             // Quality change
-            utils.on(player.media, 'qualitychange', function() {
+            utils.on(player.media, 'qualitychange', function () {
                 // Store current quality
                 player.quality.selected = player.media.quality;
 
@@ -4498,7 +4515,7 @@
             });
 
             // Caption language change
-            utils.on(player.media, 'captionchange', function() {
+            utils.on(player.media, 'captionchange', function () {
                 // Save speed to localStorage
                 updateStorage({
                     language: player.captions.language,
@@ -4506,7 +4523,7 @@
             });
 
             // Captions toggle
-            utils.on(player.media, 'captionsenabled captionsdisabled', function() {
+            utils.on(player.media, 'captionsenabled captionsdisabled', function () {
                 // Update UI
                 updateSetting('captions');
 
@@ -4518,7 +4535,7 @@
 
             // Proxy events to container
             // Bubble up key events for Edge
-            utils.on(player.media, player.config.events.concat(['keyup', 'keydown']).join(' '), function(event) {
+            utils.on(player.media, player.config.events.concat(['keyup', 'keydown']).join(' '), function (event) {
                 trigger(player.elements.container, event.type, true);
             });
         }
@@ -4617,7 +4634,7 @@
             player.ready = true;
 
             // Ready event at end of execution stack
-            window.setTimeout(function() {
+            window.setTimeout(function () {
                 trigger(player.elements.container, 'ready', true);
             }, 0);
 
@@ -4748,7 +4765,7 @@
 
             // Listen for events if debugging
             if (player.config.debug) {
-                utils.on(player.elements.container, player.config.events.join(' '), function(event) {
+                utils.on(player.elements.container, player.config.events.join(' '), function (event) {
                     log('event: ' + event.type);
                 });
             }
@@ -4797,7 +4814,7 @@
     // API
     // ---------------------------------------
     // Play
-    Plyr.prototype.play = function() {
+    Plyr.prototype.play = function () {
         var player = this;
 
         if ('play' in player.media) {
@@ -4809,7 +4826,7 @@
     };
 
     // Pause
-    Plyr.prototype.pause = function() {
+    Plyr.prototype.pause = function () {
         var player = this;
 
         if ('pause' in player.media) {
@@ -4821,7 +4838,7 @@
     };
 
     // Toggle playback
-    Plyr.prototype.togglePlay = function(toggle) {
+    Plyr.prototype.togglePlay = function (toggle) {
         var player = this;
 
         // True toggle if nothing passed
@@ -4839,12 +4856,12 @@
     };
 
     // Get playback status
-    Plyr.prototype.isPlaying = function() {
+    Plyr.prototype.isPlaying = function () {
         return !this.media.paused;
     };
 
     // Stop
-    Plyr.prototype.stop = function() {
+    Plyr.prototype.stop = function () {
         var player = this;
 
         player.restart();
@@ -4855,7 +4872,7 @@
     };
 
     // Restart
-    Plyr.prototype.restart = function() {
+    Plyr.prototype.restart = function () {
         var player = this;
 
         // Seek to 0
@@ -4866,7 +4883,7 @@
     };
 
     // Rewind
-    Plyr.prototype.rewind = function(seekTime) {
+    Plyr.prototype.rewind = function (seekTime) {
         var player = this;
 
         // Use default if needed
@@ -4881,7 +4898,7 @@
     };
 
     // Fast forward
-    Plyr.prototype.forward = function(seekTime) {
+    Plyr.prototype.forward = function (seekTime) {
         var player = this;
 
         // Use default if needed
@@ -4897,7 +4914,7 @@
 
     // Seek to time
     // The input parameter can be an event or a number
-    Plyr.prototype.seek = function(input) {
+    Plyr.prototype.seek = function (input) {
         var player = this;
         var targetTime = 0;
         var paused = player.media.paused;
@@ -4952,7 +4969,7 @@
     };
 
     // Set volume
-    Plyr.prototype.setVolume = function(volume) {
+    Plyr.prototype.setVolume = function (volume) {
         var player = this;
         var max = 1;
         var min = 0;
@@ -5013,7 +5030,7 @@
     };
 
     // Increase volume
-    Plyr.prototype.increaseVolume = function(step) {
+    Plyr.prototype.increaseVolume = function (step) {
         var player = this;
         var volume = player.media.muted ? 0 : player.media.volume;
 
@@ -5028,7 +5045,7 @@
     };
 
     // Decrease volume
-    Plyr.prototype.decreaseVolume = function(step) {
+    Plyr.prototype.decreaseVolume = function (step) {
         var player = this;
         var volume = player.media.muted ? 0 : player.media.volume;
 
@@ -5043,7 +5060,7 @@
     };
 
     // Toggle mute
-    Plyr.prototype.toggleMute = function(muted) {
+    Plyr.prototype.toggleMute = function (muted) {
         var player = this;
 
         // If the method is called without parameter, toggle based on current value
@@ -5084,7 +5101,7 @@
     };
 
     // Set playback speed
-    Plyr.prototype.setSpeed = function(speed) {
+    Plyr.prototype.setSpeed = function (speed) {
         var player = this;
 
         // Load speed from storage or default value
@@ -5127,7 +5144,7 @@
     };
 
     // Set playback quality
-    Plyr.prototype.setQuality = function(quality) {
+    Plyr.prototype.setQuality = function (quality) {
         var player = this;
 
         // Load speed from storage or default value
@@ -5163,7 +5180,7 @@
     // Toggle loop
     // TODO: Finish logic
     // TODO: Set the indicator on load as user may pass loop as config
-    Plyr.prototype.setLoop = function(type) {
+    Plyr.prototype.setLoop = function (type) {
         var player = this;
 
         // Set default to be a true toggle
@@ -5246,7 +5263,7 @@
     };
 
     // Add common function to retrieve media source
-    Plyr.prototype.source = function(source) {
+    Plyr.prototype.source = function (source) {
         var player = this;
 
         // If object or string, parse it
@@ -5264,13 +5281,13 @@
                 break;
 
             case 'vimeo':
-                player.embed.getVideoUrl.then(function(value) {
+                player.embed.getVideoUrl.then(function (value) {
                     url = value;
                 });
                 break;
 
             case 'soundcloud':
-                player.embed.getCurrentSound(function(object) {
+                player.embed.getCurrentSound(function (object) {
                     url = object.permalink_url;
                 });
                 break;
@@ -5284,7 +5301,7 @@
     };
 
     // Set or get poster
-    Plyr.prototype.poster = function(source) {
+    Plyr.prototype.poster = function (source) {
         var player = this;
 
         if (!utils.is.string(source)) {
@@ -5300,7 +5317,7 @@
     };
 
     // Toggle captions
-    Plyr.prototype.toggleCaptions = function(show) {
+    Plyr.prototype.toggleCaptions = function (show) {
         var player = this;
 
         // If there's no full support, or there's no caption toggle
@@ -5335,7 +5352,7 @@
     };
 
     // Set caption language
-    Plyr.prototype.setLanguage = function(language) {
+    Plyr.prototype.setLanguage = function (language) {
         var player = this;
 
         // Nothing specified
@@ -5372,13 +5389,13 @@
     };
 
     // Get current language
-    Plyr.prototype.getLanguage = function() {
+    Plyr.prototype.getLanguage = function () {
         return this.captions.language;
     };
 
     // Toggle fullscreen
     // Requires user input event
-    Plyr.prototype.toggleFullscreen = function(event) {
+    Plyr.prototype.toggleFullscreen = function (event) {
         var player = this;
 
         // Check for native support
@@ -5437,7 +5454,7 @@
     // Toggle picture-in-picture
     // TODO: update player with state, support, enabled
     // TODO: detect outside changes
-    Plyr.prototype.togglePictureInPicture = function(toggle) {
+    Plyr.prototype.togglePictureInPicture = function (toggle) {
         var player = this;
         var states = {
             pip: 'picture-in-picture',
@@ -5463,7 +5480,7 @@
 
     // Trigger airplay
     // TODO: update player with state, support, enabled
-    Plyr.prototype.airPlay = function() {
+    Plyr.prototype.airPlay = function () {
         var player = this;
 
         // Bail if no support
@@ -5479,7 +5496,7 @@
     };
 
     // Show the player controls in fullscreen mode
-    Plyr.prototype.toggleControls = function(toggle) {
+    Plyr.prototype.toggleControls = function (toggle) {
         var player = this;
 
         // Don't hide if config says not to, it's audio, or not ready or loading
@@ -5542,7 +5559,7 @@
         // If toggle is false or if we're playing (regardless of toggle),
         // then set the timer to hide the controls
         if (!show || !player.media.paused) {
-            player.core.timers.hover = window.setTimeout(function() {
+            player.core.timers.hover = window.setTimeout(function () {
                 // If the mouse is over the controls (and not entering fullscreen), bail
                 if ((player.elements.controls.pressed || player.elements.controls.hover) && !isEnterFullscreen) {
                     return;
@@ -5566,7 +5583,7 @@
     };
 
     // Event listeners
-    Plyr.prototype.on = function(event, callback) {
+    Plyr.prototype.on = function (event, callback) {
         var player = this;
 
         // Listen for events on container
@@ -5576,7 +5593,7 @@
         return player;
     };
 
-    Plyr.prototype.off = function(event, callback) {
+    Plyr.prototype.off = function (event, callback) {
         var player = this;
 
         // Listen for events on container
@@ -5587,14 +5604,14 @@
     };
 
     // Check for support
-    Plyr.prototype.supports = function(mimeType) {
+    Plyr.prototype.supports = function (mimeType) {
         return support.mime(this, mimeType);
     };
 
     // Destroy an instance
     // Event listeners are removed when elements are removed
     // http://stackoverflow.com/questions/12528049/if-a-dom-element-is-removed-are-its-listeners-also-removed-from-memory
-    Plyr.prototype.destroy = function(callback, restore) {
+    Plyr.prototype.destroy = function (callback, restore) {
         var player = this;
 
         // Type specific stuff
@@ -5670,7 +5687,7 @@
     };
 
     // Get the duration (or custom if set)
-    Plyr.prototype.getDuration = function() {
+    Plyr.prototype.getDuration = function () {
         var player = this;
 
         // It should be a number, but parse it just incase
