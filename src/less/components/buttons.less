@@ -21,9 +21,7 @@
     }
 
     // Hide toggle icons by default
-    .icon--exit-fullscreen,
-    .icon--muted,
-    .icon--captions-on {
+    .icon--pressed {
         display: none;
     }
 
@@ -31,6 +29,14 @@
     &:focus {
         outline: 0;
     }
+}
+
+// Change icons on state change
+.plyr__control[aria-pressed='true'] .icon--pressed {
+    display: block;
+}
+.plyr__control[aria-pressed='true'] .icon--not-pressed {
+    display: none;
 }
 
 // Audio styles

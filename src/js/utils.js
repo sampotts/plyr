@@ -536,19 +536,17 @@ const utils = {
 
     // Toggle aria-pressed state on a toggle button
     // http://www.ssbbartgroup.com/blog/how-not-to-misuse-aria-states-properties-and-roles
-    toggleState(target, state) {
+    toggleState(element, input) {
         // Bail if no target
-        if (!target) {
-            return null;
+        if (!utils.is.htmlElement(element)) {
+            return;
         }
 
         // Get state
-        const newState = utils.is.boolean(state) ? state : !target.getAttribute('aria-pressed');
+        const state = utils.is.boolean(input) ? input : !element.getAttribute('aria-pressed');
 
         // Set the attribute on target
-        target.setAttribute('aria-pressed', newState);
-
-        return newState;
+        element.setAttribute('aria-pressed', state);
     },
 
     // Get percentage

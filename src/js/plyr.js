@@ -280,6 +280,10 @@ class Plyr {
         return this;
     }
 
+    get paused() {
+        return this.media.paused;
+    }
+
     /**
      * Toggle playback based on current status
      * @param {boolean} toggle
@@ -355,6 +359,10 @@ class Plyr {
         return Number(this.media.currentTime);
     }
 
+    get seeking() {
+        return this.media.seeking;
+    }
+
     /**
      * Get the duration of the current media
      */
@@ -407,8 +415,10 @@ class Plyr {
         // Set the player volume
         this.media.volume = volume;
 
-        // Toggle muted state
-        this.muted = volume === 0;
+        // If muted, and we're increasing volume, reset muted state
+        if (this.muted && volume > 0) {
+            this.muted = false;
+        }
     }
 
     /**
@@ -434,11 +444,17 @@ class Plyr {
 
     // Toggle mute
     set muted(mute) {
-        // If the method is called without parameter, toggle based on current value
-        const toggle = utils.is.boolean(mute) ? mute : this.config.muted;
+        let toggle = mute;
 
-        // Set button state
-        utils.toggleState(this.elements.buttons.mute, toggle);
+        // Load muted state from storage
+        if (!utils.is.boolean(toggle)) {
+            toggle = storage.get.call(this).muted;
+        }
+
+        // Use config if all else fails
+        if (!utils.is.boolean(toggle)) {
+            toggle = this.config.muted;
+        }
 
         // Update config
         this.config.muted = toggle;

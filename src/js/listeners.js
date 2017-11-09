@@ -300,7 +300,7 @@ const listeners = {
             // Update UI
             controls.updateSetting.call(this, 'speed');
 
-            // Save speed to localStorage
+            // Save to storage
             storage.set.call(this, { speed: this.speed });
         });
 
@@ -309,20 +309,20 @@ const listeners = {
             // Update UI
             controls.updateSetting.call(this, 'quality');
 
-            // Save speed to localStorage
+            // Save to storage
             storage.set.call(this, { quality: this.quality });
         });
 
         // Caption language change
         utils.on(this.media, 'captionchange', () => {
-            // Save speed to localStorage
+            // Save to storage
             storage.set.call(this, { language: this.language });
         });
 
         // Volume change
         utils.on(this.media, 'volumechange', () => {
-            // Save speed to localStorage
-            storage.set.call(this, { volume: this.volume });
+            // Save to storage
+            storage.set.call(this, { volume: this.volume, muted: this.muted });
         });
 
         // Captions toggle
@@ -330,7 +330,7 @@ const listeners = {
             // Update UI
             controls.updateSetting.call(this, 'captions');
 
-            // Save speed to localStorage
+            // Save to storage
             storage.set.call(this, { captions: this.captions.enabled });
         });
 

@@ -168,7 +168,7 @@ const youtube = {
                     });
 
                     // Volume
-                    let volume = instance.getVolume() / 100;
+                    let { volume } = player.config;
                     Object.defineProperty(player.media, 'volume', {
                         get() {
                             return volume;
@@ -181,13 +181,14 @@ const youtube = {
                     });
 
                     // Muted
-                    player.media.muted = instance.isMuted();
+                    let { muted } = player.config;
                     Object.defineProperty(player.media, 'muted', {
                         get() {
-                            return instance.isMuted();
+                            return muted;
                         },
                         set(input) {
-                            const toggle = utils.is.boolean(input) ? input : false;
+                            const toggle = utils.is.boolean(input) ? input : muted;
+                            muted = toggle;
                             instance[toggle ? 'mute' : 'unMute']();
                             utils.dispatchEvent.call(player, player.media, 'volumechange');
                         },

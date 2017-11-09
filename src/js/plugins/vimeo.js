@@ -145,13 +145,16 @@ const vimeo = {
         });
 
         // Muted
+        let { muted } = player.config;
         Object.defineProperty(player.media, 'muted', {
             get() {
-                return volume === 0;
+                return muted;
             },
             set(input) {
                 const toggle = utils.is.boolean(input) ? input : false;
-                player.volume = toggle ? 0 : player.config.volume;
+                muted = toggle;
+                player.embed.setVolume(toggle ? 0 : player.config.volume);
+                utils.dispatchEvent.call(player, player.media, 'volumechange');
             },
         });
 

@@ -195,12 +195,18 @@ const controls = {
         if (utils.is.string(iconToggled)) {
             button.appendChild(
                 controls.createIcon.call(this, iconToggled, {
-                    class: `icon--${iconToggled}`,
+                    class: 'icon--pressed',
                 })
             );
+            button.appendChild(
+                controls.createIcon.call(this, iconDefault, {
+                    class: 'icon--not-pressed',
+                })
+            );
+        } else {
+            button.appendChild(controls.createIcon.call(this, iconDefault));
         }
 
-        button.appendChild(controls.createIcon.call(this, iconDefault));
         button.appendChild(controls.createLabel.call(this, labelKey));
 
         utils.setAttributes(button, attributes);

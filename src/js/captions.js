@@ -115,6 +115,7 @@ const captions = {
                 utils.off(track, 'cuechange', event => captions.setCue.call(this, event));
 
                 // Hide captions
+                // eslint-disable-next-line
                 track.mode = 'hidden';
             });
 

@@ -268,7 +268,6 @@ const defaults = {
         type: 'plyr--{0}',
         stopped: 'plyr--stopped',
         playing: 'plyr--playing',
-        muted: 'plyr--muted',
         loading: 'plyr--loading',
         hover: 'plyr--hover',
         tooltip: 'plyr__tooltip',

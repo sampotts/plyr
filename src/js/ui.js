@@ -110,7 +110,7 @@ const ui = {
         }
 
         // If there's only one time display, display duration there
-        if (!this.elements.display.duration && this.config.displayDuration && this.media.paused) {
+        if (!this.elements.display.duration && this.config.displayDuration && this.paused) {
             ui.updateTimeDisplay.call(this, this.duration, this.elements.display.currentTime);
         }
 
@@ -164,30 +164,27 @@ const ui = {
 
     // Check playing state
     checkPlaying() {
-        utils.toggleClass(this.elements.container, this.config.classNames.playing, !this.media.paused);
+        utils.toggleClass(this.elements.container, this.config.classNames.playing, !this.paused);
 
-        utils.toggleClass(this.elements.container, this.config.classNames.stopped, this.media.paused);
+        utils.toggleClass(this.elements.container, this.config.classNames.stopped, this.paused);
 
-        this.toggleControls(this.media.paused);
+        this.toggleControls(this.paused);
     },
 
     // Update volume UI and storage
     updateVolume() {
-        // Update the <input type="range"> if present
-        if (this.supported.ui) {
-            const value = this.muted ? 0 : this.volume;
-
-            if (utils.is.htmlElement(this.elements.inputs.volume)) {
-                ui.setRange.call(this, this.elements.inputs.volume, value);
-            }
+        if (!this.supported.ui) {
+            return;
         }
 
-        // Toggle class if muted
-        utils.toggleClass(this.elements.container, this.config.classNames.muted, this.muted);
+        // Update range
+        if (utils.is.htmlElement(this.elements.inputs.volume)) {
+            ui.setRange.call(this, this.elements.inputs.volume, this.muted ? 0 : this.volume);
+        }
 
         // Update checkbox for mute state
-        if (this.supported.ui && utils.is.htmlElement(this.elements.buttons.mute)) {
-            utils.toggleState(this.elements.buttons.mute, this.muted);
+        if (utils.is.htmlElement(this.elements.buttons.mute)) {
+            utils.toggleState(this.elements.buttons.mute, this.muted || this.volume === 0);
         }
     },
 
@@ -214,6 +211,7 @@ const ui = {
             return;
         }
 
+        // eslint-disable-next-line
         target.value = value;
 
         // Webkit range fill
@@ -312,6 +310,7 @@ const ui = {
         const display = `${(displayHours ? `${hours}:` : '') + mins}:${secs}`;
 
         // Render
+        // eslint-disable-next-line
         element.textContent = display;
 
         // Return for looping
