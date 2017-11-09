@@ -542,13 +542,13 @@ const controls = {
 
                 // Unsupported value
                 if (!this.options[setting].includes(value)) {
-                    this.warn(`Unsupported value of '${value}' for ${setting}`);
+                    this.console.warn(`Unsupported value of '${value}' for ${setting}`);
                     return;
                 }
 
                 // Disabled value
                 if (!this.config[setting].options.includes(value)) {
-                    this.warn(`Disabled value of '${value}' for ${setting}`);
+                    this.console.warn(`Disabled value of '${value}' for ${setting}`);
                     return;
                 }
 

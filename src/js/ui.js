@@ -31,7 +31,7 @@ const ui = {
 
         // Don't setup interface if no support
         if (!this.supported.ui) {
-            this.warn(`Basic support only for ${this.type}`);
+            this.console.warn(`Basic support only for ${this.type}`);
 
             // Remove controls
             utils.removeElement.call(this, 'controls');

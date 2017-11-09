@@ -101,7 +101,7 @@ const listeners = {
                     case 75:
                         // Space and K key
                         if (!held) {
-                            this.warn('togglePlay', event.type);
+                            this.console.warn('togglePlay', event.type);
                             this.togglePlay();
                         }
                         break;
@@ -475,7 +475,7 @@ const listeners = {
                     // TODO: This should be done in the method itself I think
                     // var value = event.target.getAttribute('data-loop__value') || event.target.getAttribute('data-loop__type');
 
-                    this.warn('Set loop');
+                    this.console.warn('Set loop');
                 });
             }
         });

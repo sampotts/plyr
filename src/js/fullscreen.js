@@ -108,12 +108,12 @@ const fullscreen = {
         const nativeSupport = fullscreen.enabled;
 
         if (nativeSupport || (this.config.fullscreen.fallback && !utils.inFrame())) {
-            this.log(`${nativeSupport ? 'Native' : 'Fallback'} fullscreen enabled`);
+            this.console.log(`${nativeSupport ? 'Native' : 'Fallback'} fullscreen enabled`);
 
             // Add styling hook to show button
             utils.toggleClass(this.elements.container, this.config.classNames.fullscreen.enabled, true);
         } else {
-            this.log('Fullscreen not supported and fallback disabled');
+            this.console.log('Fullscreen not supported and fallback disabled');
         }
 
         // Toggle state

@@ -183,7 +183,7 @@ const captions = {
             // Set new caption text
             this.elements.captions.appendChild(content);
         } else {
-            this.warn('No captions element to render to');
+            this.console.warn('No captions element to render to');
         }
     },
 

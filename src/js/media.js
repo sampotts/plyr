@@ -16,7 +16,7 @@ const media = {
     setup() {
         // If there's no media, bail
         if (!this.media) {
-            this.warn('No media element found!');
+            this.console.warn('No media element found!');
             return;
         }
 
@@ -105,7 +105,7 @@ const media = {
         this.media.load();
 
         // Debugging
-        this.log('Cancelled network requests');
+        this.console.log('Cancelled network requests');
     },
 };
 

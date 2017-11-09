@@ -26,7 +26,7 @@ const source = {
     // Sources are not checked for support so be careful
     change(input) {
         if (!utils.is.object(input) || !('sources' in input) || !input.sources.length) {
-            this.warn('Invalid source format');
+            this.console.warn('Invalid source format');
             return;
         }
 

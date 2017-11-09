@@ -97,42 +97,46 @@ class Plyr {
         };
 
         // Debugging
-        this.log = () => {};
-        this.warn = () => {};
-        this.error = () => {};
+        this.console = {
+            log() {},
+            warn() {},
+            error() {},
+        };
         if (this.config.debug && 'console' in window) {
-            this.log = console.log; // eslint-disable-line
-            this.warn = console.warn; // eslint-disable-line
-            this.error = console.error; // eslint-disable-line
-            this.log('Debugging enabled');
+            this.console = {
+                log: console.log, // eslint-disable-line
+                warn: console.warn, // eslint-disable-line
+                error: console.error, // eslint-disable-line
+            };
+            this.console.log('Debugging enabled');
         }
 
         // Log config options and support
-        this.log('Config', this.config);
-        this.log('Support', support);
+        this.console.log('Config', this.config);
+        this.console.log('Support', support);
 
         // We need an element to setup
         if (this.media === null || utils.is.undefined(this.media) || !utils.is.htmlElement(this.media)) {
-            this.error('Setup failed: no suitable element passed');
+            this.console.error('Setup failed: no suitable element passed');
             return;
         }
 
         // Bail if the element is initialized
         if (this.media.plyr) {
-            this.warn('Target already setup');
+            this.console.warn('Target already setup');
             return;
         }
 
         // Bail if not enabled
         if (!this.config.enabled) {
-            this.error('Setup failed: disabled by config');
+            this.console.error('Setup failed: disabled by config');
             return;
         }
 
         // Bail if disabled or no basic support
         // You may want to disable certain UAs etc
         if (!support.check().api) {
-            this.error('Setup failed: no support');
+            this.console.error('Setup failed: no support');
             return;
         }
 
@@ -152,12 +156,12 @@ class Plyr {
                 this.embedId = this.media.getAttribute('data-video-id');
 
                 if (utils.is.empty(this.type)) {
-                    this.error('Setup failed: embed type missing');
+                    this.console.error('Setup failed: embed type missing');
                     return;
                 }
 
                 if (utils.is.empty(this.embedId)) {
-                    this.error('Setup failed: video id missing');
+                    this.console.error('Setup failed: video id missing');
                     return;
                 }
 
@@ -189,7 +193,7 @@ class Plyr {
                 break;
 
             default:
-                this.error('Setup failed: unsupported type');
+                this.console.error('Setup failed: unsupported type');
                 return;
         }
 
@@ -201,7 +205,7 @@ class Plyr {
 
         // If no support for even API, bail
         if (!this.supported.api) {
-            this.error('Setup failed: no support');
+            this.console.error('Setup failed: no support');
             return;
         }
 
@@ -227,7 +231,7 @@ class Plyr {
         // Listen for events if debugging
         if (this.config.debug) {
             utils.on(this.elements.container, this.config.events.join(' '), event => {
-                this.log(`event: ${event.type}`);
+                this.console.log(`event: ${event.type}`);
             });
         }
 
@@ -352,7 +356,7 @@ class Plyr {
         this.media.currentTime = targetTime.toFixed(4);
 
         // Logging
-        this.log(`Seeking to ${this.currentTime} seconds`);
+        this.console.log(`Seeking to ${this.currentTime} seconds`);
     }
 
     get currentTime() {
@@ -488,7 +492,7 @@ class Plyr {
         }
 
         if (!this.config.speed.options.includes(speed)) {
-            this.warn(`Unsupported speed (${speed})`);
+            this.console.warn(`Unsupported speed (${speed})`);
             return;
         }
 
@@ -516,7 +520,7 @@ class Plyr {
         }
 
         if (!this.options.quality.includes(quality)) {
-            this.warn(`Unsupported quality option (${quality})`);
+            this.console.warn(`Unsupported quality option (${quality})`);
             return;
         }
 
@@ -598,7 +602,7 @@ class Plyr {
     // Poster image
     set poster(input) {
         if (this.type !== 'video') {
-            this.warn('Poster can only be set on HTML5 video');
+            this.console.warn('Poster can only be set on HTML5 video');
             return;
         }
 
@@ -914,6 +918,7 @@ class Plyr {
 
             // GC for embed
             this.embed = null;
+            this.embedId = null;
 
             // If it's a soft destroy, make minimal changes
             if (soft) {

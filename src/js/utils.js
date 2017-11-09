@@ -418,7 +418,7 @@ const utils = {
             return true;
         } catch (error) {
             // Log it
-            this.warn('It looks like there is a problem with your custom controls HTML', error);
+            this.console.warn('It looks like there is a problem with your custom controls HTML', error);
 
             // Restore native video controls
             this.toggleNativeControls(true);
