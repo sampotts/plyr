@@ -279,7 +279,7 @@ Method | Parameters | Description
 -------- | ---------- | -----------
 `play()` | - | Start playback.
 `pause()` | - | Pause playback.
-`togglePlay(toggle)` | `Boolean` | Toggle playback, if no parameters are passed, it will toggle based on current status.
+`togglePlay(toggle)` | Boolean | Toggle playback, if no parameters are passed, it will toggle based on current status.
 `stop()` | - | Stop playback and reset to start.
 `restart()` | - | Restart playback.
 `rewind(seekTime)` | Number | Rewind playback by the specified seek time. If no parameter is passed, the default seek time will be used.
@@ -785,18 +785,14 @@ Plyr costs money to run, not my time - I donate that for free but domains, hosti
 - [Grime Archive](https://grimearchive.com/)
 - [koel - A personal music streaming server that works.](http://koel.phanan.net/)
 - [Oscar Radio](http://oscar-radio.xyz/)
+- [Sparkk TV](https://www.sparkktv.com/)
 
 Let me know on [Twitter](https://twitter.com/sam_potts) I can add you to the above list. It'd be awesome to see how you're using Plyr :-)
 
 ## Useful links and credits
-Credit to the PayPal HTML5 Video player from which Plyr's caption functionality is ported from:
+Credit to the PayPal HTML5 Video player from which Plyr's caption functionality was originally ported from:
 - [PayPal's Accessible HTML5 Video Player](https://github.com/paypal/accessible-html5-video-player)
-- The icons used in Plyr are [Vicons](https://dribbble.com/shots/1663443-60-Vicons-Free-Icon-Set) plus some ones I made
 - [An awesome guide for Plyr in Japanese!](http://syncer.jp/how-to-use-plyr-io) by [@arayutw](https://twitter.com/arayutw)
-
-Also these links helped created Plyr:
-- [Media Events - W3.org](http://www.w3.org/2010/05/video/mediaevents.html)
-- [Styling the `<progress>` element - hongkiat.com](http://www.hongkiat.com/blog/html5-progress-bar/)
 
 ## Thanks
 [![Fastly](https://www.fastly.com/sites/all/themes/custom/fastly2016/logo.png)](https://www.fastly.com/)
