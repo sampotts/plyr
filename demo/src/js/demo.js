@@ -97,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         switch (type) {
             case types.video:
-                player.src = {
+                player.source = {
                     type: 'video',
                     title: 'View From A Blue Moon',
                     sources: [
@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
 
             case types.audio:
-                player.src = {
+                player.source = {
                     type: 'audio',
                     title: 'Kishi Bashi &ndash; &ldquo;It All Began With A Burst&rdquo;',
                     sources: [
@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
 
             case types.youtube:
-                player.src = {
+                player.source = {
                     type: 'video',
                     title: 'View From A Blue Moon',
                     sources: [
@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
 
             case types.vimeo:
-                player.src = {
+                player.source = {
                     type: 'video',
                     title: 'View From A Blue Moon',
                     sources: [

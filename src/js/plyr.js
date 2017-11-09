@@ -267,8 +267,6 @@ class Plyr {
         if ('play' in this.media) {
             this.media.play();
         }
-
-        // Allow chaining
         return this;
     }
 
@@ -279,8 +277,6 @@ class Plyr {
         if ('pause' in this.media) {
             this.media.pause();
         }
-
-        // Allow chaining
         return this;
     }
 
@@ -591,11 +587,11 @@ class Plyr {
     }
 
     // Media source
-    set src(input) {
+    set source(input) {
         source.change.call(this, input);
     }
 
-    get src() {
+    get source() {
         return this.media.currentSrc;
     }
 
@@ -623,6 +619,7 @@ class Plyr {
     get autoplay() {
         return this.config.autoplay;
     }
+
     set autoplay(input) {
         const toggle = utils.is.boolean(input) ? input : this.config.autoplay;
         this.config.autoplay = toggle;
@@ -893,13 +890,11 @@ class Plyr {
     // Event listeners
     on(event, callback) {
         utils.on(this.elements.container, event, callback);
-
         return this;
     }
 
     off(event, callback) {
         utils.off(this.elements.container, event, callback);
-
         return this;
     }
 

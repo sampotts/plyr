@@ -220,7 +220,7 @@ Option | Type | Default | Description
 `loadSprite` | Boolean | `true` | Load the SVG sprite specified as the `iconUrl` option (if a URL). If `false`, it is assumed you are handling sprite loading yourself.
 `iconUrl` | String | `null` | Specify a URL or path to the SVG sprite. See the [SVG section](#svg) for more info.
 `iconPrefix` | String | `plyr` | Specify the id prefix for the icons used in the default controls (e.g. "plyr-play" would be "plyr"). This is to prevent clashes if you're using your own SVG sprite but with the default controls. Most people can ignore this option.
-`blankUrl` | String | `https://cdn.plyr.io/static/blank.mp4` | Specify a URL or path to a blank video file used to properly cancel network requests. See [issue #174](#174) for more info.
+`blankUrl` | String | `https://cdn.plyr.io/static/blank.mp4` | Specify a URL or path to a blank video file used to properly cancel network requests.
 `autoplay` | Boolean | `false` | Autoplay the media on load. This is generally advised against on UX grounds. It is also disabled by default in some browsers. If the `autoplay` attribute is present on a `<video>` or `<audio>` element, this will be automatically set to true.
 `seekTime` | Number | `10` | The time, in seconds, to seek when a user hits fast forward or rewind.
 `volume` | Number | `1` | A number, between 0 and 1, representing the initial volume of the player.
@@ -243,276 +243,182 @@ Option | Type | Default | Description
 
 ## API
 
-### Instance
+There are methods, setters and getters on a Plyr object.
 
-The easiest way to access the plyr instances is to store the return value from your call to the constructor. For example:
+### Object
+
+The easiest way to access the Plyr object is to set the return value from your call to the constructor to a variable. For example:
 
 ```javascript
 const player = new Plyr('#player', { /* options */ });
 ```
 
-You can also access the instance through the event handlers:
+You can also access the object through any events:
 
 ```javascript
-instance.on('ready', event => {
-  const instance = event.detail.plyr;
+element.addEventListener('ready', event => {
+    const player = event.detail.plyr;
 });
 ```
 
 ### Methods
 
-Once you have your instances, you can use the API methods below on it. For example to pause the first player:
+An example method:
 
 ```javascript
-players[0].pause();
+player.pause();
 ```
 
-Here's a list of the methods supported:
+Methods are chainable so you can do the following:
 
-<table class="table" width="100%">
-<thead>
-  <tr>
-    <th width="20%">Method</th>
-    <th width="15%">Parameters</th>
-    <th width="65%">Description</th>
-  </tr>
-</thead>
-<tbody>
-  <tr>
-    <td><code>getContainer()</code></td>
-    <td>&mdash;</td>
-    <td>Get the players outer container element that is automatically injected.</td>
-  </tr>
-  <tr>
-    <td><code>getMedia()</code></td>
-    <td>&mdash;</td>
-    <td>Get the media element (<code>&gt;video&lt;</code>, <code>&gt;audio&lt;</code> or <code>&gt;div&lt;</code> for YouTube or Vimeo).</td>
-  </tr>
-  <tr>
-    <td><code>getEmbed()</code></td>
-    <td>&mdash;</td>
-    <td>Get the [embed](#embed) API to access those methods - either YouTube or Vimeo.</td>
-  </tr>
-  <tr>
-    <td><code>getType()</code></td>
-    <td>&mdash;</td>
-    <td>Get the type - 'video', 'audio', 'youtube' or 'vimeo'.</td>
-  </tr>
-  <tr>
-    <td><code>isReady()</code></td>
-    <td>&mdash;</td>
-    <td>Determine if the player is loaded and UI ready.</td>
-  </tr>
-  <tr>
-    <td><code>on()</code></td>
-    <td>String, Function</td>
-    <td>Watch for an event (first argument) and run a callback function (second argument). This saves you doing your own <code>addEventListner</code> code. This is chainable.</td>
-  </tr>
-  <tr>
-    <td><code>play()</code></td>
-    <td>&mdash;</td>
-    <td>Plays the media</td>
-  </tr>
-  <tr>
-    <td><code>pause()</code></td>
-    <td>&mdash;</td>
-    <td>Pauses the media</td>
-  </tr>
-  <tr>
-    <td><code>stop()</code></td>
-    <td>&mdash;</td>
-    <td>Stops the media</td>
-  </tr>
-  <tr>
-    <td><code>restart()</code></td>
-    <td>&mdash;</td>
-    <td>Restarts playback</td>
-  </tr>
-  <tr>
-    <td><code>rewind(...)</code></td>
-    <td>Number</td>
-    <td>Rewinds by the provided parameter, in seconds. If no parameter is provided, the default seekInterval is used (10 seconds).</td>
-  </tr>
-  <tr>
-    <td><code>forward(...)</code></td>
-    <td>Number</td>
-    <td>Fast forwards by the provided parameter, in seconds. If no parameter is provided, the default seekInterval is used (10 seconds).</td>
-  </tr>
-  <tr>
-    <td><code>seek(...)</code></td>
-    <td>Number</td>
-    <td>Seeks the media to the provided parameter, time in seconds.</td>
-  </tr>
-  <tr>
-    <td><code>getCurrentTime()</code></td>
-    <td>&mdash;</td>
-    <td>Will return a float with the current time in seconds.</td>
-  </tr>
-  <tr>
-    <td><code>getDuration()</code></td>
-    <td>&mdash;</td>
-    <td>Will return a float with the duration in seconds.</td>
-  </tr>
-  <tr>
-    <td><code>getVolume()</code></td>
-    <td>&mdash;</td>
-    <td>Will return a float between 0 and 1 for the current volume level.</td>
-  </tr>
-  <tr>
-    <td><code>isMuted()</code></td>
-    <td>&mdash;</td>
-    <td>Will return a boolean for whether the media is currently muted.</td>
-  </tr>
-  <tr>
-    <td><code>setVolume(...)</code></td>
-    <td>Number</td>
-    <td>Sets the player volume to the provided parameter. The value should be between 0 (muted) and 10 (loudest). If no parameter is provided, the default volume is used (5). Values over 10 are ignored.</td>
-  </tr>
-  <tr>
-    <td><code>togglePlay()</code></td>
-    <td>Boolean</td>
-    <td>Toggles playback for the player based on either the boolean argument or it's current state.</td>
-  </tr>
-  <tr>
-    <td><code>isPaused()</code></td>
-    <td>&mdash;</td>
-    <td>Will return a boolean for whether the media is currently paused.</td>
-  </tr>
-  <tr>
-    <td><code>toggleMute()</code></td>
-    <td>&mdash;</td>
-    <td>Toggles mute for the player.</td>
-  </tr>
-  <tr>
-    <td><code>toggleCaptions()</code></td>
-    <td>&mdash;</td>
-    <td>Toggles whether captions are enabled.</td>
-  </tr>
-  <tr>
-    <td><code>setCaptionIndex()</code></td>
-    <td>Number</td>
-    <td>Set the active track to the provided number. Index starts with 0.</td>
-  </tr>
-  <tr>
-    <td><code>toggleFullscreen()</code></td>
-    <td>Event</td>
-    <td>Toggles fullscreen. This can only be initiated by a user gesture due to browser security, i.e. a user event such as click.</td>
-  </tr>
-  <tr>
-    <td><code>isFullscreen()</code></td>
-    <td>&mdash;</td>
-    <td>Boolean returned if the player is in fullscreen.</td>
-  </tr>
-  <tr>
-    <td><code>support(...)</code></td>
-    <td>String</td>
-    <td>Determine if a player supports a certain MIME type. This is not supported for embedded content (YouTube).</td>
-  </tr>
-  <tr>
-    <td><code>source(...)</code></td>
-    <td>Object or undefined</td>
-    <td>
-      Get/Set the media source.
-      <br><br>
-      <strong>Object</strong><br>
-      See <a href="#source-method">below</a>
-      <br><br>
-      <strong>YouTube</strong><br>
-      Currently this API method only accepts a YouTube ID when used with a YouTube player. I will add URL support soon, along with being able to swap between types (e.g. YouTube to Audio or Video and vice versa.)
-      <br><br>
-      <strong>undefined</strong><br>
-      Returns the current media source url. Works for both native videos and embeds.
-    </td>
-  </tr>
-  <tr>
-    <td><code>poster(...)</code></td>
-    <td>String</td>
-    <td>Set the poster url. This is supported for the <code>video</code> element only.</td>
-  </tr>
-  <tr>
-    <td><code>destroy()</code></td>
-    <td>&mdash;</td>
-    <td>Restores the original element, reversing the effects of <code>setup()</code>.</td>
-  </tr>
- </tbody>
-</table>
+```javascript
+player.restart().play();
+```
 
-#### .source() method
-This allows changing the plyr source and type on the fly.
+Method | Parameters | Description
+-------- | ---------- | -----------
+`play()` | - | Start playback.
+`pause()` | - | Pause playback.
+`togglePlay(toggle)` | `Boolean` | Toggle playback, if no parameters are passed, it will toggle based on current status.
+`stop()` | - | Stop playback and reset to start.
+`restart()` | - | Restart playback.
+`rewind(seekTime)` | Number | Rewind playback by the specified seek time. If no parameter is passed, the default seek time will be used.
+`forward(seekTime)` | Number | Fast forward by the specified seek time. If no parameter is passed, the default seek time will be used.
+`increaseVolume(step)` | Number | Increase volume by the specified step. If no parameter is passed, the default step will be used.
+`decreaseVolume(step)` | Number | Increase volume by the specified step. If no parameter is passed, the default step will be used.
+`toggleCaptions(toggle)` | Boolean | Toggle captions display. If no parameter is passed, it will toggle based on current status.
+`toggleFullscreen(event)` | Event | Toggle fullscreen. Fullscreen can only be initiated by a user event. Exit is possible without user input.
+`airplay()` | - | Trigger the airplay dialog on supported devices.
+`toggleControls(toggle)` | Boolean | Toggle the controls based on the specified boolean.
+`on(event, function)` | String, Function | Add an event listener for the specified event.
+`off(event, function)` | String, Function | Remove an event listener for the specified event.
+`supports(type)` | String | Check support for a mime type.
+`destroy()` | - | Destroy the instance and garbage collect any elements.
+
+### Getters and Setters
+
+An example setter:
+
+```javascript
+player.volume = 0.5;
+```
+
+An example getter:
+
+```javascript
+player.volume; // returns 0.5;
+```
+
+Property | Getter | Setter | Description
+-------- | ------ | ------ | -----------
+`isHTML5` | ✔ | - | Returns a boolean indicating if the current player is HTML5.
+`isEmbed` | ✔ | - | Returns a boolean indicating if the current player is an embedded player.
+`paused` | ✔ | - | Returns a boolean indicating if the current player is paused.
+`currentTime` | ✔ | ✔ | Gets or sets the currentTime for the player. The setter accepts a float in seconds.
+`seeking` | ✔ | - | Returns a boolean indicating if the current player is seeking.
+`duration` | ✔ | - | Returns the duration for the current media.
+`volume` | ✔ | ✔ | Gets or sets the volume for the player. The setter accepts a float between 0 and 1.
+`muted` | ✔ | ✔ | Gets or sets the muted state of the player. The setter accepts a boolean.
+`speed` | ✔ | ✔ | Gets or sets the speed for the player. The setter accepts a value in the options specified in your config. Generally the minimum should be 0.5.
+`quality`¹ | ✔ | ✔ | Gets or sets the quality for the player. The setter accepts a value from the options specified in your config.
+`loop` | ✔ | ✔ | Gets or sets the current loop state of the player. The setter accepts a boolean.
+`source` | ✔ | ✔ | Gets or sets the current source for the player. The setter accepts an object. See [source setter](#source-setter) below for examples.
+`poster`² | ✔ | ✔ | Gets or sets the current poster image for the player. The setter accepts a string; the URL for the updated poster image.
+`autoplay` | ✔ | ✔ | Gets or sets the autoplay state of the player. The setter accepts a boolean.
+`language` | ✔ | ✔ | Gets or sets the preferred captions language for the player. The setter accepts an ISO two-letter language code. Support for the languages is dependent on the captions you include.
+`pip` | ✔ | ✔ | Gets or sets the picture-in-picture state of the player. The setter accepts a boolean. This currently only supported on Safari 10+ on MacOS Sierra+ and iOS 10+.
+
+1. YouTube only. HTML5 will follow.
+2. HTML5 only
+
+#### .source setter
+
+This allows changing the player source and type on the fly.
 
 Video example:
 
 ```javascript
-player.source({
-  type:       'video',
-  title:      'Example title',
-  sources: [{
-      src:    '/path/to/movie.mp4',
-      type:   'video/mp4'
-  },
-  {
-      src:    '/path/to/movie.webm',
-      type:   'video/webm'
-  }],
-  poster:     '/path/to/poster.jpg',
-  tracks:     [{
-      kind:   'captions',
-      label:  'English',
-      srclang:'en',
-      src:    '/path/to/captions.vtt',
-      default: true
-  }],
-  loopKeyEvents: {
-      toggleLoop: 76,
-      loopin:     73,
-      loopout:    79
-  }
-});
+player.source = {
+    type: 'video',
+    title: 'Example title',
+    sources: [
+        {
+            src: '/path/to/movie.mp4',
+            type: 'video/mp4',
+        },
+        {
+            src: '/path/to/movie.webm',
+            type: 'video/webm',
+        }
+    ],
+    poster: '/path/to/poster.jpg',
+    tracks: [
+        {
+            kind: 'captions',
+            label:  'English',
+            srclang: 'en',
+            src: '/path/to/captions.en.vtt',
+            default: true,
+        },
+        {
+            kind: 'captions',
+            label:  'French',
+            srclang: 'fr',
+            src: '/path/to/captions.fr.vtt',
+        }
+    ],
+};
 ```
 
 Audio example:
 
 ```javascript
-player.source({
-  type:       'audio',
-  title:      'Example title',
-  sources: [{
-    src:      '/path/to/audio.mp3',
-    type:     'audio/mp3'
-  },
-  {
-    src:      '/path/to/audio.ogg',
-    type:     'audio/ogg'
-  }]
-});
+player.source = {
+    type: 'audio',
+    title: 'Example title',
+    sources: [
+        {
+            src: '/path/to/audio.mp3',
+            type: 'audio/mp3',
+        },
+        {
+            src: '/path/to/audio.ogg',
+            type: 'audio/ogg',
+        },
+    ],
+};
 ```
 
 YouTube example:
 
 ```javascript
-player.source({
-  type:       'video',
-  title:      'Example title',
-  sources: [{
-      src:    'bTqVqk7FSmY',
-      type:   'youtube'
-  }]
-});
+player.source = {
+    type: 'video',
+    title: 'Example title',
+    sources: [
+        {
+            src: 'bTqVqk7FSmY',
+            type: 'youtube',
+        },
+    ],
+};
 ```
 
-Note: `src` can be the video ID or URL
+*Note*: `src` can be the video ID or URL
 
 Vimeo example
 
 ```javascript
-player.source({
-  type:       'video',
-  title:      'Example title',
-  sources: [{
-      src:    '143418951',
-      type:   'vimeo'
-  }]
-});
+player.source = {
+    type: 'video',
+    title: 'Example title',
+    sources: [
+        {
+            src: '143418951',
+            type: 'vimeo',
+        },
+    ],
+};
 ```
 
 Note: `src` can be the video ID or URL
