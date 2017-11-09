@@ -24,15 +24,9 @@ const vimeo = {
 
         // Load the API if not already
         if (!utils.is.object(window.Vimeo)) {
-            utils.loadScript(this.config.urls.vimeo.api);
-
-            // Wait for load
-            const vimeoTimer = window.setInterval(() => {
-                if (utils.is.object(window.Vimeo)) {
-                    window.clearInterval(vimeoTimer);
-                    vimeo.ready.call(this);
-                }
-            }, 50);
+            utils.loadScript(this.config.urls.vimeo.api, () => {
+                vimeo.ready.call(this);
+            });
         } else {
             vimeo.ready.call(this);
         }
