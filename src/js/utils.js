@@ -76,17 +76,26 @@ const utils = {
     },
 
     // Load an external script
-    loadScript(url) {
+    loadScript(url, callback) {
         // Check script is not already referenced
         if (document.querySelectorAll(`script[src="${url}"]`).length) {
             return;
         }
 
-        const tag = document.createElement('script');
-        tag.src = url;
+        // Build the element
+        const element = document.createElement('script');
+        element.src = url;
 
-        const firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+        // Find first script
+        const first = document.getElementsByTagName('script')[0];
+
+        // Bind callback
+        if (utils.is.function(callback)) {
+            element.addEventListener('load', event => callback.call(null, event), false);
+        }
+
+        // Inject
+        first.parentNode.insertBefore(element, first);
     },
 
     // Load an external SVG sprite
