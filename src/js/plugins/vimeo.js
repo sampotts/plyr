@@ -25,6 +25,7 @@ const vimeo = {
         // Load the API if not already
         if (!utils.is.object(window.Vimeo)) {
             utils.loadScript(this.config.urls.vimeo.api);
+
             // Wait for load
             const vimeoTimer = window.setInterval(() => {
                 if (utils.is.object(window.Vimeo)) {
@@ -38,6 +39,7 @@ const vimeo = {
     },
 
     // Set aspect ratio
+    // For Vimeo we have an extra 300% height <div> to hide the standard controls and UI
     setAspectRatio(input) {
         const ratio = utils.is.string(input) ? input.split(':') : this.config.ratio.split(':');
         const padding = 100 / ratio[0] * ratio[1];
