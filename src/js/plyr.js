@@ -922,16 +922,23 @@ class Plyr {
 
             // If it's a soft destroy, make minimal changes
             if (soft) {
-                utils.removeElement(this.elements.captions);
-                Array.from(this.elements.buttons.play).forEach(button => utils.removeElement(button));
-                utils.removeElement(this.elements.controls);
-                utils.removeElement(this.elements.wrapper);
+                if (Object.keys(this.elements).length) {
+                    // Remove buttons
+                    if (this.elements.buttons && this.elements.buttons.play) {
+                        Array.from(this.elements.buttons.play).forEach(button => utils.removeElement(button));
+                    }
 
-                // Clear for GC
-                this.elements.captions = null;
-                this.elements.controls = null;
-                this.elements.buttons.play = null;
-                this.elements.wrapper = null;
+                    // Remove others
+                    utils.removeElement(this.elements.captions);
+                    utils.removeElement(this.elements.controls);
+                    utils.removeElement(this.elements.wrapper);
+
+                    // Clear for GC
+                    this.elements.buttons.play = null;
+                    this.elements.captions = null;
+                    this.elements.controls = null;
+                    this.elements.wrapper = null;
+                }
 
                 // Callback
                 if (utils.is.function(callback)) {
