@@ -220,160 +220,26 @@ Option | Type | Default | Description
 `loadSprite` | Boolean | `true` | Load the SVG sprite specified as the `iconUrl` option (if a URL). If `false`, it is assumed you are handling sprite loading yourself.
 `iconUrl` | String | `null` | Specify a URL or path to the SVG sprite. See the [SVG section](#svg) for more info.
 `iconPrefix` | String | `plyr` | Specify the id prefix for the icons used in the default controls (e.g. "plyr-play" would be "plyr"). This is to prevent clashes if you're using your own SVG sprite but with the default controls. Most people can ignore this option.
-
-
-
-<table class="table" width="100%">
-  <thead>
-    <tr>
-      <th width="20%">Option</th>
-      <th width="15%">Type</th>
-      <th width="15%">Default</th>
-      <th width="50%">Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><code>blankUrl</code></td>
-      <td>String</td>
-      <td><code>https://cdn.selz.com/plyr/blank.mp4</code></td>
-      <td>Specify a URL or path to a blank video file used to properly cancel network requests. See <a href="https://github.com/sampotts/plyr/issues/174">issue #174</a> for more info.</td>
-    </tr>
-    <tr>
-      <td><code>autoplay</code></td>
-      <td>Boolean</td>
-      <td><code>false</code></td>
-      <td>Autoplay the media on load. This is generally advised against on UX grounds. It is also disabled on iOS (an Apple limitation).</td>
-    </tr>
-    <tr>
-      <td><code>seekTime</code></td>
-      <td>Number</td>
-      <td><code>10</code></td>
-      <td>The time, in seconds, to seek when a user hits fast forward or rewind.</td>
-    </tr>
-    <tr>
-      <td><code>volume</code></td>
-      <td>Number</td>
-      <td><code>5</code></td>
-      <td>A number, between 1 and 10, representing the initial volume of the player.</td>
-    </tr>
-    <tr>
-      <td><code>clickToPlay</code></td>
-      <td>Boolean</td>
-      <td><code>true</code></td>
-      <td>Click (or tap) of the video container will toggle pause/play.</td>
-    </tr>
-    <tr>
-      <td><code>disableContextMenu</code></td>
-      <td>Boolean</td>
-      <td><code>true</code></td>
-      <td>Disable right click menu on video to <em>help</em> as very primitive obfuscation to prevent downloads of content.</td>
-    </tr>
-    <tr>
-      <td><code>hideControls</code></td>
-      <td>Boolean</td>
-      <td><code>true</code></td>
-      <td>Hide video controls automatically after 2s of no mouse or focus movement, on control element blur (tab out), on playback start or entering fullscreen. As soon as the mouse is moved, a control element is focused or playback is paused, the controls reappear instantly.</td>
-    </tr>
-    <tr>
-      <td><code>showPosterOnEnd</code></td>
-      <td>Boolean</td>
-      <td><code>false</code></td>
-      <td>This will restore and *reload* HTML5 video once playback is complete. Note: depending on the browser caching, this may result in the video downloading again (or parts of it). Use with caution.</td>
-    </tr>
-    <tr>
-      <td><code>keyboard</code></td>
-      <td>Object</td>
-      <td><code>{ focused: true, global: false }</code></td>
-      <td>Enable <a href="#shortcuts">keyboard shortcuts</a> for focused players only or globally as well (this will only work if there's one player in the document)</td>
-    </tr>
-    <tr>
-      <td><code>tooltips</code></td>
-      <td>Object</td>
-      <td><code>{ controls: false, seek: true }</code></td>
-      <td>
-  		<strong>controls</strong>: Display control labels as tooltips on :hover &amp; :focus (by default, the labels are screen reader only).
-  		<br><br>
-  		<strong>seek</strong>: Display a seek tooltip to indicate on click where the media would seek to.
-  	</td>
-    </tr>
-    <tr>
-      <td><code>duration</code></td>
-      <td>Number</td>
-      <td><code>null</code></td>
-      <td>Specify a custom duration.</td>
-    </tr>
-    <tr>
-      <td><code>displayDuration</code></td>
-      <td>Boolean</td>
-      <td><code>true</code></td>
-      <td>Displays the duration of the media on the "metadataloaded" event (on startup) in the current time display. This will only work if the `preload` attribute is not set to `none` (or is not set at all) and you choose not to display the duration (see <code>controls</code> option).</td>
-    </tr>
-    <tr>
-      <td><code>listeners</code></td>
-      <td>Object</td>
-      <td>&mdash;</td>
-      <td>Allows early binding of event listeners to the controls. See <code>controls</code> above for list of controls and see <code>plyr.js</code> in <code>/src</code> for more info.</td>
-    </tr>
-    <tr>
-      <td><code>captions</code></td>
-      <td>Object</td>
-      <td>&mdash;</td>
-      <td>Two properties: <code>defaultActive</code> which toggles if captions should be on by default. The default value is <code>false</code>. The <code>selectedIndex</code> property sets the default starting index for the caption tracks.</td>
-    </tr>
-    <tr>
-      <td><code>fullscreen</code></td>
-      <td>Object</td>
-      <td>&mdash;</td>
-      <td>See <a href="#fullscreen-options">below</a></td>
-    </tr>
-    <tr>
-      <td><code>storage</code></td>
-      <td>Object</td>
-      <td>&mdash;</td>
-      <td>Two properties; <code>enabled</code> which toggles if local storage should be enabled (if the browser supports it). The default value is `true`. This enables storing user settings, currently it only stores volume but more will be added later. The second property <code>key</code> is the key used for the local storage. The default is <code>plyr_volume</code> until more settings are stored.</td>
-    </tr>
-    <tr>
-      <td><code>speeds</code></td>
-      <td>Array</td>
-      <td>[1.0, 1.5, 2.0, 0.5]</td>
-      <td>Playback speed list.</td>
-    </tr>
-    <tr>
-      <td><code>loops</code></td>
-      <td>Array</td>
-      <td>[Loop All, Loop in, Loop out, No Loop]</td>
-      <td>Playback loop list.</td>
-    </tr>
-  </tbody>
-</table>
-
-#### Fullscreen options
-
-<table class="table" width="100%" id="fullscreen-options">
-  <thead>
-    <tr>
-      <th width="20%">Option</th>
-      <th width="15%">Type</th>
-      <th width="15%">Default</th>
-      <th width="50%">Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><code>enabled</code></td>
-      <td>Boolean</td>
-      <td><code>true</code></td>
-      <td>Toggles if fullscreen should be enabled (if the browser supports it).</td>
-    </tr>
-    <tr>
-      <td><code>fallback</code></td>
-      <td>Boolean</td>
-      <td><code>true</code></td>
-      <td>Enable a full viewport view for older browsers.</td>
-    </tr>
-  </tbody>
-</table>
+`blankUrl` | String | `https://cdn.plyr.io/static/blank.mp4` | Specify a URL or path to a blank video file used to properly cancel network requests. See [issue #174](#174) for more info.
+`autoplay` | Boolean | `false` | Autoplay the media on load. This is generally advised against on UX grounds. It is also disabled by default in some browsers. If the `autoplay` attribute is present on a `<video>` or `<audio>` element, this will be automatically set to true.
+`seekTime` | Number | `10` | The time, in seconds, to seek when a user hits fast forward or rewind.
+`volume` | Number | `1` | A number, between 0 and 1, representing the initial volume of the player.
+`muted` | Boolean | `false` | Whether to start playback muted. If the `muted` attribute is present on a `<video>` or `<audio>` element, this will be automatically set to true.
+`clickToPlay` | Boolean | `true` | Click (or tap) of the video container will toggle pause/play.
+`disableContextMenu` | Boolean | `true` | Disable right click menu on video to <em>help</em> as very primitive obfuscation to prevent downloads of content.
+`hideControls` | Boolean | `true` | Hide video controls automatically after 2s of no mouse or focus movement, on control element blur (tab out), on playback start or entering fullscreen. As soon as the mouse is moved, a control element is focused or playback is paused, the controls reappear instantly.
+`showPosterOnEnd` | Boolean | false | This will restore and *reload* HTML5 video once playback is complete. Note: depending on the browser caching, this may result in the video downloading again (or parts of it). Use with caution.
+`keyboard` | Object | `{ focused: true, global: false }` | Enable [keyboard shortcuts](#shortcuts) for focused players only or globally
+`tooltips` | Object | `{ controls: false, seek: true }` | `controls`: Display control labels as tooltips on `:hover` & `:focus` (by default, the labels are screen reader only). `seek`: Display a seek tooltip to indicate on click where the media would seek to.
+`duration` | Number | `null` | Specify a custom duration for media.
+`displayDuration` | Boolean | `true` | Displays the duration of the media on the "metadataloaded" event (on startup) in the current time display. This will only work if the `preload` attribute is not set to `none` (or is not set at all) and you choose not to display the duration (see `controls` option).
+`listeners` | Object | `null` | Allows binding of event listeners to the controls before the default handlers. See the `defaults.js` for available listeners. IF your handler prevents default on the event, the default handler will not fire.
+`captions` | Object | `{ active: false, language: window.navigator.language.split('-')[0] }` | `active`: Toggles if captions should be active by default. `language`: Sets the default language to load (if available).
+`fullscreen` | Object | `{ enabled: true, fallback: true }` | `enabled`: Toggles whether fullscreen should be enabled. `fallback`: Allow fallback to a full-window solution.
+`storage` | Object | `{ enabled: true, key: 'plyr' }` | `enabled`: Allow use of local storage to store user settings. `key`: The key name to use.
+`speed` | Object | `{ selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2] }` | `selected`: The default speed for playback. `options`: Options to display in the menu. Most browsers will refuse to play slower than 0.5.
+`quality` | Object | `{ default: 'default', options: ['hd2160', 'hd1440', 'hd1080', 'hd720', 'large', 'medium', 'small', 'tiny', 'default'] }` | Currently only supported by YouTube. `default` is the default quality level, determined by YouTube. `options` are the options to display.
+`loop` | Object | `{ active: false }` | `active`: Whether to loop the current video. If the `loop` attribute is present on a `<video>` or `<audio>` element, this will be automatically set to true This is an object to support future functionality.
 
 ## API
 
