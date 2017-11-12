@@ -329,8 +329,8 @@ Property | Getter | Setter | Description
 `language` | ✔ | ✔ | Gets or sets the preferred captions language for the player. The setter accepts an ISO two-letter language code. Support for the languages is dependent on the captions you include.
 `pip` | ✔ | ✔ | Gets or sets the picture-in-picture state of the player. The setter accepts a boolean. This currently only supported on Safari 10+ on MacOS Sierra+ and iOS 10+.
 
-*1. YouTube only. HTML5 will follow.*
-*2. HTML5 only*
+1. YouTube only. HTML5 will follow.
+2. HTML5 only*
 
 #### The `.source` setter
 
@@ -429,10 +429,10 @@ Property | Type | Description
 `type` | String | Either `video` or `audio`. *Note:* YouTube and Vimeo are currently not supported as audio sources.
 `title` | String | *Optional.* Title of the new media. Used for the `aria-label` attribute on the play button, and outer container. YouTube and Vimeo are populated automatically.
 `sources` | Array | This is an array of sources. For HTML5 media, the properties of this object are mapped directly to HTML attributes so more can be added to the object if required.
-`poster`¹ | String | The URL for the poster image (HTML5 video only).
-`tracks`¹ | String | An array of track objects. Each element in the array is mapped directly to a track element and any keys mapped directly to HTML attributes so as in the example above, it will render as `<track kind="captions" label="English" srclang="en" src="https://cdn.selz.com/plyr/1.0/example_captions_en.vtt" default>` and similar for the French version. Booleans are converted to HTML5 value-less attributes.
+`poster`&sup1; | String | The URL for the poster image (HTML5 video only).
+`tracks`&sup1; | String | An array of track objects. Each element in the array is mapped directly to a track element and any keys mapped directly to HTML attributes so as in the example above, it will render as `<track kind="captions" label="English" srclang="en" src="https://cdn.selz.com/plyr/1.0/example_captions_en.vtt" default>` and similar for the French version. Booleans are converted to HTML5 value-less attributes.
 
-*1. HTML5 only*
+1. HTML5 only
 
 ## Events
 
@@ -546,9 +546,9 @@ Edge | ✔
 IE10+ | ✔&sup2;
 IE9 | API only&sup3;
 
-*1. Mobile Safari on the iPhone forces the native player for `<video>` unless the `playsinline` attribute is present. Volume controls are also disabled.*
-*2. Native player used (no support for `<progress>` or `<input type="range">`) but the API is supported (v1.0.28+)*
-*3. IE10 has no native fullscreen support, fallback can be used (see [options](#options))*
+1. Mobile Safari on the iPhone forces the native player for `<video>` unless the `playsinline` attribute is present. Volume controls are also disabled.
+2. Native player used (no support for `<progress>` or `<input type="range">`) but the API is supported (v1.0.28+)
+3. IE10 has no native fullscreen support, fallback can be used (see [options](#options))
 
 The `enabled` option can be used to disable certain User Agents. For example, if you don't want to use Plyr for smartphones, you could use:
 
