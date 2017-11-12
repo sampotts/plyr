@@ -203,7 +203,7 @@ const defaults = {
         'exitfullscreen',
         'captionsenabled',
         'captionsdisabled',
-        'captionchange',
+        'languagechange',
         'controlshidden',
         'controlsshown',
         'ready',

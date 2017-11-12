@@ -331,7 +331,7 @@ Property | Getter | Setter | Description
 1. YouTube only. HTML5 will follow.
 2. HTML5 only
 
-#### .source setter
+#### The `.source` setter
 
 This allows changing the player source and type on the fly.
 
@@ -421,207 +421,87 @@ player.source = {
 };
 ```
 
-Note: `src` can be the video ID or URL
+*Note:* `src` property for YouTube and Vimeo can either be the video ID or the whole URL.
 
-More details on the object parameters
+Property | Type | Description
+-------- | ---- | -----------
+`type` | String | Either `video` or `audio`. *Note:* YouTube and Vimeo are currently not supported as audio sources.
+`title` | String | *Optional.* Title of the new media. Used for the `aria-label` attribute on the play button, and outer container. YouTube and Vimeo can be populated automatically.
+`sources` | Array | This is an array of sources. For HTML5 media, the properties of this object are mapped directly to HTML attributes so more can be added to the object if required.
+`poster`¹ | String | The URL for the poster image (HTML5 video only).
+`tracks`¹ | String | An array of track objects. Each element in the array is mapped directly to a track element and any keys mapped directly to HTML attributes so as in the example above, it will render as `<track kind="captions" label="English" srclang="en" src="https://cdn.selz.com/plyr/1.0/example_captions_en.vtt" default>` and similar for the French version. Booleans are converted to HTML5 value-less attributes.
 
-<table class="table" width="100%">
-  <thead>
-    <tr>
-      <th width="20%">Key</th>
-      <th width="15%">Type</th>
-      <th width="65%">Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><code>type</code></td>
-      <td>String</td>
-      <td>Options are <code>video</code>, <code>audio</code>, <code>youtube</code> and <code>vimeo</code></td>
-    </tr>
-    <tr>
-      <td><code>title</code></td>
-      <td>String</td>
-      <td>Title of the new media. Used for the `aria-label` attribute on the play button, and outer container.</td>
-    </tr>
-    <tr>
-      <td><code>sources</code></td>
-      <td>Array</td>
-      <td>This is an array of sources. <code>type</code> is optional for YouTube and Vimeo when specifying an array. For YouTube and Vimeo media, the video ID or URL must be passed as the source as shown above. The keys of this object are mapped directly to HTML attributes so more can be added to the object if required.</td>
-    </tr>
-    <tr>
-      <td><code>poster</code></td>
-      <td>String</td>
-      <td>URL for the poster image (video only).</td>
-    </tr>
-    <tr>
-      <td><code>tracks</code></td>
-      <td>Array</td>
-      <td>An array of track objects. Each element in the array is mapped directly to a track element and any keys mapped directly to HTML attributes so as in the example above, it will render as `<track kind="captions" label="English" srclang="en" src="https://cdn.selz.com/plyr/1.0/example_captions_en.vtt" default>`. Booleans are converted to HTML5 value-less attributes.</td>
-    </tr>
-  </tbody>
-</table>
+1. HTML5 only
 
 ## Events
+
 You can listen for events on the target element you setup Plyr on (see example under the table). Some events only apply to HTML5 audio and video. Using your reference to the instance, you can use the `on()` API method or `addEventListener()`. Access to the API can be obtained this way through the `event.detail.plyr` property. Here's an example:
 
 ```javascript
-instance.on('ready', function(event) {
-  var instance = event.detail.plyr;
+player.on('ready', event => {
+    const instance = event.detail.plyr;
 });
 ```
 
-These events also bubble up the DOM. The event target will be the container element.
+### Standard Media Events
 
-<table class="table" width="100%">
-  <thead>
-    <tr>
-      <th width="20%">Event name</th>
-	    <th width="20%">HTML5 only</th>
-      <th width="60%">Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><code>ready</code></td>
-      <td></td>
-      <td>Triggered when the instance is ready for API calls.</td>
-    </tr>
-  	<tr>
-  		<td><code>canplay</code></td>
-  		<td>✔</td>
-  		<td>Sent when enough data is available that the media can be played, at least for a couple of frames. This corresponds to the <code>HAVE_ENOUGH_DATA</code> <code>readyState</code>.</td>
-  	</tr>
-  	<tr>
-  		<td><code>canplaythrough</code></td>
-  		<td></td>
-  		<td>Sent when the ready state changes to <code>CAN_PLAY_THROUGH</code>, indicating that the entire media can be played without interruption, assuming the download rate remains at least at the current level. <strong>Note</strong>: Manually setting the <code>currentTime</code> will eventually fire a <code>canplaythrough</code> event in firefox. Other browsers might not fire this event.</td>
-  	</tr>
-  	<tr>
-  		<td><code>emptied</code></td>
-  		<td>✔</td>
-  		<td>The media has become empty; for example, this event is sent if the media has already been loaded (or partially loaded), and the <code>load()</code> method is called to reload it.</td>
-  	</tr>
-  	<tr>
-  		<td><code>ended</code></td>
-  		<td></td>
-  		<td>Sent when playback completes. Note: with Vimeo this does not occur if `loop` is enabled.</td>
-  	</tr>
-  	<tr>
-  		<td><code>error</code></td>
-  		<td>✔</td>
-  		<td>Sent when an error occurs.&nbsp; The element's <code>error</code> attribute contains more information.</td>
-  	</tr>
-  	<tr>
-  		<td><code>loadeddata</code></td>
-  		<td>✔</td>
-  		<td>The first frame of the media has finished loading.</td>
-  	</tr>
-  	<tr>
-  		<td><code>loadedmetadata</code></td>
-  		<td>✔</td>
-  		<td>The media's metadata has finished loading; all attributes now contain as much useful information as they're going to.</td>
-  	</tr>
-  	<tr>
-  		<td><code>loadstart</code></td>
-  		<td>✔</td>
-  		<td>Sent when loading of the media begins.</td>
-  	</tr>
-  	<tr>
-  		<td><code>pause</code></td>
-  		<td></td>
-  		<td>Sent when playback is paused.</td>
-  	</tr>
-  	<tr>
-  		<td><code>play</code></td>
-  		<td></td>
-  		<td>Sent when playback of the media starts after having been paused; that is, when playback is resumed after a prior <code>pause</code> event.</td>
-  	</tr>
-  	<tr>
-  		<td><code>playing</code></td>
-  		<td></td>
-  		<td>Sent when the media begins to play (either for the first time, after having been paused, or after ending and then restarting).</td>
-  	</tr>
-  	<tr>
-  		<td><code>progress</code></td>
-  		<td></td>
-  		<td>Sent periodically to inform interested parties of progress downloading the media. Information about the current amount of the media that has been downloaded is available in the media element's <code>buffered</code> attribute.</td>
-  	</tr>
-  	<tr>
-  		<td><code>seeked</code></td>
-  		<td></td>
-  		<td>Sent when a seek operation completes.</td>
-  	</tr>
-  	<tr>
-  		<td><code>seeking</code></td>
-  		<td></td>
-  		<td>Sent when a seek operation begins.</td>
-  	</tr>
-  	<tr>
-  		<td><code>stalled</code></td>
-  		<td>✔</td>
-  		<td>Sent when the user agent is trying to fetch media data, but data is unexpectedly not forthcoming.</td>
-  	</tr>
-  	<tr>
-  		<td><code>timeupdate</code></td>
-  		<td></td>
-  		<td>The time indicated by the element's <code>currentTime</code> attribute has changed.</td>
-  	</tr>
-  	<tr>
-  		<td><code>volumechange</code></td>
-  		<td></td>
-  		<td>Sent when the audio volume changes (both when the volume is set and when the <code>muted</code> attribute is changed).</td>
-  	</tr>
-  	<tr>
-  		<td><code>waiting</code></td>
-  		<td>✔</td>
-  		<td>Sent when the requested operation (such as playback) is delayed pending the completion of another operation (such as a seek).</td>
-  	</tr>
-  	<tr>
-  		<td><code>enterfullscreen</code></td>
-  		<td></td>
-  		<td>User enters fullscreen (either the proper fullscreen or full-window fallback for older browsers)</td>
-  	</tr>
-  	<tr>
-  		<td><code>exitfullscreen</code></td>
-  		<td></td>
-  		<td>User exits fullscreen</td>
-  	</tr>
-  	<tr>
-  		<td><code>captionsenabled</code></td>
-  		<td></td>
-  		<td>Captions toggled on</td>
-  	</tr>
-  	<tr>
-  		<td><code>captionsdisabled</code></td>
-  		<td></td>
-  		<td>Captions toggled off</td>
-  	</tr>
-    <tr>
-      <td><code>destroyed</code></td>
-      <td></td>
-      <td>When an instance is destroyed. The original element that replaced the container will be returned to your handler as the event target.</td>
-    </tr>
-	</tbody>
-</table>
+Event Type | Description
+---------- | -----------
+`progress` | Sent periodically to inform interested parties of progress downloading the media. Information about the current amount of the media that has been downloaded is available in the media element's `buffered` attribute.
+`playing` | Sent when the media begins to play (either for the first time, after having been paused, or after ending and then restarting).
+`play` | Sent when playback of the media starts after having been paused; that is, when playback is resumed after a prior `pause` event.
+`pause` | Sent when playback is paused.
+`timeupdate` | The time indicated by the element's `currentTime` attribute has changed.
+`volumechange` | Sent when the audio volume changes (both when the volume is set and when the `muted` state is changed).
+`seeking` | Sent when a seek operation begins.
+`seeked` | Sent when a seek operation completes.
+`ratechange` | Sent when the playback speed changes.
+`ended` | Sent when playback completes.
+`enterfullscreen` | Sent when the player enters fullscreen mode (either the proper fullscreen or full-window fallback for older browsers).
+`exitfullscreen` | Sent when the player exits fullscreen mode.
+`captionsenabled` | Sent when captions are enabled.
+`captionsdisabled` | Sent when captions are disabled.
+`languagechange` | Sent when the caption language is changed.
+`controlshidden` | Sent when the controls are hidden.
+`controlsshown` | Sent when the controls are shown.
+`ready` | Triggered when the instance is ready for API calls.
 
-Details borrowed from: [https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events](https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events)
+#### HTML5 only
+Event Type | Description
+---------- | -----------
+`loadstart` | Sent when loading of the media begins.
+`loadeddata` | The first frame of the media has finished loading.
+`loadedmetadata` | The media's metadata has finished loading; all attributes now contain as much useful information as they're going to.
+`canplay` | Sent when enough data is available that the media can be played, at least for a couple of frames. This corresponds to the `HAVE_ENOUGH_DATA` `readyState`.
+`canplaythrough` | Sent when the ready state changes to `CAN_PLAY_THROUGH`, indicating that the entire media can be played without interruption, assuming the download rate remains at least at the current level. *Note:* Manually setting the `currentTime` will eventually fire a `canplaythrough` event in firefox. Other browsers might not fire this event.
+`stalled` | Sent when the user agent is trying to fetch media data, but data is unexpectedly not forthcoming.
+`waiting` | Sent when the requested operation (such as playback) is delayed pending the completion of another operation (such as a seek).
+`emptied` | he media has become empty; for example, this event is sent if the media has already been loaded (or partially loaded), and the `load()` method is called to reload it.
+`cuechange` | Sent when a `TextTrack` has changed the currently displaying cues.
+`error` | Sent when an error occurs. The element's `error` attribute contains more information.
+
+#### YouTube only
+Event Type | Description
+---------- | -----------
+`statechange` | The state of the player has changed. The code can be accessed via `event.detail.code`. Possible values are `-1`: Unstarted, `0`: Ended, `1`: Playing, `2`: Paused, `3`: Buffering, `5`: Video cued. See the [YouTube Docs](https://developers.google.com/youtube/iframe_api_reference#onStateChange) for more information.
+`qualitychange` | The quality of playback has changed.
+`qualityrequested` | A change to playback quality has been requested. *Note:* A change to quality can only be *requested* via the API. There is no guarantee the quality will change to the level requested. You should listen to the `qualitychange` event for true changes.
+
+*Note:* These events also bubble up the DOM. The event target will be the container element.
+
+Some event details borrowed from [MDN](https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events).
 
 ## Embeds
-YouTube and Vimeo are currently supported and function much like a HTML5 video. Check the relevant documentation sections for any differences.
 
-Plyr references a custom version of the Vimeo Froogaloop API as Vimeo have neglected to maintain the library and there were bugs with their version. You don't need to worry about including your own versions of the Vimeo or YouTube JavaScript APIs.
+YouTube and Vimeo are currently supported and function much like a HTML5 video. Similar events and API methods are available for all types. However if you wish to access the API's directly. You can do so via the `embed` property of your player object - e.g. `player.embed`. You can then use the relevant methods from the third party APIs. More info on the respective API's here:
 
-The embed third party API's can be accessed through the `getEmbed()` API method.
+- [YouTube iframe API Reference](https://developers.google.com/youtube/iframe_api_reference)
+- [Vimeo player.js Reference](https://github.com/vimeo/player.js)
 
-More info on the respective API's here:
-
-- [YouTube API Reference](https://developers.google.com/youtube/js_api_reference)
-- [Vimeo API Reference](https://developer.vimeo.com/player/js-api#reference)
-
-*Please note*: not all API methods may work 100%. Your mileage may vary. It's better to use the universal plyr API where possible.
+*Note*: Not all API methods may work 100%. Your mileage may vary. It's better to use the Plyr API where possible.
 
 ## Shortcuts
+
 By default, a player will bind the following keyboard shortcuts when it has focus. If you have the `global` option to `true` and there's only one player in the document then the shortcuts will work when any element has focus, apart from an element that requires input.
 
 <table class="table" width="100%">

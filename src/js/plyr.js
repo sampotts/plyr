@@ -680,7 +680,7 @@ class Plyr {
         this.captions.language = language;
 
         // Trigger an event
-        utils.dispatchEvent.call(this, this.media, 'captionchange');
+        utils.dispatchEvent.call(this, this.media, 'languagechange');
 
         // Clear caption
         captions.set.call(this);

@@ -314,7 +314,7 @@ const listeners = {
         });
 
         // Caption language change
-        utils.on(this.media, 'captionchange', () => {
+        utils.on(this.media, 'languagechange', () => {
             // Save to storage
             storage.set.call(this, { language: this.language });
         });
