@@ -66,18 +66,19 @@ Plyr extends upon the standard HTML5 markup so that's all you need for those typ
 #### HTML5 Video
 ```html
 <video poster="/path/to/poster.jpg" id="player" controls>
-  <source src="/path/to/video.mp4" type="video/mp4">
-  <source src="/path/to/video.webm" type="video/webm">
-  <!-- Captions are optional -->
-  <track kind="captions" label="English captions" src="/path/to/captions.vtt" srclang="en" default>
+    <source src="/path/to/video.mp4" type="video/mp4">
+    <source src="/path/to/video.webm" type="video/webm">
+
+    <!-- Captions are optional -->
+    <track kind="captions" label="English captions" src="/path/to/captions.vtt" srclang="en" default>
 </video>
 ```
 
 #### HTML5 Audio
 ```html
 <audio id="player" controls>
-  <source src="/path/to/audio.mp3" type="audio/mp3">
-  <source src="/path/to/audio.ogg" type="audio/ogg">
+    <source src="/path/to/audio.mp3" type="audio/mp3">
+    <source src="/path/to/audio.ogg" type="audio/ogg">
 </audio>
 ```
 
@@ -101,7 +102,7 @@ Include the `plyr.js` script before the closing `</body>` tag and then call `ply
 
 ```html
 <script src="path/to/plyr.js"></script>
-<script>var player = new Plyr('#player')</script>
+<script>const player = new Plyr('#player');</script>
 ```
 
 If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for the JavaScript, you can use the following:
@@ -131,7 +132,7 @@ The SVG sprite is loaded automatically from our CDN (provided by [Fastly](https:
 
 ### LESS & SASS/SCSS
 
-You can use `plyr.less` or `plyr.scss` file included in `/src` as part of your build and change variables to suit your design. The LESS and SASS require you to use the [autoprefixer](https://www.npmjs.com/package/gulp-autoprefixer) plugin (you should already) as all declerations use the W3C definitions - e.g. `appearance: none;` will be prefixed to `-webkit-appearance: none;` by autoprefixer.
+You can use `plyr.less` or `plyr.scss` file included in `/src` as part of your build and change variables to suit your design. The LESS and SASS require you to use the [autoprefixer](https://www.npmjs.com/package/gulp-autoprefixer) plugin (you be should already!) as all declarations use the W3C definitions.
 
 The HTML markup uses the BEM methodology with `plyr` as the block, e.g. `.plyr__controls`. You can change the class hooks in the options to match any custom CSS you write. Check out the JavaScript source for more on this.
 
@@ -320,16 +321,16 @@ Property | Getter | Setter | Description
 `volume` | ✔ | ✔ | Gets or sets the volume for the player. The setter accepts a float between 0 and 1.
 `muted` | ✔ | ✔ | Gets or sets the muted state of the player. The setter accepts a boolean.
 `speed` | ✔ | ✔ | Gets or sets the speed for the player. The setter accepts a value in the options specified in your config. Generally the minimum should be 0.5.
-`quality`¹ | ✔ | ✔ | Gets or sets the quality for the player. The setter accepts a value from the options specified in your config.
+`quality`&sup1; | ✔ | ✔ | Gets or sets the quality for the player. The setter accepts a value from the options specified in your config.
 `loop` | ✔ | ✔ | Gets or sets the current loop state of the player. The setter accepts a boolean.
 `source` | ✔ | ✔ | Gets or sets the current source for the player. The setter accepts an object. See [source setter](#source-setter) below for examples.
-`poster`² | ✔ | ✔ | Gets or sets the current poster image for the player. The setter accepts a string; the URL for the updated poster image.
+`poster`&sup2; | ✔ | ✔ | Gets or sets the current poster image for the player. The setter accepts a string; the URL for the updated poster image.
 `autoplay` | ✔ | ✔ | Gets or sets the autoplay state of the player. The setter accepts a boolean.
 `language` | ✔ | ✔ | Gets or sets the preferred captions language for the player. The setter accepts an ISO two-letter language code. Support for the languages is dependent on the captions you include.
 `pip` | ✔ | ✔ | Gets or sets the picture-in-picture state of the player. The setter accepts a boolean. This currently only supported on Safari 10+ on MacOS Sierra+ and iOS 10+.
 
-1. YouTube only. HTML5 will follow.
-2. HTML5 only
+*1. YouTube only. HTML5 will follow.*
+*2. HTML5 only*
 
 #### The `.source` setter
 
@@ -426,12 +427,12 @@ player.source = {
 Property | Type | Description
 -------- | ---- | -----------
 `type` | String | Either `video` or `audio`. *Note:* YouTube and Vimeo are currently not supported as audio sources.
-`title` | String | *Optional.* Title of the new media. Used for the `aria-label` attribute on the play button, and outer container. YouTube and Vimeo can be populated automatically.
+`title` | String | *Optional.* Title of the new media. Used for the `aria-label` attribute on the play button, and outer container. YouTube and Vimeo are populated automatically.
 `sources` | Array | This is an array of sources. For HTML5 media, the properties of this object are mapped directly to HTML attributes so more can be added to the object if required.
 `poster`¹ | String | The URL for the poster image (HTML5 video only).
 `tracks`¹ | String | An array of track objects. Each element in the array is mapped directly to a track element and any keys mapped directly to HTML attributes so as in the example above, it will render as `<track kind="captions" label="English" srclang="en" src="https://cdn.selz.com/plyr/1.0/example_captions_en.vtt" default>` and similar for the French version. Booleans are converted to HTML5 value-less attributes.
 
-1. HTML5 only
+*1. HTML5 only*
 
 ## Events
 
@@ -504,84 +505,22 @@ YouTube and Vimeo are currently supported and function much like a HTML5 video. 
 
 By default, a player will bind the following keyboard shortcuts when it has focus. If you have the `global` option to `true` and there's only one player in the document then the shortcuts will work when any element has focus, apart from an element that requires input.
 
-<table class="table" width="100%">
-  <thead>
-    <tr>
-      <th width="25%">Key</th>
-      <th width="25%">Global</th>
-      <th width="50%">Action</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><code>0</code> to <code>9</code></td>
-      <td>✔</td>
-      <td>Seek from 0 to 90% respectively</td>
-    </tr>
-    <tr>
-      <td><code>space</code></td>
-      <td></td>
-      <td>Toggle playback</td>
-    </tr>
-    <tr>
-      <td><code>K</code></td>
-      <td>✔</td>
-      <td>Toggle playback</td>
-    </tr>
-    <tr>
-      <td><code>&larr;</code></td>
-      <td></td>
-      <td>Seek backward by the <code>seekTime</code> option</td>
-    </tr>
-    <tr>
-      <td><code>&rarr;</code></td>
-      <td></td>
-      <td>Seek forward by the <code>seekTime</code> option</td>
-    </tr>
-    <tr>
-      <td><code>&uarr;</code></td>
-      <td></td>
-      <td>Increase volume</td>
-    </tr>
-    <tr>
-      <td><code>&darr;</code></td>
-      <td></td>
-      <td>Decrease volume</td>
-    </tr>
-    <tr>
-      <td><code>M</code></td>
-      <td>✔</td>
-      <td>Toggle mute</td>
-    </tr>
-    <tr>
-      <td><code>F</code></td>
-      <td>✔</td>
-      <td>Toggle fullscreen</td>
-    </tr>
-    <tr>
-      <td><code>C</code></td>
-      <td>✔</td>
-      <td>Toggle captions</td>
-    </tr>
-    <tr>
-      <td><code>l</code></td>
-      <td></td>
-      <td>Toggle Loop All/No Loop</td>
-    </tr>
-    <tr>
-      <td><code>i</code></td>
-      <td></td>
-      <td>Set the start marker of the loop</td>
-    </tr>
-    <tr>
-      <td><code>o</code></td>
-      <td></td>
-      <td>Set the end marker of the loop</td>
-    </tr>
-  </tbody>
-</table>
+Key | Action
+--- | ------
+`0` to `9` | Seek from 0 to 90% respectively
+`space` | Toggle playback
+`K` | Toggle playback
+&larr; | Seek backward by the `seekTime` option
+&rarr; | Seek forward by the `seekTime` option
+&uarr; | Increase volume
+&darr; | Decrease volume
+`M` | Toggle mute
+`F` | Toggle fullscreen
+`C` | Toggle captions
+`L` | Toggle loop
 
 ## Streaming
+
 Because Plyr is an extension of the standard HTML5 video and audio elements, third party streaming plugins can be used with Plyr. Massive thanks to Matias Russitto ([@russitto](https://github.com/russitto)) for working on this. Here's a few examples:
 
 - Using [hls.js](https://github.com/dailymotion/hls.js) - [Demo](http://codepen.io/sampotts/pen/JKEMqB)
@@ -589,62 +528,54 @@ Because Plyr is an extension of the standard HTML5 video and audio elements, thi
 - Using [dash.js](https://github.com/Dash-Industry-Forum/dash.js) - [Demo](http://codepen.io/sampotts/pen/BzpJXN)
 
 ## Fullscreen
+
 Fullscreen in Plyr is supported by all browsers that [currently support it](http://caniuse.com/#feat=fullscreen).
 
 ## Browser support
 
-<table width="100%" style="text-align: center">
-  <thead>
-    <tr>
-      <td>Safari</td>
-      <td>Firefox</td>
-      <td>Chrome</td>
-      <td>Opera</td>
-      <td>IE9</td>
-      <td>IE10+</td>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>✔&sup1;</td>
-      <td>✔</td>
-      <td>✔</td>
-      <td>✔</td>
-      <td>API&sup2;</td>
-      <td>✔&sup3;</td>
-    </tr>
-  </tbody>
-</table>
+Plyr supports the last 2 versions of most *modern* browsers. IE11 is also supported.
 
-&sup1; Mobile Safari on the iPhone forces the native player for `<video>` so no useful customization is possible. `<audio>` elements have volume controls disabled.
+Browser | Supported
+------- | ---------
+Safari | ✔
+Mobile Safari | ✔&sup1;
+Firefox | ✔
+Chrome | ✔
+Opera | ✔
+Edge | ✔
+IE10+ | ✔&sup2;
+IE9 | API only&sup3;
 
-&sup2; Native player used (no support for `<progress>` or `<input type="range">`) but the API is supported (v1.0.28+)
-
-&sup3; IE10 has no native fullscreen support, fallback can be used (see [options](#options))
+*1. Mobile Safari on the iPhone forces the native player for `<video>` unless the `playsinline` attribute is present. Volume controls are also disabled.*
+*2. Native player used (no support for `<progress>` or `<input type="range">`) but the API is supported (v1.0.28+)*
+*3. IE10 has no native fullscreen support, fallback can be used (see [options](#options))*
 
 The `enabled` option can be used to disable certain User Agents. For example, if you don't want to use Plyr for smartphones, you could use:
 
 ```javascript
-enabled: /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent)
+{ enabled: /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent) }
 ```
 If a User Agent is disabled but supports `<video>` and `<audio>` natively, it will use the native player.
 
-Any unsupported browsers will display links to download the media if the correct html is used.
-
 ## RangeTouch
+
 Some touch browsers (particularly Mobile Safari on iOS) seem to have issues with `<input type="range">` elements whereby touching the track to set the value doesn't work and sliding the thumb can be tricky. To combat this, I've created [RangeTouch](https://rangetouch.com) which I'd recommend including in your solution. It's a tiny script with a nice benefit for users on touch devices.
 
 ## Issues
+
 If you find anything weird with Plyr, please let us know using the GitHub issues tracker.
 
 ## Author
+
 Plyr is developed by [@sam_potts](https://twitter.com/sam_potts) / [sampotts.me](http://sampotts.me) with help from the awesome [contributors](https://github.com/sampotts/plyr/graphs/contributors)
 
 ## Donate
-Plyr costs money to run, not my time - I donate that for free but domains, hosting and more. Any help is appreciated...
+
+Plyr costs money to run, not only my time - I donate that for free but domains, hosting and more. Any help is appreciated...
 [Donate to support Plyr](https://www.paypal.me/pottsy/20usd)
 
 ## Mentions
+
 - [ProductHunt](https://www.producthunt.com/tech/plyr)
 - [The Changelog](http://thechangelog.com/plyr-simple-html5-media-player-custom-controls-webvtt-captions/)
 - [HTML5 Weekly #177](http://html5weekly.com/issues/177)
@@ -657,6 +588,7 @@ Plyr costs money to run, not my time - I donate that for free but domains, hosti
 - [noupe.com](http://www.noupe.com/design/html5-plyr-is-a-responsive-and-accessible-video-player-94389.html)
 
 ## Used by
+
 - [Selz.com](https://selz.com)
 - [Peugeot.fr](http://www.peugeot.fr/marque-et-technologie/technologies/peugeot-i-cockpit.html)
 - [Peugeot.de](http://www.peugeot.de/modelle/modellberater/208-3-turer/fotos-videos.html)
@@ -670,14 +602,17 @@ Plyr costs money to run, not my time - I donate that for free but domains, hosti
 Let me know on [Twitter](https://twitter.com/sam_potts) I can add you to the above list. It'd be awesome to see how you're using Plyr :-)
 
 ## Useful links and credits
+
 Credit to the PayPal HTML5 Video player from which Plyr's caption functionality was originally ported from:
 - [PayPal's Accessible HTML5 Video Player](https://github.com/paypal/accessible-html5-video-player)
 - [An awesome guide for Plyr in Japanese!](http://syncer.jp/how-to-use-plyr-io) by [@arayutw](https://twitter.com/arayutw)
 
 ## Thanks
+
 [![Fastly](https://www.fastly.com/sites/all/themes/custom/fastly2016/logo.png)](https://www.fastly.com/)
 
-Thanks to [Fastly](https://www.fastly.com/) for providing the CDN services.
+Massive thanks to [Fastly](https://www.fastly.com/) for providing the CDN services.
 
 ## Copyright and License
-[The MIT license](license.md).
+
+[The MIT license](license.md)

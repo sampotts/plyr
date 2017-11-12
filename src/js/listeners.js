@@ -101,7 +101,6 @@ const listeners = {
                     case 75:
                         // Space and K key
                         if (!held) {
-                            this.console.warn('togglePlay', event.type);
                             this.togglePlay();
                         }
                         break;
@@ -119,7 +118,7 @@ const listeners = {
                     case 77:
                         // M key
                         if (!held) {
-                            this.muted = 'toggle';
+                            this.muted = !this.muted;
                         }
                         break;
 
@@ -143,6 +142,11 @@ const listeners = {
                         if (!held) {
                             this.toggleCaptions();
                         }
+                        break;
+
+                    case 76:
+                        // L key
+                        this.loop = !this.loop;
                         break;
 
                     /* case 73:
