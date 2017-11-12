@@ -356,14 +356,6 @@
     }
 }
 
-// Header controls
-.plyr__header {
-    .plyr__controls;
-    position: absolute;
-    z-index: 1;
-}
-
-
 // Buttons
 .plyr__control {
     position: relative;
@@ -401,31 +393,40 @@
 }
 
 // Video controls
-.plyr--video .plyr__controls {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 2;
-    padding: (@plyr-control-spacing * 3.5) (@plyr-control-spacing + 2) @plyr-control-spacing;
-    background: linear-gradient(fade(@plyr-video-controls-bg, 0%), fade(@plyr-video-controls-bg, 70%));
-    border-bottom-left-radius: inherit;
-    border-bottom-right-radius: inherit;
-    color: @plyr-video-control-color;
-    transition: all 0.4s ease-in-out;
+.plyr--video {
+    .plyr__controls {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 2;
+        padding: (@plyr-control-spacing * 3.5) (@plyr-control-spacing + 2) @plyr-control-spacing;
+        background: linear-gradient(fade(@plyr-video-controls-bg, 0%), fade(@plyr-video-controls-bg, 70%));
+        border-bottom-left-radius: inherit;
+        border-bottom-right-radius: inherit;
+        color: @plyr-video-control-color;
+        transition: all 0.4s ease-in-out;
 
-    .plyr__control {
-        svg {
-            filter: drop-shadow(0 1px 1px fade(#000, 15%));
-        }
+        .plyr__control {
+            svg {
+                filter: drop-shadow(0 1px 1px fade(#000, 15%));
+            }
 
-        // Hover and tab focus
-        &.tab-focus,
-        &:hover,
-        &[aria-expanded='true'] {
-            background: @plyr-video-control-bg-hover;
-            color: @plyr-video-control-color-hover;
+            // Hover and tab focus
+            &.tab-focus,
+            &:hover,
+            &[aria-expanded='true'] {
+                background: @plyr-video-control-bg-hover;
+                color: @plyr-video-control-color-hover;
+            }
         }
+    }
+
+    .plyr__header {
+        .plyr__controls;
+        padding: @plyr-control-spacing;
+        top: 0;
+        text-align: left;
     }
 }
 // Hide controls

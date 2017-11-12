@@ -254,6 +254,7 @@
             },
             labels: '[data-plyr]',
             buttons: {
+                back: '[data-plyr="back"]',
                 play: '[data-plyr="play"]',
                 pause: '[data-plyr="pause"]',
                 restart: '[data-plyr="restart"]',
@@ -303,6 +304,7 @@
             tooltip: 'plyr__tooltip',
             hidden: 'plyr__sr-only',
             hideControls: 'plyr--hide-controls',
+            back: 'plyr--back',
             isIos: 'plyr--is-ios',
             isTouch: 'plyr--is-touch',
             menu: {
@@ -1907,7 +1909,7 @@
                         utils.extend(utils.getAttributesFromSelector(player.config.selectors.buttons.settings), {
                             type: 'button',
                             class:
-                            player.config.classNames.control + ' ' + player.config.classNames.control + '--forward',
+                                player.config.classNames.control + ' ' + player.config.classNames.control + '--forward',
                             id: 'plyr-settings-' + data.id + '-' + type + '-tab',
                             'aria-haspopup': true,
                             'aria-controls': 'plyr-settings-' + data.id + '-' + type,
@@ -2006,17 +2008,29 @@
         }
 
         function createHeader() {
-            var html = [];
-            html.push('<div class="plyr__header">');
+            //var html = [];
+
+            // Create the container
+            var controls = utils.createElement(
+                'div',
+                utils.getAttributesFromSelector(player.config.selectors.controls.header)
+            );
+
+            controls.appendChild(createButton('back'));
+
+            /*html.push('<div class="plyr__header">');
             html.push(
                 "<div class='back-button'>",
-                "<button type='button' onclick='alert()'>",
+                "<button type='button' class="plyr__control" data-plyr="back">",
                 "<i class='fa fa-arrow-left' aria-hidden='true'></i>",
                 "<span>BUTTON</span>",
                 "</button>"
             );
             html.push('</div>');
-            return html.join('');
+            return html.join('');*/
+
+            return controls;
+
         }
 
         // Hide/show a tab
@@ -2686,8 +2700,8 @@
 
             // Inject controls HTML
             if (utils.is.htmlElement(controls)) {
+                target.appendChild(createHeader());
                 target.appendChild(controls);
-                target.insertAdjacentHTML("afterbegin", createHeader())
             } else {
                 target.insertAdjacentHTML('beforeend', controls);
                 target.insertAdjacentHTML("afterbegin", createHeader())
