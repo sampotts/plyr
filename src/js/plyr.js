@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v2.0.17
+// plyr.js v2.0.18
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -44,7 +44,7 @@
             displayDuration: true,
             loadSprite: true,
             iconPrefix: 'plyr',
-            iconUrl: 'https://cdn.plyr.io/2.0.17/plyr.svg',
+            iconUrl: 'https://cdn.plyr.io/2.0.18/plyr.svg',
             blankUrl: 'https://cdn.plyr.io/static/blank.mp4',
             clickToPlay: true,
             hideControls: true,
@@ -1768,8 +1768,10 @@
                         plyr.media.currentTime = 0;
                         plyr.media.muted = instance.isMuted();
 
-                        // Set title
-                        config.title = instance.getVideoData().title;
+                        // Set title if possible
+                        if (typeof instance.getVideoData === 'function') {
+                            config.title = instance.getVideoData().title;
+                        }
 
                         // Set the tabindex
                         if (plyr.supported.full) {
