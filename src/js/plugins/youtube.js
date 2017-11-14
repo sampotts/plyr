@@ -207,7 +207,9 @@ const youtube = {
                     }
 
                     // Set title
-                    player.config.title = instance.getVideoData().title;
+                    if (utils.is.function(instance.getVideoData)) {
+                        player.config.title = instance.getVideoData().title;
+                    }
 
                     // Set the tabindex to avoid focus entering iframe
                     if (player.supported.ui) {
