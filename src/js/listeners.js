@@ -341,7 +341,14 @@ const listeners = {
         // Proxy events to container
         // Bubble up key events for Edge
         utils.on(this.media, this.config.events.concat(['keyup', 'keydown']).join(' '), event => {
-            utils.dispatchEvent.call(this, this.elements.container, event.type, true);
+            let detail = {};
+
+            // Get error details from media
+            if (event.type === 'error') {
+                detail = this.media.error;
+            }
+
+            utils.dispatchEvent.call(this, this.elements.container, event.type, true, detail);
         });
     },
 

@@ -525,7 +525,7 @@ const utils = {
     },
 
     // Trigger event
-    dispatchEvent(element, type, bubbles, properties) {
+    dispatchEvent(element, type, bubbles, detail) {
         // Bail if no element
         if (!element || !type) {
             return;
@@ -534,7 +534,7 @@ const utils = {
         // Create and dispatch the event
         const event = new CustomEvent(type, {
             bubbles: utils.is.boolean(bubbles) ? bubbles : false,
-            detail: Object.assign({}, properties, {
+            detail: Object.assign({}, detail, {
                 plyr: this instanceof Plyr ? this : null,
             }),
         });

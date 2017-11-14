@@ -3,18 +3,15 @@ Beware: This branch is currently in beta and not production-ready
 ---
 
 # Plyr
-A simple, accessible and customizable HTML5, YouTube and Vimeo media player.
 
-[Donate to support Plyr](#donate)
+A simple, lightweight, accessible and customizable HTML5, YouTube and Vimeo media player that supports [*modern*](#browser-support) browsers.
 
-[Checkout the demo](https://plyr.io)
+[Checkout the demo](https://plyr.io) - [Donate to support Plyr](#donate)
 
 [![Image of Plyr](https://cdn.plyr.io/static/demo/screenshot.png)](https://plyr.io)
 
-## Why?
-We wanted a lightweight, accessible and customizable media player that supports [*modern*](#browser-support) browsers. Sure, there are many other players out there but we wanted to keep things simple, using the right elements for the job.
-
 ## Features
+
 - **Accessible** - full support for VTT captions and screen readers
 - **Lightweight** - just 18KB minified and gzipped
 - **[Customisable](#html)** - make the player look how you want with the markup you want
@@ -52,18 +49,22 @@ Created and maintained by Dominik Pschenitschni ([@dpschen](https://github.com/d
 You can grab the source using one of the following package managers.
 
 ### npm
+
 ```
 npm install plyr
 ```
 [https://www.npmjs.com/package/plyr](https://www.npmjs.com/package/plyr)
 
 ## Quick setup
+
 Here's a quick run through on getting up and running. There's also a [demo on Codepen](http://codepen.io/sampotts/pen/jARJYp).
 
 ### HTML
+
 Plyr extends upon the standard HTML5 markup so that's all you need for those types. More info on advanced HTML markup can be found under [initialising](#initialising).
 
 #### HTML5 Video
+
 ```html
 <video poster="/path/to/poster.jpg" id="player" controls>
     <source src="/path/to/video.mp4" type="video/mp4">
@@ -75,6 +76,7 @@ Plyr extends upon the standard HTML5 markup so that's all you need for those typ
 ```
 
 #### HTML5 Audio
+
 ```html
 <audio id="player" controls>
     <source src="/path/to/audio.mp3" type="audio/mp3">
@@ -85,6 +87,7 @@ Plyr extends upon the standard HTML5 markup so that's all you need for those typ
 For YouTube and Vimeo, Plyr uses the standard YouTube API markup (an empty `<div>`):
 
 #### YouTube embed
+
 ```html
 <div id="player" data-type="youtube" data-video-id="bTqVqk7FSmY"></div>
 ```
@@ -92,12 +95,14 @@ For YouTube and Vimeo, Plyr uses the standard YouTube API markup (an empty `<div
 Note: `data-video-id` value can now be the ID or URL for the video. This attribute name will change in a future release to reflect this change.
 
 #### Vimeo embed
+
 ```html
 <div id="player" data-type="vimeo" data-video-id="143418951"></div>
 ```
 Note: `data-video-id` value can now be the ID or URL for the video. This attribute name will change in a future release to reflect this change.
 
 ### JavaScript
+
 Include the `plyr.js` script before the closing `</body>` tag and then call `plyr.setup()`. More info on `setup()` can be found under [initialising](#initialising).
 
 ```html
@@ -112,6 +117,7 @@ If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for t
 ```
 
 ### CSS
+
 Include the `plyr.css` stylsheet into your `<head>`
 
 ```html
@@ -203,6 +209,7 @@ const player = new Plyr('#player', { /* options */ });
 The constructor will return a Plyr object that can be used with the [API](#api) methods. See the [API](#api) section for more info.
 
 #### Options
+
 Options can be passed as an object to the constructor as above or as JSON in `data-plyr` attribute on each of your target elements:
 
 ```html
@@ -468,6 +475,7 @@ Event Type | Description
 `ready` | Triggered when the instance is ready for API calls.
 
 #### HTML5 only
+
 Event Type | Description
 ---------- | -----------
 `loadstart` | Sent when loading of the media begins.
@@ -482,6 +490,7 @@ Event Type | Description
 `error` | Sent when an error occurs. The element's `error` attribute contains more information.
 
 #### YouTube only
+
 Event Type | Description
 ---------- | -----------
 `statechange` | The state of the player has changed. The code can be accessed via `event.detail.code`. Possible values are `-1`: Unstarted, `0`: Ended, `1`: Playing, `2`: Paused, `3`: Buffering, `5`: Video cued. See the [YouTube Docs](https://developers.google.com/youtube/iframe_api_reference#onStateChange) for more information.

@@ -37,7 +37,8 @@ const vimeo = {
     setAspectRatio(input) {
         const ratio = utils.is.string(input) ? input.split(':') : this.config.ratio.split(':');
         const padding = 100 / ratio[0] * ratio[1];
-        const offset = (300 - padding) / 6;
+        const height = 200;
+        const offset = (height - padding) / (height / 50);
         this.elements.wrapper.style.paddingBottom = `${padding}%`;
         this.media.style.transform = `translateY(-${offset}%)`;
     },
@@ -70,22 +71,26 @@ const vimeo = {
         // https://github.com/vimeo/player.js
         player.embed = new window.Vimeo.Player(iframe);
 
-        // Create a faux HTML5 API using the Vimeo API
-        player.media.play = () => {
-            player.embed.play();
-            player.media.paused = false;
-        };
-        player.media.pause = () => {
-            player.embed.pause();
-            player.media.paused = true;
-        };
-        player.media.stop = () => {
-            player.embed.stop();
-            player.media.paused = true;
-        };
-
         player.media.paused = true;
         player.media.currentTime = 0;
+
+        // Create a faux HTML5 API using the Vimeo API
+        player.media.play = () => {
+            player.embed.play().then(() => {
+                player.media.paused = false;
+            });
+        };
+        player.media.pause = () => {
+            player.embed.pause().then(() => {
+                player.media.paused = true;
+            });
+        };
+        player.media.stop = () => {
+            player.embed.stop().then(() => {
+                player.media.paused = true;
+                player.currentTime = 0;
+            });
+        };
 
         // Seeking
         let { currentTime } = player.media;
@@ -121,9 +126,10 @@ const vimeo = {
                 return speed;
             },
             set(input) {
-                speed = input;
-                player.embed.setPlaybackRate(input);
-                utils.dispatchEvent.call(player, player.media, 'ratechange');
+                player.embed.setPlaybackRate(input).then(() => {
+                    speed = input;
+                    utils.dispatchEvent.call(player, player.media, 'ratechange');
+                });
             },
         });
 
@@ -134,9 +140,10 @@ const vimeo = {
                 return volume;
             },
             set(input) {
-                volume = input;
-                player.embed.setVolume(input);
-                utils.dispatchEvent.call(player, player.media, 'volumechange');
+                player.embed.setVolume(input).then(() => {
+                    volume = input;
+                    utils.dispatchEvent.call(player, player.media, 'volumechange');
+                });
             },
         });
 
@@ -148,9 +155,11 @@ const vimeo = {
             },
             set(input) {
                 const toggle = utils.is.boolean(input) ? input : false;
-                muted = toggle;
-                player.embed.setVolume(toggle ? 0 : player.config.volume);
-                utils.dispatchEvent.call(player, player.media, 'volumechange');
+
+                player.embed.setVolume(toggle ? 0 : player.config.volume).then(() => {
+                    muted = toggle;
+                    utils.dispatchEvent.call(player, player.media, 'volumechange');
+                });
             },
         });
 
@@ -161,8 +170,11 @@ const vimeo = {
                 return loop;
             },
             set(input) {
-                loop = utils.is.boolean(input) ? input : player.config.loop.active;
-                player.embed.setLoop(loop);
+                const toggle = utils.is.boolean(input) ? input : player.config.loop.active;
+
+                player.embed.setLoop(toggle).then(() => {
+                    loop = toggle;
+                });
             },
         });
 
@@ -267,6 +279,11 @@ const vimeo = {
         player.embed.on('ended', () => {
             player.media.paused = true;
             utils.dispatchEvent.call(player, player.media, 'ended');
+        });
+
+        player.embed.on('error', detail => {
+            player.media.error = detail;
+            utils.dispatchEvent.call(player, player.media, 'error');
         });
 
         // Rebuild UI
