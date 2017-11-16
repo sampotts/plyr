@@ -96,11 +96,8 @@ const ui = {
         // Ready event at end of execution stack
         utils.dispatchEvent.call(this, this.media, 'ready');
 
-        // Autoplay
-        // TODO: check we still need this?
-        /* if (this.isEmbed && this.config.autoplay) {
-            this.play();
-        } */
+        // Set the title
+        ui.setTitle.call(this);
     },
 
     // Show the duration on metadataloaded
@@ -137,13 +134,10 @@ const ui = {
         }
 
         // If there's a play button, set label
-        if (this.supported.ui) {
-            if (utils.is.htmlElement(this.elements.buttons.play)) {
-                this.elements.buttons.play.setAttribute('aria-label', label);
-            }
-            if (utils.is.htmlElement(this.elements.buttons.playLarge)) {
-                this.elements.buttons.playLarge.setAttribute('aria-label', label);
-            }
+        if (utils.is.nodeList(this.elements.buttons.play)) {
+            Array.from(this.elements.buttons.play).forEach(button => {
+                button.setAttribute('aria-label', label);
+            });
         }
 
         // Set iframe title

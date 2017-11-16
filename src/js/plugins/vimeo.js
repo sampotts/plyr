@@ -56,6 +56,7 @@ const vimeo = {
             title: false,
             speed: true,
             transparent: 0,
+            gesture: 'media',
         };
         const params = utils.buildUrlParameters(options);
         const id = utils.parseVimeoId(player.embedId);
@@ -203,6 +204,7 @@ const vimeo = {
         // Get title
         player.embed.getVideoTitle().then(title => {
             player.config.title = title;
+            ui.setTitle.call(this);
         });
 
         // Get current time

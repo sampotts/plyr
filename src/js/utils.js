@@ -100,12 +100,12 @@ const utils = {
 
     // Load an external SVG sprite
     loadSprite(url, id) {
-        if (typeof url !== 'string') {
+        if (!utils.is.string(url)) {
             return;
         }
 
         const prefix = 'cache-';
-        const hasId = typeof id === 'string';
+        const hasId = utils.is.string(id);
         let isCached = false;
 
         function updateSprite(data) {
@@ -134,34 +134,25 @@ const utils = {
                 if (isCached) {
                     const data = JSON.parse(cached);
                     updateSprite.call(container, data.content);
+                    return;
                 }
             }
 
-            // ReSharper disable once InconsistentNaming
-            const xhr = new XMLHttpRequest();
+            // Get the sprite
+            fetch(url)
+                .then(response => response.text())
+                .then(text => {
+                    if (support.storage) {
+                        window.localStorage.setItem(
+                            prefix + id,
+                            JSON.stringify({
+                                content: text,
+                            })
+                        );
+                    }
 
-            // XHR for Chrome/Firefox/Opera/Safari
-            if ('withCredentials' in xhr) {
-                xhr.open('GET', url, true);
-            } else {
-                return;
-            }
-
-            // Once loaded, inject to container and body
-            xhr.onload = () => {
-                if (support.storage) {
-                    window.localStorage.setItem(
-                        prefix + id,
-                        JSON.stringify({
-                            content: xhr.responseText,
-                        })
-                    );
-                }
-
-                updateSprite.call(container, xhr.responseText);
-            };
-
-            xhr.send();
+                    updateSprite.call(container, text);
+                });
         }
     },
 

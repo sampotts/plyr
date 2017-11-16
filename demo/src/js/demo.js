@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     title: 'View From A Blue Moon',
                     sources: [
                         {
-                            src: 'https://www.youtube.com/watch?v=bTqVqk7FSmY',
+                            src: 'https://youtube.com/watch?v=bTqVqk7FSmY',
                             type: 'youtube',
                         },
                     ],
@@ -161,7 +161,6 @@ document.addEventListener('DOMContentLoaded', () => {
             case types.vimeo:
                 player.source = {
                     type: 'video',
-                    title: 'View From A Blue Moon',
                     sources: [
                         {
                             src: 'https://vimeo.com/76979871',

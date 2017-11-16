@@ -402,7 +402,6 @@ YouTube example:
 ```javascript
 player.source = {
     type: 'video',
-    title: 'Example title',
     sources: [
         {
             src: 'bTqVqk7FSmY',
@@ -419,7 +418,6 @@ Vimeo example
 ```javascript
 player.source = {
     type: 'video',
-    title: 'Example title',
     sources: [
         {
             src: '143418951',
