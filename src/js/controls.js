@@ -79,7 +79,7 @@ const controls = {
         // https://github.com/sampotts/plyr/issues/460
         // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xlink:href
         if ('href' in use) {
-            use.setAttribute('href', path);
+            use.setAttributeNS('http://www.w3.org/1999/xlink', 'href', path);
         } else {
             use.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', path);
         }

@@ -432,7 +432,7 @@ const listeners = {
         // Airplay
         utils.on(this.elements.buttons.airplay, 'click', event =>
             proxy(event, 'airplay', () => {
-                this.airPlay();
+                this.airplay();
             })
         );
 
