@@ -65,6 +65,9 @@ document.addEventListener('DOMContentLoaded', () => {
             'pip',
             'airplay',
         ],
+        keys: {
+            google: 'AIzaSyDrNwtN3nLH_8rjCmu5Wq3ZCm4MNAVdc0c',
+        },
     });
 
     // Expose for testing
@@ -102,24 +105,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     title: 'View From A Blue Moon',
                     sources: [
                         {
-                            src: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.mp4',
+                            src: 'media/View_From_A_Blue_Moon_Trailer-HD.mp4',
                             type: 'video/mp4',
                         },
                     ],
-                    poster: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.jpg',
+                    poster: 'hmedia/View_From_A_Blue_Moon_Trailer-HD.jpg',
                     tracks: [
                         {
                             kind: 'captions',
                             label: 'English',
                             srclang: 'en',
-                            src: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.en.vtt',
+                            src: 'media/View_From_A_Blue_Moon_Trailer-HD.en.vtt',
                             default: true,
                         },
                         {
                             kind: 'captions',
                             label: 'French',
                             srclang: 'fr',
-                            src: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.fr.vtt',
+                            src: 'media/View_From_A_Blue_Moon_Trailer-HD.fr.vtt',
                         },
                     ],
                 };

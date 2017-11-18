@@ -233,7 +233,7 @@ Option | Type | Default | Description
 `seekTime` | Number | `10` | The time, in seconds, to seek when a user hits fast forward or rewind.
 `volume` | Number | `1` | A number, between 0 and 1, representing the initial volume of the player.
 `muted` | Boolean | `false` | Whether to start playback muted. If the `muted` attribute is present on a `<video>` or `<audio>` element, this will be automatically set to true.
-`clickToPlay` | Boolean | `true` | Click (or tap) of the video container will toggle pause/play.
+`clickToPlay` | Boolean | `true` | Click (or tap) of the video container will toggle play/pause.
 `disableContextMenu` | Boolean | `true` | Disable right click menu on video to <em>help</em> as very primitive obfuscation to prevent downloads of content.
 `hideControls` | Boolean | `true` | Hide video controls automatically after 2s of no mouse or focus movement, on control element blur (tab out), on playback start or entering fullscreen. As soon as the mouse is moved, a control element is focused or playback is paused, the controls reappear instantly.
 `showPosterOnEnd` | Boolean | false | This will restore and *reload* HTML5 video once playback is complete. Note: depending on the browser caching, this may result in the video downloading again (or parts of it). Use with caution.
@@ -241,9 +241,12 @@ Option | Type | Default | Description
 `tooltips` | Object | `{ controls: false, seek: true }` | `controls`: Display control labels as tooltips on `:hover` & `:focus` (by default, the labels are screen reader only). `seek`: Display a seek tooltip to indicate on click where the media would seek to.
 `duration` | Number | `null` | Specify a custom duration for media.
 `displayDuration` | Boolean | `true` | Displays the duration of the media on the "metadataloaded" event (on startup) in the current time display. This will only work if the `preload` attribute is not set to `none` (or is not set at all) and you choose not to display the duration (see `controls` option).
+`invertTime` | Boolean | `true` | Display the current time as a countdown rather than an incremental counter.
+`toggleInvert` | Boolean | `true` | Allow users to click to toggle the above.
 `listeners` | Object | `null` | Allows binding of event listeners to the controls before the default handlers. See the `defaults.js` for available listeners. IF your handler prevents default on the event, the default handler will not fire.
 `captions` | Object | `{ active: false, language: window.navigator.language.split('-')[0] }` | `active`: Toggles if captions should be active by default. `language`: Sets the default language to load (if available).
 `fullscreen` | Object | `{ enabled: true, fallback: true }` | `enabled`: Toggles whether fullscreen should be enabled. `fallback`: Allow fallback to a full-window solution.
+`ratio` | String | `16:9` | The aspect ratio you want to use for embedded players.
 `storage` | Object | `{ enabled: true, key: 'plyr' }` | `enabled`: Allow use of local storage to store user settings. `key`: The key name to use.
 `speed` | Object | `{ selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2] }` | `selected`: The default speed for playback. `options`: Options to display in the menu. Most browsers will refuse to play slower than 0.5.
 `quality` | Object | `{ default: 'default', options: ['hd2160', 'hd1440', 'hd1080', 'hd720', 'large', 'medium', 'small', 'tiny', 'default'] }` | Currently only supported by YouTube. `default` is the default quality level, determined by YouTube. `options` are the options to display.

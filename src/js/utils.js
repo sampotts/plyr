@@ -31,6 +31,9 @@ const utils = {
         htmlElement(input) {
             return !this.undefined(input) && input instanceof HTMLElement;
         },
+        textNode(input) {
+            return this.getConstructor(input) === Text;
+        },
         event(input) {
             return !this.undefined(input) && input instanceof Event;
         },
@@ -49,8 +52,8 @@ const utils = {
             return (
                 input === null ||
                 typeof input === 'undefined' ||
-                ((this.string(input) || this.array(input) || this.nodeList(input)) && input.length === 0) ||
-                (this.object(input) && Object.keys(input).length === 0)
+                ((this.string(input) || this.array(input) || this.nodeList(input)) && !input.length) ||
+                (this.object(input) && !Object.keys(input).length)
             );
         },
         getConstructor(input) {
@@ -140,8 +143,12 @@ const utils = {
 
             // Get the sprite
             fetch(url)
-                .then(response => response.text())
+                .then(response => (response.ok ? response.text() : null))
                 .then(text => {
+                    if (text === null) {
+                        return;
+                    }
+
                     if (support.storage) {
                         window.localStorage.setItem(
                             prefix + id,
@@ -152,7 +159,8 @@ const utils = {
                     }
 
                     updateSprite.call(container, text);
-                });
+                })
+                .catch(() => {});
         }
     },
 
@@ -201,22 +209,6 @@ const utils = {
             });
     },
 
-    // Remove an element
-    removeElement(element) {
-        if (!utils.is.htmlElement(element) || !utils.is.htmlElement(element.parentNode)) {
-            return null;
-        }
-
-        element.parentNode.removeChild(element);
-
-        return element;
-    },
-
-    // Inaert an element after another
-    insertAfter(element, target) {
-        target.parentNode.insertBefore(element, target.nextSibling);
-    },
-
     // Create a DocumentFragment
     createElement(type, attributes, text) {
         // Create a new <element>
@@ -236,10 +228,26 @@ const utils = {
         return element;
     },
 
+    // Inaert an element after another
+    insertAfter(element, target) {
+        target.parentNode.insertBefore(element, target.nextSibling);
+    },
+
     // Insert a DocumentFragment
     insertElement(type, parent, attributes, text) {
         // Inject the new <element>
         parent.appendChild(utils.createElement(type, attributes, text));
+    },
+
+    // Remove an element
+    removeElement(element) {
+        if (!utils.is.htmlElement(element) || !utils.is.htmlElement(element.parentNode)) {
+            return null;
+        }
+
+        element.parentNode.removeChild(element);
+
+        return element;
     },
 
     // Remove all child elements
@@ -433,9 +441,9 @@ const utils = {
 
     // Trap focus inside container
     trapFocus() {
-        const tabbables = utils.getElements.call(this, 'button:not(:disabled), input:not(:disabled), [tabindex]');
-        const first = tabbables[0];
-        const last = tabbables[tabbables.length - 1];
+        const focusable = utils.getElements.call(this, 'button:not(:disabled), input:not(:disabled), [tabindex]');
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
 
         utils.on(
             this.elements.container,

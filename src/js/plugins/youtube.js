@@ -23,19 +23,21 @@ const youtube = {
         // Set ID
         this.media.setAttribute('id', utils.generateId(this.type));
 
-        // Get the title
-        const key = 'AIzaSyDrNwtN3nLH_8rjCmu5Wq3ZCm4MNAVdc0c';
-        const url = `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&fields=items(snippet(title))&part=snippet&key=${key}`;
+        // Get the media title via Google API
+        const key = this.config.keys.google;
+        if (utils.is.string(key) && !utils.is.empty(key)) {
+            const url = `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${key}&fields=items(snippet(title))&part=snippet`;
 
-        fetch(url)
-            .then(response => response.json())
-            .then(obj => {
-                if (utils.is.object(obj)) {
-                    this.config.title = obj.items[0].snippet.title;
-                    ui.setTitle.call(this);
-                }
-            })
-            .catch(() => {});
+            fetch(url)
+                .then(response => (response.ok ? response.json() : null))
+                .then(result => {
+                    if (result !== null && utils.is.object(result)) {
+                        this.config.title = result.items[0].snippet.title;
+                        ui.setTitle.call(this);
+                    }
+                })
+                .catch(() => {});
+        }
 
         // Setup API
         if (utils.is.object(window.YT)) {
