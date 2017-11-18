@@ -493,7 +493,7 @@ const controls = {
                 controls.getLabel.call(this, 'quality', quality),
                 getBadge(quality)
             )
-            );
+        );
 
         controls.updateSetting.call(this, type, list);
     },
@@ -732,7 +732,7 @@ const controls = {
         // Create items
         this.options.speed.forEach(speed =>
             controls.createMenuItem.call(this, speed, list, type, controls.getLabel.call(this, 'speed', speed))
-            );
+        );
 
         controls.updateSetting.call(this, type, list);
     },
