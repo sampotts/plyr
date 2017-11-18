@@ -3,18 +3,15 @@ Beware: This branch is currently in beta and not production-ready
 ---
 
 # Plyr
-A simple, accessible and customizable HTML5, YouTube and Vimeo media player.
 
-[Donate to support Plyr](#donate)
+A simple, lightweight, accessible and customizable HTML5, YouTube and Vimeo media player that supports [*modern*](#browser-support) browsers.
 
-[Checkout the demo](https://plyr.io)
+[Checkout the demo](https://plyr.io) - [Donate to support Plyr](#donate)
 
 [![Image of Plyr](https://cdn.plyr.io/static/demo/screenshot.png)](https://plyr.io)
 
-## Why?
-We wanted a lightweight, accessible and customizable media player that supports [*modern*](#browser-support) browsers. Sure, there are many other players out there but we wanted to keep things simple, using the right elements for the job.
-
 ## Features
+
 - **Accessible** - full support for VTT captions and screen readers
 - **Lightweight** - just 18KB minified and gzipped
 - **[Customisable](#html)** - make the player look how you want with the markup you want
@@ -52,38 +49,45 @@ Created and maintained by Dominik Pschenitschni ([@dpschen](https://github.com/d
 You can grab the source using one of the following package managers.
 
 ### npm
+
 ```
 npm install plyr
 ```
 [https://www.npmjs.com/package/plyr](https://www.npmjs.com/package/plyr)
 
 ## Quick setup
+
 Here's a quick run through on getting up and running. There's also a [demo on Codepen](http://codepen.io/sampotts/pen/jARJYp).
 
 ### HTML
+
 Plyr extends upon the standard HTML5 markup so that's all you need for those types. More info on advanced HTML markup can be found under [initialising](#initialising).
 
 #### HTML5 Video
+
 ```html
 <video poster="/path/to/poster.jpg" id="player" controls>
-  <source src="/path/to/video.mp4" type="video/mp4">
-  <source src="/path/to/video.webm" type="video/webm">
-  <!-- Captions are optional -->
-  <track kind="captions" label="English captions" src="/path/to/captions.vtt" srclang="en" default>
+    <source src="/path/to/video.mp4" type="video/mp4">
+    <source src="/path/to/video.webm" type="video/webm">
+
+    <!-- Captions are optional -->
+    <track kind="captions" label="English captions" src="/path/to/captions.vtt" srclang="en" default>
 </video>
 ```
 
 #### HTML5 Audio
+
 ```html
 <audio id="player" controls>
-  <source src="/path/to/audio.mp3" type="audio/mp3">
-  <source src="/path/to/audio.ogg" type="audio/ogg">
+    <source src="/path/to/audio.mp3" type="audio/mp3">
+    <source src="/path/to/audio.ogg" type="audio/ogg">
 </audio>
 ```
 
 For YouTube and Vimeo, Plyr uses the standard YouTube API markup (an empty `<div>`):
 
 #### YouTube embed
+
 ```html
 <div id="player" data-type="youtube" data-video-id="bTqVqk7FSmY"></div>
 ```
@@ -91,17 +95,19 @@ For YouTube and Vimeo, Plyr uses the standard YouTube API markup (an empty `<div
 Note: `data-video-id` value can now be the ID or URL for the video. This attribute name will change in a future release to reflect this change.
 
 #### Vimeo embed
+
 ```html
 <div id="player" data-type="vimeo" data-video-id="143418951"></div>
 ```
 Note: `data-video-id` value can now be the ID or URL for the video. This attribute name will change in a future release to reflect this change.
 
 ### JavaScript
+
 Include the `plyr.js` script before the closing `</body>` tag and then call `plyr.setup()`. More info on `setup()` can be found under [initialising](#initialising).
 
 ```html
 <script src="path/to/plyr.js"></script>
-<script>var player = new Plyr('#player')</script>
+<script>const player = new Plyr('#player');</script>
 ```
 
 If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for the JavaScript, you can use the following:
@@ -111,6 +117,7 @@ If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for t
 ```
 
 ### CSS
+
 Include the `plyr.css` stylsheet into your `<head>`
 
 ```html
@@ -131,7 +138,7 @@ The SVG sprite is loaded automatically from our CDN (provided by [Fastly](https:
 
 ### LESS & SASS/SCSS
 
-You can use `plyr.less` or `plyr.scss` file included in `/src` as part of your build and change variables to suit your design. The LESS and SASS require you to use the [autoprefixer](https://www.npmjs.com/package/gulp-autoprefixer) plugin (you should already) as all declerations use the W3C definitions - e.g. `appearance: none;` will be prefixed to `-webkit-appearance: none;` by autoprefixer.
+You can use `plyr.less` or `plyr.scss` file included in `/src` as part of your build and change variables to suit your design. The LESS and SASS require you to use the [autoprefixer](https://www.npmjs.com/package/gulp-autoprefixer) plugin (you be should already!) as all declarations use the W3C definitions.
 
 The HTML markup uses the BEM methodology with `plyr` as the block, e.g. `.plyr__controls`. You can change the class hooks in the options to match any custom CSS you write. Check out the JavaScript source for more on this.
 
@@ -202,6 +209,7 @@ const player = new Plyr('#player', { /* options */ });
 The constructor will return a Plyr object that can be used with the [API](#api) methods. See the [API](#api) section for more info.
 
 #### Options
+
 Options can be passed as an object to the constructor as above or as JSON in `data-plyr` attribute on each of your target elements:
 
 ```html
@@ -225,7 +233,7 @@ Option | Type | Default | Description
 `seekTime` | Number | `10` | The time, in seconds, to seek when a user hits fast forward or rewind.
 `volume` | Number | `1` | A number, between 0 and 1, representing the initial volume of the player.
 `muted` | Boolean | `false` | Whether to start playback muted. If the `muted` attribute is present on a `<video>` or `<audio>` element, this will be automatically set to true.
-`clickToPlay` | Boolean | `true` | Click (or tap) of the video container will toggle pause/play.
+`clickToPlay` | Boolean | `true` | Click (or tap) of the video container will toggle play/pause.
 `disableContextMenu` | Boolean | `true` | Disable right click menu on video to <em>help</em> as very primitive obfuscation to prevent downloads of content.
 `hideControls` | Boolean | `true` | Hide video controls automatically after 2s of no mouse or focus movement, on control element blur (tab out), on playback start or entering fullscreen. As soon as the mouse is moved, a control element is focused or playback is paused, the controls reappear instantly.
 `showPosterOnEnd` | Boolean | false | This will restore and *reload* HTML5 video once playback is complete. Note: depending on the browser caching, this may result in the video downloading again (or parts of it). Use with caution.
@@ -233,9 +241,12 @@ Option | Type | Default | Description
 `tooltips` | Object | `{ controls: false, seek: true }` | `controls`: Display control labels as tooltips on `:hover` & `:focus` (by default, the labels are screen reader only). `seek`: Display a seek tooltip to indicate on click where the media would seek to.
 `duration` | Number | `null` | Specify a custom duration for media.
 `displayDuration` | Boolean | `true` | Displays the duration of the media on the "metadataloaded" event (on startup) in the current time display. This will only work if the `preload` attribute is not set to `none` (or is not set at all) and you choose not to display the duration (see `controls` option).
+`invertTime` | Boolean | `true` | Display the current time as a countdown rather than an incremental counter.
+`toggleInvert` | Boolean | `true` | Allow users to click to toggle the above.
 `listeners` | Object | `null` | Allows binding of event listeners to the controls before the default handlers. See the `defaults.js` for available listeners. IF your handler prevents default on the event, the default handler will not fire.
 `captions` | Object | `{ active: false, language: window.navigator.language.split('-')[0] }` | `active`: Toggles if captions should be active by default. `language`: Sets the default language to load (if available).
 `fullscreen` | Object | `{ enabled: true, fallback: true }` | `enabled`: Toggles whether fullscreen should be enabled. `fallback`: Allow fallback to a full-window solution.
+`ratio` | String | `16:9` | The aspect ratio you want to use for embedded players.
 `storage` | Object | `{ enabled: true, key: 'plyr' }` | `enabled`: Allow use of local storage to store user settings. `key`: The key name to use.
 `speed` | Object | `{ selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2] }` | `selected`: The default speed for playback. `options`: Options to display in the menu. Most browsers will refuse to play slower than 0.5.
 `quality` | Object | `{ default: 'default', options: ['hd2160', 'hd1440', 'hd1080', 'hd720', 'large', 'medium', 'small', 'tiny', 'default'] }` | Currently only supported by YouTube. `default` is the default quality level, determined by YouTube. `options` are the options to display.
@@ -320,18 +331,18 @@ Property | Getter | Setter | Description
 `volume` | ✔ | ✔ | Gets or sets the volume for the player. The setter accepts a float between 0 and 1.
 `muted` | ✔ | ✔ | Gets or sets the muted state of the player. The setter accepts a boolean.
 `speed` | ✔ | ✔ | Gets or sets the speed for the player. The setter accepts a value in the options specified in your config. Generally the minimum should be 0.5.
-`quality`¹ | ✔ | ✔ | Gets or sets the quality for the player. The setter accepts a value from the options specified in your config.
+`quality`&sup1; | ✔ | ✔ | Gets or sets the quality for the player. The setter accepts a value from the options specified in your config.
 `loop` | ✔ | ✔ | Gets or sets the current loop state of the player. The setter accepts a boolean.
 `source` | ✔ | ✔ | Gets or sets the current source for the player. The setter accepts an object. See [source setter](#source-setter) below for examples.
-`poster`² | ✔ | ✔ | Gets or sets the current poster image for the player. The setter accepts a string; the URL for the updated poster image.
+`poster`&sup2; | ✔ | ✔ | Gets or sets the current poster image for the player. The setter accepts a string; the URL for the updated poster image.
 `autoplay` | ✔ | ✔ | Gets or sets the autoplay state of the player. The setter accepts a boolean.
 `language` | ✔ | ✔ | Gets or sets the preferred captions language for the player. The setter accepts an ISO two-letter language code. Support for the languages is dependent on the captions you include.
 `pip` | ✔ | ✔ | Gets or sets the picture-in-picture state of the player. The setter accepts a boolean. This currently only supported on Safari 10+ on MacOS Sierra+ and iOS 10+.
 
 1. YouTube only. HTML5 will follow.
-2. HTML5 only
+2. HTML5 only*
 
-#### .source setter
+#### The `.source` setter
 
 This allows changing the player source and type on the fly.
 
@@ -394,7 +405,6 @@ YouTube example:
 ```javascript
 player.source = {
     type: 'video',
-    title: 'Example title',
     sources: [
         {
             src: 'bTqVqk7FSmY',
@@ -411,7 +421,6 @@ Vimeo example
 ```javascript
 player.source = {
     type: 'video',
-    title: 'Example title',
     sources: [
         {
             src: '143418951',
@@ -421,287 +430,107 @@ player.source = {
 };
 ```
 
-Note: `src` can be the video ID or URL
+*Note:* `src` property for YouTube and Vimeo can either be the video ID or the whole URL.
 
-More details on the object parameters
+Property | Type | Description
+-------- | ---- | -----------
+`type` | String | Either `video` or `audio`. *Note:* YouTube and Vimeo are currently not supported as audio sources.
+`title` | String | *Optional.* Title of the new media. Used for the `aria-label` attribute on the play button, and outer container. YouTube and Vimeo are populated automatically.
+`sources` | Array | This is an array of sources. For HTML5 media, the properties of this object are mapped directly to HTML attributes so more can be added to the object if required.
+`poster`&sup1; | String | The URL for the poster image (HTML5 video only).
+`tracks`&sup1; | String | An array of track objects. Each element in the array is mapped directly to a track element and any keys mapped directly to HTML attributes so as in the example above, it will render as `<track kind="captions" label="English" srclang="en" src="https://cdn.selz.com/plyr/1.0/example_captions_en.vtt" default>` and similar for the French version. Booleans are converted to HTML5 value-less attributes.
 
-<table class="table" width="100%">
-  <thead>
-    <tr>
-      <th width="20%">Key</th>
-      <th width="15%">Type</th>
-      <th width="65%">Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><code>type</code></td>
-      <td>String</td>
-      <td>Options are <code>video</code>, <code>audio</code>, <code>youtube</code> and <code>vimeo</code></td>
-    </tr>
-    <tr>
-      <td><code>title</code></td>
-      <td>String</td>
-      <td>Title of the new media. Used for the `aria-label` attribute on the play button, and outer container.</td>
-    </tr>
-    <tr>
-      <td><code>sources</code></td>
-      <td>Array</td>
-      <td>This is an array of sources. <code>type</code> is optional for YouTube and Vimeo when specifying an array. For YouTube and Vimeo media, the video ID or URL must be passed as the source as shown above. The keys of this object are mapped directly to HTML attributes so more can be added to the object if required.</td>
-    </tr>
-    <tr>
-      <td><code>poster</code></td>
-      <td>String</td>
-      <td>URL for the poster image (video only).</td>
-    </tr>
-    <tr>
-      <td><code>tracks</code></td>
-      <td>Array</td>
-      <td>An array of track objects. Each element in the array is mapped directly to a track element and any keys mapped directly to HTML attributes so as in the example above, it will render as `<track kind="captions" label="English" srclang="en" src="https://cdn.selz.com/plyr/1.0/example_captions_en.vtt" default>`. Booleans are converted to HTML5 value-less attributes.</td>
-    </tr>
-  </tbody>
-</table>
+1. HTML5 only
 
 ## Events
+
 You can listen for events on the target element you setup Plyr on (see example under the table). Some events only apply to HTML5 audio and video. Using your reference to the instance, you can use the `on()` API method or `addEventListener()`. Access to the API can be obtained this way through the `event.detail.plyr` property. Here's an example:
 
 ```javascript
-instance.on('ready', function(event) {
-  var instance = event.detail.plyr;
+player.on('ready', event => {
+    const instance = event.detail.plyr;
 });
 ```
 
-These events also bubble up the DOM. The event target will be the container element.
+### Standard Media Events
 
-<table class="table" width="100%">
-  <thead>
-    <tr>
-      <th width="20%">Event name</th>
-	    <th width="20%">HTML5 only</th>
-      <th width="60%">Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><code>ready</code></td>
-      <td></td>
-      <td>Triggered when the instance is ready for API calls.</td>
-    </tr>
-  	<tr>
-  		<td><code>canplay</code></td>
-  		<td>✔</td>
-  		<td>Sent when enough data is available that the media can be played, at least for a couple of frames. This corresponds to the <code>HAVE_ENOUGH_DATA</code> <code>readyState</code>.</td>
-  	</tr>
-  	<tr>
-  		<td><code>canplaythrough</code></td>
-  		<td></td>
-  		<td>Sent when the ready state changes to <code>CAN_PLAY_THROUGH</code>, indicating that the entire media can be played without interruption, assuming the download rate remains at least at the current level. <strong>Note</strong>: Manually setting the <code>currentTime</code> will eventually fire a <code>canplaythrough</code> event in firefox. Other browsers might not fire this event.</td>
-  	</tr>
-  	<tr>
-  		<td><code>emptied</code></td>
-  		<td>✔</td>
-  		<td>The media has become empty; for example, this event is sent if the media has already been loaded (or partially loaded), and the <code>load()</code> method is called to reload it.</td>
-  	</tr>
-  	<tr>
-  		<td><code>ended</code></td>
-  		<td></td>
-  		<td>Sent when playback completes. Note: with Vimeo this does not occur if `loop` is enabled.</td>
-  	</tr>
-  	<tr>
-  		<td><code>error</code></td>
-  		<td>✔</td>
-  		<td>Sent when an error occurs.&nbsp; The element's <code>error</code> attribute contains more information.</td>
-  	</tr>
-  	<tr>
-  		<td><code>loadeddata</code></td>
-  		<td>✔</td>
-  		<td>The first frame of the media has finished loading.</td>
-  	</tr>
-  	<tr>
-  		<td><code>loadedmetadata</code></td>
-  		<td>✔</td>
-  		<td>The media's metadata has finished loading; all attributes now contain as much useful information as they're going to.</td>
-  	</tr>
-  	<tr>
-  		<td><code>loadstart</code></td>
-  		<td>✔</td>
-  		<td>Sent when loading of the media begins.</td>
-  	</tr>
-  	<tr>
-  		<td><code>pause</code></td>
-  		<td></td>
-  		<td>Sent when playback is paused.</td>
-  	</tr>
-  	<tr>
-  		<td><code>play</code></td>
-  		<td></td>
-  		<td>Sent when playback of the media starts after having been paused; that is, when playback is resumed after a prior <code>pause</code> event.</td>
-  	</tr>
-  	<tr>
-  		<td><code>playing</code></td>
-  		<td></td>
-  		<td>Sent when the media begins to play (either for the first time, after having been paused, or after ending and then restarting).</td>
-  	</tr>
-  	<tr>
-  		<td><code>progress</code></td>
-  		<td></td>
-  		<td>Sent periodically to inform interested parties of progress downloading the media. Information about the current amount of the media that has been downloaded is available in the media element's <code>buffered</code> attribute.</td>
-  	</tr>
-  	<tr>
-  		<td><code>seeked</code></td>
-  		<td></td>
-  		<td>Sent when a seek operation completes.</td>
-  	</tr>
-  	<tr>
-  		<td><code>seeking</code></td>
-  		<td></td>
-  		<td>Sent when a seek operation begins.</td>
-  	</tr>
-  	<tr>
-  		<td><code>stalled</code></td>
-  		<td>✔</td>
-  		<td>Sent when the user agent is trying to fetch media data, but data is unexpectedly not forthcoming.</td>
-  	</tr>
-  	<tr>
-  		<td><code>timeupdate</code></td>
-  		<td></td>
-  		<td>The time indicated by the element's <code>currentTime</code> attribute has changed.</td>
-  	</tr>
-  	<tr>
-  		<td><code>volumechange</code></td>
-  		<td></td>
-  		<td>Sent when the audio volume changes (both when the volume is set and when the <code>muted</code> attribute is changed).</td>
-  	</tr>
-  	<tr>
-  		<td><code>waiting</code></td>
-  		<td>✔</td>
-  		<td>Sent when the requested operation (such as playback) is delayed pending the completion of another operation (such as a seek).</td>
-  	</tr>
-  	<tr>
-  		<td><code>enterfullscreen</code></td>
-  		<td></td>
-  		<td>User enters fullscreen (either the proper fullscreen or full-window fallback for older browsers)</td>
-  	</tr>
-  	<tr>
-  		<td><code>exitfullscreen</code></td>
-  		<td></td>
-  		<td>User exits fullscreen</td>
-  	</tr>
-  	<tr>
-  		<td><code>captionsenabled</code></td>
-  		<td></td>
-  		<td>Captions toggled on</td>
-  	</tr>
-  	<tr>
-  		<td><code>captionsdisabled</code></td>
-  		<td></td>
-  		<td>Captions toggled off</td>
-  	</tr>
-    <tr>
-      <td><code>destroyed</code></td>
-      <td></td>
-      <td>When an instance is destroyed. The original element that replaced the container will be returned to your handler as the event target.</td>
-    </tr>
-	</tbody>
-</table>
+Event Type | Description
+---------- | -----------
+`progress` | Sent periodically to inform interested parties of progress downloading the media. Information about the current amount of the media that has been downloaded is available in the media element's `buffered` attribute.
+`playing` | Sent when the media begins to play (either for the first time, after having been paused, or after ending and then restarting).
+`play` | Sent when playback of the media starts after having been paused; that is, when playback is resumed after a prior `pause` event.
+`pause` | Sent when playback is paused.
+`timeupdate` | The time indicated by the element's `currentTime` attribute has changed.
+`volumechange` | Sent when the audio volume changes (both when the volume is set and when the `muted` state is changed).
+`seeking` | Sent when a seek operation begins.
+`seeked` | Sent when a seek operation completes.
+`ratechange` | Sent when the playback speed changes.
+`ended` | Sent when playback completes.
+`enterfullscreen` | Sent when the player enters fullscreen mode (either the proper fullscreen or full-window fallback for older browsers).
+`exitfullscreen` | Sent when the player exits fullscreen mode.
+`captionsenabled` | Sent when captions are enabled.
+`captionsdisabled` | Sent when captions are disabled.
+`languagechange` | Sent when the caption language is changed.
+`controlshidden` | Sent when the controls are hidden.
+`controlsshown` | Sent when the controls are shown.
+`ready` | Triggered when the instance is ready for API calls.
 
-Details borrowed from: [https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events](https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events)
+#### HTML5 only
+
+Event Type | Description
+---------- | -----------
+`loadstart` | Sent when loading of the media begins.
+`loadeddata` | The first frame of the media has finished loading.
+`loadedmetadata` | The media's metadata has finished loading; all attributes now contain as much useful information as they're going to.
+`canplay` | Sent when enough data is available that the media can be played, at least for a couple of frames. This corresponds to the `HAVE_ENOUGH_DATA` `readyState`.
+`canplaythrough` | Sent when the ready state changes to `CAN_PLAY_THROUGH`, indicating that the entire media can be played without interruption, assuming the download rate remains at least at the current level. *Note:* Manually setting the `currentTime` will eventually fire a `canplaythrough` event in firefox. Other browsers might not fire this event.
+`stalled` | Sent when the user agent is trying to fetch media data, but data is unexpectedly not forthcoming.
+`waiting` | Sent when the requested operation (such as playback) is delayed pending the completion of another operation (such as a seek).
+`emptied` | he media has become empty; for example, this event is sent if the media has already been loaded (or partially loaded), and the `load()` method is called to reload it.
+`cuechange` | Sent when a `TextTrack` has changed the currently displaying cues.
+`error` | Sent when an error occurs. The element's `error` attribute contains more information.
+
+#### YouTube only
+
+Event Type | Description
+---------- | -----------
+`statechange` | The state of the player has changed. The code can be accessed via `event.detail.code`. Possible values are `-1`: Unstarted, `0`: Ended, `1`: Playing, `2`: Paused, `3`: Buffering, `5`: Video cued. See the [YouTube Docs](https://developers.google.com/youtube/iframe_api_reference#onStateChange) for more information.
+`qualitychange` | The quality of playback has changed.
+`qualityrequested` | A change to playback quality has been requested. *Note:* A change to quality can only be *requested* via the API. There is no guarantee the quality will change to the level requested. You should listen to the `qualitychange` event for true changes.
+
+*Note:* These events also bubble up the DOM. The event target will be the container element.
+
+Some event details borrowed from [MDN](https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Media_events).
 
 ## Embeds
-YouTube and Vimeo are currently supported and function much like a HTML5 video. Check the relevant documentation sections for any differences.
 
-Plyr references a custom version of the Vimeo Froogaloop API as Vimeo have neglected to maintain the library and there were bugs with their version. You don't need to worry about including your own versions of the Vimeo or YouTube JavaScript APIs.
+YouTube and Vimeo are currently supported and function much like a HTML5 video. Similar events and API methods are available for all types. However if you wish to access the API's directly. You can do so via the `embed` property of your player object - e.g. `player.embed`. You can then use the relevant methods from the third party APIs. More info on the respective API's here:
 
-The embed third party API's can be accessed through the `getEmbed()` API method.
+- [YouTube iframe API Reference](https://developers.google.com/youtube/iframe_api_reference)
+- [Vimeo player.js Reference](https://github.com/vimeo/player.js)
 
-More info on the respective API's here:
-
-- [YouTube API Reference](https://developers.google.com/youtube/js_api_reference)
-- [Vimeo API Reference](https://developer.vimeo.com/player/js-api#reference)
-
-*Please note*: not all API methods may work 100%. Your mileage may vary. It's better to use the universal plyr API where possible.
+*Note*: Not all API methods may work 100%. Your mileage may vary. It's better to use the Plyr API where possible.
 
 ## Shortcuts
+
 By default, a player will bind the following keyboard shortcuts when it has focus. If you have the `global` option to `true` and there's only one player in the document then the shortcuts will work when any element has focus, apart from an element that requires input.
 
-<table class="table" width="100%">
-  <thead>
-    <tr>
-      <th width="25%">Key</th>
-      <th width="25%">Global</th>
-      <th width="50%">Action</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><code>0</code> to <code>9</code></td>
-      <td>✔</td>
-      <td>Seek from 0 to 90% respectively</td>
-    </tr>
-    <tr>
-      <td><code>space</code></td>
-      <td></td>
-      <td>Toggle playback</td>
-    </tr>
-    <tr>
-      <td><code>K</code></td>
-      <td>✔</td>
-      <td>Toggle playback</td>
-    </tr>
-    <tr>
-      <td><code>&larr;</code></td>
-      <td></td>
-      <td>Seek backward by the <code>seekTime</code> option</td>
-    </tr>
-    <tr>
-      <td><code>&rarr;</code></td>
-      <td></td>
-      <td>Seek forward by the <code>seekTime</code> option</td>
-    </tr>
-    <tr>
-      <td><code>&uarr;</code></td>
-      <td></td>
-      <td>Increase volume</td>
-    </tr>
-    <tr>
-      <td><code>&darr;</code></td>
-      <td></td>
-      <td>Decrease volume</td>
-    </tr>
-    <tr>
-      <td><code>M</code></td>
-      <td>✔</td>
-      <td>Toggle mute</td>
-    </tr>
-    <tr>
-      <td><code>F</code></td>
-      <td>✔</td>
-      <td>Toggle fullscreen</td>
-    </tr>
-    <tr>
-      <td><code>C</code></td>
-      <td>✔</td>
-      <td>Toggle captions</td>
-    </tr>
-    <tr>
-      <td><code>l</code></td>
-      <td></td>
-      <td>Toggle Loop All/No Loop</td>
-    </tr>
-    <tr>
-      <td><code>i</code></td>
-      <td></td>
-      <td>Set the start marker of the loop</td>
-    </tr>
-    <tr>
-      <td><code>o</code></td>
-      <td></td>
-      <td>Set the end marker of the loop</td>
-    </tr>
-  </tbody>
-</table>
+Key | Action
+--- | ------
+`0` to `9` | Seek from 0 to 90% respectively
+`space` | Toggle playback
+`K` | Toggle playback
+&larr; | Seek backward by the `seekTime` option
+&rarr; | Seek forward by the `seekTime` option
+&uarr; | Increase volume
+&darr; | Decrease volume
+`M` | Toggle mute
+`F` | Toggle fullscreen
+`C` | Toggle captions
+`L` | Toggle loop
 
 ## Streaming
+
 Because Plyr is an extension of the standard HTML5 video and audio elements, third party streaming plugins can be used with Plyr. Massive thanks to Matias Russitto ([@russitto](https://github.com/russitto)) for working on this. Here's a few examples:
 
 - Using [hls.js](https://github.com/dailymotion/hls.js) - [Demo](http://codepen.io/sampotts/pen/JKEMqB)
@@ -709,62 +538,54 @@ Because Plyr is an extension of the standard HTML5 video and audio elements, thi
 - Using [dash.js](https://github.com/Dash-Industry-Forum/dash.js) - [Demo](http://codepen.io/sampotts/pen/BzpJXN)
 
 ## Fullscreen
+
 Fullscreen in Plyr is supported by all browsers that [currently support it](http://caniuse.com/#feat=fullscreen).
 
 ## Browser support
 
-<table width="100%" style="text-align: center">
-  <thead>
-    <tr>
-      <td>Safari</td>
-      <td>Firefox</td>
-      <td>Chrome</td>
-      <td>Opera</td>
-      <td>IE9</td>
-      <td>IE10+</td>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>✔&sup1;</td>
-      <td>✔</td>
-      <td>✔</td>
-      <td>✔</td>
-      <td>API&sup2;</td>
-      <td>✔&sup3;</td>
-    </tr>
-  </tbody>
-</table>
+Plyr supports the last 2 versions of most *modern* browsers. IE11 is also supported.
 
-&sup1; Mobile Safari on the iPhone forces the native player for `<video>` so no useful customization is possible. `<audio>` elements have volume controls disabled.
+Browser | Supported
+------- | ---------
+Safari | ✔
+Mobile Safari | ✔&sup1;
+Firefox | ✔
+Chrome | ✔
+Opera | ✔
+Edge | ✔
+IE10+ | ✔&sup2;
+IE9 | API only&sup3;
 
-&sup2; Native player used (no support for `<progress>` or `<input type="range">`) but the API is supported (v1.0.28+)
-
-&sup3; IE10 has no native fullscreen support, fallback can be used (see [options](#options))
+1. Mobile Safari on the iPhone forces the native player for `<video>` unless the `playsinline` attribute is present. Volume controls are also disabled.
+2. Native player used (no support for `<progress>` or `<input type="range">`) but the API is supported (v1.0.28+)
+3. IE10 has no native fullscreen support, fallback can be used (see [options](#options))
 
 The `enabled` option can be used to disable certain User Agents. For example, if you don't want to use Plyr for smartphones, you could use:
 
 ```javascript
-enabled: /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent)
+{ enabled: /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent) }
 ```
 If a User Agent is disabled but supports `<video>` and `<audio>` natively, it will use the native player.
 
-Any unsupported browsers will display links to download the media if the correct html is used.
-
 ## RangeTouch
+
 Some touch browsers (particularly Mobile Safari on iOS) seem to have issues with `<input type="range">` elements whereby touching the track to set the value doesn't work and sliding the thumb can be tricky. To combat this, I've created [RangeTouch](https://rangetouch.com) which I'd recommend including in your solution. It's a tiny script with a nice benefit for users on touch devices.
 
 ## Issues
+
 If you find anything weird with Plyr, please let us know using the GitHub issues tracker.
 
 ## Author
+
 Plyr is developed by [@sam_potts](https://twitter.com/sam_potts) / [sampotts.me](http://sampotts.me) with help from the awesome [contributors](https://github.com/sampotts/plyr/graphs/contributors)
 
 ## Donate
-Plyr costs money to run, not my time - I donate that for free but domains, hosting and more. Any help is appreciated...
+
+Plyr costs money to run, not only my time - I donate that for free but domains, hosting and more. Any help is appreciated...
 [Donate to support Plyr](https://www.paypal.me/pottsy/20usd)
 
 ## Mentions
+
 - [ProductHunt](https://www.producthunt.com/tech/plyr)
 - [The Changelog](http://thechangelog.com/plyr-simple-html5-media-player-custom-controls-webvtt-captions/)
 - [HTML5 Weekly #177](http://html5weekly.com/issues/177)
@@ -777,6 +598,7 @@ Plyr costs money to run, not my time - I donate that for free but domains, hosti
 - [noupe.com](http://www.noupe.com/design/html5-plyr-is-a-responsive-and-accessible-video-player-94389.html)
 
 ## Used by
+
 - [Selz.com](https://selz.com)
 - [Peugeot.fr](http://www.peugeot.fr/marque-et-technologie/technologies/peugeot-i-cockpit.html)
 - [Peugeot.de](http://www.peugeot.de/modelle/modellberater/208-3-turer/fotos-videos.html)
@@ -790,14 +612,17 @@ Plyr costs money to run, not my time - I donate that for free but domains, hosti
 Let me know on [Twitter](https://twitter.com/sam_potts) I can add you to the above list. It'd be awesome to see how you're using Plyr :-)
 
 ## Useful links and credits
+
 Credit to the PayPal HTML5 Video player from which Plyr's caption functionality was originally ported from:
 - [PayPal's Accessible HTML5 Video Player](https://github.com/paypal/accessible-html5-video-player)
 - [An awesome guide for Plyr in Japanese!](http://syncer.jp/how-to-use-plyr-io) by [@arayutw](https://twitter.com/arayutw)
 
 ## Thanks
+
 [![Fastly](https://www.fastly.com/sites/all/themes/custom/fastly2016/logo.png)](https://www.fastly.com/)
 
-Thanks to [Fastly](https://www.fastly.com/) for providing the CDN services.
+Massive thanks to [Fastly](https://www.fastly.com/) for providing the CDN services.
 
 ## Copyright and License
-[The MIT license](license.md).
+
+[The MIT license](license.md)

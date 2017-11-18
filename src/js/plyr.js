@@ -669,7 +669,7 @@ class Plyr {
         const language = input.toLowerCase();
 
         // If nothing to change, bail
-        if (this.captions.language === language) {
+        if (this.language === language) {
             return;
         }
 
@@ -680,7 +680,7 @@ class Plyr {
         this.captions.language = language;
 
         // Trigger an event
-        utils.dispatchEvent.call(this, this.media, 'captionchange');
+        utils.dispatchEvent.call(this, this.media, 'languagechange');
 
         // Clear caption
         captions.set.call(this);
@@ -797,31 +797,28 @@ class Plyr {
 
     // Show the player controls in fullscreen mode
     toggleControls(toggle) {
-        const player = this;
-
         // We need controls of course...
         if (!utils.is.htmlElement(this.elements.controls)) {
-            return player;
+            return this;
         }
 
         // Don't hide if config says not to, it's audio, or not ready or loading
         if (!this.supported.ui || !this.config.hideControls || this.type === 'audio') {
-            return player;
+            return this;
         }
 
         let delay = 0;
         let show = toggle;
         let isEnterFullscreen = false;
-        const loading = utils.hasClass(this.elements.container, this.config.classNames.loading);
 
-        // Default to false if no boolean
+        // Get toggle state if not set
         if (!utils.is.boolean(toggle)) {
             if (utils.is.event(toggle)) {
                 // Is the enter fullscreen event
                 isEnterFullscreen = toggle.type === 'enterfullscreen';
 
                 // Whether to show controls
-                show = ['mousemove', 'touchstart', 'mouseenter', 'focus'].includes(toggle.type);
+                show = ['click', 'mousemove', 'touchmove', 'mouseenter', 'focusin'].includes(toggle.type);
 
                 // Delay hiding on move events
                 if (['mousemove', 'touchmove'].includes(toggle.type)) {
@@ -829,8 +826,9 @@ class Plyr {
                 }
 
                 // Delay a little more for keyboard users
-                if (toggle.type === 'focus') {
+                if (toggle.type === 'focusin') {
                     delay = 3000;
+                    utils.toggleClass(this.elements.controls, this.config.classNames.noTransition, true);
                 }
             } else {
                 show = utils.hasClass(this.elements.container, this.config.classNames.hideControls);
@@ -841,7 +839,7 @@ class Plyr {
         window.clearTimeout(this.timers.hover);
 
         // If the mouse is not over the controls, set a timeout to hide them
-        if (show || this.media.paused || loading) {
+        if (show || this.media.paused || this.loading) {
             // Check if controls toggled
             const toggled = utils.toggleClass(this.elements.container, this.config.classNames.hideControls, false);
 
@@ -851,8 +849,8 @@ class Plyr {
             }
 
             // Always show controls when paused or if touch
-            if (this.media.paused || loading) {
-                return player;
+            if (this.media.paused || this.loading) {
+                return this;
             }
 
             // Delay for hiding on touch
@@ -868,6 +866,11 @@ class Plyr {
                 // If the mouse is over the controls (and not entering fullscreen), bail
                 if ((this.elements.controls.pressed || this.elements.controls.hover) && !isEnterFullscreen) {
                     return;
+                }
+
+                // Restore transition behaviour
+                if (!utils.hasClass(this.elements.container, this.config.classNames.hideControls)) {
+                    utils.toggleClass(this.elements.controls, this.config.classNames.noTransition, false);
                 }
 
                 // Check if controls toggled

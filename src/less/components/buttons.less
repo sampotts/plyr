@@ -53,13 +53,13 @@
 .plyr__play-large {
     display: none;
     position: absolute;
-    z-index: 1;
+    z-index: 3;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    padding: ceil(@plyr-control-spacing * 1.25);
+    padding: ceil(@plyr-control-spacing * 1.5);
     background: fade(@plyr-video-control-bg-hover, 80%);
-    border: 3px solid currentColor;
+    border: 0;
     border-radius: 100%;
     box-shadow: 0 1px 1px fade(#000, 15%);
     color: @plyr-video-control-color;
@@ -81,7 +81,12 @@
     }
 
     &:focus {
-        outline: 1px dotted fade(@plyr-video-control-color, 50%);
+        outline: 0;
+    }
+
+    &.plyr__tab-focus {
+        outline: 0;
+        box-shadow: 0 0 0 3px fade(@plyr-video-control-color, 50%);
     }
 }
 

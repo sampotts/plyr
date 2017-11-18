@@ -12,6 +12,8 @@
     cursor: pointer;
     border: none;
     background: transparent;
+    transition: box-shadow 0.3s ease;
+    border-radius: (@plyr-range-thumb-height * 2);
 
     // Used in JS to populate lower fill for WebKit
     color: @plyr-range-selected-bg;
@@ -79,10 +81,6 @@
         border: 0;
     }
 
-    &.plyr__tab-focus {
-        outline-offset: 3px;
-    }
-
     // Pressed styles
     &:active {
         &::-webkit-slider-thumb {
@@ -114,7 +112,7 @@
     }
 
     &.plyr__tab-focus {
-        outline: 1px dotted fade(@plyr-video-control-color, 50%);
+        box-shadow: 0 0 0 3px fade(@plyr-video-control-color, 50%);
     }
 }
 
@@ -133,6 +131,6 @@
     }
 
     &.plyr__tab-focus {
-        outline: 1px dotted fade(@plyr-audio-control-color, 50%);
+        box-shadow: 0 0 0 3px fade(@plyr-audio-control-color, 50%);
     }
 }

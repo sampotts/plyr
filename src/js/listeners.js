@@ -101,7 +101,6 @@ const listeners = {
                     case 75:
                         // Space and K key
                         if (!held) {
-                            this.console.warn('togglePlay', event.type);
                             this.togglePlay();
                         }
                         break;
@@ -119,7 +118,7 @@ const listeners = {
                     case 77:
                         // M key
                         if (!held) {
-                            this.muted = 'toggle';
+                            this.muted = !this.muted;
                         }
                         break;
 
@@ -143,6 +142,11 @@ const listeners = {
                         if (!held) {
                             this.toggleCaptions();
                         }
+                        break;
+
+                    case 76:
+                        // L key
+                        this.loop = !this.loop;
                         break;
 
                     /* case 73:
@@ -205,7 +209,7 @@ const listeners = {
             // Toggle controls on mouse events and entering fullscreen
             utils.on(
                 this.elements.container,
-                'mouseenter mouseleave mousemove touchstart touchend touchcancel touchmove enterfullscreen',
+                'click mouseenter mouseleave mousemove touchmove enterfullscreen exitfullscreen',
                 event => {
                     this.toggleControls(event);
                 }
@@ -213,11 +217,11 @@ const listeners = {
         }
 
         // Handle user exiting fullscreen by escaping etc
-        if (fullscreen.enabled) {
+        /* if (fullscreen.enabled) {
             utils.on(document, fullscreen.eventType, event => {
                 this.toggleFullscreen(event);
             });
-        }
+        } */
     },
 
     // Listen for media events
@@ -226,7 +230,7 @@ const listeners = {
         utils.on(this.media, 'timeupdate seeking', event => ui.timeUpdate.call(this, event));
 
         // Display duration
-        utils.on(this.media, 'durationchange loadedmetadata', event => ui.displayDuration.call(this, event));
+        utils.on(this.media, 'durationchange loadedmetadata', event => ui.durationUpdate.call(this, event));
 
         // Handle the media finishing
         utils.on(this.media, 'ended', () => {
@@ -314,7 +318,7 @@ const listeners = {
         });
 
         // Caption language change
-        utils.on(this.media, 'captionchange', () => {
+        utils.on(this.media, 'languagechange', () => {
             // Save to storage
             storage.set.call(this, { language: this.language });
         });
@@ -337,7 +341,14 @@ const listeners = {
         // Proxy events to container
         // Bubble up key events for Edge
         utils.on(this.media, this.config.events.concat(['keyup', 'keydown']).join(' '), event => {
-            utils.dispatchEvent.call(this, this.elements.container, event.type, true);
+            let detail = {};
+
+            // Get error details from media
+            if (event.type === 'error') {
+                detail = this.media.error;
+            }
+
+            utils.dispatchEvent.call(this, this.elements.container, event.type, true, detail);
         });
     },
 
@@ -452,11 +463,16 @@ const listeners = {
             controls.showTab.call(this, event);
 
             // Settings menu items - use event delegation as items are added/removed
-            // Settings - Language
             if (utils.matches(event.target, this.config.selectors.inputs.language)) {
+                // Settings - Language
                 proxy(event, 'language', () => {
-                    this.toggleCaptions(true);
-                    this.language = event.target.value.toLowerCase();
+                    const language = event.target.value;
+
+                    this.toggleCaptions(!utils.is.empty(language));
+
+                    if (!utils.is.empty(language)) {
+                        this.language = event.target.value.toLowerCase();
+                    }
                 });
             } else if (utils.matches(event.target, this.config.selectors.inputs.quality)) {
                 // Settings - Quality
@@ -468,7 +484,7 @@ const listeners = {
                 proxy(event, 'speed', () => {
                     this.speed = parseFloat(event.target.value);
                 });
-            } else if (utils.matches(event.target, this.config.selectors.buttons.loop)) {
+            } /* else if (utils.matches(event.target, this.config.selectors.buttons.loop)) {
                 // Settings - Looping
                 // TODO: use toggle buttons
                 proxy(event, 'loop', () => {
@@ -477,7 +493,7 @@ const listeners = {
 
                     this.console.warn('Set loop');
                 });
-            }
+            } */
         });
 
         // Seek
@@ -486,6 +502,20 @@ const listeners = {
                 this.currentTime = event.target.value / event.target.max * this.duration;
             })
         );
+
+        // Current time invert
+        // Only if one time element is used for both currentTime and duration
+        if (this.config.toggleInvert && !utils.is.htmlElement(this.elements.display.duration)) {
+            utils.on(this.elements.display.currentTime, 'click', () => {
+                // Do nothing if we're at the start
+                if (this.currentTime === 0) {
+                    return;
+                }
+
+                this.config.invertTime = !this.config.invertTime;
+                ui.timeUpdate.call(this);
+            });
+        }
 
         // Volume
         utils.on(this.elements.inputs.volume, inputEvent, event =>
@@ -522,7 +552,7 @@ const listeners = {
             // TODO: Check we need capture here
             utils.on(
                 this.elements.controls,
-                'focus blur',
+                'focusin focusout',
                 event => {
                     this.toggleControls(event);
                 },

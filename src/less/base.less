@@ -12,6 +12,7 @@
     line-height: @plyr-line-height;
     direction: ltr;
     text-shadow: none;
+    transition: box-shadow 0.3s ease;
     .plyr-font-smoothing(off);
 
     // Media elements
@@ -21,6 +22,11 @@
         height: auto;
         vertical-align: middle;
         border-radius: inherit;
+    }
+
+    &:focus {
+        outline: 0;
+        box-shadow: 0 0 0 3px fade(#000, 10%);
     }
 }
 

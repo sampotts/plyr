@@ -65,7 +65,6 @@ const media = {
             utils.wrap(this.media, this.elements.wrapper);
         }
 
-        // Embeds
         if (this.isEmbed) {
             switch (this.type) {
                 case 'youtube':
@@ -79,9 +78,9 @@ const media = {
                 default:
                     break;
             }
+        } else {
+            ui.setTitle.call(this);
         }
-
-        ui.setTitle.call(this);
     },
 
     // Cancel current network requests

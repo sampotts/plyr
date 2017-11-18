@@ -22,13 +22,20 @@ const defaults = {
     // Pass a custom duration
     duration: null,
 
-    // Display the media duration
+    // Display the media duration on load in the current time position
+    // If you have opted to display both duration and currentTime, this is ignored
     displayDuration: true,
+
+    // Invert the current time to be a countdown
+    invertTime: true,
+
+    // Clicking the currentTime inverts it's value to show time left rather than elapsed
+    toggleInvert: true,
 
     // Aspect ratio (for embeds)
     ratio: '16:9',
 
-    // Click video to play
+    // Click video container to play/pause
     clickToPlay: true,
 
     // Auto hide the controls
@@ -203,7 +210,7 @@ const defaults = {
         'exitfullscreen',
         'captionsenabled',
         'captionsdisabled',
-        'captionchange',
+        'languagechange',
         'controlshidden',
         'controlsshown',
         'ready',
@@ -276,6 +283,7 @@ const defaults = {
         isIos: 'plyr--is-ios',
         isTouch: 'plyr--is-touch',
         uiSupported: 'plyr--full-ui',
+        noTransition: 'plyr--no-transition',
         menu: {
             value: 'plyr__menu__value',
             badge: 'plyr__badge',
@@ -297,6 +305,11 @@ const defaults = {
             active: 'plyr--airplay-active',
         },
         tabFocus: 'plyr__tab-focus',
+    },
+
+    // API keys
+    keys: {
+        google: null,
     },
 };
 

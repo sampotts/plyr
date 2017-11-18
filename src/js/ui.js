@@ -15,7 +15,7 @@ const ui = {
     },
 
     // Toggle native HTML5 media controls
-    toggleNativeControls(toggle) {
+    toggleNativeControls(toggle = false) {
         if (toggle && this.isHTML5) {
             this.media.setAttribute('controls', '');
         } else {
@@ -96,31 +96,8 @@ const ui = {
         // Ready event at end of execution stack
         utils.dispatchEvent.call(this, this.media, 'ready');
 
-        // Autoplay
-        // TODO: check we still need this?
-        /* if (this.isEmbed && this.config.autoplay) {
-            this.play();
-        } */
-    },
-
-    // Show the duration on metadataloaded
-    displayDuration() {
-        if (!this.supported.ui) {
-            return;
-        }
-
-        // If there's only one time display, display duration there
-        if (!this.elements.display.duration && this.config.displayDuration && this.paused) {
-            ui.updateTimeDisplay.call(this, this.duration, this.elements.display.currentTime);
-        }
-
-        // If there's a duration element, update content
-        if (this.elements.display.duration) {
-            ui.updateTimeDisplay.call(this, this.duration, this.elements.display.duration);
-        }
-
-        // Update the tooltip (if visible)
-        controls.updateSeekTooltip.call(this);
+        // Set the title
+        ui.setTitle.call(this);
     },
 
     // Setup aria attribute for play and iframe title
@@ -137,13 +114,10 @@ const ui = {
         }
 
         // If there's a play button, set label
-        if (this.supported.ui) {
-            if (utils.is.htmlElement(this.elements.buttons.play)) {
-                this.elements.buttons.play.setAttribute('aria-label', label);
-            }
-            if (utils.is.htmlElement(this.elements.buttons.playLarge)) {
-                this.elements.buttons.playLarge.setAttribute('aria-label', label);
-            }
+        if (utils.is.nodeList(this.elements.buttons.play)) {
+            Array.from(this.elements.buttons.play).forEach(button => {
+                button.setAttribute('aria-label', label);
+            });
         }
 
         // Set iframe title
@@ -171,23 +145,6 @@ const ui = {
         this.toggleControls(this.paused);
     },
 
-    // Update volume UI and storage
-    updateVolume() {
-        if (!this.supported.ui) {
-            return;
-        }
-
-        // Update range
-        if (utils.is.htmlElement(this.elements.inputs.volume)) {
-            ui.setRange.call(this, this.elements.inputs.volume, this.muted ? 0 : this.volume);
-        }
-
-        // Update checkbox for mute state
-        if (utils.is.htmlElement(this.elements.buttons.mute)) {
-            utils.toggleState(this.elements.buttons.mute, this.muted || this.volume === 0);
-        }
-    },
-
     // Check if media is loading
     checkLoading(event) {
         this.loading = event.type === 'waiting';
@@ -205,8 +162,25 @@ const ui = {
         }, this.loading ? 250 : 0);
     },
 
+    // Update volume UI and storage
+    updateVolume() {
+        if (!this.supported.ui) {
+            return;
+        }
+
+        // Update range
+        if (utils.is.htmlElement(this.elements.inputs.volume)) {
+            ui.setRange.call(this, this.elements.inputs.volume, this.muted ? 0 : this.volume);
+        }
+
+        // Update checkbox for mute state
+        if (utils.is.htmlElement(this.elements.buttons.mute)) {
+            utils.toggleState(this.elements.buttons.mute, this.muted || this.volume === 0);
+        }
+    },
+
     // Update seek value and lower fill
-    setRange(target, value) {
+    setRange(target, value = 0) {
         if (!utils.is.htmlElement(target)) {
             return;
         }
@@ -220,9 +194,8 @@ const ui = {
 
     // Set <progress> value
     setProgress(target, input) {
-        // Default to 0
-        const value = !utils.is.undefined(input) ? input : 0;
-        const progress = !utils.is.undefined(target) ? target : this.elements.display.buffer;
+        const value = utils.is.number(input) ? input : 0;
+        const progress = utils.is.htmlElement(target) ? target : this.elements.display.buffer;
 
         // Update value and label
         if (utils.is.htmlElement(progress)) {
@@ -238,7 +211,7 @@ const ui = {
 
     // Update <progress> elements
     updateProgress(event) {
-        if (!this.supported.ui) {
+        if (!this.supported.ui || !utils.is.event(event)) {
             return;
         }
 
@@ -286,41 +259,49 @@ const ui = {
     },
 
     // Update the displayed time
-    updateTimeDisplay(value, element) {
-        // Bail if there's no duration display
-        if (!utils.is.htmlElement(element)) {
-            return null;
+    updateTimeDisplay(target = null, time = 0, inverted = false) {
+        // Bail if there's no element to display or the value isn't a number
+        if (!utils.is.htmlElement(target) || !utils.is.number(time)) {
+            return;
         }
 
-        // Fallback to 0
-        const time = !Number.isNaN(value) ? value : 0;
+        // Format time component to add leading zero
+        const format = value => `0${value}`.slice(-2);
 
-        let secs = parseInt(time % 60, 10);
-        let mins = parseInt((time / 60) % 60, 10);
-        const hours = parseInt((time / 60 / 60) % 60, 10);
+        // Helpers
+        const getHours = value => parseInt((value / 60 / 60) % 60, 10);
+        const getMinutes = value => parseInt((value / 60) % 60, 10);
+        const getSeconds = value => parseInt(value % 60, 10);
+
+        // Breakdown to hours, mins, secs
+        let hours = getHours(time);
+        const mins = getMinutes(time);
+        const secs = getSeconds(time);
 
         // Do we need to display hours?
-        const displayHours = parseInt((this.duration / 60 / 60) % 60, 10) > 0;
-
-        // Ensure it's two digits. For example, 03 rather than 3.
-        secs = `0${secs}`.slice(-2);
-        mins = `0${mins}`.slice(-2);
-
-        // Generate display
-        const display = `${(displayHours ? `${hours}:` : '') + mins}:${secs}`;
+        if (getHours(this.duration) > 0) {
+            hours = `${hours}:`;
+        } else {
+            hours = '';
+        }
 
         // Render
-        // eslint-disable-next-line
-        element.textContent = display;
-
-        // Return for looping
-        return display;
+        // eslint-disable-next-line no-param-reassign
+        target.textContent = `${inverted ? '-' : ''}${hours}${format(mins)}:${format(secs)}`;
     },
 
     // Handle time change event
     timeUpdate(event) {
+        // Only invert if only one time element is displayed and used for both duration and currentTime
+        const invert = !utils.is.htmlElement(this.elements.display.duration) && this.config.invertTime;
+
         // Duration
-        ui.updateTimeDisplay.call(this, this.currentTime, this.elements.display.currentTime);
+        ui.updateTimeDisplay.call(
+            this,
+            this.elements.display.currentTime,
+            invert ? this.duration - this.currentTime : this.currentTime,
+            invert
+        );
 
         // Ignore updates while seeking
         if (event && event.type === 'timeupdate' && this.media.seeking) {
@@ -329,6 +310,26 @@ const ui = {
 
         // Playing progress
         ui.updateProgress.call(this, event);
+    },
+
+    // Show the duration on metadataloaded
+    durationUpdate() {
+        if (!this.supported.ui) {
+            return;
+        }
+
+        // If there's only one time display, display duration there
+        if (!utils.is.htmlElement(this.elements.display.duration) && this.config.displayDuration && this.paused) {
+            ui.updateTimeDisplay.call(this, this.elements.display.currentTime, this.duration);
+        }
+
+        // If there's a duration element, update content
+        if (utils.is.htmlElement(this.elements.display.duration)) {
+            ui.updateTimeDisplay.call(this, this.elements.display.duration, this.duration);
+        }
+
+        // Update the tooltip (if visible)
+        controls.updateSeekTooltip.call(this);
     },
 };
 

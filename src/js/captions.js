@@ -79,8 +79,9 @@ const captions = {
 
             // Filter doesn't seem to work for a TextTrackList :-(
             Array.from(this.captions.tracks).forEach(track => {
-                if (track.language === this.captions.language.toLowerCase()) {
+                if (track.language.toLowerCase() === this.language.toLowerCase()) {
                     this.captions.currentTrack = track;
+                    console.warn(`Set current track to ${this.language}`);
                 }
             });
         };

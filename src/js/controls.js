@@ -75,7 +75,7 @@ const controls = {
         const use = document.createElementNS(namespace, 'use');
         const path = `${iconPath}-${type}`;
 
-        // If the new `href` attribute is supported, use that
+        // Set `href` attributes
         // https://github.com/sampotts/plyr/issues/460
         // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xlink:href
         if ('href' in use) {
@@ -118,6 +118,10 @@ const controls = {
 
     // Create a badge
     createBadge(text) {
+        if (utils.is.empty(text)) {
+            return null;
+        }
+
         const badge = utils.createElement('span', {
             class: this.config.classNames.menu.value,
         });
@@ -322,6 +326,39 @@ const controls = {
         return container;
     },
 
+    // Create a settings menu item
+    createMenuItem(value, list, type, title, badge = null, checked = false) {
+        const item = utils.createElement('li');
+
+        const label = utils.createElement('label', {
+            class: this.config.classNames.control,
+        });
+
+        const radio = utils.createElement(
+            'input',
+            utils.extend(utils.getAttributesFromSelector(this.config.selectors.inputs[type]), {
+                type: 'radio',
+                name: `plyr-${type}`,
+                value,
+                checked,
+                class: 'plyr__sr-only',
+            })
+        );
+
+        const faux = utils.createElement('span', { 'aria-hidden': true });
+
+        label.appendChild(radio);
+        label.appendChild(faux);
+        label.insertAdjacentHTML('beforeend', title);
+
+        if (utils.is.htmlElement(badge)) {
+            label.appendChild(badge);
+        }
+
+        item.appendChild(label);
+        list.appendChild(item);
+    },
+
     // Update hover tooltip for seeking
     updateSeekTooltip(event) {
         // Bail if setting not true
@@ -356,7 +393,7 @@ const controls = {
         }
 
         // Display the time a click would seek to
-        ui.updateTimeDisplay.call(this, this.duration / 100 * percent, this.elements.display.seekTooltip);
+        ui.updateTimeDisplay.call(this, this.elements.display.seekTooltip, this.duration / 100 * percent);
 
         // Set position
         this.elements.display.seekTooltip.style.left = `${percent}%`;
@@ -393,6 +430,7 @@ const controls = {
     // Set the YouTube quality menu
     // TODO: Support for HTML5
     setQualityMenu(options) {
+        const type = 'quality';
         const list = this.elements.settings.panes.quality.querySelector('ul');
 
         // Set options if passed and filter based on config
@@ -404,7 +442,7 @@ const controls = {
 
         // Toggle the pane and tab
         const toggle = !utils.is.empty(this.options.quality) && this.type === 'youtube';
-        controls.toggleTab.call(this, 'quality', toggle);
+        controls.toggleTab.call(this, type, toggle);
 
         // If we're hiding, nothing more to do
         if (!toggle) {
@@ -446,35 +484,18 @@ const controls = {
             return controls.createBadge.call(this, label);
         };
 
-        this.options.quality.forEach(quality => {
-            const item = utils.createElement('li');
-
-            const label = utils.createElement('label', {
-                class: this.config.classNames.control,
-            });
-
-            const radio = utils.createElement(
-                'input',
-                utils.extend(utils.getAttributesFromSelector(this.config.selectors.inputs.quality), {
-                    type: 'radio',
-                    name: 'plyr-quality',
-                    value: quality,
-                })
+        this.options.quality.forEach(quality =>
+            controls.createMenuItem.call(
+                this,
+                quality,
+                list,
+                type,
+                controls.getLabel.call(this, 'quality', quality),
+                getBadge(quality)
+            )
             );
 
-            label.appendChild(radio);
-            label.appendChild(document.createTextNode(controls.getLabel.call(this, 'quality', quality)));
-
-            const badge = getBadge(quality);
-            if (utils.is.htmlElement(badge)) {
-                label.appendChild(badge);
-            }
-
-            item.appendChild(label);
-            list.appendChild(item);
-        });
-
-        controls.updateSetting.call(this, 'quality', list);
+        controls.updateSetting.call(this, type, list);
     },
 
     // Translate a value into a nice label
@@ -576,7 +597,7 @@ const controls = {
     },
 
     // Set the looping options
-    setLoopMenu() {
+    /* setLoopMenu() {
         const options = ['start', 'end', 'all', 'reset'];
         const list = this.elements.settings.panes.loop.querySelector('ul');
 
@@ -612,7 +633,7 @@ const controls = {
             item.appendChild(button);
             list.appendChild(item);
         });
-    },
+    }, */
 
     // Get current selected caption language
     // TODO: rework this to user the getter in the API?
@@ -634,11 +655,13 @@ const controls = {
 
     // Set a list of available captions languages
     setCaptionsMenu() {
+        // TODO: Captions or language? Currently it's mixed
+        const type = 'captions';
         const list = this.elements.settings.panes.captions.querySelector('ul');
 
         // Toggle the pane and tab
         const toggle = !utils.is.empty(this.captions.tracks);
-        controls.toggleTab.call(this, 'captions', toggle);
+        controls.toggleTab.call(this, type, toggle);
 
         // Empty the menu
         utils.emptyElement(list);
@@ -651,7 +674,6 @@ const controls = {
         // Re-map the tracks into just the data we need
         const tracks = Array.from(this.captions.tracks).map(track => ({
             language: track.language,
-            badge: true,
             label: !utils.is.empty(track.label) ? track.label : track.language.toUpperCase(),
         }));
 
@@ -663,41 +685,24 @@ const controls = {
 
         // Generate options
         tracks.forEach(track => {
-            const item = utils.createElement('li');
-
-            const label = utils.createElement('label', {
-                class: this.config.classNames.control,
-            });
-
-            const radio = utils.createElement(
-                'input',
-                utils.extend(utils.getAttributesFromSelector(this.config.selectors.inputs.language), {
-                    type: 'radio',
-                    name: 'plyr-language',
-                    value: track.language,
-                })
+            controls.createMenuItem.call(
+                this,
+                track.language,
+                list,
+                'language',
+                track.label || track.language,
+                controls.createBadge.call(this, track.language.toUpperCase()),
+                track.language.toLowerCase() === this.captions.language.toLowerCase()
             );
-
-            if (track.language.toLowerCase() === this.captions.language.toLowerCase()) {
-                radio.checked = true;
-            }
-
-            label.appendChild(radio);
-            label.appendChild(document.createTextNode(track.label || track.language));
-
-            if (track.badge) {
-                label.appendChild(controls.createBadge.call(this, track.language.toUpperCase()));
-            }
-
-            item.appendChild(label);
-            list.appendChild(item);
         });
 
-        controls.updateSetting.call(this, 'captions', list);
+        controls.updateSetting.call(this, type, list);
     },
 
     // Set a list of available captions languages
     setSpeedMenu(options) {
+        const type = 'speed';
+
         // Set options if passed and filter based on config
         if (utils.is.array(options)) {
             this.options.speed = options.filter(speed => this.config.speed.options.includes(speed));
@@ -707,7 +712,7 @@ const controls = {
 
         // Toggle the pane and tab
         const toggle = !utils.is.empty(this.options.speed);
-        controls.toggleTab.call(this, 'speed', toggle);
+        controls.toggleTab.call(this, type, toggle);
 
         // If we're hiding, nothing more to do
         if (!toggle) {
@@ -725,39 +730,23 @@ const controls = {
         utils.emptyElement(list);
 
         // Create items
-        this.options.speed.forEach(speed => {
-            const item = utils.createElement('li');
-
-            const label = utils.createElement('label', {
-                class: this.config.classNames.control,
-            });
-
-            const radio = utils.createElement(
-                'input',
-                utils.extend(utils.getAttributesFromSelector(this.config.selectors.inputs.speed), {
-                    type: 'radio',
-                    name: 'plyr-speed',
-                    value: speed,
-                })
+        this.options.speed.forEach(speed =>
+            controls.createMenuItem.call(this, speed, list, type, controls.getLabel.call(this, 'speed', speed))
             );
 
-            label.appendChild(radio);
-            label.insertAdjacentHTML('beforeend', controls.getLabel.call(this, 'speed', speed));
-            item.appendChild(label);
-            list.appendChild(item);
-        });
-
-        controls.updateSetting.call(this, 'speed', list);
+        controls.updateSetting.call(this, type, list);
     },
 
     // Show/hide menu
     toggleMenu(event) {
         const { form } = this.elements.settings;
         const button = this.elements.buttons.settings;
-        const show = utils.is.boolean(event) ? event : form && form.getAttribute('aria-hidden') === 'true';
+        const show = utils.is.boolean(event)
+            ? event
+            : utils.is.htmlElement(form) && form.getAttribute('aria-hidden') === 'true';
 
         if (utils.is.event(event)) {
-            const isMenuItem = form && form.contains(event.target);
+            const isMenuItem = utils.is.htmlElement(form) && form.contains(event.target);
             const isButton = event.target === this.elements.buttons.settings;
 
             // If the click was inside the form or if the click
@@ -774,10 +763,11 @@ const controls = {
         }
 
         // Set form and button attributes
-        if (button) {
+        if (utils.is.htmlElement(button)) {
             button.setAttribute('aria-expanded', show);
         }
-        if (form) {
+
+        if (utils.is.htmlElement(form)) {
             form.setAttribute('aria-hidden', !show);
 
             if (show) {
@@ -885,6 +875,9 @@ const controls = {
         pane.setAttribute('aria-hidden', !show);
         tab.setAttribute('aria-expanded', show);
         pane.removeAttribute('tabindex');
+
+        // Focus the first item
+        pane.querySelectorAll('button:not(:disabled), input:not(:disabled), [tabindex]')[0].focus();
     },
 
     // Build the default HTML
