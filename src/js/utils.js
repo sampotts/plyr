@@ -23,48 +23,41 @@ const utils = {
             return this.getConstructor(input) === Function;
         },
         array(input) {
-            return !this.undefined(input) && Array.isArray(input);
+            return !this.nullOrUndefined(input) && Array.isArray(input);
         },
         nodeList(input) {
-            return !this.undefined(input) && input instanceof NodeList;
+            return this.instanceof(input, window.NodeList);
         },
         htmlElement(input) {
-            return !this.undefined(input) && input instanceof HTMLElement;
+            return this.instanceof(input, window.HTMLElement);
         },
         textNode(input) {
             return this.getConstructor(input) === Text;
         },
         event(input) {
-            return !this.undefined(input) && input instanceof Event;
+            return this.instanceof(input, window.Event);
         },
         cue(input) {
-            return this.instanceOf(input, window.TextTrackCue) || this.instanceOf(input, window.VTTCue);
+            return this.instanceof(input, window.TextTrackCue) || this.instanceof(input, window.VTTCue);
         },
         track(input) {
-            return (
-                !this.undefined(input) && (this.instanceOf(input, window.TextTrack) || typeof input.kind === 'string')
-            );
+            return this.instanceof(input, window.TextTrack) || this.string(input.kind);
         },
-        undefined(input) {
-            return input !== null && typeof input === 'undefined';
+        nullOrUndefined(input) {
+            return input === null || typeof input === 'undefined';
         },
         empty(input) {
             return (
-                input === null ||
-                typeof input === 'undefined' ||
+                this.nullOrUndefined(input) ||
                 ((this.string(input) || this.array(input) || this.nodeList(input)) && !input.length) ||
                 (this.object(input) && !Object.keys(input).length)
             );
         },
-        getConstructor(input) {
-            if (input === null || typeof input === 'undefined') {
-                return null;
-            }
-
-            return input.constructor;
-        },
-        instanceOf(input, constructor) {
+        instanceof(input, constructor) {
             return Boolean(input && constructor && input instanceof constructor);
+        },
+        getConstructor(input) {
+            return !this.nullOrUndefined(input) ? input.constructor : null;
         },
     },
 
@@ -474,7 +467,7 @@ const utils = {
     // Toggle event listener
     toggleListener(elements, event, callback, toggle, passive, capture) {
         // Bail if no elements
-        if (elements === null || utils.is.undefined(elements)) {
+        if (utils.is.nullOrUndefined(elements)) {
             return;
         }
 

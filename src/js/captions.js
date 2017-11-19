@@ -33,8 +33,6 @@ const captions = {
 
         // Only Vimeo and HTML5 video supported at this point
         if (!['video', 'vimeo'].includes(this.type) || (this.type === 'video' && !support.textTracks)) {
-            this.captions.tracks = null;
-
             // Clear menu and hide
             if (this.config.controls.includes('settings') && this.config.settings.includes('captions')) {
                 controls.setCaptionsMenu.call(this);
@@ -49,92 +47,27 @@ const captions = {
                 'div',
                 utils.getAttributesFromSelector(this.config.selectors.captions)
             );
-            utils.insertAfter(this.elements.captions, this.elements.wrapper);
-        }
 
-        // Get tracks from HTML5
-        if (this.type === 'video') {
-            this.captions.tracks = this.media.textTracks;
+            utils.insertAfter(this.elements.captions, this.elements.wrapper);
         }
 
         // Set the class hook
         utils.toggleClass(
             this.elements.container,
             this.config.classNames.captions.enabled,
-            !utils.is.empty(this.captions.tracks)
+            !utils.is.empty(captions.getTracks.call(this))
         );
 
         // If no caption file exists, hide container for caption text
-        if (utils.is.empty(this.captions.tracks)) {
+        if (utils.is.empty(captions.getTracks.call(this))) {
             return;
         }
 
+        // Set language
+        captions.setLanguage.call(this);
+
         // Enable UI
         captions.show.call(this);
-
-        // Get a track
-        const setCurrentTrack = () => {
-            // Reset by default
-            this.captions.currentTrack = null;
-
-            // Filter doesn't seem to work for a TextTrackList :-(
-            Array.from(this.captions.tracks).forEach(track => {
-                if (track.language.toLowerCase() === this.language.toLowerCase()) {
-                    this.captions.currentTrack = track;
-                    console.warn(`Set current track to ${this.language}`);
-                }
-            });
-        };
-
-        // Get current track
-        setCurrentTrack();
-
-        // If we couldn't get the requested language, revert to default
-        if (!utils.is.track(this.captions.currentTrack)) {
-            const { language } = this.config.captions;
-
-            // Reset to default
-            // We don't update user storage as the selected language could become available
-            this.captions.language = language;
-
-            // Get fallback track
-            setCurrentTrack();
-
-            // If no match, disable captions
-            if (!utils.is.track(this.captions.currentTrack)) {
-                this.toggleCaptions(false);
-            }
-
-            controls.updateSetting.call(this, 'captions');
-        }
-
-        // Setup HTML5 track rendering
-        if (this.type === 'video') {
-            // Turn off native caption rendering to avoid double captions
-            Array.from(this.captions.tracks).forEach(track => {
-                // Remove previous bindings (if we've changed source or language)
-                utils.off(track, 'cuechange', event => captions.setCue.call(this, event));
-
-                // Hide captions
-                // eslint-disable-next-line
-                track.mode = 'hidden';
-            });
-
-            // Check if suported kind
-            const supported =
-                this.captions.currentTrack && ['captions', 'subtitles'].includes(this.captions.currentTrack.kind);
-
-            if (utils.is.track(this.captions.currentTrack) && supported) {
-                utils.on(this.captions.currentTrack, 'cuechange', event => captions.setCue.call(this, event));
-
-                // If we change the active track while a cue is already displayed we need to update it
-                if (this.captions.currentTrack.activeCues && this.captions.currentTrack.activeCues.length > 0) {
-                    captions.setCue.call(this, this.captions.currentTrack);
-                }
-            }
-        } else if (this.type === 'vimeo' && this.captions.active) {
-            this.embed.enableTextTrack(this.captions.language);
-        }
 
         // Set available languages in list
         if (this.config.controls.includes('settings') && this.config.settings.includes('captions')) {
@@ -142,24 +75,74 @@ const captions = {
         }
     },
 
+    // Set the captions language
+    setLanguage() {
+        // Setup HTML5 track rendering
+        if (this.type === 'video') {
+            captions.getTracks.call(this).forEach(track => {
+                // Remove previous bindings
+                utils.on(track, 'cuechange', event => captions.setCue.call(this, event));
+
+                // Turn off native caption rendering to avoid double captions
+                // eslint-disable-next-line
+                track.mode = 'hidden';
+            });
+
+            // Get current track
+            const currentTrack = captions.getCurrentTrack.call(this);
+
+            // Check if suported kind
+            if (utils.is.track(currentTrack)) {
+                // If we change the active track while a cue is already displayed we need to update it
+                if (Array.from(currentTrack.activeCues || []).length) {
+                    captions.setCue.call(this, currentTrack);
+                }
+            }
+        } else if (this.type === 'vimeo' && this.captions.active) {
+            this.embed.enableTextTrack(this.language);
+        }
+    },
+
+    // Get the tracks
+    getTracks() {
+        // Return empty array at least
+        if (utils.is.nullOrUndefined(this.media)) {
+            return [];
+        }
+
+        // Only get accepted kinds
+        return Array.from(this.media.textTracks || []).filter(track => ['captions', 'subtitles'].includes(track.kind));
+    },
+
+    // Get the current track for the current language
+    getCurrentTrack() {
+        return captions.getTracks.call(this).find(track => track.language.toLowerCase() === this.language);
+    },
+
     // Display active caption if it contains text
     setCue(input) {
         // Get the track from the event if needed
         const track = utils.is.event(input) ? input.target : input;
         const active = track.activeCues[0];
+        const currentTrack = captions.getCurrentTrack.call(this);
+
+        // Only display current track
+        if (track !== currentTrack) {
+            return;
+        }
 
         // Display a cue, if there is one
         if (utils.is.cue(active)) {
-            captions.set.call(this, active.getCueAsHTML());
+            captions.setText.call(this, active.getCueAsHTML());
         } else {
-            captions.set.call(this);
+            captions.setText.call(this, null);
         }
 
         utils.dispatchEvent.call(this, this.media, 'cuechange');
     },
 
     // Set the current caption
-    set(input) {
+    setText(input) {
         // Requires UI
         if (!this.supported.ui) {
             return;
@@ -172,7 +155,7 @@ const captions = {
             utils.emptyElement(this.elements.captions);
 
             // Default to empty
-            const caption = !utils.is.undefined(input) ? input : '';
+            const caption = !utils.is.nullOrUndefined(input) ? input : '';
 
             // Set the span content
             if (utils.is.string(caption)) {

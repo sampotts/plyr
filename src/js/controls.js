@@ -5,6 +5,7 @@
 import support from './support';
 import utils from './utils';
 import ui from './ui';
+import captions from './captions';
 
 // Sniff out the browser
 const browser = utils.getBrowser();
@@ -642,12 +643,16 @@ const controls = {
             return null;
         }
 
-        if (!support.textTracks || utils.is.empty(this.captions.tracks)) {
+        if (!support.textTracks || !captions.getTracks.call(this).length) {
             return this.config.i18n.none;
         }
 
         if (this.captions.enabled) {
-            return this.captions.currentTrack.label;
+            const currentTrack = captions.getCurrentTrack.call(this);
+
+            if (utils.is.track(currentTrack)) {
+                return currentTrack.label;
+            }
         }
 
         return this.config.i18n.disabled;
@@ -660,19 +665,19 @@ const controls = {
         const list = this.elements.settings.panes.captions.querySelector('ul');
 
         // Toggle the pane and tab
-        const toggle = !utils.is.empty(this.captions.tracks);
-        controls.toggleTab.call(this, type, toggle);
+        const hasTracks = captions.getTracks.call(this).length;
+        controls.toggleTab.call(this, type, hasTracks);
 
         // Empty the menu
         utils.emptyElement(list);
 
         // If there's no captions, bail
-        if (utils.is.empty(this.captions.tracks)) {
+        if (!hasTracks) {
             return;
         }
 
         // Re-map the tracks into just the data we need
-        const tracks = Array.from(this.captions.tracks).map(track => ({
+        const tracks = captions.getTracks.call(this).map(track => ({
             language: track.language,
             label: !utils.is.empty(track.label) ? track.label : track.language.toUpperCase(),
         }));

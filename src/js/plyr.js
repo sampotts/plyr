@@ -81,7 +81,6 @@ class Plyr {
         // Captions
         this.captions = {
             enabled: null,
-            tracks: null,
             currentTrack: null,
         };
 
@@ -116,7 +115,7 @@ class Plyr {
         this.console.log('Support', support);
 
         // We need an element to setup
-        if (this.media === null || utils.is.undefined(this.media) || !utils.is.htmlElement(this.media)) {
+        if (utils.is.nullOrUndefined(this.media) || !utils.is.htmlElement(this.media)) {
             this.console.error('Setup failed: no suitable element passed');
             return;
         }
@@ -665,6 +664,14 @@ class Plyr {
             return;
         }
 
+        // Toggle captions based on input
+        this.toggleCaptions(!utils.is.empty(input));
+
+        // If empty string is passed, assume disable captions
+        if (utils.is.empty(input)) {
+            return;
+        }
+
         // Normalize
         const language = input.toLowerCase();
 
@@ -673,20 +680,17 @@ class Plyr {
             return;
         }
 
-        // Reset UI
-        this.toggleCaptions(true);
-
         // Update config
         this.captions.language = language;
 
+        // Clear caption
+        captions.setText.call(this, null);
+
+        // Update captions
+        captions.setLanguage.call(this);
+
         // Trigger an event
         utils.dispatchEvent.call(this, this.media, 'languagechange');
-
-        // Clear caption
-        captions.set.call(this);
-
-        // Re-run setup
-        captions.setup.call(this);
     }
 
     get language() {

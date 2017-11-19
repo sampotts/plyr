@@ -221,7 +221,7 @@ const vimeo = {
 
         // Get captions
         player.embed.getTextTracks().then(tracks => {
-            player.captions.tracks = tracks;
+            player.media.textTracks = tracks;
             captions.setup.call(player);
         });
 
@@ -232,7 +232,7 @@ const vimeo = {
                 cue = utils.stripHTML(data.cues[0].text);
             }
 
-            captions.set.call(player, cue);
+            captions.setText.call(player, cue);
         });
 
         player.embed.on('loaded', () => {

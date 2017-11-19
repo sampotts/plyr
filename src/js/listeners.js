@@ -459,41 +459,24 @@ const listeners = {
 
         // Settings menu
         utils.on(this.elements.settings.form, 'click', event => {
-            // Show tab in menu
-            controls.showTab.call(this, event);
+            event.stopPropagation();
 
             // Settings menu items - use event delegation as items are added/removed
             if (utils.matches(event.target, this.config.selectors.inputs.language)) {
-                // Settings - Language
                 proxy(event, 'language', () => {
-                    const language = event.target.value;
-
-                    this.toggleCaptions(!utils.is.empty(language));
-
-                    if (!utils.is.empty(language)) {
-                        this.language = event.target.value.toLowerCase();
-                    }
+                    this.language = event.target.value;
                 });
             } else if (utils.matches(event.target, this.config.selectors.inputs.quality)) {
-                // Settings - Quality
                 proxy(event, 'quality', () => {
                     this.quality = event.target.value;
                 });
             } else if (utils.matches(event.target, this.config.selectors.inputs.speed)) {
-                // Settings - Speed
                 proxy(event, 'speed', () => {
                     this.speed = parseFloat(event.target.value);
                 });
-            } /* else if (utils.matches(event.target, this.config.selectors.buttons.loop)) {
-                // Settings - Looping
-                // TODO: use toggle buttons
-                proxy(event, 'loop', () => {
-                    // TODO: This should be done in the method itself I think
-                    // var value = event.target.getAttribute('data-loop__value') || event.target.getAttribute('data-loop__type');
-
-                    this.console.warn('Set loop');
-                });
-            } */
+            } else {
+                controls.showTab.call(this, event);
+            }
         });
 
         // Seek

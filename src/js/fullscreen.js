@@ -51,7 +51,7 @@ const fullscreen = {
             return false;
         }
 
-        const target = utils.is.undefined(element) ? document.body : element;
+        const target = utils.is.nullOrUndefined(element) ? document.body : element;
 
         switch (prefix) {
             case '':
@@ -71,7 +71,7 @@ const fullscreen = {
             return false;
         }
 
-        const target = utils.is.undefined(element) ? document.body : element;
+        const target = utils.is.nullOrUndefined(element) ? document.body : element;
 
         return !prefix.length
             ? target.requestFullScreen()

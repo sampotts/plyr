@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             type: 'video/mp4',
                         },
                     ],
-                    poster: 'hmedia/View_From_A_Blue_Moon_Trailer-HD.jpg',
+                    poster: 'media/View_From_A_Blue_Moon_Trailer-HD.jpg',
                     tracks: [
                         {
                             kind: 'captions',
