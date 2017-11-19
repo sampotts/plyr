@@ -283,6 +283,14 @@ class Plyr {
         return this.media.paused;
     }
 
+    get playing() {
+        return this.currentTime > 0 && !this.paused && !this.ended && (this.isHTML5 ? this.media.readyState > 2 : true);
+    }
+
+    get ended() {
+        return this.media.ended;
+    }
+
     /**
      * Toggle playback based on current status
      * @param {boolean} toggle

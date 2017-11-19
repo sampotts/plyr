@@ -138,11 +138,13 @@ const ui = {
 
     // Check playing state
     checkPlaying() {
-        utils.toggleClass(this.elements.container, this.config.classNames.playing, !this.paused);
+        window.setTimeout(() => {
+            utils.toggleClass(this.elements.container, this.config.classNames.playing, this.playing);
 
-        utils.toggleClass(this.elements.container, this.config.classNames.stopped, this.paused);
+            utils.toggleClass(this.elements.container, this.config.classNames.stopped, this.paused);
 
-        this.toggleControls(this.paused);
+            this.toggleControls(!this.playing);
+        }, 10);
     },
 
     // Check if media is loading

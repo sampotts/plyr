@@ -254,6 +254,13 @@ const youtube = {
                         },
                     });
 
+                    // Ended
+                    Object.defineProperty(player.media, 'ended', {
+                        get() {
+                            return player.currentTime === player.duration;
+                        },
+                    });
+
                     // Get available speeds
                     if (player.config.controls.includes('settings') && player.config.settings.includes('speed')) {
                         controls.setSpeedMenu.call(player, instance.getAvailablePlaybackRates());
@@ -316,6 +323,8 @@ const youtube = {
                     // 5    Video cued
                     switch (event.data) {
                         case 0:
+                            player.media.paused = true;
+
                             // YouTube doesn't support loop for a single video, so mimick it.
                             if (player.media.loop) {
                                 // YouTube needs a call to `stopVideo` before playing again
@@ -323,20 +332,18 @@ const youtube = {
                                 instance.playVideo();
                             } else {
                                 utils.dispatchEvent.call(player, player.media, 'ended');
-                                player.media.paused = true;
                             }
 
                             break;
 
                         case 1:
                             player.media.paused = false;
+                            player.media.seeking = false;
 
                             // If we were seeking, fire seeked event
                             if (player.media.seeking) {
                                 utils.dispatchEvent.call(player, player.media, 'seeked');
                             }
-
-                            player.media.seeking = false;
 
                             utils.dispatchEvent.call(player, player.media, 'play');
                             utils.dispatchEvent.call(player, player.media, 'playing');

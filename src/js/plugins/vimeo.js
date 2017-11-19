@@ -190,6 +190,13 @@ const vimeo = {
             },
         });
 
+        // Ended
+        Object.defineProperty(player.media, 'ended', {
+            get() {
+                return player.currentTime === player.duration;
+            },
+        });
+
         // Set aspect ratio based on video size
         Promise.all([player.embed.getVideoWidth(), player.embed.getVideoHeight()]).then(dimensions => {
             const ratio = utils.getAspectRatio(dimensions[0], dimensions[1]);
