@@ -23,22 +23,6 @@ const youtube = {
         // Set ID
         this.media.setAttribute('id', utils.generateId(this.type));
 
-        // Get the media title via Google API
-        const key = this.config.keys.google;
-        if (utils.is.string(key) && !utils.is.empty(key)) {
-            const url = `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${key}&fields=items(snippet(title))&part=snippet`;
-
-            fetch(url)
-                .then(response => (response.ok ? response.json() : null))
-                .then(result => {
-                    if (result !== null && utils.is.object(result)) {
-                        this.config.title = result.items[0].snippet.title;
-                        ui.setTitle.call(this);
-                    }
-                })
-                .catch(() => {});
-        }
-
         // Setup API
         if (utils.is.object(window.YT)) {
             youtube.ready.call(this, videoId);
@@ -60,6 +44,39 @@ const youtube = {
                     callback();
                 });
             };
+        }
+    },
+
+    // Get the media title
+    getTitle() {
+        // Try via undocumented API method first
+        // This method disappears now and then though...
+        // https://github.com/sampotts/plyr/issues/709
+        if (utils.is.function(this.embed.getVideoData)) {
+            const { title } = this.embed.getVideoData();
+
+            if (utils.is.empty(title)) {
+                this.config.title = title;
+                ui.setTitle.call(this);
+                return;
+            }
+        }
+
+        // Or via Google API
+        const key = this.config.keys.google;
+        const videoId = utils.parseYouTubeId(this.embedId);
+        if (utils.is.string(key) && !utils.is.empty(key)) {
+            const url = `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${key}&fields=items(snippet(title))&part=snippet`;
+
+            fetch(url)
+                .then(response => (response.ok ? response.json() : null))
+                .then(result => {
+                    if (result !== null && utils.is.object(result)) {
+                        this.config.title = result.items[0].snippet.title;
+                        ui.setTitle.call(this);
+                    }
+                })
+                .catch(() => {});
         }
     },
 
@@ -161,6 +178,9 @@ const youtube = {
                     // Get the instance
                     const instance = event.target;
 
+                    // Get the title
+                    youtube.getTitle.call(player);
+
                     // Create a faux HTML5 API using the YouTube API
                     player.media.play = () => {
                         instance.playVideo();
@@ -257,11 +277,6 @@ const youtube = {
                     // Get available speeds
                     if (player.config.controls.includes('settings') && player.config.settings.includes('speed')) {
                         controls.setSpeedMenu.call(player, instance.getAvailablePlaybackRates());
-                    }
-
-                    // Set title
-                    if (utils.is.function(instance.getVideoData)) {
-                        player.config.title = instance.getVideoData().title;
                     }
 
                     // Set the tabindex to avoid focus entering iframe
