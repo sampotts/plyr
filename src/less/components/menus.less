@@ -34,7 +34,7 @@
         white-space: nowrap;
         text-align: left;
         color: @plyr-menu-color;
-        font-size: @plyr-font-size-small;
+        font-size: @plyr-font-size-base;
 
         > div {
             overflow: hidden;
@@ -67,7 +67,6 @@
             width: 100%;
             padding: ceil(@plyr-control-padding / 2) (@plyr-control-padding * 2);
             color: @plyr-menu-color;
-            font-weight: @plyr-font-weight-bold;
             user-select: none;
 
             &::after {
@@ -101,7 +100,7 @@
                 margin: @plyr-control-padding;
                 margin-bottom: floor(@plyr-control-padding / 2);
                 padding-left: ceil(@plyr-control-padding * 4);
-                font-weight: @plyr-font-weight-normal;
+                font-weight: @plyr-font-weight-regular;
 
                 &::after {
                     left: @plyr-control-padding;
@@ -166,6 +165,10 @@
                 }
             }
 
+            input[type='radio']:focus + span {
+                .plyr-tab-focus();
+            }
+
             &.plyr__tab-focus input[type='radio'] + span,
             &:hover input[type='radio'] + span {
                 background: fade(#000, 10%);
@@ -181,11 +184,6 @@
             padding-left: ceil(@plyr-control-padding * 3.5);
             pointer-events: none;
             overflow: hidden;
-            font-weight: @plyr-font-weight-normal;
-
-            .plyr__badge {
-                font-weight: @plyr-font-weight-bold;
-            }
         }
     }
 }

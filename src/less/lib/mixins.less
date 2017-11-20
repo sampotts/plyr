@@ -3,6 +3,13 @@
 // https://github.com/sampotts/plyr
 // ==========================================================================
 
+// Nicer focus styles
+// ---------------------------------------
+.plyr-tab-focus(@color: @plyr-tab-focus-default-color) {
+    outline: 0;
+    box-shadow: 0 0 0 3px fade(@color, 35%);
+}
+
 // Font smoothing
 // ---------------------------------------
 .plyr-font-smoothing(@mode: on) when(@mode = on) {
@@ -15,12 +22,14 @@
 }
 
 // <input type="range"> styling
+// ---------------------------------------
 .plyr-range-track() {
     height: @plyr-range-track-height;
     background: transparent;
     border: 0;
     border-radius: (@plyr-range-track-height / 2);
     user-select: none;
+    transition: all 0.3s ease;
 }
 
 .plyr-range-thumb() {
@@ -42,9 +51,11 @@
 }
 
 // Fullscreen styles
+// ---------------------------------------
 .plyr-fullscreen-active() {
     height: 100%;
     width: 100%;
+    margin: 0;
     background: #000;
     border-radius: 0 !important;
 

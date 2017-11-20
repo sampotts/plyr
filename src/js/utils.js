@@ -41,7 +41,9 @@ const utils = {
             return this.instanceof(input, window.TextTrackCue) || this.instanceof(input, window.VTTCue);
         },
         track(input) {
-            return this.instanceof(input, window.TextTrack) || this.string(input.kind);
+            return (
+                this.instanceof(input, window.TextTrack) || (!this.nullOrUndefined(input) && this.string(input.kind))
+            );
         },
         nullOrUndefined(input) {
             return input === null || typeof input === 'undefined';

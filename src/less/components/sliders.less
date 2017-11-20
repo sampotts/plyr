@@ -81,6 +81,20 @@
         border: 0;
     }
 
+    &.plyr__tab-focus {
+        &::-webkit-slider-runnable-track {
+            .plyr-tab-focus();
+        }
+
+        &::-moz-range-track {
+            .plyr-tab-focus();
+        }
+
+        &::-ms-track {
+            .plyr-tab-focus();
+        }
+    }
+
     // Pressed styles
     &:active {
         &::-webkit-slider-thumb {
@@ -110,10 +124,6 @@
     &::-ms-track {
         background: @plyr-video-range-track-bg;
     }
-
-    &.plyr__tab-focus {
-        box-shadow: 0 0 0 3px fade(@plyr-video-control-color, 50%);
-    }
 }
 
 // Audio range inputs
@@ -128,9 +138,5 @@
 
     &::-ms-track {
         background: @plyr-audio-range-track-bg;
-    }
-
-    &.plyr__tab-focus {
-        box-shadow: 0 0 0 3px fade(@plyr-audio-control-color, 50%);
     }
 }

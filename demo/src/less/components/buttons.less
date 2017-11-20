@@ -14,10 +14,9 @@
     box-shadow: 0 1px 1px fade(#000, 10%);
     background: #fff;
     border: 0;
-    color: @gray;
     user-select: none;
-    font-weight: @font-weight-bold;
     text-shadow: none;
+    color: @gray;
 }
 
 // Buttons
@@ -25,6 +24,7 @@
     padding-left: @spacing-base;
     padding-right: @spacing-base;
     transition: all 0.2s ease;
+    font-weight: @font-weight-bold;
 
     &:hover,
     &:focus {
@@ -45,6 +45,7 @@
 .button__count {
     margin-left: (@spacing-base / 2);
     animation: fadein 0.2s ease;
+    font-weight: @font-weight-medium;
 
     &::before {
         content: '';

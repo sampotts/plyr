@@ -12,21 +12,26 @@
 @plyr-color-main: #1aafff;
 
 // Font
-@plyr-font-family: Avenir, 'Avenir Next', 'Helvetica Neue', 'Segoe UI', Helvetica, Arial, sans-serif;
-@plyr-font-size-base: 16px;
-@plyr-font-size-small: 14px;
-@plyr-font-size-tiny: 10px;
-@plyr-font-weight-normal: 500;
+@plyr-font-family: inherit; //Avenir, 'Avenir Next', 'Helvetica Neue', 'Segoe UI', Helvetica, Arial, sans-serif;
+@plyr-font-size-base: 13px;
+@plyr-font-size-small: 12px;
+@plyr-font-size-tiny: 11px;
+@plyr-font-size-micro: 9px;
+@plyr-font-weight-regular: 500;
 @plyr-font-weight-bold: 600;
 @plyr-line-height: 1.7;
+@plyr-font-smoothing: on;
+
+// Focus
+@plyr-tab-focus-default-color: @plyr-color-main;
 
 // Captions
 @plyr-captions-bg: fade(#000, 80%);
 @plyr-captions-color: #fff;
 @plyr-font-size-captions-base: @plyr-font-size-base;
 @plyr-font-size-captions-small: @plyr-font-size-small;
-@plyr-font-size-captions-medium: ceil(@plyr-font-size-base * 1.25);
-@plyr-font-size-captions-large: (@plyr-font-size-base * 1.5);
+@plyr-font-size-captions-medium: 18px;
+@plyr-font-size-captions-large: 21px;
 
 // Controls
 @plyr-control-icon-size: 18px;
@@ -41,6 +46,7 @@
 @plyr-audio-control-color: #565d64;
 @plyr-audio-control-color-hover: #fff;
 @plyr-audio-control-bg-hover: @plyr-color-main;
+@plyr-font-size-time: @plyr-font-size-tiny;
 
 // Tooltips
 @plyr-tooltip-bg: fade(#fff, 90%);

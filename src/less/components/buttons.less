@@ -9,7 +9,7 @@
     background: transparent;
     border-radius: 3px;
     cursor: pointer;
-    transition: background 0.3s ease, color 0.3s ease, opacity 0.3s ease;
+    transition: all 0.3s ease;
     color: inherit;
 
     svg {
@@ -28,6 +28,11 @@
     // Default focus
     &:focus {
         outline: 0;
+    }
+
+    // Tab focus
+    &.plyr__tab-focus {
+        .plyr-tab-focus();
     }
 }
 
@@ -85,8 +90,7 @@
     }
 
     &.plyr__tab-focus {
-        outline: 0;
-        box-shadow: 0 0 0 3px fade(@plyr-video-control-color, 50%);
+        .plyr-tab-focus();
     }
 }
 

@@ -144,7 +144,7 @@ const ui = {
             utils.toggleClass(this.elements.container, this.config.classNames.stopped, this.paused);
 
             this.toggleControls(!this.playing);
-        }, 10);
+        }, 100);
     },
 
     // Check if media is loading

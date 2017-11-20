@@ -8,12 +8,12 @@
     max-width: 100%;
     min-width: 200px;
     font-family: @plyr-font-family;
-    font-weight: @plyr-font-weight-normal;
+    font-weight: @plyr-font-weight-regular;
     line-height: @plyr-line-height;
     direction: ltr;
     text-shadow: none;
     transition: box-shadow 0.3s ease;
-    .plyr-font-smoothing(off);
+    .plyr-font-smoothing(@plyr-font-smoothing);
 
     // Media elements
     video,
@@ -25,8 +25,7 @@
     }
 
     &:focus {
-        outline: 0;
-        box-shadow: 0 0 0 3px fade(#000, 10%);
+        .plyr-tab-focus();
     }
 }
 
