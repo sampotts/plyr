@@ -272,13 +272,13 @@ const listeners = {
             // On click play, pause ore restart
             utils.on(wrapper, 'click', () => {
                 // Touch devices will just show controls (if we're hiding controls)
-                if (this.config.hideControls && support.touch && !this.media.paused) {
+                if (this.config.hideControls && support.touch && !this.paused) {
                     return;
                 }
 
-                if (this.media.paused) {
+                if (this.paused) {
                     this.play();
-                } else if (this.media.ended) {
+                } else if (this.ended) {
                     this.restart();
                     this.play();
                 } else {
