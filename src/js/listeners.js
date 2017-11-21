@@ -24,7 +24,12 @@ const listeners = {
         const handleKey = event => {
             const code = getKeyCode(event);
             const pressed = event.type === 'keydown';
-            const held = pressed && code === last;
+            const repeat = pressed && code === last;
+
+            // Bail if a modifier key is set
+            if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) {
+                return;
+            }
 
             // If the event is bubbled from the media element
             // Firefox doesn't get the keycode for whatever reason
@@ -92,7 +97,7 @@ const listeners = {
                     case 56:
                     case 57:
                         // 0-9
-                        if (!held) {
+                        if (!repeat) {
                             seekByKey();
                         }
                         break;
@@ -100,7 +105,7 @@ const listeners = {
                     case 32:
                     case 75:
                         // Space and K key
-                        if (!held) {
+                        if (!repeat) {
                             this.togglePlay();
                         }
                         break;
@@ -117,7 +122,7 @@ const listeners = {
 
                     case 77:
                         // M key
-                        if (!held) {
+                        if (!repeat) {
                             this.muted = !this.muted;
                         }
                         break;
@@ -139,7 +144,7 @@ const listeners = {
 
                     case 67:
                         // C key
-                        if (!held) {
+                        if (!repeat) {
                             this.toggleCaptions();
                         }
                         break;
@@ -209,7 +214,7 @@ const listeners = {
             // Toggle controls on mouse events and entering fullscreen
             utils.on(
                 this.elements.container,
-                'click mouseenter mouseleave mousemove touchmove enterfullscreen exitfullscreen',
+                'mouseenter mouseleave mousemove touchstart touchend touchmove enterfullscreen exitfullscreen',
                 event => {
                     this.toggleControls(event);
                 }
@@ -269,12 +274,9 @@ const listeners = {
             const wrapper = utils.getElement.call(this, `.${this.config.classNames.video}`);
 
             // Bail if there's no wrapper (this should never happen)
-            if (!wrapper) {
+            if (!utils.is.htmlElement(wrapper)) {
                 return;
             }
-
-            // Set cursor
-            wrapper.style.cursor = 'pointer';
 
             // On click play, pause ore restart
             utils.on(wrapper, 'click', () => {
@@ -527,15 +529,9 @@ const listeners = {
             });
 
             // Focus in/out on controls
-            // TODO: Check we need capture here
-            utils.on(
-                this.elements.controls,
-                'focusin focusout',
-                event => {
-                    this.toggleControls(event);
-                },
-                true
-            );
+            utils.on(this.elements.controls, 'focusin focusout', event => {
+                this.toggleControls(event);
+            });
         }
 
         // Mouse wheel for volume

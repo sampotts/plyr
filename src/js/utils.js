@@ -559,7 +559,8 @@ const utils = {
         }
 
         // Get state
-        const state = utils.is.boolean(input) ? input : !element.getAttribute('aria-pressed');
+        const pressed = element.getAttribute('aria-pressed') === 'true';
+        const state = utils.is.boolean(input) ? input : !pressed;
 
         // Set the attribute on target
         element.setAttribute('aria-pressed', state);

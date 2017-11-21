@@ -33,9 +33,9 @@
 
 // Change icons on state change
 .plyr__control[aria-pressed='false'] .icon--pressed,
-    .plyr__control[aria-pressed='true'] .icon--not-pressed,
-    .plyr__control[aria-pressed='false'] .label--pressed,
-    .plyr__control[aria-pressed='true'] .label--not-pressed {
+.plyr__control[aria-pressed='true'] .icon--not-pressed,
+.plyr__control[aria-pressed='false'] .label--pressed,
+.plyr__control[aria-pressed='true'] .label--not-pressed {
     display: none;
 }
 
@@ -53,7 +53,7 @@
 .plyr__control--overlaid {
     display: none;
     position: absolute;
-    z-index: 3;
+    z-index: 2;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);

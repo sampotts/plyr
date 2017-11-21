@@ -143,7 +143,7 @@ const ui = {
         utils.toggleClass(this.elements.container, this.config.classNames.stopped, this.paused);
 
         // Set aria state
-        if (utils.is.array(this.elements.buttons.play)) {
+        if (utils.is.nodeList(this.elements.buttons.play)) {
             Array.from(this.elements.buttons.play).forEach(button => utils.toggleState(button, this.playing));
         }
 
@@ -179,7 +179,7 @@ const ui = {
             ui.setRange.call(this, this.elements.inputs.volume, this.muted ? 0 : this.volume);
         }
 
-        // Update checkbox for mute state
+        // Update mute state
         if (utils.is.htmlElement(this.elements.buttons.mute)) {
             utils.toggleState(this.elements.buttons.mute, this.muted || this.volume === 0);
         }

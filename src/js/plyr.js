@@ -290,7 +290,7 @@ class Plyr {
      * Get playing state
      */
     get playing() {
-        return !this.paused && !this.ended && (this.isHTML5 ? this.media.readyState > 2: true);
+        return !this.paused && !this.ended && (this.isHTML5 ? this.media.readyState > 2 : true);
     }
 
     /**
@@ -912,8 +912,8 @@ class Plyr {
             return this;
         }
 
-        // Don't hide if config says not to, it's audio, or not ready or loading
-        if (!this.supported.ui || !this.config.hideControls || this.type === 'audio') {
+        // Don't hide if no UI support or it's audio
+        if (!this.supported.ui || this.type === 'audio') {
             return this;
         }
 
@@ -928,10 +928,10 @@ class Plyr {
                 isEnterFullscreen = toggle.type === 'enterfullscreen';
 
                 // Whether to show controls
-                show = ['click', 'mousemove', 'touchmove', 'mouseenter', 'focusin'].includes(toggle.type);
+                show = ['mouseenter', 'mousemove', 'touchstart', 'touchmove', 'focusin'].includes(toggle.type);
 
                 // Delay hiding on move events
-                if (['mousemove', 'touchmove'].includes(toggle.type)) {
+                if (['mousemove', 'touchmove', 'touchend'].includes(toggle.type)) {
                     delay = 2000;
                 }
 
@@ -945,11 +945,11 @@ class Plyr {
             }
         }
 
-        // Clear timer every movement
-        window.clearTimeout(this.timers.hover);
+        // Clear timer on every call
+        window.clearTimeout(this.timers.controls);
 
         // If the mouse is not over the controls, set a timeout to hide them
-        if (show || this.media.paused || this.loading) {
+        if (show || this.paused || this.loading) {
             // Check if controls toggled
             const toggled = utils.toggleClass(this.elements.container, this.config.classNames.hideControls, false);
 
@@ -959,7 +959,7 @@ class Plyr {
             }
 
             // Always show controls when paused or if touch
-            if (this.media.paused || this.loading) {
+            if (this.paused || this.loading) {
                 return this;
             }
 
@@ -971,8 +971,16 @@ class Plyr {
 
         // If toggle is false or if we're playing (regardless of toggle),
         // then set the timer to hide the controls
-        if (!show || !this.media.paused) {
-            this.timers.hover = window.setTimeout(() => {
+        if (!show || this.playing) {
+            this.timers.controls = window.setTimeout(() => {
+                console.warn({
+                    pressed: this.elements.controls.pressed,
+                    hover: this.elements.controls.pressed,
+                    playing: this.playing,
+                    paused: this.paused,
+                    loading: this.loading,
+                });
+
                 // If the mouse is over the controls (and not entering fullscreen), bail
                 if ((this.elements.controls.pressed || this.elements.controls.hover) && !isEnterFullscreen) {
                     return;

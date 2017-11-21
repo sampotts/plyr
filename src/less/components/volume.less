@@ -13,11 +13,11 @@
 
     @media (min-width: @plyr-bp-screen-sm) {
         display: block;
-        max-width: 60px;
+        max-width: 50px;
     }
 
     @media (min-width: @plyr-bp-screen-md) {
-        max-width: 100px;
+        max-width: 80px;
     }
 }
 
@@ -25,6 +25,6 @@
 // It's not supported to change volume using JavaScript:
 // https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html
 .plyr--is-ios .plyr__volume,
-    .plyr--is-ios [data-plyr='mute'] {
+.plyr--is-ios [data-plyr='mute'] {
     display: none !important;
 }
