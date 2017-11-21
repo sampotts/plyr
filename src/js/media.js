@@ -78,7 +78,7 @@ const media = {
                 default:
                     break;
             }
-        } else {
+        } else if (this.isHTML5) {
             ui.setTitle.call(this);
         }
     },

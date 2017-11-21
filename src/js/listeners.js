@@ -232,6 +232,13 @@ const listeners = {
         // Display duration
         utils.on(this.media, 'durationchange loadedmetadata', event => ui.durationUpdate.call(this, event));
 
+        // Check for audio tracks on load
+        // We can't use `loadedmetadata` as it doesn't seem to have audio tracks at that point
+        utils.on(this.media, 'loadeddata', () => {
+            utils.toggleHidden(this.elements.volume, !this.hasAudio);
+            utils.toggleHidden(this.elements.buttons.mute, !this.hasAudio);
+        });
+
         // Handle the media finishing
         utils.on(this.media, 'ended', () => {
             // Show poster on end
@@ -251,10 +258,10 @@ const listeners = {
         utils.on(this.media, 'volumechange', event => ui.updateVolume.call(this, event));
 
         // Handle native play/pause
-        utils.on(this.media, 'play pause ended', event => ui.checkPlaying.call(this, event));
+        utils.on(this.media, 'playing play pause ended', event => ui.checkPlaying.call(this, event));
 
         // Loading
-        utils.on(this.media, 'waiting canplay seeked', event => ui.checkLoading.call(this, event));
+        utils.on(this.media, 'stalled waiting canplay seeked playing', event => ui.checkLoading.call(this, event));
 
         // Click video
         if (this.supported.ui && this.config.clickToPlay && this.type !== 'audio') {

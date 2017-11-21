@@ -329,6 +329,7 @@ Property | Getter | Setter | Description
 `duration` | ✔ | - | Returns the duration for the current media.
 `volume` | ✔ | ✔ | Gets or sets the volume for the player. The setter accepts a float between 0 and 1.
 `muted` | ✔ | ✔ | Gets or sets the muted state of the player. The setter accepts a boolean.
+`hasAudio` | ✔ | - | Returns a boolean indicating if the current media has an audio track.
 `speed` | ✔ | ✔ | Gets or sets the speed for the player. The setter accepts a value in the options specified in your config. Generally the minimum should be 0.5.
 `quality`&sup1; | ✔ | ✔ | Gets or sets the quality for the player. The setter accepts a value from the options specified in your config.
 `loop` | ✔ | ✔ | Gets or sets the current loop state of the player. The setter accepts a boolean.

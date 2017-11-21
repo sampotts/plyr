@@ -144,7 +144,9 @@ const ui = {
             utils.toggleClass(this.elements.container, this.config.classNames.stopped, this.paused);
 
             // Set aria state
-            Array.from(this.elements.buttons.play).forEach(button => utils.toggleState(button, this.playing));
+            if (utils.is.array(this.elements.buttons.play)) {
+                Array.from(this.elements.buttons.play).forEach(button => utils.toggleState(button, this.playing));
+            }
 
             // Toggle controls
             this.toggleControls(!this.playing);
@@ -153,7 +155,7 @@ const ui = {
 
     // Check if media is loading
     checkLoading(event) {
-        this.loading = event.type === 'waiting';
+        this.loading = ['stalled', 'waiting'].includes(event.type);
 
         // Clear timer
         clearTimeout(this.timers.loading);

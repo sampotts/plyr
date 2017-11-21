@@ -140,7 +140,6 @@ const defaults = {
         unmute: 'Unmute',
         enableCaptions: 'Enable captions',
         disableCaptions: 'Disable captions',
-        fullscreen: 'Fullscreen',
         enterFullscreen: 'Enter fullscreen',
         exitFullscreen: 'Exit fullscreen',
         frameTitle: 'Player for {title}',

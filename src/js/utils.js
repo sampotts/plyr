@@ -118,7 +118,7 @@ const utils = {
         if (!hasId || !document.querySelectorAll(`#${id}`).length) {
             // Create container
             const container = document.createElement('div');
-            container.setAttribute('hidden', '');
+            utils.toggleHidden(container, true);
 
             if (hasId) {
                 container.setAttribute('id', id);
@@ -335,6 +335,19 @@ const utils = {
     // Has class name
     hasClass(element, className) {
         return utils.is.htmlElement(element) && element.classList.contains(className);
+    },
+
+    // Toggle hidden attribute on an element
+    toggleHidden(element, toggle) {
+        if (!utils.is.htmlElement(element)) {
+            return;
+        }
+
+        if (toggle) {
+            element.setAttribute('hidden', '');
+        } else {
+            element.removeAttribute('hidden');
+        }
     },
 
     // Element matches selector

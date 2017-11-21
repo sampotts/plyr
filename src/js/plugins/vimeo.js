@@ -258,8 +258,11 @@ const vimeo = {
         });
 
         player.embed.on('play', () => {
+            // Only fire play if paused before
+            if (player.media.paused) {
+                utils.dispatchEvent.call(player, player.media, 'play');
+            }
             player.media.paused = false;
-            utils.dispatchEvent.call(player, player.media, 'play');
             utils.dispatchEvent.call(player, player.media, 'playing');
         });
 

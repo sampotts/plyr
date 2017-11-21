@@ -429,21 +429,8 @@ const controls = {
         const tab = this.elements.settings.tabs[setting];
         const pane = this.elements.settings.panes[setting];
 
-        if (utils.is.htmlElement(tab)) {
-            if (toggle) {
-                tab.removeAttribute('hidden');
-            } else {
-                tab.setAttribute('hidden', '');
-            }
-        }
-
-        if (utils.is.htmlElement(pane)) {
-            if (toggle) {
-                pane.removeAttribute('hidden');
-            } else {
-                pane.setAttribute('hidden', '');
-            }
-        }
+        utils.toggleHidden(tab, !toggle);
+        utils.toggleHidden(pane, !toggle);
     },
 
     // Set the YouTube quality menu
@@ -621,8 +608,8 @@ const controls = {
         const list = this.elements.settings.panes.loop.querySelector('ul');
 
         // Show the pane and tab
-        this.elements.settings.tabs.loop.removeAttribute('hidden');
-        this.elements.settings.panes.loop.removeAttribute('hidden');
+        utils.toggleHidden(this.elements.settings.tabs.loop, false);
+        utils.toggleHidden(this.elements.settings.panes.loop, false);
 
         // Toggle the pane and tab
         const toggle = !utils.is.empty(this.loop.options);
@@ -746,8 +733,8 @@ const controls = {
         const list = this.elements.settings.panes.speed.querySelector('ul');
 
         // Show the pane and tab
-        this.elements.settings.tabs.speed.removeAttribute('hidden');
-        this.elements.settings.panes.speed.removeAttribute('hidden');
+        utils.toggleHidden(this.elements.settings.tabs.speed, false);
+        utils.toggleHidden(this.elements.settings.panes.speed, false);
 
         // Empty the menu
         utils.emptyElement(list);
@@ -1014,6 +1001,8 @@ const controls = {
             );
             volume.appendChild(range.label);
             volume.appendChild(range.input);
+
+            this.elements.volume = volume;
 
             container.appendChild(volume);
         }

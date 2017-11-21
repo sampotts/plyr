@@ -352,15 +352,18 @@ const youtube = {
                             break;
 
                         case 1:
-                            player.media.paused = false;
-                            player.media.seeking = false;
-
                             // If we were seeking, fire seeked event
                             if (player.media.seeking) {
                                 utils.dispatchEvent.call(player, player.media, 'seeked');
                             }
+                            player.media.seeking = false;
 
-                            utils.dispatchEvent.call(player, player.media, 'play');
+                            // Only fire play if paused before
+                            if (player.media.paused) {
+                                utils.dispatchEvent.call(player, player.media, 'play');
+                            }
+                            player.media.paused = false;
+
                             utils.dispatchEvent.call(player, player.media, 'playing');
 
                             // Poll to get playback progress
