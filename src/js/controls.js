@@ -92,8 +92,9 @@ const controls = {
     },
 
     // Create hidden text label
-    createLabel(type) {
+    createLabel(type, attr) {
         let text = this.config.i18n[type];
+        const attributes = Object.assign({}, attr);
 
         switch (type) {
             case 'pip':
@@ -108,13 +109,13 @@ const controls = {
                 break;
         }
 
-        return utils.createElement(
-            'span',
-            {
-                class: this.config.classNames.hidden,
-            },
-            text
-        );
+        if ('class' in attributes) {
+            attributes.class += ` ${this.config.classNames.hidden}`;
+        } else {
+            attributes.class = this.config.classNames.hidden;
+        }
+
+        return utils.createElement('span', attributes, text);
     },
 
     // Create a badge
@@ -145,16 +146,19 @@ const controls = {
         const button = utils.createElement('button');
         const attributes = Object.assign({}, attr);
         let type = buttonType;
-        let iconDefault;
-        let iconToggled;
-        let labelKey;
+
+        let toggle = false;
+        let label;
+        let icon;
+        let labelPressed;
+        let iconPressed;
 
         if (!('type' in attributes)) {
             attributes.type = 'button';
         }
 
         if ('class' in attributes) {
-            if (attributes.class.indexOf(this.config.classNames.control) === -1) {
+            if (attributes.class.includes(this.config.classNames.control)) {
                 attributes.class += ` ${this.config.classNames.control}`;
             }
         } else {
@@ -163,56 +167,70 @@ const controls = {
 
         // Large play button
         switch (type) {
+            case 'play':
+                toggle = true;
+                label = 'play';
+                labelPressed = 'pause';
+                icon = 'play';
+                iconPressed = 'pause';
+                break;
+
             case 'mute':
-                labelKey = 'toggleMute';
-                iconDefault = 'volume';
-                iconToggled = 'muted';
+                toggle = true;
+                label = 'mute';
+                labelPressed = 'unmute';
+                icon = 'volume';
+                iconPressed = 'muted';
                 break;
 
             case 'captions':
-                labelKey = 'toggleCaptions';
-                iconDefault = 'captions-off';
-                iconToggled = 'captions-on';
+                toggle = true;
+                label = 'enableCaptions';
+                labelPressed = 'disableCaptions';
+                icon = 'captions-off';
+                iconPressed = 'captions-on';
                 break;
 
             case 'fullscreen':
-                labelKey = 'toggleFullscreen';
-                iconDefault = 'enter-fullscreen';
-                iconToggled = 'exit-fullscreen';
+                toggle = true;
+                label = 'enterFullscreen';
+                labelPressed = 'exitFullscreen';
+                icon = 'enter-fullscreen';
+                iconPressed = 'exit-fullscreen';
                 break;
 
             case 'play-large':
-                attributes.class = 'plyr__play-large';
+                attributes.class += ` ${this.config.classNames.control}--overlaid`;
                 type = 'play';
-                labelKey = 'play';
-                iconDefault = 'play';
+                label = 'play';
+                icon = 'play';
                 break;
 
             default:
-                labelKey = type;
-                iconDefault = type;
+                label = type;
+                icon = type;
+        }
+
+        // Setup toggle icon and labels
+        if (toggle) {
+            // Icon
+            button.appendChild(controls.createIcon.call(this, iconPressed, { class: 'icon--pressed' }));
+            button.appendChild(controls.createIcon.call(this, icon, { class: 'icon--not-pressed' }));
+
+            // Label/Tooltip
+            button.appendChild(controls.createLabel.call(this, labelPressed, { class: 'label--pressed' }));
+            button.appendChild(controls.createLabel.call(this, label, { class: 'label--not-pressed' }));
+
+            // Add aria attributes
+            attributes['aria-pressed'] = false;
+            attributes['aria-label'] = this.config.i18n[label];
+        } else {
+            button.appendChild(controls.createIcon.call(this, icon));
+            button.appendChild(controls.createLabel.call(this, label));
         }
 
         // Merge attributes
         utils.extend(attributes, utils.getAttributesFromSelector(this.config.selectors.buttons[type], attributes));
-
-        // Add toggle icon if needed
-        if (utils.is.string(iconToggled)) {
-            button.appendChild(
-                controls.createIcon.call(this, iconToggled, {
-                    class: 'icon--pressed',
-                })
-            );
-            button.appendChild(
-                controls.createIcon.call(this, iconDefault, {
-                    class: 'icon--not-pressed',
-                })
-            );
-        } else {
-            button.appendChild(controls.createIcon.call(this, iconDefault));
-        }
-
-        button.appendChild(controls.createLabel.call(this, labelKey));
 
         utils.setAttributes(button, attributes);
 
@@ -909,10 +927,10 @@ const controls = {
             container.appendChild(controls.createButton.call(this, 'rewind'));
         }
 
-        // Play Pause button
+        // Play/Pause button
         if (this.config.controls.includes('play')) {
             container.appendChild(controls.createButton.call(this, 'play'));
-            container.appendChild(controls.createButton.call(this, 'pause'));
+            // container.appendChild(controls.createButton.call(this, 'pause'));
         }
 
         // Fast forward button
@@ -1233,6 +1251,7 @@ const controls = {
             Array.from(labels).forEach(label => {
                 utils.toggleClass(label, this.config.classNames.hidden, false);
                 utils.toggleClass(label, this.config.classNames.tooltip, true);
+                label.setAttribute('role', 'tooltip');
             });
         }
     },

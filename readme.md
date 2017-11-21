@@ -224,7 +224,7 @@ Option | Type | Default | Description
 `debug` | Boolean | `false` | Display debugging information in the console
 `controls` | Function or Array | `['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen']` | If a function is passed, it is assumed your method will return a string of HTML for the controls. Three arguments will be passed to your function; id (the unique id for the player), seektime (the seektime step in seconds), and title (the media title). See [controls.md](controls.md) for more info on how the html needs to be structured.
 `settings` | Array | `['captions', 'quality', 'speed', 'loop']` | If you're using the default controls are used then you can specify which settings to show in the menu
-`i18n` | Object | See [defaults.js](/src/js/defaults.js) | Used for internationalization (i18n) of the tooltips/labels within the buttons.
+`i18n` | Object | See [defaults.js](/src/js/defaults.js) | Used for internationalization (i18n) of the text within the UI.
 `loadSprite` | Boolean | `true` | Load the SVG sprite specified as the `iconUrl` option (if a URL). If `false`, it is assumed you are handling sprite loading yourself.
 `iconUrl` | String | `null` | Specify a URL or path to the SVG sprite. See the [SVG section](#svg) for more info.
 `iconPrefix` | String | `plyr` | Specify the id prefix for the icons used in the default controls (e.g. "plyr-play" would be "plyr"). This is to prevent clashes if you're using your own SVG sprite but with the default controls. Most people can ignore this option.
@@ -280,12 +280,6 @@ An example method:
 player.pause();
 ```
 
-Methods are chainable so you can do the following:
-
-```javascript
-player.restart().play();
-```
-
 Method | Parameters | Description
 -------- | ---------- | -----------
 `play()` | - | Start playback.
@@ -325,6 +319,8 @@ Property | Getter | Setter | Description
 `isHTML5` | ✔ | - | Returns a boolean indicating if the current player is HTML5.
 `isEmbed` | ✔ | - | Returns a boolean indicating if the current player is an embedded player.
 `paused` | ✔ | - | Returns a boolean indicating if the current player is paused.
+`playing` | ✔ | - | Returns a boolean indicating if the current player is playing.
+`ended` | ✔ | - | Returns a boolean indicating if the current player has finished playback.
 `currentTime` | ✔ | ✔ | Gets or sets the currentTime for the player. The setter accepts a float in seconds.
 `seeking` | ✔ | - | Returns a boolean indicating if the current player is seeking.
 `duration` | ✔ | - | Returns the duration for the current media.
@@ -465,7 +461,7 @@ Event Type | Description
 `seeking` | Sent when a seek operation begins.
 `seeked` | Sent when a seek operation completes.
 `ratechange` | Sent when the playback speed changes.
-`ended` | Sent when playback completes.
+`ended` | Sent when playback completes. *Note:* This does not fire if `autoplay` is true.
 `enterfullscreen` | Sent when the player enters fullscreen mode (either the proper fullscreen or full-window fallback for older browsers).
 `exitfullscreen` | Sent when the player exits fullscreen mode.
 `captionsenabled` | Sent when captions are enabled.

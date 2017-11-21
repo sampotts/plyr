@@ -217,11 +217,11 @@ const listeners = {
         }
 
         // Handle user exiting fullscreen by escaping etc
-        /* if (fullscreen.enabled) {
+        if (fullscreen.enabled) {
             utils.on(document, fullscreen.eventType, event => {
                 this.toggleFullscreen(event);
             });
-        } */
+        }
     },
 
     // Listen for media events
@@ -372,24 +372,12 @@ const listeners = {
             }
         };
 
-        // Click play/pause helper
-        const togglePlay = () => {
-            const play = this.togglePlay();
-
-            // Determine which buttons
-            const target = this.elements.buttons[play ? 'pause' : 'play'];
-
-            // Transfer focus
-            if (utils.is.htmlElement(target)) {
-                target.focus();
-            }
-        };
-
-        // Play
-        utils.on(this.elements.buttons.play, 'click', event => proxy(event, 'play', togglePlay));
-
-        // Pause
-        utils.on(this.elements.buttons.pause, 'click', event => proxy(event, 'pause', togglePlay));
+        // Play/pause toggle
+        utils.on(this.elements.buttons.play, 'click', event =>
+            proxy(event, 'play', () => {
+                this.togglePlay();
+            })
+        );
 
         // Pause
         utils.on(this.elements.buttons.restart, 'click', event =>
@@ -412,21 +400,21 @@ const listeners = {
             })
         );
 
-        // Mute
+        // Mute toggle
         utils.on(this.elements.buttons.mute, 'click', event =>
             proxy(event, 'mute', () => {
                 this.muted = !this.muted;
             })
         );
 
-        // Captions
+        // Captions toggle
         utils.on(this.elements.buttons.captions, 'click', event =>
             proxy(event, 'captions', () => {
                 this.toggleCaptions();
             })
         );
 
-        // Fullscreen
+        // Fullscreen toggle
         utils.on(this.elements.buttons.fullscreen, 'click', event =>
             proxy(event, 'fullscreen', () => {
                 this.toggleFullscreen();

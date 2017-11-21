@@ -710,21 +710,16 @@ class Plyr {
     toggleFullscreen(event) {
         // Check for native support
         if (fullscreen.enabled) {
-            // If it's a fullscreen change event, update the UI
             if (utils.is.event(event) && event.type === fullscreen.eventType) {
+                // If it's a fullscreen change event, update the state
                 this.fullscreen.active = fullscreen.isFullScreen(this.elements.container);
             } else {
                 // Else it's a user request to enter or exit
                 if (!this.fullscreen.active) {
-                    // Request full screen
                     fullscreen.requestFullScreen(this.elements.container);
                 } else {
-                    // Bail from fullscreen
                     fullscreen.cancelFullScreen();
                 }
-
-                // Check if we're actually full screen (it could fail)
-                this.fullscreen.active = fullscreen.isFullScreen(this.elements.container);
 
                 return this;
             }
@@ -754,7 +749,7 @@ class Plyr {
         }
 
         // Set button state
-        if (this.elements.buttons && this.elements.buttons.fullscreen) {
+        if (utils.is.htmlElement(this.elements.buttons.fullscreen)) {
             utils.toggleState(this.elements.buttons.fullscreen, this.fullscreen.active);
         }
 

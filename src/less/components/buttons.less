@@ -20,11 +20,6 @@
         pointer-events: none;
     }
 
-    // Hide toggle icons by default
-    .icon--pressed {
-        display: none;
-    }
-
     // Default focus
     &:focus {
         outline: 0;
@@ -37,10 +32,10 @@
 }
 
 // Change icons on state change
-.plyr__control[aria-pressed='true'] .icon--pressed {
-    display: block;
-}
-.plyr__control[aria-pressed='true'] .icon--not-pressed {
+.plyr__control[aria-pressed='false'] .icon--pressed,
+    .plyr__control[aria-pressed='true'] .icon--not-pressed,
+    .plyr__control[aria-pressed='false'] .label--pressed,
+    .plyr__control[aria-pressed='true'] .label--not-pressed {
     display: none;
 }
 
@@ -55,7 +50,7 @@
 }
 
 // Large play button (video only)
-.plyr__play-large {
+.plyr__control--overlaid {
     display: none;
     position: absolute;
     z-index: 3;
@@ -68,37 +63,25 @@
     border-radius: 100%;
     box-shadow: 0 1px 1px fade(#000, 15%);
     color: @plyr-video-control-color;
-    transition: all 0.3s ease;
 
     svg {
         position: relative;
         left: 2px;
-        width: 20px;
-        height: 20px;
-        display: block;
-        fill: currentColor;
-        pointer-events: none;
+        width: @plyr-control-icon-size-large;
+        height: @plyr-control-icon-size-large;
     }
 
     &:hover,
     &:focus {
         background: @plyr-video-control-bg-hover;
     }
-
-    &:focus {
-        outline: 0;
-    }
-
-    &.plyr__tab-focus {
-        .plyr-tab-focus();
-    }
 }
 
-.plyr--full-ui.plyr--video .plyr__play-large {
+.plyr--full-ui.plyr--video .plyr__control--overlaid {
     display: inline-block;
 }
 
-.plyr--playing .plyr__play-large {
+.plyr--playing .plyr__control--overlaid {
     opacity: 0;
     visibility: hidden;
 }
