@@ -203,6 +203,11 @@ const vimeo = {
             vimeo.setAspectRatio.call(this, ratio);
         });
 
+        // Set autopause
+        player.embed.setAutopause(player.config.autopause).then(state => {
+            player.config.autopause = state;
+        });
+
         // Get available speeds
         if (player.config.controls.includes('settings') && player.config.settings.includes('speed')) {
             controls.setSpeedMenu.call(player);

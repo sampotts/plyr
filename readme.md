@@ -230,6 +230,7 @@ Option | Type | Default | Description
 `iconPrefix` | String | `plyr` | Specify the id prefix for the icons used in the default controls (e.g. "plyr-play" would be "plyr"). This is to prevent clashes if you're using your own SVG sprite but with the default controls. Most people can ignore this option.
 `blankUrl` | String | `https://cdn.plyr.io/static/blank.mp4` | Specify a URL or path to a blank video file used to properly cancel network requests.
 `autoplay` | Boolean | `false` | Autoplay the media on load. This is generally advised against on UX grounds. It is also disabled by default in some browsers. If the `autoplay` attribute is present on a `<video>` or `<audio>` element, this will be automatically set to true.
+`autopause`&sup1; | Boolean | `false` | Only allow one player playing at once.
 `seekTime` | Number | `10` | The time, in seconds, to seek when a user hits fast forward or rewind.
 `volume` | Number | `1` | A number, between 0 and 1, representing the initial volume of the player.
 `muted` | Boolean | `false` | Whether to start playback muted. If the `muted` attribute is present on a `<video>` or `<audio>` element, this will be automatically set to true.
@@ -251,6 +252,8 @@ Option | Type | Default | Description
 `speed` | Object | `{ selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2] }` | `selected`: The default speed for playback. `options`: Options to display in the menu. Most browsers will refuse to play slower than 0.5.
 `quality` | Object | `{ default: 'default', options: ['hd2160', 'hd1440', 'hd1080', 'hd720', 'large', 'medium', 'small', 'tiny', 'default'] }` | Currently only supported by YouTube. `default` is the default quality level, determined by YouTube. `options` are the options to display.
 `loop` | Object | `{ active: false }` | `active`: Whether to loop the current video. If the `loop` attribute is present on a `<video>` or `<audio>` element, this will be automatically set to true This is an object to support future functionality.
+
+1. Vimeo only
 
 ## API
 

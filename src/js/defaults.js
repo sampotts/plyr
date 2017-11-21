@@ -12,6 +12,9 @@ const defaults = {
     // Auto play (if supported)
     autoplay: false,
 
+    // Only allow one media playing at once (vimeo only)
+    autopause: false,
+
     // Default time to skip when rewind/fast forward
     seekTime: 10,
 
