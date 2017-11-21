@@ -290,14 +290,7 @@ class Plyr {
      * Get playing state
      */
     get playing() {
-        // Because the third party players don't fire timeupdate as frequently as HTML5,
-        // we can't use the check for currentTime > 0 for those players which is a shame
-        // readystate also does not exist for the embedded players
-        if (this.isHTML5) {
-            return !this.paused && !this.ended && this.currentTime > 0 && this.media.readyState > 2;
-        }
-
-        return !this.paused && !this.ended;
+        return !this.paused && !this.ended && (this.isHTML5 ? this.media.readyState > 2: true);
     }
 
     /**

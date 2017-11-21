@@ -138,19 +138,17 @@ const ui = {
 
     // Check playing state
     checkPlaying() {
-        window.setTimeout(() => {
-            // Class hooks
-            utils.toggleClass(this.elements.container, this.config.classNames.playing, this.playing);
-            utils.toggleClass(this.elements.container, this.config.classNames.stopped, this.paused);
+        // Class hooks
+        utils.toggleClass(this.elements.container, this.config.classNames.playing, this.playing);
+        utils.toggleClass(this.elements.container, this.config.classNames.stopped, this.paused);
 
-            // Set aria state
-            if (utils.is.array(this.elements.buttons.play)) {
-                Array.from(this.elements.buttons.play).forEach(button => utils.toggleState(button, this.playing));
-            }
+        // Set aria state
+        if (utils.is.array(this.elements.buttons.play)) {
+            Array.from(this.elements.buttons.play).forEach(button => utils.toggleState(button, this.playing));
+        }
 
-            // Toggle controls
-            this.toggleControls(!this.playing);
-        }, 100);
+        // Toggle controls
+        this.toggleControls(!this.playing);
     },
 
     // Check if media is loading
