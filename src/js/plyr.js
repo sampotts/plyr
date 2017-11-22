@@ -3745,12 +3745,16 @@
             // Issue raised https://github.com/vimeo/player.js/issues/87
             case 'vimeo':
                 basic = true;
-                full = !isOldIE && !isIos;
+
+                // let's give it a shot, it seems to be workin (tested on iPhone 6, Safari 11)
+                full = !isOldIE /* && !isIos */;
                 break;
 
             case 'youtube':
                 basic = true;
-                full = !isOldIE && !isIos;
+
+                // let's give it a shot, it seems to be workin (tested on iPhone 6, Safari 11)
+                full = !isOldIE /* && !isIos */;
 
                 // YouTube seems to work on iOS 10+ on iPad
                 if (isIos && !isIphone && browser.version >= 10) {
