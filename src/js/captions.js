@@ -32,7 +32,7 @@ const captions = {
         }
 
         // Only Vimeo and HTML5 video supported at this point
-        if (!this.isVideo || this.isYouTube || (this.isVideo && !support.textTracks)) {
+        if (!this.isVideo || this.isYouTube || (this.isHTML5 && !support.textTracks)) {
             // Clear menu and hide
             if (this.config.controls.includes('settings') && this.config.settings.includes('captions')) {
                 controls.setCaptionsMenu.call(this);
@@ -71,7 +71,7 @@ const captions = {
     // Set the captions language
     setLanguage() {
         // Setup HTML5 track rendering
-        if (this.isVideo) {
+        if (this.isHTML5 && this.isVideo) {
             captions.getTracks.call(this).forEach(track => {
                 // Remove previous bindings
                 utils.on(track, 'cuechange', event => captions.setCue.call(this, event));
