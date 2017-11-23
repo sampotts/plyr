@@ -767,6 +767,7 @@ const controls = {
 
         if (utils.is.htmlElement(form)) {
             form.setAttribute('aria-hidden', !show);
+            utils.toggleClass(this.elements.container, this.config.classNames.menu.open, show);
 
             if (show) {
                 form.removeAttribute('tabindex');

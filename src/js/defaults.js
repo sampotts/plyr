@@ -282,6 +282,7 @@ const defaults = {
         menu: {
             value: 'plyr__menu__value',
             badge: 'plyr__badge',
+            open: 'plyr--menu-open',
         },
         captions: {
             enabled: 'plyr--captions-enabled',
