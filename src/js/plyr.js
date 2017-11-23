@@ -56,7 +56,7 @@ class Plyr {
             options,
             (() => {
                 try {
-                    return JSON.parse(this.media.getAttribute('data-plyr'));
+                    return JSON.parse(this.media.getAttribute('data-plyr-config'));
                 } catch (e) {
                     return null;
                 }
@@ -146,13 +146,19 @@ class Plyr {
         // Supported: video, audio, vimeo, youtube
         const type = this.media.tagName.toLowerCase();
 
+        // Embed attributes
+        const attributes = {
+            provider: 'data-plyr-provider',
+            id: 'data-plyr-provider-id',
+        };
+
         // Different setup based on type
         switch (type) {
             // TODO: Handle passing an iframe for true progressive enhancement
             // case 'iframe':
             case 'div':
-                this.type = this.media.getAttribute('data-type');
-                this.embedId = this.media.getAttribute('data-video-id');
+                this.type = this.media.getAttribute(attributes.provider);
+                this.embedId = this.media.getAttribute(attributes.id);
 
                 if (utils.is.empty(this.type)) {
                     this.console.error('Setup failed: embed type missing');
@@ -165,8 +171,9 @@ class Plyr {
                 }
 
                 // Clean up
-                this.media.removeAttribute('data-type');
-                this.media.removeAttribute('data-video-id');
+                this.media.removeAttribute(attributes.provider);
+                this.media.removeAttribute(attributes.id);
+
                 break;
 
             case 'video':

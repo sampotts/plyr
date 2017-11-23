@@ -3,7 +3,7 @@
         "less": {
             "plyr.css": "src/less/bundle.less"
         },
-        "scss": {
+        "sass": {
             "plyr.css": "src/scss/plyr.scss"
         },
         "js": {

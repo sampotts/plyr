@@ -208,11 +208,6 @@ const vimeo = {
             player.config.autopause = state;
         });
 
-        // Get available speeds
-        if (player.config.controls.includes('settings') && player.config.settings.includes('speed')) {
-            controls.setSpeedMenu.call(player);
-        }
-
         // Get title
         player.embed.getVideoTitle().then(title => {
             player.config.title = title;

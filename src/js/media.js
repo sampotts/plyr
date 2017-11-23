@@ -31,18 +31,10 @@ const media = {
 
         if (this.supported.ui) {
             // Check for picture-in-picture support
-            utils.toggleClass(
-                this.elements.container,
-                this.config.classNames.pip.supported,
-                support.pip && this.type === 'video'
-            );
+            utils.toggleClass(this.elements.container, this.config.classNames.pip.supported, support.pip && this.type === 'video');
 
             // Check for airplay support
-            utils.toggleClass(
-                this.elements.container,
-                this.config.classNames.airplay.supported,
-                support.airplay && this.isHTML5
-            );
+            utils.toggleClass(this.elements.container, this.config.classNames.airplay.supported, support.airplay && this.isHTML5);
 
             // If there's no autoplay attribute, assume the video is stopped and add state class
             utils.toggleClass(this.elements.container, this.config.classNames.stopped, this.config.autoplay);

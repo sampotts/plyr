@@ -29,14 +29,18 @@ const { minify } = require('uglify-es');
 const commonjs = require('rollup-plugin-commonjs');
 const resolve = require('rollup-plugin-node-resolve');
 
-const root = __dirname;
+const bundles = require('./bundles.json');
+const pkg = require('./package.json');
+const aws = require('./aws.json');
 
+// Paths
+const root = __dirname;
 const paths = {
     plyr: {
         // Source paths
         src: {
             less: path.join(root, 'src/less/**/*'),
-            scss: path.join(root, 'src/scss/**/*'),
+            sass: path.join(root, 'src/sass/**/*'),
             js: path.join(root, 'src/js/**/*'),
             sprite: path.join(root, 'src/sprite/*.svg'),
         },
@@ -63,23 +67,12 @@ const paths = {
 // Task arrays
 const tasks = {
     less: [],
-    scss: [],
+    sass: [],
     js: [],
     sprite: [],
 };
 
-// Load json
-function loadJSON(pathname) {
-    try {
-        return JSON.parse(fs.readFileSync(pathname));
-    } catch (err) {
-        return {};
-    }
-}
-
-// Fetch bundles from JSON
-const bundles = loadJSON(path.join(root, 'bundles.json'));
-const pkg = loadJSON(path.join(root, 'package.json'));
+// Size plugin
 const sizeOptions = { showFiles: true, gzip: true };
 
 // Browserlist
@@ -147,14 +140,14 @@ const build = {
             );
         });
     },
-    scss(files, bundle) {
+    sass(files, bundle) {
         Object.keys(files).forEach(key => {
-            const name = `scss-${key}`;
-            tasks.scss.push(name);
+            const name = `sass-${key}`;
+            tasks.sass.push(name);
 
             gulp.task(name, () =>
                 gulp
-                    .src(bundles[bundle].scss[key])
+                    .src(bundles[bundle].sass[key])
                     .pipe(sass())
                     .on('error', gutil.log)
                     .pipe(concat(key))
@@ -192,9 +185,8 @@ const build = {
 
 // Plyr core files
 build.js(bundles.plyr.js, 'plyr', { name: 'Plyr', format: 'umd' });
-
 build.less(bundles.plyr.less, 'plyr');
-build.scss(bundles.plyr.scss, 'plyr');
+build.sass(bundles.plyr.sass, 'plyr');
 build.sprite('plyr');
 
 // Demo files
@@ -206,9 +198,9 @@ gulp.task('js', () => {
     run(tasks.js);
 });
 
-// Build SCSS (for testing, default is LESS)
-gulp.task('scss', () => {
-    run(tasks.scss);
+// Build sass (for testing, default is LESS)
+gulp.task('sass', () => {
+    run(tasks.sass);
 });
 
 // Watch for file changes
@@ -230,9 +222,6 @@ gulp.task('default', () => {
 
 // Publish a version to CDN and demo
 // --------------------------------------------
-
-// Some options
-const aws = loadJSON(path.join(root, 'aws.json'));
 const { version } = pkg;
 const maxAge = 31536000; // 1 year
 const options = {
@@ -283,7 +272,8 @@ if ('cdn' in aws) {
             )
             .pipe(
                 rename(p => {
-                    p.dirname = path.dirname.replace('.', version);
+                    // eslint-disable-next-line
+                    p.dirname = p.dirname.replace('.', version);
                 })
             )
             .pipe(replace(localPath, versionPath))

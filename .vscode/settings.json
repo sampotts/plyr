@@ -17,7 +17,6 @@
 
     // Prettier
     "prettier.eslintIntegration": true,
-    "prettier.cssEnable": ["css", "less"],
     "prettier.stylelintIntegration": true,
 
     // Formatting

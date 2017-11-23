@@ -43,20 +43,13 @@ const captions = {
 
         // Inject the container
         if (!utils.is.htmlElement(this.elements.captions)) {
-            this.elements.captions = utils.createElement(
-                'div',
-                utils.getAttributesFromSelector(this.config.selectors.captions)
-            );
+            this.elements.captions = utils.createElement('div', utils.getAttributesFromSelector(this.config.selectors.captions));
 
             utils.insertAfter(this.elements.captions, this.elements.wrapper);
         }
 
         // Set the class hook
-        utils.toggleClass(
-            this.elements.container,
-            this.config.classNames.captions.enabled,
-            !utils.is.empty(captions.getTracks.call(this))
-        );
+        utils.toggleClass(this.elements.container, this.config.classNames.captions.enabled, !utils.is.empty(captions.getTracks.call(this)));
 
         // If no caption file exists, hide container for caption text
         if (utils.is.empty(captions.getTracks.call(this))) {

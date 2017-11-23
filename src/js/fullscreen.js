@@ -35,11 +35,7 @@ const fullscreen = {
     prefix,
 
     // Check if we can use it
-    enabled:
-        document.fullscreenEnabled ||
-        document.webkitFullscreenEnabled ||
-        document.mozFullScreenEnabled ||
-        document.msFullscreenEnabled,
+    enabled: document.fullscreenEnabled || document.webkitFullscreenEnabled || document.mozFullScreenEnabled || document.msFullscreenEnabled,
 
     // Yet again Microsoft awesomeness,
     // Sometimes the prefix is 'ms', sometimes 'MS' to keep you on your toes
@@ -73,9 +69,7 @@ const fullscreen = {
 
         const target = utils.is.nullOrUndefined(element) ? document.body : element;
 
-        return !prefix.length
-            ? target.requestFullScreen()
-            : target[prefix + (prefix === 'ms' ? 'RequestFullscreen' : 'RequestFullScreen')]();
+        return !prefix.length ? target.requestFullScreen() : target[prefix + (prefix === 'ms' ? 'RequestFullscreen' : 'RequestFullScreen')]();
     },
 
     // Bail from fullscreen
@@ -84,9 +78,7 @@ const fullscreen = {
             return false;
         }
 
-        return !prefix.length
-            ? document.cancelFullScreen()
-            : document[prefix + (prefix === 'ms' ? 'ExitFullscreen' : 'CancelFullScreen')]();
+        return !prefix.length ? document.cancelFullScreen() : document[prefix + (prefix === 'ms' ? 'ExitFullscreen' : 'CancelFullScreen')]();
     },
 
     // Get the current element

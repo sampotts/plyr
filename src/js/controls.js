@@ -336,9 +336,7 @@ const controls = {
             )
         );
 
-        container.appendChild(
-            utils.createElement('span', utils.getAttributesFromSelector(this.config.selectors.display[type]), '00:00')
-        );
+        container.appendChild(utils.createElement('span', utils.getAttributesFromSelector(this.config.selectors.display[type]), '00:00'));
 
         this.elements.display[type] = container;
 
@@ -491,14 +489,7 @@ const controls = {
         };
 
         this.options.quality.forEach(quality =>
-            controls.createMenuItem.call(
-                this,
-                quality,
-                list,
-                type,
-                controls.getLabel.call(this, 'quality', quality),
-                getBadge(quality)
-            )
+            controls.createMenuItem.call(this, quality, list, type, controls.getLabel.call(this, 'quality', quality), getBadge(quality))
         );
 
         controls.updateSetting.call(this, type, list);
@@ -710,15 +701,16 @@ const controls = {
     },
 
     // Set a list of available captions languages
-    setSpeedMenu(options) {
+    setSpeedMenu() {
         const type = 'speed';
 
-        // Set options if passed and filter based on config
-        if (utils.is.array(options)) {
-            this.options.speed = options.filter(speed => this.config.speed.options.includes(speed));
-        } else {
-            this.options.speed = this.config.speed.options;
+        // Set the default speeds
+        if (!utils.is.object(this.options.speed) || !Object.keys(this.options.speed).length) {
+            this.options.speed = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
         }
+
+        // Set options if passed and filter based on config
+        this.options.speed = this.options.speed.filter(speed => this.config.speed.options.includes(speed));
 
         // Toggle the pane and tab
         const toggle = !utils.is.empty(this.options.speed);
@@ -740,9 +732,7 @@ const controls = {
         utils.emptyElement(list);
 
         // Create items
-        this.options.speed.forEach(speed =>
-            controls.createMenuItem.call(this, speed, list, type, controls.getLabel.call(this, 'speed', speed))
-        );
+        this.options.speed.forEach(speed => controls.createMenuItem.call(this, speed, list, type, controls.getLabel.call(this, 'speed', speed)));
 
         controls.updateSetting.call(this, type, list);
     },
@@ -751,9 +741,7 @@ const controls = {
     toggleMenu(event) {
         const { form } = this.elements.settings;
         const button = this.elements.buttons.settings;
-        const show = utils.is.boolean(event)
-            ? event
-            : utils.is.htmlElement(form) && form.getAttribute('aria-hidden') === 'true';
+        const show = utils.is.boolean(event) ? event : utils.is.htmlElement(form) && form.getAttribute('aria-hidden') === 'true';
 
         if (utils.is.event(event)) {
             const isMenuItem = utils.is.htmlElement(form) && form.contains(event.target);
@@ -899,10 +887,7 @@ const controls = {
         }
 
         // Create the container
-        const container = utils.createElement(
-            'div',
-            utils.getAttributesFromSelector(this.config.selectors.controls.wrapper)
-        );
+        const container = utils.createElement('div', utils.getAttributesFromSelector(this.config.selectors.controls.wrapper));
 
         // Restart button
         if (this.config.controls.includes('restart')) {
@@ -927,10 +912,7 @@ const controls = {
 
         // Progress
         if (this.config.controls.includes('progress')) {
-            const progress = utils.createElement(
-                'span',
-                utils.getAttributesFromSelector(this.config.selectors.progress)
-            );
+            const progress = utils.createElement('span', utils.getAttributesFromSelector(this.config.selectors.progress));
 
             // Seek range slider
             const seek = controls.createRange.call(this, 'seek', {
@@ -1228,13 +1210,7 @@ const controls = {
         if (this.config.tooltips.controls) {
             const labels = utils.getElements.call(
                 this,
-                [
-                    this.config.selectors.controls.wrapper,
-                    ' ',
-                    this.config.selectors.labels,
-                    ' .',
-                    this.config.classNames.hidden,
-                ].join('')
+                [this.config.selectors.controls.wrapper, ' ', this.config.selectors.labels, ' .', this.config.classNames.hidden].join('')
             );
 
             Array.from(labels).forEach(label => {

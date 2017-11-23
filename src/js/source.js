@@ -116,11 +116,7 @@ const source = {
                 }
 
                 // Restore class hooks
-                utils.toggleClass(
-                    this.elements.container,
-                    this.config.classNames.captions.active,
-                    this.supported.ui && this.captions.enabled
-                );
+                utils.toggleClass(this.elements.container, this.config.classNames.captions.active, this.supported.ui && this.captions.enabled);
 
                 ui.addStyleHook.call(this);
 

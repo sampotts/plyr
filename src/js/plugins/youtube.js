@@ -143,8 +143,7 @@ const youtube = {
 
                         case 101:
                         case 150:
-                            detail.message =
-                                'The owner of the requested video does not allow it to be played in embedded players.';
+                            detail.message = 'The owner of the requested video does not allow it to be played in embedded players.';
                             break;
 
                         default:
@@ -282,9 +281,7 @@ const youtube = {
                     });
 
                     // Get available speeds
-                    if (player.config.controls.includes('settings') && player.config.settings.includes('speed')) {
-                        controls.setSpeedMenu.call(player, instance.getAvailablePlaybackRates());
-                    }
+                    player.options.speed = instance.getAvailablePlaybackRates();
 
                     // Set the tabindex to avoid focus entering iframe
                     if (player.supported.ui) {

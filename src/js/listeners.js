@@ -47,29 +47,7 @@ const listeners = {
             // Reset on keyup
             if (pressed) {
                 // Which keycodes should we prevent default
-                const preventDefault = [
-                    48,
-                    49,
-                    50,
-                    51,
-                    52,
-                    53,
-                    54,
-                    56,
-                    57,
-                    32,
-                    75,
-                    38,
-                    40,
-                    77,
-                    39,
-                    37,
-                    70,
-                    67,
-                    73,
-                    76,
-                    79,
-                ];
+                const preventDefault = [48, 49, 50, 51, 52, 53, 54, 56, 57, 32, 75, 38, 40, 77, 39, 37, 70, 67, 73, 76, 79];
 
                 // Check focused element
                 // and if the focused element is not editable (e.g. text input)
@@ -212,13 +190,9 @@ const listeners = {
         // Toggle controls visibility based on mouse movement
         if (this.config.hideControls) {
             // Toggle controls on mouse events and entering fullscreen
-            utils.on(
-                this.elements.container,
-                'mouseenter mouseleave mousemove touchstart touchend touchmove enterfullscreen exitfullscreen',
-                event => {
-                    this.toggleControls(event);
-                }
-            );
+            utils.on(this.elements.container, 'mouseenter mouseleave mousemove touchstart touchend touchmove enterfullscreen exitfullscreen', event => {
+                this.toggleControls(event);
+            });
         }
 
         // Handle user exiting fullscreen by escaping etc
@@ -512,9 +486,7 @@ const listeners = {
         }
 
         // Seek tooltip
-        utils.on(this.elements.progress, 'mouseenter mouseleave mousemove', event =>
-            controls.updateSeekTooltip.call(this, event)
-        );
+        utils.on(this.elements.progress, 'mouseenter mouseleave mousemove', event => controls.updateSeekTooltip.call(this, event));
 
         // Toggle controls visibility based on mouse movement
         if (this.config.hideControls) {

@@ -41,9 +41,7 @@ const utils = {
             return this.instanceof(input, window.TextTrackCue) || this.instanceof(input, window.VTTCue);
         },
         track(input) {
-            return (
-                this.instanceof(input, window.TextTrack) || (!this.nullOrUndefined(input) && this.string(input.kind))
-            );
+            return this.instanceof(input, window.TextTrack) || (!this.nullOrUndefined(input) && this.string(input.kind));
         },
         nullOrUndefined(input) {
             return input === null || typeof input === 'undefined';
@@ -358,12 +356,7 @@ const utils = {
             return Array.from(document.querySelectorAll(selector)).includes(this);
         }
 
-        const matches =
-            prototype.matches ||
-            prototype.webkitMatchesSelector ||
-            prototype.mozMatchesSelector ||
-            prototype.msMatchesSelector ||
-            match;
+        const matches = prototype.matches || prototype.webkitMatchesSelector || prototype.mozMatchesSelector || prototype.msMatchesSelector || match;
 
         return matches.call(element, selector);
     },
@@ -417,9 +410,7 @@ const utils = {
 
             // Seek tooltip
             if (utils.is.htmlElement(this.elements.progress)) {
-                this.elements.display.seekTooltip = this.elements.progress.querySelector(
-                    `.${this.config.classNames.tooltip}`
-                );
+                this.elements.display.seekTooltip = this.elements.progress.querySelector(`.${this.config.classNames.tooltip}`);
             }
 
             return true;

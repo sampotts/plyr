@@ -302,12 +302,7 @@ const ui = {
         const invert = !utils.is.htmlElement(this.elements.display.duration) && this.config.invertTime;
 
         // Duration
-        ui.updateTimeDisplay.call(
-            this,
-            this.elements.display.currentTime,
-            invert ? this.duration - this.currentTime : this.currentTime,
-            invert
-        );
+        ui.updateTimeDisplay.call(this, this.elements.display.currentTime, invert ? this.duration - this.currentTime : this.currentTime, invert);
 
         // Ignore updates while seeking
         if (event && event.type === 'timeupdate' && this.media.seeking) {
