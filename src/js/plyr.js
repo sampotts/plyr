@@ -5,8 +5,8 @@
 // License: The MIT License (MIT)
 // ==========================================================================
 
+import { providers, types } from './types';
 import defaults from './defaults';
-import types from './types';
 import support from './support';
 import utils from './utils';
 
@@ -40,11 +40,7 @@ class Plyr {
         }
 
         // jQuery, NodeList or Array passed, use first element
-        if (
-            (window.jQuery && this.media instanceof jQuery) ||
-            utils.is.nodeList(this.media) ||
-            utils.is.array(this.media)
-        ) {
+        if ((window.jQuery && this.media instanceof jQuery) || utils.is.nodeList(this.media) || utils.is.array(this.media)) {
             // eslint-disable-next-line
             this.media = this.media[0];
         }
@@ -149,7 +145,7 @@ class Plyr {
         // Embed attributes
         const attributes = {
             provider: 'data-plyr-provider',
-            id: 'data-plyr-provider-id',
+            id: 'data-plyr-embed-id',
         };
 
         // Different setup based on type
@@ -157,16 +153,18 @@ class Plyr {
             // TODO: Handle passing an iframe for true progressive enhancement
             // case 'iframe':
             case 'div':
-                this.type = this.media.getAttribute(attributes.provider);
+                this.type = types.video; // Audio will come later for external providers
+                this.provider = this.media.getAttribute(attributes.provider);
                 this.embedId = this.media.getAttribute(attributes.id);
 
-                if (utils.is.empty(this.type)) {
-                    this.console.error('Setup failed: embed type missing');
+                if (utils.is.empty(this.provider) || !Object.keys(providers).includes(this.provider)) {
+                    this.console.error('Setup failed: Invalid provider');
                     return;
                 }
 
+                // Try and get the embed id
                 if (utils.is.empty(this.embedId)) {
-                    this.console.error('Setup failed: video id missing');
+                    this.console.error('Setup failed: Embed ID or URL missing');
                     return;
                 }
 
@@ -179,19 +177,24 @@ class Plyr {
             case 'video':
             case 'audio':
                 this.type = type;
+                this.provider = providers.html5;
 
                 if (this.media.hasAttribute('crossorigin')) {
                     this.config.crossorigin = true;
                 }
+
                 if (this.media.hasAttribute('autoplay')) {
                     this.config.autoplay = true;
                 }
+
                 if (this.media.hasAttribute('playsinline')) {
                     this.config.inline = true;
                 }
+
                 if (this.media.hasAttribute('muted')) {
                     this.config.muted = true;
                 }
+
                 if (this.media.hasAttribute('loop')) {
                     this.config.loop.active = true;
                 }
@@ -207,7 +210,7 @@ class Plyr {
         storage.setup.call(this);
 
         // Check for support again but with type
-        this.supported = support.check(this.type, this.config.inline);
+        this.supported = support.check(this.type, this.provider, this.config.inline);
 
         // If no support for even API, bail
         if (!this.supported.api) {
@@ -253,17 +256,25 @@ class Plyr {
     // ---------------------------------------
 
     /**
-     * If the player is HTML5
+     * Types and provider helpers
      */
     get isHTML5() {
-        return types.html5.includes(this.type);
+        return this.provider === providers.html5;
     }
-
-    /**
-     * If the player is an embed - e.g. YouTube or Vimeo
-     */
     get isEmbed() {
-        return types.embed.includes(this.type);
+        return this.isYouTube || this.isVimeo;
+    }
+    get isYouTube() {
+        return this.provider === providers.youtube;
+    }
+    get isVimeo() {
+        return this.provider === providers.vimeo;
+    }
+    get isVideo() {
+        return this.type === types.video;
+    }
+    get isAudio() {
+        return this.type === types.audio;
     }
 
     /**
@@ -518,11 +529,7 @@ class Plyr {
         }
 
         // Get audio tracks
-        return (
-            this.media.mozHasAudio ||
-            Boolean(this.media.webkitAudioDecodedByteCount) ||
-            Boolean(this.media.audioTracks && this.media.audioTracks.length)
-        );
+        return this.media.mozHasAudio || Boolean(this.media.webkitAudioDecodedByteCount) || Boolean(this.media.audioTracks && this.media.audioTracks.length);
     }
 
     /**
@@ -683,7 +690,7 @@ class Plyr {
      * @param {input} - the URL for the new poster image
      */
     set poster(input) {
-        if (!this.isHTML5 || this.type !== 'video') {
+        if (!this.isHTML5 || !this.isVideo) {
             this.console.warn('Poster can only be set on HTML5 video');
             return;
         }
@@ -697,7 +704,7 @@ class Plyr {
      * Get the current poster image
      */
     get poster() {
-        if (!this.isHTML5 || this.type !== 'video') {
+        if (!this.isHTML5 || !this.isVideo) {
             return null;
         }
 
@@ -731,9 +738,7 @@ class Plyr {
         }
 
         // If the method is called without parameter, toggle based on current value
-        const show = utils.is.boolean(input)
-            ? input
-            : this.elements.container.className.indexOf(this.config.classNames.captions.active) === -1;
+        const show = utils.is.boolean(input) ? input : this.elements.container.className.indexOf(this.config.classNames.captions.active) === -1;
 
         // Nothing to change...
         if (this.captions.enabled === show) {
@@ -828,11 +833,7 @@ class Plyr {
             this.fullscreen.active = !this.fullscreen.active;
 
             // Add class hook
-            utils.toggleClass(
-                this.elements.container,
-                this.config.classNames.fullscreen.fallback,
-                this.fullscreen.active
-            );
+            utils.toggleClass(this.elements.container, this.config.classNames.fullscreen.fallback, this.fullscreen.active);
 
             // Make sure we don't lose scroll position
             if (this.fullscreen.active) {
@@ -920,7 +921,7 @@ class Plyr {
         }
 
         // Don't hide if no UI support or it's audio
-        if (!this.supported.ui || this.type === 'audio') {
+        if (!this.supported.ui || this.isAudio) {
             return this;
         }
 
@@ -980,13 +981,13 @@ class Plyr {
         // then set the timer to hide the controls
         if (!show || this.playing) {
             this.timers.controls = window.setTimeout(() => {
-                console.warn({
+                /* this.console.warn({
                     pressed: this.elements.controls.pressed,
                     hover: this.elements.controls.pressed,
                     playing: this.playing,
                     paused: this.paused,
                     loading: this.loading,
-                });
+                }); */
 
                 // If the mouse is over the controls (and not entering fullscreen), bail
                 if ((this.elements.controls.pressed || this.elements.controls.hover) && !isEnterFullscreen) {
@@ -1105,8 +1106,18 @@ class Plyr {
         };
 
         // Type specific stuff
-        switch (this.type) {
-            case 'youtube':
+        switch (`${this.provider}:${this.type}`) {
+            case 'html5:video':
+            case 'html5:audio':
+                // Restore native video controls
+                ui.toggleNativeControls.call(this, true);
+
+                // Clean up
+                done();
+
+                break;
+
+            case 'youtube:video':
                 // Clear timers
                 window.clearInterval(this.timers.buffering);
                 window.clearInterval(this.timers.playing);
@@ -1119,23 +1130,13 @@ class Plyr {
 
                 break;
 
-            case 'vimeo':
+            case 'vimeo:video':
                 // Destroy Vimeo API
                 // then clean up (wait, to prevent postmessage errors)
                 this.embed.unload().then(done);
 
                 // Vimeo does not always return
                 window.setTimeout(done, 200);
-
-                break;
-
-            case 'video':
-            case 'audio':
-                // Restore native video controls
-                ui.toggleNativeControls.call(this, true);
-
-                // Clean up
-                done();
 
                 break;
 

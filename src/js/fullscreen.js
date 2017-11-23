@@ -92,7 +92,7 @@ const fullscreen = {
 
     // Setup fullscreen
     setup() {
-        if (!this.supported.ui || this.type === 'audio' || !this.config.fullscreen.enabled) {
+        if (!this.supported.ui || this.isAudio || !this.config.fullscreen.enabled) {
             return;
         }
 

@@ -4,13 +4,12 @@
 
 import utils from './../utils';
 import captions from './../captions';
-import controls from './../controls';
 import ui from './../ui';
 
 const vimeo = {
     setup() {
         // Remove old containers
-        const containers = utils.getElements.call(this, `[id^="${this.type}-"]`);
+        const containers = utils.getElements.call(this, `[id^="${this.provider}-"]`);
         Array.from(containers).forEach(utils.removeElement);
 
         // Add embed class for responsive
@@ -20,7 +19,7 @@ const vimeo = {
         vimeo.setAspectRatio.call(this);
 
         // Set ID
-        this.media.setAttribute('id', utils.generateId(this.type));
+        this.media.setAttribute('id', utils.generateId(this.provider));
 
         // Load the API if not already
         if (!utils.is.object(window.Vimeo)) {

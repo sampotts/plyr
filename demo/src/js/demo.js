@@ -52,19 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
         captions: {
             active: true,
         },
-        controls: [
-            'play-large',
-            'play',
-            'progress',
-            'current-time',
-            'mute',
-            'volume',
-            'captions',
-            'settings',
-            'fullscreen',
-            'pip',
-            'airplay',
-        ],
+        controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'fullscreen', 'pip', 'airplay'],
         keys: {
             google: 'AIzaSyDrNwtN3nLH_8rjCmu5Wq3ZCm4MNAVdc0c',
         },
@@ -154,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     sources: [
                         {
                             src: 'https://youtube.com/watch?v=bTqVqk7FSmY',
-                            type: 'youtube',
+                            provider: 'youtube',
                         },
                     ],
                 };
@@ -167,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     sources: [
                         {
                             src: 'https://vimeo.com/76979871',
-                            type: 'vimeo',
+                            provider: 'vimeo',
                         },
                     ],
                 };

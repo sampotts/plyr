@@ -11,7 +11,7 @@ const youtube = {
         const videoId = utils.parseYouTubeId(this.embedId);
 
         // Remove old containers
-        const containers = utils.getElements.call(this, `[id^="${this.type}-"]`);
+        const containers = utils.getElements.call(this, `[id^="${this.provider}-"]`);
         Array.from(containers).forEach(utils.removeElement);
 
         // Add embed class for responsive
@@ -21,7 +21,7 @@ const youtube = {
         youtube.setAspectRatio.call(this);
 
         // Set ID
-        this.media.setAttribute('id', utils.generateId(this.type));
+        this.media.setAttribute('id', utils.generateId(this.provider));
 
         // Setup API
         if (utils.is.object(window.YT)) {
@@ -31,6 +31,7 @@ const youtube = {
             utils.loadScript(this.config.urls.youtube.api);
 
             // Setup callback for the API
+            // YouTube has it's own system of course...
             window.onYouTubeReadyCallbacks = window.onYouTubeReadyCallbacks || [];
 
             // Add to queue

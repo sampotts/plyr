@@ -12,29 +12,29 @@ const support = {
 
     // Check for support
     // Basic functionality vs full UI
-    check(type, inline) {
+    check(type, provider, inline) {
         let api = false;
         let ui = false;
         const browser = utils.getBrowser();
         const playsInline = browser.isIPhone && inline && support.inline;
 
-        switch (type) {
-            case 'video':
+        switch (`${provider}:${type}`) {
+            case 'html5:video':
                 api = support.video;
                 ui = api && support.rangeInput && (!browser.isIPhone || playsInline);
                 break;
 
-            case 'audio':
+            case 'html5:audio':
                 api = support.audio;
                 ui = api && support.rangeInput;
                 break;
 
-            case 'youtube':
+            case 'youtube:video':
                 api = true;
                 ui = support.rangeInput && (!browser.isIPhone || playsInline);
                 break;
 
-            case 'vimeo':
+            case 'vimeo:video':
                 api = true;
                 ui = support.rangeInput && !browser.isIPhone;
                 break;
@@ -92,12 +92,12 @@ const support = {
 
         try {
             // Bail if no checking function
-            if (!utils.is.function(media.canPlayType)) {
+            if (!this.isHTML5 || !utils.is.function(media.canPlayType)) {
                 return false;
             }
 
             // Type specific checks
-            if (this.type === 'video') {
+            if (this.isVideo) {
                 switch (type) {
                     case 'video/webm':
                         return media.canPlayType('video/webm; codecs="vp8, vorbis"').replace(/no/, '');
@@ -111,7 +111,7 @@ const support = {
                     default:
                         return false;
                 }
-            } else if (this.type === 'audio') {
+            } else if (this.isAudio) {
                 switch (type) {
                     case 'audio/mpeg':
                         return media.canPlayType('audio/mpeg;').replace(/no/, '');

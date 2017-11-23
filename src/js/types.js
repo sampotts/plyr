@@ -1,10 +1,16 @@
 // ==========================================================================
-// Plyr supported types
+// Plyr supported types and providers
 // ==========================================================================
 
-const types = {
-    embed: ['youtube', 'vimeo'],
-    html5: ['video', 'audio'],
+export const providers = {
+    html5: 'html5',
+    youtube: 'youtube',
+    vimeo: 'vimeo',
 };
 
-export default types;
+export const types = {
+    audio: 'audio',
+    video: 'video',
+};
+
+export default { providers, types };

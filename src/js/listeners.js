@@ -221,7 +221,7 @@ const listeners = {
         // Handle the media finishing
         utils.on(this.media, 'ended', () => {
             // Show poster on end
-            if (this.type === 'video' && this.config.showPosterOnEnd) {
+            if (this.isHTML5 && this.isVideo && this.config.showPosterOnEnd) {
                 // Restart
                 this.restart();
 
@@ -243,7 +243,7 @@ const listeners = {
         utils.on(this.media, 'stalled waiting canplay seeked playing', event => ui.checkLoading.call(this, event));
 
         // Click video
-        if (this.supported.ui && this.config.clickToPlay && this.type !== 'audio') {
+        if (this.supported.ui && this.config.clickToPlay && !this.isAudio) {
             // Re-fetch the wrapper
             const wrapper = utils.getElement.call(this, `.${this.config.classNames.video}`);
 

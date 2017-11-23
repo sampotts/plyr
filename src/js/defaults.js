@@ -13,7 +13,7 @@ const defaults = {
     autoplay: false,
 
     // Only allow one media playing at once (vimeo only)
-    autopause: false,
+    autopause: true,
 
     // Default time to skip when rewind/fast forward
     seekTime: 10,
@@ -267,6 +267,7 @@ const defaults = {
         embed: 'plyr__video-embed',
         control: 'plyr__control',
         type: 'plyr--{0}',
+        provider: 'plyr--{0}',
         stopped: 'plyr--stopped',
         playing: 'plyr--playing',
         loading: 'plyr--loading',

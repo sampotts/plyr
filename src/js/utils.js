@@ -73,24 +73,39 @@ const utils = {
 
     // Load an external script
     loadScript(url, callback) {
-        // Check script is not already referenced
-        if (document.querySelectorAll(`script[src="${url}"]`).length) {
+        const current = document.querySelector(`script[src="${url}"]`);
+
+        // Check script is not already referenced, if so wait for load
+        if (current !== null) {
+            current.callbacks = current.callbacks || [];
+            current.callbacks.push(callback);
             return;
         }
 
         // Build the element
         const element = document.createElement('script');
-        element.src = url;
 
-        // Find first script
-        const first = document.getElementsByTagName('script')[0];
+        // Callback queue
+        element.callbacks = element.callbacks || [];
+        element.callbacks.push(callback);
 
         // Bind callback
         if (utils.is.function(callback)) {
-            element.addEventListener('load', event => callback.call(null, event), false);
+            element.addEventListener(
+                'load',
+                event => {
+                    element.callbacks.forEach(cb => cb.call(null, event));
+                    element.callbacks = null;
+                },
+                false
+            );
         }
 
+        // Set the URL after binding callback
+        element.src = url;
+
         // Inject
+        const first = document.getElementsByTagName('script')[0];
         first.parentNode.insertBefore(element, first);
     },
 

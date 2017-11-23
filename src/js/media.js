@@ -23,6 +23,9 @@ const media = {
         // Add type class
         utils.toggleClass(this.elements.container, this.config.classNames.type.replace('{0}', this.type), true);
 
+        // Add provider class
+        utils.toggleClass(this.elements.container, this.config.classNames.provider.replace('{0}', this.provider), true);
+
         // Add video class for embeds
         // This will require changes if audio embeds are added
         if (this.isEmbed) {
@@ -31,7 +34,7 @@ const media = {
 
         if (this.supported.ui) {
             // Check for picture-in-picture support
-            utils.toggleClass(this.elements.container, this.config.classNames.pip.supported, support.pip && this.type === 'video');
+            utils.toggleClass(this.elements.container, this.config.classNames.pip.supported, support.pip && this.isHTML5 && this.isVideo);
 
             // Check for airplay support
             utils.toggleClass(this.elements.container, this.config.classNames.airplay.supported, support.airplay && this.isHTML5);
@@ -47,7 +50,7 @@ const media = {
         }
 
         // Inject the player wrapper
-        if (['video', 'youtube', 'vimeo'].includes(this.type)) {
+        if (this.isVideo || this.isYouTube || this.isVimeo) {
             // Create the wrapper div
             this.elements.wrapper = utils.createElement('div', {
                 class: this.config.classNames.video,
@@ -58,7 +61,7 @@ const media = {
         }
 
         if (this.isEmbed) {
-            switch (this.type) {
+            switch (this.provider) {
                 case 'youtube':
                     youtube.setup.call(this);
                     break;

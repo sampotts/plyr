@@ -445,7 +445,7 @@ const controls = {
         }
 
         // Toggle the pane and tab
-        const toggle = !utils.is.empty(this.options.quality) && this.type === 'youtube';
+        const toggle = !utils.is.empty(this.options.quality) && this.isYouTube;
         controls.toggleTab.call(this, type, toggle);
 
         // If we're hiding, nothing more to do
