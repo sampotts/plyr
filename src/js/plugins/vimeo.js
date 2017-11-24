@@ -275,8 +275,8 @@ const vimeo = {
             player.media.buffered = data.percent;
             utils.dispatchEvent.call(player, player.media, 'progress');
 
+            // Check all loaded
             if (parseInt(data.percent, 10) === 1) {
-                // Trigger event
                 utils.dispatchEvent.call(player, player.media, 'canplaythrough');
             }
         });

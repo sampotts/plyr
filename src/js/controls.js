@@ -542,12 +542,7 @@ const controls = {
 
         switch (setting) {
             case 'captions':
-                value = this.captions.language;
-
-                if (!this.captions.enabled) {
-                    value = '';
-                }
-
+                value = this.captions.enabled ? this.captions.language : '';
                 break;
 
             default:
@@ -578,19 +573,19 @@ const controls = {
             list = pane && pane.querySelector('ul');
         }
 
+        // Update the label
+        if (!utils.is.empty(value)) {
+            const label = this.elements.settings.tabs[setting].querySelector(`.${this.config.classNames.menu.value}`);
+            label.innerHTML = controls.getLabel.call(this, setting, value);
+        }
+
         // Find the radio option
         const target = list && list.querySelector(`input[value="${value}"]`);
 
-        if (!utils.is.htmlElement(target)) {
-            return;
+        if (utils.is.htmlElement(target)) {
+            // Check it
+            target.checked = true;
         }
-
-        // Check it
-        target.checked = true;
-
-        // Find the label
-        const label = this.elements.settings.tabs[setting].querySelector(`.${this.config.classNames.menu.value}`);
-        label.innerHTML = controls.getLabel.call(this, setting, value);
     },
 
     // Set the looping options

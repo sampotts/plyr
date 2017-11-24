@@ -282,6 +282,12 @@ const listeners = {
             );
         }
 
+        // Volume change
+        utils.on(this.media, 'volumechange', () => {
+            // Save to storage
+            storage.set.call(this, { volume: this.volume, muted: this.muted });
+        });
+
         // Speed change
         utils.on(this.media, 'ratechange', () => {
             // Update UI
@@ -302,14 +308,11 @@ const listeners = {
 
         // Caption language change
         utils.on(this.media, 'languagechange', () => {
+            // Update UI
+            controls.updateSetting.call(this, 'captions');
+
             // Save to storage
             storage.set.call(this, { language: this.language });
-        });
-
-        // Volume change
-        utils.on(this.media, 'volumechange', () => {
-            // Save to storage
-            storage.set.call(this, { volume: this.volume, muted: this.muted });
         });
 
         // Captions toggle
