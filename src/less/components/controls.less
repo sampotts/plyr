@@ -87,20 +87,19 @@
     padding: @plyr-control-spacing;
     border-radius: inherit;
     background: @plyr-audio-controls-bg;
-    border: @plyr-audio-controls-border;
     color: @plyr-audio-control-color;
 }
 
 // Some options are hidden by default
 .plyr [data-plyr='captions'],
-    .plyr [data-plyr='pip'],
-    .plyr [data-plyr='airplay'],
-    .plyr [data-plyr='fullscreen'] {
+.plyr [data-plyr='pip'],
+.plyr [data-plyr='airplay'],
+.plyr [data-plyr='fullscreen'] {
     display: none;
 }
 .plyr--captions-enabled [data-plyr='captions'],
-    .plyr--pip-supported [data-plyr='pip'],
-    .plyr--airplay-supported [data-plyr='airplay'],
-    .plyr--fullscreen-enabled [data-plyr='fullscreen'] {
+.plyr--pip-supported [data-plyr='pip'],
+.plyr--airplay-supported [data-plyr='airplay'],
+.plyr--fullscreen-enabled [data-plyr='fullscreen'] {
     display: inline-block;
 }
