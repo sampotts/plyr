@@ -63,6 +63,9 @@ Created and maintained by Jon Uhlmann ([@jonnitto](https://github.com/jonnitto))
 ### [Kirby](https://github.com/dpschen/kirby-plyrtag)
 Created and maintained by Dominik Pschenitschni ([@dpschen](https://github.com/dpschen))
 
+### [React](https://github.com/xDae/react-plyr)
+Created and maintained by Jose Miguel Bejarano ([@xDae](https://github.com/xDae))
+
 ## Using package managers
 You can grab the source using one of the following package managers.
 
