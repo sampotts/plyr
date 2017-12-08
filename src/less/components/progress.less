@@ -4,7 +4,7 @@
 
 .plyr__progress {
     position: relative;
-    display: none;
+    display: flex;
     flex: 1;
 
     input[type='range'] {
@@ -17,10 +17,6 @@
         left: 0;
         font-size: @plyr-font-size-time;
     }
-}
-
-.plyr .plyr__progress {
-    display: inline-block;
 }
 
 .plyr__progress--buffer {
@@ -40,6 +36,7 @@
 
     &::-webkit-progress-bar {
         background: transparent;
+        transition: width 0.2s ease;
     }
 
     &::-webkit-progress-value {
@@ -53,24 +50,12 @@
         background: currentColor;
         border-radius: 100px;
         min-width: @plyr-range-track-height;
+        transition: width 0.2s ease;
     }
 
     // Microsoft
     &::-ms-fill {
         border-radius: 100px;
-    }
-}
-
-.plyr__progress--buffer {
-    &::-webkit-progress-value {
-        transition: width 0.2s ease;
-    }
-
-    &::-moz-progress-bar {
-        transition: width 0.2s ease;
-    }
-
-    &::-ms-fill {
         transition: width 0.2s ease;
     }
 }

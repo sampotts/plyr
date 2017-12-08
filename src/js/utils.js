@@ -29,22 +29,22 @@ const utils = {
             return !this.nullOrUndefined(input) && Array.isArray(input);
         },
         weakMap(input) {
-            return this.instanceof(input, WeakMap);
+            return this.instanceof(input, window.WeakMap);
         },
         nodeList(input) {
-            return this.instanceof(input, NodeList);
+            return this.instanceof(input, window.NodeList);
         },
         element(input) {
-            return this.instanceof(input, Element);
+            return this.instanceof(input, window.Element);
         },
         textNode(input) {
             return this.getConstructor(input) === Text;
         },
         event(input) {
-            return this.instanceof(input, Event);
+            return this.instanceof(input, window.Event);
         },
         cue(input) {
-            return this.instanceof(input, TextTrackCue) || this.instanceof(input, VTTCue);
+            return this.instanceof(input, window.TextTrackCue) || this.instanceof(input, window.VTTCue);
         },
         track(input) {
             return this.instanceof(input, TextTrack) || (!this.nullOrUndefined(input) && this.string(input.kind));

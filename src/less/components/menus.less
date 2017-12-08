@@ -3,6 +3,7 @@
 // --------------------------------------------------------------
 
 .plyr__menu {
+    display: flex; // Edge fix
     position: relative;
 
     // Animate the icon
@@ -11,7 +12,7 @@
     }
     .plyr__control[aria-expanded='true'] {
         svg {
-            transform: rotate(45deg);
+            transform: rotate(90deg);
         }
 
         // Hide tooltip

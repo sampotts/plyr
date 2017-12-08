@@ -35,7 +35,7 @@
 .plyr-range-thumb() {
     position: relative;
     height: @plyr-range-thumb-height;
-    width: @plyr-range-thumb-width;
+    width: @plyr-range-thumb-height;
     background: @plyr-range-thumb-bg;
     border: @plyr-range-thumb-border;
     border-radius: 100%;
@@ -47,7 +47,7 @@
 .plyr-range-thumb-active() {
     background: @plyr-range-thumb-active-bg;
     border-color: @plyr-range-thumb-active-border-color;
-    transform: scale(@plyr-range-thumb-active-scale);
+    transform: scale(unit(@plyr-range-thumb-active-height / @plyr-range-thumb-height));
 }
 
 // Fullscreen styles

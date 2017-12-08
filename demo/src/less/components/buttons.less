@@ -29,15 +29,37 @@
     &:hover,
     &:focus {
         color: @gray-dark;
-        outline: 0;
 
+        // Remove the underline/border
         &::after {
             display: none;
         }
     }
 
+    &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 2px fade(#000, 10%);
+    }
+
+    &:focus {
+        outline: 0;
+    }
+
     &.tab-focus {
         .tab-focus();
+    }
+
+    &:active {
+        transform: translateY(1px);
+    }
+}
+
+// Button group
+.button--with-count {
+    display: inline-flex;
+
+    .button .icon {
+        flex-shrink: 0;
     }
 }
 
