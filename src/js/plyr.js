@@ -10,14 +10,20 @@ import defaults from './defaults';
 import support from './support';
 import utils from './utils';
 
+import Console from './console';
+import Storage from './storage';
+
 import captions from './captions';
 import controls from './controls';
 import fullscreen from './fullscreen';
 import listeners from './listeners';
 import media from './media';
-import storage from './storage';
 import source from './source';
 import ui from './ui';
+
+// Private properties
+// TODO: Use a WeakMap for private globals
+// const globals = new WeakMap();
 
 // Globals
 let scrollPosition = {
@@ -54,7 +60,7 @@ class Plyr {
                 try {
                     return JSON.parse(this.media.getAttribute('data-plyr-config'));
                 } catch (e) {
-                    return null;
+                    return {};
                 }
             })()
         );
@@ -76,7 +82,7 @@ class Plyr {
 
         // Captions
         this.captions = {
-            enabled: null,
+            active: null,
             currentTrack: null,
         };
 
@@ -92,46 +98,35 @@ class Plyr {
         };
 
         // Debugging
-        this.console = {
-            log() {},
-            warn() {},
-            error() {},
-        };
-        if (this.config.debug && 'console' in window) {
-            this.console = {
-                log: console.log, // eslint-disable-line
-                warn: console.warn, // eslint-disable-line
-                error: console.error, // eslint-disable-line
-            };
-            this.console.log('Debugging enabled');
-        }
+        // TODO: move to globals
+        this.debug = new Console(this);
 
         // Log config options and support
-        this.console.log('Config', this.config);
-        this.console.log('Support', support);
+        this.debug.log('Config', this.config);
+        this.debug.log('Support', support);
 
         // We need an element to setup
-        if (utils.is.nullOrUndefined(this.media) || !utils.is.htmlElement(this.media)) {
-            this.console.error('Setup failed: no suitable element passed');
+        if (utils.is.nullOrUndefined(this.media) || !utils.is.element(this.media)) {
+            this.debug.error('Setup failed: no suitable element passed');
             return;
         }
 
         // Bail if the element is initialized
         if (this.media.plyr) {
-            this.console.warn('Target already setup');
+            this.debug.warn('Target already setup');
             return;
         }
 
         // Bail if not enabled
         if (!this.config.enabled) {
-            this.console.error('Setup failed: disabled by config');
+            this.debug.error('Setup failed: disabled by config');
             return;
         }
 
         // Bail if disabled or no basic support
         // You may want to disable certain UAs etc
         if (!support.check().api) {
-            this.console.error('Setup failed: no support');
+            this.debug.error('Setup failed: no support');
             return;
         }
 
@@ -158,13 +153,13 @@ class Plyr {
                 this.embedId = this.media.getAttribute(attributes.id);
 
                 if (utils.is.empty(this.provider) || !Object.keys(providers).includes(this.provider)) {
-                    this.console.error('Setup failed: Invalid provider');
+                    this.debug.error('Setup failed: Invalid provider');
                     return;
                 }
 
                 // Try and get the embed id
                 if (utils.is.empty(this.embedId)) {
-                    this.console.error('Setup failed: Embed ID or URL missing');
+                    this.debug.error('Setup failed: Embed ID or URL missing');
                     return;
                 }
 
@@ -202,19 +197,19 @@ class Plyr {
                 break;
 
             default:
-                this.console.error('Setup failed: unsupported type');
+                this.debug.error('Setup failed: unsupported type');
                 return;
         }
 
         // Setup local storage for user settings
-        storage.setup.call(this);
+        this.storage = new Storage(this);
 
         // Check for support again but with type
         this.supported = support.check(this.type, this.provider, this.config.inline);
 
         // If no support for even API, bail
         if (!this.supported.api) {
-            this.console.error('Setup failed: no support');
+            this.debug.error('Setup failed: no support');
             return;
         }
 
@@ -240,7 +235,7 @@ class Plyr {
         // Listen for events if debugging
         if (this.config.debug) {
             utils.on(this.elements.container, this.config.events.join(' '), event => {
-                this.console.log(`event: ${event.type}`);
+                this.debug.log(`event: ${event.type}`);
             });
         }
 
@@ -386,7 +381,7 @@ class Plyr {
         this.media.currentTime = targetTime.toFixed(4);
 
         // Logging
-        this.console.log(`Seeking to ${this.currentTime} seconds`);
+        this.debug.log(`Seeking to ${this.currentTime} seconds`);
     }
 
     /**
@@ -432,7 +427,7 @@ class Plyr {
 
         // Load volume from storage if no value specified
         if (!utils.is.number(volume)) {
-            ({ volume } = storage.get.call(this));
+            volume = this.storage.get('volume');
         }
 
         // Use config if all else fails
@@ -497,7 +492,7 @@ class Plyr {
 
         // Load muted state from storage
         if (!utils.is.boolean(toggle)) {
-            toggle = storage.get.call(this).muted;
+            toggle = this.storage.get('muted');
         }
 
         // Use config if all else fails
@@ -541,9 +536,13 @@ class Plyr {
 
         if (utils.is.number(input)) {
             speed = input;
-        } else if (utils.is.number(storage.get.call(this).speed)) {
-            ({ speed } = storage.get.call(this));
-        } else {
+        }
+
+        if (!utils.is.number(speed)) {
+            speed = this.storage.get('speed');
+        }
+
+        if (!utils.is.number(speed)) {
             speed = this.config.speed.selected;
         }
 
@@ -556,7 +555,7 @@ class Plyr {
         }
 
         if (!this.config.speed.options.includes(speed)) {
-            this.console.warn(`Unsupported speed (${speed})`);
+            this.debug.warn(`Unsupported speed (${speed})`);
             return;
         }
 
@@ -584,14 +583,18 @@ class Plyr {
 
         if (utils.is.string(input)) {
             quality = input;
-        } else if (utils.is.number(storage.get.call(this).quality)) {
-            ({ quality } = storage.get.call(this));
-        } else {
+        }
+
+        if (!utils.is.string(quality)) {
+            quality = this.storage.get('quality');
+        }
+
+        if (!utils.is.string(quality)) {
             quality = this.config.quality.selected;
         }
 
         if (!this.options.quality.includes(quality)) {
-            this.console.warn(`Unsupported quality option (${quality})`);
+            this.debug.warn(`Unsupported quality option (${quality})`);
             return;
         }
 
@@ -691,7 +694,7 @@ class Plyr {
      */
     set poster(input) {
         if (!this.isHTML5 || !this.isVideo) {
-            this.console.warn('Poster can only be set on HTML5 video');
+            this.debug.warn('Poster can only be set on HTML5 video');
             return;
         }
 
@@ -733,7 +736,7 @@ class Plyr {
      */
     toggleCaptions(input) {
         // If there's no full support, or there's no caption toggle
-        if (!this.supported.ui || !utils.is.htmlElement(this.elements.buttons.captions)) {
+        if (!this.supported.ui || !utils.is.element(this.elements.buttons.captions)) {
             return this;
         }
 
@@ -741,21 +744,21 @@ class Plyr {
         const show = utils.is.boolean(input) ? input : this.elements.container.className.indexOf(this.config.classNames.captions.active) === -1;
 
         // Nothing to change...
-        if (this.captions.enabled === show) {
+        if (this.captions.active === show) {
             return this;
         }
 
         // Set global
-        this.captions.enabled = show;
+        this.captions.active = show;
 
         // Toggle state
-        utils.toggleState(this.elements.buttons.captions, this.captions.enabled);
+        utils.toggleState(this.elements.buttons.captions, this.captions.active);
 
         // Add class hook
-        utils.toggleClass(this.elements.container, this.config.classNames.captions.active, this.captions.enabled);
+        utils.toggleClass(this.elements.container, this.config.classNames.captions.active, this.captions.active);
 
         // Trigger an event
-        utils.dispatchEvent.call(this, this.media, this.captions.enabled ? 'captionsenabled' : 'captionsdisabled');
+        utils.dispatchEvent.call(this, this.media, this.captions.active ? 'captionsenabled' : 'captionsdisabled');
 
         // Allow chaining
         return this;
@@ -850,7 +853,7 @@ class Plyr {
         }
 
         // Set button state
-        if (utils.is.htmlElement(this.elements.buttons.fullscreen)) {
+        if (utils.is.element(this.elements.buttons.fullscreen)) {
             utils.toggleState(this.elements.buttons.fullscreen, this.fullscreen.active);
         }
 
@@ -916,7 +919,7 @@ class Plyr {
      */
     toggleControls(toggle) {
         // We need controls of course...
-        if (!utils.is.htmlElement(this.elements.controls)) {
+        if (!utils.is.element(this.elements.controls)) {
             return this;
         }
 
@@ -981,7 +984,7 @@ class Plyr {
         // then set the timer to hide the controls
         if (!show || this.playing) {
             this.timers.controls = window.setTimeout(() => {
-                /* this.console.warn({
+                /* this.debug.warn({
                     pressed: this.elements.controls.pressed,
                     hover: this.elements.controls.pressed,
                     playing: this.playing,
@@ -1088,7 +1091,7 @@ class Plyr {
                 // Replace the container with the original element provided
                 const parent = this.elements.container.parentNode;
 
-                if (utils.is.htmlElement(parent)) {
+                if (utils.is.element(parent)) {
                     parent.replaceChild(this.elements.original, this.elements.container);
                 }
 

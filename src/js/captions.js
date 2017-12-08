@@ -5,7 +5,6 @@
 import support from './support';
 import utils from './utils';
 import controls from './controls';
-import storage from './storage';
 
 const captions = {
     // Setup captions
@@ -16,18 +15,24 @@ const captions = {
         }
 
         // Set default language if not set
-        if (!utils.is.empty(storage.get.call(this).language)) {
-            this.captions.language = storage.get.call(this).language;
-        } else if (utils.is.empty(this.captions.language)) {
+        const stored = this.storage.get('language');
+
+        if (!utils.is.empty(stored)) {
+            this.captions.language = stored;
+        }
+
+        if (utils.is.empty(this.captions.language)) {
             this.captions.language = this.config.captions.language.toLowerCase();
         }
 
         // Set captions enabled state if not set
-        if (!utils.is.boolean(this.captions.enabled)) {
-            if (!utils.is.empty(storage.get.call(this).language)) {
-                this.captions.enabled = storage.get.call(this).captions;
+        if (!utils.is.boolean(this.captions.active)) {
+            const active = this.storage.get('captions');
+
+            if (utils.is.boolean(active)) {
+                this.captions.active = active;
             } else {
-                this.captions.enabled = this.config.captions.active;
+                this.captions.active = this.config.captions.active;
             }
         }
 
@@ -42,7 +47,7 @@ const captions = {
         }
 
         // Inject the container
-        if (!utils.is.htmlElement(this.elements.captions)) {
+        if (!utils.is.element(this.elements.captions)) {
             this.elements.captions = utils.createElement('div', utils.getAttributesFromSelector(this.config.selectors.captions));
 
             utils.insertAfter(this.elements.captions, this.elements.wrapper);
@@ -141,7 +146,7 @@ const captions = {
             return;
         }
 
-        if (utils.is.htmlElement(this.elements.captions)) {
+        if (utils.is.element(this.elements.captions)) {
             const content = utils.createElement('span');
 
             // Empty the container
@@ -160,19 +165,19 @@ const captions = {
             // Set new caption text
             this.elements.captions.appendChild(content);
         } else {
-            this.console.warn('No captions element to render to');
+            this.debug.warn('No captions element to render to');
         }
     },
 
     // Display captions container and button (for initialization)
     show() {
         // If there's no caption toggle, bail
-        if (!utils.is.htmlElement(this.elements.buttons.captions)) {
+        if (!utils.is.element(this.elements.buttons.captions)) {
             return;
         }
 
         // Try to load the value from storage
-        let active = storage.get.call(this).captions;
+        let active = this.storage.get('captions');
 
         // Otherwise fall back to the default config
         if (!utils.is.boolean(active)) {

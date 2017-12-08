@@ -31,7 +31,7 @@ const ui = {
 
         // Don't setup interface if no support
         if (!this.supported.ui) {
-            this.console.warn(`Basic support only for ${this.provider} ${this.type}`);
+            this.debug.warn(`Basic support only for ${this.provider} ${this.type}`);
 
             // Remove controls
             utils.removeElement.call(this, 'controls');
@@ -47,7 +47,7 @@ const ui = {
         }
 
         // Inject custom controls if not present
-        if (!utils.is.htmlElement(this.elements.controls)) {
+        if (!utils.is.element(this.elements.controls)) {
             // Inject custom controls
             controls.inject.call(this);
 
@@ -56,7 +56,7 @@ const ui = {
         }
 
         // If there's no controls, bail
-        if (!utils.is.htmlElement(this.elements.controls)) {
+        if (!utils.is.element(this.elements.controls)) {
             return;
         }
 
@@ -125,7 +125,7 @@ const ui = {
         if (this.isEmbed) {
             const iframe = utils.getElement.call(this, 'iframe');
 
-            if (!utils.is.htmlElement(iframe)) {
+            if (!utils.is.element(iframe)) {
                 return;
             }
 
@@ -175,19 +175,19 @@ const ui = {
         }
 
         // Update range
-        if (utils.is.htmlElement(this.elements.inputs.volume)) {
+        if (utils.is.element(this.elements.inputs.volume)) {
             ui.setRange.call(this, this.elements.inputs.volume, this.muted ? 0 : this.volume);
         }
 
         // Update mute state
-        if (utils.is.htmlElement(this.elements.buttons.mute)) {
+        if (utils.is.element(this.elements.buttons.mute)) {
             utils.toggleState(this.elements.buttons.mute, this.muted || this.volume === 0);
         }
     },
 
     // Update seek value and lower fill
     setRange(target, value = 0) {
-        if (!utils.is.htmlElement(target)) {
+        if (!utils.is.element(target)) {
             return;
         }
 
@@ -201,15 +201,15 @@ const ui = {
     // Set <progress> value
     setProgress(target, input) {
         const value = utils.is.number(input) ? input : 0;
-        const progress = utils.is.htmlElement(target) ? target : this.elements.display.buffer;
+        const progress = utils.is.element(target) ? target : this.elements.display.buffer;
 
         // Update value and label
-        if (utils.is.htmlElement(progress)) {
+        if (utils.is.element(progress)) {
             progress.value = value;
 
             // Update text label inside
             const label = progress.getElementsByTagName('span')[0];
-            if (utils.is.htmlElement(label)) {
+            if (utils.is.element(label)) {
                 label.childNodes[0].nodeValue = value;
             }
         }
@@ -267,7 +267,7 @@ const ui = {
     // Update the displayed time
     updateTimeDisplay(target = null, time = 0, inverted = false) {
         // Bail if there's no element to display or the value isn't a number
-        if (!utils.is.htmlElement(target) || !utils.is.number(time)) {
+        if (!utils.is.element(target) || !utils.is.number(time)) {
             return;
         }
 
@@ -299,7 +299,7 @@ const ui = {
     // Handle time change event
     timeUpdate(event) {
         // Only invert if only one time element is displayed and used for both duration and currentTime
-        const invert = !utils.is.htmlElement(this.elements.display.duration) && this.config.invertTime;
+        const invert = !utils.is.element(this.elements.display.duration) && this.config.invertTime;
 
         // Duration
         ui.updateTimeDisplay.call(this, this.elements.display.currentTime, invert ? this.duration - this.currentTime : this.currentTime, invert);
@@ -320,12 +320,12 @@ const ui = {
         }
 
         // If there's only one time display, display duration there
-        if (!utils.is.htmlElement(this.elements.display.duration) && this.config.displayDuration && this.paused) {
+        if (!utils.is.element(this.elements.display.duration) && this.config.displayDuration && this.paused) {
             ui.updateTimeDisplay.call(this, this.elements.display.currentTime, this.duration);
         }
 
         // If there's a duration element, update content
-        if (utils.is.htmlElement(this.elements.display.duration)) {
+        if (utils.is.element(this.elements.display.duration)) {
             ui.updateTimeDisplay.call(this, this.elements.display.duration, this.duration);
         }
 

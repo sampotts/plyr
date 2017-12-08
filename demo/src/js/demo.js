@@ -34,10 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 0);
     });
 
-    /* document.body.addEventListener('ready', function(event) {
-        console.log(event);
-    }); */
-
     // Setup the player
     const player = new window.Plyr('#player', {
         debug: true,

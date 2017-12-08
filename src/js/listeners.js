@@ -6,7 +6,6 @@ import support from './support';
 import utils from './utils';
 import controls from './controls';
 import fullscreen from './fullscreen';
-import storage from './storage';
 import ui from './ui';
 
 // Sniff out the browser
@@ -53,7 +52,7 @@ const listeners = {
                 // and if the focused element is not editable (e.g. text input)
                 // and any that accept key input http://webaim.org/techniques/keyboard/
                 const focused = utils.getFocusElement();
-                if (utils.is.htmlElement(focused) && utils.matches(focused, this.config.selectors.editable)) {
+                if (utils.is.element(focused) && utils.matches(focused, this.config.selectors.editable)) {
                     return;
                 }
 
@@ -248,7 +247,7 @@ const listeners = {
             const wrapper = utils.getElement.call(this, `.${this.config.classNames.video}`);
 
             // Bail if there's no wrapper (this should never happen)
-            if (!utils.is.htmlElement(wrapper)) {
+            if (!utils.is.element(wrapper)) {
                 return;
             }
 
@@ -285,7 +284,7 @@ const listeners = {
         // Volume change
         utils.on(this.media, 'volumechange', () => {
             // Save to storage
-            storage.set.call(this, { volume: this.volume, muted: this.muted });
+            this.storage.set({ volume: this.volume, muted: this.muted });
         });
 
         // Speed change
@@ -294,7 +293,7 @@ const listeners = {
             controls.updateSetting.call(this, 'speed');
 
             // Save to storage
-            storage.set.call(this, { speed: this.speed });
+            this.storage.set({ speed: this.speed });
         });
 
         // Quality change
@@ -303,7 +302,7 @@ const listeners = {
             controls.updateSetting.call(this, 'quality');
 
             // Save to storage
-            storage.set.call(this, { quality: this.quality });
+            this.storage.set({ quality: this.quality });
         });
 
         // Caption language change
@@ -312,7 +311,7 @@ const listeners = {
             controls.updateSetting.call(this, 'captions');
 
             // Save to storage
-            storage.set.call(this, { language: this.language });
+            this.storage.set({ language: this.language });
         });
 
         // Captions toggle
@@ -321,7 +320,7 @@ const listeners = {
             controls.updateSetting.call(this, 'captions');
 
             // Save to storage
-            storage.set.call(this, { captions: this.captions.enabled });
+            this.storage.set({ captions: this.captions.active });
         });
 
         // Proxy events to container
@@ -462,7 +461,7 @@ const listeners = {
 
         // Current time invert
         // Only if one time element is used for both currentTime and duration
-        if (this.config.toggleInvert && !utils.is.htmlElement(this.elements.display.duration)) {
+        if (this.config.toggleInvert && !utils.is.element(this.elements.display.duration)) {
             utils.on(this.elements.display.currentTime, 'click', () => {
                 // Do nothing if we're at the start
                 if (this.currentTime === 0) {

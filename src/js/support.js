@@ -50,25 +50,6 @@ const support = {
         };
     },
 
-    // Local storage
-    // We can't assume if local storage is present that we can use it
-    storage: (() => {
-        if (!('localStorage' in window)) {
-            return false;
-        }
-
-        // Try to use it (it might be disabled, e.g. user is in private/porn mode)
-        // see: https://github.com/sampotts/plyr/issues/131
-        const test = '___test';
-        try {
-            window.localStorage.setItem(test, test);
-            window.localStorage.removeItem(test);
-            return true;
-        } catch (e) {
-            return false;
-        }
-    })(),
-
     // Picture-in-picture support
     // Safari only currently
     pip: (() => {

@@ -7,6 +7,9 @@ import support from './support';
 const utils = {
     // Check variable types
     is: {
+        plyr(input) {
+            return this.instanceof(input, Plyr);
+        },
         object(input) {
             return this.getConstructor(input) === Object;
         },
@@ -25,23 +28,26 @@ const utils = {
         array(input) {
             return !this.nullOrUndefined(input) && Array.isArray(input);
         },
-        nodeList(input) {
-            return this.instanceof(input, window.NodeList);
+        weakMap(input) {
+            return this.instanceof(input, WeakMap);
         },
-        htmlElement(input) {
-            return this.instanceof(input, window.HTMLElement);
+        nodeList(input) {
+            return this.instanceof(input, NodeList);
+        },
+        element(input) {
+            return this.instanceof(input, Element);
         },
         textNode(input) {
             return this.getConstructor(input) === Text;
         },
         event(input) {
-            return this.instanceof(input, window.Event);
+            return this.instanceof(input, Event);
         },
         cue(input) {
-            return this.instanceof(input, window.TextTrackCue) || this.instanceof(input, window.VTTCue);
+            return this.instanceof(input, TextTrackCue) || this.instanceof(input, VTTCue);
         },
         track(input) {
-            return this.instanceof(input, window.TextTrack) || (!this.nullOrUndefined(input) && this.string(input.kind));
+            return this.instanceof(input, TextTrack) || (!this.nullOrUndefined(input) && this.string(input.kind));
         },
         nullOrUndefined(input) {
             return input === null || typeof input === 'undefined';
@@ -249,7 +255,7 @@ const utils = {
 
     // Remove an element
     removeElement(element) {
-        if (!utils.is.htmlElement(element) || !utils.is.htmlElement(element.parentNode)) {
+        if (!utils.is.element(element) || !utils.is.element(element.parentNode)) {
             return null;
         }
 
@@ -270,6 +276,10 @@ const utils = {
 
     // Set attributes
     setAttributes(element, attributes) {
+        if (!utils.is.element(element) || utils.is.empty(attributes)) {
+            return;
+        }
+
         Object.keys(attributes).forEach(key => {
             element.setAttribute(key, attributes[key]);
         });
@@ -334,7 +344,7 @@ const utils = {
 
     // Toggle class on an element
     toggleClass(element, className, toggle) {
-        if (utils.is.htmlElement(element)) {
+        if (utils.is.element(element)) {
             const contains = element.classList.contains(className);
 
             element.classList[toggle ? 'add' : 'remove'](className);
@@ -347,12 +357,12 @@ const utils = {
 
     // Has class name
     hasClass(element, className) {
-        return utils.is.htmlElement(element) && element.classList.contains(className);
+        return utils.is.element(element) && element.classList.contains(className);
     },
 
     // Toggle hidden attribute on an element
     toggleHidden(element, toggle) {
-        if (!utils.is.htmlElement(element)) {
+        if (!utils.is.element(element)) {
             return;
         }
 
@@ -424,14 +434,14 @@ const utils = {
             };
 
             // Seek tooltip
-            if (utils.is.htmlElement(this.elements.progress)) {
+            if (utils.is.element(this.elements.progress)) {
                 this.elements.display.seekTooltip = this.elements.progress.querySelector(`.${this.config.classNames.tooltip}`);
             }
 
             return true;
         } catch (error) {
             // Log it
-            this.console.warn('It looks like there is a problem with your custom controls HTML', error);
+            this.debug.warn('It looks like there is a problem with your custom controls HTML', error);
 
             // Restore native video controls
             this.toggleNativeControls(true);
@@ -560,7 +570,7 @@ const utils = {
     // http://www.ssbbartgroup.com/blog/how-not-to-misuse-aria-states-properties-and-roles
     toggleState(element, input) {
         // Bail if no target
-        if (!utils.is.htmlElement(element)) {
+        if (!utils.is.element(element)) {
             return;
         }
 
@@ -580,45 +590,31 @@ const utils = {
         return (current / max * 100).toFixed(2);
     },
 
-    // Deep extend/merge destination object with N more objects
-    // http://andrewdupont.net/2009/08/28/deep-extending-objects-in-javascript/
-    // Removed call to arguments.callee (used explicit function name instead)
-    extend(...objects) {
-        const { length } = objects;
-
-        // Bail if nothing to merge
-        if (!length) {
-            return null;
+    // Deep extend destination object with N more objects
+    extend(target = {}, ...sources) {
+        if (!sources.length) {
+            return target;
         }
 
-        // Return first if specified but nothing to merge
-        if (length === 1) {
-            return objects[0];
+        const source = sources.shift();
+
+        if (!utils.is.object(source)) {
+            return target;
         }
 
-        // First object is the destination
-        let destination = Array.prototype.shift.call(objects);
-        if (!utils.is.object(destination)) {
-            destination = {};
-        }
-
-        // Loop through all objects to merge
-        objects.forEach(source => {
-            if (!utils.is.object(source)) {
-                return;
-            }
-
-            Object.keys(source).forEach(property => {
-                if (source[property] && source[property].constructor && source[property].constructor === Object) {
-                    destination[property] = destination[property] || {};
-                    utils.extend(destination[property], source[property]);
-                } else {
-                    destination[property] = source[property];
+        Object.keys(source).forEach(key => {
+            if (utils.is.object(source[key])) {
+                if (!Object.keys(target).includes(key)) {
+                    Object.assign(target, { [key]: {} });
                 }
-            });
+
+                utils.extend(target[key], source[key]);
+            } else {
+                Object.assign(target, { [key]: source[key] });
+            }
         });
 
-        return destination;
+        return utils.extend(target, ...sources);
     },
 
     // Parse YouTube ID from URL
@@ -679,6 +675,15 @@ const utils = {
 
         return typeof type === 'string' ? type : false;
     })(),
+
+    // Force repaint of element
+    repaint(element) {
+        window.setTimeout(() => {
+            element.setAttribute('hidden', '');
+            element.offsetHeight; // eslint-disable-line
+            element.removeAttribute('hidden');
+        }, 0);
+    },
 };
 
 export default utils;

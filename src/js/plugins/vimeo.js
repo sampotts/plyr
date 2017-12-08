@@ -242,7 +242,7 @@ const vimeo = {
         });
 
         player.embed.on('loaded', () => {
-            if (utils.is.htmlElement(player.embed.element) && player.supported.ui) {
+            if (utils.is.element(player.embed.element) && player.supported.ui) {
                 const frame = player.embed.element;
 
                 // Fix keyboard focus issues

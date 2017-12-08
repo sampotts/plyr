@@ -1,13 +1,15 @@
+// --------------------------------------------------------------
+// Control buttons
+// --------------------------------------------------------------
+
 .plyr__control {
     position: relative;
-    display: inline-block;
     flex-shrink: 0;
     overflow: visible; // IE11
-    vertical-align: middle;
     padding: @plyr-control-padding;
     border: 0;
     background: transparent;
-    border-radius: 3px;
+    border-radius: @plyr-control-radius;
     cursor: pointer;
     transition: all 0.3s ease;
     color: inherit;
@@ -66,7 +68,7 @@
 
     svg {
         position: relative;
-        left: 2px;
+        left: 2px; // Offset to make the play button look right
         width: @plyr-control-icon-size-large;
         height: @plyr-control-icon-size-large;
     }
@@ -78,7 +80,7 @@
 }
 
 .plyr--full-ui.plyr--video .plyr__control--overlaid {
-    display: inline-block;
+    display: block;
 }
 
 .plyr--playing .plyr__control--overlaid {

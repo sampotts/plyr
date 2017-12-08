@@ -4,7 +4,7 @@
 /* global require, __dirname */
 /* eslint no-console: "off" */
 
-const fs = require('fs');
+const del = require('del');
 const path = require('path');
 const gulp = require('gulp');
 const gutil = require('gulp-util');
@@ -70,6 +70,7 @@ const tasks = {
     sass: [],
     js: [],
     sprite: [],
+    clean: ['clean'],
 };
 
 // Size plugin
@@ -97,10 +98,20 @@ const babelrc = {
     exclude: 'node_modules/**',
 };
 
+// Clean out /dist
+gulp.task('clean', () => {
+    const dirs = [paths.plyr.output, paths.demo.output].map(dir => path.join(dir, '**/*'));
+
+    // Don't delete the mp4
+    dirs.push(`!${path.join(paths.plyr.output, '**/*.mp4')}`);
+
+    del(dirs);
+});
+
 const build = {
     js(files, bundle, options) {
         Object.keys(files).forEach(key => {
-            const name = `js-${key}`;
+            const name = `js:${key}`;
             tasks.js.push(name);
 
             gulp.task(name, () =>
@@ -124,7 +135,7 @@ const build = {
     },
     less(files, bundle) {
         Object.keys(files).forEach(key => {
-            const name = `less-${key}`;
+            const name = `less:${key}`;
             tasks.less.push(name);
 
             gulp.task(name, () =>
@@ -142,7 +153,7 @@ const build = {
     },
     sass(files, bundle) {
         Object.keys(files).forEach(key => {
-            const name = `sass-${key}`;
+            const name = `sass:${key}`;
             tasks.sass.push(name);
 
             gulp.task(name, () =>
@@ -159,7 +170,7 @@ const build = {
         });
     },
     sprite(bundle) {
-        const name = `sprite-${bundle}`;
+        const name = `svg:sprite:${bundle}`;
         tasks.sprite.push(name);
 
         // Process Icons
@@ -217,7 +228,7 @@ gulp.task('watch', () => {
 
 // Default gulp task
 gulp.task('default', () => {
-    run(tasks.js, tasks.less, tasks.sprite, 'watch');
+    run(tasks.clean, tasks.js, tasks.less, tasks.sprite, 'watch');
 });
 
 // Publish a version to CDN and demo
@@ -250,8 +261,7 @@ const options = {
 
 // If aws is setup
 if ('cdn' in aws) {
-    const regex =
-        '(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*).(?:0|[1-9][0-9]*)(?:-[\\da-z\\-]+(?:.[\\da-z\\-]+)*)?(?:\\+[\\da-z\\-]+(?:.[\\da-z\\-]+)*)?';
+    const regex = '(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*).(?:0|[1-9][0-9]*)(?:-[\\da-z\\-]+(?:.[\\da-z\\-]+)*)?(?:\\+[\\da-z\\-]+(?:.[\\da-z\\-]+)*)?';
     const cdnpath = new RegExp(`${aws.cdn.domain}/${regex}`, 'gi');
     const semver = new RegExp(`v${regex}`, 'gi');
     const localPath = new RegExp('(../)?dist', 'gi');
@@ -350,6 +360,6 @@ if ('cdn' in aws) {
 
     // Do everything
     gulp.task('publish', () => {
-        run(tasks.js, tasks.less, tasks.sprite, 'cdn', 'demo');
+        run(tasks.clean, tasks.js, tasks.less, tasks.sprite, 'cdn', 'demo');
     });
 }

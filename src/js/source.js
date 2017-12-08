@@ -26,7 +26,7 @@ const source = {
     // Sources are not checked for support so be careful
     change(input) {
         if (!utils.is.object(input) || !('sources' in input) || !input.sources.length) {
-            this.console.warn('Invalid source format');
+            this.debug.warn('Invalid source format');
             return;
         }
 
@@ -44,7 +44,7 @@ const source = {
                 this.media = null;
 
                 // Reset class name
-                if (utils.is.htmlElement(this.elements.container)) {
+                if (utils.is.element(this.elements.container)) {
                     this.elements.container.removeAttribute('class');
                 }
 
@@ -105,8 +105,7 @@ const source = {
                     }
                 }
 
-                // Restore class hooks
-                utils.toggleClass(this.elements.container, this.config.classNames.captions.active, this.supported.ui && this.captions.enabled);
+                // Restore class hook
                 ui.addStyleHook.call(this);
 
                 // Set new sources for html5

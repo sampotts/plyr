@@ -22,12 +22,12 @@ const controls = {
         const range = utils.is.event(target) ? target.target : target;
 
         // Needs to be a valid <input type='range'>
-        if (!utils.is.htmlElement(range) || range.getAttribute('type') !== 'range') {
+        if (!utils.is.element(range) || range.getAttribute('type') !== 'range') {
             return;
         }
 
         // Inject the stylesheet if needed
-        if (!utils.is.htmlElement(this.elements.styleSheet)) {
+        if (!utils.is.element(this.elements.styleSheet)) {
             this.elements.styleSheet = utils.createElement('style');
             this.elements.container.appendChild(this.elements.styleSheet);
         }
@@ -322,7 +322,7 @@ const controls = {
 
     // Create time display
     createTime(type) {
-        const container = utils.createElement('span', {
+        const container = utils.createElement('div', {
             class: 'plyr__time',
         });
 
@@ -368,7 +368,7 @@ const controls = {
         label.appendChild(faux);
         label.insertAdjacentHTML('beforeend', title);
 
-        if (utils.is.htmlElement(badge)) {
+        if (utils.is.element(badge)) {
             label.appendChild(badge);
         }
 
@@ -381,8 +381,8 @@ const controls = {
         // Bail if setting not true
         if (
             !this.config.tooltips.seek ||
-            !utils.is.htmlElement(this.elements.inputs.seek) ||
-            !utils.is.htmlElement(this.elements.display.seekTooltip) ||
+            !utils.is.element(this.elements.inputs.seek) ||
+            !utils.is.element(this.elements.display.seekTooltip) ||
             this.duration === 0
         ) {
             return;
@@ -542,7 +542,7 @@ const controls = {
 
         switch (setting) {
             case 'captions':
-                value = this.captions.enabled ? this.captions.language : '';
+                value = this.captions.active ? this.captions.language : '';
                 break;
 
             default:
@@ -555,13 +555,13 @@ const controls = {
 
                 // Unsupported value
                 if (!this.options[setting].includes(value)) {
-                    this.console.warn(`Unsupported value of '${value}' for ${setting}`);
+                    this.debug.warn(`Unsupported value of '${value}' for ${setting}`);
                     return;
                 }
 
                 // Disabled value
                 if (!this.config[setting].options.includes(value)) {
-                    this.console.warn(`Disabled value of '${value}' for ${setting}`);
+                    this.debug.warn(`Disabled value of '${value}' for ${setting}`);
                     return;
                 }
 
@@ -569,7 +569,7 @@ const controls = {
         }
 
         // Get the list if we need to
-        if (!utils.is.htmlElement(list)) {
+        if (!utils.is.element(list)) {
             list = pane && pane.querySelector('ul');
         }
 
@@ -582,7 +582,7 @@ const controls = {
         // Find the radio option
         const target = list && list.querySelector(`input[value="${value}"]`);
 
-        if (utils.is.htmlElement(target)) {
+        if (utils.is.element(target)) {
             // Check it
             target.checked = true;
         }
@@ -638,7 +638,7 @@ const controls = {
             return this.config.i18n.none;
         }
 
-        if (this.captions.enabled) {
+        if (this.captions.active) {
             const currentTrack = captions.getCurrentTrack.call(this);
 
             if (utils.is.track(currentTrack)) {
@@ -736,10 +736,10 @@ const controls = {
     toggleMenu(event) {
         const { form } = this.elements.settings;
         const button = this.elements.buttons.settings;
-        const show = utils.is.boolean(event) ? event : utils.is.htmlElement(form) && form.getAttribute('aria-hidden') === 'true';
+        const show = utils.is.boolean(event) ? event : utils.is.element(form) && form.getAttribute('aria-hidden') === 'true';
 
         if (utils.is.event(event)) {
-            const isMenuItem = utils.is.htmlElement(form) && form.contains(event.target);
+            const isMenuItem = utils.is.element(form) && form.contains(event.target);
             const isButton = event.target === this.elements.buttons.settings;
 
             // If the click was inside the form or if the click
@@ -756,11 +756,11 @@ const controls = {
         }
 
         // Set form and button attributes
-        if (utils.is.htmlElement(button)) {
+        if (utils.is.element(button)) {
             button.setAttribute('aria-expanded', show);
         }
 
-        if (utils.is.htmlElement(form)) {
+        if (utils.is.element(form)) {
             form.setAttribute('aria-hidden', !show);
             utils.toggleClass(this.elements.container, this.config.classNames.menu.open, show);
 
@@ -809,7 +809,7 @@ const controls = {
         const pane = document.getElementById(tab.getAttribute('aria-controls'));
 
         // Nothing to show, bail
-        if (!utils.is.htmlElement(pane)) {
+        if (!utils.is.element(pane)) {
             return;
         }
 
@@ -908,7 +908,7 @@ const controls = {
 
         // Progress
         if (this.config.controls.includes('progress')) {
-            const progress = utils.createElement('span', utils.getAttributesFromSelector(this.config.selectors.progress));
+            const progress = utils.createElement('div', utils.getAttributesFromSelector(this.config.selectors.progress));
 
             // Seek range slider
             const seek = controls.createRange.call(this, 'seek', {
@@ -958,7 +958,7 @@ const controls = {
 
         // Volume range control
         if (this.config.controls.includes('volume')) {
-            const volume = utils.createElement('span', {
+            const volume = utils.createElement('div', {
                 class: 'plyr__volume',
             });
 
@@ -1186,20 +1186,25 @@ const controls = {
         }
 
         // Inject into the container by default
-        if (!utils.is.htmlElement(target)) {
+        if (!utils.is.element(target)) {
             target = this.elements.container;
         }
 
         // Inject controls HTML
-        if (utils.is.htmlElement(container)) {
+        if (utils.is.element(container)) {
             target.appendChild(container);
         } else {
             target.insertAdjacentHTML('beforeend', container);
         }
 
         // Find the elements if need be
-        if (utils.is.htmlElement(this.elements.controls)) {
+        if (utils.is.element(this.elements.controls)) {
             utils.findElements.call(this);
+        }
+
+        // Edge sometimes doesn't finish the paint so force a redraw
+        if (window.navigator.userAgent.includes('Edge')) {
+            utils.repaint(target);
         }
 
         // Setup tooltips
