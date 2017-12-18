@@ -270,7 +270,7 @@ const listeners = {
         }
 
         // Disable right click
-        if (this.config.disableContextMenu) {
+        if (this.supported.ui && this.config.disableContextMenu) {
             utils.on(
                 this.media,
                 'contextmenu',

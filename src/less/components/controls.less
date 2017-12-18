@@ -3,7 +3,7 @@
 // --------------------------------------------------------------
 
 // Hide native controls
-.plyr ::-webkit-media-controls {
+.plyr--full-ui ::-webkit-media-controls {
     display: none;
 }
 
@@ -75,13 +75,6 @@
     }
 }
 
-// Hide controls
-.plyr--video.plyr--hide-controls .plyr__controls {
-    opacity: 0;
-    transform: translateY(100%);
-    pointer-events: none;
-}
-
 // Audio controls
 .plyr--audio .plyr__controls {
     padding: @plyr-control-spacing;
@@ -90,16 +83,23 @@
     color: @plyr-audio-control-color;
 }
 
+// Hide controls
+.plyr--video.plyr--hide-controls .plyr__controls {
+    opacity: 0;
+    transform: translateY(100%);
+    pointer-events: none;
+}
+
 // Some options are hidden by default
 .plyr [data-plyr='captions'],
-.plyr [data-plyr='pip'],
-.plyr [data-plyr='airplay'],
-.plyr [data-plyr='fullscreen'] {
+    .plyr [data-plyr='pip'],
+    .plyr [data-plyr='airplay'],
+    .plyr [data-plyr='fullscreen'] {
     display: none;
 }
 .plyr--captions-enabled [data-plyr='captions'],
-.plyr--pip-supported [data-plyr='pip'],
-.plyr--airplay-supported [data-plyr='airplay'],
-.plyr--fullscreen-enabled [data-plyr='fullscreen'] {
+    .plyr--pip-supported [data-plyr='pip'],
+    .plyr--airplay-supported [data-plyr='airplay'],
+    .plyr--fullscreen-enabled [data-plyr='fullscreen'] {
     display: inline-block;
 }

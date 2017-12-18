@@ -6,15 +6,15 @@
     "main": "src/js/plyr.js",
     "devDependencies": {
         "babel-core": "^6.26.0",
-        "babel-eslint": "^8.0.2",
+        "babel-eslint": "^8.0.3",
         "babel-plugin-external-helpers": "^6.22.0",
         "babel-preset-env": "^1.6.1",
         "del": "^3.0.0",
-        "eslint": "^4.12.1",
+        "eslint": "^4.13.1",
         "eslint-config-airbnb": "^16.1.0",
         "eslint-config-prettier": "^2.9.0",
         "eslint-plugin-import": "^2.8.0",
-        "eslint-plugin-jsx-a11y": "^6.0.2",
+        "eslint-plugin-jsx-a11y": "^6.0.3",
         "eslint-plugin-react": "^7.5.1",
         "gulp": "^3.9.1",
         "gulp-autoprefixer": "^4.0.0",
@@ -37,20 +37,12 @@
         "rollup-plugin-node-resolve": "^3.0.0",
         "rollup-plugin-uglify": "^2.0.1",
         "run-sequence": "^2.2.0",
-        "stylelint": "^8.3.1",
+        "stylelint": "^8.4.0",
         "stylelint-config-prettier": "^2.0.0",
         "stylelint-config-standard": "^18.0.0",
-        "uglify-es": "^3.2.0"
+        "uglify-es": "^3.2.2"
     },
-    "keywords": [
-        "HTML5 Video",
-        "HTML5 Audio",
-        "Media Player",
-        "DASH",
-        "Shaka",
-        "WordPress",
-        "HLS"
-    ],
+    "keywords": ["HTML5 Video", "HTML5 Audio", "Media Player", "DASH", "Shaka", "WordPress", "HLS"],
     "repository": {
         "type": "git",
         "url": "git://github.com/sampotts/plyr.git"

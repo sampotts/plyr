@@ -35,9 +35,9 @@
 
 // Change icons on state change
 .plyr__control[aria-pressed='false'] .icon--pressed,
-.plyr__control[aria-pressed='true'] .icon--not-pressed,
-.plyr__control[aria-pressed='false'] .label--pressed,
-.plyr__control[aria-pressed='true'] .label--not-pressed {
+    .plyr__control[aria-pressed='true'] .icon--not-pressed,
+    .plyr__control[aria-pressed='false'] .label--pressed,
+    .plyr__control[aria-pressed='true'] .label--not-pressed {
     display: none;
 }
 
@@ -79,11 +79,11 @@
     }
 }
 
-.plyr--full-ui.plyr--video .plyr__control--overlaid {
-    display: block;
-}
-
 .plyr--playing .plyr__control--overlaid {
     opacity: 0;
     visibility: hidden;
+}
+
+.plyr--full-ui.plyr--video .plyr__control--overlaid {
+    display: block;
 }
