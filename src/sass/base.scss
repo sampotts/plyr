@@ -33,7 +33,7 @@
 
 // border-box everything
 // http://paulirish.com/2012/box-sizing-border-box-ftw/
-@if $plyr-border-box == true {
+@if $plyr-border-box {
     .plyr--full-ui {
         box-sizing: border-box;
 
@@ -46,7 +46,7 @@
 }
 
 // Fix 300ms delay
-@if $plyr-touch-action == true {
+@if $plyr-touch-action {
     .plyr--full-ui {
         a,
         button,

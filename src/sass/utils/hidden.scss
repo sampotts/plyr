@@ -17,15 +17,13 @@
     overflow: hidden;
 
     // !important is not always needed
-    @if $plyr-sr-only-important == true {
+    @if $plyr-sr-only-important {
         border: 0 !important;
         height: 1px !important;
         padding: 0 !important;
         position: absolute !important;
         width: 1px !important;
-    }
-
-    @if $plyr-sr-only-important == false {
+    } @else {
         border: 0;
         height: 1px;
         padding: 0;

@@ -49,7 +49,7 @@ const paths = {
     demo: {
         // Source paths
         src: {
-            sass: path.join(root, 'demo/src/sassgu/**/*.scss'),
+            sass: path.join(root, 'demo/src/sass/**/*.scss'),
             js: path.join(root, 'demo/src/js/**/*'),
         },
 

@@ -400,7 +400,7 @@ const controls = {
         if (utils.is.event(event)) {
             percent = 100 / clientRect.width * (event.pageX - clientRect.left);
         } else if (utils.hasClass(this.elements.display.seekTooltip, visible)) {
-            percent = this.elements.display.seekTooltip.style.left.replace('%', '');
+            percent = parseFloat(this.elements.display.seekTooltip.style.left, 10);
         } else {
             return;
         }
