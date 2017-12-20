@@ -27,7 +27,7 @@ A simple, lightweight, accessible and customizable HTML5, YouTube and Vimeo medi
 * **[Shortcuts](#shortcuts)** - supports keyboard shortcuts
 * **i18n support** - support for internationalization of controls
 * **No dependencies** - written in "vanilla" ES6 JavaScript, no jQuery required
-* **SASS and LESS** - to include in your build processes
+* **SASS** - to include in your build processes
 
 Oh and yes, it works with Bootstrap.
 
@@ -146,7 +146,7 @@ reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/2.0.13
 
 ### SASS
 
-You can use `bundle.scss` file included in `/src` as part of your build and change variables to suit your design. The LESS and SASS require you to
+You can use `bundle.scss` file included in `/src` as part of your build and change variables to suit your design. The SASS require you to
 use the [autoprefixer](https://www.npmjs.com/package/gulp-autoprefixer) plugin (you be should already!) as all declarations use the W3C definitions.
 
 The HTML markup uses the BEM methodology with `plyr` as the block, e.g. `.plyr__controls`. You can change the class hooks in the options to match any custom CSS
