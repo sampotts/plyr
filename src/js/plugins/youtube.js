@@ -186,14 +186,17 @@ const youtube = {
                         instance.playVideo();
                         player.media.paused = false;
                     };
+
                     player.media.pause = () => {
                         instance.pauseVideo();
                         player.media.paused = true;
                     };
+
                     player.media.stop = () => {
                         instance.stopVideo();
                         player.media.paused = true;
                     };
+
                     player.media.duration = instance.getDuration();
                     player.media.paused = true;
 

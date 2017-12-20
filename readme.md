@@ -295,15 +295,15 @@ element.addEventListener('ready', event => {
 
 ### Methods
 
-An example method:
+Methods are not chainable. An example use of a method:
 
 ```javascript
-player.pause();
+player.play();
 ```
 
 | Method                    | Parameters       | Description                                                                                                |
 | ------------------------- | ---------------- | ---------------------------------------------------------------------------------------------------------- |
-| `play()`                  | -                | Start playback.                                                                                            |
+| `play()`&sup1;            | -                | Start playback.                                                                                            |
 | `pause()`                 | -                | Pause playback.                                                                                            |
 | `togglePlay(toggle)`      | Boolean          | Toggle playback, if no parameters are passed, it will toggle based on current status.                      |
 | `stop()`                  | -                | Stop playback and reset to start.                                                                          |
@@ -320,6 +320,8 @@ player.pause();
 | `off(event, function)`    | String, Function | Remove an event listener for the specified event.                                                          |
 | `supports(type)`          | String           | Check support for a mime type.                                                                             |
 | `destroy()`               | -                | Destroy the instance and garbage collect any elements.                                                     |
+
+1. `play()` will return a [`Promise`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) in _some_ browsers - WebKit and Mozilla [according to MDN](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/play) at time of writing.
 
 ### Getters and Setters
 

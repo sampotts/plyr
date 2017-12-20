@@ -80,11 +80,13 @@ const vimeo = {
                 player.media.paused = false;
             });
         };
+
         player.media.pause = () => {
             player.embed.pause().then(() => {
                 player.media.paused = true;
             });
         };
+
         player.media.stop = () => {
             player.embed.stop().then(() => {
                 player.media.paused = true;
@@ -197,7 +199,10 @@ const vimeo = {
         });
 
         // Set aspect ratio based on video size
-        Promise.all([player.embed.getVideoWidth(), player.embed.getVideoHeight()]).then(dimensions => {
+        Promise.all([
+            player.embed.getVideoWidth(),
+            player.embed.getVideoHeight(),
+        ]).then(dimensions => {
             const ratio = utils.getAspectRatio(dimensions[0], dimensions[1]);
             vimeo.setAspectRatio.call(this, ratio);
         });

@@ -276,20 +276,14 @@ class Plyr {
      * Play the media
      */
     play() {
-        if ('play' in this.media) {
-            this.media.play();
-        }
-        return this;
+        return this.media.play();
     }
 
     /**
      * Pause the media
      */
     pause() {
-        if ('pause' in this.media) {
-            this.media.pause();
-        }
-        return this;
+        return this.media.pause();
     }
 
     /**
@@ -320,17 +314,18 @@ class Plyr {
     togglePlay(toggle) {
         // True toggle if nothing passed
         if ((!utils.is.boolean(toggle) && this.media.paused) || toggle) {
-            return this.play();
+            this.play();
+        } else {
+            this.pause();
         }
-
-        return this.pause();
     }
 
     /**
      * Stop playback
      */
     stop() {
-        return this.restart().pause();
+        this.restart();
+        this.pause();
     }
 
     /**
@@ -338,7 +333,6 @@ class Plyr {
      */
     restart() {
         this.currentTime = 0;
-        return this;
     }
 
     /**
@@ -347,7 +341,6 @@ class Plyr {
      */
     rewind(seekTime) {
         this.currentTime = this.currentTime - (utils.is.number(seekTime) ? seekTime : this.config.seekTime);
-        return this;
     }
 
     /**
@@ -356,7 +349,6 @@ class Plyr {
      */
     forward(seekTime) {
         this.currentTime = this.currentTime + (utils.is.number(seekTime) ? seekTime : this.config.seekTime);
-        return this;
     }
 
     /**
@@ -470,7 +462,6 @@ class Plyr {
     increaseVolume(step) {
         const volume = this.media.muted ? 0 : this.volume;
         this.volume = volume + (utils.is.number(step) ? step : 1);
-        return this;
     }
 
     /**
@@ -480,7 +471,6 @@ class Plyr {
     decreaseVolume(step) {
         const volume = this.media.muted ? 0 : this.volume;
         this.volume = volume - (utils.is.number(step) ? step : 1);
-        return this;
     }
 
     /**
@@ -737,7 +727,7 @@ class Plyr {
     toggleCaptions(input) {
         // If there's no full support, or there's no caption toggle
         if (!this.supported.ui || !utils.is.element(this.elements.buttons.captions)) {
-            return this;
+            return;
         }
 
         // If the method is called without parameter, toggle based on current value
@@ -745,7 +735,7 @@ class Plyr {
 
         // Nothing to change...
         if (this.captions.active === show) {
-            return this;
+            return;
         }
 
         // Set global
@@ -759,9 +749,6 @@ class Plyr {
 
         // Trigger an event
         utils.dispatchEvent.call(this, this.media, this.captions.active ? 'captionsenabled' : 'captionsdisabled');
-
-        // Allow chaining
-        return this;
     }
 
     /**
@@ -829,7 +816,7 @@ class Plyr {
                     fullscreen.cancelFullScreen();
                 }
 
-                return this;
+                return;
             }
         } else {
             // Otherwise, it's a simple toggle
@@ -859,8 +846,6 @@ class Plyr {
 
         // Trigger an event
         utils.dispatchEvent.call(this, this.media, this.fullscreen.active ? 'enterfullscreen' : 'exitfullscreen');
-
-        return this;
     }
 
     /**
@@ -902,15 +887,10 @@ class Plyr {
      * TODO: update player with state, support, enabled
      */
     airplay() {
-        // Bail if no support
-        if (!support.airplay) {
-            return this;
+        // Show dialog if supported
+        if (support.airplay) {
+            this.media.webkitShowPlaybackTargetPicker();
         }
-
-        // Show dialog
-        this.media.webkitShowPlaybackTargetPicker();
-
-        return this;
     }
 
     /**
@@ -920,12 +900,12 @@ class Plyr {
     toggleControls(toggle) {
         // We need controls of course...
         if (!utils.is.element(this.elements.controls)) {
-            return this;
+            return;
         }
 
         // Don't hide if no UI support or it's audio
         if (!this.supported.ui || this.isAudio) {
-            return this;
+            return;
         }
 
         let delay = 0;
@@ -981,7 +961,7 @@ class Plyr {
 
             // Always show controls when paused or if touch
             if (this.paused || this.loading) {
-                return this;
+                return;
             }
 
             // Delay for hiding on touch
@@ -1025,8 +1005,6 @@ class Plyr {
                 }
             }, delay);
         }
-
-        return this;
     }
 
     /**
@@ -1036,7 +1014,6 @@ class Plyr {
      */
     on(event, callback) {
         utils.on(this.elements.container, event, callback);
-        return this;
     }
 
     /**
@@ -1046,7 +1023,6 @@ class Plyr {
      */
     off(event, callback) {
         utils.off(this.elements.container, event, callback);
-        return this;
     }
 
     /**
