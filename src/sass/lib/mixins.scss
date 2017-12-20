@@ -48,7 +48,7 @@
 @mixin plyr-range-thumb-active() {
     background: $plyr-range-thumb-active-bg;
     border-color: $plyr-range-thumb-active-border-color;
-    transform: scale(unit($plyr-range-thumb-active-height / $plyr-range-thumb-height));
+    transform: scale($plyr-range-thumb-active-height / $plyr-range-thumb-height);
 }
 
 // Fullscreen styles
