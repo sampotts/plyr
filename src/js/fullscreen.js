@@ -12,7 +12,13 @@ const prefix = (() => {
         value = '';
     } else {
         // Check for fullscreen support by vendor prefix
-        ['webkit', 'o', 'moz', 'ms', 'khtml'].some(pre => {
+        [
+            'webkit',
+            'o',
+            'moz',
+            'ms',
+            'khtml',
+        ].some(pre => {
             if (utils.is.function(document[`${pre}CancelFullScreen`])) {
                 value = pre;
                 return true;

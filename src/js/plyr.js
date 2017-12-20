@@ -939,10 +939,20 @@ class Plyr {
                 isEnterFullscreen = toggle.type === 'enterfullscreen';
 
                 // Whether to show controls
-                show = ['mouseenter', 'mousemove', 'touchstart', 'touchmove', 'focusin'].includes(toggle.type);
+                show = [
+                    'mouseenter',
+                    'mousemove',
+                    'touchstart',
+                    'touchmove',
+                    'focusin',
+                ].includes(toggle.type);
 
                 // Delay hiding on move events
-                if (['mousemove', 'touchmove', 'touchend'].includes(toggle.type)) {
+                if ([
+                    'mousemove',
+                    'touchmove',
+                    'touchend',
+                ].includes(toggle.type)) {
                     delay = 2000;
                 }
 

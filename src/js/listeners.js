@@ -46,7 +46,29 @@ const listeners = {
             // Reset on keyup
             if (pressed) {
                 // Which keycodes should we prevent default
-                const preventDefault = [48, 49, 50, 51, 52, 53, 54, 56, 57, 32, 75, 38, 40, 77, 39, 37, 70, 67, 73, 76, 79];
+                const preventDefault = [
+                    48,
+                    49,
+                    50,
+                    51,
+                    52,
+                    53,
+                    54,
+                    56,
+                    57,
+                    32,
+                    75,
+                    38,
+                    40,
+                    77,
+                    39,
+                    37,
+                    70,
+                    67,
+                    73,
+                    76,
+                    79,
+                ];
 
                 // Check focused element
                 // and if the focused element is not editable (e.g. text input)
@@ -325,7 +347,10 @@ const listeners = {
 
         // Proxy events to container
         // Bubble up key events for Edge
-        utils.on(this.media, this.config.events.concat(['keyup', 'keydown']).join(' '), event => {
+        utils.on(this.media, this.config.events.concat([
+            'keyup',
+            'keydown',
+        ]).join(' '), event => {
             let detail = {};
 
             // Get error details from media
@@ -499,7 +524,10 @@ const listeners = {
 
             // Watch for cursor over controls so they don't hide when trying to interact
             utils.on(this.elements.controls, 'mousedown mouseup touchstart touchend touchcancel', event => {
-                this.elements.controls.pressed = ['mousedown', 'touchstart'].includes(event.type);
+                this.elements.controls.pressed = [
+                    'mousedown',
+                    'touchstart',
+                ].includes(event.type);
             });
 
             // Focus in/out on controls

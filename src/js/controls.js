@@ -46,7 +46,10 @@ const controls = {
         }
 
         // Insert new one
-        styleSheet.insertRule([selector, styles].join(' '));
+        styleSheet.insertRule([
+            selector,
+            styles,
+        ].join(' '));
     },
 
     // Get icon URL
@@ -417,7 +420,10 @@ const controls = {
 
         // Show/hide the tooltip
         // If the event is a moues in/out and percentage is inside bounds
-        if (utils.is.event(event) && ['mouseenter', 'mouseleave'].includes(event.type)) {
+        if (utils.is.event(event) && [
+            'mouseenter',
+            'mouseleave',
+        ].includes(event.type)) {
             utils.toggleClass(this.elements.display.seekTooltip, visible, event.type === 'mouseenter');
         }
     },
@@ -701,7 +707,15 @@ const controls = {
 
         // Set the default speeds
         if (!utils.is.object(this.options.speed) || !Object.keys(this.options.speed).length) {
-            this.options.speed = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
+            this.options.speed = [
+                0.5,
+                0.75,
+                1,
+                1.25,
+                1.5,
+                1.75,
+                2,
+            ];
         }
 
         // Set options if passed and filter based on config
@@ -841,7 +855,10 @@ const controls = {
             // Restore auto height/width
             const restore = e => {
                 // We're only bothered about height and width on the container
-                if (e.target !== container || !['width', 'height'].includes(e.propertyName)) {
+                if (e.target !== container || ![
+                    'width',
+                    'height',
+                ].includes(e.propertyName)) {
                     return;
                 }
 
@@ -1211,7 +1228,13 @@ const controls = {
         if (this.config.tooltips.controls) {
             const labels = utils.getElements.call(
                 this,
-                [this.config.selectors.controls.wrapper, ' ', this.config.selectors.labels, ' .', this.config.classNames.hidden].join('')
+                [
+                    this.config.selectors.controls.wrapper,
+                    ' ',
+                    this.config.selectors.labels,
+                    ' .',
+                    this.config.classNames.hidden,
+                ].join('')
             );
 
             Array.from(labels).forEach(label => {

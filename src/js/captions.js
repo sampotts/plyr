@@ -109,7 +109,10 @@ const captions = {
         }
 
         // Only get accepted kinds
-        return Array.from(this.media.textTracks || []).filter(track => ['captions', 'subtitles'].includes(track.kind));
+        return Array.from(this.media.textTracks || []).filter(track => [
+            'captions',
+            'subtitles',
+        ].includes(track.kind));
     },
 
     // Get the current track for the current language

@@ -1,19 +1,16 @@
 {
     "plyr": {
-        "less": {
-            "plyr.css": "src/less/bundle.less"
-        },
         "sass": {
-            "plyr.css": "src/scss/plyr.scss"
+            "plyr.css": "src/sass/plyr.scss"
         },
         "js": {
             "plyr.js": "src/js/plyr.js"
         }
     },
     "demo": {
-        "less": {
-            "demo.css": "demo/src/less/bundles/demo.less",
-            "error.css": "demo/src/less/bundles/error.less"
+        "sass": {
+            "demo.css": "demo/src/sass/bundles/demo.scss",
+            "error.css": "demo/src/sass/bundles/error.csss"
         },
         "js": {
             "demo.js": "demo/src/js/demo.js"

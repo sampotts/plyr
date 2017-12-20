@@ -153,7 +153,10 @@ const ui = {
 
     // Check if media is loading
     checkLoading(event) {
-        this.loading = ['stalled', 'waiting'].includes(event.type);
+        this.loading = [
+            'stalled',
+            'waiting',
+        ].includes(event.type);
 
         // Clear timer
         clearTimeout(this.timers.loading);

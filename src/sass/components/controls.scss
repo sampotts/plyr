@@ -1,0 +1,105 @@
+// --------------------------------------------------------------
+// Controls
+// --------------------------------------------------------------
+
+// Hide native controls
+.plyr--full-ui ::-webkit-media-controls {
+    display: none;
+}
+
+// Playback controls
+.plyr__controls {
+    align-items: center;
+    display: flex;
+    text-align: center;
+
+    // Spacing
+    > .plyr__control,
+    .plyr__progress,
+    .plyr__time,
+    .plyr__menu {
+        margin-left: ($plyr-control-spacing / 2);
+
+        &:first-child,
+        &:first-child + [data-plyr='pause'] {
+            margin-left: 0;
+        }
+    }
+
+    .plyr__volume {
+        margin-left: ($plyr-control-spacing / 2);
+    }
+
+    @media (min-width: $plyr-bp-sm) {
+        > .plyr__control,
+        .plyr__progress,
+        .plyr__time,
+        .plyr__menu {
+            margin-left: $plyr-control-spacing;
+        }
+
+        > .plyr__control + .plyr__control,
+        .plyr__menu + .plyr__control,
+        > .plyr__control + .plyr__menu {
+            margin-left: ($plyr-control-spacing / 2);
+        }
+    }
+}
+
+// Video controls
+.plyr--video .plyr__controls {
+    background: linear-gradient(rgba($plyr-video-controls-bg, 0), rgba($plyr-video-controls-bg, 0.7));
+    border-bottom-left-radius: inherit;
+    border-bottom-right-radius: inherit;
+    bottom: 0;
+    color: $plyr-video-control-color;
+    left: 0;
+    padding: ($plyr-control-spacing * 3.5) $plyr-control-spacing $plyr-control-spacing;
+    position: absolute;
+    right: 0;
+    transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+    z-index: 2;
+
+    .plyr__control {
+        svg {
+            filter: drop-shadow(0 1px 1px rgba(#000, 0.15));
+        }
+
+        // Hover and tab focus
+        &.plyr__tab-focus,
+        &:hover,
+        &[aria-expanded='true'] {
+            background: $plyr-video-control-bg-hover;
+            color: $plyr-video-control-color-hover;
+        }
+    }
+}
+
+// Audio controls
+.plyr--audio .plyr__controls {
+    background: $plyr-audio-controls-bg;
+    border-radius: inherit;
+    color: $plyr-audio-control-color;
+    padding: $plyr-control-spacing;
+}
+
+// Hide controls
+.plyr--video.plyr--hide-controls .plyr__controls {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(100%);
+}
+
+// Some options are hidden by default
+.plyr [data-plyr='captions'],
+.plyr [data-plyr='pip'],
+.plyr [data-plyr='airplay'],
+.plyr [data-plyr='fullscreen'] {
+    display: none;
+}
+.plyr--captions-enabled [data-plyr='captions'],
+.plyr--pip-supported [data-plyr='pip'],
+.plyr--airplay-supported [data-plyr='airplay'],
+.plyr--fullscreen-enabled [data-plyr='fullscreen'] {
+    display: inline-block;
+}

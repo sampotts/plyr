@@ -61,7 +61,17 @@ const defaults = {
     // Quality default
     quality: {
         default: 'default',
-        options: ['hd2160', 'hd1440', 'hd1080', 'hd720', 'large', 'medium', 'small', 'tiny', 'default'],
+        options: [
+            'hd2160',
+            'hd1440',
+            'hd1080',
+            'hd720',
+            'large',
+            'medium',
+            'small',
+            'tiny',
+            'default',
+        ],
     },
 
     // Set loops
@@ -74,7 +84,15 @@ const defaults = {
     // Speed default and options to display
     speed: {
         selected: 1,
-        options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2],
+        options: [
+            0.5,
+            0.75,
+            1,
+            1.25,
+            1.5,
+            1.75,
+            2,
+        ],
     },
 
     // Keyboard shortcut settings
@@ -108,8 +126,25 @@ const defaults = {
     },
 
     // Default controls
-    controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen'],
-    settings: ['captions', 'quality', 'speed', 'loop'],
+    controls: [
+        'play-large',
+        'play',
+        'progress',
+        'current-time',
+        'mute',
+        'volume',
+        'captions',
+        'settings',
+        'pip',
+        'airplay',
+        'fullscreen',
+    ],
+    settings: [
+        'captions',
+        'quality',
+        'speed',
+        'loop',
+    ],
 
     // Localisation
     i18n: {
