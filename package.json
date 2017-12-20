@@ -3,7 +3,9 @@
     "version": "2.0.13",
     "description": "A simple, accessible and customizable HTML5, YouTube and Vimeo media player",
     "homepage": "http://plyr.io",
-    "main": "src/js/plyr.js",
+    "main": "./dist",
+    "sass": "./src/sass/plyr.scss",
+    "style": "./dist/plyr.css",
     "devDependencies": {
         "babel-core": "^6.26.0",
         "babel-eslint": "^8.0.3",

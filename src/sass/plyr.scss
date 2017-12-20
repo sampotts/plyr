@@ -6,16 +6,17 @@
 @charset 'UTF-8';
 
 @import 'settings/breakpoints';
-@import 'settings/captions';
 @import 'settings/colors';
-@import 'settings/controls';
 @import 'settings/cosmetics';
+@import 'settings/type';
+
+@import 'settings/captions';
+@import 'settings/controls';
 @import 'settings/helpers';
 @import 'settings/menus';
 @import 'settings/progress';
 @import 'settings/sliders';
 @import 'settings/tooltips';
-@import 'settings/type';
 
 @import 'lib/animation';
 @import 'lib/mixins';

@@ -144,9 +144,9 @@ reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/2.0.13
 
 ## Advanced
 
-### LESS & SASS/SCSS
+### SASS
 
-You can use `plyr.less` or `plyr.scss` file included in `/src` as part of your build and change variables to suit your design. The LESS and SASS require you to
+You can use `bundle.scss` file included in `/src` as part of your build and change variables to suit your design. The LESS and SASS require you to
 use the [autoprefixer](https://www.npmjs.com/package/gulp-autoprefixer) plugin (you be should already!) as all declarations use the W3C definitions.
 
 The HTML markup uses the BEM methodology with `plyr` as the block, e.g. `.plyr__controls`. You can change the class hooks in the options to match any custom CSS
