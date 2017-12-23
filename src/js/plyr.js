@@ -1025,13 +1025,7 @@ class Plyr {
         utils.off(this.elements.container, event, callback);
     }
 
-    /**
-     * Check for support for a mime type (HTML5 only)
-     * @param {string} type - Mime type
-     */
-    supports(type) {
-        return support.mime.call(this, type);
-    }
+
 
     /**
      * Destroy an instance
@@ -1132,6 +1126,33 @@ class Plyr {
             default:
                 break;
         }
+    }
+
+    /**
+     * Check for support for a mime type (HTML5 only)
+     * @param {string} type - Mime type
+     */
+    supports(type) {
+        return support.mime.call(this, type);
+    }
+
+    /**
+     * Check for support
+     * @param {string} type - Player type (audio/video)
+     * @param {string} provider - Provider (html5/youtube/vimeo)
+     * @param {bool} inline - Where player has `playsinline` sttribute
+     */
+    static supported(type, provider, inline) {
+        return support.check(type, provider, inline);
+    }
+
+    /**
+     * Load an SVG sprite into the page
+     * @param {string} url - URL for the SVG sprite
+     * @param {string} [id] - Unique ID
+     */
+    static loadSprite(url, id) {
+        return utils.loadSprite(url, id);
     }
 }
 

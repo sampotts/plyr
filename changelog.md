@@ -1,4 +1,71 @@
-# Changelog
+# v3.0.0
+
+This is a massive release. A _mostly_ complete rewrite in ES6. What started out as a few changes quickly snowballed. There's many breaking changes so be careful upgrading.
+
+### Big changes
+
+* New settings menu complete with funky animations
+* Ability to adjust speed of playback
+* Ability to toggle caption language (HTML5 and Vimeo only)
+* Ability to set YouTube quality (HTML5 will follow)
+* Added support for Vimeo captions
+* Added Picture-in-Picture support (Safari only)
+* Added AirPlay support (again, Safari only)
+* Added `playsinline` support for iOS 10+
+* Soundcloud removed until I can work on a plugin framework
+
+### Other stuff
+
+* Now using SASS exclusively. Sorry, LESS folk it just made sense to maintain one method as SASS is what the cool kids use
+* Moved to ES6. All the rage these days
+* Added basic looping support
+* Added an aspect ratio option for those that can't leave the 90s and want 4:3
+* `controlshidden` and `controlsshown` events added for when the controls show or hide
+* `qualityrequested` and `qualitychange` events for YouTube quality control (HTML5 will follow)
+* Volume is now `0` to `1` as per HTML5 spec
+* No longer bodging a `<progress>` behind the `<input type="range">` to make up for WebKit's lack of lower fill styling
+* Captions now render with line breaks as intended
+* Captions now render without AJAX using the native events etc
+* Added a fallback for getting YouTube video data incase `.getVideoData()` disappears when one of their developers randomly deletes it again
+* Setup and building of the UI should be way "snappier"
+* Click to toggle inverted time (e.g. 0:01 or -2:59 for a 3 minute video at 1 seconds) - new `toggleInvert` and `invertTime` options
+* Added `autopause` option for Vimeo
+* Added `muted` option for you guessed it, muted playback
+* Restored the `.off()` API method
+* `.play()` will now return a promise to prevent that pesky uncaught promise issue in Chrome etc
+* Pressing and hold the seek bar no longer freezes all other updates of the UI
+
+...plus loads of bug fixes.
+
+### Breaking changes
+
+You gotta break eggs to make an omelette. Sadly, there's quite a few breaking changes:
+
+* Setup now uses proper constructor, accepts a single selector/element/node and returns a single instance - much simpler than before
+* Much of the API is now using getters and setters rather than methods (where it makes sense) to match the HTML5 API - see the docs for more info
+* `blankUrl` -> `blankVideo`
+* `volume` is now `0` to `1` as per HTML5 spec
+* `keyboardShorcuts` (typo) is now just `keyboard`
+* `loop` is now `loop.active` in preparation for loop enhancements later
+* `html` option for custom controls removed in favour of the `controls` option which now accepts an array (to use built in controls) or a string of HTML for custom controls.
+* `classes` -> `classNames`
+* `classes.videoWrapper` -> `classNames.video`
+* `classes.embedWrapper` -> `classNames.embed`
+* `classes.ready` removed
+* `classes.setup` removed
+* `classes.muted` removed
+* `classes.fullscreen.active` removed in favour of the `:fullscreen` selector
+* `selectors.html5` removed
+* `selectors.embed` removed
+* `selectors.buttons.seek` -> `selectors.inputs.seek`
+* `selectors.volume.input` -> `selectors.inputs.volume`
+* `selectors.volume.display` -> `selectors.display.volume`
+* `selectors.currentTime` -> `selectors.display.currentTime`
+* `selectors.duration` -> `selectors.display.duration`
+
+### Polyfilling
+
+Because we're using the fancy new ES6 syntax, you will need to polyfill for vintage browsers if you want to use Plyr and still support them. Luckily there's a decent service for this that makes it painless, [https://polyfill.io](polyfill.io).
 
 ## v2.0.12
 

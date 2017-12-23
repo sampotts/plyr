@@ -143,7 +143,6 @@ const defaults = {
         'captions',
         'quality',
         'speed',
-        'loop',
     ],
 
     // Localisation

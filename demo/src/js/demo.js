@@ -48,7 +48,19 @@ document.addEventListener('DOMContentLoaded', () => {
         captions: {
             active: true,
         },
-        controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'fullscreen', 'pip', 'airplay'],
+        controls: [
+            'play-large',
+            'play',
+            'progress',
+            'current-time',
+            'mute',
+            'volume',
+            'captions',
+            'settings',
+            'fullscreen',
+            'pip',
+            'airplay',
+        ],
         keys: {
             google: 'AIzaSyDrNwtN3nLH_8rjCmu5Wq3ZCm4MNAVdc0c',
         },
@@ -87,12 +99,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 player.source = {
                     type: 'video',
                     title: 'View From A Blue Moon',
-                    sources: [
-                        {
-                            src: 'media/View_From_A_Blue_Moon_Trailer-HD.mp4',
-                            type: 'video/mp4',
-                        },
-                    ],
+                    sources: [{
+                        src: 'media/View_From_A_Blue_Moon_Trailer-HD.mp4',
+                        type: 'video/mp4',
+                    }],
                     poster: 'media/View_From_A_Blue_Moon_Trailer-HD.jpg',
                     tracks: [
                         {
@@ -135,12 +145,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 player.source = {
                     type: 'video',
                     title: 'View From A Blue Moon',
-                    sources: [
-                        {
-                            src: 'https://youtube.com/watch?v=bTqVqk7FSmY',
-                            provider: 'youtube',
-                        },
-                    ],
+                    sources: [{
+                        src: 'https://youtube.com/watch?v=bTqVqk7FSmY',
+                        provider: 'youtube',
+                    }],
                 };
 
                 break;
@@ -148,12 +156,10 @@ document.addEventListener('DOMContentLoaded', () => {
             case types.vimeo:
                 player.source = {
                     type: 'video',
-                    sources: [
-                        {
-                            src: 'https://vimeo.com/76979871',
-                            provider: 'vimeo',
-                        },
-                    ],
+                    sources: [{
+                        src: 'https://vimeo.com/76979871',
+                        provider: 'vimeo',
+                    }],
                 };
 
                 break;
