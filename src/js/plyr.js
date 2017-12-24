@@ -2229,9 +2229,11 @@
 
         // Toggle fullscreen
         function _toggleFullscreen(event) {
+            // We don't allow fullscreen on audio player
             if (plyr.type === 'audio') {
               return
             }
+
             // Check for native support
             var nativeSupport = fullscreen.supportsFullScreen;
 
