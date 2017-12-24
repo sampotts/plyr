@@ -2229,6 +2229,9 @@
 
         // Toggle fullscreen
         function _toggleFullscreen(event) {
+            if (plyr.type === 'audio') {
+              return
+            }
             // Check for native support
             var nativeSupport = fullscreen.supportsFullScreen;
 
@@ -3192,6 +3195,9 @@
 
             // Fullscreen
             _proxyListener(plyr.buttons.fullscreen, 'click', config.listeners.fullscreen, _toggleFullscreen);
+
+            // Toggle fullscreen when user double clicks on video wrapper
+            _proxyListener(plyr.container, 'dblclick', config.listeners.fullscreen, _toggleFullscreen);
 
             // Handle user exiting fullscreen by escaping etc
             if (fullscreen.supportsFullScreen) {
