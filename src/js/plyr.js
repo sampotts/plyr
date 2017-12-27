@@ -283,7 +283,11 @@ class Plyr {
      * Pause the media
      */
     pause() {
-        return this.media.pause();
+        if (!this.playing) {
+            return;
+        }
+
+        this.media.pause();
     }
 
     /**
@@ -309,11 +313,13 @@ class Plyr {
 
     /**
      * Toggle playback based on current status
-     * @param {boolean} toggle
+     * @param {boolean} input
      */
-    togglePlay(toggle) {
-        // True toggle if nothing passed
-        if ((!utils.is.boolean(toggle) && this.media.paused) || toggle) {
+    togglePlay(input) {
+        // Toggle based on current state if nothing passed
+        const toggle = utils.is.boolean(input) ? input : !this.playing;
+
+        if (toggle) {
             this.play();
         } else {
             this.pause();
