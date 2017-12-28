@@ -20,38 +20,12 @@
 </head>
 
 <body>
-    <header>
-        <h1>Plyr</h1>
-        <p>A simple, accessible HTML5 media player by <a href="https://twitter.com/sam_potts" target="_blank">@sam_potts</a></p>
-        <nav>
-            <ul>
-                <li>
-                    <a href="https://github.com/sampotts/plyr" target="_blank" class="btn btn--large btn--primary" data-shr-network="github">
-                        <svg class="icon">
-                            <use xlink:href="#icon-github" />
-                        </svg>Download on GitHub
-                    </a>
-                </li>
-                <li>
-                    <a href="https://twitter.com/intent/tweet?text=A+simple+HTML5+media+player+with+custom+controls+and+WebVTT+captions.&url=http%3A%2F%2Fplyr.io&via=Sam_Potts"
-                        target="_blank" class="btn btn--large btn--twitter" data-shr-network="twitter">
-                        <svg class="icon">
-                            <use xlink:href="#icon-twitter" />
-                        </svg>Tweet
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </header>
 
     <main role="main" id="main">
-        <nav class="btn__bar">
+        <nav id="playlist" class="btn__bar">
             <ul>
                 <li class="active">
                     <button type="button" class="btn" data-source="video">Video</button>
-                </li>
-                <li>
-                    <button type="button" class="btn" data-source="audio">Audio</button>
                 </li>
                 <li>
                     <button type="button" class="btn btn--youtube" data-source="youtube"><svg class="icon"><use xlink:href="#icon-youtube"/></svg>YouTube</button>
@@ -77,7 +51,6 @@
 
             <ul>
                 <li class="plyr__cite plyr__cite--video"><small><a href="http://viewfromabluemoon.com/" target="_blank">View From A Blue Moon</a> &copy; Brainfarm</small></li>
-                <li class="plyr__cite plyr__cite--audio"><small><a href="http://www.kishibashi.com/" target="_blank">Kishi Bashi &ndash; &ldquo;It All Began With A Burst&rdquo;</a> &copy; Kishi Bashi</small></li>
                 <li class="plyr__cite plyr__cite--youtube"><small><a href="https://www.youtube.com/watch?v=bTqVqk7FSmY" target="_blank">View From A Blue Moon</a> on <span class="color--youtube"><svg class="icon"><use xlink:href="#icon-youtube"/></svg>YouTube</span></small></li>
                 <li class="plyr__cite plyr__cite--vimeo"><small><a href="https://vimeo.com/ondemand/viewfromabluemoon4k" target="_blank">View From A Blue Moon</a> on <span class="color--vimeo"><svg class="icon"><use xlink:href="#icon-vimeo"/></svg>Vimeo</span></small></li>
             </ul>

@@ -72,6 +72,8 @@
                     seek: '[data-plyr="seek"]',
                     play: '[data-plyr="play"]',
                     pause: '[data-plyr="pause"]',
+                    previous: '[data-plyr="previous"]',
+                    next: '[data-plyr="next"]',
                     restart: '[data-plyr="restart"]',
                     rewind: '[data-plyr="rewind"]',
                     forward: '[data-plyr="fast-forward"]',
@@ -131,8 +133,10 @@
                 enabled: true,
                 key: 'plyr',
             },
-            controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'fullscreen'],
+            controls: ['play-large', 'play', 'previous', 'next', 'progress', 'current-time', 'mute', 'volume', 'captions', 'fullscreen'],
             i18n: {
+                previous: 'Previous',
+                next: 'Next',
                 restart: 'Restart',
                 rewind: 'Rewind {seektime} secs',
                 play: 'Play',
@@ -169,6 +173,8 @@
                 seek: null,
                 play: null,
                 pause: null,
+                previous: null,
+                next: null,
                 restart: null,
                 rewind: null,
                 forward: null,
@@ -863,6 +869,26 @@
                 );
             }
 
+            // Previous button
+            if (_inArray(config.controls, 'previous')) {
+                html.push(
+                    '<button type="button" data-plyr="previous">',
+                    '<svg><use xlink:href="' + iconPath + '-previous" /></svg>',
+                    '<span class="plyr__sr-only">' + config.i18n.previous + '</span>',
+                    '</button>'
+                );
+            }
+
+            // Next button
+            if (_inArray(config.controls, 'next')) {
+                html.push(
+                    '<button type="button" data-plyr="next">',
+                    '<svg><use xlink:href="' + iconPath + '-next" /></svg>',
+                    '<span class="plyr__sr-only">' + config.i18n.next + '</span>',
+                    '</button>'
+                );
+            }
+
             // Fast forward button
             if (_inArray(config.controls, 'fast-forward')) {
                 html.push(
@@ -1411,6 +1437,8 @@
                 plyr.buttons.seek = _getElement(config.selectors.buttons.seek);
                 plyr.buttons.play = _getElements(config.selectors.buttons.play);
                 plyr.buttons.pause = _getElement(config.selectors.buttons.pause);
+                plyr.buttons.previous = _getElement(config.selectors.buttons.previous);
+                plyr.buttons.next = _getElement(config.selectors.buttons.next);
                 plyr.buttons.restart = _getElement(config.selectors.buttons.restart);
                 plyr.buttons.rewind = _getElement(config.selectors.buttons.rewind);
                 plyr.buttons.forward = _getElement(config.selectors.buttons.forward);
@@ -3170,6 +3198,12 @@
             // Pause
             _proxyListener(plyr.buttons.pause, 'click', config.listeners.pause, togglePlay);
 
+            // Previous
+            _proxyListener(plyr.buttons.previous, 'click', config.listeners.previous, _seek);
+
+            // Next
+            _proxyListener(plyr.buttons.next, 'click', config.listeners.next, _seek);
+
             // Restart
             _proxyListener(plyr.buttons.restart, 'click', config.listeners.restart, _seek);
 
@@ -3632,6 +3666,8 @@
                 _pause();
                 _seek();
             },
+            previous: _rewind,
+            next: _forward,
             restart: _seek,
             rewind: _rewind,
             forward: _forward,
