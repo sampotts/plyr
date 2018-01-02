@@ -1024,7 +1024,7 @@ Fullscreen in Plyr is supported by all browsers that [currently support it](http
 The `enabled` option can be used to disable certain User Agents. For example, if you don't want to use Plyr for smartphones, you could use:
 
 ```javascript
-enabled: /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent)
+enabled: !/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent)
 ```
 If a User Agent is disabled but supports `<video>` and `<audio>` natively, it will use the native player.
 
