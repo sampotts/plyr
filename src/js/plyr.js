@@ -35,7 +35,11 @@ let scrollPosition = {
 class Plyr {
     constructor(target, options) {
         this.timers = {};
+
+        // State
         this.ready = false;
+        this.loading = false;
+        this.failed = false;
 
         // Set the media element
         this.media = target;
@@ -809,6 +813,11 @@ class Plyr {
      * @param {event} event
      */
     toggleFullscreen(event) {
+        // Video only
+        if (this.isAudio) {
+            return;
+        }
+
         // Check for native support
         if (fullscreen.enabled) {
             if (utils.is.event(event) && event.type === fullscreen.eventType) {

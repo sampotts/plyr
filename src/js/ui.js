@@ -153,13 +153,36 @@ const ui = {
 
     // Check if media is loading
     checkLoading(event) {
-        this.loading = [
+        this.loading = this.media.networkState === 2 || [
             'stalled',
             'waiting',
         ].includes(event.type);
 
         // Clear timer
         clearTimeout(this.timers.loading);
+
+        // Timer to prevent flicker when seeking
+        this.timers.loading = setTimeout(() => {
+            // Toggle container class hook
+            utils.toggleClass(this.elements.container, this.config.classNames.loading, this.loading);
+
+            // Show controls if loading, hide if done
+            this.toggleControls(this.loading);
+        }, this.loading ? 250 : 0);
+    },
+
+    // Check if media failed to load
+    checkFailed() {
+        // https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/networkState
+        this.failed = this.media.networkState === 3;
+
+        if (this.failed) {
+            utils.toggleClass(this.elements.container, this.config.classNames.loading, false);
+            utils.toggleClass(this.elements.container, this.config.classNames.error, true);
+        }
+
+        // Clear timer
+        clearTimeout(this.timers.failed);
 
         // Timer to prevent flicker when seeking
         this.timers.loading = setTimeout(() => {

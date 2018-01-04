@@ -221,6 +221,11 @@ const listeners = {
             utils.on(document, fullscreen.eventType, event => {
                 this.toggleFullscreen(event);
             });
+
+            // Fullscreen toggle on double click
+            utils.on(this.elements.container, 'dblclick', event => {
+                this.toggleFullscreen(event);
+            });
         }
     },
 
@@ -262,6 +267,9 @@ const listeners = {
 
         // Loading
         utils.on(this.media, 'stalled waiting canplay seeked playing', event => ui.checkLoading.call(this, event));
+
+        // Check if media failed to load
+        // utils.on(this.media, 'play', event => ui.checkFailed.call(this, event));
 
         // Click video
         if (this.supported.ui && this.config.clickToPlay && !this.isAudio) {

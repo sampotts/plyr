@@ -6,14 +6,17 @@
     @include plyr-fullscreen-active();
 }
 
+/* stylelint-disable-next-line */
 .plyr:-webkit-full-screen {
     @include plyr-fullscreen-active();
 }
 
+/* stylelint-disable-next-line */
 .plyr:-moz-full-screen {
     @include plyr-fullscreen-active();
 }
 
+/* stylelint-disable-next-line */
 .plyr:-ms-fullscreen {
     @include plyr-fullscreen-active();
 }
@@ -22,10 +25,10 @@
 .plyr--fullscreen-fallback {
     @include plyr-fullscreen-active();
 
-    position: fixed;
-    top: 0;
     bottom: 0;
     left: 0;
+    position: fixed;
     right: 0;
+    top: 0;
     z-index: 10000000;
 }
