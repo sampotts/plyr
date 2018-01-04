@@ -47,7 +47,15 @@
         "stylelint-selector-bem-pattern": "^2.0.0",
         "uglify-es": "^3.2.2"
     },
-    "keywords": ["HTML5 Video", "HTML5 Audio", "Media Player", "DASH", "Shaka", "WordPress", "HLS"],
+    "keywords": [
+        "HTML5 Video",
+        "HTML5 Audio",
+        "Media Player",
+        "DASH",
+        "Shaka",
+        "WordPress",
+        "HLS"
+    ],
     "repository": {
         "type": "git",
         "url": "git://github.com/sampotts/plyr.git"
