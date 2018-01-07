@@ -53,7 +53,12 @@ class Storage {
         }
 
         // Get current storage
-        const storage = this.get();
+        let storage = this.get();
+
+        // Default to empty object
+        if (utils.is.empty(storage)) {
+            storage = {};
+        }
 
         // Update the working copy of the values
         utils.extend(storage, object);
