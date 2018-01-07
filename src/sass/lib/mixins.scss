@@ -34,20 +34,18 @@
 
 @mixin plyr-range-thumb() {
     background: $plyr-range-thumb-bg;
-    border: $plyr-range-thumb-border;
+    border: 0;
     border-radius: 100%;
     box-shadow: $plyr-range-thumb-shadow;
     box-sizing: border-box;
     height: $plyr-range-thumb-height;
     position: relative;
-    transition: background 0.2s ease, border 0.2s ease, transform 0.2s ease;
+    transition: all 0.2s ease;
     width: $plyr-range-thumb-height;
 }
 
 @mixin plyr-range-thumb-active() {
-    background: $plyr-range-thumb-active-bg;
-    border-color: $plyr-range-thumb-active-border-color;
-    transform: scale($plyr-range-thumb-active-height / $plyr-range-thumb-height);
+    box-shadow: 0 0 0 $plyr-range-thumb-active-shadow-width transparentize($plyr-range-thumb-bg, 0.5);
 }
 
 // Fullscreen styles
