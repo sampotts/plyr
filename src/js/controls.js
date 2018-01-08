@@ -26,30 +26,8 @@ const controls = {
             return;
         }
 
-        // Inject the stylesheet if needed
-        if (!utils.is.element(this.elements.styleSheet)) {
-            this.elements.styleSheet = utils.createElement('style');
-            this.elements.container.appendChild(this.elements.styleSheet);
-        }
-
-        const styleSheet = this.elements.styleSheet.sheet;
-        const percentage = range.value / range.max * 100;
-        const selector = `#${range.id}::-webkit-slider-runnable-track`;
-        const styles = `{ background-image: linear-gradient(to right, currentColor ${percentage}%, transparent ${percentage}%) }`;
-
-        // Find old rule if it exists
-        const index = Array.from(styleSheet.rules).findIndex(rule => rule.selectorText === selector);
-
-        // Remove old rule
-        if (index !== -1) {
-            styleSheet.deleteRule(index);
-        }
-
-        // Insert new one
-        styleSheet.insertRule([
-            selector,
-            styles,
-        ].join(' '));
+        // Set CSS custom property
+        range.style.setProperty('--value', `${range.value / range.max * 100}%`);
     },
 
     // Get icon URL

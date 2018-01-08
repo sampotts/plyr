@@ -20,6 +20,7 @@
 
     &::-webkit-slider-runnable-track {
         @include plyr-range-track();
+        background-image: linear-gradient(to right, currentColor var(--value), transparent var(--value));
     }
 
     &::-webkit-slider-thumb {
@@ -111,29 +112,29 @@
 // Video range inputs
 .plyr--full-ui.plyr--video input[type='range'] {
     &::-webkit-slider-runnable-track {
-        background: $plyr-video-range-track-bg;
+        background-color: $plyr-video-range-track-bg;
     }
 
     &::-moz-range-track {
-        background: $plyr-video-range-track-bg;
+        background-color: $plyr-video-range-track-bg;
     }
 
     &::-ms-track {
-        background: $plyr-video-range-track-bg;
+        background-color: $plyr-video-range-track-bg;
     }
 }
 
 // Audio range inputs
 .plyr--full-ui.plyr--audio input[type='range'] {
     &::-webkit-slider-runnable-track {
-        background: $plyr-audio-range-track-bg;
+        background-color: $plyr-audio-range-track-bg;
     }
 
     &::-moz-range-track {
-        background: $plyr-audio-range-track-bg;
+        background-color: $plyr-audio-range-track-bg;
     }
 
     &::-ms-track {
-        background: $plyr-audio-range-track-bg;
+        background-color: $plyr-audio-range-track-bg;
     }
 }
