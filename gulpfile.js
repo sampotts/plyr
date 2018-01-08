@@ -30,7 +30,11 @@ const resolve = require('rollup-plugin-node-resolve');
 
 const bundles = require('./bundles.json');
 const pkg = require('./package.json');
-const aws = require('./aws.json');
+
+let aws;
+try {
+    aws = require('./aws.json');
+} catch (err) {}
 
 // Paths
 const root = __dirname;
@@ -240,7 +244,7 @@ const options = {
 };
 
 // If aws is setup
-if ('cdn' in aws) {
+if (aws && 'cdn' in aws) {
     const regex = '(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*).(?:0|[1-9][0-9]*)(?:-[\\da-z\\-]+(?:.[\\da-z\\-]+)*)?(?:\\+[\\da-z\\-]+(?:.[\\da-z\\-]+)*)?';
     const cdnpath = new RegExp(`${aws.cdn.domain}/${regex}`, 'gi');
     const semver = new RegExp(`v${regex}`, 'gi');
