@@ -31,10 +31,13 @@ const resolve = require('rollup-plugin-node-resolve');
 const bundles = require('./bundles.json');
 const pkg = require('./package.json');
 
+// Get AWS config
 let aws;
 try {
-    aws = require('./aws.json');
-} catch (err) {}
+    aws = require('./aws.json'); //eslint-disable-line
+} catch (e) {
+    // Do nothing
+}
 
 // Paths
 const root = __dirname;
