@@ -1040,8 +1040,6 @@ class Plyr {
         utils.off(this.elements.container, event, callback);
     }
 
-
-
     /**
      * Destroy an instance
      * Event listeners are removed when elements are removed

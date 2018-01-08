@@ -153,7 +153,7 @@ const ui = {
 
     // Check if media is loading
     checkLoading(event) {
-        this.loading = this.media.networkState === 2 || [
+        this.loading = [
             'stalled',
             'waiting',
         ].includes(event.type);
