@@ -221,34 +221,11 @@ gulp.task('default', () => {
 
 // Publish a version to CDN and demo
 // --------------------------------------------
-const { version } = pkg;
-const maxAge = 31536000; // 1 year
-const options = {
-    cdn: {
-        headers: {
-            'Cache-Control': `max-age=${maxAge}`,
-            Vary: 'Accept-Encoding',
-        },
-    },
-    demo: {
-        headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
-            Vary: 'Accept-Encoding',
-        },
-    },
-    symlinks(ver, filename) {
-        return {
-            headers: {
-                // http://stackoverflow.com/questions/2272835/amazon-s3-object-redirect
-                'x-amz-website-redirect-location': `/${ver}/${filename}`,
-                'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
-            },
-        };
-    },
-};
-
 // If aws is setup
 if (Object.keys(aws).includes('cdn') && Object.keys(aws).includes('demo')) {
+    const { version } = pkg;
+
+    // Get branch info
     const branch = {
         current: gitbranch.sync(),
         master: 'master',
@@ -259,12 +236,36 @@ if (Object.keys(aws).includes('cdn') && Object.keys(aws).includes('demo')) {
         branch.beta,
     ];
 
+    const maxAge = 31536000; // 1 year
+    const options = {
+        cdn: {
+            headers: {
+                'Cache-Control': `max-age=${maxAge}`,
+                Vary: 'Accept-Encoding',
+            },
+        },
+        demo: {
+            uploadPath: branch.current === branch.beta ? 'beta/' : null,
+            headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
+                Vary: 'Accept-Encoding',
+            },
+        },
+        symlinks(ver, filename) {
+            return {
+                headers: {
+                    // http://stackoverflow.com/questions/2272835/amazon-s3-object-redirect
+                    'x-amz-website-redirect-location': `/${ver}/${filename}`,
+                    'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
+                },
+            };
+        },
+    };
+
     const regex = '(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*).(?:0|[1-9][0-9]*)(?:-[\\da-z\\-]+(?:.[\\da-z\\-]+)*)?(?:\\+[\\da-z\\-]+(?:.[\\da-z\\-]+)*)?';
-    const folder = branch.current === branch.beta ? '/beta' : '';
-    const cdnpath = new RegExp(`${aws.cdn.domain}${folder}/${regex}`, 'gi');
     const semver = new RegExp(`v${regex}`, 'gi');
     const localPath = new RegExp('(../)?dist', 'gi');
-    const versionPath = `https://${aws.cdn.domain}${folder}/${version}`;
+    const versionPath = `https://${aws.cdn.domain}/${version}`;
 
     // Publish version to CDN bucket
     gulp.task('cdn', () => {
@@ -273,7 +274,7 @@ if (Object.keys(aws).includes('cdn') && Object.keys(aws).includes('demo')) {
             return null;
         }
 
-        console.log(`Uploading '${version}' to ${aws.cdn.domain}${folder}...`);
+        console.log(`Uploading '${version}' to ${aws.cdn.domain}...`);
 
         // Upload to CDN
         return gulp
@@ -301,19 +302,21 @@ if (Object.keys(aws).includes('cdn') && Object.keys(aws).includes('demo')) {
             return null;
         }
 
-        console.log(`Uploading '${version}' demo to ${aws.demo.domain}${folder}...`);
+        console.log(`Uploading '${version}' demo to ${aws.demo.domain}...`);
+
+        const cdnpath = new RegExp(`${aws.cdn.domain}/${regex}/`, 'gi');
 
         // Replace versioned files in readme.md
         gulp
             .src([`${root}/readme.md`])
-            .pipe(replace(cdnpath, `${aws.cdn.domain}${folder}/${version}`))
+            .pipe(replace(cdnpath, `${aws.cdn.domain}/${version}/`))
             .pipe(gulp.dest(root));
 
         // Replace versioned files in plyr.js
         gulp
             .src(path.join(root, 'src/js/plyr.js'))
             .pipe(replace(semver, `v${version}`))
-            .pipe(replace(cdnpath, `${aws.cdn.domain}${folder}/${version}`))
+            .pipe(replace(cdnpath, `${aws.cdn.domain}/${version}/`))
             .pipe(gulp.dest(path.join(root, 'src/js/')));
 
         // Replace local file paths with remote paths in demo HTML

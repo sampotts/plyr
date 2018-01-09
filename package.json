@@ -1,6 +1,6 @@
 {
     "name": "plyr",
-    "version": "3.0.0-alpha.1",
+    "version": "3.0.0-beta.1",
     "description": "A simple, accessible and customizable HTML5, YouTube and Vimeo media player",
     "homepage": "https://plyr.io",
     "main": "./dist",
@@ -8,7 +8,7 @@
     "style": "./dist/plyr.css",
     "devDependencies": {
         "babel-core": "^6.26.0",
-        "babel-eslint": "^8.1.2",
+        "babel-eslint": "^8.2.1",
         "babel-plugin-external-helpers": "^6.22.0",
         "babel-preset-env": "^1.6.1",
         "del": "^3.0.0",
@@ -46,15 +46,7 @@
         "stylelint-selector-bem-pattern": "^2.0.0",
         "uglify-es": "^3.3.5"
     },
-    "keywords": [
-        "HTML5 Video",
-        "HTML5 Audio",
-        "Media Player",
-        "DASH",
-        "Shaka",
-        "WordPress",
-        "HLS"
-    ],
+    "keywords": ["HTML5 Video", "HTML5 Audio", "Media Player", "DASH", "Shaka", "WordPress", "HLS"],
     "repository": {
         "type": "git",
         "url": "git://github.com/sampotts/plyr.git"

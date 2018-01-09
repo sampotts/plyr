@@ -88,18 +88,17 @@
         </header>
 
         <main>
-            <video controls crossorigin playsinline poster="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.jpg" id="player">
+            <video controls crossorigin playsinline poster="media/View_From_A_Blue_Moon_Trailer-HD.jpg" id="player">
                 <!-- Video files -->
-                <source src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.mp4" type="video/mp4">
-                <source src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.webm" type="video/webm">
+                <source src="media/View_From_A_Blue_Moon_Trailer-HD.mp4" type="video/mp4">
+                <!--<source src="media/View_From_A_Blue_Moon_Trailer-UHD.mp4" type="video/mp4">-->
 
                 <!-- Text track file -->
-                <track kind="captions" label="English" srclang="en" src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.en.vtt"
-                    default>
-                <track kind="captions" label="Français" srclang="fr" src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.fr.vtt">
+                <track kind="captions" label="English" srclang="en" src="media/View_From_A_Blue_Moon_Trailer-HD.en.vtt" default>
+                <track kind="captions" label="Français" srclang="fr" src="media/View_From_A_Blue_Moon_Trailer-HD.fr.vtt">
 
                 <!-- Fallback for browsers that don't support the <video> element -->
-                <a href="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.mp4" download>Download</a>
+                <a href="media/View_From_A_Blue_Moon_Trailer-HD.mp4" download>Download</a>
             </video>
 
             <ul>
@@ -178,7 +177,7 @@
     <script src="https://cdn.rangetouch.com/1.0.1/rangetouch.js" async></script>
 
     <!-- Docs script -->
-    <script src="dist/demo.js?v=2"></script>
+    <script src="dist/demo.js"></script>
 </body>
 
 </html>
