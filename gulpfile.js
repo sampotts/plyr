@@ -321,14 +321,27 @@ if (Object.keys(aws).includes('cdn') && Object.keys(aws).includes('demo')) {
 
         // Replace local file paths with remote paths in demo HTML
         // e.g. "../dist/plyr.js" to "https://cdn.plyr.io/x.x.x/plyr.js"
+        const index = `${paths.demo.root}index.html`;
+        const error = `${paths.demo.root}error.html`;
+        const pages = [index];
+
+        if (branch.current === branch.master) {
+            pages.push(error);
+        }
+
         gulp
-            .src([`${paths.demo.root}*.html`])
+            .src(pages)
             .pipe(replace(localPath, versionPath))
             .pipe(s3(aws.demo, options.demo));
 
+        // Only update CDN for master (prod)
+        if (branch.current !== branch.master) {
+            return null;
+        }
+
         // Upload error.html to cdn (as well as demo site)
         return gulp
-            .src([`${paths.demo.root}error.html`])
+            .src([error])
             .pipe(replace(localPath, versionPath))
             .pipe(s3(aws.cdn, options.demo));
     });
