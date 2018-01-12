@@ -13,6 +13,7 @@ This is a massive release. A _mostly_ complete rewrite in ES6. What started out 
 * Added AirPlay support (again, Safari only)
 * Added `playsinline` support for iOS 10+
 * Soundcloud removed until I can work on a plugin framework
+* Embedded players are now progressively enhanced - no more empty `<div>`s!
 
 ### Other stuff
 
@@ -68,27 +69,33 @@ You gotta break eggs to make an omelette. Sadly, there's quite a few breaking ch
 Because we're using the fancy new ES6 syntax, you will need to polyfill for vintage browsers if you want to use Plyr and still support them. Luckily there's a decent service for this that makes it painless, [https://polyfill.io](polyfill.io).
 
 ## v2.0.18
-- Fix for YouTube .getVideoData() issue (fixes #709)
+
+* Fix for YouTube .getVideoData() issue (fixes #709)
 
 ## v2.0.17
-- Vimeo controls fix (fixes #697)
-- SVG4everybody compatibility fix
-- Allow Plyr.setup event listeners to be set up as separate event listeners (https://github.com/sampotts/plyr/pull/703)
-- Added title to the layer html template (for custom controls) (https://github.com/sampotts/plyr/pull/649)
-- Target is null bug fix (https://github.com/sampotts/plyr/pull/617)
-- fix #684 memory leaks issues after destroy (https://github.com/sampotts/plyr/pull/700)
+
+* Vimeo controls fix (fixes #697)
+* SVG4everybody compatibility fix
+* Allow Plyr.setup event listeners to be set up as separate event listeners (https://github.com/sampotts/plyr/pull/703)
+* Added title to the layer html template (for custom controls) (https://github.com/sampotts/plyr/pull/649)
+* Target is null bug fix (https://github.com/sampotts/plyr/pull/617)
+* fix #684 memory leaks issues after destroy (https://github.com/sampotts/plyr/pull/700)
 
 ## v2.0.16
-- Fullscreen bug fix (fixes #664)
+
+* Fullscreen bug fix (fixes #664)
 
 ## v2.0.15
-- Demo fix
+
+* Demo fix
 
 ## v2.0.14
-- CDN URL updates. Sorry, still working on V3 as hard as I can...
+
+* CDN URL updates. Sorry, still working on V3 as hard as I can...
 
 ## v2.0.13
-- Repo moved and Vimeo demo fix
+
+* Repo moved and Vimeo demo fix
 
 ## v2.0.12
 

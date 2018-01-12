@@ -11,6 +11,7 @@
 
     height: 0;
     padding-bottom: to-percentage($padding);
+    position: relative;
 
     iframe {
         border: 0;

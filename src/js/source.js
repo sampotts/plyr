@@ -67,8 +67,9 @@ const source = {
 
                     case 'youtube:video':
                     case 'vimeo:video':
-                        this.media = utils.createElement('div');
-                        this.embedId = input.sources[0].src;
+                        this.media = utils.createElement('div', {
+                            src: input.sources[0].src,
+                        });
                         break;
 
                     default:
@@ -136,7 +137,7 @@ const source = {
                     ui.build.call(this);
                 }
             },
-            true
+            true,
         );
     },
 };

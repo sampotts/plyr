@@ -50,7 +50,7 @@ const media = {
         }
 
         // Inject the player wrapper
-        if (this.isVideo || this.isYouTube || this.isVimeo) {
+        if (this.isVideo) {
             // Create the wrapper div
             this.elements.wrapper = utils.createElement('div', {
                 class: this.config.classNames.video,

@@ -8,18 +8,11 @@ import ui from './../ui';
 
 const vimeo = {
     setup() {
-        // Remove old containers
-        const containers = utils.getElements.call(this, `[id^="${this.provider}-"]`);
-        Array.from(containers).forEach(utils.removeElement);
-
         // Add embed class for responsive
         utils.toggleClass(this.elements.wrapper, this.config.classNames.embed, true);
 
         // Set intial ratio
         vimeo.setAspectRatio.call(this);
-
-        // Set ID
-        this.media.setAttribute('id', utils.generateId(this.provider));
 
         // Load the API if not already
         if (!utils.is.object(window.Vimeo)) {
@@ -57,15 +50,21 @@ const vimeo = {
             transparent: 0,
             gesture: 'media',
         };
-        const params = utils.buildUrlParameters(options);
-        const id = utils.parseVimeoId(player.embedId);
+        const params = utils.buildUrlParams(options);
+        const id = utils.parseVimeoId(player.media.getAttribute('src'));
 
         // Build an iframe
         const iframe = utils.createElement('iframe');
         const src = `https://player.vimeo.com/video/${id}?${params}`;
         iframe.setAttribute('src', src);
         iframe.setAttribute('allowfullscreen', '');
-        player.media.appendChild(iframe);
+        iframe.setAttribute('allowtransparency', '');
+        iframe.setAttribute('allow', 'autoplay');
+
+        // Inject the package
+        const wrapper = utils.createElement('div');
+        wrapper.appendChild(iframe);
+        player.media = utils.replaceElement(wrapper, player.media);
 
         // Setup instance
         // https://github.com/vimeo/player.js

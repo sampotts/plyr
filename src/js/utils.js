@@ -3,6 +3,7 @@
 // ==========================================================================
 
 import support from './support';
+import { providers } from './types';
 
 const utils = {
     // Check variable types
@@ -103,7 +104,7 @@ const utils = {
                     element.callbacks.forEach(cb => cb.call(null, event));
                     element.callbacks = null;
                 },
-                false
+                false,
             );
         }
 
@@ -168,7 +169,7 @@ const utils = {
                             prefix + id,
                             JSON.stringify({
                                 content: text,
-                            })
+                            }),
                         );
                     }
 
@@ -272,6 +273,17 @@ const utils = {
             element.removeChild(element.lastChild);
             length -= 1;
         }
+    },
+
+    // Replace element
+    replaceElement(newChild, oldChild) {
+        if (!utils.is.element(oldChild) || !utils.is.element(oldChild.parentNode) || !utils.is.element(newChild)) {
+            return null;
+        }
+
+        oldChild.parentNode.replaceChild(newChild, oldChild);
+
+        return newChild;
     },
 
     // Set attributes
@@ -491,7 +503,7 @@ const utils = {
                     event.preventDefault();
                 }
             },
-            false
+            false,
         );
     },
 
@@ -617,14 +629,37 @@ const utils = {
         return utils.extend(target, ...sources);
     },
 
+    // Get the provider for a given URL
+    getProviderByUrl(url) {
+        // YouTube
+        if (/^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$/.test(url)) {
+            return providers.youtube;
+        }
+
+        // Vimeo
+        if (/^https?:\/\/player.vimeo.com\/video\/\d{8,}(?=\b|\/)/.test(url)) {
+            return providers.vimeo;
+        }
+
+        return null;
+    },
+
     // Parse YouTube ID from URL
     parseYouTubeId(url) {
+        if (utils.is.empty(url)) {
+            return null;
+        }
+
         const regex = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
         return url.match(regex) ? RegExp.$2 : url;
     },
 
     // Parse Vimeo ID from URL
     parseVimeoId(url) {
+        if (utils.is.empty(url)) {
+            return null;
+        }
+
         if (utils.is.number(Number(url))) {
             return url;
         }
@@ -633,8 +668,40 @@ const utils = {
         return url.match(regex) ? RegExp.$2 : url;
     },
 
+    // Convert a URL to a location object
+    parseUrl(url) {
+        const parser = document.createElement('a');
+        parser.href = url;
+        return parser;
+    },
+
+    // Get URL query parameters
+    getUrlParams(input) {
+        let search = input;
+
+        // Parse URL if needed
+        if (input.startsWith('http://') || input.startsWith('https://')) {
+            ({ search } = this.parseUrl(input));
+        }
+
+        if (this.is.empty(search)) {
+            return null;
+        }
+
+        const hashes = search.slice(search.indexOf('?') + 1).split('&');
+
+        return hashes.reduce((params, hash) => {
+            const [
+                key,
+                val,
+            ] = hash.split('=');
+
+            return Object.assign(params, { [key]: decodeURIComponent(val) });
+        }, {});
+    },
+
     // Convert object to URL parameters
-    buildUrlParameters(input) {
+    buildUrlParams(input) {
         if (!utils.is.object(input)) {
             return '';
         }

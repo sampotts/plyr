@@ -91,21 +91,23 @@ Plyr extends upon the standard HTML5 markup so that's all you need for those typ
 </audio>
 ```
 
-For YouTube and Vimeo, Plyr uses the standard YouTube API markup (an empty `<div>`):
+For YouTube and Vimeo players, Plyr uses progressive enhancement to enhance the default `<iframe>` embeds. Below are some examples. The `plyr__video-embed` classname will make the embed responsive. You can add the `autoplay`, `loop` and `playsinline` (YouTube only) query parameters to the URL and they will be set as config options automatically. For YouTube, the `origin` should be updated to reflect the domain you're hosting the embed on, or you can opt to omit it.
 
 #### YouTube embed
 
 ```html
-<div id="player" data-plyr-provider="youtube" data-plyr-embed-id="bTqVqk7FSmY"></div>
+<div class="plyr__video-embed" id="player">
+    <iframe src="https://www.youtube.com/embed/bTqVqk7FSmY?origin=https://plyr.io&amp;iv_load_policy=3&amp;modestbranding=1&amp;playsinline=1&amp;showinfo=0&amp;rel=0&amp;enablejsapi=1" allowfullscreen allowtransparency allow="autoplay"></iframe>
+</div>
 ```
 
 #### Vimeo embed
 
 ```html
-<div id="player" data-plyr-provider="vimeo" data-plyr-embed-id="143418951"></div>
+<div class="plyr__video-embed" id="player">
+    <iframe src="https://player.vimeo.com/video/76979871?loop=false&amp;byline=false&amp;portrait=false&amp;title=false&amp;speed=true&amp;transparent=0&amp;gesture=media" allowfullscreen allowtransparency allow="autoplay"></iframe>
+</div>
 ```
-
-Note: In both cases, `data-plyr-embed-id` value can be the ID or URL for the media.
 
 ### JavaScript
 
@@ -120,7 +122,7 @@ Include the `plyr.js` script before the closing `</body>` tag and then call `ply
 If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for the JavaScript, you can use the following:
 
 ```html
-<script src="https://cdn.plyr.io/3.0.0-beta.1/plyr.js"></script>
+<script src="https://cdn.plyr.io/3.0.0-beta.2/plyr.js"></script>
 ```
 
 ### CSS
@@ -134,13 +136,13 @@ Include the `plyr.css` stylsheet into your `<head>`
 If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for the default CSS, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/3.0.0-beta.1/plyr.css">
+<link rel="stylesheet" href="https://cdn.plyr.io/3.0.0-beta.2/plyr.css">
 ```
 
 ### SVG Sprite
 
 The SVG sprite is loaded automatically from our CDN (provided by [Fastly](https://www.fastly.com/)). To change this, see the [options](#options) below. For
-reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.0.0-beta.1/plyr.svg`.
+reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.0.0-beta.2/plyr.svg`.
 
 ## Advanced
 
@@ -211,8 +213,7 @@ Passing a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList):
 const player = new Plyr(document.querySelectorAll('.js-player'));
 ```
 
-The NodeList, HTMLElement or string selector can be the target `<video>`, `<audio>` or `[data-plyr-provider]` (for embeds) element itself or a container
-element.
+The NodeList, HTMLElement or string selector can be the target `<video>`, `<audio>`, or `<div>` wrapper for embeds
 
 The second argument for the constructor is the [#options](options) object:
 

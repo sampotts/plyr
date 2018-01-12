@@ -5,8 +5,8 @@
 const noop = () => {};
 
 export default class Console {
-    constructor(player) {
-        this.enabled = window.console && player.config.debug;
+    constructor(enabled = false) {
+        this.enabled = window.console && enabled;
 
         if (this.enabled) {
             this.log('Debugging enabled');

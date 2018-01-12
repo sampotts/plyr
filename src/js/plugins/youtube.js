@@ -8,24 +8,15 @@ import ui from './../ui';
 
 const youtube = {
     setup() {
-        const videoId = utils.parseYouTubeId(this.embedId);
-
-        // Remove old containers
-        const containers = utils.getElements.call(this, `[id^="${this.provider}-"]`);
-        Array.from(containers).forEach(utils.removeElement);
-
         // Add embed class for responsive
         utils.toggleClass(this.elements.wrapper, this.config.classNames.embed, true);
 
         // Set aspect ratio
         youtube.setAspectRatio.call(this);
 
-        // Set ID
-        this.media.setAttribute('id', utils.generateId(this.provider));
-
         // Setup API
-        if (utils.is.object(window.YT)) {
-            youtube.ready.call(this, videoId);
+        if (utils.is.object(window.YT) && utils.is.function(window.YT.Player)) {
+            youtube.ready.call(this);
         } else {
             // Load the API
             utils.loadScript(this.config.urls.youtube.api);
@@ -36,7 +27,7 @@ const youtube = {
 
             // Add to queue
             window.onYouTubeReadyCallbacks.push(() => {
-                youtube.ready.call(this, videoId);
+                youtube.ready.call(this);
             });
 
             // Set callback to process queue
@@ -49,7 +40,7 @@ const youtube = {
     },
 
     // Get the media title
-    getTitle() {
+    getTitle(videoId) {
         // Try via undocumented API method first
         // This method disappears now and then though...
         // https://github.com/sampotts/plyr/issues/709
@@ -65,7 +56,6 @@ const youtube = {
 
         // Or via Google API
         const key = this.config.keys.google;
-        const videoId = utils.parseYouTubeId(this.embedId);
         if (utils.is.string(key) && !utils.is.empty(key)) {
             const url = `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${key}&fields=items(snippet(title))&part=snippet`;
 
@@ -88,12 +78,24 @@ const youtube = {
     },
 
     // API ready
-    ready(videoId) {
+    ready() {
         const player = this;
+
+        // Ignore already setup (race condition)
+        const currentId = player.media.getAttribute('id');
+        if (!utils.is.empty(currentId) && currentId.startsWith('youtube-')) {
+            return;
+        }
+
+        // Replace the <iframe> with a <div> due to YouTube API issues
+        const videoId = utils.parseYouTubeId(player.media.getAttribute('src'));
+        const id = utils.generateId(player.provider);
+        const container = utils.createElement('div', { id });
+        player.media = utils.replaceElement(container, player.media);
 
         // Setup instance
         // https://developers.google.com/youtube/iframe_api_reference
-        player.embed = new window.YT.Player(player.media.id, {
+        player.embed = new window.YT.Player(id, {
             videoId,
             playerVars: {
                 autoplay: player.config.autoplay ? 1 : 0, // Autoplay
@@ -110,8 +112,8 @@ const youtube = {
                 widget_referrer: window && window.location.href,
 
                 // Captions are flaky on YouTube
-                cc_load_policy: this.captions.active ? 1 : 0,
-                cc_lang_pref: this.config.captions.language,
+                cc_load_policy: player.captions.active ? 1 : 0,
+                cc_lang_pref: player.config.captions.language,
             },
             events: {
                 onError(event) {
@@ -179,7 +181,7 @@ const youtube = {
                     const instance = event.target;
 
                     // Get the title
-                    youtube.getTitle.call(player);
+                    youtube.getTitle.call(player, videoId);
 
                     // Create a faux HTML5 API using the YouTube API
                     player.media.play = () => {
