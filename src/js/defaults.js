@@ -186,6 +186,9 @@ const defaults = {
         youtube: {
             api: 'https://www.youtube.com/iframe_api',
         },
+        googleIMA: {
+            api: 'https://imasdk.googleapis.com/js/sdkloader/ima3.js',
+        },
     },
 
     // Custom control listeners

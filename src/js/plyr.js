@@ -12,6 +12,7 @@ import utils from './utils';
 
 import Console from './console';
 import Storage from './storage';
+import Ads from './plugins/ads';
 
 import captions from './captions';
 import controls from './controls';
@@ -273,6 +274,9 @@ class Plyr {
         if (this.isHTML5 || (this.isEmbed && !this.supported.ui)) {
             ui.build.call(this);
         }
+
+        // Setup ads if provided
+        this.ads = new Ads(this);
     }
 
     // ---------------------------------------
