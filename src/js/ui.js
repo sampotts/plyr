@@ -345,13 +345,16 @@ const ui = {
             return;
         }
 
+        // If there's a spot to display duration
+        const hasDuration = utils.is.element(this.elements.display.duration);
+
         // If there's only one time display, display duration there
-        if (!utils.is.element(this.elements.display.duration) && this.config.displayDuration && this.paused) {
+        if (!hasDuration && this.config.displayDuration && this.paused) {
             ui.updateTimeDisplay.call(this, this.elements.display.currentTime, this.duration);
         }
 
         // If there's a duration element, update content
-        if (utils.is.element(this.elements.display.duration)) {
+        if (hasDuration) {
             ui.updateTimeDisplay.call(this, this.elements.display.duration, this.duration);
         }
 

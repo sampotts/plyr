@@ -48,19 +48,6 @@ document.addEventListener('DOMContentLoaded', () => {
         captions: {
             active: true,
         },
-        controls: [
-            'play-large',
-            'play',
-            'progress',
-            'current-time',
-            'mute',
-            'volume',
-            'captions',
-            'settings',
-            'fullscreen',
-            'pip',
-            'airplay',
-        ],
         keys: {
             google: 'AIzaSyDrNwtN3nLH_8rjCmu5Wq3ZCm4MNAVdc0c',
         },
