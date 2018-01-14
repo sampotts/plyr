@@ -64,6 +64,9 @@ document.addEventListener('DOMContentLoaded', () => {
         keys: {
             google: 'AIzaSyDrNwtN3nLH_8rjCmu5Wq3ZCm4MNAVdc0c',
         },
+        ads: {
+            adTagUrl: 'http://go.aniview.com/api/adserver6/vast/?AV_PUBLISHERID=58c25bb0073ef448b1087ad6&AV_CHANNELID=5a0458dc28a06145e4519d21&AV_URL=127.0.0.1:3000&cb=1&AV_WIDTH=640&AV_HEIGHT=480',
+        },
     });
 
     // Expose for testing

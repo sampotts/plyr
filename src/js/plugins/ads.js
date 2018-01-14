@@ -18,6 +18,7 @@ const getStartEvents = () => {
 
 export default class Ads {
     constructor(player) {
+        this.player = player;
 
         // Check if an adTagUrl is provided.
         if (!player.config.ads.adTagUrl) {
@@ -26,10 +27,15 @@ export default class Ads {
 
         // Check if the Google IMA3 SDK is loaded.
         if (!utils.is.object(window.google)) {
-            utils.loadScript(player.config.urls.googleIMA.api);
+            utils.loadScript(player.config.urls.googleIMA.api, () => {
+                this.ready(this);
+            });
+        } else {
+            this.ready();
         }
+    }
 
-        this.player = player;
+    ready() {
         this.startEvents = getStartEvents();
         this.adDisplayContainer = null;
         this.adDisplayElement = null;
@@ -47,7 +53,7 @@ export default class Ads {
         this.setupIMA();
 
         // Set listeners on the Plyr instance.
-        // this.setupListeners();
+        this.setupListeners();
     }
 
     setupIMA() {
