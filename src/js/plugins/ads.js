@@ -113,12 +113,12 @@ export default class Ads {
         this.adsManager.addEventListener(window.google.ima.AdEvent.Type.COMPLETE, event => this.onAdEvent(event));
     }
 
-    onAdEvent(adEvent) {
+    onAdEvent(event) {
         const { container } = this.player.elements;
 
         // Retrieve the ad from the event. Some events (e.g. ALL_ADS_COMPLETED)
         // don't have ad object associated.
-        const ad = adEvent.getAd();
+        const ad = event.getAd();
 
         // Set the currently played ad. This information could be used by callback
         // events.
@@ -126,7 +126,7 @@ export default class Ads {
 
         // let intervalTimer;
 
-        switch (adEvent.type) {
+        switch (event.type) {
             case window.google.ima.AdEvent.Type.LOADED:
                 // This is the first event sent for an ad - it is possible to
                 // determine whether the ad is a video ad or an overlay.
@@ -311,8 +311,8 @@ export default class Ads {
     /**
      * Set start event listener on a DOM element and triggers the
      * callback when clicked.
-     * @param {HtmlElment} element - The element on which to set the listener
-     * @param {Function} callback - The callback which will be invoked once triggered.
+     * @param {element} element - The element on which to set the listener
+     * @param {function} callback - The callback which will be invoked once triggered.
      */
 
     setOnClickHandler(element, callback) {
