@@ -52,8 +52,12 @@ document.addEventListener('DOMContentLoaded', () => {
             google: 'AIzaSyDrNwtN3nLH_8rjCmu5Wq3ZCm4MNAVdc0c',
         },
         ads: {
-            tagUrl:
-                'http://go.aniview.com/api/adserver6/vast/?AV_PUBLISHERID=58c25bb0073ef448b1087ad6&AV_CHANNELID=5a0458dc28a06145e4519d21&AV_URL=127.0.0.1:3000&cb=1&AV_WIDTH=640&AV_HEIGHT=480',
+            tagUrl: 'https://pubads.g.doubleclick.net/gampad/ads' +
+            '?sz=640x480&iu=/124319096/external/ad_rule_samples&' +
+            'ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&' +
+            'output=vmap&unviewed_position_start=1&cust_params=d' +
+            'eployment%3Ddevsite%26sample_ar%3Dpremidpostoptimiz' +
+            'edpod&cmsid=496&vid=short_onecue&correlator=',
         },
     });
 
