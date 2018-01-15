@@ -309,6 +309,11 @@ class Plyr {
      * Play the media
      */
     play() {
+        if (this.ads) {
+            this.ads.playAds();
+            return this;
+        }
+
         return this.media.play();
     }
 
