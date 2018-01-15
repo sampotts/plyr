@@ -7,3 +7,5 @@ index-*.html
 npm-debug.log
 *.webm
 /package-lock.json
+.idea/
+
