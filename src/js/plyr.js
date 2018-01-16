@@ -310,11 +310,12 @@ class Plyr {
      */
     play() {
         if (this.ads) {
-            this.ads.playAds();
-            return this;
+            this.ads.play();
         }
 
-        return this.media.play();
+        if (!this.ads.playing) {
+            return this.media.play();
+        }
     }
 
     /**
