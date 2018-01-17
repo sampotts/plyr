@@ -141,6 +141,7 @@ class Ads {
      * @param {Event} adsManagerLoadedEvent
      */
     onAdsManagerLoaded(adsManagerLoadedEvent) {
+        const { container } = this.player.elements;
 
         // Get the ads manager.
         const settings = new google.ima.AdsRenderingSettings();
@@ -155,6 +156,18 @@ class Ads {
 
         // Get the cue points for any mid-rolls by filtering out the pre- and post-roll.
         this.adsCuePoints = this.adsManager.getCuePoints();
+
+        // Add advertisement cue's within the time line if available.
+        this.adsCuePoints.forEach((cuePoint, index) => {
+            if (cuePoint !== 0 && cuePoint !== -1) {
+                const seekElement = this.player.elements.progress;
+                const cue = utils.createElement('span', {
+                    class: this.player.config.classNames.cues,
+                });
+                cue.style.left = cuePoint.toString() + 'px';
+                seekElement.appendChild(cue);
+            }
+        });
 
         // Add listeners to the required events.
         // Advertisement error events.
@@ -368,12 +381,12 @@ class Ads {
             this.adsLoader.contentComplete();
         });
 
-        this.player.on('seeking', event => {
+        this.player.on('seeking', () => {
             time = this.player.currentTime;
             return time;
         });
 
-        this.player.on('seeked', event => {
+        this.player.on('seeked', () => {
             const seekedTime = this.player.currentTime;
 
             this.adsCuePoints.forEach((cuePoint, index) => {

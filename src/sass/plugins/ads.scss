@@ -16,3 +16,17 @@
         left: 0;
     }
 }
+
+// Advertisement cue's for the progress bar.
+.plyr__cues {
+    display: block;
+    position: absolute;
+    z-index: 3; // Between progress and thumb.
+    top: 50%;
+    left: 0;
+    margin: -($plyr-range-track-height / 2) 0 0;
+    width: 3px;
+    height: $plyr-range-track-height;
+    background: currentColor;
+    opacity: 0.8;
+}
