@@ -159,11 +159,14 @@ class Ads {
         this.adsCuePoints.forEach((cuePoint) => {
             if (cuePoint !== 0 && cuePoint !== -1) {
                 const seekElement = this.player.elements.progress;
-                const cue = utils.createElement('span', {
-                    class: this.player.config.classNames.cues,
-                });
-                cue.style.left = cuePoint.toString() + 'px';
-                seekElement.appendChild(cue);
+                if(seekElement) {
+                    const cuePercentage = 100 / this.player.duration * cuePoint;
+                    const cue = utils.createElement('span', {
+                        class: this.player.config.classNames.cues,
+                    });
+                    cue.style.left = `${cuePercentage.toString()}%`;
+                    seekElement.appendChild(cue);
+                }
             }
         });
 
