@@ -42,12 +42,16 @@ class Ads {
         // Setup a simple promise to resolve if the IMA loader is ready.
         this.adsLoaderPromise = new Promise((resolve) => {
             this.on('ADS_LOADER_LOADED', () => resolve());
+        });
+        this.adsLoaderPromise.then(() => {
             this.player.debug.log(`[${(Date.now() - this.time) / 1000}s][IMA SDK] adsLoader resolved!`, this.adsLoader);
         });
 
         // Setup a promise to resolve if the IMA manager is ready.
         this.adsManagerPromise = new Promise((resolve) => {
             this.on('ADS_MANAGER_LOADED', () => resolve());
+        });
+        this.adsManagerPromise.then(() => {
             this.player.debug.log(`[${(Date.now() - this.time) / 1000}s][IMA SDK] adsManager resolved!`, this.adsManager);
 
             // Clear the safety timer.
