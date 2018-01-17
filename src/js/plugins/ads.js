@@ -276,7 +276,11 @@ class Ads {
     }
 
     setupAdDisplayContainer() {
-        const { wrapper } = this.player.elements;
+        // Create the container for our advertisements.
+        const container = utils.createElement('div', {
+            class: this.player.config.classNames.ads,
+        });
+        this.player.elements.container.appendChild(container);
 
         // So we can run VPAID2.
         google.ima.settings.setVpaidMode(google.ima.ImaSdkSettings.VpaidMode.ENABLED);
@@ -287,9 +291,9 @@ class Ads {
 
         // We assume the adContainer is the video container of the plyr element
         // that will house the ads.
-        this.adDisplayContainer = new google.ima.AdDisplayContainer(wrapper);
+        this.adDisplayContainer = new google.ima.AdDisplayContainer(container);
 
-        this.adsDisplayElement = wrapper.firstChild;
+        this.adsDisplayElement = container.firstChild;
 
         // The AdDisplayContainer call from google IMA sets the style attribute
         // by default. We remove the inline style and set it through the stylesheet.
@@ -297,6 +301,14 @@ class Ads {
 
         // Set class name on the adDisplayContainer element.
         this.adsDisplayElement.setAttribute('class', this.player.config.classNames.ads);
+
+        // Make sure our advertisement container has the right z-index.
+        this.on('CONTENT_PAUSE_REQUESTED', () => {
+            container.style.zIndex = '3';
+        });
+        this.on('CONTENT_RESUME_REQUESTED', () => {
+            container.style.zIndex = '1';
+        });
 
         // Play ads when clicked. Wait until the adsManager and adsLoader
         // are both resolved.
