@@ -3,13 +3,14 @@
 // ==========================================================================
 
 .plyr__ads {
+    display: none; // Hide initially.
     bottom: 0;
     cursor: pointer;
     left: 0;
     position: absolute;
     right: 0;
     top: 0;
-    z-index: 1;
+    z-index: 3; // Above the controls.
 
     video {
         left: 0;

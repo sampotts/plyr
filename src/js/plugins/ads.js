@@ -1,23 +1,5 @@
 import utils from '../utils';
 
-// Events are different on various devices. We set the correct events, based on userAgent.
-const getStartEvents = () => {
-    let events = ['click'];
-
-    // TODO: Detecting touch is tricky, we should look at other ways?
-    // For mobile users the start event will be one of
-    // touchstart, touchend and touchmove.
-    if (navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPad/i) || navigator.userAgent.match(/Android/i)) {
-        events = [
-            'touchstart',
-            'touchend',
-            'touchmove',
-        ];
-    }
-
-    return events;
-};
-
 class Ads {
     constructor(player) {
         this.player = player;
@@ -41,7 +23,6 @@ class Ads {
 
     ready() {
         this.time = Date.now();
-        this.startEvents = getStartEvents();
         this.adsContainer = null;
         this.adDisplayContainer = null;
         this.adsManager = null;
@@ -105,24 +86,6 @@ class Ads {
         // We assume the adContainer is the video container of the plyr element
         // that will house the ads.
         this.adDisplayContainer = new google.ima.AdDisplayContainer(this.adsContainer);
-
-        const adsDisplayElement = this.adsContainer.firstChild;
-
-        // The AdDisplayContainer call from google IMA sets the style attribute
-        // by default. We remove the inline style and set it through the stylesheet.
-        adsDisplayElement.removeAttribute('style');
-
-        // Set class name on the adDisplayContainer element.
-        adsDisplayElement.setAttribute('class', this.player.config.classNames.ads);
-
-        // Play ads when clicked. Wait until the adsManager and adsLoader
-        // are both resolved.
-        Promise.all([
-            this.adsManagerPromise,
-            this.adsLoaderPromise,
-        ]).then(() => {
-            this.setOnClickHandler(adsDisplayElement, this.play);
-        });
 
         // Request video ads to be pre-loaded.
         this.requestAds();
@@ -462,7 +425,6 @@ class Ads {
 
         // Hide our ad container.
         this.adsContainer.style.display = 'none';
-        this.adsContainer.style.zIndex = '1';
 
         // Ad is stopped.
         this.playing = false;
@@ -481,7 +443,6 @@ class Ads {
 
         // Show our ad container.
         this.adsContainer.style.display = 'block';
-        this.adsContainer.style.zIndex = '3';
 
         // Ad is playing.
         this.playing = true;
@@ -543,27 +504,6 @@ class Ads {
     handleEventListeners(event) {
         if (typeof this.events[event] !== 'undefined') {
             this.events[event].call(this);
-        }
-    }
-
-    /**
-     * Set start event listener on a DOM element and triggers the
-     * callback when clicked.
-     * @param {element} element - The element on which to set the listener
-     * @param {function} callback - The callback which will be invoked once triggered.
-     */
-    setOnClickHandler(element, callback) {
-        for (let i = 0; i < this.startEvents.length; i += 1) {
-            const startEvent = this.startEvents[i];
-            element.addEventListener(
-                startEvent,
-                event => {
-                    if ((event.type === 'touchend' && startEvent === 'touchend') || event.type === 'click') {
-                        callback.call(this);
-                    }
-                },
-                { once: true },
-            );
         }
     }
 
