@@ -51,20 +51,20 @@ class Ads {
         this.events = {};
         this.safetyTimer = null;
 
+        // Set listeners on the Plyr instance.
+        this.setupListeners();
+
         // Setup a simple promise to resolve if the IMA loader is ready.
-        this.adsLoaderResolve = () => {};
         this.adsLoaderPromise = new Promise((resolve) => {
-            this.adsLoaderResolve = resolve;
+            this.on('ADS_LOADER_LOADED', () => resolve());
         });
         this.adsLoaderPromise.then(() => {
             this.player.debug.log(`[${(Date.now() - this.time) / 1000}s][IMA SDK] adsLoader resolved!`, this.adsLoader);
         });
 
         // Setup a promise to resolve if the IMA manager is ready.
-        this.adsManagerResolve = () => {};
         this.adsManagerPromise = new Promise((resolve) => {
-            // Resolve our promise.
-            this.adsManagerResolve = resolve;
+            this.on('ADS_MANAGER_LOADED', () => resolve());
         });
         this.adsManagerPromise.then(() => {
             // Clear the safety timer.
@@ -81,9 +81,6 @@ class Ads {
 
         // Setup the IMA SDK.
         this.setupIMA();
-
-        // Set listeners on the Plyr instance.
-        this.setupListeners();
     }
 
     setupIMA() {
@@ -109,7 +106,7 @@ class Ads {
 
         this.adsLoader.requestAds(adsRequest);
 
-        this.adsLoaderResolve();
+        this.handleEventListeners('ADS_LOADER_LOADED');
     }
 
     onAdsManagerLoaded(adsManagerLoadedEvent) {
@@ -141,7 +138,7 @@ class Ads {
         this.adsManager.addEventListener(google.ima.AdEvent.Type.COMPLETE, event => this.onAdEvent(event));
 
         // Resolve our adsManager.
-        this.adsManagerResolve();
+        this.handleEventListeners('ADS_MANAGER_LOADED');
     }
 
     onAdEvent(event) {
@@ -160,12 +157,7 @@ class Ads {
         switch (event.type) {
 
             case google.ima.AdEvent.Type.AD_BREAK_READY:
-                // This event indicates that a mid-roll ad is ready to start.
-                // We pause the player and tell the adsManager to start playing the ad.
                 this.player.debug.log(`[${(Date.now() - this.time) / 1000}s][IMA SDK] AD_BREAK_READY |`, 'Fired when an ad rule or a VMAP ad break would have played if autoPlayAdBreaks is false.');
-                // this.handleEventListeners('AD_BREAK_READY');
-                // this.playing = true;
-                // this.adsManager.start();
                 break;
             case google.ima.AdEvent.Type.AD_METADATA:
                 this.player.debug.log(`[${(Date.now() - this.time) / 1000}s][IMA SDK] AD_METADATA |`, 'Fired when an ads list is loaded.');
@@ -178,29 +170,36 @@ class Ads {
                 this.player.debug.log(`[${(Date.now() - this.time) / 1000}s][IMA SDK] CLICK |`, 'Fired when the ad is clicked.');
                 break;
             case google.ima.AdEvent.Type.COMPLETE:
+                this.player.debug.log(`[${(Date.now() - this.time) / 1000}s][IMA SDK] COMPLETE |`, 'Fired when the ad completes playing.');
+                break;
+            case google.ima.AdEvent.Type.CONTENT_PAUSE_REQUESTED:
+                // This event indicates the ad has started - the video player
+                // can adjust the UI, for example display a pause button and
+                // remaining time.
+                this.player.debug.log(`[${(Date.now() - this.time) / 1000}s][IMA SDK] CONTENT_PAUSE_REQUESTED |`, 'Fired when content should be paused. This usually happens right before an ad is about to cover the content.');
+                this.handleEventListeners('CONTENT_PAUSE_REQUESTED');
+
+                // Show our advertiment container.
+                this.adsDisplayElement.style.display = 'block';
+
+                this.playing = true;
+
+                // Pause our video.
+                this.player.pause();
+                break;
+            case google.ima.AdEvent.Type.CONTENT_RESUME_REQUESTED:
                 // This event indicates the ad has finished - the video player
                 // can perform appropriate UI actions, such as removing the timer for
                 // remaining time detection.
-                // clearInterval(intervalTimer);
-                this.player.debug.log(`[${(Date.now() - this.time) / 1000}s][IMA SDK] COMPLETE |`, 'Fired when the ad completes playing.');
-                this.handleEventListeners('COMPLETE');
-                this.playing = false;
-
-                this.adsDisplayElement.style.display = 'none';
-
-                if (this.player.currentTime < this.player.duration) {
-                    this.player.play();
-                }
-                break;
-            case google.ima.AdEvent.Type.CONTENT_PAUSE_REQUESTED:
-                this.player.debug.log(`[${(Date.now() - this.time) / 1000}s][IMA SDK] CONTENT_PAUSE_REQUESTED |`, 'Fired when content should be paused. This usually happens right before an ad is about to cover the content.');
-                this.handleEventListeners('CONTENT_PAUSE_REQUESTED');
-                this.player.pause();
-                break;
-
-            case google.ima.AdEvent.Type.CONTENT_RESUME_REQUESTED:
                 this.player.debug.log(`[${(Date.now() - this.time) / 1000}s][IMA SDK] CONTENT_RESUME_REQUESTED |`, 'Fired when content should be resumed. This usually happens when an ad finishes or collapses.');
                 this.handleEventListeners('CONTENT_RESUME_REQUESTED');
+
+                // Hide the advertisement container.
+                this.adsDisplayElement.style.display = 'none';
+
+                this.playing = false;
+
+                // Play our video.
                 if (this.player.currentTime < this.player.duration) {
                     this.player.play();
                 }
@@ -210,9 +209,6 @@ class Ads {
                 // determine whether the ad is a video ad or an overlay.
                 this.player.debug.log(`[${(Date.now() - this.time) / 1000}s][IMA SDK] LOADED |`, event.getAd().getContentType());
                 this.handleEventListeners('LOADED');
-
-                // Show the ad display element.
-                this.adsDisplayElement.style.display = 'block';
 
                 if (!ad.isLinear()) {
                     // Position AdDisplayContainer correctly for overlay.
@@ -224,13 +220,7 @@ class Ads {
                 // console.info('Ad time: ' + event.getAd().getAdPodInfo().getTimeOffset());
                 break;
             case google.ima.AdEvent.Type.STARTED:
-                // This event indicates the ad has started - the video player
-                // can adjust the UI, for example display a pause button and
-                // remaining time.
                 this.player.debug.log(`[${(Date.now() - this.time) / 1000}s][IMA SDK] STARTED |`, 'Fired when the ad starts playing.');
-                this.player.pause();
-                this.playing = true;
-                this.handleEventListeners('STARTED');
                 break;
             case google.ima.AdEvent.Type.DURATION_CHANGE:
                 this.player.debug.log(`[${(Date.now() - this.time) / 1000}s][IMA SDK] DURATION_CHANGE |`, 'Fired when the ad\'s duration changes.');
