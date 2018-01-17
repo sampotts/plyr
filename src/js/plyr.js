@@ -276,7 +276,9 @@ class Plyr {
         }
 
         // Setup ads if provided
-        this.ads = new Ads(this);
+        if (utils.is.url(this.config.ads.tagUrl)) {
+            this.ads = new Ads(this);
+        }
     }
 
     // ---------------------------------------
@@ -306,16 +308,21 @@ class Plyr {
     }
 
     /**
-     * Play the media
+     * Play the media, or play the advertisement
      */
     play() {
-        if (this.ads) {
-            this.ads.play();
+        if (utils.is.url(this.config.ads.tagUrl)) {
+            if (this.ads.playing) {
+                return;
+            }
+            if (!this.ads.initialized) {
+                this.ads.play();
+            }
+            if (!this.ads.playing) {
+                this.media.play();
+            }
         }
-
-        if (!this.ads.playing) {
-            return this.media.play();
-        }
+        this.media.play();
     }
 
     /**

@@ -21,8 +21,8 @@ const getStartEvents = () => {
 class Ads {
     constructor(player) {
         this.player = player;
-        this.isPlaying = false;
-        this.isInitialized = false;
+        this.playing = false;
+        this.initialized = false;
 
         // Check if a tag URL is provided.
         if (!utils.is.url(player.config.ads.tagUrl)) {
@@ -37,22 +37,6 @@ class Ads {
         } else {
             this.ready();
         }
-    }
-
-    set playing(bool = false) {
-        this.isPlaying = bool;
-    }
-
-    get playing() {
-        return this.isPlaying;
-    }
-
-    set initialized(bool = false) {
-        this.isInitialized = bool;
-    }
-
-    get initialized() {
-        return this.isInitialized;
     }
 
     ready() {
@@ -298,10 +282,7 @@ class Ads {
 
     onAdError(adErrorEvent) {
         this.cancel();
-
-        if (this.player.debug) {
-            throw new Error(adErrorEvent);
-        }
+        this.player.debug.log(`[${(Date.now() - this.time) / 1000}s][IMA SDK] ERROR |`, adErrorEvent);
     }
 
     setupAdDisplayContainer() {
