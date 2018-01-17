@@ -141,8 +141,6 @@ class Ads {
      * @param {Event} adsManagerLoadedEvent
      */
     onAdsManagerLoaded(adsManagerLoadedEvent) {
-        const { container } = this.player.elements;
-
         // Get the ads manager.
         const settings = new google.ima.AdsRenderingSettings();
 
@@ -158,7 +156,7 @@ class Ads {
         this.adsCuePoints = this.adsManager.getCuePoints();
 
         // Add advertisement cue's within the time line if available.
-        this.adsCuePoints.forEach((cuePoint, index) => {
+        this.adsCuePoints.forEach((cuePoint) => {
             if (cuePoint !== 0 && cuePoint !== -1) {
                 const seekElement = this.player.elements.progress;
                 const cue = utils.createElement('span', {
