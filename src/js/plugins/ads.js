@@ -284,7 +284,7 @@ class Ads {
                 // for example display a pause button and remaining time. Fired when content should
                 // be paused. This usually happens right before an ad is about to cover the content.
                 this.handleEventListeners('CONTENT_PAUSE_REQUESTED');
-                this.pause();
+                this.pauseContent();
                 break;
             case google.ima.AdEvent.Type.CONTENT_RESUME_REQUESTED:
                 // This event indicates the ad has finished - the video player can perform
@@ -292,7 +292,7 @@ class Ads {
                 // Fired when content should be resumed. This usually happens when an ad finishes
                 // or collapses.
                 this.handleEventListeners('CONTENT_RESUME_REQUESTED');
-                this.resume();
+                this.resumeContent();
                 break;
             case google.ima.AdEvent.Type.LOADED:
                 // This is the first event sent for an ad - it is possible to determine whether the
@@ -395,7 +395,7 @@ class Ads {
     /**
      * Resume our video.
      */
-    resume() {
+    resumeContent() {
         this.player.debug.log('Resume video.');
 
         // Hide our ad container.
@@ -413,7 +413,7 @@ class Ads {
     /**
      * Pause our video.
      */
-    pause() {
+    pauseContent() {
         this.player.debug.log('Pause video.');
 
         // Show our ad container.
@@ -436,7 +436,7 @@ class Ads {
         this.player.debug.warn('Ad cancelled.');
 
         // Pause our video.
-        this.resume();
+        this.resumeContent();
 
         // Tell our instance that we're done for now.
         this.handleEventListeners('ERROR');
