@@ -126,8 +126,8 @@ const build = {
             gulp.task(name, () =>
                 gulp
                     .src(bundles[bundle].js[key])
-                    .pipe(concat(key))
                     .pipe(sourcemaps.init())
+                    .pipe(concat(key))
                     .pipe(
                         rollup(
                             {
