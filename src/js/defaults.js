@@ -176,6 +176,7 @@ const defaults = {
         reset: 'Reset',
         none: 'None',
         disabled: 'Disabled',
+        advertisement: 'Advertisement',
     },
 
     // URLs

@@ -3,7 +3,6 @@
 // ==========================================================================
 
 .plyr__ads {
-    display: none; // Hide initially.
     bottom: 0;
     cursor: pointer;
     left: 0;
@@ -12,21 +11,31 @@
     top: 0;
     z-index: 3; // Above the controls.
 
-    video {
-        left: 0;
+    &::after {
+        background: rgba($plyr-color-gunmetal, 0.8);
+        border-radius: 2px;
+        bottom: ($plyr-control-spacing * 2);
+        color: #fff;
+        content: attr(data-badge-text);
+        font-size: $plyr-font-size-captions-small;
+        padding: 2px 6px;
+        pointer-events: none;
+        position: absolute;
+        right: ($plyr-control-spacing * 2);
+        z-index: 3;
     }
 }
 
 // Advertisement cue's for the progress bar.
 .plyr__cues {
+    background: currentColor;
     display: block;
-    position: absolute;
-    z-index: 3; // Between progress and thumb.
-    top: 50%;
+    height: $plyr-range-track-height;
     left: 0;
     margin: -($plyr-range-track-height / 2) 0 0;
-    width: 3px;
-    height: $plyr-range-track-height;
-    background: currentColor;
     opacity: 0.8;
+    position: absolute;
+    top: 50%;
+    width: 3px;
+    z-index: 3; // Between progress and thumb.
 }

@@ -749,9 +749,9 @@ const utils = {
     // Force repaint of element
     repaint(element) {
         window.setTimeout(() => {
-            element.setAttribute('hidden', '');
+            utils.toggleHidden(element, true);
             element.offsetHeight; // eslint-disable-line
-            element.removeAttribute('hidden');
+            utils.toggleHidden(element, false);
         }, 0);
     },
 };
