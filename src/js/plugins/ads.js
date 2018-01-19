@@ -1,3 +1,11 @@
+// ==========================================================================
+// Advertisment plugin
+// Create an account with our ad partner, vi here:
+// https://www.vi.ai/publisher-video-monetization/
+// ==========================================================================
+
+/* global google */
+
 import utils from '../utils';
 
 // Events are different on various devices. We set the correct events, based on userAgent.
@@ -53,7 +61,7 @@ class Ads {
 
         // Setup a simple promise to resolve if the IMA loader is ready.
         this.adsLoaderResolve = () => {};
-        this.adsLoaderPromise = new Promise((resolve) => {
+        this.adsLoaderPromise = new Promise(resolve => {
             this.adsLoaderResolve = resolve;
         });
         this.adsLoaderPromise.then(() => {
@@ -62,7 +70,7 @@ class Ads {
 
         // Setup a promise to resolve if the IMA manager is ready.
         this.adsManagerResolve = () => {};
-        this.adsManagerPromise = new Promise((resolve) => {
+        this.adsManagerPromise = new Promise(resolve => {
             // Resolve our promise.
             this.adsManagerResolve = resolve;
         });
@@ -113,7 +121,6 @@ class Ads {
     }
 
     onAdsManagerLoaded(adsManagerLoadedEvent) {
-
         // Get the ads manager.
         const settings = new google.ima.AdsRenderingSettings();
 
@@ -158,11 +165,13 @@ class Ads {
         // let intervalTimer;
 
         switch (event.type) {
-
             case google.ima.AdEvent.Type.AD_BREAK_READY:
                 // This event indicates that a mid-roll ad is ready to start.
                 // We pause the player and tell the adsManager to start playing the ad.
-                this.player.debug.log(`[${(Date.now() - this.time) / 1000}s][IMA SDK] AD_BREAK_READY |`, 'Fired when an ad rule or a VMAP ad break would have played if autoPlayAdBreaks is false.');
+                this.player.debug.log(
+                    `[${(Date.now() - this.time) / 1000}s][IMA SDK] AD_BREAK_READY |`,
+                    'Fired when an ad rule or a VMAP ad break would have played if autoPlayAdBreaks is false.',
+                );
                 // this.handleEventListeners('AD_BREAK_READY');
                 // this.playing = true;
                 // this.adsManager.start();
@@ -171,7 +180,10 @@ class Ads {
                 this.player.debug.log(`[${(Date.now() - this.time) / 1000}s][IMA SDK] AD_METADATA |`, 'Fired when an ads list is loaded.');
                 break;
             case google.ima.AdEvent.Type.ALL_ADS_COMPLETED:
-                this.player.debug.log(`[${(Date.now() - this.time) / 1000}s][IMA SDK] ALL_ADS_COMPLETED |`, 'Fired when the ads manager is done playing all the ads.');
+                this.player.debug.log(
+                    `[${(Date.now() - this.time) / 1000}s][IMA SDK] ALL_ADS_COMPLETED |`,
+                    'Fired when the ads manager is done playing all the ads.',
+                );
                 this.handleEventListeners('ALL_ADS_COMPLETED');
                 break;
             case google.ima.AdEvent.Type.CLICK:
@@ -193,13 +205,19 @@ class Ads {
                 }
                 break;
             case google.ima.AdEvent.Type.CONTENT_PAUSE_REQUESTED:
-                this.player.debug.log(`[${(Date.now() - this.time) / 1000}s][IMA SDK] CONTENT_PAUSE_REQUESTED |`, 'Fired when content should be paused. This usually happens right before an ad is about to cover the content.');
+                this.player.debug.log(
+                    `[${(Date.now() - this.time) / 1000}s][IMA SDK] CONTENT_PAUSE_REQUESTED |`,
+                    'Fired when content should be paused. This usually happens right before an ad is about to cover the content.',
+                );
                 this.handleEventListeners('CONTENT_PAUSE_REQUESTED');
                 this.player.pause();
                 break;
 
             case google.ima.AdEvent.Type.CONTENT_RESUME_REQUESTED:
-                this.player.debug.log(`[${(Date.now() - this.time) / 1000}s][IMA SDK] CONTENT_RESUME_REQUESTED |`, 'Fired when content should be resumed. This usually happens when an ad finishes or collapses.');
+                this.player.debug.log(
+                    `[${(Date.now() - this.time) / 1000}s][IMA SDK] CONTENT_RESUME_REQUESTED |`,
+                    'Fired when content should be resumed. This usually happens when an ad finishes or collapses.',
+                );
                 this.handleEventListeners('CONTENT_RESUME_REQUESTED');
                 if (this.player.currentTime < this.player.duration) {
                     this.player.play();
@@ -233,7 +251,7 @@ class Ads {
                 this.handleEventListeners('STARTED');
                 break;
             case google.ima.AdEvent.Type.DURATION_CHANGE:
-                this.player.debug.log(`[${(Date.now() - this.time) / 1000}s][IMA SDK] DURATION_CHANGE |`, 'Fired when the ad\'s duration changes.');
+                this.player.debug.log(`[${(Date.now() - this.time) / 1000}s][IMA SDK] DURATION_CHANGE |`, "Fired when the ad's duration changes.");
                 break;
             case google.ima.AdEvent.Type.FIRST_QUARTILE:
                 this.player.debug.log(`[${(Date.now() - this.time) / 1000}s][IMA SDK] FIRST_QUARTILE |`, 'Fired when the ad playhead crosses first quartile.');
@@ -242,10 +260,16 @@ class Ads {
                 this.player.debug.log(`[${(Date.now() - this.time) / 1000}s][IMA SDK] IMPRESSION |`, 'Fired when the impression URL has been pinged.');
                 break;
             case google.ima.AdEvent.Type.INTERACTION:
-                this.player.debug.log(`[${(Date.now() - this.time) / 1000}s][IMA SDK] INTERACTION |`, 'Fired when an ad triggers the interaction callback. Ad interactions contain an interaction ID string in the ad data.');
+                this.player.debug.log(
+                    `[${(Date.now() - this.time) / 1000}s][IMA SDK] INTERACTION |`,
+                    'Fired when an ad triggers the interaction callback. Ad interactions contain an interaction ID string in the ad data.',
+                );
                 break;
             case google.ima.AdEvent.Type.LINEAR_CHANGED:
-                this.player.debug.log(`[${(Date.now() - this.time) / 1000}s][IMA SDK] LINEAR_CHANGED |`, 'Fired when the displayed ad changes from linear to nonlinear, or vice versa.');
+                this.player.debug.log(
+                    `[${(Date.now() - this.time) / 1000}s][IMA SDK] LINEAR_CHANGED |`,
+                    'Fired when the displayed ad changes from linear to nonlinear, or vice versa.',
+                );
                 break;
             case google.ima.AdEvent.Type.MIDPOINT:
                 this.player.debug.log(`[${(Date.now() - this.time) / 1000}s][IMA SDK] MIDPOINT |`, 'Fired when the ad playhead crosses midpoint.');
@@ -257,7 +281,10 @@ class Ads {
                 this.player.debug.log(`[${(Date.now() - this.time) / 1000}s][IMA SDK] RESUMED |`, 'Fired when the ad is resumed.');
                 break;
             case google.ima.AdEvent.Type.SKIPPABLE_STATE_CHANGED:
-                this.player.debug.log(`[${(Date.now() - this.time) / 1000}s][IMA SDK] SKIPPABLE_STATE_CHANGED |`, 'Fired when the displayed ads skippable state is changed.');
+                this.player.debug.log(
+                    `[${(Date.now() - this.time) / 1000}s][IMA SDK] SKIPPABLE_STATE_CHANGED |`,
+                    'Fired when the displayed ads skippable state is changed.',
+                );
                 break;
             case google.ima.AdEvent.Type.SKIPPED:
                 this.player.debug.log(`[${(Date.now() - this.time) / 1000}s][IMA SDK] SKIPPED |`, 'Fired when the ad is skipped by the user.');
@@ -367,7 +394,6 @@ class Ads {
         this.adsManagerPromise.then(() => {
             try {
                 if (!this.initialized) {
-
                     // Initialize the ads manager. Ad rules playlist will start at this time.
                     this.adsManager.init(container.offsetWidth, container.offsetHeight, google.ima.ViewMode.NORMAL);
 
@@ -484,4 +510,3 @@ class Ads {
 }
 
 export default Ads;
-
