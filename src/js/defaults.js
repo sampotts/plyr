@@ -312,6 +312,7 @@ const defaults = {
         error: 'plyr--has-error',
         hover: 'plyr--hover',
         tooltip: 'plyr__tooltip',
+        cues: 'plyr__cues',
         hidden: 'plyr__sr-only',
         hideControls: 'plyr--hide-controls',
         isIos: 'plyr--is-ios',
