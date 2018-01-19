@@ -731,7 +731,7 @@ const utils = {
     },
 
     // Get the transition end event
-    transitionEnd: (() => {
+    get transitionEndEvent() {
         const element = document.createElement('span');
 
         const events = {
@@ -743,8 +743,8 @@ const utils = {
 
         const type = Object.keys(events).find(event => element.style[event] !== undefined);
 
-        return typeof type === 'string' ? type : false;
-    })(),
+        return utils.is.string(type) ? events[type] : false;
+    },
 
     // Force repaint of element
     repaint(element) {
