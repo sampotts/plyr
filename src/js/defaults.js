@@ -1,4 +1,7 @@
-// Default config
+// ==========================================================================
+// Plyr default config
+// ==========================================================================
+
 const defaults = {
     // Disable
     enabled: true,
@@ -176,7 +179,7 @@ const defaults = {
         reset: 'Reset',
         none: 'None',
         disabled: 'Disabled',
-        advertisement: 'Advertisement',
+        adCountdown: 'Ad - {countdown}',
     },
 
     // URLs
@@ -251,6 +254,17 @@ const defaults = {
         'statechange',
         'qualitychange',
         'qualityrequested',
+
+        // Ads
+        'adsloaded',
+        'adscontentpause',
+        'adsconentresume',
+        'adstarted',
+        'adsmidpoint',
+        'adscomplete',
+        'adsallcomplete',
+        'adsimpression',
+        'adsclick',
     ],
 
     // Selectors

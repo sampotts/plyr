@@ -14,15 +14,19 @@
     &::after {
         background: rgba($plyr-color-gunmetal, 0.8);
         border-radius: 2px;
-        bottom: ($plyr-control-spacing * 2);
+        bottom: $plyr-control-spacing;
         color: #fff;
         content: attr(data-badge-text);
-        font-size: $plyr-font-size-captions-small;
+        font-size: 10px;
         padding: 2px 6px;
         pointer-events: none;
         position: absolute;
-        right: ($plyr-control-spacing * 2);
+        right: $plyr-control-spacing;
         z-index: 3;
+    }
+
+    &::after:empty {
+        display: none;
     }
 }
 

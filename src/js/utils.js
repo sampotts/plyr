@@ -605,6 +605,32 @@ const utils = {
         return (current / max * 100).toFixed(2);
     },
 
+    // Time helpers
+    getHours(value) { return parseInt((value / 60 / 60) % 60, 10); },
+    getMinutes(value) { return parseInt((value / 60) % 60, 10); },
+    getSeconds(value) { return parseInt(value % 60, 10); },
+
+    // Format time to UI friendly string
+    formatTime(time = 0, displayHours = false, inverted = false) {
+        // Format time component to add leading zero
+        const format = value => `0${value}`.slice(-2);
+
+        // Breakdown to hours, mins, secs
+        let hours = this.getHours(time);
+        const mins = this.getMinutes(time);
+        const secs = this.getSeconds(time);
+
+        // Do we need to display hours?
+        if (displayHours || hours > 0) {
+            hours = `${hours}:`;
+        } else {
+            hours = '';
+        }
+
+        // Render
+        return `${inverted ? '-' : ''}${hours}${format(mins)}:${format(secs)}`;
+    },
+
     // Deep extend destination object with N more objects
     extend(target = {}, ...sources) {
         if (!sources.length) {

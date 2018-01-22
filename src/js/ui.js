@@ -293,33 +293,15 @@ const ui = {
     // Update the displayed time
     updateTimeDisplay(target = null, time = 0, inverted = false) {
         // Bail if there's no element to display or the value isn't a number
-        if (!utils.is.element(target) || !utils.is.number(time)) {
+        if (!utils.is.element(target)) {
             return;
         }
 
-        // Format time component to add leading zero
-        const format = value => `0${value}`.slice(-2);
+        // Always display hours if duration is over an hour
+        const displayHours = utils.getHours(this.duration) > 0;
 
-        // Helpers
-        const getHours = value => parseInt((value / 60 / 60) % 60, 10);
-        const getMinutes = value => parseInt((value / 60) % 60, 10);
-        const getSeconds = value => parseInt(value % 60, 10);
-
-        // Breakdown to hours, mins, secs
-        let hours = getHours(time);
-        const mins = getMinutes(time);
-        const secs = getSeconds(time);
-
-        // Do we need to display hours?
-        if (getHours(this.duration) > 0) {
-            hours = `${hours}:`;
-        } else {
-            hours = '';
-        }
-
-        // Render
         // eslint-disable-next-line no-param-reassign
-        target.textContent = `${inverted ? '-' : ''}${hours}${format(mins)}:${format(secs)}`;
+        target.textContent = utils.formatTime(time, displayHours, inverted);
     },
 
     // Handle time change event
