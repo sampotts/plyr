@@ -309,18 +309,8 @@ class Plyr {
      * Play the media, or play the advertisement
      */
     play() {
-        if (this.ads.enabled) {
-            if (this.ads.playing) {
-                return;
-            }
-
-            if (!this.ads.initialized) {
-                this.ads.play();
-            }
-
-            if (!this.ads.playing) {
-                this.media.play();
-            }
+        if (this.ads.enabled && !this.ads.initialized) {
+            this.ads.play();
         }
 
         this.media.play();

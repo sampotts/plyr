@@ -485,9 +485,6 @@ class Ads {
                 this.player.debug.log(this.manager);
             });
 
-            // Make sure we can re-call advertisements
-            this.initialized = false;
-
             // Now request some new advertisements
             this.requestAds();
         });
