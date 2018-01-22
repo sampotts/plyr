@@ -1,6 +1,6 @@
 {
     "name": "plyr",
-    "version": "3.0.0-beta.3",
+    "version": "3.0.0-beta.4",
     "description": "A simple, accessible and customizable HTML5, YouTube and Vimeo media player",
     "homepage": "https://plyr.io",
     "main": "./dist",
@@ -12,14 +12,14 @@
         "babel-plugin-external-helpers": "^6.22.0",
         "babel-preset-env": "^1.6.1",
         "del": "^3.0.0",
-        "eslint": "^4.15.0",
+        "eslint": "^4.16.0",
         "eslint-config-airbnb-base": "^12.1.0",
         "eslint-config-prettier": "^2.9.0",
         "eslint-plugin-import": "^2.8.0",
         "git-branch": "^1.0.0",
         "gulp": "^3.9.1",
         "gulp-autoprefixer": "^4.1.0",
-        "gulp-better-rollup": "^2.0.0",
+        "gulp-better-rollup": "^3.0.0",
         "gulp-clean-css": "^3.9.2",
         "gulp-concat": "^2.6.1",
         "gulp-open": "^2.1.0",
@@ -35,7 +35,7 @@
         "rollup-plugin-babel": "^3.0.3",
         "rollup-plugin-commonjs": "^8.2.6",
         "rollup-plugin-node-resolve": "^3.0.2",
-        "rollup-plugin-uglify": "^2.0.1",
+        "rollup-plugin-uglify": "^3.0.0",
         "run-sequence": "^2.2.1",
         "stylelint": "^8.4.0",
         "stylelint-config-prettier": "^2.0.0",
@@ -44,7 +44,7 @@
         "stylelint-order": "^0.8.0",
         "stylelint-scss": "^2.2.0",
         "stylelint-selector-bem-pattern": "^2.0.0",
-        "uglify-es": "^3.3.7"
+        "uglify-es": "^3.3.8"
     },
     "keywords": ["HTML5 Video", "HTML5 Audio", "Media Player", "DASH", "Shaka", "WordPress", "HLS"],
     "repository": {

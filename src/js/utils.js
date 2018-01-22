@@ -612,6 +612,11 @@ const utils = {
 
     // Format time to UI friendly string
     formatTime(time = 0, displayHours = false, inverted = false) {
+        // Bail if the value isn't a number
+        if (!utils.is.number(time)) {
+            return;
+        }
+
         // Format time component to add leading zero
         const format = value => `0${value}`.slice(-2);
 

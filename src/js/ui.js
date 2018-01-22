@@ -293,7 +293,7 @@ const ui = {
     // Update the displayed time
     updateTimeDisplay(target = null, time = 0, inverted = false) {
         // Bail if there's no element to display or the value isn't a number
-        if (!utils.is.element(target)) {
+        if (!utils.is.element(target) || !utils.is.number(time)) {
             return;
         }
 
