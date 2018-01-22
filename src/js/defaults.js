@@ -1,4 +1,7 @@
-// Default config
+// ==========================================================================
+// Plyr default config
+// ==========================================================================
+
 const defaults = {
     // Disable
     enabled: true,
@@ -176,6 +179,7 @@ const defaults = {
         reset: 'Reset',
         none: 'None',
         disabled: 'Disabled',
+        adCountdown: 'Ad - {countdown}',
     },
 
     // URLs
@@ -185,6 +189,9 @@ const defaults = {
         },
         youtube: {
             api: 'https://www.youtube.com/iframe_api',
+        },
+        googleIMA: {
+            api: 'https://imasdk.googleapis.com/js/sdkloader/ima3.js',
         },
     },
 
@@ -247,6 +254,17 @@ const defaults = {
         'statechange',
         'qualitychange',
         'qualityrequested',
+
+        // Ads
+        'adsloaded',
+        'adscontentpause',
+        'adsconentresume',
+        'adstarted',
+        'adsmidpoint',
+        'adscomplete',
+        'adsallcomplete',
+        'adsimpression',
+        'adsclick',
     ],
 
     // Selectors
@@ -299,6 +317,7 @@ const defaults = {
     classNames: {
         video: 'plyr__video-wrapper',
         embed: 'plyr__video-embed',
+        ads: 'plyr__ads',
         control: 'plyr__control',
         type: 'plyr--{0}',
         provider: 'plyr--{0}',
@@ -308,6 +327,7 @@ const defaults = {
         error: 'plyr--has-error',
         hover: 'plyr--hover',
         tooltip: 'plyr__tooltip',
+        cues: 'plyr__cues',
         hidden: 'plyr__sr-only',
         hideControls: 'plyr--hide-controls',
         isIos: 'plyr--is-ios',
@@ -341,6 +361,11 @@ const defaults = {
     // API keys
     keys: {
         google: null,
+    },
+
+    // Ads
+    ads: {
+        tagUrl: null,
     },
 };
 

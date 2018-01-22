@@ -12,6 +12,7 @@ import utils from './utils';
 
 import Console from './console';
 import Storage from './storage';
+import Ads from './plugins/ads';
 
 import captions from './captions';
 import controls from './controls';
@@ -273,6 +274,11 @@ class Plyr {
         if (this.isHTML5 || (this.isEmbed && !this.supported.ui)) {
             ui.build.call(this);
         }
+
+        // Setup ads if provided
+        if (utils.is.url(this.config.ads.tagUrl)) {
+            this.ads = new Ads(this);
+        }
     }
 
     // ---------------------------------------
@@ -302,10 +308,21 @@ class Plyr {
     }
 
     /**
-     * Play the media
+     * Play the media, or play the advertisement
      */
     play() {
-        return this.media.play();
+        if (utils.is.url(this.config.ads.tagUrl)) {
+            if (this.ads.playing) {
+                return;
+            }
+            if (!this.ads.initialized) {
+                this.ads.play();
+            }
+            if (!this.ads.playing) {
+                this.media.play();
+            }
+        }
+        this.media.play();
     }
 
     /**

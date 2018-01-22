@@ -195,7 +195,7 @@ build.sprite('plyr');
 
 // Demo files
 build.sass(bundles.demo.sass, 'demo');
-build.js(bundles.demo.js, 'demo', { format: 'es' });
+build.js(bundles.demo.js, 'demo', { format: 'iife' });
 
 // Build all JS
 gulp.task('js', () => {

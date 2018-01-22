@@ -50,6 +50,9 @@ const utils = {
         track(input) {
             return this.instanceof(input, TextTrack) || (!this.nullOrUndefined(input) && this.string(input.kind));
         },
+        url(input) {
+            return !this.nullOrUndefined(input) && /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/.test(input);
+        },
         nullOrUndefined(input) {
             return input === null || typeof input === 'undefined';
         },
@@ -602,6 +605,32 @@ const utils = {
         return (current / max * 100).toFixed(2);
     },
 
+    // Time helpers
+    getHours(value) { return parseInt((value / 60 / 60) % 60, 10); },
+    getMinutes(value) { return parseInt((value / 60) % 60, 10); },
+    getSeconds(value) { return parseInt(value % 60, 10); },
+
+    // Format time to UI friendly string
+    formatTime(time = 0, displayHours = false, inverted = false) {
+        // Format time component to add leading zero
+        const format = value => `0${value}`.slice(-2);
+
+        // Breakdown to hours, mins, secs
+        let hours = this.getHours(time);
+        const mins = this.getMinutes(time);
+        const secs = this.getSeconds(time);
+
+        // Do we need to display hours?
+        if (displayHours || hours > 0) {
+            hours = `${hours}:`;
+        } else {
+            hours = '';
+        }
+
+        // Render
+        return `${inverted ? '-' : ''}${hours}${format(mins)}:${format(secs)}`;
+    },
+
     // Deep extend destination object with N more objects
     extend(target = {}, ...sources) {
         if (!sources.length) {
@@ -746,9 +775,9 @@ const utils = {
     // Force repaint of element
     repaint(element) {
         window.setTimeout(() => {
-            element.setAttribute('hidden', '');
+            utils.toggleHidden(element, true);
             element.offsetHeight; // eslint-disable-line
-            element.removeAttribute('hidden');
+            utils.toggleHidden(element, false);
         }, 0);
     },
 };
