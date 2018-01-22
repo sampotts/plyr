@@ -179,7 +179,6 @@ const defaults = {
         reset: 'Reset',
         none: 'None',
         disabled: 'Disabled',
-        adCountdown: 'Ad - {countdown}',
     },
 
     // URLs
@@ -365,7 +364,7 @@ const defaults = {
 
     // Ads
     ads: {
-        tagUrl: null,
+        tag: null,
     },
 };
 

@@ -9,7 +9,7 @@
     position: absolute;
     right: 0;
     top: 0;
-    z-index: 3; // Above the controls.
+    z-index: 3; // Above the controls
 
     &::after {
         background: rgba($plyr-color-gunmetal, 0.8);
@@ -17,7 +17,7 @@
         bottom: $plyr-control-spacing;
         color: #fff;
         content: attr(data-badge-text);
-        font-size: 10px;
+        font-size: 11px;
         padding: 2px 6px;
         pointer-events: none;
         position: absolute;
@@ -30,7 +30,7 @@
     }
 }
 
-// Advertisement cue's for the progress bar.
+// Advertisement cue's for the progress bar
 .plyr__cues {
     background: currentColor;
     display: block;
@@ -41,5 +41,5 @@
     position: absolute;
     top: 50%;
     width: 3px;
-    z-index: 3; // Between progress and thumb.
+    z-index: 3; // Between progress and thumb
 }

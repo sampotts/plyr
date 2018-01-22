@@ -18,7 +18,7 @@ class Ads {
         this.player = player;
         this.playing = false;
         this.initialized = false;
-        this.enabled = utils.is.url(player.config.ads.tagUrl);
+        this.enabled = utils.is.url(player.config.ads.tag);
 
         // Check if a tag URL is provided.
         if (!this.enabled) {
@@ -122,7 +122,7 @@ class Ads {
 
             // Request video ads
             const request = new google.ima.AdsRequest();
-            request.adTagUrl = this.player.config.ads.tagUrl;
+            request.adTagUrl = this.player.config.ads.tag;
 
             // Specify the linear and nonlinear slot sizes. This helps the SDK
             // to select the correct creative if multiple are returned
@@ -150,15 +150,15 @@ class Ads {
         if (!start) {
             window.clearInterval(this.countdownTimer);
             this.elements.container.removeAttribute('data-badge-text');
+            return;
         }
 
         const update = () => {
             const time = utils.formatTime(this.manager.getRemainingTime());
-            const text = this.player.config.i18n.adCountdown.replace('{countdown}', time);
-            this.elements.container.setAttribute('data-badge-text', text);
+            this.elements.container.setAttribute('data-badge-text', time);
         };
 
-        this.countdownTimer = window.setInterval(update, 500);
+        this.countdownTimer = window.setInterval(update, 100);
     }
 
     /**
@@ -296,7 +296,9 @@ class Ads {
                 // for example display a pause button and remaining time. Fired when content should
                 // be paused. This usually happens right before an ad is about to cover the content
                 this.handleEventListeners('CONTENT_PAUSE_REQUESTED');
+
                 dispatchEvent('contentpause');
+
                 this.pauseContent();
 
                 break;
@@ -307,8 +309,13 @@ class Ads {
                 // Fired when content should be resumed. This usually happens when an ad finishes
                 // or collapses
                 this.handleEventListeners('CONTENT_RESUME_REQUESTED');
+
                 dispatchEvent('contentresume');
+
+                this.pollCountdown();
+
                 this.resumeContent();
+
                 break;
 
             case google.ima.AdEvent.Type.STARTED:
@@ -321,9 +328,6 @@ class Ads {
 
             case google.ima.AdEvent.Type.COMPLETE:
                 dispatchEvent('complete');
-
-                // End countdown
-                this.pollCountdown();
                 break;
 
             case google.ima.AdEvent.Type.IMPRESSION:
