@@ -18,10 +18,11 @@ class Ads {
         this.player = player;
         this.playing = false;
         this.initialized = false;
+        this.enabled = utils.is.url(player.config.ads.tagUrl);
 
         // Check if a tag URL is provided.
-        if (!utils.is.url(player.config.ads.tagUrl)) {
-            return this;
+        if (!this.enabled) {
+            return;
         }
 
         // Check if the Google IMA3 SDK is loaded
@@ -456,7 +457,9 @@ class Ads {
      */
     cancel() {
         // Pause our video
-        this.resumeContent();
+        if (this.initialized) {
+            this.resumeContent();
+        }
 
         // Tell our instance that we're done for now
         this.handleEventListeners('ERROR');

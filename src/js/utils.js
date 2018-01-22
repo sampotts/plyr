@@ -614,7 +614,7 @@ const utils = {
     formatTime(time = 0, displayHours = false, inverted = false) {
         // Bail if the value isn't a number
         if (!utils.is.number(time)) {
-            return;
+            return this.formatTime(null, displayHours, inverted);
         }
 
         // Format time component to add leading zero
