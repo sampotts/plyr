@@ -155,7 +155,8 @@ class Ads {
 
         const update = () => {
             const time = utils.formatTime(this.manager.getRemainingTime());
-            this.elements.container.setAttribute('data-badge-text', time);
+            const label = `${this.player.config.i18n.advertisment} - ${time}`;
+            this.elements.container.setAttribute('data-badge-text', label);
         };
 
         this.countdownTimer = window.setInterval(update, 100);
