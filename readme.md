@@ -1,12 +1,12 @@
 ---
-Beware: This branch is currently in beta and not production-ready
+Beware: This version is currently in beta and not production-ready
 ---
 
 # Plyr
 
 A simple, lightweight, accessible and customizable HTML5, YouTube and Vimeo media player that supports [_modern_](#browser-support) browsers.
 
-[Checkout the demo](https://plyr.io) - [Donate to support Plyr](#donate)
+[Checkout the demo](https://plyr.io) - [Donate to support Plyr](#donate) - [Chat on Slack](http://bit.ly/plyr-chat)
 
 [![Image of Plyr](https://cdn.plyr.io/static/demo/screenshot.png)](https://plyr.io)
 
