@@ -8,6 +8,22 @@
 
 import utils from '../utils';
 
+// Build the default tag URL
+const getTagUrl = () => {
+    const params = {
+        AV_PUBLISHERID: '58c25bb0073ef448b1087ad6',
+        AV_CHANNELID: '5a0458dc28a06145e4519d21',
+        AV_URL: '127.0.0.1:3000',
+        cb: 1,
+        AV_WIDTH: 640,
+        AV_HEIGHT: 480,
+    };
+
+    const base = 'https://go.aniview.com/api/adserver6/vast/';
+
+    return `${base}?${utils.buildUrlParams(params)}`;
+};
+
 class Ads {
     /**
      * Ads constructor.
@@ -16,9 +32,9 @@ class Ads {
      */
     constructor(player) {
         this.player = player;
+        this.enabled = player.config.ads.enabled;
         this.playing = false;
         this.initialized = false;
-        this.enabled = utils.is.url(player.config.ads.tag);
 
         // Check if a tag URL is provided.
         if (!this.enabled) {
@@ -122,7 +138,7 @@ class Ads {
 
             // Request video ads
             const request = new google.ima.AdsRequest();
-            request.adTagUrl = this.player.config.ads.tag;
+            request.adTagUrl = getTagUrl();
 
             // Specify the linear and nonlinear slot sizes. This helps the SDK
             // to select the correct creative if multiple are returned

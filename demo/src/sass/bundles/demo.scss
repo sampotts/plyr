@@ -34,8 +34,13 @@
 @import '../components/icons';
 @import '../components/links';
 @import '../components/lists';
+@import '../components/media';
 @import '../components/navigation';
 @import '../components/players';
 
 // Plyr
 @import '../../../../src/sass/plyr';
+
+// Utils
+@import '../utilities/cosmetic';
+@import '../utilities/hidden';

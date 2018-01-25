@@ -108,8 +108,8 @@ const youtube = {
                 playsinline: 1, // Allow iOS inline playback
 
                 // Tracking for stats
-                origin: window && window.location.hostname,
-                widget_referrer: window && window.location.href,
+                // origin: window ? `${window.location.protocol}//${window.location.host}` : null,
+                widget_referrer: window ? window.location.href : null,
 
                 // Captions are flaky on YouTube
                 cc_load_policy: player.captions.active ? 1 : 0,

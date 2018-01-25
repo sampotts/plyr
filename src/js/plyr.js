@@ -309,11 +309,14 @@ class Plyr {
      * Play the media, or play the advertisement
      */
     play() {
+        // Play the ad if setup
+        // TODO: Fix the occasional play of the video before the Ad fires?
         if (this.ads.enabled && !this.ads.initialized) {
             this.ads.play();
         }
 
-        this.media.play();
+        // Return the promise (for HTML5)
+        return this.media.play();
     }
 
     /**
