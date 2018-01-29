@@ -2322,9 +2322,9 @@ gulp-size@^3.0.0:
     stream-counter "^1.0.0"
     through2 "^2.0.0"
 
-gulp-sourcemaps@^2.6.3:
-  version "2.6.3"
-  resolved "https://registry.yarnpkg.com/gulp-sourcemaps/-/gulp-sourcemaps-2.6.3.tgz#11b033f759f909e0a5f15b7bdf47ac29cc54efa4"
+gulp-sourcemaps@^2.6.4:
+  version "2.6.4"
+  resolved "https://registry.yarnpkg.com/gulp-sourcemaps/-/gulp-sourcemaps-2.6.4.tgz#cbb2008450b1bcce6cd23bf98337be751bf6e30a"
   dependencies:
     "@gulp-sourcemaps/identity-map" "1.X"
     "@gulp-sourcemaps/map-sources" "1.X"
@@ -2334,7 +2334,7 @@ gulp-sourcemaps@^2.6.3:
     debug-fabulous "1.X"
     detect-newline "2.X"
     graceful-fs "4.X"
-    source-map "0.X"
+    source-map "~0.6.0"
     strip-bom-string "1.X"
     through2 "2.X"
 
@@ -4553,9 +4553,9 @@ rollup-plugin-babel@^3.0.3:
   dependencies:
     rollup-pluginutils "^1.5.0"
 
-rollup-plugin-commonjs@^8.2.6:
-  version "8.2.6"
-  resolved "https://registry.yarnpkg.com/rollup-plugin-commonjs/-/rollup-plugin-commonjs-8.2.6.tgz#27e5b9069ff94005bb01e01bb46a1e4873784677"
+rollup-plugin-commonjs@^8.3.0:
+  version "8.3.0"
+  resolved "https://registry.yarnpkg.com/rollup-plugin-commonjs/-/rollup-plugin-commonjs-8.3.0.tgz#91b4ba18f340951e39ed7b1901f377a80ab3f9c3"
   dependencies:
     acorn "^5.2.1"
     estree-walker "^0.5.0"
@@ -4791,10 +4791,6 @@ source-map@0.5.x, source-map@^0.5.1, source-map@^0.5.3, source-map@^0.5.6:
   version "0.5.7"
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.5.7.tgz#8a039d2d1021d22d1ea14c80d8ea468ba2ef3fcc"
 
-source-map@0.X, source-map@^0.6.1, source-map@~0.6.1:
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.6.1.tgz#74722af32e9614e9c287a8d0bbde48b5e2f1a263"
-
 source-map@^0.1.38:
   version "0.1.43"
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.1.43.tgz#c24bc146ca517c1471f5dacbe2571b2b7f9e3346"
@@ -4806,6 +4802,10 @@ source-map@^0.4.2:
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.4.4.tgz#eba4f5da9c0dc999de68032d8b4f76173652036b"
   dependencies:
     amdefine ">=0.0.4"
+
+source-map@^0.6.1, source-map@~0.6.0, source-map@~0.6.1:
+  version "0.6.1"
+  resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.6.1.tgz#74722af32e9614e9c287a8d0bbde48b5e2f1a263"
 
 sparkles@^1.0.0:
   version "1.0.0"
@@ -5287,9 +5287,9 @@ uglify-es@^3.3.7:
     commander "~2.13.0"
     source-map "~0.6.1"
 
-uglify-es@^3.3.8:
-  version "3.3.8"
-  resolved "https://registry.yarnpkg.com/uglify-es/-/uglify-es-3.3.8.tgz#f2c68e6cff0d0f9dc9577e4da207151c2e753b7e"
+uglify-es@^3.3.9:
+  version "3.3.9"
+  resolved "https://registry.yarnpkg.com/uglify-es/-/uglify-es-3.3.9.tgz#0c1c4f0700bed8dbc124cdb304d2592ca203e677"
   dependencies:
     commander "~2.13.0"
     source-map "~0.6.1"

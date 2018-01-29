@@ -42,4 +42,8 @@ a {
     &.tab-focus {
         @include tab-focus();
     }
+
+    &.no-border::after {
+        display: none;
+    }
 }

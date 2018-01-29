@@ -8,6 +8,22 @@
 
 import utils from '../utils';
 
+// Build the default tag URL
+const getTagUrl = () => {
+    const params = {
+        AV_PUBLISHERID: '58c25bb0073ef448b1087ad6',
+        AV_CHANNELID: '5a0458dc28a06145e4519d21',
+        AV_URL: '127.0.0.1:3000',
+        cb: 1,
+        AV_WIDTH: 640,
+        AV_HEIGHT: 480,
+    };
+
+    const base = 'https://go.aniview.com/api/adserver6/vast/';
+
+    return `${base}?${utils.buildUrlParams(params)}`;
+};
+
 class Ads {
     /**
      * Ads constructor.
@@ -16,6 +32,7 @@ class Ads {
      */
     constructor(player) {
         this.player = player;
+        this.enabled = player.config.ads.enabled;
         this.playing = false;
         this.initialized = false;
         this.blocked = false;
@@ -28,14 +45,17 @@ class Ads {
 
         // Check if the Google IMA3 SDK is loaded or load it ourselves
         if (!utils.is.object(window.google)) {
-            utils.loadScript(player.config.urls.googleIMA.api, () => {
-                this.ready();
-            }, () => {
-
-                // Script failed to load or is blocked
-                this.blocked = true;
-                this.player.debug.log('Ads error: Google IMA SDK failed to load');
-            });
+            utils.loadScript(
+                player.config.urls.googleIMA.api,
+                () => {
+                    this.ready();
+                },
+                () => {
+                    // Script failed to load or is blocked
+                    this.blocked = true;
+                    this.player.debug.log('Ads error: Google IMA SDK failed to load');
+                },
+            );
         } else {
             this.ready();
         }
@@ -128,7 +148,7 @@ class Ads {
 
             // Request video ads
             const request = new google.ima.AdsRequest();
-            request.adTagUrl = this.player.config.ads.tag;
+            request.adTagUrl = getTagUrl();
 
             // Specify the linear and nonlinear slot sizes. This helps the SDK
             // to select the correct creative if multiple are returned
@@ -161,7 +181,8 @@ class Ads {
 
         const update = () => {
             const time = utils.formatTime(this.manager.getRemainingTime());
-            this.elements.container.setAttribute('data-badge-text', time);
+            const label = `${this.player.config.i18n.advertisment} - ${time}`;
+            this.elements.container.setAttribute('data-badge-text', label);
         };
 
         this.countdownTimer = window.setInterval(update, 100);

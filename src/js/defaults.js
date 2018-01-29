@@ -179,6 +179,7 @@ const defaults = {
         reset: 'Reset',
         none: 'None',
         disabled: 'Disabled',
+        advertisment: 'Ad',
     },
 
     // URLs
@@ -362,9 +363,10 @@ const defaults = {
         google: null,
     },
 
-    // Ads
+    // Advertisements plugin
+    // Tag is not required as publisher is determined by vi.ai using the domain
     ads: {
-        tag: null,
+        enabled: false,
     },
 };
 
