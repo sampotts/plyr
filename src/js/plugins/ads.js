@@ -18,6 +18,7 @@ class Ads {
         this.player = player;
         this.playing = false;
         this.initialized = false;
+        this.blocked = false;
         this.enabled = utils.is.url(player.config.ads.tag);
 
         // Check if a tag URL is provided.
@@ -25,10 +26,15 @@ class Ads {
             return;
         }
 
-        // Check if the Google IMA3 SDK is loaded
+        // Check if the Google IMA3 SDK is loaded or load ourselves.
         if (!utils.is.object(window.google)) {
             utils.loadScript(player.config.urls.googleIMA.api, () => {
                 this.ready();
+            }, () => {
+
+                // Script failed to load or is blocked.
+                this.blocked = true;
+                this.player.debug.log('Ads error: Google IMA SDK failed to load');
             });
         } else {
             this.ready();
