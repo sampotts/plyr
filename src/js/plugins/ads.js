@@ -26,13 +26,13 @@ class Ads {
             return;
         }
 
-        // Check if the Google IMA3 SDK is loaded or load ourselves.
+        // Check if the Google IMA3 SDK is loaded or load it ourselves
         if (!utils.is.object(window.google)) {
             utils.loadScript(player.config.urls.googleIMA.api, () => {
                 this.ready();
             }, () => {
 
-                // Script failed to load or is blocked.
+                // Script failed to load or is blocked
                 this.blocked = true;
                 this.player.debug.log('Ads error: Google IMA SDK failed to load');
             });
