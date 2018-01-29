@@ -28,12 +28,12 @@
         "gulp-s3": "^0.11.0",
         "gulp-sass": "^3.1.0",
         "gulp-size": "^3.0.0",
-        "gulp-sourcemaps": "^1.12.1",
+        "gulp-sourcemaps": "^2.6.4",
         "gulp-svgmin": "^1.2.4",
         "gulp-svgstore": "^6.1.1",
         "gulp-util": "^3.0.8",
         "rollup-plugin-babel": "^3.0.3",
-        "rollup-plugin-commonjs": "^8.2.6",
+        "rollup-plugin-commonjs": "^8.3.0",
         "rollup-plugin-node-resolve": "^3.0.2",
         "rollup-plugin-uglify": "^3.0.0",
         "run-sequence": "^2.2.1",
@@ -44,7 +44,7 @@
         "stylelint-order": "^0.8.0",
         "stylelint-scss": "^2.2.0",
         "stylelint-selector-bem-pattern": "^2.0.0",
-        "uglify-es": "^3.3.8"
+        "uglify-es": "^3.3.9"
     },
     "keywords": ["HTML5 Video", "HTML5 Audio", "Media Player", "DASH", "Shaka", "WordPress", "HLS"],
     "repository": {

@@ -82,7 +82,7 @@ const utils = {
     },
 
     // Load an external script
-    loadScript(url, callback) {
+    loadScript(url, callback, error) {
         const current = document.querySelector(`script[src="${url}"]`);
 
         // Check script is not already referenced, if so wait for load
@@ -99,6 +99,10 @@ const utils = {
         element.callbacks = element.callbacks || [];
         element.callbacks.push(callback);
 
+        // Error queue
+        element.errors = element.errors || [];
+        element.errors.push(error);
+
         // Bind callback
         if (utils.is.function(callback)) {
             element.addEventListener(
@@ -110,6 +114,16 @@ const utils = {
                 false,
             );
         }
+
+        // Bind error handling
+        element.addEventListener(
+            'error',
+            event => {
+                element.errors.forEach(err => err.call(null, event));
+                element.errors = null;
+            },
+            false,
+        );
 
         // Set the URL after binding callback
         element.src = url;
