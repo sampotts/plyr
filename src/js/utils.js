@@ -2,6 +2,7 @@
 // Plyr utils
 // ==========================================================================
 
+import Plyr from './plyr';
 import support from './support';
 import { providers } from './types';
 
