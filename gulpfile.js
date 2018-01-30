@@ -312,9 +312,13 @@ if (Object.keys(aws).includes('cdn') && Object.keys(aws).includes('demo')) {
             .pipe(replace(cdnpath, `${aws.cdn.domain}/${version}/`))
             .pipe(gulp.dest(root));
 
-        // Replace versioned files in plyr.js
+        // Replace versioned URLs in source
+        const files = [
+            'plyr.js',
+            'defaults.js',
+        ];
         gulp
-            .src(path.join(root, 'src/js/plyr.js'))
+            .src(files.map(file => path.join(root, `src/js/${file}`)))
             .pipe(replace(semver, `v${version}`))
             .pipe(replace(cdnpath, `${aws.cdn.domain}/${version}/`))
             .pipe(gulp.dest(path.join(root, 'src/js/')));
