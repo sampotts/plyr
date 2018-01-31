@@ -2,7 +2,6 @@
 // Plyr utils
 // ==========================================================================
 
-import Plyr from './plyr';
 import support from './support';
 import { providers } from './types';
 
@@ -588,7 +587,7 @@ const utils = {
         const event = new CustomEvent(type, {
             bubbles: utils.is.boolean(bubbles) ? bubbles : false,
             detail: Object.assign({}, detail, {
-                plyr: this instanceof Plyr ? this : null,
+                plyr: (window.Plyr && this instanceof window.Plyr) ? this : null,
             }),
         });
 
@@ -621,9 +620,15 @@ const utils = {
     },
 
     // Time helpers
-    getHours(value) { return parseInt((value / 60 / 60) % 60, 10); },
-    getMinutes(value) { return parseInt((value / 60) % 60, 10); },
-    getSeconds(value) { return parseInt(value % 60, 10); },
+    getHours(value) {
+        return parseInt((value / 60 / 60) % 60, 10);
+    },
+    getMinutes(value) {
+        return parseInt((value / 60) % 60, 10);
+    },
+    getSeconds(value) {
+        return parseInt(value % 60, 10);
+    },
 
     // Format time to UI friendly string
     formatTime(time = 0, displayHours = false, inverted = false) {
