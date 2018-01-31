@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v3.0.0-beta.10
+// plyr.js v3.0.0-beta.11
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -556,6 +556,10 @@ class Plyr {
     get hasAudio() {
         // Assume yes for all non HTML5 (as we can't tell...)
         if (!this.isHTML5) {
+            return true;
+        }
+
+        if (this.isAudio) {
             return true;
         }
 
