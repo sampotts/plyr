@@ -93,11 +93,11 @@ const utils = {
                     return;
                 }
 
-                request.addEventListener('readystatechange', () => {
-                    if (request.readyState === 4 && request.status === 200) {
+                request.addEventListener('load', () => {
+                    try {
+                        resolve(JSON.parse(request.responseText));
+                    } catch(e) {
                         resolve(request.responseText);
-                    } else if (request.status === 0) {
-                        throw new Error(request.statusText);
                     }
                 });
 
@@ -206,11 +206,10 @@ const utils = {
             }
 
             // Get the sprite
-            utils.fetch(url)
-                .then(text => {
-                    console.log(text);
-
-                    if (text === null) {
+            utils
+                .fetch(url)
+                .then(result => {
+                    if (utils.is.empty(result)) {
                         return;
                     }
 
@@ -218,12 +217,12 @@ const utils = {
                         window.localStorage.setItem(
                             prefix + id,
                             JSON.stringify({
-                                content: text,
+                                content: result,
                             }),
                         );
                     }
 
-                    updateSprite.call(container, text);
+                    updateSprite.call(container, result);
                 })
                 .catch(() => {});
         }

@@ -59,10 +59,10 @@ const youtube = {
         if (utils.is.string(key) && !utils.is.empty(key)) {
             const url = `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${key}&fields=items(snippet(title))&part=snippet`;
 
-            fetch(url)
-                .then(response => (response.ok ? response.json() : null))
+            utils
+                .fetch(url)
                 .then(result => {
-                    if (result !== null && utils.is.object(result)) {
+                    if (utils.is.object(result)) {
                         this.config.title = result.items[0].snippet.title;
                         ui.setTitle.call(this);
                     }
