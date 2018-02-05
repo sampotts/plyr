@@ -51,7 +51,16 @@ const vimeo = {
             gesture: 'media',
         };
         const params = utils.buildUrlParams(options);
-        const id = utils.parseVimeoId(player.media.getAttribute('src'));
+
+        // Get the source URL or ID
+        let source = player.media.getAttribute('src');
+
+        // Get from <div> if needed
+        if (utils.is.empty(source)) {
+            source = player.media.getAttribute(this.config.attributes.embed.id);
+        }
+
+        const id = utils.parseVimeoId(source);
 
         // Build an iframe
         const iframe = utils.createElement('iframe');

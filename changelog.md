@@ -17,8 +17,8 @@ This is a massive release. A _mostly_ complete rewrite in ES6. What started out 
 
 ### Other stuff
 
-* Now using SASS exclusively. Sorry, LESS folk it just made sense to maintain one method as SASS is what the cool kids use
-* Moved to ES6. All the rage these days
+* Now using SASS exclusively. Sorry, LESS folk it just made sense to maintain one method as SASS is what the cool kids use. It may come back if we work out an automated way to convert the SASS
+* Moved to ES6. All the rage these days. You'll need to look at polyfills. The demo uses [polyfill.io](https://polyfill.io)
 * Added basic looping support
 * Added an aspect ratio option for those that can't leave the 90s and want 4:3
 * `controlshidden` and `controlsshown` events added for when the controls show or hide
@@ -44,6 +44,7 @@ You gotta break eggs to make an omelette. Sadly, there's quite a few breaking ch
 
 * Setup now uses proper constructor, accepts a single selector/element/node and returns a single instance - much simpler than before
 * Much of the API is now using getters and setters rather than methods (where it makes sense) to match the HTML5 API - see the docs for more info
+* The data attributes for the embeds are now `data-plyr-provider` and `data-plyr-embed-id` to prevent compatibility issues. These can be changed under `config.attributes.embed` if required
 * `blankUrl` -> `blankVideo`
 * `volume` is now `0` to `1` as per HTML5 spec
 * `keyboardShorcuts` (typo) is now just `keyboard`
@@ -66,7 +67,7 @@ You gotta break eggs to make an omelette. Sadly, there's quite a few breaking ch
 
 ### Polyfilling
 
-Because we're using the fancy new ES6 syntax, you will need to polyfill for vintage browsers if you want to use Plyr and still support them. Luckily there's a decent service for this that makes it painless, [https://polyfill.io](polyfill.io).
+Because we're using the fancy new ES6 syntax, you will need to polyfill for vintage browsers if you want to use Plyr and still support them. Luckily there's a decent service for this that makes it painless, [polyfill.io](https://polyfill.io).
 
 ## v2.0.18
 

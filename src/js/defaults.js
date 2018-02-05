@@ -358,6 +358,14 @@ const defaults = {
         tabFocus: 'plyr__tab-focus',
     },
 
+    // Embed attributes
+    attributes: {
+        embed: {
+            provider: 'data-plyr-provider',
+            id: 'data-plyr-embed-id',
+        },
+    },
+
     // API keys
     keys: {
         google: null,

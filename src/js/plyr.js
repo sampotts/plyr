@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 // Plyr
 // plyr.js v3.0.0-beta.11
 // https://github.com/sampotts/plyr
@@ -153,50 +153,53 @@ class Plyr {
                 // Find the frame
                 iframe = this.media.querySelector('iframe');
 
-                // <iframe> required
-                if (!utils.is.element(iframe)) {
-                    this.debug.error('Setup failed: <iframe> is missing');
-                    return;
+                // <iframe> type
+                if (utils.is.element(iframe)) {
+                    // Detect provider
+                    url = iframe.getAttribute('src');
+                    this.provider = utils.getProviderByUrl(url);
+
+                    // Rework elements
+                    this.elements.container = this.media;
+                    this.media = iframe;
+
+                    // Reset classname
+                    this.elements.container.className = '';
+
+                    // Get attributes from URL and set config
+                    params = utils.getUrlParams(url);
+                    if (!utils.is.empty(params)) {
+                        const truthy = [
+                            '1',
+                            'true',
+                        ];
+
+                        if (truthy.includes(params.autoplay)) {
+                            this.config.autoplay = true;
+                        }
+                        if (truthy.includes(params.playsinline)) {
+                            this.config.inline = true;
+                        }
+                        if (truthy.includes(params.loop)) {
+                            this.config.loop.active = true;
+                        }
+                    }
+                } else {
+                    // <div> with attributes
+                    this.provider = this.media.getAttribute(this.config.attributes.embed.provider);
+
+                    // Remove attribute
+                    this.media.removeAttribute(this.config.attributes.embed.provider);
                 }
 
-                // Audio will come later for external providers
-                this.type = types.video;
-
-                // Detect provider
-                url = iframe.getAttribute('src');
-                this.provider = utils.getProviderByUrl(url);
-
-                // Get attributes from URL and set config
-                params = utils.getUrlParams(url);
-                if (!utils.is.empty(params)) {
-                    const truthy = [
-                        '1',
-                        'true',
-                    ];
-
-                    if (truthy.includes(params.autoplay)) {
-                        this.config.autoplay = true;
-                    }
-                    if (truthy.includes(params.playsinline)) {
-                        this.config.inline = true;
-                    }
-                    if (truthy.includes(params.loop)) {
-                        this.config.loop.active = true;
-                    }
-                }
-
-                // Unsupported provider
+                // Unsupported or missing provider
                 if (utils.is.empty(this.provider) || !Object.keys(providers).includes(this.provider)) {
                     this.debug.error('Setup failed: Invalid provider');
                     return;
                 }
 
-                // Rework elements
-                this.elements.container = this.media;
-                this.media = iframe;
-
-                // Reset classname
-                this.elements.container.className = '';
+                // Audio will come later for external providers
+                this.type = types.video;
 
                 break;
 

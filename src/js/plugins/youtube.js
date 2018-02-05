@@ -87,8 +87,16 @@ const youtube = {
             return;
         }
 
+        // Get the source URL or ID
+        let source = player.media.getAttribute('src');
+
+        // Get from <div> if needed
+        if (utils.is.empty(source)) {
+            source = player.media.getAttribute(this.config.attributes.embed.id);
+        }
+
         // Replace the <iframe> with a <div> due to YouTube API issues
-        const videoId = utils.parseYouTubeId(player.media.getAttribute('src'));
+        const videoId = utils.parseYouTubeId(source);
         const id = utils.generateId(player.provider);
         const container = utils.createElement('div', { id });
         player.media = utils.replaceElement(container, player.media);

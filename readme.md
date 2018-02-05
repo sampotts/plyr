@@ -95,18 +95,38 @@ For YouTube and Vimeo players, Plyr uses progressive enhancement to enhance the 
 
 #### YouTube embed
 
+We recommend [progressive enhancement](https://www.smashingmagazine.com/2009/04/progressive-enhancement-what-it-is-and-how-to-use-it/) with the embedded players. You can elect to use an `<iframe>` as the source element (which Plyr will progressively enhance) or a bog standard `<div>` with two essential data attributes - `data-plyr-provider` and `data-plyr-embed-id`.
+
 ```html
 <div class="plyr__video-embed" id="player">
     <iframe src="https://www.youtube.com/embed/bTqVqk7FSmY?origin=https://plyr.io&amp;iv_load_policy=3&amp;modestbranding=1&amp;playsinline=1&amp;showinfo=0&amp;rel=0&amp;enablejsapi=1" allowfullscreen allowtransparency allow="autoplay"></iframe>
 </div>
 ```
 
+_Note_: The `plyr__video-embed` classname will make the player a responsive 16:9 (most common) iframe embed. When plyr itself kicks in, your custom `ratio` config option will be used.
+
+Or the `<div>` non progressively enhanced method:
+
+```html
+<div id="player" data-plyr-provider="youtube" data-plyr-embed-id="bTqVqk7FSmY"></div>
+```
+
+_Note_: The `data-plyr-embed-id` can either be the video ID or URL for the media.
+
 #### Vimeo embed
+
+Much the same as YouTube above.
 
 ```html
 <div class="plyr__video-embed" id="player">
     <iframe src="https://player.vimeo.com/video/76979871?loop=false&amp;byline=false&amp;portrait=false&amp;title=false&amp;speed=true&amp;transparent=0&amp;gesture=media" allowfullscreen allowtransparency allow="autoplay"></iframe>
 </div>
+```
+
+Or the `<div>` non progressively enhanced method:
+
+```html
+<div id="player" data-plyr-provider="vimeo" data-plyr-embed-id="76979871"></div>
 ```
 
 ### JavaScript
@@ -124,6 +144,8 @@ If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for t
 ```html
 <script src="https://cdn.plyr.io/3.0.0-beta.11/plyr.js"></script>
 ```
+
+_Note_: Be sure to read the [polyfills](#polyfills) section below about browser compatibility
 
 ### CSS
 
@@ -570,22 +592,25 @@ Fullscreen in Plyr is supported by all browsers that [currently support it](http
 
 ## Browser support
 
-Plyr supports the last 2 versions of most _modern_ browsers. IE11 is also supported.
+Plyr supports the last 2 versions of most _modern_ browsers.
 
-| Browser       | Supported      |
-| ------------- | -------------- |
-| Safari        | ✔              |
-| Mobile Safari | ✔&sup1;        |
-| Firefox       | ✔              |
-| Chrome        | ✔              |
-| Opera         | ✔              |
-| Edge          | ✔              |
-| IE10+         | ✔&sup2;        |
-| IE9           | API only&sup3; |
+| Browser       | Supported |
+| ------------- | --------- |
+| Safari        | ✔         |
+| Mobile Safari | ✔&sup1;   |
+| Firefox       | ✔         |
+| Chrome        | ✔         |
+| Opera         | ✔         |
+| Edge          | ✔         |
+| IE11          | ✔         |
+| IE10          | ✔&sup2;   |
 
-1. Mobile Safari on the iPhone forces the native player for `<video>` unless the `playsinline` attribute is present. Volume controls are also disabled.
-2. Native player used (no support for `<progress>` or `<input type="range">`) but the API is supported (v1.0.28+)
-3. IE10 has no native fullscreen support, fallback can be used (see [options](#options))
+1. Mobile Safari on the iPhone forces the native player for `<video>` unless the `playsinline` attribute is present. Volume controls are also disabled as they are handled device wide.
+2. Native player used (no support for `<progress>` or `<input type="range">`) but the API is supported. No native fullscreen support, fallback can be used (see [options](#options))
+
+### Polyfills
+
+Plyr uses ES6 which isn't supported in all browsers quite yet. This means some features will need to be polyfilled to be available otherwise you'll run into issues. We've elected to not burden the ~90% of users that do support these features with extra JS and instead leave polyfilling to you to work out based on your needs. The easiest method I've found is to use [polyfill.io](https://polyfill.io) which provides polyfills based on user agent. This is the method the demo uses.
 
 ### Checking for support
 
