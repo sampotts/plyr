@@ -66,6 +66,9 @@ Created and maintained by Dominik Pschenitschni ([@dpschen](https://github.com/d
 ### [React](https://github.com/xDae/react-plyr)
 Created and maintained by Jose Miguel Bejarano ([@xDae](https://github.com/xDae))
 
+### [Vue](https://github.com/redxtech/vue-plyr)
+Created and maintained by Gabe Dunn ([@redxtech](https://github.com/redxtech))
+
 ## Using package managers
 You can grab the source using one of the following package managers.
 
