@@ -1,6 +1,6 @@
 {
     "name": "plyr",
-    "version": "3.0.0-beta.11",
+    "version": "3.0.0-beta.12",
     "description": "A simple, accessible and customizable HTML5, YouTube and Vimeo media player",
     "homepage": "https://plyr.io",
     "main": "./dist/plyr.js",
@@ -12,7 +12,7 @@
         "babel-plugin-external-helpers": "^6.22.0",
         "babel-preset-env": "^1.6.1",
         "del": "^3.0.0",
-        "eslint": "^4.16.0",
+        "eslint": "^4.17.0",
         "eslint-config-airbnb-base": "^12.1.0",
         "eslint-config-prettier": "^2.9.0",
         "eslint-plugin-import": "^2.8.0",
@@ -42,7 +42,7 @@
         "stylelint-config-sass-guidelines": "^4.1.0",
         "stylelint-config-standard": "^18.0.0",
         "stylelint-order": "^0.8.0",
-        "stylelint-scss": "^2.2.0",
+        "stylelint-scss": "^2.3.0",
         "stylelint-selector-bem-pattern": "^2.0.0",
         "uglify-es": "^3.3.9"
     },
