@@ -91,6 +91,21 @@
             @include plyr-tab-focus();
         }
     }
+}
+
+// Video range inputs
+.plyr--full-ui.plyr--video input[type='range'] {
+    &::-webkit-slider-runnable-track {
+        background-color: $plyr-video-range-track-bg;
+    }
+
+    &::-moz-range-track {
+        background-color: $plyr-video-range-track-bg;
+    }
+
+    &::-ms-track {
+        background-color: $plyr-video-range-track-bg;
+    }
 
     // Pressed styles
     &:active {
@@ -108,21 +123,6 @@
     }
 }
 
-// Video range inputs
-.plyr--full-ui.plyr--video input[type='range'] {
-    &::-webkit-slider-runnable-track {
-        background-color: $plyr-video-range-track-bg;
-    }
-
-    &::-moz-range-track {
-        background-color: $plyr-video-range-track-bg;
-    }
-
-    &::-ms-track {
-        background-color: $plyr-video-range-track-bg;
-    }
-}
-
 // Audio range inputs
 .plyr--full-ui.plyr--audio input[type='range'] {
     &::-webkit-slider-runnable-track {
@@ -135,5 +135,20 @@
 
     &::-ms-track {
         background-color: $plyr-audio-range-track-bg;
+    }
+
+    // Pressed styles
+    &:active {
+        &::-webkit-slider-thumb {
+            @include plyr-range-thumb-active($plyr-audio-range-thumb-shadow-color);
+        }
+
+        &::-moz-range-thumb {
+            @include plyr-range-thumb-active($plyr-audio-range-thumb-shadow-color);
+        }
+
+        &::-ms-thumb {
+            @include plyr-range-thumb-active($plyr-audio-range-thumb-shadow-color);
+        }
     }
 }

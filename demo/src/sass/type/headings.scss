@@ -4,7 +4,7 @@
 
 h1 {
     @include font-size($font-size-h1);
-    font-weight: $font-weight-bold;
+    font-weight: $font-weight-light;
     letter-spacing: $letter-spacing-headings;
     margin: 0 0 ($spacing-base / 2);
 }

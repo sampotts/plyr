@@ -44,8 +44,8 @@
     width: $plyr-range-thumb-height;
 }
 
-@mixin plyr-range-thumb-active() {
-    box-shadow: 0 0 0 $plyr-range-thumb-active-shadow-width transparentize($plyr-range-thumb-bg, 0.5);
+@mixin plyr-range-thumb-active($color: rgba($plyr-range-thumb-bg, 0.5)) {
+    box-shadow: $plyr-range-thumb-shadow, 0 0 0 $plyr-range-thumb-active-shadow-width $color;
 }
 
 // Fullscreen styles
@@ -85,6 +85,11 @@
         + svg {
             display: none;
         }
+    }
+
+    // Hide cursor in fullscreen when controls hidden
+    &.plyr--hide-controls {
+        cursor: none;
     }
 
     // Large captions in full screen on larger screens

@@ -9,7 +9,7 @@ const utils = {
     // Check variable types
     is: {
         plyr(input) {
-            return this.instanceof(input, Plyr);
+            return this.instanceof(input, window.Plyr);
         },
         object(input) {
             return this.getConstructor(input) === Object;
@@ -620,7 +620,7 @@ const utils = {
         const event = new CustomEvent(type, {
             bubbles: utils.is.boolean(bubbles) ? bubbles : false,
             detail: Object.assign({}, detail, {
-                plyr: this instanceof Plyr ? this : null,
+                plyr: utils.is.plyr(this) ? this : null,
             }),
         });
 
