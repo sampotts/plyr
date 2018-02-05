@@ -81,6 +81,38 @@ const utils = {
         };
     },
 
+    // Fetch wrapper
+    // Using XHR to avoid issues with older browsers
+    fetch(url) {
+        return new Promise((resolve, reject) => {
+            try {
+                const request = new XMLHttpRequest();
+
+                // Check for CORS support
+                if (!('withCredentials' in request)) {
+                    return;
+                }
+
+                request.addEventListener('readystatechange', () => {
+                    if (request.readyState === 4 && request.status === 200) {
+                        resolve(request.responseText);
+                    } else if (request.status === 0) {
+                        throw new Error(request.statusText);
+                    }
+                });
+
+                request.addEventListener('error', () => {
+                    throw new Error(request.statusText);
+                });
+
+                request.open('GET', url, true);
+                request.send();
+            } catch (e) {
+                reject(e);
+            }
+        });
+    },
+
     // Load an external script
     loadScript(url, callback, error) {
         const current = document.querySelector(`script[src="${url}"]`);
@@ -174,9 +206,10 @@ const utils = {
             }
 
             // Get the sprite
-            fetch(url)
-                .then(response => (response.ok ? response.text() : null))
+            utils.fetch(url)
                 .then(text => {
+                    console.log(text);
+
                     if (text === null) {
                         return;
                     }
@@ -620,9 +653,15 @@ const utils = {
     },
 
     // Time helpers
-    getHours(value) { return parseInt((value / 60 / 60) % 60, 10); },
-    getMinutes(value) { return parseInt((value / 60) % 60, 10); },
-    getSeconds(value) { return parseInt(value % 60, 10); },
+    getHours(value) {
+        return parseInt((value / 60 / 60) % 60, 10);
+    },
+    getMinutes(value) {
+        return parseInt((value / 60) % 60, 10);
+    },
+    getSeconds(value) {
+        return parseInt(value % 60, 10);
+    },
 
     // Format time to UI friendly string
     formatTime(time = 0, displayHours = false, inverted = false) {
