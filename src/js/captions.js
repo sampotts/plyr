@@ -124,7 +124,8 @@ const captions = {
     setCue(input) {
         // Get the track from the event if needed
         const track = utils.is.event(input) ? input.target : input;
-        const active = track.activeCues[0];
+        const {activeCues} = track;
+        const active = activeCues.length && activeCues[0];
         const currentTrack = captions.getCurrentTrack.call(this);
 
         // Only display current track
