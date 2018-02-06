@@ -35,35 +35,19 @@ Oh and yes, it works with Bootstrap.
 
 Check out the [changelog](changelog.md) to see what's new with Plyr.
 
-## CMS plugins
+## Plugins and Wrappers
 
-### [WordPress](https://wordpress.org/plugins/plyr/)
-
-Created and maintained by Ryan Anthony Drake ([@iamryandrake](https://github.com/iamryandrake))
-
-### [Neos](https://packagist.org/packages/jonnitto/plyr)
-
-Created and maintained by Jon Uhlmann ([@jonnitto](https://github.com/jonnitto))
-
-### [Kirby](https://github.com/dpschen/kirby-plyrtag)
-
-Created and maintained by Dominik Pschenitschni ([@dpschen](https://github.com/dpschen))
-
-## Using package managers
-
-You can grab the source using one of the following package managers.
-
-### npm
-
-```
-npm install plyr
-```
-
-[https://www.npmjs.com/package/plyr](https://www.npmjs.com/package/plyr)
+| Type      | Maintainer                                                            | Link                                                                                         |
+| --------- | --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| WordPress | Ryan Anthony Drake ([@iamryandrake](https://github.com/iamryandrake)) | [https://wordpress.org/plugins/plyr/](https://wordpress.org/plugins/plyr/)                   |
+| React     | Jose Miguel Bejarano ([@xDae](https://github.com/xDae))               | [https://github.com/xDae/react-plyr](https://github.com/xDae/react-plyr)                     |
+| Vue       | Gabe Dunn ([@redxtech](https://github.com/redxtech))                  | [https://github.com/redxtech/vue-plyr](https://github.com/redxtech/vue-plyr)                 |
+| Neos      | Jon Uhlmann ([@jonnitto](https://github.com/jonnitto))                | [https://packagist.org/packages/jonnitto/plyr](https://packagist.org/packages/jonnitto/plyr) |
+| Kirby     | Dominik Pschenitschni ([@dpschen](https://github.com/dpschen))        | [https://github.com/dpschen/kirby-plyrtag](https://github.com/dpschen/kirby-plyrtag)         |
 
 ## Quick setup
 
-Here's a quick run through on getting up and running. There's also a [demo on Codepen](http://codepen.io/sampotts/pen/jARJYp).
+Here's a quick run through on getting up and running. There's also a [demo on Codepen](http://codepen.io/sampotts/pen/jARJYp). You can grab all of the source with [NPM](https://www.npmjs.com/package/plyr) using `npm install plyr`.
 
 ### HTML
 
