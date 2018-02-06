@@ -35,7 +35,9 @@ Oh and yes, it works with Bootstrap.
 
 Check out the [changelog](changelog.md) to see what's new with Plyr.
 
-## Plugins and Wrappers
+## CMSs & Frameworks
+
+Some awesome folks have made plugins for CMSs and JavaScript frameworks:
 
 | Type      | Maintainer                                                            | Link                                                                                         |
 | --------- | --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
