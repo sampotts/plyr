@@ -348,25 +348,25 @@ player.volume; // returns 0.5;
 
 | Property        | Getter | Setter | Description                                                                                                                                                                          |
 | --------------- | ------ | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `isHTML5`       | ✔      | -      | Returns a boolean indicating if the current player is HTML5.                                                                                                                         |
-| `isEmbed`       | ✔      | -      | Returns a boolean indicating if the current player is an embedded player.                                                                                                            |
-| `paused`        | ✔      | -      | Returns a boolean indicating if the current player is paused.                                                                                                                        |
-| `playing`       | ✔      | -      | Returns a boolean indicating if the current player is playing.                                                                                                                       |
-| `ended`         | ✔      | -      | Returns a boolean indicating if the current player has finished playback.                                                                                                            |
-| `currentTime`   | ✔      | ✔      | Gets or sets the currentTime for the player. The setter accepts a float in seconds.                                                                                                  |
-| `seeking`       | ✔      | -      | Returns a boolean indicating if the current player is seeking.                                                                                                                       |
-| `duration`      | ✔      | -      | Returns the duration for the current media.                                                                                                                                          |
-| `volume`        | ✔      | ✔      | Gets or sets the volume for the player. The setter accepts a float between 0 and 1.                                                                                                  |
-| `muted`         | ✔      | ✔      | Gets or sets the muted state of the player. The setter accepts a boolean.                                                                                                            |
-| `hasAudio`      | ✔      | -      | Returns a boolean indicating if the current media has an audio track.                                                                                                                |
-| `speed`         | ✔      | ✔      | Gets or sets the speed for the player. The setter accepts a value in the options specified in your config. Generally the minimum should be 0.5.                                      |
-| `quality`&sup1; | ✔      | ✔      | Gets or sets the quality for the player. The setter accepts a value from the options specified in your config.                                                                       |
-| `loop`          | ✔      | ✔      | Gets or sets the current loop state of the player. The setter accepts a boolean.                                                                                                     |
-| `source`        | ✔      | ✔      | Gets or sets the current source for the player. The setter accepts an object. See [source setter](#source-setter) below for examples.                                                |
-| `poster`&sup2;  | ✔      | ✔      | Gets or sets the current poster image for the player. The setter accepts a string; the URL for the updated poster image.                                                             |
-| `autoplay`      | ✔      | ✔      | Gets or sets the autoplay state of the player. The setter accepts a boolean.                                                                                                         |
-| `language`      | ✔      | ✔      | Gets or sets the preferred captions language for the player. The setter accepts an ISO two-letter language code. Support for the languages is dependent on the captions you include. |
-| `pip`           | ✔      | ✔      | Gets or sets the picture-in-picture state of the player. The setter accepts a boolean. This currently only supported on Safari 10+ on MacOS Sierra+ and iOS 10+.                     |
+| `isHTML5`       | ✓      | -      | Returns a boolean indicating if the current player is HTML5.                                                                                                                         |
+| `isEmbed`       | ✓      | -      | Returns a boolean indicating if the current player is an embedded player.                                                                                                            |
+| `paused`        | ✓      | -      | Returns a boolean indicating if the current player is paused.                                                                                                                        |
+| `playing`       | ✓      | -      | Returns a boolean indicating if the current player is playing.                                                                                                                       |
+| `ended`         | ✓      | -      | Returns a boolean indicating if the current player has finished playback.                                                                                                            |
+| `currentTime`   | ✓      | ✓      | Gets or sets the currentTime for the player. The setter accepts a float in seconds.                                                                                                  |
+| `seeking`       | ✓      | -      | Returns a boolean indicating if the current player is seeking.                                                                                                                       |
+| `duration`      | ✓      | -      | Returns the duration for the current media.                                                                                                                                          |
+| `volume`        | ✓      | ✓      | Gets or sets the volume for the player. The setter accepts a float between 0 and 1.                                                                                                  |
+| `muted`         | ✓      | ✓      | Gets or sets the muted state of the player. The setter accepts a boolean.                                                                                                            |
+| `hasAudio`      | ✓      | -      | Returns a boolean indicating if the current media has an audio track.                                                                                                                |
+| `speed`         | ✓      | ✓      | Gets or sets the speed for the player. The setter accepts a value in the options specified in your config. Generally the minimum should be 0.5.                                      |
+| `quality`&sup1; | ✓      | ✓      | Gets or sets the quality for the player. The setter accepts a value from the options specified in your config.                                                                       |
+| `loop`          | ✓      | ✓      | Gets or sets the current loop state of the player. The setter accepts a boolean.                                                                                                     |
+| `source`        | ✓      | ✓      | Gets or sets the current source for the player. The setter accepts an object. See [source setter](#source-setter) below for examples.                                                |
+| `poster`&sup2;  | ✓      | ✓      | Gets or sets the current poster image for the player. The setter accepts a string; the URL for the updated poster image.                                                             |
+| `autoplay`      | ✓      | ✓      | Gets or sets the autoplay state of the player. The setter accepts a boolean.                                                                                                         |
+| `language`      | ✓      | ✓      | Gets or sets the preferred captions language for the player. The setter accepts an ISO two-letter language code. Support for the languages is dependent on the captions you include. |
+| `pip`           | ✓      | ✓      | Gets or sets the picture-in-picture state of the player. The setter accepts a boolean. This currently only supported on Safari 10+ on MacOS Sierra+ and iOS 10+.                     |
 
 1. YouTube only. HTML5 will follow.
 2. HTML5 only
@@ -582,14 +582,14 @@ Plyr supports the last 2 versions of most _modern_ browsers.
 
 | Browser       | Supported |
 | ------------- | --------- |
-| Safari        | ✔         |
-| Mobile Safari | ✔&sup1;   |
-| Firefox       | ✔         |
-| Chrome        | ✔         |
-| Opera         | ✔         |
-| Edge          | ✔         |
-| IE11          | ✔         |
-| IE10          | ✔&sup2;   |
+| Safari        | ✓         |
+| Mobile Safari | ✓&sup1;   |
+| Firefox       | ✓         |
+| Chrome        | ✓         |
+| Opera         | ✓         |
+| Edge          | ✓         |
+| IE11          | ✓         |
+| IE10          | ✓&sup2;   |
 
 1. Mobile Safari on the iPhone forces the native player for `<video>` unless the `playsinline` attribute is present. Volume controls are also disabled as they are handled device wide.
 2. Native player used (no support for `<progress>` or `<input type="range">`) but the API is supported. No native fullscreen support, fallback can be used (see [options](#options))
