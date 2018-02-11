@@ -136,6 +136,9 @@ const source = {
                     // Setup interface
                     ui.build.call(this);
                 }
+
+                // Update the fullscreen support
+                this.fullscreen.update();
             },
             true,
         );

@@ -120,6 +120,7 @@ const defaults = {
     fullscreen: {
         enabled: true, // Allow fullscreen?
         fallback: true, // Fallback for vintage browsers
+        iosNative: false, // Use the native fullscreen in iOS (disables custom controls)
     },
 
     // Local storage

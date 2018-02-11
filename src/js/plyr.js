@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 // Plyr
 // plyr.js v3.0.0-beta.12
 // https://github.com/sampotts/plyr
@@ -11,12 +11,12 @@ import support from './support';
 import utils from './utils';
 
 import Console from './console';
+import Fullscreen from './fullscreen';
 import Storage from './storage';
 import Ads from './plugins/ads';
 
 import captions from './captions';
 import controls from './controls';
-import fullscreen from './fullscreen';
 import listeners from './listeners';
 import media from './media';
 import source from './source';
@@ -25,12 +25,6 @@ import ui from './ui';
 // Private properties
 // TODO: Use a WeakMap for private globals
 // const globals = new WeakMap();
-
-// Globals
-let scrollPosition = {
-    x: 0,
-    y: 0,
-};
 
 // Plyr instance
 class Plyr {
@@ -232,9 +226,6 @@ class Plyr {
                 return;
         }
 
-        // Setup local storage for user settings
-        this.storage = new Storage(this);
-
         // Check for support again but with type
         this.supported = support.check(this.type, this.provider, this.config.inline);
 
@@ -243,6 +234,9 @@ class Plyr {
             this.debug.error('Setup failed: no support');
             return;
         }
+
+        // Setup local storage for user settings
+        this.storage = new Storage(this);
 
         // Store reference
         this.media.plyr = this;
@@ -277,6 +271,9 @@ class Plyr {
         if (this.isHTML5 || (this.isEmbed && !this.supported.ui)) {
             ui.build.call(this);
         }
+
+        // Setup fullscreen
+        this.fullscreen = new Fullscreen(this);
 
         // Setup ads if provided
         this.ads = new Ads(this);
@@ -848,62 +845,6 @@ class Plyr {
      */
     get language() {
         return this.captions.language;
-    }
-
-    /**
-     * Toggle fullscreen playback
-     * Requires user input event
-     * @param {event} event
-     */
-    toggleFullscreen(event) {
-        // Video only
-        if (this.isAudio) {
-            return;
-        }
-
-        // Check for native support
-        if (fullscreen.enabled) {
-            if (utils.is.event(event) && event.type === fullscreen.eventType) {
-                // If it's a fullscreen change event, update the state
-                this.fullscreen.active = fullscreen.isFullScreen(this.elements.container);
-            } else {
-                // Else it's a user request to enter or exit
-                if (!this.fullscreen.active) {
-                    fullscreen.requestFullScreen(this.elements.container);
-                } else {
-                    fullscreen.cancelFullScreen();
-                }
-
-                return;
-            }
-        } else {
-            // Otherwise, it's a simple toggle
-            this.fullscreen.active = !this.fullscreen.active;
-
-            // Add class hook
-            utils.toggleClass(this.elements.container, this.config.classNames.fullscreen.fallback, this.fullscreen.active);
-
-            // Make sure we don't lose scroll position
-            if (this.fullscreen.active) {
-                scrollPosition = {
-                    x: window.pageXOffset || 0,
-                    y: window.pageYOffset || 0,
-                };
-            } else {
-                window.scrollTo(scrollPosition.x, scrollPosition.y);
-            }
-
-            // Bind/unbind escape key
-            document.body.style.overflow = this.fullscreen.active ? 'hidden' : '';
-        }
-
-        // Set button state
-        if (utils.is.element(this.elements.buttons.fullscreen)) {
-            utils.toggleState(this.elements.buttons.fullscreen, this.fullscreen.active);
-        }
-
-        // Trigger an event
-        utils.dispatchEvent.call(this, this.media, this.fullscreen.active ? 'enterfullscreen' : 'exitfullscreen');
     }
 
     /**

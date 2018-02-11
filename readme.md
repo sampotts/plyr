@@ -304,69 +304,77 @@ element.addEventListener('ready', event => {
 
 ### Methods
 
-Methods are not chainable. An example use of a method:
+Example method use:
 
 ```javascript
-player.play();
+player.play(); // Start playback
+player.fullscreen.enter(); // Enter fullscreen
 ```
 
-| Method                    | Parameters       | Description                                                                                                |
-| ------------------------- | ---------------- | ---------------------------------------------------------------------------------------------------------- |
-| `play()`&sup1;            | -                | Start playback.                                                                                            |
-| `pause()`                 | -                | Pause playback.                                                                                            |
-| `togglePlay(toggle)`      | Boolean          | Toggle playback, if no parameters are passed, it will toggle based on current status.                      |
-| `stop()`                  | -                | Stop playback and reset to start.                                                                          |
-| `restart()`               | -                | Restart playback.                                                                                          |
-| `rewind(seekTime)`        | Number           | Rewind playback by the specified seek time. If no parameter is passed, the default seek time will be used. |
-| `forward(seekTime)`       | Number           | Fast forward by the specified seek time. If no parameter is passed, the default seek time will be used.    |
-| `increaseVolume(step)`    | Number           | Increase volume by the specified step. If no parameter is passed, the default step will be used.           |
-| `decreaseVolume(step)`    | Number           | Increase volume by the specified step. If no parameter is passed, the default step will be used.           |
-| `toggleCaptions(toggle)`  | Boolean          | Toggle captions display. If no parameter is passed, it will toggle based on current status.                |
-| `toggleFullscreen(event)` | Event            | Toggle fullscreen. Fullscreen can only be initiated by a user event. Exit is possible without user input.  |
-| `airplay()`               | -                | Trigger the airplay dialog on supported devices.                                                           |
-| `toggleControls(toggle)`  | Boolean          | Toggle the controls based on the specified boolean.                                                        |
-| `on(event, function)`     | String, Function | Add an event listener for the specified event.                                                             |
-| `off(event, function)`    | String, Function | Remove an event listener for the specified event.                                                          |
-| `supports(type)`          | String           | Check support for a mime type.                                                                             |
-| `destroy()`               | -                | Destroy the instance and garbage collect any elements.                                                     |
+| Method                   | Parameters       | Description                                                                                                |
+| ------------------------ | ---------------- | ---------------------------------------------------------------------------------------------------------- |
+| `play()`&sup1;           | -                | Start playback.                                                                                            |
+| `pause()`                | -                | Pause playback.                                                                                            |
+| `togglePlay(toggle)`     | Boolean          | Toggle playback, if no parameters are passed, it will toggle based on current status.                      |
+| `stop()`                 | -                | Stop playback and reset to start.                                                                          |
+| `restart()`              | -                | Restart playback.                                                                                          |
+| `rewind(seekTime)`       | Number           | Rewind playback by the specified seek time. If no parameter is passed, the default seek time will be used. |
+| `forward(seekTime)`      | Number           | Fast forward by the specified seek time. If no parameter is passed, the default seek time will be used.    |
+| `increaseVolume(step)`   | Number           | Increase volume by the specified step. If no parameter is passed, the default step will be used.           |
+| `decreaseVolume(step)`   | Number           | Increase volume by the specified step. If no parameter is passed, the default step will be used.           |
+| `toggleCaptions(toggle)` | Boolean          | Toggle captions display. If no parameter is passed, it will toggle based on current status.                |
+| `fullscreen.enter()`     | -                | Enter fullscreen. If fullscreen is not supported, a fallback "full window/viewport" is used instead.       |
+| `fullscreen.exit()`      | -                | Exit fullscreen.                                                                                           |
+| `fullscreen.toggle()`    | -                | Toggle fullscreen.                                                                                         |
+| `airplay()`              | -                | Trigger the airplay dialog on supported devices.                                                           |
+| `toggleControls(toggle)` | Boolean          | Toggle the controls based on the specified boolean.                                                        |
+| `on(event, function)`    | String, Function | Add an event listener for the specified event.                                                             |
+| `off(event, function)`   | String, Function | Remove an event listener for the specified event.                                                          |
+| `supports(type)`         | String           | Check support for a mime type.                                                                             |
+| `destroy()`              | -                | Destroy the instance and garbage collect any elements.                                                     |
 
 1. For HTML5 players, `play()` will return a [`Promise`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) in _some_ browsers - WebKit and Mozilla [according to MDN](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/play) at time of writing.
 
 ### Getters and Setters
 
-An example setter:
+Example setters:
 
 ```javascript
-player.volume = 0.5;
+player.volume = 0.5; // Sets volume at 50%
+player.currentTime = 10; // Seeks to 10 seconds
 ```
 
-An example getter:
+Example getters:
 
 ```javascript
-player.volume; // returns 0.5;
+player.volume; // 0.5;
+player.currentTime; // 10
+player.fullscreen.active; // false;
 ```
 
-| Property        | Getter | Setter | Description                                                                                                                                                                          |
-| --------------- | ------ | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `isHTML5`       | ✓      | -      | Returns a boolean indicating if the current player is HTML5.                                                                                                                         |
-| `isEmbed`       | ✓      | -      | Returns a boolean indicating if the current player is an embedded player.                                                                                                            |
-| `paused`        | ✓      | -      | Returns a boolean indicating if the current player is paused.                                                                                                                        |
-| `playing`       | ✓      | -      | Returns a boolean indicating if the current player is playing.                                                                                                                       |
-| `ended`         | ✓      | -      | Returns a boolean indicating if the current player has finished playback.                                                                                                            |
-| `currentTime`   | ✓      | ✓      | Gets or sets the currentTime for the player. The setter accepts a float in seconds.                                                                                                  |
-| `seeking`       | ✓      | -      | Returns a boolean indicating if the current player is seeking.                                                                                                                       |
-| `duration`      | ✓      | -      | Returns the duration for the current media.                                                                                                                                          |
-| `volume`        | ✓      | ✓      | Gets or sets the volume for the player. The setter accepts a float between 0 and 1.                                                                                                  |
-| `muted`         | ✓      | ✓      | Gets or sets the muted state of the player. The setter accepts a boolean.                                                                                                            |
-| `hasAudio`      | ✓      | -      | Returns a boolean indicating if the current media has an audio track.                                                                                                                |
-| `speed`         | ✓      | ✓      | Gets or sets the speed for the player. The setter accepts a value in the options specified in your config. Generally the minimum should be 0.5.                                      |
-| `quality`&sup1; | ✓      | ✓      | Gets or sets the quality for the player. The setter accepts a value from the options specified in your config.                                                                       |
-| `loop`          | ✓      | ✓      | Gets or sets the current loop state of the player. The setter accepts a boolean.                                                                                                     |
-| `source`        | ✓      | ✓      | Gets or sets the current source for the player. The setter accepts an object. See [source setter](#source-setter) below for examples.                                                |
-| `poster`&sup2;  | ✓      | ✓      | Gets or sets the current poster image for the player. The setter accepts a string; the URL for the updated poster image.                                                             |
-| `autoplay`      | ✓      | ✓      | Gets or sets the autoplay state of the player. The setter accepts a boolean.                                                                                                         |
-| `language`      | ✓      | ✓      | Gets or sets the preferred captions language for the player. The setter accepts an ISO two-letter language code. Support for the languages is dependent on the captions you include. |
-| `pip`           | ✓      | ✓      | Gets or sets the picture-in-picture state of the player. The setter accepts a boolean. This currently only supported on Safari 10+ on MacOS Sierra+ and iOS 10+.                     |
+| Property             | Getter | Setter | Description                                                                                                                                                                          |
+| -------------------- | ------ | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `isHTML5`            | ✓      | -      | Returns a boolean indicating if the current player is HTML5.                                                                                                                         |
+| `isEmbed`            | ✓      | -      | Returns a boolean indicating if the current player is an embedded player.                                                                                                            |
+| `paused`             | ✓      | -      | Returns a boolean indicating if the current player is paused.                                                                                                                        |
+| `playing`            | ✓      | -      | Returns a boolean indicating if the current player is playing.                                                                                                                       |
+| `ended`              | ✓      | -      | Returns a boolean indicating if the current player has finished playback.                                                                                                            |
+| `currentTime`        | ✓      | ✓      | Gets or sets the currentTime for the player. The setter accepts a float in seconds.                                                                                                  |
+| `seeking`            | ✓      | -      | Returns a boolean indicating if the current player is seeking.                                                                                                                       |
+| `duration`           | ✓      | -      | Returns the duration for the current media.                                                                                                                                          |
+| `volume`             | ✓      | ✓      | Gets or sets the volume for the player. The setter accepts a float between 0 and 1.                                                                                                  |
+| `muted`              | ✓      | ✓      | Gets or sets the muted state of the player. The setter accepts a boolean.                                                                                                            |
+| `hasAudio`           | ✓      | -      | Returns a boolean indicating if the current media has an audio track.                                                                                                                |
+| `speed`              | ✓      | ✓      | Gets or sets the speed for the player. The setter accepts a value in the options specified in your config. Generally the minimum should be 0.5.                                      |
+| `quality`&sup1;      | ✓      | ✓      | Gets or sets the quality for the player. The setter accepts a value from the options specified in your config.                                                                       |
+| `loop`               | ✓      | ✓      | Gets or sets the current loop state of the player. The setter accepts a boolean.                                                                                                     |
+| `source`             | ✓      | ✓      | Gets or sets the current source for the player. The setter accepts an object. See [source setter](#source-setter) below for examples.                                                |
+| `poster`&sup2;       | ✓      | ✓      | Gets or sets the current poster image for the player. The setter accepts a string; the URL for the updated poster image.                                                             |
+| `autoplay`           | ✓      | ✓      | Gets or sets the autoplay state of the player. The setter accepts a boolean.                                                                                                         |
+| `language`           | ✓      | ✓      | Gets or sets the preferred captions language for the player. The setter accepts an ISO two-letter language code. Support for the languages is dependent on the captions you include. |
+| `fullscreen.active`  | ✓      | -      | Returns a boolean indicating if the current player is in fullscreen mode.                                                                                                            |
+| `fullscreen.enabled` | ✓      | -      | Returns a boolean indicating if the current player has fullscreen enabled.                                                                                                           |
+| `pip`                | ✓      | ✓      | Gets or sets the picture-in-picture state of the player. The setter accepts a boolean. This currently only supported on Safari 10+ on MacOS Sierra+ and iOS 10+.                     |
 
 1. YouTube only. HTML5 will follow.
 2. HTML5 only

@@ -5,7 +5,6 @@
 import utils from './utils';
 import captions from './captions';
 import controls from './controls';
-import fullscreen from './fullscreen';
 import listeners from './listeners';
 
 const ui = {
@@ -62,9 +61,6 @@ const ui = {
 
         // Remove native controls
         ui.toggleNativeControls.call(this);
-
-        // Setup fullscreen
-        fullscreen.setup.call(this);
 
         // Captions
         captions.setup.call(this);

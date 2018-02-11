@@ -6,11 +6,11 @@
 .button,
 .button__count {
     align-items: center;
-    background: #fff;
+    background: $color-button-background;
     border: 0;
     border-radius: $border-radius-base;
     box-shadow: 0 1px 1px rgba(#000, 0.1);
-    color: $gray;
+    color: $color-button-text;
     display: inline-flex;
     padding: ($spacing-base * 0.75);
     position: relative;
@@ -71,7 +71,7 @@
     &::before {
         border: $arrow-size solid transparent;
         border-left-width: 0;
-        border-right-color: #fff;
+        border-right-color: $color-button-background;
         content: '';
         height: 0;
         position: absolute;
