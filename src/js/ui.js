@@ -32,12 +32,6 @@ const ui = {
         if (!this.supported.ui) {
             this.debug.warn(`Basic support only for ${this.provider} ${this.type}`);
 
-            // Remove controls
-            utils.removeElement.call(this, 'controls');
-
-            // Remove large play
-            utils.removeElement.call(this, 'buttons.play');
-
             // Restore native controls
             ui.toggleNativeControls.call(this, true);
 

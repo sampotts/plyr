@@ -306,12 +306,15 @@ const utils = {
     // Remove an element
     removeElement(element) {
         if (!utils.is.element(element) || !utils.is.element(element.parentNode)) {
-            return null;
+            return;
+        }
+
+        if (utils.is.nodeList(element) || utils.is.array(element)) {
+            Array.from(element).forEach(utils.removeElement);
+            return;
         }
 
         element.parentNode.removeChild(element);
-
-        return element;
     },
 
     // Remove all child elements
@@ -569,7 +572,7 @@ const utils = {
         }
 
         // If a nodelist is passed, call itself on each node
-        if (utils.is.nodeList(elements)) {
+        if (utils.is.nodeList(elements) || utils.is.array(elements)) {
             // Create listener for each node
             Array.from(elements).forEach(element => {
                 if (element instanceof Node) {

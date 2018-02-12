@@ -70,6 +70,9 @@ class Fullscreen {
             this.toggle();
         });
 
+        // Prevent double click on controls bubbling up
+        utils.on(this.player.elements.controls, 'dblclick', event => event.stopPropagation());
+
         // Update the UI
         this.update();
     }
