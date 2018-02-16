@@ -9,6 +9,7 @@ const path = require('path');
 const gulp = require('gulp');
 const gutil = require('gulp-util');
 const concat = require('gulp-concat');
+const filter = require('gulp-filter');
 const sass = require('gulp-sass');
 const cleancss = require('gulp-clean-css');
 const run = require('run-sequence');
@@ -24,8 +25,7 @@ const size = require('gulp-size');
 const rollup = require('gulp-better-rollup');
 const babel = require('rollup-plugin-babel');
 const sourcemaps = require('gulp-sourcemaps');
-const uglify = require('rollup-plugin-uglify');
-const { minify } = require('uglify-es');
+const uglify = require('gulp-uglify');
 const commonjs = require('rollup-plugin-commonjs');
 const resolve = require('rollup-plugin-node-resolve');
 
@@ -122,6 +122,7 @@ const build = {
         Object.keys(files).forEach(key => {
             const name = `js:${key}`;
             tasks.js.push(name);
+            const {output} = paths[bundle];
 
             gulp.task(name, () =>
                 gulp
@@ -135,15 +136,20 @@ const build = {
                                     resolve(),
                                     commonjs(),
                                     babel(babelrc),
-                                    uglify({}, minify),
                                 ],
                             },
                             options,
                         ),
                     )
-                    .pipe(size(sizeOptions))
                     .pipe(sourcemaps.write(''))
-                    .pipe(gulp.dest(paths[bundle].output)),
+                    .pipe(gulp.dest(output))
+                    .pipe(filter('**/*.js'))
+                    .pipe(uglify())
+                    .pipe(size(sizeOptions))
+                    .pipe(rename({suffix:'.min'}))
+                    .pipe(sourcemaps.write(''))
+                    .pipe(gulp.dest(output)),
+
             );
         });
     },

@@ -8,6 +8,7 @@
     "globals": { "Plyr": false, "jQuery": false },
     "rules": {
         "no-const-assign": 1,
+        "no-shadow": 0,
         "no-this-before-super": 1,
         "no-undef": 1,
         "no-unreachable": 1,

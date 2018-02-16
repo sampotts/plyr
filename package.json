@@ -22,6 +22,7 @@
         "gulp-better-rollup": "^3.0.0",
         "gulp-clean-css": "^3.9.2",
         "gulp-concat": "^2.6.1",
+        "gulp-filter": "^5.1.0",
         "gulp-open": "^2.1.0",
         "gulp-rename": "^1.2.2",
         "gulp-replace": "^0.6.1",
@@ -31,11 +32,11 @@
         "gulp-sourcemaps": "^2.6.4",
         "gulp-svgmin": "^1.2.4",
         "gulp-svgstore": "^6.1.1",
+        "gulp-uglify": "^3.0.0",
         "gulp-util": "^3.0.8",
         "rollup-plugin-babel": "^3.0.3",
         "rollup-plugin-commonjs": "^8.3.0",
         "rollup-plugin-node-resolve": "^3.0.2",
-        "rollup-plugin-uglify": "^3.0.0",
         "run-sequence": "^2.2.1",
         "stylelint": "^8.4.0",
         "stylelint-config-prettier": "^2.0.0",
@@ -46,7 +47,15 @@
         "stylelint-selector-bem-pattern": "^2.0.0",
         "uglify-es": "^3.3.10"
     },
-    "keywords": ["HTML5 Video", "HTML5 Audio", "Media Player", "DASH", "Shaka", "WordPress", "HLS"],
+    "keywords": [
+        "HTML5 Video",
+        "HTML5 Audio",
+        "Media Player",
+        "DASH",
+        "Shaka",
+        "WordPress",
+        "HLS"
+    ],
     "repository": {
         "type": "git",
         "url": "git://github.com/sampotts/plyr.git"
