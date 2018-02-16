@@ -59,6 +59,14 @@
             margin: 0;
             overflow: hidden;
             padding: $plyr-control-padding;
+
+            li {
+                margin-top: 2px;
+
+                &:first-child {
+                    margin-top: 0;
+                }
+            }
         }
 
         // Options

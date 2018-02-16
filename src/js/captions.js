@@ -39,7 +39,7 @@ const captions = {
         // Only Vimeo and HTML5 video supported at this point
         if (!this.isVideo || this.isYouTube || (this.isHTML5 && !support.textTracks)) {
             // Clear menu and hide
-            if (this.config.controls.includes('settings') && this.config.settings.includes('captions')) {
+            if (utils.is.array(this.config.controls) && this.config.controls.includes('settings') && this.config.settings.includes('captions')) {
                 controls.setCaptionsMenu.call(this);
             }
 
@@ -68,7 +68,7 @@ const captions = {
         captions.show.call(this);
 
         // Set available languages in list
-        if (this.config.controls.includes('settings') && this.config.settings.includes('captions')) {
+        if (utils.is.array(this.config.controls) && this.config.controls.includes('settings') && this.config.settings.includes('captions')) {
             controls.setCaptionsMenu.call(this);
         }
     },
@@ -78,7 +78,7 @@ const captions = {
         // Setup HTML5 track rendering
         if (this.isHTML5 && this.isVideo) {
             captions.getTracks.call(this).forEach(track => {
-                // Remove previous bindings
+                // Show track
                 utils.on(track, 'cuechange', event => captions.setCue.call(this, event));
 
                 // Turn off native caption rendering to avoid double captions
@@ -124,7 +124,8 @@ const captions = {
     setCue(input) {
         // Get the track from the event if needed
         const track = utils.is.event(input) ? input.target : input;
-        const active = track.activeCues[0];
+        const { activeCues } = track;
+        const active = activeCues.length && activeCues[0];
         const currentTrack = captions.getCurrentTrack.call(this);
 
         // Only display current track

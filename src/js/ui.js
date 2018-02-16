@@ -5,7 +5,6 @@
 import utils from './utils';
 import captions from './captions';
 import controls from './controls';
-import fullscreen from './fullscreen';
 import listeners from './listeners';
 
 const ui = {
@@ -33,12 +32,6 @@ const ui = {
         if (!this.supported.ui) {
             this.debug.warn(`Basic support only for ${this.provider} ${this.type}`);
 
-            // Remove controls
-            utils.removeElement.call(this, 'controls');
-
-            // Remove large play
-            utils.removeElement.call(this, 'buttons.play');
-
             // Restore native controls
             ui.toggleNativeControls.call(this, true);
 
@@ -62,9 +55,6 @@ const ui = {
 
         // Remove native controls
         ui.toggleNativeControls.call(this);
-
-        // Setup fullscreen
-        fullscreen.setup.call(this);
 
         // Captions
         captions.setup.call(this);

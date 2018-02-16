@@ -306,12 +306,15 @@ const utils = {
     // Remove an element
     removeElement(element) {
         if (!utils.is.element(element) || !utils.is.element(element.parentNode)) {
-            return null;
+            return;
+        }
+
+        if (utils.is.nodeList(element) || utils.is.array(element)) {
+            Array.from(element).forEach(utils.removeElement);
+            return;
         }
 
         element.parentNode.removeChild(element);
-
-        return element;
     },
 
     // Remove all child elements
@@ -525,46 +528,51 @@ const utils = {
     },
 
     // Trap focus inside container
-    trapFocus() {
+    trapFocus(element = null, toggle = false) {
+        if (!utils.is.element(element)) {
+            return;
+        }
+
         const focusable = utils.getElements.call(this, 'button:not(:disabled), input:not(:disabled), [tabindex]');
         const first = focusable[0];
         const last = focusable[focusable.length - 1];
 
-        utils.on(
-            this.elements.container,
-            'keydown',
-            event => {
-                // Bail if not tab key or not fullscreen
-                if (event.key !== 'Tab' || event.keyCode !== 9 || !this.fullscreen.active) {
-                    return;
-                }
+        const trap = event => {
+            // Bail if not tab key or not fullscreen
+            if (event.key !== 'Tab' || event.keyCode !== 9) {
+                return;
+            }
 
-                // Get the current focused element
-                const focused = utils.getFocusElement();
+            // Get the current focused element
+            const focused = utils.getFocusElement();
 
-                if (focused === last && !event.shiftKey) {
-                    // Move focus to first element that can be tabbed if Shift isn't used
-                    first.focus();
-                    event.preventDefault();
-                } else if (focused === first && event.shiftKey) {
-                    // Move focus to last element that can be tabbed if Shift is used
-                    last.focus();
-                    event.preventDefault();
-                }
-            },
-            false,
-        );
+            if (focused === last && !event.shiftKey) {
+                // Move focus to first element that can be tabbed if Shift isn't used
+                first.focus();
+                event.preventDefault();
+            } else if (focused === first && event.shiftKey) {
+                // Move focus to last element that can be tabbed if Shift is used
+                last.focus();
+                event.preventDefault();
+            }
+        };
+
+        if (toggle) {
+            utils.on(this.elements.container, 'keydown', trap, false);
+        } else {
+            utils.off(this.elements.container, 'keydown', trap, false);
+        }
     },
 
     // Toggle event listener
     toggleListener(elements, event, callback, toggle, passive, capture) {
-        // Bail if no elements
-        if (utils.is.nullOrUndefined(elements)) {
+        // Bail if no elemetns, event, or callback
+        if (utils.is.empty(elements)  || utils.is.empty(event) || !utils.is.function(callback)) {
             return;
         }
 
         // If a nodelist is passed, call itself on each node
-        if (utils.is.nodeList(elements)) {
+        if (utils.is.nodeList(elements) || utils.is.array(elements)) {
             // Create listener for each node
             Array.from(elements).forEach(element => {
                 if (element instanceof Node) {

@@ -5,7 +5,6 @@
 import support from './support';
 import utils from './utils';
 import controls from './controls';
-import fullscreen from './fullscreen';
 import ui from './ui';
 
 // Sniff out the browser
@@ -138,7 +137,7 @@ const listeners = {
 
                     case 70:
                         // F key
-                        this.toggleFullscreen();
+                        this.fullscreen.toggle();
                         break;
 
                     case 67:
@@ -171,8 +170,8 @@ const listeners = {
 
                 // Escape is handle natively when in full screen
                 // So we only need to worry about non native
-                if (!fullscreen.enabled && this.fullscreen.active && code === 27) {
-                    this.toggleFullscreen();
+                if (!this.fullscreen.enabled && this.fullscreen.active && code === 27) {
+                    this.fullscreen.toggle();
                 }
 
                 // Store last code for next cycle
@@ -215,18 +214,6 @@ const listeners = {
                 this.toggleControls(event);
             });
         }
-
-        // Handle user exiting fullscreen by escaping etc
-        if (fullscreen.enabled) {
-            utils.on(document, fullscreen.eventType, event => {
-                this.toggleFullscreen(event);
-            });
-
-            // Fullscreen toggle on double click
-            utils.on(this.elements.container, 'dblclick', event => {
-                this.toggleFullscreen(event);
-            });
-        }
     },
 
     // Listen for media events
@@ -266,7 +253,7 @@ const listeners = {
         utils.on(this.media, 'playing play pause ended', event => ui.checkPlaying.call(this, event));
 
         // Loading
-        utils.on(this.media, 'stalled waiting canplay seeked playing', event => ui.checkLoading.call(this, event));
+        utils.on(this.media, 'waiting canplay seeked playing', event => ui.checkLoading.call(this, event));
 
         // Check if media failed to load
         // utils.on(this.media, 'play', event => ui.checkFailed.call(this, event));
@@ -307,7 +294,7 @@ const listeners = {
                 event => {
                     event.preventDefault();
                 },
-                false
+                false,
             );
         }
 
@@ -394,63 +381,63 @@ const listeners = {
         utils.on(this.elements.buttons.play, 'click', event =>
             proxy(event, 'play', () => {
                 this.togglePlay();
-            })
+            }),
         );
 
         // Pause
         utils.on(this.elements.buttons.restart, 'click', event =>
             proxy(event, 'restart', () => {
                 this.restart();
-            })
+            }),
         );
 
         // Rewind
         utils.on(this.elements.buttons.rewind, 'click', event =>
             proxy(event, 'rewind', () => {
                 this.rewind();
-            })
+            }),
         );
 
         // Rewind
         utils.on(this.elements.buttons.forward, 'click', event =>
             proxy(event, 'forward', () => {
                 this.forward();
-            })
+            }),
         );
 
         // Mute toggle
         utils.on(this.elements.buttons.mute, 'click', event =>
             proxy(event, 'mute', () => {
                 this.muted = !this.muted;
-            })
+            }),
         );
 
         // Captions toggle
         utils.on(this.elements.buttons.captions, 'click', event =>
             proxy(event, 'captions', () => {
                 this.toggleCaptions();
-            })
+            }),
         );
 
         // Fullscreen toggle
         utils.on(this.elements.buttons.fullscreen, 'click', event =>
             proxy(event, 'fullscreen', () => {
-                this.toggleFullscreen();
-            })
+                this.fullscreen.toggle();
+            }),
         );
 
         // Picture-in-Picture
         utils.on(this.elements.buttons.pip, 'click', event =>
             proxy(event, 'pip', () => {
                 this.pip = 'toggle';
-            })
+            }),
         );
 
         // Airplay
         utils.on(this.elements.buttons.airplay, 'click', event =>
             proxy(event, 'airplay', () => {
                 this.airplay();
-            })
+            }),
         );
 
         // Settings menu
@@ -489,7 +476,7 @@ const listeners = {
         utils.on(this.elements.inputs.seek, inputEvent, event =>
             proxy(event, 'seek', () => {
                 this.currentTime = event.target.value / event.target.max * this.duration;
-            })
+            }),
         );
 
         // Current time invert
@@ -510,7 +497,7 @@ const listeners = {
         utils.on(this.elements.inputs.volume, inputEvent, event =>
             proxy(event, 'volume', () => {
                 this.volume = event.target.value;
-            })
+            }),
         );
 
         // Polyfill for lower fill in <input type="range"> for webkit
@@ -583,7 +570,7 @@ const listeners = {
                         event.preventDefault();
                     }
                 }),
-            false
+            false,
         );
     },
 };

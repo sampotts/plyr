@@ -86,7 +86,7 @@ const media = {
         }
 
         // Remove child sources
-        Array.from(this.media.querySelectorAll('source')).forEach(utils.removeElement);
+        utils.removeElement(this.media.querySelectorAll('source'));
 
         // Set blank video src attribute
         // This is to prevent a MEDIA_ERR_SRC_NOT_SUPPORTED error
