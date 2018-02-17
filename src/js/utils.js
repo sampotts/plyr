@@ -619,7 +619,7 @@ const utils = {
     // Trigger event
     dispatchEvent(element, type, bubbles, detail) {
         // Bail if no element
-        if (!element || !type) {
+        if (!utils.is.element(element) || !utils.is.string(type)) {
             return;
         }
 
@@ -638,6 +638,12 @@ const utils = {
     // Toggle aria-pressed state on a toggle button
     // http://www.ssbbartgroup.com/blog/how-not-to-misuse-aria-states-properties-and-roles
     toggleState(element, input) {
+        // If multiple elements passed
+        if (utils.is.array(element) || utils.is.nodeList(element)) {
+            Array.from(element).forEach(target => utils.toggleState(target, input));
+            return;
+        }
+
         // Bail if no target
         if (!utils.is.element(element)) {
             return;

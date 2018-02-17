@@ -4,7 +4,8 @@
             "plyr.css": "src/sass/plyr.scss"
         },
         "js": {
-            "plyr.js": "src/js/plyr.js"
+            "plyr.js": "src/js/plyr.js",
+            "plyr.polyfilled.js": "src/js/plyr.polyfilled.js"
         }
     },
     "demo": {

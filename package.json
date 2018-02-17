@@ -1,9 +1,10 @@
 {
     "name": "plyr",
-    "version": "3.0.0-beta.13",
+    "version": "3.0.0-beta.14",
     "description": "A simple, accessible and customizable HTML5, YouTube and Vimeo media player",
     "homepage": "https://plyr.io",
     "main": "./dist/plyr.js",
+    "browser": "./dist/plyr.min.js",
     "sass": "./src/sass/plyr.scss",
     "style": "./dist/plyr.css",
     "devDependencies": {
@@ -12,7 +13,7 @@
         "babel-plugin-external-helpers": "^6.22.0",
         "babel-preset-env": "^1.6.1",
         "del": "^3.0.0",
-        "eslint": "^4.17.0",
+        "eslint": "^4.18.0",
         "eslint-config-airbnb-base": "^12.1.0",
         "eslint-config-prettier": "^2.9.0",
         "eslint-plugin-import": "^2.8.0",
@@ -32,11 +33,11 @@
         "gulp-sourcemaps": "^2.6.4",
         "gulp-svgmin": "^1.2.4",
         "gulp-svgstore": "^6.1.1",
-        "gulp-uglify": "^3.0.0",
+        "gulp-uglify-es": "^1.0.0",
         "gulp-util": "^3.0.8",
         "rollup-plugin-babel": "^3.0.3",
         "rollup-plugin-commonjs": "^8.3.0",
-        "rollup-plugin-node-resolve": "^3.0.2",
+        "rollup-plugin-node-resolve": "^3.0.3",
         "run-sequence": "^2.2.1",
         "stylelint": "^8.4.0",
         "stylelint-config-prettier": "^2.0.0",
@@ -44,8 +45,7 @@
         "stylelint-config-standard": "^18.0.0",
         "stylelint-order": "^0.8.0",
         "stylelint-scss": "^2.3.0",
-        "stylelint-selector-bem-pattern": "^2.0.0",
-        "uglify-es": "^3.3.10"
+        "stylelint-selector-bem-pattern": "^2.0.0"
     },
     "keywords": [
         "HTML5 Video",
@@ -71,5 +71,8 @@
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "Sam Potts <sam@potts.es>",
-    "dependencies": {}
+    "dependencies": {
+        "babel-polyfill": "^6.26.0",
+        "custom-event-polyfill": "^0.3.0"
+    }
 }

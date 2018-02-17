@@ -132,10 +132,8 @@ const ui = {
         utils.toggleClass(this.elements.container, this.config.classNames.playing, this.playing);
         utils.toggleClass(this.elements.container, this.config.classNames.stopped, this.paused);
 
-        // Set aria state
-        if (utils.is.nodeList(this.elements.buttons.play)) {
-            Array.from(this.elements.buttons.play).forEach(button => utils.toggleState(button, this.playing));
-        }
+        // Set ARIA state
+        utils.toggleState(this.elements.buttons.play, this.playing);
 
         // Toggle controls
         this.toggleControls(!this.playing);
