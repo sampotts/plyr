@@ -649,6 +649,8 @@ var utils = {
     // Fetch wrapper
     // Using XHR to avoid issues with older browsers
     fetch: function fetch(url) {
+        var responseType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'text';
+
         return new Promise(function (resolve, reject) {
             try {
                 var request = new XMLHttpRequest();
@@ -659,10 +661,14 @@ var utils = {
                 }
 
                 request.addEventListener('load', function () {
-                    try {
-                        resolve(JSON.parse(request.responseText));
-                    } catch (e) {
-                        resolve(request.responseText);
+                    if (responseType === 'text') {
+                        try {
+                            resolve(JSON.parse(request.responseText));
+                        } catch (e) {
+                            resolve(request.responseText);
+                        }
+                    } else {
+                        resolve(request.response);
                     }
                 });
 
@@ -671,6 +677,10 @@ var utils = {
                 });
 
                 request.open('GET', url, true);
+
+                // Set the required response type
+                request.responseType = responseType;
+
                 request.send();
             } catch (e) {
                 reject(e);
@@ -1474,7 +1484,6 @@ var utils = {
 // Plyr support checks
 // ==========================================================================
 
-// Check for feature support
 var support = {
     // Basic support
     audio: 'canPlayType' in document.createElement('audio'),
@@ -1992,7 +2001,6 @@ var Storage = function () {
 
 /* global google */
 
-// Build the default tag URL
 var getTagUrl = function getTagUrl() {
     var params = {
         AV_PUBLISHERID: '58c25bb0073ef448b1087ad6',
@@ -2653,7 +2661,6 @@ var Ads = function () {
 // Plyr Event Listeners
 // ==========================================================================
 
-// Sniff out the browser
 var browser$2 = utils.getBrowser();
 
 var listeners = {
@@ -3565,7 +3572,6 @@ var ui = {
 // Plyr controls
 // ==========================================================================
 
-// Sniff out the browser
 var browser$1 = utils.getBrowser();
 
 var controls = {
@@ -4741,6 +4747,7 @@ var controls = {
 
 // ==========================================================================
 // Plyr Captions
+// TODO: Create as class
 // ==========================================================================
 
 var captions = {
@@ -4782,7 +4789,6 @@ var captions = {
 
             return;
         }
-
         // Inject the container
         if (!utils.is.element(this.elements.captions)) {
             this.elements.captions = utils.createElement('div', utils.getAttributesFromSelector(this.config.selectors.captions));
@@ -4793,9 +4799,34 @@ var captions = {
         // Set the class hook
         utils.toggleClass(this.elements.container, this.config.classNames.captions.enabled, !utils.is.empty(captions.getTracks.call(this)));
 
+        // Get tracks
+        var tracks = captions.getTracks.call(this);
+
         // If no caption file exists, hide container for caption text
-        if (utils.is.empty(captions.getTracks.call(this))) {
+        if (utils.is.empty(tracks)) {
             return;
+        }
+
+        // Get browser info
+        var browser = utils.getBrowser();
+
+        // Fix IE captions if CORS is used
+        // Fetch captions and inject as blobs instead (data URIs not supported!)
+        if (browser.isIE && window.URL) {
+            var elements = this.media.querySelectorAll('track');
+
+            Array.from(elements).forEach(function (track) {
+                var src = track.getAttribute('src');
+                var href = utils.parseUrl(src);
+
+                if (href.hostname !== window.location.href.hostname && ['http:', 'https:'].includes(href.protocol)) {
+                    utils.fetch(src, 'blob').then(function (blob) {
+                        track.setAttribute('src', window.URL.createObjectURL(blob));
+                    }).catch(function () {
+                        utils.removeElement(track);
+                    });
+                }
+            });
         }
 
         // Set language
@@ -5694,7 +5725,6 @@ var vimeo = {
 // Plyr Media
 // ==========================================================================
 
-// Sniff out the browser
 var browser$3 = utils.getBrowser();
 
 var media = {
@@ -5938,12 +5968,6 @@ var source = {
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
-
-// Private properties
-// TODO: Use a WeakMap for private globals
-// const globals = new WeakMap();
-
-// Plyr instance
 
 var Plyr = function () {
     function Plyr(target, options) {

@@ -1,5 +1,6 @@
 // ==========================================================================
 // Plyr Captions
+// TODO: Create as class
 // ==========================================================================
 
 import support from './support';
@@ -45,7 +46,6 @@ const captions = {
 
             return;
         }
-
         // Inject the container
         if (!utils.is.element(this.elements.captions)) {
             this.elements.captions = utils.createElement('div', utils.getAttributesFromSelector(this.config.selectors.captions));
@@ -56,9 +56,40 @@ const captions = {
         // Set the class hook
         utils.toggleClass(this.elements.container, this.config.classNames.captions.enabled, !utils.is.empty(captions.getTracks.call(this)));
 
+        // Get tracks
+        const tracks = captions.getTracks.call(this);
+
         // If no caption file exists, hide container for caption text
-        if (utils.is.empty(captions.getTracks.call(this))) {
+        if (utils.is.empty(tracks)) {
             return;
+        }
+
+        // Get browser info
+        const browser = utils.getBrowser();
+
+        // Fix IE captions if CORS is used
+        // Fetch captions and inject as blobs instead (data URIs not supported!)
+        if (browser.isIE && window.URL) {
+            const elements = this.media.querySelectorAll('track');
+
+            Array.from(elements).forEach(track => {
+                const src = track.getAttribute('src');
+                const href = utils.parseUrl(src);
+
+                if (href.hostname !== window.location.href.hostname && [
+                    'http:',
+                    'https:',
+                ].includes(href.protocol)) {
+                    utils
+                        .fetch(src, 'blob')
+                        .then(blob => {
+                            track.setAttribute('src', window.URL.createObjectURL(blob));
+                        })
+                        .catch(() => {
+                            utils.removeElement(track);
+                        });
+                }
+            });
         }
 
         // Set language

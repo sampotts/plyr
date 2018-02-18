@@ -83,7 +83,7 @@ const utils = {
 
     // Fetch wrapper
     // Using XHR to avoid issues with older browsers
-    fetch(url) {
+    fetch(url, responseType = 'text') {
         return new Promise((resolve, reject) => {
             try {
                 const request = new XMLHttpRequest();
@@ -94,10 +94,15 @@ const utils = {
                 }
 
                 request.addEventListener('load', () => {
-                    try {
-                        resolve(JSON.parse(request.responseText));
-                    } catch(e) {
-                        resolve(request.responseText);
+                    if (responseType === 'text') {
+                        try {
+                            resolve(JSON.parse(request.responseText));
+                        } catch(e) {
+                            resolve(request.responseText);
+                        }
+                    }
+                    else {
+                        resolve(request.response);
                     }
                 });
 
@@ -106,6 +111,10 @@ const utils = {
                 });
 
                 request.open('GET', url, true);
+
+                // Set the required response type
+                request.responseType = responseType;
+
                 request.send();
             } catch (e) {
                 reject(e);
