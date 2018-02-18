@@ -128,7 +128,7 @@ Include the `plyr.js` script before the closing `</body>` tag and then call `ply
 If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for the JavaScript, you can use the following:
 
 ```html
-<script src="https://cdn.plyr.io/3.0.0-beta.14/plyr.js"></script>
+<script src="https://cdn.plyr.io/3.0.0-beta.15/plyr.js"></script>
 ```
 
 _Note_: Be sure to read the [polyfills](#polyfills) section below about browser compatibility
@@ -144,13 +144,13 @@ Include the `plyr.css` stylsheet into your `<head>`
 If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for the default CSS, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/3.0.0-beta.14/plyr.css">
+<link rel="stylesheet" href="https://cdn.plyr.io/3.0.0-beta.15/plyr.css">
 ```
 
 ### SVG Sprite
 
 The SVG sprite is loaded automatically from our CDN (provided by [Fastly](https://www.fastly.com/)). To change this, see the [options](#options) below. For
-reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.0.0-beta.14/plyr.svg`.
+reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.0.0-beta.15/plyr.svg`.
 
 ## Advanced
 
