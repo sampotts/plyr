@@ -391,7 +391,9 @@ const youtube = {
                             }
 
                             // Get quality
-                            controls.setQualityMenu.call(player, instance.getAvailableQualityLevels());
+                            if (player.elements.settings.menu) {
+                                controls.setQualityMenu.call(player, instance.getAvailableQualityLevels());
+                            }
 
                             break;
 
