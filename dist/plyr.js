@@ -1484,7 +1484,6 @@ var utils = {
 // Plyr support checks
 // ==========================================================================
 
-// Check for feature support
 var support = {
     // Basic support
     audio: 'canPlayType' in document.createElement('audio'),
@@ -2002,7 +2001,6 @@ var Storage = function () {
 
 /* global google */
 
-// Build the default tag URL
 var getTagUrl = function getTagUrl() {
     var params = {
         AV_PUBLISHERID: '58c25bb0073ef448b1087ad6',
@@ -2663,7 +2661,6 @@ var Ads = function () {
 // Plyr Event Listeners
 // ==========================================================================
 
-// Sniff out the browser
 var browser$2 = utils.getBrowser();
 
 var listeners = {
@@ -5378,7 +5375,9 @@ var youtube = {
                             }
 
                             // Get quality
-                            controls.setQualityMenu.call(player, instance.getAvailableQualityLevels());
+                            if (player.elements.settings.menu) {
+                                controls.setQualityMenu.call(player, instance.getAvailableQualityLevels());
+                            }
 
                             break;
 
@@ -5729,7 +5728,6 @@ var vimeo = {
 // Plyr Media
 // ==========================================================================
 
-// Sniff out the browser
 var browser$3 = utils.getBrowser();
 
 var media = {
@@ -5973,12 +5971,6 @@ var source = {
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
-
-// Private properties
-// TODO: Use a WeakMap for private globals
-// const globals = new WeakMap();
-
-// Plyr instance
 
 var Plyr = function () {
     function Plyr(target, options) {
