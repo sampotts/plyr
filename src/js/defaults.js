@@ -180,7 +180,7 @@ const defaults = {
         reset: 'Reset',
         none: 'None',
         disabled: 'Disabled',
-        advertisment: 'Ad',
+        advertisement: 'Ad',
     },
 
     // URLs

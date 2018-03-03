@@ -181,7 +181,7 @@ class Ads {
 
         const update = () => {
             const time = utils.formatTime(this.manager.getRemainingTime());
-            const label = `${this.player.config.i18n.advertisment} - ${time}`;
+            const label = `${this.player.config.i18n.advertisement} - ${time}`;
             this.elements.container.setAttribute('data-badge-text', label);
         };
 
