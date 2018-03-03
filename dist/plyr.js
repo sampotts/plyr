@@ -77,7 +77,7 @@ var defaults = {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.0.0-beta.15/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.0.0-beta.16/plyr.svg',
 
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
@@ -167,7 +167,7 @@ var defaults = {
         reset: 'Reset',
         none: 'None',
         disabled: 'Disabled',
-        advertisment: 'Ad'
+        advertisement: 'Ad'
     },
 
     // URLs
@@ -2205,7 +2205,7 @@ var Ads = function () {
 
             var update = function update() {
                 var time = utils.formatTime(_this4.manager.getRemainingTime());
-                var label = _this4.player.config.i18n.advertisment + ' - ' + time;
+                var label = _this4.player.config.i18n.advertisement + ' - ' + time;
                 _this4.elements.container.setAttribute('data-badge-text', label);
             };
 
@@ -5970,7 +5970,7 @@ var source = {
 
 // ==========================================================================
 // Plyr
-// plyr.js v3.0.0-beta.15
+// plyr.js v3.0.0-beta.16
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
