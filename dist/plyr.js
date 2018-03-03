@@ -1484,6 +1484,7 @@ var utils = {
 // Plyr support checks
 // ==========================================================================
 
+// Check for feature support
 var support = {
     // Basic support
     audio: 'canPlayType' in document.createElement('audio'),
@@ -2001,6 +2002,7 @@ var Storage = function () {
 
 /* global google */
 
+// Build the default tag URL
 var getTagUrl = function getTagUrl() {
     var params = {
         AV_PUBLISHERID: '58c25bb0073ef448b1087ad6',
@@ -2661,6 +2663,7 @@ var Ads = function () {
 // Plyr Event Listeners
 // ==========================================================================
 
+// Sniff out the browser
 var browser$2 = utils.getBrowser();
 
 var listeners = {
@@ -3576,6 +3579,7 @@ var ui = {
 // Plyr controls
 // ==========================================================================
 
+// Sniff out the browser
 var browser$1 = utils.getBrowser();
 
 var controls = {
@@ -5726,6 +5730,7 @@ var vimeo = {
 // Plyr Media
 // ==========================================================================
 
+// Sniff out the browser
 var browser$3 = utils.getBrowser();
 
 var media = {
