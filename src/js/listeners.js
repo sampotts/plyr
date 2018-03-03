@@ -202,7 +202,7 @@ const listeners = {
 
             // Delay the adding of classname until the focus has changed
             // This event fires before the focusin event
-            window.setTimeout(() => {
+            setTimeout(() => {
                 utils.toggleClass(utils.getFocusElement(), this.config.classNames.tabFocus, true);
             }, 0);
         });

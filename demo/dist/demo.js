@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Delay the adding of classname until the focus has changed
         // This event fires before the focusin event
-        window.setTimeout(function () {
+        setTimeout(function () {
             document.activeElement.classList.add(tabClassName);
         }, 0);
     });
@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Expose for testing
+    // Expose for tinkering in the console
     window.player = player;
 
     // Setup type toggle

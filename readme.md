@@ -12,22 +12,22 @@ A simple, lightweight, accessible and customizable HTML5, YouTube and Vimeo medi
 
 ## Features
 
-* **Accessible** - full support for VTT captions and screen readers
-* **Lightweight** - just 18KB minified and gzipped
-* **[Customisable](#html)** - make the player look how you want with the markup you want
-* **Semantic** - uses the _right_ elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no
-  `<span>` or `<a href="#">` button hacks
-* **Responsive** - works with any screen size
-* **HTML Video & Audio** - support for both formats
-* **[Embedded Video](#embeds)** - support for YouTube and Vimeo video playback
-* **[Streaming](#streaming)** - support for hls.js, Shaka and dash.js streaming playback
-* **[API](#api)** - toggle playback, volume, seeking, and more through a standardized API
-* **[Events](#events)** - no messing around with Vimeo and YouTube APIs, all events are standardized across formats
-* **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes
-* **[Shortcuts](#shortcuts)** - supports keyboard shortcuts
-* **i18n support** - support for internationalization of controls
-* **No dependencies** - written in "vanilla" ES6 JavaScript, no jQuery required
-* **SASS** - to include in your build processes
+*   **Accessible** - full support for VTT captions and screen readers
+*   **Lightweight** - just 18KB minified and gzipped
+*   **[Customisable](#html)** - make the player look how you want with the markup you want
+*   **Semantic** - uses the _right_ elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no
+    `<span>` or `<a href="#">` button hacks
+*   **Responsive** - works with any screen size
+*   **HTML Video & Audio** - support for both formats
+*   **[Embedded Video](#embeds)** - support for YouTube and Vimeo video playback
+*   **[Streaming](#streaming)** - support for hls.js, Shaka and dash.js streaming playback
+*   **[API](#api)** - toggle playback, volume, seeking, and more through a standardized API
+*   **[Events](#events)** - no messing around with Vimeo and YouTube APIs, all events are standardized across formats
+*   **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes
+*   **[Shortcuts](#shortcuts)** - supports keyboard shortcuts
+*   **i18n support** - support for internationalization of controls
+*   **No dependencies** - written in "vanilla" ES6 JavaScript, no jQuery required
+*   **SASS** - to include in your build processes
 
 Oh and yes, it works with Bootstrap.
 
@@ -53,8 +53,7 @@ Here's a quick run through on getting up and running. There's also a [demo on Co
 
 ### HTML
 
-Plyr extends upon the standard HTML5 markup so that's all you need for those types. More info on advanced HTML markup can be found under
-[initialising](#initialising).
+Plyr extends upon the standard [HTML5 media element](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement) markup so that's all you need for those types.
 
 #### HTML5 Video
 
@@ -117,13 +116,14 @@ Or the `<div>` non progressively enhanced method:
 
 ### JavaScript
 
-Include the `plyr.js` script before the closing `</body>` tag and then call `plyr.setup()`. More info on `setup()` can be found under
-[initialising](#initialising).
+Include the `plyr.js` script before the closing `</body>` tag and then in your JS create a new instance of Plyr as below.
 
 ```html
 <script src="path/to/plyr.js"></script>
 <script>const player = new Plyr('#player');</script>
 ```
+
+See [initialising](#initialising) for more information on advanced setups.
 
 If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for the JavaScript, you can use the following:
 
@@ -195,11 +195,12 @@ WebVTT captions are supported. To add a caption track, check the HTML example ab
 
 You can specify a range of arguments for the constructor to use:
 
-* A CSS string selector that's compatible with [`querySelector`](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector)
-* A [HTMLElement](https://developer.mozilla.org/en/docs/Web/API/HTMLElement)
-* A [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList) or Array of [HTMLElement](https://developer.mozilla.org/en/docs/Web/API/HTMLElement) -
-  the first element will be used
-* A [jQuery](https://jquery.com) object - if multiple are passed, the first element will be used
+*   A CSS string selector that's compatible with [`querySelector`](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector)
+*   A [`HTMLElement`](https://developer.mozilla.org/en/docs/Web/API/HTMLElement)
+*   A [`NodeList]`(https://developer.mozilla.org/en-US/docs/Web/API/NodeList)
+*   A [jQuery](https://jquery.com) object
+
+_Note_: If a `NodeList`, `Array`, or jQuery object are passed, the first element will be used for setup.
 
 Here's some examples
 
@@ -222,6 +223,12 @@ const player = new Plyr(document.querySelectorAll('.js-player'));
 ```
 
 The NodeList, HTMLElement or string selector can be the target `<video>`, `<audio>`, or `<div>` wrapper for embeds
+
+##### Setting up multiple players
+
+```javascript
+const players = Array.from(document.querySelectorAll('.js-player')).map(player => new Plyr(player));
+```
 
 The second argument for the constructor is the [#options](options) object:
 
@@ -278,7 +285,7 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
 | `quality`            | Object                     | `{ default: 'default', options: ['hd2160', 'hd1440', 'hd1080', 'hd720', 'large', 'medium', 'small', 'tiny', 'default'] }`      | Currently only supported by YouTube. `default` is the default quality level, determined by YouTube. `options` are the options to display.                                                                                                                                                                                                                              |
 | `loop`               | Object                     | `{ active: false }`                                                                                                            | `active`: Whether to loop the current video. If the `loop` attribute is present on a `<video>` or `<audio>` element, this will be automatically set to true This is an object to support future functionality.                                                                                                                                                         |
 
-1. Vimeo only
+1.  Vimeo only
 
 ## API
 
@@ -333,7 +340,7 @@ player.fullscreen.enter(); // Enter fullscreen
 | `supports(type)`         | String           | Check support for a mime type.                                                                             |
 | `destroy()`              | -                | Destroy the instance and garbage collect any elements.                                                     |
 
-1. For HTML5 players, `play()` will return a [`Promise`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) in _some_ browsers - WebKit and Mozilla [according to MDN](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/play) at time of writing.
+1.  For HTML5 players, `play()` will return a [`Promise`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) in _some_ browsers - WebKit and Mozilla [according to MDN](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/play) at time of writing.
 
 ### Getters and Setters
 
@@ -376,8 +383,8 @@ player.fullscreen.active; // false;
 | `fullscreen.enabled` | ✓      | -      | Returns a boolean indicating if the current player has fullscreen enabled.                                                                                                           |
 | `pip`                | ✓      | ✓      | Gets or sets the picture-in-picture state of the player. The setter accepts a boolean. This currently only supported on Safari 10+ on MacOS Sierra+ and iOS 10+.                     |
 
-1. YouTube only. HTML5 will follow.
-2. HTML5 only
+1.  YouTube only. HTML5 will follow.
+2.  HTML5 only
 
 #### The `.source` setter
 
@@ -477,7 +484,7 @@ _Note:_ `src` property for YouTube and Vimeo can either be the video ID or the w
 | `poster`&sup1; | String | The URL for the poster image (HTML5 video only).                                                                                                                                                                                                                                                                                                                                                               |
 | `tracks`&sup1; | String | An array of track objects. Each element in the array is mapped directly to a track element and any keys mapped directly to HTML attributes so as in the example above, it will render as `<track kind="captions" label="English" srclang="en" src="https://cdn.selz.com/plyr/1.0/example_captions_en.vtt" default>` and similar for the French version. Booleans are converted to HTML5 value-less attributes. |
 
-1. HTML5 only
+1.  HTML5 only
 
 ## Events
 
@@ -547,8 +554,8 @@ YouTube and Vimeo are currently supported and function much like a HTML5 video. 
 to access the API's directly. You can do so via the `embed` property of your player object - e.g. `player.embed`. You can then use the relevant methods from the
 third party APIs. More info on the respective API's here:
 
-* [YouTube iframe API Reference](https://developers.google.com/youtube/iframe_api_reference)
-* [Vimeo player.js Reference](https://github.com/vimeo/player.js)
+*   [YouTube iframe API Reference](https://developers.google.com/youtube/iframe_api_reference)
+*   [Vimeo player.js Reference](https://github.com/vimeo/player.js)
 
 _Note_: Not all API methods may work 100%. Your mileage may vary. It's better to use the Plyr API where possible.
 
@@ -576,9 +583,9 @@ document then the shortcuts will work when any element has focus, apart from an 
 Because Plyr is an extension of the standard HTML5 video and audio elements, third party streaming plugins can be used with Plyr. Massive thanks to Matias
 Russitto ([@russitto](https://github.com/russitto)) for working on this. Here's a few examples:
 
-* Using [hls.js](https://github.com/dailymotion/hls.js) - [Demo](http://codepen.io/sampotts/pen/JKEMqB)
-* Using [Shaka](https://github.com/google/shaka-player) - [Demo](http://codepen.io/sampotts/pen/zBNpVR)
-* Using [dash.js](https://github.com/Dash-Industry-Forum/dash.js) - [Demo](http://codepen.io/sampotts/pen/BzpJXN)
+*   Using [hls.js](https://github.com/dailymotion/hls.js) - [Demo](http://codepen.io/sampotts/pen/JKEMqB)
+*   Using [Shaka](https://github.com/google/shaka-player) - [Demo](http://codepen.io/sampotts/pen/zBNpVR)
+*   Using [dash.js](https://github.com/Dash-Industry-Forum/dash.js) - [Demo](http://codepen.io/sampotts/pen/BzpJXN)
 
 ## Fullscreen
 
@@ -599,8 +606,8 @@ Plyr supports the last 2 versions of most _modern_ browsers.
 | IE11          | ✓         |
 | IE10          | ✓&sup2;   |
 
-1. Mobile Safari on the iPhone forces the native player for `<video>` unless the `playsinline` attribute is present. Volume controls are also disabled as they are handled device wide.
-2. Native player used (no support for `<progress>` or `<input type="range">`) but the API is supported. No native fullscreen support, fallback can be used (see [options](#options))
+1.  Mobile Safari on the iPhone forces the native player for `<video>` unless the `playsinline` attribute is present. Volume controls are also disabled as they are handled device wide.
+2.  Native player used (no support for `<progress>` or `<input type="range">`) but the API is supported. No native fullscreen support, fallback can be used (see [options](#options))
 
 ### Polyfills
 
@@ -616,9 +623,9 @@ const supported = Plyr.supported('video', 'html5', true);
 
 The arguments are:
 
-* Media type (`audio` or `video`)
-* Provider (`html5`, `youtube` or `vimeo`)
-* Whether the player has the `playsinline` attribute (only applicable to iOS 10+)
+*   Media type (`audio` or `video`)
+*   Provider (`html5`, `youtube` or `vimeo`)
+*   Whether the player has the `playsinline` attribute (only applicable to iOS 10+)
 
 ### Disable support programatically
 
@@ -654,28 +661,28 @@ Plyr costs money to run, not only my time - I donate that for free but domains, 
 
 ## Mentions
 
-* [ProductHunt](https://www.producthunt.com/tech/plyr)
-* [The Changelog](http://thechangelog.com/plyr-simple-html5-media-player-custom-controls-webvtt-captions/)
-* [HTML5 Weekly #177](http://html5weekly.com/issues/177)
-* [Responsive Design #149](http://us4.campaign-archive2.com/?u=559bc631fe5294fc66f5f7f89&id=451a61490f)
-* [Web Design Weekly #174](https://web-design-weekly.com/2015/02/24/web-design-weekly-174/)
-* [Hacker News](https://news.ycombinator.com/item?id=9136774)
-* [Web Platform Daily](http://webplatformdaily.org/releases/2015-03-04)
-* [LayerVault Designer News](https://news.layervault.com/stories/45394-plyr--a-simple-html5-media-player)
-* [The Treehouse Show #131](https://teamtreehouse.com/library/episode-131-origami-react-responsive-hero-images)
-* [noupe.com](http://www.noupe.com/design/html5-plyr-is-a-responsive-and-accessible-video-player-94389.html)
+*   [ProductHunt](https://www.producthunt.com/tech/plyr)
+*   [The Changelog](http://thechangelog.com/plyr-simple-html5-media-player-custom-controls-webvtt-captions/)
+*   [HTML5 Weekly #177](http://html5weekly.com/issues/177)
+*   [Responsive Design #149](http://us4.campaign-archive2.com/?u=559bc631fe5294fc66f5f7f89&id=451a61490f)
+*   [Web Design Weekly #174](https://web-design-weekly.com/2015/02/24/web-design-weekly-174/)
+*   [Hacker News](https://news.ycombinator.com/item?id=9136774)
+*   [Web Platform Daily](http://webplatformdaily.org/releases/2015-03-04)
+*   [LayerVault Designer News](https://news.layervault.com/stories/45394-plyr--a-simple-html5-media-player)
+*   [The Treehouse Show #131](https://teamtreehouse.com/library/episode-131-origami-react-responsive-hero-images)
+*   [noupe.com](http://www.noupe.com/design/html5-plyr-is-a-responsive-and-accessible-video-player-94389.html)
 
 ## Used by
 
-* [Selz.com](https://selz.com)
-* [Peugeot.fr](http://www.peugeot.fr/marque-et-technologie/technologies/peugeot-i-cockpit.html)
-* [Peugeot.de](http://www.peugeot.de/modelle/modellberater/208-3-turer/fotos-videos.html)
-* [TomTom.com](http://prioritydriving.tomtom.com/)
-* [DIGBMX](http://digbmx.com/)
-* [Grime Archive](https://grimearchive.com/)
-* [koel - A personal music streaming server that works.](http://koel.phanan.net/)
-* [Oscar Radio](http://oscar-radio.xyz/)
-* [Sparkk TV](https://www.sparkktv.com/)
+*   [Selz.com](https://selz.com)
+*   [Peugeot.fr](http://www.peugeot.fr/marque-et-technologie/technologies/peugeot-i-cockpit.html)
+*   [Peugeot.de](http://www.peugeot.de/modelle/modellberater/208-3-turer/fotos-videos.html)
+*   [TomTom.com](http://prioritydriving.tomtom.com/)
+*   [DIGBMX](http://digbmx.com/)
+*   [Grime Archive](https://grimearchive.com/)
+*   [koel - A personal music streaming server that works.](http://koel.phanan.net/)
+*   [Oscar Radio](http://oscar-radio.xyz/)
+*   [Sparkk TV](https://www.sparkktv.com/)
 
 Let me know on [Twitter](https://twitter.com/sam_potts) I can add you to the above list. It'd be awesome to see how you're using Plyr :-)
 
@@ -683,8 +690,8 @@ Let me know on [Twitter](https://twitter.com/sam_potts) I can add you to the abo
 
 Credit to the PayPal HTML5 Video player from which Plyr's caption functionality was originally ported from:
 
-* [PayPal's Accessible HTML5 Video Player](https://github.com/paypal/accessible-html5-video-player)
-* [An awesome guide for Plyr in Japanese!](http://syncer.jp/how-to-use-plyr-io) by [@arayutw](https://twitter.com/arayutw)
+*   [PayPal's Accessible HTML5 Video Player](https://github.com/paypal/accessible-html5-video-player)
+*   [An awesome guide for Plyr in Japanese!](http://syncer.jp/how-to-use-plyr-io) by [@arayutw](https://twitter.com/arayutw)
 
 ## Thanks
 

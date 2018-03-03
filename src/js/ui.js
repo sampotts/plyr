@@ -84,7 +84,9 @@ const ui = {
         this.ready = true;
 
         // Ready event at end of execution stack
-        utils.dispatchEvent.call(this, this.media, 'ready');
+        setTimeout(() => {
+            utils.dispatchEvent.call(this, this.media, 'ready');
+        }, 0);
 
         // Set the title
         ui.setTitle.call(this);

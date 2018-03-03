@@ -1472,7 +1472,7 @@ var utils = {
 
     // Force repaint of element
     repaint: function repaint(element) {
-        window.setTimeout(function () {
+        setTimeout(function () {
             utils.toggleHidden(element, true);
             element.offsetHeight; // eslint-disable-line
             utils.toggleHidden(element, false);
@@ -1484,7 +1484,6 @@ var utils = {
 // Plyr support checks
 // ==========================================================================
 
-// Check for feature support
 var support = {
     // Basic support
     audio: 'canPlayType' in document.createElement('audio'),
@@ -2002,7 +2001,6 @@ var Storage = function () {
 
 /* global google */
 
-// Build the default tag URL
 var getTagUrl = function getTagUrl() {
     var params = {
         AV_PUBLISHERID: '58c25bb0073ef448b1087ad6',
@@ -2634,7 +2632,7 @@ var Ads = function () {
 
             this.player.debug.log('Safety timer invoked from: ' + from);
 
-            this.safetyTimer = window.setTimeout(function () {
+            this.safetyTimer = setTimeout(function () {
                 _this10.cancel();
                 _this10.clearSafetyTimer('startSafetyTimer()');
             }, time);
@@ -2663,7 +2661,6 @@ var Ads = function () {
 // Plyr Event Listeners
 // ==========================================================================
 
-// Sniff out the browser
 var browser$2 = utils.getBrowser();
 
 var listeners = {
@@ -2838,7 +2835,7 @@ var listeners = {
 
             // Delay the adding of classname until the focus has changed
             // This event fires before the focusin event
-            window.setTimeout(function () {
+            setTimeout(function () {
                 utils.toggleClass(utils.getFocusElement(), _this.config.classNames.tabFocus, true);
             }, 0);
         });
@@ -3241,6 +3238,8 @@ var ui = {
 
     // Setup the UI
     build: function build() {
+        var _this = this;
+
         // Re-attach media element listeners
         // TODO: Use event bubbling
         listeners.media.call(this);
@@ -3301,7 +3300,9 @@ var ui = {
         this.ready = true;
 
         // Ready event at end of execution stack
-        utils.dispatchEvent.call(this, this.media, 'ready');
+        setTimeout(function () {
+            utils.dispatchEvent.call(_this, _this.media, 'ready');
+        }, 0);
 
         // Set the title
         ui.setTitle.call(this);
@@ -3361,7 +3362,7 @@ var ui = {
 
     // Check if media is loading
     checkLoading: function checkLoading(event) {
-        var _this = this;
+        var _this2 = this;
 
         this.loading = ['stalled', 'waiting'].includes(event.type);
 
@@ -3371,17 +3372,17 @@ var ui = {
         // Timer to prevent flicker when seeking
         this.timers.loading = setTimeout(function () {
             // Toggle container class hook
-            utils.toggleClass(_this.elements.container, _this.config.classNames.loading, _this.loading);
+            utils.toggleClass(_this2.elements.container, _this2.config.classNames.loading, _this2.loading);
 
             // Show controls if loading, hide if done
-            _this.toggleControls(_this.loading);
+            _this2.toggleControls(_this2.loading);
         }, this.loading ? 250 : 0);
     },
 
 
     // Check if media failed to load
     checkFailed: function checkFailed() {
-        var _this2 = this;
+        var _this3 = this;
 
         // https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/networkState
         this.failed = this.media.networkState === 3;
@@ -3397,10 +3398,10 @@ var ui = {
         // Timer to prevent flicker when seeking
         this.timers.loading = setTimeout(function () {
             // Toggle container class hook
-            utils.toggleClass(_this2.elements.container, _this2.config.classNames.loading, _this2.loading);
+            utils.toggleClass(_this3.elements.container, _this3.config.classNames.loading, _this3.loading);
 
             // Show controls if loading, hide if done
-            _this2.toggleControls(_this2.loading);
+            _this3.toggleControls(_this3.loading);
         }, this.loading ? 250 : 0);
     },
 
@@ -3459,7 +3460,7 @@ var ui = {
 
     // Update <progress> elements
     updateProgress: function updateProgress(event) {
-        var _this3 = this;
+        var _this4 = this;
 
         if (!this.supported.ui || !utils.is.event(event)) {
             return;
@@ -3485,12 +3486,12 @@ var ui = {
                 case 'playing':
                 case 'progress':
                     value = function () {
-                        var buffered = _this3.media.buffered;
+                        var buffered = _this4.media.buffered;
 
 
                         if (buffered && buffered.length) {
                             // HTML5
-                            return utils.getPercentage(buffered.end(0), _this3.duration);
+                            return utils.getPercentage(buffered.end(0), _this4.duration);
                         } else if (utils.is.number(buffered)) {
                             // YouTube returns between 0 and 1
                             return buffered * 100;
@@ -3575,7 +3576,6 @@ var ui = {
 // Plyr controls
 // ==========================================================================
 
-// Sniff out the browser
 var browser$1 = utils.getBrowser();
 
 var controls = {
@@ -5177,17 +5177,14 @@ var youtube = {
                     // Create a faux HTML5 API using the YouTube API
                     player.media.play = function () {
                         instance.playVideo();
-                        player.media.paused = false;
                     };
 
                     player.media.pause = function () {
                         instance.pauseVideo();
-                        player.media.paused = true;
                     };
 
                     player.media.stop = function () {
                         instance.stopVideo();
-                        player.media.paused = true;
                     };
 
                     player.media.duration = instance.getDuration();
@@ -5316,7 +5313,7 @@ var youtube = {
                     }, 200);
 
                     // Rebuild UI
-                    window.setTimeout(function () {
+                    setTimeout(function () {
                         return ui.build.call(player);
                     }, 50);
                 },
@@ -5719,7 +5716,7 @@ var vimeo = {
         });
 
         // Rebuild UI
-        window.setTimeout(function () {
+        setTimeout(function () {
             return ui.build.call(player);
         }, 0);
     }
@@ -5729,7 +5726,6 @@ var vimeo = {
 // Plyr Media
 // ==========================================================================
 
-// Sniff out the browser
 var browser$3 = utils.getBrowser();
 
 var media = {
@@ -6500,15 +6496,7 @@ var Plyr = function () {
             // If toggle is false or if we're playing (regardless of toggle),
             // then set the timer to hide the controls
             if (!show || this.playing) {
-                this.timers.controls = window.setTimeout(function () {
-                    /* this.debug.warn({
-                        pressed: this.elements.controls.pressed,
-                        hover: this.elements.controls.pressed,
-                        playing: this.playing,
-                        paused: this.paused,
-                        loading: this.loading,
-                    }); */
-
+                this.timers.controls = setTimeout(function () {
                     // If the mouse is over the controls (and not entering fullscreen), bail
                     if ((_this2.elements.controls.pressed || _this2.elements.controls.hover) && !isEnterFullscreen) {
                         return;
@@ -6652,7 +6640,7 @@ var Plyr = function () {
                     }
 
                     // Vimeo does not always return
-                    window.setTimeout(done, 200);
+                    setTimeout(done, 200);
 
                     break;
 

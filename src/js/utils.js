@@ -854,7 +854,7 @@ const utils = {
 
     // Force repaint of element
     repaint(element) {
-        window.setTimeout(() => {
+        setTimeout(() => {
             utils.toggleHidden(element, true);
             element.offsetHeight; // eslint-disable-line
             utils.toggleHidden(element, false);

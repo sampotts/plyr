@@ -311,7 +311,7 @@ const vimeo = {
         });
 
         // Rebuild UI
-        window.setTimeout(() => ui.build.call(player), 0);
+        setTimeout(() => ui.build.call(player), 0);
     },
 };
 

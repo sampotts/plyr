@@ -194,17 +194,14 @@ const youtube = {
                     // Create a faux HTML5 API using the YouTube API
                     player.media.play = () => {
                         instance.playVideo();
-                        player.media.paused = false;
                     };
 
                     player.media.pause = () => {
                         instance.pauseVideo();
-                        player.media.paused = true;
                     };
 
                     player.media.stop = () => {
                         instance.stopVideo();
-                        player.media.paused = true;
                     };
 
                     player.media.duration = instance.getDuration();
@@ -331,7 +328,7 @@ const youtube = {
                     }, 200);
 
                     // Rebuild UI
-                    window.setTimeout(() => ui.build.call(player), 50);
+                    setTimeout(() => ui.build.call(player), 50);
                 },
                 onStateChange(event) {
                     // Get the instance

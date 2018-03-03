@@ -553,7 +553,7 @@ class Ads {
     startSafetyTimer(time, from) {
         this.player.debug.log(`Safety timer invoked from: ${from}`);
 
-        this.safetyTimer = window.setTimeout(() => {
+        this.safetyTimer = setTimeout(() => {
             this.cancel();
             this.clearSafetyTimer('startSafetyTimer()');
         }, time);
