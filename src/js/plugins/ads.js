@@ -36,9 +36,8 @@ class Ads {
         this.playing = false;
         this.initialized = false;
         this.blocked = false;
-        this.enabled = utils.is.url(player.config.ads.tag);
 
-        // Check if a tag URL is provided.
+        // Check if ads are enabled.
         if (!this.enabled) {
             return;
         }
@@ -83,14 +82,12 @@ class Ads {
         // thing doesn't resolve within our set time; we bail
         this.startSafetyTimer(12000, 'ready()');
 
-        // Setup a simple promise to resolve if the IMA loader is ready
-        this.loaderPromise = new Promise(resolve => {
-            this.on('ADS_LOADER_LOADED', () => resolve());
-        });
-
         // Setup a promise to resolve if the IMA manager is ready
-        this.managerPromise = new Promise(resolve => {
+        this.managerPromise = new Promise((resolve, reject) => {
+            // The ad is pre-loaded and ready
             this.on('ADS_MANAGER_LOADED', () => resolve());
+            // Ads failed
+            this.on('ERROR', () => reject());
         });
 
         // Clear the safety timer
