@@ -9,7 +9,19 @@
     position: absolute;
     right: 0;
     top: 0;
-    z-index: 3; // Above the controls
+    z-index: -1; // Hide it.
+
+    // Make sure the inner container is big enough for the ad creative.
+    > div {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        iframe {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+    }
 
     &::after {
         background: rgba($plyr-color-gunmetal, 0.8);

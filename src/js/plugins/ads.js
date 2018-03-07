@@ -111,7 +111,6 @@ class Ads {
         // Create the container for our advertisements
         this.elements.container = utils.createElement('div', {
             class: this.player.config.classNames.ads,
-            hidden: '',
         });
         this.player.elements.container.appendChild(this.elements.container);
 
@@ -451,8 +450,8 @@ class Ads {
      * Resume our video.
      */
     resumeContent() {
-        // Hide our ad container
-        utils.toggleHidden(this.elements.container, true);
+        // Hide the advertisement container
+        this.elements.container.style.zIndex = '';
 
         // Ad is stopped
         this.playing = false;
@@ -467,8 +466,8 @@ class Ads {
      * Pause our video
      */
     pauseContent() {
-        // Show our ad container.
-        utils.toggleHidden(this.elements.container, false);
+        // Show the advertisement container
+        this.elements.container.style.zIndex = '3';
 
         // Ad is playing.
         this.playing = true;
