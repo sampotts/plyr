@@ -206,7 +206,7 @@ class Ads {
 
         // Add advertisement cue's within the time line if available
         this.cuePoints.forEach(cuePoint => {
-            if (cuePoint !== 0 && cuePoint !== -1) {
+            if (cuePoint !== 0 && cuePoint !== -1 && cuePoint < this.player.duration) {
                 const seekElement = this.player.elements.progress;
 
                 if (seekElement) {
