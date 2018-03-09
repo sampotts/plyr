@@ -311,10 +311,10 @@ class Plyr {
     play() {
         // Return the promise (for HTML5)
         if (this.ads.enabled && !this.ads.initialized) {
-            this.ads.managerPromise.then(() => {
+            return this.ads.managerPromise.then(() => {
                 this.ads.play();
             }).catch(() => {
-                return this.media.play();
+                this.media.play();
             });
         } else {
             return this.media.play();
