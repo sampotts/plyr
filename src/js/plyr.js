@@ -316,9 +316,9 @@ class Plyr {
             }).catch(() => {
                 this.media.play();
             });
-        } else {
-            return this.media.play();
         }
+
+        return this.media.play();
     }
 
     /**
