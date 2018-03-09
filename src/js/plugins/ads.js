@@ -68,9 +68,9 @@ class Ads {
         // Setup a promise to resolve when the IMA manager is ready
         this.managerPromise = new Promise((resolve, reject) => {
             // The ad is pre-loaded and ready
-            this.on('ADS_MANAGER_LOADED', () => resolve());
+            this.on('ADS_MANAGER_LOADED', resolve);
             // Ads failed
-            this.on('ERROR', () => reject());
+            this.on('ERROR', reject);
         });
     }
 
@@ -503,7 +503,7 @@ class Ads {
 
             // Re-set our adsManager promises
             this.managerPromise = new Promise(resolve => {
-                this.on('ADS_MANAGER_LOADED', () => resolve());
+                this.on('ADS_MANAGER_LOADED', resolve);
                 this.player.debug.log(this.manager);
             });
 
