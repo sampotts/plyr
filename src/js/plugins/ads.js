@@ -35,35 +35,6 @@ class Ads {
         this.enabled = player.config.ads.enabled;
         this.playing = false;
         this.initialized = false;
-        this.blocked = false;
-
-        // Check if ads are enabled.
-        if (!this.enabled) {
-            return;
-        }
-
-        // Check if the Google IMA3 SDK is loaded or load it ourselves
-        if (!utils.is.object(window.google)) {
-            utils.loadScript(
-                player.config.urls.googleIMA.api,
-                () => {
-                    this.ready();
-                },
-                () => {
-                    // Script failed to load or is blocked
-                    this.blocked = true;
-                    this.player.debug.log('Ads error: Google IMA SDK failed to load');
-                },
-            );
-        } else {
-            this.ready();
-        }
-    }
-
-    /**
-     * Get the ads instance ready.
-     */
-    ready() {
         this.elements = {
             container: null,
             displayContainer: null,
@@ -75,25 +46,49 @@ class Ads {
         this.safetyTimer = null;
         this.countdownTimer = null;
 
-        // Set listeners on the Plyr instance
-        this.listeners();
+        if (this.enabled) {
+            // Check if the Google IMA3 SDK is loaded or load it ourselves
+            if (!utils.is.object(window.google)) {
+                utils.loadScript(
+                    player.config.urls.googleIMA.api,
+                    () => {
+                        this.ready();
+                    },
+                    () => {
+                        // Script failed to load or is blocked
+                        this.handleEventListeners('ERROR');
+                        this.player.debug.log('Ads error: Google IMA SDK failed to load');
+                    },
+                );
+            } else {
+                this.ready();
+            }
+        }
 
-        // Start ticking our safety timer. If the whole advertisement
-        // thing doesn't resolve within our set time; we bail
-        this.startSafetyTimer(12000, 'ready()');
-
-        // Setup a promise to resolve if the IMA manager is ready
+        // Setup a promise to resolve when the IMA manager is ready
         this.managerPromise = new Promise((resolve, reject) => {
             // The ad is pre-loaded and ready
             this.on('ADS_MANAGER_LOADED', () => resolve());
             // Ads failed
             this.on('ERROR', () => reject());
         });
+    }
+
+    /**
+     * Get the ads instance ready.
+     */
+    ready() {
+        // Start ticking our safety timer. If the whole advertisement
+        // thing doesn't resolve within our set time; we bail
+        this.startSafetyTimer(12000, 'ready()');
 
         // Clear the safety timer
         this.managerPromise.then(() => {
             this.clearSafetyTimer('onAdsManagerLoaded()');
         });
+
+        // Set listeners on the Plyr instance
+        this.listeners();
 
         // Setup the IMA SDK
         this.setupIMA();

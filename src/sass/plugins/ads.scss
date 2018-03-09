@@ -12,15 +12,11 @@
     z-index: -1; // Hide it.
 
     // Make sure the inner container is big enough for the ad creative.
-    > div {
+    > div,
+    > div iframe {
         position: absolute;
         width: 100%;
         height: 100%;
-        iframe {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-        }
     }
 
     &::after {
