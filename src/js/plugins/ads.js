@@ -50,8 +50,9 @@ class Ads {
                     })
                     .catch(() => {
                         // Script failed to load or is blocked
-                        this.trigger('ERROR');
-                        this.player.debug.error('Google IMA SDK failed to load');
+                        const message = 'Google IMA SDK failed to load';
+                        this.trigger('ERROR', new Error(message));
+                        this.player.debug.error(message);
                     });
             } else {
                 this.ready();
@@ -518,13 +519,13 @@ class Ads {
      * Handles callbacks after an ad event was invoked
      * @param {string} event - Event type
      */
-    trigger(event) {
+    trigger(event, ...args) {
         const handlers = this.events[event];
 
         if (utils.is.array(handlers)) {
             handlers.forEach(handler => {
                 if (utils.is.function(handler)) {
-                    handler.call(this);
+                    handler.apply(this, args);
                 }
             });
         }
