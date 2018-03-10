@@ -19,7 +19,9 @@ const youtube = {
             youtube.ready.call(this);
         } else {
             // Load the API
-            utils.loadScript(this.config.urls.youtube.api);
+            utils.loadScript(this.config.urls.youtube.api).catch(error => {
+                this.debug.warn('YouTube API failed to load', error);
+            });
 
             // Setup callback for the API
             // YouTube has it's own system of course...

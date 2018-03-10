@@ -16,9 +16,14 @@ const vimeo = {
 
         // Load the API if not already
         if (!utils.is.object(window.Vimeo)) {
-            utils.loadScript(this.config.urls.vimeo.api, () => {
-                vimeo.ready.call(this);
-            });
+            utils
+                .loadScript(this.config.urls.vimeo.api)
+                .then(() => {
+                    vimeo.ready.call(this);
+                })
+                .catch(error => {
+                    this.debug.warn('Vimeo API failed to load', error);
+                });
         } else {
             vimeo.ready.call(this);
         }

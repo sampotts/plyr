@@ -26,7 +26,7 @@ const ui = {
     build() {
         // Re-attach media element listeners
         // TODO: Use event bubbling
-        listeners.media.call(this);
+        this.listeners.media();
 
         // Don't setup interface if no support
         if (!this.supported.ui) {
@@ -45,7 +45,7 @@ const ui = {
             controls.inject.call(this);
 
             // Re-attach control listeners
-            listeners.controls.call(this);
+            this.listeners.controls();
         }
 
         // If there's no controls, bail

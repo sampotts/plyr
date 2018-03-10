@@ -12,12 +12,12 @@ import utils from './utils';
 
 import Console from './console';
 import Fullscreen from './fullscreen';
+import Listeners from './listeners';
 import Storage from './storage';
 import Ads from './plugins/ads';
 
 import captions from './captions';
 import controls from './controls';
-import listeners from './listeners';
 import media from './media';
 import source from './source';
 import ui from './ui';
@@ -235,6 +235,9 @@ class Plyr {
             return;
         }
 
+        // Create listeners
+        this.listeners = new Listeners(this);
+
         // Setup local storage for user settings
         this.storage = new Storage(this);
 
@@ -249,9 +252,6 @@ class Plyr {
 
         // Allow focus to be captured
         this.elements.container.setAttribute('tabindex', 0);
-
-        // Global listeners
-        listeners.global.call(this);
 
         // Add style hook
         ui.addStyleHook.call(this);
@@ -271,6 +271,12 @@ class Plyr {
         if (this.isHTML5 || (this.isEmbed && !this.supported.ui)) {
             ui.build.call(this);
         }
+
+        // Container listeners
+        this.listeners.container();
+
+        // Global listeners
+        this.listeners.global(true);
 
         // Setup fullscreen
         this.fullscreen = new Fullscreen(this);
@@ -309,15 +315,12 @@ class Plyr {
      * Play the media, or play the advertisement (if they are not blocked)
      */
     play() {
-        // Return the promise (for HTML5)
+        // If ads are enabled, wait for them first
         if (this.ads.enabled && !this.ads.initialized) {
-            return this.ads.managerPromise.then(() => {
-                this.ads.play();
-            }).catch(() => {
-                this.media.play();
-            });
+            return this.ads.managerPromise.then(() => this.ads.play()).catch(() => this.media.play());
         }
 
+        // Return the promise (for HTML5)
         return this.media.play();
     }
 
@@ -1056,6 +1059,9 @@ class Plyr {
             } else {
                 // Replace the container with the original element provided
                 utils.replaceElement(this.elements.original, this.elements.container);
+
+                // Unbind global listeners
+                this.listeners.global(false);
 
                 // Event
                 utils.dispatchEvent.call(this, this.elements.original, 'destroyed', true);

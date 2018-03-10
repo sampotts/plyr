@@ -123,29 +123,29 @@ const utils = {
     },
 
     // Load an external script
-    loadScript(url, callback, error) {
-        const current = document.querySelector(`script[src="${url}"]`);
+    loadScript(url) {
+        return new Promise((resolve, reject) => {
+            const current = document.querySelector(`script[src="${url}"]`);
 
-        // Check script is not already referenced, if so wait for load
-        if (current !== null) {
-            current.callbacks = current.callbacks || [];
-            current.callbacks.push(callback);
-            return;
-        }
+            // Check script is not already referenced, if so wait for load
+            if (current !== null) {
+                current.callbacks = current.callbacks || [];
+                current.callbacks.push(resolve);
+                return;
+            }
 
-        // Build the element
-        const element = document.createElement('script');
+            // Build the element
+            const element = document.createElement('script');
 
-        // Callback queue
-        element.callbacks = element.callbacks || [];
-        element.callbacks.push(callback);
+            // Callback queue
+            element.callbacks = element.callbacks || [];
+            element.callbacks.push(resolve);
 
-        // Error queue
-        element.errors = element.errors || [];
-        element.errors.push(error);
+            // Error queue
+            element.errors = element.errors || [];
+            element.errors.push(reject);
 
-        // Bind callback
-        if (utils.is.function(callback)) {
+            // Bind callback
             element.addEventListener(
                 'load',
                 event => {
@@ -154,24 +154,24 @@ const utils = {
                 },
                 false,
             );
-        }
 
-        // Bind error handling
-        element.addEventListener(
-            'error',
-            event => {
-                element.errors.forEach(err => err.call(null, event));
-                element.errors = null;
-            },
-            false,
-        );
+            // Bind error handling
+            element.addEventListener(
+                'error',
+                event => {
+                    element.errors.forEach(err => err.call(null, event));
+                    element.errors = null;
+                },
+                false,
+            );
 
-        // Set the URL after binding callback
-        element.src = url;
+            // Set the URL after binding callback
+            element.src = url;
 
-        // Inject
-        const first = document.getElementsByTagName('script')[0];
-        first.parentNode.insertBefore(element, first);
+            // Inject
+            const first = document.getElementsByTagName('script')[0];
+            first.parentNode.insertBefore(element, first);
+        });
     },
 
     // Load an external SVG sprite

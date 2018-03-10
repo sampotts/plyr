@@ -752,6 +752,12 @@ const controls = {
     toggleMenu(event) {
         const { form } = this.elements.settings;
         const button = this.elements.buttons.settings;
+
+        // Menu and button are required
+        if (!utils.is.element(form) || !utils.is.element(button)) {
+            return;
+        }
+
         const show = utils.is.boolean(event) ? event : utils.is.element(form) && form.getAttribute('aria-hidden') === 'true';
 
         if (utils.is.event(event)) {

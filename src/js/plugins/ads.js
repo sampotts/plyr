@@ -8,22 +8,6 @@
 
 import utils from '../utils';
 
-// Build the default tag URL
-const getTagUrl = () => {
-    const params = {
-        AV_PUBLISHERID: '58c25bb0073ef448b1087ad6',
-        AV_CHANNELID: '5a0458dc28a06145e4519d21',
-        AV_URL: '127.0.0.1:3000',
-        cb: 1,
-        AV_WIDTH: 640,
-        AV_HEIGHT: 480,
-    };
-
-    const base = 'https://go.aniview.com/api/adserver6/vast/';
-
-    return `${base}?${utils.buildUrlParams(params)}`;
-};
-
 class Ads {
     /**
      * Ads constructor.
@@ -32,7 +16,8 @@ class Ads {
      */
     constructor(player) {
         this.player = player;
-        this.enabled = player.config.ads.enabled;
+        this.publisherId = player.config.ads.publisherId;
+        this.enabled = player.isHTML5 && player.isVideo && player.config.ads.enabled && utils.is.string(this.publisherId) && this.publisherId.length;
         this.playing = false;
         this.initialized = false;
         this.elements = {
@@ -46,32 +31,32 @@ class Ads {
         this.safetyTimer = null;
         this.countdownTimer = null;
 
-        if (this.enabled) {
-            // Check if the Google IMA3 SDK is loaded or load it ourselves
-            if (!utils.is.object(window.google)) {
-                utils.loadScript(
-                    player.config.urls.googleIMA.api,
-                    () => {
-                        this.ready();
-                    },
-                    () => {
-                        // Script failed to load or is blocked
-                        this.handleEventListeners('ERROR');
-                        this.player.debug.log('Ads error: Google IMA SDK failed to load');
-                    },
-                );
-            } else {
-                this.ready();
-            }
-        }
-
         // Setup a promise to resolve when the IMA manager is ready
         this.managerPromise = new Promise((resolve, reject) => {
             // The ad is pre-loaded and ready
             this.on('ADS_MANAGER_LOADED', resolve);
+
             // Ads failed
             this.on('ERROR', reject);
         });
+
+        if (this.enabled) {
+            // Check if the Google IMA3 SDK is loaded or load it ourselves
+            if (!utils.is.object(window.google)) {
+                utils
+                    .loadScript(player.config.urls.googleIMA.api)
+                    .then(() => {
+                        this.ready();
+                    })
+                    .catch(() => {
+                        // Script failed to load or is blocked
+                        this.trigger('ERROR');
+                        this.player.debug.error('Google IMA SDK failed to load');
+                    });
+            } else {
+                this.ready();
+            }
+        }
     }
 
     /**
@@ -92,6 +77,23 @@ class Ads {
 
         // Setup the IMA SDK
         this.setupIMA();
+    }
+
+    // Build the default tag URL
+    get tagUrl() {
+        const params = {
+            AV_PUBLISHERID: '58c25bb0073ef448b1087ad6',
+            AV_CHANNELID: '5a0458dc28a06145e4519d21',
+            AV_URL: location.hostname,
+            cb: Date.now(),
+            AV_WIDTH: 640,
+            AV_HEIGHT: 480,
+            AV_CDIM2: this.publisherId,
+        };
+
+        const base = 'https://go.aniview.com/api/adserver6/vast/';
+
+        return `${base}?${utils.buildUrlParams(params)}`;
     }
 
     /**
@@ -139,7 +141,7 @@ class Ads {
 
             // Request video ads
             const request = new google.ima.AdsRequest();
-            request.adTagUrl = getTagUrl();
+            request.adTagUrl = this.tagUrl;
 
             // Specify the linear and nonlinear slot sizes. This helps the SDK
             // to select the correct creative if multiple are returned
@@ -153,7 +155,7 @@ class Ads {
 
             this.loader.requestAds(request);
 
-            this.handleEventListeners('ADS_LOADER_LOADED');
+            this.trigger('ADS_LOADER_LOADED');
         } catch (e) {
             this.onAdError(e);
         }
@@ -171,7 +173,7 @@ class Ads {
         }
 
         const update = () => {
-            const time = utils.formatTime(this.manager.getRemainingTime());
+            const time = utils.formatTime(Math.max(this.manager.getRemainingTime(), 0));
             const label = `${this.player.config.i18n.advertisement} - ${time}`;
             this.elements.container.setAttribute('data-badge-text', label);
         };
@@ -232,7 +234,7 @@ class Ads {
         });
 
         // Resolve our adsManager
-        this.handleEventListeners('ADS_MANAGER_LOADED');
+        this.trigger('ADS_MANAGER_LOADED');
     }
 
     /**
@@ -257,7 +259,7 @@ class Ads {
             case google.ima.AdEvent.Type.LOADED:
                 // This is the first event sent for an ad - it is possible to determine whether the
                 // ad is a video ad or an overlay
-                this.handleEventListeners('LOADED');
+                this.trigger('LOADED');
 
                 // Bubble event
                 dispatchEvent('loaded');
@@ -278,7 +280,7 @@ class Ads {
             case google.ima.AdEvent.Type.ALL_ADS_COMPLETED:
                 // All ads for the current videos are done. We can now request new advertisements
                 // in case the video is re-played
-                this.handleEventListeners('ALL_ADS_COMPLETED');
+                this.trigger('ALL_ADS_COMPLETED');
 
                 // Fire event
                 dispatchEvent('allcomplete');
@@ -313,7 +315,7 @@ class Ads {
                 // This event indicates the ad has started - the video player can adjust the UI,
                 // for example display a pause button and remaining time. Fired when content should
                 // be paused. This usually happens right before an ad is about to cover the content
-                this.handleEventListeners('CONTENT_PAUSE_REQUESTED');
+                this.trigger('CONTENT_PAUSE_REQUESTED');
 
                 dispatchEvent('contentpause');
 
@@ -326,7 +328,7 @@ class Ads {
                 // appropriate UI actions, such as removing the timer for remaining time detection.
                 // Fired when content should be resumed. This usually happens when an ad finishes
                 // or collapses
-                this.handleEventListeners('CONTENT_RESUME_REQUESTED');
+                this.trigger('CONTENT_RESUME_REQUESTED');
 
                 dispatchEvent('contentresume');
 
@@ -462,7 +464,7 @@ class Ads {
      */
     pauseContent() {
         // Show the advertisement container
-        this.elements.container.style.zIndex = '3';
+        this.elements.container.style.zIndex = 3;
 
         // Ad is playing.
         this.playing = true;
@@ -484,7 +486,7 @@ class Ads {
         }
 
         // Tell our instance that we're done for now
-        this.handleEventListeners('ERROR');
+        this.trigger('ERROR');
 
         // Re-create our adsManager
         this.loadAds();
@@ -516,9 +518,15 @@ class Ads {
      * Handles callbacks after an ad event was invoked
      * @param {string} event - Event type
      */
-    handleEventListeners(event) {
-        if (utils.is.function(this.events[event])) {
-            this.events[event].call(this);
+    trigger(event) {
+        const handlers = this.events[event];
+
+        if (utils.is.array(handlers)) {
+            handlers.forEach(handler => {
+                if (utils.is.function(handler)) {
+                    handler.call(this);
+                }
+            });
         }
     }
 
@@ -529,7 +537,12 @@ class Ads {
      * @return {Ads}
      */
     on(event, callback) {
-        this.events[event] = callback;
+        if (!utils.is.array(this.events[event])) {
+            this.events[event] = [];
+        }
+
+        this.events[event].push(callback);
+
         return this;
     }
 

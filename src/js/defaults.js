@@ -373,9 +373,10 @@ const defaults = {
     },
 
     // Advertisements plugin
-    // Tag is not required as publisher is determined by vi.ai using the domain
+    // Register for an account here: http://vi.ai/publisher-video-monetization/?aid=plyrio
     ads: {
         enabled: false,
+        publisherId: null,
     },
 };
 

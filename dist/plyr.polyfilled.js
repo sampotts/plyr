@@ -6124,7 +6124,7 @@ var defaults = {
     'statechange', 'qualitychange', 'qualityrequested',
 
     // Ads
-    'adsloaded', 'adscontentpause', 'adsconentresume', 'adstarted', 'adsmidpoint', 'adscomplete', 'adsallcomplete', 'adsimpression', 'adsclick'],
+    'adsloaded', 'adscontentpause', 'adscontentresume', 'adstarted', 'adsmidpoint', 'adscomplete', 'adsallcomplete', 'adsimpression', 'adsclick'],
 
     // Selectors
     // Change these to match your template if using custom HTML
@@ -6231,9 +6231,10 @@ var defaults = {
     },
 
     // Advertisements plugin
-    // Tag is not required as publisher is determined by vi.ai using the domain
+    // Register for an account here: http://vi.ai/publisher-video-monetization/?aid=plyrio
     ads: {
-        enabled: false
+        enabled: false,
+        publisherId: null
     }
 };
 
@@ -6598,51 +6599,51 @@ var utils = {
 
 
     // Load an external script
-    loadScript: function loadScript(url, callback, error) {
-        var current = document.querySelector('script[src="' + url + '"]');
+    loadScript: function loadScript(url) {
+        return new Promise(function (resolve, reject) {
+            var current = document.querySelector('script[src="' + url + '"]');
 
-        // Check script is not already referenced, if so wait for load
-        if (current !== null) {
-            current.callbacks = current.callbacks || [];
-            current.callbacks.push(callback);
-            return;
-        }
+            // Check script is not already referenced, if so wait for load
+            if (current !== null) {
+                current.callbacks = current.callbacks || [];
+                current.callbacks.push(resolve);
+                return;
+            }
 
-        // Build the element
-        var element = document.createElement('script');
+            // Build the element
+            var element = document.createElement('script');
 
-        // Callback queue
-        element.callbacks = element.callbacks || [];
-        element.callbacks.push(callback);
+            // Callback queue
+            element.callbacks = element.callbacks || [];
+            element.callbacks.push(resolve);
 
-        // Error queue
-        element.errors = element.errors || [];
-        element.errors.push(error);
+            // Error queue
+            element.errors = element.errors || [];
+            element.errors.push(reject);
 
-        // Bind callback
-        if (utils.is.function(callback)) {
+            // Bind callback
             element.addEventListener('load', function (event) {
                 element.callbacks.forEach(function (cb) {
                     return cb.call(null, event);
                 });
                 element.callbacks = null;
             }, false);
-        }
 
-        // Bind error handling
-        element.addEventListener('error', function (event) {
-            element.errors.forEach(function (err) {
-                return err.call(null, event);
-            });
-            element.errors = null;
-        }, false);
+            // Bind error handling
+            element.addEventListener('error', function (event) {
+                element.errors.forEach(function (err) {
+                    return err.call(null, event);
+                });
+                element.errors = null;
+            }, false);
 
-        // Set the URL after binding callback
-        element.src = url;
+            // Set the URL after binding callback
+            element.src = url;
 
-        // Inject
-        var first = document.getElementsByTagName('script')[0];
-        first.parentNode.insertBefore(element, first);
+            // Inject
+            var first = document.getElementsByTagName('script')[0];
+            first.parentNode.insertBefore(element, first);
+        });
     },
 
 
@@ -7824,1300 +7825,236 @@ var Fullscreen = function () {
 }();
 
 // ==========================================================================
-// Plyr storage
+// Plyr Captions
+// TODO: Create as class
 // ==========================================================================
 
-var Storage = function () {
-    function Storage(player) {
-        classCallCheck(this, Storage);
-
-        this.enabled = player.config.storage.enabled;
-        this.key = player.config.storage.key;
-    }
-
-    // Check for actual support (see if we can use it)
-
-
-    createClass(Storage, [{
-        key: 'get',
-        value: function get(key) {
-            var store = window.localStorage.getItem(this.key);
-
-            if (!Storage.supported || utils.is.empty(store)) {
-                return null;
-            }
-
-            var json = JSON.parse(store);
-
-            return utils.is.string(key) && key.length ? json[key] : json;
-        }
-    }, {
-        key: 'set',
-        value: function set(object) {
-            // Bail if we don't have localStorage support or it's disabled
-            if (!Storage.supported || !this.enabled) {
-                return;
-            }
-
-            // Can only store objectst
-            if (!utils.is.object(object)) {
-                return;
-            }
-
-            // Get current storage
-            var storage = this.get();
-
-            // Default to empty object
-            if (utils.is.empty(storage)) {
-                storage = {};
-            }
-
-            // Update the working copy of the values
-            utils.extend(storage, object);
-
-            // Update storage
-            window.localStorage.setItem(this.key, JSON.stringify(storage));
-        }
-    }], [{
-        key: 'supported',
-        get: function get() {
-            if (!('localStorage' in window)) {
-                return false;
-            }
-
-            var test = '___test';
-
-            // Try to use it (it might be disabled, e.g. user is in private mode)
-            // see: https://github.com/sampotts/plyr/issues/131
-            try {
-                window.localStorage.setItem(test, test);
-                window.localStorage.removeItem(test);
-                return true;
-            } catch (e) {
-                return false;
-            }
-        }
-    }]);
-    return Storage;
-}();
-
-// ==========================================================================
-// Advertisement plugin using Google IMA HTML5 SDK
-// Create an account with our ad partner, vi here:
-// https://www.vi.ai/publisher-video-monetization/
-// ==========================================================================
-
-/* global google */
-
-var getTagUrl = function getTagUrl() {
-    var params = {
-        AV_PUBLISHERID: '58c25bb0073ef448b1087ad6',
-        AV_CHANNELID: '5a0458dc28a06145e4519d21',
-        AV_URL: '127.0.0.1:3000',
-        cb: 1,
-        AV_WIDTH: 640,
-        AV_HEIGHT: 480
-    };
-
-    var base = 'https://go.aniview.com/api/adserver6/vast/';
-
-    return base + '?' + utils.buildUrlParams(params);
-};
-
-var Ads = function () {
-    /**
-     * Ads constructor.
-     * @param {object} player
-     * @return {Ads}
-     */
-    function Ads(player) {
-        var _this = this;
-
-        classCallCheck(this, Ads);
-
-        this.player = player;
-        this.enabled = player.config.ads.enabled;
-        this.playing = false;
-        this.initialized = false;
-        this.blocked = false;
-        this.enabled = utils.is.url(player.config.ads.tag);
-
-        // Check if a tag URL is provided.
-        if (!this.enabled) {
+var captions = {
+    // Setup captions
+    setup: function setup() {
+        // Requires UI support
+        if (!this.supported.ui) {
             return;
         }
 
-        // Check if the Google IMA3 SDK is loaded or load it ourselves
-        if (!utils.is.object(window.google)) {
-            utils.loadScript(player.config.urls.googleIMA.api, function () {
-                _this.ready();
-            }, function () {
-                // Script failed to load or is blocked
-                _this.blocked = true;
-                _this.player.debug.log('Ads error: Google IMA SDK failed to load');
-            });
-        } else {
-            this.ready();
-        }
-    }
+        // Set default language if not set
+        var stored = this.storage.get('language');
 
-    /**
-     * Get the ads instance ready.
-     */
-
-
-    createClass(Ads, [{
-        key: 'ready',
-        value: function ready() {
-            var _this2 = this;
-
-            this.elements = {
-                container: null,
-                displayContainer: null
-            };
-            this.manager = null;
-            this.loader = null;
-            this.cuePoints = null;
-            this.events = {};
-            this.safetyTimer = null;
-            this.countdownTimer = null;
-
-            // Set listeners on the Plyr instance
-            this.listeners();
-
-            // Start ticking our safety timer. If the whole advertisement
-            // thing doesn't resolve within our set time; we bail
-            this.startSafetyTimer(12000, 'ready()');
-
-            // Setup a simple promise to resolve if the IMA loader is ready
-            this.loaderPromise = new Promise(function (resolve) {
-                _this2.on('ADS_LOADER_LOADED', function () {
-                    return resolve();
-                });
-            });
-
-            // Setup a promise to resolve if the IMA manager is ready
-            this.managerPromise = new Promise(function (resolve) {
-                _this2.on('ADS_MANAGER_LOADED', function () {
-                    return resolve();
-                });
-            });
-
-            // Clear the safety timer
-            this.managerPromise.then(function () {
-                _this2.clearSafetyTimer('onAdsManagerLoaded()');
-            });
-
-            // Setup the IMA SDK
-            this.setupIMA();
+        if (!utils.is.empty(stored)) {
+            this.captions.language = stored;
         }
 
-        /**
-         * In order for the SDK to display ads for our video, we need to tell it where to put them,
-         * so here we define our ad container. This div is set up to render on top of the video player.
-         * Using the code below, we tell the SDK to render ads within that div. We also provide a
-         * handle to the content video player - the SDK will poll the current time of our player to
-         * properly place mid-rolls. After we create the ad display container, we initialize it. On
-         * mobile devices, this initialization is done as the result of a user action.
-         */
-
-    }, {
-        key: 'setupIMA',
-        value: function setupIMA() {
-            // Create the container for our advertisements
-            this.elements.container = utils.createElement('div', {
-                class: this.player.config.classNames.ads,
-                hidden: ''
-            });
-            this.player.elements.container.appendChild(this.elements.container);
-
-            // So we can run VPAID2
-            google.ima.settings.setVpaidMode(google.ima.ImaSdkSettings.VpaidMode.ENABLED);
-
-            // Set language
-            google.ima.settings.setLocale(this.player.config.ads.language);
-
-            // We assume the adContainer is the video container of the plyr element
-            // that will house the ads
-            this.elements.displayContainer = new google.ima.AdDisplayContainer(this.elements.container);
-
-            // Request video ads to be pre-loaded
-            this.requestAds();
+        if (utils.is.empty(this.captions.language)) {
+            this.captions.language = this.config.captions.language.toLowerCase();
         }
 
-        /**
-         * Request advertisements
-         */
+        // Set captions enabled state if not set
+        if (!utils.is.boolean(this.captions.active)) {
+            var active = this.storage.get('captions');
 
-    }, {
-        key: 'requestAds',
-        value: function requestAds() {
-            var _this3 = this;
-
-            var container = this.player.elements.container;
-
-
-            try {
-                // Create ads loader
-                this.loader = new google.ima.AdsLoader(this.elements.displayContainer);
-
-                // Listen and respond to ads loaded and error events
-                this.loader.addEventListener(google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED, function (event) {
-                    return _this3.onAdsManagerLoaded(event);
-                }, false);
-                this.loader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, function (error) {
-                    return _this3.onAdError(error);
-                }, false);
-
-                // Request video ads
-                var request = new google.ima.AdsRequest();
-                request.adTagUrl = getTagUrl();
-
-                // Specify the linear and nonlinear slot sizes. This helps the SDK
-                // to select the correct creative if multiple are returned
-                request.linearAdSlotWidth = container.offsetWidth;
-                request.linearAdSlotHeight = container.offsetHeight;
-                request.nonLinearAdSlotWidth = container.offsetWidth;
-                request.nonLinearAdSlotHeight = container.offsetHeight;
-
-                // We only overlay ads as we only support video.
-                request.forceNonLinearFullSlot = false;
-
-                this.loader.requestAds(request);
-
-                this.handleEventListeners('ADS_LOADER_LOADED');
-            } catch (e) {
-                this.onAdError(e);
+            if (utils.is.boolean(active)) {
+                this.captions.active = active;
+            } else {
+                this.captions.active = this.config.captions.active;
             }
         }
 
-        /**
-         * Update the ad countdown
-         * @param {boolean} start
-         */
-
-    }, {
-        key: 'pollCountdown',
-        value: function pollCountdown() {
-            var _this4 = this;
-
-            var start = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-
-            if (!start) {
-                window.clearInterval(this.countdownTimer);
-                this.elements.container.removeAttribute('data-badge-text');
-                return;
+        // Only Vimeo and HTML5 video supported at this point
+        if (!this.isVideo || this.isYouTube || this.isHTML5 && !support.textTracks) {
+            // Clear menu and hide
+            if (utils.is.array(this.config.controls) && this.config.controls.includes('settings') && this.config.settings.includes('captions')) {
+                controls.setCaptionsMenu.call(this);
             }
 
-            var update = function update() {
-                var time = utils.formatTime(_this4.manager.getRemainingTime());
-                var label = _this4.player.config.i18n.advertisement + ' - ' + time;
-                _this4.elements.container.setAttribute('data-badge-text', label);
-            };
+            return;
+        }
+        // Inject the container
+        if (!utils.is.element(this.elements.captions)) {
+            this.elements.captions = utils.createElement('div', utils.getAttributesFromSelector(this.config.selectors.captions));
 
-            this.countdownTimer = window.setInterval(update, 100);
+            utils.insertAfter(this.elements.captions, this.elements.wrapper);
         }
 
-        /**
-         * This method is called whenever the ads are ready inside the AdDisplayContainer
-         * @param {Event} adsManagerLoadedEvent
-         */
+        // Set the class hook
+        utils.toggleClass(this.elements.container, this.config.classNames.captions.enabled, !utils.is.empty(captions.getTracks.call(this)));
 
-    }, {
-        key: 'onAdsManagerLoaded',
-        value: function onAdsManagerLoaded(adsManagerLoadedEvent) {
-            var _this5 = this;
+        // Get tracks
+        var tracks = captions.getTracks.call(this);
 
-            // Get the ads manager
-            var settings = new google.ima.AdsRenderingSettings();
-
-            // Tell the SDK to save and restore content video state on our behalf
-            settings.restoreCustomPlaybackStateOnAdBreakComplete = true;
-            settings.enablePreloading = true;
-
-            // The SDK is polling currentTime on the contentPlayback. And needs a duration
-            // so it can determine when to start the mid- and post-roll
-            this.manager = adsManagerLoadedEvent.getAdsManager(this.player, settings);
-
-            // Get the cue points for any mid-rolls by filtering out the pre- and post-roll
-            this.cuePoints = this.manager.getCuePoints();
-
-            // Add advertisement cue's within the time line if available
-            this.cuePoints.forEach(function (cuePoint) {
-                if (cuePoint !== 0 && cuePoint !== -1) {
-                    var seekElement = _this5.player.elements.progress;
-
-                    if (seekElement) {
-                        var cuePercentage = 100 / _this5.player.duration * cuePoint;
-                        var cue = utils.createElement('span', {
-                            class: _this5.player.config.classNames.cues
-                        });
-
-                        cue.style.left = cuePercentage.toString() + '%';
-                        seekElement.appendChild(cue);
-                    }
-                }
-            });
-
-            // Get skippable state
-            // TODO: Skip button
-            // this.manager.getAdSkippableState();
-
-            // Set volume to match player
-            this.manager.setVolume(this.player.volume);
-
-            // Add listeners to the required events
-            // Advertisement error events
-            this.manager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, function (error) {
-                return _this5.onAdError(error);
-            });
-
-            // Advertisement regular events
-            Object.keys(google.ima.AdEvent.Type).forEach(function (type) {
-                _this5.manager.addEventListener(google.ima.AdEvent.Type[type], function (event) {
-                    return _this5.onAdEvent(event);
-                });
-            });
-
-            // Resolve our adsManager
-            this.handleEventListeners('ADS_MANAGER_LOADED');
+        // If no caption file exists, hide container for caption text
+        if (utils.is.empty(tracks)) {
+            return;
         }
 
-        /**
-         * This is where all the event handling takes place. Retrieve the ad from the event. Some
-         * events (e.g. ALL_ADS_COMPLETED) don't have the ad object associated
-         * https://developers.google.com/interactive-media-ads/docs/sdks/html5/v3/apis#ima.AdEvent.Type
-         * @param {Event} event
-         */
-
-    }, {
-        key: 'onAdEvent',
-        value: function onAdEvent(event) {
-            var _this6 = this;
-
-            var container = this.player.elements.container;
-
-            // Retrieve the ad from the event. Some events (e.g. ALL_ADS_COMPLETED)
-            // don't have ad object associated
-
-            var ad = event.getAd();
-
-            // Proxy event
-            var dispatchEvent = function dispatchEvent(type) {
-                utils.dispatchEvent.call(_this6.player, _this6.player.media, 'ads' + type);
-            };
-
-            switch (event.type) {
-                case google.ima.AdEvent.Type.LOADED:
-                    // This is the first event sent for an ad - it is possible to determine whether the
-                    // ad is a video ad or an overlay
-                    this.handleEventListeners('LOADED');
-
-                    // Bubble event
-                    dispatchEvent('loaded');
-
-                    // Start countdown
-                    this.pollCountdown(true);
-
-                    if (!ad.isLinear()) {
-                        // Position AdDisplayContainer correctly for overlay
-                        ad.width = container.offsetWidth;
-                        ad.height = container.offsetHeight;
-                    }
-
-                    // console.info('Ad type: ' + event.getAd().getAdPodInfo().getPodIndex());
-                    // console.info('Ad time: ' + event.getAd().getAdPodInfo().getTimeOffset());
-                    break;
-
-                case google.ima.AdEvent.Type.ALL_ADS_COMPLETED:
-                    // All ads for the current videos are done. We can now request new advertisements
-                    // in case the video is re-played
-                    this.handleEventListeners('ALL_ADS_COMPLETED');
-
-                    // Fire event
-                    dispatchEvent('allcomplete');
-
-                    // TODO: Example for what happens when a next video in a playlist would be loaded.
-                    // So here we load a new video when all ads are done.
-                    // Then we load new ads within a new adsManager. When the video
-                    // Is started - after - the ads are loaded, then we get ads.
-                    // You can also easily test cancelling and reloading by running
-                    // player.ads.cancel() and player.ads.play from the console I guess.
-                    // this.player.source = {
-                    //     type: 'video',
-                    //     title: 'View From A Blue Moon',
-                    //     sources: [{
-                    //         src:
-                    // 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.mp4', type:
-                    // 'video/mp4', }], poster:
-                    // 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.jpg', tracks:
-                    // [ { kind: 'captions', label: 'English', srclang: 'en', src:
-                    // 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.en.vtt',
-                    // default: true, }, { kind: 'captions', label: 'French', srclang: 'fr', src:
-                    // 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.fr.vtt', }, ],
-                    // };
-
-                    // TODO: So there is still this thing where a video should only be allowed to start
-                    // playing when the IMA SDK is ready or has failed
-
-                    this.loadAds();
-                    break;
-
-                case google.ima.AdEvent.Type.CONTENT_PAUSE_REQUESTED:
-                    // This event indicates the ad has started - the video player can adjust the UI,
-                    // for example display a pause button and remaining time. Fired when content should
-                    // be paused. This usually happens right before an ad is about to cover the content
-                    this.handleEventListeners('CONTENT_PAUSE_REQUESTED');
-
-                    dispatchEvent('contentpause');
-
-                    this.pauseContent();
-
-                    break;
-
-                case google.ima.AdEvent.Type.CONTENT_RESUME_REQUESTED:
-                    // This event indicates the ad has finished - the video player can perform
-                    // appropriate UI actions, such as removing the timer for remaining time detection.
-                    // Fired when content should be resumed. This usually happens when an ad finishes
-                    // or collapses
-                    this.handleEventListeners('CONTENT_RESUME_REQUESTED');
-
-                    dispatchEvent('contentresume');
-
-                    this.pollCountdown();
-
-                    this.resumeContent();
-
-                    break;
-
-                case google.ima.AdEvent.Type.STARTED:
-                    dispatchEvent('started');
-                    break;
-
-                case google.ima.AdEvent.Type.MIDPOINT:
-                    dispatchEvent('midpoint');
-                    break;
-
-                case google.ima.AdEvent.Type.COMPLETE:
-                    dispatchEvent('complete');
-                    break;
-
-                case google.ima.AdEvent.Type.IMPRESSION:
-                    dispatchEvent('impression');
-                    break;
-
-                case google.ima.AdEvent.Type.CLICK:
-                    dispatchEvent('click');
-                    break;
-
-                default:
-                    break;
-            }
-        }
-
-        /**
-         * Any ad error handling comes through here
-         * @param {Event} event
-         */
-
-    }, {
-        key: 'onAdError',
-        value: function onAdError(event) {
-            this.cancel();
-            this.player.debug.log('Ads error', event);
-        }
-
-        /**
-         * Setup hooks for Plyr and window events. This ensures
-         * the mid- and post-roll launch at the correct time. And
-         * resize the advertisement when the player resizes
-         */
-
-    }, {
-        key: 'listeners',
-        value: function listeners() {
-            var _this7 = this;
-
-            var container = this.player.elements.container;
-
-            var time = void 0;
-
-            // Add listeners to the required events
-            this.player.on('ended', function () {
-                _this7.loader.contentComplete();
-            });
-
-            this.player.on('seeking', function () {
-                time = _this7.player.currentTime;
-                return time;
-            });
-
-            this.player.on('seeked', function () {
-                var seekedTime = _this7.player.currentTime;
-
-                _this7.cuePoints.forEach(function (cuePoint, index) {
-                    if (time < cuePoint && cuePoint < seekedTime) {
-                        _this7.manager.discardAdBreak();
-                        _this7.cuePoints.splice(index, 1);
-                    }
-                });
-            });
-
-            // Listen to the resizing of the window. And resize ad accordingly
-            // TODO: eventually implement ResizeObserver
-            window.addEventListener('resize', function () {
-                _this7.manager.resize(container.offsetWidth, container.offsetHeight, google.ima.ViewMode.NORMAL);
-            });
-        }
-
-        /**
-         * Initialize the adsManager and start playing advertisements
-         */
-
-    }, {
-        key: 'play',
-        value: function play() {
-            var _this8 = this;
-
-            var container = this.player.elements.container;
-
-
-            if (!this.managerPromise) {
-                return;
-            }
-
-            // Play the requested advertisement whenever the adsManager is ready
-            this.managerPromise.then(function () {
-                // Initialize the container. Must be done via a user action on mobile devices
-                _this8.elements.displayContainer.initialize();
-
-                try {
-                    if (!_this8.initialized) {
-                        // Initialize the ads manager. Ad rules playlist will start at this time
-                        _this8.manager.init(container.offsetWidth, container.offsetHeight, google.ima.ViewMode.NORMAL);
-
-                        // Call play to start showing the ad. Single video and overlay ads will
-                        // start at this time; the call will be ignored for ad rules
-                        _this8.manager.start();
-                    }
-
-                    _this8.initialized = true;
-                } catch (adError) {
-                    // An error may be thrown if there was a problem with the
-                    // VAST response
-                    _this8.onAdError(adError);
-                }
-            });
-        }
-
-        /**
-         * Resume our video.
-         */
-
-    }, {
-        key: 'resumeContent',
-        value: function resumeContent() {
-            // Hide our ad container
-            utils.toggleHidden(this.elements.container, true);
-
-            // Ad is stopped
-            this.playing = false;
-
-            // Play our video
-            if (this.player.currentTime < this.player.duration) {
-                this.player.play();
-            }
-        }
-
-        /**
-         * Pause our video
-         */
-
-    }, {
-        key: 'pauseContent',
-        value: function pauseContent() {
-            // Show our ad container.
-            utils.toggleHidden(this.elements.container, false);
-
-            // Ad is playing.
-            this.playing = true;
-
-            // Pause our video.
-            this.player.pause();
-        }
-
-        /**
-         * Destroy the adsManager so we can grab new ads after this. If we don't then we're not
-         * allowed to call new ads based on google policies, as they interpret this as an accidental
-         * video requests. https://developers.google.com/interactive-
-         * media-ads/docs/sdks/android/faq#8
-         */
-
-    }, {
-        key: 'cancel',
-        value: function cancel() {
-            // Pause our video
-            if (this.initialized) {
-                this.resumeContent();
-            }
-
-            // Tell our instance that we're done for now
-            this.handleEventListeners('ERROR');
-
-            // Re-create our adsManager
-            this.loadAds();
-        }
-
-        /**
-         * Re-create our adsManager
-         */
-
-    }, {
-        key: 'loadAds',
-        value: function loadAds() {
-            var _this9 = this;
-
-            // Tell our adsManager to go bye bye
-            this.managerPromise.then(function () {
-                // Destroy our adsManager
-                if (_this9.manager) {
-                    _this9.manager.destroy();
-                }
-
-                // Re-set our adsManager promises
-                _this9.managerPromise = new Promise(function (resolve) {
-                    _this9.on('ADS_MANAGER_LOADED', function () {
-                        return resolve();
+        // Get browser info
+        var browser = utils.getBrowser();
+
+        // Fix IE captions if CORS is used
+        // Fetch captions and inject as blobs instead (data URIs not supported!)
+        if (browser.isIE && window.URL) {
+            var elements = this.media.querySelectorAll('track');
+
+            Array.from(elements).forEach(function (track) {
+                var src = track.getAttribute('src');
+                var href = utils.parseUrl(src);
+
+                if (href.hostname !== window.location.href.hostname && ['http:', 'https:'].includes(href.protocol)) {
+                    utils.fetch(src, 'blob').then(function (blob) {
+                        track.setAttribute('src', window.URL.createObjectURL(blob));
+                    }).catch(function () {
+                        utils.removeElement(track);
                     });
-                    _this9.player.debug.log(_this9.manager);
-                });
-
-                // Now request some new advertisements
-                _this9.requestAds();
+                }
             });
         }
 
-        /**
-         * Handles callbacks after an ad event was invoked
-         * @param {string} event - Event type
-         */
+        // Set language
+        captions.setLanguage.call(this);
 
-    }, {
-        key: 'handleEventListeners',
-        value: function handleEventListeners(event) {
-            if (utils.is.function(this.events[event])) {
-                this.events[event].call(this);
-            }
+        // Enable UI
+        captions.show.call(this);
+
+        // Set available languages in list
+        if (utils.is.array(this.config.controls) && this.config.controls.includes('settings') && this.config.settings.includes('captions')) {
+            controls.setCaptionsMenu.call(this);
         }
+    },
 
-        /**
-         * Add event listeners
-         * @param {string} event - Event type
-         * @param {function} callback - Callback for when event occurs
-         * @return {Ads}
-         */
 
-    }, {
-        key: 'on',
-        value: function on(event, callback) {
-            this.events[event] = callback;
-            return this;
-        }
-
-        /**
-         * Setup a safety timer for when the ad network doesn't respond for whatever reason.
-         * The advertisement has 12 seconds to get its things together. We stop this timer when the
-         * advertisement is playing, or when a user action is required to start, then we clear the
-         * timer on ad ready
-         * @param {number} time
-         * @param {string} from
-         */
-
-    }, {
-        key: 'startSafetyTimer',
-        value: function startSafetyTimer(time, from) {
-            var _this10 = this;
-
-            this.player.debug.log('Safety timer invoked from: ' + from);
-
-            this.safetyTimer = setTimeout(function () {
-                _this10.cancel();
-                _this10.clearSafetyTimer('startSafetyTimer()');
-            }, time);
-        }
-
-        /**
-         * Clear our safety timer(s)
-         * @param {string} from
-         */
-
-    }, {
-        key: 'clearSafetyTimer',
-        value: function clearSafetyTimer(from) {
-            if (!utils.is.nullOrUndefined(this.safetyTimer)) {
-                this.player.debug.log('Safety timer cleared from: ' + from);
-
-                clearTimeout(this.safetyTimer);
-                this.safetyTimer = null;
-            }
-        }
-    }]);
-    return Ads;
-}();
-
-// ==========================================================================
-// Plyr Event Listeners
-// ==========================================================================
-
-var browser$2 = utils.getBrowser();
-
-var listeners = {
-    // Global listeners
-    global: function global() {
+    // Set the captions language
+    setLanguage: function setLanguage() {
         var _this = this;
 
-        var last = null;
+        // Setup HTML5 track rendering
+        if (this.isHTML5 && this.isVideo) {
+            captions.getTracks.call(this).forEach(function (track) {
+                // Show track
+                utils.on(track, 'cuechange', function (event) {
+                    return captions.setCue.call(_this, event);
+                });
 
-        // Get the key code for an event
-        var getKeyCode = function getKeyCode(event) {
-            return event.keyCode ? event.keyCode : event.which;
-        };
-
-        // Handle key press
-        var handleKey = function handleKey(event) {
-            var code = getKeyCode(event);
-            var pressed = event.type === 'keydown';
-            var repeat = pressed && code === last;
-
-            // Bail if a modifier key is set
-            if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) {
-                return;
-            }
-
-            // If the event is bubbled from the media element
-            // Firefox doesn't get the keycode for whatever reason
-            if (!utils.is.number(code)) {
-                return;
-            }
-
-            // Seek by the number keys
-            var seekByKey = function seekByKey() {
-                // Divide the max duration into 10th's and times by the number value
-                _this.currentTime = _this.duration / 10 * (code - 48);
-            };
-
-            // Handle the key on keydown
-            // Reset on keyup
-            if (pressed) {
-                // Which keycodes should we prevent default
-                var preventDefault = [48, 49, 50, 51, 52, 53, 54, 56, 57, 32, 75, 38, 40, 77, 39, 37, 70, 67, 73, 76, 79];
-
-                // Check focused element
-                // and if the focused element is not editable (e.g. text input)
-                // and any that accept key input http://webaim.org/techniques/keyboard/
-                var focused = utils.getFocusElement();
-                if (utils.is.element(focused) && utils.matches(focused, _this.config.selectors.editable)) {
-                    return;
-                }
-
-                // If the code is found prevent default (e.g. prevent scrolling for arrows)
-                if (preventDefault.includes(code)) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-
-                switch (code) {
-                    case 48:
-                    case 49:
-                    case 50:
-                    case 51:
-                    case 52:
-                    case 53:
-                    case 54:
-                    case 55:
-                    case 56:
-                    case 57:
-                        // 0-9
-                        if (!repeat) {
-                            seekByKey();
-                        }
-                        break;
-
-                    case 32:
-                    case 75:
-                        // Space and K key
-                        if (!repeat) {
-                            _this.togglePlay();
-                        }
-                        break;
-
-                    case 38:
-                        // Arrow up
-                        _this.increaseVolume(0.1);
-                        break;
-
-                    case 40:
-                        // Arrow down
-                        _this.decreaseVolume(0.1);
-                        break;
-
-                    case 77:
-                        // M key
-                        if (!repeat) {
-                            _this.muted = !_this.muted;
-                        }
-                        break;
-
-                    case 39:
-                        // Arrow forward
-                        _this.forward();
-                        break;
-
-                    case 37:
-                        // Arrow back
-                        _this.rewind();
-                        break;
-
-                    case 70:
-                        // F key
-                        _this.fullscreen.toggle();
-                        break;
-
-                    case 67:
-                        // C key
-                        if (!repeat) {
-                            _this.toggleCaptions();
-                        }
-                        break;
-
-                    case 76:
-                        // L key
-                        _this.loop = !_this.loop;
-                        break;
-
-                    /* case 73:
-                        this.setLoop('start');
-                        break;
-                     case 76:
-                        this.setLoop();
-                        break;
-                     case 79:
-                        this.setLoop('end');
-                        break; */
-
-                    default:
-                        break;
-                }
-
-                // Escape is handle natively when in full screen
-                // So we only need to worry about non native
-                if (!_this.fullscreen.enabled && _this.fullscreen.active && code === 27) {
-                    _this.fullscreen.toggle();
-                }
-
-                // Store last code for next cycle
-                last = code;
-            } else {
-                last = null;
-            }
-        };
-
-        // Keyboard shortcuts
-        if (this.config.keyboard.global) {
-            utils.on(window, 'keydown keyup', handleKey, false);
-        } else if (this.config.keyboard.focused) {
-            utils.on(this.elements.container, 'keydown keyup', handleKey, false);
-        }
-
-        // Detect tab focus
-        // Remove class on blur/focusout
-        utils.on(this.elements.container, 'focusout', function (event) {
-            utils.toggleClass(event.target, _this.config.classNames.tabFocus, false);
-        });
-
-        // Add classname to tabbed elements
-        utils.on(this.elements.container, 'keydown', function (event) {
-            if (event.keyCode !== 9) {
-                return;
-            }
-
-            // Delay the adding of classname until the focus has changed
-            // This event fires before the focusin event
-            setTimeout(function () {
-                utils.toggleClass(utils.getFocusElement(), _this.config.classNames.tabFocus, true);
-            }, 0);
-        });
-
-        // Toggle controls visibility based on mouse movement
-        if (this.config.hideControls) {
-            // Toggle controls on mouse events and entering fullscreen
-            utils.on(this.elements.container, 'mouseenter mouseleave mousemove touchstart touchend touchmove enterfullscreen exitfullscreen', function (event) {
-                _this.toggleControls(event);
+                // Turn off native caption rendering to avoid double captions
+                // eslint-disable-next-line
+                track.mode = 'hidden';
             });
+
+            // Get current track
+            var currentTrack = captions.getCurrentTrack.call(this);
+
+            // Check if suported kind
+            if (utils.is.track(currentTrack)) {
+                // If we change the active track while a cue is already displayed we need to update it
+                if (Array.from(currentTrack.activeCues || []).length) {
+                    captions.setCue.call(this, currentTrack);
+                }
+            }
+        } else if (this.isVimeo && this.captions.active) {
+            this.embed.enableTextTrack(this.language);
         }
     },
 
 
-    // Listen for media events
-    media: function media() {
+    // Get the tracks
+    getTracks: function getTracks() {
+        // Return empty array at least
+        if (utils.is.nullOrUndefined(this.media)) {
+            return [];
+        }
+
+        // Only get accepted kinds
+        return Array.from(this.media.textTracks || []).filter(function (track) {
+            return ['captions', 'subtitles'].includes(track.kind);
+        });
+    },
+
+
+    // Get the current track for the current language
+    getCurrentTrack: function getCurrentTrack() {
         var _this2 = this;
 
-        // Time change on media
-        utils.on(this.media, 'timeupdate seeking', function (event) {
-            return ui.timeUpdate.call(_this2, event);
-        });
-
-        // Display duration
-        utils.on(this.media, 'durationchange loadedmetadata', function (event) {
-            return ui.durationUpdate.call(_this2, event);
-        });
-
-        // Check for audio tracks on load
-        // We can't use `loadedmetadata` as it doesn't seem to have audio tracks at that point
-        utils.on(this.media, 'loadeddata', function () {
-            utils.toggleHidden(_this2.elements.volume, !_this2.hasAudio);
-            utils.toggleHidden(_this2.elements.buttons.mute, !_this2.hasAudio);
-        });
-
-        // Handle the media finishing
-        utils.on(this.media, 'ended', function () {
-            // Show poster on end
-            if (_this2.isHTML5 && _this2.isVideo && _this2.config.showPosterOnEnd) {
-                // Restart
-                _this2.restart();
-
-                // Re-load media
-                _this2.media.load();
-            }
-        });
-
-        // Check for buffer progress
-        utils.on(this.media, 'progress playing', function (event) {
-            return ui.updateProgress.call(_this2, event);
-        });
-
-        // Handle native mute
-        utils.on(this.media, 'volumechange', function (event) {
-            return ui.updateVolume.call(_this2, event);
-        });
-
-        // Handle native play/pause
-        utils.on(this.media, 'playing play pause ended', function (event) {
-            return ui.checkPlaying.call(_this2, event);
-        });
-
-        // Loading
-        utils.on(this.media, 'waiting canplay seeked playing', function (event) {
-            return ui.checkLoading.call(_this2, event);
-        });
-
-        // Check if media failed to load
-        // utils.on(this.media, 'play', event => ui.checkFailed.call(this, event));
-
-        // Click video
-        if (this.supported.ui && this.config.clickToPlay && !this.isAudio) {
-            // Re-fetch the wrapper
-            var wrapper = utils.getElement.call(this, '.' + this.config.classNames.video);
-
-            // Bail if there's no wrapper (this should never happen)
-            if (!utils.is.element(wrapper)) {
-                return;
-            }
-
-            // On click play, pause ore restart
-            utils.on(wrapper, 'click', function () {
-                // Touch devices will just show controls (if we're hiding controls)
-                if (_this2.config.hideControls && support.touch && !_this2.paused) {
-                    return;
-                }
-
-                if (_this2.paused) {
-                    _this2.play();
-                } else if (_this2.ended) {
-                    _this2.restart();
-                    _this2.play();
-                } else {
-                    _this2.pause();
-                }
-            });
-        }
-
-        // Disable right click
-        if (this.supported.ui && this.config.disableContextMenu) {
-            utils.on(this.media, 'contextmenu', function (event) {
-                event.preventDefault();
-            }, false);
-        }
-
-        // Volume change
-        utils.on(this.media, 'volumechange', function () {
-            // Save to storage
-            _this2.storage.set({ volume: _this2.volume, muted: _this2.muted });
-        });
-
-        // Speed change
-        utils.on(this.media, 'ratechange', function () {
-            // Update UI
-            controls.updateSetting.call(_this2, 'speed');
-
-            // Save to storage
-            _this2.storage.set({ speed: _this2.speed });
-        });
-
-        // Quality change
-        utils.on(this.media, 'qualitychange', function () {
-            // Update UI
-            controls.updateSetting.call(_this2, 'quality');
-
-            // Save to storage
-            _this2.storage.set({ quality: _this2.quality });
-        });
-
-        // Caption language change
-        utils.on(this.media, 'languagechange', function () {
-            // Update UI
-            controls.updateSetting.call(_this2, 'captions');
-
-            // Save to storage
-            _this2.storage.set({ language: _this2.language });
-        });
-
-        // Captions toggle
-        utils.on(this.media, 'captionsenabled captionsdisabled', function () {
-            // Update UI
-            controls.updateSetting.call(_this2, 'captions');
-
-            // Save to storage
-            _this2.storage.set({ captions: _this2.captions.active });
-        });
-
-        // Proxy events to container
-        // Bubble up key events for Edge
-        utils.on(this.media, this.config.events.concat(['keyup', 'keydown']).join(' '), function (event) {
-            var detail = {};
-
-            // Get error details from media
-            if (event.type === 'error') {
-                detail = _this2.media.error;
-            }
-
-            utils.dispatchEvent.call(_this2, _this2.elements.container, event.type, true, detail);
+        return captions.getTracks.call(this).find(function (track) {
+            return track.language.toLowerCase() === _this2.language;
         });
     },
 
 
-    // Listen for control events
-    controls: function controls$$1() {
-        var _this3 = this;
+    // Display active caption if it contains text
+    setCue: function setCue(input) {
+        // Get the track from the event if needed
+        var track = utils.is.event(input) ? input.target : input;
+        var activeCues = track.activeCues;
 
-        // IE doesn't support input event, so we fallback to change
-        var inputEvent = browser$2.isIE ? 'change' : 'input';
+        var active = activeCues.length && activeCues[0];
+        var currentTrack = captions.getCurrentTrack.call(this);
 
-        // Trigger custom and default handlers
-        var proxy = function proxy(event, handlerKey, defaultHandler) {
-            var customHandler = _this3.config.listeners[handlerKey];
+        // Only display current track
+        if (track !== currentTrack) {
+            return;
+        }
 
-            // Execute custom handler
-            if (utils.is.function(customHandler)) {
-                customHandler.call(_this3, event);
-            }
+        // Display a cue, if there is one
+        if (utils.is.cue(active)) {
+            captions.setText.call(this, active.getCueAsHTML());
+        } else {
+            captions.setText.call(this, null);
+        }
 
-            // Only call default handler if not prevented in custom handler
-            if (!event.defaultPrevented && utils.is.function(defaultHandler)) {
-                defaultHandler.call(_this3, event);
-            }
-        };
+        utils.dispatchEvent.call(this, this.media, 'cuechange');
+    },
 
-        // Play/pause toggle
-        utils.on(this.elements.buttons.play, 'click', function (event) {
-            return proxy(event, 'play', function () {
-                _this3.togglePlay();
-            });
-        });
 
-        // Pause
-        utils.on(this.elements.buttons.restart, 'click', function (event) {
-            return proxy(event, 'restart', function () {
-                _this3.restart();
-            });
-        });
+    // Set the current caption
+    setText: function setText(input) {
+        // Requires UI
+        if (!this.supported.ui) {
+            return;
+        }
 
-        // Rewind
-        utils.on(this.elements.buttons.rewind, 'click', function (event) {
-            return proxy(event, 'rewind', function () {
-                _this3.rewind();
-            });
-        });
+        if (utils.is.element(this.elements.captions)) {
+            var content = utils.createElement('span');
 
-        // Rewind
-        utils.on(this.elements.buttons.forward, 'click', function (event) {
-            return proxy(event, 'forward', function () {
-                _this3.forward();
-            });
-        });
+            // Empty the container
+            utils.emptyElement(this.elements.captions);
 
-        // Mute toggle
-        utils.on(this.elements.buttons.mute, 'click', function (event) {
-            return proxy(event, 'mute', function () {
-                _this3.muted = !_this3.muted;
-            });
-        });
+            // Default to empty
+            var caption = !utils.is.nullOrUndefined(input) ? input : '';
 
-        // Captions toggle
-        utils.on(this.elements.buttons.captions, 'click', function (event) {
-            return proxy(event, 'captions', function () {
-                _this3.toggleCaptions();
-            });
-        });
-
-        // Fullscreen toggle
-        utils.on(this.elements.buttons.fullscreen, 'click', function (event) {
-            return proxy(event, 'fullscreen', function () {
-                _this3.fullscreen.toggle();
-            });
-        });
-
-        // Picture-in-Picture
-        utils.on(this.elements.buttons.pip, 'click', function (event) {
-            return proxy(event, 'pip', function () {
-                _this3.pip = 'toggle';
-            });
-        });
-
-        // Airplay
-        utils.on(this.elements.buttons.airplay, 'click', function (event) {
-            return proxy(event, 'airplay', function () {
-                _this3.airplay();
-            });
-        });
-
-        // Settings menu
-        utils.on(this.elements.buttons.settings, 'click', function (event) {
-            controls.toggleMenu.call(_this3, event);
-        });
-
-        // Click anywhere closes menu
-        utils.on(document.documentElement, 'click', function (event) {
-            controls.toggleMenu.call(_this3, event);
-        });
-
-        // Settings menu
-        utils.on(this.elements.settings.form, 'click', function (event) {
-            event.stopPropagation();
-
-            // Settings menu items - use event delegation as items are added/removed
-            if (utils.matches(event.target, _this3.config.selectors.inputs.language)) {
-                proxy(event, 'language', function () {
-                    _this3.language = event.target.value;
-                });
-            } else if (utils.matches(event.target, _this3.config.selectors.inputs.quality)) {
-                proxy(event, 'quality', function () {
-                    _this3.quality = event.target.value;
-                });
-            } else if (utils.matches(event.target, _this3.config.selectors.inputs.speed)) {
-                proxy(event, 'speed', function () {
-                    _this3.speed = parseFloat(event.target.value);
-                });
+            // Set the span content
+            if (utils.is.string(caption)) {
+                content.textContent = caption.trim();
             } else {
-                controls.showTab.call(_this3, event);
+                content.appendChild(caption);
             }
-        });
 
-        // Seek
-        utils.on(this.elements.inputs.seek, inputEvent, function (event) {
-            return proxy(event, 'seek', function () {
-                _this3.currentTime = event.target.value / event.target.max * _this3.duration;
-            });
-        });
+            // Set new caption text
+            this.elements.captions.appendChild(content);
+        } else {
+            this.debug.warn('No captions element to render to');
+        }
+    },
 
-        // Current time invert
-        // Only if one time element is used for both currentTime and duration
-        if (this.config.toggleInvert && !utils.is.element(this.elements.display.duration)) {
-            utils.on(this.elements.display.currentTime, 'click', function () {
-                // Do nothing if we're at the start
-                if (_this3.currentTime === 0) {
-                    return;
-                }
 
-                _this3.config.invertTime = !_this3.config.invertTime;
-                ui.timeUpdate.call(_this3);
-            });
+    // Display captions container and button (for initialization)
+    show: function show() {
+        // If there's no caption toggle, bail
+        if (!utils.is.element(this.elements.buttons.captions)) {
+            return;
         }
 
-        // Volume
-        utils.on(this.elements.inputs.volume, inputEvent, function (event) {
-            return proxy(event, 'volume', function () {
-                _this3.volume = event.target.value;
-            });
-        });
+        // Try to load the value from storage
+        var active = this.storage.get('captions');
 
-        // Polyfill for lower fill in <input type="range"> for webkit
-        if (browser$2.isWebkit) {
-            utils.on(utils.getElements.call(this, 'input[type="range"]'), 'input', function (event) {
-                controls.updateRangeFill.call(_this3, event.target);
-            });
+        // Otherwise fall back to the default config
+        if (!utils.is.boolean(active)) {
+            active = this.config.captions.active;
+        } else {
+            this.captions.active = active;
         }
 
-        // Seek tooltip
-        utils.on(this.elements.progress, 'mouseenter mouseleave mousemove', function (event) {
-            return controls.updateSeekTooltip.call(_this3, event);
-        });
-
-        // Toggle controls visibility based on mouse movement
-        if (this.config.hideControls) {
-            // Watch for cursor over controls so they don't hide when trying to interact
-            utils.on(this.elements.controls, 'mouseenter mouseleave', function (event) {
-                _this3.elements.controls.hover = event.type === 'mouseenter';
-            });
-
-            // Watch for cursor over controls so they don't hide when trying to interact
-            utils.on(this.elements.controls, 'mousedown mouseup touchstart touchend touchcancel', function (event) {
-                _this3.elements.controls.pressed = ['mousedown', 'touchstart'].includes(event.type);
-            });
-
-            // Focus in/out on controls
-            utils.on(this.elements.controls, 'focusin focusout', function (event) {
-                _this3.toggleControls(event);
-            });
+        if (active) {
+            utils.toggleClass(this.elements.container, this.config.classNames.captions.active, true);
+            utils.toggleState(this.elements.buttons.captions, true);
         }
-
-        // Mouse wheel for volume
-        utils.on(this.elements.inputs.volume, 'wheel', function (event) {
-            return proxy(event, 'volume', function () {
-                // Detect "natural" scroll - suppored on OS X Safari only
-                // Other browsers on OS X will be inverted until support improves
-                var inverted = event.webkitDirectionInvertedFromDevice;
-                var step = 1 / 50;
-                var direction = 0;
-
-                // Scroll down (or up on natural) to decrease
-                if (event.deltaY < 0 || event.deltaX > 0) {
-                    if (inverted) {
-                        _this3.decreaseVolume(step);
-                        direction = -1;
-                    } else {
-                        _this3.increaseVolume(step);
-                        direction = 1;
-                    }
-                }
-
-                // Scroll up (or down on natural) to increase
-                if (event.deltaY > 0 || event.deltaX < 0) {
-                    if (inverted) {
-                        _this3.increaseVolume(step);
-                        direction = 1;
-                    } else {
-                        _this3.decreaseVolume(step);
-                        direction = -1;
-                    }
-                }
-
-                // Don't break page scrolling at max and min
-                if (direction === 1 && _this3.media.volume < 1 || direction === -1 && _this3.media.volume > 0) {
-                    event.preventDefault();
-                }
-            });
-        }, false);
     }
 };
 
@@ -9150,7 +8087,7 @@ var ui = {
 
         // Re-attach media element listeners
         // TODO: Use event bubbling
-        listeners.media.call(this);
+        this.listeners.media();
 
         // Don't setup interface if no support
         if (!this.supported.ui) {
@@ -9169,7 +8106,7 @@ var ui = {
             controls.inject.call(this);
 
             // Re-attach control listeners
-            listeners.controls.call(this);
+            this.listeners.controls();
         }
 
         // If there's no controls, bail
@@ -9484,14 +8421,13 @@ var ui = {
 // Plyr controls
 // ==========================================================================
 
-// Sniff out the browser
-var browser$1 = utils.getBrowser();
+var browser$2 = utils.getBrowser();
 
 var controls = {
     // Webkit polyfill for lower fill range
     updateRangeFill: function updateRangeFill(target) {
         // WebKit only
-        if (!browser$1.isWebkit) {
+        if (!browser$2.isWebkit) {
             return;
         }
 
@@ -9512,7 +8448,7 @@ var controls = {
     getIconUrl: function getIconUrl() {
         return {
             url: this.config.iconUrl,
-            absolute: this.config.iconUrl.indexOf('http') === 0 || browser$1.isIE && !window.svg4everybody
+            absolute: this.config.iconUrl.indexOf('http') === 0 || browser$2.isIE && !window.svg4everybody
         };
     },
 
@@ -10197,6 +9133,12 @@ var controls = {
         var form = this.elements.settings.form;
 
         var button = this.elements.buttons.settings;
+
+        // Menu and button are required
+        if (!utils.is.element(form) || !utils.is.element(button)) {
+            return;
+        }
+
         var show = utils.is.boolean(event) ? event : utils.is.element(form) && form.getAttribute('aria-hidden') === 'true';
 
         if (utils.is.event(event)) {
@@ -10673,238 +9615,1341 @@ var controls = {
 };
 
 // ==========================================================================
-// Plyr Captions
-// TODO: Create as class
+// Plyr Event Listeners
 // ==========================================================================
 
-var captions = {
-    // Setup captions
-    setup: function setup() {
-        // Requires UI support
-        if (!this.supported.ui) {
-            return;
-        }
+// Sniff out the browser
+var browser$1 = utils.getBrowser();
 
-        // Set default language if not set
-        var stored = this.storage.get('language');
+var Listeners = function () {
+    function Listeners(player) {
+        classCallCheck(this, Listeners);
 
-        if (!utils.is.empty(stored)) {
-            this.captions.language = stored;
-        }
+        this.player = player;
+        this.lastKey = null;
 
-        if (utils.is.empty(this.captions.language)) {
-            this.captions.language = this.config.captions.language.toLowerCase();
-        }
+        this.handleKey = this.handleKey.bind(this);
+        this.toggleMenu = this.toggleMenu.bind(this);
+    }
 
-        // Set captions enabled state if not set
-        if (!utils.is.boolean(this.captions.active)) {
-            var active = this.storage.get('captions');
+    // Handle key presses
 
-            if (utils.is.boolean(active)) {
-                this.captions.active = active;
-            } else {
-                this.captions.active = this.config.captions.active;
-            }
-        }
 
-        // Only Vimeo and HTML5 video supported at this point
-        if (!this.isVideo || this.isYouTube || this.isHTML5 && !support.textTracks) {
-            // Clear menu and hide
-            if (utils.is.array(this.config.controls) && this.config.controls.includes('settings') && this.config.settings.includes('captions')) {
-                controls.setCaptionsMenu.call(this);
+    createClass(Listeners, [{
+        key: 'handleKey',
+        value: function handleKey(event) {
+            var _this = this;
+
+            var code = event.keyCode ? event.keyCode : event.which;
+            var pressed = event.type === 'keydown';
+            var repeat = pressed && code === this.lastKey;
+
+            // Bail if a modifier key is set
+            if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) {
+                return;
             }
 
-            return;
-        }
-        // Inject the container
-        if (!utils.is.element(this.elements.captions)) {
-            this.elements.captions = utils.createElement('div', utils.getAttributesFromSelector(this.config.selectors.captions));
+            // If the event is bubbled from the media element
+            // Firefox doesn't get the keycode for whatever reason
+            if (!utils.is.number(code)) {
+                return;
+            }
 
-            utils.insertAfter(this.elements.captions, this.elements.wrapper);
-        }
+            // Seek by the number keys
+            var seekByKey = function seekByKey() {
+                // Divide the max duration into 10th's and times by the number value
+                _this.player.currentTime = _this.player.duration / 10 * (code - 48);
+            };
 
-        // Set the class hook
-        utils.toggleClass(this.elements.container, this.config.classNames.captions.enabled, !utils.is.empty(captions.getTracks.call(this)));
+            // Handle the key on keydown
+            // Reset on keyup
+            if (pressed) {
+                // Which keycodes should we prevent default
+                var preventDefault = [48, 49, 50, 51, 52, 53, 54, 56, 57, 32, 75, 38, 40, 77, 39, 37, 70, 67, 73, 76, 79];
 
-        // Get tracks
-        var tracks = captions.getTracks.call(this);
-
-        // If no caption file exists, hide container for caption text
-        if (utils.is.empty(tracks)) {
-            return;
-        }
-
-        // Get browser info
-        var browser = utils.getBrowser();
-
-        // Fix IE captions if CORS is used
-        // Fetch captions and inject as blobs instead (data URIs not supported!)
-        if (browser.isIE && window.URL) {
-            var elements = this.media.querySelectorAll('track');
-
-            Array.from(elements).forEach(function (track) {
-                var src = track.getAttribute('src');
-                var href = utils.parseUrl(src);
-
-                if (href.hostname !== window.location.href.hostname && ['http:', 'https:'].includes(href.protocol)) {
-                    utils.fetch(src, 'blob').then(function (blob) {
-                        track.setAttribute('src', window.URL.createObjectURL(blob));
-                    }).catch(function () {
-                        utils.removeElement(track);
-                    });
+                // Check focused element
+                // and if the focused element is not editable (e.g. text input)
+                // and any that accept key input http://webaim.org/techniques/keyboard/
+                var focused = utils.getFocusElement();
+                if (utils.is.element(focused) && utils.matches(focused, this.player.config.selectors.editable)) {
+                    return;
                 }
+
+                // If the code is found prevent default (e.g. prevent scrolling for arrows)
+                if (preventDefault.includes(code)) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+
+                switch (code) {
+                    case 48:
+                    case 49:
+                    case 50:
+                    case 51:
+                    case 52:
+                    case 53:
+                    case 54:
+                    case 55:
+                    case 56:
+                    case 57:
+                        // 0-9
+                        if (!repeat) {
+                            seekByKey();
+                        }
+                        break;
+
+                    case 32:
+                    case 75:
+                        // Space and K key
+                        if (!repeat) {
+                            this.player.togglePlay();
+                        }
+                        break;
+
+                    case 38:
+                        // Arrow up
+                        this.player.increaseVolume(0.1);
+                        break;
+
+                    case 40:
+                        // Arrow down
+                        this.player.decreaseVolume(0.1);
+                        break;
+
+                    case 77:
+                        // M key
+                        if (!repeat) {
+                            this.player.muted = !this.player.muted;
+                        }
+                        break;
+
+                    case 39:
+                        // Arrow forward
+                        this.player.forward();
+                        break;
+
+                    case 37:
+                        // Arrow back
+                        this.player.rewind();
+                        break;
+
+                    case 70:
+                        // F key
+                        this.player.fullscreen.toggle();
+                        break;
+
+                    case 67:
+                        // C key
+                        if (!repeat) {
+                            this.player.toggleCaptions();
+                        }
+                        break;
+
+                    case 76:
+                        // L key
+                        this.player.loop = !this.player.loop;
+                        break;
+
+                    /* case 73:
+                        this.setLoop('start');
+                        break;
+                     case 76:
+                        this.setLoop();
+                        break;
+                     case 79:
+                        this.setLoop('end');
+                        break; */
+
+                    default:
+                        break;
+                }
+
+                // Escape is handle natively when in full screen
+                // So we only need to worry about non native
+                if (!this.player.fullscreen.enabled && this.player.fullscreen.active && code === 27) {
+                    this.player.fullscreen.toggle();
+                }
+
+                // Store last code for next cycle
+                this.lastKey = code;
+            } else {
+                this.lastKey = null;
+            }
+        }
+
+        // Toggle menu
+
+    }, {
+        key: 'toggleMenu',
+        value: function toggleMenu(event) {
+            controls.toggleMenu.call(this.player, event);
+        }
+
+        // Global window & document listeners
+
+    }, {
+        key: 'global',
+        value: function global(toggle) {
+            // Keyboard shortcuts
+            if (this.player.config.keyboard.global) {
+                utils.toggleListener(window, 'keydown keyup', this.handleKey, toggle, false);
+            }
+
+            // Click anywhere closes menu
+            utils.toggleListener(document.body, 'click', this.toggleMenu, toggle);
+        }
+
+        // Container listeners
+
+    }, {
+        key: 'container',
+        value: function container() {
+            var _this2 = this;
+
+            // Keyboard shortcuts
+            if (!this.player.config.keyboard.global && this.player.config.keyboard.focused) {
+                utils.on(this.player.elements.container, 'keydown keyup', this.handleKey, false);
+            }
+
+            // Detect tab focus
+            // Remove class on blur/focusout
+            utils.on(this.player.elements.container, 'focusout', function (event) {
+                utils.toggleClass(event.target, _this2.player.config.classNames.tabFocus, false);
+            });
+
+            // Add classname to tabbed elements
+            utils.on(this.player.elements.container, 'keydown', function (event) {
+                if (event.keyCode !== 9) {
+                    return;
+                }
+
+                // Delay the adding of classname until the focus has changed
+                // This event fires before the focusin event
+                setTimeout(function () {
+                    utils.toggleClass(utils.getFocusElement(), _this2.player.config.classNames.tabFocus, true);
+                }, 0);
+            });
+
+            // Toggle controls visibility based on mouse movement
+            if (this.player.config.hideControls) {
+                // Toggle controls on mouse events and entering fullscreen
+                utils.on(this.player.elements.container, 'mouseenter mouseleave mousemove touchstart touchend touchmove enterfullscreen exitfullscreen', function (event) {
+                    _this2.player.toggleControls(event);
+                });
+            }
+        }
+
+        // Listen for media events
+
+    }, {
+        key: 'media',
+        value: function media() {
+            var _this3 = this;
+
+            // Time change on media
+            utils.on(this.player.media, 'timeupdate seeking', function (event) {
+                return ui.timeUpdate.call(_this3.player, event);
+            });
+
+            // Display duration
+            utils.on(this.player.media, 'durationchange loadedmetadata', function (event) {
+                return ui.durationUpdate.call(_this3.player, event);
+            });
+
+            // Check for audio tracks on load
+            // We can't use `loadedmetadata` as it doesn't seem to have audio tracks at that point
+            utils.on(this.player.media, 'loadeddata', function () {
+                utils.toggleHidden(_this3.player.elements.volume, !_this3.player.hasAudio);
+                utils.toggleHidden(_this3.player.elements.buttons.mute, !_this3.player.hasAudio);
+            });
+
+            // Handle the media finishing
+            utils.on(this.player.media, 'ended', function () {
+                // Show poster on end
+                if (_this3.player.isHTML5 && _this3.player.isVideo && _this3.player.config.showPosterOnEnd) {
+                    // Restart
+                    _this3.player.restart();
+
+                    // Re-load media
+                    _this3.player.media.load();
+                }
+            });
+
+            // Check for buffer progress
+            utils.on(this.player.media, 'progress playing', function (event) {
+                return ui.updateProgress.call(_this3.player, event);
+            });
+
+            // Handle native mute
+            utils.on(this.player.media, 'volumechange', function (event) {
+                return ui.updateVolume.call(_this3.player, event);
+            });
+
+            // Handle native play/pause
+            utils.on(this.player.media, 'playing play pause ended', function (event) {
+                return ui.checkPlaying.call(_this3.player, event);
+            });
+
+            // Loading
+            utils.on(this.player.media, 'waiting canplay seeked playing', function (event) {
+                return ui.checkLoading.call(_this3.player, event);
+            });
+
+            // Check if media failed to load
+            // utils.on(this.player.media, 'play', event => ui.checkFailed.call(this.player, event));
+
+            // Click video
+            if (this.player.supported.ui && this.player.config.clickToPlay && !this.player.isAudio) {
+                // Re-fetch the wrapper
+                var wrapper = utils.getElement.call(this.player, '.' + this.player.config.classNames.video);
+
+                // Bail if there's no wrapper (this should never happen)
+                if (!utils.is.element(wrapper)) {
+                    return;
+                }
+
+                // On click play, pause ore restart
+                utils.on(wrapper, 'click', function () {
+                    // Touch devices will just show controls (if we're hiding controls)
+                    if (_this3.player.config.hideControls && support.touch && !_this3.player.paused) {
+                        return;
+                    }
+
+                    if (_this3.player.paused) {
+                        _this3.player.play();
+                    } else if (_this3.player.ended) {
+                        _this3.player.restart();
+                        _this3.player.play();
+                    } else {
+                        _this3.player.pause();
+                    }
+                });
+            }
+
+            // Disable right click
+            if (this.player.supported.ui && this.player.config.disableContextMenu) {
+                utils.on(this.player.media, 'contextmenu', function (event) {
+                    event.preventDefault();
+                }, false);
+            }
+
+            // Volume change
+            utils.on(this.player.media, 'volumechange', function () {
+                // Save to storage
+                _this3.player.storage.set({ volume: _this3.player.volume, muted: _this3.player.muted });
+            });
+
+            // Speed change
+            utils.on(this.player.media, 'ratechange', function () {
+                // Update UI
+                controls.updateSetting.call(_this3.player, 'speed');
+
+                // Save to storage
+                _this3.player.storage.set({ speed: _this3.player.speed });
+            });
+
+            // Quality change
+            utils.on(this.player.media, 'qualitychange', function () {
+                // Update UI
+                controls.updateSetting.call(_this3.player, 'quality');
+
+                // Save to storage
+                _this3.player.storage.set({ quality: _this3.player.quality });
+            });
+
+            // Caption language change
+            utils.on(this.player.media, 'languagechange', function () {
+                // Update UI
+                controls.updateSetting.call(_this3.player, 'captions');
+
+                // Save to storage
+                _this3.player.storage.set({ language: _this3.player.language });
+            });
+
+            // Captions toggle
+            utils.on(this.player.media, 'captionsenabled captionsdisabled', function () {
+                // Update UI
+                controls.updateSetting.call(_this3.player, 'captions');
+
+                // Save to storage
+                _this3.player.storage.set({ captions: _this3.player.captions.active });
+            });
+
+            // Proxy events to container
+            // Bubble up key events for Edge
+            utils.on(this.player.media, this.player.config.events.concat(['keyup', 'keydown']).join(' '), function (event) {
+                var detail = {};
+
+                // Get error details from media
+                if (event.type === 'error') {
+                    detail = _this3.player.media.error;
+                }
+
+                utils.dispatchEvent.call(_this3.player, _this3.player.elements.container, event.type, true, detail);
             });
         }
 
-        // Set language
-        captions.setLanguage.call(this);
+        // Listen for control events
 
-        // Enable UI
-        captions.show.call(this);
+    }, {
+        key: 'controls',
+        value: function controls$$1() {
+            var _this4 = this;
 
-        // Set available languages in list
-        if (utils.is.array(this.config.controls) && this.config.controls.includes('settings') && this.config.settings.includes('captions')) {
-            controls.setCaptionsMenu.call(this);
-        }
-    },
+            // IE doesn't support input event, so we fallback to change
+            var inputEvent = browser$1.isIE ? 'change' : 'input';
 
+            // Trigger custom and default handlers
+            var proxy = function proxy(event, handlerKey, defaultHandler) {
+                var customHandler = _this4.player.config.listeners[handlerKey];
 
-    // Set the captions language
-    setLanguage: function setLanguage() {
-        var _this = this;
+                // Execute custom handler
+                if (utils.is.function(customHandler)) {
+                    customHandler.call(_this4.player, event);
+                }
 
-        // Setup HTML5 track rendering
-        if (this.isHTML5 && this.isVideo) {
-            captions.getTracks.call(this).forEach(function (track) {
-                // Show track
-                utils.on(track, 'cuechange', function (event) {
-                    return captions.setCue.call(_this, event);
+                // Only call default handler if not prevented in custom handler
+                if (!event.defaultPrevented && utils.is.function(defaultHandler)) {
+                    defaultHandler.call(_this4.player, event);
+                }
+            };
+
+            // Play/pause toggle
+            utils.on(this.player.elements.buttons.play, 'click', function (event) {
+                return proxy(event, 'play', function () {
+                    _this4.player.togglePlay();
+                });
+            });
+
+            // Pause
+            utils.on(this.player.elements.buttons.restart, 'click', function (event) {
+                return proxy(event, 'restart', function () {
+                    _this4.player.restart();
+                });
+            });
+
+            // Rewind
+            utils.on(this.player.elements.buttons.rewind, 'click', function (event) {
+                return proxy(event, 'rewind', function () {
+                    _this4.player.rewind();
+                });
+            });
+
+            // Rewind
+            utils.on(this.player.elements.buttons.forward, 'click', function (event) {
+                return proxy(event, 'forward', function () {
+                    _this4.player.forward();
+                });
+            });
+
+            // Mute toggle
+            utils.on(this.player.elements.buttons.mute, 'click', function (event) {
+                return proxy(event, 'mute', function () {
+                    _this4.player.muted = !_this4.player.muted;
+                });
+            });
+
+            // Captions toggle
+            utils.on(this.player.elements.buttons.captions, 'click', function (event) {
+                return proxy(event, 'captions', function () {
+                    _this4.player.toggleCaptions();
+                });
+            });
+
+            // Fullscreen toggle
+            utils.on(this.player.elements.buttons.fullscreen, 'click', function (event) {
+                return proxy(event, 'fullscreen', function () {
+                    _this4.player.fullscreen.toggle();
+                });
+            });
+
+            // Picture-in-Picture
+            utils.on(this.player.elements.buttons.pip, 'click', function (event) {
+                return proxy(event, 'pip', function () {
+                    _this4.player.pip = 'toggle';
+                });
+            });
+
+            // Airplay
+            utils.on(this.player.elements.buttons.airplay, 'click', function (event) {
+                return proxy(event, 'airplay', function () {
+                    _this4.player.airplay();
+                });
+            });
+
+            // Settings menu
+            utils.on(this.player.elements.buttons.settings, 'click', function (event) {
+                controls.toggleMenu.call(_this4.player, event);
+            });
+
+            // Settings menu
+            utils.on(this.player.elements.settings.form, 'click', function (event) {
+                event.stopPropagation();
+
+                // Settings menu items - use event delegation as items are added/removed
+                if (utils.matches(event.target, _this4.player.config.selectors.inputs.language)) {
+                    proxy(event, 'language', function () {
+                        _this4.player.language = event.target.value;
+                    });
+                } else if (utils.matches(event.target, _this4.player.config.selectors.inputs.quality)) {
+                    proxy(event, 'quality', function () {
+                        _this4.player.quality = event.target.value;
+                    });
+                } else if (utils.matches(event.target, _this4.player.config.selectors.inputs.speed)) {
+                    proxy(event, 'speed', function () {
+                        _this4.player.speed = parseFloat(event.target.value);
+                    });
+                } else {
+                    controls.showTab.call(_this4.player, event);
+                }
+            });
+
+            // Seek
+            utils.on(this.player.elements.inputs.seek, inputEvent, function (event) {
+                return proxy(event, 'seek', function () {
+                    _this4.player.currentTime = event.target.value / event.target.max * _this4.player.duration;
+                });
+            });
+
+            // Current time invert
+            // Only if one time element is used for both currentTime and duration
+            if (this.player.config.toggleInvert && !utils.is.element(this.player.elements.display.duration)) {
+                utils.on(this.player.elements.display.currentTime, 'click', function () {
+                    // Do nothing if we're at the start
+                    if (_this4.player.currentTime === 0) {
+                        return;
+                    }
+
+                    _this4.player.config.invertTime = !_this4.player.config.invertTime;
+                    ui.timeUpdate.call(_this4.player);
+                });
+            }
+
+            // Volume
+            utils.on(this.player.elements.inputs.volume, inputEvent, function (event) {
+                return proxy(event, 'volume', function () {
+                    _this4.player.volume = event.target.value;
+                });
+            });
+
+            // Polyfill for lower fill in <input type="range"> for webkit
+            if (browser$1.isWebkit) {
+                utils.on(utils.getElements.call(this.player, 'input[type="range"]'), 'input', function (event) {
+                    controls.updateRangeFill.call(_this4.player, event.target);
+                });
+            }
+
+            // Seek tooltip
+            utils.on(this.player.elements.progress, 'mouseenter mouseleave mousemove', function (event) {
+                return controls.updateSeekTooltip.call(_this4.player, event);
+            });
+
+            // Toggle controls visibility based on mouse movement
+            if (this.player.config.hideControls) {
+                // Watch for cursor over controls so they don't hide when trying to interact
+                utils.on(this.player.elements.controls, 'mouseenter mouseleave', function (event) {
+                    _this4.player.elements.controls.hover = event.type === 'mouseenter';
                 });
 
-                // Turn off native caption rendering to avoid double captions
-                // eslint-disable-next-line
-                track.mode = 'hidden';
-            });
+                // Watch for cursor over controls so they don't hide when trying to interact
+                utils.on(this.player.elements.controls, 'mousedown mouseup touchstart touchend touchcancel', function (event) {
+                    _this4.player.elements.controls.pressed = ['mousedown', 'touchstart'].includes(event.type);
+                });
 
-            // Get current track
-            var currentTrack = captions.getCurrentTrack.call(this);
-
-            // Check if suported kind
-            if (utils.is.track(currentTrack)) {
-                // If we change the active track while a cue is already displayed we need to update it
-                if (Array.from(currentTrack.activeCues || []).length) {
-                    captions.setCue.call(this, currentTrack);
-                }
+                // Focus in/out on controls
+                utils.on(this.player.elements.controls, 'focusin focusout', function (event) {
+                    _this4.player.toggleControls(event);
+                });
             }
-        } else if (this.isVimeo && this.captions.active) {
-            this.embed.enableTextTrack(this.language);
+
+            // Mouse wheel for volume
+            utils.on(this.player.elements.inputs.volume, 'wheel', function (event) {
+                return proxy(event, 'volume', function () {
+                    // Detect "natural" scroll - suppored on OS X Safari only
+                    // Other browsers on OS X will be inverted until support improves
+                    var inverted = event.webkitDirectionInvertedFromDevice;
+                    var step = 1 / 50;
+                    var direction = 0;
+
+                    // Scroll down (or up on natural) to decrease
+                    if (event.deltaY < 0 || event.deltaX > 0) {
+                        if (inverted) {
+                            _this4.player.decreaseVolume(step);
+                            direction = -1;
+                        } else {
+                            _this4.player.increaseVolume(step);
+                            direction = 1;
+                        }
+                    }
+
+                    // Scroll up (or down on natural) to increase
+                    if (event.deltaY > 0 || event.deltaX < 0) {
+                        if (inverted) {
+                            _this4.player.increaseVolume(step);
+                            direction = 1;
+                        } else {
+                            _this4.player.decreaseVolume(step);
+                            direction = -1;
+                        }
+                    }
+
+                    // Don't break page scrolling at max and min
+                    if (direction === 1 && _this4.player.media.volume < 1 || direction === -1 && _this4.player.media.volume > 0) {
+                        event.preventDefault();
+                    }
+                });
+            }, false);
         }
-    },
+    }]);
+    return Listeners;
+}();
+
+// ==========================================================================
+// Plyr storage
+// ==========================================================================
+
+var Storage = function () {
+    function Storage(player) {
+        classCallCheck(this, Storage);
+
+        this.enabled = player.config.storage.enabled;
+        this.key = player.config.storage.key;
+    }
+
+    // Check for actual support (see if we can use it)
 
 
-    // Get the tracks
-    getTracks: function getTracks() {
-        // Return empty array at least
-        if (utils.is.nullOrUndefined(this.media)) {
-            return [];
+    createClass(Storage, [{
+        key: 'get',
+        value: function get(key) {
+            var store = window.localStorage.getItem(this.key);
+
+            if (!Storage.supported || utils.is.empty(store)) {
+                return null;
+            }
+
+            var json = JSON.parse(store);
+
+            return utils.is.string(key) && key.length ? json[key] : json;
         }
+    }, {
+        key: 'set',
+        value: function set(object) {
+            // Bail if we don't have localStorage support or it's disabled
+            if (!Storage.supported || !this.enabled) {
+                return;
+            }
 
-        // Only get accepted kinds
-        return Array.from(this.media.textTracks || []).filter(function (track) {
-            return ['captions', 'subtitles'].includes(track.kind);
+            // Can only store objectst
+            if (!utils.is.object(object)) {
+                return;
+            }
+
+            // Get current storage
+            var storage = this.get();
+
+            // Default to empty object
+            if (utils.is.empty(storage)) {
+                storage = {};
+            }
+
+            // Update the working copy of the values
+            utils.extend(storage, object);
+
+            // Update storage
+            window.localStorage.setItem(this.key, JSON.stringify(storage));
+        }
+    }], [{
+        key: 'supported',
+        get: function get() {
+            if (!('localStorage' in window)) {
+                return false;
+            }
+
+            var test = '___test';
+
+            // Try to use it (it might be disabled, e.g. user is in private mode)
+            // see: https://github.com/sampotts/plyr/issues/131
+            try {
+                window.localStorage.setItem(test, test);
+                window.localStorage.removeItem(test);
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+    }]);
+    return Storage;
+}();
+
+// ==========================================================================
+// Advertisement plugin using Google IMA HTML5 SDK
+// Create an account with our ad partner, vi here:
+// https://www.vi.ai/publisher-video-monetization/
+// ==========================================================================
+
+/* global google */
+
+var Ads = function () {
+    /**
+     * Ads constructor.
+     * @param {object} player
+     * @return {Ads}
+     */
+    function Ads(player) {
+        var _this = this;
+
+        classCallCheck(this, Ads);
+
+        this.player = player;
+        this.publisherId = player.config.ads.publisherId;
+        this.enabled = player.isHTML5 && player.isVideo && player.config.ads.enabled && utils.is.string(this.publisherId) && this.publisherId.length;
+        this.playing = false;
+        this.initialized = false;
+        this.elements = {
+            container: null,
+            displayContainer: null
+        };
+        this.manager = null;
+        this.loader = null;
+        this.cuePoints = null;
+        this.events = {};
+        this.safetyTimer = null;
+        this.countdownTimer = null;
+
+        // Setup a promise to resolve when the IMA manager is ready
+        this.managerPromise = new Promise(function (resolve, reject) {
+            // The ad is pre-loaded and ready
+            _this.on('ADS_MANAGER_LOADED', resolve);
+
+            // Ads failed
+            _this.on('ERROR', reject);
         });
-    },
 
-
-    // Get the current track for the current language
-    getCurrentTrack: function getCurrentTrack() {
-        var _this2 = this;
-
-        return captions.getTracks.call(this).find(function (track) {
-            return track.language.toLowerCase() === _this2.language;
-        });
-    },
-
-
-    // Display active caption if it contains text
-    setCue: function setCue(input) {
-        // Get the track from the event if needed
-        var track = utils.is.event(input) ? input.target : input;
-        var activeCues = track.activeCues;
-
-        var active = activeCues.length && activeCues[0];
-        var currentTrack = captions.getCurrentTrack.call(this);
-
-        // Only display current track
-        if (track !== currentTrack) {
-            return;
-        }
-
-        // Display a cue, if there is one
-        if (utils.is.cue(active)) {
-            captions.setText.call(this, active.getCueAsHTML());
-        } else {
-            captions.setText.call(this, null);
-        }
-
-        utils.dispatchEvent.call(this, this.media, 'cuechange');
-    },
-
-
-    // Set the current caption
-    setText: function setText(input) {
-        // Requires UI
-        if (!this.supported.ui) {
-            return;
-        }
-
-        if (utils.is.element(this.elements.captions)) {
-            var content = utils.createElement('span');
-
-            // Empty the container
-            utils.emptyElement(this.elements.captions);
-
-            // Default to empty
-            var caption = !utils.is.nullOrUndefined(input) ? input : '';
-
-            // Set the span content
-            if (utils.is.string(caption)) {
-                content.textContent = caption.trim();
+        if (this.enabled) {
+            // Check if the Google IMA3 SDK is loaded or load it ourselves
+            if (!utils.is.object(window.google)) {
+                utils.loadScript(player.config.urls.googleIMA.api).then(function () {
+                    _this.ready();
+                }).catch(function () {
+                    // Script failed to load or is blocked
+                    _this.trigger('ERROR');
+                    _this.player.debug.error('Google IMA SDK failed to load');
+                });
             } else {
-                content.appendChild(caption);
+                this.ready();
             }
-
-            // Set new caption text
-            this.elements.captions.appendChild(content);
-        } else {
-            this.debug.warn('No captions element to render to');
-        }
-    },
-
-
-    // Display captions container and button (for initialization)
-    show: function show() {
-        // If there's no caption toggle, bail
-        if (!utils.is.element(this.elements.buttons.captions)) {
-            return;
-        }
-
-        // Try to load the value from storage
-        var active = this.storage.get('captions');
-
-        // Otherwise fall back to the default config
-        if (!utils.is.boolean(active)) {
-            active = this.config.captions.active;
-        } else {
-            this.captions.active = active;
-        }
-
-        if (active) {
-            utils.toggleClass(this.elements.container, this.config.classNames.captions.active, true);
-            utils.toggleState(this.elements.buttons.captions, true);
         }
     }
-};
+
+    /**
+     * Get the ads instance ready.
+     */
+
+
+    createClass(Ads, [{
+        key: 'ready',
+        value: function ready() {
+            var _this2 = this;
+
+            // Start ticking our safety timer. If the whole advertisement
+            // thing doesn't resolve within our set time; we bail
+            this.startSafetyTimer(12000, 'ready()');
+
+            // Clear the safety timer
+            this.managerPromise.then(function () {
+                _this2.clearSafetyTimer('onAdsManagerLoaded()');
+            });
+
+            // Set listeners on the Plyr instance
+            this.listeners();
+
+            // Setup the IMA SDK
+            this.setupIMA();
+        }
+
+        // Build the default tag URL
+
+    }, {
+        key: 'setupIMA',
+
+
+        /**
+         * In order for the SDK to display ads for our video, we need to tell it where to put them,
+         * so here we define our ad container. This div is set up to render on top of the video player.
+         * Using the code below, we tell the SDK to render ads within that div. We also provide a
+         * handle to the content video player - the SDK will poll the current time of our player to
+         * properly place mid-rolls. After we create the ad display container, we initialize it. On
+         * mobile devices, this initialization is done as the result of a user action.
+         */
+        value: function setupIMA() {
+            // Create the container for our advertisements
+            this.elements.container = utils.createElement('div', {
+                class: this.player.config.classNames.ads
+            });
+            this.player.elements.container.appendChild(this.elements.container);
+
+            // So we can run VPAID2
+            google.ima.settings.setVpaidMode(google.ima.ImaSdkSettings.VpaidMode.ENABLED);
+
+            // Set language
+            google.ima.settings.setLocale(this.player.config.ads.language);
+
+            // We assume the adContainer is the video container of the plyr element
+            // that will house the ads
+            this.elements.displayContainer = new google.ima.AdDisplayContainer(this.elements.container);
+
+            // Request video ads to be pre-loaded
+            this.requestAds();
+        }
+
+        /**
+         * Request advertisements
+         */
+
+    }, {
+        key: 'requestAds',
+        value: function requestAds() {
+            var _this3 = this;
+
+            var container = this.player.elements.container;
+
+
+            try {
+                // Create ads loader
+                this.loader = new google.ima.AdsLoader(this.elements.displayContainer);
+
+                // Listen and respond to ads loaded and error events
+                this.loader.addEventListener(google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED, function (event) {
+                    return _this3.onAdsManagerLoaded(event);
+                }, false);
+                this.loader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, function (error) {
+                    return _this3.onAdError(error);
+                }, false);
+
+                // Request video ads
+                var request = new google.ima.AdsRequest();
+                request.adTagUrl = this.tagUrl;
+
+                // Specify the linear and nonlinear slot sizes. This helps the SDK
+                // to select the correct creative if multiple are returned
+                request.linearAdSlotWidth = container.offsetWidth;
+                request.linearAdSlotHeight = container.offsetHeight;
+                request.nonLinearAdSlotWidth = container.offsetWidth;
+                request.nonLinearAdSlotHeight = container.offsetHeight;
+
+                // We only overlay ads as we only support video.
+                request.forceNonLinearFullSlot = false;
+
+                this.loader.requestAds(request);
+
+                this.trigger('ADS_LOADER_LOADED');
+            } catch (e) {
+                this.onAdError(e);
+            }
+        }
+
+        /**
+         * Update the ad countdown
+         * @param {boolean} start
+         */
+
+    }, {
+        key: 'pollCountdown',
+        value: function pollCountdown() {
+            var _this4 = this;
+
+            var start = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+            if (!start) {
+                window.clearInterval(this.countdownTimer);
+                this.elements.container.removeAttribute('data-badge-text');
+                return;
+            }
+
+            var update = function update() {
+                var time = utils.formatTime(Math.max(_this4.manager.getRemainingTime(), 0));
+                var label = _this4.player.config.i18n.advertisement + ' - ' + time;
+                _this4.elements.container.setAttribute('data-badge-text', label);
+            };
+
+            this.countdownTimer = window.setInterval(update, 100);
+        }
+
+        /**
+         * This method is called whenever the ads are ready inside the AdDisplayContainer
+         * @param {Event} adsManagerLoadedEvent
+         */
+
+    }, {
+        key: 'onAdsManagerLoaded',
+        value: function onAdsManagerLoaded(adsManagerLoadedEvent) {
+            var _this5 = this;
+
+            // Get the ads manager
+            var settings = new google.ima.AdsRenderingSettings();
+
+            // Tell the SDK to save and restore content video state on our behalf
+            settings.restoreCustomPlaybackStateOnAdBreakComplete = true;
+            settings.enablePreloading = true;
+
+            // The SDK is polling currentTime on the contentPlayback. And needs a duration
+            // so it can determine when to start the mid- and post-roll
+            this.manager = adsManagerLoadedEvent.getAdsManager(this.player, settings);
+
+            // Get the cue points for any mid-rolls by filtering out the pre- and post-roll
+            this.cuePoints = this.manager.getCuePoints();
+
+            // Add advertisement cue's within the time line if available
+            this.cuePoints.forEach(function (cuePoint) {
+                if (cuePoint !== 0 && cuePoint !== -1 && cuePoint < _this5.player.duration) {
+                    var seekElement = _this5.player.elements.progress;
+
+                    if (seekElement) {
+                        var cuePercentage = 100 / _this5.player.duration * cuePoint;
+                        var cue = utils.createElement('span', {
+                            class: _this5.player.config.classNames.cues
+                        });
+
+                        cue.style.left = cuePercentage.toString() + '%';
+                        seekElement.appendChild(cue);
+                    }
+                }
+            });
+
+            // Get skippable state
+            // TODO: Skip button
+            // this.manager.getAdSkippableState();
+
+            // Set volume to match player
+            this.manager.setVolume(this.player.volume);
+
+            // Add listeners to the required events
+            // Advertisement error events
+            this.manager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, function (error) {
+                return _this5.onAdError(error);
+            });
+
+            // Advertisement regular events
+            Object.keys(google.ima.AdEvent.Type).forEach(function (type) {
+                _this5.manager.addEventListener(google.ima.AdEvent.Type[type], function (event) {
+                    return _this5.onAdEvent(event);
+                });
+            });
+
+            // Resolve our adsManager
+            this.trigger('ADS_MANAGER_LOADED');
+        }
+
+        /**
+         * This is where all the event handling takes place. Retrieve the ad from the event. Some
+         * events (e.g. ALL_ADS_COMPLETED) don't have the ad object associated
+         * https://developers.google.com/interactive-media-ads/docs/sdks/html5/v3/apis#ima.AdEvent.Type
+         * @param {Event} event
+         */
+
+    }, {
+        key: 'onAdEvent',
+        value: function onAdEvent(event) {
+            var _this6 = this;
+
+            var container = this.player.elements.container;
+
+            // Retrieve the ad from the event. Some events (e.g. ALL_ADS_COMPLETED)
+            // don't have ad object associated
+
+            var ad = event.getAd();
+
+            // Proxy event
+            var dispatchEvent = function dispatchEvent(type) {
+                utils.dispatchEvent.call(_this6.player, _this6.player.media, 'ads' + type);
+            };
+
+            switch (event.type) {
+                case google.ima.AdEvent.Type.LOADED:
+                    // This is the first event sent for an ad - it is possible to determine whether the
+                    // ad is a video ad or an overlay
+                    this.trigger('LOADED');
+
+                    // Bubble event
+                    dispatchEvent('loaded');
+
+                    // Start countdown
+                    this.pollCountdown(true);
+
+                    if (!ad.isLinear()) {
+                        // Position AdDisplayContainer correctly for overlay
+                        ad.width = container.offsetWidth;
+                        ad.height = container.offsetHeight;
+                    }
+
+                    // console.info('Ad type: ' + event.getAd().getAdPodInfo().getPodIndex());
+                    // console.info('Ad time: ' + event.getAd().getAdPodInfo().getTimeOffset());
+                    break;
+
+                case google.ima.AdEvent.Type.ALL_ADS_COMPLETED:
+                    // All ads for the current videos are done. We can now request new advertisements
+                    // in case the video is re-played
+                    this.trigger('ALL_ADS_COMPLETED');
+
+                    // Fire event
+                    dispatchEvent('allcomplete');
+
+                    // TODO: Example for what happens when a next video in a playlist would be loaded.
+                    // So here we load a new video when all ads are done.
+                    // Then we load new ads within a new adsManager. When the video
+                    // Is started - after - the ads are loaded, then we get ads.
+                    // You can also easily test cancelling and reloading by running
+                    // player.ads.cancel() and player.ads.play from the console I guess.
+                    // this.player.source = {
+                    //     type: 'video',
+                    //     title: 'View From A Blue Moon',
+                    //     sources: [{
+                    //         src:
+                    // 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.mp4', type:
+                    // 'video/mp4', }], poster:
+                    // 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.jpg', tracks:
+                    // [ { kind: 'captions', label: 'English', srclang: 'en', src:
+                    // 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.en.vtt',
+                    // default: true, }, { kind: 'captions', label: 'French', srclang: 'fr', src:
+                    // 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.fr.vtt', }, ],
+                    // };
+
+                    // TODO: So there is still this thing where a video should only be allowed to start
+                    // playing when the IMA SDK is ready or has failed
+
+                    this.loadAds();
+                    break;
+
+                case google.ima.AdEvent.Type.CONTENT_PAUSE_REQUESTED:
+                    // This event indicates the ad has started - the video player can adjust the UI,
+                    // for example display a pause button and remaining time. Fired when content should
+                    // be paused. This usually happens right before an ad is about to cover the content
+                    this.trigger('CONTENT_PAUSE_REQUESTED');
+
+                    dispatchEvent('contentpause');
+
+                    this.pauseContent();
+
+                    break;
+
+                case google.ima.AdEvent.Type.CONTENT_RESUME_REQUESTED:
+                    // This event indicates the ad has finished - the video player can perform
+                    // appropriate UI actions, such as removing the timer for remaining time detection.
+                    // Fired when content should be resumed. This usually happens when an ad finishes
+                    // or collapses
+                    this.trigger('CONTENT_RESUME_REQUESTED');
+
+                    dispatchEvent('contentresume');
+
+                    this.pollCountdown();
+
+                    this.resumeContent();
+
+                    break;
+
+                case google.ima.AdEvent.Type.STARTED:
+                    dispatchEvent('started');
+                    break;
+
+                case google.ima.AdEvent.Type.MIDPOINT:
+                    dispatchEvent('midpoint');
+                    break;
+
+                case google.ima.AdEvent.Type.COMPLETE:
+                    dispatchEvent('complete');
+                    break;
+
+                case google.ima.AdEvent.Type.IMPRESSION:
+                    dispatchEvent('impression');
+                    break;
+
+                case google.ima.AdEvent.Type.CLICK:
+                    dispatchEvent('click');
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        /**
+         * Any ad error handling comes through here
+         * @param {Event} event
+         */
+
+    }, {
+        key: 'onAdError',
+        value: function onAdError(event) {
+            this.cancel();
+            this.player.debug.log('Ads error', event);
+        }
+
+        /**
+         * Setup hooks for Plyr and window events. This ensures
+         * the mid- and post-roll launch at the correct time. And
+         * resize the advertisement when the player resizes
+         */
+
+    }, {
+        key: 'listeners',
+        value: function listeners() {
+            var _this7 = this;
+
+            var container = this.player.elements.container;
+
+            var time = void 0;
+
+            // Add listeners to the required events
+            this.player.on('ended', function () {
+                _this7.loader.contentComplete();
+            });
+
+            this.player.on('seeking', function () {
+                time = _this7.player.currentTime;
+                return time;
+            });
+
+            this.player.on('seeked', function () {
+                var seekedTime = _this7.player.currentTime;
+
+                _this7.cuePoints.forEach(function (cuePoint, index) {
+                    if (time < cuePoint && cuePoint < seekedTime) {
+                        _this7.manager.discardAdBreak();
+                        _this7.cuePoints.splice(index, 1);
+                    }
+                });
+            });
+
+            // Listen to the resizing of the window. And resize ad accordingly
+            // TODO: eventually implement ResizeObserver
+            window.addEventListener('resize', function () {
+                _this7.manager.resize(container.offsetWidth, container.offsetHeight, google.ima.ViewMode.NORMAL);
+            });
+        }
+
+        /**
+         * Initialize the adsManager and start playing advertisements
+         */
+
+    }, {
+        key: 'play',
+        value: function play() {
+            var _this8 = this;
+
+            var container = this.player.elements.container;
+
+
+            if (!this.managerPromise) {
+                return;
+            }
+
+            // Play the requested advertisement whenever the adsManager is ready
+            this.managerPromise.then(function () {
+                // Initialize the container. Must be done via a user action on mobile devices
+                _this8.elements.displayContainer.initialize();
+
+                try {
+                    if (!_this8.initialized) {
+                        // Initialize the ads manager. Ad rules playlist will start at this time
+                        _this8.manager.init(container.offsetWidth, container.offsetHeight, google.ima.ViewMode.NORMAL);
+
+                        // Call play to start showing the ad. Single video and overlay ads will
+                        // start at this time; the call will be ignored for ad rules
+                        _this8.manager.start();
+                    }
+
+                    _this8.initialized = true;
+                } catch (adError) {
+                    // An error may be thrown if there was a problem with the
+                    // VAST response
+                    _this8.onAdError(adError);
+                }
+            });
+        }
+
+        /**
+         * Resume our video.
+         */
+
+    }, {
+        key: 'resumeContent',
+        value: function resumeContent() {
+            // Hide the advertisement container
+            this.elements.container.style.zIndex = '';
+
+            // Ad is stopped
+            this.playing = false;
+
+            // Play our video
+            if (this.player.currentTime < this.player.duration) {
+                this.player.play();
+            }
+        }
+
+        /**
+         * Pause our video
+         */
+
+    }, {
+        key: 'pauseContent',
+        value: function pauseContent() {
+            // Show the advertisement container
+            this.elements.container.style.zIndex = 3;
+
+            // Ad is playing.
+            this.playing = true;
+
+            // Pause our video.
+            this.player.pause();
+        }
+
+        /**
+         * Destroy the adsManager so we can grab new ads after this. If we don't then we're not
+         * allowed to call new ads based on google policies, as they interpret this as an accidental
+         * video requests. https://developers.google.com/interactive-
+         * media-ads/docs/sdks/android/faq#8
+         */
+
+    }, {
+        key: 'cancel',
+        value: function cancel() {
+            // Pause our video
+            if (this.initialized) {
+                this.resumeContent();
+            }
+
+            // Tell our instance that we're done for now
+            this.trigger('ERROR');
+
+            // Re-create our adsManager
+            this.loadAds();
+        }
+
+        /**
+         * Re-create our adsManager
+         */
+
+    }, {
+        key: 'loadAds',
+        value: function loadAds() {
+            var _this9 = this;
+
+            // Tell our adsManager to go bye bye
+            this.managerPromise.then(function () {
+                // Destroy our adsManager
+                if (_this9.manager) {
+                    _this9.manager.destroy();
+                }
+
+                // Re-set our adsManager promises
+                _this9.managerPromise = new Promise(function (resolve) {
+                    _this9.on('ADS_MANAGER_LOADED', resolve);
+                    _this9.player.debug.log(_this9.manager);
+                });
+
+                // Now request some new advertisements
+                _this9.requestAds();
+            });
+        }
+
+        /**
+         * Handles callbacks after an ad event was invoked
+         * @param {string} event - Event type
+         */
+
+    }, {
+        key: 'trigger',
+        value: function trigger(event) {
+            var _this10 = this;
+
+            var handlers = this.events[event];
+
+            if (utils.is.array(handlers)) {
+                handlers.forEach(function (handler) {
+                    if (utils.is.function(handler)) {
+                        handler.call(_this10);
+                    }
+                });
+            }
+        }
+
+        /**
+         * Add event listeners
+         * @param {string} event - Event type
+         * @param {function} callback - Callback for when event occurs
+         * @return {Ads}
+         */
+
+    }, {
+        key: 'on',
+        value: function on(event, callback) {
+            if (!utils.is.array(this.events[event])) {
+                this.events[event] = [];
+            }
+
+            this.events[event].push(callback);
+
+            return this;
+        }
+
+        /**
+         * Setup a safety timer for when the ad network doesn't respond for whatever reason.
+         * The advertisement has 12 seconds to get its things together. We stop this timer when the
+         * advertisement is playing, or when a user action is required to start, then we clear the
+         * timer on ad ready
+         * @param {number} time
+         * @param {string} from
+         */
+
+    }, {
+        key: 'startSafetyTimer',
+        value: function startSafetyTimer(time, from) {
+            var _this11 = this;
+
+            this.player.debug.log('Safety timer invoked from: ' + from);
+
+            this.safetyTimer = setTimeout(function () {
+                _this11.cancel();
+                _this11.clearSafetyTimer('startSafetyTimer()');
+            }, time);
+        }
+
+        /**
+         * Clear our safety timer(s)
+         * @param {string} from
+         */
+
+    }, {
+        key: 'clearSafetyTimer',
+        value: function clearSafetyTimer(from) {
+            if (!utils.is.nullOrUndefined(this.safetyTimer)) {
+                this.player.debug.log('Safety timer cleared from: ' + from);
+
+                clearTimeout(this.safetyTimer);
+                this.safetyTimer = null;
+            }
+        }
+    }, {
+        key: 'tagUrl',
+        get: function get() {
+            var params = {
+                AV_PUBLISHERID: '58c25bb0073ef448b1087ad6',
+                AV_CHANNELID: '5a0458dc28a06145e4519d21',
+                AV_URL: location.hostname,
+                cb: Date.now(),
+                AV_WIDTH: 640,
+                AV_HEIGHT: 480,
+                AV_CDIM2: this.publisherId
+            };
+
+            var base = 'https://go.aniview.com/api/adserver6/vast/';
+
+            return base + '?' + utils.buildUrlParams(params);
+        }
+    }]);
+    return Ads;
+}();
 
 // ==========================================================================
 // YouTube plugin
@@ -10925,7 +10970,9 @@ var youtube = {
             youtube.ready.call(this);
         } else {
             // Load the API
-            utils.loadScript(this.config.urls.youtube.api);
+            utils.loadScript(this.config.urls.youtube.api).catch(function (error) {
+                _this.debug.warn('YouTube API failed to load', error);
+            });
 
             // Setup callback for the API
             // YouTube has it's own system of course...
@@ -11338,8 +11385,10 @@ var vimeo = {
 
         // Load the API if not already
         if (!utils.is.object(window.Vimeo)) {
-            utils.loadScript(this.config.urls.vimeo.api, function () {
+            utils.loadScript(this.config.urls.vimeo.api).then(function () {
                 vimeo.ready.call(_this);
+            }).catch(function (error) {
+                _this.debug.warn('Vimeo API failed to load', error);
             });
         } else {
             vimeo.ready.call(this);
@@ -12097,6 +12146,9 @@ var Plyr$1 = function () {
             return;
         }
 
+        // Create listeners
+        this.listeners = new Listeners(this);
+
         // Setup local storage for user settings
         this.storage = new Storage(this);
 
@@ -12111,9 +12163,6 @@ var Plyr$1 = function () {
 
         // Allow focus to be captured
         this.elements.container.setAttribute('tabindex', 0);
-
-        // Global listeners
-        listeners.global.call(this);
 
         // Add style hook
         ui.addStyleHook.call(this);
@@ -12133,6 +12182,12 @@ var Plyr$1 = function () {
         if (this.isHTML5 || this.isEmbed && !this.supported.ui) {
             ui.build.call(this);
         }
+
+        // Container listeners
+        this.listeners.container();
+
+        // Global listeners
+        this.listeners.global(true);
 
         // Setup fullscreen
         this.fullscreen = new Fullscreen(this);
@@ -12158,10 +12213,15 @@ var Plyr$1 = function () {
          * Play the media, or play the advertisement (if they are not blocked)
          */
         value: function play() {
-            // TODO: Always return a promise?
-            if (this.ads.enabled && !this.ads.initialized && !this.ads.blocked) {
-                this.ads.play();
-                return null;
+            var _this2 = this;
+
+            // If ads are enabled, wait for them first
+            if (this.ads.enabled && !this.ads.initialized) {
+                return this.ads.managerPromise.then(function () {
+                    return _this2.ads.play();
+                }).catch(function () {
+                    return _this2.media.play();
+                });
             }
 
             // Return the promise (for HTML5)
@@ -12346,7 +12406,7 @@ var Plyr$1 = function () {
     }, {
         key: 'toggleControls',
         value: function toggleControls(toggle) {
-            var _this2 = this;
+            var _this3 = this;
 
             // We need controls of course...
             if (!utils.is.element(this.elements.controls)) {
@@ -12415,24 +12475,24 @@ var Plyr$1 = function () {
             if (!show || this.playing) {
                 this.timers.controls = setTimeout(function () {
                     // If the mouse is over the controls (and not entering fullscreen), bail
-                    if ((_this2.elements.controls.pressed || _this2.elements.controls.hover) && !isEnterFullscreen) {
+                    if ((_this3.elements.controls.pressed || _this3.elements.controls.hover) && !isEnterFullscreen) {
                         return;
                     }
 
                     // Restore transition behaviour
-                    if (!utils.hasClass(_this2.elements.container, _this2.config.classNames.hideControls)) {
-                        utils.toggleClass(_this2.elements.controls, _this2.config.classNames.noTransition, false);
+                    if (!utils.hasClass(_this3.elements.container, _this3.config.classNames.hideControls)) {
+                        utils.toggleClass(_this3.elements.controls, _this3.config.classNames.noTransition, false);
                     }
 
                     // Check if controls toggled
-                    var toggled = utils.toggleClass(_this2.elements.container, _this2.config.classNames.hideControls, true);
+                    var toggled = utils.toggleClass(_this3.elements.container, _this3.config.classNames.hideControls, true);
 
                     // Trigger event and close menu
                     if (toggled) {
-                        utils.dispatchEvent.call(_this2, _this2.media, 'controlshidden');
+                        utils.dispatchEvent.call(_this3, _this3.media, 'controlshidden');
 
-                        if (_this2.config.controls.includes('settings') && !utils.is.empty(_this2.config.settings)) {
-                            controls.toggleMenu.call(_this2, false);
+                        if (_this3.config.controls.includes('settings') && !utils.is.empty(_this3.config.settings)) {
+                            controls.toggleMenu.call(_this3, false);
                         }
                     }
                 }, delay);
@@ -12474,7 +12534,7 @@ var Plyr$1 = function () {
     }, {
         key: 'destroy',
         value: function destroy(callback) {
-            var _this3 = this;
+            var _this4 = this;
 
             var soft = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
@@ -12483,22 +12543,22 @@ var Plyr$1 = function () {
                 document.body.style.overflow = '';
 
                 // GC for embed
-                _this3.embed = null;
+                _this4.embed = null;
 
                 // If it's a soft destroy, make minimal changes
                 if (soft) {
-                    if (Object.keys(_this3.elements).length) {
+                    if (Object.keys(_this4.elements).length) {
                         // Remove elements
-                        utils.removeElement(_this3.elements.buttons.play);
-                        utils.removeElement(_this3.elements.captions);
-                        utils.removeElement(_this3.elements.controls);
-                        utils.removeElement(_this3.elements.wrapper);
+                        utils.removeElement(_this4.elements.buttons.play);
+                        utils.removeElement(_this4.elements.captions);
+                        utils.removeElement(_this4.elements.controls);
+                        utils.removeElement(_this4.elements.wrapper);
 
                         // Clear for GC
-                        _this3.elements.buttons.play = null;
-                        _this3.elements.captions = null;
-                        _this3.elements.controls = null;
-                        _this3.elements.wrapper = null;
+                        _this4.elements.buttons.play = null;
+                        _this4.elements.captions = null;
+                        _this4.elements.controls = null;
+                        _this4.elements.wrapper = null;
                     }
 
                     // Callback
@@ -12507,18 +12567,21 @@ var Plyr$1 = function () {
                     }
                 } else {
                     // Replace the container with the original element provided
-                    utils.replaceElement(_this3.elements.original, _this3.elements.container);
+                    utils.replaceElement(_this4.elements.original, _this4.elements.container);
+
+                    // Unbind global listeners
+                    _this4.listeners.global(false);
 
                     // Event
-                    utils.dispatchEvent.call(_this3, _this3.elements.original, 'destroyed', true);
+                    utils.dispatchEvent.call(_this4, _this4.elements.original, 'destroyed', true);
 
                     // Callback
                     if (utils.is.function(callback)) {
-                        callback.call(_this3.elements.original);
+                        callback.call(_this4.elements.original);
                     }
 
                     // Clear for GC
-                    _this3.elements = null;
+                    _this4.elements = null;
                 }
             };
 
