@@ -308,7 +308,7 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
       <td><code>autoplay</code></td>
       <td>Boolean</td>
       <td><code>false</code></td>
-      <td>Autoplay the media on load. This is generally advised against on UX grounds. It is also disabled on iOS (an Apple limitation).</td>
+      <td>Autoplay the media on load. This is generally advised against on UX grounds. It is also disabled on <a href="https://webkit.org/blog/7734/auto-play-policy-changes-for-macos/">iOS and macOS</a> (an Apple limitation).</td>
     </tr>
     <tr>
       <td><code>seekTime</code></td>
