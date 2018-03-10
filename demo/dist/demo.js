@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var player = new Plyr('#player', {
         debug: true,
         title: 'View From A Blue Moon',
-        // iconUrl: '../dist/plyr.svg',
+        iconUrl: '../dist/plyr.svg',
         keyboard: {
             global: true
         },
@@ -231,7 +231,7 @@ if (window.location.host === 'plyr.io') {
         a.async = 1;
         a.src = g;
         m.parentNode.insertBefore(a, m);
-    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+    })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
     window.ga('create', 'UA-40881672-11', 'auto');
     window.ga('send', 'pageview');
 }

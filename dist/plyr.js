@@ -77,7 +77,7 @@ var defaults = {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.0.0-beta.16/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.0.0-beta.17/plyr.svg',
 
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
@@ -1484,7 +1484,6 @@ var utils = {
 // Plyr support checks
 // ==========================================================================
 
-// Check for feature support
 var support = {
     // Basic support
     audio: 'canPlayType' in document.createElement('audio'),
@@ -2002,7 +2001,6 @@ var Storage = function () {
 
 /* global google */
 
-// Build the default tag URL
 var getTagUrl = function getTagUrl() {
     var params = {
         AV_PUBLISHERID: '58c25bb0073ef448b1087ad6',
@@ -2663,7 +2661,6 @@ var Ads = function () {
 // Plyr Event Listeners
 // ==========================================================================
 
-// Sniff out the browser
 var browser$2 = utils.getBrowser();
 
 var listeners = {
@@ -3972,6 +3969,11 @@ var controls = {
     setQualityMenu: function setQualityMenu(options) {
         var _this = this;
 
+        // Menu required
+        if (!utils.is.element(this.elements.settings.panes.quality)) {
+            return;
+        }
+
         var type = 'quality';
         var list = this.elements.settings.panes.quality.querySelector('ul');
 
@@ -4133,7 +4135,11 @@ var controls = {
 
     // Set the looping options
     /* setLoopMenu() {
-        const options = ['start', 'end', 'all', 'reset'];
+        // Menu required
+        if (!utils.is.element(this.elements.settings.panes.loop)) {
+            return;
+        }
+         const options = ['start', 'end', 'all', 'reset'];
         const list = this.elements.settings.panes.loop.querySelector('ul');
          // Show the pane and tab
         utils.toggleHidden(this.elements.settings.tabs.loop, false);
@@ -4232,6 +4238,11 @@ var controls = {
     // Set a list of available captions languages
     setSpeedMenu: function setSpeedMenu() {
         var _this3 = this;
+
+        // Menu required
+        if (!utils.is.element(this.elements.settings.panes.speed)) {
+            return;
+        }
 
         var type = 'speed';
 
@@ -5730,7 +5741,6 @@ var vimeo = {
 // Plyr Media
 // ==========================================================================
 
-// Sniff out the browser
 var browser$3 = utils.getBrowser();
 
 var media = {
@@ -5970,16 +5980,10 @@ var source = {
 
 // ==========================================================================
 // Plyr
-// plyr.js v3.0.0-beta.16
+// plyr.js v3.0.0-beta.17
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
-
-// Private properties
-// TODO: Use a WeakMap for private globals
-// const globals = new WeakMap();
-
-// Plyr instance
 
 var Plyr = function () {
     function Plyr(target, options) {

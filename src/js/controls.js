@@ -50,7 +50,7 @@ const controls = {
             icon,
             utils.extend(attributes, {
                 role: 'presentation',
-            })
+            }),
         );
 
         // Create the <use> to reference sprite
@@ -115,8 +115,8 @@ const controls = {
                 {
                     class: this.config.classNames.menu.badge,
                 },
-                text
-            )
+                text,
+            ),
         );
 
         return badge;
@@ -238,7 +238,7 @@ const controls = {
                 for: attributes.id,
                 class: this.config.classNames.hidden,
             },
-            this.config.i18n[type]
+            this.config.i18n[type],
         );
 
         // Seek input
@@ -254,8 +254,8 @@ const controls = {
                     value: 0,
                     autocomplete: 'off',
                 },
-                attributes
-            )
+                attributes,
+            ),
         );
 
         this.elements.inputs[type] = input;
@@ -280,8 +280,8 @@ const controls = {
                     max: 100,
                     value: 0,
                 },
-                attributes
-            )
+                attributes,
+            ),
         );
 
         // Create the label inside
@@ -322,8 +322,8 @@ const controls = {
                 {
                     class: this.config.classNames.hidden,
                 },
-                this.config.i18n[type]
-            )
+                this.config.i18n[type],
+            ),
         );
 
         container.appendChild(utils.createElement('span', utils.getAttributesFromSelector(this.config.selectors.display[type]), '00:00'));
@@ -349,7 +349,7 @@ const controls = {
                 value,
                 checked,
                 class: 'plyr__sr-only',
-            })
+            }),
         );
 
         const faux = utils.createElement('span', { 'aria-hidden': true });
@@ -427,6 +427,11 @@ const controls = {
     // Set the YouTube quality menu
     // TODO: Support for HTML5
     setQualityMenu(options) {
+        // Menu required
+        if (!utils.is.element(this.elements.settings.panes.quality)) {
+            return;
+        }
+
         const type = 'quality';
         const list = this.elements.settings.panes.quality.querySelector('ul');
 
@@ -482,7 +487,7 @@ const controls = {
         };
 
         this.options.quality.forEach(quality =>
-            controls.createMenuItem.call(this, quality, list, type, controls.getLabel.call(this, 'quality', quality), getBadge(quality))
+            controls.createMenuItem.call(this, quality, list, type, controls.getLabel.call(this, 'quality', quality), getBadge(quality)),
         );
 
         controls.updateSetting.call(this, type, list);
@@ -583,6 +588,11 @@ const controls = {
 
     // Set the looping options
     /* setLoopMenu() {
+        // Menu required
+        if (!utils.is.element(this.elements.settings.panes.loop)) {
+            return;
+        }
+
         const options = ['start', 'end', 'all', 'reset'];
         const list = this.elements.settings.panes.loop.querySelector('ul');
 
@@ -681,7 +691,7 @@ const controls = {
                 'language',
                 track.label || track.language,
                 controls.createBadge.call(this, track.language.toUpperCase()),
-                track.language.toLowerCase() === this.captions.language.toLowerCase()
+                track.language.toLowerCase() === this.captions.language.toLowerCase(),
             );
         });
 
@@ -690,6 +700,11 @@ const controls = {
 
     // Set a list of available captions languages
     setSpeedMenu() {
+        // Menu required
+        if (!utils.is.element(this.elements.settings.panes.speed)) {
+            return;
+        }
+
         const type = 'speed';
 
         // Set the default speeds
@@ -933,7 +948,7 @@ const controls = {
                         role: 'tooltip',
                         class: this.config.classNames.tooltip,
                     },
-                    '00:00'
+                    '00:00',
                 );
 
                 progress.appendChild(tooltip);
@@ -978,7 +993,7 @@ const controls = {
                 'volume',
                 utils.extend(attributes, {
                     id: `plyr-volume-${data.id}`,
-                })
+                }),
             );
             volume.appendChild(range.label);
             volume.appendChild(range.input);
@@ -1005,7 +1020,7 @@ const controls = {
                     'aria-haspopup': true,
                     'aria-controls': `plyr-settings-${data.id}`,
                     'aria-expanded': false,
-                })
+                }),
             );
 
             const form = utils.createElement('form', {
@@ -1048,7 +1063,7 @@ const controls = {
                         'aria-controls': `plyr-settings-${data.id}-${type}`,
                         'aria-expanded': false,
                     }),
-                    this.config.i18n[type]
+                    this.config.i18n[type],
                 );
 
                 const value = utils.createElement('span', {
@@ -1088,7 +1103,7 @@ const controls = {
                         'aria-controls': `plyr-settings-${data.id}-home`,
                         'aria-expanded': false,
                     },
-                    this.config.i18n[type]
+                    this.config.i18n[type],
                 );
 
                 pane.appendChild(back);
@@ -1221,7 +1236,7 @@ const controls = {
                     this.config.selectors.labels,
                     ' .',
                     this.config.classNames.hidden,
-                ].join('')
+                ].join(''),
             );
 
             Array.from(labels).forEach(label => {
