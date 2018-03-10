@@ -309,13 +309,15 @@ class Plyr {
      * Play the media, or play the advertisement (if they are not blocked)
      */
     play() {
-        // TODO: Always return a promise?
-        if (this.ads.enabled && !this.ads.initialized && !this.ads.blocked) {
-            this.ads.play();
-            return null;
+        // Return the promise (for HTML5)
+        if (this.ads.enabled && !this.ads.initialized) {
+            return this.ads.managerPromise.then(() => {
+                this.ads.play();
+            }).catch(() => {
+                this.media.play();
+            });
         }
 
-        // Return the promise (for HTML5)
         return this.media.play();
     }
 
