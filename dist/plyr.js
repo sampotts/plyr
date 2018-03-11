@@ -4432,7 +4432,7 @@ var Ads = function () {
 
             if (this.enabled) {
                 // Check if the Google IMA3 SDK is loaded or load it ourselves
-                if (!utils.is.object(window.google)) {
+                if (!utils.is.object(window.google) || !utils.is.object(window.google.ima)) {
                     utils.loadScript(this.player.config.urls.googleIMA.api).then(function () {
                         _this2.ready();
                     }).catch(function () {
@@ -4544,8 +4544,6 @@ var Ads = function () {
                 request.forceNonLinearFullSlot = false;
 
                 this.loader.requestAds(request);
-
-                this.trigger('loaded');
             } catch (e) {
                 this.onAdError(e);
             }
@@ -4585,7 +4583,7 @@ var Ads = function () {
 
     }, {
         key: 'onAdsManagerLoaded',
-        value: function onAdsManagerLoaded(adsManagerLoadedEvent) {
+        value: function onAdsManagerLoaded(event) {
             var _this6 = this;
 
             // Get the ads manager
@@ -4597,7 +4595,7 @@ var Ads = function () {
 
             // The SDK is polling currentTime on the contentPlayback. And needs a duration
             // so it can determine when to start the mid- and post-roll
-            this.manager = adsManagerLoadedEvent.getAdsManager(this.player, settings);
+            this.manager = event.getAdsManager(this.player, settings);
 
             // Get the cue points for any mid-rolls by filtering out the pre- and post-roll
             this.cuePoints = this.manager.getCuePoints();
@@ -4840,7 +4838,7 @@ var Ads = function () {
 
 
             if (!this.managerPromise) {
-                return;
+                this.resumeContent();
             }
 
             // Play the requested advertisement whenever the adsManager is ready
@@ -4864,7 +4862,7 @@ var Ads = function () {
                     // VAST response
                     _this9.onAdError(adError);
                 }
-            });
+            }).catch(function () {});
         }
 
         /**
@@ -4949,7 +4947,7 @@ var Ads = function () {
 
                 // Now request some new advertisements
                 _this10.requestAds();
-            });
+            }).catch(function () {});
         }
 
         /**

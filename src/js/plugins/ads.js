@@ -49,7 +49,7 @@ class Ads {
     load() {
         if (this.enabled) {
             // Check if the Google IMA3 SDK is loaded or load it ourselves
-            if (!utils.is.object(window.google)) {
+            if (!utils.is.object(window.google) || !utils.is.object(window.google.ima)) {
                 utils
                     .loadScript(this.player.config.urls.googleIMA.api)
                     .then(() => {
@@ -160,8 +160,6 @@ class Ads {
             request.forceNonLinearFullSlot = false;
 
             this.loader.requestAds(request);
-
-            this.trigger('loaded');
         } catch (e) {
             this.onAdError(e);
         }
@@ -191,7 +189,7 @@ class Ads {
      * This method is called whenever the ads are ready inside the AdDisplayContainer
      * @param {Event} adsManagerLoadedEvent
      */
-    onAdsManagerLoaded(adsManagerLoadedEvent) {
+    onAdsManagerLoaded(event) {
         // Get the ads manager
         const settings = new google.ima.AdsRenderingSettings();
 
@@ -201,7 +199,7 @@ class Ads {
 
         // The SDK is polling currentTime on the contentPlayback. And needs a duration
         // so it can determine when to start the mid- and post-roll
-        this.manager = adsManagerLoadedEvent.getAdsManager(this.player, settings);
+        this.manager = event.getAdsManager(this.player, settings);
 
         // Get the cue points for any mid-rolls by filtering out the pre- and post-roll
         this.cuePoints = this.manager.getCuePoints();
@@ -419,31 +417,33 @@ class Ads {
         const { container } = this.player.elements;
 
         if (!this.managerPromise) {
-            return;
+            this.resumeContent();
         }
 
         // Play the requested advertisement whenever the adsManager is ready
-        this.managerPromise.then(() => {
-            // Initialize the container. Must be done via a user action on mobile devices
-            this.elements.displayContainer.initialize();
+        this.managerPromise
+            .then(() => {
+                // Initialize the container. Must be done via a user action on mobile devices
+                this.elements.displayContainer.initialize();
 
-            try {
-                if (!this.initialized) {
-                    // Initialize the ads manager. Ad rules playlist will start at this time
-                    this.manager.init(container.offsetWidth, container.offsetHeight, google.ima.ViewMode.NORMAL);
+                try {
+                    if (!this.initialized) {
+                        // Initialize the ads manager. Ad rules playlist will start at this time
+                        this.manager.init(container.offsetWidth, container.offsetHeight, google.ima.ViewMode.NORMAL);
 
-                    // Call play to start showing the ad. Single video and overlay ads will
-                    // start at this time; the call will be ignored for ad rules
-                    this.manager.start();
+                        // Call play to start showing the ad. Single video and overlay ads will
+                        // start at this time; the call will be ignored for ad rules
+                        this.manager.start();
+                    }
+
+                    this.initialized = true;
+                } catch (adError) {
+                    // An error may be thrown if there was a problem with the
+                    // VAST response
+                    this.onAdError(adError);
                 }
-
-                this.initialized = true;
-            } catch (adError) {
-                // An error may be thrown if there was a problem with the
-                // VAST response
-                this.onAdError(adError);
-            }
-        });
+            })
+            .catch(() => {});
     }
 
     /**
@@ -500,21 +500,23 @@ class Ads {
      */
     loadAds() {
         // Tell our adsManager to go bye bye
-        this.managerPromise.then(() => {
-            // Destroy our adsManager
-            if (this.manager) {
-                this.manager.destroy();
-            }
+        this.managerPromise
+            .then(() => {
+                // Destroy our adsManager
+                if (this.manager) {
+                    this.manager.destroy();
+                }
 
-            // Re-set our adsManager promises
-            this.managerPromise = new Promise(resolve => {
-                this.on('loaded', resolve);
-                this.player.debug.log(this.manager);
-            });
+                // Re-set our adsManager promises
+                this.managerPromise = new Promise(resolve => {
+                    this.on('loaded', resolve);
+                    this.player.debug.log(this.manager);
+                });
 
-            // Now request some new advertisements
-            this.requestAds();
-        });
+                // Now request some new advertisements
+                this.requestAds();
+            })
+            .catch(() => {});
     }
 
     /**
