@@ -9618,7 +9618,6 @@ var controls = {
 // Plyr Event Listeners
 // ==========================================================================
 
-// Sniff out the browser
 var browser$1 = utils.getBrowser();
 
 var Listeners = function () {
@@ -10319,38 +10318,49 @@ var Ads = function () {
 
         // Setup a promise to resolve when the IMA manager is ready
         this.managerPromise = new Promise(function (resolve, reject) {
-            // The ad is pre-loaded and ready
-            _this.on('ADS_MANAGER_LOADED', resolve);
+            // The ad is loaded and ready
+            _this.on('loaded', resolve);
 
             // Ads failed
-            _this.on('ERROR', reject);
+            _this.on('error', reject);
         });
 
-        if (this.enabled) {
-            // Check if the Google IMA3 SDK is loaded or load it ourselves
-            if (!utils.is.object(window.google)) {
-                utils.loadScript(player.config.urls.googleIMA.api).then(function () {
-                    _this.ready();
-                }).catch(function () {
-                    // Script failed to load or is blocked
-                    _this.trigger('ERROR');
-                    _this.player.debug.error('Google IMA SDK failed to load');
-                });
-            } else {
-                this.ready();
-            }
-        }
+        this.load();
     }
 
     /**
-     * Get the ads instance ready.
+     * Load the IMA SDK
      */
 
 
     createClass(Ads, [{
+        key: 'load',
+        value: function load() {
+            var _this2 = this;
+
+            if (this.enabled) {
+                // Check if the Google IMA3 SDK is loaded or load it ourselves
+                if (!utils.is.object(window.google)) {
+                    utils.loadScript(this.player.config.urls.googleIMA.api).then(function () {
+                        _this2.ready();
+                    }).catch(function () {
+                        // Script failed to load or is blocked
+                        _this2.trigger('error', new Error('Google IMA SDK failed to load'));
+                    });
+                } else {
+                    this.ready();
+                }
+            }
+        }
+
+        /**
+         * Get the ads instance ready
+         */
+
+    }, {
         key: 'ready',
         value: function ready() {
-            var _this2 = this;
+            var _this3 = this;
 
             // Start ticking our safety timer. If the whole advertisement
             // thing doesn't resolve within our set time; we bail
@@ -10358,7 +10368,7 @@ var Ads = function () {
 
             // Clear the safety timer
             this.managerPromise.then(function () {
-                _this2.clearSafetyTimer('onAdsManagerLoaded()');
+                _this3.clearSafetyTimer('onAdsManagerLoaded()');
             });
 
             // Set listeners on the Plyr instance
@@ -10410,7 +10420,7 @@ var Ads = function () {
     }, {
         key: 'requestAds',
         value: function requestAds() {
-            var _this3 = this;
+            var _this4 = this;
 
             var container = this.player.elements.container;
 
@@ -10421,10 +10431,10 @@ var Ads = function () {
 
                 // Listen and respond to ads loaded and error events
                 this.loader.addEventListener(google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED, function (event) {
-                    return _this3.onAdsManagerLoaded(event);
+                    return _this4.onAdsManagerLoaded(event);
                 }, false);
                 this.loader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, function (error) {
-                    return _this3.onAdError(error);
+                    return _this4.onAdError(error);
                 }, false);
 
                 // Request video ads
@@ -10443,7 +10453,7 @@ var Ads = function () {
 
                 this.loader.requestAds(request);
 
-                this.trigger('ADS_LOADER_LOADED');
+                this.trigger('loaded');
             } catch (e) {
                 this.onAdError(e);
             }
@@ -10457,7 +10467,7 @@ var Ads = function () {
     }, {
         key: 'pollCountdown',
         value: function pollCountdown() {
-            var _this4 = this;
+            var _this5 = this;
 
             var start = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
@@ -10468,9 +10478,9 @@ var Ads = function () {
             }
 
             var update = function update() {
-                var time = utils.formatTime(Math.max(_this4.manager.getRemainingTime(), 0));
-                var label = _this4.player.config.i18n.advertisement + ' - ' + time;
-                _this4.elements.container.setAttribute('data-badge-text', label);
+                var time = utils.formatTime(Math.max(_this5.manager.getRemainingTime(), 0));
+                var label = _this5.player.config.i18n.advertisement + ' - ' + time;
+                _this5.elements.container.setAttribute('data-badge-text', label);
             };
 
             this.countdownTimer = window.setInterval(update, 100);
@@ -10484,7 +10494,7 @@ var Ads = function () {
     }, {
         key: 'onAdsManagerLoaded',
         value: function onAdsManagerLoaded(adsManagerLoadedEvent) {
-            var _this5 = this;
+            var _this6 = this;
 
             // Get the ads manager
             var settings = new google.ima.AdsRenderingSettings();
@@ -10502,13 +10512,13 @@ var Ads = function () {
 
             // Add advertisement cue's within the time line if available
             this.cuePoints.forEach(function (cuePoint) {
-                if (cuePoint !== 0 && cuePoint !== -1 && cuePoint < _this5.player.duration) {
-                    var seekElement = _this5.player.elements.progress;
+                if (cuePoint !== 0 && cuePoint !== -1 && cuePoint < _this6.player.duration) {
+                    var seekElement = _this6.player.elements.progress;
 
                     if (seekElement) {
-                        var cuePercentage = 100 / _this5.player.duration * cuePoint;
+                        var cuePercentage = 100 / _this6.player.duration * cuePoint;
                         var cue = utils.createElement('span', {
-                            class: _this5.player.config.classNames.cues
+                            class: _this6.player.config.classNames.cues
                         });
 
                         cue.style.left = cuePercentage.toString() + '%';
@@ -10527,18 +10537,18 @@ var Ads = function () {
             // Add listeners to the required events
             // Advertisement error events
             this.manager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, function (error) {
-                return _this5.onAdError(error);
+                return _this6.onAdError(error);
             });
 
             // Advertisement regular events
             Object.keys(google.ima.AdEvent.Type).forEach(function (type) {
-                _this5.manager.addEventListener(google.ima.AdEvent.Type[type], function (event) {
-                    return _this5.onAdEvent(event);
+                _this6.manager.addEventListener(google.ima.AdEvent.Type[type], function (event) {
+                    return _this6.onAdEvent(event);
                 });
             });
 
             // Resolve our adsManager
-            this.trigger('ADS_MANAGER_LOADED');
+            this.trigger('loaded');
         }
 
         /**
@@ -10551,7 +10561,7 @@ var Ads = function () {
     }, {
         key: 'onAdEvent',
         value: function onAdEvent(event) {
-            var _this6 = this;
+            var _this7 = this;
 
             var container = this.player.elements.container;
 
@@ -10562,14 +10572,14 @@ var Ads = function () {
 
             // Proxy event
             var dispatchEvent = function dispatchEvent(type) {
-                utils.dispatchEvent.call(_this6.player, _this6.player.media, 'ads' + type);
+                utils.dispatchEvent.call(_this7.player, _this7.player.media, 'ads' + type);
             };
 
             switch (event.type) {
                 case google.ima.AdEvent.Type.LOADED:
                     // This is the first event sent for an ad - it is possible to determine whether the
                     // ad is a video ad or an overlay
-                    this.trigger('LOADED');
+                    this.trigger('loaded');
 
                     // Bubble event
                     dispatchEvent('loaded');
@@ -10590,7 +10600,6 @@ var Ads = function () {
                 case google.ima.AdEvent.Type.ALL_ADS_COMPLETED:
                     // All ads for the current videos are done. We can now request new advertisements
                     // in case the video is re-played
-                    this.trigger('ALL_ADS_COMPLETED');
 
                     // Fire event
                     dispatchEvent('allcomplete');
@@ -10625,7 +10634,6 @@ var Ads = function () {
                     // This event indicates the ad has started - the video player can adjust the UI,
                     // for example display a pause button and remaining time. Fired when content should
                     // be paused. This usually happens right before an ad is about to cover the content
-                    this.trigger('CONTENT_PAUSE_REQUESTED');
 
                     dispatchEvent('contentpause');
 
@@ -10638,7 +10646,6 @@ var Ads = function () {
                     // appropriate UI actions, such as removing the timer for remaining time detection.
                     // Fired when content should be resumed. This usually happens when an ad finishes
                     // or collapses
-                    this.trigger('CONTENT_RESUME_REQUESTED');
 
                     dispatchEvent('contentresume');
 
@@ -10682,7 +10689,7 @@ var Ads = function () {
         key: 'onAdError',
         value: function onAdError(event) {
             this.cancel();
-            this.player.debug.log('Ads error', event);
+            this.player.debug.warn('Ads error', event);
         }
 
         /**
@@ -10694,7 +10701,7 @@ var Ads = function () {
     }, {
         key: 'listeners',
         value: function listeners() {
-            var _this7 = this;
+            var _this8 = this;
 
             var container = this.player.elements.container;
 
@@ -10702,21 +10709,21 @@ var Ads = function () {
 
             // Add listeners to the required events
             this.player.on('ended', function () {
-                _this7.loader.contentComplete();
+                _this8.loader.contentComplete();
             });
 
             this.player.on('seeking', function () {
-                time = _this7.player.currentTime;
+                time = _this8.player.currentTime;
                 return time;
             });
 
             this.player.on('seeked', function () {
-                var seekedTime = _this7.player.currentTime;
+                var seekedTime = _this8.player.currentTime;
 
-                _this7.cuePoints.forEach(function (cuePoint, index) {
+                _this8.cuePoints.forEach(function (cuePoint, index) {
                     if (time < cuePoint && cuePoint < seekedTime) {
-                        _this7.manager.discardAdBreak();
-                        _this7.cuePoints.splice(index, 1);
+                        _this8.manager.discardAdBreak();
+                        _this8.cuePoints.splice(index, 1);
                     }
                 });
             });
@@ -10724,7 +10731,7 @@ var Ads = function () {
             // Listen to the resizing of the window. And resize ad accordingly
             // TODO: eventually implement ResizeObserver
             window.addEventListener('resize', function () {
-                _this7.manager.resize(container.offsetWidth, container.offsetHeight, google.ima.ViewMode.NORMAL);
+                _this8.manager.resize(container.offsetWidth, container.offsetHeight, google.ima.ViewMode.NORMAL);
             });
         }
 
@@ -10735,7 +10742,7 @@ var Ads = function () {
     }, {
         key: 'play',
         value: function play() {
-            var _this8 = this;
+            var _this9 = this;
 
             var container = this.player.elements.container;
 
@@ -10747,29 +10754,29 @@ var Ads = function () {
             // Play the requested advertisement whenever the adsManager is ready
             this.managerPromise.then(function () {
                 // Initialize the container. Must be done via a user action on mobile devices
-                _this8.elements.displayContainer.initialize();
+                _this9.elements.displayContainer.initialize();
 
                 try {
-                    if (!_this8.initialized) {
+                    if (!_this9.initialized) {
                         // Initialize the ads manager. Ad rules playlist will start at this time
-                        _this8.manager.init(container.offsetWidth, container.offsetHeight, google.ima.ViewMode.NORMAL);
+                        _this9.manager.init(container.offsetWidth, container.offsetHeight, google.ima.ViewMode.NORMAL);
 
                         // Call play to start showing the ad. Single video and overlay ads will
                         // start at this time; the call will be ignored for ad rules
-                        _this8.manager.start();
+                        _this9.manager.start();
                     }
 
-                    _this8.initialized = true;
+                    _this9.initialized = true;
                 } catch (adError) {
                     // An error may be thrown if there was a problem with the
                     // VAST response
-                    _this8.onAdError(adError);
+                    _this9.onAdError(adError);
                 }
             });
         }
 
         /**
-         * Resume our video.
+         * Resume our video
          */
 
     }, {
@@ -10820,7 +10827,7 @@ var Ads = function () {
             }
 
             // Tell our instance that we're done for now
-            this.trigger('ERROR');
+            this.trigger('error');
 
             // Re-create our adsManager
             this.loadAds();
@@ -10833,23 +10840,23 @@ var Ads = function () {
     }, {
         key: 'loadAds',
         value: function loadAds() {
-            var _this9 = this;
+            var _this10 = this;
 
             // Tell our adsManager to go bye bye
             this.managerPromise.then(function () {
                 // Destroy our adsManager
-                if (_this9.manager) {
-                    _this9.manager.destroy();
+                if (_this10.manager) {
+                    _this10.manager.destroy();
                 }
 
                 // Re-set our adsManager promises
-                _this9.managerPromise = new Promise(function (resolve) {
-                    _this9.on('ADS_MANAGER_LOADED', resolve);
-                    _this9.player.debug.log(_this9.manager);
+                _this10.managerPromise = new Promise(function (resolve) {
+                    _this10.on('loaded', resolve);
+                    _this10.player.debug.log(_this10.manager);
                 });
 
                 // Now request some new advertisements
-                _this9.requestAds();
+                _this10.requestAds();
             });
         }
 
@@ -10861,14 +10868,18 @@ var Ads = function () {
     }, {
         key: 'trigger',
         value: function trigger(event) {
-            var _this10 = this;
+            var _this11 = this;
+
+            for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+                args[_key - 1] = arguments[_key];
+            }
 
             var handlers = this.events[event];
 
             if (utils.is.array(handlers)) {
                 handlers.forEach(function (handler) {
                     if (utils.is.function(handler)) {
-                        handler.call(_this10);
+                        handler.apply(_this11, args);
                     }
                 });
             }
@@ -10905,13 +10916,13 @@ var Ads = function () {
     }, {
         key: 'startSafetyTimer',
         value: function startSafetyTimer(time, from) {
-            var _this11 = this;
+            var _this12 = this;
 
             this.player.debug.log('Safety timer invoked from: ' + from);
 
             this.safetyTimer = setTimeout(function () {
-                _this11.cancel();
-                _this11.clearSafetyTimer('startSafetyTimer()');
+                _this12.cancel();
+                _this12.clearSafetyTimer('startSafetyTimer()');
             }, time);
         }
 

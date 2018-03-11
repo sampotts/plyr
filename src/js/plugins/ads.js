@@ -33,26 +33,31 @@ class Ads {
 
         // Setup a promise to resolve when the IMA manager is ready
         this.managerPromise = new Promise((resolve, reject) => {
-            // The ad is pre-loaded and ready
-            this.on('ADS_MANAGER_LOADED', resolve);
+            // The ad is loaded and ready
+            this.on('loaded', resolve);
 
             // Ads failed
-            this.on('ERROR', reject);
+            this.on('error', reject);
         });
 
+        this.load();
+    }
+
+    /**
+     * Load the IMA SDK
+     */
+    load() {
         if (this.enabled) {
             // Check if the Google IMA3 SDK is loaded or load it ourselves
             if (!utils.is.object(window.google)) {
                 utils
-                    .loadScript(player.config.urls.googleIMA.api)
+                    .loadScript(this.player.config.urls.googleIMA.api)
                     .then(() => {
                         this.ready();
                     })
                     .catch(() => {
                         // Script failed to load or is blocked
-                        const message = 'Google IMA SDK failed to load';
-                        this.trigger('ERROR', new Error(message));
-                        this.player.debug.error(message);
+                        this.trigger('error', new Error('Google IMA SDK failed to load'));
                     });
             } else {
                 this.ready();
@@ -61,7 +66,7 @@ class Ads {
     }
 
     /**
-     * Get the ads instance ready.
+     * Get the ads instance ready
      */
     ready() {
         // Start ticking our safety timer. If the whole advertisement
@@ -156,7 +161,7 @@ class Ads {
 
             this.loader.requestAds(request);
 
-            this.trigger('ADS_LOADER_LOADED');
+            this.trigger('loaded');
         } catch (e) {
             this.onAdError(e);
         }
@@ -235,7 +240,7 @@ class Ads {
         });
 
         // Resolve our adsManager
-        this.trigger('ADS_MANAGER_LOADED');
+        this.trigger('loaded');
     }
 
     /**
@@ -260,7 +265,7 @@ class Ads {
             case google.ima.AdEvent.Type.LOADED:
                 // This is the first event sent for an ad - it is possible to determine whether the
                 // ad is a video ad or an overlay
-                this.trigger('LOADED');
+                this.trigger('loaded');
 
                 // Bubble event
                 dispatchEvent('loaded');
@@ -281,7 +286,6 @@ class Ads {
             case google.ima.AdEvent.Type.ALL_ADS_COMPLETED:
                 // All ads for the current videos are done. We can now request new advertisements
                 // in case the video is re-played
-                this.trigger('ALL_ADS_COMPLETED');
 
                 // Fire event
                 dispatchEvent('allcomplete');
@@ -316,7 +320,6 @@ class Ads {
                 // This event indicates the ad has started - the video player can adjust the UI,
                 // for example display a pause button and remaining time. Fired when content should
                 // be paused. This usually happens right before an ad is about to cover the content
-                this.trigger('CONTENT_PAUSE_REQUESTED');
 
                 dispatchEvent('contentpause');
 
@@ -329,7 +332,6 @@ class Ads {
                 // appropriate UI actions, such as removing the timer for remaining time detection.
                 // Fired when content should be resumed. This usually happens when an ad finishes
                 // or collapses
-                this.trigger('CONTENT_RESUME_REQUESTED');
 
                 dispatchEvent('contentresume');
 
@@ -370,7 +372,7 @@ class Ads {
      */
     onAdError(event) {
         this.cancel();
-        this.player.debug.log('Ads error', event);
+        this.player.debug.warn('Ads error', event);
     }
 
     /**
@@ -445,7 +447,7 @@ class Ads {
     }
 
     /**
-     * Resume our video.
+     * Resume our video
      */
     resumeContent() {
         // Hide the advertisement container
@@ -487,7 +489,7 @@ class Ads {
         }
 
         // Tell our instance that we're done for now
-        this.trigger('ERROR');
+        this.trigger('error');
 
         // Re-create our adsManager
         this.loadAds();
@@ -506,7 +508,7 @@ class Ads {
 
             // Re-set our adsManager promises
             this.managerPromise = new Promise(resolve => {
-                this.on('ADS_MANAGER_LOADED', resolve);
+                this.on('loaded', resolve);
                 this.player.debug.log(this.manager);
             });
 
