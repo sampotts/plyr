@@ -1930,9 +1930,6 @@
             plyr.media.paused = true;
             plyr.media.currentTime = 0;
 
-            // Update UI
-            _embedReady();
-
             plyr.embed.getCurrentTime().then(function(value) {
                 plyr.media.currentTime = value;
 
@@ -1958,6 +1955,19 @@
                 if (_is.htmlElement(plyr.embed.element) && plyr.supported.full) {
                     plyr.embed.element.setAttribute('tabindex', '-1');
                 }
+
+                // Fix player not seeking
+                // https://github.com/sampotts/plyr/issues/537
+                // https://github.com/sampotts/plyr/issues/208
+                plyr.embed.getDuration().then(function(value) {
+                    plyr.media.duration = value;
+
+                    // Trigger timeupdate
+                    _triggerEvent(plyr.media, 'durationchange');
+
+                    // Update UI
+                    _embedReady();
+                });
             });
 
             plyr.embed.on('play', function() {
@@ -2160,7 +2170,12 @@
 
                     case 'vimeo':
                         // Round to nearest second for vimeo
-                        plyr.embed.setCurrentTime(targetTime.toFixed(0));
+                        plyr.embed.setCurrentTime(targetTime.toFixed(0)).then(function () {
+                            // Prevent player from playing after seeking, if it was paused
+                            if (paused) {
+                                _pause();
+                            }
+                        });
                         break;
 
                     case 'soundcloud':
