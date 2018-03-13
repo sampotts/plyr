@@ -2170,7 +2170,12 @@
 
                     case 'vimeo':
                         // Round to nearest second for vimeo
-                        plyr.embed.setCurrentTime(targetTime.toFixed(0));
+                        plyr.embed.setCurrentTime(targetTime.toFixed(0)).then(function () {
+                            // Prevent player from playing after seeking, if it was paused
+                            if (paused) {
+                                _pause();
+                            }
+                        });
                         break;
 
                     case 'soundcloud':
