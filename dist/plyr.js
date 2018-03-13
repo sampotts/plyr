@@ -77,7 +77,7 @@ var defaults = {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.0.0-beta.18/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.0.0-beta.19/plyr.svg',
 
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
@@ -6031,7 +6031,7 @@ var source = {
 
 // ==========================================================================
 // Plyr
-// plyr.js v3.0.0-beta.18
+// plyr.js v3.0.0-beta.19
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================

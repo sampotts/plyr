@@ -1129,9 +1129,9 @@ class-utils@^0.3.5:
     lazy-cache "^2.0.2"
     static-extend "^0.1.1"
 
-clean-css@4.1.9:
-  version "4.1.9"
-  resolved "https://registry.yarnpkg.com/clean-css/-/clean-css-4.1.9.tgz#35cee8ae7687a49b98034f70de00c4edd3826301"
+clean-css@4.1.11:
+  version "4.1.11"
+  resolved "https://registry.yarnpkg.com/clean-css/-/clean-css-4.1.11.tgz#2ecdf145aba38f54740f26cefd0ff3e03e125d6a"
   dependencies:
     source-map "0.5.x"
 
@@ -1788,7 +1788,7 @@ estree-walker@^0.3.0:
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/estree-walker/-/estree-walker-0.3.1.tgz#e6b1a51cf7292524e7237c312e5fe6660c1ce1aa"
 
-estree-walker@^0.5.1:
+estree-walker@^0.5.0:
   version "0.5.1"
   resolved "https://registry.yarnpkg.com/estree-walker/-/estree-walker-0.5.1.tgz#64fc375053abc6f57d73e9bd2f004644ad3c5854"
 
@@ -2148,9 +2148,11 @@ getpass@^0.1.1:
   dependencies:
     assert-plus "^1.0.0"
 
-git-branch@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/git-branch/-/git-branch-1.0.0.tgz#64cc7dd75da2d81a9d4679087c1f8b56e6bd2d3d"
+git-branch@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/git-branch/-/git-branch-2.0.1.tgz#442724a97574c66ede4290ded75b7430785da08f"
+  dependencies:
+    findup-sync "^2.0.0"
 
 glob-base@^0.3.0:
   version "0.3.0"
@@ -2351,12 +2353,12 @@ gulp-better-rollup@^3.0.0:
     vinyl "^2.1.0"
     vinyl-sourcemaps-apply "^0.2.1"
 
-gulp-clean-css@^3.9.2:
-  version "3.9.2"
-  resolved "https://registry.yarnpkg.com/gulp-clean-css/-/gulp-clean-css-3.9.2.tgz#b280e6f56bf8bee39e697e77aaa72d3e7e7d3bd5"
+gulp-clean-css@^3.9.3:
+  version "3.9.3"
+  resolved "https://registry.yarnpkg.com/gulp-clean-css/-/gulp-clean-css-3.9.3.tgz#47bf7ad62f44970f86e4ac4bdeed68ad904e65c5"
   dependencies:
-    clean-css "4.1.9"
-    plugin-error "0.1.2"
+    clean-css "4.1.11"
+    plugin-error "1.0.1"
     through2 "2.0.3"
     vinyl-sourcemaps-apply "0.2.1"
 
@@ -4182,7 +4184,16 @@ pkg-dir@^1.0.0:
   dependencies:
     find-up "^1.0.0"
 
-plugin-error@0.1.2, plugin-error@^0.1.2:
+plugin-error@1.0.1, plugin-error@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/plugin-error/-/plugin-error-1.0.1.tgz#77016bd8919d0ac377fdcdd0322328953ca5781c"
+  dependencies:
+    ansi-colors "^1.0.1"
+    arr-diff "^4.0.0"
+    arr-union "^3.1.0"
+    extend-shallow "^3.0.2"
+
+plugin-error@^0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/plugin-error/-/plugin-error-0.1.2.tgz#3b9bb3335ccf00f425e07437e19276967da47ace"
   dependencies:
@@ -4191,15 +4202,6 @@ plugin-error@0.1.2, plugin-error@^0.1.2:
     arr-diff "^1.0.1"
     arr-union "^2.0.1"
     extend-shallow "^1.1.2"
-
-plugin-error@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/plugin-error/-/plugin-error-1.0.1.tgz#77016bd8919d0ac377fdcdd0322328953ca5781c"
-  dependencies:
-    ansi-colors "^1.0.1"
-    arr-diff "^4.0.0"
-    arr-union "^3.1.0"
-    extend-shallow "^3.0.2"
 
 plugin-log@^0.1.0:
   version "0.1.0"
@@ -4700,7 +4702,7 @@ resolve-url@^0.2.1, resolve-url@~0.2.1:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/resolve-url/-/resolve-url-0.2.1.tgz#2c637fe77c893afd2a663fe21aa9080068e2052a"
 
-resolve@^1.1.6, resolve@^1.1.7, resolve@^1.2.0, resolve@^1.5.0:
+resolve@^1.1.6, resolve@^1.1.7, resolve@^1.2.0, resolve@^1.4.0:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.5.0.tgz#1f09acce796c9a762579f31b2c1cc4c3cddf9f36"
   dependencies:
@@ -4725,13 +4727,14 @@ rollup-plugin-babel@^3.0.3:
   dependencies:
     rollup-pluginutils "^1.5.0"
 
-rollup-plugin-commonjs@^9.1.0:
-  version "9.1.0"
-  resolved "https://registry.yarnpkg.com/rollup-plugin-commonjs/-/rollup-plugin-commonjs-9.1.0.tgz#468341aab32499123ee9a04b22f51d9bf26fdd94"
+rollup-plugin-commonjs@^8.4.1:
+  version "8.4.1"
+  resolved "https://registry.yarnpkg.com/rollup-plugin-commonjs/-/rollup-plugin-commonjs-8.4.1.tgz#5c9cea2b2c3de322f5fbccd147e07ed5e502d7a0"
   dependencies:
-    estree-walker "^0.5.1"
+    acorn "^5.2.1"
+    estree-walker "^0.5.0"
     magic-string "^0.22.4"
-    resolve "^1.5.0"
+    resolve "^1.4.0"
     rollup-pluginutils "^2.0.1"
 
 rollup-plugin-node-resolve@^3.2.0:
