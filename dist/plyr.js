@@ -326,7 +326,7 @@ var defaults = {
     // Register for an account here: http://vi.ai/publisher-video-monetization/?aid=plyrio
     ads: {
         enabled: false,
-        publisherId: null
+        publisherId: '918848828995742'
     }
 };
 
@@ -1485,6 +1485,7 @@ var utils = {
 // Plyr support checks
 // ==========================================================================
 
+// Check for feature support
 var support = {
     // Basic support
     audio: 'canPlayType' in document.createElement('audio'),
@@ -2513,6 +2514,7 @@ var ui = {
 // Plyr controls
 // ==========================================================================
 
+// Sniff out the browser
 var browser$2 = utils.getBrowser();
 
 var controls = {
@@ -3710,6 +3712,7 @@ var controls = {
 // Plyr Event Listeners
 // ==========================================================================
 
+// Sniff out the browser
 var browser$1 = utils.getBrowser();
 
 var Listeners = function () {
@@ -4662,7 +4665,7 @@ var Ads = function () {
 
             // Proxy event
             var dispatchEvent = function dispatchEvent(type) {
-                var event = 'ads' + type.replace(/_/g, ' ').toLowerCase();
+                var event = 'ads' + type.replace(/_/g, '').toLowerCase();
                 utils.dispatchEvent.call(_this7.player, _this7.player.media, event);
             };
 
@@ -5788,6 +5791,7 @@ var vimeo = {
 // Plyr Media
 // ==========================================================================
 
+// Sniff out the browser
 var browser$3 = utils.getBrowser();
 
 var media = {
@@ -6031,6 +6035,12 @@ var source = {
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
+
+// Private properties
+// TODO: Use a WeakMap for private globals
+// const globals = new WeakMap();
+
+// Plyr instance
 
 var Plyr = function () {
     function Plyr(target, options) {
