@@ -1,6 +1,6 @@
 {
     "plugins": ["stylelint-selector-bem-pattern", "stylelint-scss"],
-    "extends": ["stylelint-config-sass-guidelines", "stylelint-config-recommended", "stylelint-config-prettier"],
+    "extends": ["stylelint-config-recommended", "stylelint-config-sass-guidelines", "stylelint-config-prettier"],
     "rules": {
         "selector-class-pattern": null,
         "selector-no-qualifying-type": [

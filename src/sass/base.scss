@@ -8,6 +8,7 @@
 
     direction: ltr;
     font-family: $plyr-font-family;
+    font-variant-numeric: tabular-nums; // Force monosace-esque number widths
     font-weight: $plyr-font-weight-regular;
     line-height: $plyr-line-height;
     max-width: 100%;

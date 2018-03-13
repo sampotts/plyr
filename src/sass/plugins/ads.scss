@@ -9,16 +9,17 @@
     position: absolute;
     right: 0;
     top: 0;
-    z-index: -1; // Hide it.
+    z-index: -1; // Hide it by default
 
     // Make sure the inner container is big enough for the ad creative.
     > div,
     > div iframe {
+        height: 100%;
         position: absolute;
         width: 100%;
-        height: 100%;
     }
 
+    // The countdown label
     &::after {
         background: rgba($plyr-color-gunmetal, 0.8);
         border-radius: 2px;
