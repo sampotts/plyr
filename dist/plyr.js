@@ -4662,7 +4662,8 @@ var Ads = function () {
 
             // Proxy event
             var dispatchEvent = function dispatchEvent(type) {
-                utils.dispatchEvent.call(_this7.player, _this7.player.media, 'ads' + type);
+                var event = 'ads' + type.replace(/_/g, ' ').toLowerCase();
+                utils.dispatchEvent.call(_this7.player, _this7.player.media, event);
             };
 
             switch (event.type) {
@@ -4672,7 +4673,7 @@ var Ads = function () {
                     this.trigger('loaded');
 
                     // Bubble event
-                    dispatchEvent('loaded');
+                    dispatchEvent(event.type);
 
                     // Start countdown
                     this.pollCountdown(true);
@@ -4692,7 +4693,7 @@ var Ads = function () {
                     // in case the video is re-played
 
                     // Fire event
-                    dispatchEvent('allcomplete');
+                    dispatchEvent(event.type);
 
                     // TODO: Example for what happens when a next video in a playlist would be loaded.
                     // So here we load a new video when all ads are done.
@@ -4725,7 +4726,7 @@ var Ads = function () {
                     // for example display a pause button and remaining time. Fired when content should
                     // be paused. This usually happens right before an ad is about to cover the content
 
-                    dispatchEvent('contentpause');
+                    dispatchEvent(event.type);
 
                     this.pauseContent();
 
@@ -4737,7 +4738,7 @@ var Ads = function () {
                     // Fired when content should be resumed. This usually happens when an ad finishes
                     // or collapses
 
-                    dispatchEvent('contentresume');
+                    dispatchEvent(event.type);
 
                     this.pollCountdown();
 
@@ -4746,23 +4747,11 @@ var Ads = function () {
                     break;
 
                 case google.ima.AdEvent.Type.STARTED:
-                    dispatchEvent('started');
-                    break;
-
                 case google.ima.AdEvent.Type.MIDPOINT:
-                    dispatchEvent('midpoint');
-                    break;
-
                 case google.ima.AdEvent.Type.COMPLETE:
-                    dispatchEvent('complete');
-                    break;
-
                 case google.ima.AdEvent.Type.IMPRESSION:
-                    dispatchEvent('impression');
-                    break;
-
                 case google.ima.AdEvent.Type.CLICK:
-                    dispatchEvent('click');
+                    dispatchEvent(event.type);
                     break;
 
                 default:

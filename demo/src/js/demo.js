@@ -53,7 +53,6 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         ads: {
             enabled: true,
-            publisherId: 'plyrio',
         },
     });
 
