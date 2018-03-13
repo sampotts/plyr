@@ -171,7 +171,7 @@ class Ads {
      */
     pollCountdown(start = false) {
         if (!start) {
-            window.clearInterval(this.countdownTimer);
+            clearInterval(this.countdownTimer);
             this.elements.container.removeAttribute('data-badge-text');
             return;
         }
@@ -182,7 +182,7 @@ class Ads {
             this.elements.container.setAttribute('data-badge-text', label);
         };
 
-        this.countdownTimer = window.setInterval(update, 100);
+        this.countdownTimer = setInterval(update, 100);
     }
 
     /**

@@ -188,7 +188,7 @@ class Listeners {
     }
 
     // Global window & document listeners
-    global(toggle) {
+    global(toggle = true) {
         // Keyboard shortcuts
         if (this.player.config.keyboard.global) {
             utils.toggleListener(window, 'keydown keyup', this.handleKey, toggle, false);
@@ -584,6 +584,11 @@ class Listeners {
                 }),
             false,
         );
+    }
+
+    // Reset on destroy
+    clear() {
+        this.global(false);
     }
 }
 

@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v3.0.0-beta.19
+// plyr.js v3.0.0-beta.20
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -276,7 +276,7 @@ class Plyr {
         this.listeners.container();
 
         // Global listeners
-        this.listeners.global(true);
+        this.listeners.global();
 
         // Setup fullscreen
         this.fullscreen = new Fullscreen(this);
@@ -951,7 +951,7 @@ class Plyr {
         }
 
         // Clear timer on every call
-        window.clearTimeout(this.timers.controls);
+        clearTimeout(this.timers.controls);
 
         // If the mouse is not over the controls, set a timeout to hide them
         if (show || this.paused || this.loading) {
@@ -1057,11 +1057,11 @@ class Plyr {
                     callback();
                 }
             } else {
+                // Unbind listeners
+                this.listeners.clear();
+
                 // Replace the container with the original element provided
                 utils.replaceElement(this.elements.original, this.elements.container);
-
-                // Unbind global listeners
-                this.listeners.global(false);
 
                 // Event
                 utils.dispatchEvent.call(this, this.elements.original, 'destroyed', true);
@@ -1071,15 +1071,24 @@ class Plyr {
                     callback.call(this.elements.original);
                 }
 
-                // Clear for GC
-                this.elements = null;
+                // Clear for garbage collection
+                setTimeout(() => {
+                    this.elements = null;
+                    this.media = null;
+                }, 200);
             }
         };
+
+        // Stop playback
+        this.stop();
 
         // Type specific stuff
         switch (`${this.provider}:${this.type}`) {
             case 'html5:video':
             case 'html5:audio':
+                // Clear timeout
+                clearTimeout(this.timers.loading);
+
                 // Restore native video controls
                 ui.toggleNativeControls.call(this, true);
 
@@ -1090,8 +1099,8 @@ class Plyr {
 
             case 'youtube:video':
                 // Clear timers
-                window.clearInterval(this.timers.buffering);
-                window.clearInterval(this.timers.playing);
+                clearInterval(this.timers.buffering);
+                clearInterval(this.timers.playing);
 
                 // Destroy YouTube API
                 if (this.embed !== null) {

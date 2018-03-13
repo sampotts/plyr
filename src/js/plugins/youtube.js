@@ -305,10 +305,10 @@ const youtube = {
                     utils.dispatchEvent.call(player, player.media, 'durationchange');
 
                     // Reset timer
-                    window.clearInterval(player.timers.buffering);
+                    clearInterval(player.timers.buffering);
 
                     // Setup buffering
-                    player.timers.buffering = window.setInterval(() => {
+                    player.timers.buffering = setInterval(() => {
                         // Get loaded % from YouTube
                         player.media.buffered = instance.getVideoLoadedFraction();
 
@@ -322,7 +322,7 @@ const youtube = {
 
                         // Bail if we're at 100%
                         if (player.media.buffered === 1) {
-                            window.clearInterval(player.timers.buffering);
+                            clearInterval(player.timers.buffering);
 
                             // Trigger event
                             utils.dispatchEvent.call(player, player.media, 'canplaythrough');
@@ -337,7 +337,7 @@ const youtube = {
                     const instance = event.target;
 
                     // Reset timer
-                    window.clearInterval(player.timers.playing);
+                    clearInterval(player.timers.playing);
 
                     // Handle events
                     // -1   Unstarted
@@ -377,7 +377,7 @@ const youtube = {
                             utils.dispatchEvent.call(player, player.media, 'playing');
 
                             // Poll to get playback progress
-                            player.timers.playing = window.setInterval(() => {
+                            player.timers.playing = setInterval(() => {
                                 utils.dispatchEvent.call(player, player.media, 'timeupdate');
                             }, 50);
 

@@ -5268,7 +5268,7 @@ var defaults = {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.0.0-beta.19/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.0.0-beta.20/plyr.svg',
 
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
@@ -9074,7 +9074,9 @@ var Listeners = function () {
 
     }, {
         key: 'global',
-        value: function global(toggle) {
+        value: function global() {
+            var toggle = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+
             // Keyboard shortcuts
             if (this.player.config.keyboard.global) {
                 utils.toggleListener(window, 'keydown keyup', this.handleKey, toggle, false);
@@ -9485,6 +9487,14 @@ var Listeners = function () {
                 });
             }, false);
         }
+
+        // Reset on destroy
+
+    }, {
+        key: 'clear',
+        value: function clear() {
+            this.global(false);
+        }
     }]);
     return Listeners;
 }();
@@ -9756,7 +9766,7 @@ var Ads = function () {
             var start = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
             if (!start) {
-                window.clearInterval(this.countdownTimer);
+                clearInterval(this.countdownTimer);
                 this.elements.container.removeAttribute('data-badge-text');
                 return;
             }
@@ -9767,7 +9777,7 @@ var Ads = function () {
                 _this5.elements.container.setAttribute('data-badge-text', label);
             };
 
-            this.countdownTimer = window.setInterval(update, 100);
+            this.countdownTimer = setInterval(update, 100);
         }
 
         /**
@@ -10542,10 +10552,10 @@ var youtube = {
                     utils.dispatchEvent.call(player, player.media, 'durationchange');
 
                     // Reset timer
-                    window.clearInterval(player.timers.buffering);
+                    clearInterval(player.timers.buffering);
 
                     // Setup buffering
-                    player.timers.buffering = window.setInterval(function () {
+                    player.timers.buffering = setInterval(function () {
                         // Get loaded % from YouTube
                         player.media.buffered = instance.getVideoLoadedFraction();
 
@@ -10559,7 +10569,7 @@ var youtube = {
 
                         // Bail if we're at 100%
                         if (player.media.buffered === 1) {
-                            window.clearInterval(player.timers.buffering);
+                            clearInterval(player.timers.buffering);
 
                             // Trigger event
                             utils.dispatchEvent.call(player, player.media, 'canplaythrough');
@@ -10576,7 +10586,7 @@ var youtube = {
                     var instance = event.target;
 
                     // Reset timer
-                    window.clearInterval(player.timers.playing);
+                    clearInterval(player.timers.playing);
 
                     // Handle events
                     // -1   Unstarted
@@ -10616,7 +10626,7 @@ var youtube = {
                             utils.dispatchEvent.call(player, player.media, 'playing');
 
                             // Poll to get playback progress
-                            player.timers.playing = window.setInterval(function () {
+                            player.timers.playing = setInterval(function () {
                                 utils.dispatchEvent.call(player, player.media, 'timeupdate');
                             }, 50);
 
@@ -11222,7 +11232,7 @@ var source = {
 
 // ==========================================================================
 // Plyr
-// plyr.js v3.0.0-beta.19
+// plyr.js v3.0.0-beta.20
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -11478,7 +11488,7 @@ var Plyr$1 = function () {
         this.listeners.container();
 
         // Global listeners
-        this.listeners.global(true);
+        this.listeners.global();
 
         // Setup fullscreen
         this.fullscreen = new Fullscreen(this);
@@ -11738,7 +11748,7 @@ var Plyr$1 = function () {
             }
 
             // Clear timer on every call
-            window.clearTimeout(this.timers.controls);
+            clearTimeout(this.timers.controls);
 
             // If the mouse is not over the controls, set a timeout to hide them
             if (show || this.paused || this.loading) {
@@ -11857,11 +11867,11 @@ var Plyr$1 = function () {
                         callback();
                     }
                 } else {
+                    // Unbind listeners
+                    _this4.listeners.clear();
+
                     // Replace the container with the original element provided
                     utils.replaceElement(_this4.elements.original, _this4.elements.container);
-
-                    // Unbind global listeners
-                    _this4.listeners.global(false);
 
                     // Event
                     utils.dispatchEvent.call(_this4, _this4.elements.original, 'destroyed', true);
@@ -11871,15 +11881,24 @@ var Plyr$1 = function () {
                         callback.call(_this4.elements.original);
                     }
 
-                    // Clear for GC
-                    _this4.elements = null;
+                    // Clear for garbage collection
+                    setTimeout(function () {
+                        _this4.elements = null;
+                        _this4.media = null;
+                    }, 200);
                 }
             };
+
+            // Stop playback
+            this.stop();
 
             // Type specific stuff
             switch (this.provider + ':' + this.type) {
                 case 'html5:video':
                 case 'html5:audio':
+                    // Clear timeout
+                    clearTimeout(this.timers.loading);
+
                     // Restore native video controls
                     ui.toggleNativeControls.call(this, true);
 
@@ -11890,8 +11909,8 @@ var Plyr$1 = function () {
 
                 case 'youtube:video':
                     // Clear timers
-                    window.clearInterval(this.timers.buffering);
-                    window.clearInterval(this.timers.playing);
+                    clearInterval(this.timers.buffering);
+                    clearInterval(this.timers.playing);
 
                     // Destroy YouTube API
                     if (this.embed !== null) {
