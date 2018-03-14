@@ -30,13 +30,9 @@ const support = {
                 break;
 
             case 'youtube:video':
-                api = true;
-                ui = support.rangeInput && (!browser.isIPhone || playsInline);
-                break;
-
             case 'vimeo:video':
                 api = true;
-                ui = support.rangeInput && !browser.isIPhone;
+                ui = support.rangeInput && (!browser.isIPhone || playsInline);
                 break;
 
             default:

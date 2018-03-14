@@ -5,7 +5,6 @@
 import utils from './utils';
 import captions from './captions';
 import controls from './controls';
-import listeners from './listeners';
 
 const ui = {
     addStyleHook() {
@@ -25,7 +24,7 @@ const ui = {
     // Setup the UI
     build() {
         // Re-attach media element listeners
-        // TODO: Use event bubbling
+        // TODO: Use event bubbling?
         this.listeners.media();
 
         // Don't setup interface if no support

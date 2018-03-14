@@ -1029,6 +1029,10 @@ class Plyr {
      * @param {boolean} soft - Whether it's a soft destroy (for source changes etc)
      */
     destroy(callback, soft = false) {
+        if (!this.ready) {
+            return;
+        }
+
         const done = () => {
             // Reset overflow (incase destroyed while in fullscreen)
             document.body.style.overflow = '';
@@ -1070,6 +1074,9 @@ class Plyr {
                 if (utils.is.function(callback)) {
                     callback.call(this.elements.original);
                 }
+
+                // Reset state
+                this.ready = false;
 
                 // Clear for garbage collection
                 setTimeout(() => {
