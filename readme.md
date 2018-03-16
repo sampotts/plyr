@@ -63,6 +63,12 @@ Created and maintained by Jon Uhlmann ([@jonnitto](https://github.com/jonnitto))
 ### [Kirby](https://github.com/dpschen/kirby-plyrtag)
 Created and maintained by Dominik Pschenitschni ([@dpschen](https://github.com/dpschen))
 
+### [React](https://github.com/xDae/react-plyr)
+Created and maintained by Jose Miguel Bejarano ([@xDae](https://github.com/xDae))
+
+### [Vue](https://github.com/redxtech/vue-plyr)
+Created and maintained by Gabe Dunn ([@redxtech](https://github.com/redxtech))
+
 ## Using package managers
 You can grab the source using one of the following package managers.
 
@@ -302,7 +308,7 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
       <td><code>autoplay</code></td>
       <td>Boolean</td>
       <td><code>false</code></td>
-      <td>Autoplay the media on load. This is generally advised against on UX grounds. It is also disabled on iOS (an Apple limitation).</td>
+      <td>Autoplay the media on load. This is generally advised against on UX grounds. It is also disabled on <a href="https://webkit.org/blog/7734/auto-play-policy-changes-for-macos/">iOS and macOS</a> (an Apple limitation).</td>
     </tr>
     <tr>
       <td><code>seekTime</code></td>
@@ -1024,7 +1030,7 @@ Fullscreen in Plyr is supported by all browsers that [currently support it](http
 The `enabled` option can be used to disable certain User Agents. For example, if you don't want to use Plyr for smartphones, you could use:
 
 ```javascript
-enabled: /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent)
+enabled: !/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent)
 ```
 If a User Agent is disabled but supports `<video>` and `<audio>` natively, it will use the native player.
 
