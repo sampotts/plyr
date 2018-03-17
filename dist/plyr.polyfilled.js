@@ -5268,7 +5268,7 @@ var defaults = {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.0.0/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.0.1/plyr.svg',
 
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
@@ -9497,9 +9497,13 @@ var Storage = function () {
     createClass(Storage, [{
         key: 'get',
         value: function get(key) {
+            if (!Storage.supported) {
+                return null;
+            }
+
             var store = window.localStorage.getItem(this.key);
 
-            if (!Storage.supported || utils.is.empty(store)) {
+            if (utils.is.empty(store)) {
                 return null;
             }
 
@@ -9537,17 +9541,18 @@ var Storage = function () {
     }], [{
         key: 'supported',
         get: function get() {
-            if (!('localStorage' in window)) {
-                return false;
-            }
-
-            var test = '___test';
-
-            // Try to use it (it might be disabled, e.g. user is in private mode)
-            // see: https://github.com/sampotts/plyr/issues/131
             try {
+                if (!('localStorage' in window)) {
+                    return false;
+                }
+
+                var test = '___test';
+
+                // Try to use it (it might be disabled, e.g. user is in private mode)
+                // see: https://github.com/sampotts/plyr/issues/131
                 window.localStorage.setItem(test, test);
                 window.localStorage.removeItem(test);
+
                 return true;
             } catch (e) {
                 return false;
@@ -11212,7 +11217,7 @@ var source = {
 
 // ==========================================================================
 // Plyr
-// plyr.js v3.0.0
+// plyr.js v3.0.1
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -11496,6 +11501,10 @@ var Plyr$1 = function () {
         value: function play() {
             var _this2 = this;
 
+            if (!utils.is.function(this.media.play)) {
+                return null;
+            }
+
             // If ads are enabled, wait for them first
             if (this.ads.enabled && !this.ads.initialized) {
                 return this.ads.managerPromise.then(function () {
@@ -11516,7 +11525,7 @@ var Plyr$1 = function () {
     }, {
         key: 'pause',
         value: function pause() {
-            if (!this.playing) {
+            if (!this.playing || !utils.is.function(this.media.pause)) {
                 return;
             }
 
@@ -12512,7 +12521,7 @@ var Plyr$1 = function () {
 
 // ==========================================================================
 // Plyr Polyfilled Build
-// plyr.js v3.0.0
+// plyr.js v3.0.1
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================

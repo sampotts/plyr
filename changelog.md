@@ -1,3 +1,7 @@
+# v3.0.1
+
+*   Fix for trying to accessing local storage when it's blocked
+
 # v3.0.0
 
 This is a massive release. A _mostly_ complete rewrite in ES6. What started out as a few changes quickly snowballed. There's many breaking changes so be careful upgrading.

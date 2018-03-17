@@ -12,17 +12,18 @@ class Storage {
 
     // Check for actual support (see if we can use it)
     static get supported() {
-        if (!('localStorage' in window)) {
-            return false;
-        }
-
-        const test = '___test';
-
-        // Try to use it (it might be disabled, e.g. user is in private mode)
-        // see: https://github.com/sampotts/plyr/issues/131
         try {
+            if (!('localStorage' in window)) {
+                return false;
+            }
+
+            const test = '___test';
+
+            // Try to use it (it might be disabled, e.g. user is in private mode)
+            // see: https://github.com/sampotts/plyr/issues/131
             window.localStorage.setItem(test, test);
             window.localStorage.removeItem(test);
+
             return true;
         } catch (e) {
             return false;
@@ -30,9 +31,13 @@ class Storage {
     }
 
     get(key) {
+        if (!Storage.supported) {
+            return null;
+        }
+
         const store = window.localStorage.getItem(this.key);
 
-        if (!Storage.supported || utils.is.empty(store)) {
+        if (utils.is.empty(store)) {
             return null;
         }
 
