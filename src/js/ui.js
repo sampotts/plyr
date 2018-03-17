@@ -255,21 +255,7 @@ const ui = {
                 // Check buffer status
                 case 'playing':
                 case 'progress':
-                    value = (() => {
-                        const { buffered } = this.media;
-
-                        if (buffered && buffered.length) {
-                            // HTML5
-                            return utils.getPercentage(buffered.end(0), this.duration);
-                        } else if (utils.is.number(buffered)) {
-                            // YouTube returns between 0 and 1
-                            return buffered * 100;
-                        }
-
-                        return 0;
-                    })();
-
-                    ui.setProgress.call(this, this.elements.display.buffer, value);
+                    ui.setProgress.call(this, this.elements.display.buffer, this.buffered * 100);
 
                     break;
 

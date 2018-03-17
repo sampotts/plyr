@@ -53,6 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         ads: {
             enabled: true,
+            publisherId: '918848828995742',
         },
     });
 

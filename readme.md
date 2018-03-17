@@ -13,13 +13,13 @@ A simple, lightweight, accessible and customizable HTML5, YouTube and Vimeo medi
 ## Features
 
 *   **Accessible** - full support for VTT captions and screen readers
-*   **Lightweight** - just 18KB minified and gzipped
 *   **[Customisable](#html)** - make the player look how you want with the markup you want
 *   **Semantic** - uses the _right_ elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no
     `<span>` or `<a href="#">` button hacks
 *   **Responsive** - works with any screen size
 *   **HTML Video & Audio** - support for both formats
 *   **[Embedded Video](#embeds)** - support for YouTube and Vimeo video playback
+*   **[Monetization](#ads)** - make money from your videos
 *   **[Streaming](#streaming)** - support for hls.js, Shaka and dash.js streaming playback
 *   **[API](#api)** - toggle playback, volume, seeking, and more through a standardized API
 *   **[Events](#events)** - no messing around with Vimeo and YouTube APIs, all events are standardized across formats
@@ -151,6 +151,16 @@ If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for t
 
 The SVG sprite is loaded automatically from our CDN (provided by [Fastly](https://www.fastly.com/)). To change this, see the [options](#options) below. For
 reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.0.0-beta.20/plyr.svg`.
+
+## Ads
+
+Plyr has partnered up with [ai.vi](http://vi.ai/publisher-video-monetization/?aid=plyrio) to offer monetization options for your videos. Getting setup is easy:
+
+*   [Sign up for a vi.ai account](http://vi.ai/publisher-video-monetization/?aid=plyrio)
+*   Grab your publisher ID from the code snippet
+*   Enable ads in the [config options](#options) and enter your publisher ID
+
+Any questions regarding the ads can be sent straight to vi.ai and any issues with rendering raised through GitHub issues.
 
 ## Advanced
 
@@ -284,6 +294,7 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
 | `speed`              | Object                     | `{ selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2] }`                                                                 | `selected`: The default speed for playback. `options`: Options to display in the menu. Most browsers will refuse to play slower than 0.5.                                                                                                                                                                                                                              |
 | `quality`            | Object                     | `{ default: 'default', options: ['hd2160', 'hd1440', 'hd1080', 'hd720', 'large', 'medium', 'small', 'tiny', 'default'] }`      | Currently only supported by YouTube. `default` is the default quality level, determined by YouTube. `options` are the options to display.                                                                                                                                                                                                                              |
 | `loop`               | Object                     | `{ active: false }`                                                                                                            | `active`: Whether to loop the current video. If the `loop` attribute is present on a `<video>` or `<audio>` element, this will be automatically set to true This is an object to support future functionality.                                                                                                                                                         |
+| `ads`                | Object                     | `{ enabled: false, publisherId: '' }`                                                                                          | `enabled`: Whether to enable vi.ai ads. `publisherId`: Your unique vi.ai publisher ID.                                                                                                                                                                                                                                                                                 |
 
 1.  Vimeo only
 
@@ -366,6 +377,7 @@ player.fullscreen.active; // false;
 | `paused`             | ✓      | -      | Returns a boolean indicating if the current player is paused.                                                                                                                        |
 | `playing`            | ✓      | -      | Returns a boolean indicating if the current player is playing.                                                                                                                       |
 | `ended`              | ✓      | -      | Returns a boolean indicating if the current player has finished playback.                                                                                                            |
+| `buffered`           | ✓      | -      | Returns a float between 0 and 1 indicating how much of the media is buffered                                                                                                         |
 | `currentTime`        | ✓      | ✓      | Gets or sets the currentTime for the player. The setter accepts a float in seconds.                                                                                                  |
 | `seeking`            | ✓      | -      | Returns a boolean indicating if the current player is seeking.                                                                                                                       |
 | `duration`           | ✓      | -      | Returns the duration for the current media.                                                                                                                                          |

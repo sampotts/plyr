@@ -326,7 +326,7 @@ var defaults = {
     // Register for an account here: http://vi.ai/publisher-video-monetization/?aid=plyrio
     ads: {
         enabled: false,
-        publisherId: '918848828995742'
+        publisherId: ''
     }
 };
 
@@ -1260,6 +1260,7 @@ var utils = {
         if (current === 0 || max === 0 || Number.isNaN(current) || Number.isNaN(max)) {
             return 0;
         }
+
         return (current / max * 100).toFixed(2);
     },
 
@@ -1485,7 +1486,6 @@ var utils = {
 // Plyr support checks
 // ==========================================================================
 
-// Check for feature support
 var support = {
     // Basic support
     audio: 'canPlayType' in document.createElement('audio'),
@@ -2394,8 +2394,6 @@ var ui = {
 
     // Update <progress> elements
     updateProgress: function updateProgress(event) {
-        var _this4 = this;
-
         if (!this.supported.ui || !utils.is.event(event)) {
             return;
         }
@@ -2419,22 +2417,7 @@ var ui = {
                 // Check buffer status
                 case 'playing':
                 case 'progress':
-                    value = function () {
-                        var buffered = _this4.media.buffered;
-
-
-                        if (buffered && buffered.length) {
-                            // HTML5
-                            return utils.getPercentage(buffered.end(0), _this4.duration);
-                        } else if (utils.is.number(buffered)) {
-                            // YouTube returns between 0 and 1
-                            return buffered * 100;
-                        }
-
-                        return 0;
-                    }();
-
-                    ui.setProgress.call(this, this.elements.display.buffer, value);
+                    ui.setProgress.call(this, this.elements.display.buffer, this.buffered * 100);
 
                     break;
 
@@ -2510,7 +2493,6 @@ var ui = {
 // Plyr controls
 // ==========================================================================
 
-// Sniff out the browser
 var browser$2 = utils.getBrowser();
 
 var controls = {
@@ -3708,7 +3690,6 @@ var controls = {
 // Plyr Event Listeners
 // ==========================================================================
 
-// Sniff out the browser
 var browser$1 = utils.getBrowser();
 
 var Listeners = function () {
@@ -5797,7 +5778,6 @@ var vimeo = {
 // Plyr Media
 // ==========================================================================
 
-// Sniff out the browser
 var browser$3 = utils.getBrowser();
 
 var media = {
@@ -6772,37 +6752,37 @@ var Plyr = function () {
     }, {
         key: 'isHTML5',
         get: function get$$1() {
-            return this.provider === providers.html5;
+            return Boolean(this.provider === providers.html5);
         }
     }, {
         key: 'isEmbed',
         get: function get$$1() {
-            return this.isYouTube || this.isVimeo;
+            return Boolean(this.isYouTube || this.isVimeo);
         }
     }, {
         key: 'isYouTube',
         get: function get$$1() {
-            return this.provider === providers.youtube;
+            return Boolean(this.provider === providers.youtube);
         }
     }, {
         key: 'isVimeo',
         get: function get$$1() {
-            return this.provider === providers.vimeo;
+            return Boolean(this.provider === providers.vimeo);
         }
     }, {
         key: 'isVideo',
         get: function get$$1() {
-            return this.type === types.video;
+            return Boolean(this.type === types.video);
         }
     }, {
         key: 'isAudio',
         get: function get$$1() {
-            return this.type === types.audio;
+            return Boolean(this.type === types.audio);
         }
     }, {
         key: 'paused',
         get: function get$$1() {
-            return this.media.paused;
+            return Boolean(this.media.paused);
         }
 
         /**
@@ -6812,7 +6792,7 @@ var Plyr = function () {
     }, {
         key: 'playing',
         get: function get$$1() {
-            return !this.paused && !this.ended && (this.isHTML5 ? this.media.readyState > 2 : true);
+            return Boolean(!this.paused && !this.ended && (this.isHTML5 ? this.media.readyState > 2 : true));
         }
 
         /**
@@ -6822,7 +6802,7 @@ var Plyr = function () {
     }, {
         key: 'ended',
         get: function get$$1() {
-            return this.media.ended;
+            return Boolean(this.media.ended);
         }
     }, {
         key: 'currentTime',
@@ -6856,13 +6836,38 @@ var Plyr = function () {
         }
 
         /**
+         * Get buffered
+         */
+
+    }, {
+        key: 'buffered',
+        get: function get$$1() {
+            var buffered = this.media.buffered;
+
+            // YouTube / Vimeo return a float between 0-1
+
+            if (utils.is.number(buffered)) {
+                return buffered;
+            }
+
+            // HTML5
+            // TODO: Handle buffered chunks of the media
+            // (i.e. seek to another section buffers only that section)
+            if (buffered && buffered.length && this.duration > 0) {
+                return buffered.end(0) / this.duration;
+            }
+
+            return 0;
+        }
+
+        /**
          * Get seeking status
          */
 
     }, {
         key: 'seeking',
         get: function get$$1() {
-            return this.media.seeking;
+            return Boolean(this.media.seeking);
         }
 
         /**
@@ -6934,7 +6939,7 @@ var Plyr = function () {
          */
         ,
         get: function get$$1() {
-            return this.media.volume;
+            return Number(this.media.volume);
         }
     }, {
         key: 'muted',
@@ -6963,7 +6968,7 @@ var Plyr = function () {
          */
         ,
         get: function get$$1() {
-            return this.media.muted;
+            return Boolean(this.media.muted);
         }
 
         /**
@@ -6983,12 +6988,12 @@ var Plyr = function () {
             }
 
             // Get audio tracks
-            return this.media.mozHasAudio || Boolean(this.media.webkitAudioDecodedByteCount) || Boolean(this.media.audioTracks && this.media.audioTracks.length);
+            return Boolean(this.media.mozHasAudio) || Boolean(this.media.webkitAudioDecodedByteCount) || Boolean(this.media.audioTracks && this.media.audioTracks.length);
         }
 
         /**
          * Set playback speed
-         * @param {decimal} speed - the speed of playback (0.5-2.0)
+         * @param {number} speed - the speed of playback (0.5-2.0)
          */
 
     }, {
@@ -7033,7 +7038,7 @@ var Plyr = function () {
          */
         ,
         get: function get$$1() {
-            return this.media.playbackRate;
+            return Number(this.media.playbackRate);
         }
 
         /**
@@ -7136,7 +7141,7 @@ var Plyr = function () {
          */
         ,
         get: function get$$1() {
-            return this.media.loop;
+            return Boolean(this.media.loop);
         }
 
         /**
@@ -7205,7 +7210,7 @@ var Plyr = function () {
          */
         ,
         get: function get$$1() {
-            return this.config.autoplay;
+            return Boolean(this.config.autoplay);
         }
     }, {
         key: 'language',

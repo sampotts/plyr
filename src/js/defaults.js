@@ -376,7 +376,7 @@ const defaults = {
     // Register for an account here: http://vi.ai/publisher-video-monetization/?aid=plyrio
     ads: {
         enabled: false,
-        publisherId: '918848828995742',
+        publisherId: '',
     },
 };
 
