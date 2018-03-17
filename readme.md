@@ -150,7 +150,7 @@ reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.0.0/
 
 ## Ads
 
-Plyr has partnered up with [ai.vi](http://vi.ai/publisher-video-monetization/?aid=plyrio) to offer monetization options for your videos. Getting setup is easy:
+Plyr has partnered up with [vi.ai](http://vi.ai/publisher-video-monetization/?aid=plyrio) to offer monetization options for your videos. Getting setup is easy:
 
 *   [Sign up for a vi.ai account](http://vi.ai/publisher-video-monetization/?aid=plyrio)
 *   Grab your publisher ID from the code snippet
