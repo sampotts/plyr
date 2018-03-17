@@ -1,24 +1,20 @@
 {
     "plyr": {
-        "less": {
-            "plyr.css":     ["src/less/plyr.less"]
-        },
-        "scss": {
-            "plyr.css":     ["src/scss/plyr.scss"]
+        "sass": {
+            "plyr.css": "src/sass/plyr.scss"
         },
         "js": {
-            "plyr.js":      ["src/js/plyr.js"]
+            "plyr.js": "src/js/plyr.js",
+            "plyr.polyfilled.js": "src/js/plyr.polyfilled.js"
         }
     },
     "demo": {
-        "less": {
-            "demo.css":     ["demo/src/less/demo.less"]
+        "sass": {
+            "demo.css": "demo/src/sass/bundles/demo.scss",
+            "error.css": "demo/src/sass/bundles/error.csss"
         },
         "js": {
-            "demo.js": [
-                "demo/src/js/lib/classlist.js",
-                "demo/src/js/main.js"
-            ]
+            "demo.js": "demo/src/js/demo.js"
         }
     }
 }

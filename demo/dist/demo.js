@@ -1,1 +1,243 @@
-"document"in self&&("classList"in document.createElement("_")?function(){"use strict";var t=document.createElement("_");if(t.classList.add("c1","c2"),!t.classList.contains("c2")){var e=function(t){var e=DOMTokenList.prototype[t];DOMTokenList.prototype[t]=function(t){var i,o=arguments.length;for(i=0;i<o;i++)t=arguments[i],e.call(this,t)}};e("add"),e("remove")}if(t.classList.toggle("c3",!1),t.classList.contains("c3")){var i=DOMTokenList.prototype.toggle;DOMTokenList.prototype.toggle=function(t,e){return 1 in arguments&&!this.contains(t)==!e?e:i.call(this,t)}}t=null}():function(t){"use strict";if("Element"in t){var e=t.Element.prototype,i=Object,o=String.prototype.trim||function(){return this.replace(/^\s+|\s+$/g,"")},s=Array.prototype.indexOf||function(t){for(var e=0,i=this.length;e<i;e++)if(e in this&&this[e]===t)return e;return-1},n=function(t,e){this.name=t,this.code=DOMException[t],this.message=e},r=function(t,e){if(""===e)throw new n("SYNTAX_ERR","An invalid or illegal string was specified");if(/\s/.test(e))throw new n("INVALID_CHARACTER_ERR","String contains an invalid character");return s.call(t,e)},a=function(t){for(var e=o.call(t.getAttribute("class")||""),i=e?e.split(/\s+/):[],s=0,n=i.length;s<n;s++)this.push(i[s]);this._updateClassName=function(){t.setAttribute("class",this.toString())}},c=a.prototype=[],l=function(){return new a(this)};if(n.prototype=Error.prototype,c.item=function(t){return this[t]||null},c.contains=function(t){return t+="",-1!==r(this,t)},c.add=function(){var t,e=arguments,i=0,o=e.length,s=!1;do{t=e[i]+"",-1===r(this,t)&&(this.push(t),s=!0)}while(++i<o);s&&this._updateClassName()},c.remove=function(){var t,e,i=arguments,o=0,s=i.length,n=!1;do{for(t=i[o]+"",e=r(this,t);-1!==e;)this.splice(e,1),n=!0,e=r(this,t)}while(++o<s);n&&this._updateClassName()},c.toggle=function(t,e){t+="";var i=this.contains(t),o=i?!0!==e&&"remove":!1!==e&&"add";return o&&this[o](t),!0===e||!1===e?e:!i},c.toString=function(){return this.join(" ")},i.defineProperty){var u={get:l,enumerable:!0,configurable:!0};try{i.defineProperty(e,"classList",u)}catch(t){-2146823252===t.number&&(u.enumerable=!1,i.defineProperty(e,"classList",u))}}else i.prototype.__defineGetter__&&e.__defineGetter__("classList",l)}}(self)),function(){function t(t,e,i){if(t)if(t.classList)t.classList[i?"add":"remove"](e);else{var o=(" "+t.className+" ").replace(/\s+/g," ").replace(" "+e+" ","");t.className=o+(i?" "+e:"")}}function e(e,i){if(e in n&&(i||e!==r)&&(r.length||e!==n.video)){switch(e){case n.video:o.source({type:"video",title:"View From A Blue Moon",sources:[{src:"https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.mp4",type:"video/mp4"},{src:"https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.webm",type:"video/webm"}],poster:"https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.jpg",tracks:[{kind:"captions",label:"English",srclang:"en",src:"https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.en.vtt",default:!0}]});break;case n.audio:o.source({type:"audio",title:"Kishi Bashi &ndash; &ldquo;It All Began With A Burst&rdquo;",sources:[{src:"https://cdn.plyr.io/static/demo/Kishi_Bashi_-_It_All_Began_With_a_Burst.mp3",type:"audio/mp3"},{src:"https://cdn.plyr.io/static/demo/Kishi_Bashi_-_It_All_Began_With_a_Burst.ogg",type:"audio/ogg"}]});break;case n.youtube:o.source({type:"video",title:"View From A Blue Moon",sources:[{src:"bTqVqk7FSmY",type:"youtube"}]});break;case n.vimeo:o.source({type:"video",title:"View From A Blue Moon",sources:[{src:"147865858",type:"vimeo"}]})}r=e;for(var a=s.length-1;a>=0;a--)t(s[a].parentElement,"active",!1);t(document.querySelector('[data-source="'+e+'"]').parentElement,"active",!0)}}var i=plyr.setup({debug:!0,title:"Video demo",iconUrl:"../dist/plyr.svg",tooltips:{controls:!0},captions:{defaultActive:!0}});plyr.loadSprite("dist/demo.svg");for(var o=i[0],s=document.querySelectorAll("[data-source]"),n={video:"video",audio:"audio",youtube:"youtube",vimeo:"vimeo"},r=window.location.hash.replace("#",""),a=window.history&&window.history.pushState,c=s.length-1;c>=0;c--)s[c].addEventListener("click",function(){var t=this.getAttribute("data-source");e(t),a&&history.pushState({type:t},"","#"+t)});if(window.addEventListener("popstate",function(t){t.state&&"type"in t.state&&e(t.state.type)}),a){var l=!r.length;l&&(r=n.video),r in n&&history.replaceState({type:r},"",l?"":"#"+r),r!==n.video&&e(r,!0)}}(),document.domain.indexOf("plyr.io")>-1&&(!function(t,e,i,o,s,n,r){t.GoogleAnalyticsObject=s,t.ga=t.ga||function(){(t.ga.q=t.ga.q||[]).push(arguments)},t.ga.l=1*new Date,n=e.createElement(i),r=e.getElementsByTagName(i)[0],n.async=1,n.src="//www.google-analytics.com/analytics.js",r.parentNode.insertBefore(n,r)}(window,document,"script",0,"ga"),ga("create","UA-40881672-11","auto"),ga("send","pageview"));
+(function () {
+'use strict';
+
+// ==========================================================================
+// Plyr.io demo
+// This code is purely for the https://plyr.io website
+// Please see readme.md in the root or github.com/sampotts/plyr
+// ==========================================================================
+
+document.addEventListener('DOMContentLoaded', function () {
+    if (window.shr) {
+        window.shr.setup({
+            count: {
+                classname: 'button__count'
+            }
+        });
+    }
+
+    // Setup tab focus
+    var tabClassName = 'tab-focus';
+
+    // Remove class on blur
+    document.addEventListener('focusout', function (event) {
+        event.target.classList.remove(tabClassName);
+    });
+
+    // Add classname to tabbed elements
+    document.addEventListener('keydown', function (event) {
+        if (event.keyCode !== 9) {
+            return;
+        }
+
+        // Delay the adding of classname until the focus has changed
+        // This event fires before the focusin event
+        setTimeout(function () {
+            document.activeElement.classList.add(tabClassName);
+        }, 0);
+    });
+
+    // Setup the player
+    var player = new Plyr('#player', {
+        debug: true,
+        title: 'View From A Blue Moon',
+        iconUrl: '../dist/plyr.svg',
+        keyboard: {
+            global: true
+        },
+        tooltips: {
+            controls: true
+        },
+        captions: {
+            active: true
+        },
+        keys: {
+            google: 'AIzaSyDrNwtN3nLH_8rjCmu5Wq3ZCm4MNAVdc0c'
+        },
+        ads: {
+            enabled: true,
+            publisherId: '918848828995742'
+        }
+    });
+
+    // Expose for tinkering in the console
+    window.player = player;
+
+    // Setup type toggle
+    var buttons = document.querySelectorAll('[data-source]');
+    var types = {
+        video: 'video',
+        audio: 'audio',
+        youtube: 'youtube',
+        vimeo: 'vimeo'
+    };
+    var currentType = window.location.hash.replace('#', '');
+    var historySupport = window.history && window.history.pushState;
+
+    // Toggle class on an element
+    function toggleClass(element, className, state) {
+        if (element) {
+            element.classList[state ? 'add' : 'remove'](className);
+        }
+    }
+
+    // Set a new source
+    function newSource(type, init) {
+        // Bail if new type isn't known, it's the current type, or current type is empty (video is default) and new type is video
+        if (!(type in types) || !init && type === currentType || !currentType.length && type === types.video) {
+            return;
+        }
+
+        switch (type) {
+            case types.video:
+                player.source = {
+                    type: 'video',
+                    title: 'View From A Blue Moon',
+                    sources: [{
+                        src: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.mp4',
+                        type: 'video/mp4'
+                    }],
+                    poster: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.jpg',
+                    tracks: [{
+                        kind: 'captions',
+                        label: 'English',
+                        srclang: 'en',
+                        src: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.en.vtt',
+                        default: true
+                    }, {
+                        kind: 'captions',
+                        label: 'French',
+                        srclang: 'fr',
+                        src: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.fr.vtt'
+                    }]
+                };
+
+                break;
+
+            case types.audio:
+                player.source = {
+                    type: 'audio',
+                    title: 'Kishi Bashi &ndash; &ldquo;It All Began With A Burst&rdquo;',
+                    sources: [{
+                        src: 'https://cdn.plyr.io/static/demo/Kishi_Bashi_-_It_All_Began_With_a_Burst.mp3',
+                        type: 'audio/mp3'
+                    }, {
+                        src: 'https://cdn.plyr.io/static/demo/Kishi_Bashi_-_It_All_Began_With_a_Burst.ogg',
+                        type: 'audio/ogg'
+                    }]
+                };
+
+                break;
+
+            case types.youtube:
+                player.source = {
+                    type: 'video',
+                    title: 'View From A Blue Moon',
+                    sources: [{
+                        src: 'https://youtube.com/watch?v=bTqVqk7FSmY',
+                        provider: 'youtube'
+                    }]
+                };
+
+                break;
+
+            case types.vimeo:
+                player.source = {
+                    type: 'video',
+                    sources: [{
+                        src: 'https://vimeo.com/76979871',
+                        provider: 'vimeo'
+                    }]
+                };
+
+                break;
+
+            default:
+                break;
+        }
+
+        // Set the current type for next time
+        currentType = type;
+
+        // Remove active classes
+        Array.from(buttons).forEach(function (button) {
+            return toggleClass(button.parentElement, 'active', false);
+        });
+
+        // Set active on parent
+        toggleClass(document.querySelector('[data-source="' + type + '"]'), 'active', true);
+
+        // Show cite
+        Array.from(document.querySelectorAll('.plyr__cite')).forEach(function (cite) {
+            cite.setAttribute('hidden', '');
+        });
+        document.querySelector('.plyr__cite--' + type).removeAttribute('hidden');
+    }
+
+    // Bind to each button
+    Array.from(buttons).forEach(function (button) {
+        button.addEventListener('click', function () {
+            var type = button.getAttribute('data-source');
+
+            newSource(type);
+
+            if (historySupport) {
+                window.history.pushState({ type: type }, '', '#' + type);
+            }
+        });
+    });
+
+    // List for backwards/forwards
+    window.addEventListener('popstate', function (event) {
+        if (event.state && 'type' in event.state) {
+            newSource(event.state.type);
+        }
+    });
+
+    // On load
+    if (historySupport) {
+        var video = !currentType.length;
+
+        // If there's no current type set, assume video
+        if (video) {
+            currentType = types.video;
+        }
+
+        // Replace current history state
+        if (currentType in types) {
+            window.history.replaceState({
+                type: currentType
+            }, '', video ? '' : '#' + currentType);
+        }
+
+        // If it's not video, load the source
+        if (currentType !== types.video) {
+            newSource(currentType, true);
+        }
+    }
+});
+
+// Google analytics
+// For demo site (https://plyr.io) only
+/* eslint-disable */
+if (window.location.host === 'plyr.io') {
+    (function (i, s, o, g, r, a, m) {
+        i.GoogleAnalyticsObject = r;
+        i[r] = i[r] || function () {
+            (i[r].q = i[r].q || []).push(arguments);
+        };
+        i[r].l = 1 * new Date();
+        a = s.createElement(o);
+        m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m);
+    })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+    window.ga('create', 'UA-40881672-11', 'auto');
+    window.ga('send', 'pageview');
+}
+/* eslint-enable */
+
+}());
+
+//# sourceMappingURL=demo.js.map

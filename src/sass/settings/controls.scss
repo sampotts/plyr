@@ -1,0 +1,19 @@
+// ==========================================================================
+// Controls
+// ==========================================================================
+
+$plyr-control-icon-size: 18px !default;
+$plyr-control-icon-size-large: 20px !default;
+$plyr-control-spacing: 10px !default;
+$plyr-control-padding: ($plyr-control-spacing * 0.7) !default;
+$plyr-control-radius: 3px !default;
+
+$plyr-video-controls-bg: #000 !default;
+$plyr-video-control-color: #fff !default;
+$plyr-video-control-color-hover: #fff !default;
+$plyr-video-control-bg-hover: $plyr-color-main !default;
+
+$plyr-audio-controls-bg: #fff !default;
+$plyr-audio-control-color: $plyr-color-fiord !default;
+$plyr-audio-control-color-hover: #fff !default;
+$plyr-audio-control-bg-hover: $plyr-color-main !default;
