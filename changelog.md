@@ -67,7 +67,7 @@ You gotta break eggs to make an omelette. Sadly, there's quite a few breaking ch
 
 ### Polyfilling
 
-Because we're using the fancy new ES6 syntax, you will need to polyfill for vintage browsers if you want to use Plyr and still support them. Luckily there's a decent service for this that makes it painless, [polyfill.io](https://polyfill.io).
+Because we're using the fancy new ES6 syntax, you will need to polyfill for vintage browsers if you want to use Plyr and still support them. Luckily there's a decent service for this that makes it painless, [polyfill.io](https://polyfill.io). Alternatively, you can use the prebuilt polyfilled build but bear in mind this is 20kb larger. I'd suggest working our your own polyfill strategy.
 
 ## v2.0.18
 
