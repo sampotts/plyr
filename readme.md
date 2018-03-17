@@ -1,7 +1,3 @@
----
-Beware: This version is currently in beta and not production-ready
----
-
 # Plyr
 
 A simple, lightweight, accessible and customizable HTML5, YouTube and Vimeo media player that supports [_modern_](#browser-support) browsers.
