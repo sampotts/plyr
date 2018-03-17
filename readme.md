@@ -703,7 +703,7 @@ Credit to the PayPal HTML5 Video player from which Plyr's caption functionality 
 
 ## Thanks
 
-[![Fastly](https://www.fastly.com/sites/all/themes/custom/fastly2016/logo.png)](https://www.fastly.com/)
+[![Fastly](https://cdn.plyr.io/static/demo/fastly-logo.png)](https://www.fastly.com/)
 
 Massive thanks to [Fastly](https://www.fastly.com/) for providing the CDN services.
 

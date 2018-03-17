@@ -12512,7 +12512,7 @@ var Plyr$1 = function () {
 
 // ==========================================================================
 // Plyr Polyfilled Build
-// plyr.js v3.0.0-beta.20
+// plyr.js v3.0.0
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
