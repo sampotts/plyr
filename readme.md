@@ -4,7 +4,7 @@ A simple, lightweight, accessible and customizable HTML5, YouTube and Vimeo medi
 
 [Checkout the demo](https://plyr.io) - [Donate to support Plyr](#donate) - [Chat on Slack](https://bit.ly/plyr-slack)
 
-[![Image of Plyr](https://cdn.plyr.io/static/demo/screenshot.png)](https://plyr.io)
+[![Image of Plyr](https://cdn.plyr.io/static/demo/screenshot.png?v=3)](https://plyr.io)
 
 ## Features
 
