@@ -70,10 +70,11 @@ const paths = {
         root: path.join(root, 'demo/'),
     },
     upload: [
-        path.join(root, `dist/*${minSuffix}.js`),
+        path.join(root, `dist/*${minSuffix}.*`),
         path.join(root, 'dist/*.css'),
         path.join(root, 'dist/*.svg'),
-        path.join(root, 'demo/dist/**'),
+        path.join(root, `demo/dist/*${minSuffix}.*`),
+        path.join(root, 'demo/dist/*.css'),
     ],
 };
 
@@ -303,22 +304,26 @@ if (Object.keys(aws).includes('cdn') && Object.keys(aws).includes('demo')) {
         console.log(`Uploading '${version}' to ${aws.cdn.domain}...`);
 
         // Upload to CDN
-        return gulp
-            .src(paths.upload)
-            .pipe(
-                rename(p => {
-                    p.basename = p.basename.replace(minSuffix, ''); // eslint-disable-line
-                    p.dirname = p.dirname.replace('.', version); // eslint-disable-line
-                }),
-            )
-            .pipe(
-                size({
-                    showFiles: true,
-                    gzip: true,
-                }),
-            )
-            .pipe(replace(localPath, versionPath))
-            .pipe(s3(aws.cdn, options.cdn));
+        return (
+            gulp
+                .src(paths.upload)
+                .pipe(
+                    rename(p => {
+                        p.basename = p.basename.replace(minSuffix, ''); // eslint-disable-line
+                        p.dirname = p.dirname.replace('.', version); // eslint-disable-line
+                    }),
+                )
+                // Remove min suffix from source map URL
+                .pipe(replace(/sourceMappingURL=([\w-?.]+)/, (match, p1) => `sourceMappingURL=${p1.replace(minSuffix, '')}`))
+                .pipe(
+                    size({
+                        showFiles: true,
+                        gzip: true,
+                    }),
+                )
+                .pipe(replace(localPath, versionPath))
+                .pipe(s3(aws.cdn, options.cdn))
+        );
     });
 
     // Publish to demo bucket
