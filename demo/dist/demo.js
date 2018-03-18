@@ -88,6 +88,17 @@ function serializer(replacer, cycleReplacer) {
 }
 });
 
+var stringify_2 = stringify_1.getSerialize;
+
+
+var stringify = Object.freeze({
+	default: stringify_1,
+	__moduleExports: stringify_1,
+	getSerialize: stringify_2
+});
+
+var stringify$1 = ( stringify && stringify_1 ) || stringify;
+
 var _window$3 =
   typeof window !== 'undefined'
     ? window
@@ -594,7 +605,7 @@ function serializeException$1(ex, depth, maxSize) {
 
   var serialized = serializeObject(ex, depth);
 
-  if (jsonSize(stringify_1(serialized)) > maxSize) {
+  if (jsonSize(stringify$1(serialized)) > maxSize) {
     return serializeException$1(ex, depth - 1);
   }
 
@@ -657,15 +668,76 @@ var utils = {
   serializeKeysForMessage: serializeKeysForMessage$1
 };
 
-/*
- TraceKit - Cross brower stack traces
+var utils_1 = utils.isObject;
+var utils_2 = utils.isError;
+var utils_3 = utils.isErrorEvent;
+var utils_4 = utils.isUndefined;
+var utils_5 = utils.isFunction;
+var utils_6 = utils.isPlainObject;
+var utils_7 = utils.isString;
+var utils_8 = utils.isArray;
+var utils_9 = utils.isEmptyObject;
+var utils_10 = utils.supportsErrorEvent;
+var utils_11 = utils.supportsFetch;
+var utils_12 = utils.supportsReferrerPolicy;
+var utils_13 = utils.supportsPromiseRejectionEvent;
+var utils_14 = utils.wrappedCallback;
+var utils_15 = utils.each;
+var utils_16 = utils.objectMerge;
+var utils_17 = utils.truncate;
+var utils_18 = utils.objectFrozen;
+var utils_19 = utils.hasKey;
+var utils_20 = utils.joinRegExp;
+var utils_21 = utils.urlencode;
+var utils_22 = utils.uuid4;
+var utils_23 = utils.htmlTreeAsString;
+var utils_24 = utils.htmlElementAsString;
+var utils_25 = utils.isSameException;
+var utils_26 = utils.isSameStacktrace;
+var utils_27 = utils.parseUrl;
+var utils_28 = utils.fill;
+var utils_29 = utils.safeJoin;
+var utils_30 = utils.serializeException;
+var utils_31 = utils.serializeKeysForMessage;
 
- This was originally forked from github.com/occ/TraceKit, but has since been
- largely re-written and is now maintained as part of raven-js.  Tests for
- this are in test/vendor.
 
- MIT license
-*/
+var utils$2 = Object.freeze({
+	default: utils,
+	__moduleExports: utils,
+	isObject: utils_1,
+	isError: utils_2,
+	isErrorEvent: utils_3,
+	isUndefined: utils_4,
+	isFunction: utils_5,
+	isPlainObject: utils_6,
+	isString: utils_7,
+	isArray: utils_8,
+	isEmptyObject: utils_9,
+	supportsErrorEvent: utils_10,
+	supportsFetch: utils_11,
+	supportsReferrerPolicy: utils_12,
+	supportsPromiseRejectionEvent: utils_13,
+	wrappedCallback: utils_14,
+	each: utils_15,
+	objectMerge: utils_16,
+	truncate: utils_17,
+	objectFrozen: utils_18,
+	hasKey: utils_19,
+	joinRegExp: utils_20,
+	urlencode: utils_21,
+	uuid4: utils_22,
+	htmlTreeAsString: utils_23,
+	htmlElementAsString: utils_24,
+	isSameException: utils_25,
+	isSameStacktrace: utils_26,
+	parseUrl: utils_27,
+	fill: utils_28,
+	safeJoin: utils_29,
+	serializeException: utils_30,
+	serializeKeysForMessage: utils_31
+});
+
+var utils$3 = ( utils$2 && utils ) || utils$2;
 
 var TraceKit = {
   collectWindowErrors: true,
@@ -805,9 +877,9 @@ TraceKit.report = (function reportModuleWrapper() {
   function traceKitWindowOnError(msg, url, lineNo, colNo, ex) {
     var stack = null;
     // If 'ex' is ErrorEvent, get real Error from inside
-    var exception = utils.isErrorEvent(ex) ? ex.error : ex;
+    var exception = utils$3.isErrorEvent(ex) ? ex.error : ex;
     // If 'msg' is ErrorEvent, get real message from inside
-    var message = utils.isErrorEvent(msg) ? msg.message : msg;
+    var message = utils$3.isErrorEvent(msg) ? msg.message : msg;
 
     if (lastExceptionStack) {
       TraceKit.computeStackTrace.augmentStackTraceWithInitialElement(
@@ -817,7 +889,7 @@ TraceKit.report = (function reportModuleWrapper() {
         message
       );
       processLastException();
-    } else if (exception && utils.isError(exception)) {
+    } else if (exception && utils$3.isError(exception)) {
       // non-string `exception` arg; attempt to extract stack trace
 
       // New chrome and blink send along a real error object
@@ -1284,6 +1356,13 @@ TraceKit.computeStackTrace = (function computeStackTraceWrapper() {
 
 var tracekit = TraceKit;
 
+
+
+var tracekit$2 = Object.freeze({
+	default: tracekit,
+	__moduleExports: tracekit
+});
+
 /*
  * JavaScript MD5
  * https://github.com/blueimp/JavaScript-MD5
@@ -1551,6 +1630,13 @@ function md5(string, key, raw) {
 
 var md5_1 = md5;
 
+
+
+var md5$1 = Object.freeze({
+	default: md5_1,
+	__moduleExports: md5_1
+});
+
 function RavenConfigError(message) {
   this.name = 'RavenConfigError';
   this.message = message;
@@ -1559,6 +1645,13 @@ RavenConfigError.prototype = new Error();
 RavenConfigError.prototype.constructor = RavenConfigError;
 
 var configError = RavenConfigError;
+
+
+
+var configError$2 = Object.freeze({
+	default: configError,
+	__moduleExports: configError
+});
 
 var wrapMethod = function(console, level, callback) {
   var originalConsoleLevel = console[level];
@@ -1573,14 +1666,14 @@ var wrapMethod = function(console, level, callback) {
   console[level] = function() {
     var args = [].slice.call(arguments);
 
-    var msg = utils.safeJoin(args, ' ');
+    var msg = utils$3.safeJoin(args, ' ');
     var data = {level: sentryLevel, logger: 'console', extra: {arguments: args}};
 
     if (level === 'assert') {
       if (args[0] === false) {
         // Default browsers message
         msg =
-          'Assertion failed: ' + (utils.safeJoin(args.slice(1), ' ') || 'console.assert');
+          'Assertion failed: ' + (utils$3.safeJoin(args.slice(1), ' ') || 'console.assert');
         data.extra.arguments = args.slice(1);
         callback && callback(msg, data);
       }
@@ -1601,42 +1694,51 @@ var console$1 = {
   wrapMethod: wrapMethod
 };
 
-/*global XDomainRequest:false */
+var console_1 = console$1.wrapMethod;
 
 
+var console$3 = Object.freeze({
+	default: console$1,
+	__moduleExports: console$1,
+	wrapMethod: console_1
+});
 
+var TraceKit$1 = ( tracekit$2 && tracekit ) || tracekit$2;
 
+var md5$2 = ( md5$1 && md5_1 ) || md5$1;
 
+var RavenConfigError$1 = ( configError$2 && configError ) || configError$2;
 
+var require$$0 = ( console$3 && console$1 ) || console$3;
 
-var isError = utils.isError;
-var isObject = utils.isObject;
-var isPlainObject = utils.isPlainObject;
-var isErrorEvent = utils.isErrorEvent;
-var isUndefined = utils.isUndefined;
-var isFunction = utils.isFunction;
-var isString = utils.isString;
-var isArray = utils.isArray;
-var isEmptyObject = utils.isEmptyObject;
-var each = utils.each;
-var objectMerge = utils.objectMerge;
-var truncate = utils.truncate;
-var objectFrozen = utils.objectFrozen;
-var hasKey = utils.hasKey;
-var joinRegExp = utils.joinRegExp;
-var urlencode = utils.urlencode;
-var uuid4 = utils.uuid4;
-var htmlTreeAsString = utils.htmlTreeAsString;
-var isSameException = utils.isSameException;
-var isSameStacktrace = utils.isSameStacktrace;
-var parseUrl = utils.parseUrl;
-var fill = utils.fill;
-var supportsFetch = utils.supportsFetch;
-var supportsReferrerPolicy = utils.supportsReferrerPolicy;
-var serializeKeysForMessage = utils.serializeKeysForMessage;
-var serializeException = utils.serializeException;
+var isError = utils$3.isError;
+var isObject = utils$3.isObject;
+var isPlainObject = utils$3.isPlainObject;
+var isErrorEvent = utils$3.isErrorEvent;
+var isUndefined = utils$3.isUndefined;
+var isFunction = utils$3.isFunction;
+var isString = utils$3.isString;
+var isArray = utils$3.isArray;
+var isEmptyObject = utils$3.isEmptyObject;
+var each = utils$3.each;
+var objectMerge = utils$3.objectMerge;
+var truncate = utils$3.truncate;
+var objectFrozen = utils$3.objectFrozen;
+var hasKey = utils$3.hasKey;
+var joinRegExp = utils$3.joinRegExp;
+var urlencode = utils$3.urlencode;
+var uuid4 = utils$3.uuid4;
+var htmlTreeAsString = utils$3.htmlTreeAsString;
+var isSameException = utils$3.isSameException;
+var isSameStacktrace = utils$3.isSameStacktrace;
+var parseUrl = utils$3.parseUrl;
+var fill = utils$3.fill;
+var supportsFetch = utils$3.supportsFetch;
+var supportsReferrerPolicy = utils$3.supportsReferrerPolicy;
+var serializeKeysForMessage = utils$3.serializeKeysForMessage;
+var serializeException = utils$3.serializeException;
 
-var wrapConsoleMethod = console$1.wrapMethod;
+var wrapConsoleMethod = require$$0.wrapMethod;
 
 var dsnKeys = 'source protocol user pass host port path'.split(' ');
 var dsnPattern = /^(?:(\w+):)?\/\/(?:(\w+)(:\w+)?@)?([\w\.-]+)(?::(\d+))?(\/.*)/;
@@ -1743,7 +1845,7 @@ Raven$2.prototype = {
 
   debug: false,
 
-  TraceKit: tracekit, // alias to TraceKit
+  TraceKit: TraceKit$1, // alias to TraceKit
 
   /*
      * Configure Raven with a DSN and extra options
@@ -1824,7 +1926,7 @@ Raven$2.prototype = {
     }
     globalOptions.instrument = instrument;
 
-    tracekit.collectWindowErrors = !!globalOptions.collectWindowErrors;
+    TraceKit$1.collectWindowErrors = !!globalOptions.collectWindowErrors;
 
     // return for chaining
     return self;
@@ -1841,7 +1943,7 @@ Raven$2.prototype = {
   install: function() {
     var self = this;
     if (self.isSetup() && !self._isRavenInstalled) {
-      tracekit.report.subscribe(function() {
+      TraceKit$1.report.subscribe(function() {
         self._handleOnErrorStackInfo.apply(self, arguments);
       });
 
@@ -2005,7 +2107,7 @@ Raven$2.prototype = {
    * @return {Raven}
    */
   uninstall: function() {
-    tracekit.report.uninstall();
+    TraceKit$1.report.uninstall();
 
     this._detachPromiseRejectionHandler();
     this._unpatchFunctionToString();
@@ -2100,7 +2202,7 @@ Raven$2.prototype = {
     // raises an exception different from the one we asked to
     // report on.
     try {
-      var stack = tracekit.computeStackTrace(ex);
+      var stack = TraceKit$1.computeStackTrace(ex);
       this._handleStackInfo(stack, options);
     } catch (ex1) {
       if (ex !== ex1) {
@@ -2116,7 +2218,7 @@ Raven$2.prototype = {
     var options = objectMerge(currentOptions, {
       message:
         'Non-Error exception captured with keys: ' + serializeKeysForMessage(exKeys),
-      fingerprint: [md5_1(exKeys)],
+      fingerprint: [md5$2(exKeys)],
       extra: currentOptions.extra || {}
     });
     options.extra.__serialized__ = serializeException(ex);
@@ -2165,7 +2267,7 @@ Raven$2.prototype = {
 
     // null exception name so `Error` isn't prefixed to msg
     ex.name = null;
-    var stack = tracekit.computeStackTrace(ex);
+    var stack = TraceKit$1.computeStackTrace(ex);
 
     // stack[0] is `throw new Error(msg)` call itself, we are interested in the frame that was just before that, stack[1]
     var initialCall = isArray(stack.stack) && stack.stack[1];
@@ -2312,7 +2414,7 @@ Raven$2.prototype = {
      */
   getContext: function() {
     // lol javascript
-    return JSON.parse(stringify_1(this._globalContext));
+    return JSON.parse(stringify$1(this._globalContext));
   },
 
   /*
@@ -2448,12 +2550,12 @@ Raven$2.prototype = {
 
     var lastEventId = options.eventId || this.lastEventId();
     if (!lastEventId) {
-      throw new configError('Missing eventId');
+      throw new RavenConfigError$1('Missing eventId');
     }
 
     var dsn = options.dsn || this._dsn;
     if (!dsn) {
-      throw new configError('Missing DSN');
+      throw new RavenConfigError$1('Missing DSN');
     }
 
     var encode = encodeURIComponent;
@@ -3095,11 +3197,11 @@ Raven$2.prototype = {
     try {
       while (i--) dsn[dsnKeys[i]] = m[i] || '';
     } catch (e) {
-      throw new configError('Invalid DSN: ' + str);
+      throw new RavenConfigError$1('Invalid DSN: ' + str);
     }
 
     if (dsn.pass && !this._globalOptions.allowSecretKey) {
-      throw new configError(
+      throw new RavenConfigError$1(
         'Do not specify your secret key in the DSN. See: http://bit.ly/raven-secret-key'
       );
     }
@@ -3614,7 +3716,7 @@ Raven$2.prototype = {
     }
 
     if (supportsFetch()) {
-      evaluatedFetchParameters.body = stringify_1(opts.data);
+      evaluatedFetchParameters.body = stringify$1(opts.data);
 
       var defaultFetchOptions = objectMerge({}, this._fetchDefaults);
       var fetchOptions = objectMerge(defaultFetchOptions, evaluatedFetchParameters);
@@ -3689,7 +3791,7 @@ Raven$2.prototype = {
       });
     }
 
-    request.send(stringify_1(opts.data));
+    request.send(stringify$1(opts.data));
   },
 
   _evaluateHash: function(hash) {
@@ -3731,22 +3833,22 @@ Raven$2.prototype.setReleaseContext = Raven$2.prototype.setRelease;
 
 var raven = Raven$2;
 
-/**
- * Enforces a single instance of the Raven client, and the
- * main entry point for Raven. If you are a consumer of the
- * Raven library, you SHOULD load this file (vs raven.js).
- **/
 
 
+var raven$2 = Object.freeze({
+	default: raven,
+	__moduleExports: raven
+});
 
-// This is to be defensive in environments where window does not exist (see https://github.com/getsentry/raven-js/pull/785)
+var RavenConstructor = ( raven$2 && raven ) || raven$2;
+
 var _window =
   typeof window !== 'undefined'
     ? window
     : typeof commonjsGlobal !== 'undefined' ? commonjsGlobal : typeof self !== 'undefined' ? self : {};
 var _Raven = _window.Raven;
 
-var Raven = new raven();
+var Raven = new RavenConstructor();
 
 /*
  * Allow multiple versions of Raven to be installed.

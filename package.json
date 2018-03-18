@@ -35,6 +35,8 @@
         "gulp-svgstore": "^6.1.1",
         "gulp-uglify-es": "^1.0.1",
         "gulp-util": "^3.0.8",
+        "prettier-eslint": "^8.8.1",
+        "prettier-stylelint": "^0.4.2",
         "rollup-plugin-babel": "^3.0.3",
         "rollup-plugin-commonjs": "^8.4.1",
         "rollup-plugin-node-resolve": "^3.2.0",
@@ -66,6 +68,7 @@
     "dependencies": {
         "babel-polyfill": "^6.26.0",
         "custom-event-polyfill": "^0.3.0",
+        "loadjs": "^3.5.2",
         "raven-js": "^3.23.3"
     }
 }

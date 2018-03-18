@@ -330,6 +330,305 @@ var defaults = {
     }
 };
 
+var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
+
+
+
+
+function createCommonjsModule(fn, module) {
+	return module = { exports: {} }, fn(module, module.exports), module.exports;
+}
+
+var loadjs_umd = createCommonjsModule(function (module, exports) {
+(function(root, factory) {
+  if (typeof undefined === 'function' && undefined.amd) {
+    undefined([], factory);
+  } else {
+    module.exports = factory();
+  }
+}(commonjsGlobal, function() {
+/**
+ * Global dependencies.
+ * @global {Object} document - DOM
+ */
+
+var devnull = function() {},
+    bundleIdCache = {},
+    bundleResultCache = {},
+    bundleCallbackQueue = {};
+
+
+/**
+ * Subscribe to bundle load event.
+ * @param {string[]} bundleIds - Bundle ids
+ * @param {Function} callbackFn - The callback function
+ */
+function subscribe(bundleIds, callbackFn) {
+  // listify
+  bundleIds = bundleIds.push ? bundleIds : [bundleIds];
+
+  var depsNotFound = [],
+      i = bundleIds.length,
+      numWaiting = i,
+      fn,
+      bundleId,
+      r,
+      q;
+
+  // define callback function
+  fn = function (bundleId, pathsNotFound) {
+    if (pathsNotFound.length) depsNotFound.push(bundleId);
+
+    numWaiting--;
+    if (!numWaiting) callbackFn(depsNotFound);
+  };
+
+  // register callback
+  while (i--) {
+    bundleId = bundleIds[i];
+
+    // execute callback if in result cache
+    r = bundleResultCache[bundleId];
+    if (r) {
+      fn(bundleId, r);
+      continue;
+    }
+
+    // add to callback queue
+    q = bundleCallbackQueue[bundleId] = bundleCallbackQueue[bundleId] || [];
+    q.push(fn);
+  }
+}
+
+
+/**
+ * Publish bundle load event.
+ * @param {string} bundleId - Bundle id
+ * @param {string[]} pathsNotFound - List of files not found
+ */
+function publish(bundleId, pathsNotFound) {
+  // exit if id isn't defined
+  if (!bundleId) return;
+
+  var q = bundleCallbackQueue[bundleId];
+
+  // cache result
+  bundleResultCache[bundleId] = pathsNotFound;
+
+  // exit if queue is empty
+  if (!q) return;
+
+  // empty callback queue
+  while (q.length) {
+    q[0](bundleId, pathsNotFound);
+    q.splice(0, 1);
+  }
+}
+
+
+/**
+ * Execute callbacks.
+ * @param {Object or Function} args - The callback args
+ * @param {string[]} depsNotFound - List of dependencies not found
+ */
+function executeCallbacks(args, depsNotFound) {
+  // accept function as argument
+  if (args.call) args = {success: args};
+
+  // success and error callbacks
+  if (depsNotFound.length) (args.error || devnull)(depsNotFound);
+  else (args.success || devnull)(args);
+}
+
+
+/**
+ * Load individual file.
+ * @param {string} path - The file path
+ * @param {Function} callbackFn - The callback function
+ */
+function loadFile(path, callbackFn, args, numTries) {
+  var doc = document,
+      async = args.async,
+      maxTries = (args.numRetries || 0) + 1,
+      beforeCallbackFn = args.before || devnull,
+      isCss,
+      e;
+
+  numTries = numTries || 0;
+
+  if (/(^css!|\.css$)/.test(path)) {
+    isCss = true;
+
+    // css
+    e = doc.createElement('link');
+    e.rel = 'stylesheet';
+    e.href = path.replace(/^css!/, '');  // remove "css!" prefix
+  } else {
+    // javascript
+    e = doc.createElement('script');
+    e.src = path;
+    e.async = async === undefined ? true : async;
+  }
+
+  e.onload = e.onerror = e.onbeforeload = function (ev) {
+    var result = ev.type[0];
+
+    // Note: The following code isolates IE using `hideFocus` and treats empty
+    // stylesheets as failures to get around lack of onerror support
+    if (isCss && 'hideFocus' in e) {
+      try {
+        if (!e.sheet.cssText.length) result = 'e';
+      } catch (x) {
+        // sheets objects created from load errors don't allow access to
+        // `cssText`
+        result = 'e';
+      }
+    }
+
+    // handle retries in case of load failure
+    if (result == 'e') {
+      // increment counter
+      numTries += 1;
+
+      // exit function and try again
+      if (numTries < maxTries) {
+        return loadFile(path, callbackFn, args, numTries);
+      }
+    }
+
+    // execute callback
+    callbackFn(path, result, ev.defaultPrevented);
+  };
+
+  // add to document (unless callback returns `false`)
+  if (beforeCallbackFn(path, e) !== false) doc.head.appendChild(e);
+}
+
+
+/**
+ * Load multiple files.
+ * @param {string[]} paths - The file paths
+ * @param {Function} callbackFn - The callback function
+ */
+function loadFiles(paths, callbackFn, args) {
+  // listify paths
+  paths = paths.push ? paths : [paths];
+
+  var numWaiting = paths.length,
+      x = numWaiting,
+      pathsNotFound = [],
+      fn,
+      i;
+
+  // define callback function
+  fn = function(path, result, defaultPrevented) {
+    // handle error
+    if (result == 'e') pathsNotFound.push(path);
+
+    // handle beforeload event. If defaultPrevented then that means the load
+    // will be blocked (ex. Ghostery/ABP on Safari)
+    if (result == 'b') {
+      if (defaultPrevented) pathsNotFound.push(path);
+      else return;
+    }
+
+    numWaiting--;
+    if (!numWaiting) callbackFn(pathsNotFound);
+  };
+
+  // load scripts
+  for (i=0; i < x; i++) loadFile(paths[i], fn, args);
+}
+
+
+/**
+ * Initiate script load and register bundle.
+ * @param {(string|string[])} paths - The file paths
+ * @param {(string|Function)} [arg1] - The bundleId or success callback
+ * @param {Function} [arg2] - The success or error callback
+ * @param {Function} [arg3] - The error callback
+ */
+function loadjs(paths, arg1, arg2) {
+  var bundleId,
+      args;
+
+  // bundleId (if string)
+  if (arg1 && arg1.trim) bundleId = arg1;
+
+  // args (default is {})
+  args = (bundleId ? arg2 : arg1) || {};
+
+  // throw error if bundle is already defined
+  if (bundleId) {
+    if (bundleId in bundleIdCache) {
+      throw "LoadJS";
+    } else {
+      bundleIdCache[bundleId] = true;
+    }
+  }
+
+  // load scripts
+  loadFiles(paths, function (pathsNotFound) {
+    // execute callbacks
+    executeCallbacks(args, pathsNotFound);
+
+    // publish bundle load event
+    publish(bundleId, pathsNotFound);
+  }, args);
+}
+
+
+/**
+ * Execute callbacks when dependencies have been satisfied.
+ * @param {(string|string[])} deps - List of bundle ids
+ * @param {Object} args - success/error arguments
+ */
+loadjs.ready = function ready(deps, args) {
+  // subscribe to bundle load event
+  subscribe(deps, function (depsNotFound) {
+    // execute callbacks
+    executeCallbacks(args, depsNotFound);
+  });
+
+  return loadjs;
+};
+
+
+/**
+ * Manually satisfy bundle dependencies.
+ * @param {string} bundleId - The bundle id
+ */
+loadjs.done = function done(bundleId) {
+  publish(bundleId, []);
+};
+
+
+/**
+ * Reset loadjs dependencies statuses
+ */
+loadjs.reset = function reset() {
+  bundleIdCache = {};
+  bundleResultCache = {};
+  bundleCallbackQueue = {};
+};
+
+
+/**
+ * Determine if bundle has already been defined
+ * @param String} bundleId - The bundle id
+ */
+loadjs.isDefined = function isDefined(bundleId) {
+  return bundleId in bundleIdCache;
+};
+
+
+// export
+return loadjs;
+
+}));
+});
+
 var asyncGenerator = function () {
   function AwaitValue(value) {
     this.value = value;
@@ -693,48 +992,10 @@ var utils = {
     // Load an external script
     loadScript: function loadScript(url) {
         return new Promise(function (resolve, reject) {
-            var current = document.querySelector('script[src="' + url + '"]');
-
-            // Check script is not already referenced, if so wait for load
-            if (current !== null) {
-                current.callbacks = current.callbacks || [];
-                current.callbacks.push(resolve);
-                return;
-            }
-
-            // Build the element
-            var element = document.createElement('script');
-
-            // Callback queue
-            element.callbacks = element.callbacks || [];
-            element.callbacks.push(resolve);
-
-            // Error queue
-            element.errors = element.errors || [];
-            element.errors.push(reject);
-
-            // Bind callback
-            element.addEventListener('load', function (event) {
-                element.callbacks.forEach(function (cb) {
-                    return cb.call(null, event);
-                });
-                element.callbacks = null;
-            }, false);
-
-            // Bind error handling
-            element.addEventListener('error', function (event) {
-                element.errors.forEach(function (err) {
-                    return err.call(null, event);
-                });
-                element.errors = null;
-            }, false);
-
-            // Set the URL after binding callback
-            element.src = url;
-
-            // Inject
-            var first = document.getElementsByTagName('script')[0];
-            first.parentNode.insertBefore(element, first);
+            loadjs_umd(url, {
+                success: resolve,
+                error: reject
+            });
         });
     },
 
@@ -1486,7 +1747,6 @@ var utils = {
 // Plyr support checks
 // ==========================================================================
 
-// Check for feature support
 var support = {
     // Basic support
     audio: 'canPlayType' in document.createElement('audio'),
@@ -2494,7 +2754,6 @@ var ui = {
 // Plyr controls
 // ==========================================================================
 
-// Sniff out the browser
 var browser$2 = utils.getBrowser();
 
 var controls = {
@@ -3692,7 +3951,6 @@ var controls = {
 // Plyr Event Listeners
 // ==========================================================================
 
-// Sniff out the browser
 var browser$1 = utils.getBrowser();
 
 var Listeners = function () {
@@ -5786,7 +6044,6 @@ var vimeo = {
 // Plyr Media
 // ==========================================================================
 
-// Sniff out the browser
 var browser$3 = utils.getBrowser();
 
 var media = {
@@ -6030,12 +6287,6 @@ var source = {
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
-
-// Private properties
-// TODO: Use a WeakMap for private globals
-// const globals = new WeakMap();
-
-// Plyr instance
 
 var Plyr = function () {
     function Plyr(target, options) {

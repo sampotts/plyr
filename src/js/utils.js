@@ -2,6 +2,8 @@
 // Plyr utils
 // ==========================================================================
 
+import loadjs from 'loadjs';
+
 import support from './support';
 import { providers } from './types';
 
@@ -97,11 +99,10 @@ const utils = {
                     if (responseType === 'text') {
                         try {
                             resolve(JSON.parse(request.responseText));
-                        } catch(e) {
+                        } catch (e) {
                             resolve(request.responseText);
                         }
-                    }
-                    else {
+                    } else {
                         resolve(request.response);
                     }
                 });
@@ -125,52 +126,10 @@ const utils = {
     // Load an external script
     loadScript(url) {
         return new Promise((resolve, reject) => {
-            const current = document.querySelector(`script[src="${url}"]`);
-
-            // Check script is not already referenced, if so wait for load
-            if (current !== null) {
-                current.callbacks = current.callbacks || [];
-                current.callbacks.push(resolve);
-                return;
-            }
-
-            // Build the element
-            const element = document.createElement('script');
-
-            // Callback queue
-            element.callbacks = element.callbacks || [];
-            element.callbacks.push(resolve);
-
-            // Error queue
-            element.errors = element.errors || [];
-            element.errors.push(reject);
-
-            // Bind callback
-            element.addEventListener(
-                'load',
-                event => {
-                    element.callbacks.forEach(cb => cb.call(null, event));
-                    element.callbacks = null;
-                },
-                false,
-            );
-
-            // Bind error handling
-            element.addEventListener(
-                'error',
-                event => {
-                    element.errors.forEach(err => err.call(null, event));
-                    element.errors = null;
-                },
-                false,
-            );
-
-            // Set the URL after binding callback
-            element.src = url;
-
-            // Inject
-            const first = document.getElementsByTagName('script')[0];
-            first.parentNode.insertBefore(element, first);
+            loadjs(url, {
+                success: resolve,
+                error: reject,
+            });
         });
     },
 
@@ -576,7 +535,7 @@ const utils = {
     // Toggle event listener
     toggleListener(elements, event, callback, toggle, passive, capture) {
         // Bail if no elemetns, event, or callback
-        if (utils.is.empty(elements)  || utils.is.empty(event) || !utils.is.function(callback)) {
+        if (utils.is.empty(elements) || utils.is.empty(event) || !utils.is.function(callback)) {
             return;
         }
 
