@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v3.0.1
+// plyr.js v3.0.2
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -474,7 +474,7 @@ class Plyr {
         const fauxDuration = parseInt(this.config.duration, 10);
 
         // True duration
-        const realDuration = Number(this.media.duration);
+        const realDuration = this.media ? Number(this.media.duration) : 0;
 
         // If custom duration is funky, use regular duration
         return !Number.isNaN(fauxDuration) ? fauxDuration : realDuration;
@@ -1139,7 +1139,7 @@ class Plyr {
                 clearInterval(this.timers.playing);
 
                 // Destroy YouTube API
-                if (this.embed !== null) {
+                if (this.embed !== null && utils.is.function(this.embed.destroy)) {
                     this.embed.destroy();
                 }
 

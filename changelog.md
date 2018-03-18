@@ -1,3 +1,7 @@
+# v3.0.2
+
+*   Fix for Safari not firing error events when trying to load blocked scripts
+
 # v3.0.1
 
 *   Fix for trying to accessing local storage when it's blocked

@@ -77,7 +77,7 @@ var defaults = {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.0.1/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.0.2/plyr.svg',
 
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
@@ -1747,6 +1747,7 @@ var utils = {
 // Plyr support checks
 // ==========================================================================
 
+// Check for feature support
 var support = {
     // Basic support
     audio: 'canPlayType' in document.createElement('audio'),
@@ -2754,6 +2755,7 @@ var ui = {
 // Plyr controls
 // ==========================================================================
 
+// Sniff out the browser
 var browser$2 = utils.getBrowser();
 
 var controls = {
@@ -3951,6 +3953,7 @@ var controls = {
 // Plyr Event Listeners
 // ==========================================================================
 
+// Sniff out the browser
 var browser$1 = utils.getBrowser();
 
 var Listeners = function () {
@@ -6044,6 +6047,7 @@ var vimeo = {
 // Plyr Media
 // ==========================================================================
 
+// Sniff out the browser
 var browser$3 = utils.getBrowser();
 
 var media = {
@@ -6283,10 +6287,16 @@ var source = {
 
 // ==========================================================================
 // Plyr
-// plyr.js v3.0.1
+// plyr.js v3.0.2
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
+
+// Private properties
+// TODO: Use a WeakMap for private globals
+// const globals = new WeakMap();
+
+// Plyr instance
 
 var Plyr = function () {
     function Plyr(target, options) {
@@ -6969,7 +6979,7 @@ var Plyr = function () {
                     clearInterval(this.timers.playing);
 
                     // Destroy YouTube API
-                    if (this.embed !== null) {
+                    if (this.embed !== null && utils.is.function(this.embed.destroy)) {
                         this.embed.destroy();
                     }
 
@@ -7145,7 +7155,7 @@ var Plyr = function () {
             var fauxDuration = parseInt(this.config.duration, 10);
 
             // True duration
-            var realDuration = Number(this.media.duration);
+            var realDuration = this.media ? Number(this.media.duration) : 0;
 
             // If custom duration is funky, use regular duration
             return !Number.isNaN(fauxDuration) ? fauxDuration : realDuration;
