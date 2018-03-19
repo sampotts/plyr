@@ -8,4 +8,5 @@ docs/index.dev.html
 index-dev.html
 notes.txt
 *.vtt
+/.idea
 docs/index.dev.php
