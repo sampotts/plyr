@@ -240,7 +240,7 @@ The NodeList, HTMLElement or string selector can be the target `<video>`, `<audi
 const players = Array.from(document.querySelectorAll('.js-player')).map(player => new Plyr(player));
 ```
 
-The second argument for the constructor is the [#options](options) object:
+The second argument for the constructor is the [options](#options) object:
 
 ```javascript
 const player = new Plyr('#player', {
