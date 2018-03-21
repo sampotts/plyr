@@ -6,7 +6,7 @@
 .plyr__video-embed {
     // Default to 16:9 ratio but this is set by JavaScript based on config
     $padding: ((100 / 16) * 9);
-    $height: 200;
+    $height: 240;
     $offset: to-percentage(($height - $padding) / ($height / 50));
 
     height: 0;
