@@ -267,7 +267,7 @@ class Listeners {
         utils.on(this.player.media, 'volumechange', event => ui.updateVolume.call(this.player, event));
 
         // Handle native play/pause
-        utils.on(this.player.media, 'playing play pause ended', event => ui.checkPlaying.call(this.player, event));
+        utils.on(this.player.media, 'playing play pause ended emptied', event => ui.checkPlaying.call(this.player, event));
 
         // Loading
         utils.on(this.player.media, 'waiting canplay seeked playing', event => ui.checkLoading.call(this.player, event));

@@ -379,8 +379,11 @@ class Plyr {
      * Stop playback
      */
     stop() {
-        this.restart();
-        this.pause();
+        if (this.isHTML5) {
+            this.media.load();
+        } else {
+            this.media.stop();
+        }
     }
 
     /**

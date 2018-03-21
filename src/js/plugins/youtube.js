@@ -339,6 +339,8 @@ const youtube = {
                     // Reset timer
                     clearInterval(player.timers.playing);
 
+                    console.warn(event.data);
+
                     // Handle events
                     // -1   Unstarted
                     // 0    Ended
@@ -347,6 +349,16 @@ const youtube = {
                     // 3    Buffering
                     // 5    Video cued
                     switch (event.data) {
+                        case -1:
+                            // Update scrubber
+                            utils.dispatchEvent.call(player, player.media, 'timeupdate');
+
+                            // Get loaded % from YouTube
+                            player.media.buffered = instance.getVideoLoadedFraction();
+                            utils.dispatchEvent.call(player, player.media, 'progress');
+
+                            break;
+
                         case 0:
                             player.media.paused = true;
 

@@ -101,10 +101,8 @@ const vimeo = {
         };
 
         player.media.stop = () => {
-            player.embed.stop().then(() => {
-                player.media.paused = true;
-                player.currentTime = 0;
-            });
+            player.pause();
+            player.currentTime = 0;
         };
 
         // Seeking

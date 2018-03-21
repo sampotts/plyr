@@ -8666,7 +8666,6 @@ var ui = {
 // Plyr controls
 // ==========================================================================
 
-// Sniff out the browser
 var browser$2 = utils.getBrowser();
 
 var controls = {
@@ -10133,7 +10132,7 @@ var Listeners = function () {
             });
 
             // Handle native play/pause
-            utils.on(this.player.media, 'playing play pause ended', function (event) {
+            utils.on(this.player.media, 'playing play pause ended emptied', function (event) {
                 return ui.checkPlaying.call(_this3.player, event);
             });
 
@@ -11553,6 +11552,8 @@ var youtube = {
                     // Reset timer
                     clearInterval(player.timers.playing);
 
+                    console.warn(event.data);
+
                     // Handle events
                     // -1   Unstarted
                     // 0    Ended
@@ -11561,6 +11562,16 @@ var youtube = {
                     // 3    Buffering
                     // 5    Video cued
                     switch (event.data) {
+                        case -1:
+                            // Update scrubber
+                            utils.dispatchEvent.call(player, player.media, 'timeupdate');
+
+                            // Get loaded % from YouTube
+                            player.media.buffered = instance.getVideoLoadedFraction();
+                            utils.dispatchEvent.call(player, player.media, 'progress');
+
+                            break;
+
                         case 0:
                             player.media.paused = true;
 
@@ -11730,10 +11741,8 @@ var vimeo = {
         };
 
         player.media.stop = function () {
-            player.embed.stop().then(function () {
-                player.media.paused = true;
-                player.currentTime = 0;
-            });
+            player.pause();
+            player.currentTime = 0;
         };
 
         // Seeking
@@ -12201,12 +12210,6 @@ var source = {
 // License: The MIT License (MIT)
 // ==========================================================================
 
-// Private properties
-// TODO: Use a WeakMap for private globals
-// const globals = new WeakMap();
-
-// Plyr instance
-
 var Plyr$1 = function () {
     function Plyr(target, options) {
         var _this = this;
@@ -12541,8 +12544,11 @@ var Plyr$1 = function () {
     }, {
         key: 'stop',
         value: function stop() {
-            this.restart();
-            this.pause();
+            if (this.isHTML5) {
+                this.media.load();
+            } else {
+                this.media.stop();
+            }
         }
 
         /**
