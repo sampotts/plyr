@@ -1,3 +1,14 @@
+# v3.0.3
+
+*   Vimeo offset tweak (fixes #826)
+*   Fix for .stop() method (fixes #819)
+*   Check for array for speed options (fixes #252)
+*   Restore as float (fixes #828)
+*   Fix for Firefox fullscreen oddness (Fixes #821)
+*   Improve Sprite checking (fixes #827)
+*   Fix fast-forward control (thanks @saadshahd)
+*   Fix the options link in the readme (thanks @DanielRuf)
+
 # v3.0.2
 
 *   Fix for Safari not firing error events when trying to load blocked scripts
