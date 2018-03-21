@@ -8666,6 +8666,7 @@ var ui = {
 // Plyr controls
 // ==========================================================================
 
+// Sniff out the browser
 var browser$2 = utils.getBrowser();
 
 var controls = {
@@ -9336,7 +9337,7 @@ var controls = {
         var type = 'speed';
 
         // Set the default speeds
-        if (!utils.is.object(this.options.speed) || !Object.keys(this.options.speed).length) {
+        if (!utils.is.array(this.options.speed) || !this.options.speed.length) {
             this.options.speed = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
         }
 
@@ -13002,7 +13003,7 @@ var Plyr$1 = function () {
                 targetTime = this.duration;
             }
 
-            // Set with slightly reduced accuracy
+            // Set
             this.media.currentTime = parseFloat(targetTime.toFixed(4));
 
             // Logging

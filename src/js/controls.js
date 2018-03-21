@@ -708,7 +708,7 @@ const controls = {
         const type = 'speed';
 
         // Set the default speeds
-        if (!utils.is.object(this.options.speed) || !Object.keys(this.options.speed).length) {
+        if (!utils.is.array(this.options.speed) || !this.options.speed.length) {
             this.options.speed = [
                 0.5,
                 0.75,
