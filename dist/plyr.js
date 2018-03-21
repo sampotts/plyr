@@ -1010,7 +1010,16 @@ var utils = {
         var hasId = utils.is.string(id);
         var isCached = false;
 
-        function updateSprite(data) {
+        var exists = function exists() {
+            return document.querySelectorAll('#' + id).length;
+        };
+
+        function injectSprite(data) {
+            // Check again incase of race condition
+            if (hasId && exists()) {
+                return;
+            }
+
             // Inject content
             this.innerHTML = data;
 
@@ -1018,8 +1027,8 @@ var utils = {
             document.body.insertBefore(this, document.body.childNodes[0]);
         }
 
-        // Only load once
-        if (!hasId || !document.querySelectorAll('#' + id).length) {
+        // Only load once if ID set
+        if (!hasId || !exists()) {
             // Create container
             var container = document.createElement('div');
             utils.toggleHidden(container, true);
@@ -1035,7 +1044,7 @@ var utils = {
 
                 if (isCached) {
                     var data = JSON.parse(cached);
-                    updateSprite.call(container, data.content);
+                    injectSprite.call(container, data.content);
                     return;
                 }
             }
@@ -1052,7 +1061,7 @@ var utils = {
                     }));
                 }
 
-                updateSprite.call(container, result);
+                injectSprite.call(container, result);
             }).catch(function () {});
         }
     },

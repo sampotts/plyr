@@ -143,7 +143,14 @@ const utils = {
         const hasId = utils.is.string(id);
         let isCached = false;
 
-        function updateSprite(data) {
+        const exists = () => document.querySelectorAll(`#${id}`).length;
+
+        function injectSprite(data) {
+            // Check again incase of race condition
+            if (hasId && exists()) {
+                return;
+            }
+
             // Inject content
             this.innerHTML = data;
 
@@ -151,8 +158,8 @@ const utils = {
             document.body.insertBefore(this, document.body.childNodes[0]);
         }
 
-        // Only load once
-        if (!hasId || !document.querySelectorAll(`#${id}`).length) {
+        // Only load once if ID set
+        if (!hasId || !exists()) {
             // Create container
             const container = document.createElement('div');
             utils.toggleHidden(container, true);
@@ -168,7 +175,7 @@ const utils = {
 
                 if (isCached) {
                     const data = JSON.parse(cached);
-                    updateSprite.call(container, data.content);
+                    injectSprite.call(container, data.content);
                     return;
                 }
             }
@@ -190,7 +197,7 @@ const utils = {
                         );
                     }
 
-                    updateSprite.call(container, result);
+                    injectSprite.call(container, result);
                 })
                 .catch(() => {});
         }
