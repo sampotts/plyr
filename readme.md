@@ -21,6 +21,10 @@ A simple, lightweight, accessible and customizable HTML5, YouTube and Vimeo medi
 *   **[Events](#events)** - no messing around with Vimeo and YouTube APIs, all events are standardized across formats
 *   **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes
 *   **[Shortcuts](#shortcuts)** - supports keyboard shortcuts
+*   **Picture-in-Picture** - supports Safari's picture-in-picture mode
+*   **Playsinline** - supports the `playsinline` attribute
+*   **Speed controls** - adjust speed on the fly
+*   **Multiple captions** - support for multiple caption tracks
 *   **i18n support** - support for internationalization of controls
 *   **No dependencies** - written in "vanilla" ES6 JavaScript, no jQuery required
 *   **SASS** - to include in your build processes
