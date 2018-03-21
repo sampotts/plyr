@@ -12200,6 +12200,12 @@ var source = {
 // License: The MIT License (MIT)
 // ==========================================================================
 
+// Private properties
+// TODO: Use a WeakMap for private globals
+// const globals = new WeakMap();
+
+// Plyr instance
+
 var Plyr$1 = function () {
     function Plyr(target, options) {
         var _this = this;
@@ -12996,8 +13002,8 @@ var Plyr$1 = function () {
                 targetTime = this.duration;
             }
 
-            // Set
-            this.media.currentTime = targetTime.toFixed(4);
+            // Set with slightly reduced accuracy
+            this.media.currentTime = parseFloat(targetTime.toFixed(4));
 
             // Logging
             this.debug.log('Seeking to ' + this.currentTime + ' seconds');

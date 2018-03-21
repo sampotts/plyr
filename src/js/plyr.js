@@ -425,7 +425,7 @@ class Plyr {
         }
 
         // Set
-        this.media.currentTime = targetTime.toFixed(4);
+        this.media.currentTime = parseFloat(targetTime.toFixed(4));
 
         // Logging
         this.debug.log(`Seeking to ${this.currentTime} seconds`);
