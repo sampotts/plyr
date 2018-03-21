@@ -447,7 +447,7 @@ const utils = {
                 pause: utils.getElement.call(this, this.config.selectors.buttons.pause),
                 restart: utils.getElement.call(this, this.config.selectors.buttons.restart),
                 rewind: utils.getElement.call(this, this.config.selectors.buttons.rewind),
-                forward: utils.getElement.call(this, this.config.selectors.buttons.forward),
+                fastForward: utils.getElement.call(this, this.config.selectors.buttons.fastForward),
                 mute: utils.getElement.call(this, this.config.selectors.buttons.mute),
                 pip: utils.getElement.call(this, this.config.selectors.buttons.pip),
                 airplay: utils.getElement.call(this, this.config.selectors.buttons.airplay),
