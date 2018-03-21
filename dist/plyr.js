@@ -233,7 +233,7 @@ var defaults = {
             pause: '[data-plyr="pause"]',
             restart: '[data-plyr="restart"]',
             rewind: '[data-plyr="rewind"]',
-            forward: '[data-plyr="fast-forward"]',
+            fastForward: '[data-plyr="fast-forward"]',
             mute: '[data-plyr="mute"]',
             captions: '[data-plyr="captions"]',
             fullscreen: '[data-plyr="fullscreen"]',
@@ -1327,7 +1327,7 @@ var utils = {
                 pause: utils.getElement.call(this, this.config.selectors.buttons.pause),
                 restart: utils.getElement.call(this, this.config.selectors.buttons.restart),
                 rewind: utils.getElement.call(this, this.config.selectors.buttons.rewind),
-                forward: utils.getElement.call(this, this.config.selectors.buttons.forward),
+                fastForward: utils.getElement.call(this, this.config.selectors.buttons.fastForward),
                 mute: utils.getElement.call(this, this.config.selectors.buttons.mute),
                 pip: utils.getElement.call(this, this.config.selectors.buttons.pip),
                 airplay: utils.getElement.call(this, this.config.selectors.buttons.airplay),
@@ -1756,7 +1756,6 @@ var utils = {
 // Plyr support checks
 // ==========================================================================
 
-// Check for feature support
 var support = {
     // Basic support
     audio: 'canPlayType' in document.createElement('audio'),
@@ -1951,6 +1950,7 @@ var Console = function () {
 
 // ==========================================================================
 // Fullscreen wrapper
+// https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API#prefixing
 // ==========================================================================
 
 var browser = utils.getBrowser();
@@ -2009,6 +2009,7 @@ var Fullscreen = function () {
 
         // Get prefix
         this.prefix = Fullscreen.prefix;
+        this.name = Fullscreen.name;
 
         // Scroll position
         this.scrollPosition = { x: 0, y: 0 };
@@ -2072,7 +2073,7 @@ var Fullscreen = function () {
             } else if (!this.prefix) {
                 this.target.requestFullScreen();
             } else if (!utils.is.empty(this.prefix)) {
-                this.target['' + this.prefix + (this.prefix === 'ms' ? 'RequestFullscreen' : 'RequestFullScreen')]();
+                this.target[this.prefix + 'Request' + this.name]();
             }
         }
 
@@ -2094,7 +2095,8 @@ var Fullscreen = function () {
             } else if (!this.prefix) {
                 document.cancelFullScreen();
             } else if (!utils.is.empty(this.prefix)) {
-                document['' + this.prefix + (this.prefix === 'ms' ? 'ExitFullscreen' : 'CancelFullScreen')]();
+                var action = this.prefix === 'moz' ? 'Cancel' : 'Exit';
+                document['' + this.prefix + action + this.name]();
             }
         }
 
@@ -2134,7 +2136,7 @@ var Fullscreen = function () {
                 return utils.hasClass(this.target, this.player.config.classNames.fullscreen.fallback);
             }
 
-            var element = !this.prefix ? document.fullscreenElement : document[this.prefix + 'FullscreenElement'];
+            var element = !this.prefix ? document.fullscreenElement : document['' + this.prefix + this.name + 'Element'];
 
             return element === this.target;
         }
@@ -2158,7 +2160,7 @@ var Fullscreen = function () {
         key: 'prefix',
         get: function get$$1() {
             // No prefix
-            if (utils.is.function(document.cancelFullScreen)) {
+            if (utils.is.function(document.exitFullscreen)) {
                 return false;
             }
 
@@ -2167,11 +2169,8 @@ var Fullscreen = function () {
             var prefixes = ['webkit', 'moz', 'ms'];
 
             prefixes.some(function (pre) {
-                if (utils.is.function(document[pre + 'CancelFullScreen'])) {
+                if (utils.is.function(document[pre + 'ExitFullscreen']) || utils.is.function(document[pre + 'CancelFullScreen'])) {
                     value = pre;
-                    return true;
-                } else if (utils.is.function(document.msExitFullscreen)) {
-                    value = 'ms';
                     return true;
                 }
 
@@ -2179,6 +2178,11 @@ var Fullscreen = function () {
             });
 
             return value;
+        }
+    }, {
+        key: 'name',
+        get: function get$$1() {
+            return this.prefix === 'moz' ? 'FullScreen' : 'Fullscreen';
         }
     }]);
     return Fullscreen;
@@ -2764,7 +2768,6 @@ var ui = {
 // Plyr controls
 // ==========================================================================
 
-// Sniff out the browser
 var browser$2 = utils.getBrowser();
 
 var controls = {
@@ -3655,7 +3658,7 @@ var controls = {
 
         // Fast forward button
         if (this.config.controls.includes('fast-forward')) {
-            container.appendChild(controls.createButton.call(this, 'fast-forward'));
+            container.appendChild(controls.createButton.call(this, 'fastForward'));
         }
 
         // Progress
@@ -3962,7 +3965,6 @@ var controls = {
 // Plyr Event Listeners
 // ==========================================================================
 
-// Sniff out the browser
 var browser$1 = utils.getBrowser();
 
 var Listeners = function () {
@@ -6056,7 +6058,6 @@ var vimeo = {
 // Plyr Media
 // ==========================================================================
 
-// Sniff out the browser
 var browser$3 = utils.getBrowser();
 
 var media = {
@@ -6300,12 +6301,6 @@ var source = {
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
-
-// Private properties
-// TODO: Use a WeakMap for private globals
-// const globals = new WeakMap();
-
-// Plyr instance
 
 var Plyr = function () {
     function Plyr(target, options) {

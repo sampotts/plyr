@@ -1,5 +1,6 @@
 // ==========================================================================
 // Fullscreen wrapper
+// https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API#prefixing
 // ==========================================================================
 
 import utils from './utils';
@@ -54,6 +55,7 @@ class Fullscreen {
 
         // Get prefix
         this.prefix = Fullscreen.prefix;
+        this.name = Fullscreen.name;
 
         // Scroll position
         this.scrollPosition = { x: 0, y: 0 };
@@ -85,7 +87,7 @@ class Fullscreen {
     // Get the prefix for handlers
     static get prefix() {
         // No prefix
-        if (utils.is.function(document.cancelFullScreen)) {
+        if (utils.is.function(document.exitFullscreen)) {
             return false;
         }
 
@@ -98,11 +100,8 @@ class Fullscreen {
         ];
 
         prefixes.some(pre => {
-            if (utils.is.function(document[`${pre}CancelFullScreen`])) {
+            if (utils.is.function(document[`${pre}ExitFullscreen`]) || utils.is.function(document[`${pre}CancelFullScreen`])) {
                 value = pre;
-                return true;
-            } else if (utils.is.function(document.msExitFullscreen)) {
-                value = 'ms';
                 return true;
             }
 
@@ -110,6 +109,10 @@ class Fullscreen {
         });
 
         return value;
+    }
+
+    static get name() {
+        return this.prefix === 'moz' ? 'FullScreen' : 'Fullscreen';
     }
 
     // Determine if fullscreen is enabled
@@ -130,7 +133,7 @@ class Fullscreen {
             return utils.hasClass(this.target, this.player.config.classNames.fullscreen.fallback);
         }
 
-        const element = !this.prefix ? document.fullscreenElement : document[`${this.prefix}FullscreenElement`];
+        const element = !this.prefix ? document.fullscreenElement : document[`${this.prefix}${this.name}Element`];
 
         return element === this.target;
     }
@@ -168,7 +171,7 @@ class Fullscreen {
         } else if (!this.prefix) {
             this.target.requestFullScreen();
         } else if (!utils.is.empty(this.prefix)) {
-            this.target[`${this.prefix}${this.prefix === 'ms' ? 'RequestFullscreen' : 'RequestFullScreen'}`]();
+            this.target[`${this.prefix}Request${this.name}`]();
         }
     }
 
@@ -187,7 +190,8 @@ class Fullscreen {
         } else if (!this.prefix) {
             document.cancelFullScreen();
         } else if (!utils.is.empty(this.prefix)) {
-            document[`${this.prefix}${this.prefix === 'ms' ? 'ExitFullscreen' : 'CancelFullScreen'}`]();
+            const action = this.prefix === 'moz' ? 'Cancel' : 'Exit';
+            document[`${this.prefix}${action}${this.name}`]();
         }
     }
 
