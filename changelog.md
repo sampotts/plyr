@@ -2,7 +2,7 @@
 
 *   Vimeo offset tweak (fixes #826)
 *   Fix for .stop() method (fixes #819)
-*   Check for array for speed options (fixes #252)
+*   Check for array for speed options (fixes #817)
 *   Restore as float (fixes #828)
 *   Fix for Firefox fullscreen oddness (Fixes #821)
 *   Improve Sprite checking (fixes #827)
