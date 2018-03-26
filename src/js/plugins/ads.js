@@ -7,6 +7,7 @@
 /* global google */
 
 import utils from '../utils';
+import i18n from '../i18n';
 
 class Ads {
     /**
@@ -178,7 +179,7 @@ class Ads {
 
         const update = () => {
             const time = utils.formatTime(Math.max(this.manager.getRemainingTime(), 0));
-            const label = `${this.player.config.i18n.advertisement} - ${time}`;
+            const label = `${i18n.get('advertisement', this.player.config)} - ${time}`;
             this.elements.container.setAttribute('data-badge-text', label);
         };
 

@@ -161,6 +161,8 @@ class Fullscreen {
             return;
         }
 
+        console.warn(this.prefix);
+
         // iOS native fullscreen doesn't need the request step
         if (browser.isIos && this.player.config.fullscreen.iosNative) {
             if (this.player.playing) {
@@ -169,7 +171,7 @@ class Fullscreen {
         } else if (!Fullscreen.native) {
             toggleFallback.call(this, true);
         } else if (!this.prefix) {
-            this.target.requestFullScreen();
+            this.target.requestFullscreen();
         } else if (!utils.is.empty(this.prefix)) {
             this.target[`${this.prefix}Request${this.name}`]();
         }
@@ -197,6 +199,8 @@ class Fullscreen {
 
     // Toggle state
     toggle() {
+        console.warn('TOGGLE');
+
         if (!this.active) {
             this.enter();
         } else {

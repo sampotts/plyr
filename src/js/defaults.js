@@ -132,7 +132,10 @@ const defaults = {
     // Default controls
     controls: [
         'play-large',
+        // 'restart',
+        // 'rewind',
         'play',
+        // 'fast-forward',
         'progress',
         'current-time',
         'mute',
@@ -155,7 +158,7 @@ const defaults = {
         rewind: 'Rewind {seektime} secs',
         play: 'Play',
         pause: 'Pause',
-        forward: 'Forward {seektime} secs',
+        fastForward: 'Forward {seektime} secs',
         seek: 'Seek',
         played: 'Played',
         buffered: 'Buffered',
@@ -203,7 +206,7 @@ const defaults = {
         pause: null,
         restart: null,
         rewind: null,
-        forward: null,
+        fastForward: null,
         mute: null,
         volume: null,
         captions: null,

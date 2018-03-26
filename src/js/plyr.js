@@ -405,7 +405,7 @@ class Plyr {
      * Fast forward
      * @param {number} seekTime - how far to fast forward in seconds. Defaults to the config.seekTime
      */
-    forward(seekTime) {
+    fastForward(seekTime) {
         this.currentTime = this.currentTime + (utils.is.number(seekTime) ? seekTime : this.config.seekTime);
     }
 

@@ -5,6 +5,7 @@
 import support from './support';
 import utils from './utils';
 import ui from './ui';
+import i18n from './i18n';
 import captions from './captions';
 
 // Sniff out the browser
@@ -74,7 +75,7 @@ const controls = {
 
     // Create hidden text label
     createLabel(type, attr) {
-        let text = this.config.i18n[type];
+        let text = i18n.get(type, this.config);
         const attributes = Object.assign({}, attr);
 
         switch (type) {
@@ -126,7 +127,7 @@ const controls = {
     createButton(buttonType, attr) {
         const button = utils.createElement('button');
         const attributes = Object.assign({}, attr);
-        let type = buttonType;
+        let type = utils.toCamelCase(buttonType);
 
         let toggle = false;
         let label;
@@ -147,7 +148,7 @@ const controls = {
         }
 
         // Large play button
-        switch (type) {
+        switch (buttonType) {
             case 'play':
                 toggle = true;
                 label = 'play';
@@ -189,7 +190,7 @@ const controls = {
 
             default:
                 label = type;
-                icon = type;
+                icon = buttonType;
         }
 
         // Setup toggle icon and labels
@@ -204,7 +205,7 @@ const controls = {
 
             // Add aria attributes
             attributes['aria-pressed'] = false;
-            attributes['aria-label'] = this.config.i18n[label];
+            attributes['aria-label'] = i18n.get(label, this.config);
         } else {
             button.appendChild(controls.createIcon.call(this, icon));
             button.appendChild(controls.createLabel.call(this, label));
@@ -238,7 +239,7 @@ const controls = {
                 for: attributes.id,
                 class: this.config.classNames.hidden,
             },
-            this.config.i18n[type],
+            i18n.get(type, this.config),
         );
 
         // Seek input
@@ -291,11 +292,11 @@ const controls = {
             let suffix = '';
             switch (type) {
                 case 'played':
-                    suffix = this.config.i18n.played;
+                    suffix = i18n.get('played', this.config);
                     break;
 
                 case 'buffer':
-                    suffix = this.config.i18n.buffered;
+                    suffix = i18n.get('buffered', this.config);
                     break;
 
                 default:
@@ -322,7 +323,7 @@ const controls = {
                 {
                     class: this.config.classNames.hidden,
                 },
-                this.config.i18n[type],
+                i18n.get(type, this.config),
             ),
         );
 
@@ -617,7 +618,7 @@ const controls = {
                     class: this.config.classNames.control,
                     'data-plyr-loop-action': option,
                 }),
-                this.config.i18n[option]
+                i18n.get(option, this.config)
             );
 
             if (['start', 'end'].includes(option)) {
@@ -638,7 +639,7 @@ const controls = {
         }
 
         if (!support.textTracks || !captions.getTracks.call(this).length) {
-            return this.config.i18n.none;
+            return i18n.get('none', this.config);
         }
 
         if (this.captions.active) {
@@ -649,7 +650,7 @@ const controls = {
             }
         }
 
-        return this.config.i18n.disabled;
+        return i18n.get('disabled', this.config);
     },
 
     // Set a list of available captions languages
@@ -679,7 +680,7 @@ const controls = {
         // Add the "None" option to turn off captions
         tracks.unshift({
             language: '',
-            label: this.config.i18n.none,
+            label: i18n.get('none', this.config),
         });
 
         // Generate options
@@ -927,7 +928,7 @@ const controls = {
 
         // Fast forward button
         if (this.config.controls.includes('fast-forward')) {
-            container.appendChild(controls.createButton.call(this, 'fastForward'));
+            container.appendChild(controls.createButton.call(this, 'fast-forward'));
         }
 
         // Progress
@@ -1069,7 +1070,7 @@ const controls = {
                         'aria-controls': `plyr-settings-${data.id}-${type}`,
                         'aria-expanded': false,
                     }),
-                    this.config.i18n[type],
+                    i18n.get(type, this.config),
                 );
 
                 const value = utils.createElement('span', {
@@ -1109,7 +1110,7 @@ const controls = {
                         'aria-controls': `plyr-settings-${data.id}-home`,
                         'aria-expanded': false,
                     },
-                    this.config.i18n[type],
+                    i18n.get(type, this.config),
                 );
 
                 pane.appendChild(back);

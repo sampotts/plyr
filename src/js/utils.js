@@ -540,7 +540,7 @@ const utils = {
     },
 
     // Toggle event listener
-    toggleListener(elements, event, callback, toggle, passive, capture) {
+    toggleListener(elements, event, callback, toggle = false, passive = true, capture = false) {
         // Bail if no elemetns, event, or callback
         if (utils.is.empty(elements) || utils.is.empty(event) || !utils.is.function(callback)) {
             return;
@@ -562,16 +562,16 @@ const utils = {
         const events = event.split(' ');
 
         // Build options
-        // Default to just capture boolean
-        let options = utils.is.boolean(capture) ? capture : false;
+        // Default to just the capture boolean for browsers with no passive listener support
+        let options = capture;
 
         // If passive events listeners are supported
         if (support.passiveListeners) {
             options = {
                 // Whether the listener can be passive (i.e. default never prevented)
-                passive: utils.is.boolean(passive) ? passive : true,
+                passive,
                 // Whether the listener is a capturing listener or not
-                capture: utils.is.boolean(capture) ? capture : false,
+                capture,
             };
         }
 
@@ -582,12 +582,12 @@ const utils = {
     },
 
     // Bind event handler
-    on(element, events, callback, passive, capture) {
+    on(element, events = '', callback, passive = true, capture = false) {
         utils.toggleListener(element, events, callback, true, passive, capture);
     },
 
     // Unbind event handler
-    off(element, events, callback, passive, capture) {
+    off(element, events = '', callback, passive = true, capture = false) {
         utils.toggleListener(element, events, callback, false, passive, capture);
     },
 
@@ -676,6 +676,44 @@ const utils = {
 
         // Render
         return `${inverted ? '-' : ''}${hours}${format(mins)}:${format(secs)}`;
+    },
+
+    // Replace all occurances of a string in a string
+    replaceAll(input = '', find = '', replace = '') {
+        return input.replace(new RegExp(find.toString().replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1'), 'g'), replace.toString());
+    },
+
+    // Convert to title case
+    toTitleCase(input = '') {
+        return input.toString().replace(/\w\S*/g, text => text.charAt(0).toUpperCase() + text.substr(1).toLowerCase());
+    },
+
+    // Convert string to pascalCase
+    toPascalCase(input = '') {
+        let string = input.toString();
+
+        // Convert kebab case
+        string = utils.replaceAll(string, '-', ' ');
+
+        // Convert snake case
+        string = utils.replaceAll(string, '_', ' ');
+
+        // Convert to title case
+        string = utils.toTitleCase(string);
+
+        // Convert to pascal case
+        return utils.replaceAll(string, ' ', '');
+    },
+
+    // Convert string to pascalCase
+    toCamelCase(input = '') {
+        let string = input.toString();
+
+        // Convert to pascal case
+        string = utils.toPascalCase(string);
+
+        // Convert first character to lowercase
+        return string.charAt(0).toLowerCase() + string.slice(1);
     },
 
     // Deep extend destination object with N more objects
