@@ -7094,8 +7094,12 @@ var utils = {
             return;
         }
 
-        Object.keys(attributes).forEach(function (key) {
-            element.setAttribute(key, attributes[key]);
+        Object.entries(attributes).forEach(function (_ref) {
+            var _ref2 = slicedToArray(_ref, 2),
+                key = _ref2[0],
+                value = _ref2[1];
+
+            element.setAttribute(key, value);
         });
     },
 
