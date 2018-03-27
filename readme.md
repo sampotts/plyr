@@ -2,7 +2,7 @@
 
 A simple, lightweight, accessible and customizable HTML5, YouTube and Vimeo media player that supports [_modern_](#browser-support) browsers.
 
-[Checkout the demo](https://plyr.io) - [Donate to support Plyr](#donate) - [Chat on Slack](https://bit.ly/plyr-slack)
+[Checkout the demo](https://plyr.io) - [Donate to support Plyr](#donate) - [Chat on Slack](https://bit.ly/plyr-chat)
 
 [![Image of Plyr](https://cdn.plyr.io/static/demo/screenshot.png?v=3)](https://plyr.io)
 
