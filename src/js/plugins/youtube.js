@@ -339,8 +339,6 @@ const youtube = {
                     // Reset timer
                     clearInterval(player.timers.playing);
 
-                    console.warn(event.data);
-
                     // Handle events
                     // -1   Unstarted
                     // 0    Ended

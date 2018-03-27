@@ -77,7 +77,7 @@ var defaults = {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.0.3/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.0.4/plyr.svg',
 
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
@@ -2130,8 +2130,6 @@ var Fullscreen = function () {
                 return;
             }
 
-            console.warn(this.prefix);
-
             // iOS native fullscreen doesn't need the request step
             if (browser.isIos && this.player.config.fullscreen.iosNative) {
                 if (this.player.playing) {
@@ -2174,8 +2172,6 @@ var Fullscreen = function () {
     }, {
         key: 'toggle',
         value: function toggle() {
-            console.warn('TOGGLE');
-
             if (!this.active) {
                 this.enter();
             } else {
@@ -5760,8 +5756,6 @@ var youtube = {
                     // Reset timer
                     clearInterval(player.timers.playing);
 
-                    console.warn(event.data);
-
                     // Handle events
                     // -1   Unstarted
                     // 0    Ended
@@ -6414,7 +6408,7 @@ var source = {
 
 // ==========================================================================
 // Plyr
-// plyr.js v3.0.3
+// plyr.js v3.0.4
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -6973,8 +6967,6 @@ var Plyr = function () {
             // then set the timer to hide the controls
             if (!show || this.playing) {
                 this.timers.controls = setTimeout(function () {
-                    console.warn(_this3.elements.controls.pressed, _this3.elements.controls.hover, delay);
-
                     // If the mouse is over the controls (and not entering fullscreen), bail
                     if ((_this3.elements.controls.pressed || _this3.elements.controls.hover) && !isEnterFullscreen) {
                         return;

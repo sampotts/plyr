@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v3.0.4
+// plyr.js v3.0.5
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -1019,8 +1019,6 @@ class Plyr {
         // then set the timer to hide the controls
         if (!show || this.playing) {
             this.timers.controls = setTimeout(() => {
-                console.warn(this.elements.controls.pressed, this.elements.controls.hover, delay);
-
                 // If the mouse is over the controls (and not entering fullscreen), bail
                 if ((this.elements.controls.pressed || this.elements.controls.hover) && !isEnterFullscreen) {
                     return;
