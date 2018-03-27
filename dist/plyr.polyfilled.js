@@ -5268,7 +5268,7 @@ var defaults = {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.0.5/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.0.6/plyr.svg',
 
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
@@ -9657,14 +9657,15 @@ var Listeners = function () {
             var proxy = function proxy(event, defaultHandler, customHandlerKey) {
                 var customHandler = _this4.player.config.listeners[customHandlerKey];
                 var hasCustomHandler = utils.is.function(customHandler);
+                var returned = true;
 
                 // Execute custom handler
                 if (hasCustomHandler) {
-                    customHandler.call(_this4.player, event);
+                    returned = customHandler.call(_this4.player, event);
                 }
 
                 // Only call default handler if not prevented in custom handler
-                if (!event.defaultPrevented && utils.is.function(defaultHandler)) {
+                if (returned && utils.is.function(defaultHandler)) {
                     defaultHandler.call(_this4.player, event);
                 }
             };
@@ -11589,7 +11590,7 @@ var source = {
 
 // ==========================================================================
 // Plyr
-// plyr.js v3.0.5
+// plyr.js v3.0.6
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -12905,7 +12906,7 @@ var Plyr$1 = function () {
 
 // ==========================================================================
 // Plyr Polyfilled Build
-// plyr.js v3.0.4
+// plyr.js v3.0.6
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================

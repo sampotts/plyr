@@ -398,14 +398,15 @@ class Listeners {
         const proxy = (event, defaultHandler, customHandlerKey) => {
             const customHandler = this.player.config.listeners[customHandlerKey];
             const hasCustomHandler = utils.is.function(customHandler);
+            let returned = true;
 
             // Execute custom handler
             if (hasCustomHandler) {
-                customHandler.call(this.player, event);
+                returned = customHandler.call(this.player, event);
             }
 
             // Only call default handler if not prevented in custom handler
-            if (!event.defaultPrevented && utils.is.function(defaultHandler)) {
+            if (returned && utils.is.function(defaultHandler)) {
                 defaultHandler.call(this.player, event);
             }
         };
