@@ -17,6 +17,7 @@ class Listeners {
 
         this.handleKey = this.handleKey.bind(this);
         this.toggleMenu = this.toggleMenu.bind(this);
+        this.firstTouch = this.firstTouch.bind(this);
     }
 
     // Handle key presses
@@ -187,6 +188,17 @@ class Listeners {
         controls.toggleMenu.call(this.player, event);
     }
 
+    // Device is touch enabled
+    firstTouch() {
+        this.player.touch = true;
+
+        // Add touch class
+        utils.toggleClass(this.player.elements.container, this.player.config.classNames.isTouch, true);
+
+        // Clean up
+        utils.off(document.body, 'touchstart', this.firstTouch);
+    }
+
     // Global window & document listeners
     global(toggle = true) {
         // Keyboard shortcuts
@@ -196,6 +208,9 @@ class Listeners {
 
         // Click anywhere closes menu
         utils.toggleListener(document.body, 'click', this.toggleMenu, toggle);
+
+        // Detect touch by events
+        utils.on(document.body, 'touchstart', this.firstTouch);
     }
 
     // Container listeners
@@ -288,7 +303,7 @@ class Listeners {
             // On click play, pause ore restart
             utils.on(wrapper, 'click', () => {
                 // Touch devices will just show controls (if we're hiding controls)
-                if (this.player.config.hideControls && support.touch && !this.player.paused) {
+                if (this.player.config.hideControls && this.player.touch && !this.player.paused) {
                     return;
                 }
 
@@ -538,7 +553,7 @@ class Listeners {
         if (this.player.config.hideControls) {
             // Watch for cursor over controls so they don't hide when trying to interact
             on(this.player.elements.controls, 'mouseenter mouseleave', event => {
-                this.player.elements.controls.hover = event.type === 'mouseenter';
+                this.player.elements.controls.hover = !this.player.touch && event.type === 'mouseenter';
             });
 
             // Watch for cursor over controls so they don't hide when trying to interact

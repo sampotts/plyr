@@ -36,6 +36,9 @@ class Plyr {
         this.loading = false;
         this.failed = false;
 
+        // Touch device
+        this.touch = support.touch;
+
         // Set the media element
         this.media = target;
 
@@ -954,26 +957,32 @@ class Plyr {
                 // Is the enter fullscreen event
                 isEnterFullscreen = toggle.type === 'enterfullscreen';
 
-                // Whether to show controls
-                show = [
-                    'mouseenter',
-                    'mousemove',
+                // Events that show the controls
+                const showEvents = [
                     'touchstart',
                     'touchmove',
-                    'focusin',
-                ].includes(toggle.type);
-
-                // Delay hiding on move events
-                if ([
+                    'mouseenter',
                     'mousemove',
+                    'focusin',
+                ];
+
+                // Events that delay hiding
+                const delayEvents = [
                     'touchmove',
                     'touchend',
-                ].includes(toggle.type)) {
+                    'mousemove',
+                ];
+
+                // Whether to show controls
+                show = showEvents.includes(toggle.type);
+
+                // Delay hiding on move events
+                if (delayEvents.includes(toggle.type)) {
                     delay = 2000;
                 }
 
                 // Delay a little more for keyboard users
-                if (toggle.type === 'focusin') {
+                if (!this.touch && toggle.type === 'focusin') {
                     delay = 3000;
                     utils.toggleClass(this.elements.controls, this.config.classNames.noTransition, true);
                 }
@@ -1001,7 +1010,7 @@ class Plyr {
             }
 
             // Delay for hiding on touch
-            if (support.touch) {
+            if (this.touch) {
                 delay = 3000;
             }
         }
@@ -1010,6 +1019,8 @@ class Plyr {
         // then set the timer to hide the controls
         if (!show || this.playing) {
             this.timers.controls = setTimeout(() => {
+                console.warn(this.elements.controls.pressed, this.elements.controls.hover, delay);
+
                 // If the mouse is over the controls (and not entering fullscreen), bail
                 if ((this.elements.controls.pressed || this.elements.controls.hover) && !isEnterFullscreen) {
                     return;

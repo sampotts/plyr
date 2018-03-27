@@ -181,7 +181,6 @@ const defaults = {
         end: 'End',
         all: 'All',
         reset: 'Reset',
-        none: 'None',
         disabled: 'Disabled',
         advertisement: 'Ad',
     },

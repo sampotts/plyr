@@ -384,6 +384,16 @@ const controls = {
         const clientRect = this.elements.inputs.seek.getBoundingClientRect();
         const visible = `${this.config.classNames.tooltip}--visible`;
 
+        const toggle = toggle => {
+            utils.toggleClass(this.elements.display.seekTooltip, visible, toggle);
+        };
+
+        // Hide on touch
+        if (this.touch) {
+            toggle(false);
+            return;
+        }
+
         // Determine percentage, if already visible
         if (utils.is.event(event)) {
             percent = 100 / clientRect.width * (event.pageX - clientRect.left);
@@ -412,7 +422,7 @@ const controls = {
             'mouseenter',
             'mouseleave',
         ].includes(event.type)) {
-            utils.toggleClass(this.elements.display.seekTooltip, visible, event.type === 'mouseenter');
+            toggle(event.type === 'mouseenter');
         }
     },
 
@@ -541,7 +551,7 @@ const controls = {
 
         switch (setting) {
             case 'captions':
-                value = this.captions.active ? this.captions.language : '';
+                value = this.captions.active ? this.captions.language : i18n.get('disabled', this.config);
                 break;
 
             default:
@@ -638,11 +648,7 @@ const controls = {
             return null;
         }
 
-        if (!support.textTracks || !captions.getTracks.call(this).length) {
-            return i18n.get('none', this.config);
-        }
-
-        if (this.captions.active) {
+        if (support.textTracks && captions.getTracks.call(this).length && this.captions.active) {
             const currentTrack = captions.getCurrentTrack.call(this);
 
             if (utils.is.track(currentTrack)) {
@@ -677,10 +683,10 @@ const controls = {
             label: !utils.is.empty(track.label) ? track.label : track.language.toUpperCase(),
         }));
 
-        // Add the "None" option to turn off captions
+        // Add the "Disabled" option to turn off captions
         tracks.unshift({
             language: '',
-            label: i18n.get('none', this.config),
+            label: i18n.get('disabled', this.config),
         });
 
         // Generate options

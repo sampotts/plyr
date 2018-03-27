@@ -46,7 +46,7 @@ const media = {
             utils.toggleClass(this.elements.container, this.config.classNames.isIos, browser.isIos);
 
             // Add touch class
-            utils.toggleClass(this.elements.container, this.config.classNames.isTouch, support.touch);
+            utils.toggleClass(this.elements.container, this.config.classNames.isTouch, this.touch);
         }
 
         // Inject the player wrapper

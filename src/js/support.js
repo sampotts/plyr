@@ -143,7 +143,7 @@ const support = {
     })(),
 
     // Touch
-    // Remember a device can be moust + touch enabled
+    // NOTE: Remember a device can be mouse + touch enabled so we check on first touch event
     touch: 'ontouchstart' in document.documentElement,
 
     // Detect transitions support

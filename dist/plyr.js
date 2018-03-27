@@ -170,7 +170,6 @@ var defaults = {
         end: 'End',
         all: 'All',
         reset: 'Reset',
-        none: 'None',
         disabled: 'Disabled',
         advertisement: 'Ad'
     },
@@ -1964,7 +1963,7 @@ var support = {
     }(),
 
     // Touch
-    // Remember a device can be moust + touch enabled
+    // NOTE: Remember a device can be mouse + touch enabled so we check on first touch event
     touch: 'ontouchstart' in document.documentElement,
 
     // Detect transitions support
@@ -2869,6 +2868,7 @@ var ui = {
 // Plyr controls
 // ==========================================================================
 
+// Sniff out the browser
 var browser$2 = utils.getBrowser();
 
 var controls = {
@@ -3206,6 +3206,8 @@ var controls = {
 
     // Update hover tooltip for seeking
     updateSeekTooltip: function updateSeekTooltip(event) {
+        var _this = this;
+
         // Bail if setting not true
         if (!this.config.tooltips.seek || !utils.is.element(this.elements.inputs.seek) || !utils.is.element(this.elements.display.seekTooltip) || this.duration === 0) {
             return;
@@ -3215,6 +3217,16 @@ var controls = {
         var percent = 0;
         var clientRect = this.elements.inputs.seek.getBoundingClientRect();
         var visible = this.config.classNames.tooltip + '--visible';
+
+        var toggle = function toggle(_toggle) {
+            utils.toggleClass(_this.elements.display.seekTooltip, visible, _toggle);
+        };
+
+        // Hide on touch
+        if (this.touch) {
+            toggle(false);
+            return;
+        }
 
         // Determine percentage, if already visible
         if (utils.is.event(event)) {
@@ -3241,7 +3253,7 @@ var controls = {
         // Show/hide the tooltip
         // If the event is a moues in/out and percentage is inside bounds
         if (utils.is.event(event) && ['mouseenter', 'mouseleave'].includes(event.type)) {
-            utils.toggleClass(this.elements.display.seekTooltip, visible, event.type === 'mouseenter');
+            toggle(event.type === 'mouseenter');
         }
     },
 
@@ -3259,7 +3271,7 @@ var controls = {
     // Set the YouTube quality menu
     // TODO: Support for HTML5
     setQualityMenu: function setQualityMenu(options) {
-        var _this = this;
+        var _this2 = this;
 
         // Menu required
         if (!utils.is.element(this.elements.settings.panes.quality)) {
@@ -3272,7 +3284,7 @@ var controls = {
         // Set options if passed and filter based on config
         if (utils.is.array(options)) {
             this.options.quality = options.filter(function (quality) {
-                return _this.config.quality.options.includes(quality);
+                return _this2.config.quality.options.includes(quality);
             });
         } else {
             this.options.quality = this.config.quality.options;
@@ -3319,11 +3331,11 @@ var controls = {
                 return null;
             }
 
-            return controls.createBadge.call(_this, label);
+            return controls.createBadge.call(_this2, label);
         };
 
         this.options.quality.forEach(function (quality) {
-            return controls.createMenuItem.call(_this, quality, list, type, controls.getLabel.call(_this, 'quality', quality), getBadge(quality));
+            return controls.createMenuItem.call(_this2, quality, list, type, controls.getLabel.call(_this2, 'quality', quality), getBadge(quality));
         });
 
         controls.updateSetting.call(this, type, list);
@@ -3378,7 +3390,7 @@ var controls = {
 
         switch (setting) {
             case 'captions':
-                value = this.captions.active ? this.captions.language : '';
+                value = this.captions.active ? this.captions.language : i18n.get('disabled', this.config);
                 break;
 
             default:
@@ -3468,11 +3480,7 @@ var controls = {
             return null;
         }
 
-        if (!support.textTracks || !captions.getTracks.call(this).length) {
-            return i18n.get('none', this.config);
-        }
-
-        if (this.captions.active) {
+        if (support.textTracks && captions.getTracks.call(this).length && this.captions.active) {
             var currentTrack = captions.getCurrentTrack.call(this);
 
             if (utils.is.track(currentTrack)) {
@@ -3486,7 +3494,7 @@ var controls = {
 
     // Set a list of available captions languages
     setCaptionsMenu: function setCaptionsMenu() {
-        var _this2 = this;
+        var _this3 = this;
 
         // TODO: Captions or language? Currently it's mixed
         var type = 'captions';
@@ -3512,15 +3520,15 @@ var controls = {
             };
         });
 
-        // Add the "None" option to turn off captions
+        // Add the "Disabled" option to turn off captions
         tracks.unshift({
             language: '',
-            label: i18n.get('none', this.config)
+            label: i18n.get('disabled', this.config)
         });
 
         // Generate options
         tracks.forEach(function (track) {
-            controls.createMenuItem.call(_this2, track.language, list, 'language', track.label || track.language, controls.createBadge.call(_this2, track.language.toUpperCase()), track.language.toLowerCase() === _this2.captions.language.toLowerCase());
+            controls.createMenuItem.call(_this3, track.language, list, 'language', track.label || track.language, controls.createBadge.call(_this3, track.language.toUpperCase()), track.language.toLowerCase() === _this3.captions.language.toLowerCase());
         });
 
         controls.updateSetting.call(this, type, list);
@@ -3529,7 +3537,7 @@ var controls = {
 
     // Set a list of available captions languages
     setSpeedMenu: function setSpeedMenu() {
-        var _this3 = this;
+        var _this4 = this;
 
         // Menu required
         if (!utils.is.element(this.elements.settings.panes.speed)) {
@@ -3545,7 +3553,7 @@ var controls = {
 
         // Set options if passed and filter based on config
         this.options.speed = this.options.speed.filter(function (speed) {
-            return _this3.config.speed.options.includes(speed);
+            return _this4.config.speed.options.includes(speed);
         });
 
         // Toggle the pane and tab
@@ -3569,7 +3577,7 @@ var controls = {
 
         // Create items
         this.options.speed.forEach(function (speed) {
-            return controls.createMenuItem.call(_this3, speed, list, type, controls.getLabel.call(_this3, 'speed', speed));
+            return controls.createMenuItem.call(_this4, speed, list, type, controls.getLabel.call(_this4, 'speed', speed));
         });
 
         controls.updateSetting.call(this, type, list);
@@ -3732,7 +3740,7 @@ var controls = {
     // Build the default HTML
     // TODO: Set order based on order in the config.controls array?
     create: function create(data) {
-        var _this4 = this;
+        var _this5 = this;
 
         // Do nothing if we want no controls
         if (utils.is.empty(this.config.controls)) {
@@ -3881,17 +3889,17 @@ var controls = {
                     hidden: ''
                 });
 
-                var button = utils.createElement('button', utils.extend(utils.getAttributesFromSelector(_this4.config.selectors.buttons.settings), {
+                var button = utils.createElement('button', utils.extend(utils.getAttributesFromSelector(_this5.config.selectors.buttons.settings), {
                     type: 'button',
-                    class: _this4.config.classNames.control + ' ' + _this4.config.classNames.control + '--forward',
+                    class: _this5.config.classNames.control + ' ' + _this5.config.classNames.control + '--forward',
                     id: 'plyr-settings-' + data.id + '-' + type + '-tab',
                     'aria-haspopup': true,
                     'aria-controls': 'plyr-settings-' + data.id + '-' + type,
                     'aria-expanded': false
-                }), i18n.get(type, _this4.config));
+                }), i18n.get(type, _this5.config));
 
                 var value = utils.createElement('span', {
-                    class: _this4.config.classNames.menu.value
+                    class: _this5.config.classNames.menu.value
                 });
 
                 // Speed contains HTML entities
@@ -3901,7 +3909,7 @@ var controls = {
                 tab.appendChild(button);
                 tabs.appendChild(tab);
 
-                _this4.elements.settings.tabs[type] = tab;
+                _this5.elements.settings.tabs[type] = tab;
             });
 
             home.appendChild(tabs);
@@ -3920,11 +3928,11 @@ var controls = {
 
                 var back = utils.createElement('button', {
                     type: 'button',
-                    class: _this4.config.classNames.control + ' ' + _this4.config.classNames.control + '--back',
+                    class: _this5.config.classNames.control + ' ' + _this5.config.classNames.control + '--back',
                     'aria-haspopup': true,
                     'aria-controls': 'plyr-settings-' + data.id + '-home',
                     'aria-expanded': false
-                }, i18n.get(type, _this4.config));
+                }, i18n.get(type, _this5.config));
 
                 pane.appendChild(back);
 
@@ -3933,7 +3941,7 @@ var controls = {
                 pane.appendChild(options);
                 inner.appendChild(pane);
 
-                _this4.elements.settings.panes[type] = pane;
+                _this5.elements.settings.panes[type] = pane;
             });
 
             form.appendChild(inner);
@@ -3976,7 +3984,7 @@ var controls = {
 
     // Insert controls
     inject: function inject() {
-        var _this5 = this;
+        var _this6 = this;
 
         // Sprite
         if (this.config.loadSprite) {
@@ -4054,8 +4062,8 @@ var controls = {
             var labels = utils.getElements.call(this, [this.config.selectors.controls.wrapper, ' ', this.config.selectors.labels, ' .', this.config.classNames.hidden].join(''));
 
             Array.from(labels).forEach(function (label) {
-                utils.toggleClass(label, _this5.config.classNames.hidden, false);
-                utils.toggleClass(label, _this5.config.classNames.tooltip, true);
+                utils.toggleClass(label, _this6.config.classNames.hidden, false);
+                utils.toggleClass(label, _this6.config.classNames.tooltip, true);
                 label.setAttribute('role', 'tooltip');
             });
         }
@@ -4077,6 +4085,7 @@ var Listeners = function () {
 
         this.handleKey = this.handleKey.bind(this);
         this.toggleMenu = this.toggleMenu.bind(this);
+        this.firstTouch = this.firstTouch.bind(this);
     }
 
     // Handle key presses
@@ -4232,6 +4241,20 @@ var Listeners = function () {
             controls.toggleMenu.call(this.player, event);
         }
 
+        // Device is touch enabled
+
+    }, {
+        key: 'firstTouch',
+        value: function firstTouch() {
+            this.player.touch = true;
+
+            // Add touch class
+            utils.toggleClass(this.player.elements.container, this.player.config.classNames.isTouch, true);
+
+            // Clean up
+            utils.off(document.body, 'touchstart', this.firstTouch);
+        }
+
         // Global window & document listeners
 
     }, {
@@ -4246,6 +4269,9 @@ var Listeners = function () {
 
             // Click anywhere closes menu
             utils.toggleListener(document.body, 'click', this.toggleMenu, toggle);
+
+            // Detect touch by events
+            utils.on(document.body, 'touchstart', this.firstTouch);
         }
 
         // Container listeners
@@ -4360,7 +4386,7 @@ var Listeners = function () {
                 // On click play, pause ore restart
                 utils.on(wrapper, 'click', function () {
                     // Touch devices will just show controls (if we're hiding controls)
-                    if (_this3.player.config.hideControls && support.touch && !_this3.player.paused) {
+                    if (_this3.player.config.hideControls && _this3.player.touch && !_this3.player.paused) {
                         return;
                     }
 
@@ -4486,7 +4512,7 @@ var Listeners = function () {
             on(this.player.elements.buttons.rewind, 'click', this.player.rewind, 'rewind');
 
             // Rewind
-            on(this.player.elements.buttons.fastForward, 'click', this.player.fastForward, 'fastForward');
+            on(this.player.elements.buttons.fastForward, 'click', this.player.forward, 'fastForward');
 
             // Mute toggle
             on(this.player.elements.buttons.mute, 'click', function () {
@@ -4576,7 +4602,7 @@ var Listeners = function () {
             if (this.player.config.hideControls) {
                 // Watch for cursor over controls so they don't hide when trying to interact
                 on(this.player.elements.controls, 'mouseenter mouseleave', function (event) {
-                    _this4.player.elements.controls.hover = event.type === 'mouseenter';
+                    _this4.player.elements.controls.hover = !_this4.player.touch && event.type === 'mouseenter';
                 });
 
                 // Watch for cursor over controls so they don't hide when trying to interact
@@ -6183,7 +6209,7 @@ var media = {
             utils.toggleClass(this.elements.container, this.config.classNames.isIos, browser$3.isIos);
 
             // Add touch class
-            utils.toggleClass(this.elements.container, this.config.classNames.isTouch, support.touch);
+            utils.toggleClass(this.elements.container, this.config.classNames.isTouch, this.touch);
         }
 
         // Inject the player wrapper
@@ -6390,12 +6416,6 @@ var source = {
 // License: The MIT License (MIT)
 // ==========================================================================
 
-// Private properties
-// TODO: Use a WeakMap for private globals
-// const globals = new WeakMap();
-
-// Plyr instance
-
 var Plyr = function () {
     function Plyr(target, options) {
         var _this = this;
@@ -6408,6 +6428,9 @@ var Plyr = function () {
         this.ready = false;
         this.loading = false;
         this.failed = false;
+
+        // Touch device
+        this.touch = support.touch;
 
         // Set the media element
         this.media = target;
@@ -6889,16 +6912,22 @@ var Plyr = function () {
                     // Is the enter fullscreen event
                     isEnterFullscreen = toggle.type === 'enterfullscreen';
 
+                    // Events that show the controls
+                    var showEvents = ['touchstart', 'touchmove', 'mouseenter', 'mousemove', 'focusin'];
+
+                    // Events that delay hiding
+                    var delayEvents = ['touchmove', 'touchend', 'mousemove'];
+
                     // Whether to show controls
-                    show = ['mouseenter', 'mousemove', 'touchstart', 'touchmove', 'focusin'].includes(toggle.type);
+                    show = showEvents.includes(toggle.type);
 
                     // Delay hiding on move events
-                    if (['mousemove', 'touchmove', 'touchend'].includes(toggle.type)) {
+                    if (delayEvents.includes(toggle.type)) {
                         delay = 2000;
                     }
 
                     // Delay a little more for keyboard users
-                    if (toggle.type === 'focusin') {
+                    if (!this.touch && toggle.type === 'focusin') {
                         delay = 3000;
                         utils.toggleClass(this.elements.controls, this.config.classNames.noTransition, true);
                     }
@@ -6926,7 +6955,7 @@ var Plyr = function () {
                 }
 
                 // Delay for hiding on touch
-                if (support.touch) {
+                if (this.touch) {
                     delay = 3000;
                 }
             }
@@ -6935,6 +6964,8 @@ var Plyr = function () {
             // then set the timer to hide the controls
             if (!show || this.playing) {
                 this.timers.controls = setTimeout(function () {
+                    console.warn(_this3.elements.controls.pressed, _this3.elements.controls.hover, delay);
+
                     // If the mouse is over the controls (and not entering fullscreen), bail
                     if ((_this3.elements.controls.pressed || _this3.elements.controls.hover) && !isEnterFullscreen) {
                         return;

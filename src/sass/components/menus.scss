@@ -84,7 +84,6 @@
                 position: absolute;
                 top: 50%;
                 transform: translateY(-50%);
-                transition: border-color 0.2s ease;
             }
 
             &--forward {
@@ -108,7 +107,6 @@
                 margin-bottom: floor($plyr-control-padding / 2);
                 padding-left: ceil($plyr-control-padding * 4);
                 position: relative;
-
                 width: calc(100% - #{$horizontal-padding});
 
                 &::after {
