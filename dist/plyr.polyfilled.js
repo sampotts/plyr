@@ -12288,6 +12288,12 @@ var source = {
 // License: The MIT License (MIT)
 // ==========================================================================
 
+// Private properties
+// TODO: Use a WeakMap for private globals
+// const globals = new WeakMap();
+
+// Plyr instance
+
 var Plyr$1 = function () {
     function Plyr(target, options) {
         var _this = this;
@@ -12656,8 +12662,8 @@ var Plyr$1 = function () {
          */
 
     }, {
-        key: 'fastForward',
-        value: function fastForward(seekTime) {
+        key: 'forward',
+        value: function forward(seekTime) {
             this.currentTime = this.currentTime + (utils.is.number(seekTime) ? seekTime : this.config.seekTime);
         }
 
