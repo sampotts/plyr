@@ -491,9 +491,9 @@ class Listeners {
         });
 
         // Seek
-        on(this.player.elements.inputs.seek, inputEvent, 'seek', event => {
+        on(this.player.elements.inputs.seek, inputEvent, event => {
             this.player.currentTime = event.target.value / event.target.max * this.player.duration;
-        });
+        }, 'seek');
 
         // Current time invert
         // Only if one time element is used for both currentTime and duration

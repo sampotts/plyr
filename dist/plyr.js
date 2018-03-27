@@ -1833,6 +1833,7 @@ var utils = {
 // Plyr support checks
 // ==========================================================================
 
+// Check for feature support
 var support = {
     // Basic support
     audio: 'canPlayType' in document.createElement('audio'),
@@ -2881,6 +2882,7 @@ var ui = {
 // Plyr controls
 // ==========================================================================
 
+// Sniff out the browser
 var browser$2 = utils.getBrowser();
 
 var controls = {
@@ -4078,6 +4080,7 @@ var controls = {
 // Plyr Event Listeners
 // ==========================================================================
 
+// Sniff out the browser
 var browser$1 = utils.getBrowser();
 
 var Listeners = function () {
@@ -4549,9 +4552,9 @@ var Listeners = function () {
             });
 
             // Seek
-            on(this.player.elements.inputs.seek, inputEvent, 'seek', function (event) {
+            on(this.player.elements.inputs.seek, inputEvent, function (event) {
                 _this4.player.currentTime = event.target.value / event.target.max * _this4.player.duration;
-            });
+            }, 'seek');
 
             // Current time invert
             // Only if one time element is used for both currentTime and duration
@@ -6158,6 +6161,7 @@ var vimeo = {
 // Plyr Media
 // ==========================================================================
 
+// Sniff out the browser
 var browser$3 = utils.getBrowser();
 
 var media = {
@@ -6401,6 +6405,12 @@ var source = {
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
+
+// Private properties
+// TODO: Use a WeakMap for private globals
+// const globals = new WeakMap();
+
+// Plyr instance
 
 var Plyr = function () {
     function Plyr(target, options) {
