@@ -208,15 +208,6 @@ const utils = {
         return `${prefix}-${Math.floor(Math.random() * 10000)}`;
     },
 
-    // Determine if we're in an iframe
-    inFrame() {
-        try {
-            return window.self !== window.top;
-        } catch (e) {
-            return true;
-        }
-    },
-
     // Wrap an element
     wrap(elements, wrapper) {
         // Convert `elements` to an array, if necessary.

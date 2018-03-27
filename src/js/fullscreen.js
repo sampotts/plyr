@@ -117,9 +117,12 @@ class Fullscreen {
 
     // Determine if fullscreen is enabled
     get enabled() {
-        const fallback = this.player.config.fullscreen.fallback && !utils.inFrame();
-
-        return (Fullscreen.native || fallback) && this.player.config.fullscreen.enabled && this.player.supported.ui && this.player.isVideo;
+        return (
+            (Fullscreen.native || this.player.config.fullscreen.fallback) &&
+            this.player.config.fullscreen.enabled &&
+            this.player.supported.ui &&
+            this.player.isVideo
+        );
     }
 
     // Get active state

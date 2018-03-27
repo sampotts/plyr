@@ -1078,16 +1078,6 @@ var utils = {
     },
 
 
-    // Determine if we're in an iframe
-    inFrame: function inFrame() {
-        try {
-            return window.self !== window.top;
-        } catch (e) {
-            return true;
-        }
-    },
-
-
     // Wrap an element
     wrap: function wrap(elements, wrapper) {
         // Convert `elements` to an array, if necessary.
@@ -1833,7 +1823,6 @@ var utils = {
 // Plyr support checks
 // ==========================================================================
 
-// Check for feature support
 var support = {
     // Basic support
     audio: 'canPlayType' in document.createElement('audio'),
@@ -2199,9 +2188,7 @@ var Fullscreen = function () {
 
         // Determine if fullscreen is enabled
         get: function get$$1() {
-            var fallback = this.player.config.fullscreen.fallback && !utils.inFrame();
-
-            return (Fullscreen.native || fallback) && this.player.config.fullscreen.enabled && this.player.supported.ui && this.player.isVideo;
+            return (Fullscreen.native || this.player.config.fullscreen.fallback) && this.player.config.fullscreen.enabled && this.player.supported.ui && this.player.isVideo;
         }
 
         // Get active state
@@ -2882,7 +2869,6 @@ var ui = {
 // Plyr controls
 // ==========================================================================
 
-// Sniff out the browser
 var browser$2 = utils.getBrowser();
 
 var controls = {
@@ -4080,7 +4066,6 @@ var controls = {
 // Plyr Event Listeners
 // ==========================================================================
 
-// Sniff out the browser
 var browser$1 = utils.getBrowser();
 
 var Listeners = function () {
@@ -6161,7 +6146,6 @@ var vimeo = {
 // Plyr Media
 // ==========================================================================
 
-// Sniff out the browser
 var browser$3 = utils.getBrowser();
 
 var media = {
@@ -6405,12 +6389,6 @@ var source = {
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
-
-// Private properties
-// TODO: Use a WeakMap for private globals
-// const globals = new WeakMap();
-
-// Plyr instance
 
 var Plyr = function () {
     function Plyr(target, options) {
