@@ -4,6 +4,7 @@
 
 import utils from './../utils';
 import captions from './../captions';
+import controls from './../controls';
 import ui from './../ui';
 
 const vimeo = {
@@ -139,10 +140,18 @@ const vimeo = {
                 return speed;
             },
             set(input) {
-                player.embed.setPlaybackRate(input).then(() => {
-                    speed = input;
-                    utils.dispatchEvent.call(player, player.media, 'ratechange');
-                });
+                player.embed
+                    .setPlaybackRate(input)
+                    .then(() => {
+                        speed = input;
+                        utils.dispatchEvent.call(player, player.media, 'ratechange');
+                    })
+                    .catch(error => {
+                        // Hide menu item (and menu if empty)
+                        if (error.name === 'Error') {
+                            controls.setSpeedMenu.call(player, []);
+                        }
+                    });
             },
         });
 

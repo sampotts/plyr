@@ -3533,8 +3533,13 @@ var controls = {
 
 
     // Set a list of available captions languages
-    setSpeedMenu: function setSpeedMenu() {
+    setSpeedMenu: function setSpeedMenu(options) {
         var _this4 = this;
+
+        // Do nothing if not selected
+        if (!this.config.controls.includes('settings') || !this.config.settings.includes('speed')) {
+            return;
+        }
 
         // Menu required
         if (!utils.is.element(this.elements.settings.panes.speed)) {
@@ -3543,9 +3548,11 @@ var controls = {
 
         var type = 'speed';
 
-        // Set the default speeds
-        if (!utils.is.array(this.options.speed) || !this.options.speed.length) {
+        // Set the speed options
+        if (!utils.is.array(options)) {
             this.options.speed = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
+        } else {
+            this.options.speed = options;
         }
 
         // Set options if passed and filter based on config
@@ -3556,6 +3563,9 @@ var controls = {
         // Toggle the pane and tab
         var toggle = !utils.is.empty(this.options.speed);
         controls.toggleTab.call(this, type, toggle);
+
+        // Check if we need to toggle the parent
+        controls.checkMenu.call(this);
 
         // If we're hiding, nothing more to do
         if (!toggle) {
@@ -3578,6 +3588,15 @@ var controls = {
         });
 
         controls.updateSetting.call(this, type, list);
+    },
+
+
+    // Check if we need to hide/show the settings menu
+    checkMenu: function checkMenu() {
+        var speedHidden = this.elements.settings.tabs.speed.getAttribute('hidden') !== null;
+        var languageHidden = this.elements.settings.tabs.captions.getAttribute('hidden') !== null;
+
+        utils.toggleHidden(this.elements.settings.menu, speedHidden && languageHidden);
     },
 
 
@@ -3971,7 +3990,7 @@ var controls = {
 
         this.elements.controls = container;
 
-        if (this.config.controls.includes('settings') && this.config.settings.includes('speed')) {
+        if (this.isHTML5) {
             controls.setSpeedMenu.call(this);
         }
 
@@ -4179,7 +4198,7 @@ var Listeners = function () {
 
                     case 39:
                         // Arrow forward
-                        this.player.fastForward();
+                        this.player.forward();
                         break;
 
                     case 37:
@@ -5710,7 +5729,8 @@ var youtube = {
                     });
 
                     // Get available speeds
-                    player.options.speed = instance.getAvailablePlaybackRates();
+                    var options = instance.getAvailablePlaybackRates();
+                    controls.setSpeedMenu.call(player, options);
 
                     // Set the tabindex to avoid focus entering iframe
                     if (player.supported.ui) {
@@ -5987,6 +6007,11 @@ var vimeo = {
                 player.embed.setPlaybackRate(input).then(function () {
                     speed = input;
                     utils.dispatchEvent.call(player, player.media, 'ratechange');
+                }).catch(function (error) {
+                    // Hide menu item (and menu if empty)
+                    if (error.name === 'Error') {
+                        controls.setSpeedMenu.call(player, []);
+                    }
                 });
             }
         });

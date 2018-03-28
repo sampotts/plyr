@@ -129,7 +129,7 @@ class Listeners {
 
                 case 39:
                     // Arrow forward
-                    this.player.fastForward();
+                    this.player.forward();
                     break;
 
                 case 37:

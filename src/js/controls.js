@@ -706,7 +706,12 @@ const controls = {
     },
 
     // Set a list of available captions languages
-    setSpeedMenu() {
+    setSpeedMenu(options) {
+        // Do nothing if not selected
+        if (!this.config.controls.includes('settings') || !this.config.settings.includes('speed')) {
+            return;
+        }
+
         // Menu required
         if (!utils.is.element(this.elements.settings.panes.speed)) {
             return;
@@ -714,8 +719,8 @@ const controls = {
 
         const type = 'speed';
 
-        // Set the default speeds
-        if (!utils.is.array(this.options.speed) || !this.options.speed.length) {
+        // Set the speed options
+        if (!utils.is.array(options)) {
             this.options.speed = [
                 0.5,
                 0.75,
@@ -725,6 +730,8 @@ const controls = {
                 1.75,
                 2,
             ];
+        } else {
+            this.options.speed = options;
         }
 
         // Set options if passed and filter based on config
@@ -733,6 +740,9 @@ const controls = {
         // Toggle the pane and tab
         const toggle = !utils.is.empty(this.options.speed);
         controls.toggleTab.call(this, type, toggle);
+
+        // Check if we need to toggle the parent
+        controls.checkMenu.call(this);
 
         // If we're hiding, nothing more to do
         if (!toggle) {
@@ -753,6 +763,14 @@ const controls = {
         this.options.speed.forEach(speed => controls.createMenuItem.call(this, speed, list, type, controls.getLabel.call(this, 'speed', speed)));
 
         controls.updateSetting.call(this, type, list);
+    },
+
+    // Check if we need to hide/show the settings menu
+    checkMenu() {
+        const speedHidden = this.elements.settings.tabs.speed.getAttribute('hidden') !== null;
+        const languageHidden = this.elements.settings.tabs.captions.getAttribute('hidden') !== null;
+
+        utils.toggleHidden(this.elements.settings.menu, speedHidden && languageHidden);
     },
 
     // Show/hide menu
@@ -1159,7 +1177,7 @@ const controls = {
 
         this.elements.controls = container;
 
-        if (this.config.controls.includes('settings') && this.config.settings.includes('speed')) {
+        if (this.isHTML5) {
             controls.setSpeedMenu.call(this);
         }
 

@@ -1,3 +1,8 @@
+## v3.0.7
+
+*   Fix for keyboard shortcut error with fast forward
+*   Fix for Vimeo trying to set playback rate when not allowed
+
 ## v3.0.6
 
 *   Improved the logic for the custom handlers preventing default handlers

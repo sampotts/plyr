@@ -3936,7 +3936,7 @@ var singleton = Raven;
                         player.source = {
                             type: 'video',
                             sources: [{
-                                src: 'https://vimeo.com/76979871',
+                                src: 'https://vimeo.com/25345658',
                                 provider: 'vimeo'
                             }]
                         };
