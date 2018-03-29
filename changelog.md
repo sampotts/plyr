@@ -1,3 +1,8 @@
+## v3.0.9
+
+*   Demo fix
+*   Fix Vimeo regression
+
 ## v3.0.8
 
 *   Vimeo hotfix for private videos

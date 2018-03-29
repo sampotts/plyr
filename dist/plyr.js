@@ -3990,9 +3990,7 @@ var controls = {
 
         this.elements.controls = container;
 
-        if (this.isHTML5) {
-            controls.setSpeedMenu.call(this);
-        }
+        controls.setSpeedMenu.call(this);
 
         return container;
     },

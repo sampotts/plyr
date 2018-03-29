@@ -3846,9 +3846,6 @@ var singleton = Raven;
                     enabled: true,
                     publisherId: '918848828995742'
                 }
-                /* listeners: {
-                    seek: () => false,
-                }, */
             });
 
             // Expose for tinkering in the console
@@ -3936,7 +3933,7 @@ var singleton = Raven;
                         player.source = {
                             type: 'video',
                             sources: [{
-                                src: 'https://vimeo.com/25345658',
+                                src: 'https://vimeo.com/76979871',
                                 provider: 'vimeo'
                             }]
                         };
