@@ -77,7 +77,7 @@ var defaults = {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.0.6/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.0.8/plyr.svg',
 
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
@@ -6068,7 +6068,10 @@ var vimeo = {
         var currentSrc = void 0;
         player.embed.getVideoUrl().then(function (value) {
             currentSrc = value;
+        }).catch(function (error) {
+            _this2.debug.warn(error);
         });
+
         Object.defineProperty(player.media, 'currentSrc', {
             get: function get() {
                 return currentSrc;
@@ -6434,7 +6437,7 @@ var source = {
 
 // ==========================================================================
 // Plyr
-// plyr.js v3.0.6
+// plyr.js v3.0.8
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================

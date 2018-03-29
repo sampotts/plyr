@@ -202,9 +202,15 @@ const vimeo = {
 
         // Source
         let currentSrc;
-        player.embed.getVideoUrl().then(value => {
-            currentSrc = value;
-        });
+        player.embed
+            .getVideoUrl()
+            .then(value => {
+                currentSrc = value;
+            })
+            .catch(error => {
+                this.debug.warn(error);
+            });
+
         Object.defineProperty(player.media, 'currentSrc', {
             get() {
                 return currentSrc;

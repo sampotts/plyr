@@ -1,3 +1,7 @@
+## v3.0.8
+
+*   Vimeo hotfix for private videos
+
 ## v3.0.7
 
 *   Fix for keyboard shortcut error with fast forward
