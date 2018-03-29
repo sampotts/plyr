@@ -65,6 +65,7 @@ import Raven from 'raven-js';
                     'fast-forward',
                     'progress',
                     'current-time',
+                    'duration',
                     'mute',
                     'volume',
                     'captions',

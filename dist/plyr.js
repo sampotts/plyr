@@ -77,7 +77,7 @@ var defaults = {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.0.8/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.0.9/plyr.svg',
 
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
@@ -336,10 +336,6 @@ var defaults = {
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
-
-
-
-
 function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
@@ -456,6 +452,7 @@ function loadFile(path, callbackFn, args, numTries) {
       async = args.async,
       maxTries = (args.numRetries || 0) + 1,
       beforeCallbackFn = args.before || devnull,
+      pathStripped = path.replace(/^(css|img)!/, ''),
       isCss,
       e;
 
@@ -467,7 +464,11 @@ function loadFile(path, callbackFn, args, numTries) {
     // css
     e = doc.createElement('link');
     e.rel = 'stylesheet';
-    e.href = path.replace(/^css!/, '');  // remove "css!" prefix
+    e.href = pathStripped; //.replace(/^css!/, '');  // remove "css!" prefix
+  } else if (/(^img!|\.(png|gif|jpg|svg)$)/.test(path)) {
+    // image
+    e = doc.createElement('img');
+    e.src = pathStripped;    
   } else {
     // javascript
     e = doc.createElement('script');
@@ -633,123 +634,6 @@ return loadjs;
 }));
 });
 
-var asyncGenerator = function () {
-  function AwaitValue(value) {
-    this.value = value;
-  }
-
-  function AsyncGenerator(gen) {
-    var front, back;
-
-    function send(key, arg) {
-      return new Promise(function (resolve, reject) {
-        var request = {
-          key: key,
-          arg: arg,
-          resolve: resolve,
-          reject: reject,
-          next: null
-        };
-
-        if (back) {
-          back = back.next = request;
-        } else {
-          front = back = request;
-          resume(key, arg);
-        }
-      });
-    }
-
-    function resume(key, arg) {
-      try {
-        var result = gen[key](arg);
-        var value = result.value;
-
-        if (value instanceof AwaitValue) {
-          Promise.resolve(value.value).then(function (arg) {
-            resume("next", arg);
-          }, function (arg) {
-            resume("throw", arg);
-          });
-        } else {
-          settle(result.done ? "return" : "normal", result.value);
-        }
-      } catch (err) {
-        settle("throw", err);
-      }
-    }
-
-    function settle(type, value) {
-      switch (type) {
-        case "return":
-          front.resolve({
-            value: value,
-            done: true
-          });
-          break;
-
-        case "throw":
-          front.reject(value);
-          break;
-
-        default:
-          front.resolve({
-            value: value,
-            done: false
-          });
-          break;
-      }
-
-      front = front.next;
-
-      if (front) {
-        resume(front.key, front.arg);
-      } else {
-        back = null;
-      }
-    }
-
-    this._invoke = send;
-
-    if (typeof gen.return !== "function") {
-      this.return = undefined;
-    }
-  }
-
-  if (typeof Symbol === "function" && Symbol.asyncIterator) {
-    AsyncGenerator.prototype[Symbol.asyncIterator] = function () {
-      return this;
-    };
-  }
-
-  AsyncGenerator.prototype.next = function (arg) {
-    return this._invoke("next", arg);
-  };
-
-  AsyncGenerator.prototype.throw = function (arg) {
-    return this._invoke("throw", arg);
-  };
-
-  AsyncGenerator.prototype.return = function (arg) {
-    return this._invoke("return", arg);
-  };
-
-  return {
-    wrap: function (fn) {
-      return function () {
-        return new AsyncGenerator(fn.apply(this, arguments));
-      };
-    },
-    await: function (value) {
-      return new AwaitValue(value);
-    }
-  };
-}();
-
-
-
-
-
 var classCallCheck = function (instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -774,10 +658,6 @@ var createClass = function () {
   };
 }();
 
-
-
-
-
 var defineProperty = function (obj, key, value) {
   if (key in obj) {
     Object.defineProperty(obj, key, {
@@ -792,26 +672,6 @@ var defineProperty = function (obj, key, value) {
 
   return obj;
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 var slicedToArray = function () {
   function sliceIterator(arr, i) {
@@ -851,18 +711,6 @@ var slicedToArray = function () {
   };
 }();
 
-
-
-
-
-
-
-
-
-
-
-
-
 var toConsumableArray = function (arr) {
   if (Array.isArray(arr)) {
     for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
@@ -873,8 +721,6 @@ var toConsumableArray = function (arr) {
   }
 };
 
-// ==========================================================================
-// Plyr utils
 // ==========================================================================
 
 var utils = {
@@ -1819,8 +1665,6 @@ var utils = {
 };
 
 // ==========================================================================
-// Plyr support checks
-// ==========================================================================
 
 // Check for feature support
 var support = {
@@ -2015,9 +1859,6 @@ var Console = function () {
     return Console;
 }();
 
-// ==========================================================================
-// Fullscreen wrapper
-// https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API#prefixing
 // ==========================================================================
 
 var browser = utils.getBrowser();
@@ -2254,9 +2095,6 @@ var Fullscreen = function () {
 }();
 
 // ==========================================================================
-// Plyr Captions
-// TODO: Create as class
-// ==========================================================================
 
 var captions = {
     // Setup captions
@@ -2488,8 +2326,6 @@ var captions = {
 };
 
 // ==========================================================================
-// Plyr internationalization
-// ==========================================================================
 
 var i18n = {
     get: function get$$1() {
@@ -2519,8 +2355,6 @@ var i18n = {
     }
 };
 
-// ==========================================================================
-// Plyr UI
 // ==========================================================================
 
 var ui = {
@@ -2862,17 +2696,15 @@ var ui = {
 };
 
 // ==========================================================================
-// Plyr controls
-// ==========================================================================
 
 // Sniff out the browser
-var browser$2 = utils.getBrowser();
+var browser$1 = utils.getBrowser();
 
 var controls = {
     // Webkit polyfill for lower fill range
     updateRangeFill: function updateRangeFill(target) {
         // WebKit only
-        if (!browser$2.isWebkit) {
+        if (!browser$1.isWebkit) {
             return;
         }
 
@@ -2893,7 +2725,7 @@ var controls = {
     getIconUrl: function getIconUrl() {
         return {
             url: this.config.iconUrl,
-            absolute: this.config.iconUrl.indexOf('http') === 0 || browser$2.isIE && !window.svg4everybody
+            absolute: this.config.iconUrl.indexOf('http') === 0 || browser$1.isIE && !window.svg4everybody
         };
     },
 
@@ -4085,11 +3917,9 @@ var controls = {
 };
 
 // ==========================================================================
-// Plyr Event Listeners
-// ==========================================================================
 
 // Sniff out the browser
-var browser$1 = utils.getBrowser();
+var browser$2 = utils.getBrowser();
 
 var Listeners = function () {
     function Listeners(player) {
@@ -4487,7 +4317,7 @@ var Listeners = function () {
             var _this4 = this;
 
             // IE doesn't support input event, so we fallback to change
-            var inputEvent = browser$1.isIE ? 'change' : 'input';
+            var inputEvent = browser$2.isIE ? 'change' : 'input';
 
             // Run default and custom handlers
             var proxy = function proxy(event, defaultHandler, customHandlerKey) {
@@ -4603,7 +4433,7 @@ var Listeners = function () {
             }, 'volume');
 
             // Polyfill for lower fill in <input type="range"> for webkit
-            if (browser$1.isWebkit) {
+            if (browser$2.isWebkit) {
                 on(utils.getElements.call(this.player, 'input[type="range"]'), 'input', function (event) {
                     controls.updateRangeFill.call(_this4.player, event.target);
                 });
@@ -4680,8 +4510,6 @@ var Listeners = function () {
     return Listeners;
 }();
 
-// ==========================================================================
-// Plyr storage
 // ==========================================================================
 
 var Storage = function () {
@@ -4764,12 +4592,6 @@ var Storage = function () {
 }();
 
 // ==========================================================================
-// Advertisement plugin using Google IMA HTML5 SDK
-// Create an account with our ad partner, vi here:
-// https://www.vi.ai/publisher-video-monetization/
-// ==========================================================================
-
-/* global google */
 
 var Ads = function () {
     /**
@@ -5432,8 +5254,6 @@ var Ads = function () {
 }();
 
 // ==========================================================================
-// YouTube plugin
-// ==========================================================================
 
 var youtube = {
     setup: function setup() {
@@ -5861,8 +5681,6 @@ var youtube = {
 };
 
 // ==========================================================================
-// Vimeo plugin
-// ==========================================================================
 
 var vimeo = {
     setup: function setup() {
@@ -6192,8 +6010,6 @@ var vimeo = {
 };
 
 // ==========================================================================
-// Plyr Media
-// ==========================================================================
 
 // Sniff out the browser
 var browser$3 = utils.getBrowser();
@@ -6291,8 +6107,6 @@ var media = {
     }
 };
 
-// ==========================================================================
-// Plyr source update
 // ==========================================================================
 
 var source = {
@@ -6433,11 +6247,6 @@ var source = {
     }
 };
 
-// ==========================================================================
-// Plyr
-// plyr.js v3.0.8
-// https://github.com/sampotts/plyr
-// License: The MIT License (MIT)
 // ==========================================================================
 
 // Private properties
