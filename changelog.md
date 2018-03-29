@@ -1,3 +1,8 @@
+## v3.0.10
+
+*   Docs fix
+*   Package upgrades
+
 ## v3.0.9
 
 *   Demo fix
