@@ -133,7 +133,17 @@ class Plyr {
         }
 
         // Cache original element state for .destroy()
-        this.elements.original = this.media.cloneNode(true);
+        // TODO: Investigate a better solution as I suspect this causes reported double load issues?
+        setTimeout(() => {
+            const clone = this.media.cloneNode(true);
+
+            // Prevent the clone autoplaying
+            if (clone.getAttribute('autoplay')) {
+                clone.pause();
+            }
+
+            this.elements.original = clone;
+        }, 0);
 
         // Set media type based on tag or data attribute
         // Supported: video, audio, vimeo, youtube
@@ -286,6 +296,11 @@ class Plyr {
 
         // Setup ads if provided
         this.ads = new Ads(this);
+
+        // Autoplay if required
+        if (this.config.autoplay) {
+            this.play();
+        }
     }
 
     // ---------------------------------------
@@ -323,9 +338,9 @@ class Plyr {
         }
 
         // If ads are enabled, wait for them first
-        if (this.ads.enabled && !this.ads.initialized) {
+        /* if (this.ads.enabled && !this.ads.initialized) {
             return this.ads.managerPromise.then(() => this.ads.play()).catch(() => this.media.play());
-        }
+        } */
 
         // Return the promise (for HTML5)
         return this.media.play();
@@ -384,7 +399,7 @@ class Plyr {
     stop() {
         if (this.isHTML5) {
             this.media.load();
-        } else {
+        } else if (utils.is.function(this.media.stop)) {
             this.media.stop();
         }
     }
@@ -524,8 +539,8 @@ class Plyr {
         // Set the player volume
         this.media.volume = volume;
 
-        // If muted, and we're increasing volume, reset muted state
-        if (this.muted && volume > 0) {
+        // If muted, and we're increasing volume manually, reset muted state
+        if (!utils.is.empty(value) && this.muted && volume > 0) {
             this.muted = false;
         }
     }
@@ -1019,6 +1034,11 @@ class Plyr {
         // then set the timer to hide the controls
         if (!show || this.playing) {
             this.timers.controls = setTimeout(() => {
+                // We need controls of course...
+                if (!utils.is.element(this.elements.controls)) {
+                    return;
+                }
+
                 // If the mouse is over the controls (and not entering fullscreen), bail
                 if ((this.elements.controls.pressed || this.elements.controls.hover) && !isEnterFullscreen) {
                     return;

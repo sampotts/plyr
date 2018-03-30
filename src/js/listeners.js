@@ -278,17 +278,27 @@ class Listeners {
         // Check for buffer progress
         utils.on(this.player.media, 'progress playing', event => ui.updateProgress.call(this.player, event));
 
-        // Handle native mute
+        // Handle volume changes
         utils.on(this.player.media, 'volumechange', event => ui.updateVolume.call(this.player, event));
 
-        // Handle native play/pause
+        // Handle play/pause
         utils.on(this.player.media, 'playing play pause ended emptied', event => ui.checkPlaying.call(this.player, event));
 
-        // Loading
+        // Loading state
         utils.on(this.player.media, 'waiting canplay seeked playing', event => ui.checkLoading.call(this.player, event));
 
         // Check if media failed to load
         // utils.on(this.player.media, 'play', event => ui.checkFailed.call(this.player, event));
+
+        // If autoplay, then load advertisement if required
+        // TODO: Show some sort of loading state while the ad manager loads else there's a delay before ad shows
+        utils.on(this.player.media, 'playing', () => {
+            // If ads are enabled, wait for them first
+            if (this.player.ads.enabled && !this.player.ads.initialized) {
+                // Wait for manager response
+                this.player.ads.managerPromise.then(() => this.player.ads.play()).catch(() => this.player.play());
+            }
+        });
 
         // Click video
         if (this.player.supported.ui && this.player.config.clickToPlay && !this.player.isAudio) {

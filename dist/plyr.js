@@ -77,7 +77,7 @@ var defaults = {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.0.9/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.0.10/plyr.svg',
 
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
@@ -2430,6 +2430,9 @@ var ui = {
         // Reset quality options
         this.options.quality = [];
 
+        // Reset volume display
+        ui.updateVolume.call(this);
+
         // Reset time display
         ui.timeUpdate.call(this);
 
@@ -4200,23 +4203,37 @@ var Listeners = function () {
                 return ui.updateProgress.call(_this3.player, event);
             });
 
-            // Handle native mute
+            // Handle volume changes
             utils.on(this.player.media, 'volumechange', function (event) {
                 return ui.updateVolume.call(_this3.player, event);
             });
 
-            // Handle native play/pause
+            // Handle play/pause
             utils.on(this.player.media, 'playing play pause ended emptied', function (event) {
                 return ui.checkPlaying.call(_this3.player, event);
             });
 
-            // Loading
+            // Loading state
             utils.on(this.player.media, 'waiting canplay seeked playing', function (event) {
                 return ui.checkLoading.call(_this3.player, event);
             });
 
             // Check if media failed to load
             // utils.on(this.player.media, 'play', event => ui.checkFailed.call(this.player, event));
+
+            // If autoplay, then load advertisement if required
+            // TODO: Show some sort of loading state while the ad manager loads else there's a delay before ad shows
+            utils.on(this.player.media, 'playing', function () {
+                // If ads are enabled, wait for them first
+                if (_this3.player.ads.enabled && !_this3.player.ads.initialized) {
+                    // Wait for manager response
+                    _this3.player.ads.managerPromise.then(function () {
+                        return _this3.player.ads.play();
+                    }).catch(function () {
+                        return _this3.player.play();
+                    });
+                }
+            });
 
             // Click video
             if (this.player.supported.ui && this.player.config.clickToPlay && !this.player.isAudio) {
@@ -4813,21 +4830,23 @@ var Ads = function () {
             this.cuePoints = this.manager.getCuePoints();
 
             // Add advertisement cue's within the time line if available
-            this.cuePoints.forEach(function (cuePoint) {
-                if (cuePoint !== 0 && cuePoint !== -1 && cuePoint < _this6.player.duration) {
-                    var seekElement = _this6.player.elements.progress;
+            if (!utils.is.empty(this.cuePoints)) {
+                this.cuePoints.forEach(function (cuePoint) {
+                    if (cuePoint !== 0 && cuePoint !== -1 && cuePoint < _this6.player.duration) {
+                        var seekElement = _this6.player.elements.progress;
 
-                    if (seekElement) {
-                        var cuePercentage = 100 / _this6.player.duration * cuePoint;
-                        var cue = utils.createElement('span', {
-                            class: _this6.player.config.classNames.cues
-                        });
+                        if (utils.is.element(seekElement)) {
+                            var cuePercentage = 100 / _this6.player.duration * cuePoint;
+                            var cue = utils.createElement('span', {
+                                class: _this6.player.config.classNames.cues
+                            });
 
-                        cue.style.left = cuePercentage.toString() + '%';
-                        seekElement.appendChild(cue);
+                            cue.style.left = cuePercentage.toString() + '%';
+                            seekElement.appendChild(cue);
+                        }
                     }
-                }
-            });
+                });
+            }
 
             // Get skippable state
             // TODO: Skip button
@@ -5011,6 +5030,10 @@ var Ads = function () {
             this.player.on('seeked', function () {
                 var seekedTime = _this8.player.currentTime;
 
+                if (utils.is.empty(_this8.cuePoints)) {
+                    return;
+                }
+
                 _this8.cuePoints.forEach(function (cuePoint, index) {
                     if (time < cuePoint && cuePoint < seekedTime) {
                         _this8.manager.discardAdBreak();
@@ -5022,7 +5045,9 @@ var Ads = function () {
             // Listen to the resizing of the window. And resize ad accordingly
             // TODO: eventually implement ResizeObserver
             window.addEventListener('resize', function () {
-                _this8.manager.resize(container.offsetWidth, container.offsetHeight, google.ima.ViewMode.NORMAL);
+                if (_this8.manager) {
+                    _this8.manager.resize(container.offsetWidth, container.offsetHeight, google.ima.ViewMode.NORMAL);
+                }
             });
         }
 
@@ -6360,7 +6385,17 @@ var Plyr = function () {
         }
 
         // Cache original element state for .destroy()
-        this.elements.original = this.media.cloneNode(true);
+        // TODO: Investigate a better solution as I suspect this causes reported double load issues?
+        setTimeout(function () {
+            var clone = _this.media.cloneNode(true);
+
+            // Prevent the clone autoplaying
+            if (clone.getAttribute('autoplay')) {
+                clone.pause();
+            }
+
+            _this.elements.original = clone;
+        }, 0);
 
         // Set media type based on tag or data attribute
         // Supported: video, audio, vimeo, youtube
@@ -6510,6 +6545,11 @@ var Plyr = function () {
 
         // Setup ads if provided
         this.ads = new Ads(this);
+
+        // Always autoplay if required
+        if (this.config.autoplay) {
+            this.play();
+        }
     }
 
     // ---------------------------------------
@@ -6529,20 +6569,14 @@ var Plyr = function () {
          * Play the media, or play the advertisement (if they are not blocked)
          */
         value: function play() {
-            var _this2 = this;
-
             if (!utils.is.function(this.media.play)) {
                 return null;
             }
 
             // If ads are enabled, wait for them first
-            if (this.ads.enabled && !this.ads.initialized) {
-                return this.ads.managerPromise.then(function () {
-                    return _this2.ads.play();
-                }).catch(function () {
-                    return _this2.media.play();
-                });
-            }
+            /* if (this.ads.enabled && !this.ads.initialized) {
+                return this.ads.managerPromise.then(() => this.ads.play()).catch(() => this.media.play());
+            } */
 
             // Return the promise (for HTML5)
             return this.media.play();
@@ -6594,7 +6628,7 @@ var Plyr = function () {
         value: function stop() {
             if (this.isHTML5) {
                 this.media.load();
-            } else {
+            } else if (utils.is.function(this.media.stop)) {
                 this.media.stop();
             }
         }
@@ -6729,7 +6763,7 @@ var Plyr = function () {
     }, {
         key: 'toggleControls',
         value: function toggleControls(toggle) {
-            var _this3 = this;
+            var _this2 = this;
 
             // We need controls of course...
             if (!utils.is.element(this.elements.controls)) {
@@ -6803,25 +6837,30 @@ var Plyr = function () {
             // then set the timer to hide the controls
             if (!show || this.playing) {
                 this.timers.controls = setTimeout(function () {
+                    // We need controls of course...
+                    if (!utils.is.element(_this2.elements.controls)) {
+                        return;
+                    }
+
                     // If the mouse is over the controls (and not entering fullscreen), bail
-                    if ((_this3.elements.controls.pressed || _this3.elements.controls.hover) && !isEnterFullscreen) {
+                    if ((_this2.elements.controls.pressed || _this2.elements.controls.hover) && !isEnterFullscreen) {
                         return;
                     }
 
                     // Restore transition behaviour
-                    if (!utils.hasClass(_this3.elements.container, _this3.config.classNames.hideControls)) {
-                        utils.toggleClass(_this3.elements.controls, _this3.config.classNames.noTransition, false);
+                    if (!utils.hasClass(_this2.elements.container, _this2.config.classNames.hideControls)) {
+                        utils.toggleClass(_this2.elements.controls, _this2.config.classNames.noTransition, false);
                     }
 
                     // Check if controls toggled
-                    var toggled = utils.toggleClass(_this3.elements.container, _this3.config.classNames.hideControls, true);
+                    var toggled = utils.toggleClass(_this2.elements.container, _this2.config.classNames.hideControls, true);
 
                     // Trigger event and close menu
                     if (toggled) {
-                        utils.dispatchEvent.call(_this3, _this3.media, 'controlshidden');
+                        utils.dispatchEvent.call(_this2, _this2.media, 'controlshidden');
 
-                        if (_this3.config.controls.includes('settings') && !utils.is.empty(_this3.config.settings)) {
-                            controls.toggleMenu.call(_this3, false);
+                        if (_this2.config.controls.includes('settings') && !utils.is.empty(_this2.config.settings)) {
+                            controls.toggleMenu.call(_this2, false);
                         }
                     }
                 }, delay);
@@ -6863,7 +6902,7 @@ var Plyr = function () {
     }, {
         key: 'destroy',
         value: function destroy(callback) {
-            var _this4 = this;
+            var _this3 = this;
 
             var soft = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
@@ -6876,22 +6915,22 @@ var Plyr = function () {
                 document.body.style.overflow = '';
 
                 // GC for embed
-                _this4.embed = null;
+                _this3.embed = null;
 
                 // If it's a soft destroy, make minimal changes
                 if (soft) {
-                    if (Object.keys(_this4.elements).length) {
+                    if (Object.keys(_this3.elements).length) {
                         // Remove elements
-                        utils.removeElement(_this4.elements.buttons.play);
-                        utils.removeElement(_this4.elements.captions);
-                        utils.removeElement(_this4.elements.controls);
-                        utils.removeElement(_this4.elements.wrapper);
+                        utils.removeElement(_this3.elements.buttons.play);
+                        utils.removeElement(_this3.elements.captions);
+                        utils.removeElement(_this3.elements.controls);
+                        utils.removeElement(_this3.elements.wrapper);
 
                         // Clear for GC
-                        _this4.elements.buttons.play = null;
-                        _this4.elements.captions = null;
-                        _this4.elements.controls = null;
-                        _this4.elements.wrapper = null;
+                        _this3.elements.buttons.play = null;
+                        _this3.elements.captions = null;
+                        _this3.elements.controls = null;
+                        _this3.elements.wrapper = null;
                     }
 
                     // Callback
@@ -6900,26 +6939,26 @@ var Plyr = function () {
                     }
                 } else {
                     // Unbind listeners
-                    _this4.listeners.clear();
+                    _this3.listeners.clear();
 
                     // Replace the container with the original element provided
-                    utils.replaceElement(_this4.elements.original, _this4.elements.container);
+                    utils.replaceElement(_this3.elements.original, _this3.elements.container);
 
                     // Event
-                    utils.dispatchEvent.call(_this4, _this4.elements.original, 'destroyed', true);
+                    utils.dispatchEvent.call(_this3, _this3.elements.original, 'destroyed', true);
 
                     // Callback
                     if (utils.is.function(callback)) {
-                        callback.call(_this4.elements.original);
+                        callback.call(_this3.elements.original);
                     }
 
                     // Reset state
-                    _this4.ready = false;
+                    _this3.ready = false;
 
                     // Clear for garbage collection
                     setTimeout(function () {
-                        _this4.elements = null;
-                        _this4.media = null;
+                        _this3.elements = null;
+                        _this3.media = null;
                     }, 200);
                 }
             };
@@ -7171,8 +7210,8 @@ var Plyr = function () {
             // Set the player volume
             this.media.volume = volume;
 
-            // If muted, and we're increasing volume, reset muted state
-            if (this.muted && volume > 0) {
+            // If muted, and we're increasing volume manually, reset muted state
+            if (!utils.is.empty(value) && this.muted && volume > 0) {
                 this.muted = false;
             }
         }

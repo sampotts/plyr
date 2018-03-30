@@ -74,6 +74,9 @@ const ui = {
         // Reset quality options
         this.options.quality = [];
 
+        // Reset volume display
+        ui.updateVolume.call(this);
+
         // Reset time display
         ui.timeUpdate.call(this);
 
