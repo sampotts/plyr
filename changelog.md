@@ -1,3 +1,8 @@
+## v3.0.11
+
+*   Muted and autoplay fixes
+*   Small bug fixes from Sentry logs
+
 ## v3.0.10
 
 *   Docs fix

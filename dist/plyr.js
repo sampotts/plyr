@@ -6546,7 +6546,7 @@ var Plyr = function () {
         // Setup ads if provided
         this.ads = new Ads(this);
 
-        // Always autoplay if required
+        // Autoplay if required
         if (this.config.autoplay) {
             this.play();
         }
