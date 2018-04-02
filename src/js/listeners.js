@@ -355,13 +355,16 @@ class Listeners {
             this.player.storage.set({ speed: this.player.speed });
         });
 
-        // Quality change
-        utils.on(this.player.media, 'qualitychange', () => {
-            // Update UI
-            controls.updateSetting.call(this.player, 'quality');
-
+        // Quality request
+        utils.on(this.player.media, 'qualityrequested', event => {
             // Save to storage
-            this.player.storage.set({ quality: this.player.quality });
+            this.player.storage.set({ quality: event.detail.quality });
+        });
+
+        // Quality change
+        utils.on(this.player.media, 'qualitychange', event => {
+            // Update UI
+            controls.updateSetting.call(this.player, 'quality', null, event.detail.quality);
         });
 
         // Caption language change

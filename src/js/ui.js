@@ -71,8 +71,8 @@ const ui = {
         // Reset loop state
         this.loop = null;
 
-        // Reset quality options
-        this.options.quality = [];
+        // Reset quality setting
+        this.quality = null;
 
         // Reset volume display
         ui.updateVolume.call(this);

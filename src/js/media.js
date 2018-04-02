@@ -6,6 +6,7 @@ import support from './support';
 import utils from './utils';
 import youtube from './plugins/youtube';
 import vimeo from './plugins/vimeo';
+import html5 from './html5';
 import ui from './ui';
 
 // Sniff out the browser
@@ -75,31 +76,9 @@ const media = {
             }
         } else if (this.isHTML5) {
             ui.setTitle.call(this);
+
+            html5.extend.call(this);
         }
-    },
-
-    // Cancel current network requests
-    // See https://github.com/sampotts/plyr/issues/174
-    cancelRequests() {
-        if (!this.isHTML5) {
-            return;
-        }
-
-        // Remove child sources
-        utils.removeElement(this.media.querySelectorAll('source'));
-
-        // Set blank video src attribute
-        // This is to prevent a MEDIA_ERR_SRC_NOT_SUPPORTED error
-        // Info: http://stackoverflow.com/questions/32231579/how-to-properly-dispose-of-an-html5-video-and-close-socket-or-connection
-        this.media.setAttribute('src', this.config.blankVideo);
-
-        // Load the new empty source
-        // This will cancel existing requests
-        // See https://github.com/sampotts/plyr/issues/174
-        this.media.load();
-
-        // Debugging
-        this.debug.log('Cancelled network requests');
     },
 };
 

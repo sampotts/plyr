@@ -6,6 +6,64 @@ import utils from './../utils';
 import controls from './../controls';
 import ui from './../ui';
 
+// Standardise YouTube quality unit
+function mapQualityUnit(input) {
+    switch (input) {
+        case 'hd2160':
+            return 2160;
+
+        case 2160:
+            return 'hd2160';
+
+        case 'hd1440':
+            return 1440;
+
+        case 1440:
+            return 'hd1440';
+
+        case 'hd1080':
+            return 1080;
+
+        case 1080:
+            return 'hd1080';
+
+        case 'hd720':
+            return 720;
+
+        case 720:
+            return 'hd720';
+
+        case 'large':
+            return 480;
+
+        case 480:
+            return 'large';
+
+        case 'medium':
+            return 360;
+
+        case 360:
+            return 'medium';
+
+        case 'small':
+            return 240;
+
+        case 240:
+            return 'small';
+
+        default:
+            return 'default';
+    }
+}
+
+function mapQualityUnits(levels) {
+    if (utils.is.empty(levels)) {
+        return levels;
+    }
+
+    return utils.dedupe(levels.map(level => mapQualityUnit(level)));
+}
+
 const youtube = {
     setup() {
         // Add embed class for responsive
@@ -168,14 +226,10 @@ const youtube = {
 
                     utils.dispatchEvent.call(player, player.media, 'error');
                 },
-                onPlaybackQualityChange(event) {
-                    // Get the instance
-                    const instance = event.target;
-
-                    // Get current quality
-                    player.media.quality = instance.getPlaybackQuality();
-
-                    utils.dispatchEvent.call(player, player.media, 'qualitychange');
+                onPlaybackQualityChange() {
+                    utils.dispatchEvent.call(player, player.media, 'qualitychange', false, {
+                        quality: player.media.quality,
+                    });
                 },
                 onPlaybackRateChange(event) {
                     // Get the instance
@@ -240,15 +294,18 @@ const youtube = {
                     // Quality
                     Object.defineProperty(player.media, 'quality', {
                         get() {
-                            return instance.getPlaybackQuality();
+                            return mapQualityUnit(instance.getPlaybackQuality());
                         },
                         set(input) {
+                            const quality = input;
+
+                            // Set via API
+                            instance.setPlaybackQuality(mapQualityUnit(quality));
+
                             // Trigger request event
                             utils.dispatchEvent.call(player, player.media, 'qualityrequested', false, {
-                                quality: input,
+                                quality,
                             });
-
-                            instance.setPlaybackQuality(input);
                         },
                     });
 
@@ -401,7 +458,7 @@ const youtube = {
                             }
 
                             // Get quality
-                            controls.setQualityMenu.call(player, instance.getAvailableQualityLevels());
+                            controls.setQualityMenu.call(player, mapQualityUnits(instance.getAvailableQualityLevels()));
 
                             break;
 

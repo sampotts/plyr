@@ -63,17 +63,19 @@ const defaults = {
 
     // Quality default
     quality: {
-        default: 'default',
+        default: 720,
         options: [
-            'hd2160',
-            'hd1440',
-            'hd1080',
-            'hd720',
-            'large',
-            'medium',
-            'small',
-            'tiny',
-            'default',
+            4320,
+            2880,
+            2160,
+            1440,
+            1080,
+            720,
+            576,
+            480,
+            360,
+            240,
+            'default', // YouTube's "auto"
         ],
     },
 

@@ -4,6 +4,7 @@
 
 import { providers } from './types';
 import utils from './utils';
+import html5 from './html5';
 import media from './media';
 import ui from './ui';
 import support from './support';
@@ -31,13 +32,14 @@ const source = {
         }
 
         // Cancel current network requests
-        media.cancelRequests.call(this);
+        html5.cancelRequests.call(this);
 
         // Destroy instance and re-setup
         this.destroy.call(
             this,
             () => {
-                // TODO: Reset menus here
+                // Reset quality options
+                this.options.quality = [];
 
                 // Remove elements
                 utils.removeElement(this.media);

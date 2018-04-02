@@ -9,6 +9,7 @@
                 "ignore": ["attribute", "class"]
             }
         ],
+        "string-no-newline": null,
         "indentation": 4,
         "string-quotes": "single",
         "max-nesting-depth": 2,

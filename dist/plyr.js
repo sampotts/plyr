@@ -77,15 +77,15 @@ var defaults = {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.0.10/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.0.11/plyr.svg',
 
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
 
     // Quality default
     quality: {
-        default: 'default',
-        options: ['hd2160', 'hd1440', 'hd1080', 'hd720', 'large', 'medium', 'small', 'tiny', 'default']
+        default: 720,
+        options: [4320, 2880, 2160, 1440, 1080, 720, 576, 480, 360, 240, 'default']
     },
 
     // Set loops
@@ -1339,15 +1339,19 @@ var utils = {
 
 
     // Trigger event
-    dispatchEvent: function dispatchEvent(element, type, bubbles, detail) {
+    dispatchEvent: function dispatchEvent(element) {
+        var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+        var bubbles = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+        var detail = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+
         // Bail if no element
-        if (!utils.is.element(element) || !utils.is.string(type)) {
+        if (!utils.is.element(element) || utils.is.empty(type)) {
             return;
         }
 
         // Create and dispatch the event
         var event = new CustomEvent(type, {
-            bubbles: utils.is.boolean(bubbles) ? bubbles : false,
+            bubbles: bubbles,
             detail: Object.assign({}, detail, {
                 plyr: utils.is.plyr(this) ? this : null
             })
@@ -1523,6 +1527,18 @@ var utils = {
         });
 
         return utils.extend.apply(utils, [target].concat(toConsumableArray(sources)));
+    },
+
+
+    // Remove duplicates in an array
+    dedupe: function dedupe(array) {
+        if (!utils.is.array(array)) {
+            return array;
+        }
+
+        return array.filter(function (item, index) {
+            return array.indexOf(item) === index;
+        });
     },
 
 
@@ -2427,8 +2443,8 @@ var ui = {
         // Reset loop state
         this.loop = null;
 
-        // Reset quality options
-        this.options.quality = [];
+        // Reset quality setting
+        this.quality = null;
 
         // Reset volume display
         ui.updateVolume.call(this);
@@ -2695,6 +2711,159 @@ var ui = {
 
         // Update the tooltip (if visible)
         controls.updateSeekTooltip.call(this);
+    }
+};
+
+// ==========================================================================
+
+var html5 = {
+    getSources: function getSources() {
+        if (!this.isHTML5) {
+            return null;
+        }
+
+        return this.media.querySelectorAll('source');
+    },
+
+
+    // Get quality levels
+    getQualityOptions: function getQualityOptions() {
+        if (!this.isHTML5) {
+            return null;
+        }
+
+        // Get sources
+        var sources = html5.getSources.call(this);
+
+        if (utils.is.empty(sources)) {
+            return null;
+        }
+
+        // Get <source> with size attribute
+        var sizes = Array.from(sources).filter(function (source) {
+            return !utils.is.empty(source.getAttribute('size'));
+        });
+
+        // If none, bail
+        if (utils.is.empty(sizes)) {
+            return null;
+        }
+
+        // Reduce to unique list
+        return utils.dedupe(sizes.map(function (source) {
+            return Number(source.getAttribute('size'));
+        }));
+    },
+    extend: function extend() {
+        if (!this.isHTML5) {
+            return;
+        }
+
+        var player = this;
+
+        // Quality
+        Object.defineProperty(player.media, 'quality', {
+            get: function get() {
+                // Get sources
+                var sources = html5.getSources.call(player);
+
+                if (utils.is.empty(sources)) {
+                    return null;
+                }
+
+                var matches = Array.from(sources).filter(function (source) {
+                    return source.getAttribute('src') === player.source;
+                });
+
+                if (utils.is.empty(matches)) {
+                    return null;
+                }
+
+                return Number(matches[0].getAttribute('size'));
+            },
+            set: function set(input) {
+                // Get sources
+                var sources = html5.getSources.call(player);
+
+                if (utils.is.empty(sources)) {
+                    return;
+                }
+
+                // Get matches for requested size
+                var matches = Array.from(sources).filter(function (source) {
+                    return Number(source.getAttribute('size')) === input;
+                });
+
+                // No matches for requested size
+                if (utils.is.empty(matches)) {
+                    return;
+                }
+
+                // Get supported sources
+                var supported = matches.filter(function (source) {
+                    return support.mime.call(player, source.getAttribute('type'));
+                });
+
+                // No supported sources
+                if (utils.is.empty(supported)) {
+                    return;
+                }
+
+                // Trigger change event
+                utils.dispatchEvent.call(player, player.media, 'qualityrequested', false, {
+                    quality: input
+                });
+
+                // Get current state
+                var currentTime = player.currentTime,
+                    playing = player.playing;
+
+                // Set new source
+
+                player.media.src = supported[0].getAttribute('src');
+
+                // Load new source
+                player.media.load();
+
+                // Resume playing
+                if (playing) {
+                    player.play();
+                }
+
+                // Restore time
+                player.currentTime = currentTime;
+
+                // Trigger change event
+                utils.dispatchEvent.call(player, player.media, 'qualitychange', false, {
+                    quality: input
+                });
+            }
+        });
+    },
+
+
+    // Cancel current network requests
+    // See https://github.com/sampotts/plyr/issues/174
+    cancelRequests: function cancelRequests() {
+        if (!this.isHTML5) {
+            return;
+        }
+
+        // Remove child sources
+        utils.removeElement(html5.getSources());
+
+        // Set blank video src attribute
+        // This is to prevent a MEDIA_ERR_SRC_NOT_SUPPORTED error
+        // Info: http://stackoverflow.com/questions/32231579/how-to-properly-dispose-of-an-html5-video-and-close-socket-or-connection
+        this.media.setAttribute('src', this.config.blankVideo);
+
+        // Load the new empty source
+        // This will cancel existing requests
+        // See https://github.com/sampotts/plyr/issues/174
+        this.media.load();
+
+        // Debugging
+        this.debug.log('Cancelled network requests');
     }
 };
 
@@ -3100,8 +3269,8 @@ var controls = {
     },
 
 
-    // Set the YouTube quality menu
-    // TODO: Support for HTML5
+    // Set the quality menu
+    // TODO: Vimeo support
     setQualityMenu: function setQualityMenu(options) {
         var _this2 = this;
 
@@ -3118,12 +3287,10 @@ var controls = {
             this.options.quality = options.filter(function (quality) {
                 return _this2.config.quality.options.includes(quality);
             });
-        } else {
-            this.options.quality = this.config.quality.options;
         }
 
         // Toggle the pane and tab
-        var toggle = !utils.is.empty(this.options.quality) && this.isYouTube;
+        var toggle = !utils.is.empty(this.options.quality) && this.options.quality.length > 1;
         controls.toggleTab.call(this, type, toggle);
 
         // If we're hiding, nothing more to do
@@ -3139,20 +3306,24 @@ var controls = {
             var label = '';
 
             switch (quality) {
-                case 'hd2160':
+                case 2160:
                     label = '4K';
                     break;
 
-                case 'hd1440':
+                case 1440:
                     label = 'WQHD';
                     break;
 
-                case 'hd1080':
+                case 1080:
                     label = 'HD';
                     break;
 
-                case 'hd720':
+                case 720:
                     label = 'HD';
+                    break;
+
+                case 576:
+                    label = 'SD';
                     break;
 
                 default:
@@ -3166,8 +3337,13 @@ var controls = {
             return controls.createBadge.call(_this2, label);
         };
 
-        this.options.quality.forEach(function (quality) {
-            return controls.createMenuItem.call(_this2, quality, list, type, controls.getLabel.call(_this2, 'quality', quality), getBadge(quality));
+        // Sort options by the config and then render options
+        this.options.quality.sort(function (a, b) {
+            var sorting = _this2.config.quality.options;
+            return sorting.indexOf(a) > sorting.indexOf(b) ? 1 : -1;
+        }).forEach(function (quality) {
+            var label = controls.getLabel.call(_this2, 'quality', quality);
+            controls.createMenuItem.call(_this2, quality, list, type, label, getBadge(quality));
         });
 
         controls.updateSetting.call(this, type, list);
@@ -3182,28 +3358,10 @@ var controls = {
                 return value === 1 ? 'Normal' : value + '&times;';
 
             case 'quality':
-                switch (value) {
-                    case 'hd2160':
-                        return '2160P';
-                    case 'hd1440':
-                        return '1440P';
-                    case 'hd1080':
-                        return '1080P';
-                    case 'hd720':
-                        return '720P';
-                    case 'large':
-                        return '480P';
-                    case 'medium':
-                        return '360P';
-                    case 'small':
-                        return '240P';
-                    case 'tiny':
-                        return 'Tiny';
-                    case 'default':
-                        return 'Auto';
-                    default:
-                        return value;
+                if (utils.is.number(value)) {
+                    return value + 'p';
                 }
+                return utils.toTitleCase(value);
 
             case 'captions':
                 return controls.getLanguage.call(this);
@@ -3215,7 +3373,7 @@ var controls = {
 
 
     // Update the selected setting
-    updateSetting: function updateSetting(setting, container) {
+    updateSetting: function updateSetting(setting, container, input) {
         var pane = this.elements.settings.panes[setting];
         var value = null;
         var list = container;
@@ -3226,7 +3384,7 @@ var controls = {
                 break;
 
             default:
-                value = this[setting];
+                value = !utils.is.empty(input) ? input : this[setting];
 
                 // Get default
                 if (utils.is.empty(value)) {
@@ -3234,7 +3392,7 @@ var controls = {
                 }
 
                 // Unsupported value
-                if (!this.options[setting].includes(value)) {
+                if (!utils.is.empty(this.options[setting]) && !this.options[setting].includes(value)) {
                     this.debug.warn('Unsupported value of \'' + value + '\' for ' + setting);
                     return;
                 }
@@ -3428,10 +3586,13 @@ var controls = {
 
     // Check if we need to hide/show the settings menu
     checkMenu: function checkMenu() {
-        var speedHidden = this.elements.settings.tabs.speed.getAttribute('hidden') !== null;
-        var languageHidden = this.elements.settings.tabs.captions.getAttribute('hidden') !== null;
+        var tabs = this.elements.settings.tabs;
 
-        utils.toggleHidden(this.elements.settings.menu, speedHidden && languageHidden);
+        var visible = !utils.is.empty(tabs) && Object.values(tabs).some(function (tab) {
+            return !tab.hidden;
+        });
+
+        utils.toggleHidden(this.elements.settings.menu, !visible);
     },
 
 
@@ -3826,6 +3987,10 @@ var controls = {
         this.elements.controls = container;
 
         controls.setSpeedMenu.call(this);
+
+        if (this.isHTML5) {
+            controls.setQualityMenu.call(this, html5.getQualityOptions.call(this));
+        }
 
         return container;
     },
@@ -4285,13 +4450,16 @@ var Listeners = function () {
                 _this3.player.storage.set({ speed: _this3.player.speed });
             });
 
-            // Quality change
-            utils.on(this.player.media, 'qualitychange', function () {
-                // Update UI
-                controls.updateSetting.call(_this3.player, 'quality');
-
+            // Quality request
+            utils.on(this.player.media, 'qualityrequested', function (event) {
                 // Save to storage
-                _this3.player.storage.set({ quality: _this3.player.quality });
+                _this3.player.storage.set({ quality: event.detail.quality });
+            });
+
+            // Quality change
+            utils.on(this.player.media, 'qualitychange', function (event) {
+                // Update UI
+                controls.updateSetting.call(_this3.player, 'quality', null, event.detail.quality);
             });
 
             // Caption language change
@@ -5280,6 +5448,66 @@ var Ads = function () {
 
 // ==========================================================================
 
+// Standardise YouTube quality unit
+function mapQualityUnit(input) {
+    switch (input) {
+        case 'hd2160':
+            return 2160;
+
+        case 2160:
+            return 'hd2160';
+
+        case 'hd1440':
+            return 1440;
+
+        case 1440:
+            return 'hd1440';
+
+        case 'hd1080':
+            return 1080;
+
+        case 1080:
+            return 'hd1080';
+
+        case 'hd720':
+            return 720;
+
+        case 720:
+            return 'hd720';
+
+        case 'large':
+            return 480;
+
+        case 480:
+            return 'large';
+
+        case 'medium':
+            return 360;
+
+        case 360:
+            return 'medium';
+
+        case 'small':
+            return 240;
+
+        case 240:
+            return 'small';
+
+        default:
+            return 'default';
+    }
+}
+
+function mapQualityUnits(levels) {
+    if (utils.is.empty(levels)) {
+        return levels;
+    }
+
+    return utils.dedupe(levels.map(function (level) {
+        return mapQualityUnit(level);
+    }));
+}
+
 var youtube = {
     setup: function setup() {
         var _this = this;
@@ -5444,14 +5672,10 @@ var youtube = {
 
                     utils.dispatchEvent.call(player, player.media, 'error');
                 },
-                onPlaybackQualityChange: function onPlaybackQualityChange(event) {
-                    // Get the instance
-                    var instance = event.target;
-
-                    // Get current quality
-                    player.media.quality = instance.getPlaybackQuality();
-
-                    utils.dispatchEvent.call(player, player.media, 'qualitychange');
+                onPlaybackQualityChange: function onPlaybackQualityChange() {
+                    utils.dispatchEvent.call(player, player.media, 'qualitychange', false, {
+                        quality: player.media.quality
+                    });
                 },
                 onPlaybackRateChange: function onPlaybackRateChange(event) {
                     // Get the instance
@@ -5516,15 +5740,18 @@ var youtube = {
                     // Quality
                     Object.defineProperty(player.media, 'quality', {
                         get: function get() {
-                            return instance.getPlaybackQuality();
+                            return mapQualityUnit(instance.getPlaybackQuality());
                         },
                         set: function set(input) {
+                            var quality = input;
+
+                            // Set via API
+                            instance.setPlaybackQuality(mapQualityUnit(quality));
+
                             // Trigger request event
                             utils.dispatchEvent.call(player, player.media, 'qualityrequested', false, {
-                                quality: input
+                                quality: quality
                             });
-
-                            instance.setPlaybackQuality(input);
                         }
                     });
 
@@ -5681,7 +5908,7 @@ var youtube = {
                             }
 
                             // Get quality
-                            controls.setQualityMenu.call(player, instance.getAvailableQualityLevels());
+                            controls.setQualityMenu.call(player, mapQualityUnits(instance.getAvailableQualityLevels()));
 
                             break;
 
@@ -6103,32 +6330,9 @@ var media = {
             }
         } else if (this.isHTML5) {
             ui.setTitle.call(this);
+
+            html5.extend.call(this);
         }
-    },
-
-
-    // Cancel current network requests
-    // See https://github.com/sampotts/plyr/issues/174
-    cancelRequests: function cancelRequests() {
-        if (!this.isHTML5) {
-            return;
-        }
-
-        // Remove child sources
-        utils.removeElement(this.media.querySelectorAll('source'));
-
-        // Set blank video src attribute
-        // This is to prevent a MEDIA_ERR_SRC_NOT_SUPPORTED error
-        // Info: http://stackoverflow.com/questions/32231579/how-to-properly-dispose-of-an-html5-video-and-close-socket-or-connection
-        this.media.setAttribute('src', this.config.blankVideo);
-
-        // Load the new empty source
-        // This will cancel existing requests
-        // See https://github.com/sampotts/plyr/issues/174
-        this.media.load();
-
-        // Debugging
-        this.debug.log('Cancelled network requests');
     }
 };
 
@@ -6162,11 +6366,12 @@ var source = {
         }
 
         // Cancel current network requests
-        media.cancelRequests.call(this);
+        html5.cancelRequests.call(this);
 
         // Destroy instance and re-setup
         this.destroy.call(this, function () {
-            // TODO: Reset menus here
+            // Reset quality options
+            _this2.options.quality = [];
 
             // Remove elements
             utils.removeElement(_this2.media);
@@ -7325,8 +7530,8 @@ var Plyr = function () {
 
         /**
          * Set playback quality
-         * Currently YouTube only
-         * @param {string} input - Quality level
+         * Currently HTML5 & YouTube only
+         * @param {number} input - Quality level
          */
 
     }, {
@@ -7334,16 +7539,20 @@ var Plyr = function () {
         set: function set$$1(input) {
             var quality = null;
 
-            if (utils.is.string(input)) {
-                quality = input;
+            if (!utils.is.empty(input)) {
+                quality = Number(input);
             }
 
-            if (!utils.is.string(quality)) {
+            if (!utils.is.number(quality) || quality === 0) {
                 quality = this.storage.get('quality');
             }
 
-            if (!utils.is.string(quality)) {
+            if (!utils.is.number(quality)) {
                 quality = this.config.quality.selected;
+            }
+
+            if (!utils.is.number(quality)) {
+                quality = this.config.quality.default;
             }
 
             if (!this.options.quality.includes(quality)) {

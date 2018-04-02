@@ -670,22 +670,26 @@ class Plyr {
 
     /**
      * Set playback quality
-     * Currently YouTube only
-     * @param {string} input - Quality level
+     * Currently HTML5 & YouTube only
+     * @param {number} input - Quality level
      */
     set quality(input) {
         let quality = null;
 
-        if (utils.is.string(input)) {
-            quality = input;
+        if (!utils.is.empty(input)) {
+            quality = Number(input);
         }
 
-        if (!utils.is.string(quality)) {
+        if (!utils.is.number(quality) || quality === 0) {
             quality = this.storage.get('quality');
         }
 
-        if (!utils.is.string(quality)) {
+        if (!utils.is.number(quality)) {
             quality = this.config.quality.selected;
+        }
+
+        if (!utils.is.number(quality)) {
+            quality = this.config.quality.default;
         }
 
         if (!this.options.quality.includes(quality)) {

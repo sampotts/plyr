@@ -7,6 +7,7 @@ import utils from './utils';
 import ui from './ui';
 import i18n from './i18n';
 import captions from './captions';
+import html5 from './html5';
 
 // Sniff out the browser
 const browser = utils.getBrowser();
@@ -435,8 +436,8 @@ const controls = {
         utils.toggleHidden(pane, !toggle);
     },
 
-    // Set the YouTube quality menu
-    // TODO: Support for HTML5
+    // Set the quality menu
+    // TODO: Vimeo support
     setQualityMenu(options) {
         // Menu required
         if (!utils.is.element(this.elements.settings.panes.quality)) {
@@ -449,12 +450,10 @@ const controls = {
         // Set options if passed and filter based on config
         if (utils.is.array(options)) {
             this.options.quality = options.filter(quality => this.config.quality.options.includes(quality));
-        } else {
-            this.options.quality = this.config.quality.options;
         }
 
         // Toggle the pane and tab
-        const toggle = !utils.is.empty(this.options.quality) && this.isYouTube;
+        const toggle = !utils.is.empty(this.options.quality) && this.options.quality.length > 1;
         controls.toggleTab.call(this, type, toggle);
 
         // If we're hiding, nothing more to do
@@ -470,20 +469,24 @@ const controls = {
             let label = '';
 
             switch (quality) {
-                case 'hd2160':
+                case 2160:
                     label = '4K';
                     break;
 
-                case 'hd1440':
+                case 1440:
                     label = 'WQHD';
                     break;
 
-                case 'hd1080':
+                case 1080:
                     label = 'HD';
                     break;
 
-                case 'hd720':
+                case 720:
                     label = 'HD';
+                    break;
+
+                case 576:
+                    label = 'SD';
                     break;
 
                 default:
@@ -497,9 +500,14 @@ const controls = {
             return controls.createBadge.call(this, label);
         };
 
-        this.options.quality.forEach(quality =>
-            controls.createMenuItem.call(this, quality, list, type, controls.getLabel.call(this, 'quality', quality), getBadge(quality)),
-        );
+        // Sort options by the config and then render options
+        this.options.quality.sort((a, b) => {
+            const sorting = this.config.quality.options;
+            return sorting.indexOf(a) > sorting.indexOf(b) ? 1 : -1;
+        }).forEach(quality => {
+            const label = controls.getLabel.call(this, 'quality', quality);
+            controls.createMenuItem.call(this, quality, list, type, label, getBadge(quality));
+        });
 
         controls.updateSetting.call(this, type, list);
     },
@@ -512,28 +520,10 @@ const controls = {
                 return value === 1 ? 'Normal' : `${value}&times;`;
 
             case 'quality':
-                switch (value) {
-                    case 'hd2160':
-                        return '2160P';
-                    case 'hd1440':
-                        return '1440P';
-                    case 'hd1080':
-                        return '1080P';
-                    case 'hd720':
-                        return '720P';
-                    case 'large':
-                        return '480P';
-                    case 'medium':
-                        return '360P';
-                    case 'small':
-                        return '240P';
-                    case 'tiny':
-                        return 'Tiny';
-                    case 'default':
-                        return 'Auto';
-                    default:
-                        return value;
+                if (utils.is.number(value)) {
+                    return `${value}p`;
                 }
+                return utils.toTitleCase(value);
 
             case 'captions':
                 return controls.getLanguage.call(this);
@@ -544,7 +534,7 @@ const controls = {
     },
 
     // Update the selected setting
-    updateSetting(setting, container) {
+    updateSetting(setting, container, input) {
         const pane = this.elements.settings.panes[setting];
         let value = null;
         let list = container;
@@ -555,7 +545,7 @@ const controls = {
                 break;
 
             default:
-                value = this[setting];
+                value = !utils.is.empty(input) ? input : this[setting];
 
                 // Get default
                 if (utils.is.empty(value)) {
@@ -563,7 +553,7 @@ const controls = {
                 }
 
                 // Unsupported value
-                if (!this.options[setting].includes(value)) {
+                if (!utils.is.empty(this.options[setting]) && !this.options[setting].includes(value)) {
                     this.debug.warn(`Unsupported value of '${value}' for ${setting}`);
                     return;
                 }
@@ -767,10 +757,10 @@ const controls = {
 
     // Check if we need to hide/show the settings menu
     checkMenu() {
-        const speedHidden = this.elements.settings.tabs.speed.getAttribute('hidden') !== null;
-        const languageHidden = this.elements.settings.tabs.captions.getAttribute('hidden') !== null;
+        const { tabs } = this.elements.settings;
+        const visible = !utils.is.empty(tabs) && Object.values(tabs).some(tab => !tab.hidden);
 
-        utils.toggleHidden(this.elements.settings.menu, speedHidden && languageHidden);
+        utils.toggleHidden(this.elements.settings.menu, !visible);
     },
 
     // Show/hide menu
@@ -1178,6 +1168,10 @@ const controls = {
         this.elements.controls = container;
 
         controls.setSpeedMenu.call(this);
+
+        if (this.isHTML5) {
+            controls.setQualityMenu.call(this, html5.getQualityOptions.call(this));
+        }
 
         return container;
     },

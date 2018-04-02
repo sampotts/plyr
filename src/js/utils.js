@@ -586,15 +586,15 @@ const utils = {
     },
 
     // Trigger event
-    dispatchEvent(element, type, bubbles, detail) {
+    dispatchEvent(element, type = '', bubbles = false, detail = {}) {
         // Bail if no element
-        if (!utils.is.element(element) || !utils.is.string(type)) {
+        if (!utils.is.element(element) || utils.is.empty(type)) {
             return;
         }
 
         // Create and dispatch the event
         const event = new CustomEvent(type, {
-            bubbles: utils.is.boolean(bubbles) ? bubbles : false,
+            bubbles,
             detail: Object.assign({}, detail, {
                 plyr: utils.is.plyr(this) ? this : null,
             }),
@@ -735,6 +735,15 @@ const utils = {
         });
 
         return utils.extend(target, ...sources);
+    },
+
+    // Remove duplicates in an array
+    dedupe(array) {
+        if (!utils.is.array(array)) {
+            return array;
+        }
+
+        return array.filter((item, index) => array.indexOf(item) === index);
     },
 
     // Get the provider for a given URL

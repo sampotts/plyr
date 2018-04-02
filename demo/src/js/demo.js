@@ -119,10 +119,28 @@ import Raven from 'raven-js';
                         player.source = {
                             type: 'video',
                             title: 'View From A Blue Moon',
-                            sources: [{
-                                src: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.mp4',
-                                type: 'video/mp4',
-                            }],
+                            sources: [
+                                {
+                                    src: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-576p.mp4',
+                                    type: 'video/mp4',
+                                    size: 576,
+                                },
+                                {
+                                    src: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-720p.mp4',
+                                    type: 'video/mp4',
+                                    size: 720,
+                                },
+                                {
+                                    src: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-1080p.mp4',
+                                    type: 'video/mp4',
+                                    size: 1080,
+                                },
+                                {
+                                    src: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-1440p.mp4',
+                                    type: 'video/mp4',
+                                    size: 1440,
+                                },
+                            ],
                             poster: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.jpg',
                             tracks: [
                                 {
