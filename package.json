@@ -1,6 +1,6 @@
 {
     "name": "plyr",
-    "version": "3.0.11",
+    "version": "3.1.0-beta.1",
     "description": "A simple, accessible and customizable HTML5, YouTube and Vimeo media player",
     "homepage": "https://plyr.io",
     "main": "./dist/plyr.js",

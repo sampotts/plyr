@@ -73,6 +73,11 @@ const support = {
                 return false;
             }
 
+            // Check directly if codecs specified
+            if (type.includes('codecs=')) {
+                return media.canPlayType(type).replace(/no/, '');
+            }
+
             // Type specific checks
             if (this.isVideo) {
                 switch (type) {

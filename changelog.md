@@ -1,3 +1,8 @@
+## v3.1.0-beta.1
+
+*   HTML5 quality selection
+*   Improvements to the YouTube quality selection
+
 ## v3.0.11
 
 *   Muted and autoplay fixes

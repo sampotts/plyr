@@ -77,7 +77,7 @@ var defaults = {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.0.11/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.1.0-beta.1/plyr.svg',
 
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
@@ -1751,6 +1751,11 @@ var support = {
             // Bail if no checking function
             if (!this.isHTML5 || !utils.is.function(media.canPlayType)) {
                 return false;
+            }
+
+            // Check directly if codecs specified
+            if (type.includes('codecs=')) {
+                return media.canPlayType(type).replace(/no/, '');
             }
 
             // Type specific checks
