@@ -84,7 +84,7 @@ var defaults = {
 
     // Quality default
     quality: {
-        default: 720,
+        default: 576,
         options: [4320, 2880, 2160, 1440, 1080, 720, 576, 480, 360, 240, 'default']
     },
 
@@ -1542,6 +1542,18 @@ var utils = {
     },
 
 
+    // Get the closest value in an array
+    closest: function closest(array, value) {
+        if (!utils.is.array(array) || !array.length) {
+            return null;
+        }
+
+        return array.reduce(function (prev, curr) {
+            return Math.abs(curr - value) < Math.abs(prev - value) ? curr : prev;
+        });
+    },
+
+
     // Get the provider for a given URL
     getProviderByUrl: function getProviderByUrl(url) {
         // YouTube
@@ -1951,13 +1963,13 @@ var Fullscreen = function () {
         });
 
         // Fullscreen toggle on double click
-        utils.on(this.player.elements.container, 'dblclick', function () {
-            _this.toggle();
-        });
+        utils.on(this.player.elements.container, 'dblclick', function (event) {
+            // Ignore double click in controls
+            if (_this.player.elements.controls.contains(event.target)) {
+                return;
+            }
 
-        // Prevent double click on controls bubbling up
-        utils.on(this.player.elements.controls, 'dblclick', function (event) {
-            return event.stopPropagation();
+            _this.toggle();
         });
 
         // Update the UI
@@ -3316,13 +3328,7 @@ var controls = {
                     break;
 
                 case 1440:
-                    label = 'WQHD';
-                    break;
-
                 case 1080:
-                    label = 'HD';
-                    break;
-
                 case 720:
                     label = 'HD';
                     break;
@@ -3496,14 +3502,14 @@ var controls = {
         var list = this.elements.settings.panes.captions.querySelector('ul');
 
         // Toggle the pane and tab
-        var hasTracks = captions.getTracks.call(this).length;
-        controls.toggleTab.call(this, type, hasTracks);
+        var toggle = captions.getTracks.call(this).length;
+        controls.toggleTab.call(this, type, toggle);
 
         // Empty the menu
         utils.emptyElement(list);
 
         // If there's no captions, bail
-        if (!hasTracks) {
+        if (!toggle) {
             return;
         }
 
@@ -3547,10 +3553,10 @@ var controls = {
         var type = 'speed';
 
         // Set the speed options
-        if (!utils.is.array(options)) {
-            this.options.speed = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
-        } else {
+        if (utils.is.array(options)) {
             this.options.speed = options;
+        } else if (this.isHTML5 || this.isVimeo) {
+            this.options.speed = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
         }
 
         // Set options if passed and filter based on config
@@ -3559,7 +3565,7 @@ var controls = {
         });
 
         // Toggle the pane and tab
-        var toggle = !utils.is.empty(this.options.speed);
+        var toggle = !utils.is.empty(this.options.speed) && this.options.speed.length > 1;
         controls.toggleTab.call(this, type, toggle);
 
         // Check if we need to toggle the parent
@@ -3582,7 +3588,8 @@ var controls = {
 
         // Create items
         this.options.speed.forEach(function (speed) {
-            return controls.createMenuItem.call(_this4, speed, list, type, controls.getLabel.call(_this4, 'speed', speed));
+            var label = controls.getLabel.call(_this4, 'speed', speed);
+            controls.createMenuItem.call(_this4, speed, list, type, label);
         });
 
         controls.updateSetting.call(this, type, list);
@@ -3866,7 +3873,8 @@ var controls = {
         // Settings button / menu
         if (this.config.controls.includes('settings') && !utils.is.empty(this.config.settings)) {
             var menu = utils.createElement('div', {
-                class: 'plyr__menu'
+                class: 'plyr__menu',
+                hidden: ''
             });
 
             menu.appendChild(controls.createButton.call(this, 'settings', {
@@ -3991,11 +3999,11 @@ var controls = {
 
         this.elements.controls = container;
 
-        controls.setSpeedMenu.call(this);
-
         if (this.isHTML5) {
             controls.setQualityMenu.call(this, html5.getQualityOptions.call(this));
         }
+
+        controls.setSpeedMenu.call(this);
 
         return container;
     },
@@ -5804,8 +5812,7 @@ var youtube = {
                     });
 
                     // Get available speeds
-                    var options = instance.getAvailablePlaybackRates();
-                    controls.setSpeedMenu.call(player, options);
+                    player.options.speed = instance.getAvailablePlaybackRates();
 
                     // Set the tabindex to avoid focus entering iframe
                     if (player.supported.ui) {
@@ -7560,9 +7567,14 @@ var Plyr = function () {
                 quality = this.config.quality.default;
             }
 
-            if (!this.options.quality.includes(quality)) {
-                this.debug.warn('Unsupported quality option (' + quality + ')');
+            if (!this.options.quality.length) {
                 return;
+            }
+
+            if (!this.options.quality.includes(quality)) {
+                var closest = utils.closest(this.options.quality, quality);
+                this.debug.warn('Unsupported quality option: ' + quality + ', using ' + closest + ' instead');
+                quality = closest;
             }
 
             // Update config

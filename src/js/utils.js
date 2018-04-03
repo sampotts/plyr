@@ -746,6 +746,15 @@ const utils = {
         return array.filter((item, index) => array.indexOf(item) === index);
     },
 
+    // Get the closest value in an array
+    closest(array, value) {
+        if (!utils.is.array(array) || !array.length) {
+            return null;
+        }
+
+        return array.reduce((prev, curr) => Math.abs(curr - value) < Math.abs(prev - value) ? curr : prev);
+    },
+
     // Get the provider for a given URL
     getProviderByUrl(url) {
         // YouTube

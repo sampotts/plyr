@@ -474,13 +474,7 @@ const controls = {
                     break;
 
                 case 1440:
-                    label = 'WQHD';
-                    break;
-
                 case 1080:
-                    label = 'HD';
-                    break;
-
                 case 720:
                     label = 'HD';
                     break;
@@ -656,14 +650,14 @@ const controls = {
         const list = this.elements.settings.panes.captions.querySelector('ul');
 
         // Toggle the pane and tab
-        const hasTracks = captions.getTracks.call(this).length;
-        controls.toggleTab.call(this, type, hasTracks);
+        const toggle = captions.getTracks.call(this).length;
+        controls.toggleTab.call(this, type, toggle);
 
         // Empty the menu
         utils.emptyElement(list);
 
         // If there's no captions, bail
-        if (!hasTracks) {
+        if (!toggle) {
             return;
         }
 
@@ -710,7 +704,9 @@ const controls = {
         const type = 'speed';
 
         // Set the speed options
-        if (!utils.is.array(options)) {
+        if (utils.is.array(options)) {
+            this.options.speed = options;
+        } else if (this.isHTML5 || this.isVimeo) {
             this.options.speed = [
                 0.5,
                 0.75,
@@ -720,15 +716,13 @@ const controls = {
                 1.75,
                 2,
             ];
-        } else {
-            this.options.speed = options;
         }
 
         // Set options if passed and filter based on config
         this.options.speed = this.options.speed.filter(speed => this.config.speed.options.includes(speed));
 
         // Toggle the pane and tab
-        const toggle = !utils.is.empty(this.options.speed);
+        const toggle = !utils.is.empty(this.options.speed) && this.options.speed.length > 1;
         controls.toggleTab.call(this, type, toggle);
 
         // Check if we need to toggle the parent
@@ -750,7 +744,10 @@ const controls = {
         utils.emptyElement(list);
 
         // Create items
-        this.options.speed.forEach(speed => controls.createMenuItem.call(this, speed, list, type, controls.getLabel.call(this, 'speed', speed)));
+        this.options.speed.forEach(speed => {
+            const label = controls.getLabel.call(this, 'speed', speed);
+            controls.createMenuItem.call(this, speed, list, type, label);
+        });
 
         controls.updateSetting.call(this, type, list);
     },
@@ -1033,6 +1030,7 @@ const controls = {
         if (this.config.controls.includes('settings') && !utils.is.empty(this.config.settings)) {
             const menu = utils.createElement('div', {
                 class: 'plyr__menu',
+                hidden: '',
             });
 
             menu.appendChild(
@@ -1167,11 +1165,11 @@ const controls = {
 
         this.elements.controls = container;
 
-        controls.setSpeedMenu.call(this);
-
         if (this.isHTML5) {
             controls.setQualityMenu.call(this, html5.getQualityOptions.call(this));
         }
+
+        controls.setSpeedMenu.call(this);
 
         return container;
     },

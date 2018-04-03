@@ -692,9 +692,14 @@ class Plyr {
             quality = this.config.quality.default;
         }
 
-        if (!this.options.quality.includes(quality)) {
-            this.debug.warn(`Unsupported quality option (${quality})`);
+        if (!this.options.quality.length) {
             return;
+        }
+
+        if (!this.options.quality.includes(quality)) {
+            const closest = utils.closest(this.options.quality, quality);
+            this.debug.warn(`Unsupported quality option: ${quality}, using ${closest} instead`);
+            quality = closest;
         }
 
         // Update config

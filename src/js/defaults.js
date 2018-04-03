@@ -63,7 +63,7 @@ const defaults = {
 
     // Quality default
     quality: {
-        default: 720,
+        default: 576,
         options: [
             4320,
             2880,
