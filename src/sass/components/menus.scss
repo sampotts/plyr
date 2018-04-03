@@ -74,6 +74,7 @@
             align-items: center;
             color: $plyr-menu-color;
             display: flex;
+            font-size: $plyr-font-size-menu;
             padding: ceil($plyr-control-padding / 2) ($plyr-control-padding * 2);
             user-select: none;
             width: 100%;

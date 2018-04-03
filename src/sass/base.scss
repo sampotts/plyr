@@ -26,6 +26,11 @@
         width: 100%;
     }
 
+    button {
+        font: inherit;
+        line-height: inherit;
+    }
+
     // Ignore focus
     &:focus {
         outline: 0;

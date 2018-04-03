@@ -8,8 +8,9 @@ $plyr-font-size-small: 14px !default;
 $plyr-font-size-large: 18px !default;
 $plyr-font-size-xlarge: 21px !default;
 
-$plyr-font-size-time: 14px !default;
+$plyr-font-size-time: $plyr-font-size-small !default;
 $plyr-font-size-badge: 9px !default;
+$plyr-font-size-menu: $plyr-font-size-small !default;
 
 $plyr-font-weight-regular: 500 !default;
 $plyr-font-weight-bold: 600 !default;
