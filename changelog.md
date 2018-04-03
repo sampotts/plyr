@@ -1,3 +1,11 @@
+## v3.1.0
+
+*   Styling fixes
+
+## v3.1.0-beta.2
+
+*   YouTube playback speed fixes
+
 ## v3.1.0-beta.1
 
 *   HTML5 quality selection
