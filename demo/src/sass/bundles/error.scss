@@ -3,12 +3,6 @@
 // ==========================================================================
 @charset 'UTF-8';
 
-// Libs
-@import '../lib/fontface';
-@import '../lib/mixins';
-@import '../lib/normalize';
-@import '../lib/reset';
-
 // Settings
 @import '../settings/colors';
 @import '../settings/cosmetic';
@@ -16,6 +10,12 @@
 @import '../settings/layout';
 @import '../settings/spacing';
 @import '../settings/type';
+
+// Libs
+@import '../lib/fontface';
+@import '../lib/mixins';
+@import '../lib/normalize';
+@import '../lib/reset';
 
 // Layout
 @import '../layout/error';

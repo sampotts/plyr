@@ -11,7 +11,7 @@
     "demo": {
         "sass": {
             "demo.css": "demo/src/sass/bundles/demo.scss",
-            "error.css": "demo/src/sass/bundles/error.csss"
+            "error.css": "demo/src/sass/bundles/error.scss"
         },
         "js": {
             "demo.js": "demo/src/js/demo.js"
