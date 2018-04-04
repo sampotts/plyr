@@ -57,7 +57,7 @@ class Plyr {
         this.config = utils.extend(
             {},
             defaults,
-            options,
+            options || {},
             (() => {
                 try {
                     return JSON.parse(this.media.getAttribute('data-plyr-config'));
