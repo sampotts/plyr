@@ -19,7 +19,7 @@
 
     &::-webkit-slider-runnable-track {
         @include plyr-range-track();
-        background-image: linear-gradient(to right, currentColor var(--value), transparent var(--value));
+        background-image: linear-gradient(to right, currentColor var(--value, 0%), transparent var(--value, 0%));
     }
 
     &::-webkit-slider-thumb {
