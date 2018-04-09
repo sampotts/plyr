@@ -5,6 +5,14 @@
 import support from './support';
 import utils from './utils';
 
+function mapQualityUnit(input) {
+    const resolution = parseInt(input, 10);
+    if (utils.is.number(resolution)) {
+        return resolution;
+    }
+    return input;
+}
+
 const html5 = {
     getSources() {
         if (!this.isHTML5) {
@@ -36,7 +44,7 @@ const html5 = {
         }
 
         // Reduce to unique list
-        return utils.dedupe(sizes.map(source => Number(source.getAttribute('size'))));
+        return utils.dedupe(sizes.map(source => mapQualityUnit(source.getAttribute('size'))));
     },
 
     extend() {
@@ -62,7 +70,7 @@ const html5 = {
                     return null;
                 }
 
-                return Number(matches[0].getAttribute('size'));
+                return mapQualityUnit(matches[0].getAttribute('size'));
             },
             set(input) {
                 // Get sources
@@ -73,7 +81,7 @@ const html5 = {
                 }
 
                 // Get matches for requested size
-                const matches = Array.from(sources).filter(source => Number(source.getAttribute('size')) === input);
+                const matches = Array.from(sources).filter(source => mapQualityUnit(source.getAttribute('size')) === input);
 
                 // No matches for requested size
                 if (utils.is.empty(matches)) {

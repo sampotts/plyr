@@ -677,18 +677,18 @@ class Plyr {
         let quality = null;
 
         if (!utils.is.empty(input)) {
-            quality = Number(input);
+            quality = input;
         }
 
-        if (!utils.is.number(quality) || quality === 0) {
+        if (utils.is.empty(quality)) {
             quality = this.storage.get('quality');
         }
 
-        if (!utils.is.number(quality)) {
+        if (utils.is.empty(quality)) {
             quality = this.config.quality.selected;
         }
 
-        if (!utils.is.number(quality)) {
+        if (utils.is.empty(quality)) {
             quality = this.config.quality.default;
         }
 
