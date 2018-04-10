@@ -193,7 +193,7 @@ class Fullscreen {
         } else if (!Fullscreen.native) {
             toggleFallback.call(this, false);
         } else if (!this.prefix) {
-            document.cancelFullScreen();
+            (document.cancelFullScreen || document.exitFullscreen).call(document);
         } else if (!utils.is.empty(this.prefix)) {
             const action = this.prefix === 'moz' ? 'Cancel' : 'Exit';
             document[`${this.prefix}${action}${this.name}`]();
