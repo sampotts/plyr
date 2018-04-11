@@ -845,7 +845,7 @@ class Plyr {
         }
 
         // If the method is called without parameter, toggle based on current value
-        const show = utils.is.boolean(input) ? input : this.elements.container.className.indexOf(this.config.classNames.captions.active) === -1;
+        const show = utils.is.boolean(input) ? input : !this.elements.container.classList.contains(this.config.classNames.captions.active);
 
         // Nothing to change...
         if (this.captions.active === show) {
