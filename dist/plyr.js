@@ -5729,7 +5729,11 @@ var youtube = {
                             return Number(instance.getCurrentTime());
                         },
                         set: function set(time) {
+                            // Vimeo will automatically play on seek
+                            var paused = player.media.paused;
+
                             // Set seeking flag
+
                             player.media.seeking = true;
 
                             // Trigger seeking
@@ -5737,6 +5741,11 @@ var youtube = {
 
                             // Seek after events sent
                             instance.seekTo(time);
+
+                            // Restore pause state
+                            if (paused) {
+                                player.pause();
+                            }
                         }
                     });
 
@@ -6528,7 +6537,7 @@ var Plyr = function () {
         }
 
         // Set config
-        this.config = utils.extend({}, defaults, options, function () {
+        this.config = utils.extend({}, defaults, options || {}, function () {
             try {
                 return JSON.parse(_this.media.getAttribute('data-plyr-config'));
             } catch (e) {
