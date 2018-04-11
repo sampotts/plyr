@@ -177,6 +177,7 @@ const defaults = {
         captions: 'Captions',
         settings: 'Settings',
         speed: 'Speed',
+        normal: 'Normal',
         quality: 'Quality',
         loop: 'Loop',
         start: 'Start',

@@ -511,7 +511,7 @@ const controls = {
     getLabel(setting, value) {
         switch (setting) {
             case 'speed':
-                return value === 1 ? 'Normal' : `${value}&times;`;
+                return value === 1 ? i18n.get('normal', this.config) : `${value}&times;`;
 
             case 'quality':
                 if (utils.is.number(value)) {
