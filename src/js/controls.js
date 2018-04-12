@@ -725,9 +725,6 @@ const controls = {
         const toggle = !utils.is.empty(this.options.speed) && this.options.speed.length > 1;
         controls.toggleTab.call(this, type, toggle);
 
-        // Check if we need to toggle the parent
-        controls.checkMenu.call(this);
-
         // If we're hiding, nothing more to do
         if (!toggle) {
             return;
