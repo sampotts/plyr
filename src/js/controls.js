@@ -530,6 +530,7 @@ const controls = {
     // Update the selected setting
     updateSetting(setting, container, input) {
         const pane = this.elements.settings.panes[setting];
+        const tab = this.elements.settings.tabs[setting];
         let value = null;
         let list = container;
 
@@ -567,8 +568,8 @@ const controls = {
         }
 
         // Update the label
-        if (!utils.is.empty(value)) {
-            const label = this.elements.settings.tabs[setting].querySelector(`.${this.config.classNames.menu.value}`);
+        if (tab && !utils.is.empty(value)) {
+            const label = tab.querySelector(`.${this.config.classNames.menu.value}`);
             label.innerHTML = controls.getLabel.call(this, setting, value);
         }
 
