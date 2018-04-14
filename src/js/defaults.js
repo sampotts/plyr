@@ -115,7 +115,7 @@ const defaults = {
     // Captions settings
     captions: {
         active: false,
-        language: window.navigator.language.split('-')[0],
+        language: window.navigator.language ? window.navigator.language.split('-')[0] : 'en',
     },
 
     // Fullscreen settings
