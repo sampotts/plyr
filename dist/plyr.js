@@ -116,7 +116,7 @@ var defaults = {
     // Captions settings
     captions: {
         active: false,
-        language: window.navigator.language.split('-')[0]
+        language: (navigator.language || navigator.userLanguage).split('-')[0]
     },
 
     // Fullscreen settings
@@ -164,6 +164,7 @@ var defaults = {
         captions: 'Captions',
         settings: 'Settings',
         speed: 'Speed',
+        normal: 'Normal',
         quality: 'Quality',
         loop: 'Loop',
         start: 'Start',
@@ -2034,7 +2035,7 @@ var Fullscreen = function () {
             } else if (!Fullscreen.native) {
                 toggleFallback.call(this, false);
             } else if (!this.prefix) {
-                document.cancelFullScreen();
+                (document.cancelFullScreen || document.exitFullscreen).call(document);
             } else if (!utils.is.empty(this.prefix)) {
                 var action = this.prefix === 'moz' ? 'Cancel' : 'Exit';
                 document['' + this.prefix + action + this.name]();
@@ -3366,7 +3367,7 @@ var controls = {
     getLabel: function getLabel(setting, value) {
         switch (setting) {
             case 'speed':
-                return value === 1 ? 'Normal' : value + '&times;';
+                return value === 1 ? i18n.get('normal', this.config) : value + '&times;';
 
             case 'quality':
                 if (utils.is.number(value)) {
@@ -4070,7 +4071,7 @@ var controls = {
         // Inject controls HTML
         if (utils.is.element(container)) {
             target.appendChild(container);
-        } else {
+        } else if (container) {
             target.insertAdjacentHTML('beforeend', container);
         }
 
@@ -4402,6 +4403,10 @@ var Listeners = function () {
             // If autoplay, then load advertisement if required
             // TODO: Show some sort of loading state while the ad manager loads else there's a delay before ad shows
             utils.on(this.player.media, 'playing', function () {
+                if (!_this3.player.ads) {
+                    return;
+                }
+
                 // If ads are enabled, wait for them first
                 if (_this3.player.ads.enabled && !_this3.player.ads.initialized) {
                     // Wait for manager response
@@ -6941,7 +6946,7 @@ var Plyr = function () {
             }
 
             // If the method is called without parameter, toggle based on current value
-            var show = utils.is.boolean(input) ? input : this.elements.container.className.indexOf(this.config.classNames.captions.active) === -1;
+            var show = utils.is.boolean(input) ? input : !this.elements.container.classList.contains(this.config.classNames.captions.active);
 
             // Nothing to change...
             if (this.captions.active === show) {

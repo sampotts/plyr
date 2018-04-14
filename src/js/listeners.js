@@ -293,6 +293,10 @@ class Listeners {
         // If autoplay, then load advertisement if required
         // TODO: Show some sort of loading state while the ad manager loads else there's a delay before ad shows
         utils.on(this.player.media, 'playing', () => {
+            if (!this.player.ads) {
+                return;
+            }
+
             // If ads are enabled, wait for them first
             if (this.player.ads.enabled && !this.player.ads.initialized) {
                 // Wait for manager response
