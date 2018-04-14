@@ -530,6 +530,7 @@ const controls = {
     // Update the selected setting
     updateSetting(setting, container, input) {
         const pane = this.elements.settings.panes[setting];
+        const tab = this.elements.settings.tabs[setting];
         let value = null;
         let list = container;
 
@@ -567,8 +568,8 @@ const controls = {
         }
 
         // Update the label
-        if (!utils.is.empty(value)) {
-            const label = this.elements.settings.tabs[setting].querySelector(`.${this.config.classNames.menu.value}`);
+        if (tab && !utils.is.empty(value)) {
+            const label = tab.querySelector(`.${this.config.classNames.menu.value}`);
             label.innerHTML = controls.getLabel.call(this, setting, value);
         }
 
@@ -724,9 +725,6 @@ const controls = {
         // Toggle the pane and tab
         const toggle = !utils.is.empty(this.options.speed) && this.options.speed.length > 1;
         controls.toggleTab.call(this, type, toggle);
-
-        // Check if we need to toggle the parent
-        controls.checkMenu.call(this);
 
         // If we're hiding, nothing more to do
         if (!toggle) {

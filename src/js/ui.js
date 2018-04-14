@@ -93,6 +93,9 @@ const ui = {
 
         // Set the title
         ui.setTitle.call(this);
+
+        // Check if we should show the settings icon
+        controls.checkMenu.call(this);
     },
 
     // Setup aria attribute for play and iframe title
