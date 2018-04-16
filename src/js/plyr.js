@@ -213,7 +213,7 @@
                 fullscreen: null
             },
             // Events to watch on HTML5 media elements
-            events: ['ready', 'ended', 'progress', 'stalled', 'playing', 'waiting', 'canplay', 'canplaythrough', 'loadstart', 'loadeddata', 'loadedmetadata', 'timeupdate', 'volumechange', 'play', 'pause', 'error', 'beforeseeking', 'seeking', 'seeked', 'emptied', 'qualitychanged'],
+            events: ['ready', 'ended', 'progress', 'stalled', 'playing', 'waiting', 'canplay', 'canplaythrough', 'loadstart', 'loadeddata', 'loadedmetadata', 'timeupdate', 'volumechange', 'play', 'pause', 'error', 'beforeseeking', 'seeking', 'seeked', 'emptied', 'qualitychanged', 'controlshidden', 'controlsshown'],
             // Logging
             logPrefix: '[Plyr]'
         };
@@ -390,6 +390,23 @@
     // Get a classname from selector
     function _getClassname(selector) {
         return selector.replace('.', '');
+    }
+
+    // Trigger event
+    function _dispatchEvent(element, type = '', bubbles = false, detail = {}) {
+        // Bail if no element
+        if (!element || _is.empty(type)) {
+            return;
+        }
+
+        // Create and dispatch the event
+        const event = new CustomEvent(type, {
+            bubbles,
+            detail,
+        });
+
+        // Dispatch the event
+        element.dispatchEvent(event);
     }
 
     // Toggle class on an element
@@ -3419,6 +3436,7 @@
             // If the mouse is not over the controls, set a timeout to hide them
             if (show || plyr.media.paused || loading) {
                 _toggleClass(plyr.container, config.classes.hideControls, false);
+                _dispatchEvent.call(plyr, plyr.media, 'controlsshown');
 
                 // Always show controls when paused or if touch
                 if (plyr.media.paused || loading) {
@@ -3441,6 +3459,7 @@
                     }
 
                     _toggleClass(plyr.container, config.classes.hideControls, true);
+                    _dispatchEvent.call(plyr, plyr.media, 'controlshidden');
                 }, delay);
             }
         }
