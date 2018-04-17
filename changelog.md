@@ -1,3 +1,13 @@
+## v3.1.1
+
+*   Fullscreen fixes (thanks @friday)
+*   Menu fix for if speed not in config
+*   Menu z-index fix (thanks @danielsarin)
+*   i18n fix for missing "Normal" string (thanks @danielsarin)
+*   Safer check for active caption (thanks @Antonio-Laguna)
+*   Add custom property fallback (thanks @friday)
+*   Fixed bug for captions with no srclang and labels and improved logic (fixes #875)
+
 ## v3.1.0
 
 *   Styling fixes

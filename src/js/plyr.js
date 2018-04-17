@@ -97,6 +97,7 @@ class Plyr {
         this.options = {
             speed: [],
             quality: [],
+            captions: [],
         };
 
         // Debugging
@@ -875,16 +876,28 @@ class Plyr {
             return;
         }
 
-        // Toggle captions based on input
-        this.toggleCaptions(!utils.is.empty(input));
-
         // If empty string is passed, assume disable captions
         if (utils.is.empty(input)) {
+            this.toggleCaptions(false);
             return;
         }
 
         // Normalize
         const language = input.toLowerCase();
+
+        // Check for support
+        if (!this.options.captions.includes(language)) {
+            this.debug.warn(`Unsupported language option: ${language}`);
+            return;
+        }
+
+        // Ensure captions are enabled
+        this.toggleCaptions(true);
+
+        // Enabled only
+        if (language === 'enabled') {
+            return;
+        }
 
         // If nothing to change, bail
         if (this.language === language) {

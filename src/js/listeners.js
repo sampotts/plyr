@@ -2,7 +2,6 @@
 // Plyr Event Listeners
 // ==========================================================================
 
-import support from './support';
 import utils from './utils';
 import controls from './controls';
 import ui from './ui';

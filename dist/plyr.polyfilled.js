@@ -6112,6 +6112,7 @@ var defaults = {
         all: 'All',
         reset: 'Reset',
         disabled: 'Disabled',
+        enabled: 'Enabled',
         advertisement: 'Ad'
     },
 
@@ -8064,6 +8065,36 @@ var Fullscreen = function () {
 
 // ==========================================================================
 
+var i18n = {
+    get: function get() {
+        var key = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+        var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+        if (utils.is.empty(key) || utils.is.empty(config) || !Object.keys(config.i18n).includes(key)) {
+            return '';
+        }
+
+        var string = config.i18n[key];
+
+        var replace = {
+            '{seektime}': config.seekTime,
+            '{title}': config.title
+        };
+
+        Object.entries(replace).forEach(function (_ref) {
+            var _ref2 = slicedToArray(_ref, 2),
+                key = _ref2[0],
+                value = _ref2[1];
+
+            string = utils.replaceAll(string, key, value);
+        });
+
+        return string;
+    }
+};
+
+// ==========================================================================
+
 var captions = {
     // Setup captions
     setup: function setup() {
@@ -8103,6 +8134,7 @@ var captions = {
 
             return;
         }
+
         // Inject the container
         if (!utils.is.element(this.elements.captions)) {
             this.elements.captions = utils.createElement('div', utils.getAttributesFromSelector(this.config.selectors.captions));
@@ -8207,9 +8239,54 @@ var captions = {
     getCurrentTrack: function getCurrentTrack() {
         var _this2 = this;
 
-        return captions.getTracks.call(this).find(function (track) {
+        var tracks = captions.getTracks.call(this);
+
+        if (!tracks.length) {
+            return null;
+        }
+
+        // Get track based on current language
+        var track = tracks.find(function (track) {
             return track.language.toLowerCase() === _this2.language;
         });
+
+        // Get the <track> with default attribute
+        if (!track) {
+            track = utils.getElement.call(this, 'track[default]');
+        }
+
+        // Get the first track
+        if (!track) {
+            var _tracks = slicedToArray(tracks, 1);
+
+            track = _tracks[0];
+        }
+
+        return track;
+    },
+
+
+    // Get UI label for track
+    getLabel: function getLabel(track) {
+        var currentTrack = track;
+
+        if (!utils.is.track(currentTrack) && support.textTracks && this.captions.active) {
+            currentTrack = captions.getCurrentTrack.call(this);
+        }
+
+        if (utils.is.track(currentTrack)) {
+            if (!utils.is.empty(currentTrack.label)) {
+                return currentTrack.label;
+            }
+
+            if (!utils.is.empty(currentTrack.language)) {
+                return track.language.toUpperCase();
+            }
+
+            return i18n.get('enabled', this.config);
+        }
+
+        return i18n.get('disabled', this.config);
     },
 
 
@@ -8290,36 +8367,6 @@ var captions = {
             utils.toggleClass(this.elements.container, this.config.classNames.captions.active, true);
             utils.toggleState(this.elements.buttons.captions, true);
         }
-    }
-};
-
-// ==========================================================================
-
-var i18n = {
-    get: function get() {
-        var key = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-        var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-        if (utils.is.empty(key) || utils.is.empty(config) || !Object.keys(config.i18n).includes(key)) {
-            return '';
-        }
-
-        var string = config.i18n[key];
-
-        var replace = {
-            '{seektime}': config.seekTime,
-            '{title}': config.title
-        };
-
-        Object.entries(replace).forEach(function (_ref) {
-            var _ref2 = slicedToArray(_ref, 2),
-                key = _ref2[0],
-                value = _ref2[1];
-
-            string = utils.replaceAll(string, key, value);
-        });
-
-        return string;
     }
 };
 
@@ -9245,6 +9292,9 @@ var controls = {
         var toggle = !utils.is.empty(this.options.quality) && this.options.quality.length > 1;
         controls.toggleTab.call(this, type, toggle);
 
+        // Check if we need to toggle the parent
+        controls.checkMenu.call(this);
+
         // If we're hiding, nothing more to do
         if (!toggle) {
             return;
@@ -9307,10 +9357,11 @@ var controls = {
                 if (utils.is.number(value)) {
                     return value + 'p';
                 }
+
                 return utils.toTitleCase(value);
 
             case 'captions':
-                return controls.getLanguage.call(this);
+                return captions.getLabel.call(this);
 
             default:
                 return null;
@@ -9326,7 +9377,18 @@ var controls = {
 
         switch (setting) {
             case 'captions':
-                value = this.captions.active ? this.captions.language : i18n.get('disabled', this.config);
+                if (this.captions.active) {
+                    if (this.options.captions.length > 2 || !this.options.captions.some(function (lang) {
+                        return lang === 'enabled';
+                    })) {
+                        value = this.captions.language;
+                    } else {
+                        value = 'enabled';
+                    }
+                } else {
+                    value = '';
+                }
+
                 break;
 
             default:
@@ -9358,16 +9420,13 @@ var controls = {
         }
 
         // Update the label
-        if (!utils.is.empty(value)) {
-            var label = this.elements.settings.tabs[setting].querySelector('.' + this.config.classNames.menu.value);
-            label.innerHTML = controls.getLabel.call(this, setting, value);
-        }
+        var label = this.elements.settings.tabs[setting].querySelector('.' + this.config.classNames.menu.value);
+        label.innerHTML = controls.getLabel.call(this, setting, value);
 
-        // Find the radio option
+        // Find the radio option and check it
         var target = list && list.querySelector('input[value="' + value + '"]');
 
         if (utils.is.element(target)) {
-            // Check it
             target.checked = true;
         }
     },
@@ -9411,21 +9470,6 @@ var controls = {
 
     // Get current selected caption language
     // TODO: rework this to user the getter in the API?
-    getLanguage: function getLanguage() {
-        if (!this.supported.ui) {
-            return null;
-        }
-
-        if (support.textTracks && captions.getTracks.call(this).length && this.captions.active) {
-            var currentTrack = captions.getCurrentTrack.call(this);
-
-            if (utils.is.track(currentTrack)) {
-                return currentTrack.label;
-            }
-        }
-
-        return i18n.get('disabled', this.config);
-    },
 
 
     // Set a list of available captions languages
@@ -9443,6 +9487,9 @@ var controls = {
         // Empty the menu
         utils.emptyElement(list);
 
+        // Check if we need to toggle the parent
+        controls.checkMenu.call(this);
+
         // If there's no captions, bail
         if (!toggle) {
             return;
@@ -9451,8 +9498,8 @@ var controls = {
         // Re-map the tracks into just the data we need
         var tracks = captions.getTracks.call(this).map(function (track) {
             return {
-                language: track.language,
-                label: !utils.is.empty(track.label) ? track.label : track.language.toUpperCase()
+                language: !utils.is.empty(track.language) ? track.language : 'enabled',
+                label: captions.getLabel.call(_this3, track)
             };
         });
 
@@ -9464,7 +9511,12 @@ var controls = {
 
         // Generate options
         tracks.forEach(function (track) {
-            controls.createMenuItem.call(_this3, track.language, list, 'language', track.label || track.language, controls.createBadge.call(_this3, track.language.toUpperCase()), track.language.toLowerCase() === _this3.captions.language.toLowerCase());
+            controls.createMenuItem.call(_this3, track.language, list, 'language', track.label, track.language !== 'enabled' ? controls.createBadge.call(_this3, track.language.toUpperCase()) : null, track.language.toLowerCase() === _this3.captions.language.toLowerCase());
+        });
+
+        // Store reference
+        this.options.captions = tracks.map(function (track) {
+            return track.language;
         });
 
         controls.updateSetting.call(this, type, list);
@@ -9983,7 +10035,7 @@ var controls = {
                 seektime: this.config.seekTime,
                 speed: this.speed,
                 quality: this.quality,
-                captions: controls.getLanguage.call(this)
+                captions: captions.getLabel.call(this)
                 // TODO: Looping
                 // loop: 'None',
             });
@@ -12513,7 +12565,8 @@ var Plyr = function () {
         // Options
         this.options = {
             speed: [],
-            quality: []
+            quality: [],
+            captions: []
         };
 
         // Debugging
@@ -13676,16 +13729,28 @@ var Plyr = function () {
                 return;
             }
 
-            // Toggle captions based on input
-            this.toggleCaptions(!utils.is.empty(input));
-
             // If empty string is passed, assume disable captions
             if (utils.is.empty(input)) {
+                this.toggleCaptions(false);
                 return;
             }
 
             // Normalize
             var language = input.toLowerCase();
+
+            // Check for support
+            if (!this.options.captions.includes(language)) {
+                this.debug.warn('Unsupported language option: ' + language);
+                return;
+            }
+
+            // Ensure captions are enabled
+            this.toggleCaptions(true);
+
+            // Enabled only
+            if (language === 'enabled') {
+                return;
+            }
 
             // If nothing to change, bail
             if (this.language === language) {

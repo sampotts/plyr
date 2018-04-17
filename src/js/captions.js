@@ -6,6 +6,7 @@
 import support from './support';
 import utils from './utils';
 import controls from './controls';
+import i18n from './i18n';
 
 const captions = {
     // Setup captions
@@ -46,6 +47,7 @@ const captions = {
 
             return;
         }
+
         // Inject the container
         if (!utils.is.element(this.elements.captions)) {
             this.elements.captions = utils.createElement('div', utils.getAttributesFromSelector(this.config.selectors.captions));
@@ -148,7 +150,49 @@ const captions = {
 
     // Get the current track for the current language
     getCurrentTrack() {
-        return captions.getTracks.call(this).find(track => track.language.toLowerCase() === this.language);
+        const tracks = captions.getTracks.call(this);
+
+        if (!tracks.length) {
+            return null;
+        }
+
+        // Get track based on current language
+        let track = tracks.find(track => track.language.toLowerCase() === this.language);
+
+        // Get the <track> with default attribute
+        if (!track) {
+            track = utils.getElement.call(this, 'track[default]');
+        }
+
+        // Get the first track
+        if (!track) {
+            [track] = tracks;
+        }
+
+        return track;
+    },
+
+    // Get UI label for track
+    getLabel(track) {
+        let currentTrack = track;
+
+        if (!utils.is.track(currentTrack) && support.textTracks && this.captions.active) {
+            currentTrack = captions.getCurrentTrack.call(this);
+        }
+
+        if (utils.is.track(currentTrack)) {
+            if (!utils.is.empty(currentTrack.label)) {
+                return currentTrack.label;
+            }
+
+            if (!utils.is.empty(currentTrack.language)) {
+                return track.language.toUpperCase();
+            }
+
+            return i18n.get('enabled', this.config);
+        }
+
+        return i18n.get('disabled', this.config);
     },
 
     // Display active caption if it contains text

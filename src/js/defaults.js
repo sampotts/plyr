@@ -185,6 +185,7 @@ const defaults = {
         all: 'All',
         reset: 'Reset',
         disabled: 'Disabled',
+        enabled: 'Enabled',
         advertisement: 'Ad',
     },
 
