@@ -250,11 +250,6 @@ const captions = {
 
     // Display captions container and button (for initialization)
     show() {
-        // If there's no caption toggle, bail
-        if (!utils.is.element(this.elements.buttons.captions)) {
-            return;
-        }
-
         // Try to load the value from storage
         let active = this.storage.get('captions');
 
