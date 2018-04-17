@@ -4020,6 +4020,7 @@ singleton.Client = Client;
                 tooltips: {
                     controls: true
                 },
+                settings: ['captions'],
                 /* controls: [
                     'play-large',
                     'restart',

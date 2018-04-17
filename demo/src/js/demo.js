@@ -57,6 +57,7 @@ import Raven from 'raven-js';
                 tooltips: {
                     controls: true,
                 },
+                settings: ['captions'],
                 /* controls: [
                     'play-large',
                     'restart',

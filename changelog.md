@@ -7,6 +7,7 @@
 *   Safer check for active caption (thanks @Antonio-Laguna)
 *   Add custom property fallback (thanks @friday)
 *   Fixed bug for captions with no srclang and labels and improved logic (fixes #875)
+*   Fix for `playing` false positive
 
 ## v3.1.0
 

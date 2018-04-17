@@ -369,7 +369,7 @@ class Plyr {
      * Get playing state
      */
     get playing() {
-        return Boolean(!this.paused && !this.ended && (this.isHTML5 ? this.media.readyState > 2 : true));
+        return Boolean(this.ready && !this.paused && !this.ended && (this.isHTML5 ? this.media.readyState > 2 : true));
     }
 
     /**

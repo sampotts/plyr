@@ -13292,7 +13292,7 @@ var Plyr = function () {
     }, {
         key: 'playing',
         get: function get() {
-            return Boolean(!this.paused && !this.ended && (this.isHTML5 ? this.media.readyState > 2 : true));
+            return Boolean(this.ready && !this.paused && !this.ended && (this.isHTML5 ? this.media.readyState > 2 : true));
         }
 
         /**
