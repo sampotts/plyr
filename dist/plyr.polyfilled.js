@@ -7638,16 +7638,16 @@ var support = {
 
     // Check for support
     // Basic functionality vs full UI
-    check: function check(type, provider, inline) {
+    check: function check(type, provider, playsinline) {
         var api = false;
         var ui = false;
         var browser = utils.getBrowser();
-        var playsInline = browser.isIPhone && inline && support.inline;
+        var canPlayInline = browser.isIPhone && playsinline && support.playsinline;
 
         switch (provider + ':' + type) {
             case 'html5:video':
                 api = support.video;
-                ui = api && support.rangeInput && (!browser.isIPhone || playsInline);
+                ui = api && support.rangeInput && (!browser.isIPhone || canPlayInline);
                 break;
 
             case 'html5:audio':
@@ -7658,7 +7658,7 @@ var support = {
             case 'youtube:video':
             case 'vimeo:video':
                 api = true;
-                ui = support.rangeInput && (!browser.isIPhone || playsInline);
+                ui = support.rangeInput && (!browser.isIPhone || canPlayInline);
                 break;
 
             default:
@@ -7686,7 +7686,7 @@ var support = {
 
     // Inline playback support
     // https://webkit.org/blog/6784/new-video-policies-for-ios/
-    inline: 'playsInline' in document.createElement('video'),
+    playsinline: 'playsInline' in document.createElement('video'),
 
     // Check for mime type support against a player instance
     // Credits: http://diveintohtml5.info/everything.html
@@ -9417,6 +9417,11 @@ var controls = {
         // Get the list if we need to
         if (!utils.is.element(list)) {
             list = pane && pane.querySelector('ul');
+        }
+
+        // If there's no list it means it's not been rendered...
+        if (!utils.is.element(list)) {
+            return;
         }
 
         // Update the label
@@ -11974,10 +11979,14 @@ var vimeo = {
     setAspectRatio: function setAspectRatio(input) {
         var ratio = utils.is.string(input) ? input.split(':') : this.config.ratio.split(':');
         var padding = 100 / ratio[0] * ratio[1];
-        var height = 240;
-        var offset = (height - padding) / (height / 50);
         this.elements.wrapper.style.paddingBottom = padding + '%';
-        this.media.style.transform = 'translateY(-' + offset + '%)';
+
+        if (this.supported.ui) {
+            var height = 240;
+            var offset = (height - padding) / (height / 50);
+
+            this.media.style.transform = 'translateY(-' + offset + '%)';
+        }
     },
 
 
@@ -11996,7 +12005,8 @@ var vimeo = {
             title: false,
             speed: true,
             transparent: 0,
-            gesture: 'media'
+            gesture: 'media',
+            playsinline: !this.config.fullscreen.iosNative
         };
         var params = utils.buildUrlParams(options);
 
@@ -12029,6 +12039,11 @@ var vimeo = {
 
         player.media.paused = true;
         player.media.currentTime = 0;
+
+        // Disable native text track rendering
+        if (player.supported.ui) {
+            player.embed.disableTextTrack();
+        }
 
         // Create a faux HTML5 API using the Vimeo API
         player.media.play = function () {
@@ -12399,7 +12414,7 @@ var source = {
             _this2.provider = !utils.is.empty(input.sources[0].provider) ? input.sources[0].provider : providers.html5;
 
             // Check for support
-            _this2.supported = support.check(_this2.type, _this2.provider, _this2.config.inline);
+            _this2.supported = support.check(_this2.type, _this2.provider, _this2.config.playsinline);
 
             // Create new markup
             switch (_this2.provider + ':' + _this2.type) {
@@ -12447,7 +12462,7 @@ var source = {
                 if (_this2.config.muted) {
                     _this2.media.setAttribute('muted', '');
                 }
-                if (_this2.config.inline) {
+                if (_this2.config.playsinline) {
                     _this2.media.setAttribute('playsinline', '');
                 }
             }
@@ -12651,11 +12666,16 @@ var Plyr = function () {
                         if (truthy.includes(params.autoplay)) {
                             this.config.autoplay = true;
                         }
-                        if (truthy.includes(params.playsinline)) {
-                            this.config.inline = true;
-                        }
                         if (truthy.includes(params.loop)) {
                             this.config.loop.active = true;
+                        }
+
+                        // TODO: replace fullscreen.iosNative with this playsinline config option
+                        // YouTube requires the playsinline in the URL
+                        if (this.isYouTube) {
+                            this.config.playsinline = truthy.includes(params.playsinline);
+                        } else {
+                            this.config.playsinline = true;
                         }
                     }
                 } else {
@@ -12690,7 +12710,7 @@ var Plyr = function () {
                     this.config.autoplay = true;
                 }
                 if (this.media.hasAttribute('playsinline')) {
-                    this.config.inline = true;
+                    this.config.playsinline = true;
                 }
                 if (this.media.hasAttribute('muted')) {
                     this.config.muted = true;
@@ -12707,7 +12727,7 @@ var Plyr = function () {
         }
 
         // Check for support again but with type
-        this.supported = support.check(this.type, this.provider, this.config.inline);
+        this.supported = support.check(this.type, this.provider, this.config.playsinline);
 
         // If no support for even API, bail
         if (!this.supported.api) {

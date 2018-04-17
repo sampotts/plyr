@@ -3,14 +3,12 @@
 // YouTube, Vimeo, etc
 // --------------------------------------------------------------
 
-.plyr__video-embed {
-    // Default to 16:9 ratio but this is set by JavaScript based on config
-    $padding: ((100 / 16) * 9);
-    $height: 240;
-    $offset: to-percentage(($height - $padding) / ($height / 50));
+// Default to 16:9 ratio but this is set by JavaScript based on config
+$embed-padding: ((100 / 16) * 9);
 
+.plyr__video-embed {
     height: 0;
-    padding-bottom: to-percentage($padding);
+    padding-bottom: to-percentage($embed-padding);
     position: relative;
 
     iframe {
@@ -22,6 +20,17 @@
         user-select: none;
         width: 100%;
     }
+}
+
+// If the full custom UI is supported
+.plyr--full-ui .plyr__video-embed {
+    $height: 240;
+    $offset: to-percentage(($height - $embed-padding) / ($height / 50));
+
+    // To allow mouse events to be captured if full support
+    iframe {
+        pointer-events: none;
+    }
 
     // Vimeo hack
     > div {
@@ -29,8 +38,4 @@
         position: relative;
         transform: translateY(-$offset);
     }
-}
-// To allow mouse events to be captured if full support
-.plyr--full-ui .plyr__video-embed iframe {
-    pointer-events: none;
 }

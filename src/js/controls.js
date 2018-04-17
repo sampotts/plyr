@@ -581,6 +581,11 @@ const controls = {
             list = pane && pane.querySelector('ul');
         }
 
+        // If there's no list it means it's not been rendered...
+        if (!utils.is.element(list)) {
+            return;
+        }
+
         // Update the label
         const label = this.elements.settings.tabs[setting].querySelector(`.${this.config.classNames.menu.value}`);
         label.innerHTML = controls.getLabel.call(this, setting, value);

@@ -1,4 +1,4 @@
-## v3.1.1
+## v3.2.0
 
 *   Fullscreen fixes (thanks @friday)
 *   Menu fix for if speed not in config
@@ -7,7 +7,10 @@
 *   Safer check for active caption (thanks @Antonio-Laguna)
 *   Add custom property fallback (thanks @friday)
 *   Fixed bug for captions with no srclang and labels and improved logic (fixes #875)
-*   Fix for `playing` false positive
+*   Fix for `playing` false positive (fixes #898)
+*   Fix for IE issue with navigator.language (thanks @nicolasthy) (fixes #893)
+*   Fix for Vimeo controls missing on iOS (thanks @verde-io) (fixes #807)
+*   Fix for double vimeo caption rendering (fixes #877)
 
 ## v3.1.0
 

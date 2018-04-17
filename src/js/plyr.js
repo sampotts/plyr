@@ -185,11 +185,16 @@ class Plyr {
                         if (truthy.includes(params.autoplay)) {
                             this.config.autoplay = true;
                         }
-                        if (truthy.includes(params.playsinline)) {
-                            this.config.inline = true;
-                        }
                         if (truthy.includes(params.loop)) {
                             this.config.loop.active = true;
+                        }
+
+                        // TODO: replace fullscreen.iosNative with this playsinline config option
+                        // YouTube requires the playsinline in the URL
+                        if (this.isYouTube) {
+                            this.config.playsinline = truthy.includes(params.playsinline);
+                        } else {
+                            this.config.playsinline = true;
                         }
                     }
                 } else {
@@ -224,7 +229,7 @@ class Plyr {
                     this.config.autoplay = true;
                 }
                 if (this.media.hasAttribute('playsinline')) {
-                    this.config.inline = true;
+                    this.config.playsinline = true;
                 }
                 if (this.media.hasAttribute('muted')) {
                     this.config.muted = true;
@@ -241,7 +246,7 @@ class Plyr {
         }
 
         // Check for support again but with type
-        this.supported = support.check(this.type, this.provider, this.config.inline);
+        this.supported = support.check(this.type, this.provider, this.config.playsinline);
 
         // If no support for even API, bail
         if (!this.supported.api) {

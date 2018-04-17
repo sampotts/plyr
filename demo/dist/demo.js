@@ -4010,7 +4010,7 @@ singleton.Client = Client;
             });
 
             // Setup the player
-            var player = new Plyr('video', {
+            var player = new Plyr('#player', {
                 debug: true,
                 title: 'View From A Blue Moon',
                 iconUrl: '../dist/plyr.svg',
@@ -4020,7 +4020,6 @@ singleton.Client = Client;
                 tooltips: {
                     controls: true
                 },
-                settings: ['captions'],
                 /* controls: [
                     'play-large',
                     'restart',
