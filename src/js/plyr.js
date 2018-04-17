@@ -845,8 +845,8 @@ class Plyr {
      * @param {boolean} input - Whether to enable captions
      */
     toggleCaptions(input) {
-        // If there's no full support, or there's no caption toggle
-        if (!this.supported.ui || !utils.is.element(this.elements.buttons.captions)) {
+        // If there's no full support
+        if (!this.supported.ui) {
             return;
         }
 
