@@ -452,7 +452,7 @@ class Plyr {
         }
 
         // Set
-        this.media.currentTime = parseFloat(targetTime.toFixed(4));
+        this.media.currentTime = targetTime;
 
         // Logging
         this.debug.log(`Seeking to ${this.currentTime} seconds`);
@@ -498,7 +498,7 @@ class Plyr {
      */
     get duration() {
         // Faux duration set via config
-        const fauxDuration = parseInt(this.config.duration, 10);
+        const fauxDuration = parseFloat(this.config.duration);
 
         // True duration
         const realDuration = this.media ? Number(this.media.duration) : 0;

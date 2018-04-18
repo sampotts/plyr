@@ -77,7 +77,7 @@ var defaults = {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.1.0/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.2.0/plyr.svg',
 
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
@@ -2940,16 +2940,20 @@ var browser$1 = utils.getBrowser();
 var controls = {
     // Webkit polyfill for lower fill range
     updateRangeFill: function updateRangeFill(target) {
-        // WebKit only
-        if (!browser$1.isWebkit) {
-            return;
-        }
 
         // Get range from event if event passed
         var range = utils.is.event(target) ? target.target : target;
 
         // Needs to be a valid <input type='range'>
         if (!utils.is.element(range) || range.getAttribute('type') !== 'range') {
+            return;
+        }
+
+        // Set aria value for https://github.com/sampotts/plyr/issues/905
+        range.setAttribute('aria-valuenow', range.value);
+
+        // WebKit only
+        if (!browser$1.isWebkit) {
             return;
         }
 
@@ -3158,6 +3162,7 @@ var controls = {
         // Seek label
         var label = utils.createElement('label', {
             for: attributes.id,
+            id: attributes.id + '-label',
             class: this.config.classNames.hidden
         }, i18n.get(type, this.config));
 
@@ -3168,7 +3173,13 @@ var controls = {
             max: 100,
             step: 0.01,
             value: 0,
-            autocomplete: 'off'
+            autocomplete: 'off',
+            // A11y fixes for https://github.com/sampotts/plyr/issues/905
+            role: 'slider',
+            'aria-labelledby': attributes.id + '-label',
+            'aria-valuemin': 0,
+            'aria-valuemax': 100,
+            'aria-valuenow': 0
         }, attributes));
 
         this.elements.inputs[type] = input;
@@ -6149,7 +6160,9 @@ var vimeo = {
                 utils.dispatchEvent.call(player, player.media, 'seeking');
 
                 // Seek after events
-                player.embed.setCurrentTime(time);
+                player.embed.setCurrentTime(time).catch(function () {
+                    // Do nothing
+                });
 
                 // Restore pause state
                 if (paused) {
@@ -6329,6 +6342,15 @@ var vimeo = {
             if (parseInt(data.percent, 10) === 1) {
                 utils.dispatchEvent.call(player, player.media, 'canplaythrough');
             }
+
+            // Get duration as if we do it before load, it gives an incorrect value
+            // https://github.com/sampotts/plyr/issues/891
+            player.embed.getDuration().then(function (value) {
+                if (value !== player.media.duration) {
+                    player.media.duration = value;
+                    utils.dispatchEvent.call(player, player.media, 'durationchange');
+                }
+            });
         });
 
         player.embed.on('seeked', function () {
@@ -7407,7 +7429,7 @@ var Plyr = function () {
             }
 
             // Set
-            this.media.currentTime = parseFloat(targetTime.toFixed(4));
+            this.media.currentTime = targetTime;
 
             // Logging
             this.debug.log('Seeking to ' + this.currentTime + ' seconds');
@@ -7464,7 +7486,7 @@ var Plyr = function () {
         key: 'duration',
         get: function get$$1() {
             // Faux duration set via config
-            var fauxDuration = parseInt(this.config.duration, 10);
+            var fauxDuration = parseFloat(this.config.duration);
 
             // True duration
             var realDuration = this.media ? Number(this.media.duration) : 0;

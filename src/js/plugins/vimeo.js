@@ -134,7 +134,9 @@ const vimeo = {
                 utils.dispatchEvent.call(player, player.media, 'seeking');
 
                 // Seek after events
-                player.embed.setCurrentTime(time);
+                player.embed.setCurrentTime(time).catch(() => {
+                    // Do nothing
+                });
 
                 // Restore pause state
                 if (paused) {
@@ -320,6 +322,15 @@ const vimeo = {
             if (parseInt(data.percent, 10) === 1) {
                 utils.dispatchEvent.call(player, player.media, 'canplaythrough');
             }
+
+            // Get duration as if we do it before load, it gives an incorrect value
+            // https://github.com/sampotts/plyr/issues/891
+            player.embed.getDuration().then(value => {
+                if (value !== player.media.duration) {
+                    player.media.duration = value;
+                    utils.dispatchEvent.call(player, player.media, 'durationchange');
+                }
+            });
         });
 
         player.embed.on('seeked', () => {

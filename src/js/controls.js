@@ -15,16 +15,21 @@ const browser = utils.getBrowser();
 const controls = {
     // Webkit polyfill for lower fill range
     updateRangeFill(target) {
-        // WebKit only
-        if (!browser.isWebkit) {
-            return;
-        }
+
 
         // Get range from event if event passed
         const range = utils.is.event(target) ? target.target : target;
 
         // Needs to be a valid <input type='range'>
         if (!utils.is.element(range) || range.getAttribute('type') !== 'range') {
+            return;
+        }
+
+        // Set aria value for https://github.com/sampotts/plyr/issues/905
+        range.setAttribute('aria-valuenow', range.value);
+
+        // WebKit only
+        if (!browser.isWebkit) {
             return;
         }
 
@@ -238,6 +243,7 @@ const controls = {
             'label',
             {
                 for: attributes.id,
+                id: `${attributes.id}-label`,
                 class: this.config.classNames.hidden,
             },
             i18n.get(type, this.config),
@@ -255,6 +261,12 @@ const controls = {
                     step: 0.01,
                     value: 0,
                     autocomplete: 'off',
+                    // A11y fixes for https://github.com/sampotts/plyr/issues/905
+                    role: 'slider',
+                    'aria-labelledby': `${attributes.id}-label`,
+                    'aria-valuemin': 0,
+                    'aria-valuemax': 100,
+                    'aria-valuenow': 0,
                 },
                 attributes,
             ),
