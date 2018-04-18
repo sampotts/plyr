@@ -8036,7 +8036,7 @@ var Fullscreen = function () {
         get: function get() {
             // No prefix
             if (utils.is.function(document.exitFullscreen)) {
-                return false;
+                return '';
             }
 
             // Check for fullscreen support by vendor prefix
@@ -8348,11 +8348,6 @@ var captions = {
 
     // Display captions container and button (for initialization)
     show: function show() {
-        // If there's no caption toggle, bail
-        if (!utils.is.element(this.elements.buttons.captions)) {
-            return;
-        }
-
         // Try to load the value from storage
         var active = this.storage.get('captions');
 
@@ -12969,8 +12964,8 @@ var Plyr = function () {
          * @param {boolean} input - Whether to enable captions
          */
         value: function toggleCaptions(input) {
-            // If there's no full support, or there's no caption toggle
-            if (!this.supported.ui || !utils.is.element(this.elements.buttons.captions)) {
+            // If there's no full support
+            if (!this.supported.ui) {
                 return;
             }
 
