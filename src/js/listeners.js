@@ -334,7 +334,7 @@ class Listeners {
         // Disable right click
         if (this.player.supported.ui && this.player.config.disableContextMenu) {
             utils.on(
-                this.player.media,
+                this.player.elements.wrapper,
                 'contextmenu',
                 event => {
                     event.preventDefault();

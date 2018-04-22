@@ -57,6 +57,7 @@ const controls = {
             icon,
             utils.extend(attributes, {
                 role: 'presentation',
+                focusable: 'false',
             }),
         );
 
@@ -293,6 +294,8 @@ const controls = {
                     min: 0,
                     max: 100,
                     value: 0,
+                    role: 'presentation',
+                    'aria-hidden': true,
                 },
                 attributes,
             ),

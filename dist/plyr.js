@@ -2975,7 +2975,8 @@ var controls = {
         // Create <svg>
         var icon = document.createElementNS(namespace, 'svg');
         utils.setAttributes(icon, utils.extend(attributes, {
-            role: 'presentation'
+            role: 'presentation',
+            focusable: 'false'
         }));
 
         // Create the <use> to reference sprite
@@ -3194,7 +3195,9 @@ var controls = {
         var progress = utils.createElement('progress', utils.extend(utils.getAttributesFromSelector(this.config.selectors.display[type]), {
             min: 0,
             max: 100,
-            value: 0
+            value: 0,
+            role: 'presentation',
+            'aria-hidden': true
         }, attributes));
 
         // Create the label inside
@@ -4511,7 +4514,7 @@ var Listeners = function () {
 
             // Disable right click
             if (this.player.supported.ui && this.player.config.disableContextMenu) {
-                utils.on(this.player.media, 'contextmenu', function (event) {
+                utils.on(this.player.elements.wrapper, 'contextmenu', function (event) {
                     event.preventDefault();
                 }, false);
             }
