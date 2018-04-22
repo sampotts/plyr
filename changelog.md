@@ -1,3 +1,9 @@
+## v3.2.1
+
+*   Accessibility improvements for the controls (part of #905 fixes)
+*   Fix for context menu showing on YouTube (thanks Anthony Recenello in Slack)
+*   Vimeo fix for their API not returning the right duration until playback begins (fixes #891)
+
 ## v3.2.0
 
 *   Fullscreen fixes (thanks @friday)
