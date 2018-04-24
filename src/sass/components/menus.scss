@@ -1,0 +1,197 @@
+// --------------------------------------------------------------
+// Menus
+// --------------------------------------------------------------
+
+.plyr__menu {
+    display: flex; // Edge fix
+    position: relative;
+
+    // Animate the icon
+    .plyr__control svg {
+        transition: transform 0.3s ease;
+    }
+    .plyr__control[aria-expanded='true'] {
+        svg {
+            transform: rotate(90deg);
+        }
+
+        // Hide tooltip
+        .plyr__tooltip {
+            display: none;
+        }
+    }
+
+    // The actual menu container
+    &__container {
+        animation: plyr-popup 0.2s ease;
+        background: $plyr-menu-bg;
+        border-radius: 4px;
+        bottom: 100%;
+        box-shadow: $plyr-menu-shadow;
+        color: $plyr-menu-color;
+        font-size: $plyr-font-size-base;
+        margin-bottom: 10px;
+        position: absolute;
+        right: -3px;
+        text-align: left;
+        white-space: nowrap;
+        z-index: 3;
+
+        > div {
+            overflow: hidden;
+            transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1), width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        // Arrow
+        &::after {
+            border: 4px solid transparent;
+            border-top-color: $plyr-menu-bg;
+            content: '';
+            height: 0;
+            position: absolute;
+            right: 15px;
+            top: 100%;
+            width: 0;
+        }
+
+        ul {
+            list-style: none;
+            margin: 0;
+            overflow: hidden;
+            padding: $plyr-control-padding;
+
+            li {
+                margin-top: 2px;
+
+                &:first-child {
+                    margin-top: 0;
+                }
+            }
+        }
+
+        // Options
+        .plyr__control {
+            align-items: center;
+            color: $plyr-menu-color;
+            display: flex;
+            font-size: $plyr-font-size-menu;
+            padding: ceil($plyr-control-padding / 2) ($plyr-control-padding * 2);
+            user-select: none;
+            width: 100%;
+
+            &::after {
+                border: 4px solid transparent;
+                content: '';
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+            }
+
+            &--forward {
+                padding-right: ceil($plyr-control-padding * 4);
+
+                &::after {
+                    border-left-color: rgba($plyr-menu-color, 0.8);
+                    right: 5px;
+                }
+
+                &.plyr__tab-focus::after,
+                &:hover::after {
+                    border-left-color: currentColor;
+                }
+            }
+
+            &--back {
+                $horizontal-padding: ($plyr-control-padding * 2);
+                font-weight: $plyr-font-weight-regular;
+                margin: $plyr-control-padding;
+                margin-bottom: floor($plyr-control-padding / 2);
+                padding-left: ceil($plyr-control-padding * 4);
+                position: relative;
+                width: calc(100% - #{$horizontal-padding});
+
+                &::after {
+                    border-right-color: rgba($plyr-menu-color, 0.8);
+                    left: $plyr-control-padding;
+                }
+
+                &::before {
+                    background: $plyr-menu-border-color;
+                    box-shadow: 0 1px 0 $plyr-menu-border-shadow-color;
+                    content: '';
+                    height: 1px;
+                    left: 0;
+                    margin-top: ceil($plyr-control-padding / 2);
+                    overflow: hidden;
+                    position: absolute;
+                    right: 0;
+                    top: 100%;
+                }
+
+                &.plyr__tab-focus::after,
+                &:hover::after {
+                    border-right-color: currentColor;
+                }
+            }
+        }
+
+        label.plyr__control {
+            padding-left: $plyr-control-padding;
+
+            input[type='radio'] + span {
+                background: rgba(#000, 0.1);
+                border-radius: 100%;
+                display: block;
+                flex-shrink: 0;
+                height: 16px;
+                margin-right: $plyr-control-spacing;
+                position: relative;
+                transition: all 0.3s ease;
+                width: 16px;
+
+                &::after {
+                    background: #fff;
+                    border-radius: 100%;
+                    content: '';
+                    height: 6px;
+                    left: 5px;
+                    opacity: 0;
+                    position: absolute;
+                    top: 5px;
+                    transform: scale(0);
+                    transition: transform 0.3s ease, opacity 0.3s ease;
+                    width: 6px;
+                }
+            }
+
+            input[type='radio']:checked + span {
+                background: $plyr-color-main;
+
+                &::after {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+            }
+
+            input[type='radio']:focus + span {
+                @include plyr-tab-focus();
+            }
+
+            &.plyr__tab-focus input[type='radio'] + span,
+            &:hover input[type='radio'] + span {
+                background: rgba(#000, 0.1);
+            }
+        }
+
+        // Option value
+        .plyr__menu__value {
+            align-items: center;
+            display: flex;
+            margin-left: auto;
+            margin-right: -$plyr-control-padding;
+            overflow: hidden;
+            padding-left: ceil($plyr-control-padding * 3.5);
+            pointer-events: none;
+        }
+    }
+}

@@ -1,0 +1,56 @@
+// ==========================================================================
+// Advertisements
+// ==========================================================================
+
+.plyr__ads {
+    border-radius: inherit;
+    bottom: 0;
+    cursor: pointer;
+    left: 0;
+    overflow: hidden;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: -1; // Hide it by default
+
+    // Make sure the inner container is big enough for the ad creative.
+    > div,
+    > div iframe {
+        height: 100%;
+        position: absolute;
+        width: 100%;
+    }
+
+    // The countdown label
+    &::after {
+        background: rgba($plyr-color-gunmetal, 0.8);
+        border-radius: 2px;
+        bottom: $plyr-control-spacing;
+        color: #fff;
+        content: attr(data-badge-text);
+        font-size: 11px;
+        padding: 2px 6px;
+        pointer-events: none;
+        position: absolute;
+        right: $plyr-control-spacing;
+        z-index: 3;
+    }
+
+    &::after:empty {
+        display: none;
+    }
+}
+
+// Advertisement cue's for the progress bar
+.plyr__cues {
+    background: currentColor;
+    display: block;
+    height: $plyr-range-track-height;
+    left: 0;
+    margin: -($plyr-range-track-height / 2) 0 0;
+    opacity: 0.8;
+    position: absolute;
+    top: 50%;
+    width: 3px;
+    z-index: 3; // Between progress and thumb
+}

@@ -1,0 +1,12 @@
+// ==========================================================================
+// Breakpoints
+// ==========================================================================
+
+$plyr-bp-sm: 480px !default;
+$plyr-bp-md: 768px !default;
+$plyr-bp-lg: 1024px !default;
+
+// Max-width media queries
+$plyr-bp-xs-max: ($plyr-bp-sm - 1);
+$plyr-bp-sm-max: ($plyr-bp-md - 1);
+$plyr-bp-md-max: ($plyr-bp-lg - 1);

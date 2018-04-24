@@ -1,0 +1,64 @@
+// ==========================================================================
+// Core
+// ==========================================================================
+
+html,
+body {
+    display: flex;
+    width: 100%;
+}
+
+html {
+    background: $page-background;
+    background-attachment: fixed;
+    height: 100%;
+}
+
+body {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
+
+.grid {
+    flex: 1;
+    overflow: auto;
+}
+
+main {
+    margin: auto;
+    padding-bottom: 1px; // Collapsing margins
+    text-align: center;
+}
+
+aside {
+    align-items: center;
+    background: #fff;
+    color: $gray;
+    display: flex;
+    flex-shrink: 0;
+    justify-content: center;
+    padding: ($spacing-base * 0.75);
+    position: relative;
+    text-align: center;
+    text-shadow: none;
+    width: 100%;
+
+    .icon {
+        fill: $color-twitter;
+        margin-right: ($spacing-base / 2);
+    }
+
+    p {
+        margin: 0;
+    }
+
+    a {
+        color: $color-twitter;
+
+        &.tab-focus {
+            @include tab-focus($color-twitter);
+        }
+    }
+}

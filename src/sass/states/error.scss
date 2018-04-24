@@ -1,0 +1,25 @@
+// --------------------------------------------------------------
+// Error state
+// --------------------------------------------------------------
+
+.plyr--has-error {
+    pointer-events: none;
+
+    &::after {
+        align-items: center;
+        background: rgba(#000, 90%);
+        color: #fff;
+        content: attr(data-plyr-error);
+        display: flex;
+        font-size: $plyr-font-size-base;
+        height: 100%;
+        justify-content: center;
+        left: 0;
+        position: absolute;
+        text-align: center;
+        text-shadow: 0 1px 1px rgba(#000, 10%);
+        top: 0;
+        width: 100%;
+        z-index: 10;
+    }
+}
