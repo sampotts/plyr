@@ -77,7 +77,7 @@ var defaults = {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.1.0/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.2.1/plyr.svg',
 
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
@@ -116,7 +116,7 @@ var defaults = {
     // Captions settings
     captions: {
         active: false,
-        language: window.navigator.language.split('-')[0]
+        language: (navigator.language || navigator.userLanguage).split('-')[0]
     },
 
     // Fullscreen settings
@@ -164,6 +164,7 @@ var defaults = {
         captions: 'Captions',
         settings: 'Settings',
         speed: 'Speed',
+        normal: 'Normal',
         quality: 'Quality',
         loop: 'Loop',
         start: 'Start',
@@ -171,6 +172,7 @@ var defaults = {
         all: 'All',
         reset: 'Reset',
         disabled: 'Disabled',
+        enabled: 'Enabled',
         advertisement: 'Ad'
     },
 
@@ -1702,16 +1704,16 @@ var support = {
 
     // Check for support
     // Basic functionality vs full UI
-    check: function check(type, provider, inline) {
+    check: function check(type, provider, playsinline) {
         var api = false;
         var ui = false;
         var browser = utils.getBrowser();
-        var playsInline = browser.isIPhone && inline && support.inline;
+        var canPlayInline = browser.isIPhone && playsinline && support.playsinline;
 
         switch (provider + ':' + type) {
             case 'html5:video':
                 api = support.video;
-                ui = api && support.rangeInput && (!browser.isIPhone || playsInline);
+                ui = api && support.rangeInput && (!browser.isIPhone || canPlayInline);
                 break;
 
             case 'html5:audio':
@@ -1722,7 +1724,7 @@ var support = {
             case 'youtube:video':
             case 'vimeo:video':
                 api = true;
-                ui = support.rangeInput && (!browser.isIPhone || playsInline);
+                ui = support.rangeInput && (!browser.isIPhone || canPlayInline);
                 break;
 
             default:
@@ -1750,7 +1752,7 @@ var support = {
 
     // Inline playback support
     // https://webkit.org/blog/6784/new-video-policies-for-ios/
-    inline: 'playsInline' in document.createElement('video'),
+    playsinline: 'playsInline' in document.createElement('video'),
 
     // Check for mime type support against a player instance
     // Credits: http://diveintohtml5.info/everything.html
@@ -2034,7 +2036,7 @@ var Fullscreen = function () {
             } else if (!Fullscreen.native) {
                 toggleFallback.call(this, false);
             } else if (!this.prefix) {
-                document.cancelFullScreen();
+                (document.cancelFullScreen || document.exitFullscreen).call(document);
             } else if (!utils.is.empty(this.prefix)) {
                 var action = this.prefix === 'moz' ? 'Cancel' : 'Exit';
                 document['' + this.prefix + action + this.name]();
@@ -2100,7 +2102,7 @@ var Fullscreen = function () {
         get: function get$$1() {
             // No prefix
             if (utils.is.function(document.exitFullscreen)) {
-                return false;
+                return '';
             }
 
             // Check for fullscreen support by vendor prefix
@@ -2126,6 +2128,36 @@ var Fullscreen = function () {
     }]);
     return Fullscreen;
 }();
+
+// ==========================================================================
+
+var i18n = {
+    get: function get$$1() {
+        var key = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+        var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+        if (utils.is.empty(key) || utils.is.empty(config) || !Object.keys(config.i18n).includes(key)) {
+            return '';
+        }
+
+        var string = config.i18n[key];
+
+        var replace = {
+            '{seektime}': config.seekTime,
+            '{title}': config.title
+        };
+
+        Object.entries(replace).forEach(function (_ref) {
+            var _ref2 = slicedToArray(_ref, 2),
+                key = _ref2[0],
+                value = _ref2[1];
+
+            string = utils.replaceAll(string, key, value);
+        });
+
+        return string;
+    }
+};
 
 // ==========================================================================
 
@@ -2168,6 +2200,7 @@ var captions = {
 
             return;
         }
+
         // Inject the container
         if (!utils.is.element(this.elements.captions)) {
             this.elements.captions = utils.createElement('div', utils.getAttributesFromSelector(this.config.selectors.captions));
@@ -2272,9 +2305,54 @@ var captions = {
     getCurrentTrack: function getCurrentTrack() {
         var _this2 = this;
 
-        return captions.getTracks.call(this).find(function (track) {
+        var tracks = captions.getTracks.call(this);
+
+        if (!tracks.length) {
+            return null;
+        }
+
+        // Get track based on current language
+        var track = tracks.find(function (track) {
             return track.language.toLowerCase() === _this2.language;
         });
+
+        // Get the <track> with default attribute
+        if (!track) {
+            track = utils.getElement.call(this, 'track[default]');
+        }
+
+        // Get the first track
+        if (!track) {
+            var _tracks = slicedToArray(tracks, 1);
+
+            track = _tracks[0];
+        }
+
+        return track;
+    },
+
+
+    // Get UI label for track
+    getLabel: function getLabel(track) {
+        var currentTrack = track;
+
+        if (!utils.is.track(currentTrack) && support.textTracks && this.captions.active) {
+            currentTrack = captions.getCurrentTrack.call(this);
+        }
+
+        if (utils.is.track(currentTrack)) {
+            if (!utils.is.empty(currentTrack.label)) {
+                return currentTrack.label;
+            }
+
+            if (!utils.is.empty(currentTrack.language)) {
+                return track.language.toUpperCase();
+            }
+
+            return i18n.get('enabled', this.config);
+        }
+
+        return i18n.get('disabled', this.config);
     },
 
 
@@ -2336,11 +2414,6 @@ var captions = {
 
     // Display captions container and button (for initialization)
     show: function show() {
-        // If there's no caption toggle, bail
-        if (!utils.is.element(this.elements.buttons.captions)) {
-            return;
-        }
-
         // Try to load the value from storage
         var active = this.storage.get('captions');
 
@@ -2355,36 +2428,6 @@ var captions = {
             utils.toggleClass(this.elements.container, this.config.classNames.captions.active, true);
             utils.toggleState(this.elements.buttons.captions, true);
         }
-    }
-};
-
-// ==========================================================================
-
-var i18n = {
-    get: function get$$1() {
-        var key = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-        var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-        if (utils.is.empty(key) || utils.is.empty(config) || !Object.keys(config.i18n).includes(key)) {
-            return '';
-        }
-
-        var string = config.i18n[key];
-
-        var replace = {
-            '{seektime}': config.seekTime,
-            '{title}': config.title
-        };
-
-        Object.entries(replace).forEach(function (_ref) {
-            var _ref2 = slicedToArray(_ref, 2),
-                key = _ref2[0],
-                value = _ref2[1];
-
-            string = utils.replaceAll(string, key, value);
-        });
-
-        return string;
     }
 };
 
@@ -2892,16 +2935,20 @@ var browser$1 = utils.getBrowser();
 var controls = {
     // Webkit polyfill for lower fill range
     updateRangeFill: function updateRangeFill(target) {
-        // WebKit only
-        if (!browser$1.isWebkit) {
-            return;
-        }
 
         // Get range from event if event passed
         var range = utils.is.event(target) ? target.target : target;
 
         // Needs to be a valid <input type='range'>
         if (!utils.is.element(range) || range.getAttribute('type') !== 'range') {
+            return;
+        }
+
+        // Set aria value for https://github.com/sampotts/plyr/issues/905
+        range.setAttribute('aria-valuenow', range.value);
+
+        // WebKit only
+        if (!browser$1.isWebkit) {
             return;
         }
 
@@ -2928,7 +2975,8 @@ var controls = {
         // Create <svg>
         var icon = document.createElementNS(namespace, 'svg');
         utils.setAttributes(icon, utils.extend(attributes, {
-            role: 'presentation'
+            role: 'presentation',
+            focusable: 'false'
         }));
 
         // Create the <use> to reference sprite
@@ -3110,6 +3158,7 @@ var controls = {
         // Seek label
         var label = utils.createElement('label', {
             for: attributes.id,
+            id: attributes.id + '-label',
             class: this.config.classNames.hidden
         }, i18n.get(type, this.config));
 
@@ -3120,7 +3169,13 @@ var controls = {
             max: 100,
             step: 0.01,
             value: 0,
-            autocomplete: 'off'
+            autocomplete: 'off',
+            // A11y fixes for https://github.com/sampotts/plyr/issues/905
+            role: 'slider',
+            'aria-labelledby': attributes.id + '-label',
+            'aria-valuemin': 0,
+            'aria-valuemax': 100,
+            'aria-valuenow': 0
         }, attributes));
 
         this.elements.inputs[type] = input;
@@ -3140,7 +3195,9 @@ var controls = {
         var progress = utils.createElement('progress', utils.extend(utils.getAttributesFromSelector(this.config.selectors.display[type]), {
             min: 0,
             max: 100,
-            value: 0
+            value: 0,
+            role: 'presentation',
+            'aria-hidden': true
         }, attributes));
 
         // Create the label inside
@@ -3310,6 +3367,9 @@ var controls = {
         var toggle = !utils.is.empty(this.options.quality) && this.options.quality.length > 1;
         controls.toggleTab.call(this, type, toggle);
 
+        // Check if we need to toggle the parent
+        controls.checkMenu.call(this);
+
         // If we're hiding, nothing more to do
         if (!toggle) {
             return;
@@ -3366,16 +3426,17 @@ var controls = {
     getLabel: function getLabel(setting, value) {
         switch (setting) {
             case 'speed':
-                return value === 1 ? 'Normal' : value + '&times;';
+                return value === 1 ? i18n.get('normal', this.config) : value + '&times;';
 
             case 'quality':
                 if (utils.is.number(value)) {
                     return value + 'p';
                 }
+
                 return utils.toTitleCase(value);
 
             case 'captions':
-                return controls.getLanguage.call(this);
+                return captions.getLabel.call(this);
 
             default:
                 return null;
@@ -3391,7 +3452,18 @@ var controls = {
 
         switch (setting) {
             case 'captions':
-                value = this.captions.active ? this.captions.language : i18n.get('disabled', this.config);
+                if (this.captions.active) {
+                    if (this.options.captions.length > 2 || !this.options.captions.some(function (lang) {
+                        return lang === 'enabled';
+                    })) {
+                        value = this.captions.language;
+                    } else {
+                        value = 'enabled';
+                    }
+                } else {
+                    value = '';
+                }
+
                 break;
 
             default:
@@ -3422,17 +3494,19 @@ var controls = {
             list = pane && pane.querySelector('ul');
         }
 
-        // Update the label
-        if (!utils.is.empty(value)) {
-            var label = this.elements.settings.tabs[setting].querySelector('.' + this.config.classNames.menu.value);
-            label.innerHTML = controls.getLabel.call(this, setting, value);
+        // If there's no list it means it's not been rendered...
+        if (!utils.is.element(list)) {
+            return;
         }
 
-        // Find the radio option
+        // Update the label
+        var label = this.elements.settings.tabs[setting].querySelector('.' + this.config.classNames.menu.value);
+        label.innerHTML = controls.getLabel.call(this, setting, value);
+
+        // Find the radio option and check it
         var target = list && list.querySelector('input[value="' + value + '"]');
 
         if (utils.is.element(target)) {
-            // Check it
             target.checked = true;
         }
     },
@@ -3476,21 +3550,6 @@ var controls = {
 
     // Get current selected caption language
     // TODO: rework this to user the getter in the API?
-    getLanguage: function getLanguage() {
-        if (!this.supported.ui) {
-            return null;
-        }
-
-        if (support.textTracks && captions.getTracks.call(this).length && this.captions.active) {
-            var currentTrack = captions.getCurrentTrack.call(this);
-
-            if (utils.is.track(currentTrack)) {
-                return currentTrack.label;
-            }
-        }
-
-        return i18n.get('disabled', this.config);
-    },
 
 
     // Set a list of available captions languages
@@ -3508,6 +3567,9 @@ var controls = {
         // Empty the menu
         utils.emptyElement(list);
 
+        // Check if we need to toggle the parent
+        controls.checkMenu.call(this);
+
         // If there's no captions, bail
         if (!toggle) {
             return;
@@ -3516,8 +3578,8 @@ var controls = {
         // Re-map the tracks into just the data we need
         var tracks = captions.getTracks.call(this).map(function (track) {
             return {
-                language: track.language,
-                label: !utils.is.empty(track.label) ? track.label : track.language.toUpperCase()
+                language: !utils.is.empty(track.language) ? track.language : 'enabled',
+                label: captions.getLabel.call(_this3, track)
             };
         });
 
@@ -3529,7 +3591,12 @@ var controls = {
 
         // Generate options
         tracks.forEach(function (track) {
-            controls.createMenuItem.call(_this3, track.language, list, 'language', track.label || track.language, controls.createBadge.call(_this3, track.language.toUpperCase()), track.language.toLowerCase() === _this3.captions.language.toLowerCase());
+            controls.createMenuItem.call(_this3, track.language, list, 'language', track.label, track.language !== 'enabled' ? controls.createBadge.call(_this3, track.language.toUpperCase()) : null, track.language.toLowerCase() === _this3.captions.language.toLowerCase());
+        });
+
+        // Store reference
+        this.options.captions = tracks.map(function (track) {
+            return track.language;
         });
 
         controls.updateSetting.call(this, type, list);
@@ -4048,7 +4115,7 @@ var controls = {
                 seektime: this.config.seekTime,
                 speed: this.speed,
                 quality: this.quality,
-                captions: controls.getLanguage.call(this)
+                captions: captions.getLabel.call(this)
                 // TODO: Looping
                 // loop: 'None',
             });
@@ -4070,7 +4137,7 @@ var controls = {
         // Inject controls HTML
         if (utils.is.element(container)) {
             target.appendChild(container);
-        } else {
+        } else if (container) {
             target.insertAdjacentHTML('beforeend', container);
         }
 
@@ -4402,6 +4469,10 @@ var Listeners = function () {
             // If autoplay, then load advertisement if required
             // TODO: Show some sort of loading state while the ad manager loads else there's a delay before ad shows
             utils.on(this.player.media, 'playing', function () {
+                if (!_this3.player.ads) {
+                    return;
+                }
+
                 // If ads are enabled, wait for them first
                 if (_this3.player.ads.enabled && !_this3.player.ads.initialized) {
                     // Wait for manager response
@@ -4443,7 +4514,7 @@ var Listeners = function () {
 
             // Disable right click
             if (this.player.supported.ui && this.player.config.disableContextMenu) {
-                utils.on(this.player.media, 'contextmenu', function (event) {
+                utils.on(this.player.elements.wrapper, 'contextmenu', function (event) {
                     event.preventDefault();
                 }, false);
             }
@@ -5729,7 +5800,11 @@ var youtube = {
                             return Number(instance.getCurrentTime());
                         },
                         set: function set(time) {
+                            // Vimeo will automatically play on seek
+                            var paused = player.media.paused;
+
                             // Set seeking flag
+
                             player.media.seeking = true;
 
                             // Trigger seeking
@@ -5737,6 +5812,11 @@ var youtube = {
 
                             // Seek after events sent
                             instance.seekTo(time);
+
+                            // Restore pause state
+                            if (paused) {
+                                player.pause();
+                            }
                         }
                     });
 
@@ -5974,10 +6054,14 @@ var vimeo = {
     setAspectRatio: function setAspectRatio(input) {
         var ratio = utils.is.string(input) ? input.split(':') : this.config.ratio.split(':');
         var padding = 100 / ratio[0] * ratio[1];
-        var height = 240;
-        var offset = (height - padding) / (height / 50);
         this.elements.wrapper.style.paddingBottom = padding + '%';
-        this.media.style.transform = 'translateY(-' + offset + '%)';
+
+        if (this.supported.ui) {
+            var height = 240;
+            var offset = (height - padding) / (height / 50);
+
+            this.media.style.transform = 'translateY(-' + offset + '%)';
+        }
     },
 
 
@@ -5996,7 +6080,8 @@ var vimeo = {
             title: false,
             speed: true,
             transparent: 0,
-            gesture: 'media'
+            gesture: 'media',
+            playsinline: !this.config.fullscreen.iosNative
         };
         var params = utils.buildUrlParams(options);
 
@@ -6029,6 +6114,11 @@ var vimeo = {
 
         player.media.paused = true;
         player.media.currentTime = 0;
+
+        // Disable native text track rendering
+        if (player.supported.ui) {
+            player.embed.disableTextTrack();
+        }
 
         // Create a faux HTML5 API using the Vimeo API
         player.media.play = function () {
@@ -6068,7 +6158,9 @@ var vimeo = {
                 utils.dispatchEvent.call(player, player.media, 'seeking');
 
                 // Seek after events
-                player.embed.setCurrentTime(time);
+                player.embed.setCurrentTime(time).catch(function () {
+                    // Do nothing
+                });
 
                 // Restore pause state
                 if (paused) {
@@ -6248,6 +6340,15 @@ var vimeo = {
             if (parseInt(data.percent, 10) === 1) {
                 utils.dispatchEvent.call(player, player.media, 'canplaythrough');
             }
+
+            // Get duration as if we do it before load, it gives an incorrect value
+            // https://github.com/sampotts/plyr/issues/891
+            player.embed.getDuration().then(function (value) {
+                if (value !== player.media.duration) {
+                    player.media.duration = value;
+                    utils.dispatchEvent.call(player, player.media, 'durationchange');
+                }
+            });
         });
 
         player.embed.on('seeked', function () {
@@ -6399,7 +6500,7 @@ var source = {
             _this2.provider = !utils.is.empty(input.sources[0].provider) ? input.sources[0].provider : providers.html5;
 
             // Check for support
-            _this2.supported = support.check(_this2.type, _this2.provider, _this2.config.inline);
+            _this2.supported = support.check(_this2.type, _this2.provider, _this2.config.playsinline);
 
             // Create new markup
             switch (_this2.provider + ':' + _this2.type) {
@@ -6447,7 +6548,7 @@ var source = {
                 if (_this2.config.muted) {
                     _this2.media.setAttribute('muted', '');
                 }
-                if (_this2.config.inline) {
+                if (_this2.config.playsinline) {
                     _this2.media.setAttribute('playsinline', '');
                 }
             }
@@ -6528,7 +6629,7 @@ var Plyr = function () {
         }
 
         // Set config
-        this.config = utils.extend({}, defaults, options, function () {
+        this.config = utils.extend({}, defaults, options || {}, function () {
             try {
                 return JSON.parse(_this.media.getAttribute('data-plyr-config'));
             } catch (e) {
@@ -6565,7 +6666,8 @@ var Plyr = function () {
         // Options
         this.options = {
             speed: [],
-            quality: []
+            quality: [],
+            captions: []
         };
 
         // Debugging
@@ -6650,11 +6752,16 @@ var Plyr = function () {
                         if (truthy.includes(params.autoplay)) {
                             this.config.autoplay = true;
                         }
-                        if (truthy.includes(params.playsinline)) {
-                            this.config.inline = true;
-                        }
                         if (truthy.includes(params.loop)) {
                             this.config.loop.active = true;
+                        }
+
+                        // TODO: replace fullscreen.iosNative with this playsinline config option
+                        // YouTube requires the playsinline in the URL
+                        if (this.isYouTube) {
+                            this.config.playsinline = truthy.includes(params.playsinline);
+                        } else {
+                            this.config.playsinline = true;
                         }
                     }
                 } else {
@@ -6689,7 +6796,7 @@ var Plyr = function () {
                     this.config.autoplay = true;
                 }
                 if (this.media.hasAttribute('playsinline')) {
-                    this.config.inline = true;
+                    this.config.playsinline = true;
                 }
                 if (this.media.hasAttribute('muted')) {
                     this.config.muted = true;
@@ -6706,7 +6813,7 @@ var Plyr = function () {
         }
 
         // Check for support again but with type
-        this.supported = support.check(this.type, this.provider, this.config.inline);
+        this.supported = support.check(this.type, this.provider, this.config.playsinline);
 
         // If no support for even API, bail
         if (!this.supported.api) {
@@ -6926,13 +7033,13 @@ var Plyr = function () {
          * @param {boolean} input - Whether to enable captions
          */
         value: function toggleCaptions(input) {
-            // If there's no full support, or there's no caption toggle
-            if (!this.supported.ui || !utils.is.element(this.elements.buttons.captions)) {
+            // If there's no full support
+            if (!this.supported.ui) {
                 return;
             }
 
             // If the method is called without parameter, toggle based on current value
-            var show = utils.is.boolean(input) ? input : this.elements.container.className.indexOf(this.config.classNames.captions.active) === -1;
+            var show = utils.is.boolean(input) ? input : !this.elements.container.classList.contains(this.config.classNames.captions.active);
 
             // Nothing to change...
             if (this.captions.active === show) {
@@ -7291,7 +7398,7 @@ var Plyr = function () {
     }, {
         key: 'playing',
         get: function get$$1() {
-            return Boolean(!this.paused && !this.ended && (this.isHTML5 ? this.media.readyState > 2 : true));
+            return Boolean(this.ready && !this.paused && !this.ended && (this.isHTML5 ? this.media.readyState > 2 : true));
         }
 
         /**
@@ -7320,7 +7427,7 @@ var Plyr = function () {
             }
 
             // Set
-            this.media.currentTime = parseFloat(targetTime.toFixed(4));
+            this.media.currentTime = targetTime;
 
             // Logging
             this.debug.log('Seeking to ' + this.currentTime + ' seconds');
@@ -7377,7 +7484,7 @@ var Plyr = function () {
         key: 'duration',
         get: function get$$1() {
             // Faux duration set via config
-            var fauxDuration = parseInt(this.config.duration, 10);
+            var fauxDuration = parseFloat(this.config.duration);
 
             // True duration
             var realDuration = this.media ? Number(this.media.duration) : 0;
@@ -7728,16 +7835,28 @@ var Plyr = function () {
                 return;
             }
 
-            // Toggle captions based on input
-            this.toggleCaptions(!utils.is.empty(input));
-
             // If empty string is passed, assume disable captions
             if (utils.is.empty(input)) {
+                this.toggleCaptions(false);
                 return;
             }
 
             // Normalize
             var language = input.toLowerCase();
+
+            // Check for support
+            if (!this.options.captions.includes(language)) {
+                this.debug.warn('Unsupported language option: ' + language);
+                return;
+            }
+
+            // Ensure captions are enabled
+            this.toggleCaptions(true);
+
+            // Enabled only
+            if (language === 'enabled') {
+                return;
+            }
 
             // If nothing to change, bail
             if (this.language === language) {

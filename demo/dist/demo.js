@@ -3887,7 +3887,7 @@ singleton.Client = Client;
             });
 
             // Setup the player
-            var player = new Plyr('video', {
+            var player = new Plyr('#player', {
                 debug: true,
                 title: 'View From A Blue Moon',
                 iconUrl: '../dist/plyr.svg',
@@ -4011,7 +4011,6 @@ singleton.Client = Client;
                     case types.youtube:
                         player.source = {
                             type: 'video',
-                            title: 'View From A Blue Moon',
                             sources: [{
                                 src: 'https://youtube.com/watch?v=bTqVqk7FSmY',
                                 provider: 'youtube'

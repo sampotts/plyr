@@ -47,7 +47,7 @@ import Raven from 'raven-js';
             });
 
             // Setup the player
-            const player = new Plyr('video', {
+            const player = new Plyr('#player', {
                 debug: true,
                 title: 'View From A Blue Moon',
                 iconUrl: '../dist/plyr.svg',
@@ -182,7 +182,6 @@ import Raven from 'raven-js';
                     case types.youtube:
                         player.source = {
                             type: 'video',
-                            title: 'View From A Blue Moon',
                             sources: [{
                                 src: 'https://youtube.com/watch?v=bTqVqk7FSmY',
                                 provider: 'youtube',
