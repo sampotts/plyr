@@ -270,6 +270,9 @@ const youtube = {
                             return Number(instance.getCurrentTime());
                         },
                         set(time) {
+                            // Vimeo will automatically play on seek
+                            const { paused } = player.media;
+
                             // Set seeking flag
                             player.media.seeking = true;
 
@@ -278,6 +281,11 @@ const youtube = {
 
                             // Seek after events sent
                             instance.seekTo(time);
+
+                            // Restore pause state
+                            if (paused) {
+                                player.pause();
+                            }
                         },
                     });
 
