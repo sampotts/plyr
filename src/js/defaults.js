@@ -56,7 +56,7 @@ const defaults = {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.1.0/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.2.1/plyr.svg',
 
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
@@ -115,7 +115,7 @@ const defaults = {
     // Captions settings
     captions: {
         active: false,
-        language: window.navigator.language ? window.navigator.language.split('-')[0] : 'en',
+        language: (navigator.language || navigator.userLanguage).split('-')[0],
     },
 
     // Fullscreen settings
@@ -185,6 +185,7 @@ const defaults = {
         all: 'All',
         reset: 'Reset',
         disabled: 'Disabled',
+        enabled: 'Enabled',
         advertisement: 'Ad',
     },
 

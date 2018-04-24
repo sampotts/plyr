@@ -12,16 +12,16 @@ const support = {
 
     // Check for support
     // Basic functionality vs full UI
-    check(type, provider, inline) {
+    check(type, provider, playsinline) {
         let api = false;
         let ui = false;
         const browser = utils.getBrowser();
-        const playsInline = browser.isIPhone && inline && support.inline;
+        const canPlayInline = browser.isIPhone && playsinline && support.playsinline;
 
         switch (`${provider}:${type}`) {
             case 'html5:video':
                 api = support.video;
-                ui = api && support.rangeInput && (!browser.isIPhone || playsInline);
+                ui = api && support.rangeInput && (!browser.isIPhone || canPlayInline);
                 break;
 
             case 'html5:audio':
@@ -32,7 +32,7 @@ const support = {
             case 'youtube:video':
             case 'vimeo:video':
                 api = true;
-                ui = support.rangeInput && (!browser.isIPhone || playsInline);
+                ui = support.rangeInput && (!browser.isIPhone || canPlayInline);
                 break;
 
             default:
@@ -59,7 +59,7 @@ const support = {
 
     // Inline playback support
     // https://webkit.org/blog/6784/new-video-policies-for-ios/
-    inline: 'playsInline' in document.createElement('video'),
+    playsinline: 'playsInline' in document.createElement('video'),
 
     // Check for mime type support against a player instance
     // Credits: http://diveintohtml5.info/everything.html

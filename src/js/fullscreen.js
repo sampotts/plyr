@@ -90,7 +90,7 @@ class Fullscreen {
     static get prefix() {
         // No prefix
         if (utils.is.function(document.exitFullscreen)) {
-            return false;
+            return '';
         }
 
         // Check for fullscreen support by vendor prefix

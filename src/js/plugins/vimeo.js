@@ -35,10 +35,14 @@ const vimeo = {
     setAspectRatio(input) {
         const ratio = utils.is.string(input) ? input.split(':') : this.config.ratio.split(':');
         const padding = 100 / ratio[0] * ratio[1];
-        const height = 240;
-        const offset = (height - padding) / (height / 50);
         this.elements.wrapper.style.paddingBottom = `${padding}%`;
-        this.media.style.transform = `translateY(-${offset}%)`;
+
+        if (this.supported.ui) {
+            const height = 240;
+            const offset = (height - padding) / (height / 50);
+
+            this.media.style.transform = `translateY(-${offset}%)`;
+        }
     },
 
     // API Ready
@@ -55,6 +59,7 @@ const vimeo = {
             speed: true,
             transparent: 0,
             gesture: 'media',
+            playsinline: !this.config.fullscreen.iosNative,
         };
         const params = utils.buildUrlParams(options);
 
@@ -87,6 +92,11 @@ const vimeo = {
 
         player.media.paused = true;
         player.media.currentTime = 0;
+
+        // Disable native text track rendering
+        if (player.supported.ui) {
+            player.embed.disableTextTrack();
+        }
 
         // Create a faux HTML5 API using the Vimeo API
         player.media.play = () => {
@@ -124,7 +134,9 @@ const vimeo = {
                 utils.dispatchEvent.call(player, player.media, 'seeking');
 
                 // Seek after events
-                player.embed.setCurrentTime(time);
+                player.embed.setCurrentTime(time).catch(() => {
+                    // Do nothing
+                });
 
                 // Restore pause state
                 if (paused) {
@@ -310,6 +322,15 @@ const vimeo = {
             if (parseInt(data.percent, 10) === 1) {
                 utils.dispatchEvent.call(player, player.media, 'canplaythrough');
             }
+
+            // Get duration as if we do it before load, it gives an incorrect value
+            // https://github.com/sampotts/plyr/issues/891
+            player.embed.getDuration().then(value => {
+                if (value !== player.media.duration) {
+                    player.media.duration = value;
+                    utils.dispatchEvent.call(player, player.media, 'durationchange');
+                }
+            });
         });
 
         player.embed.on('seeked', () => {

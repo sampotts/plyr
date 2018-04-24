@@ -15,16 +15,21 @@ const browser = utils.getBrowser();
 const controls = {
     // Webkit polyfill for lower fill range
     updateRangeFill(target) {
-        // WebKit only
-        if (!browser.isWebkit) {
-            return;
-        }
+
 
         // Get range from event if event passed
         const range = utils.is.event(target) ? target.target : target;
 
         // Needs to be a valid <input type='range'>
         if (!utils.is.element(range) || range.getAttribute('type') !== 'range') {
+            return;
+        }
+
+        // Set aria value for https://github.com/sampotts/plyr/issues/905
+        range.setAttribute('aria-valuenow', range.value);
+
+        // WebKit only
+        if (!browser.isWebkit) {
             return;
         }
 
@@ -52,6 +57,7 @@ const controls = {
             icon,
             utils.extend(attributes, {
                 role: 'presentation',
+                focusable: 'false',
             }),
         );
 
@@ -238,6 +244,7 @@ const controls = {
             'label',
             {
                 for: attributes.id,
+                id: `${attributes.id}-label`,
                 class: this.config.classNames.hidden,
             },
             i18n.get(type, this.config),
@@ -255,6 +262,12 @@ const controls = {
                     step: 0.01,
                     value: 0,
                     autocomplete: 'off',
+                    // A11y fixes for https://github.com/sampotts/plyr/issues/905
+                    role: 'slider',
+                    'aria-labelledby': `${attributes.id}-label`,
+                    'aria-valuemin': 0,
+                    'aria-valuemax': 100,
+                    'aria-valuenow': 0,
                 },
                 attributes,
             ),
@@ -281,6 +294,8 @@ const controls = {
                     min: 0,
                     max: 100,
                     value: 0,
+                    role: 'presentation',
+                    'aria-hidden': true,
                 },
                 attributes,
             ),
@@ -456,6 +471,9 @@ const controls = {
         const toggle = !utils.is.empty(this.options.quality) && this.options.quality.length > 1;
         controls.toggleTab.call(this, type, toggle);
 
+        // Check if we need to toggle the parent
+        controls.checkMenu.call(this);
+
         // If we're hiding, nothing more to do
         if (!toggle) {
             return;
@@ -495,13 +513,15 @@ const controls = {
         };
 
         // Sort options by the config and then render options
-        this.options.quality.sort((a, b) => {
-            const sorting = this.config.quality.options;
-            return sorting.indexOf(a) > sorting.indexOf(b) ? 1 : -1;
-        }).forEach(quality => {
-            const label = controls.getLabel.call(this, 'quality', quality);
-            controls.createMenuItem.call(this, quality, list, type, label, getBadge(quality));
-        });
+        this.options.quality
+            .sort((a, b) => {
+                const sorting = this.config.quality.options;
+                return sorting.indexOf(a) > sorting.indexOf(b) ? 1 : -1;
+            })
+            .forEach(quality => {
+                const label = controls.getLabel.call(this, 'quality', quality);
+                controls.createMenuItem.call(this, quality, list, type, label, getBadge(quality));
+            });
 
         controls.updateSetting.call(this, type, list);
     },
@@ -517,10 +537,11 @@ const controls = {
                 if (utils.is.number(value)) {
                     return `${value}p`;
                 }
+
                 return utils.toTitleCase(value);
 
             case 'captions':
-                return controls.getLanguage.call(this);
+                return captions.getLabel.call(this);
 
             default:
                 return null;
@@ -535,7 +556,16 @@ const controls = {
 
         switch (setting) {
             case 'captions':
-                value = this.captions.active ? this.captions.language : i18n.get('disabled', this.config);
+                if (this.captions.active) {
+                    if (this.options.captions.length > 2 || !this.options.captions.some(lang => lang === 'enabled')) {
+                        value = this.captions.language;
+                    } else {
+                        value = 'enabled';
+                    }
+                } else {
+                    value = '';
+                }
+
                 break;
 
             default:
@@ -566,17 +596,19 @@ const controls = {
             list = pane && pane.querySelector('ul');
         }
 
-        // Update the label
-        if (!utils.is.empty(value)) {
-            const label = this.elements.settings.tabs[setting].querySelector(`.${this.config.classNames.menu.value}`);
-            label.innerHTML = controls.getLabel.call(this, setting, value);
+        // If there's no list it means it's not been rendered...
+        if (!utils.is.element(list)) {
+            return;
         }
 
-        // Find the radio option
+        // Update the label
+        const label = this.elements.settings.tabs[setting].querySelector(`.${this.config.classNames.menu.value}`);
+        label.innerHTML = controls.getLabel.call(this, setting, value);
+
+        // Find the radio option and check it
         const target = list && list.querySelector(`input[value="${value}"]`);
 
         if (utils.is.element(target)) {
-            // Check it
             target.checked = true;
         }
     },
@@ -627,21 +659,7 @@ const controls = {
 
     // Get current selected caption language
     // TODO: rework this to user the getter in the API?
-    getLanguage() {
-        if (!this.supported.ui) {
-            return null;
-        }
 
-        if (support.textTracks && captions.getTracks.call(this).length && this.captions.active) {
-            const currentTrack = captions.getCurrentTrack.call(this);
-
-            if (utils.is.track(currentTrack)) {
-                return currentTrack.label;
-            }
-        }
-
-        return i18n.get('disabled', this.config);
-    },
 
     // Set a list of available captions languages
     setCaptionsMenu() {
@@ -656,6 +674,9 @@ const controls = {
         // Empty the menu
         utils.emptyElement(list);
 
+        // Check if we need to toggle the parent
+        controls.checkMenu.call(this);
+
         // If there's no captions, bail
         if (!toggle) {
             return;
@@ -663,8 +684,8 @@ const controls = {
 
         // Re-map the tracks into just the data we need
         const tracks = captions.getTracks.call(this).map(track => ({
-            language: track.language,
-            label: !utils.is.empty(track.label) ? track.label : track.language.toUpperCase(),
+            language: !utils.is.empty(track.language) ? track.language : 'enabled',
+            label: captions.getLabel.call(this, track),
         }));
 
         // Add the "Disabled" option to turn off captions
@@ -680,11 +701,14 @@ const controls = {
                 track.language,
                 list,
                 'language',
-                track.label || track.language,
-                controls.createBadge.call(this, track.language.toUpperCase()),
+                track.label,
+                track.language !== 'enabled' ? controls.createBadge.call(this, track.language.toUpperCase()) : null,
                 track.language.toLowerCase() === this.captions.language.toLowerCase(),
             );
         });
+
+        // Store reference
+        this.options.captions = tracks.map(track => track.language);
 
         controls.updateSetting.call(this, type, list);
     },
@@ -1211,7 +1235,7 @@ const controls = {
                 seektime: this.config.seekTime,
                 speed: this.speed,
                 quality: this.quality,
-                captions: controls.getLanguage.call(this),
+                captions: captions.getLabel.call(this),
                 // TODO: Looping
                 // loop: 'None',
             });
