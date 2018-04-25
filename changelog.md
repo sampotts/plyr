@@ -1,3 +1,8 @@
+## v3.2.2
+
+*   Fix for regression in 3.2.1 resulting in hidden buffer display
+*   Cleaned up incorrect use of `aria-hidden` attribute
+
 ## v3.2.1
 
 *   Accessibility improvements for the controls (part of #905 fixes)
