@@ -1,6 +1,10 @@
+## v3.2.3
+
+*   Fix for iOS 9 throwing error for `name` property in fullscreen API (fixes #908)
+
 ## v3.2.2
 
-*   Fix for regression in 3.2.1 resulting in hidden buffer display
+*   Fix for regression in 3.2.1 resulting in hidden buffer display (fixes #920)
 *   Cleaned up incorrect use of `aria-hidden` attribute
 
 ## v3.2.1
