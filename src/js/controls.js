@@ -15,8 +15,6 @@ const browser = utils.getBrowser();
 const controls = {
     // Webkit polyfill for lower fill range
     updateRangeFill(target) {
-
-
         // Get range from event if event passed
         const range = utils.is.event(target) ? target.target : target;
 
@@ -369,7 +367,7 @@ const controls = {
             }),
         );
 
-        const faux = utils.createElement('span', { 'aria-hidden': true });
+        const faux = utils.createElement('span', { hidden: '' });
 
         label.appendChild(radio);
         label.appendChild(faux);
@@ -444,11 +442,7 @@ const controls = {
 
     // Hide/show a tab
     toggleTab(setting, toggle) {
-        const tab = this.elements.settings.tabs[setting];
-        const pane = this.elements.settings.panes[setting];
-
-        utils.toggleHidden(tab, !toggle);
-        utils.toggleHidden(pane, !toggle);
+        utils.toggleHidden(this.elements.settings.tabs[setting], !toggle);
     },
 
     // Set the quality menu
@@ -660,7 +654,6 @@ const controls = {
     // Get current selected caption language
     // TODO: rework this to user the getter in the API?
 
-
     // Set a list of available captions languages
     setCaptionsMenu() {
         // TODO: Captions or language? Currently it's mixed
@@ -760,10 +753,6 @@ const controls = {
         // Get the list to populate
         const list = this.elements.settings.panes.speed.querySelector('ul');
 
-        // Show the pane and tab
-        utils.toggleHidden(this.elements.settings.tabs.speed, false);
-        utils.toggleHidden(this.elements.settings.panes.speed, false);
-
         // Empty the menu
         utils.emptyElement(list);
 
@@ -794,7 +783,7 @@ const controls = {
             return;
         }
 
-        const show = utils.is.boolean(event) ? event : utils.is.element(form) && form.getAttribute('aria-hidden') === 'true';
+        const show = utils.is.boolean(event) ? event : utils.is.element(form) && form.hasAttribute('hidden');
 
         if (utils.is.event(event)) {
             const isMenuItem = utils.is.element(form) && form.contains(event.target);
@@ -819,7 +808,7 @@ const controls = {
         }
 
         if (utils.is.element(form)) {
-            form.setAttribute('aria-hidden', !show);
+            utils.toggleHidden(form, !show);
             utils.toggleClass(this.elements.container, this.config.classNames.menu.open, show);
 
             if (show) {
@@ -835,7 +824,7 @@ const controls = {
         const clone = tab.cloneNode(true);
         clone.style.position = 'absolute';
         clone.style.opacity = 0;
-        clone.setAttribute('aria-hidden', false);
+        clone.removeAttribute('hidden');
 
         // Prevent input's being unchecked due to the name being identical
         Array.from(clone.querySelectorAll('input[name]')).forEach(input => {
@@ -879,7 +868,7 @@ const controls = {
 
         // Hide all other tabs
         // Get other tabs
-        const current = menu.querySelector('[role="tabpanel"][aria-hidden="false"]');
+        const current = menu.querySelector('[role="tabpanel"]:not([hidden])');
         const container = current.parentNode;
 
         // Set other toggles to be expanded false
@@ -923,11 +912,11 @@ const controls = {
         }
 
         // Set attributes on current tab
-        current.setAttribute('aria-hidden', true);
+        utils.toggleHidden(current, true);
         current.setAttribute('tabindex', -1);
 
         // Set attributes on target
-        pane.setAttribute('aria-hidden', !show);
+        utils.toggleHidden(pane, !show);
         tab.setAttribute('aria-expanded', show);
         pane.removeAttribute('tabindex');
 
@@ -1069,7 +1058,7 @@ const controls = {
             const form = utils.createElement('form', {
                 class: 'plyr__menu__container',
                 id: `plyr-settings-${data.id}`,
-                'aria-hidden': true,
+                hidden: '',
                 'aria-labelled-by': `plyr-settings-toggle-${data.id}`,
                 role: 'tablist',
                 tabindex: -1,
@@ -1079,7 +1068,6 @@ const controls = {
 
             const home = utils.createElement('div', {
                 id: `plyr-settings-${data.id}-home`,
-                'aria-hidden': false,
                 'aria-labelled-by': `plyr-settings-toggle-${data.id}`,
                 role: 'tabpanel',
             });
@@ -1130,11 +1118,10 @@ const controls = {
             this.config.settings.forEach(type => {
                 const pane = utils.createElement('div', {
                     id: `plyr-settings-${data.id}-${type}`,
-                    'aria-hidden': true,
+                    hidden: '',
                     'aria-labelled-by': `plyr-settings-${data.id}-${type}-tab`,
                     role: 'tabpanel',
                     tabindex: -1,
-                    hidden: '',
                 });
 
                 const back = utils.createElement(

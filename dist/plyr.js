@@ -1101,6 +1101,26 @@ var utils = {
     },
 
 
+    // Toggle hidden
+    toggleHidden: function toggleHidden(element, hidden) {
+        if (!utils.is.element(element)) {
+            return;
+        }
+
+        var hide = hidden;
+
+        if (!utils.is.boolean(hide)) {
+            hide = !element.hasAttribute('hidden');
+        }
+
+        if (hide) {
+            element.setAttribute('hidden', '');
+        } else {
+            element.removeAttribute('hidden');
+        }
+    },
+
+
     // Toggle class on an element
     toggleClass: function toggleClass(element, className, toggle) {
         if (utils.is.element(element)) {
@@ -1118,20 +1138,6 @@ var utils = {
     // Has class name
     hasClass: function hasClass(element, className) {
         return utils.is.element(element) && element.classList.contains(className);
-    },
-
-
-    // Toggle hidden attribute on an element
-    toggleHidden: function toggleHidden(element, toggle) {
-        if (!utils.is.element(element)) {
-            return;
-        }
-
-        if (toggle) {
-            element.setAttribute('hidden', '');
-        } else {
-            element.removeAttribute('hidden');
-        }
     },
 
 
@@ -2935,7 +2941,6 @@ var browser$1 = utils.getBrowser();
 var controls = {
     // Webkit polyfill for lower fill range
     updateRangeFill: function updateRangeFill(target) {
-
         // Get range from event if event passed
         var range = utils.is.event(target) ? target.target : target;
 
@@ -3264,7 +3269,7 @@ var controls = {
             class: 'plyr__sr-only'
         }));
 
-        var faux = utils.createElement('span', { 'aria-hidden': true });
+        var faux = utils.createElement('span', { hidden: '' });
 
         label.appendChild(radio);
         label.appendChild(faux);
@@ -3335,11 +3340,7 @@ var controls = {
 
     // Hide/show a tab
     toggleTab: function toggleTab(setting, toggle) {
-        var tab = this.elements.settings.tabs[setting];
-        var pane = this.elements.settings.panes[setting];
-
-        utils.toggleHidden(tab, !toggle);
-        utils.toggleHidden(pane, !toggle);
+        utils.toggleHidden(this.elements.settings.tabs[setting], !toggle);
     },
 
 
@@ -3551,7 +3552,6 @@ var controls = {
     // Get current selected caption language
     // TODO: rework this to user the getter in the API?
 
-
     // Set a list of available captions languages
     setCaptionsMenu: function setCaptionsMenu() {
         var _this3 = this;
@@ -3646,10 +3646,6 @@ var controls = {
         // Get the list to populate
         var list = this.elements.settings.panes.speed.querySelector('ul');
 
-        // Show the pane and tab
-        utils.toggleHidden(this.elements.settings.tabs.speed, false);
-        utils.toggleHidden(this.elements.settings.panes.speed, false);
-
         // Empty the menu
         utils.emptyElement(list);
 
@@ -3686,7 +3682,7 @@ var controls = {
             return;
         }
 
-        var show = utils.is.boolean(event) ? event : utils.is.element(form) && form.getAttribute('aria-hidden') === 'true';
+        var show = utils.is.boolean(event) ? event : utils.is.element(form) && form.hasAttribute('hidden');
 
         if (utils.is.event(event)) {
             var isMenuItem = utils.is.element(form) && form.contains(event.target);
@@ -3711,7 +3707,7 @@ var controls = {
         }
 
         if (utils.is.element(form)) {
-            form.setAttribute('aria-hidden', !show);
+            utils.toggleHidden(form, !show);
             utils.toggleClass(this.elements.container, this.config.classNames.menu.open, show);
 
             if (show) {
@@ -3728,7 +3724,7 @@ var controls = {
         var clone = tab.cloneNode(true);
         clone.style.position = 'absolute';
         clone.style.opacity = 0;
-        clone.setAttribute('aria-hidden', false);
+        clone.removeAttribute('hidden');
 
         // Prevent input's being unchecked due to the name being identical
         Array.from(clone.querySelectorAll('input[name]')).forEach(function (input) {
@@ -3774,7 +3770,7 @@ var controls = {
 
         // Hide all other tabs
         // Get other tabs
-        var current = menu.querySelector('[role="tabpanel"][aria-hidden="false"]');
+        var current = menu.querySelector('[role="tabpanel"]:not([hidden])');
         var container = current.parentNode;
 
         // Set other toggles to be expanded false
@@ -3815,11 +3811,11 @@ var controls = {
         }
 
         // Set attributes on current tab
-        current.setAttribute('aria-hidden', true);
+        utils.toggleHidden(current, true);
         current.setAttribute('tabindex', -1);
 
         // Set attributes on target
-        pane.setAttribute('aria-hidden', !show);
+        utils.toggleHidden(pane, !show);
         tab.setAttribute('aria-expanded', show);
         pane.removeAttribute('tabindex');
 
@@ -3954,7 +3950,7 @@ var controls = {
             var form = utils.createElement('form', {
                 class: 'plyr__menu__container',
                 id: 'plyr-settings-' + data.id,
-                'aria-hidden': true,
+                hidden: '',
                 'aria-labelled-by': 'plyr-settings-toggle-' + data.id,
                 role: 'tablist',
                 tabindex: -1
@@ -3964,7 +3960,6 @@ var controls = {
 
             var home = utils.createElement('div', {
                 id: 'plyr-settings-' + data.id + '-home',
-                'aria-hidden': false,
                 'aria-labelled-by': 'plyr-settings-toggle-' + data.id,
                 role: 'tabpanel'
             });
@@ -4011,11 +4006,10 @@ var controls = {
             this.config.settings.forEach(function (type) {
                 var pane = utils.createElement('div', {
                     id: 'plyr-settings-' + data.id + '-' + type,
-                    'aria-hidden': true,
+                    hidden: '',
                     'aria-labelled-by': 'plyr-settings-' + data.id + '-' + type + '-tab',
                     role: 'tabpanel',
-                    tabindex: -1,
-                    hidden: ''
+                    tabindex: -1
                 });
 
                 var back = utils.createElement('button', {
