@@ -77,7 +77,7 @@ var defaults = {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.2.1/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.2.2/plyr.svg',
 
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
@@ -1958,7 +1958,7 @@ var Fullscreen = function () {
 
         // Get prefix
         this.prefix = Fullscreen.prefix;
-        this.name = Fullscreen.name;
+        this.property = Fullscreen.property;
 
         // Scroll position
         this.scrollPosition = { x: 0, y: 0 };
@@ -2022,7 +2022,7 @@ var Fullscreen = function () {
             } else if (!this.prefix) {
                 this.target.requestFullscreen();
             } else if (!utils.is.empty(this.prefix)) {
-                this.target[this.prefix + 'Request' + this.name]();
+                this.target[this.prefix + 'Request' + this.property]();
             }
         }
 
@@ -2045,7 +2045,7 @@ var Fullscreen = function () {
                 (document.cancelFullScreen || document.exitFullscreen).call(document);
             } else if (!utils.is.empty(this.prefix)) {
                 var action = this.prefix === 'moz' ? 'Cancel' : 'Exit';
-                document['' + this.prefix + action + this.name]();
+                document['' + this.prefix + action + this.property]();
             }
         }
 
@@ -2083,7 +2083,7 @@ var Fullscreen = function () {
                 return utils.hasClass(this.target, this.player.config.classNames.fullscreen.fallback);
             }
 
-            var element = !this.prefix ? document.fullscreenElement : document['' + this.prefix + this.name + 'Element'];
+            var element = !this.prefix ? document.fullscreenElement : document['' + this.prefix + this.property + 'Element'];
 
             return element === this.target;
         }
@@ -2127,7 +2127,7 @@ var Fullscreen = function () {
             return value;
         }
     }, {
-        key: 'name',
+        key: 'property',
         get: function get$$1() {
             return this.prefix === 'moz' ? 'FullScreen' : 'Fullscreen';
         }
