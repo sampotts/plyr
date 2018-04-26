@@ -1076,8 +1076,8 @@ class Plyr {
                     utils.toggleClass(this.elements.controls, this.config.classNames.noTransition, false);
                 }
 
-                // Check if controls toggled
-                const toggled = utils.toggleClass(this.elements.container, this.config.classNames.hideControls, true);
+                // Set hideControls class
+                const toggled = utils.toggleClass(this.elements.container, this.config.classNames.hideControls, this.config.hideControls);
 
                 // Trigger event and close menu
                 if (toggled) {
