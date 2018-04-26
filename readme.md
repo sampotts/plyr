@@ -39,13 +39,13 @@ Check out the [changelog](changelog.md) to see what's new with Plyr.
 
 Some awesome folks have made plugins for CMSs and Components for JavaScript frameworks:
 
-| Type      | Maintainer                                                            | Link                                                                                         |
-| --------- | --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| WordPress | Ryan Anthony Drake ([@iamryandrake](https://github.com/iamryandrake)) | [https://wordpress.org/plugins/plyr/](https://wordpress.org/plugins/plyr/)                   |
-| React     | Jose Miguel Bejarano ([@xDae](https://github.com/xDae))               | [https://github.com/xDae/react-plyr](https://github.com/xDae/react-plyr)                     |
-| Vue       | Gabe Dunn ([@redxtech](https://github.com/redxtech))                  | [https://github.com/redxtech/vue-plyr](https://github.com/redxtech/vue-plyr)                 |
-| Neos      | Jon Uhlmann ([@jonnitto](https://github.com/jonnitto))                | [https://packagist.org/packages/jonnitto/plyr](https://packagist.org/packages/jonnitto/plyr) |
-| Kirby     | Dominik Pschenitschni ([@dpschen](https://github.com/dpschen))        | [https://github.com/dpschen/kirby-plyrtag](https://github.com/dpschen/kirby-plyrtag)         |
+| Type      | Maintainer                                                     | Link                                                                                         |
+| --------- | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| WordPress | Brandon Lavigne ([@drrobotnik](https://github.com/drrobotnik)) | [https://wordpress.org/plugins/plyr/](https://wordpress.org/plugins/plyr/)                   |
+| React     | Jose Miguel Bejarano ([@xDae](https://github.com/xDae))        | [https://github.com/xDae/react-plyr](https://github.com/xDae/react-plyr)                     |
+| Vue       | Gabe Dunn ([@redxtech](https://github.com/redxtech))           | [https://github.com/redxtech/vue-plyr](https://github.com/redxtech/vue-plyr)                 |
+| Neos      | Jon Uhlmann ([@jonnitto](https://github.com/jonnitto))         | [https://packagist.org/packages/jonnitto/plyr](https://packagist.org/packages/jonnitto/plyr) |
+| Kirby     | Dominik Pschenitschni ([@dpschen](https://github.com/dpschen)) | [https://github.com/dpschen/kirby-plyrtag](https://github.com/dpschen/kirby-plyrtag)         |
 
 ## Quick setup
 
