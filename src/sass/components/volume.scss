@@ -23,7 +23,12 @@
 // Hide sound controls on iOS
 // It's not supported to change volume using JavaScript:
 // https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html
-.plyr--is-ios .plyr__volume,
-.plyr--is-ios [data-plyr='mute'] {
+.plyr--is-ios .plyr__volume {
+    display: none !important;
+}
+
+// Vimeo has no toggle mute method so hide mute button
+// https://github.com/vimeo/player.js/issues/236#issuecomment-384663183
+.plyr--is-ios.plyr--vimeo [data-plyr='mute'] {
     display: none !important;
 }

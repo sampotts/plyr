@@ -210,7 +210,6 @@ const controls = {
 
             // Add aria attributes
             attributes['aria-pressed'] = false;
-            attributes['aria-label'] = i18n.get(label, this.config);
         } else {
             button.appendChild(controls.createIcon.call(this, icon));
             button.appendChild(controls.createLabel.call(this, label));
@@ -327,22 +326,14 @@ const controls = {
 
     // Create time display
     createTime(type) {
-        const container = utils.createElement('div', {
-            class: 'plyr__time',
-        });
+        const attributes = utils.getAttributesFromSelector(this.config.selectors.display[type]);
 
-        container.appendChild(
-            utils.createElement(
-                'span',
-                {
-                    class: this.config.classNames.hidden,
-                },
-                i18n.get(type, this.config),
-            ),
-        );
+        const container = utils.createElement('div', utils.extend(attributes, {
+            class: `plyr__time ${attributes.class}`,
+            'aria-label': i18n.get(type, this.config),
+        }), '0:00');
 
-        container.appendChild(utils.createElement('span', utils.getAttributesFromSelector(this.config.selectors.display[type]), '00:00'));
-
+        // Reference for updates
         this.elements.display[type] = container;
 
         return container;
@@ -1204,17 +1195,21 @@ const controls = {
         let container = null;
         this.elements.controls = null;
 
-        // HTML or Element passed as the option
+        // Set template properties
+        const props = {
+            id: this.id,
+            seektime: this.config.seekTime,
+            title: this.config.title,
+        };
+        let update = true;
+
         if (utils.is.string(this.config.controls) || utils.is.element(this.config.controls)) {
+            // String or HTMLElement passed as the option
             container = this.config.controls;
         } else if (utils.is.function(this.config.controls)) {
             // A custom function to build controls
             // The function can return a HTMLElement or String
-            container = this.config.controls({
-                id: this.id,
-                seektime: this.config.seekTime,
-                title: this.config.title,
-            });
+            container = this.config.controls.call(this, props);
         } else {
             // Create controls
             container = controls.create.call(this, {
@@ -1226,6 +1221,30 @@ const controls = {
                 // TODO: Looping
                 // loop: 'None',
             });
+            update = false;
+        }
+
+        // Replace props with their value
+        const replace = input => {
+            let result = input;
+
+            Object.entries(props).forEach(([
+                key,
+                value,
+            ]) => {
+                result = utils.replaceAll(result, `{${key}}`, value);
+            });
+
+            return result;
+        };
+
+        // Update markup
+        if (update) {
+            if (utils.is.string(this.config.controls)) {
+                container = replace(container);
+            } else if (utils.is.element(container)) {
+                container.innerHTML = replace(container.innerHTML);
+            }
         }
 
         // Controls container

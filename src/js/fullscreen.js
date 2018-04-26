@@ -70,7 +70,7 @@ class Fullscreen {
         // Fullscreen toggle on double click
         utils.on(this.player.elements.container, 'dblclick', event => {
             // Ignore double click in controls
-            if (this.player.elements.controls.contains(event.target)) {
+            if (utils.is.element(this.player.elements.controls) && this.player.elements.controls.contains(event.target)) {
                 return;
             }
 

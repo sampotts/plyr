@@ -468,8 +468,8 @@ const utils = {
             // Display
             this.elements.display = {
                 buffer: utils.getElement.call(this, this.config.selectors.display.buffer),
-                duration: utils.getElement.call(this, this.config.selectors.display.duration),
                 currentTime: utils.getElement.call(this, this.config.selectors.display.currentTime),
+                duration: utils.getElement.call(this, this.config.selectors.display.duration),
             };
 
             // Seek tooltip

@@ -121,7 +121,8 @@ const controls = `
         <progress class="plyr__progress--buffer" min="0" max="100" value="0">% buffered</progress>
         <span role="tooltip" class="plyr__tooltip">00:00</span>
     </div>
-    <div class="plyr__time">00:00</div>
+    <div class="plyr__time plyr__time--current" aria-label="Current time">00:00</div>
+    <div class="plyr__time plyr__time--duration" aria-label="Duration">00:00</div>
     <button type="button" class="plyr__control" aria-pressed="false" aria-label="Mute" data-plyr="mute">
         <svg class="icon--pressed" role="presentation"><use xlink:href="#plyr-muted"></use></svg>
         <svg class="icon--not-pressed" role="presentation"><use xlink:href="#plyr-volume"></use></svg>

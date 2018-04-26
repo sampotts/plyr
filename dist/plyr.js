@@ -77,7 +77,7 @@ var defaults = {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.2.2/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.2.3/plyr.svg',
 
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
@@ -1200,8 +1200,8 @@ var utils = {
             // Display
             this.elements.display = {
                 buffer: utils.getElement.call(this, this.config.selectors.display.buffer),
-                duration: utils.getElement.call(this, this.config.selectors.display.duration),
-                currentTime: utils.getElement.call(this, this.config.selectors.display.currentTime)
+                currentTime: utils.getElement.call(this, this.config.selectors.display.currentTime),
+                duration: utils.getElement.call(this, this.config.selectors.display.duration)
             };
 
             // Seek tooltip
@@ -1973,7 +1973,7 @@ var Fullscreen = function () {
         // Fullscreen toggle on double click
         utils.on(this.player.elements.container, 'dblclick', function (event) {
             // Ignore double click in controls
-            if (_this.player.elements.controls.contains(event.target)) {
+            if (utils.is.element(_this.player.elements.controls) && _this.player.elements.controls.contains(event.target)) {
                 return;
             }
 
@@ -2486,11 +2486,6 @@ var ui = {
             this.listeners.controls();
         }
 
-        // If there's no controls, bail
-        if (!utils.is.element(this.elements.controls)) {
-            return;
-        }
-
         // Remove native controls
         ui.toggleNativeControls.call(this);
 
@@ -2731,10 +2726,10 @@ var ui = {
         }
 
         // Always display hours if duration is over an hour
-        var displayHours = utils.getHours(this.duration) > 0;
+        var forceHours = utils.getHours(this.duration) > 0;
 
         // eslint-disable-next-line no-param-reassign
-        target.textContent = utils.formatTime(time, displayHours, inverted);
+        target.textContent = utils.formatTime(time, forceHours, inverted);
     },
 
 
@@ -3132,7 +3127,6 @@ var controls = {
 
             // Add aria attributes
             attributes['aria-pressed'] = false;
-            attributes['aria-label'] = i18n.get(label, this.config);
         } else {
             button.appendChild(controls.createIcon.call(this, icon));
             button.appendChild(controls.createLabel.call(this, label));
@@ -3234,16 +3228,14 @@ var controls = {
 
     // Create time display
     createTime: function createTime(type) {
-        var container = utils.createElement('div', {
-            class: 'plyr__time'
-        });
+        var attributes = utils.getAttributesFromSelector(this.config.selectors.display[type]);
 
-        container.appendChild(utils.createElement('span', {
-            class: this.config.classNames.hidden
-        }, i18n.get(type, this.config)));
+        var container = utils.createElement('div', utils.extend(attributes, {
+            class: 'plyr__time ' + attributes.class,
+            'aria-label': i18n.get(type, this.config)
+        }), '0:00');
 
-        container.appendChild(utils.createElement('span', utils.getAttributesFromSelector(this.config.selectors.display[type]), '00:00'));
-
+        // Reference for updates
         this.elements.display[type] = container;
 
         return container;
@@ -4091,17 +4083,21 @@ var controls = {
         var container = null;
         this.elements.controls = null;
 
-        // HTML or Element passed as the option
+        // Set template properties
+        var props = {
+            id: this.id,
+            seektime: this.config.seekTime,
+            title: this.config.title
+        };
+        var update = true;
+
         if (utils.is.string(this.config.controls) || utils.is.element(this.config.controls)) {
+            // String or HTMLElement passed as the option
             container = this.config.controls;
         } else if (utils.is.function(this.config.controls)) {
             // A custom function to build controls
             // The function can return a HTMLElement or String
-            container = this.config.controls({
-                id: this.id,
-                seektime: this.config.seekTime,
-                title: this.config.title
-            });
+            container = this.config.controls.call(this, props);
         } else {
             // Create controls
             container = controls.create.call(this, {
@@ -4113,6 +4109,31 @@ var controls = {
                 // TODO: Looping
                 // loop: 'None',
             });
+            update = false;
+        }
+
+        // Replace props with their value
+        var replace = function replace(input) {
+            var result = input;
+
+            Object.entries(props).forEach(function (_ref) {
+                var _ref2 = slicedToArray(_ref, 2),
+                    key = _ref2[0],
+                    value = _ref2[1];
+
+                result = utils.replaceAll(result, '{' + key + '}', value);
+            });
+
+            return result;
+        };
+
+        // Update markup
+        if (update) {
+            if (utils.is.string(this.config.controls)) {
+                container = replace(container);
+            } else if (utils.is.element(container)) {
+                container.innerHTML = replace(container.innerHTML);
+            }
         }
 
         // Controls container
@@ -4414,7 +4435,7 @@ var Listeners = function () {
             });
 
             // Display duration
-            utils.on(this.player.media, 'durationchange loadedmetadata', function (event) {
+            utils.on(this.player.media, 'durationchange loadeddata loadedmetadata', function (event) {
                 return ui.durationUpdate.call(_this3.player, event);
             });
 

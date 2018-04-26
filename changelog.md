@@ -1,3 +1,12 @@
+## v3.2.4
+
+*   Fix issue wher player never reports as ready if controls is empty array
+*   Fix issue where screen reader labels were removed from time displays
+*   Fix issue where custom controls placeholders were not populated
+*   Custom controls HTML example updated
+*   Fix for aria-label being set to the initial state on toggle buttons, overriding the inner labels
+*   Fix for hidden mute button on iOS (not functional for Vimeo due to API limitations) (fixes #656)
+
 ## v3.2.3
 
 *   Fix for iOS 9 throwing error for `name` property in fullscreen API (fixes #908)
