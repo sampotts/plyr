@@ -85,6 +85,15 @@ function serializer(replacer, cycleReplacer) {
 });
 var stringify_2 = stringify_1.getSerialize;
 
+
+var stringify = Object.freeze({
+	default: stringify_1,
+	__moduleExports: stringify_1,
+	getSerialize: stringify_2
+});
+
+var stringify$1 = ( stringify && stringify_1 ) || stringify;
+
 var _window =
   typeof window !== 'undefined'
     ? window
@@ -597,7 +606,7 @@ function serializeException(ex, depth, maxSize) {
 
   var serialized = serializeObject(ex, depth);
 
-  if (jsonSize(stringify_1(serialized)) > maxSize) {
+  if (jsonSize(stringify$1(serialized)) > maxSize) {
     return serializeException(ex, depth - 1);
   }
 
@@ -635,7 +644,7 @@ function sanitize(input, sanitizeKeys) {
   var safeInput;
 
   try {
-    safeInput = JSON.parse(stringify_1(input));
+    safeInput = JSON.parse(stringify$1(input));
   } catch (o_O) {
     return input;
   }
@@ -698,6 +707,78 @@ var utils = {
   serializeKeysForMessage: serializeKeysForMessage,
   sanitize: sanitize
 };
+var utils_1 = utils.isObject;
+var utils_2 = utils.isError;
+var utils_3 = utils.isErrorEvent;
+var utils_4 = utils.isUndefined;
+var utils_5 = utils.isFunction;
+var utils_6 = utils.isPlainObject;
+var utils_7 = utils.isString;
+var utils_8 = utils.isArray;
+var utils_9 = utils.isEmptyObject;
+var utils_10 = utils.supportsErrorEvent;
+var utils_11 = utils.supportsFetch;
+var utils_12 = utils.supportsReferrerPolicy;
+var utils_13 = utils.supportsPromiseRejectionEvent;
+var utils_14 = utils.wrappedCallback;
+var utils_15 = utils.each;
+var utils_16 = utils.objectMerge;
+var utils_17 = utils.truncate;
+var utils_18 = utils.objectFrozen;
+var utils_19 = utils.hasKey;
+var utils_20 = utils.joinRegExp;
+var utils_21 = utils.urlencode;
+var utils_22 = utils.uuid4;
+var utils_23 = utils.htmlTreeAsString;
+var utils_24 = utils.htmlElementAsString;
+var utils_25 = utils.isSameException;
+var utils_26 = utils.isSameStacktrace;
+var utils_27 = utils.parseUrl;
+var utils_28 = utils.fill;
+var utils_29 = utils.safeJoin;
+var utils_30 = utils.serializeException;
+var utils_31 = utils.serializeKeysForMessage;
+var utils_32 = utils.sanitize;
+
+
+var utils$1 = Object.freeze({
+	default: utils,
+	__moduleExports: utils,
+	isObject: utils_1,
+	isError: utils_2,
+	isErrorEvent: utils_3,
+	isUndefined: utils_4,
+	isFunction: utils_5,
+	isPlainObject: utils_6,
+	isString: utils_7,
+	isArray: utils_8,
+	isEmptyObject: utils_9,
+	supportsErrorEvent: utils_10,
+	supportsFetch: utils_11,
+	supportsReferrerPolicy: utils_12,
+	supportsPromiseRejectionEvent: utils_13,
+	wrappedCallback: utils_14,
+	each: utils_15,
+	objectMerge: utils_16,
+	truncate: utils_17,
+	objectFrozen: utils_18,
+	hasKey: utils_19,
+	joinRegExp: utils_20,
+	urlencode: utils_21,
+	uuid4: utils_22,
+	htmlTreeAsString: utils_23,
+	htmlElementAsString: utils_24,
+	isSameException: utils_25,
+	isSameStacktrace: utils_26,
+	parseUrl: utils_27,
+	fill: utils_28,
+	safeJoin: utils_29,
+	serializeException: utils_30,
+	serializeKeysForMessage: utils_31,
+	sanitize: utils_32
+});
+
+var utils$2 = ( utils$1 && utils ) || utils$1;
 
 /*
  TraceKit - Cross brower stack traces
@@ -847,9 +928,9 @@ TraceKit.report = (function reportModuleWrapper() {
   function traceKitWindowOnError(msg, url, lineNo, colNo, ex) {
     var stack = null;
     // If 'ex' is ErrorEvent, get real Error from inside
-    var exception = utils.isErrorEvent(ex) ? ex.error : ex;
+    var exception = utils$2.isErrorEvent(ex) ? ex.error : ex;
     // If 'msg' is ErrorEvent, get real message from inside
-    var message = utils.isErrorEvent(msg) ? msg.message : msg;
+    var message = utils$2.isErrorEvent(msg) ? msg.message : msg;
 
     if (lastExceptionStack) {
       TraceKit.computeStackTrace.augmentStackTraceWithInitialElement(
@@ -859,7 +940,7 @@ TraceKit.report = (function reportModuleWrapper() {
         message
       );
       processLastException();
-    } else if (exception && utils.isError(exception)) {
+    } else if (exception && utils$2.isError(exception)) {
       // non-string `exception` arg; attempt to extract stack trace
 
       // New chrome and blink send along a real error object
@@ -1326,6 +1407,12 @@ TraceKit.computeStackTrace = (function computeStackTraceWrapper() {
 
 var tracekit = TraceKit;
 
+
+var tracekit$1 = Object.freeze({
+	default: tracekit,
+	__moduleExports: tracekit
+});
+
 /*
  * JavaScript MD5
  * https://github.com/blueimp/JavaScript-MD5
@@ -1593,6 +1680,12 @@ function md5(string, key, raw) {
 
 var md5_1 = md5;
 
+
+var md5$1 = Object.freeze({
+	default: md5_1,
+	__moduleExports: md5_1
+});
+
 function RavenConfigError(message) {
   this.name = 'RavenConfigError';
   this.message = message;
@@ -1601,6 +1694,12 @@ RavenConfigError.prototype = new Error();
 RavenConfigError.prototype.constructor = RavenConfigError;
 
 var configError = RavenConfigError;
+
+
+var configError$1 = Object.freeze({
+	default: configError,
+	__moduleExports: configError
+});
 
 var wrapMethod = function(console, level, callback) {
   var originalConsoleLevel = console[level];
@@ -1615,14 +1714,14 @@ var wrapMethod = function(console, level, callback) {
   console[level] = function() {
     var args = [].slice.call(arguments);
 
-    var msg = utils.safeJoin(args, ' ');
+    var msg = utils$2.safeJoin(args, ' ');
     var data = {level: sentryLevel, logger: 'console', extra: {arguments: args}};
 
     if (level === 'assert') {
       if (args[0] === false) {
         // Default browsers message
         msg =
-          'Assertion failed: ' + (utils.safeJoin(args.slice(1), ' ') || 'console.assert');
+          'Assertion failed: ' + (utils$2.safeJoin(args.slice(1), ' ') || 'console.assert');
         data.extra.arguments = args.slice(1);
         callback && callback(msg, data);
       }
@@ -1642,6 +1741,22 @@ var wrapMethod = function(console, level, callback) {
 var console$1 = {
   wrapMethod: wrapMethod
 };
+var console_1 = console$1.wrapMethod;
+
+
+var console$2 = Object.freeze({
+	default: console$1,
+	__moduleExports: console$1,
+	wrapMethod: console_1
+});
+
+var TraceKit$1 = ( tracekit$1 && tracekit ) || tracekit$1;
+
+var md5$2 = ( md5$1 && md5_1 ) || md5$1;
+
+var RavenConfigError$1 = ( configError$1 && configError ) || configError$1;
+
+var require$$0 = ( console$2 && console$1 ) || console$2;
 
 /*global XDomainRequest:false */
 
@@ -1651,35 +1766,35 @@ var console$1 = {
 
 
 
-var isError$1 = utils.isError;
-var isObject$1 = utils.isObject;
-var isPlainObject$1 = utils.isPlainObject;
-var isErrorEvent$1 = utils.isErrorEvent;
-var isUndefined$1 = utils.isUndefined;
-var isFunction$1 = utils.isFunction;
-var isString$1 = utils.isString;
-var isArray$1 = utils.isArray;
-var isEmptyObject$1 = utils.isEmptyObject;
-var each$1 = utils.each;
-var objectMerge$1 = utils.objectMerge;
-var truncate$1 = utils.truncate;
-var objectFrozen$1 = utils.objectFrozen;
-var hasKey$1 = utils.hasKey;
-var joinRegExp$1 = utils.joinRegExp;
-var urlencode$1 = utils.urlencode;
-var uuid4$1 = utils.uuid4;
-var htmlTreeAsString$1 = utils.htmlTreeAsString;
-var isSameException$1 = utils.isSameException;
-var isSameStacktrace$1 = utils.isSameStacktrace;
-var parseUrl$1 = utils.parseUrl;
-var fill$1 = utils.fill;
-var supportsFetch$1 = utils.supportsFetch;
-var supportsReferrerPolicy$1 = utils.supportsReferrerPolicy;
-var serializeKeysForMessage$1 = utils.serializeKeysForMessage;
-var serializeException$1 = utils.serializeException;
-var sanitize$1 = utils.sanitize;
+var isError$1 = utils$2.isError;
+var isObject$1 = utils$2.isObject;
+var isPlainObject$1 = utils$2.isPlainObject;
+var isErrorEvent$1 = utils$2.isErrorEvent;
+var isUndefined$1 = utils$2.isUndefined;
+var isFunction$1 = utils$2.isFunction;
+var isString$1 = utils$2.isString;
+var isArray$1 = utils$2.isArray;
+var isEmptyObject$1 = utils$2.isEmptyObject;
+var each$1 = utils$2.each;
+var objectMerge$1 = utils$2.objectMerge;
+var truncate$1 = utils$2.truncate;
+var objectFrozen$1 = utils$2.objectFrozen;
+var hasKey$1 = utils$2.hasKey;
+var joinRegExp$1 = utils$2.joinRegExp;
+var urlencode$1 = utils$2.urlencode;
+var uuid4$1 = utils$2.uuid4;
+var htmlTreeAsString$1 = utils$2.htmlTreeAsString;
+var isSameException$1 = utils$2.isSameException;
+var isSameStacktrace$1 = utils$2.isSameStacktrace;
+var parseUrl$1 = utils$2.parseUrl;
+var fill$1 = utils$2.fill;
+var supportsFetch$1 = utils$2.supportsFetch;
+var supportsReferrerPolicy$1 = utils$2.supportsReferrerPolicy;
+var serializeKeysForMessage$1 = utils$2.serializeKeysForMessage;
+var serializeException$1 = utils$2.serializeException;
+var sanitize$1 = utils$2.sanitize;
 
-var wrapConsoleMethod = console$1.wrapMethod;
+var wrapConsoleMethod = require$$0.wrapMethod;
 
 var dsnKeys = 'source protocol user pass host port path'.split(' '),
   dsnPattern = /^(?:(\w+):)?\/\/(?:(\w+)(:\w+)?@)?([\w\.-]+)(?::(\d+))?(\/.*)/;
@@ -1786,7 +1901,7 @@ Raven.prototype = {
 
   debug: false,
 
-  TraceKit: tracekit, // alias to TraceKit
+  TraceKit: TraceKit$1, // alias to TraceKit
 
   /*
      * Configure Raven with a DSN and extra options
@@ -1867,7 +1982,7 @@ Raven.prototype = {
     }
     globalOptions.instrument = instrument;
 
-    tracekit.collectWindowErrors = !!globalOptions.collectWindowErrors;
+    TraceKit$1.collectWindowErrors = !!globalOptions.collectWindowErrors;
 
     // return for chaining
     return self;
@@ -1884,7 +1999,7 @@ Raven.prototype = {
   install: function() {
     var self = this;
     if (self.isSetup() && !self._isRavenInstalled) {
-      tracekit.report.subscribe(function() {
+      TraceKit$1.report.subscribe(function() {
         self._handleOnErrorStackInfo.apply(self, arguments);
       });
 
@@ -2048,7 +2163,7 @@ Raven.prototype = {
    * @return {Raven}
    */
   uninstall: function() {
-    tracekit.report.uninstall();
+    TraceKit$1.report.uninstall();
 
     this._detachPromiseRejectionHandler();
     this._unpatchFunctionToString();
@@ -2147,7 +2262,7 @@ Raven.prototype = {
     // raises an exception different from the one we asked to
     // report on.
     try {
-      var stack = tracekit.computeStackTrace(ex);
+      var stack = TraceKit$1.computeStackTrace(ex);
       this._handleStackInfo(stack, options);
     } catch (ex1) {
       if (ex !== ex1) {
@@ -2163,7 +2278,7 @@ Raven.prototype = {
     var options = objectMerge$1(currentOptions, {
       message:
         'Non-Error exception captured with keys: ' + serializeKeysForMessage$1(exKeys),
-      fingerprint: [md5_1(exKeys)],
+      fingerprint: [md5$2(exKeys)],
       extra: currentOptions.extra || {}
     });
     options.extra.__serialized__ = serializeException$1(ex);
@@ -2212,7 +2327,7 @@ Raven.prototype = {
 
     // null exception name so `Error` isn't prefixed to msg
     ex.name = null;
-    var stack = tracekit.computeStackTrace(ex);
+    var stack = TraceKit$1.computeStackTrace(ex);
 
     // stack[0] is `throw new Error(msg)` call itself, we are interested in the frame that was just before that, stack[1]
     var initialCall = isArray$1(stack.stack) && stack.stack[1];
@@ -2367,7 +2482,7 @@ Raven.prototype = {
      */
   getContext: function() {
     // lol javascript
-    return JSON.parse(stringify_1(this._globalContext));
+    return JSON.parse(stringify$1(this._globalContext));
   },
 
   /*
@@ -2503,12 +2618,12 @@ Raven.prototype = {
 
     var lastEventId = options.eventId || this.lastEventId();
     if (!lastEventId) {
-      throw new configError('Missing eventId');
+      throw new RavenConfigError$1('Missing eventId');
     }
 
     var dsn = options.dsn || this._dsn;
     if (!dsn) {
-      throw new configError('Missing DSN');
+      throw new RavenConfigError$1('Missing DSN');
     }
 
     var encode = encodeURIComponent;
@@ -3163,11 +3278,11 @@ Raven.prototype = {
     try {
       while (i--) dsn[dsnKeys[i]] = m[i] || '';
     } catch (e) {
-      throw new configError('Invalid DSN: ' + str);
+      throw new RavenConfigError$1('Invalid DSN: ' + str);
     }
 
     if (dsn.pass && !this._globalOptions.allowSecretKey) {
-      throw new configError(
+      throw new RavenConfigError$1(
         'Do not specify your secret key in the DSN. See: http://bit.ly/raven-secret-key'
       );
     }
@@ -3688,7 +3803,7 @@ Raven.prototype = {
     }
 
     if (supportsFetch$1()) {
-      evaluatedFetchParameters.body = stringify_1(opts.data);
+      evaluatedFetchParameters.body = stringify$1(opts.data);
 
       var defaultFetchOptions = objectMerge$1({}, this._fetchDefaults);
       var fetchOptions = objectMerge$1(defaultFetchOptions, evaluatedFetchParameters);
@@ -3763,7 +3878,7 @@ Raven.prototype = {
       });
     }
 
-    request.send(stringify_1(opts.data));
+    request.send(stringify$1(opts.data));
   },
 
   _evaluateHash: function(hash) {
@@ -3809,6 +3924,14 @@ Raven.prototype.setReleaseContext = Raven.prototype.setRelease;
 
 var raven = Raven;
 
+
+var raven$1 = Object.freeze({
+	default: raven,
+	__moduleExports: raven
+});
+
+var RavenConstructor = ( raven$1 && raven ) || raven$1;
+
 /**
  * Enforces a single instance of the Raven client, and the
  * main entry point for Raven. If you are a consumer of the
@@ -3824,7 +3947,7 @@ var _window$3 =
     : typeof commonjsGlobal !== 'undefined' ? commonjsGlobal : typeof self !== 'undefined' ? self : {};
 var _Raven = _window$3.Raven;
 
-var Raven$1 = new raven();
+var Raven$1 = new RavenConstructor();
 
 /*
  * Allow multiple versions of Raven to be installed.
@@ -3875,7 +3998,7 @@ var singleton = Raven$1;
  *
  * It should "just work".
  */
-var Client = raven;
+var Client = RavenConstructor;
 singleton.Client = Client;
 
 // ==========================================================================

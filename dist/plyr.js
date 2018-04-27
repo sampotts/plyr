@@ -77,7 +77,7 @@ var defaults = {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.2.3/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.2.4/plyr.svg',
 
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
@@ -3233,7 +3233,7 @@ var controls = {
         var container = utils.createElement('div', utils.extend(attributes, {
             class: 'plyr__time ' + attributes.class,
             'aria-label': i18n.get(type, this.config)
-        }), '0:00');
+        }), '00:00');
 
         // Reference for updates
         this.elements.display[type] = container;
