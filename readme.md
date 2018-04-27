@@ -39,13 +39,13 @@ Check out the [changelog](changelog.md) to see what's new with Plyr.
 
 Some awesome folks have made plugins for CMSs and Components for JavaScript frameworks:
 
-| Type      | Maintainer                                                            | Link                                                                                         |
-| --------- | --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| WordPress | Ryan Anthony Drake ([@iamryandrake](https://github.com/iamryandrake)) | [https://wordpress.org/plugins/plyr/](https://wordpress.org/plugins/plyr/)                   |
-| React     | Jose Miguel Bejarano ([@xDae](https://github.com/xDae))               | [https://github.com/xDae/react-plyr](https://github.com/xDae/react-plyr)                     |
-| Vue       | Gabe Dunn ([@redxtech](https://github.com/redxtech))                  | [https://github.com/redxtech/vue-plyr](https://github.com/redxtech/vue-plyr)                 |
-| Neos      | Jon Uhlmann ([@jonnitto](https://github.com/jonnitto))                | [https://packagist.org/packages/jonnitto/plyr](https://packagist.org/packages/jonnitto/plyr) |
-| Kirby     | Dominik Pschenitschni ([@dpschen](https://github.com/dpschen))        | [https://github.com/dpschen/kirby-plyrtag](https://github.com/dpschen/kirby-plyrtag)         |
+| Type      | Maintainer                                                     | Link                                                                                         |
+| --------- | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| WordPress | Brandon Lavigne ([@drrobotnik](https://github.com/drrobotnik)) | [https://wordpress.org/plugins/plyr/](https://wordpress.org/plugins/plyr/)                   |
+| React     | Jose Miguel Bejarano ([@xDae](https://github.com/xDae))        | [https://github.com/xDae/react-plyr](https://github.com/xDae/react-plyr)                     |
+| Vue       | Gabe Dunn ([@redxtech](https://github.com/redxtech))           | [https://github.com/redxtech/vue-plyr](https://github.com/redxtech/vue-plyr)                 |
+| Neos      | Jon Uhlmann ([@jonnitto](https://github.com/jonnitto))         | [https://packagist.org/packages/jonnitto/plyr](https://packagist.org/packages/jonnitto/plyr) |
+| Kirby     | Dominik Pschenitschni ([@dpschen](https://github.com/dpschen)) | [https://github.com/dpschen/kirby-plyrtag](https://github.com/dpschen/kirby-plyrtag)         |
 
 ## Quick setup
 
@@ -128,7 +128,7 @@ See [initialising](#initialising) for more information on advanced setups.
 If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for the JavaScript, you can use the following:
 
 ```html
-<script src="https://cdn.plyr.io/3.2.1/plyr.js"></script>
+<script src="https://cdn.plyr.io/3.2.4/plyr.js"></script>
 ```
 
 _Note_: Be sure to read the [polyfills](#polyfills) section below about browser compatibility
@@ -144,13 +144,13 @@ Include the `plyr.css` stylsheet into your `<head>`
 If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for the default CSS, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/3.2.1/plyr.css">
+<link rel="stylesheet" href="https://cdn.plyr.io/3.2.4/plyr.css">
 ```
 
 ### SVG Sprite
 
 The SVG sprite is loaded automatically from our CDN (provided by [Fastly](https://www.fastly.com/)). To change this, see the [options](#options) below. For
-reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.2.1/plyr.svg`.
+reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.2.4/plyr.svg`.
 
 ## Ads
 
@@ -668,8 +668,10 @@ Plyr is developed by [@sam_potts](https://twitter.com/sam_potts) / [sampotts.me]
 
 ## Donate
 
-Plyr costs money to run, not only my time - I donate that for free but domains, hosting and more. Any help is appreciated...
-[Donate to support Plyr](https://www.paypal.me/pottsy/20usd)
+Plyr costs money to run, not only my time. I donate my time for free as I enjoy building Plyr but unfortunately have to pay for domains, hosting, and more. Any help with costs is appreciated...
+
+*   [Donate via Patron](https://www.patreon.com/plyr)
+*   [Donate via PayPal](https://www.paypal.me/pottsy/20usd)
 
 ## Mentions
 
@@ -707,9 +709,13 @@ Credit to the PayPal HTML5 Video player from which Plyr's caption functionality 
 
 ## Thanks
 
-[![Fastly](https://cdn.plyr.io/static/demo/fastly-logo.png)](https://www.fastly.com/)
+[![Fastly](https://cdn.plyr.io/static/fastly-logo.png)](https://www.fastly.com/)
 
 Massive thanks to [Fastly](https://www.fastly.com/) for providing the CDN services.
+
+[![Sentry](https://cdn.plyr.io/static/sentry-logo-black.svg)](https://sentry.io/)
+
+Massive thanks to [Sentry](https://sentry.io/) for providing the logging services for the demo site.
 
 ## Copyright and License
 

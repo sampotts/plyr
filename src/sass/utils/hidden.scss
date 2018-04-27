@@ -2,15 +2,6 @@
 // Hiding content nicely
 // --------------------------------------------------------------
 
-// Attributes
-.plyr--full-ui [hidden] {
-    display: none;
-}
-
-.plyr--full-ui [aria-hidden='true'] {
-    display: none;
-}
-
 // Screen reader only elements
 .plyr__sr-only {
     clip: rect(1px, 1px, 1px, 1px);

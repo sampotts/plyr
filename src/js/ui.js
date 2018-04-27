@@ -48,11 +48,6 @@ const ui = {
             this.listeners.controls();
         }
 
-        // If there's no controls, bail
-        if (!utils.is.element(this.elements.controls)) {
-            return;
-        }
-
         // Remove native controls
         ui.toggleNativeControls.call(this);
 
@@ -277,10 +272,10 @@ const ui = {
         }
 
         // Always display hours if duration is over an hour
-        const displayHours = utils.getHours(this.duration) > 0;
+        const forceHours = utils.getHours(this.duration) > 0;
 
         // eslint-disable-next-line no-param-reassign
-        target.textContent = utils.formatTime(time, displayHours, inverted);
+        target.textContent = utils.formatTime(time, forceHours, inverted);
     },
 
     // Handle time change event

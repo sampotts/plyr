@@ -55,7 +55,7 @@ class Fullscreen {
 
         // Get prefix
         this.prefix = Fullscreen.prefix;
-        this.name = Fullscreen.name;
+        this.property = Fullscreen.property;
 
         // Scroll position
         this.scrollPosition = { x: 0, y: 0 };
@@ -70,7 +70,7 @@ class Fullscreen {
         // Fullscreen toggle on double click
         utils.on(this.player.elements.container, 'dblclick', event => {
             // Ignore double click in controls
-            if (this.player.elements.controls.contains(event.target)) {
+            if (utils.is.element(this.player.elements.controls) && this.player.elements.controls.contains(event.target)) {
                 return;
             }
 
@@ -113,7 +113,7 @@ class Fullscreen {
         return value;
     }
 
-    static get name() {
+    static get property() {
         return this.prefix === 'moz' ? 'FullScreen' : 'Fullscreen';
     }
 
@@ -138,7 +138,7 @@ class Fullscreen {
             return utils.hasClass(this.target, this.player.config.classNames.fullscreen.fallback);
         }
 
-        const element = !this.prefix ? document.fullscreenElement : document[`${this.prefix}${this.name}Element`];
+        const element = !this.prefix ? document.fullscreenElement : document[`${this.prefix}${this.property}Element`];
 
         return element === this.target;
     }
@@ -176,7 +176,7 @@ class Fullscreen {
         } else if (!this.prefix) {
             this.target.requestFullscreen();
         } else if (!utils.is.empty(this.prefix)) {
-            this.target[`${this.prefix}Request${this.name}`]();
+            this.target[`${this.prefix}Request${this.property}`]();
         }
     }
 
@@ -196,7 +196,7 @@ class Fullscreen {
             (document.cancelFullScreen || document.exitFullscreen).call(document);
         } else if (!utils.is.empty(this.prefix)) {
             const action = this.prefix === 'moz' ? 'Cancel' : 'Exit';
-            document[`${this.prefix}${action}${this.name}`]();
+            document[`${this.prefix}${action}${this.property}`]();
         }
     }
 

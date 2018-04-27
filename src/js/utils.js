@@ -375,6 +375,25 @@ const utils = {
         return attributes;
     },
 
+    // Toggle hidden
+    toggleHidden(element, hidden) {
+        if (!utils.is.element(element)) {
+            return;
+        }
+
+        let hide = hidden;
+
+        if (!utils.is.boolean(hide)) {
+            hide = !element.hasAttribute('hidden');
+        }
+
+        if (hide) {
+            element.setAttribute('hidden', '');
+        } else {
+            element.removeAttribute('hidden');
+        }
+    },
+
     // Toggle class on an element
     toggleClass(element, className, toggle) {
         if (utils.is.element(element)) {
@@ -391,19 +410,6 @@ const utils = {
     // Has class name
     hasClass(element, className) {
         return utils.is.element(element) && element.classList.contains(className);
-    },
-
-    // Toggle hidden attribute on an element
-    toggleHidden(element, toggle) {
-        if (!utils.is.element(element)) {
-            return;
-        }
-
-        if (toggle) {
-            element.setAttribute('hidden', '');
-        } else {
-            element.removeAttribute('hidden');
-        }
     },
 
     // Element matches selector
@@ -462,8 +468,8 @@ const utils = {
             // Display
             this.elements.display = {
                 buffer: utils.getElement.call(this, this.config.selectors.display.buffer),
-                duration: utils.getElement.call(this, this.config.selectors.display.duration),
                 currentTime: utils.getElement.call(this, this.config.selectors.display.currentTime),
+                duration: utils.getElement.call(this, this.config.selectors.display.duration),
             };
 
             // Seek tooltip
@@ -752,7 +758,7 @@ const utils = {
             return null;
         }
 
-        return array.reduce((prev, curr) => Math.abs(curr - value) < Math.abs(prev - value) ? curr : prev);
+        return array.reduce((prev, curr) => (Math.abs(curr - value) < Math.abs(prev - value) ? curr : prev));
     },
 
     // Get the provider for a given URL

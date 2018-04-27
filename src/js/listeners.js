@@ -253,7 +253,7 @@ class Listeners {
         utils.on(this.player.media, 'timeupdate seeking', event => ui.timeUpdate.call(this.player, event));
 
         // Display duration
-        utils.on(this.player.media, 'durationchange loadedmetadata', event => ui.durationUpdate.call(this.player, event));
+        utils.on(this.player.media, 'durationchange loadeddata loadedmetadata', event => ui.durationUpdate.call(this.player, event));
 
         // Check for audio tracks on load
         // We can't use `loadedmetadata` as it doesn't seem to have audio tracks at that point

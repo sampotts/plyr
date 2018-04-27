@@ -1,6 +1,6 @@
 {
     "name": "plyr",
-    "version": "3.2.1",
+    "version": "3.2.4",
     "description": "A simple, accessible and customizable HTML5, YouTube and Vimeo media player",
     "homepage": "https://plyr.io",
     "main": "./dist/plyr.js",
@@ -37,7 +37,7 @@
         "gulp-util": "^3.0.8",
         "prettier-eslint": "^8.8.1",
         "prettier-stylelint": "^0.4.2",
-        "rollup-plugin-babel": "^3.0.3",
+        "rollup-plugin-babel": "^3.0.4",
         "rollup-plugin-commonjs": "^9.1.0",
         "rollup-plugin-node-resolve": "^3.3.0",
         "run-sequence": "^2.2.1",
@@ -46,7 +46,7 @@
         "stylelint-config-recommended": "^2.1.0",
         "stylelint-config-sass-guidelines": "^5.0.0",
         "stylelint-order": "^0.8.1",
-        "stylelint-scss": "^3.0.0",
+        "stylelint-scss": "^3.0.1",
         "stylelint-selector-bem-pattern": "^2.0.0"
     },
     "keywords": ["HTML5 Video", "HTML5 Audio", "Media Player", "DASH", "Shaka", "WordPress", "HLS"],
@@ -69,6 +69,7 @@
         "babel-polyfill": "^6.26.0",
         "custom-event-polyfill": "^0.3.0",
         "loadjs": "^3.5.4",
-        "raven-js": "^3.24.0"
+        "npm": "^6.0.0",
+        "raven-js": "^3.24.2"
     }
 }
