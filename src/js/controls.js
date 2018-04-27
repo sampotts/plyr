@@ -331,7 +331,7 @@ const controls = {
         const container = utils.createElement('div', utils.extend(attributes, {
             class: `plyr__time ${attributes.class}`,
             'aria-label': i18n.get(type, this.config),
-        }), '0:00');
+        }), '00:00');
 
         // Reference for updates
         this.elements.display[type] = container;
