@@ -668,8 +668,10 @@ Plyr is developed by [@sam_potts](https://twitter.com/sam_potts) / [sampotts.me]
 
 ## Donate
 
-Plyr costs money to run, not only my time - I donate that for free but domains, hosting and more. Any help is appreciated...
-[Donate to support Plyr](https://www.paypal.me/pottsy/20usd)
+Plyr costs money to run, not only my time. I donate my time for free as I enjoy building Plyr but unfortunately have to pay for domains, hosting, and more. Any help with costs is appreciated...
+
+*   [Donate via Patron](https://www.patreon.com/plyr)
+*   [Donate via PayPal](https://www.paypal.me/pottsy/20usd)
 
 ## Mentions
 
@@ -707,9 +709,13 @@ Credit to the PayPal HTML5 Video player from which Plyr's caption functionality 
 
 ## Thanks
 
-[![Fastly](https://cdn.plyr.io/static/demo/fastly-logo.png)](https://www.fastly.com/)
+[![Fastly](https://cdn.plyr.io/static/fastly-logo.png)](https://www.fastly.com/)
 
 Massive thanks to [Fastly](https://www.fastly.com/) for providing the CDN services.
+
+[![Sentry](https://cdn.plyr.io/static/sentry-logo-black.svg)](https://sentry.io/)
+
+Massive thanks to [Sentry](https://sentry.io/) for providing the logging services for the demo site.
 
 ## Copyright and License
 
