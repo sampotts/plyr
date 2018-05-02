@@ -7,6 +7,7 @@
 var fs          = require("fs"),
     path        = require("path"),
     gulp        = require("gulp"),
+    babel       = require('gulp-babel');
     gutil       = require("gulp-util"),
     concat      = require("gulp-concat"),
     uglify      = require("gulp-uglify"),
@@ -106,7 +107,11 @@ var build = {
 
                 gulp.task(name, function () {
                     return gulp
-                        .src(bundles[bundle].js[key])
+                        .src([
+                            'node_modules/babel-polyfill/dist/polyfill.js',
+                            ...bundles[bundle].js[key],
+                        ])
+                        .pipe(babel({presets: ['es2015']}))
                         .pipe(concat(key))
                         .pipe(uglify())
                         .pipe(gulp.dest(paths[bundle].output));
