@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v3.3.0
+// plyr.js v3.3.2
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -332,11 +332,6 @@ class Plyr {
         if (!utils.is.function(this.media.play)) {
             return null;
         }
-
-        // If ads are enabled, wait for them first
-        /* if (this.ads.enabled && !this.ads.initialized) {
-            return this.ads.managerPromise.then(() => this.ads.play()).catch(() => this.media.play());
-        } */
 
         // Return the promise (for HTML5)
         return this.media.play();

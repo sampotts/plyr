@@ -3742,7 +3742,7 @@ var defaults$1 = {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.3.0/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.3.2/plyr.svg',
 
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
@@ -5805,7 +5805,6 @@ var Ads = function () {
 
         this.player = player;
         this.publisherId = player.config.ads.publisherId;
-        this.enabled = player.isHTML5 && player.isVideo && player.config.ads.enabled && utils.is.string(this.publisherId) && this.publisherId.length;
         this.playing = false;
         this.initialized = false;
         this.elements = {
@@ -5831,13 +5830,13 @@ var Ads = function () {
         this.load();
     }
 
-    /**
-     * Load the IMA SDK
-     */
-
-
     createClass(Ads, [{
         key: 'load',
+
+
+        /**
+         * Load the IMA SDK
+         */
         value: function load() {
             var _this2 = this;
 
@@ -6443,6 +6442,11 @@ var Ads = function () {
             }
         }
     }, {
+        key: 'enabled',
+        get: function get$$1() {
+            return this.player.isHTML5 && this.player.isVideo && this.player.config.ads.enabled && utils.is.string(this.publisherId) && this.publisherId.length;
+        }
+    }, {
         key: 'tagUrl',
         get: function get$$1() {
             var params = {
@@ -6553,8 +6557,8 @@ var source = {
                 if (_this2.config.autoplay) {
                     _this2.media.setAttribute('autoplay', '');
                 }
-                if ('poster' in input) {
-                    _this2.media.setAttribute('poster', input.poster);
+                if (!utils.is.empty(input.poster)) {
+                    _this2.poster = input.poster;
                 }
                 if (_this2.config.loop.active) {
                     _this2.media.setAttribute('loop', '');
@@ -6983,11 +6987,6 @@ var Plyr = function () {
             if (!utils.is.function(this.media.play)) {
                 return null;
             }
-
-            // If ads are enabled, wait for them first
-            /* if (this.ads.enabled && !this.ads.initialized) {
-                return this.ads.managerPromise.then(() => this.ads.play()).catch(() => this.media.play());
-            } */
 
             // Return the promise (for HTML5)
             return this.media.play();

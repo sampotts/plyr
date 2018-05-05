@@ -18,7 +18,6 @@ class Ads {
     constructor(player) {
         this.player = player;
         this.publisherId = player.config.ads.publisherId;
-        this.enabled = player.isHTML5 && player.isVideo && player.config.ads.enabled && utils.is.string(this.publisherId) && this.publisherId.length;
         this.playing = false;
         this.initialized = false;
         this.elements = {
@@ -42,6 +41,10 @@ class Ads {
         });
 
         this.load();
+    }
+
+    get enabled() {
+        return this.player.isHTML5 && this.player.isVideo && this.player.config.ads.enabled && utils.is.string(this.publisherId) && this.publisherId.length;
     }
 
     /**

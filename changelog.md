@@ -1,3 +1,8 @@
+# v3.3.2
+
+*   Fix for ads running in audio
+*   Fix for setting poster on source change
+
 ## v3.3.0
 
 *   Now using a custom poster image element to hide the YouTube play button and give more control over when the poster image shows
