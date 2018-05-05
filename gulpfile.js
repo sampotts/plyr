@@ -129,7 +129,7 @@ const build = {
             tasks.js.push(name);
             const { output } = paths[bundle];
 
-            gulp.task(name, () =>
+            return gulp.task(name, () =>
                 gulp
                     .src(bundles[bundle].js[key])
                     .pipe(sourcemaps.init())
@@ -162,7 +162,7 @@ const build = {
             const name = `sass:${key}`;
             tasks.sass.push(name);
 
-            gulp.task(name, () =>
+            return gulp.task(name, () =>
                 gulp
                     .src(bundles[bundle].sass[key])
                     .pipe(sass())
@@ -180,7 +180,7 @@ const build = {
         tasks.sprite.push(name);
 
         // Process Icons
-        gulp.task(name, () =>
+        return gulp.task(name, () =>
             gulp
                 .src(paths[bundle].src.sprite)
                 .pipe(
@@ -287,7 +287,8 @@ if (Object.keys(aws).includes('cdn') && Object.keys(aws).includes('demo')) {
             'plyr.polyfilled.js',
             'defaults.js',
         ];
-        gulp
+
+        return gulp
             .src(files.map(file => path.join(root, `src/js/${file}`)))
             .pipe(replace(semver, `v${version}`))
             .pipe(replace(cdnpath, `${aws.cdn.domain}/${version}/`))
@@ -406,7 +407,7 @@ if (Object.keys(aws).includes('cdn') && Object.keys(aws).includes('demo')) {
     });
 
     // Do everything
-    gulp.task('publish', () => {
-        run('version', tasks.clean, tasks.js, tasks.sass, tasks.sprite, 'cdn', 'demo');
+    gulp.task('publish', callback => {
+        run('version', tasks.clean, tasks.js, tasks.sass, tasks.sprite, 'cdn', 'demo', callback);
     });
 }

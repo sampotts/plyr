@@ -2,10 +2,10 @@
 // Vimeo plugin
 // ==========================================================================
 
-import utils from './../utils';
 import captions from './../captions';
 import controls from './../controls';
 import ui from './../ui';
+import utils from './../utils';
 
 const vimeo = {
     setup() {
@@ -18,7 +18,7 @@ const vimeo = {
         // Load the API if not already
         if (!utils.is.object(window.Vimeo)) {
             utils
-                .loadScript(this.config.urls.vimeo.api)
+                .loadScript(this.config.urls.vimeo.sdk)
                 .then(() => {
                     vimeo.ready.call(this);
                 })
@@ -68,14 +68,14 @@ const vimeo = {
 
         // Get from <div> if needed
         if (utils.is.empty(source)) {
-            source = player.media.getAttribute(this.config.attributes.embed.id);
+            source = player.media.getAttribute(player.config.attributes.embed.id);
         }
 
         const id = utils.parseVimeoId(source);
 
         // Build an iframe
         const iframe = utils.createElement('iframe');
-        const src = `https://player.vimeo.com/video/${id}?${params}`;
+        const src = utils.format(player.config.urls.vimeo.iframe, id, params);
         iframe.setAttribute('src', src);
         iframe.setAttribute('allowfullscreen', '');
         iframe.setAttribute('allowtransparency', '');
@@ -85,6 +85,25 @@ const vimeo = {
         const wrapper = utils.createElement('div');
         wrapper.appendChild(iframe);
         player.media = utils.replaceElement(wrapper, player.media);
+
+        // Get poster image
+        utils.fetch(utils.format(player.config.urls.vimeo.api, id), 'json').then(response => {
+            if (utils.is.empty(response)) {
+                return;
+            }
+
+            // Get the URL for thumbnail
+            const url = new URL(response[0].thumbnail_large);
+
+            // Get original image
+            url.pathname = `${url.pathname.split('_')[0]}.jpg`;
+
+            // Set attribute
+            player.media.setAttribute('poster', url.href);
+
+            // Update
+            ui.setPoster.call(player);
+        });
 
         // Setup instance
         // https://github.com/vimeo/player.js

@@ -6,8 +6,8 @@
 
 /* global google */
 
-import utils from '../utils';
 import i18n from '../i18n';
+import utils from '../utils';
 
 class Ads {
     /**
@@ -52,7 +52,7 @@ class Ads {
             // Check if the Google IMA3 SDK is loaded or load it ourselves
             if (!utils.is.object(window.google) || !utils.is.object(window.google.ima)) {
                 utils
-                    .loadScript(this.player.config.urls.googleIMA.api)
+                    .loadScript(this.player.config.urls.googleIMA.sdk)
                     .then(() => {
                         this.ready();
                     })
@@ -160,6 +160,9 @@ class Ads {
             // We only overlay ads as we only support video.
             request.forceNonLinearFullSlot = false;
 
+            // Mute based on current state
+            request.setAdWillPlayMuted(!this.player.muted);
+
             this.loader.requestAds(request);
         } catch (e) {
             this.onAdError(e);
@@ -226,7 +229,7 @@ class Ads {
 
         // Get skippable state
         // TODO: Skip button
-        // this.manager.getAdSkippableState();
+        // this.player.debug.warn(this.manager.getAdSkippableState());
 
         // Set volume to match player
         this.manager.setVolume(this.player.volume);

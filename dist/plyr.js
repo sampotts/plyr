@@ -4,338 +4,6 @@
 	(global.Plyr = factory());
 }(this, (function () { 'use strict';
 
-// ==========================================================================
-// Plyr supported types and providers
-// ==========================================================================
-
-var providers = {
-    html5: 'html5',
-    youtube: 'youtube',
-    vimeo: 'vimeo'
-};
-
-var types = {
-    audio: 'audio',
-    video: 'video'
-};
-
-// ==========================================================================
-// Plyr default config
-// ==========================================================================
-
-var defaults = {
-    // Disable
-    enabled: true,
-
-    // Custom media title
-    title: '',
-
-    // Logging to console
-    debug: false,
-
-    // Auto play (if supported)
-    autoplay: false,
-
-    // Only allow one media playing at once (vimeo only)
-    autopause: true,
-
-    // Default time to skip when rewind/fast forward
-    seekTime: 10,
-
-    // Default volume
-    volume: 1,
-    muted: false,
-
-    // Pass a custom duration
-    duration: null,
-
-    // Display the media duration on load in the current time position
-    // If you have opted to display both duration and currentTime, this is ignored
-    displayDuration: true,
-
-    // Invert the current time to be a countdown
-    invertTime: true,
-
-    // Clicking the currentTime inverts it's value to show time left rather than elapsed
-    toggleInvert: true,
-
-    // Aspect ratio (for embeds)
-    ratio: '16:9',
-
-    // Click video container to play/pause
-    clickToPlay: true,
-
-    // Auto hide the controls
-    hideControls: true,
-
-    // Revert to poster on finish (HTML5 - will cause reload)
-    showPosterOnEnd: false,
-
-    // Disable the standard context menu
-    disableContextMenu: true,
-
-    // Sprite (for icons)
-    loadSprite: true,
-    iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.2.4/plyr.svg',
-
-    // Blank video (used to prevent errors on source change)
-    blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
-
-    // Quality default
-    quality: {
-        default: 576,
-        options: [4320, 2880, 2160, 1440, 1080, 720, 576, 480, 360, 240, 'default']
-    },
-
-    // Set loops
-    loop: {
-        active: false
-        // start: null,
-        // end: null,
-    },
-
-    // Speed default and options to display
-    speed: {
-        selected: 1,
-        options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2]
-    },
-
-    // Keyboard shortcut settings
-    keyboard: {
-        focused: true,
-        global: false
-    },
-
-    // Display tooltips
-    tooltips: {
-        controls: false,
-        seek: true
-    },
-
-    // Captions settings
-    captions: {
-        active: false,
-        language: (navigator.language || navigator.userLanguage).split('-')[0]
-    },
-
-    // Fullscreen settings
-    fullscreen: {
-        enabled: true, // Allow fullscreen?
-        fallback: true, // Fallback for vintage browsers
-        iosNative: false // Use the native fullscreen in iOS (disables custom controls)
-    },
-
-    // Local storage
-    storage: {
-        enabled: true,
-        key: 'plyr'
-    },
-
-    // Default controls
-    controls: ['play-large',
-    // 'restart',
-    // 'rewind',
-    'play',
-    // 'fast-forward',
-    'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen'],
-    settings: ['captions', 'quality', 'speed'],
-
-    // Localisation
-    i18n: {
-        restart: 'Restart',
-        rewind: 'Rewind {seektime} secs',
-        play: 'Play',
-        pause: 'Pause',
-        fastForward: 'Forward {seektime} secs',
-        seek: 'Seek',
-        played: 'Played',
-        buffered: 'Buffered',
-        currentTime: 'Current time',
-        duration: 'Duration',
-        volume: 'Volume',
-        mute: 'Mute',
-        unmute: 'Unmute',
-        enableCaptions: 'Enable captions',
-        disableCaptions: 'Disable captions',
-        enterFullscreen: 'Enter fullscreen',
-        exitFullscreen: 'Exit fullscreen',
-        frameTitle: 'Player for {title}',
-        captions: 'Captions',
-        settings: 'Settings',
-        speed: 'Speed',
-        normal: 'Normal',
-        quality: 'Quality',
-        loop: 'Loop',
-        start: 'Start',
-        end: 'End',
-        all: 'All',
-        reset: 'Reset',
-        disabled: 'Disabled',
-        enabled: 'Enabled',
-        advertisement: 'Ad'
-    },
-
-    // URLs
-    urls: {
-        vimeo: {
-            api: 'https://player.vimeo.com/api/player.js'
-        },
-        youtube: {
-            api: 'https://www.youtube.com/iframe_api'
-        },
-        googleIMA: {
-            api: 'https://imasdk.googleapis.com/js/sdkloader/ima3.js'
-        }
-    },
-
-    // Custom control listeners
-    listeners: {
-        seek: null,
-        play: null,
-        pause: null,
-        restart: null,
-        rewind: null,
-        fastForward: null,
-        mute: null,
-        volume: null,
-        captions: null,
-        fullscreen: null,
-        pip: null,
-        airplay: null,
-        speed: null,
-        quality: null,
-        loop: null,
-        language: null
-    },
-
-    // Events to watch and bubble
-    events: [
-    // Events to watch on HTML5 media elements and bubble
-    // https://developer.mozilla.org/en/docs/Web/Guide/Events/Media_events
-    'ended', 'progress', 'stalled', 'playing', 'waiting', 'canplay', 'canplaythrough', 'loadstart', 'loadeddata', 'loadedmetadata', 'timeupdate', 'volumechange', 'play', 'pause', 'error', 'seeking', 'seeked', 'emptied', 'ratechange', 'cuechange',
-
-    // Custom events
-    'enterfullscreen', 'exitfullscreen', 'captionsenabled', 'captionsdisabled', 'languagechange', 'controlshidden', 'controlsshown', 'ready',
-
-    // YouTube
-    'statechange', 'qualitychange', 'qualityrequested',
-
-    // Ads
-    'adsloaded', 'adscontentpause', 'adscontentresume', 'adstarted', 'adsmidpoint', 'adscomplete', 'adsallcomplete', 'adsimpression', 'adsclick'],
-
-    // Selectors
-    // Change these to match your template if using custom HTML
-    selectors: {
-        editable: 'input, textarea, select, [contenteditable]',
-        container: '.plyr',
-        controls: {
-            container: null,
-            wrapper: '.plyr__controls'
-        },
-        labels: '[data-plyr]',
-        buttons: {
-            play: '[data-plyr="play"]',
-            pause: '[data-plyr="pause"]',
-            restart: '[data-plyr="restart"]',
-            rewind: '[data-plyr="rewind"]',
-            fastForward: '[data-plyr="fast-forward"]',
-            mute: '[data-plyr="mute"]',
-            captions: '[data-plyr="captions"]',
-            fullscreen: '[data-plyr="fullscreen"]',
-            pip: '[data-plyr="pip"]',
-            airplay: '[data-plyr="airplay"]',
-            settings: '[data-plyr="settings"]',
-            loop: '[data-plyr="loop"]'
-        },
-        inputs: {
-            seek: '[data-plyr="seek"]',
-            volume: '[data-plyr="volume"]',
-            speed: '[data-plyr="speed"]',
-            language: '[data-plyr="language"]',
-            quality: '[data-plyr="quality"]'
-        },
-        display: {
-            currentTime: '.plyr__time--current',
-            duration: '.plyr__time--duration',
-            buffer: '.plyr__progress--buffer',
-            played: '.plyr__progress--played',
-            loop: '.plyr__progress--loop',
-            volume: '.plyr__volume--display'
-        },
-        progress: '.plyr__progress',
-        captions: '.plyr__captions',
-        menu: {
-            quality: '.js-plyr__menu__list--quality'
-        }
-    },
-
-    // Class hooks added to the player in different states
-    classNames: {
-        video: 'plyr__video-wrapper',
-        embed: 'plyr__video-embed',
-        ads: 'plyr__ads',
-        control: 'plyr__control',
-        type: 'plyr--{0}',
-        provider: 'plyr--{0}',
-        stopped: 'plyr--stopped',
-        playing: 'plyr--playing',
-        loading: 'plyr--loading',
-        error: 'plyr--has-error',
-        hover: 'plyr--hover',
-        tooltip: 'plyr__tooltip',
-        cues: 'plyr__cues',
-        hidden: 'plyr__sr-only',
-        hideControls: 'plyr--hide-controls',
-        isIos: 'plyr--is-ios',
-        isTouch: 'plyr--is-touch',
-        uiSupported: 'plyr--full-ui',
-        noTransition: 'plyr--no-transition',
-        menu: {
-            value: 'plyr__menu__value',
-            badge: 'plyr__badge',
-            open: 'plyr--menu-open'
-        },
-        captions: {
-            enabled: 'plyr--captions-enabled',
-            active: 'plyr--captions-active'
-        },
-        fullscreen: {
-            enabled: 'plyr--fullscreen-enabled',
-            fallback: 'plyr--fullscreen-fallback'
-        },
-        pip: {
-            supported: 'plyr--pip-supported',
-            active: 'plyr--pip-active'
-        },
-        airplay: {
-            supported: 'plyr--airplay-supported',
-            active: 'plyr--airplay-active'
-        },
-        tabFocus: 'plyr__tab-focus'
-    },
-
-    // Embed attributes
-    attributes: {
-        embed: {
-            provider: 'data-plyr-provider',
-            id: 'data-plyr-embed-id'
-        }
-    },
-
-    // API keys
-    keys: {
-        google: null
-    },
-
-    // Advertisements plugin
-    // Register for an account here: http://vi.ai/publisher-video-monetization/?aid=plyrio
-    ads: {
-        enabled: false,
-        publisherId: ''
-    }
-};
-
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 function createCommonjsModule(fn, module) {
@@ -635,6 +303,21 @@ return loadjs;
 
 }));
 });
+
+// ==========================================================================
+// Plyr supported types and providers
+// ==========================================================================
+
+var providers = {
+    html5: 'html5',
+    youtube: 'youtube',
+    vimeo: 'vimeo'
+};
+
+var types = {
+    audio: 'audio',
+    video: 'video'
+};
 
 var classCallCheck = function (instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -988,14 +671,14 @@ var utils = {
     },
 
 
-    // Remove an element
+    // Remove element(s)
     removeElement: function removeElement(element) {
-        if (!utils.is.element(element) || !utils.is.element(element.parentNode)) {
+        if (utils.is.nodeList(element) || utils.is.array(element)) {
+            Array.from(element).forEach(utils.removeElement);
             return;
         }
 
-        if (utils.is.nodeList(element) || utils.is.array(element)) {
-            Array.from(element).forEach(utils.removeElement);
+        if (!utils.is.element(element) || !utils.is.element(element.parentNode)) {
             return;
         }
 
@@ -1164,61 +847,6 @@ var utils = {
     // Find a single element
     getElement: function getElement(selector) {
         return this.elements.container.querySelector(selector);
-    },
-
-
-    // Find the UI controls and store references in custom controls
-    // TODO: Allow settings menus with custom controls
-    findElements: function findElements() {
-        try {
-            this.elements.controls = utils.getElement.call(this, this.config.selectors.controls.wrapper);
-
-            // Buttons
-            this.elements.buttons = {
-                play: utils.getElements.call(this, this.config.selectors.buttons.play),
-                pause: utils.getElement.call(this, this.config.selectors.buttons.pause),
-                restart: utils.getElement.call(this, this.config.selectors.buttons.restart),
-                rewind: utils.getElement.call(this, this.config.selectors.buttons.rewind),
-                fastForward: utils.getElement.call(this, this.config.selectors.buttons.fastForward),
-                mute: utils.getElement.call(this, this.config.selectors.buttons.mute),
-                pip: utils.getElement.call(this, this.config.selectors.buttons.pip),
-                airplay: utils.getElement.call(this, this.config.selectors.buttons.airplay),
-                settings: utils.getElement.call(this, this.config.selectors.buttons.settings),
-                captions: utils.getElement.call(this, this.config.selectors.buttons.captions),
-                fullscreen: utils.getElement.call(this, this.config.selectors.buttons.fullscreen)
-            };
-
-            // Progress
-            this.elements.progress = utils.getElement.call(this, this.config.selectors.progress);
-
-            // Inputs
-            this.elements.inputs = {
-                seek: utils.getElement.call(this, this.config.selectors.inputs.seek),
-                volume: utils.getElement.call(this, this.config.selectors.inputs.volume)
-            };
-
-            // Display
-            this.elements.display = {
-                buffer: utils.getElement.call(this, this.config.selectors.display.buffer),
-                currentTime: utils.getElement.call(this, this.config.selectors.display.currentTime),
-                duration: utils.getElement.call(this, this.config.selectors.display.duration)
-            };
-
-            // Seek tooltip
-            if (utils.is.element(this.elements.progress)) {
-                this.elements.display.seekTooltip = this.elements.progress.querySelector('.' + this.config.classNames.tooltip);
-            }
-
-            return true;
-        } catch (error) {
-            // Log it
-            this.debug.warn('It looks like there is a problem with your custom controls HTML', error);
-
-            // Restore native video controls
-            this.toggleNativeControls(true);
-
-            return false;
-        }
     },
 
 
@@ -1395,6 +1023,22 @@ var utils = {
     },
 
 
+    // Format string
+    format: function format(input) {
+        for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+            args[_key - 1] = arguments[_key];
+        }
+
+        if (utils.is.empty(input)) {
+            return input;
+        }
+
+        return input.toString().replace(/{(\d+)}/g, function (match, i) {
+            return utils.is.string(args[i]) ? args[i] : '';
+        });
+    },
+
+
     // Get percentage
     getPercentage: function getPercentage(current, max) {
         if (current === 0 || max === 0 || Number.isNaN(current) || Number.isNaN(max)) {
@@ -1508,8 +1152,8 @@ var utils = {
     extend: function extend() {
         var target = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
-        for (var _len = arguments.length, sources = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-            sources[_key - 1] = arguments[_key];
+        for (var _len2 = arguments.length, sources = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+            sources[_key2 - 1] = arguments[_key2];
         }
 
         if (!sources.length) {
@@ -1861,279 +1505,157 @@ var support = {
 };
 
 // ==========================================================================
-// Console wrapper
-// ==========================================================================
 
-var noop = function noop() {};
-
-var Console = function () {
-    function Console() {
-        var enabled = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-        classCallCheck(this, Console);
-
-        this.enabled = window.console && enabled;
-
-        if (this.enabled) {
-            this.log('Debugging enabled');
+var html5 = {
+    getSources: function getSources() {
+        if (!this.isHTML5) {
+            return null;
         }
-    }
 
-    createClass(Console, [{
-        key: 'log',
-        get: function get$$1() {
-            // eslint-disable-next-line no-console
-            return this.enabled ? Function.prototype.bind.call(console.log, console) : noop;
+        return this.media.querySelectorAll('source');
+    },
+
+
+    // Get quality levels
+    getQualityOptions: function getQualityOptions() {
+        if (!this.isHTML5) {
+            return null;
         }
-    }, {
-        key: 'warn',
-        get: function get$$1() {
-            // eslint-disable-next-line no-console
-            return this.enabled ? Function.prototype.bind.call(console.warn, console) : noop;
+
+        // Get sources
+        var sources = html5.getSources.call(this);
+
+        if (utils.is.empty(sources)) {
+            return null;
         }
-    }, {
-        key: 'error',
-        get: function get$$1() {
-            // eslint-disable-next-line no-console
-            return this.enabled ? Function.prototype.bind.call(console.error, console) : noop;
-        }
-    }]);
-    return Console;
-}();
 
-// ==========================================================================
-
-var browser = utils.getBrowser();
-
-function onChange() {
-    if (!this.enabled) {
-        return;
-    }
-
-    // Update toggle button
-    var button = this.player.elements.buttons.fullscreen;
-    if (utils.is.element(button)) {
-        utils.toggleState(button, this.active);
-    }
-
-    // Trigger an event
-    utils.dispatchEvent(this.target, this.active ? 'enterfullscreen' : 'exitfullscreen', true);
-
-    // Trap focus in container
-    if (!browser.isIos) {
-        utils.trapFocus.call(this.player, this.target, this.active);
-    }
-}
-
-function toggleFallback() {
-    var toggle = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-
-    // Store or restore scroll position
-    if (toggle) {
-        this.scrollPosition = {
-            x: window.scrollX || 0,
-            y: window.scrollY || 0
-        };
-    } else {
-        window.scrollTo(this.scrollPosition.x, this.scrollPosition.y);
-    }
-
-    // Toggle scroll
-    document.body.style.overflow = toggle ? 'hidden' : '';
-
-    // Toggle class hook
-    utils.toggleClass(this.target, this.player.config.classNames.fullscreen.fallback, toggle);
-
-    // Toggle button and fire events
-    onChange.call(this);
-}
-
-var Fullscreen = function () {
-    function Fullscreen(player) {
-        var _this = this;
-
-        classCallCheck(this, Fullscreen);
-
-        // Keep reference to parent
-        this.player = player;
-
-        // Get prefix
-        this.prefix = Fullscreen.prefix;
-        this.property = Fullscreen.property;
-
-        // Scroll position
-        this.scrollPosition = { x: 0, y: 0 };
-
-        // Register event listeners
-        // Handle event (incase user presses escape etc)
-        utils.on(document, this.prefix === 'ms' ? 'MSFullscreenChange' : this.prefix + 'fullscreenchange', function () {
-            // TODO: Filter for target??
-            onChange.call(_this);
+        // Get <source> with size attribute
+        var sizes = Array.from(sources).filter(function (source) {
+            return !utils.is.empty(source.getAttribute('size'));
         });
 
-        // Fullscreen toggle on double click
-        utils.on(this.player.elements.container, 'dblclick', function (event) {
-            // Ignore double click in controls
-            if (utils.is.element(_this.player.elements.controls) && _this.player.elements.controls.contains(event.target)) {
-                return;
-            }
+        // If none, bail
+        if (utils.is.empty(sizes)) {
+            return null;
+        }
 
-            _this.toggle();
+        // Reduce to unique list
+        return utils.dedupe(sizes.map(function (source) {
+            return Number(source.getAttribute('size'));
+        }));
+    },
+    extend: function extend() {
+        if (!this.isHTML5) {
+            return;
+        }
+
+        var player = this;
+
+        // Quality
+        Object.defineProperty(player.media, 'quality', {
+            get: function get() {
+                // Get sources
+                var sources = html5.getSources.call(player);
+
+                if (utils.is.empty(sources)) {
+                    return null;
+                }
+
+                var matches = Array.from(sources).filter(function (source) {
+                    return source.getAttribute('src') === player.source;
+                });
+
+                if (utils.is.empty(matches)) {
+                    return null;
+                }
+
+                return Number(matches[0].getAttribute('size'));
+            },
+            set: function set(input) {
+                // Get sources
+                var sources = html5.getSources.call(player);
+
+                if (utils.is.empty(sources)) {
+                    return;
+                }
+
+                // Get matches for requested size
+                var matches = Array.from(sources).filter(function (source) {
+                    return Number(source.getAttribute('size')) === input;
+                });
+
+                // No matches for requested size
+                if (utils.is.empty(matches)) {
+                    return;
+                }
+
+                // Get supported sources
+                var supported = matches.filter(function (source) {
+                    return support.mime.call(player, source.getAttribute('type'));
+                });
+
+                // No supported sources
+                if (utils.is.empty(supported)) {
+                    return;
+                }
+
+                // Trigger change event
+                utils.dispatchEvent.call(player, player.media, 'qualityrequested', false, {
+                    quality: input
+                });
+
+                // Get current state
+                var currentTime = player.currentTime,
+                    playing = player.playing;
+
+                // Set new source
+
+                player.media.src = supported[0].getAttribute('src');
+
+                // Load new source
+                player.media.load();
+
+                // Resume playing
+                if (playing) {
+                    player.play();
+                }
+
+                // Restore time
+                player.currentTime = currentTime;
+
+                // Trigger change event
+                utils.dispatchEvent.call(player, player.media, 'qualitychange', false, {
+                    quality: input
+                });
+            }
         });
+    },
 
-        // Update the UI
-        this.update();
+
+    // Cancel current network requests
+    // See https://github.com/sampotts/plyr/issues/174
+    cancelRequests: function cancelRequests() {
+        if (!this.isHTML5) {
+            return;
+        }
+
+        // Remove child sources
+        utils.removeElement(html5.getSources());
+
+        // Set blank video src attribute
+        // This is to prevent a MEDIA_ERR_SRC_NOT_SUPPORTED error
+        // Info: http://stackoverflow.com/questions/32231579/how-to-properly-dispose-of-an-html5-video-and-close-socket-or-connection
+        this.media.setAttribute('src', this.config.blankVideo);
+
+        // Load the new empty source
+        // This will cancel existing requests
+        // See https://github.com/sampotts/plyr/issues/174
+        this.media.load();
+
+        // Debugging
+        this.debug.log('Cancelled network requests');
     }
-
-    // Determine if native supported
-
-
-    createClass(Fullscreen, [{
-        key: 'update',
-
-
-        // Update UI
-        value: function update() {
-            if (this.enabled) {
-                this.player.debug.log((Fullscreen.native ? 'Native' : 'Fallback') + ' fullscreen enabled');
-            } else {
-                this.player.debug.log('Fullscreen not supported and fallback disabled');
-            }
-
-            // Add styling hook to show button
-            utils.toggleClass(this.player.elements.container, this.player.config.classNames.fullscreen.enabled, this.enabled);
-        }
-
-        // Make an element fullscreen
-
-    }, {
-        key: 'enter',
-        value: function enter() {
-            if (!this.enabled) {
-                return;
-            }
-
-            // iOS native fullscreen doesn't need the request step
-            if (browser.isIos && this.player.config.fullscreen.iosNative) {
-                if (this.player.playing) {
-                    this.target.webkitEnterFullscreen();
-                }
-            } else if (!Fullscreen.native) {
-                toggleFallback.call(this, true);
-            } else if (!this.prefix) {
-                this.target.requestFullscreen();
-            } else if (!utils.is.empty(this.prefix)) {
-                this.target[this.prefix + 'Request' + this.property]();
-            }
-        }
-
-        // Bail from fullscreen
-
-    }, {
-        key: 'exit',
-        value: function exit() {
-            if (!this.enabled) {
-                return;
-            }
-
-            // iOS native fullscreen
-            if (browser.isIos && this.player.config.fullscreen.iosNative) {
-                this.target.webkitExitFullscreen();
-                this.player.play();
-            } else if (!Fullscreen.native) {
-                toggleFallback.call(this, false);
-            } else if (!this.prefix) {
-                (document.cancelFullScreen || document.exitFullscreen).call(document);
-            } else if (!utils.is.empty(this.prefix)) {
-                var action = this.prefix === 'moz' ? 'Cancel' : 'Exit';
-                document['' + this.prefix + action + this.property]();
-            }
-        }
-
-        // Toggle state
-
-    }, {
-        key: 'toggle',
-        value: function toggle() {
-            if (!this.active) {
-                this.enter();
-            } else {
-                this.exit();
-            }
-        }
-    }, {
-        key: 'enabled',
-
-
-        // Determine if fullscreen is enabled
-        get: function get$$1() {
-            return (Fullscreen.native || this.player.config.fullscreen.fallback) && this.player.config.fullscreen.enabled && this.player.supported.ui && this.player.isVideo;
-        }
-
-        // Get active state
-
-    }, {
-        key: 'active',
-        get: function get$$1() {
-            if (!this.enabled) {
-                return false;
-            }
-
-            // Fallback using classname
-            if (!Fullscreen.native) {
-                return utils.hasClass(this.target, this.player.config.classNames.fullscreen.fallback);
-            }
-
-            var element = !this.prefix ? document.fullscreenElement : document['' + this.prefix + this.property + 'Element'];
-
-            return element === this.target;
-        }
-
-        // Get target element
-
-    }, {
-        key: 'target',
-        get: function get$$1() {
-            return browser.isIos && this.player.config.fullscreen.iosNative ? this.player.media : this.player.elements.container;
-        }
-    }], [{
-        key: 'native',
-        get: function get$$1() {
-            return !!(document.fullscreenEnabled || document.webkitFullscreenEnabled || document.mozFullScreenEnabled || document.msFullscreenEnabled);
-        }
-
-        // Get the prefix for handlers
-
-    }, {
-        key: 'prefix',
-        get: function get$$1() {
-            // No prefix
-            if (utils.is.function(document.exitFullscreen)) {
-                return '';
-            }
-
-            // Check for fullscreen support by vendor prefix
-            var value = '';
-            var prefixes = ['webkit', 'moz', 'ms'];
-
-            prefixes.some(function (pre) {
-                if (utils.is.function(document[pre + 'ExitFullscreen']) || utils.is.function(document[pre + 'CancelFullScreen'])) {
-                    value = pre;
-                    return true;
-                }
-
-                return false;
-            });
-
-            return value;
-        }
-    }, {
-        key: 'property',
-        get: function get$$1() {
-            return this.prefix === 'moz' ? 'FullScreen' : 'Fullscreen';
-        }
-    }]);
-    return Fullscreen;
-}();
+};
 
 // ==========================================================================
 
@@ -2167,277 +1689,8 @@ var i18n = {
 
 // ==========================================================================
 
-var captions = {
-    // Setup captions
-    setup: function setup() {
-        // Requires UI support
-        if (!this.supported.ui) {
-            return;
-        }
-
-        // Set default language if not set
-        var stored = this.storage.get('language');
-
-        if (!utils.is.empty(stored)) {
-            this.captions.language = stored;
-        }
-
-        if (utils.is.empty(this.captions.language)) {
-            this.captions.language = this.config.captions.language.toLowerCase();
-        }
-
-        // Set captions enabled state if not set
-        if (!utils.is.boolean(this.captions.active)) {
-            var active = this.storage.get('captions');
-
-            if (utils.is.boolean(active)) {
-                this.captions.active = active;
-            } else {
-                this.captions.active = this.config.captions.active;
-            }
-        }
-
-        // Only Vimeo and HTML5 video supported at this point
-        if (!this.isVideo || this.isYouTube || this.isHTML5 && !support.textTracks) {
-            // Clear menu and hide
-            if (utils.is.array(this.config.controls) && this.config.controls.includes('settings') && this.config.settings.includes('captions')) {
-                controls.setCaptionsMenu.call(this);
-            }
-
-            return;
-        }
-
-        // Inject the container
-        if (!utils.is.element(this.elements.captions)) {
-            this.elements.captions = utils.createElement('div', utils.getAttributesFromSelector(this.config.selectors.captions));
-
-            utils.insertAfter(this.elements.captions, this.elements.wrapper);
-        }
-
-        // Set the class hook
-        utils.toggleClass(this.elements.container, this.config.classNames.captions.enabled, !utils.is.empty(captions.getTracks.call(this)));
-
-        // Get tracks
-        var tracks = captions.getTracks.call(this);
-
-        // If no caption file exists, hide container for caption text
-        if (utils.is.empty(tracks)) {
-            return;
-        }
-
-        // Get browser info
-        var browser = utils.getBrowser();
-
-        // Fix IE captions if CORS is used
-        // Fetch captions and inject as blobs instead (data URIs not supported!)
-        if (browser.isIE && window.URL) {
-            var elements = this.media.querySelectorAll('track');
-
-            Array.from(elements).forEach(function (track) {
-                var src = track.getAttribute('src');
-                var href = utils.parseUrl(src);
-
-                if (href.hostname !== window.location.href.hostname && ['http:', 'https:'].includes(href.protocol)) {
-                    utils.fetch(src, 'blob').then(function (blob) {
-                        track.setAttribute('src', window.URL.createObjectURL(blob));
-                    }).catch(function () {
-                        utils.removeElement(track);
-                    });
-                }
-            });
-        }
-
-        // Set language
-        captions.setLanguage.call(this);
-
-        // Enable UI
-        captions.show.call(this);
-
-        // Set available languages in list
-        if (utils.is.array(this.config.controls) && this.config.controls.includes('settings') && this.config.settings.includes('captions')) {
-            controls.setCaptionsMenu.call(this);
-        }
-    },
-
-
-    // Set the captions language
-    setLanguage: function setLanguage() {
-        var _this = this;
-
-        // Setup HTML5 track rendering
-        if (this.isHTML5 && this.isVideo) {
-            captions.getTracks.call(this).forEach(function (track) {
-                // Show track
-                utils.on(track, 'cuechange', function (event) {
-                    return captions.setCue.call(_this, event);
-                });
-
-                // Turn off native caption rendering to avoid double captions
-                // eslint-disable-next-line
-                track.mode = 'hidden';
-            });
-
-            // Get current track
-            var currentTrack = captions.getCurrentTrack.call(this);
-
-            // Check if suported kind
-            if (utils.is.track(currentTrack)) {
-                // If we change the active track while a cue is already displayed we need to update it
-                if (Array.from(currentTrack.activeCues || []).length) {
-                    captions.setCue.call(this, currentTrack);
-                }
-            }
-        } else if (this.isVimeo && this.captions.active) {
-            this.embed.enableTextTrack(this.language);
-        }
-    },
-
-
-    // Get the tracks
-    getTracks: function getTracks() {
-        // Return empty array at least
-        if (utils.is.nullOrUndefined(this.media)) {
-            return [];
-        }
-
-        // Only get accepted kinds
-        return Array.from(this.media.textTracks || []).filter(function (track) {
-            return ['captions', 'subtitles'].includes(track.kind);
-        });
-    },
-
-
-    // Get the current track for the current language
-    getCurrentTrack: function getCurrentTrack() {
-        var _this2 = this;
-
-        var tracks = captions.getTracks.call(this);
-
-        if (!tracks.length) {
-            return null;
-        }
-
-        // Get track based on current language
-        var track = tracks.find(function (track) {
-            return track.language.toLowerCase() === _this2.language;
-        });
-
-        // Get the <track> with default attribute
-        if (!track) {
-            track = utils.getElement.call(this, 'track[default]');
-        }
-
-        // Get the first track
-        if (!track) {
-            var _tracks = slicedToArray(tracks, 1);
-
-            track = _tracks[0];
-        }
-
-        return track;
-    },
-
-
-    // Get UI label for track
-    getLabel: function getLabel(track) {
-        var currentTrack = track;
-
-        if (!utils.is.track(currentTrack) && support.textTracks && this.captions.active) {
-            currentTrack = captions.getCurrentTrack.call(this);
-        }
-
-        if (utils.is.track(currentTrack)) {
-            if (!utils.is.empty(currentTrack.label)) {
-                return currentTrack.label;
-            }
-
-            if (!utils.is.empty(currentTrack.language)) {
-                return track.language.toUpperCase();
-            }
-
-            return i18n.get('enabled', this.config);
-        }
-
-        return i18n.get('disabled', this.config);
-    },
-
-
-    // Display active caption if it contains text
-    setCue: function setCue(input) {
-        // Get the track from the event if needed
-        var track = utils.is.event(input) ? input.target : input;
-        var activeCues = track.activeCues;
-
-        var active = activeCues.length && activeCues[0];
-        var currentTrack = captions.getCurrentTrack.call(this);
-
-        // Only display current track
-        if (track !== currentTrack) {
-            return;
-        }
-
-        // Display a cue, if there is one
-        if (utils.is.cue(active)) {
-            captions.setText.call(this, active.getCueAsHTML());
-        } else {
-            captions.setText.call(this, null);
-        }
-
-        utils.dispatchEvent.call(this, this.media, 'cuechange');
-    },
-
-
-    // Set the current caption
-    setText: function setText(input) {
-        // Requires UI
-        if (!this.supported.ui) {
-            return;
-        }
-
-        if (utils.is.element(this.elements.captions)) {
-            var content = utils.createElement('span');
-
-            // Empty the container
-            utils.emptyElement(this.elements.captions);
-
-            // Default to empty
-            var caption = !utils.is.nullOrUndefined(input) ? input : '';
-
-            // Set the span content
-            if (utils.is.string(caption)) {
-                content.textContent = caption.trim();
-            } else {
-                content.appendChild(caption);
-            }
-
-            // Set new caption text
-            this.elements.captions.appendChild(content);
-        } else {
-            this.debug.warn('No captions element to render to');
-        }
-    },
-
-
-    // Display captions container and button (for initialization)
-    show: function show() {
-        // Try to load the value from storage
-        var active = this.storage.get('captions');
-
-        // Otherwise fall back to the default config
-        if (!utils.is.boolean(active)) {
-            active = this.config.captions.active;
-        } else {
-            this.captions.active = active;
-        }
-
-        if (active) {
-            utils.toggleClass(this.elements.container, this.config.classNames.captions.active, true);
-            utils.toggleState(this.elements.buttons.captions, true);
-        }
-    }
-};
-
-// ==========================================================================
+// Sniff out the browser
+var browser = utils.getBrowser();
 
 var ui = {
     addStyleHook: function addStyleHook() {
@@ -2516,6 +1769,18 @@ var ui = {
         // Update the UI
         ui.checkPlaying.call(this);
 
+        // Check for picture-in-picture support
+        utils.toggleClass(this.elements.container, this.config.classNames.pip.supported, support.pip && this.isHTML5 && this.isVideo);
+
+        // Check for airplay support
+        utils.toggleClass(this.elements.container, this.config.classNames.airplay.supported, support.airplay && this.isHTML5);
+
+        // Add iOS class
+        utils.toggleClass(this.elements.container, this.config.classNames.isIos, browser.isIos);
+
+        // Add touch class
+        utils.toggleClass(this.elements.container, this.config.classNames.isTouch, this.touch);
+
         // Ready for API calls
         this.ready = true;
 
@@ -2526,6 +1791,9 @@ var ui = {
 
         // Set the title
         ui.setTitle.call(this);
+
+        // Set the poster image
+        ui.setPoster.call(this);
     },
 
 
@@ -2560,9 +1828,24 @@ var ui = {
 
             // Default to media type
             var title = !utils.is.empty(this.config.title) ? this.config.title : 'video';
+            var format = i18n.get('frameTitle', this.config);
 
-            iframe.setAttribute('title', i18n.get('frameTitle', this.config));
+            iframe.setAttribute('title', format.replace('{title}', title));
         }
+    },
+
+
+    // Set the poster image
+    setPoster: function setPoster() {
+        if (!utils.is.element(this.elements.poster) || utils.is.empty(this.poster)) {
+            return;
+        }
+
+        // Set the inline style
+        var posters = this.poster.split(',');
+        this.elements.poster.style.backgroundImage = posters.map(function (p) {
+            return 'url(\'' + p + '\')';
+        }).join(',');
     },
 
 
@@ -2570,7 +1853,8 @@ var ui = {
     checkPlaying: function checkPlaying() {
         // Class hooks
         utils.toggleClass(this.elements.container, this.config.classNames.playing, this.playing);
-        utils.toggleClass(this.elements.container, this.config.classNames.stopped, this.paused);
+        utils.toggleClass(this.elements.container, this.config.classNames.paused, this.paused);
+        utils.toggleClass(this.elements.container, this.config.classNames.stopped, this.stopped);
 
         // Set ARIA state
         utils.toggleState(this.elements.buttons.play, this.playing);
@@ -2777,159 +2061,6 @@ var ui = {
 
 // ==========================================================================
 
-var html5 = {
-    getSources: function getSources() {
-        if (!this.isHTML5) {
-            return null;
-        }
-
-        return this.media.querySelectorAll('source');
-    },
-
-
-    // Get quality levels
-    getQualityOptions: function getQualityOptions() {
-        if (!this.isHTML5) {
-            return null;
-        }
-
-        // Get sources
-        var sources = html5.getSources.call(this);
-
-        if (utils.is.empty(sources)) {
-            return null;
-        }
-
-        // Get <source> with size attribute
-        var sizes = Array.from(sources).filter(function (source) {
-            return !utils.is.empty(source.getAttribute('size'));
-        });
-
-        // If none, bail
-        if (utils.is.empty(sizes)) {
-            return null;
-        }
-
-        // Reduce to unique list
-        return utils.dedupe(sizes.map(function (source) {
-            return Number(source.getAttribute('size'));
-        }));
-    },
-    extend: function extend() {
-        if (!this.isHTML5) {
-            return;
-        }
-
-        var player = this;
-
-        // Quality
-        Object.defineProperty(player.media, 'quality', {
-            get: function get() {
-                // Get sources
-                var sources = html5.getSources.call(player);
-
-                if (utils.is.empty(sources)) {
-                    return null;
-                }
-
-                var matches = Array.from(sources).filter(function (source) {
-                    return source.getAttribute('src') === player.source;
-                });
-
-                if (utils.is.empty(matches)) {
-                    return null;
-                }
-
-                return Number(matches[0].getAttribute('size'));
-            },
-            set: function set(input) {
-                // Get sources
-                var sources = html5.getSources.call(player);
-
-                if (utils.is.empty(sources)) {
-                    return;
-                }
-
-                // Get matches for requested size
-                var matches = Array.from(sources).filter(function (source) {
-                    return Number(source.getAttribute('size')) === input;
-                });
-
-                // No matches for requested size
-                if (utils.is.empty(matches)) {
-                    return;
-                }
-
-                // Get supported sources
-                var supported = matches.filter(function (source) {
-                    return support.mime.call(player, source.getAttribute('type'));
-                });
-
-                // No supported sources
-                if (utils.is.empty(supported)) {
-                    return;
-                }
-
-                // Trigger change event
-                utils.dispatchEvent.call(player, player.media, 'qualityrequested', false, {
-                    quality: input
-                });
-
-                // Get current state
-                var currentTime = player.currentTime,
-                    playing = player.playing;
-
-                // Set new source
-
-                player.media.src = supported[0].getAttribute('src');
-
-                // Load new source
-                player.media.load();
-
-                // Resume playing
-                if (playing) {
-                    player.play();
-                }
-
-                // Restore time
-                player.currentTime = currentTime;
-
-                // Trigger change event
-                utils.dispatchEvent.call(player, player.media, 'qualitychange', false, {
-                    quality: input
-                });
-            }
-        });
-    },
-
-
-    // Cancel current network requests
-    // See https://github.com/sampotts/plyr/issues/174
-    cancelRequests: function cancelRequests() {
-        if (!this.isHTML5) {
-            return;
-        }
-
-        // Remove child sources
-        utils.removeElement(html5.getSources());
-
-        // Set blank video src attribute
-        // This is to prevent a MEDIA_ERR_SRC_NOT_SUPPORTED error
-        // Info: http://stackoverflow.com/questions/32231579/how-to-properly-dispose-of-an-html5-video-and-close-socket-or-connection
-        this.media.setAttribute('src', this.config.blankVideo);
-
-        // Load the new empty source
-        // This will cancel existing requests
-        // See https://github.com/sampotts/plyr/issues/174
-        this.media.load();
-
-        // Debugging
-        this.debug.log('Cancelled network requests');
-    }
-};
-
-// ==========================================================================
-
 // Sniff out the browser
 var browser$1 = utils.getBrowser();
 
@@ -2959,10 +2090,68 @@ var controls = {
 
     // Get icon URL
     getIconUrl: function getIconUrl() {
+        var url = new URL(this.config.iconUrl, window.location);
+        var cors = url.host !== window.location.host || browser$1.isIE && !window.svg4everybody;
+
         return {
             url: this.config.iconUrl,
-            absolute: this.config.iconUrl.indexOf('http') === 0 || browser$1.isIE && !window.svg4everybody
+            cors: cors
         };
+    },
+
+
+    // Find the UI controls and store references in custom controls
+    // TODO: Allow settings menus with custom controls
+    findElements: function findElements() {
+        try {
+            this.elements.controls = utils.getElement.call(this, this.config.selectors.controls.wrapper);
+
+            // Buttons
+            this.elements.buttons = {
+                play: utils.getElements.call(this, this.config.selectors.buttons.play),
+                pause: utils.getElement.call(this, this.config.selectors.buttons.pause),
+                restart: utils.getElement.call(this, this.config.selectors.buttons.restart),
+                rewind: utils.getElement.call(this, this.config.selectors.buttons.rewind),
+                fastForward: utils.getElement.call(this, this.config.selectors.buttons.fastForward),
+                mute: utils.getElement.call(this, this.config.selectors.buttons.mute),
+                pip: utils.getElement.call(this, this.config.selectors.buttons.pip),
+                airplay: utils.getElement.call(this, this.config.selectors.buttons.airplay),
+                settings: utils.getElement.call(this, this.config.selectors.buttons.settings),
+                captions: utils.getElement.call(this, this.config.selectors.buttons.captions),
+                fullscreen: utils.getElement.call(this, this.config.selectors.buttons.fullscreen)
+            };
+
+            // Progress
+            this.elements.progress = utils.getElement.call(this, this.config.selectors.progress);
+
+            // Inputs
+            this.elements.inputs = {
+                seek: utils.getElement.call(this, this.config.selectors.inputs.seek),
+                volume: utils.getElement.call(this, this.config.selectors.inputs.volume)
+            };
+
+            // Display
+            this.elements.display = {
+                buffer: utils.getElement.call(this, this.config.selectors.display.buffer),
+                currentTime: utils.getElement.call(this, this.config.selectors.display.currentTime),
+                duration: utils.getElement.call(this, this.config.selectors.display.duration)
+            };
+
+            // Seek tooltip
+            if (utils.is.element(this.elements.progress)) {
+                this.elements.display.seekTooltip = this.elements.progress.querySelector('.' + this.config.classNames.tooltip);
+            }
+
+            return true;
+        } catch (error) {
+            // Log it
+            this.debug.warn('It looks like there is a problem with your custom controls HTML', error);
+
+            // Restore native video controls
+            this.toggleNativeControls(true);
+
+            return false;
+        }
     },
 
 
@@ -2970,7 +2159,7 @@ var controls = {
     createIcon: function createIcon(type, attributes) {
         var namespace = 'http://www.w3.org/2000/svg';
         var iconUrl = controls.getIconUrl.call(this);
-        var iconPath = (!iconUrl.absolute ? iconUrl.url : '') + '#' + this.config.iconPrefix;
+        var iconPath = (!iconUrl.cors ? iconUrl.url : '') + '#' + this.config.iconPrefix;
 
         // Create <svg>
         var icon = document.createElementNS(namespace, 'svg');
@@ -3742,12 +2931,11 @@ var controls = {
 
 
     // Toggle Menu
-    showTab: function showTab(event) {
+    showTab: function showTab() {
+        var target = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
         var menu = this.elements.settings.menu;
 
-        var tab = event.target;
-        var show = tab.getAttribute('aria-expanded') === 'false';
-        var pane = document.getElementById(tab.getAttribute('aria-controls'));
+        var pane = document.getElementById(target);
 
         // Nothing to show, bail
         if (!utils.is.element(pane)) {
@@ -3807,8 +2995,12 @@ var controls = {
         current.setAttribute('tabindex', -1);
 
         // Set attributes on target
-        utils.toggleHidden(pane, !show);
-        tab.setAttribute('aria-expanded', show);
+        utils.toggleHidden(pane, false);
+
+        var tabs = utils.getElements.call(this, '[aria-controls="' + target + '"]');
+        Array.from(tabs).forEach(function (tab) {
+            tab.setAttribute('aria-expanded', true);
+        });
         pane.removeAttribute('tabindex');
 
         // Focus the first item
@@ -4071,7 +3263,7 @@ var controls = {
             var icon = controls.getIconUrl.call(this);
 
             // Only load external sprite using AJAX
-            if (icon.absolute) {
+            if (icon.cors) {
                 utils.loadSprite(icon.url, 'sprite-plyr');
             }
         }
@@ -4158,7 +3350,7 @@ var controls = {
 
         // Find the elements if need be
         if (!utils.is.element(this.elements.controls)) {
-            utils.findElements.call(this);
+            controls.findElements.call(this);
         }
 
         // Edge sometimes doesn't finish the paint so force a redraw
@@ -4181,8 +3373,878 @@ var controls = {
 
 // ==========================================================================
 
-// Sniff out the browser
+var captions = {
+    // Setup captions
+    setup: function setup() {
+        // Requires UI support
+        if (!this.supported.ui) {
+            return;
+        }
+
+        // Set default language if not set
+        var stored = this.storage.get('language');
+
+        if (!utils.is.empty(stored)) {
+            this.captions.language = stored;
+        }
+
+        if (utils.is.empty(this.captions.language)) {
+            this.captions.language = this.config.captions.language.toLowerCase();
+        }
+
+        // Set captions enabled state if not set
+        if (!utils.is.boolean(this.captions.active)) {
+            var active = this.storage.get('captions');
+
+            if (utils.is.boolean(active)) {
+                this.captions.active = active;
+            } else {
+                this.captions.active = this.config.captions.active;
+            }
+        }
+
+        // Only Vimeo and HTML5 video supported at this point
+        if (!this.isVideo || this.isYouTube || this.isHTML5 && !support.textTracks) {
+            // Clear menu and hide
+            if (utils.is.array(this.config.controls) && this.config.controls.includes('settings') && this.config.settings.includes('captions')) {
+                controls.setCaptionsMenu.call(this);
+            }
+
+            return;
+        }
+
+        // Inject the container
+        if (!utils.is.element(this.elements.captions)) {
+            this.elements.captions = utils.createElement('div', utils.getAttributesFromSelector(this.config.selectors.captions));
+
+            utils.insertAfter(this.elements.captions, this.elements.wrapper);
+        }
+
+        // Set the class hook
+        utils.toggleClass(this.elements.container, this.config.classNames.captions.enabled, !utils.is.empty(captions.getTracks.call(this)));
+
+        // Get tracks
+        var tracks = captions.getTracks.call(this);
+
+        // If no caption file exists, hide container for caption text
+        if (utils.is.empty(tracks)) {
+            return;
+        }
+
+        // Get browser info
+        var browser = utils.getBrowser();
+
+        // Fix IE captions if CORS is used
+        // Fetch captions and inject as blobs instead (data URIs not supported!)
+        if (browser.isIE && window.URL) {
+            var elements = this.media.querySelectorAll('track');
+
+            Array.from(elements).forEach(function (track) {
+                var src = track.getAttribute('src');
+                var href = utils.parseUrl(src);
+
+                if (href.hostname !== window.location.href.hostname && ['http:', 'https:'].includes(href.protocol)) {
+                    utils.fetch(src, 'blob').then(function (blob) {
+                        track.setAttribute('src', window.URL.createObjectURL(blob));
+                    }).catch(function () {
+                        utils.removeElement(track);
+                    });
+                }
+            });
+        }
+
+        // Set language
+        captions.setLanguage.call(this);
+
+        // Enable UI
+        captions.show.call(this);
+
+        // Set available languages in list
+        if (utils.is.array(this.config.controls) && this.config.controls.includes('settings') && this.config.settings.includes('captions')) {
+            controls.setCaptionsMenu.call(this);
+        }
+    },
+
+
+    // Set the captions language
+    setLanguage: function setLanguage() {
+        var _this = this;
+
+        // Setup HTML5 track rendering
+        if (this.isHTML5 && this.isVideo) {
+            captions.getTracks.call(this).forEach(function (track) {
+                // Show track
+                utils.on(track, 'cuechange', function (event) {
+                    return captions.setCue.call(_this, event);
+                });
+
+                // Turn off native caption rendering to avoid double captions
+                // eslint-disable-next-line
+                track.mode = 'hidden';
+            });
+
+            // Get current track
+            var currentTrack = captions.getCurrentTrack.call(this);
+
+            // Check if suported kind
+            if (utils.is.track(currentTrack)) {
+                // If we change the active track while a cue is already displayed we need to update it
+                if (Array.from(currentTrack.activeCues || []).length) {
+                    captions.setCue.call(this, currentTrack);
+                }
+            }
+        } else if (this.isVimeo && this.captions.active) {
+            this.embed.enableTextTrack(this.language);
+        }
+    },
+
+
+    // Get the tracks
+    getTracks: function getTracks() {
+        // Return empty array at least
+        if (utils.is.nullOrUndefined(this.media)) {
+            return [];
+        }
+
+        // Only get accepted kinds
+        return Array.from(this.media.textTracks || []).filter(function (track) {
+            return ['captions', 'subtitles'].includes(track.kind);
+        });
+    },
+
+
+    // Get the current track for the current language
+    getCurrentTrack: function getCurrentTrack() {
+        var _this2 = this;
+
+        var tracks = captions.getTracks.call(this);
+
+        if (!tracks.length) {
+            return null;
+        }
+
+        // Get track based on current language
+        var track = tracks.find(function (track) {
+            return track.language.toLowerCase() === _this2.language;
+        });
+
+        // Get the <track> with default attribute
+        if (!track) {
+            track = utils.getElement.call(this, 'track[default]');
+        }
+
+        // Get the first track
+        if (!track) {
+            var _tracks = slicedToArray(tracks, 1);
+
+            track = _tracks[0];
+        }
+
+        return track;
+    },
+
+
+    // Get UI label for track
+    getLabel: function getLabel(track) {
+        var currentTrack = track;
+
+        if (!utils.is.track(currentTrack) && support.textTracks && this.captions.active) {
+            currentTrack = captions.getCurrentTrack.call(this);
+        }
+
+        if (utils.is.track(currentTrack)) {
+            if (!utils.is.empty(currentTrack.label)) {
+                return currentTrack.label;
+            }
+
+            if (!utils.is.empty(currentTrack.language)) {
+                return track.language.toUpperCase();
+            }
+
+            return i18n.get('enabled', this.config);
+        }
+
+        return i18n.get('disabled', this.config);
+    },
+
+
+    // Display active caption if it contains text
+    setCue: function setCue(input) {
+        // Get the track from the event if needed
+        var track = utils.is.event(input) ? input.target : input;
+        var activeCues = track.activeCues;
+
+        var active = activeCues.length && activeCues[0];
+        var currentTrack = captions.getCurrentTrack.call(this);
+
+        // Only display current track
+        if (track !== currentTrack) {
+            return;
+        }
+
+        // Display a cue, if there is one
+        if (utils.is.cue(active)) {
+            captions.setText.call(this, active.getCueAsHTML());
+        } else {
+            captions.setText.call(this, null);
+        }
+
+        utils.dispatchEvent.call(this, this.media, 'cuechange');
+    },
+
+
+    // Set the current caption
+    setText: function setText(input) {
+        // Requires UI
+        if (!this.supported.ui) {
+            return;
+        }
+
+        if (utils.is.element(this.elements.captions)) {
+            var content = utils.createElement('span');
+
+            // Empty the container
+            utils.emptyElement(this.elements.captions);
+
+            // Default to empty
+            var caption = !utils.is.nullOrUndefined(input) ? input : '';
+
+            // Set the span content
+            if (utils.is.string(caption)) {
+                content.textContent = caption.trim();
+            } else {
+                content.appendChild(caption);
+            }
+
+            // Set new caption text
+            this.elements.captions.appendChild(content);
+        } else {
+            this.debug.warn('No captions element to render to');
+        }
+    },
+
+
+    // Display captions container and button (for initialization)
+    show: function show() {
+        // Try to load the value from storage
+        var active = this.storage.get('captions');
+
+        // Otherwise fall back to the default config
+        if (!utils.is.boolean(active)) {
+            active = this.config.captions.active;
+        } else {
+            this.captions.active = active;
+        }
+
+        if (active) {
+            utils.toggleClass(this.elements.container, this.config.classNames.captions.active, true);
+            utils.toggleState(this.elements.buttons.captions, true);
+        }
+    }
+};
+
+// ==========================================================================
+// Console wrapper
+// ==========================================================================
+
+var noop = function noop() {};
+
+var Console = function () {
+    function Console() {
+        var enabled = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+        classCallCheck(this, Console);
+
+        this.enabled = window.console && enabled;
+
+        if (this.enabled) {
+            this.log('Debugging enabled');
+        }
+    }
+
+    createClass(Console, [{
+        key: 'log',
+        get: function get$$1() {
+            // eslint-disable-next-line no-console
+            return this.enabled ? Function.prototype.bind.call(console.log, console) : noop;
+        }
+    }, {
+        key: 'warn',
+        get: function get$$1() {
+            // eslint-disable-next-line no-console
+            return this.enabled ? Function.prototype.bind.call(console.warn, console) : noop;
+        }
+    }, {
+        key: 'error',
+        get: function get$$1() {
+            // eslint-disable-next-line no-console
+            return this.enabled ? Function.prototype.bind.call(console.error, console) : noop;
+        }
+    }]);
+    return Console;
+}();
+
+// ==========================================================================
+// Plyr default config
+// ==========================================================================
+
+var defaults$1 = {
+    // Disable
+    enabled: true,
+
+    // Custom media title
+    title: '',
+
+    // Logging to console
+    debug: false,
+
+    // Auto play (if supported)
+    autoplay: false,
+
+    // Only allow one media playing at once (vimeo only)
+    autopause: true,
+
+    // Default time to skip when rewind/fast forward
+    seekTime: 10,
+
+    // Default volume
+    volume: 1,
+    muted: false,
+
+    // Pass a custom duration
+    duration: null,
+
+    // Display the media duration on load in the current time position
+    // If you have opted to display both duration and currentTime, this is ignored
+    displayDuration: true,
+
+    // Invert the current time to be a countdown
+    invertTime: true,
+
+    // Clicking the currentTime inverts it's value to show time left rather than elapsed
+    toggleInvert: true,
+
+    // Aspect ratio (for embeds)
+    ratio: '16:9',
+
+    // Click video container to play/pause
+    clickToPlay: true,
+
+    // Auto hide the controls
+    hideControls: true,
+
+    // Reset to start when playback ended
+    resetOnEnd: false,
+
+    // Disable the standard context menu
+    disableContextMenu: true,
+
+    // Sprite (for icons)
+    loadSprite: true,
+    iconPrefix: 'plyr',
+    iconUrl: 'https://cdn.plyr.io/3.3.0/plyr.svg',
+
+    // Blank video (used to prevent errors on source change)
+    blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
+
+    // Quality default
+    quality: {
+        default: 576,
+        options: [4320, 2880, 2160, 1440, 1080, 720, 576, 480, 360, 240, 'default']
+    },
+
+    // Set loops
+    loop: {
+        active: false
+        // start: null,
+        // end: null,
+    },
+
+    // Speed default and options to display
+    speed: {
+        selected: 1,
+        options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2]
+    },
+
+    // Keyboard shortcut settings
+    keyboard: {
+        focused: true,
+        global: false
+    },
+
+    // Display tooltips
+    tooltips: {
+        controls: false,
+        seek: true
+    },
+
+    // Captions settings
+    captions: {
+        active: false,
+        language: (navigator.language || navigator.userLanguage).split('-')[0]
+    },
+
+    // Fullscreen settings
+    fullscreen: {
+        enabled: true, // Allow fullscreen?
+        fallback: true, // Fallback for vintage browsers
+        iosNative: false // Use the native fullscreen in iOS (disables custom controls)
+    },
+
+    // Local storage
+    storage: {
+        enabled: true,
+        key: 'plyr'
+    },
+
+    // Default controls
+    controls: ['play-large',
+    // 'restart',
+    // 'rewind',
+    'play',
+    // 'fast-forward',
+    'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen'],
+    settings: ['captions', 'quality', 'speed'],
+
+    // Localisation
+    i18n: {
+        restart: 'Restart',
+        rewind: 'Rewind {seektime} secs',
+        play: 'Play',
+        pause: 'Pause',
+        fastForward: 'Forward {seektime} secs',
+        seek: 'Seek',
+        played: 'Played',
+        buffered: 'Buffered',
+        currentTime: 'Current time',
+        duration: 'Duration',
+        volume: 'Volume',
+        mute: 'Mute',
+        unmute: 'Unmute',
+        enableCaptions: 'Enable captions',
+        disableCaptions: 'Disable captions',
+        enterFullscreen: 'Enter fullscreen',
+        exitFullscreen: 'Exit fullscreen',
+        frameTitle: 'Player for {title}',
+        captions: 'Captions',
+        settings: 'Settings',
+        speed: 'Speed',
+        normal: 'Normal',
+        quality: 'Quality',
+        loop: 'Loop',
+        start: 'Start',
+        end: 'End',
+        all: 'All',
+        reset: 'Reset',
+        disabled: 'Disabled',
+        enabled: 'Enabled',
+        advertisement: 'Ad'
+    },
+
+    // URLs
+    urls: {
+        vimeo: {
+            sdk: 'https://player.vimeo.com/api/player.js',
+            iframe: 'https://player.vimeo.com/video/{0}?{1}',
+            api: 'https://vimeo.com/api/v2/video/{0}.json'
+        },
+        youtube: {
+            sdk: 'https://www.youtube.com/iframe_api',
+            api: 'https://www.googleapis.com/youtube/v3/videos?id={0}&key={1}&fields=items(snippet(title))&part=snippet',
+            poster: 'https://img.youtube.com/vi/{0}/maxresdefault.jpg,https://img.youtube.com/vi/{0}/hqdefault.jpg'
+        },
+        googleIMA: {
+            sdk: 'https://imasdk.googleapis.com/js/sdkloader/ima3.js'
+        }
+    },
+
+    // Custom control listeners
+    listeners: {
+        seek: null,
+        play: null,
+        pause: null,
+        restart: null,
+        rewind: null,
+        fastForward: null,
+        mute: null,
+        volume: null,
+        captions: null,
+        fullscreen: null,
+        pip: null,
+        airplay: null,
+        speed: null,
+        quality: null,
+        loop: null,
+        language: null
+    },
+
+    // Events to watch and bubble
+    events: [
+    // Events to watch on HTML5 media elements and bubble
+    // https://developer.mozilla.org/en/docs/Web/Guide/Events/Media_events
+    'ended', 'progress', 'stalled', 'playing', 'waiting', 'canplay', 'canplaythrough', 'loadstart', 'loadeddata', 'loadedmetadata', 'timeupdate', 'volumechange', 'play', 'pause', 'error', 'seeking', 'seeked', 'emptied', 'ratechange', 'cuechange',
+
+    // Custom events
+    'enterfullscreen', 'exitfullscreen', 'captionsenabled', 'captionsdisabled', 'languagechange', 'controlshidden', 'controlsshown', 'ready',
+
+    // YouTube
+    'statechange', 'qualitychange', 'qualityrequested',
+
+    // Ads
+    'adsloaded', 'adscontentpause', 'adscontentresume', 'adstarted', 'adsmidpoint', 'adscomplete', 'adsallcomplete', 'adsimpression', 'adsclick'],
+
+    // Selectors
+    // Change these to match your template if using custom HTML
+    selectors: {
+        editable: 'input, textarea, select, [contenteditable]',
+        container: '.plyr',
+        controls: {
+            container: null,
+            wrapper: '.plyr__controls'
+        },
+        labels: '[data-plyr]',
+        buttons: {
+            play: '[data-plyr="play"]',
+            pause: '[data-plyr="pause"]',
+            restart: '[data-plyr="restart"]',
+            rewind: '[data-plyr="rewind"]',
+            fastForward: '[data-plyr="fast-forward"]',
+            mute: '[data-plyr="mute"]',
+            captions: '[data-plyr="captions"]',
+            fullscreen: '[data-plyr="fullscreen"]',
+            pip: '[data-plyr="pip"]',
+            airplay: '[data-plyr="airplay"]',
+            settings: '[data-plyr="settings"]',
+            loop: '[data-plyr="loop"]'
+        },
+        inputs: {
+            seek: '[data-plyr="seek"]',
+            volume: '[data-plyr="volume"]',
+            speed: '[data-plyr="speed"]',
+            language: '[data-plyr="language"]',
+            quality: '[data-plyr="quality"]'
+        },
+        display: {
+            currentTime: '.plyr__time--current',
+            duration: '.plyr__time--duration',
+            buffer: '.plyr__progress--buffer',
+            played: '.plyr__progress--played',
+            loop: '.plyr__progress--loop',
+            volume: '.plyr__volume--display'
+        },
+        progress: '.plyr__progress',
+        captions: '.plyr__captions',
+        menu: {
+            quality: '.js-plyr__menu__list--quality'
+        }
+    },
+
+    // Class hooks added to the player in different states
+    classNames: {
+        video: 'plyr__video-wrapper',
+        embed: 'plyr__video-embed',
+        poster: 'plyr__poster',
+        ads: 'plyr__ads',
+        control: 'plyr__control',
+        type: 'plyr--{0}',
+        provider: 'plyr--{0}',
+        playing: 'plyr--playing',
+        paused: 'plyr--paused',
+        stopped: 'plyr--stopped',
+        loading: 'plyr--loading',
+        error: 'plyr--has-error',
+        hover: 'plyr--hover',
+        tooltip: 'plyr__tooltip',
+        cues: 'plyr__cues',
+        hidden: 'plyr__sr-only',
+        hideControls: 'plyr--hide-controls',
+        isIos: 'plyr--is-ios',
+        isTouch: 'plyr--is-touch',
+        uiSupported: 'plyr--full-ui',
+        noTransition: 'plyr--no-transition',
+        menu: {
+            value: 'plyr__menu__value',
+            badge: 'plyr__badge',
+            open: 'plyr--menu-open'
+        },
+        captions: {
+            enabled: 'plyr--captions-enabled',
+            active: 'plyr--captions-active'
+        },
+        fullscreen: {
+            enabled: 'plyr--fullscreen-enabled',
+            fallback: 'plyr--fullscreen-fallback'
+        },
+        pip: {
+            supported: 'plyr--pip-supported',
+            active: 'plyr--pip-active'
+        },
+        airplay: {
+            supported: 'plyr--airplay-supported',
+            active: 'plyr--airplay-active'
+        },
+        tabFocus: 'plyr__tab-focus'
+    },
+
+    // Embed attributes
+    attributes: {
+        embed: {
+            provider: 'data-plyr-provider',
+            id: 'data-plyr-embed-id'
+        }
+    },
+
+    // API keys
+    keys: {
+        google: null
+    },
+
+    // Advertisements plugin
+    // Register for an account here: http://vi.ai/publisher-video-monetization/?aid=plyrio
+    ads: {
+        enabled: false,
+        publisherId: ''
+    }
+};
+
+// ==========================================================================
+
 var browser$2 = utils.getBrowser();
+
+function onChange() {
+    if (!this.enabled) {
+        return;
+    }
+
+    // Update toggle button
+    var button = this.player.elements.buttons.fullscreen;
+    if (utils.is.element(button)) {
+        utils.toggleState(button, this.active);
+    }
+
+    // Trigger an event
+    utils.dispatchEvent(this.target, this.active ? 'enterfullscreen' : 'exitfullscreen', true);
+
+    // Trap focus in container
+    if (!browser$2.isIos) {
+        utils.trapFocus.call(this.player, this.target, this.active);
+    }
+}
+
+function toggleFallback() {
+    var toggle = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+    // Store or restore scroll position
+    if (toggle) {
+        this.scrollPosition = {
+            x: window.scrollX || 0,
+            y: window.scrollY || 0
+        };
+    } else {
+        window.scrollTo(this.scrollPosition.x, this.scrollPosition.y);
+    }
+
+    // Toggle scroll
+    document.body.style.overflow = toggle ? 'hidden' : '';
+
+    // Toggle class hook
+    utils.toggleClass(this.target, this.player.config.classNames.fullscreen.fallback, toggle);
+
+    // Toggle button and fire events
+    onChange.call(this);
+}
+
+var Fullscreen = function () {
+    function Fullscreen(player) {
+        var _this = this;
+
+        classCallCheck(this, Fullscreen);
+
+        // Keep reference to parent
+        this.player = player;
+
+        // Get prefix
+        this.prefix = Fullscreen.prefix;
+        this.property = Fullscreen.property;
+
+        // Scroll position
+        this.scrollPosition = { x: 0, y: 0 };
+
+        // Register event listeners
+        // Handle event (incase user presses escape etc)
+        utils.on(document, this.prefix === 'ms' ? 'MSFullscreenChange' : this.prefix + 'fullscreenchange', function () {
+            // TODO: Filter for target??
+            onChange.call(_this);
+        });
+
+        // Fullscreen toggle on double click
+        utils.on(this.player.elements.container, 'dblclick', function (event) {
+            // Ignore double click in controls
+            if (utils.is.element(_this.player.elements.controls) && _this.player.elements.controls.contains(event.target)) {
+                return;
+            }
+
+            _this.toggle();
+        });
+
+        // Update the UI
+        this.update();
+    }
+
+    // Determine if native supported
+
+
+    createClass(Fullscreen, [{
+        key: 'update',
+
+
+        // Update UI
+        value: function update() {
+            if (this.enabled) {
+                this.player.debug.log((Fullscreen.native ? 'Native' : 'Fallback') + ' fullscreen enabled');
+            } else {
+                this.player.debug.log('Fullscreen not supported and fallback disabled');
+            }
+
+            // Add styling hook to show button
+            utils.toggleClass(this.player.elements.container, this.player.config.classNames.fullscreen.enabled, this.enabled);
+        }
+
+        // Make an element fullscreen
+
+    }, {
+        key: 'enter',
+        value: function enter() {
+            if (!this.enabled) {
+                return;
+            }
+
+            // iOS native fullscreen doesn't need the request step
+            if (browser$2.isIos && this.player.config.fullscreen.iosNative) {
+                if (this.player.playing) {
+                    this.target.webkitEnterFullscreen();
+                }
+            } else if (!Fullscreen.native) {
+                toggleFallback.call(this, true);
+            } else if (!this.prefix) {
+                this.target.requestFullscreen();
+            } else if (!utils.is.empty(this.prefix)) {
+                this.target[this.prefix + 'Request' + this.property]();
+            }
+        }
+
+        // Bail from fullscreen
+
+    }, {
+        key: 'exit',
+        value: function exit() {
+            if (!this.enabled) {
+                return;
+            }
+
+            // iOS native fullscreen
+            if (browser$2.isIos && this.player.config.fullscreen.iosNative) {
+                this.target.webkitExitFullscreen();
+                this.player.play();
+            } else if (!Fullscreen.native) {
+                toggleFallback.call(this, false);
+            } else if (!this.prefix) {
+                (document.cancelFullScreen || document.exitFullscreen).call(document);
+            } else if (!utils.is.empty(this.prefix)) {
+                var action = this.prefix === 'moz' ? 'Cancel' : 'Exit';
+                document['' + this.prefix + action + this.property]();
+            }
+        }
+
+        // Toggle state
+
+    }, {
+        key: 'toggle',
+        value: function toggle() {
+            if (!this.active) {
+                this.enter();
+            } else {
+                this.exit();
+            }
+        }
+    }, {
+        key: 'enabled',
+
+
+        // Determine if fullscreen is enabled
+        get: function get$$1() {
+            return (Fullscreen.native || this.player.config.fullscreen.fallback) && this.player.config.fullscreen.enabled && this.player.supported.ui && this.player.isVideo;
+        }
+
+        // Get active state
+
+    }, {
+        key: 'active',
+        get: function get$$1() {
+            if (!this.enabled) {
+                return false;
+            }
+
+            // Fallback using classname
+            if (!Fullscreen.native) {
+                return utils.hasClass(this.target, this.player.config.classNames.fullscreen.fallback);
+            }
+
+            var element = !this.prefix ? document.fullscreenElement : document['' + this.prefix + this.property + 'Element'];
+
+            return element === this.target;
+        }
+
+        // Get target element
+
+    }, {
+        key: 'target',
+        get: function get$$1() {
+            return browser$2.isIos && this.player.config.fullscreen.iosNative ? this.player.media : this.player.elements.container;
+        }
+    }], [{
+        key: 'native',
+        get: function get$$1() {
+            return !!(document.fullscreenEnabled || document.webkitFullscreenEnabled || document.mozFullScreenEnabled || document.msFullscreenEnabled);
+        }
+
+        // Get the prefix for handlers
+
+    }, {
+        key: 'prefix',
+        get: function get$$1() {
+            // No prefix
+            if (utils.is.function(document.exitFullscreen)) {
+                return '';
+            }
+
+            // Check for fullscreen support by vendor prefix
+            var value = '';
+            var prefixes = ['webkit', 'moz', 'ms'];
+
+            prefixes.some(function (pre) {
+                if (utils.is.function(document[pre + 'ExitFullscreen']) || utils.is.function(document[pre + 'CancelFullScreen'])) {
+                    value = pre;
+                    return true;
+                }
+
+                return false;
+            });
+
+            return value;
+        }
+    }, {
+        key: 'property',
+        get: function get$$1() {
+            return this.prefix === 'moz' ? 'FullScreen' : 'Fullscreen';
+        }
+    }]);
+    return Fullscreen;
+}();
+
+// ==========================================================================
+
+// Sniff out the browser
+var browser$3 = utils.getBrowser();
 
 var Listeners = function () {
     function Listeners(player) {
@@ -4449,12 +4511,9 @@ var Listeners = function () {
             // Handle the media finishing
             utils.on(this.player.media, 'ended', function () {
                 // Show poster on end
-                if (_this3.player.isHTML5 && _this3.player.isVideo && _this3.player.config.showPosterOnEnd) {
+                if (_this3.player.isHTML5 && _this3.player.isVideo && _this3.player.config.resetOnEnd) {
                     // Restart
                     _this3.player.restart();
-
-                    // Re-load media
-                    _this3.player.media.load();
                 }
             });
 
@@ -4469,7 +4528,7 @@ var Listeners = function () {
             });
 
             // Handle play/pause
-            utils.on(this.player.media, 'playing play pause ended emptied', function (event) {
+            utils.on(this.player.media, 'playing play pause ended emptied timeupdate', function (event) {
                 return ui.checkPlaying.call(_this3.player, event);
             });
 
@@ -4601,7 +4660,7 @@ var Listeners = function () {
             var _this4 = this;
 
             // IE doesn't support input event, so we fallback to change
-            var inputEvent = browser$2.isIE ? 'change' : 'input';
+            var inputEvent = browser$3.isIE ? 'change' : 'input';
 
             // Run default and custom handlers
             var proxy = function proxy(event, defaultHandler, customHandlerKey) {
@@ -4674,21 +4733,31 @@ var Listeners = function () {
             on(this.player.elements.settings.form, 'click', function (event) {
                 event.stopPropagation();
 
+                // Go back to home tab on click
+                var showHomeTab = function showHomeTab() {
+                    var id = 'plyr-settings-' + _this4.player.id + '-home';
+                    controls.showTab.call(_this4.player, id);
+                };
+
                 // Settings menu items - use event delegation as items are added/removed
                 if (utils.matches(event.target, _this4.player.config.selectors.inputs.language)) {
                     proxy(event, function () {
                         _this4.player.language = event.target.value;
+                        showHomeTab();
                     }, 'language');
                 } else if (utils.matches(event.target, _this4.player.config.selectors.inputs.quality)) {
                     proxy(event, function () {
                         _this4.player.quality = event.target.value;
+                        showHomeTab();
                     }, 'quality');
                 } else if (utils.matches(event.target, _this4.player.config.selectors.inputs.speed)) {
                     proxy(event, function () {
                         _this4.player.speed = parseFloat(event.target.value);
+                        showHomeTab();
                     }, 'speed');
                 } else {
-                    controls.showTab.call(_this4.player, event);
+                    var tab = event.target;
+                    controls.showTab.call(_this4.player, tab.getAttribute('aria-controls'));
                 }
             });
 
@@ -4717,7 +4786,7 @@ var Listeners = function () {
             }, 'volume');
 
             // Polyfill for lower fill in <input type="range"> for webkit
-            if (browser$2.isWebkit) {
+            if (browser$3.isWebkit) {
                 on(utils.getElements.call(this.player, 'input[type="range"]'), 'input', function (event) {
                     controls.updateRangeFill.call(_this4.player, event.target);
                 });
@@ -4796,84 +4865,929 @@ var Listeners = function () {
 
 // ==========================================================================
 
-var Storage = function () {
-    function Storage(player) {
-        classCallCheck(this, Storage);
+var vimeo = {
+    setup: function setup() {
+        var _this = this;
 
-        this.enabled = player.config.storage.enabled;
-        this.key = player.config.storage.key;
+        // Add embed class for responsive
+        utils.toggleClass(this.elements.wrapper, this.config.classNames.embed, true);
+
+        // Set intial ratio
+        vimeo.setAspectRatio.call(this);
+
+        // Load the API if not already
+        if (!utils.is.object(window.Vimeo)) {
+            utils.loadScript(this.config.urls.vimeo.sdk).then(function () {
+                vimeo.ready.call(_this);
+            }).catch(function (error) {
+                _this.debug.warn('Vimeo API failed to load', error);
+            });
+        } else {
+            vimeo.ready.call(this);
+        }
+    },
+
+
+    // Set aspect ratio
+    // For Vimeo we have an extra 300% height <div> to hide the standard controls and UI
+    setAspectRatio: function setAspectRatio(input) {
+        var ratio = utils.is.string(input) ? input.split(':') : this.config.ratio.split(':');
+        var padding = 100 / ratio[0] * ratio[1];
+        this.elements.wrapper.style.paddingBottom = padding + '%';
+
+        if (this.supported.ui) {
+            var height = 240;
+            var offset = (height - padding) / (height / 50);
+
+            this.media.style.transform = 'translateY(-' + offset + '%)';
+        }
+    },
+
+
+    // API Ready
+    ready: function ready() {
+        var _this2 = this;
+
+        var player = this;
+
+        // Get Vimeo params for the iframe
+        var options = {
+            loop: player.config.loop.active,
+            autoplay: player.autoplay,
+            byline: false,
+            portrait: false,
+            title: false,
+            speed: true,
+            transparent: 0,
+            gesture: 'media',
+            playsinline: !this.config.fullscreen.iosNative
+        };
+        var params = utils.buildUrlParams(options);
+
+        // Get the source URL or ID
+        var source = player.media.getAttribute('src');
+
+        // Get from <div> if needed
+        if (utils.is.empty(source)) {
+            source = player.media.getAttribute(player.config.attributes.embed.id);
+        }
+
+        var id = utils.parseVimeoId(source);
+
+        // Build an iframe
+        var iframe = utils.createElement('iframe');
+        var src = utils.format(player.config.urls.vimeo.iframe, id, params);
+        iframe.setAttribute('src', src);
+        iframe.setAttribute('allowfullscreen', '');
+        iframe.setAttribute('allowtransparency', '');
+        iframe.setAttribute('allow', 'autoplay');
+
+        // Inject the package
+        var wrapper = utils.createElement('div');
+        wrapper.appendChild(iframe);
+        player.media = utils.replaceElement(wrapper, player.media);
+
+        // Get poster image
+        utils.fetch(utils.format(player.config.urls.vimeo.api, id), 'json').then(function (response) {
+            if (utils.is.empty(response)) {
+                return;
+            }
+
+            // Get the URL for thumbnail
+            var url = new URL(response[0].thumbnail_large);
+
+            // Get original image
+            url.pathname = url.pathname.split('_')[0] + '.jpg';
+
+            // Set attribute
+            player.media.setAttribute('poster', url.href);
+
+            // Update
+            ui.setPoster.call(player);
+        });
+
+        // Setup instance
+        // https://github.com/vimeo/player.js
+        player.embed = new window.Vimeo.Player(iframe);
+
+        player.media.paused = true;
+        player.media.currentTime = 0;
+
+        // Disable native text track rendering
+        if (player.supported.ui) {
+            player.embed.disableTextTrack();
+        }
+
+        // Create a faux HTML5 API using the Vimeo API
+        player.media.play = function () {
+            player.embed.play().then(function () {
+                player.media.paused = false;
+            });
+        };
+
+        player.media.pause = function () {
+            player.embed.pause().then(function () {
+                player.media.paused = true;
+            });
+        };
+
+        player.media.stop = function () {
+            player.pause();
+            player.currentTime = 0;
+        };
+
+        // Seeking
+        var currentTime = player.media.currentTime;
+
+        Object.defineProperty(player.media, 'currentTime', {
+            get: function get() {
+                return currentTime;
+            },
+            set: function set(time) {
+                // Get current paused state
+                // Vimeo will automatically play on seek
+                var paused = player.media.paused;
+
+                // Set seeking flag
+
+                player.media.seeking = true;
+
+                // Trigger seeking
+                utils.dispatchEvent.call(player, player.media, 'seeking');
+
+                // Seek after events
+                player.embed.setCurrentTime(time).catch(function () {
+                    // Do nothing
+                });
+
+                // Restore pause state
+                if (paused) {
+                    player.pause();
+                }
+            }
+        });
+
+        // Playback speed
+        var speed = player.config.speed.selected;
+        Object.defineProperty(player.media, 'playbackRate', {
+            get: function get() {
+                return speed;
+            },
+            set: function set(input) {
+                player.embed.setPlaybackRate(input).then(function () {
+                    speed = input;
+                    utils.dispatchEvent.call(player, player.media, 'ratechange');
+                }).catch(function (error) {
+                    // Hide menu item (and menu if empty)
+                    if (error.name === 'Error') {
+                        controls.setSpeedMenu.call(player, []);
+                    }
+                });
+            }
+        });
+
+        // Volume
+        var volume = player.config.volume;
+
+        Object.defineProperty(player.media, 'volume', {
+            get: function get() {
+                return volume;
+            },
+            set: function set(input) {
+                player.embed.setVolume(input).then(function () {
+                    volume = input;
+                    utils.dispatchEvent.call(player, player.media, 'volumechange');
+                });
+            }
+        });
+
+        // Muted
+        var muted = player.config.muted;
+
+        Object.defineProperty(player.media, 'muted', {
+            get: function get() {
+                return muted;
+            },
+            set: function set(input) {
+                var toggle = utils.is.boolean(input) ? input : false;
+
+                player.embed.setVolume(toggle ? 0 : player.config.volume).then(function () {
+                    muted = toggle;
+                    utils.dispatchEvent.call(player, player.media, 'volumechange');
+                });
+            }
+        });
+
+        // Loop
+        var loop = player.config.loop;
+
+        Object.defineProperty(player.media, 'loop', {
+            get: function get() {
+                return loop;
+            },
+            set: function set(input) {
+                var toggle = utils.is.boolean(input) ? input : player.config.loop.active;
+
+                player.embed.setLoop(toggle).then(function () {
+                    loop = toggle;
+                });
+            }
+        });
+
+        // Source
+        var currentSrc = void 0;
+        player.embed.getVideoUrl().then(function (value) {
+            currentSrc = value;
+        }).catch(function (error) {
+            _this2.debug.warn(error);
+        });
+
+        Object.defineProperty(player.media, 'currentSrc', {
+            get: function get() {
+                return currentSrc;
+            }
+        });
+
+        // Ended
+        Object.defineProperty(player.media, 'ended', {
+            get: function get() {
+                return player.currentTime === player.duration;
+            }
+        });
+
+        // Set aspect ratio based on video size
+        Promise.all([player.embed.getVideoWidth(), player.embed.getVideoHeight()]).then(function (dimensions) {
+            var ratio = utils.getAspectRatio(dimensions[0], dimensions[1]);
+            vimeo.setAspectRatio.call(_this2, ratio);
+        });
+
+        // Set autopause
+        player.embed.setAutopause(player.config.autopause).then(function (state) {
+            player.config.autopause = state;
+        });
+
+        // Get title
+        player.embed.getVideoTitle().then(function (title) {
+            player.config.title = title;
+            ui.setTitle.call(_this2);
+        });
+
+        // Get current time
+        player.embed.getCurrentTime().then(function (value) {
+            currentTime = value;
+            utils.dispatchEvent.call(player, player.media, 'timeupdate');
+        });
+
+        // Get duration
+        player.embed.getDuration().then(function (value) {
+            player.media.duration = value;
+            utils.dispatchEvent.call(player, player.media, 'durationchange');
+        });
+
+        // Get captions
+        player.embed.getTextTracks().then(function (tracks) {
+            player.media.textTracks = tracks;
+            captions.setup.call(player);
+        });
+
+        player.embed.on('cuechange', function (data) {
+            var cue = null;
+
+            if (data.cues.length) {
+                cue = utils.stripHTML(data.cues[0].text);
+            }
+
+            captions.setText.call(player, cue);
+        });
+
+        player.embed.on('loaded', function () {
+            if (utils.is.element(player.embed.element) && player.supported.ui) {
+                var frame = player.embed.element;
+
+                // Fix keyboard focus issues
+                // https://github.com/sampotts/plyr/issues/317
+                frame.setAttribute('tabindex', -1);
+            }
+        });
+
+        player.embed.on('play', function () {
+            // Only fire play if paused before
+            if (player.media.paused) {
+                utils.dispatchEvent.call(player, player.media, 'play');
+            }
+            player.media.paused = false;
+            utils.dispatchEvent.call(player, player.media, 'playing');
+        });
+
+        player.embed.on('pause', function () {
+            player.media.paused = true;
+            utils.dispatchEvent.call(player, player.media, 'pause');
+        });
+
+        player.embed.on('timeupdate', function (data) {
+            player.media.seeking = false;
+            currentTime = data.seconds;
+            utils.dispatchEvent.call(player, player.media, 'timeupdate');
+        });
+
+        player.embed.on('progress', function (data) {
+            player.media.buffered = data.percent;
+            utils.dispatchEvent.call(player, player.media, 'progress');
+
+            // Check all loaded
+            if (parseInt(data.percent, 10) === 1) {
+                utils.dispatchEvent.call(player, player.media, 'canplaythrough');
+            }
+
+            // Get duration as if we do it before load, it gives an incorrect value
+            // https://github.com/sampotts/plyr/issues/891
+            player.embed.getDuration().then(function (value) {
+                if (value !== player.media.duration) {
+                    player.media.duration = value;
+                    utils.dispatchEvent.call(player, player.media, 'durationchange');
+                }
+            });
+        });
+
+        player.embed.on('seeked', function () {
+            player.media.seeking = false;
+            utils.dispatchEvent.call(player, player.media, 'seeked');
+            utils.dispatchEvent.call(player, player.media, 'play');
+        });
+
+        player.embed.on('ended', function () {
+            player.media.paused = true;
+            utils.dispatchEvent.call(player, player.media, 'ended');
+        });
+
+        player.embed.on('error', function (detail) {
+            player.media.error = detail;
+            utils.dispatchEvent.call(player, player.media, 'error');
+        });
+
+        // Rebuild UI
+        setTimeout(function () {
+            return ui.build.call(player);
+        }, 0);
+    }
+};
+
+// ==========================================================================
+
+// Standardise YouTube quality unit
+function mapQualityUnit(input) {
+    switch (input) {
+        case 'hd2160':
+            return 2160;
+
+        case 2160:
+            return 'hd2160';
+
+        case 'hd1440':
+            return 1440;
+
+        case 1440:
+            return 'hd1440';
+
+        case 'hd1080':
+            return 1080;
+
+        case 1080:
+            return 'hd1080';
+
+        case 'hd720':
+            return 720;
+
+        case 720:
+            return 'hd720';
+
+        case 'large':
+            return 480;
+
+        case 480:
+            return 'large';
+
+        case 'medium':
+            return 360;
+
+        case 360:
+            return 'medium';
+
+        case 'small':
+            return 240;
+
+        case 240:
+            return 'small';
+
+        default:
+            return 'default';
+    }
+}
+
+function mapQualityUnits(levels) {
+    if (utils.is.empty(levels)) {
+        return levels;
     }
 
-    // Check for actual support (see if we can use it)
+    return utils.dedupe(levels.map(function (level) {
+        return mapQualityUnit(level);
+    }));
+}
 
+var youtube = {
+    setup: function setup() {
+        var _this = this;
 
-    createClass(Storage, [{
-        key: 'get',
-        value: function get$$1(key) {
-            if (!Storage.supported) {
-                return null;
-            }
+        // Add embed class for responsive
+        utils.toggleClass(this.elements.wrapper, this.config.classNames.embed, true);
 
-            var store = window.localStorage.getItem(this.key);
+        // Set aspect ratio
+        youtube.setAspectRatio.call(this);
 
-            if (utils.is.empty(store)) {
-                return null;
-            }
+        // Setup API
+        if (utils.is.object(window.YT) && utils.is.function(window.YT.Player)) {
+            youtube.ready.call(this);
+        } else {
+            // Load the API
+            utils.loadScript(this.config.urls.youtube.sdk).catch(function (error) {
+                _this.debug.warn('YouTube API failed to load', error);
+            });
 
-            var json = JSON.parse(store);
+            // Setup callback for the API
+            // YouTube has it's own system of course...
+            window.onYouTubeReadyCallbacks = window.onYouTubeReadyCallbacks || [];
 
-            return utils.is.string(key) && key.length ? json[key] : json;
+            // Add to queue
+            window.onYouTubeReadyCallbacks.push(function () {
+                youtube.ready.call(_this);
+            });
+
+            // Set callback to process queue
+            window.onYouTubeIframeAPIReady = function () {
+                window.onYouTubeReadyCallbacks.forEach(function (callback) {
+                    callback();
+                });
+            };
         }
-    }, {
-        key: 'set',
-        value: function set$$1(object) {
-            // Bail if we don't have localStorage support or it's disabled
-            if (!Storage.supported || !this.enabled) {
+    },
+
+
+    // Get the media title
+    getTitle: function getTitle(videoId) {
+        var _this2 = this;
+
+        // Try via undocumented API method first
+        // This method disappears now and then though...
+        // https://github.com/sampotts/plyr/issues/709
+        if (utils.is.function(this.embed.getVideoData)) {
+            var _embed$getVideoData = this.embed.getVideoData(),
+                title = _embed$getVideoData.title;
+
+            if (utils.is.empty(title)) {
+                this.config.title = title;
+                ui.setTitle.call(this);
                 return;
             }
-
-            // Can only store objectst
-            if (!utils.is.object(object)) {
-                return;
-            }
-
-            // Get current storage
-            var storage = this.get();
-
-            // Default to empty object
-            if (utils.is.empty(storage)) {
-                storage = {};
-            }
-
-            // Update the working copy of the values
-            utils.extend(storage, object);
-
-            // Update storage
-            window.localStorage.setItem(this.key, JSON.stringify(storage));
         }
-    }], [{
-        key: 'supported',
-        get: function get$$1() {
-            try {
-                if (!('localStorage' in window)) {
-                    return false;
+
+        // Or via Google API
+        var key = this.config.keys.google;
+        if (utils.is.string(key) && !utils.is.empty(key)) {
+            var url = utils.format(this.config.urls.youtube.api, videoId, key);
+
+            utils.fetch(url).then(function (result) {
+                if (utils.is.object(result)) {
+                    _this2.config.title = result.items[0].snippet.title;
+                    ui.setTitle.call(_this2);
                 }
-
-                var test = '___test';
-
-                // Try to use it (it might be disabled, e.g. user is in private mode)
-                // see: https://github.com/sampotts/plyr/issues/131
-                window.localStorage.setItem(test, test);
-                window.localStorage.removeItem(test);
-
-                return true;
-            } catch (e) {
-                return false;
-            }
+            }).catch(function () {});
         }
-    }]);
-    return Storage;
-}();
+    },
+
+
+    // Set aspect ratio
+    setAspectRatio: function setAspectRatio() {
+        var ratio = this.config.ratio.split(':');
+        this.elements.wrapper.style.paddingBottom = 100 / ratio[0] * ratio[1] + '%';
+    },
+
+
+    // API ready
+    ready: function ready() {
+        var player = this;
+
+        // Ignore already setup (race condition)
+        var currentId = player.media.getAttribute('id');
+        if (!utils.is.empty(currentId) && currentId.startsWith('youtube-')) {
+            return;
+        }
+
+        // Get the source URL or ID
+        var source = player.media.getAttribute('src');
+
+        // Get from <div> if needed
+        if (utils.is.empty(source)) {
+            source = player.media.getAttribute(this.config.attributes.embed.id);
+        }
+
+        // Replace the <iframe> with a <div> due to YouTube API issues
+        var videoId = utils.parseYouTubeId(source);
+        var id = utils.generateId(player.provider);
+        var container = utils.createElement('div', { id: id });
+        player.media = utils.replaceElement(container, player.media);
+
+        // Set poster image
+        player.media.setAttribute('poster', utils.format(player.config.urls.youtube.poster, videoId));
+
+        // Setup instance
+        // https://developers.google.com/youtube/iframe_api_reference
+        player.embed = new window.YT.Player(id, {
+            videoId: videoId,
+            playerVars: {
+                autoplay: player.config.autoplay ? 1 : 0, // Autoplay
+                controls: player.supported.ui ? 0 : 1, // Only show controls if not fully supported
+                rel: 0, // No related vids
+                showinfo: 0, // Hide info
+                iv_load_policy: 3, // Hide annotations
+                modestbranding: 1, // Hide logos as much as possible (they still show one in the corner when paused)
+                disablekb: 1, // Disable keyboard as we handle it
+                playsinline: 1, // Allow iOS inline playback
+
+                // Tracking for stats
+                // origin: window ? `${window.location.protocol}//${window.location.host}` : null,
+                widget_referrer: window ? window.location.href : null,
+
+                // Captions are flaky on YouTube
+                cc_load_policy: player.captions.active ? 1 : 0,
+                cc_lang_pref: player.config.captions.language
+            },
+            events: {
+                onError: function onError(event) {
+                    // If we've already fired an error, don't do it again
+                    // YouTube fires onError twice
+                    if (utils.is.object(player.media.error)) {
+                        return;
+                    }
+
+                    var detail = {
+                        code: event.data
+                    };
+
+                    // Messages copied from https://developers.google.com/youtube/iframe_api_reference#onError
+                    switch (event.data) {
+                        case 2:
+                            detail.message = 'The request contains an invalid parameter value. For example, this error occurs if you specify a video ID that does not have 11 characters, or if the video ID contains invalid characters, such as exclamation points or asterisks.';
+                            break;
+
+                        case 5:
+                            detail.message = 'The requested content cannot be played in an HTML5 player or another error related to the HTML5 player has occurred.';
+                            break;
+
+                        case 100:
+                            detail.message = 'The video requested was not found. This error occurs when a video has been removed (for any reason) or has been marked as private.';
+                            break;
+
+                        case 101:
+                        case 150:
+                            detail.message = 'The owner of the requested video does not allow it to be played in embedded players.';
+                            break;
+
+                        default:
+                            detail.message = 'An unknown error occured';
+                            break;
+                    }
+
+                    player.media.error = detail;
+
+                    utils.dispatchEvent.call(player, player.media, 'error');
+                },
+                onPlaybackQualityChange: function onPlaybackQualityChange() {
+                    utils.dispatchEvent.call(player, player.media, 'qualitychange', false, {
+                        quality: player.media.quality
+                    });
+                },
+                onPlaybackRateChange: function onPlaybackRateChange(event) {
+                    // Get the instance
+                    var instance = event.target;
+
+                    // Get current speed
+                    player.media.playbackRate = instance.getPlaybackRate();
+
+                    utils.dispatchEvent.call(player, player.media, 'ratechange');
+                },
+                onReady: function onReady(event) {
+                    // Get the instance
+                    var instance = event.target;
+
+                    // Get the title
+                    youtube.getTitle.call(player, videoId);
+
+                    // Create a faux HTML5 API using the YouTube API
+                    player.media.play = function () {
+                        instance.playVideo();
+                    };
+
+                    player.media.pause = function () {
+                        instance.pauseVideo();
+                    };
+
+                    player.media.stop = function () {
+                        instance.stopVideo();
+                    };
+
+                    player.media.duration = instance.getDuration();
+                    player.media.paused = true;
+
+                    // Seeking
+                    player.media.currentTime = 0;
+                    Object.defineProperty(player.media, 'currentTime', {
+                        get: function get() {
+                            return Number(instance.getCurrentTime());
+                        },
+                        set: function set(time) {
+                            // Vimeo will automatically play on seek
+                            var paused = player.media.paused;
+
+                            // Set seeking flag
+
+                            player.media.seeking = true;
+
+                            // Trigger seeking
+                            utils.dispatchEvent.call(player, player.media, 'seeking');
+
+                            // Seek after events sent
+                            instance.seekTo(time);
+
+                            // Restore pause state
+                            if (paused) {
+                                player.pause();
+                            }
+                        }
+                    });
+
+                    // Playback speed
+                    Object.defineProperty(player.media, 'playbackRate', {
+                        get: function get() {
+                            return instance.getPlaybackRate();
+                        },
+                        set: function set(input) {
+                            instance.setPlaybackRate(input);
+                        }
+                    });
+
+                    // Quality
+                    Object.defineProperty(player.media, 'quality', {
+                        get: function get() {
+                            return mapQualityUnit(instance.getPlaybackQuality());
+                        },
+                        set: function set(input) {
+                            var quality = input;
+
+                            // Set via API
+                            instance.setPlaybackQuality(mapQualityUnit(quality));
+
+                            // Trigger request event
+                            utils.dispatchEvent.call(player, player.media, 'qualityrequested', false, {
+                                quality: quality
+                            });
+                        }
+                    });
+
+                    // Volume
+                    var volume = player.config.volume;
+
+                    Object.defineProperty(player.media, 'volume', {
+                        get: function get() {
+                            return volume;
+                        },
+                        set: function set(input) {
+                            volume = input;
+                            instance.setVolume(volume * 100);
+                            utils.dispatchEvent.call(player, player.media, 'volumechange');
+                        }
+                    });
+
+                    // Muted
+                    var muted = player.config.muted;
+
+                    Object.defineProperty(player.media, 'muted', {
+                        get: function get() {
+                            return muted;
+                        },
+                        set: function set(input) {
+                            var toggle = utils.is.boolean(input) ? input : muted;
+                            muted = toggle;
+                            instance[toggle ? 'mute' : 'unMute']();
+                            utils.dispatchEvent.call(player, player.media, 'volumechange');
+                        }
+                    });
+
+                    // Source
+                    Object.defineProperty(player.media, 'currentSrc', {
+                        get: function get() {
+                            return instance.getVideoUrl();
+                        }
+                    });
+
+                    // Ended
+                    Object.defineProperty(player.media, 'ended', {
+                        get: function get() {
+                            return player.currentTime === player.duration;
+                        }
+                    });
+
+                    // Get available speeds
+                    player.options.speed = instance.getAvailablePlaybackRates();
+
+                    // Set the tabindex to avoid focus entering iframe
+                    if (player.supported.ui) {
+                        player.media.setAttribute('tabindex', -1);
+                    }
+
+                    utils.dispatchEvent.call(player, player.media, 'timeupdate');
+                    utils.dispatchEvent.call(player, player.media, 'durationchange');
+
+                    // Reset timer
+                    clearInterval(player.timers.buffering);
+
+                    // Setup buffering
+                    player.timers.buffering = setInterval(function () {
+                        // Get loaded % from YouTube
+                        player.media.buffered = instance.getVideoLoadedFraction();
+
+                        // Trigger progress only when we actually buffer something
+                        if (player.media.lastBuffered === null || player.media.lastBuffered < player.media.buffered) {
+                            utils.dispatchEvent.call(player, player.media, 'progress');
+                        }
+
+                        // Set last buffer point
+                        player.media.lastBuffered = player.media.buffered;
+
+                        // Bail if we're at 100%
+                        if (player.media.buffered === 1) {
+                            clearInterval(player.timers.buffering);
+
+                            // Trigger event
+                            utils.dispatchEvent.call(player, player.media, 'canplaythrough');
+                        }
+                    }, 200);
+
+                    // Rebuild UI
+                    setTimeout(function () {
+                        return ui.build.call(player);
+                    }, 50);
+                },
+                onStateChange: function onStateChange(event) {
+                    // Get the instance
+                    var instance = event.target;
+
+                    // Reset timer
+                    clearInterval(player.timers.playing);
+
+                    // Handle events
+                    // -1   Unstarted
+                    // 0    Ended
+                    // 1    Playing
+                    // 2    Paused
+                    // 3    Buffering
+                    // 5    Video cued
+                    switch (event.data) {
+                        case -1:
+                            // Update scrubber
+                            utils.dispatchEvent.call(player, player.media, 'timeupdate');
+
+                            // Get loaded % from YouTube
+                            player.media.buffered = instance.getVideoLoadedFraction();
+                            utils.dispatchEvent.call(player, player.media, 'progress');
+
+                            break;
+
+                        case 0:
+                            player.media.paused = true;
+
+                            // YouTube doesn't support loop for a single video, so mimick it.
+                            if (player.media.loop) {
+                                // YouTube needs a call to `stopVideo` before playing again
+                                instance.stopVideo();
+                                instance.playVideo();
+                            } else {
+                                utils.dispatchEvent.call(player, player.media, 'ended');
+                            }
+
+                            break;
+
+                        case 1:
+                            // If we were seeking, fire seeked event
+                            if (player.media.seeking) {
+                                utils.dispatchEvent.call(player, player.media, 'seeked');
+                            }
+                            player.media.seeking = false;
+
+                            // Only fire play if paused before
+                            if (player.media.paused) {
+                                utils.dispatchEvent.call(player, player.media, 'play');
+                            }
+                            player.media.paused = false;
+
+                            utils.dispatchEvent.call(player, player.media, 'playing');
+
+                            // Poll to get playback progress
+                            player.timers.playing = setInterval(function () {
+                                utils.dispatchEvent.call(player, player.media, 'timeupdate');
+                            }, 50);
+
+                            // Check duration again due to YouTube bug
+                            // https://github.com/sampotts/plyr/issues/374
+                            // https://code.google.com/p/gdata-issues/issues/detail?id=8690
+                            if (player.media.duration !== instance.getDuration()) {
+                                player.media.duration = instance.getDuration();
+                                utils.dispatchEvent.call(player, player.media, 'durationchange');
+                            }
+
+                            // Get quality
+                            controls.setQualityMenu.call(player, mapQualityUnits(instance.getAvailableQualityLevels()));
+
+                            break;
+
+                        case 2:
+                            player.media.paused = true;
+
+                            utils.dispatchEvent.call(player, player.media, 'pause');
+
+                            break;
+
+                        default:
+                            break;
+                    }
+
+                    utils.dispatchEvent.call(player, player.elements.container, 'statechange', false, {
+                        code: event.data
+                    });
+                }
+            }
+        });
+    }
+};
+
+// ==========================================================================
+
+var media = {
+    // Setup media
+    setup: function setup() {
+        // If there's no media, bail
+        if (!this.media) {
+            this.debug.warn('No media element found!');
+            return;
+        }
+
+        // Add type class
+        utils.toggleClass(this.elements.container, this.config.classNames.type.replace('{0}', this.type), true);
+
+        // Add provider class
+        utils.toggleClass(this.elements.container, this.config.classNames.provider.replace('{0}', this.provider), true);
+
+        // Add video class for embeds
+        // This will require changes if audio embeds are added
+        if (this.isEmbed) {
+            utils.toggleClass(this.elements.container, this.config.classNames.type.replace('{0}', 'video'), true);
+        }
+
+        // Inject the player wrapper
+        if (this.isVideo) {
+            // Create the wrapper div
+            this.elements.wrapper = utils.createElement('div', {
+                class: this.config.classNames.video
+            });
+
+            // Wrap the video in a container
+            utils.wrap(this.media, this.elements.wrapper);
+
+            // Faux poster container
+            this.elements.poster = utils.createElement('span', {
+                class: this.config.classNames.poster
+            });
+
+            this.elements.wrapper.appendChild(this.elements.poster);
+        }
+
+        if (this.isEmbed) {
+            switch (this.provider) {
+                case 'youtube':
+                    youtube.setup.call(this);
+                    break;
+
+                case 'vimeo':
+                    vimeo.setup.call(this);
+                    break;
+
+                default:
+                    break;
+            }
+        } else if (this.isHTML5) {
+            html5.extend.call(this);
+        }
+    }
+};
 
 // ==========================================================================
 
@@ -4929,7 +5843,7 @@ var Ads = function () {
             if (this.enabled) {
                 // Check if the Google IMA3 SDK is loaded or load it ourselves
                 if (!utils.is.object(window.google) || !utils.is.object(window.google.ima)) {
-                    utils.loadScript(this.player.config.urls.googleIMA.api).then(function () {
+                    utils.loadScript(this.player.config.urls.googleIMA.sdk).then(function () {
                         _this2.ready();
                     }).catch(function () {
                         // Script failed to load or is blocked
@@ -5039,6 +5953,9 @@ var Ads = function () {
                 // We only overlay ads as we only support video.
                 request.forceNonLinearFullSlot = false;
 
+                // Mute based on current state
+                request.setAdWillPlayMuted(!this.player.muted);
+
                 this.loader.requestAds(request);
             } catch (e) {
                 this.onAdError(e);
@@ -5117,7 +6034,7 @@ var Ads = function () {
 
             // Get skippable state
             // TODO: Skip button
-            // this.manager.getAdSkippableState();
+            // this.player.debug.warn(this.manager.getAdSkippableState());
 
             // Set volume to match player
             this.manager.setVolume(this.player.volume);
@@ -5547,925 +6464,6 @@ var Ads = function () {
 
 // ==========================================================================
 
-// Standardise YouTube quality unit
-function mapQualityUnit(input) {
-    switch (input) {
-        case 'hd2160':
-            return 2160;
-
-        case 2160:
-            return 'hd2160';
-
-        case 'hd1440':
-            return 1440;
-
-        case 1440:
-            return 'hd1440';
-
-        case 'hd1080':
-            return 1080;
-
-        case 1080:
-            return 'hd1080';
-
-        case 'hd720':
-            return 720;
-
-        case 720:
-            return 'hd720';
-
-        case 'large':
-            return 480;
-
-        case 480:
-            return 'large';
-
-        case 'medium':
-            return 360;
-
-        case 360:
-            return 'medium';
-
-        case 'small':
-            return 240;
-
-        case 240:
-            return 'small';
-
-        default:
-            return 'default';
-    }
-}
-
-function mapQualityUnits(levels) {
-    if (utils.is.empty(levels)) {
-        return levels;
-    }
-
-    return utils.dedupe(levels.map(function (level) {
-        return mapQualityUnit(level);
-    }));
-}
-
-var youtube = {
-    setup: function setup() {
-        var _this = this;
-
-        // Add embed class for responsive
-        utils.toggleClass(this.elements.wrapper, this.config.classNames.embed, true);
-
-        // Set aspect ratio
-        youtube.setAspectRatio.call(this);
-
-        // Setup API
-        if (utils.is.object(window.YT) && utils.is.function(window.YT.Player)) {
-            youtube.ready.call(this);
-        } else {
-            // Load the API
-            utils.loadScript(this.config.urls.youtube.api).catch(function (error) {
-                _this.debug.warn('YouTube API failed to load', error);
-            });
-
-            // Setup callback for the API
-            // YouTube has it's own system of course...
-            window.onYouTubeReadyCallbacks = window.onYouTubeReadyCallbacks || [];
-
-            // Add to queue
-            window.onYouTubeReadyCallbacks.push(function () {
-                youtube.ready.call(_this);
-            });
-
-            // Set callback to process queue
-            window.onYouTubeIframeAPIReady = function () {
-                window.onYouTubeReadyCallbacks.forEach(function (callback) {
-                    callback();
-                });
-            };
-        }
-    },
-
-
-    // Get the media title
-    getTitle: function getTitle(videoId) {
-        var _this2 = this;
-
-        // Try via undocumented API method first
-        // This method disappears now and then though...
-        // https://github.com/sampotts/plyr/issues/709
-        if (utils.is.function(this.embed.getVideoData)) {
-            var _embed$getVideoData = this.embed.getVideoData(),
-                title = _embed$getVideoData.title;
-
-            if (utils.is.empty(title)) {
-                this.config.title = title;
-                ui.setTitle.call(this);
-                return;
-            }
-        }
-
-        // Or via Google API
-        var key = this.config.keys.google;
-        if (utils.is.string(key) && !utils.is.empty(key)) {
-            var url = 'https://www.googleapis.com/youtube/v3/videos?id=' + videoId + '&key=' + key + '&fields=items(snippet(title))&part=snippet';
-
-            utils.fetch(url).then(function (result) {
-                if (utils.is.object(result)) {
-                    _this2.config.title = result.items[0].snippet.title;
-                    ui.setTitle.call(_this2);
-                }
-            }).catch(function () {});
-        }
-    },
-
-
-    // Set aspect ratio
-    setAspectRatio: function setAspectRatio() {
-        var ratio = this.config.ratio.split(':');
-        this.elements.wrapper.style.paddingBottom = 100 / ratio[0] * ratio[1] + '%';
-    },
-
-
-    // API ready
-    ready: function ready() {
-        var player = this;
-
-        // Ignore already setup (race condition)
-        var currentId = player.media.getAttribute('id');
-        if (!utils.is.empty(currentId) && currentId.startsWith('youtube-')) {
-            return;
-        }
-
-        // Get the source URL or ID
-        var source = player.media.getAttribute('src');
-
-        // Get from <div> if needed
-        if (utils.is.empty(source)) {
-            source = player.media.getAttribute(this.config.attributes.embed.id);
-        }
-
-        // Replace the <iframe> with a <div> due to YouTube API issues
-        var videoId = utils.parseYouTubeId(source);
-        var id = utils.generateId(player.provider);
-        var container = utils.createElement('div', { id: id });
-        player.media = utils.replaceElement(container, player.media);
-
-        // Setup instance
-        // https://developers.google.com/youtube/iframe_api_reference
-        player.embed = new window.YT.Player(id, {
-            videoId: videoId,
-            playerVars: {
-                autoplay: player.config.autoplay ? 1 : 0, // Autoplay
-                controls: player.supported.ui ? 0 : 1, // Only show controls if not fully supported
-                rel: 0, // No related vids
-                showinfo: 0, // Hide info
-                iv_load_policy: 3, // Hide annotations
-                modestbranding: 1, // Hide logos as much as possible (they still show one in the corner when paused)
-                disablekb: 1, // Disable keyboard as we handle it
-                playsinline: 1, // Allow iOS inline playback
-
-                // Tracking for stats
-                // origin: window ? `${window.location.protocol}//${window.location.host}` : null,
-                widget_referrer: window ? window.location.href : null,
-
-                // Captions are flaky on YouTube
-                cc_load_policy: player.captions.active ? 1 : 0,
-                cc_lang_pref: player.config.captions.language
-            },
-            events: {
-                onError: function onError(event) {
-                    // If we've already fired an error, don't do it again
-                    // YouTube fires onError twice
-                    if (utils.is.object(player.media.error)) {
-                        return;
-                    }
-
-                    var detail = {
-                        code: event.data
-                    };
-
-                    // Messages copied from https://developers.google.com/youtube/iframe_api_reference#onError
-                    switch (event.data) {
-                        case 2:
-                            detail.message = 'The request contains an invalid parameter value. For example, this error occurs if you specify a video ID that does not have 11 characters, or if the video ID contains invalid characters, such as exclamation points or asterisks.';
-                            break;
-
-                        case 5:
-                            detail.message = 'The requested content cannot be played in an HTML5 player or another error related to the HTML5 player has occurred.';
-                            break;
-
-                        case 100:
-                            detail.message = 'The video requested was not found. This error occurs when a video has been removed (for any reason) or has been marked as private.';
-                            break;
-
-                        case 101:
-                        case 150:
-                            detail.message = 'The owner of the requested video does not allow it to be played in embedded players.';
-                            break;
-
-                        default:
-                            detail.message = 'An unknown error occured';
-                            break;
-                    }
-
-                    player.media.error = detail;
-
-                    utils.dispatchEvent.call(player, player.media, 'error');
-                },
-                onPlaybackQualityChange: function onPlaybackQualityChange() {
-                    utils.dispatchEvent.call(player, player.media, 'qualitychange', false, {
-                        quality: player.media.quality
-                    });
-                },
-                onPlaybackRateChange: function onPlaybackRateChange(event) {
-                    // Get the instance
-                    var instance = event.target;
-
-                    // Get current speed
-                    player.media.playbackRate = instance.getPlaybackRate();
-
-                    utils.dispatchEvent.call(player, player.media, 'ratechange');
-                },
-                onReady: function onReady(event) {
-                    // Get the instance
-                    var instance = event.target;
-
-                    // Get the title
-                    youtube.getTitle.call(player, videoId);
-
-                    // Create a faux HTML5 API using the YouTube API
-                    player.media.play = function () {
-                        instance.playVideo();
-                    };
-
-                    player.media.pause = function () {
-                        instance.pauseVideo();
-                    };
-
-                    player.media.stop = function () {
-                        instance.stopVideo();
-                    };
-
-                    player.media.duration = instance.getDuration();
-                    player.media.paused = true;
-
-                    // Seeking
-                    player.media.currentTime = 0;
-                    Object.defineProperty(player.media, 'currentTime', {
-                        get: function get() {
-                            return Number(instance.getCurrentTime());
-                        },
-                        set: function set(time) {
-                            // Vimeo will automatically play on seek
-                            var paused = player.media.paused;
-
-                            // Set seeking flag
-
-                            player.media.seeking = true;
-
-                            // Trigger seeking
-                            utils.dispatchEvent.call(player, player.media, 'seeking');
-
-                            // Seek after events sent
-                            instance.seekTo(time);
-
-                            // Restore pause state
-                            if (paused) {
-                                player.pause();
-                            }
-                        }
-                    });
-
-                    // Playback speed
-                    Object.defineProperty(player.media, 'playbackRate', {
-                        get: function get() {
-                            return instance.getPlaybackRate();
-                        },
-                        set: function set(input) {
-                            instance.setPlaybackRate(input);
-                        }
-                    });
-
-                    // Quality
-                    Object.defineProperty(player.media, 'quality', {
-                        get: function get() {
-                            return mapQualityUnit(instance.getPlaybackQuality());
-                        },
-                        set: function set(input) {
-                            var quality = input;
-
-                            // Set via API
-                            instance.setPlaybackQuality(mapQualityUnit(quality));
-
-                            // Trigger request event
-                            utils.dispatchEvent.call(player, player.media, 'qualityrequested', false, {
-                                quality: quality
-                            });
-                        }
-                    });
-
-                    // Volume
-                    var volume = player.config.volume;
-
-                    Object.defineProperty(player.media, 'volume', {
-                        get: function get() {
-                            return volume;
-                        },
-                        set: function set(input) {
-                            volume = input;
-                            instance.setVolume(volume * 100);
-                            utils.dispatchEvent.call(player, player.media, 'volumechange');
-                        }
-                    });
-
-                    // Muted
-                    var muted = player.config.muted;
-
-                    Object.defineProperty(player.media, 'muted', {
-                        get: function get() {
-                            return muted;
-                        },
-                        set: function set(input) {
-                            var toggle = utils.is.boolean(input) ? input : muted;
-                            muted = toggle;
-                            instance[toggle ? 'mute' : 'unMute']();
-                            utils.dispatchEvent.call(player, player.media, 'volumechange');
-                        }
-                    });
-
-                    // Source
-                    Object.defineProperty(player.media, 'currentSrc', {
-                        get: function get() {
-                            return instance.getVideoUrl();
-                        }
-                    });
-
-                    // Ended
-                    Object.defineProperty(player.media, 'ended', {
-                        get: function get() {
-                            return player.currentTime === player.duration;
-                        }
-                    });
-
-                    // Get available speeds
-                    player.options.speed = instance.getAvailablePlaybackRates();
-
-                    // Set the tabindex to avoid focus entering iframe
-                    if (player.supported.ui) {
-                        player.media.setAttribute('tabindex', -1);
-                    }
-
-                    utils.dispatchEvent.call(player, player.media, 'timeupdate');
-                    utils.dispatchEvent.call(player, player.media, 'durationchange');
-
-                    // Reset timer
-                    clearInterval(player.timers.buffering);
-
-                    // Setup buffering
-                    player.timers.buffering = setInterval(function () {
-                        // Get loaded % from YouTube
-                        player.media.buffered = instance.getVideoLoadedFraction();
-
-                        // Trigger progress only when we actually buffer something
-                        if (player.media.lastBuffered === null || player.media.lastBuffered < player.media.buffered) {
-                            utils.dispatchEvent.call(player, player.media, 'progress');
-                        }
-
-                        // Set last buffer point
-                        player.media.lastBuffered = player.media.buffered;
-
-                        // Bail if we're at 100%
-                        if (player.media.buffered === 1) {
-                            clearInterval(player.timers.buffering);
-
-                            // Trigger event
-                            utils.dispatchEvent.call(player, player.media, 'canplaythrough');
-                        }
-                    }, 200);
-
-                    // Rebuild UI
-                    setTimeout(function () {
-                        return ui.build.call(player);
-                    }, 50);
-                },
-                onStateChange: function onStateChange(event) {
-                    // Get the instance
-                    var instance = event.target;
-
-                    // Reset timer
-                    clearInterval(player.timers.playing);
-
-                    // Handle events
-                    // -1   Unstarted
-                    // 0    Ended
-                    // 1    Playing
-                    // 2    Paused
-                    // 3    Buffering
-                    // 5    Video cued
-                    switch (event.data) {
-                        case -1:
-                            // Update scrubber
-                            utils.dispatchEvent.call(player, player.media, 'timeupdate');
-
-                            // Get loaded % from YouTube
-                            player.media.buffered = instance.getVideoLoadedFraction();
-                            utils.dispatchEvent.call(player, player.media, 'progress');
-
-                            break;
-
-                        case 0:
-                            player.media.paused = true;
-
-                            // YouTube doesn't support loop for a single video, so mimick it.
-                            if (player.media.loop) {
-                                // YouTube needs a call to `stopVideo` before playing again
-                                instance.stopVideo();
-                                instance.playVideo();
-                            } else {
-                                utils.dispatchEvent.call(player, player.media, 'ended');
-                            }
-
-                            break;
-
-                        case 1:
-                            // If we were seeking, fire seeked event
-                            if (player.media.seeking) {
-                                utils.dispatchEvent.call(player, player.media, 'seeked');
-                            }
-                            player.media.seeking = false;
-
-                            // Only fire play if paused before
-                            if (player.media.paused) {
-                                utils.dispatchEvent.call(player, player.media, 'play');
-                            }
-                            player.media.paused = false;
-
-                            utils.dispatchEvent.call(player, player.media, 'playing');
-
-                            // Poll to get playback progress
-                            player.timers.playing = setInterval(function () {
-                                utils.dispatchEvent.call(player, player.media, 'timeupdate');
-                            }, 50);
-
-                            // Check duration again due to YouTube bug
-                            // https://github.com/sampotts/plyr/issues/374
-                            // https://code.google.com/p/gdata-issues/issues/detail?id=8690
-                            if (player.media.duration !== instance.getDuration()) {
-                                player.media.duration = instance.getDuration();
-                                utils.dispatchEvent.call(player, player.media, 'durationchange');
-                            }
-
-                            // Get quality
-                            controls.setQualityMenu.call(player, mapQualityUnits(instance.getAvailableQualityLevels()));
-
-                            break;
-
-                        case 2:
-                            player.media.paused = true;
-
-                            utils.dispatchEvent.call(player, player.media, 'pause');
-
-                            break;
-
-                        default:
-                            break;
-                    }
-
-                    utils.dispatchEvent.call(player, player.elements.container, 'statechange', false, {
-                        code: event.data
-                    });
-                }
-            }
-        });
-    }
-};
-
-// ==========================================================================
-
-var vimeo = {
-    setup: function setup() {
-        var _this = this;
-
-        // Add embed class for responsive
-        utils.toggleClass(this.elements.wrapper, this.config.classNames.embed, true);
-
-        // Set intial ratio
-        vimeo.setAspectRatio.call(this);
-
-        // Load the API if not already
-        if (!utils.is.object(window.Vimeo)) {
-            utils.loadScript(this.config.urls.vimeo.api).then(function () {
-                vimeo.ready.call(_this);
-            }).catch(function (error) {
-                _this.debug.warn('Vimeo API failed to load', error);
-            });
-        } else {
-            vimeo.ready.call(this);
-        }
-    },
-
-
-    // Set aspect ratio
-    // For Vimeo we have an extra 300% height <div> to hide the standard controls and UI
-    setAspectRatio: function setAspectRatio(input) {
-        var ratio = utils.is.string(input) ? input.split(':') : this.config.ratio.split(':');
-        var padding = 100 / ratio[0] * ratio[1];
-        this.elements.wrapper.style.paddingBottom = padding + '%';
-
-        if (this.supported.ui) {
-            var height = 240;
-            var offset = (height - padding) / (height / 50);
-
-            this.media.style.transform = 'translateY(-' + offset + '%)';
-        }
-    },
-
-
-    // API Ready
-    ready: function ready() {
-        var _this2 = this;
-
-        var player = this;
-
-        // Get Vimeo params for the iframe
-        var options = {
-            loop: player.config.loop.active,
-            autoplay: player.autoplay,
-            byline: false,
-            portrait: false,
-            title: false,
-            speed: true,
-            transparent: 0,
-            gesture: 'media',
-            playsinline: !this.config.fullscreen.iosNative
-        };
-        var params = utils.buildUrlParams(options);
-
-        // Get the source URL or ID
-        var source = player.media.getAttribute('src');
-
-        // Get from <div> if needed
-        if (utils.is.empty(source)) {
-            source = player.media.getAttribute(this.config.attributes.embed.id);
-        }
-
-        var id = utils.parseVimeoId(source);
-
-        // Build an iframe
-        var iframe = utils.createElement('iframe');
-        var src = 'https://player.vimeo.com/video/' + id + '?' + params;
-        iframe.setAttribute('src', src);
-        iframe.setAttribute('allowfullscreen', '');
-        iframe.setAttribute('allowtransparency', '');
-        iframe.setAttribute('allow', 'autoplay');
-
-        // Inject the package
-        var wrapper = utils.createElement('div');
-        wrapper.appendChild(iframe);
-        player.media = utils.replaceElement(wrapper, player.media);
-
-        // Setup instance
-        // https://github.com/vimeo/player.js
-        player.embed = new window.Vimeo.Player(iframe);
-
-        player.media.paused = true;
-        player.media.currentTime = 0;
-
-        // Disable native text track rendering
-        if (player.supported.ui) {
-            player.embed.disableTextTrack();
-        }
-
-        // Create a faux HTML5 API using the Vimeo API
-        player.media.play = function () {
-            player.embed.play().then(function () {
-                player.media.paused = false;
-            });
-        };
-
-        player.media.pause = function () {
-            player.embed.pause().then(function () {
-                player.media.paused = true;
-            });
-        };
-
-        player.media.stop = function () {
-            player.pause();
-            player.currentTime = 0;
-        };
-
-        // Seeking
-        var currentTime = player.media.currentTime;
-
-        Object.defineProperty(player.media, 'currentTime', {
-            get: function get() {
-                return currentTime;
-            },
-            set: function set(time) {
-                // Get current paused state
-                // Vimeo will automatically play on seek
-                var paused = player.media.paused;
-
-                // Set seeking flag
-
-                player.media.seeking = true;
-
-                // Trigger seeking
-                utils.dispatchEvent.call(player, player.media, 'seeking');
-
-                // Seek after events
-                player.embed.setCurrentTime(time).catch(function () {
-                    // Do nothing
-                });
-
-                // Restore pause state
-                if (paused) {
-                    player.pause();
-                }
-            }
-        });
-
-        // Playback speed
-        var speed = player.config.speed.selected;
-        Object.defineProperty(player.media, 'playbackRate', {
-            get: function get() {
-                return speed;
-            },
-            set: function set(input) {
-                player.embed.setPlaybackRate(input).then(function () {
-                    speed = input;
-                    utils.dispatchEvent.call(player, player.media, 'ratechange');
-                }).catch(function (error) {
-                    // Hide menu item (and menu if empty)
-                    if (error.name === 'Error') {
-                        controls.setSpeedMenu.call(player, []);
-                    }
-                });
-            }
-        });
-
-        // Volume
-        var volume = player.config.volume;
-
-        Object.defineProperty(player.media, 'volume', {
-            get: function get() {
-                return volume;
-            },
-            set: function set(input) {
-                player.embed.setVolume(input).then(function () {
-                    volume = input;
-                    utils.dispatchEvent.call(player, player.media, 'volumechange');
-                });
-            }
-        });
-
-        // Muted
-        var muted = player.config.muted;
-
-        Object.defineProperty(player.media, 'muted', {
-            get: function get() {
-                return muted;
-            },
-            set: function set(input) {
-                var toggle = utils.is.boolean(input) ? input : false;
-
-                player.embed.setVolume(toggle ? 0 : player.config.volume).then(function () {
-                    muted = toggle;
-                    utils.dispatchEvent.call(player, player.media, 'volumechange');
-                });
-            }
-        });
-
-        // Loop
-        var loop = player.config.loop;
-
-        Object.defineProperty(player.media, 'loop', {
-            get: function get() {
-                return loop;
-            },
-            set: function set(input) {
-                var toggle = utils.is.boolean(input) ? input : player.config.loop.active;
-
-                player.embed.setLoop(toggle).then(function () {
-                    loop = toggle;
-                });
-            }
-        });
-
-        // Source
-        var currentSrc = void 0;
-        player.embed.getVideoUrl().then(function (value) {
-            currentSrc = value;
-        }).catch(function (error) {
-            _this2.debug.warn(error);
-        });
-
-        Object.defineProperty(player.media, 'currentSrc', {
-            get: function get() {
-                return currentSrc;
-            }
-        });
-
-        // Ended
-        Object.defineProperty(player.media, 'ended', {
-            get: function get() {
-                return player.currentTime === player.duration;
-            }
-        });
-
-        // Set aspect ratio based on video size
-        Promise.all([player.embed.getVideoWidth(), player.embed.getVideoHeight()]).then(function (dimensions) {
-            var ratio = utils.getAspectRatio(dimensions[0], dimensions[1]);
-            vimeo.setAspectRatio.call(_this2, ratio);
-        });
-
-        // Set autopause
-        player.embed.setAutopause(player.config.autopause).then(function (state) {
-            player.config.autopause = state;
-        });
-
-        // Get title
-        player.embed.getVideoTitle().then(function (title) {
-            player.config.title = title;
-            ui.setTitle.call(_this2);
-        });
-
-        // Get current time
-        player.embed.getCurrentTime().then(function (value) {
-            currentTime = value;
-            utils.dispatchEvent.call(player, player.media, 'timeupdate');
-        });
-
-        // Get duration
-        player.embed.getDuration().then(function (value) {
-            player.media.duration = value;
-            utils.dispatchEvent.call(player, player.media, 'durationchange');
-        });
-
-        // Get captions
-        player.embed.getTextTracks().then(function (tracks) {
-            player.media.textTracks = tracks;
-            captions.setup.call(player);
-        });
-
-        player.embed.on('cuechange', function (data) {
-            var cue = null;
-
-            if (data.cues.length) {
-                cue = utils.stripHTML(data.cues[0].text);
-            }
-
-            captions.setText.call(player, cue);
-        });
-
-        player.embed.on('loaded', function () {
-            if (utils.is.element(player.embed.element) && player.supported.ui) {
-                var frame = player.embed.element;
-
-                // Fix keyboard focus issues
-                // https://github.com/sampotts/plyr/issues/317
-                frame.setAttribute('tabindex', -1);
-            }
-        });
-
-        player.embed.on('play', function () {
-            // Only fire play if paused before
-            if (player.media.paused) {
-                utils.dispatchEvent.call(player, player.media, 'play');
-            }
-            player.media.paused = false;
-            utils.dispatchEvent.call(player, player.media, 'playing');
-        });
-
-        player.embed.on('pause', function () {
-            player.media.paused = true;
-            utils.dispatchEvent.call(player, player.media, 'pause');
-        });
-
-        player.embed.on('timeupdate', function (data) {
-            player.media.seeking = false;
-            currentTime = data.seconds;
-            utils.dispatchEvent.call(player, player.media, 'timeupdate');
-        });
-
-        player.embed.on('progress', function (data) {
-            player.media.buffered = data.percent;
-            utils.dispatchEvent.call(player, player.media, 'progress');
-
-            // Check all loaded
-            if (parseInt(data.percent, 10) === 1) {
-                utils.dispatchEvent.call(player, player.media, 'canplaythrough');
-            }
-
-            // Get duration as if we do it before load, it gives an incorrect value
-            // https://github.com/sampotts/plyr/issues/891
-            player.embed.getDuration().then(function (value) {
-                if (value !== player.media.duration) {
-                    player.media.duration = value;
-                    utils.dispatchEvent.call(player, player.media, 'durationchange');
-                }
-            });
-        });
-
-        player.embed.on('seeked', function () {
-            player.media.seeking = false;
-            utils.dispatchEvent.call(player, player.media, 'seeked');
-            utils.dispatchEvent.call(player, player.media, 'play');
-        });
-
-        player.embed.on('ended', function () {
-            player.media.paused = true;
-            utils.dispatchEvent.call(player, player.media, 'ended');
-        });
-
-        player.embed.on('error', function (detail) {
-            player.media.error = detail;
-            utils.dispatchEvent.call(player, player.media, 'error');
-        });
-
-        // Rebuild UI
-        setTimeout(function () {
-            return ui.build.call(player);
-        }, 0);
-    }
-};
-
-// ==========================================================================
-
-// Sniff out the browser
-var browser$3 = utils.getBrowser();
-
-var media = {
-    // Setup media
-    setup: function setup() {
-        // If there's no media, bail
-        if (!this.media) {
-            this.debug.warn('No media element found!');
-            return;
-        }
-
-        // Add type class
-        utils.toggleClass(this.elements.container, this.config.classNames.type.replace('{0}', this.type), true);
-
-        // Add provider class
-        utils.toggleClass(this.elements.container, this.config.classNames.provider.replace('{0}', this.provider), true);
-
-        // Add video class for embeds
-        // This will require changes if audio embeds are added
-        if (this.isEmbed) {
-            utils.toggleClass(this.elements.container, this.config.classNames.type.replace('{0}', 'video'), true);
-        }
-
-        if (this.supported.ui) {
-            // Check for picture-in-picture support
-            utils.toggleClass(this.elements.container, this.config.classNames.pip.supported, support.pip && this.isHTML5 && this.isVideo);
-
-            // Check for airplay support
-            utils.toggleClass(this.elements.container, this.config.classNames.airplay.supported, support.airplay && this.isHTML5);
-
-            // If there's no autoplay attribute, assume the video is stopped and add state class
-            utils.toggleClass(this.elements.container, this.config.classNames.stopped, this.config.autoplay);
-
-            // Add iOS class
-            utils.toggleClass(this.elements.container, this.config.classNames.isIos, browser$3.isIos);
-
-            // Add touch class
-            utils.toggleClass(this.elements.container, this.config.classNames.isTouch, this.touch);
-        }
-
-        // Inject the player wrapper
-        if (this.isVideo) {
-            // Create the wrapper div
-            this.elements.wrapper = utils.createElement('div', {
-                class: this.config.classNames.video
-            });
-
-            // Wrap the video in a container
-            utils.wrap(this.media, this.elements.wrapper);
-        }
-
-        if (this.isEmbed) {
-            switch (this.provider) {
-                case 'youtube':
-                    youtube.setup.call(this);
-                    break;
-
-                case 'vimeo':
-                    vimeo.setup.call(this);
-                    break;
-
-                default:
-                    break;
-            }
-        } else if (this.isHTML5) {
-            ui.setTitle.call(this);
-
-            html5.extend.call(this);
-        }
-    }
-};
-
-// ==========================================================================
-
 var source = {
     // Add elements to HTML5 media (source, tracks, etc)
     insertElements: function insertElements(type, attributes) {
@@ -6607,6 +6605,87 @@ var source = {
 
 // ==========================================================================
 
+var Storage = function () {
+    function Storage(player) {
+        classCallCheck(this, Storage);
+
+        this.enabled = player.config.storage.enabled;
+        this.key = player.config.storage.key;
+    }
+
+    // Check for actual support (see if we can use it)
+
+
+    createClass(Storage, [{
+        key: 'get',
+        value: function get$$1(key) {
+            if (!Storage.supported) {
+                return null;
+            }
+
+            var store = window.localStorage.getItem(this.key);
+
+            if (utils.is.empty(store)) {
+                return null;
+            }
+
+            var json = JSON.parse(store);
+
+            return utils.is.string(key) && key.length ? json[key] : json;
+        }
+    }, {
+        key: 'set',
+        value: function set$$1(object) {
+            // Bail if we don't have localStorage support or it's disabled
+            if (!Storage.supported || !this.enabled) {
+                return;
+            }
+
+            // Can only store objectst
+            if (!utils.is.object(object)) {
+                return;
+            }
+
+            // Get current storage
+            var storage = this.get();
+
+            // Default to empty object
+            if (utils.is.empty(storage)) {
+                storage = {};
+            }
+
+            // Update the working copy of the values
+            utils.extend(storage, object);
+
+            // Update storage
+            window.localStorage.setItem(this.key, JSON.stringify(storage));
+        }
+    }], [{
+        key: 'supported',
+        get: function get$$1() {
+            try {
+                if (!('localStorage' in window)) {
+                    return false;
+                }
+
+                var test = '___test';
+
+                // Try to use it (it might be disabled, e.g. user is in private mode)
+                // see: https://github.com/sampotts/plyr/issues/131
+                window.localStorage.setItem(test, test);
+                window.localStorage.removeItem(test);
+
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+    }]);
+    return Storage;
+}();
+
+// ==========================================================================
+
 // Private properties
 // TODO: Use a WeakMap for private globals
 // const globals = new WeakMap();
@@ -6644,7 +6723,7 @@ var Plyr = function () {
         }
 
         // Set config
-        this.config = utils.extend({}, defaults, options || {}, function () {
+        this.config = utils.extend({}, defaults$1, options || {}, function () {
             try {
                 return JSON.parse(_this.media.getAttribute('data-plyr-config'));
             } catch (e) {
@@ -6719,17 +6798,9 @@ var Plyr = function () {
         }
 
         // Cache original element state for .destroy()
-        // TODO: Investigate a better solution as I suspect this causes reported double load issues?
-        setTimeout(function () {
-            var clone = _this.media.cloneNode(true);
-
-            // Prevent the clone autoplaying
-            if (clone.getAttribute('autoplay')) {
-                clone.pause();
-            }
-
-            _this.elements.original = clone;
-        }, 0);
+        var clone = this.media.cloneNode(true);
+        clone.autoplay = false;
+        this.elements.original = clone;
 
         // Set media type based on tag or data attribute
         // Supported: video, audio, vimeo, youtube
@@ -6936,7 +7007,7 @@ var Plyr = function () {
         }
 
         /**
-         * Get paused state
+         * Get playing state
          */
 
     }, {
@@ -7191,8 +7262,8 @@ var Plyr = function () {
                         utils.toggleClass(_this2.elements.controls, _this2.config.classNames.noTransition, false);
                     }
 
-                    // Check if controls toggled
-                    var toggled = utils.toggleClass(_this2.elements.container, _this2.config.classNames.hideControls, true);
+                    // Set hideControls class
+                    var toggled = utils.toggleClass(_this2.elements.container, _this2.config.classNames.hideControls, _this2.config.hideControls);
 
                     // Trigger event and close menu
                     if (toggled) {
@@ -7401,19 +7472,29 @@ var Plyr = function () {
             return Boolean(this.type === types.audio);
         }
     }, {
+        key: 'playing',
+        get: function get$$1() {
+            return Boolean(this.ready && !this.paused && !this.ended);
+        }
+
+        /**
+         * Get paused state
+         */
+
+    }, {
         key: 'paused',
         get: function get$$1() {
             return Boolean(this.media.paused);
         }
 
         /**
-         * Get playing state
+         * Get stopped state
          */
 
     }, {
-        key: 'playing',
+        key: 'stopped',
         get: function get$$1() {
-            return Boolean(this.ready && !this.paused && !this.ended && (this.isHTML5 ? this.media.readyState > 2 : true));
+            return Boolean(this.paused && this.currentTime === 0);
         }
 
         /**
@@ -7794,20 +7875,21 @@ var Plyr = function () {
         }
 
         /**
-         * Set the poster image for a HTML5 video
+         * Set the poster image for a video
          * @param {input} - the URL for the new poster image
          */
 
     }, {
         key: 'poster',
         set: function set$$1(input) {
-            if (!this.isHTML5 || !this.isVideo) {
-                this.debug.warn('Poster can only be set on HTML5 video');
+            if (!this.isVideo) {
+                this.debug.warn('Poster can only be set for video');
                 return;
             }
 
             if (utils.is.string(input)) {
                 this.media.setAttribute('poster', input);
+                ui.setPoster.call(this);
             }
         }
 
@@ -7816,7 +7898,7 @@ var Plyr = function () {
          */
         ,
         get: function get$$1() {
-            if (!this.isHTML5 || !this.isVideo) {
+            if (!this.isVideo) {
                 return null;
             }
 

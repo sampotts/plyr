@@ -1,3 +1,14 @@
+## v3.3.0
+
+*   Now using a custom poster image element to hide the YouTube play button and give more control over when the poster image shows
+*   Renamed `showPosterOnEnd` to `resetOnEnd` as it makes more sense and now works for all players and does not reload media
+*   Fix for same domain SVG URLs (raised by Jochem in Slack)
+*   [`URL`](https://developer.mozilla.org/en-US/docs/Web/API/Window/URL) is polyfill now required
+*   Added pause className (fixes #941)
+*   Button height set in CSS (auto) (fixes #928)
+*   Don't autoplay cloned original media (fixes #936)
+*   Return to the home menu pane after selecting an option
+
 ## v3.2.4
 
 *   Fix issue wher player never reports as ready if controls is empty array

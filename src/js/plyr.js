@@ -1,26 +1,24 @@
 // ==========================================================================
 // Plyr
-// plyr.js v3.2.4
+// plyr.js v3.3.0
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
 
-import { providers, types } from './types';
-import defaults from './defaults';
-import support from './support';
-import utils from './utils';
-
+import captions from './captions';
 import Console from './console';
+import controls from './controls';
+import defaults from './defaults';
 import Fullscreen from './fullscreen';
 import Listeners from './listeners';
-import Storage from './storage';
-import Ads from './plugins/ads';
-
-import captions from './captions';
-import controls from './controls';
 import media from './media';
+import Ads from './plugins/ads';
 import source from './source';
+import Storage from './storage';
+import support from './support';
+import { providers, types } from './types';
 import ui from './ui';
+import utils from './utils';
 
 // Private properties
 // TODO: Use a WeakMap for private globals
@@ -134,17 +132,9 @@ class Plyr {
         }
 
         // Cache original element state for .destroy()
-        // TODO: Investigate a better solution as I suspect this causes reported double load issues?
-        setTimeout(() => {
-            const clone = this.media.cloneNode(true);
-
-            // Prevent the clone autoplaying
-            if (clone.getAttribute('autoplay')) {
-                clone.pause();
-            }
-
-            this.elements.original = clone;
-        }, 0);
+        const clone = this.media.cloneNode(true);
+        clone.autoplay = false;
+        this.elements.original = clone;
 
         // Set media type based on tag or data attribute
         // Supported: video, audio, vimeo, youtube
@@ -364,6 +354,13 @@ class Plyr {
     }
 
     /**
+     * Get playing state
+     */
+    get playing() {
+        return Boolean(this.ready && !this.paused && !this.ended);
+    }
+
+    /**
      * Get paused state
      */
     get paused() {
@@ -371,10 +368,10 @@ class Plyr {
     }
 
     /**
-     * Get playing state
+     * Get stopped state
      */
-    get playing() {
-        return Boolean(this.ready && !this.paused && !this.ended && (this.isHTML5 ? this.media.readyState > 2 : true));
+    get stopped() {
+        return Boolean(this.paused && this.currentTime === 0);
     }
 
     /**
@@ -799,17 +796,18 @@ class Plyr {
     }
 
     /**
-     * Set the poster image for a HTML5 video
+     * Set the poster image for a video
      * @param {input} - the URL for the new poster image
      */
     set poster(input) {
-        if (!this.isHTML5 || !this.isVideo) {
-            this.debug.warn('Poster can only be set on HTML5 video');
+        if (!this.isVideo) {
+            this.debug.warn('Poster can only be set for video');
             return;
         }
 
         if (utils.is.string(input)) {
             this.media.setAttribute('poster', input);
+            ui.setPoster.call(this);
         }
     }
 
@@ -817,7 +815,7 @@ class Plyr {
      * Get the current poster image
      */
     get poster() {
-        if (!this.isHTML5 || !this.isVideo) {
+        if (!this.isVideo) {
             return null;
         }
 
