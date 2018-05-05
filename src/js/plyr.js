@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v3.3.3
+// plyr.js v3.3.5
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -396,7 +396,8 @@ class Plyr {
      */
     stop() {
         if (this.isHTML5) {
-            this.media.load();
+            this.pause();
+            this.restart();
         } else if (utils.is.function(this.media.stop)) {
             this.media.stop();
         }

@@ -1,3 +1,12 @@
+# v3.3.5
+
+*   Removed `.load()` call as it breaks HLS (see #870)
+
+# v3.3.4
+
+*   Fix for controls sometimes not showing while video is playing
+*   Fixed logic for show home tab on option select
+
 # v3.3.3
 
 *   Reverted change to show home tab on option select due to usability regression

@@ -158,7 +158,7 @@ const ui = {
     },
 
     // Check playing state
-    checkPlaying() {
+    checkPlaying(event) {
         // Class hooks
         utils.toggleClass(this.elements.container, this.config.classNames.playing, this.playing);
         utils.toggleClass(this.elements.container, this.config.classNames.paused, this.paused);
@@ -166,6 +166,11 @@ const ui = {
 
         // Set ARIA state
         utils.toggleState(this.elements.buttons.play, this.playing);
+
+        // Only update controls on non timeupdate events
+        if (utils.is.event(event) && event.type === 'timeupdate') {
+            return;
+        }
 
         // Toggle controls
         this.toggleControls(!this.playing);

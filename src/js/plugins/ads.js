@@ -44,7 +44,7 @@ class Ads {
     }
 
     get enabled() {
-        return this.player.isHTML5 && this.player.isVideo && this.player.config.ads.enabled && utils.is.string(this.publisherId) && this.publisherId.length;
+        return this.player.isVideo && this.player.config.ads.enabled && !utils.is.empty(this.publisherId);
     }
 
     /**

@@ -1850,7 +1850,7 @@ var ui = {
 
 
     // Check playing state
-    checkPlaying: function checkPlaying() {
+    checkPlaying: function checkPlaying(event) {
         // Class hooks
         utils.toggleClass(this.elements.container, this.config.classNames.playing, this.playing);
         utils.toggleClass(this.elements.container, this.config.classNames.paused, this.paused);
@@ -1858,6 +1858,11 @@ var ui = {
 
         // Set ARIA state
         utils.toggleState(this.elements.buttons.play, this.playing);
+
+        // Only update controls on non timeupdate events
+        if (utils.is.event(event) && event.type === 'timeupdate') {
+            return;
+        }
 
         // Toggle controls
         this.toggleControls(!this.playing);
@@ -3742,7 +3747,7 @@ var defaults$1 = {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.3.3/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.3.5/plyr.svg',
 
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
@@ -4734,18 +4739,27 @@ var Listeners = function () {
             on(this.player.elements.settings.form, 'click', function (event) {
                 event.stopPropagation();
 
+                // Go back to home tab on click
+                var showHomeTab = function showHomeTab() {
+                    var id = 'plyr-settings-' + _this4.player.id + '-home';
+                    controls.showTab.call(_this4.player, id);
+                };
+
                 // Settings menu items - use event delegation as items are added/removed
                 if (utils.matches(event.target, _this4.player.config.selectors.inputs.language)) {
                     proxy(event, function () {
                         _this4.player.language = event.target.value;
+                        showHomeTab();
                     }, 'language');
                 } else if (utils.matches(event.target, _this4.player.config.selectors.inputs.quality)) {
                     proxy(event, function () {
                         _this4.player.quality = event.target.value;
+                        showHomeTab();
                     }, 'quality');
                 } else if (utils.matches(event.target, _this4.player.config.selectors.inputs.speed)) {
                     proxy(event, function () {
                         _this4.player.speed = parseFloat(event.target.value);
+                        showHomeTab();
                     }, 'speed');
                 } else {
                     var tab = event.target;
@@ -6435,7 +6449,7 @@ var Ads = function () {
     }, {
         key: 'enabled',
         get: function get$$1() {
-            return this.player.isHTML5 && this.player.isVideo && this.player.config.ads.enabled && utils.is.string(this.publisherId) && this.publisherId.length;
+            return this.player.isVideo && this.player.config.ads.enabled && !utils.is.empty(this.publisherId);
         }
     }, {
         key: 'tagUrl',
@@ -7028,7 +7042,8 @@ var Plyr = function () {
         key: 'stop',
         value: function stop() {
             if (this.isHTML5) {
-                this.media.load();
+                this.pause();
+                this.restart();
             } else if (utils.is.function(this.media.stop)) {
                 this.media.stop();
             }
