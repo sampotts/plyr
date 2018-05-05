@@ -489,19 +489,12 @@ class Listeners {
         on(this.player.elements.settings.form, 'click', event => {
             event.stopPropagation();
 
-            // Go back to home tab on click
-            const showHomeTab = () => {
-                const id = `plyr-settings-${this.player.id}-home`;
-                controls.showTab.call(this.player, id);
-            };
-
             // Settings menu items - use event delegation as items are added/removed
             if (utils.matches(event.target, this.player.config.selectors.inputs.language)) {
                 proxy(
                     event,
                     () => {
                         this.player.language = event.target.value;
-                        showHomeTab();
                     },
                     'language',
                 );
@@ -510,7 +503,6 @@ class Listeners {
                     event,
                     () => {
                         this.player.quality = event.target.value;
-                        showHomeTab();
                     },
                     'quality',
                 );
@@ -519,7 +511,6 @@ class Listeners {
                     event,
                     () => {
                         this.player.speed = parseFloat(event.target.value);
-                        showHomeTab();
                     },
                     'speed',
                 );

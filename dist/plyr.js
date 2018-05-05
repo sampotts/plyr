@@ -4734,27 +4734,18 @@ var Listeners = function () {
             on(this.player.elements.settings.form, 'click', function (event) {
                 event.stopPropagation();
 
-                // Go back to home tab on click
-                var showHomeTab = function showHomeTab() {
-                    var id = 'plyr-settings-' + _this4.player.id + '-home';
-                    controls.showTab.call(_this4.player, id);
-                };
-
                 // Settings menu items - use event delegation as items are added/removed
                 if (utils.matches(event.target, _this4.player.config.selectors.inputs.language)) {
                     proxy(event, function () {
                         _this4.player.language = event.target.value;
-                        showHomeTab();
                     }, 'language');
                 } else if (utils.matches(event.target, _this4.player.config.selectors.inputs.quality)) {
                     proxy(event, function () {
                         _this4.player.quality = event.target.value;
-                        showHomeTab();
                     }, 'quality');
                 } else if (utils.matches(event.target, _this4.player.config.selectors.inputs.speed)) {
                     proxy(event, function () {
                         _this4.player.speed = parseFloat(event.target.value);
-                        showHomeTab();
                     }, 'speed');
                 } else {
                     var tab = event.target;

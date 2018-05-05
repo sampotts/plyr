@@ -6893,6 +6893,8 @@ var ui = {
         // Set ARIA state
         utils.toggleState(this.elements.buttons.play, this.playing);
 
+        console.warn(this.playing);
+
         // Toggle controls
         this.toggleControls(!this.playing);
     },

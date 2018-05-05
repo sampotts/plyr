@@ -1,3 +1,7 @@
+# v3.3.3
+
+*   Reverted change to show home tab on option select due to usability regression
+
 # v3.3.2
 
 *   Fix for ads running in audio
