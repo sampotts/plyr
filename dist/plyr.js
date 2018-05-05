@@ -2576,6 +2576,7 @@ var controls = {
                     break;
 
                 case 576:
+                case 480:
                     label = 'SD';
                     break;
 
