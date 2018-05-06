@@ -8041,6 +8041,38 @@ var Plyr = function () {
         value: function loadSprite(url, id) {
             return utils.loadSprite(url, id);
         }
+
+        /**
+         * Setup multiple instances
+         * @param {*} selector
+         * @param {object} options
+         */
+
+    }, {
+        key: 'setup',
+        value: function setup(selector) {
+            var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+            var targets = null;
+
+            if (utils.is.string(selector)) {
+                targets = Array.from(document.querySelectorAll(selector));
+            } else if (utils.is.nodeList(selector)) {
+                targets = Array.from(selector);
+            } else if (utils.is.array(selector)) {
+                targets = selector.filter(function (i) {
+                    return utils.is.element(i);
+                });
+            }
+
+            if (utils.is.empty(targets)) {
+                return null;
+            }
+
+            return targets.map(function (t) {
+                return new Plyr(t, options);
+            });
+        }
     }]);
     return Plyr;
 }();
