@@ -2,10 +2,14 @@
 // Plyr UI
 // ==========================================================================
 
-import utils from './utils';
 import captions from './captions';
 import controls from './controls';
 import i18n from './i18n';
+import support from './support';
+import utils from './utils';
+
+// Sniff out the browser
+const browser = utils.getBrowser();
 
 const ui = {
     addStyleHook() {
@@ -78,6 +82,18 @@ const ui = {
         // Update the UI
         ui.checkPlaying.call(this);
 
+        // Check for picture-in-picture support
+        utils.toggleClass(this.elements.container, this.config.classNames.pip.supported, support.pip && this.isHTML5 && this.isVideo);
+
+        // Check for airplay support
+        utils.toggleClass(this.elements.container, this.config.classNames.airplay.supported, support.airplay && this.isHTML5);
+
+        // Add iOS class
+        utils.toggleClass(this.elements.container, this.config.classNames.isIos, browser.isIos);
+
+        // Add touch class
+        utils.toggleClass(this.elements.container, this.config.classNames.isTouch, this.touch);
+
         // Ready for API calls
         this.ready = true;
 
@@ -88,6 +104,9 @@ const ui = {
 
         // Set the title
         ui.setTitle.call(this);
+
+        // Set the poster image
+        ui.setPoster.call(this);
     },
 
     // Setup aria attribute for play and iframe title
@@ -121,19 +140,37 @@ const ui = {
 
             // Default to media type
             const title = !utils.is.empty(this.config.title) ? this.config.title : 'video';
+            const format = i18n.get('frameTitle', this.config);
 
-            iframe.setAttribute('title', i18n.get('frameTitle', this.config));
+            iframe.setAttribute('title', format.replace('{title}', title));
         }
     },
 
+    // Set the poster image
+    setPoster() {
+        if (!utils.is.element(this.elements.poster) || utils.is.empty(this.poster)) {
+            return;
+        }
+
+        // Set the inline style
+        const posters = this.poster.split(',');
+        this.elements.poster.style.backgroundImage = posters.map(p => `url('${p}')`).join(',');
+    },
+
     // Check playing state
-    checkPlaying() {
+    checkPlaying(event) {
         // Class hooks
         utils.toggleClass(this.elements.container, this.config.classNames.playing, this.playing);
-        utils.toggleClass(this.elements.container, this.config.classNames.stopped, this.paused);
+        utils.toggleClass(this.elements.container, this.config.classNames.paused, this.paused);
+        utils.toggleClass(this.elements.container, this.config.classNames.stopped, this.stopped);
 
         // Set ARIA state
         utils.toggleState(this.elements.buttons.play, this.playing);
+
+        // Only update controls on non timeupdate events
+        if (utils.is.event(event) && event.type === 'timeupdate') {
+            return;
+        }
 
         // Toggle controls
         this.toggleControls(!this.playing);

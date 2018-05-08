@@ -47,8 +47,8 @@ const defaults = {
     // Auto hide the controls
     hideControls: true,
 
-    // Revert to poster on finish (HTML5 - will cause reload)
-    showPosterOnEnd: false,
+    // Reset to start when playback ended
+    resetOnEnd: false,
 
     // Disable the standard context menu
     disableContextMenu: true,
@@ -56,7 +56,7 @@ const defaults = {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.2.4/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.3.6/plyr.svg',
 
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
@@ -157,10 +157,10 @@ const defaults = {
     // Localisation
     i18n: {
         restart: 'Restart',
-        rewind: 'Rewind {seektime} secs',
+        rewind: 'Rewind {seektime}s',
         play: 'Play',
         pause: 'Pause',
-        fastForward: 'Forward {seektime} secs',
+        fastForward: 'Forward {seektime}s',
         seek: 'Seek',
         played: 'Played',
         buffered: 'Buffered',
@@ -192,13 +192,17 @@ const defaults = {
     // URLs
     urls: {
         vimeo: {
-            api: 'https://player.vimeo.com/api/player.js',
+            sdk: 'https://player.vimeo.com/api/player.js',
+            iframe: 'https://player.vimeo.com/video/{0}?{1}',
+            api: 'https://vimeo.com/api/v2/video/{0}.json',
         },
         youtube: {
-            api: 'https://www.youtube.com/iframe_api',
+            sdk: 'https://www.youtube.com/iframe_api',
+            api: 'https://www.googleapis.com/youtube/v3/videos?id={0}&key={1}&fields=items(snippet(title))&part=snippet',
+            poster: 'https://img.youtube.com/vi/{0}/maxresdefault.jpg,https://img.youtube.com/vi/{0}/hqdefault.jpg',
         },
         googleIMA: {
-            api: 'https://imasdk.googleapis.com/js/sdkloader/ima3.js',
+            sdk: 'https://imasdk.googleapis.com/js/sdkloader/ima3.js',
         },
     },
 
@@ -322,14 +326,17 @@ const defaults = {
 
     // Class hooks added to the player in different states
     classNames: {
-        video: 'plyr__video-wrapper',
-        embed: 'plyr__video-embed',
-        ads: 'plyr__ads',
-        control: 'plyr__control',
         type: 'plyr--{0}',
         provider: 'plyr--{0}',
-        stopped: 'plyr--stopped',
+        video: 'plyr__video-wrapper',
+        embed: 'plyr__video-embed',
+        embedContainer: 'plyr__video-embed__container',
+        poster: 'plyr__poster',
+        ads: 'plyr__ads',
+        control: 'plyr__control',
         playing: 'plyr--playing',
+        paused: 'plyr--paused',
+        stopped: 'plyr--stopped',
         loading: 'plyr--loading',
         error: 'plyr--has-error',
         hover: 'plyr--hover',

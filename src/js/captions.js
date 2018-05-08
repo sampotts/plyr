@@ -3,10 +3,10 @@
 // TODO: Create as class
 // ==========================================================================
 
-import support from './support';
-import utils from './utils';
 import controls from './controls';
 import i18n from './i18n';
+import support from './support';
+import utils from './utils';
 
 const captions = {
     // Setup captions

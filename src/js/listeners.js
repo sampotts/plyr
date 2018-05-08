@@ -2,9 +2,9 @@
 // Plyr Event Listeners
 // ==========================================================================
 
-import utils from './utils';
 import controls from './controls';
 import ui from './ui';
+import utils from './utils';
 
 // Sniff out the browser
 const browser = utils.getBrowser();
@@ -265,12 +265,9 @@ class Listeners {
         // Handle the media finishing
         utils.on(this.player.media, 'ended', () => {
             // Show poster on end
-            if (this.player.isHTML5 && this.player.isVideo && this.player.config.showPosterOnEnd) {
+            if (this.player.isHTML5 && this.player.isVideo && this.player.config.resetOnEnd) {
                 // Restart
                 this.player.restart();
-
-                // Re-load media
-                this.player.media.load();
             }
         });
 
@@ -281,7 +278,7 @@ class Listeners {
         utils.on(this.player.media, 'volumechange', event => ui.updateVolume.call(this.player, event));
 
         // Handle play/pause
-        utils.on(this.player.media, 'playing play pause ended emptied', event => ui.checkPlaying.call(this.player, event));
+        utils.on(this.player.media, 'playing play pause ended emptied timeupdate', event => ui.checkPlaying.call(this.player, event));
 
         // Loading state
         utils.on(this.player.media, 'waiting canplay seeked playing', event => ui.checkLoading.call(this.player, event));
@@ -492,12 +489,19 @@ class Listeners {
         on(this.player.elements.settings.form, 'click', event => {
             event.stopPropagation();
 
+            // Go back to home tab on click
+            const showHomeTab = () => {
+                const id = `plyr-settings-${this.player.id}-home`;
+                controls.showTab.call(this.player, id);
+            };
+
             // Settings menu items - use event delegation as items are added/removed
             if (utils.matches(event.target, this.player.config.selectors.inputs.language)) {
                 proxy(
                     event,
                     () => {
                         this.player.language = event.target.value;
+                        showHomeTab();
                     },
                     'language',
                 );
@@ -506,6 +510,7 @@ class Listeners {
                     event,
                     () => {
                         this.player.quality = event.target.value;
+                        showHomeTab();
                     },
                     'quality',
                 );
@@ -514,11 +519,13 @@ class Listeners {
                     event,
                     () => {
                         this.player.speed = parseFloat(event.target.value);
+                        showHomeTab();
                     },
                     'speed',
                 );
             } else {
-                controls.showTab.call(this.player, event);
+                const tab = event.target;
+                controls.showTab.call(this.player, tab.getAttribute('aria-controls'));
             }
         });
 

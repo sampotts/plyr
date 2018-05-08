@@ -2,12 +2,12 @@
 // Plyr source update
 // ==========================================================================
 
-import { providers } from './types';
-import utils from './utils';
 import html5 from './html5';
 import media from './media';
-import ui from './ui';
 import support from './support';
+import { providers } from './types';
+import ui from './ui';
+import utils from './utils';
 
 const source = {
     // Add elements to HTML5 media (source, tracks, etc)
@@ -94,8 +94,8 @@ const source = {
                     if (this.config.autoplay) {
                         this.media.setAttribute('autoplay', '');
                     }
-                    if ('poster' in input) {
-                        this.media.setAttribute('poster', input.poster);
+                    if (!utils.is.empty(input.poster)) {
+                        this.poster = input.poster;
                     }
                     if (this.config.loop.active) {
                         this.media.setAttribute('loop', '');

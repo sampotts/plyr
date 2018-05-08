@@ -32,8 +32,8 @@ $embed-padding: ((100 / 16) * 9);
         pointer-events: none;
     }
 
-    // Vimeo hack
-    > div {
+    // Only used for Vimeo
+    > .plyr__video-embed__container {
         padding-bottom: to-percentage($height);
         position: relative;
         transform: translateY(-$offset);
