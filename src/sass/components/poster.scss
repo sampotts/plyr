@@ -6,7 +6,7 @@
     background-color: #000;
     background-position: 50% 50%;
     background-repeat: no-repeat;
-    background-size: 100% 100%;
+    background-size: contain;
     height: 100%;
     left: 0;
     opacity: 0;
@@ -15,6 +15,7 @@
     transition: opacity 0.3s ease;
     width: 100%;
     z-index: 1;
+    pointer-events: none;
 }
 
 .plyr--stopped .plyr__poster {
