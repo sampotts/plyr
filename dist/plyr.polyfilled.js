@@ -6248,7 +6248,7 @@ var utils = {
         }
 
         // Vimeo
-        if (/^https?:\/\/player.vimeo.com\/video\/\d{8,}(?=\b|\/)/.test(url)) {
+        if (/^https?:\/\/player.vimeo.com\/video\/\d{0,9}(?=\b|\/)/.test(url)) {
             return providers.vimeo;
         }
 
@@ -8848,10 +8848,10 @@ var defaults$1 = {
     // Localisation
     i18n: {
         restart: 'Restart',
-        rewind: 'Rewind {seektime} secs',
+        rewind: 'Rewind {seektime}s',
         play: 'Play',
         pause: 'Pause',
-        fastForward: 'Forward {seektime} secs',
+        fastForward: 'Forward {seektime}s',
         seek: 'Seek',
         played: 'Played',
         buffered: 'Buffered',
@@ -8980,13 +8980,14 @@ var defaults$1 = {
 
     // Class hooks added to the player in different states
     classNames: {
+        type: 'plyr--{0}',
+        provider: 'plyr--{0}',
         video: 'plyr__video-wrapper',
         embed: 'plyr__video-embed',
+        embedContainer: 'plyr__video-embed__container',
         poster: 'plyr__poster',
         ads: 'plyr__ads',
         control: 'plyr__control',
-        type: 'plyr--{0}',
-        provider: 'plyr--{0}',
         playing: 'plyr--playing',
         paused: 'plyr--paused',
         stopped: 'plyr--stopped',
@@ -9954,6 +9955,7 @@ var vimeo = {
         var options = {
             loop: player.config.loop.active,
             autoplay: player.autoplay,
+            // muted: player.muted,
             byline: false,
             portrait: false,
             title: false,
@@ -9983,7 +9985,7 @@ var vimeo = {
         iframe.setAttribute('allow', 'autoplay');
 
         // Inject the package
-        var wrapper = utils.createElement('div');
+        var wrapper = utils.createElement('div', { class: player.config.classNames.embedContainer });
         wrapper.appendChild(iframe);
         player.media = utils.replaceElement(wrapper, player.media);
 
@@ -10803,7 +10805,7 @@ var media = {
             utils.wrap(this.media, this.elements.wrapper);
 
             // Faux poster container
-            this.elements.poster = utils.createElement('span', {
+            this.elements.poster = utils.createElement('div', {
                 class: this.config.classNames.poster
             });
 
@@ -13074,6 +13076,38 @@ var Plyr = function () {
         key: 'loadSprite',
         value: function loadSprite(url, id) {
             return utils.loadSprite(url, id);
+        }
+
+        /**
+         * Setup multiple instances
+         * @param {*} selector
+         * @param {object} options
+         */
+
+    }, {
+        key: 'setup',
+        value: function setup(selector) {
+            var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+            var targets = null;
+
+            if (utils.is.string(selector)) {
+                targets = Array.from(document.querySelectorAll(selector));
+            } else if (utils.is.nodeList(selector)) {
+                targets = Array.from(selector);
+            } else if (utils.is.array(selector)) {
+                targets = selector.filter(function (i) {
+                    return utils.is.element(i);
+                });
+            }
+
+            if (utils.is.empty(targets)) {
+                return null;
+            }
+
+            return targets.map(function (t) {
+                return new Plyr(t, options);
+            });
         }
     }]);
     return Plyr;

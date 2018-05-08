@@ -39,7 +39,7 @@ const media = {
             utils.wrap(this.media, this.elements.wrapper);
 
             // Faux poster container
-            this.elements.poster = utils.createElement('span', {
+            this.elements.poster = utils.createElement('div', {
                 class: this.config.classNames.poster,
             });
 

@@ -157,10 +157,10 @@ const defaults = {
     // Localisation
     i18n: {
         restart: 'Restart',
-        rewind: 'Rewind {seektime} secs',
+        rewind: 'Rewind {seektime}s',
         play: 'Play',
         pause: 'Pause',
-        fastForward: 'Forward {seektime} secs',
+        fastForward: 'Forward {seektime}s',
         seek: 'Seek',
         played: 'Played',
         buffered: 'Buffered',
@@ -326,13 +326,14 @@ const defaults = {
 
     // Class hooks added to the player in different states
     classNames: {
+        type: 'plyr--{0}',
+        provider: 'plyr--{0}',
         video: 'plyr__video-wrapper',
         embed: 'plyr__video-embed',
+        embedContainer: 'plyr__video-embed__container',
         poster: 'plyr__poster',
         ads: 'plyr__ads',
         control: 'plyr__control',
-        type: 'plyr--{0}',
-        provider: 'plyr--{0}',
         playing: 'plyr--playing',
         paused: 'plyr--paused',
         stopped: 'plyr--stopped',

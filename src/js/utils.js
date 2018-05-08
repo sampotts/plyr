@@ -723,7 +723,7 @@ const utils = {
         }
 
         // Vimeo
-        if (/^https?:\/\/player.vimeo.com\/video\/\d{8,}(?=\b|\/)/.test(url)) {
+        if (/^https?:\/\/player.vimeo.com\/video\/\d{0,9}(?=\b|\/)/.test(url)) {
             return providers.vimeo;
         }
 
