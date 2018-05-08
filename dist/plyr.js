@@ -4976,7 +4976,10 @@ var vimeo = {
 
         // Setup instance
         // https://github.com/vimeo/player.js
-        player.embed = new window.Vimeo.Player(iframe);
+        player.embed = new window.Vimeo.Player(iframe, {
+            autopause: player.config.autopause,
+            muted: player.muted
+        });
 
         player.media.paused = true;
         player.media.currentTime = 0;

@@ -3921,7 +3921,7 @@ singleton.Client = Client;
             });
 
             // Setup the player
-            var player = new Plyr('#player', {
+            var player = Plyr.setup('#player', {
                 debug: true,
                 title: 'View From A Blue Moon',
                 iconUrl: '../dist/plyr.svg',
@@ -3991,7 +3991,7 @@ singleton.Client = Client;
                     enabled: true,
                     publisherId: '918848828995742'
                 }
-            });
+            })[0];
 
             // Expose for tinkering in the console
             window.player = player;

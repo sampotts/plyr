@@ -210,7 +210,7 @@ You can specify a range of arguments for the constructor to use:
 *   A [`NodeList]`(https://developer.mozilla.org/en-US/docs/Web/API/NodeList)
 *   A [jQuery](https://jquery.com) object
 
-_Note_: If a `NodeList`, `Array`, or jQuery object are passed, the first element will be used for setup.
+_Note_: If a `NodeList`, `Array`, or jQuery object are passed, the first element will be used for setup. To setup multiple players, see [setting up multiple players](#setting-up-multiple-players) below.
 
 Here's some examples
 
@@ -226,19 +226,31 @@ Passing a [HTMLElement](https://developer.mozilla.org/en/docs/Web/API/HTMLElemen
 const player = new Plyr(document.getElementById('player'));
 ```
 
-Passing a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList):
+Passing a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList) (see note below):
 
 ```javascript
 const player = new Plyr(document.querySelectorAll('.js-player'));
 ```
 
-The NodeList, HTMLElement or string selector can be the target `<video>`, `<audio>`, or `<div>` wrapper for embeds
+The NodeList, HTMLElement or string selector can be the target `<video>`, `<audio>`, or `<div>` wrapper for embeds.
 
 ##### Setting up multiple players
 
+You have two choices here. You can either use a simple array loop to map the constructor:
+
 ```javascript
-const players = Array.from(document.querySelectorAll('.js-player')).map(player => new Plyr(player));
+const players = Array.from(document.querySelectorAll('.js-player')).map(p => new Plyr(p));
 ```
+
+...or use a static method where you can pass a [string selector](https://developer.mozilla.org/en-US/docs/Web/API/NodeList), a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList) or an [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array) of elements:
+
+```javascript
+const players = Plyr.setup('.js-player');
+```
+
+Both options will also return an array of instances in the order of they were in the DOM for the string selector or the source NodeList or Array.
+
+##### Passing options
 
 The second argument for the constructor is the [options](#options) object:
 
@@ -248,7 +260,7 @@ const player = new Plyr('#player', {
 });
 ```
 
-The constructor will return a Plyr object that can be used with the [API](#api) methods. See the [API](#api) section for more info.
+In all cases, the constructor will return a Plyr object that can be used with the [API](#api) methods. See the [API](#api) section for more info.
 
 #### Options
 
