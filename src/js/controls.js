@@ -2,12 +2,12 @@
 // Plyr controls
 // ==========================================================================
 
-import support from './support';
-import utils from './utils';
-import ui from './ui';
-import i18n from './i18n';
 import captions from './captions';
 import html5 from './html5';
+import i18n from './i18n';
+import support from './support';
+import ui from './ui';
+import utils from './utils';
 
 // Sniff out the browser
 const browser = utils.getBrowser();
@@ -37,17 +37,74 @@ const controls = {
 
     // Get icon URL
     getIconUrl() {
+        const url = new URL(this.config.iconUrl, window.location);
+        const cors = url.host !== window.location.host || (browser.isIE && !window.svg4everybody);
+
         return {
             url: this.config.iconUrl,
-            absolute: this.config.iconUrl.indexOf('http') === 0 || (browser.isIE && !window.svg4everybody),
+            cors,
         };
+    },
+
+    // Find the UI controls and store references in custom controls
+    // TODO: Allow settings menus with custom controls
+    findElements() {
+        try {
+            this.elements.controls = utils.getElement.call(this, this.config.selectors.controls.wrapper);
+
+            // Buttons
+            this.elements.buttons = {
+                play: utils.getElements.call(this, this.config.selectors.buttons.play),
+                pause: utils.getElement.call(this, this.config.selectors.buttons.pause),
+                restart: utils.getElement.call(this, this.config.selectors.buttons.restart),
+                rewind: utils.getElement.call(this, this.config.selectors.buttons.rewind),
+                fastForward: utils.getElement.call(this, this.config.selectors.buttons.fastForward),
+                mute: utils.getElement.call(this, this.config.selectors.buttons.mute),
+                pip: utils.getElement.call(this, this.config.selectors.buttons.pip),
+                airplay: utils.getElement.call(this, this.config.selectors.buttons.airplay),
+                settings: utils.getElement.call(this, this.config.selectors.buttons.settings),
+                captions: utils.getElement.call(this, this.config.selectors.buttons.captions),
+                fullscreen: utils.getElement.call(this, this.config.selectors.buttons.fullscreen),
+            };
+
+            // Progress
+            this.elements.progress = utils.getElement.call(this, this.config.selectors.progress);
+
+            // Inputs
+            this.elements.inputs = {
+                seek: utils.getElement.call(this, this.config.selectors.inputs.seek),
+                volume: utils.getElement.call(this, this.config.selectors.inputs.volume),
+            };
+
+            // Display
+            this.elements.display = {
+                buffer: utils.getElement.call(this, this.config.selectors.display.buffer),
+                currentTime: utils.getElement.call(this, this.config.selectors.display.currentTime),
+                duration: utils.getElement.call(this, this.config.selectors.display.duration),
+            };
+
+            // Seek tooltip
+            if (utils.is.element(this.elements.progress)) {
+                this.elements.display.seekTooltip = this.elements.progress.querySelector(`.${this.config.classNames.tooltip}`);
+            }
+
+            return true;
+        } catch (error) {
+            // Log it
+            this.debug.warn('It looks like there is a problem with your custom controls HTML', error);
+
+            // Restore native video controls
+            this.toggleNativeControls(true);
+
+            return false;
+        }
     },
 
     // Create <svg> icon
     createIcon(type, attributes) {
         const namespace = 'http://www.w3.org/2000/svg';
         const iconUrl = controls.getIconUrl.call(this);
-        const iconPath = `${!iconUrl.absolute ? iconUrl.url : ''}#${this.config.iconPrefix}`;
+        const iconPath = `${!iconUrl.cors ? iconUrl.url : ''}#${this.config.iconPrefix}`;
 
         // Create <svg>
         const icon = document.createElementNS(namespace, 'svg');
@@ -331,7 +388,7 @@ const controls = {
         const container = utils.createElement('div', utils.extend(attributes, {
             class: `plyr__time ${attributes.class}`,
             'aria-label': i18n.get(type, this.config),
-        }), '0:00');
+        }), '00:00');
 
         // Reference for updates
         this.elements.display[type] = container;
@@ -483,6 +540,7 @@ const controls = {
                     break;
 
                 case 576:
+                case 480:
                     label = 'SD';
                     break;
 
@@ -840,11 +898,9 @@ const controls = {
     },
 
     // Toggle Menu
-    showTab(event) {
+    showTab(target = '') {
         const { menu } = this.elements.settings;
-        const tab = event.target;
-        const show = tab.getAttribute('aria-expanded') === 'false';
-        const pane = document.getElementById(tab.getAttribute('aria-controls'));
+        const pane = document.getElementById(target);
 
         // Nothing to show, bail
         if (!utils.is.element(pane)) {
@@ -907,8 +963,12 @@ const controls = {
         current.setAttribute('tabindex', -1);
 
         // Set attributes on target
-        utils.toggleHidden(pane, !show);
-        tab.setAttribute('aria-expanded', show);
+        utils.toggleHidden(pane, false);
+
+        const tabs = utils.getElements.call(this, `[aria-controls="${target}"]`);
+        Array.from(tabs).forEach(tab => {
+            tab.setAttribute('aria-expanded', true);
+        });
         pane.removeAttribute('tabindex');
 
         // Focus the first item
@@ -1183,7 +1243,7 @@ const controls = {
             const icon = controls.getIconUrl.call(this);
 
             // Only load external sprite using AJAX
-            if (icon.absolute) {
+            if (icon.cors) {
                 utils.loadSprite(icon.url, 'sprite-plyr');
             }
         }
@@ -1269,7 +1329,7 @@ const controls = {
 
         // Find the elements if need be
         if (!utils.is.element(this.elements.controls)) {
-            utils.findElements.call(this);
+            controls.findElements.call(this);
         }
 
         // Edge sometimes doesn't finish the paint so force a redraw

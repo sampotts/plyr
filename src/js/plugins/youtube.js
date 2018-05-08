@@ -2,9 +2,9 @@
 // YouTube plugin
 // ==========================================================================
 
-import utils from './../utils';
 import controls from './../controls';
 import ui from './../ui';
+import utils from './../utils';
 
 // Standardise YouTube quality unit
 function mapQualityUnit(input) {
@@ -77,7 +77,7 @@ const youtube = {
             youtube.ready.call(this);
         } else {
             // Load the API
-            utils.loadScript(this.config.urls.youtube.api).catch(error => {
+            utils.loadScript(this.config.urls.youtube.sdk).catch(error => {
                 this.debug.warn('YouTube API failed to load', error);
             });
 
@@ -117,7 +117,7 @@ const youtube = {
         // Or via Google API
         const key = this.config.keys.google;
         if (utils.is.string(key) && !utils.is.empty(key)) {
-            const url = `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${key}&fields=items(snippet(title))&part=snippet`;
+            const url = utils.format(this.config.urls.youtube.api, videoId, key);
 
             utils
                 .fetch(url)
@@ -160,6 +160,9 @@ const youtube = {
         const id = utils.generateId(player.provider);
         const container = utils.createElement('div', { id });
         player.media = utils.replaceElement(container, player.media);
+
+        // Set poster image
+        player.media.setAttribute('poster', utils.format(player.config.urls.youtube.poster, videoId));
 
         // Setup instance
         // https://developers.google.com/youtube/iframe_api_reference

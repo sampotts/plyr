@@ -1,26 +1,24 @@
 // ==========================================================================
 // Plyr
-// plyr.js v3.2.4
+// plyr.js v3.3.6
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
 
-import { providers, types } from './types';
-import defaults from './defaults';
-import support from './support';
-import utils from './utils';
-
+import captions from './captions';
 import Console from './console';
+import controls from './controls';
+import defaults from './defaults';
 import Fullscreen from './fullscreen';
 import Listeners from './listeners';
-import Storage from './storage';
-import Ads from './plugins/ads';
-
-import captions from './captions';
-import controls from './controls';
 import media from './media';
+import Ads from './plugins/ads';
 import source from './source';
+import Storage from './storage';
+import support from './support';
+import { providers, types } from './types';
 import ui from './ui';
+import utils from './utils';
 
 // Private properties
 // TODO: Use a WeakMap for private globals
@@ -134,17 +132,9 @@ class Plyr {
         }
 
         // Cache original element state for .destroy()
-        // TODO: Investigate a better solution as I suspect this causes reported double load issues?
-        setTimeout(() => {
-            const clone = this.media.cloneNode(true);
-
-            // Prevent the clone autoplaying
-            if (clone.getAttribute('autoplay')) {
-                clone.pause();
-            }
-
-            this.elements.original = clone;
-        }, 0);
+        const clone = this.media.cloneNode(true);
+        clone.autoplay = false;
+        this.elements.original = clone;
 
         // Set media type based on tag or data attribute
         // Supported: video, audio, vimeo, youtube
@@ -343,11 +333,6 @@ class Plyr {
             return null;
         }
 
-        // If ads are enabled, wait for them first
-        /* if (this.ads.enabled && !this.ads.initialized) {
-            return this.ads.managerPromise.then(() => this.ads.play()).catch(() => this.media.play());
-        } */
-
         // Return the promise (for HTML5)
         return this.media.play();
     }
@@ -364,6 +349,13 @@ class Plyr {
     }
 
     /**
+     * Get playing state
+     */
+    get playing() {
+        return Boolean(this.ready && !this.paused && !this.ended);
+    }
+
+    /**
      * Get paused state
      */
     get paused() {
@@ -371,10 +363,10 @@ class Plyr {
     }
 
     /**
-     * Get playing state
+     * Get stopped state
      */
-    get playing() {
-        return Boolean(this.ready && !this.paused && !this.ended && (this.isHTML5 ? this.media.readyState > 2 : true));
+    get stopped() {
+        return Boolean(this.paused && this.currentTime === 0);
     }
 
     /**
@@ -404,7 +396,8 @@ class Plyr {
      */
     stop() {
         if (this.isHTML5) {
-            this.media.load();
+            this.pause();
+            this.restart();
         } else if (utils.is.function(this.media.stop)) {
             this.media.stop();
         }
@@ -799,17 +792,18 @@ class Plyr {
     }
 
     /**
-     * Set the poster image for a HTML5 video
+     * Set the poster image for a video
      * @param {input} - the URL for the new poster image
      */
     set poster(input) {
-        if (!this.isHTML5 || !this.isVideo) {
-            this.debug.warn('Poster can only be set on HTML5 video');
+        if (!this.isVideo) {
+            this.debug.warn('Poster can only be set for video');
             return;
         }
 
         if (utils.is.string(input)) {
             this.media.setAttribute('poster', input);
+            ui.setPoster.call(this);
         }
     }
 
@@ -817,7 +811,7 @@ class Plyr {
      * Get the current poster image
      */
     get poster() {
-        if (!this.isHTML5 || !this.isVideo) {
+        if (!this.isVideo) {
             return null;
         }
 
@@ -1076,8 +1070,8 @@ class Plyr {
                     utils.toggleClass(this.elements.controls, this.config.classNames.noTransition, false);
                 }
 
-                // Check if controls toggled
-                const toggled = utils.toggleClass(this.elements.container, this.config.classNames.hideControls, true);
+                // Set hideControls class
+                const toggled = utils.toggleClass(this.elements.container, this.config.classNames.hideControls, this.config.hideControls);
 
                 // Trigger event and close menu
                 if (toggled) {
@@ -1249,6 +1243,29 @@ class Plyr {
      */
     static loadSprite(url, id) {
         return utils.loadSprite(url, id);
+    }
+
+    /**
+     * Setup multiple instances
+     * @param {*} selector
+     * @param {object} options
+     */
+    static setup(selector, options = {}) {
+        let targets = null;
+
+        if (utils.is.string(selector)) {
+            targets = Array.from(document.querySelectorAll(selector));
+        } else if (utils.is.nodeList(selector)) {
+            targets = Array.from(selector);
+        } else if (utils.is.array(selector)) {
+            targets = selector.filter(i => utils.is.element(i));
+        }
+
+        if (utils.is.empty(targets)) {
+            return null;
+        }
+
+        return targets.map(t => new Plyr(t, options));
     }
 }
 
