@@ -15,6 +15,7 @@
     transition: opacity 0.3s ease;
     width: 100%;
     z-index: 1;
+    pointer-events: none;
 }
 
 .plyr--stopped .plyr__poster {
