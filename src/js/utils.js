@@ -9,9 +9,6 @@ import { providers } from './types';
 const utils = {
     // Check variable types
     is: {
-        plyr(input) {
-            return this.instanceof(input, window.Plyr);
-        },
         object(input) {
             return this.getConstructor(input) === Object;
         },
@@ -31,22 +28,22 @@ const utils = {
             return !this.nullOrUndefined(input) && Array.isArray(input);
         },
         weakMap(input) {
-            return this.instanceof(input, window.WeakMap);
+            return this.instanceof(input, WeakMap);
         },
         nodeList(input) {
-            return this.instanceof(input, window.NodeList);
+            return this.instanceof(input, NodeList);
         },
         element(input) {
-            return this.instanceof(input, window.Element);
+            return this.instanceof(input, Element);
         },
         textNode(input) {
             return this.getConstructor(input) === Text;
         },
         event(input) {
-            return this.instanceof(input, window.Event);
+            return this.instanceof(input, Event);
         },
         cue(input) {
-            return this.instanceof(input, window.TextTrackCue) || this.instanceof(input, window.VTTCue);
+            return this.instanceof(input, TextTrackCue) || this.instanceof(input, VTTCue);
         },
         track(input) {
             return this.instanceof(input, TextTrack) || (!this.nullOrUndefined(input) && this.string(input.kind));
@@ -547,7 +544,7 @@ const utils = {
         const event = new CustomEvent(type, {
             bubbles,
             detail: Object.assign({}, detail, {
-                plyr: utils.is.plyr(this) ? this : null,
+                plyr: this,
             }),
         });
 

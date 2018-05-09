@@ -19,7 +19,7 @@ function onChange() {
     }
 
     // Trigger an event
-    utils.dispatchEvent(this.target, this.active ? 'enterfullscreen' : 'exitfullscreen', true);
+    utils.dispatchEvent.call(this.player, this.target, this.active ? 'enterfullscreen' : 'exitfullscreen', true);
 
     // Trap focus in container
     if (!browser.isIos) {

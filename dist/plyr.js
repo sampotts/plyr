@@ -411,9 +411,6 @@ var toConsumableArray = function (arr) {
 var utils = {
     // Check variable types
     is: {
-        plyr: function plyr(input) {
-            return this.instanceof(input, window.Plyr);
-        },
         object: function object(input) {
             return this.getConstructor(input) === Object;
         },
@@ -433,22 +430,22 @@ var utils = {
             return !this.nullOrUndefined(input) && Array.isArray(input);
         },
         weakMap: function weakMap(input) {
-            return this.instanceof(input, window.WeakMap);
+            return this.instanceof(input, WeakMap);
         },
         nodeList: function nodeList(input) {
-            return this.instanceof(input, window.NodeList);
+            return this.instanceof(input, NodeList);
         },
         element: function element(input) {
-            return this.instanceof(input, window.Element);
+            return this.instanceof(input, Element);
         },
         textNode: function textNode(input) {
             return this.getConstructor(input) === Text;
         },
         event: function event(input) {
-            return this.instanceof(input, window.Event);
+            return this.instanceof(input, Event);
         },
         cue: function cue(input) {
-            return this.instanceof(input, window.TextTrackCue) || this.instanceof(input, window.VTTCue);
+            return this.instanceof(input, TextTrackCue) || this.instanceof(input, VTTCue);
         },
         track: function track(input) {
             return this.instanceof(input, TextTrack) || !this.nullOrUndefined(input) && this.string(input.kind);
@@ -989,7 +986,7 @@ var utils = {
         var event = new CustomEvent(type, {
             bubbles: bubbles,
             detail: Object.assign({}, detail, {
-                plyr: utils.is.plyr(this) ? this : null
+                plyr: this
             })
         });
 
@@ -4029,7 +4026,7 @@ function onChange() {
     }
 
     // Trigger an event
-    utils.dispatchEvent(this.target, this.active ? 'enterfullscreen' : 'exitfullscreen', true);
+    utils.dispatchEvent.call(this.player, this.target, this.active ? 'enterfullscreen' : 'exitfullscreen', true);
 
     // Trap focus in container
     if (!browser$2.isIos) {
