@@ -283,9 +283,6 @@ class Listeners {
         // Loading state
         utils.on(this.player.media, 'waiting canplay seeked playing', event => ui.checkLoading.call(this.player, event));
 
-        // Check if media failed to load
-        // utils.on(this.player.media, 'play', event => ui.checkFailed.call(this.player, event));
-
         // If autoplay, then load advertisement if required
         // TODO: Show some sort of loading state while the ad manager loads else there's a delay before ad shows
         utils.on(this.player.media, 'playing', () => {

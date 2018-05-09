@@ -338,7 +338,6 @@ const defaults = {
         paused: 'plyr--paused',
         stopped: 'plyr--stopped',
         loading: 'plyr--loading',
-        error: 'plyr--has-error',
         hover: 'plyr--hover',
         tooltip: 'plyr__tooltip',
         cues: 'plyr__cues',

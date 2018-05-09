@@ -196,29 +196,6 @@ const ui = {
         }, this.loading ? 250 : 0);
     },
 
-    // Check if media failed to load
-    checkFailed() {
-        // https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/networkState
-        this.failed = this.media.networkState === 3;
-
-        if (this.failed) {
-            utils.toggleClass(this.elements.container, this.config.classNames.loading, false);
-            utils.toggleClass(this.elements.container, this.config.classNames.error, true);
-        }
-
-        // Clear timer
-        clearTimeout(this.timers.failed);
-
-        // Timer to prevent flicker when seeking
-        this.timers.loading = setTimeout(() => {
-            // Toggle container class hook
-            utils.toggleClass(this.elements.container, this.config.classNames.loading, this.loading);
-
-            // Show controls if loading, hide if done
-            this.toggleControls(this.loading);
-        }, this.loading ? 250 : 0);
-    },
-
     // Update volume UI and storage
     updateVolume() {
         if (!this.supported.ui) {
