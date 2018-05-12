@@ -602,9 +602,10 @@ const controls = {
         controls.updateProgress.call(this, event);
     },
 
-    // Show the duration on metadataloaded
+    // Show the duration on metadataloaded or durationchange events
     durationUpdate() {
-        if (!this.supported.ui) {
+        // Bail if no ui or durationchange event triggered after playing/seek when invertTime is false
+        if (!this.supported.ui || (!this.config.invertTime && this.currentTime)) {
             return;
         }
 
