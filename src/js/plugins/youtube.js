@@ -424,6 +424,17 @@ const youtube = {
                     // Reset timer
                     clearInterval(player.timers.playing);
 
+                    const seeked = player.media.seeking && [
+                        1,
+                        2,
+                    ].includes(event.data);
+
+                    if (seeked) {
+                        // Unset seeking and fire seeked event
+                        player.media.seeking = false;
+                        utils.dispatchEvent.call(player, player.media, 'seeked');
+                    }
+
                     // Handle events
                     // -1   Unstarted
                     // 0    Ended
@@ -457,12 +468,6 @@ const youtube = {
                             break;
 
                         case 1:
-                            // If we were seeking, fire seeked event
-                            if (player.media.seeking) {
-                                player.media.seeking = false;
-                                utils.dispatchEvent.call(player, player.media, 'seeked');
-                            }
-
                             // Restore paused state (YouTube starts playing on seek if the video hasn't been played yet)
                             if (player.media.paused) {
                                 player.media.pause();
