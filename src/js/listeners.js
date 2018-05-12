@@ -273,7 +273,7 @@ class Listeners {
     // Listen for media events
     media() {
         // Time change on media
-        utils.on(this.player.media, 'timeupdate seeking', event => controls.timeUpdate.call(this.player, event));
+        utils.on(this.player.media, 'timeupdate seeking seeked', event => controls.timeUpdate.call(this.player, event));
 
         // Display duration
         utils.on(this.player.media, 'durationchange loadeddata loadedmetadata', event => controls.durationUpdate.call(this.player, event));
@@ -295,7 +295,7 @@ class Listeners {
         });
 
         // Check for buffer progress
-        utils.on(this.player.media, 'progress playing', event => controls.updateProgress.call(this.player, event));
+        utils.on(this.player.media, 'progress playing seeking seeked', event => controls.updateProgress.call(this.player, event));
 
         // Handle volume changes
         utils.on(this.player.media, 'volumechange', event => controls.updateVolume.call(this.player, event));

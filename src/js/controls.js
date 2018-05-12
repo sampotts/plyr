@@ -481,6 +481,7 @@ const controls = {
                 // Video playing
                 case 'timeupdate':
                 case 'seeking':
+                case 'seeked':
                     value = utils.getPercentage(this.currentTime, this.duration);
 
                     // Set seek range value only if it's a 'natural' time event
