@@ -55,7 +55,7 @@ const ui = {
         // Remove native controls
         ui.toggleNativeControls.call(this);
 
-        // Setup captions for html5
+        // Setup captions for HTML5
         if (this.isHTML5) {
             captions.setup.call(this);
         }
