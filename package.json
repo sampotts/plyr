@@ -24,6 +24,7 @@
         "gulp-clean-css": "^3.9.4",
         "gulp-concat": "^2.6.1",
         "gulp-filter": "^5.1.0",
+        "gulp-header": "^2.0.5",
         "gulp-open": "^3.0.1",
         "gulp-rename": "^1.2.2",
         "gulp-replace": "^0.6.1",
