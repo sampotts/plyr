@@ -529,12 +529,30 @@ class Listeners {
             }
         });
 
+        // Set range input alternative "value", which matches the tooltip time (#954)
+        on(
+            this.player.elements.inputs.seek,
+            'mousedown mousemove',
+            event => {
+                const clientRect = this.player.elements.progress.getBoundingClientRect();
+                const percent = 100 / clientRect.width * (event.pageX - clientRect.left);
+                event.currentTarget.setAttribute('seekNext', percent);
+            }
+        );
+
         // Seek
         on(
             this.player.elements.inputs.seek,
             inputEvent,
             event => {
-                this.player.currentTime = event.target.value / event.target.max * this.player.duration;
+                const seek = event.currentTarget;
+                // If it exists, use seekNext instead of "value" for consistency with tooltip time (#954)
+                let seekTo = seek.getAttribute('seekNext');
+                if (utils.is.empty(seekTo)) {
+                    seekTo = seek.value;
+                }
+                seek.removeAttribute('seekNext');
+                this.player.currentTime = seekTo / seek.max * this.player.duration;
             },
             'seek',
         );
