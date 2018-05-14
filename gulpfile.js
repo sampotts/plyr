@@ -13,6 +13,7 @@ const filter = require('gulp-filter');
 const sass = require('gulp-sass');
 const cleancss = require('gulp-clean-css');
 const run = require('run-sequence');
+const header = require('gulp-header');
 const prefix = require('gulp-autoprefixer');
 const gitbranch = require('git-branch');
 const svgstore = require('gulp-svgstore');
@@ -146,6 +147,7 @@ const build = {
                             options,
                         ),
                     )
+                    .pipe(header('typeof navigator === "object" && ')) // "Support" SSR (#935)
                     .pipe(sourcemaps.write(''))
                     .pipe(gulp.dest(output))
                     .pipe(filter('**/*.js'))
