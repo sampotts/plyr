@@ -703,6 +703,11 @@ const utils = {
         return array.filter((item, index) => array.indexOf(item) === index);
     },
 
+    // Clone nested objects
+    cloneDeep(object) {
+        return JSON.parse(JSON.stringify(object));
+    },
+
     // Get the closest value in an array
     closest(array, value) {
         if (!utils.is.array(array) || !array.length) {
