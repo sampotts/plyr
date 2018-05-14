@@ -109,6 +109,7 @@ var build = {
                         .src(bundles[bundle].js[key])
                         .pipe(concat(key))
                         .pipe(uglify())
+                            .on('error', function (err) { gutil.log(gutil.colors.red('[Error]'), err.toString()); })
                         .pipe(gulp.dest(paths[bundle].output));
                 });
             })(key);

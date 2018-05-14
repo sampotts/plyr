@@ -393,7 +393,17 @@
     }
 
     // Trigger event
-    function _dispatchEvent(element, type = '', bubbles = false, detail = {}) {
+    function _dispatchEvent(element, type, bubbles, detail) {
+        if (!type) {
+            type = '';
+        }
+        if (bubbles === undefined || bubbles === null) {
+            bubbles = false;
+        }
+        if (!detail) {
+            detail = {};
+        }
+
         // Bail if no element
         if (!element || _is.empty(type)) {
             return;
@@ -401,8 +411,8 @@
 
         // Create and dispatch the event
         const event = new CustomEvent(type, {
-            bubbles,
-            detail,
+            bubbles: bubbles,
+            detail: detail
         });
 
         // Dispatch the event
@@ -3475,9 +3485,11 @@
             // If not null or undefined, parse it
             if (!_is.undefined(source)) {
                 _updateSource(source);
-                _buildCaptionControl();
-                _buildCaptionPositionControl();
-                _buildQualityControl();
+                if(plyr.supported.full) {
+                    _buildCaptionControl();
+                    _buildCaptionPositionControl();
+                    _buildQualityControl();
+                }
                 return;
             }
 
