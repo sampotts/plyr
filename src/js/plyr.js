@@ -801,10 +801,7 @@ class Plyr {
             return;
         }
 
-        if (utils.is.string(input)) {
-            this.media.setAttribute('poster', input);
-            ui.setPoster.call(this);
-        }
+        ui.setPoster.call(this, input);
     }
 
     /**

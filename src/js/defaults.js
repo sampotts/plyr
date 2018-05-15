@@ -199,7 +199,6 @@ const defaults = {
         youtube: {
             sdk: 'https://www.youtube.com/iframe_api',
             api: 'https://www.googleapis.com/youtube/v3/videos?id={0}&key={1}&fields=items(snippet(title))&part=snippet',
-            poster: 'https://img.youtube.com/vi/{0}/maxresdefault.jpg,https://img.youtube.com/vi/{0}/hqdefault.jpg',
         },
         googleIMA: {
             sdk: 'https://imasdk.googleapis.com/js/sdkloader/ima3.js',
@@ -332,6 +331,7 @@ const defaults = {
         embed: 'plyr__video-embed',
         embedContainer: 'plyr__video-embed__container',
         poster: 'plyr__poster',
+        posterEnabled: 'plyr__poster-enabled',
         ads: 'plyr__ads',
         control: 'plyr__control',
         playing: 'plyr--playing',
