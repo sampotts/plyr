@@ -105,8 +105,8 @@ const ui = {
         // Set the title
         ui.setTitle.call(this);
 
-        // Assure the poster image is set, if the property was added before the UI was created
-        if (this.poster) {
+        // Assure the poster image is set, if the property was added before the element was created
+        if (this.poster && this.elements.poster && !this.elements.poster.style.backgroundImage) {
             ui.setPoster.call(this, this.poster);
         }
     },
@@ -167,6 +167,11 @@ const ui = {
         const loadPromise = utils.loadImage(poster)
             .then(() => {
                 this.elements.poster.style.backgroundImage = `url('${poster}')`;
+                Object.assign(this.elements.poster.style, {
+                    backgroundImage: `url('${poster}')`,
+                    // Reset backgroundSize as well (since it can be set to "cover" for padded thumbnails for youtube)
+                    backgroundSize: '',
+                });
                 ui.togglePoster.call(this, true);
                 return poster;
             });

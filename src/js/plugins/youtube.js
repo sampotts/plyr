@@ -168,7 +168,13 @@ const youtube = {
         utils.loadImage(posterSrc('maxres'), 121) // Higest quality and unpadded
             .catch(() => utils.loadImage(posterSrc('sd'), 121)) // 480p padded 4:3
             .catch(() => utils.loadImage(posterSrc('hq'))) // 360p padded 4:3. Always exists
-            .then(image => ui.setPoster.call(player, image.src));
+            .then(image => ui.setPoster.call(player, image.src))
+            .then(posterSrc => {
+                // If the image is padded, use background-size "cover" instead (like youtube does too with their posters)
+                if (!posterSrc.includes('maxres')) {
+                    player.elements.poster.style.backgroundSize = 'cover';
+                }
+            });
 
         // Setup instance
         // https://developers.google.com/youtube/iframe_api_reference
