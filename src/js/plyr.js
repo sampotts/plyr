@@ -410,7 +410,7 @@
         }
 
         // Create and dispatch the event
-        const event = new CustomEvent(type, {
+        var event = new CustomEvent(type, {
             bubbles: bubbles,
             detail: detail
         });
