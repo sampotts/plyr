@@ -64,6 +64,14 @@ function mapQualityUnits(levels) {
     return utils.dedupe(levels.map(level => mapQualityUnit(level)));
 }
 
+// Set playback state and trigger change (only on actual change)
+function assurePlaybackState(play) {
+    if (this.media.paused === play) {
+        this.media.paused = !play;
+        utils.dispatchEvent.call(this, this.media, play ? 'play' : 'pause');
+    }
+}
+
 const youtube = {
     setup() {
         // Add embed class for responsive
@@ -264,10 +272,12 @@ const youtube = {
 
                     // Create a faux HTML5 API using the YouTube API
                     player.media.play = () => {
+                        assurePlaybackState.call(player, true);
                         instance.playVideo();
                     };
 
                     player.media.pause = () => {
+                        assurePlaybackState.call(player, false);
                         instance.pauseVideo();
                     };
 
@@ -438,7 +448,8 @@ const youtube = {
                             break;
 
                         case 0:
-                            player.media.paused = true;
+                            // Assure state and event
+                            assurePlaybackState.call(player, false);
 
                             // YouTube doesn't support loop for a single video, so mimick it.
                             if (player.media.loop) {
@@ -455,14 +466,11 @@ const youtube = {
                             // If we were seeking, fire seeked event
                             if (player.media.seeking) {
                                 utils.dispatchEvent.call(player, player.media, 'seeked');
+                                player.media.seeking = false;
                             }
-                            player.media.seeking = false;
 
-                            // Only fire play if paused before
-                            if (player.media.paused) {
-                                utils.dispatchEvent.call(player, player.media, 'play');
-                            }
-                            player.media.paused = false;
+                            // Assure state and event (must be done after seeked event)
+                            assurePlaybackState.call(player, true);
 
                             utils.dispatchEvent.call(player, player.media, 'playing');
 
@@ -485,9 +493,7 @@ const youtube = {
                             break;
 
                         case 2:
-                            player.media.paused = true;
-
-                            utils.dispatchEvent.call(player, player.media, 'pause');
+                            assurePlaybackState.call(player, false);
 
                             break;
 
