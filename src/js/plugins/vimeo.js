@@ -149,25 +149,26 @@ const vimeo = {
                 return currentTime;
             },
             set(time) {
-                // Get current paused state
-                // Vimeo will automatically play on seek
-                const { paused } = player.media;
+                // Vimeo will automatically play on seek if the video hasn't been played before
 
-                // Set seeking flag
-                player.media.seeking = true;
+                // Get current paused state and volume etc
+                const { embed, media, paused, volume } = player;
 
-                // Trigger seeking
-                utils.dispatchEvent.call(player, player.media, 'seeking');
+                // Set seeking state and trigger event
+                media.seeking = true;
+                utils.dispatchEvent.call(player, media, 'seeking');
 
-                // Seek after events
-                player.embed.setCurrentTime(time).catch(() => {
-                    // Do nothing
-                });
-
-                // Restore pause state
-                if (paused) {
-                    player.pause();
-                }
+                // If paused, mute until seek is complete
+                Promise.resolve(paused && embed.setVolume(0))
+                    // Seek
+                    .then(() => embed.setCurrentTime(time))
+                    // Restore paused
+                    .then(() => paused && embed.pause())
+                    // Restore volume
+                    .then(() => paused && embed.setVolume(volume))
+                    .catch(() => {
+                        // Do nothing
+                    });
             },
         });
 
@@ -357,7 +358,6 @@ const vimeo = {
         player.embed.on('seeked', () => {
             player.media.seeking = false;
             utils.dispatchEvent.call(player, player.media, 'seeked');
-            utils.dispatchEvent.call(player, player.media, 'play');
         });
 
         player.embed.on('ended', () => {

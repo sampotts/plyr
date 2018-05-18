@@ -295,22 +295,17 @@ const youtube = {
                             return Number(instance.getCurrentTime());
                         },
                         set(time) {
-                            // Vimeo will automatically play on seek
-                            const { paused } = player.media;
+                            // If paused, mute audio preventively (YouTube starts playing on seek if the video hasn't been played yet).
+                            if (player.paused) {
+                                player.embed.mute();
+                            }
 
-                            // Set seeking flag
+                            // Set seeking state and trigger event
                             player.media.seeking = true;
-
-                            // Trigger seeking
                             utils.dispatchEvent.call(player, player.media, 'seeking');
 
                             // Seek after events sent
                             instance.seekTo(time);
-
-                            // Restore pause state
-                            if (paused) {
-                                player.pause();
-                            }
                         },
                     });
 
@@ -448,7 +443,6 @@ const youtube = {
                             break;
 
                         case 0:
-                            // Assure state and event
                             assurePlaybackState.call(player, false);
 
                             // YouTube doesn't support loop for a single video, so mimick it.
@@ -465,34 +459,42 @@ const youtube = {
                         case 1:
                             // If we were seeking, fire seeked event
                             if (player.media.seeking) {
-                                utils.dispatchEvent.call(player, player.media, 'seeked');
                                 player.media.seeking = false;
+                                utils.dispatchEvent.call(player, player.media, 'seeked');
                             }
 
-                            // Assure state and event (must be done after seeked event)
-                            assurePlaybackState.call(player, true);
+                            // Restore paused state (YouTube starts playing on seek if the video hasn't been played yet)
+                            if (player.media.paused) {
+                                player.media.pause();
+                            } else {
+                                assurePlaybackState.call(player, true);
 
-                            utils.dispatchEvent.call(player, player.media, 'playing');
+                                utils.dispatchEvent.call(player, player.media, 'playing');
 
-                            // Poll to get playback progress
-                            player.timers.playing = setInterval(() => {
-                                utils.dispatchEvent.call(player, player.media, 'timeupdate');
-                            }, 50);
+                                // Poll to get playback progress
+                                player.timers.playing = setInterval(() => {
+                                    utils.dispatchEvent.call(player, player.media, 'timeupdate');
+                                }, 50);
 
-                            // Check duration again due to YouTube bug
-                            // https://github.com/sampotts/plyr/issues/374
-                            // https://code.google.com/p/gdata-issues/issues/detail?id=8690
-                            if (player.media.duration !== instance.getDuration()) {
-                                player.media.duration = instance.getDuration();
-                                utils.dispatchEvent.call(player, player.media, 'durationchange');
+                                // Check duration again due to YouTube bug
+                                // https://github.com/sampotts/plyr/issues/374
+                                // https://code.google.com/p/gdata-issues/issues/detail?id=8690
+                                if (player.media.duration !== instance.getDuration()) {
+                                    player.media.duration = instance.getDuration();
+                                    utils.dispatchEvent.call(player, player.media, 'durationchange');
+                                }
+
+                                // Get quality
+                                controls.setQualityMenu.call(player, mapQualityUnits(instance.getAvailableQualityLevels()));
                             }
-
-                            // Get quality
-                            controls.setQualityMenu.call(player, mapQualityUnits(instance.getAvailableQualityLevels()));
 
                             break;
 
                         case 2:
+                            // Restore audio (YouTube starts playing on seek if the video hasn't been played yet)
+                            if (!player.muted) {
+                                player.embed.unMute();
+                            }
                             assurePlaybackState.call(player, false);
 
                             break;
