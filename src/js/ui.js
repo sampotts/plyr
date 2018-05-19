@@ -74,10 +74,10 @@ const ui = {
         this.quality = null;
 
         // Reset volume display
-        ui.updateVolume.call(this);
+        controls.updateVolume.call(this);
 
         // Reset time display
-        ui.timeUpdate.call(this);
+        controls.timeUpdate.call(this);
 
         // Update the UI
         ui.checkPlaying.call(this);
@@ -217,142 +217,6 @@ const ui = {
             // Show controls if loading, hide if done
             this.toggleControls(this.loading);
         }, this.loading ? 250 : 0);
-    },
-
-    // Update volume UI and storage
-    updateVolume() {
-        if (!this.supported.ui) {
-            return;
-        }
-
-        // Update range
-        if (utils.is.element(this.elements.inputs.volume)) {
-            ui.setRange.call(this, this.elements.inputs.volume, this.muted ? 0 : this.volume);
-        }
-
-        // Update mute state
-        if (utils.is.element(this.elements.buttons.mute)) {
-            utils.toggleState(this.elements.buttons.mute, this.muted || this.volume === 0);
-        }
-    },
-
-    // Update seek value and lower fill
-    setRange(target, value = 0) {
-        if (!utils.is.element(target)) {
-            return;
-        }
-
-        // eslint-disable-next-line
-        target.value = value;
-
-        // Webkit range fill
-        controls.updateRangeFill.call(this, target);
-    },
-
-    // Set <progress> value
-    setProgress(target, input) {
-        const value = utils.is.number(input) ? input : 0;
-        const progress = utils.is.element(target) ? target : this.elements.display.buffer;
-
-        // Update value and label
-        if (utils.is.element(progress)) {
-            progress.value = value;
-
-            // Update text label inside
-            const label = progress.getElementsByTagName('span')[0];
-            if (utils.is.element(label)) {
-                label.childNodes[0].nodeValue = value;
-            }
-        }
-    },
-
-    // Update <progress> elements
-    updateProgress(event) {
-        if (!this.supported.ui || !utils.is.event(event)) {
-            return;
-        }
-
-        let value = 0;
-
-        if (event) {
-            switch (event.type) {
-                // Video playing
-                case 'timeupdate':
-                case 'seeking':
-                    value = utils.getPercentage(this.currentTime, this.duration);
-
-                    // Set seek range value only if it's a 'natural' time event
-                    if (event.type === 'timeupdate') {
-                        ui.setRange.call(this, this.elements.inputs.seek, value);
-                    }
-
-                    break;
-
-                // Check buffer status
-                case 'playing':
-                case 'progress':
-                    ui.setProgress.call(this, this.elements.display.buffer, this.buffered * 100);
-
-                    break;
-
-                default:
-                    break;
-            }
-        }
-    },
-
-    // Update the displayed time
-    updateTimeDisplay(target = null, time = 0, inverted = false) {
-        // Bail if there's no element to display or the value isn't a number
-        if (!utils.is.element(target) || !utils.is.number(time)) {
-            return;
-        }
-
-        // Always display hours if duration is over an hour
-        const forceHours = utils.getHours(this.duration) > 0;
-
-        // eslint-disable-next-line no-param-reassign
-        target.textContent = utils.formatTime(time, forceHours, inverted);
-    },
-
-    // Handle time change event
-    timeUpdate(event) {
-        // Only invert if only one time element is displayed and used for both duration and currentTime
-        const invert = !utils.is.element(this.elements.display.duration) && this.config.invertTime;
-
-        // Duration
-        ui.updateTimeDisplay.call(this, this.elements.display.currentTime, invert ? this.duration - this.currentTime : this.currentTime, invert);
-
-        // Ignore updates while seeking
-        if (event && event.type === 'timeupdate' && this.media.seeking) {
-            return;
-        }
-
-        // Playing progress
-        ui.updateProgress.call(this, event);
-    },
-
-    // Show the duration on metadataloaded
-    durationUpdate() {
-        if (!this.supported.ui) {
-            return;
-        }
-
-        // If there's a spot to display duration
-        const hasDuration = utils.is.element(this.elements.display.duration);
-
-        // If there's only one time display, display duration there
-        if (!hasDuration && this.config.displayDuration && this.paused) {
-            ui.updateTimeDisplay.call(this, this.elements.display.currentTime, this.duration);
-        }
-
-        // If there's a duration element, update content
-        if (hasDuration) {
-            ui.updateTimeDisplay.call(this, this.elements.display.duration, this.duration);
-        }
-
-        // Update the tooltip (if visible)
-        controls.updateSeekTooltip.call(this);
     },
 };
 

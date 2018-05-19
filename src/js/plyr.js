@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v3.3.6
+// plyr.js v3.3.7
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -55,6 +55,7 @@ class Plyr {
         this.config = utils.extend(
             {},
             defaults,
+            Plyr.defaults,
             options || {},
             (() => {
                 try {
@@ -1268,5 +1269,7 @@ class Plyr {
         return targets.map(t => new Plyr(t, options));
     }
 }
+
+Plyr.defaults = utils.cloneDeep(defaults);
 
 export default Plyr;

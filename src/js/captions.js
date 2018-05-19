@@ -236,7 +236,7 @@ const captions = {
 
             // Set the span content
             if (utils.is.string(caption)) {
-                content.textContent = caption.trim();
+                content.innerText = caption.trim();
             } else {
                 content.appendChild(caption);
             }

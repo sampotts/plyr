@@ -1,3 +1,8 @@
+# v3.3.7
+
+*   Poster fixes (thanks @friday)
+*   Grid tweak
+
 # v3.3.6
 
 *   Vimeo fixes for mute state

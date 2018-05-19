@@ -250,10 +250,10 @@ class Listeners {
     // Listen for media events
     media() {
         // Time change on media
-        utils.on(this.player.media, 'timeupdate seeking', event => ui.timeUpdate.call(this.player, event));
+        utils.on(this.player.media, 'timeupdate seeking', event => controls.timeUpdate.call(this.player, event));
 
         // Display duration
-        utils.on(this.player.media, 'durationchange loadeddata loadedmetadata', event => ui.durationUpdate.call(this.player, event));
+        utils.on(this.player.media, 'durationchange loadeddata loadedmetadata', event => controls.durationUpdate.call(this.player, event));
 
         // Check for audio tracks on load
         // We can't use `loadedmetadata` as it doesn't seem to have audio tracks at that point
@@ -272,10 +272,10 @@ class Listeners {
         });
 
         // Check for buffer progress
-        utils.on(this.player.media, 'progress playing', event => ui.updateProgress.call(this.player, event));
+        utils.on(this.player.media, 'progress playing', event => controls.updateProgress.call(this.player, event));
 
         // Handle volume changes
-        utils.on(this.player.media, 'volumechange', event => ui.updateVolume.call(this.player, event));
+        utils.on(this.player.media, 'volumechange', event => controls.updateVolume.call(this.player, event));
 
         // Handle play/pause
         utils.on(this.player.media, 'playing play pause ended emptied timeupdate', event => ui.checkPlaying.call(this.player, event));
@@ -549,7 +549,8 @@ class Listeners {
                 }
 
                 this.player.config.invertTime = !this.player.config.invertTime;
-                ui.timeUpdate.call(this.player);
+
+                controls.timeUpdate.call(this.player);
             });
         }
 
