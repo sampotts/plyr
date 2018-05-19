@@ -105,8 +105,10 @@ const ui = {
         // Set the title
         ui.setTitle.call(this);
 
-        // Set the poster image
-        ui.setPoster.call(this);
+        // Assure the poster image is set, if the property was added before the element was created
+        if (this.poster && this.elements.poster && !this.elements.poster.style.backgroundImage) {
+            ui.setPoster.call(this, this.poster);
+        }
     },
 
     // Setup aria attribute for play and iframe title
@@ -146,15 +148,39 @@ const ui = {
         }
     },
 
-    // Set the poster image
-    setPoster() {
-        if (!utils.is.element(this.elements.poster) || utils.is.empty(this.poster)) {
-            return;
+    // Toggle poster
+    togglePoster(enable) {
+        utils.toggleClass(this.elements.container, this.config.classNames.posterEnabled, enable);
+    },
+
+    // Set the poster image (async)
+    setPoster(poster) {
+        // Set property regardless of validity
+        this.media.setAttribute('poster', poster);
+
+        // Bail if element is missing
+        if (!utils.is.element(this.elements.poster)) {
+            return Promise.reject();
         }
 
-        // Set the inline style
-        const posters = this.poster.split(',');
-        this.elements.poster.style.backgroundImage = posters.map(p => `url('${p}')`).join(',');
+        // Load the image, and set poster if successful
+        const loadPromise = utils.loadImage(poster)
+            .then(() => {
+                this.elements.poster.style.backgroundImage = `url('${poster}')`;
+                Object.assign(this.elements.poster.style, {
+                    backgroundImage: `url('${poster}')`,
+                    // Reset backgroundSize as well (since it can be set to "cover" for padded thumbnails for youtube)
+                    backgroundSize: '',
+                });
+                ui.togglePoster.call(this, true);
+                return poster;
+            });
+
+        // Hide the element if the poster can't be loaded (otherwise it will just be a black element covering the video)
+        loadPromise.catch(() => ui.togglePoster.call(this, false));
+
+        // Return the promise so the caller can use it as well
+        return loadPromise;
     },
 
     // Check playing state

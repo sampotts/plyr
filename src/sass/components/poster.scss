@@ -18,6 +18,6 @@
     pointer-events: none;
 }
 
-.plyr--stopped .plyr__poster {
+.plyr--stopped.plyr__poster-enabled .plyr__poster {
     opacity: 1;
 }

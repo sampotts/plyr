@@ -99,11 +99,8 @@ const vimeo = {
             // Get original image
             url.pathname = `${url.pathname.split('_')[0]}.jpg`;
 
-            // Set attribute
-            player.media.setAttribute('poster', url.href);
-
-            // Update
-            ui.setPoster.call(player);
+            // Set and show poster
+            ui.setPoster.call(player, url.href);
         });
 
         // Setup instance
