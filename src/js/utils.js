@@ -393,14 +393,16 @@ const utils = {
         }
     },
 
-    // Toggle class on an element
-    toggleClass(element, className, toggle) {
+    // Mirror Element.classList.toggle, with IE compatibility for "force" argument
+    toggleClass(element, className, force) {
         if (utils.is.element(element)) {
-            const contains = element.classList.contains(className);
+            let method = 'toggle';
+            if (typeof force !== 'undefined') {
+                method = force ? 'add' : 'remove';
+            }
 
-            element.classList[toggle ? 'add' : 'remove'](className);
-
-            return (toggle && !contains) || (!toggle && contains);
+            element.classList[method](className);
+            return element.classList.contains(className);
         }
 
         return null;

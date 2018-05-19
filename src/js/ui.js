@@ -173,7 +173,7 @@ const ui = {
         }
 
         // Toggle controls
-        this.toggleControls(!this.playing);
+        ui.toggleControls.call(this);
     },
 
     // Check if media is loading
@@ -188,35 +188,22 @@ const ui = {
 
         // Timer to prevent flicker when seeking
         this.timers.loading = setTimeout(() => {
-            // Toggle container class hook
+            // Update progress bar loading class state
             utils.toggleClass(this.elements.container, this.config.classNames.loading, this.loading);
 
-            // Show controls if loading, hide if done
-            this.toggleControls(this.loading);
+            // Update controls visibility
+            ui.toggleControls.call(this);
         }, this.loading ? 250 : 0);
     },
 
-    // Check if media failed to load
-    checkFailed() {
-        // https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/networkState
-        this.failed = this.media.networkState === 3;
+    // Toggle controls based on state and `force` argument
+    toggleControls(force) {
+        const { controls } = this.elements;
 
-        if (this.failed) {
-            utils.toggleClass(this.elements.container, this.config.classNames.loading, false);
-            utils.toggleClass(this.elements.container, this.config.classNames.error, true);
+        if (controls && this.config.hideControls) {
+            // Show controls if force, loading, paused, or button interaction, otherwise hide
+            this.toggleControls(Boolean(force || this.loading || this.paused || controls.pressed || controls.hover));
         }
-
-        // Clear timer
-        clearTimeout(this.timers.failed);
-
-        // Timer to prevent flicker when seeking
-        this.timers.loading = setTimeout(() => {
-            // Toggle container class hook
-            utils.toggleClass(this.elements.container, this.config.classNames.loading, this.loading);
-
-            // Show controls if loading, hide if done
-            this.toggleControls(this.loading);
-        }, this.loading ? 250 : 0);
     },
 };
 
