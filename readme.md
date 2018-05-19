@@ -125,13 +125,17 @@ Include the `plyr.js` script before the closing `</body>` tag and then in your J
 
 See [initialising](#initialising) for more information on advanced setups.
 
-If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for the JavaScript, you can use the following:
+You can use our CDN (provided by [Fastly](https://www.fastly.com/)) for the JavaScript. There's 2 versions; one with and one without [polyfills](#polyfills). My recommendation would be to manage polyfills seperately as part of your application but to make life easier you can use the polyfilled build.
 
 ```html
 <script src="https://cdn.plyr.io/3.3.7/plyr.js"></script>
 ```
 
-_Note_: Be sure to read the [polyfills](#polyfills) section below about browser compatibility
+...or...
+
+```html
+<script src="https://cdn.plyr.io/3.3.7/plyr.polyfilled.js"></script>
+```
 
 ### CSS
 

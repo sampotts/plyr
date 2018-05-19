@@ -3,6 +3,7 @@
 // ==========================================================================
 
 import loadjs from 'loadjs';
+import Storage from './storage';
 import support from './support';
 import { providers } from './types';
 
@@ -156,6 +157,8 @@ const utils = {
 
         // Only load once if ID set
         if (!hasId || !exists()) {
+            const useStorage = Storage.supported;
+
             // Create container
             const container = document.createElement('div');
             utils.toggleHidden(container, true);
@@ -165,7 +168,7 @@ const utils = {
             }
 
             // Check in cache
-            if (support.storage) {
+            if (useStorage) {
                 const cached = window.localStorage.getItem(prefix + id);
                 isCached = cached !== null;
 
@@ -184,7 +187,7 @@ const utils = {
                         return;
                     }
 
-                    if (support.storage) {
+                    if (useStorage) {
                         window.localStorage.setItem(
                             prefix + id,
                             JSON.stringify({
@@ -247,7 +250,7 @@ const utils = {
 
         // Add text node
         if (utils.is.string(text)) {
-            element.textContent = text;
+            element.innerText = text;
         }
 
         // Return built element
@@ -580,7 +583,7 @@ const utils = {
             return input;
         }
 
-        return input.toString().replace(/{(\d+)}/g, (match, i) => utils.is.string(args[i]) ? args[i] : '');
+        return input.toString().replace(/{(\d+)}/g, (match, i) => (utils.is.string(args[i]) ? args[i] : ''));
     },
 
     // Get percentage

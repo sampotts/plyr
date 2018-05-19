@@ -6,34 +6,13 @@ import captions from './captions';
 import html5 from './html5';
 import i18n from './i18n';
 import support from './support';
-import ui from './ui';
 import utils from './utils';
 
 // Sniff out the browser
 const browser = utils.getBrowser();
 
 const controls = {
-    // Webkit polyfill for lower fill range
-    updateRangeFill(target) {
-        // Get range from event if event passed
-        const range = utils.is.event(target) ? target.target : target;
 
-        // Needs to be a valid <input type='range'>
-        if (!utils.is.element(range) || range.getAttribute('type') !== 'range') {
-            return;
-        }
-
-        // Set aria value for https://github.com/sampotts/plyr/issues/905
-        range.setAttribute('aria-valuenow', range.value);
-
-        // WebKit only
-        if (!browser.isWebkit) {
-            return;
-        }
-
-        // Set CSS custom property
-        range.style.setProperty('--value', `${range.value / range.max * 100}%`);
-    },
 
     // Get icon URL
     getIconUrl() {
@@ -373,7 +352,7 @@ const controls = {
                     break;
             }
 
-            progress.textContent = `% ${suffix.toLowerCase()}`;
+            progress.innerText = `% ${suffix.toLowerCase()}`;
         }
 
         this.elements.display[type] = progress;
@@ -429,6 +408,123 @@ const controls = {
         list.appendChild(item);
     },
 
+    // Update the displayed time
+    updateTimeDisplay(target = null, time = 0, inverted = false) {
+        // Bail if there's no element to display or the value isn't a number
+        if (!utils.is.element(target) || !utils.is.number(time)) {
+            return;
+        }
+
+        // Always display hours if duration is over an hour
+        const forceHours = utils.getHours(this.duration) > 0;
+
+        // eslint-disable-next-line no-param-reassign
+        target.innerText = utils.formatTime(time, forceHours, inverted);
+    },
+
+    // Update volume UI and storage
+    updateVolume() {
+        if (!this.supported.ui) {
+            return;
+        }
+
+        // Update range
+        if (utils.is.element(this.elements.inputs.volume)) {
+            controls.setRange.call(this, this.elements.inputs.volume, this.muted ? 0 : this.volume);
+        }
+
+        // Update mute state
+        if (utils.is.element(this.elements.buttons.mute)) {
+            utils.toggleState(this.elements.buttons.mute, this.muted || this.volume === 0);
+        }
+    },
+
+    // Update seek value and lower fill
+    setRange(target, value = 0) {
+        if (!utils.is.element(target)) {
+            return;
+        }
+
+        // eslint-disable-next-line
+        target.value = value;
+
+        // Webkit range fill
+        controls.updateRangeFill.call(this, target);
+    },
+
+    // Update <progress> elements
+    updateProgress(event) {
+        if (!this.supported.ui || !utils.is.event(event)) {
+            return;
+        }
+
+        let value = 0;
+
+        const setProgress = (target, input) => {
+            const value = utils.is.number(input) ? input : 0;
+            const progress = utils.is.element(target) ? target : this.elements.display.buffer;
+
+            // Update value and label
+            if (utils.is.element(progress)) {
+                progress.value = value;
+
+                // Update text label inside
+                const label = progress.getElementsByTagName('span')[0];
+                if (utils.is.element(label)) {
+                    label.childNodes[0].nodeValue = value;
+                }
+            }
+        };
+
+        if (event) {
+            switch (event.type) {
+                // Video playing
+                case 'timeupdate':
+                case 'seeking':
+                    value = utils.getPercentage(this.currentTime, this.duration);
+
+                    // Set seek range value only if it's a 'natural' time event
+                    if (event.type === 'timeupdate') {
+                        controls.setRange.call(this, this.elements.inputs.seek, value);
+                    }
+
+                    break;
+
+                // Check buffer status
+                case 'playing':
+                case 'progress':
+                    setProgress(this.elements.display.buffer, this.buffered * 100);
+
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    },
+
+    // Webkit polyfill for lower fill range
+    updateRangeFill(target) {
+        // Get range from event if event passed
+        const range = utils.is.event(target) ? target.target : target;
+
+        // Needs to be a valid <input type='range'>
+        if (!utils.is.element(range) || range.getAttribute('type') !== 'range') {
+            return;
+        }
+
+        // Set aria value for https://github.com/sampotts/plyr/issues/905
+        range.setAttribute('aria-valuenow', range.value);
+
+        // WebKit only
+        if (!browser.isWebkit) {
+            return;
+        }
+
+        // Set CSS custom property
+        range.style.setProperty('--value', `${range.value / range.max * 100}%`);
+    },
+
     // Update hover tooltip for seeking
     updateSeekTooltip(event) {
         // Bail if setting not true
@@ -473,7 +569,7 @@ const controls = {
         }
 
         // Display the time a click would seek to
-        ui.updateTimeDisplay.call(this, this.elements.display.seekTooltip, this.duration / 100 * percent);
+        controls.updateTimeDisplay.call(this, this.elements.display.seekTooltip, this.duration / 100 * percent);
 
         // Set position
         this.elements.display.seekTooltip.style.left = `${percent}%`;
@@ -486,6 +582,46 @@ const controls = {
         ].includes(event.type)) {
             toggle(event.type === 'mouseenter');
         }
+    },
+
+    // Handle time change event
+    timeUpdate(event) {
+        // Only invert if only one time element is displayed and used for both duration and currentTime
+        const invert = !utils.is.element(this.elements.display.duration) && this.config.invertTime;
+
+        // Duration
+        controls.updateTimeDisplay.call(this, this.elements.display.currentTime, invert ? this.duration - this.currentTime : this.currentTime, invert);
+
+        // Ignore updates while seeking
+        if (event && event.type === 'timeupdate' && this.media.seeking) {
+            return;
+        }
+
+        // Playing progress
+        controls.updateProgress.call(this, event);
+    },
+
+    // Show the duration on metadataloaded
+    durationUpdate() {
+        if (!this.supported.ui) {
+            return;
+        }
+
+        // If there's a spot to display duration
+        const hasDuration = utils.is.element(this.elements.display.duration);
+
+        // If there's only one time display, display duration there
+        if (!hasDuration && this.config.displayDuration && this.paused) {
+            controls.updateTimeDisplay.call(this, this.elements.display.currentTime, this.duration);
+        }
+
+        // If there's a duration element, update content
+        if (hasDuration) {
+            controls.updateTimeDisplay.call(this, this.elements.display.duration, this.duration);
+        }
+
+        // Update the tooltip (if visible)
+        controls.updateSeekTooltip.call(this);
     },
 
     // Hide/show a tab
