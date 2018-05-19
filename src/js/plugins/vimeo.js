@@ -7,6 +7,14 @@ import controls from './../controls';
 import ui from './../ui';
 import utils from './../utils';
 
+// Set playback state and trigger change (only on actual change)
+function assurePlaybackState(play) {
+    if (this.media.paused === play) {
+        this.media.paused = !play;
+        utils.dispatchEvent.call(this, this.media, play ? 'play' : 'pause');
+    }
+}
+
 const vimeo = {
     setup() {
         // Add embed class for responsive
@@ -120,15 +128,13 @@ const vimeo = {
 
         // Create a faux HTML5 API using the Vimeo API
         player.media.play = () => {
-            player.embed.play().then(() => {
-                player.media.paused = false;
-            });
+            assurePlaybackState.call(player, true);
+            return player.embed.play();
         };
 
         player.media.pause = () => {
-            player.embed.pause().then(() => {
-                player.media.paused = true;
-            });
+            assurePlaybackState.call(player, false);
+            return player.embed.pause();
         };
 
         player.media.stop = () => {
@@ -143,25 +149,26 @@ const vimeo = {
                 return currentTime;
             },
             set(time) {
-                // Get current paused state
-                // Vimeo will automatically play on seek
-                const { paused } = player.media;
+                // Vimeo will automatically play on seek if the video hasn't been played before
 
-                // Set seeking flag
-                player.media.seeking = true;
+                // Get current paused state and volume etc
+                const { embed, media, paused, volume } = player;
 
-                // Trigger seeking
-                utils.dispatchEvent.call(player, player.media, 'seeking');
+                // Set seeking state and trigger event
+                media.seeking = true;
+                utils.dispatchEvent.call(player, media, 'seeking');
 
-                // Seek after events
-                player.embed.setCurrentTime(time).catch(() => {
-                    // Do nothing
-                });
-
-                // Restore pause state
-                if (paused) {
-                    player.pause();
-                }
+                // If paused, mute until seek is complete
+                Promise.resolve(paused && embed.setVolume(0))
+                    // Seek
+                    .then(() => embed.setCurrentTime(time))
+                    // Restore paused
+                    .then(() => paused && embed.pause())
+                    // Restore volume
+                    .then(() => paused && embed.setVolume(volume))
+                    .catch(() => {
+                        // Do nothing
+                    });
             },
         });
 
@@ -315,17 +322,12 @@ const vimeo = {
         });
 
         player.embed.on('play', () => {
-            // Only fire play if paused before
-            if (player.media.paused) {
-                utils.dispatchEvent.call(player, player.media, 'play');
-            }
-            player.media.paused = false;
+            assurePlaybackState.call(player, true);
             utils.dispatchEvent.call(player, player.media, 'playing');
         });
 
         player.embed.on('pause', () => {
-            player.media.paused = true;
-            utils.dispatchEvent.call(player, player.media, 'pause');
+            assurePlaybackState.call(player, false);
         });
 
         player.embed.on('timeupdate', data => {
@@ -356,7 +358,6 @@ const vimeo = {
         player.embed.on('seeked', () => {
             player.media.seeking = false;
             utils.dispatchEvent.call(player, player.media, 'seeked');
-            utils.dispatchEvent.call(player, player.media, 'play');
         });
 
         player.embed.on('ended', () => {

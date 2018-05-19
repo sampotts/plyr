@@ -481,6 +481,7 @@ const controls = {
                 // Video playing
                 case 'timeupdate':
                 case 'seeking':
+                case 'seeked':
                     value = utils.getPercentage(this.currentTime, this.duration);
 
                     // Set seek range value only if it's a 'natural' time event
@@ -601,9 +602,10 @@ const controls = {
         controls.updateProgress.call(this, event);
     },
 
-    // Show the duration on metadataloaded
+    // Show the duration on metadataloaded or durationchange events
     durationUpdate() {
-        if (!this.supported.ui) {
+        // Bail if no ui or durationchange event triggered after playing/seek when invertTime is false
+        if (!this.supported.ui || (!this.config.invertTime && this.currentTime)) {
             return;
         }
 
