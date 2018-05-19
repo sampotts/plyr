@@ -539,7 +539,7 @@ const controls = {
 
         // Calculate percentage
         let percent = 0;
-        const clientRect = this.elements.inputs.seek.getBoundingClientRect();
+        const clientRect = this.elements.progress.getBoundingClientRect();
         const visible = `${this.config.classNames.tooltip}--visible`;
 
         const toggle = toggle => {
