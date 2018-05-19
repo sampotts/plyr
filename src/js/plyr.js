@@ -55,6 +55,7 @@ class Plyr {
         this.config = utils.extend(
             {},
             defaults,
+            Plyr.defaults,
             options || {},
             (() => {
                 try {
@@ -1268,5 +1269,7 @@ class Plyr {
         return targets.map(t => new Plyr(t, options));
     }
 }
+
+Plyr.defaults = utils.cloneDeep(defaults);
 
 export default Plyr;
