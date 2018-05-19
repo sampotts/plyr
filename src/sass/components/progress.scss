@@ -6,10 +6,15 @@
     display: flex;
     flex: 1;
     position: relative;
+    margin-right: $plyr-range-thumb-height;
+    left: $plyr-range-thumb-height / 2;
 
     input[type='range'] {
         position: relative;
         z-index: 2;
+        // Offset the range thumb in order to be able to calculate the relative progress (#954)
+        width: calc(100% + #{$plyr-range-thumb-height}) !important;
+        margin: 0 -#{$plyr-range-thumb-height / 2} !important;
     }
 
     // Seek tooltip to show time
