@@ -550,15 +550,34 @@ class Listeners {
         });
 
         // Set range input alternative "value", which matches the tooltip time (#954)
-        on(
-            this.player.elements.inputs.seek,
-            'mousedown mousemove',
-            event => {
-                const clientRect = this.player.elements.progress.getBoundingClientRect();
-                const percent = 100 / clientRect.width * (event.pageX - clientRect.left);
-                event.currentTarget.setAttribute('seekNext', percent);
+        on(this.player.elements.inputs.seek, 'mousedown mousemove', event => {
+            const clientRect = this.player.elements.progress.getBoundingClientRect();
+            const percent = 100 / clientRect.width * (event.pageX - clientRect.left);
+            event.currentTarget.setAttribute('seek', percent);
+        });
+
+        // Pause while seeking
+        on(this.player.elements.inputs.seek, 'mousedown mouseup keydown keyup touchstart touchend', event => {
+            const seek = event.currentTarget;
+
+            // Was playing before?
+            const play = seek.hasAttribute('play-on-seeked');
+
+            // Done seeking
+            const done = [
+                'mouseup',
+                'touchend',
+                'keyup',
+            ].includes(event.type);
+
+            if (play && done) {
+                seek.removeAttribute('play-on-seeked');
+                this.player.play();
+            } else if (!done && this.player.playing) {
+                seek.setAttribute('play-on-seeked', '');
+                this.player.pause();
             }
-        );
+        });
 
         // Seek
         on(
@@ -566,12 +585,16 @@ class Listeners {
             inputEvent,
             event => {
                 const seek = event.currentTarget;
+
                 // If it exists, use seekNext instead of "value" for consistency with tooltip time (#954)
-                let seekTo = seek.getAttribute('seekNext');
+                let seekTo = seek.getAttribute('seek');
+
                 if (utils.is.empty(seekTo)) {
                     seekTo = seek.value;
                 }
-                seek.removeAttribute('seekNext');
+
+                seek.removeAttribute('seek');
+
                 this.player.currentTime = seekTo / seek.max * this.player.duration;
             },
             'seek',
