@@ -553,7 +553,7 @@ class Listeners {
         on(this.player.elements.inputs.seek, 'mousedown mousemove', event => {
             const clientRect = this.player.elements.progress.getBoundingClientRect();
             const percent = 100 / clientRect.width * (event.pageX - clientRect.left);
-            event.currentTarget.setAttribute('seek', percent);
+            event.currentTarget.setAttribute('seek-value', percent);
         });
 
         // Pause while seeking
@@ -570,6 +570,7 @@ class Listeners {
                 'keyup',
             ].includes(event.type);
 
+            // If we're done seeking and it was playing, resume playback
             if (play && done) {
                 seek.removeAttribute('play-on-seeked');
                 this.player.play();
@@ -586,14 +587,14 @@ class Listeners {
             event => {
                 const seek = event.currentTarget;
 
-                // If it exists, use seekNext instead of "value" for consistency with tooltip time (#954)
-                let seekTo = seek.getAttribute('seek');
+                // If it exists, use seek-value instead of "value" for consistency with tooltip time (#954)
+                let seekTo = seek.getAttribute('seek-value');
 
                 if (utils.is.empty(seekTo)) {
                     seekTo = seek.value;
                 }
 
-                seek.removeAttribute('seek');
+                seek.removeAttribute('seek-value');
 
                 this.player.currentTime = seekTo / seek.max * this.player.duration;
             },
