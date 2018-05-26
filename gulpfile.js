@@ -241,11 +241,11 @@ if (Object.keys(aws).includes('cdn') && Object.keys(aws).includes('demo')) {
     const branch = {
         current: gitbranch.sync(),
         master: 'master',
-        beta: 'beta',
+        develop: 'develop',
     };
     const allowed = [
         branch.master,
-        branch.beta,
+        branch.develop,
     ];
 
     const maxAge = 31536000; // 1 year
@@ -257,7 +257,7 @@ if (Object.keys(aws).includes('cdn') && Object.keys(aws).includes('demo')) {
             },
         },
         demo: {
-            uploadPath: branch.current === branch.beta ? 'beta/' : null,
+            uploadPath: branch.current === branch.develop ? 'beta/' : null,
             headers: {
                 'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
                 Vary: 'Accept-Encoding',

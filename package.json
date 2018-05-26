@@ -1,6 +1,6 @@
 {
     "name": "plyr",
-    "version": "3.3.7",
+    "version": "3.3.8",
     "description": "A simple, accessible and customizable HTML5, YouTube and Vimeo media player",
     "homepage": "https://plyr.io",
     "main": "./dist/plyr.js",
@@ -52,15 +52,7 @@
         "stylelint-scss": "^3.1.0",
         "stylelint-selector-bem-pattern": "^2.0.0"
     },
-    "keywords": [
-        "HTML5 Video",
-        "HTML5 Audio",
-        "Media Player",
-        "DASH",
-        "Shaka",
-        "WordPress",
-        "HLS"
-    ],
+    "keywords": ["HTML5 Video", "HTML5 Audio", "Media Player", "DASH", "Shaka", "WordPress", "HLS"],
     "repository": {
         "type": "git",
         "url": "git://github.com/sampotts/plyr.git"

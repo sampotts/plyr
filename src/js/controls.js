@@ -1165,7 +1165,6 @@ const controls = {
                 const tooltip = utils.createElement(
                     'span',
                     {
-                        role: 'tooltip',
                         class: this.config.classNames.tooltip,
                     },
                     '00:00',
