@@ -64,6 +64,14 @@ function mapQualityUnits(levels) {
     return utils.dedupe(levels.map(level => mapQualityUnit(level)));
 }
 
+// Set playback state and trigger change (only on actual change)
+function assurePlaybackState(play) {
+    if (this.media.paused === play) {
+        this.media.paused = !play;
+        utils.dispatchEvent.call(this, this.media, play ? 'play' : 'pause');
+    }
+}
+
 const youtube = {
     setup() {
         // Add embed class for responsive
@@ -162,7 +170,19 @@ const youtube = {
         player.media = utils.replaceElement(container, player.media);
 
         // Set poster image
-        player.media.setAttribute('poster', utils.format(player.config.urls.youtube.poster, videoId));
+        const posterSrc = format => `https://img.youtube.com/vi/${videoId}/${format}default.jpg`;
+
+        // Check thumbnail images in order of quality, but reject fallback thumbnails (120px wide)
+        utils.loadImage(posterSrc('maxres'), 121) // Higest quality and unpadded
+            .catch(() => utils.loadImage(posterSrc('sd'), 121)) // 480p padded 4:3
+            .catch(() => utils.loadImage(posterSrc('hq'))) // 360p padded 4:3. Always exists
+            .then(image => ui.setPoster.call(player, image.src))
+            .then(posterSrc => {
+                // If the image is padded, use background-size "cover" instead (like youtube does too with their posters)
+                if (!posterSrc.includes('maxres')) {
+                    player.elements.poster.style.backgroundSize = 'cover';
+                }
+            });
 
         // Setup instance
         // https://developers.google.com/youtube/iframe_api_reference
@@ -252,10 +272,12 @@ const youtube = {
 
                     // Create a faux HTML5 API using the YouTube API
                     player.media.play = () => {
+                        assurePlaybackState.call(player, true);
                         instance.playVideo();
                     };
 
                     player.media.pause = () => {
+                        assurePlaybackState.call(player, false);
                         instance.pauseVideo();
                     };
 
@@ -273,22 +295,17 @@ const youtube = {
                             return Number(instance.getCurrentTime());
                         },
                         set(time) {
-                            // Vimeo will automatically play on seek
-                            const { paused } = player.media;
+                            // If paused, mute audio preventively (YouTube starts playing on seek if the video hasn't been played yet).
+                            if (player.paused) {
+                                player.embed.mute();
+                            }
 
-                            // Set seeking flag
+                            // Set seeking state and trigger event
                             player.media.seeking = true;
-
-                            // Trigger seeking
                             utils.dispatchEvent.call(player, player.media, 'seeking');
 
                             // Seek after events sent
                             instance.seekTo(time);
-
-                            // Restore pause state
-                            if (paused) {
-                                player.pause();
-                            }
                         },
                     });
 
@@ -407,6 +424,17 @@ const youtube = {
                     // Reset timer
                     clearInterval(player.timers.playing);
 
+                    const seeked = player.media.seeking && [
+                        1,
+                        2,
+                    ].includes(event.data);
+
+                    if (seeked) {
+                        // Unset seeking and fire seeked event
+                        player.media.seeking = false;
+                        utils.dispatchEvent.call(player, player.media, 'seeked');
+                    }
+
                     // Handle events
                     // -1   Unstarted
                     // 0    Ended
@@ -426,7 +454,7 @@ const youtube = {
                             break;
 
                         case 0:
-                            player.media.paused = true;
+                            assurePlaybackState.call(player, false);
 
                             // YouTube doesn't support loop for a single video, so mimick it.
                             if (player.media.loop) {
@@ -440,42 +468,39 @@ const youtube = {
                             break;
 
                         case 1:
-                            // If we were seeking, fire seeked event
-                            if (player.media.seeking) {
-                                utils.dispatchEvent.call(player, player.media, 'seeked');
-                            }
-                            player.media.seeking = false;
-
-                            // Only fire play if paused before
+                            // Restore paused state (YouTube starts playing on seek if the video hasn't been played yet)
                             if (player.media.paused) {
-                                utils.dispatchEvent.call(player, player.media, 'play');
+                                player.media.pause();
+                            } else {
+                                assurePlaybackState.call(player, true);
+
+                                utils.dispatchEvent.call(player, player.media, 'playing');
+
+                                // Poll to get playback progress
+                                player.timers.playing = setInterval(() => {
+                                    utils.dispatchEvent.call(player, player.media, 'timeupdate');
+                                }, 50);
+
+                                // Check duration again due to YouTube bug
+                                // https://github.com/sampotts/plyr/issues/374
+                                // https://code.google.com/p/gdata-issues/issues/detail?id=8690
+                                if (player.media.duration !== instance.getDuration()) {
+                                    player.media.duration = instance.getDuration();
+                                    utils.dispatchEvent.call(player, player.media, 'durationchange');
+                                }
+
+                                // Get quality
+                                controls.setQualityMenu.call(player, mapQualityUnits(instance.getAvailableQualityLevels()));
                             }
-                            player.media.paused = false;
-
-                            utils.dispatchEvent.call(player, player.media, 'playing');
-
-                            // Poll to get playback progress
-                            player.timers.playing = setInterval(() => {
-                                utils.dispatchEvent.call(player, player.media, 'timeupdate');
-                            }, 50);
-
-                            // Check duration again due to YouTube bug
-                            // https://github.com/sampotts/plyr/issues/374
-                            // https://code.google.com/p/gdata-issues/issues/detail?id=8690
-                            if (player.media.duration !== instance.getDuration()) {
-                                player.media.duration = instance.getDuration();
-                                utils.dispatchEvent.call(player, player.media, 'durationchange');
-                            }
-
-                            // Get quality
-                            controls.setQualityMenu.call(player, mapQualityUnits(instance.getAvailableQualityLevels()));
 
                             break;
 
                         case 2:
-                            player.media.paused = true;
-
-                            utils.dispatchEvent.call(player, player.media, 'pause');
+                            // Restore audio (YouTube starts playing on seek if the video hasn't been played yet)
+                            if (!player.muted) {
+                                player.embed.unMute();
+                            }
+                            assurePlaybackState.call(player, false);
 
                             break;
 

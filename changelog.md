@@ -1,3 +1,15 @@
+# v3.3.8
+
+*   Added missing URL polyfill
+*   Pause while seeking to mimic default HTML5 behaviour
+*   Add 'seeked' event listener to update progress (fixes #966)
+*   Trigger seeked event in youtube plugin if either playing or paused (fixes #921)
+*   Fix for YouTube and Vimeo autoplays on seek (fixes #876)
+*   Toggle controls improvements
+*   Cleanup unused code
+*   Poster image loading improvements
+*   Fix for seek tooltip vs click accuracy
+
 # v3.3.7
 
 *   Poster fixes (thanks @friday)

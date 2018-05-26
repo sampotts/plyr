@@ -56,7 +56,7 @@ const defaults = {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.3.7/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.3.8/plyr.svg',
 
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
@@ -199,7 +199,6 @@ const defaults = {
         youtube: {
             sdk: 'https://www.youtube.com/iframe_api',
             api: 'https://www.googleapis.com/youtube/v3/videos?id={0}&key={1}&fields=items(snippet(title))&part=snippet',
-            poster: 'https://img.youtube.com/vi/{0}/maxresdefault.jpg,https://img.youtube.com/vi/{0}/hqdefault.jpg',
         },
         googleIMA: {
             sdk: 'https://imasdk.googleapis.com/js/sdkloader/ima3.js',
@@ -332,13 +331,13 @@ const defaults = {
         embed: 'plyr__video-embed',
         embedContainer: 'plyr__video-embed__container',
         poster: 'plyr__poster',
+        posterEnabled: 'plyr__poster-enabled',
         ads: 'plyr__ads',
         control: 'plyr__control',
         playing: 'plyr--playing',
         paused: 'plyr--paused',
         stopped: 'plyr--stopped',
         loading: 'plyr--loading',
-        error: 'plyr--has-error',
         hover: 'plyr--hover',
         tooltip: 'plyr__tooltip',
         cues: 'plyr__cues',

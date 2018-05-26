@@ -238,19 +238,42 @@ class Listeners {
             }, 0);
         });
 
-        // Toggle controls visibility based on mouse movement
-        if (this.player.config.hideControls) {
-            // Toggle controls on mouse events and entering fullscreen
-            utils.on(this.player.elements.container, 'mouseenter mouseleave mousemove touchstart touchend touchmove enterfullscreen exitfullscreen', event => {
-                this.player.toggleControls(event);
-            });
-        }
+        // Toggle controls on mouse events and entering fullscreen
+        utils.on(this.player.elements.container, 'mousemove mouseleave touchstart touchmove enterfullscreen exitfullscreen', event => {
+            const { controls } = this.player.elements;
+
+            // Remove button states for fullscreen
+            if (event.type === 'enterfullscreen') {
+                controls.pressed = false;
+                controls.hover = false;
+            }
+
+            // Show, then hide after a timeout unless another control event occurs
+            const show = [
+                'touchstart',
+                'touchmove',
+                'mousemove',
+            ].includes(event.type);
+
+            let delay = 0;
+
+            if (show) {
+                ui.toggleControls.call(this.player, true);
+                // Use longer timeout for touch devices
+                delay = this.player.touch ? 3000 : 2000;
+            }
+
+            // Clear timer
+            clearTimeout(this.player.timers.controls);
+            // Timer to prevent flicker when seeking
+            this.player.timers.controls = setTimeout(() => ui.toggleControls.call(this.player, false), delay);
+        });
     }
 
     // Listen for media events
     media() {
         // Time change on media
-        utils.on(this.player.media, 'timeupdate seeking', event => controls.timeUpdate.call(this.player, event));
+        utils.on(this.player.media, 'timeupdate seeking seeked', event => controls.timeUpdate.call(this.player, event));
 
         // Display duration
         utils.on(this.player.media, 'durationchange loadeddata loadedmetadata', event => controls.durationUpdate.call(this.player, event));
@@ -272,7 +295,7 @@ class Listeners {
         });
 
         // Check for buffer progress
-        utils.on(this.player.media, 'progress playing', event => controls.updateProgress.call(this.player, event));
+        utils.on(this.player.media, 'progress playing seeking seeked', event => controls.updateProgress.call(this.player, event));
 
         // Handle volume changes
         utils.on(this.player.media, 'volumechange', event => controls.updateVolume.call(this.player, event));
@@ -282,9 +305,6 @@ class Listeners {
 
         // Loading state
         utils.on(this.player.media, 'waiting canplay seeked playing', event => ui.checkLoading.call(this.player, event));
-
-        // Check if media failed to load
-        // utils.on(this.player.media, 'play', event => ui.checkFailed.call(this.player, event));
 
         // If autoplay, then load advertisement if required
         // TODO: Show some sort of loading state while the ad manager loads else there's a delay before ad shows
@@ -530,15 +550,35 @@ class Listeners {
         });
 
         // Set range input alternative "value", which matches the tooltip time (#954)
-        on(
-            this.player.elements.inputs.seek,
-            'mousedown mousemove',
-            event => {
-                const clientRect = this.player.elements.progress.getBoundingClientRect();
-                const percent = 100 / clientRect.width * (event.pageX - clientRect.left);
-                event.currentTarget.setAttribute('seekNext', percent);
+        on(this.player.elements.inputs.seek, 'mousedown mousemove', event => {
+            const clientRect = this.player.elements.progress.getBoundingClientRect();
+            const percent = 100 / clientRect.width * (event.pageX - clientRect.left);
+            event.currentTarget.setAttribute('seek-value', percent);
+        });
+
+        // Pause while seeking
+        on(this.player.elements.inputs.seek, 'mousedown mouseup keydown keyup touchstart touchend', event => {
+            const seek = event.currentTarget;
+
+            // Was playing before?
+            const play = seek.hasAttribute('play-on-seeked');
+
+            // Done seeking
+            const done = [
+                'mouseup',
+                'touchend',
+                'keyup',
+            ].includes(event.type);
+
+            // If we're done seeking and it was playing, resume playback
+            if (play && done) {
+                seek.removeAttribute('play-on-seeked');
+                this.player.play();
+            } else if (!done && this.player.playing) {
+                seek.setAttribute('play-on-seeked', '');
+                this.player.pause();
             }
-        );
+        });
 
         // Seek
         on(
@@ -546,12 +586,16 @@ class Listeners {
             inputEvent,
             event => {
                 const seek = event.currentTarget;
-                // If it exists, use seekNext instead of "value" for consistency with tooltip time (#954)
-                let seekTo = seek.getAttribute('seekNext');
+
+                // If it exists, use seek-value instead of "value" for consistency with tooltip time (#954)
+                let seekTo = seek.getAttribute('seek-value');
+
                 if (utils.is.empty(seekTo)) {
                     seekTo = seek.value;
                 }
-                seek.removeAttribute('seekNext');
+
+                seek.removeAttribute('seek-value');
+
                 this.player.currentTime = seekTo / seek.max * this.player.duration;
             },
             'seek',
@@ -592,26 +636,45 @@ class Listeners {
         // Seek tooltip
         on(this.player.elements.progress, 'mouseenter mouseleave mousemove', event => controls.updateSeekTooltip.call(this.player, event));
 
-        // Toggle controls visibility based on mouse movement
-        if (this.player.config.hideControls) {
-            // Watch for cursor over controls so they don't hide when trying to interact
-            on(this.player.elements.controls, 'mouseenter mouseleave', event => {
-                this.player.elements.controls.hover = !this.player.touch && event.type === 'mouseenter';
-            });
+        // Update controls.hover state (used for ui.toggleControls to avoid hiding when interacting)
+        on(this.player.elements.controls, 'mouseenter mouseleave', event => {
+            this.player.elements.controls.hover = !this.player.touch && event.type === 'mouseenter';
+        });
 
-            // Watch for cursor over controls so they don't hide when trying to interact
-            on(this.player.elements.controls, 'mousedown mouseup touchstart touchend touchcancel', event => {
-                this.player.elements.controls.pressed = [
-                    'mousedown',
-                    'touchstart',
-                ].includes(event.type);
-            });
+        // Update controls.pressed state (used for ui.toggleControls to avoid hiding when interacting)
+        on(this.player.elements.controls, 'mousedown mouseup touchstart touchend touchcancel', event => {
+            this.player.elements.controls.pressed = [
+                'mousedown',
+                'touchstart',
+            ].includes(event.type);
+        });
 
-            // Focus in/out on controls
-            on(this.player.elements.controls, 'focusin focusout', event => {
-                this.player.toggleControls(event);
-            });
-        }
+        // Focus in/out on controls
+        on(this.player.elements.controls, 'focusin focusout', event => {
+            const { config, elements, timers } = this.player;
+
+            // Skip transition to prevent focus from scrolling the parent element
+            utils.toggleClass(elements.controls, config.classNames.noTransition, event.type === 'focusin');
+
+            // Toggle
+            ui.toggleControls.call(this.player, event.type === 'focusin');
+
+            // If focusin, hide again after delay
+            if (event.type === 'focusin') {
+                // Restore transition
+                setTimeout(() => {
+                    utils.toggleClass(elements.controls, config.classNames.noTransition, false);
+                }, 0);
+
+                // Delay a little more for keyboard users
+                const delay = this.touch ? 3000 : 4000;
+
+                // Clear timer
+                clearTimeout(timers.controls);
+                // Hide
+                timers.controls = setTimeout(() => ui.toggleControls.call(this.player, false), delay);
+            }
+        });
 
         // Mouse wheel for volume
         on(
