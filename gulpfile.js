@@ -12,6 +12,8 @@ const concat = require('gulp-concat');
 const filter = require('gulp-filter');
 const sass = require('gulp-sass');
 const cleancss = require('gulp-clean-css');
+const postcss = require('gulp-postcss');
+const customprops = require('postcss-custom-properties');
 const run = require('run-sequence');
 const header = require('gulp-header');
 const prefix = require('gulp-autoprefixer');
@@ -171,6 +173,7 @@ const build = {
                     .on('error', gutil.log)
                     .pipe(concat(key))
                     .pipe(prefix(browsers, { cascade: false }))
+                    .pipe(postcss([customprops()]))
                     .pipe(cleancss())
                     .pipe(size(sizeOptions))
                     .pipe(gulp.dest(paths[bundle].output)),

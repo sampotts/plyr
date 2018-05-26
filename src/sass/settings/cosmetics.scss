@@ -3,3 +3,5 @@
 // ==========================================================================
 
 $plyr-tab-focus-default-color: $plyr-color-main !default;
+
+@include css-vars((--plyr-tab-focus-default-color: $plyr-tab-focus-default-color));

@@ -16,7 +16,7 @@ $plyr-range-track-height: 6px !default;
 $plyr-range-max-height: ($plyr-range-thumb-active-shadow-width * 2) + $plyr-range-thumb-height !default;
 
 // Fill
-$plyr-range-fill-bg: $plyr-color-main !default;
+$plyr-range-fill-bg: var(--plyr-color-main);
 
 // Type specific
 $plyr-video-range-track-bg: $plyr-video-progress-buffered-bg !default;

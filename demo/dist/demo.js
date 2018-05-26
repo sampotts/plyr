@@ -1,4 +1,4 @@
-(function () {
+typeof navigator === "object" && (function () {
 'use strict';
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
@@ -97,7 +97,7 @@ function isObject(what) {
 // Yanked from https://git.io/vS8DV re-used under CC0
 // with some tiny modifications
 function isError(value) {
-  switch ({}.toString.call(value)) {
+  switch (Object.prototype.toString.call(value)) {
     case '[object Error]':
       return true;
     case '[object Exception]':
@@ -110,7 +110,15 @@ function isError(value) {
 }
 
 function isErrorEvent(value) {
-  return supportsErrorEvent() && {}.toString.call(value) === '[object ErrorEvent]';
+  return Object.prototype.toString.call(value) === '[object ErrorEvent]';
+}
+
+function isDOMError(value) {
+  return Object.prototype.toString.call(value) === '[object DOMError]';
+}
+
+function isDOMException(value) {
+  return Object.prototype.toString.call(value) === '[object DOMException]';
 }
 
 function isUndefined(what) {
@@ -147,6 +155,24 @@ function isEmptyObject(what) {
 function supportsErrorEvent() {
   try {
     new ErrorEvent(''); // eslint-disable-line no-new
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function supportsDOMError() {
+  try {
+    new DOMError(''); // eslint-disable-line no-new
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function supportsDOMException() {
+  try {
+    new DOMException(''); // eslint-disable-line no-new
     return true;
   } catch (e) {
     return false;
@@ -668,6 +694,8 @@ var utils = {
   isObject: isObject,
   isError: isError,
   isErrorEvent: isErrorEvent,
+  isDOMError: isDOMError,
+  isDOMException: isDOMException,
   isUndefined: isUndefined,
   isFunction: isFunction,
   isPlainObject: isPlainObject,
@@ -675,6 +703,8 @@ var utils = {
   isArray: isArray,
   isEmptyObject: isEmptyObject,
   supportsErrorEvent: supportsErrorEvent,
+  supportsDOMError: supportsDOMError,
+  supportsDOMException: supportsDOMException,
   supportsFetch: supportsFetch,
   supportsReferrerPolicy: supportsReferrerPolicy,
   supportsPromiseRejectionEvent: supportsPromiseRejectionEvent,
@@ -729,8 +759,22 @@ var ERROR_TYPES_RE = /^(?:[Uu]ncaught (?:exception: )?)?(?:((?:Eval|Internal|Ran
 
 function getLocationHref() {
   if (typeof document === 'undefined' || document.location == null) return '';
-
   return document.location.href;
+}
+
+function getLocationOrigin() {
+  if (typeof document === 'undefined' || document.location == null) return '';
+
+  // Oh dear IE10...
+  if (!document.location.origin) {
+    document.location.origin =
+      document.location.protocol +
+      '//' +
+      document.location.hostname +
+      (document.location.port ? ':' + document.location.port : '');
+  }
+
+  return document.location.origin;
 }
 
 /**
@@ -1138,6 +1182,44 @@ TraceKit.computeStackTrace = (function computeStackTraceWrapper() {
 
       if (!element.func && element.line) {
         element.func = UNKNOWN_FUNCTION;
+      }
+
+      if (element.url && element.url.substr(0, 5) === 'blob:') {
+        // Special case for handling JavaScript loaded into a blob.
+        // We use a synchronous AJAX request here as a blob is already in
+        // memory - it's not making a network request.  This will generate a warning
+        // in the browser console, but there has already been an error so that's not
+        // that much of an issue.
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', element.url, false);
+        xhr.send(null);
+
+        // If we failed to download the source, skip this patch
+        if (xhr.status === 200) {
+          var source = xhr.responseText || '';
+
+          // We trim the source down to the last 300 characters as sourceMappingURL is always at the end of the file.
+          // Why 300? To be in line with: https://github.com/getsentry/sentry/blob/4af29e8f2350e20c28a6933354e4f42437b4ba42/src/sentry/lang/javascript/processor.py#L164-L175
+          source = source.slice(-300);
+
+          // Now we dig out the source map URL
+          var sourceMaps = source.match(/\/\/# sourceMappingURL=(.*)$/);
+
+          // If we don't find a source map comment or we find more than one, continue on to the next element.
+          if (sourceMaps) {
+            var sourceMapAddress = sourceMaps[1];
+
+            // Now we check to see if it's a relative URL.
+            // If it is, convert it to an absolute one.
+            if (sourceMapAddress.charAt(0) === '~') {
+              sourceMapAddress = getLocationOrigin() + sourceMapAddress.slice(1);
+            }
+
+            // Now we strip the '.map' off of the end of the URL and update the
+            // element so that Sentry can match the map to the blob.
+            element.url = sourceMapAddress.slice(0, -4);
+          }
+        }
       }
 
       stack.push(element);
@@ -1651,10 +1733,12 @@ var console$1 = {
 
 
 
+var isErrorEvent$1 = utils.isErrorEvent;
+var isDOMError$1 = utils.isDOMError;
+var isDOMException$1 = utils.isDOMException;
 var isError$1 = utils.isError;
 var isObject$1 = utils.isObject;
 var isPlainObject$1 = utils.isPlainObject;
-var isErrorEvent$1 = utils.isErrorEvent;
 var isUndefined$1 = utils.isUndefined;
 var isFunction$1 = utils.isFunction;
 var isString$1 = utils.isString;
@@ -1782,7 +1866,7 @@ Raven.prototype = {
   // webpack (using a build step causes webpack #1617). Grunt verifies that
   // this value matches package.json during build.
   //   See: https://github.com/getsentry/raven-js/issues/465
-  VERSION: '3.24.2',
+  VERSION: '3.25.2',
 
   debug: false,
 
@@ -2114,6 +2198,23 @@ Raven.prototype = {
     if (isErrorEvent$1(ex) && ex.error) {
       // If it is an ErrorEvent with `error` property, extract it to get actual Error
       ex = ex.error;
+    } else if (isDOMError$1(ex) || isDOMException$1(ex)) {
+      // If it is a DOMError or DOMException (which are legacy APIs, but still supported in some browsers)
+      // then we just extract the name and message, as they don't provide anything else
+      // https://developer.mozilla.org/en-US/docs/Web/API/DOMError
+      // https://developer.mozilla.org/en-US/docs/Web/API/DOMException
+      var name = ex.name || (isDOMError$1(ex) ? 'DOMError' : 'DOMException');
+      var message = ex.message ? name + ': ' + ex.message : name;
+
+      return this.captureMessage(
+        message,
+        objectMerge$1(options, {
+          // neither DOMError or DOMException provide stack trace and we most likely wont get it this way as well
+          // but it's barely any overhead so we may at least try
+          stacktrace: true,
+          trimHeadFrames: options.trimHeadFrames + 1
+        })
+      );
     } else if (isError$1(ex)) {
       // we have a real Error object
       ex = ex;
@@ -2125,6 +2226,7 @@ Raven.prototype = {
       ex = new Error(options.message);
     } else {
       // If none of previous checks were valid, then it means that
+      // it's not a DOMError/DOMException
       // it's not a plain Object
       // it's not a valid ErrorEvent (one with an error property)
       // it's not an Error
@@ -3073,8 +3175,8 @@ Raven.prototype = {
     var hasPushAndReplaceState =
       !isChromePackagedApp &&
       _window$2.history &&
-      history.pushState &&
-      history.replaceState;
+      _window$2.history.pushState &&
+      _window$2.history.replaceState;
     if (autoBreadcrumbs.location && hasPushAndReplaceState) {
       // TODO: remove onpopstate handler on uninstall()
       var oldOnPopState = _window$2.onpopstate;
@@ -3103,8 +3205,8 @@ Raven.prototype = {
         };
       };
 
-      fill$1(history, 'pushState', historyReplacementFunction, wrappedBuiltIns);
-      fill$1(history, 'replaceState', historyReplacementFunction, wrappedBuiltIns);
+      fill$1(_window$2.history, 'pushState', historyReplacementFunction, wrappedBuiltIns);
+      fill$1(_window$2.history, 'replaceState', historyReplacementFunction, wrappedBuiltIns);
     }
 
     if (autoBreadcrumbs.console && 'console' in _window$2 && console.log) {
@@ -3320,7 +3422,7 @@ Raven.prototype = {
             }
           ]
         },
-        culprit: fileurl
+        transaction: fileurl
       },
       options
     );
@@ -3394,7 +3496,7 @@ Raven.prototype = {
 
     if (this._hasNavigator && _navigator.userAgent) {
       httpData.headers = {
-        'User-Agent': navigator.userAgent
+        'User-Agent': _navigator.userAgent
       };
     }
 
@@ -3435,7 +3537,7 @@ Raven.prototype = {
     if (
       !last ||
       current.message !== last.message || // defined for captureMessage
-      current.culprit !== last.culprit // defined for captureException/onerror
+      current.transaction !== last.transaction // defined for captureException/onerror
     )
       return false;
 

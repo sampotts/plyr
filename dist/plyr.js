@@ -1,4 +1,4 @@
-(function (global, factory) {
+typeof navigator === "object" && (function (global, factory) {
 	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
 	typeof define === 'function' && define.amd ? define('Plyr', factory) :
 	(global.Plyr = factory());
@@ -602,6 +602,24 @@ var utils = {
     },
 
 
+    // Load image avoiding xhr/fetch CORS issues
+    // Server status can't be obtained this way unfortunately, so this uses "naturalWidth" to determine if the image has loaded.
+    // By default it checks if it is at least 1px, but you can add a second argument to change this.
+    loadImage: function loadImage(src) {
+        var minWidth = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+
+        return new Promise(function (resolve, reject) {
+            var image = new Image();
+            var handler = function handler() {
+                delete image.onload;
+                delete image.onerror;
+                (image.naturalWidth >= minWidth ? resolve : reject)(image);
+            };
+            Object.assign(image, { onload: handler, onerror: handler, src: src });
+        });
+    },
+
+
     // Load an external script
     loadScript: function loadScript(url) {
         return new Promise(function (resolve, reject) {
@@ -730,7 +748,7 @@ var utils = {
 
         // Add text node
         if (utils.is.string(text)) {
-            element.textContent = text;
+            element.innerText = text;
         }
 
         // Return built element
@@ -884,14 +902,16 @@ var utils = {
     },
 
 
-    // Toggle class on an element
-    toggleClass: function toggleClass(element, className, toggle) {
+    // Mirror Element.classList.toggle, with IE compatibility for "force" argument
+    toggleClass: function toggleClass(element, className, force) {
         if (utils.is.element(element)) {
-            var contains = element.classList.contains(className);
+            var method = 'toggle';
+            if (typeof force !== 'undefined') {
+                method = force ? 'add' : 'remove';
+            }
 
-            element.classList[toggle ? 'add' : 'remove'](className);
-
-            return toggle && !contains || !toggle && contains;
+            element.classList[method](className);
+            return element.classList.contains(className);
         }
 
         return null;
@@ -1271,6 +1291,12 @@ var utils = {
         return array.filter(function (item, index) {
             return array.indexOf(item) === index;
         });
+    },
+
+
+    // Clone nested objects
+    cloneDeep: function cloneDeep(object) {
+        return JSON.parse(JSON.stringify(object));
     },
 
 
@@ -2093,7 +2119,7 @@ var controls = {
                     break;
             }
 
-            progress.textContent = '% ' + suffix.toLowerCase();
+            progress.innerText = '% ' + suffix.toLowerCase();
         }
 
         this.elements.display[type] = progress;
@@ -2167,7 +2193,7 @@ var controls = {
         var forceHours = utils.getHours(this.duration) > 0;
 
         // eslint-disable-next-line no-param-reassign
-        target.textContent = utils.formatTime(time, forceHours, inverted);
+        target.innerText = utils.formatTime(time, forceHours, inverted);
     },
 
 
@@ -2236,6 +2262,7 @@ var controls = {
                 // Video playing
                 case 'timeupdate':
                 case 'seeking':
+                case 'seeked':
                     value = utils.getPercentage(this.currentTime, this.duration);
 
                     // Set seek range value only if it's a 'natural' time event
@@ -2293,7 +2320,7 @@ var controls = {
 
         // Calculate percentage
         var percent = 0;
-        var clientRect = this.elements.inputs.seek.getBoundingClientRect();
+        var clientRect = this.elements.progress.getBoundingClientRect();
         var visible = this.config.classNames.tooltip + '--visible';
 
         var toggle = function toggle(_toggle) {
@@ -2354,9 +2381,10 @@ var controls = {
     },
 
 
-    // Show the duration on metadataloaded
+    // Show the duration on metadataloaded or durationchange events
     durationUpdate: function durationUpdate() {
-        if (!this.supported.ui) {
+        // Bail if no ui or durationchange event triggered after playing/seek when invertTime is false
+        if (!this.supported.ui || !this.config.invertTime && this.currentTime) {
             return;
         }
 
@@ -3471,7 +3499,7 @@ var captions = {
 
             // Set the span content
             if (utils.is.string(caption)) {
-                content.textContent = caption.trim();
+                content.innerText = caption.trim();
             } else {
                 content.appendChild(caption);
             }
@@ -3709,8 +3737,7 @@ var defaults$1 = {
         },
         youtube: {
             sdk: 'https://www.youtube.com/iframe_api',
-            api: 'https://www.googleapis.com/youtube/v3/videos?id={0}&key={1}&fields=items(snippet(title))&part=snippet',
-            poster: 'https://img.youtube.com/vi/{0}/maxresdefault.jpg,https://img.youtube.com/vi/{0}/hqdefault.jpg'
+            api: 'https://www.googleapis.com/youtube/v3/videos?id={0}&key={1}&fields=items(snippet(title))&part=snippet'
         },
         googleIMA: {
             sdk: 'https://imasdk.googleapis.com/js/sdkloader/ima3.js'
@@ -3806,13 +3833,13 @@ var defaults$1 = {
         embed: 'plyr__video-embed',
         embedContainer: 'plyr__video-embed__container',
         poster: 'plyr__poster',
+        posterEnabled: 'plyr__poster-enabled',
         ads: 'plyr__ads',
         control: 'plyr__control',
         playing: 'plyr--playing',
         paused: 'plyr--paused',
         stopped: 'plyr--stopped',
         loading: 'plyr--loading',
-        error: 'plyr--has-error',
         hover: 'plyr--hover',
         tooltip: 'plyr__tooltip',
         cues: 'plyr__cues',
@@ -4207,8 +4234,10 @@ var ui = {
         // Set the title
         ui.setTitle.call(this);
 
-        // Set the poster image
-        ui.setPoster.call(this);
+        // Assure the poster image is set, if the property was added before the element was created
+        if (this.poster && this.elements.poster && !this.elements.poster.style.backgroundImage) {
+            ui.setPoster.call(this, this.poster);
+        }
     },
 
 
@@ -4250,17 +4279,43 @@ var ui = {
     },
 
 
-    // Set the poster image
-    setPoster: function setPoster() {
-        if (!utils.is.element(this.elements.poster) || utils.is.empty(this.poster)) {
-            return;
+    // Toggle poster
+    togglePoster: function togglePoster(enable) {
+        utils.toggleClass(this.elements.container, this.config.classNames.posterEnabled, enable);
+    },
+
+
+    // Set the poster image (async)
+    setPoster: function setPoster(poster) {
+        var _this2 = this;
+
+        // Set property regardless of validity
+        this.media.setAttribute('poster', poster);
+
+        // Bail if element is missing
+        if (!utils.is.element(this.elements.poster)) {
+            return Promise.reject();
         }
 
-        // Set the inline style
-        var posters = this.poster.split(',');
-        this.elements.poster.style.backgroundImage = posters.map(function (p) {
-            return 'url(\'' + p + '\')';
-        }).join(',');
+        // Load the image, and set poster if successful
+        var loadPromise = utils.loadImage(poster).then(function () {
+            _this2.elements.poster.style.backgroundImage = 'url(\'' + poster + '\')';
+            Object.assign(_this2.elements.poster.style, {
+                backgroundImage: 'url(\'' + poster + '\')',
+                // Reset backgroundSize as well (since it can be set to "cover" for padded thumbnails for youtube)
+                backgroundSize: ''
+            });
+            ui.togglePoster.call(_this2, true);
+            return poster;
+        });
+
+        // Hide the element if the poster can't be loaded (otherwise it will just be a black element covering the video)
+        loadPromise.catch(function () {
+            return ui.togglePoster.call(_this2, false);
+        });
+
+        // Return the promise so the caller can use it as well
+        return loadPromise;
     },
 
 
@@ -4280,13 +4335,13 @@ var ui = {
         }
 
         // Toggle controls
-        this.toggleControls(!this.playing);
+        ui.toggleControls.call(this);
     },
 
 
     // Check if media is loading
     checkLoading: function checkLoading(event) {
-        var _this2 = this;
+        var _this3 = this;
 
         this.loading = ['stalled', 'waiting'].includes(event.type);
 
@@ -4295,38 +4350,24 @@ var ui = {
 
         // Timer to prevent flicker when seeking
         this.timers.loading = setTimeout(function () {
-            // Toggle container class hook
-            utils.toggleClass(_this2.elements.container, _this2.config.classNames.loading, _this2.loading);
+            // Update progress bar loading class state
+            utils.toggleClass(_this3.elements.container, _this3.config.classNames.loading, _this3.loading);
 
-            // Show controls if loading, hide if done
-            _this2.toggleControls(_this2.loading);
+            // Update controls visibility
+            ui.toggleControls.call(_this3);
         }, this.loading ? 250 : 0);
     },
 
 
-    // Check if media failed to load
-    checkFailed: function checkFailed() {
-        var _this3 = this;
+    // Toggle controls based on state and `force` argument
+    toggleControls: function toggleControls(force) {
+        var controls$$1 = this.elements.controls;
 
-        // https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/networkState
-        this.failed = this.media.networkState === 3;
 
-        if (this.failed) {
-            utils.toggleClass(this.elements.container, this.config.classNames.loading, false);
-            utils.toggleClass(this.elements.container, this.config.classNames.error, true);
+        if (controls$$1 && this.config.hideControls) {
+            // Show controls if force, loading, paused, or button interaction, otherwise hide
+            this.toggleControls(Boolean(force || this.loading || this.paused || controls$$1.pressed || controls$$1.hover));
         }
-
-        // Clear timer
-        clearTimeout(this.timers.failed);
-
-        // Timer to prevent flicker when seeking
-        this.timers.loading = setTimeout(function () {
-            // Toggle container class hook
-            utils.toggleClass(_this3.elements.container, _this3.config.classNames.loading, _this3.loading);
-
-            // Show controls if loading, hide if done
-            _this3.toggleControls(_this3.loading);
-        }, this.loading ? 250 : 0);
     }
 };
 
@@ -4564,13 +4605,35 @@ var Listeners = function () {
                 }, 0);
             });
 
-            // Toggle controls visibility based on mouse movement
-            if (this.player.config.hideControls) {
-                // Toggle controls on mouse events and entering fullscreen
-                utils.on(this.player.elements.container, 'mouseenter mouseleave mousemove touchstart touchend touchmove enterfullscreen exitfullscreen', function (event) {
-                    _this2.player.toggleControls(event);
-                });
-            }
+            // Toggle controls on mouse events and entering fullscreen
+            utils.on(this.player.elements.container, 'mousemove mouseleave touchstart touchmove enterfullscreen exitfullscreen', function (event) {
+                var controls$$1 = _this2.player.elements.controls;
+
+                // Remove button states for fullscreen
+
+                if (event.type === 'enterfullscreen') {
+                    controls$$1.pressed = false;
+                    controls$$1.hover = false;
+                }
+
+                // Show, then hide after a timeout unless another control event occurs
+                var show = ['touchstart', 'touchmove', 'mousemove'].includes(event.type);
+
+                var delay = 0;
+
+                if (show) {
+                    ui.toggleControls.call(_this2.player, true);
+                    // Use longer timeout for touch devices
+                    delay = _this2.player.touch ? 3000 : 2000;
+                }
+
+                // Clear timer
+                clearTimeout(_this2.player.timers.controls);
+                // Timer to prevent flicker when seeking
+                _this2.player.timers.controls = setTimeout(function () {
+                    return ui.toggleControls.call(_this2.player, false);
+                }, delay);
+            });
         }
 
         // Listen for media events
@@ -4581,7 +4644,7 @@ var Listeners = function () {
             var _this3 = this;
 
             // Time change on media
-            utils.on(this.player.media, 'timeupdate seeking', function (event) {
+            utils.on(this.player.media, 'timeupdate seeking seeked', function (event) {
                 return controls.timeUpdate.call(_this3.player, event);
             });
 
@@ -4607,7 +4670,7 @@ var Listeners = function () {
             });
 
             // Check for buffer progress
-            utils.on(this.player.media, 'progress playing', function (event) {
+            utils.on(this.player.media, 'progress playing seeking seeked', function (event) {
                 return controls.updateProgress.call(_this3.player, event);
             });
 
@@ -4625,9 +4688,6 @@ var Listeners = function () {
             utils.on(this.player.media, 'waiting canplay seeked playing', function (event) {
                 return ui.checkLoading.call(_this3.player, event);
             });
-
-            // Check if media failed to load
-            // utils.on(this.player.media, 'play', event => ui.checkFailed.call(this.player, event));
 
             // If autoplay, then load advertisement if required
             // TODO: Show some sort of loading state while the ad manager loads else there's a delay before ad shows
@@ -4850,9 +4910,47 @@ var Listeners = function () {
                 }
             });
 
+            // Set range input alternative "value", which matches the tooltip time (#954)
+            on(this.player.elements.inputs.seek, 'mousedown mousemove', function (event) {
+                var clientRect = _this4.player.elements.progress.getBoundingClientRect();
+                var percent = 100 / clientRect.width * (event.pageX - clientRect.left);
+                event.currentTarget.setAttribute('seek-value', percent);
+            });
+
+            // Pause while seeking
+            on(this.player.elements.inputs.seek, 'mousedown mouseup keydown keyup touchstart touchend', function (event) {
+                var seek = event.currentTarget;
+
+                // Was playing before?
+                var play = seek.hasAttribute('play-on-seeked');
+
+                // Done seeking
+                var done = ['mouseup', 'touchend', 'keyup'].includes(event.type);
+
+                // If we're done seeking and it was playing, resume playback
+                if (play && done) {
+                    seek.removeAttribute('play-on-seeked');
+                    _this4.player.play();
+                } else if (!done && _this4.player.playing) {
+                    seek.setAttribute('play-on-seeked', '');
+                    _this4.player.pause();
+                }
+            });
+
             // Seek
             on(this.player.elements.inputs.seek, inputEvent, function (event) {
-                _this4.player.currentTime = event.target.value / event.target.max * _this4.player.duration;
+                var seek = event.currentTarget;
+
+                // If it exists, use seek-value instead of "value" for consistency with tooltip time (#954)
+                var seekTo = seek.getAttribute('seek-value');
+
+                if (utils.is.empty(seekTo)) {
+                    seekTo = seek.value;
+                }
+
+                seek.removeAttribute('seek-value');
+
+                _this4.player.currentTime = seekTo / seek.max * _this4.player.duration;
             }, 'seek');
 
             // Current time invert
@@ -4887,23 +4985,48 @@ var Listeners = function () {
                 return controls.updateSeekTooltip.call(_this4.player, event);
             });
 
-            // Toggle controls visibility based on mouse movement
-            if (this.player.config.hideControls) {
-                // Watch for cursor over controls so they don't hide when trying to interact
-                on(this.player.elements.controls, 'mouseenter mouseleave', function (event) {
-                    _this4.player.elements.controls.hover = !_this4.player.touch && event.type === 'mouseenter';
-                });
+            // Update controls.hover state (used for ui.toggleControls to avoid hiding when interacting)
+            on(this.player.elements.controls, 'mouseenter mouseleave', function (event) {
+                _this4.player.elements.controls.hover = !_this4.player.touch && event.type === 'mouseenter';
+            });
 
-                // Watch for cursor over controls so they don't hide when trying to interact
-                on(this.player.elements.controls, 'mousedown mouseup touchstart touchend touchcancel', function (event) {
-                    _this4.player.elements.controls.pressed = ['mousedown', 'touchstart'].includes(event.type);
-                });
+            // Update controls.pressed state (used for ui.toggleControls to avoid hiding when interacting)
+            on(this.player.elements.controls, 'mousedown mouseup touchstart touchend touchcancel', function (event) {
+                _this4.player.elements.controls.pressed = ['mousedown', 'touchstart'].includes(event.type);
+            });
 
-                // Focus in/out on controls
-                on(this.player.elements.controls, 'focusin focusout', function (event) {
-                    _this4.player.toggleControls(event);
-                });
-            }
+            // Focus in/out on controls
+            on(this.player.elements.controls, 'focusin focusout', function (event) {
+                var _player = _this4.player,
+                    config = _player.config,
+                    elements = _player.elements,
+                    timers = _player.timers;
+
+                // Skip transition to prevent focus from scrolling the parent element
+
+                utils.toggleClass(elements.controls, config.classNames.noTransition, event.type === 'focusin');
+
+                // Toggle
+                ui.toggleControls.call(_this4.player, event.type === 'focusin');
+
+                // If focusin, hide again after delay
+                if (event.type === 'focusin') {
+                    // Restore transition
+                    setTimeout(function () {
+                        utils.toggleClass(elements.controls, config.classNames.noTransition, false);
+                    }, 0);
+
+                    // Delay a little more for keyboard users
+                    var delay = _this4.touch ? 3000 : 4000;
+
+                    // Clear timer
+                    clearTimeout(timers.controls);
+                    // Hide
+                    timers.controls = setTimeout(function () {
+                        return ui.toggleControls.call(_this4.player, false);
+                    }, delay);
+                }
+            });
 
             // Mouse wheel for volume
             on(this.player.elements.inputs.volume, 'wheel', function (event) {
@@ -4954,6 +5077,14 @@ var Listeners = function () {
 }();
 
 // ==========================================================================
+
+// Set playback state and trigger change (only on actual change)
+function assurePlaybackState(play) {
+    if (this.media.paused === play) {
+        this.media.paused = !play;
+        utils.dispatchEvent.call(this, this.media, play ? 'play' : 'pause');
+    }
+}
 
 var vimeo = {
     setup: function setup() {
@@ -5050,11 +5181,8 @@ var vimeo = {
             // Get original image
             url.pathname = url.pathname.split('_')[0] + '.jpg';
 
-            // Set attribute
-            player.media.setAttribute('poster', url.href);
-
-            // Update
-            ui.setPoster.call(player);
+            // Set and show poster
+            ui.setPoster.call(player, url.href);
         });
 
         // Setup instance
@@ -5074,15 +5202,13 @@ var vimeo = {
 
         // Create a faux HTML5 API using the Vimeo API
         player.media.play = function () {
-            player.embed.play().then(function () {
-                player.media.paused = false;
-            });
+            assurePlaybackState.call(player, true);
+            return player.embed.play();
         };
 
         player.media.pause = function () {
-            player.embed.pause().then(function () {
-                player.media.paused = true;
-            });
+            assurePlaybackState.call(player, false);
+            return player.embed.pause();
         };
 
         player.media.stop = function () {
@@ -5098,26 +5224,35 @@ var vimeo = {
                 return currentTime;
             },
             set: function set(time) {
-                // Get current paused state
-                // Vimeo will automatically play on seek
-                var paused = player.media.paused;
+                // Vimeo will automatically play on seek if the video hasn't been played before
 
-                // Set seeking flag
+                // Get current paused state and volume etc
+                var embed = player.embed,
+                    media = player.media,
+                    paused = player.paused,
+                    volume = player.volume;
 
-                player.media.seeking = true;
+                // Set seeking state and trigger event
 
-                // Trigger seeking
-                utils.dispatchEvent.call(player, player.media, 'seeking');
+                media.seeking = true;
+                utils.dispatchEvent.call(player, media, 'seeking');
 
-                // Seek after events
-                player.embed.setCurrentTime(time).catch(function () {
+                // If paused, mute until seek is complete
+                Promise.resolve(paused && embed.setVolume(0))
+                // Seek
+                .then(function () {
+                    return embed.setCurrentTime(time);
+                })
+                // Restore paused
+                .then(function () {
+                    return paused && embed.pause();
+                })
+                // Restore volume
+                .then(function () {
+                    return paused && embed.setVolume(volume);
+                }).catch(function () {
                     // Do nothing
                 });
-
-                // Restore pause state
-                if (paused) {
-                    player.pause();
-                }
             }
         });
 
@@ -5265,17 +5400,12 @@ var vimeo = {
         });
 
         player.embed.on('play', function () {
-            // Only fire play if paused before
-            if (player.media.paused) {
-                utils.dispatchEvent.call(player, player.media, 'play');
-            }
-            player.media.paused = false;
+            assurePlaybackState.call(player, true);
             utils.dispatchEvent.call(player, player.media, 'playing');
         });
 
         player.embed.on('pause', function () {
-            player.media.paused = true;
-            utils.dispatchEvent.call(player, player.media, 'pause');
+            assurePlaybackState.call(player, false);
         });
 
         player.embed.on('timeupdate', function (data) {
@@ -5306,7 +5436,6 @@ var vimeo = {
         player.embed.on('seeked', function () {
             player.media.seeking = false;
             utils.dispatchEvent.call(player, player.media, 'seeked');
-            utils.dispatchEvent.call(player, player.media, 'play');
         });
 
         player.embed.on('ended', function () {
@@ -5386,6 +5515,14 @@ function mapQualityUnits(levels) {
     return utils.dedupe(levels.map(function (level) {
         return mapQualityUnit(level);
     }));
+}
+
+// Set playback state and trigger change (only on actual change)
+function assurePlaybackState$1(play) {
+    if (this.media.paused === play) {
+        this.media.paused = !play;
+        utils.dispatchEvent.call(this, this.media, play ? 'play' : 'pause');
+    }
 }
 
 var youtube = {
@@ -5491,7 +5628,26 @@ var youtube = {
         player.media = utils.replaceElement(container, player.media);
 
         // Set poster image
-        player.media.setAttribute('poster', utils.format(player.config.urls.youtube.poster, videoId));
+        var posterSrc = function posterSrc(format) {
+            return 'https://img.youtube.com/vi/' + videoId + '/' + format + 'default.jpg';
+        };
+
+        // Check thumbnail images in order of quality, but reject fallback thumbnails (120px wide)
+        utils.loadImage(posterSrc('maxres'), 121) // Higest quality and unpadded
+        .catch(function () {
+            return utils.loadImage(posterSrc('sd'), 121);
+        }) // 480p padded 4:3
+        .catch(function () {
+            return utils.loadImage(posterSrc('hq'));
+        }) // 360p padded 4:3. Always exists
+        .then(function (image) {
+            return ui.setPoster.call(player, image.src);
+        }).then(function (posterSrc) {
+            // If the image is padded, use background-size "cover" instead (like youtube does too with their posters)
+            if (!posterSrc.includes('maxres')) {
+                player.elements.poster.style.backgroundSize = 'cover';
+            }
+        });
 
         // Setup instance
         // https://developers.google.com/youtube/iframe_api_reference
@@ -5578,10 +5734,12 @@ var youtube = {
 
                     // Create a faux HTML5 API using the YouTube API
                     player.media.play = function () {
+                        assurePlaybackState$1.call(player, true);
                         instance.playVideo();
                     };
 
                     player.media.pause = function () {
+                        assurePlaybackState$1.call(player, false);
                         instance.pauseVideo();
                     };
 
@@ -5599,23 +5757,17 @@ var youtube = {
                             return Number(instance.getCurrentTime());
                         },
                         set: function set(time) {
-                            // Vimeo will automatically play on seek
-                            var paused = player.media.paused;
+                            // If paused, mute audio preventively (YouTube starts playing on seek if the video hasn't been played yet).
+                            if (player.paused) {
+                                player.embed.mute();
+                            }
 
-                            // Set seeking flag
-
+                            // Set seeking state and trigger event
                             player.media.seeking = true;
-
-                            // Trigger seeking
                             utils.dispatchEvent.call(player, player.media, 'seeking');
 
                             // Seek after events sent
                             instance.seekTo(time);
-
-                            // Restore pause state
-                            if (paused) {
-                                player.pause();
-                            }
                         }
                     });
 
@@ -5738,6 +5890,14 @@ var youtube = {
                     // Reset timer
                     clearInterval(player.timers.playing);
 
+                    var seeked = player.media.seeking && [1, 2].includes(event.data);
+
+                    if (seeked) {
+                        // Unset seeking and fire seeked event
+                        player.media.seeking = false;
+                        utils.dispatchEvent.call(player, player.media, 'seeked');
+                    }
+
                     // Handle events
                     // -1   Unstarted
                     // 0    Ended
@@ -5757,7 +5917,7 @@ var youtube = {
                             break;
 
                         case 0:
-                            player.media.paused = true;
+                            assurePlaybackState$1.call(player, false);
 
                             // YouTube doesn't support loop for a single video, so mimick it.
                             if (player.media.loop) {
@@ -5771,42 +5931,39 @@ var youtube = {
                             break;
 
                         case 1:
-                            // If we were seeking, fire seeked event
-                            if (player.media.seeking) {
-                                utils.dispatchEvent.call(player, player.media, 'seeked');
-                            }
-                            player.media.seeking = false;
-
-                            // Only fire play if paused before
+                            // Restore paused state (YouTube starts playing on seek if the video hasn't been played yet)
                             if (player.media.paused) {
-                                utils.dispatchEvent.call(player, player.media, 'play');
+                                player.media.pause();
+                            } else {
+                                assurePlaybackState$1.call(player, true);
+
+                                utils.dispatchEvent.call(player, player.media, 'playing');
+
+                                // Poll to get playback progress
+                                player.timers.playing = setInterval(function () {
+                                    utils.dispatchEvent.call(player, player.media, 'timeupdate');
+                                }, 50);
+
+                                // Check duration again due to YouTube bug
+                                // https://github.com/sampotts/plyr/issues/374
+                                // https://code.google.com/p/gdata-issues/issues/detail?id=8690
+                                if (player.media.duration !== instance.getDuration()) {
+                                    player.media.duration = instance.getDuration();
+                                    utils.dispatchEvent.call(player, player.media, 'durationchange');
+                                }
+
+                                // Get quality
+                                controls.setQualityMenu.call(player, mapQualityUnits(instance.getAvailableQualityLevels()));
                             }
-                            player.media.paused = false;
-
-                            utils.dispatchEvent.call(player, player.media, 'playing');
-
-                            // Poll to get playback progress
-                            player.timers.playing = setInterval(function () {
-                                utils.dispatchEvent.call(player, player.media, 'timeupdate');
-                            }, 50);
-
-                            // Check duration again due to YouTube bug
-                            // https://github.com/sampotts/plyr/issues/374
-                            // https://code.google.com/p/gdata-issues/issues/detail?id=8690
-                            if (player.media.duration !== instance.getDuration()) {
-                                player.media.duration = instance.getDuration();
-                                utils.dispatchEvent.call(player, player.media, 'durationchange');
-                            }
-
-                            // Get quality
-                            controls.setQualityMenu.call(player, mapQualityUnits(instance.getAvailableQualityLevels()));
 
                             break;
 
                         case 2:
-                            player.media.paused = true;
-
-                            utils.dispatchEvent.call(player, player.media, 'pause');
+                            // Restore audio (YouTube starts playing on seek if the video hasn't been played yet)
+                            if (!player.muted) {
+                                player.embed.unMute();
+                            }
+                            assurePlaybackState$1.call(player, false);
 
                             break;
 
@@ -6740,7 +6897,7 @@ var Plyr = function () {
         }
 
         // Set config
-        this.config = utils.extend({}, defaults$1, options || {}, function () {
+        this.config = utils.extend({}, defaults$1, Plyr.defaults, options || {}, function () {
             try {
                 return JSON.parse(_this.media.getAttribute('data-plyr-config'));
             } catch (e) {
@@ -7180,114 +7337,35 @@ var Plyr = function () {
 
         /**
          * Toggle the player controls
-         * @param {boolean} toggle - Whether to show the controls
+         * @param {boolean} [toggle] - Whether to show the controls
          */
 
     }, {
         key: 'toggleControls',
         value: function toggleControls(toggle) {
-            var _this2 = this;
+            // Don't toggle if missing UI support or if it's audio
+            if (this.supported.ui && !this.isAudio) {
+                // Get state before change
+                var isHidden = utils.hasClass(this.elements.container, this.config.classNames.hideControls);
 
-            // We need controls of course...
-            if (!utils.is.element(this.elements.controls)) {
-                return;
-            }
+                // Negate the argument if not undefined since adding the class to hides the controls
+                var force = typeof toggle === 'undefined' ? undefined : !toggle;
 
-            // Don't hide if no UI support or it's audio
-            if (!this.supported.ui || this.isAudio) {
-                return;
-            }
+                // Apply and get updated state
+                var hiding = utils.toggleClass(this.elements.container, this.config.classNames.hideControls, force);
 
-            var delay = 0;
-            var show = toggle;
-            var isEnterFullscreen = false;
-
-            // Get toggle state if not set
-            if (!utils.is.boolean(toggle)) {
-                if (utils.is.event(toggle)) {
-                    // Is the enter fullscreen event
-                    isEnterFullscreen = toggle.type === 'enterfullscreen';
-
-                    // Events that show the controls
-                    var showEvents = ['touchstart', 'touchmove', 'mouseenter', 'mousemove', 'focusin'];
-
-                    // Events that delay hiding
-                    var delayEvents = ['touchmove', 'touchend', 'mousemove'];
-
-                    // Whether to show controls
-                    show = showEvents.includes(toggle.type);
-
-                    // Delay hiding on move events
-                    if (delayEvents.includes(toggle.type)) {
-                        delay = 2000;
-                    }
-
-                    // Delay a little more for keyboard users
-                    if (!this.touch && toggle.type === 'focusin') {
-                        delay = 3000;
-                        utils.toggleClass(this.elements.controls, this.config.classNames.noTransition, true);
-                    }
-                } else {
-                    show = utils.hasClass(this.elements.container, this.config.classNames.hideControls);
+                // Close menu
+                if (hiding && this.config.controls.includes('settings') && !utils.is.empty(this.config.settings)) {
+                    controls.toggleMenu.call(this, false);
                 }
-            }
-
-            // Clear timer on every call
-            clearTimeout(this.timers.controls);
-
-            // If the mouse is not over the controls, set a timeout to hide them
-            if (show || this.paused || this.loading) {
-                // Check if controls toggled
-                var toggled = utils.toggleClass(this.elements.container, this.config.classNames.hideControls, false);
-
-                // Trigger event
-                if (toggled) {
-                    utils.dispatchEvent.call(this, this.media, 'controlsshown');
+                // Trigger event on change
+                if (hiding !== isHidden) {
+                    var eventName = hiding ? 'controlshidden' : 'controlsshown';
+                    utils.dispatchEvent.call(this, this.media, eventName);
                 }
-
-                // Always show controls when paused or if touch
-                if (this.paused || this.loading) {
-                    return;
-                }
-
-                // Delay for hiding on touch
-                if (this.touch) {
-                    delay = 3000;
-                }
+                return !hiding;
             }
-
-            // If toggle is false or if we're playing (regardless of toggle),
-            // then set the timer to hide the controls
-            if (!show || this.playing) {
-                this.timers.controls = setTimeout(function () {
-                    // We need controls of course...
-                    if (!utils.is.element(_this2.elements.controls)) {
-                        return;
-                    }
-
-                    // If the mouse is over the controls (and not entering fullscreen), bail
-                    if ((_this2.elements.controls.pressed || _this2.elements.controls.hover) && !isEnterFullscreen) {
-                        return;
-                    }
-
-                    // Restore transition behaviour
-                    if (!utils.hasClass(_this2.elements.container, _this2.config.classNames.hideControls)) {
-                        utils.toggleClass(_this2.elements.controls, _this2.config.classNames.noTransition, false);
-                    }
-
-                    // Set hideControls class
-                    var toggled = utils.toggleClass(_this2.elements.container, _this2.config.classNames.hideControls, _this2.config.hideControls);
-
-                    // Trigger event and close menu
-                    if (toggled) {
-                        utils.dispatchEvent.call(_this2, _this2.media, 'controlshidden');
-
-                        if (_this2.config.controls.includes('settings') && !utils.is.empty(_this2.config.settings)) {
-                            controls.toggleMenu.call(_this2, false);
-                        }
-                    }
-                }, delay);
-            }
+            return false;
         }
 
         /**
@@ -7325,7 +7403,7 @@ var Plyr = function () {
     }, {
         key: 'destroy',
         value: function destroy(callback) {
-            var _this3 = this;
+            var _this2 = this;
 
             var soft = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
@@ -7338,22 +7416,22 @@ var Plyr = function () {
                 document.body.style.overflow = '';
 
                 // GC for embed
-                _this3.embed = null;
+                _this2.embed = null;
 
                 // If it's a soft destroy, make minimal changes
                 if (soft) {
-                    if (Object.keys(_this3.elements).length) {
+                    if (Object.keys(_this2.elements).length) {
                         // Remove elements
-                        utils.removeElement(_this3.elements.buttons.play);
-                        utils.removeElement(_this3.elements.captions);
-                        utils.removeElement(_this3.elements.controls);
-                        utils.removeElement(_this3.elements.wrapper);
+                        utils.removeElement(_this2.elements.buttons.play);
+                        utils.removeElement(_this2.elements.captions);
+                        utils.removeElement(_this2.elements.controls);
+                        utils.removeElement(_this2.elements.wrapper);
 
                         // Clear for GC
-                        _this3.elements.buttons.play = null;
-                        _this3.elements.captions = null;
-                        _this3.elements.controls = null;
-                        _this3.elements.wrapper = null;
+                        _this2.elements.buttons.play = null;
+                        _this2.elements.captions = null;
+                        _this2.elements.controls = null;
+                        _this2.elements.wrapper = null;
                     }
 
                     // Callback
@@ -7362,26 +7440,26 @@ var Plyr = function () {
                     }
                 } else {
                     // Unbind listeners
-                    _this3.listeners.clear();
+                    _this2.listeners.clear();
 
                     // Replace the container with the original element provided
-                    utils.replaceElement(_this3.elements.original, _this3.elements.container);
+                    utils.replaceElement(_this2.elements.original, _this2.elements.container);
 
                     // Event
-                    utils.dispatchEvent.call(_this3, _this3.elements.original, 'destroyed', true);
+                    utils.dispatchEvent.call(_this2, _this2.elements.original, 'destroyed', true);
 
                     // Callback
                     if (utils.is.function(callback)) {
-                        callback.call(_this3.elements.original);
+                        callback.call(_this2.elements.original);
                     }
 
                     // Reset state
-                    _this3.ready = false;
+                    _this2.ready = false;
 
                     // Clear for garbage collection
                     setTimeout(function () {
-                        _this3.elements = null;
-                        _this3.media = null;
+                        _this2.elements = null;
+                        _this2.media = null;
                     }, 200);
                 }
             };
@@ -7900,10 +7978,7 @@ var Plyr = function () {
                 return;
             }
 
-            if (utils.is.string(input)) {
-                this.media.setAttribute('poster', input);
-                ui.setPoster.call(this);
-            }
+            ui.setPoster.call(this, input);
         }
 
         /**
@@ -8083,6 +8158,8 @@ var Plyr = function () {
     }]);
     return Plyr;
 }();
+
+Plyr.defaults = utils.cloneDeep(defaults$1);
 
 return Plyr;
 
