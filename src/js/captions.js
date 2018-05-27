@@ -83,6 +83,11 @@ const captions = {
         // Set toggled state
         this.toggleCaptions(active);
 
+        // Watch changes to textTracks and update captions menu
+        if (this.config.captions.update) {
+            utils.on(this.media.textTracks, 'change', captions.update.bind(this));
+        }
+
         // Update available languages in list
         captions.update.call(this);
     },
