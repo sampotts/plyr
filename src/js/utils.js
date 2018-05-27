@@ -44,7 +44,7 @@ const utils = {
             return this.instanceof(input, Event);
         },
         cue(input) {
-            return this.instanceof(input, TextTrackCue) || this.instanceof(input, VTTCue);
+            return this.instanceof(input, window.TextTrackCue) || this.instanceof(input, window.VTTCue);
         },
         track(input) {
             return this.instanceof(input, TextTrack) || (!this.nullOrUndefined(input) && this.string(input.kind));
