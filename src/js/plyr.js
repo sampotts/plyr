@@ -432,21 +432,16 @@ class Plyr {
      * @param {number} input - where to seek to in seconds. Defaults to 0 (the start)
      */
     set currentTime(input) {
-        let targetTime = 0;
-
-        if (utils.is.number(input)) {
-            targetTime = input;
+        // Bail if media duration isn't available yet
+        if (!this.duration) {
+            return;
         }
 
-        // Normalise targetTime
-        if (targetTime < 0) {
-            targetTime = 0;
-        } else if (targetTime > this.duration) {
-            targetTime = this.duration;
-        }
+        // Validate input
+        const inputIsValid = utils.is.number(input) && input > 0;
 
         // Set
-        this.media.currentTime = targetTime;
+        this.media.currentTime = inputIsValid ? Math.min(input, this.duration) : 0;
 
         // Logging
         this.debug.log(`Seeking to ${this.currentTime} seconds`);
