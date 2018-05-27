@@ -494,11 +494,11 @@ class Plyr {
         // Faux duration set via config
         const fauxDuration = parseFloat(this.config.duration);
 
-        // True duration
-        const realDuration = this.media ? Number(this.media.duration) : 0;
+        // Media duration can be NaN before the media has loaded
+        const duration = (this.media || {}).duration || 0;
 
-        // If custom duration is funky, use regular duration
-        return !Number.isNaN(fauxDuration) ? fauxDuration : realDuration;
+        // If config duration is funky, use regular duration
+        return fauxDuration || duration;
     }
 
     /**
