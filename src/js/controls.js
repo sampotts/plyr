@@ -883,12 +883,9 @@ const controls = {
                 'language',
                 track.label,
                 track.language !== 'enabled' ? controls.createBadge.call(this, track.language.toUpperCase()) : null,
-                track.language.toLowerCase() === this.captions.language.toLowerCase(),
+                track.language.toLowerCase() === this.language,
             );
         });
-
-        // Store reference
-        this.options.captions = tracks.map(track => track.language);
 
         controls.updateSetting.call(this, type, list);
     },

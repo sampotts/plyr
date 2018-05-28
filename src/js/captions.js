@@ -16,17 +16,6 @@ const captions = {
             return;
         }
 
-        // Set default language if not set
-        const stored = this.storage.get('language');
-
-        if (!utils.is.empty(stored)) {
-            this.captions.language = stored;
-        }
-
-        if (utils.is.empty(this.captions.language)) {
-            this.captions.language = this.config.captions.language.toLowerCase();
-        }
-
         // Only Vimeo and HTML5 video supported at this point
         if (!this.isVideo || this.isYouTube || (this.isHTML5 && !support.textTracks)) {
             // Clear menu and hide
@@ -93,8 +82,14 @@ const captions = {
     },
 
     update() {
-        // Set language
-        captions.setLanguage.call(this);
+        // Update tracks
+        const tracks = captions.getTracks.call(this);
+        this.options.captions = tracks.map(({language}) => language);
+
+        // Set language if it hasn't been set already
+        if (!this.language) {
+            this.language = this.storage.get('language') || (this.config.captions.language || '').toLowerCase();
+        }
 
         // Toggle the class hooks
         utils.toggleClass(this.elements.container, this.config.classNames.captions.enabled, !utils.is.empty(captions.getTracks.call(this)));
