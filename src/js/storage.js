@@ -31,7 +31,7 @@ class Storage {
     }
 
     get(key) {
-        if (!Storage.supported) {
+        if (!Storage.supported || !this.enabled) {
             return null;
         }
 
