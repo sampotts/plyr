@@ -74,7 +74,7 @@ const captions = {
 
         // Watch changes to textTracks and update captions menu
         if (this.config.captions.update) {
-            utils.on(this.media.textTracks, 'change', captions.update.bind(this));
+            utils.on(this.media.textTracks, 'addtrack removetrack', captions.update.bind(this));
         }
 
         // Update available languages in list
