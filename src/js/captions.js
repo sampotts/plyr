@@ -88,7 +88,11 @@ const captions = {
 
         // Set language if it hasn't been set already
         if (!this.language) {
-            this.language = this.storage.get('language') || (this.config.captions.language || '').toLowerCase();
+            let { language } = this.config.captions;
+            if (language === 'auto') {
+                [ language ] = (navigator.language || navigator.userLanguage).split('-');
+            }
+            this.language = this.storage.get('language') || (language || '').toLowerCase();
         }
 
         // Toggle the class hooks
