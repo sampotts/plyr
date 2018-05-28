@@ -407,7 +407,7 @@ var Storage = function () {
     createClass(Storage, [{
         key: 'get',
         value: function get$$1(key) {
-            if (!Storage.supported) {
+            if (!Storage.supported || !this.enabled) {
                 return null;
             }
 
@@ -526,7 +526,7 @@ var utils = {
             return this.instanceof(input, Event);
         },
         cue: function cue(input) {
-            return this.instanceof(input, TextTrackCue) || this.instanceof(input, VTTCue);
+            return this.instanceof(input, window.TextTrackCue) || this.instanceof(input, window.VTTCue);
         },
         track: function track(input) {
             return this.instanceof(input, TextTrack) || !this.nullOrUndefined(input) && this.string(input.kind);
@@ -3628,7 +3628,7 @@ var defaults$1 = {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.3.8/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.3.9/plyr.svg',
 
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
@@ -7599,21 +7599,16 @@ var Plyr = function () {
     }, {
         key: 'currentTime',
         set: function set$$1(input) {
-            var targetTime = 0;
-
-            if (utils.is.number(input)) {
-                targetTime = input;
+            // Bail if media duration isn't available yet
+            if (!this.duration) {
+                return;
             }
 
-            // Normalise targetTime
-            if (targetTime < 0) {
-                targetTime = 0;
-            } else if (targetTime > this.duration) {
-                targetTime = this.duration;
-            }
+            // Validate input
+            var inputIsValid = utils.is.number(input) && input > 0;
 
             // Set
-            this.media.currentTime = targetTime;
+            this.media.currentTime = inputIsValid ? Math.min(input, this.duration) : 0;
 
             // Logging
             this.debug.log('Seeking to ' + this.currentTime + ' seconds');
@@ -7672,11 +7667,11 @@ var Plyr = function () {
             // Faux duration set via config
             var fauxDuration = parseFloat(this.config.duration);
 
-            // True duration
-            var realDuration = this.media ? Number(this.media.duration) : 0;
+            // Media duration can be NaN before the media has loaded
+            var duration = (this.media || {}).duration || 0;
 
-            // If custom duration is funky, use regular duration
-            return !Number.isNaN(fauxDuration) ? fauxDuration : realDuration;
+            // If config duration is funky, use regular duration
+            return fauxDuration || duration;
         }
 
         /**
