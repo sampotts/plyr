@@ -77,8 +77,8 @@ const captions = {
             utils.on(this.media.textTracks, 'addtrack removetrack', captions.update.bind(this));
         }
 
-        // Update available languages in list
-        captions.update.call(this);
+        // Update available languages in list next tick (the event must not be triggered before the listeners)
+        setTimeout(captions.update.bind(this), 0);
     },
 
     update() {
