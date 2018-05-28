@@ -572,28 +572,6 @@ const utils = {
         element.dispatchEvent(event);
     },
 
-    // Toggle aria-pressed state on a toggle button
-    // http://www.ssbbartgroup.com/blog/how-not-to-misuse-aria-states-properties-and-roles
-    toggleState(element, input) {
-        // If multiple elements passed
-        if (utils.is.array(element) || utils.is.nodeList(element)) {
-            Array.from(element).forEach(target => utils.toggleState(target, input));
-            return;
-        }
-
-        // Bail if no target
-        if (!utils.is.element(element)) {
-            return;
-        }
-
-        // Get state
-        const pressed = element.getAttribute('aria-pressed') === 'true';
-        const state = utils.is.boolean(input) ? input : !pressed;
-
-        // Set the attribute on target
-        element.setAttribute('aria-pressed', state);
-    },
-
     // Format string
     format(input, ...args) {
         if (utils.is.empty(input)) {

@@ -243,9 +243,6 @@ const controls = {
             // Label/Tooltip
             button.appendChild(controls.createLabel.call(this, labelPressed, { class: 'label--pressed' }));
             button.appendChild(controls.createLabel.call(this, label, { class: 'label--not-pressed' }));
-
-            // Add aria attributes
-            attributes['aria-pressed'] = false;
         } else {
             button.appendChild(controls.createIcon.call(this, icon));
             button.appendChild(controls.createLabel.call(this, label));
@@ -267,22 +264,23 @@ const controls = {
             this.elements.buttons[type] = button;
         }
 
+        // Toggle classname when pressed property is set
+        const className = this.config.classNames.controlPressed;
+        Object.defineProperty(button, 'pressed', {
+            enumerable: true,
+            get() {
+                return utils.hasClass(button, className);
+            },
+            set(pressed = false) {
+                utils.toggleClass(button, className, pressed);
+            },
+        });
+
         return button;
     },
 
     // Create an <input type='range'>
     createRange(type, attributes) {
-        // Seek label
-        const label = utils.createElement(
-            'label',
-            {
-                for: attributes.id,
-                id: `${attributes.id}-label`,
-                class: this.config.classNames.hidden,
-            },
-            i18n.get(type, this.config),
-        );
-
         // Seek input
         const input = utils.createElement(
             'input',
@@ -297,7 +295,7 @@ const controls = {
                     autocomplete: 'off',
                     // A11y fixes for https://github.com/sampotts/plyr/issues/905
                     role: 'slider',
-                    'aria-labelledby': `${attributes.id}-label`,
+                    'aria-label': i18n.get(type, this.config),
                     'aria-valuemin': 0,
                     'aria-valuemax': 100,
                     'aria-valuenow': 0,
@@ -311,10 +309,7 @@ const controls = {
         // Set the fill for webkit now
         controls.updateRangeFill.call(this, input);
 
-        return {
-            label,
-            input,
-        };
+        return input;
     },
 
     // Create a <progress>
@@ -435,7 +430,7 @@ const controls = {
 
         // Update mute state
         if (utils.is.element(this.elements.buttons.mute)) {
-            utils.toggleState(this.elements.buttons.mute, this.muted || this.volume === 0);
+            this.elements.buttons.mute.pressed = this.muted || this.volume === 0;
         }
     },
 
@@ -1149,11 +1144,9 @@ const controls = {
             const progress = utils.createElement('div', utils.getAttributesFromSelector(this.config.selectors.progress));
 
             // Seek range slider
-            const seek = controls.createRange.call(this, 'seek', {
+            progress.appendChild(controls.createRange.call(this, 'seek', {
                 id: `plyr-seek-${data.id}`,
-            });
-            progress.appendChild(seek.label);
-            progress.appendChild(seek.input);
+            }));
 
             // Buffer progress
             progress.appendChild(controls.createProgress.call(this, 'buffer'));
@@ -1207,15 +1200,13 @@ const controls = {
             };
 
             // Create the volume range slider
-            const range = controls.createRange.call(
+            volume.appendChild(controls.createRange.call(
                 this,
                 'volume',
                 utils.extend(attributes, {
                     id: `plyr-volume-${data.id}`,
                 }),
-            );
-            volume.appendChild(range.label);
-            volume.appendChild(range.input);
+            ));
 
             this.elements.volume = volume;
 

@@ -262,7 +262,7 @@ const captions = {
 
         if (active) {
             utils.toggleClass(this.elements.container, this.config.classNames.captions.active, true);
-            utils.toggleState(this.elements.buttons.captions, true);
+            this.elements.buttons.captions.pressed = true;
         }
     },
 };

@@ -1098,31 +1098,6 @@ var utils = {
     },
 
 
-    // Toggle aria-pressed state on a toggle button
-    // http://www.ssbbartgroup.com/blog/how-not-to-misuse-aria-states-properties-and-roles
-    toggleState: function toggleState(element, input) {
-        // If multiple elements passed
-        if (utils.is.array(element) || utils.is.nodeList(element)) {
-            Array.from(element).forEach(function (target) {
-                return utils.toggleState(target, input);
-            });
-            return;
-        }
-
-        // Bail if no target
-        if (!utils.is.element(element)) {
-            return;
-        }
-
-        // Get state
-        var pressed = element.getAttribute('aria-pressed') === 'true';
-        var state = utils.is.boolean(input) ? input : !pressed;
-
-        // Set the attribute on target
-        element.setAttribute('aria-pressed', state);
-    },
-
-
     // Format string
     format: function format(input) {
         for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
@@ -3590,6 +3565,10 @@ var defaults$1 = {
     // Only allow one media playing at once (vimeo only)
     autopause: true,
 
+    // Allow inline playback on iOS (this effects YouTube/Vimeo - HTML5 requires the attribute present)
+    // TODO: Remove iosNative fullscreen option in favour of this (logic needs work)
+    playsinline: true,
+
     // Default time to skip when rewind/fast forward
     seekTime: 10,
 
@@ -3835,6 +3814,7 @@ var defaults$1 = {
         posterEnabled: 'plyr__poster-enabled',
         ads: 'plyr__ads',
         control: 'plyr__control',
+        controlPressed: 'plyr__control--pressed',
         playing: 'plyr--playing',
         paused: 'plyr--paused',
         stopped: 'plyr--stopped',
@@ -3905,7 +3885,7 @@ function onChange() {
     // Update toggle button
     var button = this.player.elements.buttons.fullscreen;
     if (utils.is.element(button)) {
-        utils.toggleState(button, this.active);
+        button.pressed = this.active;
     }
 
     // Trigger an event
@@ -4320,13 +4300,17 @@ var ui = {
 
     // Check playing state
     checkPlaying: function checkPlaying(event) {
+        var _this3 = this;
+
         // Class hooks
         utils.toggleClass(this.elements.container, this.config.classNames.playing, this.playing);
         utils.toggleClass(this.elements.container, this.config.classNames.paused, this.paused);
         utils.toggleClass(this.elements.container, this.config.classNames.stopped, this.stopped);
 
-        // Set ARIA state
-        utils.toggleState(this.elements.buttons.play, this.playing);
+        // Set state
+        Array.from(this.elements.buttons.play).forEach(function (target) {
+            target.pressed = _this3.playing;
+        });
 
         // Only update controls on non timeupdate events
         if (utils.is.event(event) && event.type === 'timeupdate') {
@@ -4340,7 +4324,7 @@ var ui = {
 
     // Check if media is loading
     checkLoading: function checkLoading(event) {
-        var _this3 = this;
+        var _this4 = this;
 
         this.loading = ['stalled', 'waiting'].includes(event.type);
 
@@ -4350,10 +4334,10 @@ var ui = {
         // Timer to prevent flicker when seeking
         this.timers.loading = setTimeout(function () {
             // Update progress bar loading class state
-            utils.toggleClass(_this3.elements.container, _this3.config.classNames.loading, _this3.loading);
+            utils.toggleClass(_this4.elements.container, _this4.config.classNames.loading, _this4.loading);
 
             // Update controls visibility
-            ui.toggleControls.call(_this3);
+            ui.toggleControls.call(_this4);
         }, this.loading ? 250 : 0);
     },
 

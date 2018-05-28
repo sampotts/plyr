@@ -18,6 +18,10 @@ const defaults = {
     // Only allow one media playing at once (vimeo only)
     autopause: true,
 
+    // Allow inline playback on iOS (this effects YouTube/Vimeo - HTML5 requires the attribute present)
+    // TODO: Remove iosNative fullscreen option in favour of this (logic needs work)
+    playsinline: true,
+
     // Default time to skip when rewind/fast forward
     seekTime: 10,
 
@@ -334,6 +338,7 @@ const defaults = {
         posterEnabled: 'plyr__poster-enabled',
         ads: 'plyr__ads',
         control: 'plyr__control',
+        controlPressed: 'plyr__control--pressed',
         playing: 'plyr--playing',
         paused: 'plyr--paused',
         stopped: 'plyr--stopped',

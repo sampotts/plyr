@@ -164,17 +164,16 @@ const ui = {
         }
 
         // Load the image, and set poster if successful
-        const loadPromise = utils.loadImage(poster)
-            .then(() => {
-                this.elements.poster.style.backgroundImage = `url('${poster}')`;
-                Object.assign(this.elements.poster.style, {
-                    backgroundImage: `url('${poster}')`,
-                    // Reset backgroundSize as well (since it can be set to "cover" for padded thumbnails for youtube)
-                    backgroundSize: '',
-                });
-                ui.togglePoster.call(this, true);
-                return poster;
+        const loadPromise = utils.loadImage(poster).then(() => {
+            this.elements.poster.style.backgroundImage = `url('${poster}')`;
+            Object.assign(this.elements.poster.style, {
+                backgroundImage: `url('${poster}')`,
+                // Reset backgroundSize as well (since it can be set to "cover" for padded thumbnails for youtube)
+                backgroundSize: '',
             });
+            ui.togglePoster.call(this, true);
+            return poster;
+        });
 
         // Hide the element if the poster can't be loaded (otherwise it will just be a black element covering the video)
         loadPromise.catch(() => ui.togglePoster.call(this, false));
@@ -190,8 +189,10 @@ const ui = {
         utils.toggleClass(this.elements.container, this.config.classNames.paused, this.paused);
         utils.toggleClass(this.elements.container, this.config.classNames.stopped, this.stopped);
 
-        // Set ARIA state
-        utils.toggleState(this.elements.buttons.play, this.playing);
+        // Set state
+        Array.from(this.elements.buttons.play).forEach(target => {
+            target.pressed = this.playing;
+        });
 
         // Only update controls on non timeupdate events
         if (utils.is.event(event) && event.type === 'timeupdate') {

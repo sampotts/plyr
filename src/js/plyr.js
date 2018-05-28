@@ -854,7 +854,7 @@ class Plyr {
         this.captions.active = show;
 
         // Toggle state
-        utils.toggleState(this.elements.buttons.captions, this.captions.active);
+        this.elements.buttons.captions.pressed = this.captions.active;
 
         // Add class hook
         utils.toggleClass(this.elements.container, this.config.classNames.captions.active, this.captions.active);

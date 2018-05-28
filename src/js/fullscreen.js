@@ -15,7 +15,7 @@ function onChange() {
     // Update toggle button
     const button = this.player.elements.buttons.fullscreen;
     if (utils.is.element(button)) {
-        utils.toggleState(button, this.active);
+        button.pressed = this.active;
     }
 
     // Trigger an event
