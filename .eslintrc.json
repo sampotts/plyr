@@ -32,6 +32,7 @@
                 "message": "Use local parameter instead."
             }
         ],
+        "no-param-reassign": [2, { "props": false }],
         "array-bracket-newline": [2, { "minItems": 2 }],
         "array-element-newline": [2, { "minItems": 2 }]
     },
