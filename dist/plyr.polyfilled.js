@@ -20,7 +20,7 @@ if (typeof __g == 'number') __g = global; // eslint-disable-line no-undef
 });
 
 var _core = createCommonjsModule(function (module) {
-var core = module.exports = { version: '2.5.6' };
+var core = module.exports = { version: '2.5.5' };
 if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
 });
 var _core_1 = _core.version;
@@ -333,18 +333,11 @@ var _arrayIncludes = function (IS_INCLUDES) {
   };
 };
 
-var _shared = createCommonjsModule(function (module) {
 var SHARED = '__core-js_shared__';
 var store = _global[SHARED] || (_global[SHARED] = {});
-
-(module.exports = function (key, value) {
-  return store[key] || (store[key] = value !== undefined ? value : {});
-})('versions', []).push({
-  version: _core.version,
-  mode: _library ? 'pure' : 'global',
-  copyright: '© 2018 Denis Pushkarev (zloirock.ru)'
-});
-});
+var _shared = function (key) {
+  return store[key] || (store[key] = {});
+};
 
 var shared = _shared('keys');
 
@@ -2652,8 +2645,7 @@ var _microtask = function () {
     };
   // environments with maybe non-completely correct, but existent Promise
   } else if (Promise$1 && Promise$1.resolve) {
-    // Promise.resolve without an argument throws an error in LG WebOS 2
-    var promise = Promise$1.resolve(undefined);
+    var promise = Promise$1.resolve();
     notify = function () {
       promise.then(flush);
     };
@@ -2710,10 +2702,6 @@ var _perform = function (exec) {
   }
 };
 
-var navigator$1 = _global.navigator;
-
-var _userAgent = navigator$1 && navigator$1.userAgent || '';
-
 var _promiseResolve = function (C, x) {
   _anObject(C);
   if (_isObject(x) && x.constructor === C) return x;
@@ -2728,12 +2716,9 @@ var microtask = _microtask();
 
 
 
-
 var PROMISE = 'Promise';
 var TypeError$1 = _global.TypeError;
 var process$2 = _global.process;
-var versions = process$2 && process$2.versions;
-var v8 = versions && versions.v8 || '';
 var $Promise = _global[PROMISE];
 var isNode$1 = _classof(process$2) == 'process';
 var empty = function () { /* empty */ };
@@ -2748,13 +2733,7 @@ var USE_NATIVE = !!function () {
       exec(empty, empty);
     };
     // unhandled rejections tracking support, NodeJS Promise without it fails @@species test
-    return (isNode$1 || typeof PromiseRejectionEvent == 'function')
-      && promise.then(empty) instanceof FakePromise
-      // v8 6.6 (Node 10 and Chrome 66) have a bug with resolving custom thenables
-      // https://bugs.chromium.org/p/chromium/issues/detail?id=830565
-      // we can't detect it synchronously, so just check versions
-      && v8.indexOf('6.6') !== 0
-      && _userAgent.indexOf('Chrome/66') === -1;
+    return (isNode$1 || typeof PromiseRejectionEvent == 'function') && promise.then(empty) instanceof FakePromise;
   } catch (e) { /* empty */ }
 }();
 
@@ -4181,6 +4160,10 @@ var _stringPad = function (that, maxLength, fillString, left) {
   if (stringFiller.length > fillLen) stringFiller = stringFiller.slice(0, fillLen);
   return left ? stringFiller + S : S + stringFiller;
 };
+
+var navigator$1 = _global.navigator;
+
+var _userAgent = navigator$1 && navigator$1.userAgent || '';
 
 // https://github.com/tc39/proposal-string-pad-start-end
 
@@ -7177,11 +7160,17 @@ var i18n = {
         var key = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
         var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-        if (utils.is.empty(key) || utils.is.empty(config) || !Object.keys(config.i18n).includes(key)) {
+        if (utils.is.empty(key) || utils.is.empty(config)) {
             return '';
         }
 
-        var string = config.i18n[key];
+        var string = key.split('.').reduce(function (o, i) {
+            return o[i] || {};
+        }, config.i18n);
+
+        if (utils.is.empty(string)) {
+            return '';
+        }
 
         var replace = {
             '{seektime}': config.seekTime,
@@ -7855,27 +7844,7 @@ var controls = {
 
         // Get the badge HTML for HD, 4K etc
         var getBadge = function getBadge(quality) {
-            var label = '';
-
-            switch (quality) {
-                case 2160:
-                    label = '4K';
-                    break;
-
-                case 1440:
-                case 1080:
-                case 720:
-                    label = 'HD';
-                    break;
-
-                case 576:
-                case 480:
-                    label = 'SD';
-                    break;
-
-                default:
-                    break;
-            }
+            var label = i18n.get('qualityBadge.' + quality, _this3.config);
 
             if (!label.length) {
                 return null;
@@ -7898,7 +7867,6 @@ var controls = {
 
 
     // Translate a value into a nice label
-    // TODO: Localisation
     getLabel: function getLabel(setting, value) {
         switch (setting) {
             case 'speed':
@@ -7906,7 +7874,13 @@ var controls = {
 
             case 'quality':
                 if (utils.is.number(value)) {
-                    return value + 'p';
+                    var qualityName = i18n.get('qualityName.' + value, this.config);
+
+                    if (!qualityName.length) {
+                        return value + 'p';
+                    }
+
+                    return qualityName;
                 }
 
                 return utils.toTitleCase(value);
@@ -9130,7 +9104,18 @@ var defaults$1 = {
         reset: 'Reset',
         disabled: 'Disabled',
         enabled: 'Enabled',
-        advertisement: 'Ad'
+        advertisement: 'Ad',
+        qualityName: {
+            720: 'Hohe Qualität'
+        },
+        qualityBadge: {
+            2160: '4K',
+            1440: 'HD',
+            1080: 'HD',
+            720: 'HD',
+            576: 'SD',
+            480: 'SD'
+        }
     },
 
     // URLs
@@ -13249,7 +13234,7 @@ var Plyr = function () {
                 quality = Number(input);
             }
 
-            if (!utils.is.number(quality) || quality === 0) {
+            if (!utils.is.number(quality)) {
                 quality = this.storage.get('quality');
             }
 

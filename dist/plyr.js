@@ -1771,11 +1771,17 @@ var i18n = {
         var key = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
         var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-        if (utils.is.empty(key) || utils.is.empty(config) || !Object.keys(config.i18n).includes(key)) {
+        if (utils.is.empty(key) || utils.is.empty(config)) {
             return '';
         }
 
-        var string = config.i18n[key];
+        var string = key.split('.').reduce(function (o, i) {
+            return o[i] || {};
+        }, config.i18n);
+
+        if (utils.is.empty(string)) {
+            return '';
+        }
 
         var replace = {
             '{seektime}': config.seekTime,
@@ -2449,27 +2455,7 @@ var controls = {
 
         // Get the badge HTML for HD, 4K etc
         var getBadge = function getBadge(quality) {
-            var label = '';
-
-            switch (quality) {
-                case 2160:
-                    label = '4K';
-                    break;
-
-                case 1440:
-                case 1080:
-                case 720:
-                    label = 'HD';
-                    break;
-
-                case 576:
-                case 480:
-                    label = 'SD';
-                    break;
-
-                default:
-                    break;
-            }
+            var label = i18n.get('qualityBadge.' + quality, _this3.config);
 
             if (!label.length) {
                 return null;
@@ -2492,7 +2478,6 @@ var controls = {
 
 
     // Translate a value into a nice label
-    // TODO: Localisation
     getLabel: function getLabel(setting, value) {
         switch (setting) {
             case 'speed':
@@ -2500,7 +2485,13 @@ var controls = {
 
             case 'quality':
                 if (utils.is.number(value)) {
-                    return value + 'p';
+                    var qualityName = i18n.get('qualityName.' + value, this.config);
+
+                    if (!qualityName.length) {
+                        return value + 'p';
+                    }
+
+                    return qualityName;
                 }
 
                 return utils.toTitleCase(value);
@@ -3724,7 +3715,15 @@ var defaults$1 = {
         reset: 'Reset',
         disabled: 'Disabled',
         enabled: 'Enabled',
-        advertisement: 'Ad'
+        advertisement: 'Ad',
+        qualityBadge: {
+            2160: '4K',
+            1440: 'HD',
+            1080: 'HD',
+            720: 'HD',
+            576: 'SD',
+            480: 'SD'
+        }
     },
 
     // URLs
@@ -7843,7 +7842,7 @@ var Plyr = function () {
                 quality = Number(input);
             }
 
-            if (!utils.is.number(quality) || quality === 0) {
+            if (!utils.is.number(quality)) {
                 quality = this.storage.get('quality');
             }
 
