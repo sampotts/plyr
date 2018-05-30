@@ -730,7 +730,7 @@ const utils = {
 
     // Get a nested value in an object
     getDeep(object, path) {
-        return path.split('.').reduce((obj, key) => (obj && obj[key]) || undefined, object);
+        return path.split('.').reduce((obj, key) => obj && obj[key], object);
     },
 
     // Get the closest value in an array
