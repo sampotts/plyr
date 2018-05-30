@@ -6689,6 +6689,14 @@ var utils = {
     },
 
 
+    // Get a nested value in an object
+    getDeep: function getDeep(object, value) {
+        return value.split('.').reduce(function (obj, key) {
+            return obj[key] || {};
+        }, object);
+    },
+
+
     // Get the closest value in an array
     closest: function closest(array, value) {
         if (!utils.is.array(array) || !array.length) {
@@ -7164,9 +7172,7 @@ var i18n = {
             return '';
         }
 
-        var string = key.split('.').reduce(function (o, i) {
-            return o[i] || {};
-        }, config.i18n);
+        var string = utils.getDeep(config.i18n, key);
 
         if (utils.is.empty(string)) {
             return '';
@@ -8040,12 +8046,7 @@ var controls = {
 
         // Generate options
         tracks.forEach(function (track) {
-            controls.createMenuItem.call(_this4, track.language, list, 'language', track.label, track.language !== 'enabled' ? controls.createBadge.call(_this4, track.language.toUpperCase()) : null, track.language.toLowerCase() === _this4.captions.language.toLowerCase());
-        });
-
-        // Store reference
-        this.options.captions = tracks.map(function (track) {
-            return track.language;
+            controls.createMenuItem.call(_this4, track.language, list, 'language', track.label, track.language !== 'enabled' ? controls.createBadge.call(_this4, track.language.toUpperCase()) : null, track.language.toLowerCase() === _this4.language);
         });
 
         controls.updateSetting.call(this, type, list);
@@ -8648,28 +8649,6 @@ var captions = {
             return;
         }
 
-        // Set default language if not set
-        var stored = this.storage.get('language');
-
-        if (!utils.is.empty(stored)) {
-            this.captions.language = stored;
-        }
-
-        if (utils.is.empty(this.captions.language)) {
-            this.captions.language = this.config.captions.language.toLowerCase();
-        }
-
-        // Set captions enabled state if not set
-        if (!utils.is.boolean(this.captions.active)) {
-            var active = this.storage.get('captions');
-
-            if (utils.is.boolean(active)) {
-                this.captions.active = active;
-            } else {
-                this.captions.active = this.config.captions.active;
-            }
-        }
-
         // Only Vimeo and HTML5 video supported at this point
         if (!this.isVideo || this.isYouTube || this.isHTML5 && !support.textTracks) {
             // Clear menu and hide
@@ -8685,17 +8664,6 @@ var captions = {
             this.elements.captions = utils.createElement('div', utils.getAttributesFromSelector(this.config.selectors.captions));
 
             utils.insertAfter(this.elements.captions, this.elements.wrapper);
-        }
-
-        // Set the class hook
-        utils.toggleClass(this.elements.container, this.config.classNames.captions.enabled, !utils.is.empty(captions.getTracks.call(this)));
-
-        // Get tracks
-        var tracks = captions.getTracks.call(this);
-
-        // If no caption file exists, hide container for caption text
-        if (utils.is.empty(tracks)) {
-            return;
         }
 
         // Get browser info
@@ -8720,14 +8688,52 @@ var captions = {
             });
         }
 
-        // Set language
-        captions.setLanguage.call(this);
+        // Try to load the value from storage
+        var active = this.storage.get('captions');
 
-        // Enable UI
-        captions.show.call(this);
+        // Otherwise fall back to the default config
+        if (!utils.is.boolean(active)) {
+            active = this.config.captions.active;
+        }
 
-        // Set available languages in list
-        if (utils.is.array(this.config.controls) && this.config.controls.includes('settings') && this.config.settings.includes('captions')) {
+        // Set toggled state
+        this.toggleCaptions(active);
+
+        // Watch changes to textTracks and update captions menu
+        if (this.config.captions.update) {
+            utils.on(this.media.textTracks, 'addtrack removetrack', captions.update.bind(this));
+        }
+
+        // Update available languages in list next tick (the event must not be triggered before the listeners)
+        setTimeout(captions.update.bind(this), 0);
+    },
+    update: function update() {
+        // Update tracks
+        var tracks = captions.getTracks.call(this);
+        this.options.captions = tracks.map(function (_ref) {
+            var language = _ref.language;
+            return language;
+        });
+
+        // Set language if it hasn't been set already
+        if (!this.language) {
+            var language = this.config.captions.language;
+
+            if (language === 'auto') {
+                var _split = (navigator.language || navigator.userLanguage).split('-');
+
+                var _split2 = slicedToArray(_split, 1);
+
+                language = _split2[0];
+            }
+            this.language = this.storage.get('language') || (language || '').toLowerCase();
+        }
+
+        // Toggle the class hooks
+        utils.toggleClass(this.elements.container, this.config.classNames.captions.enabled, !utils.is.empty(captions.getTracks.call(this)));
+
+        // Update available languages in list
+        if ((this.config.controls || []).includes('settings') && this.config.settings.includes('captions')) {
             controls.setCaptionsMenu.call(this);
         }
     },
@@ -8888,25 +8894,6 @@ var captions = {
         } else {
             this.debug.warn('No captions element to render to');
         }
-    },
-
-
-    // Display captions container and button (for initialization)
-    show: function show() {
-        // Try to load the value from storage
-        var active = this.storage.get('captions');
-
-        // Otherwise fall back to the default config
-        if (!utils.is.boolean(active)) {
-            active = this.config.captions.active;
-        } else {
-            this.captions.active = active;
-        }
-
-        if (active) {
-            utils.toggleClass(this.elements.container, this.config.classNames.captions.active, true);
-            utils.toggleState(this.elements.buttons.captions, true);
-        }
     }
 };
 
@@ -9047,7 +9034,10 @@ var defaults$1 = {
     // Captions settings
     captions: {
         active: false,
-        language: (navigator.language || navigator.userLanguage).split('-')[0]
+        language: 'auto',
+        // Listen to new tracks added after Plyr is initialized.
+        // This is needed for streaming captions, but may result in unselectable options
+        update: false
     },
 
     // Fullscreen settings
@@ -9105,9 +9095,6 @@ var defaults$1 = {
         disabled: 'Disabled',
         enabled: 'Enabled',
         advertisement: 'Ad',
-        qualityName: {
-            720: 'Hohe Qualität'
-        },
         qualityBadge: {
             2160: '4K',
             1440: 'HD',
@@ -9574,8 +9561,10 @@ var ui = {
         // Remove native controls
         ui.toggleNativeControls.call(this);
 
-        // Captions
-        captions.setup.call(this);
+        // Setup captions for HTML5
+        if (this.isHTML5) {
+            captions.setup.call(this);
+        }
 
         // Reset volume
         this.volume = null;
@@ -9627,6 +9616,12 @@ var ui = {
         // Assure the poster image is set, if the property was added before the element was created
         if (this.poster && this.elements.poster && !this.elements.poster.style.backgroundImage) {
             ui.setPoster.call(this, this.poster);
+        }
+
+        // Manually set the duration if user has overridden it.
+        // The event listeners for it doesn't get called if preload is disabled (#701)
+        if (this.config.duration) {
+            controls.durationUpdate.call(this);
         }
     },
 
@@ -12685,24 +12680,19 @@ var Plyr = function () {
             }
 
             // If the method is called without parameter, toggle based on current value
-            var show = utils.is.boolean(input) ? input : !this.elements.container.classList.contains(this.config.classNames.captions.active);
-
-            // Nothing to change...
-            if (this.captions.active === show) {
-                return;
-            }
-
-            // Set global
-            this.captions.active = show;
+            var active = utils.is.boolean(input) ? input : !this.elements.container.classList.contains(this.config.classNames.captions.active);
 
             // Toggle state
-            utils.toggleState(this.elements.buttons.captions, this.captions.active);
+            utils.toggleState(this.elements.buttons.captions, active);
 
             // Add class hook
-            utils.toggleClass(this.elements.container, this.config.classNames.captions.active, this.captions.active);
+            utils.toggleClass(this.elements.container, this.config.classNames.captions.active, active);
 
-            // Trigger an event
-            utils.dispatchEvent.call(this, this.media, this.captions.active ? 'captionsenabled' : 'captionsdisabled');
+            // Update state and trigger event
+            if (active !== this.captions.active) {
+                this.captions.active = active;
+                utils.dispatchEvent.call(this, this.media, this.captions.active ? 'captionsenabled' : 'captionsdisabled');
+            }
         }
 
         /**
