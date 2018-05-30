@@ -190,6 +190,14 @@ const defaults = {
         disabled: 'Disabled',
         enabled: 'Enabled',
         advertisement: 'Ad',
+        qualityBadge: {
+            2160: '4K',
+            1440: 'HD',
+            1080: 'HD',
+            720: 'HD',
+            576: 'SD',
+            480: 'SD',
+        },
     },
 
     // URLs
