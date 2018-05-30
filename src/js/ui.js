@@ -55,8 +55,10 @@ const ui = {
         // Remove native controls
         ui.toggleNativeControls.call(this);
 
-        // Captions
-        captions.setup.call(this);
+        // Setup captions for HTML5
+        if (this.isHTML5) {
+            captions.setup.call(this);
+        }
 
         // Reset volume
         this.volume = null;

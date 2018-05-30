@@ -115,7 +115,10 @@ const defaults = {
     // Captions settings
     captions: {
         active: false,
-        language: (navigator.language || navigator.userLanguage).split('-')[0],
+        language: 'auto',
+        // Listen to new tracks added after Plyr is initialized.
+        // This is needed for streaming captions, but may result in unselectable options
+        update: false,
     },
 
     // Fullscreen settings
