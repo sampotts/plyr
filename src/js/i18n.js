@@ -10,7 +10,7 @@ const i18n = {
             return '';
         }
 
-        let string = key.split('.').reduce((o,i) => o[i] || {}, config.i18n);
+        let string = utils.getDeep(config.i18n, key);
 
         if (utils.is.empty(string)) {
             return '';
