@@ -1300,6 +1300,14 @@ var utils = {
     },
 
 
+    // Get a nested value in an object
+    getDeep: function getDeep(object, value) {
+        return value.split('.').reduce(function (obj, key) {
+            return obj[key] || {};
+        }, object);
+    },
+
+
     // Get the closest value in an array
     closest: function closest(array, value) {
         if (!utils.is.array(array) || !array.length) {
@@ -1775,9 +1783,7 @@ var i18n = {
             return '';
         }
 
-        var string = key.split('.').reduce(function (o, i) {
-            return o[i] || {};
-        }, config.i18n);
+        var string = utils.getDeep(config.i18n, key);
 
         if (utils.is.empty(string)) {
             return '';
