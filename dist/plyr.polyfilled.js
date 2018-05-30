@@ -6690,9 +6690,9 @@ var utils = {
 
 
     // Get a nested value in an object
-    getDeep: function getDeep(object, value) {
-        return value.split('.').reduce(function (obj, key) {
-            return obj[key] || {};
+    getDeep: function getDeep(object, path) {
+        return path.split('.').reduce(function (obj, key) {
+            return obj && obj[key] || undefined;
         }, object);
     },
 
