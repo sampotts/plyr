@@ -675,7 +675,7 @@ class Plyr {
             quality = Number(input);
         }
 
-        if (!utils.is.number(quality) || quality === 0) {
+        if (!utils.is.number(quality)) {
             quality = this.storage.get('quality');
         }
 
