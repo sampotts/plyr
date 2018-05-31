@@ -728,6 +728,11 @@ const utils = {
         return JSON.parse(JSON.stringify(object));
     },
 
+    // Get a nested value in an object
+    getDeep(object, path) {
+        return path.split('.').reduce((obj, key) => obj && obj[key], object);
+    },
+
     // Get the closest value in an array
     closest(array, value) {
         if (!utils.is.array(array) || !array.length) {

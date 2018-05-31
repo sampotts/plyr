@@ -664,27 +664,7 @@ const controls = {
 
         // Get the badge HTML for HD, 4K etc
         const getBadge = quality => {
-            let label = '';
-
-            switch (quality) {
-                case 2160:
-                    label = '4K';
-                    break;
-
-                case 1440:
-                case 1080:
-                case 720:
-                    label = 'HD';
-                    break;
-
-                case 576:
-                case 480:
-                    label = 'SD';
-                    break;
-
-                default:
-                    break;
-            }
+            const label = i18n.get(`qualityBadge.${quality}`, this.config);
 
             if (!label.length) {
                 return null;
@@ -708,7 +688,6 @@ const controls = {
     },
 
     // Translate a value into a nice label
-    // TODO: Localisation
     getLabel(setting, value) {
         switch (setting) {
             case 'speed':
@@ -716,7 +695,13 @@ const controls = {
 
             case 'quality':
                 if (utils.is.number(value)) {
-                    return `${value}p`;
+                    const label = i18n.get(`qualityLabel.${value}`, this.config);
+
+                    if (!label.length) {
+                        return `${value}p`;
+                    }
+
+                    return label;
                 }
 
                 return utils.toTitleCase(value);

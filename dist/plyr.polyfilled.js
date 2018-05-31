@@ -20,7 +20,7 @@ if (typeof __g == 'number') __g = global; // eslint-disable-line no-undef
 });
 
 var _core = createCommonjsModule(function (module) {
-var core = module.exports = { version: '2.5.6' };
+var core = module.exports = { version: '2.5.5' };
 if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
 });
 var _core_1 = _core.version;
@@ -333,18 +333,11 @@ var _arrayIncludes = function (IS_INCLUDES) {
   };
 };
 
-var _shared = createCommonjsModule(function (module) {
 var SHARED = '__core-js_shared__';
 var store = _global[SHARED] || (_global[SHARED] = {});
-
-(module.exports = function (key, value) {
-  return store[key] || (store[key] = value !== undefined ? value : {});
-})('versions', []).push({
-  version: _core.version,
-  mode: _library ? 'pure' : 'global',
-  copyright: '© 2018 Denis Pushkarev (zloirock.ru)'
-});
-});
+var _shared = function (key) {
+  return store[key] || (store[key] = {});
+};
 
 var shared = _shared('keys');
 
@@ -2652,8 +2645,7 @@ var _microtask = function () {
     };
   // environments with maybe non-completely correct, but existent Promise
   } else if (Promise$1 && Promise$1.resolve) {
-    // Promise.resolve without an argument throws an error in LG WebOS 2
-    var promise = Promise$1.resolve(undefined);
+    var promise = Promise$1.resolve();
     notify = function () {
       promise.then(flush);
     };
@@ -2710,10 +2702,6 @@ var _perform = function (exec) {
   }
 };
 
-var navigator$1 = _global.navigator;
-
-var _userAgent = navigator$1 && navigator$1.userAgent || '';
-
 var _promiseResolve = function (C, x) {
   _anObject(C);
   if (_isObject(x) && x.constructor === C) return x;
@@ -2728,12 +2716,9 @@ var microtask = _microtask();
 
 
 
-
 var PROMISE = 'Promise';
 var TypeError$1 = _global.TypeError;
 var process$2 = _global.process;
-var versions = process$2 && process$2.versions;
-var v8 = versions && versions.v8 || '';
 var $Promise = _global[PROMISE];
 var isNode$1 = _classof(process$2) == 'process';
 var empty = function () { /* empty */ };
@@ -2748,13 +2733,7 @@ var USE_NATIVE = !!function () {
       exec(empty, empty);
     };
     // unhandled rejections tracking support, NodeJS Promise without it fails @@species test
-    return (isNode$1 || typeof PromiseRejectionEvent == 'function')
-      && promise.then(empty) instanceof FakePromise
-      // v8 6.6 (Node 10 and Chrome 66) have a bug with resolving custom thenables
-      // https://bugs.chromium.org/p/chromium/issues/detail?id=830565
-      // we can't detect it synchronously, so just check versions
-      && v8.indexOf('6.6') !== 0
-      && _userAgent.indexOf('Chrome/66') === -1;
+    return (isNode$1 || typeof PromiseRejectionEvent == 'function') && promise.then(empty) instanceof FakePromise;
   } catch (e) { /* empty */ }
 }();
 
@@ -4181,6 +4160,10 @@ var _stringPad = function (that, maxLength, fillString, left) {
   if (stringFiller.length > fillLen) stringFiller = stringFiller.slice(0, fillLen);
   return left ? stringFiller + S : S + stringFiller;
 };
+
+var navigator$1 = _global.navigator;
+
+var _userAgent = navigator$1 && navigator$1.userAgent || '';
 
 // https://github.com/tc39/proposal-string-pad-start-end
 
@@ -6706,6 +6689,14 @@ var utils = {
     },
 
 
+    // Get a nested value in an object
+    getDeep: function getDeep(object, path) {
+        return path.split('.').reduce(function (obj, key) {
+            return obj && obj[key] || undefined;
+        }, object);
+    },
+
+
     // Get the closest value in an array
     closest: function closest(array, value) {
         if (!utils.is.array(array) || !array.length) {
@@ -7177,11 +7168,15 @@ var i18n = {
         var key = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
         var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-        if (utils.is.empty(key) || utils.is.empty(config) || !Object.keys(config.i18n).includes(key)) {
+        if (utils.is.empty(key) || utils.is.empty(config)) {
             return '';
         }
 
-        var string = config.i18n[key];
+        var string = utils.getDeep(config.i18n, key);
+
+        if (utils.is.empty(string)) {
+            return '';
+        }
 
         var replace = {
             '{seektime}': config.seekTime,
@@ -7855,27 +7850,7 @@ var controls = {
 
         // Get the badge HTML for HD, 4K etc
         var getBadge = function getBadge(quality) {
-            var label = '';
-
-            switch (quality) {
-                case 2160:
-                    label = '4K';
-                    break;
-
-                case 1440:
-                case 1080:
-                case 720:
-                    label = 'HD';
-                    break;
-
-                case 576:
-                case 480:
-                    label = 'SD';
-                    break;
-
-                default:
-                    break;
-            }
+            var label = i18n.get('qualityBadge.' + quality, _this3.config);
 
             if (!label.length) {
                 return null;
@@ -7898,7 +7873,6 @@ var controls = {
 
 
     // Translate a value into a nice label
-    // TODO: Localisation
     getLabel: function getLabel(setting, value) {
         switch (setting) {
             case 'speed':
@@ -7906,7 +7880,13 @@ var controls = {
 
             case 'quality':
                 if (utils.is.number(value)) {
-                    return value + 'p';
+                    var qualityName = i18n.get('qualityName.' + value, this.config);
+
+                    if (!qualityName.length) {
+                        return value + 'p';
+                    }
+
+                    return qualityName;
                 }
 
                 return utils.toTitleCase(value);
@@ -8066,12 +8046,7 @@ var controls = {
 
         // Generate options
         tracks.forEach(function (track) {
-            controls.createMenuItem.call(_this4, track.language, list, 'language', track.label, track.language !== 'enabled' ? controls.createBadge.call(_this4, track.language.toUpperCase()) : null, track.language.toLowerCase() === _this4.captions.language.toLowerCase());
-        });
-
-        // Store reference
-        this.options.captions = tracks.map(function (track) {
-            return track.language;
+            controls.createMenuItem.call(_this4, track.language, list, 'language', track.label, track.language !== 'enabled' ? controls.createBadge.call(_this4, track.language.toUpperCase()) : null, track.language.toLowerCase() === _this4.language);
         });
 
         controls.updateSetting.call(this, type, list);
@@ -8674,28 +8649,6 @@ var captions = {
             return;
         }
 
-        // Set default language if not set
-        var stored = this.storage.get('language');
-
-        if (!utils.is.empty(stored)) {
-            this.captions.language = stored;
-        }
-
-        if (utils.is.empty(this.captions.language)) {
-            this.captions.language = this.config.captions.language.toLowerCase();
-        }
-
-        // Set captions enabled state if not set
-        if (!utils.is.boolean(this.captions.active)) {
-            var active = this.storage.get('captions');
-
-            if (utils.is.boolean(active)) {
-                this.captions.active = active;
-            } else {
-                this.captions.active = this.config.captions.active;
-            }
-        }
-
         // Only Vimeo and HTML5 video supported at this point
         if (!this.isVideo || this.isYouTube || this.isHTML5 && !support.textTracks) {
             // Clear menu and hide
@@ -8711,17 +8664,6 @@ var captions = {
             this.elements.captions = utils.createElement('div', utils.getAttributesFromSelector(this.config.selectors.captions));
 
             utils.insertAfter(this.elements.captions, this.elements.wrapper);
-        }
-
-        // Set the class hook
-        utils.toggleClass(this.elements.container, this.config.classNames.captions.enabled, !utils.is.empty(captions.getTracks.call(this)));
-
-        // Get tracks
-        var tracks = captions.getTracks.call(this);
-
-        // If no caption file exists, hide container for caption text
-        if (utils.is.empty(tracks)) {
-            return;
         }
 
         // Get browser info
@@ -8746,14 +8688,52 @@ var captions = {
             });
         }
 
-        // Set language
-        captions.setLanguage.call(this);
+        // Try to load the value from storage
+        var active = this.storage.get('captions');
 
-        // Enable UI
-        captions.show.call(this);
+        // Otherwise fall back to the default config
+        if (!utils.is.boolean(active)) {
+            active = this.config.captions.active;
+        }
 
-        // Set available languages in list
-        if (utils.is.array(this.config.controls) && this.config.controls.includes('settings') && this.config.settings.includes('captions')) {
+        // Set toggled state
+        this.toggleCaptions(active);
+
+        // Watch changes to textTracks and update captions menu
+        if (this.config.captions.update) {
+            utils.on(this.media.textTracks, 'addtrack removetrack', captions.update.bind(this));
+        }
+
+        // Update available languages in list next tick (the event must not be triggered before the listeners)
+        setTimeout(captions.update.bind(this), 0);
+    },
+    update: function update() {
+        // Update tracks
+        var tracks = captions.getTracks.call(this);
+        this.options.captions = tracks.map(function (_ref) {
+            var language = _ref.language;
+            return language;
+        });
+
+        // Set language if it hasn't been set already
+        if (!this.language) {
+            var language = this.config.captions.language;
+
+            if (language === 'auto') {
+                var _split = (navigator.language || navigator.userLanguage).split('-');
+
+                var _split2 = slicedToArray(_split, 1);
+
+                language = _split2[0];
+            }
+            this.language = this.storage.get('language') || (language || '').toLowerCase();
+        }
+
+        // Toggle the class hooks
+        utils.toggleClass(this.elements.container, this.config.classNames.captions.enabled, !utils.is.empty(captions.getTracks.call(this)));
+
+        // Update available languages in list
+        if ((this.config.controls || []).includes('settings') && this.config.settings.includes('captions')) {
             controls.setCaptionsMenu.call(this);
         }
     },
@@ -8914,25 +8894,6 @@ var captions = {
         } else {
             this.debug.warn('No captions element to render to');
         }
-    },
-
-
-    // Display captions container and button (for initialization)
-    show: function show() {
-        // Try to load the value from storage
-        var active = this.storage.get('captions');
-
-        // Otherwise fall back to the default config
-        if (!utils.is.boolean(active)) {
-            active = this.config.captions.active;
-        } else {
-            this.captions.active = active;
-        }
-
-        if (active) {
-            utils.toggleClass(this.elements.container, this.config.classNames.captions.active, true);
-            utils.toggleState(this.elements.buttons.captions, true);
-        }
     }
 };
 
@@ -9073,7 +9034,10 @@ var defaults$1 = {
     // Captions settings
     captions: {
         active: false,
-        language: (navigator.language || navigator.userLanguage).split('-')[0]
+        language: 'auto',
+        // Listen to new tracks added after Plyr is initialized.
+        // This is needed for streaming captions, but may result in unselectable options
+        update: false
     },
 
     // Fullscreen settings
@@ -9130,7 +9094,15 @@ var defaults$1 = {
         reset: 'Reset',
         disabled: 'Disabled',
         enabled: 'Enabled',
-        advertisement: 'Ad'
+        advertisement: 'Ad',
+        qualityBadge: {
+            2160: '4K',
+            1440: 'HD',
+            1080: 'HD',
+            720: 'HD',
+            576: 'SD',
+            480: 'SD'
+        }
     },
 
     // URLs
@@ -9589,8 +9561,10 @@ var ui = {
         // Remove native controls
         ui.toggleNativeControls.call(this);
 
-        // Captions
-        captions.setup.call(this);
+        // Setup captions for HTML5
+        if (this.isHTML5) {
+            captions.setup.call(this);
+        }
 
         // Reset volume
         this.volume = null;
@@ -9642,6 +9616,12 @@ var ui = {
         // Assure the poster image is set, if the property was added before the element was created
         if (this.poster && this.elements.poster && !this.elements.poster.style.backgroundImage) {
             ui.setPoster.call(this, this.poster);
+        }
+
+        // Manually set the duration if user has overridden it.
+        // The event listeners for it doesn't get called if preload is disabled (#701)
+        if (this.config.duration) {
+            controls.durationUpdate.call(this);
         }
     },
 
@@ -12700,24 +12680,19 @@ var Plyr = function () {
             }
 
             // If the method is called without parameter, toggle based on current value
-            var show = utils.is.boolean(input) ? input : !this.elements.container.classList.contains(this.config.classNames.captions.active);
-
-            // Nothing to change...
-            if (this.captions.active === show) {
-                return;
-            }
-
-            // Set global
-            this.captions.active = show;
+            var active = utils.is.boolean(input) ? input : !this.elements.container.classList.contains(this.config.classNames.captions.active);
 
             // Toggle state
-            utils.toggleState(this.elements.buttons.captions, this.captions.active);
+            utils.toggleState(this.elements.buttons.captions, active);
 
             // Add class hook
-            utils.toggleClass(this.elements.container, this.config.classNames.captions.active, this.captions.active);
+            utils.toggleClass(this.elements.container, this.config.classNames.captions.active, active);
 
-            // Trigger an event
-            utils.dispatchEvent.call(this, this.media, this.captions.active ? 'captionsenabled' : 'captionsdisabled');
+            // Update state and trigger event
+            if (active !== this.captions.active) {
+                this.captions.active = active;
+                utils.dispatchEvent.call(this, this.media, this.captions.active ? 'captionsenabled' : 'captionsdisabled');
+            }
         }
 
         /**
@@ -13249,7 +13224,7 @@ var Plyr = function () {
                 quality = Number(input);
             }
 
-            if (!utils.is.number(quality) || quality === 0) {
+            if (!utils.is.number(quality)) {
                 quality = this.storage.get('quality');
             }
 
