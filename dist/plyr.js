@@ -1303,7 +1303,7 @@ var utils = {
     // Get a nested value in an object
     getDeep: function getDeep(object, path) {
         return path.split('.').reduce(function (obj, key) {
-            return obj && obj[key] || undefined;
+            return obj && obj[key];
         }, object);
     },
 
@@ -1727,6 +1727,13 @@ var html5 = {
 
                 player.media.src = supported[0].getAttribute('src');
 
+                // Restore time
+                var onLoadedMetaData = function onLoadedMetaData() {
+                    player.currentTime = currentTime;
+                    player.off('loadedmetadata', onLoadedMetaData);
+                };
+                player.on('loadedmetadata', onLoadedMetaData);
+
                 // Load new source
                 player.media.load();
 
@@ -1734,9 +1741,6 @@ var html5 = {
                 if (playing) {
                     player.play();
                 }
-
-                // Restore time
-                player.currentTime = currentTime;
 
                 // Trigger change event
                 utils.dispatchEvent.call(player, player.media, 'qualitychange', false, {
@@ -2491,13 +2495,13 @@ var controls = {
 
             case 'quality':
                 if (utils.is.number(value)) {
-                    var qualityName = i18n.get('qualityName.' + value, this.config);
+                    var label = i18n.get('qualityLabel.' + value, this.config);
 
-                    if (!qualityName.length) {
+                    if (!label.length) {
                         return value + 'p';
                     }
 
-                    return qualityName;
+                    return label;
                 }
 
                 return utils.toTitleCase(value);
@@ -3801,9 +3805,8 @@ var defaults$1 = {
         display: {
             currentTime: '.plyr__time--current',
             duration: '.plyr__time--duration',
-            buffer: '.plyr__progress--buffer',
-            played: '.plyr__progress--played',
-            loop: '.plyr__progress--loop',
+            buffer: '.plyr__progress__buffer',
+            loop: '.plyr__progress__loop', // Used later
             volume: '.plyr__volume--display'
         },
         progress: '.plyr__progress',

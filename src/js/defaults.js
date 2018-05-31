@@ -322,9 +322,8 @@ const defaults = {
         display: {
             currentTime: '.plyr__time--current',
             duration: '.plyr__time--duration',
-            buffer: '.plyr__progress--buffer',
-            played: '.plyr__progress--played',
-            loop: '.plyr__progress--loop',
+            buffer: '.plyr__progress__buffer',
+            loop: '.plyr__progress__loop', // Used later
             volume: '.plyr__volume--display',
         },
         progress: '.plyr__progress',

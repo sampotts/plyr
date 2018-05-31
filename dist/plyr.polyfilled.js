@@ -20,7 +20,7 @@ if (typeof __g == 'number') __g = global; // eslint-disable-line no-undef
 });
 
 var _core = createCommonjsModule(function (module) {
-var core = module.exports = { version: '2.5.5' };
+var core = module.exports = { version: '2.5.3' };
 if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
 });
 var _core_1 = _core.version;
@@ -991,7 +991,7 @@ var _iterDefine = function (Base, NAME, Constructor, next, DEFAULT, IS_SET, FORC
   var VALUES_BUG = false;
   var proto = Base.prototype;
   var $native = proto[ITERATOR$2] || proto[FF_ITERATOR] || DEFAULT && proto[DEFAULT];
-  var $default = $native || getMethod(DEFAULT);
+  var $default = (!BUGGY && $native) || getMethod(DEFAULT);
   var $entries = DEFAULT ? !DEF_VALUES ? $default : getMethod('entries') : undefined;
   var $anyNative = NAME == 'Array' ? proto.entries || $native : $native;
   var methods, key, IteratorPrototype;
@@ -1002,7 +1002,7 @@ var _iterDefine = function (Base, NAME, Constructor, next, DEFAULT, IS_SET, FORC
       // Set @@toStringTag to native iterators
       _setToStringTag(IteratorPrototype, TAG, true);
       // fix for some old engines
-      if (!_library && typeof IteratorPrototype[ITERATOR$2] != 'function') _hide(IteratorPrototype, ITERATOR$2, returnThis);
+      if (!_library && !_has(IteratorPrototype, ITERATOR$2)) _hide(IteratorPrototype, ITERATOR$2, returnThis);
     }
   }
   // fix Array#{values, @@iterator}.name in V8 / FF
@@ -2496,11 +2496,9 @@ function set(target, propertyKey, V /* , receiver */) {
   }
   if (_has(ownDesc, 'value')) {
     if (ownDesc.writable === false || !_isObject(receiver)) return false;
-    if (existingDescriptor = _objectGopd.f(receiver, propertyKey)) {
-      if (existingDescriptor.get || existingDescriptor.set || existingDescriptor.writable === false) return false;
-      existingDescriptor.value = V;
-      _objectDp.f(receiver, propertyKey, existingDescriptor);
-    } else _objectDp.f(receiver, propertyKey, _propertyDesc(0, V));
+    existingDescriptor = _objectGopd.f(receiver, propertyKey) || _propertyDesc(0);
+    existingDescriptor.value = V;
+    _objectDp.f(receiver, propertyKey, existingDescriptor);
     return true;
   }
   return ownDesc.set === undefined ? false : (ownDesc.set.call(receiver, V), true);
@@ -2755,7 +2753,7 @@ var notify = function (promise, isReject) {
       var resolve = reaction.resolve;
       var reject = reaction.reject;
       var domain = reaction.domain;
-      var result, then, exited;
+      var result, then;
       try {
         if (handler) {
           if (!ok) {
@@ -2765,11 +2763,8 @@ var notify = function (promise, isReject) {
           if (handler === true) result = value;
           else {
             if (domain) domain.enter();
-            result = handler(value); // may throw
-            if (domain) {
-              domain.exit();
-              exited = true;
-            }
+            result = handler(value);
+            if (domain) domain.exit();
           }
           if (result === reaction.promise) {
             reject(TypeError$1('Promise-chain cycle'));
@@ -2778,7 +2773,6 @@ var notify = function (promise, isReject) {
           } else resolve(result);
         } else reject(value);
       } catch (e) {
-        if (domain && !exited) domain.exit();
         reject(e);
       }
     };
@@ -6692,7 +6686,7 @@ var utils = {
     // Get a nested value in an object
     getDeep: function getDeep(object, path) {
         return path.split('.').reduce(function (obj, key) {
-            return obj && obj[key] || undefined;
+            return obj && obj[key];
         }, object);
     },
 
@@ -7116,6 +7110,13 @@ var html5 = {
 
                 player.media.src = supported[0].getAttribute('src');
 
+                // Restore time
+                var onLoadedMetaData = function onLoadedMetaData() {
+                    player.currentTime = currentTime;
+                    player.off('loadedmetadata', onLoadedMetaData);
+                };
+                player.on('loadedmetadata', onLoadedMetaData);
+
                 // Load new source
                 player.media.load();
 
@@ -7123,9 +7124,6 @@ var html5 = {
                 if (playing) {
                     player.play();
                 }
-
-                // Restore time
-                player.currentTime = currentTime;
 
                 // Trigger change event
                 utils.dispatchEvent.call(player, player.media, 'qualitychange', false, {
@@ -7880,13 +7878,13 @@ var controls = {
 
             case 'quality':
                 if (utils.is.number(value)) {
-                    var qualityName = i18n.get('qualityName.' + value, this.config);
+                    var label = i18n.get('qualityLabel.' + value, this.config);
 
-                    if (!qualityName.length) {
+                    if (!label.length) {
                         return value + 'p';
                     }
 
-                    return qualityName;
+                    return label;
                 }
 
                 return utils.toTitleCase(value);
