@@ -65,6 +65,8 @@
         "doc": "readme.md"
     },
     "scripts": {
+        "build": "gulp build",
+        "lint": "eslint src/js",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "Sam Potts <sam@potts.es>",

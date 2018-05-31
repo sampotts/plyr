@@ -99,6 +99,13 @@ const html5 = {
                 // Set new source
                 player.media.src = supported[0].getAttribute('src');
 
+                // Restore time
+                const onLoadedMetaData = () => {
+                    player.currentTime = currentTime;
+                    player.off('loadedmetadata', onLoadedMetaData);
+                };
+                player.on('loadedmetadata', onLoadedMetaData);
+
                 // Load new source
                 player.media.load();
 
@@ -106,9 +113,6 @@ const html5 = {
                 if (playing) {
                     player.play();
                 }
-
-                // Restore time
-                player.currentTime = currentTime;
 
                 // Trigger change event
                 utils.dispatchEvent.call(player, player.media, 'qualitychange', false, {
