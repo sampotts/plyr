@@ -55,8 +55,10 @@ const ui = {
         // Remove native controls
         ui.toggleNativeControls.call(this);
 
-        // Captions
-        captions.setup.call(this);
+        // Setup captions for HTML5
+        if (this.isHTML5) {
+            captions.setup.call(this);
+        }
 
         // Reset volume
         this.volume = null;
@@ -108,6 +110,12 @@ const ui = {
         // Assure the poster image is set, if the property was added before the element was created
         if (this.poster && this.elements.poster && !this.elements.poster.style.backgroundImage) {
             ui.setPoster.call(this, this.poster);
+        }
+
+        // Manually set the duration if user has overridden it.
+        // The event listeners for it doesn't get called if preload is disabled (#701)
+        if (this.config.duration) {
+            controls.durationUpdate.call(this);
         }
     },
 

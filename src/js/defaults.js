@@ -115,7 +115,10 @@ const defaults = {
     // Captions settings
     captions: {
         active: false,
-        language: (navigator.language || navigator.userLanguage).split('-')[0],
+        language: 'auto',
+        // Listen to new tracks added after Plyr is initialized.
+        // This is needed for streaming captions, but may result in unselectable options
+        update: false,
     },
 
     // Fullscreen settings
@@ -187,6 +190,14 @@ const defaults = {
         disabled: 'Disabled',
         enabled: 'Enabled',
         advertisement: 'Ad',
+        qualityBadge: {
+            2160: '4K',
+            1440: 'HD',
+            1080: 'HD',
+            720: 'HD',
+            576: 'SD',
+            480: 'SD',
+        },
     },
 
     // URLs
@@ -311,9 +322,8 @@ const defaults = {
         display: {
             currentTime: '.plyr__time--current',
             duration: '.plyr__time--duration',
-            buffer: '.plyr__progress--buffer',
-            played: '.plyr__progress--played',
-            loop: '.plyr__progress--loop',
+            buffer: '.plyr__progress__buffer',
+            loop: '.plyr__progress__loop', // Used later
             volume: '.plyr__volume--display',
         },
         progress: '.plyr__progress',

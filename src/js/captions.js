@@ -16,28 +16,6 @@ const captions = {
             return;
         }
 
-        // Set default language if not set
-        const stored = this.storage.get('language');
-
-        if (!utils.is.empty(stored)) {
-            this.captions.language = stored;
-        }
-
-        if (utils.is.empty(this.captions.language)) {
-            this.captions.language = this.config.captions.language.toLowerCase();
-        }
-
-        // Set captions enabled state if not set
-        if (!utils.is.boolean(this.captions.active)) {
-            const active = this.storage.get('captions');
-
-            if (utils.is.boolean(active)) {
-                this.captions.active = active;
-            } else {
-                this.captions.active = this.config.captions.active;
-            }
-        }
-
         // Only Vimeo and HTML5 video supported at this point
         if (!this.isVideo || this.isYouTube || (this.isHTML5 && !support.textTracks)) {
             // Clear menu and hide
@@ -53,17 +31,6 @@ const captions = {
             this.elements.captions = utils.createElement('div', utils.getAttributesFromSelector(this.config.selectors.captions));
 
             utils.insertAfter(this.elements.captions, this.elements.wrapper);
-        }
-
-        // Set the class hook
-        utils.toggleClass(this.elements.container, this.config.classNames.captions.enabled, !utils.is.empty(captions.getTracks.call(this)));
-
-        // Get tracks
-        const tracks = captions.getTracks.call(this);
-
-        // If no caption file exists, hide container for caption text
-        if (utils.is.empty(tracks)) {
-            return;
         }
 
         // Get browser info
@@ -94,14 +61,45 @@ const captions = {
             });
         }
 
-        // Set language
-        captions.setLanguage.call(this);
+        // Try to load the value from storage
+        let active = this.storage.get('captions');
 
-        // Enable UI
-        captions.show.call(this);
+        // Otherwise fall back to the default config
+        if (!utils.is.boolean(active)) {
+            ({ active } = this.config.captions);
+        }
 
-        // Set available languages in list
-        if (utils.is.array(this.config.controls) && this.config.controls.includes('settings') && this.config.settings.includes('captions')) {
+        // Set toggled state
+        this.toggleCaptions(active);
+
+        // Watch changes to textTracks and update captions menu
+        if (this.config.captions.update) {
+            utils.on(this.media.textTracks, 'addtrack removetrack', captions.update.bind(this));
+        }
+
+        // Update available languages in list next tick (the event must not be triggered before the listeners)
+        setTimeout(captions.update.bind(this), 0);
+    },
+
+    update() {
+        // Update tracks
+        const tracks = captions.getTracks.call(this);
+        this.options.captions = tracks.map(({language}) => language);
+
+        // Set language if it hasn't been set already
+        if (!this.language) {
+            let { language } = this.config.captions;
+            if (language === 'auto') {
+                [ language ] = (navigator.language || navigator.userLanguage).split('-');
+            }
+            this.language = this.storage.get('language') || (language || '').toLowerCase();
+        }
+
+        // Toggle the class hooks
+        utils.toggleClass(this.elements.container, this.config.classNames.captions.enabled, !utils.is.empty(captions.getTracks.call(this)));
+
+        // Update available languages in list
+        if ((this.config.controls || []).includes('settings') && this.config.settings.includes('captions')) {
             controls.setCaptionsMenu.call(this);
         }
     },
@@ -245,24 +243,6 @@ const captions = {
             this.elements.captions.appendChild(content);
         } else {
             this.debug.warn('No captions element to render to');
-        }
-    },
-
-    // Display captions container and button (for initialization)
-    show() {
-        // Try to load the value from storage
-        let active = this.storage.get('captions');
-
-        // Otherwise fall back to the default config
-        if (!utils.is.boolean(active)) {
-            ({ active } = this.config.captions);
-        } else {
-            this.captions.active = active;
-        }
-
-        if (active) {
-            utils.toggleClass(this.elements.container, this.config.classNames.captions.active, true);
-            utils.toggleState(this.elements.buttons.captions, true);
         }
     },
 };

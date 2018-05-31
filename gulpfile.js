@@ -226,9 +226,14 @@ gulp.task('watch', () => {
     gulp.watch(paths.demo.src.sass, tasks.sass);
 });
 
+// Build distribution
+gulp.task('build', () => {
+    run(tasks.clean, tasks.js, tasks.sass, tasks.sprite);
+});
+
 // Default gulp task
 gulp.task('default', () => {
-    run(tasks.clean, tasks.js, tasks.sass, tasks.sprite, 'watch');
+    run('build', 'watch');
 });
 
 // Publish a version to CDN and demo

@@ -675,7 +675,7 @@ class Plyr {
             quality = Number(input);
         }
 
-        if (!utils.is.number(quality) || quality === 0) {
+        if (!utils.is.number(quality)) {
             quality = this.storage.get('quality');
         }
 
@@ -838,24 +838,19 @@ class Plyr {
         }
 
         // If the method is called without parameter, toggle based on current value
-        const show = utils.is.boolean(input) ? input : !this.elements.container.classList.contains(this.config.classNames.captions.active);
-
-        // Nothing to change...
-        if (this.captions.active === show) {
-            return;
-        }
-
-        // Set global
-        this.captions.active = show;
+        const active = utils.is.boolean(input) ? input : !this.elements.container.classList.contains(this.config.classNames.captions.active);
 
         // Toggle state
-        utils.toggleState(this.elements.buttons.captions, this.captions.active);
+        utils.toggleState(this.elements.buttons.captions, active);
 
         // Add class hook
-        utils.toggleClass(this.elements.container, this.config.classNames.captions.active, this.captions.active);
+        utils.toggleClass(this.elements.container, this.config.classNames.captions.active, active);
 
-        // Trigger an event
-        utils.dispatchEvent.call(this, this.media, this.captions.active ? 'captionsenabled' : 'captionsdisabled');
+        // Update state and trigger event
+        if (active !== this.captions.active) {
+            this.captions.active = active;
+            utils.dispatchEvent.call(this, this.media, this.captions.active ? 'captionsenabled' : 'captionsdisabled');
+        }
     }
 
     /**
