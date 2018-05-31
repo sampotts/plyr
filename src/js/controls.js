@@ -695,13 +695,13 @@ const controls = {
 
             case 'quality':
                 if (utils.is.number(value)) {
-                    const qualityName = i18n.get(`qualityName.${value}`, this.config);
+                    const label = i18n.get(`qualityLabel.${value}`, this.config);
 
-                    if (!qualityName.length) {
+                    if (!label.length) {
                         return `${value}p`;
                     }
 
-                    return qualityName;
+                    return label;
                 }
 
                 return utils.toTitleCase(value);
