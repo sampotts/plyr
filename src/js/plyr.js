@@ -895,7 +895,7 @@ class Plyr {
         this.captions.language = language;
 
         // Clear caption
-        captions.setText.call(this, null);
+        captions.updateCues.call(this, []);
 
         // Update captions
         captions.setLanguage.call(this);

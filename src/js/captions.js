@@ -110,23 +110,16 @@ const captions = {
         if (this.isHTML5 && this.isVideo) {
             captions.getTracks.call(this).forEach(track => {
                 // Show track
-                utils.on(track, 'cuechange', event => captions.setCue.call(this, event));
+                utils.on(track, 'cuechange', () => captions.updateCues.call(this));
 
                 // Turn off native caption rendering to avoid double captions
                 // eslint-disable-next-line
                 track.mode = 'hidden';
             });
 
-            // Get current track
-            const currentTrack = captions.getCurrentTrack.call(this);
+            // If we change the active track while a cue is already displayed we need to update it
+            captions.updateCues.call(this);
 
-            // Check if suported kind
-            if (utils.is.track(currentTrack)) {
-                // If we change the active track while a cue is already displayed we need to update it
-                if (Array.from(currentTrack.activeCues || []).length) {
-                    captions.setCue.call(this, currentTrack);
-                }
-            }
         } else if (this.isVimeo && this.captions.active) {
             this.embed.enableTextTrack(this.language);
         }
@@ -193,56 +186,48 @@ const captions = {
         return i18n.get('disabled', this.config);
     },
 
-    // Display active caption if it contains text
-    setCue(input) {
-        // Get the track from the event if needed
-        const track = utils.is.event(input) ? input.target : input;
-        const { activeCues } = track;
-        const active = activeCues.length && activeCues[0];
-        const currentTrack = captions.getCurrentTrack.call(this);
-
-        // Only display current track
-        if (track !== currentTrack) {
-            return;
-        }
-
-        // Display a cue, if there is one
-        if (utils.is.cue(active)) {
-            captions.setText.call(this, active.getCueAsHTML());
-        } else {
-            captions.setText.call(this, null);
-        }
-
-        utils.dispatchEvent.call(this, this.media, 'cuechange');
-    },
-
-    // Set the current caption
-    setText(input) {
+    // Update captions using current track's active cues
+    // Also optional array argument in case there isn't any track (ex: vimeo)
+    updateCues(input) {
         // Requires UI
         if (!this.supported.ui) {
             return;
         }
 
-        if (utils.is.element(this.elements.captions)) {
-            const content = utils.createElement('span');
-
-            // Empty the container
-            utils.emptyElement(this.elements.captions);
-
-            // Default to empty
-            const caption = !utils.is.nullOrUndefined(input) ? input : '';
-
-            // Set the span content
-            if (utils.is.string(caption)) {
-                content.innerText = caption.trim();
-            } else {
-                content.appendChild(caption);
-            }
-
-            // Set new caption text
-            this.elements.captions.appendChild(content);
-        } else {
+        if (!utils.is.element(this.elements.captions)) {
             this.debug.warn('No captions element to render to');
+            return;
+        }
+
+        // Only accept array or empty input
+        if (!utils.is.nullOrUndefined(input) && !Array.isArray(input)) {
+            this.debug.warn('updateCues: Invalid input', input);
+            return;
+        }
+
+        let cues = input;
+
+        // Get cues from track
+        if (!cues) {
+            const track = captions.getCurrentTrack.call(this);
+            cues = Array.from((track || {}).activeCues || [])
+                .map(cue => cue.getCueAsHTML())
+                .map(utils.getHTML);
+        }
+
+        // Set new caption text
+        const content = cues.map(cueText => cueText.trim()).join('\n');
+        const changed = content !== this.elements.captions.innerHTML;
+
+        if (changed) {
+            // Empty the container and create a new child element
+            utils.emptyElement(this.elements.captions);
+            const caption = utils.createElement('span');
+            caption.innerHTML = content;
+            this.elements.captions.appendChild(caption);
+
+            // Trigger event
+            utils.dispatchEvent.call(this, this.media, 'cuechange');
         }
     },
 };
