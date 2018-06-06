@@ -563,6 +563,12 @@ class Listeners {
         on(this.player.elements.inputs.seek, 'mousedown mouseup keydown keyup touchstart touchend', event => {
             const seek = event.currentTarget;
 
+            const code = event.keyCode ? event.keyCode : event.which;
+            const eventType = event.type;
+
+            if ((eventType === 'keydown' || eventType === 'keyup') && (code !== 39 && code !== 37)) {
+                return;
+            }
             // Was playing before?
             const play = seek.hasAttribute('play-on-seeked');
 
