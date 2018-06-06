@@ -74,7 +74,10 @@ class Listeners {
             // and if the focused element is not editable (e.g. text input)
             // and any that accept key input http://webaim.org/techniques/keyboard/
             const focused = utils.getFocusElement();
-            if (utils.is.element(focused) && utils.matches(focused, this.player.config.selectors.editable)) {
+            if (utils.is.element(focused) && (
+                focused !== this.player.elements.inputs.seek &&
+                utils.matches(focused, this.player.config.selectors.editable))
+            ) {
                 return;
             }
 
