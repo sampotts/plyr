@@ -25,6 +25,12 @@ Describe the issue as detailed as possible, answering these questions:
   * [Hls.js integration](https://codepen.io/pen?template=oyLKQb)
   * [Shaka Player integration](https://codepen.io/pen?template=ZRpzZO)
 
+It's important that you keep the issue description and replication demo **minimal**. If your implementation is using a framework, library or custom methods, which aren't needed to reproduce the issue, this makes it harder to debug and understand the issue. While it may be relevant to bring this up (ex: "I need Plyr to trigger the event sooner or it breaks Framework X") it also means that the person who is trying to fix the issue either has to know or learn your frameworks, libraries and custom methods, or that no one will try to fix your issue because it's too much work.
+
+In order to keep things on topic and to avoid bothering people with github notifications, please don't combine multiple problems or bugs into one issue, don't comment on issues unless your comment is related to that issue, and don't post "+1" or "I agree" type of comments. Use the emojis instead.
+
+Last but not least: Keep a civil tone in issues and comments. Non-constructive comments may be removed.
+
 ## Requesting features and improvements
 
 If you are missing something in Plyr, you can create a GitHub issue for this as well. Since we prioritize fixing bugs first, and may have a lot of other suggestions and architectural changes to work on as well, these may not be at the top of our list. If it's important or urgent to you, you may want to first ensure it's something we want to have in Plyr, and then contribute it as a pull request.
