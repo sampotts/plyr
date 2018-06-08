@@ -1,3 +1,12 @@
+# v3.3.10
+
+*   Fix for buffer display alignment and incorrect BEM classname
+*   Fix for playback not resuming position after quality swap (fixes #991, thanks @philipgiuliani!)
+*   Travis integration (thanks @friday!)
+*   Translate quality badges and quality names (thanks @philipgiuliani!)
+*   Improve captions handling for streaming (thanks @friday!)
+*   Call duration update method manually if user config has duration (thanks @friday!)
+
 # v3.3.9
 
 Again, more changes from @friday!
