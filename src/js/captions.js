@@ -222,7 +222,7 @@ const captions = {
         if (changed) {
             // Empty the container and create a new child element
             utils.emptyElement(this.elements.captions);
-            const caption = utils.createElement('span');
+            const caption = utils.createElement('span', utils.getAttributesFromSelector(this.config.selectors.caption));
             caption.innerHTML = content;
             this.elements.captions.appendChild(caption);
 
