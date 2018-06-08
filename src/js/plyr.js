@@ -874,7 +874,7 @@ class Plyr {
 
         // Check for support
         if (!this.options.captions.includes(language)) {
-            this.debug.warn(`Unsupported language option: ${language}`);
+            this.debug.log(`Language option: ${language} doesn't yet exist`);
             return;
         }
 
