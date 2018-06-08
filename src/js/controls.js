@@ -727,16 +727,7 @@ const controls = {
 
         switch (setting) {
             case 'captions':
-                if (this.captions.active) {
-                    if (this.options.captions.length > 2 || !this.options.captions.some(lang => lang === 'enabled')) {
-                        value = this.captions.language;
-                    } else {
-                        value = 'enabled';
-                    }
-                } else {
-                    value = '';
-                }
-
+                value = this.currentTrack;
                 break;
 
             default:
@@ -836,10 +827,10 @@ const controls = {
         // TODO: Captions or language? Currently it's mixed
         const type = 'captions';
         const list = this.elements.settings.panes.captions.querySelector('ul');
+        const tracks = captions.getTracks.call(this);
 
         // Toggle the pane and tab
-        const toggle = captions.getTracks.call(this).length;
-        controls.toggleTab.call(this, type, toggle);
+        controls.toggleTab.call(this, type, tracks.length);
 
         // Empty the menu
         utils.emptyElement(list);
@@ -848,33 +839,31 @@ const controls = {
         controls.checkMenu.call(this);
 
         // If there's no captions, bail
-        if (!toggle) {
+        if (!tracks.length) {
             return;
         }
 
-        // Re-map the tracks into just the data we need
-        const tracks = captions.getTracks.call(this).map(track => ({
-            language: !utils.is.empty(track.language) ? track.language : 'enabled',
-            label: captions.getLabel.call(this, track),
+        // Generate options data
+        const options = tracks.map((track, value) => ({
+            value,
+            checked: this.captions.active && this.currentTrack === value,
+            title: captions.getLabel.call(this, track),
+            badge: track.language && controls.createBadge.call(this, track.language.toUpperCase()),
+            list,
+            type: 'language',
         }));
 
         // Add the "Disabled" option to turn off captions
-        tracks.unshift({
-            language: '',
-            label: i18n.get('disabled', this.config),
+        options.unshift({
+            value: -1,
+            checked: !this.captions.active,
+            title: i18n.get('disabled', this.config),
+            list,
+            type: 'language',
         });
 
         // Generate options
-        tracks.forEach(track => {
-            controls.createMenuItem.call(this, {
-                value: track.language,
-                list,
-                type: 'language',
-                title: track.label,
-                badge: track.language !== 'enabled' ? controls.createBadge.call(this, track.language.toUpperCase()) : null,
-                checked: track.language.toLowerCase() === this.language,
-            });
-        });
+        options.forEach(controls.createMenuItem.bind(this));
 
         controls.updateSetting.call(this, type, list);
     },

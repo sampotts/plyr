@@ -69,12 +69,18 @@ const captions = {
             ({ active } = this.config.captions);
         }
 
-        // Set toggled state
-        this.toggleCaptions(active);
+        // Get language from storage, fallback to config
+        let language = this.storage.get('language') || this.config.captions.language;
+        if (language === 'auto') {
+            [ language ] = (navigator.language || navigator.userLanguage).split('-');
+        }
+        // Set language and show if active
+        captions.setLanguage.call(this, language, active);
 
         // Watch changes to textTracks and update captions menu
-        if (this.config.captions.update) {
-            utils.on(this.media.textTracks, 'addtrack removetrack', captions.update.bind(this));
+        if (this.isHTML5) {
+            const trackEvents = this.config.captions.update ? 'addtrack removetrack' : 'removetrack';
+            utils.on(this.media.textTracks, trackEvents, captions.update.bind(this));
         }
 
         // Update available languages in list next tick (the event must not be triggered before the listeners)
@@ -82,21 +88,39 @@ const captions = {
     },
 
     update() {
-        // Update tracks
-        const tracks = captions.getTracks.call(this);
-        this.options.captions = tracks.map(({language}) => language);
+        const tracks = captions.getTracks.call(this, true);
+        // Get the wanted language
+        const { language, meta } = this.captions;
 
-        // Set language if it hasn't been set already
-        if (!this.language) {
-            let { language } = this.config.captions;
-            if (language === 'auto') {
-                [ language ] = (navigator.language || navigator.userLanguage).split('-');
-            }
-            this.language = this.storage.get('language') || (language || '').toLowerCase();
+        // Handle tracks (add event listener and "pseudo"-default)
+        if (this.isHTML5 && this.isVideo) {
+            tracks
+                .filter(track => !meta.get(track))
+                .forEach(track => {
+                    this.debug.log('Track added', track);
+                    // Attempt to store if the original dom element was "default"
+                    meta.set(track, {
+                        default: track.mode === 'showing',
+                    });
+
+                    // Turn off native caption rendering to avoid double captions
+                    track.mode = 'hidden';
+
+                    // Add event listener for cue changes
+                    utils.on(track, 'cuechange', () => captions.updateCues.call(this));
+                });
         }
 
-        // Toggle the class hooks
-        utils.toggleClass(this.elements.container, this.config.classNames.captions.enabled, !utils.is.empty(captions.getTracks.call(this)));
+        const trackRemoved = !tracks.find(track => track === this.captions.currentTrackNode);
+        const firstMatch = this.language !== language && tracks.find(track => track.language === language);
+
+        // Update language if removed or first matching track added
+        if (trackRemoved || firstMatch) {
+            captions.setLanguage.call(this, language, this.config.captions.active);
+        }
+
+        // Enable or disable captions based on track length
+        utils.toggleClass(this.elements.container, this.config.classNames.captions.enabled, !utils.is.empty(tracks));
 
         // Update available languages in list
         if ((this.config.controls || []).includes('settings') && this.config.settings.includes('captions')) {
@@ -104,60 +128,94 @@ const captions = {
         }
     },
 
-    // Set the captions language
-    setLanguage() {
-        // Setup HTML5 track rendering
+    set(index, setLanguage = true, show = true) {
+        const tracks = captions.getTracks.call(this);
+
+        // Disable captions if setting to -1
+        if (index === -1) {
+            this.toggleCaptions(false);
+            return;
+        }
+
+        if (!utils.is.number(index)) {
+            this.debug.warn('Invalid caption argument', index);
+            return;
+        }
+
+        if (!(index in tracks)) {
+            this.debug.warn('Track not found', index);
+            return;
+        }
+
+        if (this.captions.currentTrack !== index) {
+            this.captions.currentTrack = index;
+            const track = captions.getCurrentTrack.call(this);
+            const { language } = track || {};
+
+            // Store reference to node for invalidation on remove
+            this.captions.currentTrackNode = track;
+
+            // Prevent setting language in some cases, since it can violate user's intentions
+            if (setLanguage) {
+                this.captions.language = language;
+            }
+
+            // Handle Vimeo captions
+            if (this.isVimeo) {
+                this.embed.enableTextTrack(language);
+            }
+
+            // Trigger event
+            utils.dispatchEvent.call(this, this.media, 'languagechange');
+        }
+
         if (this.isHTML5 && this.isVideo) {
-            captions.getTracks.call(this).forEach(track => {
-                // Show track
-                utils.on(track, 'cuechange', () => captions.updateCues.call(this));
-
-                // Turn off native caption rendering to avoid double captions
-                // eslint-disable-next-line
-                track.mode = 'hidden';
-            });
-
             // If we change the active track while a cue is already displayed we need to update it
             captions.updateCues.call(this);
+        }
 
-        } else if (this.isVimeo && this.captions.active) {
-            this.embed.enableTextTrack(this.language);
+        // Show captions
+        if (show) {
+            this.toggleCaptions(true);
         }
     },
 
-    // Get the tracks
-    getTracks() {
+    setLanguage(language, show = true) {
+        if (!utils.is.string(language)) {
+            this.debug.warn('Invalid language argument', language);
+            return;
+        }
+        // Normalize
+        this.captions.language = language.toLowerCase();
+
+        // Set currentTrack
+        const tracks = captions.getTracks.call(this);
+        const track = captions.getCurrentTrack.call(this, true);
+        captions.set.call(this, tracks.indexOf(track), false, show);
+    },
+
+    // Get current valid caption tracks
+    // If update is false it will also ignore tracks without metadata
+    // This is used to "freeze" the language options when captions.update is false
+    getTracks(update = false) {
         // Handle media or textTracks missing or null
-        const { textTracks } = this.media || {};
-        // Filter out invalid tracks kinds (like metadata)
-        return Array.from(textTracks || []).filter(track => [
-            'captions',
-            'subtitles',
-        ].includes(track.kind));
+        const tracks = Array.from((this.media || {}).textTracks || []);
+        // For HTML5, use cache instead of current tracks when it exists (if captions.update is false)
+        // Filter out removed tracks and tracks that aren't captions/subtitles (for example metadata)
+        return tracks
+            .filter(track => !this.isHTML5 || update || this.captions.meta.has(track))
+            .filter(track => [
+                'captions',
+                'subtitles',
+            ].includes(track.kind));
     },
 
     // Get the current track for the current language
-    getCurrentTrack() {
+    getCurrentTrack(fromLanguage = false) {
         const tracks = captions.getTracks.call(this);
-
-        if (!tracks.length) {
-            return null;
-        }
-
-        // Get track based on current language
-        let track = tracks.find(track => track.language.toLowerCase() === this.language);
-
-        // Get the <track> with default attribute
-        if (!track) {
-            track = utils.getElement.call(this, 'track[default]');
-        }
-
-        // Get the first track
-        if (!track) {
-            [track] = tracks;
-        }
-
-        return track;
+        const sortIsDefault = track => Number((this.captions.meta.get(track) || {}).default);
+        const sorted = Array.from(tracks).sort((a, b) => sortIsDefault(b) - sortIsDefault(a));
+        return (!fromLanguage && tracks[this.currentTrack]) || sorted.find(track => track.language === this.captions.language) || sorted[0];
     },
 
     // Get UI label for track
