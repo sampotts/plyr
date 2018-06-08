@@ -127,13 +127,10 @@ const captions = {
 
     // Get the tracks
     getTracks() {
-        // Return empty array at least
-        if (utils.is.nullOrUndefined(this.media)) {
-            return [];
-        }
-
-        // Only get accepted kinds
-        return Array.from(this.media.textTracks || []).filter(track => [
+        // Handle media or textTracks missing or null
+        const { textTracks } = this.media || {};
+        // Filter out invalid tracks kinds (like metadata)
+        return Array.from(textTracks || []).filter(track => [
             'captions',
             'subtitles',
         ].includes(track.kind));
