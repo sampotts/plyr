@@ -376,7 +376,7 @@ const controls = {
     },
 
     // Create a settings menu item
-    createMenuItem(value, list, type, title, badge = null, checked = false) {
+    createMenuItem({value, list, type, title, badge = null, checked = false}) {
         const item = utils.createElement('li');
 
         const label = utils.createElement('label', {
@@ -680,8 +680,13 @@ const controls = {
                 return sorting.indexOf(a) > sorting.indexOf(b) ? 1 : -1;
             })
             .forEach(quality => {
-                const label = controls.getLabel.call(this, 'quality', quality);
-                controls.createMenuItem.call(this, quality, list, type, label, getBadge(quality));
+                controls.createMenuItem.call(this, {
+                    value: quality,
+                    list,
+                    type,
+                    title: controls.getLabel.call(this, 'quality', quality),
+                    badge: getBadge(quality),
+                });
             });
 
         controls.updateSetting.call(this, type, list);
@@ -861,15 +866,14 @@ const controls = {
 
         // Generate options
         tracks.forEach(track => {
-            controls.createMenuItem.call(
-                this,
-                track.language,
+            controls.createMenuItem.call(this, {
+                value: track.language,
                 list,
-                'language',
-                track.label,
-                track.language !== 'enabled' ? controls.createBadge.call(this, track.language.toUpperCase()) : null,
-                track.language.toLowerCase() === this.language,
-            );
+                type: 'language',
+                title: track.label,
+                badge: track.language !== 'enabled' ? controls.createBadge.call(this, track.language.toUpperCase()) : null,
+                checked: track.language.toLowerCase() === this.language,
+            });
         });
 
         controls.updateSetting.call(this, type, list);
@@ -927,8 +931,12 @@ const controls = {
 
         // Create items
         this.options.speed.forEach(speed => {
-            const label = controls.getLabel.call(this, 'speed', speed);
-            controls.createMenuItem.call(this, speed, list, type, label);
+            controls.createMenuItem.call(this, {
+                value: speed,
+                list,
+                type,
+                title: controls.getLabel.call(this, 'speed', speed),
+            });
         });
 
         controls.updateSetting.call(this, type, list);
