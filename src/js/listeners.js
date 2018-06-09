@@ -74,7 +74,10 @@ class Listeners {
             // and if the focused element is not editable (e.g. text input)
             // and any that accept key input http://webaim.org/techniques/keyboard/
             const focused = utils.getFocusElement();
-            if (utils.is.element(focused) && utils.matches(focused, this.player.config.selectors.editable)) {
+            if (utils.is.element(focused) && (
+                focused !== this.player.elements.inputs.seek &&
+                utils.matches(focused, this.player.config.selectors.editable))
+            ) {
                 return;
             }
 
@@ -560,6 +563,12 @@ class Listeners {
         on(this.player.elements.inputs.seek, 'mousedown mouseup keydown keyup touchstart touchend', event => {
             const seek = event.currentTarget;
 
+            const code = event.keyCode ? event.keyCode : event.which;
+            const eventType = event.type;
+
+            if ((eventType === 'keydown' || eventType === 'keyup') && (code !== 39 && code !== 37)) {
+                return;
+            }
             // Was playing before?
             const play = seek.hasAttribute('play-on-seeked');
 

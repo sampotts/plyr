@@ -1,6 +1,6 @@
 {
     "name": "plyr",
-    "version": "3.3.8",
+    "version": "3.3.10",
     "description": "A simple, accessible and customizable HTML5, YouTube and Vimeo media player",
     "homepage": "https://plyr.io",
     "main": "./dist/plyr.js",
@@ -65,6 +65,8 @@
         "doc": "readme.md"
     },
     "scripts": {
+        "build": "gulp build",
+        "lint": "eslint src/js",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "Sam Potts <sam@potts.es>",

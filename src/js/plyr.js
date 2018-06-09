@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v3.3.8
+// plyr.js v3.3.10
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -432,21 +432,16 @@ class Plyr {
      * @param {number} input - where to seek to in seconds. Defaults to 0 (the start)
      */
     set currentTime(input) {
-        let targetTime = 0;
-
-        if (utils.is.number(input)) {
-            targetTime = input;
+        // Bail if media duration isn't available yet
+        if (!this.duration) {
+            return;
         }
 
-        // Normalise targetTime
-        if (targetTime < 0) {
-            targetTime = 0;
-        } else if (targetTime > this.duration) {
-            targetTime = this.duration;
-        }
+        // Validate input
+        const inputIsValid = utils.is.number(input) && input > 0;
 
         // Set
-        this.media.currentTime = targetTime;
+        this.media.currentTime = inputIsValid ? Math.min(input, this.duration) : 0;
 
         // Logging
         this.debug.log(`Seeking to ${this.currentTime} seconds`);
@@ -494,11 +489,11 @@ class Plyr {
         // Faux duration set via config
         const fauxDuration = parseFloat(this.config.duration);
 
-        // True duration
-        const realDuration = this.media ? Number(this.media.duration) : 0;
+        // Media duration can be NaN before the media has loaded
+        const duration = (this.media || {}).duration || 0;
 
-        // If custom duration is funky, use regular duration
-        return !Number.isNaN(fauxDuration) ? fauxDuration : realDuration;
+        // If config duration is funky, use regular duration
+        return fauxDuration || duration;
     }
 
     /**
@@ -680,7 +675,7 @@ class Plyr {
             quality = Number(input);
         }
 
-        if (!utils.is.number(quality) || quality === 0) {
+        if (!utils.is.number(quality)) {
             quality = this.storage.get('quality');
         }
 
@@ -843,24 +838,19 @@ class Plyr {
         }
 
         // If the method is called without parameter, toggle based on current value
-        const show = utils.is.boolean(input) ? input : !this.elements.container.classList.contains(this.config.classNames.captions.active);
-
-        // Nothing to change...
-        if (this.captions.active === show) {
-            return;
-        }
-
-        // Set global
-        this.captions.active = show;
+        const active = utils.is.boolean(input) ? input : !this.elements.container.classList.contains(this.config.classNames.captions.active);
 
         // Toggle state
-        this.elements.buttons.captions.pressed = this.captions.active;
+        this.elements.buttons.captions.pressed = active;
 
         // Add class hook
-        utils.toggleClass(this.elements.container, this.config.classNames.captions.active, this.captions.active);
+        utils.toggleClass(this.elements.container, this.config.classNames.captions.active, active);
 
-        // Trigger an event
+        // Update state and trigger event
+        if (active !== this.captions.active) {
+            this.captions.active = active;
         utils.dispatchEvent.call(this, this.media, this.captions.active ? 'captionsenabled' : 'captionsdisabled');
+        }
     }
 
     /**

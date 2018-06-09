@@ -407,7 +407,7 @@ var Storage = function () {
     createClass(Storage, [{
         key: 'get',
         value: function get$$1(key) {
-            if (!Storage.supported) {
+            if (!Storage.supported || !this.enabled) {
                 return null;
             }
 
@@ -526,7 +526,7 @@ var utils = {
             return this.instanceof(input, Event);
         },
         cue: function cue(input) {
-            return this.instanceof(input, TextTrackCue) || this.instanceof(input, VTTCue);
+            return this.instanceof(input, window.TextTrackCue) || this.instanceof(input, window.VTTCue);
         },
         track: function track(input) {
             return this.instanceof(input, TextTrack) || !this.nullOrUndefined(input) && this.string(input.kind);
@@ -637,26 +637,25 @@ var utils = {
             return;
         }
 
-        var prefix = 'cache-';
+        var prefix = 'cache';
         var hasId = utils.is.string(id);
         var isCached = false;
 
         var exists = function exists() {
-            return document.querySelectorAll('#' + id).length;
+            return document.getElementById(id) !== null;
         };
 
-        function injectSprite(data) {
+        var update = function update(container, data) {
+            container.innerHTML = data;
+
             // Check again incase of race condition
             if (hasId && exists()) {
                 return;
             }
 
-            // Inject content
-            this.innerHTML = data;
-
             // Inject the SVG to the body
-            document.body.insertBefore(this, document.body.childNodes[0]);
-        }
+            document.body.insertAdjacentElement('afterbegin', container);
+        };
 
         // Only load once if ID set
         if (!hasId || !exists()) {
@@ -672,13 +671,12 @@ var utils = {
 
             // Check in cache
             if (useStorage) {
-                var cached = window.localStorage.getItem(prefix + id);
+                var cached = window.localStorage.getItem(prefix + '-' + id);
                 isCached = cached !== null;
 
                 if (isCached) {
                     var data = JSON.parse(cached);
-                    injectSprite.call(container, data.content);
-                    return;
+                    update(container, data.content);
                 }
             }
 
@@ -689,12 +687,12 @@ var utils = {
                 }
 
                 if (useStorage) {
-                    window.localStorage.setItem(prefix + id, JSON.stringify({
+                    window.localStorage.setItem(prefix + '-' + id, JSON.stringify({
                         content: result
                     }));
                 }
 
-                injectSprite.call(container, result);
+                update(container, result);
             }).catch(function () {});
         }
     },
@@ -1275,6 +1273,14 @@ var utils = {
     },
 
 
+    // Get a nested value in an object
+    getDeep: function getDeep(object, path) {
+        return path.split('.').reduce(function (obj, key) {
+            return obj && obj[key];
+        }, object);
+    },
+
+
     // Get the closest value in an array
     closest: function closest(array, value) {
         if (!utils.is.array(array) || !array.length) {
@@ -1694,6 +1700,13 @@ var html5 = {
 
                 player.media.src = supported[0].getAttribute('src');
 
+                // Restore time
+                var onLoadedMetaData = function onLoadedMetaData() {
+                    player.currentTime = currentTime;
+                    player.off('loadedmetadata', onLoadedMetaData);
+                };
+                player.on('loadedmetadata', onLoadedMetaData);
+
                 // Load new source
                 player.media.load();
 
@@ -1701,9 +1714,6 @@ var html5 = {
                 if (playing) {
                     player.play();
                 }
-
-                // Restore time
-                player.currentTime = currentTime;
 
                 // Trigger change event
                 utils.dispatchEvent.call(player, player.media, 'qualitychange', false, {
@@ -1746,11 +1756,15 @@ var i18n = {
         var key = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
         var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-        if (utils.is.empty(key) || utils.is.empty(config) || !Object.keys(config.i18n).includes(key)) {
+        if (utils.is.empty(key) || utils.is.empty(config)) {
             return '';
         }
 
-        var string = config.i18n[key];
+        var string = utils.getDeep(config.i18n, key);
+
+        if (utils.is.empty(string)) {
+            return '';
+        }
 
         var replace = {
             '{seektime}': config.seekTime,
@@ -2001,9 +2015,6 @@ var controls = {
             // Label/Tooltip
             button.appendChild(controls.createLabel.call(this, labelPressed, { class: 'label--pressed' }));
             button.appendChild(controls.createLabel.call(this, label, { class: 'label--not-pressed' }));
-
-            // Add aria attributes
-            attributes['aria-pressed'] = false;
         } else {
             button.appendChild(controls.createIcon.call(this, icon));
             button.appendChild(controls.createLabel.call(this, label));
@@ -2025,19 +2036,26 @@ var controls = {
             this.elements.buttons[type] = button;
         }
 
+        // Toggle classname when pressed property is set
+        var className = this.config.classNames.controlPressed;
+        Object.defineProperty(button, 'pressed', {
+            enumerable: true,
+            get: function get$$1() {
+                return utils.hasClass(button, className);
+            },
+            set: function set$$1() {
+                var pressed = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+                utils.toggleClass(button, className, pressed);
+            }
+        });
+
         return button;
     },
 
 
     // Create an <input type='range'>
     createRange: function createRange(type, attributes) {
-        // Seek label
-        var label = utils.createElement('label', {
-            for: attributes.id,
-            id: attributes.id + '-label',
-            class: this.config.classNames.hidden
-        }, i18n.get(type, this.config));
-
         // Seek input
         var input = utils.createElement('input', utils.extend(utils.getAttributesFromSelector(this.config.selectors.inputs[type]), {
             type: 'range',
@@ -2048,7 +2066,7 @@ var controls = {
             autocomplete: 'off',
             // A11y fixes for https://github.com/sampotts/plyr/issues/905
             role: 'slider',
-            'aria-labelledby': attributes.id + '-label',
+            'aria-label': i18n.get(type, this.config),
             'aria-valuemin': 0,
             'aria-valuemax': 100,
             'aria-valuenow': 0
@@ -2059,10 +2077,7 @@ var controls = {
         // Set the fill for webkit now
         controls.updateRangeFill.call(this, input);
 
-        return {
-            label: label,
-            input: input
-        };
+        return input;
     },
 
 
@@ -2185,7 +2200,7 @@ var controls = {
 
         // Update mute state
         if (utils.is.element(this.elements.buttons.mute)) {
-            utils.toggleState(this.elements.buttons.mute, this.muted || this.volume === 0);
+            this.elements.buttons.mute.pressed = this.muted || this.volume === 0;
         }
     },
 
@@ -2424,27 +2439,7 @@ var controls = {
 
         // Get the badge HTML for HD, 4K etc
         var getBadge = function getBadge(quality) {
-            var label = '';
-
-            switch (quality) {
-                case 2160:
-                    label = '4K';
-                    break;
-
-                case 1440:
-                case 1080:
-                case 720:
-                    label = 'HD';
-                    break;
-
-                case 576:
-                case 480:
-                    label = 'SD';
-                    break;
-
-                default:
-                    break;
-            }
+            var label = i18n.get('qualityBadge.' + quality, _this3.config);
 
             if (!label.length) {
                 return null;
@@ -2467,7 +2462,6 @@ var controls = {
 
 
     // Translate a value into a nice label
-    // TODO: Localisation
     getLabel: function getLabel(setting, value) {
         switch (setting) {
             case 'speed':
@@ -2475,7 +2469,13 @@ var controls = {
 
             case 'quality':
                 if (utils.is.number(value)) {
-                    return value + 'p';
+                    var label = i18n.get('qualityLabel.' + value, this.config);
+
+                    if (!label.length) {
+                        return value + 'p';
+                    }
+
+                    return label;
                 }
 
                 return utils.toTitleCase(value);
@@ -2635,12 +2635,7 @@ var controls = {
 
         // Generate options
         tracks.forEach(function (track) {
-            controls.createMenuItem.call(_this4, track.language, list, 'language', track.label, track.language !== 'enabled' ? controls.createBadge.call(_this4, track.language.toUpperCase()) : null, track.language.toLowerCase() === _this4.captions.language.toLowerCase());
-        });
-
-        // Store reference
-        this.options.captions = tracks.map(function (track) {
-            return track.language;
+            controls.createMenuItem.call(_this4, track.language, list, 'language', track.label, track.language !== 'enabled' ? controls.createBadge.call(_this4, track.language.toUpperCase()) : null, track.language.toLowerCase() === _this4.language);
         });
 
         controls.updateSetting.call(this, type, list);
@@ -2909,11 +2904,9 @@ var controls = {
             var progress = utils.createElement('div', utils.getAttributesFromSelector(this.config.selectors.progress));
 
             // Seek range slider
-            var seek = controls.createRange.call(this, 'seek', {
+            progress.appendChild(controls.createRange.call(this, 'seek', {
                 id: 'plyr-seek-' + data.id
-            });
-            progress.appendChild(seek.label);
-            progress.appendChild(seek.input);
+            }));
 
             // Buffer progress
             progress.appendChild(controls.createProgress.call(this, 'buffer'));
@@ -2963,11 +2956,9 @@ var controls = {
             };
 
             // Create the volume range slider
-            var range = controls.createRange.call(this, 'volume', utils.extend(attributes, {
+            volume.appendChild(controls.createRange.call(this, 'volume', utils.extend(attributes, {
                 id: 'plyr-volume-' + data.id
-            }));
-            volume.appendChild(range.label);
-            volume.appendChild(range.input);
+            })));
 
             this.elements.volume = volume;
 
@@ -3243,28 +3234,6 @@ var captions = {
             return;
         }
 
-        // Set default language if not set
-        var stored = this.storage.get('language');
-
-        if (!utils.is.empty(stored)) {
-            this.captions.language = stored;
-        }
-
-        if (utils.is.empty(this.captions.language)) {
-            this.captions.language = this.config.captions.language.toLowerCase();
-        }
-
-        // Set captions enabled state if not set
-        if (!utils.is.boolean(this.captions.active)) {
-            var active = this.storage.get('captions');
-
-            if (utils.is.boolean(active)) {
-                this.captions.active = active;
-            } else {
-                this.captions.active = this.config.captions.active;
-            }
-        }
-
         // Only Vimeo and HTML5 video supported at this point
         if (!this.isVideo || this.isYouTube || this.isHTML5 && !support.textTracks) {
             // Clear menu and hide
@@ -3280,17 +3249,6 @@ var captions = {
             this.elements.captions = utils.createElement('div', utils.getAttributesFromSelector(this.config.selectors.captions));
 
             utils.insertAfter(this.elements.captions, this.elements.wrapper);
-        }
-
-        // Set the class hook
-        utils.toggleClass(this.elements.container, this.config.classNames.captions.enabled, !utils.is.empty(captions.getTracks.call(this)));
-
-        // Get tracks
-        var tracks = captions.getTracks.call(this);
-
-        // If no caption file exists, hide container for caption text
-        if (utils.is.empty(tracks)) {
-            return;
         }
 
         // Get browser info
@@ -3315,14 +3273,52 @@ var captions = {
             });
         }
 
-        // Set language
-        captions.setLanguage.call(this);
+        // Try to load the value from storage
+        var active = this.storage.get('captions');
 
-        // Enable UI
-        captions.show.call(this);
+        // Otherwise fall back to the default config
+        if (!utils.is.boolean(active)) {
+            active = this.config.captions.active;
+        }
 
-        // Set available languages in list
-        if (utils.is.array(this.config.controls) && this.config.controls.includes('settings') && this.config.settings.includes('captions')) {
+        // Set toggled state
+        this.toggleCaptions(active);
+
+        // Watch changes to textTracks and update captions menu
+        if (this.config.captions.update) {
+            utils.on(this.media.textTracks, 'addtrack removetrack', captions.update.bind(this));
+        }
+
+        // Update available languages in list next tick (the event must not be triggered before the listeners)
+        setTimeout(captions.update.bind(this), 0);
+    },
+    update: function update() {
+        // Update tracks
+        var tracks = captions.getTracks.call(this);
+        this.options.captions = tracks.map(function (_ref) {
+            var language = _ref.language;
+            return language;
+        });
+
+        // Set language if it hasn't been set already
+        if (!this.language) {
+            var language = this.config.captions.language;
+
+            if (language === 'auto') {
+                var _split = (navigator.language || navigator.userLanguage).split('-');
+
+                var _split2 = slicedToArray(_split, 1);
+
+                language = _split2[0];
+            }
+            this.language = this.storage.get('language') || (language || '').toLowerCase();
+        }
+
+        // Toggle the class hooks
+        utils.toggleClass(this.elements.container, this.config.classNames.captions.enabled, !utils.is.empty(captions.getTracks.call(this)));
+
+        // Update available languages in list
+        if ((this.config.controls || []).includes('settings') && this.config.settings.includes('captions')) {
             controls.setCaptionsMenu.call(this);
         }
     },
@@ -3483,25 +3479,6 @@ var captions = {
         } else {
             this.debug.warn('No captions element to render to');
         }
-    },
-
-
-    // Display captions container and button (for initialization)
-    show: function show() {
-        // Try to load the value from storage
-        var active = this.storage.get('captions');
-
-        // Otherwise fall back to the default config
-        if (!utils.is.boolean(active)) {
-            active = this.config.captions.active;
-        } else {
-            this.captions.active = active;
-        }
-
-        if (active) {
-            utils.toggleClass(this.elements.container, this.config.classNames.captions.active, true);
-            utils.toggleState(this.elements.buttons.captions, true);
-        }
     }
 };
 
@@ -3607,7 +3584,7 @@ var defaults$1 = {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.3.8/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.3.10/plyr.svg',
 
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
@@ -3646,7 +3623,10 @@ var defaults$1 = {
     // Captions settings
     captions: {
         active: false,
-        language: (navigator.language || navigator.userLanguage).split('-')[0]
+        language: 'auto',
+        // Listen to new tracks added after Plyr is initialized.
+        // This is needed for streaming captions, but may result in unselectable options
+        update: false
     },
 
     // Fullscreen settings
@@ -3703,7 +3683,15 @@ var defaults$1 = {
         reset: 'Reset',
         disabled: 'Disabled',
         enabled: 'Enabled',
-        advertisement: 'Ad'
+        advertisement: 'Ad',
+        qualityBadge: {
+            2160: '4K',
+            1440: 'HD',
+            1080: 'HD',
+            720: 'HD',
+            576: 'SD',
+            480: 'SD'
+        }
     },
 
     // URLs
@@ -3791,9 +3779,8 @@ var defaults$1 = {
         display: {
             currentTime: '.plyr__time--current',
             duration: '.plyr__time--duration',
-            buffer: '.plyr__progress--buffer',
-            played: '.plyr__progress--played',
-            loop: '.plyr__progress--loop',
+            buffer: '.plyr__progress__buffer',
+            loop: '.plyr__progress__loop', // Used later
             volume: '.plyr__volume--display'
         },
         progress: '.plyr__progress',
@@ -4163,8 +4150,10 @@ var ui = {
         // Remove native controls
         ui.toggleNativeControls.call(this);
 
-        // Captions
-        captions.setup.call(this);
+        // Setup captions for HTML5
+        if (this.isHTML5) {
+            captions.setup.call(this);
+        }
 
         // Reset volume
         this.volume = null;
@@ -4216,6 +4205,12 @@ var ui = {
         // Assure the poster image is set, if the property was added before the element was created
         if (this.poster && this.elements.poster && !this.elements.poster.style.backgroundImage) {
             ui.setPoster.call(this, this.poster);
+        }
+
+        // Manually set the duration if user has overridden it.
+        // The event listeners for it doesn't get called if preload is disabled (#701)
+        if (this.config.duration) {
+            controls.durationUpdate.call(this);
         }
     },
 
@@ -4410,7 +4405,7 @@ var Listeners = function () {
                 // and if the focused element is not editable (e.g. text input)
                 // and any that accept key input http://webaim.org/techniques/keyboard/
                 var focused = utils.getFocusElement();
-                if (utils.is.element(focused) && utils.matches(focused, this.player.config.selectors.editable)) {
+                if (utils.is.element(focused) && focused !== this.player.elements.inputs.seek && utils.matches(focused, this.player.config.selectors.editable)) {
                     return;
                 }
 
@@ -4904,6 +4899,12 @@ var Listeners = function () {
             on(this.player.elements.inputs.seek, 'mousedown mouseup keydown keyup touchstart touchend', function (event) {
                 var seek = event.currentTarget;
 
+                var code = event.keyCode ? event.keyCode : event.which;
+                var eventType = event.type;
+
+                if ((eventType === 'keydown' || eventType === 'keyup') && code !== 39 && code !== 37) {
+                    return;
+                }
                 // Was playing before?
                 var play = seek.hasAttribute('play-on-seeked');
 
@@ -7278,24 +7279,19 @@ var Plyr = function () {
             }
 
             // If the method is called without parameter, toggle based on current value
-            var show = utils.is.boolean(input) ? input : !this.elements.container.classList.contains(this.config.classNames.captions.active);
-
-            // Nothing to change...
-            if (this.captions.active === show) {
-                return;
-            }
-
-            // Set global
-            this.captions.active = show;
+            var active = utils.is.boolean(input) ? input : !this.elements.container.classList.contains(this.config.classNames.captions.active);
 
             // Toggle state
-            utils.toggleState(this.elements.buttons.captions, this.captions.active);
+            this.elements.buttons.captions.pressed = active;
 
             // Add class hook
-            utils.toggleClass(this.elements.container, this.config.classNames.captions.active, this.captions.active);
+            utils.toggleClass(this.elements.container, this.config.classNames.captions.active, active);
 
-            // Trigger an event
-            utils.dispatchEvent.call(this, this.media, this.captions.active ? 'captionsenabled' : 'captionsdisabled');
+            // Update state and trigger event
+            if (active !== this.captions.active) {
+                this.captions.active = active;
+                utils.dispatchEvent.call(this, this.media, this.captions.active ? 'captionsenabled' : 'captionsdisabled');
+            }
         }
 
         /**
@@ -7583,21 +7579,16 @@ var Plyr = function () {
     }, {
         key: 'currentTime',
         set: function set$$1(input) {
-            var targetTime = 0;
-
-            if (utils.is.number(input)) {
-                targetTime = input;
+            // Bail if media duration isn't available yet
+            if (!this.duration) {
+                return;
             }
 
-            // Normalise targetTime
-            if (targetTime < 0) {
-                targetTime = 0;
-            } else if (targetTime > this.duration) {
-                targetTime = this.duration;
-            }
+            // Validate input
+            var inputIsValid = utils.is.number(input) && input > 0;
 
             // Set
-            this.media.currentTime = targetTime;
+            this.media.currentTime = inputIsValid ? Math.min(input, this.duration) : 0;
 
             // Logging
             this.debug.log('Seeking to ' + this.currentTime + ' seconds');
@@ -7656,11 +7647,11 @@ var Plyr = function () {
             // Faux duration set via config
             var fauxDuration = parseFloat(this.config.duration);
 
-            // True duration
-            var realDuration = this.media ? Number(this.media.duration) : 0;
+            // Media duration can be NaN before the media has loaded
+            var duration = (this.media || {}).duration || 0;
 
-            // If custom duration is funky, use regular duration
-            return !Number.isNaN(fauxDuration) ? fauxDuration : realDuration;
+            // If config duration is funky, use regular duration
+            return fauxDuration || duration;
         }
 
         /**
@@ -7832,7 +7823,7 @@ var Plyr = function () {
                 quality = Number(input);
             }
 
-            if (!utils.is.number(quality) || quality === 0) {
+            if (!utils.is.number(quality)) {
                 quality = this.storage.get('quality');
             }
 

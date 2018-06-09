@@ -44,7 +44,7 @@ const utils = {
             return this.instanceof(input, Event);
         },
         cue(input) {
-            return this.instanceof(input, TextTrackCue) || this.instanceof(input, VTTCue);
+            return this.instanceof(input, window.TextTrackCue) || this.instanceof(input, window.VTTCue);
         },
         track(input) {
             return this.instanceof(input, TextTrack) || (!this.nullOrUndefined(input) && this.string(input.kind));
@@ -151,24 +151,23 @@ const utils = {
             return;
         }
 
-        const prefix = 'cache-';
+        const prefix = 'cache';
         const hasId = utils.is.string(id);
         let isCached = false;
 
-        const exists = () => document.querySelectorAll(`#${id}`).length;
+        const exists = () => document.getElementById(id) !== null;
 
-        function injectSprite(data) {
+        const update = (container, data) => {
+            container.innerHTML = data;
+
             // Check again incase of race condition
             if (hasId && exists()) {
                 return;
             }
 
-            // Inject content
-            this.innerHTML = data;
-
             // Inject the SVG to the body
-            document.body.insertBefore(this, document.body.childNodes[0]);
-        }
+            document.body.insertAdjacentElement('afterbegin', container);
+        };
 
         // Only load once if ID set
         if (!hasId || !exists()) {
@@ -184,13 +183,12 @@ const utils = {
 
             // Check in cache
             if (useStorage) {
-                const cached = window.localStorage.getItem(prefix + id);
+                const cached = window.localStorage.getItem(`${prefix}-${id}`);
                 isCached = cached !== null;
 
                 if (isCached) {
                     const data = JSON.parse(cached);
-                    injectSprite.call(container, data.content);
-                    return;
+                    update(container, data.content);
                 }
             }
 
@@ -204,14 +202,14 @@ const utils = {
 
                     if (useStorage) {
                         window.localStorage.setItem(
-                            prefix + id,
+                            `${prefix}-${id}`,
                             JSON.stringify({
                                 content: result,
                             }),
                         );
                     }
 
-                    injectSprite.call(container, result);
+                    update(container, result);
                 })
                 .catch(() => {});
         }
@@ -704,6 +702,11 @@ const utils = {
     // Clone nested objects
     cloneDeep(object) {
         return JSON.parse(JSON.stringify(object));
+    },
+
+    // Get a nested value in an object
+    getDeep(object, path) {
+        return path.split('.').reduce((obj, key) => obj && obj[key], object);
     },
 
     // Get the closest value in an array
