@@ -6060,7 +6060,6 @@ var utils = {
                 if (isCached) {
                     var data = JSON.parse(cached);
                     update(container, data.content);
-                    return;
                 }
             }
 

@@ -50,7 +50,7 @@ import Raven from 'raven-js';
             const player = new Plyr('#player', {
                 debug: true,
                 title: 'View From A Blue Moon',
-                // iconUrl: '../dist/plyr.svg',
+                iconUrl: '../dist/plyr.svg',
                 keyboard: {
                     global: true,
                 },
