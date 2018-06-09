@@ -637,26 +637,25 @@ var utils = {
             return;
         }
 
-        var prefix = 'cache-';
+        var prefix = 'cache';
         var hasId = utils.is.string(id);
         var isCached = false;
 
         var exists = function exists() {
-            return document.querySelectorAll('#' + id).length;
+            return document.getElementById(id) !== null;
         };
 
-        function injectSprite(data) {
+        var update = function update(container, data) {
+            container.innerHTML = data;
+
             // Check again incase of race condition
             if (hasId && exists()) {
                 return;
             }
 
-            // Inject content
-            this.innerHTML = data;
-
             // Inject the SVG to the body
-            document.body.insertBefore(this, document.body.childNodes[0]);
-        }
+            document.body.insertAdjacentElement('afterbegin', container);
+        };
 
         // Only load once if ID set
         if (!hasId || !exists()) {
@@ -672,13 +671,12 @@ var utils = {
 
             // Check in cache
             if (useStorage) {
-                var cached = window.localStorage.getItem(prefix + id);
+                var cached = window.localStorage.getItem(prefix + '-' + id);
                 isCached = cached !== null;
 
                 if (isCached) {
                     var data = JSON.parse(cached);
-                    injectSprite.call(container, data.content);
-                    return;
+                    update(container, data.content);
                 }
             }
 
@@ -689,12 +687,12 @@ var utils = {
                 }
 
                 if (useStorage) {
-                    window.localStorage.setItem(prefix + id, JSON.stringify({
+                    window.localStorage.setItem(prefix + '-' + id, JSON.stringify({
                         content: result
                     }));
                 }
 
-                injectSprite.call(container, result);
+                update(container, result);
             }).catch(function () {});
         }
     },
@@ -4426,7 +4424,7 @@ var Listeners = function () {
                 // and if the focused element is not editable (e.g. text input)
                 // and any that accept key input http://webaim.org/techniques/keyboard/
                 var focused = utils.getFocusElement();
-                if (utils.is.element(focused) && utils.matches(focused, this.player.config.selectors.editable)) {
+                if (utils.is.element(focused) && focused !== this.player.elements.inputs.seek && utils.matches(focused, this.player.config.selectors.editable)) {
                     return;
                 }
 
@@ -4920,6 +4918,12 @@ var Listeners = function () {
             on(this.player.elements.inputs.seek, 'mousedown mouseup keydown keyup touchstart touchend', function (event) {
                 var seek = event.currentTarget;
 
+                var code = event.keyCode ? event.keyCode : event.which;
+                var eventType = event.type;
+
+                if ((eventType === 'keydown' || eventType === 'keyup') && code !== 39 && code !== 37) {
+                    return;
+                }
                 // Was playing before?
                 var play = seek.hasAttribute('play-on-seeked');
 
