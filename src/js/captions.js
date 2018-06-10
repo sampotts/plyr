@@ -197,8 +197,6 @@ const captions = {
     setCue(input) {
         // Get the track from the event if needed
         const track = utils.is.event(input) ? input.target : input;
-        const { activeCues } = track;
-        const active = activeCues.length && activeCues[0];
         const currentTrack = captions.getCurrentTrack.call(this);
 
         // Only display current track
@@ -207,8 +205,9 @@ const captions = {
         }
 
         // Display a cue, if there is one
-        if (utils.is.cue(active)) {
-            captions.setText.call(this, active.getCueAsHTML());
+        const activeCues = Array.from(track.activeCues || []).filter(cue => utils.is.cue(cue));
+        if (activeCues.length > 0) {
+            captions.setText.call(this, activeCues.map(cue => cue.getCueAsHTML()));
         } else {
             captions.setText.call(this, null);
         }
@@ -218,29 +217,38 @@ const captions = {
 
     // Set the current caption
     setText(input) {
+        const captions = Array.from(input || []);
+
         // Requires UI
         if (!this.supported.ui) {
             return;
         }
 
         if (utils.is.element(this.elements.captions)) {
-            const content = utils.createElement('span');
-
             // Empty the container
             utils.emptyElement(this.elements.captions);
 
-            // Default to empty
-            const caption = !utils.is.nullOrUndefined(input) ? input : '';
-
             // Set the span content
-            if (utils.is.string(caption)) {
-                content.innerText = caption.trim();
-            } else {
-                content.appendChild(caption);
-            }
+            captions.forEach((caption, index) => {
+                if (utils.is.nullOrUndefined(caption)) {
+                    return;
+                }
 
-            // Set new caption text
-            this.elements.captions.appendChild(content);
+                const content = utils.createElement('span');
+                if (utils.is.string(caption)) {
+                    content.innerText = caption.trim();
+                } else {
+                    content.appendChild(caption);
+                }
+
+                // Set new caption text
+                this.elements.captions.appendChild(content);
+
+                // Add a linebreak between the lines.
+                if (index !== captions.length - 1) {
+                    this.elements.captions.innerHTML += '<br>';
+                }
+            });
         } else {
             this.debug.warn('No captions element to render to');
         }
