@@ -7182,7 +7182,6 @@ var i18n = {
 var browser = utils.getBrowser();
 
 var controls = {
-
     // Get icon URL
     getIconUrl: function getIconUrl() {
         var url = new URL(this.config.iconUrl, window.location);
@@ -7567,6 +7566,23 @@ var controls = {
     },
 
 
+    // Format a time for display
+    formatTime: function formatTime() {
+        var time = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+        var inverted = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+        // Bail if the value isn't a number
+        if (!utils.is.number(time)) {
+            return time;
+        }
+
+        // Always display hours if duration is over an hour
+        var forceHours = utils.getHours(this.duration) > 0;
+
+        return utils.formatTime(time, forceHours, inverted);
+    },
+
+
     // Update the displayed time
     updateTimeDisplay: function updateTimeDisplay() {
         var target = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
@@ -7578,11 +7594,8 @@ var controls = {
             return;
         }
 
-        // Always display hours if duration is over an hour
-        var forceHours = utils.getHours(this.duration) > 0;
-
         // eslint-disable-next-line no-param-reassign
-        target.innerText = utils.formatTime(time, forceHours, inverted);
+        target.innerText = controls.formatTime(time, inverted);
     },
 
 
@@ -7685,8 +7698,20 @@ var controls = {
             return;
         }
 
-        // Set aria value for https://github.com/sampotts/plyr/issues/905
-        range.setAttribute('aria-valuenow', range.value);
+        // Set aria values for https://github.com/sampotts/plyr/issues/905
+        if (utils.matches(range, this.config.selectors.inputs.seek)) {
+            range.setAttribute('aria-valuenow', this.currentTime);
+            var currentTime = controls.formatTime(this.currentTime);
+            var duration = controls.formatTime(this.duration);
+            var format = i18n.get('seekLabel', this.config);
+            range.setAttribute('aria-valuetext', format.replace('{currentTime}', currentTime).replace('{duration}', duration));
+        } else if (utils.matches(range, this.config.selectors.inputs.volume)) {
+            var percent = range.value * 100;
+            range.setAttribute('aria-valuenow', percent);
+            range.setAttribute('aria-valuetext', percent + '%');
+        } else {
+            range.setAttribute('aria-valuenow', range.value);
+        }
 
         // WebKit only
         if (!browser.isWebkit) {
@@ -7772,9 +7797,14 @@ var controls = {
 
     // Show the duration on metadataloaded or durationchange events
     durationUpdate: function durationUpdate() {
-        // Bail if no ui or durationchange event triggered after playing/seek when invertTime is false
+        // Bail if no UI or durationchange event triggered after playing/seek when invertTime is false
         if (!this.supported.ui || !this.config.invertTime && this.currentTime) {
             return;
+        }
+
+        // Update ARIA values
+        if (utils.is.element(this.elements.inputs.seek)) {
+            this.elements.inputs.seek.setAttribute('aria-valuemax', this.duration);
         }
 
         // If there's a spot to display duration
@@ -8620,7 +8650,6 @@ var controls = {
             Array.from(labels).forEach(function (label) {
                 utils.toggleClass(label, _this7.config.classNames.hidden, false);
                 utils.toggleClass(label, _this7.config.classNames.tooltip, true);
-                label.setAttribute('role', 'tooltip');
             });
         }
     }
@@ -9118,6 +9147,7 @@ var defaults$1 = {
         pause: 'Pause',
         fastForward: 'Forward {seektime}s',
         seek: 'Seek',
+        seekLabel: '{currentTime} of {duration}',
         played: 'Played',
         buffered: 'Buffered',
         currentTime: 'Current time',
@@ -9132,6 +9162,7 @@ var defaults$1 = {
         frameTitle: 'Player for {title}',
         captions: 'Captions',
         settings: 'Settings',
+        menuBack: 'Go back to previous menu',
         speed: 'Speed',
         normal: 'Normal',
         quality: 'Quality',
@@ -9683,9 +9714,6 @@ var ui = {
         // If there's a media title set, use that for the label
         if (utils.is.string(this.config.title) && !utils.is.empty(this.config.title)) {
             label += ', ' + this.config.title;
-
-            // Set container label
-            this.elements.container.setAttribute('aria-label', this.config.title);
         }
 
         // If there's a play button, set label
@@ -12556,9 +12584,6 @@ var Plyr = function () {
             this.elements.container = utils.createElement('div');
             utils.wrap(this.media, this.elements.container);
         }
-
-        // Allow focus to be captured
-        this.elements.container.setAttribute('tabindex', 0);
 
         // Add style hook
         ui.addStyleHook.call(this);
