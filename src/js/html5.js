@@ -20,12 +20,9 @@ const html5 = {
     // Get quality levels
     getQualityOptions() {
         // Get sizes from <source> elements
-        const sizes = html5.getSources.call(this)
+        return html5.getSources.call(this)
             .map(source => Number(source.getAttribute('size')))
             .filter(Boolean);
-
-        // Reduce to unique list
-        return utils.dedupe(sizes);
     },
 
     extend() {

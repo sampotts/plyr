@@ -641,9 +641,10 @@ const controls = {
         const type = 'quality';
         const list = this.elements.settings.panes.quality.querySelector('ul');
 
-        // Set options if passed and filter based on config
+        // Set options if passed and filter based on uniqueness and config
         if (utils.is.array(options)) {
-            this.options.quality = options.filter(quality => this.config.quality.options.includes(quality));
+            this.options.quality = utils.dedupe(options)
+                .filter(quality => this.config.quality.options.includes(quality));
         }
 
         // Toggle the pane and tab
