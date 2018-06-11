@@ -669,36 +669,28 @@ class Plyr {
      * @param {number} input - Quality level
      */
     set quality(input) {
-        let quality = null;
+        const config = this.config.quality;
+        const options = this.options.quality;
 
-        if (!utils.is.empty(input)) {
-            quality = Number(input);
-        }
-
-        if (!utils.is.number(quality)) {
-            quality = this.storage.get('quality');
-        }
-
-        if (!utils.is.number(quality)) {
-            quality = this.config.quality.selected;
-        }
-
-        if (!utils.is.number(quality)) {
-            quality = this.config.quality.default;
-        }
-
-        if (!this.options.quality.length) {
+        if (!options.length) {
             return;
         }
 
-        if (!this.options.quality.includes(quality)) {
-            const closest = utils.closest(this.options.quality, quality);
+        let quality = ([
+            !utils.is.empty(input) && Number(input),
+            this.storage.get('quality'),
+            config.selected,
+            config.default,
+        ]).find(utils.is.number);
+
+        if (!options.includes(quality)) {
+            const closest = utils.closest(options, quality);
             this.debug.warn(`Unsupported quality option: ${quality}, using ${closest} instead`);
             quality = closest;
         }
 
         // Update config
-        this.config.quality.selected = quality;
+        config.selected = quality;
 
         // Set quality
         this.media.quality = quality;
