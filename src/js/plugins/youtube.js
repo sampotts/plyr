@@ -8,52 +8,26 @@ import utils from './../utils';
 
 // Standardise YouTube quality unit
 function mapQualityUnit(input) {
-    switch (input) {
-        case 'hd2160':
-            return 2160;
+    const qualities = {
+        hd2160: 2160,
+        hd1440: 1440,
+        hd1080: 1080,
+        hd720: 720,
+        large: 480,
+        medium: 360,
+        small: 240,
+        tiny: 144,
+    };
 
-        case 2160:
-            return 'hd2160';
+    const entry = Object.entries(qualities)
+        .find(entry => entry.includes(input));
 
-        case 'hd1440':
-            return 1440;
-
-        case 1440:
-            return 'hd1440';
-
-        case 'hd1080':
-            return 1080;
-
-        case 1080:
-            return 'hd1080';
-
-        case 'hd720':
-            return 720;
-
-        case 720:
-            return 'hd720';
-
-        case 'large':
-            return 480;
-
-        case 480:
-            return 'large';
-
-        case 'medium':
-            return 360;
-
-        case 360:
-            return 'medium';
-
-        case 'small':
-            return 240;
-
-        case 240:
-            return 'small';
-
-        default:
-            return 'default';
+    if (entry) {
+        // Get the match corresponding to the input
+        return entry.find(value => value !== input);
     }
+
+    return 'default';
 }
 
 function mapQualityUnits(levels) {
