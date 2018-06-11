@@ -316,6 +316,14 @@ const vimeo = {
         });
 
         player.embed.on('loaded', () => {
+            // Assure state and events are updated on autoplay
+            player.embed.getPaused().then(paused => {
+                assurePlaybackState.call(player, !paused);
+                if (!paused) {
+                    utils.dispatchEvent.call(player, player.media, 'playing');
+                }
+            });
+
             if (utils.is.element(player.embed.element) && player.supported.ui) {
                 const frame = player.embed.element;
 
