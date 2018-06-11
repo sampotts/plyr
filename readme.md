@@ -215,7 +215,7 @@ You can specify a range of arguments for the constructor to use:
 
 *   A CSS string selector that's compatible with [`querySelector`](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector)
 *   A [`HTMLElement`](https://developer.mozilla.org/en/docs/Web/API/HTMLElement)
-*   A [`NodeList]`(https://developer.mozilla.org/en-US/docs/Web/API/NodeList)
+*   A [`NodeList`](https://developer.mozilla.org/en-US/docs/Web/API/NodeList)
 *   A [jQuery](https://jquery.com) object
 
 _Note_: If a `NodeList`, `Array`, or jQuery object are passed, the first element will be used for setup. To setup multiple players, see [setting up multiple players](#setting-up-multiple-players) below.
