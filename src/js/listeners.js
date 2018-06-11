@@ -414,7 +414,7 @@ class Listeners {
             'keyup',
             'keydown',
         ]).join(' '), event => {
-            let detail = {};
+            let {detail = {}} = event;
 
             // Get error details from media
             if (event.type === 'error') {
