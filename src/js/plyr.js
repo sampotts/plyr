@@ -689,6 +689,9 @@ class Plyr {
             quality = closest;
         }
 
+        // Trigger request event
+        utils.dispatchEvent.call(this, this.media, 'qualityrequested', false, { quality });
+
         // Update config
         config.selected = quality;
 

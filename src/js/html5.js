@@ -57,11 +57,6 @@ const html5 = {
                     return;
                 }
 
-                // Trigger change event
-                utils.dispatchEvent.call(player, player.media, 'qualityrequested', false, {
-                    quality: input,
-                });
-
                 // Get current state
                 const { currentTime, playing } = player;
 

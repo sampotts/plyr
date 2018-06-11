@@ -302,15 +302,7 @@ const youtube = {
                             return mapQualityUnit(instance.getPlaybackQuality());
                         },
                         set(input) {
-                            const quality = input;
-
-                            // Set via API
-                            instance.setPlaybackQuality(mapQualityUnit(quality));
-
-                            // Trigger request event
-                            utils.dispatchEvent.call(player, player.media, 'qualityrequested', false, {
-                                quality,
-                            });
+                            instance.setPlaybackQuality(mapQualityUnit(input));
                         },
                     });
 
