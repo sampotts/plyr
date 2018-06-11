@@ -1,4 +1,4 @@
-# v3.3.11
+# v3.3.12
 
 -   Fix synthetic event bubble/proxy loses detail (thanks @friday!)
 -   Make utils static (thanks @friday!)
