@@ -632,7 +632,6 @@ const controls = {
     },
 
     // Set the quality menu
-    // TODO: Vimeo support
     setQualityMenu(options) {
         // Menu required
         if (!utils.is.element(this.elements.settings.panes.quality)) {
