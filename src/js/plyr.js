@@ -84,7 +84,8 @@ class Plyr {
         // Captions
         this.captions = {
             active: null,
-            currentTrack: null,
+            currentTrack: -1,
+            meta: new WeakMap(),
         };
 
         // Fullscreen
@@ -96,7 +97,6 @@ class Plyr {
         this.options = {
             speed: [],
             quality: [],
-            captions: [],
         };
 
         // Debugging
@@ -854,61 +854,35 @@ class Plyr {
     }
 
     /**
-     * Set the captions language
-     * @param {string} - Two character ISO language code (e.g. EN, FR, PT, etc)
+     * Set the caption track by index
+     * @param {number} - Caption index
      */
-    set language(input) {
-        // Nothing specified
-        if (!utils.is.string(input)) {
-            return;
-        }
-
-        // If empty string is passed, assume disable captions
-        if (utils.is.empty(input)) {
-            this.toggleCaptions(false);
-            return;
-        }
-
-        // Normalize
-        const language = input.toLowerCase();
-
-        // Check for support
-        if (!this.options.captions.includes(language)) {
-            this.debug.warn(`Unsupported language option: ${language}`);
-            return;
-        }
-
-        // Ensure captions are enabled
-        this.toggleCaptions(true);
-
-        // Enabled only
-        if (language === 'enabled') {
-            return;
-        }
-
-        // If nothing to change, bail
-        if (this.language === language) {
-            return;
-        }
-
-        // Update config
-        this.captions.language = language;
-
-        // Clear caption
-        captions.setText.call(this, null);
-
-        // Update captions
-        captions.setLanguage.call(this);
-
-        // Trigger an event
-        utils.dispatchEvent.call(this, this.media, 'languagechange');
+    set currentTrack(input) {
+        captions.set.call(this, input);
     }
 
     /**
-     * Get the current captions language
+     * Get the current caption track index (-1 if disabled)
+     */
+    get currentTrack() {
+        const { active, currentTrack } = this.captions;
+        return active ? currentTrack : -1;
+    }
+
+    /**
+     * Set the wanted language for captions
+     * Since tracks can be added later it won't update the actual caption track until there is a matching track
+     * @param {string} - Two character ISO language code (e.g. EN, FR, PT, etc)
+     */
+    set language(input) {
+        captions.setLanguage.call(this, input);
+    }
+
+    /**
+     * Get the current track's language
      */
     get language() {
-        return this.captions.language;
+        return (captions.getCurrentTrack.call(this) || {}).language;
     }
 
     /**

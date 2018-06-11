@@ -21,7 +21,7 @@
     transition: transform 0.4s ease-in-out;
     width: 100%;
 
-    span {
+    .plyr__caption {
         background: $plyr-captions-bg;
         border-radius: 2px;
         box-decoration-break: clone;

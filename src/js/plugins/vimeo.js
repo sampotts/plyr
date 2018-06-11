@@ -305,14 +305,9 @@ const vimeo = {
             captions.setup.call(player);
         });
 
-        player.embed.on('cuechange', data => {
-            let cue = null;
-
-            if (data.cues.length) {
-                cue = utils.stripHTML(data.cues[0].text);
-            }
-
-            captions.setText.call(player, cue);
+        player.embed.on('cuechange', ({ cues = [] }) => {
+            const strippedCues = cues.map(cue => utils.stripHTML(cue.text));
+            captions.updateCues.call(player, strippedCues);
         });
 
         player.embed.on('loaded', () => {

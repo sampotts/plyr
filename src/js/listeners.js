@@ -523,7 +523,7 @@ class Listeners {
                 proxy(
                     event,
                     () => {
-                        this.player.language = event.target.value;
+                        this.player.currentTrack = Number(event.target.value);
                         showHomeTab();
                     },
                     'language',

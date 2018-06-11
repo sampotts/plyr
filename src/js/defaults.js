@@ -328,6 +328,7 @@ const defaults = {
         },
         progress: '.plyr__progress',
         captions: '.plyr__captions',
+        caption: '.plyr__caption',
         menu: {
             quality: '.js-plyr__menu__list--quality',
         },

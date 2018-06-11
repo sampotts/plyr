@@ -831,6 +831,13 @@ const utils = {
         return fragment.firstChild.innerText;
     },
 
+    // Like outerHTML, but also works for DocumentFragment
+    getHTML(element) {
+        const wrapper = document.createElement('div');
+        wrapper.appendChild(element);
+        return wrapper.innerHTML;
+    },
+
     // Get aspect ratio for dimensions
     getAspectRatio(width, height) {
         const getRatio = (w, h) => (h === 0 ? w : getRatio(h, w % h));
