@@ -66,6 +66,9 @@ function mapQualityUnits(levels) {
 
 // Set playback state and trigger change (only on actual change)
 function assurePlaybackState(play) {
+    if (play && !this.embed.hasPlayed) {
+        this.embed.hasPlayed = true;
+    }
     if (this.media.paused === play) {
         this.media.paused = !play;
         utils.dispatchEvent.call(this, this.media, play ? 'play' : 'pause');
@@ -469,7 +472,7 @@ const youtube = {
 
                         case 1:
                             // Restore paused state (YouTube starts playing on seek if the video hasn't been played yet)
-                            if (player.media.paused) {
+                            if (player.media.paused && !player.embed.hasPlayed) {
                                 player.media.pause();
                             } else {
                                 assurePlaybackState.call(player, true);
