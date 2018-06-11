@@ -767,11 +767,12 @@ function getLocationOrigin() {
 
   // Oh dear IE10...
   if (!document.location.origin) {
-    document.location.origin =
+    return (
       document.location.protocol +
       '//' +
       document.location.hostname +
-      (document.location.port ? ':' + document.location.port : '');
+      (document.location.port ? ':' + document.location.port : '')
+    );
   }
 
   return document.location.origin;
@@ -1866,7 +1867,7 @@ Raven.prototype = {
   // webpack (using a build step causes webpack #1617). Grunt verifies that
   // this value matches package.json during build.
   //   See: https://github.com/getsentry/raven-js/issues/465
-  VERSION: '3.25.2',
+  VERSION: '3.26.1',
 
   debug: false,
 
@@ -2032,7 +2033,7 @@ Raven.prototype = {
     if (isFunction$1(options)) {
       args = func || [];
       func = options;
-      options = undefined;
+      options = {};
     }
 
     return this.wrap(options, func).apply(this, args);
@@ -2043,7 +2044,7 @@ Raven.prototype = {
      *
      * @param {object} options A specific set of options for this context [optional]
      * @param {function} func The function to be wrapped in a new context
-     * @param {function} func A function to call before the try/catch wrapper [optional, private]
+     * @param {function} _before A function to call before the try/catch wrapper [optional, private]
      * @return {function} The newly wrapped functions with a context
      */
   wrap: function(options, func, _before) {
@@ -2156,8 +2157,9 @@ Raven.prototype = {
   _promiseRejectionHandler: function(event) {
     this._logDebug('debug', 'Raven caught unhandled promise rejection:', event);
     this.captureException(event.reason, {
-      extra: {
-        unhandledPromiseRejection: true
+      mechanism: {
+        type: 'onunhandledrejection',
+        handled: false
       }
     });
   },
@@ -2834,7 +2836,15 @@ Raven.prototype = {
         }
         var originalCallback = args[0];
         if (isFunction$1(originalCallback)) {
-          args[0] = self.wrap(originalCallback);
+          args[0] = self.wrap(
+            {
+              mechanism: {
+                type: 'instrument',
+                data: {function: orig.name}
+              }
+            },
+            originalCallback
+          );
         }
 
         // IE < 9 doesn't support .call/.apply on setInterval/setTimeout, but it
@@ -2861,7 +2871,15 @@ Raven.prototype = {
               // preserve arity
               try {
                 if (fn && fn.handleEvent) {
-                  fn.handleEvent = self.wrap(fn.handleEvent);
+                  fn.handleEvent = self.wrap(
+                    {
+                      mechanism: {
+                        type: 'instrument',
+                        data: {target: global, function: 'handleEvent', handler: fn.name}
+                      }
+                    },
+                    fn.handleEvent
+                  );
                 }
               } catch (err) {
                 // can sometimes get 'Permission denied to access property "handle Event'
@@ -2901,7 +2919,20 @@ Raven.prototype = {
               return orig.call(
                 this,
                 evtName,
-                self.wrap(fn, undefined, before),
+                self.wrap(
+                  {
+                    mechanism: {
+                      type: 'instrument',
+                      data: {
+                        target: global,
+                        function: 'addEventListener',
+                        handler: fn.name
+                      }
+                    }
+                  },
+                  fn,
+                  before
+                ),
                 capture,
                 secure
               );
@@ -2935,7 +2966,17 @@ Raven.prototype = {
         'requestAnimationFrame',
         function(orig) {
           return function(cb) {
-            return orig(self.wrap(cb));
+            return orig(
+              self.wrap(
+                {
+                  mechanism: {
+                    type: 'instrument',
+                    data: {function: 'requestAnimationFrame', handler: orig.name}
+                  }
+                },
+                cb
+              )
+            );
           };
         },
         wrappedBuiltIns
@@ -2998,7 +3039,15 @@ Raven.prototype = {
     function wrapProp(prop, xhr) {
       if (prop in xhr && isFunction$1(xhr[prop])) {
         fill$1(xhr, prop, function(orig) {
-          return self.wrap(orig);
+          return self.wrap(
+            {
+              mechanism: {
+                type: 'instrument',
+                data: {function: prop, handler: orig.name}
+              }
+            },
+            orig
+          );
         }); // intentionally don't track filled methods on XHR instances
       }
     }
@@ -3063,7 +3112,19 @@ Raven.prototype = {
                 xhr,
                 'onreadystatechange',
                 function(orig) {
-                  return self.wrap(orig, undefined, onreadystatechangeHandler);
+                  return self.wrap(
+                    {
+                      mechanism: {
+                        type: 'instrument',
+                        data: {
+                          function: 'onreadystatechange',
+                          handler: orig.name
+                        }
+                      }
+                    },
+                    orig,
+                    onreadystatechangeHandler
+                  );
                 } /* intentionally don't track this instrumentation */
               );
             } else {
@@ -3287,10 +3348,16 @@ Raven.prototype = {
     return globalServer;
   },
 
-  _handleOnErrorStackInfo: function() {
+  _handleOnErrorStackInfo: function(stackInfo, options) {
+    options = options || {};
+    options.mechanism = options.mechanism || {
+      type: 'onerror',
+      handled: false
+    };
+
     // if we are intentionally ignoring errors via onerror, bail out
     if (!this._ignoreOnError) {
-      this._handleStackInfo.apply(this, arguments);
+      this._handleStackInfo(stackInfo, options);
     }
   },
 
@@ -3426,6 +3493,19 @@ Raven.prototype = {
       },
       options
     );
+
+    // Move mechanism from options to exception interface
+    // We do this, as requiring user to pass `{exception:{mechanism:{ ... }}}` would be
+    // too much
+    if (!data.exception.mechanism && data.mechanism) {
+      data.exception.mechanism = data.mechanism;
+      delete data.mechanism;
+    }
+
+    data.exception.mechanism = objectMerge$1(data.exception.mechanism || {}, {
+      type: 'generic',
+      handled: true
+    });
 
     // Fire away!
     this._send(data);
