@@ -127,9 +127,6 @@ const ui = {
         // If there's a media title set, use that for the label
         if (utils.is.string(this.config.title) && !utils.is.empty(this.config.title)) {
             label += `, ${this.config.title}`;
-
-            // Set container label
-            this.elements.container.setAttribute('aria-label', this.config.title);
         }
 
         // If there's a play button, set label

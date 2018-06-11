@@ -260,9 +260,6 @@ class Plyr {
             utils.wrap(this.media, this.elements.container);
         }
 
-        // Allow focus to be captured
-        this.elements.container.setAttribute('tabindex', 0);
-
         // Add style hook
         ui.addStyleHook.call(this);
 
@@ -849,7 +846,7 @@ class Plyr {
         // Update state and trigger event
         if (active !== this.captions.active) {
             this.captions.active = active;
-        utils.dispatchEvent.call(this, this.media, this.captions.active ? 'captionsenabled' : 'captionsdisabled');
+            utils.dispatchEvent.call(this, this.media, this.captions.active ? 'captionsenabled' : 'captionsdisabled');
         }
     }
 

@@ -12,8 +12,6 @@ import utils from './utils';
 const browser = utils.getBrowser();
 
 const controls = {
-
-
     // Get icon URL
     getIconUrl() {
         const url = new URL(this.config.iconUrl, window.location);
@@ -359,10 +357,14 @@ const controls = {
     createTime(type) {
         const attributes = utils.getAttributesFromSelector(this.config.selectors.display[type]);
 
-        const container = utils.createElement('div', utils.extend(attributes, {
-            class: `plyr__time ${attributes.class}`,
-            'aria-label': i18n.get(type, this.config),
-        }), '00:00');
+        const container = utils.createElement(
+            'div',
+            utils.extend(attributes, {
+                class: `plyr__time ${attributes.class}`,
+                'aria-label': i18n.get(type, this.config),
+            }),
+            '00:00',
+        );
 
         // Reference for updates
         this.elements.display[type] = container;
@@ -403,6 +405,19 @@ const controls = {
         list.appendChild(item);
     },
 
+    // Format a time for display
+    formatTime(time = 0, inverted = false) {
+        // Bail if the value isn't a number
+        if (!utils.is.number(time)) {
+            return time;
+        }
+
+        // Always display hours if duration is over an hour
+        const forceHours = utils.getHours(this.duration) > 0;
+
+        return utils.formatTime(time, forceHours, inverted);
+    },
+
     // Update the displayed time
     updateTimeDisplay(target = null, time = 0, inverted = false) {
         // Bail if there's no element to display or the value isn't a number
@@ -410,11 +425,8 @@ const controls = {
             return;
         }
 
-        // Always display hours if duration is over an hour
-        const forceHours = utils.getHours(this.duration) > 0;
-
         // eslint-disable-next-line no-param-reassign
-        target.innerText = utils.formatTime(time, forceHours, inverted);
+        target.innerText = controls.formatTime(time, inverted);
     },
 
     // Update volume UI and storage
@@ -509,8 +521,20 @@ const controls = {
             return;
         }
 
-        // Set aria value for https://github.com/sampotts/plyr/issues/905
-        range.setAttribute('aria-valuenow', range.value);
+        // Set aria values for https://github.com/sampotts/plyr/issues/905
+        if (utils.matches(range, this.config.selectors.inputs.seek)) {
+            range.setAttribute('aria-valuenow', this.currentTime);
+            const currentTime = controls.formatTime(this.currentTime);
+            const duration = controls.formatTime(this.duration);
+            const format = i18n.get('seekLabel', this.config);
+            range.setAttribute('aria-valuetext', format.replace('{currentTime}', currentTime).replace('{duration}', duration));
+        } else if (utils.matches(range, this.config.selectors.inputs.volume)) {
+            const percent = range.value * 100;
+            range.setAttribute('aria-valuenow', percent);
+            range.setAttribute('aria-valuetext', `${percent}%`);
+        } else {
+            range.setAttribute('aria-valuenow', range.value);
+        }
 
         // WebKit only
         if (!browser.isWebkit) {
@@ -599,9 +623,14 @@ const controls = {
 
     // Show the duration on metadataloaded or durationchange events
     durationUpdate() {
-        // Bail if no ui or durationchange event triggered after playing/seek when invertTime is false
+        // Bail if no UI or durationchange event triggered after playing/seek when invertTime is false
         if (!this.supported.ui || (!this.config.invertTime && this.currentTime)) {
             return;
+        }
+
+        // Update ARIA values
+        if (utils.is.element(this.elements.inputs.seek)) {
+            this.elements.inputs.seek.setAttribute('aria-valuemax', this.duration);
         }
 
         // If there's a spot to display duration
@@ -1126,9 +1155,11 @@ const controls = {
             const progress = utils.createElement('div', utils.getAttributesFromSelector(this.config.selectors.progress));
 
             // Seek range slider
-            progress.appendChild(controls.createRange.call(this, 'seek', {
-                id: `plyr-seek-${data.id}`,
-            }));
+            progress.appendChild(
+                controls.createRange.call(this, 'seek', {
+                    id: `plyr-seek-${data.id}`,
+                }),
+            );
 
             // Buffer progress
             progress.appendChild(controls.createProgress.call(this, 'buffer'));
@@ -1182,13 +1213,15 @@ const controls = {
             };
 
             // Create the volume range slider
-            volume.appendChild(controls.createRange.call(
-                this,
-                'volume',
-                utils.extend(attributes, {
-                    id: `plyr-volume-${data.id}`,
-                }),
-            ));
+            volume.appendChild(
+                controls.createRange.call(
+                    this,
+                    'volume',
+                    utils.extend(attributes, {
+                        id: `plyr-volume-${data.id}`,
+                    }),
+                ),
+            );
 
             this.elements.volume = volume;
 
@@ -1463,7 +1496,6 @@ const controls = {
             Array.from(labels).forEach(label => {
                 utils.toggleClass(label, this.config.classNames.hidden, false);
                 utils.toggleClass(label, this.config.classNames.tooltip, true);
-                label.setAttribute('role', 'tooltip');
             });
         }
     },
