@@ -1,6 +1,6 @@
 {
     "name": "plyr",
-    "version": "3.3.10",
+    "version": "3.3.11",
     "description": "A simple, accessible and customizable HTML5, YouTube and Vimeo media player",
     "homepage": "https://plyr.io",
     "main": "./dist/plyr.js",
@@ -74,7 +74,7 @@
         "babel-polyfill": "^6.26.0",
         "custom-event-polyfill": "^0.3.0",
         "loadjs": "^3.5.4",
-        "raven-js": "^3.25.2",
+        "raven-js": "^3.26.1",
         "url-polyfill": "^1.0.13"
     }
 }
