@@ -11,19 +11,19 @@ const utils = {
     // Check variable types
     is: {
         object(input) {
-            return this.getConstructor(input) === Object;
+            return utils.getConstructor(input) === Object;
         },
         number(input) {
-            return this.getConstructor(input) === Number && !Number.isNaN(input);
+            return utils.getConstructor(input) === Number && !Number.isNaN(input);
         },
         string(input) {
-            return this.getConstructor(input) === String;
+            return utils.getConstructor(input) === String;
         },
         boolean(input) {
-            return this.getConstructor(input) === Boolean;
+            return utils.getConstructor(input) === Boolean;
         },
         function(input) {
-            return this.getConstructor(input) === Function;
+            return utils.getConstructor(input) === Function;
         },
         array(input) {
             return !this.nullOrUndefined(input) && Array.isArray(input);
@@ -38,7 +38,7 @@ const utils = {
             return this.instanceof(input, Element);
         },
         textNode(input) {
-            return this.getConstructor(input) === Text;
+            return utils.getConstructor(input) === Text;
         },
         event(input) {
             return this.instanceof(input, Event);
@@ -65,9 +65,10 @@ const utils = {
         instanceof(input, constructor) {
             return Boolean(input && constructor && input instanceof constructor);
         },
-        getConstructor(input) {
-            return !this.nullOrUndefined(input) ? input.constructor : null;
-        },
+    },
+
+    getConstructor(input) {
+        return !utils.is.nullOrUndefined(input) ? input.constructor : null;
     },
 
     // Unfortunately, due to mixed support, UA sniffing is required
