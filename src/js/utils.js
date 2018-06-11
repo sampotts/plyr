@@ -26,40 +26,40 @@ const utils = {
             return utils.getConstructor(input) === Function;
         },
         array(input) {
-            return !this.nullOrUndefined(input) && Array.isArray(input);
+            return !utils.is.nullOrUndefined(input) && Array.isArray(input);
         },
         weakMap(input) {
-            return this.instanceof(input, WeakMap);
+            return utils.is.instanceof(input, WeakMap);
         },
         nodeList(input) {
-            return this.instanceof(input, NodeList);
+            return utils.is.instanceof(input, NodeList);
         },
         element(input) {
-            return this.instanceof(input, Element);
+            return utils.is.instanceof(input, Element);
         },
         textNode(input) {
             return utils.getConstructor(input) === Text;
         },
         event(input) {
-            return this.instanceof(input, Event);
+            return utils.is.instanceof(input, Event);
         },
         cue(input) {
-            return this.instanceof(input, window.TextTrackCue) || this.instanceof(input, window.VTTCue);
+            return utils.is.instanceof(input, window.TextTrackCue) || utils.is.instanceof(input, window.VTTCue);
         },
         track(input) {
-            return this.instanceof(input, TextTrack) || (!this.nullOrUndefined(input) && this.string(input.kind));
+            return utils.is.instanceof(input, TextTrack) || (!utils.is.nullOrUndefined(input) && utils.is.string(input.kind));
         },
         url(input) {
-            return !this.nullOrUndefined(input) && /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/.test(input);
+            return !utils.is.nullOrUndefined(input) && /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/.test(input);
         },
         nullOrUndefined(input) {
             return input === null || typeof input === 'undefined';
         },
         empty(input) {
             return (
-                this.nullOrUndefined(input) ||
-                ((this.string(input) || this.array(input) || this.nodeList(input)) && !input.length) ||
-                (this.object(input) && !Object.keys(input).length)
+                utils.is.nullOrUndefined(input) ||
+                ((utils.is.string(input) || utils.is.array(input) || utils.is.nodeList(input)) && !input.length) ||
+                (utils.is.object(input) && !Object.keys(input).length)
             );
         },
         instanceof(input, constructor) {
@@ -626,16 +626,16 @@ const utils = {
     formatTime(time = 0, displayHours = false, inverted = false) {
         // Bail if the value isn't a number
         if (!utils.is.number(time)) {
-            return this.formatTime(null, displayHours, inverted);
+            return utils.formatTime(null, displayHours, inverted);
         }
 
         // Format time component to add leading zero
         const format = value => `0${value}`.slice(-2);
 
         // Breakdown to hours, mins, secs
-        let hours = this.getHours(time);
-        const mins = this.getMinutes(time);
-        const secs = this.getSeconds(time);
+        let hours = utils.getHours(time);
+        const mins = utils.getMinutes(time);
+        const secs = utils.getSeconds(time);
 
         // Do we need to display hours?
         if (displayHours || hours > 0) {
@@ -793,10 +793,10 @@ const utils = {
 
         // Parse URL if needed
         if (input.startsWith('http://') || input.startsWith('https://')) {
-            ({ search } = this.parseUrl(input));
+            ({ search } = utils.parseUrl(input));
         }
 
-        if (this.is.empty(search)) {
+        if (utils.is.empty(search)) {
             return null;
         }
 
