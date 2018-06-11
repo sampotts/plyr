@@ -414,7 +414,7 @@ class Listeners {
             'keyup',
             'keydown',
         ]).join(' '), event => {
-            let detail = {};
+            let {detail = {}} = event;
 
             // Get error details from media
             if (event.type === 'error') {
@@ -523,7 +523,7 @@ class Listeners {
                 proxy(
                     event,
                     () => {
-                        this.player.language = event.target.value;
+                        this.player.currentTrack = Number(event.target.value);
                         showHomeTab();
                     },
                     'language',

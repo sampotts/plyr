@@ -9,6 +9,9 @@ import utils from './../utils';
 
 // Set playback state and trigger change (only on actual change)
 function assurePlaybackState(play) {
+    if (play && !this.embed.hasPlayed) {
+        this.embed.hasPlayed = true;
+    }
     if (this.media.paused === play) {
         this.media.paused = !play;
         utils.dispatchEvent.call(this, this.media, play ? 'play' : 'pause');
@@ -153,19 +156,20 @@ const vimeo = {
 
                 // Get current paused state and volume etc
                 const { embed, media, paused, volume } = player;
+                const restorePause = paused && !embed.hasPlayed;
 
                 // Set seeking state and trigger event
                 media.seeking = true;
                 utils.dispatchEvent.call(player, media, 'seeking');
 
                 // If paused, mute until seek is complete
-                Promise.resolve(paused && embed.setVolume(0))
+                Promise.resolve(restorePause && embed.setVolume(0))
                     // Seek
                     .then(() => embed.setCurrentTime(time))
                     // Restore paused
-                    .then(() => paused && embed.pause())
+                    .then(() => restorePause && embed.pause())
                     // Restore volume
-                    .then(() => paused && embed.setVolume(volume))
+                    .then(() => restorePause && embed.setVolume(volume))
                     .catch(() => {
                         // Do nothing
                     });
@@ -301,17 +305,20 @@ const vimeo = {
             captions.setup.call(player);
         });
 
-        player.embed.on('cuechange', data => {
-            let cue = null;
-
-            if (data.cues.length) {
-                cue = utils.stripHTML(data.cues[0].text);
-            }
-
-            captions.setText.call(player, cue);
+        player.embed.on('cuechange', ({ cues = [] }) => {
+            const strippedCues = cues.map(cue => utils.stripHTML(cue.text));
+            captions.updateCues.call(player, strippedCues);
         });
 
         player.embed.on('loaded', () => {
+            // Assure state and events are updated on autoplay
+            player.embed.getPaused().then(paused => {
+                assurePlaybackState.call(player, !paused);
+                if (!paused) {
+                    utils.dispatchEvent.call(player, player.media, 'playing');
+                }
+            });
+
             if (utils.is.element(player.embed.element) && player.supported.ui) {
                 const frame = player.embed.element;
 

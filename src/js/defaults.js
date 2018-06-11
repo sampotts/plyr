@@ -60,7 +60,7 @@ const defaults = {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.3.10/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.3.11/plyr.svg',
 
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
@@ -334,6 +334,7 @@ const defaults = {
         },
         progress: '.plyr__progress',
         captions: '.plyr__captions',
+        caption: '.plyr__caption',
         menu: {
             quality: '.js-plyr__menu__list--quality',
         },
