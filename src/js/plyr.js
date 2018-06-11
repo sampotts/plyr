@@ -1133,7 +1133,7 @@ class Plyr {
         } else if (utils.is.nodeList(selector)) {
             targets = Array.from(selector);
         } else if (utils.is.array(selector)) {
-            targets = selector.filter(i => utils.is.element(i));
+            targets = selector.filter(utils.is.element);
         }
 
         if (utils.is.empty(targets)) {
