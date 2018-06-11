@@ -8,35 +8,21 @@ import utils from './utils';
 const html5 = {
     getSources() {
         if (!this.isHTML5) {
-            return null;
+            return [];
         }
 
-        return this.media.querySelectorAll('source');
+        return Array.from(this.media.querySelectorAll('source'));
     },
 
     // Get quality levels
     getQualityOptions() {
-        if (!this.isHTML5) {
-            return null;
-        }
-
-        // Get sources
-        const sources = html5.getSources.call(this);
-
-        if (utils.is.empty(sources)) {
-            return null;
-        }
-
-        // Get <source> with size attribute
-        const sizes = Array.from(sources).filter(source => !utils.is.empty(source.getAttribute('size')));
-
-        // If none, bail
-        if (utils.is.empty(sizes)) {
-            return null;
-        }
+        // Get sizes from <source> elements
+        const sizes = html5.getSources.call(this)
+            .map(source => Number(source.getAttribute('size')))
+            .filter(Boolean);
 
         // Reduce to unique list
-        return utils.dedupe(sizes.map(source => Number(source.getAttribute('size'))));
+        return utils.dedupe(sizes);
     },
 
     extend() {
@@ -51,34 +37,17 @@ const html5 = {
             get() {
                 // Get sources
                 const sources = html5.getSources.call(player);
+                const [source] = sources.filter(source => source.getAttribute('src') === player.source);
 
-                if (utils.is.empty(sources)) {
-                    return null;
-                }
-
-                const matches = Array.from(sources).filter(source => source.getAttribute('src') === player.source);
-
-                if (utils.is.empty(matches)) {
-                    return null;
-                }
-
-                return Number(matches[0].getAttribute('size'));
+                // Return size, if match is found
+                return source && Number(source.getAttribute('size'));
             },
             set(input) {
                 // Get sources
                 const sources = html5.getSources.call(player);
 
-                if (utils.is.empty(sources)) {
-                    return;
-                }
-
                 // Get matches for requested size
-                const matches = Array.from(sources).filter(source => Number(source.getAttribute('size')) === input);
-
-                // No matches for requested size
-                if (utils.is.empty(matches)) {
-                    return;
-                }
+                const matches = sources.filter(source => Number(source.getAttribute('size')) === input);
 
                 // Get supported sources
                 const supported = matches.filter(source => support.mime.call(player, source.getAttribute('type')));
