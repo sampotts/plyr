@@ -11,7 +11,10 @@ const html5 = {
             return [];
         }
 
-        return Array.from(this.media.querySelectorAll('source'));
+        const sources = Array.from(this.media.querySelectorAll('source'));
+
+        // Filter out unsupported sources
+        return sources.filter(source => support.mime.call(this, source.getAttribute('type')));
     },
 
     // Get quality levels
@@ -46,14 +49,11 @@ const html5 = {
                 // Get sources
                 const sources = html5.getSources.call(player);
 
-                // Get matches for requested size
-                const matches = sources.filter(source => Number(source.getAttribute('size')) === input);
+                // Get first match for requested size
+                const source = sources.find(source => Number(source.getAttribute('size')) === input);
 
-                // Get supported sources
-                const supported = matches.filter(source => support.mime.call(player, source.getAttribute('type')));
-
-                // No supported sources
-                if (utils.is.empty(supported)) {
+                // No matching source found
+                if (!source) {
                     return;
                 }
 
@@ -66,7 +66,7 @@ const html5 = {
                 const { currentTime, playing } = player;
 
                 // Set new source
-                player.media.src = supported[0].getAttribute('src');
+                player.media.src = source.getAttribute('src');
 
                 // Restore time
                 const onLoadedMetaData = () => {
