@@ -28,7 +28,7 @@ const supportsPassiveListeners = (() => {
 
 // Toggle event listener
 export function toggleListener(elements, event, callback, toggle = false, passive = true, capture = false, once = false) {
-    // Bail if no elemetns, event, or callback
+    // Bail if no elements, event, or callback
     if (is.empty(elements) || is.empty(event) || !is.function(callback)) {
         return;
     }
