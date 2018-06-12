@@ -130,8 +130,15 @@ const html5 = {
             return;
         }
 
-        // Remove child sources
-        utils.removeElement(html5.getSources());
+        const sources = html5.getSources.call(this);
+        if (sources && sources.length > 0) {
+            // set source to blank string to avoid memory leak
+            sources.forEach((source) => {
+                source.setAttribute('src', '');
+            });
+            this.media.load();
+        }
+        utils.removeElement(sources);
 
         // Set blank video src attribute
         // This is to prevent a MEDIA_ERR_SRC_NOT_SUPPORTED error
