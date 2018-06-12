@@ -245,6 +245,8 @@ class Plyr {
             return;
         }
 
+        this.eventListeners = [];
+
         // Create listeners
         this.listeners = new Listeners(this);
 
@@ -271,7 +273,7 @@ class Plyr {
 
         // Listen for events if debugging
         if (this.config.debug) {
-            utils.on(this.elements.container, this.config.events.join(' '), event => {
+            utils.on.call(this, this.elements.container, this.config.events.join(' '), event => {
                 this.debug.log(`event: ${event.type}`);
             });
         }
@@ -961,9 +963,16 @@ class Plyr {
      * @param {function} callback - Callback for when event occurs
      */
     on(event, callback) {
-        utils.on(this.elements.container, event, callback);
+        utils.on.call(this, this.elements.container, event, callback);
     }
-
+    /**
+     * Add event listeners once
+     * @param {string} event - Event type
+     * @param {function} callback - Callback for when event occurs
+     */
+    once(event, callback) {
+        utils.once(this.elements.container, event, callback);
+    }
     /**
      * Remove event listeners
      * @param {string} event - Event type
@@ -1014,8 +1023,7 @@ class Plyr {
                 }
             } else {
                 // Unbind listeners
-                this.listeners.clear();
-
+                utils.cleanupEventListeners.call(this);
                 // Replace the container with the original element provided
                 utils.replaceElement(this.elements.original, this.elements.container);
 

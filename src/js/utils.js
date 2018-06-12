@@ -494,14 +494,14 @@ const utils = {
         };
 
         if (toggle) {
-            utils.on(this.elements.container, 'keydown', trap, false);
+            utils.on.call(this, this.elements.container, 'keydown', trap, false);
         } else {
             utils.off(this.elements.container, 'keydown', trap, false);
         }
     },
 
     // Toggle event listener
-    toggleListener(elements, event, callback, toggle = false, passive = true, capture = false) {
+    toggleListener(elements, event, callback, toggle = false, passive = true, capture = false, once = false) {
         // Bail if no elemetns, event, or callback
         if (utils.is.empty(elements) || utils.is.empty(event) || !utils.is.function(callback)) {
             return;
@@ -512,7 +512,7 @@ const utils = {
             // Create listener for each node
             Array.from(elements).forEach(element => {
                 if (element instanceof Node) {
-                    utils.toggleListener.call(null, element, event, callback, toggle, passive, capture);
+                    utils.toggleListener.call(this, element, event, callback, toggle, passive, capture, once);
                 }
             });
 
@@ -538,13 +538,35 @@ const utils = {
 
         // If a single node is passed, bind the event listener
         events.forEach(type => {
+            if (this && this.eventListeners && toggle && !once) {
+                // cache event listener
+                this.eventListeners.push({ elements, type, callback, options });
+            }
             elements[toggle ? 'addEventListener' : 'removeEventListener'](type, callback, options);
         });
     },
-
+    // remove all cached event listeners
+    cleanupEventListeners() {
+        if (this && this.eventListeners) {
+            this.eventListeners.forEach(item => {
+                const { elements, type, callback, options } = item;
+                elements.removeEventListener(type, callback, options);
+            });
+            this.eventListeners = [];
+        }
+    },
     // Bind event handler
     on(element, events = '', callback, passive = true, capture = false) {
-        utils.toggleListener(element, events, callback, true, passive, capture);
+        utils.toggleListener.call(this, element, events, callback, true, passive, capture);
+    },
+
+    // Bind event handler once
+    once(element, events = '', callback, passive = true, capture = false) {
+        function onceCallback(...args) {
+            utils.off(element, events, onceCallback, passive, capture);
+            callback.apply(this, args);
+        }
+        utils.toggleListener(element, events, onceCallback, true, passive, capture, true);
     },
 
     // Unbind event handler

@@ -1063,12 +1063,10 @@ const controls = {
                 container.style.width = '';
                 container.style.height = '';
 
-                // Only listen once
-                utils.off(container, utils.transitionEndEvent, restore);
             };
 
             // Listen for the transition finishing and restore auto height/width
-            utils.on(container, utils.transitionEndEvent, restore);
+            utils.once(container, utils.transitionEndEvent, restore);
 
             // Set dimensions to target
             container.style.width = `${size.width}px`;

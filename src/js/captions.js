@@ -80,7 +80,7 @@ const captions = {
         // Watch changes to textTracks and update captions menu
         if (this.isHTML5) {
             const trackEvents = this.config.captions.update ? 'addtrack removetrack' : 'removetrack';
-            utils.on(this.media.textTracks, trackEvents, captions.update.bind(this));
+            utils.on.call(this, this.media.textTracks, trackEvents, captions.update.bind(this));
         }
 
         // Update available languages in list next tick (the event must not be triggered before the listeners)
@@ -107,7 +107,7 @@ const captions = {
                     track.mode = 'hidden';
 
                     // Add event listener for cue changes
-                    utils.on(track, 'cuechange', () => captions.updateCues.call(this));
+                    utils.on.call(this, track, 'cuechange', () => captions.updateCues.call(this));
                 });
         }
 
