@@ -210,7 +210,7 @@ class Listeners {
         toggleListener.call(this.player, document.body, 'click', this.toggleMenu, toggle);
 
         // Detect touch by events
-        once(document.body, 'touchstart', this.firstTouch);
+        once.call(this.player, document.body, 'touchstart', this.firstTouch);
     }
 
     // Container listeners

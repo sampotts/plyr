@@ -27,7 +27,7 @@ const supportsPassiveListeners = (() => {
 })();
 
 // Toggle event listener
-export function toggleListener(element, event, callback, toggle = false, passive = true, capture = false, once = false) {
+export function toggleListener(element, event, callback, toggle = false, passive = true, capture = false) {
     // Bail if no element, event, or callback
     if (!is.element(element) || is.empty(event) || !is.function(callback)) {
         return;
@@ -52,7 +52,7 @@ export function toggleListener(element, event, callback, toggle = false, passive
 
     // If a single node is passed, bind the event listener
     events.forEach(type => {
-        if (this && this.eventListeners && toggle && !once) {
+        if (this && this.eventListeners && toggle) {
             // Cache event listener
             this.eventListeners.push({ element, type, callback, options });
         }
@@ -78,7 +78,7 @@ export function once(element, events = '', callback, passive = true, capture = f
         callback.apply(this, args);
     }
 
-    toggleListener(element, events, onceCallback, true, passive, capture, true);
+    toggleListener.call(this, element, events, onceCallback, true, passive, capture);
 }
 
 // Trigger event
