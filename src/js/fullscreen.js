@@ -62,13 +62,13 @@ class Fullscreen {
 
         // Register event listeners
         // Handle event (incase user presses escape etc)
-        utils.on(document, this.prefix === 'ms' ? 'MSFullscreenChange' : `${this.prefix}fullscreenchange`, () => {
+        utils.on.call(this.player, document, this.prefix === 'ms' ? 'MSFullscreenChange' : `${this.prefix}fullscreenchange`, () => {
             // TODO: Filter for target??
             onChange.call(this);
         });
 
         // Fullscreen toggle on double click
-        utils.on(this.player.elements.container, 'dblclick', event => {
+        utils.on.call(this.player, this.player.elements.container, 'dblclick', event => {
             // Ignore double click in controls
             if (utils.is.element(this.player.elements.controls) && this.player.elements.controls.contains(event.target)) {
                 return;

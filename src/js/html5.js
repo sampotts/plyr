@@ -63,9 +63,8 @@ const html5 = {
                 // Restore time
                 const onLoadedMetaData = () => {
                     player.currentTime = currentTime;
-                    player.off('loadedmetadata', onLoadedMetaData);
                 };
-                player.on('loadedmetadata', onLoadedMetaData);
+                player.once('loadedmetadata', onLoadedMetaData);
 
                 // Load new source
                 player.media.load();

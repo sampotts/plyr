@@ -367,6 +367,7 @@ player.fullscreen.enter(); // Enter fullscreen
 | `airplay()`              | -                | Trigger the airplay dialog on supported devices.                                                           |
 | `toggleControls(toggle)` | Boolean          | Toggle the controls (video only). Takes optional truthy value to force it on/off.                                                        |
 | `on(event, function)`    | String, Function | Add an event listener for the specified event.                                                             |
+| `once(event, function)`    | String, Function | Add an event listener for the specified event once.                                                             |
 | `off(event, function)`   | String, Function | Remove an event listener for the specified event.                                                          |
 | `supports(type)`         | String           | Check support for a mime type.                                                                             |
 | `destroy()`              | -                | Destroy the instance and garbage collect any elements.                                                     |
