@@ -15,7 +15,7 @@ export function format(input, ...args) {
         return input;
     }
 
-    return input.toString().replace(/{(\d+)}/g, (match, i) => (is.string(args[i]) ? args[i] : ''));
+    return input.toString().replace(/{(\d+)}/g, (match, i) => args[i].toString());
 }
 
 // Get percentage

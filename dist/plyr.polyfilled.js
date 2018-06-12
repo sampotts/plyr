@@ -6361,7 +6361,7 @@ function format(input) {
     }
 
     return input.toString().replace(/{(\d+)}/g, function (match, i) {
-        return is$1.string(args[i]) ? args[i] : '';
+        return args[i].toString();
     });
 }
 
@@ -9724,7 +9724,7 @@ var Listeners = function () {
 
             // Check for audio tracks on load
             // We can't use `loadedmetadata` as it doesn't seem to have audio tracks at that point
-            on.call(this.player, this.player.media, 'loadeddata', function () {
+            on.call(this.player, this.player.media, 'canplay', function () {
                 toggleHidden(_this3.player.elements.volume, !_this3.player.hasAudio);
                 toggleHidden(_this3.player.elements.buttons.mute, !_this3.player.hasAudio);
             });

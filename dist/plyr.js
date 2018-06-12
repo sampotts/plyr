@@ -972,7 +972,7 @@ function format(input) {
     }
 
     return input.toString().replace(/{(\d+)}/g, function (match, i) {
-        return is.string(args[i]) ? args[i] : '';
+        return args[i].toString();
     });
 }
 
