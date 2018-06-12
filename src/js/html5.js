@@ -48,6 +48,7 @@ const html5 = {
 
         // Quality
         Object.defineProperty(player.media, 'quality', {
+            configurable: true,
             get() {
                 // Get sources
                 const sources = html5.getSources.call(player);
