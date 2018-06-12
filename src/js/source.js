@@ -5,7 +5,7 @@
 import html5 from './html5';
 import media from './media';
 import support from './support';
-import { providers } from './types';
+import { providers, types } from './types';
 import ui from './ui';
 import utils from './utils';
 
@@ -43,12 +43,15 @@ const source = {
 
                 // Remove elements
                 utils.removeElement(this.media);
-                this.media = null;
 
                 // Reset class name
                 if (utils.is.element(this.elements.container)) {
                     this.elements.container.removeAttribute('class');
                 }
+
+                // retain old provider and type
+                const prevType = this.type;
+                const prevProvider = this.provider;
 
                 // Set the type and provider
                 this.type = input.type;
@@ -57,25 +60,33 @@ const source = {
                 // Check for support
                 this.supported = support.check(this.type, this.provider, this.config.playsinline);
 
-                // Create new markup
-                switch (`${this.provider}:${this.type}`) {
-                    case 'html5:video':
-                        this.media = utils.createElement('video');
-                        break;
+                // if provider and type is html5:video then to keep this.media to reuse
+                // because create new video tag will comsume a lot of memory in iOS hardware.
+                // iOS can only create about 16 video tag
+                if (prevType !== this.type || prevProvider !== this.provider || this.type !== types.video || this.provider !== providers.html5) {
+                    delete this.media;
+                    this.media = null;
 
-                    case 'html5:audio':
-                        this.media = utils.createElement('audio');
-                        break;
+                    // Create new markup
+                    switch (`${this.provider}:${this.type}`) {
+                        case 'html5:video':
+                            this.media = utils.createElement('video');
+                            break;
 
-                    case 'youtube:video':
-                    case 'vimeo:video':
-                        this.media = utils.createElement('div', {
-                            src: input.sources[0].src,
-                        });
-                        break;
+                        case 'html5:audio':
+                            this.media = utils.createElement('audio');
+                            break;
 
-                    default:
-                        break;
+                        case 'youtube:video':
+                        case 'vimeo:video':
+                            this.media = utils.createElement('div', {
+                                src: input.sources[0].src,
+                            });
+                            break;
+
+                        default:
+                            break;
+                    }
                 }
 
                 // Inject the new element
