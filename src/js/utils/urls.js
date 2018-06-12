@@ -27,18 +27,16 @@ export function parseUrl(input, safe = true) {
 
 // Convert object to URLSearchParams
 export function buildUrlParams(input) {
-    if (!is.object(input)) {
-        return '';
-    }
-
     const params = new URLSearchParams();
 
-    Object.entries(input).forEach(([
-        key,
-        value,
-    ]) => {
-        params.set(key, value);
-    });
+    if (is.object(input)) {
+        Object.entries(input).forEach(([
+            key,
+            value,
+        ]) => {
+            params.set(key, value);
+        });
+    }
 
     return params;
 }

@@ -2820,19 +2820,17 @@ function parseUrl(input) {
 
 // Convert object to URLSearchParams
 function buildUrlParams(input) {
-    if (!is.object(input)) {
-        return '';
-    }
-
     var params = new URLSearchParams();
 
-    Object.entries(input).forEach(function (_ref) {
-        var _ref2 = slicedToArray(_ref, 2),
-            key = _ref2[0],
-            value = _ref2[1];
+    if (is.object(input)) {
+        Object.entries(input).forEach(function (_ref) {
+            var _ref2 = slicedToArray(_ref, 2),
+                key = _ref2[0],
+                value = _ref2[1];
 
-        params.set(key, value);
-    });
+            params.set(key, value);
+        });
+    }
 
     return params;
 }
