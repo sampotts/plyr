@@ -453,7 +453,9 @@ class Listeners {
         };
 
         // Play/pause toggle
-        bind(this.player.elements.buttons.play, 'click', this.player.togglePlay, 'play');
+        Array.from(this.player.elements.buttons.play).forEach(button => {
+            bind(button, 'click', this.player.togglePlay, 'play');
+        });
 
         // Pause
         bind(this.player.elements.buttons.restart, 'click', this.player.restart, 'restart');
@@ -634,8 +636,8 @@ class Listeners {
 
         // Polyfill for lower fill in <input type="range"> for webkit
         if (browser.isWebkit) {
-            bind(getElements.call(this.player, 'input[type="range"]'), 'input', event => {
-                controls.updateRangeFill.call(this.player, event.target);
+            Array.from(getElements.call(this.player, 'input[type="range"]')).forEach(element => {
+                bind(element, 'input', event => controls.updateRangeFill.call(this.player, event.target));
             });
         }
 

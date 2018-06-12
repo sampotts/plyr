@@ -27,21 +27,9 @@ const supportsPassiveListeners = (() => {
 })();
 
 // Toggle event listener
-export function toggleListener(elements, event, callback, toggle = false, passive = true, capture = false, once = false) {
-    // Bail if no elements, event, or callback
-    if (is.empty(elements) || is.empty(event) || !is.function(callback)) {
-        return;
-    }
-
-    // If a nodelist is passed, call itself on each node
-    if (is.nodeList(elements) || is.array(elements)) {
-        // Create listener for each node
-        Array.from(elements).forEach(element => {
-            if (element instanceof Node) {
-                toggleListener.call(null, element, event, callback, toggle, passive, capture);
-            }
-        });
-
+export function toggleListener(element, event, callback, toggle = false, passive = true, capture = false, once = false) {
+    // Bail if no element, event, or callback
+    if (!is.element(element) || is.empty(event) || !is.function(callback)) {
         return;
     }
 
@@ -66,10 +54,10 @@ export function toggleListener(elements, event, callback, toggle = false, passiv
     events.forEach(type => {
         if (this && this.eventListeners && toggle && !once) {
             // Cache event listener
-            this.eventListeners.push({ elements, type, callback, options });
+            this.eventListeners.push({ element, type, callback, options });
         }
 
-        elements[toggle ? 'addEventListener' : 'removeEventListener'](type, callback, options);
+        element[toggle ? 'addEventListener' : 'removeEventListener'](type, callback, options);
     });
 }
 
@@ -116,8 +104,8 @@ export function triggerEvent(element, type = '', bubbles = false, detail = {}) {
 export function unbindListeners() {
     if (this && this.eventListeners) {
         this.eventListeners.forEach(item => {
-            const { elements, type, callback, options } = item;
-            elements.removeEventListener(type, callback, options);
+            const { element, type, callback, options } = item;
+            element.removeEventListener(type, callback, options);
         });
 
         this.eventListeners = [];
