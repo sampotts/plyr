@@ -1,0 +1,58 @@
+// --------------------------------------------------------------
+// Captions
+// --------------------------------------------------------------
+
+// Hide default captions
+.plyr--full-ui ::-webkit-media-text-track-container {
+    display: none;
+}
+
+.plyr__captions {
+    animation: plyr-fade-in 0.3s ease;
+    bottom: 0;
+    color: $plyr-captions-color;
+    display: none;
+    font-size: $plyr-font-size-captions-small;
+    left: 0;
+    padding: $plyr-control-spacing;
+    position: absolute;
+    text-align: center;
+    transform: translateY(-($plyr-control-spacing * 4));
+    transition: transform 0.4s ease-in-out;
+    width: 100%;
+
+    .plyr__caption {
+        background: $plyr-captions-bg;
+        border-radius: 2px;
+        box-decoration-break: clone;
+        line-height: 185%;
+        padding: 0.2em 0.5em;
+        white-space: pre-wrap;
+
+        // Firefox adds a <div> when using getCueAsHTML()
+        div {
+            display: inline;
+        }
+    }
+
+    span:empty {
+        display: none;
+    }
+
+    @media (min-width: $plyr-bp-sm) {
+        font-size: $plyr-font-size-captions-base;
+        padding: ($plyr-control-spacing * 2);
+    }
+
+    @media (min-width: $plyr-bp-md) {
+        font-size: $plyr-font-size-captions-medium;
+    }
+}
+
+.plyr--captions-active .plyr__captions {
+    display: block;
+}
+
+.plyr--hide-controls .plyr__captions {
+    transform: translateY(-($plyr-control-spacing * 1.5));
+}

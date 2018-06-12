@@ -1,0 +1,50 @@
+// ==========================================================================
+// Examples
+// ==========================================================================
+
+// For non supported browsers
+video {
+    max-width: 100%;
+    vertical-align: middle;
+}
+
+// Example players
+.plyr {
+    border-radius: $border-radius-base;
+    box-shadow: 0 2px 5px rgba(#000, 0.2);
+    margin: $spacing-base auto;
+
+    &.plyr--audio {
+        max-width: 480px;
+    }
+}
+
+.plyr__video-wrapper::after {
+    border: 1px solid rgba(#000, 0.15);
+    border-radius: inherit;
+    bottom: 0;
+    content: '';
+    left: 0;
+    pointer-events: none;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 3;
+}
+
+// Style full supported player
+.plyr__cite {
+    display: none;
+    margin-top: $spacing-base;
+
+    .icon {
+        margin-right: ceil($spacing-base / 6);
+    }
+}
+
+.plyr--video:not(.plyr--youtube):not(.plyr--vimeo) ~ ul .plyr__cite--video,
+.plyr--audio ~ ul .plyr__cite--audio,
+.plyr--youtube ~ ul .plyr__cite--youtube,
+.plyr--vimeo ~ ul .plyr__cite--vimeo {
+    display: block;
+}

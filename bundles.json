@@ -1,0 +1,20 @@
+{
+    "plyr": {
+        "sass": {
+            "plyr.css": "src/sass/plyr.scss"
+        },
+        "js": {
+            "plyr.js": "src/js/plyr.js",
+            "plyr.polyfilled.js": "src/js/plyr.polyfilled.js"
+        }
+    },
+    "demo": {
+        "sass": {
+            "demo.css": "demo/src/sass/bundles/demo.scss",
+            "error.css": "demo/src/sass/bundles/error.scss"
+        },
+        "js": {
+            "demo.js": "demo/src/js/demo.js"
+        }
+    }
+}

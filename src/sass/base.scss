@@ -1,0 +1,65 @@
+// --------------------------------------------------------------
+// Base styling
+// --------------------------------------------------------------
+
+// Base
+.plyr {
+    @include plyr-font-smoothing($plyr-font-smoothing);
+
+    direction: ltr;
+    font-family: $plyr-font-family;
+    font-variant-numeric: tabular-nums; // Force monosace-esque number widths
+    font-weight: $plyr-font-weight-regular;
+    line-height: $plyr-line-height;
+    max-width: 100%;
+    min-width: 200px;
+    position: relative;
+    text-shadow: none;
+    transition: box-shadow 0.3s ease;
+
+    // Media elements
+    video,
+    audio {
+        border-radius: inherit;
+        height: auto;
+        vertical-align: middle;
+        width: 100%;
+    }
+
+    button {
+        font: inherit;
+        line-height: inherit;
+        width: auto;
+    }
+
+    // Ignore focus
+    &:focus {
+        outline: 0;
+    }
+}
+
+// border-box everything
+// http://paulirish.com/2012/box-sizing-border-box-ftw/
+@if $plyr-border-box {
+    .plyr--full-ui {
+        box-sizing: border-box;
+
+        *,
+        *::after,
+        *::before {
+            box-sizing: inherit;
+        }
+    }
+}
+
+// Fix 300ms delay
+@if $plyr-touch-action {
+    .plyr--full-ui {
+        a,
+        button,
+        input,
+        label {
+            touch-action: manipulation;
+        }
+    }
+}

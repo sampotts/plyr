@@ -1,0 +1,103 @@
+// --------------------------------------------------------------
+// Playback progress
+// --------------------------------------------------------------
+
+.plyr__progress {
+    display: flex;
+    flex: 1;
+    left: $plyr-range-thumb-height / 2;
+    margin-right: $plyr-range-thumb-height;
+    position: relative;
+
+    input[type='range'],
+    &__buffer {
+        margin-left: -($plyr-range-thumb-height / 2);
+        margin-right: -($plyr-range-thumb-height / 2);
+        // Offset the range thumb in order to be able to calculate the relative progress (#954)
+        width: calc(100% + #{$plyr-range-thumb-height});
+    }
+
+    input[type='range'] {
+        position: relative;
+        z-index: 2;
+    }
+
+    // Seek tooltip to show time
+    .plyr__tooltip {
+        font-size: $plyr-font-size-time;
+        left: 0;
+    }
+}
+
+.plyr__progress__buffer {
+    -webkit-appearance: none; /* stylelint-disable-line */
+    background: transparent;
+    border: 0;
+    border-radius: 100px;
+    height: $plyr-range-track-height;
+    left: 0;
+    margin-top: -($plyr-range-track-height / 2);
+    padding: 0;
+    position: absolute;
+    top: 50%;
+
+    &::-webkit-progress-bar {
+        background: transparent;
+        transition: width 0.2s ease;
+    }
+
+    &::-webkit-progress-value {
+        background: currentColor;
+        border-radius: 100px;
+        min-width: $plyr-range-track-height;
+    }
+
+    // Mozilla
+    &::-moz-progress-bar {
+        background: currentColor;
+        border-radius: 100px;
+        min-width: $plyr-range-track-height;
+        transition: width 0.2s ease;
+    }
+
+    // Microsoft
+    &::-ms-fill {
+        border-radius: 100px;
+        transition: width 0.2s ease;
+    }
+}
+
+.plyr--video .plyr__progress__buffer {
+    box-shadow: 0 1px 1px rgba(#000, 0.15);
+    color: $plyr-video-progress-buffered-bg;
+}
+
+.plyr--audio .plyr__progress__buffer {
+    color: $plyr-audio-progress-buffered-bg;
+}
+
+// Loading state
+.plyr--loading .plyr__progress__buffer {
+    animation: plyr-progress 1s linear infinite;
+    background-image: linear-gradient(
+        -45deg,
+        $plyr-progress-loading-bg 25%,
+        transparent 25%,
+        transparent 50%,
+        $plyr-progress-loading-bg 50%,
+        $plyr-progress-loading-bg 75%,
+        transparent 75%,
+        transparent
+    );
+    background-repeat: repeat-x;
+    background-size: $plyr-progress-loading-size $plyr-progress-loading-size;
+    color: transparent;
+}
+
+.plyr--video.plyr--loading .plyr__progress__buffer {
+    background-color: $plyr-video-progress-buffered-bg;
+}
+
+.plyr--audio.plyr--loading .plyr__progress__buffer {
+    background-color: $plyr-audio-progress-buffered-bg;
+}

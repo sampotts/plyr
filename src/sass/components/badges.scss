@@ -1,0 +1,12 @@
+// --------------------------------------------------------------
+// Badges
+// --------------------------------------------------------------
+
+.plyr__badge {
+    background: $plyr-badge-bg;
+    border-radius: 2px;
+    color: $plyr-badge-color;
+    font-size: $plyr-font-size-badge;
+    line-height: 1;
+    padding: 3px 4px;
+}

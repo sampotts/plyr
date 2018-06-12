@@ -1,0 +1,154 @@
+// --------------------------------------------------------------
+// Slider inputs - <input type="range">
+// --------------------------------------------------------------
+
+.plyr--full-ui input[type='range'] {
+    // WebKit
+    -webkit-appearance: none; /* stylelint-disable-line */
+    background: transparent;
+    border: 0;
+    border-radius: ($plyr-range-thumb-height * 2);
+    // color is used in JS to populate lower fill for WebKit
+    color: $plyr-range-fill-bg;
+    display: block;
+    height: $plyr-range-max-height;
+    margin: 0;
+    padding: 0;
+    transition: box-shadow 0.3s ease;
+    width: 100%;
+
+    &::-webkit-slider-runnable-track {
+        @include plyr-range-track();
+        background-image: linear-gradient(to right, currentColor var(--value, 0%), transparent var(--value, 0%));
+    }
+
+    &::-webkit-slider-thumb {
+        @include plyr-range-thumb();
+        -webkit-appearance: none; /* stylelint-disable-line */
+        margin-top: -(($plyr-range-thumb-height - $plyr-range-track-height) / 2);
+    }
+
+    // Mozilla
+    &::-moz-range-track {
+        @include plyr-range-track();
+    }
+
+    &::-moz-range-thumb {
+        @include plyr-range-thumb();
+    }
+
+    &::-moz-range-progress {
+        background: currentColor;
+        border-radius: ($plyr-range-track-height / 2);
+        height: $plyr-range-track-height;
+    }
+
+    // Microsoft
+    &::-ms-track {
+        @include plyr-range-track();
+        color: transparent;
+    }
+
+    &::-ms-fill-upper {
+        @include plyr-range-track();
+    }
+
+    &::-ms-fill-lower {
+        @include plyr-range-track();
+
+        background: currentColor;
+    }
+
+    &::-ms-thumb {
+        @include plyr-range-thumb();
+        // For some reason, Edge uses the -webkit margin above
+        margin-top: 0;
+    }
+
+    &::-ms-tooltip {
+        display: none;
+    }
+
+    // Focus styles
+    &:focus {
+        outline: 0;
+    }
+
+    &::-moz-focus-outer {
+        border: 0;
+    }
+
+    &.plyr__tab-focus {
+        &::-webkit-slider-runnable-track {
+            @include plyr-tab-focus();
+        }
+
+        &::-moz-range-track {
+            @include plyr-tab-focus();
+        }
+
+        &::-ms-track {
+            @include plyr-tab-focus();
+        }
+    }
+}
+
+// Video range inputs
+.plyr--full-ui.plyr--video input[type='range'] {
+    &::-webkit-slider-runnable-track {
+        background-color: $plyr-video-range-track-bg;
+    }
+
+    &::-moz-range-track {
+        background-color: $plyr-video-range-track-bg;
+    }
+
+    &::-ms-track {
+        background-color: $plyr-video-range-track-bg;
+    }
+
+    // Pressed styles
+    &:active {
+        &::-webkit-slider-thumb {
+            @include plyr-range-thumb-active();
+        }
+
+        &::-moz-range-thumb {
+            @include plyr-range-thumb-active();
+        }
+
+        &::-ms-thumb {
+            @include plyr-range-thumb-active();
+        }
+    }
+}
+
+// Audio range inputs
+.plyr--full-ui.plyr--audio input[type='range'] {
+    &::-webkit-slider-runnable-track {
+        background-color: $plyr-audio-range-track-bg;
+    }
+
+    &::-moz-range-track {
+        background-color: $plyr-audio-range-track-bg;
+    }
+
+    &::-ms-track {
+        background-color: $plyr-audio-range-track-bg;
+    }
+
+    // Pressed styles
+    &:active {
+        &::-webkit-slider-thumb {
+            @include plyr-range-thumb-active($plyr-audio-range-thumb-shadow-color);
+        }
+
+        &::-moz-range-thumb {
+            @include plyr-range-thumb-active($plyr-audio-range-thumb-shadow-color);
+        }
+
+        &::-ms-thumb {
+            @include plyr-range-thumb-active($plyr-audio-range-thumb-shadow-color);
+        }
+    }
+}

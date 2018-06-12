@@ -1,0 +1,11 @@
+node_modules
+.DS_Store
+aws.json
+*.mp4
+!dist/blank.mp4
+index-*.html
+npm-debug.log
+*.webm
+/package-lock.json
+.idea/
+

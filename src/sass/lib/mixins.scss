@@ -1,0 +1,101 @@
+// ==========================================================================
+// Mixins
+// ==========================================================================
+
+// Nicer focus styles
+// ---------------------------------------
+@mixin plyr-tab-focus($color: $plyr-tab-focus-default-color) {
+    box-shadow: 0 0 0 3px rgba($color, 0.35);
+    outline: 0;
+}
+
+// Font smoothing
+// ---------------------------------------
+@mixin plyr-font-smoothing($mode: true) {
+    @if $mode {
+        -moz-osx-font-smoothing: grayscale;
+        -webkit-font-smoothing: antialiased;
+    } @else {
+        -moz-osx-font-smoothing: auto;
+        -webkit-font-smoothing: subpixel-antialiased;
+    }
+}
+
+// <input type="range"> styling
+// ---------------------------------------
+@mixin plyr-range-track() {
+    background: transparent;
+    border: 0;
+    border-radius: ($plyr-range-track-height / 2);
+    height: $plyr-range-track-height;
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+@mixin plyr-range-thumb() {
+    background: $plyr-range-thumb-bg;
+    border: 0;
+    border-radius: 100%;
+    box-shadow: $plyr-range-thumb-shadow;
+    box-sizing: border-box;
+    height: $plyr-range-thumb-height;
+    position: relative;
+    transition: all 0.2s ease;
+    width: $plyr-range-thumb-height;
+}
+
+@mixin plyr-range-thumb-active($color: rgba($plyr-range-thumb-bg, 0.5)) {
+    box-shadow: $plyr-range-thumb-shadow, 0 0 0 $plyr-range-thumb-active-shadow-width $color;
+}
+
+// Fullscreen styles
+// ---------------------------------------
+@mixin plyr-fullscreen-active() {
+    background: #000;
+    border-radius: 0 !important;
+    height: 100%;
+    margin: 0;
+    width: 100%;
+
+    video {
+        height: 100%;
+    }
+
+    .plyr__video-wrapper {
+        height: 100%;
+        width: 100%;
+    }
+
+    .plyr__video-embed {
+        // Revert overflow change
+        overflow: visible;
+    }
+
+    // Vimeo requires some different styling
+    &.plyr--vimeo .plyr__video-wrapper {
+        height: 0;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    // Display correct icon
+    .plyr__control .icon--exit-fullscreen {
+        display: block;
+
+        + svg {
+            display: none;
+        }
+    }
+
+    // Hide cursor in fullscreen when controls hidden
+    &.plyr--hide-controls {
+        cursor: none;
+    }
+
+    // Large captions in full screen on larger screens
+    @media (min-width: $plyr-bp-lg) {
+        .plyr__captions {
+            font-size: $plyr-font-size-captions-large;
+        }
+    }
+}
