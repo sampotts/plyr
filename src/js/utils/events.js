@@ -27,7 +27,7 @@ const supportsPassiveListeners = (() => {
 })();
 
 // Toggle event listener
-export function toggleListener(elements, event, callback, toggle = false, passive = true, capture = false) {
+export function toggleListener(elements, event, callback, toggle = false, passive = true, capture = false, once = false) {
     // Bail if no elemetns, event, or callback
     if (is.empty(elements) || is.empty(event) || !is.function(callback)) {
         return;
@@ -64,22 +64,37 @@ export function toggleListener(elements, event, callback, toggle = false, passiv
 
     // If a single node is passed, bind the event listener
     events.forEach(type => {
+        if (this && this.eventListeners && toggle && !once) {
+            // Cache event listener
+            this.eventListeners.push({ elements, type, callback, options });
+        }
+
         elements[toggle ? 'addEventListener' : 'removeEventListener'](type, callback, options);
     });
 }
 
 // Bind event handler
 export function on(element, events = '', callback, passive = true, capture = false) {
-    toggleListener(element, events, callback, true, passive, capture);
+    toggleListener.call(this, element, events, callback, true, passive, capture);
 }
 
 // Unbind event handler
 export function off(element, events = '', callback, passive = true, capture = false) {
-    toggleListener(element, events, callback, false, passive, capture);
+    toggleListener.call(this, element, events, callback, false, passive, capture);
+}
+
+// Bind once-only event handler
+export function once(element, events = '', callback, passive = true, capture = false) {
+    function onceCallback(...args) {
+        off(element, events, onceCallback, passive, capture);
+        callback.apply(this, args);
+    }
+
+    toggleListener(element, events, onceCallback, true, passive, capture, true);
 }
 
 // Trigger event
-export function trigger(element, type = '', bubbles = false, detail = {}) {
+export function triggerEvent(element, type = '', bubbles = false, detail = {}) {
     // Bail if no element
     if (!is.element(element) || is.empty(type)) {
         return;
@@ -95,4 +110,16 @@ export function trigger(element, type = '', bubbles = false, detail = {}) {
 
     // Dispatch the event
     element.dispatchEvent(event);
+}
+
+// Unbind all cached event listeners
+export function unbindListeners() {
+    if (this && this.eventListeners) {
+        this.eventListeners.forEach(item => {
+            const { elements, type, callback, options } = item;
+            elements.removeEventListener(type, callback, options);
+        });
+
+        this.eventListeners = [];
+    }
 }

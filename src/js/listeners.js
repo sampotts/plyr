@@ -6,7 +6,7 @@ import controls from './controls';
 import ui from './ui';
 import browser from './utils/browser';
 import { getElement, getElements, getFocusElement, matches, toggleClass, toggleHidden } from './utils/elements';
-import { off, on, toggleListener, trigger } from './utils/events';
+import { on, once, toggleListener, triggerEvent } from './utils/events';
 import is from './utils/is';
 
 class Listeners {
@@ -197,39 +197,36 @@ class Listeners {
         // Add touch class
         toggleClass(this.player.elements.container, this.player.config.classNames.isTouch, true);
 
-        // Clean up
-        off(document.body, 'touchstart', this.firstTouch);
     }
 
     // Global window & document listeners
     global(toggle = true) {
         // Keyboard shortcuts
         if (this.player.config.keyboard.global) {
-            toggleListener(window, 'keydown keyup', this.handleKey, toggle, false);
+            toggleListener.call(this.player, window, 'keydown keyup', this.handleKey, toggle, false);
         }
 
         // Click anywhere closes menu
-        toggleListener(document.body, 'click', this.toggleMenu, toggle);
+        toggleListener.call(this.player, document.body, 'click', this.toggleMenu, toggle);
 
         // Detect touch by events
-        on(document.body, 'touchstart', this.firstTouch);
+        once(document.body, 'touchstart', this.firstTouch);
     }
 
     // Container listeners
     container() {
         // Keyboard shortcuts
         if (!this.player.config.keyboard.global && this.player.config.keyboard.focused) {
-            on(this.player.elements.container, 'keydown keyup', this.handleKey, false);
+            on.call(this.player, this.player.elements.container, 'keydown keyup', this.handleKey, false);
         }
 
         // Detect tab focus
         // Remove class on blur/focusout
-        on(this.player.elements.container, 'focusout', event => {
+        on.call(this.player, this.player.elements.container, 'focusout', event => {
             toggleClass(event.target, this.player.config.classNames.tabFocus, false);
         });
-
         // Add classname to tabbed elements
-        on(this.player.elements.container, 'keydown', event => {
+        on.call(this.player, this.player.elements.container, 'keydown', event => {
             if (event.keyCode !== 9) {
                 return;
             }
@@ -242,7 +239,7 @@ class Listeners {
         });
 
         // Toggle controls on mouse events and entering fullscreen
-        on(this.player.elements.container, 'mousemove mouseleave touchstart touchmove enterfullscreen exitfullscreen', event => {
+        on.call(this.player, this.player.elements.container, 'mousemove mouseleave touchstart touchmove enterfullscreen exitfullscreen', event => {
             const { controls } = this.player.elements;
 
             // Remove button states for fullscreen
@@ -276,20 +273,20 @@ class Listeners {
     // Listen for media events
     media() {
         // Time change on media
-        on(this.player.media, 'timeupdate seeking seeked', event => controls.timeUpdate.call(this.player, event));
+        on.call(this.player, this.player.media, 'timeupdate seeking seeked', event => controls.timeUpdate.call(this.player, event));
 
         // Display duration
-        on(this.player.media, 'durationchange loadeddata loadedmetadata', event => controls.durationUpdate.call(this.player, event));
+        on.call(this.player, this.player.media, 'durationchange loadeddata loadedmetadata', event => controls.durationUpdate.call(this.player, event));
 
         // Check for audio tracks on load
         // We can't use `loadedmetadata` as it doesn't seem to have audio tracks at that point
-        on(this.player.media, 'loadeddata canplay', () => {
+        on.call(this.player, this.player.media, 'canplay', () => {
             toggleHidden(this.player.elements.volume, !this.player.hasAudio);
             toggleHidden(this.player.elements.buttons.mute, !this.player.hasAudio);
         });
 
         // Handle the media finishing
-        on(this.player.media, 'ended', () => {
+        on.call(this.player, this.player.media, 'ended', () => {
             // Show poster on end
             if (this.player.isHTML5 && this.player.isVideo && this.player.config.resetOnEnd) {
                 // Restart
@@ -298,20 +295,20 @@ class Listeners {
         });
 
         // Check for buffer progress
-        on(this.player.media, 'progress playing seeking seeked', event => controls.updateProgress.call(this.player, event));
+        on.call(this.player, this.player.media, 'progress playing seeking seeked', event => controls.updateProgress.call(this.player, event));
 
         // Handle volume changes
-        on(this.player.media, 'volumechange', event => controls.updateVolume.call(this.player, event));
+        on.call(this.player, this.player.media, 'volumechange', event => controls.updateVolume.call(this.player, event));
 
         // Handle play/pause
-        on(this.player.media, 'playing play pause ended emptied timeupdate', event => ui.checkPlaying.call(this.player, event));
+        on.call(this.player, this.player.media, 'playing play pause ended emptied timeupdate', event => ui.checkPlaying.call(this.player, event));
 
         // Loading state
-        on(this.player.media, 'waiting canplay seeked playing', event => ui.checkLoading.call(this.player, event));
+        on.call(this.player, this.player.media, 'waiting canplay seeked playing', event => ui.checkLoading.call(this.player, event));
 
         // If autoplay, then load advertisement if required
         // TODO: Show some sort of loading state while the ad manager loads else there's a delay before ad shows
-        on(this.player.media, 'playing', () => {
+        on.call(this.player, this.player.media, 'playing', () => {
             if (!this.player.ads) {
                 return;
             }
@@ -334,7 +331,7 @@ class Listeners {
             }
 
             // On click play, pause ore restart
-            on(wrapper, 'click', () => {
+            on.call(this.player, wrapper, 'click', () => {
                 // Touch devices will just show controls (if we're hiding controls)
                 if (this.player.config.hideControls && this.player.touch && !this.player.paused) {
                     return;
@@ -353,7 +350,7 @@ class Listeners {
 
         // Disable right click
         if (this.player.supported.ui && this.player.config.disableContextMenu) {
-            on(
+            on.call(this.player,
                 this.player.elements.wrapper,
                 'contextmenu',
                 event => {
@@ -364,13 +361,13 @@ class Listeners {
         }
 
         // Volume change
-        on(this.player.media, 'volumechange', () => {
+        on.call(this.player, this.player.media, 'volumechange', () => {
             // Save to storage
             this.player.storage.set({ volume: this.player.volume, muted: this.player.muted });
         });
 
         // Speed change
-        on(this.player.media, 'ratechange', () => {
+        on.call(this.player, this.player.media, 'ratechange', () => {
             // Update UI
             controls.updateSetting.call(this.player, 'speed');
 
@@ -379,19 +376,19 @@ class Listeners {
         });
 
         // Quality request
-        on(this.player.media, 'qualityrequested', event => {
+        on.call(this.player, this.player.media, 'qualityrequested', event => {
             // Save to storage
             this.player.storage.set({ quality: event.detail.quality });
         });
 
         // Quality change
-        on(this.player.media, 'qualitychange', event => {
+        on.call(this.player, this.player.media, 'qualitychange', event => {
             // Update UI
             controls.updateSetting.call(this.player, 'quality', null, event.detail.quality);
         });
 
         // Caption language change
-        on(this.player.media, 'languagechange', () => {
+        on.call(this.player, this.player.media, 'languagechange', () => {
             // Update UI
             controls.updateSetting.call(this.player, 'captions');
 
@@ -400,7 +397,7 @@ class Listeners {
         });
 
         // Captions toggle
-        on(this.player.media, 'captionsenabled captionsdisabled', () => {
+        on.call(this.player, this.player.media, 'captionsenabled captionsdisabled', () => {
             // Update UI
             controls.updateSetting.call(this.player, 'captions');
 
@@ -410,7 +407,7 @@ class Listeners {
 
         // Proxy events to container
         // Bubble up key events for Edge
-        on(this.player.media, this.player.config.events.concat([
+        on.call(this.player, this.player.media, this.player.config.events.concat([
             'keyup',
             'keydown',
         ]).join(' '), event => {
@@ -421,7 +418,7 @@ class Listeners {
                 detail = this.player.media.error;
             }
 
-            trigger.call(this.player, this.player.elements.container, event.type, true, detail);
+            triggerEvent.call(this.player, this.player.elements.container, event.type, true, detail);
         });
     }
 
@@ -452,7 +449,7 @@ class Listeners {
             const customHandler = this.player.config.listeners[customHandlerKey];
             const hasCustomHandler = is.function(customHandler);
 
-            on(element, type, event => proxy(event, defaultHandler, customHandlerKey), passive && !hasCustomHandler);
+            on.call(this.player, element, type, event => proxy(event, defaultHandler, customHandlerKey), passive && !hasCustomHandler);
         };
 
         // Play/pause toggle
@@ -726,11 +723,6 @@ class Listeners {
             'volume',
             false,
         );
-    }
-
-    // Reset on destroy
-    clear() {
-        this.global(false);
     }
 }
 

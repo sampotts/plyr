@@ -8,7 +8,7 @@
 
 import i18n from '../i18n';
 import { createElement } from './../utils/elements';
-import { trigger } from './../utils/events';
+import { triggerEvent } from './../utils/events';
 import is from './../utils/is';
 import loadScript from './../utils/loadScript';
 import { formatTime } from './../utils/time';
@@ -270,7 +270,7 @@ class Ads {
         // Proxy event
         const dispatchEvent = type => {
             const event = `ads${type.replace(/_/g, '').toLowerCase()}`;
-            trigger.call(this.player, this.player.media, event);
+            triggerEvent.call(this.player, this.player.media, event);
         };
 
         switch (event.type) {

@@ -5484,7 +5484,11 @@ var supportsPassiveListeners = function () {
 function toggleListener(elements, event, callback) {
     var toggle = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
     var passive = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
+
+    var _this = this;
+
     var capture = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
+    var once = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : false;
 
     // Bail if no elemetns, event, or callback
     if (is$1.empty(elements) || is$1.empty(event) || !is$1.function(callback)) {
@@ -5522,6 +5526,11 @@ function toggleListener(elements, event, callback) {
 
     // If a single node is passed, bind the event listener
     events.forEach(function (type) {
+        if (_this && _this.eventListeners && toggle && !once) {
+            // Cache event listener
+            _this.eventListeners.push({ elements: elements, type: type, callback: callback, options: options });
+        }
+
         elements[toggle ? 'addEventListener' : 'removeEventListener'](type, callback, options);
     });
 }
@@ -5533,7 +5542,7 @@ function on(element) {
     var passive = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
     var capture = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
 
-    toggleListener(element, events, callback, true, passive, capture);
+    toggleListener.call(this, element, events, callback, true, passive, capture);
 }
 
 // Unbind event handler
@@ -5543,11 +5552,31 @@ function off(element) {
     var passive = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
     var capture = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
 
-    toggleListener(element, events, callback, false, passive, capture);
+    toggleListener.call(this, element, events, callback, false, passive, capture);
+}
+
+// Bind once-only event handler
+function once(element) {
+    var events = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+    var callback = arguments[2];
+    var passive = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
+    var capture = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
+
+    function onceCallback() {
+        off(element, events, onceCallback, passive, capture);
+
+        for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+            args[_key] = arguments[_key];
+        }
+
+        callback.apply(this, args);
+    }
+
+    toggleListener(element, events, onceCallback, true, passive, capture, true);
 }
 
 // Trigger event
-function trigger(element) {
+function triggerEvent(element) {
     var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
     var bubbles = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
     var detail = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
@@ -5567,6 +5596,22 @@ function trigger(element) {
 
     // Dispatch the event
     element.dispatchEvent(event);
+}
+
+// Unbind all cached event listeners
+function unbindListeners() {
+    if (this && this.eventListeners) {
+        this.eventListeners.forEach(function (item) {
+            var elements = item.elements,
+                type = item.type,
+                callback = item.callback,
+                options = item.options;
+
+            elements.removeEventListener(type, callback, options);
+        });
+
+        this.eventListeners = [];
+    }
 }
 
 var classCallCheck = function (instance, Constructor) {
@@ -5994,8 +6039,6 @@ var browser = {
     isIos: /(iPad|iPhone|iPod)/gi.test(navigator.platform)
 };
 
-var browser$1 = { browser: browser };
-
 // ==========================================================================
 
 // Check for feature support
@@ -6009,12 +6052,12 @@ var support = {
     check: function check(type, provider, playsinline) {
         var api = false;
         var ui = false;
-        var canPlayInline = browser$1.isIPhone && playsinline && support.playsinline;
+        var canPlayInline = browser.isIPhone && playsinline && support.playsinline;
 
         switch (provider + ':' + type) {
             case 'html5:video':
                 api = support.video;
-                ui = api && support.rangeInput && (!browser$1.isIPhone || canPlayInline);
+                ui = api && support.rangeInput && (!browser.isIPhone || canPlayInline);
                 break;
 
             case 'html5:audio':
@@ -6025,7 +6068,7 @@ var support = {
             case 'youtube:video':
             case 'vimeo:video':
                 api = true;
-                ui = support.rangeInput && (!browser$1.isIPhone || canPlayInline);
+                ui = support.rangeInput && (!browser.isIPhone || canPlayInline);
                 break;
 
             default:
@@ -6043,7 +6086,7 @@ var support = {
     // Picture-in-picture support
     // Safari only currently
     pip: function () {
-        return !browser$1.isIPhone && is$1.function(createElement('video').webkitSetPresentationMode);
+        return !browser.isIPhone && is$1.function(createElement('video').webkitSetPresentationMode);
     }(),
 
     // Airplay support
@@ -6135,67 +6178,29 @@ var support = {
 
 // ==========================================================================
 
-// Remove duplicates in an array
-function dedupe(array) {
-    if (!is$1.array(array)) {
-        return array;
-    }
-
-    return array.filter(function (item, index) {
-        return array.indexOf(item) === index;
-    });
-}
-
-// Get the closest value in an array
-function closest(array, value) {
-    if (!is$1.array(array) || !array.length) {
-        return null;
-    }
-
-    return array.reduce(function (prev, curr) {
-        return Math.abs(curr - value) < Math.abs(prev - value) ? curr : prev;
-    });
-}
-
-// ==========================================================================
-
 var html5 = {
     getSources: function getSources() {
+        var _this = this;
+
         if (!this.isHTML5) {
-            return null;
+            return [];
         }
 
-        return this.media.querySelectorAll('source');
+        var sources = Array.from(this.media.querySelectorAll('source'));
+
+        // Filter out unsupported sources
+        return sources.filter(function (source) {
+            return support.mime.call(_this, source.getAttribute('type'));
+        });
     },
 
 
     // Get quality levels
     getQualityOptions: function getQualityOptions() {
-        if (!this.isHTML5) {
-            return null;
-        }
-
-        // Get sources
-        var sources = html5.getSources.call(this);
-
-        if (is$1.empty(sources)) {
-            return null;
-        }
-
-        // Get <source> with size attribute
-        var sizes = Array.from(sources).filter(function (source) {
-            return !is$1.empty(source.getAttribute('size'));
-        });
-
-        // If none, bail
-        if (is$1.empty(sizes)) {
-            return null;
-        }
-
-        // Reduce to unique list
-        return dedupe(sizes.map(function (source) {
+        // Get sizes from <source> elements
+        return html5.getSources.call(this).map(function (source) {
             return Number(source.getAttribute('size'));
-        }));
+        }).filter(Boolean);
     },
     extend: function extend() {
         if (!this.isHTML5) {
@@ -6210,52 +6215,30 @@ var html5 = {
                 // Get sources
                 var sources = html5.getSources.call(player);
 
-                if (is$1.empty(sources)) {
-                    return null;
-                }
-
-                var matches$$1 = Array.from(sources).filter(function (source) {
+                var _sources$filter = sources.filter(function (source) {
                     return source.getAttribute('src') === player.source;
-                });
+                }),
+                    _sources$filter2 = slicedToArray(_sources$filter, 1),
+                    source = _sources$filter2[0];
 
-                if (is$1.empty(matches$$1)) {
-                    return null;
-                }
+                // Return size, if match is found
 
-                return Number(matches$$1[0].getAttribute('size'));
+
+                return source && Number(source.getAttribute('size'));
             },
             set: function set(input) {
                 // Get sources
                 var sources = html5.getSources.call(player);
 
-                if (is$1.empty(sources)) {
-                    return;
-                }
-
-                // Get matches for requested size
-                var matches$$1 = Array.from(sources).filter(function (source) {
+                // Get first match for requested size
+                var source = sources.find(function (source) {
                     return Number(source.getAttribute('size')) === input;
                 });
 
-                // No matches for requested size
-                if (is$1.empty(matches$$1)) {
+                // No matching source found
+                if (!source) {
                     return;
                 }
-
-                // Get supported sources
-                var supported = matches$$1.filter(function (source) {
-                    return support.mime.call(player, source.getAttribute('type'));
-                });
-
-                // No supported sources
-                if (is$1.empty(supported)) {
-                    return;
-                }
-
-                // Trigger change event
-                trigger.call(player, player.media, 'qualityrequested', false, {
-                    quality: input
-                });
 
                 // Get current state
                 var currentTime = player.currentTime,
@@ -6263,14 +6246,13 @@ var html5 = {
 
                 // Set new source
 
-                player.media.src = supported[0].getAttribute('src');
+                player.media.src = source.getAttribute('src');
 
                 // Restore time
                 var onLoadedMetaData = function onLoadedMetaData() {
                     player.currentTime = currentTime;
-                    player.off('loadedmetadata', onLoadedMetaData);
                 };
-                player.on('loadedmetadata', onLoadedMetaData);
+                player.once('loadedmetadata', onLoadedMetaData);
 
                 // Load new source
                 player.media.load();
@@ -6281,7 +6263,7 @@ var html5 = {
                 }
 
                 // Trigger change event
-                trigger.call(player, player.media, 'qualitychange', false, {
+                triggerEvent.call(player, player.media, 'qualitychange', false, {
                     quality: input
                 });
             }
@@ -6297,7 +6279,7 @@ var html5 = {
         }
 
         // Remove child sources
-        removeElement(html5.getSources());
+        removeElement(html5.getSources.call(this));
 
         // Set blank video src attribute
         // This is to prevent a MEDIA_ERR_SRC_NOT_SUPPORTED error
@@ -6491,6 +6473,30 @@ var i18n = {
         return string;
     }
 };
+
+// ==========================================================================
+
+// Remove duplicates in an array
+function dedupe(array) {
+    if (!is$1.array(array)) {
+        return array;
+    }
+
+    return array.filter(function (item, index) {
+        return array.indexOf(item) === index;
+    });
+}
+
+// Get the closest value in an array
+function closest(array, value) {
+    if (!is$1.array(array) || !array.length) {
+        return null;
+    }
+
+    return array.reduce(function (prev, curr) {
+        return Math.abs(curr - value) < Math.abs(prev - value) ? curr : prev;
+    });
+}
 
 // ==========================================================================
 
@@ -6692,7 +6698,7 @@ var controls = {
     // Get icon URL
     getIconUrl: function getIconUrl() {
         var url = new URL(this.config.iconUrl, window.location);
-        var cors = url.host !== window.location.host || browser$1.isIE && !window.svg4everybody;
+        var cors = url.host !== window.location.host || browser.isIE && !window.svg4everybody;
 
         return {
             url: this.config.iconUrl,
@@ -7194,7 +7200,7 @@ var controls = {
         range.setAttribute('aria-valuenow', range.value);
 
         // WebKit only
-        if (!browser$1.isWebkit) {
+        if (!browser.isWebkit) {
             return;
         }
 
@@ -7307,7 +7313,6 @@ var controls = {
 
 
     // Set the quality menu
-    // TODO: Vimeo support
     setQualityMenu: function setQualityMenu(options) {
         var _this3 = this;
 
@@ -7319,9 +7324,9 @@ var controls = {
         var type = 'quality';
         var list = this.elements.settings.panes.quality.querySelector('ul');
 
-        // Set options if passed and filter based on config
+        // Set options if passed and filter based on uniqueness and config
         if (is$1.array(options)) {
-            this.options.quality = options.filter(function (quality) {
+            this.options.quality = dedupe(options).filter(function (quality) {
                 return _this3.config.quality.options.includes(quality);
             });
         }
@@ -7742,13 +7747,10 @@ var controls = {
                 // Revert back to auto
                 container.style.width = '';
                 container.style.height = '';
-
-                // Only listen once
-                off(container, transitionEndEvent, restore);
             };
 
             // Listen for the transition finishing and restore auto height/width
-            on(container, transitionEndEvent, restore);
+            once(container, transitionEndEvent, restore);
 
             // Set dimensions to target
             container.style.width = size.width + 'px';
@@ -8253,7 +8255,7 @@ var captions = {
 
         // Fix IE captions if CORS is used
         // Fetch captions and inject as blobs instead (data URIs not supported!)
-        if (browser$1.isIE && window.URL) {
+        if (browser.isIE && window.URL) {
             var elements = this.media.querySelectorAll('track');
 
             Array.from(elements).forEach(function (track) {
@@ -8293,7 +8295,7 @@ var captions = {
         // Watch changes to textTracks and update captions menu
         if (this.isHTML5) {
             var trackEvents = this.config.captions.update ? 'addtrack removetrack' : 'removetrack';
-            on(this.media.textTracks, trackEvents, captions.update.bind(this));
+            on.call(this, this.media.textTracks, trackEvents, captions.update.bind(this));
         }
 
         // Update available languages in list next tick (the event must not be triggered before the listeners)
@@ -8324,7 +8326,7 @@ var captions = {
                 track.mode = 'hidden';
 
                 // Add event listener for cue changes
-                on(track, 'cuechange', function () {
+                on.call(_this, track, 'cuechange', function () {
                     return captions.updateCues.call(_this);
                 });
             });
@@ -8395,7 +8397,7 @@ var captions = {
             }
 
             // Trigger event
-            trigger.call(this, this.media, 'languagechange');
+            triggerEvent.call(this, this.media, 'languagechange');
         }
 
         if (this.isHTML5 && this.isVideo) {
@@ -8531,7 +8533,7 @@ var captions = {
             this.elements.captions.appendChild(caption);
 
             // Trigger event
-            trigger.call(this, this.media, 'cuechange');
+            triggerEvent.call(this, this.media, 'cuechange');
         }
     }
 };
@@ -8957,10 +8959,10 @@ function onChange() {
     }
 
     // Trigger an event
-    trigger.call(this.player, this.target, this.active ? 'enterfullscreen' : 'exitfullscreen', true);
+    triggerEvent.call(this.player, this.target, this.active ? 'enterfullscreen' : 'exitfullscreen', true);
 
     // Trap focus in container
-    if (!browser$1.isIos) {
+    if (!browser.isIos) {
         trapFocus.call(this.player, this.target, this.active);
     }
 }
@@ -9006,13 +9008,13 @@ var Fullscreen = function () {
 
         // Register event listeners
         // Handle event (incase user presses escape etc)
-        on(document, this.prefix === 'ms' ? 'MSFullscreenChange' : this.prefix + 'fullscreenchange', function () {
+        on.call(this.player, document, this.prefix === 'ms' ? 'MSFullscreenChange' : this.prefix + 'fullscreenchange', function () {
             // TODO: Filter for target??
             onChange.call(_this);
         });
 
         // Fullscreen toggle on double click
-        on(this.player.elements.container, 'dblclick', function (event) {
+        on.call(this.player, this.player.elements.container, 'dblclick', function (event) {
             // Ignore double click in controls
             if (is$1.element(_this.player.elements.controls) && _this.player.elements.controls.contains(event.target)) {
                 return;
@@ -9054,7 +9056,7 @@ var Fullscreen = function () {
             }
 
             // iOS native fullscreen doesn't need the request step
-            if (browser$1.isIos && this.player.config.fullscreen.iosNative) {
+            if (browser.isIos && this.player.config.fullscreen.iosNative) {
                 if (this.player.playing) {
                     this.target.webkitEnterFullscreen();
                 }
@@ -9077,7 +9079,7 @@ var Fullscreen = function () {
             }
 
             // iOS native fullscreen
-            if (browser$1.isIos && this.player.config.fullscreen.iosNative) {
+            if (browser.isIos && this.player.config.fullscreen.iosNative) {
                 this.target.webkitExitFullscreen();
                 this.player.play();
             } else if (!Fullscreen.native) {
@@ -9134,7 +9136,7 @@ var Fullscreen = function () {
     }, {
         key: 'target',
         get: function get() {
-            return browser$1.isIos && this.player.config.fullscreen.iosNative ? this.player.media : this.player.elements.container;
+            return browser.isIos && this.player.config.fullscreen.iosNative ? this.player.media : this.player.elements.container;
         }
     }], [{
         key: 'native',
@@ -9286,7 +9288,7 @@ var ui = {
         toggleClass(this.elements.container, this.config.classNames.airplay.supported, support.airplay && this.isHTML5);
 
         // Add iOS class
-        toggleClass(this.elements.container, this.config.classNames.isIos, browser$1.isIos);
+        toggleClass(this.elements.container, this.config.classNames.isIos, browser.isIos);
 
         // Add touch class
         toggleClass(this.elements.container, this.config.classNames.isTouch, this.touch);
@@ -9296,7 +9298,7 @@ var ui = {
 
         // Ready event at end of execution stack
         setTimeout(function () {
-            trigger.call(_this, _this.media, 'ready');
+            triggerEvent.call(_this, _this.media, 'ready');
         }, 0);
 
         // Set the title
@@ -9621,9 +9623,6 @@ var Listeners = function () {
 
             // Add touch class
             toggleClass(this.player.elements.container, this.player.config.classNames.isTouch, true);
-
-            // Clean up
-            off(document.body, 'touchstart', this.firstTouch);
         }
 
         // Global window & document listeners
@@ -9635,14 +9634,14 @@ var Listeners = function () {
 
             // Keyboard shortcuts
             if (this.player.config.keyboard.global) {
-                toggleListener(window, 'keydown keyup', this.handleKey, toggle, false);
+                toggleListener.call(this.player, window, 'keydown keyup', this.handleKey, toggle, false);
             }
 
             // Click anywhere closes menu
-            toggleListener(document.body, 'click', this.toggleMenu, toggle);
+            toggleListener.call(this.player, document.body, 'click', this.toggleMenu, toggle);
 
             // Detect touch by events
-            on(document.body, 'touchstart', this.firstTouch);
+            once(document.body, 'touchstart', this.firstTouch);
         }
 
         // Container listeners
@@ -9654,17 +9653,16 @@ var Listeners = function () {
 
             // Keyboard shortcuts
             if (!this.player.config.keyboard.global && this.player.config.keyboard.focused) {
-                on(this.player.elements.container, 'keydown keyup', this.handleKey, false);
+                on.call(this.player, this.player.elements.container, 'keydown keyup', this.handleKey, false);
             }
 
             // Detect tab focus
             // Remove class on blur/focusout
-            on(this.player.elements.container, 'focusout', function (event) {
+            on.call(this.player, this.player.elements.container, 'focusout', function (event) {
                 toggleClass(event.target, _this2.player.config.classNames.tabFocus, false);
             });
-
             // Add classname to tabbed elements
-            on(this.player.elements.container, 'keydown', function (event) {
+            on.call(this.player, this.player.elements.container, 'keydown', function (event) {
                 if (event.keyCode !== 9) {
                     return;
                 }
@@ -9677,7 +9675,7 @@ var Listeners = function () {
             });
 
             // Toggle controls on mouse events and entering fullscreen
-            on(this.player.elements.container, 'mousemove mouseleave touchstart touchmove enterfullscreen exitfullscreen', function (event) {
+            on.call(this.player, this.player.elements.container, 'mousemove mouseleave touchstart touchmove enterfullscreen exitfullscreen', function (event) {
                 var controls$$1 = _this2.player.elements.controls;
 
                 // Remove button states for fullscreen
@@ -9715,24 +9713,24 @@ var Listeners = function () {
             var _this3 = this;
 
             // Time change on media
-            on(this.player.media, 'timeupdate seeking seeked', function (event) {
+            on.call(this.player, this.player.media, 'timeupdate seeking seeked', function (event) {
                 return controls.timeUpdate.call(_this3.player, event);
             });
 
             // Display duration
-            on(this.player.media, 'durationchange loadeddata loadedmetadata', function (event) {
+            on.call(this.player, this.player.media, 'durationchange loadeddata loadedmetadata', function (event) {
                 return controls.durationUpdate.call(_this3.player, event);
             });
 
             // Check for audio tracks on load
             // We can't use `loadedmetadata` as it doesn't seem to have audio tracks at that point
-            on(this.player.media, 'loadeddata canplay', function () {
+            on.call(this.player, this.player.media, 'loadeddata', function () {
                 toggleHidden(_this3.player.elements.volume, !_this3.player.hasAudio);
                 toggleHidden(_this3.player.elements.buttons.mute, !_this3.player.hasAudio);
             });
 
             // Handle the media finishing
-            on(this.player.media, 'ended', function () {
+            on.call(this.player, this.player.media, 'ended', function () {
                 // Show poster on end
                 if (_this3.player.isHTML5 && _this3.player.isVideo && _this3.player.config.resetOnEnd) {
                     // Restart
@@ -9741,28 +9739,28 @@ var Listeners = function () {
             });
 
             // Check for buffer progress
-            on(this.player.media, 'progress playing seeking seeked', function (event) {
+            on.call(this.player, this.player.media, 'progress playing seeking seeked', function (event) {
                 return controls.updateProgress.call(_this3.player, event);
             });
 
             // Handle volume changes
-            on(this.player.media, 'volumechange', function (event) {
+            on.call(this.player, this.player.media, 'volumechange', function (event) {
                 return controls.updateVolume.call(_this3.player, event);
             });
 
             // Handle play/pause
-            on(this.player.media, 'playing play pause ended emptied timeupdate', function (event) {
+            on.call(this.player, this.player.media, 'playing play pause ended emptied timeupdate', function (event) {
                 return ui.checkPlaying.call(_this3.player, event);
             });
 
             // Loading state
-            on(this.player.media, 'waiting canplay seeked playing', function (event) {
+            on.call(this.player, this.player.media, 'waiting canplay seeked playing', function (event) {
                 return ui.checkLoading.call(_this3.player, event);
             });
 
             // If autoplay, then load advertisement if required
             // TODO: Show some sort of loading state while the ad manager loads else there's a delay before ad shows
-            on(this.player.media, 'playing', function () {
+            on.call(this.player, this.player.media, 'playing', function () {
                 if (!_this3.player.ads) {
                     return;
                 }
@@ -9789,7 +9787,7 @@ var Listeners = function () {
                 }
 
                 // On click play, pause ore restart
-                on(wrapper, 'click', function () {
+                on.call(this.player, wrapper, 'click', function () {
                     // Touch devices will just show controls (if we're hiding controls)
                     if (_this3.player.config.hideControls && _this3.player.touch && !_this3.player.paused) {
                         return;
@@ -9808,19 +9806,19 @@ var Listeners = function () {
 
             // Disable right click
             if (this.player.supported.ui && this.player.config.disableContextMenu) {
-                on(this.player.elements.wrapper, 'contextmenu', function (event) {
+                on.call(this.player, this.player.elements.wrapper, 'contextmenu', function (event) {
                     event.preventDefault();
                 }, false);
             }
 
             // Volume change
-            on(this.player.media, 'volumechange', function () {
+            on.call(this.player, this.player.media, 'volumechange', function () {
                 // Save to storage
                 _this3.player.storage.set({ volume: _this3.player.volume, muted: _this3.player.muted });
             });
 
             // Speed change
-            on(this.player.media, 'ratechange', function () {
+            on.call(this.player, this.player.media, 'ratechange', function () {
                 // Update UI
                 controls.updateSetting.call(_this3.player, 'speed');
 
@@ -9829,19 +9827,19 @@ var Listeners = function () {
             });
 
             // Quality request
-            on(this.player.media, 'qualityrequested', function (event) {
+            on.call(this.player, this.player.media, 'qualityrequested', function (event) {
                 // Save to storage
                 _this3.player.storage.set({ quality: event.detail.quality });
             });
 
             // Quality change
-            on(this.player.media, 'qualitychange', function (event) {
+            on.call(this.player, this.player.media, 'qualitychange', function (event) {
                 // Update UI
                 controls.updateSetting.call(_this3.player, 'quality', null, event.detail.quality);
             });
 
             // Caption language change
-            on(this.player.media, 'languagechange', function () {
+            on.call(this.player, this.player.media, 'languagechange', function () {
                 // Update UI
                 controls.updateSetting.call(_this3.player, 'captions');
 
@@ -9850,7 +9848,7 @@ var Listeners = function () {
             });
 
             // Captions toggle
-            on(this.player.media, 'captionsenabled captionsdisabled', function () {
+            on.call(this.player, this.player.media, 'captionsenabled captionsdisabled', function () {
                 // Update UI
                 controls.updateSetting.call(_this3.player, 'captions');
 
@@ -9860,7 +9858,7 @@ var Listeners = function () {
 
             // Proxy events to container
             // Bubble up key events for Edge
-            on(this.player.media, this.player.config.events.concat(['keyup', 'keydown']).join(' '), function (event) {
+            on.call(this.player, this.player.media, this.player.config.events.concat(['keyup', 'keydown']).join(' '), function (event) {
                 var _event$detail = event.detail,
                     detail = _event$detail === undefined ? {} : _event$detail;
 
@@ -9870,7 +9868,7 @@ var Listeners = function () {
                     detail = _this3.player.media.error;
                 }
 
-                trigger.call(_this3.player, _this3.player.elements.container, event.type, true, detail);
+                triggerEvent.call(_this3.player, _this3.player.elements.container, event.type, true, detail);
             });
         }
 
@@ -9882,7 +9880,7 @@ var Listeners = function () {
             var _this4 = this;
 
             // IE doesn't support input event, so we fallback to change
-            var inputEvent = browser$1.isIE ? 'change' : 'input';
+            var inputEvent = browser.isIE ? 'change' : 'input';
 
             // Run default and custom handlers
             var proxy = function proxy(event, defaultHandler, customHandlerKey) {
@@ -9908,7 +9906,7 @@ var Listeners = function () {
                 var customHandler = _this4.player.config.listeners[customHandlerKey];
                 var hasCustomHandler = is$1.function(customHandler);
 
-                on(element, type, function (event) {
+                on.call(_this4.player, element, type, function (event) {
                     return proxy(event, defaultHandler, customHandlerKey);
                 }, passive && !hasCustomHandler);
             };
@@ -10053,7 +10051,7 @@ var Listeners = function () {
             }, 'volume');
 
             // Polyfill for lower fill in <input type="range"> for webkit
-            if (browser$1.isWebkit) {
+            if (browser.isWebkit) {
                 bind(getElements.call(this.player, 'input[type="range"]'), 'input', function (event) {
                     controls.updateRangeFill.call(_this4.player, event.target);
                 });
@@ -10142,14 +10140,6 @@ var Listeners = function () {
                     event.preventDefault();
                 }
             }, 'volume', false);
-        }
-
-        // Reset on destroy
-
-    }, {
-        key: 'clear',
-        value: function clear() {
-            this.global(false);
         }
     }]);
     return Listeners;
@@ -10492,7 +10482,7 @@ function assurePlaybackState(play) {
     }
     if (this.media.paused === play) {
         this.media.paused = !play;
-        trigger.call(this, this.media, play ? 'play' : 'pause');
+        triggerEvent.call(this, this.media, play ? 'play' : 'pause');
     }
 }
 
@@ -10646,7 +10636,7 @@ var vimeo = {
 
                 // Set seeking state and trigger event
                 media.seeking = true;
-                trigger.call(player, media, 'seeking');
+                triggerEvent.call(player, media, 'seeking');
 
                 // If paused, mute until seek is complete
                 Promise.resolve(restorePause && embed.setVolume(0))
@@ -10676,7 +10666,7 @@ var vimeo = {
             set: function set(input) {
                 player.embed.setPlaybackRate(input).then(function () {
                     speed = input;
-                    trigger.call(player, player.media, 'ratechange');
+                    triggerEvent.call(player, player.media, 'ratechange');
                 }).catch(function (error) {
                     // Hide menu item (and menu if empty)
                     if (error.name === 'Error') {
@@ -10696,7 +10686,7 @@ var vimeo = {
             set: function set(input) {
                 player.embed.setVolume(input).then(function () {
                     volume = input;
-                    trigger.call(player, player.media, 'volumechange');
+                    triggerEvent.call(player, player.media, 'volumechange');
                 });
             }
         });
@@ -10713,7 +10703,7 @@ var vimeo = {
 
                 player.embed.setVolume(toggle ? 0 : player.config.volume).then(function () {
                     muted = toggle;
-                    trigger.call(player, player.media, 'volumechange');
+                    triggerEvent.call(player, player.media, 'volumechange');
                 });
             }
         });
@@ -10775,13 +10765,13 @@ var vimeo = {
         // Get current time
         player.embed.getCurrentTime().then(function (value) {
             currentTime = value;
-            trigger.call(player, player.media, 'timeupdate');
+            triggerEvent.call(player, player.media, 'timeupdate');
         });
 
         // Get duration
         player.embed.getDuration().then(function (value) {
             player.media.duration = value;
-            trigger.call(player, player.media, 'durationchange');
+            triggerEvent.call(player, player.media, 'durationchange');
         });
 
         // Get captions
@@ -10805,7 +10795,7 @@ var vimeo = {
             player.embed.getPaused().then(function (paused) {
                 assurePlaybackState.call(player, !paused);
                 if (!paused) {
-                    trigger.call(player, player.media, 'playing');
+                    triggerEvent.call(player, player.media, 'playing');
                 }
             });
 
@@ -10820,7 +10810,7 @@ var vimeo = {
 
         player.embed.on('play', function () {
             assurePlaybackState.call(player, true);
-            trigger.call(player, player.media, 'playing');
+            triggerEvent.call(player, player.media, 'playing');
         });
 
         player.embed.on('pause', function () {
@@ -10830,16 +10820,16 @@ var vimeo = {
         player.embed.on('timeupdate', function (data) {
             player.media.seeking = false;
             currentTime = data.seconds;
-            trigger.call(player, player.media, 'timeupdate');
+            triggerEvent.call(player, player.media, 'timeupdate');
         });
 
         player.embed.on('progress', function (data) {
             player.media.buffered = data.percent;
-            trigger.call(player, player.media, 'progress');
+            triggerEvent.call(player, player.media, 'progress');
 
             // Check all loaded
             if (parseInt(data.percent, 10) === 1) {
-                trigger.call(player, player.media, 'canplaythrough');
+                triggerEvent.call(player, player.media, 'canplaythrough');
             }
 
             // Get duration as if we do it before load, it gives an incorrect value
@@ -10847,24 +10837,24 @@ var vimeo = {
             player.embed.getDuration().then(function (value) {
                 if (value !== player.media.duration) {
                     player.media.duration = value;
-                    trigger.call(player, player.media, 'durationchange');
+                    triggerEvent.call(player, player.media, 'durationchange');
                 }
             });
         });
 
         player.embed.on('seeked', function () {
             player.media.seeking = false;
-            trigger.call(player, player.media, 'seeked');
+            triggerEvent.call(player, player.media, 'seeked');
         });
 
         player.embed.on('ended', function () {
             player.media.paused = true;
-            trigger.call(player, player.media, 'ended');
+            triggerEvent.call(player, player.media, 'ended');
         });
 
         player.embed.on('error', function (detail) {
             player.media.error = detail;
-            trigger.call(player, player.media, 'error');
+            triggerEvent.call(player, player.media, 'error');
         });
 
         // Rebuild UI
@@ -10888,52 +10878,29 @@ function parseId$1(url) {
 
 // Standardise YouTube quality unit
 function mapQualityUnit(input) {
-    switch (input) {
-        case 'hd2160':
-            return 2160;
+    var qualities = {
+        hd2160: 2160,
+        hd1440: 1440,
+        hd1080: 1080,
+        hd720: 720,
+        large: 480,
+        medium: 360,
+        small: 240,
+        tiny: 144
+    };
 
-        case 2160:
-            return 'hd2160';
+    var entry = Object.entries(qualities).find(function (entry) {
+        return entry.includes(input);
+    });
 
-        case 'hd1440':
-            return 1440;
-
-        case 1440:
-            return 'hd1440';
-
-        case 'hd1080':
-            return 1080;
-
-        case 1080:
-            return 'hd1080';
-
-        case 'hd720':
-            return 720;
-
-        case 720:
-            return 'hd720';
-
-        case 'large':
-            return 480;
-
-        case 480:
-            return 'large';
-
-        case 'medium':
-            return 360;
-
-        case 360:
-            return 'medium';
-
-        case 'small':
-            return 240;
-
-        case 240:
-            return 'small';
-
-        default:
-            return 'default';
+    if (entry) {
+        // Get the match corresponding to the input
+        return entry.find(function (value) {
+            return value !== input;
+        });
     }
+
+    return 'default';
 }
 
 function mapQualityUnits(levels) {
@@ -10953,7 +10920,7 @@ function assurePlaybackState$1(play) {
     }
     if (this.media.paused === play) {
         this.media.paused = !play;
-        trigger.call(this, this.media, play ? 'play' : 'pause');
+        triggerEvent.call(this, this.media, play ? 'play' : 'pause');
     }
 }
 
@@ -11141,10 +11108,10 @@ var youtube = {
 
                     player.media.error = detail;
 
-                    trigger.call(player, player.media, 'error');
+                    triggerEvent.call(player, player.media, 'error');
                 },
                 onPlaybackQualityChange: function onPlaybackQualityChange() {
-                    trigger.call(player, player.media, 'qualitychange', false, {
+                    triggerEvent.call(player, player.media, 'qualitychange', false, {
                         quality: player.media.quality
                     });
                 },
@@ -11155,7 +11122,7 @@ var youtube = {
                     // Get current speed
                     player.media.playbackRate = instance.getPlaybackRate();
 
-                    trigger.call(player, player.media, 'ratechange');
+                    triggerEvent.call(player, player.media, 'ratechange');
                 },
                 onReady: function onReady(event) {
                     // Get the instance
@@ -11196,7 +11163,7 @@ var youtube = {
 
                             // Set seeking state and trigger event
                             player.media.seeking = true;
-                            trigger.call(player, player.media, 'seeking');
+                            triggerEvent.call(player, player.media, 'seeking');
 
                             // Seek after events sent
                             instance.seekTo(time);
@@ -11219,15 +11186,7 @@ var youtube = {
                             return mapQualityUnit(instance.getPlaybackQuality());
                         },
                         set: function set(input) {
-                            var quality = input;
-
-                            // Set via API
-                            instance.setPlaybackQuality(mapQualityUnit(quality));
-
-                            // Trigger request event
-                            trigger.call(player, player.media, 'qualityrequested', false, {
-                                quality: quality
-                            });
+                            instance.setPlaybackQuality(mapQualityUnit(input));
                         }
                     });
 
@@ -11241,7 +11200,7 @@ var youtube = {
                         set: function set(input) {
                             volume = input;
                             instance.setVolume(volume * 100);
-                            trigger.call(player, player.media, 'volumechange');
+                            triggerEvent.call(player, player.media, 'volumechange');
                         }
                     });
 
@@ -11256,7 +11215,7 @@ var youtube = {
                             var toggle = is$1.boolean(input) ? input : muted;
                             muted = toggle;
                             instance[toggle ? 'mute' : 'unMute']();
-                            trigger.call(player, player.media, 'volumechange');
+                            triggerEvent.call(player, player.media, 'volumechange');
                         }
                     });
 
@@ -11282,8 +11241,8 @@ var youtube = {
                         player.media.setAttribute('tabindex', -1);
                     }
 
-                    trigger.call(player, player.media, 'timeupdate');
-                    trigger.call(player, player.media, 'durationchange');
+                    triggerEvent.call(player, player.media, 'timeupdate');
+                    triggerEvent.call(player, player.media, 'durationchange');
 
                     // Reset timer
                     clearInterval(player.timers.buffering);
@@ -11295,7 +11254,7 @@ var youtube = {
 
                         // Trigger progress only when we actually buffer something
                         if (player.media.lastBuffered === null || player.media.lastBuffered < player.media.buffered) {
-                            trigger.call(player, player.media, 'progress');
+                            triggerEvent.call(player, player.media, 'progress');
                         }
 
                         // Set last buffer point
@@ -11306,7 +11265,7 @@ var youtube = {
                             clearInterval(player.timers.buffering);
 
                             // Trigger event
-                            trigger.call(player, player.media, 'canplaythrough');
+                            triggerEvent.call(player, player.media, 'canplaythrough');
                         }
                     }, 200);
 
@@ -11327,7 +11286,7 @@ var youtube = {
                     if (seeked) {
                         // Unset seeking and fire seeked event
                         player.media.seeking = false;
-                        trigger.call(player, player.media, 'seeked');
+                        triggerEvent.call(player, player.media, 'seeked');
                     }
 
                     // Handle events
@@ -11340,11 +11299,11 @@ var youtube = {
                     switch (event.data) {
                         case -1:
                             // Update scrubber
-                            trigger.call(player, player.media, 'timeupdate');
+                            triggerEvent.call(player, player.media, 'timeupdate');
 
                             // Get loaded % from YouTube
                             player.media.buffered = instance.getVideoLoadedFraction();
-                            trigger.call(player, player.media, 'progress');
+                            triggerEvent.call(player, player.media, 'progress');
 
                             break;
 
@@ -11357,7 +11316,7 @@ var youtube = {
                                 instance.stopVideo();
                                 instance.playVideo();
                             } else {
-                                trigger.call(player, player.media, 'ended');
+                                triggerEvent.call(player, player.media, 'ended');
                             }
 
                             break;
@@ -11369,11 +11328,11 @@ var youtube = {
                             } else {
                                 assurePlaybackState$1.call(player, true);
 
-                                trigger.call(player, player.media, 'playing');
+                                triggerEvent.call(player, player.media, 'playing');
 
                                 // Poll to get playback progress
                                 player.timers.playing = setInterval(function () {
-                                    trigger.call(player, player.media, 'timeupdate');
+                                    triggerEvent.call(player, player.media, 'timeupdate');
                                 }, 50);
 
                                 // Check duration again due to YouTube bug
@@ -11381,7 +11340,7 @@ var youtube = {
                                 // https://code.google.com/p/gdata-issues/issues/detail?id=8690
                                 if (player.media.duration !== instance.getDuration()) {
                                     player.media.duration = instance.getDuration();
-                                    trigger.call(player, player.media, 'durationchange');
+                                    triggerEvent.call(player, player.media, 'durationchange');
                                 }
 
                                 // Get quality
@@ -11403,7 +11362,7 @@ var youtube = {
                             break;
                     }
 
-                    trigger.call(player, player.elements.container, 'statechange', false, {
+                    triggerEvent.call(player, player.elements.container, 'statechange', false, {
                         code: event.data
                     });
                 }
@@ -11760,7 +11719,7 @@ var Ads = function () {
             // Proxy event
             var dispatchEvent = function dispatchEvent(type) {
                 var event = 'ads' + type.replace(/_/g, '').toLowerCase();
-                trigger.call(_this7.player, _this7.player.media, event);
+                triggerEvent.call(_this7.player, _this7.player.media, event);
             };
 
             switch (event.type) {
@@ -12049,7 +12008,7 @@ var Ads = function () {
 
     }, {
         key: 'trigger',
-        value: function trigger$$1(event) {
+        value: function trigger(event) {
             var _this11 = this;
 
             for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
@@ -12436,7 +12395,7 @@ var Plyr = function () {
                     this.elements.container.className = '';
 
                     // Get attributes from URL and set config
-                    if (!url.searchParams) {
+                    if (url.searchParams.length) {
                         var truthy = ['1', 'true'];
 
                         if (truthy.includes(url.searchParams.get('autoplay'))) {
@@ -12511,6 +12470,8 @@ var Plyr = function () {
             return;
         }
 
+        this.eventListeners = [];
+
         // Create listeners
         this.listeners = new Listeners(this);
 
@@ -12537,7 +12498,7 @@ var Plyr = function () {
 
         // Listen for events if debugging
         if (this.config.debug) {
-            on(this.elements.container, this.config.events.join(' '), function (event) {
+            on.call(this, this.elements.container, this.config.events.join(' '), function (event) {
                 _this.debug.log('event: ' + event.type);
             });
         }
@@ -12736,7 +12697,7 @@ var Plyr = function () {
             // Update state and trigger event
             if (active !== this.captions.active) {
                 this.captions.active = active;
-                trigger.call(this, this.media, this.captions.active ? 'captionsenabled' : 'captionsdisabled');
+                triggerEvent.call(this, this.media, this.captions.active ? 'captionsenabled' : 'captionsdisabled');
             }
         }
 
@@ -12786,7 +12747,7 @@ var Plyr = function () {
                 // Trigger event on change
                 if (hiding !== isHidden) {
                     var eventName = hiding ? 'controlshidden' : 'controlsshown';
-                    trigger.call(this, this.media, eventName);
+                    triggerEvent.call(this, this.media, eventName);
                 }
                 return !hiding;
             }
@@ -12802,9 +12763,19 @@ var Plyr = function () {
     }, {
         key: 'on',
         value: function on$$1(event, callback) {
-            on(this.elements.container, event, callback);
+            on.call(this, this.elements.container, event, callback);
         }
+        /**
+         * Add event listeners once
+         * @param {string} event - Event type
+         * @param {function} callback - Callback for when event occurs
+         */
 
+    }, {
+        key: 'once',
+        value: function once$$1(event, callback) {
+            once(this.elements.container, event, callback);
+        }
         /**
          * Remove event listeners
          * @param {string} event - Event type
@@ -12865,13 +12836,13 @@ var Plyr = function () {
                     }
                 } else {
                     // Unbind listeners
-                    _this2.listeners.clear();
+                    unbindListeners.call(_this2);
 
                     // Replace the container with the original element provided
                     replaceElement(_this2.elements.original, _this2.elements.container);
 
                     // Event
-                    trigger.call(_this2, _this2.elements.original, 'destroyed', true);
+                    triggerEvent.call(_this2, _this2.elements.original, 'destroyed', true);
 
                     // Callback
                     if (is$1.function(callback)) {
@@ -13263,36 +13234,26 @@ var Plyr = function () {
     }, {
         key: 'quality',
         set: function set(input) {
-            var quality = null;
+            var config = this.config.quality;
+            var options = this.options.quality;
 
-            if (!is$1.empty(input)) {
-                quality = Number(input);
-            }
-
-            if (!is$1.number(quality)) {
-                quality = this.storage.get('quality');
-            }
-
-            if (!is$1.number(quality)) {
-                quality = this.config.quality.selected;
-            }
-
-            if (!is$1.number(quality)) {
-                quality = this.config.quality.default;
-            }
-
-            if (!this.options.quality.length) {
+            if (!options.length) {
                 return;
             }
 
-            if (!this.options.quality.includes(quality)) {
-                var value = closest(this.options.quality, quality);
+            var quality = [!is$1.empty(input) && Number(input), this.storage.get('quality'), config.selected, config.default].find(is$1.number);
+
+            if (!options.includes(quality)) {
+                var value = closest(options, quality);
                 this.debug.warn('Unsupported quality option: ' + quality + ', using ' + value + ' instead');
                 quality = value;
             }
 
+            // Trigger request event
+            triggerEvent.call(this, this.media, 'qualityrequested', false, { quality: quality });
+
             // Update config
-            this.config.quality.selected = quality;
+            config.selected = quality;
 
             // Set quality
             this.media.quality = quality;
@@ -13521,8 +13482,8 @@ var Plyr = function () {
 
     }, {
         key: 'loadSprite',
-        value: function loadSprite(url, id) {
-            return loadScript(url, id);
+        value: function loadSprite$$1(url, id) {
+            return loadSprite(url, id);
         }
 
         /**

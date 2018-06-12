@@ -7,9 +7,10 @@ import html5 from './html5';
 import i18n from './i18n';
 import support from './support';
 import { repaint, transitionEndEvent } from './utils/animation';
+import { dedupe } from './utils/arrays';
 import browser from './utils/browser';
 import { createElement, emptyElement, getAttributesFromSelector, getElement, getElements, hasClass, removeElement, setAttributes, toggleClass, toggleHidden, toggleState } from './utils/elements';
-import { off, on } from './utils/events';
+import { once } from './utils/events';
 import is from './utils/is';
 import loadSprite from './utils/loadSprite';
 import { extend } from './utils/objects';
@@ -634,7 +635,6 @@ const controls = {
     },
 
     // Set the quality menu
-    // TODO: Vimeo support
     setQualityMenu(options) {
         // Menu required
         if (!is.element(this.elements.settings.panes.quality)) {
@@ -644,9 +644,9 @@ const controls = {
         const type = 'quality';
         const list = this.elements.settings.panes.quality.querySelector('ul');
 
-        // Set options if passed and filter based on config
+        // Set options if passed and filter based on uniqueness and config
         if (is.array(options)) {
-            this.options.quality = options.filter(quality => this.config.quality.options.includes(quality));
+            this.options.quality = dedupe(options).filter(quality => this.config.quality.options.includes(quality));
         }
 
         // Toggle the pane and tab
@@ -1065,12 +1065,10 @@ const controls = {
                 container.style.width = '';
                 container.style.height = '';
 
-                // Only listen once
-                off(container, transitionEndEvent, restore);
             };
 
             // Listen for the transition finishing and restore auto height/width
-            on(container, transitionEndEvent, restore);
+            once(container, transitionEndEvent, restore);
 
             // Set dimensions to target
             container.style.width = `${size.width}px`;

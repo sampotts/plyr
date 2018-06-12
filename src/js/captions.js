@@ -8,7 +8,7 @@ import i18n from './i18n';
 import support from './support';
 import browser from './utils/browser';
 import { createElement, emptyElement, getAttributesFromSelector, insertAfter, removeElement, toggleClass } from './utils/elements';
-import { on, trigger } from './utils/events';
+import { on, triggerEvent } from './utils/events';
 import fetch from './utils/fetch';
 import is from './utils/is';
 import { getHTML } from './utils/strings';
@@ -82,7 +82,7 @@ const captions = {
         // Watch changes to textTracks and update captions menu
         if (this.isHTML5) {
             const trackEvents = this.config.captions.update ? 'addtrack removetrack' : 'removetrack';
-            on(this.media.textTracks, trackEvents, captions.update.bind(this));
+            on.call(this, this.media.textTracks, trackEvents, captions.update.bind(this));
         }
 
         // Update available languages in list next tick (the event must not be triggered before the listeners)
@@ -107,7 +107,7 @@ const captions = {
                 track.mode = 'hidden';
 
                 // Add event listener for cue changes
-                on(track, 'cuechange', () => captions.updateCues.call(this));
+                on.call(this, track, 'cuechange', () => captions.updateCues.call(this));
             });
         }
 
@@ -166,7 +166,7 @@ const captions = {
             }
 
             // Trigger event
-            trigger.call(this, this.media, 'languagechange');
+            triggerEvent.call(this, this.media, 'languagechange');
         }
 
         if (this.isHTML5 && this.isVideo) {
@@ -280,7 +280,7 @@ const captions = {
             this.elements.captions.appendChild(caption);
 
             // Trigger event
-            trigger.call(this, this.media, 'cuechange');
+            triggerEvent.call(this, this.media, 'cuechange');
         }
     },
 };

@@ -6,7 +6,7 @@ import captions from './../captions';
 import controls from './../controls';
 import ui from './../ui';
 import { createElement, replaceElement, toggleClass } from './../utils/elements';
-import { trigger } from './../utils/events';
+import { triggerEvent } from './../utils/events';
 import fetch from './../utils/fetch';
 import is from './../utils/is';
 import loadScript from './../utils/loadScript';
@@ -41,7 +41,7 @@ function assurePlaybackState(play) {
     }
     if (this.media.paused === play) {
         this.media.paused = !play;
-        trigger.call(this, this.media, play ? 'play' : 'pause');
+        triggerEvent.call(this, this.media, play ? 'play' : 'pause');
     }
 }
 
@@ -186,7 +186,7 @@ const vimeo = {
 
                 // Set seeking state and trigger event
                 media.seeking = true;
-                trigger.call(player, media, 'seeking');
+                triggerEvent.call(player, media, 'seeking');
 
                 // If paused, mute until seek is complete
                 Promise.resolve(restorePause && embed.setVolume(0))
@@ -213,7 +213,7 @@ const vimeo = {
                     .setPlaybackRate(input)
                     .then(() => {
                         speed = input;
-                        trigger.call(player, player.media, 'ratechange');
+                        triggerEvent.call(player, player.media, 'ratechange');
                     })
                     .catch(error => {
                         // Hide menu item (and menu if empty)
@@ -233,7 +233,7 @@ const vimeo = {
             set(input) {
                 player.embed.setVolume(input).then(() => {
                     volume = input;
-                    trigger.call(player, player.media, 'volumechange');
+                    triggerEvent.call(player, player.media, 'volumechange');
                 });
             },
         });
@@ -249,7 +249,7 @@ const vimeo = {
 
                 player.embed.setVolume(toggle ? 0 : player.config.volume).then(() => {
                     muted = toggle;
-                    trigger.call(player, player.media, 'volumechange');
+                    triggerEvent.call(player, player.media, 'volumechange');
                 });
             },
         });
@@ -316,13 +316,13 @@ const vimeo = {
         // Get current time
         player.embed.getCurrentTime().then(value => {
             currentTime = value;
-            trigger.call(player, player.media, 'timeupdate');
+            triggerEvent.call(player, player.media, 'timeupdate');
         });
 
         // Get duration
         player.embed.getDuration().then(value => {
             player.media.duration = value;
-            trigger.call(player, player.media, 'durationchange');
+            triggerEvent.call(player, player.media, 'durationchange');
         });
 
         // Get captions
@@ -341,7 +341,7 @@ const vimeo = {
             player.embed.getPaused().then(paused => {
                 assurePlaybackState.call(player, !paused);
                 if (!paused) {
-                    trigger.call(player, player.media, 'playing');
+                    triggerEvent.call(player, player.media, 'playing');
                 }
             });
 
@@ -356,7 +356,7 @@ const vimeo = {
 
         player.embed.on('play', () => {
             assurePlaybackState.call(player, true);
-            trigger.call(player, player.media, 'playing');
+            triggerEvent.call(player, player.media, 'playing');
         });
 
         player.embed.on('pause', () => {
@@ -366,16 +366,16 @@ const vimeo = {
         player.embed.on('timeupdate', data => {
             player.media.seeking = false;
             currentTime = data.seconds;
-            trigger.call(player, player.media, 'timeupdate');
+            triggerEvent.call(player, player.media, 'timeupdate');
         });
 
         player.embed.on('progress', data => {
             player.media.buffered = data.percent;
-            trigger.call(player, player.media, 'progress');
+            triggerEvent.call(player, player.media, 'progress');
 
             // Check all loaded
             if (parseInt(data.percent, 10) === 1) {
-                trigger.call(player, player.media, 'canplaythrough');
+                triggerEvent.call(player, player.media, 'canplaythrough');
             }
 
             // Get duration as if we do it before load, it gives an incorrect value
@@ -383,24 +383,24 @@ const vimeo = {
             player.embed.getDuration().then(value => {
                 if (value !== player.media.duration) {
                     player.media.duration = value;
-                    trigger.call(player, player.media, 'durationchange');
+                    triggerEvent.call(player, player.media, 'durationchange');
                 }
             });
         });
 
         player.embed.on('seeked', () => {
             player.media.seeking = false;
-            trigger.call(player, player.media, 'seeked');
+            triggerEvent.call(player, player.media, 'seeked');
         });
 
         player.embed.on('ended', () => {
             player.media.paused = true;
-            trigger.call(player, player.media, 'ended');
+            triggerEvent.call(player, player.media, 'ended');
         });
 
         player.embed.on('error', detail => {
             player.media.error = detail;
-            trigger.call(player, player.media, 'error');
+            triggerEvent.call(player, player.media, 'error');
         });
 
         // Rebuild UI

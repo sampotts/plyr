@@ -5,7 +5,7 @@
 
 import browser from './utils/browser';
 import { hasClass, toggleClass, toggleState, trapFocus } from './utils/elements';
-import { on, trigger } from './utils/events';
+import { on, triggerEvent } from './utils/events';
 import is from './utils/is';
 
 function onChange() {
@@ -20,7 +20,7 @@ function onChange() {
     }
 
     // Trigger an event
-    trigger.call(this.player, this.target, this.active ? 'enterfullscreen' : 'exitfullscreen', true);
+    triggerEvent.call(this.player, this.target, this.active ? 'enterfullscreen' : 'exitfullscreen', true);
 
     // Trap focus in container
     if (!browser.isIos) {
@@ -63,13 +63,13 @@ class Fullscreen {
 
         // Register event listeners
         // Handle event (incase user presses escape etc)
-        on(document, this.prefix === 'ms' ? 'MSFullscreenChange' : `${this.prefix}fullscreenchange`, () => {
+        on.call(this.player, document, this.prefix === 'ms' ? 'MSFullscreenChange' : `${this.prefix}fullscreenchange`, () => {
             // TODO: Filter for target??
             onChange.call(this);
         });
 
         // Fullscreen toggle on double click
-        on(this.player.elements.container, 'dblclick', event => {
+        on.call(this.player, this.player.elements.container, 'dblclick', event => {
             // Ignore double click in controls
             if (is.element(this.player.elements.controls) && this.player.elements.controls.contains(event.target)) {
                 return;

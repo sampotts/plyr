@@ -20,9 +20,9 @@ import support from './support';
 import ui from './ui';
 import { closest } from './utils/arrays';
 import { createElement, hasClass, removeElement, replaceElement, toggleClass, toggleState, wrap } from './utils/elements';
-import { off, on, trigger } from './utils/events';
+import { off, on, once, triggerEvent, unbindListeners } from './utils/events';
 import is from './utils/is';
-import loadSprite from './utils/loadScript';
+import loadSprite from './utils/loadSprite';
 import { cloneDeep, extend } from './utils/objects';
 import { parseUrl } from './utils/urls';
 
@@ -171,7 +171,7 @@ class Plyr {
                     this.elements.container.className = '';
 
                     // Get attributes from URL and set config
-                    if (!url.searchParams) {
+                    if (url.searchParams.length) {
                         const truthy = [
                             '1',
                             'true',
@@ -249,6 +249,8 @@ class Plyr {
             return;
         }
 
+        this.eventListeners = [];
+
         // Create listeners
         this.listeners = new Listeners(this);
 
@@ -275,7 +277,7 @@ class Plyr {
 
         // Listen for events if debugging
         if (this.config.debug) {
-            on(this.elements.container, this.config.events.join(' '), event => {
+            on.call(this, this.elements.container, this.config.events.join(' '), event => {
                 this.debug.log(`event: ${event.type}`);
             });
         }
@@ -673,36 +675,31 @@ class Plyr {
      * @param {number} input - Quality level
      */
     set quality(input) {
-        let quality = null;
+        const config = this.config.quality;
+        const options = this.options.quality;
 
-        if (!is.empty(input)) {
-            quality = Number(input);
-        }
-
-        if (!is.number(quality)) {
-            quality = this.storage.get('quality');
-        }
-
-        if (!is.number(quality)) {
-            quality = this.config.quality.selected;
-        }
-
-        if (!is.number(quality)) {
-            quality = this.config.quality.default;
-        }
-
-        if (!this.options.quality.length) {
+        if (!options.length) {
             return;
         }
 
-        if (!this.options.quality.includes(quality)) {
-            const value = closest(this.options.quality, quality);
+        let quality = ([
+            !is.empty(input) && Number(input),
+            this.storage.get('quality'),
+            config.selected,
+            config.default,
+        ]).find(is.number);
+
+        if (!options.includes(quality)) {
+            const value = closest(options, quality);
             this.debug.warn(`Unsupported quality option: ${quality}, using ${value} instead`);
             quality = value;
         }
 
+        // Trigger request event
+        triggerEvent.call(this, this.media, 'qualityrequested', false, { quality });
+
         // Update config
-        this.config.quality.selected = quality;
+        config.selected = quality;
 
         // Set quality
         this.media.quality = quality;
@@ -853,7 +850,7 @@ class Plyr {
         // Update state and trigger event
         if (active !== this.captions.active) {
             this.captions.active = active;
-            trigger.call(this, this.media, this.captions.active ? 'captionsenabled' : 'captionsdisabled');
+            triggerEvent.call(this, this.media, this.captions.active ? 'captionsenabled' : 'captionsdisabled');
         }
     }
 
@@ -957,7 +954,7 @@ class Plyr {
             // Trigger event on change
             if (hiding !== isHidden) {
                 const eventName = hiding ? 'controlshidden' : 'controlsshown';
-                trigger.call(this, this.media, eventName);
+                triggerEvent.call(this, this.media, eventName);
             }
             return !hiding;
         }
@@ -970,9 +967,16 @@ class Plyr {
      * @param {function} callback - Callback for when event occurs
      */
     on(event, callback) {
-        on(this.elements.container, event, callback);
+        on.call(this, this.elements.container, event, callback);
     }
-
+    /**
+     * Add event listeners once
+     * @param {string} event - Event type
+     * @param {function} callback - Callback for when event occurs
+     */
+    once(event, callback) {
+        once(this.elements.container, event, callback);
+    }
     /**
      * Remove event listeners
      * @param {string} event - Event type
@@ -1023,13 +1027,13 @@ class Plyr {
                 }
             } else {
                 // Unbind listeners
-                this.listeners.clear();
+                unbindListeners.call(this);
 
                 // Replace the container with the original element provided
                 replaceElement(this.elements.original, this.elements.container);
 
                 // Event
-                trigger.call(this, this.elements.original, 'destroyed', true);
+                triggerEvent.call(this, this.elements.original, 'destroyed', true);
 
                 // Callback
                 if (is.function(callback)) {

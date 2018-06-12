@@ -8,7 +8,7 @@ import i18n from './i18n';
 import support from './support';
 import browser from './utils/browser';
 import { getElement, toggleClass, toggleState } from './utils/elements';
-import { trigger } from './utils/events';
+import { triggerEvent } from './utils/events';
 import is from './utils/is';
 import loadImage from './utils/loadImage';
 
@@ -102,7 +102,7 @@ const ui = {
 
         // Ready event at end of execution stack
         setTimeout(() => {
-            trigger.call(this, this.media, 'ready');
+            triggerEvent.call(this, this.media, 'ready');
         }, 0);
 
         // Set the title

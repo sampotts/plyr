@@ -6,7 +6,7 @@ import controls from './../controls';
 import ui from './../ui';
 import { dedupe } from './../utils/arrays';
 import { createElement, replaceElement, toggleClass } from './../utils/elements';
-import { trigger } from './../utils/events';
+import { triggerEvent } from './../utils/events';
 import fetch from './../utils/fetch';
 import is from './../utils/is';
 import loadImage from './../utils/loadImage';
@@ -25,52 +25,25 @@ function parseId(url) {
 
 // Standardise YouTube quality unit
 function mapQualityUnit(input) {
-    switch (input) {
-        case 'hd2160':
-            return 2160;
+    const qualities = {
+        hd2160: 2160,
+        hd1440: 1440,
+        hd1080: 1080,
+        hd720: 720,
+        large: 480,
+        medium: 360,
+        small: 240,
+        tiny: 144,
+    };
 
-        case 2160:
-            return 'hd2160';
+    const entry = Object.entries(qualities).find(entry => entry.includes(input));
 
-        case 'hd1440':
-            return 1440;
-
-        case 1440:
-            return 'hd1440';
-
-        case 'hd1080':
-            return 1080;
-
-        case 1080:
-            return 'hd1080';
-
-        case 'hd720':
-            return 720;
-
-        case 720:
-            return 'hd720';
-
-        case 'large':
-            return 480;
-
-        case 480:
-            return 'large';
-
-        case 'medium':
-            return 360;
-
-        case 360:
-            return 'medium';
-
-        case 'small':
-            return 240;
-
-        case 240:
-            return 'small';
-
-        default:
-            return 'default';
+    if (entry) {
+        // Get the match corresponding to the input
+        return entry.find(value => value !== input);
     }
+
+    return 'default';
 }
 
 function mapQualityUnits(levels) {
@@ -88,7 +61,7 @@ function assurePlaybackState(play) {
     }
     if (this.media.paused === play) {
         this.media.paused = !play;
-        trigger.call(this, this.media, play ? 'play' : 'pause');
+        triggerEvent.call(this, this.media, play ? 'play' : 'pause');
     }
 }
 
@@ -266,10 +239,10 @@ const youtube = {
 
                     player.media.error = detail;
 
-                    trigger.call(player, player.media, 'error');
+                    triggerEvent.call(player, player.media, 'error');
                 },
                 onPlaybackQualityChange() {
-                    trigger.call(player, player.media, 'qualitychange', false, {
+                    triggerEvent.call(player, player.media, 'qualitychange', false, {
                         quality: player.media.quality,
                     });
                 },
@@ -280,7 +253,7 @@ const youtube = {
                     // Get current speed
                     player.media.playbackRate = instance.getPlaybackRate();
 
-                    trigger.call(player, player.media, 'ratechange');
+                    triggerEvent.call(player, player.media, 'ratechange');
                 },
                 onReady(event) {
                     // Get the instance
@@ -321,7 +294,7 @@ const youtube = {
 
                             // Set seeking state and trigger event
                             player.media.seeking = true;
-                            trigger.call(player, player.media, 'seeking');
+                            triggerEvent.call(player, player.media, 'seeking');
 
                             // Seek after events sent
                             instance.seekTo(time);
@@ -344,15 +317,7 @@ const youtube = {
                             return mapQualityUnit(instance.getPlaybackQuality());
                         },
                         set(input) {
-                            const quality = input;
-
-                            // Set via API
-                            instance.setPlaybackQuality(mapQualityUnit(quality));
-
-                            // Trigger request event
-                            trigger.call(player, player.media, 'qualityrequested', false, {
-                                quality,
-                            });
+                            instance.setPlaybackQuality(mapQualityUnit(input));
                         },
                     });
 
@@ -365,7 +330,7 @@ const youtube = {
                         set(input) {
                             volume = input;
                             instance.setVolume(volume * 100);
-                            trigger.call(player, player.media, 'volumechange');
+                            triggerEvent.call(player, player.media, 'volumechange');
                         },
                     });
 
@@ -379,7 +344,7 @@ const youtube = {
                             const toggle = is.boolean(input) ? input : muted;
                             muted = toggle;
                             instance[toggle ? 'mute' : 'unMute']();
-                            trigger.call(player, player.media, 'volumechange');
+                            triggerEvent.call(player, player.media, 'volumechange');
                         },
                     });
 
@@ -405,8 +370,8 @@ const youtube = {
                         player.media.setAttribute('tabindex', -1);
                     }
 
-                    trigger.call(player, player.media, 'timeupdate');
-                    trigger.call(player, player.media, 'durationchange');
+                    triggerEvent.call(player, player.media, 'timeupdate');
+                    triggerEvent.call(player, player.media, 'durationchange');
 
                     // Reset timer
                     clearInterval(player.timers.buffering);
@@ -418,7 +383,7 @@ const youtube = {
 
                         // Trigger progress only when we actually buffer something
                         if (player.media.lastBuffered === null || player.media.lastBuffered < player.media.buffered) {
-                            trigger.call(player, player.media, 'progress');
+                            triggerEvent.call(player, player.media, 'progress');
                         }
 
                         // Set last buffer point
@@ -429,7 +394,7 @@ const youtube = {
                             clearInterval(player.timers.buffering);
 
                             // Trigger event
-                            trigger.call(player, player.media, 'canplaythrough');
+                            triggerEvent.call(player, player.media, 'canplaythrough');
                         }
                     }, 200);
 
@@ -451,7 +416,7 @@ const youtube = {
                     if (seeked) {
                         // Unset seeking and fire seeked event
                         player.media.seeking = false;
-                        trigger.call(player, player.media, 'seeked');
+                        triggerEvent.call(player, player.media, 'seeked');
                     }
 
                     // Handle events
@@ -464,11 +429,11 @@ const youtube = {
                     switch (event.data) {
                         case -1:
                             // Update scrubber
-                            trigger.call(player, player.media, 'timeupdate');
+                            triggerEvent.call(player, player.media, 'timeupdate');
 
                             // Get loaded % from YouTube
                             player.media.buffered = instance.getVideoLoadedFraction();
-                            trigger.call(player, player.media, 'progress');
+                            triggerEvent.call(player, player.media, 'progress');
 
                             break;
 
@@ -481,7 +446,7 @@ const youtube = {
                                 instance.stopVideo();
                                 instance.playVideo();
                             } else {
-                                trigger.call(player, player.media, 'ended');
+                                triggerEvent.call(player, player.media, 'ended');
                             }
 
                             break;
@@ -493,11 +458,11 @@ const youtube = {
                             } else {
                                 assurePlaybackState.call(player, true);
 
-                                trigger.call(player, player.media, 'playing');
+                                triggerEvent.call(player, player.media, 'playing');
 
                                 // Poll to get playback progress
                                 player.timers.playing = setInterval(() => {
-                                    trigger.call(player, player.media, 'timeupdate');
+                                    triggerEvent.call(player, player.media, 'timeupdate');
                                 }, 50);
 
                                 // Check duration again due to YouTube bug
@@ -505,7 +470,7 @@ const youtube = {
                                 // https://code.google.com/p/gdata-issues/issues/detail?id=8690
                                 if (player.media.duration !== instance.getDuration()) {
                                     player.media.duration = instance.getDuration();
-                                    trigger.call(player, player.media, 'durationchange');
+                                    triggerEvent.call(player, player.media, 'durationchange');
                                 }
 
                                 // Get quality
@@ -527,7 +492,7 @@ const youtube = {
                             break;
                     }
 
-                    trigger.call(player, player.elements.container, 'statechange', false, {
+                    triggerEvent.call(player, player.elements.container, 'statechange', false, {
                         code: event.data,
                     });
                 },
