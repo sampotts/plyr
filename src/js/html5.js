@@ -91,7 +91,7 @@ const html5 = {
         }
 
         // Remove child sources
-        utils.removeElement(html5.getSources());
+        utils.removeElement(html5.getSources.call(this));
 
         // Set blank video src attribute
         // This is to prevent a MEDIA_ERR_SRC_NOT_SUPPORTED error
