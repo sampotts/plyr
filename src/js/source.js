@@ -2,23 +2,24 @@
 // Plyr source update
 // ==========================================================================
 
+import { providers } from './config/types';
 import html5 from './html5';
 import media from './media';
 import support from './support';
-import { providers } from './types';
 import ui from './ui';
-import utils from './utils';
+import { createElement, insertElement, removeElement } from './utils/elements';
+import is from './utils/is';
 
 const source = {
     // Add elements to HTML5 media (source, tracks, etc)
     insertElements(type, attributes) {
-        if (utils.is.string(attributes)) {
-            utils.insertElement(type, this.media, {
+        if (is.string(attributes)) {
+            insertElement(type, this.media, {
                 src: attributes,
             });
-        } else if (utils.is.array(attributes)) {
+        } else if (is.array(attributes)) {
             attributes.forEach(attribute => {
-                utils.insertElement(type, this.media, attribute);
+                insertElement(type, this.media, attribute);
             });
         }
     },
@@ -26,7 +27,7 @@ const source = {
     // Update source
     // Sources are not checked for support so be careful
     change(input) {
-        if (!utils.is.object(input) || !('sources' in input) || !input.sources.length) {
+        if (!is.object(input) || !('sources' in input) || !input.sources.length) {
             this.debug.warn('Invalid source format');
             return;
         }
@@ -42,17 +43,17 @@ const source = {
                 this.options.quality = [];
 
                 // Remove elements
-                utils.removeElement(this.media);
+                removeElement(this.media);
                 this.media = null;
 
                 // Reset class name
-                if (utils.is.element(this.elements.container)) {
+                if (is.element(this.elements.container)) {
                     this.elements.container.removeAttribute('class');
                 }
 
                 // Set the type and provider
                 this.type = input.type;
-                this.provider = !utils.is.empty(input.sources[0].provider) ? input.sources[0].provider : providers.html5;
+                this.provider = !is.empty(input.sources[0].provider) ? input.sources[0].provider : providers.html5;
 
                 // Check for support
                 this.supported = support.check(this.type, this.provider, this.config.playsinline);
@@ -60,16 +61,16 @@ const source = {
                 // Create new markup
                 switch (`${this.provider}:${this.type}`) {
                     case 'html5:video':
-                        this.media = utils.createElement('video');
+                        this.media = createElement('video');
                         break;
 
                     case 'html5:audio':
-                        this.media = utils.createElement('audio');
+                        this.media = createElement('audio');
                         break;
 
                     case 'youtube:video':
                     case 'vimeo:video':
-                        this.media = utils.createElement('div', {
+                        this.media = createElement('div', {
                             src: input.sources[0].src,
                         });
                         break;
@@ -82,7 +83,7 @@ const source = {
                 this.elements.container.appendChild(this.media);
 
                 // Autoplay the new source?
-                if (utils.is.boolean(input.autoplay)) {
+                if (is.boolean(input.autoplay)) {
                     this.config.autoplay = input.autoplay;
                 }
 
@@ -94,7 +95,7 @@ const source = {
                     if (this.config.autoplay) {
                         this.media.setAttribute('autoplay', '');
                     }
-                    if (!utils.is.empty(input.poster)) {
+                    if (!is.empty(input.poster)) {
                         this.poster = input.poster;
                     }
                     if (this.config.loop.active) {

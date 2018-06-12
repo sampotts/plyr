@@ -5,7 +5,34 @@
 import captions from './../captions';
 import controls from './../controls';
 import ui from './../ui';
-import utils from './../utils';
+import { createElement, replaceElement, toggleClass } from './../utils/elements';
+import { trigger } from './../utils/events';
+import fetch from './../utils/fetch';
+import is from './../utils/is';
+import loadScript from './../utils/loadScript';
+import { format, stripHTML } from './../utils/strings';
+import { buildUrlParams } from './../utils/urls';
+
+// Parse Vimeo ID from URL
+function parseId(url) {
+    if (is.empty(url)) {
+        return null;
+    }
+
+    if (is.number(Number(url))) {
+        return url;
+    }
+
+    const regex = /^.*(vimeo.com\/|video\/)(\d+).*/;
+    return url.match(regex) ? RegExp.$2 : url;
+}
+
+// Get aspect ratio for dimensions
+function getAspectRatio(width, height) {
+    const getRatio = (w, h) => (h === 0 ? w : getRatio(h, w % h));
+    const ratio = getRatio(width, height);
+    return `${width / ratio}:${height / ratio}`;
+}
 
 // Set playback state and trigger change (only on actual change)
 function assurePlaybackState(play) {
@@ -14,22 +41,21 @@ function assurePlaybackState(play) {
     }
     if (this.media.paused === play) {
         this.media.paused = !play;
-        utils.dispatchEvent.call(this, this.media, play ? 'play' : 'pause');
+        trigger.call(this, this.media, play ? 'play' : 'pause');
     }
 }
 
 const vimeo = {
     setup() {
         // Add embed class for responsive
-        utils.toggleClass(this.elements.wrapper, this.config.classNames.embed, true);
+        toggleClass(this.elements.wrapper, this.config.classNames.embed, true);
 
         // Set intial ratio
         vimeo.setAspectRatio.call(this);
 
         // Load the API if not already
-        if (!utils.is.object(window.Vimeo)) {
-            utils
-                .loadScript(this.config.urls.vimeo.sdk)
+        if (!is.object(window.Vimeo)) {
+            loadScript(this.config.urls.vimeo.sdk)
                 .then(() => {
                     vimeo.ready.call(this);
                 })
@@ -44,7 +70,7 @@ const vimeo = {
     // Set aspect ratio
     // For Vimeo we have an extra 300% height <div> to hide the standard controls and UI
     setAspectRatio(input) {
-        const ratio = utils.is.string(input) ? input.split(':') : this.config.ratio.split(':');
+        const ratio = is.string(input) ? input.split(':') : this.config.ratio.split(':');
         const padding = 100 / ratio[0] * ratio[1];
         this.elements.wrapper.style.paddingBottom = `${padding}%`;
 
@@ -73,34 +99,34 @@ const vimeo = {
             gesture: 'media',
             playsinline: !this.config.fullscreen.iosNative,
         };
-        const params = utils.buildUrlParams(options);
+        const params = buildUrlParams(options);
 
         // Get the source URL or ID
         let source = player.media.getAttribute('src');
 
         // Get from <div> if needed
-        if (utils.is.empty(source)) {
+        if (is.empty(source)) {
             source = player.media.getAttribute(player.config.attributes.embed.id);
         }
 
-        const id = utils.parseVimeoId(source);
+        const id = parseId(source);
 
         // Build an iframe
-        const iframe = utils.createElement('iframe');
-        const src = utils.format(player.config.urls.vimeo.iframe, id, params);
+        const iframe = createElement('iframe');
+        const src = format(player.config.urls.vimeo.iframe, id, params);
         iframe.setAttribute('src', src);
         iframe.setAttribute('allowfullscreen', '');
         iframe.setAttribute('allowtransparency', '');
         iframe.setAttribute('allow', 'autoplay');
 
         // Inject the package
-        const wrapper = utils.createElement('div', { class: player.config.classNames.embedContainer });
+        const wrapper = createElement('div', { class: player.config.classNames.embedContainer });
         wrapper.appendChild(iframe);
-        player.media = utils.replaceElement(wrapper, player.media);
+        player.media = replaceElement(wrapper, player.media);
 
         // Get poster image
-        utils.fetch(utils.format(player.config.urls.vimeo.api, id), 'json').then(response => {
-            if (utils.is.empty(response)) {
+        fetch(format(player.config.urls.vimeo.api, id), 'json').then(response => {
+            if (is.empty(response)) {
                 return;
             }
 
@@ -160,7 +186,7 @@ const vimeo = {
 
                 // Set seeking state and trigger event
                 media.seeking = true;
-                utils.dispatchEvent.call(player, media, 'seeking');
+                trigger.call(player, media, 'seeking');
 
                 // If paused, mute until seek is complete
                 Promise.resolve(restorePause && embed.setVolume(0))
@@ -187,7 +213,7 @@ const vimeo = {
                     .setPlaybackRate(input)
                     .then(() => {
                         speed = input;
-                        utils.dispatchEvent.call(player, player.media, 'ratechange');
+                        trigger.call(player, player.media, 'ratechange');
                     })
                     .catch(error => {
                         // Hide menu item (and menu if empty)
@@ -207,7 +233,7 @@ const vimeo = {
             set(input) {
                 player.embed.setVolume(input).then(() => {
                     volume = input;
-                    utils.dispatchEvent.call(player, player.media, 'volumechange');
+                    trigger.call(player, player.media, 'volumechange');
                 });
             },
         });
@@ -219,11 +245,11 @@ const vimeo = {
                 return muted;
             },
             set(input) {
-                const toggle = utils.is.boolean(input) ? input : false;
+                const toggle = is.boolean(input) ? input : false;
 
                 player.embed.setVolume(toggle ? 0 : player.config.volume).then(() => {
                     muted = toggle;
-                    utils.dispatchEvent.call(player, player.media, 'volumechange');
+                    trigger.call(player, player.media, 'volumechange');
                 });
             },
         });
@@ -235,7 +261,7 @@ const vimeo = {
                 return loop;
             },
             set(input) {
-                const toggle = utils.is.boolean(input) ? input : player.config.loop.active;
+                const toggle = is.boolean(input) ? input : player.config.loop.active;
 
                 player.embed.setLoop(toggle).then(() => {
                     loop = toggle;
@@ -272,7 +298,7 @@ const vimeo = {
             player.embed.getVideoWidth(),
             player.embed.getVideoHeight(),
         ]).then(dimensions => {
-            const ratio = utils.getAspectRatio(dimensions[0], dimensions[1]);
+            const ratio = getAspectRatio(dimensions[0], dimensions[1]);
             vimeo.setAspectRatio.call(this, ratio);
         });
 
@@ -290,13 +316,13 @@ const vimeo = {
         // Get current time
         player.embed.getCurrentTime().then(value => {
             currentTime = value;
-            utils.dispatchEvent.call(player, player.media, 'timeupdate');
+            trigger.call(player, player.media, 'timeupdate');
         });
 
         // Get duration
         player.embed.getDuration().then(value => {
             player.media.duration = value;
-            utils.dispatchEvent.call(player, player.media, 'durationchange');
+            trigger.call(player, player.media, 'durationchange');
         });
 
         // Get captions
@@ -306,7 +332,7 @@ const vimeo = {
         });
 
         player.embed.on('cuechange', ({ cues = [] }) => {
-            const strippedCues = cues.map(cue => utils.stripHTML(cue.text));
+            const strippedCues = cues.map(cue => stripHTML(cue.text));
             captions.updateCues.call(player, strippedCues);
         });
 
@@ -315,11 +341,11 @@ const vimeo = {
             player.embed.getPaused().then(paused => {
                 assurePlaybackState.call(player, !paused);
                 if (!paused) {
-                    utils.dispatchEvent.call(player, player.media, 'playing');
+                    trigger.call(player, player.media, 'playing');
                 }
             });
 
-            if (utils.is.element(player.embed.element) && player.supported.ui) {
+            if (is.element(player.embed.element) && player.supported.ui) {
                 const frame = player.embed.element;
 
                 // Fix keyboard focus issues
@@ -330,7 +356,7 @@ const vimeo = {
 
         player.embed.on('play', () => {
             assurePlaybackState.call(player, true);
-            utils.dispatchEvent.call(player, player.media, 'playing');
+            trigger.call(player, player.media, 'playing');
         });
 
         player.embed.on('pause', () => {
@@ -340,16 +366,16 @@ const vimeo = {
         player.embed.on('timeupdate', data => {
             player.media.seeking = false;
             currentTime = data.seconds;
-            utils.dispatchEvent.call(player, player.media, 'timeupdate');
+            trigger.call(player, player.media, 'timeupdate');
         });
 
         player.embed.on('progress', data => {
             player.media.buffered = data.percent;
-            utils.dispatchEvent.call(player, player.media, 'progress');
+            trigger.call(player, player.media, 'progress');
 
             // Check all loaded
             if (parseInt(data.percent, 10) === 1) {
-                utils.dispatchEvent.call(player, player.media, 'canplaythrough');
+                trigger.call(player, player.media, 'canplaythrough');
             }
 
             // Get duration as if we do it before load, it gives an incorrect value
@@ -357,24 +383,24 @@ const vimeo = {
             player.embed.getDuration().then(value => {
                 if (value !== player.media.duration) {
                     player.media.duration = value;
-                    utils.dispatchEvent.call(player, player.media, 'durationchange');
+                    trigger.call(player, player.media, 'durationchange');
                 }
             });
         });
 
         player.embed.on('seeked', () => {
             player.media.seeking = false;
-            utils.dispatchEvent.call(player, player.media, 'seeked');
+            trigger.call(player, player.media, 'seeked');
         });
 
         player.embed.on('ended', () => {
             player.media.paused = true;
-            utils.dispatchEvent.call(player, player.media, 'ended');
+            trigger.call(player, player.media, 'ended');
         });
 
         player.embed.on('error', detail => {
             player.media.error = detail;
-            utils.dispatchEvent.call(player, player.media, 'error');
+            trigger.call(player, player.media, 'error');
         });
 
         // Rebuild UI

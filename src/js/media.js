@@ -5,7 +5,7 @@
 import html5 from './html5';
 import vimeo from './plugins/vimeo';
 import youtube from './plugins/youtube';
-import utils from './utils';
+import { createElement, toggleClass, wrap } from './utils/elements';
 
 const media = {
     // Setup media
@@ -17,29 +17,29 @@ const media = {
         }
 
         // Add type class
-        utils.toggleClass(this.elements.container, this.config.classNames.type.replace('{0}', this.type), true);
+        toggleClass(this.elements.container, this.config.classNames.type.replace('{0}', this.type), true);
 
         // Add provider class
-        utils.toggleClass(this.elements.container, this.config.classNames.provider.replace('{0}', this.provider), true);
+        toggleClass(this.elements.container, this.config.classNames.provider.replace('{0}', this.provider), true);
 
         // Add video class for embeds
         // This will require changes if audio embeds are added
         if (this.isEmbed) {
-            utils.toggleClass(this.elements.container, this.config.classNames.type.replace('{0}', 'video'), true);
+            toggleClass(this.elements.container, this.config.classNames.type.replace('{0}', 'video'), true);
         }
 
         // Inject the player wrapper
         if (this.isVideo) {
             // Create the wrapper div
-            this.elements.wrapper = utils.createElement('div', {
+            this.elements.wrapper = createElement('div', {
                 class: this.config.classNames.video,
             });
 
             // Wrap the video in a container
-            utils.wrap(this.media, this.elements.wrapper);
+            wrap(this.media, this.elements.wrapper);
 
             // Faux poster container
-            this.elements.poster = utils.createElement('div', {
+            this.elements.poster = createElement('div', {
                 class: this.config.classNames.poster,
             });
 

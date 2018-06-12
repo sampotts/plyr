@@ -11,7 +11,8 @@
 		},
 		// Exclude from search
 		"search.exclude": {
-			"dist/": true
+			"dist/": true,
+			"demo/dist/": true
 		},
 		// Linting
 		"stylelint.enable": true,

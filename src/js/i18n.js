@@ -2,17 +2,19 @@
 // Plyr internationalization
 // ==========================================================================
 
-import utils from './utils';
+import is from './utils/is';
+import { getDeep } from './utils/objects';
+import { replaceAll } from './utils/strings';
 
 const i18n = {
     get(key = '', config = {}) {
-        if (utils.is.empty(key) || utils.is.empty(config)) {
+        if (is.empty(key) || is.empty(config)) {
             return '';
         }
 
-        let string = utils.getDeep(config.i18n, key);
+        let string = getDeep(config.i18n, key);
 
-        if (utils.is.empty(string)) {
+        if (is.empty(string)) {
             return '';
         }
 
@@ -25,7 +27,7 @@ const i18n = {
             key,
             value,
         ]) => {
-            string = utils.replaceAll(string, key, value);
+            string = replaceAll(string, key, value);
         });
 
         return string;

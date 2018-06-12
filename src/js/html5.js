@@ -3,7 +3,10 @@
 // ==========================================================================
 
 import support from './support';
-import utils from './utils';
+import { dedupe } from './utils/arrays';
+import { removeElement } from './utils/elements';
+import { trigger } from './utils/events';
+import is from './utils/is';
 
 const html5 = {
     getSources() {
@@ -23,20 +26,20 @@ const html5 = {
         // Get sources
         const sources = html5.getSources.call(this);
 
-        if (utils.is.empty(sources)) {
+        if (is.empty(sources)) {
             return null;
         }
 
         // Get <source> with size attribute
-        const sizes = Array.from(sources).filter(source => !utils.is.empty(source.getAttribute('size')));
+        const sizes = Array.from(sources).filter(source => !is.empty(source.getAttribute('size')));
 
         // If none, bail
-        if (utils.is.empty(sizes)) {
+        if (is.empty(sizes)) {
             return null;
         }
 
         // Reduce to unique list
-        return utils.dedupe(sizes.map(source => Number(source.getAttribute('size'))));
+        return dedupe(sizes.map(source => Number(source.getAttribute('size'))));
     },
 
     extend() {
@@ -52,13 +55,13 @@ const html5 = {
                 // Get sources
                 const sources = html5.getSources.call(player);
 
-                if (utils.is.empty(sources)) {
+                if (is.empty(sources)) {
                     return null;
                 }
 
                 const matches = Array.from(sources).filter(source => source.getAttribute('src') === player.source);
 
-                if (utils.is.empty(matches)) {
+                if (is.empty(matches)) {
                     return null;
                 }
 
@@ -68,7 +71,7 @@ const html5 = {
                 // Get sources
                 const sources = html5.getSources.call(player);
 
-                if (utils.is.empty(sources)) {
+                if (is.empty(sources)) {
                     return;
                 }
 
@@ -76,7 +79,7 @@ const html5 = {
                 const matches = Array.from(sources).filter(source => Number(source.getAttribute('size')) === input);
 
                 // No matches for requested size
-                if (utils.is.empty(matches)) {
+                if (is.empty(matches)) {
                     return;
                 }
 
@@ -84,12 +87,12 @@ const html5 = {
                 const supported = matches.filter(source => support.mime.call(player, source.getAttribute('type')));
 
                 // No supported sources
-                if (utils.is.empty(supported)) {
+                if (is.empty(supported)) {
                     return;
                 }
 
                 // Trigger change event
-                utils.dispatchEvent.call(player, player.media, 'qualityrequested', false, {
+                trigger.call(player, player.media, 'qualityrequested', false, {
                     quality: input,
                 });
 
@@ -115,7 +118,7 @@ const html5 = {
                 }
 
                 // Trigger change event
-                utils.dispatchEvent.call(player, player.media, 'qualitychange', false, {
+                trigger.call(player, player.media, 'qualitychange', false, {
                     quality: input,
                 });
             },
@@ -130,7 +133,7 @@ const html5 = {
         }
 
         // Remove child sources
-        utils.removeElement(html5.getSources());
+        removeElement(html5.getSources());
 
         // Set blank video src attribute
         // This is to prevent a MEDIA_ERR_SRC_NOT_SUPPORTED error

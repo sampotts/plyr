@@ -6,15 +6,16 @@ import captions from './captions';
 import controls from './controls';
 import i18n from './i18n';
 import support from './support';
-import utils from './utils';
-
-// Sniff out the browser
-const browser = utils.getBrowser();
+import browser from './utils/browser';
+import { getElement, toggleClass, toggleState } from './utils/elements';
+import { trigger } from './utils/events';
+import is from './utils/is';
+import loadImage from './utils/loadImage';
 
 const ui = {
     addStyleHook() {
-        utils.toggleClass(this.elements.container, this.config.selectors.container.replace('.', ''), true);
-        utils.toggleClass(this.elements.container, this.config.classNames.uiSupported, this.supported.ui);
+        toggleClass(this.elements.container, this.config.selectors.container.replace('.', ''), true);
+        toggleClass(this.elements.container, this.config.classNames.uiSupported, this.supported.ui);
     },
 
     // Toggle native HTML5 media controls
@@ -44,7 +45,7 @@ const ui = {
         }
 
         // Inject custom controls if not present
-        if (!utils.is.element(this.elements.controls)) {
+        if (!is.element(this.elements.controls)) {
             // Inject custom controls
             controls.inject.call(this);
 
@@ -85,23 +86,23 @@ const ui = {
         ui.checkPlaying.call(this);
 
         // Check for picture-in-picture support
-        utils.toggleClass(this.elements.container, this.config.classNames.pip.supported, support.pip && this.isHTML5 && this.isVideo);
+        toggleClass(this.elements.container, this.config.classNames.pip.supported, support.pip && this.isHTML5 && this.isVideo);
 
         // Check for airplay support
-        utils.toggleClass(this.elements.container, this.config.classNames.airplay.supported, support.airplay && this.isHTML5);
+        toggleClass(this.elements.container, this.config.classNames.airplay.supported, support.airplay && this.isHTML5);
 
         // Add iOS class
-        utils.toggleClass(this.elements.container, this.config.classNames.isIos, browser.isIos);
+        toggleClass(this.elements.container, this.config.classNames.isIos, browser.isIos);
 
         // Add touch class
-        utils.toggleClass(this.elements.container, this.config.classNames.isTouch, this.touch);
+        toggleClass(this.elements.container, this.config.classNames.isTouch, this.touch);
 
         // Ready for API calls
         this.ready = true;
 
         // Ready event at end of execution stack
         setTimeout(() => {
-            utils.dispatchEvent.call(this, this.media, 'ready');
+            trigger.call(this, this.media, 'ready');
         }, 0);
 
         // Set the title
@@ -125,7 +126,7 @@ const ui = {
         let label = i18n.get('play', this.config);
 
         // If there's a media title set, use that for the label
-        if (utils.is.string(this.config.title) && !utils.is.empty(this.config.title)) {
+        if (is.string(this.config.title) && !is.empty(this.config.title)) {
             label += `, ${this.config.title}`;
 
             // Set container label
@@ -133,7 +134,7 @@ const ui = {
         }
 
         // If there's a play button, set label
-        if (utils.is.nodeList(this.elements.buttons.play)) {
+        if (is.nodeList(this.elements.buttons.play)) {
             Array.from(this.elements.buttons.play).forEach(button => {
                 button.setAttribute('aria-label', label);
             });
@@ -142,14 +143,14 @@ const ui = {
         // Set iframe title
         // https://github.com/sampotts/plyr/issues/124
         if (this.isEmbed) {
-            const iframe = utils.getElement.call(this, 'iframe');
+            const iframe = getElement.call(this, 'iframe');
 
-            if (!utils.is.element(iframe)) {
+            if (!is.element(iframe)) {
                 return;
             }
 
             // Default to media type
-            const title = !utils.is.empty(this.config.title) ? this.config.title : 'video';
+            const title = !is.empty(this.config.title) ? this.config.title : 'video';
             const format = i18n.get('frameTitle', this.config);
 
             iframe.setAttribute('title', format.replace('{title}', title));
@@ -158,7 +159,7 @@ const ui = {
 
     // Toggle poster
     togglePoster(enable) {
-        utils.toggleClass(this.elements.container, this.config.classNames.posterEnabled, enable);
+        toggleClass(this.elements.container, this.config.classNames.posterEnabled, enable);
     },
 
     // Set the poster image (async)
@@ -167,22 +168,21 @@ const ui = {
         this.media.setAttribute('poster', poster);
 
         // Bail if element is missing
-        if (!utils.is.element(this.elements.poster)) {
+        if (!is.element(this.elements.poster)) {
             return Promise.reject();
         }
 
         // Load the image, and set poster if successful
-        const loadPromise = utils.loadImage(poster)
-            .then(() => {
-                this.elements.poster.style.backgroundImage = `url('${poster}')`;
-                Object.assign(this.elements.poster.style, {
-                    backgroundImage: `url('${poster}')`,
-                    // Reset backgroundSize as well (since it can be set to "cover" for padded thumbnails for youtube)
-                    backgroundSize: '',
-                });
-                ui.togglePoster.call(this, true);
-                return poster;
+        const loadPromise = loadImage(poster).then(() => {
+            this.elements.poster.style.backgroundImage = `url('${poster}')`;
+            Object.assign(this.elements.poster.style, {
+                backgroundImage: `url('${poster}')`,
+                // Reset backgroundSize as well (since it can be set to "cover" for padded thumbnails for youtube)
+                backgroundSize: '',
             });
+            ui.togglePoster.call(this, true);
+            return poster;
+        });
 
         // Hide the element if the poster can't be loaded (otherwise it will just be a black element covering the video)
         loadPromise.catch(() => ui.togglePoster.call(this, false));
@@ -194,15 +194,15 @@ const ui = {
     // Check playing state
     checkPlaying(event) {
         // Class hooks
-        utils.toggleClass(this.elements.container, this.config.classNames.playing, this.playing);
-        utils.toggleClass(this.elements.container, this.config.classNames.paused, this.paused);
-        utils.toggleClass(this.elements.container, this.config.classNames.stopped, this.stopped);
+        toggleClass(this.elements.container, this.config.classNames.playing, this.playing);
+        toggleClass(this.elements.container, this.config.classNames.paused, this.paused);
+        toggleClass(this.elements.container, this.config.classNames.stopped, this.stopped);
 
         // Set ARIA state
-        utils.toggleState(this.elements.buttons.play, this.playing);
+        toggleState(this.elements.buttons.play, this.playing);
 
         // Only update controls on non timeupdate events
-        if (utils.is.event(event) && event.type === 'timeupdate') {
+        if (is.event(event) && event.type === 'timeupdate') {
             return;
         }
 
@@ -223,7 +223,7 @@ const ui = {
         // Timer to prevent flicker when seeking
         this.timers.loading = setTimeout(() => {
             // Update progress bar loading class state
-            utils.toggleClass(this.elements.container, this.config.classNames.loading, this.loading);
+            toggleClass(this.elements.container, this.config.classNames.loading, this.loading);
 
             // Update controls visibility
             ui.toggleControls.call(this);

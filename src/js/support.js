@@ -2,7 +2,10 @@
 // Plyr support checks
 // ==========================================================================
 
-import utils from './utils';
+import { transitionEndEvent } from './utils/animation';
+import browser from './utils/browser';
+import { createElement } from './utils/elements';
+import is from './utils/is';
 
 // Check for feature support
 const support = {
@@ -15,7 +18,6 @@ const support = {
     check(type, provider, playsinline) {
         let api = false;
         let ui = false;
-        const browser = utils.getBrowser();
         const canPlayInline = browser.isIPhone && playsinline && support.playsinline;
 
         switch (`${provider}:${type}`) {
@@ -48,14 +50,11 @@ const support = {
 
     // Picture-in-picture support
     // Safari only currently
-    pip: (() => {
-        const browser = utils.getBrowser();
-        return !browser.isIPhone && utils.is.function(utils.createElement('video').webkitSetPresentationMode);
-    })(),
+    pip: (() => !browser.isIPhone && is.function(createElement('video').webkitSetPresentationMode))(),
 
     // Airplay support
     // Safari only currently
-    airplay: utils.is.function(window.WebKitPlaybackTargetAvailabilityEvent),
+    airplay: is.function(window.WebKitPlaybackTargetAvailabilityEvent),
 
     // Inline playback support
     // https://webkit.org/blog/6784/new-video-policies-for-ios/
@@ -69,7 +68,7 @@ const support = {
 
         try {
             // Bail if no checking function
-            if (!this.isHTML5 || !utils.is.function(media.canPlayType)) {
+            if (!this.isHTML5 || !is.function(media.canPlayType)) {
                 return false;
             }
 
@@ -119,28 +118,6 @@ const support = {
     // Check for textTracks support
     textTracks: 'textTracks' in document.createElement('video'),
 
-    // Check for passive event listener support
-    // https://github.com/WICG/EventListenerOptions/blob/gh-pages/explainer.md
-    // https://www.youtube.com/watch?v=NPM6172J22g
-    passiveListeners: (() => {
-        // Test via a getter in the options object to see if the passive property is accessed
-        let supported = false;
-        try {
-            const options = Object.defineProperty({}, 'passive', {
-                get() {
-                    supported = true;
-                    return null;
-                },
-            });
-            window.addEventListener('test', null, options);
-            window.removeEventListener('test', null, options);
-        } catch (e) {
-            // Do nothing
-        }
-
-        return supported;
-    })(),
-
     // <input type="range"> Sliders
     rangeInput: (() => {
         const range = document.createElement('input');
@@ -153,7 +130,7 @@ const support = {
     touch: 'ontouchstart' in document.documentElement,
 
     // Detect transitions support
-    transitions: utils.transitionEndEvent !== false,
+    transitions: transitionEndEvent !== false,
 
     // Reduced motion iOS & MacOS setting
     // https://webkit.org/blog/7551/responsive-design-for-motion/
