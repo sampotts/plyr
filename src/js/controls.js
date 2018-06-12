@@ -714,6 +714,9 @@ const controls = {
             case 'captions':
                 return captions.getLabel.call(this);
 
+            case 'caption-position':
+                return i18n.get(`captionPositionLabel.${value}`, this.config);
+
             default:
                 return null;
         }
@@ -728,6 +731,9 @@ const controls = {
         switch (setting) {
             case 'captions':
                 value = this.currentTrack;
+                break;
+            case 'caption-position':
+                value = this.captionPosition;
                 break;
 
             default:
@@ -865,6 +871,42 @@ const controls = {
         // Generate options
         options.forEach(controls.createMenuItem.bind(this));
 
+        controls.updateSetting.call(this, type, list);
+    },
+
+    setCaptionsPositionMenu () {
+        if (!this.config.controls.includes('caption-position')) {
+            return;
+        }
+
+        if (!utils.is.element(this.elements.settings.panes['caption-position'])) {
+            return;
+        }
+
+        const type = 'caption-position';
+
+        controls.toggleTab.call(this, type, true);
+
+        // Get the list to populate
+        const list = this.elements.settings.panes['caption-position'].querySelector('ul');
+
+        // Empty the menu
+        utils.emptyElement(list);
+
+        const positions = [
+            'top' ,
+            'bottom',
+        ];
+
+        // Create items
+        positions.forEach(position => {
+            controls.createMenuItem.call(this, {
+                value: position,
+                list,
+                type,
+                title: controls.getLabel.call(this, 'caption-position', position),
+            });
+        });
         controls.updateSetting.call(this, type, list);
     },
 

@@ -21,6 +21,7 @@ const captions = {
             // Clear menu and hide
             if (utils.is.array(this.config.controls) && this.config.controls.includes('settings') && this.config.settings.includes('captions')) {
                 controls.setCaptionsMenu.call(this);
+                controls.setCaptionsPositionMenu.call(this);
             }
 
             return;
@@ -76,6 +77,7 @@ const captions = {
         }
         // Set language and show if active
         captions.setLanguage.call(this, language, active);
+        captions.setPosition.call(this, this.captionPosition);
 
         // Watch changes to textTracks and update captions menu
         if (this.isHTML5) {
@@ -284,6 +286,16 @@ const captions = {
             // Trigger event
             utils.dispatchEvent.call(this, this.media, 'cuechange');
         }
+    },
+
+    setPosition (position) {
+        // if already setup correct class name, just ignore
+        if (utils.hasClass(this.elements.captions, this.config.classNames.captionPosition.replace('{0}', 'top'))) {
+            if (position === 'top') return;
+        } else if (position === 'bottom') {
+            return;
+        }
+        utils.toggleClass(this.elements.captions, this.config.classNames.captionPosition.replace('{0}', 'top'));
     },
 };
 

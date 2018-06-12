@@ -116,6 +116,7 @@ const defaults = {
     captions: {
         active: false,
         language: 'auto',
+        position: 'bottom',
         // Listen to new tracks added after Plyr is initialized.
         // This is needed for streaming captions, but may result in unselectable options
         update: false,
@@ -146,6 +147,7 @@ const defaults = {
         'mute',
         'volume',
         'captions',
+        'caption-position',
         'settings',
         'pip',
         'airplay',
@@ -153,6 +155,7 @@ const defaults = {
     ],
     settings: [
         'captions',
+        'caption-position',
         'quality',
         'speed',
     ],
@@ -178,6 +181,11 @@ const defaults = {
         exitFullscreen: 'Exit fullscreen',
         frameTitle: 'Player for {title}',
         captions: 'Captions',
+        'caption-position': 'Caption Position',
+        'captionPositionLabel': {
+            top: 'Top',
+            bottom: 'Bottom',
+        },
         settings: 'Settings',
         speed: 'Speed',
         normal: 'Normal',
@@ -317,6 +325,7 @@ const defaults = {
             volume: '[data-plyr="volume"]',
             speed: '[data-plyr="speed"]',
             language: '[data-plyr="language"]',
+            'caption-position': '[data-plyr="caption-position"]',
             quality: '[data-plyr="quality"]',
         },
         display: {
@@ -367,6 +376,7 @@ const defaults = {
             enabled: 'plyr--captions-enabled',
             active: 'plyr--captions-active',
         },
+        captionPosition: 'plyr__caption_position__{0}',
         fullscreen: {
             enabled: 'plyr--fullscreen-enabled',
             fallback: 'plyr--fullscreen-fallback',

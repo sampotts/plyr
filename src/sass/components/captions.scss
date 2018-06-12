@@ -49,10 +49,19 @@
     }
 }
 
+.plyr__caption_position__top {
+    bottom: inherit;
+    top: 30px;
+}
+
 .plyr--captions-active .plyr__captions {
     display: block;
 }
 
 .plyr--hide-controls .plyr__captions {
     transform: translateY(-($plyr-control-spacing * 1.5));
+}
+
+.plyr--hide-controls .plyr__captions.plyr__caption_position__top {
+    transform: none;
 }

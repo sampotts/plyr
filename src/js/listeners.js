@@ -546,6 +546,11 @@ class Listeners {
                     },
                     'speed',
                 );
+            } else if (utils.matches(event.target, this.player.config.selectors.inputs['caption-position'])) {
+
+                proxy(event, () => {
+                    this.player.captionPosition = event.target.value;
+                }, 'caption-position');
             } else {
                 const tab = event.target;
                 controls.showTab.call(this.player, tab.getAttribute('aria-controls'));

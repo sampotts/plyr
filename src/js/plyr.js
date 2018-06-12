@@ -869,6 +869,18 @@ class Plyr {
         return active ? currentTrack : -1;
     }
 
+    set captionPosition(input) {
+        this.captions.position = input;
+        this.storage.set({
+            captionPosition: input,
+        });
+        captions.setPosition.call(this, this.captions.position);
+    }
+
+    get captionPosition() {
+        return this.storage.get('captionPosition') || this.config.captions.position;
+    }
+
     /**
      * Set the wanted language for captions
      * Since tracks can be added later it won't update the actual caption track until there is a matching track
