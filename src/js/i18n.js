@@ -23,10 +23,7 @@ const i18n = {
             '{title}': config.title,
         };
 
-        Object.entries(replace).forEach(([
-            key,
-            value,
-        ]) => {
+        Object.entries(replace).forEach(([key, value]) => {
             string = replaceAll(string, key, value);
         });
 

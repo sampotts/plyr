@@ -48,10 +48,7 @@ const captions = {
                 const src = track.getAttribute('src');
                 const url = parseUrl(src);
 
-                if (url !== null && url.hostname !== window.location.href.hostname && [
-                    'http:',
-                    'https:',
-                ].includes(url.protocol)) {
+                if (url !== null && url.hostname !== window.location.href.hostname && ['http:', 'https:'].includes(url.protocol)) {
                     fetch(src, 'blob')
                         .then(blob => {
                             track.setAttribute('src', window.URL.createObjectURL(blob));
@@ -202,10 +199,9 @@ const captions = {
         const tracks = Array.from((this.media || {}).textTracks || []);
         // For HTML5, use cache instead of current tracks when it exists (if captions.update is false)
         // Filter out removed tracks and tracks that aren't captions/subtitles (for example metadata)
-        return tracks.filter(track => !this.isHTML5 || update || this.captions.meta.has(track)).filter(track => [
-            'captions',
-            'subtitles',
-        ].includes(track.kind));
+        return tracks
+            .filter(track => !this.isHTML5 || update || this.captions.meta.has(track))
+            .filter(track => ['captions', 'subtitles'].includes(track.kind));
     },
 
     // Get the current track for the current language

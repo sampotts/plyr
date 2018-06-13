@@ -30,10 +30,7 @@ export function buildUrlParams(input) {
     const params = new URLSearchParams();
 
     if (is.object(input)) {
-        Object.entries(input).forEach(([
-            key,
-            value,
-        ]) => {
+        Object.entries(input).forEach(([key, value]) => {
             params.set(key, value);
         });
     }
