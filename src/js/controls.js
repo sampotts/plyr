@@ -214,6 +214,14 @@ const controls = {
                 iconPressed = 'captions-on';
                 break;
 
+            case 'zoom':
+                toggle = true;
+                label = 'enterZoom';
+                labelPressed = 'exitZoom';
+                icon = 'enter-zoom';
+                iconPressed = 'exit-zoom';
+                break;
+
             case 'fullscreen':
                 toggle = true;
                 label = 'enterFullscreen';
@@ -1371,6 +1379,10 @@ const controls = {
         // Airplay button
         if (this.config.controls.includes('airplay') && support.airplay) {
             container.appendChild(controls.createButton.call(this, 'airplay'));
+        }
+
+        if (this.config.controls.includes('zoom')) {
+            container.appendChild(controls.createButton.call(this, 'zoom'));
         }
 
         // Toggle fullscreen button

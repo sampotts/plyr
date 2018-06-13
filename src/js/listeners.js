@@ -46,38 +46,13 @@ class Listeners {
         // Reset on keyup
         if (pressed) {
             // Which keycodes should we prevent default
-            const preventDefault = [
-                48,
-                49,
-                50,
-                51,
-                52,
-                53,
-                54,
-                56,
-                57,
-                32,
-                75,
-                38,
-                40,
-                77,
-                39,
-                37,
-                70,
-                67,
-                73,
-                76,
-                79,
-            ];
+            const preventDefault = [48, 49, 50, 51, 52, 53, 54, 56, 57, 32, 75, 38, 40, 77, 39, 37, 70, 67, 73, 76, 79];
 
             // Check focused element
             // and if the focused element is not editable (e.g. text input)
             // and any that accept key input http://webaim.org/techniques/keyboard/
             const focused = utils.getFocusElement();
-            if (utils.is.element(focused) && (
-                focused !== this.player.elements.inputs.seek &&
-                utils.matches(focused, this.player.config.selectors.editable))
-            ) {
+            if (utils.is.element(focused) && (focused !== this.player.elements.inputs.seek && utils.matches(focused, this.player.config.selectors.editable))) {
                 return;
             }
 
@@ -252,11 +227,7 @@ class Listeners {
             }
 
             // Show, then hide after a timeout unless another control event occurs
-            const show = [
-                'touchstart',
-                'touchmove',
-                'mousemove',
-            ].includes(event.type);
+            const show = ['touchstart', 'touchmove', 'mousemove'].includes(event.type);
 
             let delay = 0;
 
@@ -410,11 +381,8 @@ class Listeners {
 
         // Proxy events to container
         // Bubble up key events for Edge
-        utils.on(this.player.media, this.player.config.events.concat([
-            'keyup',
-            'keydown',
-        ]).join(' '), event => {
-            let {detail = {}} = event;
+        utils.on(this.player.media, this.player.config.events.concat(['keyup', 'keydown']).join(' '), event => {
+            let { detail = {} } = event;
 
             // Get error details from media
             if (event.type === 'error') {
@@ -479,6 +447,16 @@ class Listeners {
 
         // Captions toggle
         on(this.player.elements.buttons.captions, 'click', this.player.toggleCaptions);
+
+        // zoom toggle
+        on(
+            this.player.elements.buttons.zoom,
+            'click',
+            () => {
+                this.player.fullscreen.toggleZoom();
+            },
+            'zoom',
+        );
 
         // Fullscreen toggle
         on(
@@ -547,10 +525,13 @@ class Listeners {
                     'speed',
                 );
             } else if (utils.matches(event.target, this.player.config.selectors.inputs['caption-position'])) {
-
-                proxy(event, () => {
-                    this.player.captionPosition = event.target.value;
-                }, 'caption-position');
+                proxy(
+                    event,
+                    () => {
+                        this.player.captionPosition = event.target.value;
+                    },
+                    'caption-position',
+                );
             } else {
                 const tab = event.target;
                 controls.showTab.call(this.player, tab.getAttribute('aria-controls'));
@@ -578,11 +559,7 @@ class Listeners {
             const play = seek.hasAttribute('play-on-seeked');
 
             // Done seeking
-            const done = [
-                'mouseup',
-                'touchend',
-                'keyup',
-            ].includes(event.type);
+            const done = ['mouseup', 'touchend', 'keyup'].includes(event.type);
 
             // If we're done seeking and it was playing, resume playback
             if (play && done) {
@@ -657,10 +634,7 @@ class Listeners {
 
         // Update controls.pressed state (used for ui.toggleControls to avoid hiding when interacting)
         on(this.player.elements.controls, 'mousedown mouseup touchstart touchend touchcancel', event => {
-            this.player.elements.controls.pressed = [
-                'mousedown',
-                'touchstart',
-            ].includes(event.type);
+            this.player.elements.controls.pressed = ['mousedown', 'touchstart'].includes(event.type);
         });
 
         // Focus in/out on controls

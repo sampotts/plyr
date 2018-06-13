@@ -143,6 +143,10 @@ class Fullscreen {
         return element === this.target;
     }
 
+    get zoomActive () {
+        return utils.hasClass(this.target, this.player.config.classNames.fullscreen.fallback);
+    }
+
     // Get target element
     get target() {
         return browser.isIos && this.player.config.fullscreen.iosNative ? this.player.media : this.player.elements.container;
@@ -197,6 +201,19 @@ class Fullscreen {
         } else if (!utils.is.empty(this.prefix)) {
             const action = this.prefix === 'moz' ? 'Cancel' : 'Exit';
             document[`${this.prefix}${action}${this.property}`]();
+        }
+    }
+
+    toggleZoom () {
+        if (!this.zoomActive) {
+            toggleFallback.call(this, true);
+        } else {
+            toggleFallback.call(this, false);
+        }
+        // Update toggle button
+        const button = this.player.elements.buttons.zoom;
+        if (utils.is.element(button)) {
+            utils.toggleState(button, this.zoomActive);
         }
     }
 
