@@ -282,6 +282,27 @@ class Plyr {
             ui.build.call(this);
         }
 
+        // add custom logo
+        if (this.config.logo && this.config.logo.url) {
+            const logoContainer = document.createElement('div');
+            utils.toggleClass(logoContainer, this.config.classNames.logo, true);
+            let imageContainer = logoContainer;
+            if (this.config.logo.link) {
+                const linkElement = document.createElement('a');
+                utils.setAttributes(linkElement, {
+                    href: this.config.logo.link,
+                });
+                logoContainer.appendChild(linkElement);
+                imageContainer = linkElement;
+            }
+            const logoElement = document.createElement('img');
+            utils.setAttributes(logoElement, {
+                src: this.config.logo.url,
+            });
+            imageContainer.appendChild(logoElement);
+            this.elements.container.appendChild(logoContainer);
+        }
+
         // Container listeners
         this.listeners.container();
 

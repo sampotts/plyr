@@ -61,6 +61,11 @@ const defaults = {
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
 
+    logo: {
+        url: undefined,
+        link: undefined
+    },
+
     // Quality default
     quality: {
         default: 576,
@@ -371,6 +376,7 @@ const defaults = {
         isTouch: 'plyr--is-touch',
         uiSupported: 'plyr--full-ui',
         noTransition: 'plyr--no-transition',
+        logo: 'plyr--logo',
         menu: {
             value: 'plyr__menu__value',
             badge: 'plyr__badge',
