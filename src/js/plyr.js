@@ -975,7 +975,7 @@ class Plyr {
      * @param {function} callback - Callback for when event occurs
      */
     once(event, callback) {
-        once(this.elements.container, event, callback);
+        once.call(this, this.elements.container, event, callback);
     }
     /**
      * Remove event listeners

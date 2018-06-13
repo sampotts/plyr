@@ -2,7 +2,7 @@
 // Element utils
 // ==========================================================================
 
-import { off, on } from './events';
+import { toggleListener } from './events';
 import is from './is';
 
 // Wrap an element
@@ -277,11 +277,7 @@ export function trapFocus(element = null, toggle = false) {
         }
     };
 
-    if (toggle) {
-        on(this.elements.container, 'keydown', trap, false);
-    } else {
-        off(this.elements.container, 'keydown', trap, false);
-    }
+    toggleListener.call(this, this.elements.container, 'keydown', trap, toggle, false);
 }
 
 // Toggle aria-pressed state on a toggle button
