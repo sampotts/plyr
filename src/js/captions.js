@@ -128,6 +128,7 @@ const captions = {
         }
     },
 
+    // Used internally for toggleCaptions()
     toggle(input) {
         // If there's no full support
         if (!this.supported.ui) {
@@ -146,10 +147,19 @@ const captions = {
         // Update state and trigger event
         if (active !== this.captions.active) {
             this.captions.active = active;
-            triggerEvent.call(this, this.media, this.captions.active ? 'captionsenabled' : 'captionsdisabled');
+
+            // Update UI
+            controls.updateSetting.call(this, 'captions');
+
+            // Save to storage
+            this.storage.set({ captions: active });
+
+            // Trigger event (not used internally)
+            triggerEvent.call(this, this.media, active ? 'captionsenabled' : 'captionsdisabled');
         }
     },
 
+    // Used internally for currentTrack setter
     set(index, setLanguage = true, show = true) {
         const tracks = captions.getTracks.call(this);
 
@@ -187,7 +197,13 @@ const captions = {
                 this.embed.enableTextTrack(language);
             }
 
-            // Trigger event
+            // Update UI
+            controls.updateSetting.call(this, 'captions');
+
+            // Save to storage
+            this.storage.set({ language });
+
+            // Trigger event (not used internally)
             triggerEvent.call(this, this.media, 'languagechange');
         }
 
@@ -202,6 +218,7 @@ const captions = {
         }
     },
 
+    // Used internally for language setter
     setLanguage(language, show = true) {
         if (!is.string(language)) {
             this.debug.warn('Invalid language argument', language);

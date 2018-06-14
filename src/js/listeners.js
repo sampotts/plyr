@@ -387,24 +387,6 @@ class Listeners {
             controls.updateSetting.call(this.player, 'quality', null, event.detail.quality);
         });
 
-        // Caption language change
-        on.call(this.player, this.player.media, 'languagechange', () => {
-            // Update UI
-            controls.updateSetting.call(this.player, 'captions');
-
-            // Save to storage
-            this.player.storage.set({ language: this.player.language });
-        });
-
-        // Captions toggle
-        on.call(this.player, this.player.media, 'captionsenabled captionsdisabled', () => {
-            // Update UI
-            controls.updateSetting.call(this.player, 'captions');
-
-            // Save to storage
-            this.player.storage.set({ captions: this.player.captions.active });
-        });
-
         // Proxy events to container
         // Bubble up key events for Edge
         on.call(this.player, this.player.media, this.player.config.events.concat([
