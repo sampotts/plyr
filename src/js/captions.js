@@ -7,7 +7,7 @@ import controls from './controls';
 import i18n from './i18n';
 import support from './support';
 import browser from './utils/browser';
-import { createElement, emptyElement, getAttributesFromSelector, insertAfter, removeElement, toggleClass } from './utils/elements';
+import { createElement, emptyElement, getAttributesFromSelector, insertAfter, removeElement, toggleClass, toggleState } from './utils/elements';
 import { on, triggerEvent } from './utils/events';
 import fetch from './utils/fetch';
 import is from './utils/is';
@@ -125,6 +125,28 @@ const captions = {
         // Update available languages in list
         if ((this.config.controls || []).includes('settings') && this.config.settings.includes('captions')) {
             controls.setCaptionsMenu.call(this);
+        }
+    },
+
+    toggle(input) {
+        // If there's no full support
+        if (!this.supported.ui) {
+            return;
+        }
+
+        // If the method is called without parameter, toggle based on current value
+        const active = is.boolean(input) ? input : !this.elements.container.classList.contains(this.config.classNames.captions.active);
+
+        // Toggle state
+        toggleState(this.elements.buttons.captions, active);
+
+        // Add class hook
+        toggleClass(this.elements.container, this.config.classNames.captions.active, active);
+
+        // Update state and trigger event
+        if (active !== this.captions.active) {
+            this.captions.active = active;
+            triggerEvent.call(this, this.media, this.captions.active ? 'captionsenabled' : 'captionsdisabled');
         }
     },
 
