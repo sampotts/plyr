@@ -46,21 +46,12 @@ const media = {
             this.elements.wrapper.appendChild(this.elements.poster);
         }
 
-        if (this.isEmbed) {
-            switch (this.provider) {
-                case 'youtube':
-                    youtube.setup.call(this);
-                    break;
-
-                case 'vimeo':
-                    vimeo.setup.call(this);
-                    break;
-
-                default:
-                    break;
-            }
-        } else if (this.isHTML5) {
+        if (this.isHTML5) {
             html5.extend.call(this);
+        } else if (this.isYouTube) {
+            youtube.setup.call(this);
+        } else if (this.isVimeo) {
+            vimeo.setup.call(this);
         }
     },
 };
