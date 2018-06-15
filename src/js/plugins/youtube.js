@@ -158,7 +158,12 @@ const youtube = {
         // Replace the <iframe> with a <div> due to YouTube API issues
         const videoId = parseId(source);
         const id = generateId(player.provider);
-        const container = createElement('div', { id });
+
+        // Get poster, if already set
+        const { poster } = player;
+
+        // Replace media element
+        const container = createElement('div', { id, poster });
         player.media = replaceElement(container, player.media);
 
         // Set poster image
