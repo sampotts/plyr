@@ -57,6 +57,10 @@ import Raven from 'raven-js';
                 tooltips: {
                     controls: true,
                 },
+                logo: {
+                    url: 'https://hahow.in/assets/images/video/logo-forplayer.png',
+                    link: 'https://hahow.in/',
+                },
                 /* controls: [
                     'play-large',
                     'restart',

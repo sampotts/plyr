@@ -4113,6 +4113,10 @@ singleton.Client = Client;
                 tooltips: {
                     controls: true
                 },
+                logo: {
+                    url: 'https://hahow.in/assets/images/video/logo-forplayer.png',
+                    link: 'https://hahow.in/'
+                },
                 /* controls: [
                     'play-large',
                     'restart',

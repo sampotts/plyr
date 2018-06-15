@@ -7059,6 +7059,7 @@ var html5 = {
 
         // Quality
         Object.defineProperty(player.media, 'quality', {
+            configurable: true,
             get: function get() {
                 // Get sources
                 var sources = html5.getSources.call(player);
@@ -7149,8 +7150,15 @@ var html5 = {
             return;
         }
 
-        // Remove child sources
-        utils.removeElement(html5.getSources());
+        var sources = html5.getSources.call(this);
+        if (sources && sources.length > 0) {
+            // set source to blank string to avoid memory leak
+            sources.forEach(function (source) {
+                source.setAttribute('src', '');
+            });
+            this.media.load();
+        }
+        utils.removeElement(sources);
 
         // Set blank video src attribute
         // This is to prevent a MEDIA_ERR_SRC_NOT_SUPPORTED error
@@ -7402,6 +7410,14 @@ var controls = {
                 labelPressed = 'disableCaptions';
                 icon = 'captions-off';
                 iconPressed = 'captions-on';
+                break;
+
+            case 'zoom':
+                toggle = true;
+                label = 'enterZoom';
+                labelPressed = 'exitZoom';
+                icon = 'enter-zoom';
+                iconPressed = 'exit-zoom';
                 break;
 
             case 'fullscreen':
@@ -7911,6 +7927,9 @@ var controls = {
             case 'captions':
                 return captions.getLabel.call(this);
 
+            case 'caption-position':
+                return i18n.get('captionPositionLabel.' + value, this.config);
+
             default:
                 return null;
         }
@@ -7926,6 +7945,9 @@ var controls = {
         switch (setting) {
             case 'captions':
                 value = this.currentTrack;
+                break;
+            case 'caption-position':
+                value = this.captionPosition;
                 break;
 
             default:
@@ -8062,11 +8084,45 @@ var controls = {
 
         controls.updateSetting.call(this, type, list);
     },
+    setCaptionsPositionMenu: function setCaptionsPositionMenu() {
+        var _this5 = this;
+
+        if (!this.config.controls.includes('caption-position')) {
+            return;
+        }
+
+        if (!utils.is.element(this.elements.settings.panes['caption-position'])) {
+            return;
+        }
+
+        var type = 'caption-position';
+
+        controls.toggleTab.call(this, type, true);
+
+        // Get the list to populate
+        var list = this.elements.settings.panes['caption-position'].querySelector('ul');
+
+        // Empty the menu
+        utils.emptyElement(list);
+
+        var positions = ['top', 'bottom'];
+
+        // Create items
+        positions.forEach(function (position) {
+            controls.createMenuItem.call(_this5, {
+                value: position,
+                list: list,
+                type: type,
+                title: controls.getLabel.call(_this5, 'caption-position', position)
+            });
+        });
+        controls.updateSetting.call(this, type, list);
+    },
 
 
     // Set a list of available captions languages
     setSpeedMenu: function setSpeedMenu(options) {
-        var _this5 = this;
+        var _this6 = this;
 
         // Do nothing if not selected
         if (!this.config.controls.includes('settings') || !this.config.settings.includes('speed')) {
@@ -8089,7 +8145,7 @@ var controls = {
 
         // Set options if passed and filter based on config
         this.options.speed = this.options.speed.filter(function (speed) {
-            return _this5.config.speed.options.includes(speed);
+            return _this6.config.speed.options.includes(speed);
         });
 
         // Toggle the pane and tab
@@ -8112,11 +8168,11 @@ var controls = {
 
         // Create items
         this.options.speed.forEach(function (speed) {
-            controls.createMenuItem.call(_this5, {
+            controls.createMenuItem.call(_this6, {
                 value: speed,
                 list: list,
                 type: type,
-                title: controls.getLabel.call(_this5, 'speed', speed)
+                title: controls.getLabel.call(_this6, 'speed', speed)
             });
         });
 
@@ -8295,7 +8351,7 @@ var controls = {
     // Build the default HTML
     // TODO: Set order based on order in the config.controls array?
     create: function create(data) {
-        var _this6 = this;
+        var _this7 = this;
 
         // Do nothing if we want no controls
         if (utils.is.empty(this.config.controls)) {
@@ -8443,17 +8499,17 @@ var controls = {
                     hidden: ''
                 });
 
-                var button = utils.createElement('button', utils.extend(utils.getAttributesFromSelector(_this6.config.selectors.buttons.settings), {
+                var button = utils.createElement('button', utils.extend(utils.getAttributesFromSelector(_this7.config.selectors.buttons.settings), {
                     type: 'button',
-                    class: _this6.config.classNames.control + ' ' + _this6.config.classNames.control + '--forward',
+                    class: _this7.config.classNames.control + ' ' + _this7.config.classNames.control + '--forward',
                     id: 'plyr-settings-' + data.id + '-' + type + '-tab',
                     'aria-haspopup': true,
                     'aria-controls': 'plyr-settings-' + data.id + '-' + type,
                     'aria-expanded': false
-                }), i18n.get(type, _this6.config));
+                }), i18n.get(type, _this7.config));
 
                 var value = utils.createElement('span', {
-                    class: _this6.config.classNames.menu.value
+                    class: _this7.config.classNames.menu.value
                 });
 
                 // Speed contains HTML entities
@@ -8463,7 +8519,7 @@ var controls = {
                 tab.appendChild(button);
                 tabs.appendChild(tab);
 
-                _this6.elements.settings.tabs[type] = tab;
+                _this7.elements.settings.tabs[type] = tab;
             });
 
             home.appendChild(tabs);
@@ -8481,11 +8537,11 @@ var controls = {
 
                 var back = utils.createElement('button', {
                     type: 'button',
-                    class: _this6.config.classNames.control + ' ' + _this6.config.classNames.control + '--back',
+                    class: _this7.config.classNames.control + ' ' + _this7.config.classNames.control + '--back',
                     'aria-haspopup': true,
                     'aria-controls': 'plyr-settings-' + data.id + '-home',
                     'aria-expanded': false
-                }, i18n.get(type, _this6.config));
+                }, i18n.get(type, _this7.config));
 
                 pane.appendChild(back);
 
@@ -8494,7 +8550,7 @@ var controls = {
                 pane.appendChild(options);
                 inner.appendChild(pane);
 
-                _this6.elements.settings.panes[type] = pane;
+                _this7.elements.settings.panes[type] = pane;
             });
 
             form.appendChild(inner);
@@ -8513,6 +8569,10 @@ var controls = {
         // Airplay button
         if (this.config.controls.includes('airplay') && support.airplay) {
             container.appendChild(controls.createButton.call(this, 'airplay'));
+        }
+
+        if (this.config.controls.includes('zoom')) {
+            container.appendChild(controls.createButton.call(this, 'zoom'));
         }
 
         // Toggle fullscreen button
@@ -8539,7 +8599,7 @@ var controls = {
 
     // Insert controls
     inject: function inject() {
-        var _this7 = this;
+        var _this8 = this;
 
         // Sprite
         if (this.config.loadSprite) {
@@ -8646,8 +8706,8 @@ var controls = {
             var labels = utils.getElements.call(this, [this.config.selectors.controls.wrapper, ' ', this.config.selectors.labels, ' .', this.config.classNames.hidden].join(''));
 
             Array.from(labels).forEach(function (label) {
-                utils.toggleClass(label, _this7.config.classNames.hidden, false);
-                utils.toggleClass(label, _this7.config.classNames.tooltip, true);
+                utils.toggleClass(label, _this8.config.classNames.hidden, false);
+                utils.toggleClass(label, _this8.config.classNames.tooltip, true);
                 label.setAttribute('role', 'tooltip');
             });
         }
@@ -8669,6 +8729,7 @@ var captions = {
             // Clear menu and hide
             if (utils.is.array(this.config.controls) && this.config.controls.includes('settings') && this.config.settings.includes('captions')) {
                 controls.setCaptionsMenu.call(this);
+                controls.setCaptionsPositionMenu.call(this);
             }
 
             return;
@@ -8722,6 +8783,7 @@ var captions = {
         }
         // Set language and show if active
         captions.setLanguage.call(this, language, active);
+        captions.setPosition.call(this, this.captionPosition);
 
         // Watch changes to textTracks and update captions menu
         if (this.isHTML5) {
@@ -8966,6 +9028,15 @@ var captions = {
             // Trigger event
             utils.dispatchEvent.call(this, this.media, 'cuechange');
         }
+    },
+    setPosition: function setPosition(position) {
+        // if already setup correct class name, just ignore
+        if (utils.hasClass(this.elements.captions, this.config.classNames.captionPosition.replace('{0}', 'top'))) {
+            if (position === 'top') return;
+        } else if (position === 'bottom') {
+            return;
+        }
+        utils.toggleClass(this.elements.captions, this.config.classNames.captionPosition.replace('{0}', 'top'));
     }
 };
 
@@ -9072,6 +9143,11 @@ var defaults$1 = {
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
 
+    logo: {
+        url: undefined,
+        link: undefined
+    },
+
     // Quality default
     quality: {
         default: 576,
@@ -9107,6 +9183,7 @@ var defaults$1 = {
     captions: {
         active: false,
         language: 'auto',
+        position: 'bottom',
         // Listen to new tracks added after Plyr is initialized.
         // This is needed for streaming captions, but may result in unselectable options
         update: false
@@ -9131,8 +9208,8 @@ var defaults$1 = {
     // 'rewind',
     'play',
     // 'fast-forward',
-    'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen'],
-    settings: ['captions', 'quality', 'speed'],
+    'progress', 'current-time', 'mute', 'volume', 'captions', 'caption-position', 'settings', 'pip', 'airplay', 'zoom', 'fullscreen'],
+    settings: ['captions', 'caption-position', 'quality', 'speed'],
 
     // Localisation
     i18n: {
@@ -9153,8 +9230,15 @@ var defaults$1 = {
         disableCaptions: 'Disable captions',
         enterFullscreen: 'Enter fullscreen',
         exitFullscreen: 'Exit fullscreen',
+        enterZoom: 'zoom',
+        exitZoom: 'reset screen size',
         frameTitle: 'Player for {title}',
         captions: 'Captions',
+        'caption-position': 'Caption Position',
+        'captionPositionLabel': {
+            top: 'Top',
+            bottom: 'Bottom'
+        },
         settings: 'Settings',
         speed: 'Speed',
         normal: 'Normal',
@@ -9246,6 +9330,7 @@ var defaults$1 = {
             fastForward: '[data-plyr="fast-forward"]',
             mute: '[data-plyr="mute"]',
             captions: '[data-plyr="captions"]',
+            zoom: '[data-plyr="zoom"]',
             fullscreen: '[data-plyr="fullscreen"]',
             pip: '[data-plyr="pip"]',
             airplay: '[data-plyr="airplay"]',
@@ -9257,6 +9342,7 @@ var defaults$1 = {
             volume: '[data-plyr="volume"]',
             speed: '[data-plyr="speed"]',
             language: '[data-plyr="language"]',
+            'caption-position': '[data-plyr="caption-position"]',
             quality: '[data-plyr="quality"]'
         },
         display: {
@@ -9298,6 +9384,7 @@ var defaults$1 = {
         isTouch: 'plyr--is-touch',
         uiSupported: 'plyr--full-ui',
         noTransition: 'plyr--no-transition',
+        logo: 'plyr--logo',
         menu: {
             value: 'plyr__menu__value',
             badge: 'plyr__badge',
@@ -9307,6 +9394,7 @@ var defaults$1 = {
             enabled: 'plyr--captions-enabled',
             active: 'plyr--captions-active'
         },
+        captionPosition: 'plyr__caption_position__{0}',
         fullscreen: {
             enabled: 'plyr--fullscreen-enabled',
             fallback: 'plyr--fullscreen-fallback'
@@ -9491,6 +9579,20 @@ var Fullscreen = function () {
                 document['' + this.prefix + action + this.property]();
             }
         }
+    }, {
+        key: 'toggleZoom',
+        value: function toggleZoom() {
+            if (!this.zoomActive) {
+                toggleFallback.call(this, true);
+            } else {
+                toggleFallback.call(this, false);
+            }
+            // Update toggle button
+            var button = this.player.elements.buttons.zoom;
+            if (utils.is.element(button)) {
+                utils.toggleState(button, this.zoomActive);
+            }
+        }
 
         // Toggle state
 
@@ -9529,6 +9631,11 @@ var Fullscreen = function () {
             var element = !this.prefix ? document.fullscreenElement : document['' + this.prefix + this.property + 'Element'];
 
             return element === this.target;
+        }
+    }, {
+        key: 'zoomActive',
+        get: function get() {
+            return utils.hasClass(this.target, this.player.config.classNames.fullscreen.fallback);
         }
 
         // Get target element
@@ -10319,6 +10426,11 @@ var Listeners = function () {
             // Captions toggle
             on(this.player.elements.buttons.captions, 'click', this.player.toggleCaptions);
 
+            // zoom toggle
+            on(this.player.elements.buttons.zoom, 'click', function () {
+                _this4.player.fullscreen.toggleZoom();
+            }, 'zoom');
+
             // Fullscreen toggle
             on(this.player.elements.buttons.fullscreen, 'click', function () {
                 _this4.player.fullscreen.toggle();
@@ -10363,6 +10475,10 @@ var Listeners = function () {
                         _this4.player.speed = parseFloat(event.target.value);
                         showHomeTab();
                     }, 'speed');
+                } else if (utils.matches(event.target, _this4.player.config.selectors.inputs['caption-position'])) {
+                    proxy(event, function () {
+                        _this4.player.captionPosition = event.target.value;
+                    }, 'caption-position');
                 } else {
                     var tab = event.target;
                     controls.showTab.call(_this4.player, tab.getAttribute('aria-controls'));
@@ -12236,12 +12352,15 @@ var source = {
 
             // Remove elements
             utils.removeElement(_this2.media);
-            _this2.media = null;
 
             // Reset class name
             if (utils.is.element(_this2.elements.container)) {
                 _this2.elements.container.removeAttribute('class');
             }
+
+            // retain old provider and type
+            var prevType = _this2.type;
+            var prevProvider = _this2.provider;
 
             // Set the type and provider
             _this2.type = input.type;
@@ -12250,25 +12369,33 @@ var source = {
             // Check for support
             _this2.supported = support.check(_this2.type, _this2.provider, _this2.config.playsinline);
 
-            // Create new markup
-            switch (_this2.provider + ':' + _this2.type) {
-                case 'html5:video':
-                    _this2.media = utils.createElement('video');
-                    break;
+            // if provider and type is html5:video then to keep this.media to reuse
+            // because create new video tag will comsume a lot of memory in iOS hardware.
+            // iOS can only create about 16 video tag
+            if (prevType !== _this2.type || prevProvider !== _this2.provider || _this2.type !== types.video || _this2.provider !== providers.html5) {
+                delete _this2.media;
+                _this2.media = null;
 
-                case 'html5:audio':
-                    _this2.media = utils.createElement('audio');
-                    break;
+                // Create new markup
+                switch (_this2.provider + ':' + _this2.type) {
+                    case 'html5:video':
+                        _this2.media = utils.createElement('video');
+                        break;
 
-                case 'youtube:video':
-                case 'vimeo:video':
-                    _this2.media = utils.createElement('div', {
-                        src: input.sources[0].src
-                    });
-                    break;
+                    case 'html5:audio':
+                        _this2.media = utils.createElement('audio');
+                        break;
 
-                default:
-                    break;
+                    case 'youtube:video':
+                    case 'vimeo:video':
+                        _this2.media = utils.createElement('div', {
+                            src: input.sources[0].src
+                        });
+                        break;
+
+                    default:
+                        break;
+                }
             }
 
             // Inject the new element
@@ -12596,6 +12723,27 @@ var Plyr = function () {
         // If embed but not fully supported, build interface now to avoid flash of controls
         if (this.isHTML5 || this.isEmbed && !this.supported.ui) {
             ui.build.call(this);
+        }
+
+        // add custom logo
+        if (this.config.logo && this.config.logo.url) {
+            var logoContainer = document.createElement('div');
+            utils.toggleClass(logoContainer, this.config.classNames.logo, true);
+            var imageContainer = logoContainer;
+            if (this.config.logo.link) {
+                var linkElement = document.createElement('a');
+                utils.setAttributes(linkElement, {
+                    href: this.config.logo.link
+                });
+                logoContainer.appendChild(linkElement);
+                imageContainer = linkElement;
+            }
+            var logoElement = document.createElement('img');
+            utils.setAttributes(logoElement, {
+                src: this.config.logo.url
+            });
+            imageContainer.appendChild(logoElement);
+            this.elements.container.appendChild(logoContainer);
         }
 
         // Container listeners
@@ -13498,6 +13646,18 @@ var Plyr = function () {
                 currentTrack = _captions.currentTrack;
 
             return active ? currentTrack : -1;
+        }
+    }, {
+        key: 'captionPosition',
+        set: function set(input) {
+            this.captions.position = input;
+            this.storage.set({
+                captionPosition: input
+            });
+            captions.setPosition.call(this, this.captions.position);
+        },
+        get: function get() {
+            return this.storage.get('captionPosition') || this.config.captions.position;
         }
 
         /**
