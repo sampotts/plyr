@@ -1028,50 +1028,37 @@ class Plyr {
         // Stop playback
         this.stop();
 
-        // Type specific stuff
-        switch (`${this.provider}:${this.type}`) {
-            case 'html5:video':
-            case 'html5:audio':
-                // Clear timeout
-                clearTimeout(this.timers.loading);
+        // Provider specific stuff
+        if (this.isHTML5) {
+            // Clear timeout
+            clearTimeout(this.timers.loading);
 
-                // Restore native video controls
-                ui.toggleNativeControls.call(this, true);
+            // Restore native video controls
+            ui.toggleNativeControls.call(this, true);
 
-                // Clean up
-                done();
+            // Clean up
+            done();
+        } else if (this.isYouTube) {
+            // Clear timers
+            clearInterval(this.timers.buffering);
+            clearInterval(this.timers.playing);
 
-                break;
+            // Destroy YouTube API
+            if (this.embed !== null && is.function(this.embed.destroy)) {
+                this.embed.destroy();
+            }
 
-            case 'youtube:video':
-                // Clear timers
-                clearInterval(this.timers.buffering);
-                clearInterval(this.timers.playing);
+            // Clean up
+            done();
+        } else if (this.isVimeo) {
+            // Destroy Vimeo API
+            // then clean up (wait, to prevent postmessage errors)
+            if (this.embed !== null) {
+                this.embed.unload().then(done);
+            }
 
-                // Destroy YouTube API
-                if (this.embed !== null && is.function(this.embed.destroy)) {
-                    this.embed.destroy();
-                }
-
-                // Clean up
-                done();
-
-                break;
-
-            case 'vimeo:video':
-                // Destroy Vimeo API
-                // then clean up (wait, to prevent postmessage errors)
-                if (this.embed !== null) {
-                    this.embed.unload().then(done);
-                }
-
-                // Vimeo does not always return
-                setTimeout(done, 200);
-
-                break;
-
-            default:
-                break;
+            // Vimeo does not always return
+            setTimeout(done, 200);
         }
     }
 
