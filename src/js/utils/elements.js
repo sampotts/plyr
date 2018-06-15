@@ -42,9 +42,11 @@ export function setAttributes(element, attributes) {
         return;
     }
 
-    Object.entries(attributes).forEach(([key, value]) => {
-        element.setAttribute(key, value);
-    });
+    // Assume null and undefined attributes should be left out,
+    // Setting them would otherwise convert them to "null" and "undefined"
+    Object.entries(attributes)
+        .filter(([, value]) => !is.nullOrUndefined(value))
+        .forEach(([key, value]) => element.setAttribute(key, value));
 }
 
 // Create a DocumentFragment
