@@ -119,28 +119,17 @@ const controls = {
     },
 
     // Create hidden text label
-    createLabel(type, attr) {
-        let text = i18n.get(type, this.config);
-        const attributes = Object.assign({}, attr);
+    createLabel(type, attr = {}) {
+        // Skip i18n for abbreviations and brand names
+        const universals = {
+            pip: 'PIP',
+            airplay: 'AirPlay',
+        };
 
-        switch (type) {
-            case 'pip':
-                text = 'PIP';
-                break;
-
-            case 'airplay':
-                text = 'AirPlay';
-                break;
-
-            default:
-                break;
-        }
-
-        if ('class' in attributes) {
-            attributes.class += ` ${this.config.classNames.hidden}`;
-        } else {
-            attributes.class = this.config.classNames.hidden;
-        }
+        const text = universals[type] || i18n.get(type, this.config);
+        const attributes = Object.assign({}, attr, {
+            class: [attr.class, this.config.classNames.hidden].filter(Boolean).join(' '),
+        });
 
         return createElement('span', attributes, text);
     },
