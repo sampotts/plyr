@@ -331,19 +331,12 @@ const controls = {
         if (type !== 'volume') {
             progress.appendChild(createElement('span', null, '0'));
 
-            let suffix = '';
-            switch (type) {
-                case 'played':
-                    suffix = i18n.get('played', this.config);
-                    break;
+            const suffixKey = ({
+                played: 'played',
+                buffer: 'buffered',
+            })[type];
 
-                case 'buffer':
-                    suffix = i18n.get('buffered', this.config);
-                    break;
-
-                default:
-                    break;
-            }
+            const suffix = suffixKey ? i18n.get(suffixKey, this.config) : '';
 
             progress.innerText = `% ${suffix.toLowerCase()}`;
         }
