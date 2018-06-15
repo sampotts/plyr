@@ -71,7 +71,7 @@ const captions = {
         const languages = dedupe(Array.from(navigator.languages || navigator.userLanguage)
             .map(language => language.split('-')[0]));
 
-        let language = this.storage.get('language') || this.config.captions.language;
+        let language = (this.storage.get('language') || this.config.captions.language || 'auto').toLowerCase();
 
         // Use first browser language when language is 'auto'
         if (language === 'auto') {
@@ -252,13 +252,14 @@ const captions = {
 
     // Set captions by language
     // Used internally for the language setter with the passive option forced to false
-    setLanguage(language, passive = true) {
-        if (!is.string(language)) {
-            this.debug.warn('Invalid language argument', language);
+    setLanguage(input, passive = true) {
+        if (!is.string(input)) {
+            this.debug.warn('Invalid language argument', input);
             return;
         }
         // Normalize
-        this.captions.language = language.toLowerCase();
+        const language = input.toLowerCase();
+        this.captions.language = language;
 
         // Set currentTrack
         const tracks = captions.getTracks.call(this);
