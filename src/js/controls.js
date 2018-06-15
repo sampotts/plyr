@@ -724,32 +724,27 @@ const controls = {
         let value = null;
         let list = container;
 
-        switch (setting) {
-            case 'captions':
-                value = this.currentTrack;
-                break;
+        if (setting === 'captions') {
+            value = this.currentTrack;
+        } else {
+            value = !is.empty(input) ? input : this[setting];
 
-            default:
-                value = !is.empty(input) ? input : this[setting];
+            // Get default
+            if (is.empty(value)) {
+                value = this.config[setting].default;
+            }
 
-                // Get default
-                if (is.empty(value)) {
-                    value = this.config[setting].default;
-                }
+            // Unsupported value
+            if (!is.empty(this.options[setting]) && !this.options[setting].includes(value)) {
+                this.debug.warn(`Unsupported value of '${value}' for ${setting}`);
+                return;
+            }
 
-                // Unsupported value
-                if (!is.empty(this.options[setting]) && !this.options[setting].includes(value)) {
-                    this.debug.warn(`Unsupported value of '${value}' for ${setting}`);
-                    return;
-                }
-
-                // Disabled value
-                if (!this.config[setting].options.includes(value)) {
-                    this.debug.warn(`Disabled value of '${value}' for ${setting}`);
-                    return;
-                }
-
-                break;
+            // Disabled value
+            if (!this.config[setting].options.includes(value)) {
+                this.debug.warn(`Disabled value of '${value}' for ${setting}`);
+                return;
+            }
         }
 
         // Get the list if we need to
