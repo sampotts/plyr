@@ -16,31 +16,9 @@ const support = {
     // Check for support
     // Basic functionality vs full UI
     check(type, provider, playsinline) {
-        let api = false;
-        let ui = false;
         const canPlayInline = browser.isIPhone && playsinline && support.playsinline;
-
-        switch (`${provider}:${type}`) {
-            case 'html5:video':
-                api = support.video;
-                ui = api && support.rangeInput && (!browser.isIPhone || canPlayInline);
-                break;
-
-            case 'html5:audio':
-                api = support.audio;
-                ui = api && support.rangeInput;
-                break;
-
-            case 'youtube:video':
-            case 'vimeo:video':
-                api = true;
-                ui = support.rangeInput && (!browser.isIPhone || canPlayInline);
-                break;
-
-            default:
-                api = support.audio && support.video;
-                ui = api && support.rangeInput;
-        }
+        const api = support[type] || provider !== 'html5';
+        const ui = api && support.rangeInput && (type !== 'video' || !browser.isIPhone || canPlayInline);
 
         return {
             api,
