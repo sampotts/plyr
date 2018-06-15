@@ -140,7 +140,7 @@ const vimeo = {
             url.pathname = `${url.pathname.split('_')[0]}.jpg`;
 
             // Set and show poster
-            ui.setPoster.call(player, url.href);
+            ui.setPoster.call(player, url.href).catch(() => {});
         });
 
         // Setup instance

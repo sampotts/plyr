@@ -8,7 +8,7 @@ import i18n from './i18n';
 import support from './support';
 import browser from './utils/browser';
 import { getElement, toggleClass, toggleState } from './utils/elements';
-import { triggerEvent } from './utils/events';
+import { ready, triggerEvent } from './utils/events';
 import is from './utils/is';
 import loadImage from './utils/loadImage';
 
@@ -109,8 +109,8 @@ const ui = {
         ui.setTitle.call(this);
 
         // Assure the poster image is set, if the property was added before the element was created
-        if (this.poster && this.elements.poster && !this.elements.poster.style.backgroundImage) {
-            ui.setPoster.call(this, this.poster);
+        if (this.poster) {
+            ui.setPoster.call(this, this.poster, false).catch(() => {});
         }
 
         // Manually set the duration if user has overridden it.
@@ -163,32 +163,43 @@ const ui = {
     },
 
     // Set the poster image (async)
-    setPoster(poster) {
-        // Set property regardless of validity
-        this.media.setAttribute('poster', poster);
-
-        // Bail if element is missing
-        if (!is.element(this.elements.poster)) {
-            return Promise.reject();
+    // Used internally for the poster setter, with the passive option forced to false
+    setPoster(poster, passive = true) {
+        // Don't override if call is passive
+        if (passive && this.poster) {
+            return Promise.reject(new Error('Poster already set'));
         }
 
-        // Load the image, and set poster if successful
-        const loadPromise = loadImage(poster).then(() => {
-            this.elements.poster.style.backgroundImage = `url('${poster}')`;
-            Object.assign(this.elements.poster.style, {
-                backgroundImage: `url('${poster}')`,
-                // Reset backgroundSize as well (since it can be set to "cover" for padded thumbnails for youtube)
-                backgroundSize: '',
+        // Set property synchronously to respect the call order
+        this.media.setAttribute('poster', poster);
+
+        // Wait until ui is ready
+        return ready.call(this)
+            // Load image
+            .then(() => loadImage(poster))
+            .catch(err => {
+                // Hide poster on error unless it's been set by another call
+                if (poster === this.poster) {
+                    ui.togglePoster.call(this, false);
+                }
+                // Rethrow
+                throw err;
+            })
+            .then(() => {
+                // Prevent race conditions
+                if (poster !== this.poster) {
+                    throw new Error('setPoster cancelled by later call to setPoster');
+                }
+            })
+            .then(() => {
+                Object.assign(this.elements.poster.style, {
+                    backgroundImage: `url('${poster}')`,
+                    // Reset backgroundSize as well (since it can be set to "cover" for padded thumbnails for youtube)
+                    backgroundSize: '',
+                });
+                ui.togglePoster.call(this, true);
+                return poster;
             });
-            ui.togglePoster.call(this, true);
-            return poster;
-        });
-
-        // Hide the element if the poster can't be loaded (otherwise it will just be a black element covering the video)
-        loadPromise.catch(() => ui.togglePoster.call(this, false));
-
-        // Return the promise so the caller can use it as well
-        return loadPromise;
     },
 
     // Check playing state

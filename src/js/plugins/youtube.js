@@ -166,7 +166,7 @@ const youtube = {
         const container = createElement('div', { id, poster });
         player.media = replaceElement(container, player.media);
 
-        // Set poster image
+        // Id to poster wrapper
         const posterSrc = format => `https://img.youtube.com/vi/${videoId}/${format}default.jpg`;
 
         // Check thumbnail images in order of quality, but reject fallback thumbnails (120px wide)
@@ -179,7 +179,8 @@ const youtube = {
                 if (!posterSrc.includes('maxres')) {
                     player.elements.poster.style.backgroundSize = 'cover';
                 }
-            });
+            })
+            .catch(() => {});
 
         // Setup instance
         // https://developers.google.com/youtube/iframe_api_reference
