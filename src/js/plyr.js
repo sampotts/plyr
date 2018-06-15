@@ -833,7 +833,7 @@ class Plyr {
      * @param {boolean} input - Whether to enable captions
      */
     toggleCaptions(input) {
-        captions.toggle.call(this, input);
+        captions.toggle.call(this, input, false);
     }
 
     /**
@@ -841,15 +841,15 @@ class Plyr {
      * @param {number} - Caption index
      */
     set currentTrack(input) {
-        captions.set.call(this, input);
+        captions.set.call(this, input, false);
     }
 
     /**
      * Get the current caption track index (-1 if disabled)
      */
     get currentTrack() {
-        const { active, currentTrack } = this.captions;
-        return active ? currentTrack : -1;
+        const { toggled, currentTrack } = this.captions;
+        return toggled ? currentTrack : -1;
     }
 
     /**
@@ -858,7 +858,7 @@ class Plyr {
      * @param {string} - Two character ISO language code (e.g. EN, FR, PT, etc)
      */
     set language(input) {
-        captions.setLanguage.call(this, input);
+        captions.setLanguage.call(this, input, false);
     }
 
     /**
