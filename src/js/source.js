@@ -8,6 +8,7 @@ import media from './media';
 import support from './support';
 import ui from './ui';
 import { createElement, insertElement, removeElement } from './utils/elements';
+import { getDeep } from './utils/objects';
 import is from './utils/is';
 
 const source = {
@@ -27,7 +28,7 @@ const source = {
     // Update source
     // Sources are not checked for support so be careful
     change(input) {
-        if (!is.object(input) || !('sources' in input) || !input.sources.length) {
+        if (!getDeep(input, 'sources.length')) {
             this.debug.warn('Invalid source format');
             return;
         }
@@ -52,32 +53,19 @@ const source = {
                 }
 
                 // Set the type and provider
-                this.type = input.type;
-                this.provider = !is.empty(input.sources[0].provider) ? input.sources[0].provider : providers.html5;
+                const { sources, type } = input;
+                const [{ provider = providers.html5, src }] = sources;
+                const tagName = provider === 'html5' ? type : 'div';
+                const attributes = provider === 'html5' ? {} : { src };
 
-                // Check for support
-                this.supported = support.check(this.type, this.provider, this.config.playsinline);
-
-                // Create new markup
-                switch (`${this.provider}:${this.type}`) {
-                    case 'html5:video':
-                        this.media = createElement('video');
-                        break;
-
-                    case 'html5:audio':
-                        this.media = createElement('audio');
-                        break;
-
-                    case 'youtube:video':
-                    case 'vimeo:video':
-                        this.media = createElement('div', {
-                            src: input.sources[0].src,
-                        });
-                        break;
-
-                    default:
-                        break;
-                }
+                Object.assign(this, {
+                    provider,
+                    type,
+                    // Check for support
+                    supported: support.check(type, provider, this.config.playsinline),
+                    // Create new element
+                    media: createElement(tagName, attributes),
+                });
 
                 // Inject the new element
                 this.elements.container.appendChild(this.media);
@@ -114,7 +102,7 @@ const source = {
 
                 // Set new sources for html5
                 if (this.isHTML5) {
-                    source.insertElements.call(this, 'source', input.sources);
+                    source.insertElements.call(this, 'source', sources);
                 }
 
                 // Set video title
