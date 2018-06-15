@@ -156,6 +156,12 @@ const captions = {
 
         // Update state and trigger event
         if (active !== toggled) {
+            // When passive, don't override user preferences
+            if (!passive) {
+                this.captions.active = active;
+                this.storage.set({ captions: active });
+            }
+
             // Force language if the call isn't passive and there is no matching language to toggle to
             if (!this.language && active && !passive) {
                 const tracks = captions.getTracks.call(this);
@@ -182,12 +188,6 @@ const captions = {
 
             // Update settings menu
             controls.updateSetting.call(this, 'captions');
-
-            // When passive, don't override user preferences
-            if (!passive) {
-                this.captions.active = active;
-                this.storage.set({ captions: active });
-            }
 
             // Trigger event (not used internally)
             triggerEvent.call(this, this.media, active ? 'captionsenabled' : 'captionsdisabled');
@@ -241,13 +241,13 @@ const captions = {
             triggerEvent.call(this, this.media, 'languagechange');
         }
 
+        // Show captions
+        captions.toggle.call(this, true, passive);
+
         if (this.isHTML5 && this.isVideo) {
             // If we change the active track while a cue is already displayed we need to update it
             captions.updateCues.call(this);
         }
-
-        // Show captions
-        captions.toggle.call(this, true, passive);
     },
 
     // Set captions by language
