@@ -111,3 +111,9 @@ export function unbindListeners() {
         this.eventListeners = [];
     }
 }
+
+// Run method when / if player is ready
+export function ready () {
+    return new Promise(resolve => this.ready ? setTimeout(resolve, 0) : on.call(this, this.elements.container, 'ready', resolve))
+        .then(() => {});
+}
