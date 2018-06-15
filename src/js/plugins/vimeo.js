@@ -70,8 +70,8 @@ const vimeo = {
     // Set aspect ratio
     // For Vimeo we have an extra 300% height <div> to hide the standard controls and UI
     setAspectRatio(input) {
-        const ratio = is.string(input) ? input.split(':') : this.config.ratio.split(':');
-        const padding = 100 / ratio[0] * ratio[1];
+        const [x, y] = (is.string(input) ? input : this.config.ratio).split(':');
+        const padding = 100 / x * y;
         this.elements.wrapper.style.paddingBottom = `${padding}%`;
 
         if (this.supported.ui) {
@@ -294,10 +294,7 @@ const vimeo = {
         });
 
         // Set aspect ratio based on video size
-        Promise.all([
-            player.embed.getVideoWidth(),
-            player.embed.getVideoHeight(),
-        ]).then(dimensions => {
+        Promise.all([player.embed.getVideoWidth(), player.embed.getVideoHeight()]).then(dimensions => {
             const ratio = getAspectRatio(dimensions[0], dimensions[1]);
             vimeo.setAspectRatio.call(this, ratio);
         });

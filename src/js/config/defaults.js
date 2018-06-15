@@ -89,15 +89,7 @@ const defaults = {
     // Speed default and options to display
     speed: {
         selected: 1,
-        options: [
-            0.5,
-            0.75,
-            1,
-            1.25,
-            1.5,
-            1.75,
-            2,
-        ],
+        options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2],
     },
 
     // Keyboard shortcut settings
@@ -151,11 +143,7 @@ const defaults = {
         'airplay',
         'fullscreen',
     ],
-    settings: [
-        'captions',
-        'quality',
-        'speed',
-    ],
+    settings: ['captions', 'quality', 'speed'],
 
     // Localisation
     i18n: {

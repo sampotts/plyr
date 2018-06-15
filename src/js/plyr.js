@@ -172,10 +172,7 @@ class Plyr {
 
                     // Get attributes from URL and set config
                     if (url.searchParams.length) {
-                        const truthy = [
-                            '1',
-                            'true',
-                        ];
+                        const truthy = ['1', 'true'];
 
                         if (truthy.includes(url.searchParams.get('autoplay'))) {
                             this.config.autoplay = true;
@@ -682,12 +679,7 @@ class Plyr {
             return;
         }
 
-        let quality = ([
-            !is.empty(input) && Number(input),
-            this.storage.get('quality'),
-            config.selected,
-            config.default,
-        ]).find(is.number);
+        let quality = [!is.empty(input) && Number(input), this.storage.get('quality'), config.selected, config.default].find(is.number);
 
         if (!options.includes(quality)) {
             const value = closest(options, quality);

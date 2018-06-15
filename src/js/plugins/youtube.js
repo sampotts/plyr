@@ -408,10 +408,7 @@ const youtube = {
                     // Reset timer
                     clearInterval(player.timers.playing);
 
-                    const seeked = player.media.seeking && [
-                        1,
-                        2,
-                    ].includes(event.data);
+                    const seeked = player.media.seeking && [1, 2].includes(event.data);
 
                     if (seeked) {
                         // Unset seeking and fire seeked event
