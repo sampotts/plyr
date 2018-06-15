@@ -10,7 +10,7 @@ import { repaint, transitionEndEvent } from './utils/animation';
 import { dedupe } from './utils/arrays';
 import browser from './utils/browser';
 import { createElement, emptyElement, getAttributesFromSelector, getElement, getElements, hasClass, removeElement, setAttributes, toggleClass, toggleHidden, toggleState } from './utils/elements';
-import { once } from './utils/events';
+import { on, off } from './utils/events';
 import is from './utils/is';
 import loadSprite from './utils/loadSprite';
 import { extend } from './utils/objects';
@@ -848,7 +848,7 @@ const controls = {
         // Generate options data
         const options = tracks.map((track, value) => ({
             value,
-            checked: this.captions.active && this.currentTrack === value,
+            checked: this.captions.toggled && this.currentTrack === value,
             title: captions.getLabel.call(this, track),
             badge: track.language && controls.createBadge.call(this, track.language.toUpperCase()),
             list,
@@ -858,7 +858,7 @@ const controls = {
         // Add the "Disabled" option to turn off captions
         options.unshift({
             value: -1,
-            checked: !this.captions.active,
+            checked: !this.captions.toggled,
             title: i18n.get('disabled', this.config),
             list,
             type: 'language',
@@ -1026,7 +1026,7 @@ const controls = {
             return;
         }
 
-        // Are we targetting a tab? If not, bail
+        // Are we targeting a tab? If not, bail
         const isTab = pane.getAttribute('role') === 'tabpanel';
         if (!isTab) {
             return;
@@ -1065,10 +1065,12 @@ const controls = {
                 container.style.width = '';
                 container.style.height = '';
 
+                // Only listen once
+                off.call(this, container, transitionEndEvent, restore);
             };
 
             // Listen for the transition finishing and restore auto height/width
-            once.call(this, container, transitionEndEvent, restore);
+            on.call(this, container, transitionEndEvent, restore);
 
             // Set dimensions to target
             container.style.width = `${size.width}px`;

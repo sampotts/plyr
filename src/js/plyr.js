@@ -19,7 +19,7 @@ import Storage from './storage';
 import support from './support';
 import ui from './ui';
 import { closest } from './utils/arrays';
-import { createElement, hasClass, removeElement, replaceElement, toggleClass, toggleState, wrap } from './utils/elements';
+import { createElement, hasClass, removeElement, replaceElement, toggleClass, wrap } from './utils/elements';
 import { off, on, once, triggerEvent, unbindListeners } from './utils/events';
 import is from './utils/is';
 import loadSprite from './utils/loadSprite';
@@ -833,25 +833,7 @@ class Plyr {
      * @param {boolean} input - Whether to enable captions
      */
     toggleCaptions(input) {
-        // If there's no full support
-        if (!this.supported.ui) {
-            return;
-        }
-
-        // If the method is called without parameter, toggle based on current value
-        const active = is.boolean(input) ? input : !this.elements.container.classList.contains(this.config.classNames.captions.active);
-
-        // Toggle state
-        toggleState(this.elements.buttons.captions, active);
-
-        // Add class hook
-        toggleClass(this.elements.container, this.config.classNames.captions.active, active);
-
-        // Update state and trigger event
-        if (active !== this.captions.active) {
-            this.captions.active = active;
-            triggerEvent.call(this, this.media, this.captions.active ? 'captionsenabled' : 'captionsdisabled');
-        }
+        captions.toggle.call(this, input, false);
     }
 
     /**
@@ -859,15 +841,15 @@ class Plyr {
      * @param {number} - Caption index
      */
     set currentTrack(input) {
-        captions.set.call(this, input);
+        captions.set.call(this, input, false);
     }
 
     /**
      * Get the current caption track index (-1 if disabled)
      */
     get currentTrack() {
-        const { active, currentTrack } = this.captions;
-        return active ? currentTrack : -1;
+        const { toggled, currentTrack } = this.captions;
+        return toggled ? currentTrack : -1;
     }
 
     /**
@@ -876,7 +858,7 @@ class Plyr {
      * @param {string} - Two character ISO language code (e.g. EN, FR, PT, etc)
      */
     set language(input) {
-        captions.setLanguage.call(this, input);
+        captions.setLanguage.call(this, input, false);
     }
 
     /**
