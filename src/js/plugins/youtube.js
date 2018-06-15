@@ -200,46 +200,22 @@ const youtube = {
             },
             events: {
                 onError(event) {
-                    // If we've already fired an error, don't do it again
-                    // YouTube fires onError twice
-                    if (is.object(player.media.error)) {
-                        return;
+                    // YouTube may fire onError twice, so only handle it once
+                    if (!player.media.error) {
+                        const code = event.data;
+                        // Messages copied from https://developers.google.com/youtube/iframe_api_reference#onError
+                        const message = ({
+                            2: 'The request contains an invalid parameter value. For example, this error occurs if you specify a video ID that does not have 11 characters, or if the video ID contains invalid characters, such as exclamation points or asterisks.',
+                            5: 'The requested content cannot be played in an HTML5 player or another error related to the HTML5 player has occurred.',
+                            100: 'The video requested was not found. This error occurs when a video has been removed (for any reason) or has been marked as private.',
+                            101: 'The owner of the requested video does not allow it to be played in embedded players.',
+                            150: 'The owner of the requested video does not allow it to be played in embedded players.',
+                        }[code]) || 'An unknown error occured';
+
+                        player.media.error = { code, message };
+
+                        triggerEvent.call(player, player.media, 'error');
                     }
-
-                    const detail = {
-                        code: event.data,
-                    };
-
-                    // Messages copied from https://developers.google.com/youtube/iframe_api_reference#onError
-                    switch (event.data) {
-                        case 2:
-                            detail.message =
-                                'The request contains an invalid parameter value. For example, this error occurs if you specify a video ID that does not have 11 characters, or if the video ID contains invalid characters, such as exclamation points or asterisks.';
-                            break;
-
-                        case 5:
-                            detail.message =
-                                'The requested content cannot be played in an HTML5 player or another error related to the HTML5 player has occurred.';
-                            break;
-
-                        case 100:
-                            detail.message =
-                                'The video requested was not found. This error occurs when a video has been removed (for any reason) or has been marked as private.';
-                            break;
-
-                        case 101:
-                        case 150:
-                            detail.message = 'The owner of the requested video does not allow it to be played in embedded players.';
-                            break;
-
-                        default:
-                            detail.message = 'An unknown error occured';
-                            break;
-                    }
-
-                    player.media.error = detail;
-
-                    triggerEvent.call(player, player.media, 'error');
                 },
                 onPlaybackQualityChange() {
                     triggerEvent.call(player, player.media, 'qualitychange', false, {
