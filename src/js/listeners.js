@@ -459,7 +459,7 @@ class Listeners {
         );
 
         // Captions toggle
-        bind(this.player.elements.buttons.captions, 'click', this.player.toggleCaptions);
+        bind(this.player.elements.buttons.captions, 'click', () => this.player.toggleCaptions());
 
         // Fullscreen toggle
         bind(
