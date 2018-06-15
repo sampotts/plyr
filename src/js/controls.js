@@ -848,7 +848,7 @@ const controls = {
         // Generate options data
         const options = tracks.map((track, value) => ({
             value,
-            checked: this.captions.active && this.currentTrack === value,
+            checked: this.captions.toggled && this.currentTrack === value,
             title: captions.getLabel.call(this, track),
             badge: track.language && controls.createBadge.call(this, track.language.toUpperCase()),
             list,
@@ -858,7 +858,7 @@ const controls = {
         // Add the "Disabled" option to turn off captions
         options.unshift({
             value: -1,
-            checked: !this.captions.active,
+            checked: !this.captions.toggled,
             title: i18n.get('disabled', this.config),
             list,
             type: 'language',

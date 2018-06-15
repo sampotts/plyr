@@ -11,6 +11,7 @@ import { createElement, emptyElement, getAttributesFromSelector, insertAfter, re
 import { on, triggerEvent } from './utils/events';
 import fetch from './utils/fetch';
 import is from './utils/is';
+import { dedupe } from './utils/arrays';
 import { getHTML } from './utils/strings';
 import { parseUrl } from './utils/urls';
 
@@ -63,21 +64,34 @@ const captions = {
             });
         }
 
-        // Try to load the value from storage
-        let active = this.storage.get('captions');
+        // Get and set initial data
+        // The "preferred" options are not realized unless / until the wanted language has a match
+        // * languages: Array of user's browser languages.
+        // * language:  The language preferred by user settings or config
+        // * active:    The state preferred by user settings or config
+        // * toggled:   The real captions state
 
-        // Otherwise fall back to the default config
+        const languages = dedupe(Array.from(navigator.languages || navigator.userLanguage)
+            .map(language => language.split('-')[0]));
+
+        let language = this.storage.get('language') || this.config.captions.language;
+
+        // Use first browser language when language is 'auto'
+        if (language === 'auto') {
+            [language] = languages;
+        }
+
+        let active = this.storage.get('captions');
         if (!is.boolean(active)) {
             ({ active } = this.config.captions);
         }
 
-        // Get language from storage, fallback to config
-        let language = this.storage.get('language') || this.config.captions.language;
-        if (language === 'auto') {
-            [language] = (navigator.language || navigator.userLanguage).split('-');
-        }
-        // Set language and show if active
-        captions.setLanguage.call(this, language, active);
+        Object.assign(this.captions, {
+            toggled: false,
+            active,
+            language,
+            languages,
+        });
 
         // Watch changes to textTracks and update captions menu
         if (this.isHTML5) {
@@ -89,10 +103,12 @@ const captions = {
         setTimeout(captions.update.bind(this), 0);
     },
 
+    // Update available language options in settings based on tracks
     update() {
         const tracks = captions.getTracks.call(this, true);
         // Get the wanted language
-        const { language, meta } = this.captions;
+        const { active, language, meta, currentTrackNode } = this.captions;
+        const languageExists = Boolean(tracks.find(track => track.language === language));
 
         // Handle tracks (add event listener and "pseudo"-default)
         if (this.isHTML5 && this.isVideo) {
@@ -111,12 +127,10 @@ const captions = {
             });
         }
 
-        const trackRemoved = !tracks.find(track => track === this.captions.currentTrackNode);
-        const firstMatch = this.language !== language && tracks.find(track => track.language === language);
-
-        // Update language if removed or first matching track added
-        if (trackRemoved || firstMatch) {
-            captions.setLanguage.call(this, language, this.config.captions.active);
+        // Update language first time it matches, or if the previous matching track was removed
+        if ((languageExists && this.language !== language) || !tracks.includes(currentTrackNode)) {
+            captions.setLanguage.call(this, language);
+            captions.toggle.call(this, active && languageExists);
         }
 
         // Enable or disable captions based on track length
@@ -128,44 +142,69 @@ const captions = {
         }
     },
 
-    // Used internally for toggleCaptions()
-    toggle(input) {
+    // Toggle captions display
+    // Used internally for the toggleCaptions method, with the passive option forced to false
+    toggle(input, passive = true) {
         // If there's no full support
         if (!this.supported.ui) {
             return;
         }
 
+        const { toggled } = this.captions; // Current state
+        const activeClass = this.config.classNames.captions.active;
+
+        // Get the next state
         // If the method is called without parameter, toggle based on current value
-        const active = is.boolean(input) ? input : !this.elements.container.classList.contains(this.config.classNames.captions.active);
-
-        // Toggle state
-        toggleState(this.elements.buttons.captions, active);
-
-        // Add class hook
-        toggleClass(this.elements.container, this.config.classNames.captions.active, active);
+        const active = is.nullOrUndefined(input) ? !toggled : input;
 
         // Update state and trigger event
-        if (active !== this.captions.active) {
-            this.captions.active = active;
+        if (active !== toggled) {
+            // Force language if the call isn't passive and there is no matching language to toggle to
+            if (!this.language && active && !passive) {
+                const tracks = captions.getTracks.call(this);
+                const track = captions.findTrack.call(this, [
+                    this.captions.language,
+                    ...this.captions.languages,
+                ], true);
 
-            // Update UI
+                // Override user preferences to avoid switching languages if a matching track is added
+                this.captions.language = track.language;
+
+                // Set caption, but don't store in localStorage as user preference
+                captions.set.call(this, tracks.indexOf(track));
+                return;
+            }
+
+            // Toggle state
+            toggleState(this.elements.buttons.captions, active);
+
+            // Add class hook
+            toggleClass(this.elements.container, activeClass, active);
+
+            this.captions.toggled = active;
+
+            // Update settings menu
             controls.updateSetting.call(this, 'captions');
 
-            // Save to storage
-            this.storage.set({ captions: active });
+            // When passive, don't override user preferences
+            if (!passive) {
+                this.captions.active = active;
+                this.storage.set({ captions: active });
+            }
 
             // Trigger event (not used internally)
             triggerEvent.call(this, this.media, active ? 'captionsenabled' : 'captionsdisabled');
         }
     },
 
-    // Used internally for currentTrack setter
-    set(index, setLanguage = true, show = true) {
+    // Set captions by track index
+    // Used internally for the currentTrack setter with the passive option forced to false
+    set(index, passive = true) {
         const tracks = captions.getTracks.call(this);
 
         // Disable captions if setting to -1
         if (index === -1) {
-            this.toggleCaptions(false);
+            captions.toggle.call(this, false, passive);
             return;
         }
 
@@ -181,15 +220,19 @@ const captions = {
 
         if (this.captions.currentTrack !== index) {
             this.captions.currentTrack = index;
-            const track = captions.getCurrentTrack.call(this);
+            const track = tracks[index];
             const { language } = track || {};
 
             // Store reference to node for invalidation on remove
             this.captions.currentTrackNode = track;
 
-            // Prevent setting language in some cases, since it can violate user's intentions
-            if (setLanguage) {
+            // Update settings menu
+            controls.updateSetting.call(this, 'captions');
+
+            // When passive, don't override user preferences
+            if (!passive) {
                 this.captions.language = language;
+                this.storage.set({ language });
             }
 
             // Handle Vimeo captions
@@ -197,13 +240,7 @@ const captions = {
                 this.embed.enableTextTrack(language);
             }
 
-            // Update UI
-            controls.updateSetting.call(this, 'captions');
-
-            // Save to storage
-            this.storage.set({ language });
-
-            // Trigger event (not used internally)
+            // Trigger event
             triggerEvent.call(this, this.media, 'languagechange');
         }
 
@@ -213,13 +250,12 @@ const captions = {
         }
 
         // Show captions
-        if (show) {
-            this.toggleCaptions(true);
-        }
+        captions.toggle.call(this, true, passive);
     },
 
-    // Used internally for language setter
-    setLanguage(language, show = true) {
+    // Set captions by language
+    // Used internally for the language setter with the passive option forced to false
+    setLanguage(language, passive = true) {
         if (!is.string(language)) {
             this.debug.warn('Invalid language argument', language);
             return;
@@ -229,8 +265,8 @@ const captions = {
 
         // Set currentTrack
         const tracks = captions.getTracks.call(this);
-        const track = captions.getCurrentTrack.call(this, true);
-        captions.set.call(this, tracks.indexOf(track), false, show);
+        const track = captions.findTrack.call(this, [language]);
+        captions.set.call(this, tracks.indexOf(track), passive);
     },
 
     // Get current valid caption tracks
@@ -247,19 +283,30 @@ const captions = {
         ].includes(track.kind));
     },
 
-    // Get the current track for the current language
-    getCurrentTrack(fromLanguage = false) {
+    // Match tracks based on languages and get the first
+    findTrack(languages, force = false) {
         const tracks = captions.getTracks.call(this);
         const sortIsDefault = track => Number((this.captions.meta.get(track) || {}).default);
         const sorted = Array.from(tracks).sort((a, b) => sortIsDefault(b) - sortIsDefault(a));
-        return (!fromLanguage && tracks[this.currentTrack]) || sorted.find(track => track.language === this.captions.language) || sorted[0];
+        let track;
+        languages.every(language => {
+            track = sorted.find(track => track.language === language);
+            return !track; // Break iteration if there is a match
+        });
+        // If no match is found but is required, get first
+        return track || (force ? sorted[0] : undefined);
+    },
+
+    // Get the current track
+    getCurrentTrack() {
+        return captions.getTracks.call(this)[this.currentTrack];
     },
 
     // Get UI label for track
     getLabel(track) {
         let currentTrack = track;
 
-        if (!is.track(currentTrack) && support.textTracks && this.captions.active) {
+        if (!is.track(currentTrack) && support.textTracks && this.captions.toggled) {
             currentTrack = captions.getCurrentTrack.call(this);
         }
 
