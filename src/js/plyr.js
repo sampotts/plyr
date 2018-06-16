@@ -263,9 +263,6 @@ class Plyr {
             wrap(this.media, this.elements.container);
         }
 
-        // Allow focus to be captured
-        this.elements.container.setAttribute('tabindex', 0);
-
         // Add style hook
         ui.addStyleHook.call(this);
 

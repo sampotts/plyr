@@ -7,7 +7,7 @@ import controls from './controls';
 import i18n from './i18n';
 import support from './support';
 import browser from './utils/browser';
-import { getElement, toggleClass, toggleState } from './utils/elements';
+import { getElement, toggleClass } from './utils/elements';
 import { ready, triggerEvent } from './utils/events';
 import is from './utils/is';
 import loadImage from './utils/loadImage';
@@ -132,9 +132,6 @@ const ui = {
         // If there's a media title set, use that for the label
         if (is.string(this.config.title) && !is.empty(this.config.title)) {
             label += `, ${this.config.title}`;
-
-            // Set container label
-            this.elements.container.setAttribute('aria-label', this.config.title);
         }
 
         // If there's a play button, set label
@@ -216,8 +213,10 @@ const ui = {
         toggleClass(this.elements.container, this.config.classNames.paused, this.paused);
         toggleClass(this.elements.container, this.config.classNames.stopped, this.stopped);
 
-        // Set ARIA state
-        toggleState(this.elements.buttons.play, this.playing);
+        // Set state
+        Array.from(this.elements.buttons.play).forEach(target => {
+            target.pressed = this.playing;
+        });
 
         // Only update controls on non timeupdate events
         if (is.event(event) && event.type === 'timeupdate') {

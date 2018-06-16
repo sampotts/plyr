@@ -15,7 +15,6 @@ import {
     insertAfter,
     removeElement,
     toggleClass,
-    toggleState,
 } from './utils/elements';
 import { on, triggerEvent } from './utils/events';
 import fetch from './utils/fetch';
@@ -193,7 +192,7 @@ const captions = {
             }
 
             // Toggle state
-            toggleState(this.elements.buttons.captions, active);
+            this.elements.buttons.captions.pressed = active;
 
             // Add class hook
             toggleClass(this.elements.container, activeClass, active);

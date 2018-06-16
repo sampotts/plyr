@@ -5981,30 +5981,6 @@ typeof navigator === "object" && (function (global, factory) {
 	    toggleListener.call(this, this.elements.container, 'keydown', trap, toggle, false);
 	}
 
-	// Toggle aria-pressed state on a toggle button
-	// http://www.ssbbartgroup.com/blog/how-not-to-misuse-aria-states-properties-and-roles
-	function toggleState(element, input) {
-	    // If multiple elements passed
-	    if (is$1.array(element) || is$1.nodeList(element)) {
-	        Array.from(element).forEach(function (target) {
-	            return toggleState(target, input);
-	        });
-	        return;
-	    }
-
-	    // Bail if no target
-	    if (!is$1.element(element)) {
-	        return;
-	    }
-
-	    // Get state
-	    var pressed = element.getAttribute('aria-pressed') === 'true';
-	    var state = is$1.boolean(input) ? input : !pressed;
-
-	    // Set the attribute on target
-	    element.setAttribute('aria-pressed', state);
-	}
-
 	// ==========================================================================
 
 	var transitionEndEvent = function () {
@@ -6657,11 +6633,12 @@ typeof navigator === "object" && (function (global, factory) {
 	    }
 
 	    // Render
-	    return '' + (inverted ? '-' : '') + hours + format(mins) + ':' + format(secs);
+	    return '' + (inverted && time > 0 ? '-' : '') + hours + format(mins) + ':' + format(secs);
 	}
 
 	// ==========================================================================
 
+	// TODO: Don't export a massive object - break down and create class
 	var controls = {
 	    // Get icon URL
 	    getIconUrl: function getIconUrl() {
@@ -6675,8 +6652,7 @@ typeof navigator === "object" && (function (global, factory) {
 	    },
 
 
-	    // Find the UI controls and store references in custom controls
-	    // TODO: Allow settings menus with custom controls
+	    // Find the UI controls
 	    findElements: function findElements() {
 	        try {
 	            this.elements.controls = getElement.call(this, this.config.selectors.controls.wrapper);
@@ -6772,12 +6748,11 @@ typeof navigator === "object" && (function (global, factory) {
 	            pip: 'PIP',
 	            airplay: 'AirPlay'
 	        };
-
 	        var text = universals[type] || i18n.get(type, this.config);
+
 	        var attributes = Object.assign({}, attr, {
 	            class: [attr.class, this.config.classNames.hidden].filter(Boolean).join(' ')
 	        });
-
 	        return createElement('span', attributes, text);
 	    },
 
@@ -6879,9 +6854,6 @@ typeof navigator === "object" && (function (global, factory) {
 	            // Label/Tooltip
 	            button.appendChild(controls.createLabel.call(this, labelPressed, { class: 'label--pressed' }));
 	            button.appendChild(controls.createLabel.call(this, label, { class: 'label--not-pressed' }));
-
-	            // Add aria attributes
-	            attributes['aria-pressed'] = false;
 	        } else {
 	            button.appendChild(controls.createIcon.call(this, icon));
 	            button.appendChild(controls.createLabel.call(this, label));
@@ -6903,19 +6875,26 @@ typeof navigator === "object" && (function (global, factory) {
 	            this.elements.buttons[type] = button;
 	        }
 
+	        // Toggle classname when pressed property is set
+	        var className = this.config.classNames.controlPressed;
+	        Object.defineProperty(button, 'pressed', {
+	            enumerable: true,
+	            get: function get() {
+	                return hasClass(button, className);
+	            },
+	            set: function set() {
+	                var pressed = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+	                toggleClass(button, className, pressed);
+	            }
+	        });
+
 	        return button;
 	    },
 
 
 	    // Create an <input type='range'>
 	    createRange: function createRange(type, attributes) {
-	        // Seek label
-	        var label = createElement('label', {
-	            for: attributes.id,
-	            id: attributes.id + '-label',
-	            class: this.config.classNames.hidden
-	        }, i18n.get(type, this.config));
-
 	        // Seek input
 	        var input = createElement('input', extend(getAttributesFromSelector(this.config.selectors.inputs[type]), {
 	            type: 'range',
@@ -6926,7 +6905,7 @@ typeof navigator === "object" && (function (global, factory) {
 	            autocomplete: 'off',
 	            // A11y fixes for https://github.com/sampotts/plyr/issues/905
 	            role: 'slider',
-	            'aria-labelledby': attributes.id + '-label',
+	            'aria-label': i18n.get(type, this.config),
 	            'aria-valuemin': 0,
 	            'aria-valuemax': 100,
 	            'aria-valuenow': 0
@@ -6937,10 +6916,7 @@ typeof navigator === "object" && (function (global, factory) {
 	        // Set the fill for webkit now
 	        controls.updateRangeFill.call(this, input);
 
-	        return {
-	            label: label,
-	            input: input
-	        };
+	        return input;
 	    },
 
 
@@ -6962,7 +6938,6 @@ typeof navigator === "object" && (function (global, factory) {
 	                played: 'played',
 	                buffer: 'buffered'
 	            }[type];
-
 	            var suffix = suffixKey ? i18n.get(suffixKey, this.config) : '';
 
 	            progress.innerText = '% ' + suffix.toLowerCase();
@@ -7030,6 +7005,23 @@ typeof navigator === "object" && (function (global, factory) {
 	    },
 
 
+	    // Format a time for display
+	    formatTime: function formatTime$$1() {
+	        var time = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+	        var inverted = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+	        // Bail if the value isn't a number
+	        if (!is$1.number(time)) {
+	            return time;
+	        }
+
+	        // Always display hours if duration is over an hour
+	        var forceHours = getHours(this.duration) > 0;
+
+	        return formatTime(time, forceHours, inverted);
+	    },
+
+
 	    // Update the displayed time
 	    updateTimeDisplay: function updateTimeDisplay() {
 	        var target = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
@@ -7041,11 +7033,8 @@ typeof navigator === "object" && (function (global, factory) {
 	            return;
 	        }
 
-	        // Always display hours if duration is over an hour
-	        var forceHours = getHours(this.duration) > 0;
-
 	        // eslint-disable-next-line no-param-reassign
-	        target.innerText = formatTime(time, forceHours, inverted);
+	        target.innerText = controls.formatTime(time, inverted);
 	    },
 
 
@@ -7062,7 +7051,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 	        // Update mute state
 	        if (is$1.element(this.elements.buttons.mute)) {
-	            toggleState(this.elements.buttons.mute, this.muted || this.volume === 0);
+	            this.elements.buttons.mute.pressed = this.muted || this.volume === 0;
 	        }
 	    },
 
@@ -7148,8 +7137,20 @@ typeof navigator === "object" && (function (global, factory) {
 	            return;
 	        }
 
-	        // Set aria value for https://github.com/sampotts/plyr/issues/905
-	        range.setAttribute('aria-valuenow', range.value);
+	        // Set aria values for https://github.com/sampotts/plyr/issues/905
+	        if (matches(range, this.config.selectors.inputs.seek)) {
+	            range.setAttribute('aria-valuenow', this.currentTime);
+	            var currentTime = controls.formatTime(this.currentTime);
+	            var duration = controls.formatTime(this.duration);
+	            var format$$1 = i18n.get('seekLabel', this.config);
+	            range.setAttribute('aria-valuetext', format$$1.replace('{currentTime}', currentTime).replace('{duration}', duration));
+	        } else if (matches(range, this.config.selectors.inputs.volume)) {
+	            var percent = range.value * 100;
+	            range.setAttribute('aria-valuenow', percent);
+	            range.setAttribute('aria-valuetext', percent + '%');
+	        } else {
+	            range.setAttribute('aria-valuenow', range.value);
+	        }
 
 	        // WebKit only
 	        if (!browser.isWebkit) {
@@ -7235,9 +7236,14 @@ typeof navigator === "object" && (function (global, factory) {
 
 	    // Show the duration on metadataloaded or durationchange events
 	    durationUpdate: function durationUpdate() {
-	        // Bail if no ui or durationchange event triggered after playing/seek when invertTime is false
+	        // Bail if no UI or durationchange event triggered after playing/seek when invertTime is false
 	        if (!this.supported.ui || !this.config.invertTime && this.currentTime) {
 	            return;
+	        }
+
+	        // Update ARIA values
+	        if (is$1.element(this.elements.inputs.seek)) {
+	            this.elements.inputs.seek.setAttribute('aria-valuemax', this.duration);
 	        }
 
 	        // If there's a spot to display duration
@@ -7765,11 +7771,9 @@ typeof navigator === "object" && (function (global, factory) {
 	            var progress = createElement('div', getAttributesFromSelector(this.config.selectors.progress));
 
 	            // Seek range slider
-	            var seek = controls.createRange.call(this, 'seek', {
+	            progress.appendChild(controls.createRange.call(this, 'seek', {
 	                id: 'plyr-seek-' + data.id
-	            });
-	            progress.appendChild(seek.label);
-	            progress.appendChild(seek.input);
+	            }));
 
 	            // Buffer progress
 	            progress.appendChild(controls.createProgress.call(this, 'buffer'));
@@ -7819,11 +7823,9 @@ typeof navigator === "object" && (function (global, factory) {
 	            };
 
 	            // Create the volume range slider
-	            var range = controls.createRange.call(this, 'volume', extend(attributes, {
+	            volume.appendChild(controls.createRange.call(this, 'volume', extend(attributes, {
 	                id: 'plyr-volume-' + data.id
-	            }));
-	            volume.appendChild(range.label);
-	            volume.appendChild(range.input);
+	            })));
 
 	            this.elements.volume = volume;
 
@@ -8088,7 +8090,6 @@ typeof navigator === "object" && (function (global, factory) {
 	            Array.from(labels).forEach(function (label) {
 	                toggleClass(label, _this8.config.classNames.hidden, false);
 	                toggleClass(label, _this8.config.classNames.tooltip, true);
-	                label.setAttribute('role', 'tooltip');
 	            });
 	        }
 	    }
@@ -8363,7 +8364,7 @@ typeof navigator === "object" && (function (global, factory) {
 	            }
 
 	            // Toggle state
-	            toggleState(this.elements.buttons.captions, active);
+	            this.elements.buttons.captions.pressed = active;
 
 	            // Add class hook
 	            toggleClass(this.elements.container, activeClass, active);
@@ -8605,6 +8606,10 @@ typeof navigator === "object" && (function (global, factory) {
 	    // Only allow one media playing at once (vimeo only)
 	    autopause: true,
 
+	    // Allow inline playback on iOS (this effects YouTube/Vimeo - HTML5 requires the attribute present)
+	    // TODO: Remove iosNative fullscreen option in favour of this (logic needs work)
+	    playsinline: true,
+
 	    // Default time to skip when rewind/fast forward
 	    seekTime: 10,
 
@@ -8718,6 +8723,7 @@ typeof navigator === "object" && (function (global, factory) {
 	        pause: 'Pause',
 	        fastForward: 'Forward {seektime}s',
 	        seek: 'Seek',
+	        seekLabel: '{currentTime} of {duration}',
 	        played: 'Played',
 	        buffered: 'Buffered',
 	        currentTime: 'Current time',
@@ -8732,6 +8738,7 @@ typeof navigator === "object" && (function (global, factory) {
 	        frameTitle: 'Player for {title}',
 	        captions: 'Captions',
 	        settings: 'Settings',
+	        menuBack: 'Go back to previous menu',
 	        speed: 'Speed',
 	        normal: 'Normal',
 	        quality: 'Quality',
@@ -8861,6 +8868,7 @@ typeof navigator === "object" && (function (global, factory) {
 	        posterEnabled: 'plyr__poster-enabled',
 	        ads: 'plyr__ads',
 	        control: 'plyr__control',
+	        controlPressed: 'plyr__control--pressed',
 	        playing: 'plyr--playing',
 	        paused: 'plyr--paused',
 	        stopped: 'plyr--stopped',
@@ -9002,7 +9010,7 @@ typeof navigator === "object" && (function (global, factory) {
 	    // Update toggle button
 	    var button = this.player.elements.buttons.fullscreen;
 	    if (is$1.element(button)) {
-	        toggleState(button, this.active);
+	        button.pressed = this.active;
 	    }
 
 	    // Trigger an event
@@ -9372,9 +9380,6 @@ typeof navigator === "object" && (function (global, factory) {
 	        // If there's a media title set, use that for the label
 	        if (is$1.string(this.config.title) && !is$1.empty(this.config.title)) {
 	            label += ', ' + this.config.title;
-
-	            // Set container label
-	            this.elements.container.setAttribute('aria-label', this.config.title);
 	        }
 
 	        // If there's a play button, set label
@@ -9454,13 +9459,17 @@ typeof navigator === "object" && (function (global, factory) {
 
 	    // Check playing state
 	    checkPlaying: function checkPlaying(event) {
+	        var _this3 = this;
+
 	        // Class hooks
 	        toggleClass(this.elements.container, this.config.classNames.playing, this.playing);
 	        toggleClass(this.elements.container, this.config.classNames.paused, this.paused);
 	        toggleClass(this.elements.container, this.config.classNames.stopped, this.stopped);
 
-	        // Set ARIA state
-	        toggleState(this.elements.buttons.play, this.playing);
+	        // Set state
+	        Array.from(this.elements.buttons.play).forEach(function (target) {
+	            target.pressed = _this3.playing;
+	        });
 
 	        // Only update controls on non timeupdate events
 	        if (is$1.event(event) && event.type === 'timeupdate') {
@@ -9474,7 +9483,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 	    // Check if media is loading
 	    checkLoading: function checkLoading(event) {
-	        var _this3 = this;
+	        var _this4 = this;
 
 	        this.loading = ['stalled', 'waiting'].includes(event.type);
 
@@ -9484,10 +9493,10 @@ typeof navigator === "object" && (function (global, factory) {
 	        // Timer to prevent flicker when seeking
 	        this.timers.loading = setTimeout(function () {
 	            // Update progress bar loading class state
-	            toggleClass(_this3.elements.container, _this3.config.classNames.loading, _this3.loading);
+	            toggleClass(_this4.elements.container, _this4.config.classNames.loading, _this4.loading);
 
 	            // Update controls visibility
-	            ui.toggleControls.call(_this3);
+	            ui.toggleControls.call(_this4);
 	        }, this.loading ? 250 : 0);
 	    },
 
@@ -12510,9 +12519,6 @@ typeof navigator === "object" && (function (global, factory) {
 	            this.elements.container = createElement('div');
 	            wrap$2(this.media, this.elements.container);
 	        }
-
-	        // Allow focus to be captured
-	        this.elements.container.setAttribute('tabindex', 0);
 
 	        // Add style hook
 	        ui.addStyleHook.call(this);

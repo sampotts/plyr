@@ -21,7 +21,7 @@
 
 Again, more changes from @friday!
 
--   Restore window reference in `utils.is.cue()`
+-   Restore window reference in `is.cue()`
 -   Fix InvalidStateError and IE11 issues
 -   Respect storage being disabled for storage getter
 

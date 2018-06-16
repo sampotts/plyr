@@ -4,7 +4,7 @@
 // ==========================================================================
 
 import browser from './utils/browser';
-import { hasClass, toggleClass, toggleState, trapFocus } from './utils/elements';
+import { hasClass, toggleClass, trapFocus } from './utils/elements';
 import { on, triggerEvent } from './utils/events';
 import is from './utils/is';
 
@@ -16,7 +16,7 @@ function onChange() {
     // Update toggle button
     const button = this.player.elements.buttons.fullscreen;
     if (is.element(button)) {
-        toggleState(button, this.active);
+        button.pressed = this.active;
     }
 
     // Trigger an event

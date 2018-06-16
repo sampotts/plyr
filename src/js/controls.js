@@ -20,7 +20,7 @@ import {
     setAttributes,
     toggleClass,
     toggleHidden,
-    toggleState,
+    matches,
 } from './utils/elements';
 import { off, on } from './utils/events';
 import is from './utils/is';
@@ -29,6 +29,7 @@ import { extend } from './utils/objects';
 import { getPercentage, replaceAll, toCamelCase, toTitleCase } from './utils/strings';
 import { formatTime, getHours } from './utils/time';
 
+// TODO: Don't export a massive object - break down and create class
 const controls = {
     // Get icon URL
     getIconUrl() {
@@ -41,8 +42,7 @@ const controls = {
         };
     },
 
-    // Find the UI controls and store references in custom controls
-    // TODO: Allow settings menus with custom controls
+    // Find the UI controls
     findElements() {
         try {
             this.elements.controls = getElement.call(this, this.config.selectors.controls.wrapper);
@@ -139,12 +139,11 @@ const controls = {
             pip: 'PIP',
             airplay: 'AirPlay',
         };
-
         const text = universals[type] || i18n.get(type, this.config);
+
         const attributes = Object.assign({}, attr, {
             class: [attr.class, this.config.classNames.hidden].filter(Boolean).join(' '),
         });
-
         return createElement('span', attributes, text);
     },
 
@@ -250,9 +249,6 @@ const controls = {
             // Label/Tooltip
             button.appendChild(controls.createLabel.call(this, labelPressed, { class: 'label--pressed' }));
             button.appendChild(controls.createLabel.call(this, label, { class: 'label--not-pressed' }));
-
-            // Add aria attributes
-            attributes['aria-pressed'] = false;
         } else {
             button.appendChild(controls.createIcon.call(this, icon));
             button.appendChild(controls.createLabel.call(this, label));
@@ -274,22 +270,23 @@ const controls = {
             this.elements.buttons[type] = button;
         }
 
+        // Toggle classname when pressed property is set
+        const className = this.config.classNames.controlPressed;
+        Object.defineProperty(button, 'pressed', {
+            enumerable: true,
+            get() {
+                return hasClass(button, className);
+            },
+            set(pressed = false) {
+                toggleClass(button, className, pressed);
+            },
+        });
+
         return button;
     },
 
     // Create an <input type='range'>
     createRange(type, attributes) {
-        // Seek label
-        const label = createElement(
-            'label',
-            {
-                for: attributes.id,
-                id: `${attributes.id}-label`,
-                class: this.config.classNames.hidden,
-            },
-            i18n.get(type, this.config),
-        );
-
         // Seek input
         const input = createElement(
             'input',
@@ -304,7 +301,7 @@ const controls = {
                     autocomplete: 'off',
                     // A11y fixes for https://github.com/sampotts/plyr/issues/905
                     role: 'slider',
-                    'aria-labelledby': `${attributes.id}-label`,
+                    'aria-label': i18n.get(type, this.config),
                     'aria-valuemin': 0,
                     'aria-valuemax': 100,
                     'aria-valuenow': 0,
@@ -318,10 +315,7 @@ const controls = {
         // Set the fill for webkit now
         controls.updateRangeFill.call(this, input);
 
-        return {
-            label,
-            input,
-        };
+        return input;
     },
 
     // Create a <progress>
@@ -349,7 +343,6 @@ const controls = {
                 played: 'played',
                 buffer: 'buffered',
             }[type];
-
             const suffix = suffixKey ? i18n.get(suffixKey, this.config) : '';
 
             progress.innerText = `% ${suffix.toLowerCase()}`;
@@ -412,6 +405,19 @@ const controls = {
         list.appendChild(item);
     },
 
+    // Format a time for display
+    formatTime(time = 0, inverted = false) {
+        // Bail if the value isn't a number
+        if (!is.number(time)) {
+            return time;
+        }
+
+        // Always display hours if duration is over an hour
+        const forceHours = getHours(this.duration) > 0;
+
+        return formatTime(time, forceHours, inverted);
+    },
+
     // Update the displayed time
     updateTimeDisplay(target = null, time = 0, inverted = false) {
         // Bail if there's no element to display or the value isn't a number
@@ -419,11 +425,8 @@ const controls = {
             return;
         }
 
-        // Always display hours if duration is over an hour
-        const forceHours = getHours(this.duration) > 0;
-
         // eslint-disable-next-line no-param-reassign
-        target.innerText = formatTime(time, forceHours, inverted);
+        target.innerText = controls.formatTime(time, inverted);
     },
 
     // Update volume UI and storage
@@ -439,7 +442,7 @@ const controls = {
 
         // Update mute state
         if (is.element(this.elements.buttons.mute)) {
-            toggleState(this.elements.buttons.mute, this.muted || this.volume === 0);
+            this.elements.buttons.mute.pressed = this.muted || this.volume === 0;
         }
     },
 
@@ -518,8 +521,23 @@ const controls = {
             return;
         }
 
-        // Set aria value for https://github.com/sampotts/plyr/issues/905
-        range.setAttribute('aria-valuenow', range.value);
+        // Set aria values for https://github.com/sampotts/plyr/issues/905
+        if (matches(range, this.config.selectors.inputs.seek)) {
+            range.setAttribute('aria-valuenow', this.currentTime);
+            const currentTime = controls.formatTime(this.currentTime);
+            const duration = controls.formatTime(this.duration);
+            const format = i18n.get('seekLabel', this.config);
+            range.setAttribute(
+                'aria-valuetext',
+                format.replace('{currentTime}', currentTime).replace('{duration}', duration),
+            );
+        } else if (matches(range, this.config.selectors.inputs.volume)) {
+            const percent = range.value * 100;
+            range.setAttribute('aria-valuenow', percent);
+            range.setAttribute('aria-valuetext', `${percent}%`);
+        } else {
+            range.setAttribute('aria-valuenow', range.value);
+        }
 
         // WebKit only
         if (!browser.isWebkit) {
@@ -610,9 +628,14 @@ const controls = {
 
     // Show the duration on metadataloaded or durationchange events
     durationUpdate() {
-        // Bail if no ui or durationchange event triggered after playing/seek when invertTime is false
+        // Bail if no UI or durationchange event triggered after playing/seek when invertTime is false
         if (!this.supported.ui || (!this.config.invertTime && this.currentTime)) {
             return;
+        }
+
+        // Update ARIA values
+        if (is.element(this.elements.inputs.seek)) {
+            this.elements.inputs.seek.setAttribute('aria-valuemax', this.duration);
         }
 
         // If there's a spot to display duration
@@ -1117,11 +1140,11 @@ const controls = {
             const progress = createElement('div', getAttributesFromSelector(this.config.selectors.progress));
 
             // Seek range slider
-            const seek = controls.createRange.call(this, 'seek', {
-                id: `plyr-seek-${data.id}`,
-            });
-            progress.appendChild(seek.label);
-            progress.appendChild(seek.input);
+            progress.appendChild(
+                controls.createRange.call(this, 'seek', {
+                    id: `plyr-seek-${data.id}`,
+                }),
+            );
 
             // Buffer progress
             progress.appendChild(controls.createProgress.call(this, 'buffer'));
@@ -1175,15 +1198,15 @@ const controls = {
             };
 
             // Create the volume range slider
-            const range = controls.createRange.call(
-                this,
-                'volume',
-                extend(attributes, {
-                    id: `plyr-volume-${data.id}`,
-                }),
+            volume.appendChild(
+                controls.createRange.call(
+                    this,
+                    'volume',
+                    extend(attributes, {
+                        id: `plyr-volume-${data.id}`,
+                    }),
+                ),
             );
-            volume.appendChild(range.label);
-            volume.appendChild(range.input);
 
             this.elements.volume = volume;
 
@@ -1448,7 +1471,6 @@ const controls = {
             Array.from(labels).forEach(label => {
                 toggleClass(label, this.config.classNames.hidden, false);
                 toggleClass(label, this.config.classNames.tooltip, true);
-                label.setAttribute('role', 'tooltip');
             });
         }
     },

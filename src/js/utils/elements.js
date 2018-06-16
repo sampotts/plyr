@@ -283,25 +283,3 @@ export function trapFocus(element = null, toggle = false) {
 
     toggleListener.call(this, this.elements.container, 'keydown', trap, toggle, false);
 }
-
-// Toggle aria-pressed state on a toggle button
-// http://www.ssbbartgroup.com/blog/how-not-to-misuse-aria-states-properties-and-roles
-export function toggleState(element, input) {
-    // If multiple elements passed
-    if (is.array(element) || is.nodeList(element)) {
-        Array.from(element).forEach(target => toggleState(target, input));
-        return;
-    }
-
-    // Bail if no target
-    if (!is.element(element)) {
-        return;
-    }
-
-    // Get state
-    const pressed = element.getAttribute('aria-pressed') === 'true';
-    const state = is.boolean(input) ? input : !pressed;
-
-    // Set the attribute on target
-    element.setAttribute('aria-pressed', state);
-}
