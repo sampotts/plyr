@@ -119,8 +119,11 @@ const vimeo = {
         iframe.setAttribute('allowtransparency', '');
         iframe.setAttribute('allow', 'autoplay');
 
+        // Get poster, if already set
+        const { poster } = player;
+
         // Inject the package
-        const wrapper = createElement('div', { class: player.config.classNames.embedContainer });
+        const wrapper = createElement('div', { poster, class: player.config.classNames.embedContainer });
         wrapper.appendChild(iframe);
         player.media = replaceElement(wrapper, player.media);
 
@@ -137,7 +140,7 @@ const vimeo = {
             url.pathname = `${url.pathname.split('_')[0]}.jpg`;
 
             // Set and show poster
-            ui.setPoster.call(player, url.href);
+            ui.setPoster.call(player, url.href).catch(() => {});
         });
 
         // Setup instance
