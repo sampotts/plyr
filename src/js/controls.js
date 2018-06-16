@@ -9,8 +9,20 @@ import support from './support';
 import { repaint, transitionEndEvent } from './utils/animation';
 import { dedupe } from './utils/arrays';
 import browser from './utils/browser';
-import { createElement, emptyElement, getAttributesFromSelector, getElement, getElements, hasClass, removeElement, setAttributes, toggleClass, toggleHidden, toggleState } from './utils/elements';
-import { on, off } from './utils/events';
+import {
+    createElement,
+    emptyElement,
+    getAttributesFromSelector,
+    getElement,
+    getElements,
+    hasClass,
+    removeElement,
+    setAttributes,
+    toggleClass,
+    toggleHidden,
+    toggleState,
+} from './utils/elements';
+import { off, on } from './utils/events';
 import is from './utils/is';
 import loadSprite from './utils/loadSprite';
 import { extend } from './utils/objects';
@@ -68,7 +80,9 @@ const controls = {
 
             // Seek tooltip
             if (is.element(this.elements.progress)) {
-                this.elements.display.seekTooltip = this.elements.progress.querySelector(`.${this.config.classNames.tooltip}`);
+                this.elements.display.seekTooltip = this.elements.progress.querySelector(
+                    `.${this.config.classNames.tooltip}`,
+                );
             }
 
             return true;
@@ -331,10 +345,10 @@ const controls = {
         if (type !== 'volume') {
             progress.appendChild(createElement('span', null, '0'));
 
-            const suffixKey = ({
+            const suffixKey = {
                 played: 'played',
                 buffer: 'buffered',
-            })[type];
+            }[type];
 
             const suffix = suffixKey ? i18n.get(suffixKey, this.config) : '';
 
@@ -519,7 +533,12 @@ const controls = {
     // Update hover tooltip for seeking
     updateSeekTooltip(event) {
         // Bail if setting not true
-        if (!this.config.tooltips.seek || !is.element(this.elements.inputs.seek) || !is.element(this.elements.display.seekTooltip) || this.duration === 0) {
+        if (
+            !this.config.tooltips.seek ||
+            !is.element(this.elements.inputs.seek) ||
+            !is.element(this.elements.display.seekTooltip) ||
+            this.duration === 0
+        ) {
             return;
         }
 
@@ -573,7 +592,12 @@ const controls = {
         const invert = !is.element(this.elements.display.duration) && this.config.invertTime;
 
         // Duration
-        controls.updateTimeDisplay.call(this, this.elements.display.currentTime, invert ? this.duration - this.currentTime : this.currentTime, invert);
+        controls.updateTimeDisplay.call(
+            this,
+            this.elements.display.currentTime,
+            invert ? this.duration - this.currentTime : this.currentTime,
+            invert,
+        );
 
         // Ignore updates while seeking
         if (event && event.type === 'timeupdate' && this.media.seeking) {

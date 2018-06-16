@@ -47,7 +47,10 @@ const is = {
         return instanceOf(input, TextTrack) || (!is.nullOrUndefined(input) && is.string(input.kind));
     },
     url(input) {
-        return !is.nullOrUndefined(input) && /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/.test(input);
+        return (
+            !is.nullOrUndefined(input) &&
+            /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/.test(input)
+        );
     },
     nullOrUndefined(input) {
         return input === null || typeof input === 'undefined';

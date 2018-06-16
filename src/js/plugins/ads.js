@@ -150,7 +150,11 @@ class Ads {
             this.loader = new google.ima.AdsLoader(this.elements.displayContainer);
 
             // Listen and respond to ads loaded and error events
-            this.loader.addEventListener(google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED, event => this.onAdsManagerLoaded(event), false);
+            this.loader.addEventListener(
+                google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED,
+                event => this.onAdsManagerLoaded(event),
+                false,
+            );
             this.loader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, error => this.onAdError(error), false);
 
             // Request video ads

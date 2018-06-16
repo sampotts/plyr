@@ -52,9 +52,10 @@ class Listeners {
             // and if the focused element is not editable (e.g. text input)
             // and any that accept key input http://webaim.org/techniques/keyboard/
             const focused = getFocusElement();
-            if (is.element(focused) && (
-                focused !== this.player.elements.inputs.seek &&
-                matches(focused, this.player.config.selectors.editable))
+            if (
+                is.element(focused) &&
+                (focused !== this.player.elements.inputs.seek &&
+                    matches(focused, this.player.config.selectors.editable))
             ) {
                 return;
             }
@@ -174,7 +175,6 @@ class Listeners {
 
         // Add touch class
         toggleClass(this.player.elements.container, this.player.config.classNames.isTouch, true);
-
     }
 
     // Global window & document listeners
@@ -217,40 +217,49 @@ class Listeners {
         });
 
         // Toggle controls on mouse events and entering fullscreen
-        on.call(this.player, this.player.elements.container, 'mousemove mouseleave touchstart touchmove enterfullscreen exitfullscreen', event => {
-            const { controls } = this.player.elements;
+        on.call(
+            this.player,
+            this.player.elements.container,
+            'mousemove mouseleave touchstart touchmove enterfullscreen exitfullscreen',
+            event => {
+                const { controls } = this.player.elements;
 
-            // Remove button states for fullscreen
-            if (event.type === 'enterfullscreen') {
-                controls.pressed = false;
-                controls.hover = false;
-            }
+                // Remove button states for fullscreen
+                if (event.type === 'enterfullscreen') {
+                    controls.pressed = false;
+                    controls.hover = false;
+                }
 
-            // Show, then hide after a timeout unless another control event occurs
-            const show = ['touchstart', 'touchmove', 'mousemove'].includes(event.type);
+                // Show, then hide after a timeout unless another control event occurs
+                const show = ['touchstart', 'touchmove', 'mousemove'].includes(event.type);
 
-            let delay = 0;
+                let delay = 0;
 
-            if (show) {
-                ui.toggleControls.call(this.player, true);
-                // Use longer timeout for touch devices
-                delay = this.player.touch ? 3000 : 2000;
-            }
+                if (show) {
+                    ui.toggleControls.call(this.player, true);
+                    // Use longer timeout for touch devices
+                    delay = this.player.touch ? 3000 : 2000;
+                }
 
-            // Clear timer
-            clearTimeout(this.player.timers.controls);
-            // Timer to prevent flicker when seeking
-            this.player.timers.controls = setTimeout(() => ui.toggleControls.call(this.player, false), delay);
-        });
+                // Clear timer
+                clearTimeout(this.player.timers.controls);
+                // Timer to prevent flicker when seeking
+                this.player.timers.controls = setTimeout(() => ui.toggleControls.call(this.player, false), delay);
+            },
+        );
     }
 
     // Listen for media events
     media() {
         // Time change on media
-        on.call(this.player, this.player.media, 'timeupdate seeking seeked', event => controls.timeUpdate.call(this.player, event));
+        on.call(this.player, this.player.media, 'timeupdate seeking seeked', event =>
+            controls.timeUpdate.call(this.player, event),
+        );
 
         // Display duration
-        on.call(this.player, this.player.media, 'durationchange loadeddata loadedmetadata', event => controls.durationUpdate.call(this.player, event));
+        on.call(this.player, this.player.media, 'durationchange loadeddata loadedmetadata', event =>
+            controls.durationUpdate.call(this.player, event),
+        );
 
         // Check for audio tracks on load
         // We can't use `loadedmetadata` as it doesn't seem to have audio tracks at that point
@@ -269,16 +278,24 @@ class Listeners {
         });
 
         // Check for buffer progress
-        on.call(this.player, this.player.media, 'progress playing seeking seeked', event => controls.updateProgress.call(this.player, event));
+        on.call(this.player, this.player.media, 'progress playing seeking seeked', event =>
+            controls.updateProgress.call(this.player, event),
+        );
 
         // Handle volume changes
-        on.call(this.player, this.player.media, 'volumechange', event => controls.updateVolume.call(this.player, event));
+        on.call(this.player, this.player.media, 'volumechange', event =>
+            controls.updateVolume.call(this.player, event),
+        );
 
         // Handle play/pause
-        on.call(this.player, this.player.media, 'playing play pause ended emptied timeupdate', event => ui.checkPlaying.call(this.player, event));
+        on.call(this.player, this.player.media, 'playing play pause ended emptied timeupdate', event =>
+            ui.checkPlaying.call(this.player, event),
+        );
 
         // Loading state
-        on.call(this.player, this.player.media, 'waiting canplay seeked playing', event => ui.checkLoading.call(this.player, event));
+        on.call(this.player, this.player.media, 'waiting canplay seeked playing', event =>
+            ui.checkLoading.call(this.player, event),
+        );
 
         // If autoplay, then load advertisement if required
         // TODO: Show some sort of loading state while the ad manager loads else there's a delay before ad shows
@@ -324,7 +341,8 @@ class Listeners {
 
         // Disable right click
         if (this.player.supported.ui && this.player.config.disableContextMenu) {
-            on.call(this.player,
+            on.call(
+                this.player,
                 this.player.elements.wrapper,
                 'contextmenu',
                 event => {
@@ -365,7 +383,7 @@ class Listeners {
         // Bubble up key events for Edge
         const proxyEvents = this.player.config.events.concat(['keyup', 'keydown']).join(' ');
         on.call(this.player, this.player.media, proxyEvents, event => {
-            let {detail = {}} = event;
+            let { detail = {} } = event;
 
             // Get error details from media
             if (event.type === 'error') {
@@ -403,7 +421,13 @@ class Listeners {
             const customHandler = this.player.config.listeners[customHandlerKey];
             const hasCustomHandler = is.function(customHandler);
 
-            on.call(this.player, element, type, event => proxy(event, defaultHandler, customHandlerKey), passive && !hasCustomHandler);
+            on.call(
+                this.player,
+                element,
+                type,
+                event => proxy(event, defaultHandler, customHandlerKey),
+                passive && !hasCustomHandler,
+            );
         };
 
         // Play/pause toggle
@@ -592,7 +616,9 @@ class Listeners {
         }
 
         // Seek tooltip
-        bind(this.player.elements.progress, 'mouseenter mouseleave mousemove', event => controls.updateSeekTooltip.call(this.player, event));
+        bind(this.player.elements.progress, 'mouseenter mouseleave mousemove', event =>
+            controls.updateSeekTooltip.call(this.player, event),
+        );
 
         // Update controls.hover state (used for ui.toggleControls to avoid hiding when interacting)
         bind(this.player.elements.controls, 'mouseenter mouseleave', event => {
@@ -665,7 +691,10 @@ class Listeners {
                 }
 
                 // Don't break page scrolling at max and min
-                if ((direction === 1 && this.player.media.volume < 1) || (direction === -1 && this.player.media.volume > 0)) {
+                if (
+                    (direction === 1 && this.player.media.volume < 1) ||
+                    (direction === -1 && this.player.media.volume > 0)
+                ) {
                     event.preventDefault();
                 }
             },

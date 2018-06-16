@@ -86,7 +86,11 @@ const ui = {
         ui.checkPlaying.call(this);
 
         // Check for picture-in-picture support
-        toggleClass(this.elements.container, this.config.classNames.pip.supported, support.pip && this.isHTML5 && this.isVideo);
+        toggleClass(
+            this.elements.container,
+            this.config.classNames.pip.supported,
+            support.pip && this.isHTML5 && this.isVideo,
+        );
 
         // Check for airplay support
         toggleClass(this.elements.container, this.config.classNames.airplay.supported, support.airplay && this.isHTML5);
@@ -174,32 +178,35 @@ const ui = {
         this.media.setAttribute('poster', poster);
 
         // Wait until ui is ready
-        return ready.call(this)
-            // Load image
-            .then(() => loadImage(poster))
-            .catch(err => {
-                // Hide poster on error unless it's been set by another call
-                if (poster === this.poster) {
-                    ui.togglePoster.call(this, false);
-                }
-                // Rethrow
-                throw err;
-            })
-            .then(() => {
-                // Prevent race conditions
-                if (poster !== this.poster) {
-                    throw new Error('setPoster cancelled by later call to setPoster');
-                }
-            })
-            .then(() => {
-                Object.assign(this.elements.poster.style, {
-                    backgroundImage: `url('${poster}')`,
-                    // Reset backgroundSize as well (since it can be set to "cover" for padded thumbnails for youtube)
-                    backgroundSize: '',
-                });
-                ui.togglePoster.call(this, true);
-                return poster;
-            });
+        return (
+            ready
+                .call(this)
+                // Load image
+                .then(() => loadImage(poster))
+                .catch(err => {
+                    // Hide poster on error unless it's been set by another call
+                    if (poster === this.poster) {
+                        ui.togglePoster.call(this, false);
+                    }
+                    // Rethrow
+                    throw err;
+                })
+                .then(() => {
+                    // Prevent race conditions
+                    if (poster !== this.poster) {
+                        throw new Error('setPoster cancelled by later call to setPoster');
+                    }
+                })
+                .then(() => {
+                    Object.assign(this.elements.poster.style, {
+                        backgroundImage: `url('${poster}')`,
+                        // Reset backgroundSize as well (since it can be set to "cover" for padded thumbnails for youtube)
+                        backgroundSize: '',
+                    });
+                    ui.togglePoster.call(this, true);
+                    return poster;
+                })
+        );
     },
 
     // Check playing state

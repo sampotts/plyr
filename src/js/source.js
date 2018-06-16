@@ -8,8 +8,8 @@ import media from './media';
 import support from './support';
 import ui from './ui';
 import { createElement, insertElement, removeElement } from './utils/elements';
-import { getDeep } from './utils/objects';
 import is from './utils/is';
+import { getDeep } from './utils/objects';
 
 const source = {
     // Add elements to HTML5 media (source, tracks, etc)

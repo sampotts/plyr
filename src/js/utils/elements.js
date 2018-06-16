@@ -218,7 +218,12 @@ export function matches(element, selector) {
         return Array.from(document.querySelectorAll(selector)).includes(this);
     }
 
-    const matches = prototype.matches || prototype.webkitMatchesSelector || prototype.mozMatchesSelector || prototype.msMatchesSelector || match;
+    const matches =
+        prototype.matches ||
+        prototype.webkitMatchesSelector ||
+        prototype.mozMatchesSelector ||
+        prototype.msMatchesSelector ||
+        match;
 
     return matches.call(element, selector);
 }

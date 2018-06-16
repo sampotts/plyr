@@ -6,12 +6,20 @@
 import controls from './controls';
 import i18n from './i18n';
 import support from './support';
+import { dedupe } from './utils/arrays';
 import browser from './utils/browser';
-import { createElement, emptyElement, getAttributesFromSelector, insertAfter, removeElement, toggleClass, toggleState } from './utils/elements';
+import {
+    createElement,
+    emptyElement,
+    getAttributesFromSelector,
+    insertAfter,
+    removeElement,
+    toggleClass,
+    toggleState,
+} from './utils/elements';
 import { on, triggerEvent } from './utils/events';
 import fetch from './utils/fetch';
 import is from './utils/is';
-import { dedupe } from './utils/arrays';
 import { getHTML } from './utils/strings';
 import { parseUrl } from './utils/urls';
 
@@ -26,7 +34,11 @@ const captions = {
         // Only Vimeo and HTML5 video supported at this point
         if (!this.isVideo || this.isYouTube || (this.isHTML5 && !support.textTracks)) {
             // Clear menu and hide
-            if (is.array(this.config.controls) && this.config.controls.includes('settings') && this.config.settings.includes('captions')) {
+            if (
+                is.array(this.config.controls) &&
+                this.config.controls.includes('settings') &&
+                this.config.settings.includes('captions')
+            ) {
                 controls.setCaptionsMenu.call(this);
             }
 
@@ -49,7 +61,11 @@ const captions = {
                 const src = track.getAttribute('src');
                 const url = parseUrl(src);
 
-                if (url !== null && url.hostname !== window.location.href.hostname && ['http:', 'https:'].includes(url.protocol)) {
+                if (
+                    url !== null &&
+                    url.hostname !== window.location.href.hostname &&
+                    ['http:', 'https:'].includes(url.protocol)
+                ) {
                     fetch(src, 'blob')
                         .then(blob => {
                             track.setAttribute('src', window.URL.createObjectURL(blob));
@@ -68,8 +84,9 @@ const captions = {
         // * active:    The state preferred by user settings or config
         // * toggled:   The real captions state
 
-        const languages = dedupe(Array.from(navigator.languages || navigator.userLanguage)
-            .map(language => language.split('-')[0]));
+        const languages = dedupe(
+            Array.from(navigator.languages || navigator.userLanguage).map(language => language.split('-')[0]),
+        );
 
         let language = (this.storage.get('language') || this.config.captions.language || 'auto').toLowerCase();
 
@@ -165,10 +182,7 @@ const captions = {
             // Force language if the call isn't passive and there is no matching language to toggle to
             if (!this.language && active && !passive) {
                 const tracks = captions.getTracks.call(this);
-                const track = captions.findTrack.call(this, [
-                    this.captions.language,
-                    ...this.captions.languages,
-                ], true);
+                const track = captions.findTrack.call(this, [this.captions.language, ...this.captions.languages], true);
 
                 // Override user preferences to avoid switching languages if a matching track is added
                 this.captions.language = track.language;

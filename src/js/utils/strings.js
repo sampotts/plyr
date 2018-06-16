@@ -29,7 +29,10 @@ export function getPercentage(current, max) {
 
 // Replace all occurances of a string in a string
 export function replaceAll(input = '', find = '', replace = '') {
-    return input.replace(new RegExp(find.toString().replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1'), 'g'), replace.toString());
+    return input.replace(
+        new RegExp(find.toString().replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1'), 'g'),
+        replace.toString(),
+    );
 }
 
 // Convert to title case

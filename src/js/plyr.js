@@ -679,7 +679,12 @@ class Plyr {
             return;
         }
 
-        let quality = [!is.empty(input) && Number(input), this.storage.get('quality'), config.selected, config.default].find(is.number);
+        let quality = [
+            !is.empty(input) && Number(input),
+            this.storage.get('quality'),
+            config.selected,
+            config.default,
+        ].find(is.number);
 
         if (!options.includes(quality)) {
             const value = closest(options, quality);

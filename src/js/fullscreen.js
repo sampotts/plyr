@@ -63,10 +63,15 @@ class Fullscreen {
 
         // Register event listeners
         // Handle event (incase user presses escape etc)
-        on.call(this.player, document, this.prefix === 'ms' ? 'MSFullscreenChange' : `${this.prefix}fullscreenchange`, () => {
-            // TODO: Filter for target??
-            onChange.call(this);
-        });
+        on.call(
+            this.player,
+            document,
+            this.prefix === 'ms' ? 'MSFullscreenChange' : `${this.prefix}fullscreenchange`,
+            () => {
+                // TODO: Filter for target??
+                onChange.call(this);
+            },
+        );
 
         // Fullscreen toggle on double click
         on.call(this.player, this.player.elements.container, 'dblclick', event => {
@@ -84,7 +89,12 @@ class Fullscreen {
 
     // Determine if native supported
     static get native() {
-        return !!(document.fullscreenEnabled || document.webkitFullscreenEnabled || document.mozFullScreenEnabled || document.msFullscreenEnabled);
+        return !!(
+            document.fullscreenEnabled ||
+            document.webkitFullscreenEnabled ||
+            document.mozFullScreenEnabled ||
+            document.msFullscreenEnabled
+        );
     }
 
     // Get the prefix for handlers
@@ -142,7 +152,9 @@ class Fullscreen {
 
     // Get target element
     get target() {
-        return browser.isIos && this.player.config.fullscreen.iosNative ? this.player.media : this.player.elements.container;
+        return browser.isIos && this.player.config.fullscreen.iosNative
+            ? this.player.media
+            : this.player.elements.container;
     }
 
     // Update UI
