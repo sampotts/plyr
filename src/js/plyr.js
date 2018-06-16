@@ -828,7 +828,7 @@ class Plyr {
      */
     toggleCaptions(input) {
         captions.toggle.call(this, input, false);
-        }
+    }
 
     /**
      * Set the caption track by index
@@ -1032,35 +1032,35 @@ class Plyr {
 
         // Provider specific stuff
         if (this.isHTML5) {
-                // Clear timeout
-                clearTimeout(this.timers.loading);
+            // Clear timeout
+            clearTimeout(this.timers.loading);
 
-                // Restore native video controls
-                ui.toggleNativeControls.call(this, true);
+            // Restore native video controls
+            ui.toggleNativeControls.call(this, true);
 
-                // Clean up
-                done();
+            // Clean up
+            done();
         } else if (this.isYouTube) {
-                // Clear timers
-                clearInterval(this.timers.buffering);
-                clearInterval(this.timers.playing);
+            // Clear timers
+            clearInterval(this.timers.buffering);
+            clearInterval(this.timers.playing);
 
-                // Destroy YouTube API
+            // Destroy YouTube API
             if (this.embed !== null && is.function(this.embed.destroy)) {
-                    this.embed.destroy();
-                }
+                this.embed.destroy();
+            }
 
-                // Clean up
-                done();
+            // Clean up
+            done();
         } else if (this.isVimeo) {
-                // Destroy Vimeo API
-                // then clean up (wait, to prevent postmessage errors)
-                if (this.embed !== null) {
-                    this.embed.unload().then(done);
-                }
+            // Destroy Vimeo API
+            // then clean up (wait, to prevent postmessage errors)
+            if (this.embed !== null) {
+                this.embed.unload().then(done);
+            }
 
-                // Vimeo does not always return
-                setTimeout(done, 200);
+            // Vimeo does not always return
+            setTimeout(done, 200);
         }
     }
 

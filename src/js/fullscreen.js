@@ -68,8 +68,8 @@ class Fullscreen {
             document,
             this.prefix === 'ms' ? 'MSFullscreenChange' : `${this.prefix}fullscreenchange`,
             () => {
-            // TODO: Filter for target??
-            onChange.call(this);
+                // TODO: Filter for target??
+                onChange.call(this);
             },
         );
 
