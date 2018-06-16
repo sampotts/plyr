@@ -7,6 +7,15 @@ import browser from './utils/browser';
 import { createElement } from './utils/elements';
 import is from './utils/is';
 
+// Default codecs for checking mimetype support
+const defaultCodecs = {
+    'audio/ogg': 'vorbis',
+    'audio/wav': '1',
+    'video/webm': 'vp8, vorbis',
+    'video/mp4': 'avc1.42E01E, mp4a.40.2',
+    'video/ogg': 'theora',
+};
+
 // Check for feature support
 const support = {
     // Basic support
@@ -16,31 +25,9 @@ const support = {
     // Check for support
     // Basic functionality vs full UI
     check(type, provider, playsinline) {
-        let api = false;
-        let ui = false;
         const canPlayInline = browser.isIPhone && playsinline && support.playsinline;
-
-        switch (`${provider}:${type}`) {
-            case 'html5:video':
-                api = support.video;
-                ui = api && support.rangeInput && (!browser.isIPhone || canPlayInline);
-                break;
-
-            case 'html5:audio':
-                api = support.audio;
-                ui = api && support.rangeInput;
-                break;
-
-            case 'youtube:video':
-            case 'vimeo:video':
-                api = true;
-                ui = support.rangeInput && (!browser.isIPhone || canPlayInline);
-                break;
-
-            default:
-                api = support.audio && support.video;
-                ui = api && support.rangeInput;
-        }
+        const api = support[type] || provider !== 'html5';
+        const ui = api && support.rangeInput && (type !== 'video' || !browser.isIPhone || canPlayInline);
 
         return {
             api,
@@ -63,56 +50,29 @@ const support = {
     // Check for mime type support against a player instance
     // Credits: http://diveintohtml5.info/everything.html
     // Related: http://www.leanbackplayer.com/test/h5mt.html
-    mime(type) {
-        const { media } = this;
-
-        try {
-            // Bail if no checking function
-            if (!this.isHTML5 || !is.function(media.canPlayType)) {
-                return false;
-            }
-
-            // Check directly if codecs specified
-            if (type.includes('codecs=')) {
-                return media.canPlayType(type).replace(/no/, '');
-            }
-
-            // Type specific checks
-            if (this.isVideo) {
-                switch (type) {
-                    case 'video/webm':
-                        return media.canPlayType('video/webm; codecs="vp8, vorbis"').replace(/no/, '');
-
-                    case 'video/mp4':
-                        return media.canPlayType('video/mp4; codecs="avc1.42E01E, mp4a.40.2"').replace(/no/, '');
-
-                    case 'video/ogg':
-                        return media.canPlayType('video/ogg; codecs="theora"').replace(/no/, '');
-
-                    default:
-                        return false;
-                }
-            } else if (this.isAudio) {
-                switch (type) {
-                    case 'audio/mpeg':
-                        return media.canPlayType('audio/mpeg;').replace(/no/, '');
-
-                    case 'audio/ogg':
-                        return media.canPlayType('audio/ogg; codecs="vorbis"').replace(/no/, '');
-
-                    case 'audio/wav':
-                        return media.canPlayType('audio/wav; codecs="1"').replace(/no/, '');
-
-                    default:
-                        return false;
-                }
-            }
-        } catch (e) {
+    mime(inputType) {
+        const [mediaType] = inputType.split('/');
+        if (!this.isHTML5 || mediaType !== this.type) {
             return false;
         }
 
-        // If we got this far, we're stuffed
-        return false;
+        let type;
+        if (inputType && inputType.includes('codecs=')) {
+            // Use input directly
+            type = inputType;
+        } else if (inputType === 'audio/mpeg') {
+            // Skip codec
+            type = 'audio/mpeg;';
+        } else if (inputType in defaultCodecs) {
+            // Use codec
+            type = `${inputType}; codecs="${defaultCodecs[inputType]}"`;
+        }
+
+        try {
+            return Boolean(type && this.media.canPlayType(type).replace(/no/, ''));
+        } catch (err) {
+            return false;
+        }
     },
 
     // Check for textTracks support

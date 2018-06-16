@@ -119,28 +119,17 @@ const controls = {
     },
 
     // Create hidden text label
-    createLabel(type, attr) {
-        let text = i18n.get(type, this.config);
-        const attributes = Object.assign({}, attr);
+    createLabel(type, attr = {}) {
+        // Skip i18n for abbreviations and brand names
+        const universals = {
+            pip: 'PIP',
+            airplay: 'AirPlay',
+        };
 
-        switch (type) {
-            case 'pip':
-                text = 'PIP';
-                break;
-
-            case 'airplay':
-                text = 'AirPlay';
-                break;
-
-            default:
-                break;
-        }
-
-        if ('class' in attributes) {
-            attributes.class += ` ${this.config.classNames.hidden}`;
-        } else {
-            attributes.class = this.config.classNames.hidden;
-        }
+        const text = universals[type] || i18n.get(type, this.config);
+        const attributes = Object.assign({}, attr, {
+            class: [attr.class, this.config.classNames.hidden].filter(Boolean).join(' '),
+        });
 
         return createElement('span', attributes, text);
     },
@@ -342,19 +331,12 @@ const controls = {
         if (type !== 'volume') {
             progress.appendChild(createElement('span', null, '0'));
 
-            let suffix = '';
-            switch (type) {
-                case 'played':
-                    suffix = i18n.get('played', this.config);
-                    break;
+            const suffixKey = ({
+                played: 'played',
+                buffer: 'buffered',
+            })[type];
 
-                case 'buffer':
-                    suffix = i18n.get('buffered', this.config);
-                    break;
-
-                default:
-                    break;
-            }
+            const suffix = suffixKey ? i18n.get(suffixKey, this.config) : '';
 
             progress.innerText = `% ${suffix.toLowerCase()}`;
         }
@@ -724,32 +706,27 @@ const controls = {
         let value = null;
         let list = container;
 
-        switch (setting) {
-            case 'captions':
-                value = this.currentTrack;
-                break;
+        if (setting === 'captions') {
+            value = this.currentTrack;
+        } else {
+            value = !is.empty(input) ? input : this[setting];
 
-            default:
-                value = !is.empty(input) ? input : this[setting];
+            // Get default
+            if (is.empty(value)) {
+                value = this.config[setting].default;
+            }
 
-                // Get default
-                if (is.empty(value)) {
-                    value = this.config[setting].default;
-                }
+            // Unsupported value
+            if (!is.empty(this.options[setting]) && !this.options[setting].includes(value)) {
+                this.debug.warn(`Unsupported value of '${value}' for ${setting}`);
+                return;
+            }
 
-                // Unsupported value
-                if (!is.empty(this.options[setting]) && !this.options[setting].includes(value)) {
-                    this.debug.warn(`Unsupported value of '${value}' for ${setting}`);
-                    return;
-                }
-
-                // Disabled value
-                if (!this.config[setting].options.includes(value)) {
-                    this.debug.warn(`Disabled value of '${value}' for ${setting}`);
-                    return;
-                }
-
-                break;
+            // Disabled value
+            if (!this.config[setting].options.includes(value)) {
+                this.debug.warn(`Disabled value of '${value}' for ${setting}`);
+                return;
+            }
         }
 
         // Get the list if we need to
