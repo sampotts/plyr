@@ -83,7 +83,7 @@ class Plyr {
             settings: {
                 popup: null,
                 menu: null,
-                menus: {},
+                panels: {},
                 buttons: {},
             },
         };

@@ -491,7 +491,7 @@ class Listeners {
 
             // Go back to home tab on click
             const showHomeTab = () => {
-                controls.showMenu.call(this.player, 'home');
+                controls.showMenuPanel.call(this.player, 'home');
             };
 
             // Settings menu items - use event delegation as items are added/removed
