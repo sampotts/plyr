@@ -661,6 +661,7 @@ const controls = {
     setQualityMenu(options) {
         // Menu required
         if (!is.element(this.elements.settings.panels.quality)) {
+            console.warn('Not an element');
             return;
         }
 
@@ -673,6 +674,7 @@ const controls = {
         }
 
         // Toggle the pane and tab
+        console.warn(this.options.quality);
         const toggle = !is.empty(this.options.quality) && this.options.quality.length > 1;
         controls.toggleMenuButton.call(this, type, toggle);
 
@@ -1073,7 +1075,10 @@ const controls = {
         toggleHidden(target, false);
 
         // Focus the first item
-        target.querySelectorAll('[role^="menuitem"]')[0].focus();
+        const firstItem = target.querySelector('[role^="menuitem"]');
+        if (firstItem) {
+            firstItem.focus();
+        }
     },
 
     // Build the default HTML

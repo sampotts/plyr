@@ -1957,6 +1957,7 @@ typeof navigator === "object" && (function (global, factory) {
 
             // Menu required
             if (!is.element(this.elements.settings.panels.quality)) {
+                console.warn('Not an element');
                 return;
             }
 
@@ -1971,6 +1972,7 @@ typeof navigator === "object" && (function (global, factory) {
             }
 
             // Toggle the pane and tab
+            console.warn(this.options.quality);
             var toggle = !is.empty(this.options.quality) && this.options.quality.length > 1;
             controls.toggleMenuButton.call(this, type, toggle);
 
@@ -2387,7 +2389,10 @@ typeof navigator === "object" && (function (global, factory) {
             toggleHidden(target, false);
 
             // Focus the first item
-            target.querySelectorAll('[role^="menuitem"]')[0].focus();
+            var firstItem = target.querySelector('[role^="menuitem"]');
+            if (firstItem) {
+                firstItem.focus();
+            }
         },
 
 
@@ -3990,11 +3995,9 @@ typeof navigator === "object" && (function (global, factory) {
             }
 
             // If there's a play button, set label
-            if (is.nodeList(this.elements.buttons.play)) {
-                Array.from(this.elements.buttons.play).forEach(function (button) {
-                    button.setAttribute('aria-label', label);
-                });
-            }
+            Array.from(this.elements.buttons.play || []).forEach(function (button) {
+                button.setAttribute('aria-label', label);
+            });
 
             // Set iframe title
             // https://github.com/sampotts/plyr/issues/124
@@ -4074,11 +4077,9 @@ typeof navigator === "object" && (function (global, factory) {
             toggleClass(this.elements.container, this.config.classNames.stopped, this.stopped);
 
             // Set state
-            if (is.nodeList(this.elements.buttons.play)) {
-                Array.from(this.elements.buttons.play).forEach(function (target) {
-                    target.pressed = _this3.playing;
-                });
-            }
+            Array.from(this.elements.buttons.play || []).forEach(function (target) {
+                target.pressed = _this3.playing;
+            });
 
             // Only update controls on non timeupdate events
             if (is.event(event) && event.type === 'timeupdate') {
