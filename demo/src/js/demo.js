@@ -143,7 +143,11 @@ import Raven from 'raven-js';
             // Set a new source
             function newSource(type, init) {
                 // Bail if new type isn't known, it's the current type, or current type is empty (video is default) and new type is video
-                if (!(type in types) || (!init && type === currentType) || (!currentType.length && type === types.video)) {
+                if (
+                    !(type in types) ||
+                    (!init && type === currentType) ||
+                    (!currentType.length && type === types.video)
+                ) {
                     return;
                 }
 
@@ -215,10 +219,12 @@ import Raven from 'raven-js';
                     case types.youtube:
                         player.source = {
                             type: 'video',
-                            sources: [{
-                                src: 'https://youtube.com/watch?v=bTqVqk7FSmY',
-                                provider: 'youtube',
-                            }],
+                            sources: [
+                                {
+                                    src: 'https://youtube.com/watch?v=bTqVqk7FSmY',
+                                    provider: 'youtube',
+                                },
+                            ],
                         };
 
                         break;
@@ -226,10 +232,12 @@ import Raven from 'raven-js';
                     case types.vimeo:
                         player.source = {
                             type: 'video',
-                            sources: [{
-                                src: 'https://vimeo.com/76979871',
-                                provider: 'vimeo',
-                            }],
+                            sources: [
+                                {
+                                    src: 'https://vimeo.com/76979871',
+                                    provider: 'vimeo',
+                                },
+                            ],
                         };
 
                         break;

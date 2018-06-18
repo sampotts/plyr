@@ -1138,6 +1138,51 @@ typeof navigator === "object" && (function (global, factory) {
     }();
 
     // ==========================================================================
+    // Fetch wrapper
+    // Using XHR to avoid issues with older browsers
+    // ==========================================================================
+
+    function fetch(url) {
+        var responseType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'text';
+
+        return new Promise(function (resolve, reject) {
+            try {
+                var request = new XMLHttpRequest();
+
+                // Check for CORS support
+                if (!('withCredentials' in request)) {
+                    return;
+                }
+
+                request.addEventListener('load', function () {
+                    if (responseType === 'text') {
+                        try {
+                            resolve(JSON.parse(request.responseText));
+                        } catch (e) {
+                            resolve(request.responseText);
+                        }
+                    } else {
+                        resolve(request.response);
+                    }
+                });
+
+                request.addEventListener('error', function () {
+                    throw new Error(request.status);
+                });
+
+                request.open('GET', url, true);
+
+                // Set the required response type
+                request.responseType = responseType;
+
+                request.send();
+            } catch (e) {
+                reject(e);
+            }
+        });
+    }
+
+    // ==========================================================================
 
     // Load an external SVG sprite
     function loadSprite(url, id) {
@@ -2710,51 +2755,6 @@ typeof navigator === "object" && (function (global, factory) {
     };
 
     // ==========================================================================
-    // Fetch wrapper
-    // Using XHR to avoid issues with older browsers
-    // ==========================================================================
-
-    function fetch$1(url) {
-        var responseType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'text';
-
-        return new Promise(function (resolve, reject) {
-            try {
-                var request = new XMLHttpRequest();
-
-                // Check for CORS support
-                if (!('withCredentials' in request)) {
-                    return;
-                }
-
-                request.addEventListener('load', function () {
-                    if (responseType === 'text') {
-                        try {
-                            resolve(JSON.parse(request.responseText));
-                        } catch (e) {
-                            resolve(request.responseText);
-                        }
-                    } else {
-                        resolve(request.response);
-                    }
-                });
-
-                request.addEventListener('error', function () {
-                    throw new Error(request.statusText);
-                });
-
-                request.open('GET', url, true);
-
-                // Set the required response type
-                request.responseType = responseType;
-
-                request.send();
-            } catch (e) {
-                reject(e);
-            }
-        });
-    }
-
-    // ==========================================================================
 
     /**
      * Parse a string to a URL object
@@ -2833,7 +2833,7 @@ typeof navigator === "object" && (function (global, factory) {
                     var url = parseUrl(src);
 
                     if (url !== null && url.hostname !== window.location.href.hostname && ['http:', 'https:'].includes(url.protocol)) {
-                        fetch$1(src, 'blob').then(function (blob) {
+                        fetch(src, 'blob').then(function (blob) {
                             track.setAttribute('src', window.URL.createObjectURL(blob));
                         }).catch(function () {
                             removeElement(track);
@@ -5253,7 +5253,7 @@ typeof navigator === "object" && (function (global, factory) {
             player.media = replaceElement(wrapper, player.media);
 
             // Get poster image
-            fetch$1(format(player.config.urls.vimeo.api, id), 'json').then(function (response) {
+            fetch(format(player.config.urls.vimeo.api, id), 'json').then(function (response) {
                 if (is.empty(response)) {
                     return;
                 }
@@ -5668,7 +5668,7 @@ typeof navigator === "object" && (function (global, factory) {
             if (is.string(key) && !is.empty(key)) {
                 var url = format(this.config.urls.youtube.api, videoId, key);
 
-                fetch$1(url).then(function (result) {
+                fetch(url).then(function (result) {
                     if (is.object(result)) {
                         _this2.config.title = result.items[0].snippet.title;
                         ui.setTitle.call(_this2);

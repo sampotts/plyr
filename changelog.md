@@ -1,3 +1,7 @@
+# v3.3.14
+
+-   Fix sprite loading regression
+
 # v3.3.13
 
 You guessed it, a load of awesome changes from contributors:
