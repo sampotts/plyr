@@ -135,11 +135,9 @@ const ui = {
         }
 
         // If there's a play button, set label
-        if (is.nodeList(this.elements.buttons.play)) {
-            Array.from(this.elements.buttons.play).forEach(button => {
-                button.setAttribute('aria-label', label);
-            });
-        }
+        Array.from(this.elements.buttons.play || []).forEach(button => {
+            button.setAttribute('aria-label', label);
+        });
 
         // Set iframe title
         // https://github.com/sampotts/plyr/issues/124
@@ -214,11 +212,9 @@ const ui = {
         toggleClass(this.elements.container, this.config.classNames.stopped, this.stopped);
 
         // Set state
-        if (is.nodeList(this.elements.buttons.play)) {
-            Array.from(this.elements.buttons.play).forEach(target => {
-                target.pressed = this.playing;
-            });
-        }
+        Array.from(this.elements.buttons.play || []).forEach(target => {
+            target.pressed = this.playing;
+        });
 
         // Only update controls on non timeupdate events
         if (is.event(event) && event.type === 'timeupdate') {
