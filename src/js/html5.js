@@ -39,7 +39,7 @@ const html5 = {
             get() {
                 // Get sources
                 const sources = html5.getSources.call(player);
-                const [source] = sources.filter(source => source.getAttribute('src') === player.source);
+                const source = sources.find(source => source.getAttribute('src') === player.source);
 
                 // Return size, if match is found
                 return source && Number(source.getAttribute('size'));
