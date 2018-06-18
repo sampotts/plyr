@@ -6,14 +6,31 @@ import captions from './captions';
 import html5 from './html5';
 import i18n from './i18n';
 import support from './support';
-import utils from './utils';
+import { repaint, transitionEndEvent } from './utils/animation';
+import { dedupe } from './utils/arrays';
+import browser from './utils/browser';
+import {
+    createElement,
+    emptyElement,
+    getAttributesFromSelector,
+    getElement,
+    getElements,
+    hasClass,
+    removeElement,
+    setAttributes,
+    toggleClass,
+    toggleHidden,
+    matches,
+} from './utils/elements';
+import { off, on } from './utils/events';
+import is from './utils/is';
+import loadSprite from './utils/loadSprite';
+import { extend } from './utils/objects';
+import { getPercentage, replaceAll, toCamelCase, toTitleCase } from './utils/strings';
+import { formatTime, getHours } from './utils/time';
 
-// Sniff out the browser
-const browser = utils.getBrowser();
-
+// TODO: Don't export a massive object - break down and create class
 const controls = {
-
-
     // Get icon URL
     getIconUrl() {
         const url = new URL(this.config.iconUrl, window.location);
@@ -25,46 +42,47 @@ const controls = {
         };
     },
 
-    // Find the UI controls and store references in custom controls
-    // TODO: Allow settings menus with custom controls
+    // Find the UI controls
     findElements() {
         try {
-            this.elements.controls = utils.getElement.call(this, this.config.selectors.controls.wrapper);
+            this.elements.controls = getElement.call(this, this.config.selectors.controls.wrapper);
 
             // Buttons
             this.elements.buttons = {
-                play: utils.getElements.call(this, this.config.selectors.buttons.play),
-                pause: utils.getElement.call(this, this.config.selectors.buttons.pause),
-                restart: utils.getElement.call(this, this.config.selectors.buttons.restart),
-                rewind: utils.getElement.call(this, this.config.selectors.buttons.rewind),
-                fastForward: utils.getElement.call(this, this.config.selectors.buttons.fastForward),
-                mute: utils.getElement.call(this, this.config.selectors.buttons.mute),
-                pip: utils.getElement.call(this, this.config.selectors.buttons.pip),
-                airplay: utils.getElement.call(this, this.config.selectors.buttons.airplay),
-                settings: utils.getElement.call(this, this.config.selectors.buttons.settings),
-                captions: utils.getElement.call(this, this.config.selectors.buttons.captions),
-                fullscreen: utils.getElement.call(this, this.config.selectors.buttons.fullscreen),
+                play: getElements.call(this, this.config.selectors.buttons.play),
+                pause: getElement.call(this, this.config.selectors.buttons.pause),
+                restart: getElement.call(this, this.config.selectors.buttons.restart),
+                rewind: getElement.call(this, this.config.selectors.buttons.rewind),
+                fastForward: getElement.call(this, this.config.selectors.buttons.fastForward),
+                mute: getElement.call(this, this.config.selectors.buttons.mute),
+                pip: getElement.call(this, this.config.selectors.buttons.pip),
+                airplay: getElement.call(this, this.config.selectors.buttons.airplay),
+                settings: getElement.call(this, this.config.selectors.buttons.settings),
+                captions: getElement.call(this, this.config.selectors.buttons.captions),
+                fullscreen: getElement.call(this, this.config.selectors.buttons.fullscreen),
             };
 
             // Progress
-            this.elements.progress = utils.getElement.call(this, this.config.selectors.progress);
+            this.elements.progress = getElement.call(this, this.config.selectors.progress);
 
             // Inputs
             this.elements.inputs = {
-                seek: utils.getElement.call(this, this.config.selectors.inputs.seek),
-                volume: utils.getElement.call(this, this.config.selectors.inputs.volume),
+                seek: getElement.call(this, this.config.selectors.inputs.seek),
+                volume: getElement.call(this, this.config.selectors.inputs.volume),
             };
 
             // Display
             this.elements.display = {
-                buffer: utils.getElement.call(this, this.config.selectors.display.buffer),
-                currentTime: utils.getElement.call(this, this.config.selectors.display.currentTime),
-                duration: utils.getElement.call(this, this.config.selectors.display.duration),
+                buffer: getElement.call(this, this.config.selectors.display.buffer),
+                currentTime: getElement.call(this, this.config.selectors.display.currentTime),
+                duration: getElement.call(this, this.config.selectors.display.duration),
             };
 
             // Seek tooltip
-            if (utils.is.element(this.elements.progress)) {
-                this.elements.display.seekTooltip = this.elements.progress.querySelector(`.${this.config.classNames.tooltip}`);
+            if (is.element(this.elements.progress)) {
+                this.elements.display.seekTooltip = this.elements.progress.querySelector(
+                    `.${this.config.classNames.tooltip}`,
+                );
             }
 
             return true;
@@ -87,9 +105,9 @@ const controls = {
 
         // Create <svg>
         const icon = document.createElementNS(namespace, 'svg');
-        utils.setAttributes(
+        setAttributes(
             icon,
-            utils.extend(attributes, {
+            extend(attributes, {
                 role: 'presentation',
                 focusable: 'false',
             }),
@@ -115,44 +133,32 @@ const controls = {
     },
 
     // Create hidden text label
-    createLabel(type, attr) {
-        let text = i18n.get(type, this.config);
-        const attributes = Object.assign({}, attr);
+    createLabel(type, attr = {}) {
+        // Skip i18n for abbreviations and brand names
+        const universals = {
+            pip: 'PIP',
+            airplay: 'AirPlay',
+        };
+        const text = universals[type] || i18n.get(type, this.config);
 
-        switch (type) {
-            case 'pip':
-                text = 'PIP';
-                break;
-
-            case 'airplay':
-                text = 'AirPlay';
-                break;
-
-            default:
-                break;
-        }
-
-        if ('class' in attributes) {
-            attributes.class += ` ${this.config.classNames.hidden}`;
-        } else {
-            attributes.class = this.config.classNames.hidden;
-        }
-
-        return utils.createElement('span', attributes, text);
+        const attributes = Object.assign({}, attr, {
+            class: [attr.class, this.config.classNames.hidden].filter(Boolean).join(' '),
+        });
+        return createElement('span', attributes, text);
     },
 
     // Create a badge
     createBadge(text) {
-        if (utils.is.empty(text)) {
+        if (is.empty(text)) {
             return null;
         }
 
-        const badge = utils.createElement('span', {
+        const badge = createElement('span', {
             class: this.config.classNames.menu.value,
         });
 
         badge.appendChild(
-            utils.createElement(
+            createElement(
                 'span',
                 {
                     class: this.config.classNames.menu.badge,
@@ -166,9 +172,9 @@ const controls = {
 
     // Create a <button>
     createButton(buttonType, attr) {
-        const button = utils.createElement('button');
+        const button = createElement('button');
         const attributes = Object.assign({}, attr);
-        let type = utils.toCamelCase(buttonType);
+        let type = toCamelCase(buttonType);
 
         let toggle = false;
         let label;
@@ -243,22 +249,19 @@ const controls = {
             // Label/Tooltip
             button.appendChild(controls.createLabel.call(this, labelPressed, { class: 'label--pressed' }));
             button.appendChild(controls.createLabel.call(this, label, { class: 'label--not-pressed' }));
-
-            // Add aria attributes
-            attributes['aria-pressed'] = false;
         } else {
             button.appendChild(controls.createIcon.call(this, icon));
             button.appendChild(controls.createLabel.call(this, label));
         }
 
         // Merge attributes
-        utils.extend(attributes, utils.getAttributesFromSelector(this.config.selectors.buttons[type], attributes));
+        extend(attributes, getAttributesFromSelector(this.config.selectors.buttons[type], attributes));
 
-        utils.setAttributes(button, attributes);
+        setAttributes(button, attributes);
 
         // We have multiple play buttons
         if (type === 'play') {
-            if (!utils.is.array(this.elements.buttons[type])) {
+            if (!is.array(this.elements.buttons[type])) {
                 this.elements.buttons[type] = [];
             }
 
@@ -267,27 +270,28 @@ const controls = {
             this.elements.buttons[type] = button;
         }
 
+        // Toggle classname when pressed property is set
+        const className = this.config.classNames.controlPressed;
+        Object.defineProperty(button, 'pressed', {
+            enumerable: true,
+            get() {
+                return hasClass(button, className);
+            },
+            set(pressed = false) {
+                toggleClass(button, className, pressed);
+            },
+        });
+
         return button;
     },
 
     // Create an <input type='range'>
     createRange(type, attributes) {
-        // Seek label
-        const label = utils.createElement(
-            'label',
-            {
-                for: attributes.id,
-                id: `${attributes.id}-label`,
-                class: this.config.classNames.hidden,
-            },
-            i18n.get(type, this.config),
-        );
-
         // Seek input
-        const input = utils.createElement(
+        const input = createElement(
             'input',
-            utils.extend(
-                utils.getAttributesFromSelector(this.config.selectors.inputs[type]),
+            extend(
+                getAttributesFromSelector(this.config.selectors.inputs[type]),
                 {
                     type: 'range',
                     min: 0,
@@ -297,7 +301,7 @@ const controls = {
                     autocomplete: 'off',
                     // A11y fixes for https://github.com/sampotts/plyr/issues/905
                     role: 'slider',
-                    'aria-labelledby': `${attributes.id}-label`,
+                    'aria-label': i18n.get(type, this.config),
                     'aria-valuemin': 0,
                     'aria-valuemax': 100,
                     'aria-valuenow': 0,
@@ -311,18 +315,15 @@ const controls = {
         // Set the fill for webkit now
         controls.updateRangeFill.call(this, input);
 
-        return {
-            label,
-            input,
-        };
+        return input;
     },
 
     // Create a <progress>
     createProgress(type, attributes) {
-        const progress = utils.createElement(
+        const progress = createElement(
             'progress',
-            utils.extend(
-                utils.getAttributesFromSelector(this.config.selectors.display[type]),
+            extend(
+                getAttributesFromSelector(this.config.selectors.display[type]),
                 {
                     min: 0,
                     max: 100,
@@ -336,21 +337,13 @@ const controls = {
 
         // Create the label inside
         if (type !== 'volume') {
-            progress.appendChild(utils.createElement('span', null, '0'));
+            progress.appendChild(createElement('span', null, '0'));
 
-            let suffix = '';
-            switch (type) {
-                case 'played':
-                    suffix = i18n.get('played', this.config);
-                    break;
-
-                case 'buffer':
-                    suffix = i18n.get('buffered', this.config);
-                    break;
-
-                default:
-                    break;
-            }
+            const suffixKey = {
+                played: 'played',
+                buffer: 'buffered',
+            }[type];
+            const suffix = suffixKey ? i18n.get(suffixKey, this.config) : '';
 
             progress.innerText = `% ${suffix.toLowerCase()}`;
         }
@@ -362,12 +355,16 @@ const controls = {
 
     // Create time display
     createTime(type) {
-        const attributes = utils.getAttributesFromSelector(this.config.selectors.display[type]);
+        const attributes = getAttributesFromSelector(this.config.selectors.display[type]);
 
-        const container = utils.createElement('div', utils.extend(attributes, {
-            class: `plyr__time ${attributes.class}`,
-            'aria-label': i18n.get(type, this.config),
-        }), '00:00');
+        const container = createElement(
+            'div',
+            extend(attributes, {
+                class: `plyr__time ${attributes.class}`,
+                'aria-label': i18n.get(type, this.config),
+            }),
+            '00:00',
+        );
 
         // Reference for updates
         this.elements.display[type] = container;
@@ -376,16 +373,16 @@ const controls = {
     },
 
     // Create a settings menu item
-    createMenuItem({value, list, type, title, badge = null, checked = false}) {
-        const item = utils.createElement('li');
+    createMenuItem({ value, list, type, title, badge = null, checked = false }) {
+        const item = createElement('li');
 
-        const label = utils.createElement('label', {
+        const label = createElement('label', {
             class: this.config.classNames.control,
         });
 
-        const radio = utils.createElement(
+        const radio = createElement(
             'input',
-            utils.extend(utils.getAttributesFromSelector(this.config.selectors.inputs[type]), {
+            extend(getAttributesFromSelector(this.config.selectors.inputs[type]), {
                 type: 'radio',
                 name: `plyr-${type}`,
                 value,
@@ -394,13 +391,13 @@ const controls = {
             }),
         );
 
-        const faux = utils.createElement('span', { hidden: '' });
+        const faux = createElement('span', { hidden: '' });
 
         label.appendChild(radio);
         label.appendChild(faux);
         label.insertAdjacentHTML('beforeend', title);
 
-        if (utils.is.element(badge)) {
+        if (is.element(badge)) {
             label.appendChild(badge);
         }
 
@@ -408,18 +405,28 @@ const controls = {
         list.appendChild(item);
     },
 
-    // Update the displayed time
-    updateTimeDisplay(target = null, time = 0, inverted = false) {
-        // Bail if there's no element to display or the value isn't a number
-        if (!utils.is.element(target) || !utils.is.number(time)) {
-            return;
+    // Format a time for display
+    formatTime(time = 0, inverted = false) {
+        // Bail if the value isn't a number
+        if (!is.number(time)) {
+            return time;
         }
 
         // Always display hours if duration is over an hour
-        const forceHours = utils.getHours(this.duration) > 0;
+        const forceHours = getHours(this.duration) > 0;
+
+        return formatTime(time, forceHours, inverted);
+    },
+
+    // Update the displayed time
+    updateTimeDisplay(target = null, time = 0, inverted = false) {
+        // Bail if there's no element to display or the value isn't a number
+        if (!is.element(target) || !is.number(time)) {
+            return;
+        }
 
         // eslint-disable-next-line no-param-reassign
-        target.innerText = utils.formatTime(time, forceHours, inverted);
+        target.innerText = controls.formatTime(time, inverted);
     },
 
     // Update volume UI and storage
@@ -429,19 +436,19 @@ const controls = {
         }
 
         // Update range
-        if (utils.is.element(this.elements.inputs.volume)) {
+        if (is.element(this.elements.inputs.volume)) {
             controls.setRange.call(this, this.elements.inputs.volume, this.muted ? 0 : this.volume);
         }
 
         // Update mute state
-        if (utils.is.element(this.elements.buttons.mute)) {
-            utils.toggleState(this.elements.buttons.mute, this.muted || this.volume === 0);
+        if (is.element(this.elements.buttons.mute)) {
+            this.elements.buttons.mute.pressed = this.muted || this.volume === 0;
         }
     },
 
     // Update seek value and lower fill
     setRange(target, value = 0) {
-        if (!utils.is.element(target)) {
+        if (!is.element(target)) {
             return;
         }
 
@@ -454,23 +461,23 @@ const controls = {
 
     // Update <progress> elements
     updateProgress(event) {
-        if (!this.supported.ui || !utils.is.event(event)) {
+        if (!this.supported.ui || !is.event(event)) {
             return;
         }
 
         let value = 0;
 
         const setProgress = (target, input) => {
-            const value = utils.is.number(input) ? input : 0;
-            const progress = utils.is.element(target) ? target : this.elements.display.buffer;
+            const value = is.number(input) ? input : 0;
+            const progress = is.element(target) ? target : this.elements.display.buffer;
 
             // Update value and label
-            if (utils.is.element(progress)) {
+            if (is.element(progress)) {
                 progress.value = value;
 
                 // Update text label inside
                 const label = progress.getElementsByTagName('span')[0];
-                if (utils.is.element(label)) {
+                if (is.element(label)) {
                     label.childNodes[0].nodeValue = value;
                 }
             }
@@ -482,7 +489,7 @@ const controls = {
                 case 'timeupdate':
                 case 'seeking':
                 case 'seeked':
-                    value = utils.getPercentage(this.currentTime, this.duration);
+                    value = getPercentage(this.currentTime, this.duration);
 
                     // Set seek range value only if it's a 'natural' time event
                     if (event.type === 'timeupdate') {
@@ -507,15 +514,30 @@ const controls = {
     // Webkit polyfill for lower fill range
     updateRangeFill(target) {
         // Get range from event if event passed
-        const range = utils.is.event(target) ? target.target : target;
+        const range = is.event(target) ? target.target : target;
 
         // Needs to be a valid <input type='range'>
-        if (!utils.is.element(range) || range.getAttribute('type') !== 'range') {
+        if (!is.element(range) || range.getAttribute('type') !== 'range') {
             return;
         }
 
-        // Set aria value for https://github.com/sampotts/plyr/issues/905
-        range.setAttribute('aria-valuenow', range.value);
+        // Set aria values for https://github.com/sampotts/plyr/issues/905
+        if (matches(range, this.config.selectors.inputs.seek)) {
+            range.setAttribute('aria-valuenow', this.currentTime);
+            const currentTime = controls.formatTime(this.currentTime);
+            const duration = controls.formatTime(this.duration);
+            const format = i18n.get('seekLabel', this.config);
+            range.setAttribute(
+                'aria-valuetext',
+                format.replace('{currentTime}', currentTime).replace('{duration}', duration),
+            );
+        } else if (matches(range, this.config.selectors.inputs.volume)) {
+            const percent = range.value * 100;
+            range.setAttribute('aria-valuenow', percent);
+            range.setAttribute('aria-valuetext', `${percent}%`);
+        } else {
+            range.setAttribute('aria-valuenow', range.value);
+        }
 
         // WebKit only
         if (!browser.isWebkit) {
@@ -531,8 +553,8 @@ const controls = {
         // Bail if setting not true
         if (
             !this.config.tooltips.seek ||
-            !utils.is.element(this.elements.inputs.seek) ||
-            !utils.is.element(this.elements.display.seekTooltip) ||
+            !is.element(this.elements.inputs.seek) ||
+            !is.element(this.elements.display.seekTooltip) ||
             this.duration === 0
         ) {
             return;
@@ -544,7 +566,7 @@ const controls = {
         const visible = `${this.config.classNames.tooltip}--visible`;
 
         const toggle = toggle => {
-            utils.toggleClass(this.elements.display.seekTooltip, visible, toggle);
+            toggleClass(this.elements.display.seekTooltip, visible, toggle);
         };
 
         // Hide on touch
@@ -554,9 +576,9 @@ const controls = {
         }
 
         // Determine percentage, if already visible
-        if (utils.is.event(event)) {
+        if (is.event(event)) {
             percent = 100 / clientRect.width * (event.pageX - clientRect.left);
-        } else if (utils.hasClass(this.elements.display.seekTooltip, visible)) {
+        } else if (hasClass(this.elements.display.seekTooltip, visible)) {
             percent = parseFloat(this.elements.display.seekTooltip.style.left, 10);
         } else {
             return;
@@ -577,10 +599,7 @@ const controls = {
 
         // Show/hide the tooltip
         // If the event is a moues in/out and percentage is inside bounds
-        if (utils.is.event(event) && [
-            'mouseenter',
-            'mouseleave',
-        ].includes(event.type)) {
+        if (is.event(event) && ['mouseenter', 'mouseleave'].includes(event.type)) {
             toggle(event.type === 'mouseenter');
         }
     },
@@ -588,10 +607,15 @@ const controls = {
     // Handle time change event
     timeUpdate(event) {
         // Only invert if only one time element is displayed and used for both duration and currentTime
-        const invert = !utils.is.element(this.elements.display.duration) && this.config.invertTime;
+        const invert = !is.element(this.elements.display.duration) && this.config.invertTime;
 
         // Duration
-        controls.updateTimeDisplay.call(this, this.elements.display.currentTime, invert ? this.duration - this.currentTime : this.currentTime, invert);
+        controls.updateTimeDisplay.call(
+            this,
+            this.elements.display.currentTime,
+            invert ? this.duration - this.currentTime : this.currentTime,
+            invert,
+        );
 
         // Ignore updates while seeking
         if (event && event.type === 'timeupdate' && this.media.seeking) {
@@ -604,13 +628,18 @@ const controls = {
 
     // Show the duration on metadataloaded or durationchange events
     durationUpdate() {
-        // Bail if no ui or durationchange event triggered after playing/seek when invertTime is false
+        // Bail if no UI or durationchange event triggered after playing/seek when invertTime is false
         if (!this.supported.ui || (!this.config.invertTime && this.currentTime)) {
             return;
         }
 
+        // Update ARIA values
+        if (is.element(this.elements.inputs.seek)) {
+            this.elements.inputs.seek.setAttribute('aria-valuemax', this.duration);
+        }
+
         // If there's a spot to display duration
-        const hasDuration = utils.is.element(this.elements.display.duration);
+        const hasDuration = is.element(this.elements.display.duration);
 
         // If there's only one time display, display duration there
         if (!hasDuration && this.config.displayDuration && this.paused) {
@@ -628,27 +657,26 @@ const controls = {
 
     // Hide/show a tab
     toggleTab(setting, toggle) {
-        utils.toggleHidden(this.elements.settings.tabs[setting], !toggle);
+        toggleHidden(this.elements.settings.tabs[setting], !toggle);
     },
 
     // Set the quality menu
-    // TODO: Vimeo support
     setQualityMenu(options) {
         // Menu required
-        if (!utils.is.element(this.elements.settings.panes.quality)) {
+        if (!is.element(this.elements.settings.panes.quality)) {
             return;
         }
 
         const type = 'quality';
         const list = this.elements.settings.panes.quality.querySelector('ul');
 
-        // Set options if passed and filter based on config
-        if (utils.is.array(options)) {
-            this.options.quality = options.filter(quality => this.config.quality.options.includes(quality));
+        // Set options if passed and filter based on uniqueness and config
+        if (is.array(options)) {
+            this.options.quality = dedupe(options).filter(quality => this.config.quality.options.includes(quality));
         }
 
         // Toggle the pane and tab
-        const toggle = !utils.is.empty(this.options.quality) && this.options.quality.length > 1;
+        const toggle = !is.empty(this.options.quality) && this.options.quality.length > 1;
         controls.toggleTab.call(this, type, toggle);
 
         // Check if we need to toggle the parent
@@ -660,7 +688,7 @@ const controls = {
         }
 
         // Empty the menu
-        utils.emptyElement(list);
+        emptyElement(list);
 
         // Get the badge HTML for HD, 4K etc
         const getBadge = quality => {
@@ -699,7 +727,7 @@ const controls = {
                 return value === 1 ? i18n.get('normal', this.config) : `${value}&times;`;
 
             case 'quality':
-                if (utils.is.number(value)) {
+                if (is.number(value)) {
                     const label = i18n.get(`qualityLabel.${value}`, this.config);
 
                     if (!label.length) {
@@ -709,7 +737,7 @@ const controls = {
                     return label;
                 }
 
-                return utils.toTitleCase(value);
+                return toTitleCase(value);
 
             case 'captions':
                 return captions.getLabel.call(this);
@@ -725,41 +753,36 @@ const controls = {
         let value = null;
         let list = container;
 
-        switch (setting) {
-            case 'captions':
-                value = this.currentTrack;
-                break;
+        if (setting === 'captions') {
+            value = this.currentTrack;
+        } else {
+            value = !is.empty(input) ? input : this[setting];
 
-            default:
-                value = !utils.is.empty(input) ? input : this[setting];
+            // Get default
+            if (is.empty(value)) {
+                value = this.config[setting].default;
+            }
 
-                // Get default
-                if (utils.is.empty(value)) {
-                    value = this.config[setting].default;
-                }
+            // Unsupported value
+            if (!is.empty(this.options[setting]) && !this.options[setting].includes(value)) {
+                this.debug.warn(`Unsupported value of '${value}' for ${setting}`);
+                return;
+            }
 
-                // Unsupported value
-                if (!utils.is.empty(this.options[setting]) && !this.options[setting].includes(value)) {
-                    this.debug.warn(`Unsupported value of '${value}' for ${setting}`);
-                    return;
-                }
-
-                // Disabled value
-                if (!this.config[setting].options.includes(value)) {
-                    this.debug.warn(`Disabled value of '${value}' for ${setting}`);
-                    return;
-                }
-
-                break;
+            // Disabled value
+            if (!this.config[setting].options.includes(value)) {
+                this.debug.warn(`Disabled value of '${value}' for ${setting}`);
+                return;
+            }
         }
 
         // Get the list if we need to
-        if (!utils.is.element(list)) {
+        if (!is.element(list)) {
             list = pane && pane.querySelector('ul');
         }
 
         // If there's no list it means it's not been rendered...
-        if (!utils.is.element(list)) {
+        if (!is.element(list)) {
             return;
         }
 
@@ -770,7 +793,7 @@ const controls = {
         // Find the radio option and check it
         const target = list && list.querySelector(`input[value="${value}"]`);
 
-        if (utils.is.element(target)) {
+        if (is.element(target)) {
             target.checked = true;
         }
     },
@@ -778,7 +801,7 @@ const controls = {
     // Set the looping options
     /* setLoopMenu() {
         // Menu required
-        if (!utils.is.element(this.elements.settings.panes.loop)) {
+        if (!is.element(this.elements.settings.panes.loop)) {
             return;
         }
 
@@ -786,22 +809,22 @@ const controls = {
         const list = this.elements.settings.panes.loop.querySelector('ul');
 
         // Show the pane and tab
-        utils.toggleHidden(this.elements.settings.tabs.loop, false);
-        utils.toggleHidden(this.elements.settings.panes.loop, false);
+        toggleHidden(this.elements.settings.tabs.loop, false);
+        toggleHidden(this.elements.settings.panes.loop, false);
 
         // Toggle the pane and tab
-        const toggle = !utils.is.empty(this.loop.options);
+        const toggle = !is.empty(this.loop.options);
         controls.toggleTab.call(this, 'loop', toggle);
 
         // Empty the menu
-        utils.emptyElement(list);
+        emptyElement(list);
 
         options.forEach(option => {
-            const item = utils.createElement('li');
+            const item = createElement('li');
 
-            const button = utils.createElement(
+            const button = createElement(
                 'button',
-                utils.extend(utils.getAttributesFromSelector(this.config.selectors.buttons.loop), {
+                extend(getAttributesFromSelector(this.config.selectors.buttons.loop), {
                     type: 'button',
                     class: this.config.classNames.control,
                     'data-plyr-loop-action': option,
@@ -833,7 +856,7 @@ const controls = {
         controls.toggleTab.call(this, type, tracks.length);
 
         // Empty the menu
-        utils.emptyElement(list);
+        emptyElement(list);
 
         // Check if we need to toggle the parent
         controls.checkMenu.call(this);
@@ -846,7 +869,7 @@ const controls = {
         // Generate options data
         const options = tracks.map((track, value) => ({
             value,
-            checked: this.captions.active && this.currentTrack === value,
+            checked: this.captions.toggled && this.currentTrack === value,
             title: captions.getLabel.call(this, track),
             badge: track.language && controls.createBadge.call(this, track.language.toUpperCase()),
             list,
@@ -856,7 +879,7 @@ const controls = {
         // Add the "Disabled" option to turn off captions
         options.unshift({
             value: -1,
-            checked: !this.captions.active,
+            checked: !this.captions.toggled,
             title: i18n.get('disabled', this.config),
             list,
             type: 'language',
@@ -876,32 +899,24 @@ const controls = {
         }
 
         // Menu required
-        if (!utils.is.element(this.elements.settings.panes.speed)) {
+        if (!is.element(this.elements.settings.panes.speed)) {
             return;
         }
 
         const type = 'speed';
 
         // Set the speed options
-        if (utils.is.array(options)) {
+        if (is.array(options)) {
             this.options.speed = options;
         } else if (this.isHTML5 || this.isVimeo) {
-            this.options.speed = [
-                0.5,
-                0.75,
-                1,
-                1.25,
-                1.5,
-                1.75,
-                2,
-            ];
+            this.options.speed = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
         }
 
         // Set options if passed and filter based on config
         this.options.speed = this.options.speed.filter(speed => this.config.speed.options.includes(speed));
 
         // Toggle the pane and tab
-        const toggle = !utils.is.empty(this.options.speed) && this.options.speed.length > 1;
+        const toggle = !is.empty(this.options.speed) && this.options.speed.length > 1;
         controls.toggleTab.call(this, type, toggle);
 
         // Check if we need to toggle the parent
@@ -916,7 +931,7 @@ const controls = {
         const list = this.elements.settings.panes.speed.querySelector('ul');
 
         // Empty the menu
-        utils.emptyElement(list);
+        emptyElement(list);
 
         // Create items
         this.options.speed.forEach(speed => {
@@ -934,9 +949,9 @@ const controls = {
     // Check if we need to hide/show the settings menu
     checkMenu() {
         const { tabs } = this.elements.settings;
-        const visible = !utils.is.empty(tabs) && Object.values(tabs).some(tab => !tab.hidden);
+        const visible = !is.empty(tabs) && Object.values(tabs).some(tab => !tab.hidden);
 
-        utils.toggleHidden(this.elements.settings.menu, !visible);
+        toggleHidden(this.elements.settings.menu, !visible);
     },
 
     // Show/hide menu
@@ -945,14 +960,14 @@ const controls = {
         const button = this.elements.buttons.settings;
 
         // Menu and button are required
-        if (!utils.is.element(form) || !utils.is.element(button)) {
+        if (!is.element(form) || !is.element(button)) {
             return;
         }
 
-        const show = utils.is.boolean(event) ? event : utils.is.element(form) && form.hasAttribute('hidden');
+        const show = is.boolean(event) ? event : is.element(form) && form.hasAttribute('hidden');
 
-        if (utils.is.event(event)) {
-            const isMenuItem = utils.is.element(form) && form.contains(event.target);
+        if (is.event(event)) {
+            const isMenuItem = is.element(form) && form.contains(event.target);
             const isButton = event.target === this.elements.buttons.settings;
 
             // If the click was inside the form or if the click
@@ -969,13 +984,13 @@ const controls = {
         }
 
         // Set form and button attributes
-        if (utils.is.element(button)) {
+        if (is.element(button)) {
             button.setAttribute('aria-expanded', show);
         }
 
-        if (utils.is.element(form)) {
-            utils.toggleHidden(form, !show);
-            utils.toggleClass(this.elements.container, this.config.classNames.menu.open, show);
+        if (is.element(form)) {
+            toggleHidden(form, !show);
+            toggleClass(this.elements.container, this.config.classNames.menu.open, show);
 
             if (show) {
                 form.removeAttribute('tabindex');
@@ -1006,7 +1021,7 @@ const controls = {
         const height = clone.scrollHeight;
 
         // Remove from the DOM
-        utils.removeElement(clone);
+        removeElement(clone);
 
         return {
             width,
@@ -1020,11 +1035,11 @@ const controls = {
         const pane = document.getElementById(target);
 
         // Nothing to show, bail
-        if (!utils.is.element(pane)) {
+        if (!is.element(pane)) {
             return;
         }
 
-        // Are we targetting a tab? If not, bail
+        // Are we targeting a tab? If not, bail
         const isTab = pane.getAttribute('role') === 'tabpanel';
         if (!isTab) {
             return;
@@ -1052,10 +1067,7 @@ const controls = {
             // Restore auto height/width
             const restore = e => {
                 // We're only bothered about height and width on the container
-                if (e.target !== container || ![
-                    'width',
-                    'height',
-                ].includes(e.propertyName)) {
+                if (e.target !== container || !['width', 'height'].includes(e.propertyName)) {
                     return;
                 }
 
@@ -1064,11 +1076,11 @@ const controls = {
                 container.style.height = '';
 
                 // Only listen once
-                utils.off(container, utils.transitionEndEvent, restore);
+                off.call(this, container, transitionEndEvent, restore);
             };
 
             // Listen for the transition finishing and restore auto height/width
-            utils.on(container, utils.transitionEndEvent, restore);
+            on.call(this, container, transitionEndEvent, restore);
 
             // Set dimensions to target
             container.style.width = `${size.width}px`;
@@ -1076,13 +1088,13 @@ const controls = {
         }
 
         // Set attributes on current tab
-        utils.toggleHidden(current, true);
+        toggleHidden(current, true);
         current.setAttribute('tabindex', -1);
 
         // Set attributes on target
-        utils.toggleHidden(pane, false);
+        toggleHidden(pane, false);
 
-        const tabs = utils.getElements.call(this, `[aria-controls="${target}"]`);
+        const tabs = getElements.call(this, `[aria-controls="${target}"]`);
         Array.from(tabs).forEach(tab => {
             tab.setAttribute('aria-expanded', true);
         });
@@ -1096,12 +1108,12 @@ const controls = {
     // TODO: Set order based on order in the config.controls array?
     create(data) {
         // Do nothing if we want no controls
-        if (utils.is.empty(this.config.controls)) {
+        if (is.empty(this.config.controls)) {
             return null;
         }
 
         // Create the container
-        const container = utils.createElement('div', utils.getAttributesFromSelector(this.config.selectors.controls.wrapper));
+        const container = createElement('div', getAttributesFromSelector(this.config.selectors.controls.wrapper));
 
         // Restart button
         if (this.config.controls.includes('restart')) {
@@ -1125,14 +1137,14 @@ const controls = {
 
         // Progress
         if (this.config.controls.includes('progress')) {
-            const progress = utils.createElement('div', utils.getAttributesFromSelector(this.config.selectors.progress));
+            const progress = createElement('div', getAttributesFromSelector(this.config.selectors.progress));
 
             // Seek range slider
-            const seek = controls.createRange.call(this, 'seek', {
-                id: `plyr-seek-${data.id}`,
-            });
-            progress.appendChild(seek.label);
-            progress.appendChild(seek.input);
+            progress.appendChild(
+                controls.createRange.call(this, 'seek', {
+                    id: `plyr-seek-${data.id}`,
+                }),
+            );
 
             // Buffer progress
             progress.appendChild(controls.createProgress.call(this, 'buffer'));
@@ -1141,7 +1153,7 @@ const controls = {
 
             // Seek tooltip
             if (this.config.tooltips.seek) {
-                const tooltip = utils.createElement(
+                const tooltip = createElement(
                     'span',
                     {
                         class: this.config.classNames.tooltip,
@@ -1174,7 +1186,7 @@ const controls = {
 
         // Volume range control
         if (this.config.controls.includes('volume')) {
-            const volume = utils.createElement('div', {
+            const volume = createElement('div', {
                 class: 'plyr__volume',
             });
 
@@ -1186,15 +1198,15 @@ const controls = {
             };
 
             // Create the volume range slider
-            const range = controls.createRange.call(
-                this,
-                'volume',
-                utils.extend(attributes, {
-                    id: `plyr-volume-${data.id}`,
-                }),
+            volume.appendChild(
+                controls.createRange.call(
+                    this,
+                    'volume',
+                    extend(attributes, {
+                        id: `plyr-volume-${data.id}`,
+                    }),
+                ),
             );
-            volume.appendChild(range.label);
-            volume.appendChild(range.input);
 
             this.elements.volume = volume;
 
@@ -1207,8 +1219,8 @@ const controls = {
         }
 
         // Settings button / menu
-        if (this.config.controls.includes('settings') && !utils.is.empty(this.config.settings)) {
-            const menu = utils.createElement('div', {
+        if (this.config.controls.includes('settings') && !is.empty(this.config.settings)) {
+            const menu = createElement('div', {
                 class: 'plyr__menu',
                 hidden: '',
             });
@@ -1222,7 +1234,7 @@ const controls = {
                 }),
             );
 
-            const form = utils.createElement('form', {
+            const form = createElement('form', {
                 class: 'plyr__menu__container',
                 id: `plyr-settings-${data.id}`,
                 hidden: '',
@@ -1231,29 +1243,29 @@ const controls = {
                 tabindex: -1,
             });
 
-            const inner = utils.createElement('div');
+            const inner = createElement('div');
 
-            const home = utils.createElement('div', {
+            const home = createElement('div', {
                 id: `plyr-settings-${data.id}-home`,
                 'aria-labelled-by': `plyr-settings-toggle-${data.id}`,
                 role: 'tabpanel',
             });
 
             // Create the tab list
-            const tabs = utils.createElement('ul', {
+            const tabs = createElement('ul', {
                 role: 'tablist',
             });
 
             // Build the tabs
             this.config.settings.forEach(type => {
-                const tab = utils.createElement('li', {
+                const tab = createElement('li', {
                     role: 'tab',
                     hidden: '',
                 });
 
-                const button = utils.createElement(
+                const button = createElement(
                     'button',
-                    utils.extend(utils.getAttributesFromSelector(this.config.selectors.buttons.settings), {
+                    extend(getAttributesFromSelector(this.config.selectors.buttons.settings), {
                         type: 'button',
                         class: `${this.config.classNames.control} ${this.config.classNames.control}--forward`,
                         id: `plyr-settings-${data.id}-${type}-tab`,
@@ -1264,7 +1276,7 @@ const controls = {
                     i18n.get(type, this.config),
                 );
 
-                const value = utils.createElement('span', {
+                const value = createElement('span', {
                     class: this.config.classNames.menu.value,
                 });
 
@@ -1283,7 +1295,7 @@ const controls = {
 
             // Build the panes
             this.config.settings.forEach(type => {
-                const pane = utils.createElement('div', {
+                const pane = createElement('div', {
                     id: `plyr-settings-${data.id}-${type}`,
                     hidden: '',
                     'aria-labelled-by': `plyr-settings-${data.id}-${type}-tab`,
@@ -1291,7 +1303,7 @@ const controls = {
                     tabindex: -1,
                 });
 
-                const back = utils.createElement(
+                const back = createElement(
                     'button',
                     {
                         type: 'button',
@@ -1305,7 +1317,7 @@ const controls = {
 
                 pane.appendChild(back);
 
-                const options = utils.createElement('ul');
+                const options = createElement('ul');
 
                 pane.appendChild(options);
                 inner.appendChild(pane);
@@ -1360,7 +1372,7 @@ const controls = {
 
             // Only load external sprite using AJAX
             if (icon.cors) {
-                utils.loadSprite(icon.url, 'sprite-plyr');
+                loadSprite(icon.url, 'sprite-plyr');
             }
         }
 
@@ -1379,10 +1391,10 @@ const controls = {
         };
         let update = true;
 
-        if (utils.is.string(this.config.controls) || utils.is.element(this.config.controls)) {
+        if (is.string(this.config.controls) || is.element(this.config.controls)) {
             // String or HTMLElement passed as the option
             container = this.config.controls;
-        } else if (utils.is.function(this.config.controls)) {
+        } else if (is.function(this.config.controls)) {
             // A custom function to build controls
             // The function can return a HTMLElement or String
             container = this.config.controls.call(this, props);
@@ -1404,11 +1416,8 @@ const controls = {
         const replace = input => {
             let result = input;
 
-            Object.entries(props).forEach(([
-                key,
-                value,
-            ]) => {
-                result = utils.replaceAll(result, `{${key}}`, value);
+            Object.entries(props).forEach(([key, value]) => {
+                result = replaceAll(result, `{${key}}`, value);
             });
 
             return result;
@@ -1416,9 +1425,9 @@ const controls = {
 
         // Update markup
         if (update) {
-            if (utils.is.string(this.config.controls)) {
+            if (is.string(this.config.controls)) {
                 container = replace(container);
-            } else if (utils.is.element(container)) {
+            } else if (is.element(container)) {
                 container.innerHTML = replace(container.innerHTML);
             }
         }
@@ -1427,49 +1436,41 @@ const controls = {
         let target;
 
         // Inject to custom location
-        if (utils.is.string(this.config.selectors.controls.container)) {
+        if (is.string(this.config.selectors.controls.container)) {
             target = document.querySelector(this.config.selectors.controls.container);
         }
 
         // Inject into the container by default
-        if (!utils.is.element(target)) {
+        if (!is.element(target)) {
             target = this.elements.container;
         }
 
         // Inject controls HTML
-        if (utils.is.element(container)) {
+        if (is.element(container)) {
             target.appendChild(container);
         } else if (container) {
             target.insertAdjacentHTML('beforeend', container);
         }
 
         // Find the elements if need be
-        if (!utils.is.element(this.elements.controls)) {
+        if (!is.element(this.elements.controls)) {
             controls.findElements.call(this);
         }
 
         // Edge sometimes doesn't finish the paint so force a redraw
         if (window.navigator.userAgent.includes('Edge')) {
-            utils.repaint(target);
+            repaint(target);
         }
 
         // Setup tooltips
         if (this.config.tooltips.controls) {
-            const labels = utils.getElements.call(
-                this,
-                [
-                    this.config.selectors.controls.wrapper,
-                    ' ',
-                    this.config.selectors.labels,
-                    ' .',
-                    this.config.classNames.hidden,
-                ].join(''),
-            );
+            const { classNames, selectors } = this.config;
+            const selector = `${selectors.controls.wrapper} ${selectors.labels} .${classNames.hidden}`;
+            const labels = getElements.call(this, selector);
 
             Array.from(labels).forEach(label => {
-                utils.toggleClass(label, this.config.classNames.hidden, false);
-                utils.toggleClass(label, this.config.classNames.tooltip, true);
-                label.setAttribute('role', 'tooltip');
+                toggleClass(label, this.config.classNames.hidden, false);
+                toggleClass(label, this.config.classNames.tooltip, true);
             });
         }
     },

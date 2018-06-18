@@ -34,10 +34,10 @@
 }
 
 // Change icons on state change
-.plyr__control[aria-pressed='false'] .icon--pressed,
-.plyr__control[aria-pressed='true'] .icon--not-pressed,
-.plyr__control[aria-pressed='false'] .label--pressed,
-.plyr__control[aria-pressed='true'] .label--not-pressed {
+.plyr__control:not(.plyr__control--pressed) .icon--pressed,
+.plyr__control.plyr__control--pressed .icon--not-pressed,
+.plyr__control:not(.plyr__control--pressed) .label--pressed,
+.plyr__control.plyr__control--pressed .label--not-pressed {
     display: none;
 }
 

@@ -3,9 +3,10 @@
 // https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API#prefixing
 // ==========================================================================
 
-import utils from './utils';
-
-const browser = utils.getBrowser();
+import browser from './utils/browser';
+import { hasClass, toggleClass, trapFocus } from './utils/elements';
+import { on, triggerEvent } from './utils/events';
+import is from './utils/is';
 
 function onChange() {
     if (!this.enabled) {
@@ -14,16 +15,16 @@ function onChange() {
 
     // Update toggle button
     const button = this.player.elements.buttons.fullscreen;
-    if (utils.is.element(button)) {
-        utils.toggleState(button, this.active);
+    if (is.element(button)) {
+        button.pressed = this.active;
     }
 
     // Trigger an event
-    utils.dispatchEvent.call(this.player, this.target, this.active ? 'enterfullscreen' : 'exitfullscreen', true);
+    triggerEvent.call(this.player, this.target, this.active ? 'enterfullscreen' : 'exitfullscreen', true);
 
     // Trap focus in container
     if (!browser.isIos) {
-        utils.trapFocus.call(this.player, this.target, this.active);
+        trapFocus.call(this.player, this.target, this.active);
     }
 }
 
@@ -42,7 +43,7 @@ function toggleFallback(toggle = false) {
     document.body.style.overflow = toggle ? 'hidden' : '';
 
     // Toggle class hook
-    utils.toggleClass(this.target, this.player.config.classNames.fullscreen.fallback, toggle);
+    toggleClass(this.target, this.player.config.classNames.fullscreen.fallback, toggle);
 
     // Toggle button and fire events
     onChange.call(this);
@@ -62,15 +63,20 @@ class Fullscreen {
 
         // Register event listeners
         // Handle event (incase user presses escape etc)
-        utils.on(document, this.prefix === 'ms' ? 'MSFullscreenChange' : `${this.prefix}fullscreenchange`, () => {
-            // TODO: Filter for target??
-            onChange.call(this);
-        });
+        on.call(
+            this.player,
+            document,
+            this.prefix === 'ms' ? 'MSFullscreenChange' : `${this.prefix}fullscreenchange`,
+            () => {
+                // TODO: Filter for target??
+                onChange.call(this);
+            },
+        );
 
         // Fullscreen toggle on double click
-        utils.on(this.player.elements.container, 'dblclick', event => {
+        on.call(this.player, this.player.elements.container, 'dblclick', event => {
             // Ignore double click in controls
-            if (utils.is.element(this.player.elements.controls) && this.player.elements.controls.contains(event.target)) {
+            if (is.element(this.player.elements.controls) && this.player.elements.controls.contains(event.target)) {
                 return;
             }
 
@@ -83,26 +89,27 @@ class Fullscreen {
 
     // Determine if native supported
     static get native() {
-        return !!(document.fullscreenEnabled || document.webkitFullscreenEnabled || document.mozFullScreenEnabled || document.msFullscreenEnabled);
+        return !!(
+            document.fullscreenEnabled ||
+            document.webkitFullscreenEnabled ||
+            document.mozFullScreenEnabled ||
+            document.msFullscreenEnabled
+        );
     }
 
     // Get the prefix for handlers
     static get prefix() {
         // No prefix
-        if (utils.is.function(document.exitFullscreen)) {
+        if (is.function(document.exitFullscreen)) {
             return '';
         }
 
         // Check for fullscreen support by vendor prefix
         let value = '';
-        const prefixes = [
-            'webkit',
-            'moz',
-            'ms',
-        ];
+        const prefixes = ['webkit', 'moz', 'ms'];
 
         prefixes.some(pre => {
-            if (utils.is.function(document[`${pre}ExitFullscreen`]) || utils.is.function(document[`${pre}CancelFullScreen`])) {
+            if (is.function(document[`${pre}ExitFullscreen`]) || is.function(document[`${pre}CancelFullScreen`])) {
                 value = pre;
                 return true;
             }
@@ -135,7 +142,7 @@ class Fullscreen {
 
         // Fallback using classname
         if (!Fullscreen.native) {
-            return utils.hasClass(this.target, this.player.config.classNames.fullscreen.fallback);
+            return hasClass(this.target, this.player.config.classNames.fullscreen.fallback);
         }
 
         const element = !this.prefix ? document.fullscreenElement : document[`${this.prefix}${this.property}Element`];
@@ -145,7 +152,9 @@ class Fullscreen {
 
     // Get target element
     get target() {
-        return browser.isIos && this.player.config.fullscreen.iosNative ? this.player.media : this.player.elements.container;
+        return browser.isIos && this.player.config.fullscreen.iosNative
+            ? this.player.media
+            : this.player.elements.container;
     }
 
     // Update UI
@@ -157,7 +166,7 @@ class Fullscreen {
         }
 
         // Add styling hook to show button
-        utils.toggleClass(this.player.elements.container, this.player.config.classNames.fullscreen.enabled, this.enabled);
+        toggleClass(this.player.elements.container, this.player.config.classNames.fullscreen.enabled, this.enabled);
     }
 
     // Make an element fullscreen
@@ -175,7 +184,7 @@ class Fullscreen {
             toggleFallback.call(this, true);
         } else if (!this.prefix) {
             this.target.requestFullscreen();
-        } else if (!utils.is.empty(this.prefix)) {
+        } else if (!is.empty(this.prefix)) {
             this.target[`${this.prefix}Request${this.property}`]();
         }
     }
@@ -194,7 +203,7 @@ class Fullscreen {
             toggleFallback.call(this, false);
         } else if (!this.prefix) {
             (document.cancelFullScreen || document.exitFullscreen).call(document);
-        } else if (!utils.is.empty(this.prefix)) {
+        } else if (!is.empty(this.prefix)) {
             const action = this.prefix === 'moz' ? 'Cancel' : 'Exit';
             document[`${this.prefix}${action}${this.property}`]();
         }
