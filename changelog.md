@@ -1,3 +1,7 @@
+# v3.3.15
+
+-   Fix for error relating to play buttons when switching source
+
 # v3.3.14
 
 -   Fix sprite loading regression

@@ -2979,7 +2979,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 	var defineProperty = _objectDp.f;
 	var _wksDefine = function (name) {
-	  var $Symbol = _core.Symbol || (_core.Symbol = _global.Symbol || {});
+	  var $Symbol = _core.Symbol || (_core.Symbol = _library ? {} : _global.Symbol || {});
 	  if (name.charAt(0) != '_' && !(name in $Symbol)) defineProperty($Symbol, name, { value: _wksExt.f(name) });
 	};
 
@@ -7010,7 +7010,7 @@ typeof navigator === "object" && (function (global, factory) {
 	        var attributes = getAttributesFromSelector(this.config.selectors.display[type]);
 
 	        var container = createElement('div', extend(attributes, {
-	            class: 'plyr__time ' + attributes.class,
+	            class: (this.config.classNames.display.time + ' ' + (attributes.class ? attributes.class : '')).trim(),
 	            'aria-label': i18n.get(type, this.config)
 	        }), '00:00');
 
@@ -7032,15 +7032,41 @@ typeof navigator === "object" && (function (global, factory) {
 	            _ref$checked = _ref.checked,
 	            checked = _ref$checked === undefined ? false : _ref$checked;
 
-	        var item = createElement('button', extend(getAttributesFromSelector(this.config.selectors.inputs[type]), {
+	        var attributes = getAttributesFromSelector(this.config.selectors.inputs[type]);
+
+	        var item = createElement('button', extend(attributes, {
 	            type: 'button',
+	            role: 'menuitemradio',
+	            class: (this.config.classNames.control + ' ' + (attributes.class ? attributes.class : '')).trim(),
 	            value: value,
 	            'aria-checked': checked
-	        }), title);
+	        }));
+
+	        // We have to set as HTML incase of special characters
+	        item.innerHTML = title;
 
 	        if (is$1.element(badge)) {
 	            item.appendChild(badge);
 	        }
+
+	        Object.defineProperty(item, 'checked', {
+	            enumerable: true,
+	            get: function get() {
+	                return item.getAttribute('aria-checked') === 'true';
+	            },
+	            set: function set(checked) {
+	                // Ensure exclusivity
+	                if (checked) {
+	                    Array.from(item.parentNode.children).filter(function (node) {
+	                        return matches(node, '[role="menuitemradio"]');
+	                    }).forEach(function (node) {
+	                        return node.setAttribute('aria-checked', 'false');
+	                    });
+	                }
+
+	                item.setAttribute('aria-checked', checked ? 'true' : 'false');
+	            }
+	        });
 
 	        list.appendChild(item);
 	    },
@@ -7316,12 +7342,12 @@ typeof navigator === "object" && (function (global, factory) {
 	        var _this3 = this;
 
 	        // Menu required
-	        if (!is$1.element(this.elements.settings.menus.quality)) {
+	        if (!is$1.element(this.elements.settings.panels.quality)) {
 	            return;
 	        }
 
 	        var type = 'quality';
-	        var list = this.elements.settings.menus.quality.querySelector('[role="menu"]');
+	        var list = this.elements.settings.panels.quality.querySelector('[role="menu"]');
 
 	        // Set options if passed and filter based on uniqueness and config
 	        if (is$1.array(options)) {
@@ -7404,7 +7430,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 	    // Update the selected setting
 	    updateSetting: function updateSetting(setting, container, input) {
-	        var pane = this.elements.settings.menus[setting];
+	        var pane = this.elements.settings.panels[setting];
 	        var value = null;
 	        var list = container;
 
@@ -7446,10 +7472,10 @@ typeof navigator === "object" && (function (global, factory) {
 	        label.innerHTML = controls.getLabel.call(this, setting, value);
 
 	        // Find the radio option and check it
-	        var target = list && list.querySelector('button[value="' + value + '"]');
+	        var target = list && list.querySelector('[value="' + value + '"]');
 
 	        if (is$1.element(target)) {
-	            target.setAttribute('aria-checked', true);
+	            target.checked = true;
 	        }
 	    },
 
@@ -7457,14 +7483,14 @@ typeof navigator === "object" && (function (global, factory) {
 	    // Set the looping options
 	    /* setLoopMenu() {
 	        // Menu required
-	        if (!is.element(this.elements.settings.menus.loop)) {
+	        if (!is.element(this.elements.settings.panels.loop)) {
 	            return;
 	        }
 	         const options = ['start', 'end', 'all', 'reset'];
-	        const list = this.elements.settings.menus.loop.querySelector('[role="menu"]');
+	        const list = this.elements.settings.panels.loop.querySelector('[role="menu"]');
 	         // Show the pane and tab
 	        toggleHidden(this.elements.settings.buttons.loop, false);
-	        toggleHidden(this.elements.settings.menus.loop, false);
+	        toggleHidden(this.elements.settings.panels.loop, false);
 	         // Toggle the pane and tab
 	        const toggle = !is.empty(this.loop.options);
 	        controls.toggleMenuButton.call(this, 'loop', toggle);
@@ -7499,7 +7525,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 	        // TODO: Captions or language? Currently it's mixed
 	        var type = 'captions';
-	        var list = this.elements.settings.menus.captions.querySelector('[role="menu"]');
+	        var list = this.elements.settings.panels.captions.querySelector('[role="menu"]');
 	        var tracks = captions.getTracks.call(this);
 
 	        // Toggle the pane and tab
@@ -7554,7 +7580,7 @@ typeof navigator === "object" && (function (global, factory) {
 	        }
 
 	        // Menu required
-	        if (!is$1.element(this.elements.settings.menus.speed)) {
+	        if (!is$1.element(this.elements.settings.panels.speed)) {
 	            return;
 	        }
 
@@ -7585,7 +7611,7 @@ typeof navigator === "object" && (function (global, factory) {
 	        }
 
 	        // Get the list to populate
-	        var list = this.elements.settings.menus.speed.querySelector('[role="menu"]');
+	        var list = this.elements.settings.panels.speed.querySelector('[role="menu"]');
 
 	        // Empty the menu
 	        emptyElement(list);
@@ -7664,18 +7690,12 @@ typeof navigator === "object" && (function (global, factory) {
 	    },
 
 
-	    // Get the natural size of a tab
-	    getTabSize: function getTabSize(tab) {
+	    // Get the natural size of a menu panel
+	    getMenuSize: function getMenuSize(tab) {
 	        var clone = tab.cloneNode(true);
 	        clone.style.position = 'absolute';
 	        clone.style.opacity = 0;
 	        clone.removeAttribute('hidden');
-
-	        // Prevent input's being unchecked due to the name being identical
-	        /* Array.from(clone.querySelectorAll('input[name]')).forEach(input => {
-	            const name = input.getAttribute('name');
-	            input.setAttribute('name', `${name}-clone`);
-	        }); */
 
 	        // Append to parent so we get the "real" size
 	        tab.parentNode.appendChild(clone);
@@ -7694,38 +7714,24 @@ typeof navigator === "object" && (function (global, factory) {
 	    },
 
 
-	    // Toggle Menu
-	    showMenu: function showMenu() {
+	    // Show a panel in the menu
+	    showMenuPanel: function showMenuPanel() {
 	        var _this6 = this;
 
 	        var type = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-	        var menu = this.elements.settings.menu;
 
-	        var pane = document.getElementById('plyr-settings-' + this.id + '-' + type);
-
-	        console.warn('plyr-settings-' + this.id + '-' + type);
+	        var target = document.getElementById('plyr-settings-' + this.id + '-' + type);
 
 	        // Nothing to show, bail
-	        if (!is$1.element(pane)) {
-	            console.warn('No pane found');
+	        if (!is$1.element(target)) {
 	            return;
 	        }
 
-	        // Are we targeting a tab? If not, bail
-	        /* const isTab = pane.getAttribute('role') === 'tabpanel';
-	        if (!isTab) {
-	            return;
-	        } */
-
-	        // Hide all other tabs
-	        // Get other tabs
-	        var current = menu.querySelector('[id^=plyr-settings-' + this.id + ']:not([hidden])');
-	        var container = current.parentNode;
-
-	        // Set other toggles to be expanded false
-	        /* Array.from(menu.querySelectorAll(`[aria-controls="${current.getAttribute('id')}"]`)).forEach(toggle => {
-	            toggle.setAttribute('aria-expanded', false);
-	        }); */
+	        // Hide all other panels
+	        var container = target.parentNode;
+	        var current = Array.from(container.children).find(function (node) {
+	            return !node.hidden;
+	        });
 
 	        // If we can do fancy animations, we'll animate the height/width
 	        if (support.transitions && !support.reducedMotion) {
@@ -7734,12 +7740,12 @@ typeof navigator === "object" && (function (global, factory) {
 	            container.style.height = current.scrollHeight + 'px';
 
 	            // Get potential sizes
-	            var size = controls.getTabSize.call(this, pane);
+	            var size = controls.getMenuSize.call(this, target);
 
 	            // Restore auto height/width
-	            var restore = function restore(e) {
+	            var restore = function restore(event) {
 	                // We're only bothered about height and width on the container
-	                if (e.target !== container || !['width', 'height'].includes(e.propertyName)) {
+	                if (event.target !== container || !['width', 'height'].includes(event.propertyName)) {
 	                    return;
 	                }
 
@@ -7764,16 +7770,10 @@ typeof navigator === "object" && (function (global, factory) {
 	        // current.setAttribute('tabindex', -1);
 
 	        // Set attributes on target
-	        toggleHidden(pane, false);
-
-	        /* const tabs = getElements.call(this, `[aria-controls="${target}"]`);
-	        Array.from(tabs).forEach(tab => {
-	            tab.setAttribute('aria-expanded', true);
-	        });
-	        pane.removeAttribute('tabindex'); */
+	        toggleHidden(target, false);
 
 	        // Focus the first item
-	        pane.querySelectorAll('button:not(:disabled), input:not(:disabled), [tabindex]')[0].focus();
+	        target.querySelectorAll('[role^="menuitem"]')[0].focus();
 	    },
 
 
@@ -7918,7 +7918,7 @@ typeof navigator === "object" && (function (global, factory) {
 	                var menuItem = createElement('button', extend(getAttributesFromSelector(_this7.config.selectors.buttons.settings), {
 	                    type: 'button',
 	                    class: _this7.config.classNames.control + ' ' + _this7.config.classNames.control + '--forward',
-	                    'role': 'menuitem',
+	                    role: 'menuitem',
 	                    'aria-haspopup': true
 	                }));
 
@@ -7942,10 +7942,14 @@ typeof navigator === "object" && (function (global, factory) {
 	                });
 
 	                // Back button
-	                pane.appendChild(createElement('button', {
+	                var back = createElement('button', {
 	                    type: 'button',
 	                    class: _this7.config.classNames.control + ' ' + _this7.config.classNames.control + '--back'
-	                }, i18n.get(type, _this7.config)));
+	                }, i18n.get(type, _this7.config));
+	                back.addEventListener('click', function () {
+	                    controls.showMenuPanel.call(_this7, 'home');
+	                });
+	                pane.appendChild(back);
 
 	                // Menu
 	                pane.appendChild(createElement('div', {
@@ -7955,11 +7959,11 @@ typeof navigator === "object" && (function (global, factory) {
 	                inner.appendChild(pane);
 
 	                menuItem.addEventListener('click', function () {
-	                    controls.showMenu.call(_this7, type);
+	                    controls.showMenuPanel.call(_this7, type);
 	                });
 
 	                _this7.elements.settings.buttons[type] = menuItem;
-	                _this7.elements.settings.menus[type] = pane;
+	                _this7.elements.settings.panels[type] = pane;
 	            });
 
 	            home.appendChild(menu);
@@ -8868,6 +8872,9 @@ typeof navigator === "object" && (function (global, factory) {
 	        isTouch: 'plyr--is-touch',
 	        uiSupported: 'plyr--full-ui',
 	        noTransition: 'plyr--no-transition',
+	        display: {
+	            time: 'plyr__time'
+	        },
 	        menu: {
 	            value: 'plyr__menu__value',
 	            badge: 'plyr__badge',
@@ -9453,9 +9460,11 @@ typeof navigator === "object" && (function (global, factory) {
 	        toggleClass(this.elements.container, this.config.classNames.stopped, this.stopped);
 
 	        // Set state
-	        Array.from(this.elements.buttons.play).forEach(function (target) {
-	            target.pressed = _this3.playing;
-	        });
+	        if (is$1.nodeList(this.elements.buttons.play)) {
+	            Array.from(this.elements.buttons.play).forEach(function (target) {
+	                target.pressed = _this3.playing;
+	            });
+	        }
 
 	        // Only update controls on non timeupdate events
 	        if (is$1.event(event) && event.type === 'timeupdate') {
@@ -9994,7 +10003,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 	                // Go back to home tab on click
 	                var showHomeTab = function showHomeTab() {
-	                    controls.showMenu.call(_this4.player, 'home');
+	                    controls.showMenuPanel.call(_this4.player, 'home');
 	                };
 
 	                // Settings menu items - use event delegation as items are added/removed
@@ -12322,7 +12331,7 @@ typeof navigator === "object" && (function (global, factory) {
 	            settings: {
 	                popup: null,
 	                menu: null,
-	                menus: {},
+	                panels: {},
 	                buttons: {}
 	            }
 	        };

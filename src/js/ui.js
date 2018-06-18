@@ -214,9 +214,11 @@ const ui = {
         toggleClass(this.elements.container, this.config.classNames.stopped, this.stopped);
 
         // Set state
-        Array.from(this.elements.buttons.play).forEach(target => {
-            target.pressed = this.playing;
-        });
+        if (is.nodeList(this.elements.buttons.play)) {
+            Array.from(this.elements.buttons.play).forEach(target => {
+                target.pressed = this.playing;
+            });
+        }
 
         // Only update controls on non timeupdate events
         if (is.event(event) && event.type === 'timeupdate') {
