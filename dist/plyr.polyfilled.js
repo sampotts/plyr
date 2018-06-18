@@ -5768,12 +5768,19 @@ typeof navigator === "object" && (function (global, factory) {
 
 	// Inaert an element after another
 	function insertAfter(element, target) {
+	    if (!is$1.element(element) || !is$1.element(target)) {
+	        return;
+	    }
+
 	    target.parentNode.insertBefore(element, target.nextSibling);
 	}
 
 	// Insert a DocumentFragment
 	function insertElement(type, parent, attributes, text) {
-	    // Inject the new <element>
+	    if (!is$1.element(parent)) {
+	        return;
+	    }
+
 	    parent.appendChild(createElement(type, attributes, text));
 	}
 
@@ -5793,6 +5800,10 @@ typeof navigator === "object" && (function (global, factory) {
 
 	// Remove all child elements
 	function emptyElement(element) {
+	    if (!is$1.element(element)) {
+	        return;
+	    }
+
 	    var length = element.childNodes.length;
 
 
@@ -6524,6 +6535,51 @@ typeof navigator === "object" && (function (global, factory) {
 	}();
 
 	// ==========================================================================
+	// Fetch wrapper
+	// Using XHR to avoid issues with older browsers
+	// ==========================================================================
+
+	function fetch(url) {
+	    var responseType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'text';
+
+	    return new Promise(function (resolve, reject) {
+	        try {
+	            var request = new XMLHttpRequest();
+
+	            // Check for CORS support
+	            if (!('withCredentials' in request)) {
+	                return;
+	            }
+
+	            request.addEventListener('load', function () {
+	                if (responseType === 'text') {
+	                    try {
+	                        resolve(JSON.parse(request.responseText));
+	                    } catch (e) {
+	                        resolve(request.responseText);
+	                    }
+	                } else {
+	                    resolve(request.response);
+	                }
+	            });
+
+	            request.addEventListener('error', function () {
+	                throw new Error(request.status);
+	            });
+
+	            request.open('GET', url, true);
+
+	            // Set the required response type
+	            request.responseType = responseType;
+
+	            request.send();
+	        } catch (e) {
+	            reject(e);
+	        }
+	    });
+	}
+
+	// ==========================================================================
 
 	// Load an external SVG sprite
 	function loadSprite(url, id) {
@@ -6976,31 +7032,16 @@ typeof navigator === "object" && (function (global, factory) {
 	            _ref$checked = _ref.checked,
 	            checked = _ref$checked === undefined ? false : _ref$checked;
 
-	        var item = createElement('li');
-
-	        var label = createElement('label', {
-	            class: this.config.classNames.control
-	        });
-
-	        var radio = createElement('input', extend(getAttributesFromSelector(this.config.selectors.inputs[type]), {
-	            type: 'radio',
-	            name: 'plyr-' + type,
+	        var item = createElement('button', extend(getAttributesFromSelector(this.config.selectors.inputs[type]), {
+	            type: 'button',
 	            value: value,
-	            checked: checked,
-	            class: 'plyr__sr-only'
-	        }));
-
-	        var faux = createElement('span', { hidden: '' });
-
-	        label.appendChild(radio);
-	        label.appendChild(faux);
-	        label.insertAdjacentHTML('beforeend', title);
+	            'aria-checked': checked
+	        }), title);
 
 	        if (is$1.element(badge)) {
-	            label.appendChild(badge);
+	            item.appendChild(badge);
 	        }
 
-	        item.appendChild(label);
 	        list.appendChild(item);
 	    },
 
@@ -7265,8 +7306,8 @@ typeof navigator === "object" && (function (global, factory) {
 
 
 	    // Hide/show a tab
-	    toggleTab: function toggleTab(setting, toggle) {
-	        toggleHidden(this.elements.settings.tabs[setting], !toggle);
+	    toggleMenuButton: function toggleMenuButton(setting, toggle) {
+	        toggleHidden(this.elements.settings.buttons[setting], !toggle);
 	    },
 
 
@@ -7275,12 +7316,12 @@ typeof navigator === "object" && (function (global, factory) {
 	        var _this3 = this;
 
 	        // Menu required
-	        if (!is$1.element(this.elements.settings.panes.quality)) {
+	        if (!is$1.element(this.elements.settings.menus.quality)) {
 	            return;
 	        }
 
 	        var type = 'quality';
-	        var list = this.elements.settings.panes.quality.querySelector('ul');
+	        var list = this.elements.settings.menus.quality.querySelector('[role="menu"]');
 
 	        // Set options if passed and filter based on uniqueness and config
 	        if (is$1.array(options)) {
@@ -7291,7 +7332,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 	        // Toggle the pane and tab
 	        var toggle = !is$1.empty(this.options.quality) && this.options.quality.length > 1;
-	        controls.toggleTab.call(this, type, toggle);
+	        controls.toggleMenuButton.call(this, type, toggle);
 
 	        // Check if we need to toggle the parent
 	        controls.checkMenu.call(this);
@@ -7363,7 +7404,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 	    // Update the selected setting
 	    updateSetting: function updateSetting(setting, container, input) {
-	        var pane = this.elements.settings.panes[setting];
+	        var pane = this.elements.settings.menus[setting];
 	        var value = null;
 	        var list = container;
 
@@ -7392,7 +7433,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 	        // Get the list if we need to
 	        if (!is$1.element(list)) {
-	            list = pane && pane.querySelector('ul');
+	            list = pane && pane.querySelector('[role="menu"]');
 	        }
 
 	        // If there's no list it means it's not been rendered...
@@ -7401,14 +7442,14 @@ typeof navigator === "object" && (function (global, factory) {
 	        }
 
 	        // Update the label
-	        var label = this.elements.settings.tabs[setting].querySelector('.' + this.config.classNames.menu.value);
+	        var label = this.elements.settings.buttons[setting].querySelector('.' + this.config.classNames.menu.value);
 	        label.innerHTML = controls.getLabel.call(this, setting, value);
 
 	        // Find the radio option and check it
-	        var target = list && list.querySelector('input[value="' + value + '"]');
+	        var target = list && list.querySelector('button[value="' + value + '"]');
 
 	        if (is$1.element(target)) {
-	            target.checked = true;
+	            target.setAttribute('aria-checked', true);
 	        }
 	    },
 
@@ -7416,17 +7457,17 @@ typeof navigator === "object" && (function (global, factory) {
 	    // Set the looping options
 	    /* setLoopMenu() {
 	        // Menu required
-	        if (!is.element(this.elements.settings.panes.loop)) {
+	        if (!is.element(this.elements.settings.menus.loop)) {
 	            return;
 	        }
 	         const options = ['start', 'end', 'all', 'reset'];
-	        const list = this.elements.settings.panes.loop.querySelector('ul');
+	        const list = this.elements.settings.menus.loop.querySelector('[role="menu"]');
 	         // Show the pane and tab
-	        toggleHidden(this.elements.settings.tabs.loop, false);
-	        toggleHidden(this.elements.settings.panes.loop, false);
+	        toggleHidden(this.elements.settings.buttons.loop, false);
+	        toggleHidden(this.elements.settings.menus.loop, false);
 	         // Toggle the pane and tab
 	        const toggle = !is.empty(this.loop.options);
-	        controls.toggleTab.call(this, 'loop', toggle);
+	        controls.toggleMenuButton.call(this, 'loop', toggle);
 	         // Empty the menu
 	        emptyElement(list);
 	         options.forEach(option => {
@@ -7458,11 +7499,11 @@ typeof navigator === "object" && (function (global, factory) {
 
 	        // TODO: Captions or language? Currently it's mixed
 	        var type = 'captions';
-	        var list = this.elements.settings.panes.captions.querySelector('ul');
+	        var list = this.elements.settings.menus.captions.querySelector('[role="menu"]');
 	        var tracks = captions.getTracks.call(this);
 
 	        // Toggle the pane and tab
-	        controls.toggleTab.call(this, type, tracks.length);
+	        controls.toggleMenuButton.call(this, type, tracks.length);
 
 	        // Empty the menu
 	        emptyElement(list);
@@ -7513,7 +7554,7 @@ typeof navigator === "object" && (function (global, factory) {
 	        }
 
 	        // Menu required
-	        if (!is$1.element(this.elements.settings.panes.speed)) {
+	        if (!is$1.element(this.elements.settings.menus.speed)) {
 	            return;
 	        }
 
@@ -7533,7 +7574,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 	        // Toggle the pane and tab
 	        var toggle = !is$1.empty(this.options.speed) && this.options.speed.length > 1;
-	        controls.toggleTab.call(this, type, toggle);
+	        controls.toggleMenuButton.call(this, type, toggle);
 
 	        // Check if we need to toggle the parent
 	        controls.checkMenu.call(this);
@@ -7544,7 +7585,7 @@ typeof navigator === "object" && (function (global, factory) {
 	        }
 
 	        // Get the list to populate
-	        var list = this.elements.settings.panes.speed.querySelector('ul');
+	        var list = this.elements.settings.menus.speed.querySelector('[role="menu"]');
 
 	        // Empty the menu
 	        emptyElement(list);
@@ -7565,10 +7606,10 @@ typeof navigator === "object" && (function (global, factory) {
 
 	    // Check if we need to hide/show the settings menu
 	    checkMenu: function checkMenu() {
-	        var tabs = this.elements.settings.tabs;
+	        var buttons = this.elements.settings.buttons;
 
-	        var visible = !is$1.empty(tabs) && Object.values(tabs).some(function (tab) {
-	            return !tab.hidden;
+	        var visible = !is$1.empty(buttons) && Object.values(buttons).some(function (button) {
+	            return !button.hidden;
 	        });
 
 	        toggleHidden(this.elements.settings.menu, !visible);
@@ -7577,19 +7618,19 @@ typeof navigator === "object" && (function (global, factory) {
 
 	    // Show/hide menu
 	    toggleMenu: function toggleMenu(event) {
-	        var form = this.elements.settings.form;
+	        var popup = this.elements.settings.popup;
 
 	        var button = this.elements.buttons.settings;
 
 	        // Menu and button are required
-	        if (!is$1.element(form) || !is$1.element(button)) {
+	        if (!is$1.element(popup) || !is$1.element(button)) {
 	            return;
 	        }
 
-	        var show = is$1.boolean(event) ? event : is$1.element(form) && form.hasAttribute('hidden');
+	        var show = is$1.boolean(event) ? event : is$1.element(popup) && popup.hasAttribute('hidden');
 
 	        if (is$1.event(event)) {
-	            var isMenuItem = is$1.element(form) && form.contains(event.target);
+	            var isMenuItem = is$1.element(popup) && popup.contains(event.target);
 	            var isButton = event.target === this.elements.buttons.settings;
 
 	            // If the click was inside the form or if the click
@@ -7610,14 +7651,14 @@ typeof navigator === "object" && (function (global, factory) {
 	            button.setAttribute('aria-expanded', show);
 	        }
 
-	        if (is$1.element(form)) {
-	            toggleHidden(form, !show);
+	        if (is$1.element(popup)) {
+	            toggleHidden(popup, !show);
 	            toggleClass(this.elements.container, this.config.classNames.menu.open, show);
 
 	            if (show) {
-	                form.removeAttribute('tabindex');
+	                popup.removeAttribute('tabindex');
 	            } else {
-	                form.setAttribute('tabindex', -1);
+	                popup.setAttribute('tabindex', -1);
 	            }
 	        }
 	    },
@@ -7631,10 +7672,10 @@ typeof navigator === "object" && (function (global, factory) {
 	        clone.removeAttribute('hidden');
 
 	        // Prevent input's being unchecked due to the name being identical
-	        Array.from(clone.querySelectorAll('input[name]')).forEach(function (input) {
-	            var name = input.getAttribute('name');
-	            input.setAttribute('name', name + '-clone');
-	        });
+	        /* Array.from(clone.querySelectorAll('input[name]')).forEach(input => {
+	            const name = input.getAttribute('name');
+	            input.setAttribute('name', `${name}-clone`);
+	        }); */
 
 	        // Append to parent so we get the "real" size
 	        tab.parentNode.appendChild(clone);
@@ -7654,34 +7695,37 @@ typeof navigator === "object" && (function (global, factory) {
 
 
 	    // Toggle Menu
-	    showTab: function showTab() {
+	    showMenu: function showMenu() {
 	        var _this6 = this;
 
-	        var target = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+	        var type = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
 	        var menu = this.elements.settings.menu;
 
-	        var pane = document.getElementById(target);
+	        var pane = document.getElementById('plyr-settings-' + this.id + '-' + type);
+
+	        console.warn('plyr-settings-' + this.id + '-' + type);
 
 	        // Nothing to show, bail
 	        if (!is$1.element(pane)) {
+	            console.warn('No pane found');
 	            return;
 	        }
 
 	        // Are we targeting a tab? If not, bail
-	        var isTab = pane.getAttribute('role') === 'tabpanel';
+	        /* const isTab = pane.getAttribute('role') === 'tabpanel';
 	        if (!isTab) {
 	            return;
-	        }
+	        } */
 
 	        // Hide all other tabs
 	        // Get other tabs
-	        var current = menu.querySelector('[role="tabpanel"]:not([hidden])');
+	        var current = menu.querySelector('[id^=plyr-settings-' + this.id + ']:not([hidden])');
 	        var container = current.parentNode;
 
 	        // Set other toggles to be expanded false
-	        Array.from(menu.querySelectorAll('[aria-controls="' + current.getAttribute('id') + '"]')).forEach(function (toggle) {
+	        /* Array.from(menu.querySelectorAll(`[aria-controls="${current.getAttribute('id')}"]`)).forEach(toggle => {
 	            toggle.setAttribute('aria-expanded', false);
-	        });
+	        }); */
 
 	        // If we can do fancy animations, we'll animate the height/width
 	        if (support.transitions && !support.reducedMotion) {
@@ -7717,16 +7761,16 @@ typeof navigator === "object" && (function (global, factory) {
 
 	        // Set attributes on current tab
 	        toggleHidden(current, true);
-	        current.setAttribute('tabindex', -1);
+	        // current.setAttribute('tabindex', -1);
 
 	        // Set attributes on target
 	        toggleHidden(pane, false);
 
-	        var tabs = getElements.call(this, '[aria-controls="' + target + '"]');
-	        Array.from(tabs).forEach(function (tab) {
+	        /* const tabs = getElements.call(this, `[aria-controls="${target}"]`);
+	        Array.from(tabs).forEach(tab => {
 	            tab.setAttribute('aria-expanded', true);
 	        });
-	        pane.removeAttribute('tabindex');
+	        pane.removeAttribute('tabindex'); */
 
 	        // Focus the first item
 	        pane.querySelectorAll('button:not(:disabled), input:not(:disabled), [tabindex]')[0].focus();
@@ -7839,55 +7883,46 @@ typeof navigator === "object" && (function (global, factory) {
 
 	        // Settings button / menu
 	        if (this.config.controls.includes('settings') && !is$1.empty(this.config.settings)) {
-	            var menu = createElement('div', {
+	            var control = createElement('div', {
 	                class: 'plyr__menu',
 	                hidden: ''
 	            });
 
-	            menu.appendChild(controls.createButton.call(this, 'settings', {
+	            control.appendChild(controls.createButton.call(this, 'settings', {
 	                id: 'plyr-settings-toggle-' + data.id,
 	                'aria-haspopup': true,
 	                'aria-controls': 'plyr-settings-' + data.id,
 	                'aria-expanded': false
 	            }));
 
-	            var form = createElement('form', {
+	            var popup = createElement('div', {
 	                class: 'plyr__menu__container',
 	                id: 'plyr-settings-' + data.id,
 	                hidden: '',
-	                'aria-labelled-by': 'plyr-settings-toggle-' + data.id,
-	                role: 'tablist',
-	                tabindex: -1
+	                'aria-labelled-by': 'plyr-settings-toggle-' + data.id
 	            });
 
 	            var inner = createElement('div');
 
 	            var home = createElement('div', {
-	                id: 'plyr-settings-' + data.id + '-home',
-	                'aria-labelled-by': 'plyr-settings-toggle-' + data.id,
-	                role: 'tabpanel'
+	                id: 'plyr-settings-' + data.id + '-home'
 	            });
 
-	            // Create the tab list
-	            var tabs = createElement('ul', {
-	                role: 'tablist'
+	            // Create the menu
+	            var menu = createElement('div', {
+	                role: 'menu'
 	            });
 
-	            // Build the tabs
+	            // Build the menu items
 	            this.config.settings.forEach(function (type) {
-	                var tab = createElement('li', {
-	                    role: 'tab',
-	                    hidden: ''
-	                });
-
-	                var button = createElement('button', extend(getAttributesFromSelector(_this7.config.selectors.buttons.settings), {
+	                var menuItem = createElement('button', extend(getAttributesFromSelector(_this7.config.selectors.buttons.settings), {
 	                    type: 'button',
 	                    class: _this7.config.classNames.control + ' ' + _this7.config.classNames.control + '--forward',
-	                    id: 'plyr-settings-' + data.id + '-' + type + '-tab',
-	                    'aria-haspopup': true,
-	                    'aria-controls': 'plyr-settings-' + data.id + '-' + type,
-	                    'aria-expanded': false
-	                }), i18n.get(type, _this7.config));
+	                    'role': 'menuitem',
+	                    'aria-haspopup': true
+	                }));
+
+	                var flex = createElement('span', null, i18n.get(type, _this7.config));
 
 	                var value = createElement('span', {
 	                    class: _this7.config.classNames.menu.value
@@ -7896,50 +7931,46 @@ typeof navigator === "object" && (function (global, factory) {
 	                // Speed contains HTML entities
 	                value.innerHTML = data[type];
 
-	                button.appendChild(value);
-	                tab.appendChild(button);
-	                tabs.appendChild(tab);
+	                flex.appendChild(value);
+	                menuItem.appendChild(flex);
+	                menu.appendChild(menuItem);
 
-	                _this7.elements.settings.tabs[type] = tab;
-	            });
-
-	            home.appendChild(tabs);
-	            inner.appendChild(home);
-
-	            // Build the panes
-	            this.config.settings.forEach(function (type) {
+	                // Build the panes
 	                var pane = createElement('div', {
 	                    id: 'plyr-settings-' + data.id + '-' + type,
-	                    hidden: '',
-	                    'aria-labelled-by': 'plyr-settings-' + data.id + '-' + type + '-tab',
-	                    role: 'tabpanel',
-	                    tabindex: -1
+	                    hidden: ''
 	                });
 
-	                var back = createElement('button', {
+	                // Back button
+	                pane.appendChild(createElement('button', {
 	                    type: 'button',
-	                    class: _this7.config.classNames.control + ' ' + _this7.config.classNames.control + '--back',
-	                    'aria-haspopup': true,
-	                    'aria-controls': 'plyr-settings-' + data.id + '-home',
-	                    'aria-expanded': false
-	                }, i18n.get(type, _this7.config));
+	                    class: _this7.config.classNames.control + ' ' + _this7.config.classNames.control + '--back'
+	                }, i18n.get(type, _this7.config)));
 
-	                pane.appendChild(back);
+	                // Menu
+	                pane.appendChild(createElement('div', {
+	                    role: 'menu'
+	                }));
 
-	                var options = createElement('ul');
-
-	                pane.appendChild(options);
 	                inner.appendChild(pane);
 
-	                _this7.elements.settings.panes[type] = pane;
+	                menuItem.addEventListener('click', function () {
+	                    controls.showMenu.call(_this7, type);
+	                });
+
+	                _this7.elements.settings.buttons[type] = menuItem;
+	                _this7.elements.settings.menus[type] = pane;
 	            });
 
-	            form.appendChild(inner);
-	            menu.appendChild(form);
-	            container.appendChild(menu);
+	            home.appendChild(menu);
+	            inner.appendChild(home);
 
-	            this.elements.settings.form = form;
-	            this.elements.settings.menu = menu;
+	            popup.appendChild(inner);
+	            control.appendChild(popup);
+	            container.appendChild(control);
+
+	            this.elements.settings.popup = popup;
+	            this.elements.settings.menu = control;
 	        }
 
 	        // Picture in picture button
@@ -8096,51 +8127,6 @@ typeof navigator === "object" && (function (global, factory) {
 	};
 
 	// ==========================================================================
-	// Fetch wrapper
-	// Using XHR to avoid issues with older browsers
-	// ==========================================================================
-
-	function fetch$1(url) {
-	    var responseType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'text';
-
-	    return new Promise(function (resolve, reject) {
-	        try {
-	            var request = new XMLHttpRequest();
-
-	            // Check for CORS support
-	            if (!('withCredentials' in request)) {
-	                return;
-	            }
-
-	            request.addEventListener('load', function () {
-	                if (responseType === 'text') {
-	                    try {
-	                        resolve(JSON.parse(request.responseText));
-	                    } catch (e) {
-	                        resolve(request.responseText);
-	                    }
-	                } else {
-	                    resolve(request.response);
-	                }
-	            });
-
-	            request.addEventListener('error', function () {
-	                throw new Error(request.statusText);
-	            });
-
-	            request.open('GET', url, true);
-
-	            // Set the required response type
-	            request.responseType = responseType;
-
-	            request.send();
-	        } catch (e) {
-	            reject(e);
-	        }
-	    });
-	}
-
-	// ==========================================================================
 
 	/**
 	 * Parse a string to a URL object
@@ -8219,7 +8205,7 @@ typeof navigator === "object" && (function (global, factory) {
 	                var url = parseUrl(src);
 
 	                if (url !== null && url.hostname !== window.location.href.hostname && ['http:', 'https:'].includes(url.protocol)) {
-	                    fetch$1(src, 'blob').then(function (blob) {
+	                    fetch(src, 'blob').then(function (blob) {
 	                        track.setAttribute('src', window.URL.createObjectURL(blob));
 	                    }).catch(function () {
 	                        removeElement(track);
@@ -10003,13 +9989,12 @@ typeof navigator === "object" && (function (global, factory) {
 	            });
 
 	            // Settings menu
-	            bind(this.player.elements.settings.form, 'click', function (event) {
+	            bind(this.player.elements.settings.popup, 'click', function (event) {
 	                event.stopPropagation();
 
 	                // Go back to home tab on click
 	                var showHomeTab = function showHomeTab() {
-	                    var id = 'plyr-settings-' + _this4.player.id + '-home';
-	                    controls.showTab.call(_this4.player, id);
+	                    controls.showMenu.call(_this4.player, 'home');
 	                };
 
 	                // Settings menu items - use event delegation as items are added/removed
@@ -10028,9 +10013,6 @@ typeof navigator === "object" && (function (global, factory) {
 	                        _this4.player.speed = parseFloat(event.target.value);
 	                        showHomeTab();
 	                    }, 'speed');
-	                } else {
-	                    var tab = event.target;
-	                    controls.showTab.call(_this4.player, tab.getAttribute('aria-controls'));
 	                }
 	            });
 
@@ -10633,7 +10615,7 @@ typeof navigator === "object" && (function (global, factory) {
 	        player.media = replaceElement(wrapper, player.media);
 
 	        // Get poster image
-	        fetch$1(format(player.config.urls.vimeo.api, id), 'json').then(function (response) {
+	        fetch(format(player.config.urls.vimeo.api, id), 'json').then(function (response) {
 	            if (is$1.empty(response)) {
 	                return;
 	            }
@@ -11048,7 +11030,7 @@ typeof navigator === "object" && (function (global, factory) {
 	        if (is$1.string(key) && !is$1.empty(key)) {
 	            var url = format(this.config.urls.youtube.api, videoId, key);
 
-	            fetch$1(url).then(function (result) {
+	            fetch(url).then(function (result) {
 	                if (is$1.object(result)) {
 	                    _this2.config.title = result.items[0].snippet.title;
 	                    ui.setTitle.call(_this2);
@@ -12332,16 +12314,17 @@ typeof navigator === "object" && (function (global, factory) {
 	        // Elements cache
 	        this.elements = {
 	            container: null,
+	            captions: null,
 	            buttons: {},
 	            display: {},
 	            progress: {},
 	            inputs: {},
 	            settings: {
+	                popup: null,
 	                menu: null,
-	                panes: {},
-	                tabs: {}
-	            },
-	            captions: null
+	                menus: {},
+	                buttons: {}
+	            }
 	        };
 
 	        // Captions

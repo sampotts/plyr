@@ -3,6 +3,7 @@
 // ==========================================================================
 
 import Storage from './../storage';
+import fetch from './fetch';
 import is from './is';
 
 // Load an external SVG sprite

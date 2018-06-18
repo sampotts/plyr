@@ -1,3 +1,27 @@
+# v3.3.14
+
+-   Fix sprite loading regression
+
+# v3.3.13
+
+You guessed it, a load of awesome changes from contributors:
+
+Thanks @friday for the following:
+
+-   Captions fixes
+-   Fix poster race conditions
+-   Minor code improvements for quality switching
+-   Minor event changes
+-   Fix condition in events.toggleListener to allow non-elements
+-   Suggestion: Remove array newline rule
+-   Contributions improvements
+
+-   fix: html5.cancelRequest not remove source tag correctly (thanks @a60814billy)
+-   remove event listeners in destroy() (thanks @cky917)
+-   Fix markdown in README (thanks @azu)
+-   Some parts of the accessibility improvements outlined in #905 (more on the way...)
+-   Fix for bug where volume slider didn't always show
+
 # v3.3.12
 
 -   Fix synthetic event bubble/proxy loses detail (thanks @friday!)
