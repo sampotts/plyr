@@ -1,3 +1,7 @@
+# v3.3.16
+
+-   Fixed regression relating the play button status (fixes #1048)
+
 # v3.3.15
 
 -   Fix for error relating to play buttons when switching source
