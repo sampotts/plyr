@@ -75,16 +75,17 @@ class Plyr {
         // Elements cache
         this.elements = {
             container: null,
+            captions: null,
             buttons: {},
             display: {},
             progress: {},
             inputs: {},
             settings: {
+                popup: null,
                 menu: null,
-                panes: {},
-                tabs: {},
+                menus: {},
+                buttons: {},
             },
-            captions: null,
         };
 
         // Captions

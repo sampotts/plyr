@@ -54,18 +54,16 @@
             width: 0;
         }
 
-        ul {
-            list-style: none;
-            margin: 0;
-            overflow: hidden;
+        [role='menu'] {
             padding: $plyr-control-padding;
+        }
 
-            li {
-                margin-top: 2px;
+        [role='menuitem'],
+        [role='menuitemradio'] {
+            margin-top: 2px;
 
-                &:first-child {
-                    margin-top: 0;
-                }
+            &:first-child {
+                margin-top: 0;
             }
         }
 
@@ -75,9 +73,15 @@
             color: $plyr-menu-color;
             display: flex;
             font-size: $plyr-font-size-menu;
-            padding: ceil($plyr-control-padding / 2) ($plyr-control-padding * 2);
+            padding: ceil($plyr-control-padding / 2) ceil($plyr-control-padding * 1.5);
             user-select: none;
             width: 100%;
+
+            > span {
+                align-items: inherit;
+                display: flex;
+                width: 100%;
+            }
 
             &::after {
                 border: 4px solid transparent;

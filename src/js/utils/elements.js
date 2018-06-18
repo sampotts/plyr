@@ -70,12 +70,19 @@ export function createElement(type, attributes, text) {
 
 // Inaert an element after another
 export function insertAfter(element, target) {
+    if (!is.element(element) || !is.element(target)) {
+        return;
+    }
+
     target.parentNode.insertBefore(element, target.nextSibling);
 }
 
 // Insert a DocumentFragment
 export function insertElement(type, parent, attributes, text) {
-    // Inject the new <element>
+    if (!is.element(parent)) {
+        return;
+    }
+
     parent.appendChild(createElement(type, attributes, text));
 }
 
@@ -95,6 +102,10 @@ export function removeElement(element) {
 
 // Remove all child elements
 export function emptyElement(element) {
+    if (!is.element(element)) {
+        return;
+    }
+
     let { length } = element.childNodes;
 
     while (length > 0) {

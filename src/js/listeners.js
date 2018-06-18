@@ -486,13 +486,12 @@ class Listeners {
         });
 
         // Settings menu
-        bind(this.player.elements.settings.form, 'click', event => {
+        bind(this.player.elements.settings.popup, 'click', event => {
             event.stopPropagation();
 
             // Go back to home tab on click
             const showHomeTab = () => {
-                const id = `plyr-settings-${this.player.id}-home`;
-                controls.showTab.call(this.player, id);
+                controls.showMenu.call(this.player, 'home');
             };
 
             // Settings menu items - use event delegation as items are added/removed
@@ -523,9 +522,6 @@ class Listeners {
                     },
                     'speed',
                 );
-            } else {
-                const tab = event.target;
-                controls.showTab.call(this.player, tab.getAttribute('aria-controls'));
             }
         });
 
