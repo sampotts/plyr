@@ -9383,11 +9383,9 @@ typeof navigator === "object" && (function (global, factory) {
 	        }
 
 	        // If there's a play button, set label
-	        if (is$1.nodeList(this.elements.buttons.play)) {
-	            Array.from(this.elements.buttons.play).forEach(function (button) {
-	                button.setAttribute('aria-label', label);
-	            });
-	        }
+	        Array.from(this.elements.buttons.play || []).forEach(function (button) {
+	            button.setAttribute('aria-label', label);
+	        });
 
 	        // Set iframe title
 	        // https://github.com/sampotts/plyr/issues/124
@@ -9467,11 +9465,9 @@ typeof navigator === "object" && (function (global, factory) {
 	        toggleClass(this.elements.container, this.config.classNames.stopped, this.stopped);
 
 	        // Set state
-	        if (is$1.nodeList(this.elements.buttons.play)) {
-	            Array.from(this.elements.buttons.play).forEach(function (target) {
-	                target.pressed = _this3.playing;
-	            });
-	        }
+	        Array.from(this.elements.buttons.play || []).forEach(function (target) {
+	            target.pressed = _this3.playing;
+	        });
 
 	        // Only update controls on non timeupdate events
 	        if (is$1.event(event) && event.type === 'timeupdate') {
