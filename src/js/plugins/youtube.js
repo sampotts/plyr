@@ -270,8 +270,8 @@ const youtube = {
                             return Number(instance.getCurrentTime());
                         },
                         set(time) {
-                            // If paused, mute audio preventively (YouTube starts playing on seek if the video hasn't been played yet).
-                            if (player.paused) {
+                            // If paused and never played, mute audio preventively (YouTube starts playing on seek if the video hasn't been played yet).
+                            if (player.paused && !player.embed.hasPlayed) {
                                 player.embed.mute();
                             }
 
