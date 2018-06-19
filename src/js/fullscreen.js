@@ -20,7 +20,16 @@ function onChange() {
     }
 
     // Trigger an event
-    triggerEvent.call(this.player, this.target, this.active ? 'enterfullscreen' : 'exitfullscreen', true);
+    if (this.isIosNative || !this.isOutterContainerSet) {
+        triggerEvent.call(this.player, this.target, this.active ? 'enterfullscreen' : 'exitfullscreen', true);
+    } else {
+        triggerEvent.call(
+            this.player,
+            this.player.elements.container,
+            this.active ? 'enterfullscreen' : 'exitfullscreen',
+            true,
+        );
+    }
 
     // Trap focus in container
     if (!browser.isIos) {
@@ -43,7 +52,13 @@ function toggleFallback(toggle = false) {
     document.body.style.overflow = toggle ? 'hidden' : '';
 
     // Toggle class hook
-    toggleClass(this.target, this.player.config.classNames.fullscreen.fallback, toggle);
+    if (this.target === this.player.elements.container) {
+        toggleClass(this.target, this.player.config.classNames.fullscreen.fallback, toggle);
+    } else {
+        toggleClass(this.target, this.player.config.classNames.fullscreen.fallback, toggle);
+        toggleClass(this.player.elements.container, this.player.config.classNames.fullscreen.fallback, toggle);
+    }
+
 
     // Toggle button and fire events
     onChange.call(this);
@@ -150,15 +165,26 @@ class Fullscreen {
         return element === this.target;
     }
 
-    get zoomActive () {
+    get zoomActive() {
         return hasClass(this.target, this.player.config.classNames.fullscreen.fallback);
+    }
+
+    get isIosNative() {
+        return browser.isIos && this.player.config.fullscreen.iosNative;
+    }
+
+    get isOutterContainerSet() {
+        return !!this.player.config.fullscreenContainer;
     }
 
     // Get target element
     get target() {
-        return browser.isIos && this.player.config.fullscreen.iosNative
-            ? this.player.media
-            : this.player.elements.container;
+        if (this.isIosNative) {
+            return this.player.media;
+        } else if (this.isOutterContainerSet) {
+            return this.player.config.fullscreenContainer;
+        }
+        return this.player.elements.container;
     }
 
     // Update UI
@@ -213,7 +239,7 @@ class Fullscreen {
         }
     }
 
-    toggleZoom () {
+    toggleZoom() {
         if (!this.zoomActive) {
             toggleFallback.call(this, true);
         } else {

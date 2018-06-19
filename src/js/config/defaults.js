@@ -70,6 +70,9 @@ const defaults = {
         link: undefined,
     },
 
+    // fullscreen container, default is plyr container
+    fullscreenContainer: undefined,
+
     // Quality default
     quality: {
         default: 576,
@@ -408,6 +411,7 @@ const defaults = {
             active: 'plyr--airplay-active',
         },
         tabFocus: 'plyr__tab-focus',
+        outerContainer: 'plyr__outer-container',
     },
 
     // Embed attributes
