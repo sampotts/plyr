@@ -1,7 +1,8 @@
 {
     "plyr": {
         "sass": {
-            "plyr.css": "src/sass/plyr.scss"
+            "plyr.css": "src/sass/plyr.scss",
+            "hahow-plyr.css": "src/sass/hahow-plyr.scss"
         },
         "js": {
             "plyr.js": "src/js/plyr.js",

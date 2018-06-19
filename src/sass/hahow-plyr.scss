@@ -1,0 +1,27 @@
+@charset 'UTF-8';
+
+$plyr-color-main: #00bea4;
+$plyr-control-radius: 0;
+$plyr-tooltip-bg: rgba(#000, 0.75);
+$plyr-tooltip-color: #fff;
+$plyr-menu-bg: rgba(#000, 0.75);
+$plyr-menu-color: #fff;
+@import "plyr";
+
+.plyr__menu__container {
+    border-radius: 0;
+    ul {
+        padding: 0;
+        li {
+            border-bottom: 2px solid hsla(0,0%,100%,.43);
+        }
+    }
+
+    .plyr__control {
+        padding: 10px 25px 10px 15px;
+    }
+
+    .plyr__control--back {
+        padding: 10px 15px 10px 25px;
+    }
+}
