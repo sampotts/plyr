@@ -16,7 +16,9 @@ const ui = {
     addStyleHook() {
         toggleClass(this.elements.container, this.config.selectors.container.replace('.', ''), true);
         toggleClass(this.elements.container, this.config.classNames.uiSupported, this.supported.ui);
+    },
 
+    addStylehookToFullscreenContainer () {
         // append plyr__outer-container class name to outer container
         if (this.config.fullscreenContainer) {
             toggleClass(this.config.fullscreenContainer, this.config.classNames.outerContainer, true);

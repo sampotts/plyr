@@ -267,6 +267,7 @@ class Plyr {
 
         // Add style hook
         ui.addStyleHook.call(this);
+        ui.addStylehookToFullscreenContainer.call(this);
 
         // Setup media
         media.setup.call(this);
@@ -567,6 +568,13 @@ class Plyr {
     decreaseVolume(step) {
         const volume = this.media.muted ? 0 : this.volume;
         this.volume = volume - (is.number(step) ? step : 1);
+    }
+
+    set fullscreenContainer (container) {
+        if (is.element(container)) {
+            this.config.fullscreenContainer = container;
+            ui.addStylehookToFullscreenContainer.call(this);
+        }
     }
 
     /**
@@ -940,7 +948,7 @@ class Plyr {
             const hiding = toggleClass(this.elements.container, this.config.classNames.hideControls, force);
 
             // Close menu
-            if (hiding && this.config.controls.includes('settings') && !is.empty(this.config.settings)) {
+            if (hiding && !is.empty(this.config.settings)) {
                 controls.toggleMenu.call(this, false);
             }
             // Trigger event on change

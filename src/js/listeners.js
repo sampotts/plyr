@@ -251,65 +251,109 @@ class Listeners {
 
     // Listen for media events
     media() {
-        // Time change on media
-        on.call(this.player, this.player.media, 'timeupdate seeking seeked', event =>
-            controls.timeUpdate.call(this.player, event),
-        );
+        if (!this.player.media.isAlreadyRegisterEventListener) {
+            this.player.media.isAlreadyRegisterEventListener = true;
+            // Time change on media
+            on.call(this.player, this.player.media, 'timeupdate seeking seeked', event =>
+                controls.timeUpdate.call(this.player, event),
+            );
 
-        // Display duration
-        on.call(this.player, this.player.media, 'durationchange loadeddata loadedmetadata', event =>
-            controls.durationUpdate.call(this.player, event),
-        );
+            // Display duration
+            on.call(this.player, this.player.media, 'durationchange loadeddata loadedmetadata', event =>
+                controls.durationUpdate.call(this.player, event),
+            );
 
-        // Check for audio tracks on load
-        // We can't use `loadedmetadata` as it doesn't seem to have audio tracks at that point
-        on.call(this.player, this.player.media, 'canplay', () => {
-            toggleHidden(this.player.elements.volume, !this.player.hasAudio);
-            toggleHidden(this.player.elements.buttons.mute, !this.player.hasAudio);
-        });
+            // Check for audio tracks on load
+            // We can't use `loadedmetadata` as it doesn't seem to have audio tracks at that point
+            on.call(this.player, this.player.media, 'canplay', () => {
+                toggleHidden(this.player.elements.volume, !this.player.hasAudio);
+                toggleHidden(this.player.elements.buttons.mute, !this.player.hasAudio);
+            });
 
-        // Handle the media finishing
-        on.call(this.player, this.player.media, 'ended', () => {
-            // Show poster on end
-            if (this.player.isHTML5 && this.player.isVideo && this.player.config.resetOnEnd) {
-                // Restart
-                this.player.restart();
-            }
-        });
+            // Handle the media finishing
+            on.call(this.player, this.player.media, 'ended', () => {
+                // Show poster on end
+                if (this.player.isHTML5 && this.player.isVideo && this.player.config.resetOnEnd) {
+                    // Restart
+                    this.player.restart();
+                }
+            });
 
-        // Check for buffer progress
-        on.call(this.player, this.player.media, 'progress playing seeking seeked', event =>
-            controls.updateProgress.call(this.player, event),
-        );
+            // Check for buffer progress
+            on.call(this.player, this.player.media, 'progress playing seeking seeked', event =>
+                controls.updateProgress.call(this.player, event),
+            );
 
-        // Handle volume changes
-        on.call(this.player, this.player.media, 'volumechange', event =>
-            controls.updateVolume.call(this.player, event),
-        );
+            // Handle volume changes
+            on.call(this.player, this.player.media, 'volumechange', event =>
+                controls.updateVolume.call(this.player, event),
+            );
 
-        // Handle play/pause
-        on.call(this.player, this.player.media, 'playing play pause ended emptied timeupdate', event =>
-            ui.checkPlaying.call(this.player, event),
-        );
+            // Handle play/pause
+            on.call(this.player, this.player.media, 'playing play pause ended emptied timeupdate', event =>
+                ui.checkPlaying.call(this.player, event),
+            );
 
-        // Loading state
-        on.call(this.player, this.player.media, 'waiting canplay seeked playing', event =>
-            ui.checkLoading.call(this.player, event),
-        );
+            // Loading state
+            on.call(this.player, this.player.media, 'waiting canplay seeked playing', event =>
+                ui.checkLoading.call(this.player, event),
+            );
 
-        // If autoplay, then load advertisement if required
-        // TODO: Show some sort of loading state while the ad manager loads else there's a delay before ad shows
-        on.call(this.player, this.player.media, 'playing', () => {
-            if (!this.player.ads) {
-                return;
-            }
+            // If autoplay, then load advertisement if required
+            // TODO: Show some sort of loading state while the ad manager loads else there's a delay before ad shows
+            on.call(this.player, this.player.media, 'playing', () => {
+                if (!this.player.ads) {
+                    return;
+                }
 
-            // If ads are enabled, wait for them first
-            if (this.player.ads.enabled && !this.player.ads.initialized) {
-                // Wait for manager response
-                this.player.ads.managerPromise.then(() => this.player.ads.play()).catch(() => this.player.play());
-            }
-        });
+                // If ads are enabled, wait for them first
+                if (this.player.ads.enabled && !this.player.ads.initialized) {
+                    // Wait for manager response
+                    this.player.ads.managerPromise.then(() => this.player.ads.play()).catch(() => this.player.play());
+                }
+            });
+
+            // Volume change
+            on.call(this.player, this.player.media, 'volumechange', () => {
+                // Save to storage
+                this.player.storage.set({ volume: this.player.volume, muted: this.player.muted });
+            });
+
+            // Speed change
+            on.call(this.player, this.player.media, 'ratechange', () => {
+                // Update UI
+                controls.updateSetting.call(this.player, 'speed');
+
+                // Save to storage
+                this.player.storage.set({ speed: this.player.speed });
+            });
+
+            // Quality request
+            on.call(this.player, this.player.media, 'qualityrequested', event => {
+                // Save to storage
+                this.player.storage.set({ quality: event.detail.quality });
+            });
+
+            // Quality change
+            on.call(this.player, this.player.media, 'qualitychange', event => {
+                // Update UI
+                controls.updateSetting.call(this.player, 'quality', null, event.detail.quality);
+            });
+
+            // Proxy events to container
+            // Bubble up key events for Edge
+            const proxyEvents = this.player.config.events.concat(['keyup', 'keydown']).join(' ');
+            on.call(this.player, this.player.media, proxyEvents, event => {
+                let { detail = {} } = event;
+
+                // Get error details from media
+                if (event.type === 'error') {
+                    detail = this.player.media.error;
+                }
+
+                triggerEvent.call(this.player, this.player.elements.container, event.type, true, detail);
+            });
+        }
 
         // Click video
         if (this.player.supported.ui && this.player.config.clickToPlay && !this.player.isAudio) {
@@ -321,77 +365,39 @@ class Listeners {
                 return;
             }
 
-            // On click play, pause ore restart
-            on.call(this.player, wrapper, 'click', () => {
-                // Touch devices will just show controls (if we're hiding controls)
-                if (this.player.config.hideControls && this.player.touch && !this.player.paused) {
-                    return;
+            if (!wrapper.isAlreadyRegisterEventListener) {
+                wrapper.isAlreadyRegisterEventListener = true;
+                // On click play, pause ore restart
+                on.call(this.player, wrapper, 'click', () => {
+                    // Touch devices will just show controls (if we're hiding controls)
+                    if (this.player.config.hideControls && this.player.touch && !this.player.paused) {
+                        return;
+                    }
+
+                    if (this.player.paused) {
+                        this.player.play();
+                    } else if (this.player.ended) {
+                        this.player.restart();
+                        this.player.play();
+                    } else {
+                        this.player.pause();
+                    }
+                });
+
+                // Disable right click
+                if (this.player.supported.ui && this.player.config.disableContextMenu) {
+                    on.call(
+                        this.player,
+                        this.player.elements.wrapper,
+                        'contextmenu',
+                        event => {
+                            event.preventDefault();
+                        },
+                        false,
+                    );
                 }
-
-                if (this.player.paused) {
-                    this.player.play();
-                } else if (this.player.ended) {
-                    this.player.restart();
-                    this.player.play();
-                } else {
-                    this.player.pause();
-                }
-            });
-        }
-
-        // Disable right click
-        if (this.player.supported.ui && this.player.config.disableContextMenu) {
-            on.call(
-                this.player,
-                this.player.elements.wrapper,
-                'contextmenu',
-                event => {
-                    event.preventDefault();
-                },
-                false,
-            );
-        }
-
-        // Volume change
-        on.call(this.player, this.player.media, 'volumechange', () => {
-            // Save to storage
-            this.player.storage.set({ volume: this.player.volume, muted: this.player.muted });
-        });
-
-        // Speed change
-        on.call(this.player, this.player.media, 'ratechange', () => {
-            // Update UI
-            controls.updateSetting.call(this.player, 'speed');
-
-            // Save to storage
-            this.player.storage.set({ speed: this.player.speed });
-        });
-
-        // Quality request
-        on.call(this.player, this.player.media, 'qualityrequested', event => {
-            // Save to storage
-            this.player.storage.set({ quality: event.detail.quality });
-        });
-
-        // Quality change
-        on.call(this.player, this.player.media, 'qualitychange', event => {
-            // Update UI
-            controls.updateSetting.call(this.player, 'quality', null, event.detail.quality);
-        });
-
-        // Proxy events to container
-        // Bubble up key events for Edge
-        const proxyEvents = this.player.config.events.concat(['keyup', 'keydown']).join(' ');
-        on.call(this.player, this.player.media, proxyEvents, event => {
-            let { detail = {} } = event;
-
-            // Get error details from media
-            if (event.type === 'error') {
-                detail = this.player.media.error;
             }
-
-            triggerEvent.call(this.player, this.player.elements.container, event.type, true, detail);
-        });
+        }
     }
 
     // Listen for control events
@@ -511,7 +517,7 @@ class Listeners {
                     event,
                     () => {
                         this.player.currentTrack = Number(event.target.value);
-                        showHomeTab();
+                        // showHomeTab();
                     },
                     'language',
                 );
@@ -520,7 +526,7 @@ class Listeners {
                     event,
                     () => {
                         this.player.quality = event.target.value;
-                        showHomeTab();
+                        // showHomeTab();
                     },
                     'quality',
                 );
@@ -529,7 +535,7 @@ class Listeners {
                     event,
                     () => {
                         this.player.speed = parseFloat(event.target.value);
-                        showHomeTab();
+                        // showHomeTab();
                     },
                     'speed',
                 );

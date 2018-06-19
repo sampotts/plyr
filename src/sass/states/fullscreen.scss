@@ -37,15 +37,31 @@
 .plyr__outer-container {
     &:fullscreen {
         @include plyr-fullscreen-active();
+
+        .plyr {
+            @include plyr-fullscreen-active();
+        }
     }
     &:-webkit-full-screen {
         @include plyr-fullscreen-active();
+
+        .plyr {
+            @include plyr-fullscreen-active();
+        }
     }
     &:-moz-full-screen {
         @include plyr-fullscreen-active();
+
+        .plyr {
+            @include plyr-fullscreen-active();
+        }
     }
     &:-ms-fullscreen {
         @include plyr-fullscreen-active();
+
+        .plyr {
+            @include plyr-fullscreen-active();
+        }
     }
     .plyr__outer-container.plyr--fullscreen-fallback {
         @include plyr-fullscreen-active();

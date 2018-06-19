@@ -113,6 +113,7 @@ const source = {
 
                 // Restore class hook
                 ui.addStyleHook.call(this);
+                ui.addStylehookToFullscreenContainer.call(this);
 
                 // Set new sources for html5
                 if (this.isHTML5) {
