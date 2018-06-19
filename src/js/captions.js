@@ -15,6 +15,7 @@ import {
     insertAfter,
     removeElement,
     toggleClass,
+    hasClass,
 } from './utils/elements';
 import { on, triggerEvent } from './utils/events';
 import fetch from './utils/fetch';
@@ -385,12 +386,12 @@ const captions = {
 
     setPosition (position) {
         // if already setup correct class name, just ignore
-        if (utils.hasClass(this.elements.captions, this.config.classNames.captionPosition.replace('{0}', 'top'))) {
+        if (hasClass(this.elements.captions, this.config.classNames.captionPosition.replace('{0}', 'top'))) {
             if (position === 'top') return;
         } else if (position === 'bottom') {
             return;
         }
-        utils.toggleClass(this.elements.captions, this.config.classNames.captionPosition.replace('{0}', 'top'));
+        toggleClass(this.elements.captions, this.config.classNames.captionPosition.replace('{0}', 'top'));
     },
 };
 

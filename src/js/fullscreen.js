@@ -151,7 +151,7 @@ class Fullscreen {
     }
 
     get zoomActive () {
-        return utils.hasClass(this.target, this.player.config.classNames.fullscreen.fallback);
+        return hasClass(this.target, this.player.config.classNames.fullscreen.fallback);
     }
 
     // Get target element
@@ -218,11 +218,6 @@ class Fullscreen {
             toggleFallback.call(this, true);
         } else {
             toggleFallback.call(this, false);
-        }
-        // Update toggle button
-        const button = this.player.elements.buttons.zoom;
-        if (utils.is.element(button)) {
-            utils.toggleState(button, this.zoomActive);
         }
     }
 

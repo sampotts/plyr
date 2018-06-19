@@ -19,7 +19,7 @@ import Storage from './storage';
 import support from './support';
 import ui from './ui';
 import { closest } from './utils/arrays';
-import { createElement, hasClass, removeElement, replaceElement, toggleClass, wrap } from './utils/elements';
+import { setAttributes, createElement, hasClass, removeElement, replaceElement, toggleClass, wrap } from './utils/elements';
 import { off, on, once, triggerEvent, unbindListeners } from './utils/events';
 import is from './utils/is';
 import loadSprite from './utils/loadSprite';
@@ -285,18 +285,18 @@ class Plyr {
         // add custom logo
         if (this.config.logo && this.config.logo.url) {
             const logoContainer = document.createElement('div');
-            utils.toggleClass(logoContainer, this.config.classNames.logo, true);
+            toggleClass(logoContainer, this.config.classNames.logo, true);
             let imageContainer = logoContainer;
             if (this.config.logo.link) {
                 const linkElement = document.createElement('a');
-                utils.setAttributes(linkElement, {
+                setAttributes(linkElement, {
                     href: this.config.logo.link,
                 });
                 logoContainer.appendChild(linkElement);
                 imageContainer = linkElement;
             }
             const logoElement = document.createElement('img');
-            utils.setAttributes(logoElement, {
+            setAttributes(logoElement, {
                 src: this.config.logo.url,
             });
             imageContainer.appendChild(logoElement);

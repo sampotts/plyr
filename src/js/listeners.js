@@ -533,7 +533,7 @@ class Listeners {
                     },
                     'speed',
                 );
-            } else if (utils.matches(event.target, this.player.config.selectors.inputs['caption-position'])) {
+            } else if (matches(event.target, this.player.config.selectors.inputs['caption-position'])) {
                 proxy(
                     event,
                     () => {
