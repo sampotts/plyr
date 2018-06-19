@@ -59,4 +59,42 @@ $plyr-control-padding: 10px;
 
 .plyr__tooltip {
     font-size: 14px;
+    border-radius: 0;
+}
+
+.plyr__control[data-plyr="rewind"] {
+    .plyr__tooltip {
+        transform: translate(-25%, 10px) scale(1);
+
+        &::before {
+            left: 25%;
+        }
+    }
+
+    &:hover {
+        .plyr__tooltip {
+            transform: translate(-25%, 0) scale(1);
+
+            &::before {
+                left: 25%;
+            }
+        }
+    }
+}
+
+// Media duration hidden on small screens
+.plyr__time + .plyr__time {
+    // Add a slash in before
+    &::before {
+        content: '\2044';
+        margin-right: $plyr-control-spacing;
+    }
+
+    @media (max-width: $plyr-bp-sm-max) {
+        display: inherit;
+    }
+
+    @media (max-width: $plyr-bp-xs-max) {
+        display: none;
+    }
 }
