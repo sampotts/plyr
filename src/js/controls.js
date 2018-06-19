@@ -891,8 +891,8 @@ const controls = {
         controls.updateSetting.call(this, type, list);
     },
 
-    // Set a list of available captions languages
-    setSpeedMenu(options) {
+    // Update the list of available speeds
+    updateSpeedMenu() {
         // Do nothing if not selected
         if (!this.config.controls.includes('settings') || !this.config.settings.includes('speed')) {
             return;
@@ -904,16 +904,6 @@ const controls = {
         }
 
         const type = 'speed';
-
-        // Set the speed options
-        if (is.array(options)) {
-            this.options.speed = options;
-        } else if (this.isHTML5 || this.isVimeo) {
-            this.options.speed = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
-        }
-
-        // Set options if passed and filter based on config
-        this.options.speed = this.options.speed.filter(speed => this.config.speed.options.includes(speed));
 
         // Toggle the pane and tab
         const toggle = !is.empty(this.options.speed) && this.options.speed.length > 1;
@@ -1356,10 +1346,14 @@ const controls = {
         this.elements.controls = container;
 
         if (this.isHTML5) {
+            // Set quality
             controls.setQualityMenu.call(this, html5.getQualityOptions.call(this));
-        }
 
-        controls.setSpeedMenu.call(this);
+            // Set speed options
+            this.options.speed = this.config.speed.options;
+        }
+        // Update speed menu
+        controls.updateSpeedMenu.call(this);
 
         return container;
     },

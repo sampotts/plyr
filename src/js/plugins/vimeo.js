@@ -50,6 +50,9 @@ const vimeo = {
         // Add embed class for responsive
         toggleClass(this.elements.wrapper, this.config.classNames.embed, true);
 
+        // Set speed options from config. Filter out invalid Vimeo speeds
+        this.options.speed = this.config.speed.options.filter(option => option >= 0.5 && option <= 2);
+
         // Set intial ratio
         vimeo.setAspectRatio.call(this);
 
@@ -221,7 +224,8 @@ const vimeo = {
                     .catch(error => {
                         // Hide menu item (and menu if empty)
                         if (error.name === 'Error') {
-                            controls.setSpeedMenu.call(player, []);
+                            this.options.speed = [];
+                            controls.updateSpeedMenu.call(player);
                         }
                     });
             },

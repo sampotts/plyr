@@ -68,7 +68,9 @@ const ui = {
         this.muted = null;
 
         // Reset speed
-        this.speed = null;
+        setTimeout(() => {
+            this.speed = this.storage.get('speed') || this.config.speed.selected;
+        }, 0);
 
         // Reset loop state
         this.loop = null;

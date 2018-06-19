@@ -622,32 +622,13 @@ class Plyr {
      * @param {number} speed - the speed of playback (0.5-2.0)
      */
     set speed(input) {
-        let speed = null;
-
-        if (is.number(input)) {
-            speed = input;
-        }
-
-        if (!is.number(speed)) {
-            speed = this.storage.get('speed');
-        }
-
-        if (!is.number(speed)) {
-            speed = this.config.speed.selected;
-        }
-
-        // Set min/max
-        if (speed < 0.1) {
-            speed = 0.1;
-        }
-        if (speed > 2.0) {
-            speed = 2.0;
-        }
-
-        if (!this.config.speed.options.includes(speed)) {
-            this.debug.warn(`Unsupported speed (${speed})`);
+        if (!is.number(input)) {
+            this.debug.warn('Unsupported speed', input);
             return;
         }
+
+        // Get closest
+        const speed = closest(this.options.speed, input);
 
         // Update config
         this.config.speed.selected = speed;

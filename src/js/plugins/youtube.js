@@ -345,7 +345,7 @@ const youtube = {
                         },
                     });
 
-                    // Get available speeds
+                    // Set speed options
                     player.options.speed = instance.getAvailablePlaybackRates();
 
                     // Set the tabindex to avoid focus entering iframe
