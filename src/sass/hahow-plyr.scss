@@ -98,3 +98,16 @@ $plyr-control-padding: 10px;
         display: none;
     }
 }
+
+.plyr__outer-container {
+    height: 100%;
+    .plyr {
+        height: 100%;
+        .plyr__video-wrapper {
+            height: 100%;
+            video {
+                height: 100%;
+            }
+        }
+    }
+}
