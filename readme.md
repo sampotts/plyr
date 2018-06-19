@@ -132,13 +132,13 @@ See [initialising](#initialising) for more information on advanced setups.
 You can use our CDN (provided by [Fastly](https://www.fastly.com/)) for the JavaScript. There's 2 versions; one with and one without [polyfills](#polyfills). My recommendation would be to manage polyfills seperately as part of your application but to make life easier you can use the polyfilled build.
 
 ```html
-<script src="https://cdn.plyr.io/3.3.12/plyr.js"></script>
+<script src="https://cdn.plyr.io/3.3.16/plyr.js"></script>
 ```
 
 ...or...
 
 ```html
-<script src="https://cdn.plyr.io/3.3.12/plyr.polyfilled.js"></script>
+<script src="https://cdn.plyr.io/3.3.16/plyr.polyfilled.js"></script>
 ```
 
 ### CSS
@@ -152,13 +152,13 @@ Include the `plyr.css` stylsheet into your `<head>`
 If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for the default CSS, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/3.3.12/plyr.css">
+<link rel="stylesheet" href="https://cdn.plyr.io/3.3.16/plyr.css">
 ```
 
 ### SVG Sprite
 
 The SVG sprite is loaded automatically from our CDN (provided by [Fastly](https://www.fastly.com/)). To change this, see the [options](#options) below. For
-reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.3.12/plyr.svg`.
+reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.3.16/plyr.svg`.
 
 ## Ads
 
@@ -215,7 +215,7 @@ You can specify a range of arguments for the constructor to use:
 
 *   A CSS string selector that's compatible with [`querySelector`](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector)
 *   A [`HTMLElement`](https://developer.mozilla.org/en/docs/Web/API/HTMLElement)
-*   A [`NodeList]`(https://developer.mozilla.org/en-US/docs/Web/API/NodeList)
+*   A [`NodeList`](https://developer.mozilla.org/en-US/docs/Web/API/NodeList)
 *   A [jQuery](https://jquery.com) object
 
 _Note_: If a `NodeList`, `Array`, or jQuery object are passed, the first element will be used for setup. To setup multiple players, see [setting up multiple players](#setting-up-multiple-players) below.
@@ -367,6 +367,7 @@ player.fullscreen.enter(); // Enter fullscreen
 | `airplay()`              | -                | Trigger the airplay dialog on supported devices.                                                           |
 | `toggleControls(toggle)` | Boolean          | Toggle the controls (video only). Takes optional truthy value to force it on/off.                                                        |
 | `on(event, function)`    | String, Function | Add an event listener for the specified event.                                                             |
+| `once(event, function)`    | String, Function | Add an event listener for the specified event once.                                                             |
 | `off(event, function)`   | String, Function | Remove an event listener for the specified event.                                                          |
 | `supports(type)`         | String           | Check support for a mime type.                                                                             |
 | `destroy()`              | -                | Destroy the instance and garbage collect any elements.                                                     |
