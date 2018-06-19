@@ -8649,12 +8649,12 @@ typeof navigator === "object" && (function (global, factory) {
 	    },
 	    setPosition: function setPosition(position) {
 	        // if already setup correct class name, just ignore
-	        if (utils.hasClass(this.elements.captions, this.config.classNames.captionPosition.replace('{0}', 'top'))) {
+	        if (hasClass(this.elements.captions, this.config.classNames.captionPosition.replace('{0}', 'top'))) {
 	            if (position === 'top') return;
 	        } else if (position === 'bottom') {
 	            return;
 	        }
-	        utils.toggleClass(this.elements.captions, this.config.classNames.captionPosition.replace('{0}', 'top'));
+	        toggleClass(this.elements.captions, this.config.classNames.captionPosition.replace('{0}', 'top'));
 	    }
 	};
 
@@ -9243,11 +9243,6 @@ typeof navigator === "object" && (function (global, factory) {
 	            } else {
 	                toggleFallback.call(this, false);
 	            }
-	            // Update toggle button
-	            var button = this.player.elements.buttons.zoom;
-	            if (utils.is.element(button)) {
-	                utils.toggleState(button, this.zoomActive);
-	            }
 	        }
 
 	        // Toggle state
@@ -9291,7 +9286,7 @@ typeof navigator === "object" && (function (global, factory) {
 	    }, {
 	        key: 'zoomActive',
 	        get: function get() {
-	            return utils.hasClass(this.target, this.player.config.classNames.fullscreen.fallback);
+	            return hasClass(this.target, this.player.config.classNames.fullscreen.fallback);
 	        }
 
 	        // Get target element
@@ -10139,7 +10134,7 @@ typeof navigator === "object" && (function (global, factory) {
 	                        _this4.player.speed = parseFloat(event.target.value);
 	                        showHomeTab();
 	                    }, 'speed');
-	                } else if (utils.matches(event.target, _this4.player.config.selectors.inputs['caption-position'])) {
+	                } else if (matches(event.target, _this4.player.config.selectors.inputs['caption-position'])) {
 	                    proxy(event, function () {
 	                        _this4.player.captionPosition = event.target.value;
 	                    }, 'caption-position');
@@ -12661,18 +12656,18 @@ typeof navigator === "object" && (function (global, factory) {
 	        // add custom logo
 	        if (this.config.logo && this.config.logo.url) {
 	            var logoContainer = document.createElement('div');
-	            utils.toggleClass(logoContainer, this.config.classNames.logo, true);
+	            toggleClass(logoContainer, this.config.classNames.logo, true);
 	            var imageContainer = logoContainer;
 	            if (this.config.logo.link) {
 	                var linkElement = document.createElement('a');
-	                utils.setAttributes(linkElement, {
+	                setAttributes(linkElement, {
 	                    href: this.config.logo.link
 	                });
 	                logoContainer.appendChild(linkElement);
 	                imageContainer = linkElement;
 	            }
 	            var logoElement = document.createElement('img');
-	            utils.setAttributes(logoElement, {
+	            setAttributes(logoElement, {
 	                src: this.config.logo.url
 	            });
 	            imageContainer.appendChild(logoElement);
