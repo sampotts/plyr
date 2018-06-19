@@ -553,7 +553,7 @@ class Plyr {
      */
     increaseVolume(step) {
         const volume = this.media.muted ? 0 : this.volume;
-        this.volume = volume + (is.number(step) ? step : 1);
+        this.volume = volume + (is.number(step) ? step : 0);
     }
 
     /**
@@ -562,7 +562,7 @@ class Plyr {
      */
     decreaseVolume(step) {
         const volume = this.media.muted ? 0 : this.volume;
-        this.volume = volume - (is.number(step) ? step : 1);
+        this.volume = volume - (is.number(step) ? step : 0);
     }
 
     /**
