@@ -6,6 +6,7 @@ $plyr-tooltip-bg: rgba(#000, 0.75);
 $plyr-tooltip-color: #fff;
 $plyr-menu-bg: rgba(#000, 0.75);
 $plyr-menu-color: #fff;
+$plyr-control-padding: 10px;
 @import 'plyr';
 
 .plyr__controls {
@@ -35,14 +36,27 @@ $plyr-menu-color: #fff;
         padding: 0;
         li {
             border-bottom: 2px solid hsla(0, 0%, 100%, 0.43);
+            margin: 0;
         }
     }
 
     .plyr__control {
+        font-size: 16px;
+        font-weight: 600;
         padding: 10px 25px 10px 15px;
+
+        .plyr__menu__value {
+            font-weight: 500;
+        }
     }
 
     .plyr__control--back {
+        margin: 0;
         padding: 10px 15px 10px 25px;
+        width: 100%;
     }
+}
+
+.plyr__tooltip {
+    font-size: 14px;
 }
