@@ -153,8 +153,13 @@ const captions = {
         // Enable or disable captions based on track length
         toggleClass(this.elements.container, this.config.classNames.captions.enabled, !is.empty(tracks));
 
-        // Update available languages in list
-        if ((this.config.controls || []).includes('settings') && this.config.settings.includes('captions')) {
+        // for custom control
+        if (is.string(this.config.controls) || is.function(this.config.controls)) {
+            if (this.config.customMenu && is.function(this.config.customMenu.caption)) {
+                this.config.customMenu.caption.call(this);
+            }
+        } else if ((this.config.controls || []).includes('settings') && this.config.settings.includes('captions')) {
+            // Update available languages in list
             controls.setCaptionsMenu.call(this);
         }
     },
@@ -384,7 +389,7 @@ const captions = {
         }
     },
 
-    setPosition (position) {
+    setPosition(position) {
         // if already setup correct class name, just ignore
         if (hasClass(this.elements.captions, this.config.classNames.captionPosition.replace('{0}', 'top'))) {
             if (position === 'top') return;

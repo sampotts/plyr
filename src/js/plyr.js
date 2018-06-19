@@ -18,7 +18,8 @@ import source from './source';
 import Storage from './storage';
 import support from './support';
 import ui from './ui';
-import logo from './logo'
+import logo from './logo';
+import hahow from './hahowCustomControl';
 import { closest } from './utils/arrays';
 import { setAttributes, createElement, hasClass, removeElement, replaceElement, toggleClass, wrap } from './utils/elements';
 import { off, on, once, triggerEvent, unbindListeners } from './utils/events';
@@ -1131,5 +1132,5 @@ class Plyr {
 }
 
 Plyr.defaults = cloneDeep(defaults);
-
+Plyr.hahow = hahow;
 export default Plyr;

@@ -226,6 +226,11 @@ const defaults = {
         },
     },
 
+    // custom control menu setup function
+    customMenu: {
+        caption: null,
+    },
+
     // Custom control listeners
     listeners: {
         seek: null,
@@ -306,6 +311,14 @@ const defaults = {
         controls: {
             container: null,
             wrapper: '.plyr__controls',
+            layer: {
+                topLayer: '.plyr__controls-top',
+                bottomLayer: '.plyr__controls-bottom',
+            },
+            bottom: {
+                left: '.plyr__controls-bottom-left',
+                right: '.plyr__controls-bottom-right',
+            },
         },
         labels: '[data-plyr]',
         buttons: {

@@ -904,12 +904,12 @@ const controls = {
         controls.updateSetting.call(this, type, list);
     },
 
-    setCaptionsPositionMenu () {
+    setCaptionsPositionMenu() {
         if (!this.config.controls.includes('caption-position')) {
             return;
         }
 
-        if (!utils.is.element(this.elements.settings.panes['caption-position'])) {
+        if (!is.element(this.elements.settings.panes['caption-position'])) {
             return;
         }
 
@@ -921,12 +921,9 @@ const controls = {
         const list = this.elements.settings.panes['caption-position'].querySelector('ul');
 
         // Empty the menu
-        utils.emptyElement(list);
+        emptyElement(list);
 
-        const positions = [
-            'top' ,
-            'bottom',
-        ];
+        const positions = ['top', 'bottom'];
 
         // Create items
         positions.forEach(position => {

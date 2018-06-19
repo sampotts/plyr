@@ -6,14 +6,35 @@ $plyr-tooltip-bg: rgba(#000, 0.75);
 $plyr-tooltip-color: #fff;
 $plyr-menu-bg: rgba(#000, 0.75);
 $plyr-menu-color: #fff;
-@import "plyr";
+@import 'plyr';
+
+.plyr__controls {
+    display: flex;
+    flex-flow: column;
+
+    &-top {
+        width: 100%;
+    }
+
+    &-bottom {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+
+        &-left,
+        &-right {
+            align-items: center;
+            display: flex;
+        }
+    }
+}
 
 .plyr__menu__container {
     border-radius: 0;
     ul {
         padding: 0;
         li {
-            border-bottom: 2px solid hsla(0,0%,100%,.43);
+            border-bottom: 2px solid hsla(0, 0%, 100%, 0.43);
         }
     }
 
