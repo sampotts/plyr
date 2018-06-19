@@ -47,6 +47,8 @@ const ui = {
             // Restore native controls
             ui.toggleNativeControls.call(this, true);
 
+            this.ready = true;
+
             // Bail
             return;
         }
