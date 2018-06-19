@@ -1448,6 +1448,9 @@ const controls = {
             // A custom function to build controls
             // The function can return a HTMLElement or String
             container = this.config.controls.call(this, props);
+            if (is.element(container)) {
+                update = false;
+            }
         } else {
             // Create controls
             container = controls.create.call(this, {
