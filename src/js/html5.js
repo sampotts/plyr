@@ -39,7 +39,7 @@ const html5 = {
             get() {
                 // Get sources
                 const sources = html5.getSources.call(player);
-                const [source] = sources.filter(source => source.getAttribute('src') === player.source);
+                const source = sources.find(source => source.getAttribute('src') === player.source);
 
                 // Return size, if match is found
                 return source && Number(source.getAttribute('size'));
@@ -57,23 +57,25 @@ const html5 = {
                 }
 
                 // Get current state
-                const { currentTime, playing } = player;
+                const { currentTime, paused, preload, readyState } = player.media;
 
                 // Set new source
                 player.media.src = source.getAttribute('src');
 
-                // Restore time
-                const onLoadedMetaData = () => {
-                    player.currentTime = currentTime;
-                };
-                player.once('loadedmetadata', onLoadedMetaData);
+                // Prevent loading if preload="none" and the current source isn't loaded (#1044)
+                if (preload !== 'none' || readyState) {
+                    // Restore time
+                    player.once('loadedmetadata', () => {
+                        player.currentTime = currentTime;
 
-                // Load new source
-                player.media.load();
+                        // Resume playing
+                        if (!paused) {
+                            player.play();
+                        }
+                    });
 
-                // Resume playing
-                if (playing) {
-                    player.play();
+                    // Load new source
+                    player.media.load();
                 }
 
                 // Trigger change event
