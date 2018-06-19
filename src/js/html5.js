@@ -57,23 +57,25 @@ const html5 = {
                 }
 
                 // Get current state
-                const { currentTime, playing } = player;
+                const { currentTime, paused, preload, readyState } = player.media;
 
                 // Set new source
                 player.media.src = source.getAttribute('src');
 
-                // Restore time
-                const onLoadedMetaData = () => {
-                    player.currentTime = currentTime;
-                };
-                player.once('loadedmetadata', onLoadedMetaData);
+                // Prevent loading if preload="none" and the current source isn't loaded (#1044)
+                if (preload !== 'none' || readyState) {
+                    // Restore time
+                    player.once('loadedmetadata', () => {
+                        player.currentTime = currentTime;
 
-                // Load new source
-                player.media.load();
+                        // Resume playing
+                        if (!paused) {
+                            player.play();
+                        }
+                    });
 
-                // Resume playing
-                if (playing) {
-                    player.play();
+                    // Load new source
+                    player.media.load();
                 }
 
                 // Trigger change event
