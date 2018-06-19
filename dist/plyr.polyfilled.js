@@ -8738,6 +8738,9 @@ typeof navigator === "object" && (function (global, factory) {
 	        link: undefined
 	    },
 
+	    // fullscreen container, default is plyr container
+	    fullscreenContainer: undefined,
+
 	    // Quality default
 	    quality: {
 	        default: 576,
@@ -9013,7 +9016,8 @@ typeof navigator === "object" && (function (global, factory) {
 	            supported: 'plyr--airplay-supported',
 	            active: 'plyr--airplay-active'
 	        },
-	        tabFocus: 'plyr__tab-focus'
+	        tabFocus: 'plyr__tab-focus',
+	        outerContainer: 'plyr__outer-container'
 	    },
 
 	    // Embed attributes
@@ -9124,7 +9128,11 @@ typeof navigator === "object" && (function (global, factory) {
 	    }
 
 	    // Trigger an event
-	    triggerEvent.call(this.player, this.target, this.active ? 'enterfullscreen' : 'exitfullscreen', true);
+	    if (this.isIosNative || !this.isOutterContainerSet) {
+	        triggerEvent.call(this.player, this.target, this.active ? 'enterfullscreen' : 'exitfullscreen', true);
+	    } else {
+	        triggerEvent.call(this.player, this.player.elements.container, this.active ? 'enterfullscreen' : 'exitfullscreen', true);
+	    }
 
 	    // Trap focus in container
 	    if (!browser.isIos) {
@@ -9149,7 +9157,12 @@ typeof navigator === "object" && (function (global, factory) {
 	    document.body.style.overflow = toggle ? 'hidden' : '';
 
 	    // Toggle class hook
-	    toggleClass(this.target, this.player.config.classNames.fullscreen.fallback, toggle);
+	    if (this.target === this.player.elements.container) {
+	        toggleClass(this.target, this.player.config.classNames.fullscreen.fallback, toggle);
+	    } else {
+	        toggleClass(this.target, this.player.config.classNames.fullscreen.fallback, toggle);
+	        toggleClass(this.player.elements.container, this.player.config.classNames.fullscreen.fallback, toggle);
+	    }
 
 	    // Toggle button and fire events
 	    onChange.call(this);
@@ -9309,13 +9322,28 @@ typeof navigator === "object" && (function (global, factory) {
 	        get: function get() {
 	            return hasClass(this.target, this.player.config.classNames.fullscreen.fallback);
 	        }
+	    }, {
+	        key: 'isIosNative',
+	        get: function get() {
+	            return browser.isIos && this.player.config.fullscreen.iosNative;
+	        }
+	    }, {
+	        key: 'isOutterContainerSet',
+	        get: function get() {
+	            return !!this.player.config.fullscreenContainer;
+	        }
 
 	        // Get target element
 
 	    }, {
 	        key: 'target',
 	        get: function get() {
-	            return browser.isIos && this.player.config.fullscreen.iosNative ? this.player.media : this.player.elements.container;
+	            if (this.isIosNative) {
+	                return this.player.media;
+	            } else if (this.isOutterContainerSet) {
+	                return this.player.config.fullscreenContainer;
+	            }
+	            return this.player.elements.container;
 	        }
 	    }], [{
 	        key: 'native',
@@ -9386,6 +9414,12 @@ typeof navigator === "object" && (function (global, factory) {
 	        toggleClass(this.elements.container, this.config.selectors.container.replace('.', ''), true);
 	        toggleClass(this.elements.container, this.config.classNames.uiSupported, this.supported.ui);
 	    },
+	    addStylehookToFullscreenContainer: function addStylehookToFullscreenContainer() {
+	        // append plyr__outer-container class name to outer container
+	        if (this.config.fullscreenContainer) {
+	            toggleClass(this.config.fullscreenContainer, this.config.classNames.outerContainer, true);
+	        }
+	    },
 
 
 	    // Toggle native HTML5 media controls
@@ -9414,6 +9448,8 @@ typeof navigator === "object" && (function (global, factory) {
 
 	            // Restore native controls
 	            ui.toggleNativeControls.call(this, true);
+
+	            this.ready = true;
 
 	            // Bail
 	            return;
@@ -9900,69 +9936,115 @@ typeof navigator === "object" && (function (global, factory) {
 	        value: function media() {
 	            var _this3 = this;
 
-	            // Time change on media
-	            on.call(this.player, this.player.media, 'timeupdate seeking seeked', function (event) {
-	                return controls.timeUpdate.call(_this3.player, event);
-	            });
+	            if (!this.player.media.isAlreadyRegisterEventListener) {
+	                this.player.media.isAlreadyRegisterEventListener = true;
+	                // Time change on media
+	                on.call(this.player, this.player.media, 'timeupdate seeking seeked', function (event) {
+	                    return controls.timeUpdate.call(_this3.player, event);
+	                });
 
-	            // Display duration
-	            on.call(this.player, this.player.media, 'durationchange loadeddata loadedmetadata', function (event) {
-	                return controls.durationUpdate.call(_this3.player, event);
-	            });
+	                // Display duration
+	                on.call(this.player, this.player.media, 'durationchange loadeddata loadedmetadata', function (event) {
+	                    return controls.durationUpdate.call(_this3.player, event);
+	                });
 
-	            // Check for audio tracks on load
-	            // We can't use `loadedmetadata` as it doesn't seem to have audio tracks at that point
-	            on.call(this.player, this.player.media, 'canplay', function () {
-	                toggleHidden(_this3.player.elements.volume, !_this3.player.hasAudio);
-	                toggleHidden(_this3.player.elements.buttons.mute, !_this3.player.hasAudio);
-	            });
+	                // Check for audio tracks on load
+	                // We can't use `loadedmetadata` as it doesn't seem to have audio tracks at that point
+	                on.call(this.player, this.player.media, 'canplay', function () {
+	                    toggleHidden(_this3.player.elements.volume, !_this3.player.hasAudio);
+	                    toggleHidden(_this3.player.elements.buttons.mute, !_this3.player.hasAudio);
+	                });
 
-	            // Handle the media finishing
-	            on.call(this.player, this.player.media, 'ended', function () {
-	                // Show poster on end
-	                if (_this3.player.isHTML5 && _this3.player.isVideo && _this3.player.config.resetOnEnd) {
-	                    // Restart
-	                    _this3.player.restart();
-	                }
-	            });
+	                // Handle the media finishing
+	                on.call(this.player, this.player.media, 'ended', function () {
+	                    // Show poster on end
+	                    if (_this3.player.isHTML5 && _this3.player.isVideo && _this3.player.config.resetOnEnd) {
+	                        // Restart
+	                        _this3.player.restart();
+	                    }
+	                });
 
-	            // Check for buffer progress
-	            on.call(this.player, this.player.media, 'progress playing seeking seeked', function (event) {
-	                return controls.updateProgress.call(_this3.player, event);
-	            });
+	                // Check for buffer progress
+	                on.call(this.player, this.player.media, 'progress playing seeking seeked', function (event) {
+	                    return controls.updateProgress.call(_this3.player, event);
+	                });
 
-	            // Handle volume changes
-	            on.call(this.player, this.player.media, 'volumechange', function (event) {
-	                return controls.updateVolume.call(_this3.player, event);
-	            });
+	                // Handle volume changes
+	                on.call(this.player, this.player.media, 'volumechange', function (event) {
+	                    return controls.updateVolume.call(_this3.player, event);
+	                });
 
-	            // Handle play/pause
-	            on.call(this.player, this.player.media, 'playing play pause ended emptied timeupdate', function (event) {
-	                return ui.checkPlaying.call(_this3.player, event);
-	            });
+	                // Handle play/pause
+	                on.call(this.player, this.player.media, 'playing play pause ended emptied timeupdate', function (event) {
+	                    return ui.checkPlaying.call(_this3.player, event);
+	                });
 
-	            // Loading state
-	            on.call(this.player, this.player.media, 'waiting canplay seeked playing', function (event) {
-	                return ui.checkLoading.call(_this3.player, event);
-	            });
+	                // Loading state
+	                on.call(this.player, this.player.media, 'waiting canplay seeked playing', function (event) {
+	                    return ui.checkLoading.call(_this3.player, event);
+	                });
 
-	            // If autoplay, then load advertisement if required
-	            // TODO: Show some sort of loading state while the ad manager loads else there's a delay before ad shows
-	            on.call(this.player, this.player.media, 'playing', function () {
-	                if (!_this3.player.ads) {
-	                    return;
-	                }
+	                // If autoplay, then load advertisement if required
+	                // TODO: Show some sort of loading state while the ad manager loads else there's a delay before ad shows
+	                on.call(this.player, this.player.media, 'playing', function () {
+	                    if (!_this3.player.ads) {
+	                        return;
+	                    }
 
-	                // If ads are enabled, wait for them first
-	                if (_this3.player.ads.enabled && !_this3.player.ads.initialized) {
-	                    // Wait for manager response
-	                    _this3.player.ads.managerPromise.then(function () {
-	                        return _this3.player.ads.play();
-	                    }).catch(function () {
-	                        return _this3.player.play();
-	                    });
-	                }
-	            });
+	                    // If ads are enabled, wait for them first
+	                    if (_this3.player.ads.enabled && !_this3.player.ads.initialized) {
+	                        // Wait for manager response
+	                        _this3.player.ads.managerPromise.then(function () {
+	                            return _this3.player.ads.play();
+	                        }).catch(function () {
+	                            return _this3.player.play();
+	                        });
+	                    }
+	                });
+
+	                // Volume change
+	                on.call(this.player, this.player.media, 'volumechange', function () {
+	                    // Save to storage
+	                    _this3.player.storage.set({ volume: _this3.player.volume, muted: _this3.player.muted });
+	                });
+
+	                // Speed change
+	                on.call(this.player, this.player.media, 'ratechange', function () {
+	                    // Update UI
+	                    controls.updateSetting.call(_this3.player, 'speed');
+
+	                    // Save to storage
+	                    _this3.player.storage.set({ speed: _this3.player.speed });
+	                });
+
+	                // Quality request
+	                on.call(this.player, this.player.media, 'qualityrequested', function (event) {
+	                    // Save to storage
+	                    _this3.player.storage.set({ quality: event.detail.quality });
+	                });
+
+	                // Quality change
+	                on.call(this.player, this.player.media, 'qualitychange', function (event) {
+	                    // Update UI
+	                    controls.updateSetting.call(_this3.player, 'quality', null, event.detail.quality);
+	                });
+
+	                // Proxy events to container
+	                // Bubble up key events for Edge
+	                var proxyEvents = this.player.config.events.concat(['keyup', 'keydown']).join(' ');
+	                on.call(this.player, this.player.media, proxyEvents, function (event) {
+	                    var _event$detail = event.detail,
+	                        detail = _event$detail === undefined ? {} : _event$detail;
+
+	                    // Get error details from media
+
+	                    if (event.type === 'error') {
+	                        detail = _this3.player.media.error;
+	                    }
+
+	                    triggerEvent.call(_this3.player, _this3.player.elements.container, event.type, true, detail);
+	                });
+	            }
 
 	            // Click video
 	            if (this.player.supported.ui && this.player.config.clickToPlay && !this.player.isAudio) {
@@ -9974,73 +10056,33 @@ typeof navigator === "object" && (function (global, factory) {
 	                    return;
 	                }
 
-	                // On click play, pause ore restart
-	                on.call(this.player, wrapper, 'click', function () {
-	                    // Touch devices will just show controls (if we're hiding controls)
-	                    if (_this3.player.config.hideControls && _this3.player.touch && !_this3.player.paused) {
-	                        return;
+	                if (!wrapper.isAlreadyRegisterEventListener) {
+	                    wrapper.isAlreadyRegisterEventListener = true;
+	                    // On click play, pause ore restart
+	                    on.call(this.player, wrapper, 'click', function () {
+	                        // Touch devices will just show controls (if we're hiding controls)
+	                        if (_this3.player.config.hideControls && _this3.player.touch && !_this3.player.paused) {
+	                            return;
+	                        }
+
+	                        if (_this3.player.paused) {
+	                            _this3.player.play();
+	                        } else if (_this3.player.ended) {
+	                            _this3.player.restart();
+	                            _this3.player.play();
+	                        } else {
+	                            _this3.player.pause();
+	                        }
+	                    });
+
+	                    // Disable right click
+	                    if (this.player.supported.ui && this.player.config.disableContextMenu) {
+	                        on.call(this.player, this.player.elements.wrapper, 'contextmenu', function (event) {
+	                            event.preventDefault();
+	                        }, false);
 	                    }
-
-	                    if (_this3.player.paused) {
-	                        _this3.player.play();
-	                    } else if (_this3.player.ended) {
-	                        _this3.player.restart();
-	                        _this3.player.play();
-	                    } else {
-	                        _this3.player.pause();
-	                    }
-	                });
-	            }
-
-	            // Disable right click
-	            if (this.player.supported.ui && this.player.config.disableContextMenu) {
-	                on.call(this.player, this.player.elements.wrapper, 'contextmenu', function (event) {
-	                    event.preventDefault();
-	                }, false);
-	            }
-
-	            // Volume change
-	            on.call(this.player, this.player.media, 'volumechange', function () {
-	                // Save to storage
-	                _this3.player.storage.set({ volume: _this3.player.volume, muted: _this3.player.muted });
-	            });
-
-	            // Speed change
-	            on.call(this.player, this.player.media, 'ratechange', function () {
-	                // Update UI
-	                controls.updateSetting.call(_this3.player, 'speed');
-
-	                // Save to storage
-	                _this3.player.storage.set({ speed: _this3.player.speed });
-	            });
-
-	            // Quality request
-	            on.call(this.player, this.player.media, 'qualityrequested', function (event) {
-	                // Save to storage
-	                _this3.player.storage.set({ quality: event.detail.quality });
-	            });
-
-	            // Quality change
-	            on.call(this.player, this.player.media, 'qualitychange', function (event) {
-	                // Update UI
-	                controls.updateSetting.call(_this3.player, 'quality', null, event.detail.quality);
-	            });
-
-	            // Proxy events to container
-	            // Bubble up key events for Edge
-	            var proxyEvents = this.player.config.events.concat(['keyup', 'keydown']).join(' ');
-	            on.call(this.player, this.player.media, proxyEvents, function (event) {
-	                var _event$detail = event.detail,
-	                    detail = _event$detail === undefined ? {} : _event$detail;
-
-	                // Get error details from media
-
-	                if (event.type === 'error') {
-	                    detail = _this3.player.media.error;
 	                }
-
-	                triggerEvent.call(_this3.player, _this3.player.elements.container, event.type, true, detail);
-	            });
+	            }
 	        }
 
 	        // Listen for control events
@@ -10133,27 +10175,21 @@ typeof navigator === "object" && (function (global, factory) {
 	            bind(this.player.elements.settings.form, 'click', function (event) {
 	                event.stopPropagation();
 
-	                // Go back to home tab on click
-	                var showHomeTab = function showHomeTab() {
-	                    var id = 'plyr-settings-' + _this4.player.id + '-home';
-	                    controls.showTab.call(_this4.player, id);
-	                };
-
 	                // Settings menu items - use event delegation as items are added/removed
 	                if (matches(event.target, _this4.player.config.selectors.inputs.language)) {
 	                    proxy(event, function () {
 	                        _this4.player.currentTrack = Number(event.target.value);
-	                        showHomeTab();
+	                        // showHomeTab();
 	                    }, 'language');
 	                } else if (matches(event.target, _this4.player.config.selectors.inputs.quality)) {
 	                    proxy(event, function () {
 	                        _this4.player.quality = event.target.value;
-	                        showHomeTab();
+	                        // showHomeTab();
 	                    }, 'quality');
 	                } else if (matches(event.target, _this4.player.config.selectors.inputs.speed)) {
 	                    proxy(event, function () {
 	                        _this4.player.speed = parseFloat(event.target.value);
-	                        showHomeTab();
+	                        // showHomeTab();
 	                    }, 'speed');
 	                } else if (matches(event.target, _this4.player.config.selectors.inputs['caption-position'])) {
 	                    proxy(event, function () {
@@ -12392,6 +12428,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 	            // Restore class hook
 	            ui.addStyleHook.call(_this2);
+	            ui.addStylehookToFullscreenContainer.call(_this2);
 
 	            // Set new sources for html5
 	            if (_this2.isHTML5) {
@@ -13083,6 +13120,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 	        // Add style hook
 	        ui.addStyleHook.call(this);
+	        ui.addStylehookToFullscreenContainer.call(this);
 
 	        // Setup media
 	        media.setup.call(this);
@@ -13258,12 +13296,6 @@ typeof navigator === "object" && (function (global, factory) {
 	            var volume = this.media.muted ? 0 : this.volume;
 	            this.volume = volume - (is$1.number(step) ? step : 1);
 	        }
-
-	        /**
-	         * Set muted state
-	         * @param {boolean} mute
-	         */
-
 	    }, {
 	        key: 'toggleCaptions',
 
@@ -13316,7 +13348,7 @@ typeof navigator === "object" && (function (global, factory) {
 	                var hiding = toggleClass(this.elements.container, this.config.classNames.hideControls, force);
 
 	                // Close menu
-	                if (hiding && this.config.controls.includes('settings') && !is$1.empty(this.config.settings)) {
+	                if (hiding && !is$1.empty(this.config.settings)) {
 	                    controls.toggleMenu.call(this, false);
 	                }
 	                // Trigger event on change
@@ -13687,6 +13719,20 @@ typeof navigator === "object" && (function (global, factory) {
 	        get: function get() {
 	            return Number(this.media.volume);
 	        }
+	    }, {
+	        key: 'fullscreenContainer',
+	        set: function set(container) {
+	            if (is$1.element(container)) {
+	                this.config.fullscreenContainer = container;
+	                ui.addStylehookToFullscreenContainer.call(this);
+	            }
+	        }
+
+	        /**
+	         * Set muted state
+	         * @param {boolean} mute
+	         */
+
 	    }, {
 	        key: 'muted',
 	        set: function set(mute) {
