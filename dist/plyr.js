@@ -2189,7 +2189,7 @@ typeof navigator === "object" && (function (global, factory) {
                 return;
             }
 
-            if (!utils.is.element(this.elements.settings.panes['caption-position'])) {
+            if (!is.element(this.elements.settings.panes['caption-position'])) {
                 return;
             }
 
@@ -2201,7 +2201,7 @@ typeof navigator === "object" && (function (global, factory) {
             var list = this.elements.settings.panes['caption-position'].querySelector('ul');
 
             // Empty the menu
-            utils.emptyElement(list);
+            emptyElement(list);
 
             var positions = ['top', 'bottom'];
 
@@ -2729,6 +2729,9 @@ typeof navigator === "object" && (function (global, factory) {
                 // A custom function to build controls
                 // The function can return a HTMLElement or String
                 container = this.config.controls.call(this, props);
+                if (is.element(container)) {
+                    update = false;
+                }
             } else {
                 // Create controls
                 container = controls.create.call(this, {
@@ -2994,8 +2997,13 @@ typeof navigator === "object" && (function (global, factory) {
             // Enable or disable captions based on track length
             toggleClass(this.elements.container, this.config.classNames.captions.enabled, !is.empty(tracks));
 
-            // Update available languages in list
-            if ((this.config.controls || []).includes('settings') && this.config.settings.includes('captions')) {
+            // for custom control
+            if (is.string(this.config.controls) || is.function(this.config.controls)) {
+                if (this.config.customMenu && is.function(this.config.customMenu.caption)) {
+                    this.config.customMenu.caption.call(this);
+                }
+            } else if ((this.config.controls || []).includes('settings') && this.config.settings.includes('captions')) {
+                // Update available languages in list
                 controls.setCaptionsMenu.call(this);
             }
         },
@@ -3475,6 +3483,11 @@ typeof navigator === "object" && (function (global, factory) {
             }
         },
 
+        // custom control menu setup function
+        customMenu: {
+            caption: null
+        },
+
         // Custom control listeners
         listeners: {
             seek: null,
@@ -3517,7 +3530,15 @@ typeof navigator === "object" && (function (global, factory) {
             container: '.plyr',
             controls: {
                 container: null,
-                wrapper: '.plyr__controls'
+                wrapper: '.plyr__controls',
+                layer: {
+                    topLayer: '.plyr__controls-top',
+                    bottomLayer: '.plyr__controls-bottom'
+                },
+                bottom: {
+                    left: '.plyr__controls-bottom-left',
+                    right: '.plyr__controls-bottom-right'
+                }
             },
             labels: '[data-plyr]',
             buttons: {
@@ -6916,7 +6937,6 @@ typeof navigator === "object" && (function (global, factory) {
 
                 // Remove elements
                 removeElement(_this2.media);
-                _this2.media = null;
 
                 // Reset class name
                 if (is.element(_this2.elements.container)) {
@@ -6944,10 +6964,21 @@ typeof navigator === "object" && (function (global, factory) {
                     provider: provider,
                     type: type,
                     // Check for support
-                    supported: support.check(type, provider, _this2.config.playsinline),
-                    // Create new element
-                    media: createElement(tagName, attributes)
+                    supported: support.check(type, provider, _this2.config.playsinline)
                 });
+
+                if (prevType === type && prevProvider === provider && provider === providers.html5) {
+                    /**
+                     * if provider is html5 and setting is same as prev source,
+                     * retain media element (because ios system has limited resource,
+                     * can't create many video resource)
+                     */
+                    setAttributes(_this2.media, attributes);
+                } else {
+                    removeElement(_this2.media);
+                    _this2.media = null;
+                    _this2.media = createElement(tagName, attributes);
+                }
 
                 // Inject the new element
                 _this2.elements.container.appendChild(_this2.media);
@@ -7013,6 +7044,422 @@ typeof navigator === "object" && (function (global, factory) {
                 // Update the fullscreen support
                 _this2.fullscreen.update();
             }, true);
+        }
+    };
+
+    var logo = {
+        setup: function setup() {
+            // add custom logo
+            if (this.config.logo && this.config.logo.url) {
+                // build logo container
+                var logoContainer = document.createElement('div');
+                toggleClass(logoContainer, this.config.classNames.logo, true);
+
+                // image put into logo container if link not present
+                var imageContainer = logoContainer;
+
+                if (this.config.logo.link) {
+                    // if logo.link setup, put image into a
+                    var linkElement = document.createElement('a');
+                    setAttributes(linkElement, {
+                        href: this.config.logo.link
+                    });
+                    logoContainer.appendChild(linkElement);
+                    imageContainer = linkElement;
+                }
+
+                // build logo image
+                var logoElement = document.createElement('img');
+                setAttributes(logoElement, {
+                    src: this.config.logo.url
+                });
+                imageContainer.appendChild(logoElement);
+                this.elements.container.appendChild(logoContainer);
+            }
+        }
+    };
+
+    var hahow = {
+        createControls: function createControls(data) {
+            var _this = this;
+
+            // Create the container
+            var container = createElement('div', getAttributesFromSelector(this.config.selectors.controls.wrapper));
+
+            var topLayer = createElement('div', getAttributesFromSelector(this.config.selectors.controls.layer.topLayer));
+            var bottomLayer = createElement('div', getAttributesFromSelector(this.config.selectors.controls.layer.bottomLayer));
+            var bottomLeft = createElement('div', getAttributesFromSelector(this.config.selectors.controls.bottom.left));
+            var bottomRight = createElement('div', getAttributesFromSelector(this.config.selectors.controls.bottom.right));
+
+            bottomLayer.appendChild(bottomLeft);
+            bottomLayer.appendChild(bottomRight);
+            container.appendChild(topLayer);
+            container.appendChild(bottomLayer);
+
+            // Rewind button
+            bottomLeft.appendChild(controls.createButton.call(this, 'rewind'));
+
+            // Play/Pause button
+            bottomLeft.appendChild(controls.createButton.call(this, 'play'));
+
+            // Fast forward button
+            bottomLeft.appendChild(controls.createButton.call(this, 'fast-forward'));
+
+            // Progress
+            var progress = createElement('div', getAttributesFromSelector(this.config.selectors.progress));
+
+            // Seek range slider
+            progress.appendChild(controls.createRange.call(this, 'seek', {
+                id: 'plyr-seek-' + data.id
+            }));
+
+            // Buffer progress
+            progress.appendChild(controls.createProgress.call(this, 'buffer'));
+
+            // TODO: Add loop display indicator
+
+            // Seek tooltip
+            if (this.config.tooltips.seek) {
+                var tooltip = createElement('span', {
+                    class: this.config.classNames.tooltip
+                }, '00:00');
+
+                progress.appendChild(tooltip);
+                this.elements.display.seekTooltip = tooltip;
+            }
+
+            this.elements.progress = progress;
+            topLayer.appendChild(this.elements.progress);
+
+            // Media current time display
+            bottomLeft.appendChild(controls.createTime.call(this, 'currentTime'));
+
+            // Media duration display
+            bottomLeft.appendChild(controls.createTime.call(this, 'duration'));
+
+            // Toggle mute button
+            bottomRight.appendChild(controls.createButton.call(this, 'mute'));
+
+            // Volume range control
+            var volume = createElement('div', {
+                class: 'plyr__volume'
+            });
+
+            // Set the attributes
+            var attributes = {
+                max: 1,
+                step: 0.05,
+                value: this.config.volume
+            };
+
+            // Create the volume range slider
+            volume.appendChild(controls.createRange.call(this, 'volume', extend(attributes, {
+                id: 'plyr-volume-' + data.id
+            })));
+
+            this.elements.volume = volume;
+
+            bottomRight.appendChild(volume);
+
+            // Settings button / menu
+            var menu = createElement('div', {
+                class: 'plyr__menu',
+                hidden: ''
+            });
+
+            menu.appendChild(controls.createButton.call(this, 'settings', {
+                id: 'plyr-settings-toggle-' + data.id,
+                'aria-haspopup': true,
+                'aria-controls': 'plyr-settings-' + data.id,
+                'aria-expanded': false
+            }));
+
+            var form = createElement('form', {
+                class: 'plyr__menu__container',
+                id: 'plyr-settings-' + data.id,
+                hidden: '',
+                'aria-labelled-by': 'plyr-settings-toggle-' + data.id,
+                role: 'tablist',
+                tabindex: -1
+            });
+
+            var inner = createElement('div');
+
+            var home = createElement('div', {
+                id: 'plyr-settings-' + data.id + '-home',
+                'aria-labelled-by': 'plyr-settings-toggle-' + data.id,
+                role: 'tabpanel'
+            });
+
+            // Create the tab list
+            var tabs = createElement('ul', {
+                role: 'tablist'
+            });
+
+            // Build the tabs
+            this.config.settings.forEach(function (type) {
+                var tab = createElement('li', {
+                    role: 'tab',
+                    hidden: ''
+                });
+
+                var button = createElement('button', extend(getAttributesFromSelector(_this.config.selectors.buttons.settings), {
+                    type: 'button',
+                    class: _this.config.classNames.control + ' ' + _this.config.classNames.control + '--forward',
+                    id: 'plyr-settings-' + data.id + '-' + type + '-tab',
+                    'aria-haspopup': true,
+                    'aria-controls': 'plyr-settings-' + data.id + '-' + type,
+                    'aria-expanded': false
+                }), i18n.get(type, _this.config));
+
+                var value = createElement('span', {
+                    class: _this.config.classNames.menu.value
+                });
+
+                // Speed contains HTML entities
+                value.innerHTML = data[type];
+
+                button.appendChild(value);
+                tab.appendChild(button);
+                tabs.appendChild(tab);
+
+                _this.elements.settings.tabs[type] = tab;
+            });
+
+            home.appendChild(tabs);
+            inner.appendChild(home);
+
+            // Build the panes
+            this.config.settings.forEach(function (type) {
+                var pane = createElement('div', {
+                    id: 'plyr-settings-' + data.id + '-' + type,
+                    hidden: '',
+                    'aria-labelled-by': 'plyr-settings-' + data.id + '-' + type + '-tab',
+                    role: 'tabpanel',
+                    tabindex: -1
+                });
+
+                var back = createElement('button', {
+                    type: 'button',
+                    class: _this.config.classNames.control + ' ' + _this.config.classNames.control + '--back',
+                    'aria-haspopup': true,
+                    'aria-controls': 'plyr-settings-' + data.id + '-home',
+                    'aria-expanded': false
+                }, i18n.get(type, _this.config));
+
+                pane.appendChild(back);
+
+                var options = createElement('ul');
+
+                pane.appendChild(options);
+                inner.appendChild(pane);
+
+                _this.elements.settings.panes[type] = pane;
+            });
+
+            form.appendChild(inner);
+            menu.appendChild(form);
+            bottomRight.appendChild(menu);
+
+            this.elements.settings.form = form;
+            this.elements.settings.menu = menu;
+
+            bottomRight.appendChild(controls.createButton.call(this, 'zoom'));
+
+            // Toggle fullscreen button
+            bottomRight.appendChild(controls.createButton.call(this, 'fullscreen'));
+
+            this.elements.controls = container;
+
+            if (this.isHTML5) {
+                hahow.setQualityMenu.call(this, html5.getQualityOptions.call(this));
+            }
+
+            hahow.setSpeedMenu.call(this);
+
+            return container;
+        },
+
+
+        // Set the quality menu
+        setQualityMenu: function setQualityMenu(options) {
+            var _this2 = this;
+
+            var type = 'quality';
+            var list = this.elements.settings.panes.quality.querySelector('ul');
+
+            // Set options if passed and filter based on uniqueness and config
+            if (is.array(options)) {
+                this.options.quality = dedupe(options).filter(function (quality) {
+                    return _this2.config.quality.options.includes(quality);
+                });
+            }
+
+            // Toggle the pane and tab
+            var toggle = !is.empty(this.options.quality) && this.options.quality.length > 1;
+            controls.toggleTab.call(this, type, toggle);
+
+            // Check if we need to toggle the parent
+            controls.checkMenu.call(this);
+
+            // If we're hiding, nothing more to do
+            if (!toggle) {
+                return;
+            }
+
+            // Empty the menu
+            emptyElement(list);
+
+            // Sort options by the config and then render options
+            this.options.quality.sort(function (a, b) {
+                var sorting = _this2.config.quality.options;
+                return sorting.indexOf(a) > sorting.indexOf(b) ? 1 : -1;
+            }).forEach(function (quality) {
+                controls.createMenuItem.call(_this2, {
+                    value: quality,
+                    list: list,
+                    type: type,
+                    title: controls.getLabel.call(_this2, 'quality', quality)
+                });
+            });
+
+            controls.updateSetting.call(this, type, list);
+        },
+
+
+        // Set a list of available captions languages
+        setCaptionsMenu: function setCaptionsMenu() {
+            var _this3 = this;
+
+            // TODO: Captions or language? Currently it's mixed
+            var type = 'captions';
+            var list = this.elements.settings.panes.captions.querySelector('ul');
+            var tracks = captions.getTracks.call(this);
+
+            // Toggle the pane and tab
+            controls.toggleTab.call(this, type, tracks.length);
+
+            // Empty the menu
+            emptyElement(list);
+
+            // Check if we need to toggle the parent
+            controls.checkMenu.call(this);
+
+            // If there's no captions, bail
+            if (!tracks.length) {
+                return;
+            }
+
+            // Generate options data
+            var options = tracks.map(function (track, value) {
+                return {
+                    value: value,
+                    checked: _this3.captions.toggled && _this3.currentTrack === value,
+                    title: captions.getLabel.call(_this3, track),
+                    badge: track.language && controls.createBadge.call(_this3, track.language.toUpperCase()),
+                    list: list,
+                    type: 'language'
+                };
+            });
+
+            // Add the "Disabled" option to turn off captions
+            options.unshift({
+                value: -1,
+                checked: !this.captions.toggled,
+                title: i18n.get('disabled', this.config),
+                list: list,
+                type: 'language'
+            });
+
+            // Generate options
+            options.forEach(controls.createMenuItem.bind(this));
+
+            controls.updateSetting.call(this, type, list);
+        },
+        setCaptionsPositionMenu: function setCaptionsPositionMenu() {
+            var _this4 = this;
+
+            if (!is.element(this.elements.settings.panes['caption-position'])) {
+                return;
+            }
+
+            var type = 'caption-position';
+
+            controls.toggleTab.call(this, type, true);
+
+            // Get the list to populate
+            var list = this.elements.settings.panes['caption-position'].querySelector('ul');
+
+            // Empty the menu
+            emptyElement(list);
+
+            var positions = ['top', 'bottom'];
+
+            // Create items
+            positions.forEach(function (position) {
+                controls.createMenuItem.call(_this4, {
+                    value: position,
+                    list: list,
+                    type: type,
+                    title: controls.getLabel.call(_this4, 'caption-position', position)
+                });
+            });
+            controls.updateSetting.call(this, type, list);
+        },
+
+
+        // Set a list of available captions languages
+        setSpeedMenu: function setSpeedMenu(options) {
+            var _this5 = this;
+
+            // Menu required
+            if (!is.element(this.elements.settings.panes.speed)) {
+                return;
+            }
+
+            var type = 'speed';
+
+            // Set the speed options
+            if (is.array(options)) {
+                this.options.speed = options;
+            } else if (this.isHTML5 || this.isVimeo) {
+                this.options.speed = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
+            }
+
+            // Set options if passed and filter based on config
+            this.options.speed = this.options.speed.filter(function (speed) {
+                return _this5.config.speed.options.includes(speed);
+            });
+
+            // Toggle the pane and tab
+            var toggle = !is.empty(this.options.speed) && this.options.speed.length > 1;
+            controls.toggleTab.call(this, type, toggle);
+
+            // Check if we need to toggle the parent
+            controls.checkMenu.call(this);
+
+            // If we're hiding, nothing more to do
+            if (!toggle) {
+                return;
+            }
+
+            // Get the list to populate
+            var list = this.elements.settings.panes.speed.querySelector('ul');
+
+            // Empty the menu
+            emptyElement(list);
+
+            // Create items
+            this.options.speed.forEach(function (speed) {
+                controls.createMenuItem.call(_this5, {
+                    value: speed,
+                    list: list,
+                    type: type,
+                    title: controls.getLabel.call(_this5, 'speed', speed)
+                });
+            });
+
+            controls.updateSetting.call(this, type, list);
         }
     };
 
@@ -7273,26 +7720,7 @@ typeof navigator === "object" && (function (global, factory) {
                 ui.build.call(this);
             }
 
-            // add custom logo
-            if (this.config.logo && this.config.logo.url) {
-                var logoContainer = document.createElement('div');
-                toggleClass(logoContainer, this.config.classNames.logo, true);
-                var imageContainer = logoContainer;
-                if (this.config.logo.link) {
-                    var linkElement = document.createElement('a');
-                    setAttributes(linkElement, {
-                        href: this.config.logo.link
-                    });
-                    logoContainer.appendChild(linkElement);
-                    imageContainer = linkElement;
-                }
-                var logoElement = document.createElement('img');
-                setAttributes(logoElement, {
-                    src: this.config.logo.url
-                });
-                imageContainer.appendChild(logoElement);
-                this.elements.container.appendChild(logoContainer);
-            }
+            logo.setup.call(this);
 
             // Container listeners
             this.listeners.container();
@@ -8286,6 +8714,7 @@ typeof navigator === "object" && (function (global, factory) {
     }();
 
     Plyr.defaults = cloneDeep(defaults$1);
+    Plyr.hahow = hahow;
 
     return Plyr;
 
