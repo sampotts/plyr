@@ -18,6 +18,7 @@ import source from './source';
 import Storage from './storage';
 import support from './support';
 import ui from './ui';
+import logo from './logo'
 import { closest } from './utils/arrays';
 import { setAttributes, createElement, hasClass, removeElement, replaceElement, toggleClass, wrap } from './utils/elements';
 import { off, on, once, triggerEvent, unbindListeners } from './utils/events';
@@ -282,26 +283,7 @@ class Plyr {
             ui.build.call(this);
         }
 
-        // add custom logo
-        if (this.config.logo && this.config.logo.url) {
-            const logoContainer = document.createElement('div');
-            toggleClass(logoContainer, this.config.classNames.logo, true);
-            let imageContainer = logoContainer;
-            if (this.config.logo.link) {
-                const linkElement = document.createElement('a');
-                setAttributes(linkElement, {
-                    href: this.config.logo.link,
-                });
-                logoContainer.appendChild(linkElement);
-                imageContainer = linkElement;
-            }
-            const logoElement = document.createElement('img');
-            setAttributes(logoElement, {
-                src: this.config.logo.url,
-            });
-            imageContainer.appendChild(logoElement);
-            this.elements.container.appendChild(logoContainer);
-        }
+        logo.setup.call(this);
 
         // Container listeners
         this.listeners.container();
