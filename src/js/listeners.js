@@ -665,36 +665,20 @@ class Listeners {
                 // Detect "natural" scroll - suppored on OS X Safari only
                 // Other browsers on OS X will be inverted until support improves
                 const inverted = event.webkitDirectionInvertedFromDevice;
-                const step = 1 / 50;
-                let direction = 0;
 
-                // Scroll down (or up on natural) to decrease
-                if (event.deltaY < 0 || event.deltaX > 0) {
-                    if (inverted) {
-                        this.player.decreaseVolume(step);
-                        direction = -1;
-                    } else {
-                        this.player.increaseVolume(step);
-                        direction = 1;
-                    }
-                }
+                // Get delta from event. Invert if `inverted` is true
+                const [x, y] = [event.deltaX, -event.deltaY]
+                    .map(value => inverted ? -value : value);
 
-                // Scroll up (or down on natural) to increase
-                if (event.deltaY > 0 || event.deltaX < 0) {
-                    if (inverted) {
-                        this.player.increaseVolume(step);
-                        direction = 1;
-                    } else {
-                        this.player.decreaseVolume(step);
-                        direction = -1;
-                    }
-                }
+                // Using the biggest delta, normalize to 1 or -1 (or 0 if no delta)
+                const direction = Math.sign(Math.abs(x) > Math.abs(y) ? x : y);
+
+                // Change the volume by 2%
+                this.player.increaseVolume(direction / 50);
 
                 // Don't break page scrolling at max and min
-                if (
-                    (direction === 1 && this.player.media.volume < 1) ||
-                    (direction === -1 && this.player.media.volume > 0)
-                ) {
+                const { volume } = this.player.media;
+                if ((direction === 1 && volume < 1) || (direction === -1 && volume > 0)) {
                     event.preventDefault();
                 }
             },
