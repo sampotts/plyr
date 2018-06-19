@@ -7,7 +7,7 @@ import html5 from './html5';
 import media from './media';
 import support from './support';
 import ui from './ui';
-import { createElement, insertElement, removeElement } from './utils/elements';
+import { createElement, insertElement, removeElement, setAttributes } from './utils/elements';
 import is from './utils/is';
 import { getDeep } from './utils/objects';
 
@@ -45,7 +45,6 @@ const source = {
 
                 // Remove elements
                 removeElement(this.media);
-                this.media = null;
 
                 // Reset class name
                 if (is.element(this.elements.container)) {
@@ -67,9 +66,20 @@ const source = {
                     type,
                     // Check for support
                     supported: support.check(type, provider, this.config.playsinline),
-                    // Create new element
-                    media: createElement(tagName, attributes),
                 });
+
+                if (prevType === type && prevProvider === provider && provider === providers.html5) {
+                    /**
+                     * if provider is html5 and setting is same as prev source,
+                     * retain media element (because ios system has limited resource,
+                     * can't create many video resource)
+                     */
+                    setAttributes(this.media, attributes);
+                } else {
+                    removeElement(this.media);
+                    this.media = null;
+                    this.media = createElement(tagName, attributes);
+                }
 
                 // Inject the new element
                 this.elements.container.appendChild(this.media);
