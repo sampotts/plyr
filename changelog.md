@@ -1,3 +1,8 @@
+# v3.3.17
+
+-   Fix YouTube muting after seeking with the progress slider
+-   Respect preload="none" when setting quality if the media hasn't been loaded some other way
+
 # v3.3.16
 
 -   Fixed regression relating the play button status (fixes #1048)

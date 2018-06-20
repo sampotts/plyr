@@ -6159,16 +6159,11 @@ typeof navigator === "object" && (function (global, factory) {
 	            get: function get() {
 	                // Get sources
 	                var sources = html5.getSources.call(player);
-
-	                var _sources$filter = sources.filter(function (source) {
+	                var source = sources.find(function (source) {
 	                    return source.getAttribute('src') === player.source;
-	                }),
-	                    _sources$filter2 = slicedToArray(_sources$filter, 1),
-	                    source = _sources$filter2[0];
+	                });
 
 	                // Return size, if match is found
-
-
 	                return source && Number(source.getAttribute('size'));
 	            },
 	            set: function set(input) {
@@ -6186,25 +6181,30 @@ typeof navigator === "object" && (function (global, factory) {
 	                }
 
 	                // Get current state
-	                var currentTime = player.currentTime,
-	                    playing = player.playing;
+	                var _player$media = player.media,
+	                    currentTime = _player$media.currentTime,
+	                    paused = _player$media.paused,
+	                    preload = _player$media.preload,
+	                    readyState = _player$media.readyState;
 
 	                // Set new source
 
 	                player.media.src = source.getAttribute('src');
 
-	                // Restore time
-	                var onLoadedMetaData = function onLoadedMetaData() {
-	                    player.currentTime = currentTime;
-	                };
-	                player.once('loadedmetadata', onLoadedMetaData);
+	                // Prevent loading if preload="none" and the current source isn't loaded (#1044)
+	                if (preload !== 'none' || readyState) {
+	                    // Restore time
+	                    player.once('loadedmetadata', function () {
+	                        player.currentTime = currentTime;
 
-	                // Load new source
-	                player.media.load();
+	                        // Resume playing
+	                        if (!paused) {
+	                            player.play();
+	                        }
+	                    });
 
-	                // Resume playing
-	                if (playing) {
-	                    player.play();
+	                    // Load new source
+	                    player.media.load();
 	                }
 
 	                // Trigger change event
@@ -11391,8 +11391,8 @@ typeof navigator === "object" && (function (global, factory) {
 	                            return Number(instance.getCurrentTime());
 	                        },
 	                        set: function set(time) {
-	                            // If paused, mute audio preventively (YouTube starts playing on seek if the video hasn't been played yet).
-	                            if (player.paused) {
+	                            // If paused and never played, mute audio preventively (YouTube starts playing on seek if the video hasn't been played yet).
+	                            if (player.paused && !player.embed.hasPlayed) {
 	                                player.embed.mute();
 	                            }
 
