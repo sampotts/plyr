@@ -191,7 +191,7 @@
             align-items: center;
             display: flex;
             margin-left: auto;
-            margin-right: -$plyr-control-padding;
+            margin-right: -($plyr-control-padding - 2);
             overflow: hidden;
             padding-left: ceil($plyr-control-padding * 3.5);
             pointer-events: none;

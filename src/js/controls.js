@@ -370,17 +370,21 @@ const controls = {
                 type: 'button',
                 role: 'menuitemradio',
                 class: `${this.config.classNames.control} ${attributes.class ? attributes.class : ''}`.trim(),
-                value,
                 'aria-checked': checked,
-            })
+                value,
+            }),
         );
 
+        const flex = createElement('span');
+
         // We have to set as HTML incase of special characters
-        item.innerHTML = title;
+        flex.innerHTML = title;
 
         if (is.element(badge)) {
-            item.appendChild(badge);
+            flex.appendChild(badge);
         }
+
+        item.appendChild(flex);
 
         Object.defineProperty(item, 'checked', {
             enumerable: true,
@@ -398,6 +402,34 @@ const controls = {
                 item.setAttribute('aria-checked', checked ? 'true' : 'false');
             },
         });
+
+        this.listeners.bind(
+            item,
+            'click',
+            () => {
+                item.checked = true;
+
+                switch (type) {
+                    case 'language':
+                        this.currentTrack = Number(value);
+                        break;
+
+                    case 'quality':
+                        this.quality = value;
+                        break;
+
+                    case 'speed':
+                        this.speed = parseFloat(value);
+                        break;
+
+                    default:
+                        break;
+                }
+
+                controls.showMenuPanel.call(this, 'home');
+            },
+            type,
+        );
 
         list.appendChild(item);
     },
@@ -657,95 +689,6 @@ const controls = {
         toggleHidden(this.elements.settings.buttons[setting], !toggle);
     },
 
-    // Set the quality menu
-    setQualityMenu(options) {
-        // Menu required
-        if (!is.element(this.elements.settings.panels.quality)) {
-            console.warn('Not an element');
-            return;
-        }
-
-        const type = 'quality';
-        const list = this.elements.settings.panels.quality.querySelector('[role="menu"]');
-
-        // Set options if passed and filter based on uniqueness and config
-        if (is.array(options)) {
-            this.options.quality = dedupe(options).filter(quality => this.config.quality.options.includes(quality));
-        }
-
-        // Toggle the pane and tab
-        console.warn(this.options.quality);
-        const toggle = !is.empty(this.options.quality) && this.options.quality.length > 1;
-        controls.toggleMenuButton.call(this, type, toggle);
-
-        // Check if we need to toggle the parent
-        controls.checkMenu.call(this);
-
-        // If we're hiding, nothing more to do
-        if (!toggle) {
-            return;
-        }
-
-        // Empty the menu
-        emptyElement(list);
-
-        // Get the badge HTML for HD, 4K etc
-        const getBadge = quality => {
-            const label = i18n.get(`qualityBadge.${quality}`, this.config);
-
-            if (!label.length) {
-                return null;
-            }
-
-            return controls.createBadge.call(this, label);
-        };
-
-        // Sort options by the config and then render options
-        this.options.quality
-            .sort((a, b) => {
-                const sorting = this.config.quality.options;
-                return sorting.indexOf(a) > sorting.indexOf(b) ? 1 : -1;
-            })
-            .forEach(quality => {
-                controls.createMenuItem.call(this, {
-                    value: quality,
-                    list,
-                    type,
-                    title: controls.getLabel.call(this, 'quality', quality),
-                    badge: getBadge(quality),
-                });
-            });
-
-        controls.updateSetting.call(this, type, list);
-    },
-
-    // Translate a value into a nice label
-    getLabel(setting, value) {
-        switch (setting) {
-            case 'speed':
-                return value === 1 ? i18n.get('normal', this.config) : `${value}&times;`;
-
-            case 'quality':
-                if (is.number(value)) {
-                    const label = i18n.get(`qualityLabel.${value}`, this.config);
-
-                    if (!label.length) {
-                        return `${value}p`;
-                    }
-
-                    return label;
-                }
-
-                return toTitleCase(value);
-
-            case 'captions':
-                return captions.getLabel.call(this);
-
-            default:
-                return null;
-        }
-    },
-
     // Update the selected setting
     updateSetting(setting, container, input) {
         const pane = this.elements.settings.panels[setting];
@@ -797,6 +740,93 @@ const controls = {
         }
     },
 
+    // Translate a value into a nice label
+    getLabel(setting, value) {
+        switch (setting) {
+            case 'speed':
+                return value === 1 ? i18n.get('normal', this.config) : `${value}&times;`;
+
+            case 'quality':
+                if (is.number(value)) {
+                    const label = i18n.get(`qualityLabel.${value}`, this.config);
+
+                    if (!label.length) {
+                        return `${value}p`;
+                    }
+
+                    return label;
+                }
+
+                return toTitleCase(value);
+
+            case 'captions':
+                return captions.getLabel.call(this);
+
+            default:
+                return null;
+        }
+    },
+
+    // Set the quality menu
+    setQualityMenu(options) {
+        // Menu required
+        if (!is.element(this.elements.settings.panels.quality)) {
+            return;
+        }
+
+        const type = 'quality';
+        const list = this.elements.settings.panels.quality.querySelector('[role="menu"]');
+
+        // Set options if passed and filter based on uniqueness and config
+        if (is.array(options)) {
+            this.options.quality = dedupe(options).filter(quality => this.config.quality.options.includes(quality));
+        }
+
+        // Toggle the pane and tab
+        const toggle = !is.empty(this.options.quality) && this.options.quality.length > 1;
+        controls.toggleMenuButton.call(this, type, toggle);
+
+        // Empty the menu
+        emptyElement(list);
+
+        // Check if we need to toggle the parent
+        controls.checkMenu.call(this);
+
+        // If we're hiding, nothing more to do
+        if (!toggle) {
+            return;
+        }
+
+        // Get the badge HTML for HD, 4K etc
+        const getBadge = quality => {
+            const label = i18n.get(`qualityBadge.${quality}`, this.config);
+
+            if (!label.length) {
+                return null;
+            }
+
+            return controls.createBadge.call(this, label);
+        };
+
+        // Sort options by the config and then render options
+        this.options.quality
+            .sort((a, b) => {
+                const sorting = this.config.quality.options;
+                return sorting.indexOf(a) > sorting.indexOf(b) ? 1 : -1;
+            })
+            .forEach(quality => {
+                controls.createMenuItem.call(this, {
+                    value: quality,
+                    list,
+                    type,
+                    title: controls.getLabel.call(this, 'quality', quality),
+                    badge: getBadge(quality),
+                });
+            });
+
+        controls.updateSetting.call(this, type, list);
+    },
+
     // Set the looping options
     /* setLoopMenu() {
         // Menu required
@@ -846,13 +876,19 @@ const controls = {
 
     // Set a list of available captions languages
     setCaptionsMenu() {
+        // Menu required
+        if (!is.element(this.elements.settings.panels.captions)) {
+            return;
+        }
+
         // TODO: Captions or language? Currently it's mixed
         const type = 'captions';
         const list = this.elements.settings.panels.captions.querySelector('[role="menu"]');
         const tracks = captions.getTracks.call(this);
+        const toggle = Boolean(tracks.length);
 
         // Toggle the pane and tab
-        controls.toggleMenuButton.call(this, type, tracks.length);
+        controls.toggleMenuButton.call(this, type, toggle);
 
         // Empty the menu
         emptyElement(list);
@@ -861,7 +897,7 @@ const controls = {
         controls.checkMenu.call(this);
 
         // If there's no captions, bail
-        if (!tracks.length) {
+        if (!toggle) {
             return;
         }
 
@@ -892,17 +928,13 @@ const controls = {
 
     // Set a list of available captions languages
     setSpeedMenu(options) {
-        // Do nothing if not selected
-        if (!this.config.controls.includes('settings') || !this.config.settings.includes('speed')) {
-            return;
-        }
-
         // Menu required
         if (!is.element(this.elements.settings.panels.speed)) {
             return;
         }
 
         const type = 'speed';
+        const list = this.elements.settings.panels.speed.querySelector('[role="menu"]');
 
         // Set the speed options
         if (is.array(options)) {
@@ -918,6 +950,9 @@ const controls = {
         const toggle = !is.empty(this.options.speed) && this.options.speed.length > 1;
         controls.toggleMenuButton.call(this, type, toggle);
 
+        // Empty the menu
+        emptyElement(list);
+
         // Check if we need to toggle the parent
         controls.checkMenu.call(this);
 
@@ -925,12 +960,6 @@ const controls = {
         if (!toggle) {
             return;
         }
-
-        // Get the list to populate
-        const list = this.elements.settings.panels.speed.querySelector('[role="menu"]');
-
-        // Empty the menu
-        emptyElement(list);
 
         // Create items
         this.options.speed.forEach(speed => {
@@ -1069,7 +1098,6 @@ const controls = {
 
         // Set attributes on current tab
         toggleHidden(current, true);
-        // current.setAttribute('tabindex', -1);
 
         // Set attributes on target
         toggleHidden(target, false);
@@ -1238,6 +1266,7 @@ const controls = {
                         class: `${this.config.classNames.control} ${this.config.classNames.control}--forward`,
                         role: 'menuitem',
                         'aria-haspopup': true,
+                        hidden: '',
                     }),
                 );
 

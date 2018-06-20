@@ -243,7 +243,8 @@ class Listeners {
 
                 // Clear timer
                 clearTimeout(this.player.timers.controls);
-                // Timer to prevent flicker when seeking
+
+                // Set new timer to prevent flicker when seeking
                 this.player.timers.controls = setTimeout(() => ui.toggleControls.call(this.player, false), delay);
             },
         );
@@ -394,58 +395,58 @@ class Listeners {
         });
     }
 
+    // Run default and custom handlers
+    proxy(event, defaultHandler, customHandlerKey) {
+        const customHandler = this.player.config.listeners[customHandlerKey];
+        const hasCustomHandler = is.function(customHandler);
+        let returned = true;
+
+        // Execute custom handler
+        if (hasCustomHandler) {
+            returned = customHandler.call(this.player, event);
+        }
+
+        // Only call default handler if not prevented in custom handler
+        if (returned && is.function(defaultHandler)) {
+            defaultHandler.call(this.player, event);
+        }
+    }
+
+    // Trigger custom and default handlers
+    bind(element, type, defaultHandler, customHandlerKey, passive = true) {
+        const customHandler = this.player.config.listeners[customHandlerKey];
+        const hasCustomHandler = is.function(customHandler);
+
+        on.call(
+            this.player,
+            element,
+            type,
+            event => this.proxy(event, defaultHandler, customHandlerKey),
+            passive && !hasCustomHandler,
+        );
+    }
+
     // Listen for control events
     controls() {
         // IE doesn't support input event, so we fallback to change
         const inputEvent = browser.isIE ? 'change' : 'input';
 
-        // Run default and custom handlers
-        const proxy = (event, defaultHandler, customHandlerKey) => {
-            const customHandler = this.player.config.listeners[customHandlerKey];
-            const hasCustomHandler = is.function(customHandler);
-            let returned = true;
-
-            // Execute custom handler
-            if (hasCustomHandler) {
-                returned = customHandler.call(this.player, event);
-            }
-
-            // Only call default handler if not prevented in custom handler
-            if (returned && is.function(defaultHandler)) {
-                defaultHandler.call(this.player, event);
-            }
-        };
-
-        // Trigger custom and default handlers
-        const bind = (element, type, defaultHandler, customHandlerKey, passive = true) => {
-            const customHandler = this.player.config.listeners[customHandlerKey];
-            const hasCustomHandler = is.function(customHandler);
-
-            on.call(
-                this.player,
-                element,
-                type,
-                event => proxy(event, defaultHandler, customHandlerKey),
-                passive && !hasCustomHandler,
-            );
-        };
-
         // Play/pause toggle
         Array.from(this.player.elements.buttons.play).forEach(button => {
-            bind(button, 'click', this.player.togglePlay, 'play');
+            this.bind(button, 'click', this.player.togglePlay, 'play');
         });
 
         // Pause
-        bind(this.player.elements.buttons.restart, 'click', this.player.restart, 'restart');
+        this.bind(this.player.elements.buttons.restart, 'click', this.player.restart, 'restart');
 
         // Rewind
-        bind(this.player.elements.buttons.rewind, 'click', this.player.rewind, 'rewind');
+        this.bind(this.player.elements.buttons.rewind, 'click', this.player.rewind, 'rewind');
 
         // Rewind
-        bind(this.player.elements.buttons.fastForward, 'click', this.player.forward, 'fastForward');
+        this.bind(this.player.elements.buttons.fastForward, 'click', this.player.forward, 'fastForward');
 
         // Mute toggle
-        bind(
+        this.bind(
             this.player.elements.buttons.mute,
             'click',
             () => {
@@ -455,10 +456,10 @@ class Listeners {
         );
 
         // Captions toggle
-        bind(this.player.elements.buttons.captions, 'click', () => this.player.toggleCaptions());
+        this.bind(this.player.elements.buttons.captions, 'click', () => this.player.toggleCaptions());
 
         // Fullscreen toggle
-        bind(
+        this.bind(
             this.player.elements.buttons.fullscreen,
             'click',
             () => {
@@ -468,7 +469,7 @@ class Listeners {
         );
 
         // Picture-in-Picture
-        bind(
+        this.bind(
             this.player.elements.buttons.pip,
             'click',
             () => {
@@ -478,62 +479,22 @@ class Listeners {
         );
 
         // Airplay
-        bind(this.player.elements.buttons.airplay, 'click', this.player.airplay, 'airplay');
+        this.bind(this.player.elements.buttons.airplay, 'click', this.player.airplay, 'airplay');
 
         // Settings menu
-        bind(this.player.elements.buttons.settings, 'click', event => {
+        this.bind(this.player.elements.buttons.settings, 'click', event => {
             controls.toggleMenu.call(this.player, event);
         });
 
-        // Settings menu
-        bind(this.player.elements.settings.popup, 'click', event => {
-            event.stopPropagation();
-
-            // Go back to home tab on click
-            const showHomeTab = () => {
-                controls.showMenuPanel.call(this.player, 'home');
-            };
-
-            // Settings menu items - use event delegation as items are added/removed
-            if (matches(event.target, this.player.config.selectors.inputs.language)) {
-                proxy(
-                    event,
-                    () => {
-                        this.player.currentTrack = Number(event.target.value);
-                        showHomeTab();
-                    },
-                    'language',
-                );
-            } else if (matches(event.target, this.player.config.selectors.inputs.quality)) {
-                proxy(
-                    event,
-                    () => {
-                        this.player.quality = event.target.value;
-                        showHomeTab();
-                    },
-                    'quality',
-                );
-            } else if (matches(event.target, this.player.config.selectors.inputs.speed)) {
-                proxy(
-                    event,
-                    () => {
-                        this.player.speed = parseFloat(event.target.value);
-                        showHomeTab();
-                    },
-                    'speed',
-                );
-            }
-        });
-
         // Set range input alternative "value", which matches the tooltip time (#954)
-        bind(this.player.elements.inputs.seek, 'mousedown mousemove', event => {
+        this.bind(this.player.elements.inputs.seek, 'mousedown mousemove', event => {
             const clientRect = this.player.elements.progress.getBoundingClientRect();
             const percent = 100 / clientRect.width * (event.pageX - clientRect.left);
             event.currentTarget.setAttribute('seek-value', percent);
         });
 
         // Pause while seeking
-        bind(this.player.elements.inputs.seek, 'mousedown mouseup keydown keyup touchstart touchend', event => {
+        this.bind(this.player.elements.inputs.seek, 'mousedown mouseup keydown keyup touchstart touchend', event => {
             const seek = event.currentTarget;
 
             const code = event.keyCode ? event.keyCode : event.which;
@@ -559,7 +520,7 @@ class Listeners {
         });
 
         // Seek
-        bind(
+        this.bind(
             this.player.elements.inputs.seek,
             inputEvent,
             event => {
@@ -582,7 +543,7 @@ class Listeners {
         // Current time invert
         // Only if one time element is used for both currentTime and duration
         if (this.player.config.toggleInvert && !is.element(this.player.elements.display.duration)) {
-            bind(this.player.elements.display.currentTime, 'click', () => {
+            this.bind(this.player.elements.display.currentTime, 'click', () => {
                 // Do nothing if we're at the start
                 if (this.player.currentTime === 0) {
                     return;
@@ -595,7 +556,7 @@ class Listeners {
         }
 
         // Volume
-        bind(
+        this.bind(
             this.player.elements.inputs.volume,
             inputEvent,
             event => {
@@ -607,27 +568,27 @@ class Listeners {
         // Polyfill for lower fill in <input type="range"> for webkit
         if (browser.isWebkit) {
             Array.from(getElements.call(this.player, 'input[type="range"]')).forEach(element => {
-                bind(element, 'input', event => controls.updateRangeFill.call(this.player, event.target));
+                this.bind(element, 'input', event => controls.updateRangeFill.call(this.player, event.target));
             });
         }
 
         // Seek tooltip
-        bind(this.player.elements.progress, 'mouseenter mouseleave mousemove', event =>
+        this.bind(this.player.elements.progress, 'mouseenter mouseleave mousemove', event =>
             controls.updateSeekTooltip.call(this.player, event),
         );
 
         // Update controls.hover state (used for ui.toggleControls to avoid hiding when interacting)
-        bind(this.player.elements.controls, 'mouseenter mouseleave', event => {
+        this.bind(this.player.elements.controls, 'mouseenter mouseleave', event => {
             this.player.elements.controls.hover = !this.player.touch && event.type === 'mouseenter';
         });
 
         // Update controls.pressed state (used for ui.toggleControls to avoid hiding when interacting)
-        bind(this.player.elements.controls, 'mousedown mouseup touchstart touchend touchcancel', event => {
+        this.bind(this.player.elements.controls, 'mousedown mouseup touchstart touchend touchcancel', event => {
             this.player.elements.controls.pressed = ['mousedown', 'touchstart'].includes(event.type);
         });
 
         // Focus in/out on controls
-        bind(this.player.elements.controls, 'focusin focusout', event => {
+        this.bind(this.player.elements.controls, 'focusin focusout', event => {
             const { config, elements, timers } = this.player;
 
             // Skip transition to prevent focus from scrolling the parent element
@@ -654,7 +615,7 @@ class Listeners {
         });
 
         // Mouse wheel for volume
-        bind(
+        this.bind(
             this.player.elements.inputs.volume,
             'wheel',
             event => {
