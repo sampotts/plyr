@@ -51,7 +51,7 @@
 
 .plyr__caption_position__top {
     bottom: inherit;
-    top: 30px;
+    top: 0;
 }
 
 .plyr--captions-active .plyr__captions {
@@ -62,6 +62,6 @@
     transform: translateY(-($plyr-control-spacing * 1.5));
 }
 
-.plyr--hide-controls .plyr__captions.plyr__caption_position__top {
+.plyr__captions.plyr__caption_position__top {
     transform: none;
 }
