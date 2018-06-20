@@ -49,7 +49,9 @@ class Ads {
     }
 
     get enabled() {
-        return this.player.isVideo && this.player.config.ads.enabled && !is.empty(this.publisherId);
+        return (
+            this.player.isHTML5 && this.player.isVideo && this.player.config.ads.enabled && !is.empty(this.publisherId)
+        );
     }
 
     /**
