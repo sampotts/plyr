@@ -98,4 +98,8 @@
             font-size: $plyr-font-size-captions-large;
         }
     }
+
+    .plyr__control[data-plyr='zoom'] {
+        display: none;
+    }
 }

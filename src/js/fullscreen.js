@@ -8,27 +8,47 @@ import { hasClass, toggleClass, trapFocus } from './utils/elements';
 import { on, triggerEvent } from './utils/events';
 import is from './utils/is';
 
-function onChange() {
+function onChange(isZoom = false) {
     if (!this.enabled) {
         return;
     }
 
-    // Update toggle button
-    const button = this.player.elements.buttons.fullscreen;
-    if (is.element(button)) {
-        button.pressed = this.active;
+    if (!isZoom) {
+        // Update toggle button
+        const button = this.player.elements.buttons.fullscreen;
+        if (is.element(button)) {
+            button.pressed = this.active;
+        }
+    } else {
+        const button = this.player.elements.buttons.zoom;
+        if (is.element(button)) {
+            button.pressed = this.zoomActive;
+        }
     }
 
     // Trigger an event
     if (this.isIosNative || !this.isOutterContainerSet) {
-        triggerEvent.call(this.player, this.target, this.active ? 'enterfullscreen' : 'exitfullscreen', true);
+        if (!isZoom) {
+            triggerEvent.call(this.player, this.target, this.active ? 'enterfullscreen' : 'exitfullscreen', true);
+        } else {
+            triggerEvent.call(this.player, this.target, this.zoomActive ? 'enterzoomfullscreen' : 'exitzoomfullscreen', true);
+        }
     } else {
-        triggerEvent.call(
-            this.player,
-            this.player.elements.container,
-            this.active ? 'enterfullscreen' : 'exitfullscreen',
-            true,
-        );
+        if (!isZoom) {
+            triggerEvent.call(
+                this.player,
+                this.player.elements.container,
+                this.active ? 'enterfullscreen' : 'exitfullscreen',
+                true,
+            );
+        } else {
+            triggerEvent.call(
+                this.player,
+                this.player.elements.container,
+                this.zoomActive ? 'enterzoomfullscreen' : 'exitzoomfullscreen',
+                true,
+            );
+        }
     }
 
     // Trap focus in container
@@ -61,7 +81,7 @@ function toggleFallback(toggle = false) {
 
 
     // Toggle button and fire events
-    onChange.call(this);
+    onChange.call(this, true);
 }
 
 class Fullscreen {
@@ -203,6 +223,10 @@ class Fullscreen {
     enter() {
         if (!this.enabled) {
             return;
+        }
+
+        if (this.zoomActive) {
+            this.toggleZoom();
         }
 
         // iOS native fullscreen doesn't need the request step
