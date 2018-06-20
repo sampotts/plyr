@@ -3,65 +3,61 @@
 // ==========================================================================
 
 const getConstructor = input => (input !== null && typeof input !== 'undefined' ? input.constructor : null);
-
 const instanceOf = (input, constructor) => Boolean(input && constructor && input instanceof constructor);
+const isNullOrUndefined = input => input === null || typeof input === 'undefined';
+const isObject = input => getConstructor(input) === Object;
+const isNumber = input => getConstructor(input) === Number && !Number.isNaN(input);
+const isString = input => getConstructor(input) === String;
+const isBoolean = input => getConstructor(input) === Boolean;
+const isFunction = input => getConstructor(input) === Function;
+const isArray = input => Array.isArray(input);
+const isWeakMap = input => instanceOf(input, WeakMap);
+const isNodeList = input => instanceOf(input, NodeList);
+const isElement = input => instanceOf(input, Element);
+const isTextNode = input => getConstructor(input) === Text;
+const isEvent = input => instanceOf(input, Event);
+const isCue = input => instanceOf(input, window.TextTrackCue) || instanceOf(input, window.VTTCue);
+const isTrack = input => instanceOf(input, TextTrack) || (!isNullOrUndefined(input) && isString(input.kind));
 
-const is = {
-    object(input) {
-        return getConstructor(input) === Object;
-    },
-    number(input) {
-        return getConstructor(input) === Number && !Number.isNaN(input);
-    },
-    string(input) {
-        return getConstructor(input) === String;
-    },
-    boolean(input) {
-        return getConstructor(input) === Boolean;
-    },
-    function(input) {
-        return getConstructor(input) === Function;
-    },
-    array(input) {
-        return !is.nullOrUndefined(input) && Array.isArray(input);
-    },
-    weakMap(input) {
-        return instanceOf(input, WeakMap);
-    },
-    nodeList(input) {
-        return instanceOf(input, NodeList);
-    },
-    element(input) {
-        return instanceOf(input, Element);
-    },
-    textNode(input) {
-        return getConstructor(input) === Text;
-    },
-    event(input) {
-        return instanceOf(input, Event);
-    },
-    cue(input) {
-        return instanceOf(input, window.TextTrackCue) || instanceOf(input, window.VTTCue);
-    },
-    track(input) {
-        return instanceOf(input, TextTrack) || (!is.nullOrUndefined(input) && is.string(input.kind));
-    },
-    url(input) {
-        return (
-            !is.nullOrUndefined(input) &&
-            /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/.test(input)
-        );
-    },
-    nullOrUndefined(input) {
-        return input === null || typeof input === 'undefined';
-    },
-    empty(input) {
-        return (
-            is.nullOrUndefined(input) ||
-            ((is.string(input) || is.array(input) || is.nodeList(input)) && !input.length) ||
-            (is.object(input) && !Object.keys(input).length)
-        );
-    },
+const isEmpty = input =>
+    isNullOrUndefined(input) ||
+    ((isString(input) || isArray(input) || isNodeList(input)) && !input.length) ||
+    (isObject(input) && !Object.keys(input).length);
+
+const isUrl = input => {
+    // Accept a URL object
+    if (instanceOf(input, window.URL)) {
+        return true;
+    }
+
+    // Add the protocol if required
+    let string = input;
+    if (!input.startsWith('http://') || !input.startsWith('https://')) {
+        string = `http://${input}`;
+    }
+
+    try {
+        return !isEmpty(new URL(string).hostname);
+    } catch (e) {
+        return false;
+    }
 };
 
-export default is;
+export default {
+    nullOrUndefined: isNullOrUndefined,
+    object: isObject,
+    number: isNumber,
+    string: isString,
+    boolean: isBoolean,
+    function: isFunction,
+    array: isArray,
+    weakMap: isWeakMap,
+    nodeList: isNodeList,
+    element: isElement,
+    textNode: isTextNode,
+    event: isEvent,
+    cue: isCue,
+    track: isTrack,
+    url: isUrl,
+    empty: isEmpty,
+};

@@ -1,7 +1,13 @@
+# 3.3.18
+
+-   Ads are now only supported on HTML5 videos as it violates terms of service for YouTube and Vimeo 😢
+-   Fix i18n defaults path on README (thanks @meyt!)
+-   Minor increaseVolume and decreaseVolume changes (thanks @friday!)
+
 # v3.3.17
 
--   Fix YouTube muting after seeking with the progress slider
--   Respect preload="none" when setting quality if the media hasn't been loaded some other way
+-   Fix YouTube muting after seeking with the progress slider (thanks @friday!)
+-   Respect preload="none" when setting quality if the media hasn't been loaded some other way (thanks @friday!)
 
 # v3.3.16
 
