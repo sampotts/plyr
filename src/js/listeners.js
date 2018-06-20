@@ -46,7 +46,7 @@ class Listeners {
         // Reset on keyup
         if (pressed) {
             // Which keycodes should we prevent default
-            const preventDefault = [32, 37, 38, 39, 40, 48, 49, 50, 51, 52, 53, 54, 56, 57, 67, 70, 73, 75, 76, 77, 79];
+            const preventDefault = [27, 32, 37, 38, 39, 40, 48, 49, 50, 51, 52, 53, 54, 56, 57, 67, 70, 73, 75, 76, 77, 79];
 
             // Check focused element
             // and if the focused element is not editable (e.g. text input)
@@ -67,6 +67,12 @@ class Listeners {
             }
 
             switch (code) {
+                case 27:
+                    // esc escape fullscreen mode
+                    if (this.player.fullscreen.enabled) {
+                        this.player.fullscreen.exit();
+                    }
+                    break;
                 case 48:
                 case 49:
                 case 50:
