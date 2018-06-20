@@ -410,12 +410,11 @@ const captions = {
             (!is.boolean(captionsActive) && is.string(captionsLanguage))
         ) {
             const tracks = captions.getTracks.call(this, true);
-            let findLanguageList = null;
+            const findLanguageList = [captionsLanguage];
             if (defaultLanguage) {
-                findLanguageList = [captionsLanguage, defaultLanguage, ...this.captions.languages];
-            } else {
-                findLanguageList = [captionsLanguage, ...this.captions.languages];
+                findLanguageList.push(defaultLanguage);
             }
+            Array.prototype.push.apply(findLanguageList, this.captions.languages);
             const track = captions.findTrack.call(this, findLanguageList, true);
             captions.set.call(this, tracks.indexOf(track));
         }

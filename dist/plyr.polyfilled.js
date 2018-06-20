@@ -8674,12 +8674,11 @@ typeof navigator === "object" && (function (global, factory) {
 	        // if storage has caption active and,
 	        if (is$1.boolean(captionsActive) && captionsActive && is$1.string(captionsLanguage) || !is$1.boolean(captionsActive) && is$1.string(captionsLanguage)) {
 	            var tracks = captions.getTracks.call(this, true);
-	            var findLanguageList = null;
+	            var findLanguageList = [captionsLanguage];
 	            if (defaultLanguage) {
-	                findLanguageList = [captionsLanguage, defaultLanguage].concat(toConsumableArray(this.captions.languages));
-	            } else {
-	                findLanguageList = [captionsLanguage].concat(toConsumableArray(this.captions.languages));
+	                findLanguageList.push(defaultLanguage);
 	            }
+	            Array.prototype.push.apply(findLanguageList, this.captions.languages);
 	            var track = captions.findTrack.call(this, findLanguageList, true);
 	            captions.set.call(this, tracks.indexOf(track));
 	        }
@@ -12783,6 +12782,11 @@ typeof navigator === "object" && (function (global, factory) {
 	    // Set a list of available captions languages
 	    setCaptionsMenu: function setCaptionsMenu() {
 	        var _this3 = this;
+
+	        // Menu required
+	        if (!is$1.element(this.elements.settings.panes.captions)) {
+	            return;
+	        }
 
 	        // TODO: Captions or language? Currently it's mixed
 	        var type = 'captions';

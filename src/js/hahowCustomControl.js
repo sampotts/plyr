@@ -281,6 +281,11 @@ const hahow = {
 
     // Set a list of available captions languages
     setCaptionsMenu() {
+        // Menu required
+        if (!is.element(this.elements.settings.panes.captions)) {
+            return;
+        }
+
         // TODO: Captions or language? Currently it's mixed
         const type = 'captions';
         const list = this.elements.settings.panes.captions.querySelector('ul');
