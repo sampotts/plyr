@@ -6988,6 +6988,7 @@ typeof navigator === "object" && (function (global, factory) {
 
             var tracks = Array.from(this.media.querySelectorAll('track'));
             removeElement(tracks);
+            this.captions.currentTrack = -1;
 
             // Destroy instance and re-setup
             this.destroy.call(this, function () {
@@ -7111,7 +7112,6 @@ typeof navigator === "object" && (function (global, factory) {
 
                 // Update the fullscreen support
                 _this2.fullscreen.update();
-
                 captions.setDefault.call(_this2, defaultCaption);
             }, true);
         }

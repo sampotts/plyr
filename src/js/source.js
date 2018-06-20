@@ -39,6 +39,7 @@ const source = {
 
         const tracks = Array.from(this.media.querySelectorAll('track'));
         removeElement(tracks);
+        this.captions.currentTrack = -1;
 
         // Destroy instance and re-setup
         this.destroy.call(
@@ -155,7 +156,6 @@ const source = {
 
                 // Update the fullscreen support
                 this.fullscreen.update();
-
                 captions.setDefault.call(this, defaultCaption);
             },
             true,
