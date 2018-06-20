@@ -74,3 +74,9 @@
         z-index: 10000000;
     }
 }
+
+.plyr--fullscreen-fallback {
+    .plyr__control[data-plyr='zoom'] {
+        display: block !important;
+    }
+}
