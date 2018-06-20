@@ -36,6 +36,9 @@ const source = {
         // Cancel current network requests
         html5.cancelRequests.call(this);
 
+        const tracks = Array.from(this.media.querySelectorAll('track'));
+        removeElement(tracks);
+
         // Destroy instance and re-setup
         this.destroy.call(
             this,
@@ -118,6 +121,7 @@ const source = {
                 // Set new sources for html5
                 if (this.isHTML5) {
                     source.insertElements.call(this, 'source', sources);
+                    this.media.setAttribute('src', sources[0].src);
                 }
 
                 // Set video title

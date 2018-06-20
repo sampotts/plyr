@@ -12433,6 +12433,7 @@ typeof navigator === "object" && (function (global, factory) {
 	            // Set new sources for html5
 	            if (_this2.isHTML5) {
 	                source.insertElements.call(_this2, 'source', sources);
+	                _this2.media.setAttribute('src', sources[0].src);
 	            }
 
 	            // Set video title
