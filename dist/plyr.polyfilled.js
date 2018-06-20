@@ -9137,21 +9137,38 @@ typeof navigator === "object" && (function (global, factory) {
 	// ==========================================================================
 
 	function onChange() {
+	    var isZoom = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
 	    if (!this.enabled) {
 	        return;
 	    }
 
-	    // Update toggle button
-	    var button = this.player.elements.buttons.fullscreen;
-	    if (is$1.element(button)) {
-	        button.pressed = this.active;
+	    if (!isZoom) {
+	        // Update toggle button
+	        var button = this.player.elements.buttons.fullscreen;
+	        if (is$1.element(button)) {
+	            button.pressed = this.active;
+	        }
+	    } else {
+	        var _button = this.player.elements.buttons.zoom;
+	        if (is$1.element(_button)) {
+	            _button.pressed = this.zoomActive;
+	        }
 	    }
 
 	    // Trigger an event
 	    if (this.isIosNative || !this.isOutterContainerSet) {
-	        triggerEvent.call(this.player, this.target, this.active ? 'enterfullscreen' : 'exitfullscreen', true);
+	        if (!isZoom) {
+	            triggerEvent.call(this.player, this.target, this.active ? 'enterfullscreen' : 'exitfullscreen', true);
+	        } else {
+	            triggerEvent.call(this.player, this.target, this.zoomActive ? 'enterzoomfullscreen' : 'exitzoomfullscreen', true);
+	        }
 	    } else {
-	        triggerEvent.call(this.player, this.player.elements.container, this.active ? 'enterfullscreen' : 'exitfullscreen', true);
+	        if (!isZoom) {
+	            triggerEvent.call(this.player, this.player.elements.container, this.active ? 'enterfullscreen' : 'exitfullscreen', true);
+	        } else {
+	            triggerEvent.call(this.player, this.player.elements.container, this.zoomActive ? 'enterzoomfullscreen' : 'exitzoomfullscreen', true);
+	        }
 	    }
 
 	    // Trap focus in container
@@ -9185,7 +9202,7 @@ typeof navigator === "object" && (function (global, factory) {
 	    }
 
 	    // Toggle button and fire events
-	    onChange.call(this);
+	    onChange.call(this, true);
 	}
 
 	var Fullscreen = function () {
@@ -9251,6 +9268,10 @@ typeof navigator === "object" && (function (global, factory) {
 	        value: function enter() {
 	            if (!this.enabled) {
 	                return;
+	            }
+
+	            if (this.zoomActive) {
+	                this.toggleZoom();
 	            }
 
 	            // iOS native fullscreen doesn't need the request step
@@ -9738,7 +9759,7 @@ typeof navigator === "object" && (function (global, factory) {
 	            // Reset on keyup
 	            if (pressed) {
 	                // Which keycodes should we prevent default
-	                var preventDefault = [32, 37, 38, 39, 40, 48, 49, 50, 51, 52, 53, 54, 56, 57, 67, 70, 73, 75, 76, 77, 79];
+	                var preventDefault = [27, 32, 37, 38, 39, 40, 48, 49, 50, 51, 52, 53, 54, 56, 57, 67, 70, 73, 75, 76, 77, 79];
 
 	                // Check focused element
 	                // and if the focused element is not editable (e.g. text input)
@@ -9755,6 +9776,12 @@ typeof navigator === "object" && (function (global, factory) {
 	                }
 
 	                switch (code) {
+	                    case 27:
+	                        // esc escape fullscreen mode
+	                        if (this.player.fullscreen.enabled) {
+	                            this.player.fullscreen.exit();
+	                        }
+	                        break;
 	                    case 48:
 	                    case 49:
 	                    case 50:
@@ -10035,12 +10062,6 @@ typeof navigator === "object" && (function (global, factory) {
 
 	                    // Save to storage
 	                    _this3.player.storage.set({ speed: _this3.player.speed });
-	                });
-
-	                // Quality request
-	                on.call(this.player, this.player.media, 'qualityrequested', function (event) {
-	                    // Save to storage
-	                    _this3.player.storage.set({ quality: event.detail.quality });
 	                });
 
 	                // Quality change
@@ -12465,6 +12486,12 @@ typeof navigator === "object" && (function (global, factory) {
 	            // Set up from scratch
 	            media.setup.call(_this2);
 
+	            // restore video quality
+	            var quality = _this2.storage.get('quality');
+	            if (is$1.number(quality)) {
+	                _this2.media.quality = quality;
+	            }
+
 	            var defaultCaption = null;
 	            // HTML5 stuff
 	            if (_this2.isHTML5) {
@@ -12493,6 +12520,11 @@ typeof navigator === "object" && (function (global, factory) {
 	            // Update the fullscreen support
 	            _this2.fullscreen.update();
 	            captions.setDefault.call(_this2, defaultCaption);
+	            var speed = _this2.storage.get('speed');
+	            if (is$1.number(speed)) {
+	                _this2.speed = speed;
+	                controls.updateSetting.call(_this2, 'speed', speed);
+	            }
 	        }, true);
 	    }
 	};
@@ -13903,6 +13935,10 @@ typeof navigator === "object" && (function (global, factory) {
 	                var value = closest(options, quality);
 	                this.debug.warn('Unsupported quality option: ' + quality + ', using ' + value + ' instead');
 	                quality = value;
+	            } else if ('' + quality === '' + input) {
+	                this.storage.set({
+	                    quality: quality
+	                });
 	            }
 
 	            // Trigger request event

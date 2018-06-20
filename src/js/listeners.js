@@ -334,12 +334,6 @@ class Listeners {
                 this.player.storage.set({ speed: this.player.speed });
             });
 
-            // Quality request
-            on.call(this.player, this.player.media, 'qualityrequested', event => {
-                // Save to storage
-                this.player.storage.set({ quality: event.detail.quality });
-            });
-
             // Quality change
             on.call(this.player, this.player.media, 'qualitychange', event => {
                 // Update UI

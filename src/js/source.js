@@ -2,7 +2,9 @@
 // Plyr source update
 // ==========================================================================
 
-import { providers, types } from './config/types';
+import captions from './captions';
+import { providers } from './config/types';
+import controls from './controls';
 import html5 from './html5';
 import media from './media';
 import support from './support';
@@ -10,7 +12,6 @@ import ui from './ui';
 import { createElement, insertElement, removeElement, setAttributes } from './utils/elements';
 import is from './utils/is';
 import { getDeep } from './utils/objects';
-import captions from './captions';
 
 const source = {
     // Add elements to HTML5 media (source, tracks, etc)
@@ -131,7 +132,13 @@ const source = {
                 // Set up from scratch
                 media.setup.call(this);
 
-                let defaultCaption = null
+                // restore video quality
+                const quality = this.storage.get('quality');
+                if (is.number(quality)) {
+                    this.media.quality = quality;
+                }
+
+                let defaultCaption = null;
                 // HTML5 stuff
                 if (this.isHTML5) {
                     // Setup captions
@@ -157,6 +164,11 @@ const source = {
                 // Update the fullscreen support
                 this.fullscreen.update();
                 captions.setDefault.call(this, defaultCaption);
+                const speed = this.storage.get('speed');
+                if (is.number(speed)) {
+                    this.speed = speed;
+                    controls.updateSetting.call(this, 'speed', speed);
+                }
             },
             true,
         );

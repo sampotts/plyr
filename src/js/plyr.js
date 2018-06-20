@@ -699,6 +699,10 @@ class Plyr {
             const value = closest(options, quality);
             this.debug.warn(`Unsupported quality option: ${quality}, using ${value} instead`);
             quality = value;
+        } else if (`${quality}` === `${input}`) {
+            this.storage.set({
+                quality,
+            });
         }
 
         // Trigger request event
