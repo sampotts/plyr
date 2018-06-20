@@ -3049,7 +3049,9 @@ typeof navigator === "object" && (function (global, factory) {
                 }
 
                 // Toggle state
-                this.elements.buttons.captions.pressed = active;
+                if (this.elements.buttons.captions && this.elements.buttons.captions.pressed) {
+                    this.elements.buttons.captions.pressed = active;
+                }
 
                 // Add class hook
                 toggleClass(this.elements.container, activeClass, active);
@@ -3277,6 +3279,24 @@ typeof navigator === "object" && (function (global, factory) {
                 return;
             }
             toggleClass(this.elements.captions, this.config.classNames.captionPosition.replace('{0}', 'top'));
+        },
+        setDefault: function setDefault() {
+            var defaultLanguage = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
+            var captionsActive = this.storage.get('captions');
+            var captionsLanguage = this.storage.get('language') || defaultLanguage;
+            // if storage has caption active and,
+            if (is.boolean(captionsActive) && captionsActive && is.string(captionsLanguage) || !is.boolean(captionsActive) && is.string(captionsLanguage)) {
+                var tracks = captions.getTracks.call(this, true);
+                var findLanguageList = null;
+                if (defaultLanguage) {
+                    findLanguageList = [captionsLanguage, defaultLanguage].concat(toConsumableArray(this.captions.languages));
+                } else {
+                    findLanguageList = [captionsLanguage].concat(toConsumableArray(this.captions.languages));
+                }
+                var track = captions.findTrack.call(this, findLanguageList, true);
+                captions.set.call(this, tracks.indexOf(track));
+            }
         }
     };
 
@@ -3442,6 +3462,7 @@ typeof navigator === "object" && (function (global, factory) {
             exitZoom: 'reset screen size',
             frameTitle: 'Player for {title}',
             captions: 'Captions',
+            noCaptions: 'No captions',
             'caption-position': 'Caption Position',
             'captionPositionLabel': {
                 top: 'Top',
@@ -7014,7 +7035,6 @@ typeof navigator === "object" && (function (global, factory) {
                      */
                     setAttributes(_this2.media, attributes);
                 } else {
-                    removeElement(_this2.media);
                     _this2.media = null;
                     _this2.media = createElement(tagName, attributes);
                 }
@@ -7065,11 +7085,19 @@ typeof navigator === "object" && (function (global, factory) {
                 // Set up from scratch
                 media.setup.call(_this2);
 
+                var defaultCaption = null;
                 // HTML5 stuff
                 if (_this2.isHTML5) {
                     // Setup captions
                     if ('tracks' in input) {
                         source.insertElements.call(_this2, 'track', input.tracks);
+                        var defaultTracks = input.tracks.filter(function (track) {
+                            return track.default;
+                        });
+                        if (defaultTracks.length > 0) {
+                            defaultCaption = defaultTracks[0].srclang;
+                        }
+                        captions.update.call(_this2);
                     }
 
                     // Load HTML5 sources
@@ -7084,6 +7112,8 @@ typeof navigator === "object" && (function (global, factory) {
 
                 // Update the fullscreen support
                 _this2.fullscreen.update();
+
+                captions.setDefault.call(_this2, defaultCaption);
             }, true);
         }
     };
@@ -7317,6 +7347,8 @@ typeof navigator === "object" && (function (global, factory) {
             }
 
             hahow.setSpeedMenu.call(this);
+            hahow.setCaptionsMenu.call(this);
+            hahow.setCaptionsPositionMenu.call(this);
 
             return container;
         },
@@ -7378,7 +7410,7 @@ typeof navigator === "object" && (function (global, factory) {
             var tracks = captions.getTracks.call(this);
 
             // Toggle the pane and tab
-            controls.toggleTab.call(this, type, tracks.length);
+            controls.toggleTab.call(this, type, true);
 
             // Empty the menu
             emptyElement(list);
@@ -7388,6 +7420,14 @@ typeof navigator === "object" && (function (global, factory) {
 
             // If there's no captions, bail
             if (!tracks.length) {
+                controls.createMenuItem.bind(this)({
+                    value: -1,
+                    checked: !this.captions.toggled,
+                    title: i18n.get('noCaptions', this.config),
+                    list: list,
+                    type: 'language'
+                });
+                controls.updateSetting.call(this, type, list);
                 return;
             }
 
