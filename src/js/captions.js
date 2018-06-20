@@ -201,7 +201,9 @@ const captions = {
             }
 
             // Toggle state
-            this.elements.buttons.captions.pressed = active;
+            if (this.elements.buttons.captions && this.elements.buttons.captions.pressed) {
+                this.elements.buttons.captions.pressed = active;
+            }
 
             // Add class hook
             toggleClass(this.elements.container, activeClass, active);
