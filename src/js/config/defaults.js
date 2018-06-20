@@ -184,6 +184,7 @@ const defaults = {
         exitZoom: 'reset screen size',
         frameTitle: 'Player for {title}',
         captions: 'Captions',
+        noCaptions: 'No captions',
         'caption-position': 'Caption Position',
         'captionPositionLabel': {
             top: 'Top',

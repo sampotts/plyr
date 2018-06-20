@@ -230,6 +230,8 @@ const hahow = {
         }
 
         hahow.setSpeedMenu.call(this);
+        hahow.setCaptionsMenu.call(this);
+        hahow.setCaptionsPositionMenu.call(this);
 
         return container;
     },
@@ -285,7 +287,7 @@ const hahow = {
         const tracks = captions.getTracks.call(this);
 
         // Toggle the pane and tab
-        controls.toggleTab.call(this, type, tracks.length);
+        controls.toggleTab.call(this, type, true);
 
         // Empty the menu
         emptyElement(list);
@@ -295,6 +297,14 @@ const hahow = {
 
         // If there's no captions, bail
         if (!tracks.length) {
+            controls.createMenuItem.bind(this)({
+                value: -1,
+                checked: !this.captions.toggled,
+                title: i18n.get('noCaptions', this.config),
+                list,
+                type: 'language',
+            });
+            controls.updateSetting.call(this, type, list);
             return;
         }
 
