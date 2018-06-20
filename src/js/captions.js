@@ -400,6 +400,26 @@ const captions = {
         }
         toggleClass(this.elements.captions, this.config.classNames.captionPosition.replace('{0}', 'top'));
     },
+
+    setDefault(defaultLanguage = null) {
+        const captionsActive = this.storage.get('captions');
+        const captionsLanguage = this.storage.get('language') || defaultLanguage;
+        // if storage has caption active and,
+        if (
+            (is.boolean(captionsActive) && captionsActive && is.string(captionsLanguage)) ||
+            (!is.boolean(captionsActive) && is.string(captionsLanguage))
+        ) {
+            const tracks = captions.getTracks.call(this, true);
+            let findLanguageList = null;
+            if (defaultLanguage) {
+                findLanguageList = [captionsLanguage, defaultLanguage, ...this.captions.languages];
+            } else {
+                findLanguageList = [captionsLanguage, ...this.captions.languages];
+            }
+            const track = captions.findTrack.call(this, findLanguageList, true);
+            captions.set.call(this, tracks.indexOf(track));
+        }
+    },
 };
 
 export default captions;

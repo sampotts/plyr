@@ -10,6 +10,7 @@ import ui from './ui';
 import { createElement, insertElement, removeElement, setAttributes } from './utils/elements';
 import is from './utils/is';
 import { getDeep } from './utils/objects';
+import captions from './captions';
 
 const source = {
     // Add elements to HTML5 media (source, tracks, etc)
@@ -79,7 +80,6 @@ const source = {
                      */
                     setAttributes(this.media, attributes);
                 } else {
-                    removeElement(this.media);
                     this.media = null;
                     this.media = createElement(tagName, attributes);
                 }
@@ -130,11 +130,17 @@ const source = {
                 // Set up from scratch
                 media.setup.call(this);
 
+                let defaultCaption = null
                 // HTML5 stuff
                 if (this.isHTML5) {
                     // Setup captions
                     if ('tracks' in input) {
                         source.insertElements.call(this, 'track', input.tracks);
+                        const defaultTracks = input.tracks.filter(track => track.default);
+                        if (defaultTracks.length > 0 ){
+                            defaultCaption = defaultTracks[0].srclang;
+                        }
+                        captions.update.call(this);
                     }
 
                     // Load HTML5 sources
@@ -149,6 +155,8 @@ const source = {
 
                 // Update the fullscreen support
                 this.fullscreen.update();
+
+                captions.setDefault.call(this, defaultCaption);
             },
             true,
         );
