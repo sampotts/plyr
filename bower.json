@@ -6,10 +6,10 @@
         "Audio",
         "Video",
         "HTML5 Audio",
-        "HTml5 Video"
+        "HTML5 Video"
     ],
     "authors": [
-        "Sam Potts <me@sampotts.me>"
+        "Sam Potts <sam@potts.es>"
     ],
     "dependencies": {},
     "main": [
@@ -27,7 +27,7 @@
     ],
     "repository": {
         "type": "git",
-        "url": "git://github.com/hahow/plyr.git"
+        "url": "git://github.com/sampotts/plyr.git"
     },
     "license": "MIT"
 }

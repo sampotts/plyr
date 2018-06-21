@@ -1,0 +1,32 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		// Exclude from the editor
+		"files.exclude": {
+			"**/node_modules": true
+		},
+		// Exclude from search
+		"search.exclude": {
+			"dist/": true,
+			"demo/dist/": true
+		},
+		// Linting
+		"stylelint.enable": true,
+		"css.validate": false,
+		"scss.validate": false,
+		"javascript.validate.enable": false,
+		// Prettier
+		"prettier.eslintIntegration": true,
+		"prettier.stylelintIntegration": true,
+		// Formatting
+		"editor.tabSize": 4,
+		"editor.insertSpaces": true,
+		"editor.formatOnSave": true,
+		// Trim on save
+		"files.trimTrailingWhitespace": true
+	}
+}

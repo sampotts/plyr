@@ -1,0 +1,49 @@
+// ==========================================================================
+// Links
+// ==========================================================================
+
+// Make a <button> look like an <a>
+button.faux-link {
+    @extend a; // stylelint-disable-line
+    @include cancel-button-styles();
+}
+
+// Links
+a {
+    border-bottom: 1px dotted currentColor;
+    color: $color-link;
+    font-weight: $font-weight-bold;
+    position: relative;
+    text-decoration: none;
+    transition: all 0.2s ease;
+
+    &::after {
+        background: currentColor;
+        content: '';
+        height: 1px;
+        left: 50%;
+        position: absolute;
+        top: 100%;
+        transform: translateX(-50%);
+        transition: width 0.2s ease;
+        width: 0;
+    }
+
+    &:hover,
+    &:focus {
+        border-bottom-color: transparent;
+        outline: 0;
+
+        &::after {
+            width: 100%;
+        }
+    }
+
+    &.tab-focus {
+        @include tab-focus();
+    }
+
+    &.no-border::after {
+        display: none;
+    }
+}

@@ -1,0 +1,20 @@
+// Logo
+.plyr--logo {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    z-index: 1;
+    a,
+    a:hover,
+    a:active,
+    a:focus {
+        border: 0;
+        text-decoration: none;
+        outline: none;
+        transition: none;
+        &::after {
+            content: none;
+            height: auto;
+        }
+    }
+}

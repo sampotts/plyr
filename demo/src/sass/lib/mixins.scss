@@ -1,0 +1,54 @@
+// ==========================================================================
+// Mixins
+// ==========================================================================
+
+// Convert a <button> into an <a>
+// ---------------------------------------
+@mixin cancel-button-styles() {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    cursor: pointer;
+    font: inherit;
+    line-height: $line-height-base;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    text-align: inherit;
+    text-shadow: inherit;
+    -moz-user-select: text; // stylelint-disable-line
+    vertical-align: baseline;
+    width: auto;
+}
+
+// Nicer focus styles
+// ---------------------------------------
+@mixin tab-focus($color: $tab-focus-default-color) {
+    box-shadow: 0 0 0 3px rgba($color, 0.35);
+    outline: 0;
+}
+
+// Use rems for font sizing
+// Leave <body> at 100%/16px
+// ---------------------------------------
+@function calculate-rem($size) {
+    $rem: $size / 16;
+    @return #{$rem}rem;
+}
+
+@mixin font-size($size: 16) {
+    font-size: $size * 1px; // Fallback in px
+    font-size: calculate-rem($size);
+}
+
+// Font smoothing
+// ---------------------------------------
+@mixin font-smoothing($enabled: true) {
+    @if $enabled {
+        -moz-osx-font-smoothing: grayscale;
+        -webkit-font-smoothing: antialiased;
+    } @else {
+        -moz-osx-font-smoothing: auto;
+        -webkit-font-smoothing: subpixel-antialiased;
+    }
+}

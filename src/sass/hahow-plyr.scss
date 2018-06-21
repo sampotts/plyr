@@ -1,0 +1,139 @@
+@charset 'UTF-8';
+
+$plyr-color-main: #00bea4;
+$plyr-control-radius: 0;
+$plyr-tooltip-bg: rgba(#000, 0.75);
+$plyr-tooltip-color: #fff;
+$plyr-menu-bg: rgba(#000, 0.75);
+$plyr-menu-color: #fff;
+$plyr-control-padding: 10px;
+$plyr-font-size-captions-base: 24px;
+$plyr-font-size-captions-small: 24px;
+@import 'plyr';
+
+.plyr__controls {
+    display: flex;
+    flex-flow: column;
+
+    &-top {
+        width: 100%;
+    }
+
+    &-bottom {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+
+        &-left,
+        &-right {
+            align-items: center;
+            display: flex;
+        }
+    }
+}
+
+.plyr__menu__container {
+    border-radius: 0;
+    ul {
+        padding: 0;
+        li {
+            border-bottom: 2px solid hsla(0, 0%, 100%, 0.43);
+            margin: 0;
+        }
+    }
+
+    .subpanel ul li {
+        border-bottom: none;
+    }
+
+    .plyr__control {
+        font-size: 16px;
+        font-weight: 600;
+        padding: 10px 25px 10px 15px;
+
+        .plyr__menu__value {
+            font-weight: 500;
+        }
+    }
+
+    .plyr__control--back {
+        margin: 0;
+        padding: 10px 15px 10px 25px;
+        width: 100%;
+
+        &::before {
+            margin-top: 0;
+        }
+    }
+}
+
+.plyr__tooltip {
+    font-size: 14px;
+    border-radius: 0;
+}
+
+.plyr__control[data-plyr="rewind"] {
+    .plyr__tooltip {
+        transform: translate(-25%, 10px) scale(1);
+
+        &::before {
+            left: 25%;
+        }
+    }
+
+    &:hover {
+        .plyr__tooltip {
+            transform: translate(-25%, 0) scale(1);
+
+            &::before {
+                left: 25%;
+            }
+        }
+    }
+}
+
+// Media duration hidden on small screens
+.plyr__time + .plyr__time {
+    // Add a slash in before
+    &::before {
+        content: '\2044';
+        margin-right: $plyr-control-spacing;
+    }
+
+    @media (max-width: $plyr-bp-sm-max) {
+        display: inherit;
+    }
+
+    @media (max-width: $plyr-bp-xs-max) {
+        display: none;
+    }
+}
+
+.plyr__outer-container {
+    height: 100%;
+    .plyr {
+        height: 100%;
+        .plyr__video-wrapper {
+            height: 100%;
+            video {
+                height: 100%;
+            }
+        }
+    }
+}
+
+.plyr__volume {
+    max-width: 100px;
+
+    @media (min-width: $plyr-bp-sm) {
+        max-width: 100px;
+    }
+
+    @media (min-width: $plyr-bp-md) {
+        max-width: 100px;
+    }
+}
+
+.plyr__captions {
+    font-size: 24px !important;
+}

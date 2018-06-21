@@ -1,0 +1,89 @@
+// --------------------------------------------------------------
+// Control buttons
+// --------------------------------------------------------------
+
+.plyr__control {
+    background: transparent;
+    border: 0;
+    border-radius: $plyr-control-radius;
+    color: inherit;
+    cursor: pointer;
+    flex-shrink: 0;
+    overflow: visible; // IE11
+    padding: $plyr-control-padding;
+    position: relative;
+    transition: all 0.3s ease;
+
+    svg {
+        display: block;
+        fill: currentColor;
+        height: $plyr-control-icon-size;
+        pointer-events: none;
+        width: $plyr-control-icon-size;
+    }
+
+    // Default focus
+    &:focus {
+        outline: 0;
+    }
+
+    // Tab focus
+    &.plyr__tab-focus {
+        @include plyr-tab-focus();
+    }
+}
+
+// Change icons on state change
+.plyr__control:not(.plyr__control--pressed) .icon--pressed,
+.plyr__control.plyr__control--pressed .icon--not-pressed,
+.plyr__control:not(.plyr__control--pressed) .label--pressed,
+.plyr__control.plyr__control--pressed .label--not-pressed {
+    display: none;
+}
+
+// Audio styles
+.plyr--audio .plyr__control {
+    &.plyr__tab-focus,
+    &:hover,
+    &[aria-expanded='true'] {
+        background: $plyr-audio-control-bg-hover;
+        color: $plyr-audio-control-color-hover;
+    }
+}
+
+// Large play button (video only)
+.plyr__control--overlaid {
+    background: rgba($plyr-video-control-bg-hover, 0.8);
+    border: 0;
+    border-radius: 100%;
+    box-shadow: 0 1px 1px rgba(#000, 0.15);
+    color: $plyr-video-control-color;
+    display: none;
+    left: 50%;
+    padding: ceil($plyr-control-spacing * 1.5);
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+
+    svg {
+        height: $plyr-control-icon-size-large;
+        left: 2px; // Offset to make the play button look right
+        position: relative;
+        width: $plyr-control-icon-size-large;
+    }
+
+    &:hover,
+    &:focus {
+        background: $plyr-video-control-bg-hover;
+    }
+}
+
+.plyr--playing .plyr__control--overlaid {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.plyr--full-ui.plyr--video .plyr__control--overlaid {
+    display: block;
+}

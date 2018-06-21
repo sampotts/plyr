@@ -1,0 +1,86 @@
+// --------------------------------------------------------------
+// Tooltips
+// --------------------------------------------------------------
+
+.plyr__tooltip {
+    background: $plyr-tooltip-bg;
+    border-radius: $plyr-tooltip-radius;
+    bottom: 100%;
+    box-shadow: $plyr-tooltip-shadow;
+    color: $plyr-tooltip-color;
+    font-size: $plyr-font-size-small;
+    font-weight: $plyr-font-weight-regular;
+    line-height: 1.3;
+    margin-bottom: ($plyr-tooltip-padding * 2);
+    opacity: 0;
+    padding: $plyr-tooltip-padding ($plyr-tooltip-padding * 1.5);
+    pointer-events: none;
+    position: absolute;
+    transform: translate(-50%, 10px) scale(0.8);
+    transform-origin: 50% 100%;
+    transition: transform 0.2s 0.1s ease, opacity 0.2s 0.1s ease;
+    white-space: nowrap;
+    z-index: 2;
+
+    // The background triangle
+    &::before {
+        border-left: $plyr-tooltip-arrow-size solid transparent;
+        border-right: $plyr-tooltip-arrow-size solid transparent;
+        border-top: $plyr-tooltip-arrow-size solid $plyr-tooltip-bg;
+        bottom: -$plyr-tooltip-arrow-size;
+        content: '';
+        height: 0;
+        left: 50%;
+        position: absolute;
+        transform: translateX(-50%);
+        width: 0;
+        z-index: 2;
+    }
+}
+
+// Displaying
+.plyr .plyr__control:hover .plyr__tooltip,
+.plyr .plyr__control.plyr__tab-focus .plyr__tooltip,
+.plyr__tooltip--visible {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+}
+
+.plyr .plyr__control:hover .plyr__tooltip {
+    z-index: 3;
+}
+
+// First tooltip
+.plyr__controls > .plyr__control:first-child .plyr__tooltip,
+.plyr__controls > .plyr__control:first-child + .plyr__control .plyr__tooltip {
+    left: 0;
+    transform: translate(0, 10px) scale(0.8);
+    transform-origin: 0 100%;
+
+    &::before {
+        left: ($plyr-control-icon-size / 2) + $plyr-control-padding;
+    }
+}
+
+// Last tooltip
+.plyr__controls > .plyr__control:last-child .plyr__tooltip {
+    right: 0;
+    transform: translate(0, 10px) scale(0.8);
+    transform-origin: 100% 100%;
+
+    &::before {
+        left: auto;
+        right: ($plyr-control-icon-size / 2) + $plyr-control-padding;
+        transform: translateX(50%);
+    }
+}
+
+.plyr__controls > .plyr__control:first-child,
+.plyr__controls > .plyr__control:first-child + .plyr__control,
+.plyr__controls > .plyr__control:last-child {
+    &:hover .plyr__tooltip,
+    &.plyr__tab-focus .plyr__tooltip,
+    .plyr__tooltip--visible {
+        transform: translate(0, 0) scale(1);
+    }
+}

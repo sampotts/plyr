@@ -1,0 +1,45 @@
+// ==========================================================================
+// Fonts
+// ==========================================================================
+
+@font-face {
+    font-display: swap;
+    font-family: 'Gordita';
+    font-style: normal;
+    font-weight: $font-weight-light;
+    src: url('https://cdn.plyr.io/static/fonts/gordita-light.woff2') format('woff2'), url('https://cdn.plyr.io/static/fonts/gordita-light.woff') format('woff');
+}
+
+@font-face {
+    font-display: swap;
+    font-family: 'Gordita';
+    font-style: normal;
+    font-weight: $font-weight-regular;
+    src: url('https://cdn.plyr.io/static/fonts/gordita-regular.woff2') format('woff2'),
+        url('https://cdn.plyr.io/static/fonts/gordita-regular.woff') format('woff');
+}
+
+@font-face {
+    font-display: swap;
+    font-family: 'Gordita';
+    font-style: normal;
+    font-weight: $font-weight-medium;
+    src: url('https://cdn.plyr.io/static/fonts/gordita-medium.woff2') format('woff2'),
+        url('https://cdn.plyr.io/static/fonts/gordita-medium.woff') format('woff');
+}
+
+@font-face {
+    font-display: swap;
+    font-family: 'Gordita';
+    font-style: normal;
+    font-weight: $font-weight-bold;
+    src: url('https://cdn.plyr.io/static/fonts/gordita-bold.woff2') format('woff2'), url('https://cdn.plyr.io/static/fonts/gordita-bold.woff') format('woff');
+}
+
+@font-face {
+    font-display: swap;
+    font-family: 'Gordita';
+    font-style: normal;
+    font-weight: $font-weight-black;
+    src: url('https://cdn.plyr.io/static/fonts/gordita-black.woff2') format('woff2'), url('https://cdn.plyr.io/static/fonts/gordita-black.woff') format('woff');
+}
