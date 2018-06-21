@@ -1,3 +1,7 @@
+# v3.3.20
+
+-   Fix for bug where controls wouldn't show on hover over YouTube video
+
 # v3.3.19
 
 -   Remove `pointer-events: none` on embed `<iframe>` to comply with YouTube ToS
