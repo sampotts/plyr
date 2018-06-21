@@ -7335,6 +7335,7 @@ typeof navigator === "object" && (function (global, factory) {
             this.config.settings.forEach(function (type) {
                 var pane = createElement('div', {
                     id: 'plyr-settings-' + data.id + '-' + type,
+                    class: 'subpanel',
                     hidden: '',
                     'aria-labelled-by': 'plyr-settings-' + data.id + '-' + type + '-tab',
                     role: 'tabpanel',
