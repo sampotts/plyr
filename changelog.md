@@ -1,3 +1,7 @@
+# v3.3.19
+
+-   Remove `pointer-events: none` on embed `<iframe>` to comply with YouTube ToS
+
 # 3.3.18
 
 -   Ads are now only supported on HTML5 videos as it violates terms of service for YouTube and Vimeo 😢
