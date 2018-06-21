@@ -85,7 +85,7 @@ const captions = {
         // * active:    The state preferred by user settings or config
         // * toggled:   The real captions state
 
-        let languageArray = (Navigator.languages || navigator.userLanguage || []).map(language => language.split('-')[0]);
+        let languageArray = (navigator.languages || navigator.userLanguage || []).map(language => language.split('-')[0]);
         const languages = dedupe(languageArray);
 
         let language = (this.storage.get('language') || this.config.captions.language || 'auto').toLowerCase();
@@ -241,6 +241,7 @@ const captions = {
         if (this.captions.currentTrack !== index) {
             this.captions.currentTrack = index;
             const track = tracks[index];
+            track.mode = 'showing';
             const { language } = track || {};
 
             // Store reference to node for invalidation on remove

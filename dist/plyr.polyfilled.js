@@ -8299,7 +8299,7 @@ typeof navigator === "object" && (function (global, factory) {
 	        // * active:    The state preferred by user settings or config
 	        // * toggled:   The real captions state
 
-	        var languageArray = (Navigator.languages || navigator.userLanguage || []).map(function (language) {
+	        var languageArray = (navigator.languages || navigator.userLanguage || []).map(function (language) {
 	            return language.split('-')[0];
 	        });
 	        var languages = dedupe(languageArray);
@@ -8480,6 +8480,7 @@ typeof navigator === "object" && (function (global, factory) {
 	        if (this.captions.currentTrack !== index) {
 	            this.captions.currentTrack = index;
 	            var track = tracks[index];
+	            track.mode = 'showing';
 
 	            var _ref = track || {},
 	                language = _ref.language;
@@ -8925,7 +8926,7 @@ typeof navigator === "object" && (function (global, factory) {
 	    'ended', 'progress', 'stalled', 'playing', 'waiting', 'canplay', 'canplaythrough', 'loadstart', 'loadeddata', 'loadedmetadata', 'timeupdate', 'volumechange', 'play', 'pause', 'error', 'seeking', 'seeked', 'emptied', 'ratechange', 'cuechange',
 
 	    // Custom events
-	    'enterfullscreen', 'exitfullscreen', 'captionsenabled', 'captionsdisabled', 'languagechange', 'controlshidden', 'controlsshown', 'ready',
+	    'enterfullscreen', 'exitfullscreen', 'enterzoomfullscreen', 'exitzoomfullscreen', 'captionsenabled', 'captionsdisabled', 'languagechange', 'controlshidden', 'controlsshown', 'ready',
 
 	    // YouTube
 	    'statechange', 'qualitychange', 'qualityrequested',

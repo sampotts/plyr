@@ -283,6 +283,8 @@ const defaults = {
         // Custom events
         'enterfullscreen',
         'exitfullscreen',
+        'enterzoomfullscreen',
+        'exitzoomfullscreen',
         'captionsenabled',
         'captionsdisabled',
         'languagechange',

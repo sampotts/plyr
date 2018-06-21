@@ -137,3 +137,15 @@ $plyr-font-size-captions-small: 24px;
 .plyr__captions {
     font-size: 24px !important;
 }
+
+.plyr {
+    .plyr__poster {
+        display: none;
+    }
+}
+
+.plyr.plyr--full-ui {
+    .plyr__poster {
+        display: block;
+    }
+}
