@@ -7,6 +7,8 @@ $plyr-tooltip-color: #fff;
 $plyr-menu-bg: rgba(#000, 0.75);
 $plyr-menu-color: #fff;
 $plyr-control-padding: 10px;
+$plyr-font-size-captions-base: 24px;
+$plyr-font-size-captions-small: 24px;
 @import 'plyr';
 
 .plyr__controls {
@@ -40,6 +42,10 @@ $plyr-control-padding: 10px;
         }
     }
 
+    .subpanel ul li {
+        border-bottom: none;
+    }
+
     .plyr__control {
         font-size: 16px;
         font-weight: 600;
@@ -54,6 +60,10 @@ $plyr-control-padding: 10px;
         margin: 0;
         padding: 10px 15px 10px 25px;
         width: 100%;
+
+        &::before {
+            margin-top: 0;
+        }
     }
 }
 
@@ -110,4 +120,20 @@ $plyr-control-padding: 10px;
             }
         }
     }
+}
+
+.plyr__volume {
+    max-width: 100px;
+
+    @media (min-width: $plyr-bp-sm) {
+        max-width: 100px;
+    }
+
+    @media (min-width: $plyr-bp-md) {
+        max-width: 100px;
+    }
+}
+
+.plyr__captions {
+    font-size: 24px !important;
 }
