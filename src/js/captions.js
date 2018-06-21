@@ -85,9 +85,8 @@ const captions = {
         // * active:    The state preferred by user settings or config
         // * toggled:   The real captions state
 
-        const languages = dedupe(
-            Array.from(navigator.languages || navigator.userLanguage).map(language => language.split('-')[0]),
-        );
+        let languageArray = (Navigator.languages || navigator.userLanguage || []).map(language => language.split('-')[0]);
+        const languages = dedupe(languageArray);
 
         let language = (this.storage.get('language') || this.config.captions.language || 'auto').toLowerCase();
 

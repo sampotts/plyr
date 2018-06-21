@@ -8299,9 +8299,10 @@ typeof navigator === "object" && (function (global, factory) {
 	        // * active:    The state preferred by user settings or config
 	        // * toggled:   The real captions state
 
-	        var languages = dedupe(Array.from(navigator.languages || navigator.userLanguage).map(function (language) {
+	        var languageArray = (Navigator.languages || navigator.userLanguage || []).map(function (language) {
 	            return language.split('-')[0];
-	        }));
+	        });
+	        var languages = dedupe(languageArray);
 
 	        var language = (this.storage.get('language') || this.config.captions.language || 'auto').toLowerCase();
 
