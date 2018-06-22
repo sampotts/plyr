@@ -8667,6 +8667,9 @@ typeof navigator === "object" && (function (global, factory) {
 	            return;
 	        }
 	        toggleClass(this.elements.captions, this.config.classNames.captionPosition.replace('{0}', 'top'));
+
+	        // Update settings menu
+	        controls.updateSetting.call(this, 'caption-position');
 	    },
 	    setDefault: function setDefault() {
 	        var defaultLanguage = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
