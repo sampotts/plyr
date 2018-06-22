@@ -399,6 +399,9 @@ const captions = {
             return;
         }
         toggleClass(this.elements.captions, this.config.classNames.captionPosition.replace('{0}', 'top'));
+
+        // Update settings menu
+        controls.updateSetting.call(this, 'caption-position');
     },
 
     setDefault(defaultLanguage = null) {
