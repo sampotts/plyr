@@ -801,31 +801,35 @@ typeof navigator === "object" && (function (global, factory) {
                         preload = _player$media.preload,
                         readyState = _player$media.readyState;
 
-                    // Set new source
 
-                    player.media.src = source.getAttribute('src');
+                    player.pause();
 
-                    // Prevent loading if preload="none" and the current source isn't loaded (#1044)
-                    if (preload !== 'none' || readyState) {
-                        // Restore time
-                        player.once('loadedmetadata', function () {
-                            if (player.currentTime === 0) {
-                                player.currentTime = currentTime;
-                            }
+                    setImmediate(function () {
+                        // Set new source
+                        player.media.src = source.getAttribute('src');
 
-                            // Resume playing
-                            if (!paused) {
-                                player.play();
-                            }
+                        // Prevent loading if preload="none" and the current source isn't loaded (#1044)
+                        if (preload !== 'none' || readyState) {
+                            // Restore time
+                            player.once('loadedmetadata', function () {
+                                if (player.currentTime === 0) {
+                                    player.currentTime = currentTime;
+                                }
+
+                                // Resume playing
+                                if (!paused) {
+                                    player.play();
+                                }
+                            });
+
+                            // Load new source
+                            player.media.load();
+                        }
+
+                        // Trigger change event
+                        triggerEvent.call(player, player.media, 'qualitychange', false, {
+                            quality: input
                         });
-
-                        // Load new source
-                        player.media.load();
-                    }
-
-                    // Trigger change event
-                    triggerEvent.call(player, player.media, 'qualitychange', false, {
-                        quality: input
                     });
                 }
             });
