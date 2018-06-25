@@ -431,9 +431,11 @@ class Listeners {
         };
 
         // Play/pause toggle
-        Array.from(this.player.elements.buttons.play).forEach(button => {
-            bind(button, 'click', this.player.togglePlay, 'play');
-        });
+        if (this.player.elements.buttons.play) {
+            Array.from(this.player.elements.buttons.play).forEach(button => {
+                bind(button, 'click', this.player.togglePlay, 'play');
+            });
+        }
 
         // Pause
         bind(this.player.elements.buttons.restart, 'click', this.player.restart, 'restart');
