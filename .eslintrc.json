@@ -21,6 +21,7 @@
         "eqeqeq": [2, "always"],
         "one-var": [2, "never"],
         "comma-dangle": [2, "always-multiline"],
+        "spaced-comment": [2, "always"],
         "no-restricted-globals": [
             "error",
             {

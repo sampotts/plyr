@@ -5397,60 +5397,92 @@ typeof navigator === "object" && (function (global, factory) {
 	var getConstructor = function getConstructor(input) {
 	    return input !== null && typeof input !== 'undefined' ? input.constructor : null;
 	};
-
 	var instanceOf = function instanceOf(input, constructor) {
 	    return Boolean(input && constructor && input instanceof constructor);
 	};
+	var isNullOrUndefined = function isNullOrUndefined(input) {
+	    return input === null || typeof input === 'undefined';
+	};
+	var isObject = function isObject(input) {
+	    return getConstructor(input) === Object;
+	};
+	var isNumber = function isNumber(input) {
+	    return getConstructor(input) === Number && !Number.isNaN(input);
+	};
+	var isString = function isString(input) {
+	    return getConstructor(input) === String;
+	};
+	var isBoolean = function isBoolean(input) {
+	    return getConstructor(input) === Boolean;
+	};
+	var isFunction = function isFunction(input) {
+	    return getConstructor(input) === Function;
+	};
+	var isArray = function isArray(input) {
+	    return Array.isArray(input);
+	};
+	var isWeakMap = function isWeakMap(input) {
+	    return instanceOf(input, WeakMap);
+	};
+	var isNodeList = function isNodeList(input) {
+	    return instanceOf(input, NodeList);
+	};
+	var isElement = function isElement(input) {
+	    return instanceOf(input, Element);
+	};
+	var isTextNode = function isTextNode(input) {
+	    return getConstructor(input) === Text;
+	};
+	var isEvent = function isEvent(input) {
+	    return instanceOf(input, Event);
+	};
+	var isCue = function isCue(input) {
+	    return instanceOf(input, window.TextTrackCue) || instanceOf(input, window.VTTCue);
+	};
+	var isTrack = function isTrack(input) {
+	    return instanceOf(input, TextTrack) || !isNullOrUndefined(input) && isString(input.kind);
+	};
+
+	var isEmpty = function isEmpty(input) {
+	    return isNullOrUndefined(input) || (isString(input) || isArray(input) || isNodeList(input)) && !input.length || isObject(input) && !Object.keys(input).length;
+	};
+
+	var isUrl = function isUrl(input) {
+	    // Accept a URL object
+	    if (instanceOf(input, window.URL)) {
+	        return true;
+	    }
+
+	    // Add the protocol if required
+	    var string = input;
+	    if (!input.startsWith('http://') || !input.startsWith('https://')) {
+	        string = 'http://' + input;
+	    }
+
+	    try {
+	        return !isEmpty(new URL(string).hostname);
+	    } catch (e) {
+	        return false;
+	    }
+	};
 
 	var is$1 = {
-	    object: function object(input) {
-	        return getConstructor(input) === Object;
-	    },
-	    number: function number(input) {
-	        return getConstructor(input) === Number && !Number.isNaN(input);
-	    },
-	    string: function string(input) {
-	        return getConstructor(input) === String;
-	    },
-	    boolean: function boolean(input) {
-	        return getConstructor(input) === Boolean;
-	    },
-	    function: function _function(input) {
-	        return getConstructor(input) === Function;
-	    },
-	    array: function array(input) {
-	        return !is$1.nullOrUndefined(input) && Array.isArray(input);
-	    },
-	    weakMap: function weakMap(input) {
-	        return instanceOf(input, WeakMap);
-	    },
-	    nodeList: function nodeList(input) {
-	        return instanceOf(input, NodeList);
-	    },
-	    element: function element(input) {
-	        return instanceOf(input, Element);
-	    },
-	    textNode: function textNode(input) {
-	        return getConstructor(input) === Text;
-	    },
-	    event: function event(input) {
-	        return instanceOf(input, Event);
-	    },
-	    cue: function cue(input) {
-	        return instanceOf(input, window.TextTrackCue) || instanceOf(input, window.VTTCue);
-	    },
-	    track: function track(input) {
-	        return instanceOf(input, TextTrack) || !is$1.nullOrUndefined(input) && is$1.string(input.kind);
-	    },
-	    url: function url(input) {
-	        return !is$1.nullOrUndefined(input) && /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/.test(input);
-	    },
-	    nullOrUndefined: function nullOrUndefined(input) {
-	        return input === null || typeof input === 'undefined';
-	    },
-	    empty: function empty(input) {
-	        return is$1.nullOrUndefined(input) || (is$1.string(input) || is$1.array(input) || is$1.nodeList(input)) && !input.length || is$1.object(input) && !Object.keys(input).length;
-	    }
+	    nullOrUndefined: isNullOrUndefined,
+	    object: isObject,
+	    number: isNumber,
+	    string: isString,
+	    boolean: isBoolean,
+	    function: isFunction,
+	    array: isArray,
+	    weakMap: isWeakMap,
+	    nodeList: isNodeList,
+	    element: isElement,
+	    textNode: isTextNode,
+	    event: isEvent,
+	    cue: isCue,
+	    track: isTrack,
+	    url: isUrl,
+	    empty: isEmpty
 	};
 
 	// ==========================================================================
@@ -7795,7 +7827,6 @@ typeof navigator === "object" && (function (global, factory) {
 
 	        // Set attributes on current tab
 	        toggleHidden(current, true);
-	        // current.setAttribute('tabindex', -1);
 
 	        // Set attributes on target
 	        toggleHidden(target, false);
@@ -8385,8 +8416,10 @@ typeof navigator === "object" && (function (global, factory) {
 	                return;
 	            }
 
-	            // Toggle state
-	            this.elements.buttons.captions.pressed = active;
+	            // Toggle button if it's enabled
+	            if (this.elements.buttons.captions) {
+	                this.elements.buttons.captions.pressed = active;
+	            }
 
 	            // Add class hook
 	            toggleClass(this.elements.container, activeClass, active);
@@ -9993,9 +10026,11 @@ typeof navigator === "object" && (function (global, factory) {
 	            var inputEvent = browser.isIE ? 'change' : 'input';
 
 	            // Play/pause toggle
-	            Array.from(this.player.elements.buttons.play).forEach(function (button) {
-	                _this5.bind(button, 'click', _this5.player.togglePlay, 'play');
-	            });
+	            if (this.player.elements.buttons.play) {
+	                Array.from(this.player.elements.buttons.play).forEach(function (button) {
+	                    _this5.bind(button, 'click', _this5.player.togglePlay, 'play');
+	                });
+	            }
 
 	            // Pause
 	            this.bind(this.player.elements.buttons.restart, 'click', this.player.restart, 'restart');
@@ -10165,33 +10200,28 @@ typeof navigator === "object" && (function (global, factory) {
 	                // Detect "natural" scroll - suppored on OS X Safari only
 	                // Other browsers on OS X will be inverted until support improves
 	                var inverted = event.webkitDirectionInvertedFromDevice;
-	                var step = 1 / 50;
-	                var direction = 0;
 
-	                // Scroll down (or up on natural) to decrease
-	                if (event.deltaY < 0 || event.deltaX > 0) {
-	                    if (inverted) {
-	                        _this5.player.decreaseVolume(step);
-	                        direction = -1;
-	                    } else {
-	                        _this5.player.increaseVolume(step);
-	                        direction = 1;
-	                    }
-	                }
+	                // Get delta from event. Invert if `inverted` is true
 
-	                // Scroll up (or down on natural) to increase
-	                if (event.deltaY > 0 || event.deltaX < 0) {
-	                    if (inverted) {
-	                        _this5.player.increaseVolume(step);
-	                        direction = 1;
-	                    } else {
-	                        _this5.player.decreaseVolume(step);
-	                        direction = -1;
-	                    }
-	                }
+	                var _map = [event.deltaX, -event.deltaY].map(function (value) {
+	                    return inverted ? -value : value;
+	                }),
+	                    _map2 = slicedToArray(_map, 2),
+	                    x = _map2[0],
+	                    y = _map2[1];
+
+	                // Using the biggest delta, normalize to 1 or -1 (or 0 if no delta)
+
+
+	                var direction = Math.sign(Math.abs(x) > Math.abs(y) ? x : y);
+
+	                // Change the volume by 2%
+	                _this5.player.increaseVolume(direction / 50);
 
 	                // Don't break page scrolling at max and min
-	                if (direction === 1 && _this5.player.media.volume < 1 || direction === -1 && _this5.player.media.volume > 0) {
+	                var volume = _this5.player.media.volume;
+
+	                if (direction === 1 && volume < 1 || direction === -1 && volume > 0) {
 	                    event.preventDefault();
 	                }
 	            }, 'volume', false);
@@ -12124,7 +12154,7 @@ typeof navigator === "object" && (function (global, factory) {
 	    }, {
 	        key: 'enabled',
 	        get: function get() {
-	            return this.player.isVideo && this.player.config.ads.enabled && !is$1.empty(this.publisherId);
+	            return this.player.isHTML5 && this.player.isVideo && this.player.config.ads.enabled && !is$1.empty(this.publisherId);
 	        }
 	    }, {
 	        key: 'tagUrl',
@@ -12682,7 +12712,7 @@ typeof navigator === "object" && (function (global, factory) {
 	         */
 	        value: function increaseVolume(step) {
 	            var volume = this.media.muted ? 0 : this.volume;
-	            this.volume = volume + (is$1.number(step) ? step : 1);
+	            this.volume = volume + (is$1.number(step) ? step : 0);
 	        }
 
 	        /**
@@ -12693,8 +12723,7 @@ typeof navigator === "object" && (function (global, factory) {
 	    }, {
 	        key: 'decreaseVolume',
 	        value: function decreaseVolume(step) {
-	            var volume = this.media.muted ? 0 : this.volume;
-	            this.volume = volume - (is$1.number(step) ? step : 1);
+	            this.increaseVolume(-step);
 	        }
 
 	        /**

@@ -554,7 +554,7 @@ class Plyr {
      */
     increaseVolume(step) {
         const volume = this.media.muted ? 0 : this.volume;
-        this.volume = volume + (is.number(step) ? step : 1);
+        this.volume = volume + (is.number(step) ? step : 0);
     }
 
     /**
@@ -562,8 +562,7 @@ class Plyr {
      * @param {boolean} step - How much to decrease by (between 0 and 1)
      */
     decreaseVolume(step) {
-        const volume = this.media.muted ? 0 : this.volume;
-        this.volume = volume - (is.number(step) ? step : 1);
+        this.increaseVolume(-step);
     }
 
     /**

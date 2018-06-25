@@ -3030,8 +3030,10 @@ typeof navigator === "object" && (function (global, factory) {
                     return;
                 }
 
-                // Toggle state
-                this.elements.buttons.captions.pressed = active;
+                // Toggle button if it's enabled
+                if (this.elements.buttons.captions) {
+                    this.elements.buttons.captions.pressed = active;
+                }
 
                 // Add class hook
                 toggleClass(this.elements.container, activeClass, active);
@@ -4638,9 +4640,11 @@ typeof navigator === "object" && (function (global, factory) {
                 var inputEvent = browser.isIE ? 'change' : 'input';
 
                 // Play/pause toggle
-                Array.from(this.player.elements.buttons.play).forEach(function (button) {
-                    _this5.bind(button, 'click', _this5.player.togglePlay, 'play');
-                });
+                if (this.player.elements.buttons.play) {
+                    Array.from(this.player.elements.buttons.play).forEach(function (button) {
+                        _this5.bind(button, 'click', _this5.player.togglePlay, 'play');
+                    });
+                }
 
                 // Pause
                 this.bind(this.player.elements.buttons.restart, 'click', this.player.restart, 'restart');
@@ -4810,33 +4814,28 @@ typeof navigator === "object" && (function (global, factory) {
                     // Detect "natural" scroll - suppored on OS X Safari only
                     // Other browsers on OS X will be inverted until support improves
                     var inverted = event.webkitDirectionInvertedFromDevice;
-                    var step = 1 / 50;
-                    var direction = 0;
 
-                    // Scroll down (or up on natural) to decrease
-                    if (event.deltaY < 0 || event.deltaX > 0) {
-                        if (inverted) {
-                            _this5.player.decreaseVolume(step);
-                            direction = -1;
-                        } else {
-                            _this5.player.increaseVolume(step);
-                            direction = 1;
-                        }
-                    }
+                    // Get delta from event. Invert if `inverted` is true
 
-                    // Scroll up (or down on natural) to increase
-                    if (event.deltaY > 0 || event.deltaX < 0) {
-                        if (inverted) {
-                            _this5.player.increaseVolume(step);
-                            direction = 1;
-                        } else {
-                            _this5.player.decreaseVolume(step);
-                            direction = -1;
-                        }
-                    }
+                    var _map = [event.deltaX, -event.deltaY].map(function (value) {
+                        return inverted ? -value : value;
+                    }),
+                        _map2 = slicedToArray(_map, 2),
+                        x = _map2[0],
+                        y = _map2[1];
+
+                    // Using the biggest delta, normalize to 1 or -1 (or 0 if no delta)
+
+
+                    var direction = Math.sign(Math.abs(x) > Math.abs(y) ? x : y);
+
+                    // Change the volume by 2%
+                    _this5.player.increaseVolume(direction / 50);
 
                     // Don't break page scrolling at max and min
-                    if (direction === 1 && _this5.player.media.volume < 1 || direction === -1 && _this5.player.media.volume > 0) {
+                    var volume = _this5.player.media.volume;
+
+                    if (direction === 1 && volume < 1 || direction === -1 && volume > 0) {
                         event.preventDefault();
                     }
                 }, 'volume', false);
@@ -6775,7 +6774,7 @@ typeof navigator === "object" && (function (global, factory) {
         }, {
             key: 'enabled',
             get: function get$$1() {
-                return this.player.isVideo && this.player.config.ads.enabled && !is.empty(this.publisherId);
+                return this.player.isHTML5 && this.player.isVideo && this.player.config.ads.enabled && !is.empty(this.publisherId);
             }
         }, {
             key: 'tagUrl',
@@ -7333,7 +7332,7 @@ typeof navigator === "object" && (function (global, factory) {
              */
             value: function increaseVolume(step) {
                 var volume = this.media.muted ? 0 : this.volume;
-                this.volume = volume + (is.number(step) ? step : 1);
+                this.volume = volume + (is.number(step) ? step : 0);
             }
 
             /**
@@ -7344,8 +7343,7 @@ typeof navigator === "object" && (function (global, factory) {
         }, {
             key: 'decreaseVolume',
             value: function decreaseVolume(step) {
-                var volume = this.media.muted ? 0 : this.volume;
-                this.volume = volume - (is.number(step) ? step : 1);
+                this.increaseVolume(-step);
             }
 
             /**
