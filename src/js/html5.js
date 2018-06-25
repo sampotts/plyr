@@ -67,7 +67,9 @@ const html5 = {
                 if (preload !== 'none' || readyState) {
                     // Restore time
                     player.once('loadedmetadata', () => {
-                        player.currentTime = currentTime;
+                        if (player.currentTime === 0) {
+                            player.currentTime = currentTime;
+                        }
 
                         // Resume playing
                         if (!paused) {

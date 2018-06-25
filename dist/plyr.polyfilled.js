@@ -6195,7 +6195,9 @@ typeof navigator === "object" && (function (global, factory) {
 	                if (preload !== 'none' || readyState) {
 	                    // Restore time
 	                    player.once('loadedmetadata', function () {
-	                        player.currentTime = currentTime;
+	                        if (player.currentTime === 0) {
+	                            player.currentTime = currentTime;
+	                        }
 
 	                        // Resume playing
 	                        if (!paused) {
