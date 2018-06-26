@@ -5579,7 +5579,12 @@ typeof navigator === "object" && (function (global, factory) {
 	    });
 
 	    // Dispatch the event
-	    element.dispatchEvent(event);
+
+	    try {
+	        element.dispatchEvent(event);
+	    } catch (err) {
+	        throw new Error('CustomEvent ' + event.type + ': ' + JSON.stringify(event.detail));
+	    }
 	}
 
 	// Unbind all cached event listeners
@@ -6210,6 +6215,13 @@ typeof navigator === "object" && (function (global, factory) {
 
 	                        // Load new source
 	                        player.media.load();
+	                    }
+
+	                    // restore speed
+	                    var speed = player.storage.get('speed');
+	                    if (is$1.number(speed)) {
+	                        player.speed = speed;
+	                        controls.updateSetting.call(player, 'speed', speed);
 	                    }
 
 	                    // Trigger change event

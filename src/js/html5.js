@@ -2,6 +2,8 @@
 // Plyr HTML5 helpers
 // ==========================================================================
 
+import controls from './controls';
+import is from './utils/is';
 import support from './support';
 import { removeElement } from './utils/elements';
 import { triggerEvent } from './utils/events';
@@ -82,6 +84,13 @@ const html5 = {
 
                         // Load new source
                         player.media.load();
+                    }
+
+                    // restore speed
+                    const speed = player.storage.get('speed');
+                    if (is.number(speed)) {
+                        player.speed = speed;
+                        controls.updateSetting.call(player, 'speed', speed);
                     }
 
                     // Trigger change event

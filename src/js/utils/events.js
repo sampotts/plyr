@@ -97,7 +97,12 @@ export function triggerEvent(element, type = '', bubbles = false, detail = {}) {
     });
 
     // Dispatch the event
-    element.dispatchEvent(event);
+
+    try {
+        element.dispatchEvent(event);
+    } catch (err) {
+        throw new Error(`CustomEvent ${event.type}: ${JSON.stringify(event.detail)}`);
+    }
 }
 
 // Unbind all cached event listeners
