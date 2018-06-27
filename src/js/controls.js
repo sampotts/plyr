@@ -187,7 +187,7 @@ const controls = {
         }
 
         if ('class' in attributes) {
-            if (attributes.class.includes(this.config.classNames.control)) {
+            if (!attributes.class.includes(this.config.classNames.control)) {
                 attributes.class += ` ${this.config.classNames.control}`;
             }
         } else {
