@@ -294,3 +294,18 @@ export function trapFocus(element = null, toggle = false) {
 
     toggleListener.call(this, this.elements.container, 'keydown', trap, toggle, false);
 }
+
+// Set focus and tab focus class
+export function setFocus(element = null, tabFocus = false) {
+    if (!is.element(element)) {
+        return;
+    }
+
+    // Set regular focus
+    element.focus();
+
+    // If we want to mimic keyboard focus via tab
+    if (tabFocus) {
+        toggleClass(element, this.config.classNames.tabFocus);
+    }
+}

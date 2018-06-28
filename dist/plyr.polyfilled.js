@@ -7737,12 +7737,20 @@ typeof navigator === "object" && (function (global, factory) {
 	            button.setAttribute('aria-expanded', show);
 	        }
 
+	        // Show the actual popup
 	        if (is$1.element(popup)) {
 	            toggleHidden(popup, !show);
 	            toggleClass(this.elements.container, this.config.classNames.menu.open, show);
 
 	            if (show) {
 	                popup.removeAttribute('tabindex');
+
+	                // Focus the first item
+	                var firstItem = popup.querySelector('[role^="menuitem"]');
+	                console.warn(firstItem);
+	                if (firstItem) {
+	                    firstItem.focus();
+	                }
 	            } else {
 	                popup.setAttribute('tabindex', -1);
 	            }
@@ -8005,14 +8013,28 @@ typeof navigator === "object" && (function (global, factory) {
 	                });
 
 	                // Back button
-	                var back = createElement('button', {
+	                var backButton = createElement('button', {
 	                    type: 'button',
 	                    class: _this8.config.classNames.control + ' ' + _this8.config.classNames.control + '--back'
-	                }, i18n.get(type, _this8.config));
-	                back.addEventListener('click', function () {
+	                });
+
+	                // Visible label
+	                backButton.appendChild(createElement('span', {
+	                    'aria-hidden': true
+	                }, i18n.get(type, _this8.config)));
+
+	                // Screen reader label
+	                backButton.appendChild(createElement('span', {
+	                    class: _this8.config.classNames.hidden
+	                }, i18n.get('menuBack', _this8.config)));
+
+	                // Bind listener
+	                backButton.addEventListener('click', function () {
 	                    controls.showMenuPanel.call(_this8, 'home');
 	                });
-	                pane.appendChild(back);
+
+	                // Add to pane
+	                pane.appendChild(backButton);
 
 	                // Menu
 	                pane.appendChild(createElement('div', {
@@ -10064,10 +10086,27 @@ typeof navigator === "object" && (function (global, factory) {
 	            // Airplay
 	            this.bind(this.player.elements.buttons.airplay, 'click', this.player.airplay, 'airplay');
 
-	            // Settings menu
+	            // Settings menu - click toggle
 	            this.bind(this.player.elements.buttons.settings, 'click', function (event) {
 	                controls.toggleMenu.call(_this5.player, event);
 	            });
+
+	            // Settings menu - keyboard toggle
+	            this.bind(this.player.elements.buttons.settings, 'keydown', function (event) {
+	                // We only care about space
+	                if (event.which !== 32) {
+	                    return;
+	                }
+
+	                // Prevent scroll
+	                event.preventDefault();
+
+	                // Prevent playing video
+	                event.stopPropagation();
+
+	                // Toggle menu
+	                controls.toggleMenu.call(_this5.player, event);
+	            }, null, false);
 
 	            // Set range input alternative "value", which matches the tooltip time (#954)
 	            this.bind(this.player.elements.inputs.seek, 'mousedown mousemove', function (event) {

@@ -9,7 +9,7 @@ import support from './support';
 import { repaint, transitionEndEvent } from './utils/animation';
 import { dedupe } from './utils/arrays';
 import browser from './utils/browser';
-import { createElement, emptyElement, getAttributesFromSelector, getElement, getElements, hasClass, matches, removeElement, setAttributes, toggleClass, toggleHidden } from './utils/elements';
+import { createElement, emptyElement, getAttributesFromSelector, getElement, getElements, hasClass, matches, removeElement, setAttributes, setFocus, toggleClass, toggleHidden } from './utils/elements';
 import { off, on } from './utils/events';
 import is from './utils/is';
 import loadSprite from './utils/loadSprite';
@@ -175,7 +175,7 @@ const controls = {
         }
 
         if ('class' in attributes) {
-            if (attributes.class.includes(this.config.classNames.control)) {
+            if (!attributes.class.includes(this.config.classNames.control)) {
                 attributes.class += ` ${this.config.classNames.control}`;
             }
         } else {
@@ -1016,12 +1016,20 @@ const controls = {
             button.setAttribute('aria-expanded', show);
         }
 
+        // Show the actual popup
         if (is.element(popup)) {
             toggleHidden(popup, !show);
             toggleClass(this.elements.container, this.config.classNames.menu.open, show);
 
             if (show) {
                 popup.removeAttribute('tabindex');
+
+                // Focus the first item if key interaction
+                if (event.type === 'keydown') {
+                    const pane = Object.values(this.elements.settings.panels).find(pane => !pane.hidden);
+                    const firstItem = pane.querySelector('[role^="menuitem"]');
+                    setFocus.call(this, firstItem, true);
+                }
             } else {
                 popup.setAttribute('tabindex', -1);
             }
@@ -1104,9 +1112,7 @@ const controls = {
 
         // Focus the first item
         const firstItem = target.querySelector('[role^="menuitem"]');
-        if (firstItem) {
-            firstItem.focus();
-        }
+        setFocus.call(this, firstItem, true);
     },
 
     // Build the default HTML
@@ -1257,6 +1263,9 @@ const controls = {
                 role: 'menu',
             });
 
+            home.appendChild(menu);
+            inner.appendChild(home);
+
             // Build the menu items
             this.config.settings.forEach(type => {
                 const menuItem = createElement(
@@ -1269,6 +1278,26 @@ const controls = {
                         hidden: '',
                     }),
                 );
+
+                // Handle space or -> to open menu
+                on(menuItem, 'keydown', event => {
+                    // We only care about space and ->
+                    if (![32,39].includes(event.which)) {
+                        return;
+                    }
+
+                    // Prevent play / seek
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    // Show the respective menu
+                    controls.showMenuPanel.call(this, type);
+                }, false);
+
+                // Show menu on click
+                on(menuItem, 'click', () => {
+                    controls.showMenuPanel.call(this, type);
+                });
 
                 const flex = createElement('span', null, i18n.get(type, this.config));
 
@@ -1290,18 +1319,55 @@ const controls = {
                 });
 
                 // Back button
-                const back = createElement(
-                    'button',
-                    {
-                        type: 'button',
-                        class: `${this.config.classNames.control} ${this.config.classNames.control}--back`,
-                    },
-                    i18n.get(type, this.config),
+                const backButton = createElement('button', {
+                    type: 'button',
+                    class: `${this.config.classNames.control} ${this.config.classNames.control}--back`,
+                });
+
+                // Visible label
+                backButton.appendChild(
+                    createElement(
+                        'span',
+                        {
+                            'aria-hidden': true,
+                        },
+                        i18n.get(type, this.config),
+                    ),
                 );
-                back.addEventListener('click', () => {
+
+                // Screen reader label
+                backButton.appendChild(
+                    createElement(
+                        'span',
+                        {
+                            class: this.config.classNames.hidden,
+                        },
+                        i18n.get('menuBack', this.config),
+                    ),
+                );
+
+                // Handle space or -> to open menu
+                on(backButton, 'keydown', event => {
+                    // We only care about <-
+                    if (event.which !== 37) {
+                        return;
+                    }
+
+                    // Prevent seek
+                    event.preventDefault();
+                    event.stopPropagation();
+
+                    // Show the respective menu
+                    controls.showMenuPanel.call(this, 'home');
+                }, false);
+
+                // Go back
+                on(backButton, 'click', () => {
                     controls.showMenuPanel.call(this, 'home');
                 });
-                pane.appendChild(back);
+
+                // Add to pane
+                pane.appendChild(backButton);
 
                 // Menu
                 pane.appendChild(
@@ -1312,16 +1378,9 @@ const controls = {
 
                 inner.appendChild(pane);
 
-                menuItem.addEventListener('click', () => {
-                    controls.showMenuPanel.call(this, type);
-                });
-
                 this.elements.settings.buttons[type] = menuItem;
                 this.elements.settings.panels[type] = pane;
             });
-
-            home.appendChild(menu);
-            inner.appendChild(home);
 
             popup.appendChild(inner);
             control.appendChild(popup);

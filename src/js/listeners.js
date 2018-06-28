@@ -483,10 +483,33 @@ class Listeners {
         // Airplay
         this.bind(this.player.elements.buttons.airplay, 'click', this.player.airplay, 'airplay');
 
-        // Settings menu
+        // Settings menu - click toggle
         this.bind(this.player.elements.buttons.settings, 'click', event => {
             controls.toggleMenu.call(this.player, event);
         });
+
+        // Settings menu - keyboard toggle
+        this.bind(
+            this.player.elements.buttons.settings,
+            'keydown',
+            event => {
+                // We only care about space
+                if (event.which !== 32) {
+                    return;
+                }
+
+                // Prevent scroll
+                event.preventDefault();
+
+                // Prevent playing video
+                event.stopPropagation();
+
+                // Toggle menu
+                controls.toggleMenu.call(this.player, event);
+            },
+            null,
+            false,
+        );
 
         // Set range input alternative "value", which matches the tooltip time (#954)
         this.bind(this.player.elements.inputs.seek, 'mousedown mousemove', event => {
@@ -626,8 +649,7 @@ class Listeners {
                 const inverted = event.webkitDirectionInvertedFromDevice;
 
                 // Get delta from event. Invert if `inverted` is true
-                const [x, y] = [event.deltaX, -event.deltaY]
-                    .map(value => inverted ? -value : value);
+                const [x, y] = [event.deltaX, -event.deltaY].map(value => (inverted ? -value : value));
 
                 // Using the biggest delta, normalize to 1 or -1 (or 0 if no delta)
                 const direction = Math.sign(Math.abs(x) > Math.abs(y) ? x : y);

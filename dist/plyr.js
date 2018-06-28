@@ -638,6 +638,24 @@ typeof navigator === "object" && (function (global, factory) {
         toggleListener.call(this, this.elements.container, 'keydown', trap, toggle, false);
     }
 
+    // Set focus and tab focus class
+    function setFocus() {
+        var element = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+        var tabFocus = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+        if (!is.element(element)) {
+            return;
+        }
+
+        // Set regular focus
+        element.focus();
+
+        // If we want to mimic keyboard focus via tab
+        if (tabFocus) {
+            toggleClass(element, this.config.classNames.tabFocus);
+        }
+    }
+
     // ==========================================================================
 
     var transitionEndEvent = function () {
@@ -2351,12 +2369,22 @@ typeof navigator === "object" && (function (global, factory) {
                 button.setAttribute('aria-expanded', show);
             }
 
+            // Show the actual popup
             if (is.element(popup)) {
                 toggleHidden(popup, !show);
                 toggleClass(this.elements.container, this.config.classNames.menu.open, show);
 
                 if (show) {
                     popup.removeAttribute('tabindex');
+
+                    // Focus the first item if key interaction
+                    if (event.type === 'keydown') {
+                        var pane = Object.values(this.elements.settings.panels).find(function (pane) {
+                            return !pane.hidden;
+                        });
+                        var firstItem = pane.querySelector('[role^="menuitem"]');
+                        setFocus.call(this, firstItem, true);
+                    }
                 } else {
                     popup.setAttribute('tabindex', -1);
                 }
@@ -2447,9 +2475,7 @@ typeof navigator === "object" && (function (global, factory) {
 
             // Focus the first item
             var firstItem = target.querySelector('[role^="menuitem"]');
-            if (firstItem) {
-                firstItem.focus();
-            }
+            setFocus.call(this, firstItem, true);
         },
 
 
@@ -2589,6 +2615,9 @@ typeof navigator === "object" && (function (global, factory) {
                     role: 'menu'
                 });
 
+                home.appendChild(menu);
+                inner.appendChild(home);
+
                 // Build the menu items
                 this.config.settings.forEach(function (type) {
                     var menuItem = createElement('button', extend(getAttributesFromSelector(_this8.config.selectors.buttons.settings), {
@@ -2598,6 +2627,26 @@ typeof navigator === "object" && (function (global, factory) {
                         'aria-haspopup': true,
                         hidden: ''
                     }));
+
+                    // Handle space or -> to open menu
+                    on(menuItem, 'keydown', function (event) {
+                        // We only care about space and ->
+                        if (![32, 39].includes(event.which)) {
+                            return;
+                        }
+
+                        // Prevent play / seek
+                        event.preventDefault();
+                        event.stopPropagation();
+
+                        // Show the respective menu
+                        controls.showMenuPanel.call(_this8, type);
+                    }, false);
+
+                    // Show menu on click
+                    on(menuItem, 'click', function () {
+                        controls.showMenuPanel.call(_this8, type);
+                    });
 
                     var flex = createElement('span', null, i18n.get(type, _this8.config));
 
@@ -2619,14 +2668,43 @@ typeof navigator === "object" && (function (global, factory) {
                     });
 
                     // Back button
-                    var back = createElement('button', {
+                    var backButton = createElement('button', {
                         type: 'button',
                         class: _this8.config.classNames.control + ' ' + _this8.config.classNames.control + '--back'
-                    }, i18n.get(type, _this8.config));
-                    back.addEventListener('click', function () {
+                    });
+
+                    // Visible label
+                    backButton.appendChild(createElement('span', {
+                        'aria-hidden': true
+                    }, i18n.get(type, _this8.config)));
+
+                    // Screen reader label
+                    backButton.appendChild(createElement('span', {
+                        class: _this8.config.classNames.hidden
+                    }, i18n.get('menuBack', _this8.config)));
+
+                    // Handle space or -> to open menu
+                    on(backButton, 'keydown', function (event) {
+                        // We only care about <-
+                        if (event.which !== 37) {
+                            return;
+                        }
+
+                        // Prevent seek
+                        event.preventDefault();
+                        event.stopPropagation();
+
+                        // Show the respective menu
+                        controls.showMenuPanel.call(_this8, 'home');
+                    }, false);
+
+                    // Go back
+                    on(backButton, 'click', function () {
                         controls.showMenuPanel.call(_this8, 'home');
                     });
-                    pane.appendChild(back);
+
+                    // Add to pane
+                    pane.appendChild(backButton);
 
                     // Menu
                     pane.appendChild(createElement('div', {
@@ -2635,16 +2713,9 @@ typeof navigator === "object" && (function (global, factory) {
 
                     inner.appendChild(pane);
 
-                    menuItem.addEventListener('click', function () {
-                        controls.showMenuPanel.call(_this8, type);
-                    });
-
                     _this8.elements.settings.buttons[type] = menuItem;
                     _this8.elements.settings.panels[type] = pane;
                 });
-
-                home.appendChild(menu);
-                inner.appendChild(home);
 
                 popup.appendChild(inner);
                 control.appendChild(popup);
@@ -4678,10 +4749,27 @@ typeof navigator === "object" && (function (global, factory) {
                 // Airplay
                 this.bind(this.player.elements.buttons.airplay, 'click', this.player.airplay, 'airplay');
 
-                // Settings menu
+                // Settings menu - click toggle
                 this.bind(this.player.elements.buttons.settings, 'click', function (event) {
                     controls.toggleMenu.call(_this5.player, event);
                 });
+
+                // Settings menu - keyboard toggle
+                this.bind(this.player.elements.buttons.settings, 'keydown', function (event) {
+                    // We only care about space
+                    if (event.which !== 32) {
+                        return;
+                    }
+
+                    // Prevent scroll
+                    event.preventDefault();
+
+                    // Prevent playing video
+                    event.stopPropagation();
+
+                    // Toggle menu
+                    controls.toggleMenu.call(_this5.player, event);
+                }, null, false);
 
                 // Set range input alternative "value", which matches the tooltip time (#954)
                 this.bind(this.player.elements.inputs.seek, 'mousedown mousemove', function (event) {
