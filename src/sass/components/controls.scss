@@ -12,6 +12,7 @@
     align-items: center;
     display: flex;
     text-align: center;
+    justify-content: flex-end;
 
     // Spacing
     > .plyr__control,
@@ -22,7 +23,7 @@
 
         &:first-child,
         &:first-child + [data-plyr='pause'] {
-            margin-left: 0;
+            margin-right:auto;
         }
     }
 
