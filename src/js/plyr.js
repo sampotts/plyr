@@ -310,18 +310,23 @@ class Plyr {
     get isHTML5() {
         return Boolean(this.provider === providers.html5);
     }
+
     get isEmbed() {
         return Boolean(this.isYouTube || this.isVimeo);
     }
+
     get isYouTube() {
         return Boolean(this.provider === providers.youtube);
     }
+
     get isVimeo() {
         return Boolean(this.provider === providers.vimeo);
     }
+
     get isVideo() {
         return Boolean(this.type === types.video);
     }
+
     get isAudio() {
         return Boolean(this.type === types.audio);
     }
@@ -489,8 +494,9 @@ class Plyr {
         // Faux duration set via config
         const fauxDuration = parseFloat(this.config.duration);
 
-        // Media duration can be NaN before the media has loaded
-        const duration = (this.media || {}).duration || 0;
+        // Media duration can be NaN or Infinity before the media has loaded
+        const realDuration = (this.media || {}).duration;
+        const duration = !is.number(realDuration) || realDuration === Infinity ? 0 : realDuration;
 
         // If config duration is funky, use regular duration
         return fauxDuration || duration;
@@ -944,6 +950,7 @@ class Plyr {
     on(event, callback) {
         on.call(this, this.elements.container, event, callback);
     }
+
     /**
      * Add event listeners once
      * @param {string} event - Event type
@@ -952,6 +959,7 @@ class Plyr {
     once(event, callback) {
         once.call(this, this.elements.container, event, callback);
     }
+
     /**
      * Remove event listeners
      * @param {string} event - Event type

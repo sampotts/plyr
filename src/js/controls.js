@@ -16,11 +16,11 @@ import {
     getElement,
     getElements,
     hasClass,
+    matches,
     removeElement,
     setAttributes,
     toggleClass,
     toggleHidden,
-    matches,
 } from './utils/elements';
 import { off, on } from './utils/events';
 import is from './utils/is';

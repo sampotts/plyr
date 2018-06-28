@@ -7,12 +7,12 @@
 /* global google */
 
 import i18n from '../i18n';
-import { createElement } from './../utils/elements';
-import { triggerEvent } from './../utils/events';
-import is from './../utils/is';
-import loadScript from './../utils/loadScript';
-import { formatTime } from './../utils/time';
-import { buildUrlParams } from './../utils/urls';
+import { createElement } from '../utils/elements';
+import { triggerEvent } from '../utils/events';
+import is from '../utils/is';
+import loadScript from '../utils/loadScript';
+import { formatTime } from '../utils/time';
+import { buildUrlParams } from '../utils/urls';
 
 class Ads {
     /**
@@ -100,7 +100,7 @@ class Ads {
         const params = {
             AV_PUBLISHERID: '58c25bb0073ef448b1087ad6',
             AV_CHANNELID: '5a0458dc28a06145e4519d21',
-            AV_URL: location.hostname,
+            AV_URL: window.location.hostname,
             cb: Date.now(),
             AV_WIDTH: 640,
             AV_HEIGHT: 480,

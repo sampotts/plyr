@@ -5,7 +5,10 @@
         "browser": true,
         "es6": true
     },
-    "globals": { "Plyr": false, "jQuery": false },
+    "globals": {
+        "Plyr": false,
+        "jQuery": false
+    },
     "rules": {
         "no-const-assign": 1,
         "no-shadow": 0,
@@ -22,17 +25,7 @@
         "one-var": [2, "never"],
         "comma-dangle": [2, "always-multiline"],
         "spaced-comment": [2, "always"],
-        "no-restricted-globals": [
-            "error",
-            {
-                "name": "event",
-                "message": "Use local parameter instead."
-            },
-            {
-                "name": "error",
-                "message": "Use local parameter instead."
-            }
-        ],
+        "no-restricted-globals": 2,
         "no-param-reassign": [2, { "props": false }]
     },
     "parserOptions": {

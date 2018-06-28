@@ -2,16 +2,16 @@
 // Vimeo plugin
 // ==========================================================================
 
-import captions from './../captions';
-import controls from './../controls';
-import ui from './../ui';
-import { createElement, replaceElement, toggleClass } from './../utils/elements';
-import { triggerEvent } from './../utils/events';
-import fetch from './../utils/fetch';
-import is from './../utils/is';
-import loadScript from './../utils/loadScript';
-import { format, stripHTML } from './../utils/strings';
-import { buildUrlParams } from './../utils/urls';
+import captions from '../captions';
+import controls from '../controls';
+import ui from '../ui';
+import { createElement, replaceElement, toggleClass } from '../utils/elements';
+import { triggerEvent } from '../utils/events';
+import fetch from '../utils/fetch';
+import is from '../utils/is';
+import loadScript from '../utils/loadScript';
+import { format, stripHTML } from '../utils/strings';
+import { buildUrlParams } from '../utils/urls';
 
 // Parse Vimeo ID from URL
 function parseId(url) {

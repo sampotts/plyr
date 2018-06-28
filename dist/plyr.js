@@ -1483,7 +1483,7 @@ typeof navigator === "object" && (function (global, factory) {
             }
 
             if ('class' in attributes) {
-                if (attributes.class.includes(this.config.classNames.control)) {
+                if (!attributes.class.includes(this.config.classNames.control)) {
                     attributes.class += ' ' + this.config.classNames.control;
                 }
             } else {
@@ -3009,8 +3009,10 @@ typeof navigator === "object" && (function (global, factory) {
                     return;
                 }
 
-                // Toggle state
-                this.elements.buttons.captions.pressed = active;
+                // Toggle button if it's enabled
+                if (this.elements.buttons.captions) {
+                    this.elements.buttons.captions.pressed = active;
+                }
 
                 // Add class hook
                 toggleClass(this.elements.container, activeClass, active);
@@ -4605,9 +4607,11 @@ typeof navigator === "object" && (function (global, factory) {
                 };
 
                 // Play/pause toggle
-                Array.from(this.player.elements.buttons.play).forEach(function (button) {
-                    bind(button, 'click', _this4.player.togglePlay, 'play');
-                });
+                if (this.player.elements.buttons.play) {
+                    Array.from(this.player.elements.buttons.play).forEach(function (button) {
+                        bind(button, 'click', _this4.player.togglePlay, 'play');
+                    });
+                }
 
                 // Pause
                 bind(this.player.elements.buttons.restart, 'click', this.player.restart, 'restart');
@@ -6777,7 +6781,7 @@ typeof navigator === "object" && (function (global, factory) {
                 var params = {
                     AV_PUBLISHERID: '58c25bb0073ef448b1087ad6',
                     AV_CHANNELID: '5a0458dc28a06145e4519d21',
-                    AV_URL: location.hostname,
+                    AV_URL: window.location.hostname,
                     cb: Date.now(),
                     AV_WIDTH: 640,
                     AV_HEIGHT: 480,
@@ -7421,6 +7425,7 @@ typeof navigator === "object" && (function (global, factory) {
             value: function on$$1(event, callback) {
                 on.call(this, this.elements.container, event, callback);
             }
+
             /**
              * Add event listeners once
              * @param {string} event - Event type
@@ -7432,6 +7437,7 @@ typeof navigator === "object" && (function (global, factory) {
             value: function once$$1(event, callback) {
                 once.call(this, this.elements.container, event, callback);
             }
+
             /**
              * Remove event listeners
              * @param {string} event - Event type
@@ -7707,8 +7713,9 @@ typeof navigator === "object" && (function (global, factory) {
                 // Faux duration set via config
                 var fauxDuration = parseFloat(this.config.duration);
 
-                // Media duration can be NaN before the media has loaded
-                var duration = (this.media || {}).duration || 0;
+                // Media duration can be NaN or Infinity before the media has loaded
+                var realDuration = (this.media || {}).duration;
+                var duration = !is.number(realDuration) || realDuration === Infinity ? 0 : realDuration;
 
                 // If config duration is funky, use regular duration
                 return fauxDuration || duration;
