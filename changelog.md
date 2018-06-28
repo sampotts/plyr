@@ -1,3 +1,26 @@
+# v3.3.20
+
+-   Fix for bug where controls wouldn't show on hover over YouTube video
+
+# v3.3.19
+
+-   Remove `pointer-events: none` on embed `<iframe>` to comply with YouTube ToS
+
+# 3.3.18
+
+-   Ads are now only supported on HTML5 videos as it violates terms of service for YouTube and Vimeo 😢
+-   Fix i18n defaults path on README (thanks @meyt!)
+-   Minor increaseVolume and decreaseVolume changes (thanks @friday!)
+
+# v3.3.17
+
+-   Fix YouTube muting after seeking with the progress slider (thanks @friday!)
+-   Respect preload="none" when setting quality if the media hasn't been loaded some other way (thanks @friday!)
+
+# v3.3.16
+
+-   Fixed regression relating the play button status (fixes #1048)
+
 # v3.3.15
 
 -   Fix for error relating to play buttons when switching source

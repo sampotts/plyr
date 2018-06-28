@@ -27,11 +27,6 @@ $embed-padding: ((100 / 16) * 9);
     $height: 240;
     $offset: to-percentage(($height - $embed-padding) / ($height / 50));
 
-    // To allow mouse events to be captured if full support
-    iframe {
-        pointer-events: none;
-    }
-
     // Only used for Vimeo
     > .plyr__video-embed__container {
         padding-bottom: to-percentage($height);

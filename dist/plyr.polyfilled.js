@@ -12149,7 +12149,7 @@ typeof navigator === "object" && (function (global, factory) {
 	    }, {
 	        key: 'enabled',
 	        get: function get() {
-	            return this.player.isVideo && this.player.config.ads.enabled && !is$1.empty(this.publisherId);
+	            return this.player.isHTML5 && this.player.isVideo && this.player.config.ads.enabled && !is$1.empty(this.publisherId);
 	        }
 	    }, {
 	        key: 'tagUrl',

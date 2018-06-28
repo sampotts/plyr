@@ -5000,9 +5000,9 @@ randomatic@^1.1.3:
     is-number "^3.0.0"
     kind-of "^4.0.0"
 
-raven-js@^3.26.2:
-  version "3.26.2"
-  resolved "https://registry.yarnpkg.com/raven-js/-/raven-js-3.26.2.tgz#9153af2416e96ccf4e0b9cbc6c90c34dda0d7e88"
+raven-js@^3.26.3:
+  version "3.26.3"
+  resolved "https://registry.yarnpkg.com/raven-js/-/raven-js-3.26.3.tgz#0efb49969b5b11ab965f7b0d6da4ca102b763cb0"
 
 rc@^1.0.1, rc@^1.1.6:
   version "1.2.6"
@@ -5903,9 +5903,9 @@ style-search@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/style-search/-/style-search-0.1.0.tgz#7958c793e47e32e07d2b5cafe5c0bf8e12e77902"
 
-stylelint-config-prettier@^3.2.0:
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/stylelint-config-prettier/-/stylelint-config-prettier-3.2.0.tgz#af32b7845adeeddbf0a0bd642ace4ca1e68958e2"
+stylelint-config-prettier@^3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/stylelint-config-prettier/-/stylelint-config-prettier-3.3.0.tgz#cc22a4b5310c1919cee77131d6e220c60a62a480"
   dependencies:
     stylelint "^9.1.1"
 
@@ -5938,9 +5938,9 @@ stylelint-scss@^2.0.0:
     postcss-selector-parser "^3.1.1"
     postcss-value-parser "^3.3.0"
 
-stylelint-scss@^3.1.2:
-  version "3.1.2"
-  resolved "https://registry.yarnpkg.com/stylelint-scss/-/stylelint-scss-3.1.2.tgz#3257c0600d197fe7642f3698944b47c91567f379"
+stylelint-scss@^3.1.3:
+  version "3.1.3"
+  resolved "https://registry.yarnpkg.com/stylelint-scss/-/stylelint-scss-3.1.3.tgz#28f881ae298c3f5db667b10b6cf94a1a219001d6"
   dependencies:
     lodash "^4.17.10"
     postcss-media-query-parser "^0.2.3"
