@@ -1874,7 +1874,7 @@ typeof navigator === "object" && (function () {
 	  // webpack (using a build step causes webpack #1617). Grunt verifies that
 	  // this value matches package.json during build.
 	  //   See: https://github.com/getsentry/raven-js/issues/465
-	  VERSION: '3.26.3',
+	  VERSION: '3.26.2',
 
 	  debug: false,
 
@@ -2351,9 +2351,7 @@ typeof navigator === "object" && (function () {
 	      return;
 	    }
 
-	    // Always attempt to get stacktrace if message is empty.
-	    // It's the only way to provide any helpful information to the user.
-	    if (this._globalOptions.stacktrace || options.stacktrace || data.message === '') {
+	    if (this._globalOptions.stacktrace || (options && options.stacktrace)) {
 	      // fingerprint on msg, not stack trace (legacy behavior, could be revisited)
 	      data.fingerprint = data.fingerprint == null ? msg : data.fingerprint;
 
@@ -3509,11 +3507,6 @@ typeof navigator === "object" && (function () {
 	      },
 	      options
 	    );
-
-	    var ex = data.exception.values[0];
-	    if (ex.type == null && ex.value === '') {
-	      ex.value = 'Unrecoverable error caught';
-	    }
 
 	    // Move mechanism from options to exception interface
 	    // We do this, as requiring user to pass `{exception:{mechanism:{ ... }}}` would be
