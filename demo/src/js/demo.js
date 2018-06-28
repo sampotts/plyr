@@ -57,6 +57,7 @@ import Raven from 'raven-js';
                 tooltips: {
                     controls: true,
                 },
+                clickToPlay: false,
                 /* controls: [
                     'play-large',
                     'restart',

@@ -11,6 +11,7 @@
 .plyr__controls {
     align-items: center;
     display: flex;
+    justify-content: flex-end;
     text-align: center;
 
     // Spacing
@@ -23,6 +24,7 @@
         &:first-child,
         &:first-child + [data-plyr='pause'] {
             margin-left: 0;
+            margin-right: auto;
         }
     }
 
@@ -48,13 +50,17 @@
 
 // Video controls
 .plyr--video .plyr__controls {
-    background: linear-gradient(rgba($plyr-video-controls-bg, 0), rgba($plyr-video-controls-bg, 0.7));
+    background: linear-gradient(
+        rgba($plyr-video-controls-bg, 0),
+        rgba($plyr-video-controls-bg, 0.7)
+    );
     border-bottom-left-radius: inherit;
     border-bottom-right-radius: inherit;
     bottom: 0;
     color: $plyr-video-control-color;
     left: 0;
-    padding: ($plyr-control-spacing * 3.5) $plyr-control-spacing $plyr-control-spacing;
+    padding: ($plyr-control-spacing * 3.5) $plyr-control-spacing
+        $plyr-control-spacing;
     position: absolute;
     right: 0;
     transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;

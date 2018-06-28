@@ -1483,7 +1483,7 @@ typeof navigator === "object" && (function (global, factory) {
             }
 
             if ('class' in attributes) {
-                if (attributes.class.includes(this.config.classNames.control)) {
+                if (!attributes.class.includes(this.config.classNames.control)) {
                     attributes.class += ' ' + this.config.classNames.control;
                 }
             } else {
@@ -1929,6 +1929,16 @@ typeof navigator === "object" && (function (global, factory) {
         durationUpdate: function durationUpdate() {
             // Bail if no UI or durationchange event triggered after playing/seek when invertTime is false
             if (!this.supported.ui || !this.config.invertTime && this.currentTime) {
+                return;
+            }
+
+            // If duration is the 2**32 (shaka), Infinity (HLS), DASH-IF (Number.MAX_SAFE_INTEGER || Number.MAX_VALUE) indicating live we hide the currentTime and progressbar.
+            // https://github.com/video-dev/hls.js/blob/5820d29d3c4c8a46e8b75f1e3afa3e68c1a9a2db/src/controller/buffer-controller.js#L415
+            // https://github.com/google/shaka-player/blob/4d889054631f4e1cf0fbd80ddd2b71887c02e232/lib/media/streaming_engine.js#L1062
+            // https://github.com/Dash-Industry-Forum/dash.js/blob/69859f51b969645b234666800d4cb596d89c602d/src/dash/models/DashManifestModel.js#L338
+            if (this.duration >= Math.pow(2, 32)) {
+                toggleHidden(this.elements.display.currentTime, true);
+                toggleHidden(this.elements.progress, true);
                 return;
             }
 
@@ -3009,8 +3019,10 @@ typeof navigator === "object" && (function (global, factory) {
                     return;
                 }
 
-                // Toggle state
-                this.elements.buttons.captions.pressed = active;
+                // Toggle button if it's enabled
+                if (this.elements.buttons.captions) {
+                    this.elements.buttons.captions.pressed = active;
+                }
 
                 // Add class hook
                 toggleClass(this.elements.container, activeClass, active);
@@ -4605,9 +4617,11 @@ typeof navigator === "object" && (function (global, factory) {
                 };
 
                 // Play/pause toggle
-                Array.from(this.player.elements.buttons.play).forEach(function (button) {
-                    bind(button, 'click', _this4.player.togglePlay, 'play');
-                });
+                if (this.player.elements.buttons.play) {
+                    Array.from(this.player.elements.buttons.play).forEach(function (button) {
+                        bind(button, 'click', _this4.player.togglePlay, 'play');
+                    });
+                }
 
                 // Pause
                 bind(this.player.elements.buttons.restart, 'click', this.player.restart, 'restart');
@@ -6777,7 +6791,7 @@ typeof navigator === "object" && (function (global, factory) {
                 var params = {
                     AV_PUBLISHERID: '58c25bb0073ef448b1087ad6',
                     AV_CHANNELID: '5a0458dc28a06145e4519d21',
-                    AV_URL: location.hostname,
+                    AV_URL: window.location.hostname,
                     cb: Date.now(),
                     AV_WIDTH: 640,
                     AV_HEIGHT: 480,
@@ -7421,6 +7435,7 @@ typeof navigator === "object" && (function (global, factory) {
             value: function on$$1(event, callback) {
                 on.call(this, this.elements.container, event, callback);
             }
+
             /**
              * Add event listeners once
              * @param {string} event - Event type
@@ -7432,6 +7447,7 @@ typeof navigator === "object" && (function (global, factory) {
             value: function once$$1(event, callback) {
                 once.call(this, this.elements.container, event, callback);
             }
+
             /**
              * Remove event listeners
              * @param {string} event - Event type
@@ -7707,8 +7723,9 @@ typeof navigator === "object" && (function (global, factory) {
                 // Faux duration set via config
                 var fauxDuration = parseFloat(this.config.duration);
 
-                // Media duration can be NaN before the media has loaded
-                var duration = (this.media || {}).duration || 0;
+                // Media duration can be NaN or Infinity before the media has loaded
+                var realDuration = (this.media || {}).duration;
+                var duration = !is.number(realDuration) || realDuration === Infinity ? 0 : realDuration;
 
                 // If config duration is funky, use regular duration
                 return fauxDuration || duration;

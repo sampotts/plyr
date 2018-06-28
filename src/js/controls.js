@@ -16,11 +16,11 @@ import {
     getElement,
     getElements,
     hasClass,
+    matches,
     removeElement,
     setAttributes,
     toggleClass,
     toggleHidden,
-    matches,
 } from './utils/elements';
 import { off, on } from './utils/events';
 import is from './utils/is';
@@ -187,7 +187,7 @@ const controls = {
         }
 
         if ('class' in attributes) {
-            if (attributes.class.includes(this.config.classNames.control)) {
+            if (!attributes.class.includes(this.config.classNames.control)) {
                 attributes.class += ` ${this.config.classNames.control}`;
             }
         } else {
@@ -630,6 +630,16 @@ const controls = {
     durationUpdate() {
         // Bail if no UI or durationchange event triggered after playing/seek when invertTime is false
         if (!this.supported.ui || (!this.config.invertTime && this.currentTime)) {
+            return;
+        }
+
+        // If duration is the 2**32 (shaka), Infinity (HLS), DASH-IF (Number.MAX_SAFE_INTEGER || Number.MAX_VALUE) indicating live we hide the currentTime and progressbar.
+        // https://github.com/video-dev/hls.js/blob/5820d29d3c4c8a46e8b75f1e3afa3e68c1a9a2db/src/controller/buffer-controller.js#L415
+        // https://github.com/google/shaka-player/blob/4d889054631f4e1cf0fbd80ddd2b71887c02e232/lib/media/streaming_engine.js#L1062
+        // https://github.com/Dash-Industry-Forum/dash.js/blob/69859f51b969645b234666800d4cb596d89c602d/src/dash/models/DashManifestModel.js#L338
+        if (this.duration >= 2**32) {
+            toggleHidden(this.elements.display.currentTime, true);
+            toggleHidden(this.elements.progress, true);
             return;
         }
 

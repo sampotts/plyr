@@ -1,3 +1,11 @@
+
+# v3.3.21
+
+-   Hide currentTime and progress for streams (thanks @mimse)
+-   Fixed condition check (thanks @mimse)
+-   Handle undefined this.player.elements.buttons.play (thanks @klassicd)
+-   Fix captions.toggle() if there is no toggle button (thanks @friday)
+
 # v3.3.20
 
 -   Fix for bug where controls wouldn't show on hover over YouTube video

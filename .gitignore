@@ -6,6 +6,5 @@ aws.json
 index-*.html
 npm-debug.log
 *.webm
-/package-lock.json
+package-lock.json
 .idea/
-

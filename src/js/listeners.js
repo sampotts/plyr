@@ -431,9 +431,11 @@ class Listeners {
         };
 
         // Play/pause toggle
-        Array.from(this.player.elements.buttons.play).forEach(button => {
-            bind(button, 'click', this.player.togglePlay, 'play');
-        });
+        if (this.player.elements.buttons.play) {
+            Array.from(this.player.elements.buttons.play).forEach(button => {
+                bind(button, 'click', this.player.togglePlay, 'play');
+            });
+        }
 
         // Pause
         bind(this.player.elements.buttons.restart, 'click', this.player.restart, 'restart');
@@ -667,8 +669,7 @@ class Listeners {
                 const inverted = event.webkitDirectionInvertedFromDevice;
 
                 // Get delta from event. Invert if `inverted` is true
-                const [x, y] = [event.deltaX, -event.deltaY]
-                    .map(value => inverted ? -value : value);
+                const [x, y] = [event.deltaX, -event.deltaY].map(value => (inverted ? -value : value));
 
                 // Using the biggest delta, normalize to 1 or -1 (or 0 if no delta)
                 const direction = Math.sign(Math.abs(x) > Math.abs(y) ? x : y);
