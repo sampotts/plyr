@@ -148,4 +148,7 @@ $plyr-font-size-captions-small: 24px;
     .plyr__poster {
         display: block;
     }
+    video::cue {
+        display: none !important;
+    }
 }
