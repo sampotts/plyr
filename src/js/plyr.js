@@ -677,21 +677,30 @@ class Plyr {
         const config = this.config.quality;
         const options = this.options.quality;
 
+        let quality;
         if (!options.length) {
             return;
         }
 
-        let quality = [
-            !is.empty(input) && Number(input),
-            this.storage.get('quality'),
-            config.selected,
-            config.default,
-        ].find(is.number);
+        if (input instanceof String) {
+            // We have only a label
+            // Convert this into an Object of the expected type
+            quality = {
+                value: input,
+            };
+        } else if (input instanceof Object) {
+            quality = input;
+        } else {
+            this.debug.warn(`Quality option of unknown type: ${input} (${typeof input}). Ignoring`);
+            return;
+        }
 
-        if (!options.includes(quality)) {
-            const value = closest(options, quality);
-            this.debug.warn(`Unsupported quality option: ${quality}, using ${value} instead`);
-            quality = value;
+        // Get the corresponding quality listing from options
+        const entry = options.find((level) => level.label === quality.label && (quality.index ? level.index === quality.index : true));
+
+        if (!entry) {
+            this.debug.warn(`Unsupported quality option: ${input}. Ignoring`);
+            return;
         }
 
         // Trigger request event

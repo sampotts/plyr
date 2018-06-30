@@ -51,7 +51,14 @@ function mapQualityUnits(levels) {
         return levels;
     }
 
-    return dedupe(levels.map(level => mapQualityUnit(level)));
+    const mappedLevels = dedupe(levels.map(level => mapQualityUnit(level)));
+    const result = mappedLevels.map((level, index) => ({
+        label: levels[index],
+        index,
+        height: level,
+        badge: level >= 720 ? 'HD' : 'SD',
+    }));
+    return result;
 }
 
 // Set playback state and trigger change (only on actual change)
@@ -300,7 +307,13 @@ const youtube = {
                             return mapQualityUnit(instance.getPlaybackQuality());
                         },
                         set(input) {
-                            instance.setPlaybackQuality(mapQualityUnit(input));
+                            let label;
+                            if (input instanceof String) {
+                                label = input;
+                            } else if (input instanceof Object) {
+                                label = input.label;
+                            }
+                            instance.setPlaybackQuality(mapQualityUnit(label));
                         },
                     });
 

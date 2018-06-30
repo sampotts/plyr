@@ -373,7 +373,7 @@ const controls = {
     },
 
     // Create a settings menu item
-    createMenuItem({ value, list, type, title, badge = null, checked = false }) {
+    createMenuItem({ value, list, type, title, badge = null, checked = false, index = null }) {
         const item = createElement('li');
 
         const label = createElement('label', {
@@ -388,6 +388,7 @@ const controls = {
                 value,
                 checked,
                 class: 'plyr__sr-only',
+                index,
             }),
         );
 
@@ -671,6 +672,17 @@ const controls = {
     },
 
     // Set the quality menu
+    // options is expected to be an array of objects
+    // Each entry in this array should be of the type:
+    // {
+    //   label: String,      // mandatory
+    //   height: Number,     // mandatory
+    //   index: Number,      // optional
+    //   badge: String,      // optional
+    // }
+    // The order of qualities will be based on height. If there are multiple
+    // entries with the same height, then we use index instead.
+    // If badge is not specified, it will be looked up by height.
     setQualityMenu(options) {
         // Menu required
         if (!is.element(this.elements.settings.panes.quality)) {
@@ -680,9 +692,9 @@ const controls = {
         const type = 'quality';
         const list = this.elements.settings.panes.quality.querySelector('ul');
 
-        // Set options if passed and filter based on uniqueness and config
+        // Set options if passed
         if (is.array(options)) {
-            this.options.quality = dedupe(options).filter(quality => this.config.quality.options.includes(quality));
+            this.options.quality = dedupe(options);
         }
 
         // Toggle the pane and tab
@@ -702,10 +714,17 @@ const controls = {
 
         // Get the badge HTML for HD, 4K etc
         const getBadge = quality => {
-            const label = i18n.get(`qualityBadge.${quality}`, this.config);
+            let label;
+            if (quality.badge) {
+                label = quality.badge;
+            } else {
+                // The badge is based on the height of the video
+                // TODO: We need some rounding logic here
+                label = i18n.get(`qualityBadge.${quality.label}`, this.config);
 
-            if (!label.length) {
-                return null;
+                if (!label.length) {
+                    return null;
+                }
             }
 
             return controls.createBadge.call(this, label);
@@ -714,16 +733,19 @@ const controls = {
         // Sort options by the config and then render options
         this.options.quality
             .sort((a, b) => {
-                const sorting = this.config.quality.options;
-                return sorting.indexOf(a) > sorting.indexOf(b) ? 1 : -1;
+                if (a.height === b.height) {
+                    return a.index > b.index ? -1 : 1;
+                }
+                return a.height > b.height ? -1 : 1;
             })
             .forEach(quality => {
                 controls.createMenuItem.call(this, {
-                    value: quality,
+                    value: quality.label,
                     list,
                     type,
-                    title: controls.getLabel.call(this, 'quality', quality),
+                    title: controls.getLabel.call(this, 'quality', quality.height, toTitleCase(quality.label)),
                     badge: getBadge(quality),
+                    index: quality.index,
                 });
             });
 
@@ -731,7 +753,7 @@ const controls = {
     },
 
     // Translate a value into a nice label
-    getLabel(setting, value) {
+    getLabel(setting, value, defaultLabel) {
         switch (setting) {
             case 'speed':
                 return value === 1 ? i18n.get('normal', this.config) : `${value}&times;`;
@@ -740,14 +762,14 @@ const controls = {
                 if (is.number(value)) {
                     const label = i18n.get(`qualityLabel.${value}`, this.config);
 
+                    // If we don't find a valid label, we return passed in defaultLabel
                     if (!label.length) {
-                        return `${value}p`;
+                        return defaultLabel;
                     }
 
                     return label;
                 }
-
-                return toTitleCase(value);
+                return defaultLabel || toTitleCase(value);
 
             case 'captions':
                 return captions.getLabel.call(this);
@@ -773,16 +795,26 @@ const controls = {
                 value = this.config[setting].default;
             }
 
+            let settingOptions = this.options[setting];
+            if (setting === 'quality') {
+                // Quality is not an array of strings. It's an array of Objects
+                // Extract out the strings
+                settingOptions = this.options[setting].map(level => controls.getLabel.call(this, 'quality', level.label));
+            }
+
             // Unsupported value
-            if (!is.empty(this.options[setting]) && !this.options[setting].includes(value)) {
+            if (!is.empty(settingOptions) && !settingOptions.includes(value)) {
                 this.debug.warn(`Unsupported value of '${value}' for ${setting}`);
                 return;
             }
 
             // Disabled value
-            if (!this.config[setting].options.includes(value)) {
-                this.debug.warn(`Disabled value of '${value}' for ${setting}`);
-                return;
+            // Don't check for quality which is permissive and accepts anything
+            if (setting !== 'quality') {
+                if (!this.config[setting].options.includes(value)) {
+                    this.debug.warn(`Disabled value of '${value}' for ${setting}`);
+                    return;
+                }
             }
         }
 
