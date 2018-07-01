@@ -677,18 +677,28 @@ class Plyr {
         const options = this.options.quality;
 
         let quality;
+        // Create a local copy of input so we can handle modifications
+        let qualityInput = input;
         if (!options.length) {
             return;
         }
 
-        if (is.string(input)) {
+        // Support setting quality as a Number
+        if (is.number(qualityInput)) {
+            // Convert this to a string since quality labels are expected to be strings
+            qualityInput = `${qualityInput}`;
+        }
+
+        // Now, convert qualityInput into a quality object.
+        // This object is emitted as part of the qualityrequested event
+        if (is.string(qualityInput)) {
             // We have only a label
             // Convert this into an Object of the expected type
             quality = {
-                value: input,
+                label: qualityInput,
             };
-        } else if (is.object(input)) {
-            quality = input;
+        } else if (is.object(qualityInput)) {
+            quality = qualityInput;
         } else {
             this.debug.warn(`Quality option of unknown type: ${input} (${typeof input}). Ignoring`);
             return;
