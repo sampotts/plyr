@@ -686,7 +686,9 @@ class Plyr {
         // Support setting quality as a Number
         if (is.number(qualityInput)) {
             // Convert this to a string since quality labels are expected to be strings
-            qualityInput = `${qualityInput}`;
+            // XXX: We really only accept labels, but
+            // this is left in place so as to be backward compatible
+            qualityInput = `${qualityInput}p`;
         }
 
         // Now, convert qualityInput into a quality object.
