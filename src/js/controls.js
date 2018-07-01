@@ -673,8 +673,8 @@ const controls = {
     // options is expected to be an array of objects
     // Each entry in this array should be of the type:
     // {
-    //   label: String,      // mandatory
     //   height: Number,     // mandatory
+    //   label: String,      // optional
     //   badge: String,      // optional
     // }
     // The order of qualities will be based on height. If there are multiple
