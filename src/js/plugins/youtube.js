@@ -310,7 +310,7 @@ const youtube = {
                             if (is.string(input)) {
                                 label = input;
                             } else if (is.object(input)) {
-                                label = input.label;
+                                ({label} = input);
                             }
                             instance.setPlaybackQuality(mapQualityUnit(label));
                         },
