@@ -376,7 +376,7 @@ class Listeners {
         // Quality change
         on.call(this.player, this.player.media, 'qualitychange', event => {
             // Update UI
-            controls.updateSetting.call(this.player, 'quality', null, event.detail.quality.label);
+            controls.updateSetting.call(this.player, 'quality', null, event.detail.quality.index);
         });
 
         // Proxy events to container
@@ -512,8 +512,7 @@ class Listeners {
                     event,
                     () => {
                         this.player.quality = {
-                            label: event.target.value,
-                            index: Number(event.target.attributes.index.value),
+                            index: Number(event.target.value),
                         };
                         showHomeTab();
                     },

@@ -693,9 +693,10 @@ class Plyr {
         // This object is emitted as part of the qualityrequested event
         if (is.string(qualityInput)) {
             // We have only a label
-            // Convert this into an Object of the expected type
+            // Find the index of this label and
+            // convert this into an Object of the expected type
             quality = {
-                label: qualityInput,
+                index: options.map(quality => quality.label).indexOf(qualityInput),
             };
         } else if (is.object(qualityInput)) {
             quality = qualityInput;
@@ -705,7 +706,7 @@ class Plyr {
         }
 
         // Get the corresponding quality listing from options
-        const entry = options.find((level) => level.label === quality.label && (quality.index ? level.index === quality.index : true));
+        const entry = options[quality.index];
 
         if (!entry) {
             this.debug.warn(`Unsupported quality option: ${input}. Ignoring`);

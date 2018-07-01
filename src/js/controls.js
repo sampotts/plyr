@@ -373,7 +373,7 @@ const controls = {
     },
 
     // Create a settings menu item
-    createMenuItem({ value, list, type, title, badge = null, checked = false, index = null }) {
+    createMenuItem({ value, list, type, title, badge = null, checked = false }) {
         const item = createElement('li');
 
         const label = createElement('label', {
@@ -388,7 +388,6 @@ const controls = {
                 value,
                 checked,
                 class: 'plyr__sr-only',
-                index,
             }),
         );
 
@@ -677,11 +676,10 @@ const controls = {
     // {
     //   label: String,      // mandatory
     //   height: Number,     // mandatory
-    //   index: Number,      // optional
     //   badge: String,      // optional
     // }
     // The order of qualities will be based on height. If there are multiple
-    // entries with the same height, then we use index instead.
+    // entries with the same height, then we use the entry's array index instead.
     // If badge is not specified, it will be looked up by height.
     setQualityMenu(options) {
         // Menu required
@@ -714,47 +712,47 @@ const controls = {
 
         // Get the badge HTML for HD, 4K etc
         const getBadge = quality => {
-            let label;
-            if (quality.badge) {
-                label = quality.badge;
-            } else {
-                // The badge is based on the height of the video
-                // TODO: We need some rounding logic here
-                label = i18n.get(`qualityBadge.${quality.label}`, this.config);
+            const {
+                height,
+                badge = i18n.get(`qualityBadge.${height}`, this.config),
+            } = quality;
 
-                if (!label.length) {
-                    // TODO: Try to find a badge based on height
-                    return null;
-                }
-            }
-
-            return controls.createBadge.call(this, label);
+            return badge ? controls.createBadge.call(this, quality.label) : null;
         };
 
         // Sort options by the config and then render options
-        this.options.quality
+        const finalOptions = this.options.quality
             .sort((a, b) => {
                 if (a.height === b.height) {
-                    return a.index > b.index ? -1 : 1;
+                    return this.options.quality.indexOf(a) > this.options.quality.indexOf(b);
                 }
-                return a.height > b.height ? -1 : 1;
-            })
-            .forEach(quality => {
-                controls.createMenuItem.call(this, {
-                    value: quality.label,
-                    list,
-                    type,
-                    title: controls.getLabel.call(this, 'quality', quality.height, toTitleCase(quality.label)),
-                    badge: getBadge(quality),
-                    index: quality.index,
-                });
-            });
+                return a.height > b.height;
+            }).map(quality => ({
+                value: this.options.quality.indexOf(quality),
+                list,
+                type,
+                title: quality.label || controls.getLabel.call(this, 'quality', quality.height),
+                badge: getBadge(quality),
+            })).reverse(); // We reverse it so that the lower height options appear at the bottom of the quality menu
 
-        controls.updateSetting.call(this, type, list);
+        // The incoming quality option may not have labels
+        // If this is the case, then the text displayed as part of qualityMenu
+        // comes from 'title' of finalOptions
+        // Thus, since finalOptions contains all the relevant data for each quality
+        // entry, we update options.quality with finalOptions
+        this.options.quality = options.map((quality, index) => {
+            const finalOpt = finalOptions.find(opt => opt.value === index);
+            return Object.assign({}, quality, {
+                label: finalOpt.title,
+                badge: finalOpt.badge,
+            });
+        });
+        finalOptions.forEach(controls.createMenuItem.bind(this));
+        controls.updateSetting.call(this, type, list, this.config[type].default);
     },
 
     // Translate a value into a nice label
-    getLabel(setting, value, defaultLabel) {
+    getLabel(setting, value) {
         let label;
         switch (setting) {
             case 'speed':
@@ -796,9 +794,8 @@ const controls = {
 
             let settingOptions = this.options[setting];
             if (setting === 'quality') {
-                // Quality is not an array of strings. It's an array of Objects
-                // Extract out the strings
-                settingOptions = this.options[setting].map(level => controls.getLabel.call(this, 'quality', level.label));
+                value = settingOptions[value].label;
+                settingOptions = settingOptions.map(quality => quality.label);
             }
 
             // Unsupported value
