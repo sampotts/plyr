@@ -763,11 +763,13 @@ const controls = {
             case 'quality':
                 label = i18n.get(`qualityLabel.${value}`, this.config);
 
-                // If we don't find a valid label, we return passed in defaultLabel
                 if (!label.length) {
-                    return defaultLabel || toTitleCase(value);
+                    // Only return with p if value is a number
+                    if (is.number(value)) {
+                        return `${value}p`;
+                    }
                 }
-                return label;
+                return toTitleCase(value);
             case 'captions':
                 return captions.getLabel.call(this);
 
