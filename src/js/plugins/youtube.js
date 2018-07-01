@@ -52,13 +52,12 @@ function mapQualityUnits(levels) {
     }
 
     const mappedLevels = dedupe(levels.map(level => mapQualityUnit(level)));
-    const result = mappedLevels.map((level, index) => ({
+    return mappedLevels.map((level, index) => ({
         label: levels[index],
         index,
         height: level,
         badge: level >= 720 ? 'HD' : 'SD',
     }));
-    return result;
 }
 
 // Set playback state and trigger change (only on actual change)
