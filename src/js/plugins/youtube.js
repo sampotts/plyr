@@ -308,9 +308,9 @@ const youtube = {
                         },
                         set(input) {
                             let label;
-                            if (input instanceof String) {
+                            if (is.string(input)) {
                                 label = input;
-                            } else if (input instanceof Object) {
+                            } else if (is.object(input)) {
                                 label = input.label;
                             }
                             instance.setPlaybackQuality(mapQualityUnit(label));

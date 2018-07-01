@@ -682,13 +682,13 @@ class Plyr {
             return;
         }
 
-        if (input instanceof String) {
+        if (is.string(input)) {
             // We have only a label
             // Convert this into an Object of the expected type
             quality = {
                 value: input,
             };
-        } else if (input instanceof Object) {
+        } else if (is.object(input)) {
             quality = input;
         } else {
             this.debug.warn(`Quality option of unknown type: ${input} (${typeof input}). Ignoring`);
