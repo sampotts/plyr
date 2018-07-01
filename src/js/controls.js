@@ -723,6 +723,7 @@ const controls = {
                 label = i18n.get(`qualityBadge.${quality.label}`, this.config);
 
                 if (!label.length) {
+                    // TODO: Try to find a badge based on height
                     return null;
                 }
             }
@@ -754,23 +755,19 @@ const controls = {
 
     // Translate a value into a nice label
     getLabel(setting, value, defaultLabel) {
+        let label;
         switch (setting) {
             case 'speed':
                 return value === 1 ? i18n.get('normal', this.config) : `${value}&times;`;
 
             case 'quality':
-                if (is.number(value)) {
-                    const label = i18n.get(`qualityLabel.${value}`, this.config);
+                label = i18n.get(`qualityLabel.${value}`, this.config);
 
-                    // If we don't find a valid label, we return passed in defaultLabel
-                    if (!label.length) {
-                        return defaultLabel;
-                    }
-
-                    return label;
+                // If we don't find a valid label, we return passed in defaultLabel
+                if (!label.length) {
+                    return defaultLabel || toTitleCase(value);
                 }
-                return defaultLabel || toTitleCase(value);
-
+                return label;
             case 'captions':
                 return captions.getLabel.call(this);
 
