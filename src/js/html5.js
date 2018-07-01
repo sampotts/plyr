@@ -21,15 +21,22 @@ const html5 = {
     // Get quality levels
     getQualityOptions() {
         // Get sizes from <source> elements
-        const sizes = html5.getSources
+        return html5.getSources
             .call(this)
-            .map(source => Number(source.getAttribute('size')))
-            .filter(Boolean);
-        return sizes.map((size, index) => ({
-            label: `${size}`,
-            height: size,
-            index,
-        }));
+            .map((source) => {
+                const {
+                    // For backward-compatibility, fallback on the old size-attribute (which I think we should deprecate)
+                    height = Number(source.getAttribute('size')),
+                    label,
+                    badge,
+                } = source.dataset;
+
+                return {
+                    badge,
+                    label,
+                    height,
+                };
+            });
     },
 
     extend() {
@@ -40,7 +47,6 @@ const html5 = {
         const player = this;
 
         // Quality
-        const qualityLevels = html5.getQualityOptions.call(player);
         Object.defineProperty(player.media, 'quality', {
             get() {
                 // Get sources
@@ -52,14 +58,14 @@ const html5 = {
                 const sourceIndex = sources.indexOf(source);
 
                 // Return label, if match is found
-                return qualityLevels[sourceIndex].label;
+                return player.options.quality[sourceIndex].label;
             },
             set(input) {
                 // Get sources
                 const sources = html5.getSources.call(player);
 
                 // Get first match for requested size
-                const source = sources.find(source => source.getAttribute('size') === input.label);
+                const source = sources[input.index];
 
                 // No matching source found
                 if (!source) {

@@ -7,7 +7,6 @@ import html5 from './html5';
 import i18n from './i18n';
 import support from './support';
 import { repaint, transitionEndEvent } from './utils/animation';
-import { dedupe } from './utils/arrays';
 import browser from './utils/browser';
 import {
     createElement,
@@ -692,7 +691,7 @@ const controls = {
 
         // Set options if passed
         if (is.array(options)) {
-            this.options.quality = dedupe(options);
+            this.options.quality = options;
         }
 
         // Toggle the pane and tab

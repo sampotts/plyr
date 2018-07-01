@@ -54,9 +54,7 @@ function mapQualityUnits(levels) {
     const mappedLevels = dedupe(levels.map(level => mapQualityUnit(level)));
     return mappedLevels.map((level, index) => ({
         label: levels[index],
-        index,
         height: level,
-        badge: level >= 720 ? 'HD' : 'SD',
     }));
 }
 
