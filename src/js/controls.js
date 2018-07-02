@@ -716,7 +716,7 @@ const controls = {
                 badge = i18n.get(`qualityBadge.${height}`, this.config),
             } = quality;
 
-            return badge ? controls.createBadge.call(this, quality.label) : null;
+            return badge ? controls.createBadge.call(this, badge) : null;
         };
 
         // Sort options by the config and then render options
