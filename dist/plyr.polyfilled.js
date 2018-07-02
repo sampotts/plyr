@@ -6024,6 +6024,24 @@ typeof navigator === "object" && (function (global, factory) {
 	    toggleListener.call(this, this.elements.container, 'keydown', trap, toggle, false);
 	}
 
+	// Set focus and tab focus class
+	function setFocus() {
+	    var element = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+	    var tabFocus = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+	    if (!is$1.element(element)) {
+	        return;
+	    }
+
+	    // Set regular focus
+	    element.focus();
+
+	    // If we want to mimic keyboard focus via tab
+	    if (tabFocus) {
+	        toggleClass(element, this.config.classNames.tabFocus);
+	    }
+	}
+
 	// ==========================================================================
 
 	var transitionEndEvent = function () {
@@ -6880,7 +6898,7 @@ typeof navigator === "object" && (function (global, factory) {
 	        }
 
 	        if ('class' in attributes) {
-	            if (attributes.class.includes(this.config.classNames.control)) {
+	            if (!attributes.class.includes(this.config.classNames.control)) {
 	                attributes.class += ' ' + this.config.classNames.control;
 	            }
 	        } else {
@@ -7369,6 +7387,16 @@ typeof navigator === "object" && (function (global, factory) {
 	            return;
 	        }
 
+	        // If duration is the 2**32 (shaka), Infinity (HLS), DASH-IF (Number.MAX_SAFE_INTEGER || Number.MAX_VALUE) indicating live we hide the currentTime and progressbar.
+	        // https://github.com/video-dev/hls.js/blob/5820d29d3c4c8a46e8b75f1e3afa3e68c1a9a2db/src/controller/buffer-controller.js#L415
+	        // https://github.com/google/shaka-player/blob/4d889054631f4e1cf0fbd80ddd2b71887c02e232/lib/media/streaming_engine.js#L1062
+	        // https://github.com/Dash-Industry-Forum/dash.js/blob/69859f51b969645b234666800d4cb596d89c602d/src/dash/models/DashManifestModel.js#L338
+	        if (this.duration >= Math.pow(2, 32)) {
+	            toggleHidden(this.elements.display.currentTime, true);
+	            toggleHidden(this.elements.progress, true);
+	            return;
+	        }
+
 	        // Update ARIA values
 	        if (is$1.element(this.elements.inputs.seek)) {
 	            this.elements.inputs.seek.setAttribute('aria-valuemax', this.duration);
@@ -7745,11 +7773,13 @@ typeof navigator === "object" && (function (global, factory) {
 	            if (show) {
 	                popup.removeAttribute('tabindex');
 
-	                // Focus the first item
-	                var firstItem = popup.querySelector('[role^="menuitem"]');
-	                console.warn(firstItem);
-	                if (firstItem) {
-	                    firstItem.focus();
+	                // Focus the first item if key interaction
+	                if (event.type === 'keydown') {
+	                    var pane = Object.values(this.elements.settings.panels).find(function (pane) {
+	                        return !pane.hidden;
+	                    });
+	                    var firstItem = pane.querySelector('[role^="menuitem"]');
+	                    setFocus.call(this, firstItem, true);
 	                }
 	            } else {
 	                popup.setAttribute('tabindex', -1);
@@ -7841,9 +7871,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 	        // Focus the first item
 	        var firstItem = target.querySelector('[role^="menuitem"]');
-	        if (firstItem) {
-	            firstItem.focus();
-	        }
+	        setFocus.call(this, firstItem, true);
 	    },
 
 
@@ -7983,6 +8011,9 @@ typeof navigator === "object" && (function (global, factory) {
 	                role: 'menu'
 	            });
 
+	            home.appendChild(menu);
+	            inner.appendChild(home);
+
 	            // Build the menu items
 	            this.config.settings.forEach(function (type) {
 	                var menuItem = createElement('button', extend(getAttributesFromSelector(_this8.config.selectors.buttons.settings), {
@@ -7992,6 +8023,26 @@ typeof navigator === "object" && (function (global, factory) {
 	                    'aria-haspopup': true,
 	                    hidden: ''
 	                }));
+
+	                // Handle space or -> to open menu
+	                on(menuItem, 'keydown', function (event) {
+	                    // We only care about space and ->
+	                    if (![32, 39].includes(event.which)) {
+	                        return;
+	                    }
+
+	                    // Prevent play / seek
+	                    event.preventDefault();
+	                    event.stopPropagation();
+
+	                    // Show the respective menu
+	                    controls.showMenuPanel.call(_this8, type);
+	                }, false);
+
+	                // Show menu on click
+	                on(menuItem, 'click', function () {
+	                    controls.showMenuPanel.call(_this8, type);
+	                });
 
 	                var flex = createElement('span', null, i18n.get(type, _this8.config));
 
@@ -8028,8 +8079,23 @@ typeof navigator === "object" && (function (global, factory) {
 	                    class: _this8.config.classNames.hidden
 	                }, i18n.get('menuBack', _this8.config)));
 
-	                // Bind listener
-	                backButton.addEventListener('click', function () {
+	                // Handle space or -> to open menu
+	                on(backButton, 'keydown', function (event) {
+	                    // We only care about <-
+	                    if (event.which !== 37) {
+	                        return;
+	                    }
+
+	                    // Prevent seek
+	                    event.preventDefault();
+	                    event.stopPropagation();
+
+	                    // Show the respective menu
+	                    controls.showMenuPanel.call(_this8, 'home');
+	                }, false);
+
+	                // Go back
+	                on(backButton, 'click', function () {
 	                    controls.showMenuPanel.call(_this8, 'home');
 	                });
 
@@ -8043,16 +8109,9 @@ typeof navigator === "object" && (function (global, factory) {
 
 	                inner.appendChild(pane);
 
-	                menuItem.addEventListener('click', function () {
-	                    controls.showMenuPanel.call(_this8, type);
-	                });
-
 	                _this8.elements.settings.buttons[type] = menuItem;
 	                _this8.elements.settings.panels[type] = pane;
 	            });
-
-	            home.appendChild(menu);
-	            inner.appendChild(home);
 
 	            popup.appendChild(inner);
 	            control.appendChild(popup);
@@ -12201,7 +12260,7 @@ typeof navigator === "object" && (function (global, factory) {
 	            var params = {
 	                AV_PUBLISHERID: '58c25bb0073ef448b1087ad6',
 	                AV_CHANNELID: '5a0458dc28a06145e4519d21',
-	                AV_URL: location.hostname,
+	                AV_URL: window.location.hostname,
 	                cb: Date.now(),
 	                AV_WIDTH: 640,
 	                AV_HEIGHT: 480,
@@ -12846,6 +12905,7 @@ typeof navigator === "object" && (function (global, factory) {
 	        value: function on$$1(event, callback) {
 	            on.call(this, this.elements.container, event, callback);
 	        }
+
 	        /**
 	         * Add event listeners once
 	         * @param {string} event - Event type
@@ -12857,6 +12917,7 @@ typeof navigator === "object" && (function (global, factory) {
 	        value: function once$$1(event, callback) {
 	            once.call(this, this.elements.container, event, callback);
 	        }
+
 	        /**
 	         * Remove event listeners
 	         * @param {string} event - Event type
@@ -13132,8 +13193,9 @@ typeof navigator === "object" && (function (global, factory) {
 	            // Faux duration set via config
 	            var fauxDuration = parseFloat(this.config.duration);
 
-	            // Media duration can be NaN before the media has loaded
-	            var duration = (this.media || {}).duration || 0;
+	            // Media duration can be NaN or Infinity before the media has loaded
+	            var realDuration = (this.media || {}).duration;
+	            var duration = !is$1.number(realDuration) || realDuration === Infinity ? 0 : realDuration;
 
 	            // If config duration is funky, use regular duration
 	            return fauxDuration || duration;

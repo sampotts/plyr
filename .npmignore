@@ -2,3 +2,10 @@ demo
 .github
 .vscode
 *.code-workspace
+aws.json
+bundles.json
+yarn.lock
+package-lock.json
+*.mp4
+*.webm
+!dist/blank.mp4

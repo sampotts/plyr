@@ -1,3 +1,13 @@
+# v3.3.16
+
+-   Hide currentTime and progress for streams (thanks @mimse)
+-   Fixed condition check (thanks @mimse)
+-   Handle undefined this.player.elements.buttons.play (thanks @klassicd)
+-   Fix captions.toggle() if there is no toggle button (thanks @friday)
+-   Minor increaseVolume and decreaseVolume changes (thanks @friday)
+-   Fix YouTube muting after seeking with the progress slider (thanks @friday)
+-   Respect preload="none" when setting quality if the media hasn't been loaded some other way (thanks @friday)
+
 # v3.3.15
 
 -   Fix for error relating to play buttons when switching source
@@ -20,8 +30,8 @@ Thanks @friday for the following:
 -   Suggestion: Remove array newline rule
 -   Contributions improvements
 
--   fix: html5.cancelRequest not remove source tag correctly (thanks @a60814billy)
--   remove event listeners in destroy() (thanks @cky917)
+-   Fix html5.cancelRequest not remove source tag correctly (thanks @a60814billy)
+-   Remove event listeners in destroy() (thanks @cky917)
 -   Fix markdown in README (thanks @azu)
 -   Some parts of the accessibility improvements outlined in #905 (more on the way...)
 -   Fix for bug where volume slider didn't always show
