@@ -16,7 +16,7 @@ A simple, lightweight, accessible and customizable HTML5, YouTube and Vimeo medi
 *   **HTML Video & Audio** - support for both formats
 *   **[Embedded Video](#embeds)** - support for YouTube and Vimeo video playback
 *   **[Monetization](#ads)** - make money from your videos
-*   **[Streaming](#streaming)** - support for hls.js, Shaka and dash.js streaming playback
+*   **[Streaming](#try-plyr-online)** - support for hls.js, Shaka and dash.js streaming playback
 *   **[API](#api)** - toggle playback, volume, seeking, and more through a standardized API
 *   **[Events](#events)** - no messing around with Vimeo and YouTube APIs, all events are standardized across formats
 *   **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes
