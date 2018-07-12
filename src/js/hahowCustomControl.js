@@ -244,7 +244,7 @@ const hahow = {
 
         // Set options if passed and filter based on uniqueness and config
         if (is.array(options)) {
-            this.options.quality = dedupe(options).filter(quality => this.config.quality.options.includes(quality));
+            this.options.quality = dedupe(options);
         }
 
         // Toggle the pane and tab
