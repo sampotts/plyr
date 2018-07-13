@@ -264,10 +264,7 @@ const hahow = {
 
         // Sort options by the config and then render options
         this.options.quality
-            .sort((a, b) => {
-                const sorting = this.config.quality.options;
-                return sorting.indexOf(a) > sorting.indexOf(b) ? 1 : -1;
-            })
+            .sort((a, b) => a - b)
             .forEach(quality => {
                 controls.createMenuItem.call(this, {
                     value: quality,

@@ -7469,7 +7469,9 @@ typeof navigator === "object" && (function (global, factory) {
 	            }
 
 	            // Disabled value
-	            if (!this.config[setting].options.includes(value)) {
+	            // We generate resolution option from real contents.
+	            // Therefore, bypasss checking on ‘quality’ config.
+	            if (setting !== 'quality' && !this.config[setting].options.includes(value)) {
 	                this.debug.warn('Disabled value of \'' + value + '\' for ' + setting);
 	                return;
 	            }
@@ -12818,8 +12820,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 	        // Sort options by the config and then render options
 	        this.options.quality.sort(function (a, b) {
-	            var sorting = _this2.config.quality.options;
-	            return sorting.indexOf(a) > sorting.indexOf(b) ? 1 : -1;
+	            return a - b;
 	        }).forEach(function (quality) {
 	            controls.createMenuItem.call(_this2, {
 	                value: quality,

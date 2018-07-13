@@ -783,7 +783,9 @@ const controls = {
             }
 
             // Disabled value
-            if (!this.config[setting].options.includes(value)) {
+            // We generate resolution option from real contents.
+            // Therefore, bypasss checking on ‘quality’ config.
+            if (setting !== 'quality' && !this.config[setting].options.includes(value)) {
                 this.debug.warn(`Disabled value of '${value}' for ${setting}`);
                 return;
             }
