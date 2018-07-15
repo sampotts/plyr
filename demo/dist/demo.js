@@ -1874,7 +1874,7 @@ typeof navigator === "object" && (function () {
 	  // webpack (using a build step causes webpack #1617). Grunt verifies that
 	  // this value matches package.json during build.
 	  //   See: https://github.com/getsentry/raven-js/issues/465
-	  VERSION: '3.26.2',
+	  VERSION: '3.26.3',
 
 	  debug: false,
 
@@ -2351,7 +2351,9 @@ typeof navigator === "object" && (function () {
 	      return;
 	    }
 
-	    if (this._globalOptions.stacktrace || (options && options.stacktrace)) {
+	    // Always attempt to get stacktrace if message is empty.
+	    // It's the only way to provide any helpful information to the user.
+	    if (this._globalOptions.stacktrace || options.stacktrace || data.message === '') {
 	      // fingerprint on msg, not stack trace (legacy behavior, could be revisited)
 	      data.fingerprint = data.fingerprint == null ? msg : data.fingerprint;
 
@@ -3508,6 +3510,11 @@ typeof navigator === "object" && (function () {
 	      options
 	    );
 
+	    var ex = data.exception.values[0];
+	    if (ex.type == null && ex.value === '') {
+	      ex.value = 'Unrecoverable error caught';
+	    }
+
 	    // Move mechanism from options to exception interface
 	    // We do this, as requiring user to pass `{exception:{mechanism:{ ... }}}` would be
 	    // too much
@@ -4090,6 +4097,9 @@ typeof navigator === "object" && (function () {
 
 	    document.addEventListener('DOMContentLoaded', function () {
 	        singleton.context(function () {
+	            var selector = '#player';
+	            var container = document.getElementById('container');
+
 	            if (window.shr) {
 	                window.shr.setup({
 	                    count: {
@@ -4103,6 +4113,9 @@ typeof navigator === "object" && (function () {
 
 	            // Remove class on blur
 	            document.addEventListener('focusout', function (event) {
+	                if (container.contains(event.target)) {
+	                    return;
+	                }
 	                event.target.classList.remove(tabClassName);
 	            });
 
@@ -4115,12 +4128,18 @@ typeof navigator === "object" && (function () {
 	                // Delay the adding of classname until the focus has changed
 	                // This event fires before the focusin event
 	                setTimeout(function () {
-	                    document.activeElement.classList.add(tabClassName);
-	                }, 0);
+	                    var focused = document.activeElement;
+
+	                    if (!focused || container.contains(focused)) {
+	                        return;
+	                    }
+
+	                    focused.classList.add(tabClassName);
+	                }, 10);
 	            });
 
 	            // Setup the player
-	            var player = new Plyr('#player', {
+	            var player = new Plyr(selector, {
 	                debug: true,
 	                title: 'View From A Blue Moon',
 	                iconUrl: '../dist/plyr.svg',

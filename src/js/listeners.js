@@ -5,7 +5,13 @@
 import controls from './controls';
 import ui from './ui';
 import browser from './utils/browser';
-import { getElement, getElements, getFocusElement, matches, toggleClass, toggleHidden } from './utils/elements';
+import {
+    getElement,
+    getElements,
+    matches,
+    toggleClass,
+    toggleHidden,
+} from './utils/elements';
 import { on, once, toggleListener, triggerEvent } from './utils/events';
 import is from './utils/is';
 
@@ -13,9 +19,12 @@ class Listeners {
     constructor(player) {
         this.player = player;
         this.lastKey = null;
+        this.focusTimer = null;
+        this.lastKeyDown = null;
 
         this.handleKey = this.handleKey.bind(this);
         this.toggleMenu = this.toggleMenu.bind(this);
+        this.setTabFocus = this.setTabFocus.bind(this);
         this.firstTouch = this.firstTouch.bind(this);
     }
 
@@ -45,20 +54,50 @@ class Listeners {
         // Handle the key on keydown
         // Reset on keyup
         if (pressed) {
-            // Which keycodes should we prevent default
-            const preventDefault = [32, 37, 38, 39, 40, 48, 49, 50, 51, 52, 53, 54, 56, 57, 67, 70, 73, 75, 76, 77, 79];
-
             // Check focused element
             // and if the focused element is not editable (e.g. text input)
             // and any that accept key input http://webaim.org/techniques/keyboard/
-            const focused = getFocusElement();
-            if (
-                is.element(focused) &&
-                (focused !== this.player.elements.inputs.seek &&
-                    matches(focused, this.player.config.selectors.editable))
-            ) {
-                return;
+            const focused = document.activeElement;
+            if (is.element(focused)) {
+                const { editable } = this.player.config.selectors;
+                const { seek } = this.player.elements.inputs;
+
+                if (focused !== seek && matches(focused, editable)) {
+                    return;
+                }
+
+                if (
+                    event.which === 32 &&
+                    matches(focused, 'button, [role^="menuitem"]')
+                ) {
+                    return;
+                }
             }
+
+            // Which keycodes should we prevent default
+            const preventDefault = [
+                32,
+                37,
+                38,
+                39,
+                40,
+                48,
+                49,
+                50,
+                51,
+                52,
+                53,
+                54,
+                56,
+                57,
+                67,
+                70,
+                73,
+                75,
+                76,
+                77,
+                79,
+            ];
 
             // If the code is found prevent default (e.g. prevent scrolling for arrows)
             if (preventDefault.includes(code)) {
@@ -153,7 +192,11 @@ class Listeners {
 
             // Escape is handle natively when in full screen
             // So we only need to worry about non native
-            if (!this.player.fullscreen.enabled && this.player.fullscreen.active && code === 27) {
+            if (
+                !this.player.fullscreen.enabled &&
+                this.player.fullscreen.active &&
+                code === 27
+            ) {
                 this.player.fullscreen.toggle();
             }
 
@@ -174,47 +217,116 @@ class Listeners {
         this.player.touch = true;
 
         // Add touch class
-        toggleClass(this.player.elements.container, this.player.config.classNames.isTouch, true);
+        toggleClass(
+            this.player.elements.container,
+            this.player.config.classNames.isTouch,
+            true,
+        );
+    }
+
+    setTabFocus(event) {
+        clearTimeout(this.focusTimer);
+
+        // Ignore any key other than tab
+        if (event.type === 'keydown' && event.code !== 'Tab') {
+            return;
+        }
+
+        // Store reference to event timeStamp
+        if (event.type === 'keydown') {
+            this.lastKeyDown = event.timeStamp;
+        }
+
+        // Remove current classes
+        const removeCurrent = () => {
+            const className = this.player.config.classNames.tabFocus;
+            const current = getElements.call(this.player, `.${className}`);
+            toggleClass(current, className, false);
+        };
+
+        // Determine if a key was pressed to trigger this event
+        const wasKeyDown = event.timeStamp - this.lastKeyDown <= 20;
+
+        // Ignore focus events if a key was pressed prior
+        if (event.type === 'focus' && !wasKeyDown) {
+            return;
+        }
+
+        // Remove all current
+        removeCurrent();
+
+        // Delay the adding of classname until the focus has changed
+        // This event fires before the focusin event
+
+        this.focusTimer = setTimeout(() => {
+            const focused = document.activeElement;
+
+            // Ignore if current focus element isn't inside the player
+            if (!this.player.elements.container.contains(focused)) {
+                return;
+            }
+
+            toggleClass(
+                document.activeElement,
+                this.player.config.classNames.tabFocus,
+                true,
+            );
+        }, 10);
     }
 
     // Global window & document listeners
     global(toggle = true) {
         // Keyboard shortcuts
         if (this.player.config.keyboard.global) {
-            toggleListener.call(this.player, window, 'keydown keyup', this.handleKey, toggle, false);
+            toggleListener.call(
+                this.player,
+                window,
+                'keydown keyup',
+                this.handleKey,
+                toggle,
+                false,
+            );
         }
 
         // Click anywhere closes menu
-        toggleListener.call(this.player, document.body, 'click', this.toggleMenu, toggle);
+        toggleListener.call(
+            this.player,
+            document.body,
+            'click',
+            this.toggleMenu,
+            toggle,
+        );
 
         // Detect touch by events
         once.call(this.player, document.body, 'touchstart', this.firstTouch);
+
+        // Tab focus detection
+        toggleListener.call(
+            this.player,
+            document.body,
+            'keydown focus blur',
+            this.setTabFocus,
+            toggle,
+            false,
+            true,
+        );
     }
 
     // Container listeners
     container() {
         // Keyboard shortcuts
-        if (!this.player.config.keyboard.global && this.player.config.keyboard.focused) {
-            on.call(this.player, this.player.elements.container, 'keydown keyup', this.handleKey, false);
+        if (
+            !this.player.config.keyboard.global &&
+            this.player.config.keyboard.focused
+        ) {
+            on.call(
+                this.player,
+                this.player.elements.container,
+                'keydown keyup',
+                this.handleKey,
+                false,
+            );
         }
-
-        // Detect tab focus
-        // Remove class on blur/focusout
-        on.call(this.player, this.player.elements.container, 'focusout', event => {
-            toggleClass(event.target, this.player.config.classNames.tabFocus, false);
-        });
-        // Add classname to tabbed elements
-        on.call(this.player, this.player.elements.container, 'keydown', event => {
-            if (event.keyCode !== 9) {
-                return;
-            }
-
-            // Delay the adding of classname until the focus has changed
-            // This event fires before the focusin event
-            setTimeout(() => {
-                toggleClass(getFocusElement(), this.player.config.classNames.tabFocus, true);
-            }, 0);
-        });
 
         // Toggle controls on mouse events and entering fullscreen
         on.call(
@@ -231,7 +343,9 @@ class Listeners {
                 }
 
                 // Show, then hide after a timeout unless another control event occurs
-                const show = ['touchstart', 'touchmove', 'mousemove'].includes(event.type);
+                const show = ['touchstart', 'touchmove', 'mousemove'].includes(
+                    event.type,
+                );
 
                 let delay = 0;
 
@@ -245,7 +359,10 @@ class Listeners {
                 clearTimeout(this.player.timers.controls);
 
                 // Set new timer to prevent flicker when seeking
-                this.player.timers.controls = setTimeout(() => ui.toggleControls.call(this.player, false), delay);
+                this.player.timers.controls = setTimeout(
+                    () => ui.toggleControls.call(this.player, false),
+                    delay,
+                );
             },
         );
     }
@@ -253,34 +370,50 @@ class Listeners {
     // Listen for media events
     media() {
         // Time change on media
-        on.call(this.player, this.player.media, 'timeupdate seeking seeked', event =>
-            controls.timeUpdate.call(this.player, event),
+        on.call(
+            this.player,
+            this.player.media,
+            'timeupdate seeking seeked',
+            event => controls.timeUpdate.call(this.player, event),
         );
 
         // Display duration
-        on.call(this.player, this.player.media, 'durationchange loadeddata loadedmetadata', event =>
-            controls.durationUpdate.call(this.player, event),
+        on.call(
+            this.player,
+            this.player.media,
+            'durationchange loadeddata loadedmetadata',
+            event => controls.durationUpdate.call(this.player, event),
         );
 
         // Check for audio tracks on load
         // We can't use `loadedmetadata` as it doesn't seem to have audio tracks at that point
         on.call(this.player, this.player.media, 'canplay', () => {
             toggleHidden(this.player.elements.volume, !this.player.hasAudio);
-            toggleHidden(this.player.elements.buttons.mute, !this.player.hasAudio);
+            toggleHidden(
+                this.player.elements.buttons.mute,
+                !this.player.hasAudio,
+            );
         });
 
         // Handle the media finishing
         on.call(this.player, this.player.media, 'ended', () => {
             // Show poster on end
-            if (this.player.isHTML5 && this.player.isVideo && this.player.config.resetOnEnd) {
+            if (
+                this.player.isHTML5 &&
+                this.player.isVideo &&
+                this.player.config.resetOnEnd
+            ) {
                 // Restart
                 this.player.restart();
             }
         });
 
         // Check for buffer progress
-        on.call(this.player, this.player.media, 'progress playing seeking seeked', event =>
-            controls.updateProgress.call(this.player, event),
+        on.call(
+            this.player,
+            this.player.media,
+            'progress playing seeking seeked',
+            event => controls.updateProgress.call(this.player, event),
         );
 
         // Handle volume changes
@@ -289,13 +422,19 @@ class Listeners {
         );
 
         // Handle play/pause
-        on.call(this.player, this.player.media, 'playing play pause ended emptied timeupdate', event =>
-            ui.checkPlaying.call(this.player, event),
+        on.call(
+            this.player,
+            this.player.media,
+            'playing play pause ended emptied timeupdate',
+            event => ui.checkPlaying.call(this.player, event),
         );
 
         // Loading state
-        on.call(this.player, this.player.media, 'waiting canplay seeked playing', event =>
-            ui.checkLoading.call(this.player, event),
+        on.call(
+            this.player,
+            this.player.media,
+            'waiting canplay seeked playing',
+            event => ui.checkLoading.call(this.player, event),
         );
 
         // If autoplay, then load advertisement if required
@@ -308,14 +447,23 @@ class Listeners {
             // If ads are enabled, wait for them first
             if (this.player.ads.enabled && !this.player.ads.initialized) {
                 // Wait for manager response
-                this.player.ads.managerPromise.then(() => this.player.ads.play()).catch(() => this.player.play());
+                this.player.ads.managerPromise
+                    .then(() => this.player.ads.play())
+                    .catch(() => this.player.play());
             }
         });
 
         // Click video
-        if (this.player.supported.ui && this.player.config.clickToPlay && !this.player.isAudio) {
+        if (
+            this.player.supported.ui &&
+            this.player.config.clickToPlay &&
+            !this.player.isAudio
+        ) {
             // Re-fetch the wrapper
-            const wrapper = getElement.call(this.player, `.${this.player.config.classNames.video}`);
+            const wrapper = getElement.call(
+                this.player,
+                `.${this.player.config.classNames.video}`,
+            );
 
             // Bail if there's no wrapper (this should never happen)
             if (!is.element(wrapper)) {
@@ -325,7 +473,11 @@ class Listeners {
             // On click play, pause ore restart
             on.call(this.player, wrapper, 'click', () => {
                 // Touch devices will just show controls (if we're hiding controls)
-                if (this.player.config.hideControls && this.player.touch && !this.player.paused) {
+                if (
+                    this.player.config.hideControls &&
+                    this.player.touch &&
+                    !this.player.paused
+                ) {
                     return;
                 }
 
@@ -356,7 +508,10 @@ class Listeners {
         // Volume change
         on.call(this.player, this.player.media, 'volumechange', () => {
             // Save to storage
-            this.player.storage.set({ volume: this.player.volume, muted: this.player.muted });
+            this.player.storage.set({
+                volume: this.player.volume,
+                muted: this.player.muted,
+            });
         });
 
         // Speed change
@@ -377,12 +532,20 @@ class Listeners {
         // Quality change
         on.call(this.player, this.player.media, 'qualitychange', event => {
             // Update UI
-            controls.updateSetting.call(this.player, 'quality', null, event.detail.quality);
+            controls.updateSetting.call(
+                this.player,
+                'quality',
+                null,
+                event.detail.quality,
+            );
         });
 
         // Proxy events to container
         // Bubble up key events for Edge
-        const proxyEvents = this.player.config.events.concat(['keyup', 'keydown']).join(' ');
+        const proxyEvents = this.player.config.events
+            .concat(['keyup', 'keydown'])
+            .join(' ');
+
         on.call(this.player, this.player.media, proxyEvents, event => {
             let { detail = {} } = event;
 
@@ -391,7 +554,13 @@ class Listeners {
                 detail = this.player.media.error;
             }
 
-            triggerEvent.call(this.player, this.player.elements.container, event.type, true, detail);
+            triggerEvent.call(
+                this.player,
+                this.player.elements.container,
+                event.type,
+                true,
+                detail,
+            );
         });
     }
 
@@ -439,13 +608,28 @@ class Listeners {
         }
 
         // Pause
-        this.bind(this.player.elements.buttons.restart, 'click', this.player.restart, 'restart');
+        this.bind(
+            this.player.elements.buttons.restart,
+            'click',
+            this.player.restart,
+            'restart',
+        );
 
         // Rewind
-        this.bind(this.player.elements.buttons.rewind, 'click', this.player.rewind, 'rewind');
+        this.bind(
+            this.player.elements.buttons.rewind,
+            'click',
+            this.player.rewind,
+            'rewind',
+        );
 
         // Rewind
-        this.bind(this.player.elements.buttons.fastForward, 'click', this.player.forward, 'fastForward');
+        this.bind(
+            this.player.elements.buttons.fastForward,
+            'click',
+            this.player.forward,
+            'fastForward',
+        );
 
         // Mute toggle
         this.bind(
@@ -458,7 +642,9 @@ class Listeners {
         );
 
         // Captions toggle
-        this.bind(this.player.elements.buttons.captions, 'click', () => this.player.toggleCaptions());
+        this.bind(this.player.elements.buttons.captions, 'click', () =>
+            this.player.toggleCaptions(),
+        );
 
         // Fullscreen toggle
         this.bind(
@@ -481,7 +667,12 @@ class Listeners {
         );
 
         // Airplay
-        this.bind(this.player.elements.buttons.airplay, 'click', this.player.airplay, 'airplay');
+        this.bind(
+            this.player.elements.buttons.airplay,
+            'click',
+            this.player.airplay,
+            'airplay',
+        );
 
         // Settings menu - click toggle
         this.bind(this.player.elements.buttons.settings, 'click', event => {
@@ -512,37 +703,51 @@ class Listeners {
         );
 
         // Set range input alternative "value", which matches the tooltip time (#954)
-        this.bind(this.player.elements.inputs.seek, 'mousedown mousemove', event => {
-            const clientRect = this.player.elements.progress.getBoundingClientRect();
-            const percent = 100 / clientRect.width * (event.pageX - clientRect.left);
-            event.currentTarget.setAttribute('seek-value', percent);
-        });
+        this.bind(
+            this.player.elements.inputs.seek,
+            'mousedown mousemove',
+            event => {
+                const clientRect = this.player.elements.progress.getBoundingClientRect();
+                const percent =
+                    100 / clientRect.width * (event.pageX - clientRect.left);
+                event.currentTarget.setAttribute('seek-value', percent);
+            },
+        );
 
         // Pause while seeking
-        this.bind(this.player.elements.inputs.seek, 'mousedown mouseup keydown keyup touchstart touchend', event => {
-            const seek = event.currentTarget;
+        this.bind(
+            this.player.elements.inputs.seek,
+            'mousedown mouseup keydown keyup touchstart touchend',
+            event => {
+                const seek = event.currentTarget;
 
-            const code = event.keyCode ? event.keyCode : event.which;
-            const eventType = event.type;
+                const code = event.keyCode ? event.keyCode : event.which;
+                const eventType = event.type;
 
-            if ((eventType === 'keydown' || eventType === 'keyup') && (code !== 39 && code !== 37)) {
-                return;
-            }
-            // Was playing before?
-            const play = seek.hasAttribute('play-on-seeked');
+                if (
+                    (eventType === 'keydown' || eventType === 'keyup') &&
+                    (code !== 39 && code !== 37)
+                ) {
+                    return;
+                }
+                // Was playing before?
+                const play = seek.hasAttribute('play-on-seeked');
 
-            // Done seeking
-            const done = ['mouseup', 'touchend', 'keyup'].includes(event.type);
+                // Done seeking
+                const done = ['mouseup', 'touchend', 'keyup'].includes(
+                    event.type,
+                );
 
-            // If we're done seeking and it was playing, resume playback
-            if (play && done) {
-                seek.removeAttribute('play-on-seeked');
-                this.player.play();
-            } else if (!done && this.player.playing) {
-                seek.setAttribute('play-on-seeked', '');
-                this.player.pause();
-            }
-        });
+                // If we're done seeking and it was playing, resume playback
+                if (play && done) {
+                    seek.removeAttribute('play-on-seeked');
+                    this.player.play();
+                } else if (!done && this.player.playing) {
+                    seek.setAttribute('play-on-seeked', '');
+                    this.player.pause();
+                }
+            },
+        );
 
         // Seek
         this.bind(
@@ -560,14 +765,18 @@ class Listeners {
 
                 seek.removeAttribute('seek-value');
 
-                this.player.currentTime = seekTo / seek.max * this.player.duration;
+                this.player.currentTime =
+                    seekTo / seek.max * this.player.duration;
             },
             'seek',
         );
 
         // Current time invert
         // Only if one time element is used for both currentTime and duration
-        if (this.player.config.toggleInvert && !is.element(this.player.elements.display.duration)) {
+        if (
+            this.player.config.toggleInvert &&
+            !is.element(this.player.elements.display.duration)
+        ) {
             this.bind(this.player.elements.display.currentTime, 'click', () => {
                 // Do nothing if we're at the start
                 if (this.player.currentTime === 0) {
@@ -592,32 +801,54 @@ class Listeners {
 
         // Polyfill for lower fill in <input type="range"> for webkit
         if (browser.isWebkit) {
-            Array.from(getElements.call(this.player, 'input[type="range"]')).forEach(element => {
-                this.bind(element, 'input', event => controls.updateRangeFill.call(this.player, event.target));
+            Array.from(
+                getElements.call(this.player, 'input[type="range"]'),
+            ).forEach(element => {
+                this.bind(element, 'input', event =>
+                    controls.updateRangeFill.call(this.player, event.target),
+                );
             });
         }
 
         // Seek tooltip
-        this.bind(this.player.elements.progress, 'mouseenter mouseleave mousemove', event =>
-            controls.updateSeekTooltip.call(this.player, event),
+        this.bind(
+            this.player.elements.progress,
+            'mouseenter mouseleave mousemove',
+            event => controls.updateSeekTooltip.call(this.player, event),
         );
 
         // Update controls.hover state (used for ui.toggleControls to avoid hiding when interacting)
-        this.bind(this.player.elements.controls, 'mouseenter mouseleave', event => {
-            this.player.elements.controls.hover = !this.player.touch && event.type === 'mouseenter';
-        });
+        this.bind(
+            this.player.elements.controls,
+            'mouseenter mouseleave',
+            event => {
+                this.player.elements.controls.hover =
+                    !this.player.touch && event.type === 'mouseenter';
+            },
+        );
 
         // Update controls.pressed state (used for ui.toggleControls to avoid hiding when interacting)
-        this.bind(this.player.elements.controls, 'mousedown mouseup touchstart touchend touchcancel', event => {
-            this.player.elements.controls.pressed = ['mousedown', 'touchstart'].includes(event.type);
-        });
+        this.bind(
+            this.player.elements.controls,
+            'mousedown mouseup touchstart touchend touchcancel',
+            event => {
+                this.player.elements.controls.pressed = [
+                    'mousedown',
+                    'touchstart',
+                ].includes(event.type);
+            },
+        );
 
         // Focus in/out on controls
         this.bind(this.player.elements.controls, 'focusin focusout', event => {
             const { config, elements, timers } = this.player;
 
             // Skip transition to prevent focus from scrolling the parent element
-            toggleClass(elements.controls, config.classNames.noTransition, event.type === 'focusin');
+            toggleClass(
+                elements.controls,
+                config.classNames.noTransition,
+                event.type === 'focusin',
+            );
 
             // Toggle
             ui.toggleControls.call(this.player, event.type === 'focusin');
@@ -626,7 +857,11 @@ class Listeners {
             if (event.type === 'focusin') {
                 // Restore transition
                 setTimeout(() => {
-                    toggleClass(elements.controls, config.classNames.noTransition, false);
+                    toggleClass(
+                        elements.controls,
+                        config.classNames.noTransition,
+                        false,
+                    );
                 }, 0);
 
                 // Delay a little more for keyboard users
@@ -634,8 +869,12 @@ class Listeners {
 
                 // Clear timer
                 clearTimeout(timers.controls);
+
                 // Hide
-                timers.controls = setTimeout(() => ui.toggleControls.call(this.player, false), delay);
+                timers.controls = setTimeout(
+                    () => ui.toggleControls.call(this.player, false),
+                    delay,
+                );
             }
         });
 
@@ -649,7 +888,9 @@ class Listeners {
                 const inverted = event.webkitDirectionInvertedFromDevice;
 
                 // Get delta from event. Invert if `inverted` is true
-                const [x, y] = [event.deltaX, -event.deltaY].map(value => (inverted ? -value : value));
+                const [x, y] = [event.deltaX, -event.deltaY].map(
+                    value => (inverted ? -value : value),
+                );
 
                 // Using the biggest delta, normalize to 1 or -1 (or 0 if no delta)
                 const direction = Math.sign(Math.abs(x) > Math.abs(y) ? x : y);
@@ -659,7 +900,10 @@ class Listeners {
 
                 // Don't break page scrolling at max and min
                 const { volume } = this.player.media;
-                if ((direction === 1 && volume < 1) || (direction === -1 && volume > 0)) {
+                if (
+                    (direction === 1 && volume < 1) ||
+                    (direction === -1 && volume > 0)
+                ) {
                     event.preventDefault();
                 }
             },

@@ -1,5 +1,6 @@
 // ==========================================================================
 // Plyr controls
+// TODO: This needs to be split into smaller files and cleaned up
 // ==========================================================================
 
 import captions from './captions';
@@ -360,11 +361,53 @@ const controls = {
         return container;
     },
 
+    // Bind keyboard shortcuts for a menu item
+    bindMenuItemShortcuts(menuItem, type) {
+        // Handle space or -> to open menu
+        on(menuItem, 'keydown', event => {
+            // We only care about space and ⬆️ ⬇️️ ➡️
+            if (![32,38,39,40].includes(event.which)) {
+                return;
+            }
+
+            // Prevent play / seek
+            event.preventDefault();
+            event.stopPropagation();
+
+            const isRadioButton = matches(menuItem, '[role="menuitemradio"]');
+
+            // Show the respective menu
+            if (!isRadioButton && [32,39].includes(event.which)) {
+                controls.showMenuPanel.call(this, type);
+            } else {
+                let target;
+
+                if (event.which !== 32) {
+                    if (event.which === 40 || isRadioButton && event.which === 39) {
+                        target = menuItem.nextElementSibling;
+
+                        if (!is.element(target)) {
+                            target = menuItem.parentNode.firstElementChild;
+                        }
+                    } else {
+                        target = menuItem.previousElementSibling;
+
+                        if (!is.element(target)) {
+                            target = menuItem.parentNode.lastElementChild;
+                        }
+                    }
+
+                    setFocus.call(this, target, true);
+                }
+            }
+        }, false);
+    },
+
     // Create a settings menu item
     createMenuItem({ value, list, type, title, badge = null, checked = false }) {
         const attributes = getAttributesFromSelector(this.config.selectors.inputs[type]);
 
-        const item = createElement(
+        const menuItem = createElement(
             'button',
             extend(attributes, {
                 type: 'button',
@@ -384,30 +427,38 @@ const controls = {
             flex.appendChild(badge);
         }
 
-        item.appendChild(flex);
+        menuItem.appendChild(flex);
 
-        Object.defineProperty(item, 'checked', {
+        // Replicate radio button behaviour
+        Object.defineProperty(menuItem, 'checked', {
             enumerable: true,
             get() {
-                return item.getAttribute('aria-checked') === 'true';
+                return menuItem.getAttribute('aria-checked') === 'true';
             },
             set(checked) {
                 // Ensure exclusivity
                 if (checked) {
-                    Array.from(item.parentNode.children)
+                    Array.from(menuItem.parentNode.children)
                         .filter(node => matches(node, '[role="menuitemradio"]'))
                         .forEach(node => node.setAttribute('aria-checked', 'false'));
                 }
 
-                item.setAttribute('aria-checked', checked ? 'true' : 'false');
+                menuItem.setAttribute('aria-checked', checked ? 'true' : 'false');
             },
         });
 
         this.listeners.bind(
-            item,
-            'click',
-            () => {
-                item.checked = true;
+            menuItem,
+            'click keydown',
+            event => {
+                if (event.type === 'keydown' && event.which !== 32) {
+                    return;
+                }
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                menuItem.checked = true;
 
                 switch (type) {
                     case 'language':
@@ -429,9 +480,12 @@ const controls = {
                 controls.showMenuPanel.call(this, 'home');
             },
             type,
+            false,
         );
 
-        list.appendChild(item);
+        controls.bindMenuItemShortcuts.call(this, menuItem, type);
+
+        list.appendChild(menuItem);
     },
 
     // Format a time for display
@@ -993,7 +1047,7 @@ const controls = {
     },
 
     // Show/hide menu
-    toggleMenu(event) {
+    toggleMenu(input) {
         const { popup } = this.elements.settings;
         const button = this.elements.buttons.settings;
 
@@ -1002,11 +1056,11 @@ const controls = {
             return;
         }
 
-        const show = is.boolean(event) ? event : is.element(popup) && popup.hasAttribute('hidden');
+        const show = is.boolean(input) ? input : is.element(popup) && popup.hasAttribute('hidden');
 
-        if (is.event(event)) {
-            const isMenuItem = is.element(popup) && popup.contains(event.target);
-            const isButton = event.target === this.elements.buttons.settings;
+        if (is.event(input)) {
+            const isMenuItem = is.element(popup) && popup.contains(input.target);
+            const isButton = input.target === this.elements.buttons.settings;
 
             // If the click was inside the form or if the click
             // wasn't the button or menu item and we're trying to
@@ -1017,7 +1071,7 @@ const controls = {
 
             // Prevent the toggle being caught by the doc listener
             if (isButton) {
-                event.stopPropagation();
+                input.stopPropagation();
             }
         }
 
@@ -1031,17 +1085,11 @@ const controls = {
             toggleHidden(popup, !show);
             toggleClass(this.elements.container, this.config.classNames.menu.open, show);
 
-            if (show) {
-                popup.removeAttribute('tabindex');
-
-                // Focus the first item if key interaction
-                if (event.type === 'keydown') {
-                    const pane = Object.values(this.elements.settings.panels).find(pane => !pane.hidden);
-                    const firstItem = pane.querySelector('[role^="menuitem"]');
-                    setFocus.call(this, firstItem, true);
-                }
-            } else {
-                popup.setAttribute('tabindex', -1);
+            // Focus the first item if key interaction
+            if (show && is.event(input) && input.type === 'keydown') {
+                const pane = Object.values(this.elements.settings.panels).find(pane => !pane.hidden);
+                const firstItem = pane.querySelector('[role^="menuitem"]');
+                setFocus.call(this, firstItem, true);
             }
         }
     },
@@ -1275,9 +1323,11 @@ const controls = {
 
             home.appendChild(menu);
             inner.appendChild(home);
+            this.elements.settings.panels.home = home;
 
             // Build the menu items
             this.config.settings.forEach(type => {
+                // TODO: bundle this with the createMenuItem helper and bindings
                 const menuItem = createElement(
                     'button',
                     extend(getAttributesFromSelector(this.config.selectors.buttons.settings), {
@@ -1289,20 +1339,8 @@ const controls = {
                     }),
                 );
 
-                // Handle space or -> to open menu
-                on(menuItem, 'keydown', event => {
-                    // We only care about space and ->
-                    if (![32,39].includes(event.which)) {
-                        return;
-                    }
-
-                    // Prevent play / seek
-                    event.preventDefault();
-                    event.stopPropagation();
-
-                    // Show the respective menu
-                    controls.showMenuPanel.call(this, type);
-                }, false);
+                // Bind menu shortcuts for keyboard users
+                controls.bindMenuItemShortcuts.call(this, menuItem, type);
 
                 // Show menu on click
                 on(menuItem, 'click', () => {
@@ -1356,8 +1394,8 @@ const controls = {
                     ),
                 );
 
-                // Handle space or -> to open menu
-                on(backButton, 'keydown', event => {
+                // Go back via keyboard
+                on(pane, 'keydown', event => {
                     // We only care about <-
                     if (event.which !== 37) {
                         return;
@@ -1371,7 +1409,7 @@ const controls = {
                     controls.showMenuPanel.call(this, 'home');
                 }, false);
 
-                // Go back
+                // Go back via button click
                 on(backButton, 'click', () => {
                     controls.showMenuPanel.call(this, 'home');
                 });

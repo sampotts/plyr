@@ -5934,6 +5934,12 @@ typeof navigator === "object" && (function (global, factory) {
 
 	// Mirror Element.classList.toggle, with IE compatibility for "force" argument
 	function toggleClass(element, className, force) {
+	    if (is$1.nodeList(element)) {
+	        return Array.from(element).map(function (e) {
+	            return toggleClass(e, className, force);
+	        });
+	    }
+
 	    if (is$1.element(element)) {
 	        var method = 'toggle';
 	        if (typeof force !== 'undefined') {
@@ -5944,7 +5950,7 @@ typeof navigator === "object" && (function (global, factory) {
 	        return element.classList.contains(className);
 	    }
 
-	    return null;
+	    return false;
 	}
 
 	// Has class name
@@ -5975,19 +5981,6 @@ typeof navigator === "object" && (function (global, factory) {
 	    return this.elements.container.querySelector(selector);
 	}
 
-	// Get the focused element
-	function getFocusElement() {
-	    var focused = document.activeElement;
-
-	    if (!focused || focused === document.body) {
-	        focused = null;
-	    } else {
-	        focused = document.querySelector(':focus');
-	    }
-
-	    return focused;
-	}
-
 	// Trap focus inside container
 	function trapFocus() {
 	    var element = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
@@ -6008,7 +6001,7 @@ typeof navigator === "object" && (function (global, factory) {
 	        }
 
 	        // Get the current focused element
-	        var focused = getFocusElement();
+	        var focused = document.activeElement;
 
 	        if (focused === last && !event.shiftKey) {
 	            // Move focus to first element that can be tabbed if Shift isn't used
@@ -7071,9 +7064,54 @@ typeof navigator === "object" && (function (global, factory) {
 	    },
 
 
+	    // Bind keyboard shortcuts for a menu item
+	    bindMenuItemShortcuts: function bindMenuItemShortcuts(menuItem, type) {
+	        var _this = this;
+
+	        // Handle space or -> to open menu
+	        on(menuItem, 'keydown', function (event) {
+	            // We only care about space and ⬆️ ⬇️️ ➡️
+	            if (![32, 38, 39, 40].includes(event.which)) {
+	                return;
+	            }
+
+	            // Prevent play / seek
+	            event.preventDefault();
+	            event.stopPropagation();
+
+	            var isRadioButton = matches(menuItem, '[role="menuitemradio"]');
+
+	            // Show the respective menu
+	            if (!isRadioButton && [32, 39].includes(event.which)) {
+	                controls.showMenuPanel.call(_this, type);
+	            } else {
+	                var target = void 0;
+
+	                if (event.which !== 32) {
+	                    if (event.which === 40 || isRadioButton && event.which === 39) {
+	                        target = menuItem.nextElementSibling;
+
+	                        if (!is$1.element(target)) {
+	                            target = menuItem.parentNode.firstElementChild;
+	                        }
+	                    } else {
+	                        target = menuItem.previousElementSibling;
+
+	                        if (!is$1.element(target)) {
+	                            target = menuItem.parentNode.lastElementChild;
+	                        }
+	                    }
+
+	                    setFocus.call(_this, target, true);
+	                }
+	            }
+	        }, false);
+	    },
+
+
 	    // Create a settings menu item
 	    createMenuItem: function createMenuItem(_ref) {
-	        var _this = this;
+	        var _this2 = this;
 
 	        var value = _ref.value,
 	            list = _ref.list,
@@ -7086,7 +7124,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 	        var attributes = getAttributesFromSelector(this.config.selectors.inputs[type]);
 
-	        var item = createElement('button', extend(attributes, {
+	        var menuItem = createElement('button', extend(attributes, {
 	            type: 'button',
 	            role: 'menuitemradio',
 	            class: (this.config.classNames.control + ' ' + (attributes.class ? attributes.class : '')).trim(),
@@ -7103,51 +7141,61 @@ typeof navigator === "object" && (function (global, factory) {
 	            flex.appendChild(badge);
 	        }
 
-	        item.appendChild(flex);
+	        menuItem.appendChild(flex);
 
-	        Object.defineProperty(item, 'checked', {
+	        // Replicate radio button behaviour
+	        Object.defineProperty(menuItem, 'checked', {
 	            enumerable: true,
 	            get: function get() {
-	                return item.getAttribute('aria-checked') === 'true';
+	                return menuItem.getAttribute('aria-checked') === 'true';
 	            },
 	            set: function set(checked) {
 	                // Ensure exclusivity
 	                if (checked) {
-	                    Array.from(item.parentNode.children).filter(function (node) {
+	                    Array.from(menuItem.parentNode.children).filter(function (node) {
 	                        return matches(node, '[role="menuitemradio"]');
 	                    }).forEach(function (node) {
 	                        return node.setAttribute('aria-checked', 'false');
 	                    });
 	                }
 
-	                item.setAttribute('aria-checked', checked ? 'true' : 'false');
+	                menuItem.setAttribute('aria-checked', checked ? 'true' : 'false');
 	            }
 	        });
 
-	        this.listeners.bind(item, 'click', function () {
-	            item.checked = true;
+	        this.listeners.bind(menuItem, 'click keydown', function (event) {
+	            if (event.type === 'keydown' && event.which !== 32) {
+	                return;
+	            }
+
+	            event.preventDefault();
+	            event.stopPropagation();
+
+	            menuItem.checked = true;
 
 	            switch (type) {
 	                case 'language':
-	                    _this.currentTrack = Number(value);
+	                    _this2.currentTrack = Number(value);
 	                    break;
 
 	                case 'quality':
-	                    _this.quality = value;
+	                    _this2.quality = value;
 	                    break;
 
 	                case 'speed':
-	                    _this.speed = parseFloat(value);
+	                    _this2.speed = parseFloat(value);
 	                    break;
 
 	                default:
 	                    break;
 	            }
 
-	            controls.showMenuPanel.call(_this, 'home');
-	        }, type);
+	            controls.showMenuPanel.call(_this2, 'home');
+	        }, type, false);
 
-	        list.appendChild(item);
+	        controls.bindMenuItemShortcuts.call(this, menuItem, type);
+
+	        list.appendChild(menuItem);
 	    },
 
 
@@ -7220,7 +7268,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 	    // Update <progress> elements
 	    updateProgress: function updateProgress(event) {
-	        var _this2 = this;
+	        var _this3 = this;
 
 	        if (!this.supported.ui || !is$1.event(event)) {
 	            return;
@@ -7230,7 +7278,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 	        var setProgress = function setProgress(target, input) {
 	            var value = is$1.number(input) ? input : 0;
-	            var progress = is$1.element(target) ? target : _this2.elements.display.buffer;
+	            var progress = is$1.element(target) ? target : _this3.elements.display.buffer;
 
 	            // Update value and label
 	            if (is$1.element(progress)) {
@@ -7310,7 +7358,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 	    // Update hover tooltip for seeking
 	    updateSeekTooltip: function updateSeekTooltip(event) {
-	        var _this3 = this;
+	        var _this4 = this;
 
 	        // Bail if setting not true
 	        if (!this.config.tooltips.seek || !is$1.element(this.elements.inputs.seek) || !is$1.element(this.elements.display.seekTooltip) || this.duration === 0) {
@@ -7323,7 +7371,7 @@ typeof navigator === "object" && (function (global, factory) {
 	        var visible = this.config.classNames.tooltip + '--visible';
 
 	        var toggle = function toggle(_toggle) {
-	            toggleClass(_this3.elements.display.seekTooltip, visible, _toggle);
+	            toggleClass(_this4.elements.display.seekTooltip, visible, _toggle);
 	        };
 
 	        // Hide on touch
@@ -7508,7 +7556,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 	    // Set the quality menu
 	    setQualityMenu: function setQualityMenu(options) {
-	        var _this4 = this;
+	        var _this5 = this;
 
 	        // Menu required
 	        if (!is$1.element(this.elements.settings.panels.quality)) {
@@ -7521,7 +7569,7 @@ typeof navigator === "object" && (function (global, factory) {
 	        // Set options if passed and filter based on uniqueness and config
 	        if (is$1.array(options)) {
 	            this.options.quality = dedupe(options).filter(function (quality) {
-	                return _this4.config.quality.options.includes(quality);
+	                return _this5.config.quality.options.includes(quality);
 	            });
 	        }
 
@@ -7542,25 +7590,25 @@ typeof navigator === "object" && (function (global, factory) {
 
 	        // Get the badge HTML for HD, 4K etc
 	        var getBadge = function getBadge(quality) {
-	            var label = i18n.get('qualityBadge.' + quality, _this4.config);
+	            var label = i18n.get('qualityBadge.' + quality, _this5.config);
 
 	            if (!label.length) {
 	                return null;
 	            }
 
-	            return controls.createBadge.call(_this4, label);
+	            return controls.createBadge.call(_this5, label);
 	        };
 
 	        // Sort options by the config and then render options
 	        this.options.quality.sort(function (a, b) {
-	            var sorting = _this4.config.quality.options;
+	            var sorting = _this5.config.quality.options;
 	            return sorting.indexOf(a) > sorting.indexOf(b) ? 1 : -1;
 	        }).forEach(function (quality) {
-	            controls.createMenuItem.call(_this4, {
+	            controls.createMenuItem.call(_this5, {
 	                value: quality,
 	                list: list,
 	                type: type,
-	                title: controls.getLabel.call(_this4, 'quality', quality),
+	                title: controls.getLabel.call(_this5, 'quality', quality),
 	                badge: getBadge(quality)
 	            });
 	        });
@@ -7610,7 +7658,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 	    // Set a list of available captions languages
 	    setCaptionsMenu: function setCaptionsMenu() {
-	        var _this5 = this;
+	        var _this6 = this;
 
 	        // Menu required
 	        if (!is$1.element(this.elements.settings.panels.captions)) {
@@ -7641,9 +7689,9 @@ typeof navigator === "object" && (function (global, factory) {
 	        var options = tracks.map(function (track, value) {
 	            return {
 	                value: value,
-	                checked: _this5.captions.toggled && _this5.currentTrack === value,
-	                title: captions.getLabel.call(_this5, track),
-	                badge: track.language && controls.createBadge.call(_this5, track.language.toUpperCase()),
+	                checked: _this6.captions.toggled && _this6.currentTrack === value,
+	                title: captions.getLabel.call(_this6, track),
+	                badge: track.language && controls.createBadge.call(_this6, track.language.toUpperCase()),
 	                list: list,
 	                type: 'language'
 	            };
@@ -7667,7 +7715,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 	    // Set a list of available captions languages
 	    setSpeedMenu: function setSpeedMenu(options) {
-	        var _this6 = this;
+	        var _this7 = this;
 
 	        // Menu required
 	        if (!is$1.element(this.elements.settings.panels.speed)) {
@@ -7686,7 +7734,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 	        // Set options if passed and filter based on config
 	        this.options.speed = this.options.speed.filter(function (speed) {
-	            return _this6.config.speed.options.includes(speed);
+	            return _this7.config.speed.options.includes(speed);
 	        });
 
 	        // Toggle the pane and tab
@@ -7706,11 +7754,11 @@ typeof navigator === "object" && (function (global, factory) {
 
 	        // Create items
 	        this.options.speed.forEach(function (speed) {
-	            controls.createMenuItem.call(_this6, {
+	            controls.createMenuItem.call(_this7, {
 	                value: speed,
 	                list: list,
 	                type: type,
-	                title: controls.getLabel.call(_this6, 'speed', speed)
+	                title: controls.getLabel.call(_this7, 'speed', speed)
 	            });
 	        });
 
@@ -7731,7 +7779,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 
 	    // Show/hide menu
-	    toggleMenu: function toggleMenu(event) {
+	    toggleMenu: function toggleMenu(input) {
 	        var popup = this.elements.settings.popup;
 
 	        var button = this.elements.buttons.settings;
@@ -7741,11 +7789,11 @@ typeof navigator === "object" && (function (global, factory) {
 	            return;
 	        }
 
-	        var show = is$1.boolean(event) ? event : is$1.element(popup) && popup.hasAttribute('hidden');
+	        var show = is$1.boolean(input) ? input : is$1.element(popup) && popup.hasAttribute('hidden');
 
-	        if (is$1.event(event)) {
-	            var isMenuItem = is$1.element(popup) && popup.contains(event.target);
-	            var isButton = event.target === this.elements.buttons.settings;
+	        if (is$1.event(input)) {
+	            var isMenuItem = is$1.element(popup) && popup.contains(input.target);
+	            var isButton = input.target === this.elements.buttons.settings;
 
 	            // If the click was inside the form or if the click
 	            // wasn't the button or menu item and we're trying to
@@ -7756,7 +7804,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 	            // Prevent the toggle being caught by the doc listener
 	            if (isButton) {
-	                event.stopPropagation();
+	                input.stopPropagation();
 	            }
 	        }
 
@@ -7770,19 +7818,13 @@ typeof navigator === "object" && (function (global, factory) {
 	            toggleHidden(popup, !show);
 	            toggleClass(this.elements.container, this.config.classNames.menu.open, show);
 
-	            if (show) {
-	                popup.removeAttribute('tabindex');
-
-	                // Focus the first item if key interaction
-	                if (event.type === 'keydown') {
-	                    var pane = Object.values(this.elements.settings.panels).find(function (pane) {
-	                        return !pane.hidden;
-	                    });
-	                    var firstItem = pane.querySelector('[role^="menuitem"]');
-	                    setFocus.call(this, firstItem, true);
-	                }
-	            } else {
-	                popup.setAttribute('tabindex', -1);
+	            // Focus the first item if key interaction
+	            if (show && is$1.event(input) && input.type === 'keydown') {
+	                var pane = Object.values(this.elements.settings.panels).find(function (pane) {
+	                    return !pane.hidden;
+	                });
+	                var firstItem = pane.querySelector('[role^="menuitem"]');
+	                setFocus.call(this, firstItem, true);
 	            }
 	        }
 	    },
@@ -7814,7 +7856,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 	    // Show a panel in the menu
 	    showMenuPanel: function showMenuPanel() {
-	        var _this7 = this;
+	        var _this8 = this;
 
 	        var type = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
 
@@ -7852,7 +7894,7 @@ typeof navigator === "object" && (function (global, factory) {
 	                container.style.height = '';
 
 	                // Only listen once
-	                off.call(_this7, container, transitionEndEvent, restore);
+	                off.call(_this8, container, transitionEndEvent, restore);
 	            };
 
 	            // Listen for the transition finishing and restore auto height/width
@@ -7878,7 +7920,7 @@ typeof navigator === "object" && (function (global, factory) {
 	    // Build the default HTML
 	    // TODO: Set order based on order in the config.controls array?
 	    create: function create(data) {
-	        var _this8 = this;
+	        var _this9 = this;
 
 	        // Do nothing if we want no controls
 	        if (is$1.empty(this.config.controls)) {
@@ -8013,41 +8055,31 @@ typeof navigator === "object" && (function (global, factory) {
 
 	            home.appendChild(menu);
 	            inner.appendChild(home);
+	            this.elements.settings.panels.home = home;
 
 	            // Build the menu items
 	            this.config.settings.forEach(function (type) {
-	                var menuItem = createElement('button', extend(getAttributesFromSelector(_this8.config.selectors.buttons.settings), {
+	                // TODO: bundle this with the createMenuItem helper and bindings
+	                var menuItem = createElement('button', extend(getAttributesFromSelector(_this9.config.selectors.buttons.settings), {
 	                    type: 'button',
-	                    class: _this8.config.classNames.control + ' ' + _this8.config.classNames.control + '--forward',
+	                    class: _this9.config.classNames.control + ' ' + _this9.config.classNames.control + '--forward',
 	                    role: 'menuitem',
 	                    'aria-haspopup': true,
 	                    hidden: ''
 	                }));
 
-	                // Handle space or -> to open menu
-	                on(menuItem, 'keydown', function (event) {
-	                    // We only care about space and ->
-	                    if (![32, 39].includes(event.which)) {
-	                        return;
-	                    }
-
-	                    // Prevent play / seek
-	                    event.preventDefault();
-	                    event.stopPropagation();
-
-	                    // Show the respective menu
-	                    controls.showMenuPanel.call(_this8, type);
-	                }, false);
+	                // Bind menu shortcuts for keyboard users
+	                controls.bindMenuItemShortcuts.call(_this9, menuItem, type);
 
 	                // Show menu on click
 	                on(menuItem, 'click', function () {
-	                    controls.showMenuPanel.call(_this8, type);
+	                    controls.showMenuPanel.call(_this9, type);
 	                });
 
-	                var flex = createElement('span', null, i18n.get(type, _this8.config));
+	                var flex = createElement('span', null, i18n.get(type, _this9.config));
 
 	                var value = createElement('span', {
-	                    class: _this8.config.classNames.menu.value
+	                    class: _this9.config.classNames.menu.value
 	                });
 
 	                // Speed contains HTML entities
@@ -8066,21 +8098,21 @@ typeof navigator === "object" && (function (global, factory) {
 	                // Back button
 	                var backButton = createElement('button', {
 	                    type: 'button',
-	                    class: _this8.config.classNames.control + ' ' + _this8.config.classNames.control + '--back'
+	                    class: _this9.config.classNames.control + ' ' + _this9.config.classNames.control + '--back'
 	                });
 
 	                // Visible label
 	                backButton.appendChild(createElement('span', {
 	                    'aria-hidden': true
-	                }, i18n.get(type, _this8.config)));
+	                }, i18n.get(type, _this9.config)));
 
 	                // Screen reader label
 	                backButton.appendChild(createElement('span', {
-	                    class: _this8.config.classNames.hidden
-	                }, i18n.get('menuBack', _this8.config)));
+	                    class: _this9.config.classNames.hidden
+	                }, i18n.get('menuBack', _this9.config)));
 
-	                // Handle space or -> to open menu
-	                on(backButton, 'keydown', function (event) {
+	                // Go back via keyboard
+	                on(pane, 'keydown', function (event) {
 	                    // We only care about <-
 	                    if (event.which !== 37) {
 	                        return;
@@ -8091,12 +8123,12 @@ typeof navigator === "object" && (function (global, factory) {
 	                    event.stopPropagation();
 
 	                    // Show the respective menu
-	                    controls.showMenuPanel.call(_this8, 'home');
+	                    controls.showMenuPanel.call(_this9, 'home');
 	                }, false);
 
-	                // Go back
+	                // Go back via button click
 	                on(backButton, 'click', function () {
-	                    controls.showMenuPanel.call(_this8, 'home');
+	                    controls.showMenuPanel.call(_this9, 'home');
 	                });
 
 	                // Add to pane
@@ -8109,8 +8141,8 @@ typeof navigator === "object" && (function (global, factory) {
 
 	                inner.appendChild(pane);
 
-	                _this8.elements.settings.buttons[type] = menuItem;
-	                _this8.elements.settings.panels[type] = pane;
+	                _this9.elements.settings.buttons[type] = menuItem;
+	                _this9.elements.settings.panels[type] = pane;
 	            });
 
 	            popup.appendChild(inner);
@@ -8155,7 +8187,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 	    // Insert controls
 	    inject: function inject() {
-	        var _this9 = this;
+	        var _this10 = this;
 
 	        // Sprite
 	        if (this.config.loadSprite) {
@@ -8267,8 +8299,8 @@ typeof navigator === "object" && (function (global, factory) {
 	            var labels = getElements.call(this, selector);
 
 	            Array.from(labels).forEach(function (label) {
-	                toggleClass(label, _this9.config.classNames.hidden, false);
-	                toggleClass(label, _this9.config.classNames.tooltip, true);
+	                toggleClass(label, _this10.config.classNames.hidden, false);
+	                toggleClass(label, _this10.config.classNames.tooltip, true);
 	            });
 	        }
 	    }
@@ -9652,6 +9684,9 @@ typeof navigator === "object" && (function (global, factory) {
 
 	// ==========================================================================
 
+	var focusTimer = null;
+	var lastKeyDown = null;
+
 	var Listeners = function () {
 	    function Listeners(player) {
 	        classCallCheck(this, Listeners);
@@ -9661,6 +9696,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 	        this.handleKey = this.handleKey.bind(this);
 	        this.toggleMenu = this.toggleMenu.bind(this);
+	        this.setTabFocus = this.setTabFocus.bind(this);
 	        this.firstTouch = this.firstTouch.bind(this);
 	    }
 
@@ -9696,16 +9732,26 @@ typeof navigator === "object" && (function (global, factory) {
 	            // Handle the key on keydown
 	            // Reset on keyup
 	            if (pressed) {
-	                // Which keycodes should we prevent default
-	                var preventDefault = [32, 37, 38, 39, 40, 48, 49, 50, 51, 52, 53, 54, 56, 57, 67, 70, 73, 75, 76, 77, 79];
-
 	                // Check focused element
 	                // and if the focused element is not editable (e.g. text input)
 	                // and any that accept key input http://webaim.org/techniques/keyboard/
-	                var focused = getFocusElement();
-	                if (is$1.element(focused) && focused !== this.player.elements.inputs.seek && matches(focused, this.player.config.selectors.editable)) {
-	                    return;
+	                var focused = document.activeElement;
+	                if (is$1.element(focused)) {
+	                    var editable = this.player.config.selectors.editable;
+	                    var seek = this.player.elements.inputs.seek;
+
+
+	                    if (focused !== seek && matches(focused, editable)) {
+	                        return;
+	                    }
+
+	                    if (event.which === 32 && matches(focused, 'button, [role^="menuitem"]')) {
+	                        return;
+	                    }
 	                }
+
+	                // Which keycodes should we prevent default
+	                var preventDefault = [32, 37, 38, 39, 40, 48, 49, 50, 51, 52, 53, 54, 56, 57, 67, 70, 73, 75, 76, 77, 79];
 
 	                // If the code is found prevent default (e.g. prevent scrolling for arrows)
 	                if (preventDefault.includes(code)) {
@@ -9827,6 +9873,53 @@ typeof navigator === "object" && (function (global, factory) {
 	            // Add touch class
 	            toggleClass(this.player.elements.container, this.player.config.classNames.isTouch, true);
 	        }
+	    }, {
+	        key: 'setTabFocus',
+	        value: function setTabFocus(event) {
+	            var _this2 = this;
+
+	            // Ignore any key other than tab
+	            if (event.type === 'keydown' && event.code !== 'Tab') {
+	                return;
+	            }
+
+	            // Store reference to event timeStamp
+	            if (event.type === 'keydown') {
+	                lastKeyDown = event.timeStamp;
+	            }
+
+	            // Remove current classes
+	            var removeCurrent = function removeCurrent() {
+	                var className = _this2.player.config.classNames.tabFocus;
+	                var current = getElements.call(_this2.player, '.' + className);
+	                toggleClass(current, className, false);
+	            };
+
+	            // Determine if a key was pressed to trigger this event
+	            var wasKeyDown = event.timeStamp - lastKeyDown <= 20;
+
+	            // Ignore focus events if a key was pressed prior
+	            if (event.type === 'focus' && !wasKeyDown) {
+	                return;
+	            }
+
+	            // Delay the adding of classname until the focus has changed
+	            // This event fires before the focusin event
+	            clearTimeout(focusTimer);
+	            focusTimer = setTimeout(function () {
+	                var focused = document.activeElement;
+
+	                // Remove all current
+	                removeCurrent();
+
+	                // Ignore if current focus element isn't inside the player
+	                if (!_this2.player.elements.container.contains(focused)) {
+	                    return;
+	                }
+
+	                toggleClass(document.activeElement, _this2.player.config.classNames.tabFocus, true);
+	            }, 10);
+	        }
 
 	        // Global window & document listeners
 
@@ -9845,6 +9938,9 @@ typeof navigator === "object" && (function (global, factory) {
 
 	            // Detect touch by events
 	            once.call(this.player, document.body, 'touchstart', this.firstTouch);
+
+	            // Tab focus detection
+	            toggleListener.call(this.player, document.body, 'keydown focus blur', this.setTabFocus, toggle, false, true);
 	        }
 
 	        // Container listeners
@@ -9852,34 +9948,16 @@ typeof navigator === "object" && (function (global, factory) {
 	    }, {
 	        key: 'container',
 	        value: function container() {
-	            var _this2 = this;
+	            var _this3 = this;
 
 	            // Keyboard shortcuts
 	            if (!this.player.config.keyboard.global && this.player.config.keyboard.focused) {
 	                on.call(this.player, this.player.elements.container, 'keydown keyup', this.handleKey, false);
 	            }
 
-	            // Detect tab focus
-	            // Remove class on blur/focusout
-	            on.call(this.player, this.player.elements.container, 'focusout', function (event) {
-	                toggleClass(event.target, _this2.player.config.classNames.tabFocus, false);
-	            });
-	            // Add classname to tabbed elements
-	            on.call(this.player, this.player.elements.container, 'keydown', function (event) {
-	                if (event.keyCode !== 9) {
-	                    return;
-	                }
-
-	                // Delay the adding of classname until the focus has changed
-	                // This event fires before the focusin event
-	                setTimeout(function () {
-	                    toggleClass(getFocusElement(), _this2.player.config.classNames.tabFocus, true);
-	                }, 0);
-	            });
-
 	            // Toggle controls on mouse events and entering fullscreen
 	            on.call(this.player, this.player.elements.container, 'mousemove mouseleave touchstart touchmove enterfullscreen exitfullscreen', function (event) {
-	                var controls$$1 = _this2.player.elements.controls;
+	                var controls$$1 = _this3.player.elements.controls;
 
 	                // Remove button states for fullscreen
 
@@ -9894,17 +9972,17 @@ typeof navigator === "object" && (function (global, factory) {
 	                var delay = 0;
 
 	                if (show) {
-	                    ui.toggleControls.call(_this2.player, true);
+	                    ui.toggleControls.call(_this3.player, true);
 	                    // Use longer timeout for touch devices
-	                    delay = _this2.player.touch ? 3000 : 2000;
+	                    delay = _this3.player.touch ? 3000 : 2000;
 	                }
 
 	                // Clear timer
-	                clearTimeout(_this2.player.timers.controls);
+	                clearTimeout(_this3.player.timers.controls);
 
 	                // Set new timer to prevent flicker when seeking
-	                _this2.player.timers.controls = setTimeout(function () {
-	                    return ui.toggleControls.call(_this2.player, false);
+	                _this3.player.timers.controls = setTimeout(function () {
+	                    return ui.toggleControls.call(_this3.player, false);
 	                }, delay);
 	            });
 	        }
@@ -9914,68 +9992,68 @@ typeof navigator === "object" && (function (global, factory) {
 	    }, {
 	        key: 'media',
 	        value: function media() {
-	            var _this3 = this;
+	            var _this4 = this;
 
 	            // Time change on media
 	            on.call(this.player, this.player.media, 'timeupdate seeking seeked', function (event) {
-	                return controls.timeUpdate.call(_this3.player, event);
+	                return controls.timeUpdate.call(_this4.player, event);
 	            });
 
 	            // Display duration
 	            on.call(this.player, this.player.media, 'durationchange loadeddata loadedmetadata', function (event) {
-	                return controls.durationUpdate.call(_this3.player, event);
+	                return controls.durationUpdate.call(_this4.player, event);
 	            });
 
 	            // Check for audio tracks on load
 	            // We can't use `loadedmetadata` as it doesn't seem to have audio tracks at that point
 	            on.call(this.player, this.player.media, 'canplay', function () {
-	                toggleHidden(_this3.player.elements.volume, !_this3.player.hasAudio);
-	                toggleHidden(_this3.player.elements.buttons.mute, !_this3.player.hasAudio);
+	                toggleHidden(_this4.player.elements.volume, !_this4.player.hasAudio);
+	                toggleHidden(_this4.player.elements.buttons.mute, !_this4.player.hasAudio);
 	            });
 
 	            // Handle the media finishing
 	            on.call(this.player, this.player.media, 'ended', function () {
 	                // Show poster on end
-	                if (_this3.player.isHTML5 && _this3.player.isVideo && _this3.player.config.resetOnEnd) {
+	                if (_this4.player.isHTML5 && _this4.player.isVideo && _this4.player.config.resetOnEnd) {
 	                    // Restart
-	                    _this3.player.restart();
+	                    _this4.player.restart();
 	                }
 	            });
 
 	            // Check for buffer progress
 	            on.call(this.player, this.player.media, 'progress playing seeking seeked', function (event) {
-	                return controls.updateProgress.call(_this3.player, event);
+	                return controls.updateProgress.call(_this4.player, event);
 	            });
 
 	            // Handle volume changes
 	            on.call(this.player, this.player.media, 'volumechange', function (event) {
-	                return controls.updateVolume.call(_this3.player, event);
+	                return controls.updateVolume.call(_this4.player, event);
 	            });
 
 	            // Handle play/pause
 	            on.call(this.player, this.player.media, 'playing play pause ended emptied timeupdate', function (event) {
-	                return ui.checkPlaying.call(_this3.player, event);
+	                return ui.checkPlaying.call(_this4.player, event);
 	            });
 
 	            // Loading state
 	            on.call(this.player, this.player.media, 'waiting canplay seeked playing', function (event) {
-	                return ui.checkLoading.call(_this3.player, event);
+	                return ui.checkLoading.call(_this4.player, event);
 	            });
 
 	            // If autoplay, then load advertisement if required
 	            // TODO: Show some sort of loading state while the ad manager loads else there's a delay before ad shows
 	            on.call(this.player, this.player.media, 'playing', function () {
-	                if (!_this3.player.ads) {
+	                if (!_this4.player.ads) {
 	                    return;
 	                }
 
 	                // If ads are enabled, wait for them first
-	                if (_this3.player.ads.enabled && !_this3.player.ads.initialized) {
+	                if (_this4.player.ads.enabled && !_this4.player.ads.initialized) {
 	                    // Wait for manager response
-	                    _this3.player.ads.managerPromise.then(function () {
-	                        return _this3.player.ads.play();
+	                    _this4.player.ads.managerPromise.then(function () {
+	                        return _this4.player.ads.play();
 	                    }).catch(function () {
-	                        return _this3.player.play();
+	                        return _this4.player.play();
 	                    });
 	                }
 	            });
@@ -9993,17 +10071,17 @@ typeof navigator === "object" && (function (global, factory) {
 	                // On click play, pause ore restart
 	                on.call(this.player, wrapper, 'click', function () {
 	                    // Touch devices will just show controls (if we're hiding controls)
-	                    if (_this3.player.config.hideControls && _this3.player.touch && !_this3.player.paused) {
+	                    if (_this4.player.config.hideControls && _this4.player.touch && !_this4.player.paused) {
 	                        return;
 	                    }
 
-	                    if (_this3.player.paused) {
-	                        _this3.player.play();
-	                    } else if (_this3.player.ended) {
-	                        _this3.player.restart();
-	                        _this3.player.play();
+	                    if (_this4.player.paused) {
+	                        _this4.player.play();
+	                    } else if (_this4.player.ended) {
+	                        _this4.player.restart();
+	                        _this4.player.play();
 	                    } else {
-	                        _this3.player.pause();
+	                        _this4.player.pause();
 	                    }
 	                });
 	            }
@@ -10018,33 +10096,37 @@ typeof navigator === "object" && (function (global, factory) {
 	            // Volume change
 	            on.call(this.player, this.player.media, 'volumechange', function () {
 	                // Save to storage
-	                _this3.player.storage.set({ volume: _this3.player.volume, muted: _this3.player.muted });
+	                _this4.player.storage.set({
+	                    volume: _this4.player.volume,
+	                    muted: _this4.player.muted
+	                });
 	            });
 
 	            // Speed change
 	            on.call(this.player, this.player.media, 'ratechange', function () {
 	                // Update UI
-	                controls.updateSetting.call(_this3.player, 'speed');
+	                controls.updateSetting.call(_this4.player, 'speed');
 
 	                // Save to storage
-	                _this3.player.storage.set({ speed: _this3.player.speed });
+	                _this4.player.storage.set({ speed: _this4.player.speed });
 	            });
 
 	            // Quality request
 	            on.call(this.player, this.player.media, 'qualityrequested', function (event) {
 	                // Save to storage
-	                _this3.player.storage.set({ quality: event.detail.quality });
+	                _this4.player.storage.set({ quality: event.detail.quality });
 	            });
 
 	            // Quality change
 	            on.call(this.player, this.player.media, 'qualitychange', function (event) {
 	                // Update UI
-	                controls.updateSetting.call(_this3.player, 'quality', null, event.detail.quality);
+	                controls.updateSetting.call(_this4.player, 'quality', null, event.detail.quality);
 	            });
 
 	            // Proxy events to container
 	            // Bubble up key events for Edge
 	            var proxyEvents = this.player.config.events.concat(['keyup', 'keydown']).join(' ');
+
 	            on.call(this.player, this.player.media, proxyEvents, function (event) {
 	                var _event$detail = event.detail,
 	                    detail = _event$detail === undefined ? {} : _event$detail;
@@ -10052,10 +10134,10 @@ typeof navigator === "object" && (function (global, factory) {
 	                // Get error details from media
 
 	                if (event.type === 'error') {
-	                    detail = _this3.player.media.error;
+	                    detail = _this4.player.media.error;
 	                }
 
-	                triggerEvent.call(_this3.player, _this3.player.elements.container, event.type, true, detail);
+	                triggerEvent.call(_this4.player, _this4.player.elements.container, event.type, true, detail);
 	            });
 	        }
 
@@ -10084,7 +10166,7 @@ typeof navigator === "object" && (function (global, factory) {
 	    }, {
 	        key: 'bind',
 	        value: function bind(element, type, defaultHandler, customHandlerKey) {
-	            var _this4 = this;
+	            var _this5 = this;
 
 	            var passive = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
 
@@ -10092,7 +10174,7 @@ typeof navigator === "object" && (function (global, factory) {
 	            var hasCustomHandler = is$1.function(customHandler);
 
 	            on.call(this.player, element, type, function (event) {
-	                return _this4.proxy(event, defaultHandler, customHandlerKey);
+	                return _this5.proxy(event, defaultHandler, customHandlerKey);
 	            }, passive && !hasCustomHandler);
 	        }
 
@@ -10101,7 +10183,7 @@ typeof navigator === "object" && (function (global, factory) {
 	    }, {
 	        key: 'controls',
 	        value: function controls$$1() {
-	            var _this5 = this;
+	            var _this6 = this;
 
 	            // IE doesn't support input event, so we fallback to change
 	            var inputEvent = browser.isIE ? 'change' : 'input';
@@ -10109,7 +10191,7 @@ typeof navigator === "object" && (function (global, factory) {
 	            // Play/pause toggle
 	            if (this.player.elements.buttons.play) {
 	                Array.from(this.player.elements.buttons.play).forEach(function (button) {
-	                    _this5.bind(button, 'click', _this5.player.togglePlay, 'play');
+	                    _this6.bind(button, 'click', _this6.player.togglePlay, 'play');
 	                });
 	            }
 
@@ -10124,22 +10206,22 @@ typeof navigator === "object" && (function (global, factory) {
 
 	            // Mute toggle
 	            this.bind(this.player.elements.buttons.mute, 'click', function () {
-	                _this5.player.muted = !_this5.player.muted;
+	                _this6.player.muted = !_this6.player.muted;
 	            }, 'mute');
 
 	            // Captions toggle
 	            this.bind(this.player.elements.buttons.captions, 'click', function () {
-	                return _this5.player.toggleCaptions();
+	                return _this6.player.toggleCaptions();
 	            });
 
 	            // Fullscreen toggle
 	            this.bind(this.player.elements.buttons.fullscreen, 'click', function () {
-	                _this5.player.fullscreen.toggle();
+	                _this6.player.fullscreen.toggle();
 	            }, 'fullscreen');
 
 	            // Picture-in-Picture
 	            this.bind(this.player.elements.buttons.pip, 'click', function () {
-	                _this5.player.pip = 'toggle';
+	                _this6.player.pip = 'toggle';
 	            }, 'pip');
 
 	            // Airplay
@@ -10147,7 +10229,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 	            // Settings menu - click toggle
 	            this.bind(this.player.elements.buttons.settings, 'click', function (event) {
-	                controls.toggleMenu.call(_this5.player, event);
+	                controls.toggleMenu.call(_this6.player, event);
 	            });
 
 	            // Settings menu - keyboard toggle
@@ -10164,12 +10246,12 @@ typeof navigator === "object" && (function (global, factory) {
 	                event.stopPropagation();
 
 	                // Toggle menu
-	                controls.toggleMenu.call(_this5.player, event);
+	                controls.toggleMenu.call(_this6.player, event);
 	            }, null, false);
 
 	            // Set range input alternative "value", which matches the tooltip time (#954)
 	            this.bind(this.player.elements.inputs.seek, 'mousedown mousemove', function (event) {
-	                var clientRect = _this5.player.elements.progress.getBoundingClientRect();
+	                var clientRect = _this6.player.elements.progress.getBoundingClientRect();
 	                var percent = 100 / clientRect.width * (event.pageX - clientRect.left);
 	                event.currentTarget.setAttribute('seek-value', percent);
 	            });
@@ -10193,10 +10275,10 @@ typeof navigator === "object" && (function (global, factory) {
 	                // If we're done seeking and it was playing, resume playback
 	                if (play && done) {
 	                    seek.removeAttribute('play-on-seeked');
-	                    _this5.player.play();
-	                } else if (!done && _this5.player.playing) {
+	                    _this6.player.play();
+	                } else if (!done && _this6.player.playing) {
 	                    seek.setAttribute('play-on-seeked', '');
-	                    _this5.player.pause();
+	                    _this6.player.pause();
 	                }
 	            });
 
@@ -10213,7 +10295,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 	                seek.removeAttribute('seek-value');
 
-	                _this5.player.currentTime = seekTo / seek.max * _this5.player.duration;
+	                _this6.player.currentTime = seekTo / seek.max * _this6.player.duration;
 	            }, 'seek');
 
 	            // Current time invert
@@ -10221,48 +10303,48 @@ typeof navigator === "object" && (function (global, factory) {
 	            if (this.player.config.toggleInvert && !is$1.element(this.player.elements.display.duration)) {
 	                this.bind(this.player.elements.display.currentTime, 'click', function () {
 	                    // Do nothing if we're at the start
-	                    if (_this5.player.currentTime === 0) {
+	                    if (_this6.player.currentTime === 0) {
 	                        return;
 	                    }
 
-	                    _this5.player.config.invertTime = !_this5.player.config.invertTime;
+	                    _this6.player.config.invertTime = !_this6.player.config.invertTime;
 
-	                    controls.timeUpdate.call(_this5.player);
+	                    controls.timeUpdate.call(_this6.player);
 	                });
 	            }
 
 	            // Volume
 	            this.bind(this.player.elements.inputs.volume, inputEvent, function (event) {
-	                _this5.player.volume = event.target.value;
+	                _this6.player.volume = event.target.value;
 	            }, 'volume');
 
 	            // Polyfill for lower fill in <input type="range"> for webkit
 	            if (browser.isWebkit) {
 	                Array.from(getElements.call(this.player, 'input[type="range"]')).forEach(function (element) {
-	                    _this5.bind(element, 'input', function (event) {
-	                        return controls.updateRangeFill.call(_this5.player, event.target);
+	                    _this6.bind(element, 'input', function (event) {
+	                        return controls.updateRangeFill.call(_this6.player, event.target);
 	                    });
 	                });
 	            }
 
 	            // Seek tooltip
 	            this.bind(this.player.elements.progress, 'mouseenter mouseleave mousemove', function (event) {
-	                return controls.updateSeekTooltip.call(_this5.player, event);
+	                return controls.updateSeekTooltip.call(_this6.player, event);
 	            });
 
 	            // Update controls.hover state (used for ui.toggleControls to avoid hiding when interacting)
 	            this.bind(this.player.elements.controls, 'mouseenter mouseleave', function (event) {
-	                _this5.player.elements.controls.hover = !_this5.player.touch && event.type === 'mouseenter';
+	                _this6.player.elements.controls.hover = !_this6.player.touch && event.type === 'mouseenter';
 	            });
 
 	            // Update controls.pressed state (used for ui.toggleControls to avoid hiding when interacting)
 	            this.bind(this.player.elements.controls, 'mousedown mouseup touchstart touchend touchcancel', function (event) {
-	                _this5.player.elements.controls.pressed = ['mousedown', 'touchstart'].includes(event.type);
+	                _this6.player.elements.controls.pressed = ['mousedown', 'touchstart'].includes(event.type);
 	            });
 
 	            // Focus in/out on controls
 	            this.bind(this.player.elements.controls, 'focusin focusout', function (event) {
-	                var _player = _this5.player,
+	                var _player = _this6.player,
 	                    config = _player.config,
 	                    elements = _player.elements,
 	                    timers = _player.timers;
@@ -10272,7 +10354,7 @@ typeof navigator === "object" && (function (global, factory) {
 	                toggleClass(elements.controls, config.classNames.noTransition, event.type === 'focusin');
 
 	                // Toggle
-	                ui.toggleControls.call(_this5.player, event.type === 'focusin');
+	                ui.toggleControls.call(_this6.player, event.type === 'focusin');
 
 	                // If focusin, hide again after delay
 	                if (event.type === 'focusin') {
@@ -10282,13 +10364,14 @@ typeof navigator === "object" && (function (global, factory) {
 	                    }, 0);
 
 	                    // Delay a little more for keyboard users
-	                    var delay = _this5.touch ? 3000 : 4000;
+	                    var delay = _this6.touch ? 3000 : 4000;
 
 	                    // Clear timer
 	                    clearTimeout(timers.controls);
+
 	                    // Hide
 	                    timers.controls = setTimeout(function () {
-	                        return ui.toggleControls.call(_this5.player, false);
+	                        return ui.toggleControls.call(_this6.player, false);
 	                    }, delay);
 	                }
 	            });
@@ -10314,10 +10397,10 @@ typeof navigator === "object" && (function (global, factory) {
 	                var direction = Math.sign(Math.abs(x) > Math.abs(y) ? x : y);
 
 	                // Change the volume by 2%
-	                _this5.player.increaseVolume(direction / 50);
+	                _this6.player.increaseVolume(direction / 50);
 
 	                // Don't break page scrolling at max and min
-	                var volume = _this5.player.media.volume;
+	                var volume = _this6.player.media.volume;
 
 	                if (direction === 1 && volume < 1 || direction === -1 && volume > 0) {
 	                    event.preventDefault();
