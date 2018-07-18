@@ -10,6 +10,7 @@
         "jQuery": false
     },
     "rules": {
+        "import/no-cycle": 1,
         "no-const-assign": 1,
         "no-shadow": 0,
         "no-this-before-super": 1,

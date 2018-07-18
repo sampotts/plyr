@@ -435,10 +435,12 @@ player.source = {
         {
             src: '/path/to/movie.mp4',
             type: 'video/mp4',
+            size: 720,
         },
         {
             src: '/path/to/movie.webm',
             type: 'video/webm',
+            size: 1080,
         },
     ],
     poster: '/path/to/poster.jpg',
