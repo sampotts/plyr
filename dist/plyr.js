@@ -2891,7 +2891,7 @@ typeof navigator === "object" && (function (global, factory) {
             // * active:    The state preferred by user settings or config
             // * toggled:   The real captions state
 
-            var languages = dedupe(Array.from(navigator.languages || navigator.userLanguage).map(function (language) {
+            var languages = dedupe(Array.from(navigator.languages || navigator.language || navigator.userLanguage).map(function (language) {
                 return language.split('-')[0];
             }));
 

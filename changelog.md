@@ -1,3 +1,8 @@
+# v3.3.17
+
+-   Travis & CI improvements (thanks @friday)
+-   Add navigator.languages fallback for iOS 9 (thanks @friday)
+
 # v3.3.16
 
 -   Hide currentTime and progress for streams (thanks @mimse)
