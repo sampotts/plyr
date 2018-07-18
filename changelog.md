@@ -1,4 +1,4 @@
-# v3.3.12
+# v3.3.22
 
 -   Travis & CI improvements (thanks @friday)
 -   Add navigator.languages fallback for iOS 9 (thanks @friday)
