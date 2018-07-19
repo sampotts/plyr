@@ -245,8 +245,8 @@ try {
 
 // If deployment is setup
 if (
-    Object.keys(credentials).includes('cdn') &&
-    Object.keys(credentials).includes('demo')
+    Object.keys(credentials).includes('aws') &&
+    Object.keys(credentials).includes('fastly')
 ) {
     const { version } = pkg;
     const { aws, fastly } = credentials;
