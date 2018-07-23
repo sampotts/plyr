@@ -1,6 +1,6 @@
 node_modules
 .DS_Store
-aws.json
+credentials.json
 *.mp4
 !dist/blank.mp4
 index-*.html

@@ -8401,7 +8401,7 @@ typeof navigator === "object" && (function (global, factory) {
 	        // * active:    The state preferred by user settings or config
 	        // * toggled:   The real captions state
 
-	        var languages = dedupe(Array.from(navigator.languages || navigator.userLanguage).map(function (language) {
+	        var languages = dedupe(Array.from(navigator.languages || navigator.language || navigator.userLanguage).map(function (language) {
 	            return language.split('-')[0];
 	        }));
 
@@ -9684,15 +9684,14 @@ typeof navigator === "object" && (function (global, factory) {
 
 	// ==========================================================================
 
-	var focusTimer = null;
-	var lastKeyDown = null;
-
 	var Listeners = function () {
 	    function Listeners(player) {
 	        classCallCheck(this, Listeners);
 
 	        this.player = player;
 	        this.lastKey = null;
+	        this.focusTimer = null;
+	        this.lastKeyDown = null;
 
 	        this.handleKey = this.handleKey.bind(this);
 	        this.toggleMenu = this.toggleMenu.bind(this);
@@ -9878,6 +9877,8 @@ typeof navigator === "object" && (function (global, factory) {
 	        value: function setTabFocus(event) {
 	            var _this2 = this;
 
+	            clearTimeout(this.focusTimer);
+
 	            // Ignore any key other than tab
 	            if (event.type === 'keydown' && event.code !== 'Tab') {
 	                return;
@@ -9885,7 +9886,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 	            // Store reference to event timeStamp
 	            if (event.type === 'keydown') {
-	                lastKeyDown = event.timeStamp;
+	                this.lastKeyDown = event.timeStamp;
 	            }
 
 	            // Remove current classes
@@ -9896,21 +9897,21 @@ typeof navigator === "object" && (function (global, factory) {
 	            };
 
 	            // Determine if a key was pressed to trigger this event
-	            var wasKeyDown = event.timeStamp - lastKeyDown <= 20;
+	            var wasKeyDown = event.timeStamp - this.lastKeyDown <= 20;
 
 	            // Ignore focus events if a key was pressed prior
 	            if (event.type === 'focus' && !wasKeyDown) {
 	                return;
 	            }
 
+	            // Remove all current
+	            removeCurrent();
+
 	            // Delay the adding of classname until the focus has changed
 	            // This event fires before the focusin event
-	            clearTimeout(focusTimer);
-	            focusTimer = setTimeout(function () {
-	                var focused = document.activeElement;
 
-	                // Remove all current
-	                removeCurrent();
+	            this.focusTimer = setTimeout(function () {
+	                var focused = document.activeElement;
 
 	                // Ignore if current focus element isn't inside the player
 	                if (!_this2.player.elements.container.contains(focused)) {

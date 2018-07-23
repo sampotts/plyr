@@ -16,7 +16,7 @@ A simple, lightweight, accessible and customizable HTML5, YouTube and Vimeo medi
 *   **HTML Video & Audio** - support for both formats
 *   **[Embedded Video](#embeds)** - support for YouTube and Vimeo video playback
 *   **[Monetization](#ads)** - make money from your videos
-*   **[Streaming](#streaming)** - support for hls.js, Shaka and dash.js streaming playback
+*   **[Streaming](#try-plyr-online)** - support for hls.js, Shaka and dash.js streaming playback
 *   **[API](#api)** - toggle playback, volume, seeking, and more through a standardized API
 *   **[Events](#events)** - no messing around with Vimeo and YouTube APIs, all events are standardized across formats
 *   **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes
@@ -132,13 +132,13 @@ See [initialising](#initialising) for more information on advanced setups.
 You can use our CDN (provided by [Fastly](https://www.fastly.com/)) for the JavaScript. There's 2 versions; one with and one without [polyfills](#polyfills). My recommendation would be to manage polyfills seperately as part of your application but to make life easier you can use the polyfilled build.
 
 ```html
-<script src="https://cdn.plyr.io/3.3.16/plyr.js"></script>
+<script src="https://cdn.plyr.io/3.3.22/plyr.js"></script>
 ```
 
 ...or...
 
 ```html
-<script src="https://cdn.plyr.io/3.3.16/plyr.polyfilled.js"></script>
+<script src="https://cdn.plyr.io/3.3.22/plyr.polyfilled.js"></script>
 ```
 
 ### CSS
@@ -152,13 +152,13 @@ Include the `plyr.css` stylsheet into your `<head>`
 If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for the default CSS, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/3.3.16/plyr.css">
+<link rel="stylesheet" href="https://cdn.plyr.io/3.3.22/plyr.css">
 ```
 
 ### SVG Sprite
 
 The SVG sprite is loaded automatically from our CDN (provided by [Fastly](https://www.fastly.com/)). To change this, see the [options](#options) below. For
-reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.3.16/plyr.svg`.
+reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.3.22/plyr.svg`.
 
 ## Ads
 
@@ -286,7 +286,7 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
 | `debug`              | Boolean                    | `false`                                                                                                                        | Display debugging information in the console                                                                                                                                                                                                                                                                                                                           |
 | `controls`           | Array, Function or Element | `['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen']` | If a function is passed, it is assumed your method will return either an element or HTML string for the controls. Three arguments will be passed to your function; `id` (the unique id for the player), `seektime` (the seektime step in seconds), and `title` (the media title). See [controls.md](controls.md) for more info on how the html needs to be structured. |
 | `settings`           | Array                      | `['captions', 'quality', 'speed', 'loop']`                                                                                     | If you're using the default controls are used then you can specify which settings to show in the menu                                                                                                                                                                                                                                                                  |
-| `i18n`               | Object                     | See [defaults.js](/src/js/defaults.js)                                                                                         | Used for internationalization (i18n) of the text within the UI.                                                                                                                                                                                                                                                                                                        |
+| `i18n`               | Object                     | See [defaults.js](/src/js/config/defaults.js)                                                                                         | Used for internationalization (i18n) of the text within the UI.                                                                                                                                                                                                                                                                                                        |
 | `loadSprite`         | Boolean                    | `true`                                                                                                                         | Load the SVG sprite specified as the `iconUrl` option (if a URL). If `false`, it is assumed you are handling sprite loading yourself.                                                                                                                                                                                                                                  |
 | `iconUrl`            | String                     | `null`                                                                                                                         | Specify a URL or path to the SVG sprite. See the [SVG section](#svg) for more info.                                                                                                                                                                                                                                                                                    |
 | `iconPrefix`         | String                     | `plyr`                                                                                                                         | Specify the id prefix for the icons used in the default controls (e.g. "plyr-play" would be "plyr"). This is to prevent clashes if you're using your own SVG sprite but with the default controls. Most people can ignore this option.                                                                                                                                 |
@@ -409,7 +409,7 @@ player.fullscreen.active; // false;
 | `speed`              | ✓      | ✓      | Gets or sets the speed for the player. The setter accepts a value in the options specified in your config. Generally the minimum should be 0.5.                                      |
 | `quality`&sup1;      | ✓      | ✓      | Gets or sets the quality for the player. The setter accepts a value from the options specified in your config.                                                                       |
 | `loop`               | ✓      | ✓      | Gets or sets the current loop state of the player. The setter accepts a boolean.                                                                                                     |
-| `source`             | ✓      | ✓      | Gets or sets the current source for the player. The setter accepts an object. See [source setter](#source-setter) below for examples.                                                |
+| `source`             | ✓      | ✓      | Gets or sets the current source for the player. The setter accepts an object. See [source setter](#the-source-setter) below for examples.                                                |
 | `poster`             | ✓      | ✓      | Gets or sets the current poster image for the player. The setter accepts a string; the URL for the updated poster image.                                                             |
 | `autoplay`           | ✓      | ✓      | Gets or sets the autoplay state of the player. The setter accepts a boolean.                                                                                                         |
 | `currentTrack`       | ✓      | ✓      | Gets or sets the caption track by index. `-1` means the track is missing or captions is not active |
@@ -435,10 +435,12 @@ player.source = {
         {
             src: '/path/to/movie.mp4',
             type: 'video/mp4',
+            size: 720,
         },
         {
             src: '/path/to/movie.webm',
             type: 'video/webm',
+            size: 1080,
         },
     ],
     poster: '/path/to/poster.jpg',

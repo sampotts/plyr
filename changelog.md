@@ -1,12 +1,37 @@
-# v3.3.16
+# v3.3.22
+
+-   Travis & CI improvements (thanks @friday)
+-   Add navigator.languages fallback for iOS 9 (thanks @friday)
+
+# v3.3.21
 
 -   Hide currentTime and progress for streams (thanks @mimse)
 -   Fixed condition check (thanks @mimse)
 -   Handle undefined this.player.elements.buttons.play (thanks @klassicd)
 -   Fix captions.toggle() if there is no toggle button (thanks @friday)
--   Minor increaseVolume and decreaseVolume changes (thanks @friday)
--   Fix YouTube muting after seeking with the progress slider (thanks @friday)
--   Respect preload="none" when setting quality if the media hasn't been loaded some other way (thanks @friday)
+
+# v3.3.20
+
+-   Fix for bug where controls wouldn't show on hover over YouTube video
+
+# v3.3.19
+
+-   Remove `pointer-events: none` on embed `<iframe>` to comply with YouTube ToS
+
+# 3.3.18
+
+-   Ads are now only supported on HTML5 videos as it violates terms of service for YouTube and Vimeo 😢
+-   Fix i18n defaults path on README (thanks @meyt!)
+-   Minor increaseVolume and decreaseVolume changes (thanks @friday!)
+
+# v3.3.17
+
+-   Fix YouTube muting after seeking with the progress slider (thanks @friday!)
+-   Respect preload="none" when setting quality if the media hasn't been loaded some other way (thanks @friday!)
+
+# v3.3.16
+
+-   Fixed regression relating the play button status (fixes #1048)
 
 # v3.3.15
 
@@ -30,8 +55,8 @@ Thanks @friday for the following:
 -   Suggestion: Remove array newline rule
 -   Contributions improvements
 
--   Fix html5.cancelRequest not remove source tag correctly (thanks @a60814billy)
--   Remove event listeners in destroy() (thanks @cky917)
+-   fix: html5.cancelRequest not remove source tag correctly (thanks @a60814billy)
+-   remove event listeners in destroy() (thanks @cky917)
 -   Fix markdown in README (thanks @azu)
 -   Some parts of the accessibility improvements outlined in #905 (more on the way...)
 -   Fix for bug where volume slider didn't always show
