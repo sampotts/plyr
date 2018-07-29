@@ -378,7 +378,7 @@ const controls = {
 
             // Show the respective menu
             if (!isRadioButton && [32,39].includes(event.which)) {
-                controls.showMenuPanel.call(this, type);
+                controls.showMenuPanel.call(this, type, true);
             } else {
                 let target;
 
@@ -477,7 +477,7 @@ const controls = {
                         break;
                 }
 
-                controls.showMenuPanel.call(this, 'home');
+                controls.showMenuPanel.call(this, 'home', event.type === 'keydown');
             },
             type,
             false,
@@ -1118,7 +1118,7 @@ const controls = {
     },
 
     // Show a panel in the menu
-    showMenuPanel(type = '') {
+    showMenuPanel(type = '', tabFocus = false) {
         const target = document.getElementById(`plyr-settings-${this.id}-${type}`);
 
         // Nothing to show, bail
@@ -1170,7 +1170,7 @@ const controls = {
 
         // Focus the first item
         const firstItem = target.querySelector('[role^="menuitem"]');
-        setFocus.call(this, firstItem, true);
+        setFocus.call(this, firstItem, tabFocus);
     },
 
     // Build the default HTML
@@ -1344,7 +1344,7 @@ const controls = {
 
                 // Show menu on click
                 on(menuItem, 'click', () => {
-                    controls.showMenuPanel.call(this, type);
+                    controls.showMenuPanel.call(this, type, false);
                 });
 
                 const flex = createElement('span', null, i18n.get(type, this.config));
@@ -1406,12 +1406,12 @@ const controls = {
                     event.stopPropagation();
 
                     // Show the respective menu
-                    controls.showMenuPanel.call(this, 'home');
+                    controls.showMenuPanel.call(this, 'home', true);
                 }, false);
 
                 // Go back via button click
                 on(backButton, 'click', () => {
-                    controls.showMenuPanel.call(this, 'home');
+                    controls.showMenuPanel.call(this, 'home', false);
                 });
 
                 // Add to pane

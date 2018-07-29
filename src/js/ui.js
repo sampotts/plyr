@@ -14,8 +14,16 @@ import loadImage from './utils/loadImage';
 
 const ui = {
     addStyleHook() {
-        toggleClass(this.elements.container, this.config.selectors.container.replace('.', ''), true);
-        toggleClass(this.elements.container, this.config.classNames.uiSupported, this.supported.ui);
+        toggleClass(
+            this.elements.container,
+            this.config.selectors.container.replace('.', ''),
+            true,
+        );
+        toggleClass(
+            this.elements.container,
+            this.config.classNames.uiSupported,
+            this.supported.ui,
+        );
     },
 
     // Toggle native HTML5 media controls
@@ -35,7 +43,9 @@ const ui = {
 
         // Don't setup interface if no support
         if (!this.supported.ui) {
-            this.debug.warn(`Basic support only for ${this.provider} ${this.type}`);
+            this.debug.warn(
+                `Basic support only for ${this.provider} ${this.type}`,
+            );
 
             // Restore native controls
             ui.toggleNativeControls.call(this, true);
@@ -93,13 +103,25 @@ const ui = {
         );
 
         // Check for airplay support
-        toggleClass(this.elements.container, this.config.classNames.airplay.supported, support.airplay && this.isHTML5);
+        toggleClass(
+            this.elements.container,
+            this.config.classNames.airplay.supported,
+            support.airplay && this.isHTML5,
+        );
 
         // Add iOS class
-        toggleClass(this.elements.container, this.config.classNames.isIos, browser.isIos);
+        toggleClass(
+            this.elements.container,
+            this.config.classNames.isIos,
+            browser.isIos,
+        );
 
         // Add touch class
-        toggleClass(this.elements.container, this.config.classNames.isTouch, this.touch);
+        toggleClass(
+            this.elements.container,
+            this.config.classNames.isTouch,
+            this.touch,
+        );
 
         // Ready for API calls
         this.ready = true;
@@ -149,7 +171,9 @@ const ui = {
             }
 
             // Default to media type
-            const title = !is.empty(this.config.title) ? this.config.title : 'video';
+            const title = !is.empty(this.config.title)
+                ? this.config.title
+                : 'video';
             const format = i18n.get('frameTitle', this.config);
 
             iframe.setAttribute('title', format.replace('{title}', title));
@@ -158,7 +182,11 @@ const ui = {
 
     // Toggle poster
     togglePoster(enable) {
-        toggleClass(this.elements.container, this.config.classNames.posterEnabled, enable);
+        toggleClass(
+            this.elements.container,
+            this.config.classNames.posterEnabled,
+            enable,
+        );
     },
 
     // Set the poster image (async)
@@ -189,7 +217,9 @@ const ui = {
                 .then(() => {
                     // Prevent race conditions
                     if (poster !== this.poster) {
-                        throw new Error('setPoster cancelled by later call to setPoster');
+                        throw new Error(
+                            'setPoster cancelled by later call to setPoster',
+                        );
                     }
                 })
                 .then(() => {
@@ -207,9 +237,21 @@ const ui = {
     // Check playing state
     checkPlaying(event) {
         // Class hooks
-        toggleClass(this.elements.container, this.config.classNames.playing, this.playing);
-        toggleClass(this.elements.container, this.config.classNames.paused, this.paused);
-        toggleClass(this.elements.container, this.config.classNames.stopped, this.stopped);
+        toggleClass(
+            this.elements.container,
+            this.config.classNames.playing,
+            this.playing,
+        );
+        toggleClass(
+            this.elements.container,
+            this.config.classNames.paused,
+            this.paused,
+        );
+        toggleClass(
+            this.elements.container,
+            this.config.classNames.stopped,
+            this.stopped,
+        );
 
         // Set state
         Array.from(this.elements.buttons.play || []).forEach(target => {
@@ -235,7 +277,11 @@ const ui = {
         // Timer to prevent flicker when seeking
         this.timers.loading = setTimeout(() => {
             // Update progress bar loading class state
-            toggleClass(this.elements.container, this.config.classNames.loading, this.loading);
+            toggleClass(
+                this.elements.container,
+                this.config.classNames.loading,
+                this.loading,
+            );
 
             // Update controls visibility
             ui.toggleControls.call(this);
@@ -248,7 +294,15 @@ const ui = {
 
         if (controls && this.config.hideControls) {
             // Show controls if force, loading, paused, or button interaction, otherwise hide
-            this.toggleControls(Boolean(force || this.loading || this.paused || controls.pressed || controls.hover));
+            this.toggleControls(
+                Boolean(
+                    force ||
+                        this.loading ||
+                        this.paused ||
+                        controls.pressed ||
+                        controls.hover,
+                ),
+            );
         }
     },
 };

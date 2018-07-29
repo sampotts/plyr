@@ -42,7 +42,7 @@
         "babel-plugin-external-helpers": "^6.22.0",
         "babel-preset-env": "^1.7.0",
         "del": "^3.0.0",
-        "eslint": "^5.1.0",
+        "eslint": "^5.2.0",
         "eslint-config-airbnb-base": "^13.0.0",
         "eslint-config-prettier": "^2.9.0",
         "eslint-plugin-import": "^2.13.0",
@@ -57,7 +57,7 @@
         "gulp-header": "^2.0.5",
         "gulp-open": "^3.0.1",
         "gulp-postcss": "^7.0.1",
-        "gulp-rename": "^1.3.0",
+        "gulp-rename": "^1.4.0",
         "gulp-replace": "^1.0.0",
         "gulp-s3": "^0.11.0",
         "gulp-sass": "^4.0.1",
@@ -81,15 +81,15 @@
         "stylelint-config-recommended": "^2.1.0",
         "stylelint-config-sass-guidelines": "^5.0.0",
         "stylelint-order": "^0.8.1",
-        "stylelint-scss": "^3.1.3",
+        "stylelint-scss": "^3.2.0",
         "stylelint-selector-bem-pattern": "^2.0.0",
         "through2": "^2.0.3"
     },
     "dependencies": {
         "babel-polyfill": "^6.26.0",
-        "custom-event-polyfill": "^0.3.0",
+        "custom-event-polyfill": "^1.0.2",
         "loadjs": "^3.5.4",
-        "raven-js": "^3.26.3",
+        "raven-js": "^3.26.4",
         "url-polyfill": "^1.0.13"
     }
 }

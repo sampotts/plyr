@@ -25,9 +25,13 @@ const support = {
     // Check for support
     // Basic functionality vs full UI
     check(type, provider, playsinline) {
-        const canPlayInline = browser.isIPhone && playsinline && support.playsinline;
+        const canPlayInline =
+            browser.isIPhone && playsinline && support.playsinline;
         const api = support[type] || provider !== 'html5';
-        const ui = api && support.rangeInput && (type !== 'video' || !browser.isIPhone || canPlayInline);
+        const ui =
+            api &&
+            support.rangeInput &&
+            (type !== 'video' || !browser.isIPhone || canPlayInline);
 
         return {
             api,
@@ -37,7 +41,9 @@ const support = {
 
     // Picture-in-picture support
     // Safari only currently
-    pip: (() => !browser.isIPhone && is.function(createElement('video').webkitSetPresentationMode))(),
+    pip: (() =>
+        !browser.isIPhone &&
+        is.function(createElement('video').webkitSetPresentationMode))(),
 
     // Airplay support
     // Safari only currently
@@ -69,7 +75,9 @@ const support = {
         }
 
         try {
-            return Boolean(type && this.media.canPlayType(type).replace(/no/, ''));
+            return Boolean(
+                type && this.media.canPlayType(type).replace(/no/, ''),
+            );
         } catch (err) {
             return false;
         }
@@ -94,7 +102,9 @@ const support = {
 
     // Reduced motion iOS & MacOS setting
     // https://webkit.org/blog/7551/responsive-design-for-motion/
-    reducedMotion: 'matchMedia' in window && window.matchMedia('(prefers-reduced-motion)').matches,
+    reducedMotion:
+        'matchMedia' in window &&
+        window.matchMedia('(prefers-reduced-motion)').matches,
 };
 
 export default support;

@@ -7,17 +7,16 @@
     background-position: 50% 50%;
     background-repeat: no-repeat;
     background-size: contain;
+    display: none;
     height: 100%;
     left: 0;
-    opacity: 0;
+    pointer-events: none;
     position: absolute;
     top: 0;
-    transition: opacity 0.3s ease;
     width: 100%;
     z-index: 1;
 }
 
 .plyr--stopped.plyr__poster-enabled .plyr__poster {
-    opacity: 1;
-    pointer-events: none;
+    display: block;
 }
