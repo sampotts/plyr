@@ -28,7 +28,6 @@
     border: 0;
     border-radius: ($plyr-range-track-height / 2);
     height: $plyr-range-track-height;
-    transition: all 0.3s ease;
     user-select: none;
 }
 
@@ -45,7 +44,8 @@
 }
 
 @mixin plyr-range-thumb-active($color: rgba($plyr-range-thumb-bg, 0.5)) {
-    box-shadow: $plyr-range-thumb-shadow, 0 0 0 $plyr-range-thumb-active-shadow-width $color;
+    box-shadow: $plyr-range-thumb-shadow,
+        0 0 0 $plyr-range-thumb-active-shadow-width $color;
 }
 
 // Fullscreen styles
