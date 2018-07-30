@@ -112,7 +112,8 @@
 
 .plyr__controls:empty {
     display: none;
+    
     ~ .plyr__captions {
-        transform: translateY(0px);
+        transform: translateY(0);
     }
 }
