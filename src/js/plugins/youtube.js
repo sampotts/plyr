@@ -188,6 +188,7 @@ const youtube = {
             videoId,
             playerVars: {
                 autoplay: player.config.autoplay ? 1 : 0, // Autoplay
+                hl: player.config.hl, // iframe interface language
                 controls: player.supported.ui ? 0 : 1, // Only show controls if not fully supported
                 rel: 0, // No related vids
                 showinfo: 0, // Hide info
@@ -239,6 +240,10 @@ const youtube = {
                     triggerEvent.call(player, player.media, 'ratechange');
                 },
                 onReady(event) {
+                    // Bail if onReady has already been called. See issue #1108
+                    if (is.function(player.media.play)) {
+                        return;
+                    }
                     // Get the instance
                     const instance = event.target;
 

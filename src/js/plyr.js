@@ -171,7 +171,7 @@ class Plyr {
                     this.elements.container.className = '';
 
                     // Get attributes from URL and set config
-                    if (url.searchParams.length) {
+                    if (url.search.length) {
                         const truthy = ['1', 'true'];
 
                         if (truthy.includes(url.searchParams.get('autoplay'))) {
@@ -185,6 +185,7 @@ class Plyr {
                         // YouTube requires the playsinline in the URL
                         if (this.isYouTube) {
                             this.config.playsinline = truthy.includes(url.searchParams.get('playsinline'));
+                            this.config.hl = url.searchParams.get('hl');
                         } else {
                             this.config.playsinline = true;
                         }
