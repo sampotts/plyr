@@ -192,8 +192,7 @@ class Plyr {
                         // YouTube requires the playsinline in the URL
                         if (this.isYouTube) {
                             this.config.playsinline = truthy.includes(url.searchParams.get('playsinline'));
-                            this.config.hl = url.searchParams.get('hl');
-                            );
+                            this.config.hl = url.searchParams.get('hl'); // TODO: Should this be setting language?
                         } else {
                             this.config.playsinline = true;
                         }
