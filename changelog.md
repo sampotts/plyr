@@ -2,6 +2,7 @@
 
 -   Add support for YouTube's hl param (thanks @renaudleo)
 -   Fix for captions positioning when no controls (thanks @friday and @mjfwebb)
+-   Fix #1108: Make sure youtube.onReady doesn't run twice (thanks @friday)
 -   Fix for WebKit redraw loop on the `<input type="range">` elements
 
 # v3.3.22
