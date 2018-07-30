@@ -8148,12 +8148,9 @@ typeof navigator === "object" && (function (global, factory) {
 	            target = this.elements.container;
 	        }
 
-	        // Inject controls HTML
-	        if (is$1.element(container)) {
-	            target.appendChild(container);
-	        } else if (container) {
-	            target.insertAdjacentHTML('beforeend', container);
-	        }
+	        // Inject controls HTML (needs to be before captions, hence "afterbegin")
+	        var insertMethod = is$1.element(container) ? 'insertAdjacentElement' : 'insertAdjacentHTML';
+	        target[insertMethod]('afterbegin', container);
 
 	        // Find the elements if need be
 	        if (!is$1.element(this.elements.controls)) {
@@ -11162,6 +11159,7 @@ typeof navigator === "object" && (function (global, factory) {
 	            videoId: videoId,
 	            playerVars: {
 	                autoplay: player.config.autoplay ? 1 : 0, // Autoplay
+	                hl: player.config.hl, // iframe interface language
 	                controls: player.supported.ui ? 0 : 1, // Only show controls if not fully supported
 	                rel: 0, // No related vids
 	                showinfo: 0, // Hide info
@@ -11212,6 +11210,10 @@ typeof navigator === "object" && (function (global, factory) {
 	                    triggerEvent.call(player, player.media, 'ratechange');
 	                },
 	                onReady: function onReady(event) {
+	                    // Bail if onReady has already been called. See issue #1108
+	                    if (is$1.function(player.media.play)) {
+	                        return;
+	                    }
 	                    // Get the instance
 	                    var instance = event.target;
 
@@ -12467,7 +12469,7 @@ typeof navigator === "object" && (function (global, factory) {
 	                    this.elements.container.className = '';
 
 	                    // Get attributes from URL and set config
-	                    if (url.searchParams.length) {
+	                    if (url.search.length) {
 	                        var truthy = ['1', 'true'];
 
 	                        if (truthy.includes(url.searchParams.get('autoplay'))) {
@@ -12481,6 +12483,7 @@ typeof navigator === "object" && (function (global, factory) {
 	                        // YouTube requires the playsinline in the URL
 	                        if (this.isYouTube) {
 	                            this.config.playsinline = truthy.includes(url.searchParams.get('playsinline'));
+	                            this.config.hl = url.searchParams.get('hl');
 	                        } else {
 	                            this.config.playsinline = true;
 	                        }
