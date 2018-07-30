@@ -761,6 +761,17 @@ class Listeners {
             },
         );
 
+        // Fix range inputs on iOS
+        // Super weird iOS bug where after you interact with an <input type="range">,
+        // it takes over further interactions on the page. This is a hack
+        if (browser.isIos) {
+            const inputs = getElements.call(player, 'input[type="range"]');
+
+            Array.from(inputs).forEach(input =>
+                this.bind(input, inputEvent, event => repaint(event.target)),
+            );
+        }
+
         // Seek
         this.bind(
             player.elements.inputs.seek,
@@ -776,12 +787,6 @@ class Listeners {
                 }
 
                 seek.removeAttribute('seek-value');
-
-                // Super weird iOS bug where after you interact with an <input type="range">,
-                // it takes over further interactions on the page. This is a hack
-                if (browser.isIos) {
-                    repaint(seek);
-                }
 
                 player.currentTime = seekTo / seek.max * player.duration;
             },
