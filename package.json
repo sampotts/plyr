@@ -1,6 +1,6 @@
 {
     "name": "plyr",
-    "version": "3.3.22",
+    "version": "3.3.23",
     "description":
         "A simple, accessible and customizable HTML5, YouTube and Vimeo media player",
     "homepage": "https://plyr.io",
@@ -73,10 +73,10 @@
         "remark-cli": "^5.0.0",
         "remark-validate-links": "^7.0.0",
         "rollup-plugin-babel": "^3.0.7",
-        "rollup-plugin-commonjs": "^9.1.3",
+        "rollup-plugin-commonjs": "^9.1.4",
         "rollup-plugin-node-resolve": "^3.3.0",
         "run-sequence": "^2.2.1",
-        "stylelint": "^9.3.0",
+        "stylelint": "^9.4.0",
         "stylelint-config-prettier": "^3.3.0",
         "stylelint-config-recommended": "^2.1.0",
         "stylelint-config-sass-guidelines": "^5.0.0",
@@ -87,7 +87,7 @@
     },
     "dependencies": {
         "babel-polyfill": "^6.26.0",
-        "custom-event-polyfill": "^1.0.2",
+        "custom-event-polyfill": "^1.0.6",
         "loadjs": "^3.5.4",
         "raven-js": "^3.26.4",
         "url-polyfill": "^1.0.13"

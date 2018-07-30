@@ -1550,12 +1550,9 @@ const controls = {
             target = this.elements.container;
         }
 
-        // Inject controls HTML
-        if (is.element(container)) {
-            target.appendChild(container);
-        } else if (container) {
-            target.insertAdjacentHTML('beforeend', container);
-        }
+        // Inject controls HTML (needs to be before captions, hence "afterbegin")
+        const insertMethod = is.element(container) ? 'insertAdjacentElement' : 'insertAdjacentHTML';
+        target[insertMethod]('afterbegin', container);
 
         // Find the elements if need be
         if (!is.element(this.elements.controls)) {

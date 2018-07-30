@@ -80,7 +80,7 @@ Plyr extends upon the standard [HTML5 media element](https://developer.mozilla.o
 </audio>
 ```
 
-For YouTube and Vimeo players, Plyr uses progressive enhancement to enhance the default `<iframe>` embeds. Below are some examples. The `plyr__video-embed` classname will make the embed responsive. You can add the `autoplay`, `loop` and `playsinline` (YouTube only) query parameters to the URL and they will be set as config options automatically. For YouTube, the `origin` should be updated to reflect the domain you're hosting the embed on, or you can opt to omit it.
+For YouTube and Vimeo players, Plyr uses progressive enhancement to enhance the default `<iframe>` embeds. Below are some examples. The `plyr__video-embed` classname will make the embed responsive. You can add the `autoplay`, `loop`, `hl` (YouTube only) and `playsinline` (YouTube only) query parameters to the URL and they will be set as config options automatically. For YouTube, the `origin` should be updated to reflect the domain you're hosting the embed on, or you can opt to omit it.
 
 #### YouTube embed
 
@@ -132,13 +132,13 @@ See [initialising](#initialising) for more information on advanced setups.
 You can use our CDN (provided by [Fastly](https://www.fastly.com/)) for the JavaScript. There's 2 versions; one with and one without [polyfills](#polyfills). My recommendation would be to manage polyfills seperately as part of your application but to make life easier you can use the polyfilled build.
 
 ```html
-<script src="https://cdn.plyr.io/3.3.22/plyr.js"></script>
+<script src="https://cdn.plyr.io/3.3.23/plyr.js"></script>
 ```
 
 ...or...
 
 ```html
-<script src="https://cdn.plyr.io/3.3.22/plyr.polyfilled.js"></script>
+<script src="https://cdn.plyr.io/3.3.23/plyr.polyfilled.js"></script>
 ```
 
 ### CSS
@@ -152,13 +152,13 @@ Include the `plyr.css` stylsheet into your `<head>`
 If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for the default CSS, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/3.3.22/plyr.css">
+<link rel="stylesheet" href="https://cdn.plyr.io/3.3.23/plyr.css">
 ```
 
 ### SVG Sprite
 
 The SVG sprite is loaded automatically from our CDN (provided by [Fastly](https://www.fastly.com/)). To change this, see the [options](#options) below. For
-reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.3.22/plyr.svg`.
+reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.3.23/plyr.svg`.
 
 ## Ads
 
