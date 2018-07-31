@@ -27,21 +27,9 @@ const supportsPassiveListeners = (() => {
 })();
 
 // Toggle event listener
-export function toggleListener(
-    element,
-    event,
-    callback,
-    toggle = false,
-    passive = true,
-    capture = false,
-) {
+export function toggleListener(element, event, callback, toggle = false, passive = true, capture = false) {
     // Bail if no element, event, or callback
-    if (
-        !element ||
-        !('addEventListener' in element) ||
-        is.empty(event) ||
-        !is.function(callback)
-    ) {
+    if (!element || !('addEventListener' in element) || is.empty(event) || !is.function(callback)) {
         return;
     }
 
@@ -69,74 +57,28 @@ export function toggleListener(
             this.eventListeners.push({ element, type, callback, options });
         }
 
-        element[toggle ? 'addEventListener' : 'removeEventListener'](
-            type,
-            callback,
-            options,
-        );
+        element[toggle ? 'addEventListener' : 'removeEventListener'](type, callback, options);
     });
 }
 
 // Bind event handler
-export function on(
-    element,
-    events = '',
-    callback,
-    passive = true,
-    capture = false,
-) {
-    toggleListener.call(
-        this,
-        element,
-        events,
-        callback,
-        true,
-        passive,
-        capture,
-    );
+export function on(element, events = '', callback, passive = true, capture = false) {
+    toggleListener.call(this, element, events, callback, true, passive, capture);
 }
 
 // Unbind event handler
-export function off(
-    element,
-    events = '',
-    callback,
-    passive = true,
-    capture = false,
-) {
-    toggleListener.call(
-        this,
-        element,
-        events,
-        callback,
-        false,
-        passive,
-        capture,
-    );
+export function off(element, events = '', callback, passive = true, capture = false) {
+    toggleListener.call(this, element, events, callback, false, passive, capture);
 }
 
 // Bind once-only event handler
-export function once(
-    element,
-    events = '',
-    callback,
-    passive = true,
-    capture = false,
-) {
+export function once(element, events = '', callback, passive = true, capture = false) {
     function onceCallback(...args) {
         off(element, events, onceCallback, passive, capture);
         callback.apply(this, args);
     }
 
-    toggleListener.call(
-        this,
-        element,
-        events,
-        onceCallback,
-        true,
-        passive,
-        capture,
-    );
+    toggleListener.call(this, element, events, onceCallback, true, passive, capture);
 }
 
 // Trigger event
@@ -173,9 +115,6 @@ export function unbindListeners() {
 // Run method when / if player is ready
 export function ready() {
     return new Promise(
-        resolve =>
-            this.ready
-                ? setTimeout(resolve, 0)
-                : on.call(this, this.elements.container, 'ready', resolve),
+        resolve => (this.ready ? setTimeout(resolve, 0) : on.call(this, this.elements.container, 'ready', resolve)),
     ).then(() => {});
 }

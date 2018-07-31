@@ -52,11 +52,7 @@ class Plyr {
         }
 
         // jQuery, NodeList or Array passed, use first element
-        if (
-            (window.jQuery && this.media instanceof jQuery) ||
-            is.nodeList(this.media) ||
-            is.array(this.media)
-        ) {
+        if ((window.jQuery && this.media instanceof jQuery) || is.nodeList(this.media) || is.array(this.media)) {
             // eslint-disable-next-line
             this.media = this.media[0];
         }
@@ -69,9 +65,7 @@ class Plyr {
             options || {},
             (() => {
                 try {
-                    return JSON.parse(
-                        this.media.getAttribute('data-plyr-config'),
-                    );
+                    return JSON.parse(this.media.getAttribute('data-plyr-config'));
                 } catch (e) {
                     return {};
                 }
@@ -199,21 +193,14 @@ class Plyr {
                     }
                 } else {
                     // <div> with attributes
-                    this.provider = this.media.getAttribute(
-                        this.config.attributes.embed.provider,
-                    );
+                    this.provider = this.media.getAttribute(this.config.attributes.embed.provider);
 
                     // Remove attribute
-                    this.media.removeAttribute(
-                        this.config.attributes.embed.provider,
-                    );
+                    this.media.removeAttribute(this.config.attributes.embed.provider);
                 }
 
                 // Unsupported or missing provider
-                if (
-                    is.empty(this.provider) ||
-                    !Object.keys(providers).includes(this.provider)
-                ) {
+                if (is.empty(this.provider) || !Object.keys(providers).includes(this.provider)) {
                     this.debug.error('Setup failed: Invalid provider');
                     return;
                 }
@@ -235,10 +222,7 @@ class Plyr {
                 if (this.media.hasAttribute('autoplay')) {
                     this.config.autoplay = true;
                 }
-                if (
-                    this.media.hasAttribute('playsinline') ||
-                    this.media.hasAttribute('webkit-playsinline')
-                ) {
+                if (this.media.hasAttribute('playsinline') || this.media.hasAttribute('webkit-playsinline')) {
                     this.config.playsinline = true;
                 }
                 if (this.media.hasAttribute('muted')) {
@@ -256,11 +240,7 @@ class Plyr {
         }
 
         // Check for support again but with type
-        this.supported = support.check(
-            this.type,
-            this.provider,
-            this.config.playsinline,
-        );
+        this.supported = support.check(this.type, this.provider, this.config.playsinline);
 
         // If no support for even API, bail
         if (!this.supported.api) {
@@ -293,14 +273,9 @@ class Plyr {
 
         // Listen for events if debugging
         if (this.config.debug) {
-            on.call(
-                this,
-                this.elements.container,
-                this.config.events.join(' '),
-                event => {
-                    this.debug.log(`event: ${event.type}`);
-                },
-            );
+            on.call(this, this.elements.container, this.config.events.join(' '), event => {
+                this.debug.log(`event: ${event.type}`);
+            });
         }
 
         // Setup interface
@@ -450,9 +425,7 @@ class Plyr {
      * @param {number} seekTime - how far to rewind in seconds. Defaults to the config.seekTime
      */
     rewind(seekTime) {
-        this.currentTime =
-            this.currentTime -
-            (is.number(seekTime) ? seekTime : this.config.seekTime);
+        this.currentTime = this.currentTime - (is.number(seekTime) ? seekTime : this.config.seekTime);
     }
 
     /**
@@ -460,9 +433,7 @@ class Plyr {
      * @param {number} seekTime - how far to fast forward in seconds. Defaults to the config.seekTime
      */
     forward(seekTime) {
-        this.currentTime =
-            this.currentTime +
-            (is.number(seekTime) ? seekTime : this.config.seekTime);
+        this.currentTime = this.currentTime + (is.number(seekTime) ? seekTime : this.config.seekTime);
     }
 
     /**
@@ -479,9 +450,7 @@ class Plyr {
         const inputIsValid = is.number(input) && input > 0;
 
         // Set
-        this.media.currentTime = inputIsValid
-            ? Math.min(input, this.duration)
-            : 0;
+        this.media.currentTime = inputIsValid ? Math.min(input, this.duration) : 0;
 
         // Logging
         this.debug.log(`Seeking to ${this.currentTime} seconds`);
@@ -531,10 +500,7 @@ class Plyr {
 
         // Media duration can be NaN or Infinity before the media has loaded
         const realDuration = (this.media || {}).duration;
-        const duration =
-            !is.number(realDuration) || realDuration === Infinity
-                ? 0
-                : realDuration;
+        const duration = !is.number(realDuration) || realDuration === Infinity ? 0 : realDuration;
 
         // If config duration is funky, use regular duration
         return fauxDuration || duration;
@@ -728,9 +694,7 @@ class Plyr {
 
         if (!options.includes(quality)) {
             const value = closest(options, quality);
-            this.debug.warn(
-                `Unsupported quality option: ${quality}, using ${value} instead`,
-            );
+            this.debug.warn(`Unsupported quality option: ${quality}, using ${value} instead`);
             quality = value;
         }
 
@@ -929,9 +893,7 @@ class Plyr {
         const toggle = is.boolean(input) ? input : this.pip === states.inline;
 
         // Toggle based on current state
-        this.media.webkitSetPresentationMode(
-            toggle ? states.pip : states.inline,
-        );
+        this.media.webkitSetPresentationMode(toggle ? states.pip : states.inline);
     }
 
     /**
@@ -964,27 +926,16 @@ class Plyr {
         // Don't toggle if missing UI support or if it's audio
         if (this.supported.ui && !this.isAudio) {
             // Get state before change
-            const isHidden = hasClass(
-                this.elements.container,
-                this.config.classNames.hideControls,
-            );
+            const isHidden = hasClass(this.elements.container, this.config.classNames.hideControls);
 
             // Negate the argument if not undefined since adding the class to hides the controls
             const force = typeof toggle === 'undefined' ? undefined : !toggle;
 
             // Apply and get updated state
-            const hiding = toggleClass(
-                this.elements.container,
-                this.config.classNames.hideControls,
-                force,
-            );
+            const hiding = toggleClass(this.elements.container, this.config.classNames.hideControls, force);
 
             // Close menu
-            if (
-                hiding &&
-                this.config.controls.includes('settings') &&
-                !is.empty(this.config.settings)
-            ) {
+            if (hiding && this.config.controls.includes('settings') && !is.empty(this.config.settings)) {
                 controls.toggleMenu.call(this, false);
             }
 
@@ -1074,12 +1025,7 @@ class Plyr {
                 replaceElement(this.elements.original, this.elements.container);
 
                 // Event
-                triggerEvent.call(
-                    this,
-                    this.elements.original,
-                    'destroyed',
-                    true,
-                );
+                triggerEvent.call(this, this.elements.original, 'destroyed', true);
 
                 // Callback
                 if (is.function(callback)) {

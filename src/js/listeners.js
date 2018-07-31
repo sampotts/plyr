@@ -6,14 +6,7 @@ import controls from './controls';
 import ui from './ui';
 import { repaint } from './utils/animation';
 import browser from './utils/browser';
-import {
-    getElement,
-    getElements,
-    hasClass,
-    matches,
-    toggleClass,
-    toggleHidden,
-} from './utils/elements';
+import { getElement, getElements, hasClass, matches, toggleClass, toggleHidden } from './utils/elements';
 import { on, once, toggleListener, triggerEvent } from './utils/events';
 import is from './utils/is';
 
@@ -69,38 +62,13 @@ class Listeners {
                     return;
                 }
 
-                if (
-                    event.which === 32 &&
-                    matches(focused, 'button, [role^="menuitem"]')
-                ) {
+                if (event.which === 32 && matches(focused, 'button, [role^="menuitem"]')) {
                     return;
                 }
             }
 
             // Which keycodes should we prevent default
-            const preventDefault = [
-                32,
-                37,
-                38,
-                39,
-                40,
-                48,
-                49,
-                50,
-                51,
-                52,
-                53,
-                54,
-                56,
-                57,
-                67,
-                70,
-                73,
-                75,
-                76,
-                77,
-                79,
-            ];
+            const preventDefault = [32, 37, 38, 39, 40, 48, 49, 50, 51, 52, 53, 54, 56, 57, 67, 70, 73, 75, 76, 77, 79];
 
             // If the code is found prevent default (e.g. prevent scrolling for arrows)
             if (preventDefault.includes(code)) {
@@ -195,11 +163,7 @@ class Listeners {
 
             // Escape is handle natively when in full screen
             // So we only need to worry about non native
-            if (
-                !player.fullscreen.enabled &&
-                player.fullscreen.active &&
-                code === 27
-            ) {
+            if (!player.fullscreen.enabled && player.fullscreen.active && code === 27) {
                 player.fullscreen.toggle();
             }
 
@@ -222,11 +186,7 @@ class Listeners {
         player.touch = true;
 
         // Add touch class
-        toggleClass(
-            player.elements.container,
-            player.config.classNames.isTouch,
-            true,
-        );
+        toggleClass(player.elements.container, player.config.classNames.isTouch, true);
     }
 
     setTabFocus(event) {
@@ -272,11 +232,7 @@ class Listeners {
                 return;
             }
 
-            toggleClass(
-                document.activeElement,
-                player.config.classNames.tabFocus,
-                true,
-            );
+            toggleClass(document.activeElement, player.config.classNames.tabFocus, true);
         }, 10);
     }
 
@@ -286,38 +242,17 @@ class Listeners {
 
         // Keyboard shortcuts
         if (player.config.keyboard.global) {
-            toggleListener.call(
-                player,
-                window,
-                'keydown keyup',
-                this.handleKey,
-                toggle,
-                false,
-            );
+            toggleListener.call(player, window, 'keydown keyup', this.handleKey, toggle, false);
         }
 
         // Click anywhere closes menu
-        toggleListener.call(
-            player,
-            document.body,
-            'click',
-            this.toggleMenu,
-            toggle,
-        );
+        toggleListener.call(player, document.body, 'click', this.toggleMenu, toggle);
 
         // Detect touch by events
         once.call(player, document.body, 'touchstart', this.firstTouch);
 
         // Tab focus detection
-        toggleListener.call(
-            player,
-            document.body,
-            'keydown focus blur',
-            this.setTabFocus,
-            toggle,
-            false,
-            true,
-        );
+        toggleListener.call(player, document.body, 'keydown focus blur', this.setTabFocus, toggle, false, true);
     }
 
     // Container listeners
@@ -326,13 +261,7 @@ class Listeners {
 
         // Keyboard shortcuts
         if (!player.config.keyboard.global && player.config.keyboard.focused) {
-            on.call(
-                player,
-                player.elements.container,
-                'keydown keyup',
-                this.handleKey,
-                false,
-            );
+            on.call(player, player.elements.container, 'keydown keyup', this.handleKey, false);
         }
 
         // Toggle controls on mouse events and entering fullscreen
@@ -350,9 +279,7 @@ class Listeners {
                 }
 
                 // Show, then hide after a timeout unless another control event occurs
-                const show = ['touchstart', 'touchmove', 'mousemove'].includes(
-                    event.type,
-                );
+                const show = ['touchstart', 'touchmove', 'mousemove'].includes(event.type);
 
                 let delay = 0;
 
@@ -366,10 +293,7 @@ class Listeners {
                 clearTimeout(player.timers.controls);
 
                 // Set new timer to prevent flicker when seeking
-                player.timers.controls = setTimeout(
-                    () => ui.toggleControls.call(player, false),
-                    delay,
-                );
+                player.timers.controls = setTimeout(() => ui.toggleControls.call(player, false), delay);
             },
         );
     }
@@ -379,16 +303,11 @@ class Listeners {
         const { player } = this;
 
         // Time change on media
-        on.call(player, player.media, 'timeupdate seeking seeked', event =>
-            controls.timeUpdate.call(player, event),
-        );
+        on.call(player, player.media, 'timeupdate seeking seeked', event => controls.timeUpdate.call(player, event));
 
         // Display duration
-        on.call(
-            player,
-            player.media,
-            'durationchange loadeddata loadedmetadata',
-            event => controls.durationUpdate.call(player, event),
+        on.call(player, player.media, 'durationchange loadeddata loadedmetadata', event =>
+            controls.durationUpdate.call(player, event),
         );
 
         // Check for audio tracks on load
@@ -408,30 +327,20 @@ class Listeners {
         });
 
         // Check for buffer progress
-        on.call(
-            player,
-            player.media,
-            'progress playing seeking seeked',
-            event => controls.updateProgress.call(player, event),
+        on.call(player, player.media, 'progress playing seeking seeked', event =>
+            controls.updateProgress.call(player, event),
         );
 
         // Handle volume changes
-        on.call(player, player.media, 'volumechange', event =>
-            controls.updateVolume.call(player, event),
-        );
+        on.call(player, player.media, 'volumechange', event => controls.updateVolume.call(player, event));
 
         // Handle play/pause
-        on.call(
-            player,
-            player.media,
-            'playing play pause ended emptied timeupdate',
-            event => ui.checkPlaying.call(player, event),
+        on.call(player, player.media, 'playing play pause ended emptied timeupdate', event =>
+            ui.checkPlaying.call(player, event),
         );
 
         // Loading state
-        on.call(player, player.media, 'waiting canplay seeked playing', event =>
-            ui.checkLoading.call(player, event),
-        );
+        on.call(player, player.media, 'waiting canplay seeked playing', event => ui.checkLoading.call(player, event));
 
         // If autoplay, then load advertisement if required
         // TODO: Show some sort of loading state while the ad manager loads else there's a delay before ad shows
@@ -443,23 +352,14 @@ class Listeners {
             // If ads are enabled, wait for them first
             if (player.ads.enabled && !player.ads.initialized) {
                 // Wait for manager response
-                player.ads.managerPromise
-                    .then(() => player.ads.play())
-                    .catch(() => player.play());
+                player.ads.managerPromise.then(() => player.ads.play()).catch(() => player.play());
             }
         });
 
         // Click video
-        if (
-            player.supported.ui &&
-            player.config.clickToPlay &&
-            !player.isAudio
-        ) {
+        if (player.supported.ui && player.config.clickToPlay && !player.isAudio) {
             // Re-fetch the wrapper
-            const wrapper = getElement.call(
-                player,
-                `.${player.config.classNames.video}`,
-            );
+            const wrapper = getElement.call(player, `.${player.config.classNames.video}`);
 
             // Bail if there's no wrapper (this should never happen)
             if (!is.element(wrapper)) {
@@ -467,42 +367,31 @@ class Listeners {
             }
 
             // On click play, pause ore restart
-            on.call(
-                player,
-                player.elements.container,
-                'click touchstart',
-                event => {
-                    const targets = [player.elements.container, wrapper];
+            on.call(player, player.elements.container, 'click touchstart', event => {
+                const targets = [player.elements.container, wrapper];
 
-                    // Ignore if click if not container or in video wrapper
-                    if (
-                        !targets.includes(event.target) &&
-                        !wrapper.contains(event.target)
-                    ) {
-                        return;
-                    }
+                // Ignore if click if not container or in video wrapper
+                if (!targets.includes(event.target) && !wrapper.contains(event.target)) {
+                    return;
+                }
 
-                    // First touch on touch devices will just show controls (if we're hiding controls)
-                    // If controls are shown then it'll toggle like a pointer device
-                    if (
-                        player.config.hideControls &&
-                        player.touch &&
-                        hasClass(
-                            player.elements.container,
-                            player.config.classNames.hideControls,
-                        )
-                    ) {
-                        return;
-                    }
+                // First touch on touch devices will just show controls (if we're hiding controls)
+                // If controls are shown then it'll toggle like a pointer device
+                if (
+                    player.config.hideControls &&
+                    player.touch &&
+                    hasClass(player.elements.container, player.config.classNames.hideControls)
+                ) {
+                    return;
+                }
 
-                    if (player.ended) {
-                        player.restart();
-                        player.play();
-                    } else {
-                        player.togglePlay();
-                    }
-                },
-            );
+                if (player.ended) {
+                    player.restart();
+                    player.play();
+                } else {
+                    player.togglePlay();
+                }
+            });
         }
 
         // Disable right click
@@ -545,19 +434,12 @@ class Listeners {
         // Quality change
         on.call(player, player.media, 'qualitychange', event => {
             // Update UI
-            controls.updateSetting.call(
-                player,
-                'quality',
-                null,
-                event.detail.quality,
-            );
+            controls.updateSetting.call(player, 'quality', null, event.detail.quality);
         });
 
         // Proxy events to container
         // Bubble up key events for Edge
-        const proxyEvents = player.config.events
-            .concat(['keyup', 'keydown'])
-            .join(' ');
+        const proxyEvents = player.config.events.concat(['keyup', 'keydown']).join(' ');
 
         on.call(player, player.media, proxyEvents, event => {
             let { detail = {} } = event;
@@ -567,13 +449,7 @@ class Listeners {
                 detail = player.media.error;
             }
 
-            triggerEvent.call(
-                player,
-                player.elements.container,
-                event.type,
-                true,
-                detail,
-            );
+            triggerEvent.call(player, player.elements.container, event.type, true, detail);
         });
     }
 
@@ -625,28 +501,13 @@ class Listeners {
         }
 
         // Pause
-        this.bind(
-            player.elements.buttons.restart,
-            'click',
-            player.restart,
-            'restart',
-        );
+        this.bind(player.elements.buttons.restart, 'click', player.restart, 'restart');
 
         // Rewind
-        this.bind(
-            player.elements.buttons.rewind,
-            'click',
-            player.rewind,
-            'rewind',
-        );
+        this.bind(player.elements.buttons.rewind, 'click', player.rewind, 'rewind');
 
         // Rewind
-        this.bind(
-            player.elements.buttons.fastForward,
-            'click',
-            player.forward,
-            'fastForward',
-        );
+        this.bind(player.elements.buttons.fastForward, 'click', player.forward, 'fastForward');
 
         // Mute toggle
         this.bind(
@@ -659,9 +520,7 @@ class Listeners {
         );
 
         // Captions toggle
-        this.bind(player.elements.buttons.captions, 'click', () =>
-            player.toggleCaptions(),
-        );
+        this.bind(player.elements.buttons.captions, 'click', () => player.toggleCaptions());
 
         // Fullscreen toggle
         this.bind(
@@ -684,12 +543,7 @@ class Listeners {
         );
 
         // Airplay
-        this.bind(
-            player.elements.buttons.airplay,
-            'click',
-            player.airplay,
-            'airplay',
-        );
+        this.bind(player.elements.buttons.airplay, 'click', player.airplay, 'airplay');
 
         // Settings menu - click toggle
         this.bind(player.elements.buttons.settings, 'click', event => {
@@ -731,39 +585,30 @@ class Listeners {
         });
 
         // Pause while seeking
-        this.bind(
-            player.elements.inputs.seek,
-            'mousedown mouseup keydown keyup touchstart touchend',
-            event => {
-                const seek = event.currentTarget;
-                const code = event.keyCode ? event.keyCode : event.which;
-                const eventType = event.type;
-                const attribute = 'play-on-seeked';
+        this.bind(player.elements.inputs.seek, 'mousedown mouseup keydown keyup touchstart touchend', event => {
+            const seek = event.currentTarget;
+            const code = event.keyCode ? event.keyCode : event.which;
+            const eventType = event.type;
+            const attribute = 'play-on-seeked';
 
-                if (
-                    (eventType === 'keydown' || eventType === 'keyup') &&
-                    (code !== 39 && code !== 37)
-                ) {
-                    return;
-                }
-                // Was playing before?
-                const play = seek.hasAttribute(attribute);
+            if ((eventType === 'keydown' || eventType === 'keyup') && (code !== 39 && code !== 37)) {
+                return;
+            }
+            // Was playing before?
+            const play = seek.hasAttribute(attribute);
 
-                // Done seeking
-                const done = ['mouseup', 'touchend', 'keyup'].includes(
-                    event.type,
-                );
+            // Done seeking
+            const done = ['mouseup', 'touchend', 'keyup'].includes(event.type);
 
-                // If we're done seeking and it was playing, resume playback
-                if (play && done) {
-                    seek.removeAttribute(attribute);
-                    player.play();
-                } else if (!done && player.playing) {
-                    seek.setAttribute(attribute, '');
-                    player.pause();
-                }
-            },
-        );
+            // If we're done seeking and it was playing, resume playback
+            if (play && done) {
+                seek.removeAttribute(attribute);
+                player.play();
+            } else if (!done && player.playing) {
+                seek.setAttribute(attribute, '');
+                player.pause();
+            }
+        });
 
         // Fix range inputs on iOS
         // Super weird iOS bug where after you interact with an <input type="range">,
@@ -771,9 +616,7 @@ class Listeners {
         if (browser.isIos) {
             const inputs = getElements.call(player, 'input[type="range"]');
 
-            Array.from(inputs).forEach(input =>
-                this.bind(input, inputEvent, event => repaint(event.target)),
-            );
+            Array.from(inputs).forEach(input => this.bind(input, inputEvent, event => repaint(event.target)));
         }
 
         // Seek
@@ -799,10 +642,7 @@ class Listeners {
 
         // Current time invert
         // Only if one time element is used for both currentTime and duration
-        if (
-            player.config.toggleInvert &&
-            !is.element(player.elements.display.duration)
-        ) {
+        if (player.config.toggleInvert && !is.element(player.elements.display.duration)) {
             this.bind(player.elements.display.currentTime, 'click', () => {
                 // Do nothing if we're at the start
                 if (player.currentTime === 0) {
@@ -827,39 +667,25 @@ class Listeners {
 
         // Polyfill for lower fill in <input type="range"> for webkit
         if (browser.isWebkit) {
-            Array.from(getElements.call(player, 'input[type="range"]')).forEach(
-                element => {
-                    this.bind(element, 'input', event =>
-                        controls.updateRangeFill.call(player, event.target),
-                    );
-                },
-            );
+            Array.from(getElements.call(player, 'input[type="range"]')).forEach(element => {
+                this.bind(element, 'input', event => controls.updateRangeFill.call(player, event.target));
+            });
         }
 
         // Seek tooltip
-        this.bind(
-            player.elements.progress,
-            'mouseenter mouseleave mousemove',
-            event => controls.updateSeekTooltip.call(player, event),
+        this.bind(player.elements.progress, 'mouseenter mouseleave mousemove', event =>
+            controls.updateSeekTooltip.call(player, event),
         );
 
         // Update controls.hover state (used for ui.toggleControls to avoid hiding when interacting)
         this.bind(player.elements.controls, 'mouseenter mouseleave', event => {
-            player.elements.controls.hover =
-                !player.touch && event.type === 'mouseenter';
+            player.elements.controls.hover = !player.touch && event.type === 'mouseenter';
         });
 
         // Update controls.pressed state (used for ui.toggleControls to avoid hiding when interacting)
-        this.bind(
-            player.elements.controls,
-            'mousedown mouseup touchstart touchend touchcancel',
-            event => {
-                player.elements.controls.pressed = [
-                    'mousedown',
-                    'touchstart',
-                ].includes(event.type);
-            },
-        );
+        this.bind(player.elements.controls, 'mousedown mouseup touchstart touchend touchcancel', event => {
+            player.elements.controls.pressed = ['mousedown', 'touchstart'].includes(event.type);
+        });
 
         // Focus in/out on controls
         this.bind(player.elements.controls, 'focusin focusout', event => {
@@ -867,11 +693,7 @@ class Listeners {
             const isFocusIn = event.type === 'focusin';
 
             // Skip transition to prevent focus from scrolling the parent element
-            toggleClass(
-                elements.controls,
-                config.classNames.noTransition,
-                isFocusIn,
-            );
+            toggleClass(elements.controls, config.classNames.noTransition, isFocusIn);
 
             // Toggle
             ui.toggleControls.call(player, isFocusIn);
@@ -880,11 +702,7 @@ class Listeners {
             if (isFocusIn) {
                 // Restore transition
                 setTimeout(() => {
-                    toggleClass(
-                        elements.controls,
-                        config.classNames.noTransition,
-                        false,
-                    );
+                    toggleClass(elements.controls, config.classNames.noTransition, false);
                 }, 0);
 
                 // Delay a little more for keyboard users
@@ -894,10 +712,7 @@ class Listeners {
                 clearTimeout(timers.controls);
 
                 // Hide
-                timers.controls = setTimeout(
-                    () => ui.toggleControls.call(player, false),
-                    delay,
-                );
+                timers.controls = setTimeout(() => ui.toggleControls.call(player, false), delay);
             }
         });
 
@@ -911,9 +726,7 @@ class Listeners {
                 const inverted = event.webkitDirectionInvertedFromDevice;
 
                 // Get delta from event. Invert if `inverted` is true
-                const [x, y] = [event.deltaX, -event.deltaY].map(
-                    value => (inverted ? -value : value),
-                );
+                const [x, y] = [event.deltaX, -event.deltaY].map(value => (inverted ? -value : value));
 
                 // Using the biggest delta, normalize to 1 or -1 (or 0 if no delta)
                 const direction = Math.sign(Math.abs(x) > Math.abs(y) ? x : y);
@@ -923,10 +736,7 @@ class Listeners {
 
                 // Don't break page scrolling at max and min
                 const { volume } = player.media;
-                if (
-                    (direction === 1 && volume < 1) ||
-                    (direction === -1 && volume > 0)
-                ) {
+                if ((direction === 1 && volume < 1) || (direction === -1 && volume > 0)) {
                     event.preventDefault();
                 }
             },

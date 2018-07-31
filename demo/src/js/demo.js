@@ -12,9 +12,7 @@ import Raven from 'raven-js';
     // Raven / Sentry
     // For demo site (https://plyr.io) only
     if (isLive) {
-        Raven.config(
-            'https://d4ad9866ad834437a4754e23937071e4@sentry.io/305555',
-        ).install();
+        Raven.config('https://d4ad9866ad834437a4754e23937071e4@sentry.io/305555').install();
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -130,7 +128,7 @@ import Raven from 'raven-js';
                     google: 'AIzaSyDrNwtN3nLH_8rjCmu5Wq3ZCm4MNAVdc0c',
                 },
                 ads: {
-                    // enabled: true,
+                    enabled: true,
                     publisherId: '918848828995742',
                 },
             });
@@ -174,47 +172,40 @@ import Raven from 'raven-js';
                             title: 'View From A Blue Moon',
                             sources: [
                                 {
-                                    src:
-                                        'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-576p.mp4',
+                                    src: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-576p.mp4',
                                     type: 'video/mp4',
                                     size: 576,
                                 },
                                 {
-                                    src:
-                                        'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-720p.mp4',
+                                    src: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-720p.mp4',
                                     type: 'video/mp4',
                                     size: 720,
                                 },
                                 {
-                                    src:
-                                        'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-1080p.mp4',
+                                    src: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-1080p.mp4',
                                     type: 'video/mp4',
                                     size: 1080,
                                 },
                                 {
-                                    src:
-                                        'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-1440p.mp4',
+                                    src: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-1440p.mp4',
                                     type: 'video/mp4',
                                     size: 1440,
                                 },
                             ],
-                            poster:
-                                'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.jpg',
+                            poster: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.jpg',
                             tracks: [
                                 {
                                     kind: 'captions',
                                     label: 'English',
                                     srclang: 'en',
-                                    src:
-                                        'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.en.vtt',
+                                    src: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.en.vtt',
                                     default: true,
                                 },
                                 {
                                     kind: 'captions',
                                     label: 'French',
                                     srclang: 'fr',
-                                    src:
-                                        'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.fr.vtt',
+                                    src: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.fr.vtt',
                                 },
                             ],
                         };
@@ -224,17 +215,14 @@ import Raven from 'raven-js';
                     case types.audio:
                         player.source = {
                             type: 'audio',
-                            title:
-                                'Kishi Bashi &ndash; &ldquo;It All Began With A Burst&rdquo;',
+                            title: 'Kishi Bashi &ndash; &ldquo;It All Began With A Burst&rdquo;',
                             sources: [
                                 {
-                                    src:
-                                        'https://cdn.plyr.io/static/demo/Kishi_Bashi_-_It_All_Began_With_a_Burst.mp3',
+                                    src: 'https://cdn.plyr.io/static/demo/Kishi_Bashi_-_It_All_Began_With_a_Burst.mp3',
                                     type: 'audio/mp3',
                                 },
                                 {
-                                    src:
-                                        'https://cdn.plyr.io/static/demo/Kishi_Bashi_-_It_All_Began_With_a_Burst.ogg',
+                                    src: 'https://cdn.plyr.io/static/demo/Kishi_Bashi_-_It_All_Began_With_a_Burst.ogg',
                                     type: 'audio/ogg',
                                 },
                             ],
@@ -247,8 +235,7 @@ import Raven from 'raven-js';
                             type: 'video',
                             sources: [
                                 {
-                                    src:
-                                        'https://youtube.com/watch?v=bTqVqk7FSmY',
+                                    src: 'https://youtube.com/watch?v=bTqVqk7FSmY',
                                     provider: 'youtube',
                                 },
                             ],
@@ -277,26 +264,16 @@ import Raven from 'raven-js';
                 currentType = type;
 
                 // Remove active classes
-                Array.from(buttons).forEach(button =>
-                    toggleClass(button.parentElement, 'active', false),
-                );
+                Array.from(buttons).forEach(button => toggleClass(button.parentElement, 'active', false));
 
                 // Set active on parent
-                toggleClass(
-                    document.querySelector(`[data-source="${type}"]`),
-                    'active',
-                    true,
-                );
+                toggleClass(document.querySelector(`[data-source="${type}"]`), 'active', true);
 
                 // Show cite
-                Array.from(document.querySelectorAll('.plyr__cite')).forEach(
-                    cite => {
-                        cite.setAttribute('hidden', '');
-                    },
-                );
-                document
-                    .querySelector(`.plyr__cite--${type}`)
-                    .removeAttribute('hidden');
+                Array.from(document.querySelectorAll('.plyr__cite')).forEach(cite => {
+                    cite.setAttribute('hidden', '');
+                });
+                document.querySelector(`.plyr__cite--${type}`).removeAttribute('hidden');
             }
 
             // Bind to each button
@@ -364,13 +341,7 @@ import Raven from 'raven-js';
             a.async = 1;
             a.src = g;
             m.parentNode.insertBefore(a, m);
-        })(
-            window,
-            document,
-            'script',
-            'https://www.google-analytics.com/analytics.js',
-            'ga',
-        );
+        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
         window.ga('create', 'UA-40881672-11', 'auto');
         window.ga('send', 'pageview');
     }
