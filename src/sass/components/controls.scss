@@ -2,6 +2,11 @@
 // Controls
 // --------------------------------------------------------------
 
+// Hide empty controls
+.plyr__controls:empty {
+    display: none;
+}
+
 // Hide native controls
 .plyr--full-ui ::-webkit-media-controls {
     display: none;
@@ -108,12 +113,4 @@
 .plyr--airplay-supported [data-plyr='airplay'],
 .plyr--fullscreen-enabled [data-plyr='fullscreen'] {
     display: inline-block;
-}
-
-.plyr__controls:empty {
-    display: none;
-    
-    ~ .plyr__captions {
-        transform: translateY(0);
-    }
 }
