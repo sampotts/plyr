@@ -4153,8 +4153,7 @@ typeof navigator === "object" && (function () {
 	                    global: true
 	                },
 	                tooltips: {
-	                    controls: false,
-	                    seek: false
+	                    controls: true
 	                },
 	                // clickToPlay: false,
 	                /* controls: [
@@ -4214,7 +4213,7 @@ typeof navigator === "object" && (function () {
 	                    google: 'AIzaSyDrNwtN3nLH_8rjCmu5Wq3ZCm4MNAVdc0c'
 	                },
 	                ads: {
-	                    // enabled: true,
+	                    enabled: true,
 	                    publisherId: '918848828995742'
 	                }
 	            });

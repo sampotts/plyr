@@ -2979,7 +2979,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 	var defineProperty = _objectDp.f;
 	var _wksDefine = function (name) {
-	  var $Symbol = _core.Symbol || (_core.Symbol = _global.Symbol || {});
+	  var $Symbol = _core.Symbol || (_core.Symbol = _library ? {} : _global.Symbol || {});
 	  if (name.charAt(0) != '_' && !(name in $Symbol)) defineProperty($Symbol, name, { value: _wksExt.f(name) });
 	};
 
@@ -6962,12 +6962,20 @@ typeof navigator === "object" && (function (global, factory) {
 	        // Setup toggle icon and labels
 	        if (toggle) {
 	            // Icon
-	            button.appendChild(controls.createIcon.call(this, iconPressed, { class: 'icon--pressed' }));
-	            button.appendChild(controls.createIcon.call(this, icon, { class: 'icon--not-pressed' }));
+	            button.appendChild(controls.createIcon.call(this, iconPressed, {
+	                class: 'icon--pressed'
+	            }));
+	            button.appendChild(controls.createIcon.call(this, icon, {
+	                class: 'icon--not-pressed'
+	            }));
 
 	            // Label/Tooltip
-	            button.appendChild(controls.createLabel.call(this, labelPressed, { class: 'label--pressed' }));
-	            button.appendChild(controls.createLabel.call(this, label, { class: 'label--not-pressed' }));
+	            button.appendChild(controls.createLabel.call(this, labelPressed, {
+	                class: 'label--pressed'
+	            }));
+	            button.appendChild(controls.createLabel.call(this, label, {
+	                class: 'label--not-pressed'
+	            }));
 	        } else {
 	            button.appendChild(controls.createIcon.call(this, icon));
 	            button.appendChild(controls.createLabel.call(this, label));
@@ -7080,11 +7088,13 @@ typeof navigator === "object" && (function (global, factory) {
 
 
 	    // Bind keyboard shortcuts for a menu item
+	    // We have to bind to keyup otherwise Firefox triggers a click when a keydown event handler shifts focus
+	    // https://bugzilla.mozilla.org/show_bug.cgi?id=1220143
 	    bindMenuItemShortcuts: function bindMenuItemShortcuts(menuItem, type) {
 	        var _this = this;
 
 	        // Handle space or -> to open menu
-	        on(menuItem, 'keydown', function (event) {
+	        on(menuItem, 'keydown keyup', function (event) {
 	            // We only care about space and ⬆️ ⬇️️ ➡️
 	            if (![32, 38, 39, 40].includes(event.which)) {
 	                return;
@@ -7093,6 +7103,11 @@ typeof navigator === "object" && (function (global, factory) {
 	            // Prevent play / seek
 	            event.preventDefault();
 	            event.stopPropagation();
+
+	            // We're just here to prevent the keydown bubbling
+	            if (event.type === 'keydown') {
+	                return;
+	            }
 
 	            var isRadioButton = matches(menuItem, '[role="menuitemradio"]');
 
@@ -7178,8 +7193,8 @@ typeof navigator === "object" && (function (global, factory) {
 	            }
 	        });
 
-	        this.listeners.bind(menuItem, 'click keydown', function (event) {
-	            if (event.type === 'keydown' && event.which !== 32) {
+	        this.listeners.bind(menuItem, 'click keyup', function (event) {
+	            if (event.type === 'keyup' && event.which !== 32) {
 	                return;
 	            }
 
@@ -7205,7 +7220,7 @@ typeof navigator === "object" && (function (global, factory) {
 	                    break;
 	            }
 
-	            controls.showMenuPanel.call(_this2, 'home', event.type === 'keydown');
+	            controls.showMenuPanel.call(_this2, 'home', event.type === 'keyup');
 	        }, type, false);
 
 	        controls.bindMenuItemShortcuts.call(this, menuItem, type);
@@ -7831,14 +7846,16 @@ typeof navigator === "object" && (function (global, factory) {
 	        // Show the actual popup
 	        if (is$1.element(popup)) {
 	            toggleHidden(popup, !show);
+
 	            toggleClass(this.elements.container, this.config.classNames.menu.open, show);
 
 	            // Focus the first item if key interaction
-	            if (show && is$1.event(input) && input.type === 'keydown') {
+	            if (show && is$1.event(input) && input.type === 'keyup') {
 	                var pane = Object.values(this.elements.settings.panels).find(function (pane) {
 	                    return !pane.hidden;
 	                });
 	                var firstItem = pane.querySelector('[role^="menuitem"]');
+
 	                setFocus.call(this, firstItem, true);
 	            }
 	        }
@@ -7937,11 +7954,6 @@ typeof navigator === "object" && (function (global, factory) {
 	    // TODO: Set order based on order in the config.controls array?
 	    create: function create(data) {
 	        var _this9 = this;
-
-	        // Do nothing if we want no controls
-	        if (is$1.empty(this.config.controls)) {
-	            return null;
-	        }
 
 	        // Create the container
 	        var container = createElement('div', getAttributesFromSelector(this.config.selectors.controls.wrapper));
@@ -8230,13 +8242,19 @@ typeof navigator === "object" && (function (global, factory) {
 	        };
 	        var update = true;
 
-	        if (is$1.string(this.config.controls) || is$1.element(this.config.controls)) {
-	            // String or HTMLElement passed as the option
+	        // If function, run it and use output
+	        if (is$1.function(this.config.controls)) {
+	            this.config.controls = this.config.controls.call(this.props);
+	        }
+
+	        // Convert falsy controls to empty array (primarily for empty strings)
+	        if (!this.config.controls) {
+	            this.config.controls = [];
+	        }
+
+	        if (is$1.element(this.config.controls) || is$1.string(this.config.controls)) {
+	            // HTMLElement or Non-empty string passed as the option
 	            container = this.config.controls;
-	        } else if (is$1.function(this.config.controls)) {
-	            // A custom function to build controls
-	            // The function can return a HTMLElement or String
-	            container = this.config.controls.call(this, props);
 	        } else {
 	            // Create controls
 	            container = controls.create.call(this, {
@@ -9897,7 +9915,7 @@ typeof navigator === "object" && (function (global, factory) {
 	            clearTimeout(this.focusTimer);
 
 	            // Ignore any key other than tab
-	            if (event.type === 'keydown' && event.code !== 'Tab') {
+	            if (event.type === 'keydown' && event.which !== 9) {
 	                return;
 	            }
 
@@ -10266,17 +10284,21 @@ typeof navigator === "object" && (function (global, factory) {
 	            });
 
 	            // Settings menu - keyboard toggle
-	            this.bind(player.elements.buttons.settings, 'keydown', function (event) {
-	                // We only care about space
-	                if (event.which !== 32) {
+	            // We have to bind to keyup otherwise Firefox triggers a click when a keydown event handler shifts focus
+	            // https://bugzilla.mozilla.org/show_bug.cgi?id=1220143
+	            this.bind(player.elements.buttons.settings, 'keyup', function (event) {
+	                // We only care about space and return
+	                if (event.which !== 32 && event.which !== 13) {
 	                    return;
 	                }
 
 	                // Prevent scroll
 	                event.preventDefault();
 
-	                // Prevent playing video
-	                event.stopPropagation();
+	                // Prevent playing video (Firefox)
+	                if (event.which === 32) {
+	                    event.stopPropagation();
+	                }
 
 	                // Toggle menu
 	                controls.toggleMenu.call(player, event);
@@ -10323,8 +10345,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 	                Array.from(inputs).forEach(function (input) {
 	                    return _this2.bind(input, inputEvent, function (event) {
-	                        console.warn(event.type, event.target);
-	                        repaint(event.target);
+	                        return repaint(event.target);
 	                    });
 	                });
 	            }
