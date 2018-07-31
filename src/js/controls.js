@@ -479,7 +479,7 @@ const controls = {
             menuItem,
             'click keyup',
             event => {
-                if (event.type === 'keyup' && event.which !== 32) {
+                if (is.keyboardEvent(event) && event.which !== 32) {
                     return;
                 }
 
@@ -505,7 +505,7 @@ const controls = {
                         break;
                 }
 
-                controls.showMenuPanel.call(this, 'home', event.type === 'keyup');
+                controls.showMenuPanel.call(this, 'home', is.keyboardEvent(event));
             },
             type,
             false,
@@ -1084,13 +1084,18 @@ const controls = {
             return;
         }
 
-        const show = is.boolean(input) ? input : is.element(popup) && popup.hasAttribute('hidden');
+        // True toggle by default
+        let show = is.element(popup) && popup.hasAttribute('hidden');
 
-        if (is.event(input)) {
-            const isMenuItem = is.element(popup) && popup.contains(input.target);
-            const isButton = input.target === this.elements.buttons.settings;
+        if (is.boolean(input)) {
+            show = input;
+        } else if (is.keyboardEvent(input) && input.which === 27) {
+            show = false;
+        } else if (is.event(input)) {
+            const isMenuItem = popup.contains(input.target);
+            const isButton = input.target === button;
 
-            // If the click was inside the form or if the click
+            // If the click was inside the menu or if the click
             // wasn't the button or menu item and we're trying to
             // show the menu (a doc click shouldn't show the menu)
             if (isMenuItem || (!isMenuItem && !isButton && show)) {
@@ -1103,24 +1108,24 @@ const controls = {
             }
         }
 
-        // Set form and button attributes
-        if (is.element(button)) {
-            button.setAttribute('aria-expanded', show);
-        }
+        // Set button attributes
+        button.setAttribute('aria-expanded', show);
 
         // Show the actual popup
-        if (is.element(popup)) {
-            toggleHidden(popup, !show);
+        toggleHidden(popup, !show);
 
-            toggleClass(this.elements.container, this.config.classNames.menu.open, show);
+        // Add class hook
+        toggleClass(this.elements.container, this.config.classNames.menu.open, show);
 
-            // Focus the first item if key interaction
-            if (show && is.event(input) && input.type === 'keyup') {
-                const pane = Object.values(this.elements.settings.panels).find(pane => !pane.hidden);
-                const firstItem = pane.querySelector('[role^="menuitem"]');
-
-                setFocus.call(this, firstItem, true);
-            }
+        // Focus the first item if key interaction
+        if (show && is.keyboardEvent(input)) {
+            const pane = Object.values(this.elements.settings.panels).find(pane => !pane.hidden);
+            const firstItem = pane.querySelector('[role^="menuitem"]');
+            setFocus.call(this, firstItem, true);
+        }
+        // If closing, re-focus the button
+        else if (!show) {
+            setFocus.call(this, button, is.keyboardEvent(input));
         }
     },
 

@@ -16,6 +16,7 @@ const isNodeList = input => instanceOf(input, NodeList);
 const isElement = input => instanceOf(input, Element);
 const isTextNode = input => getConstructor(input) === Text;
 const isEvent = input => instanceOf(input, Event);
+const isKeyboardEvent = input => instanceOf(input, KeyboardEvent);
 const isCue = input => instanceOf(input, window.TextTrackCue) || instanceOf(input, window.VTTCue);
 const isTrack = input => instanceOf(input, TextTrack) || (!isNullOrUndefined(input) && isString(input.kind));
 
@@ -56,6 +57,7 @@ export default {
     element: isElement,
     textNode: isTextNode,
     event: isEvent,
+    keyboardEvent: isKeyboardEvent,
     cue: isCue,
     track: isTrack,
     url: isUrl,
