@@ -6,14 +6,7 @@ import controls from './controls';
 import ui from './ui';
 import { repaint } from './utils/animation';
 import browser from './utils/browser';
-import {
-    getElement,
-    getElements,
-    hasClass,
-    matches,
-    toggleClass,
-    toggleHidden,
-} from './utils/elements';
+import { getElement, getElements, hasClass, matches, toggleClass, toggleHidden } from './utils/elements';
 import { on, once, toggleListener, triggerEvent } from './utils/events';
 import is from './utils/is';
 
@@ -235,7 +228,7 @@ class Listeners {
         clearTimeout(this.focusTimer);
 
         // Ignore any key other than tab
-        if (event.type === 'keydown' && event.code !== 'Tab') {
+        if (event.type === 'keydown' && event.which !== 9) {
             return;
         }
 
@@ -699,18 +692,20 @@ class Listeners {
         // Settings menu - keyboard toggle
         this.bind(
             player.elements.buttons.settings,
-            'keydown',
+            'keyup',
             event => {
-                // We only care about space
-                if (event.which !== 32) {
+                // We only care about space and return
+                if (event.which !== 32 && event.which !== 13) {
                     return;
                 }
 
                 // Prevent scroll
                 event.preventDefault();
 
-                // Prevent playing video
-                event.stopPropagation();
+                // Prevent playing video (Firefox)
+                if (event.which === 32) {
+                    event.stopPropagation();
+                }
 
                 // Toggle menu
                 controls.toggleMenu.call(player, event);

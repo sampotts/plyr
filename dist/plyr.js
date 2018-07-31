@@ -1565,12 +1565,20 @@ typeof navigator === "object" && (function (global, factory) {
             // Setup toggle icon and labels
             if (toggle) {
                 // Icon
-                button.appendChild(controls.createIcon.call(this, iconPressed, { class: 'icon--pressed' }));
-                button.appendChild(controls.createIcon.call(this, icon, { class: 'icon--not-pressed' }));
+                button.appendChild(controls.createIcon.call(this, iconPressed, {
+                    class: 'icon--pressed'
+                }));
+                button.appendChild(controls.createIcon.call(this, icon, {
+                    class: 'icon--not-pressed'
+                }));
 
                 // Label/Tooltip
-                button.appendChild(controls.createLabel.call(this, labelPressed, { class: 'label--pressed' }));
-                button.appendChild(controls.createLabel.call(this, label, { class: 'label--not-pressed' }));
+                button.appendChild(controls.createLabel.call(this, labelPressed, {
+                    class: 'label--pressed'
+                }));
+                button.appendChild(controls.createLabel.call(this, label, {
+                    class: 'label--not-pressed'
+                }));
             } else {
                 button.appendChild(controls.createIcon.call(this, icon));
                 button.appendChild(controls.createLabel.call(this, label));
@@ -1687,7 +1695,7 @@ typeof navigator === "object" && (function (global, factory) {
             var _this = this;
 
             // Handle space or -> to open menu
-            on(menuItem, 'keydown', function (event) {
+            on(menuItem, 'keydown keyup', function (event) {
                 // We only care about space and ⬆️ ⬇️️ ➡️
                 if (![32, 38, 39, 40].includes(event.which)) {
                     return;
@@ -1696,6 +1704,11 @@ typeof navigator === "object" && (function (global, factory) {
                 // Prevent play / seek
                 event.preventDefault();
                 event.stopPropagation();
+
+                // We're just here to prevent the keydown bubbling
+                if (event.type === 'keydown') {
+                    return;
+                }
 
                 var isRadioButton = matches(menuItem, '[role="menuitemradio"]');
 
@@ -1781,8 +1794,8 @@ typeof navigator === "object" && (function (global, factory) {
                 }
             });
 
-            this.listeners.bind(menuItem, 'click keydown', function (event) {
-                if (event.type === 'keydown' && event.which !== 32) {
+            this.listeners.bind(menuItem, 'click keyup', function (event) {
+                if (event.type === 'keyup' && event.which !== 32) {
                     return;
                 }
 
@@ -1808,7 +1821,7 @@ typeof navigator === "object" && (function (global, factory) {
                         break;
                 }
 
-                controls.showMenuPanel.call(_this2, 'home', event.type === 'keydown');
+                controls.showMenuPanel.call(_this2, 'home', event.type === 'keyup');
             }, type, false);
 
             controls.bindMenuItemShortcuts.call(this, menuItem, type);
@@ -2434,14 +2447,16 @@ typeof navigator === "object" && (function (global, factory) {
             // Show the actual popup
             if (is.element(popup)) {
                 toggleHidden(popup, !show);
+
                 toggleClass(this.elements.container, this.config.classNames.menu.open, show);
 
                 // Focus the first item if key interaction
-                if (show && is.event(input) && input.type === 'keydown') {
+                if (show && is.event(input) && input.type === 'keyup') {
                     var pane = Object.values(this.elements.settings.panels).find(function (pane) {
                         return !pane.hidden;
                     });
                     var firstItem = pane.querySelector('[role^="menuitem"]');
+
                     setFocus.call(this, firstItem, true);
                 }
             }
@@ -4500,7 +4515,7 @@ typeof navigator === "object" && (function (global, factory) {
                 clearTimeout(this.focusTimer);
 
                 // Ignore any key other than tab
-                if (event.type === 'keydown' && event.code !== 'Tab') {
+                if (event.type === 'keydown' && event.which !== 9) {
                     return;
                 }
 
@@ -4869,17 +4884,19 @@ typeof navigator === "object" && (function (global, factory) {
                 });
 
                 // Settings menu - keyboard toggle
-                this.bind(player.elements.buttons.settings, 'keydown', function (event) {
-                    // We only care about space
-                    if (event.which !== 32) {
+                this.bind(player.elements.buttons.settings, 'keyup', function (event) {
+                    // We only care about space and return
+                    if (event.which !== 32 && event.which !== 13) {
                         return;
                     }
 
                     // Prevent scroll
                     event.preventDefault();
 
-                    // Prevent playing video
-                    event.stopPropagation();
+                    // Prevent playing video (Firefox)
+                    if (event.which === 32) {
+                        event.stopPropagation();
+                    }
 
                     // Toggle menu
                     controls.toggleMenu.call(player, event);

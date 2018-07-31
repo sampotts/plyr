@@ -39,7 +39,8 @@
 
         > div {
             overflow: hidden;
-            transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1), width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         // Arrow
@@ -73,7 +74,8 @@
             color: $plyr-menu-color;
             display: flex;
             font-size: $plyr-font-size-menu;
-            padding: ceil($plyr-control-padding / 2) ceil($plyr-control-padding * 1.5);
+            padding: ceil($plyr-control-padding / 2)
+                ceil($plyr-control-padding * 1.5);
             user-select: none;
             width: 100%;
 
