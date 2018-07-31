@@ -23,8 +23,20 @@ const html5 = {
         // Get sizes from <source> elements
         return html5.getSources
             .call(this)
-            .map(source => Number(source.getAttribute('size')))
-            .filter(Boolean);
+            .map((source) => {
+                const {
+                    // For backward-compatibility, fallback on the old size-attribute (which I think we should deprecate)
+                    height = Number(source.getAttribute('size')),
+                    label,
+                    badge,
+                } = source.dataset;
+
+                return {
+                    badge,
+                    label,
+                    height,
+                };
+            });
     },
 
     extend() {
@@ -40,16 +52,20 @@ const html5 = {
                 // Get sources
                 const sources = html5.getSources.call(player);
                 const source = sources.find(source => source.getAttribute('src') === player.source);
+                if (!source) {
+                    return undefined;
+                }
+                const sourceIndex = sources.indexOf(source);
 
-                // Return size, if match is found
-                return source && Number(source.getAttribute('size'));
+                // Return label, if match is found
+                return player.options.quality[sourceIndex].label;
             },
             set(input) {
                 // Get sources
                 const sources = html5.getSources.call(player);
 
                 // Get first match for requested size
-                const source = sources.find(source => Number(source.getAttribute('size')) === input);
+                const source = sources[input.index];
 
                 // No matching source found
                 if (!source) {

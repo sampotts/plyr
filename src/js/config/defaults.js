@@ -67,7 +67,7 @@ const defaults = {
 
     // Quality default
     quality: {
-        default: 576,
+        default: 0, // Represents the index instead of label
         options: [
             4320,
             2880,

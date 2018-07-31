@@ -18,7 +18,6 @@ import source from './source';
 import Storage from './storage';
 import support from './support';
 import ui from './ui';
-import { closest } from './utils/arrays';
 import { createElement, hasClass, removeElement, replaceElement, toggleClass, wrap } from './utils/elements';
 import { off, on, once, triggerEvent, unbindListeners } from './utils/events';
 import is from './utils/is';
@@ -678,21 +677,43 @@ class Plyr {
         const config = this.config.quality;
         const options = this.options.quality;
 
+        let quality;
+        // Create a local copy of input so we can handle modifications
+        let qualityInput = input;
         if (!options.length) {
             return;
         }
 
-        let quality = [
-            !is.empty(input) && Number(input),
-            this.storage.get('quality'),
-            config.selected,
-            config.default,
-        ].find(is.number);
+        // Support setting quality as a Number
+        if (is.number(qualityInput)) {
+            // Convert this to a string since quality labels are expected to be strings
+            // XXX: We really only accept labels, but
+            // this is left in place so as to be backward compatible
+            qualityInput = `${qualityInput}p`;
+        }
 
-        if (!options.includes(quality)) {
-            const value = closest(options, quality);
-            this.debug.warn(`Unsupported quality option: ${quality}, using ${value} instead`);
-            quality = value;
+        // Now, convert qualityInput into a quality object.
+        // This object is emitted as part of the qualityrequested event
+        if (is.string(qualityInput)) {
+            // We have only a label
+            // Find the index of this label and
+            // convert this into an Object of the expected type
+            quality = {
+                index: options.map(quality => quality.label).indexOf(qualityInput),
+            };
+        } else if (is.object(qualityInput)) {
+            quality = qualityInput;
+        } else {
+            this.debug.warn(`Quality option of unknown type: ${input} (${typeof input}). Ignoring`);
+            return;
+        }
+
+        // Get the corresponding quality listing from options
+        const entry = options[quality.index];
+
+        if (!entry) {
+            this.debug.warn(`Unsupported quality option: ${input}. Ignoring`);
+            return;
         }
 
         // Trigger request event

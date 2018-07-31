@@ -7,7 +7,6 @@ import html5 from './html5';
 import i18n from './i18n';
 import support from './support';
 import { repaint, transitionEndEvent } from './utils/animation';
-import { dedupe } from './utils/arrays';
 import browser from './utils/browser';
 import {
     createElement,
@@ -671,6 +670,16 @@ const controls = {
     },
 
     // Set the quality menu
+    // options is expected to be an array of objects
+    // Each entry in this array should be of the type:
+    // {
+    //   height: Number,     // mandatory
+    //   label: String,      // optional
+    //   badge: String,      // optional
+    // }
+    // The order of qualities will be based on height. If there are multiple
+    // entries with the same height, then we use the entry's array index instead.
+    // If badge is not specified, it will be looked up by height.
     setQualityMenu(options) {
         // Menu required
         if (!is.element(this.elements.settings.panes.quality)) {
@@ -680,9 +689,9 @@ const controls = {
         const type = 'quality';
         const list = this.elements.settings.panes.quality.querySelector('ul');
 
-        // Set options if passed and filter based on uniqueness and config
+        // Set options if passed
         if (is.array(options)) {
-            this.options.quality = dedupe(options).filter(quality => this.config.quality.options.includes(quality));
+            this.options.quality = options;
         }
 
         // Toggle the pane and tab
@@ -702,53 +711,62 @@ const controls = {
 
         // Get the badge HTML for HD, 4K etc
         const getBadge = quality => {
-            const label = i18n.get(`qualityBadge.${quality}`, this.config);
+            const {
+                height,
+                badge = i18n.get(`qualityBadge.${height}`, this.config),
+            } = quality;
 
-            if (!label.length) {
-                return null;
-            }
-
-            return controls.createBadge.call(this, label);
+            return badge ? controls.createBadge.call(this, badge) : null;
         };
 
         // Sort options by the config and then render options
-        this.options.quality
+        const finalOptions = this.options.quality
             .sort((a, b) => {
-                const sorting = this.config.quality.options;
-                return sorting.indexOf(a) > sorting.indexOf(b) ? 1 : -1;
-            })
-            .forEach(quality => {
-                controls.createMenuItem.call(this, {
-                    value: quality,
-                    list,
-                    type,
-                    title: controls.getLabel.call(this, 'quality', quality),
-                    badge: getBadge(quality),
-                });
-            });
+                if (a.height === b.height) {
+                    return this.options.quality.indexOf(a) > this.options.quality.indexOf(b);
+                }
+                return a.height > b.height;
+            }).map(quality => ({
+                value: this.options.quality.indexOf(quality),
+                list,
+                type,
+                title: quality.label || controls.getLabel.call(this, 'quality', quality.height),
+                badge: getBadge(quality),
+            })).reverse(); // We reverse it so that the lower height options appear at the bottom of the quality menu
 
-        controls.updateSetting.call(this, type, list);
+        // The incoming quality option may not have labels
+        // If this is the case, then the text displayed as part of qualityMenu
+        // comes from 'title' of finalOptions
+        // Thus, since finalOptions contains all the relevant data for each quality
+        // entry, we update options.quality with finalOptions
+        this.options.quality = options.map((quality, index) => {
+            const finalOpt = finalOptions.find(opt => opt.value === index);
+            return Object.assign({}, quality, {
+                label: finalOpt.title,
+                badge: finalOpt.badge,
+            });
+        });
+        finalOptions.forEach(controls.createMenuItem.bind(this));
+        controls.updateSetting.call(this, type, list, this.config[type].default);
     },
 
     // Translate a value into a nice label
     getLabel(setting, value) {
+        let label;
         switch (setting) {
             case 'speed':
                 return value === 1 ? i18n.get('normal', this.config) : `${value}&times;`;
 
             case 'quality':
-                if (is.number(value)) {
-                    const label = i18n.get(`qualityLabel.${value}`, this.config);
+                label = i18n.get(`qualityLabel.${value}`, this.config);
 
-                    if (!label.length) {
+                if (!label.length) {
+                    // Only return with p if value is a number
+                    if (is.number(value)) {
                         return `${value}p`;
                     }
-
-                    return label;
                 }
-
                 return toTitleCase(value);
-
             case 'captions':
                 return captions.getLabel.call(this);
 
@@ -773,16 +791,25 @@ const controls = {
                 value = this.config[setting].default;
             }
 
+            let settingOptions = this.options[setting];
+            if (setting === 'quality') {
+                value = settingOptions[value].label;
+                settingOptions = settingOptions.map(quality => quality.label);
+            }
+
             // Unsupported value
-            if (!is.empty(this.options[setting]) && !this.options[setting].includes(value)) {
+            if (!is.empty(settingOptions) && !settingOptions.includes(value)) {
                 this.debug.warn(`Unsupported value of '${value}' for ${setting}`);
                 return;
             }
 
             // Disabled value
-            if (!this.config[setting].options.includes(value)) {
-                this.debug.warn(`Disabled value of '${value}' for ${setting}`);
-                return;
+            // Don't check for quality which is permissive and accepts anything
+            if (setting !== 'quality') {
+                if (!this.config[setting].options.includes(value)) {
+                    this.debug.warn(`Disabled value of '${value}' for ${setting}`);
+                    return;
+                }
             }
         }
 
