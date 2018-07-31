@@ -67,8 +67,7 @@ import Raven from 'raven-js';
                     global: true,
                 },
                 tooltips: {
-                    controls: false,
-                    seek: false,
+                    controls: true,
                 },
                 // clickToPlay: false,
                 /* controls: [
