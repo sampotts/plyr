@@ -2427,7 +2427,8 @@ typeof navigator === "object" && (function (global, factory) {
             }
 
             // True toggle by default
-            var show = is.element(popup) && popup.hasAttribute('hidden');
+            var hidden = popup.hasAttribute('hidden');
+            var show = hidden;
 
             if (is.boolean(input)) {
                 show = input;
@@ -2468,7 +2469,7 @@ typeof navigator === "object" && (function (global, factory) {
                 setFocus.call(this, firstItem, true);
             }
             // If closing, re-focus the button
-            else if (!show) {
+            else if (!show && !hidden) {
                     setFocus.call(this, button, is.keyboardEvent(input));
                 }
         },

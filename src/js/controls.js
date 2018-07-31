@@ -1085,7 +1085,8 @@ const controls = {
         }
 
         // True toggle by default
-        let show = is.element(popup) && popup.hasAttribute('hidden');
+        const hidden = popup.hasAttribute('hidden');
+        let show = hidden;
 
         if (is.boolean(input)) {
             show = input;
@@ -1124,7 +1125,7 @@ const controls = {
             setFocus.call(this, firstItem, true);
         }
         // If closing, re-focus the button
-        else if (!show) {
+        else if (!show && !hidden) {
             setFocus.call(this, button, is.keyboardEvent(input));
         }
     },
