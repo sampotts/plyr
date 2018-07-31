@@ -3,7 +3,9 @@
 This is the markup that is rendered for the Plyr controls. You can use the default controls or provide a customized version of markup based on your needs. You can pass the following to the `controls` option:
 
 -   `Array` of options (this builds the default controls based on your choices)
+-   `Element` with the controls
 -   `String` containing the desired HTML
+-   `false` (or empty string or array) to disable all controls
 -   `Function` that will be executed and should return one of the above
 
 ## Using default controls

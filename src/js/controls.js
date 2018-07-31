@@ -1388,11 +1388,6 @@ const controls = {
     // Build the default HTML
     // TODO: Set order based on order in the config.controls array?
     create(data) {
-        // Do nothing if we want no controls
-        if (is.empty(this.config.controls)) {
-            return null;
-        }
-
         // Create the container
         const container = createElement(
             'div',
@@ -1746,16 +1741,19 @@ const controls = {
         };
         let update = true;
 
-        if (
-            is.string(this.config.controls) ||
-            is.element(this.config.controls)
-        ) {
-            // String or HTMLElement passed as the option
+        // If function, run it and use output
+        if (is.function(this.config.controls)) {
+            this.config.controls = this.config.controls.call(this.props);
+        }
+
+        // Convert falsy controls to empty array (primarily for empty strings)
+        if (!this.config.controls) {
+            this.config.controls = [];
+        }
+
+        if (is.element(this.config.controls) || is.string(this.config.controls)) {
+            // HTMLElement or Non-empty string passed as the option
             container = this.config.controls;
-        } else if (is.function(this.config.controls)) {
-            // A custom function to build controls
-            // The function can return a HTMLElement or String
-            container = this.config.controls.call(this, props);
         } else {
             // Create controls
             container = controls.create.call(this, {
