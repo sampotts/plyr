@@ -448,6 +448,8 @@ const controls = {
     },
 
     // Bind keyboard shortcuts for a menu item
+    // We have to bind to keyup otherwise Firefox triggers a click when a keydown event handler shifts focus
+    // https://bugzilla.mozilla.org/show_bug.cgi?id=1220143
     bindMenuItemShortcuts(menuItem, type) {
         // Handle space or -> to open menu
         on(

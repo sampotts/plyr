@@ -1691,6 +1691,8 @@ typeof navigator === "object" && (function (global, factory) {
 
 
         // Bind keyboard shortcuts for a menu item
+        // We have to bind to keyup otherwise Firefox triggers a click when a keydown event handler shifts focus
+        // https://bugzilla.mozilla.org/show_bug.cgi?id=1220143
         bindMenuItemShortcuts: function bindMenuItemShortcuts(menuItem, type) {
             var _this = this;
 
@@ -4884,6 +4886,8 @@ typeof navigator === "object" && (function (global, factory) {
                 });
 
                 // Settings menu - keyboard toggle
+                // We have to bind to keyup otherwise Firefox triggers a click when a keydown event handler shifts focus
+                // https://bugzilla.mozilla.org/show_bug.cgi?id=1220143
                 this.bind(player.elements.buttons.settings, 'keyup', function (event) {
                     // We only care about space and return
                     if (event.which !== 32 && event.which !== 13) {

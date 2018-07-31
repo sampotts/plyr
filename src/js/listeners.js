@@ -6,7 +6,14 @@ import controls from './controls';
 import ui from './ui';
 import { repaint } from './utils/animation';
 import browser from './utils/browser';
-import { getElement, getElements, hasClass, matches, toggleClass, toggleHidden } from './utils/elements';
+import {
+    getElement,
+    getElements,
+    hasClass,
+    matches,
+    toggleClass,
+    toggleHidden,
+} from './utils/elements';
 import { on, once, toggleListener, triggerEvent } from './utils/events';
 import is from './utils/is';
 
@@ -690,6 +697,8 @@ class Listeners {
         });
 
         // Settings menu - keyboard toggle
+        // We have to bind to keyup otherwise Firefox triggers a click when a keydown event handler shifts focus
+        // https://bugzilla.mozilla.org/show_bug.cgi?id=1220143
         this.bind(
             player.elements.buttons.settings,
             'keyup',
