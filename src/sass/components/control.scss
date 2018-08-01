@@ -41,13 +41,28 @@
     display: none;
 }
 
-// Audio styles
+// Audio control
 .plyr--audio .plyr__control {
     &.plyr__tab-focus,
     &:hover,
     &[aria-expanded='true'] {
         background: $plyr-audio-control-bg-hover;
         color: $plyr-audio-control-color-hover;
+    }
+}
+
+// Video control
+.plyr--video .plyr__control {
+    svg {
+        filter: drop-shadow(0 1px 1px rgba(#000, 0.15));
+    }
+
+    // Hover and tab focus
+    &.plyr__tab-focus,
+    &:hover,
+    &[aria-expanded='true'] {
+        background: $plyr-video-control-bg-hover;
+        color: $plyr-video-control-color-hover;
     }
 }
 

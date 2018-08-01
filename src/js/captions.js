@@ -84,7 +84,9 @@ const captions = {
         // * toggled:   The real captions state
 
         const languages = dedupe(
-            Array.from(navigator.languages || navigator.language || navigator.userLanguage).map(language => language.split('-')[0]),
+            Array.from(navigator.languages || navigator.language || navigator.userLanguage).map(
+                language => language.split('-')[0],
+            ),
         );
 
         let language = (this.storage.get('language') || this.config.captions.language || 'auto').toLowerCase();

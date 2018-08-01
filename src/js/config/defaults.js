@@ -354,6 +354,9 @@ const defaults = {
         isTouch: 'plyr--is-touch',
         uiSupported: 'plyr--full-ui',
         noTransition: 'plyr--no-transition',
+        display: {
+            time: 'plyr__time',
+        },
         menu: {
             value: 'plyr__menu__value',
             badge: 'plyr__badge',

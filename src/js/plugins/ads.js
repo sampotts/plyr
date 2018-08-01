@@ -207,6 +207,11 @@ class Ads {
      * @param {Event} adsManagerLoadedEvent
      */
     onAdsManagerLoaded(event) {
+        // Load could occur after a source change (race condition)
+        if (!this.enabled) {
+            return;
+        }
+
         // Get the ads manager
         const settings = new google.ima.AdsRenderingSettings();
 
@@ -239,10 +244,6 @@ class Ads {
                 }
             });
         }
-
-        // Get skippable state
-        // TODO: Skip button
-        // this.player.debug.warn(this.manager.getAdSkippableState());
 
         // Set volume to match player
         this.manager.setVolume(this.player.volume);

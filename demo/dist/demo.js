@@ -1874,7 +1874,7 @@ typeof navigator === "object" && (function () {
 	  // webpack (using a build step causes webpack #1617). Grunt verifies that
 	  // this value matches package.json during build.
 	  //   See: https://github.com/getsentry/raven-js/issues/465
-	  VERSION: '3.26.3',
+	  VERSION: '3.26.4',
 
 	  debug: false,
 
@@ -2612,34 +2612,40 @@ typeof navigator === "object" && (function () {
 	    )
 	      return;
 
-	    options = options || {};
+	    options = Object.assign(
+	      {
+	        eventId: this.lastEventId(),
+	        dsn: this._dsn,
+	        user: this._globalContext.user || {}
+	      },
+	      options
+	    );
 
-	    var lastEventId = options.eventId || this.lastEventId();
-	    if (!lastEventId) {
+	    if (!options.eventId) {
 	      throw new configError('Missing eventId');
 	    }
 
-	    var dsn = options.dsn || this._dsn;
-	    if (!dsn) {
+	    if (!options.dsn) {
 	      throw new configError('Missing DSN');
 	    }
 
 	    var encode = encodeURIComponent;
-	    var qs = '';
-	    qs += '?eventId=' + encode(lastEventId);
-	    qs += '&dsn=' + encode(dsn);
+	    var encodedOptions = [];
 
-	    var user = options.user || this._globalContext.user;
-	    if (user) {
-	      if (user.name) qs += '&name=' + encode(user.name);
-	      if (user.email) qs += '&email=' + encode(user.email);
+	    for (var key in options) {
+	      if (key === 'user') {
+	        var user = options.user;
+	        if (user.name) encodedOptions.push('name=' + encode(user.name));
+	        if (user.email) encodedOptions.push('email=' + encode(user.email));
+	      } else {
+	        encodedOptions.push(encode(key) + '=' + encode(options[key]));
+	      }
 	    }
-
-	    var globalServer = this._getGlobalServer(this._parseDSN(dsn));
+	    var globalServer = this._getGlobalServer(this._parseDSN(options.dsn));
 
 	    var script = _document.createElement('script');
 	    script.async = true;
-	    script.src = globalServer + '/api/embed/error-page/' + qs;
+	    script.src = globalServer + '/api/embed/error-page/?' + encodedOptions.join('&');
 	    (_document.head || _document.body).appendChild(script);
 	  },
 
@@ -4097,6 +4103,9 @@ typeof navigator === "object" && (function () {
 
 	    document.addEventListener('DOMContentLoaded', function () {
 	        singleton.context(function () {
+	            var selector = '#player';
+	            var container = document.getElementById('container');
+
 	            if (window.shr) {
 	                window.shr.setup({
 	                    count: {
@@ -4110,6 +4119,9 @@ typeof navigator === "object" && (function () {
 
 	            // Remove class on blur
 	            document.addEventListener('focusout', function (event) {
+	                if (container.contains(event.target)) {
+	                    return;
+	                }
 	                event.target.classList.remove(tabClassName);
 	            });
 
@@ -4122,12 +4134,18 @@ typeof navigator === "object" && (function () {
 	                // Delay the adding of classname until the focus has changed
 	                // This event fires before the focusin event
 	                setTimeout(function () {
-	                    document.activeElement.classList.add(tabClassName);
-	                }, 0);
+	                    var focused = document.activeElement;
+
+	                    if (!focused || container.contains(focused)) {
+	                        return;
+	                    }
+
+	                    focused.classList.add(tabClassName);
+	                }, 10);
 	            });
 
 	            // Setup the player
-	            var player = new Plyr('#player', {
+	            var player = new Plyr(selector, {
 	                debug: true,
 	                title: 'View From A Blue Moon',
 	                iconUrl: '../dist/plyr.svg',
@@ -4137,7 +4155,7 @@ typeof navigator === "object" && (function () {
 	                tooltips: {
 	                    controls: true
 	                },
-	                clickToPlay: false,
+	                // clickToPlay: false,
 	                /* controls: [
 	                    'play-large',
 	                    'restart',

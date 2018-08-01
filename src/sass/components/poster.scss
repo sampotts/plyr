@@ -12,12 +12,11 @@
     opacity: 0;
     position: absolute;
     top: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.2s ease;
     width: 100%;
     z-index: 1;
 }
 
 .plyr--stopped.plyr__poster-enabled .plyr__poster {
     opacity: 1;
-    pointer-events: none;
 }

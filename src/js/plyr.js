@@ -75,16 +75,17 @@ class Plyr {
         // Elements cache
         this.elements = {
             container: null,
+            captions: null,
             buttons: {},
             display: {},
             progress: {},
             inputs: {},
             settings: {
+                popup: null,
                 menu: null,
-                panes: {},
-                tabs: {},
+                panels: {},
+                buttons: {},
             },
-            captions: null,
         };
 
         // Captions
@@ -185,7 +186,7 @@ class Plyr {
                         // YouTube requires the playsinline in the URL
                         if (this.isYouTube) {
                             this.config.playsinline = truthy.includes(url.searchParams.get('playsinline'));
-                            this.config.hl = url.searchParams.get('hl');
+                            this.config.hl = url.searchParams.get('hl'); // TODO: Should this be setting language?
                         } else {
                             this.config.playsinline = true;
                         }
@@ -221,7 +222,7 @@ class Plyr {
                 if (this.media.hasAttribute('autoplay')) {
                     this.config.autoplay = true;
                 }
-                if (this.media.hasAttribute('playsinline')) {
+                if (this.media.hasAttribute('playsinline') || this.media.hasAttribute('webkit-playsinline')) {
                     this.config.playsinline = true;
                 }
                 if (this.media.hasAttribute('muted')) {
@@ -293,7 +294,9 @@ class Plyr {
         this.fullscreen = new Fullscreen(this);
 
         // Setup ads if provided
-        this.ads = new Ads(this);
+        if (this.config.ads.enabled) {
+            this.ads = new Ads(this);
+        }
 
         // Autoplay if required
         if (this.config.autoplay) {
@@ -696,7 +699,9 @@ class Plyr {
         }
 
         // Trigger request event
-        triggerEvent.call(this, this.media, 'qualityrequested', false, { quality });
+        triggerEvent.call(this, this.media, 'qualityrequested', false, {
+            quality,
+        });
 
         // Update config
         config.selected = quality;
@@ -933,13 +938,16 @@ class Plyr {
             if (hiding && this.config.controls.includes('settings') && !is.empty(this.config.settings)) {
                 controls.toggleMenu.call(this, false);
             }
+
             // Trigger event on change
             if (hiding !== isHidden) {
                 const eventName = hiding ? 'controlshidden' : 'controlsshown';
                 triggerEvent.call(this, this.media, eventName);
             }
+
             return !hiding;
         }
+
         return false;
     }
 
