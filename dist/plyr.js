@@ -6594,6 +6594,11 @@ typeof navigator === "object" && (function (global, factory) {
             value: function onAdsManagerLoaded(event) {
                 var _this6 = this;
 
+                // Load could occur after a source change (race condition)
+                if (!this.enabled) {
+                    return;
+                }
+
                 // Get the ads manager
                 var settings = new google.ima.AdsRenderingSettings();
 
@@ -6626,10 +6631,6 @@ typeof navigator === "object" && (function (global, factory) {
                         }
                     });
                 }
-
-                // Get skippable state
-                // TODO: Skip button
-                // this.player.debug.warn(this.manager.getAdSkippableState());
 
                 // Set volume to match player
                 this.manager.setVolume(this.player.volume);
