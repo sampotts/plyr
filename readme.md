@@ -687,7 +687,7 @@ Plyr is developed by [@sam_potts](https://twitter.com/sam_potts) / [sampotts.me]
 
 Plyr costs money to run, not only my time. I donate my time for free as I enjoy building Plyr but unfortunately have to pay for domains, hosting, and more. Any help with costs is appreciated...
 
-*   [Donate via Patron](https://www.patreon.com/plyr)
+*   [Donate via Patreon](https://www.patreon.com/plyr)
 *   [Donate via PayPal](https://www.paypal.me/pottsy/20usd)
 
 ## Mentions
