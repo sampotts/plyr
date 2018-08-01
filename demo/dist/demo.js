@@ -4093,13 +4093,12 @@ typeof navigator === "object" && (function () {
 	// ==========================================================================
 
 	(function () {
-	    var isLive = window.location.host === 'plyr.io';
+	    var host = window.location.host;
 
-	    // Raven / Sentry
-	    // For demo site (https://plyr.io) only
-	    if (isLive) {
-	        singleton.config('https://d4ad9866ad834437a4754e23937071e4@sentry.io/305555').install();
-	    }
+	    var env = {
+	        prod: host === 'plyr.io',
+	        dev: host === 'dev.plyr.io'
+	    };
 
 	    document.addEventListener('DOMContentLoaded', function () {
 	        singleton.context(function () {
@@ -4155,57 +4154,6 @@ typeof navigator === "object" && (function () {
 	                tooltips: {
 	                    controls: true
 	                },
-	                // clickToPlay: false,
-	                /* controls: [
-	                    'play-large',
-	                    'restart',
-	                    'rewind',
-	                    'play',
-	                    'fast-forward',
-	                    'progress',
-	                    'current-time',
-	                    'duration',
-	                    'mute',
-	                    'volume',
-	                    'captions',
-	                    'settings',
-	                    'pip',
-	                    'airplay',
-	                    'fullscreen',
-	                ], */
-	                /* i18n: {
-	                    restart: '重新開始',
-	                    rewind: '快退{seektime}秒',
-	                    play: '播放',
-	                    pause: '暫停',
-	                    fastForward: '快進{seektime}秒',
-	                    seek: '尋求',
-	                    played: '發揮',
-	                    buffered: '緩衝的',
-	                    currentTime: '當前時間戳',
-	                    duration: '長短',
-	                    volume: '音量',
-	                    mute: '靜音',
-	                    unmute: '取消靜音',
-	                    enableCaptions: '開啟字幕',
-	                    disableCaptions: '關閉字幕',
-	                    enterFullscreen: '進入全螢幕',
-	                    exitFullscreen: '退出全螢幕',
-	                    frameTitle: '球員為{title}',
-	                    captions: '字幕',
-	                    settings: '設定',
-	                    speed: '速度',
-	                    normal: '正常',
-	                    quality: '質量',
-	                    loop: '循環',
-	                    start: 'Start',
-	                    end: 'End',
-	                    all: 'All',
-	                    reset: '重啟',
-	                    disabled: '殘',
-	                    enabled: '啟用',
-	                    advertisement: '廣告',
-	                }, */
 	                captions: {
 	                    active: true
 	                },
@@ -4213,7 +4161,7 @@ typeof navigator === "object" && (function () {
 	                    google: 'AIzaSyDrNwtN3nLH_8rjCmu5Wq3ZCm4MNAVdc0c'
 	                },
 	                ads: {
-	                    enabled: true,
+	                    enabled: env.prod || env.dev,
 	                    publisherId: '918848828995742'
 	                }
 	            });
@@ -4388,10 +4336,16 @@ typeof navigator === "object" && (function () {
 	        });
 	    });
 
+	    // Raven / Sentry
+	    // For demo site (https://plyr.io) only
+	    if (env.prod) {
+	        singleton.config('https://d4ad9866ad834437a4754e23937071e4@sentry.io/305555').install();
+	    }
+
 	    // Google analytics
 	    // For demo site (https://plyr.io) only
 	    /* eslint-disable */
-	    if (isLive) {
+	    if (env.prod) {
 	        (function (i, s, o, g, r, a, m) {
 	            i.GoogleAnalyticsObject = r;
 	            i[r] = i[r] || function () {

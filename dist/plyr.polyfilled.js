@@ -2979,7 +2979,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 	var defineProperty = _objectDp.f;
 	var _wksDefine = function (name) {
-	  var $Symbol = _core.Symbol || (_core.Symbol = _library ? {} : _global.Symbol || {});
+	  var $Symbol = _core.Symbol || (_core.Symbol = _global.Symbol || {});
 	  if (name.charAt(0) != '_' && !(name in $Symbol)) defineProperty($Symbol, name, { value: _wksExt.f(name) });
 	};
 
@@ -5447,6 +5447,9 @@ typeof navigator === "object" && (function (global, factory) {
 	var isEvent = function isEvent(input) {
 	    return instanceOf(input, Event);
 	};
+	var isKeyboardEvent = function isKeyboardEvent(input) {
+	    return instanceOf(input, KeyboardEvent);
+	};
 	var isCue = function isCue(input) {
 	    return instanceOf(input, window.TextTrackCue) || instanceOf(input, window.VTTCue);
 	};
@@ -5490,6 +5493,7 @@ typeof navigator === "object" && (function (global, factory) {
 	    element: isElement,
 	    textNode: isTextNode,
 	    event: isEvent,
+	    keyboardEvent: isKeyboardEvent,
 	    cue: isCue,
 	    track: isTrack,
 	    url: isUrl,
@@ -7194,7 +7198,7 @@ typeof navigator === "object" && (function (global, factory) {
 	        });
 
 	        this.listeners.bind(menuItem, 'click keyup', function (event) {
-	            if (event.type === 'keyup' && event.which !== 32) {
+	            if (is$1.keyboardEvent(event) && event.which !== 32) {
 	                return;
 	            }
 
@@ -7220,7 +7224,7 @@ typeof navigator === "object" && (function (global, factory) {
 	                    break;
 	            }
 
-	            controls.showMenuPanel.call(_this2, 'home', event.type === 'keyup');
+	            controls.showMenuPanel.call(_this2, 'home', is$1.keyboardEvent(event));
 	        }, type, false);
 
 	        controls.bindMenuItemShortcuts.call(this, menuItem, type);
@@ -7819,13 +7823,19 @@ typeof navigator === "object" && (function (global, factory) {
 	            return;
 	        }
 
-	        var show = is$1.boolean(input) ? input : is$1.element(popup) && popup.hasAttribute('hidden');
+	        // True toggle by default
+	        var hidden = popup.hasAttribute('hidden');
+	        var show = hidden;
 
-	        if (is$1.event(input)) {
-	            var isMenuItem = is$1.element(popup) && popup.contains(input.target);
-	            var isButton = input.target === this.elements.buttons.settings;
+	        if (is$1.boolean(input)) {
+	            show = input;
+	        } else if (is$1.keyboardEvent(input) && input.which === 27) {
+	            show = false;
+	        } else if (is$1.event(input)) {
+	            var isMenuItem = popup.contains(input.target);
+	            var isButton = input.target === button;
 
-	            // If the click was inside the form or if the click
+	            // If the click was inside the menu or if the click
 	            // wasn't the button or menu item and we're trying to
 	            // show the menu (a doc click shouldn't show the menu)
 	            if (isMenuItem || !isMenuItem && !isButton && show) {
@@ -7838,27 +7848,27 @@ typeof navigator === "object" && (function (global, factory) {
 	            }
 	        }
 
-	        // Set form and button attributes
-	        if (is$1.element(button)) {
-	            button.setAttribute('aria-expanded', show);
-	        }
+	        // Set button attributes
+	        button.setAttribute('aria-expanded', show);
 
 	        // Show the actual popup
-	        if (is$1.element(popup)) {
-	            toggleHidden(popup, !show);
+	        toggleHidden(popup, !show);
 
-	            toggleClass(this.elements.container, this.config.classNames.menu.open, show);
+	        // Add class hook
+	        toggleClass(this.elements.container, this.config.classNames.menu.open, show);
 
-	            // Focus the first item if key interaction
-	            if (show && is$1.event(input) && input.type === 'keyup') {
-	                var pane = Object.values(this.elements.settings.panels).find(function (pane) {
-	                    return !pane.hidden;
-	                });
-	                var firstItem = pane.querySelector('[role^="menuitem"]');
-
-	                setFocus.call(this, firstItem, true);
-	            }
+	        // Focus the first item if key interaction
+	        if (show && is$1.keyboardEvent(input)) {
+	            var pane = Object.values(this.elements.settings.panels).find(function (pane) {
+	                return !pane.hidden;
+	            });
+	            var firstItem = pane.querySelector('[role^="menuitem"]');
+	            setFocus.call(this, firstItem, true);
 	        }
+	        // If closing, re-focus the button
+	        else if (!show && !hidden) {
+	                setFocus.call(this, button, is$1.keyboardEvent(input));
+	            }
 	    },
 
 
@@ -9737,6 +9747,7 @@ typeof navigator === "object" && (function (global, factory) {
 	        key: 'handleKey',
 	        value: function handleKey(event) {
 	            var player = this.player;
+	            var elements = player.elements;
 
 	            var code = event.keyCode ? event.keyCode : event.which;
 	            var pressed = event.type === 'keydown';
@@ -9768,7 +9779,7 @@ typeof navigator === "object" && (function (global, factory) {
 	                var focused = document.activeElement;
 	                if (is$1.element(focused)) {
 	                    var editable = player.config.selectors.editable;
-	                    var seek = player.elements.inputs.seek;
+	                    var seek = elements.inputs.seek;
 
 
 	                    if (focused !== seek && matches(focused, editable)) {
@@ -9899,17 +9910,19 @@ typeof navigator === "object" && (function (global, factory) {
 	        key: 'firstTouch',
 	        value: function firstTouch() {
 	            var player = this.player;
+	            var elements = player.elements;
 
 
 	            player.touch = true;
 
 	            // Add touch class
-	            toggleClass(player.elements.container, player.config.classNames.isTouch, true);
+	            toggleClass(elements.container, player.config.classNames.isTouch, true);
 	        }
 	    }, {
 	        key: 'setTabFocus',
 	        value: function setTabFocus(event) {
 	            var player = this.player;
+	            var elements = player.elements;
 
 
 	            clearTimeout(this.focusTimer);
@@ -9948,7 +9961,7 @@ typeof navigator === "object" && (function (global, factory) {
 	                var focused = document.activeElement;
 
 	                // Ignore if current focus element isn't inside the player
-	                if (!player.elements.container.contains(focused)) {
+	                if (!elements.container.contains(focused)) {
 	                    return;
 	                }
 
@@ -9986,16 +9999,17 @@ typeof navigator === "object" && (function (global, factory) {
 	        key: 'container',
 	        value: function container() {
 	            var player = this.player;
+	            var elements = player.elements;
 
 	            // Keyboard shortcuts
 
 	            if (!player.config.keyboard.global && player.config.keyboard.focused) {
-	                on.call(player, player.elements.container, 'keydown keyup', this.handleKey, false);
+	                on.call(player, elements.container, 'keydown keyup', this.handleKey, false);
 	            }
 
 	            // Toggle controls on mouse events and entering fullscreen
-	            on.call(player, player.elements.container, 'mousemove mouseleave touchstart touchmove enterfullscreen exitfullscreen', function (event) {
-	                var controls$$1 = player.elements.controls;
+	            on.call(player, elements.container, 'mousemove mouseleave touchstart touchmove enterfullscreen exitfullscreen', function (event) {
+	                var controls$$1 = elements.controls;
 
 	                // Remove button states for fullscreen
 
@@ -10031,6 +10045,7 @@ typeof navigator === "object" && (function (global, factory) {
 	        key: 'media',
 	        value: function media() {
 	            var player = this.player;
+	            var elements = player.elements;
 
 	            // Time change on media
 
@@ -10046,8 +10061,8 @@ typeof navigator === "object" && (function (global, factory) {
 	            // Check for audio tracks on load
 	            // We can't use `loadedmetadata` as it doesn't seem to have audio tracks at that point
 	            on.call(player, player.media, 'canplay', function () {
-	                toggleHidden(player.elements.volume, !player.hasAudio);
-	                toggleHidden(player.elements.buttons.mute, !player.hasAudio);
+	                toggleHidden(elements.volume, !player.hasAudio);
+	                toggleHidden(elements.buttons.mute, !player.hasAudio);
 	            });
 
 	            // Handle the media finishing
@@ -10108,8 +10123,8 @@ typeof navigator === "object" && (function (global, factory) {
 	                }
 
 	                // On click play, pause ore restart
-	                on.call(player, player.elements.container, 'click touchstart', function (event) {
-	                    var targets = [player.elements.container, wrapper];
+	                on.call(player, elements.container, 'click touchstart', function (event) {
+	                    var targets = [elements.container, wrapper];
 
 	                    // Ignore if click if not container or in video wrapper
 	                    if (!targets.includes(event.target) && !wrapper.contains(event.target)) {
@@ -10118,7 +10133,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 	                    // First touch on touch devices will just show controls (if we're hiding controls)
 	                    // If controls are shown then it'll toggle like a pointer device
-	                    if (player.config.hideControls && player.touch && hasClass(player.elements.container, player.config.classNames.hideControls)) {
+	                    if (player.config.hideControls && player.touch && hasClass(elements.container, player.config.classNames.hideControls)) {
 	                        return;
 	                    }
 
@@ -10133,7 +10148,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 	            // Disable right click
 	            if (player.supported.ui && player.config.disableContextMenu) {
-	                on.call(player, player.elements.wrapper, 'contextmenu', function (event) {
+	                on.call(player, elements.wrapper, 'contextmenu', function (event) {
 	                    event.preventDefault();
 	                }, false);
 	            }
@@ -10182,7 +10197,7 @@ typeof navigator === "object" && (function (global, factory) {
 	                    detail = player.media.error;
 	                }
 
-	                triggerEvent.call(player, player.elements.container, event.type, true, detail);
+	                triggerEvent.call(player, elements.container, event.type, true, detail);
 	            });
 	        }
 
@@ -10234,59 +10249,60 @@ typeof navigator === "object" && (function (global, factory) {
 	            var _this2 = this;
 
 	            var player = this.player;
+	            var elements = player.elements;
 
 	            // IE doesn't support input event, so we fallback to change
 
 	            var inputEvent = browser.isIE ? 'change' : 'input';
 
 	            // Play/pause toggle
-	            if (player.elements.buttons.play) {
-	                Array.from(player.elements.buttons.play).forEach(function (button) {
+	            if (elements.buttons.play) {
+	                Array.from(elements.buttons.play).forEach(function (button) {
 	                    _this2.bind(button, 'click', player.togglePlay, 'play');
 	                });
 	            }
 
 	            // Pause
-	            this.bind(player.elements.buttons.restart, 'click', player.restart, 'restart');
+	            this.bind(elements.buttons.restart, 'click', player.restart, 'restart');
 
 	            // Rewind
-	            this.bind(player.elements.buttons.rewind, 'click', player.rewind, 'rewind');
+	            this.bind(elements.buttons.rewind, 'click', player.rewind, 'rewind');
 
 	            // Rewind
-	            this.bind(player.elements.buttons.fastForward, 'click', player.forward, 'fastForward');
+	            this.bind(elements.buttons.fastForward, 'click', player.forward, 'fastForward');
 
 	            // Mute toggle
-	            this.bind(player.elements.buttons.mute, 'click', function () {
+	            this.bind(elements.buttons.mute, 'click', function () {
 	                player.muted = !player.muted;
 	            }, 'mute');
 
 	            // Captions toggle
-	            this.bind(player.elements.buttons.captions, 'click', function () {
+	            this.bind(elements.buttons.captions, 'click', function () {
 	                return player.toggleCaptions();
 	            });
 
 	            // Fullscreen toggle
-	            this.bind(player.elements.buttons.fullscreen, 'click', function () {
+	            this.bind(elements.buttons.fullscreen, 'click', function () {
 	                player.fullscreen.toggle();
 	            }, 'fullscreen');
 
 	            // Picture-in-Picture
-	            this.bind(player.elements.buttons.pip, 'click', function () {
+	            this.bind(elements.buttons.pip, 'click', function () {
 	                player.pip = 'toggle';
 	            }, 'pip');
 
 	            // Airplay
-	            this.bind(player.elements.buttons.airplay, 'click', player.airplay, 'airplay');
+	            this.bind(elements.buttons.airplay, 'click', player.airplay, 'airplay');
 
 	            // Settings menu - click toggle
-	            this.bind(player.elements.buttons.settings, 'click', function (event) {
+	            this.bind(elements.buttons.settings, 'click', function (event) {
 	                controls.toggleMenu.call(player, event);
 	            });
 
 	            // Settings menu - keyboard toggle
 	            // We have to bind to keyup otherwise Firefox triggers a click when a keydown event handler shifts focus
 	            // https://bugzilla.mozilla.org/show_bug.cgi?id=1220143
-	            this.bind(player.elements.buttons.settings, 'keyup', function (event) {
+	            this.bind(elements.buttons.settings, 'keyup', function (event) {
 	                // We only care about space and return
 	                if (event.which !== 32 && event.which !== 13) {
 	                    return;
@@ -10304,23 +10320,30 @@ typeof navigator === "object" && (function (global, factory) {
 	                controls.toggleMenu.call(player, event);
 	            }, null, false);
 
+	            // Escape closes menu
+	            this.bind(elements.settings.menu, 'keydown', function (event) {
+	                if (event.which === 27) {
+	                    controls.toggleMenu.call(player, event);
+	                }
+	            });
+
 	            // Set range input alternative "value", which matches the tooltip time (#954)
-	            this.bind(player.elements.inputs.seek, 'mousedown mousemove', function (event) {
-	                var rect = player.elements.progress.getBoundingClientRect();
+	            this.bind(elements.inputs.seek, 'mousedown mousemove', function (event) {
+	                var rect = elements.progress.getBoundingClientRect();
 	                var percent = 100 / rect.width * (event.pageX - rect.left);
 	                event.currentTarget.setAttribute('seek-value', percent);
 	            });
 
 	            // Pause while seeking
-	            this.bind(player.elements.inputs.seek, 'mousedown mouseup keydown keyup touchstart touchend', function (event) {
+	            this.bind(elements.inputs.seek, 'mousedown mouseup keydown keyup touchstart touchend', function (event) {
 	                var seek = event.currentTarget;
 	                var code = event.keyCode ? event.keyCode : event.which;
-	                var eventType = event.type;
 	                var attribute = 'play-on-seeked';
 
-	                if ((eventType === 'keydown' || eventType === 'keyup') && code !== 39 && code !== 37) {
+	                if (is$1.keyboardEvent(event) && code !== 39 && code !== 37) {
 	                    return;
 	                }
+
 	                // Was playing before?
 	                var play = seek.hasAttribute(attribute);
 
@@ -10342,7 +10365,6 @@ typeof navigator === "object" && (function (global, factory) {
 	            // it takes over further interactions on the page. This is a hack
 	            if (browser.isIos) {
 	                var inputs = getElements.call(player, 'input[type="range"]');
-
 	                Array.from(inputs).forEach(function (input) {
 	                    return _this2.bind(input, inputEvent, function (event) {
 	                        return repaint(event.target);
@@ -10351,7 +10373,7 @@ typeof navigator === "object" && (function (global, factory) {
 	            }
 
 	            // Seek
-	            this.bind(player.elements.inputs.seek, inputEvent, function (event) {
+	            this.bind(elements.inputs.seek, inputEvent, function (event) {
 	                var seek = event.currentTarget;
 
 	                // If it exists, use seek-value instead of "value" for consistency with tooltip time (#954)
@@ -10366,10 +10388,24 @@ typeof navigator === "object" && (function (global, factory) {
 	                player.currentTime = seekTo / seek.max * player.duration;
 	            }, 'seek');
 
+	            // Seek tooltip
+	            this.bind(elements.progress, 'mouseenter mouseleave mousemove', function (event) {
+	                return controls.updateSeekTooltip.call(player, event);
+	            });
+
+	            // Polyfill for lower fill in <input type="range"> for webkit
+	            if (browser.isWebkit) {
+	                Array.from(getElements.call(player, 'input[type="range"]')).forEach(function (element) {
+	                    _this2.bind(element, 'input', function (event) {
+	                        return controls.updateRangeFill.call(player, event.target);
+	                    });
+	                });
+	            }
+
 	            // Current time invert
 	            // Only if one time element is used for both currentTime and duration
-	            if (player.config.toggleInvert && !is$1.element(player.elements.display.duration)) {
-	                this.bind(player.elements.display.currentTime, 'click', function () {
+	            if (player.config.toggleInvert && !is$1.element(elements.display.duration)) {
+	                this.bind(elements.display.currentTime, 'click', function () {
 	                    // Do nothing if we're at the start
 	                    if (player.currentTime === 0) {
 	                        return;
@@ -10382,36 +10418,22 @@ typeof navigator === "object" && (function (global, factory) {
 	            }
 
 	            // Volume
-	            this.bind(player.elements.inputs.volume, inputEvent, function (event) {
+	            this.bind(elements.inputs.volume, inputEvent, function (event) {
 	                player.volume = event.target.value;
 	            }, 'volume');
 
-	            // Polyfill for lower fill in <input type="range"> for webkit
-	            if (browser.isWebkit) {
-	                Array.from(getElements.call(player, 'input[type="range"]')).forEach(function (element) {
-	                    _this2.bind(element, 'input', function (event) {
-	                        return controls.updateRangeFill.call(player, event.target);
-	                    });
-	                });
-	            }
-
-	            // Seek tooltip
-	            this.bind(player.elements.progress, 'mouseenter mouseleave mousemove', function (event) {
-	                return controls.updateSeekTooltip.call(player, event);
-	            });
-
 	            // Update controls.hover state (used for ui.toggleControls to avoid hiding when interacting)
-	            this.bind(player.elements.controls, 'mouseenter mouseleave', function (event) {
-	                player.elements.controls.hover = !player.touch && event.type === 'mouseenter';
+	            this.bind(elements.controls, 'mouseenter mouseleave', function (event) {
+	                elements.controls.hover = !player.touch && event.type === 'mouseenter';
 	            });
 
 	            // Update controls.pressed state (used for ui.toggleControls to avoid hiding when interacting)
-	            this.bind(player.elements.controls, 'mousedown mouseup touchstart touchend touchcancel', function (event) {
-	                player.elements.controls.pressed = ['mousedown', 'touchstart'].includes(event.type);
+	            this.bind(elements.controls, 'mousedown mouseup touchstart touchend touchcancel', function (event) {
+	                elements.controls.pressed = ['mousedown', 'touchstart'].includes(event.type);
 	            });
 
 	            // Focus in/out on controls
-	            this.bind(player.elements.controls, 'focusin focusout', function (event) {
+	            this.bind(elements.controls, 'focusin focusout', function (event) {
 	                var config = player.config,
 	                    elements = player.elements,
 	                    timers = player.timers;
@@ -10445,7 +10467,7 @@ typeof navigator === "object" && (function (global, factory) {
 	            });
 
 	            // Mouse wheel for volume
-	            this.bind(player.elements.inputs.volume, 'wheel', function (event) {
+	            this.bind(elements.inputs.volume, 'wheel', function (event) {
 	                // Detect "natural" scroll - suppored on OS X Safari only
 	                // Other browsers on OS X will be inverted until support improves
 	                var inverted = event.webkitDirectionInvertedFromDevice;
@@ -11963,6 +11985,11 @@ typeof navigator === "object" && (function (global, factory) {
 	        value: function onAdsManagerLoaded(event) {
 	            var _this6 = this;
 
+	            // Load could occur after a source change (race condition)
+	            if (!this.enabled) {
+	                return;
+	            }
+
 	            // Get the ads manager
 	            var settings = new google.ima.AdsRenderingSettings();
 
@@ -11995,10 +12022,6 @@ typeof navigator === "object" && (function (global, factory) {
 	                    }
 	                });
 	            }
-
-	            // Get skippable state
-	            // TODO: Skip button
-	            // this.player.debug.warn(this.manager.getAdSkippableState());
 
 	            // Set volume to match player
 	            this.manager.setVolume(this.player.volume);

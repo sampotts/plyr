@@ -1,3 +1,9 @@
+# v3.4.0-beta.1
+
+-   Accessibility improvements (see #905)
+-   Improvements to the way the controls work on iOS
+-   Demo code clean up
+
 # v3.3.23
 
 -   Add support for YouTube's hl param (thanks @renaudleo)
