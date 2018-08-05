@@ -540,7 +540,7 @@ typeof navigator === "object" && (function (global, factory) {
         var hide = hidden;
 
         if (!is.boolean(hide)) {
-            hide = !element.hasAttribute('hidden');
+            hide = !element.hidden;
         }
 
         if (hide) {
@@ -1700,7 +1700,7 @@ typeof navigator === "object" && (function (global, factory) {
         bindMenuItemShortcuts: function bindMenuItemShortcuts(menuItem, type) {
             var _this = this;
 
-            // Handle space or -> to open menu
+            // Navigate through menus via arrow keys and space
             on(menuItem, 'keydown keyup', function (event) {
                 // We only care about space and ⬆️ ⬇️️ ➡️
                 if (![32, 38, 39, 40].includes(event.which)) {
@@ -1743,6 +1743,16 @@ typeof navigator === "object" && (function (global, factory) {
                     }
                 }
             }, false);
+
+            // Enter will fire a `click` event but we still need to manage focus
+            // So we bind to keyup which fires after and set focus here
+            on(menuItem, 'keyup', function (event) {
+                if (event.which !== 13) {
+                    return;
+                }
+
+                controls.focusFirstMenuItem.call(_this, null, true);
+            });
         },
 
 
@@ -1978,7 +1988,7 @@ typeof navigator === "object" && (function (global, factory) {
             } else if (matches(range, this.config.selectors.inputs.volume)) {
                 var percent = range.value * 100;
                 range.setAttribute('aria-valuenow', percent);
-                range.setAttribute('aria-valuetext', percent + '%');
+                range.setAttribute('aria-valuetext', percent.toFixed(1) + '%');
             } else {
                 range.setAttribute('aria-valuenow', range.value);
             }
@@ -2415,6 +2425,28 @@ typeof navigator === "object" && (function (global, factory) {
         },
 
 
+        // Focus the first menu item in a given (or visible) menu
+        focusFirstMenuItem: function focusFirstMenuItem(pane) {
+            var tabFocus = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+            if (this.elements.settings.popup.hidden) {
+                return;
+            }
+
+            var target = pane;
+
+            if (!is.element(target)) {
+                target = Object.values(this.elements.settings.panels).find(function (pane) {
+                    return !pane.hidden;
+                });
+            }
+
+            var firstItem = target.querySelector('[role^="menuitem"]');
+
+            setFocus.call(this, firstItem, tabFocus);
+        },
+
+
         // Show/hide menu
         toggleMenu: function toggleMenu(input) {
             var popup = this.elements.settings.popup;
@@ -2427,7 +2459,8 @@ typeof navigator === "object" && (function (global, factory) {
             }
 
             // True toggle by default
-            var hidden = popup.hasAttribute('hidden');
+            var hidden = popup.hidden;
+
             var show = hidden;
 
             if (is.boolean(input)) {
@@ -2436,18 +2469,12 @@ typeof navigator === "object" && (function (global, factory) {
                 show = false;
             } else if (is.event(input)) {
                 var isMenuItem = popup.contains(input.target);
-                var isButton = input.target === button;
 
                 // If the click was inside the menu or if the click
                 // wasn't the button or menu item and we're trying to
                 // show the menu (a doc click shouldn't show the menu)
-                if (isMenuItem || !isMenuItem && !isButton && show) {
+                if (isMenuItem || !isMenuItem && input.target !== button && show) {
                     return;
-                }
-
-                // Prevent the toggle being caught by the doc listener
-                if (isButton) {
-                    input.stopPropagation();
                 }
             }
 
@@ -2462,11 +2489,7 @@ typeof navigator === "object" && (function (global, factory) {
 
             // Focus the first item if key interaction
             if (show && is.keyboardEvent(input)) {
-                var pane = Object.values(this.elements.settings.panels).find(function (pane) {
-                    return !pane.hidden;
-                });
-                var firstItem = pane.querySelector('[role^="menuitem"]');
-                setFocus.call(this, firstItem, true);
+                controls.focusFirstMenuItem.call(this, null, true);
             }
             // If closing, re-focus the button
             else if (!show && !hidden) {
@@ -2558,8 +2581,7 @@ typeof navigator === "object" && (function (global, factory) {
             toggleHidden(target, false);
 
             // Focus the first item
-            var firstItem = target.querySelector('[role^="menuitem"]');
-            setFocus.call(this, firstItem, tabFocus);
+            controls.focusFirstMenuItem.call(this, target, tabFocus);
         },
 
 
@@ -2670,7 +2692,6 @@ typeof navigator === "object" && (function (global, factory) {
                 });
 
                 control.appendChild(controls.createButton.call(this, 'settings', {
-                    id: 'plyr-settings-toggle-' + data.id,
                     'aria-haspopup': true,
                     'aria-controls': 'plyr-settings-' + data.id,
                     'aria-expanded': false
@@ -2679,8 +2700,7 @@ typeof navigator === "object" && (function (global, factory) {
                 var popup = createElement('div', {
                     class: 'plyr__menu__container',
                     id: 'plyr-settings-' + data.id,
-                    hidden: '',
-                    'aria-labelled-by': 'plyr-settings-toggle-' + data.id
+                    hidden: ''
                 });
 
                 var inner = createElement('div');
@@ -4899,6 +4919,9 @@ typeof navigator === "object" && (function (global, factory) {
 
                 // Settings menu - click toggle
                 this.bind(elements.buttons.settings, 'click', function (event) {
+                    // Prevent the document click listener closing the menu
+                    event.stopPropagation();
+
                     controls.toggleMenu.call(player, event);
                 });
 
@@ -4906,8 +4929,16 @@ typeof navigator === "object" && (function (global, factory) {
                 // We have to bind to keyup otherwise Firefox triggers a click when a keydown event handler shifts focus
                 // https://bugzilla.mozilla.org/show_bug.cgi?id=1220143
                 this.bind(elements.buttons.settings, 'keyup', function (event) {
+                    var code = event.which;
+
                     // We only care about space and return
-                    if (event.which !== 32 && event.which !== 13) {
+                    if (![13, 32].includes(code)) {
+                        return;
+                    }
+
+                    // Because return triggers a click anyway, all we need to do is set focus
+                    if (code === 13) {
+                        controls.focusFirstMenuItem.call(player, null, true);
                         return;
                     }
 
@@ -4915,13 +4946,12 @@ typeof navigator === "object" && (function (global, factory) {
                     event.preventDefault();
 
                     // Prevent playing video (Firefox)
-                    if (event.which === 32) {
-                        event.stopPropagation();
-                    }
+                    event.stopPropagation();
 
                     // Toggle menu
                     controls.toggleMenu.call(player, event);
-                }, null, false);
+                }, null, false // Can't be passive as we're preventing default
+                );
 
                 // Escape closes menu
                 this.bind(elements.settings.menu, 'keydown', function (event) {

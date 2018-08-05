@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr Polyfilled Build
-// plyr.js v3.4.0-beta.1
+// plyr.js v3.4.0-beta.2
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================

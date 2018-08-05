@@ -1,4 +1,4 @@
-# v3.4.0-beta.1
+# v3.4.0
 
 -   Accessibility improvements (see #905)
 -   Improvements to the way the controls work on iOS
