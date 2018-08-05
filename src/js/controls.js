@@ -1327,7 +1327,6 @@ const controls = {
 
             control.appendChild(
                 controls.createButton.call(this, 'settings', {
-                    id: `plyr-settings-toggle-${data.id}`,
                     'aria-haspopup': true,
                     'aria-controls': `plyr-settings-${data.id}`,
                     'aria-expanded': false,
@@ -1338,7 +1337,6 @@ const controls = {
                 class: 'plyr__menu__container',
                 id: `plyr-settings-${data.id}`,
                 hidden: '',
-                'aria-labelled-by': `plyr-settings-toggle-${data.id}`,
             });
 
             const inner = createElement('div');
