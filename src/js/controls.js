@@ -645,7 +645,7 @@ const controls = {
         } else if (matches(range, this.config.selectors.inputs.volume)) {
             const percent = range.value * 100;
             range.setAttribute('aria-valuenow', percent);
-            range.setAttribute('aria-valuetext', `${percent}%`);
+            range.setAttribute('aria-valuetext', `${percent.toFixed(1)}%`);
         } else {
             range.setAttribute('aria-valuenow', range.value);
         }
