@@ -116,11 +116,7 @@ export function emptyElement(element) {
 
 // Replace element
 export function replaceElement(newChild, oldChild) {
-    if (
-        !is.element(oldChild) ||
-        !is.element(oldChild.parentNode) ||
-        !is.element(newChild)
-    ) {
+    if (!is.element(oldChild) || !is.element(oldChild.parentNode) || !is.element(newChild)) {
         return null;
     }
 
@@ -195,7 +191,7 @@ export function toggleHidden(element, hidden) {
     let hide = hidden;
 
     if (!is.boolean(hide)) {
-        hide = !element.hasAttribute('hidden');
+        hide = !element.hidden;
     }
 
     if (hide) {
@@ -263,10 +259,7 @@ export function trapFocus(element = null, toggle = false) {
         return;
     }
 
-    const focusable = getElements.call(
-        this,
-        'button:not(:disabled), input:not(:disabled), [tabindex]',
-    );
+    const focusable = getElements.call(this, 'button:not(:disabled), input:not(:disabled), [tabindex]');
     const first = focusable[0];
     const last = focusable[focusable.length - 1];
 
@@ -290,14 +283,7 @@ export function trapFocus(element = null, toggle = false) {
         }
     };
 
-    toggleListener.call(
-        this,
-        this.elements.container,
-        'keydown',
-        trap,
-        toggle,
-        false,
-    );
+    toggleListener.call(this, this.elements.container, 'keydown', trap, toggle, false);
 }
 
 // Set focus and tab focus class

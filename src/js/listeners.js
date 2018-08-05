@@ -553,6 +553,9 @@ class Listeners {
 
         // Settings menu - click toggle
         this.bind(elements.buttons.settings, 'click', event => {
+            // Prevent the document click listener closing the menu
+            event.stopPropagation();
+
             controls.toggleMenu.call(player, event);
         });
 
@@ -563,8 +566,16 @@ class Listeners {
             elements.buttons.settings,
             'keyup',
             event => {
+                const code = event.which;
+
                 // We only care about space and return
-                if (event.which !== 32 && event.which !== 13) {
+                if (![13, 32].includes(code)) {
+                    return;
+                }
+
+                // Because return triggers a click anyway, all we need to do is set focus
+                if (code === 13) {
+                    controls.focusFirstMenuItem.call(player, null, true);
                     return;
                 }
 
@@ -572,15 +583,13 @@ class Listeners {
                 event.preventDefault();
 
                 // Prevent playing video (Firefox)
-                if (event.which === 32) {
-                    event.stopPropagation();
-                }
+                event.stopPropagation();
 
                 // Toggle menu
                 controls.toggleMenu.call(player, event);
             },
             null,
-            false,
+            false, // Can't be passive as we're preventing default
         );
 
         // Escape closes menu

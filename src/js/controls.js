@@ -381,7 +381,7 @@ const controls = {
     // We have to bind to keyup otherwise Firefox triggers a click when a keydown event handler shifts focus
     // https://bugzilla.mozilla.org/show_bug.cgi?id=1220143
     bindMenuItemShortcuts(menuItem, type) {
-        // Handle space or -> to open menu
+        // Navigate through menus via arrow keys and space
         on(
             menuItem,
             'keydown keyup',
@@ -429,6 +429,16 @@ const controls = {
             },
             false,
         );
+
+        // Enter will fire a `click` event but we still need to manage focus
+        // So we bind to keyup which fires after and set focus here
+        on(menuItem, 'keyup', event => {
+            if (event.which !== 13) {
+                return;
+            }
+
+            controls.focusFirstMenuItem.call(this, null, true);
+        });
     },
 
     // Create a settings menu item
@@ -1074,6 +1084,23 @@ const controls = {
         toggleHidden(this.elements.settings.menu, !visible);
     },
 
+    // Focus the first menu item in a given (or visible) menu
+    focusFirstMenuItem(pane, tabFocus = false) {
+        if (this.elements.settings.popup.hidden) {
+            return;
+        }
+
+        let target = pane;
+
+        if (!is.element(target)) {
+            target = Object.values(this.elements.settings.panels).find(pane => !pane.hidden);
+        }
+
+        const firstItem = target.querySelector('[role^="menuitem"]');
+
+        setFocus.call(this, firstItem, tabFocus);
+    },
+
     // Show/hide menu
     toggleMenu(input) {
         const { popup } = this.elements.settings;
@@ -1085,7 +1112,7 @@ const controls = {
         }
 
         // True toggle by default
-        const hidden = popup.hasAttribute('hidden');
+        const { hidden } = popup;
         let show = hidden;
 
         if (is.boolean(input)) {
@@ -1094,18 +1121,12 @@ const controls = {
             show = false;
         } else if (is.event(input)) {
             const isMenuItem = popup.contains(input.target);
-            const isButton = input.target === button;
 
             // If the click was inside the menu or if the click
             // wasn't the button or menu item and we're trying to
             // show the menu (a doc click shouldn't show the menu)
-            if (isMenuItem || (!isMenuItem && !isButton && show)) {
+            if (isMenuItem || (!isMenuItem && input.target !== button && show)) {
                 return;
-            }
-
-            // Prevent the toggle being caught by the doc listener
-            if (isButton) {
-                input.stopPropagation();
             }
         }
 
@@ -1120,9 +1141,7 @@ const controls = {
 
         // Focus the first item if key interaction
         if (show && is.keyboardEvent(input)) {
-            const pane = Object.values(this.elements.settings.panels).find(pane => !pane.hidden);
-            const firstItem = pane.querySelector('[role^="menuitem"]');
-            setFocus.call(this, firstItem, true);
+            controls.focusFirstMenuItem.call(this, null, true);
         }
         // If closing, re-focus the button
         else if (!show && !hidden) {
@@ -1205,8 +1224,7 @@ const controls = {
         toggleHidden(target, false);
 
         // Focus the first item
-        const firstItem = target.querySelector('[role^="menuitem"]');
-        setFocus.call(this, firstItem, tabFocus);
+        controls.focusFirstMenuItem.call(this, target, tabFocus);
     },
 
     // Build the default HTML
