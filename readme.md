@@ -8,26 +8,26 @@ A simple, lightweight, accessible and customizable HTML5, YouTube and Vimeo medi
 
 ## Features
 
-*   **Accessible** - full support for VTT captions and screen readers
-*   **[Customisable](#html)** - make the player look how you want with the markup you want
-*   **Good HTML** - uses the _right_ elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no
+-   **Accessible** - full support for VTT captions and screen readers
+-   **[Customisable](#html)** - make the player look how you want with the markup you want
+-   **Good HTML** - uses the _right_ elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no
     `<span>` or `<a href="#">` button hacks
-*   **Responsive** - works with any screen size
-*   **HTML Video & Audio** - support for both formats
-*   **[Embedded Video](#embeds)** - support for YouTube and Vimeo video playback
-*   **[Monetization](#ads)** - make money from your videos
-*   **[Streaming](#try-plyr-online)** - support for hls.js, Shaka and dash.js streaming playback
-*   **[API](#api)** - toggle playback, volume, seeking, and more through a standardized API
-*   **[Events](#events)** - no messing around with Vimeo and YouTube APIs, all events are standardized across formats
-*   **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes
-*   **[Shortcuts](#shortcuts)** - supports keyboard shortcuts
-*   **Picture-in-Picture** - supports Safari's picture-in-picture mode
-*   **Playsinline** - supports the `playsinline` attribute
-*   **Speed controls** - adjust speed on the fly
-*   **Multiple captions** - support for multiple caption tracks
-*   **i18n support** - support for internationalization of controls
-*   **No dependencies** - written in "vanilla" ES6 JavaScript, no jQuery required
-*   **SASS** - to include in your build processes
+-   **Responsive** - works with any screen size
+-   **HTML Video & Audio** - support for both formats
+-   **[Embedded Video](#embeds)** - support for YouTube and Vimeo video playback
+-   **[Monetization](#ads)** - make money from your videos
+-   **[Streaming](#try-plyr-online)** - support for hls.js, Shaka and dash.js streaming playback
+-   **[API](#api)** - toggle playback, volume, seeking, and more through a standardized API
+-   **[Events](#events)** - no messing around with Vimeo and YouTube APIs, all events are standardized across formats
+-   **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes
+-   **[Shortcuts](#shortcuts)** - supports keyboard shortcuts
+-   **Picture-in-Picture** - supports Safari's picture-in-picture mode
+-   **Playsinline** - supports the `playsinline` attribute
+-   **Speed controls** - adjust speed on the fly
+-   **Multiple captions** - support for multiple caption tracks
+-   **i18n support** - support for internationalization of controls
+-   **No dependencies** - written in "vanilla" ES6 JavaScript, no jQuery required
+-   **SASS** - to include in your build processes
 
 Oh and yes, it works with Bootstrap.
 
@@ -164,9 +164,9 @@ reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.4.0-
 
 Plyr has partnered up with [vi.ai](https://vi.ai/publisher-video-monetization/?aid=plyrio) to offer monetization options for your videos. Getting setup is easy:
 
-*   [Sign up for a vi.ai account](https://vi.ai/publisher-video-monetization/?aid=plyrio)
-*   Grab your publisher ID from the code snippet
-*   Enable ads in the [config options](#options) and enter your publisher ID
+-   [Sign up for a vi.ai account](https://vi.ai/publisher-video-monetization/?aid=plyrio)
+-   Grab your publisher ID from the code snippet
+-   Enable ads in the [config options](#options) and enter your publisher ID
 
 Any questions regarding the ads can be sent straight to vi.ai and any issues with rendering raised through GitHub issues.
 
@@ -213,10 +213,10 @@ WebVTT captions are supported. To add a caption track, check the HTML example ab
 
 You can specify a range of arguments for the constructor to use:
 
-*   A CSS string selector that's compatible with [`querySelector`](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector)
-*   A [`HTMLElement`](https://developer.mozilla.org/en/docs/Web/API/HTMLElement)
-*   A [`NodeList`](https://developer.mozilla.org/en-US/docs/Web/API/NodeList)
-*   A [jQuery](https://jquery.com) object
+-   A CSS string selector that's compatible with [`querySelector`](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector)
+-   A [`HTMLElement`](https://developer.mozilla.org/en/docs/Web/API/HTMLElement)
+-   A [`NodeList`](https://developer.mozilla.org/en-US/docs/Web/API/NodeList)
+-   A [jQuery](https://jquery.com) object
 
 _Note_: If a `NodeList`, `Array`, or jQuery object are passed, the first element will be used for setup. To setup multiple players, see [setting up multiple players](#setting-up-multiple-players) below.
 
@@ -286,11 +286,11 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
 | `debug`              | Boolean                    | `false`                                                                                                                        | Display debugging information in the console                                                                                                                                                                                                                                                                                                                           |
 | `controls`           | Array, Function or Element | `['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen']` | If a function is passed, it is assumed your method will return either an element or HTML string for the controls. Three arguments will be passed to your function; `id` (the unique id for the player), `seektime` (the seektime step in seconds), and `title` (the media title). See [controls.md](controls.md) for more info on how the html needs to be structured. |
 | `settings`           | Array                      | `['captions', 'quality', 'speed', 'loop']`                                                                                     | If you're using the default controls are used then you can specify which settings to show in the menu                                                                                                                                                                                                                                                                  |
-| `i18n`               | Object                     | See [defaults.js](/src/js/config/defaults.js)                                                                                         | Used for internationalization (i18n) of the text within the UI.                                                                                                                                                                                                                                                                                                        |
+| `i18n`               | Object                     | See [defaults.js](/src/js/config/defaults.js)                                                                                  | Used for internationalization (i18n) of the text within the UI.                                                                                                                                                                                                                                                                                                        |
 | `loadSprite`         | Boolean                    | `true`                                                                                                                         | Load the SVG sprite specified as the `iconUrl` option (if a URL). If `false`, it is assumed you are handling sprite loading yourself.                                                                                                                                                                                                                                  |
 | `iconUrl`            | String                     | `null`                                                                                                                         | Specify a URL or path to the SVG sprite. See the [SVG section](#svg) for more info.                                                                                                                                                                                                                                                                                    |
 | `iconPrefix`         | String                     | `plyr`                                                                                                                         | Specify the id prefix for the icons used in the default controls (e.g. "plyr-play" would be "plyr"). This is to prevent clashes if you're using your own SVG sprite but with the default controls. Most people can ignore this option.                                                                                                                                 |
-| `blankVideo`           | String                     | `https://cdn.plyr.io/static/blank.mp4`                                                                                         | Specify a URL or path to a blank video file used to properly cancel network requests.                                                                                                                                                                                                                                                                                  |
+| `blankVideo`         | String                     | `https://cdn.plyr.io/static/blank.mp4`                                                                                         | Specify a URL or path to a blank video file used to properly cancel network requests.                                                                                                                                                                                                                                                                                  |
 | `autoplay`           | Boolean                    | `false`                                                                                                                        | Autoplay the media on load. This is generally advised against on UX grounds. It is also disabled by default in some browsers. If the `autoplay` attribute is present on a `<video>` or `<audio>` element, this will be automatically set to true.                                                                                                                      |
 | `autopause`&sup1;    | Boolean                    | `true`                                                                                                                         | Only allow one player playing at once.                                                                                                                                                                                                                                                                                                                                 |
 | `seekTime`           | Number                     | `10`                                                                                                                           | The time, in seconds, to seek when a user hits fast forward or rewind.                                                                                                                                                                                                                                                                                                 |
@@ -307,7 +307,7 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
 | `invertTime`         | Boolean                    | `true`                                                                                                                         | Display the current time as a countdown rather than an incremental counter.                                                                                                                                                                                                                                                                                            |
 | `toggleInvert`       | Boolean                    | `true`                                                                                                                         | Allow users to click to toggle the above.                                                                                                                                                                                                                                                                                                                              |
 | `listeners`          | Object                     | `null`                                                                                                                         | Allows binding of event listeners to the controls before the default handlers. See the `defaults.js` for available listeners. If your handler prevents default on the event (`event.preventDefault()`), the default handler will not fire.                                                                                                                             |
-| `captions`           | Object                     | `{ active: false, language: 'auto', update: false }`                                                         | `active`: Toggles if captions should be active by default. `language`: Sets the default language to load (if available). 'auto' uses the browser language. `update`: Listen to changes to tracks and update menu. This is needed for some streaming libraries, but can result in unselectable language options).                                                                                                                                                                                                                                               |
+| `captions`           | Object                     | `{ active: false, language: 'auto', update: false }`                                                                           | `active`: Toggles if captions should be active by default. `language`: Sets the default language to load (if available). 'auto' uses the browser language. `update`: Listen to changes to tracks and update menu. This is needed for some streaming libraries, but can result in unselectable language options).                                                       |
 | `fullscreen`         | Object                     | `{ enabled: true, fallback: true, iosNative: false }`                                                                          | `enabled`: Toggles whether fullscreen should be enabled. `fallback`: Allow fallback to a full-window solution. `iosNative`: whether to use native iOS fullscreen when entering fullscreen (no custom controls)                                                                                                                                                         |
 | `ratio`              | String                     | `16:9`                                                                                                                         | The aspect ratio you want to use for embedded players.                                                                                                                                                                                                                                                                                                                 |
 | `storage`            | Object                     | `{ enabled: true, key: 'plyr' }`                                                                                               | `enabled`: Allow use of local storage to store user settings. `key`: The key name to use.                                                                                                                                                                                                                                                                              |
@@ -365,9 +365,9 @@ player.fullscreen.enter(); // Enter fullscreen
 | `fullscreen.exit()`      | -                | Exit fullscreen.                                                                                           |
 | `fullscreen.toggle()`    | -                | Toggle fullscreen.                                                                                         |
 | `airplay()`              | -                | Trigger the airplay dialog on supported devices.                                                           |
-| `toggleControls(toggle)` | Boolean          | Toggle the controls (video only). Takes optional truthy value to force it on/off.                                                        |
+| `toggleControls(toggle)` | Boolean          | Toggle the controls (video only). Takes optional truthy value to force it on/off.                          |
 | `on(event, function)`    | String, Function | Add an event listener for the specified event.                                                             |
-| `once(event, function)`    | String, Function | Add an event listener for the specified event once.                                                             |
+| `once(event, function)`  | String, Function | Add an event listener for the specified event once.                                                        |
 | `off(event, function)`   | String, Function | Remove an event listener for the specified event.                                                          |
 | `supports(type)`         | String           | Check support for a mime type.                                                                             |
 | `destroy()`              | -                | Destroy the instance and garbage collect any elements.                                                     |
@@ -391,32 +391,32 @@ player.currentTime; // 10
 player.fullscreen.active; // false;
 ```
 
-| Property             | Getter | Setter | Description                                                                                                                                                                          |
-| -------------------- | ------ | ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `isHTML5`            | ✓      | -      | Returns a boolean indicating if the current player is HTML5.                                                                                                                         |
-| `isEmbed`            | ✓      | -      | Returns a boolean indicating if the current player is an embedded player.                                                                                                            |
-| `playing`            | ✓      | -      | Returns a boolean indicating if the current player is playing.                                                                                                                       |
-| `paused`             | ✓      | -      | Returns a boolean indicating if the current player is paused.                                                                                                                        |
-| `stopped`            | ✓      | -      | Returns a boolean indicating if the current player is stopped.                                                                                                                       |
-| `ended`              | ✓      | -      | Returns a boolean indicating if the current player has finished playback.                                                                                                            |
-| `buffered`           | ✓      | -      | Returns a float between 0 and 1 indicating how much of the media is buffered                                                                                                         |
-| `currentTime`        | ✓      | ✓      | Gets or sets the currentTime for the player. The setter accepts a float in seconds.                                                                                                  |
-| `seeking`            | ✓      | -      | Returns a boolean indicating if the current player is seeking.                                                                                                                       |
-| `duration`           | ✓      | -      | Returns the duration for the current media.                                                                                                                                          |
-| `volume`             | ✓      | ✓      | Gets or sets the volume for the player. The setter accepts a float between 0 and 1.                                                                                                  |
-| `muted`              | ✓      | ✓      | Gets or sets the muted state of the player. The setter accepts a boolean.                                                                                                            |
-| `hasAudio`           | ✓      | -      | Returns a boolean indicating if the current media has an audio track.                                                                                                                |
-| `speed`              | ✓      | ✓      | Gets or sets the speed for the player. The setter accepts a value in the options specified in your config. Generally the minimum should be 0.5.                                      |
-| `quality`&sup1;      | ✓      | ✓      | Gets or sets the quality for the player. The setter accepts a value from the options specified in your config.                                                                       |
-| `loop`               | ✓      | ✓      | Gets or sets the current loop state of the player. The setter accepts a boolean.                                                                                                     |
-| `source`             | ✓      | ✓      | Gets or sets the current source for the player. The setter accepts an object. See [source setter](#the-source-setter) below for examples.                                                |
-| `poster`             | ✓      | ✓      | Gets or sets the current poster image for the player. The setter accepts a string; the URL for the updated poster image.                                                             |
-| `autoplay`           | ✓      | ✓      | Gets or sets the autoplay state of the player. The setter accepts a boolean.                                                                                                         |
-| `currentTrack`       | ✓      | ✓      | Gets or sets the caption track by index. `-1` means the track is missing or captions is not active |
+| Property             | Getter | Setter | Description                                                                                                                                                                                                                                                                                                                            |
+| -------------------- | ------ | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `isHTML5`            | ✓      | -      | Returns a boolean indicating if the current player is HTML5.                                                                                                                                                                                                                                                                           |
+| `isEmbed`            | ✓      | -      | Returns a boolean indicating if the current player is an embedded player.                                                                                                                                                                                                                                                              |
+| `playing`            | ✓      | -      | Returns a boolean indicating if the current player is playing.                                                                                                                                                                                                                                                                         |
+| `paused`             | ✓      | -      | Returns a boolean indicating if the current player is paused.                                                                                                                                                                                                                                                                          |
+| `stopped`            | ✓      | -      | Returns a boolean indicating if the current player is stopped.                                                                                                                                                                                                                                                                         |
+| `ended`              | ✓      | -      | Returns a boolean indicating if the current player has finished playback.                                                                                                                                                                                                                                                              |
+| `buffered`           | ✓      | -      | Returns a float between 0 and 1 indicating how much of the media is buffered                                                                                                                                                                                                                                                           |
+| `currentTime`        | ✓      | ✓      | Gets or sets the currentTime for the player. The setter accepts a float in seconds.                                                                                                                                                                                                                                                    |
+| `seeking`            | ✓      | -      | Returns a boolean indicating if the current player is seeking.                                                                                                                                                                                                                                                                         |
+| `duration`           | ✓      | -      | Returns the duration for the current media.                                                                                                                                                                                                                                                                                            |
+| `volume`             | ✓      | ✓      | Gets or sets the volume for the player. The setter accepts a float between 0 and 1.                                                                                                                                                                                                                                                    |
+| `muted`              | ✓      | ✓      | Gets or sets the muted state of the player. The setter accepts a boolean.                                                                                                                                                                                                                                                              |
+| `hasAudio`           | ✓      | -      | Returns a boolean indicating if the current media has an audio track.                                                                                                                                                                                                                                                                  |
+| `speed`              | ✓      | ✓      | Gets or sets the speed for the player. The setter accepts a value in the options specified in your config. Generally the minimum should be 0.5.                                                                                                                                                                                        |
+| `quality`&sup1;      | ✓      | ✓      | Gets or sets the quality for the player. The setter accepts a value from the options specified in your config.                                                                                                                                                                                                                         |
+| `loop`               | ✓      | ✓      | Gets or sets the current loop state of the player. The setter accepts a boolean.                                                                                                                                                                                                                                                       |
+| `source`             | ✓      | ✓      | Gets or sets the current source for the player. The setter accepts an object. See [source setter](#the-source-setter) below for examples.                                                                                                                                                                                              |
+| `poster`             | ✓      | ✓      | Gets or sets the current poster image for the player. The setter accepts a string; the URL for the updated poster image.                                                                                                                                                                                                               |
+| `autoplay`           | ✓      | ✓      | Gets or sets the autoplay state of the player. The setter accepts a boolean.                                                                                                                                                                                                                                                           |
+| `currentTrack`       | ✓      | ✓      | Gets or sets the caption track by index. `-1` means the track is missing or captions is not active                                                                                                                                                                                                                                     |
 | `language`           | ✓      | ✓      | Gets or sets the preferred captions language for the player. The setter accepts an ISO two-letter language code. Support for the languages is dependent on the captions you include. If your captions don't have any language data, or if you have multiple tracks with the same language, you may want to use `currentTrack` instead. |
-| `fullscreen.active`  | ✓      | -      | Returns a boolean indicating if the current player is in fullscreen mode.                                                                                                            |
-| `fullscreen.enabled` | ✓      | -      | Returns a boolean indicating if the current player has fullscreen enabled.                                                                                                           |
-| `pip`                | ✓      | ✓      | Gets or sets the picture-in-picture state of the player. The setter accepts a boolean. This currently only supported on Safari 10+ on MacOS Sierra+ and iOS 10+.                     |
+| `fullscreen.active`  | ✓      | -      | Returns a boolean indicating if the current player is in fullscreen mode.                                                                                                                                                                                                                                                              |
+| `fullscreen.enabled` | ✓      | -      | Returns a boolean indicating if the current player has fullscreen enabled.                                                                                                                                                                                                                                                             |
+| `pip`                | ✓      | ✓      | Gets or sets the picture-in-picture state of the player. The setter accepts a boolean. This currently only supported on Safari 10+ on MacOS Sierra+ and iOS 10+.                                                                                                                                                                       |
 
 1.  YouTube only. HTML5 will follow.
 2.  HTML5 only
@@ -565,6 +565,7 @@ player.on('ready', event => {
 | `loadstart`      | Sent when loading of the media begins.                                                                                                                                                                                                                                                                                                         |
 | `loadeddata`     | The first frame of the media has finished loading.                                                                                                                                                                                                                                                                                             |
 | `loadedmetadata` | The media's metadata has finished loading; all attributes now contain as much useful information as they're going to.                                                                                                                                                                                                                          |
+| `qualitychange`  | The quality of playback has changed.                                                                                                                                                                                                                                                                                                           |
 | `canplay`        | Sent when enough data is available that the media can be played, at least for a couple of frames. This corresponds to the `HAVE_ENOUGH_DATA` `readyState`.                                                                                                                                                                                     |
 | `canplaythrough` | Sent when the ready state changes to `CAN_PLAY_THROUGH`, indicating that the entire media can be played without interruption, assuming the download rate remains at least at the current level. _Note:_ Manually setting the `currentTime` will eventually fire a `canplaythrough` event in firefox. Other browsers might not fire this event. |
 | `stalled`        | Sent when the user agent is trying to fetch media data, but data is unexpectedly not forthcoming.                                                                                                                                                                                                                                              |
@@ -575,11 +576,9 @@ player.on('ready', event => {
 
 #### YouTube only
 
-| Event Type         | Description                                                                                                                                                                                                                                                                                                                |
-| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `statechange`      | The state of the player has changed. The code can be accessed via `event.detail.code`. Possible values are `-1`: Unstarted, `0`: Ended, `1`: Playing, `2`: Paused, `3`: Buffering, `5`: Video cued. See the [YouTube Docs](https://developers.google.com/youtube/iframe_api_reference#onStateChange) for more information. |
-| `qualitychange`    | The quality of playback has changed.                                                                                                                                                                                                                                                                                       |
-| `qualityrequested` | A change to playback quality has been requested. _Note:_ A change to quality can only be _requested_ via the API. There is no guarantee the quality will change to the level requested. You should listen to the `qualitychange` event for true changes.                                                                   |
+| Event Type    | Description                                                                                                                                                                                                                                                                                                                |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `statechange` | The state of the player has changed. The code can be accessed via `event.detail.code`. Possible values are `-1`: Unstarted, `0`: Ended, `1`: Playing, `2`: Paused, `3`: Buffering, `5`: Video cued. See the [YouTube Docs](https://developers.google.com/youtube/iframe_api_reference#onStateChange) for more information. |
 
 _Note:_ These events also bubble up the DOM. The event target will be the container element.
 
@@ -591,8 +590,8 @@ YouTube and Vimeo are currently supported and function much like a HTML5 video. 
 to access the API's directly. You can do so via the `embed` property of your player object - e.g. `player.embed`. You can then use the relevant methods from the
 third party APIs. More info on the respective API's here:
 
-*   [YouTube iframe API Reference](https://developers.google.com/youtube/iframe_api_reference)
-*   [Vimeo player.js Reference](https://github.com/vimeo/player.js)
+-   [YouTube iframe API Reference](https://developers.google.com/youtube/iframe_api_reference)
+-   [Vimeo player.js Reference](https://github.com/vimeo/player.js)
 
 _Note_: Not all API methods may work 100%. Your mileage may vary. It's better to use the Plyr API where possible.
 
@@ -652,9 +651,9 @@ const supported = Plyr.supported('video', 'html5', true);
 
 The arguments are:
 
-*   Media type (`audio` or `video`)
-*   Provider (`html5`, `youtube` or `vimeo`)
-*   Whether the player has the `playsinline` attribute (only applicable to iOS 10+)
+-   Media type (`audio` or `video`)
+-   Provider (`html5`, `youtube` or `vimeo`)
+-   Whether the player has the `playsinline` attribute (only applicable to iOS 10+)
 
 ### Disable support programatically
 
@@ -687,33 +686,33 @@ Plyr is developed by [@sam_potts](https://twitter.com/sam_potts) / [sampotts.me]
 
 Plyr costs money to run, not only my time. I donate my time for free as I enjoy building Plyr but unfortunately have to pay for domains, hosting, and more. Any help with costs is appreciated...
 
-*   [Donate via Patron](https://www.patreon.com/plyr)
-*   [Donate via PayPal](https://www.paypal.me/pottsy/20usd)
+-   [Donate via Patron](https://www.patreon.com/plyr)
+-   [Donate via PayPal](https://www.paypal.me/pottsy/20usd)
 
 ## Mentions
 
-*   [ProductHunt](https://www.producthunt.com/tech/plyr)
-*   [The Changelog](http://thechangelog.com/plyr-simple-html5-media-player-custom-controls-webvtt-captions/)
-*   [HTML5 Weekly #177](http://html5weekly.com/issues/177)
-*   [Responsive Design #149](http://us4.campaign-archive2.com/?u=559bc631fe5294fc66f5f7f89&id=451a61490f)
-*   [Web Design Weekly #174](https://web-design-weekly.com/2015/02/24/web-design-weekly-174/)
-*   [Hacker News](https://news.ycombinator.com/item?id=9136774)
-*   [Web Platform Daily](http://webplatformdaily.org/releases/2015-03-04)
-*   [LayerVault Designer News](https://news.layervault.com/stories/45394-plyr--a-simple-html5-media-player)
-*   [The Treehouse Show #131](https://teamtreehouse.com/library/episode-131-origami-react-responsive-hero-images)
-*   [noupe.com](http://www.noupe.com/design/html5-plyr-is-a-responsive-and-accessible-video-player-94389.html)
+-   [ProductHunt](https://www.producthunt.com/tech/plyr)
+-   [The Changelog](http://thechangelog.com/plyr-simple-html5-media-player-custom-controls-webvtt-captions/)
+-   [HTML5 Weekly #177](http://html5weekly.com/issues/177)
+-   [Responsive Design #149](http://us4.campaign-archive2.com/?u=559bc631fe5294fc66f5f7f89&id=451a61490f)
+-   [Web Design Weekly #174](https://web-design-weekly.com/2015/02/24/web-design-weekly-174/)
+-   [Hacker News](https://news.ycombinator.com/item?id=9136774)
+-   [Web Platform Daily](http://webplatformdaily.org/releases/2015-03-04)
+-   [LayerVault Designer News](https://news.layervault.com/stories/45394-plyr--a-simple-html5-media-player)
+-   [The Treehouse Show #131](https://teamtreehouse.com/library/episode-131-origami-react-responsive-hero-images)
+-   [noupe.com](http://www.noupe.com/design/html5-plyr-is-a-responsive-and-accessible-video-player-94389.html)
 
 ## Used by
 
-*   [Selz.com](https://selz.com)
-*   [Peugeot.fr](http://www.peugeot.fr/marque-et-technologie/technologies/peugeot-i-cockpit.html)
-*   [Peugeot.de](http://www.peugeot.de/modelle/modellberater/208-3-turer/fotos-videos.html)
-*   [TomTom.com](http://prioritydriving.tomtom.com/)
-*   [DIGBMX](http://digbmx.com/)
-*   [Grime Archive](https://grimearchive.com/)
-*   [koel - A personal music streaming server that works.](http://koel.phanan.net/)
-*   [Oscar Radio](http://oscar-radio.xyz/)
-*   [Sparkk TV](https://www.sparkktv.com/)
+-   [Selz.com](https://selz.com)
+-   [Peugeot.fr](http://www.peugeot.fr/marque-et-technologie/technologies/peugeot-i-cockpit.html)
+-   [Peugeot.de](http://www.peugeot.de/modelle/modellberater/208-3-turer/fotos-videos.html)
+-   [TomTom.com](http://prioritydriving.tomtom.com/)
+-   [DIGBMX](http://digbmx.com/)
+-   [Grime Archive](https://grimearchive.com/)
+-   [koel - A personal music streaming server that works.](http://koel.phanan.net/)
+-   [Oscar Radio](http://oscar-radio.xyz/)
+-   [Sparkk TV](https://www.sparkktv.com/)
 
 Let me know on [Twitter](https://twitter.com/sam_potts) I can add you to the above list. It'd be awesome to see how you're using Plyr :-)
 
@@ -721,8 +720,8 @@ Let me know on [Twitter](https://twitter.com/sam_potts) I can add you to the abo
 
 Credit to the PayPal HTML5 Video player from which Plyr's caption functionality was originally ported from:
 
-*   [PayPal's Accessible HTML5 Video Player](https://github.com/paypal/accessible-html5-video-player)
-*   [An awesome guide for Plyr in Japanese!](http://syncer.jp/how-to-use-plyr-io) by [@arayutw](https://twitter.com/arayutw)
+-   [PayPal's Accessible HTML5 Video Player](https://github.com/paypal/accessible-html5-video-player)
+-   [An awesome guide for Plyr in Japanese!](http://syncer.jp/how-to-use-plyr-io) by [@arayutw](https://twitter.com/arayutw)
 
 ## Thanks
 

@@ -3,6 +3,7 @@
 -   Accessibility improvements (see #905)
 -   Improvements to the way the controls work on iOS
 -   Demo code clean up
+-   YouTube quality selection removed due to their poor support for it. As a result, the `qualityrequested` event has been removed
 
 # v3.3.23
 

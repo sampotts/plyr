@@ -698,11 +698,6 @@ class Plyr {
             quality = value;
         }
 
-        // Trigger request event
-        triggerEvent.call(this, this.media, 'qualityrequested', false, {
-            quality,
-        });
-
         // Update config
         config.selected = quality;
 
