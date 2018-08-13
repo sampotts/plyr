@@ -6,9 +6,9 @@
 
 /* global google */
 
-import i18n from '../i18n';
 import { createElement } from '../utils/elements';
 import { triggerEvent } from '../utils/events';
+import i18n from '../utils/i18n';
 import is from '../utils/is';
 import loadScript from '../utils/loadScript';
 import { formatTime } from '../utils/time';

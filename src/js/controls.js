@@ -5,13 +5,13 @@
 
 import captions from './captions';
 import html5 from './html5';
-import i18n from './i18n';
 import support from './support';
 import { repaint, transitionEndEvent } from './utils/animation';
 import { dedupe } from './utils/arrays';
 import browser from './utils/browser';
 import { createElement, emptyElement, getAttributesFromSelector, getElement, getElements, hasClass, matches, removeElement, setAttributes, setFocus, toggleClass, toggleHidden } from './utils/elements';
 import { off, on } from './utils/events';
+import i18n from './utils/i18n';
 import is from './utils/is';
 import loadSprite from './utils/loadSprite';
 import { extend } from './utils/objects';

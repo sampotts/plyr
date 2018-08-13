@@ -2,9 +2,9 @@
 // Plyr internationalization
 // ==========================================================================
 
-import is from './utils/is';
-import { getDeep } from './utils/objects';
-import { replaceAll } from './utils/strings';
+import is from './is';
+import { getDeep } from './objects';
+import { replaceAll } from './strings';
 
 const i18n = {
     get(key = '', config = {}) {

@@ -4,7 +4,6 @@
 // ==========================================================================
 
 import controls from './controls';
-import i18n from './i18n';
 import support from './support';
 import { dedupe } from './utils/arrays';
 import browser from './utils/browser';
@@ -18,6 +17,7 @@ import {
 } from './utils/elements';
 import { on, triggerEvent } from './utils/events';
 import fetch from './utils/fetch';
+import i18n from './utils/i18n';
 import is from './utils/is';
 import { getHTML } from './utils/strings';
 import { parseUrl } from './utils/urls';
