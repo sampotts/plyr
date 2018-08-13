@@ -68,19 +68,7 @@ const defaults = {
     // Quality default
     quality: {
         default: 576,
-        options: [
-            4320,
-            2880,
-            2160,
-            1440,
-            1080,
-            720,
-            576,
-            480,
-            360,
-            240,
-            'default', // YouTube's "auto"
-        ],
+        options: [4320, 2880, 2160, 1440, 1080, 720, 576, 480, 360, 240],
     },
 
     // Set loops
@@ -268,8 +256,9 @@ const defaults = {
 
         // YouTube
         'statechange',
+
+        // Quality
         'qualitychange',
-        'qualityrequested',
 
         // Ads
         'adsloaded',
@@ -354,6 +343,9 @@ const defaults = {
         isTouch: 'plyr--is-touch',
         uiSupported: 'plyr--full-ui',
         noTransition: 'plyr--no-transition',
+        display: {
+            time: 'plyr__time',
+        },
         menu: {
             value: 'plyr__menu__value',
             badge: 'plyr__badge',

@@ -1874,7 +1874,7 @@ typeof navigator === "object" && (function () {
 	  // webpack (using a build step causes webpack #1617). Grunt verifies that
 	  // this value matches package.json during build.
 	  //   See: https://github.com/getsentry/raven-js/issues/465
-	  VERSION: '3.26.3',
+	  VERSION: '3.26.4',
 
 	  debug: false,
 
@@ -2612,34 +2612,40 @@ typeof navigator === "object" && (function () {
 	    )
 	      return;
 
-	    options = options || {};
+	    options = Object.assign(
+	      {
+	        eventId: this.lastEventId(),
+	        dsn: this._dsn,
+	        user: this._globalContext.user || {}
+	      },
+	      options
+	    );
 
-	    var lastEventId = options.eventId || this.lastEventId();
-	    if (!lastEventId) {
+	    if (!options.eventId) {
 	      throw new configError('Missing eventId');
 	    }
 
-	    var dsn = options.dsn || this._dsn;
-	    if (!dsn) {
+	    if (!options.dsn) {
 	      throw new configError('Missing DSN');
 	    }
 
 	    var encode = encodeURIComponent;
-	    var qs = '';
-	    qs += '?eventId=' + encode(lastEventId);
-	    qs += '&dsn=' + encode(dsn);
+	    var encodedOptions = [];
 
-	    var user = options.user || this._globalContext.user;
-	    if (user) {
-	      if (user.name) qs += '&name=' + encode(user.name);
-	      if (user.email) qs += '&email=' + encode(user.email);
+	    for (var key in options) {
+	      if (key === 'user') {
+	        var user = options.user;
+	        if (user.name) encodedOptions.push('name=' + encode(user.name));
+	        if (user.email) encodedOptions.push('email=' + encode(user.email));
+	      } else {
+	        encodedOptions.push(encode(key) + '=' + encode(options[key]));
+	      }
 	    }
-
-	    var globalServer = this._getGlobalServer(this._parseDSN(dsn));
+	    var globalServer = this._getGlobalServer(this._parseDSN(options.dsn));
 
 	    var script = _document.createElement('script');
 	    script.async = true;
-	    script.src = globalServer + '/api/embed/error-page/' + qs;
+	    script.src = globalServer + '/api/embed/error-page/?' + encodedOptions.join('&');
 	    (_document.head || _document.body).appendChild(script);
 	  },
 
@@ -4087,16 +4093,18 @@ typeof navigator === "object" && (function () {
 	// ==========================================================================
 
 	(function () {
-	    var isLive = window.location.host === 'plyr.io';
+	    var host = window.location.host;
 
-	    // Raven / Sentry
-	    // For demo site (https://plyr.io) only
-	    if (isLive) {
-	        singleton.config('https://d4ad9866ad834437a4754e23937071e4@sentry.io/305555').install();
-	    }
+	    var env = {
+	        prod: host === 'plyr.io',
+	        dev: host === 'dev.plyr.io'
+	    };
 
 	    document.addEventListener('DOMContentLoaded', function () {
 	        singleton.context(function () {
+	            var selector = '#player';
+	            var container = document.getElementById('container');
+
 	            if (window.shr) {
 	                window.shr.setup({
 	                    count: {
@@ -4110,6 +4118,9 @@ typeof navigator === "object" && (function () {
 
 	            // Remove class on blur
 	            document.addEventListener('focusout', function (event) {
+	                if (container.contains(event.target)) {
+	                    return;
+	                }
 	                event.target.classList.remove(tabClassName);
 	            });
 
@@ -4122,12 +4133,18 @@ typeof navigator === "object" && (function () {
 	                // Delay the adding of classname until the focus has changed
 	                // This event fires before the focusin event
 	                setTimeout(function () {
-	                    document.activeElement.classList.add(tabClassName);
-	                }, 0);
+	                    var focused = document.activeElement;
+
+	                    if (!focused || container.contains(focused)) {
+	                        return;
+	                    }
+
+	                    focused.classList.add(tabClassName);
+	                }, 10);
 	            });
 
 	            // Setup the player
-	            var player = new Plyr('#player', {
+	            var player = new Plyr(selector, {
 	                debug: true,
 	                title: 'View From A Blue Moon',
 	                iconUrl: '../dist/plyr.svg',
@@ -4137,57 +4154,6 @@ typeof navigator === "object" && (function () {
 	                tooltips: {
 	                    controls: true
 	                },
-	                clickToPlay: false,
-	                /* controls: [
-	                    'play-large',
-	                    'restart',
-	                    'rewind',
-	                    'play',
-	                    'fast-forward',
-	                    'progress',
-	                    'current-time',
-	                    'duration',
-	                    'mute',
-	                    'volume',
-	                    'captions',
-	                    'settings',
-	                    'pip',
-	                    'airplay',
-	                    'fullscreen',
-	                ], */
-	                /* i18n: {
-	                    restart: '重新開始',
-	                    rewind: '快退{seektime}秒',
-	                    play: '播放',
-	                    pause: '暫停',
-	                    fastForward: '快進{seektime}秒',
-	                    seek: '尋求',
-	                    played: '發揮',
-	                    buffered: '緩衝的',
-	                    currentTime: '當前時間戳',
-	                    duration: '長短',
-	                    volume: '音量',
-	                    mute: '靜音',
-	                    unmute: '取消靜音',
-	                    enableCaptions: '開啟字幕',
-	                    disableCaptions: '關閉字幕',
-	                    enterFullscreen: '進入全螢幕',
-	                    exitFullscreen: '退出全螢幕',
-	                    frameTitle: '球員為{title}',
-	                    captions: '字幕',
-	                    settings: '設定',
-	                    speed: '速度',
-	                    normal: '正常',
-	                    quality: '質量',
-	                    loop: '循環',
-	                    start: 'Start',
-	                    end: 'End',
-	                    all: 'All',
-	                    reset: '重啟',
-	                    disabled: '殘',
-	                    enabled: '啟用',
-	                    advertisement: '廣告',
-	                }, */
 	                captions: {
 	                    active: true
 	                },
@@ -4195,7 +4161,7 @@ typeof navigator === "object" && (function () {
 	                    google: 'AIzaSyDrNwtN3nLH_8rjCmu5Wq3ZCm4MNAVdc0c'
 	                },
 	                ads: {
-	                    enabled: true,
+	                    enabled: env.prod || env.dev,
 	                    publisherId: '918848828995742'
 	                }
 	            });
@@ -4370,10 +4336,16 @@ typeof navigator === "object" && (function () {
 	        });
 	    });
 
+	    // Raven / Sentry
+	    // For demo site (https://plyr.io) only
+	    if (env.prod) {
+	        singleton.config('https://d4ad9866ad834437a4754e23937071e4@sentry.io/305555').install();
+	    }
+
 	    // Google analytics
 	    // For demo site (https://plyr.io) only
 	    /* eslint-disable */
-	    if (isLive) {
+	    if (env.prod) {
 	        (function (i, s, o, g, r, a, m) {
 	            i.GoogleAnalyticsObject = r;
 	            i[r] = i[r] || function () {

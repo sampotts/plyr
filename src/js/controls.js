@@ -1,28 +1,17 @@
 // ==========================================================================
 // Plyr controls
+// TODO: This needs to be split into smaller files and cleaned up
 // ==========================================================================
 
 import captions from './captions';
 import html5 from './html5';
-import i18n from './i18n';
 import support from './support';
 import { repaint, transitionEndEvent } from './utils/animation';
 import { dedupe } from './utils/arrays';
 import browser from './utils/browser';
-import {
-    createElement,
-    emptyElement,
-    getAttributesFromSelector,
-    getElement,
-    getElements,
-    hasClass,
-    matches,
-    removeElement,
-    setAttributes,
-    toggleClass,
-    toggleHidden,
-} from './utils/elements';
+import { createElement, emptyElement, getAttributesFromSelector, getElement, getElements, hasClass, matches, removeElement, setAttributes, setFocus, toggleClass, toggleHidden } from './utils/elements';
 import { off, on } from './utils/events';
+import i18n from './utils/i18n';
 import is from './utils/is';
 import loadSprite from './utils/loadSprite';
 import { extend } from './utils/objects';
@@ -243,12 +232,28 @@ const controls = {
         // Setup toggle icon and labels
         if (toggle) {
             // Icon
-            button.appendChild(controls.createIcon.call(this, iconPressed, { class: 'icon--pressed' }));
-            button.appendChild(controls.createIcon.call(this, icon, { class: 'icon--not-pressed' }));
+            button.appendChild(
+                controls.createIcon.call(this, iconPressed, {
+                    class: 'icon--pressed',
+                }),
+            );
+            button.appendChild(
+                controls.createIcon.call(this, icon, {
+                    class: 'icon--not-pressed',
+                }),
+            );
 
             // Label/Tooltip
-            button.appendChild(controls.createLabel.call(this, labelPressed, { class: 'label--pressed' }));
-            button.appendChild(controls.createLabel.call(this, label, { class: 'label--not-pressed' }));
+            button.appendChild(
+                controls.createLabel.call(this, labelPressed, {
+                    class: 'label--pressed',
+                }),
+            );
+            button.appendChild(
+                controls.createLabel.call(this, label, {
+                    class: 'label--not-pressed',
+                }),
+            );
         } else {
             button.appendChild(controls.createIcon.call(this, icon));
             button.appendChild(controls.createLabel.call(this, label));
@@ -269,18 +274,6 @@ const controls = {
         } else {
             this.elements.buttons[type] = button;
         }
-
-        // Toggle classname when pressed property is set
-        const className = this.config.classNames.controlPressed;
-        Object.defineProperty(button, 'pressed', {
-            enumerable: true,
-            get() {
-                return hasClass(button, className);
-            },
-            set(pressed = false) {
-                toggleClass(button, className, pressed);
-            },
-        });
 
         return button;
     },
@@ -360,7 +353,7 @@ const controls = {
         const container = createElement(
             'div',
             extend(attributes, {
-                class: `plyr__time ${attributes.class}`,
+                class: `${this.config.classNames.display.time} ${attributes.class ? attributes.class : ''}`.trim(),
                 'aria-label': i18n.get(type, this.config),
             }),
             '00:00',
@@ -372,37 +365,153 @@ const controls = {
         return container;
     },
 
+    // Bind keyboard shortcuts for a menu item
+    // We have to bind to keyup otherwise Firefox triggers a click when a keydown event handler shifts focus
+    // https://bugzilla.mozilla.org/show_bug.cgi?id=1220143
+    bindMenuItemShortcuts(menuItem, type) {
+        // Navigate through menus via arrow keys and space
+        on(
+            menuItem,
+            'keydown keyup',
+            event => {
+                // We only care about space and ⬆️ ⬇️️ ➡️
+                if (![32, 38, 39, 40].includes(event.which)) {
+                    return;
+                }
+
+                // Prevent play / seek
+                event.preventDefault();
+                event.stopPropagation();
+
+                // We're just here to prevent the keydown bubbling
+                if (event.type === 'keydown') {
+                    return;
+                }
+
+                const isRadioButton = matches(menuItem, '[role="menuitemradio"]');
+
+                // Show the respective menu
+                if (!isRadioButton && [32, 39].includes(event.which)) {
+                    controls.showMenuPanel.call(this, type, true);
+                } else {
+                    let target;
+
+                    if (event.which !== 32) {
+                        if (event.which === 40 || (isRadioButton && event.which === 39)) {
+                            target = menuItem.nextElementSibling;
+
+                            if (!is.element(target)) {
+                                target = menuItem.parentNode.firstElementChild;
+                            }
+                        } else {
+                            target = menuItem.previousElementSibling;
+
+                            if (!is.element(target)) {
+                                target = menuItem.parentNode.lastElementChild;
+                            }
+                        }
+
+                        setFocus.call(this, target, true);
+                    }
+                }
+            },
+            false,
+        );
+
+        // Enter will fire a `click` event but we still need to manage focus
+        // So we bind to keyup which fires after and set focus here
+        on(menuItem, 'keyup', event => {
+            if (event.which !== 13) {
+                return;
+            }
+
+            controls.focusFirstMenuItem.call(this, null, true);
+        });
+    },
+
     // Create a settings menu item
     createMenuItem({ value, list, type, title, badge = null, checked = false }) {
-        const item = createElement('li');
+        const attributes = getAttributesFromSelector(this.config.selectors.inputs[type]);
 
-        const label = createElement('label', {
-            class: this.config.classNames.control,
-        });
-
-        const radio = createElement(
-            'input',
-            extend(getAttributesFromSelector(this.config.selectors.inputs[type]), {
-                type: 'radio',
-                name: `plyr-${type}`,
+        const menuItem = createElement(
+            'button',
+            extend(attributes, {
+                type: 'button',
+                role: 'menuitemradio',
+                class: `${this.config.classNames.control} ${attributes.class ? attributes.class : ''}`.trim(),
+                'aria-checked': checked,
                 value,
-                checked,
-                class: 'plyr__sr-only',
             }),
         );
 
-        const faux = createElement('span', { hidden: '' });
+        const flex = createElement('span');
 
-        label.appendChild(radio);
-        label.appendChild(faux);
-        label.insertAdjacentHTML('beforeend', title);
+        // We have to set as HTML incase of special characters
+        flex.innerHTML = title;
 
         if (is.element(badge)) {
-            label.appendChild(badge);
+            flex.appendChild(badge);
         }
 
-        item.appendChild(label);
-        list.appendChild(item);
+        menuItem.appendChild(flex);
+
+        // Replicate radio button behaviour
+        Object.defineProperty(menuItem, 'checked', {
+            enumerable: true,
+            get() {
+                return menuItem.getAttribute('aria-checked') === 'true';
+            },
+            set(checked) {
+                // Ensure exclusivity
+                if (checked) {
+                    Array.from(menuItem.parentNode.children)
+                        .filter(node => matches(node, '[role="menuitemradio"]'))
+                        .forEach(node => node.setAttribute('aria-checked', 'false'));
+                }
+
+                menuItem.setAttribute('aria-checked', checked ? 'true' : 'false');
+            },
+        });
+
+        this.listeners.bind(
+            menuItem,
+            'click keyup',
+            event => {
+                if (is.keyboardEvent(event) && event.which !== 32) {
+                    return;
+                }
+
+                event.preventDefault();
+                event.stopPropagation();
+
+                menuItem.checked = true;
+
+                switch (type) {
+                    case 'language':
+                        this.currentTrack = Number(value);
+                        break;
+
+                    case 'quality':
+                        this.quality = value;
+                        break;
+
+                    case 'speed':
+                        this.speed = parseFloat(value);
+                        break;
+
+                    default:
+                        break;
+                }
+
+                controls.showMenuPanel.call(this, 'home', is.keyboardEvent(event));
+            },
+            type,
+            false,
+        );
+
+        controls.bindMenuItemShortcuts.call(this, menuItem, type);
+
+        list.appendChild(menuItem);
     },
 
     // Format a time for display
@@ -534,7 +643,7 @@ const controls = {
         } else if (matches(range, this.config.selectors.inputs.volume)) {
             const percent = range.value * 100;
             range.setAttribute('aria-valuenow', percent);
-            range.setAttribute('aria-valuetext', `${percent}%`);
+            range.setAttribute('aria-valuetext', `${percent.toFixed(1)}%`);
         } else {
             range.setAttribute('aria-valuenow', range.value);
         }
@@ -637,7 +746,7 @@ const controls = {
         // https://github.com/video-dev/hls.js/blob/5820d29d3c4c8a46e8b75f1e3afa3e68c1a9a2db/src/controller/buffer-controller.js#L415
         // https://github.com/google/shaka-player/blob/4d889054631f4e1cf0fbd80ddd2b71887c02e232/lib/media/streaming_engine.js#L1062
         // https://github.com/Dash-Industry-Forum/dash.js/blob/69859f51b969645b234666800d4cb596d89c602d/src/dash/models/DashManifestModel.js#L338
-        if (this.duration >= 2**32) {
+        if (this.duration >= 2 ** 32) {
             toggleHidden(this.elements.display.currentTime, true);
             toggleHidden(this.elements.progress, true);
             return;
@@ -666,19 +775,97 @@ const controls = {
     },
 
     // Hide/show a tab
-    toggleTab(setting, toggle) {
-        toggleHidden(this.elements.settings.tabs[setting], !toggle);
+    toggleMenuButton(setting, toggle) {
+        toggleHidden(this.elements.settings.buttons[setting], !toggle);
+    },
+
+    // Update the selected setting
+    updateSetting(setting, container, input) {
+        const pane = this.elements.settings.panels[setting];
+        let value = null;
+        let list = container;
+
+        if (setting === 'captions') {
+            value = this.currentTrack;
+        } else {
+            value = !is.empty(input) ? input : this[setting];
+
+            // Get default
+            if (is.empty(value)) {
+                value = this.config[setting].default;
+            }
+
+            // Unsupported value
+            if (!is.empty(this.options[setting]) && !this.options[setting].includes(value)) {
+                this.debug.warn(`Unsupported value of '${value}' for ${setting}`);
+                return;
+            }
+
+            // Disabled value
+            if (!this.config[setting].options.includes(value)) {
+                this.debug.warn(`Disabled value of '${value}' for ${setting}`);
+                return;
+            }
+        }
+
+        // Get the list if we need to
+        if (!is.element(list)) {
+            list = pane && pane.querySelector('[role="menu"]');
+        }
+
+        // If there's no list it means it's not been rendered...
+        if (!is.element(list)) {
+            return;
+        }
+
+        // Update the label
+        const label = this.elements.settings.buttons[setting].querySelector(`.${this.config.classNames.menu.value}`);
+        label.innerHTML = controls.getLabel.call(this, setting, value);
+
+        // Find the radio option and check it
+        const target = list && list.querySelector(`[value="${value}"]`);
+
+        if (is.element(target)) {
+            target.checked = true;
+        }
+    },
+
+    // Translate a value into a nice label
+    getLabel(setting, value) {
+        switch (setting) {
+            case 'speed':
+                return value === 1 ? i18n.get('normal', this.config) : `${value}&times;`;
+
+            case 'quality':
+                if (is.number(value)) {
+                    const label = i18n.get(`qualityLabel.${value}`, this.config);
+
+                    if (!label.length) {
+                        return `${value}p`;
+                    }
+
+                    return label;
+                }
+
+                return toTitleCase(value);
+
+            case 'captions':
+                return captions.getLabel.call(this);
+
+            default:
+                return null;
+        }
     },
 
     // Set the quality menu
     setQualityMenu(options) {
         // Menu required
-        if (!is.element(this.elements.settings.panes.quality)) {
+        if (!is.element(this.elements.settings.panels.quality)) {
             return;
         }
 
         const type = 'quality';
-        const list = this.elements.settings.panes.quality.querySelector('ul');
+        const list = this.elements.settings.panels.quality.querySelector('[role="menu"]');
 
         // Set options if passed and filter based on uniqueness and config
         if (is.array(options)) {
@@ -687,7 +874,10 @@ const controls = {
 
         // Toggle the pane and tab
         const toggle = !is.empty(this.options.quality) && this.options.quality.length > 1;
-        controls.toggleTab.call(this, type, toggle);
+        controls.toggleMenuButton.call(this, type, toggle);
+
+        // Empty the menu
+        emptyElement(list);
 
         // Check if we need to toggle the parent
         controls.checkMenu.call(this);
@@ -696,9 +886,6 @@ const controls = {
         if (!toggle) {
             return;
         }
-
-        // Empty the menu
-        emptyElement(list);
 
         // Get the badge HTML for HD, 4K etc
         const getBadge = quality => {
@@ -730,101 +917,23 @@ const controls = {
         controls.updateSetting.call(this, type, list);
     },
 
-    // Translate a value into a nice label
-    getLabel(setting, value) {
-        switch (setting) {
-            case 'speed':
-                return value === 1 ? i18n.get('normal', this.config) : `${value}&times;`;
-
-            case 'quality':
-                if (is.number(value)) {
-                    const label = i18n.get(`qualityLabel.${value}`, this.config);
-
-                    if (!label.length) {
-                        return `${value}p`;
-                    }
-
-                    return label;
-                }
-
-                return toTitleCase(value);
-
-            case 'captions':
-                return captions.getLabel.call(this);
-
-            default:
-                return null;
-        }
-    },
-
-    // Update the selected setting
-    updateSetting(setting, container, input) {
-        const pane = this.elements.settings.panes[setting];
-        let value = null;
-        let list = container;
-
-        if (setting === 'captions') {
-            value = this.currentTrack;
-        } else {
-            value = !is.empty(input) ? input : this[setting];
-
-            // Get default
-            if (is.empty(value)) {
-                value = this.config[setting].default;
-            }
-
-            // Unsupported value
-            if (!is.empty(this.options[setting]) && !this.options[setting].includes(value)) {
-                this.debug.warn(`Unsupported value of '${value}' for ${setting}`);
-                return;
-            }
-
-            // Disabled value
-            if (!this.config[setting].options.includes(value)) {
-                this.debug.warn(`Disabled value of '${value}' for ${setting}`);
-                return;
-            }
-        }
-
-        // Get the list if we need to
-        if (!is.element(list)) {
-            list = pane && pane.querySelector('ul');
-        }
-
-        // If there's no list it means it's not been rendered...
-        if (!is.element(list)) {
-            return;
-        }
-
-        // Update the label
-        const label = this.elements.settings.tabs[setting].querySelector(`.${this.config.classNames.menu.value}`);
-        label.innerHTML = controls.getLabel.call(this, setting, value);
-
-        // Find the radio option and check it
-        const target = list && list.querySelector(`input[value="${value}"]`);
-
-        if (is.element(target)) {
-            target.checked = true;
-        }
-    },
-
     // Set the looping options
     /* setLoopMenu() {
         // Menu required
-        if (!is.element(this.elements.settings.panes.loop)) {
+        if (!is.element(this.elements.settings.panels.loop)) {
             return;
         }
 
         const options = ['start', 'end', 'all', 'reset'];
-        const list = this.elements.settings.panes.loop.querySelector('ul');
+        const list = this.elements.settings.panels.loop.querySelector('[role="menu"]');
 
         // Show the pane and tab
-        toggleHidden(this.elements.settings.tabs.loop, false);
-        toggleHidden(this.elements.settings.panes.loop, false);
+        toggleHidden(this.elements.settings.buttons.loop, false);
+        toggleHidden(this.elements.settings.panels.loop, false);
 
         // Toggle the pane and tab
         const toggle = !is.empty(this.loop.options);
-        controls.toggleTab.call(this, 'loop', toggle);
+        controls.toggleMenuButton.call(this, 'loop', toggle);
 
         // Empty the menu
         emptyElement(list);
@@ -857,13 +966,19 @@ const controls = {
 
     // Set a list of available captions languages
     setCaptionsMenu() {
+        // Menu required
+        if (!is.element(this.elements.settings.panels.captions)) {
+            return;
+        }
+
         // TODO: Captions or language? Currently it's mixed
         const type = 'captions';
-        const list = this.elements.settings.panes.captions.querySelector('ul');
+        const list = this.elements.settings.panels.captions.querySelector('[role="menu"]');
         const tracks = captions.getTracks.call(this);
+        const toggle = Boolean(tracks.length);
 
         // Toggle the pane and tab
-        controls.toggleTab.call(this, type, tracks.length);
+        controls.toggleMenuButton.call(this, type, toggle);
 
         // Empty the menu
         emptyElement(list);
@@ -872,7 +987,7 @@ const controls = {
         controls.checkMenu.call(this);
 
         // If there's no captions, bail
-        if (!tracks.length) {
+        if (!toggle) {
             return;
         }
 
@@ -903,17 +1018,13 @@ const controls = {
 
     // Set a list of available captions languages
     setSpeedMenu(options) {
-        // Do nothing if not selected
-        if (!this.config.controls.includes('settings') || !this.config.settings.includes('speed')) {
-            return;
-        }
-
         // Menu required
-        if (!is.element(this.elements.settings.panes.speed)) {
+        if (!is.element(this.elements.settings.panels.speed)) {
             return;
         }
 
         const type = 'speed';
+        const list = this.elements.settings.panels.speed.querySelector('[role="menu"]');
 
         // Set the speed options
         if (is.array(options)) {
@@ -927,7 +1038,10 @@ const controls = {
 
         // Toggle the pane and tab
         const toggle = !is.empty(this.options.speed) && this.options.speed.length > 1;
-        controls.toggleTab.call(this, type, toggle);
+        controls.toggleMenuButton.call(this, type, toggle);
+
+        // Empty the menu
+        emptyElement(list);
 
         // Check if we need to toggle the parent
         controls.checkMenu.call(this);
@@ -936,12 +1050,6 @@ const controls = {
         if (!toggle) {
             return;
         }
-
-        // Get the list to populate
-        const list = this.elements.settings.panes.speed.querySelector('ul');
-
-        // Empty the menu
-        emptyElement(list);
 
         // Create items
         this.options.speed.forEach(speed => {
@@ -958,70 +1066,82 @@ const controls = {
 
     // Check if we need to hide/show the settings menu
     checkMenu() {
-        const { tabs } = this.elements.settings;
-        const visible = !is.empty(tabs) && Object.values(tabs).some(tab => !tab.hidden);
+        const { buttons } = this.elements.settings;
+        const visible = !is.empty(buttons) && Object.values(buttons).some(button => !button.hidden);
 
         toggleHidden(this.elements.settings.menu, !visible);
     },
 
-    // Show/hide menu
-    toggleMenu(event) {
-        const { form } = this.elements.settings;
-        const button = this.elements.buttons.settings;
-
-        // Menu and button are required
-        if (!is.element(form) || !is.element(button)) {
+    // Focus the first menu item in a given (or visible) menu
+    focusFirstMenuItem(pane, tabFocus = false) {
+        if (this.elements.settings.popup.hidden) {
             return;
         }
 
-        const show = is.boolean(event) ? event : is.element(form) && form.hasAttribute('hidden');
+        let target = pane;
 
-        if (is.event(event)) {
-            const isMenuItem = is.element(form) && form.contains(event.target);
-            const isButton = event.target === this.elements.buttons.settings;
+        if (!is.element(target)) {
+            target = Object.values(this.elements.settings.panels).find(pane => !pane.hidden);
+        }
 
-            // If the click was inside the form or if the click
+        const firstItem = target.querySelector('[role^="menuitem"]');
+
+        setFocus.call(this, firstItem, tabFocus);
+    },
+
+    // Show/hide menu
+    toggleMenu(input) {
+        const { popup } = this.elements.settings;
+        const button = this.elements.buttons.settings;
+
+        // Menu and button are required
+        if (!is.element(popup) || !is.element(button)) {
+            return;
+        }
+
+        // True toggle by default
+        const { hidden } = popup;
+        let show = hidden;
+
+        if (is.boolean(input)) {
+            show = input;
+        } else if (is.keyboardEvent(input) && input.which === 27) {
+            show = false;
+        } else if (is.event(input)) {
+            const isMenuItem = popup.contains(input.target);
+
+            // If the click was inside the menu or if the click
             // wasn't the button or menu item and we're trying to
             // show the menu (a doc click shouldn't show the menu)
-            if (isMenuItem || (!isMenuItem && !isButton && show)) {
+            if (isMenuItem || (!isMenuItem && input.target !== button && show)) {
                 return;
             }
-
-            // Prevent the toggle being caught by the doc listener
-            if (isButton) {
-                event.stopPropagation();
-            }
         }
 
-        // Set form and button attributes
-        if (is.element(button)) {
-            button.setAttribute('aria-expanded', show);
-        }
+        // Set button attributes
+        button.setAttribute('aria-expanded', show);
 
-        if (is.element(form)) {
-            toggleHidden(form, !show);
-            toggleClass(this.elements.container, this.config.classNames.menu.open, show);
+        // Show the actual popup
+        toggleHidden(popup, !show);
 
-            if (show) {
-                form.removeAttribute('tabindex');
-            } else {
-                form.setAttribute('tabindex', -1);
-            }
+        // Add class hook
+        toggleClass(this.elements.container, this.config.classNames.menu.open, show);
+
+        // Focus the first item if key interaction
+        if (show && is.keyboardEvent(input)) {
+            controls.focusFirstMenuItem.call(this, null, true);
+        } else if (!show && !hidden) {
+            // If closing, re-focus the button
+            setFocus.call(this, button, is.keyboardEvent(input));
         }
     },
 
-    // Get the natural size of a tab
-    getTabSize(tab) {
+    // Get the natural size of a menu panel
+    getMenuSize(tab) {
         const clone = tab.cloneNode(true);
         clone.style.position = 'absolute';
         clone.style.opacity = 0;
         clone.removeAttribute('hidden');
-
-        // Prevent input's being unchecked due to the name being identical
-        Array.from(clone.querySelectorAll('input[name]')).forEach(input => {
-            const name = input.getAttribute('name');
-            input.setAttribute('name', `${name}-clone`);
-        });
 
         // Append to parent so we get the "real" size
         tab.parentNode.appendChild(clone);
@@ -1039,31 +1159,18 @@ const controls = {
         };
     },
 
-    // Toggle Menu
-    showTab(target = '') {
-        const { menu } = this.elements.settings;
-        const pane = document.getElementById(target);
+    // Show a panel in the menu
+    showMenuPanel(type = '', tabFocus = false) {
+        const target = document.getElementById(`plyr-settings-${this.id}-${type}`);
 
         // Nothing to show, bail
-        if (!is.element(pane)) {
+        if (!is.element(target)) {
             return;
         }
 
-        // Are we targeting a tab? If not, bail
-        const isTab = pane.getAttribute('role') === 'tabpanel';
-        if (!isTab) {
-            return;
-        }
-
-        // Hide all other tabs
-        // Get other tabs
-        const current = menu.querySelector('[role="tabpanel"]:not([hidden])');
-        const container = current.parentNode;
-
-        // Set other toggles to be expanded false
-        Array.from(menu.querySelectorAll(`[aria-controls="${current.getAttribute('id')}"]`)).forEach(toggle => {
-            toggle.setAttribute('aria-expanded', false);
-        });
+        // Hide all other panels
+        const container = target.parentNode;
+        const current = Array.from(container.children).find(node => !node.hidden);
 
         // If we can do fancy animations, we'll animate the height/width
         if (support.transitions && !support.reducedMotion) {
@@ -1072,12 +1179,12 @@ const controls = {
             container.style.height = `${current.scrollHeight}px`;
 
             // Get potential sizes
-            const size = controls.getTabSize.call(this, pane);
+            const size = controls.getMenuSize.call(this, target);
 
             // Restore auto height/width
-            const restore = e => {
+            const restore = event => {
                 // We're only bothered about height and width on the container
-                if (e.target !== container || !['width', 'height'].includes(e.propertyName)) {
+                if (event.target !== container || !['width', 'height'].includes(event.propertyName)) {
                     return;
                 }
 
@@ -1099,29 +1206,17 @@ const controls = {
 
         // Set attributes on current tab
         toggleHidden(current, true);
-        current.setAttribute('tabindex', -1);
 
         // Set attributes on target
-        toggleHidden(pane, false);
-
-        const tabs = getElements.call(this, `[aria-controls="${target}"]`);
-        Array.from(tabs).forEach(tab => {
-            tab.setAttribute('aria-expanded', true);
-        });
-        pane.removeAttribute('tabindex');
+        toggleHidden(target, false);
 
         // Focus the first item
-        pane.querySelectorAll('button:not(:disabled), input:not(:disabled), [tabindex]')[0].focus();
+        controls.focusFirstMenuItem.call(this, target, tabFocus);
     },
 
     // Build the default HTML
     // TODO: Set order based on order in the config.controls array?
     create(data) {
-        // Do nothing if we want no controls
-        if (is.empty(this.config.controls)) {
-            return null;
-        }
-
         // Create the container
         const container = createElement('div', getAttributesFromSelector(this.config.selectors.controls.wrapper));
 
@@ -1189,36 +1284,39 @@ const controls = {
             container.appendChild(controls.createTime.call(this, 'duration'));
         }
 
-        // Toggle mute button
-        if (this.config.controls.includes('mute')) {
-            container.appendChild(controls.createButton.call(this, 'mute'));
-        }
-
-        // Volume range control
-        if (this.config.controls.includes('volume')) {
+        // Volume controls
+        if (this.config.controls.includes('mute') || this.config.controls.includes('volume')) {
             const volume = createElement('div', {
                 class: 'plyr__volume',
             });
 
-            // Set the attributes
-            const attributes = {
-                max: 1,
-                step: 0.05,
-                value: this.config.volume,
-            };
+            // Toggle mute button
+            if (this.config.controls.includes('mute')) {
+                volume.appendChild(controls.createButton.call(this, 'mute'));
+            }
 
-            // Create the volume range slider
-            volume.appendChild(
-                controls.createRange.call(
-                    this,
-                    'volume',
-                    extend(attributes, {
-                        id: `plyr-volume-${data.id}`,
-                    }),
-                ),
-            );
+            // Volume range control
+            if (this.config.controls.includes('volume')) {
+                // Set the attributes
+                const attributes = {
+                    max: 1,
+                    step: 0.05,
+                    value: this.config.volume,
+                };
 
-            this.elements.volume = volume;
+                // Create the volume range slider
+                volume.appendChild(
+                    controls.createRange.call(
+                        this,
+                        'volume',
+                        extend(attributes, {
+                            id: `plyr-volume-${data.id}`,
+                        }),
+                    ),
+                );
+
+                this.elements.volume = volume;
+            }
 
             container.appendChild(volume);
         }
@@ -1230,61 +1328,63 @@ const controls = {
 
         // Settings button / menu
         if (this.config.controls.includes('settings') && !is.empty(this.config.settings)) {
-            const menu = createElement('div', {
+            const control = createElement('div', {
                 class: 'plyr__menu',
                 hidden: '',
             });
 
-            menu.appendChild(
+            control.appendChild(
                 controls.createButton.call(this, 'settings', {
-                    id: `plyr-settings-toggle-${data.id}`,
                     'aria-haspopup': true,
                     'aria-controls': `plyr-settings-${data.id}`,
                     'aria-expanded': false,
                 }),
             );
 
-            const form = createElement('form', {
+            const popup = createElement('div', {
                 class: 'plyr__menu__container',
                 id: `plyr-settings-${data.id}`,
                 hidden: '',
-                'aria-labelled-by': `plyr-settings-toggle-${data.id}`,
-                role: 'tablist',
-                tabindex: -1,
             });
 
             const inner = createElement('div');
 
             const home = createElement('div', {
                 id: `plyr-settings-${data.id}-home`,
-                'aria-labelled-by': `plyr-settings-toggle-${data.id}`,
-                role: 'tabpanel',
             });
 
-            // Create the tab list
-            const tabs = createElement('ul', {
-                role: 'tablist',
+            // Create the menu
+            const menu = createElement('div', {
+                role: 'menu',
             });
 
-            // Build the tabs
+            home.appendChild(menu);
+            inner.appendChild(home);
+            this.elements.settings.panels.home = home;
+
+            // Build the menu items
             this.config.settings.forEach(type => {
-                const tab = createElement('li', {
-                    role: 'tab',
-                    hidden: '',
-                });
-
-                const button = createElement(
+                // TODO: bundle this with the createMenuItem helper and bindings
+                const menuItem = createElement(
                     'button',
                     extend(getAttributesFromSelector(this.config.selectors.buttons.settings), {
                         type: 'button',
                         class: `${this.config.classNames.control} ${this.config.classNames.control}--forward`,
-                        id: `plyr-settings-${data.id}-${type}-tab`,
+                        role: 'menuitem',
                         'aria-haspopup': true,
-                        'aria-controls': `plyr-settings-${data.id}-${type}`,
-                        'aria-expanded': false,
+                        hidden: '',
                     }),
-                    i18n.get(type, this.config),
                 );
+
+                // Bind menu shortcuts for keyboard users
+                controls.bindMenuItemShortcuts.call(this, menuItem, type);
+
+                // Show menu on click
+                on(menuItem, 'click', () => {
+                    controls.showMenuPanel.call(this, type, false);
+                });
+
+                const flex = createElement('span', null, i18n.get(type, this.config));
 
                 const value = createElement('span', {
                     class: this.config.classNames.menu.value,
@@ -1293,54 +1393,91 @@ const controls = {
                 // Speed contains HTML entities
                 value.innerHTML = data[type];
 
-                button.appendChild(value);
-                tab.appendChild(button);
-                tabs.appendChild(tab);
+                flex.appendChild(value);
+                menuItem.appendChild(flex);
+                menu.appendChild(menuItem);
 
-                this.elements.settings.tabs[type] = tab;
-            });
-
-            home.appendChild(tabs);
-            inner.appendChild(home);
-
-            // Build the panes
-            this.config.settings.forEach(type => {
+                // Build the panes
                 const pane = createElement('div', {
                     id: `plyr-settings-${data.id}-${type}`,
                     hidden: '',
-                    'aria-labelled-by': `plyr-settings-${data.id}-${type}-tab`,
-                    role: 'tabpanel',
-                    tabindex: -1,
                 });
 
-                const back = createElement(
-                    'button',
-                    {
-                        type: 'button',
-                        class: `${this.config.classNames.control} ${this.config.classNames.control}--back`,
-                        'aria-haspopup': true,
-                        'aria-controls': `plyr-settings-${data.id}-home`,
-                        'aria-expanded': false,
-                    },
-                    i18n.get(type, this.config),
+                // Back button
+                const backButton = createElement('button', {
+                    type: 'button',
+                    class: `${this.config.classNames.control} ${this.config.classNames.control}--back`,
+                });
+
+                // Visible label
+                backButton.appendChild(
+                    createElement(
+                        'span',
+                        {
+                            'aria-hidden': true,
+                        },
+                        i18n.get(type, this.config),
+                    ),
                 );
 
-                pane.appendChild(back);
+                // Screen reader label
+                backButton.appendChild(
+                    createElement(
+                        'span',
+                        {
+                            class: this.config.classNames.hidden,
+                        },
+                        i18n.get('menuBack', this.config),
+                    ),
+                );
 
-                const options = createElement('ul');
+                // Go back via keyboard
+                on(
+                    pane,
+                    'keydown',
+                    event => {
+                        // We only care about <-
+                        if (event.which !== 37) {
+                            return;
+                        }
 
-                pane.appendChild(options);
+                        // Prevent seek
+                        event.preventDefault();
+                        event.stopPropagation();
+
+                        // Show the respective menu
+                        controls.showMenuPanel.call(this, 'home', true);
+                    },
+                    false,
+                );
+
+                // Go back via button click
+                on(backButton, 'click', () => {
+                    controls.showMenuPanel.call(this, 'home', false);
+                });
+
+                // Add to pane
+                pane.appendChild(backButton);
+
+                // Menu
+                pane.appendChild(
+                    createElement('div', {
+                        role: 'menu',
+                    }),
+                );
+
                 inner.appendChild(pane);
 
-                this.elements.settings.panes[type] = pane;
+                this.elements.settings.buttons[type] = menuItem;
+                this.elements.settings.panels[type] = pane;
             });
 
-            form.appendChild(inner);
-            menu.appendChild(form);
-            container.appendChild(menu);
+            popup.appendChild(inner);
+            control.appendChild(popup);
+            container.appendChild(control);
 
-            this.elements.settings.form = form;
-            this.elements.settings.menu = menu;
+            this.elements.settings.popup = popup;
+            this.elements.settings.menu = control;
         }
 
         // Picture in picture button
@@ -1365,6 +1502,7 @@ const controls = {
 
         this.elements.controls = container;
 
+        // Set available quality levels
         if (this.isHTML5) {
             controls.setQualityMenu.call(this, html5.getQualityOptions.call(this));
         }
@@ -1401,13 +1539,19 @@ const controls = {
         };
         let update = true;
 
-        if (is.string(this.config.controls) || is.element(this.config.controls)) {
-            // String or HTMLElement passed as the option
+        // If function, run it and use output
+        if (is.function(this.config.controls)) {
+            this.config.controls = this.config.controls.call(this.props);
+        }
+
+        // Convert falsy controls to empty array (primarily for empty strings)
+        if (!this.config.controls) {
+            this.config.controls = [];
+        }
+
+        if (is.element(this.config.controls) || is.string(this.config.controls)) {
+            // HTMLElement or Non-empty string passed as the option
             container = this.config.controls;
-        } else if (is.function(this.config.controls)) {
-            // A custom function to build controls
-            // The function can return a HTMLElement or String
-            container = this.config.controls.call(this, props);
         } else {
             // Create controls
             container = controls.create.call(this, {
@@ -1462,6 +1606,23 @@ const controls = {
         // Find the elements if need be
         if (!is.element(this.elements.controls)) {
             controls.findElements.call(this);
+        }
+
+        // Add pressed property to buttons
+        if (!is.empty(this.elements.buttons)) {
+            // Toggle classname when pressed property is set
+            Object.values(this.elements.buttons).forEach(button => {
+                const className = this.config.classNames.controlPressed;
+                Object.defineProperty(button, 'pressed', {
+                    enumerable: true,
+                    get() {
+                        return hasClass(button, className);
+                    },
+                    set(pressed = false) {
+                        toggleClass(button, className, pressed);
+                    },
+                });
+            });
         }
 
         // Edge sometimes doesn't finish the paint so force a redraw

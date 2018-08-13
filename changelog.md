@@ -1,3 +1,14 @@
+# v3.4.0
+
+-   Accessibility improvements (see #905)
+-   Improvements to the way the controls work on iOS
+-   Demo code clean up
+-   YouTube quality selection removed due to their poor support for it. As a result, the `qualityrequested` event has been removed
+-   Controls spacing improvements
+-   Fix for pressed property missing with custom controls (Fixes #1062)
+-   Fix #1153: Captions language fallback (thanks @friday)
+-   Fix for setting pressed property of undefined (Fixes #1102)
+
 # v3.3.23
 
 -   Add support for YouTube's hl param (thanks @renaudleo)

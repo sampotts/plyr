@@ -70,12 +70,19 @@ export function createElement(type, attributes, text) {
 
 // Inaert an element after another
 export function insertAfter(element, target) {
+    if (!is.element(element) || !is.element(target)) {
+        return;
+    }
+
     target.parentNode.insertBefore(element, target.nextSibling);
 }
 
 // Insert a DocumentFragment
 export function insertElement(type, parent, attributes, text) {
-    // Inject the new <element>
+    if (!is.element(parent)) {
+        return;
+    }
+
     parent.appendChild(createElement(type, attributes, text));
 }
 
@@ -95,6 +102,10 @@ export function removeElement(element) {
 
 // Remove all child elements
 export function emptyElement(element) {
+    if (!is.element(element)) {
+        return;
+    }
+
     let { length } = element.childNodes;
 
     while (length > 0) {
@@ -180,7 +191,7 @@ export function toggleHidden(element, hidden) {
     let hide = hidden;
 
     if (!is.boolean(hide)) {
-        hide = !element.hasAttribute('hidden');
+        hide = !element.hidden;
     }
 
     if (hide) {
@@ -192,6 +203,10 @@ export function toggleHidden(element, hidden) {
 
 // Mirror Element.classList.toggle, with IE compatibility for "force" argument
 export function toggleClass(element, className, force) {
+    if (is.nodeList(element)) {
+        return Array.from(element).map(e => toggleClass(e, className, force));
+    }
+
     if (is.element(element)) {
         let method = 'toggle';
         if (typeof force !== 'undefined') {
@@ -202,7 +217,7 @@ export function toggleClass(element, className, force) {
         return element.classList.contains(className);
     }
 
-    return null;
+    return false;
 }
 
 // Has class name
@@ -238,19 +253,6 @@ export function getElement(selector) {
     return this.elements.container.querySelector(selector);
 }
 
-// Get the focused element
-export function getFocusElement() {
-    let focused = document.activeElement;
-
-    if (!focused || focused === document.body) {
-        focused = null;
-    } else {
-        focused = document.querySelector(':focus');
-    }
-
-    return focused;
-}
-
 // Trap focus inside container
 export function trapFocus(element = null, toggle = false) {
     if (!is.element(element)) {
@@ -268,7 +270,7 @@ export function trapFocus(element = null, toggle = false) {
         }
 
         // Get the current focused element
-        const focused = getFocusElement();
+        const focused = document.activeElement;
 
         if (focused === last && !event.shiftKey) {
             // Move focus to first element that can be tabbed if Shift isn't used
@@ -282,4 +284,19 @@ export function trapFocus(element = null, toggle = false) {
     };
 
     toggleListener.call(this, this.elements.container, 'keydown', trap, toggle, false);
+}
+
+// Set focus and tab focus class
+export function setFocus(element = null, tabFocus = false) {
+    if (!is.element(element)) {
+        return;
+    }
+
+    // Set regular focus
+    element.focus();
+
+    // If we want to mimic keyboard focus via tab
+    if (tabFocus) {
+        toggleClass(element, this.config.classNames.tabFocus);
+    }
 }

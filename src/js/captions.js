@@ -4,7 +4,6 @@
 // ==========================================================================
 
 import controls from './controls';
-import i18n from './i18n';
 import support from './support';
 import { dedupe } from './utils/arrays';
 import browser from './utils/browser';
@@ -18,6 +17,7 @@ import {
 } from './utils/elements';
 import { on, triggerEvent } from './utils/events';
 import fetch from './utils/fetch';
+import i18n from './utils/i18n';
 import is from './utils/is';
 import { getHTML } from './utils/strings';
 import { parseUrl } from './utils/urls';
@@ -83,9 +83,8 @@ const captions = {
         // * active:    The state preferred by user settings or config
         // * toggled:   The real captions state
 
-        const languages = dedupe(
-            Array.from(navigator.languages || navigator.language || navigator.userLanguage).map(language => language.split('-')[0]),
-        );
+        const browserLanguages = navigator.languages || [navigator.language || navigator.userLanguage || 'en'];
+        const languages = dedupe(browserLanguages.map(language => language.split('-')[0]));
 
         let language = (this.storage.get('language') || this.config.captions.language || 'auto').toLowerCase();
 

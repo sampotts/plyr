@@ -177,9 +177,7 @@ class Fullscreen {
 
         // iOS native fullscreen doesn't need the request step
         if (browser.isIos && this.player.config.fullscreen.iosNative) {
-            if (this.player.playing) {
-                this.target.webkitEnterFullscreen();
-            }
+            this.target.webkitEnterFullscreen();
         } else if (!Fullscreen.native) {
             toggleFallback.call(this, true);
         } else if (!this.prefix) {

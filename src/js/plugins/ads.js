@@ -6,9 +6,9 @@
 
 /* global google */
 
-import i18n from '../i18n';
 import { createElement } from '../utils/elements';
 import { triggerEvent } from '../utils/events';
+import i18n from '../utils/i18n';
 import is from '../utils/is';
 import loadScript from '../utils/loadScript';
 import { formatTime } from '../utils/time';
@@ -207,6 +207,11 @@ class Ads {
      * @param {Event} adsManagerLoadedEvent
      */
     onAdsManagerLoaded(event) {
+        // Load could occur after a source change (race condition)
+        if (!this.enabled) {
+            return;
+        }
+
         // Get the ads manager
         const settings = new google.ima.AdsRenderingSettings();
 
@@ -239,10 +244,6 @@ class Ads {
                 }
             });
         }
-
-        // Get skippable state
-        // TODO: Skip button
-        // this.player.debug.warn(this.manager.getAdSkippableState());
 
         // Set volume to match player
         this.manager.setVolume(this.player.volume);
