@@ -277,7 +277,7 @@ class Listeners {
                 const { controls } = elements;
 
                 // Remove button states for fullscreen
-                if (event.type === 'enterfullscreen') {
+                if (controls && event.type === 'enterfullscreen') {
                     controls.pressed = false;
                     controls.hover = false;
                 }
