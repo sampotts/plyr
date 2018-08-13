@@ -275,18 +275,6 @@ const controls = {
             this.elements.buttons[type] = button;
         }
 
-        // Toggle classname when pressed property is set
-        const className = this.config.classNames.controlPressed;
-        Object.defineProperty(button, 'pressed', {
-            enumerable: true,
-            get() {
-                return hasClass(button, className);
-            },
-            set(pressed = false) {
-                toggleClass(button, className, pressed);
-            },
-        });
-
         return button;
     },
 
@@ -1618,6 +1606,23 @@ const controls = {
         // Find the elements if need be
         if (!is.element(this.elements.controls)) {
             controls.findElements.call(this);
+        }
+
+        // Add pressed property to buttons
+        if (!is.empty(this.elements.buttons)) {
+            // Toggle classname when pressed property is set
+            Object.values(this.elements.buttons).forEach(button => {
+                const className = this.config.classNames.controlPressed;
+                Object.defineProperty(button, 'pressed', {
+                    enumerable: true,
+                    get() {
+                        return hasClass(button, className);
+                    },
+                    set(pressed = false) {
+                        toggleClass(button, className, pressed);
+                    },
+                });
+            });
         }
 
         // Edge sometimes doesn't finish the paint so force a redraw
