@@ -4118,9 +4118,10 @@ typeof navigator === "object" && (function () {
 
 	            // Remove class on blur
 	            document.addEventListener('focusout', function (event) {
-	                if (container.contains(event.target)) {
+	                if (!event.target.classList || container.contains(event.target)) {
 	                    return;
 	                }
+
 	                event.target.classList.remove(tabClassName);
 	            });
 
@@ -4135,7 +4136,7 @@ typeof navigator === "object" && (function () {
 	                setTimeout(function () {
 	                    var focused = document.activeElement;
 
-	                    if (!focused || container.contains(focused)) {
+	                    if (!focused || !focused.classList || container.contains(focused)) {
 	                        return;
 	                    }
 

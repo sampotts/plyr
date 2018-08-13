@@ -886,6 +886,9 @@ typeof navigator === "object" && (function (global, factory) {
                     triggerEvent.call(player, player.media, 'qualitychange', false, {
                         quality: input
                     });
+
+                    // Save to storage
+                    player.storage.set({ quality: input });
                 }
             });
         },
@@ -915,6 +918,30 @@ typeof navigator === "object" && (function (global, factory) {
             this.debug.log('Cancelled network requests');
         }
     };
+
+    // ==========================================================================
+
+    // Remove duplicates in an array
+    function dedupe(array) {
+        if (!is.array(array)) {
+            return array;
+        }
+
+        return array.filter(function (item, index) {
+            return array.indexOf(item) === index;
+        });
+    }
+
+    // Get the closest value in an array
+    function closest(array, value) {
+        if (!is.array(array) || !array.length) {
+            return null;
+        }
+
+        return array.reduce(function (prev, curr) {
+            return Math.abs(curr - value) < Math.abs(prev - value) ? curr : prev;
+        });
+    }
 
     // ==========================================================================
 
@@ -1093,30 +1120,6 @@ typeof navigator === "object" && (function (global, factory) {
             return string;
         }
     };
-
-    // ==========================================================================
-
-    // Remove duplicates in an array
-    function dedupe(array) {
-        if (!is.array(array)) {
-            return array;
-        }
-
-        return array.filter(function (item, index) {
-            return array.indexOf(item) === index;
-        });
-    }
-
-    // Get the closest value in an array
-    function closest(array, value) {
-        if (!is.array(array) || !array.length) {
-            return null;
-        }
-
-        return array.reduce(function (prev, curr) {
-            return Math.abs(curr - value) < Math.abs(prev - value) ? curr : prev;
-        });
-    }
 
     // ==========================================================================
 
@@ -1603,20 +1606,6 @@ typeof navigator === "object" && (function (global, factory) {
             } else {
                 this.elements.buttons[type] = button;
             }
-
-            // Toggle classname when pressed property is set
-            var className = this.config.classNames.controlPressed;
-            Object.defineProperty(button, 'pressed', {
-                enumerable: true,
-                get: function get$$1() {
-                    return hasClass(button, className);
-                },
-                set: function set$$1() {
-                    var pressed = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-
-                    toggleClass(button, className, pressed);
-                }
-            });
 
             return button;
         },
@@ -2490,11 +2479,10 @@ typeof navigator === "object" && (function (global, factory) {
             // Focus the first item if key interaction
             if (show && is.keyboardEvent(input)) {
                 controls.focusFirstMenuItem.call(this, null, true);
+            } else if (!show && !hidden) {
+                // If closing, re-focus the button
+                setFocus.call(this, button, is.keyboardEvent(input));
             }
-            // If closing, re-focus the button
-            else if (!show && !hidden) {
-                    setFocus.call(this, button, is.keyboardEvent(input));
-                }
         },
 
 
@@ -2651,30 +2639,33 @@ typeof navigator === "object" && (function (global, factory) {
                 container.appendChild(controls.createTime.call(this, 'duration'));
             }
 
-            // Toggle mute button
-            if (this.config.controls.includes('mute')) {
-                container.appendChild(controls.createButton.call(this, 'mute'));
-            }
-
-            // Volume range control
-            if (this.config.controls.includes('volume')) {
+            // Volume controls
+            if (this.config.controls.includes('mute') || this.config.controls.includes('volume')) {
                 var volume = createElement('div', {
                     class: 'plyr__volume'
                 });
 
-                // Set the attributes
-                var attributes = {
-                    max: 1,
-                    step: 0.05,
-                    value: this.config.volume
-                };
+                // Toggle mute button
+                if (this.config.controls.includes('mute')) {
+                    volume.appendChild(controls.createButton.call(this, 'mute'));
+                }
 
-                // Create the volume range slider
-                volume.appendChild(controls.createRange.call(this, 'volume', extend(attributes, {
-                    id: 'plyr-volume-' + data.id
-                })));
+                // Volume range control
+                if (this.config.controls.includes('volume')) {
+                    // Set the attributes
+                    var attributes = {
+                        max: 1,
+                        step: 0.05,
+                        value: this.config.volume
+                    };
 
-                this.elements.volume = volume;
+                    // Create the volume range slider
+                    volume.appendChild(controls.createRange.call(this, 'volume', extend(attributes, {
+                        id: 'plyr-volume-' + data.id
+                    })));
+
+                    this.elements.volume = volume;
+                }
 
                 container.appendChild(volume);
             }
@@ -2836,6 +2827,7 @@ typeof navigator === "object" && (function (global, factory) {
 
             this.elements.controls = container;
 
+            // Set available quality levels
             if (this.isHTML5) {
                 controls.setQualityMenu.call(this, html5.getQualityOptions.call(this));
             }
@@ -2946,6 +2938,25 @@ typeof navigator === "object" && (function (global, factory) {
             // Find the elements if need be
             if (!is.element(this.elements.controls)) {
                 controls.findElements.call(this);
+            }
+
+            // Add pressed property to buttons
+            if (!is.empty(this.elements.buttons)) {
+                // Toggle classname when pressed property is set
+                Object.values(this.elements.buttons).forEach(function (button) {
+                    var className = _this10.config.classNames.controlPressed;
+                    Object.defineProperty(button, 'pressed', {
+                        enumerable: true,
+                        get: function get$$1() {
+                            return hasClass(button, className);
+                        },
+                        set: function set$$1() {
+                            var pressed = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+                            toggleClass(button, className, pressed);
+                        }
+                    });
+                });
             }
 
             // Edge sometimes doesn't finish the paint so force a redraw
@@ -3065,7 +3076,8 @@ typeof navigator === "object" && (function (global, factory) {
             // * active:    The state preferred by user settings or config
             // * toggled:   The real captions state
 
-            var languages = dedupe(Array.from(navigator.languages || navigator.language || navigator.userLanguage).map(function (language) {
+            var browserLanguages = navigator.languages || [navigator.language || navigator.userLanguage || 'en'];
+            var languages = dedupe(browserLanguages.map(function (language) {
                 return language.split('-')[0];
             }));
 
@@ -3488,7 +3500,7 @@ typeof navigator === "object" && (function (global, factory) {
         // Quality default
         quality: {
             default: 576,
-            options: [4320, 2880, 2160, 1440, 1080, 720, 576, 480, 360, 240, 'default']
+            options: [4320, 2880, 2160, 1440, 1080, 720, 576, 480, 360, 240]
         },
 
         // Set loops
@@ -3638,7 +3650,10 @@ typeof navigator === "object" && (function (global, factory) {
         'enterfullscreen', 'exitfullscreen', 'captionsenabled', 'captionsdisabled', 'languagechange', 'controlshidden', 'controlsshown', 'ready',
 
         // YouTube
-        'statechange', 'qualitychange', 'qualityrequested',
+        'statechange',
+
+        // Quality
+        'qualitychange',
 
         // Ads
         'adsloaded', 'adscontentpause', 'adscontentresume', 'adstarted', 'adsmidpoint', 'adscomplete', 'adsallcomplete', 'adsimpression', 'adsclick'],
@@ -3947,9 +3962,7 @@ typeof navigator === "object" && (function (global, factory) {
 
                 // iOS native fullscreen doesn't need the request step
                 if (browser.isIos && this.player.config.fullscreen.iosNative) {
-                    if (this.player.playing) {
-                        this.target.webkitEnterFullscreen();
-                    }
+                    this.target.webkitEnterFullscreen();
                 } else if (!Fullscreen.native) {
                     toggleFallback.call(this, true);
                 } else if (!this.prefix) {
@@ -4636,7 +4649,7 @@ typeof navigator === "object" && (function (global, factory) {
 
                     // Remove button states for fullscreen
 
-                    if (event.type === 'enterfullscreen') {
+                    if (controls$$1 && event.type === 'enterfullscreen') {
                         controls$$1.pressed = false;
                         controls$$1.hover = false;
                     }
@@ -4792,12 +4805,6 @@ typeof navigator === "object" && (function (global, factory) {
 
                     // Save to storage
                     player.storage.set({ speed: player.speed });
-                });
-
-                // Quality request
-                on.call(player, player.media, 'qualityrequested', function (event) {
-                    // Save to storage
-                    player.storage.set({ quality: event.detail.quality });
                 });
 
                 // Quality change
@@ -5879,43 +5886,6 @@ typeof navigator === "object" && (function (global, factory) {
         return url.match(regex) ? RegExp.$2 : url;
     }
 
-    // Standardise YouTube quality unit
-    function mapQualityUnit(input) {
-        var qualities = {
-            hd2160: 2160,
-            hd1440: 1440,
-            hd1080: 1080,
-            hd720: 720,
-            large: 480,
-            medium: 360,
-            small: 240,
-            tiny: 144
-        };
-
-        var entry = Object.entries(qualities).find(function (entry) {
-            return entry.includes(input);
-        });
-
-        if (entry) {
-            // Get the match corresponding to the input
-            return entry.find(function (value) {
-                return value !== input;
-            });
-        }
-
-        return 'default';
-    }
-
-    function mapQualityUnits(levels) {
-        if (is.empty(levels)) {
-            return levels;
-        }
-
-        return dedupe(levels.map(function (level) {
-            return mapQualityUnit(level);
-        }));
-    }
-
     // Set playback state and trigger change (only on actual change)
     function assurePlaybackState$1(play) {
         if (play && !this.embed.hasPlayed) {
@@ -6099,11 +6069,6 @@ typeof navigator === "object" && (function (global, factory) {
                             triggerEvent.call(player, player.media, 'error');
                         }
                     },
-                    onPlaybackQualityChange: function onPlaybackQualityChange() {
-                        triggerEvent.call(player, player.media, 'qualitychange', false, {
-                            quality: player.media.quality
-                        });
-                    },
                     onPlaybackRateChange: function onPlaybackRateChange(event) {
                         // Get the instance
                         var instance = event.target;
@@ -6170,16 +6135,6 @@ typeof navigator === "object" && (function (global, factory) {
                             },
                             set: function set(input) {
                                 instance.setPlaybackRate(input);
-                            }
-                        });
-
-                        // Quality
-                        Object.defineProperty(player.media, 'quality', {
-                            get: function get() {
-                                return mapQualityUnit(instance.getPlaybackQuality());
-                            },
-                            set: function set(input) {
-                                instance.setPlaybackQuality(mapQualityUnit(input));
                             }
                         });
 
@@ -6335,9 +6290,6 @@ typeof navigator === "object" && (function (global, factory) {
                                         player.media.duration = instance.getDuration();
                                         triggerEvent.call(player, player.media, 'durationchange');
                                     }
-
-                                    // Get quality
-                                    controls.setQualityMenu.call(player, mapQualityUnits(instance.getAvailableQualityLevels()));
                                 }
 
                                 break;
@@ -8202,11 +8154,6 @@ typeof navigator === "object" && (function (global, factory) {
                     this.debug.warn('Unsupported quality option: ' + quality + ', using ' + value + ' instead');
                     quality = value;
                 }
-
-                // Trigger request event
-                triggerEvent.call(this, this.media, 'qualityrequested', false, {
-                    quality: quality
-                });
 
                 // Update config
                 config.selected = quality;
