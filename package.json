@@ -1,19 +1,10 @@
 {
     "name": "plyr",
     "version": "3.4.0-beta.2",
-    "description":
-        "A simple, accessible and customizable HTML5, YouTube and Vimeo media player",
+    "description": "A simple, accessible and customizable HTML5, YouTube and Vimeo media player",
     "homepage": "https://plyr.io",
     "author": "Sam Potts <sam@potts.es>",
-    "keywords": [
-        "HTML5 Video",
-        "HTML5 Audio",
-        "Media Player",
-        "DASH",
-        "Shaka",
-        "WordPress",
-        "HLS"
-    ],
+    "keywords": ["HTML5 Video", "HTML5 Audio", "Media Player", "DASH", "Shaka", "WordPress", "HLS"],
     "main": "./dist/plyr.js",
     "browser": "./dist/plyr.min.js",
     "sass": "./src/sass/plyr.scss",
@@ -32,8 +23,7 @@
     "scripts": {
         "build": "gulp build",
         "lint": "eslint src/js && npm run-script remark",
-        "remark":
-            "remark -f --use 'validate-links=repository:\"sampotts/plyr\"' '{,!(node_modules),.?**/}*.md'",
+        "remark": "remark -f --use 'validate-links=repository:\"sampotts/plyr\"' '{,!(node_modules),.?**/}*.md'",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "devDependencies": {
@@ -42,21 +32,21 @@
         "babel-plugin-external-helpers": "^6.22.0",
         "babel-preset-env": "^1.7.0",
         "del": "^3.0.0",
-        "eslint": "^5.2.0",
-        "eslint-config-airbnb-base": "^13.0.0",
+        "eslint": "^5.3.0",
+        "eslint-config-airbnb-base": "^13.1.0",
         "eslint-config-prettier": "^2.9.0",
-        "eslint-plugin-import": "^2.13.0",
+        "eslint-plugin-import": "^2.14.0",
         "fastly-purge": "^1.0.1",
         "git-branch": "^2.0.1",
         "gulp": "^3.9.1",
         "gulp-autoprefixer": "^5.0.0",
         "gulp-better-rollup": "^3.3.0",
-        "gulp-clean-css": "^3.9.4",
+        "gulp-clean-css": "^3.10.0",
         "gulp-concat": "^2.6.1",
         "gulp-filter": "^5.1.0",
         "gulp-header": "^2.0.5",
         "gulp-open": "^3.0.1",
-        "gulp-postcss": "^7.0.1",
+        "gulp-postcss": "^8.0.0",
         "gulp-rename": "^1.4.0",
         "gulp-replace": "^1.0.0",
         "gulp-s3": "^0.11.0",
@@ -73,15 +63,15 @@
         "remark-cli": "^5.0.0",
         "remark-validate-links": "^7.0.0",
         "rollup-plugin-babel": "^3.0.7",
-        "rollup-plugin-commonjs": "^9.1.4",
+        "rollup-plugin-commonjs": "^9.1.5",
         "rollup-plugin-node-resolve": "^3.3.0",
         "run-sequence": "^2.2.1",
         "stylelint": "^9.4.0",
-        "stylelint-config-prettier": "^3.3.0",
+        "stylelint-config-prettier": "^4.0.0",
         "stylelint-config-recommended": "^2.1.0",
         "stylelint-config-sass-guidelines": "^5.0.0",
-        "stylelint-order": "^0.8.1",
-        "stylelint-scss": "^3.2.0",
+        "stylelint-order": "^1.0.0",
+        "stylelint-scss": "^3.3.0",
         "stylelint-selector-bem-pattern": "^2.0.0",
         "through2": "^2.0.3"
     },
@@ -90,6 +80,6 @@
         "custom-event-polyfill": "^1.0.6",
         "loadjs": "^3.5.4",
         "raven-js": "^3.26.4",
-        "url-polyfill": "^1.0.13"
+        "url-polyfill": "^1.0.14"
     }
 }
