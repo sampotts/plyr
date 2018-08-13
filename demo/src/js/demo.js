@@ -31,9 +31,10 @@ import Raven from 'raven-js';
 
             // Remove class on blur
             document.addEventListener('focusout', event => {
-                if (container.contains(event.target)) {
+                if (!event.target.classList || container.contains(event.target)) {
                     return;
                 }
+
                 event.target.classList.remove(tabClassName);
             });
 
@@ -48,7 +49,7 @@ import Raven from 'raven-js';
                 setTimeout(() => {
                     const focused = document.activeElement;
 
-                    if (!focused || container.contains(focused)) {
+                    if (!focused || !focused.classList || container.contains(focused)) {
                         return;
                     }
 
