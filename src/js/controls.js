@@ -1142,9 +1142,8 @@ const controls = {
         // Focus the first item if key interaction
         if (show && is.keyboardEvent(input)) {
             controls.focusFirstMenuItem.call(this, null, true);
-        }
-        // If closing, re-focus the button
-        else if (!show && !hidden) {
+        } else if (!show && !hidden) {
+            // If closing, re-focus the button
             setFocus.call(this, button, is.keyboardEvent(input));
         }
     },
@@ -1297,36 +1296,39 @@ const controls = {
             container.appendChild(controls.createTime.call(this, 'duration'));
         }
 
-        // Toggle mute button
-        if (this.config.controls.includes('mute')) {
-            container.appendChild(controls.createButton.call(this, 'mute'));
-        }
-
-        // Volume range control
-        if (this.config.controls.includes('volume')) {
+        // Volume controls
+        if (this.config.controls.includes('mute') || this.config.controls.includes('volume')) {
             const volume = createElement('div', {
                 class: 'plyr__volume',
             });
 
-            // Set the attributes
-            const attributes = {
-                max: 1,
-                step: 0.05,
-                value: this.config.volume,
-            };
+            // Toggle mute button
+            if (this.config.controls.includes('mute')) {
+                volume.appendChild(controls.createButton.call(this, 'mute'));
+            }
 
-            // Create the volume range slider
-            volume.appendChild(
-                controls.createRange.call(
-                    this,
-                    'volume',
-                    extend(attributes, {
-                        id: `plyr-volume-${data.id}`,
-                    }),
-                ),
-            );
+            // Volume range control
+            if (this.config.controls.includes('volume')) {
+                // Set the attributes
+                const attributes = {
+                    max: 1,
+                    step: 0.05,
+                    value: this.config.volume,
+                };
 
-            this.elements.volume = volume;
+                // Create the volume range slider
+                volume.appendChild(
+                    controls.createRange.call(
+                        this,
+                        'volume',
+                        extend(attributes, {
+                            id: `plyr-volume-${data.id}`,
+                        }),
+                    ),
+                );
+
+                this.elements.volume = volume;
+            }
 
             container.appendChild(volume);
         }
@@ -1512,6 +1514,7 @@ const controls = {
 
         this.elements.controls = container;
 
+        // Set available quality levels
         if (this.isHTML5) {
             controls.setQualityMenu.call(this, html5.getQualityOptions.call(this));
         }
