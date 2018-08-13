@@ -1,3 +1,7 @@
+# v3.4.1
+
+-   Bug fix for custom controls (fixes #1161)
+
 # v3.4.0
 
 -   Accessibility improvements (see #905)
