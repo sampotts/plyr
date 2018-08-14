@@ -8369,8 +8369,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 	        // Add pressed property to buttons
 	        if (!is$1.empty(this.elements.buttons)) {
-	            // Toggle classname when pressed property is set
-	            Object.values(this.elements.buttons).filter(Boolean).forEach(function (button) {
+	            var addProperty = function addProperty(button) {
 	                var className = _this10.config.classNames.controlPressed;
 	                Object.defineProperty(button, 'pressed', {
 	                    enumerable: true,
@@ -8383,6 +8382,15 @@ typeof navigator === "object" && (function (global, factory) {
 	                        toggleClass(button, className, pressed);
 	                    }
 	                });
+	            };
+
+	            // Toggle classname when pressed property is set
+	            Object.values(this.elements.buttons).filter(Boolean).forEach(function (button) {
+	                if (is$1.array(button)) {
+	                    button.filter(Boolean).forEach(addProperty);
+	                } else {
+	                    addProperty(button);
+	                }
 	            });
 	        }
 
