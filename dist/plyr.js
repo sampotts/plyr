@@ -2959,8 +2959,8 @@ typeof navigator === "object" && (function (global, factory) {
 
                 // Toggle classname when pressed property is set
                 Object.values(this.elements.buttons).filter(Boolean).forEach(function (button) {
-                    if (is.array(button)) {
-                        button.filter(Boolean).forEach(addProperty);
+                    if (is.array(button) || is.nodeList(button)) {
+                        Array.from(button).filter(Boolean).forEach(addProperty);
                     } else {
                         addProperty(button);
                     }

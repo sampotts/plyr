@@ -1,3 +1,7 @@
+# v3.4.3
+
+-   Fixed issue with nodeList for custom playback controls
+
 # v3.4.2
 
 -   Fix play/pause button state
