@@ -44,7 +44,7 @@ const paths = {
         // Source paths
         src: {
             sass: path.join(root, 'src/sass/**/*.scss'),
-            js: path.join(root, 'src/js/**/*'),
+            js: path.join(root, 'src/js/**/*.js'),
             sprite: path.join(root, 'src/sprite/*.svg'),
         },
 
@@ -55,7 +55,7 @@ const paths = {
         // Source paths
         src: {
             sass: path.join(root, 'demo/src/sass/**/*.scss'),
-            js: path.join(root, 'demo/src/js/**/*'),
+            js: path.join(root, 'demo/src/js/**/*.js'),
         },
 
         // Output paths
