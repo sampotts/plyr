@@ -1,3 +1,7 @@
+# v3.4.2
+
+-   Fix play/pause button state
+
 # v3.4.1
 
 -   Bug fix for custom controls (fixes #1161)

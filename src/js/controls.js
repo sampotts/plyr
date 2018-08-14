@@ -1610,20 +1610,28 @@ const controls = {
 
         // Add pressed property to buttons
         if (!is.empty(this.elements.buttons)) {
+            const addProperty = button => {
+                const className = this.config.classNames.controlPressed;
+                Object.defineProperty(button, 'pressed', {
+                    enumerable: true,
+                    get() {
+                        return hasClass(button, className);
+                    },
+                    set(pressed = false) {
+                        toggleClass(button, className, pressed);
+                    },
+                });
+            };
+
             // Toggle classname when pressed property is set
             Object.values(this.elements.buttons)
                 .filter(Boolean)
                 .forEach(button => {
-                    const className = this.config.classNames.controlPressed;
-                    Object.defineProperty(button, 'pressed', {
-                        enumerable: true,
-                        get() {
-                            return hasClass(button, className);
-                        },
-                        set(pressed = false) {
-                            toggleClass(button, className, pressed);
-                        },
-                    });
+                    if (is.array(button)) {
+                        button.filter(Boolean).forEach(addProperty);
+                    } else {
+                        addProperty(button);
+                    }
                 });
         }
 
