@@ -146,18 +146,6 @@ class Listeners {
                     player.loop = !player.loop;
                     break;
 
-                /* case 73:
-                    this.setLoop('start');
-                    break;
-
-                case 76:
-                    this.setLoop();
-                    break;
-
-                case 79:
-                    this.setLoop('end');
-                    break; */
-
                 default:
                     break;
             }
