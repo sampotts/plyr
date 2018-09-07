@@ -372,7 +372,7 @@ class Listeners {
             }
 
             // On click play, pause ore restart
-            on.call(player, elements.container, 'click touchstart', event => {
+            on.call(player, elements.container, 'click', event => {
                 const targets = [elements.container, wrapper];
 
                 // Ignore if click if not container or in video wrapper
