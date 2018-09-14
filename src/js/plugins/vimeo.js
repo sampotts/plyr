@@ -91,6 +91,7 @@ const vimeo = {
             loop: player.config.loop.active,
             autoplay: player.autoplay,
             // muted: player.muted,
+            quality: player.config.quality,
             byline: false,
             portrait: false,
             title: false,
