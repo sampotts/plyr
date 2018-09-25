@@ -88,29 +88,26 @@ const sizeOptions = { showFiles: true, gzip: true };
 const browsers = ['> 1%'];
 
 // Babel config
-const babelrc = {
+const babelrc = (polyfill = false) => ({
     presets: [
         [
-            'env',
+            '@babel/preset-env',
             {
                 targets: {
                     browsers,
                 },
-                useBuiltIns: true,
+                useBuiltIns: polyfill ? 'usage' : false,
                 modules: false,
             },
         ],
     ],
-    plugins: ['external-helpers'],
     babelrc: false,
     exclude: 'node_modules/**',
-};
+});
 
 // Clean out /dist
 gulp.task('clean', () => {
-    const dirs = [paths.plyr.output, paths.demo.output].map(dir =>
-        path.join(dir, '**/*'),
-    );
+    const dirs = [paths.plyr.output, paths.demo.output].map(dir => path.join(dir, '**/*'));
 
     // Don't delete the mp4
     dirs.push(`!${path.join(paths.plyr.output, '**/*.mp4')}`);
@@ -124,6 +121,7 @@ const build = {
             const name = `js:${key}`;
             tasks.js.push(name);
             const { output } = paths[bundle];
+            const polyfill = name.includes('polyfilled');
 
             return gulp.task(name, () =>
                 gulp
@@ -133,11 +131,7 @@ const build = {
                     .pipe(
                         rollup(
                             {
-                                plugins: [
-                                    resolve(),
-                                    commonjs(),
-                                    babel(babelrc),
-                                ],
+                                plugins: [resolve(), commonjs(), babel(babelrc(polyfill))],
                             },
                             options,
                         ),
@@ -244,10 +238,7 @@ try {
 }
 
 // If deployment is setup
-if (
-    Object.keys(credentials).includes('aws') &&
-    Object.keys(credentials).includes('fastly')
-) {
+if (Object.keys(credentials).includes('aws') && Object.keys(credentials).includes('fastly')) {
     const { version } = pkg;
     const { aws, fastly } = credentials;
 
@@ -269,8 +260,7 @@ if (
         demo: {
             uploadPath: branch.current === branch.develop ? 'beta/' : null,
             headers: {
-                'Cache-Control':
-                    'no-cache, no-store, must-revalidate, max-age=0',
+                'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
                 Vary: 'Accept-Encoding',
             },
         },
@@ -279,8 +269,7 @@ if (
                 headers: {
                     // http://stackoverflow.com/questions/2272835/amazon-s3-object-redirect
                     'x-amz-website-redirect-location': `/${ver}/${filename}`,
-                    'Cache-Control':
-                        'no-cache, no-store, must-revalidate, max-age=0',
+                    'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
                 },
             };
         },
@@ -303,11 +292,7 @@ if (
         const allowed = [branch.master, branch.develop];
 
         if (!allowed.includes(branch.current)) {
-            console.error(
-                `Must be on ${allowed.join(', ')} to publish! (current: ${
-                    branch.current
-                })`,
-            );
+            console.error(`Must be on ${allowed.join(', ')} to publish! (current: ${branch.current})`);
 
             return false;
         }
@@ -349,8 +334,7 @@ if (
                 .pipe(
                     replace(
                         /sourceMappingURL=([\w-?.]+)/,
-                        (match, p1) =>
-                            `sourceMappingURL=${p1.replace(minSuffix, '')}`,
+                        (match, p1) => `sourceMappingURL=${p1.replace(minSuffix, '')}`,
                     ),
                 )
                 .pipe(
@@ -368,27 +352,30 @@ if (
     gulp.task('purge', () => {
         const list = [];
 
-        return gulp.src(paths.upload).pipe(
-            through.obj((file, enc, cb) => {
-                const filename = file.path.split('/').pop();
-                list.push(`${versionPath}/${filename}`);
-                cb(null);
-            }),
-        ).on('end', () => {
-            const purge = new FastlyPurge(fastly.token);
+        return gulp
+            .src(paths.upload)
+            .pipe(
+                through.obj((file, enc, cb) => {
+                    const filename = file.path.split('/').pop();
+                    list.push(`${versionPath}/${filename}`);
+                    cb(null);
+                }),
+            )
+            .on('end', () => {
+                const purge = new FastlyPurge(fastly.token);
 
-            list.forEach(url => {
-                console.log(`Purging ${url}...`);
+                list.forEach(url => {
+                    console.log(`Purging ${url}...`);
 
-                purge.url(url, (error, result) => {
-                    if (error) {
-                        console.log(error);
-                    } else if (result) {
-                        console.log(result);
-                    }
+                    purge.url(url, (error, result) => {
+                        if (error) {
+                            console.log(error);
+                        } else if (result) {
+                            console.log(result);
+                        }
+                    });
                 });
             });
-        });
     });
 
     // Publish to demo bucket
@@ -400,8 +387,7 @@ if (
         console.log(`Uploading '${version}' demo to ${aws.demo.domain}...`);
 
         // Replace versioned files in readme.md
-        gulp
-            .src([`${root}/readme.md`])
+        gulp.src([`${root}/readme.md`])
             .pipe(replace(cdnpath, `${aws.cdn.domain}/${version}/`))
             .pipe(gulp.dest(root));
 
@@ -415,8 +401,7 @@ if (
             pages.push(error);
         }
 
-        gulp
-            .src(pages)
+        gulp.src(pages)
             .pipe(replace(localPath, versionPath))
             .pipe(s3(aws.demo, options.demo));
 
@@ -468,16 +453,6 @@ if (
 
     // Do everything
     gulp.task('deploy', () =>
-        run(
-            'version',
-            tasks.clean,
-            tasks.js,
-            tasks.sass,
-            tasks.sprite,
-            'cdn',
-            'purge',
-            'demo',
-            'open',
-        ),
+        run('version', tasks.clean, tasks.js, tasks.sass, tasks.sprite, 'cdn', 'purge', 'demo', 'open'),
     );
 }

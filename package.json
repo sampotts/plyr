@@ -37,8 +37,7 @@
     "devDependencies": {
         "babel-core": "^6.26.3",
         "babel-eslint": "^9.0.0",
-        "babel-plugin-external-helpers": "^6.22.0",
-        "babel-preset-env": "^1.7.0",
+        "@babel/preset-env": "^7.1.0",
         "del": "^3.0.0",
         "eslint": "^5.6.0",
         "eslint-config-airbnb-base": "^13.1.0",
@@ -84,7 +83,7 @@
         "through2": "^2.0.3"
     },
     "dependencies": {
-        "babel-polyfill": "^6.26.0",
+        "core-js": "^2.5.7",
         "custom-event-polyfill": "^1.0.6",
         "loadjs": "^3.5.4",
         "raven-js": "^3.27.0",
