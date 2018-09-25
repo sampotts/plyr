@@ -1,8 +1,10 @@
 // ==========================================================================
 // Fullscreen wrapper
 // https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API#prefixing
+// https://webkit.org/blog/7929/designing-websites-for-iphone-x/
 // ==========================================================================
 
+import { repaint } from './utils/animation';
 import browser from './utils/browser';
 import { hasClass, toggleClass, trapFocus } from './utils/elements';
 import { on, triggerEvent } from './utils/events';
@@ -44,6 +46,37 @@ function toggleFallback(toggle = false) {
 
     // Toggle class hook
     toggleClass(this.target, this.player.config.classNames.fullscreen.fallback, toggle);
+
+    // Force full viewport on iPhone X+
+    if (browser.isIos) {
+        let viewport = document.head.querySelector('meta[name="viewport"]');
+        const property = 'viewport-fit=cover';
+
+        // Inject the viewport meta if required
+        if (!viewport) {
+            viewport = document.createElement('meta');
+            viewport.setAttribute('name', 'viewport');
+        }
+
+        // Check if the property already exists
+        const hasProperty = is.string(viewport.content) && viewport.content.includes(property);
+
+        if (toggle) {
+            this.cleanupViewport = !hasProperty;
+
+            if (!hasProperty) {
+                viewport.content += `,${property}`;
+            }
+        } else if (this.cleanupViewport) {
+            viewport.content = viewport.content
+                .split(',')
+                .filter(part => part.trim() !== property)
+                .join(',');
+        }
+
+        // Force a repaint as sometimes Safari doesn't want to fill the screen
+        setTimeout(() => repaint(this.target), 100);
+    }
 
     // Toggle button and fire events
     onChange.call(this);
