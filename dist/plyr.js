@@ -1559,9 +1559,12 @@ typeof navigator === "object" && (function (global, factory) {
 
                 case 'play-large':
                     attributes.class += ' ' + this.config.classNames.control + '--overlaid';
+                    toggle = true;
                     type = 'play';
                     label = 'play';
+                    labelPressed = 'pause';
                     icon = 'play';
+                    iconPressed = 'pause';
                     break;
 
                 default:
@@ -4514,14 +4517,14 @@ typeof navigator === "object" && (function (global, factory) {
                             break;
 
                         /* case 73:
-                            this.setLoop('start');
-                            break;
-                         case 76:
-                            this.setLoop();
-                            break;
-                         case 79:
-                            this.setLoop('end');
-                            break; */
+                        this.setLoop('start');
+                        break;
+                        case 76:
+                        this.setLoop();
+                        break;
+                        case 79:
+                        this.setLoop('end');
+                        break; */
 
                         default:
                             break;
@@ -4767,7 +4770,7 @@ typeof navigator === "object" && (function (global, factory) {
                     }
 
                     // On click play, pause ore restart
-                    on.call(player, elements.container, 'click touchstart', function (event) {
+                    on.call(player, elements.container, 'click', function (event) {
                         var targets = [elements.container, wrapper];
 
                         // Ignore if click if not container or in video wrapper
@@ -4775,9 +4778,8 @@ typeof navigator === "object" && (function (global, factory) {
                             return;
                         }
 
-                        // First touch on touch devices will just show controls (if we're hiding controls)
-                        // If controls are shown then it'll toggle like a pointer device
-                        if (player.config.hideControls && player.touch && hasClass(elements.container, player.config.classNames.hideControls)) {
+                        // Touch devices will just show controls (if hidden)
+                        if (player.touch && player.config.hideControls) {
                             return;
                         }
 

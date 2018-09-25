@@ -45,7 +45,7 @@ class Listeners {
         // Seek by the number keys
         const seekByKey = () => {
             // Divide the max duration into 10th's and times by the number value
-            player.currentTime = player.duration / 10 * (code - 48);
+            player.currentTime = (player.duration / 10) * (code - 48);
         };
 
         // Handle the key on keydown
@@ -146,7 +146,7 @@ class Listeners {
                     player.loop = !player.loop;
                     break;
 
-                /* case 73:
+                    /* case 73:
                     this.setLoop('start');
                     break;
 
@@ -372,7 +372,7 @@ class Listeners {
             }
 
             // On click play, pause ore restart
-            on.call(player, elements.container, 'click touchstart', event => {
+            on.call(player, elements.container, 'click', event => {
                 const targets = [elements.container, wrapper];
 
                 // Ignore if click if not container or in video wrapper
@@ -380,13 +380,8 @@ class Listeners {
                     return;
                 }
 
-                // First touch on touch devices will just show controls (if we're hiding controls)
-                // If controls are shown then it'll toggle like a pointer device
-                if (
-                    player.config.hideControls &&
-                    player.touch &&
-                    hasClass(elements.container, player.config.classNames.hideControls)
-                ) {
+                // Touch devices will just show controls (if hidden)
+                if (player.touch && player.config.hideControls) {
                     return;
                 }
 
@@ -596,7 +591,7 @@ class Listeners {
         // Set range input alternative "value", which matches the tooltip time (#954)
         this.bind(elements.inputs.seek, 'mousedown mousemove', event => {
             const rect = elements.progress.getBoundingClientRect();
-            const percent = 100 / rect.width * (event.pageX - rect.left);
+            const percent = (100 / rect.width) * (event.pageX - rect.left);
             event.currentTarget.setAttribute('seek-value', percent);
         });
 
@@ -650,7 +645,7 @@ class Listeners {
 
                 seek.removeAttribute('seek-value');
 
-                player.currentTime = seekTo / seek.max * player.duration;
+                player.currentTime = (seekTo / seek.max) * player.duration;
             },
             'seek',
         );

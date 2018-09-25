@@ -219,9 +219,12 @@ const controls = {
 
             case 'play-large':
                 attributes.class += ` ${this.config.classNames.control}--overlaid`;
+                toggle = true;
                 type = 'play';
                 label = 'play';
+                labelPressed = 'pause';
                 icon = 'play';
+                iconPressed = 'pause';
                 break;
 
             default:
