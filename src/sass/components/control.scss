@@ -81,11 +81,10 @@
     transform: translate(-50%, -50%);
     z-index: 2;
 
+    // Offset icon to make the play button look right
     svg {
-        height: $plyr-control-icon-size-large;
-        left: 2px; // Offset to make the play button look right
+        left: 2px;
         position: relative;
-        width: $plyr-control-icon-size-large;
     }
 
     &:hover,
@@ -94,7 +93,7 @@
     }
 }
 
-.plyr--hide-controls .plyr__control--overlaid {
+.plyr--playing .plyr__control--overlaid {
     opacity: 0;
     visibility: hidden;
 }
