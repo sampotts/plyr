@@ -371,7 +371,7 @@ class Listeners {
                 return;
             }
 
-            // On click play, pause ore restart
+            // On click play, pause or restart
             on.call(player, elements.container, 'click', event => {
                 const targets = [elements.container, wrapper];
 
