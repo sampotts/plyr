@@ -1,3 +1,9 @@
+# v3.4.4
+
+-   Fixed issue with double binding for `click` and `touchstart` for `clickToPlay` option
+-   Improved "faux" fullscreen on iPhone X/XS phones with notch
+-   Babel 7 upgrade (which reduced the polyfilled build by ~10kb!)
+
 # v3.4.3
 
 -   Fixed issue with nodeList for custom playback controls
