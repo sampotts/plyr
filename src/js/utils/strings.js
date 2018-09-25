@@ -24,7 +24,7 @@ export function getPercentage(current, max) {
         return 0;
     }
 
-    return (current / max * 100).toFixed(2);
+    return ((current / max) * 100).toFixed(2);
 }
 
 // Replace all occurances of a string in a string

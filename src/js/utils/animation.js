@@ -15,9 +15,7 @@ export const transitionEndEvent = (() => {
         transition: 'transitionend',
     };
 
-    const type = Object.keys(events).find(
-        event => element.style[event] !== undefined,
-    );
+    const type = Object.keys(events).find(event => element.style[event] !== undefined);
 
     return is.string(type) ? events[type] : false;
 })();

@@ -6,7 +6,7 @@ import controls from './controls';
 import ui from './ui';
 import { repaint } from './utils/animation';
 import browser from './utils/browser';
-import { getElement, getElements, hasClass, matches, toggleClass, toggleHidden } from './utils/elements';
+import { getElement, getElements, matches, toggleClass, toggleHidden } from './utils/elements';
 import { on, once, toggleListener, triggerEvent } from './utils/events';
 import is from './utils/is';
 
