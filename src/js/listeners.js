@@ -697,33 +697,29 @@ class Listeners {
             elements.controls.pressed = ['mousedown', 'touchstart'].includes(event.type);
         });
 
-        // Focus in/out on controls
-        this.bind(elements.controls, 'focusin focusout', event => {
+        // Show controls when they receive focus (e.g., when using keyboard tab key)
+        this.bind(elements.controls, 'focusin', event => {
             const { config, elements, timers } = player;
-            const isFocusIn = event.type === 'focusin';
 
             // Skip transition to prevent focus from scrolling the parent element
-            toggleClass(elements.controls, config.classNames.noTransition, isFocusIn);
+            toggleClass(elements.controls, config.classNames.noTransition, true);
 
             // Toggle
-            ui.toggleControls.call(player, isFocusIn);
+            ui.toggleControls.call(player, true);
 
-            // If focusin, hide again after delay
-            if (isFocusIn) {
-                // Restore transition
-                setTimeout(() => {
-                    toggleClass(elements.controls, config.classNames.noTransition, false);
-                }, 0);
+            // Restore transition
+            setTimeout(() => {
+                toggleClass(elements.controls, config.classNames.noTransition, false);
+            }, 0);
 
-                // Delay a little more for keyboard users
-                const delay = this.touch ? 3000 : 4000;
+            // Delay a little more for keyboard users
+            const delay = this.touch ? 3000 : 4000;
 
-                // Clear timer
-                clearTimeout(timers.controls);
+            // Clear timer
+            clearTimeout(timers.controls);
 
-                // Hide
-                timers.controls = setTimeout(() => ui.toggleControls.call(player, false), delay);
-            }
+            // Hide again after delay
+            timers.controls = setTimeout(() => ui.toggleControls.call(player, false), delay);
         });
 
         // Mouse wheel for volume
