@@ -431,6 +431,11 @@ class Listeners {
             controls.updateSetting.call(player, 'quality', null, event.detail.quality);
         });
 
+        // Update download link
+        on.call(player, player.media, 'ready qualitychange', () => {
+            controls.setDownloadLink.call(player);
+        });
+
         // Proxy events to container
         // Bubble up key events for Edge
         const proxyEvents = player.config.events.concat(['keyup', 'keydown']).join(' ');
@@ -516,6 +521,16 @@ class Listeners {
 
         // Captions toggle
         this.bind(elements.buttons.captions, 'click', () => player.toggleCaptions());
+
+        // Download
+        this.bind(
+            elements.buttons.download,
+            'click',
+            () => {
+                triggerEvent.call(player, player.media, 'download');
+            },
+            'download',
+        );
 
         // Fullscreen toggle
         this.bind(
@@ -698,7 +713,7 @@ class Listeners {
         });
 
         // Show controls when they receive focus (e.g., when using keyboard tab key)
-        this.bind(elements.controls, 'focusin', event => {
+        this.bind(elements.controls, 'focusin', () => {
             const { config, elements, timers } = player;
 
             // Skip transition to prevent focus from scrolling the parent element
@@ -712,7 +727,7 @@ class Listeners {
                 toggleClass(elements.controls, config.classNames.noTransition, false);
             }, 0);
 
-            // Delay a little more for keyboard users
+            // Delay a little more for mouse users
             const delay = this.touch ? 3000 : 4000;
 
             // Clear timer

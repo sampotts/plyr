@@ -15,7 +15,7 @@ export const types = {
 
 /**
  * Get provider by URL
- * @param {string} url
+ * @param {String} url
  */
 export function getProviderByUrl(url) {
     // YouTube
