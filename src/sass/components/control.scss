@@ -33,6 +33,16 @@
     }
 }
 
+// Remove any link styling
+a.plyr__control {
+    text-decoration: none;
+
+    &::after,
+    &::before {
+        display: none;
+    }
+}
+
 // Change icons on state change
 .plyr__control:not(.plyr__control--pressed) .icon--pressed,
 .plyr__control.plyr__control--pressed .icon--not-pressed,

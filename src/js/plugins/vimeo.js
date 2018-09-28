@@ -71,7 +71,7 @@ const vimeo = {
     // For Vimeo we have an extra 300% height <div> to hide the standard controls and UI
     setAspectRatio(input) {
         const [x, y] = (is.string(input) ? input : this.config.ratio).split(':');
-        const padding = 100 / x * y;
+        const padding = (100 / x) * y;
         this.elements.wrapper.style.paddingBottom = `${padding}%`;
 
         if (this.supported.ui) {
@@ -278,6 +278,7 @@ const vimeo = {
             .getVideoUrl()
             .then(value => {
                 currentSrc = value;
+                controls.setDownloadLink.call(player);
             })
             .catch(error => {
                 this.debug.warn(error);

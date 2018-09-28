@@ -6,6 +6,15 @@ import is from './is';
 import { getDeep } from './objects';
 import { replaceAll } from './strings';
 
+// Skip i18n for abbreviations and brand names
+const resources = {
+    pip: 'PIP',
+    airplay: 'AirPlay',
+    html5: 'HTML5',
+    vimeo: 'Vimeo',
+    youtube: 'YouTube',
+};
+
 const i18n = {
     get(key = '', config = {}) {
         if (is.empty(key) || is.empty(config)) {
@@ -15,6 +24,10 @@ const i18n = {
         let string = getDeep(config.i18n, key);
 
         if (is.empty(string)) {
+            if (Object.keys(resources).includes(key)) {
+                return resources[key];
+            }
+
             return '';
         }
 
