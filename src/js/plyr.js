@@ -265,6 +265,9 @@ class Plyr {
             wrap(this.media, this.elements.container);
         }
 
+        // Make container focusable
+        this.elements.container.tabIndex = 0;
+
         // Add style hook
         ui.addStyleHook.call(this);
 
@@ -342,6 +345,9 @@ class Plyr {
         if (!is.function(this.media.play)) {
             return null;
         }
+
+        // Focus on video
+        this.setContainerFocus();
 
         // Return the promise (for HTML5)
         return this.media.play();
@@ -910,6 +916,15 @@ class Plyr {
         // Show dialog if supported
         if (support.airplay) {
             this.media.webkitShowPlaybackTargetPicker();
+        }
+    }
+
+    /**
+     * Focus on the container
+     */
+    setContainerFocus() {
+        if (this.elements && this.elements.container) {
+            this.elements.container.focus();
         }
     }
 

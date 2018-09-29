@@ -266,6 +266,7 @@ class Listeners {
         // Keyboard shortcuts
         if (!player.config.keyboard.global && player.config.keyboard.focused) {
             on.call(player, elements.container, 'keydown keyup', this.handleKey, false);
+            on.call(player, elements.container, 'click', player.setContainerFocus, false);
         }
 
         // Toggle controls on mouse events and entering fullscreen
