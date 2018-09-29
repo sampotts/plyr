@@ -82,9 +82,6 @@ const html5 = {
                 triggerEvent.call(player, player.media, 'qualitychange', false, {
                     quality: input,
                 });
-
-                // Save to storage
-                player.storage.set({ quality: input });
             },
         });
     },

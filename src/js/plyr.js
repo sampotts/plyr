@@ -692,10 +692,15 @@ class Plyr {
             config.default,
         ].find(is.number);
 
+        let updateStorage = true;
+
         if (!options.includes(quality)) {
             const value = closest(options, quality);
             this.debug.warn(`Unsupported quality option: ${quality}, using ${value} instead`);
             quality = value;
+
+            // Don't update storage if quality is not supported
+            updateStorage = false;
         }
 
         // Update config
@@ -703,6 +708,11 @@ class Plyr {
 
         // Set quality
         this.media.quality = quality;
+
+        // Save to storage
+        if (updateStorage) {
+            this.storage.set({ quality: quality });
+        }
     }
 
     /**
