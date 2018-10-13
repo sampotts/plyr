@@ -680,8 +680,7 @@ class Plyr {
     set quality(input) {
         const config = this.config.quality;
         const options = this.options.quality;
-        const duration = this.duration;
-        const isPlaying = this.playing;
+        const { duration, playing } = this;
 
         if (!options.length) {
             return;
@@ -706,11 +705,11 @@ class Plyr {
         // Set quality
         this.media.quality = quality;
         
-        // seek to duration before changing quality
+        // Seek to duration before changing quality
         this.seek = duration;
 
-        // continue
-        if (isPlaying) {
+        // Continue
+        if (playing) {
             this.play();
         }
     }
