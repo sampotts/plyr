@@ -247,8 +247,11 @@ const ui = {
         const { controls } = this.elements;
 
         if (controls && this.config.hideControls) {
-            // Show controls if force, loading, paused, or button interaction, otherwise hide
-            this.toggleControls(Boolean(force || this.loading || this.paused || controls.pressed || controls.hover));
+            // Don't hide controls if a touch-device user recently seeked. (Must be limited to touch devices, or it occasionally prevents desktop controls from hiding.)
+            const recentTouchSeek = (this.touch && this.lastSeekTime + 2000 > Date.now());
+
+            // Show controls if force, loading, paused, button interaction, or recent seek, otherwise hide
+            this.toggleControls(Boolean(force || this.loading || this.paused || controls.pressed || controls.hover || recentTouchSeek));
         }
     },
 };
