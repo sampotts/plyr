@@ -111,9 +111,10 @@ const controls = {
         // https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/xlink:href
         if ('href' in use) {
             use.setAttributeNS('http://www.w3.org/1999/xlink', 'href', path);
-        } else {
-            use.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', path);
         }
+
+        // Always set the older attribute even though it's "deprecated" (it'll be around for ages)
+        use.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', path);
 
         // Add <use> to <svg>
         icon.appendChild(use);
