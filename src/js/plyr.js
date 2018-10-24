@@ -302,6 +302,9 @@ class Plyr {
         if (this.config.autoplay) {
             this.play();
         }
+
+        // Seek time will be recorded (in listeners.js) so we can prevent hiding controls for a few seconds after seek
+        this.lastSeekTime = 0;
     }
 
     // ---------------------------------------

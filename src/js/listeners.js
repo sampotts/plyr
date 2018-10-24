@@ -620,6 +620,9 @@ class Listeners {
                 return;
             }
 
+            // Record seek time so we can prevent hiding controls for a few seconds after seek
+            player.lastSeekTime = Date.now();
+
             // Was playing before?
             const play = seek.hasAttribute(attribute);
 
