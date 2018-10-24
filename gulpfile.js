@@ -308,7 +308,7 @@ if (Object.keys(credentials).includes('aws') && Object.keys(credentials).include
         console.log(`Updating versions to '${version}'...`);
 
         // Replace versioned URLs in source
-        const files = ['plyr.js', 'plyr.polyfilled.js', 'defaults.js'];
+        const files = ['plyr.js', 'plyr.polyfilled.js', 'config/defaults.js'];
 
         return gulp
             .src(files.map(file => path.join(root, `src/js/${file}`)))
