@@ -789,6 +789,15 @@ class Plyr {
     }
 
     /**
+     * Get a download URL (either source or custom)
+     */
+    get download() {
+        const { download } = this.config.urls;
+
+        return is.url(download) ? download : this.source;
+    }
+
+    /**
      * Set the poster image for a video
      * @param {input} - the URL for the new poster image
      */

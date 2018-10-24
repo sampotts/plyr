@@ -1229,11 +1229,15 @@ const controls = {
 
     // Set the download link
     setDownloadLink() {
-        // Set download link
-        const { download } = this.elements.buttons;
-        if (is.element(download)) {
-            download.setAttribute('href', this.source);
+        const button = this.elements.buttons.download;
+
+        // Bail if no button
+        if (!is.element(button)) {
+            return;
         }
+
+        // Set download link
+        button.setAttribute('href', this.download);
     },
 
     // Build the default HTML
@@ -1516,15 +1520,13 @@ const controls = {
         if (this.config.controls.includes('download')) {
             const attributes = {
                 element: 'a',
-                href: this.source,
+                href: this.download,
                 target: '_blank',
             };
 
-            if (this.isHTML5) {
-                extend(attributes, {
-                    download: '',
-                });
-            } else if (this.isEmbed) {
+            const { download } = this.config.urls;
+
+            if (!is.url(download) && this.isEmbed) {
                 extend(attributes, {
                     icon: `logo-${this.provider}`,
                     label: this.provider,

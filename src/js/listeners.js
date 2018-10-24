@@ -431,7 +431,7 @@ class Listeners {
             controls.updateSetting.call(player, 'quality', null, event.detail.quality);
         });
 
-        // Update download link
+        // Update download link when ready and if quality changes
         on.call(player, player.media, 'ready qualitychange', () => {
             controls.setDownloadLink.call(player);
         });
