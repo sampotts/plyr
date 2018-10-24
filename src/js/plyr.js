@@ -302,6 +302,9 @@ class Plyr {
         if (this.config.autoplay) {
             this.play();
         }
+
+        // Seek time will be recorded (in listeners.js) so we can prevent hiding controls for a few seconds after seek
+        this.lastSeekTime = 0;
     }
 
     // ---------------------------------------
@@ -680,6 +683,7 @@ class Plyr {
     set quality(input) {
         const config = this.config.quality;
         const options = this.options.quality;
+        const { duration, playing } = this;
 
         if (!options.length) {
             return;
@@ -712,6 +716,14 @@ class Plyr {
         // Save to storage
         if (updateStorage) {
             this.storage.set({ quality: quality });
+        }
+        
+        // Seek to duration before changing quality
+        this.seek = duration;
+
+        // Continue
+        if (playing) {
+            this.play();
         }
     }
 
@@ -796,6 +808,15 @@ class Plyr {
      */
     get source() {
         return this.media.currentSrc;
+    }
+
+    /**
+     * Get a download URL (either source or custom)
+     */
+    get download() {
+        const { download } = this.config.urls;
+
+        return is.url(download) ? download : this.source;
     }
 
     /**

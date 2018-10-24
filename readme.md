@@ -175,7 +175,7 @@ Any questions regarding the ads can be sent straight to vi.ai and any issues wit
 ### SASS
 
 You can use `bundle.scss` file included in `/src` as part of your build and change variables to suit your design. The SASS require you to
-use the [autoprefixer](https://www.npmjs.com/package/gulp-autoprefixer) plugin (you be should already!) as all declarations use the W3C definitions.
+use the [autoprefixer](https://www.npmjs.com/package/gulp-autoprefixer) plugin (you should be already!) as all declarations use the W3C definitions.
 
 The HTML markup uses the BEM methodology with `plyr` as the block, e.g. `.plyr__controls`. You can change the class hooks in the options to match any custom CSS
 you write. Check out the JavaScript source for more on this.

@@ -133,7 +133,7 @@ const defaults = {
         'settings',
         'pip',
         'airplay',
-        'download',
+        // 'download',
         'fullscreen',
     ],
     settings: ['captions', 'quality', 'speed'],
@@ -186,6 +186,7 @@ const defaults = {
 
     // URLs
     urls: {
+        download: null,
         vimeo: {
             sdk: 'https://player.vimeo.com/api/player.js',
             iframe: 'https://player.vimeo.com/video/{0}?{1}',

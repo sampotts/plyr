@@ -31,6 +31,11 @@ const isUrl = input => {
         return true;
     }
 
+    // Must be string from here
+    if (!isString(input)) {
+        return false;
+    }
+
     // Add the protocol if required
     let string = input;
     if (!input.startsWith('http://') || !input.startsWith('https://')) {

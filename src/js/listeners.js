@@ -431,7 +431,7 @@ class Listeners {
             controls.updateSetting.call(player, 'quality', null, event.detail.quality);
         });
 
-        // Update download link
+        // Update download link when ready and if quality changes
         on.call(player, player.media, 'ready qualitychange', () => {
             controls.setDownloadLink.call(player);
         });
@@ -619,6 +619,9 @@ class Listeners {
             if (is.keyboardEvent(event) && (code !== 39 && code !== 37)) {
                 return;
             }
+
+            // Record seek time so we can prevent hiding controls for a few seconds after seek
+            player.lastSeekTime = Date.now();
 
             // Was playing before?
             const play = seek.hasAttribute(attribute);
