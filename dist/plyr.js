@@ -705,9 +705,25 @@ typeof navigator === "object" && (function (global, factory) {
       };
     },
     // Picture-in-picture support
-    // Safari only currently
+    // Safari & Chrome only currently
     pip: function () {
-      return !browser.isIPhone && is.function(createElement('video').webkitSetPresentationMode);
+      if (browser.isIPhone) {
+        return false;
+      } // Safari
+      // https://developer.apple.com/documentation/webkitjs/adding_picture_in_picture_to_your_safari_media_controls
+
+
+      if (is.function(createElement('video').webkitSetPresentationMode)) {
+        return true;
+      } // Chrome
+      // https://developers.google.com/web/updates/2018/10/watch-video-using-picture-in-picture
+
+
+      if (document.pictureInPictureEnabled && !createElement('video').disablePictureInPicture) {
+        return true;
+      }
+
+      return false;
     }(),
     // Airplay support
     // Safari only currently
@@ -839,10 +855,6 @@ typeof navigator === "object" && (function (global, factory) {
 
 
           triggerEvent.call(player, player.media, 'qualitychange', false, {
-            quality: input
-          }); // Save to storage
-
-          player.storage.set({
             quality: input
           });
         }
@@ -3180,7 +3192,7 @@ typeof navigator === "object" && (function (global, factory) {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.3.12/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.4.6/plyr.svg',
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
     // Quality default
@@ -3442,6 +3454,14 @@ typeof navigator === "object" && (function (global, factory) {
       enabled: false,
       publisherId: ''
     }
+  };
+
+  // ==========================================================================
+  // Plyr states
+  // ==========================================================================
+  var pip = {
+    active: 'picture-in-picture',
+    inactive: 'inline'
   };
 
   // ==========================================================================
@@ -7429,17 +7449,26 @@ typeof navigator === "object" && (function (global, factory) {
         }
 
         var quality = [!is.empty(input) && Number(input), this.storage.get('quality'), config.selected, config.default].find(is.number);
+        var updateStorage = true;
 
         if (!options.includes(quality)) {
           var value = closest(options, quality);
           this.debug.warn("Unsupported quality option: ".concat(quality, ", using ").concat(value, " instead"));
-          quality = value;
+          quality = value; // Don't update storage if quality is not supported
+
+          updateStorage = false;
         } // Update config
 
 
         config.selected = quality; // Set quality
 
-        this.media.quality = quality;
+        this.media.quality = quality; // Save to storage
+
+        if (updateStorage) {
+          this.storage.set({
+            quality: quality
+          });
+        }
       }
       /**
        * Get current quality level
@@ -7618,19 +7647,27 @@ typeof navigator === "object" && (function (global, factory) {
     }, {
       key: "pip",
       set: function set(input) {
-        var states = {
-          pip: 'picture-in-picture',
-          inline: 'inline'
-        }; // Bail if no support
-
+        // Bail if no support
         if (!support.pip) {
           return;
         } // Toggle based on current state if not passed
 
 
-        var toggle = is.boolean(input) ? input : this.pip === states.inline; // Toggle based on current state
+        var toggle = is.boolean(input) ? input : !this.pip; // Toggle based on current state
+        // Safari
 
-        this.media.webkitSetPresentationMode(toggle ? states.pip : states.inline);
+        if (is.function(this.media.webkitSetPresentationMode)) {
+          this.media.webkitSetPresentationMode(toggle ? pip.active : pip.inactive);
+        } // Chrome
+
+
+        if (is.function(this.media.requestPictureInPicture)) {
+          if (!this.pip && toggle) {
+            this.media.requestPictureInPicture();
+          } else if (this.pip && !toggle) {
+            document.exitPictureInPicture();
+          }
+        }
       }
       /**
        * Get the current picture-in-picture state
@@ -7639,9 +7676,15 @@ typeof navigator === "object" && (function (global, factory) {
       get: function get() {
         if (!support.pip) {
           return null;
-        }
+        } // Safari
 
-        return this.media.webkitPresentationMode;
+
+        if (!is.empty(this.media.webkitPresentationMode)) {
+          return this.media.webkitPresentationMode === pip.active;
+        } // Chrome
+
+
+        return this.media === document.pictureInPictureElement;
       }
     }], [{
       key: "supported",

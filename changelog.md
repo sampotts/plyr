@@ -1,3 +1,8 @@
+# v3.4.6
+
+-   Added picture-in-picture support for Chrome 70+
+-   Fixed issue with versioning the SVG sprite in the gulp build script
+
 # v3.4.5
 
 -   Added download button option to download either current source or a custom URL you specify in options
