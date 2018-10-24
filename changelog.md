@@ -1,3 +1,10 @@
+# v3.4.5
+
+-   Added download button option to download either current source or a custom URL you specify in options
+-   Prevent immediate hiding of controls on mobile (thanks @jamesoflol)
+-   Don't hide controls on focusout event (fixes #1122) (thanks @jamesoflol)
+-   Fix HTML5 quality settings being incorrectly set in local storage (thanks @TechGuard)
+
 # v3.4.4
 
 -   Fixed issue with double binding for `click` and `touchstart` for `clickToPlay` option

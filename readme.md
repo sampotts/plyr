@@ -132,13 +132,13 @@ See [initialising](#initialising) for more information on advanced setups.
 You can use our CDN (provided by [Fastly](https://www.fastly.com/)) for the JavaScript. There's 2 versions; one with and one without [polyfills](#polyfills). My recommendation would be to manage polyfills seperately as part of your application but to make life easier you can use the polyfilled build.
 
 ```html
-<script src="https://cdn.plyr.io/3.4.4/plyr.js"></script>
+<script src="https://cdn.plyr.io/3.4.5/plyr.js"></script>
 ```
 
 ...or...
 
 ```html
-<script src="https://cdn.plyr.io/3.4.4/plyr.polyfilled.js"></script>
+<script src="https://cdn.plyr.io/3.4.5/plyr.polyfilled.js"></script>
 ```
 
 ### CSS
@@ -152,13 +152,13 @@ Include the `plyr.css` stylsheet into your `<head>`
 If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for the default CSS, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/3.4.4/plyr.css">
+<link rel="stylesheet" href="https://cdn.plyr.io/3.4.5/plyr.css">
 ```
 
 ### SVG Sprite
 
 The SVG sprite is loaded automatically from our CDN (provided by [Fastly](https://www.fastly.com/)). To change this, see the [options](#options) below. For
-reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.4.4/plyr.svg`.
+reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.4.5/plyr.svg`.
 
 ## Ads
 
@@ -315,6 +315,7 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
 | `quality`            | Object                     | `{ default: 'default', options: ['hd2160', 'hd1440', 'hd1080', 'hd720', 'large', 'medium', 'small', 'tiny', 'default'] }`      | Currently only supported by YouTube. `default` is the default quality level, determined by YouTube. `options` are the options to display.                                                                                                                                                                                                                              |
 | `loop`               | Object                     | `{ active: false }`                                                                                                            | `active`: Whether to loop the current video. If the `loop` attribute is present on a `<video>` or `<audio>` element, this will be automatically set to true This is an object to support future functionality.                                                                                                                                                         |
 | `ads`                | Object                     | `{ enabled: false, publisherId: '' }`                                                                                          | `enabled`: Whether to enable vi.ai ads. `publisherId`: Your unique vi.ai publisher ID.                                                                                                                                                                                                                                                                                 |
+| `urls`               | Object                     | See source.                                                                                                                    | If you wish to override any API URLs then you can do so here. You can also set a custom download URL for the download button.                                                                                                                                                                                                                                          |
 
 1.  Vimeo only
 
