@@ -36,8 +36,26 @@ const support = {
     },
 
     // Picture-in-picture support
-    // Safari only currently
-    pip: (() => !browser.isIPhone && is.function(createElement('video').webkitSetPresentationMode))(),
+    // Safari & Chrome only currently
+    pip: (() => {
+        if (browser.isIPhone) {
+            return false;
+        }
+
+        // Safari
+        // https://developer.apple.com/documentation/webkitjs/adding_picture_in_picture_to_your_safari_media_controls
+        if (is.function(createElement('video').webkitSetPresentationMode)) {
+            return true;
+        }
+
+        // Chrome
+        // https://developers.google.com/web/updates/2018/10/watch-video-using-picture-in-picture
+        if (document.pictureInPictureEnabled && !createElement('video').disablePictureInPicture) {
+            return true;
+        }
+
+        return false;
+    })(),
 
     // Airplay support
     // Safari only currently
