@@ -114,18 +114,20 @@ const source = {
                 // HTML5 stuff
                 if (this.isHTML5) {
                     // Setup captions
-                    if ('tracks' in input) {
+                    if (Object.keys(input).includes('tracks')) {
                         source.insertElements.call(this, 'track', input.tracks);
                     }
-
-                    // Load HTML5 sources
-                    this.media.load();
                 }
 
                 // If HTML5 or embed but not fully supported, setupInterface and call ready now
                 if (this.isHTML5 || (this.isEmbed && !this.supported.ui)) {
                     // Setup interface
                     ui.build.call(this);
+                }
+
+                if (this.isHTML5) {
+                    // Load HTML5 sources
+                    this.media.load();
                 }
 
                 // Update the fullscreen support
