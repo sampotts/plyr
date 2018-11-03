@@ -293,7 +293,7 @@ export function setFocus(element = null, tabFocus = false) {
     }
 
     // Set regular focus
-    element.focus();
+    element.focus({ preventScroll: true });
 
     // If we want to mimic keyboard focus via tab
     if (tabFocus) {
