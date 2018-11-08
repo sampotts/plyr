@@ -1480,7 +1480,7 @@ typeof navigator === "object" && (function (global, factory) {
         // Set @@toStringTag to native iterators
         _setToStringTag(IteratorPrototype, TAG, true);
         // fix for some old engines
-        if (typeof IteratorPrototype[ITERATOR$3] != 'function') _hide(IteratorPrototype, ITERATOR$3, returnThis);
+        if (!_library && typeof IteratorPrototype[ITERATOR$3] != 'function') _hide(IteratorPrototype, ITERATOR$3, returnThis);
       }
     }
     // fix Array#{values, @@iterator}.name in V8 / FF
@@ -1489,7 +1489,7 @@ typeof navigator === "object" && (function (global, factory) {
       $default = function values() { return $native.call(this); };
     }
     // Define iterator
-    if (BUGGY || VALUES_BUG || !proto[ITERATOR$3]) {
+    if ((!_library || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR$3])) {
       _hide(proto, ITERATOR$3, $default);
     }
     // Plug for library
@@ -2650,7 +2650,7 @@ typeof navigator === "object" && (function (global, factory) {
       return capability.promise;
     }
   });
-  _export(_export.S + _export.F * (!USE_NATIVE), PROMISE, {
+  _export(_export.S + _export.F * (_library || !USE_NATIVE), PROMISE, {
     // 25.4.4.6 Promise.resolve(x)
     resolve: function resolve(x) {
       return _promiseResolve(_library && this === Wrapper ? $Promise : this, x);
@@ -3195,15 +3195,12 @@ typeof navigator === "object" && (function (global, factory) {
   } // Element matches selector
 
   function matches(element, selector) {
-    var prototype = {
-      Element: Element
-    };
 
     function match() {
       return Array.from(document.querySelectorAll(selector)).includes(this);
     }
 
-    var matches = prototype.matches || prototype.webkitMatchesSelector || prototype.mozMatchesSelector || prototype.msMatchesSelector || match;
+    var matches = match;
     return matches.call(element, selector);
   } // Find all elements
 
@@ -3259,7 +3256,9 @@ typeof navigator === "object" && (function (global, factory) {
     } // Set regular focus
 
 
-    element.focus(); // If we want to mimic keyboard focus via tab
+    element.focus({
+      preventScroll: true
+    }); // If we want to mimic keyboard focus via tab
 
     if (tabFocus) {
       toggleClass(element, this.config.classNames.tabFocus);
@@ -3363,26 +3362,20 @@ typeof navigator === "object" && (function (global, factory) {
           _inputType$split2 = _slicedToArray(_inputType$split, 1),
           mediaType = _inputType$split2[0];
 
+      var type = inputType; // Verify we're using HTML5 and there's no media type mismatch
+
       if (!this.isHTML5 || mediaType !== this.type) {
         return false;
-      }
+      } // Add codec if required
 
-      var type;
 
-      if (inputType && inputType.includes('codecs=')) {
-        // Use input directly
-        type = inputType;
-      } else if (inputType === 'audio/mpeg') {
-        // Skip codec
-        type = 'audio/mpeg;';
-      } else if (inputType in defaultCodecs) {
-        // Use codec
-        type = "".concat(inputType, "; codecs=\"").concat(defaultCodecs[inputType], "\"");
+      if (Object.keys(defaultCodecs).includes(type)) {
+        type += "; codecs=\"".concat(defaultCodecs[inputType], "\"");
       }
 
       try {
         return Boolean(type && this.media.canPlayType(type).replace(/no/, ''));
-      } catch (err) {
+      } catch (e) {
         return false;
       }
     },
@@ -5855,7 +5848,7 @@ typeof navigator === "object" && (function (global, factory) {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.4.6/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.4.7/plyr.svg',
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
     // Quality default
@@ -6988,7 +6981,7 @@ typeof navigator === "object" && (function (global, factory) {
         }); // Check for audio tracks on load
         // We can't use `loadedmetadata` as it doesn't seem to have audio tracks at that point
 
-        on.call(player, player.media, 'canplay', function () {
+        on.call(player, player.media, 'canplay loadeddata', function () {
           toggleHidden(elements.volume, !player.hasAudio);
           toggleHidden(elements.buttons.mute, !player.hasAudio);
         }); // Handle the media finishing
@@ -7404,9 +7397,7 @@ typeof navigator === "object" && (function (global, factory) {
 
   var loadjs_umd = createCommonjsModule(function (module, exports) {
   (function(root, factory) {
-    if (typeof undefined === 'function' && undefined.amd) {
-      undefined([], factory);
-    } else {
+    {
       module.exports = factory();
     }
   }(commonjsGlobal, function() {
@@ -7762,12 +7753,13 @@ typeof navigator === "object" && (function (global, factory) {
     // Set aspect ratio
     // For Vimeo we have an extra 300% height <div> to hide the standard controls and UI
     setAspectRatio: function setAspectRatio(input) {
-      var _split = (is$1.string(input) ? input : this.config.ratio).split(':'),
-          _split2 = _slicedToArray(_split, 2),
-          x = _split2[0],
-          y = _split2[1];
+      var _split$map = (is$1.string(input) ? input : this.config.ratio).split(':').map(Number),
+          _split$map2 = _slicedToArray(_split$map, 2),
+          x = _split$map2[0],
+          y = _split$map2[1];
 
       var padding = 100 / x * y;
+      vimeo.padding = padding;
       this.elements.wrapper.style.paddingBottom = "".concat(padding, "%");
 
       if (this.supported.ui) {
@@ -7971,8 +7963,8 @@ typeof navigator === "object" && (function (global, factory) {
       }); // Set aspect ratio based on video size
 
       Promise.all([player.embed.getVideoWidth(), player.embed.getVideoHeight()]).then(function (dimensions) {
-        var ratio = getAspectRatio(dimensions[0], dimensions[1]);
-        vimeo.setAspectRatio.call(_this2, ratio);
+        vimeo.ratio = getAspectRatio(dimensions[0], dimensions[1]);
+        vimeo.setAspectRatio.call(_this2, vimeo.ratio);
       }); // Set autopause
 
       player.embed.setAutopause(player.config.autopause).then(function (state) {
@@ -8063,6 +8055,24 @@ typeof navigator === "object" && (function (global, factory) {
       player.embed.on('error', function (detail) {
         player.media.error = detail;
         triggerEvent.call(player, player.media, 'error');
+      }); // Set height/width on fullscreen
+
+      player.on('enterfullscreen exitfullscreen', function (event) {
+        var target = player.fullscreen.target; // Ignore for iOS native
+
+        if (target !== player.elements.container) {
+          return;
+        }
+
+        var toggle = event.type === 'enterfullscreen';
+
+        var _vimeo$ratio$split$ma = vimeo.ratio.split(':').map(Number),
+            _vimeo$ratio$split$ma2 = _slicedToArray(_vimeo$ratio$split$ma, 2),
+            x = _vimeo$ratio$split$ma2[0],
+            y = _vimeo$ratio$split$ma2[1];
+
+        var dimension = x > y ? 'width' : 'height';
+        target.style[dimension] = toggle ? "".concat(vimeo.padding, "%") : null;
       }); // Rebuild UI
 
       setTimeout(function () {
@@ -9237,18 +9247,20 @@ typeof navigator === "object" && (function (global, factory) {
 
         if (_this2.isHTML5) {
           // Setup captions
-          if ('tracks' in input) {
+          if (Object.keys(input).includes('tracks')) {
             source.insertElements.call(_this2, 'track', input.tracks);
-          } // Load HTML5 sources
-
-
-          _this2.media.load();
+          }
         } // If HTML5 or embed but not fully supported, setupInterface and call ready now
 
 
         if (_this2.isHTML5 || _this2.isEmbed && !_this2.supported.ui) {
           // Setup interface
           ui.build.call(_this2);
+        }
+
+        if (_this2.isHTML5) {
+          // Load HTML5 sources
+          _this2.media.load();
         } // Update the fullscreen support
 
 

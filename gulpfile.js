@@ -447,7 +447,16 @@ if (Object.keys(credentials).includes('aws') && Object.keys(credentials).include
     });
 
     // Do everything
-    gulp.task('deploy', () =>
-        run('version', tasks.clean, tasks.js, tasks.sass, tasks.sprite, 'cdn', 'purge', 'demo', 'open'),
+    gulp.task(
+        'deploy',
+        gulp.series(
+            'version',
+            tasks.clean,
+            gulp.parallel(tasks.js, tasks.sass, tasks.sprite),
+            'cdn',
+            'demo',
+            'purge',
+            'open',
+        ),
     );
 }
