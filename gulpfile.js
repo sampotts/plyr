@@ -12,7 +12,6 @@ const concat = require('gulp-concat');
 const filter = require('gulp-filter');
 const sass = require('gulp-sass');
 const cleancss = require('gulp-clean-css');
-const run = require('run-sequence');
 const header = require('gulp-header');
 const prefix = require('gulp-autoprefixer');
 const gitbranch = require('git-branch');
@@ -106,13 +105,15 @@ const babelrc = (polyfill = false) => ({
 });
 
 // Clean out /dist
-gulp.task('clean', () => {
+gulp.task('clean', done => {
     const dirs = [paths.plyr.output, paths.demo.output].map(dir => path.join(dir, '**/*'));
 
     // Don't delete the mp4
     dirs.push(`!${path.join(paths.plyr.output, '**/*.mp4')}`);
 
     del(dirs);
+
+    done();
 });
 
 const build = {
@@ -201,31 +202,25 @@ build.sass(bundles.demo.sass, 'demo');
 build.js(bundles.demo.js, 'demo', { format: 'iife' });
 
 // Build all JS
-gulp.task('js', () => {
-    run(tasks.js);
-});
+gulp.task('js', () => gulp.parallel(tasks.js));
 
 // Watch for file changes
 gulp.task('watch', () => {
     // Plyr core
-    gulp.watch(paths.plyr.src.js, tasks.js);
-    gulp.watch(paths.plyr.src.sass, tasks.sass);
-    gulp.watch(paths.plyr.src.sprite, tasks.sprite);
+    gulp.watch(paths.plyr.src.js, gulp.parallel(tasks.js));
+    gulp.watch(paths.plyr.src.sass, gulp.parallel(tasks.sass));
+    gulp.watch(paths.plyr.src.sprite, gulp.parallel(tasks.sprite));
 
     // Demo
-    gulp.watch(paths.demo.src.js, tasks.js);
-    gulp.watch(paths.demo.src.sass, tasks.sass);
+    gulp.watch(paths.demo.src.js, gulp.parallel(tasks.js));
+    gulp.watch(paths.demo.src.sass, gulp.parallel(tasks.sass));
 });
 
 // Build distribution
-gulp.task('build', () => {
-    run(tasks.clean, tasks.js, tasks.sass, tasks.sprite);
-});
+gulp.task('build', gulp.series(tasks.clean, gulp.parallel(tasks.js, tasks.sass, tasks.sprite)));
 
 // Default gulp task
-gulp.task('default', () => {
-    run('build', 'watch');
-});
+gulp.task('default', gulp.series('build', 'watch'));
 
 // Publish a version to CDN and demo
 // --------------------------------------------
