@@ -70,8 +70,9 @@ const vimeo = {
     // Set aspect ratio
     // For Vimeo we have an extra 300% height <div> to hide the standard controls and UI
     setAspectRatio(input) {
-        const [x, y] = (is.string(input) ? input : this.config.ratio).split(':');
+        const [x, y] = (is.string(input) ? input : this.config.ratio).split(':').map(Number);
         const padding = (100 / x) * y;
+        vimeo.padding = padding;
         this.elements.wrapper.style.paddingBottom = `${padding}%`;
 
         if (this.supported.ui) {
@@ -299,8 +300,8 @@ const vimeo = {
 
         // Set aspect ratio based on video size
         Promise.all([player.embed.getVideoWidth(), player.embed.getVideoHeight()]).then(dimensions => {
-            const ratio = getAspectRatio(dimensions[0], dimensions[1]);
-            vimeo.setAspectRatio.call(this, ratio);
+            vimeo.ratio = getAspectRatio(dimensions[0], dimensions[1]);
+            vimeo.setAspectRatio.call(this, vimeo.ratio);
         });
 
         // Set autopause
@@ -402,6 +403,22 @@ const vimeo = {
         player.embed.on('error', detail => {
             player.media.error = detail;
             triggerEvent.call(player, player.media, 'error');
+        });
+
+        // Set height/width on fullscreen
+        player.on('enterfullscreen exitfullscreen', event => {
+            const { target } = player.fullscreen;
+
+            // Ignore for iOS native
+            if (target !== player.elements.container) {
+                return;
+            }
+
+            const toggle = event.type === 'enterfullscreen';
+            const [x, y] = vimeo.ratio.split(':').map(Number);
+            const dimension = x > y ? 'width' : 'height';
+
+            target.style[dimension] = toggle ? `${vimeo.padding}%` : null;
         });
 
         // Rebuild UI
