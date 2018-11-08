@@ -12,7 +12,7 @@ $plyr-range-thumb-border: 2px solid transparent !default;
 $plyr-range-thumb-shadow: 0 1px 1px rgba(#000, 0.15), 0 0 0 1px rgba($plyr-color-gunmetal, 0.2) !default;
 
 // Track
-$plyr-range-track-height: 6px !default;
+$plyr-range-track-height: 4px !default;
 $plyr-range-max-height: ($plyr-range-thumb-active-shadow-width * 2) + $plyr-range-thumb-height !default;
 
 // Fill
