@@ -4,17 +4,18 @@
 
 import captions from './captions';
 import controls from './controls';
-import i18n from './i18n';
 import support from './support';
-import utils from './utils';
-
-// Sniff out the browser
-const browser = utils.getBrowser();
+import browser from './utils/browser';
+import { getElement, toggleClass } from './utils/elements';
+import { ready, triggerEvent } from './utils/events';
+import i18n from './utils/i18n';
+import is from './utils/is';
+import loadImage from './utils/loadImage';
 
 const ui = {
     addStyleHook() {
-        utils.toggleClass(this.elements.container, this.config.selectors.container.replace('.', ''), true);
-        utils.toggleClass(this.elements.container, this.config.classNames.uiSupported, this.supported.ui);
+        toggleClass(this.elements.container, this.config.selectors.container.replace('.', ''), true);
+        toggleClass(this.elements.container, this.config.classNames.uiSupported, this.supported.ui);
     },
 
     // Toggle native HTML5 media controls
@@ -44,7 +45,7 @@ const ui = {
         }
 
         // Inject custom controls if not present
-        if (!utils.is.element(this.elements.controls)) {
+        if (!is.element(this.elements.controls)) {
             // Inject custom controls
             controls.inject.call(this);
 
@@ -55,8 +56,10 @@ const ui = {
         // Remove native controls
         ui.toggleNativeControls.call(this);
 
-        // Captions
-        captions.setup.call(this);
+        // Setup captions for HTML5
+        if (this.isHTML5) {
+            captions.setup.call(this);
+        }
 
         // Reset volume
         this.volume = null;
@@ -83,31 +86,41 @@ const ui = {
         ui.checkPlaying.call(this);
 
         // Check for picture-in-picture support
-        utils.toggleClass(this.elements.container, this.config.classNames.pip.supported, support.pip && this.isHTML5 && this.isVideo);
+        toggleClass(
+            this.elements.container,
+            this.config.classNames.pip.supported,
+            support.pip && this.isHTML5 && this.isVideo,
+        );
 
         // Check for airplay support
-        utils.toggleClass(this.elements.container, this.config.classNames.airplay.supported, support.airplay && this.isHTML5);
+        toggleClass(this.elements.container, this.config.classNames.airplay.supported, support.airplay && this.isHTML5);
 
         // Add iOS class
-        utils.toggleClass(this.elements.container, this.config.classNames.isIos, browser.isIos);
+        toggleClass(this.elements.container, this.config.classNames.isIos, browser.isIos);
 
         // Add touch class
-        utils.toggleClass(this.elements.container, this.config.classNames.isTouch, this.touch);
+        toggleClass(this.elements.container, this.config.classNames.isTouch, this.touch);
 
         // Ready for API calls
         this.ready = true;
 
         // Ready event at end of execution stack
         setTimeout(() => {
-            utils.dispatchEvent.call(this, this.media, 'ready');
+            triggerEvent.call(this, this.media, 'ready');
         }, 0);
 
         // Set the title
         ui.setTitle.call(this);
 
         // Assure the poster image is set, if the property was added before the element was created
-        if (this.poster && this.elements.poster && !this.elements.poster.style.backgroundImage) {
-            ui.setPoster.call(this, this.poster);
+        if (this.poster) {
+            ui.setPoster.call(this, this.poster, false).catch(() => {});
+        }
+
+        // Manually set the duration if user has overridden it.
+        // The event listeners for it doesn't get called if preload is disabled (#701)
+        if (this.config.duration) {
+            controls.durationUpdate.call(this);
         }
     },
 
@@ -117,31 +130,26 @@ const ui = {
         let label = i18n.get('play', this.config);
 
         // If there's a media title set, use that for the label
-        if (utils.is.string(this.config.title) && !utils.is.empty(this.config.title)) {
+        if (is.string(this.config.title) && !is.empty(this.config.title)) {
             label += `, ${this.config.title}`;
-
-            // Set container label
-            this.elements.container.setAttribute('aria-label', this.config.title);
         }
 
         // If there's a play button, set label
-        if (utils.is.nodeList(this.elements.buttons.play)) {
-            Array.from(this.elements.buttons.play).forEach(button => {
-                button.setAttribute('aria-label', label);
-            });
-        }
+        Array.from(this.elements.buttons.play || []).forEach(button => {
+            button.setAttribute('aria-label', label);
+        });
 
         // Set iframe title
         // https://github.com/sampotts/plyr/issues/124
         if (this.isEmbed) {
-            const iframe = utils.getElement.call(this, 'iframe');
+            const iframe = getElement.call(this, 'iframe');
 
-            if (!utils.is.element(iframe)) {
+            if (!is.element(iframe)) {
                 return;
             }
 
             // Default to media type
-            const title = !utils.is.empty(this.config.title) ? this.config.title : 'video';
+            const title = !is.empty(this.config.title) ? this.config.title : 'video';
             const format = i18n.get('frameTitle', this.config);
 
             iframe.setAttribute('title', format.replace('{title}', title));
@@ -150,51 +158,66 @@ const ui = {
 
     // Toggle poster
     togglePoster(enable) {
-        utils.toggleClass(this.elements.container, this.config.classNames.posterEnabled, enable);
+        toggleClass(this.elements.container, this.config.classNames.posterEnabled, enable);
     },
 
     // Set the poster image (async)
-    setPoster(poster) {
-        // Set property regardless of validity
-        this.media.setAttribute('poster', poster);
-
-        // Bail if element is missing
-        if (!utils.is.element(this.elements.poster)) {
-            return Promise.reject();
+    // Used internally for the poster setter, with the passive option forced to false
+    setPoster(poster, passive = true) {
+        // Don't override if call is passive
+        if (passive && this.poster) {
+            return Promise.reject(new Error('Poster already set'));
         }
 
-        // Load the image, and set poster if successful
-        const loadPromise = utils.loadImage(poster)
-            .then(() => {
-                this.elements.poster.style.backgroundImage = `url('${poster}')`;
-                Object.assign(this.elements.poster.style, {
-                    backgroundImage: `url('${poster}')`,
-                    // Reset backgroundSize as well (since it can be set to "cover" for padded thumbnails for youtube)
-                    backgroundSize: '',
-                });
-                ui.togglePoster.call(this, true);
-                return poster;
-            });
+        // Set property synchronously to respect the call order
+        this.media.setAttribute('poster', poster);
 
-        // Hide the element if the poster can't be loaded (otherwise it will just be a black element covering the video)
-        loadPromise.catch(() => ui.togglePoster.call(this, false));
-
-        // Return the promise so the caller can use it as well
-        return loadPromise;
+        // Wait until ui is ready
+        return (
+            ready
+                .call(this)
+                // Load image
+                .then(() => loadImage(poster))
+                .catch(err => {
+                    // Hide poster on error unless it's been set by another call
+                    if (poster === this.poster) {
+                        ui.togglePoster.call(this, false);
+                    }
+                    // Rethrow
+                    throw err;
+                })
+                .then(() => {
+                    // Prevent race conditions
+                    if (poster !== this.poster) {
+                        throw new Error('setPoster cancelled by later call to setPoster');
+                    }
+                })
+                .then(() => {
+                    Object.assign(this.elements.poster.style, {
+                        backgroundImage: `url('${poster}')`,
+                        // Reset backgroundSize as well (since it can be set to "cover" for padded thumbnails for youtube)
+                        backgroundSize: '',
+                    });
+                    ui.togglePoster.call(this, true);
+                    return poster;
+                })
+        );
     },
 
     // Check playing state
     checkPlaying(event) {
         // Class hooks
-        utils.toggleClass(this.elements.container, this.config.classNames.playing, this.playing);
-        utils.toggleClass(this.elements.container, this.config.classNames.paused, this.paused);
-        utils.toggleClass(this.elements.container, this.config.classNames.stopped, this.stopped);
+        toggleClass(this.elements.container, this.config.classNames.playing, this.playing);
+        toggleClass(this.elements.container, this.config.classNames.paused, this.paused);
+        toggleClass(this.elements.container, this.config.classNames.stopped, this.stopped);
 
-        // Set ARIA state
-        utils.toggleState(this.elements.buttons.play, this.playing);
+        // Set state
+        Array.from(this.elements.buttons.play || []).forEach(target => {
+            target.pressed = this.playing;
+        });
 
         // Only update controls on non timeupdate events
-        if (utils.is.event(event) && event.type === 'timeupdate') {
+        if (is.event(event) && event.type === 'timeupdate') {
             return;
         }
 
@@ -204,10 +227,7 @@ const ui = {
 
     // Check if media is loading
     checkLoading(event) {
-        this.loading = [
-            'stalled',
-            'waiting',
-        ].includes(event.type);
+        this.loading = ['stalled', 'waiting'].includes(event.type);
 
         // Clear timer
         clearTimeout(this.timers.loading);
@@ -215,7 +235,7 @@ const ui = {
         // Timer to prevent flicker when seeking
         this.timers.loading = setTimeout(() => {
             // Update progress bar loading class state
-            utils.toggleClass(this.elements.container, this.config.classNames.loading, this.loading);
+            toggleClass(this.elements.container, this.config.classNames.loading, this.loading);
 
             // Update controls visibility
             ui.toggleControls.call(this);
@@ -227,8 +247,11 @@ const ui = {
         const { controls } = this.elements;
 
         if (controls && this.config.hideControls) {
-            // Show controls if force, loading, paused, or button interaction, otherwise hide
-            this.toggleControls(Boolean(force || this.loading || this.paused || controls.pressed || controls.hover));
+            // Don't hide controls if a touch-device user recently seeked. (Must be limited to touch devices, or it occasionally prevents desktop controls from hiding.)
+            const recentTouchSeek = (this.touch && this.lastSeekTime + 2000 > Date.now());
+
+            // Show controls if force, loading, paused, button interaction, or recent seek, otherwise hide
+            this.toggleControls(Boolean(force || this.loading || this.paused || controls.pressed || controls.hover || recentTouchSeek));
         }
     },
 };

@@ -11,66 +11,43 @@
 .plyr__controls {
     align-items: center;
     display: flex;
+    justify-content: flex-end;
     text-align: center;
 
     // Spacing
     > .plyr__control,
     .plyr__progress,
     .plyr__time,
-    .plyr__menu {
-        margin-left: ($plyr-control-spacing / 2);
-
-        &:first-child,
-        &:first-child + [data-plyr='pause'] {
-            margin-left: 0;
-        }
-    }
-
+    .plyr__menu,
     .plyr__volume {
         margin-left: ($plyr-control-spacing / 2);
     }
 
+    .plyr__menu + .plyr__control,
+    > .plyr__control + .plyr__menu,
+    > .plyr__control + .plyr__control,
+    .plyr__progress + .plyr__control {
+        margin-left: floor($plyr-control-spacing / 4);
+    }
+
+    > .plyr__control:first-child,
+    > .plyr__control:first-child + [data-plyr='pause'] {
+        margin-left: 0;
+        margin-right: auto;
+    }
+
+    // Hide empty controls
+    &:empty {
+        display: none;
+    }
+
     @media (min-width: $plyr-bp-sm) {
         > .plyr__control,
+        .plyr__menu,
         .plyr__progress,
         .plyr__time,
-        .plyr__menu {
+        .plyr__volume {
             margin-left: $plyr-control-spacing;
-        }
-
-        > .plyr__control + .plyr__control,
-        .plyr__menu + .plyr__control,
-        > .plyr__control + .plyr__menu {
-            margin-left: ($plyr-control-spacing / 2);
-        }
-    }
-}
-
-// Video controls
-.plyr--video .plyr__controls {
-    background: linear-gradient(rgba($plyr-video-controls-bg, 0), rgba($plyr-video-controls-bg, 0.7));
-    border-bottom-left-radius: inherit;
-    border-bottom-right-radius: inherit;
-    bottom: 0;
-    color: $plyr-video-control-color;
-    left: 0;
-    padding: ($plyr-control-spacing * 3.5) $plyr-control-spacing $plyr-control-spacing;
-    position: absolute;
-    right: 0;
-    transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
-    z-index: 2;
-
-    .plyr__control {
-        svg {
-            filter: drop-shadow(0 1px 1px rgba(#000, 0.15));
-        }
-
-        // Hover and tab focus
-        &.plyr__tab-focus,
-        &:hover,
-        &[aria-expanded='true'] {
-            background: $plyr-video-control-bg-hover;
-            color: $plyr-video-control-color-hover;
         }
     }
 }
@@ -83,7 +60,29 @@
     padding: $plyr-control-spacing;
 }
 
-// Hide controls
+// Video controls
+.plyr--video .plyr__controls {
+    background: linear-gradient(
+        rgba($plyr-video-controls-bg, 0),
+        rgba($plyr-video-controls-bg, 0.7)
+    );
+    border-bottom-left-radius: inherit;
+    border-bottom-right-radius: inherit;
+    bottom: 0;
+    color: $plyr-video-control-color;
+    left: 0;
+    padding: ($plyr-control-spacing * 2) ($plyr-control-spacing / 2) ($plyr-control-spacing / 2);
+    position: absolute;
+    right: 0;
+    transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+    z-index: 3;
+
+    @media (min-width: $plyr-bp-sm) {
+        padding: ($plyr-control-spacing * 3.5) $plyr-control-spacing $plyr-control-spacing;
+    }
+}
+
+// Hide video controls
 .plyr--video.plyr--hide-controls .plyr__controls {
     opacity: 0;
     pointer-events: none;

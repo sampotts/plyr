@@ -14,7 +14,6 @@ const sass = require('gulp-sass');
 const cleancss = require('gulp-clean-css');
 const postcss = require('gulp-postcss');
 const customprops = require('postcss-custom-properties');
-const run = require('run-sequence');
 const header = require('gulp-header');
 const prefix = require('gulp-autoprefixer');
 const gitbranch = require('git-branch');
@@ -31,17 +30,11 @@ const sourcemaps = require('gulp-sourcemaps');
 const uglify = require('gulp-uglify-es').default;
 const commonjs = require('rollup-plugin-commonjs');
 const resolve = require('rollup-plugin-node-resolve');
+const FastlyPurge = require('fastly-purge');
+const through = require('through2');
 
 const bundles = require('./bundles.json');
 const pkg = require('./package.json');
-
-// Get AWS config
-let aws = {};
-try {
-    aws = require('./aws.json'); //eslint-disable-line
-} catch (e) {
-    // Do nothing
-}
 
 const minSuffix = '.min';
 
@@ -52,7 +45,7 @@ const paths = {
         // Source paths
         src: {
             sass: path.join(root, 'src/sass/**/*.scss'),
-            js: path.join(root, 'src/js/**/*'),
+            js: path.join(root, 'src/js/**/*.js'),
             sprite: path.join(root, 'src/sprite/*.svg'),
         },
 
@@ -63,7 +56,7 @@ const paths = {
         // Source paths
         src: {
             sass: path.join(root, 'demo/src/sass/**/*.scss'),
-            js: path.join(root, 'demo/src/js/**/*'),
+            js: path.join(root, 'demo/src/js/**/*.js'),
         },
 
         // Output paths
@@ -96,33 +89,33 @@ const sizeOptions = { showFiles: true, gzip: true };
 const browsers = ['> 1%'];
 
 // Babel config
-const babelrc = {
-    presets: [[
-        'env',
+const babelrc = (polyfill = false) => ({
+    presets: [
+        [
+            '@babel/preset-env',
         {
             targets: {
                 browsers,
             },
-            useBuiltIns: true,
+                useBuiltIns: polyfill ? 'usage' : false,
             modules: false,
         },
-    ]],
-    plugins: ['external-helpers'],
+        ],
+    ],
     babelrc: false,
     exclude: 'node_modules/**',
-};
+});
 
 // Clean out /dist
-gulp.task('clean', () => {
-    const dirs = [
-        paths.plyr.output,
-        paths.demo.output,
-    ].map(dir => path.join(dir, '**/*'));
+gulp.task('clean', done => {
+    const dirs = [paths.plyr.output, paths.demo.output].map(dir => path.join(dir, '**/*'));
 
     // Don't delete the mp4
     dirs.push(`!${path.join(paths.plyr.output, '**/*.mp4')}`);
 
     del(dirs);
+
+    done();
 });
 
 const build = {
@@ -131,6 +124,7 @@ const build = {
             const name = `js:${key}`;
             tasks.js.push(name);
             const { output } = paths[bundle];
+            const polyfill = name.includes('polyfilled');
 
             return gulp.task(name, () =>
                 gulp
@@ -140,11 +134,7 @@ const build = {
                     .pipe(
                         rollup(
                             {
-                                plugins: [
-                                    resolve(),
-                                    commonjs(),
-                                    babel(babelrc),
-                                ],
+                                plugins: [resolve(), commonjs(), babel(babelrc(polyfill))],
                             },
                             options,
                         ),
@@ -190,9 +180,11 @@ const build = {
                 .src(paths[bundle].src.sprite)
                 .pipe(
                     svgmin({
-                        plugins: [{
+                        plugins: [
+                            {
                             removeDesc: true,
-                        }],
+                            },
+                        ],
                     }),
                 )
                 .pipe(svgstore())
@@ -213,43 +205,47 @@ build.sass(bundles.demo.sass, 'demo');
 build.js(bundles.demo.js, 'demo', { format: 'iife' });
 
 // Build all JS
-gulp.task('js', () => {
-    run(tasks.js);
-});
+gulp.task('js', () => gulp.parallel(tasks.js));
 
 // Watch for file changes
 gulp.task('watch', () => {
     // Plyr core
-    gulp.watch(paths.plyr.src.js, tasks.js);
-    gulp.watch(paths.plyr.src.sass, tasks.sass);
-    gulp.watch(paths.plyr.src.sprite, tasks.sprite);
+    gulp.watch(paths.plyr.src.js, gulp.parallel(tasks.js));
+    gulp.watch(paths.plyr.src.sass, gulp.parallel(tasks.sass));
+    gulp.watch(paths.plyr.src.sprite, gulp.parallel(tasks.sprite));
 
     // Demo
-    gulp.watch(paths.demo.src.js, tasks.js);
-    gulp.watch(paths.demo.src.sass, tasks.sass);
+    gulp.watch(paths.demo.src.js, gulp.parallel(tasks.js));
+    gulp.watch(paths.demo.src.sass, gulp.parallel(tasks.sass));
 });
 
+// Build distribution
+gulp.task('build', gulp.series(tasks.clean, gulp.parallel(tasks.js, tasks.sass, tasks.sprite)));
+
 // Default gulp task
-gulp.task('default', () => {
-    run(tasks.clean, tasks.js, tasks.sass, tasks.sprite, 'watch');
-});
+gulp.task('default', gulp.series('build', 'watch'));
 
 // Publish a version to CDN and demo
 // --------------------------------------------
-// If aws is setup
-if (Object.keys(aws).includes('cdn') && Object.keys(aws).includes('demo')) {
+// Get deployment config
+let credentials = {};
+try {
+    credentials = require('./credentials.json'); //eslint-disable-line
+} catch (e) {
+    // Do nothing
+}
+
+// If deployment is setup
+if (Object.keys(credentials).includes('aws') && Object.keys(credentials).includes('fastly')) {
     const { version } = pkg;
+    const { aws, fastly } = credentials;
 
     // Get branch info
     const branch = {
         current: gitbranch.sync(),
         master: 'master',
-        beta: 'beta',
+        develop: 'develop',
     };
-    const allowed = [
-        branch.master,
-        branch.beta,
-    ];
 
     const maxAge = 31536000; // 1 year
     const options = {
@@ -260,7 +256,7 @@ if (Object.keys(aws).includes('cdn') && Object.keys(aws).includes('demo')) {
             },
         },
         demo: {
-            uploadPath: branch.current === branch.beta ? 'beta/' : null,
+            uploadPath: branch.current === branch.develop ? 'beta/' : null,
             headers: {
                 'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
                 Vary: 'Accept-Encoding',
@@ -277,33 +273,51 @@ if (Object.keys(aws).includes('cdn') && Object.keys(aws).includes('demo')) {
         },
     };
 
-    const regex = '(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*).(?:0|[1-9][0-9]*)(?:-[\\da-z\\-]+(?:.[\\da-z\\-]+)*)?(?:\\+[\\da-z\\-]+(?:.[\\da-z\\-]+)*)?';
+    const regex =
+        '(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*).(?:0|[1-9][0-9]*)(?:-[\\da-z\\-]+(?:.[\\da-z\\-]+)*)?(?:\\+[\\da-z\\-]+(?:.[\\da-z\\-]+)*)?';
     const semver = new RegExp(`v${regex}`, 'gi');
     const localPath = new RegExp('(../)?dist', 'gi');
     const versionPath = `https://${aws.cdn.domain}/${version}`;
     const cdnpath = new RegExp(`${aws.cdn.domain}/${regex}/`, 'gi');
 
+    const renameFile = rename(p => {
+        p.basename = p.basename.replace(minSuffix, ''); // eslint-disable-line
+        p.dirname = p.dirname.replace('.', version); // eslint-disable-line
+    });
+
+    // Check we're on the correct branch to deploy
+    const canDeploy = () => {
+        const allowed = [branch.master, branch.develop];
+
+        if (!allowed.includes(branch.current)) {
+            console.error(`Must be on ${allowed.join(', ')} to publish! (current: ${branch.current})`);
+
+            return false;
+        }
+
+        return true;
+    };
+
     gulp.task('version', () => {
+        if (!canDeploy()) {
+            return null;
+        }
+
         console.log(`Updating versions to '${version}'...`);
 
         // Replace versioned URLs in source
-        const files = [
-            'plyr.js',
-            'plyr.polyfilled.js',
-            'defaults.js',
-        ];
+        const files = ['plyr.js', 'plyr.polyfilled.js', 'config/defaults.js'];
 
         return gulp
-            .src(files.map(file => path.join(root, `src/js/${file}`)))
+            .src(files.map(file => path.join(root, `src/js/${file}`)), { base: '.' })
             .pipe(replace(semver, `v${version}`))
             .pipe(replace(cdnpath, `${aws.cdn.domain}/${version}/`))
-            .pipe(gulp.dest(path.join(root, 'src/js/')));
+            .pipe(gulp.dest('./'));
     });
 
     // Publish version to CDN bucket
     gulp.task('cdn', () => {
-        if (!allowed.includes(branch.current)) {
-            console.error(`Must be on ${allowed.join(', ')} to publish! (current: ${branch.current})`);
+        if (!canDeploy()) {
             return null;
         }
 
@@ -313,14 +327,14 @@ if (Object.keys(aws).includes('cdn') && Object.keys(aws).includes('demo')) {
         return (
             gulp
                 .src(paths.upload)
-                .pipe(
-                    rename(p => {
-                        p.basename = p.basename.replace(minSuffix, ''); // eslint-disable-line
-                        p.dirname = p.dirname.replace('.', version); // eslint-disable-line
-                    }),
-                )
+                .pipe(renameFile)
                 // Remove min suffix from source map URL
-                .pipe(replace(/sourceMappingURL=([\w-?.]+)/, (match, p1) => `sourceMappingURL=${p1.replace(minSuffix, '')}`))
+                .pipe(
+                    replace(
+                        /sourceMappingURL=([\w-?.]+)/,
+                        (match, p1) => `sourceMappingURL=${p1.replace(minSuffix, '')}`,
+                    ),
+                )
                 .pipe(
                     size({
                         showFiles: true,
@@ -332,18 +346,46 @@ if (Object.keys(aws).includes('cdn') && Object.keys(aws).includes('demo')) {
         );
     });
 
+    // Purge the fastly cache incase any 403/404 are cached
+    gulp.task('purge', () => {
+        const list = [];
+
+        return gulp
+            .src(paths.upload)
+            .pipe(
+                through.obj((file, enc, cb) => {
+                    const filename = file.path.split('/').pop();
+                    list.push(`${versionPath}/${filename}`);
+                    cb(null);
+                }),
+            )
+            .on('end', () => {
+                const purge = new FastlyPurge(fastly.token);
+
+                list.forEach(url => {
+                    console.log(`Purging ${url}...`);
+
+                    purge.url(url, (error, result) => {
+                        if (error) {
+                            console.log(error);
+                        } else if (result) {
+                            console.log(result);
+                        }
+                    });
+                });
+            });
+    });
+
     // Publish to demo bucket
     gulp.task('demo', () => {
-        if (!allowed.includes(branch.current)) {
-            console.error(`Must be on ${allowed.join(', ')} to publish! (current: ${branch.current})`);
+        if (!canDeploy()) {
             return null;
         }
 
         console.log(`Uploading '${version}' demo to ${aws.demo.domain}...`);
 
         // Replace versioned files in readme.md
-        gulp
-            .src([`${root}/readme.md`])
+        gulp.src([`${root}/readme.md`])
             .pipe(replace(cdnpath, `${aws.cdn.domain}/${version}/`))
             .pipe(gulp.dest(root));
 
@@ -357,8 +399,7 @@ if (Object.keys(aws).includes('cdn') && Object.keys(aws).includes('demo')) {
             pages.push(error);
         }
 
-        gulp
-            .src(pages)
+        gulp.src(pages)
             .pipe(replace(localPath, versionPath))
             .pipe(s3(aws.demo, options.demo));
 
@@ -397,22 +438,28 @@ if (Object.keys(aws).includes('cdn') && Object.keys(aws).includes('demo')) {
             }));
     }); */
 
-    // Open the demo site to check it's sweet
-    gulp.task('open', () => {
-        console.log(`Opening ${aws.demo.domain}...`);
-
-        // A file must be specified or gulp will skip the task
-        // Doesn't matter which file since we set the URL above
-        // Weird, I know...
-        return gulp.src([`${paths.demo.root}index.html`]).pipe(
-            open('', {
-                url: `http://${aws.demo.domain}`,
+    // Open the demo site to check it's ok
+    gulp.task('open', callback => {
+        gulp.src(__filename).pipe(
+            open({
+                uri: `https://${aws.demo.domain}`,
             }),
         );
+
+        callback();
     });
 
     // Do everything
-    gulp.task('publish', callback => {
-        run('version', tasks.clean, tasks.js, tasks.sass, tasks.sprite, 'cdn', 'demo', callback);
-    });
+    gulp.task(
+        'deploy',
+        gulp.series(
+            'version',
+            tasks.clean,
+            gulp.parallel(tasks.js, tasks.sass, tasks.sprite),
+            'cdn',
+            'demo',
+            'purge',
+            'open',
+        ),
+    );
 }

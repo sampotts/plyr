@@ -18,6 +18,10 @@ const defaults = {
     // Only allow one media playing at once (vimeo only)
     autopause: true,
 
+    // Allow inline playback on iOS (this effects YouTube/Vimeo - HTML5 requires the attribute present)
+    // TODO: Remove iosNative fullscreen option in favour of this (logic needs work)
+    playsinline: true,
+
     // Default time to skip when rewind/fast forward
     seekTime: 10,
 
@@ -56,7 +60,7 @@ const defaults = {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.3.7/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.4.7/plyr.svg',
 
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
@@ -64,19 +68,7 @@ const defaults = {
     // Quality default
     quality: {
         default: 576,
-        options: [
-            4320,
-            2880,
-            2160,
-            1440,
-            1080,
-            720,
-            576,
-            480,
-            360,
-            240,
-            'default', // YouTube's "auto"
-        ],
+        options: [4320, 2880, 2160, 1440, 1080, 720, 576, 480, 360, 240],
     },
 
     // Set loops
@@ -89,15 +81,7 @@ const defaults = {
     // Speed default and options to display
     speed: {
         selected: 1,
-        options: [
-            0.5,
-            0.75,
-            1,
-            1.25,
-            1.5,
-            1.75,
-            2,
-        ],
+        options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2],
     },
 
     // Keyboard shortcut settings
@@ -115,7 +99,10 @@ const defaults = {
     // Captions settings
     captions: {
         active: false,
-        language: (navigator.language || navigator.userLanguage).split('-')[0],
+        language: 'auto',
+        // Listen to new tracks added after Plyr is initialized.
+        // This is needed for streaming captions, but may result in unselectable options
+        update: false,
     },
 
     // Fullscreen settings
@@ -146,13 +133,10 @@ const defaults = {
         'settings',
         'pip',
         'airplay',
+        // 'download',
         'fullscreen',
     ],
-    settings: [
-        'captions',
-        'quality',
-        'speed',
-    ],
+    settings: ['captions', 'quality', 'speed'],
 
     // Localisation
     i18n: {
@@ -162,6 +146,7 @@ const defaults = {
         pause: 'Pause',
         fastForward: 'Forward {seektime}s',
         seek: 'Seek',
+        seekLabel: '{currentTime} of {duration}',
         played: 'Played',
         buffered: 'Buffered',
         currentTime: 'Current time',
@@ -171,11 +156,13 @@ const defaults = {
         unmute: 'Unmute',
         enableCaptions: 'Enable captions',
         disableCaptions: 'Disable captions',
+        download: 'Download',
         enterFullscreen: 'Enter fullscreen',
         exitFullscreen: 'Exit fullscreen',
         frameTitle: 'Player for {title}',
         captions: 'Captions',
         settings: 'Settings',
+        menuBack: 'Go back to previous menu',
         speed: 'Speed',
         normal: 'Normal',
         quality: 'Quality',
@@ -187,10 +174,19 @@ const defaults = {
         disabled: 'Disabled',
         enabled: 'Enabled',
         advertisement: 'Ad',
+        qualityBadge: {
+            2160: '4K',
+            1440: 'HD',
+            1080: 'HD',
+            720: 'HD',
+            576: 'SD',
+            480: 'SD',
+        },
     },
 
     // URLs
     urls: {
+        download: null,
         vimeo: {
             sdk: 'https://player.vimeo.com/api/player.js',
             iframe: 'https://player.vimeo.com/video/{0}?{1}',
@@ -198,7 +194,8 @@ const defaults = {
         },
         youtube: {
             sdk: 'https://www.youtube.com/iframe_api',
-            api: 'https://www.googleapis.com/youtube/v3/videos?id={0}&key={1}&fields=items(snippet(title))&part=snippet',
+            api:
+                'https://www.googleapis.com/youtube/v3/videos?id={0}&key={1}&fields=items(snippet(title))&part=snippet',
         },
         googleIMA: {
             sdk: 'https://imasdk.googleapis.com/js/sdkloader/ima3.js',
@@ -216,6 +213,7 @@ const defaults = {
         mute: null,
         volume: null,
         captions: null,
+        download: null,
         fullscreen: null,
         pip: null,
         airplay: null,
@@ -251,6 +249,7 @@ const defaults = {
         'cuechange',
 
         // Custom events
+        'download',
         'enterfullscreen',
         'exitfullscreen',
         'captionsenabled',
@@ -262,8 +261,9 @@ const defaults = {
 
         // YouTube
         'statechange',
+
+        // Quality
         'qualitychange',
-        'qualityrequested',
 
         // Ads
         'adsloaded',
@@ -295,6 +295,7 @@ const defaults = {
             fastForward: '[data-plyr="fast-forward"]',
             mute: '[data-plyr="mute"]',
             captions: '[data-plyr="captions"]',
+            download: '[data-plyr="download"]',
             fullscreen: '[data-plyr="fullscreen"]',
             pip: '[data-plyr="pip"]',
             airplay: '[data-plyr="airplay"]',
@@ -311,13 +312,13 @@ const defaults = {
         display: {
             currentTime: '.plyr__time--current',
             duration: '.plyr__time--duration',
-            buffer: '.plyr__progress--buffer',
-            played: '.plyr__progress--played',
-            loop: '.plyr__progress--loop',
+            buffer: '.plyr__progress__buffer',
+            loop: '.plyr__progress__loop', // Used later
             volume: '.plyr__volume--display',
         },
         progress: '.plyr__progress',
         captions: '.plyr__captions',
+        caption: '.plyr__caption',
         menu: {
             quality: '.js-plyr__menu__list--quality',
         },
@@ -334,6 +335,7 @@ const defaults = {
         posterEnabled: 'plyr__poster-enabled',
         ads: 'plyr__ads',
         control: 'plyr__control',
+        controlPressed: 'plyr__control--pressed',
         playing: 'plyr--playing',
         paused: 'plyr--paused',
         stopped: 'plyr--stopped',
@@ -347,6 +349,9 @@ const defaults = {
         isTouch: 'plyr--is-touch',
         uiSupported: 'plyr--full-ui',
         noTransition: 'plyr--no-transition',
+        display: {
+            time: 'plyr__time',
+        },
         menu: {
             value: 'plyr__menu__value',
             badge: 'plyr__badge',

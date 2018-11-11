@@ -33,16 +33,41 @@
     }
 }
 
+// Remove any link styling
+a.plyr__control {
+    text-decoration: none;
+
+    &::after,
+    &::before {
+        display: none;
+    }
+}
+
 // Change icons on state change
-.plyr__control[aria-pressed='false'] .icon--pressed,
-.plyr__control[aria-pressed='true'] .icon--not-pressed,
-.plyr__control[aria-pressed='false'] .label--pressed,
-.plyr__control[aria-pressed='true'] .label--not-pressed {
+.plyr__control:not(.plyr__control--pressed) .icon--pressed,
+.plyr__control.plyr__control--pressed .icon--not-pressed,
+.plyr__control:not(.plyr__control--pressed) .label--pressed,
+.plyr__control.plyr__control--pressed .label--not-pressed {
     display: none;
 }
 
-// Audio styles
+// Audio control
 .plyr--audio .plyr__control {
+    &.plyr__tab-focus,
+    &:hover,
+    &[aria-expanded='true'] {
+        background: $plyr-audio-control-bg-hover;
+        color: $plyr-audio-control-color-hover;
+    }
+}
+
+// Video control
+.plyr--video .plyr__control {
+    svg {
+        filter: drop-shadow(0 1px 1px rgba(#000, 0.15));
+    }
+
+    // Hover and tab focus
     &.plyr__tab-focus,
     &:hover,
     &[aria-expanded='true'] {
@@ -66,11 +91,10 @@
     transform: translate(-50%, -50%);
     z-index: 2;
 
+    // Offset icon to make the play button look right
     svg {
-        height: var(--plyr-control-icon-size-large);
         left: 2px; // Offset to make the play button look right
         position: relative;
-        width: var(--plyr-control-icon-size-large);
     }
 
     &:hover,

@@ -39,7 +39,8 @@
 
         > div {
             overflow: hidden;
-            transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1), width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         // Arrow
@@ -54,18 +55,16 @@
             width: 0;
         }
 
-        ul {
-            list-style: none;
-            margin: 0;
-            overflow: hidden;
+        [role='menu'] {
             padding: $plyr-control-padding;
+        }
 
-            li {
-                margin-top: 2px;
+        [role='menuitem'],
+        [role='menuitemradio'] {
+            margin-top: 2px;
 
-                &:first-child {
-                    margin-top: 0;
-                }
+            &:first-child {
+                margin-top: 0;
             }
         }
 
@@ -75,9 +74,16 @@
             color: $plyr-menu-color;
             display: flex;
             font-size: $plyr-font-size-menu;
-            padding: ceil($plyr-control-padding / 2) ($plyr-control-padding * 2);
+            padding: ceil($plyr-control-padding / 2)
+                ceil($plyr-control-padding * 1.5);
             user-select: none;
             width: 100%;
+
+            > span {
+                align-items: inherit;
+                display: flex;
+                width: 100%;
+            }
 
             &::after {
                 border: 4px solid transparent;
@@ -135,50 +141,49 @@
             }
         }
 
-        label.plyr__control {
+        .plyr__control[role='menuitemradio'] {
             padding-left: $plyr-control-padding;
 
-            input[type='radio'] + span {
-                background: rgba(#000, 0.1);
+            &::before,
+            &::after {
                 border-radius: 100%;
+            }
+
+            &::before {
+                background: rgba(#000, 0.1);
+                content: '';
                 display: block;
                 flex-shrink: 0;
                 height: 16px;
                 margin-right: $plyr-control-spacing;
-                position: relative;
                 transition: all 0.3s ease;
                 width: 16px;
-
-                &::after {
-                    background: #fff;
-                    border-radius: 100%;
-                    content: '';
-                    height: 6px;
-                    left: 5px;
-                    opacity: 0;
-                    position: absolute;
-                    top: 5px;
-                    transform: scale(0);
-                    transition: transform 0.3s ease, opacity 0.3s ease;
-                    width: 6px;
-                }
             }
 
-            input[type='radio']:checked + span {
-                background: $plyr-color-main;
+            &::after {
+                background: #fff;
+                border: 0;
+                height: 6px;
+                left: 12px;
+                opacity: 0;
+                top: 50%;
+                transform: translateY(-50%) scale(0);
+                transition: transform 0.3s ease, opacity 0.3s ease;
+                width: 6px;
+            }
 
+            &[aria-checked='true'] {
+                &::before {
+                    background: $plyr-color-main;
+                }
                 &::after {
                     opacity: 1;
-                    transform: scale(1);
+                    transform: translateY(-50%) scale(1);
                 }
             }
 
-            input[type='radio']:focus + span {
-                @include plyr-tab-focus();
-            }
-
-            &.plyr__tab-focus input[type='radio'] + span,
-            &:hover input[type='radio'] + span {
+            &.plyr__tab-focus::before,
+            &:hover::before {
                 background: rgba(#000, 0.1);
             }
         }
@@ -188,7 +193,7 @@
             align-items: center;
             display: flex;
             margin-left: auto;
-            margin-right: -$plyr-control-padding;
+            margin-right: -($plyr-control-padding - 2);
             overflow: hidden;
             padding-left: ceil($plyr-control-padding * 3.5);
             pointer-events: none;
