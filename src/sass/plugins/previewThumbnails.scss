@@ -1,0 +1,70 @@
+// --------------------------------------------------------------
+// Preview Thumbnails
+// --------------------------------------------------------------
+
+.plyr__preview-thumbnail-container {
+    background-color: rgba(0,0,0,0.5);
+    border: 1px solid rgba(0,0,0,0); // The background colour above applies to the area under the border - so appears to be a border of 0.5 opacity black
+    border-radius: 0px;
+    bottom: 100%;
+    box-shadow: $plyr-tooltip-shadow;
+    left: 50%;
+    line-height: 1.3;
+    margin-bottom: $plyr-tooltip-padding * 2;
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    transition: opacity 0.2s 0.1s ease;
+    white-space: nowrap;
+    z-index: 2;
+
+    img {
+        position: absolute;
+        left: 0px;
+        right: 0px;
+        top: 0px;
+        bottom: 0px;
+        margin: auto;
+        height: 100%;
+        width: 100%;
+        border-radius: 0px;
+    }
+
+    // Seek time text
+    span {
+        position: absolute;
+        bottom: 0px;
+        z-index: 3;
+        transform: translate(-50%,0);
+        background-color: rgba(0,0,0,0.55);
+        color: rgba(255,255,255,1);
+        padding: 4px 6px 3px 6px;
+        font-size: $plyr-font-size-small;
+        font-weight: $plyr-font-weight-regular;
+    }
+}
+
+.plyr__preview-scrubbing-container {
+    position: absolute;
+    left: 0px;
+    right: 0px;
+    top: 0px;
+    bottom: 0px;
+    height: 100%;
+    width: 100%;
+    z-index: 1;
+    transition: opacity 0.3s 0.3s ease;
+    filter: blur(1px);
+    
+    img {
+        position: absolute;
+        left: 0px;
+        right: 0px;
+        top: 0px;
+        bottom: 0px;
+        margin: auto;
+        height: 100%;
+        width: 100%;
+        object-fit: contain;
+    }
+}

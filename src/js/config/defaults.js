@@ -342,6 +342,8 @@ const defaults = {
         loading: 'plyr--loading',
         hover: 'plyr--hover',
         tooltip: 'plyr__tooltip',
+        previewThumbnailContainer: 'plyr__preview-thumbnail-container',
+        previewScrubbingContainer: 'plyr__preview-scrubbing-container',
         cues: 'plyr__cues',
         hidden: 'plyr__sr-only',
         hideControls: 'plyr--hide-controls',
@@ -395,6 +397,11 @@ const defaults = {
         enabled: false,
         publisherId: '',
     },
+
+    // Preview Thumbnails plugin
+    previewThumbnails: {
+        enabled: false,
+    }
 };
 
 export default defaults;

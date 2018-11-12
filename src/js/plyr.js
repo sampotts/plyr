@@ -15,6 +15,7 @@ import Fullscreen from './fullscreen';
 import Listeners from './listeners';
 import media from './media';
 import Ads from './plugins/ads';
+import PreviewThumbnails from './plugins/previewThumbnails';
 import source from './source';
 import Storage from './storage';
 import support from './support';
@@ -306,6 +307,11 @@ class Plyr {
 
         // Seek time will be recorded (in listeners.js) so we can prevent hiding controls for a few seconds after seek
         this.lastSeekTime = 0;
+
+        // Setup preview thumbnails if enabled
+        if (this.config.previewThumbnails.enabled) {
+            this.previewThumbnails = new PreviewThumbnails(this);
+        }
     }
 
     // ---------------------------------------
