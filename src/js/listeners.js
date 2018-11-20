@@ -386,10 +386,10 @@ class Listeners {
                 }
 
                 if (player.ended) {
-                    player.restart();
-                    player.play();
+                    this.proxy(event, player.restart, 'restart');
+                    this.proxy(event, player.togglePlay, 'play');
                 } else {
-                    player.togglePlay();
+                    this.proxy(event, player.togglePlay, 'play');
                 }
             });
         }
