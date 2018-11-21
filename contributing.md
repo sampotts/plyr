@@ -11,6 +11,7 @@ If these doesn't answer your question
 * Use [our Slack](https://bit.ly/plyr-chat) if you need help using Plyr or have questions about Plyr.
 
 ## Commenting
+
 When commenting, keep a civil tone and stay on topic. Don't ask for [support](#support), or post "+1" or "I agree" type of comments. Use the emojis instead.
 
 Asking for the status on issues is discouraged. Unless someone has explicitly said in an issue that it's work in progress, most likely that means no one is working on it. We have a lot to do, and it may not be a top priority for us.
@@ -38,3 +39,15 @@ Please follow the instructions in our issue templates. Don't use github issues t
 * When finished, push the changes to your GitHub repository and send a pull request to **develop**. Describe what your PR does.
 
 * If the Travis build fails, or if you get a code review with change requests, you can fix these by pushing new or rebased commits to the branch.
+
+## Contributing translations
+
+* Fork Plyr, and create a new branch in your fork, based on the **develop** branch
+
+* Make and translate language file `src/locales/{lang}.js`, where `{lang}` is two-letter language code from [ISO 639-1](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes). It is recommended to copy and edit English translation.
+
+* Add your language to `src/locales/index.js`. Make sure to import your file and follow the file format. The entry `name` should be native name of language.
+
+* Test your changes.
+
+* When finished, commit and push the changes to your GitHub repository and send a pull request to **develop**.
