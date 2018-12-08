@@ -387,7 +387,7 @@ class Listeners {
 
                 if (player.ended) {
                     this.proxy(event, player.restart, 'restart');
-                    this.proxy(event, player.togglePlay, 'play');
+                    this.proxy(event, player.play, 'play');
                 } else {
                     this.proxy(event, player.togglePlay, 'play');
                 }
