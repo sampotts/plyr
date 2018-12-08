@@ -22,16 +22,8 @@ const i18n = {
             return '';
         }
 
-        const english = languages.filter(function (elem) {
-            return elem.code == 'en';
-            }
-        );
-
-        const locale = languages.filter(function (elem) {
-            return !is.empty(config.language) &&
-                elem.code == config.language;
-            }
-        );
+        const english = languages.filter(e => e.code === 'en');
+        const locale = languages.filter(e => !is.empty(config.language) && e.code === config.language);
 
         if (!is.empty(locale)) {
             config.i18n = Object.assign({}, english[0].i18n, locale[0].i18n, config.i18n);
