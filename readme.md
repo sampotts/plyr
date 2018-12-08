@@ -349,6 +349,7 @@ Example method use:
 player.play(); // Start playback
 player.fullscreen.enter(); // Enter fullscreen
 ```
+Note also that the Javascript setTimeout() method can be used for setting arbitrary times to pause, stop etc. 
 
 | Method                   | Parameters       | Description                                                                                                |
 | ------------------------ | ---------------- | ---------------------------------------------------------------------------------------------------------- |
