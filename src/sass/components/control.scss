@@ -71,8 +71,8 @@ a.plyr__control {
     &.plyr__tab-focus,
     &:hover,
     &[aria-expanded='true'] {
-        background: var(--plyr-audio-control-bg-hover);
-        color: var(--plyr-audio-control-color-hover);
+        background: var(--plyr-video-control-bg-hover);
+        color: var(--plyr-video-control-color-hover);
     }
 }
 

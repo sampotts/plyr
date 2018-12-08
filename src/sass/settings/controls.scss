@@ -20,7 +20,6 @@ $plyr-audio-control-bg-hover: var(--plyr-color-main) !default;
 @include css-vars(
     (
         --plyr-control-icon-size: $plyr-control-icon-size,
-        --plyr-control-icon-size-large: $plyr-control-icon-size-large,
         --plyr-control-spacing: $plyr-control-spacing,
         --plyr-control-padding: $plyr-control-padding,
         --plyr-control-radius: $plyr-control-radius,
