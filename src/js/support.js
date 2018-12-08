@@ -68,9 +68,13 @@ const support = {
     // Check for mime type support against a player instance
     // Credits: http://diveintohtml5.info/everything.html
     // Related: http://www.leanbackplayer.com/test/h5mt.html
-    mime(inputType) {
-        const [mediaType] = inputType.split('/');
-        let type = inputType;
+    mime(input) {
+        if (is.empty(input)) {
+            return false;
+        }
+
+        const [mediaType] = input.split('/');
+        let type = input;
 
         // Verify we're using HTML5 and there's no media type mismatch
         if (!this.isHTML5 || mediaType !== this.type) {
@@ -79,7 +83,7 @@ const support = {
 
         // Add codec if required
         if (Object.keys(defaultCodecs).includes(type)) {
-            type += `; codecs="${defaultCodecs[inputType]}"`;
+            type += `; codecs="${defaultCodecs[input]}"`;
         }
 
         try {
