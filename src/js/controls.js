@@ -1587,7 +1587,7 @@ const controls = {
 
         // If function, run it and use output
         if (is.function(this.config.controls)) {
-            this.config.controls = this.config.controls.call(this.props);
+            this.config.controls = this.config.controls.call(this, props);
         }
 
         // Convert falsy controls to empty array (primarily for empty strings)
