@@ -23,11 +23,9 @@ class PreviewThumbnails {
     constructor(player) {
         this.player = player;
         this.thumbnailsDefs = [];
-        this.showingThumb = null; // Index of the currently displayed thumbnail
         this.lastMousemoveEventTime = Date.now();
         this.mouseDown = false;
-        this.imageShowCounter = 0;
-        this.imageTryShowCounter = 0;
+        this.loadedImages = [];
 
         if (this.enabled) {
             this.load();
@@ -43,6 +41,9 @@ class PreviewThumbnails {
     }
 
     load() {
+        // Turn off the regular seek tooltip
+        this.player.config.tooltips.seek = false;
+
         this.getThumbnailsDefs()
             .then(() => {
                 // Initiate DOM listeners so that our preview thumbnails can be used
@@ -50,9 +51,6 @@ class PreviewThumbnails {
 
                 // Build HTML DOM elements
                 this.elements();
-
-                // Turn off the regular seek tooltip
-                this.player.config.tooltips.seek = false;
 
                 // Check to see if thumb container size was specified manually in CSS
                 this.determineContainerAutoSizing();
@@ -88,7 +86,7 @@ class PreviewThumbnails {
     }
 
     // Process individual VTT file
-    getThumbnailDef (url) {
+    getThumbnailDef(url) {
         return new Promise((resolve, reject) => {
             fetch(url)
                 .then(response => {
@@ -109,6 +107,7 @@ class PreviewThumbnails {
                     tempImage.src = thumbnailsDef.urlPrefix + thumbnailsDef.frames[0].text;
                     tempImage.onload = () => {
                         thumbnailsDef.height = tempImage.naturalHeight;
+                        thumbnailsDef.width = tempImage.naturalWidth;
 
                         this.thumbnailsDefs.push(thumbnailsDef);
 
@@ -170,14 +169,14 @@ class PreviewThumbnails {
             this.player.elements.progress,
             'mouseleave click',
             () => {
-                this.hideThumbContainer();
+                this.hideThumbContainer(true);
             }
         );
         this.player.on('play', () => {
-            this.hideThumbContainer();
+            this.hideThumbContainer(true);
         });
         this.player.on('seeked', () => {
-            this.hideThumbContainer();
+            this.hideThumbContainer(false);
         });
 
         // Show scrubbing preview
@@ -185,10 +184,19 @@ class PreviewThumbnails {
             this.player,
             this.player.elements.progress,
             'mousedown touchstart',
-            () => {
-                this.mouseDown = true;
-                this.showScrubbingContainer();
-                this.hideThumbContainer();
+            event => {
+                // Only act on left mouse button (0)
+                if (event.button === 0) {
+                    this.mouseDown = true;
+                    // Wait until media has a duration
+                    if (this.player.media.duration) {
+                        this.showScrubbingContainer();
+                        this.hideThumbContainer(false);
+
+                        // Download and show image
+                        this.showImageAtCurrentTime();
+                    }
+                }
             }
         );
         on.call(
@@ -264,134 +272,145 @@ class PreviewThumbnails {
         this.player.elements.display.previewScrubbingContainer = previewScrubbingContainer;
     }
 
-    showImageAtCurrentTime () {
-        if (!this.mouseDown) {
+    showImageAtCurrentTime() {
+        if (this.mouseDown) {
+            this.setScrubbingContainerSize();
+        } else {
             this.showThumbContainer();
+            this.setThumbContainerSizeAndPos();
         }
 
-        this.setThumbContainerSizeAndPos();
-
+        // // TODO: move this logic to
         // Check when we last loaded an image - don't show more than one new one every 500ms
-        if (this.lastMousemoveEventTime < Date.now() - 150) {
-            this.lastMousemoveEventTime = Date.now();
+        // if (this.lastMousemoveEventTime < Date.now() - 150) {
+        //     this.lastMousemoveEventTime = Date.now();
 
-            // Find the first thumbnail that's after `time`. Note `this.seekTime+1` - we're actually looking 1 second ahead, because it's more likely then that the viewer will actually get to see the preview frame in the actual video. This hack should be removed if we ever choose to make it seek to the nearest thumb time
-            const thumbNum = this.thumbnailsDefs[0].frames.findIndex(frame => this.seekTime+1 >= frame.startTime && this.seekTime <= frame.endTime);
+            // Find the desired thumbnail index
+            const thumbNum = this.thumbnailsDefs[0].frames.findIndex(frame => this.seekTime >= frame.startTime && this.seekTime <= frame.endTime);
+            let qualityIndex = 0;
 
-            // Only show if the thumbnail to show is different to last time
+            // Check to see if we've already downloaded higher quality versions of this image
+            for (let i = 1; i < this.thumbnailsDefs.length; i++) {
+                if (this.loadedImages.includes(this.thumbnailsDefs[i].frames[thumbNum].text)) {
+                    qualityIndex = i;
+                }
+            }
+
+            // Only proceed if either thumbnum or thumbfilename has changed
             if (thumbNum !== this.showingThumb) {
                 this.showingThumb = thumbNum;
-                this.showImage();
+                this.loadImage(qualityIndex);
             }
-        } else {
-            // Set a timeout so that we always fire this function once after the mouse stops moving. If not for this, the mouse preview would often be a bit stale
-            if (!this.mousemoveEventTimeout) {
-                this.mousemoveEventTimeout = setTimeout(() => {
-                    // Don't follow through after the timeout if it's since been hidden
-                    if (this.player.elements.display.previewThumbnailContainer.style.opacity === 1) {
-                        this.showImageAtCurrentTime();
-                        this.mousemoveEventTimeout = null;
-                    }
-                }, 200)
-            }
-        }
+
+        // } else {
+        //     // Set a timeout so that we always fire this function once after the mouse stops moving. If not for this, the mouse preview would often be a bit stale
+        //     if (this.mousemoveEventTimeout) {
+        //         clearTimeout(this.mousemoveEventTimeout);
+        //     }
+        //     this.mousemoveEventTimeout = setTimeout(() => {
+        //         // Don't follow through after the timeout if it's since been hidden
+        //         if (this.player.elements.display.previewThumbnailContainer.style.opacity === '1') {
+        //             console.log('show on timer')
+        //             this.showImageAtCurrentTime(true);
+        //             this.mousemoveEventTimeout = null;
+        //         }
+        //     }, 200)
+        // }
     }
 
     // Show the image that's currently specified in this.showingThumb
-    showImage (qualityIndex = 0) {
-        this.imageTryShowCounter += 1;
-        const localImageTryShowCounter = this.imageTryShowCounter;
+    loadImage(qualityIndex = 0) {
         let thumbNum = this.showingThumb;
-
-        if (thumbNum === this.thumbnailsDefs[qualityIndex].frames.length) {
-            // It can attempt to preview up to 5 seconds out past the end of the video. So we'll just show the last frame
-            thumbNum -= 1;
-            this.showingThumb = thumbNum;
-        }
 
         this.player.debug.log(`Preview thumbnails: showing thumbnum: ${thumbNum}: ${JSON.stringify(this.thumbnailsDefs[qualityIndex].frames[thumbNum])}`);
 
+        const frame = this.thumbnailsDefs[qualityIndex].frames[thumbNum];
         const thumbFilename = this.thumbnailsDefs[qualityIndex].frames[thumbNum].text;
         const urlPrefix = this.thumbnailsDefs[qualityIndex].urlPrefix;
         const thumbURL = urlPrefix + thumbFilename;
 
-        // We're building and adding a new image. In other implementations of similar functionality (Youtube), background image is instead used. But this causes issues with larger images in Firefox and Safari - switching between background images causes a flicker. Putting a new image over the top does not
-        const previewImage = new Image();
-        previewImage.src = thumbURL;
-        previewImage.setAttribute('data-thumbnum', thumbNum);
+        // console.log('loading: ' + thumbFilename + '. num: ' + thumbNum + '. qual: ' + qualityIndex);
 
-        previewImage.onload = () => {
-            // Many images are loaded within milliseconds of each other. An earlier one might be the last one to finish loading. Make sure we don't show an images out of order
-            if (localImageTryShowCounter >= this.imageShowCounter) {
-                this.imageShowCounter = localImageTryShowCounter;
+        if (!this.currentImageElement || this.currentImageElement.getAttribute('data-thumbfilename') !== thumbFilename) {
+            // If we're already loading a previous image, remove its onload handler - we don't want it to load after this one
+            // Only do this if not using jpeg sprites. Without jpeg sprites we really want to show as many images as possible, as a best-effort
+            if (this.loadingImage && this.usingJpegSprites) this.loadingImage.onload = null;
 
-                this.currentContainer.appendChild(previewImage);
+            // We're building and adding a new image. In other implementations of similar functionality (Youtube), background image is instead used. But this causes issues with larger images in Firefox and Safari - switching between background images causes a flicker. Putting a new image over the top does not
+            const previewImage = new Image();
+            previewImage.src = thumbURL;
+            previewImage.setAttribute('data-thumbnum', thumbNum);
+            previewImage.setAttribute('data-thumbfilename', thumbFilename);
+            // this.showingThumbFilename = this.thumbnailsDefs[qualityIndex].frames[thumbNum].text;
+            this.showingThumbFilename = thumbFilename;
 
-                // Now that this one is showing, start pre-loading a batch of nearby images. But only if this isn't a revisit
-                // this.preloadNearbyImages(thumbNum);
-                this.thumbnailsDefs[qualityIndex].frames[thumbNum].loaded = true
+            // For some reason, passing the named function directly causes it to execute immediately. So I've wrapped it in an anonymous function...
+            previewImage.onload = () => this.showImage(previewImage, frame, qualityIndex, thumbNum, thumbFilename, true);
+            this.loadingImage = previewImage;
+            this.removeOldImages(previewImage);
+        } else {
+            // Update the existing image
+            this.showImage(this.currentImageElement, frame, qualityIndex, thumbNum, thumbFilename, false);
+            this.currentImageElement.setAttribute('data-thumbnum', thumbNum);
+            this.removeOldImages(this.currentImageElement);
+        }
+    }
 
-                this.removeOldImages();
+    showImage(previewImage, frame, qualityIndex, thumbNum, thumbFilename, newImage = true) {
+        // console.log('newimage: ' + newImage)
+        console.log('showing: ' + thumbFilename + '. num: ' + thumbNum + '. qual: ' + qualityIndex + '. newimg: ' + newImage);
+        this.setImageSizeAndOffset(previewImage, frame);
 
-                // Look for a higher quality version of the same frame
-                if (qualityIndex < this.thumbnailsDefs.length - 1) {
-                    // Only use the higher quality version if it's going to look any better - if the current thumb is of a lower pixel density than the thumbnail container
-                    let previewContainerHeight = this.player.elements.display.previewThumbnailContainer.clientHeight;
-                    if (this.mouseDown) previewContainerHeight = this.player.elements.display.previewScrubbingContainer.clientHeight;
-                    // Adjust for HiDPI screen
-                    if (window.devicePixelRatio) previewContainerHeight *= window.devicePixelRatio;
+        if (newImage) {
+            this.currentContainer.appendChild(previewImage);
+            
+            this.currentImageElement = previewImage;
+            // this.removeOldImages(previewImage);
 
-                    if (previewImage.naturalHeight < previewContainerHeight) {
-                        // Recurse this function - show a higher quality one, but only if the viewer is on this frame for a while
-                        setTimeout(() => {
-                            // Make sure the mouse hasn't already moved on and started hovering at another frame
-                            if (this.showingThumb === thumbNum) {
-                                this.showImage(qualityIndex + 1);
-                            }
-                        }, 150)
+            if (!this.loadedImages.includes(thumbFilename)) this.loadedImages.push(thumbFilename);
+        }
+
+        // Look for a higher quality version of the same frame
+        if (qualityIndex < this.thumbnailsDefs.length - 1) {
+            // Only use the higher quality version if it's going to look any better - if the current thumb is of a lower pixel density than the thumbnail container
+            // let previewContainerHeight = this.player.elements.display.previewThumbnailContainer.clientHeight;
+            // if (this.mouseDown) previewContainerHeight = this.player.elements.display.previewScrubbingContainer.clientHeight;
+            // // Adjust for HiDPI screen
+            // if (window.devicePixelRatio) previewContainerHeight *= window.devicePixelRatio;
+
+            // if (previewImage.naturalHeight < previewContainerHeight) {
+                // Recurse this function - show a higher quality one, but only if the viewer is on this frame for a while
+                setTimeout(() => {
+                    // Make sure the mouse hasn't already moved on and started hovering at another frame
+                    // TODO: need to use filename instead of thumbnum, but need to use latest thumbnum instead of old thumbnum
+                    // if (this.showingThumb === thumbNum) {
+                    console.log(`${this.showingThumbFilename} ${thumbFilename}`)
+                    if (this.showingThumbFilename === thumbFilename) {
+                        // console.log('showing higher qual')
+                        this.loadImage(qualityIndex + 1);
                     }
-                }
-            }
+                }, 500)
+            // }
         }
     }
 
-    // Not using this -- Preloading looked like maybe a good idea, but it seems to actually cause more trouble than it solves. Slow connections get really backed up. Fast connections don't really need it
-    // If we were to try using this again, we might need to look at not starting a second preload while another is still going?
-    preloadNearbyImages(thumbNum, amountToPreload=30) {
-        const actualShowingThumb = [...this.currentContainer.children].reverse()[0].getAttribute('data-thumbnum');
-        if (actualShowingThumb && Number(actualShowingThumb) === this.showingThumb) {
-            let startNum = thumbNum - amountToPreload/2;
-            let endNum = thumbNum + amountToPreload/2;
-            if (startNum < 0) startNum = 0;
-            if (endNum > this.thumbnailsDefs[0].frames.length - 1) endNum = this.thumbnailsDefs[0].frames.length - 1;
-
-            for (let i = startNum; i <= endNum; i++) {
-                if (!this.thumbnailsDefs[0].frames[i].loaded) {
-                    this.player.debug.log('Thumbnail previews: preloading: ' + i);
-
-                    const thumbFilename = this.thumbnailsDefs[0].frames[i].text;
-                    const urlPrefix = this.thumbnailsDefs[0].urlPrefix;
-                    const thumbURL = urlPrefix + thumbFilename;
-
-                    // We're building and adding a new image. In other implementations of similar functionality (Youtube), background image is instead used. But this causes issues with larger images in Firefox and Safari - switching between background images causes a flicker. Putting a new image over the top does not
-                    const previewImage = new Image();
-                    previewImage.src = thumbURL;
-
-                    // Set loaded attribute. This will prevent us from wasting CPU constantly trying to preload images that we already have loaded
-                    this.thumbnailsDefs[0].frames[i].loaded = true;
-                }
-            }
-        }
-    }
-
-    removeOldImages() {
+    removeOldImages(currentImage) {
         // Get a list of all images, and reverse it - so that we can start from the end and delete all except for the most recent
-        const allImages = [...this.currentContainer.children].reverse();
+        const allImages = [...this.currentContainer.children];
 
-        // Start at the third image image - so we leave the last two images. Leaving only one might result in flickering if the newest one hasn't finished rendering yet
-        for (let i = 2; i < allImages.length; i++) {
-            if (allImages[i].tagName === 'IMG') {
-                this.currentContainer.removeChild(allImages[i]);
+        for (let image of allImages) {
+            if (image.tagName === 'IMG') {
+                const removeDelay = this.usingJpegSprites ? 200 : 1000;
+
+                if (image.getAttribute('data-thumbnum') !== currentImage.getAttribute('data-thumbnum') && !image.getAttribute('data-deleting')) {
+                    // Wait 200ms, as the new image can take some time to show on certain browsers (even though it was downloaded before showing). This will prevent flicker, and show some generosity towards slower clients
+                    // First set attribute 'deleting' to prevent multi-handling of this on repeat firing of this function
+                    image.setAttribute('data-deleting', 'true');
+                    setTimeout(() => {
+                        this.currentContainer.removeChild(image);
+                        // console.log('removing: ' + image.getAttribute('data-thumbfilename'));
+                    }, removeDelay)
+                }
             }
         }
     }
@@ -404,11 +423,58 @@ class PreviewThumbnails {
         }
     }
 
+    get usingJpegSprites() {
+        if (this.thumbnailsDefs[0].frames[0].w) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    get thumbAspectRatio() {
+        if (this.usingJpegSprites) {
+            return this.thumbnailsDefs[0].frames[0].w / this.thumbnailsDefs[0].frames[0].h;
+        } else {
+            return this.thumbnailsDefs[0].width / this.thumbnailsDefs[0].height;
+        }
+    }
+
+    get thumbContainerHeight() {
+        if (this.mouseDown) {
+            // return this.player.elements.container.clientHeight;
+            // return this.player.media.clientHeight;
+            return this.player.media.clientWidth / this.thumbAspectRatio; // Can't use media.clientHeight - html5 video goes big and does black bars above and below
+        } else {
+            // return this.player.elements.container.clientHeight / 4;
+            return this.player.media.clientWidth / this.thumbAspectRatio / 4;
+        }
+    }
+
+    get currentImageElement() {
+        if (this.mouseDown) {
+            return this.currentScrubbingImageElement;
+        } else {
+            return this.currentThumbnailImageElement;
+        }
+    }
+    set currentImageElement(element) {
+        if (this.mouseDown) {
+            this.currentScrubbingImageElement = element;
+        } else {
+            this.currentThumbnailImageElement = element;
+        }
+    }
+
     showThumbContainer() {
         this.player.elements.display.previewThumbnailContainer.style.opacity = 1;
     }
-    hideThumbContainer() {
+    hideThumbContainer(clearShowing = false) {
         this.player.elements.display.previewThumbnailContainer.style.opacity = 0;
+
+        if (clearShowing) {
+            this.showingThumb = null;
+            this.showingThumbFilename = null;
+        }
     }
 
     showScrubbingContainer() {
@@ -416,6 +482,8 @@ class PreviewThumbnails {
     }
     hideScrubbingContainer() {
         this.player.elements.display.previewScrubbingContainer.style.opacity = 0;
+        this.showingThumb = null;
+        this.showingThumbFilename = null;
     }
 
     determineContainerAutoSizing() {
@@ -426,12 +494,9 @@ class PreviewThumbnails {
 
     // Set the size to be about a quarter of the size of video. Unless option dynamicSize === false, in which case it needs to be set in CSS
     setThumbContainerSizeAndPos() {
-        // if (this.player.config.previewThumbnails.autoSize) {
         if (!this.sizeSpecifiedInCSS) {
-            const videoAspectRatio = this.player.media.videoWidth / this.player.media.videoHeight;
-            const thumbHeight = this.player.elements.container.clientHeight / 4;
-            const thumbWidth = thumbHeight * videoAspectRatio;
-            this.player.elements.display.previewThumbnailContainer.style.height = `${thumbHeight}px`;
+            const thumbWidth = this.thumbContainerHeight * this.thumbAspectRatio;
+            this.player.elements.display.previewThumbnailContainer.style.height = `${this.thumbContainerHeight}px`;
             this.player.elements.display.previewThumbnailContainer.style.width = `${thumbWidth}px`;
         }
 
@@ -458,41 +523,68 @@ class PreviewThumbnails {
         previewContainer.style.left = previewPos + 'px';
     }
 
+    // Can't use 100% width, in case the video is a different aspect ratio to the video container
+    setScrubbingContainerSize() {
+        this.player.elements.display.previewScrubbingContainer.style.width = `${this.player.media.clientWidth}px`;
+        this.player.elements.display.previewScrubbingContainer.style.height = `${this.player.media.clientWidth/this.thumbAspectRatio}px`; // Can't use media.clientHeight - html5 video goes big and does black bars above and below
+    }
+
+    // Jpeg sprites need to be offset to the correct location
+    setImageSizeAndOffset(previewImage, frame) {
+        if (this.usingJpegSprites) {
+            // Find difference between jpeg height and preview container height
+            const heightMulti = this.thumbContainerHeight / frame.h;
+
+            previewImage.style.height = `${previewImage.naturalHeight * heightMulti}px`;
+            previewImage.style.width = `${previewImage.naturalWidth * heightMulti}px`;
+            previewImage.style.left = `-${Math.ceil(frame.x * heightMulti)}px`;
+            previewImage.style.top = `-${frame.y * heightMulti}px`; // todo: might need to round this one up too
+        }
+    }
+
     // Arg: vttDataString example: "WEBVTT\n\n1\n00:00:05.000 --> 00:00:10.000\n1080p-00001.jpg"
-    parseVtt (vttDataString) {
-      const processedList = []
-      const frames = vttDataString.split(/\r\n\r\n|\n\n|\r\r/)
+    parseVtt(vttDataString) {
+        const processedList = [];
+        const frames = vttDataString.split(/\r\n\r\n|\n\n|\r\r/);
 
-      for (const frame of frames) {
-        const result = {}
+        for (const frame of frames) {
+            const result = {};
 
-        for (const line of frame.split(/\r\n|\n|\r/)) {
-          if (result.startTime == null) {
-            // The line with start and end times on it is the first line of interest
-            const matchTimes = line.match(/([0-9]{2}):([0-9]{2}):([0-9]{2}).([0-9]{2,3})( ?--> ?)([0-9]{2}):([0-9]{2}):([0-9]{2}).([0-9]{2,3})/) // Note that this currently ignores caption formatting directives that are optionally on the end of this line - fine for non-captions VTT
+            for (const line of frame.split(/\r\n|\n|\r/)) {
+                if (result.startTime == null) {
+                    // The line with start and end times on it is the first line of interest
+                    const matchTimes = line.match(/([0-9]{2}):([0-9]{2}):([0-9]{2}).([0-9]{2,3})( ?--> ?)([0-9]{2}):([0-9]{2}):([0-9]{2}).([0-9]{2,3})/) // Note that this currently ignores caption formatting directives that are optionally on the end of this line - fine for non-captions VTT
 
-            if (matchTimes) {
-              result.startTime = Number(matchTimes[1]) * 60 * 60 + Number(matchTimes[2]) * 60 + Number(matchTimes[3]) + Number("0." + matchTimes[4])
-              result.endTime = Number(matchTimes[6]) * 60 * 60 + Number(matchTimes[7]) * 60 + Number(matchTimes[8]) + Number("0." + matchTimes[9])
+                    if (matchTimes) {
+                        result.startTime = Number(matchTimes[1]) * 60 * 60 + Number(matchTimes[2]) * 60 + Number(matchTimes[3]) + Number("0." + matchTimes[4])
+                        result.endTime = Number(matchTimes[6]) * 60 * 60 + Number(matchTimes[7]) * 60 + Number(matchTimes[8]) + Number("0." + matchTimes[9])
+                    }
+                } else {
+                    // If we already have the startTime, then we're definitely up to the text line(s)
+                    if (line.trim().length > 0) {
+                        if (!result.text) {
+                            const lineSplit = line.trim().split('#xywh=');
+                            result.text = lineSplit[0];
+
+                            // If there's content in lineSplit[1], then we have jpeg sprites. If not, then it's just one frame per jpeg
+                            if (lineSplit[1]) {
+                                const xywh = lineSplit[1].split(',');
+                                result.x = xywh[0];
+                                result.y = xywh[1];
+                                result.w = xywh[2];
+                                result.h = xywh[3];
+                            }
+                        }
+                    }
+                }
             }
-          } else {
-            // If we already have the startTime, then we're definitely up to the text line(s)
-            if (line.trim().length > 0) {
-              if (!result.text) {
-                result.text = line.trim()
-              } else {
-                result.text += '\n' + line.trim()
-              }
+
+            if (result.text) {
+                processedList.push(result);
             }
-          }
         }
 
-        if (result.text) {
-          processedList.push(result)
-        }
-      }
-
-      return processedList
+        return processedList;
     }
 }
 

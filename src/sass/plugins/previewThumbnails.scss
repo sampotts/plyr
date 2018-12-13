@@ -18,15 +18,16 @@
     white-space: nowrap;
     z-index: 2;
 
+    overflow: hidden;
+
     img {
         position: absolute;
         left: 0px;
-        right: 0px;
         top: 0px;
-        bottom: 0px;
-        margin: auto;
-        height: 100%;
+        height: 100%; // Non-jpeg-sprite images are 100%. Jpeg sprites will have their size applied by javascript
         width: 100%;
+        max-height: none;
+        max-width: none;
         border-radius: 0px;
     }
 
@@ -52,19 +53,20 @@
     bottom: 0px;
     height: 100%;
     width: 100%;
+    margin: auto; // Required when video is different dimensions to container (e.g., fullscreen)
+    overflow: hidden;
     z-index: 1;
-    transition: opacity 0.3s 0.3s ease;
+    transition: opacity 0.3s ease;
     filter: blur(1px);
     
     img {
         position: absolute;
         left: 0px;
-        right: 0px;
         top: 0px;
-        bottom: 0px;
-        margin: auto;
         height: 100%;
         width: 100%;
+        max-height: none;
+        max-width: none;
         object-fit: contain;
     }
 }
