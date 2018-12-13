@@ -395,6 +395,8 @@ const defaults = {
         enabled: false,
         publisherId: '',
     },
+
+    noCookie: false,
 };
 
 export default defaults;
