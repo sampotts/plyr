@@ -185,13 +185,13 @@ class PreviewThumbnails {
             this.player.elements.progress,
             'mousedown touchstart',
             event => {
-                // Only act on left mouse button (0)
-                if (event.button === 0) {
+                // Only act on left mouse button (0), or touch device (!event.button)
+                if (!event.button || event.button === 0) {
                     this.mouseDown = true;
                     // Wait until media has a duration
                     if (this.player.media.duration) {
                         this.showScrubbingContainer();
-                        this.hideThumbContainer(false);
+                        this.hideThumbContainer(true);
 
                         // Download and show image
                         this.showImageAtCurrentTime();
@@ -280,56 +280,32 @@ class PreviewThumbnails {
             this.setThumbContainerSizeAndPos();
         }
 
-        // // TODO: move this logic to
-        // Check when we last loaded an image - don't show more than one new one every 500ms
-        // if (this.lastMousemoveEventTime < Date.now() - 150) {
-        //     this.lastMousemoveEventTime = Date.now();
+        // Find the desired thumbnail index
+        const thumbNum = this.thumbnailsDefs[0].frames.findIndex(frame => this.seekTime >= frame.startTime && this.seekTime <= frame.endTime);
+        let qualityIndex = 0;
 
-            // Find the desired thumbnail index
-            const thumbNum = this.thumbnailsDefs[0].frames.findIndex(frame => this.seekTime >= frame.startTime && this.seekTime <= frame.endTime);
-            let qualityIndex = 0;
-
-            // Check to see if we've already downloaded higher quality versions of this image
-            for (let i = 1; i < this.thumbnailsDefs.length; i++) {
-                if (this.loadedImages.includes(this.thumbnailsDefs[i].frames[thumbNum].text)) {
-                    qualityIndex = i;
-                }
+        // Check to see if we've already downloaded higher quality versions of this image
+        for (let i = 1; i < this.thumbnailsDefs.length; i++) {
+            if (this.loadedImages.includes(this.thumbnailsDefs[i].frames[thumbNum].text)) {
+                qualityIndex = i;
             }
+        }
 
-            // Only proceed if either thumbnum or thumbfilename has changed
-            if (thumbNum !== this.showingThumb) {
-                this.showingThumb = thumbNum;
-                this.loadImage(qualityIndex);
-            }
-
-        // } else {
-        //     // Set a timeout so that we always fire this function once after the mouse stops moving. If not for this, the mouse preview would often be a bit stale
-        //     if (this.mousemoveEventTimeout) {
-        //         clearTimeout(this.mousemoveEventTimeout);
-        //     }
-        //     this.mousemoveEventTimeout = setTimeout(() => {
-        //         // Don't follow through after the timeout if it's since been hidden
-        //         if (this.player.elements.display.previewThumbnailContainer.style.opacity === '1') {
-        //             console.log('show on timer')
-        //             this.showImageAtCurrentTime(true);
-        //             this.mousemoveEventTimeout = null;
-        //         }
-        //     }, 200)
-        // }
+        // Only proceed if either thumbnum or thumbfilename has changed
+        if (thumbNum !== this.showingThumb) {
+            this.showingThumb = thumbNum;
+            this.loadImage(qualityIndex);
+        }
     }
 
     // Show the image that's currently specified in this.showingThumb
     loadImage(qualityIndex = 0) {
         let thumbNum = this.showingThumb;
 
-        this.player.debug.log(`Preview thumbnails: showing thumbnum: ${thumbNum}: ${JSON.stringify(this.thumbnailsDefs[qualityIndex].frames[thumbNum])}`);
-
         const frame = this.thumbnailsDefs[qualityIndex].frames[thumbNum];
         const thumbFilename = this.thumbnailsDefs[qualityIndex].frames[thumbNum].text;
         const urlPrefix = this.thumbnailsDefs[qualityIndex].urlPrefix;
         const thumbURL = urlPrefix + thumbFilename;
-
-        // console.log('loading: ' + thumbFilename + '. num: ' + thumbNum + '. qual: ' + qualityIndex);
 
         if (!this.currentImageElement || this.currentImageElement.getAttribute('data-thumbfilename') !== thumbFilename) {
             // If we're already loading a previous image, remove its onload handler - we don't want it to load after this one
@@ -341,7 +317,6 @@ class PreviewThumbnails {
             previewImage.src = thumbURL;
             previewImage.setAttribute('data-thumbnum', thumbNum);
             previewImage.setAttribute('data-thumbfilename', thumbFilename);
-            // this.showingThumbFilename = this.thumbnailsDefs[qualityIndex].frames[thumbNum].text;
             this.showingThumbFilename = thumbFilename;
 
             // For some reason, passing the named function directly causes it to execute immediately. So I've wrapped it in an anonymous function...
@@ -357,41 +332,22 @@ class PreviewThumbnails {
     }
 
     showImage(previewImage, frame, qualityIndex, thumbNum, thumbFilename, newImage = true) {
-        // console.log('newimage: ' + newImage)
-        console.log('showing: ' + thumbFilename + '. num: ' + thumbNum + '. qual: ' + qualityIndex + '. newimg: ' + newImage);
+        this.player.debug.log('Showing thumb: ' + thumbFilename + '. num: ' + thumbNum + '. qual: ' + qualityIndex + '. newimg: ' + newImage);
         this.setImageSizeAndOffset(previewImage, frame);
 
         if (newImage) {
             this.currentContainer.appendChild(previewImage);
-            
             this.currentImageElement = previewImage;
-            // this.removeOldImages(previewImage);
 
             if (!this.loadedImages.includes(thumbFilename)) this.loadedImages.push(thumbFilename);
         }
 
-        // Look for a higher quality version of the same frame
-        if (qualityIndex < this.thumbnailsDefs.length - 1) {
-            // Only use the higher quality version if it's going to look any better - if the current thumb is of a lower pixel density than the thumbnail container
-            // let previewContainerHeight = this.player.elements.display.previewThumbnailContainer.clientHeight;
-            // if (this.mouseDown) previewContainerHeight = this.player.elements.display.previewScrubbingContainer.clientHeight;
-            // // Adjust for HiDPI screen
-            // if (window.devicePixelRatio) previewContainerHeight *= window.devicePixelRatio;
-
-            // if (previewImage.naturalHeight < previewContainerHeight) {
-                // Recurse this function - show a higher quality one, but only if the viewer is on this frame for a while
-                setTimeout(() => {
-                    // Make sure the mouse hasn't already moved on and started hovering at another frame
-                    // TODO: need to use filename instead of thumbnum, but need to use latest thumbnum instead of old thumbnum
-                    // if (this.showingThumb === thumbNum) {
-                    console.log(`${this.showingThumbFilename} ${thumbFilename}`)
-                    if (this.showingThumbFilename === thumbFilename) {
-                        // console.log('showing higher qual')
-                        this.loadImage(qualityIndex + 1);
-                    }
-                }, 500)
-            // }
-        }
+        // Preload images before and after the current one
+        // Show higher quality of the same frame
+        // Each step here has a short time delay, and only continues if still hovering/seeking the same spot. This is to protect slow connections from overloading
+        this.preloadNearby(thumbNum, true)
+            .then(this.preloadNearby(thumbNum, false))
+            .then(this.getHigherQuality(qualityIndex, previewImage, frame, thumbFilename));
     }
 
     removeOldImages(currentImage) {
@@ -400,17 +356,91 @@ class PreviewThumbnails {
 
         for (let image of allImages) {
             if (image.tagName === 'IMG') {
-                const removeDelay = this.usingJpegSprites ? 200 : 1000;
+                const removeDelay = this.usingJpegSprites ? 500 : 1000;
 
                 if (image.getAttribute('data-thumbnum') !== currentImage.getAttribute('data-thumbnum') && !image.getAttribute('data-deleting')) {
                     // Wait 200ms, as the new image can take some time to show on certain browsers (even though it was downloaded before showing). This will prevent flicker, and show some generosity towards slower clients
                     // First set attribute 'deleting' to prevent multi-handling of this on repeat firing of this function
                     image.setAttribute('data-deleting', 'true');
+                    const currentContainer = this.currentContainer; // This has to be set before the timeout - to prevent issues switching between hover and scrub
+
                     setTimeout(() => {
-                        this.currentContainer.removeChild(image);
-                        // console.log('removing: ' + image.getAttribute('data-thumbfilename'));
+                        currentContainer.removeChild(image);
+                        this.player.debug.log('Removing thumb: ' + image.getAttribute('data-thumbfilename'));
                     }, removeDelay)
                 }
+            }
+        }
+    }
+
+    // Preload images before and after the current one. Only if the user is still hovering/seeking the same frame
+    // This will only preload the lowest quality
+    preloadNearby(thumbNum, forward = true) {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                const oldThumbFilename = this.thumbnailsDefs[0].frames[thumbNum].text;
+
+                if (this.showingThumbFilename === oldThumbFilename) {
+                    // Find the nearest thumbs with different filenames. Sometimes it'll be the next index, but in the case of jpeg sprites, it might be 100+ away
+                    let thumbnailsDefsCopy
+                    if (forward) {
+                        thumbnailsDefsCopy = this.thumbnailsDefs[0].frames.slice(thumbNum);
+                    } else {
+                        thumbnailsDefsCopy = this.thumbnailsDefs[0].frames.slice(0, thumbNum).reverse();
+                    }
+
+                    let foundOne = false;
+
+                    for (const frame of thumbnailsDefsCopy) {
+                        const newThumbFilename = frame.text;
+
+                        if (newThumbFilename !== oldThumbFilename) {
+                            // Found one with a different filename. Make sure it hasn't already been loaded on this page visit
+                            if (!this.loadedImages.includes(newThumbFilename)) {
+                                foundOne = true;
+                                this.player.debug.log('Preloading thumb filename: ' + newThumbFilename);
+
+                                const urlPrefix = this.thumbnailsDefs[0].urlPrefix;
+                                const thumbURL = urlPrefix + newThumbFilename;
+
+                                const previewImage = new Image();
+                                previewImage.src = thumbURL;
+                                previewImage.onload = () => {
+                                    this.player.debug.log('Preloaded thumb filename: ' + newThumbFilename);
+                                    if (!this.loadedImages.includes(newThumbFilename)) this.loadedImages.push(newThumbFilename);
+
+                                    // We don't resolve until the thumb is loaded
+                                    resolve()
+                                };
+                            }
+
+                            break;
+                        }
+                    }
+
+                    // If there are none to preload then we want to resolve immediately
+                    if (!foundOne) resolve();
+                }
+            }, 300)
+        })
+    }
+
+    // If user has been hovering current image for half a second, look for a higher quality one
+    getHigherQuality(currentQualityIndex, previewImage, frame, thumbFilename) {
+        if (currentQualityIndex < this.thumbnailsDefs.length - 1) {
+            // Only use the higher quality version if it's going to look any better - if the current thumb is of a lower pixel density than the thumbnail container
+            let previewImageHeight = previewImage.naturalHeight;
+            if (this.usingJpegSprites) previewImageHeight = frame.h;
+
+            if (previewImageHeight < this.thumbContainerHeight) {
+                // Recurse back to the loadImage function - show a higher quality one, but only if the viewer is on this frame for a while
+                setTimeout(() => {
+                    // Make sure the mouse hasn't already moved on and started hovering at another image
+                    if (this.showingThumbFilename === thumbFilename) {
+                        this.player.debug.log('Showing higher quality thumb for: ' + thumbFilename)
+                        this.loadImage(currentQualityIndex + 1);
+                    }
+                }, 300)
             }
         }
     }
