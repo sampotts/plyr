@@ -374,6 +374,11 @@ const defaults = {
             active: 'plyr--airplay-active',
         },
         tabFocus: 'plyr__tab-focus',
+        previewThumbnails: {
+            thumbnailContainer: 'plyr__preview-thumbnail-container',
+            scrubbingContainer: 'plyr__preview-scrubbing-container',
+            timeTextContainer: 'plyr__preview-time-text-container',
+        },
     },
 
     // Embed attributes
@@ -395,6 +400,11 @@ const defaults = {
         enabled: false,
         publisherId: '',
     },
+
+    // Preview Thumbnails plugin
+    previewThumbnails: {
+        enabled: false,
+    }
 };
 
 export default defaults;
