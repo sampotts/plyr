@@ -244,12 +244,22 @@ class PreviewThumbnails {
         const previewThumbnailContainer = createElement(
             'div',
             {
-                class: this.player.config.classNames.previewThumbnailContainer,
+                class: this.player.config.classNames.previewThumbnails.thumbnailContainer,
             },
         );
 
         this.player.elements.progress.appendChild(previewThumbnailContainer);
         this.player.elements.display.previewThumbnailContainer = previewThumbnailContainer;
+
+        // Create HTML element, parent+span: time text (e.g., 01:32:00)
+        const timeTextContainer = createElement(
+            'div',
+            {
+                class: this.player.config.classNames.previewThumbnails.timeTextContainer
+            },
+        );
+
+        this.player.elements.display.previewThumbnailContainer.appendChild(timeTextContainer);
 
         const timeText = createElement(
             'span',
@@ -257,14 +267,14 @@ class PreviewThumbnails {
             '00:00',
         );
 
-        this.player.elements.display.previewThumbnailContainer.appendChild(timeText);
+        timeTextContainer.appendChild(timeText);
         this.player.elements.display.previewThumbnailTimeText = timeText;
 
         // Create HTML element: plyr__preview-scrubbing-container
         const previewScrubbingContainer = createElement(
             'div',
             {
-                class: this.player.config.classNames.previewScrubbingContainer,
+                class: this.player.config.classNames.previewThumbnails.scrubbingContainer,
             },
         );
 
@@ -350,9 +360,10 @@ class PreviewThumbnails {
             .then(this.getHigherQuality(qualityIndex, previewImage, frame, thumbFilename));
     }
 
+    // Remove all preview images that aren't the designated current image
     removeOldImages(currentImage) {
-        // Get a list of all images, and reverse it - so that we can start from the end and delete all except for the most recent
-        const allImages = [...this.currentContainer.children];
+        // Get a list of all images, convert it from a DOM list to an array
+        const allImages = Array.from(this.currentContainer.children);
 
         for (let image of allImages) {
             if (image.tagName === 'IMG') {

@@ -342,8 +342,6 @@ const defaults = {
         loading: 'plyr--loading',
         hover: 'plyr--hover',
         tooltip: 'plyr__tooltip',
-        previewThumbnailContainer: 'plyr__preview-thumbnail-container',
-        previewScrubbingContainer: 'plyr__preview-scrubbing-container',
         cues: 'plyr__cues',
         hidden: 'plyr__sr-only',
         hideControls: 'plyr--hide-controls',
@@ -376,6 +374,11 @@ const defaults = {
             active: 'plyr--airplay-active',
         },
         tabFocus: 'plyr__tab-focus',
+        previewThumbnails: {
+            thumbnailContainer: 'plyr__preview-thumbnail-container',
+            scrubbingContainer: 'plyr__preview-scrubbing-container',
+            timeTextContainer: 'plyr__preview-time-text-container',
+        },
     },
 
     // Embed attributes

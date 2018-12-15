@@ -32,16 +32,21 @@
     }
 
     // Seek time text
-    span {
+    .plyr__preview-time-text-container {
         position: absolute;
         bottom: 0px;
+        left: 0px;
+        right: 0px;
+        margin-bottom: 2px;
         z-index: 3;
-        transform: translate(-50%,0);
-        background-color: rgba(0,0,0,0.55);
-        color: rgba(255,255,255,1);
-        padding: 4px 6px 3px 6px;
-        font-size: $plyr-font-size-small;
-        font-weight: $plyr-font-weight-regular;
+
+        span {
+            background-color: rgba(0,0,0,0.55);
+            color: rgba(255,255,255,1);
+            padding: 4px 6px 3px 6px;
+            font-size: $plyr-font-size-small;
+            font-weight: $plyr-font-weight-regular;
+        }
     }
 }
 
