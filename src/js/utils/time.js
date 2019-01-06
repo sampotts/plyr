@@ -5,9 +5,9 @@
 import is from './is';
 
 // Time helpers
-export const getHours = value => parseInt((value / 60 / 60) % 60, 10);
-export const getMinutes = value => parseInt((value / 60) % 60, 10);
-export const getSeconds = value => parseInt(value % 60, 10);
+export const getHours = value => Math.trunc((value / 60 / 60) % 60, 10);
+export const getMinutes = value => Math.trunc((value / 60) % 60, 10);
+export const getSeconds = value => Math.trunc(value % 60, 10);
 
 // Format time to UI friendly string
 export function formatTime(time = 0, displayHours = false, inverted = false) {
