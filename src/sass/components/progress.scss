@@ -42,13 +42,13 @@
 
     &::-webkit-progress-bar {
         background: transparent;
-        transition: width 0.2s ease;
     }
 
     &::-webkit-progress-value {
         background: currentColor;
         border-radius: 100px;
         min-width: $plyr-range-track-height;
+        transition: width 0.2s ease;
     }
 
     // Mozilla
