@@ -158,7 +158,6 @@ const youtube = {
                 autoplay: player.config.autoplay ? 1 : 0, // Autoplay
                 hl: player.config.hl, // iframe interface language
                 controls: player.supported.ui ? 0 : 1, // Only show controls if not fully supported
-
                 rel: 0, // No related vids
                 showinfo: 0, // Hide info
                 iv_load_policy: 3, // Hide annotations
