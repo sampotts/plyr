@@ -400,11 +400,14 @@ const defaults = {
         enabled: false,
         publisherId: '',
     },
+  
+    // YouTube nocookies mode
+    noCookie: false,
 
     // Preview Thumbnails plugin
     previewThumbnails: {
         enabled: false,
-    }
+    },
 };
 
 export default defaults;

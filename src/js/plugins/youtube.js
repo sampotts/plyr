@@ -153,6 +153,7 @@ const youtube = {
         // https://developers.google.com/youtube/iframe_api_reference
         player.embed = new window.YT.Player(id, {
             videoId,
+            host: player.config.noCookie ? 'https://www.youtube-nocookie.com' : undefined,
             playerVars: {
                 autoplay: player.config.autoplay ? 1 : 0, // Autoplay
                 hl: player.config.hl, // iframe interface language
