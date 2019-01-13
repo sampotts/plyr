@@ -10,6 +10,7 @@ import is from '../utils/is';
 import loadImage from '../utils/loadImage';
 import loadScript from '../utils/loadScript';
 import { format, generateId } from '../utils/strings';
+import { setAspectRatio } from '../utils/style';
 
 // Parse YouTube ID from URL
 function parseId(url) {
@@ -38,7 +39,7 @@ const youtube = {
         toggleClass(this.elements.wrapper, this.config.classNames.embed, true);
 
         // Set aspect ratio
-        youtube.setAspectRatio.call(this);
+        setAspectRatio.call(this);
 
         // Setup API
         if (is.object(window.YT) && is.function(window.YT.Player)) {
@@ -96,12 +97,6 @@ const youtube = {
                 })
                 .catch(() => {});
         }
-    },
-
-    // Set aspect ratio
-    setAspectRatio() {
-        const ratio = this.config.ratio.split(':');
-        this.elements.wrapper.style.paddingBottom = `${100 / ratio[0] * ratio[1]}%`;
     },
 
     // API ready

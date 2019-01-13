@@ -108,7 +108,7 @@ const defaults = {
     // Fullscreen settings
     fullscreen: {
         enabled: true, // Allow fullscreen?
-        fallback: true, // Fallback for vintage browsers
+        fallback: true, // Fallback using full viewport/window
         iosNative: false, // Use the native fullscreen in iOS (disables custom controls)
     },
 

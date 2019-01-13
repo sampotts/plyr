@@ -117,8 +117,9 @@ typeof navigator === "object" && (function (global, factory) {
 
       var URLSearchParams = function(searchString) {
         Object.defineProperty(this, '_entries', { writable: true, value: {} });
+        var typeofSearchString = typeof searchString;
 
-        if (typeof searchString === 'string') {
+        if (typeofSearchString === 'undefined') ; else if (typeofSearchString === 'string') {
           if (searchString !== '') {
             this._fromString(searchString);
           }
@@ -127,6 +128,25 @@ typeof navigator === "object" && (function (global, factory) {
           searchString.forEach(function(value, name) {
             _this.append(name, value);
           });
+        } else if ((searchString !== null) && (typeofSearchString === 'object')) {
+          if (Object.prototype.toString.call(searchString) === '[object Array]') {
+            for (var i = 0; i < searchString.length; i++) {
+              var entry = searchString[i];
+              if ((Object.prototype.toString.call(entry) === '[object Array]') || (entry.length !== 2)) {
+                this.append(entry[0], entry[1]);
+              } else {
+                throw new TypeError('Expected [string, any] as entry at index ' + i + ' of URLSearchParams\'s input');
+              }
+            }
+          } else {
+            for (var key in searchString) {
+              if (searchString.hasOwnProperty(key)) {
+                this.append(key, searchString[key]);
+              }
+            }
+          }
+        } else {
+          throw new TypeError('Unsupported input\'s type for URLSearchParams');
         }
       };
 
@@ -134,9 +154,9 @@ typeof navigator === "object" && (function (global, factory) {
 
       proto.append = function(name, value) {
         if (name in this._entries) {
-          this._entries[name].push(value.toString());
+          this._entries[name].push(String(value));
         } else {
-          this._entries[name] = [value.toString()];
+          this._entries[name] = [String(value)];
         }
       };
 
@@ -157,7 +177,7 @@ typeof navigator === "object" && (function (global, factory) {
       };
 
       proto.set = function(name, value) {
-        this._entries[name] = [value.toString()];
+        this._entries[name] = [String(value)];
       };
 
       proto.forEach = function(callback, thisArg) {
@@ -208,24 +228,6 @@ typeof navigator === "object" && (function (global, factory) {
         return searchArray.join('&');
       };
 
-      Object.defineProperty(proto, '_fromString', {
-        enumerable: false,
-        configurable: false,
-        writable: false,
-        value: function(searchString) {
-          this._entries = {};
-          searchString = searchString.replace(/^\?/, '');
-          var attributes = searchString.split('&');
-          var attribute;
-          for (var i = 0; i < attributes.length; i++) {
-            attribute = attributes[i].split('=');
-            this.append(
-              deserializeParam(attribute[0]),
-              (attribute.length > 1) ? deserializeParam(attribute[1]) : ''
-            );
-          }
-        }
-      });
 
       global.URLSearchParams = URLSearchParams;
     };
@@ -234,8 +236,10 @@ typeof navigator === "object" && (function (global, factory) {
       polyfillURLSearchParams();
     }
 
-    if (typeof URLSearchParams.prototype.sort !== 'function') {
-      URLSearchParams.prototype.sort = function() {
+    var proto = URLSearchParams.prototype;
+
+    if (typeof proto.sort !== 'function') {
+      proto.sort = function() {
         var _this = this;
         var items = [];
         this.forEach(function(value, name) {
@@ -260,6 +264,38 @@ typeof navigator === "object" && (function (global, factory) {
           this.append(items[i][0], items[i][1]);
         }
       };
+    }
+
+    if (typeof proto._fromString !== 'function') {
+      Object.defineProperty(proto, '_fromString', {
+        enumerable: false,
+        configurable: false,
+        writable: false,
+        value: function(searchString) {
+          if (this._entries) {
+            this._entries = {};
+          } else {
+            var keys = [];
+            this.forEach(function(value, name) {
+              keys.push(name);
+            });
+            for (var i = 0; i < keys.length; i++) {
+              this.delete(keys[i]);
+            }
+          }
+
+          searchString = searchString.replace(/^\?/, '');
+          var attributes = searchString.split('&');
+          var attribute;
+          for (var i = 0; i < attributes.length; i++) {
+            attribute = attributes[i].split('=');
+            this.append(
+              deserializeParam(attribute[0]),
+              (attribute.length > 1) ? deserializeParam(attribute[1]) : ''
+            );
+          }
+        }
+      });
     }
 
     // HTMLAnchorElement
@@ -538,7 +574,7 @@ typeof navigator === "object" && (function (global, factory) {
   });
 
   var _core = createCommonjsModule(function (module) {
-  var core = module.exports = { version: '2.5.7' };
+  var core = module.exports = { version: '2.6.1' };
   if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
   });
   var _core_1 = _core.version;
@@ -1339,37 +1375,30 @@ typeof navigator === "object" && (function (global, factory) {
 
   _addToUnscopables('includes');
 
-  var _fixReWks = function (KEY, length, exec) {
-    var SYMBOL = _wks(KEY);
-    var fns = exec(_defined, SYMBOL, ''[KEY]);
-    var strfn = fns[0];
-    var rxfn = fns[1];
-    if (_fails(function () {
-      var O = {};
-      O[SYMBOL] = function () { return 7; };
-      return ''[KEY](O) != 7;
-    })) {
-      _redefine(String.prototype, KEY, strfn);
-      _hide(RegExp.prototype, SYMBOL, length == 2
-        // 21.2.5.8 RegExp.prototype[@@replace](string, replaceValue)
-        // 21.2.5.11 RegExp.prototype[@@split](string, limit)
-        ? function (string, arg) { return rxfn.call(string, this, arg); }
-        // 21.2.5.6 RegExp.prototype[@@match](string)
-        // 21.2.5.9 RegExp.prototype[@@search](string)
-        : function (string) { return rxfn.call(string, this); }
-      );
-    }
+  // 7.2.9 SameValue(x, y)
+  var _sameValue = Object.is || function is(x, y) {
+    // eslint-disable-next-line no-self-compare
+    return x === y ? x !== 0 || 1 / x === 1 / y : x != x && y != y;
   };
 
-  // @@search logic
-  _fixReWks('search', 1, function (defined, SEARCH, $search) {
-    // 21.1.3.15 String.prototype.search(regexp)
-    return [function search(regexp) {
-      var O = defined(this);
-      var fn = regexp == undefined ? undefined : regexp[SEARCH];
-      return fn !== undefined ? fn.call(regexp, O) : new RegExp(regexp)[SEARCH](String(O));
-    }, $search];
-  });
+  var builtinExec = RegExp.prototype.exec;
+
+   // `RegExpExec` abstract operation
+  // https://tc39.github.io/ecma262/#sec-regexpexec
+  var _regexpExecAbstract = function (R, S) {
+    var exec = R.exec;
+    if (typeof exec === 'function') {
+      var result = exec.call(R, S);
+      if (typeof result !== 'object') {
+        throw new TypeError('RegExp exec method returned something other than an Object or null');
+      }
+      return result;
+    }
+    if (_classof(R) !== 'RegExp') {
+      throw new TypeError('RegExp#exec called on incompatible receiver');
+    }
+    return builtinExec.call(R, S);
+  };
 
   // 21.2.5.3 get RegExp.prototype.flags
 
@@ -1383,6 +1412,183 @@ typeof navigator === "object" && (function (global, factory) {
     if (that.sticky) result += 'y';
     return result;
   };
+
+  var nativeExec = RegExp.prototype.exec;
+  // This always refers to the native implementation, because the
+  // String#replace polyfill uses ./fix-regexp-well-known-symbol-logic.js,
+  // which loads this file before patching the method.
+  var nativeReplace = String.prototype.replace;
+
+  var patchedExec = nativeExec;
+
+  var LAST_INDEX = 'lastIndex';
+
+  var UPDATES_LAST_INDEX_WRONG = (function () {
+    var re1 = /a/,
+        re2 = /b*/g;
+    nativeExec.call(re1, 'a');
+    nativeExec.call(re2, 'a');
+    return re1[LAST_INDEX] !== 0 || re2[LAST_INDEX] !== 0;
+  })();
+
+  // nonparticipating capturing group, copied from es5-shim's String#split patch.
+  var NPCG_INCLUDED = /()??/.exec('')[1] !== undefined;
+
+  var PATCH = UPDATES_LAST_INDEX_WRONG || NPCG_INCLUDED;
+
+  if (PATCH) {
+    patchedExec = function exec(str) {
+      var re = this;
+      var lastIndex, reCopy, match, i;
+
+      if (NPCG_INCLUDED) {
+        reCopy = new RegExp('^' + re.source + '$(?!\\s)', _flags.call(re));
+      }
+      if (UPDATES_LAST_INDEX_WRONG) lastIndex = re[LAST_INDEX];
+
+      match = nativeExec.call(re, str);
+
+      if (UPDATES_LAST_INDEX_WRONG && match) {
+        re[LAST_INDEX] = re.global ? match.index + match[0].length : lastIndex;
+      }
+      if (NPCG_INCLUDED && match && match.length > 1) {
+        // Fix browsers whose `exec` methods don't consistently return `undefined`
+        // for NPCG, like IE8. NOTE: This doesn' work for /(.?)?/
+        // eslint-disable-next-line no-loop-func
+        nativeReplace.call(match[0], reCopy, function () {
+          for (i = 1; i < arguments.length - 2; i++) {
+            if (arguments[i] === undefined) match[i] = undefined;
+          }
+        });
+      }
+
+      return match;
+    };
+  }
+
+  var _regexpExec = patchedExec;
+
+  _export({
+    target: 'RegExp',
+    proto: true,
+    forced: _regexpExec !== /./.exec
+  }, {
+    exec: _regexpExec
+  });
+
+  var SPECIES$1 = _wks('species');
+
+  var REPLACE_SUPPORTS_NAMED_GROUPS = !_fails(function () {
+    // #replace needs built-in support for named groups.
+    // #match works fine because it just return the exec results, even if it has
+    // a "grops" property.
+    var re = /./;
+    re.exec = function () {
+      var result = [];
+      result.groups = { a: '7' };
+      return result;
+    };
+    return ''.replace(re, '$<a>') !== '7';
+  });
+
+  var SPLIT_WORKS_WITH_OVERWRITTEN_EXEC = (function () {
+    // Chrome 51 has a buggy "split" implementation when RegExp#exec !== nativeExec
+    var re = /(?:)/;
+    var originalExec = re.exec;
+    re.exec = function () { return originalExec.apply(this, arguments); };
+    var result = 'ab'.split(re);
+    return result.length === 2 && result[0] === 'a' && result[1] === 'b';
+  })();
+
+  var _fixReWks = function (KEY, length, exec) {
+    var SYMBOL = _wks(KEY);
+
+    var DELEGATES_TO_SYMBOL = !_fails(function () {
+      // String methods call symbol-named RegEp methods
+      var O = {};
+      O[SYMBOL] = function () { return 7; };
+      return ''[KEY](O) != 7;
+    });
+
+    var DELEGATES_TO_EXEC = DELEGATES_TO_SYMBOL ? !_fails(function () {
+      // Symbol-named RegExp methods call .exec
+      var execCalled = false;
+      var re = /a/;
+      re.exec = function () { execCalled = true; return null; };
+      if (KEY === 'split') {
+        // RegExp[@@split] doesn't call the regex's exec method, but first creates
+        // a new one. We need to return the patched regex when creating the new one.
+        re.constructor = {};
+        re.constructor[SPECIES$1] = function () { return re; };
+      }
+      re[SYMBOL]('');
+      return !execCalled;
+    }) : undefined;
+
+    if (
+      !DELEGATES_TO_SYMBOL ||
+      !DELEGATES_TO_EXEC ||
+      (KEY === 'replace' && !REPLACE_SUPPORTS_NAMED_GROUPS) ||
+      (KEY === 'split' && !SPLIT_WORKS_WITH_OVERWRITTEN_EXEC)
+    ) {
+      var nativeRegExpMethod = /./[SYMBOL];
+      var fns = exec(
+        _defined,
+        SYMBOL,
+        ''[KEY],
+        function maybeCallNative(nativeMethod, regexp, str, arg2, forceStringMethod) {
+          if (regexp.exec === _regexpExec) {
+            if (DELEGATES_TO_SYMBOL && !forceStringMethod) {
+              // The native String method already delegates to @@method (this
+              // polyfilled function), leasing to infinite recursion.
+              // We avoid it by directly calling the native @@method method.
+              return { done: true, value: nativeRegExpMethod.call(regexp, str, arg2) };
+            }
+            return { done: true, value: nativeMethod.call(str, regexp, arg2) };
+          }
+          return { done: false };
+        }
+      );
+      var strfn = fns[0];
+      var rxfn = fns[1];
+
+      _redefine(String.prototype, KEY, strfn);
+      _hide(RegExp.prototype, SYMBOL, length == 2
+        // 21.2.5.8 RegExp.prototype[@@replace](string, replaceValue)
+        // 21.2.5.11 RegExp.prototype[@@split](string, limit)
+        ? function (string, arg) { return rxfn.call(string, this, arg); }
+        // 21.2.5.6 RegExp.prototype[@@match](string)
+        // 21.2.5.9 RegExp.prototype[@@search](string)
+        : function (string) { return rxfn.call(string, this); }
+      );
+    }
+  };
+
+  // @@search logic
+  _fixReWks('search', 1, function (defined, SEARCH, $search, maybeCallNative) {
+    return [
+      // `String.prototype.search` method
+      // https://tc39.github.io/ecma262/#sec-string.prototype.search
+      function search(regexp) {
+        var O = defined(this);
+        var fn = regexp == undefined ? undefined : regexp[SEARCH];
+        return fn !== undefined ? fn.call(regexp, O) : new RegExp(regexp)[SEARCH](String(O));
+      },
+      // `RegExp.prototype[@@search]` method
+      // https://tc39.github.io/ecma262/#sec-regexp.prototype-@@search
+      function (regexp) {
+        var res = maybeCallNative($search, regexp, this);
+        if (res.done) return res.value;
+        var rx = _anObject(regexp);
+        var S = String(this);
+        var previousLastIndex = rx.lastIndex;
+        if (!_sameValue(previousLastIndex, 0)) rx.lastIndex = 0;
+        var result = _regexpExecAbstract(rx, S);
+        if (!_sameValue(rx.lastIndex, previousLastIndex)) rx.lastIndex = previousLastIndex;
+        return result === null ? -1 : result.index;
+      }
+    ];
+  });
 
   // 21.2.5.3 get RegExp.prototype.flags()
   if (_descriptors && /./g.flags != 'g') _objectDp.f(RegExp.prototype, 'flags', {
@@ -2078,14 +2284,36 @@ typeof navigator === "object" && (function (global, factory) {
 
   _export(_export.S + _export.F, 'Object', { assign: _objectAssign });
 
+  // 7.3.20 SpeciesConstructor(O, defaultConstructor)
+
+
+  var SPECIES$2 = _wks('species');
+  var _speciesConstructor = function (O, D) {
+    var C = _anObject(O).constructor;
+    var S;
+    return C === undefined || (S = _anObject(C)[SPECIES$2]) == undefined ? D : _aFunction(S);
+  };
+
+  var at = _stringAt(true);
+
+   // `AdvanceStringIndex` abstract operation
+  // https://tc39.github.io/ecma262/#sec-advancestringindex
+  var _advanceStringIndex = function (S, index, unicode) {
+    return index + (unicode ? at(S, index).length : 1);
+  };
+
+  var $min = Math.min;
+  var $push = [].push;
+  var $SPLIT = 'split';
+  var LENGTH = 'length';
+  var LAST_INDEX$1 = 'lastIndex';
+
+  // eslint-disable-next-line no-empty
+  var SUPPORTS_Y = !!(function () { try { return new RegExp('x', 'y'); } catch (e) {} })();
+
   // @@split logic
-  _fixReWks('split', 2, function (defined, SPLIT, $split) {
-    var isRegExp = _isRegexp;
-    var _split = $split;
-    var $push = [].push;
-    var $SPLIT = 'split';
-    var LENGTH = 'length';
-    var LAST_INDEX = 'lastIndex';
+  _fixReWks('split', 2, function (defined, SPLIT, $split, maybeCallNative) {
+    var internalSplit;
     if (
       'abbc'[$SPLIT](/(b)*/)[1] == 'c' ||
       'test'[$SPLIT](/(?:)/, -1)[LENGTH] != 4 ||
@@ -2094,13 +2322,12 @@ typeof navigator === "object" && (function (global, factory) {
       '.'[$SPLIT](/()()/)[LENGTH] > 1 ||
       ''[$SPLIT](/.?/)[LENGTH]
     ) {
-      var NPCG = /()??/.exec('')[1] === undefined; // nonparticipating capturing group
       // based on es5-shim implementation, need to rework it
-      $split = function (separator, limit) {
+      internalSplit = function (separator, limit) {
         var string = String(this);
         if (separator === undefined && limit === 0) return [];
         // If `separator` is not a regex, use native split
-        if (!isRegExp(separator)) return _split.call(string, separator, limit);
+        if (!_isRegexp(separator)) return $split.call(string, separator, limit);
         var output = [];
         var flags = (separator.ignoreCase ? 'i' : '') +
                     (separator.multiline ? 'm' : '') +
@@ -2110,25 +2337,17 @@ typeof navigator === "object" && (function (global, factory) {
         var splitLimit = limit === undefined ? 4294967295 : limit >>> 0;
         // Make `global` and avoid `lastIndex` issues by working with a copy
         var separatorCopy = new RegExp(separator.source, flags + 'g');
-        var separator2, match, lastIndex, lastLength, i;
-        // Doesn't need flags gy, but they don't hurt
-        if (!NPCG) separator2 = new RegExp('^' + separatorCopy.source + '$(?!\\s)', flags);
-        while (match = separatorCopy.exec(string)) {
-          // `separatorCopy.lastIndex` is not reliable cross-browser
-          lastIndex = match.index + match[0][LENGTH];
+        var match, lastIndex, lastLength;
+        while (match = _regexpExec.call(separatorCopy, string)) {
+          lastIndex = separatorCopy[LAST_INDEX$1];
           if (lastIndex > lastLastIndex) {
             output.push(string.slice(lastLastIndex, match.index));
-            // Fix browsers whose `exec` methods don't consistently return `undefined` for NPCG
-            // eslint-disable-next-line no-loop-func
-            if (!NPCG && match[LENGTH] > 1) match[0].replace(separator2, function () {
-              for (i = 1; i < arguments[LENGTH] - 2; i++) if (arguments[i] === undefined) match[i] = undefined;
-            });
             if (match[LENGTH] > 1 && match.index < string[LENGTH]) $push.apply(output, match.slice(1));
             lastLength = match[0][LENGTH];
             lastLastIndex = lastIndex;
             if (output[LENGTH] >= splitLimit) break;
           }
-          if (separatorCopy[LAST_INDEX] === match.index) separatorCopy[LAST_INDEX]++; // Avoid an infinite loop
+          if (separatorCopy[LAST_INDEX$1] === match.index) separatorCopy[LAST_INDEX$1]++; // Avoid an infinite loop
         }
         if (lastLastIndex === string[LENGTH]) {
           if (lastLength || !separatorCopy.test('')) output.push('');
@@ -2137,16 +2356,74 @@ typeof navigator === "object" && (function (global, factory) {
       };
     // Chakra, V8
     } else if ('0'[$SPLIT](undefined, 0)[LENGTH]) {
-      $split = function (separator, limit) {
-        return separator === undefined && limit === 0 ? [] : _split.call(this, separator, limit);
+      internalSplit = function (separator, limit) {
+        return separator === undefined && limit === 0 ? [] : $split.call(this, separator, limit);
       };
+    } else {
+      internalSplit = $split;
     }
-    // 21.1.3.17 String.prototype.split(separator, limit)
-    return [function split(separator, limit) {
-      var O = defined(this);
-      var fn = separator == undefined ? undefined : separator[SPLIT];
-      return fn !== undefined ? fn.call(separator, O, limit) : $split.call(String(O), separator, limit);
-    }, $split];
+
+    return [
+      // `String.prototype.split` method
+      // https://tc39.github.io/ecma262/#sec-string.prototype.split
+      function split(separator, limit) {
+        var O = defined(this);
+        var splitter = separator == undefined ? undefined : separator[SPLIT];
+        return splitter !== undefined
+          ? splitter.call(separator, O, limit)
+          : internalSplit.call(String(O), separator, limit);
+      },
+      // `RegExp.prototype[@@split]` method
+      // https://tc39.github.io/ecma262/#sec-regexp.prototype-@@split
+      //
+      // NOTE: This cannot be properly polyfilled in engines that don't support
+      // the 'y' flag.
+      function (regexp, limit) {
+        var res = maybeCallNative(internalSplit, regexp, this, limit, internalSplit !== $split);
+        if (res.done) return res.value;
+
+        var rx = _anObject(regexp);
+        var S = String(this);
+        var C = _speciesConstructor(rx, RegExp);
+
+        var unicodeMatching = rx.unicode;
+        var flags = (rx.ignoreCase ? 'i' : '') +
+                      (rx.multiline ? 'm' : '') +
+                      (rx.unicode ? 'u' : '') +
+                      (SUPPORTS_Y ? 'y' : 'g');
+
+        // ^(? + rx + ) is needed, in combination with some S slicing, to
+        // simulate the 'y' flag.
+        var splitter = new C(SUPPORTS_Y ? rx : '^(?:' + rx.source + ')', flags);
+        var lim = limit === undefined ? 0xffffffff : limit >>> 0;
+        if (lim === 0) return [];
+        if (S.length === 0) return _regexpExecAbstract(splitter, S) === null ? [S] : [];
+        var p = 0;
+        var q = 0;
+        var A = [];
+        while (q < S.length) {
+          splitter.lastIndex = SUPPORTS_Y ? q : 0;
+          var z = _regexpExecAbstract(splitter, SUPPORTS_Y ? S : S.slice(q));
+          var e;
+          if (
+            z === null ||
+            (e = $min(_toLength(splitter.lastIndex + (SUPPORTS_Y ? 0 : q)), S.length)) === p
+          ) {
+            q = _advanceStringIndex(S, q, unicodeMatching);
+          } else {
+            A.push(S.slice(p, q));
+            if (A.length === lim) return A;
+            for (var i = 1; i <= z.length - 1; i++) {
+              A.push(z[i]);
+              if (A.length === lim) return A;
+            }
+            q = p = e;
+          }
+        }
+        A.push(S.slice(p));
+        return A;
+      }
+    ];
   });
 
   var isEnum = _objectPie.f;
@@ -2184,27 +2461,116 @@ typeof navigator === "object" && (function (global, factory) {
     }
   });
 
-  // @@replace logic
-  _fixReWks('replace', 2, function (defined, REPLACE, $replace) {
-    // 21.1.3.14 String.prototype.replace(searchValue, replaceValue)
-    return [function replace(searchValue, replaceValue) {
-      var O = defined(this);
-      var fn = searchValue == undefined ? undefined : searchValue[REPLACE];
-      return fn !== undefined
-        ? fn.call(searchValue, O, replaceValue)
-        : $replace.call(String(O), searchValue, replaceValue);
-    }, $replace];
-  });
+  var max$1 = Math.max;
+  var min$2 = Math.min;
+  var floor$1 = Math.floor;
+  var SUBSTITUTION_SYMBOLS = /\$([$&`']|\d\d?|<[^>]*>)/g;
+  var SUBSTITUTION_SYMBOLS_NO_NAMED = /\$([$&`']|\d\d?)/g;
 
-  // 7.3.20 SpeciesConstructor(O, defaultConstructor)
-
-
-  var SPECIES$1 = _wks('species');
-  var _speciesConstructor = function (O, D) {
-    var C = _anObject(O).constructor;
-    var S;
-    return C === undefined || (S = _anObject(C)[SPECIES$1]) == undefined ? D : _aFunction(S);
+  var maybeToString = function (it) {
+    return it === undefined ? it : String(it);
   };
+
+  // @@replace logic
+  _fixReWks('replace', 2, function (defined, REPLACE, $replace, maybeCallNative) {
+    return [
+      // `String.prototype.replace` method
+      // https://tc39.github.io/ecma262/#sec-string.prototype.replace
+      function replace(searchValue, replaceValue) {
+        var O = defined(this);
+        var fn = searchValue == undefined ? undefined : searchValue[REPLACE];
+        return fn !== undefined
+          ? fn.call(searchValue, O, replaceValue)
+          : $replace.call(String(O), searchValue, replaceValue);
+      },
+      // `RegExp.prototype[@@replace]` method
+      // https://tc39.github.io/ecma262/#sec-regexp.prototype-@@replace
+      function (regexp, replaceValue) {
+        var res = maybeCallNative($replace, regexp, this, replaceValue);
+        if (res.done) return res.value;
+
+        var rx = _anObject(regexp);
+        var S = String(this);
+        var functionalReplace = typeof replaceValue === 'function';
+        if (!functionalReplace) replaceValue = String(replaceValue);
+        var global = rx.global;
+        if (global) {
+          var fullUnicode = rx.unicode;
+          rx.lastIndex = 0;
+        }
+        var results = [];
+        while (true) {
+          var result = _regexpExecAbstract(rx, S);
+          if (result === null) break;
+          results.push(result);
+          if (!global) break;
+          var matchStr = String(result[0]);
+          if (matchStr === '') rx.lastIndex = _advanceStringIndex(S, _toLength(rx.lastIndex), fullUnicode);
+        }
+        var accumulatedResult = '';
+        var nextSourcePosition = 0;
+        for (var i = 0; i < results.length; i++) {
+          result = results[i];
+          var matched = String(result[0]);
+          var position = max$1(min$2(_toInteger(result.index), S.length), 0);
+          var captures = [];
+          // NOTE: This is equivalent to
+          //   captures = result.slice(1).map(maybeToString)
+          // but for some reason `nativeSlice.call(result, 1, result.length)` (called in
+          // the slice polyfill when slicing native arrays) "doesn't work" in safari 9 and
+          // causes a crash (https://pastebin.com/N21QzeQA) when trying to debug it.
+          for (var j = 1; j < result.length; j++) captures.push(maybeToString(result[j]));
+          var namedCaptures = result.groups;
+          if (functionalReplace) {
+            var replacerArgs = [matched].concat(captures, position, S);
+            if (namedCaptures !== undefined) replacerArgs.push(namedCaptures);
+            var replacement = String(replaceValue.apply(undefined, replacerArgs));
+          } else {
+            replacement = getSubstitution(matched, S, position, captures, namedCaptures, replaceValue);
+          }
+          if (position >= nextSourcePosition) {
+            accumulatedResult += S.slice(nextSourcePosition, position) + replacement;
+            nextSourcePosition = position + matched.length;
+          }
+        }
+        return accumulatedResult + S.slice(nextSourcePosition);
+      }
+    ];
+
+      // https://tc39.github.io/ecma262/#sec-getsubstitution
+    function getSubstitution(matched, str, position, captures, namedCaptures, replacement) {
+      var tailPos = position + matched.length;
+      var m = captures.length;
+      var symbols = SUBSTITUTION_SYMBOLS_NO_NAMED;
+      if (namedCaptures !== undefined) {
+        namedCaptures = _toObject(namedCaptures);
+        symbols = SUBSTITUTION_SYMBOLS;
+      }
+      return $replace.call(replacement, symbols, function (match, ch) {
+        var capture;
+        switch (ch.charAt(0)) {
+          case '$': return '$';
+          case '&': return matched;
+          case '`': return str.slice(0, position);
+          case "'": return str.slice(tailPos);
+          case '<':
+            capture = namedCaptures[ch.slice(1, -1)];
+            break;
+          default: // \d\d?
+            var n = +ch;
+            if (n === 0) return ch;
+            if (n > m) {
+              var f = floor$1(n / 10);
+              if (f === 0) return ch;
+              if (f <= m) return captures[f - 1] === undefined ? ch.charAt(1) : captures[f - 1] + ch.charAt(1);
+              return ch;
+            }
+            capture = captures[n - 1];
+        }
+        return capture === undefined ? '' : capture;
+      });
+    }
+  });
 
   // fast apply, http://jsperf.lnkit.com/fast-apply/5
   var _invoke = function (fn, args, that) {
@@ -2415,11 +2781,11 @@ typeof navigator === "object" && (function (global, factory) {
     return promiseCapability.promise;
   };
 
-  var SPECIES$2 = _wks('species');
+  var SPECIES$3 = _wks('species');
 
   var _setSpecies = function (KEY) {
     var C = _global[KEY];
-    if (_descriptors && C && !C[SPECIES$2]) _objectDp.f(C, SPECIES$2, {
+    if (_descriptors && C && !C[SPECIES$3]) _objectDp.f(C, SPECIES$3, {
       configurable: true,
       get: function () { return this; }
     });
@@ -3299,6 +3665,7 @@ typeof navigator === "object" && (function (global, factory) {
     isIE:
     /* @cc_on!@ */
     !!document.documentMode,
+    isEdge: window.navigator.userAgent.includes('Edge'),
     isWebkit: 'WebkitAppearance' in document.documentElement.style && !/Edge/.test(navigator.userAgent),
     isIPhone: /(iPhone|iPod)/gi.test(navigator.platform),
     isIos: /(iPad|iPhone|iPod)/gi.test(navigator.platform)
@@ -3357,12 +3724,16 @@ typeof navigator === "object" && (function (global, factory) {
     // Check for mime type support against a player instance
     // Credits: http://diveintohtml5.info/everything.html
     // Related: http://www.leanbackplayer.com/test/h5mt.html
-    mime: function mime(inputType) {
-      var _inputType$split = inputType.split('/'),
-          _inputType$split2 = _slicedToArray(_inputType$split, 1),
-          mediaType = _inputType$split2[0];
+    mime: function mime(input) {
+      if (is$1.empty(input)) {
+        return false;
+      }
 
-      var type = inputType; // Verify we're using HTML5 and there's no media type mismatch
+      var _input$split = input.split('/'),
+          _input$split2 = _slicedToArray(_input$split, 1),
+          mediaType = _input$split2[0];
+
+      var type = input; // Verify we're using HTML5 and there's no media type mismatch
 
       if (!this.isHTML5 || mediaType !== this.type) {
         return false;
@@ -3370,7 +3741,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 
       if (Object.keys(defaultCodecs).includes(type)) {
-        type += "; codecs=\"".concat(defaultCodecs[inputType], "\"");
+        type += "; codecs=\"".concat(defaultCodecs[input], "\"");
       }
 
       try {
@@ -3405,10 +3776,16 @@ typeof navigator === "object" && (function (global, factory) {
         return [];
       }
 
-      var sources = Array.from(this.media.querySelectorAll('source')); // Filter out unsupported sources
+      var sources = Array.from(this.media.querySelectorAll('source')); // Filter out unsupported sources (if type is specified)
 
       return sources.filter(function (source) {
-        return support.mime.call(_this, source.getAttribute('type'));
+        var type = source.getAttribute('type');
+
+        if (is$1.empty(type)) {
+          return true;
+        }
+
+        return support.mime.call(_this, type);
       });
     },
     // Get quality levels
@@ -3898,16 +4275,23 @@ typeof navigator === "object" && (function (global, factory) {
     }
   }
 
-  // ==========================================================================
+  // 20.2.2.34 Math.trunc(x)
+
+
+  _export(_export.S, 'Math', {
+    trunc: function trunc(it) {
+      return (it > 0 ? Math.floor : Math.ceil)(it);
+    }
+  });
 
   var getHours = function getHours(value) {
-    return parseInt(value / 60 / 60 % 60, 10);
+    return Math.trunc(value / 60 / 60 % 60, 10);
   };
   var getMinutes = function getMinutes(value) {
-    return parseInt(value / 60 % 60, 10);
+    return Math.trunc(value / 60 % 60, 10);
   };
   var getSeconds = function getSeconds(value) {
-    return parseInt(value % 60, 10);
+    return Math.trunc(value % 60, 10);
   }; // Format time to UI friendly string
 
   function formatTime() {
@@ -5285,7 +5669,7 @@ typeof navigator === "object" && (function (global, factory) {
       var update = true; // If function, run it and use output
 
       if (is$1.function(this.config.controls)) {
-        this.config.controls = this.config.controls.call(this.props);
+        this.config.controls = this.config.controls.call(this, props);
       } // Convert falsy controls to empty array (primarily for empty strings)
 
 
@@ -5376,10 +5760,10 @@ typeof navigator === "object" && (function (global, factory) {
             addProperty(button);
           }
         });
-      } // Edge sometimes doesn't finish the paint so force a redraw
+      } // Edge sometimes doesn't finish the paint so force a repaint
 
 
-      if (window.navigator.userAgent.includes('Edge')) {
+      if (browser.isEdge) {
         repaint(target);
       } // Setup tooltips
 
@@ -5890,7 +6274,7 @@ typeof navigator === "object" && (function (global, factory) {
       enabled: true,
       // Allow fullscreen?
       fallback: true,
-      // Fallback for vintage browsers
+      // Fallback using full viewport/window
       iosNative: false // Use the native fullscreen in iOS (disables custom controls)
 
     },
@@ -6091,7 +6475,12 @@ typeof navigator === "object" && (function (global, factory) {
         supported: 'plyr--airplay-supported',
         active: 'plyr--airplay-active'
       },
-      tabFocus: 'plyr__tab-focus'
+      tabFocus: 'plyr__tab-focus',
+      previewThumbnails: {
+        thumbnailContainer: 'plyr__preview-thumbnail-container',
+        scrubbingContainer: 'plyr__preview-scrubbing-container',
+        timeTextContainer: 'plyr__preview-time-text-container'
+      }
     },
     // Embed attributes
     attributes: {
@@ -6109,6 +6498,12 @@ typeof navigator === "object" && (function (global, factory) {
     ads: {
       enabled: false,
       publisherId: ''
+    },
+    // YouTube nocookies mode
+    noCookie: false,
+    // Preview Thumbnails plugin
+    previewThumbnails: {
+      enabled: false
     }
   };
 
@@ -6139,7 +6534,7 @@ typeof navigator === "object" && (function (global, factory) {
 
   function getProviderByUrl(url) {
     // YouTube
-    if (/^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$/.test(url)) {
+    if (/^(https?:\/\/)?(www\.)?(youtube\.com|youtube-nocookie\.com|youtu\.?be)\/.+$/.test(url)) {
       return providers.youtube;
     } // Vimeo
 
@@ -6285,7 +6680,9 @@ typeof navigator === "object" && (function (global, factory) {
       this.scrollPosition = {
         x: 0,
         y: 0
-      }; // Register event listeners
+      }; // Force the use of 'full window/browser' rather than fullscreen
+
+      this.forceFallback = player.config.fullscreen.fallback === 'force'; // Register event listeners
       // Handle event (incase user presses escape etc)
 
       on.call(this.player, document, this.prefix === 'ms' ? 'MSFullscreenChange' : "".concat(this.prefix, "fullscreenchange"), function () {
@@ -6311,7 +6708,17 @@ typeof navigator === "object" && (function (global, factory) {
       // Update UI
       value: function update() {
         if (this.enabled) {
-          this.player.debug.log("".concat(Fullscreen.native ? 'Native' : 'Fallback', " fullscreen enabled"));
+          var mode;
+
+          if (this.forceFallback) {
+            mode = 'Fallback (forced)';
+          } else if (Fullscreen.native) {
+            mode = 'Native';
+          } else {
+            mode = 'Fallback';
+          }
+
+          this.player.debug.log("".concat(mode, " fullscreen enabled"));
         } else {
           this.player.debug.log('Fullscreen not supported and fallback disabled');
         } // Add styling hook to show button
@@ -6330,7 +6737,7 @@ typeof navigator === "object" && (function (global, factory) {
 
         if (browser.isIos && this.player.config.fullscreen.iosNative) {
           this.target.webkitEnterFullscreen();
-        } else if (!Fullscreen.native) {
+        } else if (!Fullscreen.native || this.forceFallback) {
           toggleFallback.call(this, true);
         } else if (!this.prefix) {
           this.target.requestFullscreen();
@@ -6350,7 +6757,7 @@ typeof navigator === "object" && (function (global, factory) {
         if (browser.isIos && this.player.config.fullscreen.iosNative) {
           this.target.webkitExitFullscreen();
           this.player.play();
-        } else if (!Fullscreen.native) {
+        } else if (!Fullscreen.native || this.forceFallback) {
           toggleFallback.call(this, false);
         } else if (!this.prefix) {
           (document.cancelFullScreen || document.exitFullscreen).call(document);
@@ -6370,6 +6777,13 @@ typeof navigator === "object" && (function (global, factory) {
         }
       }
     }, {
+      key: "usingNative",
+      // If we're actually using native
+      get: function get() {
+        return Fullscreen.native && !this.forceFallback;
+      } // Get the prefix for handlers
+
+    }, {
       key: "enabled",
       // Determine if fullscreen is enabled
       get: function get() {
@@ -6384,7 +6798,7 @@ typeof navigator === "object" && (function (global, factory) {
         } // Fallback using classname
 
 
-        if (!Fullscreen.native) {
+        if (!Fullscreen.native || this.forceFallback) {
           return hasClass(this.target, this.player.config.classNames.fullscreen.fallback);
         }
 
@@ -6401,8 +6815,7 @@ typeof navigator === "object" && (function (global, factory) {
       key: "native",
       get: function get() {
         return !!(document.fullscreenEnabled || document.webkitFullscreenEnabled || document.mozFullScreenEnabled || document.msFullscreenEnabled);
-      } // Get the prefix for handlers
-
+      }
     }, {
       key: "prefix",
       get: function get() {
@@ -6679,6 +7092,44 @@ typeof navigator === "object" && (function (global, factory) {
     }
   };
 
+  /* function reduceAspectRatio(width, height) {
+      const getRatio = (w, h) => (h === 0 ? w : getRatio(h, w % h));
+      const ratio = getRatio(width, height);
+      return `${width / ratio}:${height / ratio}`;
+  } */
+  // Set aspect ratio for responsive container
+
+  function setAspectRatio(input) {
+    var ratio = input;
+
+    if (!is$1.string(ratio) && !is$1.nullOrUndefined(this.embed)) {
+      ratio = this.embed.ratio;
+    }
+
+    if (!is$1.string(ratio)) {
+      ratio = this.config.ratio;
+    }
+
+    var _ratio$split$map = ratio.split(':').map(Number),
+        _ratio$split$map2 = _slicedToArray(_ratio$split$map, 2),
+        x = _ratio$split$map2[0],
+        y = _ratio$split$map2[1];
+
+    var padding = 100 / x * y;
+    this.elements.wrapper.style.paddingBottom = "".concat(padding, "%"); // For Vimeo we have an extra <div> to hide the standard controls and UI
+
+    if (this.isVimeo && this.supported.ui) {
+      var height = 240;
+      var offset = (height - padding) / (height / 50);
+      this.media.style.transform = "translateY(-".concat(offset, "%)");
+    }
+
+    return {
+      padding: padding,
+      ratio: ratio
+    };
+  }
+
   var Listeners =
   /*#__PURE__*/
   function () {
@@ -6839,7 +7290,7 @@ typeof navigator === "object" && (function (global, factory) {
           // So we only need to worry about non native
 
 
-          if (!player.fullscreen.enabled && player.fullscreen.active && code === 27) {
+          if (code === 27 && !player.fullscreen.usingNative && player.fullscreen.active) {
             player.fullscreen.toggle();
           } // Store last code for next cycle
 
@@ -6932,9 +7383,11 @@ typeof navigator === "object" && (function (global, factory) {
       key: "container",
       value: function container() {
         var player = this.player;
-        var elements = player.elements; // Keyboard shortcuts
+        var config = player.config,
+            elements = player.elements,
+            timers = player.timers; // Keyboard shortcuts
 
-        if (!player.config.keyboard.global && player.config.keyboard.focused) {
+        if (!config.keyboard.global && config.keyboard.focused) {
           on.call(player, elements.container, 'keydown keyup', this.handleKey, false);
         } // Toggle controls on mouse events and entering fullscreen
 
@@ -6958,17 +7411,92 @@ typeof navigator === "object" && (function (global, factory) {
           } // Clear timer
 
 
-          clearTimeout(player.timers.controls); // Set new timer to prevent flicker when seeking
+          clearTimeout(timers.controls); // Set new timer to prevent flicker when seeking
 
-          player.timers.controls = setTimeout(function () {
+          timers.controls = setTimeout(function () {
             return ui.toggleControls.call(player, false);
           }, delay);
+        }); // Force edge to repaint on exit fullscreen
+        // TODO: Fix weird bug where Edge doesn't re-draw when exiting fullscreen
+
+        /* if (browser.isEdge) {
+            on.call(player, elements.container, 'exitfullscreen', () => {
+                setTimeout(() => repaint(elements.container), 100);
+            });
+        } */
+        // Set a gutter for Vimeo
+
+        var setGutter = function setGutter(ratio, padding, toggle) {
+          if (!player.isVimeo) {
+            return;
+          }
+
+          var target = player.elements.wrapper.firstChild;
+
+          var _ratio$split$map = ratio.split(':').map(Number),
+              _ratio$split$map2 = _slicedToArray(_ratio$split$map, 2),
+              height = _ratio$split$map2[1];
+
+          var _player$embed$ratio$s = player.embed.ratio.split(':').map(Number),
+              _player$embed$ratio$s2 = _slicedToArray(_player$embed$ratio$s, 2),
+              videoWidth = _player$embed$ratio$s2[0],
+              videoHeight = _player$embed$ratio$s2[1];
+
+          target.style.maxWidth = toggle ? "".concat(height / videoHeight * videoWidth, "px") : null;
+          target.style.margin = toggle ? '0 auto' : null;
+        }; // Resize on fullscreen change
+
+
+        var setPlayerSize = function setPlayerSize(measure) {
+          // If we don't need to measure the viewport
+          if (!measure) {
+            return setAspectRatio.call(player);
+          }
+
+          var rect = elements.container.getBoundingClientRect();
+          var width = rect.width,
+              height = rect.height;
+          return setAspectRatio.call(player, "".concat(width, ":").concat(height));
+        };
+
+        var resized = function resized() {
+          window.clearTimeout(timers.resized);
+          timers.resized = window.setTimeout(setPlayerSize, 50);
+        };
+
+        on.call(player, elements.container, 'enterfullscreen exitfullscreen', function (event) {
+          var _player$fullscreen = player.fullscreen,
+              target = _player$fullscreen.target,
+              usingNative = _player$fullscreen.usingNative; // Ignore for iOS native
+
+          if (!player.isEmbed || target !== elements.container) {
+            return;
+          }
+
+          var isEnter = event.type === 'enterfullscreen'; // Set the player size when entering fullscreen to viewport size
+
+          var _setPlayerSize = setPlayerSize(isEnter),
+              padding = _setPlayerSize.padding,
+              ratio = _setPlayerSize.ratio; // Set Vimeo gutter
+
+
+          setGutter(ratio, padding, isEnter); // If not using native fullscreen, we need to check for resizes of viewport
+
+          if (!usingNative) {
+            if (isEnter) {
+              on.call(player, window, 'resize', resized);
+            } else {
+              off.call(player, window, 'resize', resized);
+            }
+          }
         });
       } // Listen for media events
 
     }, {
       key: "media",
       value: function media() {
+        var _this = this;
+
         var player = this.player;
         var elements = player.elements; // Time change on media
 
@@ -7049,10 +7577,11 @@ typeof navigator === "object" && (function (global, factory) {
             }
 
             if (player.ended) {
-              player.restart();
-              player.play();
+              _this.proxy(event, player.restart, 'restart');
+
+              _this.proxy(event, player.play, 'play');
             } else {
-              player.togglePlay();
+              _this.proxy(event, player.togglePlay, 'play');
             }
           });
         } // Disable right click
@@ -7127,21 +7656,21 @@ typeof navigator === "object" && (function (global, factory) {
     }, {
       key: "bind",
       value: function bind(element, type, defaultHandler, customHandlerKey) {
-        var _this = this;
+        var _this2 = this;
 
         var passive = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
         var player = this.player;
         var customHandler = player.config.listeners[customHandlerKey];
         var hasCustomHandler = is$1.function(customHandler);
         on.call(player, element, type, function (event) {
-          return _this.proxy(event, defaultHandler, customHandlerKey);
+          return _this2.proxy(event, defaultHandler, customHandlerKey);
         }, passive && !hasCustomHandler);
       } // Listen for control events
 
     }, {
       key: "controls",
       value: function controls$$1() {
-        var _this2 = this;
+        var _this3 = this;
 
         var player = this.player;
         var elements = player.elements; // IE doesn't support input event, so we fallback to change
@@ -7150,7 +7679,7 @@ typeof navigator === "object" && (function (global, factory) {
 
         if (elements.buttons.play) {
           Array.from(elements.buttons.play).forEach(function (button) {
-            _this2.bind(button, 'click', player.togglePlay, 'play');
+            _this3.bind(button, 'click', player.togglePlay, 'play');
           });
         } // Pause
 
@@ -7257,7 +7786,7 @@ typeof navigator === "object" && (function (global, factory) {
         if (browser.isIos) {
           var inputs = getElements.call(player, 'input[type="range"]');
           Array.from(inputs).forEach(function (input) {
-            return _this2.bind(input, inputEvent, function (event) {
+            return _this3.bind(input, inputEvent, function (event) {
               return repaint(event.target);
             });
           });
@@ -7283,7 +7812,7 @@ typeof navigator === "object" && (function (global, factory) {
 
         if (browser.isWebkit) {
           Array.from(getElements.call(player, 'input[type="range"]')).forEach(function (element) {
-            _this2.bind(element, 'input', function (event) {
+            _this3.bind(element, 'input', function (event) {
               return controls.updateRangeFill.call(player, event.target);
             });
           });
@@ -7330,7 +7859,7 @@ typeof navigator === "object" && (function (global, factory) {
             toggleClass(elements.controls, config.classNames.noTransition, false);
           }, 0); // Delay a little more for mouse users
 
-          var delay = _this2.touch ? 3000 : 4000; // Clear timer
+          var delay = _this3.touch ? 3000 : 4000; // Clear timer
 
           clearTimeout(timers.controls); // Hide again after delay
 
@@ -7386,13 +7915,37 @@ typeof navigator === "object" && (function (global, factory) {
   });
 
   // @@match logic
-  _fixReWks('match', 1, function (defined, MATCH, $match) {
-    // 21.1.3.11 String.prototype.match(regexp)
-    return [function match(regexp) {
-      var O = defined(this);
-      var fn = regexp == undefined ? undefined : regexp[MATCH];
-      return fn !== undefined ? fn.call(regexp, O) : new RegExp(regexp)[MATCH](String(O));
-    }, $match];
+  _fixReWks('match', 1, function (defined, MATCH, $match, maybeCallNative) {
+    return [
+      // `String.prototype.match` method
+      // https://tc39.github.io/ecma262/#sec-string.prototype.match
+      function match(regexp) {
+        var O = defined(this);
+        var fn = regexp == undefined ? undefined : regexp[MATCH];
+        return fn !== undefined ? fn.call(regexp, O) : new RegExp(regexp)[MATCH](String(O));
+      },
+      // `RegExp.prototype[@@match]` method
+      // https://tc39.github.io/ecma262/#sec-regexp.prototype-@@match
+      function (regexp) {
+        var res = maybeCallNative($match, regexp, this);
+        if (res.done) return res.value;
+        var rx = _anObject(regexp);
+        var S = String(this);
+        if (!rx.global) return _regexpExecAbstract(rx, S);
+        var fullUnicode = rx.unicode;
+        rx.lastIndex = 0;
+        var A = [];
+        var n = 0;
+        var result;
+        while ((result = _regexpExecAbstract(rx, S)) !== null) {
+          var matchStr = String(result[0]);
+          A[n] = matchStr;
+          if (matchStr === '') rx.lastIndex = _advanceStringIndex(S, _toLength(rx.lastIndex), fullUnicode);
+          n++;
+        }
+        return n === 0 ? null : A;
+      }
+    ];
   });
 
   var loadjs_umd = createCommonjsModule(function (module, exports) {
@@ -7539,8 +8092,8 @@ typeof navigator === "object" && (function (global, factory) {
           if (!e.sheet.cssText.length) result = 'e';
         } catch (x) {
           // sheets objects created from load errors don't allow access to
-          // `cssText`
-          result = 'e';
+          // `cssText` (unless error is Code:18 SecurityError)
+          if (x.code != 18) result = 'e';
         }
       }
 
@@ -7707,16 +8260,6 @@ typeof navigator === "object" && (function (global, factory) {
 
     var regex = /^.*(vimeo.com\/|video\/)(\d+).*/;
     return url.match(regex) ? RegExp.$2 : url;
-  } // Get aspect ratio for dimensions
-
-
-  function getAspectRatio(width, height) {
-    var getRatio = function getRatio(w, h) {
-      return h === 0 ? w : getRatio(h, w % h);
-    };
-
-    var ratio = getRatio(width, height);
-    return "".concat(width / ratio, ":").concat(height / ratio);
   } // Set playback state and trigger change (only on actual change)
 
 
@@ -7738,7 +8281,7 @@ typeof navigator === "object" && (function (global, factory) {
       // Add embed class for responsive
       toggleClass(this.elements.wrapper, this.config.classNames.embed, true); // Set intial ratio
 
-      vimeo.setAspectRatio.call(this); // Load the API if not already
+      setAspectRatio.call(this); // Load the API if not already
 
       if (!is$1.object(window.Vimeo)) {
         loadScript(this.config.urls.vimeo.sdk).then(function () {
@@ -7750,24 +8293,6 @@ typeof navigator === "object" && (function (global, factory) {
         vimeo.ready.call(this);
       }
     },
-    // Set aspect ratio
-    // For Vimeo we have an extra 300% height <div> to hide the standard controls and UI
-    setAspectRatio: function setAspectRatio(input) {
-      var _split$map = (is$1.string(input) ? input : this.config.ratio).split(':').map(Number),
-          _split$map2 = _slicedToArray(_split$map, 2),
-          x = _split$map2[0],
-          y = _split$map2[1];
-
-      var padding = 100 / x * y;
-      vimeo.padding = padding;
-      this.elements.wrapper.style.paddingBottom = "".concat(padding, "%");
-
-      if (this.supported.ui) {
-        var height = 240;
-        var offset = (height - padding) / (height / 50);
-        this.media.style.transform = "translateY(-".concat(offset, "%)");
-      }
-    },
     // API Ready
     ready: function ready$$1() {
       var _this2 = this;
@@ -7777,7 +8302,7 @@ typeof navigator === "object" && (function (global, factory) {
       var options = {
         loop: player.config.loop.active,
         autoplay: player.autoplay,
-        // muted: player.muted,
+        muted: player.muted,
         byline: false,
         portrait: false,
         title: false,
@@ -7963,8 +8488,12 @@ typeof navigator === "object" && (function (global, factory) {
       }); // Set aspect ratio based on video size
 
       Promise.all([player.embed.getVideoWidth(), player.embed.getVideoHeight()]).then(function (dimensions) {
-        vimeo.ratio = getAspectRatio(dimensions[0], dimensions[1]);
-        vimeo.setAspectRatio.call(_this2, vimeo.ratio);
+        var _dimensions = _slicedToArray(dimensions, 2),
+            width = _dimensions[0],
+            height = _dimensions[1];
+
+        player.embed.ratio = "".concat(width, ":").concat(height);
+        setAspectRatio.call(_this2, player.embed.ratio);
       }); // Set autopause
 
       player.embed.setAutopause(player.config.autopause).then(function (state) {
@@ -8055,24 +8584,6 @@ typeof navigator === "object" && (function (global, factory) {
       player.embed.on('error', function (detail) {
         player.media.error = detail;
         triggerEvent.call(player, player.media, 'error');
-      }); // Set height/width on fullscreen
-
-      player.on('enterfullscreen exitfullscreen', function (event) {
-        var target = player.fullscreen.target; // Ignore for iOS native
-
-        if (target !== player.elements.container) {
-          return;
-        }
-
-        var toggle = event.type === 'enterfullscreen';
-
-        var _vimeo$ratio$split$ma = vimeo.ratio.split(':').map(Number),
-            _vimeo$ratio$split$ma2 = _slicedToArray(_vimeo$ratio$split$ma, 2),
-            x = _vimeo$ratio$split$ma2[0],
-            y = _vimeo$ratio$split$ma2[1];
-
-        var dimension = x > y ? 'width' : 'height';
-        target.style[dimension] = toggle ? "".concat(vimeo.padding, "%") : null;
       }); // Rebuild UI
 
       setTimeout(function () {
@@ -8109,7 +8620,7 @@ typeof navigator === "object" && (function (global, factory) {
       // Add embed class for responsive
       toggleClass(this.elements.wrapper, this.config.classNames.embed, true); // Set aspect ratio
 
-      youtube.setAspectRatio.call(this); // Setup API
+      setAspectRatio.call(this); // Setup API
 
       if (is$1.object(window.YT) && is$1.function(window.YT.Player)) {
         youtube.ready.call(this);
@@ -8164,11 +8675,6 @@ typeof navigator === "object" && (function (global, factory) {
         }).catch(function () {});
       }
     },
-    // Set aspect ratio
-    setAspectRatio: function setAspectRatio() {
-      var ratio = this.config.ratio.split(':');
-      this.elements.wrapper.style.paddingBottom = "".concat(100 / ratio[0] * ratio[1], "%");
-    },
     // API ready
     ready: function ready$$1() {
       var player = this; // Ignore already setup (race condition)
@@ -8222,6 +8728,7 @@ typeof navigator === "object" && (function (global, factory) {
 
       player.embed = new window.YT.Player(id, {
         videoId: videoId,
+        host: player.config.noCookie ? 'https://www.youtube-nocookie.com' : undefined,
         playerVars: {
           autoplay: player.config.autoplay ? 1 : 0,
           // Autoplay
@@ -9137,6 +9644,1022 @@ typeof navigator === "object" && (function (global, factory) {
     return Ads;
   }();
 
+  // 22.1.3.9 Array.prototype.findIndex(predicate, thisArg = undefined)
+
+  var $find$1 = _arrayMethods(6);
+  var KEY$1 = 'findIndex';
+  var forced$1 = true;
+  // Shouldn't skip holes
+  if (KEY$1 in []) Array(1)[KEY$1](function () { forced$1 = false; });
+  _export(_export.P + _export.F * forced$1, 'Array', {
+    findIndex: function findIndex(callbackfn /* , that = undefined */) {
+      return $find$1(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
+    }
+  });
+  _addToUnscopables(KEY$1);
+
+  var f$6 = _wks;
+
+  var _wksExt = {
+  	f: f$6
+  };
+
+  var defineProperty = _objectDp.f;
+  var _wksDefine = function (name) {
+    var $Symbol = _core.Symbol || (_core.Symbol = _global.Symbol || {});
+    if (name.charAt(0) != '_' && !(name in $Symbol)) defineProperty($Symbol, name, { value: _wksExt.f(name) });
+  };
+
+  _wksDefine('asyncIterator');
+
+  // all enumerable object keys, includes symbols
+
+
+
+  var _enumKeys = function (it) {
+    var result = _objectKeys(it);
+    var getSymbols = _objectGops.f;
+    if (getSymbols) {
+      var symbols = getSymbols(it);
+      var isEnum = _objectPie.f;
+      var i = 0;
+      var key;
+      while (symbols.length > i) if (isEnum.call(it, key = symbols[i++])) result.push(key);
+    } return result;
+  };
+
+  // fallback for IE11 buggy Object.getOwnPropertyNames with iframe and window
+
+  var gOPN$2 = _objectGopn.f;
+  var toString$1 = {}.toString;
+
+  var windowNames = typeof window == 'object' && window && Object.getOwnPropertyNames
+    ? Object.getOwnPropertyNames(window) : [];
+
+  var getWindowNames = function (it) {
+    try {
+      return gOPN$2(it);
+    } catch (e) {
+      return windowNames.slice();
+    }
+  };
+
+  var f$7 = function getOwnPropertyNames(it) {
+    return windowNames && toString$1.call(it) == '[object Window]' ? getWindowNames(it) : gOPN$2(_toIobject(it));
+  };
+
+  var _objectGopnExt = {
+  	f: f$7
+  };
+
+  // ECMAScript 6 symbols shim
+
+
+
+
+
+  var META = _meta.KEY;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  var gOPD$2 = _objectGopd.f;
+  var dP$4 = _objectDp.f;
+  var gOPN$3 = _objectGopnExt.f;
+  var $Symbol = _global.Symbol;
+  var $JSON = _global.JSON;
+  var _stringify = $JSON && $JSON.stringify;
+  var PROTOTYPE$2 = 'prototype';
+  var HIDDEN = _wks('_hidden');
+  var TO_PRIMITIVE = _wks('toPrimitive');
+  var isEnum$1 = {}.propertyIsEnumerable;
+  var SymbolRegistry = _shared('symbol-registry');
+  var AllSymbols = _shared('symbols');
+  var OPSymbols = _shared('op-symbols');
+  var ObjectProto$1 = Object[PROTOTYPE$2];
+  var USE_NATIVE$1 = typeof $Symbol == 'function';
+  var QObject = _global.QObject;
+  // Don't use setters in Qt Script, https://github.com/zloirock/core-js/issues/173
+  var setter = !QObject || !QObject[PROTOTYPE$2] || !QObject[PROTOTYPE$2].findChild;
+
+  // fallback for old Android, https://code.google.com/p/v8/issues/detail?id=687
+  var setSymbolDesc = _descriptors && _fails(function () {
+    return _objectCreate(dP$4({}, 'a', {
+      get: function () { return dP$4(this, 'a', { value: 7 }).a; }
+    })).a != 7;
+  }) ? function (it, key, D) {
+    var protoDesc = gOPD$2(ObjectProto$1, key);
+    if (protoDesc) delete ObjectProto$1[key];
+    dP$4(it, key, D);
+    if (protoDesc && it !== ObjectProto$1) dP$4(ObjectProto$1, key, protoDesc);
+  } : dP$4;
+
+  var wrap$1 = function (tag) {
+    var sym = AllSymbols[tag] = _objectCreate($Symbol[PROTOTYPE$2]);
+    sym._k = tag;
+    return sym;
+  };
+
+  var isSymbol = USE_NATIVE$1 && typeof $Symbol.iterator == 'symbol' ? function (it) {
+    return typeof it == 'symbol';
+  } : function (it) {
+    return it instanceof $Symbol;
+  };
+
+  var $defineProperty = function defineProperty(it, key, D) {
+    if (it === ObjectProto$1) $defineProperty(OPSymbols, key, D);
+    _anObject(it);
+    key = _toPrimitive(key, true);
+    _anObject(D);
+    if (_has(AllSymbols, key)) {
+      if (!D.enumerable) {
+        if (!_has(it, HIDDEN)) dP$4(it, HIDDEN, _propertyDesc(1, {}));
+        it[HIDDEN][key] = true;
+      } else {
+        if (_has(it, HIDDEN) && it[HIDDEN][key]) it[HIDDEN][key] = false;
+        D = _objectCreate(D, { enumerable: _propertyDesc(0, false) });
+      } return setSymbolDesc(it, key, D);
+    } return dP$4(it, key, D);
+  };
+  var $defineProperties = function defineProperties(it, P) {
+    _anObject(it);
+    var keys = _enumKeys(P = _toIobject(P));
+    var i = 0;
+    var l = keys.length;
+    var key;
+    while (l > i) $defineProperty(it, key = keys[i++], P[key]);
+    return it;
+  };
+  var $create = function create(it, P) {
+    return P === undefined ? _objectCreate(it) : $defineProperties(_objectCreate(it), P);
+  };
+  var $propertyIsEnumerable = function propertyIsEnumerable(key) {
+    var E = isEnum$1.call(this, key = _toPrimitive(key, true));
+    if (this === ObjectProto$1 && _has(AllSymbols, key) && !_has(OPSymbols, key)) return false;
+    return E || !_has(this, key) || !_has(AllSymbols, key) || _has(this, HIDDEN) && this[HIDDEN][key] ? E : true;
+  };
+  var $getOwnPropertyDescriptor = function getOwnPropertyDescriptor(it, key) {
+    it = _toIobject(it);
+    key = _toPrimitive(key, true);
+    if (it === ObjectProto$1 && _has(AllSymbols, key) && !_has(OPSymbols, key)) return;
+    var D = gOPD$2(it, key);
+    if (D && _has(AllSymbols, key) && !(_has(it, HIDDEN) && it[HIDDEN][key])) D.enumerable = true;
+    return D;
+  };
+  var $getOwnPropertyNames = function getOwnPropertyNames(it) {
+    var names = gOPN$3(_toIobject(it));
+    var result = [];
+    var i = 0;
+    var key;
+    while (names.length > i) {
+      if (!_has(AllSymbols, key = names[i++]) && key != HIDDEN && key != META) result.push(key);
+    } return result;
+  };
+  var $getOwnPropertySymbols = function getOwnPropertySymbols(it) {
+    var IS_OP = it === ObjectProto$1;
+    var names = gOPN$3(IS_OP ? OPSymbols : _toIobject(it));
+    var result = [];
+    var i = 0;
+    var key;
+    while (names.length > i) {
+      if (_has(AllSymbols, key = names[i++]) && (IS_OP ? _has(ObjectProto$1, key) : true)) result.push(AllSymbols[key]);
+    } return result;
+  };
+
+  // 19.4.1.1 Symbol([description])
+  if (!USE_NATIVE$1) {
+    $Symbol = function Symbol() {
+      if (this instanceof $Symbol) throw TypeError('Symbol is not a constructor!');
+      var tag = _uid(arguments.length > 0 ? arguments[0] : undefined);
+      var $set = function (value) {
+        if (this === ObjectProto$1) $set.call(OPSymbols, value);
+        if (_has(this, HIDDEN) && _has(this[HIDDEN], tag)) this[HIDDEN][tag] = false;
+        setSymbolDesc(this, tag, _propertyDesc(1, value));
+      };
+      if (_descriptors && setter) setSymbolDesc(ObjectProto$1, tag, { configurable: true, set: $set });
+      return wrap$1(tag);
+    };
+    _redefine($Symbol[PROTOTYPE$2], 'toString', function toString() {
+      return this._k;
+    });
+
+    _objectGopd.f = $getOwnPropertyDescriptor;
+    _objectDp.f = $defineProperty;
+    _objectGopn.f = _objectGopnExt.f = $getOwnPropertyNames;
+    _objectPie.f = $propertyIsEnumerable;
+    _objectGops.f = $getOwnPropertySymbols;
+
+    if (_descriptors && !_library) {
+      _redefine(ObjectProto$1, 'propertyIsEnumerable', $propertyIsEnumerable, true);
+    }
+
+    _wksExt.f = function (name) {
+      return wrap$1(_wks(name));
+    };
+  }
+
+  _export(_export.G + _export.W + _export.F * !USE_NATIVE$1, { Symbol: $Symbol });
+
+  for (var es6Symbols = (
+    // 19.4.2.2, 19.4.2.3, 19.4.2.4, 19.4.2.6, 19.4.2.8, 19.4.2.9, 19.4.2.10, 19.4.2.11, 19.4.2.12, 19.4.2.13, 19.4.2.14
+    'hasInstance,isConcatSpreadable,iterator,match,replace,search,species,split,toPrimitive,toStringTag,unscopables'
+  ).split(','), j$1 = 0; es6Symbols.length > j$1;)_wks(es6Symbols[j$1++]);
+
+  for (var wellKnownSymbols = _objectKeys(_wks.store), k = 0; wellKnownSymbols.length > k;) _wksDefine(wellKnownSymbols[k++]);
+
+  _export(_export.S + _export.F * !USE_NATIVE$1, 'Symbol', {
+    // 19.4.2.1 Symbol.for(key)
+    'for': function (key) {
+      return _has(SymbolRegistry, key += '')
+        ? SymbolRegistry[key]
+        : SymbolRegistry[key] = $Symbol(key);
+    },
+    // 19.4.2.5 Symbol.keyFor(sym)
+    keyFor: function keyFor(sym) {
+      if (!isSymbol(sym)) throw TypeError(sym + ' is not a symbol!');
+      for (var key in SymbolRegistry) if (SymbolRegistry[key] === sym) return key;
+    },
+    useSetter: function () { setter = true; },
+    useSimple: function () { setter = false; }
+  });
+
+  _export(_export.S + _export.F * !USE_NATIVE$1, 'Object', {
+    // 19.1.2.2 Object.create(O [, Properties])
+    create: $create,
+    // 19.1.2.4 Object.defineProperty(O, P, Attributes)
+    defineProperty: $defineProperty,
+    // 19.1.2.3 Object.defineProperties(O, Properties)
+    defineProperties: $defineProperties,
+    // 19.1.2.6 Object.getOwnPropertyDescriptor(O, P)
+    getOwnPropertyDescriptor: $getOwnPropertyDescriptor,
+    // 19.1.2.7 Object.getOwnPropertyNames(O)
+    getOwnPropertyNames: $getOwnPropertyNames,
+    // 19.1.2.8 Object.getOwnPropertySymbols(O)
+    getOwnPropertySymbols: $getOwnPropertySymbols
+  });
+
+  // 24.3.2 JSON.stringify(value [, replacer [, space]])
+  $JSON && _export(_export.S + _export.F * (!USE_NATIVE$1 || _fails(function () {
+    var S = $Symbol();
+    // MS Edge converts symbol values to JSON as {}
+    // WebKit converts symbol values to JSON as null
+    // V8 throws on boxed symbols
+    return _stringify([S]) != '[null]' || _stringify({ a: S }) != '{}' || _stringify(Object(S)) != '{}';
+  })), 'JSON', {
+    stringify: function stringify(it) {
+      var args = [it];
+      var i = 1;
+      var replacer, $replacer;
+      while (arguments.length > i) args.push(arguments[i++]);
+      $replacer = replacer = args[1];
+      if (!_isObject(replacer) && it === undefined || isSymbol(it)) return; // IE8 returns string on undefined
+      if (!_isArray(replacer)) replacer = function (key, value) {
+        if (typeof $replacer == 'function') value = $replacer.call(this, key, value);
+        if (!isSymbol(value)) return value;
+      };
+      args[1] = replacer;
+      return _stringify.apply($JSON, args);
+    }
+  });
+
+  // 19.4.3.4 Symbol.prototype[@@toPrimitive](hint)
+  $Symbol[PROTOTYPE$2][TO_PRIMITIVE] || _hide($Symbol[PROTOTYPE$2], TO_PRIMITIVE, $Symbol[PROTOTYPE$2].valueOf);
+  // 19.4.3.5 Symbol.prototype[@@toStringTag]
+  _setToStringTag($Symbol, 'Symbol');
+  // 20.2.1.9 Math[@@toStringTag]
+  _setToStringTag(Math, 'Math', true);
+  // 24.3.3 JSON[@@toStringTag]
+  _setToStringTag(_global.JSON, 'JSON', true);
+
+  /**
+   * Preview thumbnails for seek hover and scrubbing
+   * Seeking: Hover over the seek bar (desktop only): shows a small preview container above the seek bar
+   * Scrubbing: Click and drag the seek bar (desktop and mobile): shows the preview image over the entire video, as if the video is scrubbing at very high speed
+   *
+   * Notes:
+   * - Thumbs are set via JS settings on Plyr init, not HTML5 'track' property. Using the track property would be a bit gross, because it doesn't support custom 'kinds'. kind=metadata might be used for something else, and we want to allow multiple thumbnails tracks. Tracks must have a unique combination of 'kind' and 'label'. We would have to do something like kind=metadata,label=thumbnails1 / kind=metadata,label=thumbnails2. Square peg, round hole
+   * - VTT info: the image URL is relative to the VTT, not the current document. But if the url starts with a slash, it will naturally be relative to the current domain. https://support.jwplayer.com/articles/how-to-add-preview-thumbnails
+   * - This implementation uses multiple separate img elements. Other implementations use background-image on one element. This would be nice and simple, but Firefox and Safari have flickering issues with replacing backgrounds of larger images. It seems that Youtube perhaps only avoids this because they don't have the option for high-res previews (even the fullscreen ones, when mousedown/seeking). Images appear over the top of each other, and previous ones are discarded once the new ones have been rendered
+   */
+
+  var PreviewThumbnails =
+  /*#__PURE__*/
+  function () {
+    /**
+     * PreviewThumbnails constructor.
+     * @param {object} player
+     * @return {PreviewThumbnails}
+     */
+    function PreviewThumbnails(player) {
+      _classCallCheck(this, PreviewThumbnails);
+
+      this.player = player;
+      this.thumbnailsDefs = [];
+      this.lastMousemoveEventTime = Date.now();
+      this.mouseDown = false;
+      this.loadedImages = [];
+
+      if (this.enabled) {
+        this.load();
+      }
+    }
+
+    _createClass(PreviewThumbnails, [{
+      key: "load",
+      value: function load() {
+        var _this = this;
+
+        // Turn off the regular seek tooltip
+        this.player.config.tooltips.seek = false;
+        this.getThumbnailsDefs().then(function () {
+          // Initiate DOM listeners so that our preview thumbnails can be used
+          _this.listeners(); // Build HTML DOM elements
+
+
+          _this.elements(); // Check to see if thumb container size was specified manually in CSS
+
+
+          _this.determineContainerAutoSizing();
+        });
+      } // Download VTT files and parse them
+
+    }, {
+      key: "getThumbnailsDefs",
+      value: function getThumbnailsDefs() {
+        var _this2 = this;
+
+        return new Promise(function (resolve, reject) {
+          if (!_this2.player.config.previewThumbnails.src) {
+            throw new Error('Missing previewThumbnails.src config attribute');
+          } // previewThumbnails.src can be string or list. If string, convert into single-element list
+
+
+          var configSrc = _this2.player.config.previewThumbnails.src;
+          var urls = typeof configSrc === 'string' ? [configSrc] : configSrc;
+          var promises = []; // Loop through each src url. Download and process the VTT file, storing the resulting data in this.thumbnailsDefs
+
+          var _iteratorNormalCompletion = true;
+          var _didIteratorError = false;
+          var _iteratorError = undefined;
+
+          try {
+            for (var _iterator = urls[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+              var url = _step.value;
+              promises.push(_this2.getThumbnailDef(url));
+            }
+          } catch (err) {
+            _didIteratorError = true;
+            _iteratorError = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion && _iterator.return != null) {
+                _iterator.return();
+              }
+            } finally {
+              if (_didIteratorError) {
+                throw _iteratorError;
+              }
+            }
+          }
+
+          Promise.all(promises).then(function () {
+            // Sort smallest to biggest (e.g., [120p, 480p, 1080p])
+            _this2.thumbnailsDefs.sort(function (x, y) {
+              return x.height - y.height;
+            });
+
+            _this2.player.debug.log('Preview thumbnails: thumbnailsDefs: ' + JSON.stringify(_this2.thumbnailsDefs, null, 4));
+
+            resolve();
+          });
+        });
+      } // Process individual VTT file
+
+    }, {
+      key: "getThumbnailDef",
+      value: function getThumbnailDef(url) {
+        var _this3 = this;
+
+        return new Promise(function (resolve, reject) {
+          fetch(url).then(function (response) {
+            var thumbnailsDef = {
+              frames: _this3.parseVtt(response),
+              height: null,
+              urlPrefix: ''
+            }; // If the URLs don't start with '/', then we need to set their relative path to be the location of the VTT file
+            // If the URLs do start with '/', then they obviously don't need a prefix, so it will remain blank
+
+            if (!thumbnailsDef.frames[0].text.startsWith('/')) {
+              thumbnailsDef.urlPrefix = url.substring(0, url.lastIndexOf('/') + 1);
+            } // Download the first frame, so that we can determine/set the height of this thumbnailsDef
+
+
+            var tempImage = new Image();
+            tempImage.src = thumbnailsDef.urlPrefix + thumbnailsDef.frames[0].text;
+
+            tempImage.onload = function () {
+              thumbnailsDef.height = tempImage.naturalHeight;
+              thumbnailsDef.width = tempImage.naturalWidth;
+
+              _this3.thumbnailsDefs.push(thumbnailsDef);
+
+              resolve();
+            };
+          });
+        });
+      }
+      /**
+       * Setup hooks for Plyr and window events
+       */
+
+    }, {
+      key: "listeners",
+      value: function listeners() {
+        var _this4 = this;
+
+        // Mouse hover over seek bar
+        on.call(this.player, this.player.elements.progress, 'mousemove', function (event) {
+          // Wait until media has a duration
+          if (_this4.player.media.duration) {
+            // Calculate seek hover position as approx video seconds
+            var clientRect = _this4.player.elements.progress.getBoundingClientRect();
+
+            var percentage = 100 / clientRect.width * (event.pageX - clientRect.left);
+            _this4.seekTime = _this4.player.media.duration * (percentage / 100);
+            if (_this4.seekTime < 0) _this4.seekTime = 0; // The mousemove fires for 10+px out to the left
+
+            if (_this4.seekTime > _this4.player.media.duration - 1) _this4.seekTime = _this4.player.media.duration - 1; // Took 1 second off the duration for safety, because different players can disagree on the real duration of a video
+
+            _this4.mousePosX = event.pageX; // Set time text inside image container
+
+            _this4.player.elements.display.previewThumbnailTimeText.innerText = formatTime(_this4.seekTime); // Download and show image
+
+            _this4.showImageAtCurrentTime();
+          }
+        }); // Touch device seeking - performs same function as above
+
+        on.call(this.player, this.player.elements.progress, 'touchmove', function (event) {
+          // Wait until media has a duration
+          if (_this4.player.media.duration) {
+            // Calculate seek hover position as approx video seconds
+            _this4.seekTime = _this4.player.media.duration * (_this4.player.elements.inputs.seek.value / 100); // Download and show image
+
+            _this4.showImageAtCurrentTime();
+          }
+        }); // Hide thumbnail preview - on mouse click, mouse leave, and video play/seek. All four are required, e.g., for buffering
+
+        on.call(this.player, this.player.elements.progress, 'mouseleave click', function () {
+          _this4.hideThumbContainer(true);
+        });
+        this.player.on('play', function () {
+          _this4.hideThumbContainer(true);
+        });
+        this.player.on('seeked', function () {
+          _this4.hideThumbContainer(false);
+        }); // Show scrubbing preview
+
+        on.call(this.player, this.player.elements.progress, 'mousedown touchstart', function (event) {
+          // Only act on left mouse button (0), or touch device (!event.button)
+          if (!event.button || event.button === 0) {
+            _this4.mouseDown = true; // Wait until media has a duration
+
+            if (_this4.player.media.duration) {
+              _this4.showScrubbingContainer();
+
+              _this4.hideThumbContainer(true); // Download and show image
+
+
+              _this4.showImageAtCurrentTime();
+            }
+          }
+        });
+        on.call(this.player, this.player.media, 'timeupdate', function () {
+          _this4.timeAtLastTimeupdate = _this4.player.media.currentTime;
+        });
+        on.call(this.player, this.player.elements.progress, 'mouseup touchend', function () {
+          _this4.mouseDown = false; // Hide scrubbing preview. But wait until the video has successfully seeked before hiding the scrubbing preview
+
+          if (Math.ceil(_this4.timeAtLastTimeupdate) === Math.ceil(_this4.player.media.currentTime)) {
+            // The video was already seeked/loaded at the chosen time - hide immediately
+            _this4.hideScrubbingContainer();
+          } else {
+            // The video hasn't seeked yet. Wait for that
+            once.call(_this4.player, _this4.player.media, 'timeupdate', function () {
+              // Re-check mousedown - we might have already started scrubbing again
+              if (!_this4.mouseDown) {
+                _this4.hideScrubbingContainer();
+              }
+            });
+          }
+        });
+      }
+      /**
+       * Create HTML elements for image containers
+       */
+
+    }, {
+      key: "elements",
+      value: function elements() {
+        // Create HTML element: plyr__preview-thumbnail-container
+        var previewThumbnailContainer = createElement('div', {
+          class: this.player.config.classNames.previewThumbnails.thumbnailContainer
+        });
+        this.player.elements.progress.appendChild(previewThumbnailContainer);
+        this.player.elements.display.previewThumbnailContainer = previewThumbnailContainer; // Create HTML element, parent+span: time text (e.g., 01:32:00)
+
+        var timeTextContainer = createElement('div', {
+          class: this.player.config.classNames.previewThumbnails.timeTextContainer
+        });
+        this.player.elements.display.previewThumbnailContainer.appendChild(timeTextContainer);
+        var timeText = createElement('span', {}, '00:00');
+        timeTextContainer.appendChild(timeText);
+        this.player.elements.display.previewThumbnailTimeText = timeText; // Create HTML element: plyr__preview-scrubbing-container
+
+        var previewScrubbingContainer = createElement('div', {
+          class: this.player.config.classNames.previewThumbnails.scrubbingContainer
+        });
+        this.player.elements.wrapper.appendChild(previewScrubbingContainer);
+        this.player.elements.display.previewScrubbingContainer = previewScrubbingContainer;
+      }
+    }, {
+      key: "showImageAtCurrentTime",
+      value: function showImageAtCurrentTime() {
+        var _this5 = this;
+
+        if (this.mouseDown) {
+          this.setScrubbingContainerSize();
+        } else {
+          this.showThumbContainer();
+          this.setThumbContainerSizeAndPos();
+        } // Find the desired thumbnail index
+
+
+        var thumbNum = this.thumbnailsDefs[0].frames.findIndex(function (frame) {
+          return _this5.seekTime >= frame.startTime && _this5.seekTime <= frame.endTime;
+        });
+        var qualityIndex = 0; // Check to see if we've already downloaded higher quality versions of this image
+
+        for (var i = 1; i < this.thumbnailsDefs.length; i++) {
+          if (this.loadedImages.includes(this.thumbnailsDefs[i].frames[thumbNum].text)) {
+            qualityIndex = i;
+          }
+        } // Only proceed if either thumbnum or thumbfilename has changed
+
+
+        if (thumbNum !== this.showingThumb) {
+          this.showingThumb = thumbNum;
+          this.loadImage(qualityIndex);
+        }
+      } // Show the image that's currently specified in this.showingThumb
+
+    }, {
+      key: "loadImage",
+      value: function loadImage() {
+        var _this6 = this;
+
+        var qualityIndex = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+        var thumbNum = this.showingThumb;
+        var frame = this.thumbnailsDefs[qualityIndex].frames[thumbNum];
+        var thumbFilename = this.thumbnailsDefs[qualityIndex].frames[thumbNum].text;
+        var urlPrefix = this.thumbnailsDefs[qualityIndex].urlPrefix;
+        var thumbURL = urlPrefix + thumbFilename;
+
+        if (!this.currentImageElement || this.currentImageElement.getAttribute('data-thumbfilename') !== thumbFilename) {
+          // If we're already loading a previous image, remove its onload handler - we don't want it to load after this one
+          // Only do this if not using jpeg sprites. Without jpeg sprites we really want to show as many images as possible, as a best-effort
+          if (this.loadingImage && this.usingJpegSprites) this.loadingImage.onload = null; // We're building and adding a new image. In other implementations of similar functionality (Youtube), background image is instead used. But this causes issues with larger images in Firefox and Safari - switching between background images causes a flicker. Putting a new image over the top does not
+
+          var previewImage = new Image();
+          previewImage.src = thumbURL;
+          previewImage.setAttribute('data-thumbnum', thumbNum);
+          previewImage.setAttribute('data-thumbfilename', thumbFilename);
+          this.showingThumbFilename = thumbFilename; // For some reason, passing the named function directly causes it to execute immediately. So I've wrapped it in an anonymous function...
+
+          previewImage.onload = function () {
+            return _this6.showImage(previewImage, frame, qualityIndex, thumbNum, thumbFilename, true);
+          };
+
+          this.loadingImage = previewImage;
+          this.removeOldImages(previewImage);
+        } else {
+          // Update the existing image
+          this.showImage(this.currentImageElement, frame, qualityIndex, thumbNum, thumbFilename, false);
+          this.currentImageElement.setAttribute('data-thumbnum', thumbNum);
+          this.removeOldImages(this.currentImageElement);
+        }
+      }
+    }, {
+      key: "showImage",
+      value: function showImage(previewImage, frame, qualityIndex, thumbNum, thumbFilename) {
+        var newImage = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : true;
+        this.player.debug.log('Showing thumb: ' + thumbFilename + '. num: ' + thumbNum + '. qual: ' + qualityIndex + '. newimg: ' + newImage);
+        this.setImageSizeAndOffset(previewImage, frame);
+
+        if (newImage) {
+          this.currentContainer.appendChild(previewImage);
+          this.currentImageElement = previewImage;
+          if (!this.loadedImages.includes(thumbFilename)) this.loadedImages.push(thumbFilename);
+        } // Preload images before and after the current one
+        // Show higher quality of the same frame
+        // Each step here has a short time delay, and only continues if still hovering/seeking the same spot. This is to protect slow connections from overloading
+
+
+        this.preloadNearby(thumbNum, true).then(this.preloadNearby(thumbNum, false)).then(this.getHigherQuality(qualityIndex, previewImage, frame, thumbFilename));
+      } // Remove all preview images that aren't the designated current image
+
+    }, {
+      key: "removeOldImages",
+      value: function removeOldImages(currentImage) {
+        var _this7 = this;
+
+        // Get a list of all images, convert it from a DOM list to an array
+        var allImages = Array.from(this.currentContainer.children);
+
+        var _loop = function _loop() {
+          var image = allImages[_i];
+
+          if (image.tagName === 'IMG') {
+            var removeDelay = _this7.usingJpegSprites ? 500 : 1000;
+
+            if (image.getAttribute('data-thumbnum') !== currentImage.getAttribute('data-thumbnum') && !image.getAttribute('data-deleting')) {
+              // Wait 200ms, as the new image can take some time to show on certain browsers (even though it was downloaded before showing). This will prevent flicker, and show some generosity towards slower clients
+              // First set attribute 'deleting' to prevent multi-handling of this on repeat firing of this function
+              image.setAttribute('data-deleting', 'true');
+              var currentContainer = _this7.currentContainer; // This has to be set before the timeout - to prevent issues switching between hover and scrub
+
+              setTimeout(function () {
+                currentContainer.removeChild(image);
+
+                _this7.player.debug.log('Removing thumb: ' + image.getAttribute('data-thumbfilename'));
+              }, removeDelay);
+            }
+          }
+        };
+
+        for (var _i = 0; _i < allImages.length; _i++) {
+          _loop();
+        }
+      } // Preload images before and after the current one. Only if the user is still hovering/seeking the same frame
+      // This will only preload the lowest quality
+
+    }, {
+      key: "preloadNearby",
+      value: function preloadNearby(thumbNum) {
+        var _this8 = this;
+
+        var forward = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+        return new Promise(function (resolve, reject) {
+          setTimeout(function () {
+            var oldThumbFilename = _this8.thumbnailsDefs[0].frames[thumbNum].text;
+
+            if (_this8.showingThumbFilename === oldThumbFilename) {
+              // Find the nearest thumbs with different filenames. Sometimes it'll be the next index, but in the case of jpeg sprites, it might be 100+ away
+              var thumbnailsDefsCopy;
+
+              if (forward) {
+                thumbnailsDefsCopy = _this8.thumbnailsDefs[0].frames.slice(thumbNum);
+              } else {
+                thumbnailsDefsCopy = _this8.thumbnailsDefs[0].frames.slice(0, thumbNum).reverse();
+              }
+
+              var foundOne = false;
+              var _iteratorNormalCompletion2 = true;
+              var _didIteratorError2 = false;
+              var _iteratorError2 = undefined;
+
+              try {
+                var _loop2 = function _loop2() {
+                  var frame = _step2.value;
+                  var newThumbFilename = frame.text;
+
+                  if (newThumbFilename !== oldThumbFilename) {
+                    // Found one with a different filename. Make sure it hasn't already been loaded on this page visit
+                    if (!_this8.loadedImages.includes(newThumbFilename)) {
+                      foundOne = true;
+
+                      _this8.player.debug.log('Preloading thumb filename: ' + newThumbFilename);
+
+                      var urlPrefix = _this8.thumbnailsDefs[0].urlPrefix;
+                      var thumbURL = urlPrefix + newThumbFilename;
+                      var previewImage = new Image();
+                      previewImage.src = thumbURL;
+
+                      previewImage.onload = function () {
+                        _this8.player.debug.log('Preloaded thumb filename: ' + newThumbFilename);
+
+                        if (!_this8.loadedImages.includes(newThumbFilename)) _this8.loadedImages.push(newThumbFilename); // We don't resolve until the thumb is loaded
+
+                        resolve();
+                      };
+                    }
+
+                    return "break";
+                  }
+                };
+
+                for (var _iterator2 = thumbnailsDefsCopy[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                  var _ret = _loop2();
+
+                  if (_ret === "break") break;
+                } // If there are none to preload then we want to resolve immediately
+
+              } catch (err) {
+                _didIteratorError2 = true;
+                _iteratorError2 = err;
+              } finally {
+                try {
+                  if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+                    _iterator2.return();
+                  }
+                } finally {
+                  if (_didIteratorError2) {
+                    throw _iteratorError2;
+                  }
+                }
+              }
+
+              if (!foundOne) resolve();
+            }
+          }, 300);
+        });
+      } // If user has been hovering current image for half a second, look for a higher quality one
+
+    }, {
+      key: "getHigherQuality",
+      value: function getHigherQuality(currentQualityIndex, previewImage, frame, thumbFilename) {
+        var _this9 = this;
+
+        if (currentQualityIndex < this.thumbnailsDefs.length - 1) {
+          // Only use the higher quality version if it's going to look any better - if the current thumb is of a lower pixel density than the thumbnail container
+          var previewImageHeight = previewImage.naturalHeight;
+          if (this.usingJpegSprites) previewImageHeight = frame.h;
+
+          if (previewImageHeight < this.thumbContainerHeight) {
+            // Recurse back to the loadImage function - show a higher quality one, but only if the viewer is on this frame for a while
+            setTimeout(function () {
+              // Make sure the mouse hasn't already moved on and started hovering at another image
+              if (_this9.showingThumbFilename === thumbFilename) {
+                _this9.player.debug.log('Showing higher quality thumb for: ' + thumbFilename);
+
+                _this9.loadImage(currentQualityIndex + 1);
+              }
+            }, 300);
+          }
+        }
+      }
+    }, {
+      key: "showThumbContainer",
+      value: function showThumbContainer() {
+        this.player.elements.display.previewThumbnailContainer.style.opacity = 1;
+      }
+    }, {
+      key: "hideThumbContainer",
+      value: function hideThumbContainer() {
+        var clearShowing = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+        this.player.elements.display.previewThumbnailContainer.style.opacity = 0;
+
+        if (clearShowing) {
+          this.showingThumb = null;
+          this.showingThumbFilename = null;
+        }
+      }
+    }, {
+      key: "showScrubbingContainer",
+      value: function showScrubbingContainer() {
+        this.player.elements.display.previewScrubbingContainer.style.opacity = 1;
+      }
+    }, {
+      key: "hideScrubbingContainer",
+      value: function hideScrubbingContainer() {
+        this.player.elements.display.previewScrubbingContainer.style.opacity = 0;
+        this.showingThumb = null;
+        this.showingThumbFilename = null;
+      }
+    }, {
+      key: "determineContainerAutoSizing",
+      value: function determineContainerAutoSizing() {
+        if (this.player.elements.display.previewThumbnailContainer.clientHeight > 20) {
+          this.sizeSpecifiedInCSS = true; // This will prevent auto sizing in this.setThumbContainerSizeAndPos()
+        }
+      } // Set the size to be about a quarter of the size of video. Unless option dynamicSize === false, in which case it needs to be set in CSS
+
+    }, {
+      key: "setThumbContainerSizeAndPos",
+      value: function setThumbContainerSizeAndPos() {
+        if (!this.sizeSpecifiedInCSS) {
+          var thumbWidth = this.thumbContainerHeight * this.thumbAspectRatio;
+          this.player.elements.display.previewThumbnailContainer.style.height = "".concat(this.thumbContainerHeight, "px");
+          this.player.elements.display.previewThumbnailContainer.style.width = "".concat(thumbWidth, "px");
+        }
+
+        this.setThumbContainerPos();
+      }
+    }, {
+      key: "setThumbContainerPos",
+      value: function setThumbContainerPos() {
+        var seekbarRect = this.player.elements.progress.getBoundingClientRect();
+        var plyrRect = this.player.elements.container.getBoundingClientRect();
+        var previewContainer = this.player.elements.display.previewThumbnailContainer; // Find the lowest and highest desired left-position, so we don't slide out the side of the video container
+
+        var minVal = plyrRect.left - seekbarRect.left + 10;
+        var maxVal = plyrRect.right - seekbarRect.left - previewContainer.clientWidth - 10; // Set preview container position to: mousepos, minus seekbar.left, minus half of previewContainer.clientWidth
+
+        var previewPos = this.mousePosX - seekbarRect.left - previewContainer.clientWidth / 2;
+
+        if (previewPos < minVal) {
+          previewPos = minVal;
+        }
+
+        if (previewPos > maxVal) {
+          previewPos = maxVal;
+        }
+
+        previewContainer.style.left = previewPos + 'px';
+      } // Can't use 100% width, in case the video is a different aspect ratio to the video container
+
+    }, {
+      key: "setScrubbingContainerSize",
+      value: function setScrubbingContainerSize() {
+        this.player.elements.display.previewScrubbingContainer.style.width = "".concat(this.player.media.clientWidth, "px");
+        this.player.elements.display.previewScrubbingContainer.style.height = "".concat(this.player.media.clientWidth / this.thumbAspectRatio, "px"); // Can't use media.clientHeight - html5 video goes big and does black bars above and below
+      } // Jpeg sprites need to be offset to the correct location
+
+    }, {
+      key: "setImageSizeAndOffset",
+      value: function setImageSizeAndOffset(previewImage, frame) {
+        if (this.usingJpegSprites) {
+          // Find difference between jpeg height and preview container height
+          var heightMulti = this.thumbContainerHeight / frame.h;
+          previewImage.style.height = "".concat(previewImage.naturalHeight * heightMulti, "px");
+          previewImage.style.width = "".concat(previewImage.naturalWidth * heightMulti, "px");
+          previewImage.style.left = "-".concat(Math.ceil(frame.x * heightMulti), "px");
+          previewImage.style.top = "-".concat(frame.y * heightMulti, "px"); // todo: might need to round this one up too
+        }
+      } // Arg: vttDataString example: "WEBVTT\n\n1\n00:00:05.000 --> 00:00:10.000\n1080p-00001.jpg"
+
+    }, {
+      key: "parseVtt",
+      value: function parseVtt(vttDataString) {
+        var processedList = [];
+        var frames = vttDataString.split(/\r\n\r\n|\n\n|\r\r/);
+        var _iteratorNormalCompletion3 = true;
+        var _didIteratorError3 = false;
+        var _iteratorError3 = undefined;
+
+        try {
+          for (var _iterator3 = frames[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+            var frame = _step3.value;
+            var result = {};
+            var _iteratorNormalCompletion4 = true;
+            var _didIteratorError4 = false;
+            var _iteratorError4 = undefined;
+
+            try {
+              for (var _iterator4 = frame.split(/\r\n|\n|\r/)[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                var line = _step4.value;
+
+                if (result.startTime == null) {
+                  // The line with start and end times on it is the first line of interest
+                  var matchTimes = line.match(/([0-9]{2}):([0-9]{2}):([0-9]{2}).([0-9]{2,3})( ?--> ?)([0-9]{2}):([0-9]{2}):([0-9]{2}).([0-9]{2,3})/); // Note that this currently ignores caption formatting directives that are optionally on the end of this line - fine for non-captions VTT
+
+                  if (matchTimes) {
+                    result.startTime = Number(matchTimes[1]) * 60 * 60 + Number(matchTimes[2]) * 60 + Number(matchTimes[3]) + Number("0." + matchTimes[4]);
+                    result.endTime = Number(matchTimes[6]) * 60 * 60 + Number(matchTimes[7]) * 60 + Number(matchTimes[8]) + Number("0." + matchTimes[9]);
+                  }
+                } else {
+                  // If we already have the startTime, then we're definitely up to the text line(s)
+                  if (line.trim().length > 0) {
+                    if (!result.text) {
+                      var lineSplit = line.trim().split('#xywh=');
+                      result.text = lineSplit[0]; // If there's content in lineSplit[1], then we have jpeg sprites. If not, then it's just one frame per jpeg
+
+                      if (lineSplit[1]) {
+                        var xywh = lineSplit[1].split(',');
+                        result.x = xywh[0];
+                        result.y = xywh[1];
+                        result.w = xywh[2];
+                        result.h = xywh[3];
+                      }
+                    }
+                  }
+                }
+              }
+            } catch (err) {
+              _didIteratorError4 = true;
+              _iteratorError4 = err;
+            } finally {
+              try {
+                if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
+                  _iterator4.return();
+                }
+              } finally {
+                if (_didIteratorError4) {
+                  throw _iteratorError4;
+                }
+              }
+            }
+
+            if (result.text) {
+              processedList.push(result);
+            }
+          }
+        } catch (err) {
+          _didIteratorError3 = true;
+          _iteratorError3 = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
+              _iterator3.return();
+            }
+          } finally {
+            if (_didIteratorError3) {
+              throw _iteratorError3;
+            }
+          }
+        }
+
+        return processedList;
+      }
+    }, {
+      key: "enabled",
+      get: function get() {
+        return this.player.isHTML5 && this.player.isVideo && this.player.config.previewThumbnails.enabled;
+      }
+    }, {
+      key: "currentContainer",
+      get: function get() {
+        if (this.mouseDown) {
+          return this.player.elements.display.previewScrubbingContainer;
+        } else {
+          return this.player.elements.display.previewThumbnailContainer;
+        }
+      }
+    }, {
+      key: "usingJpegSprites",
+      get: function get() {
+        if (this.thumbnailsDefs[0].frames[0].w) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }, {
+      key: "thumbAspectRatio",
+      get: function get() {
+        if (this.usingJpegSprites) {
+          return this.thumbnailsDefs[0].frames[0].w / this.thumbnailsDefs[0].frames[0].h;
+        } else {
+          return this.thumbnailsDefs[0].width / this.thumbnailsDefs[0].height;
+        }
+      }
+    }, {
+      key: "thumbContainerHeight",
+      get: function get() {
+        if (this.mouseDown) {
+          // return this.player.elements.container.clientHeight;
+          // return this.player.media.clientHeight;
+          return this.player.media.clientWidth / this.thumbAspectRatio; // Can't use media.clientHeight - html5 video goes big and does black bars above and below
+        } else {
+          // return this.player.elements.container.clientHeight / 4;
+          return this.player.media.clientWidth / this.thumbAspectRatio / 4;
+        }
+      }
+    }, {
+      key: "currentImageElement",
+      get: function get() {
+        if (this.mouseDown) {
+          return this.currentScrubbingImageElement;
+        } else {
+          return this.currentThumbnailImageElement;
+        }
+      },
+      set: function set(element) {
+        if (this.mouseDown) {
+          this.currentScrubbingImageElement = element;
+        } else {
+          this.currentThumbnailImageElement = element;
+        }
+      }
+    }]);
+
+    return PreviewThumbnails;
+  }();
+
   var source = {
     // Add elements to HTML5 media (source, tracks, etc)
     insertElements: function insertElements(type, attributes) {
@@ -9482,7 +11005,9 @@ typeof navigator === "object" && (function (global, factory) {
       this.media.plyr = this; // Wrap media
 
       if (!is$1.element(this.elements.container)) {
-        this.elements.container = createElement('div');
+        this.elements.container = createElement('div', {
+          tabindex: 0
+        });
         wrap(this.media, this.elements.container);
       } // Add style hook
 
@@ -9520,7 +11045,11 @@ typeof navigator === "object" && (function (global, factory) {
       } // Seek time will be recorded (in listeners.js) so we can prevent hiding controls for a few seconds after seek
 
 
-      this.lastSeekTime = 0;
+      this.lastSeekTime = 0; // Setup preview thumbnails if enabled
+
+      if (this.config.previewThumbnails.enabled) {
+        this.previewThumbnails = new PreviewThumbnails(this);
+      }
     } // ---------------------------------------
     // API
     // ---------------------------------------

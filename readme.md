@@ -65,11 +65,11 @@ Plyr extends upon the standard [HTML5 media element](https://developer.mozilla.o
 
 ```html
 <video poster="/path/to/poster.jpg" id="player" playsinline controls>
-    <source src="/path/to/video.mp4" type="video/mp4">
-    <source src="/path/to/video.webm" type="video/webm">
+    <source src="/path/to/video.mp4" type="video/mp4" />
+    <source src="/path/to/video.webm" type="video/webm" />
 
     <!-- Captions are optional -->
-    <track kind="captions" label="English captions" src="/path/to/captions.vtt" srclang="en" default>
+    <track kind="captions" label="English captions" src="/path/to/captions.vtt" srclang="en" default />
 </video>
 ```
 
@@ -77,8 +77,8 @@ Plyr extends upon the standard [HTML5 media element](https://developer.mozilla.o
 
 ```html
 <audio id="player" controls>
-    <source src="/path/to/audio.mp3" type="audio/mp3">
-    <source src="/path/to/audio.ogg" type="audio/ogg">
+    <source src="/path/to/audio.mp3" type="audio/mp3" />
+    <source src="/path/to/audio.ogg" type="audio/ogg" />
 </audio>
 ```
 
@@ -90,7 +90,12 @@ We recommend [progressive enhancement](https://www.smashingmagazine.com/2009/04/
 
 ```html
 <div class="plyr__video-embed" id="player">
-    <iframe src="https://www.youtube.com/embed/bTqVqk7FSmY?origin=https://plyr.io&amp;iv_load_policy=3&amp;modestbranding=1&amp;playsinline=1&amp;showinfo=0&amp;rel=0&amp;enablejsapi=1" allowfullscreen allowtransparency allow="autoplay"></iframe>
+    <iframe
+        src="https://www.youtube.com/embed/bTqVqk7FSmY?origin=https://plyr.io&amp;iv_load_policy=3&amp;modestbranding=1&amp;playsinline=1&amp;showinfo=0&amp;rel=0&amp;enablejsapi=1"
+        allowfullscreen
+        allowtransparency
+        allow="autoplay"
+    ></iframe>
 </div>
 ```
 
@@ -110,7 +115,12 @@ Much the same as YouTube above.
 
 ```html
 <div class="plyr__video-embed" id="player">
-    <iframe src="https://player.vimeo.com/video/76979871?loop=false&amp;byline=false&amp;portrait=false&amp;title=false&amp;speed=true&amp;transparent=0&amp;gesture=media" allowfullscreen allowtransparency allow="autoplay"></iframe>
+    <iframe
+        src="https://player.vimeo.com/video/76979871?loop=false&amp;byline=false&amp;portrait=false&amp;title=false&amp;speed=true&amp;transparent=0&amp;gesture=media"
+        allowfullscreen
+        allowtransparency
+        allow="autoplay"
+    ></iframe>
 </div>
 ```
 
@@ -126,7 +136,9 @@ Include the `plyr.js` script before the closing `</body>` tag and then in your J
 
 ```html
 <script src="path/to/plyr.js"></script>
-<script>const player = new Plyr('#player');</script>
+<script>
+    const player = new Plyr('#player');
+</script>
 ```
 
 See [initialising](#initialising) for more information on advanced setups.
@@ -148,13 +160,13 @@ You can use our CDN (provided by [Fastly](https://www.fastly.com/)) for the Java
 Include the `plyr.css` stylsheet into your `<head>`
 
 ```html
-<link rel="stylesheet" href="path/to/plyr.css">
+<link rel="stylesheet" href="path/to/plyr.css" />
 ```
 
 If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for the default CSS, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/3.4.7/plyr.css">
+<link rel="stylesheet" href="https://cdn.plyr.io/3.4.7/plyr.css" />
 ```
 
 ### SVG Sprite
@@ -277,7 +289,12 @@ In all cases, the constructor will return a Plyr object that can be used with th
 Options can be passed as an object to the constructor as above or as JSON in `data-plyr-config` attribute on each of your target elements:
 
 ```html
-<video src="/path/to/video.mp4" id="player" controls data-plyr-config='{ "title": "This is an example video", "volume": 1, "debug": true }'></video>
+<video
+    src="/path/to/video.mp4"
+    id="player"
+    controls
+    data-plyr-config="{ &quot;title&quot;: &quot;This is an example video&quot;, &quot;volume&quot;: 1, &quot;debug&quot;: true }"
+></video>
 ```
 
 Note the single quotes encapsulating the JSON and double quotes on the object keys. Only string values need double quotes.
@@ -310,7 +327,7 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
 | `toggleInvert`       | Boolean                    | `true`                                                                                                                         | Allow users to click to toggle the above.                                                                                                                                                                                                                                                                                                                              |
 | `listeners`          | Object                     | `null`                                                                                                                         | Allows binding of event listeners to the controls before the default handlers. See the `defaults.js` for available listeners. If your handler prevents default on the event (`event.preventDefault()`), the default handler will not fire.                                                                                                                             |
 | `captions`           | Object                     | `{ active: false, language: 'auto', update: false }`                                                                           | `active`: Toggles if captions should be active by default. `language`: Sets the default language to load (if available). 'auto' uses the browser language. `update`: Listen to changes to tracks and update menu. This is needed for some streaming libraries, but can result in unselectable language options).                                                       |
-| `fullscreen`         | Object                     | `{ enabled: true, fallback: true, iosNative: false }`                                                                          | `enabled`: Toggles whether fullscreen should be enabled. `fallback`: Allow fallback to a full-window solution. `iosNative`: whether to use native iOS fullscreen when entering fullscreen (no custom controls)                                                                                                                                                         |
+| `fullscreen`         | Object                     | `{ enabled: true, fallback: true, iosNative: false }`                                                                          | `enabled`: Toggles whether fullscreen should be enabled. `fallback`: Allow fallback to a full-window solution (true/false/'force'). `iosNative`: whether to use native iOS fullscreen when entering fullscreen (no custom controls)                                                                                                                                    |
 | `ratio`              | String                     | `16:9`                                                                                                                         | The aspect ratio you want to use for embedded players.                                                                                                                                                                                                                                                                                                                 |
 | `storage`            | Object                     | `{ enabled: true, key: 'plyr' }`                                                                                               | `enabled`: Allow use of local storage to store user settings. `key`: The key name to use.                                                                                                                                                                                                                                                                              |
 | `speed`              | Object                     | `{ selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2] }`                                                                 | `selected`: The default speed for playback. `options`: Options to display in the menu. Most browsers will refuse to play slower than 0.5.                                                                                                                                                                                                                              |
@@ -419,7 +436,7 @@ player.fullscreen.active; // false;
 | `language`           | ✓      | ✓      | Gets or sets the preferred captions language for the player. The setter accepts an ISO two-letter language code. Support for the languages is dependent on the captions you include. If your captions don't have any language data, or if you have multiple tracks with the same language, you may want to use `currentTrack` instead. |
 | `fullscreen.active`  | ✓      | -      | Returns a boolean indicating if the current player is in fullscreen mode.                                                                                                                                                                                                                                                              |
 | `fullscreen.enabled` | ✓      | -      | Returns a boolean indicating if the current player has fullscreen enabled.                                                                                                                                                                                                                                                             |
-| `pip`&sup2;                | ✓      | ✓      | Gets or sets the picture-in-picture state of the player. The setter accepts a boolean. This currently only supported on Safari 10+ (on MacOS Sierra+ and iOS 10+) and Chrome 70+.                                                                                                                                                      |
+| `pip`&sup2;          | ✓      | ✓      | Gets or sets the picture-in-picture state of the player. The setter accepts a boolean. This currently only supported on Safari 10+ (on MacOS Sierra+ and iOS 10+) and Chrome 70+.                                                                                                                                                      |
 
 1.  YouTube only. HTML5 will follow.
 2.  HTML5 only
