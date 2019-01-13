@@ -37,38 +37,37 @@ const pkg = require('./package.json');
 const minSuffix = '.min';
 
 // Paths
-const root = __dirname;
 const paths = {
     plyr: {
         // Source paths
         src: {
-            sass: path.join(root, 'src/sass/**/*.scss'),
-            js: path.join(root, 'src/js/**/*.js'),
-            sprite: path.join(root, 'src/sprite/*.svg'),
+            sass: path.join(__dirname, 'src/sass/**/*.scss'),
+            js: path.join(__dirname, 'src/js/**/*.js'),
+            sprite: path.join(__dirname, 'src/sprite/*.svg'),
         },
 
         // Output paths
-        output: path.join(root, 'dist/'),
+        output: path.join(__dirname, 'dist/'),
     },
     demo: {
         // Source paths
         src: {
-            sass: path.join(root, 'demo/src/sass/**/*.scss'),
-            js: path.join(root, 'demo/src/js/**/*.js'),
+            sass: path.join(__dirname, 'demo/src/sass/**/*.scss'),
+            js: path.join(__dirname, 'demo/src/js/**/*.js'),
         },
 
         // Output paths
-        output: path.join(root, 'demo/dist/'),
+        output: path.join(__dirname, 'demo/dist/'),
 
         // Demo
-        root: path.join(root, 'demo/'),
+        root: path.join(__dirname, 'demo/'),
     },
     upload: [
-        path.join(root, `dist/*${minSuffix}.*`),
-        path.join(root, 'dist/*.css'),
-        path.join(root, 'dist/*.svg'),
-        path.join(root, `demo/dist/*${minSuffix}.*`),
-        path.join(root, 'demo/dist/*.css'),
+        path.join(__dirname, `dist/*${minSuffix}.*`),
+        path.join(__dirname, 'dist/*.css'),
+        path.join(__dirname, 'dist/*.svg'),
+        path.join(__dirname, `demo/dist/*${minSuffix}.*`),
+        path.join(__dirname, 'demo/dist/*.css'),
     ],
 };
 
@@ -202,22 +201,22 @@ build.sass(bundles.demo.sass, 'demo');
 build.js(bundles.demo.js, 'demo', { format: 'iife' });
 
 // Build all JS
-gulp.task('js', () => gulp.parallel(tasks.js));
+gulp.task('js', () => gulp.parallel(...tasks.js));
 
 // Watch for file changes
 gulp.task('watch', () => {
     // Plyr core
-    gulp.watch(paths.plyr.src.js, gulp.parallel(tasks.js));
-    gulp.watch(paths.plyr.src.sass, gulp.parallel(tasks.sass));
-    gulp.watch(paths.plyr.src.sprite, gulp.parallel(tasks.sprite));
+    gulp.watch(paths.plyr.src.js, gulp.parallel(...tasks.js));
+    gulp.watch(paths.plyr.src.sass, gulp.parallel(...tasks.sass));
+    gulp.watch(paths.plyr.src.sprite, gulp.parallel(...tasks.sprite));
 
     // Demo
-    gulp.watch(paths.demo.src.js, gulp.parallel(tasks.js));
-    gulp.watch(paths.demo.src.sass, gulp.parallel(tasks.sass));
+    gulp.watch(paths.demo.src.js, gulp.parallel(...tasks.js));
+    gulp.watch(paths.demo.src.sass, gulp.parallel(...tasks.sass));
 });
 
 // Build distribution
-gulp.task('build', gulp.series(tasks.clean, gulp.parallel(tasks.js, tasks.sass, tasks.sprite)));
+gulp.task('build', gulp.series(tasks.clean, gulp.parallel(...tasks.js, ...tasks.sass, ...tasks.sprite)));
 
 // Default gulp task
 gulp.task('default', gulp.series('build', 'watch'));
@@ -306,7 +305,7 @@ if (Object.keys(credentials).includes('aws') && Object.keys(credentials).include
         const files = ['plyr.js', 'plyr.polyfilled.js', 'config/defaults.js'];
 
         return gulp
-            .src(files.map(file => path.join(root, `src/js/${file}`)), { base: '.' })
+            .src(files.map(file => path.join(__dirname, `src/js/${file}`)), { base: '.' })
             .pipe(replace(semver, `v${version}`))
             .pipe(replace(cdnpath, `${aws.cdn.domain}/${version}/`))
             .pipe(gulp.dest('./'));
@@ -382,9 +381,9 @@ if (Object.keys(credentials).includes('aws') && Object.keys(credentials).include
         console.log(`Uploading '${version}' demo to ${aws.demo.domain}...`);
 
         // Replace versioned files in readme.md
-        gulp.src([`${root}/readme.md`])
+        gulp.src([`${__dirname}/readme.md`])
             .pipe(replace(cdnpath, `${aws.cdn.domain}/${version}/`))
-            .pipe(gulp.dest(root));
+            .pipe(gulp.dest(__dirname));
 
         // Replace local file paths with remote paths in demo HTML
         // e.g. "../dist/plyr.js" to "https://cdn.plyr.io/x.x.x/plyr.js"
@@ -452,7 +451,7 @@ if (Object.keys(credentials).includes('aws') && Object.keys(credentials).include
         gulp.series(
             'version',
             tasks.clean,
-            gulp.parallel(tasks.js, tasks.sass, tasks.sprite),
+            gulp.parallel(...tasks.js, ...tasks.sass, ...tasks.sprite),
             'cdn',
             'demo',
             'purge',
