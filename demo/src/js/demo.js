@@ -281,9 +281,7 @@ import Raven from 'raven-js';
     // For demo site (https://plyr.io) only
     if (env.prod) {
         window.dataLayer = window.dataLayer || [];
-        const gtag = (...args) => {
-            window.dataLayer.push(args);
-        };
+        const gtag = () => window.dataLayer.push(arguments); // eslint-disable-line
         gtag('js', new Date());
         gtag('config', 'UA-132699580-1');
     }

@@ -4089,7 +4089,7 @@ typeof navigator === "object" && (function () {
 	var Client = raven;
 	singleton.Client = Client;
 
-	// ==========================================================================
+	var _arguments = arguments;
 
 	(function () {
 	  var host = window.location.host;
@@ -4330,11 +4330,7 @@ typeof navigator === "object" && (function () {
 	    window.dataLayer = window.dataLayer || [];
 
 	    var gtag = function gtag() {
-	      for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-	        args[_key] = arguments[_key];
-	      }
-
-	      window.dataLayer.push(args);
+	      window.dataLayer.push(_arguments); // eslint-disable-line
 	    };
 
 	    gtag('js', new Date());
