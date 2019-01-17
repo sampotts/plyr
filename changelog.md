@@ -1,3 +1,7 @@
+### v3.4.8
+
+-   Calling customized controls function with proper arguments (thanks @a60814billy)
+
 ### v3.4.7
 
 -   Fix for Vimeo fullscreen with non native aspect ratios (fixes #854)

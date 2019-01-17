@@ -2622,7 +2622,7 @@ typeof navigator === "object" && (function (global, factory) {
       var update = true; // If function, run it and use output
 
       if (is.function(this.config.controls)) {
-        this.config.controls = this.config.controls.call(this.props);
+        this.config.controls = this.config.controls.call(this, props);
       } // Convert falsy controls to empty array (primarily for empty strings)
 
 
@@ -3185,7 +3185,7 @@ typeof navigator === "object" && (function (global, factory) {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.4.7/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.4.8/plyr.svg',
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
     // Quality default
@@ -4845,8 +4845,8 @@ typeof navigator === "object" && (function (global, factory) {
           if (!e.sheet.cssText.length) result = 'e';
         } catch (x) {
           // sheets objects created from load errors don't allow access to
-          // `cssText`
-          result = 'e';
+          // `cssText` (unless error is Code:18 SecurityError)
+          if (x.code != 18) result = 'e';
         }
       }
 
