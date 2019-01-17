@@ -33,7 +33,7 @@
         <meta name="twitter:card" content="summary_large_image" />
 
         <!-- Docs styles -->
-        <link rel="stylesheet" href="dist/demo.css?v=2" />
+        <link rel="stylesheet" href="dist/demo.css?2" />
 
         <!-- Preload -->
         <link
@@ -285,6 +285,16 @@
 
         <!-- Docs script -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=UA-132699580-1"></script>
-        <script src="dist/demo.js" crossorigin="anonymous"></script>
+        <script>
+            if (window.location.host === 'plyr.io') {
+                window.dataLayer = window.dataLayer || [];
+                function gtag() {
+                    window.dataLayer.push(arguments);
+                }
+                gtag('js', new Date());
+                gtag('config', 'UA-132699580-1');
+            }
+        </script>
+        <script src="dist/demo.js?2" crossorigin="anonymous"></script>
     </body>
 </html>

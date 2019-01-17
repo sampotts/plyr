@@ -4089,7 +4089,7 @@ typeof navigator === "object" && (function () {
 	var Client = raven;
 	singleton.Client = Client;
 
-	var _arguments = arguments;
+	// ==========================================================================
 
 	(function () {
 	  var host = window.location.host;
@@ -4322,19 +4322,6 @@ typeof navigator === "object" && (function () {
 
 	  if (env.prod) {
 	    singleton.config('https://d4ad9866ad834437a4754e23937071e4@sentry.io/305555').install();
-	  } // Google analytics
-	  // For demo site (https://plyr.io) only
-
-
-	  if (env.prod) {
-	    window.dataLayer = window.dataLayer || [];
-
-	    var gtag = function gtag() {
-	      window.dataLayer.push(_arguments); // eslint-disable-line
-	    };
-
-	    gtag('js', new Date());
-	    gtag('config', 'UA-132699580-1');
 	  }
 	})();
 

@@ -276,13 +276,4 @@ import Raven from 'raven-js';
     if (env.prod) {
         Raven.config('https://d4ad9866ad834437a4754e23937071e4@sentry.io/305555').install();
     }
-
-    // Google analytics
-    // For demo site (https://plyr.io) only
-    if (env.prod) {
-        window.dataLayer = window.dataLayer || [];
-        const gtag = () => window.dataLayer.push(arguments); // eslint-disable-line
-        gtag('js', new Date());
-        gtag('config', 'UA-132699580-1');
-    }
 })();
