@@ -336,7 +336,9 @@ class PreviewThumbnails {
                 this.loadingImage.onload = null;
             }
 
-            // We're building and adding a new image. In other implementations of similar functionality (Youtube), background image is instead used. But this causes issues with larger images in Firefox and Safari - switching between background images causes a flicker. Putting a new image over the top does not
+            // We're building and adding a new image. In other implementations of similar functionality (YouTube), background image
+            // is instead used. But this causes issues with larger images in Firefox and Safari - switching between background
+            // images causes a flicker. Putting a new image over the top does not
             const previewImage = new Image();
             previewImage.src = thumbUrl;
             previewImage.dataset.index = thumbNum;
@@ -395,7 +397,8 @@ class PreviewThumbnails {
                 // Wait 200ms, as the new image can take some time to show on certain browsers (even though it was downloaded before showing). This will prevent flicker, and show some generosity towards slower clients
                 // First set attribute 'deleting' to prevent multi-handling of this on repeat firing of this function
                 image.dataset.deleting = true;
-                const { currentImageContainer } = this; // This has to be set before the timeout - to prevent issues switching between hover and scrub
+                // This has to be set before the timeout - to prevent issues switching between hover and scrub
+                const { currentImageContainer } = this;
 
                 setTimeout(() => {
                     currentImageContainer.removeChild(image);

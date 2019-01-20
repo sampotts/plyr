@@ -10022,7 +10022,9 @@ typeof navigator === "object" && (function (global, factory) {
           // Only do this if not using sprites. Without sprites we really want to show as many images as possible, as a best-effort
           if (this.loadingImage && this.usingSprites) {
             this.loadingImage.onload = null;
-          } // We're building and adding a new image. In other implementations of similar functionality (Youtube), background image is instead used. But this causes issues with larger images in Firefox and Safari - switching between background images causes a flicker. Putting a new image over the top does not
+          } // We're building and adding a new image. In other implementations of similar functionality (YouTube), background image
+          // is instead used. But this causes issues with larger images in Firefox and Safari - switching between background
+          // images causes a flicker. Putting a new image over the top does not
 
 
           var previewImage = new Image();
@@ -10083,9 +10085,9 @@ typeof navigator === "object" && (function (global, factory) {
           if (image.dataset.index !== currentImage.dataset.index && !image.dataset.deleting) {
             // Wait 200ms, as the new image can take some time to show on certain browsers (even though it was downloaded before showing). This will prevent flicker, and show some generosity towards slower clients
             // First set attribute 'deleting' to prevent multi-handling of this on repeat firing of this function
-            image.dataset.deleting = true;
-            var currentImageContainer = _this7.currentImageContainer; // This has to be set before the timeout - to prevent issues switching between hover and scrub
+            image.dataset.deleting = true; // This has to be set before the timeout - to prevent issues switching between hover and scrub
 
+            var currentImageContainer = _this7.currentImageContainer;
             setTimeout(function () {
               currentImageContainer.removeChild(image);
 
