@@ -3441,9 +3441,12 @@ typeof navigator === "object" && (function (global, factory) {
       },
       tabFocus: 'plyr__tab-focus',
       previewThumbnails: {
-        thumbnailContainer: 'plyr__preview-thumbnail-container',
-        scrubbingContainer: 'plyr__preview-scrubbing-container',
-        timeTextContainer: 'plyr__preview-time-text-container'
+        // Tooltip thumbs
+        thumbContainer: 'plyr__preview-thumb',
+        imageContainer: 'plyr__preview-thumb__image-container',
+        timeContainer: 'plyr__preview-thumb__time-container',
+        // Scrubber
+        scrubbingContainer: 'plyr__preview-scrubber'
       }
     },
     // Embed attributes
@@ -6557,6 +6560,49 @@ typeof navigator === "object" && (function (global, factory) {
     return Ads;
   }();
 
+  var parseVtt = function parseVtt(vttDataString) {
+    var processedList = [];
+    var frames = vttDataString.split(/\r\n\r\n|\n\n|\r\r/);
+    frames.forEach(function (frame) {
+      var result = {};
+      var lines = frame.split(/\r\n|\n|\r/);
+      lines.forEach(function (line) {
+        if (!is.number(result.startTime)) {
+          // The line with start and end times on it is the first line of interest
+          var matchTimes = line.match(/([0-9]{2}):([0-9]{2}):([0-9]{2}).([0-9]{2,3})( ?--> ?)([0-9]{2}):([0-9]{2}):([0-9]{2}).([0-9]{2,3})/); // Note that this currently ignores caption formatting directives that are optionally on the end of this line - fine for non-captions VTT
+
+          if (matchTimes) {
+            result.startTime = Number(matchTimes[1]) * 60 * 60 + Number(matchTimes[2]) * 60 + Number(matchTimes[3]) + Number("0.".concat(matchTimes[4]));
+            result.endTime = Number(matchTimes[6]) * 60 * 60 + Number(matchTimes[7]) * 60 + Number(matchTimes[8]) + Number("0.".concat(matchTimes[9]));
+          }
+        } else if (!is.empty(line.trim()) && is.empty(result.text)) {
+          // If we already have the startTime, then we're definitely up to the text line(s)
+          var lineSplit = line.trim().split('#xywh=');
+
+          var _lineSplit = _slicedToArray(lineSplit, 1);
+
+          result.text = _lineSplit[0];
+
+          // If there's content in lineSplit[1], then we have sprites. If not, then it's just one frame per image
+          if (lineSplit[1]) {
+            var _lineSplit$1$split = lineSplit[1].split(',');
+
+            var _lineSplit$1$split2 = _slicedToArray(_lineSplit$1$split, 4);
+
+            result.x = _lineSplit$1$split2[0];
+            result.y = _lineSplit$1$split2[1];
+            result.w = _lineSplit$1$split2[2];
+            result.h = _lineSplit$1$split2[3];
+          }
+        }
+      });
+
+      if (result.text) {
+        processedList.push(result);
+      }
+    });
+    return processedList;
+  };
   /**
    * Preview thumbnails for seek hover and scrubbing
    * Seeking: Hover over the seek bar (desktop only): shows a small preview container above the seek bar
@@ -6565,8 +6611,9 @@ typeof navigator === "object" && (function (global, factory) {
    * Notes:
    * - Thumbs are set via JS settings on Plyr init, not HTML5 'track' property. Using the track property would be a bit gross, because it doesn't support custom 'kinds'. kind=metadata might be used for something else, and we want to allow multiple thumbnails tracks. Tracks must have a unique combination of 'kind' and 'label'. We would have to do something like kind=metadata,label=thumbnails1 / kind=metadata,label=thumbnails2. Square peg, round hole
    * - VTT info: the image URL is relative to the VTT, not the current document. But if the url starts with a slash, it will naturally be relative to the current domain. https://support.jwplayer.com/articles/how-to-add-preview-thumbnails
-   * - This implementation uses multiple separate img elements. Other implementations use background-image on one element. This would be nice and simple, but Firefox and Safari have flickering issues with replacing backgrounds of larger images. It seems that Youtube perhaps only avoids this because they don't have the option for high-res previews (even the fullscreen ones, when mousedown/seeking). Images appear over the top of each other, and previous ones are discarded once the new ones have been rendered
+   * - This implementation uses multiple separate img elements. Other implementations use background-image on one element. This would be nice and simple, but Firefox and Safari have flickering issues with replacing backgrounds of larger images. It seems that YouTube perhaps only avoids this because they don't have the option for high-res previews (even the fullscreen ones, when mousedown/seeking). Images appear over the top of each other, and previous ones are discarded once the new ones have been rendered
    */
+
 
   var PreviewThumbnails =
   /*#__PURE__*/
@@ -6580,10 +6627,14 @@ typeof navigator === "object" && (function (global, factory) {
       _classCallCheck(this, PreviewThumbnails);
 
       this.player = player;
-      this.thumbnailsDefs = [];
+      this.thumbnails = [];
       this.lastMousemoveEventTime = Date.now();
       this.mouseDown = false;
       this.loadedImages = [];
+      this.elements = {
+        thumb: {},
+        scrubber: {}
+      };
 
       if (this.enabled) {
         this.load();
@@ -6597,12 +6648,12 @@ typeof navigator === "object" && (function (global, factory) {
 
         // Turn off the regular seek tooltip
         this.player.config.tooltips.seek = false;
-        this.getThumbnailsDefs().then(function () {
+        this.getThumbnails().then(function () {
           // Initiate DOM listeners so that our preview thumbnails can be used
-          _this.listeners(); // Build HTML DOM elements
+          _this.listeners(); // Render DOM elements
 
 
-          _this.elements(); // Check to see if thumb container size was specified manually in CSS
+          _this.render(); // Check to see if thumb container size was specified manually in CSS
 
 
           _this.determineContainerAutoSizing();
@@ -6610,51 +6661,29 @@ typeof navigator === "object" && (function (global, factory) {
       } // Download VTT files and parse them
 
     }, {
-      key: "getThumbnailsDefs",
-      value: function getThumbnailsDefs() {
+      key: "getThumbnails",
+      value: function getThumbnails() {
         var _this2 = this;
 
-        return new Promise(function (resolve, reject) {
+        return new Promise(function (resolve) {
           if (!_this2.player.config.previewThumbnails.src) {
             throw new Error('Missing previewThumbnails.src config attribute');
           } // previewThumbnails.src can be string or list. If string, convert into single-element list
 
 
-          var configSrc = _this2.player.config.previewThumbnails.src;
-          var urls = typeof configSrc === 'string' ? [configSrc] : configSrc;
-          var promises = []; // Loop through each src url. Download and process the VTT file, storing the resulting data in this.thumbnailsDefs
+          var src = _this2.player.config.previewThumbnails.src;
+          var urls = is.string(src) ? [src] : src; // Loop through each src url. Download and process the VTT file, storing the resulting data in this.thumbnails
 
-          var _iteratorNormalCompletion = true;
-          var _didIteratorError = false;
-          var _iteratorError = undefined;
-
-          try {
-            for (var _iterator = urls[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-              var url = _step.value;
-              promises.push(_this2.getThumbnailDef(url));
-            }
-          } catch (err) {
-            _didIteratorError = true;
-            _iteratorError = err;
-          } finally {
-            try {
-              if (!_iteratorNormalCompletion && _iterator.return != null) {
-                _iterator.return();
-              }
-            } finally {
-              if (_didIteratorError) {
-                throw _iteratorError;
-              }
-            }
-          }
-
+          var promises = urls.map(function (u) {
+            return _this2.getThumbnail(u);
+          });
           Promise.all(promises).then(function () {
             // Sort smallest to biggest (e.g., [120p, 480p, 1080p])
-            _this2.thumbnailsDefs.sort(function (x, y) {
+            _this2.thumbnails.sort(function (x, y) {
               return x.height - y.height;
             });
 
-            _this2.player.debug.log('Preview thumbnails: thumbnailsDefs: ' + JSON.stringify(_this2.thumbnailsDefs, null, 4));
+            _this2.player.debug.log('Preview thumbnails', _this2.thumbnails);
 
             resolve();
           });
@@ -6662,35 +6691,36 @@ typeof navigator === "object" && (function (global, factory) {
       } // Process individual VTT file
 
     }, {
-      key: "getThumbnailDef",
-      value: function getThumbnailDef(url) {
+      key: "getThumbnail",
+      value: function getThumbnail(url) {
         var _this3 = this;
 
-        return new Promise(function (resolve, reject) {
+        return new Promise(function (resolve) {
           fetch(url).then(function (response) {
-            var thumbnailsDef = {
-              frames: _this3.parseVtt(response),
+            var thumbnail = {
+              frames: parseVtt(response),
               height: null,
               urlPrefix: ''
             }; // If the URLs don't start with '/', then we need to set their relative path to be the location of the VTT file
             // If the URLs do start with '/', then they obviously don't need a prefix, so it will remain blank
 
-            if (!thumbnailsDef.frames[0].text.startsWith('/')) {
-              thumbnailsDef.urlPrefix = url.substring(0, url.lastIndexOf('/') + 1);
+            if (!thumbnail.frames[0].text.startsWith('/')) {
+              thumbnail.urlPrefix = url.substring(0, url.lastIndexOf('/') + 1);
             } // Download the first frame, so that we can determine/set the height of this thumbnailsDef
 
 
             var tempImage = new Image();
-            tempImage.src = thumbnailsDef.urlPrefix + thumbnailsDef.frames[0].text;
 
             tempImage.onload = function () {
-              thumbnailsDef.height = tempImage.naturalHeight;
-              thumbnailsDef.width = tempImage.naturalWidth;
+              thumbnail.height = tempImage.naturalHeight;
+              thumbnail.width = tempImage.naturalWidth;
 
-              _this3.thumbnailsDefs.push(thumbnailsDef);
+              _this3.thumbnails.push(thumbnail);
 
               resolve();
             };
+
+            tempImage.src = thumbnail.urlPrefix + thumbnail.frames[0].text;
           });
         });
       }
@@ -6712,19 +6742,26 @@ typeof navigator === "object" && (function (global, factory) {
 
             var percentage = 100 / clientRect.width * (event.pageX - clientRect.left);
             _this4.seekTime = _this4.player.media.duration * (percentage / 100);
-            if (_this4.seekTime < 0) _this4.seekTime = 0; // The mousemove fires for 10+px out to the left
 
-            if (_this4.seekTime > _this4.player.media.duration - 1) _this4.seekTime = _this4.player.media.duration - 1; // Took 1 second off the duration for safety, because different players can disagree on the real duration of a video
+            if (_this4.seekTime < 0) {
+              // The mousemove fires for 10+px out to the left
+              _this4.seekTime = 0;
+            }
+
+            if (_this4.seekTime > _this4.player.media.duration - 1) {
+              // Took 1 second off the duration for safety, because different players can disagree on the real duration of a video
+              _this4.seekTime = _this4.player.media.duration - 1;
+            }
 
             _this4.mousePosX = event.pageX; // Set time text inside image container
 
-            _this4.player.elements.display.previewThumbnailTimeText.innerText = formatTime(_this4.seekTime); // Download and show image
+            _this4.elements.thumb.time.innerText = formatTime(_this4.seekTime); // Download and show image
 
             _this4.showImageAtCurrentTime();
           }
         }); // Touch device seeking - performs same function as above
 
-        on.call(this.player, this.player.elements.progress, 'touchmove', function (event) {
+        on.call(this.player, this.player.elements.progress, 'touchmove', function () {
           // Wait until media has a duration
           if (_this4.player.media.duration) {
             // Calculate seek hover position as approx video seconds
@@ -6784,28 +6821,31 @@ typeof navigator === "object" && (function (global, factory) {
        */
 
     }, {
-      key: "elements",
-      value: function elements() {
+      key: "render",
+      value: function render() {
         // Create HTML element: plyr__preview-thumbnail-container
-        var previewThumbnailContainer = createElement('div', {
-          class: this.player.config.classNames.previewThumbnails.thumbnailContainer
-        });
-        this.player.elements.progress.appendChild(previewThumbnailContainer);
-        this.player.elements.display.previewThumbnailContainer = previewThumbnailContainer; // Create HTML element, parent+span: time text (e.g., 01:32:00)
+        this.elements.thumb.container = createElement('div', {
+          class: this.player.config.classNames.previewThumbnails.thumbContainer
+        }); // Wrapper for the image for styling
 
-        var timeTextContainer = createElement('div', {
-          class: this.player.config.classNames.previewThumbnails.timeTextContainer
+        this.elements.thumb.imageContainer = createElement('div', {
+          class: this.player.config.classNames.previewThumbnails.imageContainer
         });
-        this.player.elements.display.previewThumbnailContainer.appendChild(timeTextContainer);
-        var timeText = createElement('span', {}, '00:00');
-        timeTextContainer.appendChild(timeText);
-        this.player.elements.display.previewThumbnailTimeText = timeText; // Create HTML element: plyr__preview-scrubbing-container
+        this.elements.thumb.container.appendChild(this.elements.thumb.imageContainer); // Create HTML element, parent+span: time text (e.g., 01:32:00)
 
-        var previewScrubbingContainer = createElement('div', {
+        var timeContainer = createElement('div', {
+          class: this.player.config.classNames.previewThumbnails.timeContainer
+        });
+        this.elements.thumb.time = createElement('span', {}, '00:00');
+        timeContainer.appendChild(this.elements.thumb.time);
+        this.elements.thumb.container.appendChild(timeContainer); // Inject the whole thumb
+
+        this.player.elements.progress.appendChild(this.elements.thumb.container); // Create HTML element: plyr__preview-scrubbing-container
+
+        this.elements.scrubber.container = createElement('div', {
           class: this.player.config.classNames.previewThumbnails.scrubbingContainer
         });
-        this.player.elements.wrapper.appendChild(previewScrubbingContainer);
-        this.player.elements.display.previewScrubbingContainer = previewScrubbingContainer;
+        this.player.elements.wrapper.appendChild(this.elements.scrubber.container);
       }
     }, {
       key: "showImageAtCurrentTime",
@@ -6820,17 +6860,16 @@ typeof navigator === "object" && (function (global, factory) {
         } // Find the desired thumbnail index
 
 
-        var thumbNum = this.thumbnailsDefs[0].frames.findIndex(function (frame) {
+        var thumbNum = this.thumbnails[0].frames.findIndex(function (frame) {
           return _this5.seekTime >= frame.startTime && _this5.seekTime <= frame.endTime;
         });
         var qualityIndex = 0; // Check to see if we've already downloaded higher quality versions of this image
 
-        for (var i = 1; i < this.thumbnailsDefs.length; i++) {
-          if (this.loadedImages.includes(this.thumbnailsDefs[i].frames[thumbNum].text)) {
-            qualityIndex = i;
+        this.thumbnails.forEach(function (thumbnail, index) {
+          if (_this5.loadedImages.includes(thumbnail.frames[thumbNum].text)) {
+            qualityIndex = index;
           }
-        } // Only proceed if either thumbnum or thumbfilename has changed
-
+        }); // Only proceed if either thumbnum or thumbfilename has changed
 
         if (thumbNum !== this.showingThumb) {
           this.showingThumb = thumbNum;
@@ -6845,21 +6884,26 @@ typeof navigator === "object" && (function (global, factory) {
 
         var qualityIndex = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
         var thumbNum = this.showingThumb;
-        var frame = this.thumbnailsDefs[qualityIndex].frames[thumbNum];
-        var thumbFilename = this.thumbnailsDefs[qualityIndex].frames[thumbNum].text;
-        var urlPrefix = this.thumbnailsDefs[qualityIndex].urlPrefix;
-        var thumbURL = urlPrefix + thumbFilename;
+        var thumbnail = this.thumbnails[qualityIndex];
+        var urlPrefix = thumbnail.urlPrefix;
+        var frame = thumbnail.frames[thumbNum];
+        var thumbFilename = thumbnail.frames[thumbNum].text;
+        var thumbUrl = urlPrefix + thumbFilename;
 
-        if (!this.currentImageElement || this.currentImageElement.getAttribute('data-thumbfilename') !== thumbFilename) {
+        if (!this.currentImageElement || this.currentImageElement.dataset.filename !== thumbFilename) {
           // If we're already loading a previous image, remove its onload handler - we don't want it to load after this one
-          // Only do this if not using jpeg sprites. Without jpeg sprites we really want to show as many images as possible, as a best-effort
-          if (this.loadingImage && this.usingJpegSprites) this.loadingImage.onload = null; // We're building and adding a new image. In other implementations of similar functionality (Youtube), background image is instead used. But this causes issues with larger images in Firefox and Safari - switching between background images causes a flicker. Putting a new image over the top does not
+          // Only do this if not using sprites. Without sprites we really want to show as many images as possible, as a best-effort
+          if (this.loadingImage && this.usingSprites) {
+            this.loadingImage.onload = null;
+          } // We're building and adding a new image. In other implementations of similar functionality (Youtube), background image is instead used. But this causes issues with larger images in Firefox and Safari - switching between background images causes a flicker. Putting a new image over the top does not
+
 
           var previewImage = new Image();
-          previewImage.src = thumbURL;
-          previewImage.setAttribute('data-thumbnum', thumbNum);
-          previewImage.setAttribute('data-thumbfilename', thumbFilename);
-          this.showingThumbFilename = thumbFilename; // For some reason, passing the named function directly causes it to execute immediately. So I've wrapped it in an anonymous function...
+          previewImage.src = thumbUrl;
+          previewImage.dataset.index = thumbNum;
+          previewImage.dataset.filename = thumbFilename;
+          this.showingThumbFilename = thumbFilename;
+          this.player.debug.log("Loading image: ".concat(thumbUrl)); // For some reason, passing the named function directly causes it to execute immediately. So I've wrapped it in an anonymous function...
 
           previewImage.onload = function () {
             return _this6.showImage(previewImage, frame, qualityIndex, thumbNum, thumbFilename, true);
@@ -6870,7 +6914,7 @@ typeof navigator === "object" && (function (global, factory) {
         } else {
           // Update the existing image
           this.showImage(this.currentImageElement, frame, qualityIndex, thumbNum, thumbFilename, false);
-          this.currentImageElement.setAttribute('data-thumbnum', thumbNum);
+          this.currentImageElement.dataset.index = thumbNum;
           this.removeOldImages(this.currentImageElement);
         }
       }
@@ -6878,13 +6922,16 @@ typeof navigator === "object" && (function (global, factory) {
       key: "showImage",
       value: function showImage(previewImage, frame, qualityIndex, thumbNum, thumbFilename) {
         var newImage = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : true;
-        this.player.debug.log('Showing thumb: ' + thumbFilename + '. num: ' + thumbNum + '. qual: ' + qualityIndex + '. newimg: ' + newImage);
+        this.player.debug.log("Showing thumb: ".concat(thumbFilename, ". num: ").concat(thumbNum, ". qual: ").concat(qualityIndex, ". newimg: ").concat(newImage));
         this.setImageSizeAndOffset(previewImage, frame);
 
         if (newImage) {
-          this.currentContainer.appendChild(previewImage);
+          this.currentImageContainer.appendChild(previewImage);
           this.currentImageElement = previewImage;
-          if (!this.loadedImages.includes(thumbFilename)) this.loadedImages.push(thumbFilename);
+
+          if (!this.loadedImages.includes(thumbFilename)) {
+            this.loadedImages.push(thumbFilename);
+          }
         } // Preload images before and after the current one
         // Show higher quality of the same frame
         // Each step here has a short time delay, and only continues if still hovering/seeking the same spot. This is to protect slow connections from overloading
@@ -6899,32 +6946,26 @@ typeof navigator === "object" && (function (global, factory) {
         var _this7 = this;
 
         // Get a list of all images, convert it from a DOM list to an array
-        var allImages = Array.from(this.currentContainer.children);
-
-        var _loop = function _loop() {
-          var image = allImages[_i];
-
-          if (image.tagName === 'IMG') {
-            var removeDelay = _this7.usingJpegSprites ? 500 : 1000;
-
-            if (image.getAttribute('data-thumbnum') !== currentImage.getAttribute('data-thumbnum') && !image.getAttribute('data-deleting')) {
-              // Wait 200ms, as the new image can take some time to show on certain browsers (even though it was downloaded before showing). This will prevent flicker, and show some generosity towards slower clients
-              // First set attribute 'deleting' to prevent multi-handling of this on repeat firing of this function
-              image.setAttribute('data-deleting', 'true');
-              var currentContainer = _this7.currentContainer; // This has to be set before the timeout - to prevent issues switching between hover and scrub
-
-              setTimeout(function () {
-                currentContainer.removeChild(image);
-
-                _this7.player.debug.log('Removing thumb: ' + image.getAttribute('data-thumbfilename'));
-              }, removeDelay);
-            }
+        Array.from(this.currentImageContainer.children).forEach(function (image) {
+          if (image.tagName.toLowerCase() !== 'img') {
+            return;
           }
-        };
 
-        for (var _i = 0; _i < allImages.length; _i++) {
-          _loop();
-        }
+          var removeDelay = _this7.usingSprites ? 500 : 1000;
+
+          if (image.dataset.index !== currentImage.dataset.index && !image.dataset.deleting) {
+            // Wait 200ms, as the new image can take some time to show on certain browsers (even though it was downloaded before showing). This will prevent flicker, and show some generosity towards slower clients
+            // First set attribute 'deleting' to prevent multi-handling of this on repeat firing of this function
+            image.dataset.deleting = true;
+            var currentImageContainer = _this7.currentImageContainer; // This has to be set before the timeout - to prevent issues switching between hover and scrub
+
+            setTimeout(function () {
+              currentImageContainer.removeChild(image);
+
+              _this7.player.debug.log("Removing thumb: ".concat(image.dataset.filename));
+            }, removeDelay);
+          }
+        });
       } // Preload images before and after the current one. Only if the user is still hovering/seeking the same frame
       // This will only preload the lowest quality
 
@@ -6934,77 +6975,50 @@ typeof navigator === "object" && (function (global, factory) {
         var _this8 = this;
 
         var forward = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-        return new Promise(function (resolve, reject) {
+        return new Promise(function (resolve) {
           setTimeout(function () {
-            var oldThumbFilename = _this8.thumbnailsDefs[0].frames[thumbNum].text;
+            var oldThumbFilename = _this8.thumbnails[0].frames[thumbNum].text;
 
             if (_this8.showingThumbFilename === oldThumbFilename) {
-              // Find the nearest thumbs with different filenames. Sometimes it'll be the next index, but in the case of jpeg sprites, it might be 100+ away
-              var thumbnailsDefsCopy;
+              // Find the nearest thumbs with different filenames. Sometimes it'll be the next index, but in the case of sprites, it might be 100+ away
+              var thumbnailsClone;
 
               if (forward) {
-                thumbnailsDefsCopy = _this8.thumbnailsDefs[0].frames.slice(thumbNum);
+                thumbnailsClone = _this8.thumbnails[0].frames.slice(thumbNum);
               } else {
-                thumbnailsDefsCopy = _this8.thumbnailsDefs[0].frames.slice(0, thumbNum).reverse();
+                thumbnailsClone = _this8.thumbnails[0].frames.slice(0, thumbNum).reverse();
               }
 
               var foundOne = false;
-              var _iteratorNormalCompletion2 = true;
-              var _didIteratorError2 = false;
-              var _iteratorError2 = undefined;
+              thumbnailsClone.forEach(function (frame) {
+                var newThumbFilename = frame.text;
 
-              try {
-                var _loop2 = function _loop2() {
-                  var frame = _step2.value;
-                  var newThumbFilename = frame.text;
+                if (newThumbFilename !== oldThumbFilename) {
+                  // Found one with a different filename. Make sure it hasn't already been loaded on this page visit
+                  if (!_this8.loadedImages.includes(newThumbFilename)) {
+                    foundOne = true;
 
-                  if (newThumbFilename !== oldThumbFilename) {
-                    // Found one with a different filename. Make sure it hasn't already been loaded on this page visit
-                    if (!_this8.loadedImages.includes(newThumbFilename)) {
-                      foundOne = true;
+                    _this8.player.debug.log("Preloading thumb filename: ".concat(newThumbFilename));
 
-                      _this8.player.debug.log('Preloading thumb filename: ' + newThumbFilename);
+                    var urlPrefix = _this8.thumbnails[0].urlPrefix;
+                    var thumbURL = urlPrefix + newThumbFilename;
+                    var previewImage = new Image();
+                    previewImage.src = thumbURL;
 
-                      var urlPrefix = _this8.thumbnailsDefs[0].urlPrefix;
-                      var thumbURL = urlPrefix + newThumbFilename;
-                      var previewImage = new Image();
-                      previewImage.src = thumbURL;
+                    previewImage.onload = function () {
+                      _this8.player.debug.log("Preloaded thumb filename: ".concat(newThumbFilename));
 
-                      previewImage.onload = function () {
-                        _this8.player.debug.log('Preloaded thumb filename: ' + newThumbFilename);
+                      if (!_this8.loadedImages.includes(newThumbFilename)) _this8.loadedImages.push(newThumbFilename); // We don't resolve until the thumb is loaded
 
-                        if (!_this8.loadedImages.includes(newThumbFilename)) _this8.loadedImages.push(newThumbFilename); // We don't resolve until the thumb is loaded
-
-                        resolve();
-                      };
-                    }
-
-                    return "break";
-                  }
-                };
-
-                for (var _iterator2 = thumbnailsDefsCopy[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                  var _ret = _loop2();
-
-                  if (_ret === "break") break;
-                } // If there are none to preload then we want to resolve immediately
-
-              } catch (err) {
-                _didIteratorError2 = true;
-                _iteratorError2 = err;
-              } finally {
-                try {
-                  if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
-                    _iterator2.return();
-                  }
-                } finally {
-                  if (_didIteratorError2) {
-                    throw _iteratorError2;
+                      resolve();
+                    };
                   }
                 }
-              }
+              }); // If there are none to preload then we want to resolve immediately
 
-              if (!foundOne) resolve();
+              if (!foundOne) {
+                resolve();
+              }
             }
           }, 300);
         });
@@ -7015,17 +7029,20 @@ typeof navigator === "object" && (function (global, factory) {
       value: function getHigherQuality(currentQualityIndex, previewImage, frame, thumbFilename) {
         var _this9 = this;
 
-        if (currentQualityIndex < this.thumbnailsDefs.length - 1) {
+        if (currentQualityIndex < this.thumbnails.length - 1) {
           // Only use the higher quality version if it's going to look any better - if the current thumb is of a lower pixel density than the thumbnail container
           var previewImageHeight = previewImage.naturalHeight;
-          if (this.usingJpegSprites) previewImageHeight = frame.h;
+
+          if (this.usingSprites) {
+            previewImageHeight = frame.h;
+          }
 
           if (previewImageHeight < this.thumbContainerHeight) {
             // Recurse back to the loadImage function - show a higher quality one, but only if the viewer is on this frame for a while
             setTimeout(function () {
               // Make sure the mouse hasn't already moved on and started hovering at another image
               if (_this9.showingThumbFilename === thumbFilename) {
-                _this9.player.debug.log('Showing higher quality thumb for: ' + thumbFilename);
+                _this9.player.debug.log("Showing higher quality thumb for: ".concat(thumbFilename));
 
                 _this9.loadImage(currentQualityIndex + 1);
               }
@@ -7036,13 +7053,13 @@ typeof navigator === "object" && (function (global, factory) {
     }, {
       key: "showThumbContainer",
       value: function showThumbContainer() {
-        this.player.elements.display.previewThumbnailContainer.style.opacity = 1;
+        this.elements.thumb.container.style.opacity = 1;
       }
     }, {
       key: "hideThumbContainer",
       value: function hideThumbContainer() {
         var clearShowing = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-        this.player.elements.display.previewThumbnailContainer.style.opacity = 0;
+        this.elements.thumb.container.style.opacity = 0;
 
         if (clearShowing) {
           this.showingThumb = null;
@@ -7052,20 +7069,21 @@ typeof navigator === "object" && (function (global, factory) {
     }, {
       key: "showScrubbingContainer",
       value: function showScrubbingContainer() {
-        this.player.elements.display.previewScrubbingContainer.style.opacity = 1;
+        this.elements.scrubber.container.style.opacity = 1;
       }
     }, {
       key: "hideScrubbingContainer",
       value: function hideScrubbingContainer() {
-        this.player.elements.display.previewScrubbingContainer.style.opacity = 0;
+        this.elements.scrubber.container.style.opacity = 0;
         this.showingThumb = null;
         this.showingThumbFilename = null;
       }
     }, {
       key: "determineContainerAutoSizing",
       value: function determineContainerAutoSizing() {
-        if (this.player.elements.display.previewThumbnailContainer.clientHeight > 20) {
-          this.sizeSpecifiedInCSS = true; // This will prevent auto sizing in this.setThumbContainerSizeAndPos()
+        if (this.elements.thumb.imageContainer.clientHeight > 20) {
+          // This will prevent auto sizing in this.setThumbContainerSizeAndPos()
+          this.sizeSpecifiedInCSS = true;
         }
       } // Set the size to be about a quarter of the size of video. Unless option dynamicSize === false, in which case it needs to be set in CSS
 
@@ -7073,9 +7091,9 @@ typeof navigator === "object" && (function (global, factory) {
       key: "setThumbContainerSizeAndPos",
       value: function setThumbContainerSizeAndPos() {
         if (!this.sizeSpecifiedInCSS) {
-          var thumbWidth = this.thumbContainerHeight * this.thumbAspectRatio;
-          this.player.elements.display.previewThumbnailContainer.style.height = "".concat(this.thumbContainerHeight, "px");
-          this.player.elements.display.previewThumbnailContainer.style.width = "".concat(thumbWidth, "px");
+          var thumbWidth = Math.floor(this.thumbContainerHeight * this.thumbAspectRatio);
+          this.elements.thumb.imageContainer.style.height = "".concat(this.thumbContainerHeight, "px");
+          this.elements.thumb.imageContainer.style.width = "".concat(thumbWidth, "px");
         }
 
         this.setThumbContainerPos();
@@ -7085,12 +7103,12 @@ typeof navigator === "object" && (function (global, factory) {
       value: function setThumbContainerPos() {
         var seekbarRect = this.player.elements.progress.getBoundingClientRect();
         var plyrRect = this.player.elements.container.getBoundingClientRect();
-        var previewContainer = this.player.elements.display.previewThumbnailContainer; // Find the lowest and highest desired left-position, so we don't slide out the side of the video container
+        var container = this.elements.thumb.container; // Find the lowest and highest desired left-position, so we don't slide out the side of the video container
 
         var minVal = plyrRect.left - seekbarRect.left + 10;
-        var maxVal = plyrRect.right - seekbarRect.left - previewContainer.clientWidth - 10; // Set preview container position to: mousepos, minus seekbar.left, minus half of previewContainer.clientWidth
+        var maxVal = plyrRect.right - seekbarRect.left - container.clientWidth - 10; // Set preview container position to: mousepos, minus seekbar.left, minus half of previewContainer.clientWidth
 
-        var previewPos = this.mousePosX - seekbarRect.left - previewContainer.clientWidth / 2;
+        var previewPos = this.mousePosX - seekbarRect.left - container.clientWidth / 2;
 
         if (previewPos < minVal) {
           previewPos = minVal;
@@ -7100,111 +7118,30 @@ typeof navigator === "object" && (function (global, factory) {
           previewPos = maxVal;
         }
 
-        previewContainer.style.left = previewPos + 'px';
+        container.style.left = "".concat(previewPos, "px");
       } // Can't use 100% width, in case the video is a different aspect ratio to the video container
 
     }, {
       key: "setScrubbingContainerSize",
       value: function setScrubbingContainerSize() {
-        this.player.elements.display.previewScrubbingContainer.style.width = "".concat(this.player.media.clientWidth, "px");
-        this.player.elements.display.previewScrubbingContainer.style.height = "".concat(this.player.media.clientWidth / this.thumbAspectRatio, "px"); // Can't use media.clientHeight - html5 video goes big and does black bars above and below
-      } // Jpeg sprites need to be offset to the correct location
+        this.elements.scrubber.container.style.width = "".concat(this.player.media.clientWidth, "px"); // Can't use media.clientHeight - html5 video goes big and does black bars above and below
+
+        this.elements.scrubber.container.style.height = "".concat(this.player.media.clientWidth / this.thumbAspectRatio, "px");
+      } // Sprites need to be offset to the correct location
 
     }, {
       key: "setImageSizeAndOffset",
       value: function setImageSizeAndOffset(previewImage, frame) {
-        if (this.usingJpegSprites) {
-          // Find difference between jpeg height and preview container height
-          var heightMulti = this.thumbContainerHeight / frame.h;
-          previewImage.style.height = "".concat(previewImage.naturalHeight * heightMulti, "px");
-          previewImage.style.width = "".concat(previewImage.naturalWidth * heightMulti, "px");
-          previewImage.style.left = "-".concat(Math.ceil(frame.x * heightMulti), "px");
-          previewImage.style.top = "-".concat(frame.y * heightMulti, "px"); // todo: might need to round this one up too
-        }
-      } // Arg: vttDataString example: "WEBVTT\n\n1\n00:00:05.000 --> 00:00:10.000\n1080p-00001.jpg"
+        if (!this.usingSprites) {
+          return;
+        } // Find difference between height and preview container height
 
-    }, {
-      key: "parseVtt",
-      value: function parseVtt(vttDataString) {
-        var processedList = [];
-        var frames = vttDataString.split(/\r\n\r\n|\n\n|\r\r/);
-        var _iteratorNormalCompletion3 = true;
-        var _didIteratorError3 = false;
-        var _iteratorError3 = undefined;
 
-        try {
-          for (var _iterator3 = frames[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-            var frame = _step3.value;
-            var result = {};
-            var _iteratorNormalCompletion4 = true;
-            var _didIteratorError4 = false;
-            var _iteratorError4 = undefined;
-
-            try {
-              for (var _iterator4 = frame.split(/\r\n|\n|\r/)[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                var line = _step4.value;
-
-                if (result.startTime == null) {
-                  // The line with start and end times on it is the first line of interest
-                  var matchTimes = line.match(/([0-9]{2}):([0-9]{2}):([0-9]{2}).([0-9]{2,3})( ?--> ?)([0-9]{2}):([0-9]{2}):([0-9]{2}).([0-9]{2,3})/); // Note that this currently ignores caption formatting directives that are optionally on the end of this line - fine for non-captions VTT
-
-                  if (matchTimes) {
-                    result.startTime = Number(matchTimes[1]) * 60 * 60 + Number(matchTimes[2]) * 60 + Number(matchTimes[3]) + Number("0." + matchTimes[4]);
-                    result.endTime = Number(matchTimes[6]) * 60 * 60 + Number(matchTimes[7]) * 60 + Number(matchTimes[8]) + Number("0." + matchTimes[9]);
-                  }
-                } else {
-                  // If we already have the startTime, then we're definitely up to the text line(s)
-                  if (line.trim().length > 0) {
-                    if (!result.text) {
-                      var lineSplit = line.trim().split('#xywh=');
-                      result.text = lineSplit[0]; // If there's content in lineSplit[1], then we have jpeg sprites. If not, then it's just one frame per jpeg
-
-                      if (lineSplit[1]) {
-                        var xywh = lineSplit[1].split(',');
-                        result.x = xywh[0];
-                        result.y = xywh[1];
-                        result.w = xywh[2];
-                        result.h = xywh[3];
-                      }
-                    }
-                  }
-                }
-              }
-            } catch (err) {
-              _didIteratorError4 = true;
-              _iteratorError4 = err;
-            } finally {
-              try {
-                if (!_iteratorNormalCompletion4 && _iterator4.return != null) {
-                  _iterator4.return();
-                }
-              } finally {
-                if (_didIteratorError4) {
-                  throw _iteratorError4;
-                }
-              }
-            }
-
-            if (result.text) {
-              processedList.push(result);
-            }
-          }
-        } catch (err) {
-          _didIteratorError3 = true;
-          _iteratorError3 = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion3 && _iterator3.return != null) {
-              _iterator3.return();
-            }
-          } finally {
-            if (_didIteratorError3) {
-              throw _iteratorError3;
-            }
-          }
-        }
-
-        return processedList;
+        var heightMulti = this.thumbContainerHeight / frame.h;
+        previewImage.style.height = "".concat(Math.floor(previewImage.naturalHeight * heightMulti), "px");
+        previewImage.style.width = "".concat(Math.floor(previewImage.naturalWidth * heightMulti), "px");
+        previewImage.style.left = "-".concat(Math.ceil(frame.x * heightMulti), "px");
+        previewImage.style.top = "-".concat(frame.y * heightMulti, "px"); // TODO: might need to round this one up too
       }
     }, {
       key: "enabled",
@@ -7212,52 +7149,45 @@ typeof navigator === "object" && (function (global, factory) {
         return this.player.isHTML5 && this.player.isVideo && this.player.config.previewThumbnails.enabled;
       }
     }, {
-      key: "currentContainer",
+      key: "currentImageContainer",
       get: function get() {
         if (this.mouseDown) {
-          return this.player.elements.display.previewScrubbingContainer;
-        } else {
-          return this.player.elements.display.previewThumbnailContainer;
+          return this.elements.scrubber.container;
         }
+
+        return this.elements.thumb.imageContainer;
       }
     }, {
-      key: "usingJpegSprites",
+      key: "usingSprites",
       get: function get() {
-        if (this.thumbnailsDefs[0].frames[0].w) {
-          return true;
-        } else {
-          return false;
-        }
+        return Object.keys(this.thumbnails[0].frames[0]).includes('w');
       }
     }, {
       key: "thumbAspectRatio",
       get: function get() {
-        if (this.usingJpegSprites) {
-          return this.thumbnailsDefs[0].frames[0].w / this.thumbnailsDefs[0].frames[0].h;
-        } else {
-          return this.thumbnailsDefs[0].width / this.thumbnailsDefs[0].height;
+        if (this.usingSprites) {
+          return this.thumbnails[0].frames[0].w / this.thumbnails[0].frames[0].h;
         }
+
+        return this.thumbnails[0].width / this.thumbnails[0].height;
       }
     }, {
       key: "thumbContainerHeight",
       get: function get() {
         if (this.mouseDown) {
-          // return this.player.elements.container.clientHeight;
-          // return this.player.media.clientHeight;
-          return this.player.media.clientWidth / this.thumbAspectRatio; // Can't use media.clientHeight - html5 video goes big and does black bars above and below
-        } else {
-          // return this.player.elements.container.clientHeight / 4;
-          return this.player.media.clientWidth / this.thumbAspectRatio / 4;
+          return Math.floor(this.player.media.clientWidth / this.thumbAspectRatio); // Can't use media.clientHeight - html5 video goes big and does black bars above and below
         }
+
+        return Math.floor(this.player.media.clientWidth / this.thumbAspectRatio / 4);
       }
     }, {
       key: "currentImageElement",
       get: function get() {
         if (this.mouseDown) {
           return this.currentScrubbingImageElement;
-        } else {
-          return this.currentThumbnailImageElement;
         }
+
+        return this.currentThumbnailImageElement;
       },
       set: function set(element) {
         if (this.mouseDown) {

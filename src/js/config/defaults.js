@@ -375,9 +375,12 @@ const defaults = {
         },
         tabFocus: 'plyr__tab-focus',
         previewThumbnails: {
-            thumbnailContainer: 'plyr__preview-thumbnail-container',
-            scrubbingContainer: 'plyr__preview-scrubbing-container',
-            timeTextContainer: 'plyr__preview-time-text-container',
+            // Tooltip thumbs
+            thumbContainer: 'plyr__preview-thumb',
+            imageContainer: 'plyr__preview-thumb__image-container',
+            timeContainer: 'plyr__preview-thumb__time-container',
+            // Scrubber
+            scrubbingContainer: 'plyr__preview-scrubber',
         },
     },
 
@@ -400,7 +403,7 @@ const defaults = {
         enabled: false,
         publisherId: '',
     },
-  
+
     // YouTube nocookies mode
     noCookie: false,
 
