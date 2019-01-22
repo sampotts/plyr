@@ -12,8 +12,15 @@
     padding: 3px;
     pointer-events: none;
     position: absolute;
-    transition: opacity 0.2s 0.1s ease;
+    transform: translate(0, 10px) scale(0.8);
+    transform-origin: 50% 100%;
+    transition: transform 0.2s 0.1s ease, opacity 0.2s 0.1s ease;
     z-index: 2;
+
+    &--is-shown {
+        opacity: 1;
+        transform: translate(0, 0) scale(1);
+    }
 
     // The background triangle
     &::before {
@@ -31,6 +38,7 @@
     }
 
     &__image-container {
+        background: $plyr-color-heather;
         border-radius: 2px;
         overflow: hidden;
         position: relative;
@@ -66,12 +74,13 @@
     }
 }
 
-.plyr__preview-scrubber {
+.plyr__preview-scrubbing {
     bottom: 0;
     filter: blur(1px);
     height: 100%;
     left: 0;
     margin: auto; // Required when video is different dimensions to container (e.g., fullscreen)
+    opacity: 0;
     overflow: hidden;
     position: absolute;
     right: 0;
@@ -89,5 +98,9 @@
         position: absolute;
         top: 0;
         width: 100%;
+    }
+
+    &--is-shown {
+        opacity: 1;
     }
 }

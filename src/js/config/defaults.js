@@ -377,10 +377,12 @@ const defaults = {
         previewThumbnails: {
             // Tooltip thumbs
             thumbContainer: 'plyr__preview-thumb',
+            thumbContainerShown: 'plyr__preview-thumb--is-shown',
             imageContainer: 'plyr__preview-thumb__image-container',
             timeContainer: 'plyr__preview-thumb__time-container',
-            // Scrubber
-            scrubbingContainer: 'plyr__preview-scrubber',
+            // Scrubbing
+            scrubbingContainer: 'plyr__preview-scrubbing',
+            scrubbingContainerShown: 'plyr__preview-scrubbing--is-shown',
         },
     },
 

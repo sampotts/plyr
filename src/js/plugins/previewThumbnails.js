@@ -66,7 +66,7 @@ const parseVtt = vttDataString => {
 class PreviewThumbnails {
     /**
      * PreviewThumbnails constructor.
-     * @param {object} player
+     * @param {Plyr} player
      * @return {PreviewThumbnails}
      */
     constructor(player) {
@@ -78,7 +78,7 @@ class PreviewThumbnails {
 
         this.elements = {
             thumb: {},
-            scrubber: {},
+            scrubbing: {},
         };
 
         if (this.enabled) {
@@ -210,13 +210,13 @@ class PreviewThumbnails {
 
         // Hide thumbnail preview - on mouse click, mouse leave, and video play/seek. All four are required, e.g., for buffering
         on.call(this.player, this.player.elements.progress, 'mouseleave click', () => {
-            this.hideThumbContainer(true);
+            this.toggleThumbContainer(false, true);
         });
         this.player.on('play', () => {
-            this.hideThumbContainer(true);
+            this.toggleThumbContainer(false, true);
         });
         this.player.on('seeked', () => {
-            this.hideThumbContainer(false);
+            this.toggleThumbContainer(false);
         });
 
         // Show scrubbing preview
@@ -226,8 +226,8 @@ class PreviewThumbnails {
                 this.mouseDown = true;
                 // Wait until media has a duration
                 if (this.player.media.duration) {
-                    this.showScrubbingContainer();
-                    this.hideThumbContainer(true);
+                    this.toggleScrubbingContainer(true);
+                    this.toggleThumbContainer(false, true);
 
                     // Download and show image
                     this.showImageAtCurrentTime();
@@ -243,13 +243,13 @@ class PreviewThumbnails {
             // Hide scrubbing preview. But wait until the video has successfully seeked before hiding the scrubbing preview
             if (Math.ceil(this.timeAtLastTimeupdate) === Math.ceil(this.player.media.currentTime)) {
                 // The video was already seeked/loaded at the chosen time - hide immediately
-                this.hideScrubbingContainer();
+                this.toggleScrubbingContainer(false);
             } else {
                 // The video hasn't seeked yet. Wait for that
                 once.call(this.player, this.player.media, 'timeupdate', () => {
                     // Re-check mousedown - we might have already started scrubbing again
                     if (!this.mouseDown) {
-                        this.hideScrubbingContainer();
+                        this.toggleScrubbingContainer(false);
                     }
                 });
             }
@@ -285,18 +285,18 @@ class PreviewThumbnails {
         this.player.elements.progress.appendChild(this.elements.thumb.container);
 
         // Create HTML element: plyr__preview-scrubbing-container
-        this.elements.scrubber.container = createElement('div', {
+        this.elements.scrubbing.container = createElement('div', {
             class: this.player.config.classNames.previewThumbnails.scrubbingContainer,
         });
 
-        this.player.elements.wrapper.appendChild(this.elements.scrubber.container);
+        this.player.elements.wrapper.appendChild(this.elements.scrubbing.container);
     }
 
     showImageAtCurrentTime() {
         if (this.mouseDown) {
             this.setScrubbingContainerSize();
         } else {
-            this.showThumbContainer();
+            this.toggleThumbContainer(true);
             this.setThumbContainerSizeAndPos();
         }
 
@@ -486,7 +486,7 @@ class PreviewThumbnails {
 
     get currentImageContainer() {
         if (this.mouseDown) {
-            return this.elements.scrubber.container;
+            return this.elements.scrubbing.container;
         }
 
         return this.elements.thumb.imageContainer;
@@ -506,7 +506,8 @@ class PreviewThumbnails {
 
     get thumbContainerHeight() {
         if (this.mouseDown) {
-            return Math.floor(this.player.media.clientWidth / this.thumbAspectRatio); // Can't use media.clientHeight - html5 video goes big and does black bars above and below
+            // Can't use media.clientHeight - HTML5 video goes big and does black bars above and below
+            return Math.floor(this.player.media.clientWidth / this.thumbAspectRatio);
         }
 
         return Math.floor(this.player.media.clientWidth / this.thumbAspectRatio / 4);
@@ -528,27 +529,24 @@ class PreviewThumbnails {
         }
     }
 
-    showThumbContainer() {
-        this.elements.thumb.container.style.opacity = 1;
-    }
+    toggleThumbContainer(toggle = false, clearShowing = false) {
+        const className = this.player.config.classNames.previewThumbnails.thumbContainerShown;
+        this.elements.thumb.container.classList.toggle(className, toggle);
 
-    hideThumbContainer(clearShowing = false) {
-        this.elements.thumb.container.style.opacity = 0;
-
-        if (clearShowing) {
+        if (!toggle && clearShowing) {
             this.showingThumb = null;
             this.showingThumbFilename = null;
         }
     }
 
-    showScrubbingContainer() {
-        this.elements.scrubber.container.style.opacity = 1;
-    }
+    toggleScrubbingContainer(toggle = false) {
+        const className = this.player.config.classNames.previewThumbnails.scrubbingContainerShown;
+        this.elements.scrubbing.container.classList.toggle(className, toggle);
 
-    hideScrubbingContainer() {
-        this.elements.scrubber.container.style.opacity = 0;
-        this.showingThumb = null;
-        this.showingThumbFilename = null;
+        if (!toggle) {
+            this.showingThumb = null;
+            this.showingThumbFilename = null;
+        }
     }
 
     determineContainerAutoSizing() {
@@ -594,9 +592,9 @@ class PreviewThumbnails {
 
     // Can't use 100% width, in case the video is a different aspect ratio to the video container
     setScrubbingContainerSize() {
-        this.elements.scrubber.container.style.width = `${this.player.media.clientWidth}px`;
+        this.elements.scrubbing.container.style.width = `${this.player.media.clientWidth}px`;
         // Can't use media.clientHeight - html5 video goes big and does black bars above and below
-        this.elements.scrubber.container.style.height = `${this.player.media.clientWidth / this.thumbAspectRatio}px`;
+        this.elements.scrubbing.container.style.height = `${this.player.media.clientWidth / this.thumbAspectRatio}px`;
     }
 
     // Sprites need to be offset to the correct location
@@ -606,12 +604,12 @@ class PreviewThumbnails {
         }
 
         // Find difference between height and preview container height
-        const heightMulti = this.thumbContainerHeight / frame.h;
+        const multiplier = this.thumbContainerHeight / frame.h;
 
-        previewImage.style.height = `${Math.floor(previewImage.naturalHeight * heightMulti)}px`;
-        previewImage.style.width = `${Math.floor(previewImage.naturalWidth * heightMulti)}px`;
-        previewImage.style.left = `-${Math.ceil(frame.x * heightMulti)}px`;
-        previewImage.style.top = `-${frame.y * heightMulti}px`; // TODO: might need to round this one up too
+        previewImage.style.height = `${Math.floor(previewImage.naturalHeight * multiplier)}px`;
+        previewImage.style.width = `${Math.floor(previewImage.naturalWidth * multiplier)}px`;
+        previewImage.style.left = `-${frame.x * multiplier}px`;
+        previewImage.style.top = `-${frame.y * multiplier}px`;
     }
 }
 

@@ -3443,10 +3443,12 @@ typeof navigator === "object" && (function (global, factory) {
       previewThumbnails: {
         // Tooltip thumbs
         thumbContainer: 'plyr__preview-thumb',
+        thumbContainerShown: 'plyr__preview-thumb--is-shown',
         imageContainer: 'plyr__preview-thumb__image-container',
         timeContainer: 'plyr__preview-thumb__time-container',
-        // Scrubber
-        scrubbingContainer: 'plyr__preview-scrubber'
+        // Scrubbing
+        scrubbingContainer: 'plyr__preview-scrubbing',
+        scrubbingContainerShown: 'plyr__preview-scrubbing--is-shown'
       }
     },
     // Embed attributes
@@ -6620,7 +6622,7 @@ typeof navigator === "object" && (function (global, factory) {
   function () {
     /**
      * PreviewThumbnails constructor.
-     * @param {object} player
+     * @param {Plyr} player
      * @return {PreviewThumbnails}
      */
     function PreviewThumbnails(player) {
@@ -6633,7 +6635,7 @@ typeof navigator === "object" && (function (global, factory) {
       this.loadedImages = [];
       this.elements = {
         thumb: {},
-        scrubber: {}
+        scrubbing: {}
       };
 
       if (this.enabled) {
@@ -6772,13 +6774,13 @@ typeof navigator === "object" && (function (global, factory) {
         }); // Hide thumbnail preview - on mouse click, mouse leave, and video play/seek. All four are required, e.g., for buffering
 
         on.call(this.player, this.player.elements.progress, 'mouseleave click', function () {
-          _this4.hideThumbContainer(true);
+          _this4.toggleThumbContainer(false, true);
         });
         this.player.on('play', function () {
-          _this4.hideThumbContainer(true);
+          _this4.toggleThumbContainer(false, true);
         });
         this.player.on('seeked', function () {
-          _this4.hideThumbContainer(false);
+          _this4.toggleThumbContainer(false);
         }); // Show scrubbing preview
 
         on.call(this.player, this.player.elements.progress, 'mousedown touchstart', function (event) {
@@ -6787,9 +6789,9 @@ typeof navigator === "object" && (function (global, factory) {
             _this4.mouseDown = true; // Wait until media has a duration
 
             if (_this4.player.media.duration) {
-              _this4.showScrubbingContainer();
+              _this4.toggleScrubbingContainer(true);
 
-              _this4.hideThumbContainer(true); // Download and show image
+              _this4.toggleThumbContainer(false, true); // Download and show image
 
 
               _this4.showImageAtCurrentTime();
@@ -6804,13 +6806,13 @@ typeof navigator === "object" && (function (global, factory) {
 
           if (Math.ceil(_this4.timeAtLastTimeupdate) === Math.ceil(_this4.player.media.currentTime)) {
             // The video was already seeked/loaded at the chosen time - hide immediately
-            _this4.hideScrubbingContainer();
+            _this4.toggleScrubbingContainer(false);
           } else {
             // The video hasn't seeked yet. Wait for that
             once.call(_this4.player, _this4.player.media, 'timeupdate', function () {
               // Re-check mousedown - we might have already started scrubbing again
               if (!_this4.mouseDown) {
-                _this4.hideScrubbingContainer();
+                _this4.toggleScrubbingContainer(false);
               }
             });
           }
@@ -6842,10 +6844,10 @@ typeof navigator === "object" && (function (global, factory) {
 
         this.player.elements.progress.appendChild(this.elements.thumb.container); // Create HTML element: plyr__preview-scrubbing-container
 
-        this.elements.scrubber.container = createElement('div', {
+        this.elements.scrubbing.container = createElement('div', {
           class: this.player.config.classNames.previewThumbnails.scrubbingContainer
         });
-        this.player.elements.wrapper.appendChild(this.elements.scrubber.container);
+        this.player.elements.wrapper.appendChild(this.elements.scrubbing.container);
       }
     }, {
       key: "showImageAtCurrentTime",
@@ -6855,7 +6857,7 @@ typeof navigator === "object" && (function (global, factory) {
         if (this.mouseDown) {
           this.setScrubbingContainerSize();
         } else {
-          this.showThumbContainer();
+          this.toggleThumbContainer(true);
           this.setThumbContainerSizeAndPos();
         } // Find the desired thumbnail index
 
@@ -7053,32 +7055,29 @@ typeof navigator === "object" && (function (global, factory) {
         }
       }
     }, {
-      key: "showThumbContainer",
-      value: function showThumbContainer() {
-        this.elements.thumb.container.style.opacity = 1;
-      }
-    }, {
-      key: "hideThumbContainer",
-      value: function hideThumbContainer() {
-        var clearShowing = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-        this.elements.thumb.container.style.opacity = 0;
+      key: "toggleThumbContainer",
+      value: function toggleThumbContainer() {
+        var toggle = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+        var clearShowing = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+        var className = this.player.config.classNames.previewThumbnails.thumbContainerShown;
+        this.elements.thumb.container.classList.toggle(className, toggle);
 
-        if (clearShowing) {
+        if (!toggle && clearShowing) {
           this.showingThumb = null;
           this.showingThumbFilename = null;
         }
       }
     }, {
-      key: "showScrubbingContainer",
-      value: function showScrubbingContainer() {
-        this.elements.scrubber.container.style.opacity = 1;
-      }
-    }, {
-      key: "hideScrubbingContainer",
-      value: function hideScrubbingContainer() {
-        this.elements.scrubber.container.style.opacity = 0;
-        this.showingThumb = null;
-        this.showingThumbFilename = null;
+      key: "toggleScrubbingContainer",
+      value: function toggleScrubbingContainer() {
+        var toggle = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+        var className = this.player.config.classNames.previewThumbnails.scrubbingContainerShown;
+        this.elements.scrubbing.container.classList.toggle(className, toggle);
+
+        if (!toggle) {
+          this.showingThumb = null;
+          this.showingThumbFilename = null;
+        }
       }
     }, {
       key: "determineContainerAutoSizing",
@@ -7126,9 +7125,9 @@ typeof navigator === "object" && (function (global, factory) {
     }, {
       key: "setScrubbingContainerSize",
       value: function setScrubbingContainerSize() {
-        this.elements.scrubber.container.style.width = "".concat(this.player.media.clientWidth, "px"); // Can't use media.clientHeight - html5 video goes big and does black bars above and below
+        this.elements.scrubbing.container.style.width = "".concat(this.player.media.clientWidth, "px"); // Can't use media.clientHeight - html5 video goes big and does black bars above and below
 
-        this.elements.scrubber.container.style.height = "".concat(this.player.media.clientWidth / this.thumbAspectRatio, "px");
+        this.elements.scrubbing.container.style.height = "".concat(this.player.media.clientWidth / this.thumbAspectRatio, "px");
       } // Sprites need to be offset to the correct location
 
     }, {
@@ -7139,11 +7138,11 @@ typeof navigator === "object" && (function (global, factory) {
         } // Find difference between height and preview container height
 
 
-        var heightMulti = this.thumbContainerHeight / frame.h;
-        previewImage.style.height = "".concat(Math.floor(previewImage.naturalHeight * heightMulti), "px");
-        previewImage.style.width = "".concat(Math.floor(previewImage.naturalWidth * heightMulti), "px");
-        previewImage.style.left = "-".concat(Math.ceil(frame.x * heightMulti), "px");
-        previewImage.style.top = "-".concat(frame.y * heightMulti, "px"); // TODO: might need to round this one up too
+        var multiplier = this.thumbContainerHeight / frame.h;
+        previewImage.style.height = "".concat(Math.floor(previewImage.naturalHeight * multiplier), "px");
+        previewImage.style.width = "".concat(Math.floor(previewImage.naturalWidth * multiplier), "px");
+        previewImage.style.left = "-".concat(frame.x * multiplier, "px");
+        previewImage.style.top = "-".concat(frame.y * multiplier, "px");
       }
     }, {
       key: "enabled",
@@ -7154,7 +7153,7 @@ typeof navigator === "object" && (function (global, factory) {
       key: "currentImageContainer",
       get: function get() {
         if (this.mouseDown) {
-          return this.elements.scrubber.container;
+          return this.elements.scrubbing.container;
         }
 
         return this.elements.thumb.imageContainer;
@@ -7177,7 +7176,8 @@ typeof navigator === "object" && (function (global, factory) {
       key: "thumbContainerHeight",
       get: function get() {
         if (this.mouseDown) {
-          return Math.floor(this.player.media.clientWidth / this.thumbAspectRatio); // Can't use media.clientHeight - html5 video goes big and does black bars above and below
+          // Can't use media.clientHeight - HTML5 video goes big and does black bars above and below
+          return Math.floor(this.player.media.clientWidth / this.thumbAspectRatio);
         }
 
         return Math.floor(this.player.media.clientWidth / this.thumbAspectRatio / 4);
