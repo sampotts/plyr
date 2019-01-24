@@ -413,6 +413,15 @@ const defaults = {
     previewThumbnails: {
         enabled: false,
     },
+
+    // Vimeo plugin
+    vimeo: {
+        byline: false,
+        portrait: false,
+        title: false,
+        speed: true,
+        transparent: false,
+    },
 };
 
 export default defaults;
