@@ -301,10 +301,19 @@ class PreviewThumbnails {
         }
 
         // Find the desired thumbnail index
+        // TODO: Handle a video longer than the thumbs where thumbNum is null
         const thumbNum = this.thumbnails[0].frames.findIndex(
             frame => this.seekTime >= frame.startTime && this.seekTime <= frame.endTime,
         );
+        const hasThumb = thumbNum >= 0;
         let qualityIndex = 0;
+
+        this.toggleThumbContainer(hasThumb);
+
+        // No matching thumb found
+        if (!hasThumb) {
+            return;
+        }
 
         // Check to see if we've already downloaded higher quality versions of this image
         this.thumbnails.forEach((thumbnail, index) => {

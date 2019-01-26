@@ -404,6 +404,7 @@ const defaults = {
     ads: {
         enabled: false,
         publisherId: '',
+        tagUrl: '',
     },
 
     // YouTube nocookies mode
