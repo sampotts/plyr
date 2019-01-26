@@ -3473,7 +3473,8 @@ typeof navigator === "object" && (function (global, factory) {
     noCookie: false,
     // Preview Thumbnails plugin
     previewThumbnails: {
-      enabled: false
+      enabled: false,
+      src: ''
     }
   };
 
@@ -6683,13 +6684,14 @@ typeof navigator === "object" && (function (global, factory) {
         var _this2 = this;
 
         return new Promise(function (resolve) {
-          if (!_this2.player.config.previewThumbnails.src) {
-            throw new Error('Missing previewThumbnails.src config attribute');
-          } // previewThumbnails.src can be string or list. If string, convert into single-element list
-
-
           var src = _this2.player.config.previewThumbnails.src;
-          var urls = is.string(src) ? [src] : src; // Loop through each src url. Download and process the VTT file, storing the resulting data in this.thumbnails
+
+          if (is.empty(src)) {
+            throw new Error('Missing previewThumbnails.src config attribute');
+          } // If string, convert into single-element list
+
+
+          var urls = is.string(src) ? [src] : src; // Loop through each src URL. Download and process the VTT file, storing the resulting data in this.thumbnails
 
           var promises = urls.map(function (u) {
             return _this2.getThumbnail(u);

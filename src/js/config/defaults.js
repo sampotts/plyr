@@ -413,6 +413,7 @@ const defaults = {
     // Preview Thumbnails plugin
     previewThumbnails: {
         enabled: false,
+        src: '',
     },
 };
 

@@ -109,20 +109,22 @@ class PreviewThumbnails {
     // Download VTT files and parse them
     getThumbnails() {
         return new Promise(resolve => {
-            if (!this.player.config.previewThumbnails.src) {
+            const { src } = this.player.config.previewThumbnails;
+
+            if (is.empty(src)) {
                 throw new Error('Missing previewThumbnails.src config attribute');
             }
 
-            // previewThumbnails.src can be string or list. If string, convert into single-element list
-            const { src } = this.player.config.previewThumbnails;
+            // If string, convert into single-element list
             const urls = is.string(src) ? [src] : src;
 
-            // Loop through each src url. Download and process the VTT file, storing the resulting data in this.thumbnails
+            // Loop through each src URL. Download and process the VTT file, storing the resulting data in this.thumbnails
             const promises = urls.map(u => this.getThumbnail(u));
 
             Promise.all(promises).then(() => {
                 // Sort smallest to biggest (e.g., [120p, 480p, 1080p])
                 this.thumbnails.sort((x, y) => x.height - y.height);
+
                 this.player.debug.log('Preview thumbnails', this.thumbnails);
 
                 resolve();
