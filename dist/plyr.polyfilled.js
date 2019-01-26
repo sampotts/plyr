@@ -574,7 +574,7 @@ typeof navigator === "object" && (function (global, factory) {
   });
 
   var _core = createCommonjsModule(function (module) {
-  var core = module.exports = { version: '2.6.2' };
+  var core = module.exports = { version: '2.6.3' };
   if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
   });
   var _core_1 = _core.version;
@@ -2333,9 +2333,10 @@ typeof navigator === "object" && (function (global, factory) {
   var $SPLIT = 'split';
   var LENGTH = 'length';
   var LAST_INDEX$1 = 'lastIndex';
+  var MAX_UINT32 = 0xffffffff;
 
-  // eslint-disable-next-line no-empty
-  var SUPPORTS_Y = !!(function () { try { return new RegExp('x', 'y'); } catch (e) {} })();
+  // babel-minify transpiles RegExp('x', 'y') -> /x/y and it causes SyntaxError
+  var SUPPORTS_Y = !_fails(function () { });
 
   // @@split logic
   _fixReWks('split', 2, function (defined, SPLIT, $split, maybeCallNative) {
@@ -2360,7 +2361,7 @@ typeof navigator === "object" && (function (global, factory) {
                     (separator.unicode ? 'u' : '') +
                     (separator.sticky ? 'y' : '');
         var lastLastIndex = 0;
-        var splitLimit = limit === undefined ? 4294967295 : limit >>> 0;
+        var splitLimit = limit === undefined ? MAX_UINT32 : limit >>> 0;
         // Make `global` and avoid `lastIndex` issues by working with a copy
         var separatorCopy = new RegExp(separator.source, flags + 'g');
         var match, lastIndex, lastLength;
@@ -2414,14 +2415,14 @@ typeof navigator === "object" && (function (global, factory) {
 
         var unicodeMatching = rx.unicode;
         var flags = (rx.ignoreCase ? 'i' : '') +
-                      (rx.multiline ? 'm' : '') +
-                      (rx.unicode ? 'u' : '') +
-                      (SUPPORTS_Y ? 'y' : 'g');
+                    (rx.multiline ? 'm' : '') +
+                    (rx.unicode ? 'u' : '') +
+                    (SUPPORTS_Y ? 'y' : 'g');
 
         // ^(? + rx + ) is needed, in combination with some S slicing, to
         // simulate the 'y' flag.
         var splitter = new C(SUPPORTS_Y ? rx : '^(?:' + rx.source + ')', flags);
-        var lim = limit === undefined ? 0xffffffff : limit >>> 0;
+        var lim = limit === undefined ? MAX_UINT32 : limit >>> 0;
         if (lim === 0) return [];
         if (S.length === 0) return _regexpExecAbstract(splitter, S) === null ? [S] : [];
         var p = 0;
@@ -6258,7 +6259,7 @@ typeof navigator === "object" && (function (global, factory) {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.4.7/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.4.8/plyr.svg',
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
     // Quality default
@@ -6528,13 +6529,15 @@ typeof navigator === "object" && (function (global, factory) {
     // Register for an account here: http://vi.ai/publisher-video-monetization/?aid=plyrio
     ads: {
       enabled: false,
-      publisherId: ''
+      publisherId: '',
+      tagUrl: ''
     },
     // YouTube nocookies mode
     noCookie: false,
     // Preview Thumbnails plugin
     previewThumbnails: {
-      enabled: false
+      enabled: false,
+      src: ''
     }
   };
 
@@ -9083,7 +9086,7 @@ typeof navigator === "object" && (function (global, factory) {
       _classCallCheck(this, Ads);
 
       this.player = player;
-      this.publisherId = player.config.ads.publisherId;
+      this.config = player.config.ads;
       this.playing = false;
       this.initialized = false;
       this.elements = {
@@ -9150,7 +9153,7 @@ typeof navigator === "object" && (function (global, factory) {
         this.listeners(); // Setup the IMA SDK
 
         this.setupIMA();
-      } // Build the default tag URL
+      } // Build the tag URL
 
     }, {
       key: "setupIMA",
@@ -9319,7 +9322,8 @@ typeof navigator === "object" && (function (global, factory) {
         var container = this.player.elements.container; // Retrieve the ad from the event. Some events (e.g. ALL_ADS_COMPLETED)
         // don't have ad object associated
 
-        var ad = event.getAd(); // Proxy event
+        var ad = event.getAd();
+        var adData = event.getAdData(); // Proxy event
 
         var dispatchEvent = function dispatchEvent(type) {
           var event = "ads".concat(type.replace(/_/g, '').toLowerCase());
@@ -9401,6 +9405,13 @@ typeof navigator === "object" && (function (global, factory) {
             dispatchEvent(event.type);
             break;
 
+          case google.ima.AdEvent.Type.LOG:
+            if (adData.adError) {
+              this.player.debug.warn("Non-fatal ad error: ".concat(adData.adError.getMessage()));
+            }
+
+            break;
+
           default:
             break;
         }
@@ -9433,9 +9444,8 @@ typeof navigator === "object" && (function (global, factory) {
         this.player.on('ended', function () {
           _this8.loader.contentComplete();
         });
-        this.player.on('seeking', function () {
+        this.player.on('timeupdate', function () {
           time = _this8.player.currentTime;
-          return time;
         });
         this.player.on('seeked', function () {
           var seekedTime = _this8.player.currentTime;
@@ -9653,11 +9663,18 @@ typeof navigator === "object" && (function (global, factory) {
     }, {
       key: "enabled",
       get: function get() {
-        return this.player.isHTML5 && this.player.isVideo && this.player.config.ads.enabled && !is$1.empty(this.publisherId);
+        var config = this.config;
+        return this.player.isHTML5 && this.player.isVideo && config.enabled && (!is$1.empty(config.publisherId) || is$1.url(config.tagUrl));
       }
     }, {
       key: "tagUrl",
       get: function get() {
+        var config = this.config;
+
+        if (is$1.url(config.tagUrl)) {
+          return config.tagUrl;
+        }
+
         var params = {
           AV_PUBLISHERID: '58c25bb0073ef448b1087ad6',
           AV_CHANNELID: '5a0458dc28a06145e4519d21',
@@ -9795,13 +9812,14 @@ typeof navigator === "object" && (function (global, factory) {
         var _this2 = this;
 
         return new Promise(function (resolve) {
-          if (!_this2.player.config.previewThumbnails.src) {
-            throw new Error('Missing previewThumbnails.src config attribute');
-          } // previewThumbnails.src can be string or list. If string, convert into single-element list
-
-
           var src = _this2.player.config.previewThumbnails.src;
-          var urls = is$1.string(src) ? [src] : src; // Loop through each src url. Download and process the VTT file, storing the resulting data in this.thumbnails
+
+          if (is$1.empty(src)) {
+            throw new Error('Missing previewThumbnails.src config attribute');
+          } // If string, convert into single-element list
+
+
+          var urls = is$1.string(src) ? [src] : src; // Loop through each src URL. Download and process the VTT file, storing the resulting data in this.thumbnails
 
           var promises = urls.map(function (u) {
             return _this2.getThumbnail(u);
@@ -9987,12 +10005,20 @@ typeof navigator === "object" && (function (global, factory) {
           this.toggleThumbContainer(true);
           this.setThumbContainerSizeAndPos();
         } // Find the desired thumbnail index
+        // TODO: Handle a video longer than the thumbs where thumbNum is null
 
 
         var thumbNum = this.thumbnails[0].frames.findIndex(function (frame) {
           return _this5.seekTime >= frame.startTime && _this5.seekTime <= frame.endTime;
         });
-        var qualityIndex = 0; // Check to see if we've already downloaded higher quality versions of this image
+        var hasThumb = thumbNum >= 0;
+        var qualityIndex = 0;
+        this.toggleThumbContainer(hasThumb); // No matching thumb found
+
+        if (!hasThumb) {
+          return;
+        } // Check to see if we've already downloaded higher quality versions of this image
+
 
         this.thumbnails.forEach(function (thumbnail, index) {
           if (_this5.loadedImages.includes(thumbnail.frames[thumbNum].text)) {

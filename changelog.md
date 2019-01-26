@@ -1,3 +1,19 @@
+## v3.5.0
+
+-   Preview seek/scrubbing thumbnails (thanks @jamesoflol)
+-   Fixes for proxy listeners (thanks @gurupras)
+-   Fix for buffer progress transition on WebKit (thanks @samuelgozi)
+-   Fix for error when mime type not specified (fixes #1274)
+-   Support YouTube noCookie (thanks Omar Khatib)
+-   Add Angular plugin reference (thanks @smnbbrv)
+-   Use `Math.trunc` instead of `parseInt` (thanks @taion)
+-   Many fixes for fullscreen in embedded players with non 16:9 screens or videos
+-   Added 'force' fallback option for fullscreen
+
+### v3.4.8
+
+-   Calling customized controls function with proper arguments (thanks @a60814billy)
+
 ### v3.4.7
 
 -   Fix for Vimeo fullscreen with non native aspect ratios (fixes #854)

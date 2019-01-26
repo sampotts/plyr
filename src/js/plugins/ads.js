@@ -22,7 +22,7 @@ class Ads {
      */
     constructor(player) {
         this.player = player;
-        this.publisherId = player.config.ads.publisherId;
+        this.config = player.config.ads;
         this.playing = false;
         this.initialized = false;
         this.elements = {
@@ -49,8 +49,13 @@ class Ads {
     }
 
     get enabled() {
+        const { config } = this;
+
         return (
-            this.player.isHTML5 && this.player.isVideo && this.player.config.ads.enabled && !is.empty(this.publisherId)
+            this.player.isHTML5 &&
+            this.player.isVideo &&
+            config.enabled &&
+            (!is.empty(config.publisherId) || is.url(config.tagUrl))
         );
     }
 
@@ -95,8 +100,14 @@ class Ads {
         this.setupIMA();
     }
 
-    // Build the default tag URL
+    // Build the tag URL
     get tagUrl() {
+        const { config } = this;
+
+        if (is.url(config.tagUrl)) {
+            return config.tagUrl;
+        }
+
         const params = {
             AV_PUBLISHERID: '58c25bb0073ef448b1087ad6',
             AV_CHANNELID: '5a0458dc28a06145e4519d21',
@@ -233,7 +244,7 @@ class Ads {
                     const seekElement = this.player.elements.progress;
 
                     if (is.element(seekElement)) {
-                        const cuePercentage = 100 / this.player.duration * cuePoint;
+                        const cuePercentage = (100 / this.player.duration) * cuePoint;
                         const cue = createElement('span', {
                             class: this.player.config.classNames.cues,
                         });
@@ -273,6 +284,7 @@ class Ads {
         // Retrieve the ad from the event. Some events (e.g. ALL_ADS_COMPLETED)
         // don't have ad object associated
         const ad = event.getAd();
+        const adData = event.getAdData();
 
         // Proxy event
         const dispatchEvent = type => {
@@ -368,6 +380,12 @@ class Ads {
                 dispatchEvent(event.type);
                 break;
 
+            case google.ima.AdEvent.Type.LOG:
+                if (adData.adError) {
+                    this.player.debug.warn(`Non-fatal ad error: ${adData.adError.getMessage()}`);
+                }
+                break;
+
             default:
                 break;
         }
@@ -396,9 +414,8 @@ class Ads {
             this.loader.contentComplete();
         });
 
-        this.player.on('seeking', () => {
+        this.player.on('timeupdate', () => {
             time = this.player.currentTime;
-            return time;
         });
 
         this.player.on('seeked', () => {

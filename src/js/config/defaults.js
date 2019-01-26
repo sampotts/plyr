@@ -60,7 +60,7 @@ const defaults = {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.4.7/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.4.8/plyr.svg',
 
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
@@ -404,6 +404,7 @@ const defaults = {
     ads: {
         enabled: false,
         publisherId: '',
+        tagUrl: '',
     },
 
     // YouTube nocookies mode
@@ -412,6 +413,7 @@ const defaults = {
     // Preview Thumbnails plugin
     previewThumbnails: {
         enabled: false,
+        src: '',
     },
 
     // Vimeo plugin

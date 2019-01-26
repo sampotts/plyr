@@ -2,14 +2,26 @@
 // Preview Thumbnails
 // --------------------------------------------------------------
 
+$plyr-preview-padding: $plyr-tooltip-padding !default;
+$plyr-preview-bg: $plyr-tooltip-bg !default;
+$plyr-preview-radius: $plyr-tooltip-radius !default;
+$plyr-preview-shadow: $plyr-tooltip-shadow !default;
+$plyr-preview-arrow-size: $plyr-tooltip-arrow-size !default;
+$plyr-preview-image-bg: $plyr-color-heather !default;
+$plyr-preview-time-font-size: $plyr-font-size-time !default;
+$plyr-preview-time-padding: 3px 6px !default;
+$plyr-preview-time-bg: rgba(0, 0, 0, 0.55);
+$plyr-preview-time-color: #fff;
+$plyr-preview-time-bottom-offset: 6px;
+
 .plyr__preview-thumb {
-    background-color: $plyr-tooltip-bg;
+    background-color: $plyr-preview-bg;
     border-radius: 3px;
     bottom: 100%;
-    box-shadow: $plyr-tooltip-shadow;
-    margin-bottom: $plyr-tooltip-padding * 2;
+    box-shadow: $plyr-preview-shadow;
+    margin-bottom: $plyr-preview-padding * 2;
     opacity: 0;
-    padding: 3px;
+    padding: $plyr-preview-radius;
     pointer-events: none;
     position: absolute;
     transform: translate(0, 10px) scale(0.8);
@@ -24,10 +36,10 @@
 
     // The background triangle
     &::before {
-        border-left: $plyr-tooltip-arrow-size solid transparent;
-        border-right: $plyr-tooltip-arrow-size solid transparent;
-        border-top: $plyr-tooltip-arrow-size solid $plyr-tooltip-bg;
-        bottom: -$plyr-tooltip-arrow-size;
+        border-left: $plyr-preview-arrow-size solid transparent;
+        border-right: $plyr-preview-arrow-size solid transparent;
+        border-top: $plyr-preview-arrow-size solid $plyr-preview-bg;
+        bottom: -$plyr-preview-arrow-size;
         content: '';
         height: 0;
         left: 50%;
@@ -38,14 +50,14 @@
     }
 
     &__image-container {
-        background: $plyr-color-heather;
-        border-radius: 2px;
+        background: $plyr-preview-image-bg;
+        border-radius: ($plyr-preview-radius - 1px);
         overflow: hidden;
         position: relative;
         z-index: 0;
 
         img {
-            height: 100%; // Non-jpeg-sprite images are 100%. Jpeg sprites will have their size applied by javascript
+            height: 100%; // Non sprite images are 100%. Sprites will have their size applied by JavaScript
             left: 0;
             max-height: none;
             max-width: none;
@@ -57,7 +69,7 @@
 
     // Seek time text
     &__time-container {
-        bottom: 6px;
+        bottom: $plyr-preview-time-bottom-offset;
         left: 0;
         position: absolute;
         right: 0;
@@ -65,11 +77,11 @@
         z-index: 3;
 
         span {
-            background-color: rgba(0, 0, 0, 0.55);
-            border-radius: 2px;
-            color: #fff;
-            font-size: $plyr-font-size-time;
-            padding: 3px 6px;
+            background-color: $plyr-preview-time-bg;
+            border-radius: ($plyr-preview-radius - 1px);
+            color: $plyr-preview-time-color;
+            font-size: $plyr-preview-time-font-size;
+            padding: $plyr-preview-time-padding;
         }
     }
 }
@@ -79,7 +91,7 @@
     filter: blur(1px);
     height: 100%;
     left: 0;
-    margin: auto; // Required when video is different dimensions to container (e.g., fullscreen)
+    margin: auto; // Required when video is different dimensions to container (e.g. fullscreen)
     opacity: 0;
     overflow: hidden;
     position: absolute;
@@ -88,6 +100,10 @@
     transition: opacity 0.3s ease;
     width: 100%;
     z-index: 1;
+
+    &--is-shown {
+        opacity: 1;
+    }
 
     img {
         height: 100%;
@@ -98,9 +114,5 @@
         position: absolute;
         top: 0;
         width: 100%;
-    }
-
-    &--is-shown {
-        opacity: 1;
     }
 }
