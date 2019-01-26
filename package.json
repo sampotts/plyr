@@ -4,6 +4,12 @@
     "description": "A simple, accessible and customizable HTML5, YouTube and Vimeo media player",
     "homepage": "https://plyr.io",
     "author": "Sam Potts <sam@potts.es>",
+    "main": "dist/plyr.js",
+    "module": "dist/plyr.mjs",
+    "jsnext:main": "dist/plyr.mjs",
+    "browser": "dist/plyr.min.js",
+    "sass": "src/sass/plyr.scss",
+    "style": "dist/plyr.css",
     "keywords": [
         "HTML5 Video",
         "HTML5 Audio",
@@ -13,10 +19,6 @@
         "WordPress",
         "HLS"
     ],
-    "main": "./dist/plyr.js",
-    "browser": "./dist/plyr.min.js",
-    "sass": "./src/sass/plyr.scss",
-    "style": "./dist/plyr.css",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -41,7 +43,7 @@
         "del": "^3.0.0",
         "eslint": "^5.12.1",
         "eslint-config-airbnb-base": "^13.1.0",
-        "eslint-config-prettier": "^3.6.0",
+        "eslint-config-prettier": "^4.0.0",
         "eslint-plugin-import": "^2.15.0",
         "fastly-purge": "^1.0.1",
         "git-branch": "^2.0.1",

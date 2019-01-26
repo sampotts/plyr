@@ -118,16 +118,19 @@ gulp.task('clean', done => {
 const build = {
     js(files, bundle, options) {
         Object.keys(files).forEach(key => {
-            const name = `js:${key}`;
+            const { format } = options;
+            const name = `js:${key}:${format}`;
             tasks.js.push(name);
             const { output } = paths[bundle];
             const polyfill = name.includes('polyfilled');
+            const extension = format === 'es' ? '.mjs' : '.js';
 
             return gulp.task(name, () =>
                 gulp
                     .src(bundles[bundle].js[key])
                     .pipe(sourcemaps.init())
                     .pipe(concat(key))
+
                     .pipe(
                         rollup(
                             {
@@ -137,9 +140,9 @@ const build = {
                         ),
                     )
                     .pipe(header('typeof navigator === "object" && ')) // "Support" SSR (#935)
-                    .pipe(sourcemaps.write(''))
+                    .pipe(rename({ extname: extension }))
                     .pipe(gulp.dest(output))
-                    .pipe(filter('**/*.js'))
+                    .pipe(filter(`**/*${extension}`))
                     .pipe(uglify())
                     .pipe(size(sizeOptions))
                     .pipe(rename({ suffix: minSuffix }))
@@ -192,7 +195,9 @@ const build = {
 };
 
 // Plyr core files
-build.js(bundles.plyr.js, 'plyr', { name: 'Plyr', format: 'umd' });
+const namespace = 'Plyr';
+build.js(bundles.plyr.js, 'plyr', { name: namespace, format: 'umd' });
+build.js(bundles.plyr.js, 'plyr', { name: namespace, format: 'es' });
 build.sass(bundles.plyr.sass, 'plyr');
 build.sprite('plyr');
 

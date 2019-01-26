@@ -11677,5 +11677,3 @@ typeof navigator === "object" && (function (global, factory) {
   return Plyr;
 
 })));
-
-//# sourceMappingURL=plyr.polyfilled.js.map
