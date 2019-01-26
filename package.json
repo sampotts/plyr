@@ -37,12 +37,12 @@
     "devDependencies": {
         "@babel/core": "^7.2.2",
         "babel-eslint": "^10.0.1",
-        "@babel/preset-env": "^7.2.3",
+        "@babel/preset-env": "^7.3.1",
         "del": "^3.0.0",
         "eslint": "^5.12.1",
         "eslint-config-airbnb-base": "^13.1.0",
         "eslint-config-prettier": "^3.6.0",
-        "eslint-plugin-import": "^2.14.0",
+        "eslint-plugin-import": "^2.15.0",
         "fastly-purge": "^1.0.1",
         "git-branch": "^2.0.1",
         "gulp": "^4.0.0",
@@ -82,7 +82,7 @@
         "through2": "^3.0.0"
     },
     "dependencies": {
-        "core-js": "^2.6.2",
+        "core-js": "^2.6.3",
         "custom-event-polyfill": "^1.0.6",
         "loadjs": "^3.5.5",
         "raven-js": "^3.27.0",
