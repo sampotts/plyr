@@ -73,10 +73,10 @@ export function off(element, events = '', callback, passive = true, capture = fa
 
 // Bind once-only event handler
 export function once(element, events = '', callback, passive = true, capture = false) {
-    function onceCallback(...args) {
+    const onceCallback = (...args) => {
         off(element, events, onceCallback, passive, capture);
         callback.apply(this, args);
-    }
+    };
 
     toggleListener.call(this, element, events, onceCallback, true, passive, capture);
 }
@@ -114,7 +114,7 @@ export function unbindListeners() {
 
 // Run method when / if player is ready
 export function ready() {
-    return new Promise(
-        resolve => (this.ready ? setTimeout(resolve, 0) : on.call(this, this.elements.container, 'ready', resolve)),
+    return new Promise(resolve =>
+        this.ready ? setTimeout(resolve, 0) : on.call(this, this.elements.container, 'ready', resolve),
     ).then(() => {});
 }

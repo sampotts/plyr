@@ -223,8 +223,8 @@ class PreviewThumbnails {
 
         // Show scrubbing preview
         on.call(this.player, this.player.elements.progress, 'mousedown touchstart', event => {
-            // Only act on left mouse button (0), or touch device (!event.button)
-            if (!event.button || event.button === 0) {
+            // Only act on left mouse button (0), or touch device (event.button is false)
+            if (event.button === false || event.button === 0) {
                 this.mouseDown = true;
                 // Wait until media has a duration
                 if (this.player.media.duration) {

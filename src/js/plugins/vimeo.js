@@ -10,6 +10,7 @@ import { triggerEvent } from '../utils/events';
 import fetch from '../utils/fetch';
 import is from '../utils/is';
 import loadScript from '../utils/loadScript';
+import { extend } from '../utils/objects';
 import { format, stripHTML } from '../utils/strings';
 import { setAspectRatio } from '../utils/style';
 import { buildUrlParams } from '../utils/urls';
@@ -64,21 +65,22 @@ const vimeo = {
     // API Ready
     ready() {
         const player = this;
+        const config = player.config.vimeo;
 
         // Get Vimeo params for the iframe
-        const options = {
-            loop: player.config.loop.active,
-            autoplay: player.autoplay,
-            muted: player.muted,
-            byline: player.config.vimeo.byline,
-            portrait: player.config.vimeo.portrait,
-            title: player.config.vimeo.title,
-            speed: player.config.vimeo.speed,
-            transparent: player.config.vimeo.transparent === true ? 1 : 0,
-            gesture: 'media',
-            playsinline: !this.config.fullscreen.iosNative,
-        };
-        const params = buildUrlParams(options);
+        const params = buildUrlParams(
+            extend(
+                {},
+                {
+                    loop: player.config.loop.active,
+                    autoplay: player.autoplay,
+                    muted: player.muted,
+                    gesture: 'media',
+                    playsinline: !this.config.fullscreen.iosNative,
+                },
+                config,
+            ),
+        );
 
         // Get the source URL or ID
         let source = player.media.getAttribute('src');

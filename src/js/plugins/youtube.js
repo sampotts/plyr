@@ -9,6 +9,7 @@ import fetch from '../utils/fetch';
 import is from '../utils/is';
 import loadImage from '../utils/loadImage';
 import loadScript from '../utils/loadScript';
+import { extend } from '../utils/objects';
 import { format, generateId } from '../utils/strings';
 import { setAspectRatio } from '../utils/style';
 
@@ -144,30 +145,29 @@ const youtube = {
             })
             .catch(() => {});
 
+        const config = player.config.youtube;
+
         // Setup instance
         // https://developers.google.com/youtube/iframe_api_reference
         player.embed = new window.YT.Player(id, {
             videoId,
-            host: player.config.noCookie ? 'https://www.youtube-nocookie.com' : undefined,
-            playerVars: {
-                autoplay: player.config.autoplay ? 1 : 0, // Autoplay
-                hl: player.config.hl, // iframe interface language
-                controls: player.supported.ui ? 0 : 1, // Only show controls if not fully supported
-                rel: 0, // No related vids
-                showinfo: 0, // Hide info
-                iv_load_policy: 3, // Hide annotations
-                modestbranding: 1, // Hide logos as much as possible (they still show one in the corner when paused)
-                disablekb: 1, // Disable keyboard as we handle it
-                playsinline: 1, // Allow iOS inline playback
-
-                // Tracking for stats
-                // origin: window ? `${window.location.protocol}//${window.location.host}` : null,
-                widget_referrer: window ? window.location.href : null,
-
-                // Captions are flaky on YouTube
-                cc_load_policy: player.captions.active ? 1 : 0,
-                cc_lang_pref: player.config.captions.language,
-            },
+            host: config.noCookie ? 'https://www.youtube-nocookie.com' : undefined,
+            playerVars: extend(
+                {},
+                {
+                    autoplay: player.config.autoplay ? 1 : 0, // Autoplay
+                    hl: player.config.hl, // iframe interface language
+                    controls: player.supported.ui ? 0 : 1, // Only show controls if not fully supported
+                    disablekb: 1, // Disable keyboard as we handle it
+                    playsinline: !player.config.fullscreen.iosNative ? 1 : 0, // Allow iOS inline playback
+                    // Captions are flaky on YouTube
+                    cc_load_policy: player.captions.active ? 1 : 0,
+                    cc_lang_pref: player.config.captions.language,
+                    // Tracking for stats
+                    widget_referrer: window ? window.location.href : null,
+                },
+                config,
+            ),
             events: {
                 onError(event) {
                     // YouTube may fire onError twice, so only handle it once

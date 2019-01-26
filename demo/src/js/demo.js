@@ -85,9 +85,6 @@ import Raven from 'raven-js';
                         'https://cdn.plyr.io/static/demo/thumbs/240p.vtt',
                     ],
                 },
-                vimeo: {
-                    transparent: true,
-                },
             });
 
             // Expose for tinkering in the console

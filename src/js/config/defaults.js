@@ -407,9 +407,6 @@ const defaults = {
         tagUrl: '',
     },
 
-    // YouTube nocookies mode
-    noCookie: false,
-
     // Preview Thumbnails plugin
     previewThumbnails: {
         enabled: false,
@@ -423,6 +420,15 @@ const defaults = {
         title: false,
         speed: true,
         transparent: false,
+    },
+
+    // YouTube plugin
+    youtube: {
+        noCookie: false, // Whether to use an alternative version of YouTube without cookies
+        rel: 0, // No related vids
+        showinfo: 0, // Hide info
+        iv_load_policy: 3, // Hide annotations
+        modestbranding: 1, // Hide logos as much as possible (they still show one in the corner when paused)
     },
 };
 

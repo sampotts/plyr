@@ -303,20 +303,22 @@ typeof navigator === "object" && (function (global, factory) {
   } // Bind once-only event handler
 
   function once(element) {
+    var _this2 = this;
+
     var events = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
     var callback = arguments.length > 2 ? arguments[2] : undefined;
     var passive = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
     var capture = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
 
-    function onceCallback() {
+    var onceCallback = function onceCallback() {
       off(element, events, onceCallback, passive, capture);
 
       for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
         args[_key] = arguments[_key];
       }
 
-      callback.apply(this, args);
-    }
+      callback.apply(_this2, args);
+    };
 
     toggleListener.call(this, element, events, onceCallback, true, passive, capture);
   } // Trigger event
@@ -356,10 +358,10 @@ typeof navigator === "object" && (function (global, factory) {
   } // Run method when / if player is ready
 
   function ready() {
-    var _this2 = this;
+    var _this3 = this;
 
     return new Promise(function (resolve) {
-      return _this2.ready ? setTimeout(resolve, 0) : on.call(_this2, _this2.elements.container, 'ready', resolve);
+      return _this3.ready ? setTimeout(resolve, 0) : on.call(_this3, _this3.elements.container, 'ready', resolve);
     }).then(function () {});
   }
 
@@ -3469,12 +3471,31 @@ typeof navigator === "object" && (function (global, factory) {
       publisherId: '',
       tagUrl: ''
     },
-    // YouTube nocookies mode
-    noCookie: false,
     // Preview Thumbnails plugin
     previewThumbnails: {
       enabled: false,
       src: ''
+    },
+    // Vimeo plugin
+    vimeo: {
+      byline: false,
+      portrait: false,
+      title: false,
+      speed: true,
+      transparent: false
+    },
+    // YouTube plugin
+    youtube: {
+      noCookie: false,
+      // Whether to use an alternative version of YouTube without cookies
+      rel: 0,
+      // No related vids
+      showinfo: 0,
+      // Hide info
+      iv_load_policy: 3,
+      // Hide annotations
+      modestbranding: 1 // Hide logos as much as possible (they still show one in the corner when paused)
+
     }
   };
 
@@ -5214,21 +5235,16 @@ typeof navigator === "object" && (function (global, factory) {
     ready: function ready$$1() {
       var _this2 = this;
 
-      var player = this; // Get Vimeo params for the iframe
+      var player = this;
+      var config = player.config.vimeo; // Get Vimeo params for the iframe
 
-      var options = {
+      var params = buildUrlParams(extend({}, {
         loop: player.config.loop.active,
         autoplay: player.autoplay,
         muted: player.muted,
-        byline: false,
-        portrait: false,
-        title: false,
-        speed: true,
-        transparent: 0,
         gesture: 'media',
         playsinline: !this.config.fullscreen.iosNative
-      };
-      var params = buildUrlParams(options); // Get the source URL or ID
+      }, config)); // Get the source URL or ID
 
       var source = player.media.getAttribute('src'); // Get from <div> if needed
 
@@ -5642,38 +5658,30 @@ typeof navigator === "object" && (function (global, factory) {
         if (!posterSrc.includes('maxres')) {
           player.elements.poster.style.backgroundSize = 'cover';
         }
-      }).catch(function () {}); // Setup instance
+      }).catch(function () {});
+      var config = player.config.youtube; // Setup instance
       // https://developers.google.com/youtube/iframe_api_reference
 
       player.embed = new window.YT.Player(id, {
         videoId: videoId,
-        host: player.config.noCookie ? 'https://www.youtube-nocookie.com' : undefined,
-        playerVars: {
+        host: config.noCookie ? 'https://www.youtube-nocookie.com' : undefined,
+        playerVars: extend({}, {
           autoplay: player.config.autoplay ? 1 : 0,
           // Autoplay
           hl: player.config.hl,
           // iframe interface language
           controls: player.supported.ui ? 0 : 1,
           // Only show controls if not fully supported
-          rel: 0,
-          // No related vids
-          showinfo: 0,
-          // Hide info
-          iv_load_policy: 3,
-          // Hide annotations
-          modestbranding: 1,
-          // Hide logos as much as possible (they still show one in the corner when paused)
           disablekb: 1,
           // Disable keyboard as we handle it
-          playsinline: 1,
+          playsinline: !player.config.fullscreen.iosNative ? 1 : 0,
           // Allow iOS inline playback
-          // Tracking for stats
-          // origin: window ? `${window.location.protocol}//${window.location.host}` : null,
-          widget_referrer: window ? window.location.href : null,
           // Captions are flaky on YouTube
           cc_load_policy: player.captions.active ? 1 : 0,
-          cc_lang_pref: player.config.captions.language
-        },
+          cc_lang_pref: player.config.captions.language,
+          // Tracking for stats
+          widget_referrer: window ? window.location.href : null
+        }, config),
         events: {
           onError: function onError(event) {
             // YouTube may fire onError twice, so only handle it once
@@ -6801,8 +6809,8 @@ typeof navigator === "object" && (function (global, factory) {
         }); // Show scrubbing preview
 
         on.call(this.player, this.player.elements.progress, 'mousedown touchstart', function (event) {
-          // Only act on left mouse button (0), or touch device (!event.button)
-          if (!event.button || event.button === 0) {
+          // Only act on left mouse button (0), or touch device (event.button is false)
+          if (event.button === false || event.button === 0) {
             _this4.mouseDown = true; // Wait until media has a duration
 
             if (_this4.player.media.duration) {
@@ -7502,7 +7510,7 @@ typeof navigator === "object" && (function (global, factory) {
 
               if (this.isYouTube) {
                 this.config.playsinline = truthy.includes(url.searchParams.get('playsinline'));
-                this.config.hl = url.searchParams.get('hl'); // TODO: Should this be setting language?
+                this.config.youtube.hl = url.searchParams.get('hl'); // TODO: Should this be setting language?
               } else {
                 this.config.playsinline = true;
               }
