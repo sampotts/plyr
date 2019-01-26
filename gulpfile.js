@@ -189,7 +189,8 @@ const build = {
                 .pipe(svgstore())
                 .pipe(rename({ basename: bundle }))
                 .pipe(size(sizeOptions))
-                .pipe(gulp.dest(paths[bundle].output)),
+                .pipe(gulp.dest(paths[bundle].output))
+                .pipe(gulp.dest(paths.demo.output)),
         );
     },
 };

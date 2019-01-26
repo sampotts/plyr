@@ -12676,7 +12676,7 @@ typeof navigator === "object" && (function () {
 	      var player = new Plyr(selector, {
 	        debug: true,
 	        title: 'View From A Blue Moon',
-	        iconUrl: '../dist/plyr.svg',
+	        iconUrl: 'dist/plyr.svg',
 	        keyboard: {
 	          global: true
 	        },

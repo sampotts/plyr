@@ -62,7 +62,7 @@ import Plyr from '../../../src/js/plyr';
             const player = new Plyr(selector, {
                 debug: true,
                 title: 'View From A Blue Moon',
-                iconUrl: '../dist/plyr.svg',
+                iconUrl: 'dist/plyr.svg',
                 keyboard: {
                     global: true,
                 },
