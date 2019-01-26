@@ -65,11 +65,6 @@
         width: 100%;
     }
 
-    .plyr__video-embed {
-        // Revert overflow change
-        overflow: visible;
-    }
-
     // Vimeo requires some different styling
     &.plyr--vimeo .plyr__video-wrapper {
         height: 0;
