@@ -75,10 +75,8 @@ import Raven from 'raven-js';
                     google: 'AIzaSyDrNwtN3nLH_8rjCmu5Wq3ZCm4MNAVdc0c',
                 },
                 ads: {
-                    enabled: true, // env.prod || env.dev,
+                    enabled: env.prod || env.dev,
                     publisherId: '918848828995742',
-                    tagUrl:
-                        'https://pubads.g.doubleclick.net/gampad/live/ads?sz=640x360&iu=/21736521837/ovo/web&impl=s&gdfp_req=1&env=vp&output=vast&cust_params=usergroup%3Dannon%26content-type%3Don-demand&cmsid=2490180&vid=3788',
                 },
                 previewThumbnails: {
                     enabled: true,
