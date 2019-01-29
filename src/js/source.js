@@ -125,9 +125,14 @@ const source = {
                     ui.build.call(this);
                 }
 
+                // Load HTML5 sources
                 if (this.isHTML5) {
-                    // Load HTML5 sources
                     this.media.load();
+                }
+
+                // Reload thumbnails
+                if (this.previewThumbnails) {
+                    this.previewThumbnails.load();
                 }
 
                 // Update the fullscreen support

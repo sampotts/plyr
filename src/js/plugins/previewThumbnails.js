@@ -1,5 +1,5 @@
 import { createElement } from '../utils/elements';
-import { on, once } from '../utils/events';
+import { once } from '../utils/events';
 import fetch from '../utils/fetch';
 import is from '../utils/is';
 import { formatTime } from '../utils/time';
@@ -72,7 +72,8 @@ class PreviewThumbnails {
     constructor(player) {
         this.player = player;
         this.thumbnails = [];
-        this.lastMousemoveEventTime = Date.now();
+        this.loaded = false;
+        this.lastMouseMoveTime = Date.now();
         this.mouseDown = false;
         this.loadedImages = [];
 
@@ -81,9 +82,7 @@ class PreviewThumbnails {
             scrubbing: {},
         };
 
-        if (this.enabled) {
-            this.load();
-        }
+        this.load();
     }
 
     get enabled() {
@@ -91,18 +90,23 @@ class PreviewThumbnails {
     }
 
     load() {
-        // Turn off the regular seek tooltip
-        this.player.config.tooltips.seek = false;
+        // Togglethe regular seek tooltip
+        if (this.player.elements.display.seekTooltip) {
+            this.player.elements.display.seekTooltip.hidden = this.enabled;
+        }
+
+        if (!this.enabled) {
+            return;
+        }
 
         this.getThumbnails().then(() => {
-            // Initiate DOM listeners so that our preview thumbnails can be used
-            this.listeners();
-
             // Render DOM elements
             this.render();
 
             // Check to see if thumb container size was specified manually in CSS
             this.determineContainerAutoSizing();
+
+            this.loaded = true;
         });
     }
 
@@ -165,96 +169,101 @@ class PreviewThumbnails {
         });
     }
 
+    startMove(event) {
+        if (!this.loaded) {
+            return;
+        }
+
+        if (!is.event(event) || !['touchmove', 'mousemove'].includes(event.type)) {
+            return;
+        }
+
+        // Wait until media has a duration
+        if (!this.player.media.duration) {
+            return;
+        }
+
+        if (event.type === 'touchmove') {
+            // Calculate seek hover position as approx video seconds
+            this.seekTime = this.player.media.duration * (this.player.elements.inputs.seek.value / 100);
+        } else {
+            // Calculate seek hover position as approx video seconds
+            const clientRect = this.player.elements.progress.getBoundingClientRect();
+            const percentage = (100 / clientRect.width) * (event.pageX - clientRect.left);
+            this.seekTime = this.player.media.duration * (percentage / 100);
+
+            if (this.seekTime < 0) {
+                // The mousemove fires for 10+px out to the left
+                this.seekTime = 0;
+            }
+
+            if (this.seekTime > this.player.media.duration - 1) {
+                // Took 1 second off the duration for safety, because different players can disagree on the real duration of a video
+                this.seekTime = this.player.media.duration - 1;
+            }
+
+            this.mousePosX = event.pageX;
+
+            // Set time text inside image container
+            this.elements.thumb.time.innerText = formatTime(this.seekTime);
+        }
+
+        // Download and show image
+        this.showImageAtCurrentTime();
+    }
+
+    endMove() {
+        this.toggleThumbContainer(false, true);
+    }
+
+    startScrubbing(event) {
+        // Only act on left mouse button (0), or touch device (event.button is false)
+        if (event.button === false || event.button === 0) {
+            this.mouseDown = true;
+            // Wait until media has a duration
+            if (this.player.media.duration) {
+                this.toggleScrubbingContainer(true);
+                this.toggleThumbContainer(false, true);
+
+                // Download and show image
+                this.showImageAtCurrentTime();
+            }
+        }
+    }
+
+    finishScrubbing() {
+        this.mouseDown = false;
+
+        // Hide scrubbing preview. But wait until the video has successfully seeked before hiding the scrubbing preview
+        if (Math.ceil(this.lastTime) === Math.ceil(this.player.media.currentTime)) {
+            // The video was already seeked/loaded at the chosen time - hide immediately
+            this.toggleScrubbingContainer(false);
+        } else {
+            // The video hasn't seeked yet. Wait for that
+            once.call(this.player, this.player.media, 'timeupdate', () => {
+                // Re-check mousedown - we might have already started scrubbing again
+                if (!this.mouseDown) {
+                    this.toggleScrubbingContainer(false);
+                }
+            });
+        }
+    }
+
     /**
      * Setup hooks for Plyr and window events
      */
     listeners() {
-        // Mouse hover over seek bar
-        on.call(this.player, this.player.elements.progress, 'mousemove', event => {
-            // Wait until media has a duration
-            if (this.player.media.duration) {
-                // Calculate seek hover position as approx video seconds
-                const clientRect = this.player.elements.progress.getBoundingClientRect();
-                const percentage = (100 / clientRect.width) * (event.pageX - clientRect.left);
-                this.seekTime = this.player.media.duration * (percentage / 100);
-
-                if (this.seekTime < 0) {
-                    // The mousemove fires for 10+px out to the left
-                    this.seekTime = 0;
-                }
-
-                if (this.seekTime > this.player.media.duration - 1) {
-                    // Took 1 second off the duration for safety, because different players can disagree on the real duration of a video
-                    this.seekTime = this.player.media.duration - 1;
-                }
-
-                this.mousePosX = event.pageX;
-
-                // Set time text inside image container
-                this.elements.thumb.time.innerText = formatTime(this.seekTime);
-
-                // Download and show image
-                this.showImageAtCurrentTime();
-            }
-        });
-
-        // Touch device seeking - performs same function as above
-        on.call(this.player, this.player.elements.progress, 'touchmove', () => {
-            // Wait until media has a duration
-            if (this.player.media.duration) {
-                // Calculate seek hover position as approx video seconds
-                this.seekTime = this.player.media.duration * (this.player.elements.inputs.seek.value / 100);
-
-                // Download and show image
-                this.showImageAtCurrentTime();
-            }
-        });
-
-        // Hide thumbnail preview - on mouse click, mouse leave, and video play/seek. All four are required, e.g., for buffering
-        on.call(this.player, this.player.elements.progress, 'mouseleave click', () => {
-            this.toggleThumbContainer(false, true);
-        });
+        // Hide thumbnail preview - on mouse click, mouse leave (in listeners.js for now), and video play/seek. All four are required, e.g., for buffering
         this.player.on('play', () => {
             this.toggleThumbContainer(false, true);
         });
+
         this.player.on('seeked', () => {
             this.toggleThumbContainer(false);
         });
 
-        // Show scrubbing preview
-        on.call(this.player, this.player.elements.progress, 'mousedown touchstart', event => {
-            // Only act on left mouse button (0), or touch device (event.button is false)
-            if (event.button === false || event.button === 0) {
-                this.mouseDown = true;
-                // Wait until media has a duration
-                if (this.player.media.duration) {
-                    this.toggleScrubbingContainer(true);
-                    this.toggleThumbContainer(false, true);
-
-                    // Download and show image
-                    this.showImageAtCurrentTime();
-                }
-            }
-        });
-        on.call(this.player, this.player.media, 'timeupdate', () => {
-            this.timeAtLastTimeupdate = this.player.media.currentTime;
-        });
-        on.call(this.player, this.player.elements.progress, 'mouseup touchend', () => {
-            this.mouseDown = false;
-
-            // Hide scrubbing preview. But wait until the video has successfully seeked before hiding the scrubbing preview
-            if (Math.ceil(this.timeAtLastTimeupdate) === Math.ceil(this.player.media.currentTime)) {
-                // The video was already seeked/loaded at the chosen time - hide immediately
-                this.toggleScrubbingContainer(false);
-            } else {
-                // The video hasn't seeked yet. Wait for that
-                once.call(this.player, this.player.media, 'timeupdate', () => {
-                    // Re-check mousedown - we might have already started scrubbing again
-                    if (!this.mouseDown) {
-                        this.toggleScrubbingContainer(false);
-                    }
-                });
-            }
+        this.player.on('timeupdate', () => {
+            this.lastTime = this.player.media.currentTime;
         });
     }
 

@@ -7857,6 +7857,38 @@ function () {
 
       this.bind(elements.progress, 'mouseenter mouseleave mousemove', function (event) {
         return controls.updateSeekTooltip.call(player, event);
+      }); // Preview thumbnails plugin
+      // TODO: Really need to work on some sort of plug-in wide event bus or pub-sub for this
+
+      this.bind(elements.progress, 'mousemove touchmove', function (event) {
+        var previewThumbnails = player.previewThumbnails;
+
+        if (previewThumbnails && previewThumbnails.loaded) {
+          previewThumbnails.startMove(event);
+        }
+      }); // Hide thumbnail preview - on mouse click, mouse leave, and video play/seek. All four are required, e.g., for buffering
+
+      this.bind(elements.progress, 'mouseleave click', function () {
+        var previewThumbnails = player.previewThumbnails;
+
+        if (previewThumbnails && previewThumbnails.loaded) {
+          previewThumbnails.endMove(false, true);
+        }
+      }); // Show scrubbing preview
+
+      this.bind(elements.progress, 'mousedown touchstart', function (event) {
+        var previewThumbnails = player.previewThumbnails;
+
+        if (previewThumbnails && previewThumbnails.loaded) {
+          previewThumbnails.startScrubbing(event);
+        }
+      });
+      this.bind(elements.progress, 'mouseup touchend', function (event) {
+        var previewThumbnails = player.previewThumbnails;
+
+        if (previewThumbnails && previewThumbnails.loaded) {
+          previewThumbnails.endScrubbing(event);
+        }
       }); // Polyfill for lower fill in <input type="range"> for webkit
 
       if (browser.isWebkit) {
@@ -9776,17 +9808,15 @@ function () {
 
     this.player = player;
     this.thumbnails = [];
-    this.lastMousemoveEventTime = Date.now();
+    this.loaded = false;
+    this.lastMouseMoveTime = Date.now();
     this.mouseDown = false;
     this.loadedImages = [];
     this.elements = {
       thumb: {},
       scrubbing: {}
     };
-
-    if (this.enabled) {
-      this.load();
-    }
+    this.load();
   }
 
   _createClass(PreviewThumbnails, [{
@@ -9794,17 +9824,23 @@ function () {
     value: function load() {
       var _this = this;
 
-      // Turn off the regular seek tooltip
-      this.player.config.tooltips.seek = false;
+      // Togglethe regular seek tooltip
+      if (this.player.elements.display.seekTooltip) {
+        this.player.elements.display.seekTooltip.hidden = this.enabled;
+      }
+
+      if (!this.enabled) {
+        return;
+      }
+
       this.getThumbnails().then(function () {
-        // Initiate DOM listeners so that our preview thumbnails can be used
-        _this.listeners(); // Render DOM elements
-
-
+        // Render DOM elements
         _this.render(); // Check to see if thumb container size was specified manually in CSS
 
 
         _this.determineContainerAutoSizing();
+
+        _this.loaded = true;
       });
     } // Download VTT files and parse them
 
@@ -9873,6 +9909,89 @@ function () {
         });
       });
     }
+  }, {
+    key: "startMove",
+    value: function startMove(event) {
+      if (!this.loaded) {
+        return;
+      }
+
+      if (!is$1.event(event) || !['touchmove', 'mousemove'].includes(event.type)) {
+        return;
+      } // Wait until media has a duration
+
+
+      if (!this.player.media.duration) {
+        return;
+      }
+
+      if (event.type === 'touchmove') {
+        // Calculate seek hover position as approx video seconds
+        this.seekTime = this.player.media.duration * (this.player.elements.inputs.seek.value / 100);
+      } else {
+        // Calculate seek hover position as approx video seconds
+        var clientRect = this.player.elements.progress.getBoundingClientRect();
+        var percentage = 100 / clientRect.width * (event.pageX - clientRect.left);
+        this.seekTime = this.player.media.duration * (percentage / 100);
+
+        if (this.seekTime < 0) {
+          // The mousemove fires for 10+px out to the left
+          this.seekTime = 0;
+        }
+
+        if (this.seekTime > this.player.media.duration - 1) {
+          // Took 1 second off the duration for safety, because different players can disagree on the real duration of a video
+          this.seekTime = this.player.media.duration - 1;
+        }
+
+        this.mousePosX = event.pageX; // Set time text inside image container
+
+        this.elements.thumb.time.innerText = formatTime(this.seekTime);
+      } // Download and show image
+
+
+      this.showImageAtCurrentTime();
+    }
+  }, {
+    key: "endMove",
+    value: function endMove() {
+      this.toggleThumbContainer(false, true);
+    }
+  }, {
+    key: "startScrubbing",
+    value: function startScrubbing(event) {
+      // Only act on left mouse button (0), or touch device (event.button is false)
+      if (event.button === false || event.button === 0) {
+        this.mouseDown = true; // Wait until media has a duration
+
+        if (this.player.media.duration) {
+          this.toggleScrubbingContainer(true);
+          this.toggleThumbContainer(false, true); // Download and show image
+
+          this.showImageAtCurrentTime();
+        }
+      }
+    }
+  }, {
+    key: "finishScrubbing",
+    value: function finishScrubbing() {
+      var _this4 = this;
+
+      this.mouseDown = false; // Hide scrubbing preview. But wait until the video has successfully seeked before hiding the scrubbing preview
+
+      if (Math.ceil(this.lastTime) === Math.ceil(this.player.media.currentTime)) {
+        // The video was already seeked/loaded at the chosen time - hide immediately
+        this.toggleScrubbingContainer(false);
+      } else {
+        // The video hasn't seeked yet. Wait for that
+        once.call(this.player, this.player.media, 'timeupdate', function () {
+          // Re-check mousedown - we might have already started scrubbing again
+          if (!_this4.mouseDown) {
+            _this4.toggleScrubbingContainer(false);
+          }
+        });
+      }
+    }
     /**
      * Setup hooks for Plyr and window events
      */
@@ -9880,89 +9999,17 @@ function () {
   }, {
     key: "listeners",
     value: function listeners() {
-      var _this4 = this;
+      var _this5 = this;
 
-      // Mouse hover over seek bar
-      on.call(this.player, this.player.elements.progress, 'mousemove', function (event) {
-        // Wait until media has a duration
-        if (_this4.player.media.duration) {
-          // Calculate seek hover position as approx video seconds
-          var clientRect = _this4.player.elements.progress.getBoundingClientRect();
-
-          var percentage = 100 / clientRect.width * (event.pageX - clientRect.left);
-          _this4.seekTime = _this4.player.media.duration * (percentage / 100);
-
-          if (_this4.seekTime < 0) {
-            // The mousemove fires for 10+px out to the left
-            _this4.seekTime = 0;
-          }
-
-          if (_this4.seekTime > _this4.player.media.duration - 1) {
-            // Took 1 second off the duration for safety, because different players can disagree on the real duration of a video
-            _this4.seekTime = _this4.player.media.duration - 1;
-          }
-
-          _this4.mousePosX = event.pageX; // Set time text inside image container
-
-          _this4.elements.thumb.time.innerText = formatTime(_this4.seekTime); // Download and show image
-
-          _this4.showImageAtCurrentTime();
-        }
-      }); // Touch device seeking - performs same function as above
-
-      on.call(this.player, this.player.elements.progress, 'touchmove', function () {
-        // Wait until media has a duration
-        if (_this4.player.media.duration) {
-          // Calculate seek hover position as approx video seconds
-          _this4.seekTime = _this4.player.media.duration * (_this4.player.elements.inputs.seek.value / 100); // Download and show image
-
-          _this4.showImageAtCurrentTime();
-        }
-      }); // Hide thumbnail preview - on mouse click, mouse leave, and video play/seek. All four are required, e.g., for buffering
-
-      on.call(this.player, this.player.elements.progress, 'mouseleave click', function () {
-        _this4.toggleThumbContainer(false, true);
-      });
+      // Hide thumbnail preview - on mouse click, mouse leave (in listeners.js for now), and video play/seek. All four are required, e.g., for buffering
       this.player.on('play', function () {
-        _this4.toggleThumbContainer(false, true);
+        _this5.toggleThumbContainer(false, true);
       });
       this.player.on('seeked', function () {
-        _this4.toggleThumbContainer(false);
-      }); // Show scrubbing preview
-
-      on.call(this.player, this.player.elements.progress, 'mousedown touchstart', function (event) {
-        // Only act on left mouse button (0), or touch device (event.button is false)
-        if (event.button === false || event.button === 0) {
-          _this4.mouseDown = true; // Wait until media has a duration
-
-          if (_this4.player.media.duration) {
-            _this4.toggleScrubbingContainer(true);
-
-            _this4.toggleThumbContainer(false, true); // Download and show image
-
-
-            _this4.showImageAtCurrentTime();
-          }
-        }
+        _this5.toggleThumbContainer(false);
       });
-      on.call(this.player, this.player.media, 'timeupdate', function () {
-        _this4.timeAtLastTimeupdate = _this4.player.media.currentTime;
-      });
-      on.call(this.player, this.player.elements.progress, 'mouseup touchend', function () {
-        _this4.mouseDown = false; // Hide scrubbing preview. But wait until the video has successfully seeked before hiding the scrubbing preview
-
-        if (Math.ceil(_this4.timeAtLastTimeupdate) === Math.ceil(_this4.player.media.currentTime)) {
-          // The video was already seeked/loaded at the chosen time - hide immediately
-          _this4.toggleScrubbingContainer(false);
-        } else {
-          // The video hasn't seeked yet. Wait for that
-          once.call(_this4.player, _this4.player.media, 'timeupdate', function () {
-            // Re-check mousedown - we might have already started scrubbing again
-            if (!_this4.mouseDown) {
-              _this4.toggleScrubbingContainer(false);
-            }
-          });
-        }
+      this.player.on('timeupdate', function () {
+        _this5.lastTime = _this5.player.media.currentTime;
       });
     }
     /**
@@ -9999,7 +10046,7 @@ function () {
   }, {
     key: "showImageAtCurrentTime",
     value: function showImageAtCurrentTime() {
-      var _this5 = this;
+      var _this6 = this;
 
       if (this.mouseDown) {
         this.setScrubbingContainerSize();
@@ -10011,7 +10058,7 @@ function () {
 
 
       var thumbNum = this.thumbnails[0].frames.findIndex(function (frame) {
-        return _this5.seekTime >= frame.startTime && _this5.seekTime <= frame.endTime;
+        return _this6.seekTime >= frame.startTime && _this6.seekTime <= frame.endTime;
       });
       var hasThumb = thumbNum >= 0;
       var qualityIndex = 0;
@@ -10023,7 +10070,7 @@ function () {
 
 
       this.thumbnails.forEach(function (thumbnail, index) {
-        if (_this5.loadedImages.includes(thumbnail.frames[thumbNum].text)) {
+        if (_this6.loadedImages.includes(thumbnail.frames[thumbNum].text)) {
           qualityIndex = index;
         }
       }); // Only proceed if either thumbnum or thumbfilename has changed
@@ -10037,7 +10084,7 @@ function () {
   }, {
     key: "loadImage",
     value: function loadImage() {
-      var _this6 = this;
+      var _this7 = this;
 
       var qualityIndex = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
       var thumbNum = this.showingThumb;
@@ -10065,7 +10112,7 @@ function () {
         this.player.debug.log("Loading image: ".concat(thumbUrl)); // For some reason, passing the named function directly causes it to execute immediately. So I've wrapped it in an anonymous function...
 
         previewImage.onload = function () {
-          return _this6.showImage(previewImage, frame, qualityIndex, thumbNum, thumbFilename, true);
+          return _this7.showImage(previewImage, frame, qualityIndex, thumbNum, thumbFilename, true);
         };
 
         this.loadingImage = previewImage;
@@ -10102,7 +10149,7 @@ function () {
   }, {
     key: "removeOldImages",
     value: function removeOldImages(currentImage) {
-      var _this7 = this;
+      var _this8 = this;
 
       // Get a list of all images, convert it from a DOM list to an array
       Array.from(this.currentImageContainer.children).forEach(function (image) {
@@ -10110,18 +10157,18 @@ function () {
           return;
         }
 
-        var removeDelay = _this7.usingSprites ? 500 : 1000;
+        var removeDelay = _this8.usingSprites ? 500 : 1000;
 
         if (image.dataset.index !== currentImage.dataset.index && !image.dataset.deleting) {
           // Wait 200ms, as the new image can take some time to show on certain browsers (even though it was downloaded before showing). This will prevent flicker, and show some generosity towards slower clients
           // First set attribute 'deleting' to prevent multi-handling of this on repeat firing of this function
           image.dataset.deleting = true; // This has to be set before the timeout - to prevent issues switching between hover and scrub
 
-          var currentImageContainer = _this7.currentImageContainer;
+          var currentImageContainer = _this8.currentImageContainer;
           setTimeout(function () {
             currentImageContainer.removeChild(image);
 
-            _this7.player.debug.log("Removing thumb: ".concat(image.dataset.filename));
+            _this8.player.debug.log("Removing thumb: ".concat(image.dataset.filename));
           }, removeDelay);
         }
       });
@@ -10131,21 +10178,21 @@ function () {
   }, {
     key: "preloadNearby",
     value: function preloadNearby(thumbNum) {
-      var _this8 = this;
+      var _this9 = this;
 
       var forward = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
       return new Promise(function (resolve) {
         setTimeout(function () {
-          var oldThumbFilename = _this8.thumbnails[0].frames[thumbNum].text;
+          var oldThumbFilename = _this9.thumbnails[0].frames[thumbNum].text;
 
-          if (_this8.showingThumbFilename === oldThumbFilename) {
+          if (_this9.showingThumbFilename === oldThumbFilename) {
             // Find the nearest thumbs with different filenames. Sometimes it'll be the next index, but in the case of sprites, it might be 100+ away
             var thumbnailsClone;
 
             if (forward) {
-              thumbnailsClone = _this8.thumbnails[0].frames.slice(thumbNum);
+              thumbnailsClone = _this9.thumbnails[0].frames.slice(thumbNum);
             } else {
-              thumbnailsClone = _this8.thumbnails[0].frames.slice(0, thumbNum).reverse();
+              thumbnailsClone = _this9.thumbnails[0].frames.slice(0, thumbNum).reverse();
             }
 
             var foundOne = false;
@@ -10154,20 +10201,20 @@ function () {
 
               if (newThumbFilename !== oldThumbFilename) {
                 // Found one with a different filename. Make sure it hasn't already been loaded on this page visit
-                if (!_this8.loadedImages.includes(newThumbFilename)) {
+                if (!_this9.loadedImages.includes(newThumbFilename)) {
                   foundOne = true;
 
-                  _this8.player.debug.log("Preloading thumb filename: ".concat(newThumbFilename));
+                  _this9.player.debug.log("Preloading thumb filename: ".concat(newThumbFilename));
 
-                  var urlPrefix = _this8.thumbnails[0].urlPrefix;
+                  var urlPrefix = _this9.thumbnails[0].urlPrefix;
                   var thumbURL = urlPrefix + newThumbFilename;
                   var previewImage = new Image();
                   previewImage.src = thumbURL;
 
                   previewImage.onload = function () {
-                    _this8.player.debug.log("Preloaded thumb filename: ".concat(newThumbFilename));
+                    _this9.player.debug.log("Preloaded thumb filename: ".concat(newThumbFilename));
 
-                    if (!_this8.loadedImages.includes(newThumbFilename)) _this8.loadedImages.push(newThumbFilename); // We don't resolve until the thumb is loaded
+                    if (!_this9.loadedImages.includes(newThumbFilename)) _this9.loadedImages.push(newThumbFilename); // We don't resolve until the thumb is loaded
 
                     resolve();
                   };
@@ -10186,7 +10233,7 @@ function () {
   }, {
     key: "getHigherQuality",
     value: function getHigherQuality(currentQualityIndex, previewImage, frame, thumbFilename) {
-      var _this9 = this;
+      var _this10 = this;
 
       if (currentQualityIndex < this.thumbnails.length - 1) {
         // Only use the higher quality version if it's going to look any better - if the current thumb is of a lower pixel density than the thumbnail container
@@ -10200,10 +10247,10 @@ function () {
           // Recurse back to the loadImage function - show a higher quality one, but only if the viewer is on this frame for a while
           setTimeout(function () {
             // Make sure the mouse hasn't already moved on and started hovering at another image
-            if (_this9.showingThumbFilename === thumbFilename) {
-              _this9.player.debug.log("Showing higher quality thumb for: ".concat(thumbFilename));
+            if (_this10.showingThumbFilename === thumbFilename) {
+              _this10.player.debug.log("Showing higher quality thumb for: ".concat(thumbFilename));
 
-              _this9.loadImage(currentQualityIndex + 1);
+              _this10.loadImage(currentQualityIndex + 1);
             }
           }, 300);
         }
@@ -10477,11 +10524,16 @@ var source = {
       if (_this2.isHTML5 || _this2.isEmbed && !_this2.supported.ui) {
         // Setup interface
         ui.build.call(_this2);
-      }
+      } // Load HTML5 sources
+
 
       if (_this2.isHTML5) {
-        // Load HTML5 sources
         _this2.media.load();
+      } // Reload thumbnails
+
+
+      if (_this2.previewThumbnails) {
+        _this2.previewThumbnails.load();
       } // Update the fullscreen support
 
 

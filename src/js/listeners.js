@@ -740,6 +740,42 @@ class Listeners {
             controls.updateSeekTooltip.call(player, event),
         );
 
+        // Preview thumbnails plugin
+        // TODO: Really need to work on some sort of plug-in wide event bus or pub-sub for this
+        this.bind(elements.progress, 'mousemove touchmove', event => {
+            const { previewThumbnails } = player;
+
+            if (previewThumbnails && previewThumbnails.loaded) {
+                previewThumbnails.startMove(event);
+            }
+        });
+
+        // Hide thumbnail preview - on mouse click, mouse leave, and video play/seek. All four are required, e.g., for buffering
+        this.bind(elements.progress, 'mouseleave click', () => {
+            const { previewThumbnails } = player;
+
+            if (previewThumbnails && previewThumbnails.loaded) {
+                previewThumbnails.endMove(false, true);
+            }
+        });
+
+        // Show scrubbing preview
+        this.bind(elements.progress, 'mousedown touchstart', event => {
+            const { previewThumbnails } = player;
+
+            if (previewThumbnails && previewThumbnails.loaded) {
+                previewThumbnails.startScrubbing(event);
+            }
+        });
+
+        this.bind(elements.progress, 'mouseup touchend', event => {
+            const { previewThumbnails } = player;
+
+            if (previewThumbnails && previewThumbnails.loaded) {
+                previewThumbnails.endScrubbing(event);
+            }
+        });
+
         // Polyfill for lower fill in <input type="range"> for webkit
         if (browser.isWebkit) {
             Array.from(getElements.call(player, 'input[type="range"]')).forEach(element => {
