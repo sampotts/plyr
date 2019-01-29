@@ -246,7 +246,7 @@ if (Object.keys(credentials).includes('aws') && Object.keys(credentials).include
     const branch = {
         current: gitbranch.sync(),
         master: 'master',
-        develop: 'develop',
+        beta: 'beta',
     };
 
     const maxAge = 31536000; // 1 year
@@ -258,7 +258,7 @@ if (Object.keys(credentials).includes('aws') && Object.keys(credentials).include
             },
         },
         demo: {
-            uploadPath: branch.current === branch.develop ? 'beta/' : null,
+            uploadPath: branch.current === branch.beta ? 'beta/' : null,
             headers: {
                 'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
                 Vary: 'Accept-Encoding',
@@ -289,7 +289,7 @@ if (Object.keys(credentials).includes('aws') && Object.keys(credentials).include
 
     // Check we're on the correct branch to deploy
     const canDeploy = () => {
-        const allowed = [branch.master, branch.develop];
+        const allowed = [branch.master, branch.beta];
 
         if (!allowed.includes(branch.current)) {
             console.error(`Must be on ${allowed.join(', ')} to publish! (current: ${branch.current})`);
