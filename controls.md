@@ -2,9 +2,11 @@
 
 This is the markup that is rendered for the Plyr controls. You can use the default controls or provide a customized version of markup based on your needs. You can pass the following to the `controls` option:
 
-*   `Array` of options (this builds the default controls based on your choices)
-*   `String` containing the desired HTML
-*   `Function` that will be executed and should return one of the above
+-   `Array` of options (this builds the default controls based on your choices)
+-   `Element` with the controls
+-   `String` containing the desired HTML
+-   `false` (or empty string or array) to disable all controls
+-   `Function` that will be executed and should return one of the above
 
 ## Using default controls
 
@@ -26,6 +28,7 @@ controls: [
     'settings', // Settings menu
     'pip', // Picture-in-picture (currently Safari only)
     'airplay', // Airplay (currently Safari only)
+    'download', // Show a download button with a link to either the current source or a custom URL you specify in your options
     'fullscreen', // Toggle fullscreen
 ];
 ```
@@ -81,14 +84,14 @@ The classes and data attributes used in your template should match the `selector
 
 You need to add several placeholders to your HTML template that are replaced when rendering:
 
-*   `{id}` - the dynamically generated ID for the player (for form controls)
-*   `{seektime}` - the seek time specified in options for fast forward and rewind
-*   `{title}` - the title of your media, if specified
+-   `{id}` - the dynamically generated ID for the player (for form controls)
+-   `{seektime}` - the seek time specified in options for fast forward and rewind
+-   `{title}` - the title of your media, if specified
 
 ### Limitations
 
-*   Currently the settings menus are not supported with custom controls HTML
-*   AirPlay and PiP buttons can be added but you will have to manage feature detection
+-   Currently the settings menus are not supported with custom controls HTML
+-   AirPlay and PiP buttons can be added but you will have to manage feature detection
 
 ### Example
 
@@ -105,7 +108,7 @@ const controls = `
         <svg role="presentation"><use xlink:href="#plyr-rewind"></use></svg>
         <span class="plyr__tooltip" role="tooltip">Rewind {seektime} secs</span>
     </button>
-    <button type="button" class="plyr__control" aria-pressed="false" aria-label="Play, {title}" data-plyr="play">
+    <button type="button" class="plyr__control" aria-label="Play, {title}" data-plyr="play">
         <svg class="icon--pressed" role="presentation"><use xlink:href="#plyr-pause"></use></svg>
         <svg class="icon--not-pressed" role="presentation"><use xlink:href="#plyr-play"></use></svg>
         <span class="label--pressed plyr__tooltip" role="tooltip">Pause</span>
@@ -116,30 +119,28 @@ const controls = `
         <span class="plyr__tooltip" role="tooltip">Forward {seektime} secs</span>
     </button>
     <div class="plyr__progress">
-        <label for="plyr-seek-{id}" class="plyr__sr-only">Seek</label>
-        <input data-plyr="seek" type="range" min="0" max="100" step="0.01" value="0" id="plyr-seek-{id}">
-        <progress class="plyr__progress--buffer" min="0" max="100" value="0">% buffered</progress>
+        <input data-plyr="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek">
+        <progress class="plyr__progress__buffer" min="0" max="100" value="0">% buffered</progress>
         <span role="tooltip" class="plyr__tooltip">00:00</span>
     </div>
     <div class="plyr__time plyr__time--current" aria-label="Current time">00:00</div>
     <div class="plyr__time plyr__time--duration" aria-label="Duration">00:00</div>
-    <button type="button" class="plyr__control" aria-pressed="false" aria-label="Mute" data-plyr="mute">
+    <button type="button" class="plyr__control" aria-label="Mute" data-plyr="mute">
         <svg class="icon--pressed" role="presentation"><use xlink:href="#plyr-muted"></use></svg>
         <svg class="icon--not-pressed" role="presentation"><use xlink:href="#plyr-volume"></use></svg>
         <span class="label--pressed plyr__tooltip" role="tooltip">Unmute</span>
         <span class="label--not-pressed plyr__tooltip" role="tooltip">Mute</span>
     </button>
     <div class="plyr__volume">
-        <label for="plyr-volume-{id}" class="plyr__sr-only">Volume</label>
-        <input data-plyr="volume" type="range" min="0" max="1" step="0.05" value="1" autocomplete="off" id="plyr-volume-{id}">
+        <input data-plyr="volume" type="range" min="0" max="1" step="0.05" value="1" autocomplete="off" aria-label="Volume">
     </div>
-    <button type="button" class="plyr__control" aria-pressed="true" aria-label="Enable captions" data-plyr="captions">
+    <button type="button" class="plyr__control" data-plyr="captions">
         <svg class="icon--pressed" role="presentation"><use xlink:href="#plyr-captions-on"></use></svg>
         <svg class="icon--not-pressed" role="presentation"><use xlink:href="#plyr-captions-off"></use></svg>
         <span class="label--pressed plyr__tooltip" role="tooltip">Disable captions</span>
         <span class="label--not-pressed plyr__tooltip" role="tooltip">Enable captions</span>
     </button>
-    <button type="button" class="plyr__control" aria-pressed="false" aria-label="Enter fullscreen" data-plyr="fullscreen">
+    <button type="button" class="plyr__control" data-plyr="fullscreen">
         <svg class="icon--pressed" role="presentation"><use xlink:href="#plyr-exit-fullscreen"></use></svg>
         <svg class="icon--not-pressed" role="presentation"><use xlink:href="#plyr-enter-fullscreen"></use></svg>
         <span class="label--pressed plyr__tooltip" role="tooltip">Exit fullscreen</span>

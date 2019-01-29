@@ -6,8 +6,13 @@
 
 /* global google */
 
-import i18n from '../i18n';
-import utils from '../utils';
+import { createElement } from '../utils/elements';
+import { triggerEvent } from '../utils/events';
+import i18n from '../utils/i18n';
+import is from '../utils/is';
+import loadScript from '../utils/loadScript';
+import { formatTime } from '../utils/time';
+import { buildUrlParams } from '../utils/urls';
 
 class Ads {
     /**
@@ -17,7 +22,7 @@ class Ads {
      */
     constructor(player) {
         this.player = player;
-        this.publisherId = player.config.ads.publisherId;
+        this.config = player.config.ads;
         this.playing = false;
         this.initialized = false;
         this.elements = {
@@ -44,7 +49,14 @@ class Ads {
     }
 
     get enabled() {
-        return this.player.isVideo && this.player.config.ads.enabled && !utils.is.empty(this.publisherId);
+        const { config } = this;
+
+        return (
+            this.player.isHTML5 &&
+            this.player.isVideo &&
+            config.enabled &&
+            (!is.empty(config.publisherId) || is.url(config.tagUrl))
+        );
     }
 
     /**
@@ -53,9 +65,8 @@ class Ads {
     load() {
         if (this.enabled) {
             // Check if the Google IMA3 SDK is loaded or load it ourselves
-            if (!utils.is.object(window.google) || !utils.is.object(window.google.ima)) {
-                utils
-                    .loadScript(this.player.config.urls.googleIMA.sdk)
+            if (!is.object(window.google) || !is.object(window.google.ima)) {
+                loadScript(this.player.config.urls.googleIMA.sdk)
                     .then(() => {
                         this.ready();
                     })
@@ -89,12 +100,18 @@ class Ads {
         this.setupIMA();
     }
 
-    // Build the default tag URL
+    // Build the tag URL
     get tagUrl() {
+        const { config } = this;
+
+        if (is.url(config.tagUrl)) {
+            return config.tagUrl;
+        }
+
         const params = {
             AV_PUBLISHERID: '58c25bb0073ef448b1087ad6',
             AV_CHANNELID: '5a0458dc28a06145e4519d21',
-            AV_URL: location.hostname,
+            AV_URL: window.location.hostname,
             cb: Date.now(),
             AV_WIDTH: 640,
             AV_HEIGHT: 480,
@@ -103,7 +120,7 @@ class Ads {
 
         const base = 'https://go.aniview.com/api/adserver6/vast/';
 
-        return `${base}?${utils.buildUrlParams(params)}`;
+        return `${base}?${buildUrlParams(params)}`;
     }
 
     /**
@@ -116,7 +133,7 @@ class Ads {
      */
     setupIMA() {
         // Create the container for our advertisements
-        this.elements.container = utils.createElement('div', {
+        this.elements.container = createElement('div', {
             class: this.player.config.classNames.ads,
         });
         this.player.elements.container.appendChild(this.elements.container);
@@ -146,7 +163,11 @@ class Ads {
             this.loader = new google.ima.AdsLoader(this.elements.displayContainer);
 
             // Listen and respond to ads loaded and error events
-            this.loader.addEventListener(google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED, event => this.onAdsManagerLoaded(event), false);
+            this.loader.addEventListener(
+                google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED,
+                event => this.onAdsManagerLoaded(event),
+                false,
+            );
             this.loader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, error => this.onAdError(error), false);
 
             // Request video ads
@@ -184,7 +205,7 @@ class Ads {
         }
 
         const update = () => {
-            const time = utils.formatTime(Math.max(this.manager.getRemainingTime(), 0));
+            const time = formatTime(Math.max(this.manager.getRemainingTime(), 0));
             const label = `${i18n.get('advertisement', this.player.config)} - ${time}`;
             this.elements.container.setAttribute('data-badge-text', label);
         };
@@ -197,6 +218,11 @@ class Ads {
      * @param {Event} adsManagerLoadedEvent
      */
     onAdsManagerLoaded(event) {
+        // Load could occur after a source change (race condition)
+        if (!this.enabled) {
+            return;
+        }
+
         // Get the ads manager
         const settings = new google.ima.AdsRenderingSettings();
 
@@ -212,14 +238,14 @@ class Ads {
         this.cuePoints = this.manager.getCuePoints();
 
         // Add advertisement cue's within the time line if available
-        if (!utils.is.empty(this.cuePoints)) {
+        if (!is.empty(this.cuePoints)) {
             this.cuePoints.forEach(cuePoint => {
                 if (cuePoint !== 0 && cuePoint !== -1 && cuePoint < this.player.duration) {
                     const seekElement = this.player.elements.progress;
 
-                    if (utils.is.element(seekElement)) {
-                        const cuePercentage = 100 / this.player.duration * cuePoint;
-                        const cue = utils.createElement('span', {
+                    if (is.element(seekElement)) {
+                        const cuePercentage = (100 / this.player.duration) * cuePoint;
+                        const cue = createElement('span', {
                             class: this.player.config.classNames.cues,
                         });
 
@@ -229,10 +255,6 @@ class Ads {
                 }
             });
         }
-
-        // Get skippable state
-        // TODO: Skip button
-        // this.player.debug.warn(this.manager.getAdSkippableState());
 
         // Set volume to match player
         this.manager.setVolume(this.player.volume);
@@ -262,11 +284,12 @@ class Ads {
         // Retrieve the ad from the event. Some events (e.g. ALL_ADS_COMPLETED)
         // don't have ad object associated
         const ad = event.getAd();
+        const adData = event.getAdData();
 
         // Proxy event
         const dispatchEvent = type => {
             const event = `ads${type.replace(/_/g, '').toLowerCase()}`;
-            utils.dispatchEvent.call(this.player, this.player.media, event);
+            triggerEvent.call(this.player, this.player.media, event);
         };
 
         switch (event.type) {
@@ -357,6 +380,12 @@ class Ads {
                 dispatchEvent(event.type);
                 break;
 
+            case google.ima.AdEvent.Type.LOG:
+                if (adData.adError) {
+                    this.player.debug.warn(`Non-fatal ad error: ${adData.adError.getMessage()}`);
+                }
+                break;
+
             default:
                 break;
         }
@@ -385,15 +414,14 @@ class Ads {
             this.loader.contentComplete();
         });
 
-        this.player.on('seeking', () => {
+        this.player.on('timeupdate', () => {
             time = this.player.currentTime;
-            return time;
         });
 
         this.player.on('seeked', () => {
             const seekedTime = this.player.currentTime;
 
-            if (utils.is.empty(this.cuePoints)) {
+            if (is.empty(this.cuePoints)) {
                 return;
             }
 
@@ -530,9 +558,9 @@ class Ads {
     trigger(event, ...args) {
         const handlers = this.events[event];
 
-        if (utils.is.array(handlers)) {
+        if (is.array(handlers)) {
             handlers.forEach(handler => {
-                if (utils.is.function(handler)) {
+                if (is.function(handler)) {
                     handler.apply(this, args);
                 }
             });
@@ -546,7 +574,7 @@ class Ads {
      * @return {Ads}
      */
     on(event, callback) {
-        if (!utils.is.array(this.events[event])) {
+        if (!is.array(this.events[event])) {
             this.events[event] = [];
         }
 
@@ -577,7 +605,7 @@ class Ads {
      * @param {string} from
      */
     clearSafetyTimer(from) {
-        if (!utils.is.nullOrUndefined(this.safetyTimer)) {
+        if (!is.nullOrUndefined(this.safetyTimer)) {
             this.player.debug.log(`Safety timer cleared from: ${from}`);
 
             clearTimeout(this.safetyTimer);

@@ -3,40 +3,37 @@
 // ==========================================================================
 
 import support from './support';
-import utils from './utils';
+import { removeElement } from './utils/elements';
+import { triggerEvent } from './utils/events';
+import is from './utils/is';
 
 const html5 = {
     getSources() {
         if (!this.isHTML5) {
-            return null;
+            return [];
         }
 
-        return this.media.querySelectorAll('source');
+        const sources = Array.from(this.media.querySelectorAll('source'));
+
+        // Filter out unsupported sources (if type is specified)
+        return sources.filter(source => {
+            const type = source.getAttribute('type');
+
+            if (is.empty(type)) {
+                return true;
+            }
+
+            return support.mime.call(this, type);
+        });
     },
 
     // Get quality levels
     getQualityOptions() {
-        if (!this.isHTML5) {
-            return null;
-        }
-
-        // Get sources
-        const sources = html5.getSources.call(this);
-
-        if (utils.is.empty(sources)) {
-            return null;
-        }
-
-        // Get <source> with size attribute
-        const sizes = Array.from(sources).filter(source => !utils.is.empty(source.getAttribute('size')));
-
-        // If none, bail
-        if (utils.is.empty(sizes)) {
-            return null;
-        }
-
-        // Reduce to unique list
-        return utils.dedupe(sizes.map(source => Number(source.getAttribute('size'))));
+        // Get sizes from <source> elements
+        return html5.getSources
+            .call(this)
+            .map(source => Number(source.getAttribute('size')))
+            .filter(Boolean);
     },
 
     extend() {
@@ -51,67 +48,47 @@ const html5 = {
             get() {
                 // Get sources
                 const sources = html5.getSources.call(player);
+                const source = sources.find(source => source.getAttribute('src') === player.source);
 
-                if (utils.is.empty(sources)) {
-                    return null;
-                }
-
-                const matches = Array.from(sources).filter(source => source.getAttribute('src') === player.source);
-
-                if (utils.is.empty(matches)) {
-                    return null;
-                }
-
-                return Number(matches[0].getAttribute('size'));
+                // Return size, if match is found
+                return source && Number(source.getAttribute('size'));
             },
             set(input) {
                 // Get sources
                 const sources = html5.getSources.call(player);
 
-                if (utils.is.empty(sources)) {
+                // Get first match for requested size
+                const source = sources.find(source => Number(source.getAttribute('size')) === input);
+
+                // No matching source found
+                if (!source) {
                     return;
                 }
-
-                // Get matches for requested size
-                const matches = Array.from(sources).filter(source => Number(source.getAttribute('size')) === input);
-
-                // No matches for requested size
-                if (utils.is.empty(matches)) {
-                    return;
-                }
-
-                // Get supported sources
-                const supported = matches.filter(source => support.mime.call(player, source.getAttribute('type')));
-
-                // No supported sources
-                if (utils.is.empty(supported)) {
-                    return;
-                }
-
-                // Trigger change event
-                utils.dispatchEvent.call(player, player.media, 'qualityrequested', false, {
-                    quality: input,
-                });
 
                 // Get current state
-                const { currentTime, playing } = player;
+                const { currentTime, paused, preload, readyState } = player.media;
 
                 // Set new source
-                player.media.src = supported[0].getAttribute('src');
+                player.media.src = source.getAttribute('src');
 
-                // Load new source
-                player.media.load();
+                // Prevent loading if preload="none" and the current source isn't loaded (#1044)
+                if (preload !== 'none' || readyState) {
+                    // Restore time
+                    player.once('loadedmetadata', () => {
+                        player.currentTime = currentTime;
 
-                // Resume playing
-                if (playing) {
-                    player.play();
+                        // Resume playing
+                        if (!paused) {
+                            player.play();
+                        }
+                    });
+
+                    // Load new source
+                    player.media.load();
                 }
 
-                // Restore time
-                player.currentTime = currentTime;
-
                 // Trigger change event
-                utils.dispatchEvent.call(player, player.media, 'qualitychange', false, {
+                triggerEvent.call(player, player.media, 'qualitychange', false, {
                     quality: input,
                 });
             },
@@ -126,7 +103,7 @@ const html5 = {
         }
 
         // Remove child sources
-        utils.removeElement(html5.getSources());
+        removeElement(html5.getSources.call(this));
 
         // Set blank video src attribute
         // This is to prevent a MEDIA_ERR_SRC_NOT_SUPPORTED error

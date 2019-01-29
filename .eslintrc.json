@@ -5,8 +5,12 @@
         "browser": true,
         "es6": true
     },
-    "globals": { "Plyr": false, "jQuery": false },
+    "globals": {
+        "Plyr": false,
+        "jQuery": false
+    },
     "rules": {
+        "import/no-cycle": 1,
         "no-const-assign": 1,
         "no-shadow": 0,
         "no-this-before-super": 1,
@@ -21,19 +25,9 @@
         "eqeqeq": [2, "always"],
         "one-var": [2, "never"],
         "comma-dangle": [2, "always-multiline"],
-        "no-restricted-globals": [
-            "error",
-            {
-                "name": "event",
-                "message": "Use local parameter instead."
-            },
-            {
-                "name": "error",
-                "message": "Use local parameter instead."
-            }
-        ],
-        "array-bracket-newline": [2, { "minItems": 2 }],
-        "array-element-newline": [2, { "minItems": 2 }]
+        "spaced-comment": [2, "always"],
+        "no-restricted-globals": 2,
+        "no-param-reassign": [2, { "props": false }]
     },
     "parserOptions": {
         "sourceType": "module"

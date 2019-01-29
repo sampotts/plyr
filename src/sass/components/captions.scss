@@ -17,11 +17,10 @@
     padding: $plyr-control-spacing;
     position: absolute;
     text-align: center;
-    transform: translateY(-($plyr-control-spacing * 4));
     transition: transform 0.4s ease-in-out;
     width: 100%;
 
-    span {
+    .plyr__caption {
         background: $plyr-captions-bg;
         border-radius: 2px;
         box-decoration-break: clone;
@@ -53,6 +52,8 @@
     display: block;
 }
 
-.plyr--hide-controls .plyr__captions {
-    transform: translateY(-($plyr-control-spacing * 1.5));
+// If the lower controls are shown and not empty
+.plyr:not(.plyr--hide-controls) .plyr__controls:not(:empty) ~ .plyr__captions {
+    transform: translateY(-($plyr-control-spacing * 4));
 }
+

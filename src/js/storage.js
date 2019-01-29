@@ -2,7 +2,8 @@
 // Plyr storage
 // ==========================================================================
 
-import utils from './utils';
+import is from './utils/is';
+import { extend } from './utils/objects';
 
 class Storage {
     constructor(player) {
@@ -31,19 +32,19 @@ class Storage {
     }
 
     get(key) {
-        if (!Storage.supported) {
+        if (!Storage.supported || !this.enabled) {
             return null;
         }
 
         const store = window.localStorage.getItem(this.key);
 
-        if (utils.is.empty(store)) {
+        if (is.empty(store)) {
             return null;
         }
 
         const json = JSON.parse(store);
 
-        return utils.is.string(key) && key.length ? json[key] : json;
+        return is.string(key) && key.length ? json[key] : json;
     }
 
     set(object) {
@@ -53,7 +54,7 @@ class Storage {
         }
 
         // Can only store objectst
-        if (!utils.is.object(object)) {
+        if (!is.object(object)) {
             return;
         }
 
@@ -61,12 +62,12 @@ class Storage {
         let storage = this.get();
 
         // Default to empty object
-        if (utils.is.empty(storage)) {
+        if (is.empty(storage)) {
             storage = {};
         }
 
         // Update the working copy of the values
-        utils.extend(storage, object);
+        extend(storage, object);
 
         // Update storage
         window.localStorage.setItem(this.key, JSON.stringify(storage));

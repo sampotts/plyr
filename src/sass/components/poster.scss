@@ -6,17 +6,17 @@
     background-color: #000;
     background-position: 50% 50%;
     background-repeat: no-repeat;
-    background-size: 100% 100%;
+    background-size: contain;
     height: 100%;
     left: 0;
     opacity: 0;
     position: absolute;
     top: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.2s ease;
     width: 100%;
     z-index: 1;
 }
 
-.plyr--stopped .plyr__poster {
+.plyr--stopped.plyr__poster-enabled .plyr__poster {
     opacity: 1;
 }
