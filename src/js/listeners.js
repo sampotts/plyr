@@ -414,20 +414,6 @@ class Listeners {
         // Loading state
         on.call(player, player.media, 'waiting canplay seeked playing', event => ui.checkLoading.call(player, event));
 
-        // If autoplay, then load advertisement if required
-        // TODO: Show some sort of loading state while the ad manager loads else there's a delay before ad shows
-        on.call(player, player.media, 'playing', () => {
-            if (!player.ads) {
-                return;
-            }
-
-            // If ads are enabled, wait for them first
-            if (player.ads.enabled && !player.ads.initialized) {
-                // Wait for manager response
-                player.ads.managerPromise.then(() => player.ads.play()).catch(() => player.play());
-            }
-        });
-
         // Click video
         if (player.supported.ui && player.config.clickToPlay && !player.isAudio) {
             // Re-fetch the wrapper

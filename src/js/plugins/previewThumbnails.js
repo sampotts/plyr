@@ -231,7 +231,7 @@ class PreviewThumbnails {
         }
     }
 
-    finishScrubbing() {
+    endScrubbing() {
         this.mouseDown = false;
 
         // Hide scrubbing preview. But wait until the video has successfully seeked before hiding the scrubbing preview

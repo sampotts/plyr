@@ -19,6 +19,7 @@ const isEvent = input => instanceOf(input, Event);
 const isKeyboardEvent = input => instanceOf(input, KeyboardEvent);
 const isCue = input => instanceOf(input, window.TextTrackCue) || instanceOf(input, window.VTTCue);
 const isTrack = input => instanceOf(input, TextTrack) || (!isNullOrUndefined(input) && isString(input.kind));
+const isPromise = input => instanceOf(input, Promise);
 
 const isEmpty = input =>
     isNullOrUndefined(input) ||
@@ -65,6 +66,7 @@ export default {
     keyboardEvent: isKeyboardEvent,
     cue: isCue,
     track: isTrack,
+    promise: isPromise,
     url: isUrl,
     empty: isEmpty,
 };

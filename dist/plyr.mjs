@@ -164,6 +164,10 @@ var isTrack = function isTrack(input) {
   return instanceOf(input, TextTrack) || !isNullOrUndefined(input) && isString(input.kind);
 };
 
+var isPromise = function isPromise(input) {
+  return instanceOf(input, Promise);
+};
+
 var isEmpty = function isEmpty(input) {
   return isNullOrUndefined(input) || (isString(input) || isArray(input) || isNodeList(input)) && !input.length || isObject(input) && !Object.keys(input).length;
 };
@@ -209,6 +213,7 @@ var is = {
   keyboardEvent: isKeyboardEvent,
   cue: isCue,
   track: isTrack,
+  promise: isPromise,
   url: isUrl,
   empty: isEmpty
 };
@@ -700,6 +705,28 @@ var support = {
       ui: ui
     };
   },
+  // Detect support for autoplay
+
+  /* autoplay: (() => {
+      const video = document.createElement('video');
+      video.src = 'https://cdn.plyr.io/static/blank.mp4';
+      const promise = video.play();
+       if (is.promise(promise)) {
+          console.warn('PROMISE', promise);
+           promise
+              .then(() => {
+                  console.warn('supported');
+                  return true;
+              })
+              .catch(() => {
+                  console.warn('not supported');
+                  return false;
+              });
+      } else {
+          console.warn('supported - no promise');
+          return true;
+      }
+  })(), */
   // Picture-in-picture support
   // Safari & Chrome only currently
   pip: function () {
@@ -3192,7 +3219,7 @@ var defaults = {
   // Sprite (for icons)
   loadSprite: true,
   iconPrefix: 'plyr',
-  iconUrl: 'https://cdn.plyr.io/3.4.8/plyr.svg',
+  iconUrl: 'https://cdn.plyr.io/3.5.0-beta.3/plyr.svg',
   // Blank video (used to prevent errors on source change)
   blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
   // Quality default
@@ -4512,23 +4539,6 @@ function () {
 
       on.call(player, player.media, 'waiting canplay seeked playing', function (event) {
         return ui.checkLoading.call(player, event);
-      }); // If autoplay, then load advertisement if required
-      // TODO: Show some sort of loading state while the ad manager loads else there's a delay before ad shows
-
-      on.call(player, player.media, 'playing', function () {
-        if (!player.ads) {
-          return;
-        } // If ads are enabled, wait for them first
-
-
-        if (player.ads.enabled && !player.ads.initialized) {
-          // Wait for manager response
-          player.ads.managerPromise.then(function () {
-            return player.ads.play();
-          }).catch(function () {
-            return player.play();
-          });
-        }
       }); // Click video
 
       if (player.supported.ui && player.config.clickToPlay && !player.isAudio) {
@@ -6095,10 +6105,11 @@ function () {
 
       google.ima.settings.setVpaidMode(google.ima.ImaSdkSettings.VpaidMode.ENABLED); // Set language
 
-      google.ima.settings.setLocale(this.player.config.ads.language); // We assume the adContainer is the video container of the plyr element
-      // that will house the ads
+      google.ima.settings.setLocale(this.player.config.ads.language); // Set playback for iOS10+
 
-      this.elements.displayContainer = new google.ima.AdDisplayContainer(this.elements.container); // Request video ads to be pre-loaded
+      google.ima.settings.setDisableCustomPlaybackForIOS10Plus(this.player.config.playsinline); // We assume the adContainer is the video container of the plyr element that will house the ads
+
+      this.elements.displayContainer = new google.ima.AdDisplayContainer(this.elements.container, this.player.media); // Request video ads to be pre-loaded
 
       this.requestAds();
     }
@@ -6438,11 +6449,9 @@ function () {
       // Hide the advertisement container
       this.elements.container.style.zIndex = ''; // Ad is stopped
 
-      this.playing = false; // Play our video
+      this.playing = false; // Play video
 
-      if (this.player.currentTime < this.player.duration) {
-        this.player.play();
-      }
+      this.player.media.play();
     }
     /**
      * Pause our video
@@ -6452,11 +6461,11 @@ function () {
     key: "pauseContent",
     value: function pauseContent() {
       // Show the advertisement container
-      this.elements.container.style.zIndex = 3; // Ad is playing.
+      this.elements.container.style.zIndex = 3; // Ad is playing
 
       this.playing = true; // Pause our video.
 
-      this.player.pause();
+      this.player.media.pause();
     }
     /**
      * Destroy the adsManager so we can grab new ads after this. If we don't then we're not
@@ -6845,8 +6854,8 @@ function () {
       }
     }
   }, {
-    key: "finishScrubbing",
-    value: function finishScrubbing() {
+    key: "endScrubbing",
+    value: function endScrubbing() {
       var _this4 = this;
 
       this.mouseDown = false; // Hide scrubbing preview. But wait until the video has successfully seeked before hiding the scrubbing preview
@@ -7688,8 +7697,19 @@ function () {
      * Play the media, or play the advertisement (if they are not blocked)
      */
     value: function play() {
+      var _this2 = this;
+
       if (!is.function(this.media.play)) {
         return null;
+      } // Intecept play with ads
+
+
+      if (this.ads && this.ads.enabled) {
+        this.ads.managerPromise.then(function () {
+          return _this2.ads.play();
+        }).catch(function () {
+          return _this2.media.play();
+        });
       } // Return the promise (for HTML5)
 
 
@@ -7907,7 +7927,7 @@ function () {
   }, {
     key: "destroy",
     value: function destroy(callback) {
-      var _this2 = this;
+      var _this3 = this;
 
       var soft = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
@@ -7919,20 +7939,20 @@ function () {
         // Reset overflow (incase destroyed while in fullscreen)
         document.body.style.overflow = ''; // GC for embed
 
-        _this2.embed = null; // If it's a soft destroy, make minimal changes
+        _this3.embed = null; // If it's a soft destroy, make minimal changes
 
         if (soft) {
-          if (Object.keys(_this2.elements).length) {
+          if (Object.keys(_this3.elements).length) {
             // Remove elements
-            removeElement(_this2.elements.buttons.play);
-            removeElement(_this2.elements.captions);
-            removeElement(_this2.elements.controls);
-            removeElement(_this2.elements.wrapper); // Clear for GC
+            removeElement(_this3.elements.buttons.play);
+            removeElement(_this3.elements.captions);
+            removeElement(_this3.elements.controls);
+            removeElement(_this3.elements.wrapper); // Clear for GC
 
-            _this2.elements.buttons.play = null;
-            _this2.elements.captions = null;
-            _this2.elements.controls = null;
-            _this2.elements.wrapper = null;
+            _this3.elements.buttons.play = null;
+            _this3.elements.captions = null;
+            _this3.elements.controls = null;
+            _this3.elements.wrapper = null;
           } // Callback
 
 
@@ -7941,22 +7961,22 @@ function () {
           }
         } else {
           // Unbind listeners
-          unbindListeners.call(_this2); // Replace the container with the original element provided
+          unbindListeners.call(_this3); // Replace the container with the original element provided
 
-          replaceElement(_this2.elements.original, _this2.elements.container); // Event
+          replaceElement(_this3.elements.original, _this3.elements.container); // Event
 
-          triggerEvent.call(_this2, _this2.elements.original, 'destroyed', true); // Callback
+          triggerEvent.call(_this3, _this3.elements.original, 'destroyed', true); // Callback
 
           if (is.function(callback)) {
-            callback.call(_this2.elements.original);
+            callback.call(_this3.elements.original);
           } // Reset state
 
 
-          _this2.ready = false; // Clear for garbage collection
+          _this3.ready = false; // Clear for garbage collection
 
           setTimeout(function () {
-            _this2.elements = null;
-            _this2.media = null;
+            _this3.elements = null;
+            _this3.media = null;
           }, 200);
         }
       }; // Stop playback

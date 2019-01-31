@@ -238,6 +238,7 @@ try {
 }
 
 // If deployment is setup
+// TODO: Use gulp-awspublish and use AWS CLI credentials
 if (Object.keys(credentials).includes('aws') && Object.keys(credentials).includes('fastly')) {
     const { version } = pkg;
     const { aws, fastly } = credentials;
@@ -258,7 +259,7 @@ if (Object.keys(credentials).includes('aws') && Object.keys(credentials).include
             },
         },
         demo: {
-            uploadPath: branch.current === branch.beta ? 'beta/' : null,
+            uploadPath: branch.current === branch.beta ? 'beta' : null,
             headers: {
                 'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
                 Vary: 'Accept-Encoding',
@@ -300,8 +301,9 @@ if (Object.keys(credentials).includes('aws') && Object.keys(credentials).include
         return true;
     };
 
-    gulp.task('version', () => {
+    gulp.task('version', done => {
         if (!canDeploy()) {
+            done();
             return null;
         }
 
@@ -318,8 +320,9 @@ if (Object.keys(credentials).includes('aws') && Object.keys(credentials).include
     });
 
     // Publish version to CDN bucket
-    gulp.task('cdn', () => {
+    gulp.task('cdn', done => {
         if (!canDeploy()) {
+            done();
             return null;
         }
 
@@ -379,8 +382,9 @@ if (Object.keys(credentials).includes('aws') && Object.keys(credentials).include
     });
 
     // Publish to demo bucket
-    gulp.task('demo', () => {
+    gulp.task('demo', done => {
         if (!canDeploy()) {
+            done();
             return null;
         }
 
@@ -407,6 +411,7 @@ if (Object.keys(credentials).includes('aws') && Object.keys(credentials).include
 
         // Only update CDN for master (prod)
         if (branch.current !== branch.master) {
+            done();
             return null;
         }
 
@@ -441,14 +446,12 @@ if (Object.keys(credentials).includes('aws') && Object.keys(credentials).include
     }); */
 
     // Open the demo site to check it's ok
-    gulp.task('open', callback => {
-        gulp.src(__filename).pipe(
+    gulp.task('open', () => {
+        return gulp.src(__filename).pipe(
             open({
-                uri: `https://${aws.demo.domain}`,
+                uri: `https://${aws.demo.domain}/${branch.current === branch.beta ? 'beta' : ''}`,
             }),
         );
-
-        callback();
     });
 
     // Do everything

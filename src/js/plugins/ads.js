@@ -136,6 +136,7 @@ class Ads {
         this.elements.container = createElement('div', {
             class: this.player.config.classNames.ads,
         });
+
         this.player.elements.container.appendChild(this.elements.container);
 
         // So we can run VPAID2
@@ -144,9 +145,11 @@ class Ads {
         // Set language
         google.ima.settings.setLocale(this.player.config.ads.language);
 
-        // We assume the adContainer is the video container of the plyr element
-        // that will house the ads
-        this.elements.displayContainer = new google.ima.AdDisplayContainer(this.elements.container);
+        // Set playback for iOS10+
+        google.ima.settings.setDisableCustomPlaybackForIOS10Plus(this.player.config.playsinline);
+
+        // We assume the adContainer is the video container of the plyr element that will house the ads
+        this.elements.displayContainer = new google.ima.AdDisplayContainer(this.elements.container, this.player.media);
 
         // Request video ads to be pre-loaded
         this.requestAds();
@@ -488,10 +491,8 @@ class Ads {
         // Ad is stopped
         this.playing = false;
 
-        // Play our video
-        if (this.player.currentTime < this.player.duration) {
-            this.player.play();
-        }
+        // Play video
+        this.player.media.play();
     }
 
     /**
@@ -501,11 +502,11 @@ class Ads {
         // Show the advertisement container
         this.elements.container.style.zIndex = 3;
 
-        // Ad is playing.
+        // Ad is playing
         this.playing = true;
 
         // Pause our video.
-        this.player.pause();
+        this.player.media.pause();
     }
 
     /**
