@@ -240,6 +240,23 @@ class Ads {
         // Get the cue points for any mid-rolls by filtering out the pre- and post-roll
         this.cuePoints = this.manager.getCuePoints();
 
+        // Set volume to match player
+        this.manager.setVolume(this.player.volume);
+
+        // Add listeners to the required events
+        // Advertisement error events
+        this.manager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, error => this.onAdError(error));
+
+        // Advertisement regular events
+        Object.keys(google.ima.AdEvent.Type).forEach(type => {
+            this.manager.addEventListener(google.ima.AdEvent.Type[type], event => this.onAdEvent(event));
+        });
+
+        // Resolve our adsManager
+        this.trigger('loaded');
+    }
+
+    addCuePoints() {
         // Add advertisement cue's within the time line if available
         if (!is.empty(this.cuePoints)) {
             this.cuePoints.forEach(cuePoint => {
@@ -258,21 +275,6 @@ class Ads {
                 }
             });
         }
-
-        // Set volume to match player
-        this.manager.setVolume(this.player.volume);
-
-        // Add listeners to the required events
-        // Advertisement error events
-        this.manager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, error => this.onAdError(error));
-
-        // Advertisement regular events
-        Object.keys(google.ima.AdEvent.Type).forEach(type => {
-            this.manager.addEventListener(google.ima.AdEvent.Type[type], event => this.onAdEvent(event));
-        });
-
-        // Resolve our adsManager
-        this.trigger('loaded');
     }
 
     /**
@@ -412,7 +414,10 @@ class Ads {
         const { container } = this.player.elements;
         let time;
 
-        // Add listeners to the required events
+        this.player.on('canplay', () => {
+            this.addCuePoints();
+        });
+
         this.player.on('ended', () => {
             this.loader.contentComplete();
         });

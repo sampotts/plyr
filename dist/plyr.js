@@ -711,28 +711,6 @@ typeof navigator === "object" && (function (global, factory) {
         ui: ui
       };
     },
-    // Detect support for autoplay
-
-    /* autoplay: (() => {
-        const video = document.createElement('video');
-        video.src = 'https://cdn.plyr.io/static/blank.mp4';
-        const promise = video.play();
-         if (is.promise(promise)) {
-            console.warn('PROMISE', promise);
-             promise
-                .then(() => {
-                    console.warn('supported');
-                    return true;
-                })
-                .catch(() => {
-                    console.warn('not supported');
-                    return false;
-                });
-        } else {
-            console.warn('supported - no promise');
-            return true;
-        }
-    })(), */
     // Picture-in-picture support
     // Safari & Chrome only currently
     pip: function () {
@@ -6209,25 +6187,7 @@ typeof navigator === "object" && (function (global, factory) {
 
         this.manager = event.getAdsManager(this.player, settings); // Get the cue points for any mid-rolls by filtering out the pre- and post-roll
 
-        this.cuePoints = this.manager.getCuePoints(); // Add advertisement cue's within the time line if available
-
-        if (!is.empty(this.cuePoints)) {
-          this.cuePoints.forEach(function (cuePoint) {
-            if (cuePoint !== 0 && cuePoint !== -1 && cuePoint < _this6.player.duration) {
-              var seekElement = _this6.player.elements.progress;
-
-              if (is.element(seekElement)) {
-                var cuePercentage = 100 / _this6.player.duration * cuePoint;
-                var cue = createElement('span', {
-                  class: _this6.player.config.classNames.cues
-                });
-                cue.style.left = "".concat(cuePercentage.toString(), "%");
-                seekElement.appendChild(cue);
-              }
-            }
-          });
-        } // Set volume to match player
-
+        this.cuePoints = this.manager.getCuePoints(); // Set volume to match player
 
         this.manager.setVolume(this.player.volume); // Add listeners to the required events
         // Advertisement error events
@@ -6244,6 +6204,29 @@ typeof navigator === "object" && (function (global, factory) {
 
         this.trigger('loaded');
       }
+    }, {
+      key: "addCuePoints",
+      value: function addCuePoints() {
+        var _this7 = this;
+
+        // Add advertisement cue's within the time line if available
+        if (!is.empty(this.cuePoints)) {
+          this.cuePoints.forEach(function (cuePoint) {
+            if (cuePoint !== 0 && cuePoint !== -1 && cuePoint < _this7.player.duration) {
+              var seekElement = _this7.player.elements.progress;
+
+              if (is.element(seekElement)) {
+                var cuePercentage = 100 / _this7.player.duration * cuePoint;
+                var cue = createElement('span', {
+                  class: _this7.player.config.classNames.cues
+                });
+                cue.style.left = "".concat(cuePercentage.toString(), "%");
+                seekElement.appendChild(cue);
+              }
+            }
+          });
+        }
+      }
       /**
        * This is where all the event handling takes place. Retrieve the ad from the event. Some
        * events (e.g. ALL_ADS_COMPLETED) don't have the ad object associated
@@ -6254,7 +6237,7 @@ typeof navigator === "object" && (function (global, factory) {
     }, {
       key: "onAdEvent",
       value: function onAdEvent(event) {
-        var _this7 = this;
+        var _this8 = this;
 
         var container = this.player.elements.container; // Retrieve the ad from the event. Some events (e.g. ALL_ADS_COMPLETED)
         // don't have ad object associated
@@ -6264,7 +6247,7 @@ typeof navigator === "object" && (function (global, factory) {
 
         var dispatchEvent = function dispatchEvent(type) {
           var event = "ads".concat(type.replace(/_/g, '').toLowerCase());
-          triggerEvent.call(_this7.player, _this7.player.media, event);
+          triggerEvent.call(_this8.player, _this8.player.media, event);
         };
 
         switch (event.type) {
@@ -6373,37 +6356,39 @@ typeof navigator === "object" && (function (global, factory) {
     }, {
       key: "listeners",
       value: function listeners() {
-        var _this8 = this;
+        var _this9 = this;
 
         var container = this.player.elements.container;
-        var time; // Add listeners to the required events
-
+        var time;
+        this.player.on('canplay', function () {
+          _this9.addCuePoints();
+        });
         this.player.on('ended', function () {
-          _this8.loader.contentComplete();
+          _this9.loader.contentComplete();
         });
         this.player.on('timeupdate', function () {
-          time = _this8.player.currentTime;
+          time = _this9.player.currentTime;
         });
         this.player.on('seeked', function () {
-          var seekedTime = _this8.player.currentTime;
+          var seekedTime = _this9.player.currentTime;
 
-          if (is.empty(_this8.cuePoints)) {
+          if (is.empty(_this9.cuePoints)) {
             return;
           }
 
-          _this8.cuePoints.forEach(function (cuePoint, index) {
+          _this9.cuePoints.forEach(function (cuePoint, index) {
             if (time < cuePoint && cuePoint < seekedTime) {
-              _this8.manager.discardAdBreak();
+              _this9.manager.discardAdBreak();
 
-              _this8.cuePoints.splice(index, 1);
+              _this9.cuePoints.splice(index, 1);
             }
           });
         }); // Listen to the resizing of the window. And resize ad accordingly
         // TODO: eventually implement ResizeObserver
 
         window.addEventListener('resize', function () {
-          if (_this8.manager) {
-            _this8.manager.resize(container.offsetWidth, container.offsetHeight, google.ima.ViewMode.NORMAL);
+          if (_this9.manager) {
+            _this9.manager.resize(container.offsetWidth, container.offsetHeight, google.ima.ViewMode.NORMAL);
           }
         });
       }
@@ -6414,7 +6399,7 @@ typeof navigator === "object" && (function (global, factory) {
     }, {
       key: "play",
       value: function play() {
-        var _this9 = this;
+        var _this10 = this;
 
         var container = this.player.elements.container;
 
@@ -6425,23 +6410,23 @@ typeof navigator === "object" && (function (global, factory) {
 
         this.managerPromise.then(function () {
           // Initialize the container. Must be done via a user action on mobile devices
-          _this9.elements.displayContainer.initialize();
+          _this10.elements.displayContainer.initialize();
 
           try {
-            if (!_this9.initialized) {
+            if (!_this10.initialized) {
               // Initialize the ads manager. Ad rules playlist will start at this time
-              _this9.manager.init(container.offsetWidth, container.offsetHeight, google.ima.ViewMode.NORMAL); // Call play to start showing the ad. Single video and overlay ads will
+              _this10.manager.init(container.offsetWidth, container.offsetHeight, google.ima.ViewMode.NORMAL); // Call play to start showing the ad. Single video and overlay ads will
               // start at this time; the call will be ignored for ad rules
 
 
-              _this9.manager.start();
+              _this10.manager.start();
             }
 
-            _this9.initialized = true;
+            _this10.initialized = true;
           } catch (adError) {
             // An error may be thrown if there was a problem with the
             // VAST response
-            _this9.onAdError(adError);
+            _this10.onAdError(adError);
           }
         }).catch(function () {});
       }
@@ -6500,23 +6485,23 @@ typeof navigator === "object" && (function (global, factory) {
     }, {
       key: "loadAds",
       value: function loadAds() {
-        var _this10 = this;
+        var _this11 = this;
 
         // Tell our adsManager to go bye bye
         this.managerPromise.then(function () {
           // Destroy our adsManager
-          if (_this10.manager) {
-            _this10.manager.destroy();
+          if (_this11.manager) {
+            _this11.manager.destroy();
           } // Re-set our adsManager promises
 
 
-          _this10.managerPromise = new Promise(function (resolve) {
-            _this10.on('loaded', resolve);
+          _this11.managerPromise = new Promise(function (resolve) {
+            _this11.on('loaded', resolve);
 
-            _this10.player.debug.log(_this10.manager);
+            _this11.player.debug.log(_this11.manager);
           }); // Now request some new advertisements
 
-          _this10.requestAds();
+          _this11.requestAds();
         }).catch(function () {});
       }
       /**
@@ -6527,7 +6512,7 @@ typeof navigator === "object" && (function (global, factory) {
     }, {
       key: "trigger",
       value: function trigger(event) {
-        var _this11 = this;
+        var _this12 = this;
 
         for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
           args[_key - 1] = arguments[_key];
@@ -6538,7 +6523,7 @@ typeof navigator === "object" && (function (global, factory) {
         if (is.array(handlers)) {
           handlers.forEach(function (handler) {
             if (is.function(handler)) {
-              handler.apply(_this11, args);
+              handler.apply(_this12, args);
             }
           });
         }
@@ -6572,13 +6557,13 @@ typeof navigator === "object" && (function (global, factory) {
     }, {
       key: "startSafetyTimer",
       value: function startSafetyTimer(time, from) {
-        var _this12 = this;
+        var _this13 = this;
 
         this.player.debug.log("Safety timer invoked from: ".concat(from));
         this.safetyTimer = setTimeout(function () {
-          _this12.cancel();
+          _this13.cancel();
 
-          _this12.clearSafetyTimer('startSafetyTimer()');
+          _this13.clearSafetyTimer('startSafetyTimer()');
         }, time);
       }
       /**
