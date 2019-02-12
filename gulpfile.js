@@ -337,7 +337,7 @@ if (Object.keys(credentials).includes('aws') && Object.keys(credentials).include
                 .pipe(
                     replace(
                         /sourceMappingURL=([\w-?.]+)/,
-                        (match, p1) => `sourceMappingURL=${p1.replace(minSuffix, '')}`,
+                        (match, filename) => `sourceMappingURL=${filename.replace(minSuffix, '')}`,
                     ),
                 )
                 .pipe(
@@ -360,7 +360,7 @@ if (Object.keys(credentials).includes('aws') && Object.keys(credentials).include
             .pipe(
                 through.obj((file, enc, cb) => {
                     const filename = file.path.split('/').pop();
-                    list.push(`${versionPath}/${filename}`);
+                    list.push(`${versionPath}/${filename.replace(minSuffix, '')}`);
                     cb(null);
                 }),
             )
