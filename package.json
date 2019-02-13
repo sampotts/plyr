@@ -69,6 +69,7 @@
         "postcss-custom-properties": "^8.0.9",
         "prettier-eslint": "^8.8.2",
         "prettier-stylelint": "^0.4.2",
+        "raven-js": "^3.27.0",
         "remark-cli": "^6.0.1",
         "remark-validate-links": "^8.0.0",
         "rollup-plugin-babel": "^4.3.2",
@@ -87,7 +88,6 @@
         "core-js": "^2.6.4",
         "custom-event-polyfill": "^1.0.6",
         "loadjs": "^3.5.5",
-        "raven-js": "^3.27.0",
         "url-polyfill": "^1.1.3"
     }
 }
