@@ -229,7 +229,6 @@ You can specify a range of arguments for the constructor to use:
 
 -   A CSS string selector that's compatible with [`querySelector`](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector)
 -   A [`HTMLElement`](https://developer.mozilla.org/en/docs/Web/API/HTMLElement)
--   A [`NodeList`](https://developer.mozilla.org/en-US/docs/Web/API/NodeList)
 -   A [jQuery](https://jquery.com) object
 
 _Note_: If a `NodeList`, `Array`, or jQuery object are passed, the first element will be used for setup. To setup multiple players, see [setting up multiple players](#setting-up-multiple-players) below.
@@ -248,13 +247,15 @@ Passing a [HTMLElement](https://developer.mozilla.org/en/docs/Web/API/HTMLElemen
 const player = new Plyr(document.getElementById('player'));
 ```
 
-Passing a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList) (see note below):
-
 ```javascript
-const player = new Plyr(document.querySelectorAll('.js-player'));
+const player = new Plyr(document.querySelector('#player'));
 ```
 
-The NodeList, HTMLElement or string selector can be the target `<video>`, `<audio>`, or `<div>` wrapper for embeds.
+```javascript
+const instances = [...document.querySelectorAll('.player')].map((elem) => new Plyr(elem))
+```
+
+The HTMLElement or string selector can be the target `<video>`, `<audio>`, or `<div>` wrapper for embeds.
 
 ##### Setting up multiple players
 
