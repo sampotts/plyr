@@ -6,27 +6,27 @@ Plyr is a simple, lightweight, accessible and customizable HTML5, YouTube and Vi
 
 # Features
 
--   **Accessible** - full support for VTT captions and screen readers
--   **[Customisable](#html)** - make the player look how you want with the markup you want
--   **Good HTML** - uses the _right_ elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no
+-   💪 **Accessible** - full support for VTT captions and screen readers
+-   🔧 **[Customisable](#html)** - make the player look how you want with the markup you want
+-   😎 **Good HTML** - uses the _right_ elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no
     `<span>` or `<a href="#">` button hacks
--   **Responsive** - works with any screen size
--   **HTML Video & Audio** - support for both formats
--   **[Embedded Video](#embeds)** - support for YouTube and Vimeo video playback
--   **[Monetization](#ads)** - make money from your videos
--   **[Streaming](#try-plyr-online)** - support for hls.js, Shaka and dash.js streaming playback
--   **[API](#api)** - toggle playback, volume, seeking, and more through a standardized API
--   **[Events](#events)** - no messing around with Vimeo and YouTube APIs, all events are standardized across formats
--   **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes
--   **[Shortcuts](#shortcuts)** - supports keyboard shortcuts
--   **Picture-in-Picture** - supports Safari's picture-in-picture mode
--   **Playsinline** - supports the `playsinline` attribute
--   **Speed controls** - adjust speed on the fly
--   **Multiple captions** - support for multiple caption tracks
--   **i18n support** - support for internationalization of controls
--   **[Preview thumbnails](#preview-thumbnails)** - support for displaying preview thumbnails
--   **No dependencies** - written in "vanilla" ES6 JavaScript, no jQuery required
--   **SASS** - to include in your build processes
+-   📱 **Responsive** - works with any screen size
+-   📼 **HTML Video & Audio** - support for both formats
+-   📺 **[Embedded Video](#embeds)** - support for YouTube and Vimeo video playback
+-   💵 **[Monetization](#ads)** - make money from your videos
+-   📹 **[Streaming](#try-plyr-online)** - support for hls.js, Shaka and dash.js streaming playback
+-   🎛 **[API](#api)** - toggle playback, volume, seeking, and more through a standardized API
+-   🎤 **[Events](#events)** - no messing around with Vimeo and YouTube APIs, all events are standardized across formats
+-   🔎 **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes
+-   ⌨️ **[Shortcuts](#shortcuts)** - supports keyboard shortcuts
+-   🖥 **Picture-in-Picture** - supports picture-in-picture mode
+-   📱 **Playsinline** - supports the `playsinline` attribute
+-   🏎 **Speed controls** - adjust speed on the fly
+-   📖 **Multiple captions** - support for multiple caption tracks
+-   🌎 **i18n support** - support for internationalization of controls
+-   👌 **[Preview thumbnails](#preview-thumbnails)** - support for displaying preview thumbnails
+-   🤟 **No dependencies** - written in "vanilla" ES6 JavaScript, no jQuery required
+-   💁‍♀️ **SASS** - to include in your build processes
 
 ### Demos
 
