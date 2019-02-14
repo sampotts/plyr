@@ -251,10 +251,6 @@ const player = new Plyr(document.getElementById('player'));
 const player = new Plyr(document.querySelector('#player'));
 ```
 
-```javascript
-const instances = [...document.querySelectorAll('.player')].map((elem) => new Plyr(elem))
-```
-
 The HTMLElement or string selector can be the target `<video>`, `<audio>`, or `<div>` wrapper for embeds.
 
 ##### Setting up multiple players
