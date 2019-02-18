@@ -173,7 +173,6 @@ Object.entries(build.js).forEach(([filename, entry]) => {
                         extname: `.${extension}`,
                     }),
                 )
-                .pipe(size(sizeOptions))
                 .pipe(gulp.dest(entry.dist))
                 .pipe(filter(`**/*${extension}`))
                 .pipe(terser())
@@ -268,14 +267,12 @@ const options = {
     cdn: {
         headers: {
             'Cache-Control': `max-age=${maxAge}`,
-            Vary: 'Accept-Encoding',
         },
     },
     demo: {
         uploadPath: branch.current === branch.beta ? 'beta' : null,
         headers: {
             'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
-            Vary: 'Accept-Encoding',
         },
     },
     symlinks(ver, filename) {
@@ -428,7 +425,7 @@ gulp.task('demo', done => {
     // e.g. "../dist/plyr.js" to "https://cdn.plyr.io/x.x.x/plyr.js"
     const index = `${paths.demo.root}index.html`;
     const error = `${paths.demo.root}error.html`;
-    const pages = [index, error];
+    const pages = [index];
 
     if (branch.current === branch.master) {
         pages.push(error);
@@ -466,9 +463,11 @@ gulp.task('error', done => {
 
 // Open the demo site to check it's ok
 gulp.task('open', () => {
+    const { domain } = deploy.demo;
+
     return gulp.src(__filename).pipe(
         open({
-            uri: `https://${aws.demo.domain}/${branch.current === branch.beta ? 'beta' : ''}`,
+            uri: `https://${domain}/${branch.current === branch.beta ? 'beta' : ''}`,
         }),
     );
 });
