@@ -3,6 +3,7 @@
 // TODO: This needs to be split into smaller files and cleaned up
 // ==========================================================================
 
+import RangeTouch from 'rangetouch';
 import captions from './captions';
 import html5 from './html5';
 import support from './support';
@@ -333,6 +334,9 @@ const controls = {
 
         // Set the fill for webkit now
         controls.updateRangeFill.call(this, input);
+
+        // Improve support on touch devices
+        RangeTouch.setup(input);
 
         return input;
     },

@@ -19,8 +19,8 @@ import Plyr from '../../../src/js/plyr';
             const selector = '#player';
             const container = document.getElementById('container');
 
-            if (window.shr) {
-                window.shr.setup({
+            if (window.Shr) {
+                window.Shr.setup('.js-shr-button', {
                     count: {
                         classname: 'button__count',
                     },

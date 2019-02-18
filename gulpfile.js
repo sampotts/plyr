@@ -130,7 +130,6 @@ const build = {
                     .src(bundles[bundle].js[key])
                     .pipe(sourcemaps.init())
                     .pipe(concat(key))
-
                     .pipe(
                         rollup(
                             {

@@ -9,6 +9,7 @@
 -   Use `Math.trunc` instead of `parseInt` (thanks @taion)
 -   Many fixes for fullscreen in embedded players with non 16:9 screens or videos
 -   Added 'force' fallback option for fullscreen
+-   [RangeTouch](https://rangetouch.com) is now bundled with Plyr as a dependency to fix the scrubber on touch devices
 
 ### v3.4.8
 
