@@ -95,6 +95,7 @@ const paths = {
         path.join(__dirname, 'dist/*.svg'),
         path.join(__dirname, `demo/dist/*${minSuffix}.*`),
         path.join(__dirname, 'demo/dist/*.css'),
+        path.join(__dirname, 'demo/dist/*.svg'),
     ],
 };
 
@@ -139,10 +140,7 @@ gulp.task('clean', done => {
     done();
 });
 
-// JAvaScript
-
-const namespace = 'Plyr';
-
+// JavaScript
 Object.entries(build.js).forEach(([filename, entry]) => {
     entry.formats.forEach(format => {
         const name = `js:${filename}:${format}`;
@@ -161,7 +159,7 @@ Object.entries(build.js).forEach(([filename, entry]) => {
                             plugins: [resolve(), commonjs(), babel(babelrc(polyfill))],
                         },
                         {
-                            name: namespace,
+                            name: entry.namespace,
                             // exports: 'named',
                             format,
                         },
