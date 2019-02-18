@@ -58,18 +58,11 @@ import Plyr from '../../../src/js/plyr';
                 }, 10);
             });
 
-            const userType = 'annon';
-            const contentType = 'on-demand';
-            const cmsid = 2490180;
-            const vid = 3788;
-
-            const tagUrl = `https://pubads.g.doubleclick.net/gampad/live/ads?sz=640x360&iu=/21736521837/ovo/web&impl=s&gdfp_req=1&env=vp&output=vast&cust_params=usergroup%3D${userType}%26content-type%3D${contentType}&cmsid=${cmsid}&vid=${vid}`;
-
             // Setup the player
             const player = new Plyr(selector, {
                 debug: true,
                 title: 'View From A Blue Moon',
-                iconUrl: 'dist/plyr.svg',
+                iconUrl: 'dist/demo.svg',
                 keyboard: {
                     global: true,
                 },
@@ -83,8 +76,8 @@ import Plyr from '../../../src/js/plyr';
                     google: 'AIzaSyDrNwtN3nLH_8rjCmu5Wq3ZCm4MNAVdc0c',
                 },
                 ads: {
-                    enabled: true, // env.prod || env.dev,
-                    tagUrl,
+                    enabled: env.prod || env.dev,
+                    publisherId: '918848828995742',
                 },
                 previewThumbnails: {
                     enabled: true,

@@ -5911,7 +5911,7 @@ typeof navigator === "object" && (function () {
 	      min: 0,
 	      max: 100,
 	      value: 0,
-	      role: 'presentation',
+	      role: 'progressbar',
 	      'aria-hidden': true
 	    }, attributes)); // Create the label inside
 
@@ -13004,17 +13004,12 @@ typeof navigator === "object" && (function () {
 
 	          focused.classList.add(tabClassName);
 	        }, 10);
-	      });
-	      var userType = 'annon';
-	      var contentType = 'on-demand';
-	      var cmsid = 2490180;
-	      var vid = 3788;
-	      var tagUrl = "https://pubads.g.doubleclick.net/gampad/live/ads?sz=640x360&iu=/21736521837/ovo/web&impl=s&gdfp_req=1&env=vp&output=vast&cust_params=usergroup%3D".concat(userType, "%26content-type%3D").concat(contentType, "&cmsid=").concat(cmsid, "&vid=").concat(vid); // Setup the player
+	      }); // Setup the player
 
 	      var player = new Plyr(selector, {
 	        debug: true,
 	        title: 'View From A Blue Moon',
-	        iconUrl: 'dist/plyr.svg',
+	        iconUrl: 'dist/demo.svg',
 	        keyboard: {
 	          global: true
 	        },
@@ -13028,9 +13023,8 @@ typeof navigator === "object" && (function () {
 	          google: 'AIzaSyDrNwtN3nLH_8rjCmu5Wq3ZCm4MNAVdc0c'
 	        },
 	        ads: {
-	          enabled: true,
-	          // env.prod || env.dev,
-	          tagUrl: tagUrl
+	          enabled: env.prod || env.dev,
+	          publisherId: '918848828995742'
 	        },
 	        previewThumbnails: {
 	          enabled: true,

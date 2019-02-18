@@ -1820,7 +1820,7 @@ var controls = {
       min: 0,
       max: 100,
       value: 0,
-      role: 'presentation',
+      role: 'progressbar',
       'aria-hidden': true
     }, attributes)); // Create the label inside
 

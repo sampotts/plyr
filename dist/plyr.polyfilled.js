@@ -574,7 +574,7 @@ typeof navigator === "object" && (function (global, factory) {
   });
 
   var _core = createCommonjsModule(function (module) {
-  var core = module.exports = { version: '2.6.4' };
+  var core = module.exports = { version: '2.6.5' };
   if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
   });
   var _core_1 = _core.version;
@@ -4892,7 +4892,7 @@ typeof navigator === "object" && (function (global, factory) {
         min: 0,
         max: 100,
         value: 0,
-        role: 'presentation',
+        role: 'progressbar',
         'aria-hidden': true
       }, attributes)); // Create the label inside
 
