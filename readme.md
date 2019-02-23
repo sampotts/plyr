@@ -14,7 +14,7 @@ Plyr is a simple, lightweight, accessible and customizable HTML5, YouTube and Vi
 -   📼 **HTML Video & Audio** - support for both formats
 -   📺 **[Embedded Video](#embeds)** - support for YouTube and Vimeo video playback
 -   💵 **[Monetization](#ads)** - make money from your videos
--   📹 **[Streaming](#try-plyr-online)** - support for hls.js, Shaka and dash.js streaming playback
+-   📹 **[Streaming](#demos)** - support for hls.js, Shaka and dash.js streaming playback
 -   🎛 **[API](#api)** - toggle playback, volume, seeking, and more through a standardized API
 -   🎤 **[Events](#events)** - no messing around with Vimeo and YouTube APIs, all events are standardized across formats
 -   🔎 **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes
@@ -123,13 +123,13 @@ See [initialising](#initialising) for more information on advanced setups.
 You can use our CDN (provided by [Fastly](https://www.fastly.com/)) for the JavaScript. There's 2 versions; one with and one without [polyfills](#polyfills). My recommendation would be to manage polyfills seperately as part of your application but to make life easier you can use the polyfilled build.
 
 ```html
-<script src="https://cdn.plyr.io/3.5.0-beta.4/plyr.js"></script>
+<script src="https://cdn.plyr.io/3.5.0/plyr.js"></script>
 ```
 
 ...or...
 
 ```html
-<script src="https://cdn.plyr.io/3.5.0-beta.4/plyr.polyfilled.js"></script>
+<script src="https://cdn.plyr.io/3.5.0/plyr.polyfilled.js"></script>
 ```
 
 ## CSS
@@ -143,13 +143,13 @@ Include the `plyr.css` stylsheet into your `<head>`
 If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for the default CSS, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/3.5.0-beta.4/plyr.css" />
+<link rel="stylesheet" href="https://cdn.plyr.io/3.5.0/plyr.css" />
 ```
 
 ## SVG Sprite
 
 The SVG sprite is loaded automatically from our CDN (provided by [Fastly](https://www.fastly.com/)). To change this, see the [options](#options) below. For
-reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.5.0-beta.4/plyr.svg`.
+reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.5.0/plyr.svg`.
 
 # Ads
 
