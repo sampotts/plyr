@@ -17,7 +17,7 @@ import { buildUrlParams } from '../utils/urls';
 class Ads {
     /**
      * Ads constructor.
-     * @param {object} player
+     * @param {Object} player
      * @return {Ads}
      */
     constructor(player) {
@@ -198,7 +198,7 @@ class Ads {
 
     /**
      * Update the ad countdown
-     * @param {boolean} start
+     * @param {Boolean} start
      */
     pollCountdown(start = false) {
         if (!start) {
@@ -559,7 +559,7 @@ class Ads {
 
     /**
      * Handles callbacks after an ad event was invoked
-     * @param {string} event - Event type
+     * @param {String} event - Event type
      */
     trigger(event, ...args) {
         const handlers = this.events[event];
@@ -575,8 +575,8 @@ class Ads {
 
     /**
      * Add event listeners
-     * @param {string} event - Event type
-     * @param {function} callback - Callback for when event occurs
+     * @param {String} event - Event type
+     * @param {Function} callback - Callback for when event occurs
      * @return {Ads}
      */
     on(event, callback) {
@@ -594,8 +594,8 @@ class Ads {
      * The advertisement has 12 seconds to get its things together. We stop this timer when the
      * advertisement is playing, or when a user action is required to start, then we clear the
      * timer on ad ready
-     * @param {number} time
-     * @param {string} from
+     * @param {Number} time
+     * @param {String} from
      */
     startSafetyTimer(time, from) {
         this.player.debug.log(`Safety timer invoked from: ${from}`);
@@ -608,7 +608,7 @@ class Ads {
 
     /**
      * Clear our safety timer(s)
-     * @param {string} from
+     * @param {String} from
      */
     clearSafetyTimer(from) {
         if (!is.nullOrUndefined(this.safetyTimer)) {

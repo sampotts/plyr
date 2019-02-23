@@ -2,8 +2,9 @@ demo
 .github
 .vscode
 *.code-workspace
+build.json
 credentials.json
-bundles.json
+deploy.json
 yarn.lock
 package-lock.json
 *.mp4

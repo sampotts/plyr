@@ -1,3 +1,7 @@
+## v3.5.1
+
+-   Fixed build issues with babel and browserslist
+
 ## v3.5.0
 
 -   Preview seek/scrubbing thumbnails (thanks @jamesoflol)
