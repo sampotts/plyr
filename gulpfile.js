@@ -30,6 +30,7 @@ const header = require('gulp-header');
 const gitbranch = require('git-branch');
 const rename = require('gulp-rename');
 const replace = require('gulp-replace');
+const ansi = require('ansi-colors');
 const log = require('fancy-log');
 const open = require('gulp-open');
 const plumber = require('gulp-plumber');
@@ -95,6 +96,7 @@ const paths = {
         path.join(__dirname, 'dist/*.svg'),
         path.join(__dirname, `demo/dist/*${minSuffix}.*`),
         path.join(__dirname, 'demo/dist/*.css'),
+        path.join(__dirname, 'demo/dist/*.svg'),
     ],
 };
 
@@ -103,32 +105,14 @@ const tasks = {
     css: [],
     js: [],
     sprite: [],
-    clean: ['clean'],
+    clean: 'clean',
 };
 
 // Size plugin
 const sizeOptions = { showFiles: true, gzip: true };
 
-// Babel config
-const babelrc = (polyfill = false) => ({
-    presets: [
-        [
-            '@babel/preset-env',
-            {
-                targets: {
-                    browsers,
-                },
-                useBuiltIns: polyfill ? 'usage' : false,
-                modules: false,
-            },
-        ],
-    ],
-    babelrc: false,
-    exclude: 'node_modules/**',
-});
-
 // Clean out /dist
-gulp.task('clean', done => {
+gulp.task(tasks.clean, done => {
     const dirs = [paths.plyr.output, paths.demo.output].map(dir => path.join(dir, '**/*'));
 
     // Don't delete the mp4
@@ -139,10 +123,7 @@ gulp.task('clean', done => {
     done();
 });
 
-// JAvaScript
-
-const namespace = 'Plyr';
-
+// JavaScript
 Object.entries(build.js).forEach(([filename, entry]) => {
     entry.formats.forEach(format => {
         const name = `js:${filename}:${format}`;
@@ -150,19 +131,34 @@ Object.entries(build.js).forEach(([filename, entry]) => {
         const polyfill = filename.includes('polyfilled');
         const extension = format === 'es' ? 'mjs' : 'js';
 
-        gulp.task(name, () => {
-            return gulp
+        gulp.task(name, () =>
+            gulp
                 .src(entry.src)
                 .pipe(plumber())
                 .pipe(sourcemaps.init())
                 .pipe(
                     rollup(
                         {
-                            plugins: [resolve(), commonjs(), babel(babelrc(polyfill))],
+                            plugins: [
+                                resolve(),
+                                commonjs(),
+                                babel({
+                                    presets: [
+                                        [
+                                            '@babel/env',
+                                            {
+                                                // debug: true,
+                                                useBuiltIns: polyfill ? 'usage' : false,
+                                            },
+                                        ],
+                                    ],
+                                    babelrc: false,
+                                    exclude: [/\/core-js\//],
+                                }),
+                            ],
                         },
                         {
-                            name: namespace,
-                            // exports: 'named',
+                            name: entry.namespace,
                             format,
                         },
                     ),
@@ -173,15 +169,14 @@ Object.entries(build.js).forEach(([filename, entry]) => {
                         extname: `.${extension}`,
                     }),
                 )
-                .pipe(size(sizeOptions))
                 .pipe(gulp.dest(entry.dist))
-                .pipe(filter(`**/*${extension}`))
+                .pipe(filter(`**/*.${extension}`))
                 .pipe(terser())
                 .pipe(rename({ suffix: minSuffix }))
                 .pipe(size(sizeOptions))
                 .pipe(sourcemaps.write(''))
-                .pipe(gulp.dest(entry.dist));
-        });
+                .pipe(gulp.dest(entry.dist)),
+        );
     });
 });
 
@@ -190,8 +185,8 @@ Object.entries(build.css).forEach(([filename, entry]) => {
     const name = `css:${filename}`;
     tasks.css.push(name);
 
-    gulp.task(name, () => {
-        return gulp
+    gulp.task(name, () =>
+        gulp
             .src(entry.src)
             .pipe(plumber())
             .pipe(sass())
@@ -202,8 +197,8 @@ Object.entries(build.css).forEach(([filename, entry]) => {
             )
             .pipe(clean())
             .pipe(size(sizeOptions))
-            .pipe(gulp.dest(entry.dist));
-    });
+            .pipe(gulp.dest(entry.dist)),
+    );
 });
 
 // SVG Sprites
@@ -211,18 +206,16 @@ Object.entries(build.sprite).forEach(([filename, entry]) => {
     const name = `sprite:${filename}`;
     tasks.sprite.push(name);
 
-    log(path.basename(filename));
-
-    gulp.task(name, () => {
-        return gulp
+    gulp.task(name, () =>
+        gulp
             .src(entry.src)
             .pipe(plumber())
             .pipe(imagemin())
             .pipe(svgstore())
             .pipe(rename({ basename: path.parse(filename).name }))
             .pipe(size(sizeOptions))
-            .pipe(gulp.dest(entry.dist));
-    });
+            .pipe(gulp.dest(entry.dist)),
+    );
 });
 
 // Build all JS
@@ -268,14 +261,12 @@ const options = {
     cdn: {
         headers: {
             'Cache-Control': `max-age=${maxAge}`,
-            Vary: 'Accept-Encoding',
         },
     },
     demo: {
         uploadPath: branch.current === branch.beta ? 'beta' : null,
         headers: {
             'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
-            Vary: 'Accept-Encoding',
         },
     },
     symlinks(ver, filename) {
@@ -322,7 +313,7 @@ gulp.task('version', done => {
 
     const { domain } = deploy.cdn;
 
-    console.log(`Updating versions to '${version}'...`);
+    log(`Uploading ${ansi.green.bold(version)} to ${ansi.cyan(domain)}...`);
 
     // Replace versioned URLs in source
     const files = ['plyr.js', 'plyr.polyfilled.js', 'config/defaults.js'];
@@ -347,7 +338,7 @@ gulp.task('cdn', done => {
         throw new Error('No publisher instance. Check AWS configuration.');
     }
 
-    console.log(`Uploading '${version}' to ${domain}...`);
+    log(`Uploading ${ansi.green.bold(pkg.version)} to ${ansi.cyan(domain)}...`);
 
     // Upload to CDN
     return (
@@ -390,13 +381,13 @@ gulp.task('purge', () => {
             const purge = new FastlyPurge(fastly.token);
 
             list.forEach(url => {
-                console.log(`Purging ${url}...`);
+                log(`Purging ${ansi.cyan(url)}...`);
 
                 purge.url(url, (error, result) => {
                     if (error) {
-                        console.log(error);
+                        log.error(error);
                     } else if (result) {
-                        console.log(result);
+                        log(result);
                     }
                 });
             });
@@ -417,7 +408,7 @@ gulp.task('demo', done => {
         throw new Error('No publisher instance. Check AWS configuration.');
     }
 
-    console.log(`Uploading '${version}' demo to ${deploy.demo.domain}...`);
+    log(`Uploading ${ansi.green.bold(pkg.version)} to ${ansi.cyan(domain)}...`);
 
     // Replace versioned files in readme.md
     gulp.src([`${__dirname}/readme.md`])
@@ -428,7 +419,7 @@ gulp.task('demo', done => {
     // e.g. "../dist/plyr.js" to "https://cdn.plyr.io/x.x.x/plyr.js"
     const index = `${paths.demo.root}index.html`;
     const error = `${paths.demo.root}error.html`;
-    const pages = [index, error];
+    const pages = [index];
 
     if (branch.current === branch.master) {
         pages.push(error);
@@ -466,9 +457,11 @@ gulp.task('error', done => {
 
 // Open the demo site to check it's ok
 gulp.task('open', () => {
+    const { domain } = deploy.demo;
+
     return gulp.src(__filename).pipe(
         open({
-            uri: `https://${aws.demo.domain}/${branch.current === branch.beta ? 'beta' : ''}`,
+            uri: `https://${domain}/${branch.current === branch.beta ? 'beta' : ''}`,
         }),
     );
 });
