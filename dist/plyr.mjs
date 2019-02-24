@@ -3515,7 +3515,7 @@ var defaults$1 = {
   // Sprite (for icons)
   loadSprite: true,
   iconPrefix: 'plyr',
-  iconUrl: 'https://cdn.plyr.io/3.5.1/plyr.svg',
+  iconUrl: 'https://cdn.plyr.io/3.5.2/plyr.svg',
   // Blank video (used to prevent errors on source change)
   blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
   // Quality default
@@ -7213,7 +7213,6 @@ function () {
       if (this.mouseDown) {
         this.setScrubbingContainerSize();
       } else {
-        this.toggleThumbContainer(true);
         this.setThumbContainerSizeAndPos();
       } // Find the desired thumbnail index
       // TODO: Handle a video longer than the thumbs where thumbNum is null
@@ -7223,8 +7222,12 @@ function () {
         return _this6.seekTime >= frame.startTime && _this6.seekTime <= frame.endTime;
       });
       var hasThumb = thumbNum >= 0;
-      var qualityIndex = 0;
-      this.toggleThumbContainer(hasThumb); // No matching thumb found
+      var qualityIndex = 0; // Show the thumb container if we're not scrubbing
+
+      if (!this.mouseDown) {
+        this.toggleThumbContainer(hasThumb);
+      } // No matching thumb found
+
 
       if (!hasThumb) {
         return;

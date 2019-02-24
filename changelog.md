@@ -1,3 +1,7 @@
+## v3.5.2
+
+-   Fixed issue where the preview thumbnail was present while scrubbing
+
 ## v3.5.1
 
 -   Fixed build issues with babel and browserslist
