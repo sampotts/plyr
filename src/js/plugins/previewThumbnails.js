@@ -17,17 +17,17 @@ const parseVtt = vttDataString => {
             if (!is.number(result.startTime)) {
                 // The line with start and end times on it is the first line of interest
                 const matchTimes = line.match(
-                    /([0-9]{2}):([0-9]{2}):([0-9]{2}).([0-9]{2,3})( ?--> ?)([0-9]{2}):([0-9]{2}):([0-9]{2}).([0-9]{2,3})/,
+                    /([0-9]{2})?:?([0-9]{2}):([0-9]{2}).([0-9]{2,3})( ?--> ?)([0-9]{2})?:?([0-9]{2}):([0-9]{2}).([0-9]{2,3})/,
                 ); // Note that this currently ignores caption formatting directives that are optionally on the end of this line - fine for non-captions VTT
 
                 if (matchTimes) {
                     result.startTime =
-                        Number(matchTimes[1]) * 60 * 60 +
+                        Number(matchTimes[1] || 0) * 60 * 60 +
                         Number(matchTimes[2]) * 60 +
                         Number(matchTimes[3]) +
                         Number(`0.${matchTimes[4]}`);
                     result.endTime =
-                        Number(matchTimes[6]) * 60 * 60 +
+                        Number(matchTimes[6] || 0) * 60 * 60 +
                         Number(matchTimes[7]) * 60 +
                         Number(matchTimes[8]) +
                         Number(`0.${matchTimes[9]}`);
