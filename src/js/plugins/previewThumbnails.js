@@ -220,6 +220,7 @@ class PreviewThumbnails {
         // Only act on left mouse button (0), or touch device (event.button is false)
         if (event.button === false || event.button === 0) {
             this.mouseDown = true;
+
             // Wait until media has a duration
             if (this.player.media.duration) {
                 this.toggleScrubbingContainer(true);
@@ -307,7 +308,6 @@ class PreviewThumbnails {
         if (this.mouseDown) {
             this.setScrubbingContainerSize();
         } else {
-            this.toggleThumbContainer(true);
             this.setThumbContainerSizeAndPos();
         }
 
@@ -319,7 +319,10 @@ class PreviewThumbnails {
         const hasThumb = thumbNum >= 0;
         let qualityIndex = 0;
 
-        this.toggleThumbContainer(hasThumb);
+        // Show the thumb container if we're not scrubbing
+        if (!this.mouseDown) {
+            this.toggleThumbContainer(hasThumb);
+        }
 
         // No matching thumb found
         if (!hasThumb) {

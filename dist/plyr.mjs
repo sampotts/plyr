@@ -93,279 +93,321 @@ function _nonIterableRest() {
   throw new TypeError("Invalid attempt to destructure non-iterable instance");
 }
 
-const defaults = {
-    addCSS: true, // Add CSS to the element to improve usability (required here or in your CSS!)
-    thumbWidth: 15, // The width of the thumb handle
-    watch: true, // Watch for new elements that match a string target
+var defaults = {
+  addCSS: true,
+  // Add CSS to the element to improve usability (required here or in your CSS!)
+  thumbWidth: 15,
+  // The width of the thumb handle
+  watch: true // Watch for new elements that match a string target
+
 };
 
 // Element matches a selector
 function matches(element, selector) {
 
-    function match() {
-        return Array.from(document.querySelectorAll(selector)).includes(this);
-    }
+  function match() {
+    return Array.from(document.querySelectorAll(selector)).includes(this);
+  }
 
-    const matches =
-        match;
-
-    return matches.call(element, selector);
+  var matches = match;
+  return matches.call(element, selector);
 }
 
 // Trigger event
 function trigger(element, type) {
-    if (!element || !type) {
-        return;
-    }
+  if (!element || !type) {
+    return;
+  } // Create and dispatch the event
 
-    // Create and dispatch the event
-    const event = new Event(type);
 
-    // Dispatch the event
-    element.dispatchEvent(event);
+  var event = new Event(type); // Dispatch the event
+
+  element.dispatchEvent(event);
 }
 
 // ==========================================================================
 // Type checking utils
 // ==========================================================================
+var getConstructor = function getConstructor(input) {
+  return input !== null && typeof input !== 'undefined' ? input.constructor : null;
+};
 
-const getConstructor = input => (input !== null && typeof input !== 'undefined' ? input.constructor : null);
-const instanceOf = (input, constructor) => Boolean(input && constructor && input instanceof constructor);
+var instanceOf = function instanceOf(input, constructor) {
+  return Boolean(input && constructor && input instanceof constructor);
+};
 
-const isNullOrUndefined = input => input === null || typeof input === 'undefined';
-const isObject = input => getConstructor(input) === Object;
-const isNumber = input => getConstructor(input) === Number && !Number.isNaN(input);
-const isString = input => getConstructor(input) === String;
-const isBoolean = input => getConstructor(input) === Boolean;
-const isFunction = input => getConstructor(input) === Function;
-const isArray = input => Array.isArray(input);
-const isNodeList = input => instanceOf(input, NodeList);
-const isElement = input => instanceOf(input, Element);
-const isEvent = input => instanceOf(input, Event);
-const isEmpty = input =>
-    isNullOrUndefined(input) ||
-    ((isString(input) || isArray(input) || isNodeList(input)) && !input.length) ||
-    (isObject(input) && !Object.keys(input).length);
+var isNullOrUndefined = function isNullOrUndefined(input) {
+  return input === null || typeof input === 'undefined';
+};
+
+var isObject = function isObject(input) {
+  return getConstructor(input) === Object;
+};
+
+var isNumber = function isNumber(input) {
+  return getConstructor(input) === Number && !Number.isNaN(input);
+};
+
+var isString = function isString(input) {
+  return getConstructor(input) === String;
+};
+
+var isBoolean = function isBoolean(input) {
+  return getConstructor(input) === Boolean;
+};
+
+var isFunction = function isFunction(input) {
+  return getConstructor(input) === Function;
+};
+
+var isArray = function isArray(input) {
+  return Array.isArray(input);
+};
+
+var isNodeList = function isNodeList(input) {
+  return instanceOf(input, NodeList);
+};
+
+var isElement = function isElement(input) {
+  return instanceOf(input, Element);
+};
+
+var isEvent = function isEvent(input) {
+  return instanceOf(input, Event);
+};
+
+var isEmpty = function isEmpty(input) {
+  return isNullOrUndefined(input) || (isString(input) || isArray(input) || isNodeList(input)) && !input.length || isObject(input) && !Object.keys(input).length;
+};
 
 var is = {
-    nullOrUndefined: isNullOrUndefined,
-    object: isObject,
-    number: isNumber,
-    string: isString,
-    boolean: isBoolean,
-    function: isFunction,
-    array: isArray,
-    nodeList: isNodeList,
-    element: isElement,
-    event: isEvent,
-    empty: isEmpty,
+  nullOrUndefined: isNullOrUndefined,
+  object: isObject,
+  number: isNumber,
+  string: isString,
+  boolean: isBoolean,
+  function: isFunction,
+  array: isArray,
+  nodeList: isNodeList,
+  element: isElement,
+  event: isEvent,
+  empty: isEmpty
 };
 
 // Get the number of decimal places
 function getDecimalPlaces(value) {
-    const match = `${value}`.match(/(?:\.(\d+))?(?:[eE]([+-]?\d+))?$/);
+  var match = "".concat(value).match(/(?:\.(\d+))?(?:[eE]([+-]?\d+))?$/);
 
-    if (!match) {
-        return 0;
-    }
+  if (!match) {
+    return 0;
+  }
 
-    return Math.max(
-        0,
-        // Number of digits right of decimal point.
-        (match[1] ? match[1].length : 0) -
-            // Adjust for scientific notation.
-            (match[2] ? +match[2] : 0),
-    );
-}
+  return Math.max(0, // Number of digits right of decimal point.
+  (match[1] ? match[1].length : 0) - ( // Adjust for scientific notation.
+  match[2] ? +match[2] : 0));
+} // Round to the nearest step
 
-// Round to the nearest step
 function round(number, step) {
-    if (step < 1) {
-        const places = getDecimalPlaces(step);
-        return parseFloat(number.toFixed(places));
-    }
-    return Math.round(number / step) * step;
+  if (step < 1) {
+    var places = getDecimalPlaces(step);
+    return parseFloat(number.toFixed(places));
+  }
+
+  return Math.round(number / step) * step;
 }
 
-// ==========================================================================
+var RangeTouch =
+/*#__PURE__*/
+function () {
+  /**
+   * Setup a new instance
+   * @param {String|Element} target
+   * @param {Object} options
+   */
+  function RangeTouch(target, options) {
+    _classCallCheck(this, RangeTouch);
 
-class RangeTouch {
+    if (is.element(target)) {
+      // An Element is passed, use it directly
+      this.element = target;
+    } else if (is.string(target)) {
+      // A CSS Selector is passed, fetch it from the DOM
+      this.element = document.querySelector(target);
+    }
+
+    if (!is.element(this.element) || !is.empty(this.element.rangeTouch)) {
+      return;
+    }
+
+    this.config = Object.assign({}, defaults, options);
+    this.init();
+  }
+
+  _createClass(RangeTouch, [{
+    key: "init",
+    value: function init() {
+      // Bail if not a touch enabled device
+      if (!RangeTouch.enabled) {
+        return;
+      } // Add useful CSS
+
+
+      if (this.config.addCSS) {
+        // TODO: Restore original values on destroy
+        this.element.style.userSelect = 'none';
+        this.element.style.webKitUserSelect = 'none';
+        this.element.style.touchAction = 'manipulation';
+      }
+
+      this.listeners(true);
+      this.element.rangeTouch = this;
+    }
+  }, {
+    key: "destroy",
+    value: function destroy() {
+      // Bail if not a touch enabled device
+      if (!RangeTouch.enabled) {
+        return;
+      }
+
+      this.listeners(false);
+      this.element.rangeTouch = null;
+    }
+  }, {
+    key: "listeners",
+    value: function listeners(toggle) {
+      var _this = this;
+
+      var method = toggle ? 'addEventListener' : 'removeEventListener'; // Listen for events
+
+      ['touchstart', 'touchmove', 'touchend'].forEach(function (type) {
+        _this.element[method](type, function (event) {
+          return _this.set(event);
+        }, false);
+      });
+    }
     /**
-     * Setup a new instance
-     * @param {String|Element} target
-     * @param {Object} options
+     * Get the value based on touch position
+     * @param {Event} event
      */
-    constructor(target, options) {
-        if (is.element(target)) {
-            // An Element is passed, use it directly
-            this.element = target;
-        } else if (is.string(target)) {
-            // A CSS Selector is passed, fetch it from the DOM
-            this.element = document.querySelector(target);
-        }
 
-        if (!is.element(this.element) || !is.empty(this.element.rangeTouch)) {
-            return;
-        }
+  }, {
+    key: "get",
+    value: function get(event) {
+      if (!RangeTouch.enabled || !is.event(event)) {
+        return null;
+      }
 
-        this.config = Object.assign({}, defaults, options);
+      var input = event.target;
+      var touch = event.changedTouches[0];
+      var min = parseFloat(input.getAttribute('min')) || 0;
+      var max = parseFloat(input.getAttribute('max')) || 100;
+      var step = parseFloat(input.getAttribute('step')) || 1;
+      var delta = max - min; // Calculate percentage
 
-        this.init();
+      var percent;
+      var clientRect = input.getBoundingClientRect();
+      var thumbWidth = 100 / clientRect.width * (this.config.thumbWidth / 2) / 100; // Determine left percentage
+
+      percent = 100 / clientRect.width * (touch.clientX - clientRect.left); // Don't allow outside bounds
+
+      if (percent < 0) {
+        percent = 0;
+      } else if (percent > 100) {
+        percent = 100;
+      } // Factor in the thumb offset
+
+
+      if (percent < 50) {
+        percent -= (100 - percent * 2) * thumbWidth;
+      } else if (percent > 50) {
+        percent += (percent - 50) * 2 * thumbWidth;
+      } // Find the closest step to the mouse position
+
+
+      return min + round(delta * (percent / 100), step);
     }
+    /**
+     * Update range value based on position
+     * @param {Event} event
+     */
 
-    static get enabled() {
-        return 'ontouchstart' in document.documentElement;
+  }, {
+    key: "set",
+    value: function set(event) {
+      if (!RangeTouch.enabled || !is.event(event) || event.target.disabled) {
+        return;
+      } // Prevent text highlight on iOS
+
+
+      event.preventDefault(); // Set value
+
+      event.target.value = this.get(event); // Trigger event
+
+      trigger(event.target, event.type === 'touchend' ? 'change' : 'input');
     }
+  }], [{
+    key: "setup",
 
     /**
      * Setup multiple instances
      * @param {String|Element|NodeList|Array} target
      * @param {Object} options
      */
-    static setup(target, options = {}) {
-        let targets = null;
+    value: function setup(target) {
+      var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      var targets = null;
 
-        if (is.empty(target) || is.string(target)) {
-            targets = Array.from(document.querySelectorAll(is.string(target) ? target : 'input[type="range"]'));
-        } else if (is.element(target)) {
-            targets = [target];
-        } else if (is.nodeList(target)) {
-            targets = Array.from(target);
-        } else if (is.array(target)) {
-            targets = target.filter(is.element);
-        }
+      if (is.empty(target) || is.string(target)) {
+        targets = Array.from(document.querySelectorAll(is.string(target) ? target : 'input[type="range"]'));
+      } else if (is.element(target)) {
+        targets = [target];
+      } else if (is.nodeList(target)) {
+        targets = Array.from(target);
+      } else if (is.array(target)) {
+        targets = target.filter(is.element);
+      }
 
-        if (is.empty(targets)) {
-            return null;
-        }
+      if (is.empty(targets)) {
+        return null;
+      }
 
-        const config = Object.assign({}, defaults, options);
+      var config = Object.assign({}, defaults, options);
 
-        if (is.string(target) && config.watch) {
-            // Create an observer instance
-            const observer = new MutationObserver(mutations => {
-                Array.from(mutations).forEach(mutation => {
-                    Array.from(mutation.addedNodes).forEach(node => {
-                        if (!is.element(node) || !matches(node, target)) {
-                            return;
-                        }
+      if (is.string(target) && config.watch) {
+        // Create an observer instance
+        var observer = new MutationObserver(function (mutations) {
+          Array.from(mutations).forEach(function (mutation) {
+            Array.from(mutation.addedNodes).forEach(function (node) {
+              if (!is.element(node) || !matches(node, target)) {
+                return;
+              } // eslint-disable-next-line no-unused-vars
 
-                        // eslint-disable-next-line no-unused-vars
-                        const range = new RangeTouch(node, config);
-                    });
-                });
+
+              var range = new RangeTouch(node, config);
             });
+          });
+        }); // Pass in the target node, as well as the observer options
 
-            // Pass in the target node, as well as the observer options
-            observer.observe(document.body, {
-                childList: true,
-                subtree: true,
-            });
-        }
-
-        return targets.map(t => new RangeTouch(t, options));
-    }
-
-    init() {
-        // Bail if not a touch enabled device
-        if (!RangeTouch.enabled) {
-            return;
-        }
-
-        // Add useful CSS
-        if (this.config.addCSS) {
-            // TODO: Restore original values on destroy
-            this.element.style.userSelect = 'none';
-            this.element.style.webKitUserSelect = 'none';
-            this.element.style.touchAction = 'manipulation';
-        }
-
-        this.listeners(true);
-
-        this.element.rangeTouch = this;
-    }
-
-    destroy() {
-        // Bail if not a touch enabled device
-        if (!RangeTouch.enabled) {
-            return;
-        }
-
-        this.listeners(false);
-
-        this.element.rangeTouch = null;
-    }
-
-    listeners(toggle) {
-        const method = toggle ? 'addEventListener' : 'removeEventListener';
-
-        // Listen for events
-        ['touchstart', 'touchmove', 'touchend'].forEach(type => {
-            this.element[method](type, event => this.set(event), false);
+        observer.observe(document.body, {
+          childList: true,
+          subtree: true
         });
+      }
+
+      return targets.map(function (t) {
+        return new RangeTouch(t, options);
+      });
     }
-
-    /**
-     * Get the value based on touch position
-     * @param {Event} event
-     */
-    get(event) {
-        if (!RangeTouch.enabled || !is.event(event)) {
-            return null;
-        }
-
-        const input = event.target;
-        const touch = event.changedTouches[0];
-        const min = parseFloat(input.getAttribute('min')) || 0;
-        const max = parseFloat(input.getAttribute('max')) || 100;
-        const step = parseFloat(input.getAttribute('step')) || 1;
-        const delta = max - min;
-
-        // Calculate percentage
-        let percent;
-        const clientRect = input.getBoundingClientRect();
-        const thumbWidth = ((100 / clientRect.width) * (this.config.thumbWidth / 2)) / 100;
-
-        // Determine left percentage
-        percent = (100 / clientRect.width) * (touch.clientX - clientRect.left);
-
-        // Don't allow outside bounds
-        if (percent < 0) {
-            percent = 0;
-        } else if (percent > 100) {
-            percent = 100;
-        }
-
-        // Factor in the thumb offset
-        if (percent < 50) {
-            percent -= (100 - percent * 2) * thumbWidth;
-        } else if (percent > 50) {
-            percent += (percent - 50) * 2 * thumbWidth;
-        }
-
-        // Find the closest step to the mouse position
-        return min + round(delta * (percent / 100), step);
+  }, {
+    key: "enabled",
+    get: function get() {
+      return 'ontouchstart' in document.documentElement;
     }
+  }]);
 
-    /**
-     * Update range value based on position
-     * @param {Event} event
-     */
-    set(event) {
-        if (!RangeTouch.enabled || !is.event(event) || event.target.disabled) {
-            return;
-        }
-
-        // Prevent text highlight on iOS
-        event.preventDefault();
-
-        // Set value
-        event.target.value = this.get(event);
-
-        // Trigger event
-        trigger(event.target, event.type === 'touchend' ? 'change' : 'input');
-    }
-}
+  return RangeTouch;
+}();
 
 // ==========================================================================
 // Type checking utils
@@ -3025,8 +3067,8 @@ var controls = {
 
 /**
  * Parse a string to a URL object
- * @param {string} input - the URL to be parsed
- * @param {boolean} safe - failsafe parsing
+ * @param {String} input - the URL to be parsed
+ * @param {Boolean} safe - failsafe parsing
  */
 
 function parseUrl(input) {
@@ -3473,7 +3515,7 @@ var defaults$1 = {
   // Sprite (for icons)
   loadSprite: true,
   iconPrefix: 'plyr',
-  iconUrl: 'https://cdn.plyr.io/3.5.0/plyr.svg',
+  iconUrl: 'https://cdn.plyr.io/3.5.2/plyr.svg',
   // Blank video (used to prevent errors on source change)
   blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
   // Quality default
@@ -5176,295 +5218,273 @@ function createCommonjsModule(fn, module) {
 }
 
 var loadjs_umd = createCommonjsModule(function (module, exports) {
-(function(root, factory) {
-  {
-    module.exports = factory();
-  }
-}(commonjsGlobal, function() {
-/**
- * Global dependencies.
- * @global {Object} document - DOM
- */
-
-var devnull = function() {},
-    bundleIdCache = {},
-    bundleResultCache = {},
-    bundleCallbackQueue = {};
-
-
-/**
- * Subscribe to bundle load event.
- * @param {string[]} bundleIds - Bundle ids
- * @param {Function} callbackFn - The callback function
- */
-function subscribe(bundleIds, callbackFn) {
-  // listify
-  bundleIds = bundleIds.push ? bundleIds : [bundleIds];
-
-  var depsNotFound = [],
-      i = bundleIds.length,
-      numWaiting = i,
-      fn,
-      bundleId,
-      r,
-      q;
-
-  // define callback function
-  fn = function (bundleId, pathsNotFound) {
-    if (pathsNotFound.length) depsNotFound.push(bundleId);
-
-    numWaiting--;
-    if (!numWaiting) callbackFn(depsNotFound);
-  };
-
-  // register callback
-  while (i--) {
-    bundleId = bundleIds[i];
-
-    // execute callback if in result cache
-    r = bundleResultCache[bundleId];
-    if (r) {
-      fn(bundleId, r);
-      continue;
+  (function (root, factory) {
+    {
+      module.exports = factory();
     }
-
-    // add to callback queue
-    q = bundleCallbackQueue[bundleId] = bundleCallbackQueue[bundleId] || [];
-    q.push(fn);
-  }
-}
-
-
-/**
- * Publish bundle load event.
- * @param {string} bundleId - Bundle id
- * @param {string[]} pathsNotFound - List of files not found
- */
-function publish(bundleId, pathsNotFound) {
-  // exit if id isn't defined
-  if (!bundleId) return;
-
-  var q = bundleCallbackQueue[bundleId];
-
-  // cache result
-  bundleResultCache[bundleId] = pathsNotFound;
-
-  // exit if queue is empty
-  if (!q) return;
-
-  // empty callback queue
-  while (q.length) {
-    q[0](bundleId, pathsNotFound);
-    q.splice(0, 1);
-  }
-}
+  })(commonjsGlobal, function () {
+    /**
+     * Global dependencies.
+     * @global {Object} document - DOM
+     */
+    var devnull = function devnull() {},
+        bundleIdCache = {},
+        bundleResultCache = {},
+        bundleCallbackQueue = {};
+    /**
+     * Subscribe to bundle load event.
+     * @param {string[]} bundleIds - Bundle ids
+     * @param {Function} callbackFn - The callback function
+     */
 
 
-/**
- * Execute callbacks.
- * @param {Object or Function} args - The callback args
- * @param {string[]} depsNotFound - List of dependencies not found
- */
-function executeCallbacks(args, depsNotFound) {
-  // accept function as argument
-  if (args.call) args = {success: args};
+    function subscribe(bundleIds, callbackFn) {
+      // listify
+      bundleIds = bundleIds.push ? bundleIds : [bundleIds];
+      var depsNotFound = [],
+          i = bundleIds.length,
+          numWaiting = i,
+          fn,
+          bundleId,
+          r,
+          q; // define callback function
 
-  // success and error callbacks
-  if (depsNotFound.length) (args.error || devnull)(depsNotFound);
-  else (args.success || devnull)(args);
-}
+      fn = function fn(bundleId, pathsNotFound) {
+        if (pathsNotFound.length) depsNotFound.push(bundleId);
+        numWaiting--;
+        if (!numWaiting) callbackFn(depsNotFound);
+      }; // register callback
 
 
-/**
- * Load individual file.
- * @param {string} path - The file path
- * @param {Function} callbackFn - The callback function
- */
-function loadFile(path, callbackFn, args, numTries) {
-  var doc = document,
-      async = args.async,
-      maxTries = (args.numRetries || 0) + 1,
-      beforeCallbackFn = args.before || devnull,
-      pathStripped = path.replace(/^(css|img)!/, ''),
-      isCss,
-      e;
+      while (i--) {
+        bundleId = bundleIds[i]; // execute callback if in result cache
 
-  numTries = numTries || 0;
+        r = bundleResultCache[bundleId];
 
-  if (/(^css!|\.css$)/.test(path)) {
-    isCss = true;
+        if (r) {
+          fn(bundleId, r);
+          continue;
+        } // add to callback queue
 
-    // css
-    e = doc.createElement('link');
-    e.rel = 'stylesheet';
-    e.href = pathStripped; //.replace(/^css!/, '');  // remove "css!" prefix
-  } else if (/(^img!|\.(png|gif|jpg|svg)$)/.test(path)) {
-    // image
-    e = doc.createElement('img');
-    e.src = pathStripped;    
-  } else {
-    // javascript
-    e = doc.createElement('script');
-    e.src = path;
-    e.async = async === undefined ? true : async;
-  }
 
-  e.onload = e.onerror = e.onbeforeload = function (ev) {
-    var result = ev.type[0];
-
-    // Note: The following code isolates IE using `hideFocus` and treats empty
-    // stylesheets as failures to get around lack of onerror support
-    if (isCss && 'hideFocus' in e) {
-      try {
-        if (!e.sheet.cssText.length) result = 'e';
-      } catch (x) {
-        // sheets objects created from load errors don't allow access to
-        // `cssText` (unless error is Code:18 SecurityError)
-        if (x.code != 18) result = 'e';
+        q = bundleCallbackQueue[bundleId] = bundleCallbackQueue[bundleId] || [];
+        q.push(fn);
       }
     }
+    /**
+     * Publish bundle load event.
+     * @param {string} bundleId - Bundle id
+     * @param {string[]} pathsNotFound - List of files not found
+     */
 
-    // handle retries in case of load failure
-    if (result == 'e') {
-      // increment counter
-      numTries += 1;
 
-      // exit function and try again
-      if (numTries < maxTries) {
-        return loadFile(path, callbackFn, args, numTries);
+    function publish(bundleId, pathsNotFound) {
+      // exit if id isn't defined
+      if (!bundleId) return;
+      var q = bundleCallbackQueue[bundleId]; // cache result
+
+      bundleResultCache[bundleId] = pathsNotFound; // exit if queue is empty
+
+      if (!q) return; // empty callback queue
+
+      while (q.length) {
+        q[0](bundleId, pathsNotFound);
+        q.splice(0, 1);
       }
     }
-
-    // execute callback
-    callbackFn(path, result, ev.defaultPrevented);
-  };
-
-  // add to document (unless callback returns `false`)
-  if (beforeCallbackFn(path, e) !== false) doc.head.appendChild(e);
-}
+    /**
+     * Execute callbacks.
+     * @param {Object or Function} args - The callback args
+     * @param {string[]} depsNotFound - List of dependencies not found
+     */
 
 
-/**
- * Load multiple files.
- * @param {string[]} paths - The file paths
- * @param {Function} callbackFn - The callback function
- */
-function loadFiles(paths, callbackFn, args) {
-  // listify paths
-  paths = paths.push ? paths : [paths];
+    function executeCallbacks(args, depsNotFound) {
+      // accept function as argument
+      if (args.call) args = {
+        success: args
+      }; // success and error callbacks
 
-  var numWaiting = paths.length,
-      x = numWaiting,
-      pathsNotFound = [],
-      fn,
-      i;
-
-  // define callback function
-  fn = function(path, result, defaultPrevented) {
-    // handle error
-    if (result == 'e') pathsNotFound.push(path);
-
-    // handle beforeload event. If defaultPrevented then that means the load
-    // will be blocked (ex. Ghostery/ABP on Safari)
-    if (result == 'b') {
-      if (defaultPrevented) pathsNotFound.push(path);
-      else return;
+      if (depsNotFound.length) (args.error || devnull)(depsNotFound);else (args.success || devnull)(args);
     }
-
-    numWaiting--;
-    if (!numWaiting) callbackFn(pathsNotFound);
-  };
-
-  // load scripts
-  for (i=0; i < x; i++) loadFile(paths[i], fn, args);
-}
+    /**
+     * Load individual file.
+     * @param {string} path - The file path
+     * @param {Function} callbackFn - The callback function
+     */
 
 
-/**
- * Initiate script load and register bundle.
- * @param {(string|string[])} paths - The file paths
- * @param {(string|Function)} [arg1] - The bundleId or success callback
- * @param {Function} [arg2] - The success or error callback
- * @param {Function} [arg3] - The error callback
- */
-function loadjs(paths, arg1, arg2) {
-  var bundleId,
-      args;
+    function loadFile(path, callbackFn, args, numTries) {
+      var doc = document,
+          async = args.async,
+          maxTries = (args.numRetries || 0) + 1,
+          beforeCallbackFn = args.before || devnull,
+          pathStripped = path.replace(/^(css|img)!/, ''),
+          isCss,
+          e;
+      numTries = numTries || 0;
 
-  // bundleId (if string)
-  if (arg1 && arg1.trim) bundleId = arg1;
+      if (/(^css!|\.css$)/.test(path)) {
+        isCss = true; // css
 
-  // args (default is {})
-  args = (bundleId ? arg2 : arg1) || {};
+        e = doc.createElement('link');
+        e.rel = 'stylesheet';
+        e.href = pathStripped; //.replace(/^css!/, '');  // remove "css!" prefix
+      } else if (/(^img!|\.(png|gif|jpg|svg)$)/.test(path)) {
+        // image
+        e = doc.createElement('img');
+        e.src = pathStripped;
+      } else {
+        // javascript
+        e = doc.createElement('script');
+        e.src = path;
+        e.async = async === undefined ? true : async;
+      }
 
-  // throw error if bundle is already defined
-  if (bundleId) {
-    if (bundleId in bundleIdCache) {
-      throw "LoadJS";
-    } else {
-      bundleIdCache[bundleId] = true;
+      e.onload = e.onerror = e.onbeforeload = function (ev) {
+        var result = ev.type[0]; // Note: The following code isolates IE using `hideFocus` and treats empty
+        // stylesheets as failures to get around lack of onerror support
+
+        if (isCss && 'hideFocus' in e) {
+          try {
+            if (!e.sheet.cssText.length) result = 'e';
+          } catch (x) {
+            // sheets objects created from load errors don't allow access to
+            // `cssText` (unless error is Code:18 SecurityError)
+            if (x.code != 18) result = 'e';
+          }
+        } // handle retries in case of load failure
+
+
+        if (result == 'e') {
+          // increment counter
+          numTries += 1; // exit function and try again
+
+          if (numTries < maxTries) {
+            return loadFile(path, callbackFn, args, numTries);
+          }
+        } // execute callback
+
+
+        callbackFn(path, result, ev.defaultPrevented);
+      }; // add to document (unless callback returns `false`)
+
+
+      if (beforeCallbackFn(path, e) !== false) doc.head.appendChild(e);
     }
-  }
-
-  // load scripts
-  loadFiles(paths, function (pathsNotFound) {
-    // execute callbacks
-    executeCallbacks(args, pathsNotFound);
-
-    // publish bundle load event
-    publish(bundleId, pathsNotFound);
-  }, args);
-}
+    /**
+     * Load multiple files.
+     * @param {string[]} paths - The file paths
+     * @param {Function} callbackFn - The callback function
+     */
 
 
-/**
- * Execute callbacks when dependencies have been satisfied.
- * @param {(string|string[])} deps - List of bundle ids
- * @param {Object} args - success/error arguments
- */
-loadjs.ready = function ready(deps, args) {
-  // subscribe to bundle load event
-  subscribe(deps, function (depsNotFound) {
-    // execute callbacks
-    executeCallbacks(args, depsNotFound);
+    function loadFiles(paths, callbackFn, args) {
+      // listify paths
+      paths = paths.push ? paths : [paths];
+      var numWaiting = paths.length,
+          x = numWaiting,
+          pathsNotFound = [],
+          fn,
+          i; // define callback function
+
+      fn = function fn(path, result, defaultPrevented) {
+        // handle error
+        if (result == 'e') pathsNotFound.push(path); // handle beforeload event. If defaultPrevented then that means the load
+        // will be blocked (ex. Ghostery/ABP on Safari)
+
+        if (result == 'b') {
+          if (defaultPrevented) pathsNotFound.push(path);else return;
+        }
+
+        numWaiting--;
+        if (!numWaiting) callbackFn(pathsNotFound);
+      }; // load scripts
+
+
+      for (i = 0; i < x; i++) {
+        loadFile(paths[i], fn, args);
+      }
+    }
+    /**
+     * Initiate script load and register bundle.
+     * @param {(string|string[])} paths - The file paths
+     * @param {(string|Function)} [arg1] - The bundleId or success callback
+     * @param {Function} [arg2] - The success or error callback
+     * @param {Function} [arg3] - The error callback
+     */
+
+
+    function loadjs(paths, arg1, arg2) {
+      var bundleId, args; // bundleId (if string)
+
+      if (arg1 && arg1.trim) bundleId = arg1; // args (default is {})
+
+      args = (bundleId ? arg2 : arg1) || {}; // throw error if bundle is already defined
+
+      if (bundleId) {
+        if (bundleId in bundleIdCache) {
+          throw "LoadJS";
+        } else {
+          bundleIdCache[bundleId] = true;
+        }
+      } // load scripts
+
+
+      loadFiles(paths, function (pathsNotFound) {
+        // execute callbacks
+        executeCallbacks(args, pathsNotFound); // publish bundle load event
+
+        publish(bundleId, pathsNotFound);
+      }, args);
+    }
+    /**
+     * Execute callbacks when dependencies have been satisfied.
+     * @param {(string|string[])} deps - List of bundle ids
+     * @param {Object} args - success/error arguments
+     */
+
+
+    loadjs.ready = function ready(deps, args) {
+      // subscribe to bundle load event
+      subscribe(deps, function (depsNotFound) {
+        // execute callbacks
+        executeCallbacks(args, depsNotFound);
+      });
+      return loadjs;
+    };
+    /**
+     * Manually satisfy bundle dependencies.
+     * @param {string} bundleId - The bundle id
+     */
+
+
+    loadjs.done = function done(bundleId) {
+      publish(bundleId, []);
+    };
+    /**
+     * Reset loadjs dependencies statuses
+     */
+
+
+    loadjs.reset = function reset() {
+      bundleIdCache = {};
+      bundleResultCache = {};
+      bundleCallbackQueue = {};
+    };
+    /**
+     * Determine if bundle has already been defined
+     * @param String} bundleId - The bundle id
+     */
+
+
+    loadjs.isDefined = function isDefined(bundleId) {
+      return bundleId in bundleIdCache;
+    }; // export
+
+
+    return loadjs;
   });
-
-  return loadjs;
-};
-
-
-/**
- * Manually satisfy bundle dependencies.
- * @param {string} bundleId - The bundle id
- */
-loadjs.done = function done(bundleId) {
-  publish(bundleId, []);
-};
-
-
-/**
- * Reset loadjs dependencies statuses
- */
-loadjs.reset = function reset() {
-  bundleIdCache = {};
-  bundleResultCache = {};
-  bundleCallbackQueue = {};
-};
-
-
-/**
- * Determine if bundle has already been defined
- * @param String} bundleId - The bundle id
- */
-loadjs.isDefined = function isDefined(bundleId) {
-  return bundleId in bundleIdCache;
-};
-
-
-// export
-return loadjs;
-
-}));
 });
 
 // ==========================================================================
@@ -6261,7 +6281,7 @@ var Ads =
 function () {
   /**
    * Ads constructor.
-   * @param {object} player
+   * @param {Object} player
    * @return {Ads}
    */
   function Ads(player) {
@@ -6408,7 +6428,7 @@ function () {
     }
     /**
      * Update the ad countdown
-     * @param {boolean} start
+     * @param {Boolean} start
      */
 
   }, {
@@ -6776,7 +6796,7 @@ function () {
     }
     /**
      * Handles callbacks after an ad event was invoked
-     * @param {string} event - Event type
+     * @param {String} event - Event type
      */
 
   }, {
@@ -6800,8 +6820,8 @@ function () {
     }
     /**
      * Add event listeners
-     * @param {string} event - Event type
-     * @param {function} callback - Callback for when event occurs
+     * @param {String} event - Event type
+     * @param {Function} callback - Callback for when event occurs
      * @return {Ads}
      */
 
@@ -6820,8 +6840,8 @@ function () {
      * The advertisement has 12 seconds to get its things together. We stop this timer when the
      * advertisement is playing, or when a user action is required to start, then we clear the
      * timer on ad ready
-     * @param {number} time
-     * @param {string} from
+     * @param {Number} time
+     * @param {String} from
      */
 
   }, {
@@ -6838,7 +6858,7 @@ function () {
     }
     /**
      * Clear our safety timer(s)
-     * @param {string} from
+     * @param {String} from
      */
 
   }, {
@@ -7193,7 +7213,6 @@ function () {
       if (this.mouseDown) {
         this.setScrubbingContainerSize();
       } else {
-        this.toggleThumbContainer(true);
         this.setThumbContainerSizeAndPos();
       } // Find the desired thumbnail index
       // TODO: Handle a video longer than the thumbs where thumbNum is null
@@ -7203,8 +7222,12 @@ function () {
         return _this6.seekTime >= frame.startTime && _this6.seekTime <= frame.endTime;
       });
       var hasThumb = thumbNum >= 0;
-      var qualityIndex = 0;
-      this.toggleThumbContainer(hasThumb); // No matching thumb found
+      var qualityIndex = 0; // Show the thumb container if we're not scrubbing
+
+      if (!this.mouseDown) {
+        this.toggleThumbContainer(hasThumb);
+      } // No matching thumb found
+
 
       if (!hasThumb) {
         return;
@@ -7998,7 +8021,7 @@ function () {
 
     /**
      * Toggle playback based on current status
-     * @param {boolean} input
+     * @param {Boolean} input
      */
     value: function togglePlay(input) {
       // Toggle based on current state if nothing passed
@@ -8035,7 +8058,7 @@ function () {
     }
     /**
      * Rewind
-     * @param {number} seekTime - how far to rewind in seconds. Defaults to the config.seekTime
+     * @param {Number} seekTime - how far to rewind in seconds. Defaults to the config.seekTime
      */
 
   }, {
@@ -8045,7 +8068,7 @@ function () {
     }
     /**
      * Fast forward
-     * @param {number} seekTime - how far to fast forward in seconds. Defaults to the config.seekTime
+     * @param {Number} seekTime - how far to fast forward in seconds. Defaults to the config.seekTime
      */
 
   }, {
@@ -8055,7 +8078,7 @@ function () {
     }
     /**
      * Seek to a time
-     * @param {number} input - where to seek to in seconds. Defaults to 0 (the start)
+     * @param {Number} input - where to seek to in seconds. Defaults to 0 (the start)
      */
 
   }, {
@@ -8063,7 +8086,7 @@ function () {
 
     /**
      * Increase volume
-     * @param {boolean} step - How much to decrease by (between 0 and 1)
+     * @param {Boolean} step - How much to decrease by (between 0 and 1)
      */
     value: function increaseVolume(step) {
       var volume = this.media.muted ? 0 : this.volume;
@@ -8071,7 +8094,7 @@ function () {
     }
     /**
      * Decrease volume
-     * @param {boolean} step - How much to decrease by (between 0 and 1)
+     * @param {Boolean} step - How much to decrease by (between 0 and 1)
      */
 
   }, {
@@ -8081,7 +8104,7 @@ function () {
     }
     /**
      * Set muted state
-     * @param {boolean} mute
+     * @param {Boolean} mute
      */
 
   }, {
@@ -8089,14 +8112,14 @@ function () {
 
     /**
      * Toggle captions
-     * @param {boolean} input - Whether to enable captions
+     * @param {Boolean} input - Whether to enable captions
      */
     value: function toggleCaptions(input) {
       captions.toggle.call(this, input, false);
     }
     /**
      * Set the caption track by index
-     * @param {number} - Caption index
+     * @param {Number} - Caption index
      */
 
   }, {
@@ -8114,7 +8137,7 @@ function () {
     }
     /**
      * Toggle the player controls
-     * @param {boolean} [toggle] - Whether to show the controls
+     * @param {Boolean} [toggle] - Whether to show the controls
      */
 
   }, {
@@ -8146,8 +8169,8 @@ function () {
     }
     /**
      * Add event listeners
-     * @param {string} event - Event type
-     * @param {function} callback - Callback for when event occurs
+     * @param {String} event - Event type
+     * @param {Function} callback - Callback for when event occurs
      */
 
   }, {
@@ -8157,8 +8180,8 @@ function () {
     }
     /**
      * Add event listeners once
-     * @param {string} event - Event type
-     * @param {function} callback - Callback for when event occurs
+     * @param {String} event - Event type
+     * @param {Function} callback - Callback for when event occurs
      */
 
   }, {
@@ -8168,8 +8191,8 @@ function () {
     }
     /**
      * Remove event listeners
-     * @param {string} event - Event type
-     * @param {function} callback - Callback for when event occurs
+     * @param {String} event - Event type
+     * @param {Function} callback - Callback for when event occurs
      */
 
   }, {
@@ -8181,8 +8204,8 @@ function () {
      * Destroy an instance
      * Event listeners are removed when elements are removed
      * http://stackoverflow.com/questions/12528049/if-a-dom-element-is-removed-are-its-listeners-also-removed-from-memory
-     * @param {function} callback - Callback for when destroy is complete
-     * @param {boolean} soft - Whether it's a soft destroy (for source changes etc)
+     * @param {Function} callback - Callback for when destroy is complete
+     * @param {Boolean} soft - Whether it's a soft destroy (for source changes etc)
      */
 
   }, {
@@ -8276,7 +8299,7 @@ function () {
     }
     /**
      * Check for support for a mime type (HTML5 only)
-     * @param {string} type - Mime type
+     * @param {String} type - Mime type
      */
 
   }, {
@@ -8286,9 +8309,9 @@ function () {
     }
     /**
      * Check for support
-     * @param {string} type - Player type (audio/video)
-     * @param {string} provider - Provider (html5/youtube/vimeo)
-     * @param {bool} inline - Where player has `playsinline` sttribute
+     * @param {String} type - Player type (audio/video)
+     * @param {String} provider - Provider (html5/youtube/vimeo)
+     * @param {Boolean} inline - Where player has `playsinline` sttribute
      */
 
   }, {
@@ -8423,7 +8446,7 @@ function () {
     }
     /**
      * Set the player volume
-     * @param {number} value - must be between 0 and 1. Defaults to the value from local storage and config.volume if not set in storage
+     * @param {Number} value - must be between 0 and 1. Defaults to the value from local storage and config.volume if not set in storage
      */
 
   }, {
@@ -8520,7 +8543,7 @@ function () {
     }
     /**
      * Set playback speed
-     * @param {number} speed - the speed of playback (0.5-2.0)
+     * @param {Number} speed - the speed of playback (0.5-2.0)
      */
 
   }, {
@@ -8569,7 +8592,7 @@ function () {
     /**
      * Set playback quality
      * Currently HTML5 & YouTube only
-     * @param {number} input - Quality level
+     * @param {Number} input - Quality level
      */
 
   }, {
@@ -8614,7 +8637,7 @@ function () {
     /**
      * Toggle loop
      * TODO: Finish fancy new logic. Set the indicator on load as user may pass loop as config
-     * @param {boolean} input - Whether to loop or not
+     * @param {Boolean} input - Whether to loop or not
      */
 
   }, {
@@ -8670,7 +8693,7 @@ function () {
     }
     /**
      * Set new media source
-     * @param {object} input - The new source object (see docs)
+     * @param {Object} input - The new source object (see docs)
      */
 
   }, {
@@ -8697,7 +8720,7 @@ function () {
     }
     /**
      * Set the poster image for a video
-     * @param {input} - the URL for the new poster image
+     * @param {String} input - the URL for the new poster image
      */
 
   }, {
@@ -8723,7 +8746,7 @@ function () {
     }
     /**
      * Set the autoplay state
-     * @param {boolean} input - Whether to autoplay or not
+     * @param {Boolean} input - Whether to autoplay or not
      */
 
   }, {
@@ -8757,7 +8780,7 @@ function () {
     /**
      * Set the wanted language for captions
      * Since tracks can be added later it won't update the actual caption track until there is a matching track
-     * @param {string} - Two character ISO language code (e.g. EN, FR, PT, etc)
+     * @param {String} - Two character ISO language code (e.g. EN, FR, PT, etc)
      */
 
   }, {
@@ -8827,8 +8850,8 @@ function () {
     }
     /**
      * Load an SVG sprite into the page
-     * @param {string} url - URL for the SVG sprite
-     * @param {string} [id] - Unique ID
+     * @param {String} url - URL for the SVG sprite
+     * @param {String} [id] - Unique ID
      */
 
   }, {
@@ -8839,7 +8862,7 @@ function () {
     /**
      * Setup multiple instances
      * @param {*} selector
-     * @param {object} options
+     * @param {Object} options
      */
 
   }, {
