@@ -44,7 +44,7 @@ Please follow the instructions in our issue templates. Don't use github issues t
 
 * Fork Plyr, and create a new branch in your fork, based on the **develop** branch
 
-* Make and translate language file `src/locales/{lang}.js`, where `{lang}` is [IETF BCP 47](https://en.wikipedia.org/wiki/IETF_language_tag) language tag. The language tag should have language and script subtags, seperated by a hyphen (for example `en-GB`). It is recommended to copy and edit English translation.
+* Make and translate language file `src/locales/{lang}.js`, where `{lang}` is [IETF BCP 47](https://en.wikipedia.org/wiki/IETF_language_tag) language tag. The language tag should have language and region subtags, seperated by a hyphen. The region subtag should be written in upper case. Other subtags can also be added if needed. Example of valid language tag is `en-GB`. It is recommended to copy and edit English translation.
 
 * Add your language to `src/locales/index.js`. Make sure to import your file and follow the file format. The entry `name` should be native name of language.
 
