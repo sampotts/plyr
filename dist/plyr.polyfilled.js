@@ -5,46 +5,43 @@ typeof navigator === "object" && (function (global, factory) {
 }(this, (function () { 'use strict';
 
   // Polyfill for creating CustomEvents on IE9/10/11
-
   // code pulled from:
   // https://github.com/d4tocchini/customevent-polyfill
   // https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent#Polyfill
-
-  (function() {
+  (function () {
     if (typeof window === 'undefined') {
       return;
     }
 
     try {
-      var ce = new window.CustomEvent('test', { cancelable: true });
+      var ce = new window.CustomEvent('test', {
+        cancelable: true
+      });
       ce.preventDefault();
+
       if (ce.defaultPrevented !== true) {
         // IE has problems with .preventDefault() on custom events
         // http://stackoverflow.com/questions/23349191
         throw new Error('Could not prevent default');
       }
     } catch (e) {
-      var CustomEvent = function(event, params) {
+      var CustomEvent = function CustomEvent(event, params) {
         var evt, origPrevent;
         params = params || {
           bubbles: false,
           cancelable: false,
           detail: undefined
         };
-
         evt = document.createEvent('CustomEvent');
-        evt.initCustomEvent(
-          event,
-          params.bubbles,
-          params.cancelable,
-          params.detail
-        );
+        evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
         origPrevent = evt.preventDefault;
-        evt.preventDefault = function() {
+
+        evt.preventDefault = function () {
           origPrevent.call(this);
+
           try {
             Object.defineProperty(this, 'defaultPrevented', {
-              get: function() {
+              get: function get() {
                 return true;
               }
             });
@@ -52,6 +49,7 @@ typeof navigator === "object" && (function (global, factory) {
             this.defaultPrevented = true;
           }
         };
+
         return evt;
       };
 
@@ -60,473 +58,38 @@ typeof navigator === "object" && (function (global, factory) {
     }
   })();
 
+  var _isObject = function (it) {
+    return typeof it === 'object' ? it !== null : typeof it === 'function';
+  };
+
+  var _anObject = function (it) {
+    if (!_isObject(it)) throw TypeError(it + ' is not an object!');
+    return it;
+  };
+
+  // 7.2.9 SameValue(x, y)
+  var _sameValue = Object.is || function is(x, y) {
+    // eslint-disable-next-line no-self-compare
+    return x === y ? x !== 0 || 1 / x === 1 / y : x != x && y != y;
+  };
+
+  var toString = {}.toString;
+
+  var _cof = function (it) {
+    return toString.call(it).slice(8, -1);
+  };
+
   var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
   function createCommonjsModule(fn, module) {
   	return module = { exports: {} }, fn(module, module.exports), module.exports;
   }
 
-  (function(global) {
-    /**
-     * Polyfill URLSearchParams
-     *
-     * Inspired from : https://github.com/WebReflection/url-search-params/blob/master/src/url-search-params.js
-     */
-
-    var checkIfIteratorIsSupported = function() {
-      try {
-        return !!Symbol.iterator;
-      } catch (error) {
-        return false;
-      }
-    };
-
-
-    var iteratorSupported = checkIfIteratorIsSupported();
-
-    var createIterator = function(items) {
-      var iterator = {
-        next: function() {
-          var value = items.shift();
-          return { done: value === void 0, value: value };
-        }
-      };
-
-      if (iteratorSupported) {
-        iterator[Symbol.iterator] = function() {
-          return iterator;
-        };
-      }
-
-      return iterator;
-    };
-
-    /**
-     * Search param name and values should be encoded according to https://url.spec.whatwg.org/#urlencoded-serializing
-     * encodeURIComponent() produces the same result except encoding spaces as `%20` instead of `+`.
-     */
-    var serializeParam = function(value) {
-      return encodeURIComponent(value).replace(/%20/g, '+');
-    };
-
-    var deserializeParam = function(value) {
-      return decodeURIComponent(value).replace(/\+/g, ' ');
-    };
-
-    var polyfillURLSearchParams = function() {
-
-      var URLSearchParams = function(searchString) {
-        Object.defineProperty(this, '_entries', { writable: true, value: {} });
-
-        if (typeof searchString === 'string') {
-          if (searchString !== '') {
-            this._fromString(searchString);
-          }
-        } else if (searchString instanceof URLSearchParams) {
-          var _this = this;
-          searchString.forEach(function(value, name) {
-            _this.append(name, value);
-          });
-        }
-      };
-
-      var proto = URLSearchParams.prototype;
-
-      proto.append = function(name, value) {
-        if (name in this._entries) {
-          this._entries[name].push(value.toString());
-        } else {
-          this._entries[name] = [value.toString()];
-        }
-      };
-
-      proto.delete = function(name) {
-        delete this._entries[name];
-      };
-
-      proto.get = function(name) {
-        return (name in this._entries) ? this._entries[name][0] : null;
-      };
-
-      proto.getAll = function(name) {
-        return (name in this._entries) ? this._entries[name].slice(0) : [];
-      };
-
-      proto.has = function(name) {
-        return (name in this._entries);
-      };
-
-      proto.set = function(name, value) {
-        this._entries[name] = [value.toString()];
-      };
-
-      proto.forEach = function(callback, thisArg) {
-        var entries;
-        for (var name in this._entries) {
-          if (this._entries.hasOwnProperty(name)) {
-            entries = this._entries[name];
-            for (var i = 0; i < entries.length; i++) {
-              callback.call(thisArg, entries[i], name, this);
-            }
-          }
-        }
-      };
-
-      proto.keys = function() {
-        var items = [];
-        this.forEach(function(value, name) {
-          items.push(name);
-        });
-        return createIterator(items);
-      };
-
-      proto.values = function() {
-        var items = [];
-        this.forEach(function(value) {
-          items.push(value);
-        });
-        return createIterator(items);
-      };
-
-      proto.entries = function() {
-        var items = [];
-        this.forEach(function(value, name) {
-          items.push([name, value]);
-        });
-        return createIterator(items);
-      };
-
-      if (iteratorSupported) {
-        proto[Symbol.iterator] = proto.entries;
-      }
-
-      proto.toString = function() {
-        var searchArray = [];
-        this.forEach(function(value, name) {
-          searchArray.push(serializeParam(name) + '=' + serializeParam(value));
-        });
-        return searchArray.join('&');
-      };
-
-      Object.defineProperty(proto, '_fromString', {
-        enumerable: false,
-        configurable: false,
-        writable: false,
-        value: function(searchString) {
-          this._entries = {};
-          searchString = searchString.replace(/^\?/, '');
-          var attributes = searchString.split('&');
-          var attribute;
-          for (var i = 0; i < attributes.length; i++) {
-            attribute = attributes[i].split('=');
-            this.append(
-              deserializeParam(attribute[0]),
-              (attribute.length > 1) ? deserializeParam(attribute[1]) : ''
-            );
-          }
-        }
-      });
-
-      global.URLSearchParams = URLSearchParams;
-    };
-
-    if (!('URLSearchParams' in global) || (new URLSearchParams('?a=1').toString() !== 'a=1')) {
-      polyfillURLSearchParams();
-    }
-
-    if (typeof URLSearchParams.prototype.sort !== 'function') {
-      URLSearchParams.prototype.sort = function() {
-        var _this = this;
-        var items = [];
-        this.forEach(function(value, name) {
-          items.push([name, value]);
-          if (!_this._entries) {
-            _this.delete(name);
-          }
-        });
-        items.sort(function(a, b) {
-          if (a[0] < b[0]) {
-            return -1;
-          } else if (a[0] > b[0]) {
-            return +1;
-          } else {
-            return 0;
-          }
-        });
-        if (_this._entries) { // force reset because IE keeps keys index
-          _this._entries = {};
-        }
-        for (var i = 0; i < items.length; i++) {
-          this.append(items[i][0], items[i][1]);
-        }
-      };
-    }
-
-    // HTMLAnchorElement
-
-  })(
-    (typeof commonjsGlobal !== 'undefined') ? commonjsGlobal
-      : ((typeof window !== 'undefined') ? window
-      : ((typeof self !== 'undefined') ? self : commonjsGlobal))
-  );
-
-  (function(global) {
-    /**
-     * Polyfill URL
-     *
-     * Inspired from : https://github.com/arv/DOM-URL-Polyfill/blob/master/src/url.js
-     */
-
-    var checkIfURLIsSupported = function() {
-      try {
-        var u = new URL('b', 'http://a');
-        u.pathname = 'c%20d';
-        return (u.href === 'http://a/c%20d') && u.searchParams;
-      } catch (e) {
-        return false;
-      }
-    };
-
-
-    var polyfillURL = function() {
-      var _URL = global.URL;
-
-      var URL = function(url, base) {
-        if (typeof url !== 'string') url = String(url);
-
-        // Only create another document if the base is different from current location.
-        var doc = document, baseElement;
-        if (base && (global.location === void 0 || base !== global.location.href)) {
-          doc = document.implementation.createHTMLDocument('');
-          baseElement = doc.createElement('base');
-          baseElement.href = base;
-          doc.head.appendChild(baseElement);
-          try {
-            if (baseElement.href.indexOf(base) !== 0) throw new Error(baseElement.href);
-          } catch (err) {
-            throw new Error('URL unable to set base ' + base + ' due to ' + err);
-          }
-        }
-
-        var anchorElement = doc.createElement('a');
-        anchorElement.href = url;
-        if (baseElement) {
-          doc.body.appendChild(anchorElement);
-          anchorElement.href = anchorElement.href; // force href to refresh
-        }
-
-        if (anchorElement.protocol === ':' || !/:/.test(anchorElement.href)) {
-          throw new TypeError('Invalid URL');
-        }
-
-        Object.defineProperty(this, '_anchorElement', {
-          value: anchorElement
-        });
-
-
-        // create a linked searchParams which reflect its changes on URL
-        var searchParams = new URLSearchParams(this.search);
-        var enableSearchUpdate = true;
-        var enableSearchParamsUpdate = true;
-        var _this = this;
-        ['append', 'delete', 'set'].forEach(function(methodName) {
-          var method = searchParams[methodName];
-          searchParams[methodName] = function() {
-            method.apply(searchParams, arguments);
-            if (enableSearchUpdate) {
-              enableSearchParamsUpdate = false;
-              _this.search = searchParams.toString();
-              enableSearchParamsUpdate = true;
-            }
-          };
-        });
-
-        Object.defineProperty(this, 'searchParams', {
-          value: searchParams,
-          enumerable: true
-        });
-
-        var search = void 0;
-        Object.defineProperty(this, '_updateSearchParams', {
-          enumerable: false,
-          configurable: false,
-          writable: false,
-          value: function() {
-            if (this.search !== search) {
-              search = this.search;
-              if (enableSearchParamsUpdate) {
-                enableSearchUpdate = false;
-                this.searchParams._fromString(this.search);
-                enableSearchUpdate = true;
-              }
-            }
-          }
-        });
-      };
-
-      var proto = URL.prototype;
-
-      var linkURLWithAnchorAttribute = function(attributeName) {
-        Object.defineProperty(proto, attributeName, {
-          get: function() {
-            return this._anchorElement[attributeName];
-          },
-          set: function(value) {
-            this._anchorElement[attributeName] = value;
-          },
-          enumerable: true
-        });
-      };
-
-      ['hash', 'host', 'hostname', 'port', 'protocol']
-        .forEach(function(attributeName) {
-          linkURLWithAnchorAttribute(attributeName);
-        });
-
-      Object.defineProperty(proto, 'search', {
-        get: function() {
-          return this._anchorElement['search'];
-        },
-        set: function(value) {
-          this._anchorElement['search'] = value;
-          this._updateSearchParams();
-        },
-        enumerable: true
-      });
-
-      Object.defineProperties(proto, {
-
-        'toString': {
-          get: function() {
-            var _this = this;
-            return function() {
-              return _this.href;
-            };
-          }
-        },
-
-        'href': {
-          get: function() {
-            return this._anchorElement.href.replace(/\?$/, '');
-          },
-          set: function(value) {
-            this._anchorElement.href = value;
-            this._updateSearchParams();
-          },
-          enumerable: true
-        },
-
-        'pathname': {
-          get: function() {
-            return this._anchorElement.pathname.replace(/(^\/?)/, '/');
-          },
-          set: function(value) {
-            this._anchorElement.pathname = value;
-          },
-          enumerable: true
-        },
-
-        'origin': {
-          get: function() {
-            // get expected port from protocol
-            var expectedPort = { 'http:': 80, 'https:': 443, 'ftp:': 21 }[this._anchorElement.protocol];
-            // add port to origin if, expected port is different than actual port
-            // and it is not empty f.e http://foo:8080
-            // 8080 != 80 && 8080 != ''
-            var addPortToOrigin = this._anchorElement.port != expectedPort &&
-              this._anchorElement.port !== '';
-
-            return this._anchorElement.protocol +
-              '//' +
-              this._anchorElement.hostname +
-              (addPortToOrigin ? (':' + this._anchorElement.port) : '');
-          },
-          enumerable: true
-        },
-
-        'password': { // TODO
-          get: function() {
-            return '';
-          },
-          set: function(value) {
-          },
-          enumerable: true
-        },
-
-        'username': { // TODO
-          get: function() {
-            return '';
-          },
-          set: function(value) {
-          },
-          enumerable: true
-        },
-      });
-
-      URL.createObjectURL = function(blob) {
-        return _URL.createObjectURL.apply(_URL, arguments);
-      };
-
-      URL.revokeObjectURL = function(url) {
-        return _URL.revokeObjectURL.apply(_URL, arguments);
-      };
-
-      global.URL = URL;
-
-    };
-
-    if (!checkIfURLIsSupported()) {
-      polyfillURL();
-    }
-
-    if ((global.location !== void 0) && !('origin' in global.location)) {
-      var getOrigin = function() {
-        return global.location.protocol + '//' + global.location.hostname + (global.location.port ? (':' + global.location.port) : '');
-      };
-
-      try {
-        Object.defineProperty(global.location, 'origin', {
-          get: getOrigin,
-          enumerable: true
-        });
-      } catch (e) {
-        setInterval(function() {
-          global.location.origin = getOrigin();
-        }, 100);
-      }
-    }
-
-  })(
-    (typeof commonjsGlobal !== 'undefined') ? commonjsGlobal
-      : ((typeof window !== 'undefined') ? window
-      : ((typeof self !== 'undefined') ? self : commonjsGlobal))
-  );
-
-  var _aFunction = function (it) {
-    if (typeof it != 'function') throw TypeError(it + ' is not a function!');
-    return it;
-  };
-
-  // optional / simple context binding
-
-  var _ctx = function (fn, that, length) {
-    _aFunction(fn);
-    if (that === undefined) return fn;
-    switch (length) {
-      case 1: return function (a) {
-        return fn.call(that, a);
-      };
-      case 2: return function (a, b) {
-        return fn.call(that, a, b);
-      };
-      case 3: return function (a, b, c) {
-        return fn.call(that, a, b, c);
-      };
-    }
-    return function (/* ...args */) {
-      return fn.apply(that, arguments);
-    };
-  };
+  var _core = createCommonjsModule(function (module) {
+  var core = module.exports = { version: '2.6.5' };
+  if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
+  });
+  var _core_1 = _core.version;
 
   var _global = createCommonjsModule(function (module) {
   // https://github.com/zloirock/core-js/issues/86#issuecomment-115759028
@@ -537,20 +100,151 @@ typeof navigator === "object" && (function (global, factory) {
   if (typeof __g == 'number') __g = global; // eslint-disable-line no-undef
   });
 
-  var _core = createCommonjsModule(function (module) {
-  var core = module.exports = { version: '2.5.7' };
-  if (typeof __e == 'number') __e = core; // eslint-disable-line no-undef
+  var _library = false;
+
+  var _shared = createCommonjsModule(function (module) {
+  var SHARED = '__core-js_shared__';
+  var store = _global[SHARED] || (_global[SHARED] = {});
+
+  (module.exports = function (key, value) {
+    return store[key] || (store[key] = value !== undefined ? value : {});
+  })('versions', []).push({
+    version: _core.version,
+    mode: 'global',
+    copyright: '© 2019 Denis Pushkarev (zloirock.ru)'
   });
-  var _core_1 = _core.version;
+  });
 
-  var _isObject = function (it) {
-    return typeof it === 'object' ? it !== null : typeof it === 'function';
+  var id = 0;
+  var px = Math.random();
+  var _uid = function (key) {
+    return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
   };
 
-  var _anObject = function (it) {
-    if (!_isObject(it)) throw TypeError(it + ' is not an object!');
-    return it;
+  var _wks = createCommonjsModule(function (module) {
+  var store = _shared('wks');
+
+  var Symbol = _global.Symbol;
+  var USE_SYMBOL = typeof Symbol == 'function';
+
+  var $exports = module.exports = function (name) {
+    return store[name] || (store[name] =
+      USE_SYMBOL && Symbol[name] || (USE_SYMBOL ? Symbol : _uid)('Symbol.' + name));
   };
+
+  $exports.store = store;
+  });
+
+  // getting tag from 19.1.3.6 Object.prototype.toString()
+
+  var TAG = _wks('toStringTag');
+  // ES3 wrong here
+  var ARG = _cof(function () { return arguments; }()) == 'Arguments';
+
+  // fallback for IE11 Script Access Denied error
+  var tryGet = function (it, key) {
+    try {
+      return it[key];
+    } catch (e) { /* empty */ }
+  };
+
+  var _classof = function (it) {
+    var O, T, B;
+    return it === undefined ? 'Undefined' : it === null ? 'Null'
+      // @@toStringTag case
+      : typeof (T = tryGet(O = Object(it), TAG)) == 'string' ? T
+      // builtinTag case
+      : ARG ? _cof(O)
+      // ES3 arguments fallback
+      : (B = _cof(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
+  };
+
+  var builtinExec = RegExp.prototype.exec;
+
+   // `RegExpExec` abstract operation
+  // https://tc39.github.io/ecma262/#sec-regexpexec
+  var _regexpExecAbstract = function (R, S) {
+    var exec = R.exec;
+    if (typeof exec === 'function') {
+      var result = exec.call(R, S);
+      if (typeof result !== 'object') {
+        throw new TypeError('RegExp exec method returned something other than an Object or null');
+      }
+      return result;
+    }
+    if (_classof(R) !== 'RegExp') {
+      throw new TypeError('RegExp#exec called on incompatible receiver');
+    }
+    return builtinExec.call(R, S);
+  };
+
+  // 21.2.5.3 get RegExp.prototype.flags
+
+  var _flags = function () {
+    var that = _anObject(this);
+    var result = '';
+    if (that.global) result += 'g';
+    if (that.ignoreCase) result += 'i';
+    if (that.multiline) result += 'm';
+    if (that.unicode) result += 'u';
+    if (that.sticky) result += 'y';
+    return result;
+  };
+
+  var nativeExec = RegExp.prototype.exec;
+  // This always refers to the native implementation, because the
+  // String#replace polyfill uses ./fix-regexp-well-known-symbol-logic.js,
+  // which loads this file before patching the method.
+  var nativeReplace = String.prototype.replace;
+
+  var patchedExec = nativeExec;
+
+  var LAST_INDEX = 'lastIndex';
+
+  var UPDATES_LAST_INDEX_WRONG = (function () {
+    var re1 = /a/,
+        re2 = /b*/g;
+    nativeExec.call(re1, 'a');
+    nativeExec.call(re2, 'a');
+    return re1[LAST_INDEX] !== 0 || re2[LAST_INDEX] !== 0;
+  })();
+
+  // nonparticipating capturing group, copied from es5-shim's String#split patch.
+  var NPCG_INCLUDED = /()??/.exec('')[1] !== undefined;
+
+  var PATCH = UPDATES_LAST_INDEX_WRONG || NPCG_INCLUDED;
+
+  if (PATCH) {
+    patchedExec = function exec(str) {
+      var re = this;
+      var lastIndex, reCopy, match, i;
+
+      if (NPCG_INCLUDED) {
+        reCopy = new RegExp('^' + re.source + '$(?!\\s)', _flags.call(re));
+      }
+      if (UPDATES_LAST_INDEX_WRONG) lastIndex = re[LAST_INDEX];
+
+      match = nativeExec.call(re, str);
+
+      if (UPDATES_LAST_INDEX_WRONG && match) {
+        re[LAST_INDEX] = re.global ? match.index + match[0].length : lastIndex;
+      }
+      if (NPCG_INCLUDED && match && match.length > 1) {
+        // Fix browsers whose `exec` methods don't consistently return `undefined`
+        // for NPCG, like IE8. NOTE: This doesn' work for /(.?)?/
+        // eslint-disable-next-line no-loop-func
+        nativeReplace.call(match[0], reCopy, function () {
+          for (i = 1; i < arguments.length - 2; i++) {
+            if (arguments[i] === undefined) match[i] = undefined;
+          }
+        });
+      }
+
+      return match;
+    };
+  }
+
+  var _regexpExec = patchedExec;
 
   var _fails = function (exec) {
     try {
@@ -628,20 +322,16 @@ typeof navigator === "object" && (function (global, factory) {
     return hasOwnProperty.call(it, key);
   };
 
-  var id = 0;
-  var px = Math.random();
-  var _uid = function (key) {
-    return 'Symbol('.concat(key === undefined ? '' : key, ')_', (++id + px).toString(36));
-  };
+  var _functionToString = _shared('native-function-to-string', Function.toString);
 
   var _redefine = createCommonjsModule(function (module) {
   var SRC = _uid('src');
+
   var TO_STRING = 'toString';
-  var $toString = Function[TO_STRING];
-  var TPL = ('' + $toString).split(TO_STRING);
+  var TPL = ('' + _functionToString).split(TO_STRING);
 
   _core.inspectSource = function (it) {
-    return $toString.call(it);
+    return _functionToString.call(it);
   };
 
   (module.exports = function (O, key, val, safe) {
@@ -661,9 +351,35 @@ typeof navigator === "object" && (function (global, factory) {
     }
   // add fake Function#toString for correct work wrapped methods / constructors with methods like LoDash isNative
   })(Function.prototype, TO_STRING, function toString() {
-    return typeof this == 'function' && this[SRC] || $toString.call(this);
+    return typeof this == 'function' && this[SRC] || _functionToString.call(this);
   });
   });
+
+  var _aFunction = function (it) {
+    if (typeof it != 'function') throw TypeError(it + ' is not a function!');
+    return it;
+  };
+
+  // optional / simple context binding
+
+  var _ctx = function (fn, that, length) {
+    _aFunction(fn);
+    if (that === undefined) return fn;
+    switch (length) {
+      case 1: return function (a) {
+        return fn.call(that, a);
+      };
+      case 2: return function (a, b) {
+        return fn.call(that, a, b);
+      };
+      case 3: return function (a, b, c) {
+        return fn.call(that, a, b, c);
+      };
+    }
+    return function (/* ...args */) {
+      return fn.apply(that, arguments);
+    };
+  };
 
   var PROTOTYPE = 'prototype';
 
@@ -704,69 +420,151 @@ typeof navigator === "object" && (function (global, factory) {
   $export.R = 128; // real proto method for `library`
   var _export = $export;
 
+  _export({
+    target: 'RegExp',
+    proto: true,
+    forced: _regexpExec !== /./.exec
+  }, {
+    exec: _regexpExec
+  });
+
   // 7.2.1 RequireObjectCoercible(argument)
   var _defined = function (it) {
     if (it == undefined) throw TypeError("Can't call method on  " + it);
     return it;
   };
 
-  // 7.1.13 ToObject(argument)
+  var SPECIES = _wks('species');
 
-  var _toObject = function (it) {
-    return Object(_defined(it));
-  };
+  var REPLACE_SUPPORTS_NAMED_GROUPS = !_fails(function () {
+    // #replace needs built-in support for named groups.
+    // #match works fine because it just return the exec results, even if it has
+    // a "grops" property.
+    var re = /./;
+    re.exec = function () {
+      var result = [];
+      result.groups = { a: '7' };
+      return result;
+    };
+    return ''.replace(re, '$<a>') !== '7';
+  });
 
-  // call something on iterator step with safe closing on error
+  var SPLIT_WORKS_WITH_OVERWRITTEN_EXEC = (function () {
+    // Chrome 51 has a buggy "split" implementation when RegExp#exec !== nativeExec
+    var re = /(?:)/;
+    var originalExec = re.exec;
+    re.exec = function () { return originalExec.apply(this, arguments); };
+    var result = 'ab'.split(re);
+    return result.length === 2 && result[0] === 'a' && result[1] === 'b';
+  })();
 
-  var _iterCall = function (iterator, fn, value, entries) {
-    try {
-      return entries ? fn(_anObject(value)[0], value[1]) : fn(value);
-    // 7.4.6 IteratorClose(iterator, completion)
-    } catch (e) {
-      var ret = iterator['return'];
-      if (ret !== undefined) _anObject(ret.call(iterator));
-      throw e;
+  var _fixReWks = function (KEY, length, exec) {
+    var SYMBOL = _wks(KEY);
+
+    var DELEGATES_TO_SYMBOL = !_fails(function () {
+      // String methods call symbol-named RegEp methods
+      var O = {};
+      O[SYMBOL] = function () { return 7; };
+      return ''[KEY](O) != 7;
+    });
+
+    var DELEGATES_TO_EXEC = DELEGATES_TO_SYMBOL ? !_fails(function () {
+      // Symbol-named RegExp methods call .exec
+      var execCalled = false;
+      var re = /a/;
+      re.exec = function () { execCalled = true; return null; };
+      if (KEY === 'split') {
+        // RegExp[@@split] doesn't call the regex's exec method, but first creates
+        // a new one. We need to return the patched regex when creating the new one.
+        re.constructor = {};
+        re.constructor[SPECIES] = function () { return re; };
+      }
+      re[SYMBOL]('');
+      return !execCalled;
+    }) : undefined;
+
+    if (
+      !DELEGATES_TO_SYMBOL ||
+      !DELEGATES_TO_EXEC ||
+      (KEY === 'replace' && !REPLACE_SUPPORTS_NAMED_GROUPS) ||
+      (KEY === 'split' && !SPLIT_WORKS_WITH_OVERWRITTEN_EXEC)
+    ) {
+      var nativeRegExpMethod = /./[SYMBOL];
+      var fns = exec(
+        _defined,
+        SYMBOL,
+        ''[KEY],
+        function maybeCallNative(nativeMethod, regexp, str, arg2, forceStringMethod) {
+          if (regexp.exec === _regexpExec) {
+            if (DELEGATES_TO_SYMBOL && !forceStringMethod) {
+              // The native String method already delegates to @@method (this
+              // polyfilled function), leasing to infinite recursion.
+              // We avoid it by directly calling the native @@method method.
+              return { done: true, value: nativeRegExpMethod.call(regexp, str, arg2) };
+            }
+            return { done: true, value: nativeMethod.call(str, regexp, arg2) };
+          }
+          return { done: false };
+        }
+      );
+      var strfn = fns[0];
+      var rxfn = fns[1];
+
+      _redefine(String.prototype, KEY, strfn);
+      _hide(RegExp.prototype, SYMBOL, length == 2
+        // 21.2.5.8 RegExp.prototype[@@replace](string, replaceValue)
+        // 21.2.5.11 RegExp.prototype[@@split](string, limit)
+        ? function (string, arg) { return rxfn.call(string, this, arg); }
+        // 21.2.5.6 RegExp.prototype[@@match](string)
+        // 21.2.5.9 RegExp.prototype[@@search](string)
+        : function (string) { return rxfn.call(string, this); }
+      );
     }
   };
 
-  var _iterators = {};
-
-  var _library = false;
-
-  var _shared = createCommonjsModule(function (module) {
-  var SHARED = '__core-js_shared__';
-  var store = _global[SHARED] || (_global[SHARED] = {});
-
-  (module.exports = function (key, value) {
-    return store[key] || (store[key] = value !== undefined ? value : {});
-  })('versions', []).push({
-    version: _core.version,
-    mode: 'global',
-    copyright: '© 2018 Denis Pushkarev (zloirock.ru)'
+  // @@search logic
+  _fixReWks('search', 1, function (defined, SEARCH, $search, maybeCallNative) {
+    return [
+      // `String.prototype.search` method
+      // https://tc39.github.io/ecma262/#sec-string.prototype.search
+      function search(regexp) {
+        var O = defined(this);
+        var fn = regexp == undefined ? undefined : regexp[SEARCH];
+        return fn !== undefined ? fn.call(regexp, O) : new RegExp(regexp)[SEARCH](String(O));
+      },
+      // `RegExp.prototype[@@search]` method
+      // https://tc39.github.io/ecma262/#sec-regexp.prototype-@@search
+      function (regexp) {
+        var res = maybeCallNative($search, regexp, this);
+        if (res.done) return res.value;
+        var rx = _anObject(regexp);
+        var S = String(this);
+        var previousLastIndex = rx.lastIndex;
+        if (!_sameValue(previousLastIndex, 0)) rx.lastIndex = 0;
+        var result = _regexpExecAbstract(rx, S);
+        if (!_sameValue(rx.lastIndex, previousLastIndex)) rx.lastIndex = previousLastIndex;
+        return result === null ? -1 : result.index;
+      }
+    ];
   });
-  });
 
-  var _wks = createCommonjsModule(function (module) {
-  var store = _shared('wks');
+  // 7.2.8 IsRegExp(argument)
 
-  var Symbol = _global.Symbol;
-  var USE_SYMBOL = typeof Symbol == 'function';
 
-  var $exports = module.exports = function (name) {
-    return store[name] || (store[name] =
-      USE_SYMBOL && Symbol[name] || (USE_SYMBOL ? Symbol : _uid)('Symbol.' + name));
+  var MATCH = _wks('match');
+  var _isRegexp = function (it) {
+    var isRegExp;
+    return _isObject(it) && ((isRegExp = it[MATCH]) !== undefined ? !!isRegExp : _cof(it) == 'RegExp');
   };
 
-  $exports.store = store;
-  });
+  // 7.3.20 SpeciesConstructor(O, defaultConstructor)
 
-  // check on default Array iterator
 
-  var ITERATOR = _wks('iterator');
-  var ArrayProto = Array.prototype;
-
-  var _isArrayIter = function (it) {
-    return it !== undefined && (_iterators.Array === it || ArrayProto[ITERATOR] === it);
+  var SPECIES$1 = _wks('species');
+  var _speciesConstructor = function (O, D) {
+    var C = _anObject(O).constructor;
+    var S;
+    return C === undefined || (S = _anObject(C)[SPECIES$1]) == undefined ? D : _aFunction(S);
   };
 
   // 7.1.4 ToInteger
@@ -776,6 +574,30 @@ typeof navigator === "object" && (function (global, factory) {
     return isNaN(it = +it) ? 0 : (it > 0 ? floor : ceil)(it);
   };
 
+  // true  -> String#at
+  // false -> String#codePointAt
+  var _stringAt = function (TO_STRING) {
+    return function (that, pos) {
+      var s = String(_defined(that));
+      var i = _toInteger(pos);
+      var l = s.length;
+      var a, b;
+      if (i < 0 || i >= l) return TO_STRING ? '' : undefined;
+      a = s.charCodeAt(i);
+      return a < 0xd800 || a > 0xdbff || i + 1 === l || (b = s.charCodeAt(i + 1)) < 0xdc00 || b > 0xdfff
+        ? TO_STRING ? s.charAt(i) : a
+        : TO_STRING ? s.slice(i, i + 2) : (a - 0xd800 << 10) + (b - 0xdc00) + 0x10000;
+    };
+  };
+
+  var at = _stringAt(true);
+
+   // `AdvanceStringIndex` abstract operation
+  // https://tc39.github.io/ecma262/#sec-advancestringindex
+  var _advanceStringIndex = function (S, index, unicode) {
+    return index + (unicode ? at(S, index).length : 1);
+  };
+
   // 7.1.15 ToLength
 
   var min = Math.min;
@@ -783,97 +605,144 @@ typeof navigator === "object" && (function (global, factory) {
     return it > 0 ? min(_toInteger(it), 0x1fffffffffffff) : 0; // pow(2, 53) - 1 == 9007199254740991
   };
 
-  var _createProperty = function (object, index, value) {
-    if (index in object) _objectDp.f(object, index, _propertyDesc(0, value));
-    else object[index] = value;
-  };
+  var $min = Math.min;
+  var $push = [].push;
+  var $SPLIT = 'split';
+  var LENGTH = 'length';
+  var LAST_INDEX$1 = 'lastIndex';
+  var MAX_UINT32 = 0xffffffff;
 
-  var toString = {}.toString;
+  // babel-minify transpiles RegExp('x', 'y') -> /x/y and it causes SyntaxError
+  var SUPPORTS_Y = !_fails(function () { });
 
-  var _cof = function (it) {
-    return toString.call(it).slice(8, -1);
-  };
-
-  // getting tag from 19.1.3.6 Object.prototype.toString()
-
-  var TAG = _wks('toStringTag');
-  // ES3 wrong here
-  var ARG = _cof(function () { return arguments; }()) == 'Arguments';
-
-  // fallback for IE11 Script Access Denied error
-  var tryGet = function (it, key) {
-    try {
-      return it[key];
-    } catch (e) { /* empty */ }
-  };
-
-  var _classof = function (it) {
-    var O, T, B;
-    return it === undefined ? 'Undefined' : it === null ? 'Null'
-      // @@toStringTag case
-      : typeof (T = tryGet(O = Object(it), TAG)) == 'string' ? T
-      // builtinTag case
-      : ARG ? _cof(O)
-      // ES3 arguments fallback
-      : (B = _cof(O)) == 'Object' && typeof O.callee == 'function' ? 'Arguments' : B;
-  };
-
-  var ITERATOR$1 = _wks('iterator');
-
-  var core_getIteratorMethod = _core.getIteratorMethod = function (it) {
-    if (it != undefined) return it[ITERATOR$1]
-      || it['@@iterator']
-      || _iterators[_classof(it)];
-  };
-
-  var ITERATOR$2 = _wks('iterator');
-  var SAFE_CLOSING = false;
-
-  try {
-    var riter = [7][ITERATOR$2]();
-    riter['return'] = function () { SAFE_CLOSING = true; };
-  } catch (e) { /* empty */ }
-
-  var _iterDetect = function (exec, skipClosing) {
-    if (!skipClosing && !SAFE_CLOSING) return false;
-    var safe = false;
-    try {
-      var arr = [7];
-      var iter = arr[ITERATOR$2]();
-      iter.next = function () { return { done: safe = true }; };
-      arr[ITERATOR$2] = function () { return iter; };
-      exec(arr);
-    } catch (e) { /* empty */ }
-    return safe;
-  };
-
-  _export(_export.S + _export.F * !_iterDetect(function (iter) { }), 'Array', {
-    // 22.1.2.1 Array.from(arrayLike, mapfn = undefined, thisArg = undefined)
-    from: function from(arrayLike /* , mapfn = undefined, thisArg = undefined */) {
-      var O = _toObject(arrayLike);
-      var C = typeof this == 'function' ? this : Array;
-      var aLen = arguments.length;
-      var mapfn = aLen > 1 ? arguments[1] : undefined;
-      var mapping = mapfn !== undefined;
-      var index = 0;
-      var iterFn = core_getIteratorMethod(O);
-      var length, result, step, iterator;
-      if (mapping) mapfn = _ctx(mapfn, aLen > 2 ? arguments[2] : undefined, 2);
-      // if object isn't iterable or it's array with default iterator - use simple case
-      if (iterFn != undefined && !(C == Array && _isArrayIter(iterFn))) {
-        for (iterator = iterFn.call(O), result = new C(); !(step = iterator.next()).done; index++) {
-          _createProperty(result, index, mapping ? _iterCall(iterator, mapfn, [step.value, index], true) : step.value);
+  // @@split logic
+  _fixReWks('split', 2, function (defined, SPLIT, $split, maybeCallNative) {
+    var internalSplit;
+    if (
+      'abbc'[$SPLIT](/(b)*/)[1] == 'c' ||
+      'test'[$SPLIT](/(?:)/, -1)[LENGTH] != 4 ||
+      'ab'[$SPLIT](/(?:ab)*/)[LENGTH] != 2 ||
+      '.'[$SPLIT](/(.?)(.?)/)[LENGTH] != 4 ||
+      '.'[$SPLIT](/()()/)[LENGTH] > 1 ||
+      ''[$SPLIT](/.?/)[LENGTH]
+    ) {
+      // based on es5-shim implementation, need to rework it
+      internalSplit = function (separator, limit) {
+        var string = String(this);
+        if (separator === undefined && limit === 0) return [];
+        // If `separator` is not a regex, use native split
+        if (!_isRegexp(separator)) return $split.call(string, separator, limit);
+        var output = [];
+        var flags = (separator.ignoreCase ? 'i' : '') +
+                    (separator.multiline ? 'm' : '') +
+                    (separator.unicode ? 'u' : '') +
+                    (separator.sticky ? 'y' : '');
+        var lastLastIndex = 0;
+        var splitLimit = limit === undefined ? MAX_UINT32 : limit >>> 0;
+        // Make `global` and avoid `lastIndex` issues by working with a copy
+        var separatorCopy = new RegExp(separator.source, flags + 'g');
+        var match, lastIndex, lastLength;
+        while (match = _regexpExec.call(separatorCopy, string)) {
+          lastIndex = separatorCopy[LAST_INDEX$1];
+          if (lastIndex > lastLastIndex) {
+            output.push(string.slice(lastLastIndex, match.index));
+            if (match[LENGTH] > 1 && match.index < string[LENGTH]) $push.apply(output, match.slice(1));
+            lastLength = match[0][LENGTH];
+            lastLastIndex = lastIndex;
+            if (output[LENGTH] >= splitLimit) break;
+          }
+          if (separatorCopy[LAST_INDEX$1] === match.index) separatorCopy[LAST_INDEX$1]++; // Avoid an infinite loop
         }
-      } else {
-        length = _toLength(O.length);
-        for (result = new C(length); length > index; index++) {
-          _createProperty(result, index, mapping ? mapfn(O[index], index) : O[index]);
-        }
-      }
-      result.length = index;
-      return result;
+        if (lastLastIndex === string[LENGTH]) {
+          if (lastLength || !separatorCopy.test('')) output.push('');
+        } else output.push(string.slice(lastLastIndex));
+        return output[LENGTH] > splitLimit ? output.slice(0, splitLimit) : output;
+      };
+    // Chakra, V8
+    } else if ('0'[$SPLIT](undefined, 0)[LENGTH]) {
+      internalSplit = function (separator, limit) {
+        return separator === undefined && limit === 0 ? [] : $split.call(this, separator, limit);
+      };
+    } else {
+      internalSplit = $split;
     }
+
+    return [
+      // `String.prototype.split` method
+      // https://tc39.github.io/ecma262/#sec-string.prototype.split
+      function split(separator, limit) {
+        var O = defined(this);
+        var splitter = separator == undefined ? undefined : separator[SPLIT];
+        return splitter !== undefined
+          ? splitter.call(separator, O, limit)
+          : internalSplit.call(String(O), separator, limit);
+      },
+      // `RegExp.prototype[@@split]` method
+      // https://tc39.github.io/ecma262/#sec-regexp.prototype-@@split
+      //
+      // NOTE: This cannot be properly polyfilled in engines that don't support
+      // the 'y' flag.
+      function (regexp, limit) {
+        var res = maybeCallNative(internalSplit, regexp, this, limit, internalSplit !== $split);
+        if (res.done) return res.value;
+
+        var rx = _anObject(regexp);
+        var S = String(this);
+        var C = _speciesConstructor(rx, RegExp);
+
+        var unicodeMatching = rx.unicode;
+        var flags = (rx.ignoreCase ? 'i' : '') +
+                    (rx.multiline ? 'm' : '') +
+                    (rx.unicode ? 'u' : '') +
+                    (SUPPORTS_Y ? 'y' : 'g');
+
+        // ^(? + rx + ) is needed, in combination with some S slicing, to
+        // simulate the 'y' flag.
+        var splitter = new C(SUPPORTS_Y ? rx : '^(?:' + rx.source + ')', flags);
+        var lim = limit === undefined ? MAX_UINT32 : limit >>> 0;
+        if (lim === 0) return [];
+        if (S.length === 0) return _regexpExecAbstract(splitter, S) === null ? [S] : [];
+        var p = 0;
+        var q = 0;
+        var A = [];
+        while (q < S.length) {
+          splitter.lastIndex = SUPPORTS_Y ? q : 0;
+          var z = _regexpExecAbstract(splitter, SUPPORTS_Y ? S : S.slice(q));
+          var e;
+          if (
+            z === null ||
+            (e = $min(_toLength(splitter.lastIndex + (SUPPORTS_Y ? 0 : q)), S.length)) === p
+          ) {
+            q = _advanceStringIndex(S, q, unicodeMatching);
+          } else {
+            A.push(S.slice(p, q));
+            if (A.length === lim) return A;
+            for (var i = 1; i <= z.length - 1; i++) {
+              A.push(z[i]);
+              if (A.length === lim) return A;
+            }
+            q = p = e;
+          }
+        }
+        A.push(S.slice(p));
+        return A;
+      }
+    ];
   });
+
+  // 22.1.3.31 Array.prototype[@@unscopables]
+  var UNSCOPABLES = _wks('unscopables');
+  var ArrayProto = Array.prototype;
+  if (ArrayProto[UNSCOPABLES] == undefined) _hide(ArrayProto, UNSCOPABLES, {});
+  var _addToUnscopables = function (key) {
+    ArrayProto[UNSCOPABLES][key] = true;
+  };
+
+  var _iterStep = function (done, value) {
+    return { value: value, done: !!done };
+  };
+
+  var _iterators = {};
 
   // fallback for non-array-like ES3 and non-enumerable old V8 strings
 
@@ -882,162 +751,11 @@ typeof navigator === "object" && (function (global, factory) {
     return _cof(it) == 'String' ? it.split('') : Object(it);
   };
 
-  // 7.2.2 IsArray(argument)
-
-  var _isArray = Array.isArray || function isArray(arg) {
-    return _cof(arg) == 'Array';
-  };
-
-  var SPECIES = _wks('species');
-
-  var _arraySpeciesConstructor = function (original) {
-    var C;
-    if (_isArray(original)) {
-      C = original.constructor;
-      // cross-realm fallback
-      if (typeof C == 'function' && (C === Array || _isArray(C.prototype))) C = undefined;
-      if (_isObject(C)) {
-        C = C[SPECIES];
-        if (C === null) C = undefined;
-      }
-    } return C === undefined ? Array : C;
-  };
-
-  // 9.4.2.3 ArraySpeciesCreate(originalArray, length)
-
-
-  var _arraySpeciesCreate = function (original, length) {
-    return new (_arraySpeciesConstructor(original))(length);
-  };
-
-  // 0 -> Array#forEach
-  // 1 -> Array#map
-  // 2 -> Array#filter
-  // 3 -> Array#some
-  // 4 -> Array#every
-  // 5 -> Array#find
-  // 6 -> Array#findIndex
-
-
-
-
-
-  var _arrayMethods = function (TYPE, $create) {
-    var IS_MAP = TYPE == 1;
-    var IS_FILTER = TYPE == 2;
-    var IS_SOME = TYPE == 3;
-    var IS_EVERY = TYPE == 4;
-    var IS_FIND_INDEX = TYPE == 6;
-    var NO_HOLES = TYPE == 5 || IS_FIND_INDEX;
-    var create = $create || _arraySpeciesCreate;
-    return function ($this, callbackfn, that) {
-      var O = _toObject($this);
-      var self = _iobject(O);
-      var f = _ctx(callbackfn, that, 3);
-      var length = _toLength(self.length);
-      var index = 0;
-      var result = IS_MAP ? create($this, length) : IS_FILTER ? create($this, 0) : undefined;
-      var val, res;
-      for (;length > index; index++) if (NO_HOLES || index in self) {
-        val = self[index];
-        res = f(val, index, O);
-        if (TYPE) {
-          if (IS_MAP) result[index] = res;   // map
-          else if (res) switch (TYPE) {
-            case 3: return true;             // some
-            case 5: return val;              // find
-            case 6: return index;            // findIndex
-            case 2: result.push(val);        // filter
-          } else if (IS_EVERY) return false; // every
-        }
-      }
-      return IS_FIND_INDEX ? -1 : IS_SOME || IS_EVERY ? IS_EVERY : result;
-    };
-  };
-
-  // 22.1.3.31 Array.prototype[@@unscopables]
-  var UNSCOPABLES = _wks('unscopables');
-  var ArrayProto$1 = Array.prototype;
-  if (ArrayProto$1[UNSCOPABLES] == undefined) _hide(ArrayProto$1, UNSCOPABLES, {});
-  var _addToUnscopables = function (key) {
-    ArrayProto$1[UNSCOPABLES][key] = true;
-  };
-
-  // 22.1.3.8 Array.prototype.find(predicate, thisArg = undefined)
-
-  var $find = _arrayMethods(5);
-  var KEY = 'find';
-  var forced = true;
-  // Shouldn't skip holes
-  if (KEY in []) Array(1)[KEY](function () { forced = false; });
-  _export(_export.P + _export.F * forced, 'Array', {
-    find: function find(callbackfn /* , that = undefined */) {
-      return $find(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
-    }
-  });
-  _addToUnscopables(KEY);
-
-  var f$1 = {}.propertyIsEnumerable;
-
-  var _objectPie = {
-  	f: f$1
-  };
-
   // to indexed object, toObject with fallback for non-array-like ES3 strings
 
 
   var _toIobject = function (it) {
     return _iobject(_defined(it));
-  };
-
-  var gOPD = Object.getOwnPropertyDescriptor;
-
-  var f$2 = _descriptors ? gOPD : function getOwnPropertyDescriptor(O, P) {
-    O = _toIobject(O);
-    P = _toPrimitive(P, true);
-    if (_ie8DomDefine) try {
-      return gOPD(O, P);
-    } catch (e) { /* empty */ }
-    if (_has(O, P)) return _propertyDesc(!_objectPie.f.call(O, P), O[P]);
-  };
-
-  var _objectGopd = {
-  	f: f$2
-  };
-
-  // Works with __proto__ only. Old v8 can't work with null proto objects.
-  /* eslint-disable no-proto */
-
-
-  var check = function (O, proto) {
-    _anObject(O);
-    if (!_isObject(proto) && proto !== null) throw TypeError(proto + ": can't set as prototype!");
-  };
-  var _setProto = {
-    set: Object.setPrototypeOf || ('__proto__' in {} ? // eslint-disable-line
-      function (test, buggy, set) {
-        try {
-          set = _ctx(Function.call, _objectGopd.f(Object.prototype, '__proto__').set, 2);
-          set(test, []);
-          buggy = !(test instanceof Array);
-        } catch (e) { buggy = true; }
-        return function setPrototypeOf(O, proto) {
-          check(O, proto);
-          if (buggy) O.__proto__ = proto;
-          else set(O, proto);
-          return O;
-        };
-      }({}, false) : undefined),
-    check: check
-  };
-
-  var setPrototypeOf = _setProto.set;
-  var _inheritIfRequired = function (that, target, C) {
-    var S = target.constructor;
-    var P;
-    if (S !== C && typeof S == 'function' && (P = S.prototype) !== C.prototype && _isObject(P) && setPrototypeOf) {
-      setPrototypeOf(that, P);
-    } return that;
   };
 
   var max = Math.max;
@@ -1097,48 +815,6 @@ typeof navigator === "object" && (function (global, factory) {
   var _enumBugKeys = (
     'constructor,hasOwnProperty,isPrototypeOf,propertyIsEnumerable,toLocaleString,toString,valueOf'
   ).split(',');
-
-  // 19.1.2.7 / 15.2.3.4 Object.getOwnPropertyNames(O)
-
-  var hiddenKeys = _enumBugKeys.concat('length', 'prototype');
-
-  var f$3 = Object.getOwnPropertyNames || function getOwnPropertyNames(O) {
-    return _objectKeysInternal(O, hiddenKeys);
-  };
-
-  var _objectGopn = {
-  	f: f$3
-  };
-
-  var _stringWs = '\x09\x0A\x0B\x0C\x0D\x20\xA0\u1680\u180E\u2000\u2001\u2002\u2003' +
-    '\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000\u2028\u2029\uFEFF';
-
-  var space = '[' + _stringWs + ']';
-  var non = '\u200b\u0085';
-  var ltrim = RegExp('^' + space + space + '*');
-  var rtrim = RegExp(space + space + '*$');
-
-  var exporter = function (KEY, exec, ALIAS) {
-    var exp = {};
-    var FORCE = _fails(function () {
-      return !!_stringWs[KEY]() || non[KEY]() != non;
-    });
-    var fn = exp[KEY] = FORCE ? exec(trim) : _stringWs[KEY];
-    if (ALIAS) exp[ALIAS] = fn;
-    _export(_export.P + _export.F * FORCE, 'String', exp);
-  };
-
-  // 1 -> String#trimLeft
-  // 2 -> String#trimRight
-  // 3 -> String#trim
-  var trim = exporter.trim = function (string, TYPE) {
-    string = String(_defined(string));
-    if (TYPE & 1) string = string.replace(ltrim, '');
-    if (TYPE & 2) string = string.replace(rtrim, '');
-    return string;
-  };
-
-  var _stringTrim = exporter;
 
   // 19.1.2.14 / 15.2.3.14 Object.keys(O)
 
@@ -1203,218 +879,6 @@ typeof navigator === "object" && (function (global, factory) {
     return Properties === undefined ? result : _objectDps(result, Properties);
   };
 
-  var gOPN = _objectGopn.f;
-  var gOPD$1 = _objectGopd.f;
-  var dP$1 = _objectDp.f;
-  var $trim = _stringTrim.trim;
-  var NUMBER = 'Number';
-  var $Number = _global[NUMBER];
-  var Base = $Number;
-  var proto = $Number.prototype;
-  // Opera ~12 has broken Object#toString
-  var BROKEN_COF = _cof(_objectCreate(proto)) == NUMBER;
-  var TRIM = 'trim' in String.prototype;
-
-  // 7.1.3 ToNumber(argument)
-  var toNumber = function (argument) {
-    var it = _toPrimitive(argument, false);
-    if (typeof it == 'string' && it.length > 2) {
-      it = TRIM ? it.trim() : $trim(it, 3);
-      var first = it.charCodeAt(0);
-      var third, radix, maxCode;
-      if (first === 43 || first === 45) {
-        third = it.charCodeAt(2);
-        if (third === 88 || third === 120) return NaN; // Number('+0x1') should be NaN, old V8 fix
-      } else if (first === 48) {
-        switch (it.charCodeAt(1)) {
-          case 66: case 98: radix = 2; maxCode = 49; break; // fast equal /^0b[01]+$/i
-          case 79: case 111: radix = 8; maxCode = 55; break; // fast equal /^0o[0-7]+$/i
-          default: return +it;
-        }
-        for (var digits = it.slice(2), i = 0, l = digits.length, code; i < l; i++) {
-          code = digits.charCodeAt(i);
-          // parseInt parses a string to a first unavailable symbol
-          // but ToNumber should return NaN if a string contains unavailable symbols
-          if (code < 48 || code > maxCode) return NaN;
-        } return parseInt(digits, radix);
-      }
-    } return +it;
-  };
-
-  if (!$Number(' 0o1') || !$Number('0b1') || $Number('+0x1')) {
-    $Number = function Number(value) {
-      var it = arguments.length < 1 ? 0 : value;
-      var that = this;
-      return that instanceof $Number
-        // check on 1..constructor(foo) case
-        && (BROKEN_COF ? _fails(function () { proto.valueOf.call(that); }) : _cof(that) != NUMBER)
-          ? _inheritIfRequired(new Base(toNumber(it)), that, $Number) : toNumber(it);
-    };
-    for (var keys = _descriptors ? gOPN(Base) : (
-      // ES3:
-      'MAX_VALUE,MIN_VALUE,NaN,NEGATIVE_INFINITY,POSITIVE_INFINITY,' +
-      // ES6 (in case, if modules with ES6 Number statics required before):
-      'EPSILON,isFinite,isInteger,isNaN,isSafeInteger,MAX_SAFE_INTEGER,' +
-      'MIN_SAFE_INTEGER,parseFloat,parseInt,isInteger'
-    ).split(','), j = 0, key; keys.length > j; j++) {
-      if (_has(Base, key = keys[j]) && !_has($Number, key)) {
-        dP$1($Number, key, gOPD$1(Base, key));
-      }
-    }
-    $Number.prototype = proto;
-    proto.constructor = $Number;
-    _redefine(_global, NUMBER, $Number);
-  }
-
-  // most Object methods by ES6 should accept primitives
-
-
-
-  var _objectSap = function (KEY, exec) {
-    var fn = (_core.Object || {})[KEY] || Object[KEY];
-    var exp = {};
-    exp[KEY] = exec(fn);
-    _export(_export.S + _export.F * _fails(function () { fn(1); }), 'Object', exp);
-  };
-
-  // 19.1.2.14 Object.keys(O)
-
-
-
-  _objectSap('keys', function () {
-    return function keys(it) {
-      return _objectKeys(_toObject(it));
-    };
-  });
-
-  // 7.2.8 IsRegExp(argument)
-
-
-  var MATCH = _wks('match');
-  var _isRegexp = function (it) {
-    var isRegExp;
-    return _isObject(it) && ((isRegExp = it[MATCH]) !== undefined ? !!isRegExp : _cof(it) == 'RegExp');
-  };
-
-  // helper for String#{startsWith, endsWith, includes}
-
-
-
-  var _stringContext = function (that, searchString, NAME) {
-    if (_isRegexp(searchString)) throw TypeError('String#' + NAME + " doesn't accept regex!");
-    return String(_defined(that));
-  };
-
-  var MATCH$1 = _wks('match');
-  var _failsIsRegexp = function (KEY) {
-    var re = /./;
-    try {
-      '/./'[KEY](re);
-    } catch (e) {
-      try {
-        re[MATCH$1] = false;
-        return !'/./'[KEY](re);
-      } catch (f) { /* empty */ }
-    } return true;
-  };
-
-  var INCLUDES = 'includes';
-
-  _export(_export.P + _export.F * _failsIsRegexp(INCLUDES), 'String', {
-    includes: function includes(searchString /* , position = 0 */) {
-      return !!~_stringContext(this, searchString, INCLUDES)
-        .indexOf(searchString, arguments.length > 1 ? arguments[1] : undefined);
-    }
-  });
-
-  // https://github.com/tc39/Array.prototype.includes
-
-  var $includes = _arrayIncludes(true);
-
-  _export(_export.P, 'Array', {
-    includes: function includes(el /* , fromIndex = 0 */) {
-      return $includes(this, el, arguments.length > 1 ? arguments[1] : undefined);
-    }
-  });
-
-  _addToUnscopables('includes');
-
-  var _fixReWks = function (KEY, length, exec) {
-    var SYMBOL = _wks(KEY);
-    var fns = exec(_defined, SYMBOL, ''[KEY]);
-    var strfn = fns[0];
-    var rxfn = fns[1];
-    if (_fails(function () {
-      var O = {};
-      O[SYMBOL] = function () { return 7; };
-      return ''[KEY](O) != 7;
-    })) {
-      _redefine(String.prototype, KEY, strfn);
-      _hide(RegExp.prototype, SYMBOL, length == 2
-        // 21.2.5.8 RegExp.prototype[@@replace](string, replaceValue)
-        // 21.2.5.11 RegExp.prototype[@@split](string, limit)
-        ? function (string, arg) { return rxfn.call(string, this, arg); }
-        // 21.2.5.6 RegExp.prototype[@@match](string)
-        // 21.2.5.9 RegExp.prototype[@@search](string)
-        : function (string) { return rxfn.call(string, this); }
-      );
-    }
-  };
-
-  // @@search logic
-  _fixReWks('search', 1, function (defined, SEARCH, $search) {
-    // 21.1.3.15 String.prototype.search(regexp)
-    return [function search(regexp) {
-      var O = defined(this);
-      var fn = regexp == undefined ? undefined : regexp[SEARCH];
-      return fn !== undefined ? fn.call(regexp, O) : new RegExp(regexp)[SEARCH](String(O));
-    }, $search];
-  });
-
-  // 21.2.5.3 get RegExp.prototype.flags
-
-  var _flags = function () {
-    var that = _anObject(this);
-    var result = '';
-    if (that.global) result += 'g';
-    if (that.ignoreCase) result += 'i';
-    if (that.multiline) result += 'm';
-    if (that.unicode) result += 'u';
-    if (that.sticky) result += 'y';
-    return result;
-  };
-
-  // 21.2.5.3 get RegExp.prototype.flags()
-  if (_descriptors && /./g.flags != 'g') _objectDp.f(RegExp.prototype, 'flags', {
-    configurable: true,
-    get: _flags
-  });
-
-  var TO_STRING = 'toString';
-  var $toString = /./[TO_STRING];
-
-  var define = function (fn) {
-    _redefine(RegExp.prototype, TO_STRING, fn, true);
-  };
-
-  // 21.2.5.14 RegExp.prototype.toString()
-  if (_fails(function () { return $toString.call({ source: 'a', flags: 'b' }) != '/a/b'; })) {
-    define(function toString() {
-      var R = _anObject(this);
-      return '/'.concat(R.source, '/',
-        'flags' in R ? R.flags : !_descriptors && R instanceof RegExp ? _flags.call(R) : undefined);
-    });
-  // FF44- RegExp#toString has a wrong name
-  } else if ($toString.name != TO_STRING) {
-    define(function toString() {
-      return $toString.call(this);
-    });
-  }
-
-  var _iterStep = function (done, value) {
-    return { value: value, done: !!done };
-  };
-
   var def = _objectDp.f;
 
   var TAG$1 = _wks('toStringTag');
@@ -1433,6 +897,12 @@ typeof navigator === "object" && (function (global, factory) {
     _setToStringTag(Constructor, NAME + ' Iterator');
   };
 
+  // 7.1.13 ToObject(argument)
+
+  var _toObject = function (it) {
+    return Object(_defined(it));
+  };
+
   // 19.1.2.9 / 15.2.3.2 Object.getPrototypeOf(O)
 
 
@@ -1447,7 +917,7 @@ typeof navigator === "object" && (function (global, factory) {
     } return O instanceof Object ? ObjectProto : null;
   };
 
-  var ITERATOR$3 = _wks('iterator');
+  var ITERATOR = _wks('iterator');
   var BUGGY = !([].keys && 'next' in [].keys()); // Safari has buggy iterators w/o `next`
   var FF_ITERATOR = '@@iterator';
   var KEYS = 'keys';
@@ -1468,7 +938,7 @@ typeof navigator === "object" && (function (global, factory) {
     var DEF_VALUES = DEFAULT == VALUES;
     var VALUES_BUG = false;
     var proto = Base.prototype;
-    var $native = proto[ITERATOR$3] || proto[FF_ITERATOR] || DEFAULT && proto[DEFAULT];
+    var $native = proto[ITERATOR] || proto[FF_ITERATOR] || DEFAULT && proto[DEFAULT];
     var $default = $native || getMethod(DEFAULT);
     var $entries = DEFAULT ? !DEF_VALUES ? $default : getMethod('entries') : undefined;
     var $anyNative = NAME == 'Array' ? proto.entries || $native : $native;
@@ -1480,7 +950,7 @@ typeof navigator === "object" && (function (global, factory) {
         // Set @@toStringTag to native iterators
         _setToStringTag(IteratorPrototype, TAG, true);
         // fix for some old engines
-        if (!_library && typeof IteratorPrototype[ITERATOR$3] != 'function') _hide(IteratorPrototype, ITERATOR$3, returnThis);
+        if (!_library && typeof IteratorPrototype[ITERATOR] != 'function') _hide(IteratorPrototype, ITERATOR, returnThis);
       }
     }
     // fix Array#{values, @@iterator}.name in V8 / FF
@@ -1489,8 +959,8 @@ typeof navigator === "object" && (function (global, factory) {
       $default = function values() { return $native.call(this); };
     }
     // Define iterator
-    if ((!_library || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR$3])) {
-      _hide(proto, ITERATOR$3, $default);
+    if ((!_library || FORCED) && (BUGGY || VALUES_BUG || !proto[ITERATOR])) {
+      _hide(proto, ITERATOR, $default);
     }
     // Plug for library
     _iterators[NAME] = $default;
@@ -1537,7 +1007,51 @@ typeof navigator === "object" && (function (global, factory) {
   _addToUnscopables('values');
   _addToUnscopables('entries');
 
-  var ITERATOR$4 = _wks('iterator');
+  var dP$1 = _objectDp.f;
+  var FProto = Function.prototype;
+  var nameRE = /^\s*function ([^ (]*)/;
+  var NAME = 'name';
+
+  // 19.2.4.2 name
+  NAME in FProto || _descriptors && dP$1(FProto, NAME, {
+    configurable: true,
+    get: function () {
+      try {
+        return ('' + this).match(nameRE)[1];
+      } catch (e) {
+        return '';
+      }
+    }
+  });
+
+  // 21.2.5.3 get RegExp.prototype.flags()
+  if (_descriptors && /./g.flags != 'g') _objectDp.f(RegExp.prototype, 'flags', {
+    configurable: true,
+    get: _flags
+  });
+
+  var TO_STRING = 'toString';
+  var $toString = /./[TO_STRING];
+
+  var define = function (fn) {
+    _redefine(RegExp.prototype, TO_STRING, fn, true);
+  };
+
+  // 21.2.5.14 RegExp.prototype.toString()
+  if (_fails(function () { return $toString.call({ source: 'a', flags: 'b' }) != '/a/b'; })) {
+    define(function toString() {
+      var R = _anObject(this);
+      return '/'.concat(R.source, '/',
+        'flags' in R ? R.flags : !_descriptors && R instanceof RegExp ? _flags.call(R) : undefined);
+    });
+  // FF44- RegExp#toString has a wrong name
+  } else if ($toString.name != TO_STRING) {
+    define(function toString() {
+      return $toString.call(this);
+    });
+  }
+
+  var ITERATOR$1 = _wks('iterator');
   var TO_STRING_TAG = _wks('toStringTag');
   var ArrayValues = _iterators.Array;
 
@@ -1576,51 +1090,252 @@ typeof navigator === "object" && (function (global, factory) {
   };
 
   for (var collections = _objectKeys(DOMIterables), i = 0; i < collections.length; i++) {
-    var NAME = collections[i];
-    var explicit = DOMIterables[NAME];
-    var Collection = _global[NAME];
-    var proto$1 = Collection && Collection.prototype;
-    var key$1;
-    if (proto$1) {
-      if (!proto$1[ITERATOR$4]) _hide(proto$1, ITERATOR$4, ArrayValues);
-      if (!proto$1[TO_STRING_TAG]) _hide(proto$1, TO_STRING_TAG, NAME);
-      _iterators[NAME] = ArrayValues;
-      if (explicit) for (key$1 in es6_array_iterator) if (!proto$1[key$1]) _redefine(proto$1, key$1, es6_array_iterator[key$1], true);
+    var NAME$1 = collections[i];
+    var explicit = DOMIterables[NAME$1];
+    var Collection = _global[NAME$1];
+    var proto = Collection && Collection.prototype;
+    var key;
+    if (proto) {
+      if (!proto[ITERATOR$1]) _hide(proto, ITERATOR$1, ArrayValues);
+      if (!proto[TO_STRING_TAG]) _hide(proto, TO_STRING_TAG, NAME$1);
+      _iterators[NAME$1] = ArrayValues;
+      if (explicit) for (key in es6_array_iterator) if (!proto[key]) _redefine(proto, key, es6_array_iterator[key], true);
     }
   }
 
-  // true  -> String#at
-  // false -> String#codePointAt
-  var _stringAt = function (TO_STRING) {
-    return function (that, pos) {
-      var s = String(_defined(that));
-      var i = _toInteger(pos);
-      var l = s.length;
-      var a, b;
-      if (i < 0 || i >= l) return TO_STRING ? '' : undefined;
-      a = s.charCodeAt(i);
-      return a < 0xd800 || a > 0xdbff || i + 1 === l || (b = s.charCodeAt(i + 1)) < 0xdc00 || b > 0xdfff
-        ? TO_STRING ? s.charAt(i) : a
-        : TO_STRING ? s.slice(i, i + 2) : (a - 0xd800 << 10) + (b - 0xdc00) + 0x10000;
-    };
+  function _typeof(obj) {
+    if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
+      _typeof = function (obj) {
+        return typeof obj;
+      };
+    } else {
+      _typeof = function (obj) {
+        return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+      };
+    }
+
+    return _typeof(obj);
+  }
+
+  function _classCallCheck(instance, Constructor) {
+    if (!(instance instanceof Constructor)) {
+      throw new TypeError("Cannot call a class as a function");
+    }
+  }
+
+  function _defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }
+
+  function _createClass(Constructor, protoProps, staticProps) {
+    if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) _defineProperties(Constructor, staticProps);
+    return Constructor;
+  }
+
+  function _defineProperty(obj, key, value) {
+    if (key in obj) {
+      Object.defineProperty(obj, key, {
+        value: value,
+        enumerable: true,
+        configurable: true,
+        writable: true
+      });
+    } else {
+      obj[key] = value;
+    }
+
+    return obj;
+  }
+
+  function _slicedToArray(arr, i) {
+    return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest();
+  }
+
+  function _toConsumableArray(arr) {
+    return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread();
+  }
+
+  function _arrayWithoutHoles(arr) {
+    if (Array.isArray(arr)) {
+      for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+
+      return arr2;
+    }
+  }
+
+  function _arrayWithHoles(arr) {
+    if (Array.isArray(arr)) return arr;
+  }
+
+  function _iterableToArray(iter) {
+    if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
+  }
+
+  function _iterableToArrayLimit(arr, i) {
+    var _arr = [];
+    var _n = true;
+    var _d = false;
+    var _e = undefined;
+
+    try {
+      for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+        _arr.push(_s.value);
+
+        if (i && _arr.length === i) break;
+      }
+    } catch (err) {
+      _d = true;
+      _e = err;
+    } finally {
+      try {
+        if (!_n && _i["return"] != null) _i["return"]();
+      } finally {
+        if (_d) throw _e;
+      }
+    }
+
+    return _arr;
+  }
+
+  function _nonIterableSpread() {
+    throw new TypeError("Invalid attempt to spread non-iterable instance");
+  }
+
+  function _nonIterableRest() {
+    throw new TypeError("Invalid attempt to destructure non-iterable instance");
+  }
+
+  var max$1 = Math.max;
+  var min$2 = Math.min;
+  var floor$1 = Math.floor;
+  var SUBSTITUTION_SYMBOLS = /\$([$&`']|\d\d?|<[^>]*>)/g;
+  var SUBSTITUTION_SYMBOLS_NO_NAMED = /\$([$&`']|\d\d?)/g;
+
+  var maybeToString = function (it) {
+    return it === undefined ? it : String(it);
   };
 
-  var $at = _stringAt(true);
+  // @@replace logic
+  _fixReWks('replace', 2, function (defined, REPLACE, $replace, maybeCallNative) {
+    return [
+      // `String.prototype.replace` method
+      // https://tc39.github.io/ecma262/#sec-string.prototype.replace
+      function replace(searchValue, replaceValue) {
+        var O = defined(this);
+        var fn = searchValue == undefined ? undefined : searchValue[REPLACE];
+        return fn !== undefined
+          ? fn.call(searchValue, O, replaceValue)
+          : $replace.call(String(O), searchValue, replaceValue);
+      },
+      // `RegExp.prototype[@@replace]` method
+      // https://tc39.github.io/ecma262/#sec-regexp.prototype-@@replace
+      function (regexp, replaceValue) {
+        var res = maybeCallNative($replace, regexp, this, replaceValue);
+        if (res.done) return res.value;
 
-  // 21.1.3.27 String.prototype[@@iterator]()
-  _iterDefine(String, 'String', function (iterated) {
-    this._t = String(iterated); // target
-    this._i = 0;                // next index
-  // 21.1.5.2.1 %StringIteratorPrototype%.next()
-  }, function () {
-    var O = this._t;
-    var index = this._i;
-    var point;
-    if (index >= O.length) return { value: undefined, done: true };
-    point = $at(O, index);
-    this._i += point.length;
-    return { value: point, done: false };
+        var rx = _anObject(regexp);
+        var S = String(this);
+        var functionalReplace = typeof replaceValue === 'function';
+        if (!functionalReplace) replaceValue = String(replaceValue);
+        var global = rx.global;
+        if (global) {
+          var fullUnicode = rx.unicode;
+          rx.lastIndex = 0;
+        }
+        var results = [];
+        while (true) {
+          var result = _regexpExecAbstract(rx, S);
+          if (result === null) break;
+          results.push(result);
+          if (!global) break;
+          var matchStr = String(result[0]);
+          if (matchStr === '') rx.lastIndex = _advanceStringIndex(S, _toLength(rx.lastIndex), fullUnicode);
+        }
+        var accumulatedResult = '';
+        var nextSourcePosition = 0;
+        for (var i = 0; i < results.length; i++) {
+          result = results[i];
+          var matched = String(result[0]);
+          var position = max$1(min$2(_toInteger(result.index), S.length), 0);
+          var captures = [];
+          // NOTE: This is equivalent to
+          //   captures = result.slice(1).map(maybeToString)
+          // but for some reason `nativeSlice.call(result, 1, result.length)` (called in
+          // the slice polyfill when slicing native arrays) "doesn't work" in safari 9 and
+          // causes a crash (https://pastebin.com/N21QzeQA) when trying to debug it.
+          for (var j = 1; j < result.length; j++) captures.push(maybeToString(result[j]));
+          var namedCaptures = result.groups;
+          if (functionalReplace) {
+            var replacerArgs = [matched].concat(captures, position, S);
+            if (namedCaptures !== undefined) replacerArgs.push(namedCaptures);
+            var replacement = String(replaceValue.apply(undefined, replacerArgs));
+          } else {
+            replacement = getSubstitution(matched, S, position, captures, namedCaptures, replaceValue);
+          }
+          if (position >= nextSourcePosition) {
+            accumulatedResult += S.slice(nextSourcePosition, position) + replacement;
+            nextSourcePosition = position + matched.length;
+          }
+        }
+        return accumulatedResult + S.slice(nextSourcePosition);
+      }
+    ];
+
+      // https://tc39.github.io/ecma262/#sec-getsubstitution
+    function getSubstitution(matched, str, position, captures, namedCaptures, replacement) {
+      var tailPos = position + matched.length;
+      var m = captures.length;
+      var symbols = SUBSTITUTION_SYMBOLS_NO_NAMED;
+      if (namedCaptures !== undefined) {
+        namedCaptures = _toObject(namedCaptures);
+        symbols = SUBSTITUTION_SYMBOLS;
+      }
+      return $replace.call(replacement, symbols, function (match, ch) {
+        var capture;
+        switch (ch.charAt(0)) {
+          case '$': return '$';
+          case '&': return matched;
+          case '`': return str.slice(0, position);
+          case "'": return str.slice(tailPos);
+          case '<':
+            capture = namedCaptures[ch.slice(1, -1)];
+            break;
+          default: // \d\d?
+            var n = +ch;
+            if (n === 0) return match;
+            if (n > m) {
+              var f = floor$1(n / 10);
+              if (f === 0) return match;
+              if (f <= m) return captures[f - 1] === undefined ? ch.charAt(1) : captures[f - 1] + ch.charAt(1);
+              return match;
+            }
+            capture = captures[n - 1];
+        }
+        return capture === undefined ? '' : capture;
+      });
+    }
   });
+
+  var f$1 = _wks;
+
+  var _wksExt = {
+  	f: f$1
+  };
+
+  var defineProperty = _objectDp.f;
+  var _wksDefine = function (name) {
+    var $Symbol = _core.Symbol || (_core.Symbol = _global.Symbol || {});
+    if (name.charAt(0) != '_' && !(name in $Symbol)) defineProperty($Symbol, name, { value: _wksExt.f(name) });
+  };
+
+  _wksDefine('asyncIterator');
 
   var _meta = createCommonjsModule(function (module) {
   var META = _uid('meta');
@@ -1683,11 +1398,1167 @@ typeof navigator === "object" && (function (global, factory) {
   var _meta_4 = _meta.getWeak;
   var _meta_5 = _meta.onFreeze;
 
-  var f$4 = Object.getOwnPropertySymbols;
+  var f$2 = Object.getOwnPropertySymbols;
 
   var _objectGops = {
+  	f: f$2
+  };
+
+  var f$3 = {}.propertyIsEnumerable;
+
+  var _objectPie = {
+  	f: f$3
+  };
+
+  // all enumerable object keys, includes symbols
+
+
+
+  var _enumKeys = function (it) {
+    var result = _objectKeys(it);
+    var getSymbols = _objectGops.f;
+    if (getSymbols) {
+      var symbols = getSymbols(it);
+      var isEnum = _objectPie.f;
+      var i = 0;
+      var key;
+      while (symbols.length > i) if (isEnum.call(it, key = symbols[i++])) result.push(key);
+    } return result;
+  };
+
+  // 7.2.2 IsArray(argument)
+
+  var _isArray = Array.isArray || function isArray(arg) {
+    return _cof(arg) == 'Array';
+  };
+
+  // 19.1.2.7 / 15.2.3.4 Object.getOwnPropertyNames(O)
+
+  var hiddenKeys = _enumBugKeys.concat('length', 'prototype');
+
+  var f$4 = Object.getOwnPropertyNames || function getOwnPropertyNames(O) {
+    return _objectKeysInternal(O, hiddenKeys);
+  };
+
+  var _objectGopn = {
   	f: f$4
   };
+
+  // fallback for IE11 buggy Object.getOwnPropertyNames with iframe and window
+
+  var gOPN = _objectGopn.f;
+  var toString$1 = {}.toString;
+
+  var windowNames = typeof window == 'object' && window && Object.getOwnPropertyNames
+    ? Object.getOwnPropertyNames(window) : [];
+
+  var getWindowNames = function (it) {
+    try {
+      return gOPN(it);
+    } catch (e) {
+      return windowNames.slice();
+    }
+  };
+
+  var f$5 = function getOwnPropertyNames(it) {
+    return windowNames && toString$1.call(it) == '[object Window]' ? getWindowNames(it) : gOPN(_toIobject(it));
+  };
+
+  var _objectGopnExt = {
+  	f: f$5
+  };
+
+  var gOPD = Object.getOwnPropertyDescriptor;
+
+  var f$6 = _descriptors ? gOPD : function getOwnPropertyDescriptor(O, P) {
+    O = _toIobject(O);
+    P = _toPrimitive(P, true);
+    if (_ie8DomDefine) try {
+      return gOPD(O, P);
+    } catch (e) { /* empty */ }
+    if (_has(O, P)) return _propertyDesc(!_objectPie.f.call(O, P), O[P]);
+  };
+
+  var _objectGopd = {
+  	f: f$6
+  };
+
+  // ECMAScript 6 symbols shim
+
+
+
+
+
+  var META = _meta.KEY;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  var gOPD$1 = _objectGopd.f;
+  var dP$2 = _objectDp.f;
+  var gOPN$1 = _objectGopnExt.f;
+  var $Symbol = _global.Symbol;
+  var $JSON = _global.JSON;
+  var _stringify = $JSON && $JSON.stringify;
+  var PROTOTYPE$2 = 'prototype';
+  var HIDDEN = _wks('_hidden');
+  var TO_PRIMITIVE = _wks('toPrimitive');
+  var isEnum = {}.propertyIsEnumerable;
+  var SymbolRegistry = _shared('symbol-registry');
+  var AllSymbols = _shared('symbols');
+  var OPSymbols = _shared('op-symbols');
+  var ObjectProto$1 = Object[PROTOTYPE$2];
+  var USE_NATIVE = typeof $Symbol == 'function';
+  var QObject = _global.QObject;
+  // Don't use setters in Qt Script, https://github.com/zloirock/core-js/issues/173
+  var setter = !QObject || !QObject[PROTOTYPE$2] || !QObject[PROTOTYPE$2].findChild;
+
+  // fallback for old Android, https://code.google.com/p/v8/issues/detail?id=687
+  var setSymbolDesc = _descriptors && _fails(function () {
+    return _objectCreate(dP$2({}, 'a', {
+      get: function () { return dP$2(this, 'a', { value: 7 }).a; }
+    })).a != 7;
+  }) ? function (it, key, D) {
+    var protoDesc = gOPD$1(ObjectProto$1, key);
+    if (protoDesc) delete ObjectProto$1[key];
+    dP$2(it, key, D);
+    if (protoDesc && it !== ObjectProto$1) dP$2(ObjectProto$1, key, protoDesc);
+  } : dP$2;
+
+  var wrap = function (tag) {
+    var sym = AllSymbols[tag] = _objectCreate($Symbol[PROTOTYPE$2]);
+    sym._k = tag;
+    return sym;
+  };
+
+  var isSymbol = USE_NATIVE && typeof $Symbol.iterator == 'symbol' ? function (it) {
+    return typeof it == 'symbol';
+  } : function (it) {
+    return it instanceof $Symbol;
+  };
+
+  var $defineProperty = function defineProperty(it, key, D) {
+    if (it === ObjectProto$1) $defineProperty(OPSymbols, key, D);
+    _anObject(it);
+    key = _toPrimitive(key, true);
+    _anObject(D);
+    if (_has(AllSymbols, key)) {
+      if (!D.enumerable) {
+        if (!_has(it, HIDDEN)) dP$2(it, HIDDEN, _propertyDesc(1, {}));
+        it[HIDDEN][key] = true;
+      } else {
+        if (_has(it, HIDDEN) && it[HIDDEN][key]) it[HIDDEN][key] = false;
+        D = _objectCreate(D, { enumerable: _propertyDesc(0, false) });
+      } return setSymbolDesc(it, key, D);
+    } return dP$2(it, key, D);
+  };
+  var $defineProperties = function defineProperties(it, P) {
+    _anObject(it);
+    var keys = _enumKeys(P = _toIobject(P));
+    var i = 0;
+    var l = keys.length;
+    var key;
+    while (l > i) $defineProperty(it, key = keys[i++], P[key]);
+    return it;
+  };
+  var $create = function create(it, P) {
+    return P === undefined ? _objectCreate(it) : $defineProperties(_objectCreate(it), P);
+  };
+  var $propertyIsEnumerable = function propertyIsEnumerable(key) {
+    var E = isEnum.call(this, key = _toPrimitive(key, true));
+    if (this === ObjectProto$1 && _has(AllSymbols, key) && !_has(OPSymbols, key)) return false;
+    return E || !_has(this, key) || !_has(AllSymbols, key) || _has(this, HIDDEN) && this[HIDDEN][key] ? E : true;
+  };
+  var $getOwnPropertyDescriptor = function getOwnPropertyDescriptor(it, key) {
+    it = _toIobject(it);
+    key = _toPrimitive(key, true);
+    if (it === ObjectProto$1 && _has(AllSymbols, key) && !_has(OPSymbols, key)) return;
+    var D = gOPD$1(it, key);
+    if (D && _has(AllSymbols, key) && !(_has(it, HIDDEN) && it[HIDDEN][key])) D.enumerable = true;
+    return D;
+  };
+  var $getOwnPropertyNames = function getOwnPropertyNames(it) {
+    var names = gOPN$1(_toIobject(it));
+    var result = [];
+    var i = 0;
+    var key;
+    while (names.length > i) {
+      if (!_has(AllSymbols, key = names[i++]) && key != HIDDEN && key != META) result.push(key);
+    } return result;
+  };
+  var $getOwnPropertySymbols = function getOwnPropertySymbols(it) {
+    var IS_OP = it === ObjectProto$1;
+    var names = gOPN$1(IS_OP ? OPSymbols : _toIobject(it));
+    var result = [];
+    var i = 0;
+    var key;
+    while (names.length > i) {
+      if (_has(AllSymbols, key = names[i++]) && (IS_OP ? _has(ObjectProto$1, key) : true)) result.push(AllSymbols[key]);
+    } return result;
+  };
+
+  // 19.4.1.1 Symbol([description])
+  if (!USE_NATIVE) {
+    $Symbol = function Symbol() {
+      if (this instanceof $Symbol) throw TypeError('Symbol is not a constructor!');
+      var tag = _uid(arguments.length > 0 ? arguments[0] : undefined);
+      var $set = function (value) {
+        if (this === ObjectProto$1) $set.call(OPSymbols, value);
+        if (_has(this, HIDDEN) && _has(this[HIDDEN], tag)) this[HIDDEN][tag] = false;
+        setSymbolDesc(this, tag, _propertyDesc(1, value));
+      };
+      if (_descriptors && setter) setSymbolDesc(ObjectProto$1, tag, { configurable: true, set: $set });
+      return wrap(tag);
+    };
+    _redefine($Symbol[PROTOTYPE$2], 'toString', function toString() {
+      return this._k;
+    });
+
+    _objectGopd.f = $getOwnPropertyDescriptor;
+    _objectDp.f = $defineProperty;
+    _objectGopn.f = _objectGopnExt.f = $getOwnPropertyNames;
+    _objectPie.f = $propertyIsEnumerable;
+    _objectGops.f = $getOwnPropertySymbols;
+
+    if (_descriptors && !_library) {
+      _redefine(ObjectProto$1, 'propertyIsEnumerable', $propertyIsEnumerable, true);
+    }
+
+    _wksExt.f = function (name) {
+      return wrap(_wks(name));
+    };
+  }
+
+  _export(_export.G + _export.W + _export.F * !USE_NATIVE, { Symbol: $Symbol });
+
+  for (var es6Symbols = (
+    // 19.4.2.2, 19.4.2.3, 19.4.2.4, 19.4.2.6, 19.4.2.8, 19.4.2.9, 19.4.2.10, 19.4.2.11, 19.4.2.12, 19.4.2.13, 19.4.2.14
+    'hasInstance,isConcatSpreadable,iterator,match,replace,search,species,split,toPrimitive,toStringTag,unscopables'
+  ).split(','), j = 0; es6Symbols.length > j;)_wks(es6Symbols[j++]);
+
+  for (var wellKnownSymbols = _objectKeys(_wks.store), k = 0; wellKnownSymbols.length > k;) _wksDefine(wellKnownSymbols[k++]);
+
+  _export(_export.S + _export.F * !USE_NATIVE, 'Symbol', {
+    // 19.4.2.1 Symbol.for(key)
+    'for': function (key) {
+      return _has(SymbolRegistry, key += '')
+        ? SymbolRegistry[key]
+        : SymbolRegistry[key] = $Symbol(key);
+    },
+    // 19.4.2.5 Symbol.keyFor(sym)
+    keyFor: function keyFor(sym) {
+      if (!isSymbol(sym)) throw TypeError(sym + ' is not a symbol!');
+      for (var key in SymbolRegistry) if (SymbolRegistry[key] === sym) return key;
+    },
+    useSetter: function () { setter = true; },
+    useSimple: function () { setter = false; }
+  });
+
+  _export(_export.S + _export.F * !USE_NATIVE, 'Object', {
+    // 19.1.2.2 Object.create(O [, Properties])
+    create: $create,
+    // 19.1.2.4 Object.defineProperty(O, P, Attributes)
+    defineProperty: $defineProperty,
+    // 19.1.2.3 Object.defineProperties(O, Properties)
+    defineProperties: $defineProperties,
+    // 19.1.2.6 Object.getOwnPropertyDescriptor(O, P)
+    getOwnPropertyDescriptor: $getOwnPropertyDescriptor,
+    // 19.1.2.7 Object.getOwnPropertyNames(O)
+    getOwnPropertyNames: $getOwnPropertyNames,
+    // 19.1.2.8 Object.getOwnPropertySymbols(O)
+    getOwnPropertySymbols: $getOwnPropertySymbols
+  });
+
+  // 24.3.2 JSON.stringify(value [, replacer [, space]])
+  $JSON && _export(_export.S + _export.F * (!USE_NATIVE || _fails(function () {
+    var S = $Symbol();
+    // MS Edge converts symbol values to JSON as {}
+    // WebKit converts symbol values to JSON as null
+    // V8 throws on boxed symbols
+    return _stringify([S]) != '[null]' || _stringify({ a: S }) != '{}' || _stringify(Object(S)) != '{}';
+  })), 'JSON', {
+    stringify: function stringify(it) {
+      var args = [it];
+      var i = 1;
+      var replacer, $replacer;
+      while (arguments.length > i) args.push(arguments[i++]);
+      $replacer = replacer = args[1];
+      if (!_isObject(replacer) && it === undefined || isSymbol(it)) return; // IE8 returns string on undefined
+      if (!_isArray(replacer)) replacer = function (key, value) {
+        if (typeof $replacer == 'function') value = $replacer.call(this, key, value);
+        if (!isSymbol(value)) return value;
+      };
+      args[1] = replacer;
+      return _stringify.apply($JSON, args);
+    }
+  });
+
+  // 19.4.3.4 Symbol.prototype[@@toPrimitive](hint)
+  $Symbol[PROTOTYPE$2][TO_PRIMITIVE] || _hide($Symbol[PROTOTYPE$2], TO_PRIMITIVE, $Symbol[PROTOTYPE$2].valueOf);
+  // 19.4.3.5 Symbol.prototype[@@toStringTag]
+  _setToStringTag($Symbol, 'Symbol');
+  // 20.2.1.9 Math[@@toStringTag]
+  _setToStringTag(Math, 'Math', true);
+  // 24.3.3 JSON[@@toStringTag]
+  _setToStringTag(_global.JSON, 'JSON', true);
+
+  (function (global) {
+    /**
+     * Polyfill URLSearchParams
+     *
+     * Inspired from : https://github.com/WebReflection/url-search-params/blob/master/src/url-search-params.js
+     */
+    var checkIfIteratorIsSupported = function checkIfIteratorIsSupported() {
+      try {
+        return !!Symbol.iterator;
+      } catch (error) {
+        return false;
+      }
+    };
+
+    var iteratorSupported = checkIfIteratorIsSupported();
+
+    var createIterator = function createIterator(items) {
+      var iterator = {
+        next: function next() {
+          var value = items.shift();
+          return {
+            done: value === void 0,
+            value: value
+          };
+        }
+      };
+
+      if (iteratorSupported) {
+        iterator[Symbol.iterator] = function () {
+          return iterator;
+        };
+      }
+
+      return iterator;
+    };
+    /**
+     * Search param name and values should be encoded according to https://url.spec.whatwg.org/#urlencoded-serializing
+     * encodeURIComponent() produces the same result except encoding spaces as `%20` instead of `+`.
+     */
+
+
+    var serializeParam = function serializeParam(value) {
+      return encodeURIComponent(value).replace(/%20/g, '+');
+    };
+
+    var deserializeParam = function deserializeParam(value) {
+      return decodeURIComponent(value).replace(/\+/g, ' ');
+    };
+
+    var polyfillURLSearchParams = function polyfillURLSearchParams() {
+      var URLSearchParams = function URLSearchParams(searchString) {
+        Object.defineProperty(this, '_entries', {
+          writable: true,
+          value: {}
+        });
+
+        var typeofSearchString = _typeof(searchString);
+
+        if (typeofSearchString === 'undefined') ; else if (typeofSearchString === 'string') {
+          if (searchString !== '') {
+            this._fromString(searchString);
+          }
+        } else if (searchString instanceof URLSearchParams) {
+          var _this = this;
+
+          searchString.forEach(function (value, name) {
+            _this.append(name, value);
+          });
+        } else if (searchString !== null && typeofSearchString === 'object') {
+          if (Object.prototype.toString.call(searchString) === '[object Array]') {
+            for (var i = 0; i < searchString.length; i++) {
+              var entry = searchString[i];
+
+              if (Object.prototype.toString.call(entry) === '[object Array]' || entry.length !== 2) {
+                this.append(entry[0], entry[1]);
+              } else {
+                throw new TypeError('Expected [string, any] as entry at index ' + i + ' of URLSearchParams\'s input');
+              }
+            }
+          } else {
+            for (var key in searchString) {
+              if (searchString.hasOwnProperty(key)) {
+                this.append(key, searchString[key]);
+              }
+            }
+          }
+        } else {
+          throw new TypeError('Unsupported input\'s type for URLSearchParams');
+        }
+      };
+
+      var proto = URLSearchParams.prototype;
+
+      proto.append = function (name, value) {
+        if (name in this._entries) {
+          this._entries[name].push(String(value));
+        } else {
+          this._entries[name] = [String(value)];
+        }
+      };
+
+      proto.delete = function (name) {
+        delete this._entries[name];
+      };
+
+      proto.get = function (name) {
+        return name in this._entries ? this._entries[name][0] : null;
+      };
+
+      proto.getAll = function (name) {
+        return name in this._entries ? this._entries[name].slice(0) : [];
+      };
+
+      proto.has = function (name) {
+        return name in this._entries;
+      };
+
+      proto.set = function (name, value) {
+        this._entries[name] = [String(value)];
+      };
+
+      proto.forEach = function (callback, thisArg) {
+        var entries;
+
+        for (var name in this._entries) {
+          if (this._entries.hasOwnProperty(name)) {
+            entries = this._entries[name];
+
+            for (var i = 0; i < entries.length; i++) {
+              callback.call(thisArg, entries[i], name, this);
+            }
+          }
+        }
+      };
+
+      proto.keys = function () {
+        var items = [];
+        this.forEach(function (value, name) {
+          items.push(name);
+        });
+        return createIterator(items);
+      };
+
+      proto.values = function () {
+        var items = [];
+        this.forEach(function (value) {
+          items.push(value);
+        });
+        return createIterator(items);
+      };
+
+      proto.entries = function () {
+        var items = [];
+        this.forEach(function (value, name) {
+          items.push([name, value]);
+        });
+        return createIterator(items);
+      };
+
+      if (iteratorSupported) {
+        proto[Symbol.iterator] = proto.entries;
+      }
+
+      proto.toString = function () {
+        var searchArray = [];
+        this.forEach(function (value, name) {
+          searchArray.push(serializeParam(name) + '=' + serializeParam(value));
+        });
+        return searchArray.join('&');
+      };
+
+      global.URLSearchParams = URLSearchParams;
+    };
+
+    if (!('URLSearchParams' in global) || new URLSearchParams('?a=1').toString() !== 'a=1') {
+      polyfillURLSearchParams();
+    }
+
+    var proto = URLSearchParams.prototype;
+
+    if (typeof proto.sort !== 'function') {
+      proto.sort = function () {
+        var _this = this;
+
+        var items = [];
+        this.forEach(function (value, name) {
+          items.push([name, value]);
+
+          if (!_this._entries) {
+            _this.delete(name);
+          }
+        });
+        items.sort(function (a, b) {
+          if (a[0] < b[0]) {
+            return -1;
+          } else if (a[0] > b[0]) {
+            return +1;
+          } else {
+            return 0;
+          }
+        });
+
+        if (_this._entries) {
+          // force reset because IE keeps keys index
+          _this._entries = {};
+        }
+
+        for (var i = 0; i < items.length; i++) {
+          this.append(items[i][0], items[i][1]);
+        }
+      };
+    }
+
+    if (typeof proto._fromString !== 'function') {
+      Object.defineProperty(proto, '_fromString', {
+        enumerable: false,
+        configurable: false,
+        writable: false,
+        value: function value(searchString) {
+          if (this._entries) {
+            this._entries = {};
+          } else {
+            var keys = [];
+            this.forEach(function (value, name) {
+              keys.push(name);
+            });
+
+            for (var i = 0; i < keys.length; i++) {
+              this.delete(keys[i]);
+            }
+          }
+
+          searchString = searchString.replace(/^\?/, '');
+          var attributes = searchString.split('&');
+          var attribute;
+
+          for (var i = 0; i < attributes.length; i++) {
+            attribute = attributes[i].split('=');
+            this.append(deserializeParam(attribute[0]), attribute.length > 1 ? deserializeParam(attribute[1]) : '');
+          }
+        }
+      });
+    } // HTMLAnchorElement
+
+  })(typeof commonjsGlobal !== 'undefined' ? commonjsGlobal : typeof window !== 'undefined' ? window : typeof self !== 'undefined' ? self : commonjsGlobal);
+
+  (function (global) {
+    /**
+     * Polyfill URL
+     *
+     * Inspired from : https://github.com/arv/DOM-URL-Polyfill/blob/master/src/url.js
+     */
+    var checkIfURLIsSupported = function checkIfURLIsSupported() {
+      try {
+        var u = new URL('b', 'http://a');
+        u.pathname = 'c%20d';
+        return u.href === 'http://a/c%20d' && u.searchParams;
+      } catch (e) {
+        return false;
+      }
+    };
+
+    var polyfillURL = function polyfillURL() {
+      var _URL = global.URL;
+
+      var URL = function URL(url, base) {
+        if (typeof url !== 'string') url = String(url); // Only create another document if the base is different from current location.
+
+        var doc = document,
+            baseElement;
+
+        if (base && (global.location === void 0 || base !== global.location.href)) {
+          doc = document.implementation.createHTMLDocument('');
+          baseElement = doc.createElement('base');
+          baseElement.href = base;
+          doc.head.appendChild(baseElement);
+
+          try {
+            if (baseElement.href.indexOf(base) !== 0) throw new Error(baseElement.href);
+          } catch (err) {
+            throw new Error('URL unable to set base ' + base + ' due to ' + err);
+          }
+        }
+
+        var anchorElement = doc.createElement('a');
+        anchorElement.href = url;
+
+        if (baseElement) {
+          doc.body.appendChild(anchorElement);
+          anchorElement.href = anchorElement.href; // force href to refresh
+        }
+
+        if (anchorElement.protocol === ':' || !/:/.test(anchorElement.href)) {
+          throw new TypeError('Invalid URL');
+        }
+
+        Object.defineProperty(this, '_anchorElement', {
+          value: anchorElement
+        }); // create a linked searchParams which reflect its changes on URL
+
+        var searchParams = new URLSearchParams(this.search);
+        var enableSearchUpdate = true;
+        var enableSearchParamsUpdate = true;
+
+        var _this = this;
+
+        ['append', 'delete', 'set'].forEach(function (methodName) {
+          var method = searchParams[methodName];
+
+          searchParams[methodName] = function () {
+            method.apply(searchParams, arguments);
+
+            if (enableSearchUpdate) {
+              enableSearchParamsUpdate = false;
+              _this.search = searchParams.toString();
+              enableSearchParamsUpdate = true;
+            }
+          };
+        });
+        Object.defineProperty(this, 'searchParams', {
+          value: searchParams,
+          enumerable: true
+        });
+        var search = void 0;
+        Object.defineProperty(this, '_updateSearchParams', {
+          enumerable: false,
+          configurable: false,
+          writable: false,
+          value: function value() {
+            if (this.search !== search) {
+              search = this.search;
+
+              if (enableSearchParamsUpdate) {
+                enableSearchUpdate = false;
+
+                this.searchParams._fromString(this.search);
+
+                enableSearchUpdate = true;
+              }
+            }
+          }
+        });
+      };
+
+      var proto = URL.prototype;
+
+      var linkURLWithAnchorAttribute = function linkURLWithAnchorAttribute(attributeName) {
+        Object.defineProperty(proto, attributeName, {
+          get: function get() {
+            return this._anchorElement[attributeName];
+          },
+          set: function set(value) {
+            this._anchorElement[attributeName] = value;
+          },
+          enumerable: true
+        });
+      };
+
+      ['hash', 'host', 'hostname', 'port', 'protocol'].forEach(function (attributeName) {
+        linkURLWithAnchorAttribute(attributeName);
+      });
+      Object.defineProperty(proto, 'search', {
+        get: function get() {
+          return this._anchorElement['search'];
+        },
+        set: function set(value) {
+          this._anchorElement['search'] = value;
+
+          this._updateSearchParams();
+        },
+        enumerable: true
+      });
+      Object.defineProperties(proto, {
+        'toString': {
+          get: function get() {
+            var _this = this;
+
+            return function () {
+              return _this.href;
+            };
+          }
+        },
+        'href': {
+          get: function get() {
+            return this._anchorElement.href.replace(/\?$/, '');
+          },
+          set: function set(value) {
+            this._anchorElement.href = value;
+
+            this._updateSearchParams();
+          },
+          enumerable: true
+        },
+        'pathname': {
+          get: function get() {
+            return this._anchorElement.pathname.replace(/(^\/?)/, '/');
+          },
+          set: function set(value) {
+            this._anchorElement.pathname = value;
+          },
+          enumerable: true
+        },
+        'origin': {
+          get: function get() {
+            // get expected port from protocol
+            var expectedPort = {
+              'http:': 80,
+              'https:': 443,
+              'ftp:': 21
+            }[this._anchorElement.protocol]; // add port to origin if, expected port is different than actual port
+            // and it is not empty f.e http://foo:8080
+            // 8080 != 80 && 8080 != ''
+
+            var addPortToOrigin = this._anchorElement.port != expectedPort && this._anchorElement.port !== '';
+            return this._anchorElement.protocol + '//' + this._anchorElement.hostname + (addPortToOrigin ? ':' + this._anchorElement.port : '');
+          },
+          enumerable: true
+        },
+        'password': {
+          // TODO
+          get: function get() {
+            return '';
+          },
+          set: function set(value) {},
+          enumerable: true
+        },
+        'username': {
+          // TODO
+          get: function get() {
+            return '';
+          },
+          set: function set(value) {},
+          enumerable: true
+        }
+      });
+
+      URL.createObjectURL = function (blob) {
+        return _URL.createObjectURL.apply(_URL, arguments);
+      };
+
+      URL.revokeObjectURL = function (url) {
+        return _URL.revokeObjectURL.apply(_URL, arguments);
+      };
+
+      global.URL = URL;
+    };
+
+    if (!checkIfURLIsSupported()) {
+      polyfillURL();
+    }
+
+    if (global.location !== void 0 && !('origin' in global.location)) {
+      var getOrigin = function getOrigin() {
+        return global.location.protocol + '//' + global.location.hostname + (global.location.port ? ':' + global.location.port : '');
+      };
+
+      try {
+        Object.defineProperty(global.location, 'origin', {
+          get: getOrigin,
+          enumerable: true
+        });
+      } catch (e) {
+        setInterval(function () {
+          global.location.origin = getOrigin();
+        }, 100);
+      }
+    }
+  })(typeof commonjsGlobal !== 'undefined' ? commonjsGlobal : typeof window !== 'undefined' ? window : typeof self !== 'undefined' ? self : commonjsGlobal);
+
+  // call something on iterator step with safe closing on error
+
+  var _iterCall = function (iterator, fn, value, entries) {
+    try {
+      return entries ? fn(_anObject(value)[0], value[1]) : fn(value);
+    // 7.4.6 IteratorClose(iterator, completion)
+    } catch (e) {
+      var ret = iterator['return'];
+      if (ret !== undefined) _anObject(ret.call(iterator));
+      throw e;
+    }
+  };
+
+  // check on default Array iterator
+
+  var ITERATOR$2 = _wks('iterator');
+  var ArrayProto$1 = Array.prototype;
+
+  var _isArrayIter = function (it) {
+    return it !== undefined && (_iterators.Array === it || ArrayProto$1[ITERATOR$2] === it);
+  };
+
+  var _createProperty = function (object, index, value) {
+    if (index in object) _objectDp.f(object, index, _propertyDesc(0, value));
+    else object[index] = value;
+  };
+
+  var ITERATOR$3 = _wks('iterator');
+
+  var core_getIteratorMethod = _core.getIteratorMethod = function (it) {
+    if (it != undefined) return it[ITERATOR$3]
+      || it['@@iterator']
+      || _iterators[_classof(it)];
+  };
+
+  var ITERATOR$4 = _wks('iterator');
+  var SAFE_CLOSING = false;
+
+  try {
+    var riter = [7][ITERATOR$4]();
+    riter['return'] = function () { SAFE_CLOSING = true; };
+  } catch (e) { /* empty */ }
+
+  var _iterDetect = function (exec, skipClosing) {
+    if (!skipClosing && !SAFE_CLOSING) return false;
+    var safe = false;
+    try {
+      var arr = [7];
+      var iter = arr[ITERATOR$4]();
+      iter.next = function () { return { done: safe = true }; };
+      arr[ITERATOR$4] = function () { return iter; };
+      exec(arr);
+    } catch (e) { /* empty */ }
+    return safe;
+  };
+
+  _export(_export.S + _export.F * !_iterDetect(function (iter) { }), 'Array', {
+    // 22.1.2.1 Array.from(arrayLike, mapfn = undefined, thisArg = undefined)
+    from: function from(arrayLike /* , mapfn = undefined, thisArg = undefined */) {
+      var O = _toObject(arrayLike);
+      var C = typeof this == 'function' ? this : Array;
+      var aLen = arguments.length;
+      var mapfn = aLen > 1 ? arguments[1] : undefined;
+      var mapping = mapfn !== undefined;
+      var index = 0;
+      var iterFn = core_getIteratorMethod(O);
+      var length, result, step, iterator;
+      if (mapping) mapfn = _ctx(mapfn, aLen > 2 ? arguments[2] : undefined, 2);
+      // if object isn't iterable or it's array with default iterator - use simple case
+      if (iterFn != undefined && !(C == Array && _isArrayIter(iterFn))) {
+        for (iterator = iterFn.call(O), result = new C(); !(step = iterator.next()).done; index++) {
+          _createProperty(result, index, mapping ? _iterCall(iterator, mapfn, [step.value, index], true) : step.value);
+        }
+      } else {
+        length = _toLength(O.length);
+        for (result = new C(length); length > index; index++) {
+          _createProperty(result, index, mapping ? mapfn(O[index], index) : O[index]);
+        }
+      }
+      result.length = index;
+      return result;
+    }
+  });
+
+  var SPECIES$2 = _wks('species');
+
+  var _arraySpeciesConstructor = function (original) {
+    var C;
+    if (_isArray(original)) {
+      C = original.constructor;
+      // cross-realm fallback
+      if (typeof C == 'function' && (C === Array || _isArray(C.prototype))) C = undefined;
+      if (_isObject(C)) {
+        C = C[SPECIES$2];
+        if (C === null) C = undefined;
+      }
+    } return C === undefined ? Array : C;
+  };
+
+  // 9.4.2.3 ArraySpeciesCreate(originalArray, length)
+
+
+  var _arraySpeciesCreate = function (original, length) {
+    return new (_arraySpeciesConstructor(original))(length);
+  };
+
+  // 0 -> Array#forEach
+  // 1 -> Array#map
+  // 2 -> Array#filter
+  // 3 -> Array#some
+  // 4 -> Array#every
+  // 5 -> Array#find
+  // 6 -> Array#findIndex
+
+
+
+
+
+  var _arrayMethods = function (TYPE, $create) {
+    var IS_MAP = TYPE == 1;
+    var IS_FILTER = TYPE == 2;
+    var IS_SOME = TYPE == 3;
+    var IS_EVERY = TYPE == 4;
+    var IS_FIND_INDEX = TYPE == 6;
+    var NO_HOLES = TYPE == 5 || IS_FIND_INDEX;
+    var create = $create || _arraySpeciesCreate;
+    return function ($this, callbackfn, that) {
+      var O = _toObject($this);
+      var self = _iobject(O);
+      var f = _ctx(callbackfn, that, 3);
+      var length = _toLength(self.length);
+      var index = 0;
+      var result = IS_MAP ? create($this, length) : IS_FILTER ? create($this, 0) : undefined;
+      var val, res;
+      for (;length > index; index++) if (NO_HOLES || index in self) {
+        val = self[index];
+        res = f(val, index, O);
+        if (TYPE) {
+          if (IS_MAP) result[index] = res;   // map
+          else if (res) switch (TYPE) {
+            case 3: return true;             // some
+            case 5: return val;              // find
+            case 6: return index;            // findIndex
+            case 2: result.push(val);        // filter
+          } else if (IS_EVERY) return false; // every
+        }
+      }
+      return IS_FIND_INDEX ? -1 : IS_SOME || IS_EVERY ? IS_EVERY : result;
+    };
+  };
+
+  // 22.1.3.8 Array.prototype.find(predicate, thisArg = undefined)
+
+  var $find = _arrayMethods(5);
+  var KEY = 'find';
+  var forced = true;
+  // Shouldn't skip holes
+  if (KEY in []) Array(1)[KEY](function () { forced = false; });
+  _export(_export.P + _export.F * forced, 'Array', {
+    find: function find(callbackfn /* , that = undefined */) {
+      return $find(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
+    }
+  });
+  _addToUnscopables(KEY);
+
+  // Works with __proto__ only. Old v8 can't work with null proto objects.
+  /* eslint-disable no-proto */
+
+
+  var check = function (O, proto) {
+    _anObject(O);
+    if (!_isObject(proto) && proto !== null) throw TypeError(proto + ": can't set as prototype!");
+  };
+  var _setProto = {
+    set: Object.setPrototypeOf || ('__proto__' in {} ? // eslint-disable-line
+      function (test, buggy, set) {
+        try {
+          set = _ctx(Function.call, _objectGopd.f(Object.prototype, '__proto__').set, 2);
+          set(test, []);
+          buggy = !(test instanceof Array);
+        } catch (e) { buggy = true; }
+        return function setPrototypeOf(O, proto) {
+          check(O, proto);
+          if (buggy) O.__proto__ = proto;
+          else set(O, proto);
+          return O;
+        };
+      }({}, false) : undefined),
+    check: check
+  };
+
+  var setPrototypeOf = _setProto.set;
+  var _inheritIfRequired = function (that, target, C) {
+    var S = target.constructor;
+    var P;
+    if (S !== C && typeof S == 'function' && (P = S.prototype) !== C.prototype && _isObject(P) && setPrototypeOf) {
+      setPrototypeOf(that, P);
+    } return that;
+  };
+
+  var _stringWs = '\x09\x0A\x0B\x0C\x0D\x20\xA0\u1680\u180E\u2000\u2001\u2002\u2003' +
+    '\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000\u2028\u2029\uFEFF';
+
+  var space = '[' + _stringWs + ']';
+  var non = '\u200b\u0085';
+  var ltrim = RegExp('^' + space + space + '*');
+  var rtrim = RegExp(space + space + '*$');
+
+  var exporter = function (KEY, exec, ALIAS) {
+    var exp = {};
+    var FORCE = _fails(function () {
+      return !!_stringWs[KEY]() || non[KEY]() != non;
+    });
+    var fn = exp[KEY] = FORCE ? exec(trim) : _stringWs[KEY];
+    if (ALIAS) exp[ALIAS] = fn;
+    _export(_export.P + _export.F * FORCE, 'String', exp);
+  };
+
+  // 1 -> String#trimLeft
+  // 2 -> String#trimRight
+  // 3 -> String#trim
+  var trim = exporter.trim = function (string, TYPE) {
+    string = String(_defined(string));
+    if (TYPE & 1) string = string.replace(ltrim, '');
+    if (TYPE & 2) string = string.replace(rtrim, '');
+    return string;
+  };
+
+  var _stringTrim = exporter;
+
+  var gOPN$2 = _objectGopn.f;
+  var gOPD$2 = _objectGopd.f;
+  var dP$3 = _objectDp.f;
+  var $trim = _stringTrim.trim;
+  var NUMBER = 'Number';
+  var $Number = _global[NUMBER];
+  var Base = $Number;
+  var proto$1 = $Number.prototype;
+  // Opera ~12 has broken Object#toString
+  var BROKEN_COF = _cof(_objectCreate(proto$1)) == NUMBER;
+  var TRIM = 'trim' in String.prototype;
+
+  // 7.1.3 ToNumber(argument)
+  var toNumber = function (argument) {
+    var it = _toPrimitive(argument, false);
+    if (typeof it == 'string' && it.length > 2) {
+      it = TRIM ? it.trim() : $trim(it, 3);
+      var first = it.charCodeAt(0);
+      var third, radix, maxCode;
+      if (first === 43 || first === 45) {
+        third = it.charCodeAt(2);
+        if (third === 88 || third === 120) return NaN; // Number('+0x1') should be NaN, old V8 fix
+      } else if (first === 48) {
+        switch (it.charCodeAt(1)) {
+          case 66: case 98: radix = 2; maxCode = 49; break; // fast equal /^0b[01]+$/i
+          case 79: case 111: radix = 8; maxCode = 55; break; // fast equal /^0o[0-7]+$/i
+          default: return +it;
+        }
+        for (var digits = it.slice(2), i = 0, l = digits.length, code; i < l; i++) {
+          code = digits.charCodeAt(i);
+          // parseInt parses a string to a first unavailable symbol
+          // but ToNumber should return NaN if a string contains unavailable symbols
+          if (code < 48 || code > maxCode) return NaN;
+        } return parseInt(digits, radix);
+      }
+    } return +it;
+  };
+
+  if (!$Number(' 0o1') || !$Number('0b1') || $Number('+0x1')) {
+    $Number = function Number(value) {
+      var it = arguments.length < 1 ? 0 : value;
+      var that = this;
+      return that instanceof $Number
+        // check on 1..constructor(foo) case
+        && (BROKEN_COF ? _fails(function () { proto$1.valueOf.call(that); }) : _cof(that) != NUMBER)
+          ? _inheritIfRequired(new Base(toNumber(it)), that, $Number) : toNumber(it);
+    };
+    for (var keys = _descriptors ? gOPN$2(Base) : (
+      // ES3:
+      'MAX_VALUE,MIN_VALUE,NaN,NEGATIVE_INFINITY,POSITIVE_INFINITY,' +
+      // ES6 (in case, if modules with ES6 Number statics required before):
+      'EPSILON,isFinite,isInteger,isNaN,isSafeInteger,MAX_SAFE_INTEGER,' +
+      'MIN_SAFE_INTEGER,parseFloat,parseInt,isInteger'
+    ).split(','), j$1 = 0, key$1; keys.length > j$1; j$1++) {
+      if (_has(Base, key$1 = keys[j$1]) && !_has($Number, key$1)) {
+        dP$3($Number, key$1, gOPD$2(Base, key$1));
+      }
+    }
+    $Number.prototype = proto$1;
+    proto$1.constructor = $Number;
+    _redefine(_global, NUMBER, $Number);
+  }
+
+  // most Object methods by ES6 should accept primitives
+
+
+
+  var _objectSap = function (KEY, exec) {
+    var fn = (_core.Object || {})[KEY] || Object[KEY];
+    var exp = {};
+    exp[KEY] = exec(fn);
+    _export(_export.S + _export.F * _fails(function () { fn(1); }), 'Object', exp);
+  };
+
+  // 19.1.2.14 Object.keys(O)
+
+
+
+  _objectSap('keys', function () {
+    return function keys(it) {
+      return _objectKeys(_toObject(it));
+    };
+  });
+
+  // helper for String#{startsWith, endsWith, includes}
+
+
+
+  var _stringContext = function (that, searchString, NAME) {
+    if (_isRegexp(searchString)) throw TypeError('String#' + NAME + " doesn't accept regex!");
+    return String(_defined(that));
+  };
+
+  var MATCH$1 = _wks('match');
+  var _failsIsRegexp = function (KEY) {
+    var re = /./;
+    try {
+      '/./'[KEY](re);
+    } catch (e) {
+      try {
+        re[MATCH$1] = false;
+        return !'/./'[KEY](re);
+      } catch (f) { /* empty */ }
+    } return true;
+  };
+
+  var INCLUDES = 'includes';
+
+  _export(_export.P + _export.F * _failsIsRegexp(INCLUDES), 'String', {
+    includes: function includes(searchString /* , position = 0 */) {
+      return !!~_stringContext(this, searchString, INCLUDES)
+        .indexOf(searchString, arguments.length > 1 ? arguments[1] : undefined);
+    }
+  });
+
+  // https://github.com/tc39/Array.prototype.includes
+
+  var $includes = _arrayIncludes(true);
+
+  _export(_export.P, 'Array', {
+    includes: function includes(el /* , fromIndex = 0 */) {
+      return $includes(this, el, arguments.length > 1 ? arguments[1] : undefined);
+    }
+  });
+
+  _addToUnscopables('includes');
+
+  var $at = _stringAt(true);
+
+  // 21.1.3.27 String.prototype[@@iterator]()
+  _iterDefine(String, 'String', function (iterated) {
+    this._t = String(iterated); // target
+    this._i = 0;                // next index
+  // 21.1.5.2.1 %StringIteratorPrototype%.next()
+  }, function () {
+    var O = this._t;
+    var index = this._i;
+    var point;
+    if (index >= O.length) return { value: undefined, done: true };
+    point = $at(O, index);
+    this._i += point.length;
+    return { value: point, done: false };
+  });
 
   // 19.1.2.1 Object.assign(target, source, ...)
 
@@ -1771,7 +2642,7 @@ typeof navigator === "object" && (function (global, factory) {
 
   var arrayFind = _arrayMethods(5);
   var arrayFindIndex = _arrayMethods(6);
-  var id$1 = 0;
+  var id$2 = 0;
 
   // fallback for uncaught frozen keys
   var uncaughtFrozenStore = function (that) {
@@ -1812,7 +2683,7 @@ typeof navigator === "object" && (function (global, factory) {
       var C = wrapper(function (that, iterable) {
         _anInstance(that, C, NAME, '_i');
         that._t = NAME;      // collection type
-        that._i = id$1++;      // collection id
+        that._i = id$2++;      // collection id
         that._l = undefined; // leak store for uncaught frozen objects
         if (iterable != undefined) _forOf(iterable, IS_MAP, that[ADDER], that);
       });
@@ -1918,6 +2789,7 @@ typeof navigator === "object" && (function (global, factory) {
   };
 
   var es6_weakMap = createCommonjsModule(function (module) {
+
   var each = _arrayMethods(0);
 
 
@@ -1925,12 +2797,12 @@ typeof navigator === "object" && (function (global, factory) {
 
 
 
-
+  var NATIVE_WEAK_MAP = _validateCollection;
+  var IS_IE11 = !_global.ActiveXObject && 'ActiveXObject' in _global;
   var WEAK_MAP = 'WeakMap';
   var getWeak = _meta.getWeak;
   var isExtensible = Object.isExtensible;
   var uncaughtFrozenStore = _collectionWeak.ufstore;
-  var tmp = {};
   var InternalMap;
 
   var wrapper = function (get) {
@@ -1958,7 +2830,7 @@ typeof navigator === "object" && (function (global, factory) {
   var $WeakMap = module.exports = _collection(WEAK_MAP, wrapper, methods, _collectionWeak, true, true);
 
   // IE11 WeakMap frozen keys fix
-  if (_fails(function () { return new $WeakMap().set((Object.freeze || Object)(tmp), 7).get(tmp) != 7; })) {
+  if (NATIVE_WEAK_MAP && IS_IE11) {
     InternalMap = _collectionWeak.getConstructor(wrapper, WEAK_MAP);
     _objectAssign(InternalMap.prototype, methods);
     _meta.NEED = true;
@@ -1978,178 +2850,12 @@ typeof navigator === "object" && (function (global, factory) {
   }
   });
 
-  function _classCallCheck(instance, Constructor) {
-    if (!(instance instanceof Constructor)) {
-      throw new TypeError("Cannot call a class as a function");
-    }
-  }
-
-  function _defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];
-      descriptor.enumerable = descriptor.enumerable || false;
-      descriptor.configurable = true;
-      if ("value" in descriptor) descriptor.writable = true;
-      Object.defineProperty(target, descriptor.key, descriptor);
-    }
-  }
-
-  function _createClass(Constructor, protoProps, staticProps) {
-    if (protoProps) _defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) _defineProperties(Constructor, staticProps);
-    return Constructor;
-  }
-
-  function _defineProperty(obj, key, value) {
-    if (key in obj) {
-      Object.defineProperty(obj, key, {
-        value: value,
-        enumerable: true,
-        configurable: true,
-        writable: true
-      });
-    } else {
-      obj[key] = value;
-    }
-
-    return obj;
-  }
-
-  function _slicedToArray(arr, i) {
-    return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest();
-  }
-
-  function _toConsumableArray(arr) {
-    return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread();
-  }
-
-  function _arrayWithoutHoles(arr) {
-    if (Array.isArray(arr)) {
-      for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
-
-      return arr2;
-    }
-  }
-
-  function _arrayWithHoles(arr) {
-    if (Array.isArray(arr)) return arr;
-  }
-
-  function _iterableToArray(iter) {
-    if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
-  }
-
-  function _iterableToArrayLimit(arr, i) {
-    var _arr = [];
-    var _n = true;
-    var _d = false;
-    var _e = undefined;
-
-    try {
-      for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
-        _arr.push(_s.value);
-
-        if (i && _arr.length === i) break;
-      }
-    } catch (err) {
-      _d = true;
-      _e = err;
-    } finally {
-      try {
-        if (!_n && _i["return"] != null) _i["return"]();
-      } finally {
-        if (_d) throw _e;
-      }
-    }
-
-    return _arr;
-  }
-
-  function _nonIterableSpread() {
-    throw new TypeError("Invalid attempt to spread non-iterable instance");
-  }
-
-  function _nonIterableRest() {
-    throw new TypeError("Invalid attempt to destructure non-iterable instance");
-  }
-
   // 19.1.3.1 Object.assign(target, source)
 
 
   _export(_export.S + _export.F, 'Object', { assign: _objectAssign });
 
-  // @@split logic
-  _fixReWks('split', 2, function (defined, SPLIT, $split) {
-    var isRegExp = _isRegexp;
-    var _split = $split;
-    var $push = [].push;
-    var $SPLIT = 'split';
-    var LENGTH = 'length';
-    var LAST_INDEX = 'lastIndex';
-    if (
-      'abbc'[$SPLIT](/(b)*/)[1] == 'c' ||
-      'test'[$SPLIT](/(?:)/, -1)[LENGTH] != 4 ||
-      'ab'[$SPLIT](/(?:ab)*/)[LENGTH] != 2 ||
-      '.'[$SPLIT](/(.?)(.?)/)[LENGTH] != 4 ||
-      '.'[$SPLIT](/()()/)[LENGTH] > 1 ||
-      ''[$SPLIT](/.?/)[LENGTH]
-    ) {
-      var NPCG = /()??/.exec('')[1] === undefined; // nonparticipating capturing group
-      // based on es5-shim implementation, need to rework it
-      $split = function (separator, limit) {
-        var string = String(this);
-        if (separator === undefined && limit === 0) return [];
-        // If `separator` is not a regex, use native split
-        if (!isRegExp(separator)) return _split.call(string, separator, limit);
-        var output = [];
-        var flags = (separator.ignoreCase ? 'i' : '') +
-                    (separator.multiline ? 'm' : '') +
-                    (separator.unicode ? 'u' : '') +
-                    (separator.sticky ? 'y' : '');
-        var lastLastIndex = 0;
-        var splitLimit = limit === undefined ? 4294967295 : limit >>> 0;
-        // Make `global` and avoid `lastIndex` issues by working with a copy
-        var separatorCopy = new RegExp(separator.source, flags + 'g');
-        var separator2, match, lastIndex, lastLength, i;
-        // Doesn't need flags gy, but they don't hurt
-        if (!NPCG) separator2 = new RegExp('^' + separatorCopy.source + '$(?!\\s)', flags);
-        while (match = separatorCopy.exec(string)) {
-          // `separatorCopy.lastIndex` is not reliable cross-browser
-          lastIndex = match.index + match[0][LENGTH];
-          if (lastIndex > lastLastIndex) {
-            output.push(string.slice(lastLastIndex, match.index));
-            // Fix browsers whose `exec` methods don't consistently return `undefined` for NPCG
-            // eslint-disable-next-line no-loop-func
-            if (!NPCG && match[LENGTH] > 1) match[0].replace(separator2, function () {
-              for (i = 1; i < arguments[LENGTH] - 2; i++) if (arguments[i] === undefined) match[i] = undefined;
-            });
-            if (match[LENGTH] > 1 && match.index < string[LENGTH]) $push.apply(output, match.slice(1));
-            lastLength = match[0][LENGTH];
-            lastLastIndex = lastIndex;
-            if (output[LENGTH] >= splitLimit) break;
-          }
-          if (separatorCopy[LAST_INDEX] === match.index) separatorCopy[LAST_INDEX]++; // Avoid an infinite loop
-        }
-        if (lastLastIndex === string[LENGTH]) {
-          if (lastLength || !separatorCopy.test('')) output.push('');
-        } else output.push(string.slice(lastLastIndex));
-        return output[LENGTH] > splitLimit ? output.slice(0, splitLimit) : output;
-      };
-    // Chakra, V8
-    } else if ('0'[$SPLIT](undefined, 0)[LENGTH]) {
-      $split = function (separator, limit) {
-        return separator === undefined && limit === 0 ? [] : _split.call(this, separator, limit);
-      };
-    }
-    // 21.1.3.17 String.prototype.split(separator, limit)
-    return [function split(separator, limit) {
-      var O = defined(this);
-      var fn = separator == undefined ? undefined : separator[SPLIT];
-      return fn !== undefined ? fn.call(separator, O, limit) : $split.call(String(O), separator, limit);
-    }, $split];
-  });
-
-  var isEnum = _objectPie.f;
+  var isEnum$1 = _objectPie.f;
   var _objectToArray = function (isEntries) {
     return function (it) {
       var O = _toIobject(it);
@@ -2158,7 +2864,7 @@ typeof navigator === "object" && (function (global, factory) {
       var i = 0;
       var result = [];
       var key;
-      while (length > i) if (isEnum.call(O, key = keys[i++])) {
+      while (length > i) if (isEnum$1.call(O, key = keys[i++])) {
         result.push(isEntries ? [key, O[key]] : O[key]);
       } return result;
     };
@@ -2184,27 +2890,365 @@ typeof navigator === "object" && (function (global, factory) {
     }
   });
 
-  // @@replace logic
-  _fixReWks('replace', 2, function (defined, REPLACE, $replace) {
-    // 21.1.3.14 String.prototype.replace(searchValue, replaceValue)
-    return [function replace(searchValue, replaceValue) {
-      var O = defined(this);
-      var fn = searchValue == undefined ? undefined : searchValue[REPLACE];
-      return fn !== undefined
-        ? fn.call(searchValue, O, replaceValue)
-        : $replace.call(String(O), searchValue, replaceValue);
-    }, $replace];
+  var defaults = {
+    addCSS: true,
+    // Add CSS to the element to improve usability (required here or in your CSS!)
+    thumbWidth: 15,
+    // The width of the thumb handle
+    watch: true // Watch for new elements that match a string target
+
+  };
+
+  // Element matches a selector
+  function matches(element, selector) {
+
+    function match() {
+      return Array.from(document.querySelectorAll(selector)).includes(this);
+    }
+
+    var matches = match;
+    return matches.call(element, selector);
+  }
+
+  // Trigger event
+  function trigger(element, type) {
+    if (!element || !type) {
+      return;
+    } // Create and dispatch the event
+
+
+    var event = new Event(type); // Dispatch the event
+
+    element.dispatchEvent(event);
+  }
+
+  // 20.1.2.4 Number.isNaN(number)
+
+
+  _export(_export.S, 'Number', {
+    isNaN: function isNaN(number) {
+      // eslint-disable-next-line no-self-compare
+      return number != number;
+    }
   });
 
-  // 7.3.20 SpeciesConstructor(O, defaultConstructor)
-
-
-  var SPECIES$1 = _wks('species');
-  var _speciesConstructor = function (O, D) {
-    var C = _anObject(O).constructor;
-    var S;
-    return C === undefined || (S = _anObject(C)[SPECIES$1]) == undefined ? D : _aFunction(S);
+  // ==========================================================================
+  // Type checking utils
+  // ==========================================================================
+  var getConstructor = function getConstructor(input) {
+    return input !== null && typeof input !== 'undefined' ? input.constructor : null;
   };
+
+  var instanceOf = function instanceOf(input, constructor) {
+    return Boolean(input && constructor && input instanceof constructor);
+  };
+
+  var isNullOrUndefined = function isNullOrUndefined(input) {
+    return input === null || typeof input === 'undefined';
+  };
+
+  var isObject = function isObject(input) {
+    return getConstructor(input) === Object;
+  };
+
+  var isNumber = function isNumber(input) {
+    return getConstructor(input) === Number && !Number.isNaN(input);
+  };
+
+  var isString = function isString(input) {
+    return getConstructor(input) === String;
+  };
+
+  var isBoolean = function isBoolean(input) {
+    return getConstructor(input) === Boolean;
+  };
+
+  var isFunction = function isFunction(input) {
+    return getConstructor(input) === Function;
+  };
+
+  var isArray = function isArray(input) {
+    return Array.isArray(input);
+  };
+
+  var isNodeList = function isNodeList(input) {
+    return instanceOf(input, NodeList);
+  };
+
+  var isElement = function isElement(input) {
+    return instanceOf(input, Element);
+  };
+
+  var isEvent = function isEvent(input) {
+    return instanceOf(input, Event);
+  };
+
+  var isEmpty = function isEmpty(input) {
+    return isNullOrUndefined(input) || (isString(input) || isArray(input) || isNodeList(input)) && !input.length || isObject(input) && !Object.keys(input).length;
+  };
+
+  var is$1 = {
+    nullOrUndefined: isNullOrUndefined,
+    object: isObject,
+    number: isNumber,
+    string: isString,
+    boolean: isBoolean,
+    function: isFunction,
+    array: isArray,
+    nodeList: isNodeList,
+    element: isElement,
+    event: isEvent,
+    empty: isEmpty
+  };
+
+  // @@match logic
+  _fixReWks('match', 1, function (defined, MATCH, $match, maybeCallNative) {
+    return [
+      // `String.prototype.match` method
+      // https://tc39.github.io/ecma262/#sec-string.prototype.match
+      function match(regexp) {
+        var O = defined(this);
+        var fn = regexp == undefined ? undefined : regexp[MATCH];
+        return fn !== undefined ? fn.call(regexp, O) : new RegExp(regexp)[MATCH](String(O));
+      },
+      // `RegExp.prototype[@@match]` method
+      // https://tc39.github.io/ecma262/#sec-regexp.prototype-@@match
+      function (regexp) {
+        var res = maybeCallNative($match, regexp, this);
+        if (res.done) return res.value;
+        var rx = _anObject(regexp);
+        var S = String(this);
+        if (!rx.global) return _regexpExecAbstract(rx, S);
+        var fullUnicode = rx.unicode;
+        rx.lastIndex = 0;
+        var A = [];
+        var n = 0;
+        var result;
+        while ((result = _regexpExecAbstract(rx, S)) !== null) {
+          var matchStr = String(result[0]);
+          A[n] = matchStr;
+          if (matchStr === '') rx.lastIndex = _advanceStringIndex(S, _toLength(rx.lastIndex), fullUnicode);
+          n++;
+        }
+        return n === 0 ? null : A;
+      }
+    ];
+  });
+
+  // Get the number of decimal places
+  function getDecimalPlaces(value) {
+    var match = "".concat(value).match(/(?:\.(\d+))?(?:[eE]([+-]?\d+))?$/);
+
+    if (!match) {
+      return 0;
+    }
+
+    return Math.max(0, // Number of digits right of decimal point.
+    (match[1] ? match[1].length : 0) - ( // Adjust for scientific notation.
+    match[2] ? +match[2] : 0));
+  } // Round to the nearest step
+
+  function round(number, step) {
+    if (step < 1) {
+      var places = getDecimalPlaces(step);
+      return parseFloat(number.toFixed(places));
+    }
+
+    return Math.round(number / step) * step;
+  }
+
+  var RangeTouch =
+  /*#__PURE__*/
+  function () {
+    /**
+     * Setup a new instance
+     * @param {String|Element} target
+     * @param {Object} options
+     */
+    function RangeTouch(target, options) {
+      _classCallCheck(this, RangeTouch);
+
+      if (is$1.element(target)) {
+        // An Element is passed, use it directly
+        this.element = target;
+      } else if (is$1.string(target)) {
+        // A CSS Selector is passed, fetch it from the DOM
+        this.element = document.querySelector(target);
+      }
+
+      if (!is$1.element(this.element) || !is$1.empty(this.element.rangeTouch)) {
+        return;
+      }
+
+      this.config = Object.assign({}, defaults, options);
+      this.init();
+    }
+
+    _createClass(RangeTouch, [{
+      key: "init",
+      value: function init() {
+        // Bail if not a touch enabled device
+        if (!RangeTouch.enabled) {
+          return;
+        } // Add useful CSS
+
+
+        if (this.config.addCSS) {
+          // TODO: Restore original values on destroy
+          this.element.style.userSelect = 'none';
+          this.element.style.webKitUserSelect = 'none';
+          this.element.style.touchAction = 'manipulation';
+        }
+
+        this.listeners(true);
+        this.element.rangeTouch = this;
+      }
+    }, {
+      key: "destroy",
+      value: function destroy() {
+        // Bail if not a touch enabled device
+        if (!RangeTouch.enabled) {
+          return;
+        }
+
+        this.listeners(false);
+        this.element.rangeTouch = null;
+      }
+    }, {
+      key: "listeners",
+      value: function listeners(toggle) {
+        var _this = this;
+
+        var method = toggle ? 'addEventListener' : 'removeEventListener'; // Listen for events
+
+        ['touchstart', 'touchmove', 'touchend'].forEach(function (type) {
+          _this.element[method](type, function (event) {
+            return _this.set(event);
+          }, false);
+        });
+      }
+      /**
+       * Get the value based on touch position
+       * @param {Event} event
+       */
+
+    }, {
+      key: "get",
+      value: function get(event) {
+        if (!RangeTouch.enabled || !is$1.event(event)) {
+          return null;
+        }
+
+        var input = event.target;
+        var touch = event.changedTouches[0];
+        var min = parseFloat(input.getAttribute('min')) || 0;
+        var max = parseFloat(input.getAttribute('max')) || 100;
+        var step = parseFloat(input.getAttribute('step')) || 1;
+        var delta = max - min; // Calculate percentage
+
+        var percent;
+        var clientRect = input.getBoundingClientRect();
+        var thumbWidth = 100 / clientRect.width * (this.config.thumbWidth / 2) / 100; // Determine left percentage
+
+        percent = 100 / clientRect.width * (touch.clientX - clientRect.left); // Don't allow outside bounds
+
+        if (percent < 0) {
+          percent = 0;
+        } else if (percent > 100) {
+          percent = 100;
+        } // Factor in the thumb offset
+
+
+        if (percent < 50) {
+          percent -= (100 - percent * 2) * thumbWidth;
+        } else if (percent > 50) {
+          percent += (percent - 50) * 2 * thumbWidth;
+        } // Find the closest step to the mouse position
+
+
+        return min + round(delta * (percent / 100), step);
+      }
+      /**
+       * Update range value based on position
+       * @param {Event} event
+       */
+
+    }, {
+      key: "set",
+      value: function set(event) {
+        if (!RangeTouch.enabled || !is$1.event(event) || event.target.disabled) {
+          return;
+        } // Prevent text highlight on iOS
+
+
+        event.preventDefault(); // Set value
+
+        event.target.value = this.get(event); // Trigger event
+
+        trigger(event.target, event.type === 'touchend' ? 'change' : 'input');
+      }
+    }], [{
+      key: "setup",
+
+      /**
+       * Setup multiple instances
+       * @param {String|Element|NodeList|Array} target
+       * @param {Object} options
+       */
+      value: function setup(target) {
+        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+        var targets = null;
+
+        if (is$1.empty(target) || is$1.string(target)) {
+          targets = Array.from(document.querySelectorAll(is$1.string(target) ? target : 'input[type="range"]'));
+        } else if (is$1.element(target)) {
+          targets = [target];
+        } else if (is$1.nodeList(target)) {
+          targets = Array.from(target);
+        } else if (is$1.array(target)) {
+          targets = target.filter(is$1.element);
+        }
+
+        if (is$1.empty(targets)) {
+          return null;
+        }
+
+        var config = Object.assign({}, defaults, options);
+
+        if (is$1.string(target) && config.watch) {
+          // Create an observer instance
+          var observer = new MutationObserver(function (mutations) {
+            Array.from(mutations).forEach(function (mutation) {
+              Array.from(mutation.addedNodes).forEach(function (node) {
+                if (!is$1.element(node) || !matches(node, target)) {
+                  return;
+                } // eslint-disable-next-line no-unused-vars
+
+
+                var range = new RangeTouch(node, config);
+              });
+            });
+          }); // Pass in the target node, as well as the observer options
+
+          observer.observe(document.body, {
+            childList: true,
+            subtree: true
+          });
+        }
+
+        return targets.map(function (t) {
+          return new RangeTouch(t, options);
+        });
+      }
+    }, {
+      key: "enabled",
+      get: function get() {
+        return 'ontouchstart' in document.documentElement;
+      }
+    }]);
+
+    return RangeTouch;
+  }();
 
   // fast apply, http://jsperf.lnkit.com/fast-apply/5
   var _invoke = function (fn, args, that) {
@@ -2386,12 +3430,12 @@ typeof navigator === "object" && (function (global, factory) {
     this.reject = _aFunction(reject);
   }
 
-  var f$5 = function (C) {
+  var f$7 = function (C) {
     return new PromiseCapability(C);
   };
 
   var _newPromiseCapability = {
-  	f: f$5
+  	f: f$7
   };
 
   var _perform = function (exec) {
@@ -2415,11 +3459,11 @@ typeof navigator === "object" && (function (global, factory) {
     return promiseCapability.promise;
   };
 
-  var SPECIES$2 = _wks('species');
+  var SPECIES$3 = _wks('species');
 
   var _setSpecies = function (KEY) {
     var C = _global[KEY];
-    if (_descriptors && C && !C[SPECIES$2]) _objectDp.f(C, SPECIES$2, {
+    if (_descriptors && C && !C[SPECIES$3]) _objectDp.f(C, SPECIES$3, {
       configurable: true,
       get: function () { return this; }
     });
@@ -2442,7 +3486,7 @@ typeof navigator === "object" && (function (global, factory) {
   var Internal, newGenericPromiseCapability, OwnPromiseCapability, Wrapper;
   var newPromiseCapability = newGenericPromiseCapability = _newPromiseCapability.f;
 
-  var USE_NATIVE = !!function () {
+  var USE_NATIVE$1 = !!function () {
     try {
       // correct subclassing with @@species support
       var promise = $Promise.resolve(1);
@@ -2583,7 +3627,7 @@ typeof navigator === "object" && (function (global, factory) {
   };
 
   // constructor polyfill
-  if (!USE_NATIVE) {
+  if (!USE_NATIVE$1) {
     // 25.4.3.1 Promise(executor)
     $Promise = function Promise(executor) {
       _anInstance(this, $Promise, PROMISE, '_h');
@@ -2635,13 +3679,13 @@ typeof navigator === "object" && (function (global, factory) {
     };
   }
 
-  _export(_export.G + _export.W + _export.F * !USE_NATIVE, { Promise: $Promise });
+  _export(_export.G + _export.W + _export.F * !USE_NATIVE$1, { Promise: $Promise });
   _setToStringTag($Promise, PROMISE);
   _setSpecies(PROMISE);
   Wrapper = _core[PROMISE];
 
   // statics
-  _export(_export.S + _export.F * !USE_NATIVE, PROMISE, {
+  _export(_export.S + _export.F * !USE_NATIVE$1, PROMISE, {
     // 25.4.4.5 Promise.reject(r)
     reject: function reject(r) {
       var capability = newPromiseCapability(this);
@@ -2650,13 +3694,13 @@ typeof navigator === "object" && (function (global, factory) {
       return capability.promise;
     }
   });
-  _export(_export.S + _export.F * (_library || !USE_NATIVE), PROMISE, {
+  _export(_export.S + _export.F * (_library || !USE_NATIVE$1), PROMISE, {
     // 25.4.4.6 Promise.resolve(x)
     resolve: function resolve(x) {
       return _promiseResolve(_library && this === Wrapper ? $Promise : this, x);
     }
   });
-  _export(_export.S + _export.F * !(USE_NATIVE && _iterDetect(function (iter) {
+  _export(_export.S + _export.F * !(USE_NATIVE$1 && _iterDetect(function (iter) {
     $Promise.all(iter)['catch'](empty);
   })), PROMISE, {
     // 25.4.4.1 Promise.all(iterable)
@@ -2715,99 +3759,93 @@ typeof navigator === "object" && (function (global, factory) {
     }
   });
 
-  // 20.1.2.4 Number.isNaN(number)
-
-
-  _export(_export.S, 'Number', {
-    isNaN: function isNaN(number) {
-      // eslint-disable-next-line no-self-compare
-      return number != number;
-    }
-  });
-
   // ==========================================================================
   // Type checking utils
   // ==========================================================================
-  var getConstructor = function getConstructor(input) {
+  var getConstructor$1 = function getConstructor(input) {
     return input !== null && typeof input !== 'undefined' ? input.constructor : null;
   };
 
-  var instanceOf = function instanceOf(input, constructor) {
+  var instanceOf$1 = function instanceOf(input, constructor) {
     return Boolean(input && constructor && input instanceof constructor);
   };
 
-  var isNullOrUndefined = function isNullOrUndefined(input) {
+  var isNullOrUndefined$1 = function isNullOrUndefined(input) {
     return input === null || typeof input === 'undefined';
   };
 
-  var isObject = function isObject(input) {
-    return getConstructor(input) === Object;
+  var isObject$1 = function isObject(input) {
+    return getConstructor$1(input) === Object;
   };
 
-  var isNumber = function isNumber(input) {
-    return getConstructor(input) === Number && !Number.isNaN(input);
+  var isNumber$1 = function isNumber(input) {
+    return getConstructor$1(input) === Number && !Number.isNaN(input);
   };
 
-  var isString = function isString(input) {
-    return getConstructor(input) === String;
+  var isString$1 = function isString(input) {
+    return getConstructor$1(input) === String;
   };
 
-  var isBoolean = function isBoolean(input) {
-    return getConstructor(input) === Boolean;
+  var isBoolean$1 = function isBoolean(input) {
+    return getConstructor$1(input) === Boolean;
   };
 
-  var isFunction = function isFunction(input) {
-    return getConstructor(input) === Function;
+  var isFunction$1 = function isFunction(input) {
+    return getConstructor$1(input) === Function;
   };
 
-  var isArray = function isArray(input) {
+  var isArray$1 = function isArray(input) {
     return Array.isArray(input);
   };
 
   var isWeakMap = function isWeakMap(input) {
-    return instanceOf(input, WeakMap);
+    return instanceOf$1(input, WeakMap);
   };
 
-  var isNodeList = function isNodeList(input) {
-    return instanceOf(input, NodeList);
+  var isNodeList$1 = function isNodeList(input) {
+    return instanceOf$1(input, NodeList);
   };
 
-  var isElement = function isElement(input) {
-    return instanceOf(input, Element);
+  var isElement$1 = function isElement(input) {
+    return instanceOf$1(input, Element);
   };
 
   var isTextNode = function isTextNode(input) {
-    return getConstructor(input) === Text;
+    return getConstructor$1(input) === Text;
   };
 
-  var isEvent = function isEvent(input) {
-    return instanceOf(input, Event);
+  var isEvent$1 = function isEvent(input) {
+    return instanceOf$1(input, Event);
   };
 
   var isKeyboardEvent = function isKeyboardEvent(input) {
-    return instanceOf(input, KeyboardEvent);
+    return instanceOf$1(input, KeyboardEvent);
   };
 
   var isCue = function isCue(input) {
-    return instanceOf(input, window.TextTrackCue) || instanceOf(input, window.VTTCue);
+    return instanceOf$1(input, window.TextTrackCue) || instanceOf$1(input, window.VTTCue);
   };
 
   var isTrack = function isTrack(input) {
-    return instanceOf(input, TextTrack) || !isNullOrUndefined(input) && isString(input.kind);
+    return instanceOf$1(input, TextTrack) || !isNullOrUndefined$1(input) && isString$1(input.kind);
   };
 
-  var isEmpty = function isEmpty(input) {
-    return isNullOrUndefined(input) || (isString(input) || isArray(input) || isNodeList(input)) && !input.length || isObject(input) && !Object.keys(input).length;
+  var isPromise = function isPromise(input) {
+    return instanceOf$1(input, Promise);
+  };
+
+  var isEmpty$1 = function isEmpty(input) {
+    return isNullOrUndefined$1(input) || (isString$1(input) || isArray$1(input) || isNodeList$1(input)) && !input.length || isObject$1(input) && !Object.keys(input).length;
   };
 
   var isUrl = function isUrl(input) {
     // Accept a URL object
-    if (instanceOf(input, window.URL)) {
+    if (instanceOf$1(input, window.URL)) {
       return true;
     } // Must be string from here
 
 
-    if (!isString(input)) {
+    if (!isString$1(input)) {
       return false;
     } // Add the protocol if required
 
@@ -2819,30 +3857,31 @@ typeof navigator === "object" && (function (global, factory) {
     }
 
     try {
-      return !isEmpty(new URL(string).hostname);
+      return !isEmpty$1(new URL(string).hostname);
     } catch (e) {
       return false;
     }
   };
 
-  var is$1 = {
-    nullOrUndefined: isNullOrUndefined,
-    object: isObject,
-    number: isNumber,
-    string: isString,
-    boolean: isBoolean,
-    function: isFunction,
-    array: isArray,
+  var is$2 = {
+    nullOrUndefined: isNullOrUndefined$1,
+    object: isObject$1,
+    number: isNumber$1,
+    string: isString$1,
+    boolean: isBoolean$1,
+    function: isFunction$1,
+    array: isArray$1,
     weakMap: isWeakMap,
-    nodeList: isNodeList,
-    element: isElement,
+    nodeList: isNodeList$1,
+    element: isElement$1,
     textNode: isTextNode,
-    event: isEvent,
+    event: isEvent$1,
     keyboardEvent: isKeyboardEvent,
     cue: isCue,
     track: isTrack,
+    promise: isPromise,
     url: isUrl,
-    empty: isEmpty
+    empty: isEmpty$1
   };
 
   // https://github.com/WICG/EventListenerOptions/blob/gh-pages/explainer.md
@@ -2876,7 +3915,7 @@ typeof navigator === "object" && (function (global, factory) {
     var capture = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : false;
 
     // Bail if no element, event, or callback
-    if (!element || !('addEventListener' in element) || is$1.empty(event) || !is$1.function(callback)) {
+    if (!element || !('addEventListener' in element) || is$2.empty(event) || !is$2.function(callback)) {
       return;
     } // Allow multiple events
 
@@ -2928,20 +3967,22 @@ typeof navigator === "object" && (function (global, factory) {
   } // Bind once-only event handler
 
   function once(element) {
+    var _this2 = this;
+
     var events = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
     var callback = arguments.length > 2 ? arguments[2] : undefined;
     var passive = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
     var capture = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : false;
 
-    function onceCallback() {
+    var onceCallback = function onceCallback() {
       off(element, events, onceCallback, passive, capture);
 
       for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
         args[_key] = arguments[_key];
       }
 
-      callback.apply(this, args);
-    }
+      callback.apply(_this2, args);
+    };
 
     toggleListener.call(this, element, events, onceCallback, true, passive, capture);
   } // Trigger event
@@ -2952,7 +3993,7 @@ typeof navigator === "object" && (function (global, factory) {
     var detail = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
     // Bail if no element
-    if (!is$1.element(element) || is$1.empty(type)) {
+    if (!is$2.element(element) || is$2.empty(type)) {
       return;
     } // Create and dispatch the event
 
@@ -2981,14 +4022,14 @@ typeof navigator === "object" && (function (global, factory) {
   } // Run method when / if player is ready
 
   function ready() {
-    var _this2 = this;
+    var _this3 = this;
 
     return new Promise(function (resolve) {
-      return _this2.ready ? setTimeout(resolve, 0) : on.call(_this2, _this2.elements.container, 'ready', resolve);
+      return _this3.ready ? setTimeout(resolve, 0) : on.call(_this3, _this3.elements.container, 'ready', resolve);
     }).then(function () {});
   }
 
-  function wrap(elements, wrapper) {
+  function wrap$1(elements, wrapper) {
     // Convert `elements` to an array, if necessary.
     var targets = elements.length ? elements : [elements]; // Loops backwards to prevent having to clone the wrapper on the
     // first element (see `child` below).
@@ -3013,7 +4054,7 @@ typeof navigator === "object" && (function (global, factory) {
   } // Set attributes
 
   function setAttributes(element, attributes) {
-    if (!is$1.element(element) || is$1.empty(attributes)) {
+    if (!is$2.element(element) || is$2.empty(attributes)) {
       return;
     } // Assume null and undefined attributes should be left out,
     // Setting them would otherwise convert them to "null" and "undefined"
@@ -3023,7 +4064,7 @@ typeof navigator === "object" && (function (global, factory) {
       var _ref2 = _slicedToArray(_ref, 2),
           value = _ref2[1];
 
-      return !is$1.nullOrUndefined(value);
+      return !is$2.nullOrUndefined(value);
     }).forEach(function (_ref3) {
       var _ref4 = _slicedToArray(_ref3, 2),
           key = _ref4[0],
@@ -3037,12 +4078,12 @@ typeof navigator === "object" && (function (global, factory) {
     // Create a new <element>
     var element = document.createElement(type); // Set all passed attributes
 
-    if (is$1.object(attributes)) {
+    if (is$2.object(attributes)) {
       setAttributes(element, attributes);
     } // Add text node
 
 
-    if (is$1.string(text)) {
+    if (is$2.string(text)) {
       element.innerText = text;
     } // Return built element
 
@@ -3051,7 +4092,7 @@ typeof navigator === "object" && (function (global, factory) {
   } // Inaert an element after another
 
   function insertAfter(element, target) {
-    if (!is$1.element(element) || !is$1.element(target)) {
+    if (!is$2.element(element) || !is$2.element(target)) {
       return;
     }
 
@@ -3059,7 +4100,7 @@ typeof navigator === "object" && (function (global, factory) {
   } // Insert a DocumentFragment
 
   function insertElement(type, parent, attributes, text) {
-    if (!is$1.element(parent)) {
+    if (!is$2.element(parent)) {
       return;
     }
 
@@ -3067,12 +4108,12 @@ typeof navigator === "object" && (function (global, factory) {
   } // Remove element(s)
 
   function removeElement(element) {
-    if (is$1.nodeList(element) || is$1.array(element)) {
+    if (is$2.nodeList(element) || is$2.array(element)) {
       Array.from(element).forEach(removeElement);
       return;
     }
 
-    if (!is$1.element(element) || !is$1.element(element.parentNode)) {
+    if (!is$2.element(element) || !is$2.element(element.parentNode)) {
       return;
     }
 
@@ -3080,7 +4121,7 @@ typeof navigator === "object" && (function (global, factory) {
   } // Remove all child elements
 
   function emptyElement(element) {
-    if (!is$1.element(element)) {
+    if (!is$2.element(element)) {
       return;
     }
 
@@ -3093,7 +4134,7 @@ typeof navigator === "object" && (function (global, factory) {
   } // Replace element
 
   function replaceElement(newChild, oldChild) {
-    if (!is$1.element(oldChild) || !is$1.element(oldChild.parentNode) || !is$1.element(newChild)) {
+    if (!is$2.element(oldChild) || !is$2.element(oldChild.parentNode) || !is$2.element(newChild)) {
       return null;
     }
 
@@ -3106,7 +4147,7 @@ typeof navigator === "object" && (function (global, factory) {
     // '.test' to { class: 'test' }
     // '#test' to { id: 'test' }
     // '[data-test="test"]' to { 'data-test': 'test' }
-    if (!is$1.string(sel) || is$1.empty(sel)) {
+    if (!is$2.string(sel) || is$2.empty(sel)) {
       return {};
     }
 
@@ -3127,7 +4168,7 @@ typeof navigator === "object" && (function (global, factory) {
       switch (start) {
         case '.':
           // Add to existing classname
-          if (is$1.object(existing) && is$1.string(existing.class)) {
+          if (is$2.object(existing) && is$2.string(existing.class)) {
             existing.class += " ".concat(className);
           }
 
@@ -3152,13 +4193,13 @@ typeof navigator === "object" && (function (global, factory) {
   } // Toggle hidden
 
   function toggleHidden(element, hidden) {
-    if (!is$1.element(element)) {
+    if (!is$2.element(element)) {
       return;
     }
 
     var hide = hidden;
 
-    if (!is$1.boolean(hide)) {
+    if (!is$2.boolean(hide)) {
       hide = !element.hidden;
     }
 
@@ -3170,13 +4211,13 @@ typeof navigator === "object" && (function (global, factory) {
   } // Mirror Element.classList.toggle, with IE compatibility for "force" argument
 
   function toggleClass(element, className, force) {
-    if (is$1.nodeList(element)) {
+    if (is$2.nodeList(element)) {
       return Array.from(element).map(function (e) {
         return toggleClass(e, className, force);
       });
     }
 
-    if (is$1.element(element)) {
+    if (is$2.element(element)) {
       var method = 'toggle';
 
       if (typeof force !== 'undefined') {
@@ -3191,10 +4232,10 @@ typeof navigator === "object" && (function (global, factory) {
   } // Has class name
 
   function hasClass(element, className) {
-    return is$1.element(element) && element.classList.contains(className);
+    return is$2.element(element) && element.classList.contains(className);
   } // Element matches selector
 
-  function matches(element, selector) {
+  function matches$1(element, selector) {
 
     function match() {
       return Array.from(document.querySelectorAll(selector)).includes(this);
@@ -3216,7 +4257,7 @@ typeof navigator === "object" && (function (global, factory) {
     var element = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
     var toggle = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
-    if (!is$1.element(element)) {
+    if (!is$2.element(element)) {
       return;
     }
 
@@ -3251,7 +4292,7 @@ typeof navigator === "object" && (function (global, factory) {
     var element = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
     var tabFocus = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
-    if (!is$1.element(element)) {
+    if (!is$2.element(element)) {
       return;
     } // Set regular focus
 
@@ -3276,7 +4317,7 @@ typeof navigator === "object" && (function (global, factory) {
     var type = Object.keys(events).find(function (event) {
       return element.style[event] !== undefined;
     });
-    return is$1.string(type) ? events[type] : false;
+    return is$2.string(type) ? events[type] : false;
   }(); // Force repaint of element
 
   function repaint(element) {
@@ -3299,6 +4340,7 @@ typeof navigator === "object" && (function (global, factory) {
     isIE:
     /* @cc_on!@ */
     !!document.documentMode,
+    isEdge: window.navigator.userAgent.includes('Edge'),
     isWebkit: 'WebkitAppearance' in document.documentElement.style && !/Edge/.test(navigator.userAgent),
     isIPhone: /(iPhone|iPod)/gi.test(navigator.platform),
     isIos: /(iPad|iPhone|iPod)/gi.test(navigator.platform)
@@ -3336,7 +4378,7 @@ typeof navigator === "object" && (function (global, factory) {
       // https://developer.apple.com/documentation/webkitjs/adding_picture_in_picture_to_your_safari_media_controls
 
 
-      if (is$1.function(createElement('video').webkitSetPresentationMode)) {
+      if (is$2.function(createElement('video').webkitSetPresentationMode)) {
         return true;
       } // Chrome
       // https://developers.google.com/web/updates/2018/10/watch-video-using-picture-in-picture
@@ -3350,19 +4392,23 @@ typeof navigator === "object" && (function (global, factory) {
     }(),
     // Airplay support
     // Safari only currently
-    airplay: is$1.function(window.WebKitPlaybackTargetAvailabilityEvent),
+    airplay: is$2.function(window.WebKitPlaybackTargetAvailabilityEvent),
     // Inline playback support
     // https://webkit.org/blog/6784/new-video-policies-for-ios/
     playsinline: 'playsInline' in document.createElement('video'),
     // Check for mime type support against a player instance
     // Credits: http://diveintohtml5.info/everything.html
     // Related: http://www.leanbackplayer.com/test/h5mt.html
-    mime: function mime(inputType) {
-      var _inputType$split = inputType.split('/'),
-          _inputType$split2 = _slicedToArray(_inputType$split, 1),
-          mediaType = _inputType$split2[0];
+    mime: function mime(input) {
+      if (is$2.empty(input)) {
+        return false;
+      }
 
-      var type = inputType; // Verify we're using HTML5 and there's no media type mismatch
+      var _input$split = input.split('/'),
+          _input$split2 = _slicedToArray(_input$split, 1),
+          mediaType = _input$split2[0];
+
+      var type = input; // Verify we're using HTML5 and there's no media type mismatch
 
       if (!this.isHTML5 || mediaType !== this.type) {
         return false;
@@ -3370,7 +4416,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 
       if (Object.keys(defaultCodecs).includes(type)) {
-        type += "; codecs=\"".concat(defaultCodecs[inputType], "\"");
+        type += "; codecs=\"".concat(defaultCodecs[input], "\"");
       }
 
       try {
@@ -3405,10 +4451,16 @@ typeof navigator === "object" && (function (global, factory) {
         return [];
       }
 
-      var sources = Array.from(this.media.querySelectorAll('source')); // Filter out unsupported sources
+      var sources = Array.from(this.media.querySelectorAll('source')); // Filter out unsupported sources (if type is specified)
 
       return sources.filter(function (source) {
-        return support.mime.call(_this, source.getAttribute('type'));
+        var type = source.getAttribute('type');
+
+        if (is$2.empty(type)) {
+          return true;
+        }
+
+        return support.mime.call(_this, type);
       });
     },
     // Get quality levels
@@ -3501,7 +4553,7 @@ typeof navigator === "object" && (function (global, factory) {
   // ==========================================================================
 
   function dedupe(array) {
-    if (!is$1.array(array)) {
+    if (!is$2.array(array)) {
       return array;
     }
 
@@ -3511,7 +4563,7 @@ typeof navigator === "object" && (function (global, factory) {
   } // Get the closest value in an array
 
   function closest(array, value) {
-    if (!is$1.array(array) || !array.length) {
+    if (!is$2.array(array) || !array.length) {
       return null;
     }
 
@@ -3543,12 +4595,12 @@ typeof navigator === "object" && (function (global, factory) {
 
     var source = sources.shift();
 
-    if (!is$1.object(source)) {
+    if (!is$2.object(source)) {
       return target;
     }
 
     Object.keys(source).forEach(function (key) {
-      if (is$1.object(source[key])) {
+      if (is$2.object(source[key])) {
         if (!Object.keys(target).includes(key)) {
           Object.assign(target, _defineProperty({}, key, {}));
         }
@@ -3561,8 +4613,8 @@ typeof navigator === "object" && (function (global, factory) {
     return extend.apply(void 0, [target].concat(sources));
   }
 
-  var dP$2 = _objectDp.f;
-  var gOPN$1 = _objectGopn.f;
+  var dP$4 = _objectDp.f;
+  var gOPN$3 = _objectGopn.f;
 
 
   var $RegExp = _global.RegExp;
@@ -3589,13 +4641,13 @@ typeof navigator === "object" && (function (global, factory) {
         , tiRE ? this : proto$2, $RegExp);
     };
     var proxy = function (key) {
-      key in $RegExp || dP$2($RegExp, key, {
+      key in $RegExp || dP$4($RegExp, key, {
         configurable: true,
         get: function () { return Base$1[key]; },
         set: function (it) { Base$1[key] = it; }
       });
     };
-    for (var keys$1 = gOPN$1(Base$1), i$1 = 0; keys$1.length > i$1;) proxy(keys$1[i$1++]);
+    for (var keys$1 = gOPN$3(Base$1), i$1 = 0; keys$1.length > i$1;) proxy(keys$1[i$1++]);
     proto$2.constructor = $RegExp;
     $RegExp.prototype = proto$2;
     _redefine(_global, 'RegExp', $RegExp);
@@ -3612,7 +4664,7 @@ typeof navigator === "object" && (function (global, factory) {
       args[_key - 1] = arguments[_key];
     }
 
-    if (is$1.empty(input)) {
+    if (is$2.empty(input)) {
       return input;
     }
 
@@ -3691,13 +4743,13 @@ typeof navigator === "object" && (function (global, factory) {
       var key = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
       var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-      if (is$1.empty(key) || is$1.empty(config)) {
+      if (is$2.empty(key) || is$2.empty(config)) {
         return '';
       }
 
       var string = getDeep(config.i18n, key);
 
-      if (is$1.empty(string)) {
+      if (is$2.empty(string)) {
         if (Object.keys(resources).includes(key)) {
           return resources[key];
         }
@@ -3740,12 +4792,12 @@ typeof navigator === "object" && (function (global, factory) {
 
         var store = window.localStorage.getItem(this.key);
 
-        if (is$1.empty(store)) {
+        if (is$2.empty(store)) {
           return null;
         }
 
         var json = JSON.parse(store);
-        return is$1.string(key) && key.length ? json[key] : json;
+        return is$2.string(key) && key.length ? json[key] : json;
       }
     }, {
       key: "set",
@@ -3756,14 +4808,14 @@ typeof navigator === "object" && (function (global, factory) {
         } // Can only store objectst
 
 
-        if (!is$1.object(object)) {
+        if (!is$2.object(object)) {
           return;
         } // Get current storage
 
 
         var storage = this.get(); // Default to empty object
 
-        if (is$1.empty(storage)) {
+        if (is$2.empty(storage)) {
           storage = {};
         } // Update the working copy of the values
 
@@ -3836,12 +4888,12 @@ typeof navigator === "object" && (function (global, factory) {
   // ==========================================================================
 
   function loadSprite(url, id) {
-    if (!is$1.string(url)) {
+    if (!is$2.string(url)) {
       return;
     }
 
     var prefix = 'cache';
-    var hasId = is$1.string(id);
+    var hasId = is$2.string(id);
     var isCached = false;
 
     var exists = function exists() {
@@ -3883,7 +4935,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 
       fetch(url).then(function (result) {
-        if (is$1.empty(result)) {
+        if (is$2.empty(result)) {
           return;
         }
 
@@ -3898,16 +4950,23 @@ typeof navigator === "object" && (function (global, factory) {
     }
   }
 
-  // ==========================================================================
+  // 20.2.2.34 Math.trunc(x)
+
+
+  _export(_export.S, 'Math', {
+    trunc: function trunc(it) {
+      return (it > 0 ? Math.floor : Math.ceil)(it);
+    }
+  });
 
   var getHours = function getHours(value) {
-    return parseInt(value / 60 / 60 % 60, 10);
+    return Math.trunc(value / 60 / 60 % 60, 10);
   };
   var getMinutes = function getMinutes(value) {
-    return parseInt(value / 60 % 60, 10);
+    return Math.trunc(value / 60 % 60, 10);
   };
   var getSeconds = function getSeconds(value) {
-    return parseInt(value % 60, 10);
+    return Math.trunc(value % 60, 10);
   }; // Format time to UI friendly string
 
   function formatTime() {
@@ -3916,7 +4975,7 @@ typeof navigator === "object" && (function (global, factory) {
     var inverted = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
     // Bail if the value isn't a number
-    if (!is$1.number(time)) {
+    if (!is$2.number(time)) {
       return formatTime(null, displayHours, inverted);
     } // Format time component to add leading zero
 
@@ -3982,7 +5041,7 @@ typeof navigator === "object" && (function (global, factory) {
           duration: getElement.call(this, this.config.selectors.display.duration)
         }; // Seek tooltip
 
-        if (is$1.element(this.elements.progress)) {
+        if (is$2.element(this.elements.progress)) {
           this.elements.display.seekTooltip = this.elements.progress.querySelector(".".concat(this.config.classNames.tooltip));
         }
 
@@ -4033,7 +5092,7 @@ typeof navigator === "object" && (function (global, factory) {
     },
     // Create a badge
     createBadge: function createBadge(text) {
-      if (is$1.empty(text)) {
+      if (is$2.empty(text)) {
         return null;
       }
 
@@ -4119,11 +5178,11 @@ typeof navigator === "object" && (function (global, factory) {
           break;
 
         default:
-          if (is$1.empty(props.label)) {
+          if (is$2.empty(props.label)) {
             props.label = type;
           }
 
-          if (is$1.empty(props.icon)) {
+          if (is$2.empty(props.icon)) {
             props.icon = buttonType;
           }
 
@@ -4156,7 +5215,7 @@ typeof navigator === "object" && (function (global, factory) {
       setAttributes(button, attributes); // We have multiple play buttons
 
       if (type === 'play') {
-        if (!is$1.array(this.elements.buttons[type])) {
+        if (!is$2.array(this.elements.buttons[type])) {
           this.elements.buttons[type] = [];
         }
 
@@ -4186,7 +5245,9 @@ typeof navigator === "object" && (function (global, factory) {
       }, attributes));
       this.elements.inputs[type] = input; // Set the fill for webkit now
 
-      controls.updateRangeFill.call(this, input);
+      controls.updateRangeFill.call(this, input); // Improve support on touch devices
+
+      RangeTouch.setup(input);
       return input;
     },
     // Create a <progress>
@@ -4195,7 +5256,7 @@ typeof navigator === "object" && (function (global, factory) {
         min: 0,
         max: 100,
         value: 0,
-        role: 'presentation',
+        role: 'progressbar',
         'aria-hidden': true
       }, attributes)); // Create the label inside
 
@@ -4244,7 +5305,7 @@ typeof navigator === "object" && (function (global, factory) {
           return;
         }
 
-        var isRadioButton = matches(menuItem, '[role="menuitemradio"]'); // Show the respective menu
+        var isRadioButton = matches$1(menuItem, '[role="menuitemradio"]'); // Show the respective menu
 
         if (!isRadioButton && [32, 39].includes(event.which)) {
           controls.showMenuPanel.call(_this, type, true);
@@ -4255,13 +5316,13 @@ typeof navigator === "object" && (function (global, factory) {
             if (event.which === 40 || isRadioButton && event.which === 39) {
               target = menuItem.nextElementSibling;
 
-              if (!is$1.element(target)) {
+              if (!is$2.element(target)) {
                 target = menuItem.parentNode.firstElementChild;
               }
             } else {
               target = menuItem.previousElementSibling;
 
-              if (!is$1.element(target)) {
+              if (!is$2.element(target)) {
                 target = menuItem.parentNode.lastElementChild;
               }
             }
@@ -4304,7 +5365,7 @@ typeof navigator === "object" && (function (global, factory) {
 
       flex.innerHTML = title;
 
-      if (is$1.element(badge)) {
+      if (is$2.element(badge)) {
         flex.appendChild(badge);
       }
 
@@ -4319,7 +5380,7 @@ typeof navigator === "object" && (function (global, factory) {
           // Ensure exclusivity
           if (checked) {
             Array.from(menuItem.parentNode.children).filter(function (node) {
-              return matches(node, '[role="menuitemradio"]');
+              return matches$1(node, '[role="menuitemradio"]');
             }).forEach(function (node) {
               return node.setAttribute('aria-checked', 'false');
             });
@@ -4329,7 +5390,7 @@ typeof navigator === "object" && (function (global, factory) {
         }
       });
       this.listeners.bind(menuItem, 'click keyup', function (event) {
-        if (is$1.keyboardEvent(event) && event.which !== 32) {
+        if (is$2.keyboardEvent(event) && event.which !== 32) {
           return;
         }
 
@@ -4354,7 +5415,7 @@ typeof navigator === "object" && (function (global, factory) {
             break;
         }
 
-        controls.showMenuPanel.call(_this2, 'home', is$1.keyboardEvent(event));
+        controls.showMenuPanel.call(_this2, 'home', is$2.keyboardEvent(event));
       }, type, false);
       controls.bindMenuItemShortcuts.call(this, menuItem, type);
       list.appendChild(menuItem);
@@ -4365,7 +5426,7 @@ typeof navigator === "object" && (function (global, factory) {
       var inverted = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
       // Bail if the value isn't a number
-      if (!is$1.number(time)) {
+      if (!is$2.number(time)) {
         return time;
       } // Always display hours if duration is over an hour
 
@@ -4380,7 +5441,7 @@ typeof navigator === "object" && (function (global, factory) {
       var inverted = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
       // Bail if there's no element to display or the value isn't a number
-      if (!is$1.element(target) || !is$1.number(time)) {
+      if (!is$2.element(target) || !is$2.number(time)) {
         return;
       } // eslint-disable-next-line no-param-reassign
 
@@ -4394,12 +5455,12 @@ typeof navigator === "object" && (function (global, factory) {
       } // Update range
 
 
-      if (is$1.element(this.elements.inputs.volume)) {
+      if (is$2.element(this.elements.inputs.volume)) {
         controls.setRange.call(this, this.elements.inputs.volume, this.muted ? 0 : this.volume);
       } // Update mute state
 
 
-      if (is$1.element(this.elements.buttons.mute)) {
+      if (is$2.element(this.elements.buttons.mute)) {
         this.elements.buttons.mute.pressed = this.muted || this.volume === 0;
       }
     },
@@ -4407,7 +5468,7 @@ typeof navigator === "object" && (function (global, factory) {
     setRange: function setRange(target) {
       var value = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
 
-      if (!is$1.element(target)) {
+      if (!is$2.element(target)) {
         return;
       } // eslint-disable-next-line
 
@@ -4420,22 +5481,22 @@ typeof navigator === "object" && (function (global, factory) {
     updateProgress: function updateProgress(event) {
       var _this3 = this;
 
-      if (!this.supported.ui || !is$1.event(event)) {
+      if (!this.supported.ui || !is$2.event(event)) {
         return;
       }
 
       var value = 0;
 
       var setProgress = function setProgress(target, input) {
-        var value = is$1.number(input) ? input : 0;
-        var progress = is$1.element(target) ? target : _this3.elements.display.buffer; // Update value and label
+        var value = is$2.number(input) ? input : 0;
+        var progress = is$2.element(target) ? target : _this3.elements.display.buffer; // Update value and label
 
-        if (is$1.element(progress)) {
+        if (is$2.element(progress)) {
           progress.value = value; // Update text label inside
 
           var label = progress.getElementsByTagName('span')[0];
 
-          if (is$1.element(label)) {
+          if (is$2.element(label)) {
             label.childNodes[0].nodeValue = value;
           }
         }
@@ -4469,20 +5530,20 @@ typeof navigator === "object" && (function (global, factory) {
     // Webkit polyfill for lower fill range
     updateRangeFill: function updateRangeFill(target) {
       // Get range from event if event passed
-      var range = is$1.event(target) ? target.target : target; // Needs to be a valid <input type='range'>
+      var range = is$2.event(target) ? target.target : target; // Needs to be a valid <input type='range'>
 
-      if (!is$1.element(range) || range.getAttribute('type') !== 'range') {
+      if (!is$2.element(range) || range.getAttribute('type') !== 'range') {
         return;
       } // Set aria values for https://github.com/sampotts/plyr/issues/905
 
 
-      if (matches(range, this.config.selectors.inputs.seek)) {
+      if (matches$1(range, this.config.selectors.inputs.seek)) {
         range.setAttribute('aria-valuenow', this.currentTime);
         var currentTime = controls.formatTime(this.currentTime);
         var duration = controls.formatTime(this.duration);
         var format$$1 = i18n.get('seekLabel', this.config);
         range.setAttribute('aria-valuetext', format$$1.replace('{currentTime}', currentTime).replace('{duration}', duration));
-      } else if (matches(range, this.config.selectors.inputs.volume)) {
+      } else if (matches$1(range, this.config.selectors.inputs.volume)) {
         var percent = range.value * 100;
         range.setAttribute('aria-valuenow', percent);
         range.setAttribute('aria-valuetext', "".concat(percent.toFixed(1), "%"));
@@ -4503,7 +5564,7 @@ typeof navigator === "object" && (function (global, factory) {
       var _this4 = this;
 
       // Bail if setting not true
-      if (!this.config.tooltips.seek || !is$1.element(this.elements.inputs.seek) || !is$1.element(this.elements.display.seekTooltip) || this.duration === 0) {
+      if (!this.config.tooltips.seek || !is$2.element(this.elements.inputs.seek) || !is$2.element(this.elements.display.seekTooltip) || this.duration === 0) {
         return;
       } // Calculate percentage
 
@@ -4523,7 +5584,7 @@ typeof navigator === "object" && (function (global, factory) {
       } // Determine percentage, if already visible
 
 
-      if (is$1.event(event)) {
+      if (is$2.event(event)) {
         percent = 100 / clientRect.width * (event.pageX - clientRect.left);
       } else if (hasClass(this.elements.display.seekTooltip, visible)) {
         percent = parseFloat(this.elements.display.seekTooltip.style.left, 10);
@@ -4544,14 +5605,14 @@ typeof navigator === "object" && (function (global, factory) {
       this.elements.display.seekTooltip.style.left = "".concat(percent, "%"); // Show/hide the tooltip
       // If the event is a moues in/out and percentage is inside bounds
 
-      if (is$1.event(event) && ['mouseenter', 'mouseleave'].includes(event.type)) {
+      if (is$2.event(event) && ['mouseenter', 'mouseleave'].includes(event.type)) {
         toggle(event.type === 'mouseenter');
       }
     },
     // Handle time change event
     timeUpdate: function timeUpdate(event) {
       // Only invert if only one time element is displayed and used for both duration and currentTime
-      var invert = !is$1.element(this.elements.display.duration) && this.config.invertTime; // Duration
+      var invert = !is$2.element(this.elements.display.duration) && this.config.invertTime; // Duration
 
       controls.updateTimeDisplay.call(this, this.elements.display.currentTime, invert ? this.duration - this.currentTime : this.currentTime, invert); // Ignore updates while seeking
 
@@ -4580,12 +5641,12 @@ typeof navigator === "object" && (function (global, factory) {
       } // Update ARIA values
 
 
-      if (is$1.element(this.elements.inputs.seek)) {
+      if (is$2.element(this.elements.inputs.seek)) {
         this.elements.inputs.seek.setAttribute('aria-valuemax', this.duration);
       } // If there's a spot to display duration
 
 
-      var hasDuration = is$1.element(this.elements.display.duration); // If there's only one time display, display duration there
+      var hasDuration = is$2.element(this.elements.display.duration); // If there's only one time display, display duration there
 
       if (!hasDuration && this.config.displayDuration && this.paused) {
         controls.updateTimeDisplay.call(this, this.elements.display.currentTime, this.duration);
@@ -4612,14 +5673,14 @@ typeof navigator === "object" && (function (global, factory) {
       if (setting === 'captions') {
         value = this.currentTrack;
       } else {
-        value = !is$1.empty(input) ? input : this[setting]; // Get default
+        value = !is$2.empty(input) ? input : this[setting]; // Get default
 
-        if (is$1.empty(value)) {
+        if (is$2.empty(value)) {
           value = this.config[setting].default;
         } // Unsupported value
 
 
-        if (!is$1.empty(this.options[setting]) && !this.options[setting].includes(value)) {
+        if (!is$2.empty(this.options[setting]) && !this.options[setting].includes(value)) {
           this.debug.warn("Unsupported value of '".concat(value, "' for ").concat(setting));
           return;
         } // Disabled value
@@ -4632,12 +5693,12 @@ typeof navigator === "object" && (function (global, factory) {
       } // Get the list if we need to
 
 
-      if (!is$1.element(list)) {
+      if (!is$2.element(list)) {
         list = pane && pane.querySelector('[role="menu"]');
       } // If there's no list it means it's not been rendered...
 
 
-      if (!is$1.element(list)) {
+      if (!is$2.element(list)) {
         return;
       } // Update the label
 
@@ -4647,7 +5708,7 @@ typeof navigator === "object" && (function (global, factory) {
 
       var target = list && list.querySelector("[value=\"".concat(value, "\"]"));
 
-      if (is$1.element(target)) {
+      if (is$2.element(target)) {
         target.checked = true;
       }
     },
@@ -4658,7 +5719,7 @@ typeof navigator === "object" && (function (global, factory) {
           return value === 1 ? i18n.get('normal', this.config) : "".concat(value, "&times;");
 
         case 'quality':
-          if (is$1.number(value)) {
+          if (is$2.number(value)) {
             var label = i18n.get("qualityLabel.".concat(value), this.config);
 
             if (!label.length) {
@@ -4682,21 +5743,21 @@ typeof navigator === "object" && (function (global, factory) {
       var _this5 = this;
 
       // Menu required
-      if (!is$1.element(this.elements.settings.panels.quality)) {
+      if (!is$2.element(this.elements.settings.panels.quality)) {
         return;
       }
 
       var type = 'quality';
       var list = this.elements.settings.panels.quality.querySelector('[role="menu"]'); // Set options if passed and filter based on uniqueness and config
 
-      if (is$1.array(options)) {
+      if (is$2.array(options)) {
         this.options.quality = dedupe(options).filter(function (quality) {
           return _this5.config.quality.options.includes(quality);
         });
       } // Toggle the pane and tab
 
 
-      var toggle = !is$1.empty(this.options.quality) && this.options.quality.length > 1;
+      var toggle = !is$2.empty(this.options.quality) && this.options.quality.length > 1;
       controls.toggleMenuButton.call(this, type, toggle); // Empty the menu
 
       emptyElement(list); // Check if we need to toggle the parent
@@ -4776,7 +5837,7 @@ typeof navigator === "object" && (function (global, factory) {
       var _this6 = this;
 
       // Menu required
-      if (!is$1.element(this.elements.settings.panels.captions)) {
+      if (!is$2.element(this.elements.settings.panels.captions)) {
         return;
       } // TODO: Captions or language? Currently it's mixed
 
@@ -4824,14 +5885,14 @@ typeof navigator === "object" && (function (global, factory) {
       var _this7 = this;
 
       // Menu required
-      if (!is$1.element(this.elements.settings.panels.speed)) {
+      if (!is$2.element(this.elements.settings.panels.speed)) {
         return;
       }
 
       var type = 'speed';
       var list = this.elements.settings.panels.speed.querySelector('[role="menu"]'); // Set the speed options
 
-      if (is$1.array(options)) {
+      if (is$2.array(options)) {
         this.options.speed = options;
       } else if (this.isHTML5 || this.isVimeo) {
         this.options.speed = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
@@ -4842,7 +5903,7 @@ typeof navigator === "object" && (function (global, factory) {
         return _this7.config.speed.options.includes(speed);
       }); // Toggle the pane and tab
 
-      var toggle = !is$1.empty(this.options.speed) && this.options.speed.length > 1;
+      var toggle = !is$2.empty(this.options.speed) && this.options.speed.length > 1;
       controls.toggleMenuButton.call(this, type, toggle); // Empty the menu
 
       emptyElement(list); // Check if we need to toggle the parent
@@ -4867,7 +5928,7 @@ typeof navigator === "object" && (function (global, factory) {
     // Check if we need to hide/show the settings menu
     checkMenu: function checkMenu() {
       var buttons = this.elements.settings.buttons;
-      var visible = !is$1.empty(buttons) && Object.values(buttons).some(function (button) {
+      var visible = !is$2.empty(buttons) && Object.values(buttons).some(function (button) {
         return !button.hidden;
       });
       toggleHidden(this.elements.settings.menu, !visible);
@@ -4882,7 +5943,7 @@ typeof navigator === "object" && (function (global, factory) {
 
       var target = pane;
 
-      if (!is$1.element(target)) {
+      if (!is$2.element(target)) {
         target = Object.values(this.elements.settings.panels).find(function (pane) {
           return !pane.hidden;
         });
@@ -4896,7 +5957,7 @@ typeof navigator === "object" && (function (global, factory) {
       var popup = this.elements.settings.popup;
       var button = this.elements.buttons.settings; // Menu and button are required
 
-      if (!is$1.element(popup) || !is$1.element(button)) {
+      if (!is$2.element(popup) || !is$2.element(button)) {
         return;
       } // True toggle by default
 
@@ -4904,11 +5965,11 @@ typeof navigator === "object" && (function (global, factory) {
       var hidden = popup.hidden;
       var show = hidden;
 
-      if (is$1.boolean(input)) {
+      if (is$2.boolean(input)) {
         show = input;
-      } else if (is$1.keyboardEvent(input) && input.which === 27) {
+      } else if (is$2.keyboardEvent(input) && input.which === 27) {
         show = false;
-      } else if (is$1.event(input)) {
+      } else if (is$2.event(input)) {
         var isMenuItem = popup.contains(input.target); // If the click was inside the menu or if the click
         // wasn't the button or menu item and we're trying to
         // show the menu (a doc click shouldn't show the menu)
@@ -4925,11 +5986,11 @@ typeof navigator === "object" && (function (global, factory) {
 
       toggleClass(this.elements.container, this.config.classNames.menu.open, show); // Focus the first item if key interaction
 
-      if (show && is$1.keyboardEvent(input)) {
+      if (show && is$2.keyboardEvent(input)) {
         controls.focusFirstMenuItem.call(this, null, true);
       } else if (!show && !hidden) {
         // If closing, re-focus the button
-        setFocus.call(this, button, is$1.keyboardEvent(input));
+        setFocus.call(this, button, is$2.keyboardEvent(input));
       }
     },
     // Get the natural size of a menu panel
@@ -4958,7 +6019,7 @@ typeof navigator === "object" && (function (global, factory) {
       var tabFocus = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
       var target = document.getElementById("plyr-settings-".concat(this.id, "-").concat(type)); // Nothing to show, bail
 
-      if (!is$1.element(target)) {
+      if (!is$2.element(target)) {
         return;
       } // Hide all other panels
 
@@ -5006,7 +6067,7 @@ typeof navigator === "object" && (function (global, factory) {
     setDownloadLink: function setDownloadLink() {
       var button = this.elements.buttons.download; // Bail if no button
 
-      if (!is$1.element(button)) {
+      if (!is$2.element(button)) {
         return;
       } // Set download link
 
@@ -5107,7 +6168,7 @@ typeof navigator === "object" && (function (global, factory) {
       } // Settings button / menu
 
 
-      if (this.config.controls.includes('settings') && !is$1.empty(this.config.settings)) {
+      if (this.config.controls.includes('settings') && !is$2.empty(this.config.settings)) {
         var control = createElement('div', {
           class: 'plyr__menu',
           hidden: ''
@@ -5229,7 +6290,7 @@ typeof navigator === "object" && (function (global, factory) {
         };
         var download = this.config.urls.download;
 
-        if (!is$1.url(download) && this.isEmbed) {
+        if (!is$2.url(download) && this.isEmbed) {
           extend(_attributes, {
             icon: "logo-".concat(this.provider),
             label: this.provider
@@ -5284,8 +6345,8 @@ typeof navigator === "object" && (function (global, factory) {
       };
       var update = true; // If function, run it and use output
 
-      if (is$1.function(this.config.controls)) {
-        this.config.controls = this.config.controls.call(this.props);
+      if (is$2.function(this.config.controls)) {
+        this.config.controls = this.config.controls.call(this, props);
       } // Convert falsy controls to empty array (primarily for empty strings)
 
 
@@ -5293,7 +6354,7 @@ typeof navigator === "object" && (function (global, factory) {
         this.config.controls = [];
       }
 
-      if (is$1.element(this.config.controls) || is$1.string(this.config.controls)) {
+      if (is$2.element(this.config.controls) || is$2.string(this.config.controls)) {
         // HTMLElement or Non-empty string passed as the option
         container = this.config.controls;
       } else {
@@ -5325,9 +6386,9 @@ typeof navigator === "object" && (function (global, factory) {
 
 
       if (update) {
-        if (is$1.string(this.config.controls)) {
+        if (is$2.string(this.config.controls)) {
           container = replace(container);
-        } else if (is$1.element(container)) {
+        } else if (is$2.element(container)) {
           container.innerHTML = replace(container.innerHTML);
         }
       } // Controls container
@@ -5335,25 +6396,25 @@ typeof navigator === "object" && (function (global, factory) {
 
       var target; // Inject to custom location
 
-      if (is$1.string(this.config.selectors.controls.container)) {
+      if (is$2.string(this.config.selectors.controls.container)) {
         target = document.querySelector(this.config.selectors.controls.container);
       } // Inject into the container by default
 
 
-      if (!is$1.element(target)) {
+      if (!is$2.element(target)) {
         target = this.elements.container;
       } // Inject controls HTML (needs to be before captions, hence "afterbegin")
 
 
-      var insertMethod = is$1.element(container) ? 'insertAdjacentElement' : 'insertAdjacentHTML';
+      var insertMethod = is$2.element(container) ? 'insertAdjacentElement' : 'insertAdjacentHTML';
       target[insertMethod]('afterbegin', container); // Find the elements if need be
 
-      if (!is$1.element(this.elements.controls)) {
+      if (!is$2.element(this.elements.controls)) {
         controls.findElements.call(this);
       } // Add pressed property to buttons
 
 
-      if (!is$1.empty(this.elements.buttons)) {
+      if (!is$2.empty(this.elements.buttons)) {
         var addProperty = function addProperty(button) {
           var className = _this10.config.classNames.controlPressed;
           Object.defineProperty(button, 'pressed', {
@@ -5370,16 +6431,16 @@ typeof navigator === "object" && (function (global, factory) {
 
 
         Object.values(this.elements.buttons).filter(Boolean).forEach(function (button) {
-          if (is$1.array(button) || is$1.nodeList(button)) {
+          if (is$2.array(button) || is$2.nodeList(button)) {
             Array.from(button).filter(Boolean).forEach(addProperty);
           } else {
             addProperty(button);
           }
         });
-      } // Edge sometimes doesn't finish the paint so force a redraw
+      } // Edge sometimes doesn't finish the paint so force a repaint
 
 
-      if (window.navigator.userAgent.includes('Edge')) {
+      if (browser.isEdge) {
         repaint(target);
       } // Setup tooltips
 
@@ -5400,8 +6461,8 @@ typeof navigator === "object" && (function (global, factory) {
 
   /**
    * Parse a string to a URL object
-   * @param {string} input - the URL to be parsed
-   * @param {boolean} safe - failsafe parsing
+   * @param {String} input - the URL to be parsed
+   * @param {Boolean} safe - failsafe parsing
    */
 
   function parseUrl(input) {
@@ -5424,7 +6485,7 @@ typeof navigator === "object" && (function (global, factory) {
   function buildUrlParams(input) {
     var params = new URLSearchParams();
 
-    if (is$1.object(input)) {
+    if (is$2.object(input)) {
       Object.entries(input).forEach(function (_ref) {
         var _ref2 = _slicedToArray(_ref, 2),
             key = _ref2[0],
@@ -5448,7 +6509,7 @@ typeof navigator === "object" && (function (global, factory) {
 
       if (!this.isVideo || this.isYouTube || this.isHTML5 && !support.textTracks) {
         // Clear menu and hide
-        if (is$1.array(this.config.controls) && this.config.controls.includes('settings') && this.config.settings.includes('captions')) {
+        if (is$2.array(this.config.controls) && this.config.controls.includes('settings') && this.config.settings.includes('captions')) {
           controls.setCaptionsMenu.call(this);
         }
 
@@ -5456,7 +6517,7 @@ typeof navigator === "object" && (function (global, factory) {
       } // Inject the container
 
 
-      if (!is$1.element(this.elements.captions)) {
+      if (!is$2.element(this.elements.captions)) {
         this.elements.captions = createElement('div', getAttributesFromSelector(this.config.selectors.captions));
         insertAfter(this.elements.captions, this.elements.wrapper);
       } // Fix IE captions if CORS is used
@@ -5499,7 +6560,7 @@ typeof navigator === "object" && (function (global, factory) {
 
       var active = this.storage.get('captions');
 
-      if (!is$1.boolean(active)) {
+      if (!is$2.boolean(active)) {
         active = this.config.captions.active;
       }
 
@@ -5559,7 +6620,7 @@ typeof navigator === "object" && (function (global, factory) {
       } // Enable or disable captions based on track length
 
 
-      toggleClass(this.elements.container, this.config.classNames.captions.enabled, !is$1.empty(tracks)); // Update available languages in list
+      toggleClass(this.elements.container, this.config.classNames.captions.enabled, !is$2.empty(tracks)); // Update available languages in list
 
       if ((this.config.controls || []).includes('settings') && this.config.settings.includes('captions')) {
         controls.setCaptionsMenu.call(this);
@@ -5580,7 +6641,7 @@ typeof navigator === "object" && (function (global, factory) {
       var activeClass = this.config.classNames.captions.active; // Get the next state
       // If the method is called without parameter, toggle based on current value
 
-      var active = is$1.nullOrUndefined(input) ? !toggled : input; // Update state and trigger event
+      var active = is$2.nullOrUndefined(input) ? !toggled : input; // Update state and trigger event
 
       if (active !== toggled) {
         // When passive, don't override user preferences
@@ -5627,7 +6688,7 @@ typeof navigator === "object" && (function (global, factory) {
         return;
       }
 
-      if (!is$1.number(index)) {
+      if (!is$2.number(index)) {
         this.debug.warn('Invalid caption argument', index);
         return;
       }
@@ -5678,7 +6739,7 @@ typeof navigator === "object" && (function (global, factory) {
     setLanguage: function setLanguage(input) {
       var passive = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
-      if (!is$1.string(input)) {
+      if (!is$2.string(input)) {
         this.debug.warn('Invalid language argument', input);
         return;
       } // Normalize
@@ -5740,16 +6801,16 @@ typeof navigator === "object" && (function (global, factory) {
     getLabel: function getLabel(track) {
       var currentTrack = track;
 
-      if (!is$1.track(currentTrack) && support.textTracks && this.captions.toggled) {
+      if (!is$2.track(currentTrack) && support.textTracks && this.captions.toggled) {
         currentTrack = captions.getCurrentTrack.call(this);
       }
 
-      if (is$1.track(currentTrack)) {
-        if (!is$1.empty(currentTrack.label)) {
+      if (is$2.track(currentTrack)) {
+        if (!is$2.empty(currentTrack.label)) {
           return currentTrack.label;
         }
 
-        if (!is$1.empty(currentTrack.language)) {
+        if (!is$2.empty(currentTrack.language)) {
           return track.language.toUpperCase();
         }
 
@@ -5766,13 +6827,13 @@ typeof navigator === "object" && (function (global, factory) {
         return;
       }
 
-      if (!is$1.element(this.elements.captions)) {
+      if (!is$2.element(this.elements.captions)) {
         this.debug.warn('No captions element to render to');
         return;
       } // Only accept array or empty input
 
 
-      if (!is$1.nullOrUndefined(input) && !Array.isArray(input)) {
+      if (!is$2.nullOrUndefined(input) && !Array.isArray(input)) {
         this.debug.warn('updateCues: Invalid input', input);
         return;
       }
@@ -5807,7 +6868,7 @@ typeof navigator === "object" && (function (global, factory) {
   // ==========================================================================
   // Plyr default config
   // ==========================================================================
-  var defaults = {
+  var defaults$1 = {
     // Disable
     enabled: true,
     // Custom media title
@@ -5848,7 +6909,7 @@ typeof navigator === "object" && (function (global, factory) {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.4.7/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.5.2/plyr.svg',
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
     // Quality default
@@ -5890,7 +6951,7 @@ typeof navigator === "object" && (function (global, factory) {
       enabled: true,
       // Allow fullscreen?
       fallback: true,
-      // Fallback for vintage browsers
+      // Fallback using full viewport/window
       iosNative: false // Use the native fullscreen in iOS (disables custom controls)
 
     },
@@ -6091,7 +7152,17 @@ typeof navigator === "object" && (function (global, factory) {
         supported: 'plyr--airplay-supported',
         active: 'plyr--airplay-active'
       },
-      tabFocus: 'plyr__tab-focus'
+      tabFocus: 'plyr__tab-focus',
+      previewThumbnails: {
+        // Tooltip thumbs
+        thumbContainer: 'plyr__preview-thumb',
+        thumbContainerShown: 'plyr__preview-thumb--is-shown',
+        imageContainer: 'plyr__preview-thumb__image-container',
+        timeContainer: 'plyr__preview-thumb__time-container',
+        // Scrubbing
+        scrubbingContainer: 'plyr__preview-scrubbing',
+        scrubbingContainerShown: 'plyr__preview-scrubbing--is-shown'
+      }
     },
     // Embed attributes
     attributes: {
@@ -6108,7 +7179,34 @@ typeof navigator === "object" && (function (global, factory) {
     // Register for an account here: http://vi.ai/publisher-video-monetization/?aid=plyrio
     ads: {
       enabled: false,
-      publisherId: ''
+      publisherId: '',
+      tagUrl: ''
+    },
+    // Preview Thumbnails plugin
+    previewThumbnails: {
+      enabled: false,
+      src: ''
+    },
+    // Vimeo plugin
+    vimeo: {
+      byline: false,
+      portrait: false,
+      title: false,
+      speed: true,
+      transparent: false
+    },
+    // YouTube plugin
+    youtube: {
+      noCookie: false,
+      // Whether to use an alternative version of YouTube without cookies
+      rel: 0,
+      // No related vids
+      showinfo: 0,
+      // Hide info
+      iv_load_policy: 3,
+      // Hide annotations
+      modestbranding: 1 // Hide logos as much as possible (they still show one in the corner when paused)
+
     }
   };
 
@@ -6139,7 +7237,7 @@ typeof navigator === "object" && (function (global, factory) {
 
   function getProviderByUrl(url) {
     // YouTube
-    if (/^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$/.test(url)) {
+    if (/^(https?:\/\/)?(www\.)?(youtube\.com|youtube-nocookie\.com|youtu\.?be)\/.+$/.test(url)) {
       return providers.youtube;
     } // Vimeo
 
@@ -6202,7 +7300,7 @@ typeof navigator === "object" && (function (global, factory) {
 
     var button = this.player.elements.buttons.fullscreen;
 
-    if (is$1.element(button)) {
+    if (is$2.element(button)) {
       button.pressed = this.active;
     } // Trigger an event
 
@@ -6244,7 +7342,7 @@ typeof navigator === "object" && (function (global, factory) {
       } // Check if the property already exists
 
 
-      var hasProperty = is$1.string(viewport.content) && viewport.content.includes(property);
+      var hasProperty = is$2.string(viewport.content) && viewport.content.includes(property);
 
       if (toggle) {
         this.cleanupViewport = !hasProperty;
@@ -6285,7 +7383,9 @@ typeof navigator === "object" && (function (global, factory) {
       this.scrollPosition = {
         x: 0,
         y: 0
-      }; // Register event listeners
+      }; // Force the use of 'full window/browser' rather than fullscreen
+
+      this.forceFallback = player.config.fullscreen.fallback === 'force'; // Register event listeners
       // Handle event (incase user presses escape etc)
 
       on.call(this.player, document, this.prefix === 'ms' ? 'MSFullscreenChange' : "".concat(this.prefix, "fullscreenchange"), function () {
@@ -6295,7 +7395,7 @@ typeof navigator === "object" && (function (global, factory) {
 
       on.call(this.player, this.player.elements.container, 'dblclick', function (event) {
         // Ignore double click in controls
-        if (is$1.element(_this2.player.elements.controls) && _this2.player.elements.controls.contains(event.target)) {
+        if (is$2.element(_this2.player.elements.controls) && _this2.player.elements.controls.contains(event.target)) {
           return;
         }
 
@@ -6311,7 +7411,17 @@ typeof navigator === "object" && (function (global, factory) {
       // Update UI
       value: function update() {
         if (this.enabled) {
-          this.player.debug.log("".concat(Fullscreen.native ? 'Native' : 'Fallback', " fullscreen enabled"));
+          var mode;
+
+          if (this.forceFallback) {
+            mode = 'Fallback (forced)';
+          } else if (Fullscreen.native) {
+            mode = 'Native';
+          } else {
+            mode = 'Fallback';
+          }
+
+          this.player.debug.log("".concat(mode, " fullscreen enabled"));
         } else {
           this.player.debug.log('Fullscreen not supported and fallback disabled');
         } // Add styling hook to show button
@@ -6330,11 +7440,11 @@ typeof navigator === "object" && (function (global, factory) {
 
         if (browser.isIos && this.player.config.fullscreen.iosNative) {
           this.target.webkitEnterFullscreen();
-        } else if (!Fullscreen.native) {
+        } else if (!Fullscreen.native || this.forceFallback) {
           toggleFallback.call(this, true);
         } else if (!this.prefix) {
           this.target.requestFullscreen();
-        } else if (!is$1.empty(this.prefix)) {
+        } else if (!is$2.empty(this.prefix)) {
           this.target["".concat(this.prefix, "Request").concat(this.property)]();
         }
       } // Bail from fullscreen
@@ -6350,11 +7460,11 @@ typeof navigator === "object" && (function (global, factory) {
         if (browser.isIos && this.player.config.fullscreen.iosNative) {
           this.target.webkitExitFullscreen();
           this.player.play();
-        } else if (!Fullscreen.native) {
+        } else if (!Fullscreen.native || this.forceFallback) {
           toggleFallback.call(this, false);
         } else if (!this.prefix) {
           (document.cancelFullScreen || document.exitFullscreen).call(document);
-        } else if (!is$1.empty(this.prefix)) {
+        } else if (!is$2.empty(this.prefix)) {
           var action = this.prefix === 'moz' ? 'Cancel' : 'Exit';
           document["".concat(this.prefix).concat(action).concat(this.property)]();
         }
@@ -6370,6 +7480,13 @@ typeof navigator === "object" && (function (global, factory) {
         }
       }
     }, {
+      key: "usingNative",
+      // If we're actually using native
+      get: function get() {
+        return Fullscreen.native && !this.forceFallback;
+      } // Get the prefix for handlers
+
+    }, {
       key: "enabled",
       // Determine if fullscreen is enabled
       get: function get() {
@@ -6384,7 +7501,7 @@ typeof navigator === "object" && (function (global, factory) {
         } // Fallback using classname
 
 
-        if (!Fullscreen.native) {
+        if (!Fullscreen.native || this.forceFallback) {
           return hasClass(this.target, this.player.config.classNames.fullscreen.fallback);
         }
 
@@ -6401,13 +7518,12 @@ typeof navigator === "object" && (function (global, factory) {
       key: "native",
       get: function get() {
         return !!(document.fullscreenEnabled || document.webkitFullscreenEnabled || document.mozFullScreenEnabled || document.msFullscreenEnabled);
-      } // Get the prefix for handlers
-
+      }
     }, {
       key: "prefix",
       get: function get() {
         // No prefix
-        if (is$1.function(document.exitFullscreen)) {
+        if (is$2.function(document.exitFullscreen)) {
           return '';
         } // Check for fullscreen support by vendor prefix
 
@@ -6415,7 +7531,7 @@ typeof navigator === "object" && (function (global, factory) {
         var value = '';
         var prefixes = ['webkit', 'moz', 'ms'];
         prefixes.some(function (pre) {
-          if (is$1.function(document["".concat(pre, "ExitFullscreen")]) || is$1.function(document["".concat(pre, "CancelFullScreen")])) {
+          if (is$2.function(document["".concat(pre, "ExitFullscreen")]) || is$2.function(document["".concat(pre, "CancelFullScreen")])) {
             value = pre;
             return true;
           }
@@ -6501,7 +7617,7 @@ typeof navigator === "object" && (function (global, factory) {
       } // Inject custom controls if not present
 
 
-      if (!is$1.element(this.elements.controls)) {
+      if (!is$2.element(this.elements.controls)) {
         // Inject custom controls
         controls.inject.call(this); // Re-attach control listeners
 
@@ -6563,7 +7679,7 @@ typeof navigator === "object" && (function (global, factory) {
       // Find the current text
       var label = i18n.get('play', this.config); // If there's a media title set, use that for the label
 
-      if (is$1.string(this.config.title) && !is$1.empty(this.config.title)) {
+      if (is$2.string(this.config.title) && !is$2.empty(this.config.title)) {
         label += ", ".concat(this.config.title);
       } // If there's a play button, set label
 
@@ -6576,12 +7692,12 @@ typeof navigator === "object" && (function (global, factory) {
       if (this.isEmbed) {
         var iframe = getElement.call(this, 'iframe');
 
-        if (!is$1.element(iframe)) {
+        if (!is$2.element(iframe)) {
           return;
         } // Default to media type
 
 
-        var title = !is$1.empty(this.config.title) ? this.config.title : 'video';
+        var title = !is$2.empty(this.config.title) ? this.config.title : 'video';
         var format = i18n.get('frameTitle', this.config);
         iframe.setAttribute('title', format.replace('{title}', title));
       }
@@ -6644,7 +7760,7 @@ typeof navigator === "object" && (function (global, factory) {
         target.pressed = _this3.playing;
       }); // Only update controls on non timeupdate events
 
-      if (is$1.event(event) && event.type === 'timeupdate') {
+      if (is$2.event(event) && event.type === 'timeupdate') {
         return;
       } // Toggle controls
 
@@ -6679,6 +7795,44 @@ typeof navigator === "object" && (function (global, factory) {
     }
   };
 
+  /* function reduceAspectRatio(width, height) {
+      const getRatio = (w, h) => (h === 0 ? w : getRatio(h, w % h));
+      const ratio = getRatio(width, height);
+      return `${width / ratio}:${height / ratio}`;
+  } */
+  // Set aspect ratio for responsive container
+
+  function setAspectRatio(input) {
+    var ratio = input;
+
+    if (!is$2.string(ratio) && !is$2.nullOrUndefined(this.embed)) {
+      ratio = this.embed.ratio;
+    }
+
+    if (!is$2.string(ratio)) {
+      ratio = this.config.ratio;
+    }
+
+    var _ratio$split$map = ratio.split(':').map(Number),
+        _ratio$split$map2 = _slicedToArray(_ratio$split$map, 2),
+        x = _ratio$split$map2[0],
+        y = _ratio$split$map2[1];
+
+    var padding = 100 / x * y;
+    this.elements.wrapper.style.paddingBottom = "".concat(padding, "%"); // For Vimeo we have an extra <div> to hide the standard controls and UI
+
+    if (this.isVimeo && this.supported.ui) {
+      var height = 240;
+      var offset = (height - padding) / (height / 50);
+      this.media.style.transform = "translateY(-".concat(offset, "%)");
+    }
+
+    return {
+      padding: padding,
+      ratio: ratio
+    };
+  }
+
   var Listeners =
   /*#__PURE__*/
   function () {
@@ -6711,7 +7865,7 @@ typeof navigator === "object" && (function (global, factory) {
         // Firefox doesn't get the keycode for whatever reason
 
 
-        if (!is$1.number(code)) {
+        if (!is$2.number(code)) {
           return;
         } // Seek by the number keys
 
@@ -6729,15 +7883,15 @@ typeof navigator === "object" && (function (global, factory) {
           // and any that accept key input http://webaim.org/techniques/keyboard/
           var focused = document.activeElement;
 
-          if (is$1.element(focused)) {
+          if (is$2.element(focused)) {
             var editable = player.config.selectors.editable;
             var seek = elements.inputs.seek;
 
-            if (focused !== seek && matches(focused, editable)) {
+            if (focused !== seek && matches$1(focused, editable)) {
               return;
             }
 
-            if (event.which === 32 && matches(focused, 'button, [role^="menuitem"]')) {
+            if (event.which === 32 && matches$1(focused, 'button, [role^="menuitem"]')) {
               return;
             }
           } // Which keycodes should we prevent default
@@ -6839,7 +7993,7 @@ typeof navigator === "object" && (function (global, factory) {
           // So we only need to worry about non native
 
 
-          if (!player.fullscreen.enabled && player.fullscreen.active && code === 27) {
+          if (code === 27 && !player.fullscreen.usingNative && player.fullscreen.active) {
             player.fullscreen.toggle();
           } // Store last code for next cycle
 
@@ -6932,9 +8086,11 @@ typeof navigator === "object" && (function (global, factory) {
       key: "container",
       value: function container() {
         var player = this.player;
-        var elements = player.elements; // Keyboard shortcuts
+        var config = player.config,
+            elements = player.elements,
+            timers = player.timers; // Keyboard shortcuts
 
-        if (!player.config.keyboard.global && player.config.keyboard.focused) {
+        if (!config.keyboard.global && config.keyboard.focused) {
           on.call(player, elements.container, 'keydown keyup', this.handleKey, false);
         } // Toggle controls on mouse events and entering fullscreen
 
@@ -6958,17 +8114,92 @@ typeof navigator === "object" && (function (global, factory) {
           } // Clear timer
 
 
-          clearTimeout(player.timers.controls); // Set new timer to prevent flicker when seeking
+          clearTimeout(timers.controls); // Set new timer to prevent flicker when seeking
 
-          player.timers.controls = setTimeout(function () {
+          timers.controls = setTimeout(function () {
             return ui.toggleControls.call(player, false);
           }, delay);
+        }); // Force edge to repaint on exit fullscreen
+        // TODO: Fix weird bug where Edge doesn't re-draw when exiting fullscreen
+
+        /* if (browser.isEdge) {
+            on.call(player, elements.container, 'exitfullscreen', () => {
+                setTimeout(() => repaint(elements.container), 100);
+            });
+        } */
+        // Set a gutter for Vimeo
+
+        var setGutter = function setGutter(ratio, padding, toggle) {
+          if (!player.isVimeo) {
+            return;
+          }
+
+          var target = player.elements.wrapper.firstChild;
+
+          var _ratio$split$map = ratio.split(':').map(Number),
+              _ratio$split$map2 = _slicedToArray(_ratio$split$map, 2),
+              height = _ratio$split$map2[1];
+
+          var _player$embed$ratio$s = player.embed.ratio.split(':').map(Number),
+              _player$embed$ratio$s2 = _slicedToArray(_player$embed$ratio$s, 2),
+              videoWidth = _player$embed$ratio$s2[0],
+              videoHeight = _player$embed$ratio$s2[1];
+
+          target.style.maxWidth = toggle ? "".concat(height / videoHeight * videoWidth, "px") : null;
+          target.style.margin = toggle ? '0 auto' : null;
+        }; // Resize on fullscreen change
+
+
+        var setPlayerSize = function setPlayerSize(measure) {
+          // If we don't need to measure the viewport
+          if (!measure) {
+            return setAspectRatio.call(player);
+          }
+
+          var rect = elements.container.getBoundingClientRect();
+          var width = rect.width,
+              height = rect.height;
+          return setAspectRatio.call(player, "".concat(width, ":").concat(height));
+        };
+
+        var resized = function resized() {
+          window.clearTimeout(timers.resized);
+          timers.resized = window.setTimeout(setPlayerSize, 50);
+        };
+
+        on.call(player, elements.container, 'enterfullscreen exitfullscreen', function (event) {
+          var _player$fullscreen = player.fullscreen,
+              target = _player$fullscreen.target,
+              usingNative = _player$fullscreen.usingNative; // Ignore for iOS native
+
+          if (!player.isEmbed || target !== elements.container) {
+            return;
+          }
+
+          var isEnter = event.type === 'enterfullscreen'; // Set the player size when entering fullscreen to viewport size
+
+          var _setPlayerSize = setPlayerSize(isEnter),
+              padding = _setPlayerSize.padding,
+              ratio = _setPlayerSize.ratio; // Set Vimeo gutter
+
+
+          setGutter(ratio, padding, isEnter); // If not using native fullscreen, we need to check for resizes of viewport
+
+          if (!usingNative) {
+            if (isEnter) {
+              on.call(player, window, 'resize', resized);
+            } else {
+              off.call(player, window, 'resize', resized);
+            }
+          }
         });
       } // Listen for media events
 
     }, {
       key: "media",
       value: function media() {
+        var _this = this;
+
         var player = this.player;
         var elements = player.elements; // Time change on media
 
@@ -7008,30 +8239,13 @@ typeof navigator === "object" && (function (global, factory) {
 
         on.call(player, player.media, 'waiting canplay seeked playing', function (event) {
           return ui.checkLoading.call(player, event);
-        }); // If autoplay, then load advertisement if required
-        // TODO: Show some sort of loading state while the ad manager loads else there's a delay before ad shows
-
-        on.call(player, player.media, 'playing', function () {
-          if (!player.ads) {
-            return;
-          } // If ads are enabled, wait for them first
-
-
-          if (player.ads.enabled && !player.ads.initialized) {
-            // Wait for manager response
-            player.ads.managerPromise.then(function () {
-              return player.ads.play();
-            }).catch(function () {
-              return player.play();
-            });
-          }
         }); // Click video
 
         if (player.supported.ui && player.config.clickToPlay && !player.isAudio) {
           // Re-fetch the wrapper
           var wrapper = getElement.call(player, ".".concat(player.config.classNames.video)); // Bail if there's no wrapper (this should never happen)
 
-          if (!is$1.element(wrapper)) {
+          if (!is$2.element(wrapper)) {
             return;
           } // On click play, pause or restart
 
@@ -7049,10 +8263,11 @@ typeof navigator === "object" && (function (global, factory) {
             }
 
             if (player.ended) {
-              player.restart();
-              player.play();
+              _this.proxy(event, player.restart, 'restart');
+
+              _this.proxy(event, player.play, 'play');
             } else {
-              player.togglePlay();
+              _this.proxy(event, player.togglePlay, 'play');
             }
           });
         } // Disable right click
@@ -7111,7 +8326,7 @@ typeof navigator === "object" && (function (global, factory) {
       value: function proxy(event, defaultHandler, customHandlerKey) {
         var player = this.player;
         var customHandler = player.config.listeners[customHandlerKey];
-        var hasCustomHandler = is$1.function(customHandler);
+        var hasCustomHandler = is$2.function(customHandler);
         var returned = true; // Execute custom handler
 
         if (hasCustomHandler) {
@@ -7119,7 +8334,7 @@ typeof navigator === "object" && (function (global, factory) {
         } // Only call default handler if not prevented in custom handler
 
 
-        if (returned && is$1.function(defaultHandler)) {
+        if (returned && is$2.function(defaultHandler)) {
           defaultHandler.call(player, event);
         }
       } // Trigger custom and default handlers
@@ -7127,21 +8342,21 @@ typeof navigator === "object" && (function (global, factory) {
     }, {
       key: "bind",
       value: function bind(element, type, defaultHandler, customHandlerKey) {
-        var _this = this;
+        var _this2 = this;
 
         var passive = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
         var player = this.player;
         var customHandler = player.config.listeners[customHandlerKey];
-        var hasCustomHandler = is$1.function(customHandler);
+        var hasCustomHandler = is$2.function(customHandler);
         on.call(player, element, type, function (event) {
-          return _this.proxy(event, defaultHandler, customHandlerKey);
+          return _this2.proxy(event, defaultHandler, customHandlerKey);
         }, passive && !hasCustomHandler);
       } // Listen for control events
 
     }, {
       key: "controls",
       value: function controls$$1() {
-        var _this2 = this;
+        var _this3 = this;
 
         var player = this.player;
         var elements = player.elements; // IE doesn't support input event, so we fallback to change
@@ -7150,7 +8365,7 @@ typeof navigator === "object" && (function (global, factory) {
 
         if (elements.buttons.play) {
           Array.from(elements.buttons.play).forEach(function (button) {
-            _this2.bind(button, 'click', player.togglePlay, 'play');
+            _this3.bind(button, 'click', player.togglePlay, 'play');
           });
         } // Pause
 
@@ -7232,7 +8447,7 @@ typeof navigator === "object" && (function (global, factory) {
           var code = event.keyCode ? event.keyCode : event.which;
           var attribute = 'play-on-seeked';
 
-          if (is$1.keyboardEvent(event) && code !== 39 && code !== 37) {
+          if (is$2.keyboardEvent(event) && code !== 39 && code !== 37) {
             return;
           } // Record seek time so we can prevent hiding controls for a few seconds after seek
 
@@ -7257,7 +8472,7 @@ typeof navigator === "object" && (function (global, factory) {
         if (browser.isIos) {
           var inputs = getElements.call(player, 'input[type="range"]');
           Array.from(inputs).forEach(function (input) {
-            return _this2.bind(input, inputEvent, function (event) {
+            return _this3.bind(input, inputEvent, function (event) {
               return repaint(event.target);
             });
           });
@@ -7269,7 +8484,7 @@ typeof navigator === "object" && (function (global, factory) {
 
           var seekTo = seek.getAttribute('seek-value');
 
-          if (is$1.empty(seekTo)) {
+          if (is$2.empty(seekTo)) {
             seekTo = seek.value;
           }
 
@@ -7279,11 +8494,43 @@ typeof navigator === "object" && (function (global, factory) {
 
         this.bind(elements.progress, 'mouseenter mouseleave mousemove', function (event) {
           return controls.updateSeekTooltip.call(player, event);
+        }); // Preview thumbnails plugin
+        // TODO: Really need to work on some sort of plug-in wide event bus or pub-sub for this
+
+        this.bind(elements.progress, 'mousemove touchmove', function (event) {
+          var previewThumbnails = player.previewThumbnails;
+
+          if (previewThumbnails && previewThumbnails.loaded) {
+            previewThumbnails.startMove(event);
+          }
+        }); // Hide thumbnail preview - on mouse click, mouse leave, and video play/seek. All four are required, e.g., for buffering
+
+        this.bind(elements.progress, 'mouseleave click', function () {
+          var previewThumbnails = player.previewThumbnails;
+
+          if (previewThumbnails && previewThumbnails.loaded) {
+            previewThumbnails.endMove(false, true);
+          }
+        }); // Show scrubbing preview
+
+        this.bind(elements.progress, 'mousedown touchstart', function (event) {
+          var previewThumbnails = player.previewThumbnails;
+
+          if (previewThumbnails && previewThumbnails.loaded) {
+            previewThumbnails.startScrubbing(event);
+          }
+        });
+        this.bind(elements.progress, 'mouseup touchend', function (event) {
+          var previewThumbnails = player.previewThumbnails;
+
+          if (previewThumbnails && previewThumbnails.loaded) {
+            previewThumbnails.endScrubbing(event);
+          }
         }); // Polyfill for lower fill in <input type="range"> for webkit
 
         if (browser.isWebkit) {
           Array.from(getElements.call(player, 'input[type="range"]')).forEach(function (element) {
-            _this2.bind(element, 'input', function (event) {
+            _this3.bind(element, 'input', function (event) {
               return controls.updateRangeFill.call(player, event.target);
             });
           });
@@ -7291,7 +8538,7 @@ typeof navigator === "object" && (function (global, factory) {
         // Only if one time element is used for both currentTime and duration
 
 
-        if (player.config.toggleInvert && !is$1.element(elements.display.duration)) {
+        if (player.config.toggleInvert && !is$2.element(elements.display.duration)) {
           this.bind(elements.display.currentTime, 'click', function () {
             // Do nothing if we're at the start
             if (player.currentTime === 0) {
@@ -7330,7 +8577,7 @@ typeof navigator === "object" && (function (global, factory) {
             toggleClass(elements.controls, config.classNames.noTransition, false);
           }, 0); // Delay a little more for mouse users
 
-          var delay = _this2.touch ? 3000 : 4000; // Clear timer
+          var delay = _this3.touch ? 3000 : 4000; // Clear timer
 
           clearTimeout(timers.controls); // Hide again after delay
 
@@ -7368,323 +8615,274 @@ typeof navigator === "object" && (function (global, factory) {
     return Listeners;
   }();
 
-  var dP$3 = _objectDp.f;
-  var FProto = Function.prototype;
-  var nameRE = /^\s*function ([^ (]*)/;
-  var NAME$1 = 'name';
-
-  // 19.2.4.2 name
-  NAME$1 in FProto || _descriptors && dP$3(FProto, NAME$1, {
-    configurable: true,
-    get: function () {
-      try {
-        return ('' + this).match(nameRE)[1];
-      } catch (e) {
-        return '';
-      }
-    }
-  });
-
-  // @@match logic
-  _fixReWks('match', 1, function (defined, MATCH, $match) {
-    // 21.1.3.11 String.prototype.match(regexp)
-    return [function match(regexp) {
-      var O = defined(this);
-      var fn = regexp == undefined ? undefined : regexp[MATCH];
-      return fn !== undefined ? fn.call(regexp, O) : new RegExp(regexp)[MATCH](String(O));
-    }, $match];
-  });
-
   var loadjs_umd = createCommonjsModule(function (module, exports) {
-  (function(root, factory) {
-    {
-      module.exports = factory();
-    }
-  }(commonjsGlobal, function() {
-  /**
-   * Global dependencies.
-   * @global {Object} document - DOM
-   */
-
-  var devnull = function() {},
-      bundleIdCache = {},
-      bundleResultCache = {},
-      bundleCallbackQueue = {};
-
-
-  /**
-   * Subscribe to bundle load event.
-   * @param {string[]} bundleIds - Bundle ids
-   * @param {Function} callbackFn - The callback function
-   */
-  function subscribe(bundleIds, callbackFn) {
-    // listify
-    bundleIds = bundleIds.push ? bundleIds : [bundleIds];
-
-    var depsNotFound = [],
-        i = bundleIds.length,
-        numWaiting = i,
-        fn,
-        bundleId,
-        r,
-        q;
-
-    // define callback function
-    fn = function (bundleId, pathsNotFound) {
-      if (pathsNotFound.length) depsNotFound.push(bundleId);
-
-      numWaiting--;
-      if (!numWaiting) callbackFn(depsNotFound);
-    };
-
-    // register callback
-    while (i--) {
-      bundleId = bundleIds[i];
-
-      // execute callback if in result cache
-      r = bundleResultCache[bundleId];
-      if (r) {
-        fn(bundleId, r);
-        continue;
+    (function (root, factory) {
+      {
+        module.exports = factory();
       }
-
-      // add to callback queue
-      q = bundleCallbackQueue[bundleId] = bundleCallbackQueue[bundleId] || [];
-      q.push(fn);
-    }
-  }
-
-
-  /**
-   * Publish bundle load event.
-   * @param {string} bundleId - Bundle id
-   * @param {string[]} pathsNotFound - List of files not found
-   */
-  function publish(bundleId, pathsNotFound) {
-    // exit if id isn't defined
-    if (!bundleId) return;
-
-    var q = bundleCallbackQueue[bundleId];
-
-    // cache result
-    bundleResultCache[bundleId] = pathsNotFound;
-
-    // exit if queue is empty
-    if (!q) return;
-
-    // empty callback queue
-    while (q.length) {
-      q[0](bundleId, pathsNotFound);
-      q.splice(0, 1);
-    }
-  }
+    })(commonjsGlobal, function () {
+      /**
+       * Global dependencies.
+       * @global {Object} document - DOM
+       */
+      var devnull = function devnull() {},
+          bundleIdCache = {},
+          bundleResultCache = {},
+          bundleCallbackQueue = {};
+      /**
+       * Subscribe to bundle load event.
+       * @param {string[]} bundleIds - Bundle ids
+       * @param {Function} callbackFn - The callback function
+       */
 
 
-  /**
-   * Execute callbacks.
-   * @param {Object or Function} args - The callback args
-   * @param {string[]} depsNotFound - List of dependencies not found
-   */
-  function executeCallbacks(args, depsNotFound) {
-    // accept function as argument
-    if (args.call) args = {success: args};
+      function subscribe(bundleIds, callbackFn) {
+        // listify
+        bundleIds = bundleIds.push ? bundleIds : [bundleIds];
+        var depsNotFound = [],
+            i = bundleIds.length,
+            numWaiting = i,
+            fn,
+            bundleId,
+            r,
+            q; // define callback function
 
-    // success and error callbacks
-    if (depsNotFound.length) (args.error || devnull)(depsNotFound);
-    else (args.success || devnull)(args);
-  }
+        fn = function fn(bundleId, pathsNotFound) {
+          if (pathsNotFound.length) depsNotFound.push(bundleId);
+          numWaiting--;
+          if (!numWaiting) callbackFn(depsNotFound);
+        }; // register callback
 
 
-  /**
-   * Load individual file.
-   * @param {string} path - The file path
-   * @param {Function} callbackFn - The callback function
-   */
-  function loadFile(path, callbackFn, args, numTries) {
-    var doc = document,
-        async = args.async,
-        maxTries = (args.numRetries || 0) + 1,
-        beforeCallbackFn = args.before || devnull,
-        pathStripped = path.replace(/^(css|img)!/, ''),
-        isCss,
-        e;
+        while (i--) {
+          bundleId = bundleIds[i]; // execute callback if in result cache
 
-    numTries = numTries || 0;
+          r = bundleResultCache[bundleId];
 
-    if (/(^css!|\.css$)/.test(path)) {
-      isCss = true;
+          if (r) {
+            fn(bundleId, r);
+            continue;
+          } // add to callback queue
 
-      // css
-      e = doc.createElement('link');
-      e.rel = 'stylesheet';
-      e.href = pathStripped; //.replace(/^css!/, '');  // remove "css!" prefix
-    } else if (/(^img!|\.(png|gif|jpg|svg)$)/.test(path)) {
-      // image
-      e = doc.createElement('img');
-      e.src = pathStripped;    
-    } else {
-      // javascript
-      e = doc.createElement('script');
-      e.src = path;
-      e.async = async === undefined ? true : async;
-    }
 
-    e.onload = e.onerror = e.onbeforeload = function (ev) {
-      var result = ev.type[0];
-
-      // Note: The following code isolates IE using `hideFocus` and treats empty
-      // stylesheets as failures to get around lack of onerror support
-      if (isCss && 'hideFocus' in e) {
-        try {
-          if (!e.sheet.cssText.length) result = 'e';
-        } catch (x) {
-          // sheets objects created from load errors don't allow access to
-          // `cssText`
-          result = 'e';
+          q = bundleCallbackQueue[bundleId] = bundleCallbackQueue[bundleId] || [];
+          q.push(fn);
         }
       }
+      /**
+       * Publish bundle load event.
+       * @param {string} bundleId - Bundle id
+       * @param {string[]} pathsNotFound - List of files not found
+       */
 
-      // handle retries in case of load failure
-      if (result == 'e') {
-        // increment counter
-        numTries += 1;
 
-        // exit function and try again
-        if (numTries < maxTries) {
-          return loadFile(path, callbackFn, args, numTries);
+      function publish(bundleId, pathsNotFound) {
+        // exit if id isn't defined
+        if (!bundleId) return;
+        var q = bundleCallbackQueue[bundleId]; // cache result
+
+        bundleResultCache[bundleId] = pathsNotFound; // exit if queue is empty
+
+        if (!q) return; // empty callback queue
+
+        while (q.length) {
+          q[0](bundleId, pathsNotFound);
+          q.splice(0, 1);
         }
       }
-
-      // execute callback
-      callbackFn(path, result, ev.defaultPrevented);
-    };
-
-    // add to document (unless callback returns `false`)
-    if (beforeCallbackFn(path, e) !== false) doc.head.appendChild(e);
-  }
+      /**
+       * Execute callbacks.
+       * @param {Object or Function} args - The callback args
+       * @param {string[]} depsNotFound - List of dependencies not found
+       */
 
 
-  /**
-   * Load multiple files.
-   * @param {string[]} paths - The file paths
-   * @param {Function} callbackFn - The callback function
-   */
-  function loadFiles(paths, callbackFn, args) {
-    // listify paths
-    paths = paths.push ? paths : [paths];
+      function executeCallbacks(args, depsNotFound) {
+        // accept function as argument
+        if (args.call) args = {
+          success: args
+        }; // success and error callbacks
 
-    var numWaiting = paths.length,
-        x = numWaiting,
-        pathsNotFound = [],
-        fn,
-        i;
-
-    // define callback function
-    fn = function(path, result, defaultPrevented) {
-      // handle error
-      if (result == 'e') pathsNotFound.push(path);
-
-      // handle beforeload event. If defaultPrevented then that means the load
-      // will be blocked (ex. Ghostery/ABP on Safari)
-      if (result == 'b') {
-        if (defaultPrevented) pathsNotFound.push(path);
-        else return;
+        if (depsNotFound.length) (args.error || devnull)(depsNotFound);else (args.success || devnull)(args);
       }
-
-      numWaiting--;
-      if (!numWaiting) callbackFn(pathsNotFound);
-    };
-
-    // load scripts
-    for (i=0; i < x; i++) loadFile(paths[i], fn, args);
-  }
+      /**
+       * Load individual file.
+       * @param {string} path - The file path
+       * @param {Function} callbackFn - The callback function
+       */
 
 
-  /**
-   * Initiate script load and register bundle.
-   * @param {(string|string[])} paths - The file paths
-   * @param {(string|Function)} [arg1] - The bundleId or success callback
-   * @param {Function} [arg2] - The success or error callback
-   * @param {Function} [arg3] - The error callback
-   */
-  function loadjs(paths, arg1, arg2) {
-    var bundleId,
-        args;
+      function loadFile(path, callbackFn, args, numTries) {
+        var doc = document,
+            async = args.async,
+            maxTries = (args.numRetries || 0) + 1,
+            beforeCallbackFn = args.before || devnull,
+            pathStripped = path.replace(/^(css|img)!/, ''),
+            isCss,
+            e;
+        numTries = numTries || 0;
 
-    // bundleId (if string)
-    if (arg1 && arg1.trim) bundleId = arg1;
+        if (/(^css!|\.css$)/.test(path)) {
+          isCss = true; // css
 
-    // args (default is {})
-    args = (bundleId ? arg2 : arg1) || {};
+          e = doc.createElement('link');
+          e.rel = 'stylesheet';
+          e.href = pathStripped; //.replace(/^css!/, '');  // remove "css!" prefix
+        } else if (/(^img!|\.(png|gif|jpg|svg)$)/.test(path)) {
+          // image
+          e = doc.createElement('img');
+          e.src = pathStripped;
+        } else {
+          // javascript
+          e = doc.createElement('script');
+          e.src = path;
+          e.async = async === undefined ? true : async;
+        }
 
-    // throw error if bundle is already defined
-    if (bundleId) {
-      if (bundleId in bundleIdCache) {
-        throw "LoadJS";
-      } else {
-        bundleIdCache[bundleId] = true;
+        e.onload = e.onerror = e.onbeforeload = function (ev) {
+          var result = ev.type[0]; // Note: The following code isolates IE using `hideFocus` and treats empty
+          // stylesheets as failures to get around lack of onerror support
+
+          if (isCss && 'hideFocus' in e) {
+            try {
+              if (!e.sheet.cssText.length) result = 'e';
+            } catch (x) {
+              // sheets objects created from load errors don't allow access to
+              // `cssText` (unless error is Code:18 SecurityError)
+              if (x.code != 18) result = 'e';
+            }
+          } // handle retries in case of load failure
+
+
+          if (result == 'e') {
+            // increment counter
+            numTries += 1; // exit function and try again
+
+            if (numTries < maxTries) {
+              return loadFile(path, callbackFn, args, numTries);
+            }
+          } // execute callback
+
+
+          callbackFn(path, result, ev.defaultPrevented);
+        }; // add to document (unless callback returns `false`)
+
+
+        if (beforeCallbackFn(path, e) !== false) doc.head.appendChild(e);
       }
-    }
-
-    // load scripts
-    loadFiles(paths, function (pathsNotFound) {
-      // execute callbacks
-      executeCallbacks(args, pathsNotFound);
-
-      // publish bundle load event
-      publish(bundleId, pathsNotFound);
-    }, args);
-  }
+      /**
+       * Load multiple files.
+       * @param {string[]} paths - The file paths
+       * @param {Function} callbackFn - The callback function
+       */
 
 
-  /**
-   * Execute callbacks when dependencies have been satisfied.
-   * @param {(string|string[])} deps - List of bundle ids
-   * @param {Object} args - success/error arguments
-   */
-  loadjs.ready = function ready(deps, args) {
-    // subscribe to bundle load event
-    subscribe(deps, function (depsNotFound) {
-      // execute callbacks
-      executeCallbacks(args, depsNotFound);
+      function loadFiles(paths, callbackFn, args) {
+        // listify paths
+        paths = paths.push ? paths : [paths];
+        var numWaiting = paths.length,
+            x = numWaiting,
+            pathsNotFound = [],
+            fn,
+            i; // define callback function
+
+        fn = function fn(path, result, defaultPrevented) {
+          // handle error
+          if (result == 'e') pathsNotFound.push(path); // handle beforeload event. If defaultPrevented then that means the load
+          // will be blocked (ex. Ghostery/ABP on Safari)
+
+          if (result == 'b') {
+            if (defaultPrevented) pathsNotFound.push(path);else return;
+          }
+
+          numWaiting--;
+          if (!numWaiting) callbackFn(pathsNotFound);
+        }; // load scripts
+
+
+        for (i = 0; i < x; i++) {
+          loadFile(paths[i], fn, args);
+        }
+      }
+      /**
+       * Initiate script load and register bundle.
+       * @param {(string|string[])} paths - The file paths
+       * @param {(string|Function)} [arg1] - The bundleId or success callback
+       * @param {Function} [arg2] - The success or error callback
+       * @param {Function} [arg3] - The error callback
+       */
+
+
+      function loadjs(paths, arg1, arg2) {
+        var bundleId, args; // bundleId (if string)
+
+        if (arg1 && arg1.trim) bundleId = arg1; // args (default is {})
+
+        args = (bundleId ? arg2 : arg1) || {}; // throw error if bundle is already defined
+
+        if (bundleId) {
+          if (bundleId in bundleIdCache) {
+            throw "LoadJS";
+          } else {
+            bundleIdCache[bundleId] = true;
+          }
+        } // load scripts
+
+
+        loadFiles(paths, function (pathsNotFound) {
+          // execute callbacks
+          executeCallbacks(args, pathsNotFound); // publish bundle load event
+
+          publish(bundleId, pathsNotFound);
+        }, args);
+      }
+      /**
+       * Execute callbacks when dependencies have been satisfied.
+       * @param {(string|string[])} deps - List of bundle ids
+       * @param {Object} args - success/error arguments
+       */
+
+
+      loadjs.ready = function ready(deps, args) {
+        // subscribe to bundle load event
+        subscribe(deps, function (depsNotFound) {
+          // execute callbacks
+          executeCallbacks(args, depsNotFound);
+        });
+        return loadjs;
+      };
+      /**
+       * Manually satisfy bundle dependencies.
+       * @param {string} bundleId - The bundle id
+       */
+
+
+      loadjs.done = function done(bundleId) {
+        publish(bundleId, []);
+      };
+      /**
+       * Reset loadjs dependencies statuses
+       */
+
+
+      loadjs.reset = function reset() {
+        bundleIdCache = {};
+        bundleResultCache = {};
+        bundleCallbackQueue = {};
+      };
+      /**
+       * Determine if bundle has already been defined
+       * @param String} bundleId - The bundle id
+       */
+
+
+      loadjs.isDefined = function isDefined(bundleId) {
+        return bundleId in bundleIdCache;
+      }; // export
+
+
+      return loadjs;
     });
-
-    return loadjs;
-  };
-
-
-  /**
-   * Manually satisfy bundle dependencies.
-   * @param {string} bundleId - The bundle id
-   */
-  loadjs.done = function done(bundleId) {
-    publish(bundleId, []);
-  };
-
-
-  /**
-   * Reset loadjs dependencies statuses
-   */
-  loadjs.reset = function reset() {
-    bundleIdCache = {};
-    bundleResultCache = {};
-    bundleCallbackQueue = {};
-  };
-
-
-  /**
-   * Determine if bundle has already been defined
-   * @param String} bundleId - The bundle id
-   */
-  loadjs.isDefined = function isDefined(bundleId) {
-    return bundleId in bundleIdCache;
-  };
-
-
-  // export
-  return loadjs;
-
-  }));
   });
 
   function loadScript(url) {
@@ -7697,26 +8895,16 @@ typeof navigator === "object" && (function (global, factory) {
   }
 
   function parseId(url) {
-    if (is$1.empty(url)) {
+    if (is$2.empty(url)) {
       return null;
     }
 
-    if (is$1.number(Number(url))) {
+    if (is$2.number(Number(url))) {
       return url;
     }
 
     var regex = /^.*(vimeo.com\/|video\/)(\d+).*/;
     return url.match(regex) ? RegExp.$2 : url;
-  } // Get aspect ratio for dimensions
-
-
-  function getAspectRatio(width, height) {
-    var getRatio = function getRatio(w, h) {
-      return h === 0 ? w : getRatio(h, w % h);
-    };
-
-    var ratio = getRatio(width, height);
-    return "".concat(width / ratio, ":").concat(height / ratio);
   } // Set playback state and trigger change (only on actual change)
 
 
@@ -7738,9 +8926,9 @@ typeof navigator === "object" && (function (global, factory) {
       // Add embed class for responsive
       toggleClass(this.elements.wrapper, this.config.classNames.embed, true); // Set intial ratio
 
-      vimeo.setAspectRatio.call(this); // Load the API if not already
+      setAspectRatio.call(this); // Load the API if not already
 
-      if (!is$1.object(window.Vimeo)) {
+      if (!is$2.object(window.Vimeo)) {
         loadScript(this.config.urls.vimeo.sdk).then(function () {
           vimeo.ready.call(_this);
         }).catch(function (error) {
@@ -7750,47 +8938,24 @@ typeof navigator === "object" && (function (global, factory) {
         vimeo.ready.call(this);
       }
     },
-    // Set aspect ratio
-    // For Vimeo we have an extra 300% height <div> to hide the standard controls and UI
-    setAspectRatio: function setAspectRatio(input) {
-      var _split$map = (is$1.string(input) ? input : this.config.ratio).split(':').map(Number),
-          _split$map2 = _slicedToArray(_split$map, 2),
-          x = _split$map2[0],
-          y = _split$map2[1];
-
-      var padding = 100 / x * y;
-      vimeo.padding = padding;
-      this.elements.wrapper.style.paddingBottom = "".concat(padding, "%");
-
-      if (this.supported.ui) {
-        var height = 240;
-        var offset = (height - padding) / (height / 50);
-        this.media.style.transform = "translateY(-".concat(offset, "%)");
-      }
-    },
     // API Ready
     ready: function ready$$1() {
       var _this2 = this;
 
-      var player = this; // Get Vimeo params for the iframe
+      var player = this;
+      var config = player.config.vimeo; // Get Vimeo params for the iframe
 
-      var options = {
+      var params = buildUrlParams(extend({}, {
         loop: player.config.loop.active,
         autoplay: player.autoplay,
-        // muted: player.muted,
-        byline: false,
-        portrait: false,
-        title: false,
-        speed: true,
-        transparent: 0,
+        muted: player.muted,
         gesture: 'media',
         playsinline: !this.config.fullscreen.iosNative
-      };
-      var params = buildUrlParams(options); // Get the source URL or ID
+      }, config)); // Get the source URL or ID
 
       var source = player.media.getAttribute('src'); // Get from <div> if needed
 
-      if (is$1.empty(source)) {
+      if (is$2.empty(source)) {
         source = player.media.getAttribute(player.config.attributes.embed.id);
       }
 
@@ -7813,7 +8978,7 @@ typeof navigator === "object" && (function (global, factory) {
       player.media = replaceElement(wrapper, player.media); // Get poster image
 
       fetch(format(player.config.urls.vimeo.api, id), 'json').then(function (response) {
-        if (is$1.empty(response)) {
+        if (is$2.empty(response)) {
           return;
         } // Get the URL for thumbnail
 
@@ -7922,7 +9087,7 @@ typeof navigator === "object" && (function (global, factory) {
           return muted;
         },
         set: function set(input) {
-          var toggle = is$1.boolean(input) ? input : false;
+          var toggle = is$2.boolean(input) ? input : false;
           player.embed.setVolume(toggle ? 0 : player.config.volume).then(function () {
             muted = toggle;
             triggerEvent.call(player, player.media, 'volumechange');
@@ -7936,7 +9101,7 @@ typeof navigator === "object" && (function (global, factory) {
           return loop;
         },
         set: function set(input) {
-          var toggle = is$1.boolean(input) ? input : player.config.loop.active;
+          var toggle = is$2.boolean(input) ? input : player.config.loop.active;
           player.embed.setLoop(toggle).then(function () {
             loop = toggle;
           });
@@ -7963,8 +9128,12 @@ typeof navigator === "object" && (function (global, factory) {
       }); // Set aspect ratio based on video size
 
       Promise.all([player.embed.getVideoWidth(), player.embed.getVideoHeight()]).then(function (dimensions) {
-        vimeo.ratio = getAspectRatio(dimensions[0], dimensions[1]);
-        vimeo.setAspectRatio.call(_this2, vimeo.ratio);
+        var _dimensions = _slicedToArray(dimensions, 2),
+            width = _dimensions[0],
+            height = _dimensions[1];
+
+        player.embed.ratio = "".concat(width, ":").concat(height);
+        setAspectRatio.call(_this2, player.embed.ratio);
       }); // Set autopause
 
       player.embed.setAutopause(player.config.autopause).then(function (state) {
@@ -8008,7 +9177,7 @@ typeof navigator === "object" && (function (global, factory) {
           }
         });
 
-        if (is$1.element(player.embed.element) && player.supported.ui) {
+        if (is$2.element(player.embed.element) && player.supported.ui) {
           var frame = player.embed.element; // Fix keyboard focus issues
           // https://github.com/sampotts/plyr/issues/317
 
@@ -8055,24 +9224,6 @@ typeof navigator === "object" && (function (global, factory) {
       player.embed.on('error', function (detail) {
         player.media.error = detail;
         triggerEvent.call(player, player.media, 'error');
-      }); // Set height/width on fullscreen
-
-      player.on('enterfullscreen exitfullscreen', function (event) {
-        var target = player.fullscreen.target; // Ignore for iOS native
-
-        if (target !== player.elements.container) {
-          return;
-        }
-
-        var toggle = event.type === 'enterfullscreen';
-
-        var _vimeo$ratio$split$ma = vimeo.ratio.split(':').map(Number),
-            _vimeo$ratio$split$ma2 = _slicedToArray(_vimeo$ratio$split$ma, 2),
-            x = _vimeo$ratio$split$ma2[0],
-            y = _vimeo$ratio$split$ma2[1];
-
-        var dimension = x > y ? 'width' : 'height';
-        target.style[dimension] = toggle ? "".concat(vimeo.padding, "%") : null;
       }); // Rebuild UI
 
       setTimeout(function () {
@@ -8082,7 +9233,7 @@ typeof navigator === "object" && (function (global, factory) {
   };
 
   function parseId$1(url) {
-    if (is$1.empty(url)) {
+    if (is$2.empty(url)) {
       return null;
     }
 
@@ -8109,9 +9260,9 @@ typeof navigator === "object" && (function (global, factory) {
       // Add embed class for responsive
       toggleClass(this.elements.wrapper, this.config.classNames.embed, true); // Set aspect ratio
 
-      youtube.setAspectRatio.call(this); // Setup API
+      setAspectRatio.call(this); // Setup API
 
-      if (is$1.object(window.YT) && is$1.function(window.YT.Player)) {
+      if (is$2.object(window.YT) && is$2.function(window.YT.Player)) {
         youtube.ready.call(this);
       } else {
         // Load the API
@@ -8140,11 +9291,11 @@ typeof navigator === "object" && (function (global, factory) {
       // Try via undocumented API method first
       // This method disappears now and then though...
       // https://github.com/sampotts/plyr/issues/709
-      if (is$1.function(this.embed.getVideoData)) {
+      if (is$2.function(this.embed.getVideoData)) {
         var _this$embed$getVideoD = this.embed.getVideoData(),
             title = _this$embed$getVideoD.title;
 
-        if (is$1.empty(title)) {
+        if (is$2.empty(title)) {
           this.config.title = title;
           ui.setTitle.call(this);
           return;
@@ -8154,20 +9305,15 @@ typeof navigator === "object" && (function (global, factory) {
 
       var key = this.config.keys.google;
 
-      if (is$1.string(key) && !is$1.empty(key)) {
+      if (is$2.string(key) && !is$2.empty(key)) {
         var url = format(this.config.urls.youtube.api, videoId, key);
         fetch(url).then(function (result) {
-          if (is$1.object(result)) {
+          if (is$2.object(result)) {
             _this2.config.title = result.items[0].snippet.title;
             ui.setTitle.call(_this2);
           }
         }).catch(function () {});
       }
-    },
-    // Set aspect ratio
-    setAspectRatio: function setAspectRatio() {
-      var ratio = this.config.ratio.split(':');
-      this.elements.wrapper.style.paddingBottom = "".concat(100 / ratio[0] * ratio[1], "%");
     },
     // API ready
     ready: function ready$$1() {
@@ -8175,14 +9321,14 @@ typeof navigator === "object" && (function (global, factory) {
 
       var currentId = player.media.getAttribute('id');
 
-      if (!is$1.empty(currentId) && currentId.startsWith('youtube-')) {
+      if (!is$2.empty(currentId) && currentId.startsWith('youtube-')) {
         return;
       } // Get the source URL or ID
 
 
       var source = player.media.getAttribute('src'); // Get from <div> if needed
 
-      if (is$1.empty(source)) {
+      if (is$2.empty(source)) {
         source = player.media.getAttribute(this.config.attributes.embed.id);
       } // Replace the <iframe> with a <div> due to YouTube API issues
 
@@ -8217,37 +9363,30 @@ typeof navigator === "object" && (function (global, factory) {
         if (!posterSrc.includes('maxres')) {
           player.elements.poster.style.backgroundSize = 'cover';
         }
-      }).catch(function () {}); // Setup instance
+      }).catch(function () {});
+      var config = player.config.youtube; // Setup instance
       // https://developers.google.com/youtube/iframe_api_reference
 
       player.embed = new window.YT.Player(id, {
         videoId: videoId,
-        playerVars: {
+        host: config.noCookie ? 'https://www.youtube-nocookie.com' : undefined,
+        playerVars: extend({}, {
           autoplay: player.config.autoplay ? 1 : 0,
           // Autoplay
           hl: player.config.hl,
           // iframe interface language
           controls: player.supported.ui ? 0 : 1,
           // Only show controls if not fully supported
-          rel: 0,
-          // No related vids
-          showinfo: 0,
-          // Hide info
-          iv_load_policy: 3,
-          // Hide annotations
-          modestbranding: 1,
-          // Hide logos as much as possible (they still show one in the corner when paused)
           disablekb: 1,
           // Disable keyboard as we handle it
-          playsinline: 1,
+          playsinline: !player.config.fullscreen.iosNative ? 1 : 0,
           // Allow iOS inline playback
-          // Tracking for stats
-          // origin: window ? `${window.location.protocol}//${window.location.host}` : null,
-          widget_referrer: window ? window.location.href : null,
           // Captions are flaky on YouTube
           cc_load_policy: player.captions.active ? 1 : 0,
-          cc_lang_pref: player.config.captions.language
-        },
+          cc_lang_pref: player.config.captions.language,
+          // Tracking for stats
+          widget_referrer: window ? window.location.href : null
+        }, config),
         events: {
           onError: function onError(event) {
             // YouTube may fire onError twice, so only handle it once
@@ -8277,7 +9416,7 @@ typeof navigator === "object" && (function (global, factory) {
           },
           onReady: function onReady(event) {
             // Bail if onReady has already been called. See issue #1108
-            if (is$1.function(player.media.play)) {
+            if (is$2.function(player.media.play)) {
               return;
             } // Get the instance
 
@@ -8349,7 +9488,7 @@ typeof navigator === "object" && (function (global, factory) {
                 return muted;
               },
               set: function set(input) {
-                var toggle = is$1.boolean(input) ? input : muted;
+                var toggle = is$2.boolean(input) ? input : muted;
                 muted = toggle;
                 instance[toggle ? 'mute' : 'unMute']();
                 triggerEvent.call(player, player.media, 'volumechange');
@@ -8513,7 +9652,7 @@ typeof navigator === "object" && (function (global, factory) {
           class: this.config.classNames.video
         }); // Wrap the video in a container
 
-        wrap(this.media, this.elements.wrapper); // Faux poster container
+        wrap$1(this.media, this.elements.wrapper); // Faux poster container
 
         this.elements.poster = createElement('div', {
           class: this.config.classNames.poster
@@ -8536,7 +9675,7 @@ typeof navigator === "object" && (function (global, factory) {
   function () {
     /**
      * Ads constructor.
-     * @param {object} player
+     * @param {Object} player
      * @return {Ads}
      */
     function Ads(player) {
@@ -8545,7 +9684,7 @@ typeof navigator === "object" && (function (global, factory) {
       _classCallCheck(this, Ads);
 
       this.player = player;
-      this.publisherId = player.config.ads.publisherId;
+      this.config = player.config.ads;
       this.playing = false;
       this.initialized = false;
       this.elements = {
@@ -8580,7 +9719,7 @@ typeof navigator === "object" && (function (global, factory) {
 
         if (this.enabled) {
           // Check if the Google IMA3 SDK is loaded or load it ourselves
-          if (!is$1.object(window.google) || !is$1.object(window.google.ima)) {
+          if (!is$2.object(window.google) || !is$2.object(window.google.ima)) {
             loadScript(this.player.config.urls.googleIMA.sdk).then(function () {
               _this2.ready();
             }).catch(function () {
@@ -8612,7 +9751,7 @@ typeof navigator === "object" && (function (global, factory) {
         this.listeners(); // Setup the IMA SDK
 
         this.setupIMA();
-      } // Build the default tag URL
+      } // Build the tag URL
 
     }, {
       key: "setupIMA",
@@ -8634,10 +9773,11 @@ typeof navigator === "object" && (function (global, factory) {
 
         google.ima.settings.setVpaidMode(google.ima.ImaSdkSettings.VpaidMode.ENABLED); // Set language
 
-        google.ima.settings.setLocale(this.player.config.ads.language); // We assume the adContainer is the video container of the plyr element
-        // that will house the ads
+        google.ima.settings.setLocale(this.player.config.ads.language); // Set playback for iOS10+
 
-        this.elements.displayContainer = new google.ima.AdDisplayContainer(this.elements.container); // Request video ads to be pre-loaded
+        google.ima.settings.setDisableCustomPlaybackForIOS10Plus(this.player.config.playsinline); // We assume the adContainer is the video container of the plyr element that will house the ads
+
+        this.elements.displayContainer = new google.ima.AdDisplayContainer(this.elements.container, this.player.media); // Request video ads to be pre-loaded
 
         this.requestAds();
       }
@@ -8682,7 +9822,7 @@ typeof navigator === "object" && (function (global, factory) {
       }
       /**
        * Update the ad countdown
-       * @param {boolean} start
+       * @param {Boolean} start
        */
 
     }, {
@@ -8731,25 +9871,7 @@ typeof navigator === "object" && (function (global, factory) {
 
         this.manager = event.getAdsManager(this.player, settings); // Get the cue points for any mid-rolls by filtering out the pre- and post-roll
 
-        this.cuePoints = this.manager.getCuePoints(); // Add advertisement cue's within the time line if available
-
-        if (!is$1.empty(this.cuePoints)) {
-          this.cuePoints.forEach(function (cuePoint) {
-            if (cuePoint !== 0 && cuePoint !== -1 && cuePoint < _this6.player.duration) {
-              var seekElement = _this6.player.elements.progress;
-
-              if (is$1.element(seekElement)) {
-                var cuePercentage = 100 / _this6.player.duration * cuePoint;
-                var cue = createElement('span', {
-                  class: _this6.player.config.classNames.cues
-                });
-                cue.style.left = "".concat(cuePercentage.toString(), "%");
-                seekElement.appendChild(cue);
-              }
-            }
-          });
-        } // Set volume to match player
-
+        this.cuePoints = this.manager.getCuePoints(); // Set volume to match player
 
         this.manager.setVolume(this.player.volume); // Add listeners to the required events
         // Advertisement error events
@@ -8766,6 +9888,29 @@ typeof navigator === "object" && (function (global, factory) {
 
         this.trigger('loaded');
       }
+    }, {
+      key: "addCuePoints",
+      value: function addCuePoints() {
+        var _this7 = this;
+
+        // Add advertisement cue's within the time line if available
+        if (!is$2.empty(this.cuePoints)) {
+          this.cuePoints.forEach(function (cuePoint) {
+            if (cuePoint !== 0 && cuePoint !== -1 && cuePoint < _this7.player.duration) {
+              var seekElement = _this7.player.elements.progress;
+
+              if (is$2.element(seekElement)) {
+                var cuePercentage = 100 / _this7.player.duration * cuePoint;
+                var cue = createElement('span', {
+                  class: _this7.player.config.classNames.cues
+                });
+                cue.style.left = "".concat(cuePercentage.toString(), "%");
+                seekElement.appendChild(cue);
+              }
+            }
+          });
+        }
+      }
       /**
        * This is where all the event handling takes place. Retrieve the ad from the event. Some
        * events (e.g. ALL_ADS_COMPLETED) don't have the ad object associated
@@ -8776,16 +9921,17 @@ typeof navigator === "object" && (function (global, factory) {
     }, {
       key: "onAdEvent",
       value: function onAdEvent(event) {
-        var _this7 = this;
+        var _this8 = this;
 
         var container = this.player.elements.container; // Retrieve the ad from the event. Some events (e.g. ALL_ADS_COMPLETED)
         // don't have ad object associated
 
-        var ad = event.getAd(); // Proxy event
+        var ad = event.getAd();
+        var adData = event.getAdData(); // Proxy event
 
         var dispatchEvent = function dispatchEvent(type) {
           var event = "ads".concat(type.replace(/_/g, '').toLowerCase());
-          triggerEvent.call(_this7.player, _this7.player.media, event);
+          triggerEvent.call(_this8.player, _this8.player.media, event);
         };
 
         switch (event.type) {
@@ -8863,6 +10009,13 @@ typeof navigator === "object" && (function (global, factory) {
             dispatchEvent(event.type);
             break;
 
+          case google.ima.AdEvent.Type.LOG:
+            if (adData.adError) {
+              this.player.debug.warn("Non-fatal ad error: ".concat(adData.adError.getMessage()));
+            }
+
+            break;
+
           default:
             break;
         }
@@ -8887,38 +10040,39 @@ typeof navigator === "object" && (function (global, factory) {
     }, {
       key: "listeners",
       value: function listeners() {
-        var _this8 = this;
+        var _this9 = this;
 
         var container = this.player.elements.container;
-        var time; // Add listeners to the required events
-
-        this.player.on('ended', function () {
-          _this8.loader.contentComplete();
+        var time;
+        this.player.on('canplay', function () {
+          _this9.addCuePoints();
         });
-        this.player.on('seeking', function () {
-          time = _this8.player.currentTime;
-          return time;
+        this.player.on('ended', function () {
+          _this9.loader.contentComplete();
+        });
+        this.player.on('timeupdate', function () {
+          time = _this9.player.currentTime;
         });
         this.player.on('seeked', function () {
-          var seekedTime = _this8.player.currentTime;
+          var seekedTime = _this9.player.currentTime;
 
-          if (is$1.empty(_this8.cuePoints)) {
+          if (is$2.empty(_this9.cuePoints)) {
             return;
           }
 
-          _this8.cuePoints.forEach(function (cuePoint, index) {
+          _this9.cuePoints.forEach(function (cuePoint, index) {
             if (time < cuePoint && cuePoint < seekedTime) {
-              _this8.manager.discardAdBreak();
+              _this9.manager.discardAdBreak();
 
-              _this8.cuePoints.splice(index, 1);
+              _this9.cuePoints.splice(index, 1);
             }
           });
         }); // Listen to the resizing of the window. And resize ad accordingly
         // TODO: eventually implement ResizeObserver
 
         window.addEventListener('resize', function () {
-          if (_this8.manager) {
-            _this8.manager.resize(container.offsetWidth, container.offsetHeight, google.ima.ViewMode.NORMAL);
+          if (_this9.manager) {
+            _this9.manager.resize(container.offsetWidth, container.offsetHeight, google.ima.ViewMode.NORMAL);
           }
         });
       }
@@ -8929,7 +10083,7 @@ typeof navigator === "object" && (function (global, factory) {
     }, {
       key: "play",
       value: function play() {
-        var _this9 = this;
+        var _this10 = this;
 
         var container = this.player.elements.container;
 
@@ -8940,23 +10094,23 @@ typeof navigator === "object" && (function (global, factory) {
 
         this.managerPromise.then(function () {
           // Initialize the container. Must be done via a user action on mobile devices
-          _this9.elements.displayContainer.initialize();
+          _this10.elements.displayContainer.initialize();
 
           try {
-            if (!_this9.initialized) {
+            if (!_this10.initialized) {
               // Initialize the ads manager. Ad rules playlist will start at this time
-              _this9.manager.init(container.offsetWidth, container.offsetHeight, google.ima.ViewMode.NORMAL); // Call play to start showing the ad. Single video and overlay ads will
+              _this10.manager.init(container.offsetWidth, container.offsetHeight, google.ima.ViewMode.NORMAL); // Call play to start showing the ad. Single video and overlay ads will
               // start at this time; the call will be ignored for ad rules
 
 
-              _this9.manager.start();
+              _this10.manager.start();
             }
 
-            _this9.initialized = true;
+            _this10.initialized = true;
           } catch (adError) {
             // An error may be thrown if there was a problem with the
             // VAST response
-            _this9.onAdError(adError);
+            _this10.onAdError(adError);
           }
         }).catch(function () {});
       }
@@ -8970,11 +10124,9 @@ typeof navigator === "object" && (function (global, factory) {
         // Hide the advertisement container
         this.elements.container.style.zIndex = ''; // Ad is stopped
 
-        this.playing = false; // Play our video
+        this.playing = false; // Play video
 
-        if (this.player.currentTime < this.player.duration) {
-          this.player.play();
-        }
+        this.player.media.play();
       }
       /**
        * Pause our video
@@ -8984,11 +10136,11 @@ typeof navigator === "object" && (function (global, factory) {
       key: "pauseContent",
       value: function pauseContent() {
         // Show the advertisement container
-        this.elements.container.style.zIndex = 3; // Ad is playing.
+        this.elements.container.style.zIndex = 3; // Ad is playing
 
         this.playing = true; // Pause our video.
 
-        this.player.pause();
+        this.player.media.pause();
       }
       /**
        * Destroy the adsManager so we can grab new ads after this. If we don't then we're not
@@ -9017,34 +10169,34 @@ typeof navigator === "object" && (function (global, factory) {
     }, {
       key: "loadAds",
       value: function loadAds() {
-        var _this10 = this;
+        var _this11 = this;
 
         // Tell our adsManager to go bye bye
         this.managerPromise.then(function () {
           // Destroy our adsManager
-          if (_this10.manager) {
-            _this10.manager.destroy();
+          if (_this11.manager) {
+            _this11.manager.destroy();
           } // Re-set our adsManager promises
 
 
-          _this10.managerPromise = new Promise(function (resolve) {
-            _this10.on('loaded', resolve);
+          _this11.managerPromise = new Promise(function (resolve) {
+            _this11.on('loaded', resolve);
 
-            _this10.player.debug.log(_this10.manager);
+            _this11.player.debug.log(_this11.manager);
           }); // Now request some new advertisements
 
-          _this10.requestAds();
+          _this11.requestAds();
         }).catch(function () {});
       }
       /**
        * Handles callbacks after an ad event was invoked
-       * @param {string} event - Event type
+       * @param {String} event - Event type
        */
 
     }, {
       key: "trigger",
       value: function trigger(event) {
-        var _this11 = this;
+        var _this12 = this;
 
         for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
           args[_key - 1] = arguments[_key];
@@ -9052,25 +10204,25 @@ typeof navigator === "object" && (function (global, factory) {
 
         var handlers = this.events[event];
 
-        if (is$1.array(handlers)) {
+        if (is$2.array(handlers)) {
           handlers.forEach(function (handler) {
-            if (is$1.function(handler)) {
-              handler.apply(_this11, args);
+            if (is$2.function(handler)) {
+              handler.apply(_this12, args);
             }
           });
         }
       }
       /**
        * Add event listeners
-       * @param {string} event - Event type
-       * @param {function} callback - Callback for when event occurs
+       * @param {String} event - Event type
+       * @param {Function} callback - Callback for when event occurs
        * @return {Ads}
        */
 
     }, {
       key: "on",
       value: function on$$1(event, callback) {
-        if (!is$1.array(this.events[event])) {
+        if (!is$2.array(this.events[event])) {
           this.events[event] = [];
         }
 
@@ -9082,31 +10234,31 @@ typeof navigator === "object" && (function (global, factory) {
        * The advertisement has 12 seconds to get its things together. We stop this timer when the
        * advertisement is playing, or when a user action is required to start, then we clear the
        * timer on ad ready
-       * @param {number} time
-       * @param {string} from
+       * @param {Number} time
+       * @param {String} from
        */
 
     }, {
       key: "startSafetyTimer",
       value: function startSafetyTimer(time, from) {
-        var _this12 = this;
+        var _this13 = this;
 
         this.player.debug.log("Safety timer invoked from: ".concat(from));
         this.safetyTimer = setTimeout(function () {
-          _this12.cancel();
+          _this13.cancel();
 
-          _this12.clearSafetyTimer('startSafetyTimer()');
+          _this13.clearSafetyTimer('startSafetyTimer()');
         }, time);
       }
       /**
        * Clear our safety timer(s)
-       * @param {string} from
+       * @param {String} from
        */
 
     }, {
       key: "clearSafetyTimer",
       value: function clearSafetyTimer(from) {
-        if (!is$1.nullOrUndefined(this.safetyTimer)) {
+        if (!is$2.nullOrUndefined(this.safetyTimer)) {
           this.player.debug.log("Safety timer cleared from: ".concat(from));
           clearTimeout(this.safetyTimer);
           this.safetyTimer = null;
@@ -9115,11 +10267,18 @@ typeof navigator === "object" && (function (global, factory) {
     }, {
       key: "enabled",
       get: function get() {
-        return this.player.isHTML5 && this.player.isVideo && this.player.config.ads.enabled && !is$1.empty(this.publisherId);
+        var config = this.config;
+        return this.player.isHTML5 && this.player.isVideo && config.enabled && (!is$2.empty(config.publisherId) || is$2.url(config.tagUrl));
       }
     }, {
       key: "tagUrl",
       get: function get() {
+        var config = this.config;
+
+        if (is$2.url(config.tagUrl)) {
+          return config.tagUrl;
+        }
+
         var params = {
           AV_PUBLISHERID: '58c25bb0073ef448b1087ad6',
           AV_CHANNELID: '5a0458dc28a06145e4519d21',
@@ -9137,16 +10296,698 @@ typeof navigator === "object" && (function (global, factory) {
     return Ads;
   }();
 
+  // 22.1.3.9 Array.prototype.findIndex(predicate, thisArg = undefined)
+
+  var $find$1 = _arrayMethods(6);
+  var KEY$1 = 'findIndex';
+  var forced$1 = true;
+  // Shouldn't skip holes
+  if (KEY$1 in []) Array(1)[KEY$1](function () { forced$1 = false; });
+  _export(_export.P + _export.F * forced$1, 'Array', {
+    findIndex: function findIndex(callbackfn /* , that = undefined */) {
+      return $find$1(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
+    }
+  });
+  _addToUnscopables(KEY$1);
+
+  var parseVtt = function parseVtt(vttDataString) {
+    var processedList = [];
+    var frames = vttDataString.split(/\r\n\r\n|\n\n|\r\r/);
+    frames.forEach(function (frame) {
+      var result = {};
+      var lines = frame.split(/\r\n|\n|\r/);
+      lines.forEach(function (line) {
+        if (!is$2.number(result.startTime)) {
+          // The line with start and end times on it is the first line of interest
+          var matchTimes = line.match(/([0-9]{2}):([0-9]{2}):([0-9]{2}).([0-9]{2,3})( ?--> ?)([0-9]{2}):([0-9]{2}):([0-9]{2}).([0-9]{2,3})/); // Note that this currently ignores caption formatting directives that are optionally on the end of this line - fine for non-captions VTT
+
+          if (matchTimes) {
+            result.startTime = Number(matchTimes[1]) * 60 * 60 + Number(matchTimes[2]) * 60 + Number(matchTimes[3]) + Number("0.".concat(matchTimes[4]));
+            result.endTime = Number(matchTimes[6]) * 60 * 60 + Number(matchTimes[7]) * 60 + Number(matchTimes[8]) + Number("0.".concat(matchTimes[9]));
+          }
+        } else if (!is$2.empty(line.trim()) && is$2.empty(result.text)) {
+          // If we already have the startTime, then we're definitely up to the text line(s)
+          var lineSplit = line.trim().split('#xywh=');
+
+          var _lineSplit = _slicedToArray(lineSplit, 1);
+
+          result.text = _lineSplit[0];
+
+          // If there's content in lineSplit[1], then we have sprites. If not, then it's just one frame per image
+          if (lineSplit[1]) {
+            var _lineSplit$1$split = lineSplit[1].split(',');
+
+            var _lineSplit$1$split2 = _slicedToArray(_lineSplit$1$split, 4);
+
+            result.x = _lineSplit$1$split2[0];
+            result.y = _lineSplit$1$split2[1];
+            result.w = _lineSplit$1$split2[2];
+            result.h = _lineSplit$1$split2[3];
+          }
+        }
+      });
+
+      if (result.text) {
+        processedList.push(result);
+      }
+    });
+    return processedList;
+  };
+  /**
+   * Preview thumbnails for seek hover and scrubbing
+   * Seeking: Hover over the seek bar (desktop only): shows a small preview container above the seek bar
+   * Scrubbing: Click and drag the seek bar (desktop and mobile): shows the preview image over the entire video, as if the video is scrubbing at very high speed
+   *
+   * Notes:
+   * - Thumbs are set via JS settings on Plyr init, not HTML5 'track' property. Using the track property would be a bit gross, because it doesn't support custom 'kinds'. kind=metadata might be used for something else, and we want to allow multiple thumbnails tracks. Tracks must have a unique combination of 'kind' and 'label'. We would have to do something like kind=metadata,label=thumbnails1 / kind=metadata,label=thumbnails2. Square peg, round hole
+   * - VTT info: the image URL is relative to the VTT, not the current document. But if the url starts with a slash, it will naturally be relative to the current domain. https://support.jwplayer.com/articles/how-to-add-preview-thumbnails
+   * - This implementation uses multiple separate img elements. Other implementations use background-image on one element. This would be nice and simple, but Firefox and Safari have flickering issues with replacing backgrounds of larger images. It seems that YouTube perhaps only avoids this because they don't have the option for high-res previews (even the fullscreen ones, when mousedown/seeking). Images appear over the top of each other, and previous ones are discarded once the new ones have been rendered
+   */
+
+
+  var PreviewThumbnails =
+  /*#__PURE__*/
+  function () {
+    /**
+     * PreviewThumbnails constructor.
+     * @param {Plyr} player
+     * @return {PreviewThumbnails}
+     */
+    function PreviewThumbnails(player) {
+      _classCallCheck(this, PreviewThumbnails);
+
+      this.player = player;
+      this.thumbnails = [];
+      this.loaded = false;
+      this.lastMouseMoveTime = Date.now();
+      this.mouseDown = false;
+      this.loadedImages = [];
+      this.elements = {
+        thumb: {},
+        scrubbing: {}
+      };
+      this.load();
+    }
+
+    _createClass(PreviewThumbnails, [{
+      key: "load",
+      value: function load() {
+        var _this = this;
+
+        // Togglethe regular seek tooltip
+        if (this.player.elements.display.seekTooltip) {
+          this.player.elements.display.seekTooltip.hidden = this.enabled;
+        }
+
+        if (!this.enabled) {
+          return;
+        }
+
+        this.getThumbnails().then(function () {
+          // Render DOM elements
+          _this.render(); // Check to see if thumb container size was specified manually in CSS
+
+
+          _this.determineContainerAutoSizing();
+
+          _this.loaded = true;
+        });
+      } // Download VTT files and parse them
+
+    }, {
+      key: "getThumbnails",
+      value: function getThumbnails() {
+        var _this2 = this;
+
+        return new Promise(function (resolve) {
+          var src = _this2.player.config.previewThumbnails.src;
+
+          if (is$2.empty(src)) {
+            throw new Error('Missing previewThumbnails.src config attribute');
+          } // If string, convert into single-element list
+
+
+          var urls = is$2.string(src) ? [src] : src; // Loop through each src URL. Download and process the VTT file, storing the resulting data in this.thumbnails
+
+          var promises = urls.map(function (u) {
+            return _this2.getThumbnail(u);
+          });
+          Promise.all(promises).then(function () {
+            // Sort smallest to biggest (e.g., [120p, 480p, 1080p])
+            _this2.thumbnails.sort(function (x, y) {
+              return x.height - y.height;
+            });
+
+            _this2.player.debug.log('Preview thumbnails', _this2.thumbnails);
+
+            resolve();
+          });
+        });
+      } // Process individual VTT file
+
+    }, {
+      key: "getThumbnail",
+      value: function getThumbnail(url) {
+        var _this3 = this;
+
+        return new Promise(function (resolve) {
+          fetch(url).then(function (response) {
+            var thumbnail = {
+              frames: parseVtt(response),
+              height: null,
+              urlPrefix: ''
+            }; // If the URLs don't start with '/', then we need to set their relative path to be the location of the VTT file
+            // If the URLs do start with '/', then they obviously don't need a prefix, so it will remain blank
+
+            if (!thumbnail.frames[0].text.startsWith('/')) {
+              thumbnail.urlPrefix = url.substring(0, url.lastIndexOf('/') + 1);
+            } // Download the first frame, so that we can determine/set the height of this thumbnailsDef
+
+
+            var tempImage = new Image();
+
+            tempImage.onload = function () {
+              thumbnail.height = tempImage.naturalHeight;
+              thumbnail.width = tempImage.naturalWidth;
+
+              _this3.thumbnails.push(thumbnail);
+
+              resolve();
+            };
+
+            tempImage.src = thumbnail.urlPrefix + thumbnail.frames[0].text;
+          });
+        });
+      }
+    }, {
+      key: "startMove",
+      value: function startMove(event) {
+        if (!this.loaded) {
+          return;
+        }
+
+        if (!is$2.event(event) || !['touchmove', 'mousemove'].includes(event.type)) {
+          return;
+        } // Wait until media has a duration
+
+
+        if (!this.player.media.duration) {
+          return;
+        }
+
+        if (event.type === 'touchmove') {
+          // Calculate seek hover position as approx video seconds
+          this.seekTime = this.player.media.duration * (this.player.elements.inputs.seek.value / 100);
+        } else {
+          // Calculate seek hover position as approx video seconds
+          var clientRect = this.player.elements.progress.getBoundingClientRect();
+          var percentage = 100 / clientRect.width * (event.pageX - clientRect.left);
+          this.seekTime = this.player.media.duration * (percentage / 100);
+
+          if (this.seekTime < 0) {
+            // The mousemove fires for 10+px out to the left
+            this.seekTime = 0;
+          }
+
+          if (this.seekTime > this.player.media.duration - 1) {
+            // Took 1 second off the duration for safety, because different players can disagree on the real duration of a video
+            this.seekTime = this.player.media.duration - 1;
+          }
+
+          this.mousePosX = event.pageX; // Set time text inside image container
+
+          this.elements.thumb.time.innerText = formatTime(this.seekTime);
+        } // Download and show image
+
+
+        this.showImageAtCurrentTime();
+      }
+    }, {
+      key: "endMove",
+      value: function endMove() {
+        this.toggleThumbContainer(false, true);
+      }
+    }, {
+      key: "startScrubbing",
+      value: function startScrubbing(event) {
+        // Only act on left mouse button (0), or touch device (event.button is false)
+        if (event.button === false || event.button === 0) {
+          this.mouseDown = true; // Wait until media has a duration
+
+          if (this.player.media.duration) {
+            this.toggleScrubbingContainer(true);
+            this.toggleThumbContainer(false, true); // Download and show image
+
+            this.showImageAtCurrentTime();
+          }
+        }
+      }
+    }, {
+      key: "endScrubbing",
+      value: function endScrubbing() {
+        var _this4 = this;
+
+        this.mouseDown = false; // Hide scrubbing preview. But wait until the video has successfully seeked before hiding the scrubbing preview
+
+        if (Math.ceil(this.lastTime) === Math.ceil(this.player.media.currentTime)) {
+          // The video was already seeked/loaded at the chosen time - hide immediately
+          this.toggleScrubbingContainer(false);
+        } else {
+          // The video hasn't seeked yet. Wait for that
+          once.call(this.player, this.player.media, 'timeupdate', function () {
+            // Re-check mousedown - we might have already started scrubbing again
+            if (!_this4.mouseDown) {
+              _this4.toggleScrubbingContainer(false);
+            }
+          });
+        }
+      }
+      /**
+       * Setup hooks for Plyr and window events
+       */
+
+    }, {
+      key: "listeners",
+      value: function listeners() {
+        var _this5 = this;
+
+        // Hide thumbnail preview - on mouse click, mouse leave (in listeners.js for now), and video play/seek. All four are required, e.g., for buffering
+        this.player.on('play', function () {
+          _this5.toggleThumbContainer(false, true);
+        });
+        this.player.on('seeked', function () {
+          _this5.toggleThumbContainer(false);
+        });
+        this.player.on('timeupdate', function () {
+          _this5.lastTime = _this5.player.media.currentTime;
+        });
+      }
+      /**
+       * Create HTML elements for image containers
+       */
+
+    }, {
+      key: "render",
+      value: function render() {
+        // Create HTML element: plyr__preview-thumbnail-container
+        this.elements.thumb.container = createElement('div', {
+          class: this.player.config.classNames.previewThumbnails.thumbContainer
+        }); // Wrapper for the image for styling
+
+        this.elements.thumb.imageContainer = createElement('div', {
+          class: this.player.config.classNames.previewThumbnails.imageContainer
+        });
+        this.elements.thumb.container.appendChild(this.elements.thumb.imageContainer); // Create HTML element, parent+span: time text (e.g., 01:32:00)
+
+        var timeContainer = createElement('div', {
+          class: this.player.config.classNames.previewThumbnails.timeContainer
+        });
+        this.elements.thumb.time = createElement('span', {}, '00:00');
+        timeContainer.appendChild(this.elements.thumb.time);
+        this.elements.thumb.container.appendChild(timeContainer); // Inject the whole thumb
+
+        this.player.elements.progress.appendChild(this.elements.thumb.container); // Create HTML element: plyr__preview-scrubbing-container
+
+        this.elements.scrubbing.container = createElement('div', {
+          class: this.player.config.classNames.previewThumbnails.scrubbingContainer
+        });
+        this.player.elements.wrapper.appendChild(this.elements.scrubbing.container);
+      }
+    }, {
+      key: "showImageAtCurrentTime",
+      value: function showImageAtCurrentTime() {
+        var _this6 = this;
+
+        if (this.mouseDown) {
+          this.setScrubbingContainerSize();
+        } else {
+          this.setThumbContainerSizeAndPos();
+        } // Find the desired thumbnail index
+        // TODO: Handle a video longer than the thumbs where thumbNum is null
+
+
+        var thumbNum = this.thumbnails[0].frames.findIndex(function (frame) {
+          return _this6.seekTime >= frame.startTime && _this6.seekTime <= frame.endTime;
+        });
+        var hasThumb = thumbNum >= 0;
+        var qualityIndex = 0; // Show the thumb container if we're not scrubbing
+
+        if (!this.mouseDown) {
+          this.toggleThumbContainer(hasThumb);
+        } // No matching thumb found
+
+
+        if (!hasThumb) {
+          return;
+        } // Check to see if we've already downloaded higher quality versions of this image
+
+
+        this.thumbnails.forEach(function (thumbnail, index) {
+          if (_this6.loadedImages.includes(thumbnail.frames[thumbNum].text)) {
+            qualityIndex = index;
+          }
+        }); // Only proceed if either thumbnum or thumbfilename has changed
+
+        if (thumbNum !== this.showingThumb) {
+          this.showingThumb = thumbNum;
+          this.loadImage(qualityIndex);
+        }
+      } // Show the image that's currently specified in this.showingThumb
+
+    }, {
+      key: "loadImage",
+      value: function loadImage() {
+        var _this7 = this;
+
+        var qualityIndex = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
+        var thumbNum = this.showingThumb;
+        var thumbnail = this.thumbnails[qualityIndex];
+        var urlPrefix = thumbnail.urlPrefix;
+        var frame = thumbnail.frames[thumbNum];
+        var thumbFilename = thumbnail.frames[thumbNum].text;
+        var thumbUrl = urlPrefix + thumbFilename;
+
+        if (!this.currentImageElement || this.currentImageElement.dataset.filename !== thumbFilename) {
+          // If we're already loading a previous image, remove its onload handler - we don't want it to load after this one
+          // Only do this if not using sprites. Without sprites we really want to show as many images as possible, as a best-effort
+          if (this.loadingImage && this.usingSprites) {
+            this.loadingImage.onload = null;
+          } // We're building and adding a new image. In other implementations of similar functionality (YouTube), background image
+          // is instead used. But this causes issues with larger images in Firefox and Safari - switching between background
+          // images causes a flicker. Putting a new image over the top does not
+
+
+          var previewImage = new Image();
+          previewImage.src = thumbUrl;
+          previewImage.dataset.index = thumbNum;
+          previewImage.dataset.filename = thumbFilename;
+          this.showingThumbFilename = thumbFilename;
+          this.player.debug.log("Loading image: ".concat(thumbUrl)); // For some reason, passing the named function directly causes it to execute immediately. So I've wrapped it in an anonymous function...
+
+          previewImage.onload = function () {
+            return _this7.showImage(previewImage, frame, qualityIndex, thumbNum, thumbFilename, true);
+          };
+
+          this.loadingImage = previewImage;
+          this.removeOldImages(previewImage);
+        } else {
+          // Update the existing image
+          this.showImage(this.currentImageElement, frame, qualityIndex, thumbNum, thumbFilename, false);
+          this.currentImageElement.dataset.index = thumbNum;
+          this.removeOldImages(this.currentImageElement);
+        }
+      }
+    }, {
+      key: "showImage",
+      value: function showImage(previewImage, frame, qualityIndex, thumbNum, thumbFilename) {
+        var newImage = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : true;
+        this.player.debug.log("Showing thumb: ".concat(thumbFilename, ". num: ").concat(thumbNum, ". qual: ").concat(qualityIndex, ". newimg: ").concat(newImage));
+        this.setImageSizeAndOffset(previewImage, frame);
+
+        if (newImage) {
+          this.currentImageContainer.appendChild(previewImage);
+          this.currentImageElement = previewImage;
+
+          if (!this.loadedImages.includes(thumbFilename)) {
+            this.loadedImages.push(thumbFilename);
+          }
+        } // Preload images before and after the current one
+        // Show higher quality of the same frame
+        // Each step here has a short time delay, and only continues if still hovering/seeking the same spot. This is to protect slow connections from overloading
+
+
+        this.preloadNearby(thumbNum, true).then(this.preloadNearby(thumbNum, false)).then(this.getHigherQuality(qualityIndex, previewImage, frame, thumbFilename));
+      } // Remove all preview images that aren't the designated current image
+
+    }, {
+      key: "removeOldImages",
+      value: function removeOldImages(currentImage) {
+        var _this8 = this;
+
+        // Get a list of all images, convert it from a DOM list to an array
+        Array.from(this.currentImageContainer.children).forEach(function (image) {
+          if (image.tagName.toLowerCase() !== 'img') {
+            return;
+          }
+
+          var removeDelay = _this8.usingSprites ? 500 : 1000;
+
+          if (image.dataset.index !== currentImage.dataset.index && !image.dataset.deleting) {
+            // Wait 200ms, as the new image can take some time to show on certain browsers (even though it was downloaded before showing). This will prevent flicker, and show some generosity towards slower clients
+            // First set attribute 'deleting' to prevent multi-handling of this on repeat firing of this function
+            image.dataset.deleting = true; // This has to be set before the timeout - to prevent issues switching between hover and scrub
+
+            var currentImageContainer = _this8.currentImageContainer;
+            setTimeout(function () {
+              currentImageContainer.removeChild(image);
+
+              _this8.player.debug.log("Removing thumb: ".concat(image.dataset.filename));
+            }, removeDelay);
+          }
+        });
+      } // Preload images before and after the current one. Only if the user is still hovering/seeking the same frame
+      // This will only preload the lowest quality
+
+    }, {
+      key: "preloadNearby",
+      value: function preloadNearby(thumbNum) {
+        var _this9 = this;
+
+        var forward = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+        return new Promise(function (resolve) {
+          setTimeout(function () {
+            var oldThumbFilename = _this9.thumbnails[0].frames[thumbNum].text;
+
+            if (_this9.showingThumbFilename === oldThumbFilename) {
+              // Find the nearest thumbs with different filenames. Sometimes it'll be the next index, but in the case of sprites, it might be 100+ away
+              var thumbnailsClone;
+
+              if (forward) {
+                thumbnailsClone = _this9.thumbnails[0].frames.slice(thumbNum);
+              } else {
+                thumbnailsClone = _this9.thumbnails[0].frames.slice(0, thumbNum).reverse();
+              }
+
+              var foundOne = false;
+              thumbnailsClone.forEach(function (frame) {
+                var newThumbFilename = frame.text;
+
+                if (newThumbFilename !== oldThumbFilename) {
+                  // Found one with a different filename. Make sure it hasn't already been loaded on this page visit
+                  if (!_this9.loadedImages.includes(newThumbFilename)) {
+                    foundOne = true;
+
+                    _this9.player.debug.log("Preloading thumb filename: ".concat(newThumbFilename));
+
+                    var urlPrefix = _this9.thumbnails[0].urlPrefix;
+                    var thumbURL = urlPrefix + newThumbFilename;
+                    var previewImage = new Image();
+                    previewImage.src = thumbURL;
+
+                    previewImage.onload = function () {
+                      _this9.player.debug.log("Preloaded thumb filename: ".concat(newThumbFilename));
+
+                      if (!_this9.loadedImages.includes(newThumbFilename)) _this9.loadedImages.push(newThumbFilename); // We don't resolve until the thumb is loaded
+
+                      resolve();
+                    };
+                  }
+                }
+              }); // If there are none to preload then we want to resolve immediately
+
+              if (!foundOne) {
+                resolve();
+              }
+            }
+          }, 300);
+        });
+      } // If user has been hovering current image for half a second, look for a higher quality one
+
+    }, {
+      key: "getHigherQuality",
+      value: function getHigherQuality(currentQualityIndex, previewImage, frame, thumbFilename) {
+        var _this10 = this;
+
+        if (currentQualityIndex < this.thumbnails.length - 1) {
+          // Only use the higher quality version if it's going to look any better - if the current thumb is of a lower pixel density than the thumbnail container
+          var previewImageHeight = previewImage.naturalHeight;
+
+          if (this.usingSprites) {
+            previewImageHeight = frame.h;
+          }
+
+          if (previewImageHeight < this.thumbContainerHeight) {
+            // Recurse back to the loadImage function - show a higher quality one, but only if the viewer is on this frame for a while
+            setTimeout(function () {
+              // Make sure the mouse hasn't already moved on and started hovering at another image
+              if (_this10.showingThumbFilename === thumbFilename) {
+                _this10.player.debug.log("Showing higher quality thumb for: ".concat(thumbFilename));
+
+                _this10.loadImage(currentQualityIndex + 1);
+              }
+            }, 300);
+          }
+        }
+      }
+    }, {
+      key: "toggleThumbContainer",
+      value: function toggleThumbContainer() {
+        var toggle = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+        var clearShowing = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+        var className = this.player.config.classNames.previewThumbnails.thumbContainerShown;
+        this.elements.thumb.container.classList.toggle(className, toggle);
+
+        if (!toggle && clearShowing) {
+          this.showingThumb = null;
+          this.showingThumbFilename = null;
+        }
+      }
+    }, {
+      key: "toggleScrubbingContainer",
+      value: function toggleScrubbingContainer() {
+        var toggle = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+        var className = this.player.config.classNames.previewThumbnails.scrubbingContainerShown;
+        this.elements.scrubbing.container.classList.toggle(className, toggle);
+
+        if (!toggle) {
+          this.showingThumb = null;
+          this.showingThumbFilename = null;
+        }
+      }
+    }, {
+      key: "determineContainerAutoSizing",
+      value: function determineContainerAutoSizing() {
+        if (this.elements.thumb.imageContainer.clientHeight > 20) {
+          // This will prevent auto sizing in this.setThumbContainerSizeAndPos()
+          this.sizeSpecifiedInCSS = true;
+        }
+      } // Set the size to be about a quarter of the size of video. Unless option dynamicSize === false, in which case it needs to be set in CSS
+
+    }, {
+      key: "setThumbContainerSizeAndPos",
+      value: function setThumbContainerSizeAndPos() {
+        if (!this.sizeSpecifiedInCSS) {
+          var thumbWidth = Math.floor(this.thumbContainerHeight * this.thumbAspectRatio);
+          this.elements.thumb.imageContainer.style.height = "".concat(this.thumbContainerHeight, "px");
+          this.elements.thumb.imageContainer.style.width = "".concat(thumbWidth, "px");
+        }
+
+        this.setThumbContainerPos();
+      }
+    }, {
+      key: "setThumbContainerPos",
+      value: function setThumbContainerPos() {
+        var seekbarRect = this.player.elements.progress.getBoundingClientRect();
+        var plyrRect = this.player.elements.container.getBoundingClientRect();
+        var container = this.elements.thumb.container; // Find the lowest and highest desired left-position, so we don't slide out the side of the video container
+
+        var minVal = plyrRect.left - seekbarRect.left + 10;
+        var maxVal = plyrRect.right - seekbarRect.left - container.clientWidth - 10; // Set preview container position to: mousepos, minus seekbar.left, minus half of previewContainer.clientWidth
+
+        var previewPos = this.mousePosX - seekbarRect.left - container.clientWidth / 2;
+
+        if (previewPos < minVal) {
+          previewPos = minVal;
+        }
+
+        if (previewPos > maxVal) {
+          previewPos = maxVal;
+        }
+
+        container.style.left = "".concat(previewPos, "px");
+      } // Can't use 100% width, in case the video is a different aspect ratio to the video container
+
+    }, {
+      key: "setScrubbingContainerSize",
+      value: function setScrubbingContainerSize() {
+        this.elements.scrubbing.container.style.width = "".concat(this.player.media.clientWidth, "px"); // Can't use media.clientHeight - html5 video goes big and does black bars above and below
+
+        this.elements.scrubbing.container.style.height = "".concat(this.player.media.clientWidth / this.thumbAspectRatio, "px");
+      } // Sprites need to be offset to the correct location
+
+    }, {
+      key: "setImageSizeAndOffset",
+      value: function setImageSizeAndOffset(previewImage, frame) {
+        if (!this.usingSprites) {
+          return;
+        } // Find difference between height and preview container height
+
+
+        var multiplier = this.thumbContainerHeight / frame.h;
+        previewImage.style.height = "".concat(Math.floor(previewImage.naturalHeight * multiplier), "px");
+        previewImage.style.width = "".concat(Math.floor(previewImage.naturalWidth * multiplier), "px");
+        previewImage.style.left = "-".concat(frame.x * multiplier, "px");
+        previewImage.style.top = "-".concat(frame.y * multiplier, "px");
+      }
+    }, {
+      key: "enabled",
+      get: function get() {
+        return this.player.isHTML5 && this.player.isVideo && this.player.config.previewThumbnails.enabled;
+      }
+    }, {
+      key: "currentImageContainer",
+      get: function get() {
+        if (this.mouseDown) {
+          return this.elements.scrubbing.container;
+        }
+
+        return this.elements.thumb.imageContainer;
+      }
+    }, {
+      key: "usingSprites",
+      get: function get() {
+        return Object.keys(this.thumbnails[0].frames[0]).includes('w');
+      }
+    }, {
+      key: "thumbAspectRatio",
+      get: function get() {
+        if (this.usingSprites) {
+          return this.thumbnails[0].frames[0].w / this.thumbnails[0].frames[0].h;
+        }
+
+        return this.thumbnails[0].width / this.thumbnails[0].height;
+      }
+    }, {
+      key: "thumbContainerHeight",
+      get: function get() {
+        if (this.mouseDown) {
+          // Can't use media.clientHeight - HTML5 video goes big and does black bars above and below
+          return Math.floor(this.player.media.clientWidth / this.thumbAspectRatio);
+        }
+
+        return Math.floor(this.player.media.clientWidth / this.thumbAspectRatio / 4);
+      }
+    }, {
+      key: "currentImageElement",
+      get: function get() {
+        if (this.mouseDown) {
+          return this.currentScrubbingImageElement;
+        }
+
+        return this.currentThumbnailImageElement;
+      },
+      set: function set(element) {
+        if (this.mouseDown) {
+          this.currentScrubbingImageElement = element;
+        } else {
+          this.currentThumbnailImageElement = element;
+        }
+      }
+    }]);
+
+    return PreviewThumbnails;
+  }();
+
   var source = {
     // Add elements to HTML5 media (source, tracks, etc)
     insertElements: function insertElements(type, attributes) {
       var _this = this;
 
-      if (is$1.string(attributes)) {
+      if (is$2.string(attributes)) {
         insertElement(type, this.media, {
           src: attributes
         });
-      } else if (is$1.array(attributes)) {
+      } else if (is$2.array(attributes)) {
         attributes.forEach(function (attribute) {
           insertElement(type, _this.media, attribute);
         });
@@ -9172,7 +11013,7 @@ typeof navigator === "object" && (function (global, factory) {
         removeElement(_this2.media);
         _this2.media = null; // Reset class name
 
-        if (is$1.element(_this2.elements.container)) {
+        if (is$2.element(_this2.elements.container)) {
           _this2.elements.container.removeAttribute('class');
         } // Set the type and provider
 
@@ -9202,7 +11043,7 @@ typeof navigator === "object" && (function (global, factory) {
         _this2.elements.container.appendChild(_this2.media); // Autoplay the new source?
 
 
-        if (is$1.boolean(input.autoplay)) {
+        if (is$2.boolean(input.autoplay)) {
           _this2.config.autoplay = input.autoplay;
         } // Set attributes for audio and video
 
@@ -9216,7 +11057,7 @@ typeof navigator === "object" && (function (global, factory) {
             _this2.media.setAttribute('autoplay', '');
           }
 
-          if (!is$1.empty(input.poster)) {
+          if (!is$2.empty(input.poster)) {
             _this2.poster = input.poster;
           }
 
@@ -9256,11 +11097,16 @@ typeof navigator === "object" && (function (global, factory) {
         if (_this2.isHTML5 || _this2.isEmbed && !_this2.supported.ui) {
           // Setup interface
           ui.build.call(_this2);
-        }
+        } // Load HTML5 sources
+
 
         if (_this2.isHTML5) {
-          // Load HTML5 sources
           _this2.media.load();
+        } // Reload thumbnails
+
+
+        if (_this2.previewThumbnails) {
+          _this2.previewThumbnails.load();
         } // Update the fullscreen support
 
 
@@ -9291,18 +11137,18 @@ typeof navigator === "object" && (function (global, factory) {
 
       this.media = target; // String selector passed
 
-      if (is$1.string(this.media)) {
+      if (is$2.string(this.media)) {
         this.media = document.querySelectorAll(this.media);
       } // jQuery, NodeList or Array passed, use first element
 
 
-      if (window.jQuery && this.media instanceof jQuery || is$1.nodeList(this.media) || is$1.array(this.media)) {
+      if (window.jQuery && this.media instanceof jQuery || is$2.nodeList(this.media) || is$2.array(this.media)) {
         // eslint-disable-next-line
         this.media = this.media[0];
       } // Set config
 
 
-      this.config = extend({}, defaults, Plyr.defaults, options || {}, function () {
+      this.config = extend({}, defaults$1, Plyr.defaults, options || {}, function () {
         try {
           return JSON.parse(_this.media.getAttribute('data-plyr-config'));
         } catch (e) {
@@ -9346,7 +11192,7 @@ typeof navigator === "object" && (function (global, factory) {
       this.debug.log('Config', this.config);
       this.debug.log('Support', support); // We need an element to setup
 
-      if (is$1.nullOrUndefined(this.media) || !is$1.element(this.media)) {
+      if (is$2.nullOrUndefined(this.media) || !is$2.element(this.media)) {
         this.debug.error('Setup failed: no suitable element passed');
         return;
       } // Bail if the element is initialized
@@ -9386,7 +11232,7 @@ typeof navigator === "object" && (function (global, factory) {
           // Find the frame
           iframe = this.media.querySelector('iframe'); // <iframe> type
 
-          if (is$1.element(iframe)) {
+          if (is$2.element(iframe)) {
             // Detect provider
             url = parseUrl(iframe.getAttribute('src'));
             this.provider = getProviderByUrl(url.toString()); // Rework elements
@@ -9411,7 +11257,7 @@ typeof navigator === "object" && (function (global, factory) {
 
               if (this.isYouTube) {
                 this.config.playsinline = truthy.includes(url.searchParams.get('playsinline'));
-                this.config.hl = url.searchParams.get('hl'); // TODO: Should this be setting language?
+                this.config.youtube.hl = url.searchParams.get('hl'); // TODO: Should this be setting language?
               } else {
                 this.config.playsinline = true;
               }
@@ -9424,7 +11270,7 @@ typeof navigator === "object" && (function (global, factory) {
           } // Unsupported or missing provider
 
 
-          if (is$1.empty(this.provider) || !Object.keys(providers).includes(this.provider)) {
+          if (is$2.empty(this.provider) || !Object.keys(providers).includes(this.provider)) {
             this.debug.error('Setup failed: Invalid provider');
             return;
           } // Audio will come later for external providers
@@ -9481,9 +11327,11 @@ typeof navigator === "object" && (function (global, factory) {
 
       this.media.plyr = this; // Wrap media
 
-      if (!is$1.element(this.elements.container)) {
-        this.elements.container = createElement('div');
-        wrap(this.media, this.elements.container);
+      if (!is$2.element(this.elements.container)) {
+        this.elements.container = createElement('div', {
+          tabindex: 0
+        });
+        wrap$1(this.media, this.elements.container);
       } // Add style hook
 
 
@@ -9520,7 +11368,11 @@ typeof navigator === "object" && (function (global, factory) {
       } // Seek time will be recorded (in listeners.js) so we can prevent hiding controls for a few seconds after seek
 
 
-      this.lastSeekTime = 0;
+      this.lastSeekTime = 0; // Setup preview thumbnails if enabled
+
+      if (this.config.previewThumbnails.enabled) {
+        this.previewThumbnails = new PreviewThumbnails(this);
+      }
     } // ---------------------------------------
     // API
     // ---------------------------------------
@@ -9537,8 +11389,19 @@ typeof navigator === "object" && (function (global, factory) {
        * Play the media, or play the advertisement (if they are not blocked)
        */
       value: function play() {
-        if (!is$1.function(this.media.play)) {
+        var _this2 = this;
+
+        if (!is$2.function(this.media.play)) {
           return null;
+        } // Intecept play with ads
+
+
+        if (this.ads && this.ads.enabled) {
+          this.ads.managerPromise.then(function () {
+            return _this2.ads.play();
+          }).catch(function () {
+            return _this2.media.play();
+          });
         } // Return the promise (for HTML5)
 
 
@@ -9551,7 +11414,7 @@ typeof navigator === "object" && (function (global, factory) {
     }, {
       key: "pause",
       value: function pause() {
-        if (!this.playing || !is$1.function(this.media.pause)) {
+        if (!this.playing || !is$2.function(this.media.pause)) {
           return;
         }
 
@@ -9566,11 +11429,11 @@ typeof navigator === "object" && (function (global, factory) {
 
       /**
        * Toggle playback based on current status
-       * @param {boolean} input
+       * @param {Boolean} input
        */
       value: function togglePlay(input) {
         // Toggle based on current state if nothing passed
-        var toggle = is$1.boolean(input) ? input : !this.playing;
+        var toggle = is$2.boolean(input) ? input : !this.playing;
 
         if (toggle) {
           this.play();
@@ -9588,7 +11451,7 @@ typeof navigator === "object" && (function (global, factory) {
         if (this.isHTML5) {
           this.pause();
           this.restart();
-        } else if (is$1.function(this.media.stop)) {
+        } else if (is$2.function(this.media.stop)) {
           this.media.stop();
         }
       }
@@ -9603,27 +11466,27 @@ typeof navigator === "object" && (function (global, factory) {
       }
       /**
        * Rewind
-       * @param {number} seekTime - how far to rewind in seconds. Defaults to the config.seekTime
+       * @param {Number} seekTime - how far to rewind in seconds. Defaults to the config.seekTime
        */
 
     }, {
       key: "rewind",
       value: function rewind(seekTime) {
-        this.currentTime = this.currentTime - (is$1.number(seekTime) ? seekTime : this.config.seekTime);
+        this.currentTime = this.currentTime - (is$2.number(seekTime) ? seekTime : this.config.seekTime);
       }
       /**
        * Fast forward
-       * @param {number} seekTime - how far to fast forward in seconds. Defaults to the config.seekTime
+       * @param {Number} seekTime - how far to fast forward in seconds. Defaults to the config.seekTime
        */
 
     }, {
       key: "forward",
       value: function forward(seekTime) {
-        this.currentTime = this.currentTime + (is$1.number(seekTime) ? seekTime : this.config.seekTime);
+        this.currentTime = this.currentTime + (is$2.number(seekTime) ? seekTime : this.config.seekTime);
       }
       /**
        * Seek to a time
-       * @param {number} input - where to seek to in seconds. Defaults to 0 (the start)
+       * @param {Number} input - where to seek to in seconds. Defaults to 0 (the start)
        */
 
     }, {
@@ -9631,15 +11494,15 @@ typeof navigator === "object" && (function (global, factory) {
 
       /**
        * Increase volume
-       * @param {boolean} step - How much to decrease by (between 0 and 1)
+       * @param {Boolean} step - How much to decrease by (between 0 and 1)
        */
       value: function increaseVolume(step) {
         var volume = this.media.muted ? 0 : this.volume;
-        this.volume = volume + (is$1.number(step) ? step : 0);
+        this.volume = volume + (is$2.number(step) ? step : 0);
       }
       /**
        * Decrease volume
-       * @param {boolean} step - How much to decrease by (between 0 and 1)
+       * @param {Boolean} step - How much to decrease by (between 0 and 1)
        */
 
     }, {
@@ -9649,7 +11512,7 @@ typeof navigator === "object" && (function (global, factory) {
       }
       /**
        * Set muted state
-       * @param {boolean} mute
+       * @param {Boolean} mute
        */
 
     }, {
@@ -9657,14 +11520,14 @@ typeof navigator === "object" && (function (global, factory) {
 
       /**
        * Toggle captions
-       * @param {boolean} input - Whether to enable captions
+       * @param {Boolean} input - Whether to enable captions
        */
       value: function toggleCaptions(input) {
         captions.toggle.call(this, input, false);
       }
       /**
        * Set the caption track by index
-       * @param {number} - Caption index
+       * @param {Number} - Caption index
        */
 
     }, {
@@ -9682,7 +11545,7 @@ typeof navigator === "object" && (function (global, factory) {
       }
       /**
        * Toggle the player controls
-       * @param {boolean} [toggle] - Whether to show the controls
+       * @param {Boolean} [toggle] - Whether to show the controls
        */
 
     }, {
@@ -9697,7 +11560,7 @@ typeof navigator === "object" && (function (global, factory) {
 
           var hiding = toggleClass(this.elements.container, this.config.classNames.hideControls, force); // Close menu
 
-          if (hiding && this.config.controls.includes('settings') && !is$1.empty(this.config.settings)) {
+          if (hiding && this.config.controls.includes('settings') && !is$2.empty(this.config.settings)) {
             controls.toggleMenu.call(this, false);
           } // Trigger event on change
 
@@ -9714,8 +11577,8 @@ typeof navigator === "object" && (function (global, factory) {
       }
       /**
        * Add event listeners
-       * @param {string} event - Event type
-       * @param {function} callback - Callback for when event occurs
+       * @param {String} event - Event type
+       * @param {Function} callback - Callback for when event occurs
        */
 
     }, {
@@ -9725,8 +11588,8 @@ typeof navigator === "object" && (function (global, factory) {
       }
       /**
        * Add event listeners once
-       * @param {string} event - Event type
-       * @param {function} callback - Callback for when event occurs
+       * @param {String} event - Event type
+       * @param {Function} callback - Callback for when event occurs
        */
 
     }, {
@@ -9736,8 +11599,8 @@ typeof navigator === "object" && (function (global, factory) {
       }
       /**
        * Remove event listeners
-       * @param {string} event - Event type
-       * @param {function} callback - Callback for when event occurs
+       * @param {String} event - Event type
+       * @param {Function} callback - Callback for when event occurs
        */
 
     }, {
@@ -9749,14 +11612,14 @@ typeof navigator === "object" && (function (global, factory) {
        * Destroy an instance
        * Event listeners are removed when elements are removed
        * http://stackoverflow.com/questions/12528049/if-a-dom-element-is-removed-are-its-listeners-also-removed-from-memory
-       * @param {function} callback - Callback for when destroy is complete
-       * @param {boolean} soft - Whether it's a soft destroy (for source changes etc)
+       * @param {Function} callback - Callback for when destroy is complete
+       * @param {Boolean} soft - Whether it's a soft destroy (for source changes etc)
        */
 
     }, {
       key: "destroy",
       value: function destroy(callback) {
-        var _this2 = this;
+        var _this3 = this;
 
         var soft = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
@@ -9768,44 +11631,44 @@ typeof navigator === "object" && (function (global, factory) {
           // Reset overflow (incase destroyed while in fullscreen)
           document.body.style.overflow = ''; // GC for embed
 
-          _this2.embed = null; // If it's a soft destroy, make minimal changes
+          _this3.embed = null; // If it's a soft destroy, make minimal changes
 
           if (soft) {
-            if (Object.keys(_this2.elements).length) {
+            if (Object.keys(_this3.elements).length) {
               // Remove elements
-              removeElement(_this2.elements.buttons.play);
-              removeElement(_this2.elements.captions);
-              removeElement(_this2.elements.controls);
-              removeElement(_this2.elements.wrapper); // Clear for GC
+              removeElement(_this3.elements.buttons.play);
+              removeElement(_this3.elements.captions);
+              removeElement(_this3.elements.controls);
+              removeElement(_this3.elements.wrapper); // Clear for GC
 
-              _this2.elements.buttons.play = null;
-              _this2.elements.captions = null;
-              _this2.elements.controls = null;
-              _this2.elements.wrapper = null;
+              _this3.elements.buttons.play = null;
+              _this3.elements.captions = null;
+              _this3.elements.controls = null;
+              _this3.elements.wrapper = null;
             } // Callback
 
 
-            if (is$1.function(callback)) {
+            if (is$2.function(callback)) {
               callback();
             }
           } else {
             // Unbind listeners
-            unbindListeners.call(_this2); // Replace the container with the original element provided
+            unbindListeners.call(_this3); // Replace the container with the original element provided
 
-            replaceElement(_this2.elements.original, _this2.elements.container); // Event
+            replaceElement(_this3.elements.original, _this3.elements.container); // Event
 
-            triggerEvent.call(_this2, _this2.elements.original, 'destroyed', true); // Callback
+            triggerEvent.call(_this3, _this3.elements.original, 'destroyed', true); // Callback
 
-            if (is$1.function(callback)) {
-              callback.call(_this2.elements.original);
+            if (is$2.function(callback)) {
+              callback.call(_this3.elements.original);
             } // Reset state
 
 
-            _this2.ready = false; // Clear for garbage collection
+            _this3.ready = false; // Clear for garbage collection
 
             setTimeout(function () {
-              _this2.elements = null;
-              _this2.media = null;
+              _this3.elements = null;
+              _this3.media = null;
             }, 200);
           }
         }; // Stop playback
@@ -9825,7 +11688,7 @@ typeof navigator === "object" && (function (global, factory) {
           clearInterval(this.timers.buffering);
           clearInterval(this.timers.playing); // Destroy YouTube API
 
-          if (this.embed !== null && is$1.function(this.embed.destroy)) {
+          if (this.embed !== null && is$2.function(this.embed.destroy)) {
             this.embed.destroy();
           } // Clean up
 
@@ -9844,7 +11707,7 @@ typeof navigator === "object" && (function (global, factory) {
       }
       /**
        * Check for support for a mime type (HTML5 only)
-       * @param {string} type - Mime type
+       * @param {String} type - Mime type
        */
 
     }, {
@@ -9854,9 +11717,9 @@ typeof navigator === "object" && (function (global, factory) {
       }
       /**
        * Check for support
-       * @param {string} type - Player type (audio/video)
-       * @param {string} provider - Provider (html5/youtube/vimeo)
-       * @param {bool} inline - Where player has `playsinline` sttribute
+       * @param {String} type - Player type (audio/video)
+       * @param {String} provider - Provider (html5/youtube/vimeo)
+       * @param {Boolean} inline - Where player has `playsinline` sttribute
        */
 
     }, {
@@ -9930,7 +11793,7 @@ typeof navigator === "object" && (function (global, factory) {
         } // Validate input
 
 
-        var inputIsValid = is$1.number(input) && input > 0; // Set
+        var inputIsValid = is$2.number(input) && input > 0; // Set
 
         this.media.currentTime = inputIsValid ? Math.min(input, this.duration) : 0; // Logging
 
@@ -9952,7 +11815,7 @@ typeof navigator === "object" && (function (global, factory) {
       get: function get() {
         var buffered = this.media.buffered; // YouTube / Vimeo return a float between 0-1
 
-        if (is$1.number(buffered)) {
+        if (is$2.number(buffered)) {
           return buffered;
         } // HTML5
         // TODO: Handle buffered chunks of the media
@@ -9985,13 +11848,13 @@ typeof navigator === "object" && (function (global, factory) {
         var fauxDuration = parseFloat(this.config.duration); // Media duration can be NaN or Infinity before the media has loaded
 
         var realDuration = (this.media || {}).duration;
-        var duration = !is$1.number(realDuration) || realDuration === Infinity ? 0 : realDuration; // If config duration is funky, use regular duration
+        var duration = !is$2.number(realDuration) || realDuration === Infinity ? 0 : realDuration; // If config duration is funky, use regular duration
 
         return fauxDuration || duration;
       }
       /**
        * Set the player volume
-       * @param {number} value - must be between 0 and 1. Defaults to the value from local storage and config.volume if not set in storage
+       * @param {Number} value - must be between 0 and 1. Defaults to the value from local storage and config.volume if not set in storage
        */
 
     }, {
@@ -10001,17 +11864,17 @@ typeof navigator === "object" && (function (global, factory) {
         var max = 1;
         var min = 0;
 
-        if (is$1.string(volume)) {
+        if (is$2.string(volume)) {
           volume = Number(volume);
         } // Load volume from storage if no value specified
 
 
-        if (!is$1.number(volume)) {
+        if (!is$2.number(volume)) {
           volume = this.storage.get('volume');
         } // Use config if all else fails
 
 
-        if (!is$1.number(volume)) {
+        if (!is$2.number(volume)) {
           volume = this.config.volume;
         } // Maximum is volumeMax
 
@@ -10030,7 +11893,7 @@ typeof navigator === "object" && (function (global, factory) {
 
         this.media.volume = volume; // If muted, and we're increasing volume manually, reset muted state
 
-        if (!is$1.empty(value) && this.muted && volume > 0) {
+        if (!is$2.empty(value) && this.muted && volume > 0) {
           this.muted = false;
         }
       }
@@ -10046,12 +11909,12 @@ typeof navigator === "object" && (function (global, factory) {
       set: function set(mute) {
         var toggle = mute; // Load muted state from storage
 
-        if (!is$1.boolean(toggle)) {
+        if (!is$2.boolean(toggle)) {
           toggle = this.storage.get('muted');
         } // Use config if all else fails
 
 
-        if (!is$1.boolean(toggle)) {
+        if (!is$2.boolean(toggle)) {
           toggle = this.config.muted;
         } // Update config
 
@@ -10088,7 +11951,7 @@ typeof navigator === "object" && (function (global, factory) {
       }
       /**
        * Set playback speed
-       * @param {number} speed - the speed of playback (0.5-2.0)
+       * @param {Number} speed - the speed of playback (0.5-2.0)
        */
 
     }, {
@@ -10096,15 +11959,15 @@ typeof navigator === "object" && (function (global, factory) {
       set: function set(input) {
         var speed = null;
 
-        if (is$1.number(input)) {
+        if (is$2.number(input)) {
           speed = input;
         }
 
-        if (!is$1.number(speed)) {
+        if (!is$2.number(speed)) {
           speed = this.storage.get('speed');
         }
 
-        if (!is$1.number(speed)) {
+        if (!is$2.number(speed)) {
           speed = this.config.speed.selected;
         } // Set min/max
 
@@ -10137,7 +12000,7 @@ typeof navigator === "object" && (function (global, factory) {
       /**
        * Set playback quality
        * Currently HTML5 & YouTube only
-       * @param {number} input - Quality level
+       * @param {Number} input - Quality level
        */
 
     }, {
@@ -10150,7 +12013,7 @@ typeof navigator === "object" && (function (global, factory) {
           return;
         }
 
-        var quality = [!is$1.empty(input) && Number(input), this.storage.get('quality'), config.selected, config.default].find(is$1.number);
+        var quality = [!is$2.empty(input) && Number(input), this.storage.get('quality'), config.selected, config.default].find(is$2.number);
         var updateStorage = true;
 
         if (!options.includes(quality)) {
@@ -10182,13 +12045,13 @@ typeof navigator === "object" && (function (global, factory) {
       /**
        * Toggle loop
        * TODO: Finish fancy new logic. Set the indicator on load as user may pass loop as config
-       * @param {boolean} input - Whether to loop or not
+       * @param {Boolean} input - Whether to loop or not
        */
 
     }, {
       key: "loop",
       set: function set(input) {
-        var toggle = is$1.boolean(input) ? input : this.config.loop.active;
+        var toggle = is$2.boolean(input) ? input : this.config.loop.active;
         this.config.loop.active = toggle;
         this.media.loop = toggle; // Set default to be a true toggle
 
@@ -10238,7 +12101,7 @@ typeof navigator === "object" && (function (global, factory) {
       }
       /**
        * Set new media source
-       * @param {object} input - The new source object (see docs)
+       * @param {Object} input - The new source object (see docs)
        */
 
     }, {
@@ -10261,11 +12124,11 @@ typeof navigator === "object" && (function (global, factory) {
       key: "download",
       get: function get() {
         var download = this.config.urls.download;
-        return is$1.url(download) ? download : this.source;
+        return is$2.url(download) ? download : this.source;
       }
       /**
        * Set the poster image for a video
-       * @param {input} - the URL for the new poster image
+       * @param {String} input - the URL for the new poster image
        */
 
     }, {
@@ -10291,13 +12154,13 @@ typeof navigator === "object" && (function (global, factory) {
       }
       /**
        * Set the autoplay state
-       * @param {boolean} input - Whether to autoplay or not
+       * @param {Boolean} input - Whether to autoplay or not
        */
 
     }, {
       key: "autoplay",
       set: function set(input) {
-        var toggle = is$1.boolean(input) ? input : this.config.autoplay;
+        var toggle = is$2.boolean(input) ? input : this.config.autoplay;
         this.config.autoplay = toggle;
       }
       /**
@@ -10325,7 +12188,7 @@ typeof navigator === "object" && (function (global, factory) {
       /**
        * Set the wanted language for captions
        * Since tracks can be added later it won't update the actual caption track until there is a matching track
-       * @param {string} - Two character ISO language code (e.g. EN, FR, PT, etc)
+       * @param {String} - Two character ISO language code (e.g. EN, FR, PT, etc)
        */
 
     }, {
@@ -10355,15 +12218,15 @@ typeof navigator === "object" && (function (global, factory) {
         } // Toggle based on current state if not passed
 
 
-        var toggle = is$1.boolean(input) ? input : !this.pip; // Toggle based on current state
+        var toggle = is$2.boolean(input) ? input : !this.pip; // Toggle based on current state
         // Safari
 
-        if (is$1.function(this.media.webkitSetPresentationMode)) {
+        if (is$2.function(this.media.webkitSetPresentationMode)) {
           this.media.webkitSetPresentationMode(toggle ? pip.active : pip.inactive);
         } // Chrome
 
 
-        if (is$1.function(this.media.requestPictureInPicture)) {
+        if (is$2.function(this.media.requestPictureInPicture)) {
           if (!this.pip && toggle) {
             this.media.requestPictureInPicture();
           } else if (this.pip && !toggle) {
@@ -10381,7 +12244,7 @@ typeof navigator === "object" && (function (global, factory) {
         } // Safari
 
 
-        if (!is$1.empty(this.media.webkitPresentationMode)) {
+        if (!is$2.empty(this.media.webkitPresentationMode)) {
           return this.media.webkitPresentationMode === pip.active;
         } // Chrome
 
@@ -10395,8 +12258,8 @@ typeof navigator === "object" && (function (global, factory) {
       }
       /**
        * Load an SVG sprite into the page
-       * @param {string} url - URL for the SVG sprite
-       * @param {string} [id] - Unique ID
+       * @param {String} url - URL for the SVG sprite
+       * @param {String} [id] - Unique ID
        */
 
     }, {
@@ -10407,7 +12270,7 @@ typeof navigator === "object" && (function (global, factory) {
       /**
        * Setup multiple instances
        * @param {*} selector
-       * @param {object} options
+       * @param {Object} options
        */
 
     }, {
@@ -10416,15 +12279,15 @@ typeof navigator === "object" && (function (global, factory) {
         var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
         var targets = null;
 
-        if (is$1.string(selector)) {
+        if (is$2.string(selector)) {
           targets = Array.from(document.querySelectorAll(selector));
-        } else if (is$1.nodeList(selector)) {
+        } else if (is$2.nodeList(selector)) {
           targets = Array.from(selector);
-        } else if (is$1.array(selector)) {
-          targets = selector.filter(is$1.element);
+        } else if (is$2.array(selector)) {
+          targets = selector.filter(is$2.element);
         }
 
-        if (is$1.empty(targets)) {
+        if (is$2.empty(targets)) {
           return null;
         }
 
@@ -10437,12 +12300,10 @@ typeof navigator === "object" && (function (global, factory) {
     return Plyr;
   }();
 
-  Plyr.defaults = cloneDeep(defaults);
+  Plyr.defaults = cloneDeep(defaults$1);
 
   // ==========================================================================
 
   return Plyr;
 
 })));
-
-//# sourceMappingURL=plyr.polyfilled.js.map

@@ -94,6 +94,9 @@ class Fullscreen {
         // Scroll position
         this.scrollPosition = { x: 0, y: 0 };
 
+        // Force the use of 'full window/browser' rather than fullscreen
+        this.forceFallback = player.config.fullscreen.fallback === 'force';
+
         // Register event listeners
         // Handle event (incase user presses escape etc)
         on.call(
@@ -128,6 +131,11 @@ class Fullscreen {
             document.mozFullScreenEnabled ||
             document.msFullscreenEnabled
         );
+    }
+
+    // If we're actually using native
+    get usingNative() {
+        return Fullscreen.native && !this.forceFallback;
     }
 
     // Get the prefix for handlers
@@ -174,7 +182,7 @@ class Fullscreen {
         }
 
         // Fallback using classname
-        if (!Fullscreen.native) {
+        if (!Fullscreen.native || this.forceFallback) {
             return hasClass(this.target, this.player.config.classNames.fullscreen.fallback);
         }
 
@@ -193,7 +201,17 @@ class Fullscreen {
     // Update UI
     update() {
         if (this.enabled) {
-            this.player.debug.log(`${Fullscreen.native ? 'Native' : 'Fallback'} fullscreen enabled`);
+            let mode;
+
+            if (this.forceFallback) {
+                mode = 'Fallback (forced)';
+            } else if (Fullscreen.native) {
+                mode = 'Native';
+            } else {
+                mode = 'Fallback';
+            }
+
+            this.player.debug.log(`${mode} fullscreen enabled`);
         } else {
             this.player.debug.log('Fullscreen not supported and fallback disabled');
         }
@@ -211,7 +229,7 @@ class Fullscreen {
         // iOS native fullscreen doesn't need the request step
         if (browser.isIos && this.player.config.fullscreen.iosNative) {
             this.target.webkitEnterFullscreen();
-        } else if (!Fullscreen.native) {
+        } else if (!Fullscreen.native || this.forceFallback) {
             toggleFallback.call(this, true);
         } else if (!this.prefix) {
             this.target.requestFullscreen();
@@ -230,7 +248,7 @@ class Fullscreen {
         if (browser.isIos && this.player.config.fullscreen.iosNative) {
             this.target.webkitExitFullscreen();
             this.player.play();
-        } else if (!Fullscreen.native) {
+        } else if (!Fullscreen.native || this.forceFallback) {
             toggleFallback.call(this, false);
         } else if (!this.prefix) {
             (document.cancelFullScreen || document.exitFullscreen).call(document);

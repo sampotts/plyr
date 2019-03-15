@@ -5,6 +5,7 @@
 import support from './support';
 import { removeElement } from './utils/elements';
 import { triggerEvent } from './utils/events';
+import is from './utils/is';
 
 const html5 = {
     getSources() {
@@ -14,8 +15,16 @@ const html5 = {
 
         const sources = Array.from(this.media.querySelectorAll('source'));
 
-        // Filter out unsupported sources
-        return sources.filter(source => support.mime.call(this, source.getAttribute('type')));
+        // Filter out unsupported sources (if type is specified)
+        return sources.filter(source => {
+            const type = source.getAttribute('type');
+
+            if (is.empty(type)) {
+                return true;
+            }
+
+            return support.mime.call(this, type);
+        });
     },
 
     // Get quality levels

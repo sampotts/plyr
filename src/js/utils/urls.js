@@ -6,8 +6,8 @@ import is from './is';
 
 /**
  * Parse a string to a URL object
- * @param {string} input - the URL to be parsed
- * @param {boolean} safe - failsafe parsing
+ * @param {String} input - the URL to be parsed
+ * @param {Boolean} safe - failsafe parsing
  */
 export function parseUrl(input, safe = true) {
     let url = input;
