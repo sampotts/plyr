@@ -2027,7 +2027,7 @@ var controls = {
     list.appendChild(menuItem);
   },
   // Format a time for display
-  formatTime: function formatTime$$1() {
+  formatTime: function formatTime$1() {
     var time = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
     var inverted = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
@@ -2147,8 +2147,8 @@ var controls = {
       range.setAttribute('aria-valuenow', this.currentTime);
       var currentTime = controls.formatTime(this.currentTime);
       var duration = controls.formatTime(this.duration);
-      var format$$1 = i18n.get('seekLabel', this.config);
-      range.setAttribute('aria-valuetext', format$$1.replace('{currentTime}', currentTime).replace('{duration}', duration));
+      var format = i18n.get('seekLabel', this.config);
+      range.setAttribute('aria-valuetext', format.replace('{currentTime}', currentTime).replace('{duration}', duration));
     } else if (matches$1(range, this.config.selectors.inputs.volume)) {
       var percent = range.value * 100;
       range.setAttribute('aria-valuenow', percent);
@@ -4380,13 +4380,13 @@ var ui = {
   },
   // Toggle controls based on state and `force` argument
   toggleControls: function toggleControls(force) {
-    var controls$$1 = this.elements.controls;
+    var controls = this.elements.controls;
 
-    if (controls$$1 && this.config.hideControls) {
+    if (controls && this.config.hideControls) {
       // Don't hide controls if a touch-device user recently seeked. (Must be limited to touch devices, or it occasionally prevents desktop controls from hiding.)
       var recentTouchSeek = this.touch && this.lastSeekTime + 2000 > Date.now(); // Show controls if force, loading, paused, button interaction, or recent seek, otherwise hide
 
-      this.toggleControls(Boolean(force || this.loading || this.paused || controls$$1.pressed || controls$$1.hover || recentTouchSeek));
+      this.toggleControls(Boolean(force || this.loading || this.paused || controls.pressed || controls.hover || recentTouchSeek));
     }
   }
 };
@@ -4692,11 +4692,11 @@ function () {
 
 
       on.call(player, elements.container, 'mousemove mouseleave touchstart touchmove enterfullscreen exitfullscreen', function (event) {
-        var controls$$1 = elements.controls; // Remove button states for fullscreen
+        var controls = elements.controls; // Remove button states for fullscreen
 
-        if (controls$$1 && event.type === 'enterfullscreen') {
-          controls$$1.pressed = false;
-          controls$$1.hover = false;
+        if (controls && event.type === 'enterfullscreen') {
+          controls.pressed = false;
+          controls.hover = false;
         } // Show, then hide after a timeout unless another control event occurs
 
 
@@ -4951,7 +4951,7 @@ function () {
 
   }, {
     key: "controls",
-    value: function controls$$1() {
+    value: function controls$1() {
       var _this3 = this;
 
       var player = this.player;
@@ -5320,16 +5320,23 @@ var loadjs_umd = createCommonjsModule(function (module, exports) {
           maxTries = (args.numRetries || 0) + 1,
           beforeCallbackFn = args.before || devnull,
           pathStripped = path.replace(/^(css|img)!/, ''),
-          isCss,
+          isLegacyIECss,
           e;
       numTries = numTries || 0;
 
       if (/(^css!|\.css$)/.test(path)) {
-        isCss = true; // css
-
+        // css
         e = doc.createElement('link');
         e.rel = 'stylesheet';
-        e.href = pathStripped; //.replace(/^css!/, '');  // remove "css!" prefix
+        e.href = pathStripped; // tag IE9+
+
+        isLegacyIECss = 'hideFocus' in e; // use preload in IE Edge (to detect load errors)
+
+        if (isLegacyIECss && e.relList) {
+          isLegacyIECss = 0;
+          e.rel = 'preload';
+          e.as = 'style';
+        }
       } else if (/(^img!|\.(png|gif|jpg|svg)$)/.test(path)) {
         // image
         e = doc.createElement('img');
@@ -5342,10 +5349,10 @@ var loadjs_umd = createCommonjsModule(function (module, exports) {
       }
 
       e.onload = e.onerror = e.onbeforeload = function (ev) {
-        var result = ev.type[0]; // Note: The following code isolates IE using `hideFocus` and treats empty
-        // stylesheets as failures to get around lack of onerror support
+        var result = ev.type[0]; // treat empty stylesheets as failures to get around lack of onerror
+        // support in IE9-11
 
-        if (isCss && 'hideFocus' in e) {
+        if (isLegacyIECss) {
           try {
             if (!e.sheet.cssText.length) result = 'e';
           } catch (x) {
@@ -5363,6 +5370,9 @@ var loadjs_umd = createCommonjsModule(function (module, exports) {
           if (numTries < maxTries) {
             return loadFile(path, callbackFn, args, numTries);
           }
+        } else if (e.rel == 'preload' && e.as == 'style') {
+          // activate preloaded stylesheets
+          return e.rel = 'stylesheet'; // jshint ignore:line
         } // execute callback
 
 
@@ -5428,15 +5438,26 @@ var loadjs_umd = createCommonjsModule(function (module, exports) {
         } else {
           bundleIdCache[bundleId] = true;
         }
-      } // load scripts
+      }
+
+      function loadFn(resolve, reject) {
+        loadFiles(paths, function (pathsNotFound) {
+          // execute callbacks
+          executeCallbacks(args, pathsNotFound); // resolve Promise
+
+          if (resolve) {
+            executeCallbacks({
+              success: resolve,
+              error: reject
+            }, pathsNotFound);
+          } // publish bundle load event
 
 
-      loadFiles(paths, function (pathsNotFound) {
-        // execute callbacks
-        executeCallbacks(args, pathsNotFound); // publish bundle load event
+          publish(bundleId, pathsNotFound);
+        }, args);
+      }
 
-        publish(bundleId, pathsNotFound);
-      }, args);
+      if (args.returnPromise) return new Promise(loadFn);else loadFn();
     }
     /**
      * Execute callbacks when dependencies have been satisfied.
@@ -5542,7 +5563,7 @@ var vimeo = {
     }
   },
   // API Ready
-  ready: function ready$$1() {
+  ready: function ready() {
     var _this2 = this;
 
     var player = this;
@@ -5921,7 +5942,7 @@ var youtube = {
     }
   },
   // API ready
-  ready: function ready$$1() {
+  ready: function ready() {
     var player = this; // Ignore already setup (race condition)
 
     var currentId = player.media.getAttribute('id');
@@ -5949,8 +5970,8 @@ var youtube = {
     });
     player.media = replaceElement(container, player.media); // Id to poster wrapper
 
-    var posterSrc = function posterSrc(format$$1) {
-      return "https://img.youtube.com/vi/".concat(videoId, "/").concat(format$$1, "default.jpg");
+    var posterSrc = function posterSrc(format) {
+      return "https://img.youtube.com/vi/".concat(videoId, "/").concat(format, "default.jpg");
     }; // Check thumbnail images in order of quality, but reject fallback thumbnails (120px wide)
 
 
@@ -6343,7 +6364,7 @@ function () {
 
   }, {
     key: "ready",
-    value: function ready$$1() {
+    value: function ready() {
       var _this3 = this;
 
       // Start ticking our safety timer. If the whole advertisement
@@ -6827,7 +6848,7 @@ function () {
 
   }, {
     key: "on",
-    value: function on$$1(event, callback) {
+    value: function on(event, callback) {
       if (!is$1.array(this.events[event])) {
         this.events[event] = [];
       }
@@ -8175,7 +8196,7 @@ function () {
 
   }, {
     key: "on",
-    value: function on$$1(event, callback) {
+    value: function on$1(event, callback) {
       on.call(this, this.elements.container, event, callback);
     }
     /**
@@ -8186,7 +8207,7 @@ function () {
 
   }, {
     key: "once",
-    value: function once$$1(event, callback) {
+    value: function once$1(event, callback) {
       once.call(this, this.elements.container, event, callback);
     }
     /**
@@ -8197,7 +8218,7 @@ function () {
 
   }, {
     key: "off",
-    value: function off$$1(event, callback) {
+    value: function off$1(event, callback) {
       off(this.elements.container, event, callback);
     }
     /**
@@ -8856,7 +8877,7 @@ function () {
 
   }, {
     key: "loadSprite",
-    value: function loadSprite$$1(url, id) {
+    value: function loadSprite$1(url, id) {
       return loadSprite(url, id);
     }
     /**

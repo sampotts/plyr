@@ -5,6 +5,10 @@
         }
     ],
     "settings": {
+        "search.exclude": {
+            "**/node_modules": true,
+            "**/dist": true
+        },
         // Linting
         "stylelint.enable": true,
         "css.validate": false,
