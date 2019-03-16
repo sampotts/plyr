@@ -19,7 +19,7 @@ export const types = {
  */
 export function getProviderByUrl(url) {
     // YouTube
-    if (/^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$/.test(url)) {
+    if (/^(https?:\/\/)?(www\.)?(youtube\.com|youtube-nocookie\.com|youtu\.?be)\/.+$/.test(url)) {
         return providers.youtube;
     }
 

@@ -5,6 +5,7 @@
 // ==========================================================================
 
 import Raven from 'raven-js';
+import Plyr from '../../../src/js/plyr';
 
 (() => {
     const { host } = window.location;
@@ -18,8 +19,8 @@ import Raven from 'raven-js';
             const selector = '#player';
             const container = document.getElementById('container');
 
-            if (window.shr) {
-                window.shr.setup({
+            if (window.Shr) {
+                window.Shr.setup('.js-shr-button', {
                     count: {
                         classname: 'button__count',
                     },
@@ -61,7 +62,7 @@ import Raven from 'raven-js';
             const player = new Plyr(selector, {
                 debug: true,
                 title: 'View From A Blue Moon',
-                iconUrl: '../dist/plyr.svg',
+                iconUrl: 'dist/demo.svg',
                 keyboard: {
                     global: true,
                 },
@@ -77,6 +78,13 @@ import Raven from 'raven-js';
                 ads: {
                     enabled: env.prod || env.dev,
                     publisherId: '918848828995742',
+                },
+                previewThumbnails: {
+                    enabled: true,
+                    src: [
+                        'https://cdn.plyr.io/static/demo/thumbs/100p.vtt',
+                        'https://cdn.plyr.io/static/demo/thumbs/240p.vtt',
+                    ],
                 },
             });
 
@@ -276,27 +284,4 @@ import Raven from 'raven-js';
     if (env.prod) {
         Raven.config('https://d4ad9866ad834437a4754e23937071e4@sentry.io/305555').install();
     }
-
-    // Google analytics
-    // For demo site (https://plyr.io) only
-    /* eslint-disable */
-    if (env.prod) {
-        ((i, s, o, g, r, a, m) => {
-            i.GoogleAnalyticsObject = r;
-            i[r] =
-                i[r] ||
-                function() {
-                    (i[r].q = i[r].q || []).push(arguments);
-                };
-            i[r].l = 1 * new Date();
-            a = s.createElement(o);
-            m = s.getElementsByTagName(o)[0];
-            a.async = 1;
-            a.src = g;
-            m.parentNode.insertBefore(a, m);
-        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
-        window.ga('create', 'UA-40881672-11', 'auto');
-        window.ga('send', 'pageview');
-    }
-    /* eslint-enable */
 })();

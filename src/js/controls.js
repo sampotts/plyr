@@ -3,13 +3,27 @@
 // TODO: This needs to be split into smaller files and cleaned up
 // ==========================================================================
 
+import RangeTouch from 'rangetouch';
 import captions from './captions';
 import html5 from './html5';
 import support from './support';
 import { repaint, transitionEndEvent } from './utils/animation';
 import { dedupe } from './utils/arrays';
 import browser from './utils/browser';
-import { createElement, emptyElement, getAttributesFromSelector, getElement, getElements, hasClass, matches, removeElement, setAttributes, setFocus, toggleClass, toggleHidden } from './utils/elements';
+import {
+    createElement,
+    emptyElement,
+    getAttributesFromSelector,
+    getElement,
+    getElements,
+    hasClass,
+    matches,
+    removeElement,
+    setAttributes,
+    setFocus,
+    toggleClass,
+    toggleHidden,
+} from './utils/elements';
 import { off, on } from './utils/events';
 import i18n from './utils/i18n';
 import is from './utils/is';
@@ -321,6 +335,9 @@ const controls = {
         // Set the fill for webkit now
         controls.updateRangeFill.call(this, input);
 
+        // Improve support on touch devices
+        RangeTouch.setup(input);
+
         return input;
     },
 
@@ -334,7 +351,7 @@ const controls = {
                     min: 0,
                     max: 100,
                     value: 0,
-                    role: 'presentation',
+                    role: 'progressbar',
                     'aria-hidden': true,
                 },
                 attributes,
@@ -667,7 +684,7 @@ const controls = {
         }
 
         // Set CSS custom property
-        range.style.setProperty('--value', `${range.value / range.max * 100}%`);
+        range.style.setProperty('--value', `${(range.value / range.max) * 100}%`);
     },
 
     // Update hover tooltip for seeking
@@ -699,7 +716,7 @@ const controls = {
 
         // Determine percentage, if already visible
         if (is.event(event)) {
-            percent = 100 / clientRect.width * (event.pageX - clientRect.left);
+            percent = (100 / clientRect.width) * (event.pageX - clientRect.left);
         } else if (hasClass(this.elements.display.seekTooltip, visible)) {
             percent = parseFloat(this.elements.display.seekTooltip.style.left, 10);
         } else {
@@ -714,7 +731,7 @@ const controls = {
         }
 
         // Display the time a click would seek to
-        controls.updateTimeDisplay.call(this, this.elements.display.seekTooltip, this.duration / 100 * percent);
+        controls.updateTimeDisplay.call(this, this.elements.display.seekTooltip, (this.duration / 100) * percent);
 
         // Set position
         this.elements.display.seekTooltip.style.left = `${percent}%`;
@@ -1587,7 +1604,7 @@ const controls = {
 
         // If function, run it and use output
         if (is.function(this.config.controls)) {
-            this.config.controls = this.config.controls.call(this.props);
+            this.config.controls = this.config.controls.call(this, props);
         }
 
         // Convert falsy controls to empty array (primarily for empty strings)
@@ -1674,15 +1691,17 @@ const controls = {
                 .filter(Boolean)
                 .forEach(button => {
                     if (is.array(button) || is.nodeList(button)) {
-                        Array.from(button).filter(Boolean).forEach(addProperty);
+                        Array.from(button)
+                            .filter(Boolean)
+                            .forEach(addProperty);
                     } else {
                         addProperty(button);
                     }
                 });
         }
 
-        // Edge sometimes doesn't finish the paint so force a redraw
-        if (window.navigator.userAgent.includes('Edge')) {
+        // Edge sometimes doesn't finish the paint so force a repaint
+        if (browser.isEdge) {
             repaint(target);
         }
 

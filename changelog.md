@@ -1,3 +1,28 @@
+## v3.5.2
+
+-   Fixed issue where the preview thumbnail was present while scrubbing
+
+## v3.5.1
+
+-   Fixed build issues with babel and browserslist
+
+## v3.5.0
+
+-   Preview seek/scrubbing thumbnails (thanks @jamesoflol)
+-   Fixes for proxy listeners (thanks @gurupras)
+-   Fix for buffer progress transition on WebKit (thanks @samuelgozi)
+-   Fix for error when mime type not specified (fixes #1274)
+-   Support YouTube noCookie (thanks Omar Khatib)
+-   Add Angular plugin reference (thanks @smnbbrv)
+-   Use `Math.trunc` instead of `parseInt` (thanks @taion)
+-   Many fixes for fullscreen in embedded players with non 16:9 screens or videos
+-   Added 'force' fallback option for fullscreen
+-   [RangeTouch](https://rangetouch.com) is now bundled with Plyr as a dependency to fix the scrubber on touch devices
+
+### v3.4.8
+
+-   Calling customized controls function with proper arguments (thanks @a60814billy)
+
 ### v3.4.7
 
 -   Fix for Vimeo fullscreen with non native aspect ratios (fixes #854)
@@ -48,7 +73,7 @@
 -   Add support for YouTube's hl param (thanks @renaudleo)
 -   Fix for captions positioning when no controls (thanks @friday and @mjfwebb)
 -   Fix #1108: Make sure youtube.onReady doesn't run twice (thanks @friday)
--   Fix for WebKit redraw loop on the `<input type="range">` elements
+-   Fix for WebKit repaint loop on the `<input type="range">` elements
 
 ### v3.3.22
 

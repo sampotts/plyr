@@ -7,8 +7,9 @@ import ui from './ui';
 import { repaint } from './utils/animation';
 import browser from './utils/browser';
 import { getElement, getElements, matches, toggleClass, toggleHidden } from './utils/elements';
-import { on, once, toggleListener, triggerEvent } from './utils/events';
+import { off, on, once, toggleListener, triggerEvent } from './utils/events';
 import is from './utils/is';
+import { setAspectRatio } from './utils/style';
 
 class Listeners {
     constructor(player) {
@@ -164,7 +165,7 @@ class Listeners {
 
             // Escape is handle natively when in full screen
             // So we only need to worry about non native
-            if (!player.fullscreen.enabled && player.fullscreen.active && code === 27) {
+            if (code === 27 && !player.fullscreen.usingNative && player.fullscreen.active) {
                 player.fullscreen.toggle();
             }
 
@@ -261,10 +262,10 @@ class Listeners {
     // Container listeners
     container() {
         const { player } = this;
-        const { elements } = player;
+        const { config, elements, timers } = player;
 
         // Keyboard shortcuts
-        if (!player.config.keyboard.global && player.config.keyboard.focused) {
+        if (!config.keyboard.global && config.keyboard.focused) {
             on.call(player, elements.container, 'keydown keyup', this.handleKey, false);
         }
 
@@ -294,12 +295,78 @@ class Listeners {
                 }
 
                 // Clear timer
-                clearTimeout(player.timers.controls);
+                clearTimeout(timers.controls);
 
                 // Set new timer to prevent flicker when seeking
-                player.timers.controls = setTimeout(() => ui.toggleControls.call(player, false), delay);
+                timers.controls = setTimeout(() => ui.toggleControls.call(player, false), delay);
             },
         );
+
+        // Force edge to repaint on exit fullscreen
+        // TODO: Fix weird bug where Edge doesn't re-draw when exiting fullscreen
+        /* if (browser.isEdge) {
+            on.call(player, elements.container, 'exitfullscreen', () => {
+                setTimeout(() => repaint(elements.container), 100);
+            });
+        } */
+
+        // Set a gutter for Vimeo
+        const setGutter = (ratio, padding, toggle) => {
+            if (!player.isVimeo) {
+                return;
+            }
+
+            const target = player.elements.wrapper.firstChild;
+            const [, height] = ratio.split(':').map(Number);
+            const [videoWidth, videoHeight] = player.embed.ratio.split(':').map(Number);
+
+            target.style.maxWidth = toggle ? `${(height / videoHeight) * videoWidth}px` : null;
+            target.style.margin = toggle ? '0 auto' : null;
+        };
+
+        // Resize on fullscreen change
+        const setPlayerSize = measure => {
+            // If we don't need to measure the viewport
+            if (!measure) {
+                return setAspectRatio.call(player);
+            }
+
+            const rect = elements.container.getBoundingClientRect();
+            const { width, height } = rect;
+
+            return setAspectRatio.call(player, `${width}:${height}`);
+        };
+
+        const resized = () => {
+            window.clearTimeout(timers.resized);
+            timers.resized = window.setTimeout(setPlayerSize, 50);
+        };
+
+        on.call(player, elements.container, 'enterfullscreen exitfullscreen', event => {
+            const { target, usingNative } = player.fullscreen;
+
+            // Ignore for iOS native
+            if (!player.isEmbed || target !== elements.container) {
+                return;
+            }
+
+            const isEnter = event.type === 'enterfullscreen';
+
+            // Set the player size when entering fullscreen to viewport size
+            const { padding, ratio } = setPlayerSize(isEnter);
+
+            // Set Vimeo gutter
+            setGutter(ratio, padding, isEnter);
+
+            // If not using native fullscreen, we need to check for resizes of viewport
+            if (!usingNative) {
+                if (isEnter) {
+                    on.call(player, window, 'resize', resized);
+                } else {
+                    off.call(player, window, 'resize', resized);
+                }
+            }
+        });
     }
 
     // Listen for media events
@@ -347,20 +414,6 @@ class Listeners {
         // Loading state
         on.call(player, player.media, 'waiting canplay seeked playing', event => ui.checkLoading.call(player, event));
 
-        // If autoplay, then load advertisement if required
-        // TODO: Show some sort of loading state while the ad manager loads else there's a delay before ad shows
-        on.call(player, player.media, 'playing', () => {
-            if (!player.ads) {
-                return;
-            }
-
-            // If ads are enabled, wait for them first
-            if (player.ads.enabled && !player.ads.initialized) {
-                // Wait for manager response
-                player.ads.managerPromise.then(() => player.ads.play()).catch(() => player.play());
-            }
-        });
-
         // Click video
         if (player.supported.ui && player.config.clickToPlay && !player.isAudio) {
             // Re-fetch the wrapper
@@ -386,10 +439,10 @@ class Listeners {
                 }
 
                 if (player.ended) {
-                    player.restart();
-                    player.play();
+                    this.proxy(event, player.restart, 'restart');
+                    this.proxy(event, player.play, 'play');
                 } else {
-                    player.togglePlay();
+                    this.proxy(event, player.togglePlay, 'play');
                 }
             });
         }
@@ -672,6 +725,42 @@ class Listeners {
         this.bind(elements.progress, 'mouseenter mouseleave mousemove', event =>
             controls.updateSeekTooltip.call(player, event),
         );
+
+        // Preview thumbnails plugin
+        // TODO: Really need to work on some sort of plug-in wide event bus or pub-sub for this
+        this.bind(elements.progress, 'mousemove touchmove', event => {
+            const { previewThumbnails } = player;
+
+            if (previewThumbnails && previewThumbnails.loaded) {
+                previewThumbnails.startMove(event);
+            }
+        });
+
+        // Hide thumbnail preview - on mouse click, mouse leave, and video play/seek. All four are required, e.g., for buffering
+        this.bind(elements.progress, 'mouseleave click', () => {
+            const { previewThumbnails } = player;
+
+            if (previewThumbnails && previewThumbnails.loaded) {
+                previewThumbnails.endMove(false, true);
+            }
+        });
+
+        // Show scrubbing preview
+        this.bind(elements.progress, 'mousedown touchstart', event => {
+            const { previewThumbnails } = player;
+
+            if (previewThumbnails && previewThumbnails.loaded) {
+                previewThumbnails.startScrubbing(event);
+            }
+        });
+
+        this.bind(elements.progress, 'mouseup touchend', event => {
+            const { previewThumbnails } = player;
+
+            if (previewThumbnails && previewThumbnails.loaded) {
+                previewThumbnails.endScrubbing(event);
+            }
+        });
 
         // Polyfill for lower fill in <input type="range"> for webkit
         if (browser.isWebkit) {

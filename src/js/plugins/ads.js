@@ -17,12 +17,12 @@ import { buildUrlParams } from '../utils/urls';
 class Ads {
     /**
      * Ads constructor.
-     * @param {object} player
+     * @param {Object} player
      * @return {Ads}
      */
     constructor(player) {
         this.player = player;
-        this.publisherId = player.config.ads.publisherId;
+        this.config = player.config.ads;
         this.playing = false;
         this.initialized = false;
         this.elements = {
@@ -49,8 +49,13 @@ class Ads {
     }
 
     get enabled() {
+        const { config } = this;
+
         return (
-            this.player.isHTML5 && this.player.isVideo && this.player.config.ads.enabled && !is.empty(this.publisherId)
+            this.player.isHTML5 &&
+            this.player.isVideo &&
+            config.enabled &&
+            (!is.empty(config.publisherId) || is.url(config.tagUrl))
         );
     }
 
@@ -95,8 +100,14 @@ class Ads {
         this.setupIMA();
     }
 
-    // Build the default tag URL
+    // Build the tag URL
     get tagUrl() {
+        const { config } = this;
+
+        if (is.url(config.tagUrl)) {
+            return config.tagUrl;
+        }
+
         const params = {
             AV_PUBLISHERID: '58c25bb0073ef448b1087ad6',
             AV_CHANNELID: '5a0458dc28a06145e4519d21',
@@ -125,6 +136,7 @@ class Ads {
         this.elements.container = createElement('div', {
             class: this.player.config.classNames.ads,
         });
+
         this.player.elements.container.appendChild(this.elements.container);
 
         // So we can run VPAID2
@@ -133,9 +145,11 @@ class Ads {
         // Set language
         google.ima.settings.setLocale(this.player.config.ads.language);
 
-        // We assume the adContainer is the video container of the plyr element
-        // that will house the ads
-        this.elements.displayContainer = new google.ima.AdDisplayContainer(this.elements.container);
+        // Set playback for iOS10+
+        google.ima.settings.setDisableCustomPlaybackForIOS10Plus(this.player.config.playsinline);
+
+        // We assume the adContainer is the video container of the plyr element that will house the ads
+        this.elements.displayContainer = new google.ima.AdDisplayContainer(this.elements.container, this.player.media);
 
         // Request video ads to be pre-loaded
         this.requestAds();
@@ -184,7 +198,7 @@ class Ads {
 
     /**
      * Update the ad countdown
-     * @param {boolean} start
+     * @param {Boolean} start
      */
     pollCountdown(start = false) {
         if (!start) {
@@ -226,25 +240,6 @@ class Ads {
         // Get the cue points for any mid-rolls by filtering out the pre- and post-roll
         this.cuePoints = this.manager.getCuePoints();
 
-        // Add advertisement cue's within the time line if available
-        if (!is.empty(this.cuePoints)) {
-            this.cuePoints.forEach(cuePoint => {
-                if (cuePoint !== 0 && cuePoint !== -1 && cuePoint < this.player.duration) {
-                    const seekElement = this.player.elements.progress;
-
-                    if (is.element(seekElement)) {
-                        const cuePercentage = 100 / this.player.duration * cuePoint;
-                        const cue = createElement('span', {
-                            class: this.player.config.classNames.cues,
-                        });
-
-                        cue.style.left = `${cuePercentage.toString()}%`;
-                        seekElement.appendChild(cue);
-                    }
-                }
-            });
-        }
-
         // Set volume to match player
         this.manager.setVolume(this.player.volume);
 
@@ -261,6 +256,27 @@ class Ads {
         this.trigger('loaded');
     }
 
+    addCuePoints() {
+        // Add advertisement cue's within the time line if available
+        if (!is.empty(this.cuePoints)) {
+            this.cuePoints.forEach(cuePoint => {
+                if (cuePoint !== 0 && cuePoint !== -1 && cuePoint < this.player.duration) {
+                    const seekElement = this.player.elements.progress;
+
+                    if (is.element(seekElement)) {
+                        const cuePercentage = (100 / this.player.duration) * cuePoint;
+                        const cue = createElement('span', {
+                            class: this.player.config.classNames.cues,
+                        });
+
+                        cue.style.left = `${cuePercentage.toString()}%`;
+                        seekElement.appendChild(cue);
+                    }
+                }
+            });
+        }
+    }
+
     /**
      * This is where all the event handling takes place. Retrieve the ad from the event. Some
      * events (e.g. ALL_ADS_COMPLETED) don't have the ad object associated
@@ -273,6 +289,7 @@ class Ads {
         // Retrieve the ad from the event. Some events (e.g. ALL_ADS_COMPLETED)
         // don't have ad object associated
         const ad = event.getAd();
+        const adData = event.getAdData();
 
         // Proxy event
         const dispatchEvent = type => {
@@ -368,6 +385,12 @@ class Ads {
                 dispatchEvent(event.type);
                 break;
 
+            case google.ima.AdEvent.Type.LOG:
+                if (adData.adError) {
+                    this.player.debug.warn(`Non-fatal ad error: ${adData.adError.getMessage()}`);
+                }
+                break;
+
             default:
                 break;
         }
@@ -391,14 +414,16 @@ class Ads {
         const { container } = this.player.elements;
         let time;
 
-        // Add listeners to the required events
+        this.player.on('canplay', () => {
+            this.addCuePoints();
+        });
+
         this.player.on('ended', () => {
             this.loader.contentComplete();
         });
 
-        this.player.on('seeking', () => {
+        this.player.on('timeupdate', () => {
             time = this.player.currentTime;
-            return time;
         });
 
         this.player.on('seeked', () => {
@@ -471,10 +496,8 @@ class Ads {
         // Ad is stopped
         this.playing = false;
 
-        // Play our video
-        if (this.player.currentTime < this.player.duration) {
-            this.player.play();
-        }
+        // Play video
+        this.player.media.play();
     }
 
     /**
@@ -484,11 +507,11 @@ class Ads {
         // Show the advertisement container
         this.elements.container.style.zIndex = 3;
 
-        // Ad is playing.
+        // Ad is playing
         this.playing = true;
 
         // Pause our video.
-        this.player.pause();
+        this.player.media.pause();
     }
 
     /**
@@ -536,7 +559,7 @@ class Ads {
 
     /**
      * Handles callbacks after an ad event was invoked
-     * @param {string} event - Event type
+     * @param {String} event - Event type
      */
     trigger(event, ...args) {
         const handlers = this.events[event];
@@ -552,8 +575,8 @@ class Ads {
 
     /**
      * Add event listeners
-     * @param {string} event - Event type
-     * @param {function} callback - Callback for when event occurs
+     * @param {String} event - Event type
+     * @param {Function} callback - Callback for when event occurs
      * @return {Ads}
      */
     on(event, callback) {
@@ -571,8 +594,8 @@ class Ads {
      * The advertisement has 12 seconds to get its things together. We stop this timer when the
      * advertisement is playing, or when a user action is required to start, then we clear the
      * timer on ad ready
-     * @param {number} time
-     * @param {string} from
+     * @param {Number} time
+     * @param {String} from
      */
     startSafetyTimer(time, from) {
         this.player.debug.log(`Safety timer invoked from: ${from}`);
@@ -585,7 +608,7 @@ class Ads {
 
     /**
      * Clear our safety timer(s)
-     * @param {string} from
+     * @param {String} from
      */
     clearSafetyTimer(from) {
         if (!is.nullOrUndefined(this.safetyTimer)) {
