@@ -130,7 +130,7 @@ const youtube = {
         player.media = replaceElement(container, player.media);
 
         // Id to poster wrapper
-        const posterSrc = format => `https://img.youtube.com/vi/${videoId}/${format}default.jpg`;
+        const posterSrc = format => `https://i.ytimg.com/vi/${videoId}/${format}default.jpg`;
 
         // Check thumbnail images in order of quality, but reject fallback thumbnails (120px wide)
         loadImage(posterSrc('maxres'), 121) // Higest quality and unpadded
