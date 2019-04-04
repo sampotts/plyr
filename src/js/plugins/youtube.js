@@ -34,6 +34,22 @@ function assurePlaybackState(play) {
     }
 }
 
+function useHttp() {
+    return !window.location.href.includes('https://');
+}
+
+function getYoutubeHost(config) {
+    let host;
+
+    if (config.noCookie) {
+        host = 'https://www.youtube-nocookie.com';
+    } else {
+        host = useHttp() ? 'http://www.youtube.com' : undefined;
+    }
+
+    return host;
+}
+
 const youtube = {
     setup() {
         // Add embed class for responsive
@@ -151,7 +167,7 @@ const youtube = {
         // https://developers.google.com/youtube/iframe_api_reference
         player.embed = new window.YT.Player(id, {
             videoId,
-            host: config.noCookie ? 'https://www.youtube-nocookie.com' : undefined,
+            host: getYoutubeHost(config),
             playerVars: extend(
                 {},
                 {
