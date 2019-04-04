@@ -34,20 +34,12 @@ function assurePlaybackState(play) {
     }
 }
 
-function useHttp() {
-    return !window.location.href.includes('https://');
-}
-
 function getYoutubeHost(config) {
-    let host;
-
     if (config.noCookie) {
-        host = 'https://www.youtube-nocookie.com';
-    } else {
-        host = useHttp() ? 'http://www.youtube.com' : undefined;
+        return 'https://www.youtube-nocookie.com';
     }
 
-    return host;
+    return `${window.location.protocol}//www.youtube.com`;
 }
 
 const youtube = {
