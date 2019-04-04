@@ -34,7 +34,7 @@ function assurePlaybackState(play) {
     }
 }
 
-function getYoutubeHost(config) {
+function getHost(config) {
     if (config.noCookie) {
         return 'https://www.youtube-nocookie.com';
     }
@@ -159,7 +159,7 @@ const youtube = {
         // https://developers.google.com/youtube/iframe_api_reference
         player.embed = new window.YT.Player(id, {
             videoId,
-            host: getYoutubeHost(config),
+            host: getHost(config),
             playerVars: extend(
                 {},
                 {
