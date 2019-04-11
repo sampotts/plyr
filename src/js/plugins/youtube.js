@@ -34,6 +34,14 @@ function assurePlaybackState(play) {
     }
 }
 
+function getHost(config) {
+    if (config.noCookie) {
+        return 'https://www.youtube-nocookie.com';
+    }
+
+    return `${window.location.protocol}//www.youtube.com`;
+}
+
 const youtube = {
     setup() {
         // Add embed class for responsive
@@ -130,7 +138,7 @@ const youtube = {
         player.media = replaceElement(container, player.media);
 
         // Id to poster wrapper
-        const posterSrc = format => `https://img.youtube.com/vi/${videoId}/${format}default.jpg`;
+        const posterSrc = format => `https://i.ytimg.com/vi/${videoId}/${format}default.jpg`;
 
         // Check thumbnail images in order of quality, but reject fallback thumbnails (120px wide)
         loadImage(posterSrc('maxres'), 121) // Higest quality and unpadded
@@ -151,7 +159,7 @@ const youtube = {
         // https://developers.google.com/youtube/iframe_api_reference
         player.embed = new window.YT.Player(id, {
             videoId,
-            host: config.noCookie ? 'https://www.youtube-nocookie.com' : undefined,
+            host: getHost(config),
             playerVars: extend(
                 {},
                 {
