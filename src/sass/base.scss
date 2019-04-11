@@ -7,10 +7,10 @@
     @include plyr-font-smoothing($plyr-font-smoothing);
 
     direction: ltr;
-    font-family: $plyr-font-family;
+    font-family: var(--plyr-font-family);
     font-variant-numeric: tabular-nums; // Force monosace-esque number widths
-    font-weight: $plyr-font-weight-regular;
-    line-height: $plyr-line-height;
+    font-weight: var(--plyr-font-weight-regular);
+    line-height: var(--plyr-line-height);
     max-width: 100%;
     min-width: 200px;
     position: relative;

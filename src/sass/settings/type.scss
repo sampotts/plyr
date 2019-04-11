@@ -8,9 +8,9 @@ $plyr-font-size-small: 14px !default;
 $plyr-font-size-large: 18px !default;
 $plyr-font-size-xlarge: 21px !default;
 
-$plyr-font-size-time: $plyr-font-size-small !default;
+$plyr-font-size-time: var(--plyr-font-size-small) !default;
 $plyr-font-size-badge: 9px !default;
-$plyr-font-size-menu: $plyr-font-size-small !default;
+$plyr-font-size-menu: var(--plyr-font-size-small) !default;
 
 $plyr-font-weight-regular: 500 !default;
 $plyr-font-weight-bold: 600 !default;
@@ -18,3 +18,19 @@ $plyr-font-weight-bold: 600 !default;
 $plyr-line-height: 1.7 !default;
 
 $plyr-font-smoothing: false !default;
+
+@include css-vars(
+    (
+        --plyr-font-family: $plyr-font-family,
+        --plyr-font-size-base: $plyr-font-size-base,
+        --plyr-font-size-small: $plyr-font-size-small,
+        --plyr-font-size-large: $plyr-font-size-large,
+        --plyr-font-size-xlarge: $plyr-font-size-xlarge,
+        --plyr-font-size-time: $plyr-font-size-time,
+        --plyr-font-size-badge: $plyr-font-size-badge,
+        --plyr-font-size-menu: $plyr-font-size-menu,
+        --plyr-font-weight-regular: $plyr-font-weight-regular,
+        --plyr-font-weight-bold: $plyr-font-weight-bold,
+        --plyr-line-height: $plyr-line-height
+    )
+);

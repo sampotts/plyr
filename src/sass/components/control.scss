@@ -82,7 +82,7 @@ a.plyr__control {
     border: 0;
     border-radius: 100%;
     box-shadow: 0 1px 1px rgba(#000, 0.15);
-    color: var(--plyr-video-control-color);
+    color: var(--plyr-video-control-color-hover);
     display: none;
     left: 50%;
     padding: ceil($plyr-control-spacing * 1.5);
