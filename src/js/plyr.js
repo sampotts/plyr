@@ -1088,11 +1088,13 @@ class Plyr {
         // Stop playback
         this.stop();
 
+        // Clear timeouts
+        clearTimeout(this.timers.loading);
+        clearTimeout(this.timers.controls);
+        clearTimeout(this.timers.resized);
+
         // Provider specific stuff
         if (this.isHTML5) {
-            // Clear timeout
-            clearTimeout(this.timers.loading);
-
             // Restore native video controls
             ui.toggleNativeControls.call(this, true);
 
