@@ -9,7 +9,7 @@ import browser from './utils/browser';
 import { getElement, getElements, matches, toggleClass, toggleHidden } from './utils/elements';
 import { off, on, once, toggleListener, triggerEvent } from './utils/events';
 import is from './utils/is';
-import { setAspectRatio } from './utils/style';
+import { getAspectRatio, setAspectRatio } from './utils/style';
 
 class Listeners {
     constructor(player) {
@@ -317,10 +317,10 @@ class Listeners {
             }
 
             const target = player.elements.wrapper.firstChild;
-            const [, height] = ratio.split(':').map(Number);
-            const [videoWidth, videoHeight] = player.embed.ratio.split(':').map(Number);
+            const [, y] = ratio;
+            const [videoX, videoY] = getAspectRatio.call(this);
 
-            target.style.maxWidth = toggle ? `${(height / videoHeight) * videoWidth}px` : null;
+            target.style.maxWidth = toggle ? `${(y / videoY) * videoX}px` : null;
             target.style.margin = toggle ? '0 auto' : null;
         };
 

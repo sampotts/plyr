@@ -1,3 +1,11 @@
+## v3.5.3
+
+-   Improved the usage of the `ratio` config option; it now works as expected and for all video types. The default has not changed, it is to dynamically, where possible (except YouTube where 16:9 is used) determine the ratio from the media source so this is not a breaking change.
+-   Added new `ratio` getter and setter
+-   Fix: Properly clear all timeouts on destroy
+-   Fix: Allow absolute paths in preview thumbnails
+-   Improvement: Allow optional hours and ms in VTT parser in preview thumbnails
+
 ## v3.5.2
 
 -   Fixed issue where the preview thumbnail was present while scrubbing

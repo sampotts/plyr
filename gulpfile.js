@@ -149,6 +149,7 @@ Object.entries(build.js).forEach(([filename, entry]) => {
                                             {
                                                 // debug: true,
                                                 useBuiltIns: polyfill ? 'usage' : false,
+                                                corejs: polyfill ? 3 : undefined,
                                             },
                                         ],
                                     ],

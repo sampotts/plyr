@@ -42,8 +42,9 @@ const defaults = {
     // Clicking the currentTime inverts it's value to show time left rather than elapsed
     toggleInvert: true,
 
-    // Aspect ratio (for embeds)
-    ratio: '16:9',
+    // Force an aspect ratio
+    // The format must be `'w:h'` (e.g. `'16:9'`)
+    ratio: null,
 
     // Click video container to play/pause
     clickToPlay: true,
@@ -330,6 +331,7 @@ const defaults = {
         provider: 'plyr--{0}',
         video: 'plyr__video-wrapper',
         embed: 'plyr__video-embed',
+        videoFixedRatio: 'plyr__video-wrapper--fixed-ratio',
         embedContainer: 'plyr__video-embed__container',
         poster: 'plyr__poster',
         posterEnabled: 'plyr__poster-enabled',

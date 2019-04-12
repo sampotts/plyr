@@ -39,7 +39,12 @@ function getHost(config) {
         return 'https://www.youtube-nocookie.com';
     }
 
-    return `${window.location.protocol}//www.youtube.com`;
+    if (window.location.protocol === 'http:') {
+        return 'http://www.youtube.com';
+    }
+
+    // Use YouTube's default
+    return undefined;
 }
 
 const youtube = {
@@ -394,7 +399,7 @@ const youtube = {
 
                         case 1:
                             // Restore paused state (YouTube starts playing on seek if the video hasn't been played yet)
-                            if (player.media.paused && !player.embed.hasPlayed) {
+                            if (!player.config.autoplay && player.media.paused && !player.embed.hasPlayed) {
                                 player.media.pause();
                             } else {
                                 assurePlaybackState.call(player, true);

@@ -6,6 +6,7 @@ import support from './support';
 import { removeElement } from './utils/elements';
 import { triggerEvent } from './utils/events';
 import is from './utils/is';
+import { setAspectRatio } from './utils/style';
 
 const html5 = {
     getSources() {
@@ -42,6 +43,9 @@ const html5 = {
         }
 
         const player = this;
+
+        // Set aspect ratio if set
+        setAspectRatio.call(player);
 
         // Quality
         Object.defineProperty(player.media, 'quality', {
