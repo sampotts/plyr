@@ -386,7 +386,7 @@ const youtube = {
 
                         case 1:
                             // Restore paused state (YouTube starts playing on seek if the video hasn't been played yet)
-                            if (player.media.paused && !player.embed.hasPlayed) {
+                            if (!player.config.autoplay && player.media.paused && !player.embed.hasPlayed) {
                                 player.media.pause();
                             } else {
                                 assurePlaybackState.call(player, true);
