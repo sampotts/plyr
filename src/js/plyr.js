@@ -824,6 +824,19 @@ class Plyr {
     }
 
     /**
+     * Set the download URL
+     */
+    set download(input) {
+        if (!is.url(input)) {
+            return;
+        }
+
+        this.config.urls.download = input;
+
+        controls.setDownloadUrl.call(this);
+    }
+
+    /**
      * Set the poster image for a video
      * @param {String} input - the URL for the new poster image
      */

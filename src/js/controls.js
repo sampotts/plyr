@@ -1244,8 +1244,8 @@ const controls = {
         controls.focusFirstMenuItem.call(this, target, tabFocus);
     },
 
-    // Set the download link
-    setDownloadLink() {
+    // Set the download URL
+    setDownloadUrl() {
         const button = this.elements.buttons.download;
 
         // Bail if no button
@@ -1253,7 +1253,7 @@ const controls = {
             return;
         }
 
-        // Set download link
+        // Set attribute
         button.setAttribute('href', this.download);
     },
 

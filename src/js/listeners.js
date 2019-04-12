@@ -486,7 +486,7 @@ class Listeners {
 
         // Update download link when ready and if quality changes
         on.call(player, player.media, 'ready qualitychange', () => {
-            controls.setDownloadLink.call(player);
+            controls.setDownloadUrl.call(player);
         });
 
         // Proxy events to container

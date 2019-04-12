@@ -48,14 +48,14 @@ const vimeo = {
         // Set intial ratio
         setAspectRatio.call(this);
 
-        // Load the API if not already
+        // Load the SDK if not already
         if (!is.object(window.Vimeo)) {
             loadScript(this.config.urls.vimeo.sdk)
                 .then(() => {
                     vimeo.ready.call(this);
                 })
                 .catch(error => {
-                    this.debug.warn('Vimeo API failed to load', error);
+                    this.debug.warn('Vimeo SDK (player.js) failed to load', error);
                 });
         } else {
             vimeo.ready.call(this);
@@ -259,7 +259,7 @@ const vimeo = {
             .getVideoUrl()
             .then(value => {
                 currentSrc = value;
-                controls.setDownloadLink.call(player);
+                controls.setDownloadUrl.call(player);
             })
             .catch(error => {
                 this.debug.warn(error);
