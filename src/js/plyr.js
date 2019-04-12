@@ -26,6 +26,7 @@ import { off, on, once, triggerEvent, unbindListeners } from './utils/events';
 import is from './utils/is';
 import loadSprite from './utils/loadSprite';
 import { cloneDeep, extend } from './utils/objects';
+import { getAspectRatio, reduceAspectRatio, setAspectRatio, validateRatio } from './utils/style';
 import { parseUrl } from './utils/urls';
 
 // Private properties
@@ -844,6 +845,34 @@ class Plyr {
         }
 
         return this.media.getAttribute('poster');
+    }
+
+    /**
+     * Get the current aspect ratio in use
+     */
+    get ratio() {
+        const ratio = reduceAspectRatio(getAspectRatio.call(this));
+
+        return is.array(ratio) ? ratio.join(':') : ratio;
+    }
+
+    /**
+     * Set video aspect ratio
+     */
+    set ratio(input) {
+        if (!this.isVideo) {
+            this.debug.warn('Aspect ratio can only be set for video');
+            return;
+        }
+
+        if (!is.string(input) || !validateRatio(input)) {
+            this.debug.error(`Invalid aspect ratio specified (${input})`);
+            return;
+        }
+
+        this.config.ratio = input;
+
+        setAspectRatio.call(this);
     }
 
     /**
