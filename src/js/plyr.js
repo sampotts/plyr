@@ -678,7 +678,9 @@ class Plyr {
         this.config.speed.selected = speed;
 
         // Set media speed
-        this.media.playbackRate = speed;
+        setTimeout(() => {
+            this.media.playbackRate = speed;
+        }, 0);
     }
 
     /**
