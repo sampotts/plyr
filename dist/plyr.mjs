@@ -1095,6 +1095,83 @@ var support = {
   reducedMotion: 'matchMedia' in window && window.matchMedia('(prefers-reduced-motion)').matches
 };
 
+function validateRatio(input) {
+  if (!is$1.array(input) && (!is$1.string(input) || !input.includes(':'))) {
+    return false;
+  }
+
+  var ratio = is$1.array(input) ? input : input.split(':');
+  return ratio.map(Number).every(is$1.number);
+}
+function reduceAspectRatio(ratio) {
+  if (!is$1.array(ratio) || !ratio.every(is$1.number)) {
+    return null;
+  }
+
+  var _ratio = _slicedToArray(ratio, 2),
+      width = _ratio[0],
+      height = _ratio[1];
+
+  var getDivider = function getDivider(w, h) {
+    return h === 0 ? w : getDivider(h, w % h);
+  };
+
+  var divider = getDivider(width, height);
+  return [width / divider, height / divider];
+}
+function getAspectRatio(input) {
+  var parse = function parse(ratio) {
+    if (!validateRatio(ratio)) {
+      return null;
+    }
+
+    return ratio.split(':').map(Number);
+  }; // Provided ratio
+
+
+  var ratio = parse(input); // Get from config
+
+  if (ratio === null) {
+    ratio = parse(this.config.ratio);
+  } // Get from embed
+
+
+  if (ratio === null && !is$1.empty(this.embed) && is$1.string(this.embed.ratio)) {
+    ratio = parse(this.embed.ratio);
+  }
+
+  return ratio;
+} // Set aspect ratio for responsive container
+
+function setAspectRatio(input) {
+  if (!this.isVideo) {
+    return {};
+  }
+
+  var ratio = getAspectRatio.call(this, input);
+
+  var _ref = is$1.array(ratio) ? ratio : [0, 0],
+      _ref2 = _slicedToArray(_ref, 2),
+      w = _ref2[0],
+      h = _ref2[1];
+
+  var padding = 100 / w * h;
+  this.elements.wrapper.style.paddingBottom = "".concat(padding, "%"); // For Vimeo we have an extra <div> to hide the standard controls and UI
+
+  if (this.isVimeo && this.supported.ui) {
+    var height = 240;
+    var offset = (height - padding) / (height / 50);
+    this.media.style.transform = "translateY(-".concat(offset, "%)");
+  } else if (this.isHTML5) {
+    this.elements.wrapper.classList.toggle(this.config.classNames.videoFixedRatio, ratio !== null);
+  }
+
+  return {
+    padding: padding,
+    ratio: ratio
+  };
+}
+
 // ==========================================================================
 var html5 = {
   getSources: function getSources() {
@@ -1128,7 +1205,9 @@ var html5 = {
       return;
     }
 
-    var player = this; // Quality
+    var player = this; // Set aspect ratio if set
+
+    setAspectRatio.call(player); // Quality
 
     Object.defineProperty(player.media, 'quality', {
       get: function get() {
@@ -3502,8 +3581,9 @@ var defaults$1 = {
   invertTime: true,
   // Clicking the currentTime inverts it's value to show time left rather than elapsed
   toggleInvert: true,
-  // Aspect ratio (for embeds)
-  ratio: '16:9',
+  // Force an aspect ratio
+  // The format must be `'w:h'` (e.g. `'16:9'`)
+  ratio: null,
   // Click video container to play/pause
   clickToPlay: true,
   // Auto hide the controls
@@ -3515,7 +3595,7 @@ var defaults$1 = {
   // Sprite (for icons)
   loadSprite: true,
   iconPrefix: 'plyr',
-  iconUrl: 'https://cdn.plyr.io/3.5.2/plyr.svg',
+  iconUrl: 'https://cdn.plyr.io/3.5.3/plyr.svg',
   // Blank video (used to prevent errors on source change)
   blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
   // Quality default
@@ -3715,6 +3795,7 @@ var defaults$1 = {
     provider: 'plyr--{0}',
     video: 'plyr__video-wrapper',
     embed: 'plyr__video-embed',
+    videoFixedRatio: 'plyr__video-wrapper--fixed-ratio',
     embedContainer: 'plyr__video-embed__container',
     poster: 'plyr__poster',
     posterEnabled: 'plyr__poster-enabled',
@@ -4391,44 +4472,6 @@ var ui = {
   }
 };
 
-/* function reduceAspectRatio(width, height) {
-    const getRatio = (w, h) => (h === 0 ? w : getRatio(h, w % h));
-    const ratio = getRatio(width, height);
-    return `${width / ratio}:${height / ratio}`;
-} */
-// Set aspect ratio for responsive container
-
-function setAspectRatio(input) {
-  var ratio = input;
-
-  if (!is$1.string(ratio) && !is$1.nullOrUndefined(this.embed)) {
-    ratio = this.embed.ratio;
-  }
-
-  if (!is$1.string(ratio)) {
-    ratio = this.config.ratio;
-  }
-
-  var _ratio$split$map = ratio.split(':').map(Number),
-      _ratio$split$map2 = _slicedToArray(_ratio$split$map, 2),
-      x = _ratio$split$map2[0],
-      y = _ratio$split$map2[1];
-
-  var padding = 100 / x * y;
-  this.elements.wrapper.style.paddingBottom = "".concat(padding, "%"); // For Vimeo we have an extra <div> to hide the standard controls and UI
-
-  if (this.isVimeo && this.supported.ui) {
-    var height = 240;
-    var offset = (height - padding) / (height / 50);
-    this.media.style.transform = "translateY(-".concat(offset, "%)");
-  }
-
-  return {
-    padding: padding,
-    ratio: ratio
-  };
-}
-
 var Listeners =
 /*#__PURE__*/
 function () {
@@ -4681,6 +4724,8 @@ function () {
   }, {
     key: "container",
     value: function container() {
+      var _this = this;
+
       var player = this.player;
       var config = player.config,
           elements = player.elements,
@@ -4732,16 +4777,15 @@ function () {
 
         var target = player.elements.wrapper.firstChild;
 
-        var _ratio$split$map = ratio.split(':').map(Number),
-            _ratio$split$map2 = _slicedToArray(_ratio$split$map, 2),
-            height = _ratio$split$map2[1];
+        var _ratio = _slicedToArray(ratio, 2),
+            y = _ratio[1];
 
-        var _player$embed$ratio$s = player.embed.ratio.split(':').map(Number),
-            _player$embed$ratio$s2 = _slicedToArray(_player$embed$ratio$s, 2),
-            videoWidth = _player$embed$ratio$s2[0],
-            videoHeight = _player$embed$ratio$s2[1];
+        var _getAspectRatio$call = getAspectRatio.call(_this),
+            _getAspectRatio$call2 = _slicedToArray(_getAspectRatio$call, 2),
+            videoX = _getAspectRatio$call2[0],
+            videoY = _getAspectRatio$call2[1];
 
-        target.style.maxWidth = toggle ? "".concat(height / videoHeight * videoWidth, "px") : null;
+        target.style.maxWidth = toggle ? "".concat(y / videoY * videoX, "px") : null;
         target.style.margin = toggle ? '0 auto' : null;
       }; // Resize on fullscreen change
 
@@ -4794,7 +4838,7 @@ function () {
   }, {
     key: "media",
     value: function media() {
-      var _this = this;
+      var _this2 = this;
 
       var player = this.player;
       var elements = player.elements; // Time change on media
@@ -4859,11 +4903,11 @@ function () {
           }
 
           if (player.ended) {
-            _this.proxy(event, player.restart, 'restart');
+            _this2.proxy(event, player.restart, 'restart');
 
-            _this.proxy(event, player.play, 'play');
+            _this2.proxy(event, player.play, 'play');
           } else {
-            _this.proxy(event, player.togglePlay, 'play');
+            _this2.proxy(event, player.togglePlay, 'play');
           }
         });
       } // Disable right click
@@ -4938,21 +4982,21 @@ function () {
   }, {
     key: "bind",
     value: function bind(element, type, defaultHandler, customHandlerKey) {
-      var _this2 = this;
+      var _this3 = this;
 
       var passive = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
       var player = this.player;
       var customHandler = player.config.listeners[customHandlerKey];
       var hasCustomHandler = is$1.function(customHandler);
       on.call(player, element, type, function (event) {
-        return _this2.proxy(event, defaultHandler, customHandlerKey);
+        return _this3.proxy(event, defaultHandler, customHandlerKey);
       }, passive && !hasCustomHandler);
     } // Listen for control events
 
   }, {
     key: "controls",
     value: function controls$1() {
-      var _this3 = this;
+      var _this4 = this;
 
       var player = this.player;
       var elements = player.elements; // IE doesn't support input event, so we fallback to change
@@ -4961,7 +5005,7 @@ function () {
 
       if (elements.buttons.play) {
         Array.from(elements.buttons.play).forEach(function (button) {
-          _this3.bind(button, 'click', player.togglePlay, 'play');
+          _this4.bind(button, 'click', player.togglePlay, 'play');
         });
       } // Pause
 
@@ -5068,7 +5112,7 @@ function () {
       if (browser.isIos) {
         var inputs = getElements.call(player, 'input[type="range"]');
         Array.from(inputs).forEach(function (input) {
-          return _this3.bind(input, inputEvent, function (event) {
+          return _this4.bind(input, inputEvent, function (event) {
             return repaint(event.target);
           });
         });
@@ -5126,7 +5170,7 @@ function () {
 
       if (browser.isWebkit) {
         Array.from(getElements.call(player, 'input[type="range"]')).forEach(function (element) {
-          _this3.bind(element, 'input', function (event) {
+          _this4.bind(element, 'input', function (event) {
             return controls.updateRangeFill.call(player, event.target);
           });
         });
@@ -5173,7 +5217,7 @@ function () {
           toggleClass(elements.controls, config.classNames.noTransition, false);
         }, 0); // Delay a little more for mouse users
 
-        var delay = _this3.touch ? 3000 : 4000; // Clear timer
+        var delay = _this4.touch ? 3000 : 4000; // Clear timer
 
         clearTimeout(timers.controls); // Hide again after delay
 
@@ -5211,7 +5255,7 @@ function () {
   return Listeners;
 }();
 
-var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
 
 function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
@@ -5419,9 +5463,11 @@ var loadjs_umd = createCommonjsModule(function (module, exports) {
     /**
      * Initiate script load and register bundle.
      * @param {(string|string[])} paths - The file paths
-     * @param {(string|Function)} [arg1] - The bundleId or success callback
-     * @param {Function} [arg2] - The success or error callback
-     * @param {Function} [arg3] - The error callback
+     * @param {(string|Function|Object)} [arg1] - The (1) bundleId or (2) success
+     *   callback or (3) object literal with success/error arguments, numRetries,
+     *   etc.
+     * @param {(Function|Object)} [arg2] - The (1) success callback or (2) object
+     *   literal with success/error arguments, numRetries, etc.
      */
 
 
@@ -5757,7 +5803,7 @@ var vimeo = {
           height = _dimensions[1];
 
       player.embed.ratio = "".concat(width, ":").concat(height);
-      setAspectRatio.call(_this2, player.embed.ratio);
+      setAspectRatio.call(_this2);
     }); // Set autopause
 
     player.embed.setAutopause(player.config.autopause).then(function (state) {
@@ -5879,6 +5925,19 @@ function assurePlaybackState$1(play) {
   }
 }
 
+function getHost(config) {
+  if (config.noCookie) {
+    return 'https://www.youtube-nocookie.com';
+  }
+
+  if (window.location.protocol === 'http:') {
+    return 'http://www.youtube.com';
+  } // Use YouTube's default
+
+
+  return undefined;
+}
+
 var youtube = {
   setup: function setup() {
     var _this = this;
@@ -5971,7 +6030,7 @@ var youtube = {
     player.media = replaceElement(container, player.media); // Id to poster wrapper
 
     var posterSrc = function posterSrc(format) {
-      return "https://img.youtube.com/vi/".concat(videoId, "/").concat(format, "default.jpg");
+      return "https://i.ytimg.com/vi/".concat(videoId, "/").concat(format, "default.jpg");
     }; // Check thumbnail images in order of quality, but reject fallback thumbnails (120px wide)
 
 
@@ -5995,7 +6054,7 @@ var youtube = {
 
     player.embed = new window.YT.Player(id, {
       videoId: videoId,
-      host: config.noCookie ? 'https://www.youtube-nocookie.com' : undefined,
+      host: getHost(config),
       playerVars: extend({}, {
         autoplay: player.config.autoplay ? 1 : 0,
         // Autoplay
@@ -6210,7 +6269,7 @@ var youtube = {
 
             case 1:
               // Restore paused state (YouTube starts playing on seek if the video hasn't been played yet)
-              if (player.media.paused && !player.embed.hasPlayed) {
+              if (!player.config.autoplay && player.media.paused && !player.embed.hasPlayed) {
                 player.media.pause();
               } else {
                 assurePlaybackState$1.call(player, true);
@@ -6932,11 +6991,11 @@ var parseVtt = function parseVtt(vttDataString) {
     lines.forEach(function (line) {
       if (!is$1.number(result.startTime)) {
         // The line with start and end times on it is the first line of interest
-        var matchTimes = line.match(/([0-9]{2}):([0-9]{2}):([0-9]{2}).([0-9]{2,3})( ?--> ?)([0-9]{2}):([0-9]{2}):([0-9]{2}).([0-9]{2,3})/); // Note that this currently ignores caption formatting directives that are optionally on the end of this line - fine for non-captions VTT
+        var matchTimes = line.match(/([0-9]{2})?:?([0-9]{2}):([0-9]{2}).([0-9]{2,3})( ?--> ?)([0-9]{2})?:?([0-9]{2}):([0-9]{2}).([0-9]{2,3})/); // Note that this currently ignores caption formatting directives that are optionally on the end of this line - fine for non-captions VTT
 
         if (matchTimes) {
-          result.startTime = Number(matchTimes[1]) * 60 * 60 + Number(matchTimes[2]) * 60 + Number(matchTimes[3]) + Number("0.".concat(matchTimes[4]));
-          result.endTime = Number(matchTimes[6]) * 60 * 60 + Number(matchTimes[7]) * 60 + Number(matchTimes[8]) + Number("0.".concat(matchTimes[9]));
+          result.startTime = Number(matchTimes[1] || 0) * 60 * 60 + Number(matchTimes[2]) * 60 + Number(matchTimes[3]) + Number("0.".concat(matchTimes[4]));
+          result.endTime = Number(matchTimes[6] || 0) * 60 * 60 + Number(matchTimes[7]) * 60 + Number(matchTimes[8]) + Number("0.".concat(matchTimes[9]));
         }
       } else if (!is$1.empty(line.trim()) && is$1.empty(result.text)) {
         // If we already have the startTime, then we're definitely up to the text line(s)
@@ -7071,8 +7130,9 @@ function () {
             urlPrefix: ''
           }; // If the URLs don't start with '/', then we need to set their relative path to be the location of the VTT file
           // If the URLs do start with '/', then they obviously don't need a prefix, so it will remain blank
+          // If the thumbnail URLs start with with none of '/', 'http://' or 'https://', then we need to set their relative path to be the location of the VTT file
 
-          if (!thumbnail.frames[0].text.startsWith('/')) {
+          if (!thumbnail.frames[0].text.startsWith('/') && !thumbnail.frames[0].text.startsWith('http://') && !thumbnail.frames[0].text.startsWith('https://')) {
             thumbnail.urlPrefix = url.substring(0, url.lastIndexOf('/') + 1);
           } // Download the first frame, so that we can determine/set the height of this thumbnailsDef
 
@@ -7976,8 +8036,10 @@ function () {
     } // Autoplay if required
 
 
-    if (this.config.autoplay) {
-      this.play();
+    if (this.isHTML5 && this.config.autoplay) {
+      setTimeout(function () {
+        return _this.play();
+      }, 10);
     } // Seek time will be recorded (in listeners.js) so we can prevent hiding controls for a few seconds after seek
 
 
@@ -8287,12 +8349,14 @@ function () {
       }; // Stop playback
 
 
-      this.stop(); // Provider specific stuff
+      this.stop(); // Clear timeouts
+
+      clearTimeout(this.timers.loading);
+      clearTimeout(this.timers.controls);
+      clearTimeout(this.timers.resized); // Provider specific stuff
 
       if (this.isHTML5) {
-        // Clear timeout
-        clearTimeout(this.timers.loading); // Restore native video controls
-
+        // Restore native video controls
         ui.toggleNativeControls.call(this, true); // Clean up
 
         done();
@@ -8764,6 +8828,34 @@ function () {
       }
 
       return this.media.getAttribute('poster');
+    }
+    /**
+     * Get the current aspect ratio in use
+     */
+
+  }, {
+    key: "ratio",
+    get: function get() {
+      var ratio = reduceAspectRatio(getAspectRatio.call(this));
+      return is$1.array(ratio) ? ratio.join(':') : ratio;
+    }
+    /**
+     * Set video aspect ratio
+     */
+    ,
+    set: function set(input) {
+      if (!this.isVideo) {
+        this.debug.warn('Aspect ratio can only be set for video');
+        return;
+      }
+
+      if (!is$1.string(input) || !validateRatio(input)) {
+        this.debug.error("Invalid aspect ratio specified (".concat(input, ")"));
+        return;
+      }
+
+      this.config.ratio = input;
+      setAspectRatio.call(this);
     }
     /**
      * Set the autoplay state
