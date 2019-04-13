@@ -356,7 +356,7 @@ class Listeners {
             const { padding, ratio } = setPlayerSize(isEnter);
 
             // Set Vimeo gutter
-            setGutter(ratio, padding, isEnter);
+            setGutter.call(player, ratio, padding, isEnter);
 
             // If not using native fullscreen, we need to check for resizes of viewport
             if (!usingNative) {
