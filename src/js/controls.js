@@ -1138,7 +1138,9 @@ const controls = {
         } else if (is.keyboardEvent(input) && input.which === 27) {
             show = false;
         } else if (is.event(input)) {
-            const isMenuItem = popup.contains(input.target);
+            // If Plyr is in a shadowDOM, the event target is set to the component, instead of the
+            // element in the shadowDOM. The path, however, is complete.
+            const isMenuItem = popup.contains(input.path[0]);
 
             // If the click was inside the menu or if the click
             // wasn't the button or menu item and we're trying to
