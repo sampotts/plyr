@@ -1191,7 +1191,7 @@ const controls = {
 
     // Show a panel in the menu
     showMenuPanel(type = '', tabFocus = false) {
-        const target = document.getElementById(`plyr-settings-${this.id}-${type}`);
+        const target = this.elements.container.querySelector(`#plyr-settings-${this.id}-${type}`);
 
         // Nothing to show, bail
         if (!is.element(target)) {
