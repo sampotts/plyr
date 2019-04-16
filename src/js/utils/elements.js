@@ -234,10 +234,10 @@ export function matches(element, selector) {
     }
 
     const matches =
-        prototype.matches ||
-        prototype.webkitMatchesSelector ||
-        prototype.mozMatchesSelector ||
-        prototype.msMatchesSelector ||
+        element.matches ||
+        element.webkitMatchesSelector ||
+        element.mozMatchesSelector ||
+        element.msMatchesSelector ||
         match;
 
     return matches.call(element, selector);
