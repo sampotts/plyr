@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v3.5.2
+// plyr.js v3.5.3
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -26,6 +26,7 @@ import { off, on, once, triggerEvent, unbindListeners } from './utils/events';
 import is from './utils/is';
 import loadSprite from './utils/loadSprite';
 import { cloneDeep, extend } from './utils/objects';
+import { getAspectRatio, reduceAspectRatio, setAspectRatio, validateRatio } from './utils/style';
 import { parseUrl } from './utils/urls';
 
 // Private properties
@@ -301,8 +302,8 @@ class Plyr {
         }
 
         // Autoplay if required
-        if (this.config.autoplay) {
-            this.play();
+        if (this.isHTML5 && this.config.autoplay) {
+            setTimeout(() => this.play(), 10);
         }
 
         // Seek time will be recorded (in listeners.js) so we can prevent hiding controls for a few seconds after seek
@@ -847,6 +848,34 @@ class Plyr {
     }
 
     /**
+     * Get the current aspect ratio in use
+     */
+    get ratio() {
+        const ratio = reduceAspectRatio(getAspectRatio.call(this));
+
+        return is.array(ratio) ? ratio.join(':') : ratio;
+    }
+
+    /**
+     * Set video aspect ratio
+     */
+    set ratio(input) {
+        if (!this.isVideo) {
+            this.debug.warn('Aspect ratio can only be set for video');
+            return;
+        }
+
+        if (!is.string(input) || !validateRatio(input)) {
+            this.debug.error(`Invalid aspect ratio specified (${input})`);
+            return;
+        }
+
+        this.config.ratio = input;
+
+        setAspectRatio.call(this);
+    }
+
+    /**
      * Set the autoplay state
      * @param {Boolean} input - Whether to autoplay or not
      */
@@ -1088,11 +1117,13 @@ class Plyr {
         // Stop playback
         this.stop();
 
+        // Clear timeouts
+        clearTimeout(this.timers.loading);
+        clearTimeout(this.timers.controls);
+        clearTimeout(this.timers.resized);
+
         // Provider specific stuff
         if (this.isHTML5) {
-            // Clear timeout
-            clearTimeout(this.timers.loading);
-
             // Restore native video controls
             ui.toggleNativeControls.call(this, true);
 

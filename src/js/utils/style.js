@@ -4,26 +4,63 @@
 
 import is from './is';
 
-/* function reduceAspectRatio(width, height) {
-    const getRatio = (w, h) => (h === 0 ? w : getRatio(h, w % h));
-    const ratio = getRatio(width, height);
-    return `${width / ratio}:${height / ratio}`;
-} */
+export function validateRatio(input) {
+    if (!is.array(input) && (!is.string(input) || !input.includes(':'))) {
+        return false;
+    }
+
+    const ratio = is.array(input) ? input : input.split(':');
+
+    return ratio.map(Number).every(is.number);
+}
+
+export function reduceAspectRatio(ratio) {
+    if (!is.array(ratio) || !ratio.every(is.number)) {
+        return null;
+    }
+
+    const [width, height] = ratio;
+    const getDivider = (w, h) => (h === 0 ? w : getDivider(h, w % h));
+    const divider = getDivider(width, height);
+
+    return [width / divider, height / divider];
+}
+
+export function getAspectRatio(input) {
+    const parse = ratio => {
+        if (!validateRatio(ratio)) {
+            return null;
+        }
+
+        return ratio.split(':').map(Number);
+    };
+
+    // Provided ratio
+    let ratio = parse(input);
+
+    // Get from config
+    if (ratio === null) {
+        ratio = parse(this.config.ratio);
+    }
+
+    // Get from embed
+    if (ratio === null && !is.empty(this.embed) && is.string(this.embed.ratio)) {
+        ratio = parse(this.embed.ratio);
+    }
+
+    return ratio;
+}
 
 // Set aspect ratio for responsive container
 export function setAspectRatio(input) {
-    let ratio = input;
-
-    if (!is.string(ratio) && !is.nullOrUndefined(this.embed)) {
-        ({ ratio } = this.embed);
+    if (!this.isVideo) {
+        return {};
     }
 
-    if (!is.string(ratio)) {
-        ({ ratio } = this.config);
-    }
+    const ratio = getAspectRatio.call(this, input);
 
-    const [x, y] = ratio.split(':').map(Number);
-    const padding = (100 / x) * y;
+    const [w, h] = is.array(ratio) ? ratio : [0, 0];
+    const padding = (100 / w) * h;
 
     this.elements.wrapper.style.paddingBottom = `${padding}%`;
 
@@ -32,6 +69,8 @@ export function setAspectRatio(input) {
         const height = 240;
         const offset = (height - padding) / (height / 50);
         this.media.style.transform = `translateY(-${offset}%)`;
+    } else if (this.isHTML5) {
+        this.elements.wrapper.classList.toggle(this.config.classNames.videoFixedRatio, ratio !== null);
     }
 
     return { padding, ratio };
