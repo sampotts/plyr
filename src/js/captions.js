@@ -232,6 +232,9 @@ const captions = {
         if (this.captions.currentTrack !== index) {
             this.captions.currentTrack = index;
             const track = tracks[index];
+
+            track.mode = 'showing';
+
             const { language } = track || {};
 
             // Store reference to node for invalidation on remove
