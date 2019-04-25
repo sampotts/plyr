@@ -894,6 +894,10 @@ class Plyr {
      * Get the current aspect ratio in use
      */
     get ratio() {
+        if (!this.isVideo) {
+            return null;
+        }
+
         const ratio = reduceAspectRatio(getAspectRatio.call(this));
 
         return is.array(ratio) ? ratio.join(':') : ratio;

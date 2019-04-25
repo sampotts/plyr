@@ -318,7 +318,7 @@ class Listeners {
 
             const target = player.elements.wrapper.firstChild;
             const [, y] = ratio;
-            const [videoX, videoY] = getAspectRatio.call(this);
+            const [videoX, videoY] = getAspectRatio.call(player);
 
             target.style.maxWidth = toggle ? `${(y / videoY) * videoX}px` : null;
             target.style.margin = toggle ? '0 auto' : null;
@@ -356,7 +356,7 @@ class Listeners {
             const { padding, ratio } = setPlayerSize(isEnter);
 
             // Set Vimeo gutter
-            setGutter.call(player, ratio, padding, isEnter);
+            setGutter(ratio, padding, isEnter);
 
             // If not using native fullscreen, we need to check for resizes of viewport
             if (!usingNative) {

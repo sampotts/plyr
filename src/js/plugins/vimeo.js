@@ -281,7 +281,7 @@ const vimeo = {
         // Set aspect ratio based on video size
         Promise.all([player.embed.getVideoWidth(), player.embed.getVideoHeight()]).then(dimensions => {
             const [width, height] = dimensions;
-            player.embed.ratio = `${width}:${height}`;
+            player.embed.ratio = [width, height];
             setAspectRatio.call(this);
         });
 
