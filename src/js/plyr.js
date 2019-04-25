@@ -25,6 +25,7 @@ import { createElement, hasClass, removeElement, replaceElement, toggleClass, wr
 import { off, on, once, triggerEvent, unbindListeners } from './utils/events';
 import is from './utils/is';
 import loadSprite from './utils/loadSprite';
+import { clamp } from './utils/numbers';
 import { cloneDeep, extend } from './utils/objects';
 import { getAspectRatio, reduceAspectRatio, setAspectRatio, validateRatio } from './utils/style';
 import { parseUrl } from './utils/urls';
@@ -661,24 +662,17 @@ class Plyr {
             speed = this.config.speed.selected;
         }
 
-        // Set min/max
-        if (speed < 0.1) {
-            speed = 0.1;
-        }
-        if (speed > 2.0) {
-            speed = 2.0;
-        }
-
-        if (!this.config.speed.options.includes(speed)) {
-            this.debug.warn(`Unsupported speed (${speed})`);
-            return;
-        }
+        // Clamp to min/max
+        const { minimumSpeed: min, maximumSpeed: max } = this;
+        speed = clamp(speed, min, max);
 
         // Update config
         this.config.speed.selected = speed;
 
         // Set media speed
-        this.media.playbackRate = speed;
+        setTimeout(() => {
+            this.media.playbackRate = speed;
+        }, 0);
     }
 
     /**
@@ -686,6 +680,42 @@ class Plyr {
      */
     get speed() {
         return Number(this.media.playbackRate);
+    }
+
+    /**
+     * Get the minimum allowed speed
+     */
+    get minimumSpeed() {
+        if (this.isYouTube) {
+            // https://developers.google.com/youtube/iframe_api_reference#setPlaybackRate
+            return Math.min(...this.options.speed);
+        }
+
+        if (this.isVimeo) {
+            // https://github.com/vimeo/player.js/#setplaybackrateplaybackrate-number-promisenumber-rangeerrorerror
+            return 0.5;
+        }
+
+        // https://stackoverflow.com/a/32320020/1191319
+        return 0.0625;
+    }
+
+    /**
+     * Get the maximum allowed speed
+     */
+    get maximumSpeed() {
+        if (this.isYouTube) {
+            // https://developers.google.com/youtube/iframe_api_reference#setPlaybackRate
+            return Math.max(...this.options.speed);
+        }
+
+        if (this.isVimeo) {
+            // https://github.com/vimeo/player.js/#setplaybackrateplaybackrate-number-promisenumber-rangeerrorerror
+            return 2;
+        }
+
+        // https://stackoverflow.com/a/32320020/1191319
+        return 16;
     }
 
     /**
@@ -824,6 +854,19 @@ class Plyr {
     }
 
     /**
+     * Set the download URL
+     */
+    set download(input) {
+        if (!is.url(input)) {
+            return;
+        }
+
+        this.config.urls.download = input;
+
+        controls.setDownloadUrl.call(this);
+    }
+
+    /**
      * Set the poster image for a video
      * @param {String} input - the URL for the new poster image
      */
@@ -851,6 +894,10 @@ class Plyr {
      * Get the current aspect ratio in use
      */
     get ratio() {
+        if (!this.isVideo) {
+            return null;
+        }
+
         const ratio = reduceAspectRatio(getAspectRatio.call(this));
 
         return is.array(ratio) ? ratio.join(':') : ratio;

@@ -52,9 +52,6 @@ const youtube = {
         // Add embed class for responsive
         toggleClass(this.elements.wrapper, this.config.classNames.embed, true);
 
-        // Set aspect ratio
-        setAspectRatio.call(this);
-
         // Setup API
         if (is.object(window.YT) && is.function(window.YT.Player)) {
             youtube.ready.call(this);
@@ -84,33 +81,27 @@ const youtube = {
 
     // Get the media title
     getTitle(videoId) {
-        // Try via undocumented API method first
-        // This method disappears now and then though...
-        // https://github.com/sampotts/plyr/issues/709
-        if (is.function(this.embed.getVideoData)) {
-            const { title } = this.embed.getVideoData();
+        const url = format(this.config.urls.youtube.api, videoId);
 
-            if (is.empty(title)) {
-                this.config.title = title;
-                ui.setTitle.call(this);
-                return;
-            }
-        }
+        fetch(url)
+            .then(data => {
+                if (is.object(data)) {
+                    const { title, height, width } = data;
 
-        // Or via Google API
-        const key = this.config.keys.google;
-        if (is.string(key) && !is.empty(key)) {
-            const url = format(this.config.urls.youtube.api, videoId, key);
+                    // Set title
+                    this.config.title = title;
+                    ui.setTitle.call(this);
 
-            fetch(url)
-                .then(result => {
-                    if (is.object(result)) {
-                        this.config.title = result.items[0].snippet.title;
-                        ui.setTitle.call(this);
-                    }
-                })
-                .catch(() => {});
-        }
+                    // Set aspect ratio
+                    this.embed.ratio = [width, height];
+                }
+
+                setAspectRatio.call(this);
+            })
+            .catch(() => {
+                // Set aspect ratio
+                setAspectRatio.call(this);
+            });
     },
 
     // API ready

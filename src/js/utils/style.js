@@ -44,8 +44,14 @@ export function getAspectRatio(input) {
     }
 
     // Get from embed
-    if (ratio === null && !is.empty(this.embed) && is.string(this.embed.ratio)) {
-        ratio = parse(this.embed.ratio);
+    if (ratio === null && !is.empty(this.embed) && is.array(this.embed.ratio)) {
+        ({ ratio } = this.embed);
+    }
+
+    // Get from HTML5 video
+    if (ratio === null && this.isHTML5) {
+        const { videoWidth, videoHeight } = this.media;
+        ratio = reduceAspectRatio([videoWidth, videoHeight]);
     }
 
     return ratio;

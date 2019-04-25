@@ -318,7 +318,7 @@ class Listeners {
 
             const target = player.elements.wrapper.firstChild;
             const [, y] = ratio;
-            const [videoX, videoY] = getAspectRatio.call(this);
+            const [videoX, videoY] = getAspectRatio.call(player);
 
             target.style.maxWidth = toggle ? `${(y / videoY) * videoX}px` : null;
             target.style.margin = toggle ? '0 auto' : null;
@@ -486,7 +486,7 @@ class Listeners {
 
         // Update download link when ready and if quality changes
         on.call(player, player.media, 'ready qualitychange', () => {
-            controls.setDownloadLink.call(player);
+            controls.setDownloadUrl.call(player);
         });
 
         // Proxy events to container

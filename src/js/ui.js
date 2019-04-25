@@ -67,14 +67,14 @@ const ui = {
         // Reset mute state
         this.muted = null;
 
-        // Reset speed
-        this.speed = null;
-
         // Reset loop state
         this.loop = null;
 
         // Reset quality setting
         this.quality = null;
+
+        // Reset speed
+        this.speed = null;
 
         // Reset volume display
         controls.updateVolume.call(this);
@@ -233,13 +233,16 @@ const ui = {
         clearTimeout(this.timers.loading);
 
         // Timer to prevent flicker when seeking
-        this.timers.loading = setTimeout(() => {
-            // Update progress bar loading class state
-            toggleClass(this.elements.container, this.config.classNames.loading, this.loading);
+        this.timers.loading = setTimeout(
+            () => {
+                // Update progress bar loading class state
+                toggleClass(this.elements.container, this.config.classNames.loading, this.loading);
 
-            // Update controls visibility
-            ui.toggleControls.call(this);
-        }, this.loading ? 250 : 0);
+                // Update controls visibility
+                ui.toggleControls.call(this);
+            },
+            this.loading ? 250 : 0,
+        );
     },
 
     // Toggle controls based on state and `force` argument
@@ -248,10 +251,12 @@ const ui = {
 
         if (controls && this.config.hideControls) {
             // Don't hide controls if a touch-device user recently seeked. (Must be limited to touch devices, or it occasionally prevents desktop controls from hiding.)
-            const recentTouchSeek = (this.touch && this.lastSeekTime + 2000 > Date.now());
+            const recentTouchSeek = this.touch && this.lastSeekTime + 2000 > Date.now();
 
             // Show controls if force, loading, paused, button interaction, or recent seek, otherwise hide
-            this.toggleControls(Boolean(force || this.loading || this.paused || controls.pressed || controls.hover || recentTouchSeek));
+            this.toggleControls(
+                Boolean(force || this.loading || this.paused || controls.pressed || controls.hover || recentTouchSeek),
+            );
         }
     },
 };
