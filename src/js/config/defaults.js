@@ -61,7 +61,7 @@ const defaults = {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.5.3/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.5.2/plyr.svg',
 
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
@@ -195,8 +195,7 @@ const defaults = {
         },
         youtube: {
             sdk: 'https://www.youtube.com/iframe_api',
-            api:
-                'https://www.googleapis.com/youtube/v3/videos?id={0}&key={1}&fields=items(snippet(title))&part=snippet',
+            api: 'https://noembed.com/embed?url=https://www.youtube.com/watch?v={0}', // 'https://www.googleapis.com/youtube/v3/videos?id={0}&key={1}&fields=items(snippet(title),fileDetails)&part=snippet',
         },
         googleIMA: {
             sdk: 'https://imasdk.googleapis.com/js/sdkloader/ima3.js',
@@ -320,9 +319,6 @@ const defaults = {
         progress: '.plyr__progress',
         captions: '.plyr__captions',
         caption: '.plyr__caption',
-        menu: {
-            quality: '.js-plyr__menu__list--quality',
-        },
     },
 
     // Class hooks added to the player in different states
@@ -394,11 +390,6 @@ const defaults = {
             provider: 'data-plyr-provider',
             id: 'data-plyr-embed-id',
         },
-    },
-
-    // API keys
-    keys: {
-        google: null,
     },
 
     // Advertisements plugin
