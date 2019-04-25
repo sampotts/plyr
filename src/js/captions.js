@@ -124,19 +124,21 @@ const captions = {
 
         // Handle tracks (add event listener and "pseudo"-default)
         if (this.isHTML5 && this.isVideo) {
-            tracks.filter(track => !meta.get(track)).forEach(track => {
-                this.debug.log('Track added', track);
-                // Attempt to store if the original dom element was "default"
-                meta.set(track, {
-                    default: track.mode === 'showing',
+            tracks
+                .filter(track => !meta.get(track))
+                .forEach(track => {
+                    this.debug.log('Track added', track);
+                    // Attempt to store if the original dom element was "default"
+                    meta.set(track, {
+                        default: track.mode === 'showing',
+                    });
+
+                    // Turn off native caption rendering to avoid double captions
+                    track.mode = 'hidden';
+
+                    // Add event listener for cue changes
+                    on.call(this, track, 'cuechange', () => captions.updateCues.call(this));
                 });
-
-                // Turn off native caption rendering to avoid double captions
-                track.mode = 'hidden';
-
-                // Add event listener for cue changes
-                on.call(this, track, 'cuechange', () => captions.updateCues.call(this));
-            });
         }
 
         // Update language first time it matches, or if the previous matching track was removed
@@ -300,10 +302,12 @@ const captions = {
         const sortIsDefault = track => Number((this.captions.meta.get(track) || {}).default);
         const sorted = Array.from(tracks).sort((a, b) => sortIsDefault(b) - sortIsDefault(a));
         let track;
+
         languages.every(language => {
             track = sorted.find(track => track.language === language);
             return !track; // Break iteration if there is a match
         });
+
         // If no match is found but is required, get first
         return track || (force ? sorted[0] : undefined);
     },
@@ -360,6 +364,7 @@ const captions = {
         // Get cues from track
         if (!cues) {
             const track = captions.getCurrentTrack.call(this);
+
             cues = Array.from((track || {}).activeCues || [])
                 .map(cue => cue.getCueAsHTML())
                 .map(getHTML);
