@@ -4,6 +4,7 @@
 
 import { toggleListener } from './events';
 import is from './is';
+import { extend } from './objects';
 
 // Wrap an element
 export function wrap(elements, wrapper) {
@@ -137,7 +138,7 @@ export function getAttributesFromSelector(sel, existingAttributes) {
     }
 
     const attributes = {};
-    const existing = existingAttributes;
+    const existing = extend({}, existingAttributes);
 
     sel.split(',').forEach(s => {
         // Remove whitespace
@@ -147,7 +148,7 @@ export function getAttributesFromSelector(sel, existingAttributes) {
 
         // Get the parts and value
         const parts = stripped.split('=');
-        const key = parts[0];
+        const [key] = parts;
         const value = parts.length > 1 ? parts[1].replace(/["']/g, '') : '';
 
         // Get the first character
@@ -156,11 +157,11 @@ export function getAttributesFromSelector(sel, existingAttributes) {
         switch (start) {
             case '.':
                 // Add to existing classname
-                if (is.object(existing) && is.string(existing.class)) {
-                    existing.class += ` ${className}`;
+                if (is.string(existing.class)) {
+                    attributes.class = `${existing.class} ${className}`;
+                } else {
+                    attributes.class = className;
                 }
-
-                attributes.class = className;
                 break;
 
             case '#':
@@ -179,7 +180,7 @@ export function getAttributesFromSelector(sel, existingAttributes) {
         }
     });
 
-    return attributes;
+    return extend(existing, attributes);
 }
 
 // Toggle hidden
