@@ -9,6 +9,7 @@
 -   Fixed issue with ads volume not matching current content volume
 -   Fixed race condition where ads were loading during source change
 -   Improvement: Automatic aspect ratio for YouTube is now supported, meaning all aspect ratios are set based on media content - Note: we're now using a different API to get YouTube video metadata so you may need to adjust any CSPs you have setup
+-   Fix for menu in the Shadow DOM (thanks @emielbeinema)
 
 ## v3.5.3
 

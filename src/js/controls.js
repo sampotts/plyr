@@ -10,20 +10,7 @@ import support from './support';
 import { repaint, transitionEndEvent } from './utils/animation';
 import { dedupe } from './utils/arrays';
 import browser from './utils/browser';
-import {
-    createElement,
-    emptyElement,
-    getAttributesFromSelector,
-    getElement,
-    getElements,
-    hasClass,
-    matches,
-    removeElement,
-    setAttributes,
-    setFocus,
-    toggleClass,
-    toggleHidden,
-} from './utils/elements';
+import { createElement, emptyElement, getAttributesFromSelector, getElement, getElements, hasClass, matches, removeElement, setAttributes, setFocus, toggleClass, toggleHidden } from './utils/elements';
 import { off, on } from './utils/events';
 import i18n from './utils/i18n';
 import is from './utils/is';
@@ -1141,8 +1128,9 @@ const controls = {
             show = false;
         } else if (is.event(input)) {
             // If Plyr is in a shadowDOM, the event target is set to the component, instead of the
-            // element in the shadowDOM. The path, however, is complete.
-            const isMenuItem = popup.contains(input.path[0]);
+            // Element in the shadowDOM. The path, if available, is complete.
+            const target = is.function(input.composedPath) ? input.composedPath()[0] : input.target;
+            const isMenuItem = popup.contains(target);
 
             // If the click was inside the menu or if the click
             // wasn't the button or menu item and we're trying to
