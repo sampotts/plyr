@@ -15,7 +15,6 @@ export default function loadSprite(url, id) {
     const prefix = 'cache';
     const hasId = is.string(id);
     let isCached = false;
-
     const exists = () => document.getElementById(id) !== null;
 
     const update = (container, data) => {
@@ -33,7 +32,6 @@ export default function loadSprite(url, id) {
     // Only load once if ID set
     if (!hasId || !exists()) {
         const useStorage = Storage.supported;
-
         // Create container
         const container = document.createElement('div');
         container.setAttribute('hidden', '');

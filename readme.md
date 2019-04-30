@@ -123,13 +123,13 @@ See [initialising](#initialising) for more information on advanced setups.
 You can use our CDN (provided by [Fastly](https://www.fastly.com/)) for the JavaScript. There's 2 versions; one with and one without [polyfills](#polyfills). My recommendation would be to manage polyfills seperately as part of your application but to make life easier you can use the polyfilled build.
 
 ```html
-<script src="https://cdn.plyr.io/3.5.4/plyr.js"></script>
+<script src="https://cdn.plyr.io/3.5.3/plyr.js"></script>
 ```
 
 ...or...
 
 ```html
-<script src="https://cdn.plyr.io/3.5.4/plyr.polyfilled.js"></script>
+<script src="https://cdn.plyr.io/3.5.3/plyr.polyfilled.js"></script>
 ```
 
 ## CSS
@@ -143,13 +143,13 @@ Include the `plyr.css` stylsheet into your `<head>`
 If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for the default CSS, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/3.5.4/plyr.css" />
+<link rel="stylesheet" href="https://cdn.plyr.io/3.5.3/plyr.css" />
 ```
 
 ## SVG Sprite
 
 The SVG sprite is loaded automatically from our CDN (provided by [Fastly](https://www.fastly.com/)). To change this, see the [options](#options) below. For
-reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.5.4/plyr.svg`.
+reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.5.3/plyr.svg`.
 
 # Ads
 
@@ -212,7 +212,7 @@ _Note_: If a `NodeList`, `Array`, or jQuery object are passed, the first element
 
 #### Single player
 
-Passing a [string selector](https://developer.mozilla.org/en-US/docs/Web/API/NodeList):
+Passing a CSS string selector that's compatible with [`querySelector`](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector):
 
 ```javascript
 const player = new Plyr('#player');
@@ -238,7 +238,7 @@ You have two choices here. You can either use a simple array loop to map the con
 const players = Array.from(document.querySelectorAll('.js-player')).map(p => new Plyr(p));
 ```
 
-...or use a static method where you can pass a [string selector](https://developer.mozilla.org/en-US/docs/Web/API/NodeList), a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList), an [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array) of elements, or a [JQuery](https://jquery.com) object:
+...or use a static method where you can pass a string selector that's compatible with [`querySelector`](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector), a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList), an [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array) of [HTMLElement](https://developer.mozilla.org/en/docs/Web/API/HTMLElement), or a [JQuery](https://jquery.com) object:
 
 ```javascript
 const players = Plyr.setup('.js-player');

@@ -4,6 +4,7 @@
 // ==========================================================================
 
 import RangeTouch from 'rangetouch';
+
 import captions from './captions';
 import html5 from './html5';
 import support from './support';
@@ -92,7 +93,6 @@ const controls = {
         const namespace = 'http://www.w3.org/2000/svg';
         const iconUrl = controls.getIconUrl.call(this);
         const iconPath = `${!iconUrl.cors ? iconUrl.url : ''}#${this.config.iconPrefix}`;
-
         // Create <svg>
         const icon = document.createElementNS(namespace, 'svg');
         setAttributes(

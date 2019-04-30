@@ -1,6 +1,7 @@
 {
     "parser": "babel-eslint",
     "extends": ["airbnb-base", "prettier"],
+    "plugins": ["simple-import-sort", "import"],
     "env": {
         "browser": true,
         "es6": true
@@ -27,7 +28,18 @@
         "comma-dangle": [2, "always-multiline"],
         "spaced-comment": [2, "always"],
         "no-restricted-globals": 2,
-        "no-param-reassign": [2, { "props": false }]
+        "no-param-reassign": [2, { "props": false }],
+        "padding-line-between-statements": [
+            "error",
+            {
+                "blankLine": "never",
+                "prev": ["singleline-const", "singleline-let", "singleline-var"],
+                "next": ["singleline-const", "singleline-let", "singleline-var"]
+            }
+        ],
+        "sort-imports": "off",
+        "import/order": "off",
+        "simple-import-sort/sort": "error"
     },
     "parserOptions": {
         "sourceType": "module"

@@ -151,7 +151,6 @@ class Plyr {
         // Set media type based on tag or data attribute
         // Supported: video, audio, vimeo, youtube
         const type = this.media.tagName.toLowerCase();
-
         // Embed properties
         let iframe = null;
         let url = null;
@@ -514,7 +513,6 @@ class Plyr {
     get duration() {
         // Faux duration set via config
         const fauxDuration = parseFloat(this.config.duration);
-
         // Media duration can be NaN or Infinity before the media has loaded
         const realDuration = (this.media || {}).duration;
         const duration = !is.number(realDuration) || realDuration === Infinity ? 0 : realDuration;
@@ -1045,10 +1043,8 @@ class Plyr {
         if (this.supported.ui && !this.isAudio) {
             // Get state before change
             const isHidden = hasClass(this.elements.container, this.config.classNames.hideControls);
-
             // Negate the argument if not undefined since adding the class to hides the controls
             const force = typeof toggle === 'undefined' ? undefined : !toggle;
-
             // Apply and get updated state
             const hiding = toggleClass(this.elements.container, this.config.classNames.hideControls, force);
 

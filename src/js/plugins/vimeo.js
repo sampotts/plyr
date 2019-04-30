@@ -91,7 +91,6 @@ const vimeo = {
         }
 
         const id = parseId(source);
-
         // Build an iframe
         const iframe = createElement('iframe');
         const src = format(player.config.urls.vimeo.iframe, id, params);
@@ -102,7 +101,6 @@ const vimeo = {
 
         // Get poster, if already set
         const { poster } = player;
-
         // Inject the package
         const wrapper = createElement('div', { poster, class: player.config.classNames.embedContainer });
         wrapper.appendChild(iframe);

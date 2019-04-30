@@ -35,7 +35,6 @@ export function toggleListener(element, event, callback, toggle = false, passive
 
     // Allow multiple events
     const events = event.split(' ');
-
     // Build options
     // Default to just the capture boolean for browsers with no passive listener support
     let options = capture;

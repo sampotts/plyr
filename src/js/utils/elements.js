@@ -17,7 +17,6 @@ export function wrap(elements, wrapper) {
         .reverse()
         .forEach((element, index) => {
             const child = index > 0 ? wrapper.cloneNode(true) : wrapper;
-
             // Cache the current parent and sibling.
             const parent = element.parentNode;
             const sibling = element.nextSibling;
@@ -145,12 +144,10 @@ export function getAttributesFromSelector(sel, existingAttributes) {
         const selector = s.trim();
         const className = selector.replace('.', '');
         const stripped = selector.replace(/[[\]]/g, '');
-
         // Get the parts and value
         const parts = stripped.split('=');
         const [key] = parts;
         const value = parts.length > 1 ? parts[1].replace(/["']/g, '') : '';
-
         // Get the first character
         const start = selector.charAt(0);
 

@@ -285,7 +285,6 @@ class Listeners {
 
                 // Show, then hide after a timeout unless another control event occurs
                 const show = ['touchstart', 'touchmove', 'mousemove'].includes(event.type);
-
                 let delay = 0;
 
                 if (show) {
@@ -351,7 +350,6 @@ class Listeners {
             }
 
             const isEnter = event.type === 'enterfullscreen';
-
             // Set the player size when entering fullscreen to viewport size
             const { padding, ratio } = setPlayerSize(isEnter);
 
@@ -542,7 +540,6 @@ class Listeners {
     controls() {
         const { player } = this;
         const { elements } = player;
-
         // IE doesn't support input event, so we fallback to change
         const inputEvent = browser.isIE ? 'change' : 'input';
 
@@ -678,7 +675,6 @@ class Listeners {
 
             // Was playing before?
             const play = seek.hasAttribute(attribute);
-
             // Done seeking
             const done = ['mouseup', 'touchend', 'keyup'].includes(event.type);
 
@@ -706,7 +702,6 @@ class Listeners {
             inputEvent,
             event => {
                 const seek = event.currentTarget;
-
                 // If it exists, use seek-value instead of "value" for consistency with tooltip time (#954)
                 let seekTo = seek.getAttribute('seek-value');
 
@@ -837,10 +832,8 @@ class Listeners {
                 // Detect "natural" scroll - suppored on OS X Safari only
                 // Other browsers on OS X will be inverted until support improves
                 const inverted = event.webkitDirectionInvertedFromDevice;
-
                 // Get delta from event. Invert if `inverted` is true
                 const [x, y] = [event.deltaX, -event.deltaY].map(value => (inverted ? -value : value));
-
                 // Using the biggest delta, normalize to 1 or -1 (or 0 if no delta)
                 const direction = Math.sign(Math.abs(x) > Math.abs(y) ? x : y);
 

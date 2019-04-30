@@ -303,7 +303,6 @@ class Ads {
      */
     onAdEvent(event) {
         const { container } = this.player.elements;
-
         // Retrieve the ad from the event. Some events (e.g. ALL_ADS_COMPLETED)
         // don't have ad object associated
         const ad = event.getAd();

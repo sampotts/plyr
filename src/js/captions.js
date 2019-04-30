@@ -85,7 +85,6 @@ const captions = {
 
         const browserLanguages = navigator.languages || [navigator.language || navigator.userLanguage || 'en'];
         const languages = dedupe(browserLanguages.map(language => language.split('-')[0]));
-
         let language = (this.storage.get('language') || this.config.captions.language || 'auto').toLowerCase();
 
         // Use first browser language when language is 'auto'
@@ -166,7 +165,6 @@ const captions = {
 
         const { toggled } = this.captions; // Current state
         const activeClass = this.config.classNames.captions.active;
-
         // Get the next state
         // If the method is called without parameter, toggle based on current value
         const active = is.nullOrUndefined(input) ? !toggled : input;

@@ -121,7 +121,6 @@ class PreviewThumbnails {
 
             // If string, convert into single-element list
             const urls = is.string(src) ? [src] : src;
-
             // Loop through each src URL. Download and process the VTT file, storing the resulting data in this.thumbnails
             const promises = urls.map(u => this.getThumbnail(u));
 
@@ -467,7 +466,6 @@ class PreviewThumbnails {
 
                                 const { urlPrefix } = this.thumbnails[0];
                                 const thumbURL = urlPrefix + newThumbFilename;
-
                                 const previewImage = new Image();
                                 previewImage.src = thumbURL;
                                 previewImage.onload = () => {
@@ -601,11 +599,9 @@ class PreviewThumbnails {
         const seekbarRect = this.player.elements.progress.getBoundingClientRect();
         const plyrRect = this.player.elements.container.getBoundingClientRect();
         const { container } = this.elements.thumb;
-
         // Find the lowest and highest desired left-position, so we don't slide out the side of the video container
         const minVal = plyrRect.left - seekbarRect.left + 10;
         const maxVal = plyrRect.right - seekbarRect.left - container.clientWidth - 10;
-
         // Set preview container position to: mousepos, minus seekbar.left, minus half of previewContainer.clientWidth
         let previewPos = this.mousePosX - seekbarRect.left - container.clientWidth / 2;
 

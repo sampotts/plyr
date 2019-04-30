@@ -60,7 +60,6 @@ const html5 = {
             set(input) {
                 // Get sources
                 const sources = html5.getSources.call(player);
-
                 // Get first match for requested size
                 const source = sources.find(source => Number(source.getAttribute('size')) === input);
 

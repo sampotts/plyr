@@ -7,6 +7,7 @@
 
 import 'custom-event-polyfill';
 import 'url-polyfill';
+
 import Plyr from './plyr';
 
 export default Plyr;
