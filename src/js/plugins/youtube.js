@@ -81,7 +81,7 @@ const youtube = {
             }
 
             // Add to queue
-            window.onYouTubeReadyCallbacks.push(() => {
+            onYouTubeReadyCallbacks.push(() => {
                 youtube.ready.call(this);
             });
         }
