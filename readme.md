@@ -655,7 +655,7 @@ The arguments are:
 -   Provider (`html5`, `youtube` or `vimeo`)
 -   Whether the player has the `playsinline` attribute (only applicable to iOS 10+)
 
-## Disable support programatically
+## Disable support programmatically
 
 The `enabled` option can be used to disable certain User Agents. For example, if you don't want to use Plyr for smartphones, you could use:
 
