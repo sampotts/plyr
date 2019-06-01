@@ -18,7 +18,6 @@ export function formatTime(time = 0, displayHours = false, inverted = false) {
 
     // Format time component to add leading zero
     const format = value => `0${value}`.slice(-2);
-
     // Breakdown to hours, mins, secs
     let hours = getHours(time);
     const mins = getMinutes(time);

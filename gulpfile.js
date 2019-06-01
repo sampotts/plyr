@@ -6,24 +6,28 @@
 
 const path = require('path');
 const gulp = require('gulp');
-
+// ------------------------------------
 // JavaScript
+// ------------------------------------
 const terser = require('gulp-terser');
 const rollup = require('gulp-better-rollup');
 const babel = require('rollup-plugin-babel');
 const commonjs = require('rollup-plugin-commonjs');
 const resolve = require('rollup-plugin-node-resolve');
-
+// ------------------------------------
 // CSS
+// ------------------------------------
 const sass = require('gulp-sass');
 const clean = require('gulp-clean-css');
 const prefix = require('gulp-autoprefixer');
-
+// ------------------------------------
 // Images
+// ------------------------------------
 const svgstore = require('gulp-svgstore');
 const imagemin = require('gulp-imagemin');
-
+// ------------------------------------
 // Utils
+// ------------------------------------
 const del = require('del');
 const filter = require('gulp-filter');
 const header = require('gulp-header');
@@ -37,18 +41,22 @@ const plumber = require('gulp-plumber');
 const size = require('gulp-size');
 const sourcemaps = require('gulp-sourcemaps');
 const through = require('through2');
-
+// ------------------------------------
 // Deployment
+// ------------------------------------
 const aws = require('aws-sdk');
 const publish = require('gulp-awspublish');
 const FastlyPurge = require('fastly-purge');
-
+// ------------------------------------
+// Configs
+// ------------------------------------
 const pkg = require('./package.json');
 const build = require('./build.json');
 const deploy = require('./deploy.json');
-
+// ------------------------------------
+// Info from package
+// ------------------------------------
 const { browserslist: browsers, version } = pkg;
-
 const minSuffix = '.min';
 
 // Get AWS config

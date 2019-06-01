@@ -85,7 +85,6 @@ const captions = {
 
         const browserLanguages = navigator.languages || [navigator.language || navigator.userLanguage || 'en'];
         const languages = dedupe(browserLanguages.map(language => language.split('-')[0]));
-
         let language = (this.storage.get('language') || this.config.captions.language || 'auto').toLowerCase();
 
         // Use first browser language when language is 'auto'
@@ -134,7 +133,7 @@ const captions = {
                     });
 
                     // Turn off native caption rendering to avoid double captions
-                    track.mode = 'hidden';
+                    Object.assign(track, { mode: 'hidden' });
 
                     // Add event listener for cue changes
                     on.call(this, track, 'cuechange', () => captions.updateCues.call(this));
@@ -166,7 +165,6 @@ const captions = {
 
         const { toggled } = this.captions; // Current state
         const activeClass = this.config.classNames.captions.active;
-
         // Get the next state
         // If the method is called without parameter, toggle based on current value
         const active = is.nullOrUndefined(input) ? !toggled : input;
@@ -304,7 +302,7 @@ const captions = {
         let track;
 
         languages.every(language => {
-            track = sorted.find(track => track.language === language);
+            track = sorted.find(t => t.language === language);
             return !track; // Break iteration if there is a match
         });
 

@@ -64,7 +64,6 @@ export function setAspectRatio(input) {
     }
 
     const ratio = getAspectRatio.call(this, input);
-
     const [w, h] = is.array(ratio) ? ratio : [0, 0];
     const padding = (100 / w) * h;
 

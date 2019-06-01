@@ -2,6 +2,7 @@ import { createElement } from '../utils/elements';
 import { once } from '../utils/events';
 import fetch from '../utils/fetch';
 import is from '../utils/is';
+import { extend } from '../utils/objects';
 import { formatTime } from '../utils/time';
 
 // Arg: vttDataString example: "WEBVTT\n\n1\n00:00:05.000 --> 00:00:10.000\n1080p-00001.jpg"
@@ -121,7 +122,6 @@ class PreviewThumbnails {
 
             // If string, convert into single-element list
             const urls = is.string(src) ? [src] : src;
-
             // Loop through each src URL. Download and process the VTT file, storing the resulting data in this.thumbnails
             const promises = urls.map(u => this.getThumbnail(u));
 
@@ -426,7 +426,7 @@ class PreviewThumbnails {
             if (image.dataset.index !== currentImage.dataset.index && !image.dataset.deleting) {
                 // Wait 200ms, as the new image can take some time to show on certain browsers (even though it was downloaded before showing). This will prevent flicker, and show some generosity towards slower clients
                 // First set attribute 'deleting' to prevent multi-handling of this on repeat firing of this function
-                image.dataset.deleting = true;
+                extend(image, { dataset: { deleting: true } });
                 // This has to be set before the timeout - to prevent issues switching between hover and scrub
                 const { currentImageContainer } = this;
 
@@ -467,7 +467,6 @@ class PreviewThumbnails {
 
                                 const { urlPrefix } = this.thumbnails[0];
                                 const thumbURL = urlPrefix + newThumbFilename;
-
                                 const previewImage = new Image();
                                 previewImage.src = thumbURL;
                                 previewImage.onload = () => {
@@ -601,11 +600,9 @@ class PreviewThumbnails {
         const seekbarRect = this.player.elements.progress.getBoundingClientRect();
         const plyrRect = this.player.elements.container.getBoundingClientRect();
         const { container } = this.elements.thumb;
-
         // Find the lowest and highest desired left-position, so we don't slide out the side of the video container
         const minVal = plyrRect.left - seekbarRect.left + 10;
         const maxVal = plyrRect.right - seekbarRect.left - container.clientWidth - 10;
-
         // Set preview container position to: mousepos, minus seekbar.left, minus half of previewContainer.clientWidth
         let previewPos = this.mousePosX - seekbarRect.left - container.clientWidth / 2;
 
@@ -636,9 +633,13 @@ class PreviewThumbnails {
         // Find difference between height and preview container height
         const multiplier = this.thumbContainerHeight / frame.h;
 
+        // eslint-disable-next-line no-param-reassign
         previewImage.style.height = `${Math.floor(previewImage.naturalHeight * multiplier)}px`;
+        // eslint-disable-next-line no-param-reassign
         previewImage.style.width = `${Math.floor(previewImage.naturalWidth * multiplier)}px`;
+        // eslint-disable-next-line no-param-reassign
         previewImage.style.left = `-${frame.x * multiplier}px`;
+        // eslint-disable-next-line no-param-reassign
         previewImage.style.top = `-${frame.y * multiplier}px`;
     }
 }

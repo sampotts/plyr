@@ -151,7 +151,6 @@ class Plyr {
         // Set media type based on tag or data attribute
         // Supported: video, audio, vimeo, youtube
         const type = this.media.tagName.toLowerCase();
-
         // Embed properties
         let iframe = null;
         let url = null;
@@ -324,27 +323,27 @@ class Plyr {
      * Types and provider helpers
      */
     get isHTML5() {
-        return Boolean(this.provider === providers.html5);
+        return this.provider === providers.html5;
     }
 
     get isEmbed() {
-        return Boolean(this.isYouTube || this.isVimeo);
+        return this.isYouTube || this.isVimeo;
     }
 
     get isYouTube() {
-        return Boolean(this.provider === providers.youtube);
+        return this.provider === providers.youtube;
     }
 
     get isVimeo() {
-        return Boolean(this.provider === providers.vimeo);
+        return this.provider === providers.vimeo;
     }
 
     get isVideo() {
-        return Boolean(this.type === types.video);
+        return this.type === types.video;
     }
 
     get isAudio() {
-        return Boolean(this.type === types.audio);
+        return this.type === types.audio;
     }
 
     /**
@@ -514,7 +513,6 @@ class Plyr {
     get duration() {
         // Faux duration set via config
         const fauxDuration = parseFloat(this.config.duration);
-
         // Media duration can be NaN or Infinity before the media has loaded
         const realDuration = (this.media || {}).duration;
         const duration = !is.number(realDuration) || realDuration === Infinity ? 0 : realDuration;
@@ -1045,10 +1043,8 @@ class Plyr {
         if (this.supported.ui && !this.isAudio) {
             // Get state before change
             const isHidden = hasClass(this.elements.container, this.config.classNames.hideControls);
-
             // Negate the argument if not undefined since adding the class to hides the controls
             const force = typeof toggle === 'undefined' ? undefined : !toggle;
-
             // Apply and get updated state
             const hiding = toggleClass(this.elements.container, this.config.classNames.hideControls, force);
 

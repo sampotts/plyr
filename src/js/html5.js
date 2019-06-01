@@ -52,7 +52,7 @@ const html5 = {
             get() {
                 // Get sources
                 const sources = html5.getSources.call(player);
-                const source = sources.find(source => source.getAttribute('src') === player.source);
+                const source = sources.find(s => s.getAttribute('src') === player.source);
 
                 // Return size, if match is found
                 return source && Number(source.getAttribute('size'));
@@ -60,9 +60,8 @@ const html5 = {
             set(input) {
                 // Get sources
                 const sources = html5.getSources.call(player);
-
                 // Get first match for requested size
-                const source = sources.find(source => Number(source.getAttribute('size')) === input);
+                const source = sources.find(s => Number(s.getAttribute('size')) === input);
 
                 // No matching source found
                 if (!source) {
