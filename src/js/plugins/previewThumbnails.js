@@ -426,7 +426,9 @@ class PreviewThumbnails {
             if (image.dataset.index !== currentImage.dataset.index && !image.dataset.deleting) {
                 // Wait 200ms, as the new image can take some time to show on certain browsers (even though it was downloaded before showing). This will prevent flicker, and show some generosity towards slower clients
                 // First set attribute 'deleting' to prevent multi-handling of this on repeat firing of this function
-                extend(image, { dataset: { deleting: true } });
+                // eslint-disable-next-line no-param-reassign
+                image.dataset.deleting = true;
+
                 // This has to be set before the timeout - to prevent issues switching between hover and scrub
                 const { currentImageContainer } = this;
 

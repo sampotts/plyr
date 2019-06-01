@@ -38,7 +38,6 @@
 
     &:hover {
         box-shadow: 0 2px 2px rgba(#000, 0.1);
-        transform: translateY(-1px);
     }
 
     &:focus {
@@ -50,7 +49,7 @@
     }
 
     &:active {
-        transform: translateY(1px);
+        top: 1px;
     }
 }
 

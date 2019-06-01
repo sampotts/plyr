@@ -8703,8 +8703,8 @@ typeof navigator === "object" && (function () {
 	      };
 
 	      var resized = function resized() {
-	        window.clearTimeout(timers.resized);
-	        timers.resized = window.setTimeout(setPlayerSize, 50);
+	        clearTimeout(timers.resized);
+	        timers.resized = setTimeout(setPlayerSize, 50);
 	      };
 
 	      on.call(player, elements.container, 'enterfullscreen exitfullscreen', function (event) {
@@ -9841,23 +9841,22 @@ typeof navigator === "object" && (function () {
 	    if (is$1.object(window.YT) && is$1.function(window.YT.Player)) {
 	      youtube.ready.call(this);
 	    } else {
-	      // Load the API
-	      loadScript(this.config.urls.youtube.sdk).catch(function (error) {
-	        _this.debug.warn('YouTube API failed to load', error);
-	      }); // Setup callback for the API
-	      // YouTube has it's own system of course...
-
-	      window.onYouTubeReadyCallbacks = window.onYouTubeReadyCallbacks || []; // Add to queue
-
-	      window.onYouTubeReadyCallbacks.push(function () {
-	        youtube.ready.call(_this);
-	      }); // Set callback to process queue
+	      // Reference current global callback
+	      var callback = window.onYouTubeIframeAPIReady; // Set callback to process queue
 
 	      window.onYouTubeIframeAPIReady = function () {
-	        window.onYouTubeReadyCallbacks.forEach(function (callback) {
+	        // Call global callback if set
+	        if (is$1.function(callback)) {
 	          callback();
-	        });
-	      };
+	        }
+
+	        youtube.ready.call(_this);
+	      }; // Load the SDK
+
+
+	      loadScript(this.config.urls.youtube.sdk).catch(function (error) {
+	        _this.debug.warn('YouTube API failed to load', error);
+	      });
 	    }
 	  },
 	  // Get the media title
@@ -9887,7 +9886,7 @@ typeof navigator === "object" && (function () {
 	  ready: function ready() {
 	    var player = this; // Ignore already setup (race condition)
 
-	    var currentId = player.media.getAttribute('id');
+	    var currentId = player.media && player.media.getAttribute('id');
 
 	    if (!is$1.empty(currentId) && currentId.startsWith('youtube-')) {
 	      return;
@@ -11309,11 +11308,8 @@ typeof navigator === "object" && (function () {
 	        if (image.dataset.index !== currentImage.dataset.index && !image.dataset.deleting) {
 	          // Wait 200ms, as the new image can take some time to show on certain browsers (even though it was downloaded before showing). This will prevent flicker, and show some generosity towards slower clients
 	          // First set attribute 'deleting' to prevent multi-handling of this on repeat firing of this function
-	          extend(image, {
-	            dataset: {
-	              deleting: true
-	            }
-	          }); // This has to be set before the timeout - to prevent issues switching between hover and scrub
+	          // eslint-disable-next-line no-param-reassign
+	          image.dataset.deleting = true; // This has to be set before the timeout - to prevent issues switching between hover and scrub
 
 	          var currentImageContainer = _this8.currentImageContainer;
 	          setTimeout(function () {

@@ -47,8 +47,6 @@ function getHost(config) {
     return undefined;
 }
 
-let onYouTubeReadyCallbacks;
-
 const youtube = {
     setup() {
         // Add embed class for responsive
@@ -58,31 +56,22 @@ const youtube = {
         if (is.object(window.YT) && is.function(window.YT.Player)) {
             youtube.ready.call(this);
         } else {
+            // Reference current global callback
+            const callback = window.onYouTubeIframeAPIReady;
 
-            if (!onYouTubeReadyCallbacks) {
-                const oldYouTubeIframeAPIReady = window.onYouTubeIframeAPIReady;
-                // Load the API
-                onYouTubeReadyCallbacks = [];
+            // Set callback to process queue
+            window.onYouTubeIframeAPIReady = () => {
+                // Call global callback if set
+                if (is.function(callback)) {
+                    callback();
+                }
 
-                // Set callback to process queue
-                window.onYouTubeIframeAPIReady = () => {
-                    if (oldYouTubeIframeAPIReady && is.function(oldYouTubeIframeAPIReady)) {
-                        oldYouTubeIframeAPIReady();
-                    }
-
-                    window.onYouTubeReadyCallbacks.forEach(callback => {
-                        callback();
-                    });
-                };
-
-                loadScript(this.config.urls.youtube.sdk).catch(error => {
-                    this.debug.warn('YouTube API failed to load', error);
-                });
-            }
-
-            // Add to queue
-            onYouTubeReadyCallbacks.push(() => {
                 youtube.ready.call(this);
+            };
+
+            // Load the SDK
+            loadScript(this.config.urls.youtube.sdk).catch(error => {
+                this.debug.warn('YouTube API failed to load', error);
             });
         }
     },

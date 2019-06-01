@@ -337,8 +337,8 @@ class Listeners {
         };
 
         const resized = () => {
-            window.clearTimeout(timers.resized);
-            timers.resized = window.setTimeout(setPlayerSize, 50);
+            clearTimeout(timers.resized);
+            timers.resized = setTimeout(setPlayerSize, 50);
         };
 
         on.call(player, elements.container, 'enterfullscreen exitfullscreen', event => {
