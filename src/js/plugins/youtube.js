@@ -47,6 +47,8 @@ function getHost(config) {
     return undefined;
 }
 
+let onYouTubeReadyCallbacks;
+
 const youtube = {
     setup() {
         // Add embed class for responsive
@@ -56,26 +58,32 @@ const youtube = {
         if (is.object(window.YT) && is.function(window.YT.Player)) {
             youtube.ready.call(this);
         } else {
-            // Load the API
-            loadScript(this.config.urls.youtube.sdk).catch(error => {
-                this.debug.warn('YouTube API failed to load', error);
-            });
 
-            // Setup callback for the API
-            // YouTube has it's own system of course...
-            window.onYouTubeReadyCallbacks = window.onYouTubeReadyCallbacks || [];
+            if (!onYouTubeReadyCallbacks) {
+                const oldYouTubeIframeAPIReady = window.onYouTubeIframeAPIReady;
+                // Load the API
+                onYouTubeReadyCallbacks = [];
+
+                // Set callback to process queue
+                window.onYouTubeIframeAPIReady = () => {
+                    if (oldYouTubeIframeAPIReady && is.function(oldYouTubeIframeAPIReady)) {
+                        oldYouTubeIframeAPIReady();
+                    }
+
+                    window.onYouTubeReadyCallbacks.forEach(callback => {
+                        callback();
+                    });
+                };
+
+                loadScript(this.config.urls.youtube.sdk).catch(error => {
+                    this.debug.warn('YouTube API failed to load', error);
+                });
+            }
 
             // Add to queue
-            window.onYouTubeReadyCallbacks.push(() => {
+            onYouTubeReadyCallbacks.push(() => {
                 youtube.ready.call(this);
             });
-
-            // Set callback to process queue
-            window.onYouTubeIframeAPIReady = () => {
-                window.onYouTubeReadyCallbacks.forEach(callback => {
-                    callback();
-                });
-            };
         }
     },
 
@@ -108,7 +116,7 @@ const youtube = {
     ready() {
         const player = this;
         // Ignore already setup (race condition)
-        const currentId = player.media.getAttribute('id');
+        const currentId = player.media && player.media.getAttribute('id');
         if (!is.empty(currentId) && currentId.startsWith('youtube-')) {
             return;
         }
