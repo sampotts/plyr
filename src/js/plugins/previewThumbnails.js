@@ -2,7 +2,6 @@ import { createElement } from '../utils/elements';
 import { once } from '../utils/events';
 import fetch from '../utils/fetch';
 import is from '../utils/is';
-import { extend } from '../utils/objects';
 import { formatTime } from '../utils/time';
 
 // Arg: vttDataString example: "WEBVTT\n\n1\n00:00:05.000 --> 00:00:10.000\n1080p-00001.jpg"
