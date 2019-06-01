@@ -42,8 +42,9 @@ const defaults = {
     // Clicking the currentTime inverts it's value to show time left rather than elapsed
     toggleInvert: true,
 
-    // Aspect ratio (for embeds)
-    ratio: '16:9',
+    // Force an aspect ratio
+    // The format must be `'w:h'` (e.g. `'16:9'`)
+    ratio: null,
 
     // Click video container to play/pause
     clickToPlay: true,
@@ -194,8 +195,7 @@ const defaults = {
         },
         youtube: {
             sdk: 'https://www.youtube.com/iframe_api',
-            api:
-                'https://www.googleapis.com/youtube/v3/videos?id={0}&key={1}&fields=items(snippet(title))&part=snippet',
+            api: 'https://noembed.com/embed?url=https://www.youtube.com/watch?v={0}', // 'https://www.googleapis.com/youtube/v3/videos?id={0}&key={1}&fields=items(snippet(title),fileDetails)&part=snippet',
         },
         googleIMA: {
             sdk: 'https://imasdk.googleapis.com/js/sdkloader/ima3.js',
@@ -319,9 +319,6 @@ const defaults = {
         progress: '.plyr__progress',
         captions: '.plyr__captions',
         caption: '.plyr__caption',
-        menu: {
-            quality: '.js-plyr__menu__list--quality',
-        },
     },
 
     // Class hooks added to the player in different states
@@ -330,6 +327,7 @@ const defaults = {
         provider: 'plyr--{0}',
         video: 'plyr__video-wrapper',
         embed: 'plyr__video-embed',
+        videoFixedRatio: 'plyr__video-wrapper--fixed-ratio',
         embedContainer: 'plyr__video-embed__container',
         poster: 'plyr__poster',
         posterEnabled: 'plyr__poster-enabled',
@@ -392,11 +390,6 @@ const defaults = {
             provider: 'data-plyr-provider',
             id: 'data-plyr-embed-id',
         },
-    },
-
-    // API keys
-    keys: {
-        google: null,
     },
 
     // Advertisements plugin

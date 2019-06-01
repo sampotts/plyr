@@ -4,6 +4,7 @@
 // ==========================================================================
 
 import RangeTouch from 'rangetouch';
+
 import captions from './captions';
 import html5 from './html5';
 import support from './support';
@@ -105,7 +106,6 @@ const controls = {
         const namespace = 'http://www.w3.org/2000/svg';
         const iconUrl = controls.getIconUrl.call(this);
         const iconPath = `${!iconUrl.cors ? iconUrl.url : ''}#${this.config.iconPrefix}`;
-
         // Create <svg>
         const icon = document.createElementNS(namespace, 'svg');
         setAttributes(
@@ -172,7 +172,7 @@ const controls = {
 
     // Create a <button>
     createButton(buttonType, attr) {
-        const attributes = Object.assign({}, attr);
+        const attributes = extend({}, attr);
         let type = toCamelCase(buttonType);
 
         const props = {
@@ -198,8 +198,10 @@ const controls = {
 
         // Set class name
         if (Object.keys(attributes).includes('class')) {
-            if (!attributes.class.includes(this.config.classNames.control)) {
-                attributes.class += ` ${this.config.classNames.control}`;
+            if (!attributes.class.split(' ').some(c => c === this.config.classNames.control)) {
+                extend(attributes, {
+                    class: `${attributes.class} ${this.config.classNames.control}`,
+                });
             }
         } else {
             attributes.class = this.config.classNames.control;
@@ -377,13 +379,13 @@ const controls = {
     },
 
     // Create time display
-    createTime(type) {
-        const attributes = getAttributesFromSelector(this.config.selectors.display[type]);
+    createTime(type, attrs) {
+        const attributes = getAttributesFromSelector(this.config.selectors.display[type], attrs);
 
         const container = createElement(
             'div',
             extend(attributes, {
-                class: `${this.config.classNames.display.time} ${attributes.class ? attributes.class : ''}`.trim(),
+                class: `${attributes.class ? attributes.class : ''} ${this.config.classNames.display.time} `.trim(),
                 'aria-label': i18n.get(type, this.config),
             }),
             '00:00',
@@ -491,15 +493,15 @@ const controls = {
             get() {
                 return menuItem.getAttribute('aria-checked') === 'true';
             },
-            set(checked) {
+            set(check) {
                 // Ensure exclusivity
-                if (checked) {
+                if (check) {
                     Array.from(menuItem.parentNode.children)
                         .filter(node => matches(node, '[role="menuitemradio"]'))
                         .forEach(node => node.setAttribute('aria-checked', 'false'));
                 }
 
-                menuItem.setAttribute('aria-checked', checked ? 'true' : 'false');
+                menuItem.setAttribute('aria-checked', check ? 'true' : 'false');
             },
         });
 
@@ -607,17 +609,17 @@ const controls = {
         let value = 0;
 
         const setProgress = (target, input) => {
-            const value = is.number(input) ? input : 0;
+            const val = is.number(input) ? input : 0;
             const progress = is.element(target) ? target : this.elements.display.buffer;
 
             // Update value and label
             if (is.element(progress)) {
-                progress.value = value;
+                progress.value = val;
 
                 // Update text label inside
                 const label = progress.getElementsByTagName('span')[0];
                 if (is.element(label)) {
-                    label.childNodes[0].nodeValue = value;
+                    label.childNodes[0].nodeValue = val;
                 }
             }
         };
@@ -699,14 +701,8 @@ const controls = {
             return;
         }
 
-        // Calculate percentage
-        let percent = 0;
-        const clientRect = this.elements.progress.getBoundingClientRect();
         const visible = `${this.config.classNames.tooltip}--visible`;
-
-        const toggle = toggle => {
-            toggleClass(this.elements.display.seekTooltip, visible, toggle);
-        };
+        const toggle = show => toggleClass(this.elements.display.seekTooltip, visible, show);
 
         // Hide on touch
         if (this.touch) {
@@ -715,6 +711,9 @@ const controls = {
         }
 
         // Determine percentage, if already visible
+        let percent = 0;
+        const clientRect = this.elements.progress.getBoundingClientRect();
+
         if (is.event(event)) {
             percent = (100 / clientRect.width) * (event.pageX - clientRect.left);
         } else if (hasClass(this.elements.display.seekTooltip, visible)) {
@@ -1111,7 +1110,7 @@ const controls = {
         let target = pane;
 
         if (!is.element(target)) {
-            target = Object.values(this.elements.settings.panels).find(pane => !pane.hidden);
+            target = Object.values(this.elements.settings.panels).find(p => !p.hidden);
         }
 
         const firstItem = target.querySelector('[role^="menuitem"]');
@@ -1138,7 +1137,10 @@ const controls = {
         } else if (is.keyboardEvent(input) && input.which === 27) {
             show = false;
         } else if (is.event(input)) {
-            const isMenuItem = popup.contains(input.target);
+            // If Plyr is in a shadowDOM, the event target is set to the component, instead of the
+            // Element in the shadowDOM. The path, if available, is complete.
+            const target = is.function(input.composedPath) ? input.composedPath()[0] : input.target;
+            const isMenuItem = popup.contains(target);
 
             // If the click was inside the menu or if the click
             // wasn't the button or menu item and we're trying to
@@ -1191,7 +1193,7 @@ const controls = {
 
     // Show a panel in the menu
     showMenuPanel(type = '', tabFocus = false) {
-        const target = document.getElementById(`plyr-settings-${this.id}-${type}`);
+        const target = this.elements.container.querySelector(`#plyr-settings-${this.id}-${type}`);
 
         // Nothing to show, bail
         if (!is.element(target)) {
@@ -1244,8 +1246,8 @@ const controls = {
         controls.focusFirstMenuItem.call(this, target, tabFocus);
     },
 
-    // Set the download link
-    setDownloadLink() {
+    // Set the download URL
+    setDownloadUrl() {
         const button = this.elements.buttons.download;
 
         // Bail if no button
@@ -1253,324 +1255,356 @@ const controls = {
             return;
         }
 
-        // Set download link
+        // Set attribute
         button.setAttribute('href', this.download);
     },
 
     // Build the default HTML
-    // TODO: Set order based on order in the config.controls array?
     create(data) {
+        const {
+            bindMenuItemShortcuts,
+            createButton,
+            createProgress,
+            createRange,
+            createTime,
+            setQualityMenu,
+            setSpeedMenu,
+            showMenuPanel,
+        } = controls;
+        this.elements.controls = null;
+
+        // Larger overlaid play button
+        if (this.config.controls.includes('play-large')) {
+            this.elements.container.appendChild(createButton.call(this, 'play-large'));
+        }
+
         // Create the container
         const container = createElement('div', getAttributesFromSelector(this.config.selectors.controls.wrapper));
+        this.elements.controls = container;
 
-        // Restart button
-        if (this.config.controls.includes('restart')) {
-            container.appendChild(controls.createButton.call(this, 'restart'));
-        }
+        // Default item attributes
+        const defaultAttributes = { class: 'plyr__controls__item' };
 
-        // Rewind button
-        if (this.config.controls.includes('rewind')) {
-            container.appendChild(controls.createButton.call(this, 'rewind'));
-        }
+        // Loop through controls in order
+        dedupe(this.config.controls).forEach(control => {
+            // Restart button
+            if (control === 'restart') {
+                container.appendChild(createButton.call(this, 'restart', defaultAttributes));
+            }
 
-        // Play/Pause button
-        if (this.config.controls.includes('play')) {
-            container.appendChild(controls.createButton.call(this, 'play'));
-        }
+            // Rewind button
+            if (control === 'rewind') {
+                container.appendChild(createButton.call(this, 'rewind', defaultAttributes));
+            }
 
-        // Fast forward button
-        if (this.config.controls.includes('fast-forward')) {
-            container.appendChild(controls.createButton.call(this, 'fast-forward'));
-        }
+            // Play/Pause button
+            if (control === 'play') {
+                container.appendChild(createButton.call(this, 'play', defaultAttributes));
+            }
 
-        // Progress
-        if (this.config.controls.includes('progress')) {
-            const progress = createElement('div', getAttributesFromSelector(this.config.selectors.progress));
+            // Fast forward button
+            if (control === 'fast-forward') {
+                container.appendChild(createButton.call(this, 'fast-forward', defaultAttributes));
+            }
 
-            // Seek range slider
-            progress.appendChild(
-                controls.createRange.call(this, 'seek', {
-                    id: `plyr-seek-${data.id}`,
-                }),
-            );
+            // Progress
+            if (control === 'progress') {
+                const progressContainer = createElement('div', {
+                    class: `${defaultAttributes.class} plyr__progress__container`,
+                });
 
-            // Buffer progress
-            progress.appendChild(controls.createProgress.call(this, 'buffer'));
+                const progress = createElement('div', getAttributesFromSelector(this.config.selectors.progress));
 
-            // TODO: Add loop display indicator
-
-            // Seek tooltip
-            if (this.config.tooltips.seek) {
-                const tooltip = createElement(
-                    'span',
-                    {
-                        class: this.config.classNames.tooltip,
-                    },
-                    '00:00',
+                // Seek range slider
+                progress.appendChild(
+                    createRange.call(this, 'seek', {
+                        id: `plyr-seek-${data.id}`,
+                    }),
                 );
 
-                progress.appendChild(tooltip);
-                this.elements.display.seekTooltip = tooltip;
+                // Buffer progress
+                progress.appendChild(createProgress.call(this, 'buffer'));
+
+                // TODO: Add loop display indicator
+
+                // Seek tooltip
+                if (this.config.tooltips.seek) {
+                    const tooltip = createElement(
+                        'span',
+                        {
+                            class: this.config.classNames.tooltip,
+                        },
+                        '00:00',
+                    );
+
+                    progress.appendChild(tooltip);
+                    this.elements.display.seekTooltip = tooltip;
+                }
+
+                this.elements.progress = progress;
+                progressContainer.appendChild(this.elements.progress);
+                container.appendChild(progressContainer);
             }
 
-            this.elements.progress = progress;
-            container.appendChild(this.elements.progress);
-        }
-
-        // Media current time display
-        if (this.config.controls.includes('current-time')) {
-            container.appendChild(controls.createTime.call(this, 'currentTime'));
-        }
-
-        // Media duration display
-        if (this.config.controls.includes('duration')) {
-            container.appendChild(controls.createTime.call(this, 'duration'));
-        }
-
-        // Volume controls
-        if (this.config.controls.includes('mute') || this.config.controls.includes('volume')) {
-            const volume = createElement('div', {
-                class: 'plyr__volume',
-            });
-
-            // Toggle mute button
-            if (this.config.controls.includes('mute')) {
-                volume.appendChild(controls.createButton.call(this, 'mute'));
+            // Media current time display
+            if (control === 'current-time') {
+                container.appendChild(createTime.call(this, 'currentTime', defaultAttributes));
             }
 
-            // Volume range control
-            if (this.config.controls.includes('volume')) {
-                // Set the attributes
-                const attributes = {
-                    max: 1,
-                    step: 0.05,
-                    value: this.config.volume,
-                };
+            // Media duration display
+            if (control === 'duration') {
+                container.appendChild(createTime.call(this, 'duration', defaultAttributes));
+            }
 
-                // Create the volume range slider
-                volume.appendChild(
-                    controls.createRange.call(
-                        this,
-                        'volume',
-                        extend(attributes, {
-                            id: `plyr-volume-${data.id}`,
+            // Volume controls
+            if (control === 'mute' || control === 'volume') {
+                let { volume } = this.elements;
+
+                // Create the volume container if needed
+                if (!is.element(volume) || !container.contains(volume)) {
+                    volume = createElement(
+                        'div',
+                        extend({}, defaultAttributes, {
+                            class: `${defaultAttributes.class} plyr__volume`.trim(),
                         }),
-                    ),
-                );
+                    );
 
-                this.elements.volume = volume;
+                    this.elements.volume = volume;
+
+                    container.appendChild(volume);
+                }
+
+                // Toggle mute button
+                if (control === 'mute') {
+                    volume.appendChild(createButton.call(this, 'mute'));
+                }
+
+                // Volume range control
+                if (control === 'volume') {
+                    // Set the attributes
+                    const attributes = {
+                        max: 1,
+                        step: 0.05,
+                        value: this.config.volume,
+                    };
+
+                    // Create the volume range slider
+                    volume.appendChild(
+                        createRange.call(
+                            this,
+                            'volume',
+                            extend(attributes, {
+                                id: `plyr-volume-${data.id}`,
+                            }),
+                        ),
+                    );
+                }
             }
 
-            container.appendChild(volume);
-        }
+            // Toggle captions button
+            if (control === 'captions') {
+                container.appendChild(createButton.call(this, 'captions', defaultAttributes));
+            }
 
-        // Toggle captions button
-        if (this.config.controls.includes('captions')) {
-            container.appendChild(controls.createButton.call(this, 'captions'));
-        }
-
-        // Settings button / menu
-        if (this.config.controls.includes('settings') && !is.empty(this.config.settings)) {
-            const control = createElement('div', {
-                class: 'plyr__menu',
-                hidden: '',
-            });
-
-            control.appendChild(
-                controls.createButton.call(this, 'settings', {
-                    'aria-haspopup': true,
-                    'aria-controls': `plyr-settings-${data.id}`,
-                    'aria-expanded': false,
-                }),
-            );
-
-            const popup = createElement('div', {
-                class: 'plyr__menu__container',
-                id: `plyr-settings-${data.id}`,
-                hidden: '',
-            });
-
-            const inner = createElement('div');
-
-            const home = createElement('div', {
-                id: `plyr-settings-${data.id}-home`,
-            });
-
-            // Create the menu
-            const menu = createElement('div', {
-                role: 'menu',
-            });
-
-            home.appendChild(menu);
-            inner.appendChild(home);
-            this.elements.settings.panels.home = home;
-
-            // Build the menu items
-            this.config.settings.forEach(type => {
-                // TODO: bundle this with the createMenuItem helper and bindings
-                const menuItem = createElement(
-                    'button',
-                    extend(getAttributesFromSelector(this.config.selectors.buttons.settings), {
-                        type: 'button',
-                        class: `${this.config.classNames.control} ${this.config.classNames.control}--forward`,
-                        role: 'menuitem',
-                        'aria-haspopup': true,
+            // Settings button / menu
+            if (control === 'settings' && !is.empty(this.config.settings)) {
+                const wrapper = createElement(
+                    'div',
+                    extend({}, defaultAttributes, {
+                        class: `${defaultAttributes.class} plyr__menu`.trim(),
                         hidden: '',
                     }),
                 );
 
-                // Bind menu shortcuts for keyboard users
-                controls.bindMenuItemShortcuts.call(this, menuItem, type);
-
-                // Show menu on click
-                on(menuItem, 'click', () => {
-                    controls.showMenuPanel.call(this, type, false);
-                });
-
-                const flex = createElement('span', null, i18n.get(type, this.config));
-
-                const value = createElement('span', {
-                    class: this.config.classNames.menu.value,
-                });
-
-                // Speed contains HTML entities
-                value.innerHTML = data[type];
-
-                flex.appendChild(value);
-                menuItem.appendChild(flex);
-                menu.appendChild(menuItem);
-
-                // Build the panes
-                const pane = createElement('div', {
-                    id: `plyr-settings-${data.id}-${type}`,
-                    hidden: '',
-                });
-
-                // Back button
-                const backButton = createElement('button', {
-                    type: 'button',
-                    class: `${this.config.classNames.control} ${this.config.classNames.control}--back`,
-                });
-
-                // Visible label
-                backButton.appendChild(
-                    createElement(
-                        'span',
-                        {
-                            'aria-hidden': true,
-                        },
-                        i18n.get(type, this.config),
-                    ),
-                );
-
-                // Screen reader label
-                backButton.appendChild(
-                    createElement(
-                        'span',
-                        {
-                            class: this.config.classNames.hidden,
-                        },
-                        i18n.get('menuBack', this.config),
-                    ),
-                );
-
-                // Go back via keyboard
-                on(
-                    pane,
-                    'keydown',
-                    event => {
-                        // We only care about <-
-                        if (event.which !== 37) {
-                            return;
-                        }
-
-                        // Prevent seek
-                        event.preventDefault();
-                        event.stopPropagation();
-
-                        // Show the respective menu
-                        controls.showMenuPanel.call(this, 'home', true);
-                    },
-                    false,
-                );
-
-                // Go back via button click
-                on(backButton, 'click', () => {
-                    controls.showMenuPanel.call(this, 'home', false);
-                });
-
-                // Add to pane
-                pane.appendChild(backButton);
-
-                // Menu
-                pane.appendChild(
-                    createElement('div', {
-                        role: 'menu',
+                wrapper.appendChild(
+                    createButton.call(this, 'settings', {
+                        'aria-haspopup': true,
+                        'aria-controls': `plyr-settings-${data.id}`,
+                        'aria-expanded': false,
                     }),
                 );
 
-                inner.appendChild(pane);
-
-                this.elements.settings.buttons[type] = menuItem;
-                this.elements.settings.panels[type] = pane;
-            });
-
-            popup.appendChild(inner);
-            control.appendChild(popup);
-            container.appendChild(control);
-
-            this.elements.settings.popup = popup;
-            this.elements.settings.menu = control;
-        }
-
-        // Picture in picture button
-        if (this.config.controls.includes('pip') && support.pip) {
-            container.appendChild(controls.createButton.call(this, 'pip'));
-        }
-
-        // Airplay button
-        if (this.config.controls.includes('airplay') && support.airplay) {
-            container.appendChild(controls.createButton.call(this, 'airplay'));
-        }
-
-        // Download button
-        if (this.config.controls.includes('download')) {
-            const attributes = {
-                element: 'a',
-                href: this.download,
-                target: '_blank',
-            };
-
-            const { download } = this.config.urls;
-
-            if (!is.url(download) && this.isEmbed) {
-                extend(attributes, {
-                    icon: `logo-${this.provider}`,
-                    label: this.provider,
+                const popup = createElement('div', {
+                    class: 'plyr__menu__container',
+                    id: `plyr-settings-${data.id}`,
+                    hidden: '',
                 });
+
+                const inner = createElement('div');
+
+                const home = createElement('div', {
+                    id: `plyr-settings-${data.id}-home`,
+                });
+
+                // Create the menu
+                const menu = createElement('div', {
+                    role: 'menu',
+                });
+
+                home.appendChild(menu);
+                inner.appendChild(home);
+                this.elements.settings.panels.home = home;
+
+                // Build the menu items
+                this.config.settings.forEach(type => {
+                    // TODO: bundle this with the createMenuItem helper and bindings
+                    const menuItem = createElement(
+                        'button',
+                        extend(getAttributesFromSelector(this.config.selectors.buttons.settings), {
+                            type: 'button',
+                            class: `${this.config.classNames.control} ${this.config.classNames.control}--forward`,
+                            role: 'menuitem',
+                            'aria-haspopup': true,
+                            hidden: '',
+                        }),
+                    );
+
+                    // Bind menu shortcuts for keyboard users
+                    bindMenuItemShortcuts.call(this, menuItem, type);
+
+                    // Show menu on click
+                    on(menuItem, 'click', () => {
+                        showMenuPanel.call(this, type, false);
+                    });
+
+                    const flex = createElement('span', null, i18n.get(type, this.config));
+
+                    const value = createElement('span', {
+                        class: this.config.classNames.menu.value,
+                    });
+
+                    // Speed contains HTML entities
+                    value.innerHTML = data[type];
+
+                    flex.appendChild(value);
+                    menuItem.appendChild(flex);
+                    menu.appendChild(menuItem);
+
+                    // Build the panes
+                    const pane = createElement('div', {
+                        id: `plyr-settings-${data.id}-${type}`,
+                        hidden: '',
+                    });
+
+                    // Back button
+                    const backButton = createElement('button', {
+                        type: 'button',
+                        class: `${this.config.classNames.control} ${this.config.classNames.control}--back`,
+                    });
+
+                    // Visible label
+                    backButton.appendChild(
+                        createElement(
+                            'span',
+                            {
+                                'aria-hidden': true,
+                            },
+                            i18n.get(type, this.config),
+                        ),
+                    );
+
+                    // Screen reader label
+                    backButton.appendChild(
+                        createElement(
+                            'span',
+                            {
+                                class: this.config.classNames.hidden,
+                            },
+                            i18n.get('menuBack', this.config),
+                        ),
+                    );
+
+                    // Go back via keyboard
+                    on(
+                        pane,
+                        'keydown',
+                        event => {
+                            // We only care about <-
+                            if (event.which !== 37) {
+                                return;
+                            }
+
+                            // Prevent seek
+                            event.preventDefault();
+                            event.stopPropagation();
+
+                            // Show the respective menu
+                            showMenuPanel.call(this, 'home', true);
+                        },
+                        false,
+                    );
+
+                    // Go back via button click
+                    on(backButton, 'click', () => {
+                        showMenuPanel.call(this, 'home', false);
+                    });
+
+                    // Add to pane
+                    pane.appendChild(backButton);
+
+                    // Menu
+                    pane.appendChild(
+                        createElement('div', {
+                            role: 'menu',
+                        }),
+                    );
+
+                    inner.appendChild(pane);
+
+                    this.elements.settings.buttons[type] = menuItem;
+                    this.elements.settings.panels[type] = pane;
+                });
+
+                popup.appendChild(inner);
+                wrapper.appendChild(popup);
+                container.appendChild(wrapper);
+
+                this.elements.settings.popup = popup;
+                this.elements.settings.menu = wrapper;
             }
 
-            container.appendChild(controls.createButton.call(this, 'download', attributes));
-        }
+            // Picture in picture button
+            if (control === 'pip' && support.pip) {
+                container.appendChild(createButton.call(this, 'pip', defaultAttributes));
+            }
 
-        // Toggle fullscreen button
-        if (this.config.controls.includes('fullscreen')) {
-            container.appendChild(controls.createButton.call(this, 'fullscreen'));
-        }
+            // Airplay button
+            if (control === 'airplay' && support.airplay) {
+                container.appendChild(createButton.call(this, 'airplay', defaultAttributes));
+            }
 
-        // Larger overlaid play button
-        if (this.config.controls.includes('play-large')) {
-            this.elements.container.appendChild(controls.createButton.call(this, 'play-large'));
-        }
+            // Download button
+            if (control === 'download') {
+                const attributes = extend({}, defaultAttributes, {
+                    element: 'a',
+                    href: this.download,
+                    target: '_blank',
+                });
 
-        this.elements.controls = container;
+                const { download } = this.config.urls;
+
+                if (!is.url(download) && this.isEmbed) {
+                    extend(attributes, {
+                        icon: `logo-${this.provider}`,
+                        label: this.provider,
+                    });
+                }
+
+                container.appendChild(createButton.call(this, 'download', attributes));
+            }
+
+            // Toggle fullscreen button
+            if (control === 'fullscreen') {
+                container.appendChild(createButton.call(this, 'fullscreen', defaultAttributes));
+            }
+        });
 
         // Set available quality levels
         if (this.isHTML5) {
-            controls.setQualityMenu.call(this, html5.getQualityOptions.call(this));
+            setQualityMenu.call(this, html5.getQualityOptions.call(this));
         }
 
-        controls.setSpeedMenu.call(this);
+        setSpeedMenu.call(this);
 
         return container;
     },

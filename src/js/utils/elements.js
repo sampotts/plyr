@@ -4,6 +4,7 @@
 
 import { toggleListener } from './events';
 import is from './is';
+import { extend } from './objects';
 
 // Wrap an element
 export function wrap(elements, wrapper) {
@@ -16,7 +17,6 @@ export function wrap(elements, wrapper) {
         .reverse()
         .forEach((element, index) => {
             const child = index > 0 ? wrapper.cloneNode(true) : wrapper;
-
             // Cache the current parent and sibling.
             const parent = element.parentNode;
             const sibling = element.nextSibling;
@@ -137,30 +137,28 @@ export function getAttributesFromSelector(sel, existingAttributes) {
     }
 
     const attributes = {};
-    const existing = existingAttributes;
+    const existing = extend({}, existingAttributes);
 
     sel.split(',').forEach(s => {
         // Remove whitespace
         const selector = s.trim();
         const className = selector.replace('.', '');
         const stripped = selector.replace(/[[\]]/g, '');
-
         // Get the parts and value
         const parts = stripped.split('=');
-        const key = parts[0];
+        const [key] = parts;
         const value = parts.length > 1 ? parts[1].replace(/["']/g, '') : '';
-
         // Get the first character
         const start = selector.charAt(0);
 
         switch (start) {
             case '.':
                 // Add to existing classname
-                if (is.object(existing) && is.string(existing.class)) {
-                    existing.class += ` ${className}`;
+                if (is.string(existing.class)) {
+                    attributes.class = `${existing.class} ${className}`;
+                } else {
+                    attributes.class = className;
                 }
-
-                attributes.class = className;
                 break;
 
             case '#':
@@ -179,7 +177,7 @@ export function getAttributesFromSelector(sel, existingAttributes) {
         }
     });
 
-    return attributes;
+    return extend(existing, attributes);
 }
 
 // Toggle hidden
@@ -233,14 +231,14 @@ export function matches(element, selector) {
         return Array.from(document.querySelectorAll(selector)).includes(this);
     }
 
-    const matches =
+    const method =
         prototype.matches ||
         prototype.webkitMatchesSelector ||
         prototype.mozMatchesSelector ||
         prototype.msMatchesSelector ||
         match;
 
-    return matches.call(element, selector);
+    return method.call(element, selector);
 }
 
 // Find all elements
