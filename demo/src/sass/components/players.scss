@@ -2,12 +2,6 @@
 // Examples
 // ==========================================================================
 
-// For non supported browsers
-video {
-    max-width: 100%;
-    vertical-align: middle;
-}
-
 // Example players
 .plyr {
     border-radius: $border-radius-base;
@@ -34,17 +28,9 @@ video {
 
 // Style full supported player
 .plyr__cite {
-    display: none;
     margin-top: $spacing-base;
 
     .icon {
         margin-right: ceil($spacing-base / 6);
     }
-}
-
-.plyr--video:not(.plyr--youtube):not(.plyr--vimeo) ~ ul .plyr__cite--video,
-.plyr--audio ~ ul .plyr__cite--audio,
-.plyr--youtube ~ ul .plyr__cite--youtube,
-.plyr--vimeo ~ ul .plyr__cite--vimeo {
-    display: block;
 }

@@ -231,9 +231,11 @@ import Plyr from '../../../src/js/plyr';
 
                 // Show cite
                 Array.from(document.querySelectorAll('.plyr__cite')).forEach(cite => {
-                    cite.setAttribute('hidden', '');
+                    // eslint-disable-next-line no-param-reassign
+                    cite.hidden = true;
                 });
-                document.querySelector(`.plyr__cite--${type}`).removeAttribute('hidden');
+
+                document.querySelector(`.plyr__cite--${type}`).hidden = false;
             }
 
             // Bind to each button
