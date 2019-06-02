@@ -133,15 +133,16 @@ gulp.task(tasks.clean, done => {
 
 // JavaScript
 Object.entries(build.js).forEach(([filename, entry]) => {
-    entry.formats.forEach(format => {
+    const { dist, formats, namespace, polyfill, src } = entry;
+
+    formats.forEach(format => {
         const name = `js:${filename}:${format}`;
-        tasks.js.push(name);
-        const polyfill = filename.includes('polyfilled');
         const extension = format === 'es' ? 'mjs' : 'js';
+        tasks.js.push(name);
 
         gulp.task(name, () =>
             gulp
-                .src(entry.src)
+                .src(src)
                 .pipe(plumber())
                 .pipe(sourcemaps.init())
                 .pipe(
@@ -167,7 +168,7 @@ Object.entries(build.js).forEach(([filename, entry]) => {
                             ],
                         },
                         {
-                            name: entry.namespace,
+                            name: namespace,
                             format,
                         },
                     ),
@@ -178,25 +179,26 @@ Object.entries(build.js).forEach(([filename, entry]) => {
                         extname: `.${extension}`,
                     }),
                 )
-                .pipe(gulp.dest(entry.dist))
+                .pipe(gulp.dest(dist))
                 .pipe(filter(`**/*.${extension}`))
                 .pipe(terser())
                 .pipe(rename({ suffix: minSuffix }))
                 .pipe(size(sizeOptions))
                 .pipe(sourcemaps.write(''))
-                .pipe(gulp.dest(entry.dist)),
+                .pipe(gulp.dest(dist)),
         );
     });
 });
 
 // CSS
 Object.entries(build.css).forEach(([filename, entry]) => {
+    const { dist, src } = entry;
     const name = `css:${filename}`;
     tasks.css.push(name);
 
     gulp.task(name, () =>
         gulp
-            .src(entry.src)
+            .src(src)
             .pipe(plumber())
             .pipe(sass())
             .pipe(
@@ -206,24 +208,25 @@ Object.entries(build.css).forEach(([filename, entry]) => {
             )
             .pipe(clean())
             .pipe(size(sizeOptions))
-            .pipe(gulp.dest(entry.dist)),
+            .pipe(gulp.dest(dist)),
     );
 });
 
 // SVG Sprites
 Object.entries(build.sprite).forEach(([filename, entry]) => {
+    const { dist, src } = entry;
     const name = `sprite:${filename}`;
     tasks.sprite.push(name);
 
     gulp.task(name, () =>
         gulp
-            .src(entry.src)
+            .src(src)
             .pipe(plumber())
             .pipe(imagemin())
             .pipe(svgstore())
             .pipe(rename({ basename: path.parse(filename).name }))
             .pipe(size(sizeOptions))
-            .pipe(gulp.dest(entry.dist)),
+            .pipe(gulp.dest(dist)),
     );
 });
 
