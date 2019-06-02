@@ -5,6 +5,7 @@
 // ==========================================================================
 
 import Raven from 'raven-js';
+import Shr from 'shr-buttons';
 
 import Plyr from '../../../src/js/plyr';
 
@@ -20,10 +21,13 @@ import Plyr from '../../../src/js/plyr';
             const selector = '#player';
             const container = document.getElementById('container');
 
-            if (window.Shr) {
-                window.Shr.setup('.js-shr-button', {
+            if (Shr) {
+                Shr.setup('.js-shr', {
                     count: {
-                        classname: 'button__count',
+                        className: 'button__count',
+                    },
+                    wrapper: {
+                        className: 'button--with-count',
                     },
                 });
             }

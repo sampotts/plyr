@@ -1,0 +1,11 @@
+{
+    "name": "plyr-demo",
+    "version": "1.0.0",
+    "description": "Demo for Plyr",
+    "homepage": "https://plyr.io",
+    "author": "Sam Potts <sam@potts.es>",
+    "dependencies": {
+        "raven-js": "^3.27.1",
+        "shr-buttons": "2.0.2"
+    }
+}
