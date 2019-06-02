@@ -10,6 +10,10 @@ header {
         margin-top: ($spacing-base * 1.5);
     }
 
+    p:first-of-type {
+        @include font-size(16);
+    }
+
     @media only screen and (min-width: $screen-md) {
         margin-right: ($spacing-base * 3);
         max-width: 360px;

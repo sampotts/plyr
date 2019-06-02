@@ -27,10 +27,6 @@
 }
 
 // Style full supported player
-.plyr__cite {
-    margin-top: $spacing-base;
-
-    .icon {
-        margin-right: ceil($spacing-base / 6);
-    }
+.plyr__cite .icon {
+    margin-right: ceil($spacing-base / 6);
 }
