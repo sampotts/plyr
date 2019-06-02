@@ -22776,7 +22776,11 @@ typeof navigator === "object" && (function () {
 	      }
 
 	      this.getThumbnails().then(function () {
-	        // Render DOM elements
+	        if (!_this.enabled) {
+	          return;
+	        } // Render DOM elements
+
+
 	        _this.render(); // Check to see if thumb container size was specified manually in CSS
 
 

@@ -6,12 +6,15 @@ header {
     padding-bottom: $spacing-base;
     text-align: center;
 
-    .call-to-action {
-        margin-top: ($spacing-base * 1.5);
+    h1 span {
+        animation: shrinkHide 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) 2s forwards;
+        display: inline-block;
+        font-weight: $font-weight-light;
+        opacity: 0.5;
     }
 
-    p:first-of-type {
-        @include font-size(16);
+    .call-to-action {
+        margin-top: ($spacing-base * 1.5);
     }
 
     @media only screen and (min-width: $screen-md) {
@@ -19,5 +22,9 @@ header {
         max-width: 360px;
         padding-bottom: ($spacing-base * 2);
         text-align: left;
+
+        p:first-of-type {
+            @include font-size($font-size-large);
+        }
     }
 }
