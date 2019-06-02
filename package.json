@@ -73,7 +73,7 @@
         "prettier-stylelint": "^0.4.2",
         "remark-cli": "^6.0.1",
         "remark-validate-links": "^8.0.2",
-        "rollup": "^1.13.0",
+        "rollup": "^1.13.1",
         "rollup-plugin-babel": "^4.3.2",
         "rollup-plugin-commonjs": "^10.0.0",
         "rollup-plugin-node-resolve": "^5.0.1",
@@ -91,7 +91,6 @@
         "custom-event-polyfill": "^1.0.7",
         "loadjs": "^3.6.1",
         "rangetouch": "^2.0.0",
-        "raven-js": "^3.27.1",
         "url-polyfill": "^1.1.5"
     }
 }
