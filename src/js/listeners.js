@@ -301,14 +301,6 @@ class Listeners {
             },
         );
 
-        // Force edge to repaint on exit fullscreen
-        // TODO: Fix weird bug where Edge doesn't re-draw when exiting fullscreen
-        /* if (browser.isEdge) {
-            on.call(player, elements.container, 'exitfullscreen', () => {
-                setTimeout(() => repaint(elements.container), 100);
-            });
-        } */
-
         // Set a gutter for Vimeo
         const setGutter = (ratio, padding, toggle) => {
             if (!player.isVimeo) {
