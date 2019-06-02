@@ -101,6 +101,10 @@ class PreviewThumbnails {
         }
 
         this.getThumbnails().then(() => {
+            if (!this.enabled) {
+                return;
+            }
+
             // Render DOM elements
             this.render();
 
