@@ -16724,11 +16724,13 @@ typeof navigator === "object" && (function () {
 
 	    if (!is$2.empty(this.config.ratio)) {
 	      setAspectRatio.call(player);
-	    } else {
-	      player.once('loadedmetadata', function () {
-	        setAspectRatio.call(player);
+	    }
+	    /* else {
+	      player.once('loadedmetadata', () => {
+	          setAspectRatio.call(player);
 	      });
-	    } // Quality
+	    } */
+	    // Quality
 
 
 	    Object.defineProperty(player.media, 'quality', {
@@ -20418,9 +20420,14 @@ typeof navigator === "object" && (function () {
 	      on.call(player, elements.container, 'enterfullscreen exitfullscreen', function (event) {
 	        var _player$fullscreen = player.fullscreen,
 	            target = _player$fullscreen.target,
-	            usingNative = _player$fullscreen.usingNative; // Ignore for iOS native and non embeds
+	            usingNative = _player$fullscreen.usingNative; // Ignore events not from target
 
 	        if (target !== elements.container) {
+	          return;
+	        } // If it's not an embed and no ratio specified
+
+
+	        if (!player.isEmbed && is$2.empty(player.config.ratio)) {
 	          return;
 	        }
 

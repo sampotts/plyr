@@ -24,7 +24,7 @@ header {
         text-align: left;
 
         p:first-of-type {
-            @include font-size($font-size-large);
+            @include font-size($font-size-base + 1);
         }
     }
 }
