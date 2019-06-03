@@ -128,6 +128,7 @@ const defaults = {
         // 'fast-forward',
         'progress',
         'current-time',
+        // 'duration',
         'mute',
         'volume',
         'captions',
