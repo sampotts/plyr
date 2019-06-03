@@ -73,9 +73,6 @@ function toggleFallback(toggle = false) {
                 .filter(part => part.trim() !== property)
                 .join(',');
         }
-
-        // Force a repaint as sometimes Safari doesn't want to fill the screen
-        setTimeout(() => repaint(this.target), 100);
     }
 
     // Toggle button and fire events
