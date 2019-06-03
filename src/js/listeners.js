@@ -336,8 +336,13 @@ class Listeners {
         on.call(player, elements.container, 'enterfullscreen exitfullscreen', event => {
             const { target, usingNative } = player.fullscreen;
 
-            // Ignore for iOS native
-            if (!player.isEmbed || target !== elements.container) {
+            // Ignore events not from target
+            if (target !== elements.container) {
+                return;
+            }
+
+            // If it's not an embed and no ratio specified
+            if (!player.isEmbed && is.empty(player.config.ratio)) {
                 return;
             }
 

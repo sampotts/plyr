@@ -27,15 +27,8 @@ export function reduceAspectRatio(ratio) {
 }
 
 export function getAspectRatio(input) {
-    const parse = ratio => {
-        if (!validateRatio(ratio)) {
-            return null;
-        }
-
-        return ratio.split(':').map(Number);
-    };
-
-    // Provided ratio
+    const parse = ratio => (validateRatio(ratio) ? ratio.split(':').map(Number) : null);
+    // Try provided ratio
     let ratio = parse(input);
 
     // Get from config

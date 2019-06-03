@@ -44,8 +44,10 @@ const html5 = {
 
         const player = this;
 
-        // Set aspect ratio if set
-        setAspectRatio.call(player);
+        // Set aspect ratio if fixed
+        if (!is.empty(this.config.ratio)) {
+            setAspectRatio.call(player);
+        }
 
         // Quality
         Object.defineProperty(player.media, 'quality', {

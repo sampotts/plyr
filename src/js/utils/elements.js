@@ -192,11 +192,8 @@ export function toggleHidden(element, hidden) {
         hide = !element.hidden;
     }
 
-    if (hide) {
-        element.setAttribute('hidden', '');
-    } else {
-        element.removeAttribute('hidden');
-    }
+    // eslint-disable-next-line no-param-reassign
+    element.hidden = hide;
 }
 
 // Mirror Element.classList.toggle, with IE compatibility for "force" argument
