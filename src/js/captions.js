@@ -133,7 +133,8 @@ const captions = {
                     });
 
                     // Turn off native caption rendering to avoid double captions
-                    Object.assign(track, { mode: 'hidden' });
+                    // eslint-disable-next-line no-param-reassign
+                    track.mode = 'hidden';
 
                     // Add event listener for cue changes
                     on.call(this, track, 'cuechange', () => captions.updateCues.call(this));

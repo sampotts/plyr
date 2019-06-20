@@ -3339,10 +3339,9 @@ typeof navigator === "object" && (function (global, factory) {
           meta.set(track, {
             default: track.mode === 'showing'
           }); // Turn off native caption rendering to avoid double captions
+          // eslint-disable-next-line no-param-reassign
 
-          Object.assign(track, {
-            mode: 'hidden'
-          }); // Add event listener for cue changes
+          track.mode = 'hidden'; // Add event listener for cue changes
 
           on.call(_this, track, 'cuechange', function () {
             return captions.updateCues.call(_this);

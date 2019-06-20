@@ -1,3 +1,10 @@
+## v3.5.5
+
+-   YouTube fix for when there are other embeds on the page (thanks @aFarkas)
+-   Separated demo dependencies into their own package.json
+-   Fix for Edge controls flexbox issue when resizing the player (thanks Nick Hawk via Slack)
+-   More aspect ratio fixes
+
 ## v3.5.4
 
 -   Added: Set download URL via new setter
