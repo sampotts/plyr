@@ -219,7 +219,7 @@ _Note_: If a `NodeList`, `Array`, or jQuery object are passed, the first element
 
 #### Single player
 
-Passing a [string selector](https://developer.mozilla.org/en-US/docs/Web/API/NodeList):
+Passing a CSS string selector that's compatible with [`querySelector`](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector):
 
 ```javascript
 const player = new Plyr('#player');
@@ -245,7 +245,7 @@ You have two choices here. You can either use a simple array loop to map the con
 const players = Array.from(document.querySelectorAll('.js-player')).map(p => new Plyr(p));
 ```
 
-...or use a static method where you can pass a [CSS string selector](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors), a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList), an [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array) of elements, or a [JQuery](https://jquery.com) object:
+...or use a static method where you can pass a [CSS string selector](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors), a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList), an [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array) of [HTMLElement](https://developer.mozilla.org/en/docs/Web/API/HTMLElement), or a [JQuery](https://jquery.com) object:
 
 ```javascript
 const players = Plyr.setup('.js-player');
@@ -662,7 +662,7 @@ The arguments are:
 -   Provider (`html5`, `youtube` or `vimeo`)
 -   Whether the player has the `playsinline` attribute (only applicable to iOS 10+)
 
-## Disable support programatically
+## Disable support programmatically
 
 The `enabled` option can be used to disable certain User Agents. For example, if you don't want to use Plyr for smartphones, you could use:
 
