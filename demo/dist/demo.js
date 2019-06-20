@@ -657,6 +657,8 @@ typeof navigator === "object" && (function () {
 	  iteratorWithReturn[ITERATOR$2] = function () {
 	    return this;
 	  };
+	  // eslint-disable-next-line no-throw-literal
+	  Array.from(iteratorWithReturn, function () { throw 2; });
 	} catch (error) { /* empty */ }
 
 	var checkCorrectnessOfIteration = function (exec, SKIP_CLOSING) {
@@ -677,6 +679,7 @@ typeof navigator === "object" && (function () {
 	};
 
 	var INCORRECT_ITERATION = !checkCorrectnessOfIteration(function (iterable) {
+	  Array.from(iterable);
 	});
 
 	// `Array.from` method
@@ -910,7 +913,7 @@ typeof navigator === "object" && (function () {
 	var createIteratorConstructor = function (IteratorConstructor, NAME, next) {
 	  var TO_STRING_TAG = NAME + ' Iterator';
 	  IteratorConstructor.prototype = objectCreate(IteratorPrototype$1, { next: createPropertyDescriptor(1, next) });
-	  setToStringTag(IteratorConstructor, TO_STRING_TAG, false, true);
+	  setToStringTag(IteratorConstructor, TO_STRING_TAG, false);
 	  iterators[TO_STRING_TAG] = returnThis$1;
 	  return IteratorConstructor;
 	};
@@ -985,7 +988,7 @@ typeof navigator === "object" && (function () {
 	        }
 	      }
 	      // Set @@toStringTag to native iterators
-	      setToStringTag(CurrentIteratorPrototype, TO_STRING_TAG, true, true);
+	      setToStringTag(CurrentIteratorPrototype, TO_STRING_TAG, true);
 	    }
 	  }
 
@@ -2262,7 +2265,8 @@ typeof navigator === "object" && (function () {
 	  var url = new URL('b?e=1', 'http://a');
 	  var searchParams = url.searchParams;
 	  url.pathname = 'c%20d';
-	  return !searchParams.sort
+	  return (isPure && !url.toJSON)
+	    || !searchParams.sort
 	    || url.href !== 'http://a/c%20d?e=1'
 	    || searchParams.get('e') !== '1'
 	    || String(new URLSearchParams('?a=1')) !== 'a=1'
@@ -4974,7 +4978,7 @@ typeof navigator === "object" && (function () {
 	  Promise: PromiseConstructor
 	});
 
-	setToStringTag(PromiseConstructor, PROMISE, false, true);
+	setToStringTag(PromiseConstructor, PROMISE, false);
 	setSpecies(PROMISE);
 
 	PromiseWrapper = path[PROMISE];
@@ -5655,7 +5659,7 @@ typeof navigator === "object" && (function () {
 	});
 
 	var nativeIsFrozen = Object.isFrozen;
-	var FAILS_ON_PRIMITIVES$1 = fails(function () { });
+	var FAILS_ON_PRIMITIVES$1 = fails(function () { nativeIsFrozen(1); });
 
 	// `Object.isFrozen` method
 	// https://tc39.github.io/ecma262/#sec-object.isfrozen
@@ -10405,6 +10409,7 @@ typeof navigator === "object" && (function () {
 
 	  try {
 	    for (var s, a = e[Symbol.iterator](); !(r = (s = a.next()).done) && (n.push(s.value), !t || n.length !== t); r = !0) {
+	      ;
 	    }
 	  } catch (e) {
 	    o = !0, i = e;
@@ -11766,6 +11771,8 @@ typeof navigator === "object" && (function () {
 	  iteratorWithReturn$1[ITERATOR$b] = function () {
 	    return this;
 	  };
+	  // eslint-disable-next-line no-throw-literal
+	  Array.from(iteratorWithReturn$1, function () { throw 2; });
 	} catch (error) { /* empty */ }
 
 	var checkCorrectnessOfIteration$1 = function (exec, SKIP_CLOSING) {
@@ -11786,6 +11793,7 @@ typeof navigator === "object" && (function () {
 	};
 
 	var INCORRECT_ITERATION$2 = !checkCorrectnessOfIteration$1(function (iterable) {
+	  Array.from(iterable);
 	});
 
 	// `Array.from` method
@@ -11877,7 +11885,7 @@ typeof navigator === "object" && (function () {
 	var createIteratorConstructor$1 = function (IteratorConstructor, NAME, next) {
 	  var TO_STRING_TAG = NAME + ' Iterator';
 	  IteratorConstructor.prototype = objectCreate$1(IteratorPrototype$4, { next: createPropertyDescriptor$1(1, next) });
-	  setToStringTag$1(IteratorConstructor, TO_STRING_TAG, false, true);
+	  setToStringTag$1(IteratorConstructor, TO_STRING_TAG, false);
 	  iterators$1[TO_STRING_TAG] = returnThis$4;
 	  return IteratorConstructor;
 	};
@@ -11952,7 +11960,7 @@ typeof navigator === "object" && (function () {
 	        }
 	      }
 	      // Set @@toStringTag to native iterators
-	      setToStringTag$1(CurrentIteratorPrototype, TO_STRING_TAG, true, true);
+	      setToStringTag$1(CurrentIteratorPrototype, TO_STRING_TAG, true);
 	    }
 	  }
 
@@ -13165,7 +13173,8 @@ typeof navigator === "object" && (function () {
 	  var url = new URL('b?e=1', 'http://a');
 	  var searchParams = url.searchParams;
 	  url.pathname = 'c%20d';
-	  return !searchParams.sort
+	  return (isPure$1 && !url.toJSON)
+	    || !searchParams.sort
 	    || url.href !== 'http://a/c%20d?e=1'
 	    || searchParams.get('e') !== '1'
 	    || String(new URLSearchParams('?a=1')) !== 'a=1'
@@ -15792,7 +15801,7 @@ typeof navigator === "object" && (function () {
 	  Promise: PromiseConstructor$1
 	});
 
-	setToStringTag$1(PromiseConstructor$1, PROMISE$1, false, true);
+	setToStringTag$1(PromiseConstructor$1, PROMISE$1, false);
 	setSpecies$1(PROMISE$1);
 
 	PromiseWrapper$1 = path$1[PROMISE$1];
@@ -16720,17 +16729,11 @@ typeof navigator === "object" && (function () {
 	      return;
 	    }
 
-	    var player = this; // Set aspect ratio
+	    var player = this; // Set aspect ratio if fixed
 
 	    if (!is$2.empty(this.config.ratio)) {
 	      setAspectRatio.call(player);
-	    }
-	    /* else {
-	      player.once('loadedmetadata', () => {
-	          setAspectRatio.call(player);
-	      });
-	    } */
-	    // Quality
+	    } // Quality
 
 
 	    Object.defineProperty(player.media, 'quality', {
@@ -19327,8 +19330,7 @@ typeof navigator === "object" && (function () {
 	    },
 	    youtube: {
 	      sdk: 'https://www.youtube.com/iframe_api',
-	      api: 'https://noembed.com/embed?url=https://www.youtube.com/watch?v={0}' // 'https://www.googleapis.com/youtube/v3/videos?id={0}&key={1}&fields=items(snippet(title),fileDetails)&part=snippet',
-
+	      api: 'https://noembed.com/embed?url=https://www.youtube.com/watch?v={0}'
 	    },
 	    googleIMA: {
 	      sdk: 'https://imasdk.googleapis.com/js/sdkloader/ima3.js'

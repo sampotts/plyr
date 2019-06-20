@@ -2,8 +2,16 @@
 // Colors
 // ==========================================================================
 
-$plyr-color-main: #1aafff !default;
-$plyr-color-gunmetal: #2f343d !default;
-$plyr-color-fiord: #4f5b5f !default;
-$plyr-color-lynch: #6b7d85 !default;
-$plyr-color-heather: #b7c5cd !default;
+$plyr-color-main: hsl(198, 100%, 50%) !default;
+
+// Grayscale
+$plyr-color-gray-9: hsl(210, 15%, 16%);
+$plyr-color-gray-8: lighten($plyr-color-gray-9, 9%);
+$plyr-color-gray-7: lighten($plyr-color-gray-8, 9%);
+$plyr-color-gray-6: lighten($plyr-color-gray-7, 9%);
+$plyr-color-gray-5: lighten($plyr-color-gray-6, 9%);
+$plyr-color-gray-4: lighten($plyr-color-gray-5, 9%);
+$plyr-color-gray-3: lighten($plyr-color-gray-4, 9%);
+$plyr-color-gray-2: lighten($plyr-color-gray-3, 9%);
+$plyr-color-gray-1: lighten($plyr-color-gray-2, 9%);
+$plyr-color-gray-0: lighten($plyr-color-gray-1, 9%);

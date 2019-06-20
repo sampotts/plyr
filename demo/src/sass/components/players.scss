@@ -5,7 +5,7 @@
 // Example players
 .plyr {
     border-radius: $border-radius-base;
-    box-shadow: 0 2px 5px rgba(#000, 0.2);
+    box-shadow: 0 2px 15px rgba(#000, 0.1);
     margin: $spacing-base auto;
 
     &.plyr--audio {
@@ -27,6 +27,10 @@
 }
 
 // Style full supported player
-.plyr__cite .icon {
-    margin-right: ceil($spacing-base / 6);
+.plyr__cite {
+    color: $color-gray-5;
+
+    .icon {
+        margin-right: ceil($spacing-base / 6);
+    }
 }

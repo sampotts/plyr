@@ -541,6 +541,49 @@ typeof navigator === "object" && (function (global, factory) {
   };
 
   // ==========================================================================
+  var transitionEndEvent = function () {
+    var element = document.createElement('span');
+    var events = {
+      WebkitTransition: 'webkitTransitionEnd',
+      MozTransition: 'transitionend',
+      OTransition: 'oTransitionEnd otransitionend',
+      transition: 'transitionend'
+    };
+    var type = Object.keys(events).find(function (event) {
+      return element.style[event] !== undefined;
+    });
+    return is$1.string(type) ? events[type] : false;
+  }(); // Force repaint of element
+
+  function repaint(element, delay) {
+    setTimeout(function () {
+      try {
+        // eslint-disable-next-line no-param-reassign
+        element.hidden = true; // eslint-disable-next-line no-unused-expressions
+
+        element.offsetHeight; // eslint-disable-next-line no-param-reassign
+
+        element.hidden = false;
+      } catch (e) {// Do nothing
+      }
+    }, delay);
+  }
+
+  // ==========================================================================
+  // Browser sniffing
+  // Unfortunately, due to mixed support, UA sniffing is required
+  // ==========================================================================
+  var browser = {
+    isIE:
+    /* @cc_on!@ */
+    !!document.documentMode,
+    isEdge: window.navigator.userAgent.includes('Edge'),
+    isWebkit: 'WebkitAppearance' in document.documentElement.style && !/Edge/.test(navigator.userAgent),
+    isIPhone: /(iPhone|iPod)/gi.test(navigator.platform),
+    isIos: /(iPad|iPhone|iPod)/gi.test(navigator.platform)
+  };
+
+  // ==========================================================================
   // https://github.com/WICG/EventListenerOptions/blob/gh-pages/explainer.md
   // https://www.youtube.com/watch?v=NPM6172J22g
 
@@ -903,13 +946,10 @@ typeof navigator === "object" && (function (global, factory) {
 
     if (!is$1.boolean(hide)) {
       hide = !element.hidden;
-    }
+    } // eslint-disable-next-line no-param-reassign
 
-    if (hide) {
-      element.setAttribute('hidden', '');
-    } else {
-      element.removeAttribute('hidden');
-    }
+
+    element.hidden = hide;
   } // Mirror Element.classList.toggle, with IE compatibility for "force" argument
 
   function toggleClass(element, className, force) {
@@ -1007,47 +1047,6 @@ typeof navigator === "object" && (function (global, factory) {
       toggleClass(element, this.config.classNames.tabFocus);
     }
   }
-
-  // ==========================================================================
-  var transitionEndEvent = function () {
-    var element = document.createElement('span');
-    var events = {
-      WebkitTransition: 'webkitTransitionEnd',
-      MozTransition: 'transitionend',
-      OTransition: 'oTransitionEnd otransitionend',
-      transition: 'transitionend'
-    };
-    var type = Object.keys(events).find(function (event) {
-      return element.style[event] !== undefined;
-    });
-    return is$1.string(type) ? events[type] : false;
-  }(); // Force repaint of element
-
-  function repaint(element) {
-    setTimeout(function () {
-      try {
-        toggleHidden(element, true);
-        element.offsetHeight; // eslint-disable-line
-
-        toggleHidden(element, false);
-      } catch (e) {// Do nothing
-      }
-    }, 0);
-  }
-
-  // ==========================================================================
-  // Browser sniffing
-  // Unfortunately, due to mixed support, UA sniffing is required
-  // ==========================================================================
-  var browser = {
-    isIE:
-    /* @cc_on!@ */
-    !!document.documentMode,
-    isEdge: window.navigator.userAgent.includes('Edge'),
-    isWebkit: 'WebkitAppearance' in document.documentElement.style && !/Edge/.test(navigator.userAgent),
-    isIPhone: /(iPhone|iPod)/gi.test(navigator.platform),
-    isIos: /(iPad|iPhone|iPod)/gi.test(navigator.platform)
-  };
 
   var defaultCodecs = {
     'audio/ogg': 'vorbis',
@@ -1172,12 +1171,8 @@ typeof navigator === "object" && (function (global, factory) {
   }
   function getAspectRatio(input) {
     var parse = function parse(ratio) {
-      if (!validateRatio(ratio)) {
-        return null;
-      }
-
-      return ratio.split(':').map(Number);
-    }; // Provided ratio
+      return validateRatio(ratio) ? ratio.split(':').map(Number) : null;
+    }; // Try provided ratio
 
 
     var ratio = parse(input); // Get from config
@@ -1264,9 +1259,12 @@ typeof navigator === "object" && (function (global, factory) {
         return;
       }
 
-      var player = this; // Set aspect ratio if set
+      var player = this; // Set aspect ratio if fixed
 
-      setAspectRatio.call(player); // Quality
+      if (!is$1.empty(this.config.ratio)) {
+        setAspectRatio.call(player);
+      } // Quality
+
 
       Object.defineProperty(player.media, 'quality', {
         get: function get() {
@@ -3704,7 +3702,8 @@ typeof navigator === "object" && (function (global, factory) {
     controls: ['play-large', // 'restart',
     // 'rewind',
     'play', // 'fast-forward',
-    'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', // 'download',
+    'progress', 'current-time', // 'duration',
+    'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', // 'download',
     'fullscreen'],
     settings: ['captions', 'quality', 'speed'],
     // Localisation
@@ -3762,8 +3761,7 @@ typeof navigator === "object" && (function (global, factory) {
       },
       youtube: {
         sdk: 'https://www.youtube.com/iframe_api',
-        api: 'https://noembed.com/embed?url=https://www.youtube.com/watch?v={0}' // 'https://www.googleapis.com/youtube/v3/videos?id={0}&key={1}&fields=items(snippet(title),fileDetails)&part=snippet',
-
+        api: 'https://noembed.com/embed?url=https://www.youtube.com/watch?v={0}'
       },
       googleIMA: {
         sdk: 'https://imasdk.googleapis.com/js/sdkloader/ima3.js'
@@ -4048,8 +4046,6 @@ typeof navigator === "object" && (function (global, factory) {
   }
 
   function toggleFallback() {
-    var _this = this;
-
     var toggle = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
     // Store or restore scroll position
@@ -4089,12 +4085,7 @@ typeof navigator === "object" && (function (global, factory) {
         viewport.content = viewport.content.split(',').filter(function (part) {
           return part.trim() !== property;
         }).join(',');
-      } // Force a repaint as sometimes Safari doesn't want to fill the screen
-
-
-      setTimeout(function () {
-        return repaint(_this.target);
-      }, 100);
+      }
     } // Toggle button and fire events
 
 
@@ -4105,7 +4096,7 @@ typeof navigator === "object" && (function (global, factory) {
   /*#__PURE__*/
   function () {
     function Fullscreen(player) {
-      var _this2 = this;
+      var _this = this;
 
       _classCallCheck(this, Fullscreen);
 
@@ -4125,16 +4116,16 @@ typeof navigator === "object" && (function (global, factory) {
 
       on.call(this.player, document, this.prefix === 'ms' ? 'MSFullscreenChange' : "".concat(this.prefix, "fullscreenchange"), function () {
         // TODO: Filter for target??
-        onChange.call(_this2);
+        onChange.call(_this);
       }); // Fullscreen toggle on double click
 
       on.call(this.player, this.player.elements.container, 'dblclick', function (event) {
         // Ignore double click in controls
-        if (is$1.element(_this2.player.elements.controls) && _this2.player.elements.controls.contains(event.target)) {
+        if (is$1.element(_this.player.elements.controls) && _this.player.elements.controls.contains(event.target)) {
           return;
         }
 
-        _this2.toggle();
+        _this.toggle();
       }); // Update the UI
 
       this.update();
@@ -4808,15 +4799,7 @@ typeof navigator === "object" && (function (global, factory) {
           timers.controls = setTimeout(function () {
             return ui.toggleControls.call(player, false);
           }, delay);
-        }); // Force edge to repaint on exit fullscreen
-        // TODO: Fix weird bug where Edge doesn't re-draw when exiting fullscreen
-
-        /* if (browser.isEdge) {
-            on.call(player, elements.container, 'exitfullscreen', () => {
-                setTimeout(() => repaint(elements.container), 100);
-            });
-        } */
-        // Set a gutter for Vimeo
+        }); // Set a gutter for Vimeo
 
         var setGutter = function setGutter(ratio, padding, toggle) {
           if (!player.isVimeo) {
@@ -4858,9 +4841,14 @@ typeof navigator === "object" && (function (global, factory) {
         on.call(player, elements.container, 'enterfullscreen exitfullscreen', function (event) {
           var _player$fullscreen = player.fullscreen,
               target = _player$fullscreen.target,
-              usingNative = _player$fullscreen.usingNative; // Ignore for iOS native
+              usingNative = _player$fullscreen.usingNative; // Ignore events not from target
 
-          if (!player.isEmbed || target !== elements.container) {
+          if (target !== elements.container) {
+            return;
+          } // If it's not an embed and no ratio specified
+
+
+          if (!player.isEmbed && is$1.empty(player.config.ratio)) {
             return;
           }
 
@@ -7127,7 +7115,11 @@ typeof navigator === "object" && (function (global, factory) {
         }
 
         this.getThumbnails().then(function () {
-          // Render DOM elements
+          if (!_this.enabled) {
+            return;
+          } // Render DOM elements
+
+
           _this.render(); // Check to see if thumb container size was specified manually in CSS
 
 
