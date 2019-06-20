@@ -323,27 +323,27 @@ class Plyr {
      * Types and provider helpers
      */
     get isHTML5() {
-        return Boolean(this.provider === providers.html5);
+        return this.provider === providers.html5;
     }
 
     get isEmbed() {
-        return Boolean(this.isYouTube || this.isVimeo);
+        return this.isYouTube || this.isVimeo;
     }
 
     get isYouTube() {
-        return Boolean(this.provider === providers.youtube);
+        return this.provider === providers.youtube;
     }
 
     get isVimeo() {
-        return Boolean(this.provider === providers.vimeo);
+        return this.provider === providers.vimeo;
     }
 
     get isVideo() {
-        return Boolean(this.type === types.video);
+        return this.type === types.video;
     }
 
     get isAudio() {
-        return Boolean(this.type === types.audio);
+        return this.type === types.audio;
     }
 
     /**

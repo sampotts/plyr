@@ -9,4 +9,4 @@ $arrow-size: 5px;
 $border-radius-base: 4px;
 
 // Background
-$page-background: linear-gradient(to left top, lighten($color-background, 10%), darken($color-background, 20%));
+$page-background: linear-gradient(to left top, $color-background-from, $color-background-to);

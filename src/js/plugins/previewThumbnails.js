@@ -2,6 +2,7 @@ import { createElement } from '../utils/elements';
 import { once } from '../utils/events';
 import fetch from '../utils/fetch';
 import is from '../utils/is';
+import { extend } from '../utils/objects';
 import { formatTime } from '../utils/time';
 
 // Arg: vttDataString example: "WEBVTT\n\n1\n00:00:05.000 --> 00:00:10.000\n1080p-00001.jpg"
@@ -100,6 +101,10 @@ class PreviewThumbnails {
         }
 
         this.getThumbnails().then(() => {
+            if (!this.enabled) {
+                return;
+            }
+
             // Render DOM elements
             this.render();
 
@@ -425,7 +430,9 @@ class PreviewThumbnails {
             if (image.dataset.index !== currentImage.dataset.index && !image.dataset.deleting) {
                 // Wait 200ms, as the new image can take some time to show on certain browsers (even though it was downloaded before showing). This will prevent flicker, and show some generosity towards slower clients
                 // First set attribute 'deleting' to prevent multi-handling of this on repeat firing of this function
+                // eslint-disable-next-line no-param-reassign
                 image.dataset.deleting = true;
+
                 // This has to be set before the timeout - to prevent issues switching between hover and scrub
                 const { currentImageContainer } = this;
 
@@ -632,9 +639,13 @@ class PreviewThumbnails {
         // Find difference between height and preview container height
         const multiplier = this.thumbContainerHeight / frame.h;
 
+        // eslint-disable-next-line no-param-reassign
         previewImage.style.height = `${Math.floor(previewImage.naturalHeight * multiplier)}px`;
+        // eslint-disable-next-line no-param-reassign
         previewImage.style.width = `${Math.floor(previewImage.naturalWidth * multiplier)}px`;
+        // eslint-disable-next-line no-param-reassign
         previewImage.style.left = `-${frame.x * multiplier}px`;
+        // eslint-disable-next-line no-param-reassign
         previewImage.style.top = `-${frame.y * multiplier}px`;
     }
 }

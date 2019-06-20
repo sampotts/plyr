@@ -192,11 +192,8 @@ export function toggleHidden(element, hidden) {
         hide = !element.hidden;
     }
 
-    if (hide) {
-        element.setAttribute('hidden', '');
-    } else {
-        element.removeAttribute('hidden');
-    }
+    // eslint-disable-next-line no-param-reassign
+    element.hidden = hide;
 }
 
 // Mirror Element.classList.toggle, with IE compatibility for "force" argument
@@ -231,14 +228,14 @@ export function matches(element, selector) {
         return Array.from(document.querySelectorAll(selector)).includes(this);
     }
 
-    const matches =
+    const method =
         prototype.matches ||
         prototype.webkitMatchesSelector ||
         prototype.mozMatchesSelector ||
         prototype.msMatchesSelector ||
         match;
 
-    return matches.call(element, selector);
+    return method.call(element, selector);
 }
 
 // Find all elements

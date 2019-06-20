@@ -56,26 +56,23 @@ const youtube = {
         if (is.object(window.YT) && is.function(window.YT.Player)) {
             youtube.ready.call(this);
         } else {
-            // Load the API
-            loadScript(this.config.urls.youtube.sdk).catch(error => {
-                this.debug.warn('YouTube API failed to load', error);
-            });
-
-            // Setup callback for the API
-            // YouTube has it's own system of course...
-            window.onYouTubeReadyCallbacks = window.onYouTubeReadyCallbacks || [];
-
-            // Add to queue
-            window.onYouTubeReadyCallbacks.push(() => {
-                youtube.ready.call(this);
-            });
+            // Reference current global callback
+            const callback = window.onYouTubeIframeAPIReady;
 
             // Set callback to process queue
             window.onYouTubeIframeAPIReady = () => {
-                window.onYouTubeReadyCallbacks.forEach(callback => {
+                // Call global callback if set
+                if (is.function(callback)) {
                     callback();
-                });
+                }
+
+                youtube.ready.call(this);
             };
+
+            // Load the SDK
+            loadScript(this.config.urls.youtube.sdk).catch(error => {
+                this.debug.warn('YouTube API failed to load', error);
+            });
         }
     },
 
@@ -108,7 +105,7 @@ const youtube = {
     ready() {
         const player = this;
         // Ignore already setup (race condition)
-        const currentId = player.media.getAttribute('id');
+        const currentId = player.media && player.media.getAttribute('id');
         if (!is.empty(currentId) && currentId.startsWith('youtube-')) {
             return;
         }
@@ -131,16 +128,16 @@ const youtube = {
         player.media = replaceElement(container, player.media);
 
         // Id to poster wrapper
-        const posterSrc = format => `https://i.ytimg.com/vi/${videoId}/${format}default.jpg`;
+        const posterSrc = s => `https://i.ytimg.com/vi/${videoId}/${s}default.jpg`;
 
         // Check thumbnail images in order of quality, but reject fallback thumbnails (120px wide)
         loadImage(posterSrc('maxres'), 121) // Higest quality and unpadded
             .catch(() => loadImage(posterSrc('sd'), 121)) // 480p padded 4:3
             .catch(() => loadImage(posterSrc('hq'))) // 360p padded 4:3. Always exists
             .then(image => ui.setPoster.call(player, image.src))
-            .then(posterSrc => {
+            .then(src => {
                 // If the image is padded, use background-size "cover" instead (like youtube does too with their posters)
-                if (!posterSrc.includes('maxres')) {
+                if (!src.includes('maxres')) {
                     player.elements.poster.style.backgroundSize = 'cover';
                 }
             })

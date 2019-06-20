@@ -147,7 +147,7 @@ class Listeners {
                     player.loop = !player.loop;
                     break;
 
-                    /* case 73:
+                /* case 73:
                     this.setLoop('start');
                     break;
 
@@ -275,12 +275,12 @@ class Listeners {
             elements.container,
             'mousemove mouseleave touchstart touchmove enterfullscreen exitfullscreen',
             event => {
-                const { controls } = elements;
+                const { controls: controlsElement } = elements;
 
                 // Remove button states for fullscreen
-                if (controls && event.type === 'enterfullscreen') {
-                    controls.pressed = false;
-                    controls.hover = false;
+                if (controlsElement && event.type === 'enterfullscreen') {
+                    controlsElement.pressed = false;
+                    controlsElement.hover = false;
                 }
 
                 // Show, then hide after a timeout unless another control event occurs
@@ -300,14 +300,6 @@ class Listeners {
                 timers.controls = setTimeout(() => ui.toggleControls.call(player, false), delay);
             },
         );
-
-        // Force edge to repaint on exit fullscreen
-        // TODO: Fix weird bug where Edge doesn't re-draw when exiting fullscreen
-        /* if (browser.isEdge) {
-            on.call(player, elements.container, 'exitfullscreen', () => {
-                setTimeout(() => repaint(elements.container), 100);
-            });
-        } */
 
         // Set a gutter for Vimeo
         const setGutter = (ratio, padding, toggle) => {
@@ -337,15 +329,20 @@ class Listeners {
         };
 
         const resized = () => {
-            window.clearTimeout(timers.resized);
-            timers.resized = window.setTimeout(setPlayerSize, 50);
+            clearTimeout(timers.resized);
+            timers.resized = setTimeout(setPlayerSize, 50);
         };
 
         on.call(player, elements.container, 'enterfullscreen exitfullscreen', event => {
             const { target, usingNative } = player.fullscreen;
 
-            // Ignore for iOS native
-            if (!player.isEmbed || target !== elements.container) {
+            // Ignore events not from target
+            if (target !== elements.container) {
+                return;
+            }
+
+            // If it's not an embed and no ratio specified
+            if (!player.isEmbed && is.empty(player.config.ratio)) {
                 return;
             }
 
@@ -801,7 +798,7 @@ class Listeners {
 
         // Show controls when they receive focus (e.g., when using keyboard tab key)
         this.bind(elements.controls, 'focusin', () => {
-            const { config, elements, timers } = player;
+            const { config, timers } = player;
 
             // Skip transition to prevent focus from scrolling the parent element
             toggleClass(elements.controls, config.classNames.noTransition, true);

@@ -17,7 +17,7 @@
         <link rel="icon" type="image/png" href="https://cdn.plyr.io/static/icons/16x16.png" sizes="16x16" />
         <link rel="apple-touch-icon" sizes="180x180" href="https://cdn.plyr.io/static/icons/180x180.png" />
 
-        <!-- Opengraph -->
+        <!-- Open Graph -->
         <meta
             property="og:title"
             content="Plyr - A simple, customizable HTML5 Video, Audio, YouTube and Vimeo player"
@@ -50,12 +50,23 @@
             type="font/woff2"
             href="https://cdn.plyr.io/static/fonts/gordita-bold.woff2"
         />
+
+        <!-- Google Analytics-->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-132699580-1"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+            gtag('js', new Date());
+            gtag('config', 'UA-132699580-1');
+        </script>
     </head>
 
     <body>
         <div class="grid">
             <header>
-                <h1>Plyr</h1>
+                <h1>Pl<span>a</span>y<span>e</span>r</h1>
                 <p>
                     A simple, accessible and customisable media player for
                     <button type="button" class="faux-link" data-source="video">
@@ -106,22 +117,20 @@
                 </p>
 
                 <div class="call-to-action">
-                    <span class="button--with-count">
-                        <a href="https://github.com/sampotts/plyr" target="_blank" class="button js-shr-button">
-                            <svg class="icon" role="presentation">
-                                <title>GitHub</title>
-                                <path
-                                    d="M8,0.2c-4.4,0-8,3.6-8,8c0,3.5,2.3,6.5,5.5,7.6
-               C5.9,15.9,6,15.6,6,15.4c0-0.2,0-0.7,0-1.4C3.8,14.5,3.3,13,3.3,13c-0.4-0.9-0.9-1.2-0.9-1.2c-0.7-0.5,0.1-0.5,0.1-0.5
-               c0.8,0.1,1.2,0.8,1.2,0.8C4.4,13.4,5.6,13,6,12.8c0.1-0.5,0.3-0.9,0.5-1.1c-1.8-0.2-3.6-0.9-3.6-4c0-0.9,0.3-1.6,0.8-2.1
-               c-0.1-0.2-0.4-1,0.1-2.1c0,0,0.7-0.2,2.2,0.8c0.6-0.2,1.3-0.3,2-0.3c0.7,0,1.4,0.1,2,0.3c1.5-1,2.2-0.8,2.2-0.8
-               c0.4,1.1,0.2,1.9,0.1,2.1c0.5,0.6,0.8,1.3,0.8,2.1c0,3.1-1.9,3.7-3.7,3.9C9.7,12,10,12.5,10,13.2c0,1.1,0,1.9,0,2.2
-               c0,0.2,0.1,0.5,0.6,0.4c3.2-1.1,5.5-4.1,5.5-7.6C16,3.8,12.4,0.2,8,0.2z"
-                                ></path>
-                            </svg>
-                            Download on GitHub
-                        </a>
-                    </span>
+                    <a href="https://github.com/sampotts/plyr" target="_blank" class="button js-shr">
+                        <svg class="icon" role="presentation">
+                            <title>GitHub</title>
+                            <path
+                                d="M8,0.2c-4.4,0-8,3.6-8,8c0,3.5,2.3,6.5,5.5,7.6
+            C5.9,15.9,6,15.6,6,15.4c0-0.2,0-0.7,0-1.4C3.8,14.5,3.3,13,3.3,13c-0.4-0.9-0.9-1.2-0.9-1.2c-0.7-0.5,0.1-0.5,0.1-0.5
+            c0.8,0.1,1.2,0.8,1.2,0.8C4.4,13.4,5.6,13,6,12.8c0.1-0.5,0.3-0.9,0.5-1.1c-1.8-0.2-3.6-0.9-3.6-4c0-0.9,0.3-1.6,0.8-2.1
+            c-0.1-0.2-0.4-1,0.1-2.1c0,0,0.7-0.2,2.2,0.8c0.6-0.2,1.3-0.3,2-0.3c0.7,0,1.4,0.1,2,0.3c1.5-1,2.2-0.8,2.2-0.8
+            c0.4,1.1,0.2,1.9,0.1,2.1c0.5,0.6,0.8,1.3,0.8,2.1c0,3.1-1.9,3.7-3.7,3.9C9.7,12,10,12.5,10,13.2c0,1.1,0,1.9,0,2.2
+            c0,0.2,0.1,0.5,0.6,0.4c3.2-1.1,5.5-4.1,5.5-7.6C16,3.8,12.4,0.2,8,0.2z"
+                            ></path>
+                        </svg>
+                        Download on GitHub
+                    </a>
                 </div>
             </header>
 
@@ -256,23 +265,13 @@
                 <a
                     href="https://twitter.com/intent/tweet?text=A+simple+HTML5+media+player+with+custom+controls+and+WebVTT+captions.&amp;url=http%3A%2F%2Fplyr.io&amp;via=Sam_Potts"
                     target="_blank"
-                    class="js-shr-button"
+                    class="js-shr"
                     >tweet it</a
                 >
                 👍
             </p>
         </aside>
 
-        <!-- Polyfills -->
-        <script
-            src="https://cdn.polyfill.io/v3/polyfill.min.js?features=es6,Array.prototype.includes,CustomEvent,Object.entries,Object.values,URL,Math.trunc&flags=gated"
-            crossorigin="anonymous"
-        ></script>
-
-        <!-- Sharing libary (https://shr.one) -->
-        <script src="https://cdn.shr.one/2.0.0-beta.2/shr.js" crossorigin="anonymous"></script>
-
-        <!-- Docs script -->
         <script src="dist/demo.js" crossorigin="anonymous"></script>
     </body>
 </html>

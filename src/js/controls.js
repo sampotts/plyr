@@ -11,7 +11,20 @@ import support from './support';
 import { repaint, transitionEndEvent } from './utils/animation';
 import { dedupe } from './utils/arrays';
 import browser from './utils/browser';
-import { createElement, emptyElement, getAttributesFromSelector, getElement, getElements, hasClass, matches, removeElement, setAttributes, setFocus, toggleClass, toggleHidden } from './utils/elements';
+import {
+    createElement,
+    emptyElement,
+    getAttributesFromSelector,
+    getElement,
+    getElements,
+    hasClass,
+    matches,
+    removeElement,
+    setAttributes,
+    setFocus,
+    toggleClass,
+    toggleHidden,
+} from './utils/elements';
 import { off, on } from './utils/events';
 import i18n from './utils/i18n';
 import is from './utils/is';
@@ -480,15 +493,15 @@ const controls = {
             get() {
                 return menuItem.getAttribute('aria-checked') === 'true';
             },
-            set(checked) {
+            set(check) {
                 // Ensure exclusivity
-                if (checked) {
+                if (check) {
                     Array.from(menuItem.parentNode.children)
                         .filter(node => matches(node, '[role="menuitemradio"]'))
                         .forEach(node => node.setAttribute('aria-checked', 'false'));
                 }
 
-                menuItem.setAttribute('aria-checked', checked ? 'true' : 'false');
+                menuItem.setAttribute('aria-checked', check ? 'true' : 'false');
             },
         });
 
@@ -596,17 +609,17 @@ const controls = {
         let value = 0;
 
         const setProgress = (target, input) => {
-            const value = is.number(input) ? input : 0;
+            const val = is.number(input) ? input : 0;
             const progress = is.element(target) ? target : this.elements.display.buffer;
 
             // Update value and label
             if (is.element(progress)) {
-                progress.value = value;
+                progress.value = val;
 
                 // Update text label inside
                 const label = progress.getElementsByTagName('span')[0];
                 if (is.element(label)) {
-                    label.childNodes[0].nodeValue = value;
+                    label.childNodes[0].nodeValue = val;
                 }
             }
         };
@@ -688,14 +701,8 @@ const controls = {
             return;
         }
 
-        // Calculate percentage
-        let percent = 0;
-        const clientRect = this.elements.progress.getBoundingClientRect();
         const visible = `${this.config.classNames.tooltip}--visible`;
-
-        const toggle = toggle => {
-            toggleClass(this.elements.display.seekTooltip, visible, toggle);
-        };
+        const toggle = show => toggleClass(this.elements.display.seekTooltip, visible, show);
 
         // Hide on touch
         if (this.touch) {
@@ -704,6 +711,9 @@ const controls = {
         }
 
         // Determine percentage, if already visible
+        let percent = 0;
+        const clientRect = this.elements.progress.getBoundingClientRect();
+
         if (is.event(event)) {
             percent = (100 / clientRect.width) * (event.pageX - clientRect.left);
         } else if (hasClass(this.elements.display.seekTooltip, visible)) {
@@ -1100,7 +1110,7 @@ const controls = {
         let target = pane;
 
         if (!is.element(target)) {
-            target = Object.values(this.elements.settings.panels).find(pane => !pane.hidden);
+            target = Object.values(this.elements.settings.panels).find(p => !p.hidden);
         }
 
         const firstItem = target.querySelector('[role^="menuitem"]');
@@ -1398,7 +1408,7 @@ const controls = {
 
             // Settings button / menu
             if (control === 'settings' && !is.empty(this.config.settings)) {
-                const control = createElement(
+                const wrapper = createElement(
                     'div',
                     extend({}, defaultAttributes, {
                         class: `${defaultAttributes.class} plyr__menu`.trim(),
@@ -1406,7 +1416,7 @@ const controls = {
                     }),
                 );
 
-                control.appendChild(
+                wrapper.appendChild(
                     createButton.call(this, 'settings', {
                         'aria-haspopup': true,
                         'aria-controls': `plyr-settings-${data.id}`,
@@ -1546,11 +1556,11 @@ const controls = {
                 });
 
                 popup.appendChild(inner);
-                control.appendChild(popup);
-                container.appendChild(control);
+                wrapper.appendChild(popup);
+                container.appendChild(wrapper);
 
                 this.elements.settings.popup = popup;
-                this.elements.settings.menu = control;
+                this.elements.settings.menu = wrapper;
             }
 
             // Picture in picture button

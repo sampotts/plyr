@@ -267,7 +267,7 @@ class Ads {
 
         // Advertisement regular events
         Object.keys(google.ima.AdEvent.Type).forEach(type => {
-            this.manager.addEventListener(google.ima.AdEvent.Type[type], event => this.onAdEvent(event));
+            this.manager.addEventListener(google.ima.AdEvent.Type[type], e => this.onAdEvent(e));
         });
 
         // Resolve our adsManager
@@ -310,8 +310,7 @@ class Ads {
 
         // Proxy event
         const dispatchEvent = type => {
-            const event = `ads${type.replace(/_/g, '').toLowerCase()}`;
-            triggerEvent.call(this.player, this.player.media, event);
+            triggerEvent.call(this.player, this.player.media, `ads${type.replace(/_/g, '').toLowerCase()}`);
         };
 
         // Bubble the event

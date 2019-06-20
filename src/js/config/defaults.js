@@ -128,6 +128,7 @@ const defaults = {
         // 'fast-forward',
         'progress',
         'current-time',
+        // 'duration',
         'mute',
         'volume',
         'captions',
@@ -195,7 +196,7 @@ const defaults = {
         },
         youtube: {
             sdk: 'https://www.youtube.com/iframe_api',
-            api: 'https://noembed.com/embed?url=https://www.youtube.com/watch?v={0}', // 'https://www.googleapis.com/youtube/v3/videos?id={0}&key={1}&fields=items(snippet(title),fileDetails)&part=snippet',
+            api: 'https://noembed.com/embed?url=https://www.youtube.com/watch?v={0}',
         },
         googleIMA: {
             sdk: 'https://imasdk.googleapis.com/js/sdkloader/ima3.js',

@@ -6,13 +6,12 @@ Plyr is a simple, lightweight, accessible and customizable HTML5, YouTube and Vi
 
 # Features
 
+-   📼 **HTML Video & Audio, YouTube & Vimeo** - support for the major formats
 -   💪 **Accessible** - full support for VTT captions and screen readers
 -   🔧 **[Customisable](#html)** - make the player look how you want with the markup you want
--   😎 **Good HTML** - uses the _right_ elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no
+-   😎 **Clean HTML** - uses the _right_ elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no
     `<span>` or `<a href="#">` button hacks
 -   📱 **Responsive** - works with any screen size
--   📼 **HTML Video & Audio** - support for both formats
--   📺 **[Embedded Video](#embeds)** - support for YouTube and Vimeo video playback
 -   💵 **[Monetization](#ads)** - make money from your videos
 -   📹 **[Streaming](#demos)** - support for hls.js, Shaka and dash.js streaming playback
 -   🎛 **[API](#api)** - toggle playback, volume, seeking, and more through a standardized API
@@ -25,7 +24,7 @@ Plyr is a simple, lightweight, accessible and customizable HTML5, YouTube and Vi
 -   📖 **Multiple captions** - support for multiple caption tracks
 -   🌎 **i18n support** - support for internationalization of controls
 -   👌 **[Preview thumbnails](#preview-thumbnails)** - support for displaying preview thumbnails
--   🤟 **No dependencies** - written in "vanilla" ES6 JavaScript, no jQuery required
+-   🤟 **No frameworks** - written in "vanilla" ES6 JavaScript, no jQuery required
 -   💁‍♀️ **SASS** - to include in your build processes
 
 ### Demos
@@ -109,7 +108,15 @@ Or the `<div>` non progressively enhanced method:
 
 ## JavaScript
 
-Include the `plyr.js` script before the closing `</body>` tag and then in your JS create a new instance of Plyr as below.
+You can use Plyr as an ES6 module as follows:
+
+```javascript
+import Plyr from 'plyr';
+
+const player = new Plyr('#player');
+```
+
+Alertnatively you can include the `plyr.js` script before the closing `</body>` tag and then in your JS create a new instance of Plyr as below.
 
 ```html
 <script src="path/to/plyr.js"></script>
@@ -123,18 +130,18 @@ See [initialising](#initialising) for more information on advanced setups.
 You can use our CDN (provided by [Fastly](https://www.fastly.com/)) for the JavaScript. There's 2 versions; one with and one without [polyfills](#polyfills). My recommendation would be to manage polyfills seperately as part of your application but to make life easier you can use the polyfilled build.
 
 ```html
-<script src="https://cdn.plyr.io/3.5.3/plyr.js"></script>
+<script src="https://cdn.plyr.io/3.5.4/plyr.js"></script>
 ```
 
 ...or...
 
 ```html
-<script src="https://cdn.plyr.io/3.5.3/plyr.polyfilled.js"></script>
+<script src="https://cdn.plyr.io/3.5.4/plyr.polyfilled.js"></script>
 ```
 
 ## CSS
 
-Include the `plyr.css` stylsheet into your `<head>`
+Include the `plyr.css` stylsheet into your `<head>`.
 
 ```html
 <link rel="stylesheet" href="path/to/plyr.css" />
@@ -143,13 +150,13 @@ Include the `plyr.css` stylsheet into your `<head>`
 If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for the default CSS, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/3.5.3/plyr.css" />
+<link rel="stylesheet" href="https://cdn.plyr.io/3.5.4/plyr.css" />
 ```
 
 ## SVG Sprite
 
 The SVG sprite is loaded automatically from our CDN (provided by [Fastly](https://www.fastly.com/)). To change this, see the [options](#options) below. For
-reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.5.3/plyr.svg`.
+reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.5.4/plyr.svg`.
 
 # Ads
 
@@ -204,7 +211,7 @@ WebVTT captions are supported. To add a caption track, check the HTML example ab
 
 You can specify a range of arguments for the constructor to use:
 
--   A CSS string selector that's compatible with [`querySelector`](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector)
+-   A [CSS string selector](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors)
 -   A [`HTMLElement`](https://developer.mozilla.org/en/docs/Web/API/HTMLElement)
 -   A [jQuery](https://jquery.com) object
 
@@ -238,7 +245,7 @@ You have two choices here. You can either use a simple array loop to map the con
 const players = Array.from(document.querySelectorAll('.js-player')).map(p => new Plyr(p));
 ```
 
-...or use a static method where you can pass a string selector that's compatible with [`querySelector`](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector), a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList), an [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array) of [HTMLElement](https://developer.mozilla.org/en/docs/Web/API/HTMLElement), or a [JQuery](https://jquery.com) object:
+...or use a static method where you can pass a [CSS string selector](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors), a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList), an [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array) of [HTMLElement](https://developer.mozilla.org/en/docs/Web/API/HTMLElement), or a [JQuery](https://jquery.com) object:
 
 ```javascript
 const players = Plyr.setup('.js-player');
@@ -703,6 +710,7 @@ Plyr costs money to run, not only my time. I donate my time for free as I enjoy 
 -   [HTML5 Weekly #177](http://html5weekly.com/issues/177)
 -   [Responsive Design #149](http://us4.campaign-archive2.com/?u=559bc631fe5294fc66f5f7f89&id=451a61490f)
 -   [Web Design Weekly #174](https://web-design-weekly.com/2015/02/24/web-design-weekly-174/)
+-   [Front End Focus #177](https://frontendfoc.us/issues/177)
 -   [Hacker News](https://news.ycombinator.com/item?id=9136774)
 -   [Web Platform Daily](http://webplatformdaily.org/releases/2015-03-04)
 -   [LayerVault Designer News](https://news.layervault.com/stories/45394-plyr--a-simple-html5-media-player)
@@ -722,7 +730,7 @@ Plyr costs money to run, not only my time. I donate my time for free as I enjoy 
 -   [Sparkk TV](https://www.sparkktv.com/)
 -   [@halfhalftravel](https://www.halfhalftravel.com/)
 
-Let me know on [Twitter](https://twitter.com/sam_potts) I can add you to the above list. It'd be awesome to see how you're using Plyr :-)
+If you want to be added to the list, open a pull request. It'd be awesome to see how you're using Plyr 😎
 
 # Useful links and credits
 

@@ -133,6 +133,7 @@ const captions = {
                     });
 
                     // Turn off native caption rendering to avoid double captions
+                    // eslint-disable-next-line no-param-reassign
                     track.mode = 'hidden';
 
                     // Add event listener for cue changes
@@ -302,7 +303,7 @@ const captions = {
         let track;
 
         languages.every(language => {
-            track = sorted.find(track => track.language === language);
+            track = sorted.find(t => t.language === language);
             return !track; // Break iteration if there is a match
         });
 
