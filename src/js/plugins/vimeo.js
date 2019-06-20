@@ -9,7 +9,7 @@ import { createElement, replaceElement, toggleClass } from '../utils/elements';
 import { triggerEvent } from '../utils/events';
 import fetch from '../utils/fetch';
 import is from '../utils/is';
-import loadScript from '../utils/loadScript';
+import loadScript from '../utils/load-script';
 import { extend } from '../utils/objects';
 import { format, stripHTML } from '../utils/strings';
 import { setAspectRatio } from '../utils/style';

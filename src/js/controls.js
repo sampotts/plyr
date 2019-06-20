@@ -28,7 +28,7 @@ import {
 import { off, on } from './utils/events';
 import i18n from './utils/i18n';
 import is from './utils/is';
-import loadSprite from './utils/loadSprite';
+import loadSprite from './utils/load-sprite';
 import { extend } from './utils/objects';
 import { getPercentage, replaceAll, toCamelCase, toTitleCase } from './utils/strings';
 import { formatTime, getHours } from './utils/time';

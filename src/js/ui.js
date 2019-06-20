@@ -10,7 +10,7 @@ import { getElement, toggleClass } from './utils/elements';
 import { ready, triggerEvent } from './utils/events';
 import i18n from './utils/i18n';
 import is from './utils/is';
-import loadImage from './utils/loadImage';
+import loadImage from './utils/load-image';
 
 const ui = {
     addStyleHook() {

@@ -10,7 +10,7 @@ import { createElement } from '../utils/elements';
 import { triggerEvent } from '../utils/events';
 import i18n from '../utils/i18n';
 import is from '../utils/is';
-import loadScript from '../utils/loadScript';
+import loadScript from '../utils/load-script';
 import { formatTime } from '../utils/time';
 import { buildUrlParams } from '../utils/urls';
 
