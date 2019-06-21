@@ -68,7 +68,7 @@
         "gulp-sourcemaps": "^2.6.5",
         "gulp-svgstore": "^7.0.1",
         "gulp-terser": "^1.2.0",
-        "postcss-custom-properties": "^8.0.11",
+        "postcss-custom-properties": "^9.0.1",
         "prettier-eslint": "^9.0.0",
         "prettier-stylelint": "^0.4.2",
         "remark-cli": "^6.0.1",
