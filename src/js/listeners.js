@@ -579,6 +579,9 @@ class Listeners {
             'download',
         );
 
+        // Google cast
+        this.bind(elements.buttons.googlecast, 'click', player.googlecast, 'googlecast');
+
         // Fullscreen toggle
         this.bind(
             elements.buttons.fullscreen,

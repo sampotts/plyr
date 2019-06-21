@@ -10,6 +10,7 @@ import ui from './ui';
 import { createElement, insertElement, removeElement } from './utils/elements';
 import is from './utils/is';
 import { getDeep } from './utils/objects';
+import googlecast from './plugins/google-cast';
 
 const source = {
     // Add elements to HTML5 media (source, tracks, etc)
@@ -28,6 +29,7 @@ const source = {
     // Update source
     // Sources are not checked for support so be careful
     change(input) {
+        debugger
         if (!getDeep(input, 'sources.length')) {
             this.debug.warn('Invalid source format');
             return;
@@ -35,6 +37,10 @@ const source = {
 
         // Cancel current network requests
         html5.cancelRequests.call(this);
+
+        if (this.hls) {
+            this.hls.destroy();
+        }
 
         // Destroy instance and re-setup
         this.destroy.call(
@@ -46,6 +52,9 @@ const source = {
                 // Remove elements
                 removeElement(this.media);
                 this.media = null;
+
+                // Remove hls property if set
+                delete plyr.hls
 
                 // Reset class name
                 if (is.element(this.elements.container)) {
