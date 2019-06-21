@@ -1,3 +1,7 @@
+## v3.5.6
+
+-   Another Edge fix (thanks Nick Hawk via Slack)
+
 ## v3.5.5
 
 -   YouTube fix for when there are other embeds on the page (thanks @aFarkas)
