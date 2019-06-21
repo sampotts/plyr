@@ -12,11 +12,11 @@
     align-items: center;
     display: flex;
     justify-content: flex-end;
-    min-width: 0; // Fix for Edge issue where content would overflow
     text-align: center;
 
     .plyr__progress__container {
         flex: 1;
+        min-width: 0; // Fix for Edge issue where content would overflow
     }
 
     // Spacing
