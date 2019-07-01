@@ -629,16 +629,16 @@ Fullscreen in Plyr is supported by all browsers that [currently support it](http
 
 Plyr supports the last 2 versions of most _modern_ browsers.
 
-| Browser       | Supported     |
-| ------------- | ------------- |
-| Safari        | ✓             |
-| Mobile Safari | ✓&sup1;       |
-| Firefox       | ✓             |
-| Chrome        | ✓             |
-| Opera         | ✓             |
-| Edge          | ✓             |
-| IE11          | ✓&sup3;       |
-| IE10          | ✓&sup2;&sup3; |
+| Browser       | Supported       |
+| ------------- | --------------- |
+| Safari        | ✓               |
+| Mobile Safari | ✓&sup1;         |
+| Firefox       | ✓               |
+| Chrome        | ✓               |
+| Opera         | ✓               |
+| Edge          | ✓               |
+| IE11          | ✓&sup3;         |
+| IE10          | ✓<sup>2,3</sup> |
 
 1.  Mobile Safari on the iPhone forces the native player for `<video>` unless the `playsinline` attribute is present. Volume controls are also disabled as they are handled device wide.
 2.  Native player used (no support for `<progress>` or `<input type="range">`) but the API is supported. No native fullscreen support, fallback can be used (see [options](#options)).
