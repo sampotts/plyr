@@ -570,6 +570,14 @@ const controls = {
         target.innerText = controls.formatTime(time, inverted);
     },
 
+    // Update the markers text
+    updateMarkersDisplay(target = null, markText = "") {
+        if (!is.element(target)) {
+            return;
+        }
+        target.innerText = markText;
+    },
+
     // Update volume UI and storage
     updateVolume() {
         if (!this.supported.ui) {
@@ -730,7 +738,14 @@ const controls = {
         }
 
         // Display the time a click would seek to
-        controls.updateTimeDisplay.call(this, this.elements.display.seekTooltip, (this.duration / 100) * percent);
+        var position =  (this.duration / 100) * percent
+
+        if(Math.floor(position) in this.config.markers){
+            controls.updateMarkersDisplay.call(this, this.elements.display.seekTooltip,this.config.markers[Math.floor(position)]);
+        }else{
+            controls.updateTimeDisplay.call(this, this.elements.display.seekTooltip, position);
+        }
+
 
         // Set position
         this.elements.display.seekTooltip.style.left = `${percent}%`;
@@ -740,6 +755,46 @@ const controls = {
         if (is.event(event) && ['mouseenter', 'mouseleave'].includes(event.type)) {
             toggle(event.type === 'mouseenter');
         }
+    },
+
+    // Set marker points in progress bar
+    setMarker(marker) {
+        if (!is.object(marker)) {
+            return;
+        }
+
+        var duration=this.duration
+
+        
+
+        var wrapperMarker = this.elements.container.querySelector('.plyr__marker'),
+            markerPointWidth = 100 / duration;
+
+
+
+        Object.keys(marker).forEach(function (index) {
+            var pos = parseInt(index);
+
+            if (!isNaN(pos) && pos >= 0 && pos <= duration) {
+                /*_insertElement('span', wrapperMarker, {
+                    style: 'width:' + markerPointWidth + '%; left:' + (100 * pos) / duration + '%;'
+                });*/
+                /*console.log("markerPointWidth:"+markerPointWidth)
+                console.log("duration:"+ ((100 * pos) / duration))*/
+
+                const markers = createElement(
+                    'span',
+                    {
+                        style: 'width:' + markerPointWidth*2 + '%; left:' + (100 * pos) / duration + '%;'
+                    },
+                    '',
+                );
+                wrapperMarker.appendChild(markers);
+            }
+        });
+
+        // update config*/
+        this.config.marker = marker;
     },
 
     // Handle time change event
@@ -1324,6 +1379,18 @@ const controls = {
 
                 // Buffer progress
                 progress.appendChild(createProgress.call(this, 'buffer'));
+
+                //Marker progress
+                const markers = createElement(
+                    'div',
+                    {
+                        class: "plyr__marker",//this.config.classNames.tooltip,
+                    },
+                    '',
+                );
+                progress.appendChild(markers);
+                this.elements.display.markers = markers;
+               
 
                 // TODO: Add loop display indicator
 

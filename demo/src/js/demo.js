@@ -47,6 +47,11 @@ import toggleClass from './toggle-class';
                 tooltips: {
                     controls: true,
                 },
+                markers: {
+                    "60":"苟利国家生死以",
+                    "120":"岂因祸福避趋之",
+                    "180":"闷声大发财"
+                },
                 captions: {
                     active: true,
                 },
@@ -56,14 +61,7 @@ import toggleClass from './toggle-class';
                 ads: {
                     enabled: env.prod || env.dev,
                     publisherId: '918848828995742',
-                },
-                previewThumbnails: {
-                    enabled: true,
-                    src: [
-                        'https://cdn.plyr.io/static/demo/thumbs/100p.vtt',
-                        'https://cdn.plyr.io/static/demo/thumbs/240p.vtt',
-                    ],
-                },
+                },              
             });
 
             // Expose for tinkering in the console

@@ -374,7 +374,13 @@ class Listeners {
 
         // Display duration
         on.call(player, player.media, 'durationchange loadeddata loadedmetadata', event =>
-            controls.durationUpdate.call(player, event),
+            {
+                controls.durationUpdate.call(player, event);
+
+                if ('markers' in player.config) {
+                    controls.setMarker.call(player, player.config.markers);
+                }
+            }
         );
 
         // Check for audio tracks on load

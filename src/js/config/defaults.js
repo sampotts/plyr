@@ -91,6 +91,11 @@ const defaults = {
         global: false,
     },
 
+    //Display markers
+    markers:{
+       
+    },
+
     // Display tooltips
     tooltips: {
         controls: false,
