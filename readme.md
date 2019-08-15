@@ -729,6 +729,7 @@ Plyr costs money to run, not only my time. I donate my time for free as I enjoy 
 -   [koel - A personal music streaming server that works.](http://koel.phanan.net/)
 -   [Oscar Radio](http://oscar-radio.xyz/)
 -   [Sparkk TV](https://www.sparkktv.com/)
+-   [@halfhalftravel](https://www.halfhalftravel.com/)
 
 If you want to be added to the list, open a pull request. It'd be awesome to see how you're using Plyr 😎
 
