@@ -686,6 +686,7 @@ Some awesome folks have made plugins for CMSs and Components for JavaScript fram
 | Vue       | Gabe Dunn ([@redxtech](https://github.com/redxtech))           | [https://github.com/redxtech/vue-plyr](https://github.com/redxtech/vue-plyr)                 |
 | Neos      | Jon Uhlmann ([@jonnitto](https://github.com/jonnitto))         | [https://packagist.org/packages/jonnitto/plyr](https://packagist.org/packages/jonnitto/plyr) |
 | Kirby     | Dominik Pschenitschni ([@dpschen](https://github.com/dpschen)) | [https://github.com/dpschen/kirby-plyrtag](https://github.com/dpschen/kirby-plyrtag)         |
+| REDAXO    | FriendsOfRedaxo / skerbis ([@skerbis](https://friendsofredaxo.github.io)) | [https://github.com/FriendsOfREDAXO/plyr](https://github.com/FriendsOfREDAXO/plyr)         |
 
 # Issues
 
@@ -728,7 +729,6 @@ Plyr costs money to run, not only my time. I donate my time for free as I enjoy 
 -   [koel - A personal music streaming server that works.](http://koel.phanan.net/)
 -   [Oscar Radio](http://oscar-radio.xyz/)
 -   [Sparkk TV](https://www.sparkktv.com/)
--   [@halfhalftravel](https://www.halfhalftravel.com/)
 
 If you want to be added to the list, open a pull request. It'd be awesome to see how you're using Plyr 😎
 
