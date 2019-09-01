@@ -116,7 +116,7 @@ import Plyr from 'plyr';
 const player = new Plyr('#player');
 ```
 
-Alertnatively you can include the `plyr.js` script before the closing `</body>` tag and then in your JS create a new instance of Plyr as below.
+Alternatively you can include the `plyr.js` script before the closing `</body>` tag and then in your JS create a new instance of Plyr as below.
 
 ```html
 <script src="path/to/plyr.js"></script>
