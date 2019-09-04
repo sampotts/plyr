@@ -50,7 +50,7 @@ import toggleClass from './toggle-class';
                 markers: {
                     "60":"苟利国家生死以",
                     "120":"岂因祸福避趋之",
-                    "180":"闷声大发财"
+                    "180":"闷声大发财啊"
                 },
                 captions: {
                     active: true,

@@ -7961,6 +7961,17 @@ typeof navigator === "object" && (function (global, factory) {
 
       target.innerText = controls.formatTime(time, inverted);
     },
+    // Update the markers text
+    updateMarkersDisplay: function updateMarkersDisplay() {
+      var target = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+      var markText = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
+
+      if (!is$1.element(target)) {
+        return;
+      }
+
+      target.innerText = markText;
+    },
     // Update volume UI and storage
     updateVolume: function updateVolume() {
       if (!this.supported.ui) {
@@ -8113,7 +8124,14 @@ typeof navigator === "object" && (function (global, factory) {
       } // Display the time a click would seek to
 
 
-      controls.updateTimeDisplay.call(this, this.elements.display.seekTooltip, this.duration / 100 * percent); // Set position
+      var position = this.duration / 100 * percent;
+
+      if (Math.floor(position) in this.config.markers) {
+        controls.updateMarkersDisplay.call(this, this.elements.display.seekTooltip, this.config.markers[Math.floor(position)]);
+      } else {
+        controls.updateTimeDisplay.call(this, this.elements.display.seekTooltip, position);
+      } // Set position
+
 
       this.elements.display.seekTooltip.style.left = "".concat(percent, "%"); // Show/hide the tooltip
       // If the event is a moues in/out and percentage is inside bounds
@@ -8121,6 +8139,34 @@ typeof navigator === "object" && (function (global, factory) {
       if (is$1.event(event) && ['mouseenter', 'mouseleave'].includes(event.type)) {
         toggle(event.type === 'mouseenter');
       }
+    },
+    // Set marker points in progress bar
+    setMarker: function setMarker(marker) {
+      if (!is$1.object(marker)) {
+        return;
+      }
+
+      var duration = this.duration;
+      var wrapperMarker = this.elements.container.querySelector('.plyr__marker'),
+          markerPointWidth = 100 / duration;
+      Object.keys(marker).forEach(function (index) {
+        var pos = parseInt(index);
+
+        if (!isNaN(pos) && pos >= 0 && pos <= duration) {
+          /*_insertElement('span', wrapperMarker, {
+              style: 'width:' + markerPointWidth + '%; left:' + (100 * pos) / duration + '%;'
+          });*/
+
+          /*console.log("markerPointWidth:"+markerPointWidth)
+          console.log("duration:"+ ((100 * pos) / duration))*/
+          var markers = createElement('span', {
+            style: 'width:' + markerPointWidth * 2 + '%; left:' + 100 * pos / duration + '%;'
+          }, '');
+          wrapperMarker.appendChild(markers);
+        }
+      }); // update config*/
+
+      this.config.marker = marker;
     },
     // Handle time change event
     timeUpdate: function timeUpdate(event) {
@@ -8648,7 +8694,14 @@ typeof navigator === "object" && (function (global, factory) {
             id: "plyr-seek-".concat(data.id)
           })); // Buffer progress
 
-          progress.appendChild(createProgress.call(_this10, 'buffer')); // TODO: Add loop display indicator
+          progress.appendChild(createProgress.call(_this10, 'buffer')); //Marker progress
+
+          var markers = createElement('div', {
+            class: "plyr__marker" //this.config.classNames.tooltip,
+
+          }, '');
+          progress.appendChild(markers);
+          _this10.elements.display.markers = markers; // TODO: Add loop display indicator
           // Seek tooltip
 
           if (_this10.config.tooltips.seek) {
@@ -9475,6 +9528,8 @@ typeof navigator === "object" && (function (global, factory) {
       focused: true,
       global: false
     },
+    //Display markers
+    markers: {},
     // Display tooltips
     tooltips: {
       controls: false,
@@ -10700,7 +10755,11 @@ typeof navigator === "object" && (function (global, factory) {
         }); // Display duration
 
         on.call(player, player.media, 'durationchange loadeddata loadedmetadata', function (event) {
-          return controls.durationUpdate.call(player, event);
+          controls.durationUpdate.call(player, event);
+
+          if ('markers' in player.config) {
+            controls.setMarker.call(player, player.config.markers);
+          }
         }); // Check for audio tracks on load
         // We can't use `loadedmetadata` as it doesn't seem to have audio tracks at that point
 
