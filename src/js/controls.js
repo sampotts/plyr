@@ -785,7 +785,8 @@ const controls = {
                 const markers = createElement(
                     'span',
                     {
-                        style: 'width:' + markerPointWidth*2 + '%; left:' + (100 * pos) / duration + '%;'
+                        //style: 'width:' + markerPointWidth*2 + '%; left:' + (100 * pos) / duration + '%;'
+                        style: 'width:10px; left:' + (100 * pos) / duration + '%;'
                     },
                     '',
                 );

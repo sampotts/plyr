@@ -2336,8 +2336,7 @@ var controls = {
     }
 
     var duration = this.duration;
-    var wrapperMarker = this.elements.container.querySelector('.plyr__marker'),
-        markerPointWidth = 100 / duration;
+    var wrapperMarker = this.elements.container.querySelector('.plyr__marker');
     Object.keys(marker).forEach(function (index) {
       var pos = parseInt(index);
 
@@ -2349,7 +2348,8 @@ var controls = {
         /*console.log("markerPointWidth:"+markerPointWidth)
         console.log("duration:"+ ((100 * pos) / duration))*/
         var markers = createElement('span', {
-          style: 'width:' + markerPointWidth * 2 + '%; left:' + 100 * pos / duration + '%;'
+          //style: 'width:' + markerPointWidth*2 + '%; left:' + (100 * pos) / duration + '%;'
+          style: 'width:10px; left:' + 100 * pos / duration + '%;'
         }, '');
         wrapperMarker.appendChild(markers);
       }
