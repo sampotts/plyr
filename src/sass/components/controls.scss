@@ -120,3 +120,12 @@
     margin-top: 6px;
     min-width: 2px !important;
 }
+
+.plyr__marker > span:hover {
+    cursor: pointer;
+    transform: scale(1.3);
+    -ms-transform:scale(1.3);     /* IE 9 */
+    -moz-transform:scale(1.3);     /* Firefox */
+    -webkit-transform:scale(1.3); /* Safari 和 Chrome */
+    -o-transform:scale(1.3);
+}
