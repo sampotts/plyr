@@ -390,6 +390,8 @@ class Listeners {
             if (player.isHTML5 && player.isVideo && player.config.resetOnEnd) {
                 // Restart
                 player.restart();
+                // call pause otherwise IE11 will start playing the video again
+                player.pause();
             }
         });
 
