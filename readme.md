@@ -1,6 +1,6 @@
 此项目从Plyr项目fork而来，在原来的基础上，增加了视频marker标记的功能，如下图
 
-![plyr-marker](https://cdn.alpaca-bi.com/plyr-marker.png)
+[![plyr-marker](https://cdn.alpaca-bi.com/plyr-marker.png)](https://plyr.io)
 
 # 使用方法
 ```
