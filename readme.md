@@ -1,3 +1,27 @@
+此项目从Plyr项目fork而来，在原来的基础上，增加了视频marker标记的功能，如下图
+
+![plyr-marker](https://cdn.alpaca-bi.com/plyr-marker.png)
+
+# 使用方法
+```
+const player = new Plyr(selector, {
+    tooltips: {
+        controls: true,
+    },
+    //key为秒数，value为该时间点的自定义消息
+    markers: {
+          "60":"苟利国家生死以",
+          "120":"岂因祸福避趋之",
+          "180":"闷声大发财"
+    },
+});
+```
+
+### ps.本人有空会优化代码给原作者提pr
+
+
+---下面是plyr原文档---
+---
 Plyr is a simple, lightweight, accessible and customizable HTML5, YouTube and Vimeo media player that supports [_modern_](#browser-support) browsers.
 
 [Checkout the demo](https://plyr.io) - [Donate](#donate) - [Slack](https://bit.ly/plyr-chat) - [![npm version](https://badge.fury.io/js/plyr.svg)](https://badge.fury.io/js/plyr)
