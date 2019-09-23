@@ -335,6 +335,14 @@ const vimeo = {
             }
         });
 
+        player.embed.on('bufferstart', () => {
+            triggerEvent.call(player, player.media, 'waiting');
+        });
+
+        player.embed.on('bufferend', () => {
+            triggerEvent.call(player, player.media, 'playing');
+        });
+
         player.embed.on('play', () => {
             assurePlaybackState.call(player, true);
             triggerEvent.call(player, player.media, 'playing');
