@@ -513,7 +513,7 @@ class Listeners {
         }
 
         // Only call default handler if not prevented in custom handler
-        if (returned && is.function(defaultHandler)) {
+        if (returned !== false && is.function(defaultHandler)) {
             defaultHandler.call(player, event);
         }
     }
