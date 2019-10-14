@@ -8,7 +8,7 @@ Plyr is a simple, lightweight, accessible and customizable HTML5, YouTube and Vi
 
 -   📼 **HTML Video & Audio, YouTube & Vimeo** - support for the major formats
 -   💪 **Accessible** - full support for VTT captions and screen readers
--   🔧 **[Customisable](#html)** - make the player look how you want with the markup you want
+-   🔧 **[Customizable](#html)** - make the player look how you want with the markup you want
 -   😎 **Clean HTML** - uses the _right_ elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no
     `<span>` or `<a href="#">` button hacks
 -   📱 **Responsive** - works with any screen size
