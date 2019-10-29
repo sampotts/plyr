@@ -60,6 +60,17 @@ const html5 = {
                 return source && Number(source.getAttribute('size'));
             },
             set(input) {
+              // Use custom quality selector if set in config and return.
+              if (player.config.hasOwnProperty('customQualitySelector') && typeof(player.config.customQualitySelector) === 'function'){
+                player.config.customQualitySelector(input);
+
+                // Trigger change event
+                triggerEvent.call(player, player.media, 'qualitychange', false, {
+                    quality: input,
+                });
+                return;
+              }
+
                 // Get sources
                 const sources = html5.getSources.call(player);
                 // Get first match for requested size
