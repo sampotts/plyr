@@ -228,7 +228,7 @@ class Fullscreen {
         } else if (!Fullscreen.native || this.forceFallback) {
             toggleFallback.call(this, true);
         } else if (!this.prefix) {
-            this.target.requestFullscreen();
+            this.target.requestFullscreen({ navigationUI: "hide" });
         } else if (!is.empty(this.prefix)) {
             this.target[`${this.prefix}Request${this.property}`]();
         }
