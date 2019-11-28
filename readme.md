@@ -734,9 +734,7 @@ If you want to be added to the list, open a pull request. It'd be awesome to see
 
 # Useful links and credits
 
-Credit to the PayPal HTML5 Video player from which Plyr's caption functionality was originally ported from:
-
--   [PayPal's Accessible HTML5 Video Player](https://github.com/paypal/accessible-html5-video-player)
+- [PayPal's Accessible HTML5 Video Player from which Plyr's caption functionality was originally ported from.](https://github.com/paypal/accessible-html5-video-player)
 -   [An awesome guide for Plyr in Japanese!](http://syncer.jp/how-to-use-plyr-io) by [@arayutw](https://twitter.com/arayutw)
 
 # Thanks
