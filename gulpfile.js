@@ -174,6 +174,7 @@ Object.entries(build.js).forEach(([filename, entry]) => {
                     ),
                 )
                 .pipe(header('typeof navigator === "object" && ')) // "Support" SSR (#935)
+                .pipe(header('typeof document === "object" && ')) // "Support" SSR (#935)
                 .pipe(
                     rename({
                         extname: `.${extension}`,
