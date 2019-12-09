@@ -60,6 +60,10 @@ function _iterableToArray(iter) {
 }
 
 function _iterableToArrayLimit(arr, i) {
+  if (!(Symbol.iterator in Object(arr) || Object.prototype.toString.call(arr) === "[object Arguments]")) {
+    return;
+  }
+
   var _arr = [];
   var _n = true;
   var _d = false;
@@ -109,7 +113,7 @@ function matches(element, selector) {
     return Array.from(document.querySelectorAll(selector)).includes(this);
   }
 
-  var matches = match;
+  var matches =  match;
   return matches.call(element, selector);
 }
 
@@ -570,7 +574,7 @@ function repaint(element, delay) {
 var browser = {
   isIE:
   /* @cc_on!@ */
-  !!document.documentMode,
+   !!document.documentMode,
   isEdge: window.navigator.userAgent.includes('Edge'),
   isWebkit: 'WebkitAppearance' in document.documentElement.style && !/Edge/.test(navigator.userAgent),
   isIPhone: /(iPhone|iPod)/gi.test(navigator.platform),
@@ -923,9 +927,6 @@ function getAttributesFromSelector(sel, existingAttributes) {
         // Attribute selector
         attributes[key] = value;
         break;
-
-      default:
-        break;
     }
   });
   return extend(existing, attributes);
@@ -977,7 +978,7 @@ function matches$1(element, selector) {
     return Array.from(document.querySelectorAll(selector)).includes(this);
   }
 
-  var method = match;
+  var method =  match;
   return method.call(element, selector);
 } // Find all elements
 
@@ -1243,7 +1244,14 @@ var html5 = {
   },
   // Get quality levels
   getQualityOptions: function getQualityOptions() {
-    // Get sizes from <source> elements
+    var player = this;
+    console.log('GET QUAL:', player);
+
+    if (player.config.hasOwnProperty('forceQualityOptions')) {
+      return player.config.forceQualityOptions;
+    } // Get sizes from <source> elements
+
+
     return html5.getSources.call(this).map(function (source) {
       return Number(source.getAttribute('size'));
     }).filter(Boolean);
@@ -1271,7 +1279,17 @@ var html5 = {
         return source && Number(source.getAttribute('size'));
       },
       set: function set(input) {
-        // Get sources
+        // Use custom quality selector if set in config and return.
+        if (player.config.hasOwnProperty('customQualitySelector') && typeof player.config.customQualitySelector === 'function') {
+          player.config.customQualitySelector(input); // Trigger change event
+
+          triggerEvent.call(player, player.media, 'qualitychange', false, {
+            quality: input
+          });
+          return;
+        } // Get sources
+
+
         var sources = html5.getSources.call(player); // Get first match for requested size
 
         var source = sources.find(function (s) {
@@ -2112,9 +2130,6 @@ var controls = {
         case 'speed':
           _this3.speed = parseFloat(value);
           break;
-
-        default:
-          break;
       }
 
       controls.showMenuPanel.call(_this3, 'home', is$1.keyboardEvent(event));
@@ -2222,9 +2237,6 @@ var controls = {
         case 'playing':
         case 'progress':
           setProgress(this.elements.display.buffer, this.buffered * 100);
-          break;
-
-        default:
           break;
       }
     }
@@ -2456,8 +2468,9 @@ var controls = {
       this.options.quality = dedupe(options).filter(function (quality) {
         return _this6.config.quality.options.includes(quality);
       });
-    } // Toggle the pane and tab
+    }
 
+    console.log('This.option:', this.options); // Toggle the pane and tab
 
     var toggle = !is$1.empty(this.options.quality) && this.options.quality.length > 1;
     controls.toggleMenuButton.call(this, type, toggle); // Empty the menu
@@ -3042,6 +3055,7 @@ var controls = {
     }); // Set available quality levels
 
     if (this.isHTML5) {
+      console.log('Result:', html5.getQualityOptions.call(this));
       setQualityMenu.call(this, html5.getQualityOptions.call(this));
     }
 
@@ -4648,19 +4662,6 @@ function () {
           case 76:
             // L key
             player.loop = !player.loop;
-            break;
-
-          /* case 73:
-              this.setLoop('start');
-              break;
-           case 76:
-              this.setLoop();
-              break;
-           case 79:
-              this.setLoop('end');
-              break; */
-
-          default:
             break;
         } // Escape is handle natively when in full screen
         // So we only need to worry about non native
@@ -6314,9 +6315,6 @@ var youtube = {
 
               assurePlaybackState$1.call(player, false);
               break;
-
-            default:
-              break;
           }
 
           triggerEvent.call(player, player.elements.container, 'statechange', false, {
@@ -6729,9 +6727,6 @@ function () {
             this.player.debug.warn("Non-fatal ad error: ".concat(adData.adError.getMessage()));
           }
 
-          break;
-
-        default:
           break;
       }
     }

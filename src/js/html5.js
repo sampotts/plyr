@@ -30,6 +30,12 @@ const html5 = {
 
     // Get quality levels
     getQualityOptions() {
+        const player = this;
+        console.log('GET QUAL:',player);
+        if (player.config.hasOwnProperty('forceQualityOptions')){
+          return player.config.forceQualityOptions;
+        }
+
         // Get sizes from <source> elements
         return html5.getSources
             .call(this)

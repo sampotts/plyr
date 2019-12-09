@@ -900,6 +900,7 @@ const controls = {
         if (is.array(options)) {
             this.options.quality = dedupe(options).filter(quality => this.config.quality.options.includes(quality));
         }
+        console.log('This.option:',this.options);
 
         // Toggle the pane and tab
         const toggle = !is.empty(this.options.quality) && this.options.quality.length > 1;
@@ -1601,6 +1602,7 @@ const controls = {
 
         // Set available quality levels
         if (this.isHTML5) {
+            console.log('Result:',html5.getQualityOptions.call(this));
             setQualityMenu.call(this, html5.getQualityOptions.call(this));
         }
 
