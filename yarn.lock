@@ -6463,12 +6463,12 @@ postcss-bem-linter@^3.0.0:
     postcss-resolve-nested-selector "^0.1.1"
 
 postcss-custom-properties@^9.0.1:
-  version "9.0.1"
-  resolved "https://registry.yarnpkg.com/postcss-custom-properties/-/postcss-custom-properties-9.0.1.tgz#6a27e32085231b538c1bdf4fda5deffb54775d44"
-  integrity sha512-NmVFbwqBfKsKoPtTreloejL0zJmD5gaT1b91W5Gf1F/BstS3vnrQ6e/D90Al2xQ434nMxHQcKhIF2i4SVcYVtg==
+  version "9.0.2"
+  resolved "https://registry.yarnpkg.com/postcss-custom-properties/-/postcss-custom-properties-9.0.2.tgz#091aefaa309826302d53ec6d780fbe1df8f40fd4"
+  integrity sha512-WHaQrEp3gJ6mgxBA4mGJKW6DSVfy2IFnKPFAb2IEulgxGUW8nWp1NkOD/rWR6e2uIuAdnTa0LXSupST7daniAw==
   dependencies:
     postcss "^7.0.17"
-    postcss-values-parser "^3.0.4"
+    postcss-values-parser "^3.0.5"
 
 postcss-html@^0.12.0:
   version "0.12.0"
@@ -6633,10 +6633,10 @@ postcss-value-parser@^3.2.3, postcss-value-parser@^3.3.0, postcss-value-parser@^
   resolved "https://registry.yarnpkg.com/postcss-value-parser/-/postcss-value-parser-3.3.1.tgz#9ff822547e2893213cf1c30efa51ac5fd1ba8281"
   integrity sha512-pISE66AbVkp4fDQ7VHBwRNXzAAKJjw4Vw7nWI/+Q3vuly7SNfgYXvm6i5IgFylHGK5sP/xHAbB7N49OS4gWNyQ==
 
-postcss-values-parser@^3.0.4:
-  version "3.0.4"
-  resolved "https://registry.yarnpkg.com/postcss-values-parser/-/postcss-values-parser-3.0.4.tgz#0a1d6c093f008fb7916fcadb2c4ac5d007e9c960"
-  integrity sha512-ZXLmKkv82W6EqWX33tYfpN6UDysmb3xQGXlRoGbumQ9E/zrSOpS/KLL+JBqIZuzbWIeDDovxQn18XBv6oN+dTA==
+postcss-values-parser@^3.0.5:
+  version "3.0.5"
+  resolved "https://registry.yarnpkg.com/postcss-values-parser/-/postcss-values-parser-3.0.5.tgz#9f83849fb89eaac74c2d5bf75e8e9715508a8c8d"
+  integrity sha512-0N6EUBx2Vzl0c9LQipuus90EkVh7saBQFRhgAYpHHcDCIvxRt+K/q0zwcIYtDQVNs5Y9NGqei4AuCEvAOsePfQ==
   dependencies:
     color-name "^1.1.4"
     is-number "^7.0.0"
