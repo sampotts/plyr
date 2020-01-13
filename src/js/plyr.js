@@ -368,7 +368,7 @@ class Plyr {
      */
     pause() {
         if (!this.playing || !is.function(this.media.pause)) {
-            return;
+            return null;
         }
 
         return this.media.pause();
@@ -412,9 +412,9 @@ class Plyr {
 
         if (toggle) {
             return this.play();
-        } else {
-            return this.pause();
         }
+
+        return this.pause();
     }
 
     /**
