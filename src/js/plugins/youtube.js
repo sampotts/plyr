@@ -416,6 +416,12 @@ const youtube = {
 
                             break;
 
+                        case 3:
+                            // Trigger waiting event to add loading classes to container as the video buffers.
+                            triggerEvent.call(player, player.media, 'waiting');
+
+                            break;
+
                         default:
                             break;
                     }
