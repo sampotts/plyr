@@ -139,10 +139,7 @@ const controls = {
     // Create hidden text label
     createLabel(key, attr = {}) {
         const text = i18n.get(key, this.config);
-
-        const attributes = Object.assign({}, attr, {
-            class: [attr.class, this.config.classNames.hidden].filter(Boolean).join(' '),
-        });
+        const attributes = { ...attr, class: [attr.class, this.config.classNames.hidden].filter(Boolean).join(' '),};
 
         return createElement('span', attributes, text);
     },
