@@ -371,7 +371,7 @@ class Plyr {
             return;
         }
 
-        this.media.pause();
+        return this.media.pause();
     }
 
     /**
@@ -411,9 +411,9 @@ class Plyr {
         const toggle = is.boolean(input) ? input : !this.playing;
 
         if (toggle) {
-            this.play();
+            return this.play();
         } else {
-            this.pause();
+            return this.pause();
         }
     }
 
