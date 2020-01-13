@@ -441,7 +441,7 @@ class Plyr {
      * @param {Number} seekTime - how far to rewind in seconds. Defaults to the config.seekTime
      */
     rewind(seekTime) {
-        this.currentTime = this.currentTime - (is.number(seekTime) ? seekTime : this.config.seekTime);
+        this.currentTime -= is.number(seekTime) ? seekTime : this.config.seekTime;
     }
 
     /**
@@ -449,7 +449,7 @@ class Plyr {
      * @param {Number} seekTime - how far to fast forward in seconds. Defaults to the config.seekTime
      */
     forward(seekTime) {
-        this.currentTime = this.currentTime + (is.number(seekTime) ? seekTime : this.config.seekTime);
+        this.currentTime += is.number(seekTime) ? seekTime : this.config.seekTime;
     }
 
     /**

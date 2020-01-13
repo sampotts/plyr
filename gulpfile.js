@@ -1,7 +1,6 @@
 // ==========================================================================
 // Gulp build script
 // ==========================================================================
-/* global require, __dirname */
 /* eslint no-console: "off" */
 
 const path = require('path');
@@ -41,6 +40,7 @@ const plumber = require('gulp-plumber');
 const size = require('gulp-size');
 const sourcemaps = require('gulp-sourcemaps');
 const through = require('through2');
+const browserSync = require("browser-sync").create();
 // ------------------------------------
 // Deployment
 // ------------------------------------
@@ -245,11 +245,20 @@ gulp.task('watch', () => {
     gulp.watch(paths.demo.src.sass, gulp.parallel(...tasks.css));
 });
 
+// Serve via browser sync
+gulp.task('serve', () => browserSync.init({
+    server: {
+        baseDir: paths.demo.root
+    },
+    notify: false,
+    watch: true
+}));
+
 // Build distribution
-gulp.task('build', gulp.series(tasks.clean, gulp.parallel(...tasks.js, ...tasks.css, ...tasks.sprite)));
+gulp.task('build', gulp.series(tasks.clean, gulp.parallel(...tasks.js, ...tasks.css, ...tasks.sprite )));
 
 // Default gulp task
-gulp.task('default', gulp.series('build', 'watch'));
+gulp.task('default', gulp.series('build', 'serve', 'watch' ));
 
 // Publish a version to CDN and demo
 // --------------------------------------------
