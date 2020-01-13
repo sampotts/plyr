@@ -1,6 +1,6 @@
 Plyr is a simple, lightweight, accessible and customizable HTML5, YouTube and Vimeo media player that supports [_modern_](#browser-support) browsers.
 
-[Checkout the demo](https://plyr.io) - [Donate](#donate) - [Slack](https://bit.ly/plyr-chat) - [![npm version](https://badge.fury.io/js/plyr.svg)](https://badge.fury.io/js/plyr)
+[Checkout the demo](https://plyr.io) - [Donate](#donate) - [Slack](https://bit.ly/plyr--chat) - [![npm version](https://badge.fury.io/js/plyr.svg)](https://badge.fury.io/js/plyr)
 
 [![Image of Plyr](https://cdn.plyr.io/static/demo/screenshot.png?v=3)](https://plyr.io)
 
@@ -8,7 +8,7 @@ Plyr is a simple, lightweight, accessible and customizable HTML5, YouTube and Vi
 
 -   📼 **HTML Video & Audio, YouTube & Vimeo** - support for the major formats
 -   💪 **Accessible** - full support for VTT captions and screen readers
--   🔧 **[Customisable](#html)** - make the player look how you want with the markup you want
+-   🔧 **[Customizable](#html)** - make the player look how you want with the markup you want
 -   😎 **Clean HTML** - uses the _right_ elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no
     `<span>` or `<a href="#">` button hacks
 -   📱 **Responsive** - works with any screen size
