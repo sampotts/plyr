@@ -390,7 +390,8 @@ class Listeners {
             if (player.isHTML5 && player.isVideo && player.config.resetOnEnd) {
                 // Restart
                 player.restart();
-                // call pause otherwise IE11 will start playing the video again
+
+                // Call pause otherwise IE11 will start playing the video again
                 player.pause();
             }
         });
@@ -665,7 +666,7 @@ class Listeners {
             const code = event.keyCode ? event.keyCode : event.which;
             const attribute = 'play-on-seeked';
 
-            if (is.keyboardEvent(event) && (code !== 39 && code !== 37)) {
+            if (is.keyboardEvent(event) && code !== 39 && code !== 37) {
                 return;
             }
 
