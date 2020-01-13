@@ -399,7 +399,8 @@ const controls = {
     // https://bugzilla.mozilla.org/show_bug.cgi?id=1220143
     bindMenuItemShortcuts(menuItem, type) {
         // Navigate through menus via arrow keys and space
-        on(
+        on.call(
+            this,
             menuItem,
             'keydown keyup',
             event => {
@@ -449,7 +450,7 @@ const controls = {
 
         // Enter will fire a `click` event but we still need to manage focus
         // So we bind to keyup which fires after and set focus here
-        on(menuItem, 'keyup', event => {
+        on.call(this, menuItem, 'keyup', event => {
             if (event.which !== 13) {
                 return;
             }
@@ -1460,7 +1461,7 @@ const controls = {
                     bindMenuItemShortcuts.call(this, menuItem, type);
 
                     // Show menu on click
-                    on(menuItem, 'click', () => {
+                    on.call(this, menuItem, 'click', () => {
                         showMenuPanel.call(this, type, false);
                     });
 
@@ -1512,7 +1513,8 @@ const controls = {
                     );
 
                     // Go back via keyboard
-                    on(
+                    on.call(
+                        this,
                         pane,
                         'keydown',
                         event => {
@@ -1532,7 +1534,7 @@ const controls = {
                     );
 
                     // Go back via button click
-                    on(backButton, 'click', () => {
+                    on.call(this, backButton, 'click', () => {
                         showMenuPanel.call(this, 'home', false);
                     });
 
