@@ -164,6 +164,7 @@ const defaults = {
         frameTitle: 'Player for {title}',
         captions: 'Captions',
         settings: 'Settings',
+        pip: 'PIP',
         menuBack: 'Go back to previous menu',
         speed: 'Speed',
         normal: 'Normal',
