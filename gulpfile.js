@@ -222,7 +222,11 @@ Object.entries(build.sprite).forEach(([filename, entry]) => {
         gulp
             .src(src)
             .pipe(plumber())
-            .pipe(imagemin())
+            .pipe(imagemin([
+                imagemin.svgo({
+                  plugins: [{ removeViewBox: false }]
+                })
+              ]))
             .pipe(svgstore())
             .pipe(rename({ basename: path.parse(filename).name }))
             .pipe(size(sizeOptions))
