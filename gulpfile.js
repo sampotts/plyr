@@ -40,7 +40,7 @@ const plumber = require('gulp-plumber');
 const size = require('gulp-size');
 const sourcemaps = require('gulp-sourcemaps');
 const through = require('through2');
-const browserSync = require("browser-sync").create();
+const browserSync = require('browser-sync').create();
 // ------------------------------------
 // Deployment
 // ------------------------------------
@@ -222,11 +222,13 @@ Object.entries(build.sprite).forEach(([filename, entry]) => {
         gulp
             .src(src)
             .pipe(plumber())
-            .pipe(imagemin([
-                imagemin.svgo({
-                  plugins: [{ removeViewBox: false }]
-                })
-              ]))
+            .pipe(
+                imagemin([
+                    imagemin.svgo({
+                        plugins: [{ removeViewBox: false }],
+                    }),
+                ]),
+            )
             .pipe(svgstore())
             .pipe(rename({ basename: path.parse(filename).name }))
             .pipe(size(sizeOptions))
@@ -250,19 +252,21 @@ gulp.task('watch', () => {
 });
 
 // Serve via browser sync
-gulp.task('serve', () => browserSync.init({
-    server: {
-        baseDir: paths.demo.root
-    },
-    notify: false,
-    watch: true
-}));
+gulp.task('serve', () =>
+    browserSync.init({
+        server: {
+            baseDir: paths.demo.root,
+        },
+        notify: false,
+        watch: true,
+    }),
+);
 
 // Build distribution
-gulp.task('build', gulp.series(tasks.clean, gulp.parallel(...tasks.js, ...tasks.css, ...tasks.sprite )));
+gulp.task('build', gulp.series(tasks.clean, gulp.parallel(...tasks.js, ...tasks.css, ...tasks.sprite)));
 
 // Default gulp task
-gulp.task('default', gulp.series('build', 'serve', 'watch' ));
+gulp.task('default', gulp.series('build', gulp.parallel('serve', 'watch')));
 
 // Publish a version to CDN and demo
 // --------------------------------------------
@@ -344,7 +348,10 @@ gulp.task('version', done => {
     const files = ['plyr.js', 'plyr.polyfilled.js', 'config/defaults.js'];
 
     return gulp
-        .src(files.map(file => path.join(__dirname, `src/js/${file}`)), { base: '.' })
+        .src(
+            files.map(file => path.join(__dirname, `src/js/${file}`)),
+            { base: '.' },
+        )
         .pipe(replace(semver, `v${version}`))
         .pipe(replace(cdnpath, `${domain}/${version}/`))
         .pipe(gulp.dest('./'));
