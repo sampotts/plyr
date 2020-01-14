@@ -41,14 +41,6 @@
         &.plyr__time + .plyr__time {
             padding-left: 0;
         }
-
-        &.plyr__volume {
-            padding-right: ($plyr-control-spacing / 2);
-        }
-
-        &.plyr__volume:first-child {
-            padding-right: 0;
-        }
     }
 
     // Hide empty controls

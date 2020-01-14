@@ -139,7 +139,7 @@ const controls = {
     // Create hidden text label
     createLabel(key, attr = {}) {
         const text = i18n.get(key, this.config);
-        const attributes = { ...attr, class: [attr.class, this.config.classNames.hidden].filter(Boolean).join(' '),};
+        const attributes = { ...attr, class: [attr.class, this.config.classNames.hidden].filter(Boolean).join(' ') };
 
         return createElement('span', attributes, text);
     },
@@ -1378,7 +1378,9 @@ const controls = {
                 }
 
                 // Volume range control
-                if (control === 'volume') {
+                // Ignored on iOS as it's handled globally
+                // https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html
+                if (control === 'volume' && !browser.isIos) {
                     // Set the attributes
                     const attributes = {
                         max: 1,
