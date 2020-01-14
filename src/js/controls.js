@@ -1378,7 +1378,7 @@ const controls = {
                 }
 
                 // Volume range control
-                if (control === 'volume') {
+                if (control === 'volume' && !browser.isIos) {
                     // Set the attributes
                     const attributes = {
                         max: 1,
