@@ -259,6 +259,7 @@ gulp.task('serve', () =>
         },
         notify: false,
         watch: true,
+        ghostMode: false,
     }),
 );
 
