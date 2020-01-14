@@ -5,8 +5,9 @@
 // Base
 .plyr {
     @include plyr-font-smoothing($plyr-font-smoothing);
-
+    align-items: center;
     direction: ltr;
+    display: flex;
     font-family: $plyr-font-family;
     font-variant-numeric: tabular-nums; // Force monosace-esque number widths
     font-weight: $plyr-font-weight-regular;
