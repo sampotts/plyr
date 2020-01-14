@@ -30,6 +30,11 @@ const html5 = {
 
     // Get quality levels
     getQualityOptions() {
+        // Whether we're forcing all options (e.g. for streaming)
+        if (this.config.quality.forced) {
+            return this.config.quality.options;
+        }
+
         // Get sizes from <source> elements
         return html5.getSources
             .call(this)
@@ -60,36 +65,41 @@ const html5 = {
                 return source && Number(source.getAttribute('size'));
             },
             set(input) {
-                // Get sources
-                const sources = html5.getSources.call(player);
-                // Get first match for requested size
-                const source = sources.find(s => Number(s.getAttribute('size')) === input);
+                // If we're using an an external handler...
+                if (player.config.quality.forced && is.function(player.config.quality.onChange)) {
+                    player.config.quality.onChange(input);
+                } else {
+                    // Get sources
+                    const sources = html5.getSources.call(player);
+                    // Get first match for requested size
+                    const source = sources.find(s => Number(s.getAttribute('size')) === input);
 
-                // No matching source found
-                if (!source) {
-                    return;
-                }
+                    // No matching source found
+                    if (!source) {
+                        return;
+                    }
 
-                // Get current state
-                const { currentTime, paused, preload, readyState } = player.media;
+                    // Get current state
+                    const { currentTime, paused, preload, readyState } = player.media;
 
-                // Set new source
-                player.media.src = source.getAttribute('src');
+                    // Set new source
+                    player.media.src = source.getAttribute('src');
 
-                // Prevent loading if preload="none" and the current source isn't loaded (#1044)
-                if (preload !== 'none' || readyState) {
-                    // Restore time
-                    player.once('loadedmetadata', () => {
-                        player.currentTime = currentTime;
+                    // Prevent loading if preload="none" and the current source isn't loaded (#1044)
+                    if (preload !== 'none' || readyState) {
+                        // Restore time
+                        player.once('loadedmetadata', () => {
+                            player.currentTime = currentTime;
 
-                        // Resume playing
-                        if (!paused) {
-                            player.play();
-                        }
-                    });
+                            // Resume playing
+                            if (!paused) {
+                                player.play();
+                            }
+                        });
 
-                    // Load new source
-                    player.media.load();
+                        // Load new source
+                        player.media.load();
+                    }
                 }
 
                 // Trigger change event
