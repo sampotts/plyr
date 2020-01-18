@@ -10,7 +10,7 @@ import { getElement, toggleClass } from './utils/elements';
 import { ready, triggerEvent } from './utils/events';
 import i18n from './utils/i18n';
 import is from './utils/is';
-import loadImage from './utils/loadImage';
+import loadImage from './utils/load-image';
 
 const ui = {
     addStyleHook() {
@@ -67,14 +67,14 @@ const ui = {
         // Reset mute state
         this.muted = null;
 
-        // Reset speed
-        this.speed = null;
-
         // Reset loop state
         this.loop = null;
 
         // Reset quality setting
         this.quality = null;
+
+        // Reset speed
+        this.speed = null;
 
         // Reset volume display
         controls.updateVolume.call(this);
@@ -213,7 +213,8 @@ const ui = {
 
         // Set state
         Array.from(this.elements.buttons.play || []).forEach(target => {
-            target.pressed = this.playing;
+            Object.assign(target, { pressed: this.playing });
+            target.setAttribute('aria-label', i18n.get(this.playing ? 'pause' : 'play', this.config));
         });
 
         // Only update controls on non timeupdate events
@@ -233,25 +234,37 @@ const ui = {
         clearTimeout(this.timers.loading);
 
         // Timer to prevent flicker when seeking
-        this.timers.loading = setTimeout(() => {
-            // Update progress bar loading class state
-            toggleClass(this.elements.container, this.config.classNames.loading, this.loading);
+        this.timers.loading = setTimeout(
+            () => {
+                // Update progress bar loading class state
+                toggleClass(this.elements.container, this.config.classNames.loading, this.loading);
 
-            // Update controls visibility
-            ui.toggleControls.call(this);
-        }, this.loading ? 250 : 0);
+                // Update controls visibility
+                ui.toggleControls.call(this);
+            },
+            this.loading ? 250 : 0,
+        );
     },
 
     // Toggle controls based on state and `force` argument
     toggleControls(force) {
-        const { controls } = this.elements;
+        const { controls: controlsElement } = this.elements;
 
-        if (controls && this.config.hideControls) {
+        if (controlsElement && this.config.hideControls) {
             // Don't hide controls if a touch-device user recently seeked. (Must be limited to touch devices, or it occasionally prevents desktop controls from hiding.)
-            const recentTouchSeek = (this.touch && this.lastSeekTime + 2000 > Date.now());
+            const recentTouchSeek = this.touch && this.lastSeekTime + 2000 > Date.now();
 
             // Show controls if force, loading, paused, button interaction, or recent seek, otherwise hide
-            this.toggleControls(Boolean(force || this.loading || this.paused || controls.pressed || controls.hover || recentTouchSeek));
+            this.toggleControls(
+                Boolean(
+                    force ||
+                        this.loading ||
+                        this.paused ||
+                        controlsElement.pressed ||
+                        controlsElement.hover ||
+                        recentTouchSeek,
+                ),
+            );
         }
     },
 };

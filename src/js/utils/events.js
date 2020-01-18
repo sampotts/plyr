@@ -35,7 +35,6 @@ export function toggleListener(element, event, callback, toggle = false, passive
 
     // Allow multiple events
     const events = event.split(' ');
-
     // Build options
     // Default to just the capture boolean for browsers with no passive listener support
     let options = capture;
@@ -91,9 +90,7 @@ export function triggerEvent(element, type = '', bubbles = false, detail = {}) {
     // Create and dispatch the event
     const event = new CustomEvent(type, {
         bubbles,
-        detail: Object.assign({}, detail, {
-            plyr: this,
-        }),
+        detail: { ...detail, plyr: this,},
     });
 
     // Dispatch the event

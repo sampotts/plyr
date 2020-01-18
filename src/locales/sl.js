@@ -25,6 +25,7 @@ const i18n = {
     frameTitle: 'Predvajalnik za {title}',
     captions: 'Podnapisi',
     settings: 'Nastavitve',
+    pip: 'PIP',
     menuBack: 'Pojdi nazaj v prejšnji meni',
     speed: 'Hitrost',
     normal: 'Običajna',
@@ -38,12 +39,12 @@ const i18n = {
     enabled: 'Omogočeni',
     advertisement: 'Oglas',
     qualityBadge: {
-        '480': 'SD',
-        '576': 'SD',
-        '720': 'HD',
-        '1080': 'HD',
-        '1440': 'HD',
-        '2160': '4K',
+        2160: '4K',
+        1440: 'HD',
+        1080: 'HD',
+        720: 'HD',
+        576: 'SD',
+        480: 'SD',
     },
 };
 

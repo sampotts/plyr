@@ -6,10 +6,10 @@ import controls from './controls';
 import ui from './ui';
 import { repaint } from './utils/animation';
 import browser from './utils/browser';
-import { getElement, getElements, matches, toggleClass, toggleHidden } from './utils/elements';
+import { getElement, getElements, matches, toggleClass } from './utils/elements';
 import { off, on, once, toggleListener, triggerEvent } from './utils/events';
 import is from './utils/is';
-import { setAspectRatio } from './utils/style';
+import { getAspectRatio, setAspectRatio } from './utils/style';
 
 class Listeners {
     constructor(player) {
@@ -147,7 +147,7 @@ class Listeners {
                     player.loop = !player.loop;
                     break;
 
-                    /* case 73:
+                /* case 73:
                     this.setLoop('start');
                     break;
 
@@ -275,17 +275,16 @@ class Listeners {
             elements.container,
             'mousemove mouseleave touchstart touchmove enterfullscreen exitfullscreen',
             event => {
-                const { controls } = elements;
+                const { controls: controlsElement } = elements;
 
                 // Remove button states for fullscreen
-                if (controls && event.type === 'enterfullscreen') {
-                    controls.pressed = false;
-                    controls.hover = false;
+                if (controlsElement && event.type === 'enterfullscreen') {
+                    controlsElement.pressed = false;
+                    controlsElement.hover = false;
                 }
 
                 // Show, then hide after a timeout unless another control event occurs
                 const show = ['touchstart', 'touchmove', 'mousemove'].includes(event.type);
-
                 let delay = 0;
 
                 if (show) {
@@ -302,14 +301,6 @@ class Listeners {
             },
         );
 
-        // Force edge to repaint on exit fullscreen
-        // TODO: Fix weird bug where Edge doesn't re-draw when exiting fullscreen
-        /* if (browser.isEdge) {
-            on.call(player, elements.container, 'exitfullscreen', () => {
-                setTimeout(() => repaint(elements.container), 100);
-            });
-        } */
-
         // Set a gutter for Vimeo
         const setGutter = (ratio, padding, toggle) => {
             if (!player.isVimeo) {
@@ -317,10 +308,10 @@ class Listeners {
             }
 
             const target = player.elements.wrapper.firstChild;
-            const [, height] = ratio.split(':').map(Number);
-            const [videoWidth, videoHeight] = player.embed.ratio.split(':').map(Number);
+            const [, y] = ratio;
+            const [videoX, videoY] = getAspectRatio.call(player);
 
-            target.style.maxWidth = toggle ? `${(height / videoHeight) * videoWidth}px` : null;
+            target.style.maxWidth = toggle ? `${(y / videoY) * videoX}px` : null;
             target.style.margin = toggle ? '0 auto' : null;
         };
 
@@ -338,20 +329,24 @@ class Listeners {
         };
 
         const resized = () => {
-            window.clearTimeout(timers.resized);
-            timers.resized = window.setTimeout(setPlayerSize, 50);
+            clearTimeout(timers.resized);
+            timers.resized = setTimeout(setPlayerSize, 50);
         };
 
         on.call(player, elements.container, 'enterfullscreen exitfullscreen', event => {
             const { target, usingNative } = player.fullscreen;
 
-            // Ignore for iOS native
-            if (!player.isEmbed || target !== elements.container) {
+            // Ignore events not from target
+            if (target !== elements.container) {
+                return;
+            }
+
+            // If it's not an embed and no ratio specified
+            if (!player.isEmbed && is.empty(player.config.ratio)) {
                 return;
             }
 
             const isEnter = event.type === 'enterfullscreen';
-
             // Set the player size when entering fullscreen to viewport size
             const { padding, ratio } = setPlayerSize(isEnter);
 
@@ -382,19 +377,15 @@ class Listeners {
             controls.durationUpdate.call(player, event),
         );
 
-        // Check for audio tracks on load
-        // We can't use `loadedmetadata` as it doesn't seem to have audio tracks at that point
-        on.call(player, player.media, 'canplay loadeddata', () => {
-            toggleHidden(elements.volume, !player.hasAudio);
-            toggleHidden(elements.buttons.mute, !player.hasAudio);
-        });
-
         // Handle the media finishing
         on.call(player, player.media, 'ended', () => {
             // Show poster on end
             if (player.isHTML5 && player.isVideo && player.config.resetOnEnd) {
                 // Restart
                 player.restart();
+
+                // Call pause otherwise IE11 will start playing the video again
+                player.pause();
             }
         });
 
@@ -486,7 +477,7 @@ class Listeners {
 
         // Update download link when ready and if quality changes
         on.call(player, player.media, 'ready qualitychange', () => {
-            controls.setDownloadLink.call(player);
+            controls.setDownloadUrl.call(player);
         });
 
         // Proxy events to container
@@ -518,7 +509,7 @@ class Listeners {
         }
 
         // Only call default handler if not prevented in custom handler
-        if (returned && is.function(defaultHandler)) {
+        if (returned !== false && is.function(defaultHandler)) {
             defaultHandler.call(player, event);
         }
     }
@@ -542,7 +533,6 @@ class Listeners {
     controls() {
         const { player } = this;
         const { elements } = player;
-
         // IE doesn't support input event, so we fallback to change
         const inputEvent = browser.isIE ? 'change' : 'input';
 
@@ -669,7 +659,7 @@ class Listeners {
             const code = event.keyCode ? event.keyCode : event.which;
             const attribute = 'play-on-seeked';
 
-            if (is.keyboardEvent(event) && (code !== 39 && code !== 37)) {
+            if (is.keyboardEvent(event) && code !== 39 && code !== 37) {
                 return;
             }
 
@@ -678,7 +668,6 @@ class Listeners {
 
             // Was playing before?
             const play = seek.hasAttribute(attribute);
-
             // Done seeking
             const done = ['mouseup', 'touchend', 'keyup'].includes(event.type);
 
@@ -706,7 +695,6 @@ class Listeners {
             inputEvent,
             event => {
                 const seek = event.currentTarget;
-
                 // If it exists, use seek-value instead of "value" for consistency with tooltip time (#954)
                 let seekTo = seek.getAttribute('seek-value');
 
@@ -806,7 +794,7 @@ class Listeners {
 
         // Show controls when they receive focus (e.g., when using keyboard tab key)
         this.bind(elements.controls, 'focusin', () => {
-            const { config, elements, timers } = player;
+            const { config, timers } = player;
 
             // Skip transition to prevent focus from scrolling the parent element
             toggleClass(elements.controls, config.classNames.noTransition, true);
@@ -837,10 +825,8 @@ class Listeners {
                 // Detect "natural" scroll - suppored on OS X Safari only
                 // Other browsers on OS X will be inverted until support improves
                 const inverted = event.webkitDirectionInvertedFromDevice;
-
                 // Get delta from event. Invert if `inverted` is true
                 const [x, y] = [event.deltaX, -event.deltaY].map(value => (inverted ? -value : value));
-
                 // Using the biggest delta, normalize to 1 or -1 (or 0 if no delta)
                 const direction = Math.sign(Math.abs(x) > Math.abs(y) ? x : y);
 

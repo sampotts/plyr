@@ -17,17 +17,17 @@ const parseVtt = vttDataString => {
             if (!is.number(result.startTime)) {
                 // The line with start and end times on it is the first line of interest
                 const matchTimes = line.match(
-                    /([0-9]{2}):([0-9]{2}):([0-9]{2}).([0-9]{2,3})( ?--> ?)([0-9]{2}):([0-9]{2}):([0-9]{2}).([0-9]{2,3})/,
+                    /([0-9]{2})?:?([0-9]{2}):([0-9]{2}).([0-9]{2,3})( ?--> ?)([0-9]{2})?:?([0-9]{2}):([0-9]{2}).([0-9]{2,3})/,
                 ); // Note that this currently ignores caption formatting directives that are optionally on the end of this line - fine for non-captions VTT
 
                 if (matchTimes) {
                     result.startTime =
-                        Number(matchTimes[1]) * 60 * 60 +
+                        Number(matchTimes[1] || 0) * 60 * 60 +
                         Number(matchTimes[2]) * 60 +
                         Number(matchTimes[3]) +
                         Number(`0.${matchTimes[4]}`);
                     result.endTime =
-                        Number(matchTimes[6]) * 60 * 60 +
+                        Number(matchTimes[6] || 0) * 60 * 60 +
                         Number(matchTimes[7]) * 60 +
                         Number(matchTimes[8]) +
                         Number(`0.${matchTimes[9]}`);
@@ -100,6 +100,10 @@ class PreviewThumbnails {
         }
 
         this.getThumbnails().then(() => {
+            if (!this.enabled) {
+                return;
+            }
+
             // Render DOM elements
             this.render();
 
@@ -121,7 +125,6 @@ class PreviewThumbnails {
 
             // If string, convert into single-element list
             const urls = is.string(src) ? [src] : src;
-
             // Loop through each src URL. Download and process the VTT file, storing the resulting data in this.thumbnails
             const promises = urls.map(u => this.getThumbnail(u));
 
@@ -148,7 +151,12 @@ class PreviewThumbnails {
 
                 // If the URLs don't start with '/', then we need to set their relative path to be the location of the VTT file
                 // If the URLs do start with '/', then they obviously don't need a prefix, so it will remain blank
-                if (!thumbnail.frames[0].text.startsWith('/')) {
+                // If the thumbnail URLs start with with none of '/', 'http://' or 'https://', then we need to set their relative path to be the location of the VTT file
+                if (
+                    !thumbnail.frames[0].text.startsWith('/') &&
+                    !thumbnail.frames[0].text.startsWith('http://') &&
+                    !thumbnail.frames[0].text.startsWith('https://')
+                ) {
                     thumbnail.urlPrefix = url.substring(0, url.lastIndexOf('/') + 1);
                 }
 
@@ -294,7 +302,9 @@ class PreviewThumbnails {
         this.elements.thumb.container.appendChild(timeContainer);
 
         // Inject the whole thumb
-        this.player.elements.progress.appendChild(this.elements.thumb.container);
+        if (is.element(this.player.elements.progress)) {
+            this.player.elements.progress.appendChild(this.elements.thumb.container);
+        }
 
         // Create HTML element: plyr__preview-scrubbing-container
         this.elements.scrubbing.container = createElement('div', {
@@ -419,7 +429,9 @@ class PreviewThumbnails {
             if (image.dataset.index !== currentImage.dataset.index && !image.dataset.deleting) {
                 // Wait 200ms, as the new image can take some time to show on certain browsers (even though it was downloaded before showing). This will prevent flicker, and show some generosity towards slower clients
                 // First set attribute 'deleting' to prevent multi-handling of this on repeat firing of this function
+                // eslint-disable-next-line no-param-reassign
                 image.dataset.deleting = true;
+
                 // This has to be set before the timeout - to prevent issues switching between hover and scrub
                 const { currentImageContainer } = this;
 
@@ -460,7 +472,6 @@ class PreviewThumbnails {
 
                                 const { urlPrefix } = this.thumbnails[0];
                                 const thumbURL = urlPrefix + newThumbFilename;
-
                                 const previewImage = new Image();
                                 previewImage.src = thumbURL;
                                 previewImage.onload = () => {
@@ -594,11 +605,9 @@ class PreviewThumbnails {
         const seekbarRect = this.player.elements.progress.getBoundingClientRect();
         const plyrRect = this.player.elements.container.getBoundingClientRect();
         const { container } = this.elements.thumb;
-
         // Find the lowest and highest desired left-position, so we don't slide out the side of the video container
         const minVal = plyrRect.left - seekbarRect.left + 10;
         const maxVal = plyrRect.right - seekbarRect.left - container.clientWidth - 10;
-
         // Set preview container position to: mousepos, minus seekbar.left, minus half of previewContainer.clientWidth
         let previewPos = this.mousePosX - seekbarRect.left - container.clientWidth / 2;
 
@@ -629,9 +638,13 @@ class PreviewThumbnails {
         // Find difference between height and preview container height
         const multiplier = this.thumbContainerHeight / frame.h;
 
+        // eslint-disable-next-line no-param-reassign
         previewImage.style.height = `${Math.floor(previewImage.naturalHeight * multiplier)}px`;
+        // eslint-disable-next-line no-param-reassign
         previewImage.style.width = `${Math.floor(previewImage.naturalWidth * multiplier)}px`;
+        // eslint-disable-next-line no-param-reassign
         previewImage.style.left = `-${frame.x * multiplier}px`;
+        // eslint-disable-next-line no-param-reassign
         previewImage.style.top = `-${frame.y * multiplier}px`;
     }
 }

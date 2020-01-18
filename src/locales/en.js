@@ -25,6 +25,7 @@ const i18n = {
     frameTitle: 'Player for {title}',
     captions: 'Captions',
     settings: 'Settings',
+    pip: 'PIP',
     menuBack: 'Go back to previous menu',
     speed: 'Speed',
     normal: 'Normal',
@@ -38,12 +39,12 @@ const i18n = {
     enabled: 'Enabled',
     advertisement: 'Ad',
     qualityBadge: {
-        '480': 'SD',
-        '576': 'SD',
-        '720': 'HD',
-        '1080': 'HD',
-        '1440': 'HD',
-        '2160': '4K',
+        2160: '4K',
+        1440: 'HD',
+        1080: 'HD',
+        720: 'HD',
+        576: 'SD',
+        480: 'SD',
     },
 };
 

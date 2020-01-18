@@ -7,8 +7,8 @@ import { createElement, replaceElement, toggleClass } from '../utils/elements';
 import { triggerEvent } from '../utils/events';
 import fetch from '../utils/fetch';
 import is from '../utils/is';
-import loadImage from '../utils/loadImage';
-import loadScript from '../utils/loadScript';
+import loadImage from '../utils/load-image';
+import loadScript from '../utils/load-script';
 import { extend } from '../utils/objects';
 import { format, generateId } from '../utils/strings';
 import { setAspectRatio } from '../utils/style';
@@ -34,78 +34,78 @@ function assurePlaybackState(play) {
     }
 }
 
+function getHost(config) {
+    if (config.noCookie) {
+        return 'https://www.youtube-nocookie.com';
+    }
+
+    if (window.location.protocol === 'http:') {
+        return 'http://www.youtube.com';
+    }
+
+    // Use YouTube's default
+    return undefined;
+}
+
 const youtube = {
     setup() {
         // Add embed class for responsive
         toggleClass(this.elements.wrapper, this.config.classNames.embed, true);
 
-        // Set aspect ratio
-        setAspectRatio.call(this);
-
         // Setup API
         if (is.object(window.YT) && is.function(window.YT.Player)) {
             youtube.ready.call(this);
         } else {
-            // Load the API
-            loadScript(this.config.urls.youtube.sdk).catch(error => {
-                this.debug.warn('YouTube API failed to load', error);
-            });
-
-            // Setup callback for the API
-            // YouTube has it's own system of course...
-            window.onYouTubeReadyCallbacks = window.onYouTubeReadyCallbacks || [];
-
-            // Add to queue
-            window.onYouTubeReadyCallbacks.push(() => {
-                youtube.ready.call(this);
-            });
+            // Reference current global callback
+            const callback = window.onYouTubeIframeAPIReady;
 
             // Set callback to process queue
             window.onYouTubeIframeAPIReady = () => {
-                window.onYouTubeReadyCallbacks.forEach(callback => {
+                // Call global callback if set
+                if (is.function(callback)) {
                     callback();
-                });
+                }
+
+                youtube.ready.call(this);
             };
+
+            // Load the SDK
+            loadScript(this.config.urls.youtube.sdk).catch(error => {
+                this.debug.warn('YouTube API failed to load', error);
+            });
         }
     },
 
     // Get the media title
     getTitle(videoId) {
-        // Try via undocumented API method first
-        // This method disappears now and then though...
-        // https://github.com/sampotts/plyr/issues/709
-        if (is.function(this.embed.getVideoData)) {
-            const { title } = this.embed.getVideoData();
+        const url = format(this.config.urls.youtube.api, videoId);
 
-            if (is.empty(title)) {
-                this.config.title = title;
-                ui.setTitle.call(this);
-                return;
-            }
-        }
+        fetch(url)
+            .then(data => {
+                if (is.object(data)) {
+                    const { title, height, width } = data;
 
-        // Or via Google API
-        const key = this.config.keys.google;
-        if (is.string(key) && !is.empty(key)) {
-            const url = format(this.config.urls.youtube.api, videoId, key);
+                    // Set title
+                    this.config.title = title;
+                    ui.setTitle.call(this);
 
-            fetch(url)
-                .then(result => {
-                    if (is.object(result)) {
-                        this.config.title = result.items[0].snippet.title;
-                        ui.setTitle.call(this);
-                    }
-                })
-                .catch(() => {});
-        }
+                    // Set aspect ratio
+                    this.embed.ratio = [width, height];
+                }
+
+                setAspectRatio.call(this);
+            })
+            .catch(() => {
+                // Set aspect ratio
+                setAspectRatio.call(this);
+            });
     },
 
     // API ready
     ready() {
         const player = this;
-
         // Ignore already setup (race condition)
-        const currentId = player.media.getAttribute('id');
+        const currentId = player.media && player.media.getAttribute('id');
         if (!is.empty(currentId) && currentId.startsWith('youtube-')) {
             return;
         }
@@ -121,25 +121,23 @@ const youtube = {
         // Replace the <iframe> with a <div> due to YouTube API issues
         const videoId = parseId(source);
         const id = generateId(player.provider);
-
         // Get poster, if already set
         const { poster } = player;
-
         // Replace media element
         const container = createElement('div', { id, poster });
         player.media = replaceElement(container, player.media);
 
         // Id to poster wrapper
-        const posterSrc = format => `https://i.ytimg.com/vi/${videoId}/${format}default.jpg`;
+        const posterSrc = s => `https://i.ytimg.com/vi/${videoId}/${s}default.jpg`;
 
         // Check thumbnail images in order of quality, but reject fallback thumbnails (120px wide)
         loadImage(posterSrc('maxres'), 121) // Higest quality and unpadded
             .catch(() => loadImage(posterSrc('sd'), 121)) // 480p padded 4:3
             .catch(() => loadImage(posterSrc('hq'))) // 360p padded 4:3. Always exists
             .then(image => ui.setPoster.call(player, image.src))
-            .then(posterSrc => {
+            .then(src => {
                 // If the image is padded, use background-size "cover" instead (like youtube does too with their posters)
-                if (!posterSrc.includes('maxres')) {
+                if (!src.includes('maxres')) {
                     player.elements.poster.style.backgroundSize = 'cover';
                 }
             })
@@ -151,7 +149,7 @@ const youtube = {
         // https://developers.google.com/youtube/iframe_api_reference
         player.embed = new window.YT.Player(id, {
             videoId,
-            host: config.noCookie ? 'https://www.youtube-nocookie.com' : undefined,
+            host: getHost(config),
             playerVars: extend(
                 {},
                 {
@@ -386,7 +384,7 @@ const youtube = {
 
                         case 1:
                             // Restore paused state (YouTube starts playing on seek if the video hasn't been played yet)
-                            if (player.media.paused && !player.embed.hasPlayed) {
+                            if (!player.config.autoplay && player.media.paused && !player.embed.hasPlayed) {
                                 player.media.pause();
                             } else {
                                 assurePlaybackState.call(player, true);
@@ -415,6 +413,12 @@ const youtube = {
                                 player.embed.unMute();
                             }
                             assurePlaybackState.call(player, false);
+
+                            break;
+
+                        case 3:
+                            // Trigger waiting event to add loading classes to container as the video buffers.
+                            triggerEvent.call(player, player.media, 'waiting');
 
                             break;
 
