@@ -198,7 +198,9 @@ const ui = {
                         // Reset backgroundSize as well (since it can be set to "cover" for padded thumbnails for youtube)
                         backgroundSize: '',
                     });
+
                     ui.togglePoster.call(this, true);
+
                     return poster;
                 })
         );
