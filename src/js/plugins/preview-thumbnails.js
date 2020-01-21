@@ -63,6 +63,20 @@ const parseVtt = vttDataString => {
  * - This implementation uses multiple separate img elements. Other implementations use background-image on one element. This would be nice and simple, but Firefox and Safari have flickering issues with replacing backgrounds of larger images. It seems that YouTube perhaps only avoids this because they don't have the option for high-res previews (even the fullscreen ones, when mousedown/seeking). Images appear over the top of each other, and previous ones are discarded once the new ones have been rendered
  */
 
+const fitRatio = (ratio, outer) => {
+    const targetRatio = outer.width / outer.height;
+    const result = {};
+    if (ratio > targetRatio) {
+        result.width = outer.width;
+        result.height = (1 / ratio) * outer.width;
+    } else {
+        result.height = outer.height;
+        result.width = ratio * outer.height;
+    }
+
+    return result;
+};
+
 class PreviewThumbnails {
     /**
      * PreviewThumbnails constructor.
@@ -540,7 +554,10 @@ class PreviewThumbnails {
 
     get thumbContainerHeight() {
         if (this.mouseDown) {
-            const { height } = fitRatio(this.thumbAspectRatio, { width: this.player.media.clientWidth, height: this.player.media.clientHeight });
+            const { height } = fitRatio(this.thumbAspectRatio, {
+                width: this.player.media.clientWidth,
+                height: this.player.media.clientHeight,
+            });
             return height;
         }
 
@@ -624,7 +641,10 @@ class PreviewThumbnails {
 
     // Can't use 100% width, in case the video is a different aspect ratio to the video container
     setScrubbingContainerSize() {
-        const { width, height } = fitRatio(this.thumbAspectRatio, { width: this.player.media.clientWidth, height: this.player.media.clientHeight });
+        const { width, height } = fitRatio(this.thumbAspectRatio, {
+            width: this.player.media.clientWidth,
+            height: this.player.media.clientHeight,
+        });
         this.elements.scrubbing.container.style.width = `${width}px`;
         this.elements.scrubbing.container.style.height = `${height}px`;
     }
@@ -646,21 +666,6 @@ class PreviewThumbnails {
         previewImage.style.left = `-${frame.x * multiplier}px`;
         // eslint-disable-next-line no-param-reassign
         previewImage.style.top = `-${frame.y * multiplier}px`;
-    }
-
-    fitRatio(ratio, outer) {
-        const targetRatio = outer.width / outer.height;
-
-        const result = {};
-        if (ratio > targetRatio) {
-            result.width = outer.width;
-            result.height = (1 / ratio) * outer.width;
-        } else {
-            result.height = outer.height;
-            result.width = ratio * outer.height;
-        }
-
-        return result;
     }
 }
 
