@@ -21,10 +21,11 @@
 
     // Media elements
     video,
-    audio {
+    audio,
+    iframe {
         border-radius: inherit;
+        display: block;
         height: 100%;
-        vertical-align: middle;
         width: 100%;
     }
 

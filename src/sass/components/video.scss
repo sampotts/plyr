@@ -15,6 +15,7 @@
 .plyr__video-wrapper {
     background: #000;
     border-radius: inherit;
+    height: 100%;
     margin: auto;
     overflow: hidden;
     position: relative;
@@ -35,12 +36,9 @@ $embed-padding: ((100 / 16) * 9);
 .plyr__video-embed iframe,
 .plyr__video-wrapper--fixed-ratio video {
     border: 0;
-    height: 100%;
     left: 0;
     position: absolute;
     top: 0;
-    user-select: none;
-    width: 100%;
 }
 
 // If the full custom UI is supported
