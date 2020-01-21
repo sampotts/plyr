@@ -11,6 +11,7 @@
     font-family: $plyr-font-family;
     font-variant-numeric: tabular-nums; // Force monosace-esque number widths
     font-weight: $plyr-font-weight-regular;
+    height: 100%;
     line-height: $plyr-line-height;
     max-width: 100%;
     min-width: 200px;
@@ -22,7 +23,7 @@
     video,
     audio {
         border-radius: inherit;
-        height: auto;
+        height: 100%;
         vertical-align: middle;
         width: 100%;
     }

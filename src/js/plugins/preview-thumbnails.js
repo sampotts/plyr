@@ -540,8 +540,8 @@ class PreviewThumbnails {
 
     get thumbContainerHeight() {
         if (this.mouseDown) {
-            // Can't use media.clientHeight - HTML5 video goes big and does black bars above and below
-            return Math.floor(this.player.media.clientWidth / this.thumbAspectRatio);
+            const { height } = fitRatio(this.thumbAspectRatio, { width: this.player.media.clientWidth, height: this.player.media.clientHeight });
+            return height;
         }
 
         return Math.floor(this.player.media.clientWidth / this.thumbAspectRatio / 4);
@@ -624,9 +624,9 @@ class PreviewThumbnails {
 
     // Can't use 100% width, in case the video is a different aspect ratio to the video container
     setScrubbingContainerSize() {
-        this.elements.scrubbing.container.style.width = `${this.player.media.clientWidth}px`;
-        // Can't use media.clientHeight - html5 video goes big and does black bars above and below
-        this.elements.scrubbing.container.style.height = `${this.player.media.clientWidth / this.thumbAspectRatio}px`;
+        const { width, height } = fitRatio(this.thumbAspectRatio, { width: this.player.media.clientWidth, height: this.player.media.clientHeight });
+        this.elements.scrubbing.container.style.width = `${width}px`;
+        this.elements.scrubbing.container.style.height = `${height}px`;
     }
 
     // Sprites need to be offset to the correct location
@@ -639,13 +639,28 @@ class PreviewThumbnails {
         const multiplier = this.thumbContainerHeight / frame.h;
 
         // eslint-disable-next-line no-param-reassign
-        previewImage.style.height = `${Math.floor(previewImage.naturalHeight * multiplier)}px`;
+        previewImage.style.height = `${previewImage.naturalHeight * multiplier}px`;
         // eslint-disable-next-line no-param-reassign
-        previewImage.style.width = `${Math.floor(previewImage.naturalWidth * multiplier)}px`;
+        previewImage.style.width = `${previewImage.naturalWidth * multiplier}px`;
         // eslint-disable-next-line no-param-reassign
         previewImage.style.left = `-${frame.x * multiplier}px`;
         // eslint-disable-next-line no-param-reassign
         previewImage.style.top = `-${frame.y * multiplier}px`;
+    }
+
+    fitRatio(ratio, outer) {
+        const targetRatio = outer.width / outer.height;
+
+        const result = {};
+        if (ratio > targetRatio) {
+            result.width = outer.width;
+            result.height = (1 / ratio) * outer.width;
+        } else {
+            result.height = outer.height;
+            result.width = ratio * outer.height;
+        }
+
+        return result;
     }
 }
 
