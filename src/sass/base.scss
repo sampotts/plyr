@@ -18,12 +18,12 @@
     position: relative;
     text-shadow: none;
     transition: box-shadow 0.3s ease;
+    z-index: 0; // Force any border radius
 
     // Media elements
     video,
     audio,
     iframe {
-        border-radius: inherit;
         display: block;
         height: 100%;
         width: 100%;

@@ -14,14 +14,10 @@
 
 .plyr__video-wrapper {
     background: #000;
-    border-radius: inherit;
     height: 100%;
     margin: auto;
     overflow: hidden;
-    position: relative;
     width: 100%;
-    // Require z-index to force border-radius
-    z-index: 0;
 }
 
 // Default to 16:9 ratio but this is set by JavaScript based on config
