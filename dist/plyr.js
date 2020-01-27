@@ -2,7 +2,7 @@ typeof navigator === "object" && (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define('Plyr', factory) :
   (global = global || self, global.Plyr = factory());
-}(this, function () { 'use strict';
+}(this, (function () { 'use strict';
 
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
@@ -66,6 +66,10 @@ typeof navigator === "object" && (function (global, factory) {
   }
 
   function _iterableToArrayLimit(arr, i) {
+    if (!(Symbol.iterator in Object(arr) || Object.prototype.toString.call(arr) === "[object Arguments]")) {
+      return;
+    }
+
     var _arr = [];
     var _n = true;
     var _d = false;
@@ -115,7 +119,7 @@ typeof navigator === "object" && (function (global, factory) {
       return Array.from(document.querySelectorAll(selector)).includes(this);
     }
 
-    var matches = match;
+    var matches =  match;
     return matches.call(element, selector);
   }
 
@@ -576,7 +580,7 @@ typeof navigator === "object" && (function (global, factory) {
   var browser = {
     isIE:
     /* @cc_on!@ */
-    !!document.documentMode,
+     !!document.documentMode,
     isEdge: window.navigator.userAgent.includes('Edge'),
     isWebkit: 'WebkitAppearance' in document.documentElement.style && !/Edge/.test(navigator.userAgent),
     isIPhone: /(iPhone|iPod)/gi.test(navigator.platform),
@@ -929,9 +933,6 @@ typeof navigator === "object" && (function (global, factory) {
           // Attribute selector
           attributes[key] = value;
           break;
-
-        default:
-          break;
       }
     });
     return extend(existing, attributes);
@@ -983,7 +984,7 @@ typeof navigator === "object" && (function (global, factory) {
       return Array.from(document.querySelectorAll(selector)).includes(this);
     }
 
-    var method = match;
+    var method =  match;
     return method.call(element, selector);
   } // Find all elements
 
@@ -2118,9 +2119,6 @@ typeof navigator === "object" && (function (global, factory) {
           case 'speed':
             _this3.speed = parseFloat(value);
             break;
-
-          default:
-            break;
         }
 
         controls.showMenuPanel.call(_this3, 'home', is$1.keyboardEvent(event));
@@ -2228,9 +2226,6 @@ typeof navigator === "object" && (function (global, factory) {
           case 'playing':
           case 'progress':
             setProgress(this.elements.display.buffer, this.buffered * 100);
-            break;
-
-          default:
             break;
         }
       }
@@ -4655,19 +4650,6 @@ typeof navigator === "object" && (function (global, factory) {
               // L key
               player.loop = !player.loop;
               break;
-
-            /* case 73:
-                this.setLoop('start');
-                break;
-             case 76:
-                this.setLoop();
-                break;
-             case 79:
-                this.setLoop('end');
-                break; */
-
-            default:
-              break;
           } // Escape is handle natively when in full screen
           // So we only need to worry about non native
 
@@ -5397,12 +5379,13 @@ typeof navigator === "object" && (function (global, factory) {
             async = args.async,
             maxTries = (args.numRetries || 0) + 1,
             beforeCallbackFn = args.before || devnull,
+            pathname = path.replace(/[\?|#].*$/, ''),
             pathStripped = path.replace(/^(css|img)!/, ''),
             isLegacyIECss,
             e;
         numTries = numTries || 0;
 
-        if (/(^css!|\.css$)/.test(path)) {
+        if (/(^css!|\.css$)/.test(pathname)) {
           // css
           e = doc.createElement('link');
           e.rel = 'stylesheet';
@@ -5415,7 +5398,7 @@ typeof navigator === "object" && (function (global, factory) {
             e.rel = 'preload';
             e.as = 'style';
           }
-        } else if (/(^img!|\.(png|gif|jpg|svg)$)/.test(path)) {
+        } else if (/(^img!|\.(png|gif|jpg|svg|webp)$)/.test(pathname)) {
           // image
           e = doc.createElement('img');
           e.src = pathStripped;
@@ -6320,9 +6303,6 @@ typeof navigator === "object" && (function (global, factory) {
 
                 assurePlaybackState$1.call(player, false);
                 break;
-
-              default:
-                break;
             }
 
             triggerEvent.call(player, player.elements.container, 'statechange', false, {
@@ -6735,9 +6715,6 @@ typeof navigator === "object" && (function (global, factory) {
               this.player.debug.warn("Non-fatal ad error: ".concat(adData.adError.getMessage()));
             }
 
-            break;
-
-          default:
             break;
         }
       }
@@ -9128,4 +9105,4 @@ typeof navigator === "object" && (function (global, factory) {
 
   return Plyr;
 
-}));
+})));

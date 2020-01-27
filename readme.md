@@ -749,16 +749,16 @@ Fullscreen in Plyr is supported by all browsers that
 
 Plyr supports the last 2 versions of most _modern_ browsers.
 
-| Browser       | Supported     |
-| ------------- | ------------- |
-| Safari        | ✓             |
-| Mobile Safari | ✓&sup1;       |
-| Firefox       | ✓             |
-| Chrome        | ✓             |
-| Opera         | ✓             |
-| Edge          | ✓             |
-| IE11          | ✓&sup3;       |
-| IE10          | ✓&sup2;&sup3; |
+| Browser       | Supported       |
+| ------------- | --------------- |
+| Safari        | ✓               |
+| Mobile Safari | ✓&sup1;         |
+| Firefox       | ✓               |
+| Chrome        | ✓               |
+| Opera         | ✓               |
+| Edge          | ✓               |
+| IE11          | ✓&sup3;         |
+| IE10          | ✓<sup>2,3</sup> |
 
 1.  Mobile Safari on the iPhone forces the native player for `<video>` unless
     the `playsinline` attribute is present. Volume controls are also disabled as
@@ -818,7 +818,7 @@ frameworks:
 | --------- | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
 | WordPress | Brandon Lavigne ([@drrobotnik](https://github.com/drrobotnik)) | [https://wordpress.org/plugins/plyr/](https://wordpress.org/plugins/plyr/)                   |
 | Angular   | Simon Bobrov ([@smnbbrv](https://github.com/smnbbrv))          | [https://github.com/smnbbrv/ngx-plyr](https://github.com/smnbbrv/ngx-plyr)                   |
-| React     | Jose Miguel Bejarano ([@xDae](https://github.com/xDae))        | [https://github.com/xDae/react-plyr](https://github.com/xDae/react-plyr)                     |
+| React     | Chintan Prajapati ([@chintan9](https://github.com/chintan9))        | [https://github.com/chintan9/plyr-react](https://github.com/chintan9/plyr-react)                     |
 | Vue       | Gabe Dunn ([@redxtech](https://github.com/redxtech))           | [https://github.com/redxtech/vue-plyr](https://github.com/redxtech/vue-plyr)                 |
 | Neos      | Jon Uhlmann ([@jonnitto](https://github.com/jonnitto))         | [https://packagist.org/packages/jonnitto/plyr](https://packagist.org/packages/jonnitto/plyr) |
 | Kirby     | Dominik Pschenitschni ([@dpschen](https://github.com/dpschen)) | [https://github.com/dpschen/kirby-plyrtag](https://github.com/dpschen/kirby-plyrtag)         |

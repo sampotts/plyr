@@ -90,9 +90,7 @@ export function triggerEvent(element, type = '', bubbles = false, detail = {}) {
     // Create and dispatch the event
     const event = new CustomEvent(type, {
         bubbles,
-        detail: Object.assign({}, detail, {
-            plyr: this,
-        }),
+        detail: { ...detail, plyr: this,},
     });
 
     // Dispatch the event
