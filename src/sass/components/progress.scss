@@ -2,18 +2,19 @@
 // Playback progress
 // --------------------------------------------------------------
 
+// Offset the range thumb in order to be able to calculate the relative progress (#954)
+$plyr-progress-offset: $plyr-range-thumb-height;
+
 .plyr__progress {
-    flex: 1;
-    left: $plyr-range-thumb-height / 2;
-    margin-right: $plyr-range-thumb-height;
+    left: $plyr-progress-offset / 2;
+    margin-right: $plyr-progress-offset;
     position: relative;
 
     input[type='range'],
     &__buffer {
-        margin-left: -($plyr-range-thumb-height / 2);
-        margin-right: -($plyr-range-thumb-height / 2);
-        // Offset the range thumb in order to be able to calculate the relative progress (#954)
-        width: calc(100% + #{$plyr-range-thumb-height});
+        margin-left: -($plyr-progress-offset / 2);
+        margin-right: -($plyr-progress-offset / 2);
+        width: calc(100% + #{$plyr-progress-offset});
     }
 
     input[type='range'] {

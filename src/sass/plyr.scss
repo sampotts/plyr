@@ -29,7 +29,6 @@
 @import 'components/captions';
 @import 'components/control';
 @import 'components/controls';
-@import 'components/embed';
 @import 'components/menus';
 @import 'components/sliders';
 @import 'components/poster';
@@ -42,7 +41,7 @@
 @import 'states/fullscreen';
 
 @import 'plugins/ads';
-@import 'plugins/previewThumbnails';
+@import 'plugins/preview-thumbnails';
 
 @import 'utils/animation';
 @import 'utils/hidden';

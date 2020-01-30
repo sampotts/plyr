@@ -4,7 +4,6 @@
 // https://webkit.org/blog/7929/designing-websites-for-iphone-x/
 // ==========================================================================
 
-import { repaint } from './utils/animation';
 import browser from './utils/browser';
 import { hasClass, toggleClass, trapFocus } from './utils/elements';
 import { on, triggerEvent } from './utils/events';
@@ -73,9 +72,6 @@ function toggleFallback(toggle = false) {
                 .filter(part => part.trim() !== property)
                 .join(',');
         }
-
-        // Force a repaint as sometimes Safari doesn't want to fill the screen
-        setTimeout(() => repaint(this.target), 100);
     }
 
     // Toggle button and fire events

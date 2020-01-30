@@ -35,11 +35,10 @@ main {
 aside {
     align-items: center;
     background: #fff;
-    color: $gray;
     display: flex;
     flex-shrink: 0;
     justify-content: center;
-    padding: ($spacing-base * 0.75);
+    padding: $spacing-base;
     position: relative;
     text-align: center;
     text-shadow: none;

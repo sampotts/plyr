@@ -2,7 +2,6 @@
 // Animation utils
 // ==========================================================================
 
-import { toggleHidden } from './elements';
 import is from './is';
 
 export const transitionEndEvent = (() => {
@@ -21,14 +20,19 @@ export const transitionEndEvent = (() => {
 })();
 
 // Force repaint of element
-export function repaint(element) {
+export function repaint(element, delay) {
     setTimeout(() => {
         try {
-            toggleHidden(element, true);
-            element.offsetHeight; // eslint-disable-line
-            toggleHidden(element, false);
+            // eslint-disable-next-line no-param-reassign
+            element.hidden = true;
+
+            // eslint-disable-next-line no-unused-expressions
+            element.offsetHeight;
+
+            // eslint-disable-next-line no-param-reassign
+            element.hidden = false;
         } catch (e) {
             // Do nothing
         }
-    }, 0);
+    }, delay);
 }

@@ -6,11 +6,9 @@
 .button,
 .button__count {
     align-items: center;
-    background: $color-button-background;
     border: 0;
     border-radius: $border-radius-base;
     box-shadow: 0 1px 1px rgba(#000, 0.1);
-    color: $color-button-text;
     display: inline-flex;
     padding: ($spacing-base * 0.75);
     position: relative;
@@ -21,14 +19,16 @@
 
 // Buttons
 .button {
+    background: $color-button-background;
+    color: $color-button-text;
     font-weight: $font-weight-bold;
-    padding-left: $spacing-base;
-    padding-right: $spacing-base;
+    padding-left: ($spacing-base * 1.25);
+    padding-right: ($spacing-base * 1.25);
     transition: all 0.2s ease;
 
     &:hover,
     &:focus {
-        color: $gray-dark;
+        background: $color-button-background-hover;
 
         // Remove the underline/border
         &::after {
@@ -38,7 +38,6 @@
 
     &:hover {
         box-shadow: 0 2px 2px rgba(#000, 0.1);
-        transform: translateY(-1px);
     }
 
     &:focus {
@@ -50,7 +49,7 @@
     }
 
     &:active {
-        transform: translateY(1px);
+        top: 1px;
     }
 }
 
@@ -66,12 +65,14 @@
 // Count bubble
 .button__count {
     animation: fadein 0.2s ease;
-    margin-left: ($spacing-base / 2);
+    background: $color-button-count-background;
+    color: $color-button-count-text;
+    margin-left: ($spacing-base * 0.75);
 
     &::before {
         border: $arrow-size solid transparent;
         border-left-width: 0;
-        border-right-color: $color-button-background;
+        border-right-color: $color-button-count-background;
         content: '';
         height: 0;
         position: absolute;

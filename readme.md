@@ -1,18 +1,17 @@
 Plyr is a simple, lightweight, accessible and customizable HTML5, YouTube and Vimeo media player that supports [_modern_](#browser-support) browsers.
 
-[Checkout the demo](https://plyr.io) - [Donate](#donate) - [Slack](https://bit.ly/plyr-chat) - [![npm version](https://badge.fury.io/js/plyr.svg)](https://badge.fury.io/js/plyr)
+[Checkout the demo](https://plyr.io) - [Donate](#donate) - [Slack](https://bit.ly/plyr--chat) - [![npm version](https://badge.fury.io/js/plyr.svg)](https://badge.fury.io/js/plyr)
 
 [![Image of Plyr](https://cdn.plyr.io/static/demo/screenshot.png?v=3)](https://plyr.io)
 
 # Features
 
+-   📼 **HTML Video & Audio, YouTube & Vimeo** - support for the major formats
 -   💪 **Accessible** - full support for VTT captions and screen readers
--   🔧 **[Customisable](#html)** - make the player look how you want with the markup you want
--   😎 **Good HTML** - uses the _right_ elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no
+-   🔧 **[Customizable](#html)** - make the player look how you want with the markup you want
+-   😎 **Clean HTML** - uses the _right_ elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no
     `<span>` or `<a href="#">` button hacks
 -   📱 **Responsive** - works with any screen size
--   📼 **HTML Video & Audio** - support for both formats
--   📺 **[Embedded Video](#embeds)** - support for YouTube and Vimeo video playback
 -   💵 **[Monetization](#ads)** - make money from your videos
 -   📹 **[Streaming](#demos)** - support for hls.js, Shaka and dash.js streaming playback
 -   🎛 **[API](#api)** - toggle playback, volume, seeking, and more through a standardized API
@@ -25,7 +24,7 @@ Plyr is a simple, lightweight, accessible and customizable HTML5, YouTube and Vi
 -   📖 **Multiple captions** - support for multiple caption tracks
 -   🌎 **i18n support** - support for internationalization of controls
 -   👌 **[Preview thumbnails](#preview-thumbnails)** - support for displaying preview thumbnails
--   🤟 **No dependencies** - written in "vanilla" ES6 JavaScript, no jQuery required
+-   🤟 **No frameworks** - written in "vanilla" ES6 JavaScript, no jQuery required
 -   💁‍♀️ **SASS** - to include in your build processes
 
 ### Demos
@@ -109,7 +108,15 @@ Or the `<div>` non progressively enhanced method:
 
 ## JavaScript
 
-Include the `plyr.js` script before the closing `</body>` tag and then in your JS create a new instance of Plyr as below.
+You can use Plyr as an ES6 module as follows:
+
+```javascript
+import Plyr from 'plyr';
+
+const player = new Plyr('#player');
+```
+
+Alertnatively you can include the `plyr.js` script before the closing `</body>` tag and then in your JS create a new instance of Plyr as below.
 
 ```html
 <script src="path/to/plyr.js"></script>
@@ -123,18 +130,18 @@ See [initialising](#initialising) for more information on advanced setups.
 You can use our CDN (provided by [Fastly](https://www.fastly.com/)) for the JavaScript. There's 2 versions; one with and one without [polyfills](#polyfills). My recommendation would be to manage polyfills seperately as part of your application but to make life easier you can use the polyfilled build.
 
 ```html
-<script src="https://cdn.plyr.io/3.5.0-beta.5/plyr.js"></script>
+<script src="https://cdn.plyr.io/3.5.6/plyr.js"></script>
 ```
 
 ...or...
 
 ```html
-<script src="https://cdn.plyr.io/3.5.0-beta.5/plyr.polyfilled.js"></script>
+<script src="https://cdn.plyr.io/3.5.6/plyr.polyfilled.js"></script>
 ```
 
 ## CSS
 
-Include the `plyr.css` stylsheet into your `<head>`
+Include the `plyr.css` stylsheet into your `<head>`.
 
 ```html
 <link rel="stylesheet" href="path/to/plyr.css" />
@@ -143,13 +150,13 @@ Include the `plyr.css` stylsheet into your `<head>`
 If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for the default CSS, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/3.5.0-beta.5/plyr.css" />
+<link rel="stylesheet" href="https://cdn.plyr.io/3.5.6/plyr.css" />
 ```
 
 ## SVG Sprite
 
 The SVG sprite is loaded automatically from our CDN (provided by [Fastly](https://www.fastly.com/)). To change this, see the [options](#options) below. For
-reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.5.0-beta.5/plyr.svg`.
+reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.5.6/plyr.svg`.
 
 # Ads
 
@@ -204,7 +211,7 @@ WebVTT captions are supported. To add a caption track, check the HTML example ab
 
 You can specify a range of arguments for the constructor to use:
 
--   A CSS string selector that's compatible with [`querySelector`](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector)
+-   A [CSS string selector](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors)
 -   A [`HTMLElement`](https://developer.mozilla.org/en/docs/Web/API/HTMLElement)
 -   A [jQuery](https://jquery.com) object
 
@@ -212,7 +219,7 @@ _Note_: If a `NodeList`, `Array`, or jQuery object are passed, the first element
 
 #### Single player
 
-Passing a [string selector](https://developer.mozilla.org/en-US/docs/Web/API/NodeList):
+Passing a CSS string selector that's compatible with [`querySelector`](https://developer.mozilla.org/en-US/docs/Web/API/Document/querySelector):
 
 ```javascript
 const player = new Plyr('#player');
@@ -238,7 +245,7 @@ You have two choices here. You can either use a simple array loop to map the con
 const players = Array.from(document.querySelectorAll('.js-player')).map(p => new Plyr(p));
 ```
 
-...or use a static method where you can pass a [string selector](https://developer.mozilla.org/en-US/docs/Web/API/NodeList), a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList), an [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array) of elements, or a [JQuery](https://jquery.com) object:
+...or use a static method where you can pass a [CSS string selector](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors), a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList), an [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array) of [HTMLElement](https://developer.mozilla.org/en/docs/Web/API/HTMLElement), or a [JQuery](https://jquery.com) object:
 
 ```javascript
 const players = Plyr.setup('.js-player');
@@ -269,13 +276,13 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
 | `enabled`            | Boolean                    | `true`                                                                                                                         | Completely disable Plyr. This would allow you to do a User Agent check or similar to programmatically enable or disable Plyr for a certain UA. Example below.                                                                                                                                                                                                                                           |
 | `debug`              | Boolean                    | `false`                                                                                                                        | Display debugging information in the console                                                                                                                                                                                                                                                                                                                                                            |
 | `controls`           | Array, Function or Element | `['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen']` | If a function is passed, it is assumed your method will return either an element or HTML string for the controls. Three arguments will be passed to your function; `id` (the unique id for the player), `seektime` (the seektime step in seconds), and `title` (the media title). See [controls.md](controls.md) for more info on how the html needs to be structured.                                  |
-| `settings`           | Array                      | `['captions', 'quality', 'speed', 'loop']`                                                                                     | If you're using the default controls are used then you can specify which settings to show in the menu                                                                                                                                                                                                                                                                                                   |
+| `settings`           | Array                      | `['captions', 'quality', 'speed', 'loop']`                                                                                     | If the default controls are used, you can specify which settings to show in the menu                                                                                                                                                                                                                                                                                                   |
 | `i18n`               | Object                     | See [defaults.js](/src/js/config/defaults.js)                                                                                  | Used for internationalization (i18n) of the text within the UI.                                                                                                                                                                                                                                                                                                                                         |
 | `loadSprite`         | Boolean                    | `true`                                                                                                                         | Load the SVG sprite specified as the `iconUrl` option (if a URL). If `false`, it is assumed you are handling sprite loading yourself.                                                                                                                                                                                                                                                                   |
 | `iconUrl`            | String                     | `null`                                                                                                                         | Specify a URL or path to the SVG sprite. See the [SVG section](#svg) for more info.                                                                                                                                                                                                                                                                                                                     |
 | `iconPrefix`         | String                     | `plyr`                                                                                                                         | Specify the id prefix for the icons used in the default controls (e.g. "plyr-play" would be "plyr"). This is to prevent clashes if you're using your own SVG sprite but with the default controls. Most people can ignore this option.                                                                                                                                                                  |
 | `blankVideo`         | String                     | `https://cdn.plyr.io/static/blank.mp4`                                                                                         | Specify a URL or path to a blank video file used to properly cancel network requests.                                                                                                                                                                                                                                                                                                                   |
-| `autoplay`           | Boolean                    | `false`                                                                                                                        | Autoplay the media on load. This is generally advised against on UX grounds. It is also disabled by default in some browsers. If the `autoplay` attribute is present on a `<video>` or `<audio>` element, this will be automatically set to true.                                                                                                                                                       |
+| `autoplay`&sup2;     | Boolean                    | `false`                                                                                                                        | Autoplay the media on load. If the `autoplay` attribute is present on a `<video>` or `<audio>` element, this will be automatically set to true.                                                                                                                                                                                                                                                         |
 | `autopause`&sup1;    | Boolean                    | `true`                                                                                                                         | Only allow one player playing at once.                                                                                                                                                                                                                                                                                                                                                                  |
 | `seekTime`           | Number                     | `10`                                                                                                                           | The time, in seconds, to seek when a user hits fast forward or rewind.                                                                                                                                                                                                                                                                                                                                  |
 | `volume`             | Number                     | `1`                                                                                                                            | A number, between 0 and 1, representing the initial volume of the player.                                                                                                                                                                                                                                                                                                                               |
@@ -293,10 +300,10 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
 | `listeners`          | Object                     | `null`                                                                                                                         | Allows binding of event listeners to the controls before the default handlers. See the `defaults.js` for available listeners. If your handler prevents default on the event (`event.preventDefault()`), the default handler will not fire.                                                                                                                                                              |
 | `captions`           | Object                     | `{ active: false, language: 'auto', update: false }`                                                                           | `active`: Toggles if captions should be active by default. `language`: Sets the default language to load (if available). 'auto' uses the browser language. `update`: Listen to changes to tracks and update menu. This is needed for some streaming libraries, but can result in unselectable language options).                                                                                        |
 | `fullscreen`         | Object                     | `{ enabled: true, fallback: true, iosNative: false }`                                                                          | `enabled`: Toggles whether fullscreen should be enabled. `fallback`: Allow fallback to a full-window solution (`true`/`false`/`'force'`). `iosNative`: whether to use native iOS fullscreen when entering fullscreen (no custom controls)                                                                                                                                                               |
-| `ratio`              | String                     | `16:9`                                                                                                                         | The aspect ratio you want to use for embedded players.                                                                                                                                                                                                                                                                                                                                                  |
+| `ratio`              | String                     | `null`                                                                                                                         | Force an aspect ratio for all videos. The format is `'w:h'` - e.g. `'16:9'` or `'4:3'`. If this is not specified then the default for HTML5 and Vimeo is to use the native resolution of the video. As dimensions are not available from YouTube via SDK, 16:9 is forced as a sensible default.                                                                                                         |
 | `storage`            | Object                     | `{ enabled: true, key: 'plyr' }`                                                                                               | `enabled`: Allow use of local storage to store user settings. `key`: The key name to use.                                                                                                                                                                                                                                                                                                               |
 | `speed`              | Object                     | `{ selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2] }`                                                                 | `selected`: The default speed for playback. `options`: Options to display in the menu. Most browsers will refuse to play slower than 0.5.                                                                                                                                                                                                                                                               |
-| `quality`            | Object                     | `{ default: 'default', options: ['hd2160', 'hd1440', 'hd1080', 'hd720', 'large', 'medium', 'small', 'tiny', 'default'] }`      | Currently only supported by YouTube. `default` is the default quality level, determined by YouTube. `options` are the options to display.                                                                                                                                                                                                                                                               |
+| `quality`            | Object                     | `{ default: 576, options: [4320, 2880, 2160, 1440, 1080, 720, 576, 480, 360, 240] }`                                           | `default` is the default quality level (if it exists in your sources). `options` are the options to display. This is used to filter the available sources.                                                                                                                                                                                                                                              |
 | `loop`               | Object                     | `{ active: false }`                                                                                                            | `active`: Whether to loop the current video. If the `loop` attribute is present on a `<video>` or `<audio>` element, this will be automatically set to true This is an object to support future functionality.                                                                                                                                                                                          |
 | `ads`                | Object                     | `{ enabled: false, publisherId: '' }`                                                                                          | `enabled`: Whether to enable advertisements. `publisherId`: Your unique [vi.ai](https://vi.ai/publisher-video-monetization/?aid=plyrio) publisher ID.                                                                                                                                                                                                                                                   |
 | `urls`               | Object                     | See source.                                                                                                                    | If you wish to override any API URLs then you can do so here. You can also set a custom download URL for the download button.                                                                                                                                                                                                                                                                           |
@@ -305,6 +312,11 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
 | `previewThumbnails`  | Object                     | `{ enabled: false, src: '' }`                                                                                                  | `enabled`: Whether to enable the preview thumbnails (they must be generated by you). `src` must be either a string or an array of strings representing URLs for the VTT files containing the image URL(s). Learn more about [preview thumbnails](#preview-thumbnails) below.                                                                                                                            |
 
 1.  Vimeo only
+2.  Autoplay is generally not recommended as it is seen as a negative user experience. It is also disabled in many browsers. Before raising issues, do your homework. More info can be found here:
+
+-   https://webkit.org/blog/6784/new-video-policies-for-ios/
+-   https://developers.google.com/web/updates/2017/09/autoplay-policy-changes
+-   https://hacks.mozilla.org/2019/02/firefox-66-to-block-automatically-playing-audible-video-and-audio/
 
 # API
 
@@ -404,10 +416,11 @@ player.fullscreen.active; // false;
 | `language`           | ✓      | ✓      | Gets or sets the preferred captions language for the player. The setter accepts an ISO two-letter language code. Support for the languages is dependent on the captions you include. If your captions don't have any language data, or if you have multiple tracks with the same language, you may want to use `currentTrack` instead. |
 | `fullscreen.active`  | ✓      | -      | Returns a boolean indicating if the current player is in fullscreen mode.                                                                                                                                                                                                                                                              |
 | `fullscreen.enabled` | ✓      | -      | Returns a boolean indicating if the current player has fullscreen enabled.                                                                                                                                                                                                                                                             |
-| `pip`&sup2;          | ✓      | ✓      | Gets or sets the picture-in-picture state of the player. The setter accepts a boolean. This currently only supported on Safari 10+ (on MacOS Sierra+ and iOS 10+) and Chrome 70+.                                                                                                                                                      |
+| `pip`&sup1;          | ✓      | ✓      | Gets or sets the picture-in-picture state of the player. The setter accepts a boolean. This currently only supported on Safari 10+ (on MacOS Sierra+ and iOS 10+) and Chrome 70+.                                                                                                                                                      |
+| `ratio`              | ✓      | ✓      | Gets or sets the video aspect ratio. The setter accepts a string in the same format as the `ratio` option.                                                                                                                                                                                                                             |
+| `download`           | ✓      | ✓      | Gets or sets the URL for the download button. The setter accepts a string containing a valid absolute URL.                                                                                                                                                                                                                             |
 
-1.  YouTube only. HTML5 will follow.
-2.  HTML5 only
+1.  HTML5 only
 
 ### The `.source` setter
 
@@ -649,7 +662,7 @@ The arguments are:
 -   Provider (`html5`, `youtube` or `vimeo`)
 -   Whether the player has the `playsinline` attribute (only applicable to iOS 10+)
 
-## Disable support programatically
+## Disable support programmatically
 
 The `enabled` option can be used to disable certain User Agents. For example, if you don't want to use Plyr for smartphones, you could use:
 
@@ -673,6 +686,7 @@ Some awesome folks have made plugins for CMSs and Components for JavaScript fram
 | Vue       | Gabe Dunn ([@redxtech](https://github.com/redxtech))           | [https://github.com/redxtech/vue-plyr](https://github.com/redxtech/vue-plyr)                 |
 | Neos      | Jon Uhlmann ([@jonnitto](https://github.com/jonnitto))         | [https://packagist.org/packages/jonnitto/plyr](https://packagist.org/packages/jonnitto/plyr) |
 | Kirby     | Dominik Pschenitschni ([@dpschen](https://github.com/dpschen)) | [https://github.com/dpschen/kirby-plyrtag](https://github.com/dpschen/kirby-plyrtag)         |
+| REDAXO    | FriendsOfRedaxo / skerbis ([@skerbis](https://friendsofredaxo.github.io)) | [https://github.com/FriendsOfREDAXO/plyr](https://github.com/FriendsOfREDAXO/plyr)         |
 
 # Issues
 
@@ -697,6 +711,7 @@ Plyr costs money to run, not only my time. I donate my time for free as I enjoy 
 -   [HTML5 Weekly #177](http://html5weekly.com/issues/177)
 -   [Responsive Design #149](http://us4.campaign-archive2.com/?u=559bc631fe5294fc66f5f7f89&id=451a61490f)
 -   [Web Design Weekly #174](https://web-design-weekly.com/2015/02/24/web-design-weekly-174/)
+-   [Front End Focus #177](https://frontendfoc.us/issues/177)
 -   [Hacker News](https://news.ycombinator.com/item?id=9136774)
 -   [Web Platform Daily](http://webplatformdaily.org/releases/2015-03-04)
 -   [LayerVault Designer News](https://news.layervault.com/stories/45394-plyr--a-simple-html5-media-player)
@@ -716,7 +731,7 @@ Plyr costs money to run, not only my time. I donate my time for free as I enjoy 
 -   [Sparkk TV](https://www.sparkktv.com/)
 -   [@halfhalftravel](https://www.halfhalftravel.com/)
 
-Let me know on [Twitter](https://twitter.com/sam_potts) I can add you to the above list. It'd be awesome to see how you're using Plyr :-)
+If you want to be added to the list, open a pull request. It'd be awesome to see how you're using Plyr 😎
 
 # Useful links and credits
 

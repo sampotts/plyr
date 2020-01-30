@@ -1,3 +1,43 @@
+## v3.5.6
+
+-   Another Edge fix (thanks Nick Hawk via Slack)
+
+## v3.5.5
+
+-   YouTube fix for when there are other embeds on the page (thanks @aFarkas)
+-   Separated demo dependencies into their own package.json
+-   Fix for Edge controls flexbox issue when resizing the player (thanks Nick Hawk via Slack)
+-   More aspect ratio fixes
+
+## v3.5.4
+
+-   Added: Set download URL via new setter
+-   Improvement: The order of the `controls` option now effects the order in the DOM - i.e. you can re-order the controls - Note: this may break any custom CSS you have setup. Please see the changes in the PR to the default SASS
+-   Fixed issue with empty controls and preview thumbs
+-   Fixed issue with setGutter call (from Sentry)
+-   Fixed issue with initial selected speed not working
+-   Added notes on `autoplay` config option and browser compatibility
+-   Fixed issue with ads volume not matching current content volume
+-   Fixed race condition where ads were loading during source change
+-   Improvement: Automatic aspect ratio for YouTube is now supported, meaning all aspect ratios are set based on media content - Note: we're now using a different API to get YouTube video metadata so you may need to adjust any CSPs you have setup
+-   Fix for menu in the Shadow DOM (thanks @emielbeinema)
+
+## v3.5.3
+
+-   Improved the usage of the `ratio` config option; it now works as expected and for all video types. The default has not changed, it is to dynamically, where possible (except YouTube where 16:9 is used) determine the ratio from the media source so this is not a breaking change.
+-   Added new `ratio` getter and setter
+-   Fix: Properly clear all timeouts on destroy
+-   Fix: Allow absolute paths in preview thumbnails
+-   Improvement: Allow optional hours and ms in VTT parser in preview thumbnails
+
+## v3.5.2
+
+-   Fixed issue where the preview thumbnail was present while scrubbing
+
+## v3.5.1
+
+-   Fixed build issues with babel and browserslist
+
 ## v3.5.0
 
 -   Preview seek/scrubbing thumbnails (thanks @jamesoflol)

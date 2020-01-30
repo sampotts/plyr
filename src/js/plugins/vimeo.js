@@ -9,7 +9,7 @@ import { createElement, replaceElement, toggleClass } from '../utils/elements';
 import { triggerEvent } from '../utils/events';
 import fetch from '../utils/fetch';
 import is from '../utils/is';
-import loadScript from '../utils/loadScript';
+import loadScript from '../utils/load-script';
 import { extend } from '../utils/objects';
 import { format, stripHTML } from '../utils/strings';
 import { setAspectRatio } from '../utils/style';
@@ -48,14 +48,14 @@ const vimeo = {
         // Set intial ratio
         setAspectRatio.call(this);
 
-        // Load the API if not already
+        // Load the SDK if not already
         if (!is.object(window.Vimeo)) {
             loadScript(this.config.urls.vimeo.sdk)
                 .then(() => {
                     vimeo.ready.call(this);
                 })
                 .catch(error => {
-                    this.debug.warn('Vimeo API failed to load', error);
+                    this.debug.warn('Vimeo SDK (player.js) failed to load', error);
                 });
         } else {
             vimeo.ready.call(this);
@@ -91,7 +91,6 @@ const vimeo = {
         }
 
         const id = parseId(source);
-
         // Build an iframe
         const iframe = createElement('iframe');
         const src = format(player.config.urls.vimeo.iframe, id, params);
@@ -102,7 +101,6 @@ const vimeo = {
 
         // Get poster, if already set
         const { poster } = player;
-
         // Inject the package
         const wrapper = createElement('div', { poster, class: player.config.classNames.embedContainer });
         wrapper.appendChild(iframe);
@@ -259,7 +257,7 @@ const vimeo = {
             .getVideoUrl()
             .then(value => {
                 currentSrc = value;
-                controls.setDownloadLink.call(player);
+                controls.setDownloadUrl.call(player);
             })
             .catch(error => {
                 this.debug.warn(error);
@@ -281,8 +279,8 @@ const vimeo = {
         // Set aspect ratio based on video size
         Promise.all([player.embed.getVideoWidth(), player.embed.getVideoHeight()]).then(dimensions => {
             const [width, height] = dimensions;
-            player.embed.ratio = `${width}:${height}`;
-            setAspectRatio.call(this, player.embed.ratio);
+            player.embed.ratio = [width, height];
+            setAspectRatio.call(this);
         });
 
         // Set autopause
