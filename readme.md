@@ -22,7 +22,7 @@ Plyr is a simple, lightweight, accessible and customizable HTML5, YouTube and Vi
 -   📱 **Playsinline** - supports the `playsinline` attribute
 -   🏎 **Speed controls** - adjust speed on the fly
 -   📖 **Multiple captions** - support for multiple caption tracks
--   🌎 **i18n support** - support for internationalization of controls
+-   🌎 **[i18n support](#internationalization)** - support for internationalization of controls
 -   👌 **[Preview thumbnails](#preview-thumbnails)** - support for displaying preview thumbnails
 -   🤟 **No frameworks** - written in "vanilla" ES6 JavaScript, no jQuery required
 -   💁‍♀️ **SASS** - to include in your build processes
@@ -277,6 +277,7 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
 | `debug`              | Boolean                    | `false`                                                                                                                        | Display debugging information in the console                                                                                                                                                                                                                                                                                                                                                            |
 | `controls`           | Array, Function or Element | `['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen']` | If a function is passed, it is assumed your method will return either an element or HTML string for the controls. Three arguments will be passed to your function; `id` (the unique id for the player), `seektime` (the seektime step in seconds), and `title` (the media title). See [controls.md](controls.md) for more info on how the html needs to be structured.                                  |
 | `settings`           | Array                      | `['captions', 'quality', 'speed', 'loop']`                                                                                     | If the default controls are used, you can specify which settings to show in the menu                                                                                                                                                                                                                                                                                                   |
+| `language`           | String                     | `en`                                                                                                                           | Language code (IETF BCP 47) for UI internationalization.                                                                                                                                                                                                                                                                                                                                                |
 | `i18n`               | Object                     | See [defaults.js](/src/js/config/defaults.js)                                                                                  | Used for internationalization (i18n) of the text within the UI.                                                                                                                                                                                                                                                                                                                                         |
 | `loadSprite`         | Boolean                    | `true`                                                                                                                         | Load the SVG sprite specified as the `iconUrl` option (if a URL). If `false`, it is assumed you are handling sprite loading yourself.                                                                                                                                                                                                                                                                   |
 | `iconUrl`            | String                     | `null`                                                                                                                         | Specify a URL or path to the SVG sprite. See the [SVG section](#svg) for more info.                                                                                                                                                                                                                                                                                                                     |
@@ -624,6 +625,12 @@ You can see the example VTT files [here](https://cdn.plyr.io/static/demo/thumbs/
 # Fullscreen
 
 Fullscreen in Plyr is supported by all browsers that [currently support it](http://caniuse.com/#feat=fullscreen).
+
+# Internationalization
+
+Internationalization (i18n) language could be specified with `language` option. It will translate all controls in Plyr. If the language is not specified, it will default to English.
+
+If you want custom internationalization values, you should specify them to `i18n` option.
 
 # Browser support
 

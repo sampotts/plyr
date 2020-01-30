@@ -78,7 +78,7 @@ const paths = {
         // Source paths
         src: {
             sass: path.join(__dirname, 'src/sass/**/*.scss'),
-            js: path.join(__dirname, 'src/js/**/*.js'),
+            js: path.join(__dirname, 'src/{js,locales}/**/*.js'),
             sprite: path.join(__dirname, 'src/sprite/*.svg'),
         },
 
