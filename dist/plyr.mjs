@@ -35,6 +35,40 @@ function _defineProperty(obj, key, value) {
   return obj;
 }
 
+function ownKeys(object, enumerableOnly) {
+  var keys = Object.keys(object);
+
+  if (Object.getOwnPropertySymbols) {
+    var symbols = Object.getOwnPropertySymbols(object);
+    if (enumerableOnly) symbols = symbols.filter(function (sym) {
+      return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+    });
+    keys.push.apply(keys, symbols);
+  }
+
+  return keys;
+}
+
+function _objectSpread2(target) {
+  for (var i = 1; i < arguments.length; i++) {
+    var source = arguments[i] != null ? arguments[i] : {};
+
+    if (i % 2) {
+      ownKeys(Object(source), true).forEach(function (key) {
+        _defineProperty(target, key, source[key]);
+      });
+    } else if (Object.getOwnPropertyDescriptors) {
+      Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+    } else {
+      ownKeys(Object(source)).forEach(function (key) {
+        Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+      });
+    }
+  }
+
+  return target;
+}
+
 function _slicedToArray(arr, i) {
   return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest();
 }
@@ -581,7 +615,6 @@ var browser = {
   isIos: /(iPad|iPhone|iPod)/gi.test(navigator.platform)
 };
 
-// ==========================================================================
 // https://github.com/WICG/EventListenerOptions/blob/gh-pages/explainer.md
 // https://www.youtube.com/watch?v=NPM6172J22g
 
@@ -698,7 +731,7 @@ function triggerEvent(element) {
 
   var event = new CustomEvent(type, {
     bubbles: bubbles,
-    detail: Object.assign({}, detail, {
+    detail: _objectSpread2({}, detail, {
       plyr: this
     })
   }); // Dispatch the event
@@ -1197,6 +1230,7 @@ function setAspectRatio(input) {
     return {};
   }
 
+  var wrapper = this.elements.wrapper;
   var ratio = getAspectRatio.call(this, input);
 
   var _ref = is$1.array(ratio) ? ratio : [0, 0],
@@ -1205,14 +1239,14 @@ function setAspectRatio(input) {
       h = _ref2[1];
 
   var padding = 100 / w * h;
-  this.elements.wrapper.style.paddingBottom = "".concat(padding, "%"); // For Vimeo we have an extra <div> to hide the standard controls and UI
+  wrapper.style.paddingBottom = "".concat(padding, "%"); // For Vimeo we have an extra <div> to hide the standard controls and UI
 
   if (this.isVimeo && this.supported.ui) {
     var height = 240;
     var offset = (height - padding) / (height / 50);
     this.media.style.transform = "translateY(-".concat(offset, "%)");
   } else if (this.isHTML5) {
-    this.elements.wrapper.classList.toggle(this.config.classNames.videoFixedRatio, ratio !== null);
+    wrapper.classList.toggle(this.config.classNames.videoFixedRatio, ratio !== null);
   }
 
   return {
@@ -1244,7 +1278,12 @@ var html5 = {
   },
   // Get quality levels
   getQualityOptions: function getQualityOptions() {
-    // Get sizes from <source> elements
+    // Whether we're forcing all options (e.g. for streaming)
+    if (this.config.quality.forced) {
+      return this.config.quality.options;
+    } // Get sizes from <source> elements
+
+
     return html5.getSources.call(this).map(function (source) {
       return Number(source.getAttribute('size'));
     }).filter(Boolean);
@@ -1272,37 +1311,46 @@ var html5 = {
         return source && Number(source.getAttribute('size'));
       },
       set: function set(input) {
-        // Get sources
-        var sources = html5.getSources.call(player); // Get first match for requested size
+        // If we're using an an external handler...
+        if (player.config.quality.forced && is$1.function(player.config.quality.onChange)) {
+          player.config.quality.onChange(input);
+        } else {
+          // Get sources
+          var sources = html5.getSources.call(player); // Get first match for requested size
 
-        var source = sources.find(function (s) {
-          return Number(s.getAttribute('size')) === input;
-        }); // No matching source found
+          var source = sources.find(function (s) {
+            return Number(s.getAttribute('size')) === input;
+          }); // No matching source found
 
-        if (!source) {
-          return;
-        } // Get current state
+          if (!source) {
+            return;
+          } // Get current state
 
 
-        var _player$media = player.media,
-            currentTime = _player$media.currentTime,
-            paused = _player$media.paused,
-            preload = _player$media.preload,
-            readyState = _player$media.readyState; // Set new source
+          var _player$media = player.media,
+              currentTime = _player$media.currentTime,
+              paused = _player$media.paused,
+              preload = _player$media.preload,
+              readyState = _player$media.readyState; // Set new source
 
-        player.media.src = source.getAttribute('src'); // Prevent loading if preload="none" and the current source isn't loaded (#1044)
+          player.media.src = source.getAttribute('src'); // Prevent loading if preload="none" and the current source isn't loaded (#1044)
 
-        if (preload !== 'none' || readyState) {
-          // Restore time
-          player.once('loadedmetadata', function () {
-            player.currentTime = currentTime; // Resume playing
+          if (preload !== 'none' || readyState) {
+            // Restore time
+            player.once('loadedmetadata', function () {
+              if (player.currentTime === 0) {
+                return;
+              }
 
-            if (!paused) {
-              player.play();
-            }
-          }); // Load new source
+              player.currentTime = currentTime; // Resume playing
 
-          player.media.load();
+              if (!paused) {
+                player.play();
+              }
+            }); // Load new source
+
+            player.media.load();
+          }
         } // Trigger change event
 
 
@@ -1673,7 +1721,7 @@ function formatTime() {
 
   // Bail if the value isn't a number
   if (!is$1.number(time)) {
-    return formatTime(null, displayHours, inverted);
+    return formatTime(undefined, displayHours, inverted);
   } // Format time component to add leading zero
 
 
@@ -1782,9 +1830,11 @@ var controls = {
   createLabel: function createLabel(key) {
     var attr = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
     var text = i18n.get(key, this.config);
-    var attributes = Object.assign({}, attr, {
+
+    var attributes = _objectSpread2({}, attr, {
       class: [attr.class, this.config.classNames.hidden].filter(Boolean).join(' ')
     });
+
     return createElement('span', attributes, text);
   },
   // Create a badge
@@ -1994,7 +2044,7 @@ var controls = {
     var _this2 = this;
 
     // Navigate through menus via arrow keys and space
-    on(menuItem, 'keydown keyup', function (event) {
+    on.call(this, menuItem, 'keydown keyup', function (event) {
       // We only care about space and ⬆️ ⬇️️ ➡️
       if (![32, 38, 39, 40].includes(event.which)) {
         return;
@@ -2036,7 +2086,7 @@ var controls = {
     }, false); // Enter will fire a `click` event but we still need to manage focus
     // So we bind to keyup which fires after and set focus here
 
-    on(menuItem, 'keyup', function (event) {
+    on.call(this, menuItem, 'keyup', function (event) {
       if (event.which !== 13) {
         return;
       }
@@ -2874,9 +2924,11 @@ var controls = {
         if (control === 'mute') {
           volume.appendChild(createButton.call(_this10, 'mute'));
         } // Volume range control
+        // Ignored on iOS as it's handled globally
+        // https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html
 
 
-        if (control === 'volume') {
+        if (control === 'volume' && !browser.isIos) {
           // Set the attributes
           var attributes = {
             max: 1,
@@ -2935,7 +2987,7 @@ var controls = {
 
           bindMenuItemShortcuts.call(_this10, menuItem, type); // Show menu on click
 
-          on(menuItem, 'click', function () {
+          on.call(_this10, menuItem, 'click', function () {
             showMenuPanel.call(_this10, type, false);
           });
           var flex = createElement('span', null, i18n.get(type, _this10.config));
@@ -2966,7 +3018,7 @@ var controls = {
             class: _this10.config.classNames.hidden
           }, i18n.get('menuBack', _this10.config))); // Go back via keyboard
 
-          on(pane, 'keydown', function (event) {
+          on.call(_this10, pane, 'keydown', function (event) {
             // We only care about <-
             if (event.which !== 37) {
               return;
@@ -2979,7 +3031,7 @@ var controls = {
             showMenuPanel.call(_this10, 'home', true);
           }, false); // Go back via button click
 
-          on(backButton, 'click', function () {
+          on.call(_this10, backButton, 'click', function () {
             showMenuPanel.call(_this10, 'home', false);
           }); // Add to pane
 
@@ -3641,7 +3693,9 @@ var defaults$1 = {
   // Quality default
   quality: {
     default: 576,
-    options: [4320, 2880, 2160, 1440, 1080, 720, 576, 480, 360, 240]
+    options: [4320, 2880, 2160, 1440, 1080, 720, 576, 480, 360, 240],
+    forced: false,
+    onChange: null
   },
   // Set loops
   loop: {
@@ -3718,6 +3772,7 @@ var defaults$1 = {
     frameTitle: 'Player for {title}',
     captions: 'Captions',
     settings: 'Settings',
+    pip: 'PIP',
     menuBack: 'Go back to previous menu',
     speed: 'Speed',
     normal: 'Normal',
@@ -4157,7 +4212,9 @@ function () {
       } else if (!Fullscreen.native || this.forceFallback) {
         toggleFallback.call(this, true);
       } else if (!this.prefix) {
-        this.target.requestFullscreen();
+        this.target.requestFullscreen({
+          navigationUI: "hide"
+        });
       } else if (!is$1.empty(this.prefix)) {
         this.target["".concat(this.prefix, "Request").concat(this.property)]();
       }
@@ -4464,6 +4521,7 @@ var ui = {
       Object.assign(target, {
         pressed: _this3.playing
       });
+      target.setAttribute('aria-label', i18n.get(_this3.playing ? 'pause' : 'play', _this3.config));
     }); // Only update controls on non timeupdate events
 
     if (is$1.event(event) && event.type === 'timeupdate') {
@@ -4860,19 +4918,15 @@ function () {
 
       on.call(player, player.media, 'durationchange loadeddata loadedmetadata', function (event) {
         return controls.durationUpdate.call(player, event);
-      }); // Check for audio tracks on load
-      // We can't use `loadedmetadata` as it doesn't seem to have audio tracks at that point
-
-      on.call(player, player.media, 'canplay loadeddata', function () {
-        toggleHidden(elements.volume, !player.hasAudio);
-        toggleHidden(elements.buttons.mute, !player.hasAudio);
       }); // Handle the media finishing
 
       on.call(player, player.media, 'ended', function () {
         // Show poster on end
         if (player.isHTML5 && player.isVideo && player.config.resetOnEnd) {
           // Restart
-          player.restart();
+          player.restart(); // Call pause otherwise IE11 will start playing the video again
+
+          player.pause();
         }
       }); // Check for buffer progress
 
@@ -4985,7 +5039,7 @@ function () {
       } // Only call default handler if not prevented in custom handler
 
 
-      if (returned && is$1.function(defaultHandler)) {
+      if (returned !== false && is$1.function(defaultHandler)) {
         defaultHandler.call(player, event);
       }
     } // Trigger custom and default handlers
@@ -5865,6 +5919,12 @@ var vimeo = {
         frame.setAttribute('tabindex', -1);
       }
     });
+    player.embed.on('bufferstart', function () {
+      triggerEvent.call(player, player.media, 'waiting');
+    });
+    player.embed.on('bufferend', function () {
+      triggerEvent.call(player, player.media, 'playing');
+    });
     player.embed.on('play', function () {
       assurePlaybackState.call(player, true);
       triggerEvent.call(player, player.media, 'playing');
@@ -6297,6 +6357,11 @@ var youtube = {
 
               assurePlaybackState$1.call(player, false);
               break;
+
+            case 3:
+              // Trigger waiting event to add loading classes to container as the video buffers.
+              triggerEvent.call(player, player.media, 'waiting');
+              break;
           }
 
           triggerEvent.call(player, player.elements.container, 'statechange', false, {
@@ -6337,10 +6402,12 @@ var media = {
 
       wrap(this.media, this.elements.wrapper); // Faux poster container
 
-      this.elements.poster = createElement('div', {
-        class: this.config.classNames.poster
-      });
-      this.elements.wrapper.appendChild(this.elements.poster);
+      if (this.isEmbed) {
+        this.elements.poster = createElement('div', {
+          class: this.config.classNames.poster
+        });
+        this.elements.wrapper.appendChild(this.elements.poster);
+      }
     }
 
     if (this.isHTML5) {
@@ -6981,7 +7048,7 @@ function () {
         cb: Date.now(),
         AV_WIDTH: 640,
         AV_HEIGHT: 480,
-        AV_CDIM2: this.publisherId
+        AV_CDIM2: config.publisherId
       };
       var base = 'https://go.aniview.com/api/adserver6/vast/';
       return "".concat(base, "?").concat(buildUrlParams(params));
@@ -7045,6 +7112,21 @@ var parseVtt = function parseVtt(vttDataString) {
  * - This implementation uses multiple separate img elements. Other implementations use background-image on one element. This would be nice and simple, but Firefox and Safari have flickering issues with replacing backgrounds of larger images. It seems that YouTube perhaps only avoids this because they don't have the option for high-res previews (even the fullscreen ones, when mousedown/seeking). Images appear over the top of each other, and previous ones are discarded once the new ones have been rendered
  */
 
+
+var fitRatio = function fitRatio(ratio, outer) {
+  var targetRatio = outer.width / outer.height;
+  var result = {};
+
+  if (ratio > targetRatio) {
+    result.width = outer.width;
+    result.height = 1 / ratio * outer.width;
+  } else {
+    result.height = outer.height;
+    result.width = ratio * outer.height;
+  }
+
+  return result;
+};
 
 var PreviewThumbnails =
 /*#__PURE__*/
@@ -7590,9 +7672,15 @@ function () {
   }, {
     key: "setScrubbingContainerSize",
     value: function setScrubbingContainerSize() {
-      this.elements.scrubbing.container.style.width = "".concat(this.player.media.clientWidth, "px"); // Can't use media.clientHeight - html5 video goes big and does black bars above and below
+      var _fitRatio = fitRatio(this.thumbAspectRatio, {
+        width: this.player.media.clientWidth,
+        height: this.player.media.clientHeight
+      }),
+          width = _fitRatio.width,
+          height = _fitRatio.height;
 
-      this.elements.scrubbing.container.style.height = "".concat(this.player.media.clientWidth / this.thumbAspectRatio, "px");
+      this.elements.scrubbing.container.style.width = "".concat(width, "px");
+      this.elements.scrubbing.container.style.height = "".concat(height, "px");
     } // Sprites need to be offset to the correct location
 
   }, {
@@ -7605,9 +7693,9 @@ function () {
 
       var multiplier = this.thumbContainerHeight / frame.h; // eslint-disable-next-line no-param-reassign
 
-      previewImage.style.height = "".concat(Math.floor(previewImage.naturalHeight * multiplier), "px"); // eslint-disable-next-line no-param-reassign
+      previewImage.style.height = "".concat(previewImage.naturalHeight * multiplier, "px"); // eslint-disable-next-line no-param-reassign
 
-      previewImage.style.width = "".concat(Math.floor(previewImage.naturalWidth * multiplier), "px"); // eslint-disable-next-line no-param-reassign
+      previewImage.style.width = "".concat(previewImage.naturalWidth * multiplier, "px"); // eslint-disable-next-line no-param-reassign
 
       previewImage.style.left = "-".concat(frame.x * multiplier, "px"); // eslint-disable-next-line no-param-reassign
 
@@ -7645,8 +7733,13 @@ function () {
     key: "thumbContainerHeight",
     get: function get() {
       if (this.mouseDown) {
-        // Can't use media.clientHeight - HTML5 video goes big and does black bars above and below
-        return Math.floor(this.player.media.clientWidth / this.thumbAspectRatio);
+        var _fitRatio2 = fitRatio(this.thumbAspectRatio, {
+          width: this.player.media.clientWidth,
+          height: this.player.media.clientHeight
+        }),
+            height = _fitRatio2.height;
+
+        return height;
       }
 
       return Math.floor(this.player.media.clientWidth / this.thumbAspectRatio / 4);
@@ -8130,10 +8223,10 @@ function () {
     key: "pause",
     value: function pause() {
       if (!this.playing || !is$1.function(this.media.pause)) {
-        return;
+        return null;
       }
 
-      this.media.pause();
+      return this.media.pause();
     }
     /**
      * Get playing state
@@ -8151,10 +8244,10 @@ function () {
       var toggle = is$1.boolean(input) ? input : !this.playing;
 
       if (toggle) {
-        this.play();
-      } else {
-        this.pause();
+        return this.play();
       }
+
+      return this.pause();
     }
     /**
      * Stop playback
@@ -8187,7 +8280,7 @@ function () {
   }, {
     key: "rewind",
     value: function rewind(seekTime) {
-      this.currentTime = this.currentTime - (is$1.number(seekTime) ? seekTime : this.config.seekTime);
+      this.currentTime -= is$1.number(seekTime) ? seekTime : this.config.seekTime;
     }
     /**
      * Fast forward
@@ -8197,7 +8290,7 @@ function () {
   }, {
     key: "forward",
     value: function forward(seekTime) {
-      this.currentTime = this.currentTime + (is$1.number(seekTime) ? seekTime : this.config.seekTime);
+      this.currentTime += is$1.number(seekTime) ? seekTime : this.config.seekTime;
     }
     /**
      * Seek to a time
