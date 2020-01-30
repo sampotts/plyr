@@ -18,6 +18,8 @@
 -   Various presentational fixes
 -   Removed logic to hide/show volume controls based on audio track detection due to it's problematic nature. If you want to hide volume control, use the `controls` option to do so.
 
+_Note:_ This update contains CSS changes.
+
 ### v3.5.6
 
 -   Another Edge fix (thanks Nick Hawk via Slack)
