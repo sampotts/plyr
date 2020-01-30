@@ -294,7 +294,7 @@ const options = {
         },
     },
     demo: {
-        uploadPath: branch.current === branch.beta ? 'beta' : null,
+        uploadPath: branch.current === branch.beta ? '/beta' : null,
         headers: {
             'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
         },
@@ -461,6 +461,14 @@ gulp.task('demo', done => {
     return gulp
         .src(pages)
         .pipe(replace(localPath, versionPath))
+        .pipe(
+            rename(p => {
+                if (options.demo.uploadPath) {
+                    // eslint-disable-next-line no-param-reassign
+                    p.dirname += options.demo.uploadPath;
+                }
+            }),
+        )
         .pipe(publisher.publish(options.demo.headers))
         .pipe(publish.reporter());
 });
