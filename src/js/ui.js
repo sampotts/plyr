@@ -198,7 +198,9 @@ const ui = {
                         // Reset backgroundSize as well (since it can be set to "cover" for padded thumbnails for youtube)
                         backgroundSize: '',
                     });
+
                     ui.togglePoster.call(this, true);
+
                     return poster;
                 })
         );
@@ -214,6 +216,7 @@ const ui = {
         // Set state
         Array.from(this.elements.buttons.play || []).forEach(target => {
             Object.assign(target, { pressed: this.playing });
+            target.setAttribute('aria-label', i18n.get(this.playing ? 'pause' : 'play', this.config));
         });
 
         // Only update controls on non timeupdate events

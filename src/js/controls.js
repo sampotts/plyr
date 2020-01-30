@@ -139,10 +139,7 @@ const controls = {
     // Create hidden text label
     createLabel(key, attr = {}) {
         const text = i18n.get(key, this.config);
-
-        const attributes = Object.assign({}, attr, {
-            class: [attr.class, this.config.classNames.hidden].filter(Boolean).join(' '),
-        });
+        const attributes = { ...attr, class: [attr.class, this.config.classNames.hidden].filter(Boolean).join(' ') };
 
         return createElement('span', attributes, text);
     },
@@ -402,7 +399,8 @@ const controls = {
     // https://bugzilla.mozilla.org/show_bug.cgi?id=1220143
     bindMenuItemShortcuts(menuItem, type) {
         // Navigate through menus via arrow keys and space
-        on(
+        on.call(
+            this,
             menuItem,
             'keydown keyup',
             event => {
@@ -452,7 +450,7 @@ const controls = {
 
         // Enter will fire a `click` event but we still need to manage focus
         // So we bind to keyup which fires after and set focus here
-        on(menuItem, 'keyup', event => {
+        on.call(this, menuItem, 'keyup', event => {
             if (event.which !== 13) {
                 return;
             }
@@ -1380,7 +1378,9 @@ const controls = {
                 }
 
                 // Volume range control
-                if (control === 'volume') {
+                // Ignored on iOS as it's handled globally
+                // https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html
+                if (control === 'volume' && !browser.isIos) {
                     // Set the attributes
                     const attributes = {
                         max: 1,
@@ -1463,7 +1463,7 @@ const controls = {
                     bindMenuItemShortcuts.call(this, menuItem, type);
 
                     // Show menu on click
-                    on(menuItem, 'click', () => {
+                    on.call(this, menuItem, 'click', () => {
                         showMenuPanel.call(this, type, false);
                     });
 
@@ -1515,7 +1515,8 @@ const controls = {
                     );
 
                     // Go back via keyboard
-                    on(
+                    on.call(
+                        this,
                         pane,
                         'keydown',
                         event => {
@@ -1535,7 +1536,7 @@ const controls = {
                     );
 
                     // Go back via button click
-                    on(backButton, 'click', () => {
+                    on.call(this, backButton, 'click', () => {
                         showMenuPanel.call(this, 'home', false);
                     });
 

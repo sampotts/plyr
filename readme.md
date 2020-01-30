@@ -116,7 +116,7 @@ import Plyr from 'plyr';
 const player = new Plyr('#player');
 ```
 
-Alertnatively you can include the `plyr.js` script before the closing `</body>` tag and then in your JS create a new instance of Plyr as below.
+Alternatively you can include the `plyr.js` script before the closing `</body>` tag and then in your JS create a new instance of Plyr as below.
 
 ```html
 <script src="path/to/plyr.js"></script>
@@ -629,16 +629,16 @@ Fullscreen in Plyr is supported by all browsers that [currently support it](http
 
 Plyr supports the last 2 versions of most _modern_ browsers.
 
-| Browser       | Supported     |
-| ------------- | ------------- |
-| Safari        | ✓             |
-| Mobile Safari | ✓&sup1;       |
-| Firefox       | ✓             |
-| Chrome        | ✓             |
-| Opera         | ✓             |
-| Edge          | ✓             |
-| IE11          | ✓&sup3;       |
-| IE10          | ✓&sup2;&sup3; |
+| Browser       | Supported       |
+| ------------- | --------------- |
+| Safari        | ✓               |
+| Mobile Safari | ✓&sup1;         |
+| Firefox       | ✓               |
+| Chrome        | ✓               |
+| Opera         | ✓               |
+| Edge          | ✓               |
+| IE11          | ✓&sup3;         |
+| IE10          | ✓<sup>2,3</sup> |
 
 1.  Mobile Safari on the iPhone forces the native player for `<video>` unless the `playsinline` attribute is present. Volume controls are also disabled as they are handled device wide.
 2.  Native player used (no support for `<progress>` or `<input type="range">`) but the API is supported. No native fullscreen support, fallback can be used (see [options](#options)).
@@ -682,7 +682,7 @@ Some awesome folks have made plugins for CMSs and Components for JavaScript fram
 | --------- | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
 | WordPress | Brandon Lavigne ([@drrobotnik](https://github.com/drrobotnik)) | [https://wordpress.org/plugins/plyr/](https://wordpress.org/plugins/plyr/)                   |
 | Angular   | Simon Bobrov ([@smnbbrv](https://github.com/smnbbrv))          | [https://github.com/smnbbrv/ngx-plyr](https://github.com/smnbbrv/ngx-plyr)                   |
-| React     | Jose Miguel Bejarano ([@xDae](https://github.com/xDae))        | [https://github.com/xDae/react-plyr](https://github.com/xDae/react-plyr)                     |
+| React     | Chintan Prajapati ([@chintan9](https://github.com/chintan9))        | [https://github.com/chintan9/plyr-react](https://github.com/chintan9/plyr-react)                     |
 | Vue       | Gabe Dunn ([@redxtech](https://github.com/redxtech))           | [https://github.com/redxtech/vue-plyr](https://github.com/redxtech/vue-plyr)                 |
 | Neos      | Jon Uhlmann ([@jonnitto](https://github.com/jonnitto))         | [https://packagist.org/packages/jonnitto/plyr](https://packagist.org/packages/jonnitto/plyr) |
 | Kirby     | Dominik Pschenitschni ([@dpschen](https://github.com/dpschen)) | [https://github.com/dpschen/kirby-plyrtag](https://github.com/dpschen/kirby-plyrtag)         |
@@ -735,9 +735,7 @@ If you want to be added to the list, open a pull request. It'd be awesome to see
 
 # Useful links and credits
 
-Credit to the PayPal HTML5 Video player from which Plyr's caption functionality was originally ported from:
-
--   [PayPal's Accessible HTML5 Video Player](https://github.com/paypal/accessible-html5-video-player)
+-   [PayPal's Accessible HTML5 Video Player (which Plyr was originally ported from)](https://github.com/paypal/accessible-html5-video-player)
 -   [An awesome guide for Plyr in Japanese!](http://syncer.jp/how-to-use-plyr-io) by [@arayutw](https://twitter.com/arayutw)
 
 # Thanks

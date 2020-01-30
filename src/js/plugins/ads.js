@@ -136,7 +136,7 @@ class Ads {
             cb: Date.now(),
             AV_WIDTH: 640,
             AV_HEIGHT: 480,
-            AV_CDIM2: this.publisherId,
+            AV_CDIM2: config.publisherId,
         };
 
         const base = 'https://go.aniview.com/api/adserver6/vast/';
