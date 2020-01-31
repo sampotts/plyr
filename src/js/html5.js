@@ -80,7 +80,7 @@ const html5 = {
                     }
 
                     // Get current state
-                    const { currentTime, paused, preload, readyState } = player.media;
+                    const { currentTime, paused, preload, readyState, playbackRate } = player.media;
 
                     // Set new source
                     player.media.src = source.getAttribute('src');
@@ -90,6 +90,7 @@ const html5 = {
                         // Restore time
                         player.once('loadedmetadata', () => {
 
+                            player.speed = playbackRate;
                             player.currentTime = currentTime;
 
                             // Resume playing
