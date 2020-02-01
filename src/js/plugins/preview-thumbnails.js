@@ -104,7 +104,7 @@ class PreviewThumbnails {
     }
 
     load() {
-        // Togglethe regular seek tooltip
+        // Toggle the regular seek tooltip
         if (this.player.elements.display.seekTooltip) {
             this.player.elements.display.seekTooltip.hidden = this.enabled;
         }
@@ -326,6 +326,15 @@ class PreviewThumbnails {
         });
 
         this.player.elements.wrapper.appendChild(this.elements.scrubbing.container);
+    }
+
+    destroy() {
+        if (this.elements.thumb.container) {
+            this.elements.thumb.container.remove();
+        }
+        if (this.elements.scrubbing.container) {
+            this.elements.scrubbing.container.remove();
+        }
     }
 
     showImageAtCurrentTime() {
