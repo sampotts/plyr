@@ -1580,6 +1580,7 @@ const controls = {
                     element: 'a',
                     href: this.download,
                     target: '_blank',
+                    download: '',
                 });
 
                 const { download } = this.config.urls;
