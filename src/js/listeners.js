@@ -725,7 +725,7 @@ class Listeners {
         });
 
         // Hide thumbnail preview - on mouse click, mouse leave, and video play/seek. All four are required, e.g., for buffering
-        this.bind(elements.progress, 'mouseleave click', () => {
+        this.bind(elements.progress, 'mouseleave touchend click', () => {
             const { previewThumbnails } = player;
 
             if (previewThumbnails && previewThumbnails.loaded) {

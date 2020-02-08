@@ -239,8 +239,8 @@ class PreviewThumbnails {
     }
 
     startScrubbing(event) {
-        // Only act on left mouse button (0), or touch device (event.button is false)
-        if (event.button === false || event.button === 0) {
+        // Only act on left mouse button (0), or touch device (event.button does not exist or is false)
+        if (is.nullOrUndefined(event.button) || event.button === false || event.button === 0) {
             this.mouseDown = true;
 
             // Wait until media has a duration
