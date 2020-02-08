@@ -196,12 +196,6 @@ const vimeo = {
                     .then(() => {
                         speed = input;
                         triggerEvent.call(player, player.media, 'ratechange');
-                    })
-                    .catch(error => {
-                        // Hide menu item (and menu if empty)
-                        if (error.name === 'Error') {
-                            controls.setSpeedMenu.call(player, []);
-                        }
                     });
             },
         });

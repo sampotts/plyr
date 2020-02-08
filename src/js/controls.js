@@ -9,7 +9,7 @@ import captions from './captions';
 import html5 from './html5';
 import support from './support';
 import { repaint, transitionEndEvent } from './utils/animation';
-import { dedupe } from './utils/arrays';
+import { dedupe, fillRange } from './utils/arrays';
 import browser from './utils/browser';
 import {
     createElement,
@@ -1044,7 +1044,7 @@ const controls = {
     },
 
     // Set a list of available captions languages
-    setSpeedMenu(options) {
+    setSpeedMenu() {
         // Menu required
         if (!is.element(this.elements.settings.panels.speed)) {
             return;
@@ -1053,17 +1053,13 @@ const controls = {
         const type = 'speed';
         const list = this.elements.settings.panels.speed.querySelector('[role="menu"]');
 
-        // Set the speed options
-        if (is.array(options)) {
-            this.options.speed = options;
-        } else if (is.array(this.config.speed.options)) {
+        // Determine options to display
+        // Vimeo and YouTube limit to 0.5x-2x
+        if (this.isVimeo || this.isYouTube) {
+            this.options.speed = fillRange(0.5, 2, 0.25).filter(s => this.config.speed.options.includes(s));
+        } else {
             this.options.speed = this.config.speed.options;
-        } else if (this.isHTML5 || this.isVimeo) {
-            this.options.speed = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
         }
-
-        // Set options if passed and filter based on config
-        this.options.speed = this.options.speed.filter(speed => this.config.speed.options.includes(speed));
 
         // Toggle the pane and tab
         const toggle = !is.empty(this.options.speed) && this.options.speed.length > 1;
