@@ -257,10 +257,11 @@ export function trapFocus(element = null, toggle = false) {
     const focusable = getElements.call(this, 'button:not(:disabled), input:not(:disabled), [tabindex]');
     const first = focusable[0];
     const last = focusable[focusable.length - 1];
+    const player = this;
 
     const trap = event => {
         // Bail if not tab key or not fullscreen
-        if (event.key !== 'Tab' || event.keyCode !== 9) {
+        if (event.key !== 'Tab' || event.keyCode !== 9 || !player.fullscreen.active) {
             return;
         }
 
