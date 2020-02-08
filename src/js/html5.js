@@ -65,6 +65,10 @@ const html5 = {
                 return source && Number(source.getAttribute('size'));
             },
             set(input) {
+                if (player.quality === input) {
+                    return;
+                }
+
                 // If we're using an an external handler...
                 if (player.config.quality.forced && is.function(player.config.quality.onChange)) {
                     player.config.quality.onChange(input);
