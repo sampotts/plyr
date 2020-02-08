@@ -1056,6 +1056,8 @@ const controls = {
         // Set the speed options
         if (is.array(options)) {
             this.options.speed = options;
+        } else if (is.array(this.config.speed.options)) {
+            this.options.speed = this.config.speed.options;
         } else if (this.isHTML5 || this.isVimeo) {
             this.options.speed = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
         }
