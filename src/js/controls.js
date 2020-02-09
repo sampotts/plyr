@@ -1578,8 +1578,12 @@ const controls = {
                     element: 'a',
                     href: this.download,
                     target: '_blank',
-                    download: '',
                 });
+
+                // Set download attribute for HTML5 only
+                if (this.isHTML5) {
+                    attributes.download = '';
+                }
 
                 const { download } = this.config.urls;
 
