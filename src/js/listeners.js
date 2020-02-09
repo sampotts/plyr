@@ -599,12 +599,19 @@ class Listeners {
         this.bind(elements.buttons.airplay, 'click', player.airplay, 'airplay');
 
         // Settings menu - click toggle
-        this.bind(elements.buttons.settings, 'click', event => {
-            // Prevent the document click listener closing the menu
-            event.stopPropagation();
+        this.bind(
+            elements.buttons.settings,
+            'click',
+            event => {
+                // Prevent the document click listener closing the menu
+                event.stopPropagation();
+                event.preventDefault();
 
-            controls.toggleMenu.call(player, event);
-        });
+                controls.toggleMenu.call(player, event);
+            },
+            null,
+            false
+        ); // Can't be passive as we're preventing default
 
         // Settings menu - keyboard toggle
         // We have to bind to keyup otherwise Firefox triggers a click when a keydown event handler shifts focus
