@@ -2,9 +2,10 @@
 
 -   Typescript typings (thanks @ondratra)
 -   `togglePlay` now also returns a `Promise` (thanks @azizhk)
--   Documentation improvements (thanks @MaxGiting, @0xflotus and @thatrobotdev)
+-   Documentation improvements and typo fixes (thanks @ffpetrovic, @skerbis, @ayunami2000, @pjbaert, @MaxGiting, @0xflotus and @thatrobotdev)
 -   Accessibility tweak for the play button (thanks @lunika)
 -   Fix for ads configuration (thanks @SoftCreatR)
+-   Fix handling listener return value (thanks @taion)
 -   Added localisation key for PIP (picture-in-picture) (thanks @lmislm)
 -   Preserve viewBox attribute in SVG sprite symbols (thanks @bseib)
 -   Fix being unable to unmute autoplayed video on iOS (thanks @sumanbh)
@@ -17,6 +18,11 @@
 -   Fix for multiple poster image downloads (use the native poster only for HTML5 videos)
 -   Various presentational fixes
 -   Removed logic to hide/show volume controls based on audio track detection due to it's problematic nature. If you want to hide volume control, use the `controls` option to do so.
+-   Fix preview thumbnail scrubbing not working on mobile touch devices (thanks @ydylla)
+-   Add download attribute to download button (thanks @Code1110)
+-   Trap keyboard focus only when fullscreen (thanks @k-jensen)
+-   Improvements to speed options - you can now specify all options in the UI (YouTube and Vimeo only accept 0.5-2) (thanks @ydylla)
+-   Improve/fix quality change state restoring (thanks @ydylla)
 
 _Note:_ This update contains CSS changes.
 

@@ -6,7 +6,6 @@
 export = Plyr;
 export as namespace Plyr;
 
-
 declare class Plyr {
     /**
      * Setup a new instance
@@ -201,17 +200,26 @@ declare class Plyr {
     /**
      * Add an event listener for the specified event.
      */
-    on(event: Plyr.StandardEvent | Plyr.Html5Event | Plyr.YoutubeEvent, callback: (this: this, event: Plyr.PlyrEvent) => void): void;
+    on(
+        event: Plyr.StandardEvent | Plyr.Html5Event | Plyr.YoutubeEvent,
+        callback: (this: this, event: Plyr.PlyrEvent) => void,
+    ): void;
 
     /**
      * Add an event listener for the specified event once.
      */
-    once(event: Plyr.StandardEvent | Plyr.Html5Event | Plyr.YoutubeEvent, callback: (this: this, event: Plyr.PlyrEvent) => void): void;
+    once(
+        event: Plyr.StandardEvent | Plyr.Html5Event | Plyr.YoutubeEvent,
+        callback: (this: this, event: Plyr.PlyrEvent) => void,
+    ): void;
 
     /**
      * Remove an event listener for the specified event.
      */
-    off(event: Plyr.StandardEvent | Plyr.Html5Event | Plyr.YoutubeEvent, callback: (this: this, event: Plyr.PlyrEvent) => void): void;
+    off(
+        event: Plyr.StandardEvent | Plyr.Html5Event | Plyr.YoutubeEvent,
+        callback: (this: this, event: Plyr.PlyrEvent) => void,
+    ): void;
 
     /**
      * Check support for a mime type.
@@ -225,12 +233,39 @@ declare class Plyr {
 }
 
 declare namespace Plyr {
-    type MediaType = "audio" | "video";
-    type Provider = "html5" | "youtube" | "vimeo";
-    type StandardEvent = "progress" | "playing" | "play" | "pause" | "timeupdate" | "volumechange" | "seeking" | "seeked" | "ratechange" | "ended" | "enterfullscreen" | "exitfullscreen"
-        | "captionsenabled" | "captionsdisabled" | "languagechange" | "controlshidden" | "controlsshown" | "ready";
-    type Html5Event = "loadstart" | "loadeddata" | "loadedmetadata" | "canplay" | "canplaythrough" | "stalled" | "waiting" | "emptied" | "cuechange" | "error";
-    type YoutubeEvent = "statechange" | "qualitychange" | "qualityrequested";
+    type MediaType = 'audio' | 'video';
+    type Provider = 'html5' | 'youtube' | 'vimeo';
+    type StandardEvent =
+        | 'progress'
+        | 'playing'
+        | 'play'
+        | 'pause'
+        | 'timeupdate'
+        | 'volumechange'
+        | 'seeking'
+        | 'seeked'
+        | 'ratechange'
+        | 'ended'
+        | 'enterfullscreen'
+        | 'exitfullscreen'
+        | 'captionsenabled'
+        | 'captionsdisabled'
+        | 'languagechange'
+        | 'controlshidden'
+        | 'controlsshown'
+        | 'ready';
+    type Html5Event =
+        | 'loadstart'
+        | 'loadeddata'
+        | 'loadedmetadata'
+        | 'canplay'
+        | 'canplaythrough'
+        | 'stalled'
+        | 'waiting'
+        | 'emptied'
+        | 'cuechange'
+        | 'error';
+    type YoutubeEvent = 'statechange' | 'qualitychange' | 'qualityrequested';
 
     interface FullscreenControl {
         /**
@@ -393,7 +428,7 @@ declare namespace Plyr {
          * Allows binding of event listeners to the controls before the default handlers. See the defaults.js for available listeners.
          * If your handler prevents default on the event (event.preventDefault()), the default handler will not fire.
          */
-        listeners?: {[key: string]: (error: PlyrEvent) => void};
+        listeners?: { [key: string]: (error: PlyrEvent) => void };
 
         /**
          * active: Toggles if captions should be active by default. language: Sets the default language to load (if available). 'auto' uses the browser language.
@@ -418,7 +453,7 @@ declare namespace Plyr {
         storage?: StorageOptions;
 
         /**
-         * selected: The default speed for playback. options: Options to display in the menu. Most browsers will refuse to play slower than 0.5.
+         * selected: The default speed for playback. options: The speed options to display in the UI. YouTube and Vimeo will ignore any options outside of the 0.5-2 range, so options outside of this range will be hidden automatically.
          */
         speed?: SpeedOptions;
 
@@ -527,7 +562,7 @@ declare namespace Plyr {
         size?: number;
     }
 
-    type TrackKind = "subtitles" | "captions" | "descriptions" | "chapters" | "metadata";
+    type TrackKind = 'subtitles' | 'captions' | 'descriptions' | 'chapters' | 'metadata';
     interface Track {
         /**
          * Indicates how the text track is meant to be used
@@ -550,7 +585,7 @@ declare namespace Plyr {
     }
 
     interface PlyrEvent extends CustomEvent {
-        readonly detail: { readonly plyr: Plyr; };
+        readonly detail: { readonly plyr: Plyr };
     }
 
     interface Support {
