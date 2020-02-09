@@ -4,6 +4,7 @@
 
 import captions from './captions';
 import controls from './controls';
+import googlecast from './plugins/google-cast';
 import support from './support';
 import browser from './utils/browser';
 import { getElement, toggleClass } from './utils/elements';
@@ -60,6 +61,9 @@ const ui = {
         if (this.isHTML5) {
             captions.setup.call(this);
         }
+
+        // Google cast
+        googlecast.setup.call(this);
 
         // Reset volume
         this.volume = null;

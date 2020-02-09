@@ -83,16 +83,27 @@
     transform: translateY(100%);
 }
 
+.plyr--cast-active .plyr__controls .icon--cast-on {
+    display: block;
+    color: #2243f9;
+
+    & + svg {
+      display: none;
+    }
+}
+
 // Some options are hidden by default
 .plyr [data-plyr='captions'],
 .plyr [data-plyr='pip'],
 .plyr [data-plyr='airplay'],
-.plyr [data-plyr='fullscreen'] {
+.plyr [data-plyr='fullscreen'],
+.plyr [data-plyr='cast'] {
     display: none;
 }
 .plyr--captions-enabled [data-plyr='captions'],
 .plyr--pip-supported [data-plyr='pip'],
 .plyr--airplay-supported [data-plyr='airplay'],
-.plyr--fullscreen-enabled [data-plyr='fullscreen'] {
+.plyr--fullscreen-enabled [data-plyr='fullscreen'],
+.plyr--cast-enabled [data-plyr='cast'] {
     display: inline-block;
 }
