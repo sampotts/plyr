@@ -14,11 +14,10 @@
 
 .plyr__video-wrapper {
     background: #000;
-    border-radius: inherit;
+    height: 100%;
+    margin: auto;
     overflow: hidden;
-    position: relative;
-    // Require z-index to force border-radius
-    z-index: 0;
+    width: 100%;
 }
 
 // Default to 16:9 ratio but this is set by JavaScript based on config
@@ -33,12 +32,9 @@ $embed-padding: ((100 / 16) * 9);
 .plyr__video-embed iframe,
 .plyr__video-wrapper--fixed-ratio video {
     border: 0;
-    height: 100%;
     left: 0;
     position: absolute;
     top: 0;
-    user-select: none;
-    width: 100%;
 }
 
 // If the full custom UI is supported

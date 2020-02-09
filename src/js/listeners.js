@@ -6,7 +6,7 @@ import controls from './controls';
 import ui from './ui';
 import { repaint } from './utils/animation';
 import browser from './utils/browser';
-import { getElement, getElements, matches, toggleClass, toggleHidden } from './utils/elements';
+import { getElement, getElements, matches, toggleClass } from './utils/elements';
 import { off, on, once, toggleListener, triggerEvent } from './utils/events';
 import is from './utils/is';
 import { getAspectRatio, setAspectRatio } from './utils/style';
@@ -377,19 +377,15 @@ class Listeners {
             controls.durationUpdate.call(player, event),
         );
 
-        // Check for audio tracks on load
-        // We can't use `loadedmetadata` as it doesn't seem to have audio tracks at that point
-        on.call(player, player.media, 'canplay loadeddata', () => {
-            toggleHidden(elements.volume, !player.hasAudio);
-            toggleHidden(elements.buttons.mute, !player.hasAudio);
-        });
-
         // Handle the media finishing
         on.call(player, player.media, 'ended', () => {
             // Show poster on end
             if (player.isHTML5 && player.isVideo && player.config.resetOnEnd) {
                 // Restart
                 player.restart();
+
+                // Call pause otherwise IE11 will start playing the video again
+                player.pause();
             }
         });
 
@@ -603,12 +599,19 @@ class Listeners {
         this.bind(elements.buttons.airplay, 'click', player.airplay, 'airplay');
 
         // Settings menu - click toggle
-        this.bind(elements.buttons.settings, 'click', event => {
-            // Prevent the document click listener closing the menu
-            event.stopPropagation();
+        this.bind(
+            elements.buttons.settings,
+            'click',
+            event => {
+                // Prevent the document click listener closing the menu
+                event.stopPropagation();
+                event.preventDefault();
 
-            controls.toggleMenu.call(player, event);
-        });
+                controls.toggleMenu.call(player, event);
+            },
+            null,
+            false
+        ); // Can't be passive as we're preventing default
 
         // Settings menu - keyboard toggle
         // We have to bind to keyup otherwise Firefox triggers a click when a keydown event handler shifts focus
@@ -663,7 +666,7 @@ class Listeners {
             const code = event.keyCode ? event.keyCode : event.which;
             const attribute = 'play-on-seeked';
 
-            if (is.keyboardEvent(event) && (code !== 39 && code !== 37)) {
+            if (is.keyboardEvent(event) && code !== 39 && code !== 37) {
                 return;
             }
 
@@ -729,7 +732,7 @@ class Listeners {
         });
 
         // Hide thumbnail preview - on mouse click, mouse leave, and video play/seek. All four are required, e.g., for buffering
-        this.bind(elements.progress, 'mouseleave click', () => {
+        this.bind(elements.progress, 'mouseleave touchend click', () => {
             const { previewThumbnails } = player;
 
             if (previewThumbnails && previewThumbnails.loaded) {

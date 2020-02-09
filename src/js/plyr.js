@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v3.5.6
+// plyr.js v3.5.7-beta.0
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -368,10 +368,10 @@ class Plyr {
      */
     pause() {
         if (!this.playing || !is.function(this.media.pause)) {
-            return;
+            return null;
         }
 
-        this.media.pause();
+        return this.media.pause();
     }
 
     /**
@@ -411,10 +411,10 @@ class Plyr {
         const toggle = is.boolean(input) ? input : !this.playing;
 
         if (toggle) {
-            this.play();
-        } else {
-            this.pause();
+            return this.play();
         }
+
+        return this.pause();
     }
 
     /**
@@ -441,7 +441,7 @@ class Plyr {
      * @param {Number} seekTime - how far to rewind in seconds. Defaults to the config.seekTime
      */
     rewind(seekTime) {
-        this.currentTime = this.currentTime - (is.number(seekTime) ? seekTime : this.config.seekTime);
+        this.currentTime -= is.number(seekTime) ? seekTime : this.config.seekTime;
     }
 
     /**
@@ -449,7 +449,7 @@ class Plyr {
      * @param {Number} seekTime - how far to fast forward in seconds. Defaults to the config.seekTime
      */
     forward(seekTime) {
-        this.currentTime = this.currentTime + (is.number(seekTime) ? seekTime : this.config.seekTime);
+        this.currentTime += is.number(seekTime) ? seekTime : this.config.seekTime;
     }
 
     /**

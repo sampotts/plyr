@@ -24,8 +24,8 @@
 // Fallback for unsupported browsers
 .plyr--fullscreen-fallback {
     @include plyr-fullscreen-active();
-
     bottom: 0;
+    display: block;
     left: 0;
     position: fixed;
     right: 0;

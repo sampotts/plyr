@@ -61,7 +61,7 @@ const defaults = {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.5.6/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.5.7-beta.0/plyr.svg',
 
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
@@ -69,7 +69,10 @@ const defaults = {
     // Quality default
     quality: {
         default: 576,
+        // The options to display in the UI, if available for the source media
         options: [4320, 2880, 2160, 1440, 1080, 720, 576, 480, 360, 240],
+        forced: false,
+        onChange: null,
     },
 
     // Set loops
@@ -82,7 +85,8 @@ const defaults = {
     // Speed default and options to display
     speed: {
         selected: 1,
-        options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2],
+        // The options to display in the UI, if available for the source media (e.g. Vimeo and YouTube only support 0.5x-4x)
+        options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 4],
     },
 
     // Keyboard shortcut settings
@@ -164,6 +168,7 @@ const defaults = {
         frameTitle: 'Player for {title}',
         captions: 'Captions',
         settings: 'Settings',
+        pip: 'PIP',
         menuBack: 'Go back to previous menu',
         speed: 'Speed',
         normal: 'Normal',

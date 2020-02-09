@@ -1,15 +1,43 @@
-## v3.5.6
+### v3.5.7
+
+-   Typescript typings (thanks @ondratra)
+-   `togglePlay` now also returns a `Promise` (thanks @azizhk)
+-   Documentation improvements and typo fixes (thanks @ffpetrovic, @skerbis, @ayunami2000, @pjbaert, @MaxGiting, @0xflotus and @thatrobotdev)
+-   Accessibility tweak for the play button (thanks @lunika)
+-   Fix for ads configuration (thanks @SoftCreatR)
+-   Fix handling listener return value (thanks @taion)
+-   Added localisation key for PIP (picture-in-picture) (thanks @lmislm)
+-   Preserve viewBox attribute in SVG sprite symbols (thanks @bseib)
+-   Fix being unable to unmute autoplayed video on iOS (thanks @sumanbh)
+-   Fixed Plyr container not resizing responsively (thanks @shravan2x)
+-   Change vimeo demo video (thanks @thatrobotdev)
+-   Fix for `Uncaught RangeError: Maximum call stack size exceeded` (thanks @laukstein)
+-   Improve fullscreen experience on some devices (thanks @savroff)
+-   Improvements to buffering state for embedded players (thanks @doostinharrell)
+-   Prevents IE11 with resetOnEnd option set to true to play video again (thanks @Felipe K. De Boni)
+-   Fix for multiple poster image downloads (use the native poster only for HTML5 videos)
+-   Various presentational fixes
+-   Removed logic to hide/show volume controls based on audio track detection due to it's problematic nature. If you want to hide volume control, use the `controls` option to do so.
+-   Fix preview thumbnail scrubbing not working on mobile touch devices (thanks @ydylla)
+-   Add download attribute to download button (thanks @Code1110)
+-   Trap keyboard focus only when fullscreen (thanks @k-jensen)
+-   Improvements to speed options - you can now specify all options in the UI (YouTube and Vimeo only accept 0.5-2) (thanks @ydylla)
+-   Improve/fix quality change state restoring (thanks @ydylla)
+
+_Note:_ This update contains CSS changes.
+
+### v3.5.6
 
 -   Another Edge fix (thanks Nick Hawk via Slack)
 
-## v3.5.5
+### v3.5.5
 
 -   YouTube fix for when there are other embeds on the page (thanks @aFarkas)
 -   Separated demo dependencies into their own package.json
 -   Fix for Edge controls flexbox issue when resizing the player (thanks Nick Hawk via Slack)
 -   More aspect ratio fixes
 
-## v3.5.4
+### v3.5.4
 
 -   Added: Set download URL via new setter
 -   Improvement: The order of the `controls` option now effects the order in the DOM - i.e. you can re-order the controls - Note: this may break any custom CSS you have setup. Please see the changes in the PR to the default SASS
@@ -22,7 +50,7 @@
 -   Improvement: Automatic aspect ratio for YouTube is now supported, meaning all aspect ratios are set based on media content - Note: we're now using a different API to get YouTube video metadata so you may need to adjust any CSPs you have setup
 -   Fix for menu in the Shadow DOM (thanks @emielbeinema)
 
-## v3.5.3
+### v3.5.3
 
 -   Improved the usage of the `ratio` config option; it now works as expected and for all video types. The default has not changed, it is to dynamically, where possible (except YouTube where 16:9 is used) determine the ratio from the media source so this is not a breaking change.
 -   Added new `ratio` getter and setter
@@ -30,11 +58,11 @@
 -   Fix: Allow absolute paths in preview thumbnails
 -   Improvement: Allow optional hours and ms in VTT parser in preview thumbnails
 
-## v3.5.2
+### v3.5.2
 
 -   Fixed issue where the preview thumbnail was present while scrubbing
 
-## v3.5.1
+### v3.5.1
 
 -   Fixed build issues with babel and browserslist
 

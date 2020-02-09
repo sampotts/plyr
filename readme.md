@@ -116,7 +116,7 @@ import Plyr from 'plyr';
 const player = new Plyr('#player');
 ```
 
-Alertnatively you can include the `plyr.js` script before the closing `</body>` tag and then in your JS create a new instance of Plyr as below.
+Alternatively you can include the `plyr.js` script before the closing `</body>` tag and then in your JS create a new instance of Plyr as below.
 
 ```html
 <script src="path/to/plyr.js"></script>
@@ -130,13 +130,13 @@ See [initialising](#initialising) for more information on advanced setups.
 You can use our CDN (provided by [Fastly](https://www.fastly.com/)) for the JavaScript. There's 2 versions; one with and one without [polyfills](#polyfills). My recommendation would be to manage polyfills seperately as part of your application but to make life easier you can use the polyfilled build.
 
 ```html
-<script src="https://cdn.plyr.io/3.5.6/plyr.js"></script>
+<script src="https://cdn.plyr.io/3.5.7-beta.0/plyr.js"></script>
 ```
 
 ...or...
 
 ```html
-<script src="https://cdn.plyr.io/3.5.6/plyr.polyfilled.js"></script>
+<script src="https://cdn.plyr.io/3.5.7-beta.0/plyr.polyfilled.js"></script>
 ```
 
 ## CSS
@@ -150,13 +150,13 @@ Include the `plyr.css` stylsheet into your `<head>`.
 If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for the default CSS, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/3.5.6/plyr.css" />
+<link rel="stylesheet" href="https://cdn.plyr.io/3.5.7-beta.0/plyr.css" />
 ```
 
 ## SVG Sprite
 
 The SVG sprite is loaded automatically from our CDN (provided by [Fastly](https://www.fastly.com/)). To change this, see the [options](#options) below. For
-reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.5.6/plyr.svg`.
+reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.5.7-beta.0/plyr.svg`.
 
 # Ads
 
@@ -276,7 +276,7 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
 | `enabled`            | Boolean                    | `true`                                                                                                                         | Completely disable Plyr. This would allow you to do a User Agent check or similar to programmatically enable or disable Plyr for a certain UA. Example below.                                                                                                                                                                                                                                           |
 | `debug`              | Boolean                    | `false`                                                                                                                        | Display debugging information in the console                                                                                                                                                                                                                                                                                                                                                            |
 | `controls`           | Array, Function or Element | `['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen']` | If a function is passed, it is assumed your method will return either an element or HTML string for the controls. Three arguments will be passed to your function; `id` (the unique id for the player), `seektime` (the seektime step in seconds), and `title` (the media title). See [controls.md](controls.md) for more info on how the html needs to be structured.                                  |
-| `settings`           | Array                      | `['captions', 'quality', 'speed', 'loop']`                                                                                     | If the default controls are used, you can specify which settings to show in the menu                                                                                                                                                                                                                                                                                                   |
+| `settings`           | Array                      | `['captions', 'quality', 'speed', 'loop']`                                                                                     | If the default controls are used, you can specify which settings to show in the menu                                                                                                                                                                                                                                                                                                                    |
 | `i18n`               | Object                     | See [defaults.js](/src/js/config/defaults.js)                                                                                  | Used for internationalization (i18n) of the text within the UI.                                                                                                                                                                                                                                                                                                                                         |
 | `loadSprite`         | Boolean                    | `true`                                                                                                                         | Load the SVG sprite specified as the `iconUrl` option (if a URL). If `false`, it is assumed you are handling sprite loading yourself.                                                                                                                                                                                                                                                                   |
 | `iconUrl`            | String                     | `null`                                                                                                                         | Specify a URL or path to the SVG sprite. See the [SVG section](#svg) for more info.                                                                                                                                                                                                                                                                                                                     |
@@ -302,7 +302,7 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
 | `fullscreen`         | Object                     | `{ enabled: true, fallback: true, iosNative: false }`                                                                          | `enabled`: Toggles whether fullscreen should be enabled. `fallback`: Allow fallback to a full-window solution (`true`/`false`/`'force'`). `iosNative`: whether to use native iOS fullscreen when entering fullscreen (no custom controls)                                                                                                                                                               |
 | `ratio`              | String                     | `null`                                                                                                                         | Force an aspect ratio for all videos. The format is `'w:h'` - e.g. `'16:9'` or `'4:3'`. If this is not specified then the default for HTML5 and Vimeo is to use the native resolution of the video. As dimensions are not available from YouTube via SDK, 16:9 is forced as a sensible default.                                                                                                         |
 | `storage`            | Object                     | `{ enabled: true, key: 'plyr' }`                                                                                               | `enabled`: Allow use of local storage to store user settings. `key`: The key name to use.                                                                                                                                                                                                                                                                                                               |
-| `speed`              | Object                     | `{ selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2] }`                                                                 | `selected`: The default speed for playback. `options`: Options to display in the menu. Most browsers will refuse to play slower than 0.5.                                                                                                                                                                                                                                                               |
+| `speed`              | Object                     | `{ selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2] }`                                                                 | `selected`: The default speed for playback. `options`: The speed options to display in the UI. YouTube and Vimeo will ignore any options outside of the 0.5-2 range, so options outside of this range will be hidden automatically.                                                                                                                                                                     |
 | `quality`            | Object                     | `{ default: 576, options: [4320, 2880, 2160, 1440, 1080, 720, 576, 480, 360, 240] }`                                           | `default` is the default quality level (if it exists in your sources). `options` are the options to display. This is used to filter the available sources.                                                                                                                                                                                                                                              |
 | `loop`               | Object                     | `{ active: false }`                                                                                                            | `active`: Whether to loop the current video. If the `loop` attribute is present on a `<video>` or `<audio>` element, this will be automatically set to true This is an object to support future functionality.                                                                                                                                                                                          |
 | `ads`                | Object                     | `{ enabled: false, publisherId: '' }`                                                                                          | `enabled`: Whether to enable advertisements. `publisherId`: Your unique [vi.ai](https://vi.ai/publisher-video-monetization/?aid=plyrio) publisher ID.                                                                                                                                                                                                                                                   |
@@ -629,16 +629,16 @@ Fullscreen in Plyr is supported by all browsers that [currently support it](http
 
 Plyr supports the last 2 versions of most _modern_ browsers.
 
-| Browser       | Supported     |
-| ------------- | ------------- |
-| Safari        | ✓             |
-| Mobile Safari | ✓&sup1;       |
-| Firefox       | ✓             |
-| Chrome        | ✓             |
-| Opera         | ✓             |
-| Edge          | ✓             |
-| IE11          | ✓&sup3;       |
-| IE10          | ✓&sup2;&sup3; |
+| Browser       | Supported       |
+| ------------- | --------------- |
+| Safari        | ✓               |
+| Mobile Safari | ✓&sup1;         |
+| Firefox       | ✓               |
+| Chrome        | ✓               |
+| Opera         | ✓               |
+| Edge          | ✓               |
+| IE11          | ✓&sup3;         |
+| IE10          | ✓<sup>2,3</sup> |
 
 1.  Mobile Safari on the iPhone forces the native player for `<video>` unless the `playsinline` attribute is present. Volume controls are also disabled as they are handled device wide.
 2.  Native player used (no support for `<progress>` or `<input type="range">`) but the API is supported. No native fullscreen support, fallback can be used (see [options](#options)).
@@ -678,15 +678,15 @@ If a User Agent is disabled but supports `<video>` and `<audio>` natively, it wi
 
 Some awesome folks have made plugins for CMSs and Components for JavaScript frameworks:
 
-| Type      | Maintainer                                                     | Link                                                                                         |
-| --------- | -------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| WordPress | Brandon Lavigne ([@drrobotnik](https://github.com/drrobotnik)) | [https://wordpress.org/plugins/plyr/](https://wordpress.org/plugins/plyr/)                   |
-| Angular   | Simon Bobrov ([@smnbbrv](https://github.com/smnbbrv))          | [https://github.com/smnbbrv/ngx-plyr](https://github.com/smnbbrv/ngx-plyr)                   |
-| React     | Jose Miguel Bejarano ([@xDae](https://github.com/xDae))        | [https://github.com/xDae/react-plyr](https://github.com/xDae/react-plyr)                     |
-| Vue       | Gabe Dunn ([@redxtech](https://github.com/redxtech))           | [https://github.com/redxtech/vue-plyr](https://github.com/redxtech/vue-plyr)                 |
-| Neos      | Jon Uhlmann ([@jonnitto](https://github.com/jonnitto))         | [https://packagist.org/packages/jonnitto/plyr](https://packagist.org/packages/jonnitto/plyr) |
-| Kirby     | Dominik Pschenitschni ([@dpschen](https://github.com/dpschen)) | [https://github.com/dpschen/kirby-plyrtag](https://github.com/dpschen/kirby-plyrtag)         |
-| REDAXO    | FriendsOfRedaxo / skerbis ([@skerbis](https://friendsofredaxo.github.io)) | [https://github.com/FriendsOfREDAXO/plyr](https://github.com/FriendsOfREDAXO/plyr)         |
+| Type      | Maintainer                                                                | Link                                                                                         |
+| --------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| WordPress | Brandon Lavigne ([@drrobotnik](https://github.com/drrobotnik))            | [https://wordpress.org/plugins/plyr/](https://wordpress.org/plugins/plyr/)                   |
+| Angular   | Simon Bobrov ([@smnbbrv](https://github.com/smnbbrv))                     | [https://github.com/smnbbrv/ngx-plyr](https://github.com/smnbbrv/ngx-plyr)                   |
+| React     | Chintan Prajapati ([@chintan9](https://github.com/chintan9))              | [https://github.com/chintan9/plyr-react](https://github.com/chintan9/plyr-react)             |
+| Vue       | Gabe Dunn ([@redxtech](https://github.com/redxtech))                      | [https://github.com/redxtech/vue-plyr](https://github.com/redxtech/vue-plyr)                 |
+| Neos      | Jon Uhlmann ([@jonnitto](https://github.com/jonnitto))                    | [https://packagist.org/packages/jonnitto/plyr](https://packagist.org/packages/jonnitto/plyr) |
+| Kirby     | Dominik Pschenitschni ([@dpschen](https://github.com/dpschen))            | [https://github.com/dpschen/kirby-plyrtag](https://github.com/dpschen/kirby-plyrtag)         |
+| REDAXO    | FriendsOfRedaxo / skerbis ([@skerbis](https://friendsofredaxo.github.io)) | [https://github.com/FriendsOfREDAXO/plyr](https://github.com/FriendsOfREDAXO/plyr)           |
 
 # Issues
 
@@ -735,9 +735,7 @@ If you want to be added to the list, open a pull request. It'd be awesome to see
 
 # Useful links and credits
 
-Credit to the PayPal HTML5 Video player from which Plyr's caption functionality was originally ported from:
-
--   [PayPal's Accessible HTML5 Video Player](https://github.com/paypal/accessible-html5-video-player)
+-   [PayPal's Accessible HTML5 Video Player (which Plyr was originally ported from)](https://github.com/paypal/accessible-html5-video-player)
 -   [An awesome guide for Plyr in Japanese!](http://syncer.jp/how-to-use-plyr-io) by [@arayutw](https://twitter.com/arayutw)
 
 # Thanks

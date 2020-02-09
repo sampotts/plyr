@@ -196,12 +196,6 @@ const vimeo = {
                     .then(() => {
                         speed = input;
                         triggerEvent.call(player, player.media, 'ratechange');
-                    })
-                    .catch(error => {
-                        // Hide menu item (and menu if empty)
-                        if (error.name === 'Error') {
-                            controls.setSpeedMenu.call(player, []);
-                        }
                     });
             },
         });
@@ -333,6 +327,14 @@ const vimeo = {
                 // https://github.com/sampotts/plyr/issues/317
                 frame.setAttribute('tabindex', -1);
             }
+        });
+
+        player.embed.on('bufferstart', () => {
+            triggerEvent.call(player, player.media, 'waiting');
+        });
+
+        player.embed.on('bufferend', () => {
+            triggerEvent.call(player, player.media, 'playing');
         });
 
         player.embed.on('play', () => {
