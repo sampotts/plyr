@@ -1259,12 +1259,14 @@ typeof navigator === "object" && (function (global, factory) {
         return Number(source.getAttribute('size'));
       }).filter(Boolean);
     },
-    extend: function extend() {
+    setup: function setup() {
       if (!this.isHTML5) {
         return;
       }
 
-      var player = this; // Set aspect ratio if fixed
+      var player = this; // Set speed options from config
+
+      player.options.speed = player.config.speed.options; // Set aspect ratio if fixed
 
       if (!is$1.empty(this.config.ratio)) {
         setAspectRatio.call(player);
@@ -1374,13 +1376,6 @@ typeof navigator === "object" && (function (global, factory) {
 
     return array.reduce(function (prev, curr) {
       return Math.abs(curr - value) < Math.abs(prev - value) ? curr : prev;
-    });
-  }
-  function fillRange(start, end) {
-    var step = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1;
-    var len = Math.floor((end - start) / step) + 1;
-    return Array(len).fill().map(function (_, idx) {
-      return start + idx * step;
     });
   }
 
@@ -2617,17 +2612,11 @@ typeof navigator === "object" && (function (global, factory) {
       }
 
       var type = 'speed';
-      var list = this.elements.settings.panels.speed.querySelector('[role="menu"]'); // Determine options to display
-      // Vimeo and YouTube limit to 0.5x-2x
+      var list = this.elements.settings.panels.speed.querySelector('[role="menu"]'); // Filter out invalid speeds
 
-      if (this.isVimeo || this.isYouTube) {
-        this.options.speed = fillRange(0.5, 2, 0.25).filter(function (s) {
-          return _this8.config.speed.options.includes(s);
-        });
-      } else {
-        this.options.speed = this.config.speed.options;
-      } // Toggle the pane and tab
-
+      this.options.speed = this.options.speed.filter(function (o) {
+        return o >= _this8.minimumSpeed && o <= _this8.maximumSpeed;
+      }); // Toggle the pane and tab
 
       var toggle = !is$1.empty(this.options.speed) && this.options.speed.length > 1;
       controls.toggleMenuButton.call(this, type, toggle); // Empty the menu
@@ -3671,7 +3660,7 @@ typeof navigator === "object" && (function (global, factory) {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.5.7/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.5.8/plyr.svg',
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
     // Quality default
@@ -3955,7 +3944,13 @@ typeof navigator === "object" && (function (global, factory) {
       portrait: false,
       title: false,
       speed: true,
-      transparent: false
+      transparent: false,
+      // These settings require a pro or premium account to work
+      sidedock: false,
+      controls: false,
+      // Custom settings from Plyr
+      referrerPolicy: null // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement/referrerPolicy
+
     },
     // YouTube plugin
     youtube: {
@@ -5674,26 +5669,27 @@ typeof navigator === "object" && (function (global, factory) {
 
   var vimeo = {
     setup: function setup() {
-      var _this = this;
+      var player = this; // Add embed class for responsive
 
-      // Add embed class for responsive
-      toggleClass(this.elements.wrapper, this.config.classNames.embed, true); // Set intial ratio
+      toggleClass(player.elements.wrapper, player.config.classNames.embed, true); // Set speed options from config
 
-      setAspectRatio.call(this); // Load the SDK if not already
+      player.options.speed = player.config.speed.options; // Set intial ratio
+
+      setAspectRatio.call(player); // Load the SDK if not already
 
       if (!is$1.object(window.Vimeo)) {
-        loadScript(this.config.urls.vimeo.sdk).then(function () {
-          vimeo.ready.call(_this);
+        loadScript(player.config.urls.vimeo.sdk).then(function () {
+          vimeo.ready.call(player);
         }).catch(function (error) {
-          _this.debug.warn('Vimeo SDK (player.js) failed to load', error);
+          player.debug.warn('Vimeo SDK (player.js) failed to load', error);
         });
       } else {
-        vimeo.ready.call(this);
+        vimeo.ready.call(player);
       }
     },
     // API Ready
     ready: function ready() {
-      var _this2 = this;
+      var _this = this;
 
       var player = this;
       var config = player.config.vimeo; // Get Vimeo params for the iframe
@@ -5719,7 +5715,12 @@ typeof navigator === "object" && (function (global, factory) {
       iframe.setAttribute('src', src);
       iframe.setAttribute('allowfullscreen', '');
       iframe.setAttribute('allowtransparency', '');
-      iframe.setAttribute('allow', 'autoplay'); // Get poster, if already set
+      iframe.setAttribute('allow', 'autoplay'); // Set the referrer policy if required
+
+      if (!is$1.empty(config.referrerPolicy)) {
+        iframe.setAttribute('referrerPolicy', config.referrerPolicy);
+      } // Get poster, if already set
+
 
       var poster = player.poster; // Inject the package
 
@@ -5861,7 +5862,7 @@ typeof navigator === "object" && (function (global, factory) {
         currentSrc = value;
         controls.setDownloadUrl.call(player);
       }).catch(function (error) {
-        _this2.debug.warn(error);
+        _this.debug.warn(error);
       });
       Object.defineProperty(player.media, 'currentSrc', {
         get: function get() {
@@ -5881,7 +5882,7 @@ typeof navigator === "object" && (function (global, factory) {
             height = _dimensions[1];
 
         player.embed.ratio = [width, height];
-        setAspectRatio.call(_this2);
+        setAspectRatio.call(_this);
       }); // Set autopause
 
       player.embed.setAutopause(player.config.autopause).then(function (state) {
@@ -5890,7 +5891,7 @@ typeof navigator === "object" && (function (global, factory) {
 
       player.embed.getVideoTitle().then(function (title) {
         player.config.title = title;
-        ui.setTitle.call(_this2);
+        ui.setTitle.call(_this);
       }); // Get current time
 
       player.embed.getCurrentTime().then(function (value) {
@@ -6265,7 +6266,11 @@ typeof navigator === "object" && (function (global, factory) {
               }
             }); // Get available speeds
 
-            player.options.speed = instance.getAvailablePlaybackRates(); // Set the tabindex to avoid focus entering iframe
+            var speeds = instance.getAvailablePlaybackRates(); // Filter based on config
+
+            player.options.speed = speeds.filter(function (s) {
+              return player.config.speed.options.includes(s);
+            }); // Set the tabindex to avoid focus entering iframe
 
             if (player.supported.ui) {
               player.media.setAttribute('tabindex', -1);
@@ -6424,7 +6429,7 @@ typeof navigator === "object" && (function (global, factory) {
       }
 
       if (this.isHTML5) {
-        html5.extend.call(this);
+        html5.setup.call(this);
       } else if (this.isYouTube) {
         youtube.setup.call(this);
       } else if (this.isVimeo) {
@@ -7170,7 +7175,7 @@ typeof navigator === "object" && (function (global, factory) {
       value: function load() {
         var _this = this;
 
-        // Togglethe regular seek tooltip
+        // Toggle the regular seek tooltip
         if (this.player.elements.display.seekTooltip) {
           this.player.elements.display.seekTooltip.hidden = this.enabled;
         }
@@ -7396,6 +7401,17 @@ typeof navigator === "object" && (function (global, factory) {
           class: this.player.config.classNames.previewThumbnails.scrubbingContainer
         });
         this.player.elements.wrapper.appendChild(this.elements.scrubbing.container);
+      }
+    }, {
+      key: "destroy",
+      value: function destroy() {
+        if (this.elements.thumb.container) {
+          this.elements.thumb.container.remove();
+        }
+
+        if (this.elements.scrubbing.container) {
+          this.elements.scrubbing.container.remove();
+        }
       }
     }, {
       key: "showImageAtCurrentTime",
@@ -7642,7 +7658,7 @@ typeof navigator === "object" && (function (global, factory) {
     }, {
       key: "determineContainerAutoSizing",
       value: function determineContainerAutoSizing() {
-        if (this.elements.thumb.imageContainer.clientHeight > 20) {
+        if (this.elements.thumb.imageContainer.clientHeight > 20 || this.elements.thumb.imageContainer.clientWidth > 20) {
           // This will prevent auto sizing in this.setThumbContainerSizeAndPos()
           this.sizeSpecifiedInCSS = true;
         }
@@ -7655,6 +7671,13 @@ typeof navigator === "object" && (function (global, factory) {
           var thumbWidth = Math.floor(this.thumbContainerHeight * this.thumbAspectRatio);
           this.elements.thumb.imageContainer.style.height = "".concat(this.thumbContainerHeight, "px");
           this.elements.thumb.imageContainer.style.width = "".concat(thumbWidth, "px");
+        } else if (this.elements.thumb.imageContainer.clientHeight > 20 && this.elements.thumb.imageContainer.clientWidth < 20) {
+          var _thumbWidth = Math.floor(this.elements.thumb.imageContainer.clientHeight * this.thumbAspectRatio);
+
+          this.elements.thumb.imageContainer.style.width = "".concat(_thumbWidth, "px");
+        } else if (this.elements.thumb.imageContainer.clientHeight < 20 && this.elements.thumb.imageContainer.clientWidth > 20) {
+          var thumbHeight = Math.floor(this.elements.thumb.imageContainer.clientWidth / this.thumbAspectRatio);
+          this.elements.thumb.imageContainer.style.height = "".concat(thumbHeight, "px");
         }
 
         this.setThumbContainerPos();
@@ -7753,6 +7776,11 @@ typeof navigator === "object" && (function (global, factory) {
               height = _fitRatio2.height;
 
           return height;
+        } // If css is used this needs to return the css height for sprites to work (see setImageSizeAndOffset)
+
+
+        if (this.sizeSpecifiedInCSS) {
+          return this.elements.thumb.imageContainer.clientHeight;
         }
 
         return Math.floor(this.player.media.clientWidth / this.thumbAspectRatio / 4);
@@ -7902,11 +7930,22 @@ typeof navigator === "object" && (function (global, factory) {
 
         if (_this2.isHTML5) {
           _this2.media.load();
-        } // Reload thumbnails
+        } // Update previewThumbnails config & reload plugin
 
 
-        if (_this2.previewThumbnails) {
-          _this2.previewThumbnails.load();
+        if (!is$1.empty(input.previewThumbnails)) {
+          Object.assign(_this2.config.previewThumbnails, input.previewThumbnails); // Cleanup previewThumbnails plugin if it was loaded
+
+          if (_this2.previewThumbnails && _this2.previewThumbnails.loaded) {
+            _this2.previewThumbnails.destroy();
+
+            _this2.previewThumbnails = null;
+          } // Create new instance if it is still enabled
+
+
+          if (_this2.config.previewThumbnails.enabled) {
+            _this2.previewThumbnails = new PreviewThumbnails(_this2);
+          }
         } // Update the fullscreen support
 
 
