@@ -297,7 +297,9 @@ const youtube = {
                     });
 
                     // Get available speeds
-                    player.options.speed = instance.getAvailablePlaybackRates();
+                    const speeds = instance.getAvailablePlaybackRates();
+                    // Filter based on config
+                    player.options.speed = speeds.filter(s => player.config.speed.options.includes(s));
 
                     // Set the tabindex to avoid focus entering iframe
                     if (player.supported.ui) {

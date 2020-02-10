@@ -42,23 +42,28 @@ function assurePlaybackState(play) {
 
 const vimeo = {
     setup() {
+        const player = this;
+
         // Add embed class for responsive
-        toggleClass(this.elements.wrapper, this.config.classNames.embed, true);
+        toggleClass(player.elements.wrapper, player.config.classNames.embed, true);
+
+        // Set speed options from config
+        player.options.speed = player.config.speed.options;
 
         // Set intial ratio
-        setAspectRatio.call(this);
+        setAspectRatio.call(player);
 
         // Load the SDK if not already
         if (!is.object(window.Vimeo)) {
-            loadScript(this.config.urls.vimeo.sdk)
+            loadScript(player.config.urls.vimeo.sdk)
                 .then(() => {
-                    vimeo.ready.call(this);
+                    vimeo.ready.call(player);
                 })
                 .catch(error => {
-                    this.debug.warn('Vimeo SDK (player.js) failed to load', error);
+                    player.debug.warn('Vimeo SDK (player.js) failed to load', error);
                 });
         } else {
-            vimeo.ready.call(this);
+            vimeo.ready.call(player);
         }
     },
 
@@ -98,6 +103,11 @@ const vimeo = {
         iframe.setAttribute('allowfullscreen', '');
         iframe.setAttribute('allowtransparency', '');
         iframe.setAttribute('allow', 'autoplay');
+
+        // Set the referrer policy if required
+        if (!is.empty(config.referrerPolicy)) {
+            iframe.setAttribute('referrerPolicy', config.referrerPolicy);
+        }
 
         // Get poster, if already set
         const { poster } = player;
@@ -191,12 +201,10 @@ const vimeo = {
                 return speed;
             },
             set(input) {
-                player.embed
-                    .setPlaybackRate(input)
-                    .then(() => {
-                        speed = input;
-                        triggerEvent.call(player, player.media, 'ratechange');
-                    });
+                player.embed.setPlaybackRate(input).then(() => {
+                    speed = input;
+                    triggerEvent.call(player, player.media, 'ratechange');
+                });
             },
         });
 

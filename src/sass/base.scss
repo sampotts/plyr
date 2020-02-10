@@ -8,6 +8,7 @@
     align-items: center;
     direction: ltr;
     display: flex;
+    flex-direction: column;
     font-family: $plyr-font-family;
     font-variant-numeric: tabular-nums; // Force monosace-esque number widths
     font-weight: $plyr-font-weight-regular;

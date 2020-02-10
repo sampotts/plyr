@@ -49,7 +49,7 @@ const media = {
         }
 
         if (this.isHTML5) {
-            html5.extend.call(this);
+            html5.setup.call(this);
         } else if (this.isYouTube) {
             youtube.setup.call(this);
         } else if (this.isVimeo) {

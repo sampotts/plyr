@@ -1,3 +1,13 @@
+### v3.5.8
+
+-   Added `flex-direction` property to fix some issues introduced in v3.5.7 when using custom CSS
+-   Cleaned up the organisation of some of the SCSS files (should not effect CSS output)
+-   Added `referrerPolicy` option for Vimeo to prevent an issue present in the demo site
+-   Remove all Vimeo controls for Pro & Premium accounts
+-   Improve thumbnail size calculations when size is set per css (thanks @ydylla)
+-   Add previewThumbnails source setter (thanks @ydylla)
+-   More speed setting logic improvements
+
 ### v3.5.7
 
 -   Typescript typings (thanks @ondratra)
@@ -192,7 +202,9 @@ Thanks @friday for the following:
 -   Suggestion: Remove array newline rule
 -   Contributions improvements
 
--   fix: html5.cancelRequest not remove source tag correctly (thanks @a60814billy)
+and other folks for:
+
+-   Fix: html5.cancelRequest not remove source tag correctly (thanks @a60814billy)
 -   remove event listeners in destroy() (thanks @cky917)
 -   Fix markdown in README (thanks @azu)
 -   Some parts of the accessibility improvements outlined in #905 (more on the way...)
