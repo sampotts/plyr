@@ -6,6 +6,7 @@
 -   Remove all Vimeo controls for Pro & Premium accounts
 -   Improve thumbnail size calculations when size is set per css (thanks @ydylla)
 -   Add previewThumbnails source setter (thanks @ydylla)
+-   More speed setting logic improvements
 
 ### v3.5.7
 
