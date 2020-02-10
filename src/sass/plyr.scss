@@ -25,7 +25,6 @@
 
 @import 'base';
 
-@import 'components/audio';
 @import 'components/badges';
 @import 'components/captions';
 @import 'components/control';
@@ -35,9 +34,11 @@
 @import 'components/poster';
 @import 'components/times';
 @import 'components/tooltips';
-@import 'components/video';
 @import 'components/progress';
 @import 'components/volume';
+
+@import 'types/audio';
+@import 'types/video';
 
 @import 'states/fullscreen';
 

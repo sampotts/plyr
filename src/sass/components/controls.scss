@@ -49,40 +49,6 @@
     }
 }
 
-// Audio controls
-.plyr--audio .plyr__controls {
-    background: $plyr-audio-controls-bg;
-    border-radius: inherit;
-    color: $plyr-audio-control-color;
-    padding: $plyr-control-spacing;
-}
-
-// Video controls
-.plyr--video .plyr__controls {
-    background: linear-gradient(rgba($plyr-video-controls-bg, 0), rgba($plyr-video-controls-bg, 0.7));
-    border-bottom-left-radius: inherit;
-    border-bottom-right-radius: inherit;
-    bottom: 0;
-    color: $plyr-video-control-color;
-    left: 0;
-    padding: ($plyr-control-spacing * 2) ($plyr-control-spacing / 2) ($plyr-control-spacing / 2);
-    position: absolute;
-    right: 0;
-    transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
-    z-index: 3;
-
-    @media (min-width: $plyr-bp-sm) {
-        padding: ($plyr-control-spacing * 3.5) $plyr-control-spacing $plyr-control-spacing;
-    }
-}
-
-// Hide video controls
-.plyr--video.plyr--hide-controls .plyr__controls {
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(100%);
-}
-
 // Some options are hidden by default
 .plyr [data-plyr='captions'],
 .plyr [data-plyr='pip'],
