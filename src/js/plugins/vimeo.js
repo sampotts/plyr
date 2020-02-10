@@ -99,6 +99,11 @@ const vimeo = {
         iframe.setAttribute('allowtransparency', '');
         iframe.setAttribute('allow', 'autoplay');
 
+        // Set the referrer policy if required
+        if (!is.empty(config.referrerPolicy)) {
+            iframe.setAttribute('referrerPolicy', config.referrerPolicy);
+        }
+
         // Get poster, if already set
         const { poster } = player;
         // Inject the package
@@ -191,12 +196,10 @@ const vimeo = {
                 return speed;
             },
             set(input) {
-                player.embed
-                    .setPlaybackRate(input)
-                    .then(() => {
-                        speed = input;
-                        triggerEvent.call(player, player.media, 'ratechange');
-                    });
+                player.embed.setPlaybackRate(input).then(() => {
+                    speed = input;
+                    triggerEvent.call(player, player.media, 'ratechange');
+                });
             },
         });
 

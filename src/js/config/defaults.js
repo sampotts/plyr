@@ -419,6 +419,11 @@ const defaults = {
         title: false,
         speed: true,
         transparent: false,
+        // These settings require a pro or premium account to work
+        sidedock: false,
+        controls: false,
+        // Custom settings from Plyr
+        referrerPolicy: null, // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement/referrerPolicy
     },
 
     // YouTube plugin
