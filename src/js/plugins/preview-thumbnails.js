@@ -561,6 +561,11 @@ class PreviewThumbnails {
             return height;
         }
 
+        // If css is used this needs to return the css height for sprites to work (see setImageSizeAndOffset)
+        if (this.sizeSpecifiedInCSS) {
+            return this.elements.thumb.imageContainer.clientHeight;
+        }
+
         return Math.floor(this.player.media.clientWidth / this.thumbAspectRatio / 4);
     }
 
@@ -601,7 +606,7 @@ class PreviewThumbnails {
     }
 
     determineContainerAutoSizing() {
-        if (this.elements.thumb.imageContainer.clientHeight > 20) {
+        if (this.elements.thumb.imageContainer.clientHeight > 20 || this.elements.thumb.imageContainer.clientWidth > 20) {
             // This will prevent auto sizing in this.setThumbContainerSizeAndPos()
             this.sizeSpecifiedInCSS = true;
         }
@@ -613,6 +618,12 @@ class PreviewThumbnails {
             const thumbWidth = Math.floor(this.thumbContainerHeight * this.thumbAspectRatio);
             this.elements.thumb.imageContainer.style.height = `${this.thumbContainerHeight}px`;
             this.elements.thumb.imageContainer.style.width = `${thumbWidth}px`;
+        } else if (this.elements.thumb.imageContainer.clientHeight > 20 && this.elements.thumb.imageContainer.clientWidth < 20) {
+            const thumbWidth = Math.floor(this.elements.thumb.imageContainer.clientHeight * this.thumbAspectRatio);
+            this.elements.thumb.imageContainer.style.width = `${thumbWidth}px`;
+        } else if (this.elements.thumb.imageContainer.clientHeight < 20 && this.elements.thumb.imageContainer.clientWidth > 20) {
+            const thumbHeight = Math.floor(this.elements.thumb.imageContainer.clientWidth / this.thumbAspectRatio);
+            this.elements.thumb.imageContainer.style.height = `${thumbHeight}px`;
         }
 
         this.setThumbContainerPos();
