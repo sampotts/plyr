@@ -64,6 +64,10 @@ import toggleClass from './toggle-class';
                         'https://cdn.plyr.io/static/demo/thumbs/240p.vtt',
                     ],
                 },
+                vimeo: {
+                    // Prevent Vimeo blocking plyr.io demo site
+                    referrerPolicy: 'no-referrer',
+                }
             });
 
             // Expose for tinkering in the console
