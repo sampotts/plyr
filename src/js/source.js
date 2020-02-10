@@ -135,13 +135,13 @@ const source = {
                 if (!is.empty(input.previewThumbnails)) {
                     Object.assign(this.config.previewThumbnails, input.previewThumbnails);
 
-                    // cleanup previewThumbnails plugin if it was loaded
+                    // Cleanup previewThumbnails plugin if it was loaded
                     if (this.previewThumbnails && this.previewThumbnails.loaded) {
                         this.previewThumbnails.destroy();
                         this.previewThumbnails = null;
                     }
 
-                    // create new instance if it is still enabled
+                    // Create new instance if it is still enabled
                     if (this.config.previewThumbnails.enabled) {
                         this.previewThumbnails = new PreviewThumbnails(this);
                     }
