@@ -9,7 +9,7 @@ import captions from './captions';
 import html5 from './html5';
 import support from './support';
 import { repaint, transitionEndEvent } from './utils/animation';
-import { dedupe, fillRange } from './utils/arrays';
+import { dedupe } from './utils/arrays';
 import browser from './utils/browser';
 import {
     createElement,
@@ -1053,13 +1053,8 @@ const controls = {
         const type = 'speed';
         const list = this.elements.settings.panels.speed.querySelector('[role="menu"]');
 
-        // Determine options to display
-        // Vimeo and YouTube limit to 0.5x-2x
-        if (this.isVimeo || this.isYouTube) {
-            this.options.speed = fillRange(0.5, 2, 0.25).filter(s => this.config.speed.options.includes(s));
-        } else {
-            this.options.speed = this.config.speed.options;
-        }
+        // Filter out invalid speeds
+        this.options.speed = this.options.speed.filter(o => o >= this.minimumSpeed && o <= this.maximumSpeed);
 
         // Toggle the pane and tab
         const toggle = !is.empty(this.options.speed) && this.options.speed.length > 1;

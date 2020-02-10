@@ -42,23 +42,28 @@ function assurePlaybackState(play) {
 
 const vimeo = {
     setup() {
+        const player = this;
+
         // Add embed class for responsive
-        toggleClass(this.elements.wrapper, this.config.classNames.embed, true);
+        toggleClass(player.elements.wrapper, player.config.classNames.embed, true);
+
+        // Set speed options from config
+        player.options.speed = player.config.speed.options;
 
         // Set intial ratio
-        setAspectRatio.call(this);
+        setAspectRatio.call(player);
 
         // Load the SDK if not already
         if (!is.object(window.Vimeo)) {
-            loadScript(this.config.urls.vimeo.sdk)
+            loadScript(player.config.urls.vimeo.sdk)
                 .then(() => {
-                    vimeo.ready.call(this);
+                    vimeo.ready.call(player);
                 })
                 .catch(error => {
-                    this.debug.warn('Vimeo SDK (player.js) failed to load', error);
+                    player.debug.warn('Vimeo SDK (player.js) failed to load', error);
                 });
         } else {
-            vimeo.ready.call(this);
+            vimeo.ready.call(player);
         }
     },
 

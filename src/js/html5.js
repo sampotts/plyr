@@ -42,12 +42,15 @@ const html5 = {
             .filter(Boolean);
     },
 
-    extend() {
+    setup() {
         if (!this.isHTML5) {
             return;
         }
 
         const player = this;
+
+        // Set speed options from config
+        player.options.speed = player.config.speed.options;
 
         // Set aspect ratio if fixed
         if (!is.empty(this.config.ratio)) {
@@ -93,7 +96,6 @@ const html5 = {
                     if (preload !== 'none' || readyState) {
                         // Restore time
                         player.once('loadedmetadata', () => {
-
                             player.speed = playbackRate;
                             player.currentTime = currentTime;
 
