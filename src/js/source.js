@@ -5,6 +5,7 @@
 import { providers } from './config/types';
 import html5 from './html5';
 import media from './media';
+import PreviewThumbnails from './plugins/preview-thumbnails';
 import support from './support';
 import ui from './ui';
 import { createElement, insertElement, removeElement } from './utils/elements';
@@ -130,9 +131,20 @@ const source = {
                     this.media.load();
                 }
 
-                // Reload thumbnails
-                if (this.previewThumbnails) {
-                    this.previewThumbnails.load();
+                // Update previewThumbnails config & reload plugin
+                if (!is.empty(input.previewThumbnails)) {
+                    Object.assign(this.config.previewThumbnails, input.previewThumbnails);
+
+                    // cleanup previewThumbnails plugin if it was loaded
+                    if (this.previewThumbnails && this.previewThumbnails.loaded) {
+                        this.previewThumbnails.destroy();
+                        this.previewThumbnails = null;
+                    }
+
+                    // create new instance if it is still enabled
+                    if (this.config.previewThumbnails.enabled) {
+                        this.previewThumbnails = new PreviewThumbnails(this);
+                    }
                 }
 
                 // Update the fullscreen support
