@@ -67,15 +67,6 @@ $plyr-progress-offset: $plyr-range-thumb-height;
     }
 }
 
-.plyr--video .plyr__progress__buffer {
-    box-shadow: 0 1px 1px rgba(#000, 0.15);
-    color: $plyr-video-progress-buffered-bg;
-}
-
-.plyr--audio .plyr__progress__buffer {
-    color: $plyr-audio-progress-buffered-bg;
-}
-
 // Loading state
 .plyr--loading .plyr__progress__buffer {
     animation: plyr-progress 1s linear infinite;
