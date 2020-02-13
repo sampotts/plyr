@@ -26178,9 +26178,6 @@ typeof navigator === "object" && (function () {
 	        captions: {
 	          active: true
 	        },
-	        keys: {
-	          google: 'AIzaSyDrNwtN3nLH_8rjCmu5Wq3ZCm4MNAVdc0c'
-	        },
 	        ads: {
 	          enabled: env.prod || env.dev,
 	          publisherId: '918848828995742'
