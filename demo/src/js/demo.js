@@ -50,9 +50,6 @@ import toggleClass from './toggle-class';
                 captions: {
                     active: true,
                 },
-                keys: {
-                    google: 'AIzaSyDrNwtN3nLH_8rjCmu5Wq3ZCm4MNAVdc0c',
-                },
                 ads: {
                     enabled: env.prod || env.dev,
                     publisherId: '918848828995742',
@@ -67,7 +64,7 @@ import toggleClass from './toggle-class';
                 vimeo: {
                     // Prevent Vimeo blocking plyr.io demo site
                     referrerPolicy: 'no-referrer',
-                }
+                },
             });
 
             // Expose for tinkering in the console

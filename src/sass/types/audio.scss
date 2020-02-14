@@ -54,3 +54,8 @@
         }
     }
 }
+
+// Progress
+.plyr--audio .plyr__progress__buffer {
+    color: $plyr-audio-progress-buffered-bg;
+}

@@ -152,6 +152,7 @@ $embed-padding: ((100 / 16) * 9);
     }
 }
 
-.plyr--video .plyr__time {
-    text-shadow: 0 1px 1px rgba(#000, 0.15);
+// Progress
+.plyr--video .plyr__progress__buffer {
+    color: $plyr-video-progress-buffered-bg;
 }
