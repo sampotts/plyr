@@ -17,3 +17,9 @@
         z-index: 2;
     }
 }
+
+// Auto size on iOS as there's no slider
+.plyr--is-ios .plyr__volume {
+    min-width: 0;
+    width: auto;
+}
