@@ -5,20 +5,15 @@
 .plyr__volume {
     align-items: center;
     display: flex;
+    max-width: 110px;
+    min-width: 80px;
     position: relative;
+    width: 20%;
 
     input[type='range'] {
         margin-left: ($plyr-control-spacing / 2);
         margin-right: ($plyr-control-spacing / 2);
         position: relative;
         z-index: 2;
-    }
-
-    @media (min-width: $plyr-bp-sm) {
-        max-width: 90px;
-    }
-
-    @media (min-width: $plyr-bp-md) {
-        max-width: 110px;
     }
 }
