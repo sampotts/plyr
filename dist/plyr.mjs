@@ -3654,7 +3654,7 @@ var defaults$1 = {
   // Sprite (for icons)
   loadSprite: true,
   iconPrefix: 'plyr',
-  iconUrl: 'https://cdn.plyr.io/3.5.8/plyr.svg',
+  iconUrl: 'https://cdn.plyr.io/3.5.9/plyr.svg',
   // Blank video (used to prevent errors on source change)
   blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
   // Quality default
@@ -4485,7 +4485,12 @@ var ui = {
     } // Set property synchronously to respect the call order
 
 
-    this.media.setAttribute('poster', poster); // Wait until ui is ready
+    this.media.setAttribute('poster', poster); // HTML5 uses native poster attribute
+
+    if (this.isHTML5) {
+      return Promise.resolve(poster);
+    } // Wait until ui is ready
+
 
     return ready.call(this) // Load image
     .then(function () {
