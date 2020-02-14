@@ -1,3 +1,7 @@
+### v3.5.10
+
+-   iOS volume display fix
+
 ### v3.5.9
 
 -   Fix for regression with volume control width
