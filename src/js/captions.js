@@ -151,7 +151,8 @@ const captions = {
         toggleClass(this.elements.container, this.config.classNames.captions.enabled, !is.empty(tracks));
 
         // Update available languages in list
-        if ((this.config.controls || []).includes('settings') && this.config.settings.includes('captions')) {
+        if ((is.array(this.config.controls) && this.config.controls.includes('settings'))
+            && this.config.settings.includes('captions')) {
             controls.setCaptionsMenu.call(this);
         }
     },
