@@ -29,6 +29,12 @@ Please follow the instructions in our issue templates. Don't use github issues t
 
 * To test locally, you can use the demo. First make sure you have installed the dependencies with `npm install` or `yarn`. Run `gulp` to build while you are working, and run a local server from the repository root directory. If you have Python installed, this command should work: `python -m SimpleHTTPServer 8080`. Then go to `http://localhost:8080/demo/`
 
+### Online one-click setup
+
+You can use gitpod(a free online vs code like ide) for contributing, with a single click it will automatically launch a ready to code workspace with all the dependencies pre-installed, gulp watching for changes and the web server running, so that you can start straight away without wasting time on the setup.
+
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/from-referrer/)
+
 * Develop and test your modifications.
 
 * Preferably commit your changes as independent logical chunks, with meaningful messages. Make sure you do not commit unnecessary files or changes, such as the build output, or logging and breakpoints you added for testing.
