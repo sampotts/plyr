@@ -62,6 +62,7 @@ const support = {
     airplay: is.function(window.WebKitPlaybackTargetAvailabilityEvent),
 
     // Inline playback support
+    googlecast: !is.nullOrUndefined(window.chrome),
     // https://webkit.org/blog/6784/new-video-policies-for-ios/
     playsinline: 'playsInline' in document.createElement('video'),
 

@@ -245,6 +245,14 @@ const controls = {
                 props.icon = 'play';
                 break;
 
+            case 'googlecast':
+                props.toggle = true;
+                props.label = 'enableGoogleCast';
+                props.labelPressed = 'disableGoogleCast';
+                props.icon = 'googlecast-off';
+                props.iconPressed = 'googlecast-on';
+                break;
+
             default:
                 if (is.empty(props.label)) {
                     props.label = type;
@@ -1595,6 +1603,11 @@ const controls = {
             // Toggle fullscreen button
             if (control === 'fullscreen') {
                 container.appendChild(createButton.call(this, 'fullscreen', defaultAttributes));
+            }
+
+            // Google cast button
+            if (control === 'googlecast' && support.googlecast) {
+                container.appendChild(controls.createButton.call(this, 'googlecast'));
             }
         });
 

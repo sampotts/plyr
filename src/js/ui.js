@@ -11,6 +11,7 @@ import { ready, triggerEvent } from './utils/events';
 import i18n from './utils/i18n';
 import is from './utils/is';
 import loadImage from './utils/load-image';
+import googlecast from './plugins/google-cast';
 
 const ui = {
     addStyleHook() {
@@ -60,6 +61,9 @@ const ui = {
         if (this.isHTML5) {
             captions.setup.call(this);
         }
+
+        // setup googlecast
+        googlecast.setup.call(this);
 
         // Reset volume
         this.volume = null;

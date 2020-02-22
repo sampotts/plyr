@@ -610,7 +610,7 @@ class Listeners {
                 controls.toggleMenu.call(player, event);
             },
             null,
-            false
+            false,
         ); // Can't be passive as we're preventing default
 
         // Settings menu - keyboard toggle
@@ -849,6 +849,8 @@ class Listeners {
             'volume',
             false,
         );
+
+        this.bind(elements.buttons.googlecast, 'click', player.googlecast, 'googlecast');
     }
 }
 

@@ -139,7 +139,7 @@ const defaults = {
         'settings',
         'pip',
         'airplay',
-        // 'download',
+        'googlecast',
         'fullscreen',
     ],
     settings: ['captions', 'quality', 'speed'],
@@ -189,6 +189,8 @@ const defaults = {
             576: 'SD',
             480: 'SD',
         },
+        enableGoogleCast: 'Google Cast',
+        disableGoogleCast: 'Disable Cast',
     },
 
     // URLs
@@ -205,6 +207,9 @@ const defaults = {
         },
         googleIMA: {
             sdk: 'https://imasdk.googleapis.com/js/sdkloader/ima3.js',
+        },
+        googlecast: {
+            api: 'https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=0',
         },
     },
 
@@ -227,6 +232,7 @@ const defaults = {
         quality: null,
         loop: null,
         language: null,
+        googlecast: null,
     },
 
     // Events to watch and bubble
@@ -307,6 +313,7 @@ const defaults = {
             airplay: '[data-plyr="airplay"]',
             settings: '[data-plyr="settings"]',
             loop: '[data-plyr="loop"]',
+            googlecast: '[data-plyr="googlecast"]',
         },
         inputs: {
             seek: '[data-plyr="seek"]',
@@ -325,6 +332,7 @@ const defaults = {
         progress: '.plyr__progress',
         captions: '.plyr__captions',
         caption: '.plyr__caption',
+        googlecast: '.plyr__googlecast',
     },
 
     // Class hooks added to the player in different states
@@ -387,6 +395,10 @@ const defaults = {
             // Scrubbing
             scrubbingContainer: 'plyr__preview-scrubbing',
             scrubbingContainerShown: 'plyr__preview-scrubbing--is-shown',
+        },
+        googlecast: {
+            enabled: 'plyr--googlecast-enabled',
+            active: 'plyr--googlecast-active',
         },
     },
 

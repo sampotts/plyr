@@ -6,6 +6,7 @@ import { providers } from './config/types';
 import html5 from './html5';
 import media from './media';
 import PreviewThumbnails from './plugins/preview-thumbnails';
+import googlecast from './plugins/google-cast';
 import support from './support';
 import ui from './ui';
 import { createElement, insertElement, removeElement } from './utils/elements';
@@ -37,6 +38,10 @@ const source = {
         // Cancel current network requests
         html5.cancelRequests.call(this);
 
+        if (this.hls) {
+            this.hls.destroy();
+        }
+
         // Destroy instance and re-setup
         this.destroy.call(
             this,
@@ -47,6 +52,7 @@ const source = {
                 // Remove elements
                 removeElement(this.media);
                 this.media = null;
+                delete plyr.hls;
 
                 // Reset class name
                 if (is.element(this.elements.container)) {
