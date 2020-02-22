@@ -17,7 +17,6 @@ import media from './media';
 import Ads from './plugins/ads';
 import PreviewThumbnails from './plugins/preview-thumbnails';
 import googlecast from './plugins/google-cast';
-
 import source from './source';
 import Storage from './storage';
 import support from './support';
@@ -1040,7 +1039,6 @@ class Plyr {
         if (!support.googlecast) {
             return;
         }
-        console.log("REQUEST SESSION")
         googlecast.requestSession(this);
     }
 
