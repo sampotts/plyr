@@ -103,18 +103,18 @@ class Listeners {
                 case 75:
                     // Space and K key
                     if (!repeat) {
-                        this.proxy(event, () => silencePromise(player.togglePlay()), 'play')
+                        this.proxy(event, () => silencePromise(player.togglePlay()), 'play');
                     }
                     break;
 
                 case 38:
                     // Arrow up
-                    this.proxy(event, () => player.increaseVolume(0.1), 'volume')
+                    this.proxy(event, () => player.increaseVolume(0.1), 'volume');
                     break;
 
                 case 40:
                     // Arrow down
-                    this.proxy(event, () => player.decreaseVolume(0.1), 'volume')
+                    this.proxy(event, () => player.decreaseVolume(0.1), 'volume');
                     break;
 
                 case 77:
@@ -128,23 +128,23 @@ class Listeners {
 
                 case 39:
                     // Arrow forward
-                    this.proxy(event, player.forward, 'fastForward')
+                    this.proxy(event, player.forward, 'fastForward');
                     break;
 
                 case 37:
                     // Arrow back
-                    this.proxy(event, player.rewind, 'rewind')
+                    this.proxy(event, player.rewind, 'rewind');
                     break;
 
                 case 70:
                     // F key
-                    this.proxy(event, () => player.fullscreen.toggle(), 'fullscreen')
+                    this.proxy(event, player.fullscreen.toggle, 'fullscreen');
                     break;
 
                 case 67:
                     // C key
                     if (!repeat) {
-                        this.proxy(event, () => player.toggleCaptions(), 'captions')
+                        this.proxy(event, player.toggleCaptions, 'captions');
                     }
                     break;
 
@@ -174,7 +174,7 @@ class Listeners {
             // Escape is handle natively when in full screen
             // So we only need to worry about non native
             if (code === 27 && !player.fullscreen.usingNative && player.fullscreen.active) {
-                this.proxy(event, () => player.fullscreen.toggle(), 'fullscreen')
+                this.proxy(event, player.fullscreen.toggle, 'fullscreen');
             }
 
             // Store last code for next cycle
