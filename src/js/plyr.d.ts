@@ -134,6 +134,21 @@ declare class Plyr {
      */
     pip: boolean;
 
+    /**
+     * Gets or sets the aspect ratio for embedded players.
+     */
+    ratio?: string;
+
+    /**
+     * Returns the current video Provider
+     */
+    readonly provider: 'html5' | 'vimeo' | 'youtube';
+
+    /**
+     * Returns the native API for Vimeo or Youtube players
+     */
+    readonly embed?: any;
+
     readonly fullscreen: Plyr.FullscreenControl;
 
     /**
@@ -472,6 +487,16 @@ declare namespace Plyr {
          * enabled: Whether to enable vi.ai ads. publisherId: Your unique vi.ai publisher ID.
          */
         ads?: AdOptions;
+
+        /**
+         * Vimeo Player Options.
+         */
+        vimeo?: object;
+
+        /**
+         * Youtube Player Options.
+         */
+        youtube?: object;
     }
 
     interface QualityOptions {
