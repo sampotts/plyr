@@ -138,7 +138,7 @@ class PreviewThumbnails {
             }
 
             // Resolve promise
-            const resolvePromise = () => {
+            const sortAndResolve = () => {
                 // Sort smallest to biggest (e.g., [120p, 480p, 1080p])
                 this.thumbnails.sort((x, y) => x.height - y.height);
 
@@ -147,13 +147,13 @@ class PreviewThumbnails {
                 resolve();
             };
             // Via callback()
-            if (typeof(src) == 'function') {
+            if (is.function(src)) {
                 // Ask
                 let that = this;
                 src(function(thumbnails) {
                     that.thumbnails = thumbnails;
                     // Resolve
-                    resolvePromise();
+                    sortAndResolve();
                 });
             }
             // VTT urls
@@ -163,7 +163,7 @@ class PreviewThumbnails {
                 // Loop through each src URL. Download and process the VTT file, storing the resulting data in this.thumbnails
                 const promises = urls.map(u => this.getThumbnail(u));
                 // Resolve
-                Promise.all(promises).then(resolvePromise);
+                Promise.all(promises).then(sortAndResolve);
             }
         });
     }
