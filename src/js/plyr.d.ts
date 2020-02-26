@@ -94,9 +94,8 @@ declare class Plyr {
 
     /**
      * Gets or sets the quality for the player. The setter accepts a value from the options specified in your config.
-     * Remarks: YouTube only. HTML5 will follow.
      */
-    quality: string;
+    quality: number;
 
     /**
      * Gets or sets the current loop state of the player.
@@ -475,8 +474,8 @@ declare namespace Plyr {
     }
 
     interface QualityOptions {
-        default: string;
-        options: string[];
+        default: number;
+        options: number[];
     }
 
     interface LoopOptions {
