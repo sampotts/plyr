@@ -138,7 +138,7 @@ class PreviewThumbnails {
             }
 
             // Resolve promise
-            const exec_resolve = () => {
+            const resolvePromise = () => {
                 // Sort smallest to biggest (e.g., [120p, 480p, 1080p])
                 this.thumbnails.sort((x, y) => x.height - y.height);
 
@@ -147,11 +147,14 @@ class PreviewThumbnails {
                 resolve();
             };
             // Via callback()
-            if( typeof(src) == 'function' ) {
+            if (typeof(src) == 'function') {
                 // Ask
-                this.thumbnails = src();
-                // Resolve
-                exec_resolve();
+                let that = this;
+                src(function(thumbnails) {
+                    that.thumbnails = thumbnails;
+                    // Resolve
+                    resolvePromise();
+                });
             }
             // VTT urls
             else {
@@ -160,7 +163,7 @@ class PreviewThumbnails {
                 // Loop through each src URL. Download and process the VTT file, storing the resulting data in this.thumbnails
                 const promises = urls.map(u => this.getThumbnail(u));
                 // Resolve
-                Promise.all(promises).then(exec_resolve);
+                Promise.all(promises).then(resolvePromise);
             }
         });
     }
