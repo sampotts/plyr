@@ -172,6 +172,17 @@ class Ads {
         // We assume the adContainer is the video container of the plyr element that will house the ads
         this.elements.displayContainer = new google.ima.AdDisplayContainer(this.elements.container, this.player.media);
 
+        // Create ads loader
+        this.loader = new google.ima.AdsLoader(this.elements.displayContainer);
+
+        // Listen and respond to ads loaded and error events
+        this.loader.addEventListener(
+            google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED,
+            event => this.onAdsManagerLoaded(event),
+            false,
+        );
+        this.loader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, error => this.onAdError(error), false);
+
         // Request video ads to be pre-loaded
         this.requestAds();
     }
@@ -183,17 +194,6 @@ class Ads {
         const { container } = this.player.elements;
 
         try {
-            // Create ads loader
-            this.loader = new google.ima.AdsLoader(this.elements.displayContainer);
-
-            // Listen and respond to ads loaded and error events
-            this.loader.addEventListener(
-                google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED,
-                event => this.onAdsManagerLoaded(event),
-                false,
-            );
-            this.loader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, error => this.onAdError(error), false);
-
             // Request video ads
             const request = new google.ima.AdsRequest();
             request.adTagUrl = this.tagUrl;
@@ -369,7 +369,14 @@ class Ads {
                 // TODO: So there is still this thing where a video should only be allowed to start
                 // playing when the IMA SDK is ready or has failed
 
-                this.loadAds();
+                if (player.ended){
+				    this.loadAds();
+			    }
+			    else
+			    {
+                    // The SDK won't allow new ads to be called without receiving a contentComplete()
+				    this.loader.contentComplete();
+			    }
 
                 break;
 
@@ -563,6 +570,8 @@ class Ads {
                     this.on('loaded', resolve);
                     this.player.debug.log(this.manager);
                 });
+                // Now that the manager has been destroyed set it to also be un-initialized
+                this.initialized = false;
 
                 // Now request some new advertisements
                 this.requestAds();
