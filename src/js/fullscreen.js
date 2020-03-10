@@ -118,7 +118,7 @@ class Fullscreen {
 
         const element = !this.prefix ? document.fullscreenElement : document[`${this.prefix}${this.property}Element`];
 
-        return element === this.target;
+        return (element && element.shadowRoot) ? element === this.target.getRootNode().host : element === this.target;
     }
 
     // Get target element
