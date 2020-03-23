@@ -6,6 +6,7 @@ import support from './support';
 import { removeElement } from './utils/elements';
 import { triggerEvent } from './utils/events';
 import is from './utils/is';
+import { silencePromise } from './utils/promise';
 import { setAspectRatio } from './utils/style';
 
 const html5 = {
@@ -101,7 +102,7 @@ const html5 = {
 
                             // Resume playing
                             if (!paused) {
-                                player.play();
+                                silencePromise(player.play());
                             }
                         });
 

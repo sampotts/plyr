@@ -11,6 +11,7 @@ import { triggerEvent } from '../utils/events';
 import i18n from '../utils/i18n';
 import is from '../utils/is';
 import loadScript from '../utils/load-script';
+import { silencePromise } from '../utils/promise';
 import { formatTime } from '../utils/time';
 import { buildUrlParams } from '../utils/urls';
 
@@ -510,7 +511,7 @@ class Ads {
         this.playing = false;
 
         // Play video
-        this.player.media.play();
+        silencePromise(this.player.media.play());
     }
 
     /**
