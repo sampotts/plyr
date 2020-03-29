@@ -1,6 +1,8 @@
 Plyr is a simple, lightweight, accessible and customizable HTML5, YouTube and Vimeo media player that supports [_modern_](#browser-support) browsers.
 
-[Checkout the demo](https://plyr.io) - [Donate](#donate) - [Slack](https://bit.ly/plyr--chat) - [![npm version](https://badge.fury.io/js/plyr.svg)](https://badge.fury.io/js/plyr)
+[Checkout the demo](https://plyr.io) - [Donate](#donate) - [Slack](https://bit.ly/plyr--chat)
+
+[![npm version](https://badge.fury.io/js/plyr.svg)](https://badge.fury.io/js/plyr) [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/sampotts/plyr) [![Financial Contributors on Open Collective](https://opencollective.com/plyr/all/badge.svg?label=financial+contributors)](https://opencollective.com/plyr)
 
 [![Image of Plyr](https://cdn.plyr.io/static/demo/screenshot.png?v=3)](https://plyr.io)
 
@@ -168,12 +170,14 @@ Plyr has partnered up with [vi.ai](https://vi.ai/publisher-video-monetization/?a
 
 Any questions regarding the ads can be sent straight to vi.ai and any issues with rendering raised through GitHub issues.
 
+If you do not wish to use Vi, you can set your own `ads.tagUrl` [option](#options).
+
 # Advanced
 
 ## SASS
 
-You can use `bundle.scss` file included in `/src` as part of your build and change variables to suit your design. The SASS require you to
-use the [autoprefixer](https://www.npmjs.com/package/gulp-autoprefixer) plugin (you should be already!) as all declarations use the W3C definitions.
+You can use `plyr.scss` file included in `/src/sass` as part of your build and change variables to suit your design. The SASS requires you to
+use [autoprefixer](https://www.npmjs.com/package/gulp-autoprefixer) (you should be already!) as all declarations use the W3C definitions.
 
 The HTML markup uses the BEM methodology with `plyr` as the block, e.g. `.plyr__controls`. You can change the class hooks in the options to match any custom CSS
 you write. Check out the JavaScript source for more on this.
@@ -305,7 +309,7 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
 | `speed`              | Object                     | `{ selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2] }`                                                                 | `selected`: The default speed for playback. `options`: The speed options to display in the UI. YouTube and Vimeo will ignore any options outside of the 0.5-2 range, so options outside of this range will be hidden automatically.                                                                                                                                                                     |
 | `quality`            | Object                     | `{ default: 576, options: [4320, 2880, 2160, 1440, 1080, 720, 576, 480, 360, 240] }`                                           | `default` is the default quality level (if it exists in your sources). `options` are the options to display. This is used to filter the available sources.                                                                                                                                                                                                                                              |
 | `loop`               | Object                     | `{ active: false }`                                                                                                            | `active`: Whether to loop the current video. If the `loop` attribute is present on a `<video>` or `<audio>` element, this will be automatically set to true This is an object to support future functionality.                                                                                                                                                                                          |
-| `ads`                | Object                     | `{ enabled: false, publisherId: '' }`                                                                                          | `enabled`: Whether to enable advertisements. `publisherId`: Your unique [vi.ai](https://vi.ai/publisher-video-monetization/?aid=plyrio) publisher ID.                                                                                                                                                                                                                                                   |
+| `ads`                | Object                     | `{ enabled: false, publisherId: '', tagUrl: '' }`                                                                              | `enabled`: Whether to enable advertisements. `publisherId`: Your unique [vi.ai](https://vi.ai/publisher-video-monetization/?aid=plyrio) publisher ID. `tagUrl` is a URL for a custom VAST tag if you're not using Vi.                                                                                                                                                                                   |
 | `urls`               | Object                     | See source.                                                                                                                    | If you wish to override any API URLs then you can do so here. You can also set a custom download URL for the download button.                                                                                                                                                                                                                                                                           |
 | `vimeo`              | Object                     | `{ byline: false, portrait: false, title: false, speed: true, transparent: false }`                                            | See [Vimeo embed options](https://github.com/vimeo/player.js/#embed-options). Some are set automatically based on other config options, namely: `loop`, `autoplay`, `muted`, `gesture`, `playsinline`                                                                                                                                                                                                   |
 | `youtube`            | Object                     | `{ noCookie: false, rel: 0, showinfo: 0, iv_load_policy: 3, modestbranding: 1 }`                                               | See [YouTube embed options](https://developers.google.com/youtube/player_parameters#Parameters). The only custom option is `noCookie` to use an alternative to YouTube that doesn't use cookies (useful for GDPR, etc). Some are set automatically based on other config options, namely: `autoplay`, `hl`, `controls`, `disablekb`, `playsinline`, `cc_load_policy`, `cc_lang_pref`, `widget_referrer` |
@@ -349,30 +353,30 @@ player.play(); // Start playback
 player.fullscreen.enter(); // Enter fullscreen
 ```
 
-| Method                   | Parameters       | Description                                                                                                |
-| ------------------------ | ---------------- | ---------------------------------------------------------------------------------------------------------- |
-| `play()`&sup1;           | -                | Start playback.                                                                                            |
-| `pause()`                | -                | Pause playback.                                                                                            |
-| `togglePlay(toggle)`     | Boolean          | Toggle playback, if no parameters are passed, it will toggle based on current status.                      |
-| `stop()`                 | -                | Stop playback and reset to start.                                                                          |
-| `restart()`              | -                | Restart playback.                                                                                          |
-| `rewind(seekTime)`       | Number           | Rewind playback by the specified seek time. If no parameter is passed, the default seek time will be used. |
-| `forward(seekTime)`      | Number           | Fast forward by the specified seek time. If no parameter is passed, the default seek time will be used.    |
-| `increaseVolume(step)`   | Number           | Increase volume by the specified step. If no parameter is passed, the default step will be used.           |
-| `decreaseVolume(step)`   | Number           | Increase volume by the specified step. If no parameter is passed, the default step will be used.           |
-| `toggleCaptions(toggle)` | Boolean          | Toggle captions display. If no parameter is passed, it will toggle based on current status.                |
-| `fullscreen.enter()`     | -                | Enter fullscreen. If fullscreen is not supported, a fallback "full window/viewport" is used instead.       |
-| `fullscreen.exit()`      | -                | Exit fullscreen.                                                                                           |
-| `fullscreen.toggle()`    | -                | Toggle fullscreen.                                                                                         |
-| `airplay()`              | -                | Trigger the airplay dialog on supported devices.                                                           |
-| `toggleControls(toggle)` | Boolean          | Toggle the controls (video only). Takes optional truthy value to force it on/off.                          |
-| `on(event, function)`    | String, Function | Add an event listener for the specified event.                                                             |
-| `once(event, function)`  | String, Function | Add an event listener for the specified event once.                                                        |
-| `off(event, function)`   | String, Function | Remove an event listener for the specified event.                                                          |
-| `supports(type)`         | String           | Check support for a mime type.                                                                             |
-| `destroy()`              | -                | Destroy the instance and garbage collect any elements.                                                     |
+| Method                     | Parameters       | Description                                                                                                |
+| -------------------------- | ---------------- | ---------------------------------------------------------------------------------------------------------- |
+| `play()`&sup1;             | -                | Start playback.                                                                                            |
+| `pause()`                  | -                | Pause playback.                                                                                            |
+| `togglePlay(toggle)`&sup1; | Boolean          | Toggle playback, if no parameters are passed, it will toggle based on current status.                      |
+| `stop()`                   | -                | Stop playback and reset to start.                                                                          |
+| `restart()`                | -                | Restart playback.                                                                                          |
+| `rewind(seekTime)`         | Number           | Rewind playback by the specified seek time. If no parameter is passed, the default seek time will be used. |
+| `forward(seekTime)`        | Number           | Fast forward by the specified seek time. If no parameter is passed, the default seek time will be used.    |
+| `increaseVolume(step)`     | Number           | Increase volume by the specified step. If no parameter is passed, the default step will be used.           |
+| `decreaseVolume(step)`     | Number           | Increase volume by the specified step. If no parameter is passed, the default step will be used.           |
+| `toggleCaptions(toggle)`   | Boolean          | Toggle captions display. If no parameter is passed, it will toggle based on current status.                |
+| `fullscreen.enter()`       | -                | Enter fullscreen. If fullscreen is not supported, a fallback "full window/viewport" is used instead.       |
+| `fullscreen.exit()`        | -                | Exit fullscreen.                                                                                           |
+| `fullscreen.toggle()`      | -                | Toggle fullscreen.                                                                                         |
+| `airplay()`                | -                | Trigger the airplay dialog on supported devices.                                                           |
+| `toggleControls(toggle)`   | Boolean          | Toggle the controls (video only). Takes optional truthy value to force it on/off.                          |
+| `on(event, function)`      | String, Function | Add an event listener for the specified event.                                                             |
+| `once(event, function)`    | String, Function | Add an event listener for the specified event once.                                                        |
+| `off(event, function)`     | String, Function | Remove an event listener for the specified event.                                                          |
+| `supports(type)`           | String           | Check support for a mime type.                                                                             |
+| `destroy()`                | -                | Destroy the instance and garbage collect any elements.                                                     |
 
-1.  For HTML5 players, `play()` will return a [`Promise`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) in _some_ browsers - WebKit and Mozilla [according to MDN](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/play) at time of writing.
+1.  For HTML5 players, `play()` will return a [`Promise`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) for most browsers - e.g. Chrome, Firefox, Opera, Safari and Edge [according to MDN](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/play) at time of writing.
 
 ## Getters and Setters
 
@@ -446,7 +450,7 @@ player.source = {
     ],
     poster: '/path/to/poster.jpg',
     previewThumbnails: {
-        src: '/path/to/thumbnails.vtt'
+        src: '/path/to/thumbnails.vtt',
     },
     tracks: [
         {
@@ -751,6 +755,29 @@ Massive thanks to [Fastly](https://www.fastly.com/) for providing the CDN servic
 [![Sentry](https://cdn.plyr.io/static/sentry-logo-black.svg)](https://sentry.io/)
 
 Massive thanks to [Sentry](https://sentry.io/) for providing the logging services for the demo site.
+
+## Contributors
+
+### Code Contributors
+
+This project exists thanks to all the people who contribute. [[Contribute](CONTRIBUTING.md)].
+
+<a href="https://github.com/sampotts/plyr/graphs/contributors"><img src="https://opencollective.com/plyr/contributors.svg?width=890&button=false" /></a>
+
+### Financial Contributors
+
+Become a financial contributor and help us sustain our community. [[Contribute](https://opencollective.com/plyr/contribute)]
+
+#### Individuals
+
+<a href="https://opencollective.com/plyr"><img src="https://opencollective.com/plyr/individuals.svg?width=890"></a>
+
+#### Organizations
+
+Support this project with your organization. Your logo will show up here with a link to your website. [[Contribute](https://opencollective.com/plyr/contribute)]
+
+<a href="https://opencollective.com/plyr/organization/0/website"><img src="https://opencollective.com/plyr/organization/0/avatar.svg"></a>
+<a href="https://opencollective.com/plyr/organization/1/website"><img src="https://opencollective.com/plyr/organization/1/avatar.svg"></a><a href="https://opencollective.com/plyr/organization/2/website"><img src="https://opencollective.com/plyr/organization/2/avatar.svg"></a>
 
 # Copyright and License
 

@@ -221,7 +221,7 @@ export function hasClass(element, className) {
 
 // Element matches selector
 export function matches(element, selector) {
-    const prototype = { Element };
+    const {prototype} = Element;
 
     function match() {
         return Array.from(document.querySelectorAll(selector)).includes(this);

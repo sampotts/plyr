@@ -137,19 +137,32 @@ class PreviewThumbnails {
                 throw new Error('Missing previewThumbnails.src config attribute');
             }
 
-            // If string, convert into single-element list
-            const urls = is.string(src) ? [src] : src;
-            // Loop through each src URL. Download and process the VTT file, storing the resulting data in this.thumbnails
-            const promises = urls.map(u => this.getThumbnail(u));
-
-            Promise.all(promises).then(() => {
+            // Resolve promise
+            const sortAndResolve = () => {
                 // Sort smallest to biggest (e.g., [120p, 480p, 1080p])
                 this.thumbnails.sort((x, y) => x.height - y.height);
 
                 this.player.debug.log('Preview thumbnails', this.thumbnails);
 
                 resolve();
-            });
+            };
+
+            // Via callback()
+            if (is.function(src)) {
+                src(thumbnails => {
+                    this.thumbnails = thumbnails;
+                    sortAndResolve();
+                });
+            }
+            // VTT urls
+            else {
+                // If string, convert into single-element list
+                const urls = is.string(src) ? [src] : src;
+                // Loop through each src URL. Download and process the VTT file, storing the resulting data in this.thumbnails
+                const promises = urls.map(u => this.getThumbnail(u));
+                // Resolve
+                Promise.all(promises).then(sortAndResolve);
+            }
         });
     }
 
