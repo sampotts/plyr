@@ -432,9 +432,21 @@ class Listeners {
 
                 if (player.ended) {
                     this.proxy(event, player.restart, 'restart');
-                    this.proxy(event, () => { silencePromise(player.play()) }, 'play');
+                    this.proxy(
+                        event,
+                        () => {
+                            silencePromise(player.play());
+                        },
+                        'play',
+                    );
                 } else {
-                    this.proxy(event, () => { silencePromise(player.togglePlay()) }, 'play');
+                    this.proxy(
+                        event,
+                        () => {
+                            silencePromise(player.togglePlay());
+                        },
+                        'play',
+                    );
                 }
             });
         }
@@ -540,7 +552,14 @@ class Listeners {
         // Play/pause toggle
         if (elements.buttons.play) {
             Array.from(elements.buttons.play).forEach(button => {
-                this.bind(button, 'click', () => { silencePromise(player.togglePlay()) }, 'play');
+                this.bind(
+                    button,
+                    'click',
+                    () => {
+                        silencePromise(player.togglePlay());
+                    },
+                    'play',
+                );
             });
         }
 
@@ -611,7 +630,7 @@ class Listeners {
                 controls.toggleMenu.call(player, event);
             },
             null,
-            false
+            false,
         ); // Can't be passive as we're preventing default
 
         // Settings menu - keyboard toggle
