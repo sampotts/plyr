@@ -204,6 +204,9 @@ const vimeo = {
                 player.embed.setPlaybackRate(input).then(() => {
                     speed = input;
                     triggerEvent.call(player, player.media, 'ratechange');
+                }).catch(() => {
+                    // Cannot set Playback Rate, Video is probably not on Pro account
+                    player.options.speed = [1];
                 });
             },
         });
