@@ -9,6 +9,7 @@ import browser from './utils/browser';
 import { getElement, getElements, matches, toggleClass } from './utils/elements';
 import { off, on, once, toggleListener, triggerEvent } from './utils/events';
 import is from './utils/is';
+import { silencePromise } from './utils/promise';
 import { getAspectRatio, setAspectRatio } from './utils/style';
 
 class Listeners {
@@ -99,7 +100,7 @@ class Listeners {
                 case 75:
                     // Space and K key
                     if (!repeat) {
-                        player.togglePlay();
+                        silencePromise(player.togglePlay());
                     }
                     break;
 
@@ -431,9 +432,9 @@ class Listeners {
 
                 if (player.ended) {
                     this.proxy(event, player.restart, 'restart');
-                    this.proxy(event, player.play, 'play');
+                    this.proxy(event, () => { silencePromise(player.play()) }, 'play');
                 } else {
-                    this.proxy(event, player.togglePlay, 'play');
+                    this.proxy(event, () => { silencePromise(player.togglePlay()) }, 'play');
                 }
             });
         }
@@ -539,7 +540,7 @@ class Listeners {
         // Play/pause toggle
         if (elements.buttons.play) {
             Array.from(elements.buttons.play).forEach(button => {
-                this.bind(button, 'click', player.togglePlay, 'play');
+                this.bind(button, 'click', () => { silencePromise(player.togglePlay()) }, 'play');
             });
         }
 
@@ -681,7 +682,7 @@ class Listeners {
             // If we're done seeking and it was playing, resume playback
             if (play && done) {
                 seek.removeAttribute(attribute);
-                player.play();
+                silencePromise(player.play());
             } else if (!done && player.playing) {
                 seek.setAttribute(attribute, '');
                 player.pause();

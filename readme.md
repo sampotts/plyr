@@ -351,30 +351,30 @@ player.play(); // Start playback
 player.fullscreen.enter(); // Enter fullscreen
 ```
 
-| Method                   | Parameters       | Description                                                                                                |
-| ------------------------ | ---------------- | ---------------------------------------------------------------------------------------------------------- |
-| `play()`&sup1;           | -                | Start playback.                                                                                            |
-| `pause()`                | -                | Pause playback.                                                                                            |
-| `togglePlay(toggle)`     | Boolean          | Toggle playback, if no parameters are passed, it will toggle based on current status.                      |
-| `stop()`                 | -                | Stop playback and reset to start.                                                                          |
-| `restart()`              | -                | Restart playback.                                                                                          |
-| `rewind(seekTime)`       | Number           | Rewind playback by the specified seek time. If no parameter is passed, the default seek time will be used. |
-| `forward(seekTime)`      | Number           | Fast forward by the specified seek time. If no parameter is passed, the default seek time will be used.    |
-| `increaseVolume(step)`   | Number           | Increase volume by the specified step. If no parameter is passed, the default step will be used.           |
-| `decreaseVolume(step)`   | Number           | Increase volume by the specified step. If no parameter is passed, the default step will be used.           |
-| `toggleCaptions(toggle)` | Boolean          | Toggle captions display. If no parameter is passed, it will toggle based on current status.                |
-| `fullscreen.enter()`     | -                | Enter fullscreen. If fullscreen is not supported, a fallback "full window/viewport" is used instead.       |
-| `fullscreen.exit()`      | -                | Exit fullscreen.                                                                                           |
-| `fullscreen.toggle()`    | -                | Toggle fullscreen.                                                                                         |
-| `airplay()`              | -                | Trigger the airplay dialog on supported devices.                                                           |
-| `toggleControls(toggle)` | Boolean          | Toggle the controls (video only). Takes optional truthy value to force it on/off.                          |
-| `on(event, function)`    | String, Function | Add an event listener for the specified event.                                                             |
-| `once(event, function)`  | String, Function | Add an event listener for the specified event once.                                                        |
-| `off(event, function)`   | String, Function | Remove an event listener for the specified event.                                                          |
-| `supports(type)`         | String           | Check support for a mime type.                                                                             |
-| `destroy()`              | -                | Destroy the instance and garbage collect any elements.                                                     |
+| Method                     | Parameters       | Description                                                                                                |
+| -------------------------- | ---------------- | ---------------------------------------------------------------------------------------------------------- |
+| `play()`&sup1;             | -                | Start playback.                                                                                            |
+| `pause()`                  | -                | Pause playback.                                                                                            |
+| `togglePlay(toggle)`&sup1; | Boolean          | Toggle playback, if no parameters are passed, it will toggle based on current status.                      |
+| `stop()`                   | -                | Stop playback and reset to start.                                                                          |
+| `restart()`                | -                | Restart playback.                                                                                          |
+| `rewind(seekTime)`         | Number           | Rewind playback by the specified seek time. If no parameter is passed, the default seek time will be used. |
+| `forward(seekTime)`        | Number           | Fast forward by the specified seek time. If no parameter is passed, the default seek time will be used.    |
+| `increaseVolume(step)`     | Number           | Increase volume by the specified step. If no parameter is passed, the default step will be used.           |
+| `decreaseVolume(step)`     | Number           | Increase volume by the specified step. If no parameter is passed, the default step will be used.           |
+| `toggleCaptions(toggle)`   | Boolean          | Toggle captions display. If no parameter is passed, it will toggle based on current status.                |
+| `fullscreen.enter()`       | -                | Enter fullscreen. If fullscreen is not supported, a fallback "full window/viewport" is used instead.       |
+| `fullscreen.exit()`        | -                | Exit fullscreen.                                                                                           |
+| `fullscreen.toggle()`      | -                | Toggle fullscreen.                                                                                         |
+| `airplay()`                | -                | Trigger the airplay dialog on supported devices.                                                           |
+| `toggleControls(toggle)`   | Boolean          | Toggle the controls (video only). Takes optional truthy value to force it on/off.                          |
+| `on(event, function)`      | String, Function | Add an event listener for the specified event.                                                             |
+| `once(event, function)`    | String, Function | Add an event listener for the specified event once.                                                        |
+| `off(event, function)`     | String, Function | Remove an event listener for the specified event.                                                          |
+| `supports(type)`           | String           | Check support for a mime type.                                                                             |
+| `destroy()`                | -                | Destroy the instance and garbage collect any elements.                                                     |
 
-1.  For HTML5 players, `play()` will return a [`Promise`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) in _some_ browsers - WebKit and Mozilla [according to MDN](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/play) at time of writing.
+1.  For HTML5 players, `play()` will return a [`Promise`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) for most browsers - e.g. Chrome, Firefox, Opera, Safari and Edge [according to MDN](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/play) at time of writing.
 
 ## Getters and Setters
 
