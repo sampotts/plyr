@@ -13,7 +13,7 @@ export const getSeconds = value => Math.trunc(value % 60, 10);
 export function formatTime(time = 0, displayHours = false, inverted = false) {
     // Bail if the value isn't a number
     if (!is.number(time)) {
-        return formatTime(null, displayHours, inverted);
+        return formatTime(undefined, displayHours, inverted);
     }
 
     // Format time component to add leading zero

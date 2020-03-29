@@ -5,21 +5,22 @@
 .plyr__control {
     background: transparent;
     border: 0;
-    border-radius: var(--plyr-control-radius);
+    border-radius: $plyr-control-radius;
+    border-radius: var(--plyr-control-radius, $plyr-control-radius);
     color: inherit;
     cursor: pointer;
     flex-shrink: 0;
     overflow: visible; // IE11
-    padding: var(--plyr-control-padding);
+    padding: var(--plyr-control-padding, $plyr-control-padding);
     position: relative;
     transition: all 0.3s ease;
 
     svg {
         display: block;
         fill: currentColor;
-        height: var(--plyr-control-icon-size);
+        height: var(--plyr-control-icon-size, $plyr-control-icon-size);
         pointer-events: none;
-        width: var(--plyr-control-icon-size);
+        width: var(--plyr-control-icon-size, $plyr-control-icon-size);
     }
 
     // Default focus
@@ -49,65 +50,4 @@ a.plyr__control {
 .plyr__control:not(.plyr__control--pressed) .label--pressed,
 .plyr__control.plyr__control--pressed .label--not-pressed {
     display: none;
-}
-
-// Audio control
-.plyr--audio .plyr__control {
-    &.plyr__tab-focus,
-    &:hover,
-    &[aria-expanded='true'] {
-        background: $plyr-audio-control-bg-hover;
-        color: $plyr-audio-control-color-hover;
-    }
-}
-
-// Video control
-.plyr--video .plyr__control {
-    svg {
-        filter: drop-shadow(0 1px 1px rgba(#000, 0.15));
-    }
-
-    // Hover and tab focus
-    &.plyr__tab-focus,
-    &:hover,
-    &[aria-expanded='true'] {
-        background: var(--plyr-video-control-bg-hover);
-        color: var(--plyr-video-control-color-hover);
-    }
-}
-
-// Large play button (video only)
-.plyr__control--overlaid {
-    background: var(--plyr-video-control-bg-hover);
-    border: 0;
-    border-radius: 100%;
-    box-shadow: 0 1px 1px rgba(#000, 0.15);
-    color: var(--plyr-video-control-color-hover);
-    display: none;
-    left: 50%;
-    padding: ceil($plyr-control-spacing * 1.5);
-    position: absolute;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 2;
-
-    // Offset icon to make the play button look right
-    svg {
-        left: 2px; // Offset to make the play button look right
-        position: relative;
-    }
-
-    &:hover,
-    &:focus {
-        background: var(--plyr-video-control-bg-hover);
-    }
-}
-
-.plyr--playing .plyr__control--overlaid {
-    opacity: 0;
-    visibility: hidden;
-}
-
-.plyr--full-ui.plyr--video .plyr__control--overlaid {
-    display: block;
 }

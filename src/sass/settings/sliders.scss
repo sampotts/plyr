@@ -7,18 +7,18 @@ $plyr-range-thumb-active-shadow-width: 3px !default;
 
 // Thumb
 $plyr-range-thumb-height: 13px !default;
-$plyr-range-thumb-bg: #fff !default;
+$plyr-range-thumb-background: #fff !default;
 $plyr-range-thumb-border: 2px solid transparent !default;
-$plyr-range-thumb-shadow: 0 1px 1px rgba(#000, 0.15), 0 0 0 1px rgba($plyr-color-gunmetal, 0.2) !default;
+$plyr-range-thumb-shadow: 0 1px 1px rgba(#000, 0.15), 0 0 0 1px rgba($plyr-color-gray-900, 0.2) !default;
 
 // Track
 $plyr-range-track-height: 5px !default;
 $plyr-range-max-height: ($plyr-range-thumb-active-shadow-width * 2) + $plyr-range-thumb-height !default;
 
 // Fill
-$plyr-range-fill-bg: var(--plyr-color-main);
+$plyr-range-fill-background: var(--plyr-color-main);
 
 // Type specific
-$plyr-video-range-track-bg: $plyr-video-progress-buffered-bg !default;
-$plyr-audio-range-track-bg: $plyr-audio-progress-buffered-bg !default;
+$plyr-video-range-track-background: $plyr-video-progress-buffered-background !default;
+$plyr-audio-range-track-background: $plyr-audio-progress-buffered-background !default;
 $plyr-audio-range-thumb-shadow-color: rgba(#000, 0.1) !default;

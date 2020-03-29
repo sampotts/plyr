@@ -2,18 +2,32 @@
 // Colors
 // ==========================================================================
 
-$plyr-color-main: #fff !default;
-$plyr-color-gunmetal: #2f343d !default;
-$plyr-color-fiord: #4f5b5f !default;
-$plyr-color-lynch: #6b7d85 !default;
-$plyr-color-heather: #b7c5cd !default;
+$plyr-color-main: hsl(198, 100%, 50%) !default;
+
+// Grayscale
+$plyr-color-gray-900: hsl(210, 15%, 16%);
+$plyr-color-gray-800: lighten($plyr-color-gray-900, 9%);
+$plyr-color-gray-700: lighten($plyr-color-gray-800, 9%);
+$plyr-color-gray-600: lighten($plyr-color-gray-700, 9%);
+$plyr-color-gray-500: lighten($plyr-color-gray-600, 9%);
+$plyr-color-gray-400: lighten($plyr-color-gray-500, 9%);
+$plyr-color-gray-300: lighten($plyr-color-gray-400, 9%);
+$plyr-color-gray-200: lighten($plyr-color-gray-300, 9%);
+$plyr-color-gray-100: lighten($plyr-color-gray-200, 9%);
+$plyr-color-gray-50: lighten($plyr-color-gray-100, 9%);
 
 @include css-vars(
     (
         --plyr-color-main: $plyr-color-main,
-        --plyr-color-gunmetal: $plyr-color-gunmetal,
-        --plyr-color-fiord: $plyr-color-fiord,
-        --plyr-color-lynch: $plyr-color-lynch,
-        --plyr-color-heather: $plyr-color-heather
+        --plyr-color-gray-900: $plyr-color-gray-900,
+        --plyr-color-gray-800: $plyr-color-gray-800,
+        --plyr-color-gray-700: $plyr-color-gray-700,
+        --plyr-color-gray-600: $plyr-color-gray-600,
+        --plyr-color-gray-500: $plyr-color-gray-500,
+        --plyr-color-gray-400: $plyr-color-gray-400,
+        --plyr-color-gray-300: $plyr-color-gray-300,
+        --plyr-color-gray-200: $plyr-color-gray-200,
+        --plyr-color-gray-100: $plyr-color-gray-100,
+        --plyr-color-gray-50: $plyr-color-gray-50
     )
 );

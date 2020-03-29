@@ -2,7 +2,6 @@
 // Element utils
 // ==========================================================================
 
-import { toggleListener } from './events';
 import is from './is';
 import { extend } from './objects';
 
@@ -192,11 +191,8 @@ export function toggleHidden(element, hidden) {
         hide = !element.hidden;
     }
 
-    if (hide) {
-        element.setAttribute('hidden', '');
-    } else {
-        element.removeAttribute('hidden');
-    }
+    // eslint-disable-next-line no-param-reassign
+    element.hidden = hide;
 }
 
 // Mirror Element.classList.toggle, with IE compatibility for "force" argument
@@ -225,7 +221,7 @@ export function hasClass(element, className) {
 
 // Element matches selector
 export function matches(element, selector) {
-    const prototype = { Element };
+    const {prototype} = Element;
 
     function match() {
         return Array.from(document.querySelectorAll(selector)).includes(this);
@@ -249,39 +245,6 @@ export function getElements(selector) {
 // Find a single element
 export function getElement(selector) {
     return this.elements.container.querySelector(selector);
-}
-
-// Trap focus inside container
-export function trapFocus(element = null, toggle = false) {
-    if (!is.element(element)) {
-        return;
-    }
-
-    const focusable = getElements.call(this, 'button:not(:disabled), input:not(:disabled), [tabindex]');
-    const first = focusable[0];
-    const last = focusable[focusable.length - 1];
-
-    const trap = event => {
-        // Bail if not tab key or not fullscreen
-        if (event.key !== 'Tab' || event.keyCode !== 9) {
-            return;
-        }
-
-        // Get the current focused element
-        const focused = document.activeElement;
-
-        if (focused === last && !event.shiftKey) {
-            // Move focus to first element that can be tabbed if Shift isn't used
-            first.focus();
-            event.preventDefault();
-        } else if (focused === first && event.shiftKey) {
-            // Move focus to last element that can be tabbed if Shift is used
-            last.focus();
-            event.preventDefault();
-        }
-    };
-
-    toggleListener.call(this, this.elements.container, 'keydown', trap, toggle, false);
 }
 
 // Set focus and tab focus class

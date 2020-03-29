@@ -10,7 +10,6 @@
 .plyr__captions {
     animation: plyr-fade-in 0.3s ease;
     bottom: 0;
-    color: var(--plyr-captions-text-color);
     display: none;
     font-size: $plyr-font-size-captions-small;
     left: 0;
@@ -21,9 +20,12 @@
     width: 100%;
 
     .plyr__caption {
-        background: var(--plyr-captions-background);
+        background: $plyr-captions-background;
+        background: var(--plyr-captions-background, $plyr-captions-background);
         border-radius: 2px;
         box-decoration-break: clone;
+        color: $plyr-captions-text-color;
+        color: var(--plyr-captions-text-color, $plyr-captions-text-color);
         line-height: 185%;
         padding: 0.2em 0.5em;
         white-space: pre-wrap;

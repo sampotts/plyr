@@ -3,10 +3,10 @@
 // --------------------------------------------------------------
 
 .plyr__badge {
-    background: $plyr-badge-bg;
+    background: var(--plyr-badge-background, $plyr-badge-background);
     border-radius: 2px;
-    color: $plyr-badge-color;
-    font-size: var(--plyr-font-size-badge);
+    color: var(--plyr-badge-color, $plyr-badge-color);
+    font-size: var(--plyr-font-size-badge, $plyr-font-size-badge);
     line-height: 1;
     padding: 3px 4px;
 }

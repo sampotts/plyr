@@ -39,15 +39,17 @@ const media = {
             wrap(this.media, this.elements.wrapper);
 
             // Faux poster container
-            this.elements.poster = createElement('div', {
-                class: this.config.classNames.poster,
-            });
+            if (this.isEmbed) {
+                this.elements.poster = createElement('div', {
+                    class: this.config.classNames.poster,
+                });
 
-            this.elements.wrapper.appendChild(this.elements.poster);
+                this.elements.wrapper.appendChild(this.elements.poster);
+            }
         }
 
         if (this.isHTML5) {
-            html5.extend.call(this);
+            html5.setup.call(this);
         } else if (this.isYouTube) {
             youtube.setup.call(this);
         } else if (this.isVimeo) {

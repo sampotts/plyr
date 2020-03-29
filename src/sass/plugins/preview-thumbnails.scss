@@ -3,19 +3,19 @@
 // --------------------------------------------------------------
 
 $plyr-preview-padding: $plyr-tooltip-padding !default;
-$plyr-preview-bg: $plyr-tooltip-bg !default;
+$plyr-preview-background: $plyr-tooltip-background !default;
 $plyr-preview-radius: $plyr-tooltip-radius !default;
 $plyr-preview-shadow: $plyr-tooltip-shadow !default;
 $plyr-preview-arrow-size: $plyr-tooltip-arrow-size !default;
-$plyr-preview-image-bg: $plyr-color-heather !default;
+$plyr-preview-image-background: $plyr-color-gray-200 !default;
 $plyr-preview-time-font-size: $plyr-font-size-time !default;
 $plyr-preview-time-padding: 3px 6px !default;
-$plyr-preview-time-bg: rgba(0, 0, 0, 0.55);
+$plyr-preview-time-background: rgba(0, 0, 0, 0.55);
 $plyr-preview-time-color: #fff;
 $plyr-preview-time-bottom-offset: 6px;
 
 .plyr__preview-thumb {
-    background-color: $plyr-preview-bg;
+    background-color: $plyr-preview-background;
     border-radius: 3px;
     bottom: 100%;
     box-shadow: $plyr-preview-shadow;
@@ -38,7 +38,7 @@ $plyr-preview-time-bottom-offset: 6px;
     &::before {
         border-left: $plyr-preview-arrow-size solid transparent;
         border-right: $plyr-preview-arrow-size solid transparent;
-        border-top: $plyr-preview-arrow-size solid $plyr-preview-bg;
+        border-top: $plyr-preview-arrow-size solid $plyr-preview-background;
         bottom: -$plyr-preview-arrow-size;
         content: '';
         height: 0;
@@ -50,7 +50,7 @@ $plyr-preview-time-bottom-offset: 6px;
     }
 
     &__image-container {
-        background: $plyr-preview-image-bg;
+        background: $plyr-preview-image-background;
         border-radius: ($plyr-preview-radius - 1px);
         overflow: hidden;
         position: relative;
@@ -77,7 +77,7 @@ $plyr-preview-time-bottom-offset: 6px;
         z-index: 3;
 
         span {
-            background-color: $plyr-preview-time-bg;
+            background-color: $plyr-preview-time-background;
             border-radius: ($plyr-preview-radius - 1px);
             color: $plyr-preview-time-color;
             font-size: $plyr-preview-time-font-size;

@@ -63,6 +63,20 @@ const parseVtt = vttDataString => {
  * - This implementation uses multiple separate img elements. Other implementations use background-image on one element. This would be nice and simple, but Firefox and Safari have flickering issues with replacing backgrounds of larger images. It seems that YouTube perhaps only avoids this because they don't have the option for high-res previews (even the fullscreen ones, when mousedown/seeking). Images appear over the top of each other, and previous ones are discarded once the new ones have been rendered
  */
 
+const fitRatio = (ratio, outer) => {
+    const targetRatio = outer.width / outer.height;
+    const result = {};
+    if (ratio > targetRatio) {
+        result.width = outer.width;
+        result.height = (1 / ratio) * outer.width;
+    } else {
+        result.height = outer.height;
+        result.width = ratio * outer.height;
+    }
+
+    return result;
+};
+
 class PreviewThumbnails {
     /**
      * PreviewThumbnails constructor.
@@ -90,7 +104,7 @@ class PreviewThumbnails {
     }
 
     load() {
-        // Togglethe regular seek tooltip
+        // Toggle the regular seek tooltip
         if (this.player.elements.display.seekTooltip) {
             this.player.elements.display.seekTooltip.hidden = this.enabled;
         }
@@ -100,6 +114,10 @@ class PreviewThumbnails {
         }
 
         this.getThumbnails().then(() => {
+            if (!this.enabled) {
+                return;
+            }
+
             // Render DOM elements
             this.render();
 
@@ -119,19 +137,32 @@ class PreviewThumbnails {
                 throw new Error('Missing previewThumbnails.src config attribute');
             }
 
-            // If string, convert into single-element list
-            const urls = is.string(src) ? [src] : src;
-            // Loop through each src URL. Download and process the VTT file, storing the resulting data in this.thumbnails
-            const promises = urls.map(u => this.getThumbnail(u));
-
-            Promise.all(promises).then(() => {
+            // Resolve promise
+            const sortAndResolve = () => {
                 // Sort smallest to biggest (e.g., [120p, 480p, 1080p])
                 this.thumbnails.sort((x, y) => x.height - y.height);
 
                 this.player.debug.log('Preview thumbnails', this.thumbnails);
 
                 resolve();
-            });
+            };
+
+            // Via callback()
+            if (is.function(src)) {
+                src(thumbnails => {
+                    this.thumbnails = thumbnails;
+                    sortAndResolve();
+                });
+            }
+            // VTT urls
+            else {
+                // If string, convert into single-element list
+                const urls = is.string(src) ? [src] : src;
+                // Loop through each src URL. Download and process the VTT file, storing the resulting data in this.thumbnails
+                const promises = urls.map(u => this.getThumbnail(u));
+                // Resolve
+                Promise.all(promises).then(sortAndResolve);
+            }
         });
     }
 
@@ -221,8 +252,8 @@ class PreviewThumbnails {
     }
 
     startScrubbing(event) {
-        // Only act on left mouse button (0), or touch device (event.button is false)
-        if (event.button === false || event.button === 0) {
+        // Only act on left mouse button (0), or touch device (event.button does not exist or is false)
+        if (is.nullOrUndefined(event.button) || event.button === false || event.button === 0) {
             this.mouseDown = true;
 
             // Wait until media has a duration
@@ -308,6 +339,15 @@ class PreviewThumbnails {
         });
 
         this.player.elements.wrapper.appendChild(this.elements.scrubbing.container);
+    }
+
+    destroy() {
+        if (this.elements.thumb.container) {
+            this.elements.thumb.container.remove();
+        }
+        if (this.elements.scrubbing.container) {
+            this.elements.scrubbing.container.remove();
+        }
     }
 
     showImageAtCurrentTime() {
@@ -536,8 +576,16 @@ class PreviewThumbnails {
 
     get thumbContainerHeight() {
         if (this.mouseDown) {
-            // Can't use media.clientHeight - HTML5 video goes big and does black bars above and below
-            return Math.floor(this.player.media.clientWidth / this.thumbAspectRatio);
+            const { height } = fitRatio(this.thumbAspectRatio, {
+                width: this.player.media.clientWidth,
+                height: this.player.media.clientHeight,
+            });
+            return height;
+        }
+
+        // If css is used this needs to return the css height for sprites to work (see setImageSizeAndOffset)
+        if (this.sizeSpecifiedInCSS) {
+            return this.elements.thumb.imageContainer.clientHeight;
         }
 
         return Math.floor(this.player.media.clientWidth / this.thumbAspectRatio / 4);
@@ -580,7 +628,7 @@ class PreviewThumbnails {
     }
 
     determineContainerAutoSizing() {
-        if (this.elements.thumb.imageContainer.clientHeight > 20) {
+        if (this.elements.thumb.imageContainer.clientHeight > 20 || this.elements.thumb.imageContainer.clientWidth > 20) {
             // This will prevent auto sizing in this.setThumbContainerSizeAndPos()
             this.sizeSpecifiedInCSS = true;
         }
@@ -592,6 +640,12 @@ class PreviewThumbnails {
             const thumbWidth = Math.floor(this.thumbContainerHeight * this.thumbAspectRatio);
             this.elements.thumb.imageContainer.style.height = `${this.thumbContainerHeight}px`;
             this.elements.thumb.imageContainer.style.width = `${thumbWidth}px`;
+        } else if (this.elements.thumb.imageContainer.clientHeight > 20 && this.elements.thumb.imageContainer.clientWidth < 20) {
+            const thumbWidth = Math.floor(this.elements.thumb.imageContainer.clientHeight * this.thumbAspectRatio);
+            this.elements.thumb.imageContainer.style.width = `${thumbWidth}px`;
+        } else if (this.elements.thumb.imageContainer.clientHeight < 20 && this.elements.thumb.imageContainer.clientWidth > 20) {
+            const thumbHeight = Math.floor(this.elements.thumb.imageContainer.clientWidth / this.thumbAspectRatio);
+            this.elements.thumb.imageContainer.style.height = `${thumbHeight}px`;
         }
 
         this.setThumbContainerPos();
@@ -620,9 +674,12 @@ class PreviewThumbnails {
 
     // Can't use 100% width, in case the video is a different aspect ratio to the video container
     setScrubbingContainerSize() {
-        this.elements.scrubbing.container.style.width = `${this.player.media.clientWidth}px`;
-        // Can't use media.clientHeight - html5 video goes big and does black bars above and below
-        this.elements.scrubbing.container.style.height = `${this.player.media.clientWidth / this.thumbAspectRatio}px`;
+        const { width, height } = fitRatio(this.thumbAspectRatio, {
+            width: this.player.media.clientWidth,
+            height: this.player.media.clientHeight,
+        });
+        this.elements.scrubbing.container.style.width = `${width}px`;
+        this.elements.scrubbing.container.style.height = `${height}px`;
     }
 
     // Sprites need to be offset to the correct location
@@ -635,9 +692,9 @@ class PreviewThumbnails {
         const multiplier = this.thumbContainerHeight / frame.h;
 
         // eslint-disable-next-line no-param-reassign
-        previewImage.style.height = `${Math.floor(previewImage.naturalHeight * multiplier)}px`;
+        previewImage.style.height = `${previewImage.naturalHeight * multiplier}px`;
         // eslint-disable-next-line no-param-reassign
-        previewImage.style.width = `${Math.floor(previewImage.naturalWidth * multiplier)}px`;
+        previewImage.style.width = `${previewImage.naturalWidth * multiplier}px`;
         // eslint-disable-next-line no-param-reassign
         previewImage.style.left = `-${frame.x * multiplier}px`;
         // eslint-disable-next-line no-param-reassign

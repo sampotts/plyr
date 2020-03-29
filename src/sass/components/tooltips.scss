@@ -3,7 +3,7 @@
 // --------------------------------------------------------------
 
 .plyr__tooltip {
-    background: $plyr-tooltip-bg;
+    background: $plyr-tooltip-background;
     border-radius: $plyr-tooltip-radius;
     bottom: 100%;
     box-shadow: $plyr-tooltip-shadow;
@@ -27,7 +27,7 @@
     &::before {
         border-left: $plyr-tooltip-arrow-size solid transparent;
         border-right: $plyr-tooltip-arrow-size solid transparent;
-        border-top: $plyr-tooltip-arrow-size solid $plyr-tooltip-bg;
+        border-top: $plyr-tooltip-arrow-size solid $plyr-tooltip-background;
         bottom: -$plyr-tooltip-arrow-size;
         content: '';
         height: 0;

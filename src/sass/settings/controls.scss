@@ -7,29 +7,12 @@ $plyr-control-spacing: 10px !default;
 $plyr-control-padding: ($plyr-control-spacing * 0.7) !default;
 $plyr-control-radius: 3px !default;
 
-$plyr-video-controls-bg: #000 !default;
+$plyr-video-controls-background: linear-gradient(rgba(#000, 0), rgba(#000, 0.75)) !default;
 $plyr-video-control-color: #fff !default;
-$plyr-video-control-color-hover: #000 !default;
-$plyr-video-control-bg-hover: var(--plyr-color-main) !default;
+$plyr-video-control-color-hover: #fff !default;
+$plyr-video-control-background-hover: $plyr-color-main !default;
 
-$plyr-audio-controls-bg: #fff !default;
-$plyr-audio-control-color: var(--plyr-color-fiord) !default;
+$plyr-audio-controls-background: #fff !default;
+$plyr-audio-control-color: $plyr-color-gray-700 !default;
 $plyr-audio-control-color-hover: #fff !default;
-$plyr-audio-control-bg-hover: var(--plyr-color-main) !default;
-
-@include css-vars(
-    (
-        --plyr-control-icon-size: $plyr-control-icon-size,
-        --plyr-control-spacing: $plyr-control-spacing,
-        --plyr-control-padding: $plyr-control-padding,
-        --plyr-control-radius: $plyr-control-radius,
-        --plyr-video-controls-bg: $plyr-video-controls-bg,
-        --plyr-video-control-color: $plyr-video-control-color,
-        --plyr-video-control-color-hover: $plyr-video-control-color-hover,
-        --plyr-video-control-bg-hover: $plyr-video-control-bg-hover,
-        --plyr-audio-controls-bg: $plyr-audio-controls-bg,
-        --plyr-audio-control-color: $plyr-audio-control-color,
-        --plyr-audio-control-color-hover: $plyr-audio-control-color-hover,
-        --plyr-audio-control-bg-hover: $plyr-audio-control-bg-hover
-    )
-);
+$plyr-audio-control-background-hover: $plyr-color-main !default;

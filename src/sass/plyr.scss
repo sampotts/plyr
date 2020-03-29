@@ -37,14 +37,16 @@ $css-vars-use-native: true;
 @import 'components/poster';
 @import 'components/times';
 @import 'components/tooltips';
-@import 'components/video';
 @import 'components/progress';
 @import 'components/volume';
+
+@import 'types/audio';
+@import 'types/video';
 
 @import 'states/fullscreen';
 
 @import 'plugins/ads';
-@import 'plugins/previewThumbnails';
+@import 'plugins/preview-thumbnails';
 
 @import 'utils/animation';
 @import 'utils/hidden';

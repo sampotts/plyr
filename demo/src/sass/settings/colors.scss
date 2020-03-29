@@ -2,31 +2,41 @@
 // Colors
 // ==========================================================================
 
-// Greyscale
-$gray-dark: #343f4a;
-$gray: #55646b;
-$gray-light: #cbd0d3;
-$gray-lighter: #dbe3e8;
-$off-white: #f2f5f7;
+// Grayscale
+$color-gray-900: hsl(210, 15%, 16%);
+$color-gray-800: lighten($color-gray-900, 9%);
+$color-gray-700: lighten($color-gray-800, 9%);
+$color-gray-600: lighten($color-gray-700, 9%);
+$color-gray-500: lighten($color-gray-600, 9%);
+$color-gray-400: lighten($color-gray-500, 9%);
+$color-gray-300: lighten($color-gray-400, 9%);
+$color-gray-200: lighten($color-gray-300, 9%);
+$color-gray-100: lighten($color-gray-200, 9%);
+$color-gray-50: lighten($color-gray-100, 9%);
+
+// Branding
+$color-brand-primary: hsl(198, 100%, 50%);
 
 // Text
-$color-text: #fff;
-
-// Plyr
-$color-brand-primary: #1aafff;
+$color-text: $color-gray-700;
+$color-headings: $color-brand-primary;
 
 // Brands
 $color-twitter: #4baaf4;
-$color-youtube: #cc181e;
-$color-vimeo: #19b7ed;
 
 // Elements
-$color-link: #fff;
-$color-background: $color-brand-primary;
+$color-link: $color-brand-primary;
+
+// Background
+$color-background-from: hsl(198, 100%, 94%);
+$color-background-to: hsl(198, 100%, 98%);
 
 // Buttons
-$color-button-background: #fff;
-$color-button-text: $gray;
+$color-button-background: $color-brand-primary;
+$color-button-text: #fff;
+$color-button-background-hover: hsl(198, 100%, 55%);
+$color-button-count-background: #fff;
+$color-button-count-text: $color-gray-600;
 
 // Focus
 $tab-focus-default-color: #fff;

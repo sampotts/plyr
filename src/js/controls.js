@@ -28,7 +28,7 @@ import {
 import { off, on } from './utils/events';
 import i18n from './utils/i18n';
 import is from './utils/is';
-import loadSprite from './utils/loadSprite';
+import loadSprite from './utils/load-sprite';
 import { extend } from './utils/objects';
 import { getPercentage, replaceAll, toCamelCase, toTitleCase } from './utils/strings';
 import { formatTime, getHours } from './utils/time';
@@ -111,7 +111,7 @@ const controls = {
         setAttributes(
             icon,
             extend(attributes, {
-                role: 'presentation',
+                'aria-hidden': 'true',
                 focusable: 'false',
             }),
         );
@@ -139,10 +139,7 @@ const controls = {
     // Create hidden text label
     createLabel(key, attr = {}) {
         const text = i18n.get(key, this.config);
-
-        const attributes = Object.assign({}, attr, {
-            class: [attr.class, this.config.classNames.hidden].filter(Boolean).join(' '),
-        });
+        const attributes = { ...attr, class: [attr.class, this.config.classNames.hidden].filter(Boolean).join(' ') };
 
         return createElement('span', attributes, text);
     },
@@ -402,7 +399,8 @@ const controls = {
     // https://bugzilla.mozilla.org/show_bug.cgi?id=1220143
     bindMenuItemShortcuts(menuItem, type) {
         // Navigate through menus via arrow keys and space
-        on(
+        on.call(
+            this,
             menuItem,
             'keydown keyup',
             event => {
@@ -452,7 +450,7 @@ const controls = {
 
         // Enter will fire a `click` event but we still need to manage focus
         // So we bind to keyup which fires after and set focus here
-        on(menuItem, 'keyup', event => {
+        on.call(this, menuItem, 'keyup', event => {
             if (event.which !== 13) {
                 return;
             }
@@ -1046,7 +1044,7 @@ const controls = {
     },
 
     // Set a list of available captions languages
-    setSpeedMenu(options) {
+    setSpeedMenu() {
         // Menu required
         if (!is.element(this.elements.settings.panels.speed)) {
             return;
@@ -1055,15 +1053,8 @@ const controls = {
         const type = 'speed';
         const list = this.elements.settings.panels.speed.querySelector('[role="menu"]');
 
-        // Set the speed options
-        if (is.array(options)) {
-            this.options.speed = options;
-        } else if (this.isHTML5 || this.isVimeo) {
-            this.options.speed = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
-        }
-
-        // Set options if passed and filter based on config
-        this.options.speed = this.options.speed.filter(speed => this.config.speed.options.includes(speed));
+        // Filter out invalid speeds
+        this.options.speed = this.options.speed.filter(o => o >= this.minimumSpeed && o <= this.maximumSpeed);
 
         // Toggle the pane and tab
         const toggle = !is.empty(this.options.speed) && this.options.speed.length > 1;
@@ -1380,7 +1371,9 @@ const controls = {
                 }
 
                 // Volume range control
-                if (control === 'volume') {
+                // Ignored on iOS as it's handled globally
+                // https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html
+                if (control === 'volume' && !browser.isIos) {
                     // Set the attributes
                     const attributes = {
                         max: 1,
@@ -1463,7 +1456,7 @@ const controls = {
                     bindMenuItemShortcuts.call(this, menuItem, type);
 
                     // Show menu on click
-                    on(menuItem, 'click', () => {
+                    on.call(this, menuItem, 'click', () => {
                         showMenuPanel.call(this, type, false);
                     });
 
@@ -1515,7 +1508,8 @@ const controls = {
                     );
 
                     // Go back via keyboard
-                    on(
+                    on.call(
+                        this,
                         pane,
                         'keydown',
                         event => {
@@ -1535,7 +1529,7 @@ const controls = {
                     );
 
                     // Go back via button click
-                    on(backButton, 'click', () => {
+                    on.call(this, backButton, 'click', () => {
                         showMenuPanel.call(this, 'home', false);
                     });
 
@@ -1580,6 +1574,11 @@ const controls = {
                     href: this.download,
                     target: '_blank',
                 });
+
+                // Set download attribute for HTML5 only
+                if (this.isHTML5) {
+                    attributes.download = '';
+                }
 
                 const { download } = this.config.urls;
 

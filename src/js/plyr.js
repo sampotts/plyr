@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v3.5.3
+// plyr.js v3.5.10
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -15,7 +15,7 @@ import Fullscreen from './fullscreen';
 import Listeners from './listeners';
 import media from './media';
 import Ads from './plugins/ads';
-import PreviewThumbnails from './plugins/previewThumbnails';
+import PreviewThumbnails from './plugins/preview-thumbnails';
 import source from './source';
 import Storage from './storage';
 import support from './support';
@@ -24,9 +24,10 @@ import { closest } from './utils/arrays';
 import { createElement, hasClass, removeElement, replaceElement, toggleClass, wrap } from './utils/elements';
 import { off, on, once, triggerEvent, unbindListeners } from './utils/events';
 import is from './utils/is';
-import loadSprite from './utils/loadSprite';
+import loadSprite from './utils/load-sprite';
 import { clamp } from './utils/numbers';
 import { cloneDeep, extend } from './utils/objects';
+import { silencePromise } from './utils/promise';
 import { getAspectRatio, reduceAspectRatio, setAspectRatio, validateRatio } from './utils/style';
 import { parseUrl } from './utils/urls';
 
@@ -303,7 +304,7 @@ class Plyr {
 
         // Autoplay if required
         if (this.isHTML5 && this.config.autoplay) {
-            setTimeout(() => this.play(), 10);
+            setTimeout(() => silencePromise(this.play()), 10);
         }
 
         // Seek time will be recorded (in listeners.js) so we can prevent hiding controls for a few seconds after seek
@@ -356,7 +357,7 @@ class Plyr {
 
         // Intecept play with ads
         if (this.ads && this.ads.enabled) {
-            this.ads.managerPromise.then(() => this.ads.play()).catch(() => this.media.play());
+            this.ads.managerPromise.then(() => this.ads.play()).catch(() => silencePromise(this.media.play()));
         }
 
         // Return the promise (for HTML5)
@@ -368,10 +369,10 @@ class Plyr {
      */
     pause() {
         if (!this.playing || !is.function(this.media.pause)) {
-            return;
+            return null;
         }
 
-        this.media.pause();
+        return this.media.pause();
     }
 
     /**
@@ -411,10 +412,10 @@ class Plyr {
         const toggle = is.boolean(input) ? input : !this.playing;
 
         if (toggle) {
-            this.play();
-        } else {
-            this.pause();
+            return this.play();
         }
+
+        return this.pause();
     }
 
     /**
@@ -441,7 +442,7 @@ class Plyr {
      * @param {Number} seekTime - how far to rewind in seconds. Defaults to the config.seekTime
      */
     rewind(seekTime) {
-        this.currentTime = this.currentTime - (is.number(seekTime) ? seekTime : this.config.seekTime);
+        this.currentTime -= is.number(seekTime) ? seekTime : this.config.seekTime;
     }
 
     /**
@@ -449,7 +450,7 @@ class Plyr {
      * @param {Number} seekTime - how far to fast forward in seconds. Defaults to the config.seekTime
      */
     forward(seekTime) {
-        this.currentTime = this.currentTime + (is.number(seekTime) ? seekTime : this.config.seekTime);
+        this.currentTime += is.number(seekTime) ? seekTime : this.config.seekTime;
     }
 
     /**

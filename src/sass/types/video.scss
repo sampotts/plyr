@@ -1,0 +1,166 @@
+// --------------------------------------------------------------
+// Video styles
+// --------------------------------------------------------------
+
+// Container
+.plyr--video {
+    background: #000;
+    overflow: hidden;
+
+    &.plyr--menu-open {
+        overflow: visible;
+    }
+}
+
+.plyr__video-wrapper {
+    background: #000;
+    height: 100%;
+    margin: auto;
+    overflow: hidden;
+    width: 100%;
+}
+
+// Default to 16:9 ratio but this is set by JavaScript based on config
+$embed-padding: ((100 / 16) * 9);
+
+.plyr__video-embed,
+.plyr__video-wrapper--fixed-ratio {
+    height: 0;
+    padding-bottom: to-percentage($embed-padding);
+}
+
+.plyr__video-embed iframe,
+.plyr__video-wrapper--fixed-ratio video {
+    border: 0;
+    left: 0;
+    position: absolute;
+    top: 0;
+}
+
+// If the full custom UI is supported
+.plyr--full-ui .plyr__video-embed {
+    $height: 240;
+    $offset: to-percentage(($height - $embed-padding) / ($height / 50));
+
+    // Only used for Vimeo
+    > .plyr__video-embed__container {
+        padding-bottom: to-percentage($height);
+        position: relative;
+        transform: translateY(-$offset);
+    }
+}
+
+// Controls container
+.plyr--video .plyr__controls {
+    background: $plyr-video-controls-background;
+    border-bottom-left-radius: inherit;
+    border-bottom-right-radius: inherit;
+    bottom: 0;
+    color: var(--plyr-video-control-color, $plyr-video-control-color);
+    left: 0;
+    padding: ($plyr-control-spacing * 2) ($plyr-control-spacing / 2) ($plyr-control-spacing / 2);
+    position: absolute;
+    right: 0;
+    transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+    z-index: 3;
+
+    @media (min-width: $plyr-bp-sm) {
+        padding: ($plyr-control-spacing * 3.5) $plyr-control-spacing $plyr-control-spacing;
+    }
+}
+
+// Hide controls
+.plyr--video.plyr--hide-controls .plyr__controls {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(100%);
+}
+
+// Control elements
+.plyr--video .plyr__control {
+    // Hover and tab focus
+    &.plyr__tab-focus,
+    &:hover,
+    &[aria-expanded='true'] {
+        background: var(
+            --plyr-video-control-background-hover,
+            var(--plyr-color-main, $plyr-video-control-background-hover)
+        );
+        color: var(--plyr-video-control-color-hover, $plyr-video-control-color-hover);
+    }
+}
+
+// Large play button (video only)
+.plyr__control--overlaid {
+    background: var(
+        --plyr-video-control-background-hover,
+        var(--plyr-color-main, $plyr-video-control-background-hover)
+    );
+    border: 0;
+    border-radius: 100%;
+    color: $plyr-video-control-color;
+    display: none;
+    left: 50%;
+    opacity: 0.9;
+    padding: ceil($plyr-control-spacing * 1.5);
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    transition: 0.3s;
+    z-index: 2;
+
+    // Offset icon to make the play button look right
+    svg {
+        left: 2px;
+        position: relative;
+    }
+
+    &:hover,
+    &:focus {
+        opacity: 1;
+    }
+}
+
+.plyr--playing .plyr__control--overlaid {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.plyr--full-ui.plyr--video .plyr__control--overlaid {
+    display: block;
+}
+
+// Video range inputs
+.plyr--full-ui.plyr--video input[type='range'] {
+    &::-webkit-slider-runnable-track {
+        background-color: var(--plyr-video-range-track-background, $plyr-video-range-track-background);
+    }
+
+    &::-moz-range-track {
+        background-color: var(--plyr-video-range-track-background, $plyr-video-range-track-background);
+    }
+
+    &::-ms-track {
+        background-color: var(--plyr-video-range-track-background, $plyr-video-range-track-background);
+    }
+
+    // Pressed styles
+    &:active {
+        &::-webkit-slider-thumb {
+            @include plyr-range-thumb-active();
+        }
+
+        &::-moz-range-thumb {
+            @include plyr-range-thumb-active();
+        }
+
+        &::-ms-thumb {
+            @include plyr-range-thumb-active();
+        }
+    }
+}
+
+// Progress
+.plyr--video .plyr__progress__buffer {
+    color: var(--plyr-video-progress-buffered-background, $plyr-video-progress-buffered-background);
+}

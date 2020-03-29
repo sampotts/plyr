@@ -27,7 +27,7 @@ $css-vars-use-native: false !default;
 //
 // E.G.:
 // color: var(--main-color);
-// background: var(--main-bg, green);
+// background: var(--main-background, green);
 ///
 @function var($args...) {
     // CHECK PARAMS

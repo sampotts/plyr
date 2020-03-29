@@ -7,8 +7,8 @@ import { createElement, replaceElement, toggleClass } from '../utils/elements';
 import { triggerEvent } from '../utils/events';
 import fetch from '../utils/fetch';
 import is from '../utils/is';
-import loadImage from '../utils/loadImage';
-import loadScript from '../utils/loadScript';
+import loadImage from '../utils/load-image';
+import loadScript from '../utils/load-script';
 import { extend } from '../utils/objects';
 import { format, generateId } from '../utils/strings';
 import { setAspectRatio } from '../utils/style';
@@ -297,7 +297,9 @@ const youtube = {
                     });
 
                     // Get available speeds
-                    player.options.speed = instance.getAvailablePlaybackRates();
+                    const speeds = instance.getAvailablePlaybackRates();
+                    // Filter based on config
+                    player.options.speed = speeds.filter(s => player.config.speed.options.includes(s));
 
                     // Set the tabindex to avoid focus entering iframe
                     if (player.supported.ui) {
@@ -413,6 +415,12 @@ const youtube = {
                                 player.embed.unMute();
                             }
                             assurePlaybackState.call(player, false);
+
+                            break;
+
+                        case 3:
+                            // Trigger waiting event to add loading classes to container as the video buffers.
+                            triggerEvent.call(player, player.media, 'waiting');
 
                             break;
 

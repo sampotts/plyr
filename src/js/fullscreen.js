@@ -4,83 +4,11 @@
 // https://webkit.org/blog/7929/designing-websites-for-iphone-x/
 // ==========================================================================
 
-import { repaint } from './utils/animation';
 import browser from './utils/browser';
-import { hasClass, toggleClass, trapFocus } from './utils/elements';
+import { getElements, hasClass, toggleClass } from './utils/elements';
 import { on, triggerEvent } from './utils/events';
 import is from './utils/is';
-
-function onChange() {
-    if (!this.enabled) {
-        return;
-    }
-
-    // Update toggle button
-    const button = this.player.elements.buttons.fullscreen;
-    if (is.element(button)) {
-        button.pressed = this.active;
-    }
-
-    // Trigger an event
-    triggerEvent.call(this.player, this.target, this.active ? 'enterfullscreen' : 'exitfullscreen', true);
-
-    // Trap focus in container
-    if (!browser.isIos) {
-        trapFocus.call(this.player, this.target, this.active);
-    }
-}
-
-function toggleFallback(toggle = false) {
-    // Store or restore scroll position
-    if (toggle) {
-        this.scrollPosition = {
-            x: window.scrollX || 0,
-            y: window.scrollY || 0,
-        };
-    } else {
-        window.scrollTo(this.scrollPosition.x, this.scrollPosition.y);
-    }
-
-    // Toggle scroll
-    document.body.style.overflow = toggle ? 'hidden' : '';
-
-    // Toggle class hook
-    toggleClass(this.target, this.player.config.classNames.fullscreen.fallback, toggle);
-
-    // Force full viewport on iPhone X+
-    if (browser.isIos) {
-        let viewport = document.head.querySelector('meta[name="viewport"]');
-        const property = 'viewport-fit=cover';
-
-        // Inject the viewport meta if required
-        if (!viewport) {
-            viewport = document.createElement('meta');
-            viewport.setAttribute('name', 'viewport');
-        }
-
-        // Check if the property already exists
-        const hasProperty = is.string(viewport.content) && viewport.content.includes(property);
-
-        if (toggle) {
-            this.cleanupViewport = !hasProperty;
-
-            if (!hasProperty) {
-                viewport.content += `,${property}`;
-            }
-        } else if (this.cleanupViewport) {
-            viewport.content = viewport.content
-                .split(',')
-                .filter(part => part.trim() !== property)
-                .join(',');
-        }
-
-        // Force a repaint as sometimes Safari doesn't want to fill the screen
-        setTimeout(() => repaint(this.target), 100);
-    }
-
-    // Toggle button and fire events
-    onChange.call(this);
-}
+import { silencePromise } from './utils/promise';
 
 class Fullscreen {
     constructor(player) {
@@ -105,7 +33,7 @@ class Fullscreen {
             this.prefix === 'ms' ? 'MSFullscreenChange' : `${this.prefix}fullscreenchange`,
             () => {
                 // TODO: Filter for target??
-                onChange.call(this);
+                this.onChange();
             },
         );
 
@@ -118,6 +46,9 @@ class Fullscreen {
 
             this.toggle();
         });
+
+        // Tap focus when in fullscreen
+        on.call(this, this.player.elements.container, 'keydown', event => this.trapFocus(event));
 
         // Update the UI
         this.update();
@@ -188,7 +119,7 @@ class Fullscreen {
 
         const element = !this.prefix ? document.fullscreenElement : document[`${this.prefix}${this.property}Element`];
 
-        return element === this.target;
+        return element && element.shadowRoot ? element === this.target.getRootNode().host : element === this.target;
     }
 
     // Get target element
@@ -196,6 +127,97 @@ class Fullscreen {
         return browser.isIos && this.player.config.fullscreen.iosNative
             ? this.player.media
             : this.player.elements.container;
+    }
+
+    onChange() {
+        if (!this.enabled) {
+            return;
+        }
+
+        // Update toggle button
+        const button = this.player.elements.buttons.fullscreen;
+        if (is.element(button)) {
+            button.pressed = this.active;
+        }
+
+        // Trigger an event
+        triggerEvent.call(this.player, this.target, this.active ? 'enterfullscreen' : 'exitfullscreen', true);
+    }
+
+    toggleFallback(toggle = false) {
+        // Store or restore scroll position
+        if (toggle) {
+            this.scrollPosition = {
+                x: window.scrollX || 0,
+                y: window.scrollY || 0,
+            };
+        } else {
+            window.scrollTo(this.scrollPosition.x, this.scrollPosition.y);
+        }
+
+        // Toggle scroll
+        document.body.style.overflow = toggle ? 'hidden' : '';
+
+        // Toggle class hook
+        toggleClass(this.target, this.player.config.classNames.fullscreen.fallback, toggle);
+
+        // Force full viewport on iPhone X+
+        if (browser.isIos) {
+            let viewport = document.head.querySelector('meta[name="viewport"]');
+            const property = 'viewport-fit=cover';
+
+            // Inject the viewport meta if required
+            if (!viewport) {
+                viewport = document.createElement('meta');
+                viewport.setAttribute('name', 'viewport');
+            }
+
+            // Check if the property already exists
+            const hasProperty = is.string(viewport.content) && viewport.content.includes(property);
+
+            if (toggle) {
+                this.cleanupViewport = !hasProperty;
+
+                if (!hasProperty) {
+                    viewport.content += `,${property}`;
+                }
+            } else if (this.cleanupViewport) {
+                viewport.content = viewport.content
+                    .split(',')
+                    .filter(part => part.trim() !== property)
+                    .join(',');
+            }
+        }
+
+        // Toggle button and fire events
+        this.onChange();
+    }
+
+    // Trap focus inside container
+    trapFocus(event) {
+        // Bail if iOS, not active, not the tab key
+        if (browser.isIos || !this.active || event.key !== 'Tab' || event.keyCode !== 9) {
+            return;
+        }
+
+        // Get the current focused element
+        const focused = document.activeElement;
+        const focusable = getElements.call(
+            this.player,
+            'a[href], button:not(:disabled), input:not(:disabled), [tabindex]',
+        );
+        const [first] = focusable;
+        const last = focusable[focusable.length - 1];
+
+        if (focused === last && !event.shiftKey) {
+            // Move focus to first element that can be tabbed if Shift isn't used
+            first.focus();
+            event.preventDefault();
+        } else if (focused === first && event.shiftKey) {
+            // Move focus to last element that can be tabbed if Shift is used
+            last.focus();
+            event.preventDefault();
+        }
     }
 
     // Update UI
@@ -230,9 +252,9 @@ class Fullscreen {
         if (browser.isIos && this.player.config.fullscreen.iosNative) {
             this.target.webkitEnterFullscreen();
         } else if (!Fullscreen.native || this.forceFallback) {
-            toggleFallback.call(this, true);
+            this.toggleFallback(true);
         } else if (!this.prefix) {
-            this.target.requestFullscreen();
+            this.target.requestFullscreen({ navigationUI: 'hide' });
         } else if (!is.empty(this.prefix)) {
             this.target[`${this.prefix}Request${this.property}`]();
         }
@@ -247,9 +269,9 @@ class Fullscreen {
         // iOS native fullscreen
         if (browser.isIos && this.player.config.fullscreen.iosNative) {
             this.target.webkitExitFullscreen();
-            this.player.play();
+            silencePromise(this.player.play());
         } else if (!Fullscreen.native || this.forceFallback) {
-            toggleFallback.call(this, false);
+            this.toggleFallback(false);
         } else if (!this.prefix) {
             (document.cancelFullScreen || document.exitFullscreen).call(document);
         } else if (!is.empty(this.prefix)) {

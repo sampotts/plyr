@@ -24,7 +24,7 @@
     // The actual menu container
     &__container {
         animation: plyr-popup 0.2s ease;
-        background: $plyr-menu-bg;
+        background: $plyr-menu-background;
         border-radius: 4px;
         bottom: 100%;
         box-shadow: $plyr-menu-shadow;
@@ -39,14 +39,13 @@
 
         > div {
             overflow: hidden;
-            transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-                width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1), width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         // Arrow
         &::after {
             border: 4px solid transparent;
-            border-top-color: $plyr-menu-bg;
+            border-top-color: $plyr-menu-background;
             content: '';
             height: 0;
             position: absolute;
@@ -74,8 +73,7 @@
             color: $plyr-menu-color;
             display: flex;
             font-size: $plyr-font-size-menu;
-            padding: ceil($plyr-control-padding / 2)
-                ceil($plyr-control-padding * 1.5);
+            padding: ceil($plyr-control-padding / 2) ceil($plyr-control-padding * 1.5);
             user-select: none;
             width: 100%;
 
@@ -174,7 +172,7 @@
 
             &[aria-checked='true'] {
                 &::before {
-                    background: $plyr-color-main;
+                    background: var(--plyr-color-main, $plyr-color-main);
                 }
                 &::after {
                     opacity: 1;

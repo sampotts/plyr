@@ -6,9 +6,10 @@ import controls from './controls';
 import ui from './ui';
 import { repaint } from './utils/animation';
 import browser from './utils/browser';
-import { getElement, getElements, matches, toggleClass, toggleHidden } from './utils/elements';
+import { getElement, getElements, matches, toggleClass } from './utils/elements';
 import { off, on, once, toggleListener, triggerEvent } from './utils/events';
 import is from './utils/is';
+import { silencePromise } from './utils/promise';
 import { getAspectRatio, setAspectRatio } from './utils/style';
 
 class Listeners {
@@ -99,7 +100,7 @@ class Listeners {
                 case 75:
                     // Space and K key
                     if (!repeat) {
-                        player.togglePlay();
+                        silencePromise(player.togglePlay());
                     }
                     break;
 
@@ -301,14 +302,6 @@ class Listeners {
             },
         );
 
-        // Force edge to repaint on exit fullscreen
-        // TODO: Fix weird bug where Edge doesn't re-draw when exiting fullscreen
-        /* if (browser.isEdge) {
-            on.call(player, elements.container, 'exitfullscreen', () => {
-                setTimeout(() => repaint(elements.container), 100);
-            });
-        } */
-
         // Set a gutter for Vimeo
         const setGutter = (ratio, padding, toggle) => {
             if (!player.isVimeo) {
@@ -344,8 +337,13 @@ class Listeners {
         on.call(player, elements.container, 'enterfullscreen exitfullscreen', event => {
             const { target, usingNative } = player.fullscreen;
 
-            // Ignore for iOS native
-            if (!player.isEmbed || target !== elements.container) {
+            // Ignore events not from target
+            if (target !== elements.container) {
+                return;
+            }
+
+            // If it's not an embed and no ratio specified
+            if (!player.isEmbed && is.empty(player.config.ratio)) {
                 return;
             }
 
@@ -380,19 +378,15 @@ class Listeners {
             controls.durationUpdate.call(player, event),
         );
 
-        // Check for audio tracks on load
-        // We can't use `loadedmetadata` as it doesn't seem to have audio tracks at that point
-        on.call(player, player.media, 'canplay loadeddata', () => {
-            toggleHidden(elements.volume, !player.hasAudio);
-            toggleHidden(elements.buttons.mute, !player.hasAudio);
-        });
-
         // Handle the media finishing
         on.call(player, player.media, 'ended', () => {
             // Show poster on end
             if (player.isHTML5 && player.isVideo && player.config.resetOnEnd) {
                 // Restart
                 player.restart();
+
+                // Call pause otherwise IE11 will start playing the video again
+                player.pause();
             }
         });
 
@@ -438,9 +432,21 @@ class Listeners {
 
                 if (player.ended) {
                     this.proxy(event, player.restart, 'restart');
-                    this.proxy(event, player.play, 'play');
+                    this.proxy(
+                        event,
+                        () => {
+                            silencePromise(player.play());
+                        },
+                        'play',
+                    );
                 } else {
-                    this.proxy(event, player.togglePlay, 'play');
+                    this.proxy(
+                        event,
+                        () => {
+                            silencePromise(player.togglePlay());
+                        },
+                        'play',
+                    );
                 }
             });
         }
@@ -516,7 +522,7 @@ class Listeners {
         }
 
         // Only call default handler if not prevented in custom handler
-        if (returned && is.function(defaultHandler)) {
+        if (returned !== false && is.function(defaultHandler)) {
             defaultHandler.call(player, event);
         }
     }
@@ -546,7 +552,14 @@ class Listeners {
         // Play/pause toggle
         if (elements.buttons.play) {
             Array.from(elements.buttons.play).forEach(button => {
-                this.bind(button, 'click', player.togglePlay, 'play');
+                this.bind(
+                    button,
+                    'click',
+                    () => {
+                        silencePromise(player.togglePlay());
+                    },
+                    'play',
+                );
             });
         }
 
@@ -606,12 +619,19 @@ class Listeners {
         this.bind(elements.buttons.airplay, 'click', player.airplay, 'airplay');
 
         // Settings menu - click toggle
-        this.bind(elements.buttons.settings, 'click', event => {
-            // Prevent the document click listener closing the menu
-            event.stopPropagation();
+        this.bind(
+            elements.buttons.settings,
+            'click',
+            event => {
+                // Prevent the document click listener closing the menu
+                event.stopPropagation();
+                event.preventDefault();
 
-            controls.toggleMenu.call(player, event);
-        });
+                controls.toggleMenu.call(player, event);
+            },
+            null,
+            false,
+        ); // Can't be passive as we're preventing default
 
         // Settings menu - keyboard toggle
         // We have to bind to keyup otherwise Firefox triggers a click when a keydown event handler shifts focus
@@ -666,7 +686,7 @@ class Listeners {
             const code = event.keyCode ? event.keyCode : event.which;
             const attribute = 'play-on-seeked';
 
-            if (is.keyboardEvent(event) && (code !== 39 && code !== 37)) {
+            if (is.keyboardEvent(event) && code !== 39 && code !== 37) {
                 return;
             }
 
@@ -681,7 +701,7 @@ class Listeners {
             // If we're done seeking and it was playing, resume playback
             if (play && done) {
                 seek.removeAttribute(attribute);
-                player.play();
+                silencePromise(player.play());
             } else if (!done && player.playing) {
                 seek.setAttribute(attribute, '');
                 player.pause();
@@ -732,7 +752,7 @@ class Listeners {
         });
 
         // Hide thumbnail preview - on mouse click, mouse leave, and video play/seek. All four are required, e.g., for buffering
-        this.bind(elements.progress, 'mouseleave click', () => {
+        this.bind(elements.progress, 'mouseleave touchend click', () => {
             const { previewThumbnails } = player;
 
             if (previewThumbnails && previewThumbnails.loaded) {

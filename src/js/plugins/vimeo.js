@@ -9,7 +9,7 @@ import { createElement, replaceElement, toggleClass } from '../utils/elements';
 import { triggerEvent } from '../utils/events';
 import fetch from '../utils/fetch';
 import is from '../utils/is';
-import loadScript from '../utils/loadScript';
+import loadScript from '../utils/load-script';
 import { extend } from '../utils/objects';
 import { format, stripHTML } from '../utils/strings';
 import { setAspectRatio } from '../utils/style';
@@ -42,23 +42,28 @@ function assurePlaybackState(play) {
 
 const vimeo = {
     setup() {
+        const player = this;
+
         // Add embed class for responsive
-        toggleClass(this.elements.wrapper, this.config.classNames.embed, true);
+        toggleClass(player.elements.wrapper, player.config.classNames.embed, true);
+
+        // Set speed options from config
+        player.options.speed = player.config.speed.options;
 
         // Set intial ratio
-        setAspectRatio.call(this);
+        setAspectRatio.call(player);
 
         // Load the SDK if not already
         if (!is.object(window.Vimeo)) {
-            loadScript(this.config.urls.vimeo.sdk)
+            loadScript(player.config.urls.vimeo.sdk)
                 .then(() => {
-                    vimeo.ready.call(this);
+                    vimeo.ready.call(player);
                 })
                 .catch(error => {
-                    this.debug.warn('Vimeo SDK (player.js) failed to load', error);
+                    player.debug.warn('Vimeo SDK (player.js) failed to load', error);
                 });
         } else {
-            vimeo.ready.call(this);
+            vimeo.ready.call(player);
         }
     },
 
@@ -98,6 +103,11 @@ const vimeo = {
         iframe.setAttribute('allowfullscreen', '');
         iframe.setAttribute('allowtransparency', '');
         iframe.setAttribute('allow', 'autoplay');
+
+        // Set the referrer policy if required
+        if (!is.empty(config.referrerPolicy)) {
+            iframe.setAttribute('referrerPolicy', config.referrerPolicy);
+        }
 
         // Get poster, if already set
         const { poster } = player;
@@ -191,18 +201,13 @@ const vimeo = {
                 return speed;
             },
             set(input) {
-                player.embed
-                    .setPlaybackRate(input)
-                    .then(() => {
-                        speed = input;
-                        triggerEvent.call(player, player.media, 'ratechange');
-                    })
-                    .catch(error => {
-                        // Hide menu item (and menu if empty)
-                        if (error.name === 'Error') {
-                            controls.setSpeedMenu.call(player, []);
-                        }
-                    });
+                player.embed.setPlaybackRate(input).then(() => {
+                    speed = input;
+                    triggerEvent.call(player, player.media, 'ratechange');
+                }).catch(() => {
+                    // Cannot set Playback Rate, Video is probably not on Pro account
+                    player.options.speed = [1];
+                });
             },
         });
 
@@ -333,6 +338,14 @@ const vimeo = {
                 // https://github.com/sampotts/plyr/issues/317
                 frame.setAttribute('tabindex', -1);
             }
+        });
+
+        player.embed.on('bufferstart', () => {
+            triggerEvent.call(player, player.media, 'waiting');
+        });
+
+        player.embed.on('bufferend', () => {
+            triggerEvent.call(player, player.media, 'playing');
         });
 
         player.embed.on('play', () => {

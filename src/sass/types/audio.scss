@@ -1,0 +1,64 @@
+// --------------------------------------------------------------
+// Audio styles
+// --------------------------------------------------------------
+
+// Container
+.plyr--audio {
+    display: block;
+}
+
+// Controls container
+.plyr--audio .plyr__controls {
+    background: var(--plyr-audio-controls-background, $plyr-audio-controls-background);
+    border-radius: inherit;
+    color: var(--plyr-audio-control-color, $plyr-audio-control-color);
+    padding: $plyr-control-spacing;
+}
+
+// Control elements
+.plyr--audio .plyr__control {
+    &.plyr__tab-focus,
+    &:hover,
+    &[aria-expanded='true'] {
+        background: var(
+            --plyr-audio-control-background-hover,
+            var(--plyr-color-main, $plyr-audio-control-background-hover)
+        );
+        color: var(--plyr-audio-control-color-hover, $plyr-audio-control-color-hover);
+    }
+}
+
+// Range inputs
+.plyr--full-ui.plyr--audio input[type='range'] {
+    &::-webkit-slider-runnable-track {
+        background-color: var(--plyr-audio-range-track-background, $plyr-audio-range-track-background);
+    }
+
+    &::-moz-range-track {
+        background-color: var(--plyr-audio-range-track-background, $plyr-audio-range-track-background);
+    }
+
+    &::-ms-track {
+        background-color: var(--plyr-audio-range-track-background, $plyr-audio-range-track-background);
+    }
+
+    // Pressed styles
+    &:active {
+        &::-webkit-slider-thumb {
+            @include plyr-range-thumb-active($plyr-audio-range-thumb-shadow-color);
+        }
+
+        &::-moz-range-thumb {
+            @include plyr-range-thumb-active($plyr-audio-range-thumb-shadow-color);
+        }
+
+        &::-ms-thumb {
+            @include plyr-range-thumb-active($plyr-audio-range-thumb-shadow-color);
+        }
+    }
+}
+
+// Progress
+.plyr--audio .plyr__progress__buffer {
+    color: var(--plyr-audio-progress-buffered-background, $plyr-audio-progress-buffered-background);
+}

@@ -67,25 +67,16 @@ $plyr-progress-offset: $plyr-range-thumb-height;
     }
 }
 
-.plyr--video .plyr__progress__buffer {
-    box-shadow: 0 1px 1px rgba(#000, 0.15);
-    color: $plyr-video-progress-buffered-bg;
-}
-
-.plyr--audio .plyr__progress__buffer {
-    color: $plyr-audio-progress-buffered-bg;
-}
-
 // Loading state
 .plyr--loading .plyr__progress__buffer {
     animation: plyr-progress 1s linear infinite;
     background-image: linear-gradient(
         -45deg,
-        $plyr-progress-loading-bg 25%,
+        var(--plyr-progress-loading-background, $plyr-progress-loading-background) 25%,
         transparent 25%,
         transparent 50%,
-        $plyr-progress-loading-bg 50%,
-        $plyr-progress-loading-bg 75%,
+        var(--plyr-progress-loading-background, $plyr-progress-loading-background) 50%,
+        var(--plyr-progress-loading-background, $plyr-progress-loading-background) 75%,
         transparent 75%,
         transparent
     );
@@ -95,9 +86,9 @@ $plyr-progress-offset: $plyr-range-thumb-height;
 }
 
 .plyr--video.plyr--loading .plyr__progress__buffer {
-    background-color: $plyr-video-progress-buffered-bg;
+    background-color: $plyr-video-progress-buffered-background;
 }
 
 .plyr--audio.plyr--loading .plyr__progress__buffer {
-    background-color: $plyr-audio-progress-buffered-bg;
+    background-color: $plyr-audio-progress-buffered-background;
 }

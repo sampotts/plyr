@@ -10,7 +10,7 @@ import { getElement, toggleClass } from './utils/elements';
 import { ready, triggerEvent } from './utils/events';
 import i18n from './utils/i18n';
 import is from './utils/is';
-import loadImage from './utils/loadImage';
+import loadImage from './utils/load-image';
 
 const ui = {
     addStyleHook() {
@@ -172,6 +172,11 @@ const ui = {
         // Set property synchronously to respect the call order
         this.media.setAttribute('poster', poster);
 
+        // HTML5 uses native poster attribute
+        if (this.isHTML5) {
+            return Promise.resolve(poster);
+        }
+
         // Wait until ui is ready
         return (
             ready
@@ -198,7 +203,9 @@ const ui = {
                         // Reset backgroundSize as well (since it can be set to "cover" for padded thumbnails for youtube)
                         backgroundSize: '',
                     });
+
                     ui.togglePoster.call(this, true);
+
                     return poster;
                 })
         );
@@ -214,6 +221,7 @@ const ui = {
         // Set state
         Array.from(this.elements.buttons.play || []).forEach(target => {
             Object.assign(target, { pressed: this.playing });
+            target.setAttribute('aria-label', i18n.get(this.playing ? 'pause' : 'play', this.config));
         });
 
         // Only update controls on non timeupdate events

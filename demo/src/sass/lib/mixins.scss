@@ -36,7 +36,7 @@
     @return #{$rem}rem;
 }
 
-@mixin font-size($size: 16) {
+@mixin font-size($size: $font-size-base) {
     font-size: $size * 1px; // Fallback in px
     font-size: calculate-rem($size);
 }
