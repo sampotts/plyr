@@ -35,7 +35,7 @@
         "lint:fix": "eslint --fix src/js",
         "remark": "remark -f --use 'validate-links=repository:\"sampotts/plyr\"' '{,!(node_modules),.?**/}*.md'",
         "deploy": "yarn lint && gulp version && gulp build && gulp deploy",
-        "prettier": "prettier --write ./src/js/*.js"
+        "format": "prettier --write ./src/js/**/*.js"
     },
     "devDependencies": {
         "ansi-colors": "^4.1.1",
