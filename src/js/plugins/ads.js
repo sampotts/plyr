@@ -325,11 +325,28 @@ class Ads {
 
                 // Start countdown
                 this.pollCountdown(true);
-
+                
                 if (!ad.isLinear()) {
                     // Position AdDisplayContainer correctly for overlay
                     ad.width = container.offsetWidth;
                     ad.height = container.offsetHeight;
+                    if(ad.getDuration() == -1){
+	                    //means a banner under page
+	                     this.elements.container.style.zIndex = 3;
+	                     //stop countdown don't need it any more
+	                     this.pollCountdown();
+	                     //adjust height of location sho controls remain usable
+						//maybe need nicer names for it... 
+						if(ad.width > 480){
+							var controlHeight = 40;
+						}else{
+							var controlHeight = 60;
+						}
+						
+						ad.height = container.offsetHeight - controlHeight;
+	                     	//adjust them
+	                     	this.elements.displayContainer.setSize(ad.width,ad.height);
+					}
                 }
 
                 // console.info('Ad type: ' + event.getAd().getAdPodInfo().getPodIndex());

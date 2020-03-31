@@ -21,7 +21,7 @@
         width: 100%;
     }
 
-    // The countdown label
+    // The countdown label hide it by default
     &::after {
         background: rgba($plyr-color-gray-9, 0.8);
         border-radius: 2px;
@@ -34,8 +34,11 @@
         position: absolute;
         right: $plyr-control-spacing;
         z-index: 3;
+        display: none;
     }
-
+    &[data-badge-text]:after{
+	    display: block;
+    }
     &::after:empty {
         display: none;
     }
