@@ -112,7 +112,7 @@ const controls = {
         setAttributes(
             icon,
             extend(attributes, {
-                role: 'presentation',
+                'aria-hidden': 'true',
                 focusable: 'false',
             }),
         );
