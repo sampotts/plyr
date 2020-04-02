@@ -53,7 +53,7 @@ const controls = {
 
             // Buttons
             this.elements.buttons = {
-                play: getElements.call(this, this.config.selectors.buttons.play),
+                play: getElements.call(this, this.config.selectors.buttons),
                 pause: getElement.call(this, this.config.selectors.buttons.pause),
                 restart: getElement.call(this, this.config.selectors.buttons.restart),
                 rewind: getElement.call(this, this.config.selectors.buttons.rewind),
@@ -63,6 +63,7 @@ const controls = {
                 airplay: getElement.call(this, this.config.selectors.buttons.airplay),
                 settings: getElement.call(this, this.config.selectors.buttons.settings),
                 captions: getElement.call(this, this.config.selectors.buttons.captions),
+                trim: getElement.call(this, this.config.selectors.buttons.trim),
                 fullscreen: getElement.call(this, this.config.selectors.buttons.fullscreen),
             };
 
@@ -228,6 +229,14 @@ const controls = {
                 props.labelPressed = 'disableCaptions';
                 props.icon = 'captions-off';
                 props.iconPressed = 'captions-on';
+                break;
+
+            case 'trim':
+                props.toggle = true;
+                props.label = 'enterTrim';
+                props.labelPressed = 'exitTrim';
+                props.icon = 'enter-trim';
+                props.iconPressed = 'exit-trim';
                 break;
 
             case 'fullscreen':
@@ -1590,6 +1599,11 @@ const controls = {
                 }
 
                 container.appendChild(createButton.call(this, 'download', attributes));
+            }
+
+            // Toggle trim button
+            if (control === 'trim') {
+                container.appendChild(createButton.call(this, 'trim', defaultAttributes));
             }
 
             // Toggle fullscreen button

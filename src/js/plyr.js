@@ -16,6 +16,7 @@ import Listeners from './listeners';
 import media from './media';
 import Ads from './plugins/ads';
 import PreviewThumbnails from './plugins/preview-thumbnails';
+import Trim from './plugins/trim';
 import source from './source';
 import Storage from './storage';
 import support from './support';
@@ -292,6 +293,9 @@ class Plyr {
 
         // Global listeners
         this.listeners.global();
+
+        // Setup trim
+        this.trim = new Trim(this);
 
         // Setup fullscreen
         this.fullscreen = new Fullscreen(this);
@@ -1021,6 +1025,21 @@ class Plyr {
 
         // Chrome
         return this.media === document.pictureInPictureElement;
+    }
+
+    /**
+     * Toggle Trim
+     * @param {Boolean} input - Whether to show trimming tool
+     */
+    set trimming(input) {
+        this.trim.toggle.call(this, input, false);
+    }
+
+    /**
+     * Get the current trim state
+     */
+    get trimming() {
+        return this.trim.trimming;
     }
 
     /**

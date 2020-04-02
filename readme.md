@@ -2,7 +2,7 @@ Plyr is a simple, lightweight, accessible and customizable HTML5, YouTube and Vi
 
 [Checkout the demo](https://plyr.io) - [Donate](#donate) - [Slack](https://bit.ly/plyr--chat)
 
-[![npm version](https://badge.fury.io/js/plyr.svg)](https://badge.fury.io/js/plyr) [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/sampotts/plyr) [![Financial Contributors on Open Collective](https://opencollective.com/plyr/all/badge.svg?label=financial+contributors)](https://opencollective.com/plyr) 
+[![npm version](https://badge.fury.io/js/plyr.svg)](https://badge.fury.io/js/plyr) [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/sampotts/plyr) [![Financial Contributors on Open Collective](https://opencollective.com/plyr/all/badge.svg?label=financial+contributors)](https://opencollective.com/plyr)
 
 [![Image of Plyr](https://cdn.plyr.io/static/demo/screenshot.png?v=3)](https://plyr.io)
 
@@ -448,7 +448,7 @@ player.source = {
     ],
     poster: '/path/to/poster.jpg',
     previewThumbnails: {
-        src: '/path/to/thumbnails.vtt'
+        src: '/path/to/thumbnails.vtt',
     },
     tracks: [
         {
@@ -579,6 +579,9 @@ player.on('ready', event => {
 | `waiting`        | Sent when the requested operation (such as playback) is delayed pending the completion of another operation (such as a seek).                                                                                                                                                                                                                  |
 | `emptied`        | he media has become empty; for example, this event is sent if the media has already been loaded (or partially loaded), and the `load()` method is called to reload it.                                                                                                                                                                         |
 | `cuechange`      | Sent when a `TextTrack` has changed the currently displaying cues.                                                                                                                                                                                                                                                                             |
+| `entertrim`      | Sent when the player enters the trimming tool                                                                                                                                                                                                                                                                                                  |
+| `exittrim`       | Sent when the player exits the trimming tool mode.                                                                                                                                                                                                                                                                                             |
+| `trimchange`     | Sent when the trimming region has changed.                                                                                                                                                                                                                                                                                                     |
 | `error`          | Sent when an error occurs. The element's `error` attribute contains more information.                                                                                                                                                                                                                                                          |
 
 ### YouTube only
@@ -620,6 +623,7 @@ document then the shortcuts will work when any element has focus, apart from an 
 | `F`        | Toggle fullscreen                      |
 | `C`        | Toggle captions                        |
 | `L`        | Toggle loop                            |
+| `T`        | Toggle trimming tool                   |
 
 # Preview thumbnails
 
@@ -630,6 +634,10 @@ You can see the example VTT files [here](https://cdn.plyr.io/static/demo/thumbs/
 # Fullscreen
 
 Fullscreen in Plyr is supported by all browsers that [currently support it](http://caniuse.com/#feat=fullscreen).
+
+# Trimming
+
+It's possible to create a trim region for your video using the trim control. You will need to generate the clip yourself through listening to the 'trimchange' event and will return the start and end of the selected region.
 
 # Browser support
 
@@ -776,7 +784,6 @@ Support this project with your organization. Your logo will show up here with a 
 
 <a href="https://opencollective.com/plyr/organization/0/website"><img src="https://opencollective.com/plyr/organization/0/avatar.svg"></a>
 <a href="https://opencollective.com/plyr/organization/1/website"><img src="https://opencollective.com/plyr/organization/1/avatar.svg"></a><a href="https://opencollective.com/plyr/organization/2/website"><img src="https://opencollective.com/plyr/organization/2/avatar.svg"></a>
-
 
 # Copyright and License
 
