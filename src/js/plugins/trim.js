@@ -13,7 +13,9 @@ class Trim {
         this.config = player.config.trim;
         this.loaded = false;
         this.trimming = false;
-        this.trimLength = 30;
+        this.defaultTrimLength = 30;
+        this.startTime = 0;
+        this.endTime = 0;
         this.tool = {
             bar: null,
             leftThumb: null,
@@ -29,14 +31,7 @@ class Trim {
         // Update the UI
         this.update();
 
-        // Prevent the trim tool from being added until the player is in a playable state
-        // If the user has pressed the trim tool before this event has fired, show the tool
-        this.player.once('canplay', () => {
-            this.loaded = true;
-            if (this.trimming) {
-                this.createTrimTool();
-            }
-        });
+        this.listeners();
     }
 
     // Determine if trim is enabled
@@ -54,14 +49,18 @@ class Trim {
         return this.trimming;
     }
 
-    // Get trim range in seconds
-    getTrimRange() {
-        const { left, width } = this.tool.bar.style;
-        const start = this.player.media.duration * (parseFloat(left) / 100);
-        const end = this.player.media.duration * ((parseFloat(left) + parseFloat(width)) / 100);
+    get trimTime() {
+        return { startTime: this.startTime, endTime: this.endTime };
+    }
 
-        this.player.debug.log(`Set trimming range from ${start}seconds to ${end}seconds`);
-        return { start, end };
+    // Store the trim start time in seconds
+    setStartTime(percentage) {
+        this.startTime = this.player.media.duration * (parseFloat(percentage) / 100);
+    }
+
+    // Store the trim end time in seconds
+    setEndTime(percentage) {
+        this.endTime = this.startTime + this.player.media.duration * (parseFloat(percentage) / 100);
     }
 
     // Show the trim toolbar from the timeline
@@ -88,13 +87,14 @@ class Trim {
 
     // Add trim bar to the timeline
     createTrimBar(seekElement) {
-        // Set the trim bar from the current seek time to the trimlength
+        // Set the trim bar from the current seek time percentage to x number of seconds after and limit the end percentage to 100%
         const start = this.player.elements.inputs.seek.value;
-        // Set the trim bar to be x number of seconds after start and prevent from overflowing
-        const end = Math.min(
-            parseFloat(start) + (100 / this.player.duration) * this.trimLength,
-            100 - parseFloat(start),
-        );
+        const end = Math.min(parseFloat(start) + (100 / this.player.duration) * this.defaultTrimLength, 100 - start);
+
+        // Store the start and end video percentages in seconds
+        this.setStartTime(start);
+        this.setEndTime(end);
+
         this.tool.bar = createElement('span', {
             class: this.player.config.classNames.trim.trimTool,
         });
@@ -103,7 +103,7 @@ class Trim {
         this.tool.bar.style.width = `${end.toString()}%`;
         seekElement.appendChild(this.tool.bar);
 
-        triggerEvent.call(this.player, this.getTrimRange(), 'trimchange');
+        triggerEvent.call(this.player, this.trimTime, 'trimchange');
     }
 
     // Add trim length thumbs to the timeline
@@ -139,7 +139,7 @@ class Trim {
 
         if (type === 'mouseup' || type === 'touchend') {
             this.tool.editing = null;
-            triggerEvent.call(this.player, this.getTrimRange(), 'trimchange');
+            triggerEvent.call(this.player, this.trimTime, 'trimchange');
         } else if ((type === 'mousedown' || type === 'touchstart') && target.classList.contains(leftThumb)) {
             this.tool.editing = leftThumb;
         } else if ((type === 'mousedown' || type === 'touchstart') && target.classList.contains(rightThumb)) {
@@ -150,23 +150,53 @@ class Trim {
     setTrimLength(event) {
         if (!this.tool.editing) return;
 
-        const { leftThumb, rightThumb } = this.player.config.classNames.trim;
-        const { bar, editing } = this.tool;
         const clientRect = this.player.elements.progress.getBoundingClientRect();
+        // Mouse Position
         const xPos = event.type === 'touchmove' ? event.touches[0].pageX : event.pageX;
         // Percentage must be between 0 and 100
         const percentage = Math.max(Math.min((100 / clientRect.width) * (xPos - clientRect.left), 100), 0);
-
         /* Alter width of the trim region
         - If left thumb selected increase width and keep right hand side in same position
         - If right thumb selected just decrease the width */
+        const { leftThumb, rightThumb } = this.player.config.classNames.trim;
+        const { bar, editing } = this.tool;
         if (editing === leftThumb) {
             bar.style.width = `${parseFloat(bar.style.width) - (percentage - parseFloat(bar.style.left))}%`;
             bar.style.left = `${percentage}%`;
+            this.setStartTime(percentage);
             // Update seek position to match the left thumbs position if less than the current left thumb position
         } else if (editing === rightThumb) {
-            bar.style.width = `${percentage - parseFloat(bar.style.left)}%`;
+            const end = percentage - parseFloat(bar.style.left);
+            bar.style.width = `${end}%`;
+            this.setEndTime(end);
         }
+    }
+
+    listeners() {
+        /* Prevent the trim tool from being added until the player is in a playable state
+           If the user has pressed the trim tool before this event has fired, show the tool */
+        this.player.once('canplay', () => {
+            this.loaded = true;
+            if (this.trimming) {
+                this.createTrimTool();
+            }
+        });
+
+        // Set the seektime to the start of the trim timeline, if the seektime is outside of the region.
+        this.player.on('timeupdate', () => {
+            if (!(this.active && this.trimming && this.player.playing)) {
+                return;
+            }
+
+            const { currentTime } = this.player;
+            if (currentTime < this.startTime || currentTime >= this.endTime) {
+                this.player.currentTime = this.startTime;
+
+                if (currentTime >= this.endTime) {
+                    this.player.pause();
+                }
+            }
+        });
     }
 
     // On toggle of trim control, trigger event

@@ -453,8 +453,7 @@ declare namespace Plyr {
         captions?: CaptionOptions;
 
         /**
-         * enabled: Toggles whether fullscreen should be enabled. fallback: Allow fallback to a full-window solution.
-         * iosNative: whether to use native iOS fullscreen when entering fullscreen (no custom controls)
+         * enabled: Toggles whether trimming should be enabled.
          */
         trim?: TrimOptions;
 
@@ -538,6 +537,12 @@ declare namespace Plyr {
     interface TrimOptions {
         enabled?: boolean;
         active?: boolean;
+        trimTime?: TrimTime;
+    }
+
+    interface TrimTime {
+        startTime: number;
+        endTime: number;
     }
 
     interface FullScreenOptions {
