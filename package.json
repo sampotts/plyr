@@ -31,7 +31,6 @@
     "browserslist": "> 1%",
     "scripts": {
         "build": "gulp build",
-        "serve": "gulp serve",
         "lint": "eslint src/js && npm run-script remark",
         "lint:fix": "eslint --fix src/js",
         "remark": "remark -f --use 'validate-links=repository:\"sampotts/plyr\"' '{,!(node_modules),.?**/}*.md'",

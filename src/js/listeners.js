@@ -816,13 +816,13 @@ class Listeners {
 
         // Also update controls.hover state for any non-player children of fullscreen element (as above)
         if (elements.fullscreen) {
-            for (let i = 0; i < elements.fullscreen.children.length; i++) {
-              if (!elements.fullscreen.children[i].contains(elements.container)) {
-                this.bind(elements.fullscreen.children[i], 'mouseenter mouseleave', event => {
+            Array.from(elements.fullscreen.children)
+            .filter(c => !c.contains(elements.container))
+            .forEach(child => {
+                this.bind(child, 'mouseenter mouseleave', event => {
                     elements.controls.hover = !player.touch && event.type === 'mouseenter';
                 });
-              }
-            }
+            });
         }
 
         // Update controls.pressed state (used for ui.toggleControls to avoid hiding when interacting)
