@@ -61,20 +61,12 @@ const ui = {
             captions.setup.call(this);
         }
 
-        // Reset volume
-        this.volume = null;
-
-        // Reset mute state
-        this.muted = null;
-
-        // Reset loop state
-        this.loop = null;
-
-        // Reset quality setting
-        this.quality = null;
-
-        // Reset speed
-        this.speed = null;
+        // set volume, mute, loop, quality, speed
+        this.volume = this.config.volume;
+        this.muted = this.config.muted;
+        this.loop = this.config.loop;
+        this.quality = this.config.quality;
+        this.speed = this.config.speed;
 
         // Reset volume display
         controls.updateVolume.call(this);
