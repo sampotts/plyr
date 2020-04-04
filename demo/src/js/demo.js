@@ -65,12 +65,6 @@ import toggleClass from './toggle-class';
                     // Prevent Vimeo blocking plyr.io demo site
                     referrerPolicy: 'no-referrer',
                 },
-                fullscreen: {
-                    enabled: true,
-                    fallback: true,
-                    iosNative: false,
-                    container: '#container',
-                },
             });
 
             // Expose for tinkering in the console
