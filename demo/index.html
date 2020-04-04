@@ -184,9 +184,11 @@
                     <!-- BEGIN FULLSCREEN OVERLAY EXAMPLE -->
                     <style>
                         #container {
-                            position: relative;
-                            margin-top:  16px;
                             overflow: hidden;
+                        }
+                        #container:not(.plyr--fullscreen-fallback) {
+                            position: relative;
+                            margin-top: 16px;
                         }
                         .plyr {
                             margin-top: 0;
