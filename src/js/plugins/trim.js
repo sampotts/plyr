@@ -184,7 +184,7 @@ class Trim {
 
         // Set the seektime to the start of the trim timeline, if the seektime is outside of the region.
         this.player.on('timeupdate', () => {
-            if (!(this.active && this.trimming && this.player.playing)) {
+            if (!this.active || !this.trimming || !this.player.playing || this.tool.editing) {
                 return;
             }
 
