@@ -2,10 +2,11 @@
 // Trim Tool
 // --------------------------------------------------------------
 
-$plyr-trim-thumb-width: 6px !default;
-$plyr-trim-thumb-height: 15px !default;
+$plyr-trim-thumb-width: 7px !default;
+$plyr-trim-thumb-height: $plyr-range-max-height !default;
 $plyr-trim-thumb-border: 2px !default;
 $plyr-trim-thumb-border-radius: 5px !default;
+$plyr-trim-box-shadow: inset 0 0 0 0.5px darken($plyr-color-main, 5%) !default;
 
 // Trim Tool for the progress bar
 .plyr__trim-tool {
@@ -13,12 +14,11 @@ $plyr-trim-thumb-border-radius: 5px !default;
     display: block;
     height: $plyr-range-track-height;
     left: 0;
-    margin: -($plyr-range-track-height / 2) 0 0;
-    opacity: 0.8;
+    margin-top: -($plyr-range-track-height / 2);
     position: absolute;
     top: $plyr-range-track-height;
+    top: 50%;
     width: 3px;
-    z-index: 4; // Between progress and thumb
 }
 
 .plyr__trim-thumb-left,
@@ -26,9 +26,10 @@ $plyr-trim-thumb-border-radius: 5px !default;
     background: $plyr-color-main;
     border: $plyr-trim-thumb-border;
     border-radius: $plyr-trim-thumb-border-radius;
+    box-shadow: $plyr-trim-box-shadow;
     height: $plyr-trim-thumb-height;
     position: absolute;
-    top: -$plyr-range-max-height / 2 + $plyr-trim-thumb-border;
+    top: -$plyr-trim-thumb-height / 2 + $plyr-trim-thumb-border;
     touch-action: none;
     user-select: none;
     width: $plyr-trim-thumb-width;
