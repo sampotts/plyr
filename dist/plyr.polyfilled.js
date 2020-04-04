@@ -7018,6 +7018,25 @@ typeof navigator === "object" && (function (global, factory) {
 
     var method = prototype.matches || prototype.webkitMatchesSelector || prototype.mozMatchesSelector || prototype.msMatchesSelector || match;
     return method.call(element, selector);
+  } // Closest ancestor element matching selector (also tests element itself)
+
+  function closest(element, selector) {
+    var _Element2 = Element,
+        prototype = _Element2.prototype; // https://developer.mozilla.org/en-US/docs/Web/API/Element/closest#Polyfill
+
+    function closestElement() {
+      var el = this;
+
+      do {
+        if (matches$1.matches(el, selector)) return el;
+        el = el.parentElement || el.parentNode;
+      } while (el !== null && el.nodeType === 1);
+
+      return null;
+    }
+
+    var method = prototype.closest || closestElement;
+    return method.call(element, selector);
   } // Find all elements
 
   function getElements(selector) {
@@ -7523,7 +7542,7 @@ typeof navigator === "object" && (function (global, factory) {
     });
   } // Get the closest value in an array
 
-  function closest(array, value) {
+  function closest$1(array, value) {
     if (!is$1.array(array) || !array.length) {
       return null;
     }
@@ -9948,6 +9967,9 @@ typeof navigator === "object" && (function (global, factory) {
       fallback: true,
       // Fallback using full viewport/window
       iosNative: false // Use the native fullscreen in iOS (disables custom controls)
+      // Selector for the fullscreen container so contextual / non-player content can remain visible in fullscreen mode
+      // Non-ancestors of the player element will be ignored
+      // container: null, // defaults to the player element
 
     },
     // Local storage
@@ -10304,7 +10326,10 @@ typeof navigator === "object" && (function (global, factory) {
         y: 0
       }; // Force the use of 'full window/browser' rather than fullscreen
 
-      this.forceFallback = player.config.fullscreen.fallback === 'force'; // Register event listeners
+      this.forceFallback = player.config.fullscreen.fallback === 'force'; // Get the fullscreen element
+      // Checks container is an ancestor, defaults to null
+
+      this.player.elements.fullscreen = player.config.fullscreen.container && closest(this.player.elements.container, player.config.fullscreen.container); // Register event listeners
       // Handle event (incase user presses escape etc)
 
       on.call(this.player, document, this.prefix === 'ms' ? 'MSFullscreenChange' : "".concat(this.prefix, "fullscreenchange"), function () {
@@ -10530,7 +10555,7 @@ typeof navigator === "object" && (function (global, factory) {
     }, {
       key: "target",
       get: function get() {
-        return browser.isIos && this.player.config.fullscreen.iosNative ? this.player.media : this.player.elements.container;
+        return browser.isIos && this.player.config.fullscreen.iosNative ? this.player.media : this.player.elements.fullscreen || this.player.elements.container;
       }
     }], [{
       key: "native",
@@ -11533,7 +11558,18 @@ typeof navigator === "object" && (function (global, factory) {
 
         this.bind(elements.controls, 'mouseenter mouseleave', function (event) {
           elements.controls.hover = !player.touch && event.type === 'mouseenter';
-        }); // Update controls.pressed state (used for ui.toggleControls to avoid hiding when interacting)
+        }); // Also update controls.hover state for any non-player children of fullscreen element (as above)
+
+        if (elements.fullscreen) {
+          for (var i = 0; i < elements.fullscreen.children.length; i++) {
+            if (!elements.fullscreen.children[i].contains(elements.container)) {
+              this.bind(elements.fullscreen.children[i], 'mouseenter mouseleave', function (event) {
+                elements.controls.hover = !player.touch && event.type === 'mouseenter';
+              });
+            }
+          }
+        } // Update controls.pressed state (used for ui.toggleControls to avoid hiding when interacting)
+
 
         this.bind(elements.controls, 'mousedown mouseup touchstart touchend touchcancel', function (event) {
           elements.controls.pressed = ['mousedown', 'touchstart'].includes(event.type);
@@ -14392,6 +14428,7 @@ typeof navigator === "object" && (function (global, factory) {
 
       this.elements = {
         container: null,
+        fullscreen: null,
         captions: null,
         buttons: {},
         display: {},
@@ -14577,9 +14614,11 @@ typeof navigator === "object" && (function (global, factory) {
         on.call(this, this.elements.container, this.config.events.join(' '), function (event) {
           _this.debug.log("event: ".concat(event.type));
         });
-      } // Setup interface
-      // If embed but not fully supported, build interface now to avoid flash of controls
+      } // Setup fullscreen
 
+
+      this.fullscreen = new Fullscreen(this); // Setup interface
+      // If embed but not fully supported, build interface now to avoid flash of controls
 
       if (this.isHTML5 || this.isEmbed && !this.supported.ui) {
         ui.build.call(this);
@@ -14588,9 +14627,7 @@ typeof navigator === "object" && (function (global, factory) {
 
       this.listeners.container(); // Global listeners
 
-      this.listeners.global(); // Setup fullscreen
-
-      this.fullscreen = new Fullscreen(this); // Setup ads if provided
+      this.listeners.global(); // Setup ads if provided
 
       if (this.config.ads.enabled) {
         this.ads = new Ads(this);
@@ -15289,7 +15326,7 @@ typeof navigator === "object" && (function (global, factory) {
         var updateStorage = true;
 
         if (!options.includes(quality)) {
-          var value = closest(options, quality);
+          var value = closest$1(options, quality);
           this.debug.warn("Unsupported quality option: ".concat(quality, ", using ").concat(value, " instead"));
           quality = value; // Don't update storage if quality is not supported
 

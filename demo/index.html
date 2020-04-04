@@ -180,6 +180,90 @@
                             >Download</a
                         >
                     </video>
+
+                    <!-- BEGIN FULLSCREEN OVERLAY EXAMPLE -->
+                    <style>
+                        #container {
+                            position: relative;
+                            margin-top:  16px;
+                            overflow: hidden;
+                        }
+                        .plyr {
+                            margin-top: 0;
+                        }
+                        .plyr--overlay {
+                            position: absolute;
+                            pointer-events: none;
+                            top: 0;
+                            left: 0;
+                            margin: 0.4444em;
+                            transition: 0.2s 0.3s opacity ease-in-out,
+                                        0.3s 0.3s visibility ease-in-out,
+                                        0.3s 0.3s transform ease-in-out;
+                        }
+                        .plyr--hide-controls ~ .plyr--overlay {
+                            transition-delay: 0;
+                            transform:  translateX(-1em);
+                            opacity: 0;
+                            visibility: hidden;
+                        }
+                        .plyr--title {
+                            padding: 0.125em 0.625em;
+                            background: linear-gradient(to left top,#e0f6ff,#f5fcff);
+                            color: #00b3ff;
+                            z-index: 1;
+                            border-radius: 4px;
+                            margin: 0;
+                            pointer-events: all;
+                        }
+                        .plyr--tags {
+                            display: flex;
+                            margin-top:  0.2em;
+                            list-style: none;
+                            transition: 0.3s 0.2s transform ease-in-out;
+                        }
+                        .plyr--hide-controls ~ .plyr--overlay .plyr--tags {
+                            transition-delay: 0.2s;
+                            transform:  translateX(-1em);
+                        }
+                        .plyr--tags-item {
+                            color: #fff;
+                            background: #00b3ff;
+                            padding: 0 0.4em 0.1em;
+                            border: none;
+                            border-radius: 4px;
+                            margin-right: 0.2em;
+                            pointer-events: all;
+                        }
+                        .plyr--tags-item:hover {
+                            color: #00b3ff;
+                            background: #fff;
+                            transition: none;
+                        }
+                        .plyr--tags-item small {
+                            display: inline;
+                            margin: 0;
+                        }
+                        .plyr--tags-item::after {
+                            content:  none;
+                        }
+                    </style>
+                    <div class="plyr--overlay">
+                        <h2 class="plyr--title">View From A Blue Moon</h2>
+                        <ul class="plyr--tags">
+                            <li>
+                                <a class="plyr--tags-item" href="#surf-film"><small>Surf film</small></a>
+                            </li>
+                            <li>
+                                <a class="plyr--tags-item" href="#oceans"><small>Oceans</small></a>
+                            </li>
+                            <li>
+                                <a class="plyr--tags-item" href="#bio"><small>Bio</small></a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- / END FULLSCREEN OVERLAY EXAMPLE -->
+
                 </div>
 
                 <ul>
