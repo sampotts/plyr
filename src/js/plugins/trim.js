@@ -5,6 +5,7 @@
 import { createElement, toggleClass, toggleHidden } from '../utils/elements';
 import { on, triggerEvent } from '../utils/events';
 import is from '../utils/is';
+import { formatTime } from '../utils/time';
 
 class Trim {
     constructor(player) {
@@ -13,25 +14,15 @@ class Trim {
         this.config = player.config.trim;
         this.loaded = false;
         this.trimming = false;
+        this.editing = false;
         this.defaultTrimLength = 30;
         this.startTime = 0;
         this.endTime = 0;
-        this.tool = {
-            bar: null,
-            leftThumb: null,
-            rightThumb: null,
-            editing: null,
+        this.elements = {
+            bar: {},
         };
 
-        // Handle event (incase user presses escape etc)
-        on.call(this.player, document, () => {
-            this.onChange();
-        });
-
-        // Update the UI
-        this.update();
-
-        this.listeners();
+        this.load();
     }
 
     // Determine if trim is enabled
@@ -49,8 +40,22 @@ class Trim {
         return this.trimming;
     }
 
+    // Get the current trim time
     get trimTime() {
         return { startTime: this.startTime, endTime: this.endTime };
+    }
+
+    load() {
+        // Handle event (incase user presses escape etc)
+        on.call(this.player, document, () => {
+            this.onChange();
+        });
+
+        // Update the UI
+        this.update();
+
+        // Setup player listeners
+        this.listeners();
     }
 
     // Store the trim start time in seconds
@@ -63,17 +68,17 @@ class Trim {
         this.endTime = this.startTime + this.player.media.duration * (parseFloat(percentage) / 100);
     }
 
-    // Show the trim toolbar from the timeline
+    // Show the trim toolbar on the timeline
     showTrimTool() {
-        if (!this.tool.bar) {
+        if (is.empty(this.elements.bar)) {
             this.createTrimTool();
         }
-        toggleHidden(this.tool.bar, false);
+        toggleHidden(this.elements.bar, false);
     }
 
     // Hide the trim toolbar from the timeline
     hideTrimTool() {
-        toggleHidden(this.tool.bar, true);
+        toggleHidden(this.elements.bar, true);
     }
 
     // Add trim toolbar to the timeline
@@ -82,6 +87,7 @@ class Trim {
         if (is.element(seekElement) && this.loaded) {
             this.createTrimBar(seekElement);
             this.createTrimBarThumbs();
+            this.createThumbTime();
         }
     }
 
@@ -95,13 +101,13 @@ class Trim {
         this.setStartTime(start);
         this.setEndTime(end);
 
-        this.tool.bar = createElement('span', {
+        this.elements.bar = createElement('span', {
             class: this.player.config.classNames.trim.trimTool,
         });
 
-        this.tool.bar.style.left = `${start.toString()}%`;
-        this.tool.bar.style.width = `${end.toString()}%`;
-        seekElement.appendChild(this.tool.bar);
+        this.elements.bar.style.left = `${start.toString()}%`;
+        this.elements.bar.style.width = `${end.toString()}%`;
+        seekElement.appendChild(this.elements.bar);
 
         triggerEvent.call(this.player, this.trimTime, 'trimchange');
     }
@@ -111,44 +117,72 @@ class Trim {
         const { trim } = this.player.config.classNames;
 
         // Create the trim bar thumb elements
-        this.tool.leftThumb = createElement('span', { class: trim.leftThumb });
-        this.tool.rightThumb = createElement('span', { class: trim.rightThumb });
+        this.elements.bar.leftThumb = createElement('span', { class: trim.leftThumb });
+        this.elements.bar.rightThumb = createElement('span', { class: trim.rightThumb });
 
         // Add the thumbs to the bar
-        this.tool.bar.appendChild(this.tool.leftThumb);
-        this.tool.bar.appendChild(this.tool.rightThumb);
+        this.elements.bar.appendChild(this.elements.bar.leftThumb);
+        this.elements.bar.appendChild(this.elements.bar.rightThumb);
 
         // Add listens for trim thumb (handle) selection
-        this.player.listeners.bind(this.tool.leftThumb, 'mousedown touchstart', event => {
-            if (this.tool.bar) {
+        this.player.listeners.bind(this.elements.bar.leftThumb, 'mousedown touchstart', event => {
+            if (this.elements.bar) {
                 this.setEditing(event);
             }
         });
 
         // Listen for trim thumb (handle) selection
-        this.player.listeners.bind(this.tool.rightThumb, 'mousedown touchstart', event => {
-            if (this.tool.bar) {
+        this.player.listeners.bind(this.elements.bar.rightThumb, 'mousedown touchstart', event => {
+            if (this.elements.bar) {
                 this.setEditing(event);
             }
         });
+    }
+
+    createThumbTime() {
+        // Create HTML element, parent+span: time text (e.g., 01:32:00)
+        this.elements.bar.leftThumb.timeContainer = createElement('div', {
+            class: this.player.config.classNames.trim.timeContainer,
+        });
+
+        this.elements.bar.rightThumb.timeContainer = createElement('div', {
+            class: this.player.config.classNames.trim.timeContainer,
+        });
+
+        // Append the time element to the container
+        this.elements.bar.leftThumb.timeContainer.time = createElement('span', {}, formatTime(this.startTime));
+        this.elements.bar.leftThumb.timeContainer.appendChild(this.elements.bar.leftThumb.timeContainer.time);
+        this.elements.bar.rightThumb.timeContainer.time = createElement('span', {}, formatTime(this.endTime));
+        this.elements.bar.rightThumb.timeContainer.appendChild(this.elements.bar.rightThumb.timeContainer.time);
+
+        // Append the time container to the bar
+        this.elements.bar.leftThumb.appendChild(this.elements.bar.leftThumb.timeContainer);
+        this.elements.bar.rightThumb.appendChild(this.elements.bar.rightThumb.timeContainer);
     }
 
     setEditing(event) {
         const { leftThumb, rightThumb } = this.player.config.classNames.trim;
         const { type, target } = event;
 
-        if (type === 'mouseup' || type === 'touchend') {
-            this.tool.editing = null;
+        if ((type === 'mouseup' || type === 'touchend') && this.editing === leftThumb) {
+            this.editing = null;
+            this.toggleTimeContainer(this.elements.bar.leftThumb, false);
+            triggerEvent.call(this.player, this.trimTime, 'trimchange');
+        } else if ((type === 'mouseup' || type === 'touchend') && this.editing === rightThumb) {
+            this.editing = null;
+            this.toggleTimeContainer(this.elements.bar.rightThumb, false);
             triggerEvent.call(this.player, this.trimTime, 'trimchange');
         } else if ((type === 'mousedown' || type === 'touchstart') && target.classList.contains(leftThumb)) {
-            this.tool.editing = leftThumb;
+            this.editing = leftThumb;
+            this.toggleTimeContainer(this.elements.bar.leftThumb, true);
         } else if ((type === 'mousedown' || type === 'touchstart') && target.classList.contains(rightThumb)) {
-            this.tool.editing = rightThumb;
+            this.editing = rightThumb;
+            this.toggleTimeContainer(this.elements.bar.rightThumb, true);
         }
     }
 
     setTrimLength(event) {
-        if (!this.tool.editing) return;
+        if (!this.editing) return;
 
         const clientRect = this.player.elements.progress.getBoundingClientRect();
         // Mouse Position
@@ -159,17 +193,26 @@ class Trim {
         - If left thumb selected increase width and keep right hand side in same position
         - If right thumb selected just decrease the width */
         const { leftThumb, rightThumb } = this.player.config.classNames.trim;
-        const { bar, editing } = this.tool;
-        if (editing === leftThumb) {
+        const { bar } = this.elements;
+        if (this.editing === leftThumb) {
             bar.style.width = `${parseFloat(bar.style.width) - (percentage - parseFloat(bar.style.left))}%`;
             bar.style.left = `${percentage}%`;
             this.setStartTime(percentage);
+            // Set the timestamp of the current trim handle position
+            bar.leftThumb.timeContainer.time.innerText = formatTime(this.startTime);
             // Update seek position to match the left thumbs position if less than the current left thumb position
-        } else if (editing === rightThumb) {
+        } else if (this.editing === rightThumb) {
             const end = percentage - parseFloat(bar.style.left);
             bar.style.width = `${end}%`;
             this.setEndTime(end);
+            // Set the timestamp of the current trim handle position
+            bar.rightThumb.timeContainer.time.innerText = formatTime(this.endTime);
         }
+    }
+
+    toggleTimeContainer(element, toggle = false) {
+        const className = this.player.config.classNames.trim.timeContainerShown;
+        element.timeContainer.classList.toggle(className, toggle);
     }
 
     listeners() {
@@ -184,7 +227,7 @@ class Trim {
 
         // Set the seektime to the start of the trim timeline, if the seektime is outside of the region.
         this.player.on('timeupdate', () => {
-            if (!this.active || !this.trimming || !this.player.playing || this.tool.editing) {
+            if (!this.active || !this.trimming || !this.player.playing || this.editing) {
                 return;
             }
 

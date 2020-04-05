@@ -385,8 +385,10 @@ const defaults = {
             active: 'plyr--trim-active',
             // Trim tool
             trimTool: 'plyr__trim-tool',
-            leftThumb: 'plyr__trim-thumb-left',
-            rightThumb: 'plyr__trim-thumb-right',
+            leftThumb: 'plyr__trim-tool__thumb-left',
+            rightThumb: 'plyr__trim-tool__thumb-right',
+            timeContainer: 'plyr__trim-tool__time-container',
+            timeContainerShown: 'plyr__trim-tool__time-container--is-shown',
         },
         fullscreen: {
             enabled: 'plyr--fullscreen-enabled',

@@ -776,7 +776,7 @@ class Listeners {
         this.bind(elements.controls, 'mousemove touchmove', event => {
             const { trim } = player;
 
-            if (trim && trim.tool.editing) {
+            if (trim && trim.editing) {
                 trim.setTrimLength(event);
             }
         });
@@ -785,7 +785,7 @@ class Listeners {
         this.bind(elements.controls, 'mouseup touchend', event => {
             const { trim } = player;
 
-            if (trim && trim.tool.editing) {
+            if (trim && trim.editing) {
                 trim.setEditing(event);
             }
         });
