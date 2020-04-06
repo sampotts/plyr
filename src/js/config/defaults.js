@@ -145,7 +145,7 @@ const defaults = {
         'pip',
         'airplay',
         // 'download',
-        'trim',
+        // 'trim',
         'fullscreen',
     ],
     settings: ['captions', 'quality', 'speed'],

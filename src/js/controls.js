@@ -53,7 +53,7 @@ const controls = {
 
             // Buttons
             this.elements.buttons = {
-                play: getElements.call(this, this.config.selectors.buttons),
+                play: getElements.call(this, this.config.selectors.buttons.play),
                 pause: getElement.call(this, this.config.selectors.buttons.pause),
                 restart: getElement.call(this, this.config.selectors.buttons.restart),
                 rewind: getElement.call(this, this.config.selectors.buttons.rewind),

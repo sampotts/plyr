@@ -448,7 +448,7 @@ player.source = {
     ],
     poster: '/path/to/poster.jpg',
     previewThumbnails: {
-        src: '/path/to/thumbnails.vtt',
+        src: '/path/to/thumbnails.vtt'
     },
     tracks: [
         {
@@ -579,7 +579,7 @@ player.on('ready', event => {
 | `waiting`        | Sent when the requested operation (such as playback) is delayed pending the completion of another operation (such as a seek).                                                                                                                                                                                                                  |
 | `emptied`        | he media has become empty; for example, this event is sent if the media has already been loaded (or partially loaded), and the `load()` method is called to reload it.                                                                                                                                                                         |
 | `cuechange`      | Sent when a `TextTrack` has changed the currently displaying cues.                                                                                                                                                                                                                                                                             |
-| `entertrim`      | Sent when the player enters the trimming tool                                                                                                                                                                                                                                                                                                  |
+| `entertrim`      | Sent when the player enters the trimming tool.                                                                                                                                                                                                                                                                                                 |
 | `exittrim`       | Sent when the player exits the trimming tool mode.                                                                                                                                                                                                                                                                                             |
 | `trimchange`     | Sent when the trimming region has changed.                                                                                                                                                                                                                                                                                                     |
 | `error`          | Sent when an error occurs. The element's `error` attribute contains more information.                                                                                                                                                                                                                                                          |
@@ -637,7 +637,7 @@ Fullscreen in Plyr is supported by all browsers that [currently support it](http
 
 # Trimming
 
-It's possible to create a trim region for your video using the trim control. You will need to generate the clip yourself through listening to the 'trimchange' event and will return the start and end of the selected region.
+It's possible to create a trim region from your video using the trim mode. This is useful when creating clips or repeating loops. The 'trimchange' event will give you the start and end time of the selected region.
 
 # Browser support
 
