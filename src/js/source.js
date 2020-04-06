@@ -147,6 +147,9 @@ const source = {
                     }
                 }
 
+                // Update trimming tool support
+                this.trim.update();
+
                 // Update the fullscreen support
                 this.fullscreen.update();
             },
