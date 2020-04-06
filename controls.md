@@ -59,6 +59,8 @@ i18n: {
     disableCaptions: 'Disable captions',
     enterTrim: 'Enter trim',
     exitTrim: 'Exit trim',
+    trimStart: 'Trim Start',
+    trimEnd: 'Trim End',
     enterFullscreen: 'Enter fullscreen',
     exitFullscreen: 'Exit fullscreen',
     frameTitle: 'Player for {title}',

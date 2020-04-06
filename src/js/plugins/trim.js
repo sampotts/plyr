@@ -4,7 +4,9 @@
 
 import { createElement, toggleClass, toggleHidden } from '../utils/elements';
 import { on, triggerEvent } from '../utils/events';
+import i18n from '../utils/i18n';
 import is from '../utils/is';
+import { extend } from '../utils/objects';
 import { formatTime } from '../utils/time';
 
 class Trim {
@@ -117,8 +119,32 @@ class Trim {
         const { trim } = this.player.config.classNames;
 
         // Create the trim bar thumb elements
-        this.elements.bar.leftThumb = createElement('span', { class: trim.leftThumb });
-        this.elements.bar.rightThumb = createElement('span', { class: trim.rightThumb });
+        this.elements.bar.leftThumb = createElement(
+            'span',
+            extend({
+                class: trim.leftThumb,
+                role: 'slider',
+                'aria-valuemin': 0,
+                'aria-valuemax': this.player.duration,
+                'aria-valuenow': this.startTime,
+                'aria-valuetext': formatTime(this.startTime),
+                'aria-label': i18n.get('trimStart', this.player.config),
+            }),
+        );
+
+        // Create the trim bar thumb elements
+        this.elements.bar.rightThumb = createElement(
+            'span',
+            extend({
+                class: trim.rightThumb,
+                role: 'slider',
+                'aria-valuemin': 0,
+                'aria-valuemax': this.player.duration,
+                'aria-valuenow': this.endTime,
+                'aria-valuetext': formatTime(this.endTime),
+                'aria-label': i18n.get('trimEnd', this.player.config),
+            }),
+        );
 
         // Add the thumbs to the bar
         this.elements.bar.appendChild(this.elements.bar.leftThumb);
@@ -200,6 +226,9 @@ class Trim {
             this.setStartTime(percentage);
             // Set the timestamp of the current trim handle position
             bar.leftThumb.timeContainer.time.innerText = formatTime(this.startTime);
+            // Update the aria-value
+            bar.leftThumb.setAttribute('aria-valuenow', this.startTime);
+            bar.leftThumb.setAttribute('aria-valuetext', formatTime(this.startTime));
             // Update seek position to match the left thumbs position if less than the current left thumb position
         } else if (this.editing === rightThumb) {
             const end = percentage - parseFloat(bar.style.left);
@@ -207,6 +236,9 @@ class Trim {
             this.setEndTime(end);
             // Set the timestamp of the current trim handle position
             bar.rightThumb.timeContainer.time.innerText = formatTime(this.endTime);
+            // Update the aria-value
+            bar.rightThumb.setAttribute('aria-valuenow', this.endTime);
+            bar.rightThumb.setAttribute('aria-valuetext', formatTime(this.endTime));
         }
     }
 
