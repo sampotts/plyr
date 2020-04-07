@@ -89,7 +89,11 @@ class Trim {
         if (is.element(seekElement) && this.loaded) {
             this.createTrimBar(seekElement);
             this.createTrimBarThumbs();
-            this.createThumbTime();
+            /* Only display the thumb time when displaying preview thumbnails as we don't want to display the whole thumbnail but
+               want to keep the same styling */
+            if (this.player.config.previewThumbnails.enabled) {
+                this.createThumbTime();
+            }
         }
     }
 
@@ -225,7 +229,9 @@ class Trim {
             bar.style.left = `${percentage}%`;
             this.setStartTime(percentage);
             // Set the timestamp of the current trim handle position
-            bar.leftThumb.timeContainer.time.innerText = formatTime(this.startTime);
+            if (bar.leftThumb.timeContainer) {
+                bar.leftThumb.timeContainer.time.innerText = formatTime(this.startTime);
+            }
             // Update the aria-value
             bar.leftThumb.setAttribute('aria-valuenow', this.startTime);
             bar.leftThumb.setAttribute('aria-valuetext', formatTime(this.startTime));
@@ -235,7 +241,9 @@ class Trim {
             bar.style.width = `${end}%`;
             this.setEndTime(end);
             // Set the timestamp of the current trim handle position
-            bar.rightThumb.timeContainer.time.innerText = formatTime(this.endTime);
+            if (bar.rightThumb.timeContainer) {
+                bar.rightThumb.timeContainer.time.innerText = formatTime(this.endTime);
+            }
             // Update the aria-value
             bar.rightThumb.setAttribute('aria-valuenow', this.endTime);
             bar.rightThumb.setAttribute('aria-valuetext', formatTime(this.endTime));
@@ -243,6 +251,10 @@ class Trim {
     }
 
     toggleTimeContainer(element, toggle = false) {
+        if (!element.timeContainer) {
+            return;
+        }
+
         const className = this.player.config.classNames.trim.timeContainerShown;
         element.timeContainer.classList.toggle(className, toggle);
     }
@@ -300,6 +312,16 @@ class Trim {
 
         // Add styling hook to show button
         toggleClass(this.player.elements.container, this.player.config.classNames.trim.enabled, this.enabled);
+    }
+
+    destroy() {
+        // Remove the elements with listeners on
+        if (this.elements.bar && this.elements.bar.leftThumb) {
+            this.elements.bar.leftThumb.remove();
+        }
+        if (this.elements.bar && this.elements.bar.rightThumb) {
+            this.elements.bar.rightThumb.remove();
+        }
     }
 
     // Enter trim tool
