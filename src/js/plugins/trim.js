@@ -115,7 +115,7 @@ class Trim {
         this.elements.bar.style.width = `${end.toString()}%`;
         seekElement.appendChild(this.elements.bar);
 
-        triggerEvent.call(this.player, this.trimTime, 'trimchange');
+        triggerEvent.call(this.player, this.player.media, 'trimchange', false, this.trimTime);
     }
 
     // Add trim length thumbs to the timeline
@@ -197,11 +197,11 @@ class Trim {
         if ((type === 'mouseup' || type === 'touchend') && this.editing === leftThumb) {
             this.editing = null;
             this.toggleTimeContainer(this.elements.bar.leftThumb, false);
-            triggerEvent.call(this.player, this.trimTime, 'trimchange');
+            triggerEvent.call(this.player, this.player.media, 'trimchange', false, this.trimTime);
         } else if ((type === 'mouseup' || type === 'touchend') && this.editing === rightThumb) {
             this.editing = null;
             this.toggleTimeContainer(this.elements.bar.rightThumb, false);
-            triggerEvent.call(this.player, this.trimTime, 'trimchange');
+            triggerEvent.call(this.player, this.player.media, 'trimchange', false, this.trimTime);
         } else if ((type === 'mousedown' || type === 'touchstart') && target.classList.contains(leftThumb)) {
             this.editing = leftThumb;
             this.toggleTimeContainer(this.elements.bar.leftThumb, true);
@@ -299,7 +299,7 @@ class Trim {
         }
 
         // Trigger an event
-        triggerEvent.call(this.player, this.media, this.active ? 'entertrim' : 'exittrim', true);
+        triggerEvent.call(this.player, this.player.media, this.active ? 'entertrim' : 'exittrim', true, this.trimTime);
     }
 
     // Update UI
@@ -316,11 +316,8 @@ class Trim {
 
     destroy() {
         // Remove the elements with listeners on
-        if (this.elements.bar && this.elements.bar.leftThumb) {
-            this.elements.bar.leftThumb.remove();
-        }
-        if (this.elements.bar && this.elements.bar.rightThumb) {
-            this.elements.bar.rightThumb.remove();
+        if (this.elements.bar && !is.empty(this.elements.bar)) {
+            this.elements.bar.remove();
         }
     }
 
