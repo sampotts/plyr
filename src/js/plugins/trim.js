@@ -17,7 +17,7 @@ class Trim {
         this.loaded = false;
         this.trimming = false;
         this.editing = false;
-        this.defaultTrimLength = 30;
+        this.defaultTrimLength = 20; // Trim length in percent
         this.startTime = 0;
         this.endTime = 0;
         this.timeUpdateFunction = this.timeUpdate.bind(this);
@@ -68,7 +68,7 @@ class Trim {
 
     // Store the trim end time in seconds
     setEndTime(percentage) {
-        this.endTime = this.startTime + this.player.media.duration * (parseFloat(percentage) / 100);
+        this.endTime = this.player.media.duration * (parseFloat(percentage) / 100);
     }
 
     // Show the trim toolbar on the timeline
@@ -100,9 +100,9 @@ class Trim {
 
     // Add trim bar to the timeline
     createTrimBar(seekElement) {
-        // Set the trim bar from the current seek time percentage to x number of seconds after and limit the end percentage to 100%
+        // Set the trim bar from the current seek time percentage to x percent after and limit the end percentage to 100%
         const start = this.player.elements.inputs.seek.value;
-        const end = Math.min(parseFloat(start) + (100 / this.player.duration) * this.defaultTrimLength, 100 - start);
+        const end = Math.min(parseFloat(start) + this.defaultTrimLength, 100);
 
         // Store the start and end video percentages in seconds
         this.setStartTime(start);
@@ -113,7 +113,7 @@ class Trim {
         });
 
         this.elements.bar.style.left = `${start.toString()}%`;
-        this.elements.bar.style.width = `${end.toString()}%`;
+        this.elements.bar.style.width = `${end - start.toString()}%`;
         seekElement.appendChild(this.elements.bar);
 
         triggerEvent.call(this.player, this.player.media, 'trimchange', false, this.trimTime);
@@ -238,9 +238,8 @@ class Trim {
             bar.leftThumb.setAttribute('aria-valuetext', formatTime(this.startTime));
             // Update seek position to match the left thumbs position if less than the current left thumb position
         } else if (this.editing === rightThumb) {
-            const end = percentage - parseFloat(bar.style.left);
-            bar.style.width = `${end}%`;
-            this.setEndTime(end);
+            bar.style.width = `${percentage - parseFloat(bar.style.left)}%`;
+            this.setEndTime(percentage);
             // Set the timestamp of the current trim handle position
             if (bar.rightThumb.timeContainer) {
                 bar.rightThumb.timeContainer.time.innerText = formatTime(this.endTime);
