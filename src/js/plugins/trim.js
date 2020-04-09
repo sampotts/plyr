@@ -6,6 +6,7 @@ import { createElement, toggleClass, toggleHidden } from '../utils/elements';
 import { on, triggerEvent } from '../utils/events';
 import i18n from '../utils/i18n';
 import is from '../utils/is';
+import { clamp } from '../utils/numbers.js';
 import { extend } from '../utils/objects';
 import { formatTime } from '../utils/time';
 
@@ -215,36 +216,43 @@ class Trim {
     setTrimLength(event) {
         if (!this.editing) return;
 
+        // Calculate hover position
         const clientRect = this.player.elements.progress.getBoundingClientRect();
-        // Mouse Position
         const xPos = event.type === 'touchmove' ? event.touches[0].pageX : event.pageX;
-        // Percentage must be between 0 and 100
-        const percentage = Math.max(Math.min((100 / clientRect.width) * (xPos - clientRect.left), 100), 0);
-        /* Alter width of the trim region
-        - If left thumb selected increase width and keep right hand side in same position
-        - If right thumb selected just decrease the width */
+        const percentage = clamp((100 / clientRect.width) * (xPos - clientRect.left), 0, 100);
+        // Get the current position of the trim tool bar
         const { leftThumb, rightThumb } = this.player.config.classNames.trim;
         const { bar } = this.elements;
+
+        // Update the position of the trim range tool
         if (this.editing === leftThumb) {
+            // Set the width to be in the position previously
             bar.style.width = `${parseFloat(bar.style.width) - (percentage - parseFloat(bar.style.left))}%`;
+            // Increase the left thumb
             bar.style.left = `${percentage}%`;
+            // Store and convert the start percentage to time
             this.setStartTime(percentage);
             // Set the timestamp of the current trim handle position
             if (bar.leftThumb.timeContainer) {
                 bar.leftThumb.timeContainer.time.innerText = formatTime(this.startTime);
             }
-            // Update the aria-value
+            // Update the aria-value and text
             bar.leftThumb.setAttribute('aria-valuenow', this.startTime);
             bar.leftThumb.setAttribute('aria-valuetext', formatTime(this.startTime));
-            // Update seek position to match the left thumbs position if less than the current left thumb position
         } else if (this.editing === rightThumb) {
+            // Prevent the end time to be before the start time
+            if (percentage <= parseFloat(bar.style.left)) {
+                return;
+            }
+            // Update the width of trim bar (right thumb)
             bar.style.width = `${percentage - parseFloat(bar.style.left)}%`;
+            // Store and convert the start percentage to time
             this.setEndTime(percentage);
             // Set the timestamp of the current trim handle position
             if (bar.rightThumb.timeContainer) {
                 bar.rightThumb.timeContainer.time.innerText = formatTime(this.endTime);
             }
-            // Update the aria-value
+            // Update the aria-value and text
             bar.rightThumb.setAttribute('aria-valuenow', this.endTime);
             bar.rightThumb.setAttribute('aria-valuetext', formatTime(this.endTime));
         }
