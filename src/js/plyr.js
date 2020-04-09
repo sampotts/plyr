@@ -1043,6 +1043,60 @@ class Plyr {
     }
 
     /**
+     * Set trim range start time
+     * @param {Number} input - set the trim start point in seconds. Defaults to 0 (the start)
+     */
+    set trimStartTime(input) {
+        // Bail if media duration isn't available yet
+        if (!this.duration) {
+            return;
+        }
+
+        // Validate input
+        const inputIsValid = is.number(input) && input > 0;
+
+        // Set
+        this.trim.startTime = inputIsValid ? Math.min(input, this.duration) : 0;
+
+        // Logging
+        this.debug.log(`Seeking to ${this.trim.startTime} seconds`);
+    }
+
+    /**
+     * Get trim range start time
+     */
+    get trimStartTime() {
+        return this.trim.startTime;
+    }
+
+    /**
+     * Set trim range end time
+     * @param {Number} input - set the trim start point in seconds. Defaults to 0 (the start)
+     */
+    set trimEndTime(input) {
+        // Bail if media duration isn't available yet
+        if (!this.duration) {
+            return;
+        }
+
+        // Validate input
+        const inputIsValid = is.number(input) && input > 0;
+
+        // Set
+        this.trim.endTime = inputIsValid ? Math.min(input, this.duration) : 0;
+
+        // Logging
+        this.debug.log(`Seeking to ${this.trim.endTime} seconds`);
+    }
+
+    /**
+     * Get trim range End time
+     */
+    get trimEndTime() {
+        return this.trim.startTime;
+    }
+
+    /**
      * Trigger the airplay dialog
      * TODO: update player with state, support, enabled
      */
