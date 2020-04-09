@@ -20,6 +20,7 @@ class Trim {
         this.defaultTrimLength = 30;
         this.startTime = 0;
         this.endTime = 0;
+        this.timeUpdateFunction = this.timeUpdate.bind(this);
         this.elements = {
             bar: {},
         };
@@ -259,9 +260,26 @@ class Trim {
         element.timeContainer.classList.toggle(className, toggle);
     }
 
+    // Set the seektime to the start of the trim timeline, if the seektime is outside of the region.
+    timeUpdate() {
+        if (!this.active || !this.trimming || !this.player.playing || this.editing) {
+            return;
+        }
+
+        const { currentTime } = this.player;
+        if (currentTime < this.startTime || currentTime >= this.endTime) {
+            this.player.currentTime = this.startTime;
+
+            if (currentTime >= this.endTime) {
+                this.player.pause();
+            }
+        }
+    }
+
     listeners() {
         /* Prevent the trim tool from being added until the player is in a playable state
-           If the user has pressed the trim tool before this event has fired, show the tool */
+           If the user has pressed the trim tool before this event has fired, show the tool
+        */
         this.player.once('canplay', () => {
             this.loaded = true;
             if (this.trimming) {
@@ -269,21 +287,11 @@ class Trim {
             }
         });
 
-        // Set the seektime to the start of the trim timeline, if the seektime is outside of the region.
-        this.player.on('timeupdate', () => {
-            if (!this.active || !this.trimming || !this.player.playing || this.editing) {
-                return;
-            }
-
-            const { currentTime } = this.player;
-            if (currentTime < this.startTime || currentTime >= this.endTime) {
-                this.player.currentTime = this.startTime;
-
-                if (currentTime >= this.endTime) {
-                    this.player.pause();
-                }
-            }
-        });
+        /* Listen for time changes so we can reset the seek point to within the clip.
+           Additionally, use the reference to the binding so we can remove and create a new instance of this listener
+           when we change source
+        */
+        this.player.on('timeupdate', this.timeUpdateFunction);
     }
 
     // On toggle of trim control, trigger event
@@ -319,6 +327,8 @@ class Trim {
         if (this.elements.bar && !is.empty(this.elements.bar)) {
             this.elements.bar.remove();
         }
+
+        this.player.off('timeupdate', this.timeUpdateFunction);
     }
 
     // Enter trim tool
