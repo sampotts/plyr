@@ -1678,7 +1678,7 @@ const controls = {
             if (is.string(this.config.controls)) {
                 container = replace(container);
             } else if (is.element(container)) {
-                container.innerHTML = replace(container.innerHTML);
+               // container.innerHTML = replace(container.innerHTML);
             }
         }
 
