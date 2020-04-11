@@ -2,6 +2,4 @@
 // Cosmetic
 // ==========================================================================
 
-$plyr-tab-focus-default-color: $plyr-color-main !default;
-
-@include css-vars((--plyr-tab-focus-default-color: $plyr-tab-focus-default-color));
+$plyr-tab-focus-default-color: var(--plyr-tab-focus-default-color, var(--plyr-color-main, $plyr-color-main)) !default;

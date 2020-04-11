@@ -2,9 +2,9 @@
 // Tooltips
 // ==========================================================================
 
-$plyr-tooltip-background: rgba(#fff, 0.9) !default;
-$plyr-tooltip-color: $plyr-color-gray-700 !default;
-$plyr-tooltip-padding: ($plyr-control-spacing / 2) !default;
-$plyr-tooltip-arrow-size: 4px !default;
-$plyr-tooltip-radius: 3px !default;
-$plyr-tooltip-shadow: 0 1px 2px rgba(#000, 0.15) !default;
+$plyr-tooltip-background: var(--plyr-tooltip-background, rgba(#fff, 0.9)) !default;
+$plyr-tooltip-color: var(--plyr-tooltip-color, $plyr-color-gray-700) !default;
+$plyr-tooltip-padding: var(--plyr-tooltip-padding, calc(#{$plyr-control-spacing} / 2)) !default;
+$plyr-tooltip-arrow-size: var(--plyr-tooltip-arrow-size, 4px) !default;
+$plyr-tooltip-radius: var(--plyr-tooltip-radius, 3px) !default;
+$plyr-tooltip-shadow: var(--plyr-tooltip-shadow, 0 1px 2px rgba($plyr-color-gray-900, 0.15)) !default;

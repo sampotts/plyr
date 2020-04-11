@@ -11,12 +11,12 @@ $css-vars-use-native: false !default;
 // Assigns a variable to the global map
 ///
 @function css-var-assign($varName: null, $varValue: null) {
-    @return map-merge(
-        $css-vars,
-        (
-            $varName: $varValue,
-        )
-    );
+  @return map-merge(
+    $css-vars,
+    (
+      $varName: $varValue,
+    )
+  );
 }
 
 ///
@@ -30,33 +30,33 @@ $css-vars-use-native: false !default;
 // background: var(--main-background, green);
 ///
 @function var($args...) {
-    // CHECK PARAMS
-    @if (length($args) ==0) {
-        @error 'Variable name is expected to be passed to the var() function';
-    }
-    @if (str-length(nth($args, 1)) < 2 or str-slice(nth($args, 1), 0, 2) != '--') {
-        @error "Variable name is expected to start from '--'";
+  // CHECK PARAMS
+  @if (length($args) ==0) {
+    @error 'Variable name is expected to be passed to the var() function';
+  }
+  @if (str-length(nth($args, 1)) < 2 or str-slice(nth($args, 1), 0, 2) != '--') {
+    @error "Variable name is expected to start from '--'";
+  }
+
+  // PROCESS
+  $var-name: nth($args, 1);
+  $var-value: map-get($css-vars, $var-name);
+
+  @if ($css-vars-use-native) {
+    // CSS variables
+    // Native CSS: don't process function in case of native
+    @return unquote('var(' + $args + ')');
+  } @else {
+    @if ($var-value == null) {
+      // variable is not provided so far
+      @if (length($args) == 2) {
+        $var-value: nth($args, 2);
+      }
     }
 
-    // PROCESS
-    $var-name: nth($args, 1);
-    $var-value: map-get($css-vars, $var-name);
-
-    @if ($css-vars-use-native) {
-        // CSS variables
-        // Native CSS: don't process function in case of native
-        @return unquote('var(' + $args + ')');
-    } @else {
-        @if ($var-value == null) {
-            // variable is not provided so far
-            @if (length($args) == 2) {
-                $var-value: nth($args, 2);
-            }
-        }
-
-        // Sass: return value from the map
-        @return $var-value;
-    }
+    // Sass: return value from the map
+    @return $var-value;
+  }
 }
 
 ///
@@ -69,32 +69,32 @@ $css-vars-use-native: false !default;
 // ));
 ///
 @mixin css-vars($var-map: null) {
-    // CHECK PARAMS
-    @if ($var-map == null) {
-        @error 'Map of variables is expected, instead got: null';
-    }
-    @if (type_of($var-map) != map) {
-        @error 'Map of variables is expected, instead got another type passed: #{type_of($var, ap)}';
-    }
+  // CHECK PARAMS
+  @if ($var-map == null) {
+    @error 'Map of variables is expected, instead got: null';
+  }
+  @if (type_of($var-map) != map) {
+    @error 'Map of variables is expected, instead got another type passed: #{type_of($var, ap)}';
+  }
 
-    // PROCESS
-    @if ($css-vars-use-native) {
-        // CSS variables
-        // Native CSS: assign CSS custom properties to the global scope
-        @at-root :root {
-            @each $var-name, $var-value in $var-map {
-                @if (type_of($var-value) == string) {
-                    #{$var-name}: $var-value; // to prevent quotes interpolation
-                } @else {
-                    #{$var-name}: #{$var-value};
-                }
-            }
+  // PROCESS
+  @if ($css-vars-use-native) {
+    // CSS variables
+    // Native CSS: assign CSS custom properties to the global scope
+    @at-root :root {
+      @each $var-name, $var-value in $var-map {
+        @if (type_of($var-value) == string) {
+          #{$var-name}: $var-value; // to prevent quotes interpolation
+        } @else {
+          #{$var-name}: #{$var-value};
         }
-    } @else {
-        // Sass or debug
-        // merge variables and values to the global map (provides no output)
-        @each $var-name, $var-value in $var-map {
-            $css-vars: css-var-assign($varName, $varValue) !global; // store in global variable
-        }
+      }
     }
+  } @else {
+    // Sass or debug
+    // merge variables and values to the global map (provides no output)
+    @each $var-name, $var-value in $var-map {
+      $css-vars: css-var-assign($varName, $varValue) !global; // store in global variable
+    }
+  }
 }

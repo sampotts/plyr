@@ -31,7 +31,6 @@ const size = require('gulp-size');
 const sourcemaps = require('gulp-sourcemaps');
 const browserSync = require('browser-sync').create();
 // Configs
-const pkg = require('../package.json');
 const build = require('../build.json');
 // Info from package
 const minSuffix = '.min';

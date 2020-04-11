@@ -2,17 +2,31 @@
 // Controls
 // ==========================================================================
 
-$plyr-control-icon-size: 18px !default;
-$plyr-control-spacing: 10px !default;
-$plyr-control-padding: ($plyr-control-spacing * 0.7) !default;
-$plyr-control-radius: 3px !default;
+$plyr-control-icon-size: var(--plyr-control-icon-size, 18px) !default;
+$plyr-control-spacing: var(--plyr-control-spacing, 10px) !default;
+$plyr-control-padding: var(--plyr-control-padding, calc(#{$plyr-control-spacing} * 0.7)) !default;
+$plyr-control-radius: var(--plyr-control-radius, 3px) !default;
 
-$plyr-video-controls-background: linear-gradient(rgba(#000, 0), rgba(#000, 0.75)) !default;
-$plyr-video-control-color: #fff !default;
-$plyr-video-control-color-hover: #fff !default;
-$plyr-video-control-background-hover: $plyr-color-main !default;
+$plyr-control-toggle-checked-background: var(
+  --plyr-control-toggle-checked-background,
+  var(--plyr-color-main, $plyr-color-main)
+) !default;
 
-$plyr-audio-controls-background: #fff !default;
-$plyr-audio-control-color: $plyr-color-gray-700 !default;
-$plyr-audio-control-color-hover: #fff !default;
-$plyr-audio-control-background-hover: $plyr-color-main !default;
+$plyr-video-controls-background: var(
+  --plyr-video-controls-background,
+  linear-gradient(rgba(#000, 0), rgba(#000, 0.75))
+) !default;
+$plyr-video-control-color: var(--plyr-video-control-color, #fff) !default;
+$plyr-video-control-color-hover: var(--plyr-video-control-color-hover, #fff) !default;
+$plyr-video-control-background-hover: var(
+  --plyr-video-control-background-hover,
+  var(--plyr-color-main, $plyr-color-main)
+) !default;
+
+$plyr-audio-controls-background: var(--plyr-audio-controls-background, #fff) !default;
+$plyr-audio-control-color: var(--plyr-audio-control-color, $plyr-color-gray-700) !default;
+$plyr-audio-control-color-hover: var(--plyr-audio-control-color-hover, #fff) !default;
+$plyr-audio-control-background-hover: var(
+  --plyr-audio-control-background-hover,
+  var(--plyr-color-main, $plyr-color-main)
+) !default;

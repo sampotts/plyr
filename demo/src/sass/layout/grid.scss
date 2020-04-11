@@ -3,17 +3,17 @@
 // ==========================================================================
 
 .grid {
-    margin: 0 auto;
-    padding: $spacing-base;
+  margin: 0 auto;
+  padding: $spacing-base;
 
-    @media only screen and (min-width: $screen-md) {
-        align-items: center;
-        display: flex;
-        max-width: $container-max-width;
-        width: 100%;
+  @media only screen and (min-width: $screen-md) {
+    align-items: center;
+    display: flex;
+    max-width: $container-max-width;
+    width: 100%;
 
-        > * {
-            flex: 1;
-        }
+    > * {
+      flex: 1;
     }
+  }
 }
