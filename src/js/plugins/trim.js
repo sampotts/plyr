@@ -6,7 +6,7 @@ import { createElement, toggleClass, toggleHidden } from '../utils/elements';
 import { on, triggerEvent } from '../utils/events';
 import i18n from '../utils/i18n';
 import is from '../utils/is';
-import { clamp } from '../utils/numbers.js';
+import { clamp } from '../utils/numbers';
 import { extend } from '../utils/objects';
 import { formatTime } from '../utils/time';
 
