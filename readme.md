@@ -366,6 +366,9 @@ player.fullscreen.enter(); // Enter fullscreen
 | `fullscreen.enter()`     | -                | Enter fullscreen. If fullscreen is not supported, a fallback "full window/viewport" is used instead.       |
 | `fullscreen.exit()`      | -                | Exit fullscreen.                                                                                           |
 | `fullscreen.toggle()`    | -                | Toggle fullscreen.                                                                                         |
+| `trim.enter()`           | -                | Enter Trimming tool.                                                                                       |
+| `trim.exit()`            | -                | Exit Trimming tool.                                                                                        |
+| `trim.toggle()`          | -                | Toggle Trimming tool.                                                                                      |
 | `airplay()`              | -                | Trigger the airplay dialog on supported devices.                                                           |
 | `toggleControls(toggle)` | Boolean          | Toggle the controls (video only). Takes optional truthy value to force it on/off.                          |
 | `on(event, function)`    | String, Function | Add an event listener for the specified event.                                                             |
@@ -450,7 +453,7 @@ player.source = {
     ],
     poster: '/path/to/poster.jpg',
     previewThumbnails: {
-        src: '/path/to/thumbnails.vtt'
+        src: '/path/to/thumbnails.vtt',
     },
     tracks: [
         {
