@@ -2716,7 +2716,7 @@ typeof navigator === "object" && (function (global, factory) {
           showMenuPanel = controls.showMenuPanel;
       this.elements.controls = null; // Larger overlaid play button
 
-      if (this.config.controls.includes('play-large')) {
+      if (is$1.array(this.config.controls) && this.config.controls.includes('play-large')) {
         this.elements.container.appendChild(createButton.call(this, 'play-large'));
       } // Create the container
 
@@ -2728,7 +2728,7 @@ typeof navigator === "object" && (function (global, factory) {
         class: 'plyr__controls__item'
       }; // Loop through controls in order
 
-      dedupe(this.config.controls).forEach(function (control) {
+      dedupe(is$1.array(this.config.controls) ? this.config.controls : []).forEach(function (control) {
         // Restart button
         if (control === 'restart') {
           container.appendChild(createButton.call(_this10, 'restart', defaultAttributes));
@@ -3280,7 +3280,7 @@ typeof navigator === "object" && (function (global, factory) {
 
       toggleClass(this.elements.container, this.config.classNames.captions.enabled, !is$1.empty(tracks)); // Update available languages in list
 
-      if ((this.config.controls || []).includes('settings') && this.config.settings.includes('captions')) {
+      if (is$1.array(this.config.controls) && this.config.controls.includes('settings') && this.config.settings.includes('captions')) {
         controls.setCaptionsMenu.call(this);
       }
     },
@@ -8321,7 +8321,7 @@ typeof navigator === "object" && (function (global, factory) {
 
           var hiding = toggleClass(this.elements.container, this.config.classNames.hideControls, force); // Close menu
 
-          if (hiding && this.config.controls.includes('settings') && !is$1.empty(this.config.settings)) {
+          if (hiding && is$1.array(this.config.controls) && this.config.controls.includes('settings') && !is$1.empty(this.config.settings)) {
             controls.toggleMenu.call(this, false);
           } // Trigger event on change
 
