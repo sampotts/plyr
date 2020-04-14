@@ -345,6 +345,8 @@ class Trim {
         }
         this.trimming = true;
         this.showTrimTool();
+
+        this.onChange();
     }
 
     // Exit trim tool
@@ -354,6 +356,8 @@ class Trim {
         }
         this.trimming = false;
         this.hideTrimTool();
+
+        this.onChange();
     }
 
     // Toggle state
@@ -363,7 +367,6 @@ class Trim {
         } else {
             this.exit();
         }
-        this.onChange();
     }
 }
 
