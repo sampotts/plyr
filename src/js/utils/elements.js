@@ -237,6 +237,28 @@ export function matches(element, selector) {
     return method.call(element, selector);
 }
 
+// Closest ancestor element matching selector (also tests element itself)
+export function closest(element, selector) {
+    const {prototype} = Element;
+
+    // https://developer.mozilla.org/en-US/docs/Web/API/Element/closest#Polyfill
+    function closestElement() {
+        let el = this;
+
+        do {
+          if (matches.matches(el, selector)) return el;
+          el = el.parentElement || el.parentNode;
+        } while (el !== null && el.nodeType === 1);
+        return null;
+    }
+
+    const method =
+        prototype.closest ||
+        closestElement;
+
+    return method.call(element, selector);
+}
+
 // Find all elements
 export function getElements(selector) {
     return this.elements.container.querySelectorAll(selector);

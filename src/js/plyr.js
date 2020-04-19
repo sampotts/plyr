@@ -80,6 +80,7 @@ class Plyr {
         // Elements cache
         this.elements = {
             container: null,
+            fullscreen: null,
             captions: null,
             buttons: {},
             display: {},
@@ -282,6 +283,9 @@ class Plyr {
             });
         }
 
+        // Setup fullscreen
+        this.fullscreen = new Fullscreen(this);
+
         // Setup interface
         // If embed but not fully supported, build interface now to avoid flash of controls
         if (this.isHTML5 || (this.isEmbed && !this.supported.ui)) {
@@ -293,9 +297,6 @@ class Plyr {
 
         // Global listeners
         this.listeners.global();
-
-        // Setup fullscreen
-        this.fullscreen = new Fullscreen(this);
 
         // Setup ads if provided
         if (this.config.ads.enabled) {
