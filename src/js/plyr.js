@@ -886,7 +886,7 @@ class Plyr {
       return null;
     }
 
-    return this.media.getAttribute('poster');
+    return this.media.getAttribute('poster') || this.media.getAttribute('data-poster');
   }
 
   /**

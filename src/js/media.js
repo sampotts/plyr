@@ -38,14 +38,12 @@ const media = {
       // Wrap the video in a container
       wrap(this.media, this.elements.wrapper);
 
-      // Faux poster container
-      if (this.isEmbed) {
-        this.elements.poster = createElement('div', {
-          class: this.config.classNames.poster,
-        });
+      // Poster image container
+      this.elements.poster = createElement('div', {
+        class: this.config.classNames.poster,
+      });
 
-        this.elements.wrapper.appendChild(this.elements.poster);
-      }
+      this.elements.wrapper.appendChild(this.elements.poster);
     }
 
     if (this.isHTML5) {

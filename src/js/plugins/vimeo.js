@@ -114,10 +114,10 @@ const vimeo = {
     // Inject the package
     const { poster } = player;
     if (premium) {
-      iframe.setAttribute('poster', poster);
+      iframe.setAttribute('data-poster', poster);
       player.media = replaceElement(iframe, player.media);
     } else {
-      const wrapper = createElement('div', { class: player.config.classNames.embedContainer, poster });
+      const wrapper = createElement('div', { class: player.config.classNames.embedContainer, 'data-poster': poster });
       wrapper.appendChild(iframe);
       player.media = replaceElement(wrapper, player.media);
     }

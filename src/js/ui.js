@@ -170,12 +170,7 @@ const ui = {
     }
 
     // Set property synchronously to respect the call order
-    this.media.setAttribute('poster', poster);
-
-    // HTML5 uses native poster attribute
-    if (this.isHTML5) {
-      return Promise.resolve(poster);
-    }
+    this.media.setAttribute('data-poster', poster);
 
     // Wait until ui is ready
     return (

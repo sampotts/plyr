@@ -124,7 +124,7 @@ const youtube = {
     // Get poster, if already set
     const { poster } = player;
     // Replace media element
-    const container = createElement('div', { id, poster });
+    const container = createElement('div', { id, 'data-poster': poster });
     player.media = replaceElement(container, player.media);
 
     // Id to poster wrapper
