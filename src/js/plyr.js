@@ -25,6 +25,7 @@ import { createElement, hasClass, removeElement, replaceElement, toggleClass, wr
 import { off, on, once, triggerEvent, unbindListeners } from './utils/events';
 import is from './utils/is';
 import loadSprite from './utils/load-sprite';
+import normalizeOptions from './utils/normalize-options';
 import { clamp } from './utils/numbers';
 import { cloneDeep, extend } from './utils/objects';
 import { silencePromise } from './utils/promise';
@@ -37,7 +38,11 @@ import { parseUrl } from './utils/urls';
 
 // Plyr instance
 class Plyr {
-    constructor(target, options) {
+    constructor(target, options = {}) {
+        const { storage } = defaults;
+
+        this.storage = new Storage(storage.enabled, storage.key);
+
         this.timers = {};
 
         // State
@@ -65,17 +70,15 @@ class Plyr {
         // Set config
         this.config = extend(
             {},
-            defaults,
             Plyr.defaults,
-            options || {},
-            (() => {
-                try {
-                    return JSON.parse(this.media.getAttribute('data-plyr-config'));
-                } catch (e) {
-                    return {};
-                }
-            })(),
+            defaults,
+            this.storage.get() || {},
+            options,
+            this.dataPlayerConfig
         );
+
+        this.config.speed = normalizeOptions(this.config.speed, defaults.speed);
+        this.config.quality = normalizeOptions(this.config.quality, defaults.quality);
 
         // Elements cache
         this.elements = {
@@ -258,9 +261,6 @@ class Plyr {
         // Create listeners
         this.listeners = new Listeners(this);
 
-        // Setup local storage for user settings
-        this.storage = new Storage(this);
-
         // Store reference
         this.media.plyr = this;
 
@@ -402,6 +402,14 @@ class Plyr {
      */
     get ended() {
         return Boolean(this.media.ended);
+    }
+
+    get dataPlayerConfig() {
+        try {
+        return JSON.parse(this.media.getAttribute('data-plyr-config'));
+        } catch (e) {
+            return {};
+        }
     }
 
     /**
@@ -652,10 +660,6 @@ class Plyr {
 
         if (is.number(input)) {
             speed = input;
-        }
-
-        if (!is.number(speed)) {
-            speed = this.storage.get('speed');
         }
 
         if (!is.number(speed)) {

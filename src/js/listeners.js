@@ -479,7 +479,7 @@ class Listeners {
             controls.updateSetting.call(player, 'speed');
 
             // Save to storage
-            player.storage.set({ speed: player.speed });
+            player.storage.set({ speed: player.config.speed });
         });
 
         // Quality change

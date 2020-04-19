@@ -6,9 +6,9 @@ import is from './utils/is';
 import { extend } from './utils/objects';
 
 class Storage {
-    constructor(player) {
-        this.enabled = player.config.storage.enabled;
-        this.key = player.config.storage.key;
+    constructor(enabled, key) {
+        this.enabled = enabled;
+        this.key = key;
     }
 
     // Check for actual support (see if we can use it)

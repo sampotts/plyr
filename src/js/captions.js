@@ -179,7 +179,7 @@ const captions = {
             // When passive, don't override user preferences
             if (!passive) {
                 this.captions.active = active;
-                this.storage.set({ captions: active });
+                this.storage.set({ captions: this.captions });
             }
 
             // Force language if the call isn't passive and there is no matching language to toggle to
