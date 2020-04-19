@@ -229,16 +229,18 @@ class Listeners {
 
     // Delay the adding of classname until the focus has changed
     // This event fires before the focusin event
-    this.focusTimer = setTimeout(() => {
-      const focused = document.activeElement;
+    if (event.type !== 'focusout') {
+      this.focusTimer = setTimeout(() => {
+        const focused = document.activeElement;
 
-      // Ignore if current focus element isn't inside the player
-      if (!elements.container.contains(focused)) {
-        return;
-      }
+        // Ignore if current focus element isn't inside the player
+        if (!elements.container.contains(focused)) {
+          return;
+        }
 
-      toggleClass(document.activeElement, player.config.classNames.tabFocus, true);
-    }, 10);
+        toggleClass(document.activeElement, player.config.classNames.tabFocus, true);
+      }, 10);
+    }
   }
 
   // Global window & document listeners
@@ -257,7 +259,7 @@ class Listeners {
     once.call(player, document.body, 'touchstart', this.firstTouch);
 
     // Tab focus detection
-    toggleListener.call(player, document.body, 'keydown focus blur', this.setTabFocus, toggle, false, true);
+    toggleListener.call(player, document.body, 'keydown focus blur focusout', this.setTabFocus, toggle, false, true);
   }
 
   // Container listeners
@@ -304,7 +306,7 @@ class Listeners {
 
     // Set a gutter for Vimeo
     const setGutter = (ratio, padding, toggle) => {
-      if (!player.isVimeo) {
+      if (!player.isVimeo || player.config.vimeo.premium) {
         return;
       }
 
@@ -331,6 +333,7 @@ class Listeners {
 
     const resized = () => {
       clearTimeout(timers.resized);
+
       timers.resized = setTimeout(setPlayerSize, 50);
     };
 
@@ -354,7 +357,7 @@ class Listeners {
       // Set Vimeo gutter
       setGutter(ratio, padding, isEnter);
 
-      // If not using native fullscreen, we need to check for resizes of viewport
+      // If not using the native browser fullscreen API, we need to check for resizes of viewport
       if (!usingNative) {
         if (isEnter) {
           on.call(player, window, 'resize', resized);

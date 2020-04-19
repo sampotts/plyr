@@ -419,16 +419,16 @@ const defaults = {
     title: false,
     speed: true,
     transparent: false,
-    // These settings require a pro or premium account to work
-    sidedock: false,
-    controls: false,
+    // Whether the owner of the video has a Pro or Business account
+    // (which allows us to properly hide controls without CSS hacks, etc)
+    premium: false,
     // Custom settings from Plyr
     referrerPolicy: null, // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement/referrerPolicy
   },
 
   // YouTube plugin
   youtube: {
-    noCookie: false, // Whether to use an alternative version of YouTube without cookies
+    noCookie: true, // Whether to use an alternative version of YouTube without cookies
     rel: 0, // No related vids
     showinfo: 0, // Hide info
     iv_load_policy: 3, // Hide annotations

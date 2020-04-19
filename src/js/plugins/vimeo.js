@@ -10,7 +10,6 @@ import { triggerEvent } from '../utils/events';
 import fetch from '../utils/fetch';
 import is from '../utils/is';
 import loadScript from '../utils/load-script';
-import { extend } from '../utils/objects';
 import { format, stripHTML } from '../utils/strings';
 import { setAspectRatio } from '../utils/style';
 import { buildUrlParams } from '../utils/urls';
@@ -71,21 +70,25 @@ const vimeo = {
   ready() {
     const player = this;
     const config = player.config.vimeo;
+    const { premium, referrerPolicy, ...frameParams } = config;
+
+    // If the owner has a pro or premium account then we can hide controls etc
+    if (premium) {
+      Object.assign(frameParams, {
+        controls: false,
+        sidedock: false,
+      });
+    }
 
     // Get Vimeo params for the iframe
-    const params = buildUrlParams(
-      extend(
-        {},
-        {
-          loop: player.config.loop.active,
-          autoplay: player.autoplay,
-          muted: player.muted,
-          gesture: 'media',
-          playsinline: !this.config.fullscreen.iosNative,
-        },
-        config,
-      ),
-    );
+    const params = buildUrlParams({
+      loop: player.config.loop.active,
+      autoplay: player.autoplay,
+      muted: player.muted,
+      gesture: 'media',
+      playsinline: !this.config.fullscreen.iosNative,
+      ...frameParams,
+    });
 
     // Get the source URL or ID
     let source = player.media.getAttribute('src');
@@ -101,20 +104,23 @@ const vimeo = {
     const src = format(player.config.urls.vimeo.iframe, id, params);
     iframe.setAttribute('src', src);
     iframe.setAttribute('allowfullscreen', '');
-    iframe.setAttribute('allowtransparency', '');
-    iframe.setAttribute('allow', 'autoplay');
+    iframe.setAttribute('allow', 'autoplay,fullscreen,picture-in-picture');
 
     // Set the referrer policy if required
-    if (!is.empty(config.referrerPolicy)) {
-      iframe.setAttribute('referrerPolicy', config.referrerPolicy);
+    if (!is.empty(referrerPolicy)) {
+      iframe.setAttribute('referrerPolicy', referrerPolicy);
     }
 
-    // Get poster, if already set
-    const { poster } = player;
     // Inject the package
-    const wrapper = createElement('div', { poster, class: player.config.classNames.embedContainer });
-    wrapper.appendChild(iframe);
-    player.media = replaceElement(wrapper, player.media);
+    const { poster } = player;
+    if (premium) {
+      iframe.setAttribute('poster', poster);
+      player.media = replaceElement(iframe, player.media);
+    } else {
+      const wrapper = createElement('div', { class: player.config.classNames.embedContainer, poster });
+      wrapper.appendChild(iframe);
+      player.media = replaceElement(wrapper, player.media);
+    }
 
     // Get poster image
     fetch(format(player.config.urls.vimeo.api, id), 'json').then(response => {
