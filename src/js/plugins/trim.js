@@ -232,6 +232,10 @@ class Trim {
             bar.style.left = `${percentage}%`;
             // Store and convert the start percentage to time
             this.setStartTime(percentage);
+            // Prevent the end time being before the start time
+            if (this.startTime > this.endTime) {
+                this.setEndTime(percentage);
+            }
             // Set the timestamp of the current trim handle position
             if (bar.leftThumb.timeContainer) {
                 bar.leftThumb.timeContainer.time.innerText = formatTime(this.startTime);
