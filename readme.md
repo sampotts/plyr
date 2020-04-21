@@ -501,8 +501,6 @@ player.source = {
 };
 ```
 
-_Note_: `src` can be the video ID or URL
-
 Vimeo example
 
 ```javascript
