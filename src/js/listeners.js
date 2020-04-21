@@ -880,6 +880,8 @@ class Listeners {
             'volume',
             false,
         );
+
+        this.bind(elements.buttons.googlecast, 'click', player.googlecast, 'googlecast');
     }
 }
 
