@@ -108,6 +108,26 @@ const defaults = {
         // Listen to new tracks added after Plyr is initialized.
         // This is needed for streaming captions, but may result in unselectable options
         update: false,
+        // Allow uploading captions from local filesystem.
+        // Once a file is selected,
+        // This either requires update to be true or the developer needs to call
+        upload: {
+            enabled: false,
+            // The formats that are valid
+            formats: ['vtt'],
+            // Set to true if you're allowing formats other than vtt where the input needs to be processed.
+            // This is useful in cases where the developer allows selecting of
+            // formats such as srt, ssa, etc, which need to be converted into vtt
+            // before plyr can add it as a track element.
+            callback: false,
+            // The event that plyr will trigger when the user has selected a file and callback is true.
+            // If null, then plyr will treat the file as a VTT file and directly add it
+            onInput: 'trackinput',
+            // The event that plyr will listen for when callback is true.
+            // If null, then plyr will treat the file as a VTT file and directly add it.
+            // You can also add tracks manually
+            onProcessed: 'inserttrack',
+        },
     },
 
     // Fullscreen settings
