@@ -264,6 +264,26 @@ const ui = {
       );
     }
   },
+
+  // Migrate any custom properties from the media to the parent
+  migrateStyles() {
+    // Loop through values (as they are the keys when the object is spread 🤔)
+    Object.values({ ...this.media.style })
+      // We're only fussed about Plyr specific properties
+      .filter(key => key.startsWith('--plyr'))
+      .forEach(key => {
+        // Set on the container
+        this.elements.container.style.setProperty(key, this.media.style.getPropertyValue(key));
+
+        // Clean up from media element
+        this.media.style.removeProperty(key);
+      });
+
+    // Remove attribute if empty
+    if (is.empty(this.media.style)) {
+      this.media.removeAttribute('style');
+    }
+  },
 };
 
 export default ui;

@@ -269,6 +269,9 @@ class Plyr {
       wrap(this.media, this.elements.container);
     }
 
+    // Migrate custom properties from media to container (so they work 😉)
+    ui.migrateStyles.call(this);
+
     // Add style hook
     ui.addStyleHook.call(this);
 
