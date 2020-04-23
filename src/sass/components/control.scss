@@ -3,44 +3,44 @@
 // --------------------------------------------------------------
 
 .plyr__control {
-    background: transparent;
-    border: 0;
-    border-radius: $plyr-control-radius;
-    color: inherit;
-    cursor: pointer;
-    flex-shrink: 0;
-    overflow: visible; // IE11
-    padding: $plyr-control-padding;
-    position: relative;
-    transition: all 0.3s ease;
+  background: transparent;
+  border: 0;
+  border-radius: $plyr-control-radius;
+  color: inherit;
+  cursor: pointer;
+  flex-shrink: 0;
+  overflow: visible; // IE11
+  padding: $plyr-control-padding;
+  position: relative;
+  transition: all 0.3s ease;
 
-    svg {
-        display: block;
-        fill: currentColor;
-        height: $plyr-control-icon-size;
-        pointer-events: none;
-        width: $plyr-control-icon-size;
-    }
+  svg {
+    display: block;
+    fill: currentColor;
+    height: $plyr-control-icon-size;
+    pointer-events: none;
+    width: $plyr-control-icon-size;
+  }
 
-    // Default focus
-    &:focus {
-        outline: 0;
-    }
+  // Default focus
+  &:focus {
+    outline: 0;
+  }
 
-    // Tab focus
-    &.plyr__tab-focus {
-        @include plyr-tab-focus();
-    }
+  // Tab focus
+  &.plyr__tab-focus {
+    @include plyr-tab-focus();
+  }
 }
 
 // Remove any link styling
 a.plyr__control {
-    text-decoration: none;
+  text-decoration: none;
 
-    &::after,
-    &::before {
-        display: none;
-    }
+  &::after,
+  &::before {
+    display: none;
+  }
 }
 
 // Change icons on state change
@@ -48,5 +48,5 @@ a.plyr__control {
 .plyr__control.plyr__control--pressed .icon--not-pressed,
 .plyr__control:not(.plyr__control--pressed) .label--pressed,
 .plyr__control.plyr__control--pressed .label--not-pressed {
-    display: none;
+  display: none;
 }
