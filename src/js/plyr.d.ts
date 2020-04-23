@@ -321,7 +321,7 @@ declare namespace Plyr {
 
     /**
      * If a function is passed, it is assumed your method will return either an element or HTML string for the controls. Three arguments will be passed to your function;
-     * id (the unique id for the player), seektime (the seektime step in seconds), and title (the media title). See controls.md for more info on how the html needs to be structured.
+     * id (the unique id for the player), seektime (the seektime step in seconds), and title (the media title). See CONTROLS.md for more info on how the html needs to be structured.
      * Defaults to ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen']
      */
     controls?: string[] | ((id: string, seektime: number, title: string) => unknown) | Element;

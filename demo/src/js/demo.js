@@ -1,7 +1,7 @@
 // ==========================================================================
 // Plyr.io demo
 // This code is purely for the https://plyr.io website
-// Please see readme.md in the root or github.com/sampotts/plyr
+// Please see README.md in the root or github.com/sampotts/plyr
 // ==========================================================================
 
 import './tab-focus';

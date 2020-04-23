@@ -37,37 +37,37 @@ const minSuffix = '.min';
 // Paths
 const root = path.join(__dirname, '..');
 const paths = {
-    plyr: {
-        // Source paths
-        src: {
-            sass: path.join(root, 'src/sass/**/*.scss'),
-            js: path.join(root, 'src/js/**/*.js'),
-            sprite: path.join(root, 'src/sprite/*.svg'),
-        },
-
-        // Output paths
-        output: path.join(root, 'dist/'),
+  plyr: {
+    // Source paths
+    src: {
+      sass: path.join(root, 'src/sass/**/*.scss'),
+      js: path.join(root, 'src/js/**/*.js'),
+      sprite: path.join(root, 'src/sprite/*.svg'),
     },
-    demo: {
-        // Source paths
-        src: {
-            sass: path.join(root, 'demo/src/sass/**/*.scss'),
-            js: path.join(root, 'demo/src/js/**/*.js'),
-        },
 
-        // Output paths
-        output: path.join(root, 'demo/dist/'),
-
-        // Demo
-        root: path.join(root, 'demo/'),
+    // Output paths
+    output: path.join(root, 'dist/'),
+  },
+  demo: {
+    // Source paths
+    src: {
+      sass: path.join(root, 'demo/src/sass/**/*.scss'),
+      js: path.join(root, 'demo/src/js/**/*.js'),
     },
+
+    // Output paths
+    output: path.join(root, 'demo/dist/'),
+
+    // Demo
+    root: path.join(root, 'demo/'),
+  },
 };
 
 // Task lists
 const tasks = {
-    css: [],
-    js: [],
-    sprite: [],
+  css: [],
+  js: [],
+  sprite: [],
 };
 
 // Size plugin
@@ -75,115 +75,115 @@ const sizeOptions = { showFiles: true, gzip: true };
 
 // Clean out /dist
 gulp.task('clean', done => {
-    const dirs = [paths.plyr.output, paths.demo.output].map(dir => path.join(dir, '**/*'));
+  const dirs = [paths.plyr.output, paths.demo.output].map(dir => path.join(dir, '**/*'));
 
-    // Don't delete the mp4
-    dirs.push(`!${path.join(paths.plyr.output, '**/*.mp4')}`);
+  // Don't delete the mp4
+  dirs.push(`!${path.join(paths.plyr.output, '**/*.mp4')}`);
 
-    del(dirs);
+  del(dirs);
 
-    done();
+  done();
 });
 
 // JavaScript
 Object.entries(build.js).forEach(([filename, entry]) => {
-    const { dist, formats, namespace, polyfill, src } = entry;
+  const { dist, formats, namespace, polyfill, src } = entry;
 
-    formats.forEach(format => {
-        const name = `js:${filename}:${format}`;
-        const extension = format === 'es' ? 'mjs' : 'js';
-        tasks.js.push(name);
+  formats.forEach(format => {
+    const name = `js:${filename}:${format}`;
+    const extension = format === 'es' ? 'mjs' : 'js';
+    tasks.js.push(name);
 
-        gulp.task(name, () =>
-            gulp
-                .src(src)
-                .pipe(plumber())
-                .pipe(sourcemaps.init())
-                .pipe(
-                    rollup(
-                        {
-                            plugins: [
-                                resolve(),
-                                commonjs(),
-                                babel({
-                                    presets: [
-                                        [
-                                            '@babel/env',
-                                            {
-                                                // debug: true,
-                                                useBuiltIns: polyfill ? 'usage' : false,
-                                                corejs: polyfill ? 3 : undefined,
-                                                bugfixes: true,
-                                            },
-                                        ],
-                                    ],
-                                    babelrc: false,
-                                    exclude: [/\/core-js\//],
-                                }),
-                            ],
-                        },
-                        {
-                            name: namespace,
-                            format,
-                        },
-                    ),
-                )
-                .pipe(header('typeof navigator === "object" && ')) // "Support" SSR (#935)
-                .pipe(
-                    rename({
-                        extname: `.${extension}`,
-                    }),
-                )
-                .pipe(gulp.dest(dist))
-                .pipe(filter(`**/*.${extension}`))
-                .pipe(terser())
-                .pipe(rename({ suffix: minSuffix }))
-                .pipe(size(sizeOptions))
-                .pipe(sourcemaps.write(''))
-                .pipe(gulp.dest(dist)),
-        );
-    });
+    gulp.task(name, () =>
+      gulp
+        .src(src)
+        .pipe(plumber())
+        .pipe(sourcemaps.init())
+        .pipe(
+          rollup(
+            {
+              plugins: [
+                resolve(),
+                commonjs(),
+                babel({
+                  presets: [
+                    [
+                      '@babel/env',
+                      {
+                        // debug: true,
+                        useBuiltIns: polyfill ? 'usage' : false,
+                        corejs: polyfill ? 3 : undefined,
+                        bugfixes: true,
+                      },
+                    ],
+                  ],
+                  babelrc: false,
+                  exclude: [/\/core-js\//],
+                }),
+              ],
+            },
+            {
+              name: namespace,
+              format,
+            },
+          ),
+        )
+        .pipe(header('typeof navigator === "object" && ')) // "Support" SSR (#935)
+        .pipe(
+          rename({
+            extname: `.${extension}`,
+          }),
+        )
+        .pipe(gulp.dest(dist))
+        .pipe(filter(`**/*.${extension}`))
+        .pipe(terser())
+        .pipe(rename({ suffix: minSuffix }))
+        .pipe(size(sizeOptions))
+        .pipe(sourcemaps.write(''))
+        .pipe(gulp.dest(dist)),
+    );
+  });
 });
 
 // CSS
 Object.entries(build.css).forEach(([filename, entry]) => {
-    const { dist, src } = entry;
-    const name = `css:${filename}`;
-    tasks.css.push(name);
+  const { dist, src } = entry;
+  const name = `css:${filename}`;
+  tasks.css.push(name);
 
-    gulp.task(name, () =>
-        gulp
-            .src(src)
-            .pipe(plumber())
-            .pipe(sass())
-            .pipe(postcss([customprops(), autoprefixer(), clean()]))
-            .pipe(size(sizeOptions))
-            .pipe(gulp.dest(dist)),
-    );
+  gulp.task(name, () =>
+    gulp
+      .src(src)
+      .pipe(plumber())
+      .pipe(sass())
+      .pipe(postcss([customprops(), autoprefixer(), clean()]))
+      .pipe(size(sizeOptions))
+      .pipe(gulp.dest(dist)),
+  );
 });
 
 // SVG Sprites
 Object.entries(build.sprite).forEach(([filename, entry]) => {
-    const { dist, src } = entry;
-    const name = `sprite:${filename}`;
-    tasks.sprite.push(name);
+  const { dist, src } = entry;
+  const name = `sprite:${filename}`;
+  tasks.sprite.push(name);
 
-    gulp.task(name, () =>
-        gulp
-            .src(src)
-            .pipe(plumber())
-            .pipe(
-                imagemin([
-                    imagemin.svgo({
-                        plugins: [{ removeViewBox: false }],
-                    }),
-                ]),
-            )
-            .pipe(svgstore())
-            .pipe(rename({ basename: path.parse(filename).name }))
-            .pipe(size(sizeOptions))
-            .pipe(gulp.dest(dist)),
-    );
+  gulp.task(name, () =>
+    gulp
+      .src(src)
+      .pipe(plumber())
+      .pipe(
+        imagemin([
+          imagemin.svgo({
+            plugins: [{ removeViewBox: false }],
+          }),
+        ]),
+      )
+      .pipe(svgstore())
+      .pipe(rename({ basename: path.parse(filename).name }))
+      .pipe(size(sizeOptions))
+      .pipe(gulp.dest(dist)),
+  );
 });
 
 // Build all tasks
@@ -193,26 +193,26 @@ gulp.task('sprites', gulp.parallel(...tasks.sprite));
 
 // Watch for file changes
 gulp.task('watch', () => {
-    // Plyr core
-    gulp.watch(paths.plyr.src.js, gulp.parallel('js'));
-    gulp.watch(paths.plyr.src.sass, gulp.parallel('css'));
-    gulp.watch(paths.plyr.src.sprite, gulp.parallel('sprites'));
+  // Plyr core
+  gulp.watch(paths.plyr.src.js, gulp.parallel('js'));
+  gulp.watch(paths.plyr.src.sass, gulp.parallel('css'));
+  gulp.watch(paths.plyr.src.sprite, gulp.parallel('sprites'));
 
-    // Demo
-    gulp.watch(paths.demo.src.js, gulp.parallel('js'));
-    gulp.watch(paths.demo.src.sass, gulp.parallel('css'));
+  // Demo
+  gulp.watch(paths.demo.src.js, gulp.parallel('js'));
+  gulp.watch(paths.demo.src.sass, gulp.parallel('css'));
 });
 
 // Serve via browser sync
 gulp.task('serve', () =>
-    browserSync.init({
-        server: {
-            baseDir: paths.demo.root,
-        },
-        notify: false,
-        watch: true,
-        ghostMode: false,
-    }),
+  browserSync.init({
+    server: {
+      baseDir: paths.demo.root,
+    },
+    notify: false,
+    watch: true,
+    ghostMode: false,
+  }),
 );
 
 // Build distribution
