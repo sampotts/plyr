@@ -144,15 +144,15 @@ $embed-padding: ((100 / 16) * 9);
   // Pressed styles
   &:active {
     &::-webkit-slider-thumb {
-      @include plyr-range-thumb-active();
+      @include plyr-range-thumb-active($plyr-video-range-thumb-active-shadow-color);
     }
 
     &::-moz-range-thumb {
-      @include plyr-range-thumb-active();
+      @include plyr-range-thumb-active($plyr-video-range-thumb-active-shadow-color);
     }
 
     &::-ms-thumb {
-      @include plyr-range-thumb-active();
+      @include plyr-range-thumb-active($plyr-video-range-thumb-active-shadow-color);
     }
   }
 }

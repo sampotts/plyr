@@ -44,12 +44,12 @@
 
     // Arrow
     &::after {
-      border: 4px solid transparent;
+      border: $plyr-menu-arrow-size solid transparent;
       border-top-color: $plyr-menu-background;
       content: '';
       height: 0;
       position: absolute;
-      right: 15px;
+      right: calc(((#{$plyr-control-icon-size} / 2) + #{$plyr-control-padding}) - (#{$plyr-menu-arrow-size} / 2));
       top: 100%;
       width: 0;
     }
@@ -87,7 +87,7 @@
       }
 
       &::after {
-        border: 4px solid transparent;
+        border: $plyr-menu-item-arrow-size solid transparent;
         content: '';
         position: absolute;
         top: 50%;
@@ -98,8 +98,8 @@
         padding-right: calc(#{$plyr-control-padding} * 4);
 
         &::after {
-          border-left-color: $plyr-menu-arrow-color;
-          right: 5px;
+          border-left-color: $plyr-menu-item-arrow-color;
+          right: calc((#{$plyr-control-padding} * 1.5) - #{$plyr-menu-item-arrow-size});
         }
 
         &.plyr__tab-focus::after,
@@ -117,13 +117,13 @@
         width: calc(100% - (#{$plyr-control-padding} * 2));
 
         &::after {
-          border-right-color: $plyr-menu-arrow-color;
-          left: $plyr-control-padding;
+          border-right-color: $plyr-menu-item-arrow-color;
+          left: calc((#{$plyr-control-padding} * 1.5) - #{$plyr-menu-item-arrow-size});
         }
 
         &::before {
-          background: $plyr-menu-border-color;
-          box-shadow: 0 1px 0 $plyr-menu-border-shadow-color;
+          background: $plyr-menu-back-border-color;
+          box-shadow: 0 1px 0 $plyr-menu-back-border-shadow-color;
           content: '';
           height: 1px;
           left: 0;

@@ -4,7 +4,7 @@
 
 // Nicer focus styles
 // ---------------------------------------
-@mixin plyr-tab-focus($color: $plyr-tab-focus-default-color) {
+@mixin plyr-tab-focus($color: $plyr-tab-focus-color) {
   outline-color: $color;
   outline-offset: 2px;
   outline-style: dotted;
@@ -17,9 +17,6 @@
   @if $mode {
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
-  } @else {
-    -moz-osx-font-smoothing: auto;
-    -webkit-font-smoothing: subpixel-antialiased;
   }
 }
 
@@ -45,7 +42,7 @@
   width: $plyr-range-thumb-height;
 }
 
-@mixin plyr-range-thumb-active($color: $plyr-range-thumb-active-shadow-color) {
+@mixin plyr-range-thumb-active($color) {
   box-shadow: $plyr-range-thumb-shadow, 0 0 0 $plyr-range-thumb-active-shadow-width $color;
 }
 

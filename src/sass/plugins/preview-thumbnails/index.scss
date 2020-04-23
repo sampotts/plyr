@@ -2,7 +2,7 @@
 // Preview Thumbnails
 // --------------------------------------------------------------
 
-@import './settings.scss';
+@import './settings';
 
 .plyr__preview-thumb {
   background-color: $plyr-preview-background;
@@ -68,7 +68,7 @@
 
     span {
       background-color: $plyr-preview-time-background;
-      border-radius: ($plyr-preview-radius - 1px);
+      border-radius: calc(#{$plyr-preview-radius} - 1px);
       color: $plyr-preview-time-color;
       font-size: $plyr-preview-time-font-size;
       padding: $plyr-preview-time-padding;
@@ -84,6 +84,7 @@
   margin: auto; // Required when video is different dimensions to container (e.g. fullscreen)
   opacity: 0;
   overflow: hidden;
+  pointer-events: none;
   position: absolute;
   right: 0;
   top: 0;

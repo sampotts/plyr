@@ -19,21 +19,6 @@
   transition: transform 0.4s ease-in-out;
   width: 100%;
 
-  .plyr__caption {
-    background: $plyr-captions-background;
-    border-radius: 2px;
-    box-decoration-break: clone;
-    color: $plyr-captions-text-color;
-    line-height: 185%;
-    padding: 0.2em 0.5em;
-    white-space: pre-wrap;
-
-    // Firefox adds a <div> when using getCueAsHTML()
-    div {
-      display: inline;
-    }
-  }
-
   span:empty {
     display: none;
   }
@@ -55,4 +40,19 @@
 // If the lower controls are shown and not empty
 .plyr:not(.plyr--hide-controls) .plyr__controls:not(:empty) ~ .plyr__captions {
   transform: translateY(calc(#{$plyr-control-spacing} * -4));
+}
+
+.plyr__caption {
+  background: $plyr-captions-background;
+  border-radius: 2px;
+  box-decoration-break: clone;
+  color: $plyr-captions-text-color;
+  line-height: 185%;
+  padding: 0.2em 0.5em;
+  white-space: pre-wrap;
+
+  // Firefox adds a <div> when using getCueAsHTML()
+  div {
+    display: inline;
+  }
 }

@@ -8,26 +8,26 @@ Plyr is a simple, lightweight, accessible and customizable HTML5, YouTube and Vi
 
 # Features
 
--   📼 **HTML Video & Audio, YouTube & Vimeo** - support for the major formats
--   💪 **Accessible** - full support for VTT captions and screen readers
--   🔧 **[Customizable](#html)** - make the player look how you want with the markup you want
--   😎 **Clean HTML** - uses the _right_ elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no
-    `<span>` or `<a href="#">` button hacks
--   📱 **Responsive** - works with any screen size
--   💵 **[Monetization](#ads)** - make money from your videos
--   📹 **[Streaming](#demos)** - support for hls.js, Shaka and dash.js streaming playback
--   🎛 **[API](#api)** - toggle playback, volume, seeking, and more through a standardized API
--   🎤 **[Events](#events)** - no messing around with Vimeo and YouTube APIs, all events are standardized across formats
--   🔎 **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes
--   ⌨️ **[Shortcuts](#shortcuts)** - supports keyboard shortcuts
--   🖥 **Picture-in-Picture** - supports picture-in-picture mode
--   📱 **Playsinline** - supports the `playsinline` attribute
--   🏎 **Speed controls** - adjust speed on the fly
--   📖 **Multiple captions** - support for multiple caption tracks
--   🌎 **i18n support** - support for internationalization of controls
--   👌 **[Preview thumbnails](#preview-thumbnails)** - support for displaying preview thumbnails
--   🤟 **No frameworks** - written in "vanilla" ES6 JavaScript, no jQuery required
--   💁‍♀️ **SASS** - to include in your build processes
+- 📼 **HTML Video & Audio, YouTube & Vimeo** - support for the major formats
+- 💪 **Accessible** - full support for VTT captions and screen readers
+- 🔧 **[Customizable](#html)** - make the player look how you want with the markup you want
+- 😎 **Clean HTML** - uses the _right_ elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no
+  `<span>` or `<a href="#">` button hacks
+- 📱 **Responsive** - works with any screen size
+- 💵 **[Monetization](#ads)** - make money from your videos
+- 📹 **[Streaming](#demos)** - support for hls.js, Shaka and dash.js streaming playback
+- 🎛 **[API](#api)** - toggle playback, volume, seeking, and more through a standardized API
+- 🎤 **[Events](#events)** - no messing around with Vimeo and YouTube APIs, all events are standardized across formats
+- 🔎 **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes
+- ⌨️ **[Shortcuts](#shortcuts)** - supports keyboard shortcuts
+- 🖥 **Picture-in-Picture** - supports picture-in-picture mode
+- 📱 **Playsinline** - supports the `playsinline` attribute
+- 🏎 **Speed controls** - adjust speed on the fly
+- 📖 **Multiple captions** - support for multiple caption tracks
+- 🌎 **i18n support** - support for internationalization of controls
+- 👌 **[Preview thumbnails](#preview-thumbnails)** - support for displaying preview thumbnails
+- 🤟 **No frameworks** - written in "vanilla" ES6 JavaScript, no jQuery required
+- 💁‍♀️ **SASS** - to include in your build processes
 
 ### Demos
 
@@ -42,21 +42,23 @@ Plyr extends upon the standard [HTML5 media element](https://developer.mozilla.o
 ### HTML5 Video
 
 ```html
-<video poster="/path/to/poster.jpg" id="player" playsinline controls>
-    <source src="/path/to/video.mp4" type="video/mp4" />
-    <source src="/path/to/video.webm" type="video/webm" />
+<video id="player" playsinline controls data-poster="/path/to/poster.jpg">
+  <source src="/path/to/video.mp4" type="video/mp4" />
+  <source src="/path/to/video.webm" type="video/webm" />
 
-    <!-- Captions are optional -->
-    <track kind="captions" label="English captions" src="/path/to/captions.vtt" srclang="en" default />
+  <!-- Captions are optional -->
+  <track kind="captions" label="English captions" src="/path/to/captions.vtt" srclang="en" default />
 </video>
 ```
+
+**Note**: The poster image should be specified using `data-poster`. This is to prevent it [being downloaded twice](https://github.com/sampotts/plyr/issues/1531). If you're sure the image will be cached, you can still use the `poster` attribute for true progressive enhancement.
 
 ### HTML5 Audio
 
 ```html
 <audio id="player" controls>
-    <source src="/path/to/audio.mp3" type="audio/mp3" />
-    <source src="/path/to/audio.ogg" type="audio/ogg" />
+  <source src="/path/to/audio.mp3" type="audio/mp3" />
+  <source src="/path/to/audio.ogg" type="audio/ogg" />
 </audio>
 ```
 
@@ -68,12 +70,12 @@ We recommend [progressive enhancement](https://www.smashingmagazine.com/2009/04/
 
 ```html
 <div class="plyr__video-embed" id="player">
-    <iframe
-        src="https://www.youtube.com/embed/bTqVqk7FSmY?origin=https://plyr.io&amp;iv_load_policy=3&amp;modestbranding=1&amp;playsinline=1&amp;showinfo=0&amp;rel=0&amp;enablejsapi=1"
-        allowfullscreen
-        allowtransparency
-        allow="autoplay"
-    ></iframe>
+  <iframe
+    src="https://www.youtube.com/embed/bTqVqk7FSmY?origin=https://plyr.io&amp;iv_load_policy=3&amp;modestbranding=1&amp;playsinline=1&amp;showinfo=0&amp;rel=0&amp;enablejsapi=1"
+    allowfullscreen
+    allowtransparency
+    allow="autoplay"
+  ></iframe>
 </div>
 ```
 
@@ -93,12 +95,12 @@ Much the same as YouTube above.
 
 ```html
 <div class="plyr__video-embed" id="player">
-    <iframe
-        src="https://player.vimeo.com/video/76979871?loop=false&amp;byline=false&amp;portrait=false&amp;title=false&amp;speed=true&amp;transparent=0&amp;gesture=media"
-        allowfullscreen
-        allowtransparency
-        allow="autoplay"
-    ></iframe>
+  <iframe
+    src="https://player.vimeo.com/video/76979871?loop=false&amp;byline=false&amp;portrait=false&amp;title=false&amp;speed=true&amp;transparent=0&amp;gesture=media"
+    allowfullscreen
+    allowtransparency
+    allow="autoplay"
+  ></iframe>
 </div>
 ```
 
@@ -123,7 +125,7 @@ Alternatively you can include the `plyr.js` script before the closing `</body>` 
 ```html
 <script src="path/to/plyr.js"></script>
 <script>
-    const player = new Plyr('#player');
+  const player = new Plyr('#player');
 </script>
 ```
 
@@ -164,9 +166,9 @@ reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.5.10
 
 Plyr has partnered up with [vi.ai](https://vi.ai/publisher-video-monetization/?aid=plyrio) to offer monetization options for your videos. Getting setup is easy:
 
--   [Sign up for a vi.ai account](https://vi.ai/publisher-video-monetization/?aid=plyrio)
--   Grab your publisher ID from the code snippet
--   Enable ads in the [config options](#options) and enter your publisher ID
+- [Sign up for a vi.ai account](https://vi.ai/publisher-video-monetization/?aid=plyrio)
+- Grab your publisher ID from the code snippet
+- Enable ads in the [config options](#options) and enter your publisher ID
 
 Any questions regarding the ads can be sent straight to vi.ai and any issues with rendering raised through GitHub issues.
 
@@ -174,21 +176,90 @@ If you do not wish to use Vi, you can set your own `ads.tagUrl` [option](#option
 
 # Advanced
 
-## Custom CSS
+## Customizing the CSS
 
 If you want to change any design tokens used for the rendering of the player, you can do so using [CSS Custom Properties](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties).
 
 Here's a list of the properties and what they are used for:
 
-| Name                | Description                                     | Fallback              |
-| ------------------- | ----------------------------------------------- | --------------------- |
-| `--plyr-color-main` | The main branding color - used for highlighting | `hsl(198, 100%, 50%)` |
+| Name                                           | Description                                                                                             | Default / Fallback                                                    |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| `--plyr-color-main`                            | The primary UI color.                                                                                   | ![#f03c15](https://placehold.it/15/00b3ff/000000?text=+) `#00b3ff`    |
+| `--plyr-tab-focus-color`                       | The color used for the dotted outline when an element is `:focus-visible` (equivalent) keyboard focus.  | `--plyr-color-main`                                                   |
+| `--plyr-badge-background`                      | The background color for badges in the menu.                                                            | ![#4a5464](https://placehold.it/15/4a5464/000000?text=+) `#4a5464`    |
+| `--plyr-badge-text-color`                      | The text color for badges.                                                                              | ![#ffffff](https://placehold.it/15/ffffff/000000?text=+) `#ffffff`    |
+| `--plyr-badge-border-radius`                   | The border radius used for badges.                                                                      | `2px`                                                                 |
+| `--plyr-tab-focus-color`                       | The color used to highlight tab (keyboard) focus.                                                       | `--plyr-color-main`                                                   |
+| `--plyr-captions-background`                   | The color for the background of captions.                                                               | `rgba(0, 0, 0, 0.8)`                                                  |
+| `--plyr-captions-text-color`                   | The color used for the captions text.                                                                   | ![#ffffff](https://placehold.it/15/ffffff/000000?text=+) `#ffffff`    |
+| `--plyr-control-icon-size`                     | The size of the icons used in the controls.                                                             | `18px`                                                                |
+| `--plyr-control-spacing`                       | The space between controls (sometimes used in a multiple - e.g. `10px / 2 = 5px`).                      | `10px`                                                                |
+| `--plyr-control-padding`                       | The padding inside controls.                                                                            | `--plyr-control-spacing * 0.7` (`7px`)                                |
+| `--plyr-control-radius`                        | The border radius used on controls.                                                                     | `3px`                                                                 |
+| `--plyr-control-toggle-checked-background`     | The background color used for checked menu items.                                                       | `--plyr-color-main`                                                   |
+| `--plyr-video-controls-background`             | The background for the video controls.                                                                  | `linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75))`              |
+| `--plyr-video-control-color`                   | The text/icon color for video controls.                                                                 | ![#ffffff](https://placehold.it/15/ffffff/000000?text=+) `#ffffff`    |
+| `--plyr-video-control-color-hover`             | The text/icon color used when video controls are `:hover`, `:focus` and `:focus-visible` (equivalent).  | ![#ffffff](https://placehold.it/15/ffffff/000000?text=+) `#ffffff`    |
+| `--plyr-video-control-background-hover`        | The background color used when video controls are `:hover`, `:focus` and `:focus-visible` (equivalent). | `--plyr-color-main`                                                   |
+| `--plyr-audio-controls-background`             | The background for the audio controls.                                                                  | ![#ffffff](https://placehold.it/15/ffffff/000000?text=+) `#ffffff`    |
+| `--plyr-audio-control-color`                   | The text/icon color for audio controls.                                                                 | ![#4a5464](https://placehold.it/15/4a5464/000000?text=+) `#4a5464`    |
+| `--plyr-audio-control-color-hover`             | The text/icon color used when audio controls are `:hover`, `:focus` and `:focus-visible` (equivalent).  | ![#ffffff](https://placehold.it/15/ffffff/000000?text=+) `#ffffff`    |
+| `--plyr-audio-control-background-hover`        | The background color used when video controls are `:hover`, `:focus` and `:focus-visible` (equivalent). | `--plyr-color-main`                                                   |
+| `--plyr-menu-background`                       | The background color for menus.                                                                         | `rgba(255, 255, 255, 0.9)`                                            |
+| `--plyr-menu-color`                            | The text/icon color for menu items.                                                                     | ![#4a5464](https://placehold.it/15/4a5464/000000?text=+) `#4a5464`    |
+| `--plyr-menu-shadow`                           | The shadow used on menus.                                                                               | `0 1px 2px rgba(0, 0, 0, 0.15)`                                       |
+| `--plyr-menu-radius`                           | The border radius on the menu.                                                                          | `4px`                                                                 |
+| `--plyr-menu-arrow-size`                       | The size of the arrow on the bottom of the menu.                                                        | `6px`                                                                 |
+| `--plyr-menu-item-arrow-color`                 | The color of the arrows in the menu.                                                                    | ![#728197](https://placehold.it/15/728197/000000?text=+) `#728197`    |
+| `--plyr-menu-item-arrow-size`                  | The size of the arrows in the menu.                                                                     | `4px`                                                                 |
+| `--plyr-menu-border-color`                     | The border color for the bottom of the back button in the top of the sub menu pages.                    | ![#dcdfe5](https://placehold.it/15/dcdfe5/000000?text=+) `#dcdfe5`    |
+| `--plyr-menu-border-shadow-color`              | The shadow below the border of the back button in the top of the sub menu pages.                        | ![#ffffff](https://placehold.it/15/ffffff/000000?text=+) `#ffffff`    |
+| `--plyr-progress-loading-size`                 | The size of the stripes in the loading state in the scrubber.                                           | `25px`                                                                |
+| `--plyr-progress-loading-background`           | The background color on the loading state in the scrubber.                                              | `rgba(35, 40, 47, 0.6)`                                               |
+| `--plyr-video-progress-buffered-background`    | The fill color for the buffer indication in the scrubber for video.                                     | `rgba(255, 255, 255, 0.25)`                                           |
+| `--plyr-audio-progress-buffered-background`    | The fill color for the buffer indication in the scrubber for audio.                                     | `rgba(193, 200, 209, 0.6)`                                            |
+| `--plyr-range-thumb-height`                    | The height of the scrubber handle/thumb.                                                                | `13px`                                                                |
+| `--plyr-range-thumb-background`                | The background of the scrubber handle/thumb.                                                            | ![#ffffff](https://placehold.it/15/ffffff/000000?text=+) `#ffffff`    |
+| `--plyr-range-thumb-shadow`                    | The shadow of the scrubber handle/thumb.                                                                | `0 1px 1px rgba(215, 26, 18, 0.15), 0 0 0 1px rgba(215, 26, 18, 0.2)` |
+| `--plyr-range-thumb-active-shadow-width`       | The width of the shadow when the scrubber handle/thumb is `:active` (pressed).                          | `3px`                                                                 |
+| `--plyr-range-track-height`                    | The height of the scrubber/progress track.                                                              | `5px`                                                                 |
+| `--plyr-range-fill-background`                 | The fill color of the scrubber/progress.                                                                | `--plyr-color-main`                                                   |
+| `--plyr-video-range-track-background`          | The background of the scrubber/progress.                                                                | `--plyr-video-progress-buffered-background`                           |
+| `--plyr-video-range-thumb-active-shadow-color` | The color of the shadow when the video scrubber handle/thumb is `:active` (pressed).                    | `rgba(255, 255, 255, 0.5)`                                            |
+| `--plyr-audio-range-track-background`          | The background of the scrubber/progress.                                                                | `--plyr-video-progress-buffered-background`                           |
+| `--plyr-audio-range-thumb-active-shadow-color` | The color of the shadow when the audio scrubber handle/thumb is `:active` (pressed).                    | `rgba(215, 26, 18, 0.1)`                                              |
+| `--plyr-tooltip-background`                    | The background color for tooltips.                                                                      | `rgba(255, 255, 255, 0.9)`                                            |
+| `--plyr-tooltip-color`                         | The text color for tooltips.                                                                            | ![#4a5464](https://placehold.it/15/4a5464/000000?text=+) `#4a5464`    |
+| `--plyr-tooltip-padding`                       | The padding for tooltips.                                                                               | `calc(var(--plyr-control-spacing) / 2))`                              |
+| `--plyr-tooltip-arrow-size`                    | The size of the arrow under tooltips.                                                                   | `4px`                                                                 |
+| `--plyr-tooltip-radius`                        | The border radius on tooltips.                                                                          | `3px`                                                                 |
+| `--plyr-tooltip-shadow`                        | The shadow on tooltips.                                                                                 | `0 1px 2px rgba(0, 0, 0, 0.15)`                                       |
+| `--plyr-font-family`                           | The font family used in the player.                                                                     |                                                                       |
+| `--plyr-font-size-base`                        | The base font size. Mainly used for captions.                                                           | `15px`                                                                |
+| `--plyr-font-size-small`                       | The smaller font size. Mainly used for captions.                                                        | `13px`                                                                |
+| `--plyr-font-size-large`                       | The larger font size. Mainly used for captions.                                                         | `18px`                                                                |
+| `--plyr-font-size-xlarge`                      | The even larger font size. Mainly used for captions.                                                    | `21px`                                                                |
+| `--plyr-font-size-time`                        | The font size for the time.                                                                             | `--plyr-font-size-small`                                              |
+| `--plyr-font-size-menu`                        | The font size used in the menu.                                                                         | `--plyr-font-size-small`                                              |
+| `--plyr-font-size-badge`                       | The font size used for badges.                                                                          | `9px`                                                                 |
+| `--plyr-font-weight-regular`                   | The regular font weight.                                                                                | `400`                                                                 |
+| `--plyr-font-weight-bold`                      | The bold font weight.                                                                                   | `600`                                                                 |
+| `--plyr-line-height`                           | The line height used within the player.                                                                 | `1.7`                                                                 |
+| `--plyr-font-smoothing`                        | Whether to enable font antialiasing within the player.                                                  | `false`                                                               |
 
-You can set them in your CSS:
+You can set them in your CSS for all players:
+
+```css
+:root {
+  --plyr-color-main: #1ac266;
+}
+```
+
+...or for a specific class name:
 
 ```css
 .player {
-    --plyr-color-main: #1ac266;
+  --plyr-color-main: #1ac266;
 }
 ```
 
@@ -241,9 +312,9 @@ WebVTT captions are supported. To add a caption track, check the HTML example ab
 
 You can specify a range of arguments for the constructor to use:
 
--   A [CSS string selector](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors)
--   A [`HTMLElement`](https://developer.mozilla.org/en/docs/Web/API/HTMLElement)
--   A [jQuery](https://jquery.com) object
+- A [CSS string selector](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors)
+- A [`HTMLElement`](https://developer.mozilla.org/en/docs/Web/API/HTMLElement)
+- A [jQuery](https://jquery.com) object
 
 _Note_: If a `NodeList`, `Array`, or jQuery object are passed, the first element will be used for setup. To setup multiple players, see [multiple players](#multiple-players) below.
 
@@ -289,7 +360,7 @@ The second argument for the constructor is the [options](#options) object:
 
 ```javascript
 const player = new Plyr('#player', {
-    title: 'Example Title',
+  title: 'Example Title',
 });
 ```
 
@@ -344,9 +415,9 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
 1.  Vimeo only
 2.  Autoplay is generally not recommended as it is seen as a negative user experience. It is also disabled in many browsers. Before raising issues, do your homework. More info can be found here:
 
--   https://webkit.org/blog/6784/new-video-policies-for-ios/
--   https://developers.google.com/web/updates/2017/09/autoplay-policy-changes
--   https://hacks.mozilla.org/2019/02/firefox-66-to-block-automatically-playing-audible-video-and-audio/
+- https://webkit.org/blog/6784/new-video-policies-for-ios/
+- https://developers.google.com/web/updates/2017/09/autoplay-policy-changes
+- https://hacks.mozilla.org/2019/02/firefox-66-to-block-automatically-playing-audible-video-and-audio/
 
 # API
 
@@ -358,7 +429,7 @@ The easiest way to access the Plyr object is to set the return value from your c
 
 ```javascript
 const player = new Plyr('#player', {
-    /* options */
+  /* options */
 });
 ```
 
@@ -366,7 +437,7 @@ You can also access the object through any events:
 
 ```javascript
 element.addEventListener('ready', event => {
-    const player = event.detail.plyr;
+  const player = event.detail.plyr;
 });
 ```
 
@@ -460,39 +531,39 @@ Video example:
 
 ```javascript
 player.source = {
-    type: 'video',
-    title: 'Example title',
-    sources: [
-        {
-            src: '/path/to/movie.mp4',
-            type: 'video/mp4',
-            size: 720,
-        },
-        {
-            src: '/path/to/movie.webm',
-            type: 'video/webm',
-            size: 1080,
-        },
-    ],
-    poster: '/path/to/poster.jpg',
-    previewThumbnails: {
-        src: '/path/to/thumbnails.vtt',
+  type: 'video',
+  title: 'Example title',
+  sources: [
+    {
+      src: '/path/to/movie.mp4',
+      type: 'video/mp4',
+      size: 720,
     },
-    tracks: [
-        {
-            kind: 'captions',
-            label: 'English',
-            srclang: 'en',
-            src: '/path/to/captions.en.vtt',
-            default: true,
-        },
-        {
-            kind: 'captions',
-            label: 'French',
-            srclang: 'fr',
-            src: '/path/to/captions.fr.vtt',
-        },
-    ],
+    {
+      src: '/path/to/movie.webm',
+      type: 'video/webm',
+      size: 1080,
+    },
+  ],
+  poster: '/path/to/poster.jpg',
+  previewThumbnails: {
+    src: '/path/to/thumbnails.vtt',
+  },
+  tracks: [
+    {
+      kind: 'captions',
+      label: 'English',
+      srclang: 'en',
+      src: '/path/to/captions.en.vtt',
+      default: true,
+    },
+    {
+      kind: 'captions',
+      label: 'French',
+      srclang: 'fr',
+      src: '/path/to/captions.fr.vtt',
+    },
+  ],
 };
 ```
 
@@ -500,18 +571,18 @@ Audio example:
 
 ```javascript
 player.source = {
-    type: 'audio',
-    title: 'Example title',
-    sources: [
-        {
-            src: '/path/to/audio.mp3',
-            type: 'audio/mp3',
-        },
-        {
-            src: '/path/to/audio.ogg',
-            type: 'audio/ogg',
-        },
-    ],
+  type: 'audio',
+  title: 'Example title',
+  sources: [
+    {
+      src: '/path/to/audio.mp3',
+      type: 'audio/mp3',
+    },
+    {
+      src: '/path/to/audio.ogg',
+      type: 'audio/ogg',
+    },
+  ],
 };
 ```
 
@@ -519,13 +590,13 @@ YouTube example:
 
 ```javascript
 player.source = {
-    type: 'video',
-    sources: [
-        {
-            src: 'bTqVqk7FSmY',
-            provider: 'youtube',
-        },
-    ],
+  type: 'video',
+  sources: [
+    {
+      src: 'bTqVqk7FSmY',
+      provider: 'youtube',
+    },
+  ],
 };
 ```
 
@@ -535,13 +606,13 @@ Vimeo example
 
 ```javascript
 player.source = {
-    type: 'video',
-    sources: [
-        {
-            src: '143418951',
-            provider: 'vimeo',
-        },
-    ],
+  type: 'video',
+  sources: [
+    {
+      src: '143418951',
+      provider: 'vimeo',
+    },
+  ],
 };
 ```
 
@@ -566,7 +637,7 @@ property. Here's an example:
 
 ```javascript
 player.on('ready', event => {
-    const instance = event.detail.plyr;
+  const instance = event.detail.plyr;
 });
 ```
 
@@ -625,8 +696,8 @@ YouTube and Vimeo are currently supported and function much like a HTML5 video. 
 to access the API's directly. You can do so via the `embed` property of your player object - e.g. `player.embed`. You can then use the relevant methods from the
 third party APIs. More info on the respective API's here:
 
--   [YouTube iframe API Reference](https://developers.google.com/youtube/iframe_api_reference)
--   [Vimeo player.js Reference](https://github.com/vimeo/player.js)
+- [YouTube iframe API Reference](https://developers.google.com/youtube/iframe_api_reference)
+- [Vimeo player.js Reference](https://github.com/vimeo/player.js)
 
 _Note_: Not all API methods may work 100%. Your mileage may vary. It's better to use the Plyr API where possible.
 
@@ -692,9 +763,9 @@ const supported = Plyr.supported('video', 'html5', true);
 
 The arguments are:
 
--   Media type (`audio` or `video`)
--   Provider (`html5`, `youtube` or `vimeo`)
--   Whether the player has the `playsinline` attribute (only applicable to iOS 10+)
+- Media type (`audio` or `video`)
+- Provider (`html5`, `youtube` or `vimeo`)
+- Whether the player has the `playsinline` attribute (only applicable to iOS 10+)
 
 ## Disable support programmatically
 
@@ -702,7 +773,7 @@ The `enabled` option can be used to disable certain User Agents. For example, if
 
 ```javascript
 {
-    enabled: /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent);
+  enabled: /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent);
 }
 ```
 
@@ -735,42 +806,42 @@ Plyr is developed by [@sam_potts](https://twitter.com/sam_potts) / [sampotts.me]
 
 Plyr costs money to run, not only my time. I donate my time for free as I enjoy building Plyr but unfortunately have to pay for domains, hosting, and more. Any help with costs is appreciated...
 
--   [Donate via Patreon](https://www.patreon.com/plyr)
--   [Donate via PayPal](https://www.paypal.me/pottsy/20usd)
+- [Donate via Patreon](https://www.patreon.com/plyr)
+- [Donate via PayPal](https://www.paypal.me/pottsy/20usd)
 
 # Mentions
 
--   [ProductHunt](https://www.producthunt.com/tech/plyr)
--   [The Changelog](http://thechangelog.com/plyr-simple-html5-media-player-custom-controls-webvtt-captions/)
--   [HTML5 Weekly #177](http://html5weekly.com/issues/177)
--   [Responsive Design #149](http://us4.campaign-archive2.com/?u=559bc631fe5294fc66f5f7f89&id=451a61490f)
--   [Web Design Weekly #174](https://web-design-weekly.com/2015/02/24/web-design-weekly-174/)
--   [Front End Focus #177](https://frontendfoc.us/issues/177)
--   [Hacker News](https://news.ycombinator.com/item?id=9136774)
--   [Web Platform Daily](http://webplatformdaily.org/releases/2015-03-04)
--   [LayerVault Designer News](https://news.layervault.com/stories/45394-plyr--a-simple-html5-media-player)
--   [The Treehouse Show #131](https://teamtreehouse.com/library/episode-131-origami-react-responsive-hero-images)
--   [noupe.com](http://www.noupe.com/design/html5-plyr-is-a-responsive-and-accessible-video-player-94389.html)
+- [ProductHunt](https://www.producthunt.com/tech/plyr)
+- [The Changelog](http://thechangelog.com/plyr-simple-html5-media-player-custom-controls-webvtt-captions/)
+- [HTML5 Weekly #177](http://html5weekly.com/issues/177)
+- [Responsive Design #149](http://us4.campaign-archive2.com/?u=559bc631fe5294fc66f5f7f89&id=451a61490f)
+- [Web Design Weekly #174](https://web-design-weekly.com/2015/02/24/web-design-weekly-174/)
+- [Front End Focus #177](https://frontendfoc.us/issues/177)
+- [Hacker News](https://news.ycombinator.com/item?id=9136774)
+- [Web Platform Daily](http://webplatformdaily.org/releases/2015-03-04)
+- [LayerVault Designer News](https://news.layervault.com/stories/45394-plyr--a-simple-html5-media-player)
+- [The Treehouse Show #131](https://teamtreehouse.com/library/episode-131-origami-react-responsive-hero-images)
+- [noupe.com](http://www.noupe.com/design/html5-plyr-is-a-responsive-and-accessible-video-player-94389.html)
 
 # Used by
 
--   [Selz.com](https://selz.com)
--   [Peugeot.fr](http://www.peugeot.fr/marque-et-technologie/technologies/peugeot-i-cockpit.html)
--   [Peugeot.de](http://www.peugeot.de/modelle/modellberater/208-3-turer/fotos-videos.html)
--   [TomTom.com](http://prioritydriving.tomtom.com/)
--   [DIGBMX](http://digbmx.com/)
--   [Grime Archive](https://grimearchive.com/)
--   [koel - A personal music streaming server that works.](http://koel.phanan.net/)
--   [Oscar Radio](http://oscar-radio.xyz/)
--   [Sparkk TV](https://www.sparkktv.com/)
--   [@halfhalftravel](https://www.halfhalftravel.com/)
+- [Selz.com](https://selz.com)
+- [Peugeot.fr](http://www.peugeot.fr/marque-et-technologie/technologies/peugeot-i-cockpit.html)
+- [Peugeot.de](http://www.peugeot.de/modelle/modellberater/208-3-turer/fotos-videos.html)
+- [TomTom.com](http://prioritydriving.tomtom.com/)
+- [DIGBMX](http://digbmx.com/)
+- [Grime Archive](https://grimearchive.com/)
+- [koel - A personal music streaming server that works.](http://koel.phanan.net/)
+- [Oscar Radio](http://oscar-radio.xyz/)
+- [Sparkk TV](https://www.sparkktv.com/)
+- [@halfhalftravel](https://www.halfhalftravel.com/)
 
 If you want to be added to the list, open a pull request. It'd be awesome to see how you're using Plyr 😎
 
 # Useful links and credits
 
--   [PayPal's Accessible HTML5 Video Player (which Plyr was originally ported from)](https://github.com/paypal/accessible-html5-video-player)
--   [An awesome guide for Plyr in Japanese!](http://syncer.jp/how-to-use-plyr-io) by [@arayutw](https://twitter.com/arayutw)
+- [PayPal's Accessible HTML5 Video Player (which Plyr was originally ported from)](https://github.com/paypal/accessible-html5-video-player)
+- [An awesome guide for Plyr in Japanese!](http://syncer.jp/how-to-use-plyr-io) by [@arayutw](https://twitter.com/arayutw)
 
 # Thanks
 

@@ -42,15 +42,15 @@
   // Pressed styles
   &:active {
     &::-webkit-slider-thumb {
-      @include plyr-range-thumb-active($plyr-audio-range-thumb-shadow-color);
+      @include plyr-range-thumb-active($plyr-audio-range-thumb-active-shadow-color);
     }
 
     &::-moz-range-thumb {
-      @include plyr-range-thumb-active($plyr-audio-range-thumb-shadow-color);
+      @include plyr-range-thumb-active($plyr-audio-range-thumb-active-shadow-color);
     }
 
     &::-ms-thumb {
-      @include plyr-range-thumb-active($plyr-audio-range-thumb-shadow-color);
+      @include plyr-range-thumb-active($plyr-audio-range-thumb-active-shadow-color);
     }
   }
 }
