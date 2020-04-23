@@ -2,25 +2,17 @@
 // Plyr Settings
 // ==========================================================================
 
-// Font sizes
-$plyr-font-size-base: 13px;
-$plyr-font-size-small: 12px;
-$plyr-font-size-time: 11px;
-$plyr-font-size-badges: 9px;
-
-// Font weight
-$plyr-font-weight-regular: 500;
-$plyr-font-weight-bold: 600;
-
-// Font smoothing
-$plyr-font-smoothing: true;
-
-// Colors
-$plyr-color-main: $color-brand-primary;
-
-// Captions
-$plyr-font-size-captions-base: $plyr-font-size-base;
-$plyr-font-size-captions-small: $plyr-font-size-small;
-$plyr-font-size-captions-medium: 18px;
-$plyr-font-size-captions-large: 21px;
-$plyr-font-size-menu: $plyr-font-size-base;
+@include css-vars(
+  (
+    --plyr-color-main: $color-brand-primary,
+    --plyr-font-size-base: 13px,
+    --plyr-font-size-small: 12px,
+    --plyr-font-size-time: 11px,
+    --plyr-font-size-badges: 9px,
+    --plyr-font-size-menu: var(--plyr-font-size-base),
+    --plyr-font-weight-regular: 500,
+    --plyr-font-weight-bold: 600,
+    --plyr-font-size-captions-medium: 18px,
+    --plyr-font-size-captions-large: 21px
+  )
+);
