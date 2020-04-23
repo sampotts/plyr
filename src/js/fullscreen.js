@@ -5,7 +5,7 @@
 // ==========================================================================
 
 import browser from './utils/browser';
-import { getElements, hasClass, toggleClass } from './utils/elements';
+import { getElements, hasClass, toggleClass, closest } from './utils/elements';
 import { on, triggerEvent } from './utils/events';
 import is from './utils/is';
 import { silencePromise } from './utils/promise';
@@ -24,6 +24,11 @@ class Fullscreen {
 
     // Force the use of 'full window/browser' rather than fullscreen
     this.forceFallback = player.config.fullscreen.fallback === 'force';
+
+    // Get the fullscreen element
+    // Checks container is an ancestor, defaults to null
+    this.player.elements.fullscreen =
+      player.config.fullscreen.container && closest(this.player.elements.container, player.config.fullscreen.container);
 
     // Register event listeners
     // Handle event (incase user presses escape etc)
@@ -126,7 +131,7 @@ class Fullscreen {
   get target() {
     return browser.isIos && this.player.config.fullscreen.iosNative
       ? this.player.media
-      : this.player.elements.container;
+      : this.player.elements.fullscreen || this.player.elements.container;
   }
 
   onChange() {

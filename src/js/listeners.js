@@ -333,7 +333,6 @@ class Listeners {
 
     const resized = () => {
       clearTimeout(timers.resized);
-
       timers.resized = setTimeout(setPlayerSize, 50);
     };
 
@@ -357,7 +356,7 @@ class Listeners {
       // Set Vimeo gutter
       setGutter(ratio, padding, isEnter);
 
-      // If not using the native browser fullscreen API, we need to check for resizes of viewport
+      // If not using native browser fullscreen API, we need to check for resizes of viewport
       if (!usingNative) {
         if (isEnter) {
           on.call(player, window, 'resize', resized);
@@ -816,6 +815,17 @@ class Listeners {
     this.bind(elements.controls, 'mouseenter mouseleave', event => {
       elements.controls.hover = !player.touch && event.type === 'mouseenter';
     });
+
+    // Also update controls.hover state for any non-player children of fullscreen element (as above)
+    if (elements.fullscreen) {
+      Array.from(elements.fullscreen.children)
+        .filter(c => !c.contains(elements.container))
+        .forEach(child => {
+          this.bind(child, 'mouseenter mouseleave', event => {
+            elements.controls.hover = !player.touch && event.type === 'mouseenter';
+          });
+        });
+    }
 
     // Update controls.pressed state (used for ui.toggleControls to avoid hiding when interacting)
     this.bind(elements.controls, 'mousedown mouseup touchstart touchend touchcancel', event => {

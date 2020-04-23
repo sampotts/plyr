@@ -115,6 +115,9 @@ const defaults = {
     enabled: true, // Allow fullscreen?
     fallback: true, // Fallback using full viewport/window
     iosNative: false, // Use the native fullscreen in iOS (disables custom controls)
+    // Selector for the fullscreen container so contextual / non-player content can remain visible in fullscreen mode
+    // Non-ancestors of the player element will be ignored
+    // container: null, // defaults to the player element
   },
 
   // Local storage
