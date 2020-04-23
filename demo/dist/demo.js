@@ -29440,7 +29440,10 @@ typeof navigator === "object" && (function () {
 	      label: 'French',
 	      srclang: 'fr',
 	      src: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.fr.vtt'
-	    }]
+	    }],
+	    previewThumbnails: {
+	      src: ['https://cdn.plyr.io/static/demo/thumbs/100p.vtt', 'https://cdn.plyr.io/static/demo/thumbs/240p.vtt']
+	    }
 	  },
 	  audio: {
 	    type: 'audio',
