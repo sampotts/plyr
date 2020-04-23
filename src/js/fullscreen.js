@@ -5,7 +5,7 @@
 // ==========================================================================
 
 import browser from './utils/browser';
-import { getElements, hasClass, toggleClass, closest } from './utils/elements';
+import { closest,getElements, hasClass, toggleClass } from './utils/elements';
 import { on, triggerEvent } from './utils/events';
 import is from './utils/is';
 import { silencePromise } from './utils/promise';

@@ -127,6 +127,7 @@ const captions = {
         .filter(track => !meta.get(track))
         .forEach(track => {
           this.debug.log('Track added', track);
+
           // Attempt to store if the original dom element was "default"
           meta.set(track, {
             default: track.mode === 'showing',
@@ -137,6 +138,7 @@ const captions = {
           // isn't downloaded at once, only 'showing' tracks should be reassigned
           // eslint-disable-next-line no-param-reassign
           if (track.mode === 'showing') {
+            // eslint-disable-next-line no-param-reassign
             track.mode = 'hidden';
           }
 
