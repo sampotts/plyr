@@ -133,8 +133,12 @@ const captions = {
                     });
 
                     // Turn off native caption rendering to avoid double captions
+                    // Note: mode='hidden' forces a track to download. To ensure every track
+                    // isn't downloaded at once, only 'showing' tracks should be reassigned
                     // eslint-disable-next-line no-param-reassign
-                    track.mode = 'hidden';
+                    if (track.mode === 'showing') {
+                        track.mode = 'hidden';
+                    }
 
                     // Add event listener for cue changes
                     on.call(this, track, 'cuechange', () => captions.updateCues.call(this));
@@ -211,6 +215,14 @@ const captions = {
             // Trigger event (not used internally)
             triggerEvent.call(this, this.media, active ? 'captionsenabled' : 'captionsdisabled');
         }
+
+        // Wait for the call stack to clear before setting mode='hidden'
+        // on the active track - forcing the browser to download it
+        setTimeout(() => {
+            if (active && this.captions.toggled) {
+                this.captions.currentTrackNode.mode = 'hidden';
+            }   
+        });
     },
 
     // Set captions by track index
