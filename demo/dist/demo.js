@@ -4380,6 +4380,42 @@ typeof navigator === "object" && (function () {
 	  return target;
 	}
 
+	function _objectWithoutPropertiesLoose(source, excluded) {
+	  if (source == null) return {};
+	  var target = {};
+	  var sourceKeys = Object.keys(source);
+	  var key, i;
+
+	  for (i = 0; i < sourceKeys.length; i++) {
+	    key = sourceKeys[i];
+	    if (excluded.indexOf(key) >= 0) continue;
+	    target[key] = source[key];
+	  }
+
+	  return target;
+	}
+
+	function _objectWithoutProperties(source, excluded) {
+	  if (source == null) return {};
+
+	  var target = _objectWithoutPropertiesLoose(source, excluded);
+
+	  var key, i;
+
+	  if (Object.getOwnPropertySymbols) {
+	    var sourceSymbolKeys = Object.getOwnPropertySymbols(source);
+
+	    for (i = 0; i < sourceSymbolKeys.length; i++) {
+	      key = sourceSymbolKeys[i];
+	      if (excluded.indexOf(key) >= 0) continue;
+	      if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue;
+	      target[key] = source[key];
+	    }
+	  }
+
+	  return target;
+	}
+
 	function _slicedToArray(arr, i) {
 	  return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest();
 	}
@@ -14612,7 +14648,7 @@ typeof navigator === "object" && (function () {
 	(module.exports = function (key, value) {
 	  return sharedStore$1[key] || (sharedStore$1[key] = value !== undefined ? value : {});
 	})('versions', []).push({
-	  version: '3.6.4',
+	  version: '3.6.5',
 	  mode:  'global',
 	  copyright: '© 2020 Denis Pushkarev (zloirock.ru)'
 	});
@@ -17622,7 +17658,7 @@ typeof navigator === "object" && (function () {
 	var INVALID_PORT$1 = 'Invalid port';
 
 	var ALPHA$1 = /[A-Za-z]/;
-	var ALPHANUMERIC$1 = /[\d+\-.A-Za-z]/;
+	var ALPHANUMERIC$1 = /[\d+-.A-Za-z]/;
 	var DIGIT$1 = /\d/;
 	var HEX_START$1 = /^(0x|0X)/;
 	var OCT$1 = /^[0-7]+$/;
@@ -19629,7 +19665,13 @@ typeof navigator === "object" && (function () {
 	    defer$1 = functionBindContext$1(port$1.postMessage, port$1, 1);
 	  // Browsers with postMessage, skip WebWorkers
 	  // IE8 has postMessage, but it's sync & typeof its postMessage is 'object'
-	  } else if (global_1$1.addEventListener && typeof postMessage == 'function' && !global_1$1.importScripts && !fails$1(post$1)) {
+	  } else if (
+	    global_1$1.addEventListener &&
+	    typeof postMessage == 'function' &&
+	    !global_1$1.importScripts &&
+	    !fails$1(post$1) &&
+	    location$1.protocol !== 'file:'
+	  ) {
 	    defer$1 = post$1;
 	    global_1$1.addEventListener('message', listener$1, false);
 	  // IE8-
@@ -20639,6 +20681,25 @@ typeof navigator === "object" && (function () {
 
 	  var method = prototype.matches || prototype.webkitMatchesSelector || prototype.mozMatchesSelector || prototype.msMatchesSelector || match;
 	  return method.call(element, selector);
+	} // Closest ancestor element matching selector (also tests element itself)
+
+	function closest(element, selector) {
+	  var _Element2 = Element,
+	      prototype = _Element2.prototype; // https://developer.mozilla.org/en-US/docs/Web/API/Element/closest#Polyfill
+
+	  function closestElement() {
+	    var el = this;
+
+	    do {
+	      if (matches$2.matches(el, selector)) return el;
+	      el = el.parentElement || el.parentNode;
+	    } while (el !== null && el.nodeType === 1);
+
+	    return null;
+	  }
+
+	  var method = prototype.closest || closestElement;
+	  return method.call(element, selector);
 	} // Find all elements
 
 	function getElements(selector) {
@@ -20990,8 +21051,8 @@ typeof navigator === "object" && (function () {
 	  var padding = 100 / w * h;
 	  wrapper.style.paddingBottom = "".concat(padding, "%"); // For Vimeo we have an extra <div> to hide the standard controls and UI
 
-	  if (this.isVimeo && this.supported.ui) {
-	    var height = 240;
+	  if (this.isVimeo && !this.config.vimeo.premium && this.supported.ui) {
+	    var height = 100 / this.media.offsetWidth * parseInt(window.getComputedStyle(this.media).paddingBottom, 10);
 	    var offset = (height - padding) / (height / 50);
 	    this.media.style.transform = "translateY(-".concat(offset, "%)");
 	  } else if (this.isHTML5) {
@@ -21144,7 +21205,7 @@ typeof navigator === "object" && (function () {
 	  });
 	} // Get the closest value in an array
 
-	function closest(array, value) {
+	function closest$1(array, value) {
 	  if (!is$2.array(array) || !array.length) {
 	    return null;
 	  }
@@ -23252,9 +23313,15 @@ typeof navigator === "object" && (function () {
 	        meta.set(track, {
 	          default: track.mode === 'showing'
 	        }); // Turn off native caption rendering to avoid double captions
+	        // Note: mode='hidden' forces a track to download. To ensure every track
+	        // isn't downloaded at once, only 'showing' tracks should be reassigned
 	        // eslint-disable-next-line no-param-reassign
 
-	        track.mode = 'hidden'; // Add event listener for cue changes
+	        if (track.mode === 'showing') {
+	          // eslint-disable-next-line no-param-reassign
+	          track.mode = 'hidden';
+	        } // Add event listener for cue changes
+
 
 	        on.call(_this, track, 'cuechange', function () {
 	          return captions.updateCues.call(_this);
@@ -23278,6 +23345,8 @@ typeof navigator === "object" && (function () {
 	  // Toggle captions display
 	  // Used internally for the toggleCaptions method, with the passive option forced to false
 	  toggle: function toggle(input) {
+	    var _this2 = this;
+
 	    var passive = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
 	    // If there's no full support
@@ -23324,7 +23393,15 @@ typeof navigator === "object" && (function () {
 	      controls.updateSetting.call(this, 'captions'); // Trigger event (not used internally)
 
 	      triggerEvent.call(this, this.media, active ? 'captionsenabled' : 'captionsdisabled');
-	    }
+	    } // Wait for the call stack to clear before setting mode='hidden'
+	    // on the active track - forcing the browser to download it
+
+
+	    setTimeout(function () {
+	      if (active && _this2.captions.toggled) {
+	        _this2.captions.currentTrackNode.mode = 'hidden';
+	      }
+	    });
 	  },
 	  // Set captions by track index
 	  // Used internally for the currentTrack setter with the passive option forced to false
@@ -23405,7 +23482,7 @@ typeof navigator === "object" && (function () {
 	  // If update is false it will also ignore tracks without metadata
 	  // This is used to "freeze" the language options when captions.update is false
 	  getTracks: function getTracks() {
-	    var _this2 = this;
+	    var _this3 = this;
 
 	    var update = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 	    // Handle media or textTracks missing or null
@@ -23413,20 +23490,20 @@ typeof navigator === "object" && (function () {
 	    // Filter out removed tracks and tracks that aren't captions/subtitles (for example metadata)
 
 	    return tracks.filter(function (track) {
-	      return !_this2.isHTML5 || update || _this2.captions.meta.has(track);
+	      return !_this3.isHTML5 || update || _this3.captions.meta.has(track);
 	    }).filter(function (track) {
 	      return ['captions', 'subtitles'].includes(track.kind);
 	    });
 	  },
 	  // Match tracks based on languages and get the first
 	  findTrack: function findTrack(languages) {
-	    var _this3 = this;
+	    var _this4 = this;
 
 	    var force = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 	    var tracks = captions.getTracks.call(this);
 
 	    var sortIsDefault = function sortIsDefault(track) {
-	      return Number((_this3.captions.meta.get(track) || {}).default);
+	      return Number((_this4.captions.meta.get(track) || {}).default);
 	    };
 
 	    var sorted = Array.from(tracks).sort(function (a, b) {
@@ -23607,6 +23684,9 @@ typeof navigator === "object" && (function () {
 	    fallback: true,
 	    // Fallback using full viewport/window
 	    iosNative: false // Use the native fullscreen in iOS (disables custom controls)
+	    // Selector for the fullscreen container so contextual / non-player content can remain visible in fullscreen mode
+	    // Non-ancestors of the player element will be ignored
+	    // container: null, // defaults to the player element
 
 	  },
 	  // Local storage
@@ -23844,16 +23924,16 @@ typeof navigator === "object" && (function () {
 	    title: false,
 	    speed: true,
 	    transparent: false,
-	    // These settings require a pro or premium account to work
-	    sidedock: false,
-	    controls: false,
+	    // Whether the owner of the video has a Pro or Business account
+	    // (which allows us to properly hide controls without CSS hacks, etc)
+	    premium: false,
 	    // Custom settings from Plyr
 	    referrerPolicy: null // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement/referrerPolicy
 
 	  },
 	  // YouTube plugin
 	  youtube: {
-	    noCookie: false,
+	    noCookie: true,
 	    // Whether to use an alternative version of YouTube without cookies
 	    rel: 0,
 	    // No related vids
@@ -23963,7 +24043,10 @@ typeof navigator === "object" && (function () {
 	      y: 0
 	    }; // Force the use of 'full window/browser' rather than fullscreen
 
-	    this.forceFallback = player.config.fullscreen.fallback === 'force'; // Register event listeners
+	    this.forceFallback = player.config.fullscreen.fallback === 'force'; // Get the fullscreen element
+	    // Checks container is an ancestor, defaults to null
+
+	    this.player.elements.fullscreen = player.config.fullscreen.container && closest(this.player.elements.container, player.config.fullscreen.container); // Register event listeners
 	    // Handle event (incase user presses escape etc)
 
 	    on.call(this.player, document, this.prefix === 'ms' ? 'MSFullscreenChange' : "".concat(this.prefix, "fullscreenchange"), function () {
@@ -24189,7 +24272,7 @@ typeof navigator === "object" && (function () {
 	  }, {
 	    key: "target",
 	    get: function get() {
-	      return browser.isIos && this.player.config.fullscreen.iosNative ? this.player.media : this.player.elements.container;
+	      return browser.isIos && this.player.config.fullscreen.iosNative ? this.player.media : this.player.elements.fullscreen || this.player.elements.container;
 	    }
 	  }], [{
 	    key: "native",
@@ -24398,12 +24481,7 @@ typeof navigator === "object" && (function () {
 	    } // Set property synchronously to respect the call order
 
 
-	    this.media.setAttribute('poster', poster); // HTML5 uses native poster attribute
-
-	    if (this.isHTML5) {
-	      return Promise.resolve(poster);
-	    } // Wait until ui is ready
-
+	    this.media.setAttribute('data-poster', poster); // Wait until ui is ready
 
 	    return ready.call(this) // Load image
 	    .then(function () {
@@ -24478,6 +24556,26 @@ typeof navigator === "object" && (function () {
 	      var recentTouchSeek = this.touch && this.lastSeekTime + 2000 > Date.now(); // Show controls if force, loading, paused, button interaction, or recent seek, otherwise hide
 
 	      this.toggleControls(Boolean(force || this.loading || this.paused || controlsElement.pressed || controlsElement.hover || recentTouchSeek));
+	    }
+	  },
+	  // Migrate any custom properties from the media to the parent
+	  migrateStyles: function migrateStyles() {
+	    var _this5 = this;
+
+	    // Loop through values (as they are the keys when the object is spread 🤔)
+	    Object.values(_objectSpread2({}, this.media.style)) // We're only fussed about Plyr specific properties
+	    .filter(function (key) {
+	      return key.startsWith('--plyr');
+	    }).forEach(function (key) {
+	      // Set on the container
+	      _this5.elements.container.style.setProperty(key, _this5.media.style.getPropertyValue(key)); // Clean up from media element
+
+
+	      _this5.media.style.removeProperty(key);
+	    }); // Remove attribute if empty
+
+	    if (is$2.empty(this.media.style)) {
+	      this.media.removeAttribute('style');
 	    }
 	  }
 	};
@@ -24687,15 +24785,17 @@ typeof navigator === "object" && (function () {
 	      removeCurrent(); // Delay the adding of classname until the focus has changed
 	      // This event fires before the focusin event
 
-	      this.focusTimer = setTimeout(function () {
-	        var focused = document.activeElement; // Ignore if current focus element isn't inside the player
+	      if (event.type !== 'focusout') {
+	        this.focusTimer = setTimeout(function () {
+	          var focused = document.activeElement; // Ignore if current focus element isn't inside the player
 
-	        if (!elements.container.contains(focused)) {
-	          return;
-	        }
+	          if (!elements.container.contains(focused)) {
+	            return;
+	          }
 
-	        toggleClass(document.activeElement, player.config.classNames.tabFocus, true);
-	      }, 10);
+	          toggleClass(document.activeElement, player.config.classNames.tabFocus, true);
+	        }, 10);
+	      }
 	    } // Global window & document listeners
 
 	  }, {
@@ -24713,7 +24813,7 @@ typeof navigator === "object" && (function () {
 
 	      once.call(player, document.body, 'touchstart', this.firstTouch); // Tab focus detection
 
-	      toggleListener.call(player, document.body, 'keydown focus blur', this.setTabFocus, toggle, false, true);
+	      toggleListener.call(player, document.body, 'keydown focus blur focusout', this.setTabFocus, toggle, false, true);
 	    } // Container listeners
 
 	  }, {
@@ -24756,7 +24856,7 @@ typeof navigator === "object" && (function () {
 	      }); // Set a gutter for Vimeo
 
 	      var setGutter = function setGutter(ratio, padding, toggle) {
-	        if (!player.isVimeo) {
+	        if (!player.isVimeo || player.config.vimeo.premium) {
 	          return;
 	        }
 
@@ -24813,7 +24913,7 @@ typeof navigator === "object" && (function () {
 	            ratio = _setPlayerSize.ratio; // Set Vimeo gutter
 
 
-	        setGutter(ratio, padding, isEnter); // If not using native fullscreen, we need to check for resizes of viewport
+	        setGutter(ratio, padding, isEnter); // If not using native browser fullscreen API, we need to check for resizes of viewport
 
 	        if (!usingNative) {
 	          if (isEnter) {
@@ -25192,7 +25292,18 @@ typeof navigator === "object" && (function () {
 
 	      this.bind(elements.controls, 'mouseenter mouseleave', function (event) {
 	        elements.controls.hover = !player.touch && event.type === 'mouseenter';
-	      }); // Update controls.pressed state (used for ui.toggleControls to avoid hiding when interacting)
+	      }); // Also update controls.hover state for any non-player children of fullscreen element (as above)
+
+	      if (elements.fullscreen) {
+	        Array.from(elements.fullscreen.children).filter(function (c) {
+	          return !c.contains(elements.container);
+	        }).forEach(function (child) {
+	          _this3.bind(child, 'mouseenter mouseleave', function (event) {
+	            elements.controls.hover = !player.touch && event.type === 'mouseenter';
+	          });
+	        });
+	      } // Update controls.pressed state (used for ui.toggleControls to avoid hiding when interacting)
+
 
 	      this.bind(elements.controls, 'mousedown mouseup touchstart touchend touchcancel', function (event) {
 	        elements.controls.pressed = ['mousedown', 'touchstart'].includes(event.type);
@@ -25661,15 +25772,28 @@ typeof navigator === "object" && (function () {
 	    var _this = this;
 
 	    var player = this;
-	    var config = player.config.vimeo; // Get Vimeo params for the iframe
+	    var config = player.config.vimeo;
 
-	    var params = buildUrlParams(extend$1({}, {
+	    var premium = config.premium,
+	        referrerPolicy = config.referrerPolicy,
+	        frameParams = _objectWithoutProperties(config, ["premium", "referrerPolicy"]); // If the owner has a pro or premium account then we can hide controls etc
+
+
+	    if (premium) {
+	      Object.assign(frameParams, {
+	        controls: false,
+	        sidedock: false
+	      });
+	    } // Get Vimeo params for the iframe
+
+
+	    var params = buildUrlParams(_objectSpread2({
 	      loop: player.config.loop.active,
 	      autoplay: player.autoplay,
 	      muted: player.muted,
 	      gesture: 'media',
 	      playsinline: !this.config.fullscreen.iosNative
-	    }, config)); // Get the source URL or ID
+	    }, frameParams)); // Get the source URL or ID
 
 	    var source = player.media.getAttribute('src'); // Get from <div> if needed
 
@@ -25683,22 +25807,27 @@ typeof navigator === "object" && (function () {
 	    var src = format(player.config.urls.vimeo.iframe, id, params);
 	    iframe.setAttribute('src', src);
 	    iframe.setAttribute('allowfullscreen', '');
-	    iframe.setAttribute('allowtransparency', '');
-	    iframe.setAttribute('allow', 'autoplay'); // Set the referrer policy if required
+	    iframe.setAttribute('allow', 'autoplay,fullscreen,picture-in-picture'); // Set the referrer policy if required
 
-	    if (!is$2.empty(config.referrerPolicy)) {
-	      iframe.setAttribute('referrerPolicy', config.referrerPolicy);
-	    } // Get poster, if already set
+	    if (!is$2.empty(referrerPolicy)) {
+	      iframe.setAttribute('referrerPolicy', referrerPolicy);
+	    } // Inject the package
 
 
-	    var poster = player.poster; // Inject the package
+	    var poster = player.poster;
 
-	    var wrapper = createElement$1('div', {
-	      poster: poster,
-	      class: player.config.classNames.embedContainer
-	    });
-	    wrapper.appendChild(iframe);
-	    player.media = replaceElement(wrapper, player.media); // Get poster image
+	    if (premium) {
+	      iframe.setAttribute('data-poster', poster);
+	      player.media = replaceElement(iframe, player.media);
+	    } else {
+	      var wrapper = createElement$1('div', {
+	        class: player.config.classNames.embedContainer,
+	        'data-poster': poster
+	      });
+	      wrapper.appendChild(iframe);
+	      player.media = replaceElement(wrapper, player.media);
+	    } // Get poster image
+
 
 	    fetch(format(player.config.urls.vimeo.api, id), 'json').then(function (response) {
 	      if (is$2.empty(response)) {
@@ -26069,7 +26198,7 @@ typeof navigator === "object" && (function () {
 
 	    var container = createElement$1('div', {
 	      id: id,
-	      poster: poster
+	      'data-poster': poster
 	    });
 	    player.media = replaceElement(container, player.media); // Id to poster wrapper
 
@@ -26387,14 +26516,12 @@ typeof navigator === "object" && (function () {
 	        class: this.config.classNames.video
 	      }); // Wrap the video in a container
 
-	      wrap$4(this.media, this.elements.wrapper); // Faux poster container
+	      wrap$4(this.media, this.elements.wrapper); // Poster image container
 
-	      if (this.isEmbed) {
-	        this.elements.poster = createElement$1('div', {
-	          class: this.config.classNames.poster
-	        });
-	        this.elements.wrapper.appendChild(this.elements.poster);
-	      }
+	      this.elements.poster = createElement$1('div', {
+	        class: this.config.classNames.poster
+	      });
+	      this.elements.wrapper.appendChild(this.elements.poster);
 	    }
 
 	    if (this.isHTML5) {
@@ -28051,6 +28178,7 @@ typeof navigator === "object" && (function () {
 
 	    this.elements = {
 	      container: null,
+	      fullscreen: null,
 	      captions: null,
 	      buttons: {},
 	      display: {},
@@ -28225,8 +28353,10 @@ typeof navigator === "object" && (function () {
 	        tabindex: 0
 	      });
 	      wrap$4(this.media, this.elements.container);
-	    } // Add style hook
+	    } // Migrate custom properties from media to container (so they work 😉)
 
+
+	    ui.migrateStyles.call(this); // Add style hook
 
 	    ui.addStyleHook.call(this); // Setup media
 
@@ -28236,9 +28366,11 @@ typeof navigator === "object" && (function () {
 	      on.call(this, this.elements.container, this.config.events.join(' '), function (event) {
 	        _this.debug.log("event: ".concat(event.type));
 	      });
-	    } // Setup interface
-	    // If embed but not fully supported, build interface now to avoid flash of controls
+	    } // Setup fullscreen
 
+
+	    this.fullscreen = new Fullscreen(this); // Setup interface
+	    // If embed but not fully supported, build interface now to avoid flash of controls
 
 	    if (this.isHTML5 || this.isEmbed && !this.supported.ui) {
 	      ui.build.call(this);
@@ -28247,9 +28379,7 @@ typeof navigator === "object" && (function () {
 
 	    this.listeners.container(); // Global listeners
 
-	    this.listeners.global(); // Setup fullscreen
-
-	    this.fullscreen = new Fullscreen(this); // Setup ads if provided
+	    this.listeners.global(); // Setup ads if provided
 
 	    if (this.config.ads.enabled) {
 	      this.ads = new Ads(this);
@@ -28948,7 +29078,7 @@ typeof navigator === "object" && (function () {
 	      var updateStorage = true;
 
 	      if (!options.includes(quality)) {
-	        var value = closest(options, quality);
+	        var value = closest$1(options, quality);
 	        this.debug.warn("Unsupported quality option: ".concat(quality, ", using ").concat(value, " instead"));
 	        quality = value; // Don't update storage if quality is not supported
 
@@ -29093,7 +29223,7 @@ typeof navigator === "object" && (function () {
 	        return null;
 	      }
 
-	      return this.media.getAttribute('poster');
+	      return this.media.getAttribute('poster') || this.media.getAttribute('data-poster');
 	    }
 	    /**
 	     * Get the current aspect ratio in use

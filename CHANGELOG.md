@@ -1,6 +1,22 @@
 ## v3.6.0
 
-- You can now easily change colors using CSS Custom Properties.
+- You can now easily change colors using CSS Custom Properties. See the [README](README.md#customizing-the-css).
+- Bug fix for Vimeo fullscreen.
+- Various typos (thanks @likev)
+- Preload TextTracks as per default video element (thanks @theprojectsomething)
+- Features/fullscreen container (thanks @theprojectsomething)
+- Ignore internal play promises (thanks @ydylla)
+- Ads plugin fixes to allow multiple VAST requests (thanks @Steejo)
+- Fix shadowroot (thanks @jnoordsij)
+- Add financial contributors for Open Collective (thanks @monkeywithacupcake)
+- Update the gitpod setup description to be more precise. (thanks @nisarhassan12)
+- Completely hide SVG icons to screen readers (thanks @LeBenLeBen)
+- Preview thumbnails via src:callback() (thanks @doublex)
+- Add missing Typescripts types and options (thanks @hug963)
+- Use number instead of string in TS quality definitions (thanks @mogzol)
+- Fix Vimeo playback rate (thanks @hug963)
+- Fix issue when controls config is string or element (thanks @CzBiX)
+- Simplify contributions by fully automating the dev setup with gitpod (thanks @nisarhassan12)
 
 ### v3.5.10
 
