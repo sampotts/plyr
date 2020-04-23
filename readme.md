@@ -600,8 +600,6 @@ player.source = {
 };
 ```
 
-_Note_: `src` can be the video ID or URL
-
 Vimeo example
 
 ```javascript
@@ -773,7 +771,7 @@ The `enabled` option can be used to disable certain User Agents. For example, if
 
 ```javascript
 {
-  enabled: /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent);
+  enabled: !/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent);
 }
 ```
 
