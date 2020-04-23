@@ -4,31 +4,31 @@
 
 // Set to 100% for rem sizing
 html {
-    font-size: 100%;
+  font-size: 100%;
 }
 
 body {
-    @include font-smoothing();
-    @include font-size($font-size-base);
-    color: $color-text;
-    font-family: $font-sans-serif;
-    font-weight: $font-weight-medium;
-    line-height: $line-height-base;
+  @include font-smoothing();
+  @include font-size($font-size-base);
+  color: $color-text;
+  font-family: $font-sans-serif;
+  font-weight: $font-weight-medium;
+  line-height: $line-height-base;
 }
 
 button,
 input,
 select,
 textarea {
-    font: inherit;
+  font: inherit;
 }
 
 p,
 small {
-    margin: 0 0 ($spacing-base * 1.5);
+  margin: 0 0 ($spacing-base * 1.5);
 }
 
 small {
-    @include font-size($font-size-small);
-    display: block;
+  @include font-size($font-size-small);
+  display: block;
 }

@@ -1334,19 +1334,19 @@ typeof navigator === "object" && (function (global, factory) {
     return (current / max * 100).toFixed(2);
   } // Replace all occurances of a string in a string
 
-  function replaceAll() {
+  var replaceAll = function replaceAll() {
     var input = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
     var find = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
     var replace = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
     return input.replace(new RegExp(find.toString().replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1'), 'g'), replace.toString());
-  } // Convert to title case
+  }; // Convert to title case
 
-  function toTitleCase() {
+  var toTitleCase = function toTitleCase() {
     var input = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
     return input.toString().replace(/\w\S*/g, function (text) {
       return text.charAt(0).toUpperCase() + text.substr(1).toLowerCase();
     });
-  } // Convert string to pascalCase
+  }; // Convert string to pascalCase
 
   function toPascalCase() {
     var input = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
@@ -2444,39 +2444,39 @@ typeof navigator === "object" && (function (global, factory) {
     // Set the looping options
 
     /* setLoopMenu() {
-        // Menu required
-        if (!is.element(this.elements.settings.panels.loop)) {
-            return;
-        }
-         const options = ['start', 'end', 'all', 'reset'];
-        const list = this.elements.settings.panels.loop.querySelector('[role="menu"]');
-         // Show the pane and tab
-        toggleHidden(this.elements.settings.buttons.loop, false);
-        toggleHidden(this.elements.settings.panels.loop, false);
-         // Toggle the pane and tab
-        const toggle = !is.empty(this.loop.options);
-        controls.toggleMenuButton.call(this, 'loop', toggle);
-         // Empty the menu
-        emptyElement(list);
-         options.forEach(option => {
-            const item = createElement('li');
-             const button = createElement(
-                'button',
-                extend(getAttributesFromSelector(this.config.selectors.buttons.loop), {
-                    type: 'button',
-                    class: this.config.classNames.control,
-                    'data-plyr-loop-action': option,
-                }),
-                i18n.get(option, this.config)
-            );
-             if (['start', 'end'].includes(option)) {
-                const badge = controls.createBadge.call(this, '00:00');
-                button.appendChild(badge);
-            }
-             item.appendChild(button);
-            list.appendChild(item);
-        });
-    }, */
+          // Menu required
+          if (!is.element(this.elements.settings.panels.loop)) {
+              return;
+          }
+           const options = ['start', 'end', 'all', 'reset'];
+          const list = this.elements.settings.panels.loop.querySelector('[role="menu"]');
+           // Show the pane and tab
+          toggleHidden(this.elements.settings.buttons.loop, false);
+          toggleHidden(this.elements.settings.panels.loop, false);
+           // Toggle the pane and tab
+          const toggle = !is.empty(this.loop.options);
+          controls.toggleMenuButton.call(this, 'loop', toggle);
+           // Empty the menu
+          emptyElement(list);
+           options.forEach(option => {
+              const item = createElement('li');
+               const button = createElement(
+                  'button',
+                  extend(getAttributesFromSelector(this.config.selectors.buttons.loop), {
+                      type: 'button',
+                      class: this.config.classNames.control,
+                      'data-plyr-loop-action': option,
+                  }),
+                  i18n.get(option, this.config)
+              );
+               if (['start', 'end'].includes(option)) {
+                  const badge = controls.createBadge.call(this, '00:00');
+                  button.appendChild(badge);
+              }
+               item.appendChild(button);
+              list.appendChild(item);
+          });
+      }, */
     // Get current selected caption language
     // TODO: rework this to user the getter in the API?
     // Set a list of available captions languages
@@ -8900,41 +8900,41 @@ typeof navigator === "object" && (function (global, factory) {
         this.media.loop = toggle; // Set default to be a true toggle
 
         /* const type = ['start', 'end', 'all', 'none', 'toggle'].includes(input) ? input : 'toggle';
-         switch (type) {
-            case 'start':
-                if (this.config.loop.end && this.config.loop.end <= this.currentTime) {
-                    this.config.loop.end = null;
-                }
-                this.config.loop.start = this.currentTime;
-                // this.config.loop.indicator.start = this.elements.display.played.value;
-                break;
-             case 'end':
-                if (this.config.loop.start >= this.currentTime) {
-                    return this;
-                }
-                this.config.loop.end = this.currentTime;
-                // this.config.loop.indicator.end = this.elements.display.played.value;
-                break;
-             case 'all':
-                this.config.loop.start = 0;
-                this.config.loop.end = this.duration - 2;
-                this.config.loop.indicator.start = 0;
-                this.config.loop.indicator.end = 100;
-                break;
-             case 'toggle':
-                if (this.config.loop.active) {
-                    this.config.loop.start = 0;
-                    this.config.loop.end = null;
-                } else {
+             switch (type) {
+                case 'start':
+                    if (this.config.loop.end && this.config.loop.end <= this.currentTime) {
+                        this.config.loop.end = null;
+                    }
+                    this.config.loop.start = this.currentTime;
+                    // this.config.loop.indicator.start = this.elements.display.played.value;
+                    break;
+                 case 'end':
+                    if (this.config.loop.start >= this.currentTime) {
+                        return this;
+                    }
+                    this.config.loop.end = this.currentTime;
+                    // this.config.loop.indicator.end = this.elements.display.played.value;
+                    break;
+                 case 'all':
                     this.config.loop.start = 0;
                     this.config.loop.end = this.duration - 2;
-                }
-                break;
-             default:
-                this.config.loop.start = 0;
-                this.config.loop.end = null;
-                break;
-        } */
+                    this.config.loop.indicator.start = 0;
+                    this.config.loop.indicator.end = 100;
+                    break;
+                 case 'toggle':
+                    if (this.config.loop.active) {
+                        this.config.loop.start = 0;
+                        this.config.loop.end = null;
+                    } else {
+                        this.config.loop.start = 0;
+                        this.config.loop.end = this.duration - 2;
+                    }
+                    break;
+                 default:
+                    this.config.loop.start = 0;
+                    this.config.loop.end = null;
+                    break;
+            } */
       }
       /**
        * Get current loop state

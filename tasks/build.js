@@ -14,8 +14,10 @@ const commonjs = require('rollup-plugin-commonjs');
 const resolve = require('rollup-plugin-node-resolve');
 // CSS
 const sass = require('gulp-sass');
-const clean = require('gulp-clean-css');
-const prefix = require('gulp-autoprefixer');
+const postcss = require('gulp-postcss');
+const autoprefixer = require('autoprefixer');
+const clean = require('postcss-clean');
+const customprops = require('postcss-custom-properties');
 // Images
 const svgstore = require('gulp-svgstore');
 const imagemin = require('gulp-imagemin');
@@ -29,10 +31,8 @@ const size = require('gulp-size');
 const sourcemaps = require('gulp-sourcemaps');
 const browserSync = require('browser-sync').create();
 // Configs
-const pkg = require('../package.json');
 const build = require('../build.json');
 // Info from package
-const { browserslist: browsers } = pkg;
 const minSuffix = '.min';
 // Paths
 const root = path.join(__dirname, '..');
@@ -156,12 +156,7 @@ Object.entries(build.css).forEach(([filename, entry]) => {
             .src(src)
             .pipe(plumber())
             .pipe(sass())
-            .pipe(
-                prefix(browsers, {
-                    cascade: false,
-                }),
-            )
-            .pipe(clean())
+            .pipe(postcss([customprops(), autoprefixer(), clean()]))
             .pipe(size(sizeOptions))
             .pipe(gulp.dest(dist)),
     );

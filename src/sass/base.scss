@@ -4,66 +4,66 @@
 
 // Base
 .plyr {
-    @include plyr-font-smoothing($plyr-font-smoothing);
-    align-items: center;
-    direction: ltr;
-    display: flex;
-    flex-direction: column;
-    font-family: $plyr-font-family;
-    font-variant-numeric: tabular-nums; // Force monosace-esque number widths
-    font-weight: $plyr-font-weight-regular;
+  @include plyr-font-smoothing($plyr-font-smoothing);
+  align-items: center;
+  direction: ltr;
+  display: flex;
+  flex-direction: column;
+  font-family: $plyr-font-family;
+  font-variant-numeric: tabular-nums; // Force monosace-esque number widths
+  font-weight: $plyr-font-weight-regular;
+  height: 100%;
+  line-height: $plyr-line-height;
+  max-width: 100%;
+  min-width: 200px;
+  position: relative;
+  text-shadow: none;
+  transition: box-shadow 0.3s ease;
+  z-index: 0; // Force any border radius
+
+  // Media elements
+  video,
+  audio,
+  iframe {
+    display: block;
     height: 100%;
-    line-height: $plyr-line-height;
-    max-width: 100%;
-    min-width: 200px;
-    position: relative;
-    text-shadow: none;
-    transition: box-shadow 0.3s ease;
-    z-index: 0; // Force any border radius
+    width: 100%;
+  }
 
-    // Media elements
-    video,
-    audio,
-    iframe {
-        display: block;
-        height: 100%;
-        width: 100%;
-    }
+  button {
+    font: inherit;
+    line-height: inherit;
+    width: auto;
+  }
 
-    button {
-        font: inherit;
-        line-height: inherit;
-        width: auto;
-    }
-
-    // Ignore focus
-    &:focus {
-        outline: 0;
-    }
+  // Ignore focus
+  &:focus {
+    outline: 0;
+  }
 }
 
 // border-box everything
 // http://paulirish.com/2012/box-sizing-border-box-ftw/
 @if $plyr-border-box {
-    .plyr--full-ui {
-        box-sizing: border-box;
+  .plyr--full-ui {
+    box-sizing: border-box;
 
-        *,
-        *::after,
-        *::before {
-            box-sizing: inherit;
-        }
+    *,
+    *::after,
+    *::before {
+      box-sizing: inherit;
     }
+  }
 }
 
 // Fix 300ms delay
 @if $plyr-touch-action {
-    .plyr--full-ui {
-        a,
-        button,
-        input,
-        label {
-            touch-action: manipulation;
-        }
+  .plyr--full-ui {
+    a,
+    button,
+    input,
+    label {
+      touch-action: manipulation;
     }
+  }
 }
