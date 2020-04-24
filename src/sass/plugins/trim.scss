@@ -3,10 +3,11 @@
 // --------------------------------------------------------------
 
 $plyr-trim-thumb-width: 7px !default;
-$plyr-trim-thumb-height: $plyr-range-max-height !default;
+$plyr-trim-thumb-height: calc((#{$plyr-range-thumb-active-shadow-width} * 2) + #{$plyr-range-thumb-height}) !default;
+$plyr-trim-top-margin: calc((#{$plyr-range-thumb-active-shadow-width} * 2) + #{$plyr-range-thumb-height}) !default;
 $plyr-trim-thumb-border: 2px !default;
 $plyr-trim-thumb-border-radius: 5px !default;
-$plyr-trim-box-shadow: inset 0 0 0 0.5px darken($plyr-color-main, 5%) !default;
+$plyr-trim-box-shadow: inset 0 0 0 0.5px $plyr-color-main !default;
 $plyr-trim-time-bg: rgba(0, 0, 0, 0.55);
 $plyr-trim-time-radius: $plyr-tooltip-radius !default;
 $plyr-trim-time-color: #fff;
@@ -16,63 +17,62 @@ $plyr-trim-time-bottom-offset: 1px !default;
 
 // Trim Tool for the progress bar
 .plyr__trim-tool {
-    background: currentColor;
-    display: block;
-    height: $plyr-range-track-height;
-    left: 0;
-    margin-top: -($plyr-range-track-height / 2);
+  background: currentColor;
+  display: block;
+  height: $plyr-range-track-height;
+  left: 0;
+  margin-top: calc((#{$plyr-range-track-height} / 2) * -1);
+  position: absolute;
+  top: 50%;
+  width: 3px;
+
+  &__thumb-left {
+    left: -$plyr-trim-thumb-width;
+  }
+
+  &__thumb-right {
+    right: -$plyr-trim-thumb-width;
+  }
+
+  &__thumb-left,
+  &__thumb-right {
+    background: $plyr-color-main;
+    border: $plyr-trim-thumb-border;
+    border-radius: $plyr-trim-thumb-border-radius;
+    box-shadow: $plyr-trim-box-shadow;
+    height: $plyr-trim-thumb-height;
+    margin-top: calc((#{$plyr-range-thumb-height} / 2) * -1);
     position: absolute;
-    top: $plyr-range-track-height;
-    top: 50%;
-    width: 3px;
+    touch-action: none;
+    user-select: none;
+    width: $plyr-trim-thumb-width;
+    z-index: 3;
 
-    &__thumb-left {
-        left: -$plyr-trim-thumb-width;
+    &:active {
+      @include plyr-range-thumb-active($plyr-color-main);
+    }
+  }
+
+  &__time-container {
+    bottom: calc(#{$plyr-trim-thumb-height} + #{$plyr-trim-time-bottom-offset});
+    left: 50%;
+    opacity: 0;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.3s ease;
+    white-space: nowrap;
+    z-index: 3;
+
+    &--is-shown {
+      opacity: 1;
     }
 
-    &__thumb-right {
-        right: -$plyr-trim-thumb-width;
+    span {
+      background-color: $plyr-trim-time-bg;
+      border-radius: ($plyr-trim-time-radius - 1px);
+      color: $plyr-trim-time-color;
+      font-size: $plyr-trim-time-font-size;
+      padding: $plyr-trim-time-padding;
     }
-
-    &__thumb-left,
-    &__thumb-right {
-        background: $plyr-color-main;
-        border: $plyr-trim-thumb-border;
-        border-radius: $plyr-trim-thumb-border-radius;
-        box-shadow: $plyr-trim-box-shadow;
-        height: $plyr-trim-thumb-height;
-        position: absolute;
-        top: -$plyr-trim-thumb-height / 2 + $plyr-trim-thumb-border;
-        touch-action: none;
-        user-select: none;
-        width: $plyr-trim-thumb-width;
-        z-index: 3;
-
-        &:active {
-            @include plyr-range-thumb-active($plyr-color-main);
-        }
-    }
-
-    &__time-container {
-        bottom: $plyr-trim-thumb-height + $plyr-trim-time-bottom-offset;
-        left: 50%;
-        opacity: 0;
-        position: absolute;
-        transform: translate(-50%, -50%);
-        transition: opacity 0.3s ease;
-        white-space: nowrap;
-        z-index: 3;
-
-        &--is-shown {
-            opacity: 1;
-        }
-
-        span {
-            background-color: $plyr-trim-time-bg;
-            border-radius: ($plyr-trim-time-radius - 1px);
-            color: $plyr-trim-time-color;
-            font-size: $plyr-trim-time-font-size;
-            padding: $plyr-trim-time-padding;
-        }
-    }
+  }
 }
