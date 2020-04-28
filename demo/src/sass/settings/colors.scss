@@ -3,22 +3,22 @@
 // ==========================================================================
 
 // Grayscale
-$color-gray-9: hsl(210, 15%, 16%);
-$color-gray-8: lighten($color-gray-9, 9%);
-$color-gray-7: lighten($color-gray-8, 9%);
-$color-gray-6: lighten($color-gray-7, 9%);
-$color-gray-5: lighten($color-gray-6, 9%);
-$color-gray-4: lighten($color-gray-5, 9%);
-$color-gray-3: lighten($color-gray-4, 9%);
-$color-gray-2: lighten($color-gray-3, 9%);
-$color-gray-1: lighten($color-gray-2, 9%);
-$color-gray-0: lighten($color-gray-1, 9%);
+$color-gray-900: hsl(210, 15%, 16%);
+$color-gray-800: lighten($color-gray-900, 9%);
+$color-gray-700: lighten($color-gray-800, 9%);
+$color-gray-600: lighten($color-gray-700, 9%);
+$color-gray-500: lighten($color-gray-600, 9%);
+$color-gray-400: lighten($color-gray-500, 9%);
+$color-gray-300: lighten($color-gray-400, 9%);
+$color-gray-200: lighten($color-gray-300, 9%);
+$color-gray-100: lighten($color-gray-200, 9%);
+$color-gray-50: lighten($color-gray-100, 9%);
 
 // Branding
 $color-brand-primary: hsl(198, 100%, 50%);
 
 // Text
-$color-text: $color-gray-7;
+$color-text: $color-gray-700;
 $color-headings: $color-brand-primary;
 
 // Brands
@@ -36,7 +36,7 @@ $color-button-background: $color-brand-primary;
 $color-button-text: #fff;
 $color-button-background-hover: hsl(198, 100%, 55%);
 $color-button-count-background: #fff;
-$color-button-count-text: $color-gray-6;
+$color-button-count-text: $color-gray-600;
 
 // Focus
 $tab-focus-default-color: #fff;

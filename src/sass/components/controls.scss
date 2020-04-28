@@ -4,49 +4,49 @@
 
 // Hide native controls
 .plyr--full-ui ::-webkit-media-controls {
-    display: none;
+  display: none;
 }
 
 // Playback controls
 .plyr__controls {
-    align-items: center;
-    display: flex;
-    justify-content: flex-end;
-    text-align: center;
+  align-items: center;
+  display: flex;
+  justify-content: flex-end;
+  text-align: center;
 
-    .plyr__progress__container {
-        flex: 1;
-        min-width: 0; // Fix for Edge issue where content would overflow
+  .plyr__progress__container {
+    flex: 1;
+    min-width: 0; // Fix for Edge issue where content would overflow
+  }
+
+  // Spacing
+  .plyr__controls__item {
+    margin-left: calc(#{$plyr-control-spacing} / 4);
+
+    &:first-child {
+      margin-left: 0;
+      margin-right: auto;
     }
 
-    // Spacing
-    .plyr__controls__item {
-        margin-left: ($plyr-control-spacing / 4);
-
-        &:first-child {
-            margin-left: 0;
-            margin-right: auto;
-        }
-
-        &.plyr__progress__container {
-            padding-left: ($plyr-control-spacing / 4);
-        }
-
-        &.plyr__time {
-            padding: 0 ($plyr-control-spacing / 2);
-        }
-
-        &.plyr__progress__container:first-child,
-        &.plyr__time:first-child,
-        &.plyr__time + .plyr__time {
-            padding-left: 0;
-        }
+    &.plyr__progress__container {
+      padding-left: calc(#{$plyr-control-spacing} / 4);
     }
 
-    // Hide empty controls
-    &:empty {
-        display: none;
+    &.plyr__time {
+      padding: 0 calc(#{$plyr-control-spacing} / 2);
     }
+
+    &.plyr__progress__container:first-child,
+    &.plyr__time:first-child,
+    &.plyr__time + .plyr__time {
+      padding-left: 0;
+    }
+  }
+
+  // Hide empty controls
+  &:empty {
+    display: none;
+  }
 }
 
 // Some options are hidden by default
@@ -54,11 +54,11 @@
 .plyr [data-plyr='pip'],
 .plyr [data-plyr='airplay'],
 .plyr [data-plyr='fullscreen'] {
-    display: none;
+  display: none;
 }
 .plyr--captions-enabled [data-plyr='captions'],
 .plyr--pip-supported [data-plyr='pip'],
 .plyr--airplay-supported [data-plyr='airplay'],
 .plyr--fullscreen-enabled [data-plyr='fullscreen'] {
-    display: inline-block;
+  display: inline-block;
 }

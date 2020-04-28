@@ -19,54 +19,54 @@ const isEvent = input => instanceOf(input, Event);
 const isKeyboardEvent = input => instanceOf(input, KeyboardEvent);
 const isCue = input => instanceOf(input, window.TextTrackCue) || instanceOf(input, window.VTTCue);
 const isTrack = input => instanceOf(input, TextTrack) || (!isNullOrUndefined(input) && isString(input.kind));
-const isPromise = input => instanceOf(input, Promise);
+const isPromise = input => instanceOf(input, Promise) && isFunction(input.then);
 
 const isEmpty = input =>
-    isNullOrUndefined(input) ||
-    ((isString(input) || isArray(input) || isNodeList(input)) && !input.length) ||
-    (isObject(input) && !Object.keys(input).length);
+  isNullOrUndefined(input) ||
+  ((isString(input) || isArray(input) || isNodeList(input)) && !input.length) ||
+  (isObject(input) && !Object.keys(input).length);
 
 const isUrl = input => {
-    // Accept a URL object
-    if (instanceOf(input, window.URL)) {
-        return true;
-    }
+  // Accept a URL object
+  if (instanceOf(input, window.URL)) {
+    return true;
+  }
 
-    // Must be string from here
-    if (!isString(input)) {
-        return false;
-    }
+  // Must be string from here
+  if (!isString(input)) {
+    return false;
+  }
 
-    // Add the protocol if required
-    let string = input;
-    if (!input.startsWith('http://') || !input.startsWith('https://')) {
-        string = `http://${input}`;
-    }
+  // Add the protocol if required
+  let string = input;
+  if (!input.startsWith('http://') || !input.startsWith('https://')) {
+    string = `http://${input}`;
+  }
 
-    try {
-        return !isEmpty(new URL(string).hostname);
-    } catch (e) {
-        return false;
-    }
+  try {
+    return !isEmpty(new URL(string).hostname);
+  } catch (e) {
+    return false;
+  }
 };
 
 export default {
-    nullOrUndefined: isNullOrUndefined,
-    object: isObject,
-    number: isNumber,
-    string: isString,
-    boolean: isBoolean,
-    function: isFunction,
-    array: isArray,
-    weakMap: isWeakMap,
-    nodeList: isNodeList,
-    element: isElement,
-    textNode: isTextNode,
-    event: isEvent,
-    keyboardEvent: isKeyboardEvent,
-    cue: isCue,
-    track: isTrack,
-    promise: isPromise,
-    url: isUrl,
-    empty: isEmpty,
+  nullOrUndefined: isNullOrUndefined,
+  object: isObject,
+  number: isNumber,
+  string: isString,
+  boolean: isBoolean,
+  function: isFunction,
+  array: isArray,
+  weakMap: isWeakMap,
+  nodeList: isNodeList,
+  element: isElement,
+  textNode: isTextNode,
+  event: isEvent,
+  keyboardEvent: isKeyboardEvent,
+  cue: isCue,
+  track: isTrack,
+  promise: isPromise,
+  url: isUrl,
+  empty: isEmpty,
 };

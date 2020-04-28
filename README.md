@@ -2,32 +2,32 @@ Plyr is a simple, lightweight, accessible and customizable HTML5, YouTube and Vi
 
 [Checkout the demo](https://plyr.io) - [Donate](#donate) - [Slack](https://bit.ly/plyr--chat)
 
-[![npm version](https://badge.fury.io/js/plyr.svg)](https://badge.fury.io/js/plyr) [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/sampotts/plyr) [![Financial Contributors on Open Collective](https://opencollective.com/plyr/all/badge.svg?label=financial+contributors)](https://opencollective.com/plyr) 
+[![npm version](https://badge.fury.io/js/plyr.svg)](https://badge.fury.io/js/plyr) [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/sampotts/plyr) [![Financial Contributors on Open Collective](https://opencollective.com/plyr/all/badge.svg?label=financial+contributors)](https://opencollective.com/plyr)
 
 [![Image of Plyr](https://cdn.plyr.io/static/demo/screenshot.png?v=3)](https://plyr.io)
 
 # Features
 
--   📼 **HTML Video & Audio, YouTube & Vimeo** - support for the major formats
--   💪 **Accessible** - full support for VTT captions and screen readers
--   🔧 **[Customizable](#html)** - make the player look how you want with the markup you want
--   😎 **Clean HTML** - uses the _right_ elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no
-    `<span>` or `<a href="#">` button hacks
--   📱 **Responsive** - works with any screen size
--   💵 **[Monetization](#ads)** - make money from your videos
--   📹 **[Streaming](#demos)** - support for hls.js, Shaka and dash.js streaming playback
--   🎛 **[API](#api)** - toggle playback, volume, seeking, and more through a standardized API
--   🎤 **[Events](#events)** - no messing around with Vimeo and YouTube APIs, all events are standardized across formats
--   🔎 **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes
--   ⌨️ **[Shortcuts](#shortcuts)** - supports keyboard shortcuts
--   🖥 **Picture-in-Picture** - supports picture-in-picture mode
--   📱 **Playsinline** - supports the `playsinline` attribute
--   🏎 **Speed controls** - adjust speed on the fly
--   📖 **Multiple captions** - support for multiple caption tracks
--   🌎 **i18n support** - support for internationalization of controls
--   👌 **[Preview thumbnails](#preview-thumbnails)** - support for displaying preview thumbnails
--   🤟 **No frameworks** - written in "vanilla" ES6 JavaScript, no jQuery required
--   💁‍♀️ **SASS** - to include in your build processes
+- 📼 **HTML Video & Audio, YouTube & Vimeo** - support for the major formats
+- 💪 **Accessible** - full support for VTT captions and screen readers
+- 🔧 **[Customizable](#html)** - make the player look how you want with the markup you want
+- 😎 **Clean HTML** - uses the _right_ elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no
+  `<span>` or `<a href="#">` button hacks
+- 📱 **Responsive** - works with any screen size
+- 💵 **[Monetization](#ads)** - make money from your videos
+- 📹 **[Streaming](#demos)** - support for hls.js, Shaka and dash.js streaming playback
+- 🎛 **[API](#api)** - toggle playback, volume, seeking, and more through a standardized API
+- 🎤 **[Events](#events)** - no messing around with Vimeo and YouTube APIs, all events are standardized across formats
+- 🔎 **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes
+- ⌨️ **[Shortcuts](#shortcuts)** - supports keyboard shortcuts
+- 🖥 **Picture-in-Picture** - supports picture-in-picture mode
+- 📱 **Playsinline** - supports the `playsinline` attribute
+- 🏎 **Speed controls** - adjust speed on the fly
+- 📖 **Multiple captions** - support for multiple caption tracks
+- 🌎 **i18n support** - support for internationalization of controls
+- 👌 **[Preview thumbnails](#preview-thumbnails)** - support for displaying preview thumbnails
+- 🤟 **No frameworks** - written in "vanilla" ES6 JavaScript, no jQuery required
+- 💁‍♀️ **SASS** - to include in your build processes
 
 ### Demos
 
@@ -42,21 +42,23 @@ Plyr extends upon the standard [HTML5 media element](https://developer.mozilla.o
 ### HTML5 Video
 
 ```html
-<video poster="/path/to/poster.jpg" id="player" playsinline controls>
-    <source src="/path/to/video.mp4" type="video/mp4" />
-    <source src="/path/to/video.webm" type="video/webm" />
+<video id="player" playsinline controls data-poster="/path/to/poster.jpg">
+  <source src="/path/to/video.mp4" type="video/mp4" />
+  <source src="/path/to/video.webm" type="video/webm" />
 
-    <!-- Captions are optional -->
-    <track kind="captions" label="English captions" src="/path/to/captions.vtt" srclang="en" default />
+  <!-- Captions are optional -->
+  <track kind="captions" label="English captions" src="/path/to/captions.vtt" srclang="en" default />
 </video>
 ```
+
+**Note**: The poster image should be specified using `data-poster`. This is to prevent it [being downloaded twice](https://github.com/sampotts/plyr/issues/1531). If you're sure the image will be cached, you can still use the `poster` attribute for true progressive enhancement.
 
 ### HTML5 Audio
 
 ```html
 <audio id="player" controls>
-    <source src="/path/to/audio.mp3" type="audio/mp3" />
-    <source src="/path/to/audio.ogg" type="audio/ogg" />
+  <source src="/path/to/audio.mp3" type="audio/mp3" />
+  <source src="/path/to/audio.ogg" type="audio/ogg" />
 </audio>
 ```
 
@@ -68,12 +70,12 @@ We recommend [progressive enhancement](https://www.smashingmagazine.com/2009/04/
 
 ```html
 <div class="plyr__video-embed" id="player">
-    <iframe
-        src="https://www.youtube.com/embed/bTqVqk7FSmY?origin=https://plyr.io&amp;iv_load_policy=3&amp;modestbranding=1&amp;playsinline=1&amp;showinfo=0&amp;rel=0&amp;enablejsapi=1"
-        allowfullscreen
-        allowtransparency
-        allow="autoplay"
-    ></iframe>
+  <iframe
+    src="https://www.youtube.com/embed/bTqVqk7FSmY?origin=https://plyr.io&amp;iv_load_policy=3&amp;modestbranding=1&amp;playsinline=1&amp;showinfo=0&amp;rel=0&amp;enablejsapi=1"
+    allowfullscreen
+    allowtransparency
+    allow="autoplay"
+  ></iframe>
 </div>
 ```
 
@@ -93,12 +95,12 @@ Much the same as YouTube above.
 
 ```html
 <div class="plyr__video-embed" id="player">
-    <iframe
-        src="https://player.vimeo.com/video/76979871?loop=false&amp;byline=false&amp;portrait=false&amp;title=false&amp;speed=true&amp;transparent=0&amp;gesture=media"
-        allowfullscreen
-        allowtransparency
-        allow="autoplay"
-    ></iframe>
+  <iframe
+    src="https://player.vimeo.com/video/76979871?loop=false&amp;byline=false&amp;portrait=false&amp;title=false&amp;speed=true&amp;transparent=0&amp;gesture=media"
+    allowfullscreen
+    allowtransparency
+    allow="autoplay"
+  ></iframe>
 </div>
 ```
 
@@ -123,7 +125,7 @@ Alternatively you can include the `plyr.js` script before the closing `</body>` 
 ```html
 <script src="path/to/plyr.js"></script>
 <script>
-    const player = new Plyr('#player');
+  const player = new Plyr('#player');
 </script>
 ```
 
@@ -164,18 +166,115 @@ reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.5.10
 
 Plyr has partnered up with [vi.ai](https://vi.ai/publisher-video-monetization/?aid=plyrio) to offer monetization options for your videos. Getting setup is easy:
 
--   [Sign up for a vi.ai account](https://vi.ai/publisher-video-monetization/?aid=plyrio)
--   Grab your publisher ID from the code snippet
--   Enable ads in the [config options](#options) and enter your publisher ID
+- [Sign up for a vi.ai account](https://vi.ai/publisher-video-monetization/?aid=plyrio)
+- Grab your publisher ID from the code snippet
+- Enable ads in the [config options](#options) and enter your publisher ID
 
 Any questions regarding the ads can be sent straight to vi.ai and any issues with rendering raised through GitHub issues.
 
+If you do not wish to use Vi, you can set your own `ads.tagUrl` [option](#options).
+
 # Advanced
 
-## SASS
+## Customizing the CSS
 
-You can use `bundle.scss` file included in `/src` as part of your build and change variables to suit your design. The SASS require you to
-use the [autoprefixer](https://www.npmjs.com/package/gulp-autoprefixer) plugin (you should be already!) as all declarations use the W3C definitions.
+If you want to change any design tokens used for the rendering of the player, you can do so using [CSS Custom Properties](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties).
+
+Here's a list of the properties and what they are used for:
+
+| Name                                           | Description                                                                                             | Default / Fallback                                                    |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| `--plyr-color-main`                            | The primary UI color.                                                                                   | ![#f03c15](https://placehold.it/15/00b3ff/000000?text=+) `#00b3ff`    |
+| `--plyr-tab-focus-color`                       | The color used for the dotted outline when an element is `:focus-visible` (equivalent) keyboard focus.  | `--plyr-color-main`                                                   |
+| `--plyr-badge-background`                      | The background color for badges in the menu.                                                            | ![#4a5464](https://placehold.it/15/4a5464/000000?text=+) `#4a5464`    |
+| `--plyr-badge-text-color`                      | The text color for badges.                                                                              | ![#ffffff](https://placehold.it/15/ffffff/000000?text=+) `#ffffff`    |
+| `--plyr-badge-border-radius`                   | The border radius used for badges.                                                                      | `2px`                                                                 |
+| `--plyr-tab-focus-color`                       | The color used to highlight tab (keyboard) focus.                                                       | `--plyr-color-main`                                                   |
+| `--plyr-captions-background`                   | The color for the background of captions.                                                               | `rgba(0, 0, 0, 0.8)`                                                  |
+| `--plyr-captions-text-color`                   | The color used for the captions text.                                                                   | ![#ffffff](https://placehold.it/15/ffffff/000000?text=+) `#ffffff`    |
+| `--plyr-control-icon-size`                     | The size of the icons used in the controls.                                                             | `18px`                                                                |
+| `--plyr-control-spacing`                       | The space between controls (sometimes used in a multiple - e.g. `10px / 2 = 5px`).                      | `10px`                                                                |
+| `--plyr-control-padding`                       | The padding inside controls.                                                                            | `--plyr-control-spacing * 0.7` (`7px`)                                |
+| `--plyr-control-radius`                        | The border radius used on controls.                                                                     | `3px`                                                                 |
+| `--plyr-control-toggle-checked-background`     | The background color used for checked menu items.                                                       | `--plyr-color-main`                                                   |
+| `--plyr-video-controls-background`             | The background for the video controls.                                                                  | `linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75))`              |
+| `--plyr-video-control-color`                   | The text/icon color for video controls.                                                                 | ![#ffffff](https://placehold.it/15/ffffff/000000?text=+) `#ffffff`    |
+| `--plyr-video-control-color-hover`             | The text/icon color used when video controls are `:hover`, `:focus` and `:focus-visible` (equivalent).  | ![#ffffff](https://placehold.it/15/ffffff/000000?text=+) `#ffffff`    |
+| `--plyr-video-control-background-hover`        | The background color used when video controls are `:hover`, `:focus` and `:focus-visible` (equivalent). | `--plyr-color-main`                                                   |
+| `--plyr-audio-controls-background`             | The background for the audio controls.                                                                  | ![#ffffff](https://placehold.it/15/ffffff/000000?text=+) `#ffffff`    |
+| `--plyr-audio-control-color`                   | The text/icon color for audio controls.                                                                 | ![#4a5464](https://placehold.it/15/4a5464/000000?text=+) `#4a5464`    |
+| `--plyr-audio-control-color-hover`             | The text/icon color used when audio controls are `:hover`, `:focus` and `:focus-visible` (equivalent).  | ![#ffffff](https://placehold.it/15/ffffff/000000?text=+) `#ffffff`    |
+| `--plyr-audio-control-background-hover`        | The background color used when video controls are `:hover`, `:focus` and `:focus-visible` (equivalent). | `--plyr-color-main`                                                   |
+| `--plyr-menu-background`                       | The background color for menus.                                                                         | `rgba(255, 255, 255, 0.9)`                                            |
+| `--plyr-menu-color`                            | The text/icon color for menu items.                                                                     | ![#4a5464](https://placehold.it/15/4a5464/000000?text=+) `#4a5464`    |
+| `--plyr-menu-shadow`                           | The shadow used on menus.                                                                               | `0 1px 2px rgba(0, 0, 0, 0.15)`                                       |
+| `--plyr-menu-radius`                           | The border radius on the menu.                                                                          | `4px`                                                                 |
+| `--plyr-menu-arrow-size`                       | The size of the arrow on the bottom of the menu.                                                        | `6px`                                                                 |
+| `--plyr-menu-item-arrow-color`                 | The color of the arrows in the menu.                                                                    | ![#728197](https://placehold.it/15/728197/000000?text=+) `#728197`    |
+| `--plyr-menu-item-arrow-size`                  | The size of the arrows in the menu.                                                                     | `4px`                                                                 |
+| `--plyr-menu-border-color`                     | The border color for the bottom of the back button in the top of the sub menu pages.                    | ![#dcdfe5](https://placehold.it/15/dcdfe5/000000?text=+) `#dcdfe5`    |
+| `--plyr-menu-border-shadow-color`              | The shadow below the border of the back button in the top of the sub menu pages.                        | ![#ffffff](https://placehold.it/15/ffffff/000000?text=+) `#ffffff`    |
+| `--plyr-progress-loading-size`                 | The size of the stripes in the loading state in the scrubber.                                           | `25px`                                                                |
+| `--plyr-progress-loading-background`           | The background color on the loading state in the scrubber.                                              | `rgba(35, 40, 47, 0.6)`                                               |
+| `--plyr-video-progress-buffered-background`    | The fill color for the buffer indication in the scrubber for video.                                     | `rgba(255, 255, 255, 0.25)`                                           |
+| `--plyr-audio-progress-buffered-background`    | The fill color for the buffer indication in the scrubber for audio.                                     | `rgba(193, 200, 209, 0.6)`                                            |
+| `--plyr-range-thumb-height`                    | The height of the scrubber handle/thumb.                                                                | `13px`                                                                |
+| `--plyr-range-thumb-background`                | The background of the scrubber handle/thumb.                                                            | ![#ffffff](https://placehold.it/15/ffffff/000000?text=+) `#ffffff`    |
+| `--plyr-range-thumb-shadow`                    | The shadow of the scrubber handle/thumb.                                                                | `0 1px 1px rgba(215, 26, 18, 0.15), 0 0 0 1px rgba(215, 26, 18, 0.2)` |
+| `--plyr-range-thumb-active-shadow-width`       | The width of the shadow when the scrubber handle/thumb is `:active` (pressed).                          | `3px`                                                                 |
+| `--plyr-range-track-height`                    | The height of the scrubber/progress track.                                                              | `5px`                                                                 |
+| `--plyr-range-fill-background`                 | The fill color of the scrubber/progress.                                                                | `--plyr-color-main`                                                   |
+| `--plyr-video-range-track-background`          | The background of the scrubber/progress.                                                                | `--plyr-video-progress-buffered-background`                           |
+| `--plyr-video-range-thumb-active-shadow-color` | The color of the shadow when the video scrubber handle/thumb is `:active` (pressed).                    | `rgba(255, 255, 255, 0.5)`                                            |
+| `--plyr-audio-range-track-background`          | The background of the scrubber/progress.                                                                | `--plyr-video-progress-buffered-background`                           |
+| `--plyr-audio-range-thumb-active-shadow-color` | The color of the shadow when the audio scrubber handle/thumb is `:active` (pressed).                    | `rgba(215, 26, 18, 0.1)`                                              |
+| `--plyr-tooltip-background`                    | The background color for tooltips.                                                                      | `rgba(255, 255, 255, 0.9)`                                            |
+| `--plyr-tooltip-color`                         | The text color for tooltips.                                                                            | ![#4a5464](https://placehold.it/15/4a5464/000000?text=+) `#4a5464`    |
+| `--plyr-tooltip-padding`                       | The padding for tooltips.                                                                               | `calc(var(--plyr-control-spacing) / 2))`                              |
+| `--plyr-tooltip-arrow-size`                    | The size of the arrow under tooltips.                                                                   | `4px`                                                                 |
+| `--plyr-tooltip-radius`                        | The border radius on tooltips.                                                                          | `3px`                                                                 |
+| `--plyr-tooltip-shadow`                        | The shadow on tooltips.                                                                                 | `0 1px 2px rgba(0, 0, 0, 0.15)`                                       |
+| `--plyr-font-family`                           | The font family used in the player.                                                                     |                                                                       |
+| `--plyr-font-size-base`                        | The base font size. Mainly used for captions.                                                           | `15px`                                                                |
+| `--plyr-font-size-small`                       | The smaller font size. Mainly used for captions.                                                        | `13px`                                                                |
+| `--plyr-font-size-large`                       | The larger font size. Mainly used for captions.                                                         | `18px`                                                                |
+| `--plyr-font-size-xlarge`                      | The even larger font size. Mainly used for captions.                                                    | `21px`                                                                |
+| `--plyr-font-size-time`                        | The font size for the time.                                                                             | `--plyr-font-size-small`                                              |
+| `--plyr-font-size-menu`                        | The font size used in the menu.                                                                         | `--plyr-font-size-small`                                              |
+| `--plyr-font-size-badge`                       | The font size used for badges.                                                                          | `9px`                                                                 |
+| `--plyr-font-weight-regular`                   | The regular font weight.                                                                                | `400`                                                                 |
+| `--plyr-font-weight-bold`                      | The bold font weight.                                                                                   | `600`                                                                 |
+| `--plyr-line-height`                           | The line height used within the player.                                                                 | `1.7`                                                                 |
+| `--plyr-font-smoothing`                        | Whether to enable font antialiasing within the player.                                                  | `false`                                                               |
+
+You can set them in your CSS for all players:
+
+```css
+:root {
+  --plyr-color-main: #1ac266;
+}
+```
+
+...or for a specific class name:
+
+```css
+.player {
+  --plyr-color-main: #1ac266;
+}
+```
+
+...or in your HTML:
+
+```html
+<video class="player" style="--plyr-color-main: #1ac266;">
+    ...
+</vieo>
+```
+
+### SASS
+
+You can use `plyr.scss` file included in `/src/sass` as part of your build and change variables to suit your design. The SASS requires you to
+use [autoprefixer](https://www.npmjs.com/package/gulp-autoprefixer) (you should be already!) as all declarations use the W3C definitions.
 
 The HTML markup uses the BEM methodology with `plyr` as the block, e.g. `.plyr__controls`. You can change the class hooks in the options to match any custom CSS
 you write. Check out the JavaScript source for more on this.
@@ -213,9 +312,9 @@ WebVTT captions are supported. To add a caption track, check the HTML example ab
 
 You can specify a range of arguments for the constructor to use:
 
--   A [CSS string selector](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors)
--   A [`HTMLElement`](https://developer.mozilla.org/en/docs/Web/API/HTMLElement)
--   A [jQuery](https://jquery.com) object
+- A [CSS string selector](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors)
+- A [`HTMLElement`](https://developer.mozilla.org/en/docs/Web/API/HTMLElement)
+- A [jQuery](https://jquery.com) object
 
 _Note_: If a `NodeList`, `Array`, or jQuery object are passed, the first element will be used for setup. To setup multiple players, see [multiple players](#multiple-players) below.
 
@@ -261,7 +360,7 @@ The second argument for the constructor is the [options](#options) object:
 
 ```javascript
 const player = new Plyr('#player', {
-    title: 'Example Title',
+  title: 'Example Title',
 });
 ```
 
@@ -277,7 +376,7 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
 | -------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `enabled`            | Boolean                    | `true`                                                                                                                         | Completely disable Plyr. This would allow you to do a User Agent check or similar to programmatically enable or disable Plyr for a certain UA. Example below.                                                                                                                                                                                                                                           |
 | `debug`              | Boolean                    | `false`                                                                                                                        | Display debugging information in the console                                                                                                                                                                                                                                                                                                                                                            |
-| `controls`           | Array, Function or Element | `['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen']` | If a function is passed, it is assumed your method will return either an element or HTML string for the controls. Three arguments will be passed to your function; `id` (the unique id for the player), `seektime` (the seektime step in seconds), and `title` (the media title). See [controls.md](controls.md) for more info on how the html needs to be structured.                                  |
+| `controls`           | Array, Function or Element | `['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen']` | If a function is passed, it is assumed your method will return either an element or HTML string for the controls. Three arguments will be passed to your function; `id` (the unique id for the player), `seektime` (the seektime step in seconds), and `title` (the media title). See [CONTROLS.md](CONTROLS.md) for more info on how the html needs to be structured.                                  |
 | `settings`           | Array                      | `['captions', 'quality', 'speed', 'loop']`                                                                                     | If the default controls are used, you can specify which settings to show in the menu                                                                                                                                                                                                                                                                                                                    |
 | `i18n`               | Object                     | See [defaults.js](/src/js/config/defaults.js)                                                                                  | Used for internationalization (i18n) of the text within the UI.                                                                                                                                                                                                                                                                                                                                         |
 | `loadSprite`         | Boolean                    | `true`                                                                                                                         | Load the SVG sprite specified as the `iconUrl` option (if a URL). If `false`, it is assumed you are handling sprite loading yourself.                                                                                                                                                                                                                                                                   |
@@ -301,13 +400,13 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
 | `toggleInvert`       | Boolean                    | `true`                                                                                                                         | Allow users to click to toggle the above.                                                                                                                                                                                                                                                                                                                                                               |
 | `listeners`          | Object                     | `null`                                                                                                                         | Allows binding of event listeners to the controls before the default handlers. See the `defaults.js` for available listeners. If your handler prevents default on the event (`event.preventDefault()`), the default handler will not fire.                                                                                                                                                              |
 | `captions`           | Object                     | `{ active: false, language: 'auto', update: false }`                                                                           | `active`: Toggles if captions should be active by default. `language`: Sets the default language to load (if available). 'auto' uses the browser language. `update`: Listen to changes to tracks and update menu. This is needed for some streaming libraries, but can result in unselectable language options).                                                                                        |
-| `fullscreen`         | Object                     | `{ enabled: true, fallback: true, iosNative: false }`                                                                          | `enabled`: Toggles whether fullscreen should be enabled. `fallback`: Allow fallback to a full-window solution (`true`/`false`/`'force'`). `iosNative`: whether to use native iOS fullscreen when entering fullscreen (no custom controls)                                                                                                                                                               |
+| `fullscreen`         | Object                     | `{ enabled: true, fallback: true, iosNative: false, container: null }`                                                         | `enabled`: Toggles whether fullscreen should be enabled. `fallback`: Allow fallback to a full-window solution (`true`/`false`/`'force'`). `iosNative`: whether to use native iOS fullscreen when entering fullscreen (no custom controls). `container`: A selector for an ancestor of the player element, allows contextual content to remain visual in fullscreen mode. Non-ancestors are ignored.     |
 | `ratio`              | String                     | `null`                                                                                                                         | Force an aspect ratio for all videos. The format is `'w:h'` - e.g. `'16:9'` or `'4:3'`. If this is not specified then the default for HTML5 and Vimeo is to use the native resolution of the video. As dimensions are not available from YouTube via SDK, 16:9 is forced as a sensible default.                                                                                                         |
 | `storage`            | Object                     | `{ enabled: true, key: 'plyr' }`                                                                                               | `enabled`: Allow use of local storage to store user settings. `key`: The key name to use.                                                                                                                                                                                                                                                                                                               |
 | `speed`              | Object                     | `{ selected: 1, options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2] }`                                                                 | `selected`: The default speed for playback. `options`: The speed options to display in the UI. YouTube and Vimeo will ignore any options outside of the 0.5-2 range, so options outside of this range will be hidden automatically.                                                                                                                                                                     |
 | `quality`            | Object                     | `{ default: 576, options: [4320, 2880, 2160, 1440, 1080, 720, 576, 480, 360, 240] }`                                           | `default` is the default quality level (if it exists in your sources). `options` are the options to display. This is used to filter the available sources.                                                                                                                                                                                                                                              |
 | `loop`               | Object                     | `{ active: false }`                                                                                                            | `active`: Whether to loop the current video. If the `loop` attribute is present on a `<video>` or `<audio>` element, this will be automatically set to true This is an object to support future functionality.                                                                                                                                                                                          |
-| `ads`                | Object                     | `{ enabled: false, publisherId: '' }`                                                                                          | `enabled`: Whether to enable advertisements. `publisherId`: Your unique [vi.ai](https://vi.ai/publisher-video-monetization/?aid=plyrio) publisher ID.                                                                                                                                                                                                                                                   |
+| `ads`                | Object                     | `{ enabled: false, publisherId: '', tagUrl: '' }`                                                                              | `enabled`: Whether to enable advertisements. `publisherId`: Your unique [vi.ai](https://vi.ai/publisher-video-monetization/?aid=plyrio) publisher ID. `tagUrl` is a URL for a custom VAST tag if you're not using Vi.                                                                                                                                                                                   |
 | `urls`               | Object                     | See source.                                                                                                                    | If you wish to override any API URLs then you can do so here. You can also set a custom download URL for the download button.                                                                                                                                                                                                                                                                           |
 | `vimeo`              | Object                     | `{ byline: false, portrait: false, title: false, speed: true, transparent: false }`                                            | See [Vimeo embed options](https://github.com/vimeo/player.js/#embed-options). Some are set automatically based on other config options, namely: `loop`, `autoplay`, `muted`, `gesture`, `playsinline`                                                                                                                                                                                                   |
 | `youtube`            | Object                     | `{ noCookie: false, rel: 0, showinfo: 0, iv_load_policy: 3, modestbranding: 1 }`                                               | See [YouTube embed options](https://developers.google.com/youtube/player_parameters#Parameters). The only custom option is `noCookie` to use an alternative to YouTube that doesn't use cookies (useful for GDPR, etc). Some are set automatically based on other config options, namely: `autoplay`, `hl`, `controls`, `disablekb`, `playsinline`, `cc_load_policy`, `cc_lang_pref`, `widget_referrer` |
@@ -316,9 +415,9 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
 1.  Vimeo only
 2.  Autoplay is generally not recommended as it is seen as a negative user experience. It is also disabled in many browsers. Before raising issues, do your homework. More info can be found here:
 
--   https://webkit.org/blog/6784/new-video-policies-for-ios/
--   https://developers.google.com/web/updates/2017/09/autoplay-policy-changes
--   https://hacks.mozilla.org/2019/02/firefox-66-to-block-automatically-playing-audible-video-and-audio/
+- https://webkit.org/blog/6784/new-video-policies-for-ios/
+- https://developers.google.com/web/updates/2017/09/autoplay-policy-changes
+- https://hacks.mozilla.org/2019/02/firefox-66-to-block-automatically-playing-audible-video-and-audio/
 
 # API
 
@@ -330,7 +429,7 @@ The easiest way to access the Plyr object is to set the return value from your c
 
 ```javascript
 const player = new Plyr('#player', {
-    /* options */
+  /* options */
 });
 ```
 
@@ -338,7 +437,7 @@ You can also access the object through any events:
 
 ```javascript
 element.addEventListener('ready', event => {
-    const player = event.detail.plyr;
+  const player = event.detail.plyr;
 });
 ```
 
@@ -351,30 +450,30 @@ player.play(); // Start playback
 player.fullscreen.enter(); // Enter fullscreen
 ```
 
-| Method                   | Parameters       | Description                                                                                                |
-| ------------------------ | ---------------- | ---------------------------------------------------------------------------------------------------------- |
-| `play()`&sup1;           | -                | Start playback.                                                                                            |
-| `pause()`                | -                | Pause playback.                                                                                            |
-| `togglePlay(toggle)`     | Boolean          | Toggle playback, if no parameters are passed, it will toggle based on current status.                      |
-| `stop()`                 | -                | Stop playback and reset to start.                                                                          |
-| `restart()`              | -                | Restart playback.                                                                                          |
-| `rewind(seekTime)`       | Number           | Rewind playback by the specified seek time. If no parameter is passed, the default seek time will be used. |
-| `forward(seekTime)`      | Number           | Fast forward by the specified seek time. If no parameter is passed, the default seek time will be used.    |
-| `increaseVolume(step)`   | Number           | Increase volume by the specified step. If no parameter is passed, the default step will be used.           |
-| `decreaseVolume(step)`   | Number           | Increase volume by the specified step. If no parameter is passed, the default step will be used.           |
-| `toggleCaptions(toggle)` | Boolean          | Toggle captions display. If no parameter is passed, it will toggle based on current status.                |
-| `fullscreen.enter()`     | -                | Enter fullscreen. If fullscreen is not supported, a fallback "full window/viewport" is used instead.       |
-| `fullscreen.exit()`      | -                | Exit fullscreen.                                                                                           |
-| `fullscreen.toggle()`    | -                | Toggle fullscreen.                                                                                         |
-| `airplay()`              | -                | Trigger the airplay dialog on supported devices.                                                           |
-| `toggleControls(toggle)` | Boolean          | Toggle the controls (video only). Takes optional truthy value to force it on/off.                          |
-| `on(event, function)`    | String, Function | Add an event listener for the specified event.                                                             |
-| `once(event, function)`  | String, Function | Add an event listener for the specified event once.                                                        |
-| `off(event, function)`   | String, Function | Remove an event listener for the specified event.                                                          |
-| `supports(type)`         | String           | Check support for a mime type.                                                                             |
-| `destroy()`              | -                | Destroy the instance and garbage collect any elements.                                                     |
+| Method                     | Parameters       | Description                                                                                                |
+| -------------------------- | ---------------- | ---------------------------------------------------------------------------------------------------------- |
+| `play()`&sup1;             | -                | Start playback.                                                                                            |
+| `pause()`                  | -                | Pause playback.                                                                                            |
+| `togglePlay(toggle)`&sup1; | Boolean          | Toggle playback, if no parameters are passed, it will toggle based on current status.                      |
+| `stop()`                   | -                | Stop playback and reset to start.                                                                          |
+| `restart()`                | -                | Restart playback.                                                                                          |
+| `rewind(seekTime)`         | Number           | Rewind playback by the specified seek time. If no parameter is passed, the default seek time will be used. |
+| `forward(seekTime)`        | Number           | Fast forward by the specified seek time. If no parameter is passed, the default seek time will be used.    |
+| `increaseVolume(step)`     | Number           | Increase volume by the specified step. If no parameter is passed, the default step will be used.           |
+| `decreaseVolume(step)`     | Number           | Increase volume by the specified step. If no parameter is passed, the default step will be used.           |
+| `toggleCaptions(toggle)`   | Boolean          | Toggle captions display. If no parameter is passed, it will toggle based on current status.                |
+| `fullscreen.enter()`       | -                | Enter fullscreen. If fullscreen is not supported, a fallback "full window/viewport" is used instead.       |
+| `fullscreen.exit()`        | -                | Exit fullscreen.                                                                                           |
+| `fullscreen.toggle()`      | -                | Toggle fullscreen.                                                                                         |
+| `airplay()`                | -                | Trigger the airplay dialog on supported devices.                                                           |
+| `toggleControls(toggle)`   | Boolean          | Toggle the controls (video only). Takes optional truthy value to force it on/off.                          |
+| `on(event, function)`      | String, Function | Add an event listener for the specified event.                                                             |
+| `once(event, function)`    | String, Function | Add an event listener for the specified event once.                                                        |
+| `off(event, function)`     | String, Function | Remove an event listener for the specified event.                                                          |
+| `supports(type)`           | String           | Check support for a mime type.                                                                             |
+| `destroy()`                | -                | Destroy the instance and garbage collect any elements.                                                     |
 
-1.  For HTML5 players, `play()` will return a [`Promise`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) in _some_ browsers - WebKit and Mozilla [according to MDN](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/play) at time of writing.
+1.  For HTML5 players, `play()` will return a [`Promise`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) for most browsers - e.g. Chrome, Firefox, Opera, Safari and Edge [according to MDN](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/play) at time of writing.
 
 ## Getters and Setters
 
@@ -432,39 +531,39 @@ Video example:
 
 ```javascript
 player.source = {
-    type: 'video',
-    title: 'Example title',
-    sources: [
-        {
-            src: '/path/to/movie.mp4',
-            type: 'video/mp4',
-            size: 720,
-        },
-        {
-            src: '/path/to/movie.webm',
-            type: 'video/webm',
-            size: 1080,
-        },
-    ],
-    poster: '/path/to/poster.jpg',
-    previewThumbnails: {
-        src: '/path/to/thumbnails.vtt'
+  type: 'video',
+  title: 'Example title',
+  sources: [
+    {
+      src: '/path/to/movie.mp4',
+      type: 'video/mp4',
+      size: 720,
     },
-    tracks: [
-        {
-            kind: 'captions',
-            label: 'English',
-            srclang: 'en',
-            src: '/path/to/captions.en.vtt',
-            default: true,
-        },
-        {
-            kind: 'captions',
-            label: 'French',
-            srclang: 'fr',
-            src: '/path/to/captions.fr.vtt',
-        },
-    ],
+    {
+      src: '/path/to/movie.webm',
+      type: 'video/webm',
+      size: 1080,
+    },
+  ],
+  poster: '/path/to/poster.jpg',
+  previewThumbnails: {
+    src: '/path/to/thumbnails.vtt',
+  },
+  tracks: [
+    {
+      kind: 'captions',
+      label: 'English',
+      srclang: 'en',
+      src: '/path/to/captions.en.vtt',
+      default: true,
+    },
+    {
+      kind: 'captions',
+      label: 'French',
+      srclang: 'fr',
+      src: '/path/to/captions.fr.vtt',
+    },
+  ],
 };
 ```
 
@@ -472,18 +571,18 @@ Audio example:
 
 ```javascript
 player.source = {
-    type: 'audio',
-    title: 'Example title',
-    sources: [
-        {
-            src: '/path/to/audio.mp3',
-            type: 'audio/mp3',
-        },
-        {
-            src: '/path/to/audio.ogg',
-            type: 'audio/ogg',
-        },
-    ],
+  type: 'audio',
+  title: 'Example title',
+  sources: [
+    {
+      src: '/path/to/audio.mp3',
+      type: 'audio/mp3',
+    },
+    {
+      src: '/path/to/audio.ogg',
+      type: 'audio/ogg',
+    },
+  ],
 };
 ```
 
@@ -491,13 +590,13 @@ YouTube example:
 
 ```javascript
 player.source = {
-    type: 'video',
-    sources: [
-        {
-            src: 'bTqVqk7FSmY',
-            provider: 'youtube',
-        },
-    ],
+  type: 'video',
+  sources: [
+    {
+      src: 'bTqVqk7FSmY',
+      provider: 'youtube',
+    },
+  ],
 };
 ```
 
@@ -505,13 +604,13 @@ Vimeo example
 
 ```javascript
 player.source = {
-    type: 'video',
-    sources: [
-        {
-            src: '143418951',
-            provider: 'vimeo',
-        },
-    ],
+  type: 'video',
+  sources: [
+    {
+      src: '143418951',
+      provider: 'vimeo',
+    },
+  ],
 };
 ```
 
@@ -536,7 +635,7 @@ property. Here's an example:
 
 ```javascript
 player.on('ready', event => {
-    const instance = event.detail.plyr;
+  const instance = event.detail.plyr;
 });
 ```
 
@@ -595,8 +694,8 @@ YouTube and Vimeo are currently supported and function much like a HTML5 video. 
 to access the API's directly. You can do so via the `embed` property of your player object - e.g. `player.embed`. You can then use the relevant methods from the
 third party APIs. More info on the respective API's here:
 
--   [YouTube iframe API Reference](https://developers.google.com/youtube/iframe_api_reference)
--   [Vimeo player.js Reference](https://github.com/vimeo/player.js)
+- [YouTube iframe API Reference](https://developers.google.com/youtube/iframe_api_reference)
+- [Vimeo player.js Reference](https://github.com/vimeo/player.js)
 
 _Note_: Not all API methods may work 100%. Your mileage may vary. It's better to use the Plyr API where possible.
 
@@ -662,9 +761,9 @@ const supported = Plyr.supported('video', 'html5', true);
 
 The arguments are:
 
--   Media type (`audio` or `video`)
--   Provider (`html5`, `youtube` or `vimeo`)
--   Whether the player has the `playsinline` attribute (only applicable to iOS 10+)
+- Media type (`audio` or `video`)
+- Provider (`html5`, `youtube` or `vimeo`)
+- Whether the player has the `playsinline` attribute (only applicable to iOS 10+)
 
 ## Disable support programmatically
 
@@ -672,7 +771,7 @@ The `enabled` option can be used to disable certain User Agents. For example, if
 
 ```javascript
 {
-    enabled: !/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent);
+  enabled: !/Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent);
 }
 ```
 
@@ -705,42 +804,42 @@ Plyr is developed by [@sam_potts](https://twitter.com/sam_potts) / [sampotts.me]
 
 Plyr costs money to run, not only my time. I donate my time for free as I enjoy building Plyr but unfortunately have to pay for domains, hosting, and more. Any help with costs is appreciated...
 
--   [Donate via Patreon](https://www.patreon.com/plyr)
--   [Donate via PayPal](https://www.paypal.me/pottsy/20usd)
+- [Donate via Patreon](https://www.patreon.com/plyr)
+- [Donate via PayPal](https://www.paypal.me/pottsy/20usd)
 
 # Mentions
 
--   [ProductHunt](https://www.producthunt.com/tech/plyr)
--   [The Changelog](http://thechangelog.com/plyr-simple-html5-media-player-custom-controls-webvtt-captions/)
--   [HTML5 Weekly #177](http://html5weekly.com/issues/177)
--   [Responsive Design #149](http://us4.campaign-archive2.com/?u=559bc631fe5294fc66f5f7f89&id=451a61490f)
--   [Web Design Weekly #174](https://web-design-weekly.com/2015/02/24/web-design-weekly-174/)
--   [Front End Focus #177](https://frontendfoc.us/issues/177)
--   [Hacker News](https://news.ycombinator.com/item?id=9136774)
--   [Web Platform Daily](http://webplatformdaily.org/releases/2015-03-04)
--   [LayerVault Designer News](https://news.layervault.com/stories/45394-plyr--a-simple-html5-media-player)
--   [The Treehouse Show #131](https://teamtreehouse.com/library/episode-131-origami-react-responsive-hero-images)
--   [noupe.com](http://www.noupe.com/design/html5-plyr-is-a-responsive-and-accessible-video-player-94389.html)
+- [ProductHunt](https://www.producthunt.com/tech/plyr)
+- [The Changelog](http://thechangelog.com/plyr-simple-html5-media-player-custom-controls-webvtt-captions/)
+- [HTML5 Weekly #177](http://html5weekly.com/issues/177)
+- [Responsive Design #149](http://us4.campaign-archive2.com/?u=559bc631fe5294fc66f5f7f89&id=451a61490f)
+- [Web Design Weekly #174](https://web-design-weekly.com/2015/02/24/web-design-weekly-174/)
+- [Front End Focus #177](https://frontendfoc.us/issues/177)
+- [Hacker News](https://news.ycombinator.com/item?id=9136774)
+- [Web Platform Daily](http://webplatformdaily.org/releases/2015-03-04)
+- [LayerVault Designer News](https://news.layervault.com/stories/45394-plyr--a-simple-html5-media-player)
+- [The Treehouse Show #131](https://teamtreehouse.com/library/episode-131-origami-react-responsive-hero-images)
+- [noupe.com](http://www.noupe.com/design/html5-plyr-is-a-responsive-and-accessible-video-player-94389.html)
 
 # Used by
 
--   [Selz.com](https://selz.com)
--   [Peugeot.fr](http://www.peugeot.fr/marque-et-technologie/technologies/peugeot-i-cockpit.html)
--   [Peugeot.de](http://www.peugeot.de/modelle/modellberater/208-3-turer/fotos-videos.html)
--   [TomTom.com](http://prioritydriving.tomtom.com/)
--   [DIGBMX](http://digbmx.com/)
--   [Grime Archive](https://grimearchive.com/)
--   [koel - A personal music streaming server that works.](http://koel.phanan.net/)
--   [Oscar Radio](http://oscar-radio.xyz/)
--   [Sparkk TV](https://www.sparkktv.com/)
--   [@halfhalftravel](https://www.halfhalftravel.com/)
+- [Selz.com](https://selz.com)
+- [Peugeot.fr](http://www.peugeot.fr/marque-et-technologie/technologies/peugeot-i-cockpit.html)
+- [Peugeot.de](http://www.peugeot.de/modelle/modellberater/208-3-turer/fotos-videos.html)
+- [TomTom.com](http://prioritydriving.tomtom.com/)
+- [DIGBMX](http://digbmx.com/)
+- [Grime Archive](https://grimearchive.com/)
+- [koel - A personal music streaming server that works.](http://koel.phanan.net/)
+- [Oscar Radio](http://oscar-radio.xyz/)
+- [Sparkk TV](https://www.sparkktv.com/)
+- [@halfhalftravel](https://www.halfhalftravel.com/)
 
 If you want to be added to the list, open a pull request. It'd be awesome to see how you're using Plyr 😎
 
 # Useful links and credits
 
--   [PayPal's Accessible HTML5 Video Player (which Plyr was originally ported from)](https://github.com/paypal/accessible-html5-video-player)
--   [An awesome guide for Plyr in Japanese!](http://syncer.jp/how-to-use-plyr-io) by [@arayutw](https://twitter.com/arayutw)
+- [PayPal's Accessible HTML5 Video Player (which Plyr was originally ported from)](https://github.com/paypal/accessible-html5-video-player)
+- [An awesome guide for Plyr in Japanese!](http://syncer.jp/how-to-use-plyr-io) by [@arayutw](https://twitter.com/arayutw)
 
 # Thanks
 
@@ -775,7 +874,6 @@ Support this project with your organization. Your logo will show up here with a 
 <a href="https://opencollective.com/plyr/organization/0/website"><img src="https://opencollective.com/plyr/organization/0/avatar.svg"></a>
 <a href="https://opencollective.com/plyr/organization/1/website"><img src="https://opencollective.com/plyr/organization/1/avatar.svg"></a><a href="https://opencollective.com/plyr/organization/2/website"><img src="https://opencollective.com/plyr/organization/2/avatar.svg"></a>
 
-
 # Copyright and License
 
-[The MIT license](license.md)
+[The MIT license](LICENSE.md)

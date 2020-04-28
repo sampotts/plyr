@@ -5,6 +5,9 @@
 // ==========================================================================
 @charset 'UTF-8';
 
+@import 'lib/css-vars';
+$css-vars-use-native: true;
+
 @import 'settings/breakpoints';
 @import 'settings/colors';
 @import 'settings/cosmetics';
@@ -43,7 +46,7 @@
 @import 'states/fullscreen';
 
 @import 'plugins/ads';
-@import 'plugins/preview-thumbnails';
+@import 'plugins/preview-thumbnails/index';
 
 @import 'utils/animation';
 @import 'utils/hidden';
