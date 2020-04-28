@@ -1263,7 +1263,7 @@ const controls = {
     this.elements.controls = null;
 
     // Larger overlaid play button
-    if (this.config.controls.includes('play-large')) {
+    if (is.array(this.config.controls) && this.config.controls.includes('play-large')) {
       this.elements.container.appendChild(createButton.call(this, 'play-large'));
     }
 
@@ -1275,7 +1275,7 @@ const controls = {
     const defaultAttributes = { class: 'plyr__controls__item' };
 
     // Loop through controls in order
-    dedupe(this.config.controls).forEach(control => {
+    dedupe(is.array(this.config.controls) ? this.config.controls: []).forEach(control => {
       // Restart button
       if (control === 'restart') {
         container.appendChild(createButton.call(this, 'restart', defaultAttributes));
@@ -1675,8 +1675,6 @@ const controls = {
     if (update) {
       if (is.string(this.config.controls)) {
         container = replace(container);
-      } else if (is.element(container)) {
-        container.innerHTML = replace(container.innerHTML);
       }
     }
 
