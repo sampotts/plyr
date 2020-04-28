@@ -3656,7 +3656,7 @@ typeof navigator === "object" && (function (global, factory) {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.5.10/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.6.1/plyr.svg',
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
     // Quality default
@@ -4572,7 +4572,7 @@ typeof navigator === "object" && (function (global, factory) {
       // Loop through values (as they are the keys when the object is spread 🤔)
       Object.values(_objectSpread2({}, this.media.style)) // We're only fussed about Plyr specific properties
       .filter(function (key) {
-        return key.startsWith('--plyr');
+        return !is$1.empty(key) && key.startsWith('--plyr');
       }).forEach(function (key) {
         // Set on the container
         _this5.elements.container.style.setProperty(key, _this5.media.style.getPropertyValue(key)); // Clean up from media element

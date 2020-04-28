@@ -1,3 +1,7 @@
+## v3.6.1
+
+- Safari bug fix
+
 ## v3.6.0
 
 - You can now easily change colors using CSS Custom Properties. See the [README](README.md#customizing-the-css).

@@ -214,7 +214,7 @@ typeof navigator === "object" && (function () {
 	(module.exports = function (key, value) {
 	  return sharedStore[key] || (sharedStore[key] = value !== undefined ? value : {});
 	})('versions', []).push({
-	  version: '3.6.4',
+	  version: '3.6.5',
 	  mode:  'global',
 	  copyright: '© 2020 Denis Pushkarev (zloirock.ru)'
 	});
@@ -3318,7 +3318,7 @@ typeof navigator === "object" && (function () {
 	var INVALID_PORT = 'Invalid port';
 
 	var ALPHA = /[A-Za-z]/;
-	var ALPHANUMERIC = /[\d+\-.A-Za-z]/;
+	var ALPHANUMERIC = /[\d+-.A-Za-z]/;
 	var DIGIT = /\d/;
 	var HEX_START = /^(0x|0X)/;
 	var OCT = /^[0-7]+$/;
@@ -5151,7 +5151,13 @@ typeof navigator === "object" && (function () {
 	    defer = functionBindContext(port.postMessage, port, 1);
 	  // Browsers with postMessage, skip WebWorkers
 	  // IE8 has postMessage, but it's sync & typeof its postMessage is 'object'
-	  } else if (global_1.addEventListener && typeof postMessage == 'function' && !global_1.importScripts && !fails(post)) {
+	  } else if (
+	    global_1.addEventListener &&
+	    typeof postMessage == 'function' &&
+	    !global_1.importScripts &&
+	    !fails(post) &&
+	    location.protocol !== 'file:'
+	  ) {
 	    defer = post;
 	    global_1.addEventListener('message', listener, false);
 	  // IE8-
@@ -7406,6 +7412,10 @@ typeof navigator === "object" && (function () {
 	 */
 
 	function isMatchingPattern(value, pattern) {
+	  if (!isString(value)) {
+	    return false;
+	  }
+
 	  if (isRegExp(pattern)) {
 	    return pattern.test(value);
 	  }
@@ -12595,7 +12605,7 @@ typeof navigator === "object" && (function () {
 	}(BaseBackend);
 
 	var SDK_NAME = 'sentry.javascript.browser';
-	var SDK_VERSION = '5.15.4';
+	var SDK_VERSION = '5.15.5';
 
 	/**
 	 * The Sentry Browser SDK Client.
@@ -23636,7 +23646,7 @@ typeof navigator === "object" && (function () {
 	  // Sprite (for icons)
 	  loadSprite: true,
 	  iconPrefix: 'plyr',
-	  iconUrl: 'https://cdn.plyr.io/3.5.10/plyr.svg',
+	  iconUrl: 'https://cdn.plyr.io/3.6.1/plyr.svg',
 	  // Blank video (used to prevent errors on source change)
 	  blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
 	  // Quality default
@@ -24565,7 +24575,7 @@ typeof navigator === "object" && (function () {
 	    // Loop through values (as they are the keys when the object is spread 🤔)
 	    Object.values(_objectSpread2({}, this.media.style)) // We're only fussed about Plyr specific properties
 	    .filter(function (key) {
-	      return key.startsWith('--plyr');
+	      return !is$2.empty(key) && key.startsWith('--plyr');
 	    }).forEach(function (key) {
 	      // Set on the container
 	      _this5.elements.container.style.setProperty(key, _this5.media.style.getPropertyValue(key)); // Clean up from media element
