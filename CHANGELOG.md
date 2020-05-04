@@ -1,4 +1,10 @@
-## v3.6.1
+### v3.6.2
+
+- Fixes for CSS Custom Property related errors in some build tools (thanks @Bashev)
+- Fixes for custom controls as element (thanks @taylorchu)
+- Added missing TypeScript interface for preview thumbnail options (thanks @taylorchu)
+
+### v3.6.1
 
 - Safari bug fix
 
