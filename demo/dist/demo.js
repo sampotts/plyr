@@ -4468,7 +4468,7 @@ typeof navigator === "object" && (function () {
 	  if (typeof o === "string") return _arrayLikeToArray(o, minLen);
 	  var n = Object.prototype.toString.call(o).slice(8, -1);
 	  if (n === "Object" && o.constructor) n = o.constructor.name;
-	  if (n === "Map" || n === "Set") return Array.from(n);
+	  if (n === "Map" || n === "Set") return Array.from(o);
 	  if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
 	}
 
@@ -20951,7 +20951,7 @@ typeof navigator === "object" && (function () {
 
 	  var event = new CustomEvent(type, {
 	    bubbles: bubbles,
-	    detail: _objectSpread2({}, detail, {
+	    detail: _objectSpread2(_objectSpread2({}, detail), {}, {
 	      plyr: this
 	    })
 	  }); // Dispatch the event
@@ -21776,7 +21776,7 @@ typeof navigator === "object" && (function () {
 	    var attr = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 	    var text = i18n.get(key, this.config);
 
-	    var attributes = _objectSpread2({}, attr, {
+	    var attributes = _objectSpread2(_objectSpread2({}, attr), {}, {
 	      class: [attr.class, this.config.classNames.hidden].filter(Boolean).join(' ')
 	    });
 
@@ -22776,7 +22776,7 @@ typeof navigator === "object" && (function () {
 	        showMenuPanel = controls.showMenuPanel;
 	    this.elements.controls = null; // Larger overlaid play button
 
-	    if (this.config.controls.includes('play-large')) {
+	    if (is$2.array(this.config.controls) && this.config.controls.includes('play-large')) {
 	      this.elements.container.appendChild(createButton.call(this, 'play-large'));
 	    } // Create the container
 
@@ -22788,7 +22788,7 @@ typeof navigator === "object" && (function () {
 	      class: 'plyr__controls__item'
 	    }; // Loop through controls in order
 
-	    dedupe(this.config.controls).forEach(function (control) {
+	    dedupe(is$2.array(this.config.controls) ? this.config.controls : []).forEach(function (control) {
 	      // Restart button
 	      if (control === 'restart') {
 	        container.appendChild(createButton.call(_this10, 'restart', defaultAttributes));
@@ -23107,8 +23107,6 @@ typeof navigator === "object" && (function () {
 	    if (update) {
 	      if (is$2.string(this.config.controls)) {
 	        container = replace(container);
-	      } else if (is$2.element(container)) {
-	        container.innerHTML = replace(container.innerHTML);
 	      }
 	    } // Controls container
 
@@ -23646,7 +23644,7 @@ typeof navigator === "object" && (function () {
 	  // Sprite (for icons)
 	  loadSprite: true,
 	  iconPrefix: 'plyr',
-	  iconUrl: 'https://cdn.plyr.io/3.6.1/plyr.svg',
+	  iconUrl: 'https://cdn.plyr.io/3.6.2/plyr.svg',
 	  // Blank video (used to prevent errors on source change)
 	  blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
 	  // Quality default
@@ -28595,7 +28593,7 @@ typeof navigator === "object" && (function () {
 
 	        var hiding = toggleClass(this.elements.container, this.config.classNames.hideControls, force); // Close menu
 
-	        if (hiding && this.config.controls.includes('settings') && !is$2.empty(this.config.settings)) {
+	        if (hiding && is$2.array(this.config.controls) && this.config.controls.includes('settings') && !is$2.empty(this.config.settings)) {
 	          controls.toggleMenu.call(this, false);
 	        } // Trigger event on change
 
