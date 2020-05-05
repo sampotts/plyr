@@ -145,8 +145,10 @@ class Fullscreen {
       button.pressed = this.active;
     }
 
+    // Always trigger events on the plyr / media element (not a fullscreen container) and let them bubble up
+    const target = this.target === this.player.media ? this.target : this.player.elements.container;
     // Trigger an event
-    triggerEvent.call(this.player, this.target, this.active ? 'enterfullscreen' : 'exitfullscreen', true);
+    triggerEvent.call(this.player, target, this.active ? 'enterfullscreen' : 'exitfullscreen', true);
   }
 
   toggleFallback(toggle = false) {
