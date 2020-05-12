@@ -22,7 +22,7 @@ function parseId(url) {
     return url;
   }
 
-  const regex = /^.*(dailymotion.com\/|video\/)(\w+).*/;
+  const regex = /^.*(dai.ly\/|dailymotion.com\/|video\/)(\w+).*/;
   return url.match(regex) ? RegExp.$2 : url;
 }
 
