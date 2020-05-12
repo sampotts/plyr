@@ -141,10 +141,10 @@ declare class Plyr {
   /**
    * Returns the current video Provider
    */
-  readonly provider: 'html5' | 'vimeo' | 'youtube';
+  readonly provider: 'html5' | 'vimeo' | 'youtube' | 'dailymotion';
 
   /**
-   * Returns the native API for Vimeo or Youtube players
+   * Returns the native API for Vimeo, Youtube or DailyMotion players
    */
   readonly embed?: any;
 
@@ -496,6 +496,11 @@ declare namespace Plyr {
      * Youtube Player Options.
      */
     youtube?: object;
+
+    /**
+     * DailyMotion Player Options.
+     */
+    dailymotion?: object;
 
     /**
      * Preview Thumbnails Options.
