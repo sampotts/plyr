@@ -31,7 +31,7 @@ const captions = {
     }
 
     // Only Vimeo and HTML5 video supported at this point
-    if (!this.isVideo || this.isYouTube || (this.isHTML5 && !support.textTracks)) {
+    if (!this.isVideo || !this.provider.supportCaptions || (this.isHTML5 && !support.textTracks)) {
       // Clear menu and hide
       if (
         is.array(this.config.controls) &&
