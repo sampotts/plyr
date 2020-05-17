@@ -2,6 +2,7 @@
 // YouTube plugin
 // ==========================================================================
 
+import { types } from '../config/types';
 import ui from '../ui';
 import { createElement, replaceElement, toggleClass } from '../utils/elements';
 import { triggerEvent } from '../utils/events';
@@ -12,6 +13,8 @@ import loadScript from '../utils/load-script';
 import { extend } from '../utils/objects';
 import { format, generateId } from '../utils/strings';
 import { setAspectRatio } from '../utils/style';
+import { parseUrl } from '../utils/urls';
+import PlyrProvider from './providers';
 
 // Parse YouTube ID from URL
 function parseId(url) {
@@ -47,14 +50,36 @@ function getHost(config) {
   return undefined;
 }
 
-const youtube = {
-  setup() {
+class YouTubeProvider extends PlyrProvider {
+  static get name() {
+    return 'youtube';
+  }
+
+  static type() {
+    return types.video;
+  }
+
+  // https://developers.google.com/youtube/iframe_api_reference#setPlaybackRate
+  static get availableSpeed() {
+    return [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 4];
+  }
+
+  // YouTube specific event
+  static get events() {
+    return ['statechange'];
+  }
+
+  static test(url) {
+    return /^(https?:\/\/)?(www\.)?(youtube\.com|youtube-nocookie\.com|youtu\.?be)\/.+$/.test(url);
+  }
+
+  static setup(player) {
     // Add embed class for responsive
-    toggleClass(this.elements.wrapper, this.config.classNames.embed, true);
+    toggleClass(player.elements.wrapper, player.config.classNames.embed, true);
 
     // Setup API
     if (is.object(window.YT) && is.function(window.YT.Player)) {
-      youtube.ready.call(this);
+      YouTubeProvider.ready(player);
     } else {
       // Reference current global callback
       const callback = window.onYouTubeIframeAPIReady;
@@ -66,19 +91,19 @@ const youtube = {
           callback();
         }
 
-        youtube.ready.call(this);
+        YouTubeProvider.ready(player);
       };
 
       // Load the SDK
-      loadScript(this.config.urls.youtube.sdk).catch(error => {
-        this.debug.warn('YouTube API failed to load', error);
+      loadScript(player.config.youtube.sdk).catch(error => {
+        player.debug.warn('YouTube API failed to load', error);
       });
     }
-  },
+  }
 
   // Get the media title
-  getTitle(videoId) {
-    const url = format(this.config.urls.youtube.api, videoId);
+  static getTitle(player, videoId) {
+    const url = format(player.config.youtube.api, videoId);
 
     fetch(url)
       .then(data => {
@@ -86,24 +111,22 @@ const youtube = {
           const { title, height, width } = data;
 
           // Set title
-          this.config.title = title;
-          ui.setTitle.call(this);
+          player.config.title = title;
+          ui.setTitle.call(player);
 
           // Set aspect ratio
-          this.embed.ratio = [width, height];
+          player.embed.ratio = [width, height];
         }
 
-        setAspectRatio.call(this);
+        setAspectRatio.call(player);
       })
       .catch(() => {
         // Set aspect ratio
-        setAspectRatio.call(this);
+        setAspectRatio.call(player);
       });
-  },
+  }
 
-  // API ready
-  ready() {
-    const player = this;
+  static ready(player) {
     // Ignore already setup (race condition)
     const currentId = player.media && player.media.getAttribute('id');
     if (!is.empty(currentId) && currentId.startsWith('youtube-')) {
@@ -115,7 +138,7 @@ const youtube = {
 
     // Get from <div> if needed
     if (is.empty(source)) {
-      source = player.media.getAttribute(this.config.attributes.embed.id);
+      source = player.media.getAttribute(player.config.attributes.embed.id);
     }
 
     // Replace the <iframe> with a <div> due to YouTube API issues
@@ -204,7 +227,7 @@ const youtube = {
           const instance = event.target;
 
           // Get the title
-          youtube.getTitle.call(player, videoId);
+          YouTubeProvider.getTitle(player, videoId);
 
           // Create a faux HTML5 API using the YouTube API
           player.media.play = () => {
@@ -434,7 +457,35 @@ const youtube = {
         },
       },
     });
-  },
+  }
+
+  static beforeSetup(player) {
+    const truthy = ['1', 'true'];
+    const url = parseUrl(player.media.getAttribute('src'));
+    player.config.playsinline = truthy.includes(url.searchParams.get('playsinline'));
+    player.config.youtube.hl = url.searchParams.get('hl'); // TODO: Should this be setting language?
+  }
+
+  static async destroy(player) {
+    // Clear timers
+    clearInterval(player.timers.buffering);
+    clearInterval(player.timers.playing);
+
+    // Destroy YouTube API
+    if (player.embed !== null && is.function(player.embed.destroy)) {
+      player.embed.destroy();
+    }
+  }
+}
+
+YouTubeProvider.config = {
+  sdk: 'https://www.youtube.com/iframe_api',
+  api: 'https://noembed.com/embed?url=https://www.youtube.com/watch?v={0}',
+  noCookie: true, // Whether to use an alternative version of YouTube without cookies
+  rel: 0, // No related vids
+  showinfo: 0, // Hide info
+  iv_load_policy: 3, // Hide annotations
+  modestbranding: 1, // Hide logos as much as possible (they still show one in the corner when paused)
 };
 
-export default youtube;
+export default YouTubeProvider;
