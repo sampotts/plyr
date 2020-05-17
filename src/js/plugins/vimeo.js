@@ -3,6 +3,7 @@
 // ==========================================================================
 
 import captions from '../captions';
+import { types } from '../config/types';
 import controls from '../controls';
 import ui from '../ui';
 import { createElement, replaceElement, toggleClass } from '../utils/elements';
@@ -13,6 +14,7 @@ import loadScript from '../utils/load-script';
 import { format, stripHTML } from '../utils/strings';
 import { setAspectRatio } from '../utils/style';
 import { buildUrlParams } from '../utils/urls';
+import PlyrProvider from './providers';
 
 // Parse Vimeo ID from URL
 function parseId(url) {
@@ -39,36 +41,50 @@ function assurePlaybackState(play) {
   }
 }
 
-const vimeo = {
-  setup() {
-    const player = this;
+class VimeoProvider extends PlyrProvider {
+  // https://github.com/vimeo/player.js/#setplaybackrateplaybackrate-number-promisenumber-rangeerrorerror
+  static get availableSpeed() {
+    return [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
+  }
 
+  static get name() {
+    return 'vimeo';
+  }
+
+  static type() {
+    return types.video;
+  }
+
+  static get supportCaptions() {
+    return true;
+  }
+
+  static test(url) {
+    return /^https?:\/\/player.vimeo.com\/video\/\d{0,9}(?=\b|\/)/.test(url);
+  }
+
+  static setup(player) {
     // Add embed class for responsive
     toggleClass(player.elements.wrapper, player.config.classNames.embed, true);
-
-    // Set speed options from config
-    player.options.speed = player.config.speed.options;
 
     // Set intial ratio
     setAspectRatio.call(player);
 
     // Load the SDK if not already
     if (!is.object(window.Vimeo)) {
-      loadScript(player.config.urls.vimeo.sdk)
+      loadScript(player.config.vimeo.sdk)
         .then(() => {
-          vimeo.ready.call(player);
+          this.ready(player);
         })
         .catch(error => {
           player.debug.warn('Vimeo SDK (player.js) failed to load', error);
         });
     } else {
-      vimeo.ready.call(player);
+      this.ready(player);
     }
-  },
+  }
 
-  // API Ready
-  ready() {
-    const player = this;
+  static ready(player) {
     const config = player.config.vimeo;
     const { premium, referrerPolicy, ...frameParams } = config;
 
@@ -86,7 +102,7 @@ const vimeo = {
       autoplay: player.autoplay,
       muted: player.muted,
       gesture: 'media',
-      playsinline: !this.config.fullscreen.iosNative,
+      playsinline: !player.config.fullscreen.iosNative,
       ...frameParams,
     });
 
@@ -101,7 +117,7 @@ const vimeo = {
     const id = parseId(source);
     // Build an iframe
     const iframe = createElement('iframe');
-    const src = format(player.config.urls.vimeo.iframe, id, params);
+    const src = format(player.config.vimeo.iframe, id, params);
     iframe.setAttribute('src', src);
     iframe.setAttribute('allowfullscreen', '');
     iframe.setAttribute('allow', 'autoplay,fullscreen,picture-in-picture');
@@ -115,15 +131,15 @@ const vimeo = {
     const { poster } = player;
     if (premium) {
       iframe.setAttribute('data-poster', poster);
-      player.media = replaceElement(iframe, player.media);
+      player.setMedia(replaceElement(iframe, player.media));
     } else {
       const wrapper = createElement('div', { class: player.config.classNames.embedContainer, 'data-poster': poster });
       wrapper.appendChild(iframe);
-      player.media = replaceElement(wrapper, player.media);
+      player.setMedia(replaceElement(wrapper, player.media));
     }
 
     // Get poster image
-    fetch(format(player.config.urls.vimeo.api, id), 'json').then(response => {
+    fetch(format(player.config.vimeo.api, id), 'json').then(response => {
       if (is.empty(response)) {
         return;
       }
@@ -274,7 +290,7 @@ const vimeo = {
         controls.setDownloadUrl.call(player);
       })
       .catch(error => {
-        this.debug.warn(error);
+        player.debug.warn(error);
       });
 
     Object.defineProperty(player.media, 'currentSrc', {
@@ -294,7 +310,7 @@ const vimeo = {
     Promise.all([player.embed.getVideoWidth(), player.embed.getVideoHeight()]).then(dimensions => {
       const [width, height] = dimensions;
       player.embed.ratio = [width, height];
-      setAspectRatio.call(this);
+      setAspectRatio.call(player);
     });
 
     // Set autopause
@@ -305,7 +321,7 @@ const vimeo = {
     // Get title
     player.embed.getVideoTitle().then(title => {
       player.config.title = title;
-      ui.setTitle.call(this);
+      ui.setTitle.call(player);
     });
 
     // Get current time
@@ -408,7 +424,36 @@ const vimeo = {
 
     // Rebuild UI
     setTimeout(() => ui.build.call(player), 0);
-  },
+  }
+
+  static async destroy(player) {
+    // Destroy Vimeo API
+    // then clean up (wait, to prevent postmessage errors)
+    if (player.embed !== null) {
+      try {
+        await player.embed.unload();
+      } catch (error) {
+        player.debug.warn(error);
+      }
+    }
+    // This function should always return, no need to timeout
+  }
+}
+
+VimeoProvider.config = {
+  sdk: 'https://player.vimeo.com/api/player.js',
+  iframe: 'https://player.vimeo.com/video/{0}?{1}',
+  api: 'https://vimeo.com/api/v2/video/{0}.json',
+  byline: false,
+  portrait: false,
+  title: false,
+  speed: true,
+  transparent: false,
+  // Whether the owner of the video has a Pro or Business account
+  // (which allows us to properly hide controls without CSS hacks, etc)
+  premium: false,
+  // Custom settings from Plyr
+  referrerPolicy: null, // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement/referrerPolicy
 };
 
-export default vimeo;
+export default VimeoProvider;
