@@ -6,7 +6,6 @@
 import RangeTouch from 'rangetouch';
 
 import captions from './captions';
-import html5 from './html5';
 import support from './support';
 import { repaint, transitionEndEvent } from './utils/animation';
 import { dedupe } from './utils/arrays';
@@ -1275,7 +1274,7 @@ const controls = {
     const defaultAttributes = { class: 'plyr__controls__item' };
 
     // Loop through controls in order
-    dedupe(is.array(this.config.controls) ? this.config.controls: []).forEach(control => {
+    dedupe(is.array(this.config.controls) ? this.config.controls : []).forEach(control => {
       // Restart button
       if (control === 'restart') {
         container.appendChild(createButton.call(this, 'restart', defaultAttributes));
@@ -1596,9 +1595,10 @@ const controls = {
       }
     });
 
+    const qualityOptions = this.provider.getQualityOptions(this);
     // Set available quality levels
-    if (this.isHTML5) {
-      setQualityMenu.call(this, html5.getQualityOptions.call(this));
+    if (qualityOptions.length > 0) {
+      setQualityMenu.call(this, qualityOptions);
     }
 
     setSpeedMenu.call(this);
