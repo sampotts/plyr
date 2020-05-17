@@ -2,20 +2,39 @@
 // Plyr HTML5 helpers
 // ==========================================================================
 
+import { types } from './config/types';
+import PlyrProvider from './plugins/providers';
 import support from './support';
+import ui from './ui';
 import { removeElement } from './utils/elements';
 import { triggerEvent } from './utils/events';
 import is from './utils/is';
 import { silencePromise } from './utils/promise';
 import { setAspectRatio } from './utils/style';
 
-const html5 = {
-  getSources() {
-    if (!this.isHTML5) {
+class HTML5Provider extends PlyrProvider {
+  static get name() {
+    return 'html5';
+  }
+
+  static type(player) {
+    return player.media.tagName.toLowerCase() === 'video' ? types.video : types.audio;
+  }
+
+  static get availableSpeed() {
+    return [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 4];
+  }
+
+  static get supportCaptions() {
+    return true;
+  }
+
+  static getSources(player) {
+    if (!player.isHTML5) {
       return [];
     }
 
-    const sources = Array.from(this.media.querySelectorAll('source'));
+    const sources = Array.from(player.media.querySelectorAll('source'));
 
     // Filter out unsupported sources (if type is specified)
     return sources.filter(source => {
@@ -25,36 +44,30 @@ const html5 = {
         return true;
       }
 
-      return support.mime.call(this, type);
+      return support.mime.call(player, type);
     });
-  },
+  }
 
   // Get quality levels
-  getQualityOptions() {
+  static getQualityOptions(player) {
     // Whether we're forcing all options (e.g. for streaming)
-    if (this.config.quality.forced) {
-      return this.config.quality.options;
+    if (player.config.quality.forced) {
+      return player.config.quality.options;
     }
 
     // Get sizes from <source> elements
-    return html5.getSources
-      .call(this)
+    return HTML5Provider.getSources(player)
       .map(source => Number(source.getAttribute('size')))
       .filter(Boolean);
-  },
+  }
 
-  setup() {
-    if (!this.isHTML5) {
+  static setup(player) {
+    if (!player.isHTML5) {
       return;
     }
 
-    const player = this;
-
-    // Set speed options from config
-    player.options.speed = player.config.speed.options;
-
     // Set aspect ratio if fixed
-    if (!is.empty(this.config.ratio)) {
+    if (!is.empty(player.config.ratio)) {
       setAspectRatio.call(player);
     }
 
@@ -62,7 +75,7 @@ const html5 = {
     Object.defineProperty(player.media, 'quality', {
       get() {
         // Get sources
-        const sources = html5.getSources.call(player);
+        const sources = HTML5Provider.getSources(player);
         const source = sources.find(s => s.getAttribute('src') === player.source);
 
         // Return size, if match is found
@@ -78,7 +91,7 @@ const html5 = {
           player.config.quality.onChange(input);
         } else {
           // Get sources
-          const sources = html5.getSources.call(player);
+          const sources = HTML5Provider.getSources(player);
           // Get first match for requested size
           const source = sources.find(s => Number(s.getAttribute('size')) === input);
 
@@ -91,13 +104,15 @@ const html5 = {
           const { currentTime, paused, preload, readyState, playbackRate } = player.media;
 
           // Set new source
-          player.media.src = source.getAttribute('src');
+          player.media.setAttribute('src', source.getAttribute('src'));
 
           // Prevent loading if preload="none" and the current source isn't loaded (#1044)
           if (preload !== 'none' || readyState) {
             // Restore time
             player.once('loadedmetadata', () => {
+              // eslint-disable-next-line no-param-reassign
               player.speed = playbackRate;
+              // eslint-disable-next-line no-param-reassign
               player.currentTime = currentTime;
 
               // Resume playing
@@ -117,31 +132,36 @@ const html5 = {
         });
       },
     });
-  },
+  }
 
   // Cancel current network requests
   // See https://github.com/sampotts/plyr/issues/174
-  cancelRequests() {
-    if (!this.isHTML5) {
+  static cancelRequests(player) {
+    if (!player.isHTML5) {
       return;
     }
 
     // Remove child sources
-    removeElement(html5.getSources.call(this));
+    removeElement(HTML5Provider.getSources(player));
 
     // Set blank video src attribute
     // This is to prevent a MEDIA_ERR_SRC_NOT_SUPPORTED error
     // Info: http://stackoverflow.com/questions/32231579/how-to-properly-dispose-of-an-html5-video-and-close-socket-or-connection
-    this.media.setAttribute('src', this.config.blankVideo);
+    player.media.setAttribute('src', player.config.blankVideo);
 
     // Load the new empty source
     // This will cancel existing requests
     // See https://github.com/sampotts/plyr/issues/174
-    this.media.load();
+    player.media.load();
 
     // Debugging
-    this.debug.log('Cancelled network requests');
-  },
-};
+    player.debug.log('Cancelled network requests');
+  }
 
-export default html5;
+  static async destroy(player) {
+    // Restore native video controls
+    ui.toggleNativeControls.call(player, true);
+  }
+}
+
+export default HTML5Provider;
