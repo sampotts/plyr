@@ -510,6 +510,8 @@ declare namespace Plyr {
 
   interface QualityOptions {
     default: number;
+    forced?: boolean;
+    onChange?: (quality: number) => void;
     options: number[];
   }
 
