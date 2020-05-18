@@ -139,6 +139,11 @@ declare class Plyr {
   ratio?: string;
 
   /**
+   * Access Elements cache
+   */
+  elements: Plyr.Elements;
+
+  /**
    * Returns the current video Provider
    */
   readonly provider: Plyr.Provider;
@@ -560,6 +565,27 @@ declare namespace Plyr {
   interface PreviewThumbnailsOptions {
     enabled?: boolean;
     src?: string | string[];
+  }
+
+  export interface Elements {
+    buttons: {
+      airplay?: HTMLButtonElement;
+      captions?: HTMLButtonElement;
+      download?: HTMLButtonElement;
+      fastForward?: HTMLButtonElement;
+      fullscreen?: HTMLButtonElement;
+      mute?: HTMLButtonElement;
+      pip?: HTMLButtonElement;
+      play?: HTMLButtonElement | HTMLButtonElement[];
+      restart?: HTMLButtonElement;
+      rewind?: HTMLButtonElement;
+      settings?: HTMLButtonElement;
+    };
+    captions: HTMLElement | null;
+    container: HTMLElement | null;
+    controls: HTMLElement | null;
+    fullscreen: HTMLElement | null;
+    wrapper: HTMLElement | null;
   }
 
   interface SourceInfo {
