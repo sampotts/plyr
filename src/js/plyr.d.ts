@@ -141,7 +141,7 @@ declare class Plyr {
   /**
    * Returns the current video Provider
    */
-  readonly provider: 'html5' | 'vimeo' | 'youtube';
+  readonly provider: Plyr.Provider;
 
   /**
    * Returns the native API for Vimeo or Youtube players
