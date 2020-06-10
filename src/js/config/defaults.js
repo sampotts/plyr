@@ -144,6 +144,7 @@ const defaults = {
     'airplay',
     // 'download',
     'fullscreen',
+    // 'transcript',
   ],
   settings: ['captions', 'quality', 'speed'],
 
@@ -168,6 +169,7 @@ const defaults = {
     download: 'Download',
     enterFullscreen: 'Enter fullscreen',
     exitFullscreen: 'Exit fullscreen',
+    transcript: 'Transcript',
     frameTitle: 'Player for {title}',
     captions: 'Captions',
     settings: 'Settings',
@@ -230,6 +232,7 @@ const defaults = {
     quality: null,
     loop: null,
     language: null,
+    transcript: null,
   },
 
   // Events to watch and bubble
@@ -310,6 +313,7 @@ const defaults = {
       airplay: '[data-plyr="airplay"]',
       settings: '[data-plyr="settings"]',
       loop: '[data-plyr="loop"]',
+      transcript: '[data-plyr="transcript"]',
     },
     inputs: {
       seek: '[data-plyr="seek"]',

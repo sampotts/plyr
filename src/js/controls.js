@@ -64,6 +64,7 @@ const controls = {
         settings: getElement.call(this, this.config.selectors.buttons.settings),
         captions: getElement.call(this, this.config.selectors.buttons.captions),
         fullscreen: getElement.call(this, this.config.selectors.buttons.fullscreen),
+        transcript: getElements.call(this, this.config.selectors.buttons.transcript),
       };
 
       // Progress
@@ -1275,7 +1276,11 @@ const controls = {
     const defaultAttributes = { class: 'plyr__controls__item' };
 
     // Loop through controls in order
-    dedupe(is.array(this.config.controls) ? this.config.controls: []).forEach(control => {
+    dedupe(is.array(this.config.controls) ? this.config.controls : []).forEach(control => {
+      // Transcript button
+      if (control === 'transcript') {
+        container.appendChild(createButton.call(this, 'transcript', defaultAttributes));
+      }
       // Restart button
       if (control === 'restart') {
         container.appendChild(createButton.call(this, 'restart', defaultAttributes));
