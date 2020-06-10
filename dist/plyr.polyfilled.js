@@ -4532,7 +4532,11 @@ typeof navigator === "object" && (function (global, factory) {
           anchorElement.href = anchorElement.href; // force href to refresh
         }
 
-        if (anchorElement.protocol === ':' || !/:/.test(anchorElement.href)) {
+        var inputElement = doc.createElement('input');
+        inputElement.type = 'url';
+        inputElement.value = url;
+
+        if (anchorElement.protocol === ':' || !/:/.test(anchorElement.href) || !inputElement.checkValidity() && !base) {
           throw new TypeError('Invalid URL');
         }
 
@@ -8046,7 +8050,8 @@ typeof navigator === "object" && (function (global, factory) {
           airplay: getElement.call(this, this.config.selectors.buttons.airplay),
           settings: getElement.call(this, this.config.selectors.buttons.settings),
           captions: getElement.call(this, this.config.selectors.buttons.captions),
-          fullscreen: getElement.call(this, this.config.selectors.buttons.fullscreen)
+          fullscreen: getElement.call(this, this.config.selectors.buttons.fullscreen),
+          transcript: getElements.call(this, this.config.selectors.buttons.transcript)
         }; // Progress
 
         this.elements.progress = getElement.call(this, this.config.selectors.progress); // Inputs
@@ -9120,7 +9125,12 @@ typeof navigator === "object" && (function (global, factory) {
       }; // Loop through controls in order
 
       dedupe(is$1.array(this.config.controls) ? this.config.controls : []).forEach(function (control) {
-        // Restart button
+        // Transcript button
+        if (control === 'transcript') {
+          container.appendChild(createButton.call(_this10, 'transcript', defaultAttributes));
+        } // Restart button
+
+
         if (control === 'restart') {
           container.appendChild(createButton.call(_this10, 'restart', defaultAttributes));
         } // Rewind button
@@ -10039,7 +10049,8 @@ typeof navigator === "object" && (function (global, factory) {
     'play', // 'fast-forward',
     'progress', 'current-time', // 'duration',
     'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', // 'download',
-    'fullscreen'],
+    'fullscreen' // 'transcript',
+    ],
     settings: ['captions', 'quality', 'speed'],
     // Localisation
     i18n: {
@@ -10062,6 +10073,7 @@ typeof navigator === "object" && (function (global, factory) {
       download: 'Download',
       enterFullscreen: 'Enter fullscreen',
       exitFullscreen: 'Exit fullscreen',
+      transcript: 'Transcript',
       frameTitle: 'Player for {title}',
       captions: 'Captions',
       settings: 'Settings',
@@ -10121,7 +10133,8 @@ typeof navigator === "object" && (function (global, factory) {
       speed: null,
       quality: null,
       loop: null,
-      language: null
+      language: null,
+      transcript: null
     },
     // Events to watch and bubble
     events: [// Events to watch on HTML5 media elements and bubble
@@ -10154,7 +10167,8 @@ typeof navigator === "object" && (function (global, factory) {
         pip: '[data-plyr="pip"]',
         airplay: '[data-plyr="airplay"]',
         settings: '[data-plyr="settings"]',
-        loop: '[data-plyr="loop"]'
+        loop: '[data-plyr="loop"]',
+        transcript: '[data-plyr="transcript"]'
       },
       inputs: {
         seek: '[data-plyr="seek"]',
