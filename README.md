@@ -8,26 +8,26 @@ Plyr is a simple, lightweight, accessible and customizable HTML5, YouTube and Vi
 
 # Features
 
-- 📼 **HTML Video & Audio, YouTube & Vimeo** - support for the major formats
-- 💪 **Accessible** - full support for VTT captions and screen readers
-- 🔧 **[Customizable](#html)** - make the player look how you want with the markup you want
-- 😎 **Clean HTML** - uses the _right_ elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no
+- 📼 &ensp; **HTML Video & Audio, YouTube & Vimeo** - support for the major formats
+- 💪 &ensp; **Accessible** - full support for VTT captions and screen readers
+- 🔧 &ensp; **[Customizable](#html)** - make the player look how you want with the markup you want
+- 😎 &ensp; **Clean HTML** - uses the _right_ elements. `<input type="range">` for volume and `<progress>` for progress and well, `<button>`s for buttons. There's no
   `<span>` or `<a href="#">` button hacks
-- 📱 **Responsive** - works with any screen size
-- 💵 **[Monetization](#ads)** - make money from your videos
-- 📹 **[Streaming](#demos)** - support for hls.js, Shaka and dash.js streaming playback
-- 🎛 **[API](#api)** - toggle playback, volume, seeking, and more through a standardized API
-- 🎤 **[Events](#events)** - no messing around with Vimeo and YouTube APIs, all events are standardized across formats
-- 🔎 **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes
-- ⌨️ **[Shortcuts](#shortcuts)** - supports keyboard shortcuts
-- 🖥 **Picture-in-Picture** - supports picture-in-picture mode
-- 📱 **Playsinline** - supports the `playsinline` attribute
-- 🏎 **Speed controls** - adjust speed on the fly
-- 📖 **Multiple captions** - support for multiple caption tracks
-- 🌎 **i18n support** - support for internationalization of controls
-- 👌 **[Preview thumbnails](#preview-thumbnails)** - support for displaying preview thumbnails
-- 🤟 **No frameworks** - written in "vanilla" ES6 JavaScript, no jQuery required
-- 💁‍♀️ **SASS** - to include in your build processes
+- 📱 &ensp; **Responsive** - works with any screen size
+- 💵 &ensp; **[Monetization](#ads)** - make money from your videos
+- 📹 &ensp; **[Streaming](#demos)** - support for hls.js, Shaka and dash.js streaming playback
+- 🎛 &ensp; **[API](#api)** - toggle playback, volume, seeking, and more through a standardized API
+- 🎤 &ensp; **[Events](#events)** - no messing around with Vimeo and YouTube APIs, all events are standardized across formats
+- 🔎 &ensp; **[Fullscreen](#fullscreen)** - supports native fullscreen with fallback to "full window" modes
+- ⌨️ &ensp; **[Shortcuts](#shortcuts)** - supports keyboard shortcuts
+- 🖥 &ensp; **Picture-in-Picture** - supports picture-in-picture mode
+- 📱 &ensp; **Playsinline** - supports the `playsinline` attribute
+- 🏎 &ensp; **Speed controls** - adjust speed on the fly
+- 📖 &ensp; **Multiple captions** - support for multiple caption tracks
+- 🌎 &ensp; **i18n support** - support for internationalization of controls
+- 👌 &ensp; **[Preview thumbnails](#preview-thumbnails)** - support for displaying preview thumbnails
+- 🤟 &ensp; **No frameworks** - written in "vanilla" ES6 JavaScript, no jQuery required
+- 💁‍♀️ &ensp; **SASS** - to include in your build processes
 
 ### Demos
 
