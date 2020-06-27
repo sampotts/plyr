@@ -268,7 +268,7 @@ You can set them in your CSS for all players:
 ```html
 <video class="player" style="--plyr-color-main: #1ac266;">
     ...
-</vieo>
+</video>
 ```
 
 ### SASS
