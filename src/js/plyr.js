@@ -281,7 +281,7 @@ class Plyr {
 
     // Listen for events if debugging
     if (this.config.debug) {
-      on.call(this, this.elements.container, this.config.events.join(' '), event => {
+      on.call(this, this.elements.container, this.config.events.join(' '), (event) => {
         this.debug.log(`event: ${event.type}`);
       });
     }
@@ -1054,7 +1054,12 @@ class Plyr {
       const hiding = toggleClass(this.elements.container, this.config.classNames.hideControls, force);
 
       // Close menu
-      if (hiding && is.array(this.config.controls) && this.config.controls.includes('settings') && !is.empty(this.config.settings)) {
+      if (
+        hiding &&
+        is.array(this.config.controls) &&
+        this.config.controls.includes('settings') &&
+        !is.empty(this.config.settings)
+      ) {
         controls.toggleMenu.call(this, false);
       }
 
@@ -1248,7 +1253,7 @@ class Plyr {
       return null;
     }
 
-    return targets.map(t => new Plyr(t, options));
+    return targets.map((t) => new Plyr(t, options));
   }
 }
 

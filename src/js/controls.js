@@ -179,7 +179,7 @@ const controls = {
       iconPressed: null,
     };
 
-    ['element', 'icon', 'label'].forEach(key => {
+    ['element', 'icon', 'label'].forEach((key) => {
       if (Object.keys(attributes).includes(key)) {
         props[key] = attributes[key];
         delete attributes[key];
@@ -193,7 +193,7 @@ const controls = {
 
     // Set class name
     if (Object.keys(attributes).includes('class')) {
-      if (!attributes.class.split(' ').some(c => c === this.config.classNames.control)) {
+      if (!attributes.class.split(' ').some((c) => c === this.config.classNames.control)) {
         extend(attributes, {
           class: `${attributes.class} ${this.config.classNames.control}`,
         });
@@ -401,7 +401,7 @@ const controls = {
       this,
       menuItem,
       'keydown keyup',
-      event => {
+      (event) => {
         // We only care about space and ⬆️ ⬇️️ ➡️
         if (![32, 38, 39, 40].includes(event.which)) {
           return;
@@ -448,7 +448,7 @@ const controls = {
 
     // Enter will fire a `click` event but we still need to manage focus
     // So we bind to keyup which fires after and set focus here
-    on.call(this, menuItem, 'keyup', event => {
+    on.call(this, menuItem, 'keyup', (event) => {
       if (event.which !== 13) {
         return;
       }
@@ -493,8 +493,8 @@ const controls = {
         // Ensure exclusivity
         if (check) {
           Array.from(menuItem.parentNode.children)
-            .filter(node => matches(node, '[role="menuitemradio"]'))
-            .forEach(node => node.setAttribute('aria-checked', 'false'));
+            .filter((node) => matches(node, '[role="menuitemradio"]'))
+            .forEach((node) => node.setAttribute('aria-checked', 'false'));
         }
 
         menuItem.setAttribute('aria-checked', check ? 'true' : 'false');
@@ -504,7 +504,7 @@ const controls = {
     this.listeners.bind(
       menuItem,
       'click keyup',
-      event => {
+      (event) => {
         if (is.keyboardEvent(event) && event.which !== 32) {
           return;
         }
@@ -698,7 +698,7 @@ const controls = {
     }
 
     const visible = `${this.config.classNames.tooltip}--visible`;
-    const toggle = show => toggleClass(this.elements.display.seekTooltip, visible, show);
+    const toggle = (show) => toggleClass(this.elements.display.seekTooltip, visible, show);
 
     // Hide on touch
     if (this.touch) {
@@ -894,7 +894,7 @@ const controls = {
 
     // Set options if passed and filter based on uniqueness and config
     if (is.array(options)) {
-      this.options.quality = dedupe(options).filter(quality => this.config.quality.options.includes(quality));
+      this.options.quality = dedupe(options).filter((quality) => this.config.quality.options.includes(quality));
     }
 
     // Toggle the pane and tab
@@ -913,7 +913,7 @@ const controls = {
     }
 
     // Get the badge HTML for HD, 4K etc
-    const getBadge = quality => {
+    const getBadge = (quality) => {
       const label = i18n.get(`qualityBadge.${quality}`, this.config);
 
       if (!label.length) {
@@ -929,7 +929,7 @@ const controls = {
         const sorting = this.config.quality.options;
         return sorting.indexOf(a) > sorting.indexOf(b) ? 1 : -1;
       })
-      .forEach(quality => {
+      .forEach((quality) => {
         controls.createMenuItem.call(this, {
           value: quality,
           list,
@@ -1052,7 +1052,7 @@ const controls = {
     const list = this.elements.settings.panels.speed.querySelector('[role="menu"]');
 
     // Filter out invalid speeds
-    this.options.speed = this.options.speed.filter(o => o >= this.minimumSpeed && o <= this.maximumSpeed);
+    this.options.speed = this.options.speed.filter((o) => o >= this.minimumSpeed && o <= this.maximumSpeed);
 
     // Toggle the pane and tab
     const toggle = !is.empty(this.options.speed) && this.options.speed.length > 1;
@@ -1070,7 +1070,7 @@ const controls = {
     }
 
     // Create items
-    this.options.speed.forEach(speed => {
+    this.options.speed.forEach((speed) => {
       controls.createMenuItem.call(this, {
         value: speed,
         list,
@@ -1085,7 +1085,7 @@ const controls = {
   // Check if we need to hide/show the settings menu
   checkMenu() {
     const { buttons } = this.elements.settings;
-    const visible = !is.empty(buttons) && Object.values(buttons).some(button => !button.hidden);
+    const visible = !is.empty(buttons) && Object.values(buttons).some((button) => !button.hidden);
 
     toggleHidden(this.elements.settings.menu, !visible);
   },
@@ -1099,7 +1099,7 @@ const controls = {
     let target = pane;
 
     if (!is.element(target)) {
-      target = Object.values(this.elements.settings.panels).find(p => !p.hidden);
+      target = Object.values(this.elements.settings.panels).find((p) => !p.hidden);
     }
 
     const firstItem = target.querySelector('[role^="menuitem"]');
@@ -1191,7 +1191,7 @@ const controls = {
 
     // Hide all other panels
     const container = target.parentNode;
-    const current = Array.from(container.children).find(node => !node.hidden);
+    const current = Array.from(container.children).find((node) => !node.hidden);
 
     // If we can do fancy animations, we'll animate the height/width
     if (support.transitions && !support.reducedMotion) {
@@ -1203,7 +1203,7 @@ const controls = {
       const size = controls.getMenuSize.call(this, target);
 
       // Restore auto height/width
-      const restore = event => {
+      const restore = (event) => {
         // We're only bothered about height and width on the container
         if (event.target !== container || !['width', 'height'].includes(event.propertyName)) {
           return;
@@ -1275,7 +1275,7 @@ const controls = {
     const defaultAttributes = { class: 'plyr__controls__item' };
 
     // Loop through controls in order
-    dedupe(is.array(this.config.controls) ? this.config.controls: []).forEach(control => {
+    dedupe(is.array(this.config.controls) ? this.config.controls : []).forEach((control) => {
       // Restart button
       if (control === 'restart') {
         container.appendChild(createButton.call(this, 'restart', defaultAttributes));
@@ -1437,7 +1437,7 @@ const controls = {
         this.elements.settings.panels.home = home;
 
         // Build the menu items
-        this.config.settings.forEach(type => {
+        this.config.settings.forEach((type) => {
           // TODO: bundle this with the createMenuItem helper and bindings
           const menuItem = createElement(
             'button',
@@ -1510,7 +1510,7 @@ const controls = {
             this,
             pane,
             'keydown',
-            event => {
+            (event) => {
               // We only care about <-
               if (event.which !== 37) {
                 return;
@@ -1661,7 +1661,7 @@ const controls = {
     }
 
     // Replace props with their value
-    const replace = input => {
+    const replace = (input) => {
       let result = input;
 
       Object.entries(props).forEach(([key, value]) => {
@@ -1702,7 +1702,7 @@ const controls = {
 
     // Add pressed property to buttons
     if (!is.empty(this.elements.buttons)) {
-      const addProperty = button => {
+      const addProperty = (button) => {
         const className = this.config.classNames.controlPressed;
         Object.defineProperty(button, 'pressed', {
           enumerable: true,
@@ -1718,11 +1718,9 @@ const controls = {
       // Toggle classname when pressed property is set
       Object.values(this.elements.buttons)
         .filter(Boolean)
-        .forEach(button => {
+        .forEach((button) => {
           if (is.array(button) || is.nodeList(button)) {
-            Array.from(button)
-              .filter(Boolean)
-              .forEach(addProperty);
+            Array.from(button).filter(Boolean).forEach(addProperty);
           } else {
             addProperty(button);
           }
@@ -1740,7 +1738,7 @@ const controls = {
       const selector = `${selectors.controls.wrapper} ${selectors.labels} .${classNames.hidden}`;
       const labels = getElements.call(this, selector);
 
-      Array.from(labels).forEach(label => {
+      Array.from(labels).forEach((label) => {
         toggleClass(label, this.config.classNames.hidden, false);
         toggleClass(label, this.config.classNames.tooltip, true);
       });
