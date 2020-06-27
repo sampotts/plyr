@@ -138,7 +138,7 @@ export function getAttributesFromSelector(sel, existingAttributes) {
   const attributes = {};
   const existing = extend({}, existingAttributes);
 
-  sel.split(',').forEach(s => {
+  sel.split(',').forEach((s) => {
     // Remove whitespace
     const selector = s.trim();
     const className = selector.replace('.', '');
@@ -198,7 +198,7 @@ export function toggleHidden(element, hidden) {
 // Mirror Element.classList.toggle, with IE compatibility for "force" argument
 export function toggleClass(element, className, force) {
   if (is.nodeList(element)) {
-    return Array.from(element).map(e => toggleClass(e, className, force));
+    return Array.from(element).map((e) => toggleClass(e, className, force));
   }
 
   if (is.element(element)) {

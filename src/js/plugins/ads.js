@@ -15,7 +15,7 @@ import { silencePromise } from '../utils/promise';
 import { formatTime } from '../utils/time';
 import { buildUrlParams } from '../utils/urls';
 
-const destroy = instance => {
+const destroy = (instance) => {
   // Destroy our adsManager
   if (instance.manager) {
     instance.manager.destroy();
@@ -179,10 +179,10 @@ class Ads {
     // Listen and respond to ads loaded and error events
     this.loader.addEventListener(
       google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED,
-      event => this.onAdsManagerLoaded(event),
+      (event) => this.onAdsManagerLoaded(event),
       false,
     );
-    this.loader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, error => this.onAdError(error), false);
+    this.loader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, (error) => this.onAdError(error), false);
 
     // Request video ads to be pre-loaded
     this.requestAds();
@@ -264,11 +264,11 @@ class Ads {
 
     // Add listeners to the required events
     // Advertisement error events
-    this.manager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, error => this.onAdError(error));
+    this.manager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, (error) => this.onAdError(error));
 
     // Advertisement regular events
-    Object.keys(google.ima.AdEvent.Type).forEach(type => {
-      this.manager.addEventListener(google.ima.AdEvent.Type[type], e => this.onAdEvent(e));
+    Object.keys(google.ima.AdEvent.Type).forEach((type) => {
+      this.manager.addEventListener(google.ima.AdEvent.Type[type], (e) => this.onAdEvent(e));
     });
 
     // Resolve our adsManager
@@ -278,7 +278,7 @@ class Ads {
   addCuePoints() {
     // Add advertisement cue's within the time line if available
     if (!is.empty(this.cuePoints)) {
-      this.cuePoints.forEach(cuePoint => {
+      this.cuePoints.forEach((cuePoint) => {
         if (cuePoint !== 0 && cuePoint !== -1 && cuePoint < this.player.duration) {
           const seekElement = this.player.elements.progress;
 
@@ -310,7 +310,7 @@ class Ads {
     const adData = event.getAdData();
 
     // Proxy event
-    const dispatchEvent = type => {
+    const dispatchEvent = (type) => {
       triggerEvent.call(this.player, this.player.media, `ads${type.replace(/_/g, '').toLowerCase()}`);
     };
 
@@ -565,7 +565,7 @@ class Ads {
         }
 
         // Re-set our adsManager promises
-        this.managerPromise = new Promise(resolve => {
+        this.managerPromise = new Promise((resolve) => {
           this.on('loaded', resolve);
           this.player.debug.log(this.manager);
         });
@@ -586,7 +586,7 @@ class Ads {
     const handlers = this.events[event];
 
     if (is.array(handlers)) {
-      handlers.forEach(handler => {
+      handlers.forEach((handler) => {
         if (is.function(handler)) {
           handler.apply(this, args);
         }
