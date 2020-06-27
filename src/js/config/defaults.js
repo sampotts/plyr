@@ -431,7 +431,7 @@ const defaults = {
 
   // YouTube plugin
   youtube: {
-    noCookie: true, // Whether to use an alternative version of YouTube without cookies
+    noCookie: false, // Whether to use an alternative version of YouTube without cookies
     rel: 0, // No related vids
     showinfo: 0, // Hide info
     iv_load_policy: 3, // Hide annotations
