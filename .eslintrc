@@ -1,6 +1,6 @@
 {
   "parser": "babel-eslint",
-  "extends": "@sampotts/eslint-config/es6",
+  "extends": ["@sampotts/eslint-config/es6"],
   "env": {
     "browser": true,
     "es6": true
