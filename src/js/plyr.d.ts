@@ -20,6 +20,30 @@ declare class Plyr {
    */
   static supported(mediaType?: Plyr.MediaType, provider?: Plyr.Provider, playsInline?: boolean): Plyr.Support;
 
+  /**
+   * Return the provider to use for the url provided
+   * @param {string} url
+   * @returns {(PlyrProvider | undefined)} The first mached provider or undefined if not found
+   */
+  static getProviderByUrl(url: string): PlyrProvider | undefined;
+
+  /**
+   * Return the provider by its name
+   * @param {string} name
+   * @returns {(PlyrProvider | undefined)} The first mached provider or undefined if not found
+   */
+  static getProvider(name: string): PlyrProvider | undefined;
+
+  /**
+   * List of currently available providers
+   */
+  static readonly providers: PlyrProvider[];
+
+  /**
+   * Adds a new provider to the providers available if not existent
+   */
+  static use(provider: PlyrProvider): void;
+
   constructor(targets: NodeList | HTMLElement | HTMLElement[] | string, options?: Plyr.Options);
 
   /**
@@ -141,7 +165,7 @@ declare class Plyr {
   /**
    * Returns the current video Provider
    */
-  readonly provider: 'html5' | 'vimeo' | 'youtube';
+  readonly provider: PlyrProvider;
 
   /**
    * Returns the native API for Vimeo or Youtube players
@@ -212,28 +236,31 @@ declare class Plyr {
   toggleControls(toggle: boolean): void;
 
   /**
+   * Set the options by extending the options property
+   * @param newOptions The new options to merge
+   */
+  setOptions(newOptions: Plyr.Options): void;
+
+  /**
+   * Replace the current media element with a new one
+   * @param newMedia New Media element
+   */
+  setMedia(newMedia: any): void;
+
+  /**
    * Add an event listener for the specified event.
    */
-  on(
-    event: Plyr.StandardEvent | Plyr.Html5Event | Plyr.YoutubeEvent,
-    callback: (this: this, event: Plyr.PlyrEvent) => void,
-  ): void;
+  on<K extends keyof Plyr.PlyrEventMap>(event: K, callback: (this: this, event: Plyr.PlyrEventMap[K]) => void): void;
 
   /**
    * Add an event listener for the specified event once.
    */
-  once(
-    event: Plyr.StandardEvent | Plyr.Html5Event | Plyr.YoutubeEvent,
-    callback: (this: this, event: Plyr.PlyrEvent) => void,
-  ): void;
+  once<K extends keyof Plyr.PlyrEventMap>(event: K, callback: (this: this, event: Plyr.PlyrEventMap[K]) => void): void;
 
   /**
    * Remove an event listener for the specified event.
    */
-  off(
-    event: Plyr.StandardEvent | Plyr.Html5Event | Plyr.YoutubeEvent,
-    callback: (this: this, event: Plyr.PlyrEvent) => void,
-  ): void;
+  off<K extends keyof Plyr.PlyrEventMap>(event: K, callback: (this: this, event: Plyr.PlyrEventMap[K]) => void): void;
 
   /**
    * Check support for a mime type.
@@ -249,38 +276,44 @@ declare class Plyr {
 declare namespace Plyr {
   type MediaType = 'audio' | 'video';
   type Provider = 'html5' | 'youtube' | 'vimeo';
-  type StandardEvent =
-    | 'progress'
-    | 'playing'
-    | 'play'
-    | 'pause'
-    | 'timeupdate'
-    | 'volumechange'
-    | 'seeking'
-    | 'seeked'
-    | 'ratechange'
-    | 'ended'
-    | 'enterfullscreen'
-    | 'exitfullscreen'
-    | 'captionsenabled'
-    | 'captionsdisabled'
-    | 'languagechange'
-    | 'controlshidden'
-    | 'controlsshown'
-    | 'ready';
-  type Html5Event =
-    | 'loadstart'
-    | 'loadeddata'
-    | 'loadedmetadata'
-    | 'canplay'
-    | 'canplaythrough'
-    | 'stalled'
-    | 'waiting'
-    | 'emptied'
-    | 'cuechange'
-    | 'error';
-  type YoutubeEvent = 'statechange' | 'qualitychange' | 'qualityrequested';
-
+  type StandardEventMap = {
+    progress: PlyrEvent;
+    playing: PlyrEvent;
+    play: PlyrEvent;
+    pause: PlyrEvent;
+    timeupdate: PlyrEvent;
+    volumechange: PlyrEvent;
+    seeking: PlyrEvent;
+    seeked: PlyrEvent;
+    ratechange: PlyrEvent;
+    ended: PlyrEvent;
+    enterfullscreen: PlyrEvent;
+    exitfullscreen: PlyrEvent;
+    captionsenabled: PlyrEvent;
+    captionsdisabled: PlyrEvent;
+    languagechange: PlyrEvent;
+    controlshidden: PlyrEvent;
+    controlsshown: PlyrEvent;
+    ready: PlyrEvent;
+  };
+  // For retrocompatibility, we keep StandadEvent
+  type StandadEvent = keyof Plyr.StandardEventMap;
+  type Html5EventMap = {
+    loadstart: PlyrEvent;
+    loadeddata: PlyrEvent;
+    loadedmetadata: PlyrEvent;
+    canplay: PlyrEvent;
+    canplaythrough: PlyrEvent;
+    stalled: PlyrEvent;
+    waiting: PlyrEvent;
+    emptied: PlyrEvent;
+    cuechange: PlyrEvent;
+    error: PlyrEvent;
+  };
+  // For retrocompatibility, we keep Html5Event
+  type Html5Event = keyof Plyr.Html5EventMap;
+  export interface ProviderEventMap {}
+  type PlyrEventMap = StandardEventMap & Html5EventMap & ProviderEventMap;
   interface FullscreenControl {
     /**
      * Indicates if the current player is in fullscreen mode.

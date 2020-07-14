@@ -2,10 +2,10 @@
 // Plyr source update
 // ==========================================================================
 
-import { providers } from './config/types';
-import html5 from './html5';
+import HTML5Provider from './html5';
 import media from './media';
 import PreviewThumbnails from './plugins/preview-thumbnails';
+import Plyr from './plyr';
 import support from './support';
 import ui from './ui';
 import { createElement, insertElement, removeElement } from './utils/elements';
@@ -35,7 +35,7 @@ const source = {
     }
 
     // Cancel current network requests
-    html5.cancelRequests.call(this);
+    HTML5Provider.cancelRequests(this);
 
     // Destroy instance and re-setup
     this.destroy.call(
@@ -55,12 +55,12 @@ const source = {
 
         // Set the type and provider
         const { sources, type } = input;
-        const [{ provider = providers.html5, src }] = sources;
-        const tagName = provider === 'html5' ? type : 'div';
-        const attributes = provider === 'html5' ? {} : { src };
+        const [{ provider = HTML5Provider.name, src }] = sources;
+        const tagName = provider === HTML5Provider.name ? type : 'div';
+        const attributes = provider === HTML5Provider.name ? {} : { src };
 
         Object.assign(this, {
-          provider,
+          provider: Plyr.getProvider(provider),
           type,
           // Check for support
           supported: support.check(type, provider, this.config.playsinline),

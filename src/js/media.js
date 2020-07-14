@@ -2,9 +2,6 @@
 // Plyr Media
 // ==========================================================================
 
-import html5 from './html5';
-import vimeo from './plugins/vimeo';
-import youtube from './plugins/youtube';
 import { createElement, toggleClass, wrap } from './utils/elements';
 
 const media = {
@@ -20,7 +17,7 @@ const media = {
     toggleClass(this.elements.container, this.config.classNames.type.replace('{0}', this.type), true);
 
     // Add provider class
-    toggleClass(this.elements.container, this.config.classNames.provider.replace('{0}', this.provider), true);
+    toggleClass(this.elements.container, this.config.classNames.provider.replace('{0}', this.provider.name), true);
 
     // Add video class for embeds
     // This will require changes if audio embeds are added
@@ -46,13 +43,16 @@ const media = {
       this.elements.wrapper.appendChild(this.elements.poster);
     }
 
-    if (this.isHTML5) {
-      html5.setup.call(this);
-    } else if (this.isYouTube) {
-      youtube.setup.call(this);
-    } else if (this.isVimeo) {
-      vimeo.setup.call(this);
+    // Some providers might not have the same speed array
+    // So we filter out the speeds set in config with the speed from the provider
+    this.setOptions({ speed: this.provider.filterSpeed(this.config.speed.options) });
+
+    if (this.provider === undefined) {
+      this.debug.warn('No provider found!');
+      return;
     }
+    // Provider should be already set when we call this
+    this.provider.setup(this);
   },
 };
 

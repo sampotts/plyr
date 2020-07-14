@@ -8,14 +8,17 @@
 import captions from './captions';
 import defaults from './config/defaults';
 import { pip } from './config/states';
-import { getProviderByUrl, providers, types } from './config/types';
+import { types } from './config/types';
 import Console from './console';
 import controls from './controls';
 import Fullscreen from './fullscreen';
+import HTML5Provider from './html5';
 import Listeners from './listeners';
 import media from './media';
 import Ads from './plugins/ads';
 import PreviewThumbnails from './plugins/preview-thumbnails';
+import VimeoProvider from './plugins/vimeo';
+import YouTubeProvider from './plugins/youtube';
 import source from './source';
 import Storage from './storage';
 import support from './support';
@@ -48,19 +51,8 @@ class Plyr {
     // Touch device
     this.touch = support.touch;
 
-    // Set the media element
-    this.media = target;
-
-    // String selector passed
-    if (is.string(this.media)) {
-      this.media = document.querySelectorAll(this.media);
-    }
-
-    // jQuery, NodeList or Array passed, use first element
-    if ((window.jQuery && this.media instanceof jQuery) || is.nodeList(this.media) || is.array(this.media)) {
-      // eslint-disable-next-line
-      this.media = this.media[0];
-    }
+    // Set the media
+    this.setMedia(target);
 
     // Set config
     this.config = extend(
@@ -76,6 +68,12 @@ class Plyr {
         }
       })(),
     );
+
+    Plyr.providers.forEach(provider => {
+      // Adding config and events to the config property
+      this.config[provider.name] = provider.config;
+      this.config.events.push(...provider.events);
+    });
 
     // Elements cache
     this.elements = {
@@ -167,7 +165,7 @@ class Plyr {
         if (is.element(iframe)) {
           // Detect provider
           url = parseUrl(iframe.getAttribute('src'));
-          this.provider = getProviderByUrl(url.toString());
+          this.provider = Plyr.getProviderByUrl(url.toString());
 
           // Rework elements
           this.elements.container = this.media;
@@ -186,39 +184,31 @@ class Plyr {
             if (truthy.includes(url.searchParams.get('loop'))) {
               this.config.loop.active = true;
             }
-
-            // TODO: replace fullscreen.iosNative with this playsinline config option
-            // YouTube requires the playsinline in the URL
-            if (this.isYouTube) {
-              this.config.playsinline = truthy.includes(url.searchParams.get('playsinline'));
-              this.config.youtube.hl = url.searchParams.get('hl'); // TODO: Should this be setting language?
-            } else {
-              this.config.playsinline = true;
-            }
+            this.config.playsinline = true;
           }
         } else {
           // <div> with attributes
-          this.provider = this.media.getAttribute(this.config.attributes.embed.provider);
+          this.provider = Plyr.getProvider(this.media.getAttribute(this.config.attributes.embed.provider));
 
           // Remove attribute
           this.media.removeAttribute(this.config.attributes.embed.provider);
         }
 
         // Unsupported or missing provider
-        if (is.empty(this.provider) || !Object.keys(providers).includes(this.provider)) {
+        if (this.provider === undefined) {
           this.debug.error('Setup failed: Invalid provider');
           return;
         }
 
         // Audio will come later for external providers
-        this.type = types.video;
+        this.type = this.provider.type(this);
 
         break;
 
       case 'video':
       case 'audio':
-        this.type = type;
-        this.provider = providers.html5;
+        this.type = HTML5Provider.type(this);
+        this.provider = HTML5Provider;
 
         // Get config from attributes
         if (this.media.hasAttribute('crossorigin')) {
@@ -244,6 +234,11 @@ class Plyr {
         return;
     }
 
+    // Some providers might need to do some actions before the media.setup call
+    // YouTube needs it for example
+    if (this.provider !== undefined && this.provider.beforeSetup !== undefined) {
+      this.provider.beforeSetup(this);
+    }
     // Check for support again but with type
     this.supported = support.check(this.type, this.provider, this.config.playsinline);
 
@@ -325,22 +320,66 @@ class Plyr {
   // ---------------------------------------
 
   /**
+   * Setting options through a function
+   * @param newOptions New set of options to merge/override into the options property
+   */
+  setOptions(newOptions) {
+    this.options = extend(this.options, newOptions);
+  }
+
+  /**
+   * Replacing the current media with a new media element
+   * @param newMedia
+   */
+  setMedia(newMedia) {
+    this.media = newMedia;
+    // String selector passed
+    if (is.string(this.media)) {
+      this.media = document.querySelectorAll(this.media);
+    }
+
+    if ((window.jQuery && newMedia instanceof jQuery) || is.nodeList(this.media) || is.array(this.media)) {
+      [this.media] = this.media;
+    }
+  }
+
+  /**
+   * Adds a new provider if not already existing
+   * @param {PlyrProvider} provider
+   */
+  static use(newProvider) {
+    if (!this.providers.some(provider => provider.name === newProvider.name)) {
+      this.providers.push(newProvider);
+    }
+  }
+
+  /**
+   * Get a provider by URL
+   * @param {String} url
+   * @return {(PlyrProvider | undefined)} The first matched provider or undefined if not found
+   */
+  static getProviderByUrl(url) {
+    return this.providers.find(provider => provider.test(url));
+  }
+
+  /**
+   * Get a provider by its name
+   * @param {String} name
+   * @return {(PlyrProvider | undefined)} The first matched provider or undefined if not found
+   */
+  static getProvider(name) {
+    return this.providers.find(provider => provider.name === name);
+  }
+
+  /**
    * Types and provider helpers
    */
   get isHTML5() {
-    return this.provider === providers.html5;
+    return this.provider.name === HTML5Provider.name;
   }
 
   get isEmbed() {
-    return this.isYouTube || this.isVimeo;
-  }
-
-  get isYouTube() {
-    return this.provider === providers.youtube;
-  }
-
-  get isVimeo() {
-    return this.provider === providers.vimeo;
+    return this.provider.name !== HTML5Provider.name && this.provider.name !== '';
   }
 
   get isVideo() {
@@ -689,14 +728,10 @@ class Plyr {
    * Get the minimum allowed speed
    */
   get minimumSpeed() {
-    if (this.isYouTube) {
-      // https://developers.google.com/youtube/iframe_api_reference#setPlaybackRate
+    // if it's not html5, it's another provider
+    // A provider should implement an array of available speed
+    if (!this.isHTML5) {
       return Math.min(...this.options.speed);
-    }
-
-    if (this.isVimeo) {
-      // https://github.com/vimeo/player.js/#setplaybackrateplaybackrate-number-promisenumber-rangeerrorerror
-      return 0.5;
     }
 
     // https://stackoverflow.com/a/32320020/1191319
@@ -707,14 +742,10 @@ class Plyr {
    * Get the maximum allowed speed
    */
   get maximumSpeed() {
-    if (this.isYouTube) {
-      // https://developers.google.com/youtube/iframe_api_reference#setPlaybackRate
+    // if it's not html5, it's another provider
+    // A provider should implement an array of available speed
+    if (!this.isHTML5) {
       return Math.max(...this.options.speed);
-    }
-
-    if (this.isVimeo) {
-      // https://github.com/vimeo/player.js/#setplaybackrateplaybackrate-number-promisenumber-rangeerrorerror
-      return 2;
     }
 
     // https://stackoverflow.com/a/32320020/1191319
@@ -1054,7 +1085,12 @@ class Plyr {
       const hiding = toggleClass(this.elements.container, this.config.classNames.hideControls, force);
 
       // Close menu
-      if (hiding && is.array(this.config.controls) && this.config.controls.includes('settings') && !is.empty(this.config.settings)) {
+      if (
+        hiding &&
+        is.array(this.config.controls) &&
+        this.config.controls.includes('settings') &&
+        !is.empty(this.config.settings)
+      ) {
         controls.toggleMenu.call(this, false);
       }
 
@@ -1170,35 +1206,7 @@ class Plyr {
     clearTimeout(this.timers.controls);
     clearTimeout(this.timers.resized);
 
-    // Provider specific stuff
-    if (this.isHTML5) {
-      // Restore native video controls
-      ui.toggleNativeControls.call(this, true);
-
-      // Clean up
-      done();
-    } else if (this.isYouTube) {
-      // Clear timers
-      clearInterval(this.timers.buffering);
-      clearInterval(this.timers.playing);
-
-      // Destroy YouTube API
-      if (this.embed !== null && is.function(this.embed.destroy)) {
-        this.embed.destroy();
-      }
-
-      // Clean up
-      done();
-    } else if (this.isVimeo) {
-      // Destroy Vimeo API
-      // then clean up (wait, to prevent postmessage errors)
-      if (this.embed !== null) {
-        this.embed.unload().then(done);
-      }
-
-      // Vimeo does not always return
-      setTimeout(done, 200);
-    }
+    this.provider.destroy(this).then(done);
   }
 
   /**
@@ -1251,6 +1259,12 @@ class Plyr {
     return targets.map(t => new Plyr(t, options));
   }
 }
+
+Plyr.providers = [];
+
+Plyr.use(HTML5Provider);
+Plyr.use(YouTubeProvider);
+Plyr.use(VimeoProvider);
 
 Plyr.defaults = cloneDeep(defaults);
 

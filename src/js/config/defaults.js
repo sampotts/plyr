@@ -197,15 +197,6 @@ const defaults = {
   // URLs
   urls: {
     download: null,
-    vimeo: {
-      sdk: 'https://player.vimeo.com/api/player.js',
-      iframe: 'https://player.vimeo.com/video/{0}?{1}',
-      api: 'https://vimeo.com/api/v2/video/{0}.json',
-    },
-    youtube: {
-      sdk: 'https://www.youtube.com/iframe_api',
-      api: 'https://noembed.com/embed?url=https://www.youtube.com/watch?v={0}',
-    },
     googleIMA: {
       sdk: 'https://imasdk.googleapis.com/js/sdkloader/ima3.js',
     },
@@ -267,9 +258,6 @@ const defaults = {
     'controlshidden',
     'controlsshown',
     'ready',
-
-    // YouTube
-    'statechange',
 
     // Quality
     'qualitychange',
@@ -413,29 +401,6 @@ const defaults = {
   previewThumbnails: {
     enabled: false,
     src: '',
-  },
-
-  // Vimeo plugin
-  vimeo: {
-    byline: false,
-    portrait: false,
-    title: false,
-    speed: true,
-    transparent: false,
-    // Whether the owner of the video has a Pro or Business account
-    // (which allows us to properly hide controls without CSS hacks, etc)
-    premium: false,
-    // Custom settings from Plyr
-    referrerPolicy: null, // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement/referrerPolicy
-  },
-
-  // YouTube plugin
-  youtube: {
-    noCookie: true, // Whether to use an alternative version of YouTube without cookies
-    rel: 0, // No related vids
-    showinfo: 0, // Hide info
-    iv_load_policy: 3, // Hide annotations
-    modestbranding: 1, // Hide logos as much as possible (they still show one in the corner when paused)
   },
 };
 
