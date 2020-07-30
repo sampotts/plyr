@@ -270,7 +270,7 @@ const ui = {
     // Loop through values (as they are the keys when the object is spread 🤔)
     Object.values({ ...this.media.style })
       // We're only fussed about Plyr specific properties
-      .filter(key => !is.empty(key) && key.startsWith('--plyr'))
+      .filter(key => !is.empty(key) && is.string(key) && key.startsWith('--plyr'))
       .forEach(key => {
         // Set on the container
         this.elements.container.style.setProperty(key, this.media.style.getPropertyValue(key));
