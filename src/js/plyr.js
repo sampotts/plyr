@@ -308,7 +308,7 @@ class Plyr {
 
     // Autoplay if required
     if (this.isHTML5 && this.config.autoplay) {
-      setTimeout(() => silencePromise(this.play()), 10);
+      this.on('canplay', () => silencePromise(this.play()));
     }
 
     // Seek time will be recorded (in listeners.js) so we can prevent hiding controls for a few seconds after seek
@@ -1054,7 +1054,12 @@ class Plyr {
       const hiding = toggleClass(this.elements.container, this.config.classNames.hideControls, force);
 
       // Close menu
-      if (hiding && is.array(this.config.controls) && this.config.controls.includes('settings') && !is.empty(this.config.settings)) {
+      if (
+        hiding &&
+        is.array(this.config.controls) &&
+        this.config.controls.includes('settings') &&
+        !is.empty(this.config.settings)
+      ) {
         controls.toggleMenu.call(this, false);
       }
 
