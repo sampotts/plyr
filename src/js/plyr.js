@@ -12,6 +12,7 @@ import { getProviderByUrl, providers, types } from './config/types';
 import Console from './console';
 import controls from './controls';
 import Fullscreen from './fullscreen';
+import html5 from './html5';
 import Listeners from './listeners';
 import media from './media';
 import Ads from './plugins/ads';
@@ -1134,6 +1135,9 @@ class Plyr {
             } else {
                 // Unbind listeners
                 unbindListeners.call(this);
+
+                // Cancel current network requests
+                html5.cancelRequests.call(this);
 
                 // Replace the container with the original element provided
                 replaceElement(this.elements.original, this.elements.container);
