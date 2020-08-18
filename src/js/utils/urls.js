@@ -10,30 +10,30 @@ import is from './is';
  * @param {Boolean} safe - failsafe parsing
  */
 export function parseUrl(input, safe = true) {
-    let url = input;
+  let url = input;
 
-    if (safe) {
-        const parser = document.createElement('a');
-        parser.href = url;
-        url = parser.href;
-    }
+  if (safe) {
+    const parser = document.createElement('a');
+    parser.href = url;
+    url = parser.href;
+  }
 
-    try {
-        return new URL(url);
-    } catch (e) {
-        return null;
-    }
+  try {
+    return new URL(url);
+  } catch (e) {
+    return null;
+  }
 }
 
 // Convert object to URLSearchParams
 export function buildUrlParams(input) {
-    const params = new URLSearchParams();
+  const params = new URLSearchParams();
 
-    if (is.object(input)) {
-        Object.entries(input).forEach(([key, value]) => {
-            params.set(key, value);
-        });
-    }
+  if (is.object(input)) {
+    Object.entries(input).forEach(([key, value]) => {
+      params.set(key, value);
+    });
+  }
 
-    return params;
+  return params;
 }

@@ -3,23 +3,23 @@
 // --------------------------------------------------------------
 
 .plyr__volume {
-    align-items: center;
-    display: flex;
-    max-width: 110px;
-    min-width: 80px;
-    position: relative;
-    width: 20%;
+  align-items: center;
+  display: flex;
+  max-width: 110px;
+  min-width: 80px;
+  position: relative;
+  width: 20%;
 
-    input[type='range'] {
-        margin-left: ($plyr-control-spacing / 2);
-        margin-right: ($plyr-control-spacing / 2);
-        position: relative;
-        z-index: 2;
-    }
+  input[type='range'] {
+    margin-left: calc(#{$plyr-control-spacing} / 2);
+    margin-right: calc(#{$plyr-control-spacing} / 2);
+    position: relative;
+    z-index: 2;
+  }
 }
 
 // Auto size on iOS as there's no slider
 .plyr--is-ios .plyr__volume {
-    min-width: 0;
-    width: auto;
+  min-width: 0;
+  width: auto;
 }

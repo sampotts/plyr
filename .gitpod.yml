@@ -1,5 +1,5 @@
 tasks:
-  - init: npm install && npm i gulp -g
+  - before: npm install && npm i gulp -g
     command: gulp
 ports:
   - port: 3000
