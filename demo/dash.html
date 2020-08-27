@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <title></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <link href="./plyr.css" rel="stylesheet" />
+    <script src="./plyr.min.js"></script>
+  </head>
+
+  <body>
+    <video id="player" autoplay crossorigin playsinline muted></video>
+
+    <script>
+      const videoSrc = 'https://dash.akamaized.net/envivio/EnvivioDash3/manifest.mpd';
+      window.PlyrPlayer = new Plyr('#player', { src: videoSrc });
+    </script>
+  </body>
+</html>

@@ -15,6 +15,7 @@ import Fullscreen from './fullscreen';
 import Listeners from './listeners';
 import media from './media';
 import Ads from './plugins/ads';
+import Embed from './plugins/embed';
 import PreviewThumbnails from './plugins/preview-thumbnails';
 import source from './source';
 import Storage from './storage';
@@ -39,6 +40,7 @@ import { parseUrl } from './utils/urls';
 class Plyr {
   constructor(target, options) {
     this.timers = {};
+    this.states = {};
 
     // State
     this.ready = false;
@@ -218,7 +220,7 @@ class Plyr {
       case 'video':
       case 'audio':
         this.type = type;
-        this.provider = providers.html5;
+        this.provider = getProviderByUrl(this.config.src) || providers.html5;
 
         // Get config from attributes
         if (this.media.hasAttribute('crossorigin')) {
@@ -264,6 +266,11 @@ class Plyr {
     // Store reference
     this.media.plyr = this;
 
+    // Circular dependency
+    this.setQualityMenu = controls.setQualityMenu;
+    this.setCaptionsMenu = controls.setCaptionsMenu;
+    this.updateSetting = controls.updateSetting;
+
     // Wrap media
     if (!is.element(this.elements.container)) {
       this.elements.container = createElement('div', { tabindex: 0 });
@@ -281,7 +288,7 @@ class Plyr {
 
     // Listen for events if debugging
     if (this.config.debug) {
-      on.call(this, this.elements.container, this.config.events.join(' '), event => {
+      on.call(this, this.elements.container, this.config.events.join(' '), (event) => {
         this.debug.log(`event: ${event.type}`);
       });
     }
@@ -318,6 +325,11 @@ class Plyr {
     if (this.config.previewThumbnails.enabled) {
       this.previewThumbnails = new PreviewThumbnails(this);
     }
+
+    // Embed and Share plugin
+    if (this.config.sharing) {
+      Embed.setup.call(this);
+    }
   }
 
   // ---------------------------------------
@@ -328,7 +340,15 @@ class Plyr {
    * Types and provider helpers
    */
   get isHTML5() {
-    return this.provider === providers.html5;
+    return this.provider === providers.html5 || providers.hlsjs || providers.dashjs;
+  }
+
+  get isHlsjs() {
+    return this.provider === providers.hlsjs;
+  }
+
+  get isDashjs() {
+    return this.provider === providers.dashjs;
   }
 
   get isEmbed() {
@@ -349,6 +369,10 @@ class Plyr {
 
   get isAudio() {
     return this.type === types.audio;
+  }
+
+  setState(obj = {}) {
+    extend(this.states, obj);
   }
 
   /**
@@ -1054,7 +1078,12 @@ class Plyr {
       const hiding = toggleClass(this.elements.container, this.config.classNames.hideControls, force);
 
       // Close menu
-      if (hiding && is.array(this.config.controls) && this.config.controls.includes('settings') && !is.empty(this.config.settings)) {
+      if (
+        hiding &&
+        is.array(this.config.controls) &&
+        this.config.controls.includes('settings') &&
+        !is.empty(this.config.settings)
+      ) {
         controls.toggleMenu.call(this, false);
       }
 
@@ -1248,7 +1277,7 @@ class Plyr {
       return null;
     }
 
-    return targets.map(t => new Plyr(t, options));
+    return targets.map((t) => new Plyr(t, options));
   }
 }
 

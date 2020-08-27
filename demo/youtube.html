@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <title></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <link href="./plyr.css" rel="stylesheet" />
+    <script src="./plyr.min.js"></script>
+  </head>
+
+  <body>
+    <div id="player" data-plyr-provider="youtube" data-plyr-embed-id="bTqVqk7FSmY"></div>
+
+    <script>
+      // Change "{}" to your options:
+      // https://github.com/sampotts/plyr/#options
+      window.PlyrPlayer = new Plyr('#player', {});
+    </script>
+  </body>
+</html>

@@ -1,3 +1,4 @@
+dist
 node_modules
 .DS_Store
 credentials.json
@@ -7,3 +8,5 @@ npm-debug.log
 yarn-error.log
 *.webm
 .idea/
+
+package-lock.json

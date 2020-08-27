@@ -4,6 +4,8 @@
 
 export const providers = {
   html5: 'html5',
+  hlsjs: 'hlsjs',
+  dashjs: 'dashjs',
   youtube: 'youtube',
   vimeo: 'vimeo',
 };
@@ -26,6 +28,15 @@ export function getProviderByUrl(url) {
   // Vimeo
   if (/^https?:\/\/player.vimeo.com\/video\/\d{0,9}(?=\b|\/)/.test(url)) {
     return providers.vimeo;
+  }
+
+  // Hlsjs
+  if (/^https?:\/\/(.*).m3u8(.?)/.test(url)) {
+    return providers.hlsjs;
+  }
+  // Dashjs
+  if (/^https?:\/\/(.*).mpd(.?)/.test(url)) {
+    return providers.dashjs;
   }
 
   return null;

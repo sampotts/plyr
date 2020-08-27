@@ -1,7 +1,8 @@
 // ==========================================================================
 // Plyr Media
 // ==========================================================================
-
+import dashjs from './dash';
+import hlsjs from './hls';
 import html5 from './html5';
 import vimeo from './plugins/vimeo';
 import youtube from './plugins/youtube';
@@ -46,12 +47,16 @@ const media = {
       this.elements.wrapper.appendChild(this.elements.poster);
     }
 
-    if (this.isHTML5) {
-      html5.setup.call(this);
+    if (this.isHlsjs) {
+      hlsjs.setup.call(this);
+    } else if (this.isDashjs) {
+      dashjs.setup.call(this);
     } else if (this.isYouTube) {
       youtube.setup.call(this);
     } else if (this.isVimeo) {
       vimeo.setup.call(this);
+    } else if (this.isHTML5) {
+      html5.setup.call(this);
     }
   },
 };

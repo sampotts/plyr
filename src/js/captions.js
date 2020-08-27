@@ -3,7 +3,6 @@
 // TODO: Create as class
 // ==========================================================================
 
-import controls from './controls';
 import support from './support';
 import { dedupe } from './utils/arrays';
 import browser from './utils/browser';
@@ -38,7 +37,7 @@ const captions = {
         this.config.controls.includes('settings') &&
         this.config.settings.includes('captions')
       ) {
-        controls.setCaptionsMenu.call(this);
+        this.setCaptionsMenu.call(this);
       }
 
       return;
@@ -162,7 +161,7 @@ const captions = {
       this.config.controls.includes('settings') &&
       this.config.settings.includes('captions')
     ) {
-      controls.setCaptionsMenu.call(this);
+      this.setCaptionsMenu.call(this);
     }
   },
 
@@ -212,7 +211,7 @@ const captions = {
       this.captions.toggled = active;
 
       // Update settings menu
-      controls.updateSetting.call(this, 'captions');
+      this.updateSetting.call(this, 'captions');
 
       // Trigger event (not used internally)
       triggerEvent.call(this, this.media, active ? 'captionsenabled' : 'captionsdisabled');
@@ -257,7 +256,7 @@ const captions = {
       this.captions.currentTrackNode = track;
 
       // Update settings menu
-      controls.updateSetting.call(this, 'captions');
+      this.updateSetting.call(this, 'captions');
 
       // When passive, don't override user preferences
       if (!passive) {

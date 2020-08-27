@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <title></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <link href="./plyr.css" rel="stylesheet" />
+    <script src="./plyr.min.js"></script>
+  </head>
+
+  <body>
+    <video id="PlyrPlayer" autoplay crossorigin playsinline muted></video>
+
+    <script>
+      const videoSrc =
+        'https://multiplatform-f.akamaihd.net/i/multi/april11/hdworld/hdworld_,512x288_450_b,640x360_700_b,768x432_1000_b,1024x576_1400_m,.mp4.csmil/master.m3u8';
+      window.PlyrPlayer = new Plyr(document.getElementById('PlyrPlayer'), { src: videoSrc });
+    </script>
+  </body>
+</html>

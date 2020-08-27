@@ -114,7 +114,7 @@ const defaults = {
   fullscreen: {
     enabled: true, // Allow fullscreen?
     fallback: true, // Fallback using full viewport/window
-    iosNative: false, // Use the native fullscreen in iOS (disables custom controls)
+    iosNative: true, // Use the native fullscreen in iOS (disables custom controls)
     // Selector for the fullscreen container so contextual / non-player content can remain visible in fullscreen mode
     // Non-ancestors of the player element will be ignored
     // container: null, // defaults to the player element
@@ -133,11 +133,11 @@ const defaults = {
     // 'rewind',
     'play',
     // 'fast-forward',
-    'progress',
-    'current-time',
     // 'duration',
     'mute',
     'volume',
+    'current-time',
+    'progress',
     'captions',
     'settings',
     'pip',
@@ -149,6 +149,7 @@ const defaults = {
 
   // Localisation
   i18n: {
+    auto: 'Auto',
     restart: 'Restart',
     rewind: 'Rewind {seektime}s',
     play: 'Play',
@@ -194,8 +195,20 @@ const defaults = {
     },
   },
 
+  // Buffer
+  buffer: {
+    maxBufferLength: 10, // 10 forward
+    maxMaxBufferLength: 60, // 60s total
+  },
+
   // URLs
   urls: {
+    hlsjs: {
+      sdk: 'https://cdn.jsdelivr.net/npm/hls.js@0.14.10/dist/hls.min.js',
+    },
+    dashjs: {
+      sdk: 'https://cdn.jsdelivr.net/npm/dashjs@3.1.2/dist/dash.all.min.js',
+    },
     download: null,
     vimeo: {
       sdk: 'https://player.vimeo.com/api/player.js',

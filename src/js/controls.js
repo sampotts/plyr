@@ -863,6 +863,10 @@ const controls = {
 
       case 'quality':
         if (is.number(value)) {
+          if (value === -1) {
+            return i18n.get('auto', this.config);
+          }
+
           const label = i18n.get(`qualityLabel.${value}`, this.config);
 
           if (!label.length) {
@@ -1275,7 +1279,7 @@ const controls = {
     const defaultAttributes = { class: 'plyr__controls__item' };
 
     // Loop through controls in order
-    dedupe(is.array(this.config.controls) ? this.config.controls: []).forEach(control => {
+    dedupe(is.array(this.config.controls) ? this.config.controls : []).forEach(control => {
       // Restart button
       if (control === 'restart') {
         container.appendChild(createButton.call(this, 'restart', defaultAttributes));

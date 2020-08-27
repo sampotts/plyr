@@ -68,14 +68,15 @@ const tasks = {
   css: [],
   js: [],
   sprite: [],
+  static: [],
 };
 
 // Size plugin
 const sizeOptions = { showFiles: true, gzip: true };
 
 // Clean out /dist
-gulp.task('clean', done => {
-  const dirs = [paths.plyr.output, paths.demo.output].map(dir => path.join(dir, '**/*'));
+gulp.task('clean', (done) => {
+  const dirs = [paths.plyr.output, paths.demo.output].map((dir) => path.join(dir, '**/*'));
 
   // Don't delete the mp4
   dirs.push(`!${path.join(paths.plyr.output, '**/*.mp4')}`);
@@ -85,11 +86,22 @@ gulp.task('clean', done => {
   done();
 });
 
+// Copy static libs & media
+Object.entries(build.static).forEach(([filename, entry]) => {
+  const { dist, src } = entry;
+  const name = `static:${filename}`;
+  tasks.static.push(name);
+
+  gulp.task(name, () => {
+    return gulp.src(src).pipe(gulp.dest(dist));
+  });
+});
+
 // JavaScript
 Object.entries(build.js).forEach(([filename, entry]) => {
   const { dist, formats, namespace, polyfill, src } = entry;
 
-  formats.forEach(format => {
+  formats.forEach((format) => {
     const name = `js:${filename}:${format}`;
     const extension = format === 'es' ? 'mjs' : 'js';
     tasks.js.push(name);
@@ -187,6 +199,7 @@ Object.entries(build.sprite).forEach(([filename, entry]) => {
 });
 
 // Build all tasks
+gulp.task('static', gulp.parallel(...tasks.static));
 gulp.task('js', gulp.parallel(...tasks.js));
 gulp.task('css', gulp.parallel(...tasks.css));
 gulp.task('sprites', gulp.parallel(...tasks.sprite));
@@ -216,7 +229,7 @@ gulp.task('serve', () =>
 );
 
 // Build distribution
-gulp.task('build', gulp.series('clean', gulp.parallel('js', 'css', 'sprites')));
+gulp.task('build', gulp.series('clean', gulp.parallel('static', 'js', 'css', 'sprites')));
 
 // Default gulp task
 gulp.task('default', gulp.series('build', gulp.parallel('serve', 'watch')));

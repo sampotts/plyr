@@ -1,0 +1,64 @@
+
+.plyr__progress__buffer {
+    -webkit-appearance: none; /* stylelint-disable-line */
+    background: transparent;
+    border: 0;
+    border-radius: 100px;
+    height: 3px;
+    left: 0;
+    margin-top: calc((#{$plyr-range-track-height} / 2) * -1);
+    padding: 0;
+    position: absolute;
+    top: 50%;
+  
+    &::-webkit-progress-bar {
+      background: transparent;
+    }
+  
+    &::-webkit-progress-value {
+      background: currentColor;
+      border-radius: 100px;
+      min-width: $plyr-range-track-height;
+      transition: width 0.2s ease;
+    }
+  
+    // Mozilla
+    &::-moz-progress-bar {
+      background: currentColor;
+      border-radius: 100px;
+      min-width: $plyr-range-track-height;
+      transition: width 0.2s ease;
+    }
+  
+    // Microsoft
+    &::-ms-fill {
+      border-radius: 100px;
+      transition: width 0.2s ease;
+    }
+  }
+
+.plyr__progress {
+    position: absolute;
+    left:  calc(#{$plyr-control-spacing} * 2);
+    margin-right: calc(#{$plyr-control-spacing} * 2);
+    bottom: calc(#{$plyr-control-spacing} * 4);
+    width: calc(100% - #{$plyr-control-spacing} * 4);
+  
+    input[type='range'],
+    &__buffer {
+      margin-left: calc(#{$plyr-progress-offset} * -0.5);
+      margin-right: calc(#{$plyr-progress-offset} * -0.5);
+      width: calc(100% + #{$plyr-progress-offset});
+    }
+  
+    input[type='range'] {
+      position: relative;
+      z-index: 2;
+    }
+  
+    // Seek tooltip to show time
+    .plyr__tooltip {
+      font-size: $plyr-font-size-time;
+      left: 0;
+    }
+  }
