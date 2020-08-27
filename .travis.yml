@@ -1,8 +1,12 @@
+sudo: false
 language: node_js
-node_js: lts/*
-
-script:
-- bash .travis/prevent-base-master.sh
-- bash .travis/omit-dist.sh
-- npm run lint
-- npm run build
+node_js:
+  - '8'
+  - '10'
+  - '12'
+  - '14'
+cache:
+  directories:
+    - node_modules
+before_install: if [[ `npm -v` != 6* ]]; then npm i -g npm@6; fi
+script: npm run build
