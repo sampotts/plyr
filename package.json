@@ -21,6 +21,9 @@
     "HLS"
   ],
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com/sampotts/plyr.git"
