@@ -1,9 +1,9 @@
 {
   "name": "ddplayer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A simple, accessible and customizable HTML5, YouTube and Vimeo media player",
-  "homepage": "https://plyr.io",
-  "author": "Sam Potts <sam@potts.es>",
+  "homepage": "https://github.com/leduong/ddplayer",
+  "author": "Duong Le <me@leduong.com>",
   "main": "dist/plyr.js",
   "types": "src/js/plyr.d.ts",
   "module": "dist/plyr.min.mjs",
@@ -26,10 +26,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/sampotts/plyr.git"
+    "url": "git://github.com/leduong/ddplayer.git"
   },
   "bugs": {
-    "url": "https://github.com/sampotts/plyr/issues"
+    "url": "https://github.com/leduong/ddplayer/issues"
   },
   "browserslist": "> 1%",
   "scripts": {
