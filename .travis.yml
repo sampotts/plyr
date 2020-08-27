@@ -9,3 +9,16 @@ cache:
     - node_modules
 before_install: if [[ `npm -v` != 6* ]]; then npm i -g npm@6; fi
 script: npm run build
+
+jobs:
+  - stage: npm release
+    node_js: '12'
+    script: npm run build
+    deploy:
+      provider: npm
+      skip_cleanup: true
+      on:
+        branch: release/*
+      email: me@leduong.com
+      api_key:
+        secure: fRe4MbBvv/ufs+SWBgaEUfTFD6eO4FgVWxVyOPAGOUL1l7h1X/GYMEm3nWNLftu8+AfAujx62YWYQi/vm0PRqofs3DKLTtpsSLVgCpzEncNX+2N67kaVZDSlYGhXpbQ5d1nDjqwnzKhkcFQAZhlSVgtSI7oGz8Zii9mnEqGEA3RYJ9dPL+2BRDVU6M83KfbACNqq/N1mSZZI59X2vUoXdHHgpCvziW/lCQ6piUmKUeui0LadwRFeB2GYt6FkCCXweIj+mXiTduv/xBw1eaOVilWs2FUOlT1nCmSDJE4DE/LE/b0+vBG0nOW7j22kv72jmBEBTI1aiXnuXUr1d7XqsHfGOzW7/61m3QjxqXN/F05Ne0OUjtDqu2qNz/gba90GgmcU/DNYw0JEY1fcNxRQQtnNmm7VChEPumLFZo2UnFfi7zNFPGIAbBQQN5uVOZTwU1eTUH6CtcAGI7I38pWRD17k7BhIQMTyLq5TKqEt5iwJIoejy/IA7jcgpxbirALR1jmiiGhlRoz8A+7F0sxOBgmutAO2I/xYkACdu06MDL1r9Gi9D5oiNVgKKT2JjiGiRBWp+vgCZl469TUYRA7fTz/yhBjLnDpt3uGvsVgsb8wYgPQN0XNmT2kKRMvpRMrT8ntTgDReMLndp+bhkVhOaBp76nsoTdm22g5gbBy6vU8=
