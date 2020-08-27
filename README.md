@@ -62,6 +62,27 @@ Plyr extends upon the standard [HTML5 media element](https://developer.mozilla.o
 
 For YouTube and Vimeo players, Plyr uses progressive enhancement to enhance the default `<iframe>` embeds. Below are some examples. The `plyr__video-embed` classname will make the embed responsive. You can add the `autoplay`, `loop`, `hl` (YouTube only) and `playsinline` (YouTube only) query parameters to the URL and they will be set as config options automatically. For YouTube, the `origin` should be updated to reflect the domain you're hosting the embed on, or you can opt to omit it.
 
+### DASHjs or HLSjs
+```html
+<video id="player" autoplay crossorigin playsinline muted></video>
+
+<script>
+  const videoSrc = 'https://dash.akamaized.net/envivio/EnvivioDash3/manifest.mpd';
+  window.PlyrPlayer = new Plyr('#player', { src: videoSrc });
+</script>
+```
+
+```html
+<video id="player" autoplay crossorigin playsinline muted></video>
+
+<script>
+  const videoSrc =
+    'https://multiplatform-f.akamaihd.net/i/multi/april11/hdworld/hdworld_,512x288_450_b,640x360_700_b,768x432_1000_b,1024x576_1400_m,.mp4.csmil/master.m3u8';
+  window.PlyrPlayer = new Plyr('#player', { src: videoSrc });
+</script>
+```
+
+
 ### YouTube
 
 We recommend [progressive enhancement](https://www.smashingmagazine.com/2009/04/progressive-enhancement-what-it-is-and-how-to-use-it/) with the embedded players. You can elect to use an `<iframe>` as the source element (which Plyr will progressively enhance) or a bog standard `<div>` with two essential data attributes - `data-plyr-provider` and `data-plyr-embed-id`.
