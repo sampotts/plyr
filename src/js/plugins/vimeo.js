@@ -58,7 +58,7 @@ const vimeo = {
         .then(() => {
           vimeo.ready.call(player);
         })
-        .catch(error => {
+        .catch((error) => {
           player.debug.warn('Vimeo SDK (player.js) failed to load', error);
         });
     } else {
@@ -123,7 +123,7 @@ const vimeo = {
     }
 
     // Get poster image
-    fetch(format(player.config.urls.vimeo.api, id), 'json').then(response => {
+    fetch(format(player.config.urls.vimeo.api, id), 'json').then((response) => {
       if (is.empty(response)) {
         return;
       }
@@ -269,11 +269,11 @@ const vimeo = {
     let currentSrc;
     player.embed
       .getVideoUrl()
-      .then(value => {
+      .then((value) => {
         currentSrc = value;
         controls.setDownloadUrl.call(player);
       })
-      .catch(error => {
+      .catch((error) => {
         this.debug.warn(error);
       });
 
@@ -291,49 +291,49 @@ const vimeo = {
     });
 
     // Set aspect ratio based on video size
-    Promise.all([player.embed.getVideoWidth(), player.embed.getVideoHeight()]).then(dimensions => {
+    Promise.all([player.embed.getVideoWidth(), player.embed.getVideoHeight()]).then((dimensions) => {
       const [width, height] = dimensions;
       player.embed.ratio = [width, height];
       setAspectRatio.call(this);
     });
 
     // Set autopause
-    player.embed.setAutopause(player.config.autopause).then(state => {
+    player.embed.setAutopause(player.config.autopause).then((state) => {
       player.config.autopause = state;
     });
 
     // Get title
-    player.embed.getVideoTitle().then(title => {
+    player.embed.getVideoTitle().then((title) => {
       player.config.title = title;
       ui.setTitle.call(this);
     });
 
     // Get current time
-    player.embed.getCurrentTime().then(value => {
+    player.embed.getCurrentTime().then((value) => {
       currentTime = value;
       triggerEvent.call(player, player.media, 'timeupdate');
     });
 
     // Get duration
-    player.embed.getDuration().then(value => {
+    player.embed.getDuration().then((value) => {
       player.media.duration = value;
       triggerEvent.call(player, player.media, 'durationchange');
     });
 
     // Get captions
-    player.embed.getTextTracks().then(tracks => {
+    player.embed.getTextTracks().then((tracks) => {
       player.media.textTracks = tracks;
       captions.setup.call(player);
     });
 
     player.embed.on('cuechange', ({ cues = [] }) => {
-      const strippedCues = cues.map(cue => stripHTML(cue.text));
+      const strippedCues = cues.map((cue) => stripHTML(cue.text));
       captions.updateCues.call(player, strippedCues);
     });
 
     player.embed.on('loaded', () => {
       // Assure state and events are updated on autoplay
-      player.embed.getPaused().then(paused => {
+      player.embed.getPaused().then((paused) => {
         assurePlaybackState.call(player, !paused);
         if (!paused) {
           triggerEvent.call(player, player.media, 'playing');
@@ -366,13 +366,13 @@ const vimeo = {
       assurePlaybackState.call(player, false);
     });
 
-    player.embed.on('timeupdate', data => {
+    player.embed.on('timeupdate', (data) => {
       player.media.seeking = false;
       currentTime = data.seconds;
       triggerEvent.call(player, player.media, 'timeupdate');
     });
 
-    player.embed.on('progress', data => {
+    player.embed.on('progress', (data) => {
       player.media.buffered = data.percent;
       triggerEvent.call(player, player.media, 'progress');
 
@@ -383,7 +383,7 @@ const vimeo = {
 
       // Get duration as if we do it before load, it gives an incorrect value
       // https://github.com/sampotts/plyr/issues/891
-      player.embed.getDuration().then(value => {
+      player.embed.getDuration().then((value) => {
         if (value !== player.media.duration) {
           player.media.duration = value;
           triggerEvent.call(player, player.media, 'durationchange');
@@ -401,7 +401,7 @@ const vimeo = {
       triggerEvent.call(player, player.media, 'ended');
     });
 
-    player.embed.on('error', detail => {
+    player.embed.on('error', (detail) => {
       player.media.error = detail;
       triggerEvent.call(player, player.media, 'error');
     });

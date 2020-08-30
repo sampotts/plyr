@@ -27,7 +27,7 @@ export function reduceAspectRatio(ratio) {
 }
 
 export function getAspectRatio(input) {
-  const parse = ratio => (validateRatio(ratio) ? ratio.split(':').map(Number) : null);
+  const parse = (ratio) => (validateRatio(ratio) ? ratio.split(':').map(Number) : null);
   // Try provided ratio
   let ratio = parse(input);
 
@@ -68,7 +68,7 @@ export function setAspectRatio(input) {
     const height = (100 / this.media.offsetWidth) * parseInt(window.getComputedStyle(this.media).paddingBottom, 10);
     const offset = (height - padding) / (height / 50);
 
-    if(this.fullscreen.active) {
+    if (this.fullscreen.active) {
       wrapper.style.paddingBottom = null;
     } else {
       this.media.style.transform = `translateY(-${offset}%)`;

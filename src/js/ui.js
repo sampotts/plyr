@@ -135,7 +135,7 @@ const ui = {
     }
 
     // If there's a play button, set label
-    Array.from(this.elements.buttons.play || []).forEach(button => {
+    Array.from(this.elements.buttons.play || []).forEach((button) => {
       button.setAttribute('aria-label', label);
     });
 
@@ -178,7 +178,7 @@ const ui = {
         .call(this)
         // Load image
         .then(() => loadImage(poster))
-        .catch(err => {
+        .catch((err) => {
           // Hide poster on error unless it's been set by another call
           if (poster === this.poster) {
             ui.togglePoster.call(this, false);
@@ -214,7 +214,7 @@ const ui = {
     toggleClass(this.elements.container, this.config.classNames.stopped, this.stopped);
 
     // Set state
-    Array.from(this.elements.buttons.play || []).forEach(target => {
+    Array.from(this.elements.buttons.play || []).forEach((target) => {
       Object.assign(target, { pressed: this.playing });
       target.setAttribute('aria-label', i18n.get(this.playing ? 'pause' : 'play', this.config));
     });
@@ -270,8 +270,8 @@ const ui = {
     // Loop through values (as they are the keys when the object is spread 🤔)
     Object.values({ ...this.media.style })
       // We're only fussed about Plyr specific properties
-      .filter(key => !is.empty(key) && is.string(key) && key.startsWith('--plyr'))
-      .forEach(key => {
+      .filter((key) => !is.empty(key) && is.string(key) && key.startsWith('--plyr'))
+      .forEach((key) => {
         // Set on the container
         this.elements.container.style.setProperty(key, this.media.style.getPropertyValue(key));
 

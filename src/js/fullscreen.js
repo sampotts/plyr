@@ -5,7 +5,7 @@
 // ==========================================================================
 
 import browser from './utils/browser';
-import { closest,getElements, hasClass, toggleClass } from './utils/elements';
+import { closest, getElements, hasClass, toggleClass } from './utils/elements';
 import { on, triggerEvent } from './utils/events';
 import is from './utils/is';
 import { silencePromise } from './utils/promise';
@@ -43,7 +43,7 @@ class Fullscreen {
     );
 
     // Fullscreen toggle on double click
-    on.call(this.player, this.player.elements.container, 'dblclick', event => {
+    on.call(this.player, this.player.elements.container, 'dblclick', (event) => {
       // Ignore double click in controls
       if (is.element(this.player.elements.controls) && this.player.elements.controls.contains(event.target)) {
         return;
@@ -53,7 +53,7 @@ class Fullscreen {
     });
 
     // Tap focus when in fullscreen
-    on.call(this, this.player.elements.container, 'keydown', event => this.trapFocus(event));
+    on.call(this, this.player.elements.container, 'keydown', (event) => this.trapFocus(event));
 
     // Update the UI
     this.update();
@@ -85,7 +85,7 @@ class Fullscreen {
     let value = '';
     const prefixes = ['webkit', 'moz', 'ms'];
 
-    prefixes.some(pre => {
+    prefixes.some((pre) => {
       if (is.function(document[`${pre}ExitFullscreen`]) || is.function(document[`${pre}CancelFullScreen`])) {
         value = pre;
         return true;
@@ -191,7 +191,7 @@ class Fullscreen {
       } else if (this.cleanupViewport) {
         viewport.content = viewport.content
           .split(',')
-          .filter(part => part.trim() !== property)
+          .filter((part) => part.trim() !== property)
           .join(',');
       }
     }
