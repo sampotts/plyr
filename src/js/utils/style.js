@@ -68,7 +68,11 @@ export function setAspectRatio(input) {
     const height = (100 / this.media.offsetWidth) * parseInt(window.getComputedStyle(this.media).paddingBottom, 10);
     const offset = (height - padding) / (height / 50);
 
-    this.media.style.transform = `translateY(-${offset}%)`;
+    if(this.fullscreen.active) {
+      wrapper.style.paddingBottom = null;
+    } else {
+      this.media.style.transform = `translateY(-${offset}%)`;
+    }
   } else if (this.isHTML5) {
     wrapper.classList.toggle(this.config.classNames.videoFixedRatio, ratio !== null);
   }
