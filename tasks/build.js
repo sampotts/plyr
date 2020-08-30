@@ -30,6 +30,7 @@ const plumber = require('gulp-plumber');
 const size = require('gulp-size');
 const sourcemaps = require('gulp-sourcemaps');
 const browserSync = require('browser-sync').create();
+const gulpIf = require('gulp-if');
 // Configs
 const build = require('../build.json');
 // Info from package
@@ -128,7 +129,7 @@ Object.entries(build.js).forEach(([filename, entry]) => {
             },
           ),
         )
-        .pipe(header('typeof navigator === "object" && ')) // "Support" SSR (#935)
+        .pipe(gulpIf(() => extension !== 'mjs', header('typeof navigator === "object" && '))) // "Support" SSR (#935)
         .pipe(
           rename({
             extname: `.${extension}`,
