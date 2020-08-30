@@ -12,6 +12,7 @@ import { getProviderByUrl, providers, types } from './config/types';
 import Console from './console';
 import controls from './controls';
 import Fullscreen from './fullscreen';
+import html5 from './html5';
 import Listeners from './listeners';
 import media from './media';
 import Ads from './plugins/ads';
@@ -1054,7 +1055,12 @@ class Plyr {
       const hiding = toggleClass(this.elements.container, this.config.classNames.hideControls, force);
 
       // Close menu
-      if (hiding && is.array(this.config.controls) && this.config.controls.includes('settings') && !is.empty(this.config.settings)) {
+      if (
+        hiding &&
+        is.array(this.config.controls) &&
+        this.config.controls.includes('settings') &&
+        !is.empty(this.config.settings)
+      ) {
         controls.toggleMenu.call(this, false);
       }
 
@@ -1139,6 +1145,9 @@ class Plyr {
       } else {
         // Unbind listeners
         unbindListeners.call(this);
+
+        // Cancel current network requests
+        html5.cancelRequests.call(this);
 
         // Replace the container with the original element provided
         replaceElement(this.elements.original, this.elements.container);
