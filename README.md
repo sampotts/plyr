@@ -835,6 +835,7 @@ Plyr costs money to run, not only my time. I donate my time for free as I enjoy 
 - [@halfhalftravel](https://www.halfhalftravel.com/)
 - [BitChute](https://www.bitchute.com)
 - [Rutheneum-Bote](https://gymnasium-rutheneum.de/content/newspaper/kreativwettbewerb.php)
+- [pressakey.com | Blog-Magazin für Videospiele](https://pressakey.com)
 
 If you want to be added to the list, open a pull request. It'd be awesome to see how you're using Plyr 😎
 
