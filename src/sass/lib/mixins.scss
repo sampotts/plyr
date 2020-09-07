@@ -83,11 +83,4 @@
   &.ggs-plyr--hide-controls {
     cursor: none;
   }
-
-  // Large captions in full screen on larger screens
-  @media (min-width: $plyr-bp-lg) {
-    .ggs-plyr__captions {
-      font-size: $plyr-font-size-captions-large;
-    }
-  }
 }
