@@ -56,9 +56,9 @@
 .ggs-plyr [data-plyr='fullscreen'] {
   display: none;
 }
-.plyr--captions-enabled [data-plyr='captions'],
-.plyr--pip-supported [data-plyr='pip'],
-.plyr--airplay-supported [data-plyr='airplay'],
-.plyr--fullscreen-enabled [data-plyr='fullscreen'] {
+.ggs-plyr--captions-enabled [data-plyr='captions'],
+.ggs-plyr--pip-supported [data-plyr='pip'],
+.ggs-plyr--airplay-supported [data-plyr='airplay'],
+.ggs-plyr--fullscreen-enabled [data-plyr='fullscreen'] {
   display: inline-block;
 }

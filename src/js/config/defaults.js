@@ -365,20 +365,20 @@ const defaults = {
       open: 'plyr--menu-open',
     },
     captions: {
-      enabled: 'plyr--captions-enabled',
-      active: 'plyr--captions-active',
+      enabled: 'ggs-plyr--captions-enabled',
+      active: 'ggs-plyr--captions-active',
     },
     fullscreen: {
-      enabled: 'plyr--fullscreen-enabled',
-      fallback: 'plyr--fullscreen-fallback',
+      enabled: 'ggs-plyr--fullscreen-enabled',
+      fallback: 'ggs-plyr--fullscreen-fallback',
     },
     pip: {
-      supported: 'plyr--pip-supported',
-      active: 'plyr--pip-active',
+      supported: 'ggs-plyr--pip-supported',
+      active: 'ggs-plyr--pip-active',
     },
     airplay: {
-      supported: 'plyr--airplay-supported',
-      active: 'plyr--airplay-active',
+      supported: 'ggs-plyr--airplay-supported',
+      active: 'ggs-plyr--airplay-active',
     },
     tabFocus: 'plyr__tab-focus',
     previewThumbnails: {

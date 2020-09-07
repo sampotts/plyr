@@ -22,7 +22,7 @@
 }
 
 // Fallback for unsupported browsers
-.plyr--fullscreen-fallback {
+.ggs-plyr--fullscreen-fallback {
   @include plyr-fullscreen-active();
   bottom: 0;
   display: block;
