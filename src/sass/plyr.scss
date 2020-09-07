@@ -5,48 +5,50 @@
 // ==========================================================================
 @charset 'UTF-8';
 
-@import 'lib/css-vars';
-$css-vars-use-native: true;
+.ggsi {
+  @import 'lib/css-vars';
+  $css-vars-use-native: true;
 
-@import 'settings/breakpoints';
-@import 'settings/colors';
-@import 'settings/cosmetics';
-@import 'settings/type';
+  @import 'settings/breakpoints';
+  @import 'settings/colors';
+  @import 'settings/cosmetics';
+  @import 'settings/type';
 
-@import 'settings/badges';
-@import 'settings/captions';
-@import 'settings/controls';
-@import 'settings/helpers';
-@import 'settings/menus';
-@import 'settings/progress';
-@import 'settings/sliders';
-@import 'settings/tooltips';
+  @import 'settings/badges';
+  @import 'settings/captions';
+  @import 'settings/controls';
+  @import 'settings/helpers';
+  @import 'settings/menus';
+  @import 'settings/progress';
+  @import 'settings/sliders';
+  @import 'settings/tooltips';
 
-@import 'lib/animation';
-@import 'lib/functions';
-@import 'lib/mixins';
+  @import 'lib/animation';
+  @import 'lib/functions';
+  @import 'lib/mixins';
 
-@import 'base';
+  @import 'base';
 
-@import 'components/badges';
-@import 'components/captions';
-@import 'components/control';
-@import 'components/controls';
-@import 'components/menus';
-@import 'components/sliders';
-@import 'components/poster';
-@import 'components/times';
-@import 'components/tooltips';
-@import 'components/progress';
-@import 'components/volume';
+  @import 'components/badges';
+  @import 'components/captions';
+  @import 'components/control';
+  @import 'components/controls';
+  @import 'components/menus';
+  @import 'components/sliders';
+  @import 'components/poster';
+  @import 'components/times';
+  @import 'components/tooltips';
+  @import 'components/progress';
+  @import 'components/volume';
 
-@import 'types/audio';
-@import 'types/video';
+  @import 'types/audio';
+  @import 'types/video';
 
-@import 'states/fullscreen';
+  @import 'states/fullscreen';
 
-@import 'plugins/ads';
-@import 'plugins/preview-thumbnails/index';
+  @import 'plugins/ads';
+  @import 'plugins/preview-thumbnails/index';
 
-@import 'utils/animation';
-@import 'utils/hidden';
+  @import 'utils/animation';
+  @import 'utils/hidden';
+}
