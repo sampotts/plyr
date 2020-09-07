@@ -41,7 +41,7 @@
 
 // Displaying
 .ggs-plyr .ggs-plyr__control:hover .plyr__tooltip,
-.ggs-plyr .ggs-plyr__control.plyr__tab-focus .plyr__tooltip,
+.ggs-plyr .ggs-plyr__control.ggs-plyr__tab-focus .plyr__tooltip,
 .plyr__tooltip--visible {
   opacity: 1;
   transform: translate(-50%, 0) scale(1);
@@ -81,7 +81,7 @@
 .ggs-plyr__controls > .ggs-plyr__control:first-child + .ggs-plyr__control,
 .ggs-plyr__controls > .ggs-plyr__control:last-child {
   &:hover .plyr__tooltip,
-  &.plyr__tab-focus .plyr__tooltip,
+  &.ggs-plyr__tab-focus .plyr__tooltip,
   .plyr__tooltip--visible {
     transform: translate(0, 0) scale(1);
   }

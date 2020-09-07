@@ -380,7 +380,7 @@ const defaults = {
       supported: 'ggs-plyr--airplay-supported',
       active: 'ggs-plyr--airplay-active',
     },
-    tabFocus: 'plyr__tab-focus',
+    tabFocus: 'ggs-plyr__tab-focus',
     previewThumbnails: {
       // Tooltip thumbs
       thumbContainer: 'plyr__preview-thumb',

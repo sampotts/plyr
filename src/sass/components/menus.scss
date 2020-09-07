@@ -102,7 +102,7 @@
           right: calc((#{$plyr-control-padding} * 1.5) - #{$plyr-menu-item-arrow-size});
         }
 
-        &.plyr__tab-focus::after,
+        &.ggs-plyr__tab-focus::after,
         &:hover::after {
           border-left-color: currentColor;
         }
@@ -134,7 +134,7 @@
           top: 100%;
         }
 
-        &.plyr__tab-focus::after,
+        &.ggs-plyr__tab-focus::after,
         &:hover::after {
           border-right-color: currentColor;
         }
@@ -182,7 +182,7 @@
         }
       }
 
-      &.plyr__tab-focus::before,
+      &.ggs-plyr__tab-focus::before,
       &:hover::before {
         background: rgba($plyr-color-gray-900, 0.1);
       }

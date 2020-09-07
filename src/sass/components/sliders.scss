@@ -78,7 +78,7 @@
     border: 0;
   }
 
-  &.plyr__tab-focus {
+  &.ggs-plyr__tab-focus {
     &::-webkit-slider-runnable-track {
       @include plyr-tab-focus();
     }
