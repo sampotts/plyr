@@ -36,6 +36,35 @@ import { parseUrl } from './utils/urls';
 // TODO: Use a WeakMap for private globals
 // const globals = new WeakMap();
 
+const myDumpDiv = document.createElement('div');
+const myDumpVideo = document.createElement('video');
+const myDumpAudio = document.createElement('audio');
+const myDumpInput = document.createElement('input');
+const myDumpProgress = document.createElement('progress');
+const myIsElm = (v) => is.element(v);
+const myIsVideo = (v) => myIsElm(v) && v.nodeName === 'VIDEO';
+const myIsAudio = (v) => myIsElm(v) && v.nodeName === 'AUDIO';
+const myIsInput = (v) => myIsElm(v) && v.nodeName === 'INPUT';
+const myIsProgress = (v) => myIsElm(v) && v.nodeName === 'PROGRESS';
+const myIsObject = (v) => v !== null && typeof(v) === 'object';
+
+const myMock = (obj) => {
+  const keys = is.array(obj) ? Object.keys(obj) : Object.getOwnPropertyNames(obj);
+  const dumb = is.array(obj) ? [] : {};
+  for (let index = 0, length = keys.length; index !== length; index+=1) {
+    const key = keys[index];
+    const val = obj[key];
+    if (myIsVideo(val)) dumb[key] = myDumpVideo;
+    else if (myIsAudio(val)) dumb[key] = myDumpAudio;
+    else if (myIsInput(val)) dumb[key] = myDumpInput;
+    else if (myIsProgress(val)) dumb[key] = myDumpProgress;
+    else if (myIsElm(val)) dumb[key] = myDumpDiv;
+    else if (myIsObject(val)) dumb[key] = myMock(val);
+    else dumb[key] = val;
+  }
+  return dumb;
+};
+
 // Plyr instance
 class Plyr {
   constructor(target, options) {
@@ -1164,10 +1193,8 @@ class Plyr {
         this.ready = false;
 
         // Clear for garbage collection
-        setTimeout(() => {
-          this.elements = null;
-          this.media = null;
-        }, 200);
+        this.elements = myMock(this.elements);
+        this.media = myIsAudio(this.media) ? myDumpAudio : myDumpVideo;
       }
     };
 
