@@ -2,12 +2,12 @@
 // Time
 // --------------------------------------------------------------
 
-.plyr__time {
+.ggs-plyr__time {
   font-size: $plyr-font-size-time;
 }
 
 // Media duration hidden on small screens
-.plyr__time + .plyr__time {
+.ggs-plyr__time + .ggs-plyr__time {
   // Add a slash in before
   &::before {
     content: '\2044';

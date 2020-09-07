@@ -32,13 +32,13 @@
       padding-left: calc(#{$plyr-control-spacing} / 4);
     }
 
-    &.plyr__time {
+    &.ggs-plyr__time {
       padding: 0 calc(#{$plyr-control-spacing} / 2);
     }
 
     &.plyr__progress__container:first-child,
-    &.plyr__time:first-child,
-    &.plyr__time + .plyr__time {
+    &.ggs-plyr__time:first-child,
+    &.ggs-plyr__time + .ggs-plyr__time {
       padding-left: 0;
     }
   }
