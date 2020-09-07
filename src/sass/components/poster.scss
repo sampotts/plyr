@@ -2,7 +2,7 @@
 // Faux poster overlay
 // --------------------------------------------------------------
 
-.plyr__poster {
+.ggs-plyr__poster {
   background-color: var(--plyr-video-background, $plyr-video-background);
   background-position: 50% 50%;
   background-repeat: no-repeat;
@@ -17,6 +17,6 @@
   z-index: 1;
 }
 
-.plyr--stopped.plyr__poster-enabled .plyr__poster {
+.ggs-plyr--stopped.ggs-plyr__poster-enabled .ggs-plyr__poster {
   opacity: 1;
 }

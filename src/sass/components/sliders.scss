@@ -2,7 +2,7 @@
 // Slider inputs - <input type="range">
 // --------------------------------------------------------------
 
-.plyr--full-ui input[type='range'] {
+.ggs-plyr--full-ui input[type='range'] {
   -webkit-appearance: none; /* stylelint-disable-line */
   background: transparent;
   border: 0;
@@ -18,23 +18,23 @@
   width: 100%;
 
   &::-webkit-slider-runnable-track {
-    @include plyr-range-track();
+    @include ggs-plyr-range-track();
     background-image: linear-gradient(to right, currentColor var(--value, 0%), transparent var(--value, 0%));
   }
 
   &::-webkit-slider-thumb {
-    @include plyr-range-thumb();
+    @include ggs-plyr-range-thumb();
     -webkit-appearance: none; /* stylelint-disable-line */
     margin-top: calc(((#{$plyr-range-thumb-height} - #{$plyr-range-track-height}) / 2) * -1);
   }
 
   // Mozilla
   &::-moz-range-track {
-    @include plyr-range-track();
+    @include ggs-plyr-range-track();
   }
 
   &::-moz-range-thumb {
-    @include plyr-range-thumb();
+    @include ggs-plyr-range-thumb();
   }
 
   &::-moz-range-progress {
@@ -45,22 +45,22 @@
 
   // Microsoft
   &::-ms-track {
-    @include plyr-range-track();
+    @include ggs-plyr-range-track();
     color: transparent;
   }
 
   &::-ms-fill-upper {
-    @include plyr-range-track();
+    @include ggs-plyr-range-track();
   }
 
   &::-ms-fill-lower {
-    @include plyr-range-track();
+    @include ggs-plyr-range-track();
 
     background: currentColor;
   }
 
   &::-ms-thumb {
-    @include plyr-range-thumb();
+    @include ggs-plyr-range-thumb();
     // For some reason, Edge uses the -webkit margin above
     margin-top: 0;
   }
@@ -80,15 +80,15 @@
 
   &.ggs-plyr__tab-focus {
     &::-webkit-slider-runnable-track {
-      @include plyr-tab-focus();
+      @include ggs-plyr-tab-focus();
     }
 
     &::-moz-range-track {
-      @include plyr-tab-focus();
+      @include ggs-plyr-tab-focus();
     }
 
     &::-ms-track {
-      @include plyr-tab-focus();
+      @include ggs-plyr-tab-focus();
     }
   }
 }

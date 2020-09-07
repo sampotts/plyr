@@ -333,7 +333,7 @@ class PreviewThumbnails {
       this.player.elements.progress.appendChild(this.elements.thumb.container);
     }
 
-    // Create HTML element: plyr__preview-scrubbing-container
+    // Create HTML element: ggs-plyr__preview-scrubbing-container
     this.elements.scrubbing.container = createElement('div', {
       class: this.player.config.classNames.previewThumbnails.scrubbingContainer,
     });

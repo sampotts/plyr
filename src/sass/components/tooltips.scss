@@ -2,7 +2,7 @@
 // Tooltips
 // --------------------------------------------------------------
 
-.plyr__tooltip {
+.ggs-plyr__tooltip {
   background: $plyr-tooltip-background;
   border-radius: $plyr-tooltip-radius;
   bottom: 100%;
@@ -40,20 +40,20 @@
 }
 
 // Displaying
-.ggs-plyr .ggs-plyr__control:hover .plyr__tooltip,
-.ggs-plyr .ggs-plyr__control.ggs-plyr__tab-focus .plyr__tooltip,
-.plyr__tooltip--visible {
+.ggs-plyr .ggs-plyr__control:hover .ggs-plyr__tooltip,
+.ggs-plyr .ggs-plyr__control.ggs-plyr__tab-focus .ggs-plyr__tooltip,
+.ggs-plyr__tooltip--visible {
   opacity: 1;
   transform: translate(-50%, 0) scale(1);
 }
 
-.ggs-plyr .ggs-plyr__control:hover .plyr__tooltip {
+.ggs-plyr .ggs-plyr__control:hover .ggs-plyr__tooltip {
   z-index: 3;
 }
 
 // First tooltip
-.ggs-plyr__controls > .ggs-plyr__control:first-child .plyr__tooltip,
-.ggs-plyr__controls > .ggs-plyr__control:first-child + .ggs-plyr__control .plyr__tooltip {
+.ggs-plyr__controls > .ggs-plyr__control:first-child .ggs-plyr__tooltip,
+.ggs-plyr__controls > .ggs-plyr__control:first-child + .ggs-plyr__control .ggs-plyr__tooltip {
   left: 0;
   transform: translate(0, 10px) scale(0.8);
   transform-origin: 0 100%;
@@ -64,7 +64,7 @@
 }
 
 // Last tooltip
-.ggs-plyr__controls > .ggs-plyr__control:last-child .plyr__tooltip {
+.ggs-plyr__controls > .ggs-plyr__control:last-child .ggs-plyr__tooltip {
   left: auto;
   right: 0;
   transform: translate(0, 10px) scale(0.8);
@@ -80,9 +80,9 @@
 .ggs-plyr__controls > .ggs-plyr__control:first-child,
 .ggs-plyr__controls > .ggs-plyr__control:first-child + .ggs-plyr__control,
 .ggs-plyr__controls > .ggs-plyr__control:last-child {
-  &:hover .plyr__tooltip,
-  &.ggs-plyr__tab-focus .plyr__tooltip,
-  .plyr__tooltip--visible {
+  &:hover .ggs-plyr__tooltip,
+  &.ggs-plyr__tab-focus .ggs-plyr__tooltip,
+  .ggs-plyr__tooltip--visible {
     transform: translate(0, 0) scale(1);
   }
 }

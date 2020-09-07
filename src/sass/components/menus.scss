@@ -16,14 +16,14 @@
     }
 
     // Hide tooltip
-    .plyr__tooltip {
+    .ggs-plyr__tooltip {
       display: none;
     }
   }
 
   // The actual menu container
   &__container {
-    animation: plyr-popup 0.2s ease;
+    animation: ggs-plyr-popup 0.2s ease;
     background: $plyr-menu-background;
     border-radius: 4px;
     bottom: 100%;

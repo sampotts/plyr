@@ -64,12 +64,12 @@ import toggleClass from './toggle-class';
       toggleClass(document.querySelector(`[data-source="${type}"]`), 'active', true);
 
       // Show cite
-      Array.from(document.querySelectorAll('.plyr__cite')).forEach((cite) => {
+      Array.from(document.querySelectorAll('.ggs-plyr__cite')).forEach((cite) => {
         // eslint-disable-next-line no-param-reassign
         cite.hidden = true;
       });
 
-      document.querySelector(`.plyr__cite--${type}`).hidden = false;
+      document.querySelector(`.ggs-plyr__cite--${type}`).hidden = false;
     }
 
     // Set a new source

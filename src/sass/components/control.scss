@@ -29,7 +29,7 @@
 
   // Tab focus
   &.ggs-plyr__tab-focus {
-    @include plyr-tab-focus();
+    @include ggs-plyr-tab-focus();
   }
 }
 

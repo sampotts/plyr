@@ -3,16 +3,16 @@
 // --------------------------------------------------------------
 
 // Container
-.plyr--video {
+.ggs-plyr--video {
   background: var(--plyr-video-background, $plyr-video-background);
   overflow: hidden;
 
-  &.plyr--menu-open {
+  &.ggs-plyr--menu-open {
     overflow: visible;
   }
 }
 
-.plyr__video-wrapper {
+.ggs-plyr__video-wrapper {
   background: var(--plyr-video-background, $plyr-video-background);
   height: 100%;
   margin: auto;
@@ -24,14 +24,14 @@
 // Default to 16:9 ratio but this is set by JavaScript based on config
 $embed-padding: ((100 / 16) * 9);
 
-.plyr__video-embed,
-.plyr__video-wrapper--fixed-ratio {
+.ggs-plyr__video-embed,
+.ggs-plyr__video-wrapper--fixed-ratio {
   height: 0;
   padding-bottom: to-percentage($embed-padding);
 }
 
-.plyr__video-embed iframe,
-.plyr__video-wrapper--fixed-ratio video {
+.ggs-plyr__video-embed iframe,
+.ggs-plyr__video-wrapper--fixed-ratio video {
   border: 0;
   left: 0;
   position: absolute;
@@ -39,12 +39,12 @@ $embed-padding: ((100 / 16) * 9);
 }
 
 // If the full custom UI is supported
-.plyr--full-ui .plyr__video-embed {
+.ggs-plyr--full-ui .ggs-plyr__video-embed {
   $height: 240;
   $offset: to-percentage(($height - $embed-padding) / ($height / 50));
 
   // Only used for Vimeo
-  > .plyr__video-embed__container {
+  > .ggs-plyr__video-embed__container {
     padding-bottom: to-percentage($height);
     position: relative;
     transform: translateY(-$offset);
@@ -52,7 +52,7 @@ $embed-padding: ((100 / 16) * 9);
 }
 
 // Controls container
-.plyr--video .ggs-plyr__controls {
+.ggs-plyr--video .ggs-plyr__controls {
   background: $plyr-video-controls-background;
   border-bottom-left-radius: inherit;
   border-bottom-right-radius: inherit;
@@ -73,14 +73,14 @@ $embed-padding: ((100 / 16) * 9);
 }
 
 // Hide controls
-.plyr--video.plyr--hide-controls .ggs-plyr__controls {
+.ggs-plyr--video.ggs-plyr--hide-controls .ggs-plyr__controls {
   opacity: 0;
   pointer-events: none;
   transform: translateY(100%);
 }
 
 // Control elements
-.plyr--video .ggs-plyr__control {
+.ggs-plyr--video .ggs-plyr__control {
   // Hover and tab focus
   &.ggs-plyr__tab-focus,
   &:hover,
@@ -118,17 +118,17 @@ $embed-padding: ((100 / 16) * 9);
   }
 }
 
-.plyr--playing .ggs-plyr__control--overlaid {
+.ggs-plyr--playing .ggs-plyr__control--overlaid {
   opacity: 0;
   visibility: hidden;
 }
 
-.plyr--full-ui.plyr--video .ggs-plyr__control--overlaid {
+.ggs-plyr--full-ui.ggs-plyr--video .ggs-plyr__control--overlaid {
   display: block;
 }
 
 // Video range inputs
-.plyr--full-ui.plyr--video input[type='range'] {
+.ggs-plyr--full-ui.ggs-plyr--video input[type='range'] {
   &::-webkit-slider-runnable-track {
     background-color: $plyr-video-range-track-background;
   }
@@ -144,20 +144,20 @@ $embed-padding: ((100 / 16) * 9);
   // Pressed styles
   &:active {
     &::-webkit-slider-thumb {
-      @include plyr-range-thumb-active($plyr-video-range-thumb-active-shadow-color);
+      @include ggs-plyr-range-thumb-active($plyr-video-range-thumb-active-shadow-color);
     }
 
     &::-moz-range-thumb {
-      @include plyr-range-thumb-active($plyr-video-range-thumb-active-shadow-color);
+      @include ggs-plyr-range-thumb-active($plyr-video-range-thumb-active-shadow-color);
     }
 
     &::-ms-thumb {
-      @include plyr-range-thumb-active($plyr-video-range-thumb-active-shadow-color);
+      @include ggs-plyr-range-thumb-active($plyr-video-range-thumb-active-shadow-color);
     }
   }
 }
 
 // Progress
-.plyr--video .plyr__progress__buffer {
+.ggs-plyr--video .ggs-plyr__progress__buffer {
   color: $plyr-video-progress-buffered-background;
 }

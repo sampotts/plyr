@@ -2,13 +2,13 @@
 // Animations
 // --------------------------------------------------------------
 
-@keyframes plyr-progress {
+@keyframes ggs-plyr-progress {
   to {
     background-position: $plyr-progress-loading-size 0;
   }
 }
 
-@keyframes plyr-popup {
+@keyframes ggs-plyr-popup {
   0% {
     opacity: 0.5;
     transform: translateY(10px);
@@ -20,7 +20,7 @@
   }
 }
 
-@keyframes plyr-fade-in {
+@keyframes ggs-plyr-fade-in {
   from {
     opacity: 0;
   }

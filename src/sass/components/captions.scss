@@ -3,12 +3,12 @@
 // --------------------------------------------------------------
 
 // Hide default captions
-.plyr--full-ui ::-webkit-media-text-track-container {
+.ggs-plyr--full-ui ::-webkit-media-text-track-container {
   display: none;
 }
 
 .ggs-plyr__captions {
-  animation: plyr-fade-in 0.3s ease;
+  animation: ggs-plyr-fade-in 0.3s ease;
   bottom: 0;
   display: none;
   font-size: $plyr-font-size-captions-small;
@@ -38,7 +38,7 @@
 }
 
 // If the lower controls are shown and not empty
-.ggs-plyr:not(.plyr--hide-controls) .ggs-plyr__controls:not(:empty) ~ .ggs-plyr__captions {
+.ggs-plyr:not(.ggs-plyr--hide-controls) .ggs-plyr__controls:not(:empty) ~ .ggs-plyr__captions {
   transform: translateY(calc(#{$plyr-control-spacing} * -4));
 }
 

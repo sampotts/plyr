@@ -8,12 +8,12 @@
   box-shadow: 0 2px 15px rgba(#000, 0.1);
   margin: $spacing-base auto;
 
-  &.plyr--audio {
+  &.ggs-plyr--audio {
     max-width: 480px;
   }
 }
 
-.plyr__video-wrapper::after {
+.ggs-plyr__video-wrapper::after {
   border: 1px solid rgba(#000, 0.15);
   border-radius: inherit;
   bottom: 0;
@@ -27,7 +27,7 @@
 }
 
 // Style full supported player
-.plyr__cite {
+.ggs-plyr__cite {
   color: $color-gray-500;
 
   .icon {

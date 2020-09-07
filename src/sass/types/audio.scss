@@ -3,12 +3,12 @@
 // --------------------------------------------------------------
 
 // Container
-.plyr--audio {
+.ggs-plyr--audio {
   display: block;
 }
 
 // Controls container
-.plyr--audio .ggs-plyr__controls {
+.ggs-plyr--audio .ggs-plyr__controls {
   background: $plyr-audio-controls-background;
   border-radius: inherit;
   color: $plyr-audio-control-color;
@@ -16,7 +16,7 @@
 }
 
 // Control elements
-.plyr--audio .ggs-plyr__control {
+.ggs-plyr--audio .ggs-plyr__control {
   &.ggs-plyr__tab-focus,
   &:hover,
   &[aria-expanded='true'] {
@@ -26,7 +26,7 @@
 }
 
 // Range inputs
-.plyr--full-ui.plyr--audio input[type='range'] {
+.ggs-plyr--full-ui.ggs-plyr--audio input[type='range'] {
   &::-webkit-slider-runnable-track {
     background-color: $plyr-audio-range-track-background;
   }
@@ -42,20 +42,20 @@
   // Pressed styles
   &:active {
     &::-webkit-slider-thumb {
-      @include plyr-range-thumb-active($plyr-audio-range-thumb-active-shadow-color);
+      @include ggs-plyr-range-thumb-active($plyr-audio-range-thumb-active-shadow-color);
     }
 
     &::-moz-range-thumb {
-      @include plyr-range-thumb-active($plyr-audio-range-thumb-active-shadow-color);
+      @include ggs-plyr-range-thumb-active($plyr-audio-range-thumb-active-shadow-color);
     }
 
     &::-ms-thumb {
-      @include plyr-range-thumb-active($plyr-audio-range-thumb-active-shadow-color);
+      @include ggs-plyr-range-thumb-active($plyr-audio-range-thumb-active-shadow-color);
     }
   }
 }
 
 // Progress
-.plyr--audio .plyr__progress__buffer {
+.ggs-plyr--audio .ggs-plyr__progress__buffer {
   color: $plyr-audio-progress-buffered-background;
 }
