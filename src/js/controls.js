@@ -1272,7 +1272,7 @@ const controls = {
     this.elements.controls = container;
 
     // Default item attributes
-    const defaultAttributes = { class: 'plyr__controls__item' };
+    const defaultAttributes = { class: 'ggs-plyr__controls__item' };
 
     // Loop through controls in order
     dedupe(is.array(this.config.controls) ? this.config.controls : []).forEach((control) => {

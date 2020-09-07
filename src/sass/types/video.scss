@@ -52,7 +52,7 @@ $embed-padding: ((100 / 16) * 9);
 }
 
 // Controls container
-.plyr--video .plyr__controls {
+.plyr--video .ggs-plyr__controls {
   background: $plyr-video-controls-background;
   border-bottom-left-radius: inherit;
   border-bottom-right-radius: inherit;
@@ -73,14 +73,14 @@ $embed-padding: ((100 / 16) * 9);
 }
 
 // Hide controls
-.plyr--video.plyr--hide-controls .plyr__controls {
+.plyr--video.plyr--hide-controls .ggs-plyr__controls {
   opacity: 0;
   pointer-events: none;
   transform: translateY(100%);
 }
 
 // Control elements
-.plyr--video .plyr__control {
+.plyr--video .ggs-plyr__control {
   // Hover and tab focus
   &.plyr__tab-focus,
   &:hover,
@@ -91,7 +91,7 @@ $embed-padding: ((100 / 16) * 9);
 }
 
 // Large play button (video only)
-.plyr__control--overlaid {
+.ggs-plyr__control--overlaid {
   background: $plyr-video-control-background-hover;
   border: 0;
   border-radius: 100%;
@@ -118,12 +118,12 @@ $embed-padding: ((100 / 16) * 9);
   }
 }
 
-.plyr--playing .plyr__control--overlaid {
+.plyr--playing .ggs-plyr__control--overlaid {
   opacity: 0;
   visibility: hidden;
 }
 
-.plyr--full-ui.plyr--video .plyr__control--overlaid {
+.plyr--full-ui.plyr--video .ggs-plyr__control--overlaid {
   display: block;
 }
 

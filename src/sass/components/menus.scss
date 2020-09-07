@@ -7,10 +7,10 @@
   position: relative;
 
   // Animate the icon
-  .plyr__control svg {
+  .ggs-plyr__control svg {
     transition: transform 0.3s ease;
   }
-  .plyr__control[aria-expanded='true'] {
+  .ggs-plyr__control[aria-expanded='true'] {
     svg {
       transform: rotate(90deg);
     }
@@ -68,7 +68,7 @@
     }
 
     // Options
-    .plyr__control {
+    .ggs-plyr__control {
       align-items: center;
       color: $plyr-menu-color;
       display: flex;
@@ -141,7 +141,7 @@
       }
     }
 
-    .plyr__control[role='menuitemradio'] {
+    .ggs-plyr__control[role='menuitemradio'] {
       padding-left: $plyr-control-padding;
 
       &::before,

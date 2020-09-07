@@ -38,7 +38,7 @@
 }
 
 // If the lower controls are shown and not empty
-.ggs-plyr:not(.plyr--hide-controls) .plyr__controls:not(:empty) ~ .plyr__captions {
+.ggs-plyr:not(.plyr--hide-controls) .ggs-plyr__controls:not(:empty) ~ .plyr__captions {
   transform: translateY(calc(#{$plyr-control-spacing} * -4));
 }
 

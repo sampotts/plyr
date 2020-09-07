@@ -2,7 +2,7 @@
 // Control buttons
 // --------------------------------------------------------------
 
-.plyr__control {
+.ggs-plyr__control {
   background: transparent;
   border: 0;
   border-radius: $plyr-control-radius;
@@ -34,7 +34,7 @@
 }
 
 // Remove any link styling
-a.plyr__control {
+a.ggs-plyr__control {
   text-decoration: none;
 
   &::after,
@@ -44,9 +44,9 @@ a.plyr__control {
 }
 
 // Change icons on state change
-.plyr__control:not(.plyr__control--pressed) .icon--pressed,
-.plyr__control.plyr__control--pressed .icon--not-pressed,
-.plyr__control:not(.plyr__control--pressed) .label--pressed,
-.plyr__control.plyr__control--pressed .label--not-pressed {
+.ggs-plyr__control:not(.ggs-plyr__control--pressed) .icon--pressed,
+.ggs-plyr__control.ggs-plyr__control--pressed .icon--not-pressed,
+.ggs-plyr__control:not(.ggs-plyr__control--pressed) .label--pressed,
+.ggs-plyr__control.ggs-plyr__control--pressed .label--not-pressed {
   display: none;
 }

@@ -8,7 +8,7 @@
 }
 
 // Playback controls
-.plyr__controls {
+.ggs-plyr__controls {
   align-items: center;
   display: flex;
   justify-content: flex-end;
@@ -20,7 +20,7 @@
   }
 
   // Spacing
-  .plyr__controls__item {
+  .ggs-plyr__controls__item {
     margin-left: calc(#{$plyr-control-spacing} / 4);
 
     &:first-child {

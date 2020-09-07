@@ -8,7 +8,7 @@
 }
 
 // Controls container
-.plyr--audio .plyr__controls {
+.plyr--audio .ggs-plyr__controls {
   background: $plyr-audio-controls-background;
   border-radius: inherit;
   color: $plyr-audio-control-color;
@@ -16,7 +16,7 @@
 }
 
 // Control elements
-.plyr--audio .plyr__control {
+.plyr--audio .ggs-plyr__control {
   &.plyr__tab-focus,
   &:hover,
   &[aria-expanded='true'] {

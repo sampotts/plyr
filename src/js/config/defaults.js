@@ -293,7 +293,7 @@ const defaults = {
     container: '.ggs-plyr',
     controls: {
       container: null,
-      wrapper: '.plyr__controls',
+      wrapper: '.ggs-plyr__controls',
     },
     labels: '[data-plyr]',
     buttons: {
@@ -341,8 +341,8 @@ const defaults = {
     poster: 'plyr__poster',
     posterEnabled: 'plyr__poster-enabled',
     ads: 'plyr__ads',
-    control: 'plyr__control',
-    controlPressed: 'plyr__control--pressed',
+    control: 'ggs-plyr__control',
+    controlPressed: 'ggs-plyr__control--pressed',
     playing: 'plyr--playing',
     paused: 'plyr--paused',
     stopped: 'plyr--stopped',
