@@ -7,7 +7,7 @@
   display: none;
 }
 
-.plyr__captions {
+.ggs-plyr__captions {
   animation: plyr-fade-in 0.3s ease;
   bottom: 0;
   display: none;
@@ -33,16 +33,16 @@
   }
 }
 
-.plyr--captions-active .plyr__captions {
+.plyr--captions-active .ggs-plyr__captions {
   display: block;
 }
 
 // If the lower controls are shown and not empty
-.ggs-plyr:not(.plyr--hide-controls) .ggs-plyr__controls:not(:empty) ~ .plyr__captions {
+.ggs-plyr:not(.plyr--hide-controls) .ggs-plyr__controls:not(:empty) ~ .ggs-plyr__captions {
   transform: translateY(calc(#{$plyr-control-spacing} * -4));
 }
 
-.plyr__caption {
+.ggs-plyr__caption {
   background: $plyr-captions-background;
   border-radius: 2px;
   box-decoration-break: clone;

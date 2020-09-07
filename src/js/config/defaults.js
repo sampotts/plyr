@@ -326,8 +326,8 @@ const defaults = {
       volume: '.ggs-plyr__volume--display',
     },
     progress: '.plyr__progress',
-    captions: '.plyr__captions',
-    caption: '.plyr__caption',
+    captions: '.ggs-plyr__captions',
+    caption: '.ggs-plyr__caption',
   },
 
   // Class hooks added to the player in different states
