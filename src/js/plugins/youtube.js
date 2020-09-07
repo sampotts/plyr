@@ -138,7 +138,7 @@ const youtube = {
         .then((src) => {
           // If the image is padded, use background-size "cover" instead (like youtube does too with their posters)
           if (!src.includes('maxres')) {
-            player.elements.poster.style.backgroundSize = 'cover';
+            player.elements.poster.style.setProperty('background-size', 'cover', 'important');
           }
         })
         .catch(() => {});

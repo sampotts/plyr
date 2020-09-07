@@ -288,7 +288,7 @@ class Ads {
               class: this.player.config.classNames.cues,
             });
 
-            cue.style.left = `${cuePercentage.toString()}%`;
+            cue.style.setProperty('left', `${cuePercentage.toString()}%`, 'important');
             seekElement.appendChild(cue);
           }
         }
@@ -510,7 +510,7 @@ class Ads {
    */
   resumeContent = () => {
     // Hide the advertisement container
-    this.elements.container.style.zIndex = '';
+    this.elements.container.style.removeProperty('z-index');
 
     // Ad is stopped
     this.playing = false;
@@ -524,7 +524,7 @@ class Ads {
    */
   pauseContent = () => {
     // Show the advertisement container
-    this.elements.container.style.zIndex = 3;
+    this.elements.container.style.setProperty('z-index', 3, 'important');
 
     // Ad is playing
     this.playing = true;
