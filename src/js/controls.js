@@ -1182,7 +1182,7 @@ const controls = {
 
   // Show a panel in the menu
   showMenuPanel(type = '', tabFocus = false) {
-    const target = this.elements.container.querySelector(`#plyr-settings-${this.id}-${type}`);
+    const target = this.elements.container.querySelector(`#ggs-plyr-settings-${this.id}-${type}`);
 
     // Nothing to show, bail
     if (!is.element(target)) {
@@ -1410,21 +1410,21 @@ const controls = {
         wrapper.appendChild(
           createButton.call(this, 'settings', {
             'aria-haspopup': true,
-            'aria-controls': `plyr-settings-${data.id}`,
+            'aria-controls': `ggs-plyr-settings-${data.id}`,
             'aria-expanded': false,
           }),
         );
 
         const popup = createElement('div', {
           class: 'ggs-plyr__menu__container',
-          id: `plyr-settings-${data.id}`,
+          id: `ggs-plyr-settings-${data.id}`,
           hidden: '',
         });
 
         const inner = createElement('div');
 
         const home = createElement('div', {
-          id: `plyr-settings-${data.id}-home`,
+          id: `ggs-plyr-settings-${data.id}-home`,
         });
 
         // Create the menu
@@ -1473,7 +1473,7 @@ const controls = {
 
           // Build the panes
           const pane = createElement('div', {
-            id: `plyr-settings-${data.id}-${type}`,
+            id: `ggs-plyr-settings-${data.id}-${type}`,
             hidden: '',
           });
 
