@@ -1354,7 +1354,7 @@ const controls = {
           volume = createElement(
             'div',
             extend({}, defaultAttributes, {
-              class: `${defaultAttributes.class} plyr__volume`.trim(),
+              class: `${defaultAttributes.class} ggs-plyr__volume`.trim(),
             }),
           );
 

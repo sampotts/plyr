@@ -2,7 +2,7 @@
 // Volume
 // --------------------------------------------------------------
 
-.plyr__volume {
+.ggs-plyr__volume {
   align-items: center;
   display: flex;
   max-width: 110px;
@@ -19,7 +19,7 @@
 }
 
 // Auto size on iOS as there's no slider
-.plyr--is-ios .plyr__volume {
+.plyr--is-ios .ggs-plyr__volume {
   min-width: 0;
   width: auto;
 }
