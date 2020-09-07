@@ -290,7 +290,7 @@ const defaults = {
   // Change these to match your template if using custom HTML
   selectors: {
     editable: 'input, textarea, select, [contenteditable]',
-    container: '.plyr',
+    container: '.ggs-plyr',
     controls: {
       container: null,
       wrapper: '.plyr__controls',

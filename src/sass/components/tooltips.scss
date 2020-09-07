@@ -40,14 +40,14 @@
 }
 
 // Displaying
-.plyr .plyr__control:hover .plyr__tooltip,
-.plyr .plyr__control.plyr__tab-focus .plyr__tooltip,
+.ggs-plyr .plyr__control:hover .plyr__tooltip,
+.ggs-plyr .plyr__control.plyr__tab-focus .plyr__tooltip,
 .plyr__tooltip--visible {
   opacity: 1;
   transform: translate(-50%, 0) scale(1);
 }
 
-.plyr .plyr__control:hover .plyr__tooltip {
+.ggs-plyr .plyr__control:hover .plyr__tooltip {
   z-index: 3;
 }
 

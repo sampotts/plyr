@@ -2,22 +2,22 @@
 // Fullscreen
 // --------------------------------------------------------------
 
-.plyr:fullscreen {
+.ggs-plyr:fullscreen {
   @include plyr-fullscreen-active();
 }
 
 /* stylelint-disable-next-line */
-.plyr:-webkit-full-screen {
+.ggs-plyr:-webkit-full-screen {
   @include plyr-fullscreen-active();
 }
 
 /* stylelint-disable-next-line */
-.plyr:-moz-full-screen {
+.ggs-plyr:-moz-full-screen {
   @include plyr-fullscreen-active();
 }
 
 /* stylelint-disable-next-line */
-.plyr:-ms-fullscreen {
+.ggs-plyr:-ms-fullscreen {
   @include plyr-fullscreen-active();
 }
 
