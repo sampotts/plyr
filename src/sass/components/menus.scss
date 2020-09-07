@@ -2,7 +2,7 @@
 // Menus
 // --------------------------------------------------------------
 
-.plyr__menu {
+.ggs-plyr__menu {
   display: flex; // Edge fix
   position: relative;
 
@@ -189,7 +189,7 @@
     }
 
     // Option value
-    .plyr__menu__value {
+    .ggs-plyr__menu__value {
       align-items: center;
       display: flex;
       margin-left: auto;

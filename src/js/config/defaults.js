@@ -360,7 +360,7 @@ const defaults = {
       time: 'ggs-plyr__time',
     },
     menu: {
-      value: 'plyr__menu__value',
+      value: 'ggs-plyr__menu__value',
       badge: 'ggs-plyr__badge',
       open: 'plyr--menu-open',
     },

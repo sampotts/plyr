@@ -1402,7 +1402,7 @@ const controls = {
         const wrapper = createElement(
           'div',
           extend({}, defaultAttributes, {
-            class: `${defaultAttributes.class} plyr__menu`.trim(),
+            class: `${defaultAttributes.class} ggs-plyr__menu`.trim(),
             hidden: '',
           }),
         );
@@ -1416,7 +1416,7 @@ const controls = {
         );
 
         const popup = createElement('div', {
-          class: 'plyr__menu__container',
+          class: 'ggs-plyr__menu__container',
           id: `plyr-settings-${data.id}`,
           hidden: '',
         });
