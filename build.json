@@ -3,15 +3,8 @@
         "plyr.js": {
             "src": "./src/js/plyr.js",
             "dist": "./dist/",
-            "formats": ["es", "umd"],
+            "formats": ["umd"],
             "namespace": "Plyr"
-        },
-        "plyr.polyfilled.js": {
-            "src": "./src/js/plyr.polyfilled.js",
-            "dist": "./dist/",
-            "formats": ["es", "umd"],
-            "namespace": "Plyr",
-            "polyfill": true
         },
         "demo.js": {
             "src": "./demo/src/js/demo.js",

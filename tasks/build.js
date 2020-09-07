@@ -65,7 +65,7 @@ Object.entries(build.js).forEach(([filename, entry]) => {
 
   formats.forEach((format) => {
     const name = `js:${filename}:${format}`;
-    const extension = format === 'es' ? 'mjs' : 'js';
+    const extension = 'js';
     tasks.js.push(name);
 
     gulp.task(name, () =>
