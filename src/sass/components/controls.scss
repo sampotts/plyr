@@ -14,7 +14,7 @@
   justify-content: flex-end;
   text-align: center;
 
-  .plyr__progress__container {
+  .ggs-plyr__progress__container {
     flex: 1;
     min-width: 0; // Fix for Edge issue where content would overflow
   }
@@ -28,7 +28,7 @@
       margin-right: auto;
     }
 
-    &.plyr__progress__container {
+    &.ggs-plyr__progress__container {
       padding-left: calc(#{$plyr-control-spacing} / 4);
     }
 
@@ -36,7 +36,7 @@
       padding: 0 calc(#{$plyr-control-spacing} / 2);
     }
 
-    &.plyr__progress__container:first-child,
+    &.ggs-plyr__progress__container:first-child,
     &.ggs-plyr__time:first-child,
     &.ggs-plyr__time + .ggs-plyr__time {
       padding-left: 0;
