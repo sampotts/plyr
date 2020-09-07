@@ -307,7 +307,7 @@ class PreviewThumbnails {
    * Create HTML elements for image containers
    */
   render = () => {
-    // Create HTML element: plyr__preview-thumbnail-container
+    // Create HTML element: ggs-plyr__preview-thumbnail-container
     this.elements.thumb.container = createElement('div', {
       class: this.player.config.classNames.previewThumbnails.thumbContainer,
     });

@@ -383,10 +383,10 @@ const defaults = {
     tabFocus: 'ggs-plyr__tab-focus',
     previewThumbnails: {
       // Tooltip thumbs
-      thumbContainer: 'plyr__preview-thumb',
-      thumbContainerShown: 'plyr__preview-thumb--is-shown',
-      imageContainer: 'plyr__preview-thumb__image-container',
-      timeContainer: 'plyr__preview-thumb__time-container',
+      thumbContainer: 'ggs-plyr__preview-thumb',
+      thumbContainerShown: 'ggs-plyr__preview-thumb--is-shown',
+      imageContainer: 'ggs-plyr__preview-thumb__image-container',
+      timeContainer: 'ggs-plyr__preview-thumb__time-container',
       // Scrubbing
       scrubbingContainer: 'plyr__preview-scrubbing',
       scrubbingContainerShown: 'plyr__preview-scrubbing--is-shown',
