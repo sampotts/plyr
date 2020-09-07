@@ -30,7 +30,7 @@
   },
   "browserslist": "> 1%",
   "scripts": {
-    "build": "gulp build",
+    "build": "gulp build && postcss demo/dist/demo.css -r",
     "lint": "eslint src/js"
   },
   "devDependencies": {
@@ -56,7 +56,9 @@
     "gulp-svgstore": "^7.0.1",
     "postcss": "^7.0.35",
     "postcss-clean": "^1.1.0",
+    "postcss-cli": "^7.1.2",
     "postcss-custom-properties": "^10.0.0",
+    "postcss-safe-important": "^1.2.0",
     "rollup": "^2.35.1",
     "rollup-plugin-babel": "^4.4.0",
     "rollup-plugin-commonjs": "^10.1.0",
