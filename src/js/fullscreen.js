@@ -57,7 +57,7 @@ class Fullscreen {
     });
 
     // Tap focus when in fullscreen
-    on.call(this, this.player.elements.container, 'keydown', (event) => this.trapFocus(event));
+    on.call(this.player, this.player.elements.container, 'keydown', (event) => this.trapFocus(event));
 
     // Update the UI
     this.update();
