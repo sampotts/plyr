@@ -121,21 +121,15 @@ const vimeo = {
       wrapper.appendChild(iframe);
       player.media = replaceElement(wrapper, player.media);
     }
-
+    
     // Get poster image
-    fetch(format(player.config.urls.vimeo.api, id), 'json').then(response => {
-      if (is.empty(response)) {
+    fetch(format(player.config.urls.vimeo.api, src)).then(response => {
+      if (is.empty(response) || !response.thumbnail_url) {
         return;
       }
-
-      // Get the URL for thumbnail
-      const url = new URL(response[0].thumbnail_large);
-
-      // Get original image
-      url.pathname = `${url.pathname.split('_')[0]}.jpg`;
-
+      
       // Set and show poster
-      ui.setPoster.call(player, url.href).catch(() => {});
+      ui.setPoster.call(player, response.thumbnail_url).catch(() => { });
     });
 
     // Setup instance

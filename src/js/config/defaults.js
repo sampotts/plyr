@@ -200,7 +200,7 @@ const defaults = {
     vimeo: {
       sdk: 'https://player.vimeo.com/api/player.js',
       iframe: 'https://player.vimeo.com/video/{0}?{1}',
-      api: 'https://vimeo.com/api/v2/video/{0}.json',
+      api: 'https://vimeo.com/api/oembed.json?url={0}',
     },
     youtube: {
       sdk: 'https://www.youtube.com/iframe_api',
