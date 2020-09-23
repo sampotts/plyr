@@ -49,7 +49,7 @@ class Fullscreen {
         return;
       }
 
-      this.toggle();
+      this.player.listeners.proxy(event, this.toggle, 'fullscreen');
     });
 
     // Tap focus when in fullscreen
