@@ -836,6 +836,7 @@ Plyr costs money to run, not only my time. I donate my time for free as I enjoy 
 - [BitChute](https://www.bitchute.com)
 - [Rutheneum-Bote](https://gymnasium-rutheneum.de/content/newspaper/kreativwettbewerb.php)
 - [pressakey.com | Blog-Magazin für Videospiele](https://pressakey.com)
+- [ytshd.live | Watch and Download YTS movies](https://ytshd.live)
 
 If you want to be added to the list, open a pull request. It'd be awesome to see how you're using Plyr 😎
 
