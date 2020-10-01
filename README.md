@@ -5,6 +5,7 @@ Plyr is a simple, lightweight, accessible and customizable HTML5, YouTube and Vi
 [![npm version](https://badge.fury.io/js/plyr.svg)](https://badge.fury.io/js/plyr) [![Gitpod Ready-to-Code](https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/sampotts/plyr) [![Financial Contributors on Open Collective](https://opencollective.com/plyr/all/badge.svg?label=financial+contributors)](https://opencollective.com/plyr)
 
 [![Image of Plyr](https://cdn.plyr.io/static/demo/screenshot.png?v=3)](https://plyr.io)
+added comment
 
 # Features
 
