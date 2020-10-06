@@ -11,6 +11,7 @@ import { off, on, once, toggleListener, triggerEvent } from './utils/events';
 import is from './utils/is';
 import { silencePromise } from './utils/promise';
 import { getAspectRatio, setAspectRatio } from './utils/style';
+import i18n from './utils/i18n';
 
 class Listeners {
   constructor(player) {
@@ -885,6 +886,65 @@ class Listeners {
       'volume',
       false,
     );
+  }
+
+  // Listen for control events - update aria labels
+  ariaLabels() {
+    const { player } = this;
+    const { elements } = player;
+
+    let title;
+
+    // If there's a media title set, use that for the label
+    if (is.string(player.config.title) && !is.empty(player.config.title)) {
+      title = `${player.config.title}`;
+    }
+
+    function updateLabel(target, key) {
+      if (target && title) {
+        target.setAttribute('aria-label', `${i18n.get(key, player.config)}, ${title}`);
+      }
+    }
+
+    // Initial aria-label setup
+    updateLabel(elements.buttons.restart, 'reset');
+    updateLabel(elements.buttons.rewind, 'rewind');
+    updateLabel(elements.buttons.fastForward, 'fastForward');
+    updateLabel(elements.buttons.mute, player.muted ? 'unmute' : 'mute');
+    updateLabel(elements.buttons.download, 'download');
+    updateLabel(elements.buttons.fullscreen, 'enterFullscreen');
+    updateLabel(elements.buttons.pip, 'pip');
+    updateLabel(elements.buttons.airplay, 'airplay');
+    updateLabel(elements.buttons.settings, 'settings');
+    updateLabel(elements.buttons.loop, 'loop');
+    updateLabel(elements.buttons.transcript, 'transcript');
+
+    on.call(player, player.media, 'captionsenabled', event => {
+      updateLabel(elements.buttons.captions, 'enableCaptions');
+    });
+    on.call(player, player.media, 'captionsdisabled', event => {
+      updateLabel(elements.buttons.captions, 'disableCaptions');
+    });
+    on.call(player, player.media, 'descriptionsenabled', event => {
+      updateLabel(elements.buttons.descriptions, 'enableDescriptions');
+    });
+    on.call(player, player.media, 'descriptionsdisabled', event => {
+      updateLabel(elements.buttons.descriptions, 'disableDescriptions');
+    });
+    on.call(player, player.media, 'volumechange', event => {
+      updateLabel(elements.buttons.mute, player.muted ? 'unmute' : 'mute');
+    });
+    on.call(player, player.media, 'enterfullscreen', event => {
+      updateLabel(elements.buttons.fullscreen, 'enterFullscreen');
+    });
+    on.call(player, player.media, 'exitfullscreen', event => {
+      updateLabel(elements.buttons.fullscreen, 'exitFullscreen');
+    });
+    on.call(player, player.media, 'playing play pause ended emptied timeupdate', event => {
+      Array.from(elements.buttons.play || []).forEach(target => {
+        updateLabel(target, player.playing ? 'pause' : 'play');
+      });
+    });
   }
 }
 

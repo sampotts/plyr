@@ -52,6 +52,7 @@ const ui = {
 
       // Re-attach control listeners
       this.listeners.controls();
+      this.listeners.ariaLabels();
     }
 
     // Remove native controls
@@ -222,7 +223,6 @@ const ui = {
     // Set state
     Array.from(this.elements.buttons.play || []).forEach(target => {
       Object.assign(target, { pressed: this.playing });
-      target.setAttribute('aria-label', i18n.get(this.playing ? 'pause' : 'play', this.config));
     });
 
     // Only update controls on non timeupdate events
