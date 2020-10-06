@@ -587,6 +587,9 @@ class Listeners {
     // Captions toggle
     this.bind(elements.buttons.captions, 'click', () => player.toggleCaptions());
 
+    // Descriptions toggle
+    this.bind(elements.buttons.descriptions, 'click', () => player.toggleDescriptions());
+
     // Download
     this.bind(
       elements.buttons.download,

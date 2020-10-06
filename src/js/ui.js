@@ -3,6 +3,7 @@
 // ==========================================================================
 
 import captions from './captions';
+import descriptions from './descriptions';
 import controls from './controls';
 import support from './support';
 import browser from './utils/browser';
@@ -59,6 +60,11 @@ const ui = {
     // Setup captions for HTML5
     if (this.isHTML5) {
       captions.setup.call(this);
+    }
+
+    // Setup captions for HTML5
+    if (this.isHTML5) {
+      descriptions.setup.call(this);
     }
 
     // Reset volume
