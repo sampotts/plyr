@@ -919,26 +919,29 @@ class Listeners {
     updateLabel(elements.buttons.loop, 'loop');
     updateLabel(elements.buttons.transcript, 'transcript');
 
+    updateLabel(elements.inputs.seek, 'seek');
+    updateLabel(elements.inputs.volume, 'volume');
+
     on.call(player, player.media, 'captionsenabled', event => {
-      updateLabel(elements.buttons.captions, 'enableCaptions');
-    });
-    on.call(player, player.media, 'captionsdisabled', event => {
       updateLabel(elements.buttons.captions, 'disableCaptions');
     });
+    on.call(player, player.media, 'captionsdisabled', event => {
+      updateLabel(elements.buttons.captions, 'enableCaptions');
+    });
     on.call(player, player.media, 'descriptionsenabled', event => {
-      updateLabel(elements.buttons.descriptions, 'enableDescriptions');
+      updateLabel(elements.buttons.descriptions, 'disableDescriptions');
     });
     on.call(player, player.media, 'descriptionsdisabled', event => {
-      updateLabel(elements.buttons.descriptions, 'disableDescriptions');
+      updateLabel(elements.buttons.descriptions, 'enableDescriptions');
     });
     on.call(player, player.media, 'volumechange', event => {
       updateLabel(elements.buttons.mute, player.muted ? 'unmute' : 'mute');
     });
     on.call(player, player.media, 'enterfullscreen', event => {
-      updateLabel(elements.buttons.fullscreen, 'enterFullscreen');
+      updateLabel(elements.buttons.fullscreen, 'exitFullscreen');
     });
     on.call(player, player.media, 'exitfullscreen', event => {
-      updateLabel(elements.buttons.fullscreen, 'exitFullscreen');
+      updateLabel(elements.buttons.fullscreen, 'enterFullscreen');
     });
     on.call(player, player.media, 'playing play pause ended emptied timeupdate', event => {
       Array.from(elements.buttons.play || []).forEach(target => {
