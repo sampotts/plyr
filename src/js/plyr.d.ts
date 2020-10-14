@@ -534,7 +534,7 @@ declare namespace Plyr {
 
   interface FullScreenOptions {
     enabled?: boolean;
-    fallback?: boolean;
+    fallback?: boolean | 'force';
     allowAudio?: boolean;
     iosNative?: boolean;
   }
