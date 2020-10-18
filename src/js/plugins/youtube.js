@@ -147,7 +147,7 @@ const youtube = {
 
     // Setup instance
     // https://developers.google.com/youtube/iframe_api_reference
-    player.embed = new window.YT.Player(id, {
+    player.embed = new window.YT.Player(player.media, {
       videoId,
       host: getHost(config),
       playerVars: extend(
