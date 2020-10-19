@@ -569,18 +569,28 @@ class Listeners {
     this.bind(elements.buttons.restart, 'click', player.restart, 'restart');
 
     // Rewind
-    this.bind(elements.buttons.rewind, 'click', () => {
-      // Record seek time so we can prevent hiding controls for a few seconds after rewind
-      player.lastSeekTime = Date.now();
-      player.rewind();
-    }, 'rewind');
+    this.bind(
+      elements.buttons.rewind,
+      'click',
+      () => {
+        // Record seek time so we can prevent hiding controls for a few seconds after rewind
+        player.lastSeekTime = Date.now();
+        player.rewind();
+      },
+      'rewind',
+    );
 
     // Rewind
-    this.bind(elements.buttons.fastForward, 'click', () => {
-      // Record seek time so we can prevent hiding controls for a few seconds after fast forward
-      player.lastSeekTime = Date.now();
-      player.forward();
-    }, 'fastForward');
+    this.bind(
+      elements.buttons.fastForward,
+      'click',
+      () => {
+        // Record seek time so we can prevent hiding controls for a few seconds after fast forward
+        player.lastSeekTime = Date.now();
+        player.forward();
+      },
+      'fastForward',
+    );
 
     // Mute toggle
     this.bind(
