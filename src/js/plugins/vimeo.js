@@ -112,31 +112,35 @@ const vimeo = {
     }
 
     // Inject the package
-    const { poster } = player;
-    if (premium) {
-      iframe.setAttribute('data-poster', poster);
+    if (premium || !config.customControls) {
+      iframe.setAttribute('data-poster', player.poster);
       player.media = replaceElement(iframe, player.media);
     } else {
-      const wrapper = createElement('div', { class: player.config.classNames.embedContainer, 'data-poster': poster });
+      const wrapper = createElement('div', {
+        class: player.config.classNames.embedContainer,
+        'data-poster': player.poster,
+      });
       wrapper.appendChild(iframe);
       player.media = replaceElement(wrapper, player.media);
     }
 
     // Get poster image
-    fetch(format(player.config.urls.vimeo.api, id), 'json').then((response) => {
-      if (is.empty(response)) {
-        return;
-      }
+    if (!config.customControls) {
+      fetch(format(player.config.urls.vimeo.api, id), 'json').then((response) => {
+        if (is.empty(response)) {
+          return;
+        }
 
-      // Get the URL for thumbnail
-      const url = new URL(response[0].thumbnail_large);
+        // Get the URL for thumbnail
+        const url = new URL(response[0].thumbnail_large);
 
-      // Get original image
-      url.pathname = `${url.pathname.split('_')[0]}.jpg`;
+        // Get original image
+        url.pathname = `${url.pathname.split('_')[0]}.jpg`;
 
-      // Set and show poster
-      ui.setPoster.call(player, url.href).catch(() => {});
-    });
+        // Set and show poster
+        ui.setPoster.call(player, url.href).catch(() => {});
+      });
+    }
 
     // Setup instance
     // https://github.com/vimeo/player.js
@@ -407,7 +411,9 @@ const vimeo = {
     });
 
     // Rebuild UI
-    setTimeout(() => ui.build.call(player), 0);
+    if (config.customControls) {
+      setTimeout(() => ui.build.call(player), 0);
+    }
   },
 };
 
