@@ -356,6 +356,11 @@ class Listeners {
       // Set Vimeo gutter
       setGutter(ratio, padding, isEnter);
 
+      // Horrible hack for Safari 14 not repainting properly on entering fullscreen
+      if (isEnter) {
+        setTimeout(() => repaint(elements.container), 100);
+      }
+
       // If not using native browser fullscreen API, we need to check for resizes of viewport
       if (!usingNative) {
         if (isEnter) {
