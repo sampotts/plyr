@@ -53,28 +53,28 @@ const descriptions = {
 
     // Fix IE descriptions if CORS is used
     // Fetch descriptions and inject as blobs instead (data URIs not supported!)
-    // if (browser.isIE && window.URL) {
-    //   const elements = this.media.querySelectorAll('track');
+    if (browser.isIE && window.URL) {
+      const elements = this.media.querySelectorAll('track');
 
-    //   Array.from(elements).forEach(track => {
-    //     const src = track.getAttribute('src');
-    //     const url = parseUrl(src);
+      Array.from(elements).forEach(track => {
+        const src = track.getAttribute('src');
+        const url = parseUrl(src);
 
-    //     if (
-    //       url !== null &&
-    //       url.hostname !== window.location.href.hostname &&
-    //       ['http:', 'https:'].includes(url.protocol)
-    //     ) {
-    //       fetch(src, 'blob')
-    //         .then(blob => {
-    //           track.setAttribute('src', window.URL.createObjectURL(blob));
-    //         })
-    //         .catch(() => {
-    //           removeElement(track);
-    //         });
-    //     }
-    //   });
-    // }
+        if (
+          url !== null &&
+          url.hostname !== window.location.href.hostname &&
+          ['http:', 'https:'].includes(url.protocol)
+        ) {
+          fetch(src, 'blob')
+            .then(blob => {
+              track.setAttribute('src', window.URL.createObjectURL(blob));
+            })
+            .catch(() => {
+              removeElement(track);
+            });
+        }
+      });
+    }
 
     // Get and set initial data
     // The "preferred" options are not realized unless / until the wanted language has a match
@@ -105,14 +105,15 @@ const descriptions = {
     });
 
     // Watch changes to textTracks and update descriptions menu
-    if (this.isHTML5) {
+    if (this.isHTML5 && !browser.isIE) {
       const trackEvents = this.config.descriptions.update ? 'addtrack removetrack' : 'removetrack';
       on.call(this, this.media.textTracks, trackEvents, descriptions.update.bind(this));
     }
 
     // Setup speaker
     this.speaker = tts.createSpeaker({
-      voice: 'Google US English', //TODO: configure
+      voice: 'Microsoft David Desktop - English (United States)',
+      //voice: 'Google US English', //TODO: configure
       lang: 'en-US', //TODO: configure
       volume: 1,
       pitch: 1,
@@ -131,7 +132,7 @@ const descriptions = {
     const languageExists = Boolean(tracks.find(track => track.language === language));
 
     // Handle tracks (add event listener and "pseudo"-default)
-    if (this.isHTML5 && this.isVideo) {
+    if (this.isHTML5 && this.isVideo && !browser.isIE) {
       tracks
         .filter(track => !meta.get(track))
         .forEach(track => {
@@ -294,7 +295,7 @@ const descriptions = {
     // Show descriptions
     descriptions.toggle.call(this, true, passive);
 
-    if (this.isHTML5 && this.isVideo) {
+    if (this.isHTML5 && this.isVideo && !browser.isIE) {
       // If we change the active track while a cue is already displayed we need to update it
       descriptions.updateCues.call(this);
     }

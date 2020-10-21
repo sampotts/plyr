@@ -4,6 +4,22 @@ typeof navigator === "object" && (function (global, factory) {
   (global = global || self, global.Plyr = factory());
 }(this, (function () { 'use strict';
 
+  function _typeof(obj) {
+    "@babel/helpers - typeof";
+
+    if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") {
+      _typeof = function (obj) {
+        return typeof obj;
+      };
+    } else {
+      _typeof = function (obj) {
+        return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+      };
+    }
+
+    return _typeof(obj);
+  }
+
   function _classCallCheck(instance, Constructor) {
     if (!(instance instanceof Constructor)) {
       throw new TypeError("Cannot call a class as a function");
@@ -181,6 +197,63 @@ typeof navigator === "object" && (function (global, factory) {
 
   function _nonIterableRest() {
     throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+  }
+
+  function _createForOfIteratorHelper(o, allowArrayLike) {
+    var it;
+
+    if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) {
+      if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") {
+        if (it) o = it;
+        var i = 0;
+
+        var F = function () {};
+
+        return {
+          s: F,
+          n: function () {
+            if (i >= o.length) return {
+              done: true
+            };
+            return {
+              done: false,
+              value: o[i++]
+            };
+          },
+          e: function (e) {
+            throw e;
+          },
+          f: F
+        };
+      }
+
+      throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+    }
+
+    var normalCompletion = true,
+        didErr = false,
+        err;
+    return {
+      s: function () {
+        it = o[Symbol.iterator]();
+      },
+      n: function () {
+        var step = it.next();
+        normalCompletion = step.done;
+        return step;
+      },
+      e: function (e) {
+        didErr = true;
+        err = e;
+      },
+      f: function () {
+        try {
+          if (!normalCompletion && it.return != null) it.return();
+        } finally {
+          if (didErr) throw err;
+        }
+      }
+    };
   }
 
   function _classCallCheck$1(e, t) {
@@ -400,6 +473,303 @@ typeof navigator === "object" && (function (global, factory) {
       }
     }]), e;
   }();
+
+  var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
+
+  function createCommonjsModule(fn, module) {
+  	return module = { exports: {} }, fn(module, module.exports), module.exports;
+  }
+
+  var basicTts = createCommonjsModule(function (module) {
+
+    var tts = function () {
+      var testWindow;
+      var testingEnabled = false;
+      /**
+       * Enable test mode.
+       *
+       * @param {Object=} mockWindow - The mock window object.
+       */
+
+      var enableTesting = function enableTesting(mockWindow) {
+        testWindow = mockWindow;
+        testingEnabled = true;
+      };
+      /**
+       * Disable test mode and return to production mode.
+       */
+
+
+      var disableTesting = function disableTesting() {
+        testWindow = null;
+        testingEnabled = false;
+      };
+      /**
+       * Check if we're in test mode or not.
+       *
+       * @returns {Boolean}
+       */
+
+
+      var isTestingEnabled = function isTestingEnabled() {
+        return testingEnabled;
+      };
+      /**
+       * Get the window object, depending on whether we're in test mode or not.
+       *
+       * @returns {Window}
+       */
+
+
+      var getWindow = function getWindow() {
+        return isTestingEnabled() ? testWindow : typeof window === "undefined" ? undefined : window;
+      };
+      /**
+       * Check if text-to-speech is supported.
+       *
+       * @returns {Boolean} - Whether text-to-speech is supported.
+       */
+
+
+      var isSupported = function isSupported() {
+        var window = getWindow();
+
+        if (_typeof(window) !== "object") {
+          console.warn("window is undefined!");
+          return false;
+        }
+
+        if (_typeof(window.speechSynthesis) !== "object") {
+          console.warn("speechSynthesis is undefined!");
+          return false;
+        }
+
+        for (var _i = 0, _arr = ["getVoices", "speak"]; _i < _arr.length; _i++) {
+          var method = _arr[_i];
+
+          if (typeof window.speechSynthesis[method] !== "function") {
+            console.warn("speechSynthesis.".concat(method, " is undefined!"));
+            return false;
+          }
+        }
+
+        if (typeof window.SpeechSynthesisUtterance !== "function") {
+          console.warn("SpeechSynthesisUtterance is undefined!");
+          return false;
+        }
+
+        return true;
+      };
+      /**
+       * Check if text-to-speech is supported and error if it's not.
+       */
+
+
+      var errOnUnsupported = function errOnUnsupported() {
+        if (!isSupported()) {
+          throw "Text-to-speech is not supported!";
+        }
+      };
+      /**
+       * Simple wrapper around a reject function for a Promise.
+       *
+       * @param {Function} reject - The Promise rejection function.
+       * @param {String} msg - The message to send.
+       */
+
+
+      var rejectWithMsg = function rejectWithMsg(reject, msg) {
+        reject({
+          msg: msg
+        });
+      };
+      /**
+       * Get voices from speechSynthesis (after delay) and check if they exist.
+       *
+       * @returns {Promise}
+       */
+
+
+      var loadVoices = function loadVoices() {
+        return new Promise(function (resolve, reject) {
+          setTimeout(function () {
+            var voices = getWindow().speechSynthesis.getVoices();
+
+            if (voices.length === 0) {
+              rejectWithMsg(reject, "No voices available for use.");
+            } else {
+              resolve({
+                voices: voices
+              });
+            }
+          }, 100);
+        });
+      };
+      /**
+       * Check that we have voices available for speaking.
+       *
+       * @param {Number=} attempts - The number of attempts to retrieve
+       *     voices. The default is 10 times.
+       * @returns {Promise}
+       */
+
+
+      var checkVoices = function checkVoices(attempts) {
+        errOnUnsupported();
+        var defaultAttempts = 10;
+
+        if (typeof attempts === "undefined") {
+          attempts = defaultAttempts;
+        } else if (typeof attempts !== "number") {
+          attempts = parseInt(attempts.toString());
+        }
+
+        if (isNaN(attempts) || attempts < 0) {
+          attempts = defaultAttempts;
+        }
+
+        return loadVoices().catch(function (err) {
+          if (attempts === 0) {
+            throw err;
+          } else {
+            return checkVoices(attempts - 1);
+          }
+        });
+      };
+
+      var Speaker = /*#__PURE__*/function () {
+        /**
+         * Construct a new speaker instance.
+         *
+         * @param {Object=} props - A dictionary of properties for our
+         *     SpeechSynthesisUtterance class.
+         */
+        function Speaker(props) {
+          _classCallCheck(this, Speaker);
+
+          errOnUnsupported();
+          this._props = props || {};
+          this._window = getWindow();
+          this._speaker = this._window.speechSynthesis;
+        }
+        /**
+         * Construct our SpeechSynthesisUtterance for speaking.
+         *
+         * @param {String} text - The text to speak.
+         * @returns {SpeechSynthesisUtterance}
+         */
+
+
+        _createClass(Speaker, [{
+          key: "getUtterance",
+          value: function getUtterance(text) {
+            var utterance = new this._window.SpeechSynthesisUtterance(text);
+
+            for (var _i2 = 0, _arr2 = ["lang", "volume", "pitch", "rate"]; _i2 < _arr2.length; _i2++) {
+              var key = _arr2[_i2];
+              var value = utterance[key];
+              utterance[key] = this._props[key] || value;
+            }
+
+            if (this._props["voice"]) {
+              var propVoice = this._props["voice"];
+              var speakerVoice;
+
+              var _iterator = _createForOfIteratorHelper(this._speaker.getVoices()),
+                  _step;
+
+              try {
+                for (_iterator.s(); !(_step = _iterator.n()).done;) {
+                  var voice = _step.value;
+
+                  if (voice.name === propVoice) {
+                    speakerVoice = voice;
+                    break;
+                  }
+                }
+              } catch (err) {
+                _iterator.e(err);
+              } finally {
+                _iterator.f();
+              }
+
+              if (speakerVoice === undefined) {
+                return null;
+              }
+
+              utterance.voice = speakerVoice;
+            }
+
+            return utterance;
+          }
+          /**
+           * Speak a piece of text.
+           *
+           * @param {String} text - The text to speak.
+           * @param {Number=} attempts - The number of attempts to retrieve
+           *     voices before attempting to speak.
+           * @returns {Promise}
+           */
+
+        }, {
+          key: "speak",
+          value: function speak(text, attempts) {
+            var self = this;
+            return new Promise(function (resolve, reject) {
+              checkVoices(attempts).then(function () {
+                var utterance = self.getUtterance(text);
+
+                if (!utterance) {
+                  rejectWithMsg(reject, "Speech could not be " + "initialized due to invalid voice");
+                }
+
+                utterance["onend"] = resolve;
+
+                utterance["onerror"] = function () {
+                  rejectWithMsg(reject, "Unable to speak " + "the provided text");
+                };
+
+                self._speaker.speak(utterance);
+              }).catch(reject);
+            });
+          }
+        }]);
+
+        return Speaker;
+      }();
+      /**
+       * Convenience function for initialization our Speaker class.
+       *
+       * Doing this places an abstraction layer above the Speaker class, giving
+       * us freedom to modify however we want without disrupting end-user code.
+       *
+       * @param {Object=} props - A dictionary of properties for our
+       *     SpeechSynthesisUtterance class.
+       * @returns {Speaker}
+       */
+
+
+      var createSpeaker = function createSpeaker(props) {
+        return new Speaker(props);
+      };
+
+      return {
+        // Main methods.
+        checkVoices: checkVoices,
+        isSupported: isSupported,
+        createSpeaker: createSpeaker,
+        // Test methods.
+        enableTesting: enableTesting,
+        disableTesting: disableTesting,
+        isTestingEnabled: isTestingEnabled
+      };
+    }(); // Node.
+
+
+    {
+      module.exports = tts;
+    } // AMD.
+  });
 
   // ==========================================================================
   // Type checking utils
@@ -968,6 +1338,28 @@ typeof navigator === "object" && (function (global, factory) {
     reducedMotion: 'matchMedia' in window && window.matchMedia('(prefers-reduced-motion)').matches
   };
 
+  // ==========================================================================
+
+  function dedupe(array) {
+    if (!is$1.array(array)) {
+      return array;
+    }
+
+    return array.filter(function (item, index) {
+      return array.indexOf(item) === index;
+    });
+  } // Get the closest value in an array
+
+  function closest$1(array, value) {
+    if (!is$1.array(array) || !array.length) {
+      return null;
+    }
+
+    return array.reduce(function (prev, curr) {
+      return Math.abs(curr - value) < Math.abs(prev - value) ? curr : prev;
+    });
+  }
+
   // https://github.com/WICG/EventListenerOptions/blob/gh-pages/explainer.md
   // https://www.youtube.com/watch?v=NPM6172J22g
 
@@ -1112,6 +1504,620 @@ typeof navigator === "object" && (function (global, factory) {
       return _this3.ready ? setTimeout(resolve, 0) : on.call(_this3, _this3.elements.container, 'ready', resolve);
     }).then(function () {});
   }
+
+  // ==========================================================================
+  // Fetch wrapper
+  // Using XHR to avoid issues with older browsers
+  // ==========================================================================
+  function fetch(url) {
+    var responseType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'text';
+    return new Promise(function (resolve, reject) {
+      try {
+        var request = new XMLHttpRequest(); // Check for CORS support
+
+        if (!('withCredentials' in request)) {
+          return;
+        }
+
+        request.addEventListener('load', function () {
+          if (responseType === 'text') {
+            try {
+              resolve(JSON.parse(request.responseText));
+            } catch (e) {
+              resolve(request.responseText);
+            }
+          } else {
+            resolve(request.response);
+          }
+        });
+        request.addEventListener('error', function () {
+          throw new Error(request.status);
+        });
+        request.open('GET', url, true); // Set the required response type
+
+        request.responseType = responseType;
+        request.send();
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
+
+  // ==========================================================================
+
+  function generateId(prefix) {
+    return "".concat(prefix, "-").concat(Math.floor(Math.random() * 10000));
+  } // Format string
+
+  function format(input) {
+    for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+      args[_key - 1] = arguments[_key];
+    }
+
+    if (is$1.empty(input)) {
+      return input;
+    }
+
+    return input.toString().replace(/{(\d+)}/g, function (match, i) {
+      return args[i].toString();
+    });
+  } // Get percentage
+
+  function getPercentage(current, max) {
+    if (current === 0 || max === 0 || Number.isNaN(current) || Number.isNaN(max)) {
+      return 0;
+    }
+
+    return (current / max * 100).toFixed(2);
+  } // Replace all occurances of a string in a string
+
+  var replaceAll = function replaceAll() {
+    var input = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+    var find = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+    var replace = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
+    return input.replace(new RegExp(find.toString().replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1'), 'g'), replace.toString());
+  }; // Convert to title case
+
+  var toTitleCase = function toTitleCase() {
+    var input = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+    return input.toString().replace(/\w\S*/g, function (text) {
+      return text.charAt(0).toUpperCase() + text.substr(1).toLowerCase();
+    });
+  }; // Convert string to pascalCase
+
+  function toPascalCase() {
+    var input = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+    var string = input.toString(); // Convert kebab case
+
+    string = replaceAll(string, '-', ' '); // Convert snake case
+
+    string = replaceAll(string, '_', ' '); // Convert to title case
+
+    string = toTitleCase(string); // Convert to pascal case
+
+    return replaceAll(string, ' ', '');
+  } // Convert string to pascalCase
+
+  function toCamelCase() {
+    var input = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+    var string = input.toString(); // Convert to pascal case
+
+    string = toPascalCase(string); // Convert first character to lowercase
+
+    return string.charAt(0).toLowerCase() + string.slice(1);
+  } // Remove HTML from a string
+
+  function stripHTML(source) {
+    var fragment = document.createDocumentFragment();
+    var element = document.createElement('div');
+    fragment.appendChild(element);
+    element.innerHTML = source;
+    return fragment.firstChild.innerText;
+  } // Like outerHTML, but also works for DocumentFragment
+
+  function getHTML(element) {
+    var wrapper = document.createElement('div');
+    wrapper.appendChild(element);
+    return wrapper.innerHTML;
+  }
+
+  var resources = {
+    pip: 'PIP',
+    airplay: 'AirPlay',
+    html5: 'HTML5',
+    vimeo: 'Vimeo',
+    youtube: 'YouTube'
+  };
+  var i18n = {
+    get: function get() {
+      var key = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
+      var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+      if (is$1.empty(key) || is$1.empty(config)) {
+        return '';
+      }
+
+      var string = getDeep(config.i18n, key);
+
+      if (is$1.empty(string)) {
+        if (Object.keys(resources).includes(key)) {
+          return resources[key];
+        }
+
+        return '';
+      }
+
+      var replace = {
+        '{seektime}': config.seekTime,
+        '{title}': config.title
+      };
+      Object.entries(replace).forEach(function (_ref) {
+        var _ref2 = _slicedToArray(_ref, 2),
+            k = _ref2[0],
+            v = _ref2[1];
+
+        string = replaceAll(string, k, v);
+      });
+      return string;
+    }
+  };
+
+  /**
+   * Parse a string to a URL object
+   * @param {String} input - the URL to be parsed
+   * @param {Boolean} safe - failsafe parsing
+   */
+
+  function parseUrl(input) {
+    var safe = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+    var url = input;
+
+    if (safe) {
+      var parser = document.createElement('a');
+      parser.href = url;
+      url = parser.href;
+    }
+
+    try {
+      return new URL(url);
+    } catch (e) {
+      return null;
+    }
+  } // Convert object to URLSearchParams
+
+  function buildUrlParams(input) {
+    var params = new URLSearchParams();
+
+    if (is$1.object(input)) {
+      Object.entries(input).forEach(function (_ref) {
+        var _ref2 = _slicedToArray(_ref, 2),
+            key = _ref2[0],
+            value = _ref2[1];
+
+        params.set(key, value);
+      });
+    }
+
+    return params;
+  }
+
+  var descriptions = {
+    // Setup descriptions
+    setup: function setup() {
+      // Requires UI support
+      if (!this.supported.ui) {
+        return;
+      } // Only Vimeo and HTML5 video supported at this point
+
+
+      if (!this.isVideo || this.isYouTube || this.isHTML5 && !support.textTracks) {
+        // Clear menu and hide
+        if (is$1.array(this.config.controls) && this.config.controls.includes('settings') && this.config.settings.includes('descriptions')) {
+          controls.setDescriptionsMenu.call(this);
+        }
+
+        return;
+      } // Inject the container
+
+
+      if (!is$1.element(this.elements.descriptions)) {
+        this.elements.descriptions = createElement('div', getAttributesFromSelector(this.config.selectors.descriptions));
+        insertAfter(this.elements.descriptions, this.elements.wrapper);
+      } // Fix IE descriptions if CORS is used
+      // Fetch descriptions and inject as blobs instead (data URIs not supported!)
+
+
+      if (browser.isIE && window.URL) {
+        var elements = this.media.querySelectorAll('track');
+        Array.from(elements).forEach(function (track) {
+          var src = track.getAttribute('src');
+          var url = parseUrl(src);
+
+          if (url !== null && url.hostname !== window.location.href.hostname && ['http:', 'https:'].includes(url.protocol)) {
+            fetch(src, 'blob').then(function (blob) {
+              track.setAttribute('src', window.URL.createObjectURL(blob));
+            }).catch(function () {
+              removeElement(track);
+            });
+          }
+        });
+      } // Get and set initial data
+      // The "preferred" options are not realized unless / until the wanted language has a match
+      // * languages: Array of user's browser languages.
+      // * language:  The language preferred by user settings or config
+      // * active:    The state preferred by user settings or config
+      // * toggled:   The real descriptions state
+
+
+      var browserLanguages = navigator.languages || [navigator.language || navigator.userLanguage || 'en'];
+      var languages = dedupe(browserLanguages.map(function (language) {
+        return language.split('-')[0];
+      }));
+      var language = (this.storage.get('language') || this.config.descriptions.language || 'auto').toLowerCase(); // Use first browser language when language is 'auto'
+
+      if (language === 'auto') {
+        var _languages = _slicedToArray(languages, 1);
+
+        language = _languages[0];
+      }
+
+      var active = this.storage.get('descriptions');
+
+      if (!is$1.boolean(active)) {
+        active = this.config.descriptions.active;
+      }
+
+      Object.assign(this.descriptions, {
+        toggled: false,
+        active: active,
+        language: language,
+        languages: languages
+      }); // Watch changes to textTracks and update descriptions menu
+
+      if (this.isHTML5 && !browser.isIE) {
+        var trackEvents = this.config.descriptions.update ? 'addtrack removetrack' : 'removetrack';
+        on.call(this, this.media.textTracks, trackEvents, descriptions.update.bind(this));
+      } // Setup speaker
+
+
+      this.speaker = basicTts.createSpeaker({
+        voice: 'Microsoft David Desktop - English (United States)',
+        //voice: 'Google US English', //TODO: configure
+        lang: 'en-US',
+        //TODO: configure
+        volume: 1,
+        pitch: 1,
+        rate: 1
+      }); // Update available languages in list next tick (the event must not be triggered before the listeners)
+
+      setTimeout(descriptions.update.bind(this), 0);
+    },
+    // Update available language options in settings based on tracks
+    update: function update() {
+      var _this = this;
+
+      var tracks = descriptions.getTracks.call(this, true); // Get the wanted language
+
+      var _this$descriptions = this.descriptions,
+          active = _this$descriptions.active,
+          language = _this$descriptions.language,
+          meta = _this$descriptions.meta,
+          currentTrackNode = _this$descriptions.currentTrackNode;
+      var languageExists = Boolean(tracks.find(function (track) {
+        return track.language === language;
+      })); // Handle tracks (add event listener and "pseudo"-default)
+
+      if (this.isHTML5 && this.isVideo && !browser.isIE) {
+        tracks.filter(function (track) {
+          return !meta.get(track);
+        }).forEach(function (track) {
+          _this.debug.log('Track added', track); // Attempt to store if the original dom element was "default"
+
+
+          meta.set(track, {
+            default: track.mode === 'showing'
+          }); // Turn off native caption rendering to avoid double descriptions
+          // Note: mode='hidden' forces a track to download. To ensure every track
+          // isn't downloaded at once, only 'showing' tracks should be reassigned
+          // eslint-disable-next-line no-param-reassign
+
+          if (track.mode === 'showing') {
+            // eslint-disable-next-line no-param-reassign
+            track.mode = 'hidden';
+          } // Add event listener for cue changes
+
+
+          on.call(_this, track, 'cuechange', function () {
+            return descriptions.updateCues.call(_this);
+          });
+        });
+        on.call(this, this.media, 'playing descriptionsenabled descriptionsdisabled', function () {
+          return descriptions.updateCues.call(_this);
+        });
+        on.call(this, this.media, 'seeked', function () {
+          return descriptions.clearCues.call(_this);
+        });
+      } // Update language first time it matches, or if the previous matching track was removed
+
+
+      if (languageExists && this.language !== language || !tracks.includes(currentTrackNode)) {
+        descriptions.setLanguage.call(this, language);
+        descriptions.toggle.call(this, active && languageExists);
+      } // Enable or disable descriptions based on track length
+
+
+      toggleClass(this.elements.container, this.config.classNames.descriptions.enabled, !is$1.empty(tracks)); // Update available languages in list
+
+      if (is$1.array(this.config.controls) && this.config.controls.includes('settings') && this.config.settings.includes('descriptions')) {
+        controls.setDescriptionsMenu.call(this);
+      }
+    },
+    // Toggle descriptions display
+    // Used internally for the toggleDescriptions method, with the passive option forced to false
+    toggle: function toggle(input) {
+      var _this2 = this;
+
+      var passive = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
+      // If there's no full support
+      if (!this.supported.ui) {
+        return;
+      }
+
+      var toggled = this.descriptions.toggled; // Current state
+
+      var activeClass = this.config.classNames.descriptions.active; // Get the next state
+      // If the method is called without parameter, toggle based on current value
+
+      var active = is$1.nullOrUndefined(input) ? !toggled : input; // Update state and trigger event
+
+      if (active !== toggled) {
+        // When passive, don't override user preferences
+        if (!passive) {
+          this.descriptions.active = active;
+          this.storage.set({
+            descriptions: active
+          });
+        } // Force language if the call isn't passive and there is no matching language to toggle to
+
+
+        if (!this.language && active && !passive) {
+          var tracks = descriptions.getTracks.call(this);
+          var track = descriptions.findTrack.call(this, [this.descriptions.language].concat(_toConsumableArray(this.descriptions.languages)), true); // Override user preferences to avoid switching languages if a matching track is added
+
+          this.descriptions.language = track.language; // Set caption, but don't store in localStorage as user preference
+
+          descriptions.set.call(this, tracks.indexOf(track));
+          return;
+        } // Toggle button if it's enabled
+
+
+        if (this.elements.buttons.descriptions) {
+          this.elements.buttons.descriptions.pressed = active;
+        } // Add class hook
+
+
+        toggleClass(this.elements.container, activeClass, active);
+        this.descriptions.toggled = active; // Update settings menu
+
+        controls.updateSetting.call(this, 'descriptions'); // Trigger event (not used internally)
+
+        triggerEvent.call(this, this.media, active ? 'descriptionsenabled' : 'descriptionsdisabled');
+      } // Wait for the call stack to clear before setting mode='hidden'
+      // on the active track - forcing the browser to download it
+
+
+      setTimeout(function () {
+        if (active && _this2.descriptions.toggled) {
+          _this2.descriptions.currentTrackNode.mode = 'hidden';
+        }
+      });
+    },
+    // Set descriptions by track index
+    // Used internally for the currentDescTrack setter with the passive option forced to false
+    set: function set(index) {
+      var passive = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+      var tracks = descriptions.getTracks.call(this); // Disable descriptions if setting to -1
+
+      if (index === -1) {
+        descriptions.toggle.call(this, false, passive);
+        return;
+      }
+
+      if (!is$1.number(index)) {
+        this.debug.warn('Invalid caption argument', index);
+        return;
+      }
+
+      if (!(index in tracks)) {
+        this.debug.warn('Track not found', index);
+        return;
+      }
+
+      if (this.descriptions.currentDescTrack !== index) {
+        this.descriptions.currentDescTrack = index;
+        var track = tracks[index];
+
+        var _ref = track || {},
+            language = _ref.language; // Store reference to node for invalidation on remove
+
+
+        this.descriptions.currentTrackNode = track; // Update settings menu
+
+        controls.updateSetting.call(this, 'descriptions'); // When passive, don't override user preferences
+
+        if (!passive) {
+          this.descriptions.language = language;
+          this.storage.set({
+            language: language
+          });
+        } // Handle Vimeo descriptions
+
+
+        if (this.isVimeo) {
+          this.embed.enableTextTrack(language);
+        } // Trigger event
+
+
+        triggerEvent.call(this, this.media, 'languagechange');
+      } // Show descriptions
+
+
+      descriptions.toggle.call(this, true, passive);
+
+      if (this.isHTML5 && this.isVideo && !browser.isIE) {
+        // If we change the active track while a cue is already displayed we need to update it
+        descriptions.updateCues.call(this);
+      }
+    },
+    // Set descriptions by language
+    // Used internally for the language setter with the passive option forced to false
+    setLanguage: function setLanguage(input) {
+      var passive = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
+      if (!is$1.string(input)) {
+        this.debug.warn('Invalid language argument', input);
+        return;
+      } // Normalize
+
+
+      var language = input.toLowerCase();
+      this.descriptions.language = language; // Set currentDescTrack
+
+      var tracks = descriptions.getTracks.call(this);
+      var track = descriptions.findTrack.call(this, [language]);
+      descriptions.set.call(this, tracks.indexOf(track), passive);
+    },
+    // Get current valid caption tracks
+    // If update is false it will also ignore tracks without metadata
+    // This is used to "freeze" the language options when descriptions.update is false
+    getTracks: function getTracks() {
+      var _this3 = this;
+
+      var update = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+      // Handle media or textTracks missing or null
+      var tracks = Array.from((this.media || {}).textTracks || []); // For HTML5, use cache instead of current tracks when it exists (if descriptions.update is false)
+      // Filter out removed tracks and tracks that aren't descriptions/subtitles (for example metadata)
+
+      return tracks.filter(function (track) {
+        return !_this3.isHTML5 || update || _this3.descriptions.meta.has(track);
+      }).filter(function (track) {
+        return ['descriptions'].includes(track.kind);
+      });
+    },
+    // Match tracks based on languages and get the first
+    findTrack: function findTrack(languages) {
+      var _this4 = this;
+
+      var force = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+      var tracks = descriptions.getTracks.call(this);
+
+      var sortIsDefault = function sortIsDefault(track) {
+        return Number((_this4.descriptions.meta.get(track) || {}).default);
+      };
+
+      var sorted = Array.from(tracks).sort(function (a, b) {
+        return sortIsDefault(b) - sortIsDefault(a);
+      });
+      var track;
+      languages.every(function (language) {
+        track = sorted.find(function (t) {
+          return t.language === language;
+        });
+        return !track; // Break iteration if there is a match
+      }); // If no match is found but is required, get first
+
+      return track || (force ? sorted[0] : undefined);
+    },
+    // Get the current track
+    getCurrentTrack: function getCurrentTrack() {
+      return descriptions.getTracks.call(this)[this.currentDescTrack];
+    },
+    // Get UI label for track
+    getLabel: function getLabel(track) {
+      var currentDescTrack = track;
+
+      if (!is$1.track(currentDescTrack) && support.textTracks && this.descriptions.toggled) {
+        currentDescTrack = descriptions.getCurrentTrack.call(this);
+      }
+
+      if (is$1.track(currentDescTrack)) {
+        if (!is$1.empty(currentDescTrack.label)) {
+          return currentDescTrack.label;
+        }
+
+        if (!is$1.empty(currentDescTrack.language)) {
+          return track.language.toUpperCase();
+        }
+
+        return i18n.get('enabled', this.config);
+      }
+
+      return i18n.get('disabled', this.config);
+    },
+    // Update descriptions using current track's active cues
+    // Also optional array argument in case there isn't any track (ex: vimeo)
+    updateCues: function updateCues(input) {
+      var _this5 = this;
+
+      // Requires UI
+      if (!this.supported.ui) {
+        return;
+      }
+
+      if (!is$1.element(this.elements.descriptions)) {
+        this.debug.warn('No descriptions element to render to');
+        return;
+      } // Only accept array or empty input
+
+
+      if (!is$1.nullOrUndefined(input) && !Array.isArray(input)) {
+        this.debug.warn('updateCues: Invalid input', input);
+        return;
+      }
+
+      var cues = input; // Get cues from track
+
+      if (!cues) {
+        var track = descriptions.getCurrentTrack.call(this);
+        cues = Array.from((track || {}).activeCues || []).map(function (cue) {
+          return cue.getCueAsHTML();
+        }).map(getHTML);
+      } // Set new description text
+
+
+      var content = cues.map(function (cueText) {
+        return cueText.trim();
+      }).join('\n'); // const changed = content !== this.elements.descriptions.innerHTML;
+
+      var changed = content !== this.elements.descriptions.textContent;
+
+      if (!this.descriptions.active) ;
+
+      if (content && changed && this.playing && this.descriptions.active) {
+        // Empty the container and create a new child element
+        emptyElement(this.elements.descriptions);
+        var description = createElement('span', getAttributesFromSelector(this.config.selectors.description));
+        description.innerHTML = content;
+        this.elements.descriptions.appendChild(description); //Utterance
+
+        this.pause();
+        this.speaker.speak(content).then(function () {
+          _this5.debug.log('SPOKEN: ', content);
+
+          _this5.play();
+        }).catch(function (err) {
+          _this5.debug.log('An error has occurred: ', err);
+        }); // Trigger event
+
+        triggerEvent.call(this, this.media, 'cuechange');
+      }
+    },
+    clearCues: function clearCues(input) {
+      // Reset descriptions
+      emptyElement(this.elements.descriptions);
+    }
+  };
 
   /**
    * Silence a Promise-like object.
@@ -1339,147 +2345,6 @@ typeof navigator === "object" && (function (global, factory) {
     }
   };
 
-  // ==========================================================================
-
-  function dedupe(array) {
-    if (!is$1.array(array)) {
-      return array;
-    }
-
-    return array.filter(function (item, index) {
-      return array.indexOf(item) === index;
-    });
-  } // Get the closest value in an array
-
-  function closest$1(array, value) {
-    if (!is$1.array(array) || !array.length) {
-      return null;
-    }
-
-    return array.reduce(function (prev, curr) {
-      return Math.abs(curr - value) < Math.abs(prev - value) ? curr : prev;
-    });
-  }
-
-  // ==========================================================================
-
-  function generateId(prefix) {
-    return "".concat(prefix, "-").concat(Math.floor(Math.random() * 10000));
-  } // Format string
-
-  function format(input) {
-    for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-      args[_key - 1] = arguments[_key];
-    }
-
-    if (is$1.empty(input)) {
-      return input;
-    }
-
-    return input.toString().replace(/{(\d+)}/g, function (match, i) {
-      return args[i].toString();
-    });
-  } // Get percentage
-
-  function getPercentage(current, max) {
-    if (current === 0 || max === 0 || Number.isNaN(current) || Number.isNaN(max)) {
-      return 0;
-    }
-
-    return (current / max * 100).toFixed(2);
-  } // Replace all occurances of a string in a string
-
-  var replaceAll = function replaceAll() {
-    var input = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-    var find = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-    var replace = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : '';
-    return input.replace(new RegExp(find.toString().replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1'), 'g'), replace.toString());
-  }; // Convert to title case
-
-  var toTitleCase = function toTitleCase() {
-    var input = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-    return input.toString().replace(/\w\S*/g, function (text) {
-      return text.charAt(0).toUpperCase() + text.substr(1).toLowerCase();
-    });
-  }; // Convert string to pascalCase
-
-  function toPascalCase() {
-    var input = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-    var string = input.toString(); // Convert kebab case
-
-    string = replaceAll(string, '-', ' '); // Convert snake case
-
-    string = replaceAll(string, '_', ' '); // Convert to title case
-
-    string = toTitleCase(string); // Convert to pascal case
-
-    return replaceAll(string, ' ', '');
-  } // Convert string to pascalCase
-
-  function toCamelCase() {
-    var input = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-    var string = input.toString(); // Convert to pascal case
-
-    string = toPascalCase(string); // Convert first character to lowercase
-
-    return string.charAt(0).toLowerCase() + string.slice(1);
-  } // Remove HTML from a string
-
-  function stripHTML(source) {
-    var fragment = document.createDocumentFragment();
-    var element = document.createElement('div');
-    fragment.appendChild(element);
-    element.innerHTML = source;
-    return fragment.firstChild.innerText;
-  } // Like outerHTML, but also works for DocumentFragment
-
-  function getHTML(element) {
-    var wrapper = document.createElement('div');
-    wrapper.appendChild(element);
-    return wrapper.innerHTML;
-  }
-
-  var resources = {
-    pip: 'PIP',
-    airplay: 'AirPlay',
-    html5: 'HTML5',
-    vimeo: 'Vimeo',
-    youtube: 'YouTube'
-  };
-  var i18n = {
-    get: function get() {
-      var key = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
-      var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-      if (is$1.empty(key) || is$1.empty(config)) {
-        return '';
-      }
-
-      var string = getDeep(config.i18n, key);
-
-      if (is$1.empty(string)) {
-        if (Object.keys(resources).includes(key)) {
-          return resources[key];
-        }
-
-        return '';
-      }
-
-      var replace = {
-        '{seektime}': config.seekTime,
-        '{title}': config.title
-      };
-      Object.entries(replace).forEach(function (_ref) {
-        var _ref2 = _slicedToArray(_ref, 2),
-            k = _ref2[0],
-            v = _ref2[1];
-
-        string = replaceAll(string, k, v);
-      });
-      return string;
-    }
-  };
-
   var Storage = /*#__PURE__*/function () {
     function Storage(player) {
       _classCallCheck(this, Storage);
@@ -1552,44 +2417,6 @@ typeof navigator === "object" && (function (global, factory) {
 
     return Storage;
   }();
-
-  // ==========================================================================
-  // Fetch wrapper
-  // Using XHR to avoid issues with older browsers
-  // ==========================================================================
-  function fetch(url) {
-    var responseType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'text';
-    return new Promise(function (resolve, reject) {
-      try {
-        var request = new XMLHttpRequest(); // Check for CORS support
-
-        if (!('withCredentials' in request)) {
-          return;
-        }
-
-        request.addEventListener('load', function () {
-          if (responseType === 'text') {
-            try {
-              resolve(JSON.parse(request.responseText));
-            } catch (e) {
-              resolve(request.responseText);
-            }
-          } else {
-            resolve(request.response);
-          }
-        });
-        request.addEventListener('error', function () {
-          throw new Error(request.status);
-        });
-        request.open('GET', url, true); // Set the required response type
-
-        request.responseType = responseType;
-        request.send();
-      } catch (e) {
-        reject(e);
-      }
-    });
-  }
 
   // ==========================================================================
 
@@ -1725,6 +2552,7 @@ typeof navigator === "object" && (function (global, factory) {
           airplay: getElement.call(this, this.config.selectors.buttons.airplay),
           settings: getElement.call(this, this.config.selectors.buttons.settings),
           captions: getElement.call(this, this.config.selectors.buttons.captions),
+          descriptions: getElement.call(this, this.config.selectors.buttons.descriptions),
           fullscreen: getElement.call(this, this.config.selectors.buttons.fullscreen),
           transcript: getElements.call(this, this.config.selectors.buttons.transcript)
         }; // Progress
@@ -1869,6 +2697,14 @@ typeof navigator === "object" && (function (global, factory) {
           props.labelPressed = 'disableCaptions';
           props.icon = 'captions-off';
           props.iconPressed = 'captions-on';
+          break;
+
+        case 'descriptions':
+          props.toggle = true;
+          props.label = 'enableDescriptions';
+          props.labelPressed = 'disableDescriptions';
+          props.icon = 'descriptions-off';
+          props.iconPressed = 'descriptions-on';
           break;
 
         case 'fullscreen':
@@ -2110,6 +2946,7 @@ typeof navigator === "object" && (function (global, factory) {
         switch (type) {
           case 'language':
             _this3.currentTrack = Number(value);
+            _this3.currentDescTrack = Number(value);
             break;
 
           case 'quality':
@@ -2375,6 +3212,8 @@ typeof navigator === "object" && (function (global, factory) {
 
       if (setting === 'captions') {
         value = this.currentTrack;
+      } else if (setting === 'descriptions') {
+        value = this.currentDescTrack;
       } else {
         value = !is$1.empty(input) ? input : this[setting]; // Get default
 
@@ -2436,6 +3275,9 @@ typeof navigator === "object" && (function (global, factory) {
 
         case 'captions':
           return captions.getLabel.call(this);
+
+        case 'descriptions':
+          return descriptions.getLabel.call(this);
 
         default:
           return null;
@@ -2504,19 +3346,19 @@ typeof navigator === "object" && (function (global, factory) {
           if (!is.element(this.elements.settings.panels.loop)) {
               return;
           }
-           const options = ['start', 'end', 'all', 'reset'];
+            const options = ['start', 'end', 'all', 'reset'];
           const list = this.elements.settings.panels.loop.querySelector('[role="menu"]');
-           // Show the pane and tab
+            // Show the pane and tab
           toggleHidden(this.elements.settings.buttons.loop, false);
           toggleHidden(this.elements.settings.panels.loop, false);
-           // Toggle the pane and tab
+            // Toggle the pane and tab
           const toggle = !is.empty(this.loop.options);
           controls.toggleMenuButton.call(this, 'loop', toggle);
-           // Empty the menu
+            // Empty the menu
           emptyElement(list);
-           options.forEach(option => {
+            options.forEach(option => {
               const item = createElement('li');
-               const button = createElement(
+                const button = createElement(
                   'button',
                   extend(getAttributesFromSelector(this.config.selectors.buttons.loop), {
                       type: 'button',
@@ -2525,11 +3367,11 @@ typeof navigator === "object" && (function (global, factory) {
                   }),
                   i18n.get(option, this.config)
               );
-               if (['start', 'end'].includes(option)) {
+                if (['start', 'end'].includes(option)) {
                   const badge = controls.createBadge.call(this, '00:00');
                   button.appendChild(badge);
               }
-               item.appendChild(button);
+                item.appendChild(button);
               list.appendChild(item);
           });
       }, */
@@ -2583,9 +3425,57 @@ typeof navigator === "object" && (function (global, factory) {
       options.forEach(controls.createMenuItem.bind(this));
       controls.updateSetting.call(this, type, list);
     },
+    // Set a list of available descriptions languages
+    setDescriptionsMenu: function setDescriptionsMenu() {
+      var _this8 = this;
+
+      // Menu required
+      if (!is$1.element(this.elements.settings.panels.descriptions)) {
+        return;
+      } // TODO: Captions or language? Currently it's mixed
+
+
+      var type = 'descriptions';
+      var list = this.elements.settings.panels.descriptions.querySelector('[role="menu"]');
+      var tracks = descriptions.getTracks.call(this);
+      var toggle = Boolean(tracks.length); // Toggle the pane and tab
+
+      controls.toggleMenuButton.call(this, type, toggle); // Empty the menu
+
+      emptyElement(list); // Check if we need to toggle the parent
+
+      controls.checkMenu.call(this); // If there's no captions, bail
+
+      if (!toggle) {
+        return;
+      } // Generate options data
+
+
+      var options = tracks.map(function (track, value) {
+        return {
+          value: value,
+          checked: _this8.descriptions.toggled && _this8.currentDescTrack === value,
+          title: descriptions.getLabel.call(_this8, track),
+          badge: track.language && controls.createBadge.call(_this8, track.language.toUpperCase()),
+          list: list,
+          type: 'language'
+        };
+      }); // Add the "Disabled" option to turn off descriptions
+
+      options.unshift({
+        value: -1,
+        checked: !this.descriptions.toggled,
+        title: i18n.get('disabled', this.config),
+        list: list,
+        type: 'language'
+      }); // Generate options
+
+      options.forEach(controls.createMenuItem.bind(this));
+      controls.updateSetting.call(this, type, list);
+    },
     // Set a list of available captions languages
     setSpeedMenu: function setSpeedMenu() {
-      var _this8 = this;
+      var _this9 = this;
 
       // Menu required
       if (!is$1.element(this.elements.settings.panels.speed)) {
@@ -2596,7 +3486,7 @@ typeof navigator === "object" && (function (global, factory) {
       var list = this.elements.settings.panels.speed.querySelector('[role="menu"]'); // Filter out invalid speeds
 
       this.options.speed = this.options.speed.filter(function (o) {
-        return o >= _this8.minimumSpeed && o <= _this8.maximumSpeed;
+        return o >= _this9.minimumSpeed && o <= _this9.maximumSpeed;
       }); // Toggle the pane and tab
 
       var toggle = !is$1.empty(this.options.speed) && this.options.speed.length > 1;
@@ -2612,11 +3502,11 @@ typeof navigator === "object" && (function (global, factory) {
 
 
       this.options.speed.forEach(function (speed) {
-        controls.createMenuItem.call(_this8, {
+        controls.createMenuItem.call(_this9, {
           value: speed,
           list: list,
           type: type,
-          title: controls.getLabel.call(_this8, 'speed', speed)
+          title: controls.getLabel.call(_this9, 'speed', speed)
         });
       });
       controls.updateSetting.call(this, type, list);
@@ -2712,7 +3602,7 @@ typeof navigator === "object" && (function (global, factory) {
     },
     // Show a panel in the menu
     showMenuPanel: function showMenuPanel() {
-      var _this9 = this;
+      var _this10 = this;
 
       var type = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
       var tabFocus = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
@@ -2745,7 +3635,7 @@ typeof navigator === "object" && (function (global, factory) {
           container.style.width = '';
           container.style.height = ''; // Only listen once
 
-          off.call(_this9, container, transitionEndEvent, restore);
+          off.call(_this10, container, transitionEndEvent, restore);
         }; // Listen for the transition finishing and restore auto height/width
 
 
@@ -2775,7 +3665,7 @@ typeof navigator === "object" && (function (global, factory) {
     },
     // Build the default HTML
     create: function create(data) {
-      var _this10 = this;
+      var _this11 = this;
 
       var bindMenuItemShortcuts = controls.bindMenuItemShortcuts,
           createButton = controls.createButton,
@@ -2802,27 +3692,27 @@ typeof navigator === "object" && (function (global, factory) {
       dedupe(is$1.array(this.config.controls) ? this.config.controls : []).forEach(function (control) {
         // Transcript button
         if (control === 'transcript') {
-          container.appendChild(createButton.call(_this10, 'transcript', defaultAttributes));
+          container.appendChild(createButton.call(_this11, 'transcript', defaultAttributes));
         } // Restart button
 
 
         if (control === 'restart') {
-          container.appendChild(createButton.call(_this10, 'restart', defaultAttributes));
+          container.appendChild(createButton.call(_this11, 'restart', defaultAttributes));
         } // Rewind button
 
 
         if (control === 'rewind') {
-          container.appendChild(createButton.call(_this10, 'rewind', defaultAttributes));
+          container.appendChild(createButton.call(_this11, 'rewind', defaultAttributes));
         } // Play/Pause button
 
 
         if (control === 'play') {
-          container.appendChild(createButton.call(_this10, 'play', defaultAttributes));
+          container.appendChild(createButton.call(_this11, 'play', defaultAttributes));
         } // Fast forward button
 
 
         if (control === 'fast-forward') {
-          container.appendChild(createButton.call(_this10, 'fast-forward', defaultAttributes));
+          container.appendChild(createButton.call(_this11, 'fast-forward', defaultAttributes));
         } // Progress
 
 
@@ -2830,53 +3720,53 @@ typeof navigator === "object" && (function (global, factory) {
           var progressContainer = createElement('div', {
             class: "".concat(defaultAttributes.class, " plyr__progress__container")
           });
-          var progress = createElement('div', getAttributesFromSelector(_this10.config.selectors.progress)); // Seek range slider
+          var progress = createElement('div', getAttributesFromSelector(_this11.config.selectors.progress)); // Seek range slider
 
-          progress.appendChild(createRange.call(_this10, 'seek', {
+          progress.appendChild(createRange.call(_this11, 'seek', {
             id: "plyr-seek-".concat(data.id)
           })); // Buffer progress
 
-          progress.appendChild(createProgress.call(_this10, 'buffer')); // TODO: Add loop display indicator
+          progress.appendChild(createProgress.call(_this11, 'buffer')); // TODO: Add loop display indicator
           // Seek tooltip
 
-          if (_this10.config.tooltips.seek) {
+          if (_this11.config.tooltips.seek) {
             var tooltip = createElement('span', {
-              class: _this10.config.classNames.tooltip
+              class: _this11.config.classNames.tooltip
             }, '00:00');
             progress.appendChild(tooltip);
-            _this10.elements.display.seekTooltip = tooltip;
+            _this11.elements.display.seekTooltip = tooltip;
           }
 
-          _this10.elements.progress = progress;
-          progressContainer.appendChild(_this10.elements.progress);
+          _this11.elements.progress = progress;
+          progressContainer.appendChild(_this11.elements.progress);
           container.appendChild(progressContainer);
         } // Media current time display
 
 
         if (control === 'current-time') {
-          container.appendChild(createTime.call(_this10, 'currentTime', defaultAttributes));
+          container.appendChild(createTime.call(_this11, 'currentTime', defaultAttributes));
         } // Media duration display
 
 
         if (control === 'duration') {
-          container.appendChild(createTime.call(_this10, 'duration', defaultAttributes));
+          container.appendChild(createTime.call(_this11, 'duration', defaultAttributes));
         } // Volume controls
 
 
         if (control === 'mute' || control === 'volume') {
-          var volume = _this10.elements.volume; // Create the volume container if needed
+          var volume = _this11.elements.volume; // Create the volume container if needed
 
           if (!is$1.element(volume) || !container.contains(volume)) {
             volume = createElement('div', extend({}, defaultAttributes, {
               class: "".concat(defaultAttributes.class, " plyr__volume").trim()
             }));
-            _this10.elements.volume = volume;
+            _this11.elements.volume = volume;
             container.appendChild(volume);
           } // Toggle mute button
 
 
           if (control === 'mute') {
-            volume.appendChild(createButton.call(_this10, 'mute'));
+            volume.appendChild(createButton.call(_this11, 'mute'));
           } // Volume range control
           // Ignored on iOS as it's handled globally
           // https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html
@@ -2887,10 +3777,10 @@ typeof navigator === "object" && (function (global, factory) {
             var attributes = {
               max: 1,
               step: 0.05,
-              value: _this10.config.volume
+              value: _this11.config.volume
             }; // Create the volume range slider
 
-            volume.appendChild(createRange.call(_this10, 'volume', extend(attributes, {
+            volume.appendChild(createRange.call(_this11, 'volume', extend(attributes, {
               id: "plyr-volume-".concat(data.id)
             })));
           }
@@ -2898,16 +3788,21 @@ typeof navigator === "object" && (function (global, factory) {
 
 
         if (control === 'captions') {
-          container.appendChild(createButton.call(_this10, 'captions', defaultAttributes));
+          container.appendChild(createButton.call(_this11, 'captions', defaultAttributes));
+        } // Toggle descriptions button
+
+
+        if (control === 'descriptions' && !browser.isIE) {
+          container.appendChild(createButton.call(_this11, 'descriptions', defaultAttributes));
         } // Settings button / menu
 
 
-        if (control === 'settings' && !is$1.empty(_this10.config.settings)) {
+        if (control === 'settings' && !is$1.empty(_this11.config.settings)) {
           var wrapper = createElement('div', extend({}, defaultAttributes, {
             class: "".concat(defaultAttributes.class, " plyr__menu").trim(),
             hidden: ''
           }));
-          wrapper.appendChild(createButton.call(_this10, 'settings', {
+          wrapper.appendChild(createButton.call(_this11, 'settings', {
             'aria-haspopup': true,
             'aria-controls': "plyr-settings-".concat(data.id),
             'aria-expanded': false
@@ -2927,26 +3822,26 @@ typeof navigator === "object" && (function (global, factory) {
           });
           home.appendChild(menu);
           inner.appendChild(home);
-          _this10.elements.settings.panels.home = home; // Build the menu items
+          _this11.elements.settings.panels.home = home; // Build the menu items
 
-          _this10.config.settings.forEach(function (type) {
+          _this11.config.settings.forEach(function (type) {
             // TODO: bundle this with the createMenuItem helper and bindings
-            var menuItem = createElement('button', extend(getAttributesFromSelector(_this10.config.selectors.buttons.settings), {
+            var menuItem = createElement('button', extend(getAttributesFromSelector(_this11.config.selectors.buttons.settings), {
               type: 'button',
-              class: "".concat(_this10.config.classNames.control, " ").concat(_this10.config.classNames.control, "--forward"),
+              class: "".concat(_this11.config.classNames.control, " ").concat(_this11.config.classNames.control, "--forward"),
               role: 'menuitem',
               'aria-haspopup': true,
               hidden: ''
             })); // Bind menu shortcuts for keyboard users
 
-            bindMenuItemShortcuts.call(_this10, menuItem, type); // Show menu on click
+            bindMenuItemShortcuts.call(_this11, menuItem, type); // Show menu on click
 
-            on.call(_this10, menuItem, 'click', function () {
-              showMenuPanel.call(_this10, type, false);
+            on.call(_this11, menuItem, 'click', function () {
+              showMenuPanel.call(_this11, type, false);
             });
-            var flex = createElement('span', null, i18n.get(type, _this10.config));
+            var flex = createElement('span', null, i18n.get(type, _this11.config));
             var value = createElement('span', {
-              class: _this10.config.classNames.menu.value
+              class: _this11.config.classNames.menu.value
             }); // Speed contains HTML entities
 
             value.innerHTML = data[type];
@@ -2961,18 +3856,18 @@ typeof navigator === "object" && (function (global, factory) {
 
             var backButton = createElement('button', {
               type: 'button',
-              class: "".concat(_this10.config.classNames.control, " ").concat(_this10.config.classNames.control, "--back")
+              class: "".concat(_this11.config.classNames.control, " ").concat(_this11.config.classNames.control, "--back")
             }); // Visible label
 
             backButton.appendChild(createElement('span', {
               'aria-hidden': true
-            }, i18n.get(type, _this10.config))); // Screen reader label
+            }, i18n.get(type, _this11.config))); // Screen reader label
 
             backButton.appendChild(createElement('span', {
-              class: _this10.config.classNames.hidden
-            }, i18n.get('menuBack', _this10.config))); // Go back via keyboard
+              class: _this11.config.classNames.hidden
+            }, i18n.get('menuBack', _this11.config))); // Go back via keyboard
 
-            on.call(_this10, pane, 'keydown', function (event) {
+            on.call(_this11, pane, 'keydown', function (event) {
               // We only care about <-
               if (event.which !== 37) {
                 return;
@@ -2982,11 +3877,11 @@ typeof navigator === "object" && (function (global, factory) {
               event.preventDefault();
               event.stopPropagation(); // Show the respective menu
 
-              showMenuPanel.call(_this10, 'home', true);
+              showMenuPanel.call(_this11, 'home', true);
             }, false); // Go back via button click
 
-            on.call(_this10, backButton, 'click', function () {
-              showMenuPanel.call(_this10, 'home', false);
+            on.call(_this11, backButton, 'click', function () {
+              showMenuPanel.call(_this11, 'home', false);
             }); // Add to pane
 
             pane.appendChild(backButton); // Menu
@@ -2995,55 +3890,55 @@ typeof navigator === "object" && (function (global, factory) {
               role: 'menu'
             }));
             inner.appendChild(pane);
-            _this10.elements.settings.buttons[type] = menuItem;
-            _this10.elements.settings.panels[type] = pane;
+            _this11.elements.settings.buttons[type] = menuItem;
+            _this11.elements.settings.panels[type] = pane;
           });
 
           popup.appendChild(inner);
           wrapper.appendChild(popup);
           container.appendChild(wrapper);
-          _this10.elements.settings.popup = popup;
-          _this10.elements.settings.menu = wrapper;
+          _this11.elements.settings.popup = popup;
+          _this11.elements.settings.menu = wrapper;
         } // Picture in picture button
 
 
         if (control === 'pip' && support.pip) {
-          container.appendChild(createButton.call(_this10, 'pip', defaultAttributes));
+          container.appendChild(createButton.call(_this11, 'pip', defaultAttributes));
         } // Airplay button
 
 
         if (control === 'airplay' && support.airplay) {
-          container.appendChild(createButton.call(_this10, 'airplay', defaultAttributes));
+          container.appendChild(createButton.call(_this11, 'airplay', defaultAttributes));
         } // Download button
 
 
         if (control === 'download') {
           var _attributes = extend({}, defaultAttributes, {
             element: 'a',
-            href: _this10.download,
+            href: _this11.download,
             target: '_blank'
           }); // Set download attribute for HTML5 only
 
 
-          if (_this10.isHTML5) {
+          if (_this11.isHTML5) {
             _attributes.download = '';
           }
 
-          var download = _this10.config.urls.download;
+          var download = _this11.config.urls.download;
 
-          if (!is$1.url(download) && _this10.isEmbed) {
+          if (!is$1.url(download) && _this11.isEmbed) {
             extend(_attributes, {
-              icon: "logo-".concat(_this10.provider),
-              label: _this10.provider
+              icon: "logo-".concat(_this11.provider),
+              label: _this11.provider
             });
           }
 
-          container.appendChild(createButton.call(_this10, 'download', _attributes));
+          container.appendChild(createButton.call(_this11, 'download', _attributes));
         } // Toggle fullscreen button
 
 
         if (control === 'fullscreen') {
-          container.appendChild(createButton.call(_this10, 'fullscreen', defaultAttributes));
+          container.appendChild(createButton.call(_this11, 'fullscreen', defaultAttributes));
         }
       }); // Set available quality levels
 
@@ -3056,7 +3951,7 @@ typeof navigator === "object" && (function (global, factory) {
     },
     // Insert controls
     inject: function inject() {
-      var _this11 = this;
+      var _this12 = this;
 
       // Sprite
       if (this.config.loadSprite) {
@@ -3149,7 +4044,7 @@ typeof navigator === "object" && (function (global, factory) {
 
       if (!is$1.empty(this.elements.buttons)) {
         var addProperty = function addProperty(button) {
-          var className = _this11.config.classNames.controlPressed;
+          var className = _this12.config.classNames.controlPressed;
           Object.defineProperty(button, 'pressed', {
             enumerable: true,
             get: function get() {
@@ -3185,51 +4080,12 @@ typeof navigator === "object" && (function (global, factory) {
         var selector = "".concat(selectors.controls.wrapper, " ").concat(selectors.labels, " .").concat(classNames.hidden);
         var labels = getElements.call(this, selector);
         Array.from(labels).forEach(function (label) {
-          toggleClass(label, _this11.config.classNames.hidden, false);
-          toggleClass(label, _this11.config.classNames.tooltip, true);
+          toggleClass(label, _this12.config.classNames.hidden, false);
+          toggleClass(label, _this12.config.classNames.tooltip, true);
         });
       }
     }
   };
-
-  /**
-   * Parse a string to a URL object
-   * @param {String} input - the URL to be parsed
-   * @param {Boolean} safe - failsafe parsing
-   */
-
-  function parseUrl(input) {
-    var safe = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-    var url = input;
-
-    if (safe) {
-      var parser = document.createElement('a');
-      parser.href = url;
-      url = parser.href;
-    }
-
-    try {
-      return new URL(url);
-    } catch (e) {
-      return null;
-    }
-  } // Convert object to URLSearchParams
-
-  function buildUrlParams(input) {
-    var params = new URLSearchParams();
-
-    if (is$1.object(input)) {
-      Object.entries(input).forEach(function (_ref) {
-        var _ref2 = _slicedToArray(_ref, 2),
-            key = _ref2[0],
-            value = _ref2[1];
-
-        params.set(key, value);
-      });
-    }
-
-    return params;
-  }
 
   var captions = {
     // Setup captions
@@ -3701,6 +4557,14 @@ typeof navigator === "object" && (function (global, factory) {
       // This is needed for streaming captions, but may result in unselectable options
       update: false
     },
+    // Descriptions settings
+    descriptions: {
+      active: false,
+      language: 'auto',
+      // Listen to new tracks added after Plyr is initialized.
+      // This is needed for streaming captions, but may result in unselectable options
+      update: false
+    },
     // Fullscreen settings
     fullscreen: {
       enabled: true,
@@ -3723,7 +4587,8 @@ typeof navigator === "object" && (function (global, factory) {
     // 'rewind',
     'play', // 'fast-forward',
     'progress', 'current-time', // 'duration',
-    'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', // 'download',
+    'mute', 'volume', 'captions', // 'descriptions',
+    'settings', 'pip', 'airplay', // 'download',
     'fullscreen' // 'transcript',
     ],
     settings: ['captions', 'quality', 'speed'],
@@ -3745,12 +4610,15 @@ typeof navigator === "object" && (function (global, factory) {
       unmute: 'Unmute',
       enableCaptions: 'Enable captions',
       disableCaptions: 'Disable captions',
+      enableDescriptions: 'Enable descriptions',
+      disableDescriptions: 'Disable descriptions',
       download: 'Download',
       enterFullscreen: 'Enter fullscreen',
       exitFullscreen: 'Exit fullscreen',
       transcript: 'Transcript',
       frameTitle: 'Player for {title}',
       captions: 'Captions',
+      descriptions: 'Descriptions',
       settings: 'Settings',
       pip: 'PIP',
       menuBack: 'Go back to previous menu',
@@ -3837,6 +4705,7 @@ typeof navigator === "object" && (function (global, factory) {
         fastForward: '[data-plyr="fast-forward"]',
         mute: '[data-plyr="mute"]',
         captions: '[data-plyr="captions"]',
+        descriptions: '[data-plyr="descriptions"]',
         download: '[data-plyr="download"]',
         fullscreen: '[data-plyr="fullscreen"]',
         pip: '[data-plyr="pip"]',
@@ -3862,7 +4731,9 @@ typeof navigator === "object" && (function (global, factory) {
       },
       progress: '.plyr__progress',
       captions: '.plyr__captions',
-      caption: '.plyr__caption'
+      caption: '.plyr__caption',
+      descriptions: '.plyr__descriptions',
+      description: '.plyr__description'
     },
     // Class hooks added to the player in different states
     classNames: {
@@ -3901,6 +4772,10 @@ typeof navigator === "object" && (function (global, factory) {
       captions: {
         enabled: 'plyr--captions-enabled',
         active: 'plyr--captions-active'
+      },
+      descriptions: {
+        enabled: 'plyr--descriptions-enabled',
+        active: 'plyr--descriptions-active'
       },
       fullscreen: {
         enabled: 'plyr--fullscreen-enabled',
@@ -4399,6 +5274,7 @@ typeof navigator === "object" && (function (global, factory) {
         controls.inject.call(this); // Re-attach control listeners
 
         this.listeners.controls();
+        this.listeners.ariaLabels();
       } // Remove native controls
 
 
@@ -4406,6 +5282,11 @@ typeof navigator === "object" && (function (global, factory) {
 
       if (this.isHTML5) {
         captions.setup.call(this);
+      } // Setup captions for HTML5
+
+
+      if (this.isHTML5 && !browser.isIE) {
+        descriptions.setup.call(this);
       } // Reset volume
 
 
@@ -4537,7 +5418,6 @@ typeof navigator === "object" && (function (global, factory) {
         Object.assign(target, {
           pressed: _this3.playing
         });
-        target.setAttribute('aria-label', i18n.get(_this3.playing ? 'pause' : 'play', _this3.config));
       }); // Only update controls on non timeupdate events
 
       if (is$1.event(event) && event.type === 'timeupdate') {
@@ -5129,6 +6009,10 @@ typeof navigator === "object" && (function (global, factory) {
 
         this.bind(elements.buttons.captions, 'click', function () {
           return player.toggleCaptions();
+        }); // Descriptions toggle
+
+        this.bind(elements.buttons.descriptions, 'click', function () {
+          return player.toggleDescriptions();
         }); // Download
 
         this.bind(elements.buttons.download, 'click', function () {
@@ -5368,17 +6252,70 @@ typeof navigator === "object" && (function (global, factory) {
             event.preventDefault();
           }
         }, 'volume', false);
+      } // Listen for control events - update aria labels
+
+    }, {
+      key: "ariaLabels",
+      value: function ariaLabels() {
+        var player = this.player;
+        var elements = player.elements;
+        var title; // If there's a media title set, use that for the label
+
+        if (is$1.string(player.config.title) && !is$1.empty(player.config.title)) {
+          title = "".concat(player.config.title);
+        }
+
+        function updateLabel(target, key) {
+          if (target && title) {
+            target.setAttribute('aria-label', "".concat(i18n.get(key, player.config), ", ").concat(title));
+          }
+        } // Initial aria-label setup
+
+
+        updateLabel(elements.buttons.restart, 'reset');
+        updateLabel(elements.buttons.rewind, 'rewind');
+        updateLabel(elements.buttons.fastForward, 'fastForward');
+        updateLabel(elements.buttons.mute, player.muted ? 'unmute' : 'mute');
+        updateLabel(elements.buttons.download, 'download');
+        updateLabel(elements.buttons.fullscreen, 'enterFullscreen');
+        updateLabel(elements.buttons.pip, 'pip');
+        updateLabel(elements.buttons.airplay, 'airplay');
+        updateLabel(elements.buttons.settings, 'settings');
+        updateLabel(elements.buttons.loop, 'loop');
+        updateLabel(elements.buttons.transcript, 'transcript');
+        updateLabel(elements.inputs.seek, 'seek');
+        updateLabel(elements.inputs.volume, 'volume');
+        on.call(player, player.media, 'captionsenabled', function (event) {
+          updateLabel(elements.buttons.captions, 'disableCaptions');
+        });
+        on.call(player, player.media, 'captionsdisabled', function (event) {
+          updateLabel(elements.buttons.captions, 'enableCaptions');
+        });
+        on.call(player, player.media, 'descriptionsenabled', function (event) {
+          updateLabel(elements.buttons.descriptions, 'disableDescriptions');
+        });
+        on.call(player, player.media, 'descriptionsdisabled', function (event) {
+          updateLabel(elements.buttons.descriptions, 'enableDescriptions');
+        });
+        on.call(player, player.media, 'volumechange', function (event) {
+          updateLabel(elements.buttons.mute, player.muted ? 'unmute' : 'mute');
+        });
+        on.call(player, player.media, 'enterfullscreen', function (event) {
+          updateLabel(elements.buttons.fullscreen, 'exitFullscreen');
+        });
+        on.call(player, player.media, 'exitfullscreen', function (event) {
+          updateLabel(elements.buttons.fullscreen, 'enterFullscreen');
+        });
+        on.call(player, player.media, 'playing play pause ended emptied timeupdate', function (event) {
+          Array.from(elements.buttons.play || []).forEach(function (target) {
+            updateLabel(target, player.playing ? 'pause' : 'play');
+          });
+        });
       }
     }]);
 
     return Listeners;
   }();
-
-  var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
-
-  function createCommonjsModule(fn, module) {
-  	return module = { exports: {} }, fn(module, module.exports), module.exports;
-  }
 
   var loadjs_umd = createCommonjsModule(function (module, exports) {
     (function (root, factory) {
@@ -8094,6 +9031,7 @@ typeof navigator === "object" && (function (global, factory) {
         container: null,
         fullscreen: null,
         captions: null,
+        descriptions: null,
         buttons: {},
         display: {},
         progress: {},
@@ -8109,6 +9047,12 @@ typeof navigator === "object" && (function (global, factory) {
       this.captions = {
         active: null,
         currentTrack: -1,
+        meta: new WeakMap()
+      }; // descriptions
+
+      this.descriptions = {
+        active: null,
+        currentDescTrack: -1,
         meta: new WeakMap()
       }; // Fullscreen
 
@@ -8264,7 +9208,7 @@ typeof navigator === "object" && (function (global, factory) {
 
       if (!is$1.element(this.elements.container)) {
         this.elements.container = createElement('div', {
-          tabindex: 0
+          'data-debug': this.config.debug
         });
         wrap(this.media, this.elements.container);
       } // Migrate custom properties from media to container (so they work 😉)
@@ -8465,6 +9409,16 @@ typeof navigator === "object" && (function (global, factory) {
         captions.toggle.call(this, input, false);
       }
       /**
+       * Toggle descriptions
+       * @param {Boolean} input - Whether to enable descriptions
+       */
+
+    }, {
+      key: "toggleDescriptions",
+      value: function toggleDescriptions(input) {
+        descriptions.toggle.call(this, input, false);
+      }
+      /**
        * Set the caption track by index
        * @param {Number} - Caption index
        */
@@ -8577,11 +9531,13 @@ typeof navigator === "object" && (function (global, factory) {
               // Remove elements
               removeElement(_this3.elements.buttons.play);
               removeElement(_this3.elements.captions);
+              removeElement(_this3.elements.descriptions);
               removeElement(_this3.elements.controls);
               removeElement(_this3.elements.wrapper); // Clear for GC
 
               _this3.elements.buttons.play = null;
               _this3.elements.captions = null;
+              _this3.elements.descriptions = null;
               _this3.elements.controls = null;
               _this3.elements.wrapper = null;
             } // Callback
@@ -9031,7 +9987,7 @@ typeof navigator === "object" && (function (global, factory) {
         this.media.loop = toggle; // Set default to be a true toggle
 
         /* const type = ['start', 'end', 'all', 'none', 'toggle'].includes(input) ? input : 'toggle';
-             switch (type) {
+              switch (type) {
                 case 'start':
                     if (this.config.loop.end && this.config.loop.end <= this.currentTime) {
                         this.config.loop.end = null;
@@ -9039,20 +9995,20 @@ typeof navigator === "object" && (function (global, factory) {
                     this.config.loop.start = this.currentTime;
                     // this.config.loop.indicator.start = this.elements.display.played.value;
                     break;
-                 case 'end':
+                  case 'end':
                     if (this.config.loop.start >= this.currentTime) {
                         return this;
                     }
                     this.config.loop.end = this.currentTime;
                     // this.config.loop.indicator.end = this.elements.display.played.value;
                     break;
-                 case 'all':
+                  case 'all':
                     this.config.loop.start = 0;
                     this.config.loop.end = this.duration - 2;
                     this.config.loop.indicator.start = 0;
                     this.config.loop.indicator.end = 100;
                     break;
-                 case 'toggle':
+                  case 'toggle':
                     if (this.config.loop.active) {
                         this.config.loop.start = 0;
                         this.config.loop.end = null;
@@ -9061,7 +10017,7 @@ typeof navigator === "object" && (function (global, factory) {
                         this.config.loop.end = this.duration - 2;
                     }
                     break;
-                 default:
+                  default:
                     this.config.loop.start = 0;
                     this.config.loop.end = null;
                     break;
@@ -9195,14 +10151,34 @@ typeof navigator === "object" && (function (global, factory) {
         captions.set.call(this, input, false);
       }
       /**
-       * Get the current caption track index (-1 if disabled)
+       * Set the caption track by index
+       * @param {Number} - Description index
        */
       ,
+
+      /**
+       * Get the current caption track index (-1 if disabled)
+       */
       get: function get() {
         var _this$captions = this.captions,
             toggled = _this$captions.toggled,
             currentTrack = _this$captions.currentTrack;
         return toggled ? currentTrack : -1;
+      }
+      /**
+       * Get the current caption track index (-1 if disabled)
+       */
+
+    }, {
+      key: "currentDescTrack",
+      set: function set(input) {
+        descriptions.set.call(this, input, false);
+      },
+      get: function get() {
+        var _this$descriptions = this.descriptions,
+            toggled = _this$descriptions.toggled,
+            currentDescTrack = _this$descriptions.currentDescTrack;
+        return toggled ? currentDescTrack : -1;
       }
       /**
        * Set the wanted language for captions

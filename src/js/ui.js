@@ -64,7 +64,7 @@ const ui = {
     }
 
     // Setup captions for HTML5
-    if (this.isHTML5) {
+    if (this.isHTML5 && !browser.isIE) {
       descriptions.setup.call(this);
     }
 
