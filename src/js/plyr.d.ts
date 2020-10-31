@@ -144,7 +144,7 @@ declare class Plyr {
   readonly provider: 'html5' | 'vimeo' | 'youtube';
 
   /**
-   * Returns the native API for Vimeo or Youtube players
+   * Returns the native API for Vimeo or YouTube players
    */
   readonly embed?: any;
 
@@ -276,15 +276,15 @@ declare namespace Plyr {
   };
   // For retrocompatibility, we keep Html5Event
   type Html5Event = keyof Plyr.Html5EventMap;
-  type YoutubeEventMap = {
+  type YouTubeEventMap = {
     statechange: PlyrStateChangeEvent;
     qualitychange: PlyrEvent;
     qualityrequested: PlyrEvent;
   };
-  // For retrocompatibility, we keep YoutubeEvent
-  type YoutubeEvent = keyof Plyr.YoutubeEventMap;
+  // For retrocompatibility, we keep YouTubeEvent
+  type YouTubeEvent = keyof Plyr.YouTubeEventMap;
 
-  type PlyrEventMap = StandardEventMap & Html5EventMap & YoutubeEventMap;
+  type PlyrEventMap = StandardEventMap & Html5EventMap & YouTubeEventMap;
 
   interface FullscreenControl {
     /**
@@ -498,7 +498,7 @@ declare namespace Plyr {
     vimeo?: object;
 
     /**
-     * Youtube Player Options.
+     * YouTube Player Options.
      */
     youtube?: object;
 
@@ -628,7 +628,7 @@ declare namespace Plyr {
     readonly detail: { readonly plyr: Plyr };
   }
 
-  enum YoutubeState {
+  enum YouTubeState {
     UNSTARTED = -1,
     ENDED = 0,
     PLAYING = 1,
@@ -640,7 +640,7 @@ declare namespace Plyr {
   interface PlyrStateChangeEvent extends CustomEvent {
     readonly detail: {
       readonly plyr: Plyr;
-      readonly code: YoutubeState;
+      readonly code: YouTubeState;
     };
   }
 
