@@ -126,6 +126,7 @@ const youtube = {
     const container = createElement('div', { id, 'data-poster': config.customControls ? player.poster : undefined });
     player.media = replaceElement(container, player.media);
 
+    // Only load the poster when using custom controls
     if (config.customControls) {
       const posterSrc = (s) => `https://i.ytimg.com/vi/${videoId}/${s}default.jpg`;
 

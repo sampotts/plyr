@@ -41,7 +41,7 @@
   "devDependencies": {
     "@sampotts/eslint-config": "1.1.5",
     "ansi-colors": "^4.1.1",
-    "autoprefixer": "^10.0.1",
+    "autoprefixer": "^10.0.2",
     "aws-sdk": "^2.773.0",
     "@babel/core": "^7.12.3",
     "@babel/preset-env": "^7.12.1",
@@ -67,16 +67,17 @@
     "gulp-replace": "^1.0.0",
     "gulp-sass": "^4.1.0",
     "gulp-size": "^3.0.0",
-    "gulp-sourcemaps": "^2.6.5",
+    "gulp-sourcemaps": "^3.0.0",
     "gulp-svgstore": "^7.0.1",
-    "gulp-terser": "^1.4.0",
-    "postcss": "^8.1.2",
+    "gulp-terser": "^1.4.1",
+    "postcss": "^8.1.7",
     "postcss-clean": "^1.1.0",
     "postcss-custom-properties": "^10.0.0",
+    "prettier-eslint": "^11.0.0",
     "prettier-stylelint": "^0.4.2",
     "remark-cli": "^9.0.0",
     "remark-validate-links": "^10.0.2",
-    "rollup": "^2.32.0",
+    "rollup": "^2.33.1",
     "rollup-plugin-babel": "^4.4.0",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
@@ -90,10 +91,10 @@
     "through2": "^4.0.2"
   },
   "dependencies": {
-    "core-js": "^3.6.5",
+    "core-js": "^3.7.0",
     "custom-event-polyfill": "^1.0.7",
     "loadjs": "^4.2.0",
     "rangetouch": "^2.0.1",
-    "url-polyfill": "^1.1.11"
+    "url-polyfill": "^1.1.12"
   }
 }
