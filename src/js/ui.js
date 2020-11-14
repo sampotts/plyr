@@ -172,6 +172,9 @@ const ui = {
     // Set property synchronously to respect the call order
     this.media.setAttribute('data-poster', poster);
 
+    // Show the poster
+    this.elements.poster.removeAttribute('hidden');
+
     // Wait until ui is ready
     return (
       ready
