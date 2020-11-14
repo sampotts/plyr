@@ -62,12 +62,8 @@ import toggleClass from './toggle-class';
         src: ['https://cdn.plyr.io/static/demo/thumbs/100p.vtt', 'https://cdn.plyr.io/static/demo/thumbs/240p.vtt'],
       },
       vimeo: {
-        customControls: true,
         // Prevent Vimeo blocking plyr.io demo site
         referrerPolicy: 'no-referrer',
-      },
-      youtube: {
-        customControls: true,
       },
     });
 

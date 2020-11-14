@@ -423,7 +423,7 @@ const defaults = {
     speed: true,
     transparent: false,
     // Custom settings from Plyr
-    customControls: false,
+    customControls: true,
     referrerPolicy: null, // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement/referrerPolicy
     // Whether the owner of the video has a Pro or Business account
     // (which allows us to properly hide controls without CSS hacks, etc)
@@ -437,7 +437,7 @@ const defaults = {
     iv_load_policy: 3, // Hide annotations
     modestbranding: 1, // Hide logos as much as possible (they still show one in the corner when paused)
     // Custom settings from Plyr
-    customControls: false,
+    customControls: true,
     noCookie: false, // Whether to use an alternative version of YouTube without cookies
   },
 };
