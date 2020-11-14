@@ -14817,7 +14817,7 @@ typeof navigator === "object" && (function () {
 	  check$1(typeof self == 'object' && self) ||
 	  check$1(typeof commonjsGlobal == 'object' && commonjsGlobal) ||
 	  // eslint-disable-next-line no-new-func
-	  Function('return this')();
+	  (function () { return this; })() || Function('return this')();
 
 	var fails$1 = function (exec) {
 	  try {
@@ -15012,7 +15012,7 @@ typeof navigator === "object" && (function () {
 	(module.exports = function (key, value) {
 	  return sharedStore$1[key] || (sharedStore$1[key] = value !== undefined ? value : {});
 	})('versions', []).push({
-	  version: '3.6.5',
+	  version: '3.7.0',
 	  mode:  'global',
 	  copyright: '© 2020 Denis Pushkarev (zloirock.ru)'
 	});
@@ -15050,11 +15050,12 @@ typeof navigator === "object" && (function () {
 	};
 
 	if (nativeWeakMap$1) {
-	  var store$3 = new WeakMap$4();
+	  var store$3 = sharedStore$1.state || (sharedStore$1.state = new WeakMap$4());
 	  var wmget$1 = store$3.get;
 	  var wmhas$1 = store$3.has;
 	  var wmset$1 = store$3.set;
 	  set$3 = function (it, metadata) {
+	    metadata.facade = it;
 	    wmset$1.call(store$3, it, metadata);
 	    return metadata;
 	  };
@@ -15068,6 +15069,7 @@ typeof navigator === "object" && (function () {
 	  var STATE$1 = sharedKey$1('state');
 	  hiddenKeys$2[STATE$1] = true;
 	  set$3 = function (it, metadata) {
+	    metadata.facade = it;
 	    createNonEnumerableProperty$1(it, STATE$1, metadata);
 	    return metadata;
 	  };
@@ -15096,9 +15098,15 @@ typeof navigator === "object" && (function () {
 	  var unsafe = options ? !!options.unsafe : false;
 	  var simple = options ? !!options.enumerable : false;
 	  var noTargetGet = options ? !!options.noTargetGet : false;
+	  var state;
 	  if (typeof value == 'function') {
-	    if (typeof key == 'string' && !has$2(value, 'name')) createNonEnumerableProperty$1(value, 'name', key);
-	    enforceInternalState(value).source = TEMPLATE.join(typeof key == 'string' ? key : '');
+	    if (typeof key == 'string' && !has$2(value, 'name')) {
+	      createNonEnumerableProperty$1(value, 'name', key);
+	    }
+	    state = enforceInternalState(value);
+	    if (!state.source) {
+	      state.source = TEMPLATE.join(typeof key == 'string' ? key : '');
+	    }
 	  }
 	  if (O === global_1$1) {
 	    if (simple) O[key] = value;
@@ -15724,14 +15732,20 @@ typeof navigator === "object" && (function () {
 	// https://tc39.github.io/ecma262/#sec-array.prototype-@@unscopables
 	addToUnscopables$1(FIND$1);
 
+	var iteratorClose = function (iterator) {
+	  var returnMethod = iterator['return'];
+	  if (returnMethod !== undefined) {
+	    return anObject$1(returnMethod.call(iterator)).value;
+	  }
+	};
+
 	// call something on iterator step with safe closing on error
 	var callWithSafeIterationClosing$1 = function (iterator, fn, value, ENTRIES) {
 	  try {
 	    return ENTRIES ? fn(anObject$1(value)[0], value[1]) : fn(value);
 	  // 7.4.6 IteratorClose(iterator, completion)
 	  } catch (error) {
-	    var returnMethod = iterator['return'];
-	    if (returnMethod !== undefined) anObject$1(returnMethod.call(iterator));
+	    iteratorClose(iterator);
 	    throw error;
 	  }
 	};
@@ -16452,11 +16466,11 @@ typeof navigator === "object" && (function () {
 	  var regexp = /./;
 	  try {
 	    '/./'[METHOD_NAME](regexp);
-	  } catch (e) {
+	  } catch (error1) {
 	    try {
 	      regexp[MATCH$4] = false;
 	      return '/./'[METHOD_NAME](regexp);
-	    } catch (f) { /* empty */ }
+	    } catch (error2) { /* empty */ }
 	  } return false;
 	};
 
@@ -16776,15 +16790,30 @@ typeof navigator === "object" && (function () {
 	var internalMetadata_3$1 = internalMetadata$1.getWeakData;
 	var internalMetadata_4$1 = internalMetadata$1.onFreeze;
 
-	var iterate_1$1 = createCommonjsModule(function (module) {
 	var Result = function (stopped, result) {
 	  this.stopped = stopped;
 	  this.result = result;
 	};
 
-	var iterate = module.exports = function (iterable, fn, that, AS_ENTRIES, IS_ITERATOR) {
-	  var boundFunction = functionBindContext$1(fn, that, AS_ENTRIES ? 2 : 1);
+	var iterate = function (iterable, unboundFunction, options) {
+	  var that = options && options.that;
+	  var AS_ENTRIES = !!(options && options.AS_ENTRIES);
+	  var IS_ITERATOR = !!(options && options.IS_ITERATOR);
+	  var INTERRUPTED = !!(options && options.INTERRUPTED);
+	  var fn = functionBindContext$1(unboundFunction, that, 1 + AS_ENTRIES + INTERRUPTED);
 	  var iterator, iterFn, index, length, result, next, step;
+
+	  var stop = function (condition) {
+	    if (iterator) iteratorClose(iterator);
+	    return new Result(true, condition);
+	  };
+
+	  var callFn = function (value) {
+	    if (AS_ENTRIES) {
+	      anObject$1(value);
+	      return INTERRUPTED ? fn(value[0], value[1], stop) : fn(value[0], value[1]);
+	    } return INTERRUPTED ? fn(value, stop) : fn(value);
+	  };
 
 	  if (IS_ITERATOR) {
 	    iterator = iterable;
@@ -16794,9 +16823,7 @@ typeof navigator === "object" && (function () {
 	    // optimisation for array iterators
 	    if (isArrayIteratorMethod$1(iterFn)) {
 	      for (index = 0, length = toLength$1(iterable.length); length > index; index++) {
-	        result = AS_ENTRIES
-	          ? boundFunction(anObject$1(step = iterable[index])[0], step[1])
-	          : boundFunction(iterable[index]);
+	        result = callFn(iterable[index]);
 	        if (result && result instanceof Result) return result;
 	      } return new Result(false);
 	    }
@@ -16805,15 +16832,15 @@ typeof navigator === "object" && (function () {
 
 	  next = iterator.next;
 	  while (!(step = next.call(iterator)).done) {
-	    result = callWithSafeIterationClosing$1(iterator, boundFunction, step.value, AS_ENTRIES);
+	    try {
+	      result = callFn(step.value);
+	    } catch (error) {
+	      iteratorClose(iterator);
+	      throw error;
+	    }
 	    if (typeof result == 'object' && result && result instanceof Result) return result;
 	  } return new Result(false);
 	};
-
-	iterate.stop = function (result) {
-	  return new Result(true, result);
-	};
-	});
 
 	var anInstance$1 = function (it, Constructor, name) {
 	  if (!(it instanceof Constructor)) {
@@ -16878,7 +16905,7 @@ typeof navigator === "object" && (function () {
 	      Constructor = wrapper(function (dummy, iterable) {
 	        anInstance$1(dummy, Constructor, CONSTRUCTOR_NAME);
 	        var that = inheritIfRequired$1(new NativeConstructor(), dummy, Constructor);
-	        if (iterable != undefined) iterate_1$1(iterable, that[ADDER], that, IS_MAP);
+	        if (iterable != undefined) iterate(iterable, that[ADDER], { that: that, AS_ENTRIES: IS_MAP });
 	        return that;
 	      });
 	      Constructor.prototype = NativePrototype;
@@ -16968,7 +16995,7 @@ typeof navigator === "object" && (function () {
 	        id: id$3++,
 	        frozen: undefined
 	      });
-	      if (iterable != undefined) iterate_1$1(iterable, that[ADDER], that, IS_MAP);
+	      if (iterable != undefined) iterate(iterable, that[ADDER], { that: that, AS_ENTRIES: IS_MAP });
 	    });
 
 	    var getInternalState = internalStateGetterFor$1(CONSTRUCTOR_NAME);
@@ -17806,7 +17833,7 @@ typeof navigator === "object" && (function () {
 	var URLSearchParamsPrototype$1 = URLSearchParamsConstructor$1.prototype;
 
 	redefineAll$1(URLSearchParamsPrototype$1, {
-	  // `URLSearchParams.prototype.appent` method
+	  // `URLSearchParams.prototype.append` method
 	  // https://url.spec.whatwg.org/#dom-urlsearchparams-append
 	  append: function append(name, value) {
 	    validateArgumentsLength$1(arguments.length, 2);
@@ -19959,6 +19986,8 @@ typeof navigator === "object" && (function () {
 
 	var engineIsIos$1 = /(iphone|ipod|ipad).*applewebkit/i.test(engineUserAgent$1);
 
+	var engineIsNode = classofRaw$1(global_1$1.process) == 'process';
+
 	var location$1 = global_1$1.location;
 	var set$4 = global_1$1.setImmediate;
 	var clear$1 = global_1$1.clearImmediate;
@@ -20011,7 +20040,7 @@ typeof navigator === "object" && (function () {
 	    delete queue$1[id];
 	  };
 	  // Node.js 0.8-
-	  if (classofRaw$1(process$6) == 'process') {
+	  if (engineIsNode) {
 	    defer$1 = function (id) {
 	      process$6.nextTick(runner$1(id));
 	    };
@@ -20033,8 +20062,8 @@ typeof navigator === "object" && (function () {
 	    global_1$1.addEventListener &&
 	    typeof postMessage == 'function' &&
 	    !global_1$1.importScripts &&
-	    !fails$1(post$1) &&
-	    location$1.protocol !== 'file:'
+	    location$1 && location$1.protocol !== 'file:' &&
+	    !fails$1(post$1)
 	  ) {
 	    defer$1 = post$1;
 	    global_1$1.addEventListener('message', listener$1, false);
@@ -20060,14 +20089,14 @@ typeof navigator === "object" && (function () {
 	};
 
 	var getOwnPropertyDescriptor$7 = objectGetOwnPropertyDescriptor$1.f;
-
 	var macrotask$1 = task$2.set;
 
 
+
 	var MutationObserver$2 = global_1$1.MutationObserver || global_1$1.WebKitMutationObserver;
+	var document$4 = global_1$1.document;
 	var process$7 = global_1$1.process;
 	var Promise$2 = global_1$1.Promise;
-	var IS_NODE$2 = classofRaw$1(process$7) == 'process';
 	// Node.js 11 shows ExperimentalWarning on getting `queueMicrotask`
 	var queueMicrotaskDescriptor$1 = getOwnPropertyDescriptor$7(global_1$1, 'queueMicrotask');
 	var queueMicrotask$1 = queueMicrotaskDescriptor$1 && queueMicrotaskDescriptor$1.value;
@@ -20078,7 +20107,7 @@ typeof navigator === "object" && (function () {
 	if (!queueMicrotask$1) {
 	  flush$1 = function () {
 	    var parent, fn;
-	    if (IS_NODE$2 && (parent = process$7.domain)) parent.exit();
+	    if (engineIsNode && (parent = process$7.domain)) parent.exit();
 	    while (head$1) {
 	      fn = head$1.fn;
 	      head$1 = head$1.next;
@@ -20093,15 +20122,10 @@ typeof navigator === "object" && (function () {
 	    if (parent) parent.enter();
 	  };
 
-	  // Node.js
-	  if (IS_NODE$2) {
-	    notify$2 = function () {
-	      process$7.nextTick(flush$1);
-	    };
 	  // browsers with MutationObserver, except iOS - https://github.com/zloirock/core-js/issues/339
-	  } else if (MutationObserver$2 && !engineIsIos$1) {
+	  if (!engineIsIos$1 && !engineIsNode && MutationObserver$2 && document$4) {
 	    toggle$1 = true;
-	    node$1 = document.createTextNode('');
+	    node$1 = document$4.createTextNode('');
 	    new MutationObserver$2(flush$1).observe(node$1, { characterData: true });
 	    notify$2 = function () {
 	      node$1.data = toggle$1 = !toggle$1;
@@ -20113,6 +20137,11 @@ typeof navigator === "object" && (function () {
 	    then$1 = promise$1.then;
 	    notify$2 = function () {
 	      then$1.call(promise$1, flush$1);
+	    };
+	  // Node.js without promises
+	  } else if (engineIsNode) {
+	    notify$2 = function () {
+	      process$7.nextTick(flush$1);
 	    };
 	  // for other environments - macrotask based on:
 	  // - setImmediate
@@ -20192,6 +20221,7 @@ typeof navigator === "object" && (function () {
 
 
 
+
 	var SPECIES$c = wellKnownSymbol$1('species');
 	var PROMISE$1 = 'Promise';
 	var getInternalState$8 = internalState$1.get;
@@ -20199,13 +20229,13 @@ typeof navigator === "object" && (function () {
 	var getInternalPromiseState$1 = internalState$1.getterFor(PROMISE$1);
 	var PromiseConstructor$1 = nativePromiseConstructor$1;
 	var TypeError$2 = global_1$1.TypeError;
-	var document$4 = global_1$1.document;
+	var document$5 = global_1$1.document;
 	var process$8 = global_1$1.process;
 	var $fetch$3 = getBuiltIn$1('fetch');
 	var newPromiseCapability$3 = newPromiseCapability$2.f;
 	var newGenericPromiseCapability$1 = newPromiseCapability$3;
-	var IS_NODE$3 = classofRaw$1(process$8) == 'process';
-	var DISPATCH_EVENT$1 = !!(document$4 && document$4.createEvent && global_1$1.dispatchEvent);
+	var DISPATCH_EVENT$1 = !!(document$5 && document$5.createEvent && global_1$1.dispatchEvent);
+	var NATIVE_REJECTION_EVENT = typeof PromiseRejectionEvent == 'function';
 	var UNHANDLED_REJECTION$1 = 'unhandledrejection';
 	var REJECTION_HANDLED$1 = 'rejectionhandled';
 	var PENDING$1 = 0;
@@ -20223,7 +20253,7 @@ typeof navigator === "object" && (function () {
 	    // We can't detect it synchronously, so just check versions
 	    if (engineV8Version$1 === 66) return true;
 	    // Unhandled rejections tracking support, NodeJS Promise without it fails @@species test
-	    if (!IS_NODE$3 && typeof PromiseRejectionEvent != 'function') return true;
+	    if (!engineIsNode && !NATIVE_REJECTION_EVENT) return true;
 	  }
 	  // We can't use @@species feature detection in V8 since it causes
 	  // deoptimization and performance degradation
@@ -20249,7 +20279,7 @@ typeof navigator === "object" && (function () {
 	  return isObject$2(it) && typeof (then = it.then) == 'function' ? then : false;
 	};
 
-	var notify$3 = function (promise, state, isReject) {
+	var notify$3 = function (state, isReject) {
 	  if (state.notified) return;
 	  state.notified = true;
 	  var chain = state.reactions;
@@ -20268,7 +20298,7 @@ typeof navigator === "object" && (function () {
 	      try {
 	        if (handler) {
 	          if (!ok) {
-	            if (state.rejection === UNHANDLED$1) onHandleUnhandled$1(promise, state);
+	            if (state.rejection === UNHANDLED$1) onHandleUnhandled$1(state);
 	            state.rejection = HANDLED$1;
 	          }
 	          if (handler === true) result = value;
@@ -20293,36 +20323,37 @@ typeof navigator === "object" && (function () {
 	    }
 	    state.reactions = [];
 	    state.notified = false;
-	    if (isReject && !state.rejection) onUnhandled$1(promise, state);
+	    if (isReject && !state.rejection) onUnhandled$1(state);
 	  });
 	};
 
 	var dispatchEvent$1 = function (name, promise, reason) {
 	  var event, handler;
 	  if (DISPATCH_EVENT$1) {
-	    event = document$4.createEvent('Event');
+	    event = document$5.createEvent('Event');
 	    event.promise = promise;
 	    event.reason = reason;
 	    event.initEvent(name, false, true);
 	    global_1$1.dispatchEvent(event);
 	  } else event = { promise: promise, reason: reason };
-	  if (handler = global_1$1['on' + name]) handler(event);
+	  if (!NATIVE_REJECTION_EVENT && (handler = global_1$1['on' + name])) handler(event);
 	  else if (name === UNHANDLED_REJECTION$1) hostReportErrors$1('Unhandled promise rejection', reason);
 	};
 
-	var onUnhandled$1 = function (promise, state) {
+	var onUnhandled$1 = function (state) {
 	  task$3.call(global_1$1, function () {
+	    var promise = state.facade;
 	    var value = state.value;
 	    var IS_UNHANDLED = isUnhandled$1(state);
 	    var result;
 	    if (IS_UNHANDLED) {
 	      result = perform$1(function () {
-	        if (IS_NODE$3) {
+	        if (engineIsNode) {
 	          process$8.emit('unhandledRejection', value, promise);
 	        } else dispatchEvent$1(UNHANDLED_REJECTION$1, promise, value);
 	      });
 	      // Browsers should not trigger `rejectionHandled` event if it was handled here, NodeJS - should
-	      state.rejection = IS_NODE$3 || isUnhandled$1(state) ? UNHANDLED$1 : HANDLED$1;
+	      state.rejection = engineIsNode || isUnhandled$1(state) ? UNHANDLED$1 : HANDLED$1;
 	      if (result.error) throw result.value;
 	    }
 	  });
@@ -20332,55 +20363,56 @@ typeof navigator === "object" && (function () {
 	  return state.rejection !== HANDLED$1 && !state.parent;
 	};
 
-	var onHandleUnhandled$1 = function (promise, state) {
+	var onHandleUnhandled$1 = function (state) {
 	  task$3.call(global_1$1, function () {
-	    if (IS_NODE$3) {
+	    var promise = state.facade;
+	    if (engineIsNode) {
 	      process$8.emit('rejectionHandled', promise);
 	    } else dispatchEvent$1(REJECTION_HANDLED$1, promise, state.value);
 	  });
 	};
 
-	var bind$1 = function (fn, promise, state, unwrap) {
+	var bind$1 = function (fn, state, unwrap) {
 	  return function (value) {
-	    fn(promise, state, value, unwrap);
+	    fn(state, value, unwrap);
 	  };
 	};
 
-	var internalReject$1 = function (promise, state, value, unwrap) {
+	var internalReject$1 = function (state, value, unwrap) {
 	  if (state.done) return;
 	  state.done = true;
 	  if (unwrap) state = unwrap;
 	  state.value = value;
 	  state.state = REJECTED$1;
-	  notify$3(promise, state, true);
+	  notify$3(state, true);
 	};
 
-	var internalResolve$1 = function (promise, state, value, unwrap) {
+	var internalResolve$1 = function (state, value, unwrap) {
 	  if (state.done) return;
 	  state.done = true;
 	  if (unwrap) state = unwrap;
 	  try {
-	    if (promise === value) throw TypeError$2("Promise can't be resolved itself");
+	    if (state.facade === value) throw TypeError$2("Promise can't be resolved itself");
 	    var then = isThenable$2(value);
 	    if (then) {
 	      microtask$1(function () {
 	        var wrapper = { done: false };
 	        try {
 	          then.call(value,
-	            bind$1(internalResolve$1, promise, wrapper, state),
-	            bind$1(internalReject$1, promise, wrapper, state)
+	            bind$1(internalResolve$1, wrapper, state),
+	            bind$1(internalReject$1, wrapper, state)
 	          );
 	        } catch (error) {
-	          internalReject$1(promise, wrapper, error, state);
+	          internalReject$1(wrapper, error, state);
 	        }
 	      });
 	    } else {
 	      state.value = value;
 	      state.state = FULFILLED$1;
-	      notify$3(promise, state, false);
+	      notify$3(state, false);
 	    }
 	  } catch (error) {
-	    internalReject$1(promise, { done: false }, error, state);
+	    internalReject$1({ done: false }, error, state);
 	  }
 	};
 
@@ -20393,9 +20425,9 @@ typeof navigator === "object" && (function () {
 	    Internal$1.call(this);
 	    var state = getInternalState$8(this);
 	    try {
-	      executor(bind$1(internalResolve$1, this, state), bind$1(internalReject$1, this, state));
+	      executor(bind$1(internalResolve$1, state), bind$1(internalReject$1, state));
 	    } catch (error) {
-	      internalReject$1(this, state, error);
+	      internalReject$1(state, error);
 	    }
 	  };
 	  // eslint-disable-next-line no-unused-vars
@@ -20419,10 +20451,10 @@ typeof navigator === "object" && (function () {
 	      var reaction = newPromiseCapability$3(speciesConstructor$1(this, PromiseConstructor$1));
 	      reaction.ok = typeof onFulfilled == 'function' ? onFulfilled : true;
 	      reaction.fail = typeof onRejected == 'function' && onRejected;
-	      reaction.domain = IS_NODE$3 ? process$8.domain : undefined;
+	      reaction.domain = engineIsNode ? process$8.domain : undefined;
 	      state.parent = true;
 	      state.reactions.push(reaction);
-	      if (state.state != PENDING$1) notify$3(this, state, false);
+	      if (state.state != PENDING$1) notify$3(state, false);
 	      return reaction.promise;
 	    },
 	    // `Promise.prototype.catch` method
@@ -20435,8 +20467,8 @@ typeof navigator === "object" && (function () {
 	    var promise = new Internal$1();
 	    var state = getInternalState$8(promise);
 	    this.promise = promise;
-	    this.resolve = bind$1(internalResolve$1, promise, state);
-	    this.reject = bind$1(internalReject$1, promise, state);
+	    this.resolve = bind$1(internalResolve$1, state);
+	    this.reject = bind$1(internalReject$1, state);
 	  };
 	  newPromiseCapability$2.f = newPromiseCapability$3 = function (C) {
 	    return C === PromiseConstructor$1 || C === PromiseWrapper$1
@@ -20507,7 +20539,7 @@ typeof navigator === "object" && (function () {
 	      var values = [];
 	      var counter = 0;
 	      var remaining = 1;
-	      iterate_1$1(iterable, function (promise) {
+	      iterate(iterable, function (promise) {
 	        var index = counter++;
 	        var alreadyCalled = false;
 	        values.push(undefined);
@@ -20532,7 +20564,7 @@ typeof navigator === "object" && (function () {
 	    var reject = capability.reject;
 	    var result = perform$1(function () {
 	      var $promiseResolve = aFunction$3(C.resolve);
-	      iterate_1$1(iterable, function (promise) {
+	      iterate(iterable, function (promise) {
 	        $promiseResolve.call(C, promise).then(capability.resolve, reject);
 	      });
 	    });
@@ -20779,12 +20811,17 @@ typeof navigator === "object" && (function () {
 
 
 
+
+
 	var STRICT_METHOD$a = arrayMethodIsStrict$1('reduce');
 	var USES_TO_LENGTH$i = arrayMethodUsesToLength$1('reduce', { 1: 0 });
+	// Chrome 80-82 has a critical bug
+	// https://bugs.chromium.org/p/chromium/issues/detail?id=1049982
+	var CHROME_BUG = !engineIsNode && engineV8Version$1 > 79 && engineV8Version$1 < 83;
 
 	// `Array.prototype.reduce` method
 	// https://tc39.github.io/ecma262/#sec-array.prototype.reduce
-	_export$1({ target: 'Array', proto: true, forced: !STRICT_METHOD$a || !USES_TO_LENGTH$i }, {
+	_export$1({ target: 'Array', proto: true, forced: !STRICT_METHOD$a || !USES_TO_LENGTH$i || CHROME_BUG }, {
 	  reduce: function reduce(callbackfn /* , initialValue */) {
 	    return $reduce$1(this, callbackfn, arguments.length, arguments.length > 1 ? arguments[1] : undefined);
 	  }
@@ -24003,7 +24040,7 @@ typeof navigator === "object" && (function () {
 	  // Sprite (for icons)
 	  loadSprite: true,
 	  iconPrefix: 'plyr',
-	  iconUrl: 'https://cdn.plyr.io/3.6.2/plyr.svg',
+	  iconUrl: 'https://cdn.plyr.io/3.6.3/plyr.svg',
 	  // Blank video (used to prevent errors on source change)
 	  blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
 	  // Quality default
@@ -24121,7 +24158,7 @@ typeof navigator === "object" && (function () {
 	    vimeo: {
 	      sdk: 'https://player.vimeo.com/api/player.js',
 	      iframe: 'https://player.vimeo.com/video/{0}?{1}',
-	      api: 'https://vimeo.com/api/v2/video/{0}.json'
+	      api: 'https://vimeo.com/api/oembed.json?url={0}'
 	    },
 	    youtube: {
 	      sdk: 'https://www.youtube.com/iframe_api',
@@ -24291,24 +24328,27 @@ typeof navigator === "object" && (function () {
 	    title: false,
 	    speed: true,
 	    transparent: false,
+	    // Custom settings from Plyr
+	    customControls: true,
+	    referrerPolicy: null,
+	    // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement/referrerPolicy
 	    // Whether the owner of the video has a Pro or Business account
 	    // (which allows us to properly hide controls without CSS hacks, etc)
-	    premium: false,
-	    // Custom settings from Plyr
-	    referrerPolicy: null // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement/referrerPolicy
-
+	    premium: false
 	  },
 	  // YouTube plugin
 	  youtube: {
-	    noCookie: true,
-	    // Whether to use an alternative version of YouTube without cookies
 	    rel: 0,
 	    // No related vids
 	    showinfo: 0,
 	    // Hide info
 	    iv_load_policy: 3,
 	    // Hide annotations
-	    modestbranding: 1 // Hide logos as much as possible (they still show one in the corner when paused)
+	    modestbranding: 1,
+	    // Hide logos as much as possible (they still show one in the corner when paused)
+	    // Custom settings from Plyr
+	    customControls: true,
+	    noCookie: false // Whether to use an alternative version of YouTube without cookies
 
 	  }
 	};
@@ -24427,7 +24467,7 @@ typeof navigator === "object" && (function () {
 	        return;
 	      }
 
-	      _this.toggle();
+	      _this.player.listeners.proxy(event, _this.toggle, 'fullscreen');
 	    }); // Tap focus when in fullscreen
 
 	    on.call(this, this.player.elements.container, 'keydown', function (event) {
@@ -24850,7 +24890,9 @@ typeof navigator === "object" && (function () {
 	    } // Set property synchronously to respect the call order
 
 
-	    this.media.setAttribute('data-poster', poster); // Wait until ui is ready
+	    this.media.setAttribute('data-poster', poster); // Show the poster
+
+	    this.elements.poster.removeAttribute('hidden'); // Wait until ui is ready
 
 	    return ready.call(this) // Load image
 	    .then(function () {
@@ -25282,7 +25324,14 @@ typeof navigator === "object" && (function () {
 	            ratio = _setPlayerSize.ratio; // Set Vimeo gutter
 
 
-	        setGutter(ratio, padding, isEnter); // If not using native browser fullscreen API, we need to check for resizes of viewport
+	        setGutter(ratio, padding, isEnter); // Horrible hack for Safari 14 not repainting properly on entering fullscreen
+
+	        if (isEnter) {
+	          setTimeout(function () {
+	            return repaint(elements.container);
+	          }, 100);
+	        } // If not using native browser fullscreen API, we need to check for resizes of viewport
+
 
 	        if (!usingNative) {
 	          if (isEnter) {
@@ -25473,9 +25522,17 @@ typeof navigator === "object" && (function () {
 
 	      this.bind(elements.buttons.restart, 'click', player.restart, 'restart'); // Rewind
 
-	      this.bind(elements.buttons.rewind, 'click', player.rewind, 'rewind'); // Rewind
+	      this.bind(elements.buttons.rewind, 'click', function () {
+	        // Record seek time so we can prevent hiding controls for a few seconds after rewind
+	        player.lastSeekTime = Date.now();
+	        player.rewind();
+	      }, 'rewind'); // Rewind
 
-	      this.bind(elements.buttons.fastForward, 'click', player.forward, 'fastForward'); // Mute toggle
+	      this.bind(elements.buttons.fastForward, 'click', function () {
+	        // Record seek time so we can prevent hiding controls for a few seconds after fast forward
+	        player.lastSeekTime = Date.now();
+	        player.forward();
+	      }, 'fastForward'); // Mute toggle
 
 	      this.bind(elements.buttons.mute, 'click', function () {
 	        player.muted = !player.muted;
@@ -26183,34 +26240,31 @@ typeof navigator === "object" && (function () {
 	    } // Inject the package
 
 
-	    var poster = player.poster;
-
-	    if (premium) {
-	      iframe.setAttribute('data-poster', poster);
+	    if (premium || !config.customControls) {
+	      iframe.setAttribute('data-poster', player.poster);
 	      player.media = replaceElement(iframe, player.media);
 	    } else {
 	      var wrapper = createElement$1('div', {
 	        class: player.config.classNames.embedContainer,
-	        'data-poster': poster
+	        'data-poster': player.poster
 	      });
 	      wrapper.appendChild(iframe);
 	      player.media = replaceElement(wrapper, player.media);
 	    } // Get poster image
 
 
-	    fetch(format(player.config.urls.vimeo.api, id), 'json').then(function (response) {
-	      if (is$2.empty(response)) {
-	        return;
-	      } // Get the URL for thumbnail
+	    if (!config.customControls) {
+	      fetch(format(player.config.urls.vimeo.api, src)).then(function (response) {
+	        if (is$2.empty(response) || !response.thumbnail_url) {
+	          return;
+	        } // Set and show poster
 
 
-	      var url = new URL(response[0].thumbnail_large); // Get original image
-
-	      url.pathname = "".concat(url.pathname.split('_')[0], ".jpg"); // Set and show poster
-
-	      ui.setPoster.call(player, url.href).catch(function () {});
-	    }); // Setup instance
+	        ui.setPoster.call(player, response.thumbnail_url).catch(function () {});
+	      });
+	    } // Setup instance
 	    // https://github.com/vimeo/player.js
+
 
 	    player.embed = new window.Vimeo.Player(iframe, {
 	      autopause: player.config.autopause,
@@ -26451,9 +26505,11 @@ typeof navigator === "object" && (function () {
 	      triggerEvent.call(player, player.media, 'error');
 	    }); // Rebuild UI
 
-	    setTimeout(function () {
-	      return ui.build.call(player);
-	    }, 0);
+	    if (config.customControls) {
+	      setTimeout(function () {
+	        return ui.build.call(player);
+	      }, 0);
+	    }
 	  }
 	};
 
@@ -26544,7 +26600,8 @@ typeof navigator === "object" && (function () {
 	  },
 	  // API ready
 	  ready: function ready() {
-	    var player = this; // Ignore already setup (race condition)
+	    var player = this;
+	    var config = player.config.youtube; // Ignore already setup (race condition)
 
 	    var currentId = player.media && player.media.getAttribute('id');
 
@@ -26561,53 +26618,53 @@ typeof navigator === "object" && (function () {
 
 
 	    var videoId = parseId$1(source);
-	    var id = generateId(player.provider); // Get poster, if already set
-
-	    var poster = player.poster; // Replace media element
+	    var id = generateId(player.provider); // Replace media element
 
 	    var container = createElement$1('div', {
 	      id: id,
-	      'data-poster': poster
+	      'data-poster': config.customControls ? player.poster : undefined
 	    });
-	    player.media = replaceElement(container, player.media); // Id to poster wrapper
+	    player.media = replaceElement(container, player.media); // Only load the poster when using custom controls
 
-	    var posterSrc = function posterSrc(s) {
-	      return "https://i.ytimg.com/vi/".concat(videoId, "/").concat(s, "default.jpg");
-	    }; // Check thumbnail images in order of quality, but reject fallback thumbnails (120px wide)
+	    if (config.customControls) {
+	      var posterSrc = function posterSrc(s) {
+	        return "https://i.ytimg.com/vi/".concat(videoId, "/").concat(s, "default.jpg");
+	      }; // Check thumbnail images in order of quality, but reject fallback thumbnails (120px wide)
 
 
-	    loadImage(posterSrc('maxres'), 121) // Higest quality and unpadded
-	    .catch(function () {
-	      return loadImage(posterSrc('sd'), 121);
-	    }) // 480p padded 4:3
-	    .catch(function () {
-	      return loadImage(posterSrc('hq'));
-	    }) // 360p padded 4:3. Always exists
-	    .then(function (image) {
-	      return ui.setPoster.call(player, image.src);
-	    }).then(function (src) {
-	      // If the image is padded, use background-size "cover" instead (like youtube does too with their posters)
-	      if (!src.includes('maxres')) {
-	        player.elements.poster.style.backgroundSize = 'cover';
-	      }
-	    }).catch(function () {});
-	    var config = player.config.youtube; // Setup instance
+	      loadImage(posterSrc('maxres'), 121) // Higest quality and unpadded
+	      .catch(function () {
+	        return loadImage(posterSrc('sd'), 121);
+	      }) // 480p padded 4:3
+	      .catch(function () {
+	        return loadImage(posterSrc('hq'));
+	      }) // 360p padded 4:3. Always exists
+	      .then(function (image) {
+	        return ui.setPoster.call(player, image.src);
+	      }).then(function (src) {
+	        // If the image is padded, use background-size "cover" instead (like youtube does too with their posters)
+	        if (!src.includes('maxres')) {
+	          player.elements.poster.style.backgroundSize = 'cover';
+	        }
+	      }).catch(function () {});
+	    } // Setup instance
 	    // https://developers.google.com/youtube/iframe_api_reference
 
-	    player.embed = new window.YT.Player(id, {
+
+	    player.embed = new window.YT.Player(player.media, {
 	      videoId: videoId,
 	      host: getHost$2(config),
 	      playerVars: extend$1({}, {
-	        autoplay: player.config.autoplay ? 1 : 0,
 	        // Autoplay
-	        hl: player.config.hl,
+	        autoplay: player.config.autoplay ? 1 : 0,
 	        // iframe interface language
-	        controls: player.supported.ui ? 0 : 1,
-	        // Only show controls if not fully supported
-	        disablekb: 1,
+	        hl: player.config.hl,
+	        // Only show controls if not fully supported or opted out
+	        controls: player.supported.ui && config.customControls ? 0 : 1,
 	        // Disable keyboard as we handle it
-	        playsinline: !player.config.fullscreen.iosNative ? 1 : 0,
+	        disablekb: 1,
 	        // Allow iOS inline playback
+	        playsinline: !player.config.fullscreen.iosNative ? 1 : 0,
 	        // Captions are flaky on YouTube
 	        cc_load_policy: player.captions.active ? 1 : 0,
 	        cc_lang_pref: player.config.captions.language,
@@ -26718,6 +26775,7 @@ typeof navigator === "object" && (function () {
 	              var toggle = is$2.boolean(input) ? input : muted;
 	              muted = toggle;
 	              instance[toggle ? 'mute' : 'unMute']();
+	              instance.setVolume(volume * 100);
 	              triggerEvent.call(player, player.media, 'volumechange');
 	            }
 	          }); // Source
@@ -26740,7 +26798,7 @@ typeof navigator === "object" && (function () {
 	            return player.config.speed.options.includes(s);
 	          }); // Set the tabindex to avoid focus entering iframe
 
-	          if (player.supported.ui) {
+	          if (player.supported.ui && config.customControls) {
 	            player.media.setAttribute('tabindex', -1);
 	          }
 
@@ -26767,9 +26825,11 @@ typeof navigator === "object" && (function () {
 	            }
 	          }, 200); // Rebuild UI
 
-	          setTimeout(function () {
-	            return ui.build.call(player);
-	          }, 50);
+	          if (config.customControls) {
+	            setTimeout(function () {
+	              return ui.build.call(player);
+	            }, 50);
+	          }
 	        },
 	        onStateChange: function onStateChange(event) {
 	          // Get the instance
@@ -26815,7 +26875,7 @@ typeof navigator === "object" && (function () {
 
 	            case 1:
 	              // Restore paused state (YouTube starts playing on seek if the video hasn't been played yet)
-	              if (!player.config.autoplay && player.media.paused && !player.embed.hasPlayed) {
+	              if (config.customControls && !player.config.autoplay && player.media.paused && !player.embed.hasPlayed) {
 	                player.media.pause();
 	              } else {
 	                assurePlaybackState$1.call(player, true);
@@ -26888,7 +26948,8 @@ typeof navigator === "object" && (function () {
 	      wrap$4(this.media, this.elements.wrapper); // Poster image container
 
 	      this.elements.poster = createElement$1('div', {
-	        class: this.config.classNames.poster
+	        class: this.config.classNames.poster,
+	        hidden: ''
 	      });
 	      this.elements.wrapper.appendChild(this.elements.poster);
 	    }
