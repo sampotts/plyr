@@ -422,20 +422,23 @@ const defaults = {
     title: false,
     speed: true,
     transparent: false,
+    // Custom settings from Plyr
+    customControls: true,
+    referrerPolicy: null, // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement/referrerPolicy
     // Whether the owner of the video has a Pro or Business account
     // (which allows us to properly hide controls without CSS hacks, etc)
     premium: false,
-    // Custom settings from Plyr
-    referrerPolicy: null, // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement/referrerPolicy
   },
 
   // YouTube plugin
   youtube: {
-    noCookie: true, // Whether to use an alternative version of YouTube without cookies
     rel: 0, // No related vids
     showinfo: 0, // Hide info
     iv_load_policy: 3, // Hide annotations
     modestbranding: 1, // Hide logos as much as possible (they still show one in the corner when paused)
+    // Custom settings from Plyr
+    customControls: true,
+    noCookie: false, // Whether to use an alternative version of YouTube without cookies
   },
 };
 

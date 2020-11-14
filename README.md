@@ -31,7 +31,7 @@ Plyr is a simple, lightweight, accessible and customizable HTML5, YouTube and Vi
 
 ### Demos
 
-You can try Plyr in Codepen using our minimal templates: [HTML5 video](https://codepen.io/pen?template=bKeqpr), [HTML5 audio](https://codepen.io/pen?template=rKLywR), [YouTube](https://codepen.io/pen?template=GGqbbJ), [Vimeo](https://codepen.io/pen?template=bKeXNq). For Streaming we also have example integrations with: [Dash.js](https://codepen.io/pen?template=zaBgBy), [Hls.js](https://codepen.io/pen?template=oyLKQb) and [Shaka Player](https://codepen.io/pen?template=ZRpzZO)
+You can try Plyr in Codepen using our minimal templates: [HTML5 video](https://codepen.io/pen?template=bKeqpr), [HTML5 audio](https://codepen.io/pen?template=rKLywR), [YouTube](https://codepen.io/pen?template=GGqbbJ), [Vimeo](https://codepen.io/pen?template=bKeXNq). For Streaming we also have example integrations with: [Dash.js](https://codepen.io/pen?template=GRoogML), [Hls.js](https://codepen.io/pen?template=oyLKQb) and [Shaka Player](https://codepen.io/pen?template=ZRpzZO)
 
 # Quick setup
 
@@ -790,6 +790,7 @@ Some awesome folks have made plugins for CMSs and Components for JavaScript fram
 | Neos      | Jon Uhlmann ([@jonnitto](https://github.com/jonnitto))                    | [https://packagist.org/packages/jonnitto/plyr](https://packagist.org/packages/jonnitto/plyr) |
 | Kirby     | Dominik Pschenitschni ([@dpschen](https://github.com/dpschen))            | [https://github.com/dpschen/kirby-plyrtag](https://github.com/dpschen/kirby-plyrtag)         |
 | REDAXO    | FriendsOfRedaxo / skerbis ([@skerbis](https://friendsofredaxo.github.io)) | [https://github.com/FriendsOfREDAXO/plyr](https://github.com/FriendsOfREDAXO/plyr)           |
+| svelte-plyr    | Ben Woodward / benwoodward ([@benwoodward](https://github.com/benwoodward)) | [https://github.com/benwoodward](https://github.com/benwoodward)           |
 
 # Issues
 
@@ -836,6 +837,7 @@ Plyr costs money to run, not only my time. I donate my time for free as I enjoy 
 - [BitChute](https://www.bitchute.com)
 - [Rutheneum-Bote](https://gymnasium-rutheneum.de/content/newspaper/kreativwettbewerb.php)
 - [pressakey.com | Blog-Magazin für Videospiele](https://pressakey.com)
+- [STROLLÿN: Work with a View](https://strollyn.com)
 
 If you want to be added to the list, open a pull request. It'd be awesome to see how you're using Plyr 😎
 

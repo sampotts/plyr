@@ -30,6 +30,7 @@ const plumber = require('gulp-plumber');
 const size = require('gulp-size');
 const sourcemaps = require('gulp-sourcemaps');
 const browserSync = require('browser-sync').create();
+const gulpIf = require('gulp-if');
 // Configs
 const build = require('../build.json');
 // Info from package
@@ -74,8 +75,8 @@ const tasks = {
 const sizeOptions = { showFiles: true, gzip: true };
 
 // Clean out /dist
-gulp.task('clean', done => {
-  const dirs = [paths.plyr.output, paths.demo.output].map(dir => path.join(dir, '**/*'));
+gulp.task('clean', (done) => {
+  const dirs = [paths.plyr.output, paths.demo.output].map((dir) => path.join(dir, '**/*'));
 
   // Don't delete the mp4
   dirs.push(`!${path.join(paths.plyr.output, '**/*.mp4')}`);
@@ -89,7 +90,7 @@ gulp.task('clean', done => {
 Object.entries(build.js).forEach(([filename, entry]) => {
   const { dist, formats, namespace, polyfill, src } = entry;
 
-  formats.forEach(format => {
+  formats.forEach((format) => {
     const name = `js:${filename}:${format}`;
     const extension = format === 'es' ? 'mjs' : 'js';
     tasks.js.push(name);
@@ -128,7 +129,7 @@ Object.entries(build.js).forEach(([filename, entry]) => {
             },
           ),
         )
-        .pipe(header('typeof navigator === "object" && ')) // "Support" SSR (#935)
+        .pipe(gulpIf(() => extension !== 'mjs', header('typeof navigator === "object" && '))) // "Support" SSR (#935)
         .pipe(
           rename({
             extname: `.${extension}`,

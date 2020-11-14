@@ -1,4 +1,4 @@
-typeof navigator === "object" && function _classCallCheck(instance, Constructor) {
+function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
   }
@@ -1191,7 +1191,12 @@ function setAspectRatio(input) {
   if (this.isVimeo && !this.config.vimeo.premium && this.supported.ui) {
     var height = 100 / this.media.offsetWidth * parseInt(window.getComputedStyle(this.media).paddingBottom, 10);
     var offset = (height - padding) / (height / 50);
-    this.media.style.transform = "translateY(-".concat(offset, "%)");
+
+    if (this.fullscreen.active) {
+      wrapper.style.paddingBottom = null;
+    } else {
+      this.media.style.transform = "translateY(-".concat(offset, "%)");
+    }
   } else if (this.isHTML5) {
     wrapper.classList.toggle(this.config.classNames.videoFixedRatio, ratio !== null);
   }
@@ -4095,10 +4100,12 @@ var Fullscreen = /*#__PURE__*/function () {
 
       if (is$1.element(button)) {
         button.pressed = this.active;
-      } // Trigger an event
+      } // Always trigger events on the plyr / media element (not a fullscreen container) and let them bubble up
 
 
-      triggerEvent.call(this.player, this.target, this.active ? 'enterfullscreen' : 'exitfullscreen', true);
+      var target = this.target === this.player.media ? this.target : this.player.elements.container; // Trigger an event
+
+      triggerEvent.call(this.player, target, this.active ? 'enterfullscreen' : 'exitfullscreen', true);
     }
   }, {
     key: "toggleFallback",
@@ -4564,7 +4571,7 @@ var ui = {
     // Loop through values (as they are the keys when the object is spread 🤔)
     Object.values(_objectSpread2({}, this.media.style)) // We're only fussed about Plyr specific properties
     .filter(function (key) {
-      return !is$1.empty(key) && key.startsWith('--plyr');
+      return !is$1.empty(key) && is$1.string(key) && key.startsWith('--plyr');
     }).forEach(function (key) {
       // Set on the container
       _this5.elements.container.style.setProperty(key, _this5.media.style.getPropertyValue(key)); // Clean up from media element
@@ -8285,9 +8292,9 @@ var Plyr = /*#__PURE__*/function () {
 
 
     if (this.isHTML5 && this.config.autoplay) {
-      setTimeout(function () {
+      this.once('canplay', function () {
         return silencePromise(_this.play());
-      }, 10);
+      });
     } // Seek time will be recorded (in listeners.js) so we can prevent hiding controls for a few seconds after seek
 
 
@@ -8576,7 +8583,9 @@ var Plyr = /*#__PURE__*/function () {
           }
         } else {
           // Unbind listeners
-          unbindListeners.call(_this3); // Replace the container with the original element provided
+          unbindListeners.call(_this3); // Cancel current network requests
+
+          html5.cancelRequests.call(_this3); // Replace the container with the original element provided
 
           replaceElement(_this3.elements.original, _this3.elements.container); // Event
 

@@ -41,6 +41,7 @@ const media = {
       // Poster image container
       this.elements.poster = createElement('div', {
         class: this.config.classNames.poster,
+        hidden: '',
       });
 
       this.elements.wrapper.appendChild(this.elements.poster);
