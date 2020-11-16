@@ -4,7 +4,8 @@
 
 $plyr-control-icon-size: var(--plyr-control-icon-size, 18px) !default;
 $plyr-control-spacing: var(--plyr-control-spacing, 10px) !default;
-$plyr-control-padding: var(--plyr-control-padding, calc(#{$plyr-control-spacing} * 0.7)) !default;
+$plyr-control-padding: calc(#{$plyr-control-spacing} * 0.7);
+$plyr-control-padding: var(--plyr-control-padding, $plyr-control-padding) !default;
 $plyr-control-radius: var(--plyr-control-radius, 3px) !default;
 
 $plyr-control-toggle-checked-background: var(

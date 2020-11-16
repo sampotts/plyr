@@ -1,7 +1,7 @@
 typeof navigator === "object" && (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define('Plyr', factory) :
-  (global = global || self, global.Plyr = factory());
+  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.Plyr = factory());
 }(this, (function () { 'use strict';
 
   // Polyfill for creating CustomEvents on IE9/10/11
@@ -74,7 +74,7 @@ typeof navigator === "object" && (function (global, factory) {
     check(typeof self == 'object' && self) ||
     check(typeof commonjsGlobal == 'object' && commonjsGlobal) ||
     // eslint-disable-next-line no-new-func
-    Function('return this')();
+    (function () { return this; })() || Function('return this')();
 
   var fails = function (exec) {
     try {
@@ -269,7 +269,7 @@ typeof navigator === "object" && (function (global, factory) {
   (module.exports = function (key, value) {
     return sharedStore[key] || (sharedStore[key] = value !== undefined ? value : {});
   })('versions', []).push({
-    version: '3.6.5',
+    version: '3.7.0',
     mode:  'global',
     copyright: '© 2020 Denis Pushkarev (zloirock.ru)'
   });
@@ -307,11 +307,12 @@ typeof navigator === "object" && (function (global, factory) {
   };
 
   if (nativeWeakMap) {
-    var store$1 = new WeakMap$2();
+    var store$1 = sharedStore.state || (sharedStore.state = new WeakMap$2());
     var wmget = store$1.get;
     var wmhas = store$1.has;
     var wmset = store$1.set;
     set = function (it, metadata) {
+      metadata.facade = it;
       wmset.call(store$1, it, metadata);
       return metadata;
     };
@@ -325,6 +326,7 @@ typeof navigator === "object" && (function (global, factory) {
     var STATE = sharedKey('state');
     hiddenKeys[STATE] = true;
     set = function (it, metadata) {
+      metadata.facade = it;
       createNonEnumerableProperty(it, STATE, metadata);
       return metadata;
     };
@@ -353,9 +355,15 @@ typeof navigator === "object" && (function (global, factory) {
     var unsafe = options ? !!options.unsafe : false;
     var simple = options ? !!options.enumerable : false;
     var noTargetGet = options ? !!options.noTargetGet : false;
+    var state;
     if (typeof value == 'function') {
-      if (typeof key == 'string' && !has(value, 'name')) createNonEnumerableProperty(value, 'name', key);
-      enforceInternalState(value).source = TEMPLATE.join(typeof key == 'string' ? key : '');
+      if (typeof key == 'string' && !has(value, 'name')) {
+        createNonEnumerableProperty(value, 'name', key);
+      }
+      state = enforceInternalState(value);
+      if (!state.source) {
+        state.source = TEMPLATE.join(typeof key == 'string' ? key : '');
+      }
     }
     if (O === global_1) {
       if (simple) O[key] = value;
@@ -2441,14 +2449,20 @@ typeof navigator === "object" && (function (global, factory) {
     } return T;
   } : nativeAssign;
 
+  var iteratorClose = function (iterator) {
+    var returnMethod = iterator['return'];
+    if (returnMethod !== undefined) {
+      return anObject(returnMethod.call(iterator)).value;
+    }
+  };
+
   // call something on iterator step with safe closing on error
   var callWithSafeIterationClosing = function (iterator, fn, value, ENTRIES) {
     try {
       return ENTRIES ? fn(anObject(value)[0], value[1]) : fn(value);
     // 7.4.6 IteratorClose(iterator, completion)
     } catch (error) {
-      var returnMethod = iterator['return'];
-      if (returnMethod !== undefined) anObject(returnMethod.call(iterator));
+      iteratorClose(iterator);
       throw error;
     }
   };
@@ -2845,7 +2859,7 @@ typeof navigator === "object" && (function (global, factory) {
   var URLSearchParamsPrototype = URLSearchParamsConstructor.prototype;
 
   redefineAll(URLSearchParamsPrototype, {
-    // `URLSearchParams.prototype.appent` method
+    // `URLSearchParams.prototype.append` method
     // https://url.spec.whatwg.org/#dom-urlsearchparams-append
     append: function append(name, value) {
       validateArgumentsLength(arguments.length, 2);
@@ -4211,7 +4225,7 @@ typeof navigator === "object" && (function (global, factory) {
     if (typeof o === "string") return _arrayLikeToArray(o, minLen);
     var n = Object.prototype.toString.call(o).slice(8, -1);
     if (n === "Object" && o.constructor) n = o.constructor.name;
-    if (n === "Map" || n === "Set") return Array.from(n);
+    if (n === "Map" || n === "Set") return Array.from(o);
     if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
   }
 
@@ -4408,7 +4422,7 @@ typeof navigator === "object" && (function (global, factory) {
     var checkIfURLSearchParamsSupported = function checkIfURLSearchParamsSupported() {
       try {
         var URLSearchParams = global.URLSearchParams;
-        return new URLSearchParams('?a=1').toString() === 'a=1' && typeof URLSearchParams.prototype.set === 'function';
+        return new URLSearchParams('?a=1').toString() === 'a=1' && typeof URLSearchParams.prototype.set === 'function' && typeof URLSearchParams.prototype.entries === 'function';
       } catch (e) {
         return false;
       }
@@ -4506,12 +4520,14 @@ typeof navigator === "object" && (function (global, factory) {
       var _URL = global.URL;
 
       var URL = function URL(url, base) {
-        if (typeof url !== 'string') url = String(url); // Only create another document if the base is different from current location.
+        if (typeof url !== 'string') url = String(url);
+        if (base && typeof base !== 'string') base = String(base); // Only create another document if the base is different from current location.
 
         var doc = document,
             baseElement;
 
         if (base && (global.location === void 0 || base !== global.location.href)) {
+          base = base.toLowerCase();
           doc = document.implementation.createHTMLDocument('');
           baseElement = doc.createElement('base');
           baseElement.href = base;
@@ -4532,7 +4548,11 @@ typeof navigator === "object" && (function (global, factory) {
           anchorElement.href = anchorElement.href; // force href to refresh
         }
 
-        if (anchorElement.protocol === ':' || !/:/.test(anchorElement.href)) {
+        var inputElement = doc.createElement('input');
+        inputElement.type = 'url';
+        inputElement.value = url;
+
+        if (anchorElement.protocol === ':' || !/:/.test(anchorElement.href) || !inputElement.checkValidity() && !base) {
           throw new TypeError('Invalid URL');
         }
 
@@ -5013,11 +5033,11 @@ typeof navigator === "object" && (function (global, factory) {
     var regexp = /./;
     try {
       '/./'[METHOD_NAME](regexp);
-    } catch (e) {
+    } catch (error1) {
       try {
         regexp[MATCH$1] = false;
         return '/./'[METHOD_NAME](regexp);
-      } catch (f) { /* empty */ }
+      } catch (error2) { /* empty */ }
     } return false;
   };
 
@@ -5099,15 +5119,30 @@ typeof navigator === "object" && (function (global, factory) {
   var internalMetadata_3 = internalMetadata.getWeakData;
   var internalMetadata_4 = internalMetadata.onFreeze;
 
-  var iterate_1 = createCommonjsModule(function (module) {
   var Result = function (stopped, result) {
     this.stopped = stopped;
     this.result = result;
   };
 
-  var iterate = module.exports = function (iterable, fn, that, AS_ENTRIES, IS_ITERATOR) {
-    var boundFunction = functionBindContext(fn, that, AS_ENTRIES ? 2 : 1);
+  var iterate = function (iterable, unboundFunction, options) {
+    var that = options && options.that;
+    var AS_ENTRIES = !!(options && options.AS_ENTRIES);
+    var IS_ITERATOR = !!(options && options.IS_ITERATOR);
+    var INTERRUPTED = !!(options && options.INTERRUPTED);
+    var fn = functionBindContext(unboundFunction, that, 1 + AS_ENTRIES + INTERRUPTED);
     var iterator, iterFn, index, length, result, next, step;
+
+    var stop = function (condition) {
+      if (iterator) iteratorClose(iterator);
+      return new Result(true, condition);
+    };
+
+    var callFn = function (value) {
+      if (AS_ENTRIES) {
+        anObject(value);
+        return INTERRUPTED ? fn(value[0], value[1], stop) : fn(value[0], value[1]);
+      } return INTERRUPTED ? fn(value, stop) : fn(value);
+    };
 
     if (IS_ITERATOR) {
       iterator = iterable;
@@ -5117,9 +5152,7 @@ typeof navigator === "object" && (function (global, factory) {
       // optimisation for array iterators
       if (isArrayIteratorMethod(iterFn)) {
         for (index = 0, length = toLength(iterable.length); length > index; index++) {
-          result = AS_ENTRIES
-            ? boundFunction(anObject(step = iterable[index])[0], step[1])
-            : boundFunction(iterable[index]);
+          result = callFn(iterable[index]);
           if (result && result instanceof Result) return result;
         } return new Result(false);
       }
@@ -5128,15 +5161,15 @@ typeof navigator === "object" && (function (global, factory) {
 
     next = iterator.next;
     while (!(step = next.call(iterator)).done) {
-      result = callWithSafeIterationClosing(iterator, boundFunction, step.value, AS_ENTRIES);
+      try {
+        result = callFn(step.value);
+      } catch (error) {
+        iteratorClose(iterator);
+        throw error;
+      }
       if (typeof result == 'object' && result && result instanceof Result) return result;
     } return new Result(false);
   };
-
-  iterate.stop = function (result) {
-    return new Result(true, result);
-  };
-  });
 
   var collection = function (CONSTRUCTOR_NAME, wrapper, common) {
     var IS_MAP = CONSTRUCTOR_NAME.indexOf('Map') !== -1;
@@ -5195,7 +5228,7 @@ typeof navigator === "object" && (function (global, factory) {
         Constructor = wrapper(function (dummy, iterable) {
           anInstance(dummy, Constructor, CONSTRUCTOR_NAME);
           var that = inheritIfRequired(new NativeConstructor(), dummy, Constructor);
-          if (iterable != undefined) iterate_1(iterable, that[ADDER], that, IS_MAP);
+          if (iterable != undefined) iterate(iterable, that[ADDER], { that: that, AS_ENTRIES: IS_MAP });
           return that;
         });
         Constructor.prototype = NativePrototype;
@@ -5285,7 +5318,7 @@ typeof navigator === "object" && (function (global, factory) {
           id: id$1++,
           frozen: undefined
         });
-        if (iterable != undefined) iterate_1(iterable, that[ADDER], that, IS_MAP);
+        if (iterable != undefined) iterate(iterable, that[ADDER], { that: that, AS_ENTRIES: IS_MAP });
       });
 
       var getInternalState = internalStateGetterFor(CONSTRUCTOR_NAME);
@@ -5974,6 +6007,8 @@ typeof navigator === "object" && (function (global, factory) {
 
   var engineIsIos = /(iphone|ipod|ipad).*applewebkit/i.test(engineUserAgent);
 
+  var engineIsNode = classofRaw(global_1.process) == 'process';
+
   var location = global_1.location;
   var set$1 = global_1.setImmediate;
   var clear = global_1.clearImmediate;
@@ -6026,7 +6061,7 @@ typeof navigator === "object" && (function (global, factory) {
       delete queue[id];
     };
     // Node.js 0.8-
-    if (classofRaw(process$1) == 'process') {
+    if (engineIsNode) {
       defer = function (id) {
         process$1.nextTick(runner(id));
       };
@@ -6048,8 +6083,8 @@ typeof navigator === "object" && (function (global, factory) {
       global_1.addEventListener &&
       typeof postMessage == 'function' &&
       !global_1.importScripts &&
-      !fails(post) &&
-      location.protocol !== 'file:'
+      location && location.protocol !== 'file:' &&
+      !fails(post)
     ) {
       defer = post;
       global_1.addEventListener('message', listener, false);
@@ -6075,14 +6110,14 @@ typeof navigator === "object" && (function (global, factory) {
   };
 
   var getOwnPropertyDescriptor$3 = objectGetOwnPropertyDescriptor.f;
-
   var macrotask = task.set;
 
 
+
   var MutationObserver$1 = global_1.MutationObserver || global_1.WebKitMutationObserver;
+  var document$2 = global_1.document;
   var process$2 = global_1.process;
   var Promise$1 = global_1.Promise;
-  var IS_NODE = classofRaw(process$2) == 'process';
   // Node.js 11 shows ExperimentalWarning on getting `queueMicrotask`
   var queueMicrotaskDescriptor = getOwnPropertyDescriptor$3(global_1, 'queueMicrotask');
   var queueMicrotask = queueMicrotaskDescriptor && queueMicrotaskDescriptor.value;
@@ -6093,7 +6128,7 @@ typeof navigator === "object" && (function (global, factory) {
   if (!queueMicrotask) {
     flush = function () {
       var parent, fn;
-      if (IS_NODE && (parent = process$2.domain)) parent.exit();
+      if (engineIsNode && (parent = process$2.domain)) parent.exit();
       while (head) {
         fn = head.fn;
         head = head.next;
@@ -6108,15 +6143,10 @@ typeof navigator === "object" && (function (global, factory) {
       if (parent) parent.enter();
     };
 
-    // Node.js
-    if (IS_NODE) {
-      notify = function () {
-        process$2.nextTick(flush);
-      };
     // browsers with MutationObserver, except iOS - https://github.com/zloirock/core-js/issues/339
-    } else if (MutationObserver$1 && !engineIsIos) {
+    if (!engineIsIos && !engineIsNode && MutationObserver$1 && document$2) {
       toggle = true;
-      node = document.createTextNode('');
+      node = document$2.createTextNode('');
       new MutationObserver$1(flush).observe(node, { characterData: true });
       notify = function () {
         node.data = toggle = !toggle;
@@ -6128,6 +6158,11 @@ typeof navigator === "object" && (function (global, factory) {
       then = promise.then;
       notify = function () {
         then.call(promise, flush);
+      };
+    // Node.js without promises
+    } else if (engineIsNode) {
+      notify = function () {
+        process$2.nextTick(flush);
       };
     // for other environments - macrotask based on:
     // - setImmediate
@@ -6207,6 +6242,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 
 
+
   var SPECIES$6 = wellKnownSymbol('species');
   var PROMISE = 'Promise';
   var getInternalState$3 = internalState.get;
@@ -6214,13 +6250,13 @@ typeof navigator === "object" && (function (global, factory) {
   var getInternalPromiseState = internalState.getterFor(PROMISE);
   var PromiseConstructor = nativePromiseConstructor;
   var TypeError$1 = global_1.TypeError;
-  var document$2 = global_1.document;
+  var document$3 = global_1.document;
   var process$3 = global_1.process;
   var $fetch$1 = getBuiltIn('fetch');
   var newPromiseCapability$1 = newPromiseCapability.f;
   var newGenericPromiseCapability = newPromiseCapability$1;
-  var IS_NODE$1 = classofRaw(process$3) == 'process';
-  var DISPATCH_EVENT = !!(document$2 && document$2.createEvent && global_1.dispatchEvent);
+  var DISPATCH_EVENT = !!(document$3 && document$3.createEvent && global_1.dispatchEvent);
+  var NATIVE_REJECTION_EVENT = typeof PromiseRejectionEvent == 'function';
   var UNHANDLED_REJECTION = 'unhandledrejection';
   var REJECTION_HANDLED = 'rejectionhandled';
   var PENDING = 0;
@@ -6238,7 +6274,7 @@ typeof navigator === "object" && (function (global, factory) {
       // We can't detect it synchronously, so just check versions
       if (engineV8Version === 66) return true;
       // Unhandled rejections tracking support, NodeJS Promise without it fails @@species test
-      if (!IS_NODE$1 && typeof PromiseRejectionEvent != 'function') return true;
+      if (!engineIsNode && !NATIVE_REJECTION_EVENT) return true;
     }
     // We can't use @@species feature detection in V8 since it causes
     // deoptimization and performance degradation
@@ -6264,7 +6300,7 @@ typeof navigator === "object" && (function (global, factory) {
     return isObject(it) && typeof (then = it.then) == 'function' ? then : false;
   };
 
-  var notify$1 = function (promise, state, isReject) {
+  var notify$1 = function (state, isReject) {
     if (state.notified) return;
     state.notified = true;
     var chain = state.reactions;
@@ -6283,7 +6319,7 @@ typeof navigator === "object" && (function (global, factory) {
         try {
           if (handler) {
             if (!ok) {
-              if (state.rejection === UNHANDLED) onHandleUnhandled(promise, state);
+              if (state.rejection === UNHANDLED) onHandleUnhandled(state);
               state.rejection = HANDLED;
             }
             if (handler === true) result = value;
@@ -6308,36 +6344,37 @@ typeof navigator === "object" && (function (global, factory) {
       }
       state.reactions = [];
       state.notified = false;
-      if (isReject && !state.rejection) onUnhandled(promise, state);
+      if (isReject && !state.rejection) onUnhandled(state);
     });
   };
 
   var dispatchEvent = function (name, promise, reason) {
     var event, handler;
     if (DISPATCH_EVENT) {
-      event = document$2.createEvent('Event');
+      event = document$3.createEvent('Event');
       event.promise = promise;
       event.reason = reason;
       event.initEvent(name, false, true);
       global_1.dispatchEvent(event);
     } else event = { promise: promise, reason: reason };
-    if (handler = global_1['on' + name]) handler(event);
+    if (!NATIVE_REJECTION_EVENT && (handler = global_1['on' + name])) handler(event);
     else if (name === UNHANDLED_REJECTION) hostReportErrors('Unhandled promise rejection', reason);
   };
 
-  var onUnhandled = function (promise, state) {
+  var onUnhandled = function (state) {
     task$1.call(global_1, function () {
+      var promise = state.facade;
       var value = state.value;
       var IS_UNHANDLED = isUnhandled(state);
       var result;
       if (IS_UNHANDLED) {
         result = perform(function () {
-          if (IS_NODE$1) {
+          if (engineIsNode) {
             process$3.emit('unhandledRejection', value, promise);
           } else dispatchEvent(UNHANDLED_REJECTION, promise, value);
         });
         // Browsers should not trigger `rejectionHandled` event if it was handled here, NodeJS - should
-        state.rejection = IS_NODE$1 || isUnhandled(state) ? UNHANDLED : HANDLED;
+        state.rejection = engineIsNode || isUnhandled(state) ? UNHANDLED : HANDLED;
         if (result.error) throw result.value;
       }
     });
@@ -6347,55 +6384,56 @@ typeof navigator === "object" && (function (global, factory) {
     return state.rejection !== HANDLED && !state.parent;
   };
 
-  var onHandleUnhandled = function (promise, state) {
+  var onHandleUnhandled = function (state) {
     task$1.call(global_1, function () {
-      if (IS_NODE$1) {
+      var promise = state.facade;
+      if (engineIsNode) {
         process$3.emit('rejectionHandled', promise);
       } else dispatchEvent(REJECTION_HANDLED, promise, state.value);
     });
   };
 
-  var bind = function (fn, promise, state, unwrap) {
+  var bind = function (fn, state, unwrap) {
     return function (value) {
-      fn(promise, state, value, unwrap);
+      fn(state, value, unwrap);
     };
   };
 
-  var internalReject = function (promise, state, value, unwrap) {
+  var internalReject = function (state, value, unwrap) {
     if (state.done) return;
     state.done = true;
     if (unwrap) state = unwrap;
     state.value = value;
     state.state = REJECTED;
-    notify$1(promise, state, true);
+    notify$1(state, true);
   };
 
-  var internalResolve = function (promise, state, value, unwrap) {
+  var internalResolve = function (state, value, unwrap) {
     if (state.done) return;
     state.done = true;
     if (unwrap) state = unwrap;
     try {
-      if (promise === value) throw TypeError$1("Promise can't be resolved itself");
+      if (state.facade === value) throw TypeError$1("Promise can't be resolved itself");
       var then = isThenable(value);
       if (then) {
         microtask(function () {
           var wrapper = { done: false };
           try {
             then.call(value,
-              bind(internalResolve, promise, wrapper, state),
-              bind(internalReject, promise, wrapper, state)
+              bind(internalResolve, wrapper, state),
+              bind(internalReject, wrapper, state)
             );
           } catch (error) {
-            internalReject(promise, wrapper, error, state);
+            internalReject(wrapper, error, state);
           }
         });
       } else {
         state.value = value;
         state.state = FULFILLED;
-        notify$1(promise, state, false);
+        notify$1(state, false);
       }
     } catch (error) {
-      internalReject(promise, { done: false }, error, state);
+      internalReject({ done: false }, error, state);
     }
   };
 
@@ -6408,9 +6446,9 @@ typeof navigator === "object" && (function (global, factory) {
       Internal.call(this);
       var state = getInternalState$3(this);
       try {
-        executor(bind(internalResolve, this, state), bind(internalReject, this, state));
+        executor(bind(internalResolve, state), bind(internalReject, state));
       } catch (error) {
-        internalReject(this, state, error);
+        internalReject(state, error);
       }
     };
     // eslint-disable-next-line no-unused-vars
@@ -6434,10 +6472,10 @@ typeof navigator === "object" && (function (global, factory) {
         var reaction = newPromiseCapability$1(speciesConstructor(this, PromiseConstructor));
         reaction.ok = typeof onFulfilled == 'function' ? onFulfilled : true;
         reaction.fail = typeof onRejected == 'function' && onRejected;
-        reaction.domain = IS_NODE$1 ? process$3.domain : undefined;
+        reaction.domain = engineIsNode ? process$3.domain : undefined;
         state.parent = true;
         state.reactions.push(reaction);
-        if (state.state != PENDING) notify$1(this, state, false);
+        if (state.state != PENDING) notify$1(state, false);
         return reaction.promise;
       },
       // `Promise.prototype.catch` method
@@ -6450,8 +6488,8 @@ typeof navigator === "object" && (function (global, factory) {
       var promise = new Internal();
       var state = getInternalState$3(promise);
       this.promise = promise;
-      this.resolve = bind(internalResolve, promise, state);
-      this.reject = bind(internalReject, promise, state);
+      this.resolve = bind(internalResolve, state);
+      this.reject = bind(internalReject, state);
     };
     newPromiseCapability.f = newPromiseCapability$1 = function (C) {
       return C === PromiseConstructor || C === PromiseWrapper
@@ -6522,7 +6560,7 @@ typeof navigator === "object" && (function (global, factory) {
         var values = [];
         var counter = 0;
         var remaining = 1;
-        iterate_1(iterable, function (promise) {
+        iterate(iterable, function (promise) {
           var index = counter++;
           var alreadyCalled = false;
           values.push(undefined);
@@ -6547,7 +6585,7 @@ typeof navigator === "object" && (function (global, factory) {
       var reject = capability.reject;
       var result = perform(function () {
         var $promiseResolve = aFunction$1(C.resolve);
-        iterate_1(iterable, function (promise) {
+        iterate(iterable, function (promise) {
           $promiseResolve.call(C, promise).then(capability.resolve, reject);
         });
       });
@@ -6794,12 +6832,17 @@ typeof navigator === "object" && (function (global, factory) {
 
 
 
+
+
   var STRICT_METHOD$5 = arrayMethodIsStrict('reduce');
   var USES_TO_LENGTH$9 = arrayMethodUsesToLength('reduce', { 1: 0 });
+  // Chrome 80-82 has a critical bug
+  // https://bugs.chromium.org/p/chromium/issues/detail?id=1049982
+  var CHROME_BUG = !engineIsNode && engineV8Version > 79 && engineV8Version < 83;
 
   // `Array.prototype.reduce` method
   // https://tc39.github.io/ecma262/#sec-array.prototype.reduce
-  _export({ target: 'Array', proto: true, forced: !STRICT_METHOD$5 || !USES_TO_LENGTH$9 }, {
+  _export({ target: 'Array', proto: true, forced: !STRICT_METHOD$5 || !USES_TO_LENGTH$9 || CHROME_BUG }, {
     reduce: function reduce(callbackfn /* , initialValue */) {
       return $reduce(this, callbackfn, arguments.length, arguments.length > 1 ? arguments[1] : undefined);
     }
@@ -7320,7 +7363,7 @@ typeof navigator === "object" && (function (global, factory) {
 
     var event = new CustomEvent(type, {
       bubbles: bubbles,
-      detail: _objectSpread2({}, detail, {
+      detail: _objectSpread2(_objectSpread2({}, detail), {}, {
         plyr: this
       })
     }); // Dispatch the event
@@ -7433,7 +7476,12 @@ typeof navigator === "object" && (function (global, factory) {
     if (this.isVimeo && !this.config.vimeo.premium && this.supported.ui) {
       var height = 100 / this.media.offsetWidth * parseInt(window.getComputedStyle(this.media).paddingBottom, 10);
       var offset = (height - padding) / (height / 50);
-      this.media.style.transform = "translateY(-".concat(offset, "%)");
+
+      if (this.fullscreen.active) {
+        wrapper.style.paddingBottom = null;
+      } else {
+        this.media.style.transform = "translateY(-".concat(offset, "%)");
+      }
     } else if (this.isHTML5) {
       wrapper.classList.toggle(this.config.classNames.videoFixedRatio, ratio !== null);
     }
@@ -8107,7 +8155,7 @@ typeof navigator === "object" && (function (global, factory) {
       var attr = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
       var text = i18n.get(key, this.config);
 
-      var attributes = _objectSpread2({}, attr, {
+      var attributes = _objectSpread2(_objectSpread2({}, attr), {}, {
         class: [attr.class, this.config.classNames.hidden].filter(Boolean).join(' ')
       });
 
@@ -9107,7 +9155,7 @@ typeof navigator === "object" && (function (global, factory) {
           showMenuPanel = controls.showMenuPanel;
       this.elements.controls = null; // Larger overlaid play button
 
-      if (this.config.controls.includes('play-large')) {
+      if (is$1.array(this.config.controls) && this.config.controls.includes('play-large')) {
         this.elements.container.appendChild(createButton.call(this, 'play-large'));
       } // Create the container
 
@@ -9119,7 +9167,7 @@ typeof navigator === "object" && (function (global, factory) {
         class: 'plyr__controls__item'
       }; // Loop through controls in order
 
-      dedupe(this.config.controls).forEach(function (control) {
+      dedupe(is$1.array(this.config.controls) ? this.config.controls : []).forEach(function (control) {
         // Restart button
         if (control === 'restart') {
           container.appendChild(createButton.call(_this10, 'restart', defaultAttributes));
@@ -9438,8 +9486,6 @@ typeof navigator === "object" && (function (global, factory) {
       if (update) {
         if (is$1.string(this.config.controls)) {
           container = replace(container);
-        } else if (is$1.element(container)) {
-          container.innerHTML = replace(container.innerHTML);
         }
       } // Controls container
 
@@ -9977,7 +10023,7 @@ typeof navigator === "object" && (function (global, factory) {
     // Sprite (for icons)
     loadSprite: true,
     iconPrefix: 'plyr',
-    iconUrl: 'https://cdn.plyr.io/3.5.10/plyr.svg',
+    iconUrl: 'https://cdn.plyr.io/3.6.3/plyr.svg',
     // Blank video (used to prevent errors on source change)
     blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
     // Quality default
@@ -10095,7 +10141,7 @@ typeof navigator === "object" && (function (global, factory) {
       vimeo: {
         sdk: 'https://player.vimeo.com/api/player.js',
         iframe: 'https://player.vimeo.com/video/{0}?{1}',
-        api: 'https://vimeo.com/api/v2/video/{0}.json'
+        api: 'https://vimeo.com/api/oembed.json?url={0}'
       },
       youtube: {
         sdk: 'https://www.youtube.com/iframe_api',
@@ -10265,24 +10311,27 @@ typeof navigator === "object" && (function (global, factory) {
       title: false,
       speed: true,
       transparent: false,
+      // Custom settings from Plyr
+      customControls: true,
+      referrerPolicy: null,
+      // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement/referrerPolicy
       // Whether the owner of the video has a Pro or Business account
       // (which allows us to properly hide controls without CSS hacks, etc)
-      premium: false,
-      // Custom settings from Plyr
-      referrerPolicy: null // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement/referrerPolicy
-
+      premium: false
     },
     // YouTube plugin
     youtube: {
-      noCookie: true,
-      // Whether to use an alternative version of YouTube without cookies
       rel: 0,
       // No related vids
       showinfo: 0,
       // Hide info
       iv_load_policy: 3,
       // Hide annotations
-      modestbranding: 1 // Hide logos as much as possible (they still show one in the corner when paused)
+      modestbranding: 1,
+      // Hide logos as much as possible (they still show one in the corner when paused)
+      // Custom settings from Plyr
+      customControls: true,
+      noCookie: false // Whether to use an alternative version of YouTube without cookies
 
     }
   };
@@ -10401,7 +10450,7 @@ typeof navigator === "object" && (function (global, factory) {
           return;
         }
 
-        _this.toggle();
+        _this.player.listeners.proxy(event, _this.toggle, 'fullscreen');
       }); // Tap focus when in fullscreen
 
       on.call(this, this.player.elements.container, 'keydown', function (event) {
@@ -10424,10 +10473,12 @@ typeof navigator === "object" && (function (global, factory) {
 
         if (is$1.element(button)) {
           button.pressed = this.active;
-        } // Trigger an event
+        } // Always trigger events on the plyr / media element (not a fullscreen container) and let them bubble up
 
 
-        triggerEvent.call(this.player, this.target, this.active ? 'enterfullscreen' : 'exitfullscreen', true);
+        var target = this.target === this.player.media ? this.target : this.player.elements.container; // Trigger an event
+
+        triggerEvent.call(this.player, target, this.active ? 'enterfullscreen' : 'exitfullscreen', true);
       }
     }, {
       key: "toggleFallback",
@@ -10822,7 +10873,9 @@ typeof navigator === "object" && (function (global, factory) {
       } // Set property synchronously to respect the call order
 
 
-      this.media.setAttribute('data-poster', poster); // Wait until ui is ready
+      this.media.setAttribute('data-poster', poster); // Show the poster
+
+      this.elements.poster.removeAttribute('hidden'); // Wait until ui is ready
 
       return ready.call(this) // Load image
       .then(function () {
@@ -10906,7 +10959,7 @@ typeof navigator === "object" && (function (global, factory) {
       // Loop through values (as they are the keys when the object is spread 🤔)
       Object.values(_objectSpread2({}, this.media.style)) // We're only fussed about Plyr specific properties
       .filter(function (key) {
-        return key.startsWith('--plyr');
+        return !is$1.empty(key) && is$1.string(key) && key.startsWith('--plyr');
       }).forEach(function (key) {
         // Set on the container
         _this5.elements.container.style.setProperty(key, _this5.media.style.getPropertyValue(key)); // Clean up from media element
@@ -11254,7 +11307,14 @@ typeof navigator === "object" && (function (global, factory) {
               ratio = _setPlayerSize.ratio; // Set Vimeo gutter
 
 
-          setGutter(ratio, padding, isEnter); // If not using native browser fullscreen API, we need to check for resizes of viewport
+          setGutter(ratio, padding, isEnter); // Horrible hack for Safari 14 not repainting properly on entering fullscreen
+
+          if (isEnter) {
+            setTimeout(function () {
+              return repaint(elements.container);
+            }, 100);
+          } // If not using native browser fullscreen API, we need to check for resizes of viewport
+
 
           if (!usingNative) {
             if (isEnter) {
@@ -11445,9 +11505,17 @@ typeof navigator === "object" && (function (global, factory) {
 
         this.bind(elements.buttons.restart, 'click', player.restart, 'restart'); // Rewind
 
-        this.bind(elements.buttons.rewind, 'click', player.rewind, 'rewind'); // Rewind
+        this.bind(elements.buttons.rewind, 'click', function () {
+          // Record seek time so we can prevent hiding controls for a few seconds after rewind
+          player.lastSeekTime = Date.now();
+          player.rewind();
+        }, 'rewind'); // Rewind
 
-        this.bind(elements.buttons.fastForward, 'click', player.forward, 'fastForward'); // Mute toggle
+        this.bind(elements.buttons.fastForward, 'click', function () {
+          // Record seek time so we can prevent hiding controls for a few seconds after fast forward
+          player.lastSeekTime = Date.now();
+          player.forward();
+        }, 'fastForward'); // Mute toggle
 
         this.bind(elements.buttons.mute, 'click', function () {
           player.muted = !player.muted;
@@ -12155,34 +12223,31 @@ typeof navigator === "object" && (function (global, factory) {
       } // Inject the package
 
 
-      var poster = player.poster;
-
-      if (premium) {
-        iframe.setAttribute('data-poster', poster);
+      if (premium || !config.customControls) {
+        iframe.setAttribute('data-poster', player.poster);
         player.media = replaceElement(iframe, player.media);
       } else {
         var wrapper = createElement('div', {
           class: player.config.classNames.embedContainer,
-          'data-poster': poster
+          'data-poster': player.poster
         });
         wrapper.appendChild(iframe);
         player.media = replaceElement(wrapper, player.media);
       } // Get poster image
 
 
-      fetch(format(player.config.urls.vimeo.api, id), 'json').then(function (response) {
-        if (is$1.empty(response)) {
-          return;
-        } // Get the URL for thumbnail
+      if (!config.customControls) {
+        fetch(format(player.config.urls.vimeo.api, src)).then(function (response) {
+          if (is$1.empty(response) || !response.thumbnail_url) {
+            return;
+          } // Set and show poster
 
 
-        var url = new URL(response[0].thumbnail_large); // Get original image
-
-        url.pathname = "".concat(url.pathname.split('_')[0], ".jpg"); // Set and show poster
-
-        ui.setPoster.call(player, url.href).catch(function () {});
-      }); // Setup instance
+          ui.setPoster.call(player, response.thumbnail_url).catch(function () {});
+        });
+      } // Setup instance
       // https://github.com/vimeo/player.js
+
 
       player.embed = new window.Vimeo.Player(iframe, {
         autopause: player.config.autopause,
@@ -12423,9 +12488,11 @@ typeof navigator === "object" && (function (global, factory) {
         triggerEvent.call(player, player.media, 'error');
       }); // Rebuild UI
 
-      setTimeout(function () {
-        return ui.build.call(player);
-      }, 0);
+      if (config.customControls) {
+        setTimeout(function () {
+          return ui.build.call(player);
+        }, 0);
+      }
     }
   };
 
@@ -12516,7 +12583,8 @@ typeof navigator === "object" && (function (global, factory) {
     },
     // API ready
     ready: function ready() {
-      var player = this; // Ignore already setup (race condition)
+      var player = this;
+      var config = player.config.youtube; // Ignore already setup (race condition)
 
       var currentId = player.media && player.media.getAttribute('id');
 
@@ -12533,53 +12601,53 @@ typeof navigator === "object" && (function (global, factory) {
 
 
       var videoId = parseId$1(source);
-      var id = generateId(player.provider); // Get poster, if already set
-
-      var poster = player.poster; // Replace media element
+      var id = generateId(player.provider); // Replace media element
 
       var container = createElement('div', {
         id: id,
-        'data-poster': poster
+        'data-poster': config.customControls ? player.poster : undefined
       });
-      player.media = replaceElement(container, player.media); // Id to poster wrapper
+      player.media = replaceElement(container, player.media); // Only load the poster when using custom controls
 
-      var posterSrc = function posterSrc(s) {
-        return "https://i.ytimg.com/vi/".concat(videoId, "/").concat(s, "default.jpg");
-      }; // Check thumbnail images in order of quality, but reject fallback thumbnails (120px wide)
+      if (config.customControls) {
+        var posterSrc = function posterSrc(s) {
+          return "https://i.ytimg.com/vi/".concat(videoId, "/").concat(s, "default.jpg");
+        }; // Check thumbnail images in order of quality, but reject fallback thumbnails (120px wide)
 
 
-      loadImage(posterSrc('maxres'), 121) // Higest quality and unpadded
-      .catch(function () {
-        return loadImage(posterSrc('sd'), 121);
-      }) // 480p padded 4:3
-      .catch(function () {
-        return loadImage(posterSrc('hq'));
-      }) // 360p padded 4:3. Always exists
-      .then(function (image) {
-        return ui.setPoster.call(player, image.src);
-      }).then(function (src) {
-        // If the image is padded, use background-size "cover" instead (like youtube does too with their posters)
-        if (!src.includes('maxres')) {
-          player.elements.poster.style.backgroundSize = 'cover';
-        }
-      }).catch(function () {});
-      var config = player.config.youtube; // Setup instance
+        loadImage(posterSrc('maxres'), 121) // Higest quality and unpadded
+        .catch(function () {
+          return loadImage(posterSrc('sd'), 121);
+        }) // 480p padded 4:3
+        .catch(function () {
+          return loadImage(posterSrc('hq'));
+        }) // 360p padded 4:3. Always exists
+        .then(function (image) {
+          return ui.setPoster.call(player, image.src);
+        }).then(function (src) {
+          // If the image is padded, use background-size "cover" instead (like youtube does too with their posters)
+          if (!src.includes('maxres')) {
+            player.elements.poster.style.backgroundSize = 'cover';
+          }
+        }).catch(function () {});
+      } // Setup instance
       // https://developers.google.com/youtube/iframe_api_reference
 
-      player.embed = new window.YT.Player(id, {
+
+      player.embed = new window.YT.Player(player.media, {
         videoId: videoId,
         host: getHost$1(config),
         playerVars: extend({}, {
-          autoplay: player.config.autoplay ? 1 : 0,
           // Autoplay
-          hl: player.config.hl,
+          autoplay: player.config.autoplay ? 1 : 0,
           // iframe interface language
-          controls: player.supported.ui ? 0 : 1,
-          // Only show controls if not fully supported
-          disablekb: 1,
+          hl: player.config.hl,
+          // Only show controls if not fully supported or opted out
+          controls: player.supported.ui && config.customControls ? 0 : 1,
           // Disable keyboard as we handle it
-          playsinline: !player.config.fullscreen.iosNative ? 1 : 0,
+          disablekb: 1,
           // Allow iOS inline playback
+          playsinline: !player.config.fullscreen.iosNative ? 1 : 0,
           // Captions are flaky on YouTube
           cc_load_policy: player.captions.active ? 1 : 0,
           cc_lang_pref: player.config.captions.language,
@@ -12690,6 +12758,7 @@ typeof navigator === "object" && (function (global, factory) {
                 var toggle = is$1.boolean(input) ? input : muted;
                 muted = toggle;
                 instance[toggle ? 'mute' : 'unMute']();
+                instance.setVolume(volume * 100);
                 triggerEvent.call(player, player.media, 'volumechange');
               }
             }); // Source
@@ -12712,7 +12781,7 @@ typeof navigator === "object" && (function (global, factory) {
               return player.config.speed.options.includes(s);
             }); // Set the tabindex to avoid focus entering iframe
 
-            if (player.supported.ui) {
+            if (player.supported.ui && config.customControls) {
               player.media.setAttribute('tabindex', -1);
             }
 
@@ -12739,9 +12808,11 @@ typeof navigator === "object" && (function (global, factory) {
               }
             }, 200); // Rebuild UI
 
-            setTimeout(function () {
-              return ui.build.call(player);
-            }, 50);
+            if (config.customControls) {
+              setTimeout(function () {
+                return ui.build.call(player);
+              }, 50);
+            }
           },
           onStateChange: function onStateChange(event) {
             // Get the instance
@@ -12787,7 +12858,7 @@ typeof navigator === "object" && (function (global, factory) {
 
               case 1:
                 // Restore paused state (YouTube starts playing on seek if the video hasn't been played yet)
-                if (!player.config.autoplay && player.media.paused && !player.embed.hasPlayed) {
+                if (config.customControls && !player.config.autoplay && player.media.paused && !player.embed.hasPlayed) {
                   player.media.pause();
                 } else {
                   assurePlaybackState$1.call(player, true);
@@ -12860,7 +12931,8 @@ typeof navigator === "object" && (function (global, factory) {
         wrap$1(this.media, this.elements.wrapper); // Poster image container
 
         this.elements.poster = createElement('div', {
-          class: this.config.classNames.poster
+          class: this.config.classNames.poster,
+          hidden: ''
         });
         this.elements.wrapper.appendChild(this.elements.poster);
       }
@@ -14728,9 +14800,9 @@ typeof navigator === "object" && (function (global, factory) {
 
 
       if (this.isHTML5 && this.config.autoplay) {
-        setTimeout(function () {
+        this.once('canplay', function () {
           return silencePromise(_this.play());
-        }, 10);
+        });
       } // Seek time will be recorded (in listeners.js) so we can prevent hiding controls for a few seconds after seek
 
 
@@ -14926,7 +14998,7 @@ typeof navigator === "object" && (function (global, factory) {
 
           var hiding = toggleClass(this.elements.container, this.config.classNames.hideControls, force); // Close menu
 
-          if (hiding && this.config.controls.includes('settings') && !is$1.empty(this.config.settings)) {
+          if (hiding && is$1.array(this.config.controls) && this.config.controls.includes('settings') && !is$1.empty(this.config.settings)) {
             controls.toggleMenu.call(this, false);
           } // Trigger event on change
 
@@ -15019,7 +15091,9 @@ typeof navigator === "object" && (function (global, factory) {
             }
           } else {
             // Unbind listeners
-            unbindListeners.call(_this3); // Replace the container with the original element provided
+            unbindListeners.call(_this3); // Cancel current network requests
+
+            html5.cancelRequests.call(_this3); // Replace the container with the original element provided
 
             replaceElement(_this3.elements.original, _this3.elements.container); // Event
 

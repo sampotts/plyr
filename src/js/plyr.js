@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v3.5.10
+// plyr.js v3.6.3
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -12,6 +12,7 @@ import { getProviderByUrl, providers, types } from './config/types';
 import Console from './console';
 import controls from './controls';
 import Fullscreen from './fullscreen';
+import html5 from './html5';
 import Listeners from './listeners';
 import media from './media';
 import Ads from './plugins/ads';
@@ -282,7 +283,7 @@ class Plyr {
 
     // Listen for events if debugging
     if (this.config.debug) {
-      on.call(this, this.elements.container, this.config.events.join(' '), event => {
+      on.call(this, this.elements.container, this.config.events.join(' '), (event) => {
         this.debug.log(`event: ${event.type}`);
       });
     }
@@ -312,7 +313,7 @@ class Plyr {
 
     // Autoplay if required
     if (this.isHTML5 && this.config.autoplay) {
-      setTimeout(() => silencePromise(this.play()), 10);
+      this.once('canplay', () => silencePromise(this.play()));
     }
 
     // Seek time will be recorded (in listeners.js) so we can prevent hiding controls for a few seconds after seek
@@ -1058,7 +1059,12 @@ class Plyr {
       const hiding = toggleClass(this.elements.container, this.config.classNames.hideControls, force);
 
       // Close menu
-      if (hiding && this.config.controls.includes('settings') && !is.empty(this.config.settings)) {
+      if (
+        hiding &&
+        is.array(this.config.controls) &&
+        this.config.controls.includes('settings') &&
+        !is.empty(this.config.settings)
+      ) {
         controls.toggleMenu.call(this, false);
       }
 
@@ -1143,6 +1149,9 @@ class Plyr {
       } else {
         // Unbind listeners
         unbindListeners.call(this);
+
+        // Cancel current network requests
+        html5.cancelRequests.call(this);
 
         // Replace the container with the original element provided
         replaceElement(this.elements.original, this.elements.container);
@@ -1252,7 +1261,7 @@ class Plyr {
       return null;
     }
 
-    return targets.map(t => new Plyr(t, options));
+    return targets.map((t) => new Plyr(t, options));
   }
 }
 

@@ -27,7 +27,7 @@ const { version } = pkg;
 const minSuffix = '.min';
 
 // Get AWS config
-Object.values(deploy).forEach(target => {
+Object.values(deploy).forEach((target) => {
   Object.assign(target, {
     publisher: publish.create({
       region: target.region,
@@ -42,6 +42,7 @@ Object.values(deploy).forEach(target => {
 // Paths
 const root = path.join(__dirname, '..');
 const paths = {
+  demo: path.join(root, 'demo/'),
   upload: [
     path.join(root, `dist/*${minSuffix}.*`),
     path.join(root, 'dist/*.css'),
@@ -97,11 +98,11 @@ const sizeOptions = { showFiles: true, gzip: true };
 const regex =
   '(?:0|[1-9][0-9]*)\\.(?:0|[1-9][0-9]*).(?:0|[1-9][0-9]*)(?:-[\\da-z\\-]+(?:.[\\da-z\\-]+)*)?(?:\\+[\\da-z\\-]+(?:.[\\da-z\\-]+)*)?';
 const semver = new RegExp(`v${regex}`, 'gi');
-const localPath = new RegExp('(../)?dist', 'gi');
-const versionPath = `https://${deploy.cdn.domain}/${version}`;
+const localPath = new RegExp('(../)?dist/', 'gi');
+const versionPath = `https://${deploy.cdn.domain}/${version}/`;
 const cdnpath = new RegExp(`${deploy.cdn.domain}/${regex}/`, 'gi');
 
-const renameFile = rename(p => {
+const renameFile = rename((p) => {
   p.basename = p.basename.replace(minSuffix, ''); // eslint-disable-line
   p.dirname = p.dirname.replace('.', version); // eslint-disable-line
 });
@@ -119,7 +120,7 @@ const canDeploy = () => {
   return true;
 };
 
-gulp.task('version', done => {
+gulp.task('version', (done) => {
   if (!canDeploy()) {
     done();
     return null;
@@ -127,14 +128,14 @@ gulp.task('version', done => {
 
   const { domain } = deploy.cdn;
 
-  log(`Uploading ${ansi.green.bold(version)} to ${ansi.cyan(domain)}...`);
+  log(`Updating version in files to ${ansi.green.bold(version)}...`);
 
   // Replace versioned URLs in source
   const files = ['plyr.js', 'plyr.polyfilled.js', 'config/defaults.js'];
 
   return gulp
     .src(
-      files.map(file => path.join(__dirname, `src/js/${file}`)),
+      files.map((file) => path.join(root, `src/js/${file}`)),
       { base: '.' },
     )
     .pipe(replace(semver, `v${version}`))
@@ -143,7 +144,7 @@ gulp.task('version', done => {
 });
 
 // Publish version to CDN bucket
-gulp.task('cdn', done => {
+gulp.task('cdn', (done) => {
   if (!canDeploy()) {
     done();
     return null;
@@ -190,14 +191,14 @@ gulp.task('purge', () => {
     .pipe(
       through.obj((file, enc, cb) => {
         const filename = file.path.split('/').pop();
-        list.push(`${versionPath}/${filename.replace(minSuffix, '')}`);
+        list.push(`${versionPath}${filename.replace(minSuffix, '')}`);
         cb(null);
       }),
     )
     .on('end', () => {
       const purge = new FastlyPurge(fastly.token);
 
-      list.forEach(url => {
+      list.forEach((url) => {
         log(`Purging ${ansi.cyan(url)}...`);
 
         purge.url(url, (error, result) => {
@@ -212,7 +213,7 @@ gulp.task('purge', () => {
 });
 
 // Publish to demo bucket
-gulp.task('demo', done => {
+gulp.task('demo', (done) => {
   if (!canDeploy()) {
     done();
     return null;
@@ -229,14 +230,14 @@ gulp.task('demo', done => {
 
   // Replace versioned files in README.md
   gulp
-    .src([`${__dirname}/README.md`])
+    .src([`${root}/README.md`])
     .pipe(replace(cdnpath, `${domain}/${version}/`))
-    .pipe(gulp.dest(__dirname));
+    .pipe(gulp.dest(root));
 
   // Replace local file paths with remote paths in demo HTML
   // e.g. "../dist/plyr.js" to "https://cdn.plyr.io/x.x.x/plyr.js"
-  const index = `${paths.demo.root}index.html`;
-  const error = `${paths.demo.root}error.html`;
+  const index = `${paths.demo}index.html`;
+  const error = `${paths.demo}error.html`;
   const pages = [index];
 
   if (branch.current === branch.master) {
@@ -247,7 +248,7 @@ gulp.task('demo', done => {
     .src(pages)
     .pipe(replace(localPath, versionPath))
     .pipe(
-      rename(p => {
+      rename((p) => {
         if (options.demo.uploadPath) {
           // eslint-disable-next-line no-param-reassign
           p.dirname += options.demo.uploadPath;

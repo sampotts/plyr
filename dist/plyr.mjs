@@ -1,4 +1,4 @@
-typeof navigator === "object" && function _classCallCheck(instance, Constructor) {
+function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
   }
@@ -157,7 +157,7 @@ function _unsupportedIterableToArray(o, minLen) {
   if (typeof o === "string") return _arrayLikeToArray(o, minLen);
   var n = Object.prototype.toString.call(o).slice(8, -1);
   if (n === "Object" && o.constructor) n = o.constructor.name;
-  if (n === "Map" || n === "Set") return Array.from(n);
+  if (n === "Map" || n === "Set") return Array.from(o);
   if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
 }
 
@@ -1078,7 +1078,7 @@ function triggerEvent(element) {
 
   var event = new CustomEvent(type, {
     bubbles: bubbles,
-    detail: _objectSpread2({}, detail, {
+    detail: _objectSpread2(_objectSpread2({}, detail), {}, {
       plyr: this
     })
   }); // Dispatch the event
@@ -1191,7 +1191,12 @@ function setAspectRatio(input) {
   if (this.isVimeo && !this.config.vimeo.premium && this.supported.ui) {
     var height = 100 / this.media.offsetWidth * parseInt(window.getComputedStyle(this.media).paddingBottom, 10);
     var offset = (height - padding) / (height / 50);
-    this.media.style.transform = "translateY(-".concat(offset, "%)");
+
+    if (this.fullscreen.active) {
+      wrapper.style.paddingBottom = null;
+    } else {
+      this.media.style.transform = "translateY(-".concat(offset, "%)");
+    }
   } else if (this.isHTML5) {
     wrapper.classList.toggle(this.config.classNames.videoFixedRatio, ratio !== null);
   }
@@ -1780,7 +1785,7 @@ var controls = {
     var attr = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
     var text = i18n.get(key, this.config);
 
-    var attributes = _objectSpread2({}, attr, {
+    var attributes = _objectSpread2(_objectSpread2({}, attr), {}, {
       class: [attr.class, this.config.classNames.hidden].filter(Boolean).join(' ')
     });
 
@@ -2780,7 +2785,7 @@ var controls = {
         showMenuPanel = controls.showMenuPanel;
     this.elements.controls = null; // Larger overlaid play button
 
-    if (this.config.controls.includes('play-large')) {
+    if (is$1.array(this.config.controls) && this.config.controls.includes('play-large')) {
       this.elements.container.appendChild(createButton.call(this, 'play-large'));
     } // Create the container
 
@@ -2792,7 +2797,7 @@ var controls = {
       class: 'plyr__controls__item'
     }; // Loop through controls in order
 
-    dedupe(this.config.controls).forEach(function (control) {
+    dedupe(is$1.array(this.config.controls) ? this.config.controls : []).forEach(function (control) {
       // Restart button
       if (control === 'restart') {
         container.appendChild(createButton.call(_this10, 'restart', defaultAttributes));
@@ -3111,8 +3116,6 @@ var controls = {
     if (update) {
       if (is$1.string(this.config.controls)) {
         container = replace(container);
-      } else if (is$1.element(container)) {
-        container.innerHTML = replace(container.innerHTML);
       }
     } // Controls container
 
@@ -3650,7 +3653,7 @@ var defaults$1 = {
   // Sprite (for icons)
   loadSprite: true,
   iconPrefix: 'plyr',
-  iconUrl: 'https://cdn.plyr.io/3.5.10/plyr.svg',
+  iconUrl: 'https://cdn.plyr.io/3.6.3/plyr.svg',
   // Blank video (used to prevent errors on source change)
   blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
   // Quality default
@@ -3768,7 +3771,7 @@ var defaults$1 = {
     vimeo: {
       sdk: 'https://player.vimeo.com/api/player.js',
       iframe: 'https://player.vimeo.com/video/{0}?{1}',
-      api: 'https://vimeo.com/api/v2/video/{0}.json'
+      api: 'https://vimeo.com/api/oembed.json?url={0}'
     },
     youtube: {
       sdk: 'https://www.youtube.com/iframe_api',
@@ -3938,24 +3941,27 @@ var defaults$1 = {
     title: false,
     speed: true,
     transparent: false,
+    // Custom settings from Plyr
+    customControls: true,
+    referrerPolicy: null,
+    // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement/referrerPolicy
     // Whether the owner of the video has a Pro or Business account
     // (which allows us to properly hide controls without CSS hacks, etc)
-    premium: false,
-    // Custom settings from Plyr
-    referrerPolicy: null // https://developer.mozilla.org/en-US/docs/Web/API/HTMLIFrameElement/referrerPolicy
-
+    premium: false
   },
   // YouTube plugin
   youtube: {
-    noCookie: true,
-    // Whether to use an alternative version of YouTube without cookies
     rel: 0,
     // No related vids
     showinfo: 0,
     // Hide info
     iv_load_policy: 3,
     // Hide annotations
-    modestbranding: 1 // Hide logos as much as possible (they still show one in the corner when paused)
+    modestbranding: 1,
+    // Hide logos as much as possible (they still show one in the corner when paused)
+    // Custom settings from Plyr
+    customControls: true,
+    noCookie: false // Whether to use an alternative version of YouTube without cookies
 
   }
 };
@@ -4074,7 +4080,7 @@ var Fullscreen = /*#__PURE__*/function () {
         return;
       }
 
-      _this.toggle();
+      _this.player.listeners.proxy(event, _this.toggle, 'fullscreen');
     }); // Tap focus when in fullscreen
 
     on.call(this, this.player.elements.container, 'keydown', function (event) {
@@ -4097,10 +4103,12 @@ var Fullscreen = /*#__PURE__*/function () {
 
       if (is$1.element(button)) {
         button.pressed = this.active;
-      } // Trigger an event
+      } // Always trigger events on the plyr / media element (not a fullscreen container) and let them bubble up
 
 
-      triggerEvent.call(this.player, this.target, this.active ? 'enterfullscreen' : 'exitfullscreen', true);
+      var target = this.target === this.player.media ? this.target : this.player.elements.container; // Trigger an event
+
+      triggerEvent.call(this.player, target, this.active ? 'enterfullscreen' : 'exitfullscreen', true);
     }
   }, {
     key: "toggleFallback",
@@ -4482,7 +4490,9 @@ var ui = {
     } // Set property synchronously to respect the call order
 
 
-    this.media.setAttribute('data-poster', poster); // Wait until ui is ready
+    this.media.setAttribute('data-poster', poster); // Show the poster
+
+    this.elements.poster.removeAttribute('hidden'); // Wait until ui is ready
 
     return ready.call(this) // Load image
     .then(function () {
@@ -4566,7 +4576,7 @@ var ui = {
     // Loop through values (as they are the keys when the object is spread 🤔)
     Object.values(_objectSpread2({}, this.media.style)) // We're only fussed about Plyr specific properties
     .filter(function (key) {
-      return key.startsWith('--plyr');
+      return !is$1.empty(key) && is$1.string(key) && key.startsWith('--plyr');
     }).forEach(function (key) {
       // Set on the container
       _this5.elements.container.style.setProperty(key, _this5.media.style.getPropertyValue(key)); // Clean up from media element
@@ -4914,7 +4924,14 @@ var Listeners = /*#__PURE__*/function () {
             ratio = _setPlayerSize.ratio; // Set Vimeo gutter
 
 
-        setGutter(ratio, padding, isEnter); // If not using native browser fullscreen API, we need to check for resizes of viewport
+        setGutter(ratio, padding, isEnter); // Horrible hack for Safari 14 not repainting properly on entering fullscreen
+
+        if (isEnter) {
+          setTimeout(function () {
+            return repaint(elements.container);
+          }, 100);
+        } // If not using native browser fullscreen API, we need to check for resizes of viewport
+
 
         if (!usingNative) {
           if (isEnter) {
@@ -5105,9 +5122,17 @@ var Listeners = /*#__PURE__*/function () {
 
       this.bind(elements.buttons.restart, 'click', player.restart, 'restart'); // Rewind
 
-      this.bind(elements.buttons.rewind, 'click', player.rewind, 'rewind'); // Rewind
+      this.bind(elements.buttons.rewind, 'click', function () {
+        // Record seek time so we can prevent hiding controls for a few seconds after rewind
+        player.lastSeekTime = Date.now();
+        player.rewind();
+      }, 'rewind'); // Rewind
 
-      this.bind(elements.buttons.fastForward, 'click', player.forward, 'fastForward'); // Mute toggle
+      this.bind(elements.buttons.fastForward, 'click', function () {
+        // Record seek time so we can prevent hiding controls for a few seconds after fast forward
+        player.lastSeekTime = Date.now();
+        player.forward();
+      }, 'fastForward'); // Mute toggle
 
       this.bind(elements.buttons.mute, 'click', function () {
         player.muted = !player.muted;
@@ -5762,34 +5787,31 @@ var vimeo = {
     } // Inject the package
 
 
-    var poster = player.poster;
-
-    if (premium) {
-      iframe.setAttribute('data-poster', poster);
+    if (premium || !config.customControls) {
+      iframe.setAttribute('data-poster', player.poster);
       player.media = replaceElement(iframe, player.media);
     } else {
       var wrapper = createElement('div', {
         class: player.config.classNames.embedContainer,
-        'data-poster': poster
+        'data-poster': player.poster
       });
       wrapper.appendChild(iframe);
       player.media = replaceElement(wrapper, player.media);
     } // Get poster image
 
 
-    fetch(format(player.config.urls.vimeo.api, id), 'json').then(function (response) {
-      if (is$1.empty(response)) {
-        return;
-      } // Get the URL for thumbnail
+    if (!config.customControls) {
+      fetch(format(player.config.urls.vimeo.api, src)).then(function (response) {
+        if (is$1.empty(response) || !response.thumbnail_url) {
+          return;
+        } // Set and show poster
 
 
-      var url = new URL(response[0].thumbnail_large); // Get original image
-
-      url.pathname = "".concat(url.pathname.split('_')[0], ".jpg"); // Set and show poster
-
-      ui.setPoster.call(player, url.href).catch(function () {});
-    }); // Setup instance
+        ui.setPoster.call(player, response.thumbnail_url).catch(function () {});
+      });
+    } // Setup instance
     // https://github.com/vimeo/player.js
+
 
     player.embed = new window.Vimeo.Player(iframe, {
       autopause: player.config.autopause,
@@ -6030,9 +6052,11 @@ var vimeo = {
       triggerEvent.call(player, player.media, 'error');
     }); // Rebuild UI
 
-    setTimeout(function () {
-      return ui.build.call(player);
-    }, 0);
+    if (config.customControls) {
+      setTimeout(function () {
+        return ui.build.call(player);
+      }, 0);
+    }
   }
 };
 
@@ -6125,7 +6149,8 @@ var youtube = {
   },
   // API ready
   ready: function ready() {
-    var player = this; // Ignore already setup (race condition)
+    var player = this;
+    var config = player.config.youtube; // Ignore already setup (race condition)
 
     var currentId = player.media && player.media.getAttribute('id');
 
@@ -6142,53 +6167,53 @@ var youtube = {
 
 
     var videoId = parseId$1(source);
-    var id = generateId(player.provider); // Get poster, if already set
-
-    var poster = player.poster; // Replace media element
+    var id = generateId(player.provider); // Replace media element
 
     var container = createElement('div', {
       id: id,
-      'data-poster': poster
+      'data-poster': config.customControls ? player.poster : undefined
     });
-    player.media = replaceElement(container, player.media); // Id to poster wrapper
+    player.media = replaceElement(container, player.media); // Only load the poster when using custom controls
 
-    var posterSrc = function posterSrc(s) {
-      return "https://i.ytimg.com/vi/".concat(videoId, "/").concat(s, "default.jpg");
-    }; // Check thumbnail images in order of quality, but reject fallback thumbnails (120px wide)
+    if (config.customControls) {
+      var posterSrc = function posterSrc(s) {
+        return "https://i.ytimg.com/vi/".concat(videoId, "/").concat(s, "default.jpg");
+      }; // Check thumbnail images in order of quality, but reject fallback thumbnails (120px wide)
 
 
-    loadImage(posterSrc('maxres'), 121) // Higest quality and unpadded
-    .catch(function () {
-      return loadImage(posterSrc('sd'), 121);
-    }) // 480p padded 4:3
-    .catch(function () {
-      return loadImage(posterSrc('hq'));
-    }) // 360p padded 4:3. Always exists
-    .then(function (image) {
-      return ui.setPoster.call(player, image.src);
-    }).then(function (src) {
-      // If the image is padded, use background-size "cover" instead (like youtube does too with their posters)
-      if (!src.includes('maxres')) {
-        player.elements.poster.style.backgroundSize = 'cover';
-      }
-    }).catch(function () {});
-    var config = player.config.youtube; // Setup instance
+      loadImage(posterSrc('maxres'), 121) // Higest quality and unpadded
+      .catch(function () {
+        return loadImage(posterSrc('sd'), 121);
+      }) // 480p padded 4:3
+      .catch(function () {
+        return loadImage(posterSrc('hq'));
+      }) // 360p padded 4:3. Always exists
+      .then(function (image) {
+        return ui.setPoster.call(player, image.src);
+      }).then(function (src) {
+        // If the image is padded, use background-size "cover" instead (like youtube does too with their posters)
+        if (!src.includes('maxres')) {
+          player.elements.poster.style.backgroundSize = 'cover';
+        }
+      }).catch(function () {});
+    } // Setup instance
     // https://developers.google.com/youtube/iframe_api_reference
 
-    player.embed = new window.YT.Player(id, {
+
+    player.embed = new window.YT.Player(player.media, {
       videoId: videoId,
       host: getHost(config),
       playerVars: extend({}, {
-        autoplay: player.config.autoplay ? 1 : 0,
         // Autoplay
-        hl: player.config.hl,
+        autoplay: player.config.autoplay ? 1 : 0,
         // iframe interface language
-        controls: player.supported.ui ? 0 : 1,
-        // Only show controls if not fully supported
-        disablekb: 1,
+        hl: player.config.hl,
+        // Only show controls if not fully supported or opted out
+        controls: player.supported.ui && config.customControls ? 0 : 1,
         // Disable keyboard as we handle it
-        playsinline: !player.config.fullscreen.iosNative ? 1 : 0,
+        disablekb: 1,
         // Allow iOS inline playback
+        playsinline: !player.config.fullscreen.iosNative ? 1 : 0,
         // Captions are flaky on YouTube
         cc_load_policy: player.captions.active ? 1 : 0,
         cc_lang_pref: player.config.captions.language,
@@ -6299,6 +6324,7 @@ var youtube = {
               var toggle = is$1.boolean(input) ? input : muted;
               muted = toggle;
               instance[toggle ? 'mute' : 'unMute']();
+              instance.setVolume(volume * 100);
               triggerEvent.call(player, player.media, 'volumechange');
             }
           }); // Source
@@ -6321,7 +6347,7 @@ var youtube = {
             return player.config.speed.options.includes(s);
           }); // Set the tabindex to avoid focus entering iframe
 
-          if (player.supported.ui) {
+          if (player.supported.ui && config.customControls) {
             player.media.setAttribute('tabindex', -1);
           }
 
@@ -6348,9 +6374,11 @@ var youtube = {
             }
           }, 200); // Rebuild UI
 
-          setTimeout(function () {
-            return ui.build.call(player);
-          }, 50);
+          if (config.customControls) {
+            setTimeout(function () {
+              return ui.build.call(player);
+            }, 50);
+          }
         },
         onStateChange: function onStateChange(event) {
           // Get the instance
@@ -6396,7 +6424,7 @@ var youtube = {
 
             case 1:
               // Restore paused state (YouTube starts playing on seek if the video hasn't been played yet)
-              if (!player.config.autoplay && player.media.paused && !player.embed.hasPlayed) {
+              if (config.customControls && !player.config.autoplay && player.media.paused && !player.embed.hasPlayed) {
                 player.media.pause();
               } else {
                 assurePlaybackState$1.call(player, true);
@@ -6470,7 +6498,8 @@ var media = {
       wrap(this.media, this.elements.wrapper); // Poster image container
 
       this.elements.poster = createElement('div', {
-        class: this.config.classNames.poster
+        class: this.config.classNames.poster,
+        hidden: ''
       });
       this.elements.wrapper.appendChild(this.elements.poster);
     }
@@ -8287,9 +8316,9 @@ var Plyr = /*#__PURE__*/function () {
 
 
     if (this.isHTML5 && this.config.autoplay) {
-      setTimeout(function () {
+      this.once('canplay', function () {
         return silencePromise(_this.play());
-      }, 10);
+      });
     } // Seek time will be recorded (in listeners.js) so we can prevent hiding controls for a few seconds after seek
 
 
@@ -8485,7 +8514,7 @@ var Plyr = /*#__PURE__*/function () {
 
         var hiding = toggleClass(this.elements.container, this.config.classNames.hideControls, force); // Close menu
 
-        if (hiding && this.config.controls.includes('settings') && !is$1.empty(this.config.settings)) {
+        if (hiding && is$1.array(this.config.controls) && this.config.controls.includes('settings') && !is$1.empty(this.config.settings)) {
           controls.toggleMenu.call(this, false);
         } // Trigger event on change
 
@@ -8578,7 +8607,9 @@ var Plyr = /*#__PURE__*/function () {
           }
         } else {
           // Unbind listeners
-          unbindListeners.call(_this3); // Replace the container with the original element provided
+          unbindListeners.call(_this3); // Cancel current network requests
+
+          html5.cancelRequests.call(_this3); // Replace the container with the original element provided
 
           replaceElement(_this3.elements.original, _this3.elements.container); // Event
 

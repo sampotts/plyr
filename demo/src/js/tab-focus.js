@@ -3,7 +3,7 @@ const container = document.getElementById('container');
 const tabClassName = 'tab-focus';
 
 // Remove class on blur
-document.addEventListener('focusout', event => {
+document.addEventListener('focusout', (event) => {
   if (!event.target.classList || container.contains(event.target)) {
     return;
   }
@@ -12,7 +12,7 @@ document.addEventListener('focusout', event => {
 });
 
 // Add classname to tabbed elements
-document.addEventListener('keydown', event => {
+document.addEventListener('keydown', (event) => {
   if (event.keyCode !== 9) {
     return;
   }
