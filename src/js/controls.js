@@ -1372,6 +1372,8 @@ const controls = {
         // Ignored on iOS as it's handled globally
         // https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html
         if (control === 'volume' && !browser.isIos) {
+          const volumeContainer = createElement('div', {});
+
           // Set the attributes
           const attributes = {
             max: 1,
@@ -1379,8 +1381,10 @@ const controls = {
             value: this.config.volume,
           };
 
+          this.elements.volumeContainer = volumeContainer;
+
           // Create the volume range slider
-          volume.appendChild(
+          volumeContainer.appendChild(
             createRange.call(
               this,
               'volume',
@@ -1389,6 +1393,8 @@ const controls = {
               }),
             ),
           );
+
+          volume.appendChild(volumeContainer);
         }
       }
 
