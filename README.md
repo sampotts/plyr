@@ -880,5 +880,6 @@ Support this project with your organization. Your logo will show up here with a 
 <a href="https://opencollective.com/plyr/organization/1/website"><img src="https://opencollective.com/plyr/organization/1/avatar.svg"></a><a href="https://opencollective.com/plyr/organization/2/website"><img src="https://opencollective.com/plyr/organization/2/avatar.svg"></a>
 
 # Copyright and License
+thx
 
 [The MIT license](LICENSE.md)
