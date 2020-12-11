@@ -29,10 +29,6 @@ import toggleClass from './toggle-class';
       tooltips: {
         controls: true,
       },
-      ads: {
-        enabled: window.location.host.includes(production),
-        publisherId: '918848828995742',
-      },
       previewThumbnails: {
         enabled: true,
         src: ['https://cdn.plyr.io/static/demo/thumbs/100p.vtt', 'https://cdn.plyr.io/static/demo/thumbs/240p.vtt'],
