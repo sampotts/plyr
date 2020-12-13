@@ -1,0 +1,16 @@
+---
+root: true
+
+parserOptions:
+  sourceType: module
+  ecmaVersion: 9
+
+env:
+  es6: true
+  browser: true
+
+globals:
+  jQuery: true
+
+extends:
+- eslint:recommended

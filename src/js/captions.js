@@ -3,6 +3,8 @@
 // TODO: Create as class
 // ==========================================================================
 
+import i18n from './utils/i18n';
+
 const captions = {
   setup() {
     return undefined;
