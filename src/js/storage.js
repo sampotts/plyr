@@ -31,7 +31,7 @@ class Storage {
     }
   }
 
-  get(key) {
+  get = (key) => {
     if (!Storage.supported || !this.enabled) {
       return null;
     }
@@ -45,9 +45,9 @@ class Storage {
     const json = JSON.parse(store);
 
     return is.string(key) && key.length ? json[key] : json;
-  }
+  };
 
-  set(object) {
+  set = (object) => {
     // Bail if we don't have localStorage support or it's disabled
     if (!Storage.supported || !this.enabled) {
       return;
@@ -71,7 +71,7 @@ class Storage {
 
     // Update storage
     window.localStorage.setItem(this.key, JSON.stringify(storage));
-  }
+  };
 }
 
 export default Storage;
