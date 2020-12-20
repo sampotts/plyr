@@ -118,6 +118,7 @@ Object.entries(build.js).forEach(([filename, entry]) => {
                       },
                     ],
                   ],
+                  plugins: ['@babel/plugin-proposal-class-properties'],
                   babelrc: false,
                   exclude: [/\/core-js\//],
                 }),
