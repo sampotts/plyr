@@ -57,6 +57,8 @@ class Fullscreen {
 
     // Update the UI
     this.update();
+
+    // this.toggle = this.toggle.bind(this);
   }
 
   // Determine if native supported
@@ -134,7 +136,7 @@ class Fullscreen {
       : this.player.elements.fullscreen || this.player.elements.container;
   }
 
-  onChange() {
+  onChange = () => {
     if (!this.enabled) {
       return;
     }
@@ -149,9 +151,9 @@ class Fullscreen {
     const target = this.target === this.player.media ? this.target : this.player.elements.container;
     // Trigger an event
     triggerEvent.call(this.player, target, this.active ? 'enterfullscreen' : 'exitfullscreen', true);
-  }
+  };
 
-  toggleFallback(toggle = false) {
+  toggleFallback = (toggle = false) => {
     // Store or restore scroll position
     if (toggle) {
       this.scrollPosition = {
@@ -198,10 +200,10 @@ class Fullscreen {
 
     // Toggle button and fire events
     this.onChange();
-  }
+  };
 
   // Trap focus inside container
-  trapFocus(event) {
+  trapFocus = (event) => {
     // Bail if iOS, not active, not the tab key
     if (browser.isIos || !this.active || event.key !== 'Tab' || event.keyCode !== 9) {
       return;
@@ -222,10 +224,10 @@ class Fullscreen {
       last.focus();
       event.preventDefault();
     }
-  }
+  };
 
   // Update UI
-  update() {
+  update = () => {
     if (this.enabled) {
       let mode;
 
@@ -244,10 +246,10 @@ class Fullscreen {
 
     // Add styling hook to show button
     toggleClass(this.player.elements.container, this.player.config.classNames.fullscreen.enabled, this.enabled);
-  }
+  };
 
   // Make an element fullscreen
-  enter() {
+  enter = () => {
     if (!this.enabled) {
       return;
     }
@@ -262,10 +264,10 @@ class Fullscreen {
     } else if (!is.empty(this.prefix)) {
       this.target[`${this.prefix}Request${this.property}`]();
     }
-  }
+  };
 
   // Bail from fullscreen
-  exit() {
+  exit = () => {
     if (!this.enabled) {
       return;
     }
@@ -282,16 +284,16 @@ class Fullscreen {
       const action = this.prefix === 'moz' ? 'Cancel' : 'Exit';
       document[`${this.prefix}${action}${this.property}`]();
     }
-  }
+  };
 
   // Toggle state
-  toggle() {
+  toggle = () => {
     if (!this.active) {
       this.enter();
     } else {
       this.exit();
     }
-  }
+  };
 }
 
 export default Fullscreen;

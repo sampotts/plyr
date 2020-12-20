@@ -183,7 +183,7 @@ class Listeners {
   }
 
   // Device is touch enabled
-  firstTouch() {
+  firstTouch = () => {
     const { player } = this;
     const { elements } = player;
 
@@ -191,9 +191,9 @@ class Listeners {
 
     // Add touch class
     toggleClass(elements.container, player.config.classNames.isTouch, true);
-  }
+  };
 
-  setTabFocus(event) {
+  setTabFocus = (event) => {
     const { player } = this;
     const { elements } = player;
 
@@ -241,10 +241,10 @@ class Listeners {
         toggleClass(document.activeElement, player.config.classNames.tabFocus, true);
       }, 10);
     }
-  }
+  };
 
   // Global window & document listeners
-  global(toggle = true) {
+  global = (toggle = true) => {
     const { player } = this;
 
     // Keyboard shortcuts
@@ -260,10 +260,10 @@ class Listeners {
 
     // Tab focus detection
     toggleListener.call(player, document.body, 'keydown focus blur focusout', this.setTabFocus, toggle, false, true);
-  }
+  };
 
   // Container listeners
-  container() {
+  container = () => {
     const { player } = this;
     const { config, elements, timers } = player;
 
@@ -370,10 +370,10 @@ class Listeners {
         }
       }
     });
-  }
+  };
 
   // Listen for media events
-  media() {
+  media = () => {
     const { player } = this;
     const { elements } = player;
 
@@ -514,10 +514,10 @@ class Listeners {
 
       triggerEvent.call(player, elements.container, event.type, true, detail);
     });
-  }
+  };
 
   // Run default and custom handlers
-  proxy(event, defaultHandler, customHandlerKey) {
+  proxy = (event, defaultHandler, customHandlerKey) => {
     const { player } = this;
     const customHandler = player.config.listeners[customHandlerKey];
     const hasCustomHandler = is.function(customHandler);
@@ -532,10 +532,10 @@ class Listeners {
     if (returned !== false && is.function(defaultHandler)) {
       defaultHandler.call(player, event);
     }
-  }
+  };
 
   // Trigger custom and default handlers
-  bind(element, type, defaultHandler, customHandlerKey, passive = true) {
+  bind = (element, type, defaultHandler, customHandlerKey, passive = true) => {
     const { player } = this;
     const customHandler = player.config.listeners[customHandlerKey];
     const hasCustomHandler = is.function(customHandler);
@@ -547,10 +547,10 @@ class Listeners {
       (event) => this.proxy(event, defaultHandler, customHandlerKey),
       passive && !hasCustomHandler,
     );
-  }
+  };
 
   // Listen for control events
-  controls() {
+  controls = () => {
     const { player } = this;
     const { elements } = player;
     // IE doesn't support input event, so we fallback to change
@@ -905,7 +905,7 @@ class Listeners {
       'volume',
       false,
     );
-  }
+  };
 }
 
 export default Listeners;
