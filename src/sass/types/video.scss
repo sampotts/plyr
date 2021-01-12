@@ -19,6 +19,7 @@
   overflow: hidden;
   position: relative;
   width: 100%;
+  z-index: inherit;
 }
 
 // Default to 16:9 ratio but this is set by JavaScript based on config
