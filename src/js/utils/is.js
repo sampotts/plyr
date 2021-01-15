@@ -13,7 +13,6 @@ const isFunction = (input) => getConstructor(input) === Function;
 const isArray = (input) => Array.isArray(input);
 const isWeakMap = (input) => instanceOf(input, WeakMap);
 const isNodeList = (input) => instanceOf(input, NodeList);
-const isElement = (input) => instanceOf(input, Element);
 const isTextNode = (input) => getConstructor(input) === Text;
 const isEvent = (input) => instanceOf(input, Event);
 const isKeyboardEvent = (input) => instanceOf(input, KeyboardEvent);
@@ -25,6 +24,13 @@ const isEmpty = (input) =>
   isNullOrUndefined(input) ||
   ((isString(input) || isArray(input) || isNodeList(input)) && !input.length) ||
   (isObject(input) && !Object.keys(input).length);
+
+const isElement = (input) =>
+  input !== null &&
+  (typeof input === "object") &&
+  (input.nodeType === 1) &&
+  (typeof input.style === "object") &&
+  (typeof input.ownerDocument === "object");
 
 const isUrl = (input) => {
   // Accept a URL object
