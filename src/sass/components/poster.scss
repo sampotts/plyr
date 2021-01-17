@@ -3,7 +3,7 @@
 // --------------------------------------------------------------
 
 .plyr__poster {
-  background-color: #000;
+  background-color: var(--plyr-video-background, $plyr-video-background);
   background-position: 50% 50%;
   background-repeat: no-repeat;
   background-size: contain;
