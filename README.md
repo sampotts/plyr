@@ -185,6 +185,7 @@ Here's a list of the properties and what they are used for:
 | Name                                           | Description                                                                                             | Default / Fallback                                                    |
 | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
 | `--plyr-color-main`                            | The primary UI color.                                                                                   | ![#f03c15](https://placehold.it/15/00b3ff/000000?text=+) `#00b3ff`    |
+| `--plyr-video-background`                      | The background color of video and poster wrappers for using alpha channel videos and poster images.     | `rgba(0, 0, 0, 1)`                                                    |
 | `--plyr-tab-focus-color`                       | The color used for the dotted outline when an element is `:focus-visible` (equivalent) keyboard focus.  | `--plyr-color-main`                                                   |
 | `--plyr-badge-background`                      | The background color for badges in the menu.                                                            | ![#4a5464](https://placehold.it/15/4a5464/000000?text=+) `#4a5464`    |
 | `--plyr-badge-text-color`                      | The text color for badges.                                                                              | ![#ffffff](https://placehold.it/15/ffffff/000000?text=+) `#ffffff`    |
@@ -266,9 +267,7 @@ You can set them in your CSS for all players:
 ...or in your HTML:
 
 ```html
-<video class="player" style="--plyr-color-main: #1ac266;">
-    ...
-</video>
+<video class="player" style="--plyr-color-main: #1ac266;">...</video>
 ```
 
 ### SASS
@@ -343,7 +342,7 @@ The HTMLElement or string selector can be the target `<video>`, `<audio>`, or `<
 You have two choices here. You can either use a simple array loop to map the constructor:
 
 ```javascript
-const players = Array.from(document.querySelectorAll('.js-player')).map(p => new Plyr(p));
+const players = Array.from(document.querySelectorAll('.js-player')).map((p) => new Plyr(p));
 ```
 
 ...or use a static method where you can pass a [CSS string selector](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors), a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList), an [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array) of [HTMLElement](https://developer.mozilla.org/en/docs/Web/API/HTMLElement), or a [JQuery](https://jquery.com) object:
@@ -436,7 +435,7 @@ const player = new Plyr('#player', {
 You can also access the object through any events:
 
 ```javascript
-element.addEventListener('ready', event => {
+element.addEventListener('ready', (event) => {
   const player = event.detail.plyr;
 });
 ```
@@ -634,7 +633,7 @@ reference to the instance, you can use the `on()` API method or `addEventListene
 property. Here's an example:
 
 ```javascript
-player.on('ready', event => {
+player.on('ready', (event) => {
   const instance = event.detail.plyr;
 });
 ```
@@ -781,16 +780,16 @@ If a User Agent is disabled but supports `<video>` and `<audio>` natively, it wi
 
 Some awesome folks have made plugins for CMSs and Components for JavaScript frameworks:
 
-| Type      | Maintainer                                                                | Link                                                                                         |
-| --------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| WordPress | Brandon Lavigne ([@drrobotnik](https://github.com/drrobotnik))            | [https://wordpress.org/plugins/plyr/](https://wordpress.org/plugins/plyr/)                   |
-| Angular   | Simon Bobrov ([@smnbbrv](https://github.com/smnbbrv))                     | [https://github.com/smnbbrv/ngx-plyr](https://github.com/smnbbrv/ngx-plyr)                   |
-| React     | Chintan Prajapati ([@chintan9](https://github.com/chintan9))              | [https://github.com/chintan9/plyr-react](https://github.com/chintan9/plyr-react)             |
-| Vue       | Gabe Dunn ([@redxtech](https://github.com/redxtech))                      | [https://github.com/redxtech/vue-plyr](https://github.com/redxtech/vue-plyr)                 |
-| Neos      | Jon Uhlmann ([@jonnitto](https://github.com/jonnitto))                    | [https://packagist.org/packages/jonnitto/plyr](https://packagist.org/packages/jonnitto/plyr) |
-| Kirby     | Dominik Pschenitschni ([@dpschen](https://github.com/dpschen))            | [https://github.com/dpschen/kirby-plyrtag](https://github.com/dpschen/kirby-plyrtag)         |
-| REDAXO    | FriendsOfRedaxo / skerbis ([@skerbis](https://friendsofredaxo.github.io)) | [https://github.com/FriendsOfREDAXO/plyr](https://github.com/FriendsOfREDAXO/plyr)           |
-| svelte-plyr    | Ben Woodward / benwoodward ([@benwoodward](https://github.com/benwoodward)) | [https://github.com/benwoodward](https://github.com/benwoodward)           |
+| Type        | Maintainer                                                                  | Link                                                                                         |
+| ----------- | --------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| WordPress   | Brandon Lavigne ([@drrobotnik](https://github.com/drrobotnik))              | [https://wordpress.org/plugins/plyr/](https://wordpress.org/plugins/plyr/)                   |
+| Angular     | Simon Bobrov ([@smnbbrv](https://github.com/smnbbrv))                       | [https://github.com/smnbbrv/ngx-plyr](https://github.com/smnbbrv/ngx-plyr)                   |
+| React       | Chintan Prajapati ([@chintan9](https://github.com/chintan9))                | [https://github.com/chintan9/plyr-react](https://github.com/chintan9/plyr-react)             |
+| Vue         | Gabe Dunn ([@redxtech](https://github.com/redxtech))                        | [https://github.com/redxtech/vue-plyr](https://github.com/redxtech/vue-plyr)                 |
+| Neos        | Jon Uhlmann ([@jonnitto](https://github.com/jonnitto))                      | [https://packagist.org/packages/jonnitto/plyr](https://packagist.org/packages/jonnitto/plyr) |
+| Kirby       | Dominik Pschenitschni ([@dpschen](https://github.com/dpschen))              | [https://github.com/dpschen/kirby-plyrtag](https://github.com/dpschen/kirby-plyrtag)         |
+| REDAXO      | FriendsOfRedaxo / skerbis ([@skerbis](https://friendsofredaxo.github.io))   | [https://github.com/FriendsOfREDAXO/plyr](https://github.com/FriendsOfREDAXO/plyr)           |
+| svelte-plyr | Ben Woodward / benwoodward ([@benwoodward](https://github.com/benwoodward)) | [https://github.com/benwoodward](https://github.com/benwoodward)                             |
 
 # Issues
 

@@ -36,8 +36,8 @@ Please follow the instructions in our issue templates. Don't use github issues t
 You can use Gitpod (a free online VS Code-like IDE) for contributing. With a single click it will launch a workspace and automatically:
 
 - clone the plyr repo.
-- install the dependencies.
-- run `gulp` to the start the server.
+- install the dependencies with `yarn install` in root directory and "demo" directory.
+- run `gulp` in root directory to start the dev server.
 
 So that you can start straight away.
 
