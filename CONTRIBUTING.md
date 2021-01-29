@@ -49,6 +49,6 @@ So that you can start straight away.
 
 - If your modifications changes the documented behavior or add new features, document these changes in [README.md](README.md).
 
-- When finished, push the changes to your GitHub repository and send a pull request to **develop**. Describe what your PR does.
+- When finished, push the changes to your GitHub repository and send a pull request. Describe what your PR does.
 
 - If the Travis build fails, or if you get a code review with change requests, you can fix these by pushing new or rebased commits to the branch.

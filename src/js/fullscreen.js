@@ -57,6 +57,8 @@ class Fullscreen {
 
     // Update the UI
     this.update();
+
+    // this.toggle = this.toggle.bind(this);
   }
 
   // Determine if native supported

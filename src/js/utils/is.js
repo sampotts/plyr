@@ -21,11 +21,11 @@ const isTrack = (input) => instanceOf(input, TextTrack) || (!isNullOrUndefined(i
 const isPromise = (input) => instanceOf(input, Promise) && isFunction(input.then);
 
 const isElement = (input) =>
-  input !== null && 
-  (typeof input === "object") &&
-  (input.nodeType === 1) &&
-  (typeof input.style === "object") &&
-  (typeof input.ownerDocument === "object");
+  input !== null &&
+  typeof input === 'object' &&
+  input.nodeType === 1 &&
+  typeof input.style === 'object' &&
+  typeof input.ownerDocument === 'object';
 
 const isEmpty = (input) =>
   isNullOrUndefined(input) ||
