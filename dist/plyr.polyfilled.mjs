@@ -5015,6 +5015,46 @@ _export({ target: 'Object', stat: true, forced: FAILS_ON_PRIMITIVES }, {
   }
 });
 
+var propertyIsEnumerable = objectPropertyIsEnumerable.f;
+
+// `Object.{ entries, values }` methods implementation
+var createMethod$4 = function (TO_ENTRIES) {
+  return function (it) {
+    var O = toIndexedObject(it);
+    var keys = objectKeys(O);
+    var length = keys.length;
+    var i = 0;
+    var result = [];
+    var key;
+    while (length > i) {
+      key = keys[i++];
+      if (!descriptors || propertyIsEnumerable.call(O, key)) {
+        result.push(TO_ENTRIES ? [key, O[key]] : O[key]);
+      }
+    }
+    return result;
+  };
+};
+
+var objectToArray = {
+  // `Object.entries` method
+  // https://tc39.github.io/ecma262/#sec-object.entries
+  entries: createMethod$4(true),
+  // `Object.values` method
+  // https://tc39.github.io/ecma262/#sec-object.values
+  values: createMethod$4(false)
+};
+
+var $values = objectToArray.values;
+
+// `Object.values` method
+// https://tc39.github.io/ecma262/#sec-object.values
+_export({ target: 'Object', stat: true }, {
+  values: function values(O) {
+    return $values(O);
+  }
+});
+
 var notARegexp = function (it) {
   if (isRegexp(it)) {
     throw TypeError("The method doesn't accept regular expressions");
@@ -5637,36 +5677,6 @@ _export({ target: 'Number', proto: true, forced: FORCED$1 }, {
   }
 });
 
-var propertyIsEnumerable = objectPropertyIsEnumerable.f;
-
-// `Object.{ entries, values }` methods implementation
-var createMethod$4 = function (TO_ENTRIES) {
-  return function (it) {
-    var O = toIndexedObject(it);
-    var keys = objectKeys(O);
-    var length = keys.length;
-    var i = 0;
-    var result = [];
-    var key;
-    while (length > i) {
-      key = keys[i++];
-      if (!descriptors || propertyIsEnumerable.call(O, key)) {
-        result.push(TO_ENTRIES ? [key, O[key]] : O[key]);
-      }
-    }
-    return result;
-  };
-};
-
-var objectToArray = {
-  // `Object.entries` method
-  // https://tc39.github.io/ecma262/#sec-object.entries
-  entries: createMethod$4(true),
-  // `Object.values` method
-  // https://tc39.github.io/ecma262/#sec-object.values
-  values: createMethod$4(false)
-};
-
 var $entries = objectToArray.entries;
 
 // `Object.entries` method
@@ -5674,16 +5684,6 @@ var $entries = objectToArray.entries;
 _export({ target: 'Object', stat: true }, {
   entries: function entries(O) {
     return $entries(O);
-  }
-});
-
-var $values = objectToArray.values;
-
-// `Object.values` method
-// https://tc39.github.io/ecma262/#sec-object.values
-_export({ target: 'Object', stat: true }, {
-  values: function values(O) {
-    return $values(O);
   }
 });
 
@@ -6666,10 +6666,6 @@ var isNodeList$1 = function isNodeList(input) {
   return instanceOf$1(input, NodeList);
 };
 
-var isElement$1 = function isElement(input) {
-  return instanceOf$1(input, Element);
-};
-
 var isTextNode = function isTextNode(input) {
   return getConstructor$1(input) === Text;
 };
@@ -6692,6 +6688,10 @@ var isTrack = function isTrack(input) {
 
 var isPromise = function isPromise(input) {
   return instanceOf$1(input, Promise) && isFunction$1(input.then);
+};
+
+var isElement$1 = function isElement(input) {
+  return input !== null && _typeof(input) === 'object' && input.nodeType === 1 && _typeof(input.style) === 'object' && _typeof(input.ownerDocument) === 'object';
 };
 
 var isEmpty$1 = function isEmpty(input) {
@@ -7836,21 +7836,16 @@ var i18n = {
 
 var Storage = /*#__PURE__*/function () {
   function Storage(player) {
+    var _this = this;
+
     _classCallCheck(this, Storage);
 
-    this.enabled = player.config.storage.enabled;
-    this.key = player.config.storage.key;
-  } // Check for actual support (see if we can use it)
-
-
-  _createClass(Storage, [{
-    key: "get",
-    value: function get(key) {
-      if (!Storage.supported || !this.enabled) {
+    _defineProperty(this, "get", function (key) {
+      if (!Storage.supported || !_this.enabled) {
         return null;
       }
 
-      var store = window.localStorage.getItem(this.key);
+      var store = window.localStorage.getItem(_this.key);
 
       if (is$1.empty(store)) {
         return null;
@@ -7858,12 +7853,11 @@ var Storage = /*#__PURE__*/function () {
 
       var json = JSON.parse(store);
       return is$1.string(key) && key.length ? json[key] : json;
-    }
-  }, {
-    key: "set",
-    value: function set(object) {
+    });
+
+    _defineProperty(this, "set", function (object) {
       // Bail if we don't have localStorage support or it's disabled
-      if (!Storage.supported || !this.enabled) {
+      if (!Storage.supported || !_this.enabled) {
         return;
       } // Can only store objectst
 
@@ -7873,7 +7867,8 @@ var Storage = /*#__PURE__*/function () {
       } // Get current storage
 
 
-      var storage = this.get(); // Default to empty object
+      var storage = _this.get(); // Default to empty object
+
 
       if (is$1.empty(storage)) {
         storage = {};
@@ -7882,9 +7877,15 @@ var Storage = /*#__PURE__*/function () {
 
       extend(storage, object); // Update storage
 
-      window.localStorage.setItem(this.key, JSON.stringify(storage));
-    }
-  }], [{
+      window.localStorage.setItem(_this.key, JSON.stringify(storage));
+    });
+
+    this.enabled = player.config.storage.enabled;
+    this.key = player.config.storage.key;
+  } // Check for actual support (see if we can use it)
+
+
+  _createClass(Storage, null, [{
     key: "supported",
     get: function get() {
       try {
@@ -10017,7 +10018,7 @@ var defaults$1 = {
   // Sprite (for icons)
   loadSprite: true,
   iconPrefix: 'plyr',
-  iconUrl: 'https://cdn.plyr.io/3.6.3/plyr.svg',
+  iconUrl: 'https://cdn.plyr.io/3.6.4/plyr.svg',
   // Blank video (used to prevent errors on source change)
   blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
   // Quality default
@@ -10416,6 +10417,169 @@ var Fullscreen = /*#__PURE__*/function () {
 
     _classCallCheck(this, Fullscreen);
 
+    _defineProperty(this, "onChange", function () {
+      if (!_this.enabled) {
+        return;
+      } // Update toggle button
+
+
+      var button = _this.player.elements.buttons.fullscreen;
+
+      if (is$1.element(button)) {
+        button.pressed = _this.active;
+      } // Always trigger events on the plyr / media element (not a fullscreen container) and let them bubble up
+
+
+      var target = _this.target === _this.player.media ? _this.target : _this.player.elements.container; // Trigger an event
+
+      triggerEvent.call(_this.player, target, _this.active ? 'enterfullscreen' : 'exitfullscreen', true);
+    });
+
+    _defineProperty(this, "toggleFallback", function () {
+      var toggle = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+
+      // Store or restore scroll position
+      if (toggle) {
+        _this.scrollPosition = {
+          x: window.scrollX || 0,
+          y: window.scrollY || 0
+        };
+      } else {
+        window.scrollTo(_this.scrollPosition.x, _this.scrollPosition.y);
+      } // Toggle scroll
+
+
+      document.body.style.overflow = toggle ? 'hidden' : ''; // Toggle class hook
+
+      toggleClass(_this.target, _this.player.config.classNames.fullscreen.fallback, toggle); // Force full viewport on iPhone X+
+
+      if (browser.isIos) {
+        var viewport = document.head.querySelector('meta[name="viewport"]');
+        var property = 'viewport-fit=cover'; // Inject the viewport meta if required
+
+        if (!viewport) {
+          viewport = document.createElement('meta');
+          viewport.setAttribute('name', 'viewport');
+        } // Check if the property already exists
+
+
+        var hasProperty = is$1.string(viewport.content) && viewport.content.includes(property);
+
+        if (toggle) {
+          _this.cleanupViewport = !hasProperty;
+
+          if (!hasProperty) {
+            viewport.content += ",".concat(property);
+          }
+        } else if (_this.cleanupViewport) {
+          viewport.content = viewport.content.split(',').filter(function (part) {
+            return part.trim() !== property;
+          }).join(',');
+        }
+      } // Toggle button and fire events
+
+
+      _this.onChange();
+    });
+
+    _defineProperty(this, "trapFocus", function (event) {
+      // Bail if iOS, not active, not the tab key
+      if (browser.isIos || !_this.active || event.key !== 'Tab' || event.keyCode !== 9) {
+        return;
+      } // Get the current focused element
+
+
+      var focused = document.activeElement;
+      var focusable = getElements.call(_this.player, 'a[href], button:not(:disabled), input:not(:disabled), [tabindex]');
+
+      var _focusable = _slicedToArray(focusable, 1),
+          first = _focusable[0];
+
+      var last = focusable[focusable.length - 1];
+
+      if (focused === last && !event.shiftKey) {
+        // Move focus to first element that can be tabbed if Shift isn't used
+        first.focus();
+        event.preventDefault();
+      } else if (focused === first && event.shiftKey) {
+        // Move focus to last element that can be tabbed if Shift is used
+        last.focus();
+        event.preventDefault();
+      }
+    });
+
+    _defineProperty(this, "update", function () {
+      if (_this.enabled) {
+        var mode;
+
+        if (_this.forceFallback) {
+          mode = 'Fallback (forced)';
+        } else if (Fullscreen.native) {
+          mode = 'Native';
+        } else {
+          mode = 'Fallback';
+        }
+
+        _this.player.debug.log("".concat(mode, " fullscreen enabled"));
+      } else {
+        _this.player.debug.log('Fullscreen not supported and fallback disabled');
+      } // Add styling hook to show button
+
+
+      toggleClass(_this.player.elements.container, _this.player.config.classNames.fullscreen.enabled, _this.enabled);
+    });
+
+    _defineProperty(this, "enter", function () {
+      if (!_this.enabled) {
+        return;
+      } // iOS native fullscreen doesn't need the request step
+
+
+      if (browser.isIos && _this.player.config.fullscreen.iosNative) {
+        if (_this.player.isVimeo) {
+          _this.player.embed.requestFullscreen();
+        } else {
+          _this.target.webkitEnterFullscreen();
+        }
+      } else if (!Fullscreen.native || _this.forceFallback) {
+        _this.toggleFallback(true);
+      } else if (!_this.prefix) {
+        _this.target.requestFullscreen({
+          navigationUI: 'hide'
+        });
+      } else if (!is$1.empty(_this.prefix)) {
+        _this.target["".concat(_this.prefix, "Request").concat(_this.property)]();
+      }
+    });
+
+    _defineProperty(this, "exit", function () {
+      if (!_this.enabled) {
+        return;
+      } // iOS native fullscreen
+
+
+      if (browser.isIos && _this.player.config.fullscreen.iosNative) {
+        _this.target.webkitExitFullscreen();
+
+        silencePromise(_this.player.play());
+      } else if (!Fullscreen.native || _this.forceFallback) {
+        _this.toggleFallback(false);
+      } else if (!_this.prefix) {
+        (document.cancelFullScreen || document.exitFullscreen).call(document);
+      } else if (!is$1.empty(_this.prefix)) {
+        var action = _this.prefix === 'moz' ? 'Cancel' : 'Exit';
+        document["".concat(_this.prefix).concat(action).concat(_this.property)]();
+      }
+    });
+
+    _defineProperty(this, "toggle", function () {
+      if (!_this.active) {
+        _this.enter();
+      } else {
+        _this.exit();
+      }
+    });
+
     // Keep reference to parent
     this.player = player; // Get prefix
 
@@ -10451,181 +10615,11 @@ var Fullscreen = /*#__PURE__*/function () {
       return _this.trapFocus(event);
     }); // Update the UI
 
-    this.update();
+    this.update(); // this.toggle = this.toggle.bind(this);
   } // Determine if native supported
 
 
   _createClass(Fullscreen, [{
-    key: "onChange",
-    value: function onChange() {
-      if (!this.enabled) {
-        return;
-      } // Update toggle button
-
-
-      var button = this.player.elements.buttons.fullscreen;
-
-      if (is$1.element(button)) {
-        button.pressed = this.active;
-      } // Always trigger events on the plyr / media element (not a fullscreen container) and let them bubble up
-
-
-      var target = this.target === this.player.media ? this.target : this.player.elements.container; // Trigger an event
-
-      triggerEvent.call(this.player, target, this.active ? 'enterfullscreen' : 'exitfullscreen', true);
-    }
-  }, {
-    key: "toggleFallback",
-    value: function toggleFallback() {
-      var toggle = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-
-      // Store or restore scroll position
-      if (toggle) {
-        this.scrollPosition = {
-          x: window.scrollX || 0,
-          y: window.scrollY || 0
-        };
-      } else {
-        window.scrollTo(this.scrollPosition.x, this.scrollPosition.y);
-      } // Toggle scroll
-
-
-      document.body.style.overflow = toggle ? 'hidden' : ''; // Toggle class hook
-
-      toggleClass(this.target, this.player.config.classNames.fullscreen.fallback, toggle); // Force full viewport on iPhone X+
-
-      if (browser.isIos) {
-        var viewport = document.head.querySelector('meta[name="viewport"]');
-        var property = 'viewport-fit=cover'; // Inject the viewport meta if required
-
-        if (!viewport) {
-          viewport = document.createElement('meta');
-          viewport.setAttribute('name', 'viewport');
-        } // Check if the property already exists
-
-
-        var hasProperty = is$1.string(viewport.content) && viewport.content.includes(property);
-
-        if (toggle) {
-          this.cleanupViewport = !hasProperty;
-
-          if (!hasProperty) {
-            viewport.content += ",".concat(property);
-          }
-        } else if (this.cleanupViewport) {
-          viewport.content = viewport.content.split(',').filter(function (part) {
-            return part.trim() !== property;
-          }).join(',');
-        }
-      } // Toggle button and fire events
-
-
-      this.onChange();
-    } // Trap focus inside container
-
-  }, {
-    key: "trapFocus",
-    value: function trapFocus(event) {
-      // Bail if iOS, not active, not the tab key
-      if (browser.isIos || !this.active || event.key !== 'Tab' || event.keyCode !== 9) {
-        return;
-      } // Get the current focused element
-
-
-      var focused = document.activeElement;
-      var focusable = getElements.call(this.player, 'a[href], button:not(:disabled), input:not(:disabled), [tabindex]');
-
-      var _focusable = _slicedToArray(focusable, 1),
-          first = _focusable[0];
-
-      var last = focusable[focusable.length - 1];
-
-      if (focused === last && !event.shiftKey) {
-        // Move focus to first element that can be tabbed if Shift isn't used
-        first.focus();
-        event.preventDefault();
-      } else if (focused === first && event.shiftKey) {
-        // Move focus to last element that can be tabbed if Shift is used
-        last.focus();
-        event.preventDefault();
-      }
-    } // Update UI
-
-  }, {
-    key: "update",
-    value: function update() {
-      if (this.enabled) {
-        var mode;
-
-        if (this.forceFallback) {
-          mode = 'Fallback (forced)';
-        } else if (Fullscreen.native) {
-          mode = 'Native';
-        } else {
-          mode = 'Fallback';
-        }
-
-        this.player.debug.log("".concat(mode, " fullscreen enabled"));
-      } else {
-        this.player.debug.log('Fullscreen not supported and fallback disabled');
-      } // Add styling hook to show button
-
-
-      toggleClass(this.player.elements.container, this.player.config.classNames.fullscreen.enabled, this.enabled);
-    } // Make an element fullscreen
-
-  }, {
-    key: "enter",
-    value: function enter() {
-      if (!this.enabled) {
-        return;
-      } // iOS native fullscreen doesn't need the request step
-
-
-      if (browser.isIos && this.player.config.fullscreen.iosNative) {
-        this.target.webkitEnterFullscreen();
-      } else if (!Fullscreen.native || this.forceFallback) {
-        this.toggleFallback(true);
-      } else if (!this.prefix) {
-        this.target.requestFullscreen({
-          navigationUI: 'hide'
-        });
-      } else if (!is$1.empty(this.prefix)) {
-        this.target["".concat(this.prefix, "Request").concat(this.property)]();
-      }
-    } // Bail from fullscreen
-
-  }, {
-    key: "exit",
-    value: function exit() {
-      if (!this.enabled) {
-        return;
-      } // iOS native fullscreen
-
-
-      if (browser.isIos && this.player.config.fullscreen.iosNative) {
-        this.target.webkitExitFullscreen();
-        silencePromise(this.player.play());
-      } else if (!Fullscreen.native || this.forceFallback) {
-        this.toggleFallback(false);
-      } else if (!this.prefix) {
-        (document.cancelFullScreen || document.exitFullscreen).call(document);
-      } else if (!is$1.empty(this.prefix)) {
-        var action = this.prefix === 'moz' ? 'Cancel' : 'Exit';
-        document["".concat(this.prefix).concat(action).concat(this.property)]();
-      }
-    } // Toggle state
-
-  }, {
-    key: "toggle",
-    value: function toggle() {
-      if (!this.active) {
-        this.enter();
-      } else {
-        this.exit();
-      }
-    }
-  }, {
     key: "usingNative",
     // If we're actually using native
     get: function get() {
@@ -10969,10 +10963,639 @@ var ui = {
 };
 
 var Listeners = /*#__PURE__*/function () {
-  function Listeners(player) {
+  function Listeners(_player) {
+    var _this = this;
+
     _classCallCheck(this, Listeners);
 
-    this.player = player;
+    _defineProperty(this, "firstTouch", function () {
+      var player = _this.player;
+      var elements = player.elements;
+      player.touch = true; // Add touch class
+
+      toggleClass(elements.container, player.config.classNames.isTouch, true);
+    });
+
+    _defineProperty(this, "setTabFocus", function (event) {
+      var player = _this.player;
+      var elements = player.elements;
+      clearTimeout(_this.focusTimer); // Ignore any key other than tab
+
+      if (event.type === 'keydown' && event.which !== 9) {
+        return;
+      } // Store reference to event timeStamp
+
+
+      if (event.type === 'keydown') {
+        _this.lastKeyDown = event.timeStamp;
+      } // Remove current classes
+
+
+      var removeCurrent = function removeCurrent() {
+        var className = player.config.classNames.tabFocus;
+        var current = getElements.call(player, ".".concat(className));
+        toggleClass(current, className, false);
+      }; // Determine if a key was pressed to trigger this event
+
+
+      var wasKeyDown = event.timeStamp - _this.lastKeyDown <= 20; // Ignore focus events if a key was pressed prior
+
+      if (event.type === 'focus' && !wasKeyDown) {
+        return;
+      } // Remove all current
+
+
+      removeCurrent(); // Delay the adding of classname until the focus has changed
+      // This event fires before the focusin event
+
+      if (event.type !== 'focusout') {
+        _this.focusTimer = setTimeout(function () {
+          var focused = document.activeElement; // Ignore if current focus element isn't inside the player
+
+          if (!elements.container.contains(focused)) {
+            return;
+          }
+
+          toggleClass(document.activeElement, player.config.classNames.tabFocus, true);
+        }, 10);
+      }
+    });
+
+    _defineProperty(this, "global", function () {
+      var toggle = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+      var player = _this.player; // Keyboard shortcuts
+
+      if (player.config.keyboard.global) {
+        toggleListener.call(player, window, 'keydown keyup', _this.handleKey, toggle, false);
+      } // Click anywhere closes menu
+
+
+      toggleListener.call(player, document.body, 'click', _this.toggleMenu, toggle); // Detect touch by events
+
+      once.call(player, document.body, 'touchstart', _this.firstTouch); // Tab focus detection
+
+      toggleListener.call(player, document.body, 'keydown focus blur focusout', _this.setTabFocus, toggle, false, true);
+    });
+
+    _defineProperty(this, "container", function () {
+      var player = _this.player;
+      var config = player.config,
+          elements = player.elements,
+          timers = player.timers; // Keyboard shortcuts
+
+      if (!config.keyboard.global && config.keyboard.focused) {
+        on.call(player, elements.container, 'keydown keyup', _this.handleKey, false);
+      } // Toggle controls on mouse events and entering fullscreen
+
+
+      on.call(player, elements.container, 'mousemove mouseleave touchstart touchmove enterfullscreen exitfullscreen', function (event) {
+        var controlsElement = elements.controls; // Remove button states for fullscreen
+
+        if (controlsElement && event.type === 'enterfullscreen') {
+          controlsElement.pressed = false;
+          controlsElement.hover = false;
+        } // Show, then hide after a timeout unless another control event occurs
+
+
+        var show = ['touchstart', 'touchmove', 'mousemove'].includes(event.type);
+        var delay = 0;
+
+        if (show) {
+          ui.toggleControls.call(player, true); // Use longer timeout for touch devices
+
+          delay = player.touch ? 3000 : 2000;
+        } // Clear timer
+
+
+        clearTimeout(timers.controls); // Set new timer to prevent flicker when seeking
+
+        timers.controls = setTimeout(function () {
+          return ui.toggleControls.call(player, false);
+        }, delay);
+      }); // Set a gutter for Vimeo
+
+      var setGutter = function setGutter(ratio, padding, toggle) {
+        if (!player.isVimeo || player.config.vimeo.premium) {
+          return;
+        }
+
+        var target = player.elements.wrapper.firstChild;
+
+        var _ratio = _slicedToArray(ratio, 2),
+            y = _ratio[1];
+
+        var _getAspectRatio$call = getAspectRatio.call(player),
+            _getAspectRatio$call2 = _slicedToArray(_getAspectRatio$call, 2),
+            videoX = _getAspectRatio$call2[0],
+            videoY = _getAspectRatio$call2[1];
+
+        target.style.maxWidth = toggle ? "".concat(y / videoY * videoX, "px") : null;
+        target.style.margin = toggle ? '0 auto' : null;
+      }; // Resize on fullscreen change
+
+
+      var setPlayerSize = function setPlayerSize(measure) {
+        // If we don't need to measure the viewport
+        if (!measure) {
+          return setAspectRatio.call(player);
+        }
+
+        var rect = elements.container.getBoundingClientRect();
+        var width = rect.width,
+            height = rect.height;
+        return setAspectRatio.call(player, "".concat(width, ":").concat(height));
+      };
+
+      var resized = function resized() {
+        clearTimeout(timers.resized);
+        timers.resized = setTimeout(setPlayerSize, 50);
+      };
+
+      on.call(player, elements.container, 'enterfullscreen exitfullscreen', function (event) {
+        var _player$fullscreen = player.fullscreen,
+            target = _player$fullscreen.target,
+            usingNative = _player$fullscreen.usingNative; // Ignore events not from target
+
+        if (target !== elements.container) {
+          return;
+        } // If it's not an embed and no ratio specified
+
+
+        if (!player.isEmbed && is$1.empty(player.config.ratio)) {
+          return;
+        }
+
+        var isEnter = event.type === 'enterfullscreen'; // Set the player size when entering fullscreen to viewport size
+
+        var _setPlayerSize = setPlayerSize(isEnter),
+            padding = _setPlayerSize.padding,
+            ratio = _setPlayerSize.ratio; // Set Vimeo gutter
+
+
+        setGutter(ratio, padding, isEnter); // Horrible hack for Safari 14 not repainting properly on entering fullscreen
+
+        if (isEnter) {
+          setTimeout(function () {
+            return repaint(elements.container);
+          }, 100);
+        } // If not using native browser fullscreen API, we need to check for resizes of viewport
+
+
+        if (!usingNative) {
+          if (isEnter) {
+            on.call(player, window, 'resize', resized);
+          } else {
+            off.call(player, window, 'resize', resized);
+          }
+        }
+      });
+    });
+
+    _defineProperty(this, "media", function () {
+      var player = _this.player;
+      var elements = player.elements; // Time change on media
+
+      on.call(player, player.media, 'timeupdate seeking seeked', function (event) {
+        return controls.timeUpdate.call(player, event);
+      }); // Display duration
+
+      on.call(player, player.media, 'durationchange loadeddata loadedmetadata', function (event) {
+        return controls.durationUpdate.call(player, event);
+      }); // Handle the media finishing
+
+      on.call(player, player.media, 'ended', function () {
+        // Show poster on end
+        if (player.isHTML5 && player.isVideo && player.config.resetOnEnd) {
+          // Restart
+          player.restart(); // Call pause otherwise IE11 will start playing the video again
+
+          player.pause();
+        }
+      }); // Check for buffer progress
+
+      on.call(player, player.media, 'progress playing seeking seeked', function (event) {
+        return controls.updateProgress.call(player, event);
+      }); // Handle volume changes
+
+      on.call(player, player.media, 'volumechange', function (event) {
+        return controls.updateVolume.call(player, event);
+      }); // Handle play/pause
+
+      on.call(player, player.media, 'playing play pause ended emptied timeupdate', function (event) {
+        return ui.checkPlaying.call(player, event);
+      }); // Loading state
+
+      on.call(player, player.media, 'waiting canplay seeked playing', function (event) {
+        return ui.checkLoading.call(player, event);
+      }); // Click video
+
+      if (player.supported.ui && player.config.clickToPlay && !player.isAudio) {
+        // Re-fetch the wrapper
+        var wrapper = getElement.call(player, ".".concat(player.config.classNames.video)); // Bail if there's no wrapper (this should never happen)
+
+        if (!is$1.element(wrapper)) {
+          return;
+        } // On click play, pause or restart
+
+
+        on.call(player, elements.container, 'click', function (event) {
+          var targets = [elements.container, wrapper]; // Ignore if click if not container or in video wrapper
+
+          if (!targets.includes(event.target) && !wrapper.contains(event.target)) {
+            return;
+          } // Touch devices will just show controls (if hidden)
+
+
+          if (player.touch && player.config.hideControls) {
+            return;
+          }
+
+          if (player.ended) {
+            _this.proxy(event, player.restart, 'restart');
+
+            _this.proxy(event, function () {
+              silencePromise(player.play());
+            }, 'play');
+          } else {
+            _this.proxy(event, function () {
+              silencePromise(player.togglePlay());
+            }, 'play');
+          }
+        });
+      } // Disable right click
+
+
+      if (player.supported.ui && player.config.disableContextMenu) {
+        on.call(player, elements.wrapper, 'contextmenu', function (event) {
+          event.preventDefault();
+        }, false);
+      } // Volume change
+
+
+      on.call(player, player.media, 'volumechange', function () {
+        // Save to storage
+        player.storage.set({
+          volume: player.volume,
+          muted: player.muted
+        });
+      }); // Speed change
+
+      on.call(player, player.media, 'ratechange', function () {
+        // Update UI
+        controls.updateSetting.call(player, 'speed'); // Save to storage
+
+        player.storage.set({
+          speed: player.speed
+        });
+      }); // Quality change
+
+      on.call(player, player.media, 'qualitychange', function (event) {
+        // Update UI
+        controls.updateSetting.call(player, 'quality', null, event.detail.quality);
+      }); // Update download link when ready and if quality changes
+
+      on.call(player, player.media, 'ready qualitychange', function () {
+        controls.setDownloadUrl.call(player);
+      }); // Proxy events to container
+      // Bubble up key events for Edge
+
+      var proxyEvents = player.config.events.concat(['keyup', 'keydown']).join(' ');
+      on.call(player, player.media, proxyEvents, function (event) {
+        var _event$detail = event.detail,
+            detail = _event$detail === void 0 ? {} : _event$detail; // Get error details from media
+
+        if (event.type === 'error') {
+          detail = player.media.error;
+        }
+
+        triggerEvent.call(player, elements.container, event.type, true, detail);
+      });
+    });
+
+    _defineProperty(this, "proxy", function (event, defaultHandler, customHandlerKey) {
+      var player = _this.player;
+      var customHandler = player.config.listeners[customHandlerKey];
+      var hasCustomHandler = is$1.function(customHandler);
+      var returned = true; // Execute custom handler
+
+      if (hasCustomHandler) {
+        returned = customHandler.call(player, event);
+      } // Only call default handler if not prevented in custom handler
+
+
+      if (returned !== false && is$1.function(defaultHandler)) {
+        defaultHandler.call(player, event);
+      }
+    });
+
+    _defineProperty(this, "bind", function (element, type, defaultHandler, customHandlerKey) {
+      var passive = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
+      var player = _this.player;
+      var customHandler = player.config.listeners[customHandlerKey];
+      var hasCustomHandler = is$1.function(customHandler);
+      on.call(player, element, type, function (event) {
+        return _this.proxy(event, defaultHandler, customHandlerKey);
+      }, passive && !hasCustomHandler);
+    });
+
+    _defineProperty(this, "controls", function () {
+      var player = _this.player;
+      var elements = player.elements; // IE doesn't support input event, so we fallback to change
+
+      var inputEvent = browser.isIE ? 'change' : 'input'; // Play/pause toggle
+
+      if (elements.buttons.play) {
+        Array.from(elements.buttons.play).forEach(function (button) {
+          _this.bind(button, 'click', function () {
+            silencePromise(player.togglePlay());
+          }, 'play');
+        });
+      } // Pause
+
+
+      _this.bind(elements.buttons.restart, 'click', player.restart, 'restart'); // Rewind
+
+
+      _this.bind(elements.buttons.rewind, 'click', function () {
+        // Record seek time so we can prevent hiding controls for a few seconds after rewind
+        player.lastSeekTime = Date.now();
+        player.rewind();
+      }, 'rewind'); // Rewind
+
+
+      _this.bind(elements.buttons.fastForward, 'click', function () {
+        // Record seek time so we can prevent hiding controls for a few seconds after fast forward
+        player.lastSeekTime = Date.now();
+        player.forward();
+      }, 'fastForward'); // Mute toggle
+
+
+      _this.bind(elements.buttons.mute, 'click', function () {
+        player.muted = !player.muted;
+      }, 'mute'); // Captions toggle
+
+
+      _this.bind(elements.buttons.captions, 'click', function () {
+        return player.toggleCaptions();
+      }); // Download
+
+
+      _this.bind(elements.buttons.download, 'click', function () {
+        triggerEvent.call(player, player.media, 'download');
+      }, 'download'); // Fullscreen toggle
+
+
+      _this.bind(elements.buttons.fullscreen, 'click', function () {
+        player.fullscreen.toggle();
+      }, 'fullscreen'); // Picture-in-Picture
+
+
+      _this.bind(elements.buttons.pip, 'click', function () {
+        player.pip = 'toggle';
+      }, 'pip'); // Airplay
+
+
+      _this.bind(elements.buttons.airplay, 'click', player.airplay, 'airplay'); // Settings menu - click toggle
+
+
+      _this.bind(elements.buttons.settings, 'click', function (event) {
+        // Prevent the document click listener closing the menu
+        event.stopPropagation();
+        event.preventDefault();
+        controls.toggleMenu.call(player, event);
+      }, null, false); // Can't be passive as we're preventing default
+      // Settings menu - keyboard toggle
+      // We have to bind to keyup otherwise Firefox triggers a click when a keydown event handler shifts focus
+      // https://bugzilla.mozilla.org/show_bug.cgi?id=1220143
+
+
+      _this.bind(elements.buttons.settings, 'keyup', function (event) {
+        var code = event.which; // We only care about space and return
+
+        if (![13, 32].includes(code)) {
+          return;
+        } // Because return triggers a click anyway, all we need to do is set focus
+
+
+        if (code === 13) {
+          controls.focusFirstMenuItem.call(player, null, true);
+          return;
+        } // Prevent scroll
+
+
+        event.preventDefault(); // Prevent playing video (Firefox)
+
+        event.stopPropagation(); // Toggle menu
+
+        controls.toggleMenu.call(player, event);
+      }, null, false // Can't be passive as we're preventing default
+      ); // Escape closes menu
+
+
+      _this.bind(elements.settings.menu, 'keydown', function (event) {
+        if (event.which === 27) {
+          controls.toggleMenu.call(player, event);
+        }
+      }); // Set range input alternative "value", which matches the tooltip time (#954)
+
+
+      _this.bind(elements.inputs.seek, 'mousedown mousemove', function (event) {
+        var rect = elements.progress.getBoundingClientRect();
+        var percent = 100 / rect.width * (event.pageX - rect.left);
+        event.currentTarget.setAttribute('seek-value', percent);
+      }); // Pause while seeking
+
+
+      _this.bind(elements.inputs.seek, 'mousedown mouseup keydown keyup touchstart touchend', function (event) {
+        var seek = event.currentTarget;
+        var code = event.keyCode ? event.keyCode : event.which;
+        var attribute = 'play-on-seeked';
+
+        if (is$1.keyboardEvent(event) && code !== 39 && code !== 37) {
+          return;
+        } // Record seek time so we can prevent hiding controls for a few seconds after seek
+
+
+        player.lastSeekTime = Date.now(); // Was playing before?
+
+        var play = seek.hasAttribute(attribute); // Done seeking
+
+        var done = ['mouseup', 'touchend', 'keyup'].includes(event.type); // If we're done seeking and it was playing, resume playback
+
+        if (play && done) {
+          seek.removeAttribute(attribute);
+          silencePromise(player.play());
+        } else if (!done && player.playing) {
+          seek.setAttribute(attribute, '');
+          player.pause();
+        }
+      }); // Fix range inputs on iOS
+      // Super weird iOS bug where after you interact with an <input type="range">,
+      // it takes over further interactions on the page. This is a hack
+
+
+      if (browser.isIos) {
+        var inputs = getElements.call(player, 'input[type="range"]');
+        Array.from(inputs).forEach(function (input) {
+          return _this.bind(input, inputEvent, function (event) {
+            return repaint(event.target);
+          });
+        });
+      } // Seek
+
+
+      _this.bind(elements.inputs.seek, inputEvent, function (event) {
+        var seek = event.currentTarget; // If it exists, use seek-value instead of "value" for consistency with tooltip time (#954)
+
+        var seekTo = seek.getAttribute('seek-value');
+
+        if (is$1.empty(seekTo)) {
+          seekTo = seek.value;
+        }
+
+        seek.removeAttribute('seek-value');
+        player.currentTime = seekTo / seek.max * player.duration;
+      }, 'seek'); // Seek tooltip
+
+
+      _this.bind(elements.progress, 'mouseenter mouseleave mousemove', function (event) {
+        return controls.updateSeekTooltip.call(player, event);
+      }); // Preview thumbnails plugin
+      // TODO: Really need to work on some sort of plug-in wide event bus or pub-sub for this
+
+
+      _this.bind(elements.progress, 'mousemove touchmove', function (event) {
+        var previewThumbnails = player.previewThumbnails;
+
+        if (previewThumbnails && previewThumbnails.loaded) {
+          previewThumbnails.startMove(event);
+        }
+      }); // Hide thumbnail preview - on mouse click, mouse leave, and video play/seek. All four are required, e.g., for buffering
+
+
+      _this.bind(elements.progress, 'mouseleave touchend click', function () {
+        var previewThumbnails = player.previewThumbnails;
+
+        if (previewThumbnails && previewThumbnails.loaded) {
+          previewThumbnails.endMove(false, true);
+        }
+      }); // Show scrubbing preview
+
+
+      _this.bind(elements.progress, 'mousedown touchstart', function (event) {
+        var previewThumbnails = player.previewThumbnails;
+
+        if (previewThumbnails && previewThumbnails.loaded) {
+          previewThumbnails.startScrubbing(event);
+        }
+      });
+
+      _this.bind(elements.progress, 'mouseup touchend', function (event) {
+        var previewThumbnails = player.previewThumbnails;
+
+        if (previewThumbnails && previewThumbnails.loaded) {
+          previewThumbnails.endScrubbing(event);
+        }
+      }); // Polyfill for lower fill in <input type="range"> for webkit
+
+
+      if (browser.isWebkit) {
+        Array.from(getElements.call(player, 'input[type="range"]')).forEach(function (element) {
+          _this.bind(element, 'input', function (event) {
+            return controls.updateRangeFill.call(player, event.target);
+          });
+        });
+      } // Current time invert
+      // Only if one time element is used for both currentTime and duration
+
+
+      if (player.config.toggleInvert && !is$1.element(elements.display.duration)) {
+        _this.bind(elements.display.currentTime, 'click', function () {
+          // Do nothing if we're at the start
+          if (player.currentTime === 0) {
+            return;
+          }
+
+          player.config.invertTime = !player.config.invertTime;
+          controls.timeUpdate.call(player);
+        });
+      } // Volume
+
+
+      _this.bind(elements.inputs.volume, inputEvent, function (event) {
+        player.volume = event.target.value;
+      }, 'volume'); // Update controls.hover state (used for ui.toggleControls to avoid hiding when interacting)
+
+
+      _this.bind(elements.controls, 'mouseenter mouseleave', function (event) {
+        elements.controls.hover = !player.touch && event.type === 'mouseenter';
+      }); // Also update controls.hover state for any non-player children of fullscreen element (as above)
+
+
+      if (elements.fullscreen) {
+        Array.from(elements.fullscreen.children).filter(function (c) {
+          return !c.contains(elements.container);
+        }).forEach(function (child) {
+          _this.bind(child, 'mouseenter mouseleave', function (event) {
+            elements.controls.hover = !player.touch && event.type === 'mouseenter';
+          });
+        });
+      } // Update controls.pressed state (used for ui.toggleControls to avoid hiding when interacting)
+
+
+      _this.bind(elements.controls, 'mousedown mouseup touchstart touchend touchcancel', function (event) {
+        elements.controls.pressed = ['mousedown', 'touchstart'].includes(event.type);
+      }); // Show controls when they receive focus (e.g., when using keyboard tab key)
+
+
+      _this.bind(elements.controls, 'focusin', function () {
+        var config = player.config,
+            timers = player.timers; // Skip transition to prevent focus from scrolling the parent element
+
+        toggleClass(elements.controls, config.classNames.noTransition, true); // Toggle
+
+        ui.toggleControls.call(player, true); // Restore transition
+
+        setTimeout(function () {
+          toggleClass(elements.controls, config.classNames.noTransition, false);
+        }, 0); // Delay a little more for mouse users
+
+        var delay = _this.touch ? 3000 : 4000; // Clear timer
+
+        clearTimeout(timers.controls); // Hide again after delay
+
+        timers.controls = setTimeout(function () {
+          return ui.toggleControls.call(player, false);
+        }, delay);
+      }); // Mouse wheel for volume
+
+
+      _this.bind(elements.inputs.volume, 'wheel', function (event) {
+        // Detect "natural" scroll - suppored on OS X Safari only
+        // Other browsers on OS X will be inverted until support improves
+        var inverted = event.webkitDirectionInvertedFromDevice; // Get delta from event. Invert if `inverted` is true
+
+        var _map = [event.deltaX, -event.deltaY].map(function (value) {
+          return inverted ? -value : value;
+        }),
+            _map2 = _slicedToArray(_map, 2),
+            x = _map2[0],
+            y = _map2[1]; // Using the biggest delta, normalize to 1 or -1 (or 0 if no delta)
+
+
+        var direction = Math.sign(Math.abs(x) > Math.abs(y) ? x : y); // Change the volume by 2%
+
+        player.increaseVolume(direction / 50); // Don't break page scrolling at max and min
+
+        var volume = player.media.volume;
+
+        if (direction === 1 && volume < 1 || direction === -1 && volume > 0) {
+          event.preventDefault();
+        }
+      }, 'volume', false);
+    });
+
+    this.player = _player;
     this.lastKey = null;
     this.focusTimer = null;
     this.lastKeyDown = null;
@@ -11130,633 +11753,6 @@ var Listeners = /*#__PURE__*/function () {
       controls.toggleMenu.call(this.player, event);
     } // Device is touch enabled
 
-  }, {
-    key: "firstTouch",
-    value: function firstTouch() {
-      var player = this.player;
-      var elements = player.elements;
-      player.touch = true; // Add touch class
-
-      toggleClass(elements.container, player.config.classNames.isTouch, true);
-    }
-  }, {
-    key: "setTabFocus",
-    value: function setTabFocus(event) {
-      var player = this.player;
-      var elements = player.elements;
-      clearTimeout(this.focusTimer); // Ignore any key other than tab
-
-      if (event.type === 'keydown' && event.which !== 9) {
-        return;
-      } // Store reference to event timeStamp
-
-
-      if (event.type === 'keydown') {
-        this.lastKeyDown = event.timeStamp;
-      } // Remove current classes
-
-
-      var removeCurrent = function removeCurrent() {
-        var className = player.config.classNames.tabFocus;
-        var current = getElements.call(player, ".".concat(className));
-        toggleClass(current, className, false);
-      }; // Determine if a key was pressed to trigger this event
-
-
-      var wasKeyDown = event.timeStamp - this.lastKeyDown <= 20; // Ignore focus events if a key was pressed prior
-
-      if (event.type === 'focus' && !wasKeyDown) {
-        return;
-      } // Remove all current
-
-
-      removeCurrent(); // Delay the adding of classname until the focus has changed
-      // This event fires before the focusin event
-
-      if (event.type !== 'focusout') {
-        this.focusTimer = setTimeout(function () {
-          var focused = document.activeElement; // Ignore if current focus element isn't inside the player
-
-          if (!elements.container.contains(focused)) {
-            return;
-          }
-
-          toggleClass(document.activeElement, player.config.classNames.tabFocus, true);
-        }, 10);
-      }
-    } // Global window & document listeners
-
-  }, {
-    key: "global",
-    value: function global() {
-      var toggle = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-      var player = this.player; // Keyboard shortcuts
-
-      if (player.config.keyboard.global) {
-        toggleListener.call(player, window, 'keydown keyup', this.handleKey, toggle, false);
-      } // Click anywhere closes menu
-
-
-      toggleListener.call(player, document.body, 'click', this.toggleMenu, toggle); // Detect touch by events
-
-      once.call(player, document.body, 'touchstart', this.firstTouch); // Tab focus detection
-
-      toggleListener.call(player, document.body, 'keydown focus blur focusout', this.setTabFocus, toggle, false, true);
-    } // Container listeners
-
-  }, {
-    key: "container",
-    value: function container() {
-      var player = this.player;
-      var config = player.config,
-          elements = player.elements,
-          timers = player.timers; // Keyboard shortcuts
-
-      if (!config.keyboard.global && config.keyboard.focused) {
-        on.call(player, elements.container, 'keydown keyup', this.handleKey, false);
-      } // Toggle controls on mouse events and entering fullscreen
-
-
-      on.call(player, elements.container, 'mousemove mouseleave touchstart touchmove enterfullscreen exitfullscreen', function (event) {
-        var controlsElement = elements.controls; // Remove button states for fullscreen
-
-        if (controlsElement && event.type === 'enterfullscreen') {
-          controlsElement.pressed = false;
-          controlsElement.hover = false;
-        } // Show, then hide after a timeout unless another control event occurs
-
-
-        var show = ['touchstart', 'touchmove', 'mousemove'].includes(event.type);
-        var delay = 0;
-
-        if (show) {
-          ui.toggleControls.call(player, true); // Use longer timeout for touch devices
-
-          delay = player.touch ? 3000 : 2000;
-        } // Clear timer
-
-
-        clearTimeout(timers.controls); // Set new timer to prevent flicker when seeking
-
-        timers.controls = setTimeout(function () {
-          return ui.toggleControls.call(player, false);
-        }, delay);
-      }); // Set a gutter for Vimeo
-
-      var setGutter = function setGutter(ratio, padding, toggle) {
-        if (!player.isVimeo || player.config.vimeo.premium) {
-          return;
-        }
-
-        var target = player.elements.wrapper.firstChild;
-
-        var _ratio = _slicedToArray(ratio, 2),
-            y = _ratio[1];
-
-        var _getAspectRatio$call = getAspectRatio.call(player),
-            _getAspectRatio$call2 = _slicedToArray(_getAspectRatio$call, 2),
-            videoX = _getAspectRatio$call2[0],
-            videoY = _getAspectRatio$call2[1];
-
-        target.style.maxWidth = toggle ? "".concat(y / videoY * videoX, "px") : null;
-        target.style.margin = toggle ? '0 auto' : null;
-      }; // Resize on fullscreen change
-
-
-      var setPlayerSize = function setPlayerSize(measure) {
-        // If we don't need to measure the viewport
-        if (!measure) {
-          return setAspectRatio.call(player);
-        }
-
-        var rect = elements.container.getBoundingClientRect();
-        var width = rect.width,
-            height = rect.height;
-        return setAspectRatio.call(player, "".concat(width, ":").concat(height));
-      };
-
-      var resized = function resized() {
-        clearTimeout(timers.resized);
-        timers.resized = setTimeout(setPlayerSize, 50);
-      };
-
-      on.call(player, elements.container, 'enterfullscreen exitfullscreen', function (event) {
-        var _player$fullscreen = player.fullscreen,
-            target = _player$fullscreen.target,
-            usingNative = _player$fullscreen.usingNative; // Ignore events not from target
-
-        if (target !== elements.container) {
-          return;
-        } // If it's not an embed and no ratio specified
-
-
-        if (!player.isEmbed && is$1.empty(player.config.ratio)) {
-          return;
-        }
-
-        var isEnter = event.type === 'enterfullscreen'; // Set the player size when entering fullscreen to viewport size
-
-        var _setPlayerSize = setPlayerSize(isEnter),
-            padding = _setPlayerSize.padding,
-            ratio = _setPlayerSize.ratio; // Set Vimeo gutter
-
-
-        setGutter(ratio, padding, isEnter); // Horrible hack for Safari 14 not repainting properly on entering fullscreen
-
-        if (isEnter) {
-          setTimeout(function () {
-            return repaint(elements.container);
-          }, 100);
-        } // If not using native browser fullscreen API, we need to check for resizes of viewport
-
-
-        if (!usingNative) {
-          if (isEnter) {
-            on.call(player, window, 'resize', resized);
-          } else {
-            off.call(player, window, 'resize', resized);
-          }
-        }
-      });
-    } // Listen for media events
-
-  }, {
-    key: "media",
-    value: function media() {
-      var _this = this;
-
-      var player = this.player;
-      var elements = player.elements; // Time change on media
-
-      on.call(player, player.media, 'timeupdate seeking seeked', function (event) {
-        return controls.timeUpdate.call(player, event);
-      }); // Display duration
-
-      on.call(player, player.media, 'durationchange loadeddata loadedmetadata', function (event) {
-        return controls.durationUpdate.call(player, event);
-      }); // Handle the media finishing
-
-      on.call(player, player.media, 'ended', function () {
-        // Show poster on end
-        if (player.isHTML5 && player.isVideo && player.config.resetOnEnd) {
-          // Restart
-          player.restart(); // Call pause otherwise IE11 will start playing the video again
-
-          player.pause();
-        }
-      }); // Check for buffer progress
-
-      on.call(player, player.media, 'progress playing seeking seeked', function (event) {
-        return controls.updateProgress.call(player, event);
-      }); // Handle volume changes
-
-      on.call(player, player.media, 'volumechange', function (event) {
-        return controls.updateVolume.call(player, event);
-      }); // Handle play/pause
-
-      on.call(player, player.media, 'playing play pause ended emptied timeupdate', function (event) {
-        return ui.checkPlaying.call(player, event);
-      }); // Loading state
-
-      on.call(player, player.media, 'waiting canplay seeked playing', function (event) {
-        return ui.checkLoading.call(player, event);
-      }); // Click video
-
-      if (player.supported.ui && player.config.clickToPlay && !player.isAudio) {
-        // Re-fetch the wrapper
-        var wrapper = getElement.call(player, ".".concat(player.config.classNames.video)); // Bail if there's no wrapper (this should never happen)
-
-        if (!is$1.element(wrapper)) {
-          return;
-        } // On click play, pause or restart
-
-
-        on.call(player, elements.container, 'click', function (event) {
-          var targets = [elements.container, wrapper]; // Ignore if click if not container or in video wrapper
-
-          if (!targets.includes(event.target) && !wrapper.contains(event.target)) {
-            return;
-          } // Touch devices will just show controls (if hidden)
-
-
-          if (player.touch && player.config.hideControls) {
-            return;
-          }
-
-          if (player.ended) {
-            _this.proxy(event, player.restart, 'restart');
-
-            _this.proxy(event, function () {
-              silencePromise(player.play());
-            }, 'play');
-          } else {
-            _this.proxy(event, function () {
-              silencePromise(player.togglePlay());
-            }, 'play');
-          }
-        });
-      } // Disable right click
-
-
-      if (player.supported.ui && player.config.disableContextMenu) {
-        on.call(player, elements.wrapper, 'contextmenu', function (event) {
-          event.preventDefault();
-        }, false);
-      } // Volume change
-
-
-      on.call(player, player.media, 'volumechange', function () {
-        // Save to storage
-        player.storage.set({
-          volume: player.volume,
-          muted: player.muted
-        });
-      }); // Speed change
-
-      on.call(player, player.media, 'ratechange', function () {
-        // Update UI
-        controls.updateSetting.call(player, 'speed'); // Save to storage
-
-
-        player.storage.set({
-          speed: player.speed
-        });
-      }); // Quality change
-
-      on.call(player, player.media, 'qualitychange', function (event) {
-        // Update UI
-        controls.updateSetting.call(player, 'quality', null, event.detail.quality);
-      }); // Update download link when ready and if quality changes
-
-      on.call(player, player.media, 'ready qualitychange', function () {
-        controls.setDownloadUrl.call(player);
-      }); // Proxy events to container
-      // Bubble up key events for Edge
-
-      var proxyEvents = player.config.events.concat(['keyup', 'keydown']).join(' ');
-      on.call(player, player.media, proxyEvents, function (event) {
-        var _event$detail = event.detail,
-            detail = _event$detail === void 0 ? {} : _event$detail; // Get error details from media
-
-        if (event.type === 'error') {
-          detail = player.media.error;
-        }
-
-        triggerEvent.call(player, elements.container, event.type, true, detail);
-      });
-    } // Run default and custom handlers
-
-  }, {
-    key: "proxy",
-    value: function proxy(event, defaultHandler, customHandlerKey) {
-      var player = this.player;
-      var customHandler = player.config.listeners[customHandlerKey];
-      var hasCustomHandler = is$1.function(customHandler);
-      var returned = true; // Execute custom handler
-
-      if (hasCustomHandler) {
-        returned = customHandler.call(player, event);
-      } // Only call default handler if not prevented in custom handler
-
-
-      if (returned !== false && is$1.function(defaultHandler)) {
-        defaultHandler.call(player, event);
-      }
-    } // Trigger custom and default handlers
-
-  }, {
-    key: "bind",
-    value: function bind(element, type, defaultHandler, customHandlerKey) {
-      var _this2 = this;
-
-      var passive = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
-      var player = this.player;
-      var customHandler = player.config.listeners[customHandlerKey];
-      var hasCustomHandler = is$1.function(customHandler);
-      on.call(player, element, type, function (event) {
-        return _this2.proxy(event, defaultHandler, customHandlerKey);
-      }, passive && !hasCustomHandler);
-    } // Listen for control events
-
-  }, {
-    key: "controls",
-    value: function controls$1() {
-      var _this3 = this;
-
-      var player = this.player;
-      var elements = player.elements; // IE doesn't support input event, so we fallback to change
-
-      var inputEvent = browser.isIE ? 'change' : 'input'; // Play/pause toggle
-
-      if (elements.buttons.play) {
-        Array.from(elements.buttons.play).forEach(function (button) {
-          _this3.bind(button, 'click', function () {
-            silencePromise(player.togglePlay());
-          }, 'play');
-        });
-      } // Pause
-
-
-      this.bind(elements.buttons.restart, 'click', player.restart, 'restart'); // Rewind
-
-      this.bind(elements.buttons.rewind, 'click', function () {
-        // Record seek time so we can prevent hiding controls for a few seconds after rewind
-        player.lastSeekTime = Date.now();
-        player.rewind();
-      }, 'rewind'); // Rewind
-
-      this.bind(elements.buttons.fastForward, 'click', function () {
-        // Record seek time so we can prevent hiding controls for a few seconds after fast forward
-        player.lastSeekTime = Date.now();
-        player.forward();
-      }, 'fastForward'); // Mute toggle
-
-      this.bind(elements.buttons.mute, 'click', function () {
-        player.muted = !player.muted;
-      }, 'mute'); // Captions toggle
-
-      this.bind(elements.buttons.captions, 'click', function () {
-        return player.toggleCaptions();
-      }); // Download
-
-      this.bind(elements.buttons.download, 'click', function () {
-        triggerEvent.call(player, player.media, 'download');
-      }, 'download'); // Fullscreen toggle
-
-      this.bind(elements.buttons.fullscreen, 'click', function () {
-        player.fullscreen.toggle();
-      }, 'fullscreen'); // Picture-in-Picture
-
-      this.bind(elements.buttons.pip, 'click', function () {
-        player.pip = 'toggle';
-      }, 'pip'); // Airplay
-
-      this.bind(elements.buttons.airplay, 'click', player.airplay, 'airplay'); // Settings menu - click toggle
-
-      this.bind(elements.buttons.settings, 'click', function (event) {
-        // Prevent the document click listener closing the menu
-        event.stopPropagation();
-        event.preventDefault();
-
-        controls.toggleMenu.call(player, event);
-      }, null, false); // Can't be passive as we're preventing default
-      // Settings menu - keyboard toggle
-      // We have to bind to keyup otherwise Firefox triggers a click when a keydown event handler shifts focus
-      // https://bugzilla.mozilla.org/show_bug.cgi?id=1220143
-
-      this.bind(elements.buttons.settings, 'keyup', function (event) {
-        var code = event.which; // We only care about space and return
-
-        if (![13, 32].includes(code)) {
-          return;
-        } // Because return triggers a click anyway, all we need to do is set focus
-
-
-        if (code === 13) {
-          controls.focusFirstMenuItem.call(player, null, true);
-
-          return;
-        } // Prevent scroll
-
-
-        event.preventDefault(); // Prevent playing video (Firefox)
-
-        event.stopPropagation(); // Toggle menu
-
-        controls.toggleMenu.call(player, event);
-      }, null, false // Can't be passive as we're preventing default
-      ); // Escape closes menu
-
-      this.bind(elements.settings.menu, 'keydown', function (event) {
-        if (event.which === 27) {
-          controls.toggleMenu.call(player, event);
-        }
-      }); // Set range input alternative "value", which matches the tooltip time (#954)
-
-      this.bind(elements.inputs.seek, 'mousedown mousemove', function (event) {
-        var rect = elements.progress.getBoundingClientRect();
-        var percent = 100 / rect.width * (event.pageX - rect.left);
-        event.currentTarget.setAttribute('seek-value', percent);
-      }); // Pause while seeking
-
-      this.bind(elements.inputs.seek, 'mousedown mouseup keydown keyup touchstart touchend', function (event) {
-        var seek = event.currentTarget;
-        var code = event.keyCode ? event.keyCode : event.which;
-        var attribute = 'play-on-seeked';
-
-        if (is$1.keyboardEvent(event) && code !== 39 && code !== 37) {
-          return;
-        } // Record seek time so we can prevent hiding controls for a few seconds after seek
-
-
-        player.lastSeekTime = Date.now(); // Was playing before?
-
-        var play = seek.hasAttribute(attribute); // Done seeking
-
-        var done = ['mouseup', 'touchend', 'keyup'].includes(event.type); // If we're done seeking and it was playing, resume playback
-
-        if (play && done) {
-          seek.removeAttribute(attribute);
-          silencePromise(player.play());
-        } else if (!done && player.playing) {
-          seek.setAttribute(attribute, '');
-          player.pause();
-        }
-      }); // Fix range inputs on iOS
-      // Super weird iOS bug where after you interact with an <input type="range">,
-      // it takes over further interactions on the page. This is a hack
-
-      if (browser.isIos) {
-        var inputs = getElements.call(player, 'input[type="range"]');
-        Array.from(inputs).forEach(function (input) {
-          return _this3.bind(input, inputEvent, function (event) {
-            return repaint(event.target);
-          });
-        });
-      } // Seek
-
-
-      this.bind(elements.inputs.seek, inputEvent, function (event) {
-        var seek = event.currentTarget; // If it exists, use seek-value instead of "value" for consistency with tooltip time (#954)
-
-        var seekTo = seek.getAttribute('seek-value');
-
-        if (is$1.empty(seekTo)) {
-          seekTo = seek.value;
-        }
-
-        seek.removeAttribute('seek-value');
-        player.currentTime = seekTo / seek.max * player.duration;
-      }, 'seek'); // Seek tooltip
-
-      this.bind(elements.progress, 'mouseenter mouseleave mousemove', function (event) {
-        return controls.updateSeekTooltip.call(player, event);
-      }); // Preview thumbnails plugin
-      // TODO: Really need to work on some sort of plug-in wide event bus or pub-sub for this
-
-      this.bind(elements.progress, 'mousemove touchmove', function (event) {
-        var previewThumbnails = player.previewThumbnails;
-
-        if (previewThumbnails && previewThumbnails.loaded) {
-          previewThumbnails.startMove(event);
-        }
-      }); // Hide thumbnail preview - on mouse click, mouse leave, and video play/seek. All four are required, e.g., for buffering
-
-      this.bind(elements.progress, 'mouseleave touchend click', function () {
-        var previewThumbnails = player.previewThumbnails;
-
-        if (previewThumbnails && previewThumbnails.loaded) {
-          previewThumbnails.endMove(false, true);
-        }
-      }); // Show scrubbing preview
-
-      this.bind(elements.progress, 'mousedown touchstart', function (event) {
-        var previewThumbnails = player.previewThumbnails;
-
-        if (previewThumbnails && previewThumbnails.loaded) {
-          previewThumbnails.startScrubbing(event);
-        }
-      });
-      this.bind(elements.progress, 'mouseup touchend', function (event) {
-        var previewThumbnails = player.previewThumbnails;
-
-        if (previewThumbnails && previewThumbnails.loaded) {
-          previewThumbnails.endScrubbing(event);
-        }
-      }); // Polyfill for lower fill in <input type="range"> for webkit
-
-      if (browser.isWebkit) {
-        Array.from(getElements.call(player, 'input[type="range"]')).forEach(function (element) {
-          _this3.bind(element, 'input', function (event) {
-            return controls.updateRangeFill.call(player, event.target);
-          });
-        });
-      } // Current time invert
-      // Only if one time element is used for both currentTime and duration
-
-
-      if (player.config.toggleInvert && !is$1.element(elements.display.duration)) {
-        this.bind(elements.display.currentTime, 'click', function () {
-          // Do nothing if we're at the start
-          if (player.currentTime === 0) {
-            return;
-          }
-
-          player.config.invertTime = !player.config.invertTime;
-
-          controls.timeUpdate.call(player);
-        });
-      } // Volume
-
-
-      this.bind(elements.inputs.volume, inputEvent, function (event) {
-        player.volume = event.target.value;
-      }, 'volume'); // Update controls.hover state (used for ui.toggleControls to avoid hiding when interacting)
-
-      this.bind(elements.controls, 'mouseenter mouseleave', function (event) {
-        elements.controls.hover = !player.touch && event.type === 'mouseenter';
-      }); // Also update controls.hover state for any non-player children of fullscreen element (as above)
-
-      if (elements.fullscreen) {
-        Array.from(elements.fullscreen.children).filter(function (c) {
-          return !c.contains(elements.container);
-        }).forEach(function (child) {
-          _this3.bind(child, 'mouseenter mouseleave', function (event) {
-            elements.controls.hover = !player.touch && event.type === 'mouseenter';
-          });
-        });
-      } // Update controls.pressed state (used for ui.toggleControls to avoid hiding when interacting)
-
-
-      this.bind(elements.controls, 'mousedown mouseup touchstart touchend touchcancel', function (event) {
-        elements.controls.pressed = ['mousedown', 'touchstart'].includes(event.type);
-      }); // Show controls when they receive focus (e.g., when using keyboard tab key)
-
-      this.bind(elements.controls, 'focusin', function () {
-        var config = player.config,
-            timers = player.timers; // Skip transition to prevent focus from scrolling the parent element
-
-        toggleClass(elements.controls, config.classNames.noTransition, true); // Toggle
-
-        ui.toggleControls.call(player, true); // Restore transition
-
-        setTimeout(function () {
-          toggleClass(elements.controls, config.classNames.noTransition, false);
-        }, 0); // Delay a little more for mouse users
-
-        var delay = _this3.touch ? 3000 : 4000; // Clear timer
-
-        clearTimeout(timers.controls); // Hide again after delay
-
-        timers.controls = setTimeout(function () {
-          return ui.toggleControls.call(player, false);
-        }, delay);
-      }); // Mouse wheel for volume
-
-      this.bind(elements.inputs.volume, 'wheel', function (event) {
-        // Detect "natural" scroll - suppored on OS X Safari only
-        // Other browsers on OS X will be inverted until support improves
-        var inverted = event.webkitDirectionInvertedFromDevice; // Get delta from event. Invert if `inverted` is true
-
-        var _map = [event.deltaX, -event.deltaY].map(function (value) {
-          return inverted ? -value : value;
-        }),
-            _map2 = _slicedToArray(_map, 2),
-            x = _map2[0],
-            y = _map2[1]; // Using the biggest delta, normalize to 1 or -1 (or 0 if no delta)
-
-
-        var direction = Math.sign(Math.abs(x) > Math.abs(y) ? x : y); // Change the volume by 2%
-
-        player.increaseVolume(direction / 50); // Don't break page scrolling at max and min
-
-        var volume = player.media.volume;
-
-        if (direction === 1 && volume < 1 || direction === -1 && volume > 0) {
-          event.preventDefault();
-        }
-      }, 'volume', false);
-    }
   }]);
 
   return Listeners;
@@ -12210,7 +12206,7 @@ var vimeo = {
     var src = format(player.config.urls.vimeo.iframe, id, params);
     iframe.setAttribute('src', src);
     iframe.setAttribute('allowfullscreen', '');
-    iframe.setAttribute('allow', 'autoplay,fullscreen,picture-in-picture'); // Set the referrer policy if required
+    iframe.setAttribute('allow', ['autoplay', 'fullscreen', 'picture-in-picture'].join('; ')); // Set the referrer policy if required
 
     if (!is$1.empty(referrerPolicy)) {
       iframe.setAttribute('referrerPolicy', referrerPolicy);
@@ -12966,135 +12962,84 @@ var Ads = /*#__PURE__*/function () {
 
     _classCallCheck(this, Ads);
 
-    this.player = player;
-    this.config = player.config.ads;
-    this.playing = false;
-    this.initialized = false;
-    this.elements = {
-      container: null,
-      displayContainer: null
-    };
-    this.manager = null;
-    this.loader = null;
-    this.cuePoints = null;
-    this.events = {};
-    this.safetyTimer = null;
-    this.countdownTimer = null; // Setup a promise to resolve when the IMA manager is ready
-
-    this.managerPromise = new Promise(function (resolve, reject) {
-      // The ad is loaded and ready
-      _this.on('loaded', resolve); // Ads failed
-
-
-      _this.on('error', reject);
-    });
-    this.load();
-  }
-
-  _createClass(Ads, [{
-    key: "load",
-
-    /**
-     * Load the IMA SDK
-     */
-    value: function load() {
-      var _this2 = this;
-
-      if (!this.enabled) {
+    _defineProperty(this, "load", function () {
+      if (!_this.enabled) {
         return;
       } // Check if the Google IMA3 SDK is loaded or load it ourselves
 
 
       if (!is$1.object(window.google) || !is$1.object(window.google.ima)) {
-        loadScript(this.player.config.urls.googleIMA.sdk).then(function () {
-          _this2.ready();
+        loadScript(_this.player.config.urls.googleIMA.sdk).then(function () {
+          _this.ready();
         }).catch(function () {
           // Script failed to load or is blocked
-          _this2.trigger('error', new Error('Google IMA SDK failed to load'));
+          _this.trigger('error', new Error('Google IMA SDK failed to load'));
         });
       } else {
-        this.ready();
+        _this.ready();
       }
-    }
-    /**
-     * Get the ads instance ready
-     */
+    });
 
-  }, {
-    key: "ready",
-    value: function ready() {
-      var _this3 = this;
-
+    _defineProperty(this, "ready", function () {
       // Double check we're enabled
-      if (!this.enabled) {
-        destroy(this);
+      if (!_this.enabled) {
+        destroy(_this);
       } // Start ticking our safety timer. If the whole advertisement
       // thing doesn't resolve within our set time; we bail
 
 
-      this.startSafetyTimer(12000, 'ready()'); // Clear the safety timer
+      _this.startSafetyTimer(12000, 'ready()'); // Clear the safety timer
 
-      this.managerPromise.then(function () {
-        _this3.clearSafetyTimer('onAdsManagerLoaded()');
+
+      _this.managerPromise.then(function () {
+        _this.clearSafetyTimer('onAdsManagerLoaded()');
       }); // Set listeners on the Plyr instance
 
-      this.listeners(); // Setup the IMA SDK
 
-      this.setupIMA();
-    } // Build the tag URL
+      _this.listeners(); // Setup the IMA SDK
 
-  }, {
-    key: "setupIMA",
 
-    /**
-     * In order for the SDK to display ads for our video, we need to tell it where to put them,
-     * so here we define our ad container. This div is set up to render on top of the video player.
-     * Using the code below, we tell the SDK to render ads within that div. We also provide a
-     * handle to the content video player - the SDK will poll the current time of our player to
-     * properly place mid-rolls. After we create the ad display container, we initialize it. On
-     * mobile devices, this initialization is done as the result of a user action.
-     */
-    value: function setupIMA() {
-      var _this4 = this;
+      _this.setupIMA();
+    });
 
+    _defineProperty(this, "setupIMA", function () {
       // Create the container for our advertisements
-      this.elements.container = createElement('div', {
-        class: this.player.config.classNames.ads
+      _this.elements.container = createElement('div', {
+        class: _this.player.config.classNames.ads
       });
-      this.player.elements.container.appendChild(this.elements.container); // So we can run VPAID2
+
+      _this.player.elements.container.appendChild(_this.elements.container); // So we can run VPAID2
+
 
       google.ima.settings.setVpaidMode(google.ima.ImaSdkSettings.VpaidMode.ENABLED); // Set language
 
-      google.ima.settings.setLocale(this.player.config.ads.language); // Set playback for iOS10+
+      google.ima.settings.setLocale(_this.player.config.ads.language); // Set playback for iOS10+
 
-      google.ima.settings.setDisableCustomPlaybackForIOS10Plus(this.player.config.playsinline); // We assume the adContainer is the video container of the plyr element that will house the ads
+      google.ima.settings.setDisableCustomPlaybackForIOS10Plus(_this.player.config.playsinline); // We assume the adContainer is the video container of the plyr element that will house the ads
 
-      this.elements.displayContainer = new google.ima.AdDisplayContainer(this.elements.container, this.player.media); // Create ads loader
+      _this.elements.displayContainer = new google.ima.AdDisplayContainer(_this.elements.container, _this.player.media); // Create ads loader
 
-      this.loader = new google.ima.AdsLoader(this.elements.displayContainer); // Listen and respond to ads loaded and error events
+      _this.loader = new google.ima.AdsLoader(_this.elements.displayContainer); // Listen and respond to ads loaded and error events
 
-      this.loader.addEventListener(google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED, function (event) {
-        return _this4.onAdsManagerLoaded(event);
+      _this.loader.addEventListener(google.ima.AdsManagerLoadedEvent.Type.ADS_MANAGER_LOADED, function (event) {
+        return _this.onAdsManagerLoaded(event);
       }, false);
-      this.loader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, function (error) {
-        return _this4.onAdError(error);
+
+      _this.loader.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, function (error) {
+        return _this.onAdError(error);
       }, false); // Request video ads to be pre-loaded
 
-      this.requestAds();
-    }
-    /**
-     * Request advertisements
-     */
 
-  }, {
-    key: "requestAds",
-    value: function requestAds() {
-      var container = this.player.elements.container;
+      _this.requestAds();
+    });
+
+    _defineProperty(this, "requestAds", function () {
+      var container = _this.player.elements.container;
 
       try {
         // Request video ads
         var request = new google.ima.AdsRequest();
-        request.adTagUrl = this.tagUrl; // Specify the linear and nonlinear slot sizes. This helps the SDK
+        request.adTagUrl = _this.tagUrl; // Specify the linear and nonlinear slot sizes. This helps the SDK
         // to select the correct creative if multiple are returned
 
         request.linearAdSlotWidth = container.offsetWidth;
@@ -13104,51 +13049,38 @@ var Ads = /*#__PURE__*/function () {
 
         request.forceNonLinearFullSlot = false; // Mute based on current state
 
-        request.setAdWillPlayMuted(!this.player.muted);
-        this.loader.requestAds(request);
+        request.setAdWillPlayMuted(!_this.player.muted);
+
+        _this.loader.requestAds(request);
       } catch (e) {
-        this.onAdError(e);
+        _this.onAdError(e);
       }
-    }
-    /**
-     * Update the ad countdown
-     * @param {Boolean} start
-     */
+    });
 
-  }, {
-    key: "pollCountdown",
-    value: function pollCountdown() {
-      var _this5 = this;
-
+    _defineProperty(this, "pollCountdown", function () {
       var start = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
       if (!start) {
-        clearInterval(this.countdownTimer);
-        this.elements.container.removeAttribute('data-badge-text');
+        clearInterval(_this.countdownTimer);
+
+        _this.elements.container.removeAttribute('data-badge-text');
+
         return;
       }
 
       var update = function update() {
-        var time = formatTime(Math.max(_this5.manager.getRemainingTime(), 0));
-        var label = "".concat(i18n.get('advertisement', _this5.player.config), " - ").concat(time);
+        var time = formatTime(Math.max(_this.manager.getRemainingTime(), 0));
+        var label = "".concat(i18n.get('advertisement', _this.player.config), " - ").concat(time);
 
-        _this5.elements.container.setAttribute('data-badge-text', label);
+        _this.elements.container.setAttribute('data-badge-text', label);
       };
 
-      this.countdownTimer = setInterval(update, 100);
-    }
-    /**
-     * This method is called whenever the ads are ready inside the AdDisplayContainer
-     * @param {Event} adsManagerLoadedEvent
-     */
+      _this.countdownTimer = setInterval(update, 100);
+    });
 
-  }, {
-    key: "onAdsManagerLoaded",
-    value: function onAdsManagerLoaded(event) {
-      var _this6 = this;
-
+    _defineProperty(this, "onAdsManagerLoaded", function (event) {
       // Load could occur after a source change (race condition)
-      if (!this.enabled) {
+      if (!_this.enabled) {
         return;
       } // Get the ads manager
 
@@ -13159,38 +13091,36 @@ var Ads = /*#__PURE__*/function () {
       settings.enablePreloading = true; // The SDK is polling currentTime on the contentPlayback. And needs a duration
       // so it can determine when to start the mid- and post-roll
 
-      this.manager = event.getAdsManager(this.player, settings); // Get the cue points for any mid-rolls by filtering out the pre- and post-roll
+      _this.manager = event.getAdsManager(_this.player, settings); // Get the cue points for any mid-rolls by filtering out the pre- and post-roll
 
-      this.cuePoints = this.manager.getCuePoints(); // Add listeners to the required events
+      _this.cuePoints = _this.manager.getCuePoints(); // Add listeners to the required events
       // Advertisement error events
 
-      this.manager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, function (error) {
-        return _this6.onAdError(error);
+      _this.manager.addEventListener(google.ima.AdErrorEvent.Type.AD_ERROR, function (error) {
+        return _this.onAdError(error);
       }); // Advertisement regular events
 
+
       Object.keys(google.ima.AdEvent.Type).forEach(function (type) {
-        _this6.manager.addEventListener(google.ima.AdEvent.Type[type], function (e) {
-          return _this6.onAdEvent(e);
+        _this.manager.addEventListener(google.ima.AdEvent.Type[type], function (e) {
+          return _this.onAdEvent(e);
         });
       }); // Resolve our adsManager
 
-      this.trigger('loaded');
-    }
-  }, {
-    key: "addCuePoints",
-    value: function addCuePoints() {
-      var _this7 = this;
+      _this.trigger('loaded');
+    });
 
+    _defineProperty(this, "addCuePoints", function () {
       // Add advertisement cue's within the time line if available
-      if (!is$1.empty(this.cuePoints)) {
-        this.cuePoints.forEach(function (cuePoint) {
-          if (cuePoint !== 0 && cuePoint !== -1 && cuePoint < _this7.player.duration) {
-            var seekElement = _this7.player.elements.progress;
+      if (!is$1.empty(_this.cuePoints)) {
+        _this.cuePoints.forEach(function (cuePoint) {
+          if (cuePoint !== 0 && cuePoint !== -1 && cuePoint < _this.player.duration) {
+            var seekElement = _this.player.elements.progress;
 
             if (is$1.element(seekElement)) {
-              var cuePercentage = 100 / _this7.player.duration * cuePoint;
+              var cuePercentage = 100 / _this.player.duration * cuePoint;
               var cue = createElement('span', {
-                class: _this7.player.config.classNames.cues
+                class: _this.player.config.classNames.cues
               });
               cue.style.left = "".concat(cuePercentage.toString(), "%");
               seekElement.appendChild(cue);
@@ -13198,27 +13128,17 @@ var Ads = /*#__PURE__*/function () {
           }
         });
       }
-    }
-    /**
-     * This is where all the event handling takes place. Retrieve the ad from the event. Some
-     * events (e.g. ALL_ADS_COMPLETED) don't have the ad object associated
-     * https://developers.google.com/interactive-media-ads/docs/sdks/html5/v3/apis#ima.AdEvent.Type
-     * @param {Event} event
-     */
+    });
 
-  }, {
-    key: "onAdEvent",
-    value: function onAdEvent(event) {
-      var _this8 = this;
-
-      var container = this.player.elements.container; // Retrieve the ad from the event. Some events (e.g. ALL_ADS_COMPLETED)
+    _defineProperty(this, "onAdEvent", function (event) {
+      var container = _this.player.elements.container; // Retrieve the ad from the event. Some events (e.g. ALL_ADS_COMPLETED)
       // don't have ad object associated
 
       var ad = event.getAd();
       var adData = event.getAdData(); // Proxy event
 
       var dispatchEvent = function dispatchEvent(type) {
-        triggerEvent.call(_this8.player, _this8.player.media, "ads".concat(type.replace(/_/g, '').toLowerCase()));
+        triggerEvent.call(_this.player, _this.player.media, "ads".concat(type.replace(/_/g, '').toLowerCase()));
       }; // Bubble the event
 
 
@@ -13228,9 +13148,10 @@ var Ads = /*#__PURE__*/function () {
         case google.ima.AdEvent.Type.LOADED:
           // This is the first event sent for an ad - it is possible to determine whether the
           // ad is a video ad or an overlay
-          this.trigger('loaded'); // Start countdown
+          _this.trigger('loaded'); // Start countdown
 
-          this.pollCountdown(true);
+
+          _this.pollCountdown(true);
 
           if (!ad.isLinear()) {
             // Position AdDisplayContainer correctly for overlay
@@ -13244,7 +13165,8 @@ var Ads = /*#__PURE__*/function () {
 
         case google.ima.AdEvent.Type.STARTED:
           // Set volume to match player
-          this.manager.setVolume(this.player.volume);
+          _this.manager.setVolume(_this.player.volume);
+
           break;
 
         case google.ima.AdEvent.Type.ALL_ADS_COMPLETED:
@@ -13271,11 +13193,11 @@ var Ads = /*#__PURE__*/function () {
           // };
           // TODO: So there is still this thing where a video should only be allowed to start
           // playing when the IMA SDK is ready or has failed
-          if (this.player.ended) {
-            this.loadAds();
+          if (_this.player.ended) {
+            _this.loadAds();
           } else {
             // The SDK won't allow new ads to be called without receiving a contentComplete()
-            this.loader.contentComplete();
+            _this.loader.contentComplete();
           }
 
           break;
@@ -13284,7 +13206,8 @@ var Ads = /*#__PURE__*/function () {
           // This event indicates the ad has started - the video player can adjust the UI,
           // for example display a pause button and remaining time. Fired when content should
           // be paused. This usually happens right before an ad is about to cover the content
-          this.pauseContent();
+          _this.pauseContent();
+
           break;
 
         case google.ima.AdEvent.Type.CONTENT_RESUME_REQUESTED:
@@ -13292,275 +13215,237 @@ var Ads = /*#__PURE__*/function () {
           // appropriate UI actions, such as removing the timer for remaining time detection.
           // Fired when content should be resumed. This usually happens when an ad finishes
           // or collapses
-          this.pollCountdown();
-          this.resumeContent();
+          _this.pollCountdown();
+
+          _this.resumeContent();
+
           break;
 
         case google.ima.AdEvent.Type.LOG:
           if (adData.adError) {
-            this.player.debug.warn("Non-fatal ad error: ".concat(adData.adError.getMessage()));
+            _this.player.debug.warn("Non-fatal ad error: ".concat(adData.adError.getMessage()));
           }
 
           break;
       }
-    }
-    /**
-     * Any ad error handling comes through here
-     * @param {Event} event
-     */
+    });
 
-  }, {
-    key: "onAdError",
-    value: function onAdError(event) {
-      this.cancel();
-      this.player.debug.warn('Ads error', event);
-    }
-    /**
-     * Setup hooks for Plyr and window events. This ensures
-     * the mid- and post-roll launch at the correct time. And
-     * resize the advertisement when the player resizes
-     */
+    _defineProperty(this, "onAdError", function (event) {
+      _this.cancel();
 
-  }, {
-    key: "listeners",
-    value: function listeners() {
-      var _this9 = this;
+      _this.player.debug.warn('Ads error', event);
+    });
 
-      var container = this.player.elements.container;
+    _defineProperty(this, "listeners", function () {
+      var container = _this.player.elements.container;
       var time;
-      this.player.on('canplay', function () {
-        _this9.addCuePoints();
-      });
-      this.player.on('ended', function () {
-        _this9.loader.contentComplete();
-      });
-      this.player.on('timeupdate', function () {
-        time = _this9.player.currentTime;
-      });
-      this.player.on('seeked', function () {
-        var seekedTime = _this9.player.currentTime;
 
-        if (is$1.empty(_this9.cuePoints)) {
+      _this.player.on('canplay', function () {
+        _this.addCuePoints();
+      });
+
+      _this.player.on('ended', function () {
+        _this.loader.contentComplete();
+      });
+
+      _this.player.on('timeupdate', function () {
+        time = _this.player.currentTime;
+      });
+
+      _this.player.on('seeked', function () {
+        var seekedTime = _this.player.currentTime;
+
+        if (is$1.empty(_this.cuePoints)) {
           return;
         }
 
-        _this9.cuePoints.forEach(function (cuePoint, index) {
+        _this.cuePoints.forEach(function (cuePoint, index) {
           if (time < cuePoint && cuePoint < seekedTime) {
-            _this9.manager.discardAdBreak();
+            _this.manager.discardAdBreak();
 
-            _this9.cuePoints.splice(index, 1);
+            _this.cuePoints.splice(index, 1);
           }
         });
       }); // Listen to the resizing of the window. And resize ad accordingly
       // TODO: eventually implement ResizeObserver
 
+
       window.addEventListener('resize', function () {
-        if (_this9.manager) {
-          _this9.manager.resize(container.offsetWidth, container.offsetHeight, google.ima.ViewMode.NORMAL);
+        if (_this.manager) {
+          _this.manager.resize(container.offsetWidth, container.offsetHeight, google.ima.ViewMode.NORMAL);
         }
       });
-    }
-    /**
-     * Initialize the adsManager and start playing advertisements
-     */
+    });
 
-  }, {
-    key: "play",
-    value: function play() {
-      var _this10 = this;
+    _defineProperty(this, "play", function () {
+      var container = _this.player.elements.container;
 
-      var container = this.player.elements.container;
-
-      if (!this.managerPromise) {
-        this.resumeContent();
+      if (!_this.managerPromise) {
+        _this.resumeContent();
       } // Play the requested advertisement whenever the adsManager is ready
 
 
-      this.managerPromise.then(function () {
+      _this.managerPromise.then(function () {
         // Set volume to match player
-        _this10.manager.setVolume(_this10.player.volume); // Initialize the container. Must be done via a user action on mobile devices
+        _this.manager.setVolume(_this.player.volume); // Initialize the container. Must be done via a user action on mobile devices
 
 
-        _this10.elements.displayContainer.initialize();
+        _this.elements.displayContainer.initialize();
 
         try {
-          if (!_this10.initialized) {
+          if (!_this.initialized) {
             // Initialize the ads manager. Ad rules playlist will start at this time
-            _this10.manager.init(container.offsetWidth, container.offsetHeight, google.ima.ViewMode.NORMAL); // Call play to start showing the ad. Single video and overlay ads will
+            _this.manager.init(container.offsetWidth, container.offsetHeight, google.ima.ViewMode.NORMAL); // Call play to start showing the ad. Single video and overlay ads will
             // start at this time; the call will be ignored for ad rules
 
 
-            _this10.manager.start();
+            _this.manager.start();
           }
 
-          _this10.initialized = true;
+          _this.initialized = true;
         } catch (adError) {
           // An error may be thrown if there was a problem with the
           // VAST response
-          _this10.onAdError(adError);
+          _this.onAdError(adError);
         }
       }).catch(function () {});
-    }
-    /**
-     * Resume our video
-     */
+    });
 
-  }, {
-    key: "resumeContent",
-    value: function resumeContent() {
+    _defineProperty(this, "resumeContent", function () {
       // Hide the advertisement container
-      this.elements.container.style.zIndex = ''; // Ad is stopped
+      _this.elements.container.style.zIndex = ''; // Ad is stopped
 
-      this.playing = false; // Play video
+      _this.playing = false; // Play video
 
-      silencePromise(this.player.media.play());
-    }
-    /**
-     * Pause our video
-     */
+      silencePromise(_this.player.media.play());
+    });
 
-  }, {
-    key: "pauseContent",
-    value: function pauseContent() {
+    _defineProperty(this, "pauseContent", function () {
       // Show the advertisement container
-      this.elements.container.style.zIndex = 3; // Ad is playing
+      _this.elements.container.style.zIndex = 3; // Ad is playing
 
-      this.playing = true; // Pause our video.
+      _this.playing = true; // Pause our video.
 
-      this.player.media.pause();
-    }
-    /**
-     * Destroy the adsManager so we can grab new ads after this. If we don't then we're not
-     * allowed to call new ads based on google policies, as they interpret this as an accidental
-     * video requests. https://developers.google.com/interactive-
-     * media-ads/docs/sdks/android/faq#8
-     */
+      _this.player.media.pause();
+    });
 
-  }, {
-    key: "cancel",
-    value: function cancel() {
+    _defineProperty(this, "cancel", function () {
       // Pause our video
-      if (this.initialized) {
-        this.resumeContent();
+      if (_this.initialized) {
+        _this.resumeContent();
       } // Tell our instance that we're done for now
 
 
-      this.trigger('error'); // Re-create our adsManager
+      _this.trigger('error'); // Re-create our adsManager
 
-      this.loadAds();
-    }
-    /**
-     * Re-create our adsManager
-     */
 
-  }, {
-    key: "loadAds",
-    value: function loadAds() {
-      var _this11 = this;
+      _this.loadAds();
+    });
 
+    _defineProperty(this, "loadAds", function () {
       // Tell our adsManager to go bye bye
-      this.managerPromise.then(function () {
+      _this.managerPromise.then(function () {
         // Destroy our adsManager
-        if (_this11.manager) {
-          _this11.manager.destroy();
+        if (_this.manager) {
+          _this.manager.destroy();
         } // Re-set our adsManager promises
 
 
-        _this11.managerPromise = new Promise(function (resolve) {
-          _this11.on('loaded', resolve);
+        _this.managerPromise = new Promise(function (resolve) {
+          _this.on('loaded', resolve);
 
-          _this11.player.debug.log(_this11.manager);
+          _this.player.debug.log(_this.manager);
         }); // Now that the manager has been destroyed set it to also be un-initialized
 
-        _this11.initialized = false; // Now request some new advertisements
+        _this.initialized = false; // Now request some new advertisements
 
-        _this11.requestAds();
+        _this.requestAds();
       }).catch(function () {});
-    }
-    /**
-     * Handles callbacks after an ad event was invoked
-     * @param {String} event - Event type
-     */
+    });
 
-  }, {
-    key: "trigger",
-    value: function trigger(event) {
-      var _this12 = this;
-
+    _defineProperty(this, "trigger", function (event) {
       for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
         args[_key - 1] = arguments[_key];
       }
 
-      var handlers = this.events[event];
+      var handlers = _this.events[event];
 
       if (is$1.array(handlers)) {
         handlers.forEach(function (handler) {
           if (is$1.function(handler)) {
-            handler.apply(_this12, args);
+            handler.apply(_this, args);
           }
         });
       }
-    }
-    /**
-     * Add event listeners
-     * @param {String} event - Event type
-     * @param {Function} callback - Callback for when event occurs
-     * @return {Ads}
-     */
+    });
 
-  }, {
-    key: "on",
-    value: function on(event, callback) {
-      if (!is$1.array(this.events[event])) {
-        this.events[event] = [];
+    _defineProperty(this, "on", function (event, callback) {
+      if (!is$1.array(_this.events[event])) {
+        _this.events[event] = [];
       }
 
-      this.events[event].push(callback);
-      return this;
-    }
-    /**
-     * Setup a safety timer for when the ad network doesn't respond for whatever reason.
-     * The advertisement has 12 seconds to get its things together. We stop this timer when the
-     * advertisement is playing, or when a user action is required to start, then we clear the
-     * timer on ad ready
-     * @param {Number} time
-     * @param {String} from
-     */
+      _this.events[event].push(callback);
 
-  }, {
-    key: "startSafetyTimer",
-    value: function startSafetyTimer(time, from) {
-      var _this13 = this;
+      return _this;
+    });
 
-      this.player.debug.log("Safety timer invoked from: ".concat(from));
-      this.safetyTimer = setTimeout(function () {
-        _this13.cancel();
+    _defineProperty(this, "startSafetyTimer", function (time, from) {
+      _this.player.debug.log("Safety timer invoked from: ".concat(from));
 
-        _this13.clearSafetyTimer('startSafetyTimer()');
+      _this.safetyTimer = setTimeout(function () {
+        _this.cancel();
+
+        _this.clearSafetyTimer('startSafetyTimer()');
       }, time);
-    }
-    /**
-     * Clear our safety timer(s)
-     * @param {String} from
-     */
+    });
 
-  }, {
-    key: "clearSafetyTimer",
-    value: function clearSafetyTimer(from) {
-      if (!is$1.nullOrUndefined(this.safetyTimer)) {
-        this.player.debug.log("Safety timer cleared from: ".concat(from));
-        clearTimeout(this.safetyTimer);
-        this.safetyTimer = null;
+    _defineProperty(this, "clearSafetyTimer", function (from) {
+      if (!is$1.nullOrUndefined(_this.safetyTimer)) {
+        _this.player.debug.log("Safety timer cleared from: ".concat(from));
+
+        clearTimeout(_this.safetyTimer);
+        _this.safetyTimer = null;
       }
-    }
-  }, {
+    });
+
+    this.player = player;
+    this.config = player.config.ads;
+    this.playing = false;
+    this.initialized = false;
+    this.elements = {
+      container: null,
+      displayContainer: null
+    };
+    this.manager = null;
+    this.loader = null;
+    this.cuePoints = null;
+    this.events = {};
+    this.safetyTimer = null;
+    this.countdownTimer = null; // Setup a promise to resolve when the IMA manager is ready
+
+    this.managerPromise = new Promise(function (resolve, reject) {
+      // The ad is loaded and ready
+      _this.on('loaded', resolve); // Ads failed
+
+
+      _this.on('error', reject);
+    });
+    this.load();
+  }
+
+  _createClass(Ads, [{
     key: "enabled",
     get: function get() {
       var config = this.config;
       return this.player.isHTML5 && this.player.isVideo && config.enabled && (!is$1.empty(config.publisherId) || is$1.url(config.tagUrl));
     }
+    /**
+     * Load the IMA SDK
+     */
+
   }, {
     key: "tagUrl",
+    // Build the tag URL
     get: function get() {
       var config = this.config;
 
@@ -13580,6 +13465,15 @@ var Ads = /*#__PURE__*/function () {
       var base = 'https://go.aniview.com/api/adserver6/vast/';
       return "".concat(base, "?").concat(buildUrlParams(params));
     }
+    /**
+     * In order for the SDK to display ads for our video, we need to tell it where to put them,
+     * so here we define our ad container. This div is set up to render on top of the video player.
+     * Using the code below, we tell the SDK to render ads within that div. We also provide a
+     * handle to the content video player - the SDK will poll the current time of our player to
+     * properly place mid-rolls. After we create the ad display container, we initialize it. On
+     * mobile devices, this initialization is done as the result of a user action.
+     */
+
   }]);
 
   return Ads;
@@ -13713,36 +13607,21 @@ var PreviewThumbnails = /*#__PURE__*/function () {
    * @return {PreviewThumbnails}
    */
   function PreviewThumbnails(player) {
+    var _this = this;
+
     _classCallCheck(this, PreviewThumbnails);
 
-    this.player = player;
-    this.thumbnails = [];
-    this.loaded = false;
-    this.lastMouseMoveTime = Date.now();
-    this.mouseDown = false;
-    this.loadedImages = [];
-    this.elements = {
-      thumb: {},
-      scrubbing: {}
-    };
-    this.load();
-  }
-
-  _createClass(PreviewThumbnails, [{
-    key: "load",
-    value: function load() {
-      var _this = this;
-
+    _defineProperty(this, "load", function () {
       // Toggle the regular seek tooltip
-      if (this.player.elements.display.seekTooltip) {
-        this.player.elements.display.seekTooltip.hidden = this.enabled;
+      if (_this.player.elements.display.seekTooltip) {
+        _this.player.elements.display.seekTooltip.hidden = _this.enabled;
       }
 
-      if (!this.enabled) {
+      if (!_this.enabled) {
         return;
       }
 
-      this.getThumbnails().then(function () {
+      _this.getThumbnails().then(function () {
         if (!_this.enabled) {
           return;
         } // Render DOM elements
@@ -13755,15 +13634,11 @@ var PreviewThumbnails = /*#__PURE__*/function () {
 
         _this.loaded = true;
       });
-    } // Download VTT files and parse them
+    });
 
-  }, {
-    key: "getThumbnails",
-    value: function getThumbnails() {
-      var _this2 = this;
-
+    _defineProperty(this, "getThumbnails", function () {
       return new Promise(function (resolve) {
-        var src = _this2.player.config.previewThumbnails.src;
+        var src = _this.player.config.previewThumbnails.src;
 
         if (is$1.empty(src)) {
           throw new Error('Missing previewThumbnails.src config attribute');
@@ -13772,11 +13647,11 @@ var PreviewThumbnails = /*#__PURE__*/function () {
 
         var sortAndResolve = function sortAndResolve() {
           // Sort smallest to biggest (e.g., [120p, 480p, 1080p])
-          _this2.thumbnails.sort(function (x, y) {
+          _this.thumbnails.sort(function (x, y) {
             return x.height - y.height;
           });
 
-          _this2.player.debug.log('Preview thumbnails', _this2.thumbnails);
+          _this.player.debug.log('Preview thumbnails', _this.thumbnails);
 
           resolve();
         }; // Via callback()
@@ -13784,7 +13659,7 @@ var PreviewThumbnails = /*#__PURE__*/function () {
 
         if (is$1.function(src)) {
           src(function (thumbnails) {
-            _this2.thumbnails = thumbnails;
+            _this.thumbnails = thumbnails;
             sortAndResolve();
           });
         } // VTT urls
@@ -13793,19 +13668,15 @@ var PreviewThumbnails = /*#__PURE__*/function () {
             var urls = is$1.string(src) ? [src] : src; // Loop through each src URL. Download and process the VTT file, storing the resulting data in this.thumbnails
 
             var promises = urls.map(function (u) {
-              return _this2.getThumbnail(u);
+              return _this.getThumbnail(u);
             }); // Resolve
 
             Promise.all(promises).then(sortAndResolve);
           }
       });
-    } // Process individual VTT file
+    });
 
-  }, {
-    key: "getThumbnail",
-    value: function getThumbnail(url) {
-      var _this3 = this;
-
+    _defineProperty(this, "getThumbnail", function (url) {
       return new Promise(function (resolve) {
         fetch(url).then(function (response) {
           var thumbnail = {
@@ -13827,7 +13698,7 @@ var PreviewThumbnails = /*#__PURE__*/function () {
             thumbnail.height = tempImage.naturalHeight;
             thumbnail.width = tempImage.naturalWidth;
 
-            _this3.thumbnails.push(thumbnail);
+            _this.thumbnails.push(thumbnail);
 
             resolve();
           };
@@ -13835,11 +13706,10 @@ var PreviewThumbnails = /*#__PURE__*/function () {
           tempImage.src = thumbnail.urlPrefix + thumbnail.frames[0].text;
         });
       });
-    }
-  }, {
-    key: "startMove",
-    value: function startMove(event) {
-      if (!this.loaded) {
+    });
+
+    _defineProperty(this, "startMove", function (event) {
+      if (!_this.loaded) {
         return;
       }
 
@@ -13848,163 +13718,153 @@ var PreviewThumbnails = /*#__PURE__*/function () {
       } // Wait until media has a duration
 
 
-      if (!this.player.media.duration) {
+      if (!_this.player.media.duration) {
         return;
       }
 
       if (event.type === 'touchmove') {
         // Calculate seek hover position as approx video seconds
-        this.seekTime = this.player.media.duration * (this.player.elements.inputs.seek.value / 100);
+        _this.seekTime = _this.player.media.duration * (_this.player.elements.inputs.seek.value / 100);
       } else {
         // Calculate seek hover position as approx video seconds
-        var clientRect = this.player.elements.progress.getBoundingClientRect();
+        var clientRect = _this.player.elements.progress.getBoundingClientRect();
+
         var percentage = 100 / clientRect.width * (event.pageX - clientRect.left);
-        this.seekTime = this.player.media.duration * (percentage / 100);
+        _this.seekTime = _this.player.media.duration * (percentage / 100);
 
-        if (this.seekTime < 0) {
+        if (_this.seekTime < 0) {
           // The mousemove fires for 10+px out to the left
-          this.seekTime = 0;
+          _this.seekTime = 0;
         }
 
-        if (this.seekTime > this.player.media.duration - 1) {
+        if (_this.seekTime > _this.player.media.duration - 1) {
           // Took 1 second off the duration for safety, because different players can disagree on the real duration of a video
-          this.seekTime = this.player.media.duration - 1;
+          _this.seekTime = _this.player.media.duration - 1;
         }
 
-        this.mousePosX = event.pageX; // Set time text inside image container
+        _this.mousePosX = event.pageX; // Set time text inside image container
 
-        this.elements.thumb.time.innerText = formatTime(this.seekTime);
+        _this.elements.thumb.time.innerText = formatTime(_this.seekTime);
       } // Download and show image
 
 
-      this.showImageAtCurrentTime();
-    }
-  }, {
-    key: "endMove",
-    value: function endMove() {
-      this.toggleThumbContainer(false, true);
-    }
-  }, {
-    key: "startScrubbing",
-    value: function startScrubbing(event) {
+      _this.showImageAtCurrentTime();
+    });
+
+    _defineProperty(this, "endMove", function () {
+      _this.toggleThumbContainer(false, true);
+    });
+
+    _defineProperty(this, "startScrubbing", function (event) {
       // Only act on left mouse button (0), or touch device (event.button does not exist or is false)
       if (is$1.nullOrUndefined(event.button) || event.button === false || event.button === 0) {
-        this.mouseDown = true; // Wait until media has a duration
+        _this.mouseDown = true; // Wait until media has a duration
 
-        if (this.player.media.duration) {
-          this.toggleScrubbingContainer(true);
-          this.toggleThumbContainer(false, true); // Download and show image
+        if (_this.player.media.duration) {
+          _this.toggleScrubbingContainer(true);
 
-          this.showImageAtCurrentTime();
+          _this.toggleThumbContainer(false, true); // Download and show image
+
+
+          _this.showImageAtCurrentTime();
         }
       }
-    }
-  }, {
-    key: "endScrubbing",
-    value: function endScrubbing() {
-      var _this4 = this;
+    });
 
-      this.mouseDown = false; // Hide scrubbing preview. But wait until the video has successfully seeked before hiding the scrubbing preview
+    _defineProperty(this, "endScrubbing", function () {
+      _this.mouseDown = false; // Hide scrubbing preview. But wait until the video has successfully seeked before hiding the scrubbing preview
 
-      if (Math.ceil(this.lastTime) === Math.ceil(this.player.media.currentTime)) {
+      if (Math.ceil(_this.lastTime) === Math.ceil(_this.player.media.currentTime)) {
         // The video was already seeked/loaded at the chosen time - hide immediately
-        this.toggleScrubbingContainer(false);
+        _this.toggleScrubbingContainer(false);
       } else {
         // The video hasn't seeked yet. Wait for that
-        once.call(this.player, this.player.media, 'timeupdate', function () {
+        once.call(_this.player, _this.player.media, 'timeupdate', function () {
           // Re-check mousedown - we might have already started scrubbing again
-          if (!_this4.mouseDown) {
-            _this4.toggleScrubbingContainer(false);
+          if (!_this.mouseDown) {
+            _this.toggleScrubbingContainer(false);
           }
         });
       }
-    }
-    /**
-     * Setup hooks for Plyr and window events
-     */
+    });
 
-  }, {
-    key: "listeners",
-    value: function listeners() {
-      var _this5 = this;
-
+    _defineProperty(this, "listeners", function () {
       // Hide thumbnail preview - on mouse click, mouse leave (in listeners.js for now), and video play/seek. All four are required, e.g., for buffering
-      this.player.on('play', function () {
-        _this5.toggleThumbContainer(false, true);
+      _this.player.on('play', function () {
+        _this.toggleThumbContainer(false, true);
       });
-      this.player.on('seeked', function () {
-        _this5.toggleThumbContainer(false);
-      });
-      this.player.on('timeupdate', function () {
-        _this5.lastTime = _this5.player.media.currentTime;
-      });
-    }
-    /**
-     * Create HTML elements for image containers
-     */
 
-  }, {
-    key: "render",
-    value: function render() {
+      _this.player.on('seeked', function () {
+        _this.toggleThumbContainer(false);
+      });
+
+      _this.player.on('timeupdate', function () {
+        _this.lastTime = _this.player.media.currentTime;
+      });
+    });
+
+    _defineProperty(this, "render", function () {
       // Create HTML element: plyr__preview-thumbnail-container
-      this.elements.thumb.container = createElement('div', {
-        class: this.player.config.classNames.previewThumbnails.thumbContainer
+      _this.elements.thumb.container = createElement('div', {
+        class: _this.player.config.classNames.previewThumbnails.thumbContainer
       }); // Wrapper for the image for styling
 
-      this.elements.thumb.imageContainer = createElement('div', {
-        class: this.player.config.classNames.previewThumbnails.imageContainer
+      _this.elements.thumb.imageContainer = createElement('div', {
+        class: _this.player.config.classNames.previewThumbnails.imageContainer
       });
-      this.elements.thumb.container.appendChild(this.elements.thumb.imageContainer); // Create HTML element, parent+span: time text (e.g., 01:32:00)
+
+      _this.elements.thumb.container.appendChild(_this.elements.thumb.imageContainer); // Create HTML element, parent+span: time text (e.g., 01:32:00)
+
 
       var timeContainer = createElement('div', {
-        class: this.player.config.classNames.previewThumbnails.timeContainer
+        class: _this.player.config.classNames.previewThumbnails.timeContainer
       });
-      this.elements.thumb.time = createElement('span', {}, '00:00');
-      timeContainer.appendChild(this.elements.thumb.time);
-      this.elements.thumb.container.appendChild(timeContainer); // Inject the whole thumb
+      _this.elements.thumb.time = createElement('span', {}, '00:00');
+      timeContainer.appendChild(_this.elements.thumb.time);
 
-      if (is$1.element(this.player.elements.progress)) {
-        this.player.elements.progress.appendChild(this.elements.thumb.container);
+      _this.elements.thumb.container.appendChild(timeContainer); // Inject the whole thumb
+
+
+      if (is$1.element(_this.player.elements.progress)) {
+        _this.player.elements.progress.appendChild(_this.elements.thumb.container);
       } // Create HTML element: plyr__preview-scrubbing-container
 
 
-      this.elements.scrubbing.container = createElement('div', {
-        class: this.player.config.classNames.previewThumbnails.scrubbingContainer
+      _this.elements.scrubbing.container = createElement('div', {
+        class: _this.player.config.classNames.previewThumbnails.scrubbingContainer
       });
-      this.player.elements.wrapper.appendChild(this.elements.scrubbing.container);
-    }
-  }, {
-    key: "destroy",
-    value: function destroy() {
-      if (this.elements.thumb.container) {
-        this.elements.thumb.container.remove();
+
+      _this.player.elements.wrapper.appendChild(_this.elements.scrubbing.container);
+    });
+
+    _defineProperty(this, "destroy", function () {
+      if (_this.elements.thumb.container) {
+        _this.elements.thumb.container.remove();
       }
 
-      if (this.elements.scrubbing.container) {
-        this.elements.scrubbing.container.remove();
+      if (_this.elements.scrubbing.container) {
+        _this.elements.scrubbing.container.remove();
       }
-    }
-  }, {
-    key: "showImageAtCurrentTime",
-    value: function showImageAtCurrentTime() {
-      var _this6 = this;
+    });
 
-      if (this.mouseDown) {
-        this.setScrubbingContainerSize();
+    _defineProperty(this, "showImageAtCurrentTime", function () {
+      if (_this.mouseDown) {
+        _this.setScrubbingContainerSize();
       } else {
-        this.setThumbContainerSizeAndPos();
+        _this.setThumbContainerSizeAndPos();
       } // Find the desired thumbnail index
       // TODO: Handle a video longer than the thumbs where thumbNum is null
 
 
-      var thumbNum = this.thumbnails[0].frames.findIndex(function (frame) {
-        return _this6.seekTime >= frame.startTime && _this6.seekTime <= frame.endTime;
+      var thumbNum = _this.thumbnails[0].frames.findIndex(function (frame) {
+        return _this.seekTime >= frame.startTime && _this.seekTime <= frame.endTime;
       });
+
       var hasThumb = thumbNum >= 0;
       var qualityIndex = 0; // Show the thumb container if we're not scrubbing
 
-      if (!this.mouseDown) {
-        this.toggleThumbContainer(hasThumb);
+      if (!_this.mouseDown) {
+        _this.toggleThumbContainer(hasThumb);
       } // No matching thumb found
 
 
@@ -14013,36 +13873,34 @@ var PreviewThumbnails = /*#__PURE__*/function () {
       } // Check to see if we've already downloaded higher quality versions of this image
 
 
-      this.thumbnails.forEach(function (thumbnail, index) {
-        if (_this6.loadedImages.includes(thumbnail.frames[thumbNum].text)) {
+      _this.thumbnails.forEach(function (thumbnail, index) {
+        if (_this.loadedImages.includes(thumbnail.frames[thumbNum].text)) {
           qualityIndex = index;
         }
       }); // Only proceed if either thumbnum or thumbfilename has changed
 
-      if (thumbNum !== this.showingThumb) {
-        this.showingThumb = thumbNum;
-        this.loadImage(qualityIndex);
+
+      if (thumbNum !== _this.showingThumb) {
+        _this.showingThumb = thumbNum;
+
+        _this.loadImage(qualityIndex);
       }
-    } // Show the image that's currently specified in this.showingThumb
+    });
 
-  }, {
-    key: "loadImage",
-    value: function loadImage() {
-      var _this7 = this;
-
+    _defineProperty(this, "loadImage", function () {
       var qualityIndex = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 0;
-      var thumbNum = this.showingThumb;
-      var thumbnail = this.thumbnails[qualityIndex];
+      var thumbNum = _this.showingThumb;
+      var thumbnail = _this.thumbnails[qualityIndex];
       var urlPrefix = thumbnail.urlPrefix;
       var frame = thumbnail.frames[thumbNum];
       var thumbFilename = thumbnail.frames[thumbNum].text;
       var thumbUrl = urlPrefix + thumbFilename;
 
-      if (!this.currentImageElement || this.currentImageElement.dataset.filename !== thumbFilename) {
+      if (!_this.currentImageElement || _this.currentImageElement.dataset.filename !== thumbFilename) {
         // If we're already loading a previous image, remove its onload handler - we don't want it to load after this one
         // Only do this if not using sprites. Without sprites we really want to show as many images as possible, as a best-effort
-        if (this.loadingImage && this.usingSprites) {
-          this.loadingImage.onload = null;
+        if (_this.loadingImage && _this.usingSprites) {
+          _this.loadingImage.onload = null;
         } // We're building and adding a new image. In other implementations of similar functionality (YouTube), background image
         // is instead used. But this causes issues with larger images in Firefox and Safari - switching between background
         // images causes a flicker. Putting a new image over the top does not
@@ -14052,56 +13910,59 @@ var PreviewThumbnails = /*#__PURE__*/function () {
         previewImage.src = thumbUrl;
         previewImage.dataset.index = thumbNum;
         previewImage.dataset.filename = thumbFilename;
-        this.showingThumbFilename = thumbFilename;
-        this.player.debug.log("Loading image: ".concat(thumbUrl)); // For some reason, passing the named function directly causes it to execute immediately. So I've wrapped it in an anonymous function...
+        _this.showingThumbFilename = thumbFilename;
+
+        _this.player.debug.log("Loading image: ".concat(thumbUrl)); // For some reason, passing the named function directly causes it to execute immediately. So I've wrapped it in an anonymous function...
+
 
         previewImage.onload = function () {
-          return _this7.showImage(previewImage, frame, qualityIndex, thumbNum, thumbFilename, true);
+          return _this.showImage(previewImage, frame, qualityIndex, thumbNum, thumbFilename, true);
         };
 
-        this.loadingImage = previewImage;
-        this.removeOldImages(previewImage);
+        _this.loadingImage = previewImage;
+
+        _this.removeOldImages(previewImage);
       } else {
         // Update the existing image
-        this.showImage(this.currentImageElement, frame, qualityIndex, thumbNum, thumbFilename, false);
-        this.currentImageElement.dataset.index = thumbNum;
-        this.removeOldImages(this.currentImageElement);
+        _this.showImage(_this.currentImageElement, frame, qualityIndex, thumbNum, thumbFilename, false);
+
+        _this.currentImageElement.dataset.index = thumbNum;
+
+        _this.removeOldImages(_this.currentImageElement);
       }
-    }
-  }, {
-    key: "showImage",
-    value: function showImage(previewImage, frame, qualityIndex, thumbNum, thumbFilename) {
+    });
+
+    _defineProperty(this, "showImage", function (previewImage, frame, qualityIndex, thumbNum, thumbFilename) {
       var newImage = arguments.length > 5 && arguments[5] !== undefined ? arguments[5] : true;
-      this.player.debug.log("Showing thumb: ".concat(thumbFilename, ". num: ").concat(thumbNum, ". qual: ").concat(qualityIndex, ". newimg: ").concat(newImage));
-      this.setImageSizeAndOffset(previewImage, frame);
+
+      _this.player.debug.log("Showing thumb: ".concat(thumbFilename, ". num: ").concat(thumbNum, ". qual: ").concat(qualityIndex, ". newimg: ").concat(newImage));
+
+      _this.setImageSizeAndOffset(previewImage, frame);
 
       if (newImage) {
-        this.currentImageContainer.appendChild(previewImage);
-        this.currentImageElement = previewImage;
+        _this.currentImageContainer.appendChild(previewImage);
 
-        if (!this.loadedImages.includes(thumbFilename)) {
-          this.loadedImages.push(thumbFilename);
+        _this.currentImageElement = previewImage;
+
+        if (!_this.loadedImages.includes(thumbFilename)) {
+          _this.loadedImages.push(thumbFilename);
         }
       } // Preload images before and after the current one
       // Show higher quality of the same frame
       // Each step here has a short time delay, and only continues if still hovering/seeking the same spot. This is to protect slow connections from overloading
 
 
-      this.preloadNearby(thumbNum, true).then(this.preloadNearby(thumbNum, false)).then(this.getHigherQuality(qualityIndex, previewImage, frame, thumbFilename));
-    } // Remove all preview images that aren't the designated current image
+      _this.preloadNearby(thumbNum, true).then(_this.preloadNearby(thumbNum, false)).then(_this.getHigherQuality(qualityIndex, previewImage, frame, thumbFilename));
+    });
 
-  }, {
-    key: "removeOldImages",
-    value: function removeOldImages(currentImage) {
-      var _this8 = this;
-
+    _defineProperty(this, "removeOldImages", function (currentImage) {
       // Get a list of all images, convert it from a DOM list to an array
-      Array.from(this.currentImageContainer.children).forEach(function (image) {
+      Array.from(_this.currentImageContainer.children).forEach(function (image) {
         if (image.tagName.toLowerCase() !== 'img') {
           return;
         }
 
-        var removeDelay = _this8.usingSprites ? 500 : 1000;
+        var removeDelay = _this.usingSprites ? 500 : 1000;
 
         if (image.dataset.index !== currentImage.dataset.index && !image.dataset.deleting) {
           // Wait 200ms, as the new image can take some time to show on certain browsers (even though it was downloaded before showing). This will prevent flicker, and show some generosity towards slower clients
@@ -14109,35 +13970,30 @@ var PreviewThumbnails = /*#__PURE__*/function () {
           // eslint-disable-next-line no-param-reassign
           image.dataset.deleting = true; // This has to be set before the timeout - to prevent issues switching between hover and scrub
 
-          var currentImageContainer = _this8.currentImageContainer;
+          var currentImageContainer = _this.currentImageContainer;
           setTimeout(function () {
             currentImageContainer.removeChild(image);
 
-            _this8.player.debug.log("Removing thumb: ".concat(image.dataset.filename));
+            _this.player.debug.log("Removing thumb: ".concat(image.dataset.filename));
           }, removeDelay);
         }
       });
-    } // Preload images before and after the current one. Only if the user is still hovering/seeking the same frame
-    // This will only preload the lowest quality
+    });
 
-  }, {
-    key: "preloadNearby",
-    value: function preloadNearby(thumbNum) {
-      var _this9 = this;
-
+    _defineProperty(this, "preloadNearby", function (thumbNum) {
       var forward = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
       return new Promise(function (resolve) {
         setTimeout(function () {
-          var oldThumbFilename = _this9.thumbnails[0].frames[thumbNum].text;
+          var oldThumbFilename = _this.thumbnails[0].frames[thumbNum].text;
 
-          if (_this9.showingThumbFilename === oldThumbFilename) {
+          if (_this.showingThumbFilename === oldThumbFilename) {
             // Find the nearest thumbs with different filenames. Sometimes it'll be the next index, but in the case of sprites, it might be 100+ away
             var thumbnailsClone;
 
             if (forward) {
-              thumbnailsClone = _this9.thumbnails[0].frames.slice(thumbNum);
+              thumbnailsClone = _this.thumbnails[0].frames.slice(thumbNum);
             } else {
-              thumbnailsClone = _this9.thumbnails[0].frames.slice(0, thumbNum).reverse();
+              thumbnailsClone = _this.thumbnails[0].frames.slice(0, thumbNum).reverse();
             }
 
             var foundOne = false;
@@ -14146,20 +14002,20 @@ var PreviewThumbnails = /*#__PURE__*/function () {
 
               if (newThumbFilename !== oldThumbFilename) {
                 // Found one with a different filename. Make sure it hasn't already been loaded on this page visit
-                if (!_this9.loadedImages.includes(newThumbFilename)) {
+                if (!_this.loadedImages.includes(newThumbFilename)) {
                   foundOne = true;
 
-                  _this9.player.debug.log("Preloading thumb filename: ".concat(newThumbFilename));
+                  _this.player.debug.log("Preloading thumb filename: ".concat(newThumbFilename));
 
-                  var urlPrefix = _this9.thumbnails[0].urlPrefix;
+                  var urlPrefix = _this.thumbnails[0].urlPrefix;
                   var thumbURL = urlPrefix + newThumbFilename;
                   var previewImage = new Image();
                   previewImage.src = thumbURL;
 
                   previewImage.onload = function () {
-                    _this9.player.debug.log("Preloaded thumb filename: ".concat(newThumbFilename));
+                    _this.player.debug.log("Preloaded thumb filename: ".concat(newThumbFilename));
 
-                    if (!_this9.loadedImages.includes(newThumbFilename)) _this9.loadedImages.push(newThumbFilename); // We don't resolve until the thumb is loaded
+                    if (!_this.loadedImages.includes(newThumbFilename)) _this.loadedImages.push(newThumbFilename); // We don't resolve until the thumb is loaded
 
                     resolve();
                   };
@@ -14173,97 +14029,91 @@ var PreviewThumbnails = /*#__PURE__*/function () {
           }
         }, 300);
       });
-    } // If user has been hovering current image for half a second, look for a higher quality one
+    });
 
-  }, {
-    key: "getHigherQuality",
-    value: function getHigherQuality(currentQualityIndex, previewImage, frame, thumbFilename) {
-      var _this10 = this;
-
-      if (currentQualityIndex < this.thumbnails.length - 1) {
+    _defineProperty(this, "getHigherQuality", function (currentQualityIndex, previewImage, frame, thumbFilename) {
+      if (currentQualityIndex < _this.thumbnails.length - 1) {
         // Only use the higher quality version if it's going to look any better - if the current thumb is of a lower pixel density than the thumbnail container
         var previewImageHeight = previewImage.naturalHeight;
 
-        if (this.usingSprites) {
+        if (_this.usingSprites) {
           previewImageHeight = frame.h;
         }
 
-        if (previewImageHeight < this.thumbContainerHeight) {
+        if (previewImageHeight < _this.thumbContainerHeight) {
           // Recurse back to the loadImage function - show a higher quality one, but only if the viewer is on this frame for a while
           setTimeout(function () {
             // Make sure the mouse hasn't already moved on and started hovering at another image
-            if (_this10.showingThumbFilename === thumbFilename) {
-              _this10.player.debug.log("Showing higher quality thumb for: ".concat(thumbFilename));
+            if (_this.showingThumbFilename === thumbFilename) {
+              _this.player.debug.log("Showing higher quality thumb for: ".concat(thumbFilename));
 
-              _this10.loadImage(currentQualityIndex + 1);
+              _this.loadImage(currentQualityIndex + 1);
             }
           }, 300);
         }
       }
-    }
-  }, {
-    key: "toggleThumbContainer",
-    value: function toggleThumbContainer() {
+    });
+
+    _defineProperty(this, "toggleThumbContainer", function () {
       var toggle = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
       var clearShowing = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-      var className = this.player.config.classNames.previewThumbnails.thumbContainerShown;
-      this.elements.thumb.container.classList.toggle(className, toggle);
+      var className = _this.player.config.classNames.previewThumbnails.thumbContainerShown;
+
+      _this.elements.thumb.container.classList.toggle(className, toggle);
 
       if (!toggle && clearShowing) {
-        this.showingThumb = null;
-        this.showingThumbFilename = null;
+        _this.showingThumb = null;
+        _this.showingThumbFilename = null;
       }
-    }
-  }, {
-    key: "toggleScrubbingContainer",
-    value: function toggleScrubbingContainer() {
+    });
+
+    _defineProperty(this, "toggleScrubbingContainer", function () {
       var toggle = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-      var className = this.player.config.classNames.previewThumbnails.scrubbingContainerShown;
-      this.elements.scrubbing.container.classList.toggle(className, toggle);
+      var className = _this.player.config.classNames.previewThumbnails.scrubbingContainerShown;
+
+      _this.elements.scrubbing.container.classList.toggle(className, toggle);
 
       if (!toggle) {
-        this.showingThumb = null;
-        this.showingThumbFilename = null;
+        _this.showingThumb = null;
+        _this.showingThumbFilename = null;
       }
-    }
-  }, {
-    key: "determineContainerAutoSizing",
-    value: function determineContainerAutoSizing() {
-      if (this.elements.thumb.imageContainer.clientHeight > 20 || this.elements.thumb.imageContainer.clientWidth > 20) {
+    });
+
+    _defineProperty(this, "determineContainerAutoSizing", function () {
+      if (_this.elements.thumb.imageContainer.clientHeight > 20 || _this.elements.thumb.imageContainer.clientWidth > 20) {
         // This will prevent auto sizing in this.setThumbContainerSizeAndPos()
-        this.sizeSpecifiedInCSS = true;
+        _this.sizeSpecifiedInCSS = true;
       }
-    } // Set the size to be about a quarter of the size of video. Unless option dynamicSize === false, in which case it needs to be set in CSS
+    });
 
-  }, {
-    key: "setThumbContainerSizeAndPos",
-    value: function setThumbContainerSizeAndPos() {
-      if (!this.sizeSpecifiedInCSS) {
-        var thumbWidth = Math.floor(this.thumbContainerHeight * this.thumbAspectRatio);
-        this.elements.thumb.imageContainer.style.height = "".concat(this.thumbContainerHeight, "px");
-        this.elements.thumb.imageContainer.style.width = "".concat(thumbWidth, "px");
-      } else if (this.elements.thumb.imageContainer.clientHeight > 20 && this.elements.thumb.imageContainer.clientWidth < 20) {
-        var _thumbWidth = Math.floor(this.elements.thumb.imageContainer.clientHeight * this.thumbAspectRatio);
+    _defineProperty(this, "setThumbContainerSizeAndPos", function () {
+      if (!_this.sizeSpecifiedInCSS) {
+        var thumbWidth = Math.floor(_this.thumbContainerHeight * _this.thumbAspectRatio);
+        _this.elements.thumb.imageContainer.style.height = "".concat(_this.thumbContainerHeight, "px");
+        _this.elements.thumb.imageContainer.style.width = "".concat(thumbWidth, "px");
+      } else if (_this.elements.thumb.imageContainer.clientHeight > 20 && _this.elements.thumb.imageContainer.clientWidth < 20) {
+        var _thumbWidth = Math.floor(_this.elements.thumb.imageContainer.clientHeight * _this.thumbAspectRatio);
 
-        this.elements.thumb.imageContainer.style.width = "".concat(_thumbWidth, "px");
-      } else if (this.elements.thumb.imageContainer.clientHeight < 20 && this.elements.thumb.imageContainer.clientWidth > 20) {
-        var thumbHeight = Math.floor(this.elements.thumb.imageContainer.clientWidth / this.thumbAspectRatio);
-        this.elements.thumb.imageContainer.style.height = "".concat(thumbHeight, "px");
+        _this.elements.thumb.imageContainer.style.width = "".concat(_thumbWidth, "px");
+      } else if (_this.elements.thumb.imageContainer.clientHeight < 20 && _this.elements.thumb.imageContainer.clientWidth > 20) {
+        var thumbHeight = Math.floor(_this.elements.thumb.imageContainer.clientWidth / _this.thumbAspectRatio);
+        _this.elements.thumb.imageContainer.style.height = "".concat(thumbHeight, "px");
       }
 
-      this.setThumbContainerPos();
-    }
-  }, {
-    key: "setThumbContainerPos",
-    value: function setThumbContainerPos() {
-      var seekbarRect = this.player.elements.progress.getBoundingClientRect();
-      var plyrRect = this.player.elements.container.getBoundingClientRect();
-      var container = this.elements.thumb.container; // Find the lowest and highest desired left-position, so we don't slide out the side of the video container
+      _this.setThumbContainerPos();
+    });
+
+    _defineProperty(this, "setThumbContainerPos", function () {
+      var seekbarRect = _this.player.elements.progress.getBoundingClientRect();
+
+      var plyrRect = _this.player.elements.container.getBoundingClientRect();
+
+      var container = _this.elements.thumb.container; // Find the lowest and highest desired left-position, so we don't slide out the side of the video container
 
       var minVal = plyrRect.left - seekbarRect.left + 10;
       var maxVal = plyrRect.right - seekbarRect.left - container.clientWidth - 10; // Set preview container position to: mousepos, minus seekbar.left, minus half of previewContainer.clientWidth
 
-      var previewPos = this.mousePosX - seekbarRect.left - container.clientWidth / 2;
+      var previewPos = _this.mousePosX - seekbarRect.left - container.clientWidth / 2;
 
       if (previewPos < minVal) {
         previewPos = minVal;
@@ -14274,31 +14124,27 @@ var PreviewThumbnails = /*#__PURE__*/function () {
       }
 
       container.style.left = "".concat(previewPos, "px");
-    } // Can't use 100% width, in case the video is a different aspect ratio to the video container
+    });
 
-  }, {
-    key: "setScrubbingContainerSize",
-    value: function setScrubbingContainerSize() {
-      var _fitRatio = fitRatio(this.thumbAspectRatio, {
-        width: this.player.media.clientWidth,
-        height: this.player.media.clientHeight
+    _defineProperty(this, "setScrubbingContainerSize", function () {
+      var _fitRatio = fitRatio(_this.thumbAspectRatio, {
+        width: _this.player.media.clientWidth,
+        height: _this.player.media.clientHeight
       }),
           width = _fitRatio.width,
           height = _fitRatio.height;
 
-      this.elements.scrubbing.container.style.width = "".concat(width, "px");
-      this.elements.scrubbing.container.style.height = "".concat(height, "px");
-    } // Sprites need to be offset to the correct location
+      _this.elements.scrubbing.container.style.width = "".concat(width, "px");
+      _this.elements.scrubbing.container.style.height = "".concat(height, "px");
+    });
 
-  }, {
-    key: "setImageSizeAndOffset",
-    value: function setImageSizeAndOffset(previewImage, frame) {
-      if (!this.usingSprites) {
+    _defineProperty(this, "setImageSizeAndOffset", function (previewImage, frame) {
+      if (!_this.usingSprites) {
         return;
       } // Find difference between height and preview container height
 
 
-      var multiplier = this.thumbContainerHeight / frame.h; // eslint-disable-next-line no-param-reassign
+      var multiplier = _this.thumbContainerHeight / frame.h; // eslint-disable-next-line no-param-reassign
 
       previewImage.style.height = "".concat(previewImage.naturalHeight * multiplier, "px"); // eslint-disable-next-line no-param-reassign
 
@@ -14307,8 +14153,22 @@ var PreviewThumbnails = /*#__PURE__*/function () {
       previewImage.style.left = "-".concat(frame.x * multiplier, "px"); // eslint-disable-next-line no-param-reassign
 
       previewImage.style.top = "-".concat(frame.y * multiplier, "px");
-    }
-  }, {
+    });
+
+    this.player = player;
+    this.thumbnails = [];
+    this.loaded = false;
+    this.lastMouseMoveTime = Date.now();
+    this.mouseDown = false;
+    this.loadedImages = [];
+    this.elements = {
+      thumb: {},
+      scrubbing: {}
+    };
+    this.load();
+  }
+
+  _createClass(PreviewThumbnails, [{
     key: "enabled",
     get: function get() {
       return this.player.isHTML5 && this.player.isVideo && this.player.config.previewThumbnails.enabled;
@@ -14554,6 +14414,214 @@ var Plyr = /*#__PURE__*/function () {
 
     _classCallCheck(this, Plyr);
 
+    _defineProperty(this, "play", function () {
+      if (!is$1.function(_this.media.play)) {
+        return null;
+      } // Intecept play with ads
+
+
+      if (_this.ads && _this.ads.enabled) {
+        _this.ads.managerPromise.then(function () {
+          return _this.ads.play();
+        }).catch(function () {
+          return silencePromise(_this.media.play());
+        });
+      } // Return the promise (for HTML5)
+
+
+      return _this.media.play();
+    });
+
+    _defineProperty(this, "pause", function () {
+      if (!_this.playing || !is$1.function(_this.media.pause)) {
+        return null;
+      }
+
+      return _this.media.pause();
+    });
+
+    _defineProperty(this, "togglePlay", function (input) {
+      // Toggle based on current state if nothing passed
+      var toggle = is$1.boolean(input) ? input : !_this.playing;
+
+      if (toggle) {
+        return _this.play();
+      }
+
+      return _this.pause();
+    });
+
+    _defineProperty(this, "stop", function () {
+      if (_this.isHTML5) {
+        _this.pause();
+
+        _this.restart();
+      } else if (is$1.function(_this.media.stop)) {
+        _this.media.stop();
+      }
+    });
+
+    _defineProperty(this, "restart", function () {
+      _this.currentTime = 0;
+    });
+
+    _defineProperty(this, "rewind", function (seekTime) {
+      _this.currentTime -= is$1.number(seekTime) ? seekTime : _this.config.seekTime;
+    });
+
+    _defineProperty(this, "forward", function (seekTime) {
+      _this.currentTime += is$1.number(seekTime) ? seekTime : _this.config.seekTime;
+    });
+
+    _defineProperty(this, "increaseVolume", function (step) {
+      var volume = _this.media.muted ? 0 : _this.volume;
+      _this.volume = volume + (is$1.number(step) ? step : 0);
+    });
+
+    _defineProperty(this, "decreaseVolume", function (step) {
+      _this.increaseVolume(-step);
+    });
+
+    _defineProperty(this, "airplay", function () {
+      // Show dialog if supported
+      if (support.airplay) {
+        _this.media.webkitShowPlaybackTargetPicker();
+      }
+    });
+
+    _defineProperty(this, "toggleControls", function (toggle) {
+      // Don't toggle if missing UI support or if it's audio
+      if (_this.supported.ui && !_this.isAudio) {
+        // Get state before change
+        var isHidden = hasClass(_this.elements.container, _this.config.classNames.hideControls); // Negate the argument if not undefined since adding the class to hides the controls
+
+        var force = typeof toggle === 'undefined' ? undefined : !toggle; // Apply and get updated state
+
+        var hiding = toggleClass(_this.elements.container, _this.config.classNames.hideControls, force); // Close menu
+
+        if (hiding && is$1.array(_this.config.controls) && _this.config.controls.includes('settings') && !is$1.empty(_this.config.settings)) {
+          controls.toggleMenu.call(_this, false);
+        } // Trigger event on change
+
+
+        if (hiding !== isHidden) {
+          var eventName = hiding ? 'controlshidden' : 'controlsshown';
+          triggerEvent.call(_this, _this.media, eventName);
+        }
+
+        return !hiding;
+      }
+
+      return false;
+    });
+
+    _defineProperty(this, "on", function (event, callback) {
+      on.call(_this, _this.elements.container, event, callback);
+    });
+
+    _defineProperty(this, "once", function (event, callback) {
+      once.call(_this, _this.elements.container, event, callback);
+    });
+
+    _defineProperty(this, "off", function (event, callback) {
+      off(_this.elements.container, event, callback);
+    });
+
+    _defineProperty(this, "destroy", function (callback) {
+      var soft = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+      if (!_this.ready) {
+        return;
+      }
+
+      var done = function done() {
+        // Reset overflow (incase destroyed while in fullscreen)
+        document.body.style.overflow = ''; // GC for embed
+
+        _this.embed = null; // If it's a soft destroy, make minimal changes
+
+        if (soft) {
+          if (Object.keys(_this.elements).length) {
+            // Remove elements
+            removeElement(_this.elements.buttons.play);
+            removeElement(_this.elements.captions);
+            removeElement(_this.elements.controls);
+            removeElement(_this.elements.wrapper); // Clear for GC
+
+            _this.elements.buttons.play = null;
+            _this.elements.captions = null;
+            _this.elements.controls = null;
+            _this.elements.wrapper = null;
+          } // Callback
+
+
+          if (is$1.function(callback)) {
+            callback();
+          }
+        } else {
+          // Unbind listeners
+          unbindListeners.call(_this); // Cancel current network requests
+
+          html5.cancelRequests.call(_this); // Replace the container with the original element provided
+
+          replaceElement(_this.elements.original, _this.elements.container); // Event
+
+          triggerEvent.call(_this, _this.elements.original, 'destroyed', true); // Callback
+
+          if (is$1.function(callback)) {
+            callback.call(_this.elements.original);
+          } // Reset state
+
+
+          _this.ready = false; // Clear for garbage collection
+
+          setTimeout(function () {
+            _this.elements = null;
+            _this.media = null;
+          }, 200);
+        }
+      }; // Stop playback
+
+
+      _this.stop(); // Clear timeouts
+
+
+      clearTimeout(_this.timers.loading);
+      clearTimeout(_this.timers.controls);
+      clearTimeout(_this.timers.resized); // Provider specific stuff
+
+      if (_this.isHTML5) {
+        // Restore native video controls
+        ui.toggleNativeControls.call(_this, true); // Clean up
+
+        done();
+      } else if (_this.isYouTube) {
+        // Clear timers
+        clearInterval(_this.timers.buffering);
+        clearInterval(_this.timers.playing); // Destroy YouTube API
+
+        if (_this.embed !== null && is$1.function(_this.embed.destroy)) {
+          _this.embed.destroy();
+        } // Clean up
+
+
+        done();
+      } else if (_this.isVimeo) {
+        // Destroy Vimeo API
+        // then clean up (wait, to prevent postmessage errors)
+        if (_this.embed !== null) {
+          _this.embed.unload().then(done);
+        } // Vimeo does not always return
+
+
+        setTimeout(done, 200);
+      }
+    });
+
+    _defineProperty(this, "supports", function (type) {
+      return support.mime.call(_this, type);
+    });
+
     this.timers = {}; // State
 
     this.ready = false;
@@ -14650,12 +14718,13 @@ var Plyr = /*#__PURE__*/function () {
     this.elements.original = clone; // Set media type based on tag or data attribute
     // Supported: video, audio, vimeo, youtube
 
-    var type = this.media.tagName.toLowerCase(); // Embed properties
+    var _type = this.media.tagName.toLowerCase(); // Embed properties
+
 
     var iframe = null;
     var url = null; // Different setup based on type
 
-    switch (type) {
+    switch (_type) {
       case 'div':
         // Find the frame
         iframe = this.media.querySelector('iframe'); // <iframe> type
@@ -14698,7 +14767,7 @@ var Plyr = /*#__PURE__*/function () {
         } // Unsupported or missing provider
 
 
-        if (is$1.empty(this.provider) || !Object.keys(providers).includes(this.provider)) {
+        if (is$1.empty(this.provider) || !Object.values(providers).includes(this.provider)) {
           this.debug.error('Setup failed: Invalid provider');
           return;
         } // Audio will come later for external providers
@@ -14709,7 +14778,7 @@ var Plyr = /*#__PURE__*/function () {
 
       case 'video':
       case 'audio':
-        this.type = type;
+        this.type = _type;
         this.provider = providers.html5; // Get config from attributes
 
         if (this.media.hasAttribute('crossorigin')) {
@@ -14815,139 +14884,6 @@ var Plyr = /*#__PURE__*/function () {
 
 
   _createClass(Plyr, [{
-    key: "play",
-
-    /**
-     * Play the media, or play the advertisement (if they are not blocked)
-     */
-    value: function play() {
-      var _this2 = this;
-
-      if (!is$1.function(this.media.play)) {
-        return null;
-      } // Intecept play with ads
-
-
-      if (this.ads && this.ads.enabled) {
-        this.ads.managerPromise.then(function () {
-          return _this2.ads.play();
-        }).catch(function () {
-          return silencePromise(_this2.media.play());
-        });
-      } // Return the promise (for HTML5)
-
-
-      return this.media.play();
-    }
-    /**
-     * Pause the media
-     */
-
-  }, {
-    key: "pause",
-    value: function pause() {
-      if (!this.playing || !is$1.function(this.media.pause)) {
-        return null;
-      }
-
-      return this.media.pause();
-    }
-    /**
-     * Get playing state
-     */
-
-  }, {
-    key: "togglePlay",
-
-    /**
-     * Toggle playback based on current status
-     * @param {Boolean} input
-     */
-    value: function togglePlay(input) {
-      // Toggle based on current state if nothing passed
-      var toggle = is$1.boolean(input) ? input : !this.playing;
-
-      if (toggle) {
-        return this.play();
-      }
-
-      return this.pause();
-    }
-    /**
-     * Stop playback
-     */
-
-  }, {
-    key: "stop",
-    value: function stop() {
-      if (this.isHTML5) {
-        this.pause();
-        this.restart();
-      } else if (is$1.function(this.media.stop)) {
-        this.media.stop();
-      }
-    }
-    /**
-     * Restart playback
-     */
-
-  }, {
-    key: "restart",
-    value: function restart() {
-      this.currentTime = 0;
-    }
-    /**
-     * Rewind
-     * @param {Number} seekTime - how far to rewind in seconds. Defaults to the config.seekTime
-     */
-
-  }, {
-    key: "rewind",
-    value: function rewind(seekTime) {
-      this.currentTime -= is$1.number(seekTime) ? seekTime : this.config.seekTime;
-    }
-    /**
-     * Fast forward
-     * @param {Number} seekTime - how far to fast forward in seconds. Defaults to the config.seekTime
-     */
-
-  }, {
-    key: "forward",
-    value: function forward(seekTime) {
-      this.currentTime += is$1.number(seekTime) ? seekTime : this.config.seekTime;
-    }
-    /**
-     * Seek to a time
-     * @param {Number} input - where to seek to in seconds. Defaults to 0 (the start)
-     */
-
-  }, {
-    key: "increaseVolume",
-
-    /**
-     * Increase volume
-     * @param {Boolean} step - How much to decrease by (between 0 and 1)
-     */
-    value: function increaseVolume(step) {
-      var volume = this.media.muted ? 0 : this.volume;
-      this.volume = volume + (is$1.number(step) ? step : 0);
-    }
-    /**
-     * Decrease volume
-     * @param {Boolean} step - How much to decrease by (between 0 and 1)
-     */
-
-  }, {
-    key: "decreaseVolume",
-    value: function decreaseVolume(step) {
-      this.increaseVolume(-step);
-    }
-    /**
-     * Set muted state
-     * @param {Boolean} mute
-     */
-
-  }, {
     key: "toggleCaptions",
 
     /**
@@ -14960,202 +14896,6 @@ var Plyr = /*#__PURE__*/function () {
     /**
      * Set the caption track by index
      * @param {Number} - Caption index
-     */
-
-  }, {
-    key: "airplay",
-
-    /**
-     * Trigger the airplay dialog
-     * TODO: update player with state, support, enabled
-     */
-    value: function airplay() {
-      // Show dialog if supported
-      if (support.airplay) {
-        this.media.webkitShowPlaybackTargetPicker();
-      }
-    }
-    /**
-     * Toggle the player controls
-     * @param {Boolean} [toggle] - Whether to show the controls
-     */
-
-  }, {
-    key: "toggleControls",
-    value: function toggleControls(toggle) {
-      // Don't toggle if missing UI support or if it's audio
-      if (this.supported.ui && !this.isAudio) {
-        // Get state before change
-        var isHidden = hasClass(this.elements.container, this.config.classNames.hideControls); // Negate the argument if not undefined since adding the class to hides the controls
-
-        var force = typeof toggle === 'undefined' ? undefined : !toggle; // Apply and get updated state
-
-        var hiding = toggleClass(this.elements.container, this.config.classNames.hideControls, force); // Close menu
-
-        if (hiding && is$1.array(this.config.controls) && this.config.controls.includes('settings') && !is$1.empty(this.config.settings)) {
-          controls.toggleMenu.call(this, false);
-        } // Trigger event on change
-
-
-        if (hiding !== isHidden) {
-          var eventName = hiding ? 'controlshidden' : 'controlsshown';
-          triggerEvent.call(this, this.media, eventName);
-        }
-
-        return !hiding;
-      }
-
-      return false;
-    }
-    /**
-     * Add event listeners
-     * @param {String} event - Event type
-     * @param {Function} callback - Callback for when event occurs
-     */
-
-  }, {
-    key: "on",
-    value: function on$1(event, callback) {
-      on.call(this, this.elements.container, event, callback);
-    }
-    /**
-     * Add event listeners once
-     * @param {String} event - Event type
-     * @param {Function} callback - Callback for when event occurs
-     */
-
-  }, {
-    key: "once",
-    value: function once$1(event, callback) {
-      once.call(this, this.elements.container, event, callback);
-    }
-    /**
-     * Remove event listeners
-     * @param {String} event - Event type
-     * @param {Function} callback - Callback for when event occurs
-     */
-
-  }, {
-    key: "off",
-    value: function off$1(event, callback) {
-      off(this.elements.container, event, callback);
-    }
-    /**
-     * Destroy an instance
-     * Event listeners are removed when elements are removed
-     * http://stackoverflow.com/questions/12528049/if-a-dom-element-is-removed-are-its-listeners-also-removed-from-memory
-     * @param {Function} callback - Callback for when destroy is complete
-     * @param {Boolean} soft - Whether it's a soft destroy (for source changes etc)
-     */
-
-  }, {
-    key: "destroy",
-    value: function destroy(callback) {
-      var _this3 = this;
-
-      var soft = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
-      if (!this.ready) {
-        return;
-      }
-
-      var done = function done() {
-        // Reset overflow (incase destroyed while in fullscreen)
-        document.body.style.overflow = ''; // GC for embed
-
-        _this3.embed = null; // If it's a soft destroy, make minimal changes
-
-        if (soft) {
-          if (Object.keys(_this3.elements).length) {
-            // Remove elements
-            removeElement(_this3.elements.buttons.play);
-            removeElement(_this3.elements.captions);
-            removeElement(_this3.elements.controls);
-            removeElement(_this3.elements.wrapper); // Clear for GC
-
-            _this3.elements.buttons.play = null;
-            _this3.elements.captions = null;
-            _this3.elements.controls = null;
-            _this3.elements.wrapper = null;
-          } // Callback
-
-
-          if (is$1.function(callback)) {
-            callback();
-          }
-        } else {
-          // Unbind listeners
-          unbindListeners.call(_this3); // Cancel current network requests
-
-          html5.cancelRequests.call(_this3); // Replace the container with the original element provided
-
-          replaceElement(_this3.elements.original, _this3.elements.container); // Event
-
-          triggerEvent.call(_this3, _this3.elements.original, 'destroyed', true); // Callback
-
-          if (is$1.function(callback)) {
-            callback.call(_this3.elements.original);
-          } // Reset state
-
-
-          _this3.ready = false; // Clear for garbage collection
-
-          setTimeout(function () {
-            _this3.elements = null;
-            _this3.media = null;
-          }, 200);
-        }
-      }; // Stop playback
-
-
-      this.stop(); // Clear timeouts
-
-      clearTimeout(this.timers.loading);
-      clearTimeout(this.timers.controls);
-      clearTimeout(this.timers.resized); // Provider specific stuff
-
-      if (this.isHTML5) {
-        // Restore native video controls
-        ui.toggleNativeControls.call(this, true); // Clean up
-
-        done();
-      } else if (this.isYouTube) {
-        // Clear timers
-        clearInterval(this.timers.buffering);
-        clearInterval(this.timers.playing); // Destroy YouTube API
-
-        if (this.embed !== null && is$1.function(this.embed.destroy)) {
-          this.embed.destroy();
-        } // Clean up
-
-
-        done();
-      } else if (this.isVimeo) {
-        // Destroy Vimeo API
-        // then clean up (wait, to prevent postmessage errors)
-        if (this.embed !== null) {
-          this.embed.unload().then(done);
-        } // Vimeo does not always return
-
-
-        setTimeout(done, 200);
-      }
-    }
-    /**
-     * Check for support for a mime type (HTML5 only)
-     * @param {String} type - Mime type
-     */
-
-  }, {
-    key: "supports",
-    value: function supports(type) {
-      return support.mime.call(this, type);
-    }
-    /**
-     * Check for support
-     * @param {String} type - Player type (audio/video)
-     * @param {String} provider - Provider (html5/youtube/vimeo)
-     * @param {Boolean} inline - Where player has `playsinline` sttribute
      */
 
   }, {
@@ -15188,8 +14928,16 @@ var Plyr = /*#__PURE__*/function () {
     get: function get() {
       return this.type === types.audio;
     }
+    /**
+     * Play the media, or play the advertisement (if they are not blocked)
+     */
+
   }, {
     key: "playing",
+
+    /**
+     * Get playing state
+     */
     get: function get() {
       return Boolean(this.ready && !this.paused && !this.ended);
     }
@@ -15220,8 +14968,18 @@ var Plyr = /*#__PURE__*/function () {
     get: function get() {
       return Boolean(this.media.ended);
     }
+    /**
+     * Toggle playback based on current status
+     * @param {Boolean} input
+     */
+
   }, {
     key: "currentTime",
+
+    /**
+     * Seek to a time
+     * @param {Number} input - where to seek to in seconds. Defaults to 0 (the start)
+     */
     set: function set(input) {
       // Bail if media duration isn't available yet
       if (!this.duration) {
@@ -15340,8 +15098,18 @@ var Plyr = /*#__PURE__*/function () {
     get: function get() {
       return Number(this.media.volume);
     }
+    /**
+     * Increase volume
+     * @param {Boolean} step - How much to decrease by (between 0 and 1)
+     */
+
   }, {
     key: "muted",
+
+    /**
+     * Set muted state
+     * @param {Boolean} mute
+     */
     set: function set(mute) {
       var toggle = mute; // Load muted state from storage
 
@@ -15393,7 +15161,7 @@ var Plyr = /*#__PURE__*/function () {
   }, {
     key: "speed",
     set: function set(input) {
-      var _this4 = this;
+      var _this2 = this;
 
       var speed = null;
 
@@ -15417,7 +15185,7 @@ var Plyr = /*#__PURE__*/function () {
       this.config.speed.selected = speed; // Set media speed
 
       setTimeout(function () {
-        _this4.media.playbackRate = speed;
+        _this2.media.playbackRate = speed;
       }, 0);
     }
     /**
@@ -15765,8 +15533,20 @@ var Plyr = /*#__PURE__*/function () {
 
       return this.media === document.pictureInPictureElement;
     }
+    /**
+     * Trigger the airplay dialog
+     * TODO: update player with state, support, enabled
+     */
+
   }], [{
     key: "supported",
+
+    /**
+     * Check for support
+     * @param {String} type - Player type (audio/video)
+     * @param {String} provider - Provider (html5/youtube/vimeo)
+     * @param {Boolean} inline - Where player has `playsinline` sttribute
+     */
     value: function supported(type, provider, inline) {
       return support.check(type, provider, inline);
     }
