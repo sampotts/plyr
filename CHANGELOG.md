@@ -1,3 +1,16 @@
+### v3.6.4
+
+- Remove unnecessary calc from media query (thanks @naomiaz)
+- Enhance types (thanks @lunika)
+- Fix: Object.values for the providers must be used (thanks @syteknet-core)
+- Fix: Improve support inside iframes (thanks @ajgagnon)
+- Added --plyr-video-background for having control over the background of a video with alpha channel (webm) or a poster image with alpha channel (thanks @nepomuc)
+- Fix issue with not entering iosfullscreen of vimeo videos with playsinline=true (thanks @lordon and @Frosch)
+- fix: use new syntax for iframe allow attribute
+- chore: package updates
+- chore: add @babel/plugin-proposal-class-properties
+- fix: use bound arrow functions in classes
+
 ### v3.6.3
 
 - Fix volume when unmuting from volume 0 using YouTube (thanks @stephanefbouchard)

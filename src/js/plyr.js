@@ -206,7 +206,7 @@ class Plyr {
         }
 
         // Unsupported or missing provider
-        if (is.empty(this.provider) || !Object.keys(providers).includes(this.provider)) {
+        if (is.empty(this.provider) || !Object.values(providers).includes(this.provider)) {
           this.debug.error('Setup failed: Invalid provider');
           return;
         }

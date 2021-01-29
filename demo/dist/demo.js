@@ -4665,7 +4665,7 @@ typeof navigator === "object" && (function () {
 	  var checkIfURLSearchParamsSupported = function checkIfURLSearchParamsSupported() {
 	    try {
 	      var URLSearchParams = global.URLSearchParams;
-	      return new URLSearchParams('?a=1').toString() === 'a=1' && typeof URLSearchParams.prototype.set === 'function';
+	      return new URLSearchParams('?a=1').toString() === 'a=1' && typeof URLSearchParams.prototype.set === 'function' && typeof URLSearchParams.prototype.entries === 'function';
 	    } catch (e) {
 	      return false;
 	    }
@@ -4789,7 +4789,11 @@ typeof navigator === "object" && (function () {
 	        anchorElement.href = anchorElement.href; // force href to refresh
 	      }
 
-	      if (anchorElement.protocol === ':' || !/:/.test(anchorElement.href)) {
+	      var inputElement = doc.createElement('input');
+	      inputElement.type = 'url';
+	      inputElement.value = url;
+
+	      if (anchorElement.protocol === ':' || !/:/.test(anchorElement.href) || !inputElement.checkValidity() && !base) {
 	        throw new TypeError('Invalid URL');
 	      }
 
@@ -5769,6 +5773,7 @@ typeof navigator === "object" && (function () {
 	}
 
 	/** JSDoc */
+	// eslint-disable-next-line import/export
 	var Severity;
 
 	(function (Severity) {
@@ -5792,8 +5797,7 @@ typeof navigator === "object" && (function () {
 	  /** JSDoc */
 
 	  Severity["Critical"] = "critical";
-	})(Severity || (Severity = {})); // tslint:disable:completed-docs
-	// tslint:disable:no-unnecessary-qualifier no-namespace
+	})(Severity || (Severity = {})); // eslint-disable-next-line @typescript-eslint/no-namespace, import/export
 
 
 	(function (Severity) {
@@ -5834,6 +5838,7 @@ typeof navigator === "object" && (function () {
 	})(Severity || (Severity = {}));
 
 	/** The status of an event. */
+	// eslint-disable-next-line import/export
 	var Status;
 
 	(function (Status) {
@@ -5854,8 +5859,7 @@ typeof navigator === "object" && (function () {
 	  /** A server-side error ocurred during submission. */
 
 	  Status["Failed"] = "failed";
-	})(Status || (Status = {})); // tslint:disable:completed-docs
-	// tslint:disable:no-unnecessary-qualifier no-namespace
+	})(Status || (Status = {})); // eslint-disable-next-line @typescript-eslint/no-namespace, import/export
 
 
 	(function (Status) {
@@ -5912,26 +5916,28 @@ typeof navigator === "object" && (function () {
 
 	var setPrototypeOf = Object.setPrototypeOf || ({
 	  __proto__: []
-	} instanceof Array ? setProtoOf : mixinProperties); // tslint:disable-line:no-unbound-method
-
+	} instanceof Array ? setProtoOf : mixinProperties);
 	/**
 	 * setPrototypeOf polyfill using __proto__
 	 */
+	// eslint-disable-next-line @typescript-eslint/ban-types
 
 	function setProtoOf(obj, proto) {
-	  // @ts-ignore
+	  // @ts-ignore __proto__ does not exist on obj
 	  obj.__proto__ = proto;
 	  return obj;
 	}
 	/**
 	 * setPrototypeOf polyfill using mixin
 	 */
+	// eslint-disable-next-line @typescript-eslint/ban-types
 
 
 	function mixinProperties(obj, proto) {
 	  for (var prop in proto) {
+	    // eslint-disable-next-line no-prototype-builtins
 	    if (!obj.hasOwnProperty(prop)) {
-	      // @ts-ignore
+	      // @ts-ignore typescript complains about indexing so we remove
 	      obj[prop] = proto[prop];
 	    }
 	  }
@@ -5951,8 +5957,7 @@ typeof navigator === "object" && (function () {
 
 	    var _this = _super.call(this, message) || this;
 
-	    _this.message = message; // tslint:disable:no-unsafe-any
-
+	    _this.message = message;
 	    _this.name = _newTarget.prototype.constructor.name;
 	    setPrototypeOf(_this, _newTarget.prototype);
 	    return _this;
@@ -5960,6 +5965,10 @@ typeof navigator === "object" && (function () {
 
 	  return SentryError;
 	}(Error);
+
+	/* eslint-disable @typescript-eslint/no-explicit-any */
+
+	/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
 	/**
 	 * Checks whether given value's type is one of a few Error or Error-like
@@ -6058,7 +6067,6 @@ typeof navigator === "object" && (function () {
 	 */
 
 	function isEvent(wat) {
-	  // tslint:disable-next-line:strict-type-predicates
 	  return typeof Event !== 'undefined' && isInstanceOf(wat, Event);
 	}
 	/**
@@ -6070,7 +6078,6 @@ typeof navigator === "object" && (function () {
 	 */
 
 	function isElement(wat) {
-	  // tslint:disable-next-line:strict-type-predicates
 	  return typeof Element !== 'undefined' && isInstanceOf(wat, Element);
 	}
 	/**
@@ -6090,8 +6097,8 @@ typeof navigator === "object" && (function () {
 	 */
 
 	function isThenable$1(wat) {
-	  // tslint:disable:no-unsafe-any
-	  return Boolean(wat && wat.then && typeof wat.then === 'function'); // tslint:enable:no-unsafe-any
+	  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+	  return Boolean(wat && wat.then && typeof wat.then === 'function');
 	}
 	/**
 	 * Checks whether given value's type is a SyntheticEvent
@@ -6102,7 +6109,6 @@ typeof navigator === "object" && (function () {
 	 */
 
 	function isSyntheticEvent(wat) {
-	  // tslint:disable-next-line:no-unsafe-any
 	  return isPlainObject(wat) && 'nativeEvent' in wat && 'preventDefault' in wat && 'stopPropagation' in wat;
 	}
 	/**
@@ -6116,7 +6122,6 @@ typeof navigator === "object" && (function () {
 
 	function isInstanceOf(wat, base) {
 	  try {
-	    // tslint:disable-next-line:no-unsafe-any
 	    return wat instanceof base;
 	  } catch (_e) {
 	    return false;
@@ -7370,8 +7375,7 @@ typeof navigator === "object" && (function () {
 	function truncate(str, max) {
 	  if (max === void 0) {
 	    max = 0;
-	  } // tslint:disable-next-line:strict-type-predicates
-
+	  }
 
 	  if (typeof str !== 'string' || max === 0) {
 	    return str;
@@ -7385,13 +7389,14 @@ typeof navigator === "object" && (function () {
 	 * @param delimiter string to be placed in-between values
 	 * @returns Joined values
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 
 	function safeJoin(input, delimiter) {
 	  if (!Array.isArray(input)) {
 	    return '';
 	  }
 
-	  var output = []; // tslint:disable-next-line:prefer-for-of
+	  var output = []; // eslint-disable-next-line @typescript-eslint/prefer-for-of
 
 	  for (var i = 0; i < input.length; i++) {
 	    var value = input[i];
@@ -7432,9 +7437,10 @@ typeof navigator === "object" && (function () {
 	 *
 	 * @param request The module path to resolve
 	 */
+	// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 
 	function dynamicRequire(mod, request) {
-	  // tslint:disable-next-line: no-unsafe-any
+	  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 	  return mod.require(request);
 	}
 	/**
@@ -7444,7 +7450,6 @@ typeof navigator === "object" && (function () {
 	 */
 
 	function isNodeEnv() {
-	  // tslint:disable:strict-type-predicates
 	  return Object.prototype.toString.call(typeof process !== 'undefined' ? process : 0) === '[object process]';
 	}
 	var fallbackGlobalObject = {};
@@ -7471,10 +7476,10 @@ typeof navigator === "object" && (function () {
 	    // Use window.crypto API if available
 	    var arr = new Uint16Array(8);
 	    crypto.getRandomValues(arr); // set 4 in byte 7
-	    // tslint:disable-next-line:no-bitwise
+	    // eslint-disable-next-line no-bitwise
 
 	    arr[3] = arr[3] & 0xfff | 0x4000; // set 2 most significant bits of byte 9 to '10'
-	    // tslint:disable-next-line:no-bitwise
+	    // eslint-disable-next-line no-bitwise
 
 	    arr[4] = arr[4] & 0x3fff | 0x8000;
 
@@ -7493,8 +7498,8 @@ typeof navigator === "object" && (function () {
 
 
 	  return 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-	    // tslint:disable-next-line:no-bitwise
-	    var r = Math.random() * 16 | 0; // tslint:disable-next-line:no-bitwise
+	    // eslint-disable-next-line no-bitwise
+	    var r = Math.random() * 16 | 0; // eslint-disable-next-line no-bitwise
 
 	    var v = c === 'x' ? r : r & 0x3 | 0x8;
 	    return v.toString(16);
@@ -7513,7 +7518,7 @@ typeof navigator === "object" && (function () {
 	    return {};
 	  }
 
-	  var match = url.match(/^(([^:\/?#]+):)?(\/\/([^\/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?$/);
+	  var match = url.match(/^(([^:/?#]+):)?(\/\/([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?$/);
 
 	  if (!match) {
 	    return {};
@@ -7607,11 +7612,12 @@ typeof navigator === "object" && (function () {
 
 
 	  try {
-	    // @ts-ignore
-	    // tslint:disable:no-non-null-assertion
+	    // @ts-ignore Type 'Mechanism | {}' is not assignable to type 'Mechanism | undefined'
+	    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 	    event.exception.values[0].mechanism = event.exception.values[0].mechanism || {};
 	    Object.keys(mechanism).forEach(function (key) {
-	      // @ts-ignore
+	      // @ts-ignore Mechanism has no index signature
+	      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 	      event.exception.values[0].mechanism[key] = mechanism[key];
 	    });
 	  } catch (_oO) {// no-empty
@@ -7649,7 +7655,7 @@ typeof navigator === "object" && (function () {
 	    var len = 0;
 	    var separator = ' > ';
 	    var sepLength = separator.length;
-	    var nextStr = void 0;
+	    var nextStr = void 0; // eslint-disable-next-line no-plusplus
 
 	    while (currentElem && height++ < MAX_TRAVERSE_HEIGHT) {
 	      nextStr = _htmlElementAsString(currentElem); // bail out if
@@ -7694,7 +7700,8 @@ typeof navigator === "object" && (function () {
 
 	  if (elem.id) {
 	    out.push("#" + elem.id);
-	  }
+	  } // eslint-disable-next-line prefer-const
+
 
 	  className = elem.className;
 
@@ -7706,10 +7713,10 @@ typeof navigator === "object" && (function () {
 	    }
 	  }
 
-	  var attrWhitelist = ['type', 'name', 'title', 'alt'];
+	  var allowedAttrs = ['type', 'name', 'title', 'alt'];
 
-	  for (i = 0; i < attrWhitelist.length; i++) {
-	    key = attrWhitelist[i];
+	  for (i = 0; i < allowedAttrs.length; i++) {
+	    key = allowedAttrs[i];
 	    attr = elem.getAttribute(key);
 
 	    if (attr) {
@@ -7745,22 +7752,25 @@ typeof navigator === "object" && (function () {
 	    }
 	  }
 
-	  if (getGlobalObject().performance) {
-	    // Polyfill for performance.timeOrigin.
-	    //
-	    // While performance.timing.navigationStart is deprecated in favor of performance.timeOrigin, performance.timeOrigin
-	    // is not as widely supported. Namely, performance.timeOrigin is undefined in Safari as of writing.
-	    // tslint:disable-next-line:strict-type-predicates
-	    if (performance.timeOrigin === undefined) {
-	      // As of writing, performance.timing is not available in Web Workers in mainstream browsers, so it is not always a
-	      // valid fallback. In the absence of a initial time provided by the browser, fallback to INITIAL_TIME.
-	      // @ts-ignore
-	      // tslint:disable-next-line:deprecation
-	      performance.timeOrigin = performance.timing && performance.timing.navigationStart || INITIAL_TIME;
-	    }
+	  var performance = getGlobalObject().performance;
+
+	  if (!performance || !performance.now) {
+	    return performanceFallback;
+	  } // Polyfill for performance.timeOrigin.
+	  //
+	  // While performance.timing.navigationStart is deprecated in favor of performance.timeOrigin, performance.timeOrigin
+	  // is not as widely supported. Namely, performance.timeOrigin is undefined in Safari as of writing.
+
+
+	  if (performance.timeOrigin === undefined) {
+	    // As of writing, performance.timing is not available in Web Workers in mainstream browsers, so it is not always a
+	    // valid fallback. In the absence of a initial time provided by the browser, fallback to INITIAL_TIME.
+	    // @ts-ignore ignored because timeOrigin is a readonly property but we want to override
+	    // eslint-disable-next-line deprecation/deprecation
+	    performance.timeOrigin = performance.timing && performance.timing.navigationStart || INITIAL_TIME;
 	  }
 
-	  return getGlobalObject().performance || performanceFallback;
+	  return performance;
 	}();
 	/**
 	 * Returns a timestamp in seconds with milliseconds precision since the UNIX epoch calculated with the monotonic clock.
@@ -7855,7 +7865,7 @@ typeof navigator === "object" && (function () {
 	    }
 
 	    consoleSandbox(function () {
-	      global$1.console.log(PREFIX + "[Log]: " + args.join(' ')); // tslint:disable-line:no-console
+	      global$1.console.log(PREFIX + "[Log]: " + args.join(' '));
 	    });
 	  };
 	  /** JSDoc */
@@ -7873,7 +7883,7 @@ typeof navigator === "object" && (function () {
 	    }
 
 	    consoleSandbox(function () {
-	      global$1.console.warn(PREFIX + "[Warn]: " + args.join(' ')); // tslint:disable-line:no-console
+	      global$1.console.warn(PREFIX + "[Warn]: " + args.join(' '));
 	    });
 	  };
 	  /** JSDoc */
@@ -7891,7 +7901,7 @@ typeof navigator === "object" && (function () {
 	    }
 
 	    consoleSandbox(function () {
-	      global$1.console.error(PREFIX + "[Error]: " + args.join(' ')); // tslint:disable-line:no-console
+	      global$1.console.error(PREFIX + "[Error]: " + args.join(' '));
 	    });
 	  };
 
@@ -8243,7 +8253,11 @@ typeof navigator === "object" && (function () {
 	  return function WeakSet() { return init(this, arguments.length ? arguments[0] : undefined); };
 	}, collectionWeak);
 
-	// tslint:disable:no-unsafe-any
+	/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+
+	/* eslint-disable @typescript-eslint/no-explicit-any */
+
+	/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 
 	/**
 	 * Memo class used for decycle json objects. Uses WeakSet if available otherwise array.
@@ -8252,7 +8266,6 @@ typeof navigator === "object" && (function () {
 	/** @class */
 	function () {
 	  function Memo() {
-	    // tslint:disable-next-line
 	    this._hasWeakSet = typeof WeakSet === 'function';
 	    this._inner = this._hasWeakSet ? new WeakSet() : [];
 	  }
@@ -8271,7 +8284,7 @@ typeof navigator === "object" && (function () {
 	      this._inner.add(obj);
 
 	      return false;
-	    } // tslint:disable-next-line:prefer-for-of
+	    } // eslint-disable-next-line @typescript-eslint/prefer-for-of
 
 
 	    for (var i = 0; i < this._inner.length; i++) {
@@ -8334,7 +8347,6 @@ typeof navigator === "object" && (function () {
 	  var original = source[name];
 	  var wrapped = replacement(original); // Make sure it's a function first, as we need to attach an empty prototype for `defineProperties` to work
 	  // otherwise it'll throw "TypeError: Object.defineProperties called on non-object"
-	  // tslint:disable-next-line:strict-type-predicates
 
 	  if (typeof wrapped === 'function') {
 	    try {
@@ -8360,8 +8372,7 @@ typeof navigator === "object" && (function () {
 	 */
 
 	function urlEncode(object) {
-	  return Object.keys(object).map( // tslint:disable-next-line:no-unsafe-any
-	  function (key) {
+	  return Object.keys(object).map(function (key) {
 	    return encodeURIComponent(key) + "=" + encodeURIComponent(object[key]);
 	  }).join('&');
 	}
@@ -8405,8 +8416,7 @@ typeof navigator === "object" && (function () {
 	      source.currentTarget = isElement(event_1.currentTarget) ? htmlTreeAsString(event_1.currentTarget) : Object.prototype.toString.call(event_1.currentTarget);
 	    } catch (_oO) {
 	      source.currentTarget = '<unknown>';
-	    } // tslint:disable-next-line:strict-type-predicates
-
+	    }
 
 	    if (typeof CustomEvent !== 'undefined' && isInstanceOf(value, CustomEvent)) {
 	      source.detail = event_1.detail;
@@ -8427,7 +8437,7 @@ typeof navigator === "object" && (function () {
 
 
 	function utf8Length(value) {
-	  // tslint:disable-next-line:no-bitwise
+	  // eslint-disable-next-line no-bitwise
 	  return ~-encodeURI(value).split(/%..|./).length;
 	}
 	/** Calculates bytes size of input object */
@@ -8487,7 +8497,6 @@ typeof navigator === "object" && (function () {
 	 * - serializes Error objects
 	 * - filter global objects
 	 */
-	// tslint:disable-next-line:cyclomatic-complexity
 
 
 	function normalizeValue(value, key) {
@@ -8514,8 +8523,7 @@ typeof navigator === "object" && (function () {
 
 	  if (isSyntheticEvent(value)) {
 	    return '[SyntheticEvent]';
-	  } // tslint:disable-next-line:no-tautology-expression
-
+	  }
 
 	  if (typeof value === 'number' && value !== value) {
 	    return '[NaN]';
@@ -8539,6 +8547,7 @@ typeof navigator === "object" && (function () {
 	 * @param depth Optional number indicating how deep should walking be performed
 	 * @param memo Optional Memo class handling decycling
 	 */
+	// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 
 
 	function walk(key, value, depth, memo) {
@@ -8553,13 +8562,15 @@ typeof navigator === "object" && (function () {
 
 	  if (depth === 0) {
 	    return serializeValue(value);
-	  } // If value implements `toJSON` method, call it and return early
-	  // tslint:disable:no-unsafe-any
+	  }
+	  /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+	  // If value implements `toJSON` method, call it and return early
 
 
 	  if (value !== null && value !== undefined && typeof value.toJSON === 'function') {
 	    return value.toJSON();
-	  } // tslint:enable:no-unsafe-any
+	  }
+	  /* eslint-enable @typescript-eslint/no-unsafe-member-access */
 	  // If normalized value is a primitive, there are no branches left to walk, so we can just bail out, as theres no point in going down that branch any further
 
 
@@ -8606,10 +8617,10 @@ typeof navigator === "object" && (function () {
 	 * - Takes care of Error objects serialization
 	 * - Optionally limit depth of final output
 	 */
+	// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 
 	function normalize$1(input, depth) {
 	  try {
-	    // tslint:disable-next-line:no-unsafe-any
 	    return JSON.parse(JSON.stringify(input, function (key, value) {
 	      return walk(key, value, depth);
 	    }));
@@ -8622,12 +8633,12 @@ typeof navigator === "object" && (function () {
 	 * and truncated list that will be used inside the event message.
 	 * eg. `Non-error exception captured with keys: foo, bar, baz`
 	 */
+	// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 
 	function extractExceptionKeysForMessage(exception, maxLength) {
 	  if (maxLength === void 0) {
 	    maxLength = 40;
-	  } // tslint:disable:strict-type-predicates
-
+	  }
 
 	  var keys = Object.keys(getWalkSource(exception));
 	  keys.sort();
@@ -8785,6 +8796,7 @@ typeof navigator === "object" && (function () {
 
 	        if (_this._state === States.RESOLVED) {
 	          if (handler.onfulfilled) {
+	            // eslint-disable-next-line @typescript-eslint/no-floating-promises
 	            handler.onfulfilled(_this._value);
 	          }
 	        }
@@ -8805,12 +8817,6 @@ typeof navigator === "object" && (function () {
 	      this._reject(e);
 	    }
 	  }
-	  /** JSDoc */
-
-
-	  SyncPromise.prototype.toString = function () {
-	    return '[object SyncPromise]';
-	  };
 	  /** JSDoc */
 
 
@@ -8941,6 +8947,12 @@ typeof navigator === "object" && (function () {
 	      });
 	    });
 	  };
+	  /** JSDoc */
+
+
+	  SyncPromise.prototype.toString = function () {
+	    return '[object SyncPromise]';
+	  };
 
 	  return SyncPromise;
 	}();
@@ -9055,11 +9067,8 @@ typeof navigator === "object" && (function () {
 	  }
 
 	  try {
-	    // tslint:disable-next-line:no-unused-expression
-	    new Headers(); // tslint:disable-next-line:no-unused-expression
-
-	    new Request(''); // tslint:disable-next-line:no-unused-expression
-
+	    new Headers();
+	    new Request('');
 	    new Response();
 	    return true;
 	  } catch (e) {
@@ -9069,6 +9078,7 @@ typeof navigator === "object" && (function () {
 	/**
 	 * isNativeFetch checks if the given function is a native implementation of fetch()
 	 */
+	// eslint-disable-next-line @typescript-eslint/ban-types
 
 	function isNativeFetch(func) {
 	  return func && /^function fetch\(\)\s+\{\s+\[native code\]\s+\}$/.test(func.toString());
@@ -9087,7 +9097,7 @@ typeof navigator === "object" && (function () {
 	  }
 
 	  var global = getGlobalObject(); // Fast path to avoid DOM I/O
-	  // tslint:disable-next-line:no-unbound-method
+	  // eslint-disable-next-line @typescript-eslint/unbound-method
 
 	  if (isNativeFetch(global.fetch)) {
 	    return true;
@@ -9096,7 +9106,7 @@ typeof navigator === "object" && (function () {
 
 
 	  var result = false;
-	  var doc = global.document; // tslint:disable-next-line:no-unbound-method deprecation
+	  var doc = global.document; // eslint-disable-next-line deprecation/deprecation
 
 	  if (doc && typeof doc.createElement === "function") {
 	    try {
@@ -9105,7 +9115,7 @@ typeof navigator === "object" && (function () {
 	      doc.head.appendChild(sandbox);
 
 	      if (sandbox.contentWindow && sandbox.contentWindow.fetch) {
-	        // tslint:disable-next-line:no-unbound-method
+	        // eslint-disable-next-line @typescript-eslint/unbound-method
 	        result = isNativeFetch(sandbox.contentWindow.fetch);
 	      }
 
@@ -9134,7 +9144,6 @@ typeof navigator === "object" && (function () {
 	  }
 
 	  try {
-	    // tslint:disable:no-unused-expression
 	    new Request('_', {
 	      referrerPolicy: 'origin'
 	    });
@@ -9155,9 +9164,13 @@ typeof navigator === "object" && (function () {
 	  //       a try/catch block*, will cause Chrome to output an error to console.error
 	  // borrowed from: https://github.com/angular/angular.js/pull/13945/files
 	  var global = getGlobalObject();
-	  var chrome = global.chrome; // tslint:disable-next-line:no-unsafe-any
+	  /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+	  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 
+	  var chrome = global.chrome;
 	  var isChromePackagedApp = chrome && chrome.app && chrome.app.runtime;
+	  /* eslint-enable @typescript-eslint/no-unsafe-member-access */
+
 	  var hasHistoryApi = 'history' in global && !!global.history.pushState && !!global.history.replaceState;
 	  return !isChromePackagedApp && hasHistoryApi;
 	}
@@ -9226,7 +9239,6 @@ typeof navigator === "object" && (function () {
 
 
 	function addInstrumentationHandler(handler) {
-	  // tslint:disable-next-line:strict-type-predicates
 	  if (!handler || typeof handler.type !== 'string' || typeof handler.callback !== 'function') {
 	    return;
 	  }
@@ -9323,23 +9335,29 @@ typeof navigator === "object" && (function () {
 	        },
 	        startTimestamp: Date.now()
 	      };
-	      triggerHandlers('fetch', _assign({}, commonHandlerData));
+	      triggerHandlers('fetch', _assign({}, commonHandlerData)); // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+
 	      return originalFetch.apply(global$2, args).then(function (response) {
-	        triggerHandlers('fetch', _assign({}, commonHandlerData, {
+	        triggerHandlers('fetch', _assign(_assign({}, commonHandlerData), {
 	          endTimestamp: Date.now(),
 	          response: response
 	        }));
 	        return response;
 	      }, function (error) {
-	        triggerHandlers('fetch', _assign({}, commonHandlerData, {
+	        triggerHandlers('fetch', _assign(_assign({}, commonHandlerData), {
 	          endTimestamp: Date.now(),
 	          error: error
-	        }));
+	        })); // NOTE: If you are a Sentry user, and you are seeing this stack frame,
+	        //       it means the sentry.javascript SDK caught an error invoking your application code.
+	        //       This is expected behavior and NOT indicative of a bug with sentry.javascript.
+
 	        throw error;
 	      });
 	    };
 	  });
 	}
+	/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+
 	/** Extract `method` from fetch call arguments */
 
 
@@ -9376,6 +9394,8 @@ typeof navigator === "object" && (function () {
 
 	  return String(fetchArgs[0]);
 	}
+	/* eslint-enable @typescript-eslint/no-unsafe-member-access */
+
 	/** JSDoc */
 
 
@@ -9391,38 +9411,23 @@ typeof navigator === "object" && (function () {
 
 	      for (var _i = 0; _i < arguments.length; _i++) {
 	        args[_i] = arguments[_i];
-	      }
+	      } // eslint-disable-next-line @typescript-eslint/no-this-alias
 
+
+	      var xhr = this;
 	      var url = args[1];
-	      this.__sentry_xhr__ = {
+	      xhr.__sentry_xhr__ = {
+	        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 	        method: isString(args[0]) ? args[0].toUpperCase() : args[0],
 	        url: args[1]
 	      }; // if Sentry key appears in URL, don't capture it as a request
+	      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 
-	      if (isString(url) && this.__sentry_xhr__.method === 'POST' && url.match(/sentry_key/)) {
-	        this.__sentry_own_request__ = true;
+	      if (isString(url) && xhr.__sentry_xhr__.method === 'POST' && url.match(/sentry_key/)) {
+	        xhr.__sentry_own_request__ = true;
 	      }
 
-	      return originalOpen.apply(this, args);
-	    };
-	  });
-	  fill(xhrproto, 'send', function (originalSend) {
-	    return function () {
-	      var args = [];
-
-	      for (var _i = 0; _i < arguments.length; _i++) {
-	        args[_i] = arguments[_i];
-	      }
-
-	      var xhr = this; // tslint:disable-line:no-this-assignment
-
-	      var commonHandlerData = {
-	        args: args,
-	        startTimestamp: Date.now(),
-	        xhr: xhr
-	      };
-	      triggerHandlers('xhr', _assign({}, commonHandlerData));
-	      xhr.addEventListener('readystatechange', function () {
+	      var onreadystatechangeHandler = function onreadystatechangeHandler() {
 	        if (xhr.readyState === 4) {
 	          try {
 	            // touching statusCode in some platforms throws
@@ -9434,10 +9439,47 @@ typeof navigator === "object" && (function () {
 	            /* do nothing */
 	          }
 
-	          triggerHandlers('xhr', _assign({}, commonHandlerData, {
-	            endTimestamp: Date.now()
-	          }));
+	          triggerHandlers('xhr', {
+	            args: args,
+	            endTimestamp: Date.now(),
+	            startTimestamp: Date.now(),
+	            xhr: xhr
+	          });
 	        }
+	      };
+
+	      if ('onreadystatechange' in xhr && typeof xhr.onreadystatechange === 'function') {
+	        fill(xhr, 'onreadystatechange', function (original) {
+	          return function () {
+	            var readyStateArgs = [];
+
+	            for (var _i = 0; _i < arguments.length; _i++) {
+	              readyStateArgs[_i] = arguments[_i];
+	            }
+
+	            onreadystatechangeHandler();
+	            return original.apply(xhr, readyStateArgs);
+	          };
+	        });
+	      } else {
+	        xhr.addEventListener('readystatechange', onreadystatechangeHandler);
+	      }
+
+	      return originalOpen.apply(xhr, args);
+	    };
+	  });
+	  fill(xhrproto, 'send', function (originalSend) {
+	    return function () {
+	      var args = [];
+
+	      for (var _i = 0; _i < arguments.length; _i++) {
+	        args[_i] = arguments[_i];
+	      }
+
+	      triggerHandlers('xhr', {
+	        args: args,
+	        startTimestamp: Date.now(),
+	        xhr: this
 	      });
 	      return originalSend.apply(this, args);
 	    };
@@ -9520,11 +9562,14 @@ typeof navigator === "object" && (function () {
 	  global$2.document.addEventListener('keypress', keypressEventHandler(triggerHandlers.bind(null, 'dom')), false); // After hooking into document bubbled up click and keypresses events, we also hook into user handled click & keypresses.
 
 	  ['EventTarget', 'Node'].forEach(function (target) {
-	    var proto = global$2[target] && global$2[target].prototype;
+	    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
+	    var proto = global$2[target] && global$2[target].prototype; // eslint-disable-next-line no-prototype-builtins
 
 	    if (!proto || !proto.hasOwnProperty || !proto.hasOwnProperty('addEventListener')) {
 	      return;
 	    }
+	    /* eslint-enable @typescript-eslint/no-unsafe-member-access */
+
 
 	    fill(proto, 'addEventListener', function (original) {
 	      return function (eventName, fn, options) {
@@ -9561,14 +9606,12 @@ typeof navigator === "object" && (function () {
 	    });
 	    fill(proto, 'removeEventListener', function (original) {
 	      return function (eventName, fn, options) {
-	        var callback = fn;
-
 	        try {
-	          callback = callback && (callback.__sentry_wrapped__ || callback);
+	          original.call(this, eventName, fn.__sentry_wrapped__, options);
 	        } catch (e) {// ignore, accessing __sentry_wrapped__ will throw in some Selenium environments
 	        }
 
-	        return original.call(this, eventName, callback, options);
+	        return original.call(this, eventName, fn, options);
 	      };
 	    });
 	  });
@@ -9685,6 +9728,7 @@ typeof navigator === "object" && (function () {
 	    });
 
 	    if (_oldOnErrorHandler) {
+	      // eslint-disable-next-line prefer-rest-params
 	      return _oldOnErrorHandler.apply(this, arguments);
 	    }
 
@@ -9702,6 +9746,7 @@ typeof navigator === "object" && (function () {
 	    triggerHandlers('unhandledrejection', e);
 
 	    if (_oldOnUnhandledRejectionHandler) {
+	      // eslint-disable-next-line prefer-rest-params
 	      return _oldOnUnhandledRejectionHandler.apply(this, arguments);
 	    }
 
@@ -9711,7 +9756,7 @@ typeof navigator === "object" && (function () {
 
 	/** Regular expression used to parse a Dsn. */
 
-	var DSN_REGEX = /^(?:(\w+):)\/\/(?:(\w+)(?::(\w+))?@)([\w\.-]+)(?::(\d+))?\/(.+)/;
+	var DSN_REGEX = /^(?:(\w+):)\/\/(?:(\w+)(?::(\w+))?@)([\w.-]+)(?::(\d+))?\/(.+)/;
 	/** Error message */
 
 	var ERROR_MESSAGE = 'Invalid Dsn';
@@ -9744,8 +9789,7 @@ typeof navigator === "object" && (function () {
 	  Dsn.prototype.toString = function (withPassword) {
 	    if (withPassword === void 0) {
 	      withPassword = false;
-	    } // tslint:disable-next-line:no-this-assignment
-
+	    }
 
 	    var _a = this,
 	        host = _a.host,
@@ -9787,6 +9831,14 @@ typeof navigator === "object" && (function () {
 	      projectId = split.pop();
 	    }
 
+	    if (projectId) {
+	      var projectMatch = projectId.match(/^\d+/);
+
+	      if (projectMatch) {
+	        projectId = projectMatch[0];
+	      }
+	    }
+
 	    this._fromComponents({
 	      host: host,
 	      pass: pass,
@@ -9817,16 +9869,20 @@ typeof navigator === "object" && (function () {
 
 	    ['protocol', 'user', 'host', 'projectId'].forEach(function (component) {
 	      if (!_this[component]) {
-	        throw new SentryError(ERROR_MESSAGE);
+	        throw new SentryError(ERROR_MESSAGE + ": " + component + " missing");
 	      }
 	    });
 
+	    if (!this.projectId.match(/^\d+$/)) {
+	      throw new SentryError(ERROR_MESSAGE + ": Invalid projectId " + this.projectId);
+	    }
+
 	    if (this.protocol !== 'http' && this.protocol !== 'https') {
-	      throw new SentryError(ERROR_MESSAGE);
+	      throw new SentryError(ERROR_MESSAGE + ": Invalid protocol " + this.protocol);
 	    }
 
 	    if (this.port && isNaN(parseInt(this.port, 10))) {
-	      throw new SentryError(ERROR_MESSAGE);
+	      throw new SentryError(ERROR_MESSAGE + ": Invalid port " + this.port);
 	    }
 	  };
 
@@ -9860,12 +9916,38 @@ typeof navigator === "object" && (function () {
 
 	    this._tags = {};
 	    /** Extra */
+	    // eslint-disable-next-line @typescript-eslint/no-explicit-any
 
 	    this._extra = {};
 	    /** Contexts */
+	    // eslint-disable-next-line @typescript-eslint/no-explicit-any
 
-	    this._context = {};
+	    this._contexts = {};
 	  }
+	  /**
+	   * Inherit values from the parent scope.
+	   * @param scope to clone.
+	   */
+
+
+	  Scope.clone = function (scope) {
+	    var newScope = new Scope();
+
+	    if (scope) {
+	      newScope._breadcrumbs = __spread(scope._breadcrumbs);
+	      newScope._tags = _assign({}, scope._tags);
+	      newScope._extra = _assign({}, scope._extra);
+	      newScope._contexts = _assign({}, scope._contexts);
+	      newScope._user = scope._user;
+	      newScope._level = scope._level;
+	      newScope._span = scope._span;
+	      newScope._transactionName = scope._transactionName;
+	      newScope._fingerprint = scope._fingerprint;
+	      newScope._eventProcessors = __spread(scope._eventProcessors);
+	    }
+
+	    return newScope;
+	  };
 	  /**
 	   * Add internal on change listener. Used for sub SDKs that need to store the scope.
 	   * @hidden
@@ -9886,55 +9968,6 @@ typeof navigator === "object" && (function () {
 	    return this;
 	  };
 	  /**
-	   * This will be called on every set call.
-	   */
-
-
-	  Scope.prototype._notifyScopeListeners = function () {
-	    var _this = this;
-
-	    if (!this._notifyingListeners) {
-	      this._notifyingListeners = true;
-	      setTimeout(function () {
-	        _this._scopeListeners.forEach(function (callback) {
-	          callback(_this);
-	        });
-
-	        _this._notifyingListeners = false;
-	      });
-	    }
-	  };
-	  /**
-	   * This will be called after {@link applyToEvent} is finished.
-	   */
-
-
-	  Scope.prototype._notifyEventProcessors = function (processors, event, hint, index) {
-	    var _this = this;
-
-	    if (index === void 0) {
-	      index = 0;
-	    }
-
-	    return new SyncPromise(function (resolve, reject) {
-	      var processor = processors[index]; // tslint:disable-next-line:strict-type-predicates
-
-	      if (event === null || typeof processor !== 'function') {
-	        resolve(event);
-	      } else {
-	        var result = processor(_assign({}, event), hint);
-
-	        if (isThenable$1(result)) {
-	          result.then(function (final) {
-	            return _this._notifyEventProcessors(processors, final, hint, index + 1).then(resolve);
-	          }).then(null, reject);
-	        } else {
-	          _this._notifyEventProcessors(processors, result, hint, index + 1).then(resolve).then(null, reject);
-	        }
-	      }
-	    });
-	  };
-	  /**
 	   * @inheritDoc
 	   */
 
@@ -9952,7 +9985,7 @@ typeof navigator === "object" && (function () {
 
 
 	  Scope.prototype.setTags = function (tags) {
-	    this._tags = _assign({}, this._tags, tags);
+	    this._tags = _assign(_assign({}, this._tags), tags);
 
 	    this._notifyScopeListeners();
 
@@ -9966,7 +9999,7 @@ typeof navigator === "object" && (function () {
 	  Scope.prototype.setTag = function (key, value) {
 	    var _a;
 
-	    this._tags = _assign({}, this._tags, (_a = {}, _a[key] = value, _a));
+	    this._tags = _assign(_assign({}, this._tags), (_a = {}, _a[key] = value, _a));
 
 	    this._notifyScopeListeners();
 
@@ -9978,7 +10011,7 @@ typeof navigator === "object" && (function () {
 
 
 	  Scope.prototype.setExtras = function (extras) {
-	    this._extra = _assign({}, this._extra, extras);
+	    this._extra = _assign(_assign({}, this._extra), extras);
 
 	    this._notifyScopeListeners();
 
@@ -9992,7 +10025,7 @@ typeof navigator === "object" && (function () {
 	  Scope.prototype.setExtra = function (key, extra) {
 	    var _a;
 
-	    this._extra = _assign({}, this._extra, (_a = {}, _a[key] = extra, _a));
+	    this._extra = _assign(_assign({}, this._extra), (_a = {}, _a[key] = extra, _a));
 
 	    this._notifyScopeListeners();
 
@@ -10027,26 +10060,32 @@ typeof navigator === "object" && (function () {
 	   */
 
 
-	  Scope.prototype.setTransaction = function (transaction) {
-	    this._transaction = transaction;
-
-	    if (this._span) {
-	      this._span.transaction = transaction;
-	    }
+	  Scope.prototype.setTransactionName = function (name) {
+	    this._transactionName = name;
 
 	    this._notifyScopeListeners();
 
 	    return this;
 	  };
 	  /**
+	   * Can be removed in major version.
+	   * @deprecated in favor of {@link this.setTransactionName}
+	   */
+
+
+	  Scope.prototype.setTransaction = function (name) {
+	    return this.setTransactionName(name);
+	  };
+	  /**
 	   * @inheritDoc
 	   */
+	  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 
 
 	  Scope.prototype.setContext = function (key, context) {
 	    var _a;
 
-	    this._context = _assign({}, this._context, (_a = {}, _a[key] = context, _a));
+	    this._contexts = _assign(_assign({}, this._contexts), (_a = {}, _a[key] = context, _a));
 
 	    this._notifyScopeListeners();
 
@@ -10065,8 +10104,7 @@ typeof navigator === "object" && (function () {
 	    return this;
 	  };
 	  /**
-	   * Internal getter for Span, used in Hub.
-	   * @hidden
+	   * @inheritDoc
 	   */
 
 
@@ -10074,28 +10112,71 @@ typeof navigator === "object" && (function () {
 	    return this._span;
 	  };
 	  /**
-	   * Inherit values from the parent scope.
-	   * @param scope to clone.
+	   * @inheritDoc
 	   */
 
 
-	  Scope.clone = function (scope) {
-	    var newScope = new Scope();
+	  Scope.prototype.getTransaction = function () {
+	    var span = this.getSpan();
 
-	    if (scope) {
-	      newScope._breadcrumbs = __spread(scope._breadcrumbs);
-	      newScope._tags = _assign({}, scope._tags);
-	      newScope._extra = _assign({}, scope._extra);
-	      newScope._context = _assign({}, scope._context);
-	      newScope._user = scope._user;
-	      newScope._level = scope._level;
-	      newScope._span = scope._span;
-	      newScope._transaction = scope._transaction;
-	      newScope._fingerprint = scope._fingerprint;
-	      newScope._eventProcessors = __spread(scope._eventProcessors);
+	    if (span && span.spanRecorder && span.spanRecorder.spans[0]) {
+	      return span.spanRecorder.spans[0];
 	    }
 
-	    return newScope;
+	    return undefined;
+	  };
+	  /**
+	   * @inheritDoc
+	   */
+
+
+	  Scope.prototype.update = function (captureContext) {
+	    if (!captureContext) {
+	      return this;
+	    }
+
+	    if (typeof captureContext === 'function') {
+	      var updatedScope = captureContext(this);
+	      return updatedScope instanceof Scope ? updatedScope : this;
+	    }
+
+	    if (captureContext instanceof Scope) {
+	      this._tags = _assign(_assign({}, this._tags), captureContext._tags);
+	      this._extra = _assign(_assign({}, this._extra), captureContext._extra);
+	      this._contexts = _assign(_assign({}, this._contexts), captureContext._contexts);
+
+	      if (captureContext._user) {
+	        this._user = captureContext._user;
+	      }
+
+	      if (captureContext._level) {
+	        this._level = captureContext._level;
+	      }
+
+	      if (captureContext._fingerprint) {
+	        this._fingerprint = captureContext._fingerprint;
+	      }
+	    } else if (isPlainObject(captureContext)) {
+	      // eslint-disable-next-line no-param-reassign
+	      captureContext = captureContext;
+	      this._tags = _assign(_assign({}, this._tags), captureContext.tags);
+	      this._extra = _assign(_assign({}, this._extra), captureContext.extra);
+	      this._contexts = _assign(_assign({}, this._contexts), captureContext.contexts);
+
+	      if (captureContext.user) {
+	        this._user = captureContext.user;
+	      }
+
+	      if (captureContext.level) {
+	        this._level = captureContext.level;
+	      }
+
+	      if (captureContext.fingerprint) {
+	        this._fingerprint = captureContext.fingerprint;
+	      }
+	    }
+
+	    return this;
 	  };
 	  /**
 	   * @inheritDoc
@@ -10107,9 +10188,9 @@ typeof navigator === "object" && (function () {
 	    this._tags = {};
 	    this._extra = {};
 	    this._user = {};
-	    this._context = {};
+	    this._contexts = {};
 	    this._level = undefined;
-	    this._transaction = undefined;
+	    this._transactionName = undefined;
 	    this._fingerprint = undefined;
 	    this._span = undefined;
 
@@ -10146,6 +10227,105 @@ typeof navigator === "object" && (function () {
 	    return this;
 	  };
 	  /**
+	   * Applies the current context and fingerprint to the event.
+	   * Note that breadcrumbs will be added by the client.
+	   * Also if the event has already breadcrumbs on it, we do not merge them.
+	   * @param event Event
+	   * @param hint May contain additional informartion about the original exception.
+	   * @hidden
+	   */
+
+
+	  Scope.prototype.applyToEvent = function (event, hint) {
+	    if (this._extra && Object.keys(this._extra).length) {
+	      event.extra = _assign(_assign({}, this._extra), event.extra);
+	    }
+
+	    if (this._tags && Object.keys(this._tags).length) {
+	      event.tags = _assign(_assign({}, this._tags), event.tags);
+	    }
+
+	    if (this._user && Object.keys(this._user).length) {
+	      event.user = _assign(_assign({}, this._user), event.user);
+	    }
+
+	    if (this._contexts && Object.keys(this._contexts).length) {
+	      event.contexts = _assign(_assign({}, this._contexts), event.contexts);
+	    }
+
+	    if (this._level) {
+	      event.level = this._level;
+	    }
+
+	    if (this._transactionName) {
+	      event.transaction = this._transactionName;
+	    } // We want to set the trace context for normal events only if there isn't already
+	    // a trace context on the event. There is a product feature in place where we link
+	    // errors with transaction and it relys on that.
+
+
+	    if (this._span) {
+	      event.contexts = _assign({
+	        trace: this._span.getTraceContext()
+	      }, event.contexts);
+	    }
+
+	    this._applyFingerprint(event);
+
+	    event.breadcrumbs = __spread(event.breadcrumbs || [], this._breadcrumbs);
+	    event.breadcrumbs = event.breadcrumbs.length > 0 ? event.breadcrumbs : undefined;
+	    return this._notifyEventProcessors(__spread(getGlobalEventProcessors(), this._eventProcessors), event, hint);
+	  };
+	  /**
+	   * This will be called after {@link applyToEvent} is finished.
+	   */
+
+
+	  Scope.prototype._notifyEventProcessors = function (processors, event, hint, index) {
+	    var _this = this;
+
+	    if (index === void 0) {
+	      index = 0;
+	    }
+
+	    return new SyncPromise(function (resolve, reject) {
+	      var processor = processors[index];
+
+	      if (event === null || typeof processor !== 'function') {
+	        resolve(event);
+	      } else {
+	        var result = processor(_assign({}, event), hint);
+
+	        if (isThenable$1(result)) {
+	          result.then(function (final) {
+	            return _this._notifyEventProcessors(processors, final, hint, index + 1).then(resolve);
+	          }).then(null, reject);
+	        } else {
+	          _this._notifyEventProcessors(processors, result, hint, index + 1).then(resolve).then(null, reject);
+	        }
+	      }
+	    });
+	  };
+	  /**
+	   * This will be called on every set call.
+	   */
+
+
+	  Scope.prototype._notifyScopeListeners = function () {
+	    var _this = this;
+
+	    if (!this._notifyingListeners) {
+	      this._notifyingListeners = true;
+	      setTimeout(function () {
+	        _this._scopeListeners.forEach(function (callback) {
+	          callback(_this);
+	        });
+
+	        _this._notifyingListeners = false;
+	      });
+	    }
+	  };
+	  /**
 	   * Applies fingerprint from the scope to the event if there's one,
 	   * uses message if there's one instead or get rid of empty fingerprint
 	   */
@@ -10163,53 +10343,6 @@ typeof navigator === "object" && (function () {
 	    if (event.fingerprint && !event.fingerprint.length) {
 	      delete event.fingerprint;
 	    }
-	  };
-	  /**
-	   * Applies the current context and fingerprint to the event.
-	   * Note that breadcrumbs will be added by the client.
-	   * Also if the event has already breadcrumbs on it, we do not merge them.
-	   * @param event Event
-	   * @param hint May contain additional informartion about the original exception.
-	   * @hidden
-	   */
-
-
-	  Scope.prototype.applyToEvent = function (event, hint) {
-	    if (this._extra && Object.keys(this._extra).length) {
-	      event.extra = _assign({}, this._extra, event.extra);
-	    }
-
-	    if (this._tags && Object.keys(this._tags).length) {
-	      event.tags = _assign({}, this._tags, event.tags);
-	    }
-
-	    if (this._user && Object.keys(this._user).length) {
-	      event.user = _assign({}, this._user, event.user);
-	    }
-
-	    if (this._context && Object.keys(this._context).length) {
-	      event.contexts = _assign({}, this._context, event.contexts);
-	    }
-
-	    if (this._level) {
-	      event.level = this._level;
-	    }
-
-	    if (this._transaction) {
-	      event.transaction = this._transaction;
-	    }
-
-	    if (this._span) {
-	      event.contexts = _assign({
-	        trace: this._span.getTraceContext()
-	      }, event.contexts);
-	    }
-
-	    this._applyFingerprint(event);
-
-	    event.breadcrumbs = __spread(event.breadcrumbs || [], this._breadcrumbs);
-	    event.breadcrumbs = event.breadcrumbs.length > 0 ? event.breadcrumbs : undefined;
-	    return this._notifyEventProcessors(__spread(getGlobalEventProcessors(), this._eventProcessors), event, hint);
 	  };
 
 	  return Scope;
@@ -10237,8 +10370,8 @@ typeof navigator === "object" && (function () {
 	/**
 	 * API compatibility version of this hub.
 	 *
-	 * WARNING: This number should only be incresed when the global interface
-	 * changes a and new methods are introduced.
+	 * WARNING: This number should only be increased when the global interface
+	 * changes and new methods are introduced.
 	 *
 	 * @hidden
 	 */
@@ -10289,30 +10422,9 @@ typeof navigator === "object" && (function () {
 	      client: client,
 	      scope: scope
 	    });
+
+	    this.bindClient(client);
 	  }
-	  /**
-	   * Internal helper function to call a method on the top client if it exists.
-	   *
-	   * @param method The method to call on the client.
-	   * @param args Arguments to pass to the client function.
-	   */
-
-
-	  Hub.prototype._invokeClient = function (method) {
-	    var _a;
-
-	    var args = [];
-
-	    for (var _i = 1; _i < arguments.length; _i++) {
-	      args[_i - 1] = arguments[_i];
-	    }
-
-	    var top = this.getStackTop();
-
-	    if (top && top.client && top.client[method]) {
-	      (_a = top.client)[method].apply(_a, __spread(args, [top.scope]));
-	    }
-	  };
 	  /**
 	   * @inheritDoc
 	   */
@@ -10401,6 +10513,7 @@ typeof navigator === "object" && (function () {
 	  /**
 	   * @inheritDoc
 	   */
+	  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/explicit-module-boundary-types
 
 
 	  Hub.prototype.captureException = function (exception, hint) {
@@ -10425,7 +10538,7 @@ typeof navigator === "object" && (function () {
 	      };
 	    }
 
-	    this._invokeClient('captureException', exception, _assign({}, finalHint, {
+	    this._invokeClient('captureException', exception, _assign(_assign({}, finalHint), {
 	      event_id: eventId
 	    }));
 
@@ -10458,7 +10571,7 @@ typeof navigator === "object" && (function () {
 	      };
 	    }
 
-	    this._invokeClient('captureMessage', message, level, _assign({}, finalHint, {
+	    this._invokeClient('captureMessage', message, level, _assign(_assign({}, finalHint), {
 	      event_id: eventId
 	    }));
 
@@ -10472,7 +10585,7 @@ typeof navigator === "object" && (function () {
 	  Hub.prototype.captureEvent = function (event, hint) {
 	    var eventId = this._lastEventId = uuid4();
 
-	    this._invokeClient('captureEvent', event, _assign({}, hint, {
+	    this._invokeClient('captureEvent', event, _assign(_assign({}, hint), {
 	      event_id: eventId
 	    }));
 
@@ -10496,7 +10609,8 @@ typeof navigator === "object" && (function () {
 
 	    if (!top.scope || !top.client) {
 	      return;
-	    }
+	    } // eslint-disable-next-line @typescript-eslint/unbound-method
+
 
 	    var _a = top.client.getOptions && top.client.getOptions() || {},
 	        _b = _a.beforeBreadcrumb,
@@ -10597,6 +10711,7 @@ typeof navigator === "object" && (function () {
 	  /**
 	   * @inheritDoc
 	   */
+	  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 
 
 	  Hub.prototype.setContext = function (name, context) {
@@ -10658,12 +10773,16 @@ typeof navigator === "object" && (function () {
 	   */
 
 
-	  Hub.prototype.startSpan = function (spanOrSpanContext, forceNoChild) {
-	    if (forceNoChild === void 0) {
-	      forceNoChild = false;
-	    }
+	  Hub.prototype.startSpan = function (context) {
+	    return this._callExtensionMethod('startSpan', context);
+	  };
+	  /**
+	   * @inheritDoc
+	   */
 
-	    return this._callExtensionMethod('startSpan', spanOrSpanContext, forceNoChild);
+
+	  Hub.prototype.startTransaction = function (context) {
+	    return this._callExtensionMethod('startTransaction', context);
 	  };
 	  /**
 	   * @inheritDoc
@@ -10674,9 +10793,35 @@ typeof navigator === "object" && (function () {
 	    return this._callExtensionMethod('traceHeaders');
 	  };
 	  /**
+	   * Internal helper function to call a method on the top client if it exists.
+	   *
+	   * @param method The method to call on the client.
+	   * @param args Arguments to pass to the client function.
+	   */
+	  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+
+	  Hub.prototype._invokeClient = function (method) {
+	    var _a;
+
+	    var args = [];
+
+	    for (var _i = 1; _i < arguments.length; _i++) {
+	      args[_i - 1] = arguments[_i];
+	    }
+
+	    var top = this.getStackTop();
+
+	    if (top && top.client && top.client[method]) {
+	      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
+	      (_a = top.client)[method].apply(_a, __spread(args, [top.scope]));
+	    }
+	  };
+	  /**
 	   * Calls global extension method and binding current instance to the function call
 	   */
-	  // @ts-ignore
+	  // @ts-ignore Function lacks ending return statement and return type does not include 'undefined'. ts(2366)
+	  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 
 
 	  Hub.prototype._callExtensionMethod = function (method) {
@@ -10687,7 +10832,7 @@ typeof navigator === "object" && (function () {
 	    }
 
 	    var carrier = getMainCarrier();
-	    var sentry = carrier.__SENTRY__; // tslint:disable-next-line: strict-type-predicates
+	    var sentry = carrier.__SENTRY__;
 
 	    if (sentry && sentry.extensions && typeof sentry.extensions[method] === 'function') {
 	      return sentry.extensions[method].apply(this, args);
@@ -10745,7 +10890,7 @@ typeof navigator === "object" && (function () {
 	  return getHubFromCarrier(registry);
 	}
 	/**
-	 * Try to read the hub from an active domain, fallback to the registry if one doesnt exist
+	 * Try to read the hub from an active domain, and fallback to the registry if one doesn't exist
 	 * @returns discovered hub
 	 */
 
@@ -10753,18 +10898,20 @@ typeof navigator === "object" && (function () {
 	  try {
 	    var property = 'domain';
 	    var carrier = getMainCarrier();
-	    var sentry = carrier.__SENTRY__; // tslint:disable-next-line: strict-type-predicates
+	    var sentry = carrier.__SENTRY__;
 
 	    if (!sentry || !sentry.extensions || !sentry.extensions[property]) {
 	      return getHubFromCarrier(registry);
-	    }
+	    } // eslint-disable-next-line @typescript-eslint/no-explicit-any
 
-	    var domain = sentry.extensions[property];
-	    var activeDomain = domain.active; // If there no active domain, just return global hub
+
+	    var domain = sentry.extensions[property]; // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+
+	    var activeDomain = domain.active; // If there's no active domain, just return global hub
 
 	    if (!activeDomain) {
 	      return getHubFromCarrier(registry);
-	    } // If there's no hub on current domain, or its an old API, assign a new one
+	    } // If there's no hub on current domain, or it's an old API, assign a new one
 
 
 	    if (!hasHubOnCarrier(activeDomain) || getHubFromCarrier(activeDomain).isOlderThan(API_VERSION)) {
@@ -10830,6 +10977,7 @@ typeof navigator === "object" && (function () {
 	 * @param method function to call on hub.
 	 * @param args to pass to function.
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 
 	function callOnHub(method) {
 	  var args = [];
@@ -10841,7 +10989,7 @@ typeof navigator === "object" && (function () {
 	  var hub = getCurrentHub();
 
 	  if (hub && hub[method]) {
-	    // tslint:disable-next-line:no-unsafe-any
+	    // eslint-disable-next-line @typescript-eslint/no-explicit-any
 	    return hub[method].apply(hub, __spread(args));
 	  }
 
@@ -10853,9 +11001,10 @@ typeof navigator === "object" && (function () {
 	 * @param exception An exception-like object.
 	 * @returns The generated eventId.
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/explicit-module-boundary-types
 
 
-	function captureException(exception) {
+	function captureException(exception, captureContext) {
 	  var syntheticException;
 
 	  try {
@@ -10865,6 +11014,7 @@ typeof navigator === "object" && (function () {
 	  }
 
 	  return callOnHub('captureException', exception, {
+	    captureContext: captureContext,
 	    originalException: exception,
 	    syntheticException: syntheticException
 	  });
@@ -10904,33 +11054,40 @@ typeof navigator === "object" && (function () {
 	  API.prototype.getDsn = function () {
 	    return this._dsnObject;
 	  };
-	  /** Returns a string with auth headers in the url to the store endpoint. */
+	  /** Returns the prefix to construct Sentry ingestion API endpoints. */
 
 
-	  API.prototype.getStoreEndpoint = function () {
-	    return "" + this._getBaseUrl() + this.getStoreEndpointPath();
-	  };
-	  /** Returns the store endpoint with auth added in url encoded. */
-
-
-	  API.prototype.getStoreEndpointWithUrlEncodedAuth = function () {
-	    var dsn = this._dsnObject;
-	    var auth = {
-	      sentry_key: dsn.user,
-	      sentry_version: SENTRY_API_VERSION
-	    }; // Auth is intentionally sent as part of query string (NOT as custom HTTP header)
-	    // to avoid preflight CORS requests
-
-	    return this.getStoreEndpoint() + "?" + urlEncode(auth);
-	  };
-	  /** Returns the base path of the url including the port. */
-
-
-	  API.prototype._getBaseUrl = function () {
+	  API.prototype.getBaseApiEndpoint = function () {
 	    var dsn = this._dsnObject;
 	    var protocol = dsn.protocol ? dsn.protocol + ":" : '';
 	    var port = dsn.port ? ":" + dsn.port : '';
-	    return protocol + "//" + dsn.host + port;
+	    return protocol + "//" + dsn.host + port + (dsn.path ? "/" + dsn.path : '') + "/api/";
+	  };
+	  /** Returns the store endpoint URL. */
+
+
+	  API.prototype.getStoreEndpoint = function () {
+	    return this._getIngestEndpoint('store');
+	  };
+	  /**
+	   * Returns the store endpoint URL with auth in the query string.
+	   *
+	   * Sending auth as part of the query string and not as custom HTTP headers avoids CORS preflight requests.
+	   */
+
+
+	  API.prototype.getStoreEndpointWithUrlEncodedAuth = function () {
+	    return this.getStoreEndpoint() + "?" + this._encodedAuth();
+	  };
+	  /**
+	   * Returns the envelope endpoint URL with auth in the query string.
+	   *
+	   * Sending auth as part of the query string and not as custom HTTP headers avoids CORS preflight requests.
+	   */
+
+
+	  API.prototype.getEnvelopeEndpointWithUrlEncodedAuth = function () {
+	    return this._getEnvelopeEndpoint() + "?" + this._encodedAuth();
 	  };
 	  /** Returns only the path component for the store endpoint. */
 
@@ -10939,7 +11096,10 @@ typeof navigator === "object" && (function () {
 	    var dsn = this._dsnObject;
 	    return (dsn.path ? "/" + dsn.path : '') + "/api/" + dsn.projectId + "/store/";
 	  };
-	  /** Returns an object that can be used in request headers. */
+	  /**
+	   * Returns an object that can be used in request headers.
+	   * This is needed for node and the old /store endpoint in sentry
+	   */
 
 
 	  API.prototype.getRequestHeaders = function (clientName, clientVersion) {
@@ -10966,7 +11126,7 @@ typeof navigator === "object" && (function () {
 	    }
 
 	    var dsn = this._dsnObject;
-	    var endpoint = "" + this._getBaseUrl() + (dsn.path ? "/" + dsn.path : '') + "/api/embed/error-page/";
+	    var endpoint = this.getBaseApiEndpoint() + "embed/error-page/";
 	    var encodedOptions = [];
 	    encodedOptions.push("dsn=" + dsn.toString());
 
@@ -10993,6 +11153,33 @@ typeof navigator === "object" && (function () {
 	    }
 
 	    return endpoint;
+	  };
+	  /** Returns the envelope endpoint URL. */
+
+
+	  API.prototype._getEnvelopeEndpoint = function () {
+	    return this._getIngestEndpoint('envelope');
+	  };
+	  /** Returns the ingest API endpoint for target. */
+
+
+	  API.prototype._getIngestEndpoint = function (target) {
+	    var base = this.getBaseApiEndpoint();
+	    var dsn = this._dsnObject;
+	    return "" + base + dsn.projectId + "/" + target + "/";
+	  };
+	  /** Returns a URL-encoded string with auth config suitable for a query string. */
+
+
+	  API.prototype._encodedAuth = function () {
+	    var dsn = this._dsnObject;
+	    var auth = {
+	      // We send only the minimum set of required information. See
+	      // https://github.com/getsentry/sentry-javascript/issues/2572.
+	      sentry_key: dsn.user,
+	      sentry_version: SENTRY_API_VERSION
+	    };
+	    return urlEncode(auth);
 	  };
 
 	  return API;
@@ -11129,23 +11316,17 @@ typeof navigator === "object" && (function () {
 	  /**
 	   * @inheritDoc
 	   */
+	  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/explicit-module-boundary-types
 
 
 	  BaseClient.prototype.captureException = function (exception, hint, scope) {
 	    var _this = this;
 
 	    var eventId = hint && hint.event_id;
-	    this._processing = true;
+	    this._processing = true; // eslint-disable-next-line @typescript-eslint/no-floating-promises
 
 	    this._getBackend().eventFromException(exception, hint).then(function (event) {
-	      return _this._processEvent(event, hint, scope);
-	    }).then(function (finalEvent) {
-	      // We need to check for finalEvent in case beforeSend returned null
-	      eventId = finalEvent && finalEvent.event_id;
-	      _this._processing = false;
-	    }).then(null, function (reason) {
-	      logger.error(reason);
-	      _this._processing = false;
+	      eventId = _this.captureEvent(event, hint, scope);
 	    });
 
 	    return eventId;
@@ -11160,16 +11341,10 @@ typeof navigator === "object" && (function () {
 
 	    var eventId = hint && hint.event_id;
 	    this._processing = true;
-	    var promisedEvent = isPrimitive(message) ? this._getBackend().eventFromMessage("" + message, level, hint) : this._getBackend().eventFromException(message, hint);
+	    var promisedEvent = isPrimitive(message) ? this._getBackend().eventFromMessage("" + message, level, hint) : this._getBackend().eventFromException(message, hint); // eslint-disable-next-line @typescript-eslint/no-floating-promises
+
 	    promisedEvent.then(function (event) {
-	      return _this._processEvent(event, hint, scope);
-	    }).then(function (finalEvent) {
-	      // We need to check for finalEvent in case beforeSend returned null
-	      eventId = finalEvent && finalEvent.event_id;
-	      _this._processing = false;
-	    }).then(null, function (reason) {
-	      logger.error(reason);
-	      _this._processing = false;
+	      eventId = _this.captureEvent(event, hint, scope);
 	    });
 	    return eventId;
 	  };
@@ -11314,7 +11489,7 @@ typeof navigator === "object" && (function () {
 	   * nested objects, such as the context, keys are merged.
 	   *
 	   * @param event The original event.
-	   * @param hint May contain additional informartion about the original exception.
+	   * @param hint May contain additional information about the original exception.
 	   * @param scope A scope containing event metadata.
 	   * @returns A new event with more information.
 	   */
@@ -11323,62 +11498,36 @@ typeof navigator === "object" && (function () {
 	  BaseClient.prototype._prepareEvent = function (event, scope, hint) {
 	    var _this = this;
 
-	    var _a = this.getOptions(),
-	        environment = _a.environment,
-	        release = _a.release,
-	        dist = _a.dist,
-	        _b = _a.maxValueLength,
-	        maxValueLength = _b === void 0 ? 250 : _b,
-	        _c = _a.normalizeDepth,
-	        normalizeDepth = _c === void 0 ? 3 : _c;
+	    var _a = this.getOptions().normalizeDepth,
+	        normalizeDepth = _a === void 0 ? 3 : _a;
 
-	    var prepared = _assign({}, event);
+	    var prepared = _assign(_assign({}, event), {
+	      event_id: event.event_id || (hint && hint.event_id ? hint.event_id : uuid4()),
+	      timestamp: event.timestamp || timestampWithMs()
+	    });
 
-	    if (prepared.environment === undefined && environment !== undefined) {
-	      prepared.environment = environment;
-	    }
+	    this._applyClientOptions(prepared);
 
-	    if (prepared.release === undefined && release !== undefined) {
-	      prepared.release = release;
-	    }
+	    this._applyIntegrationsMetadata(prepared); // If we have scope given to us, use it as the base for further modifications.
+	    // This allows us to prevent unnecessary copying of data if `captureContext` is not provided.
 
-	    if (prepared.dist === undefined && dist !== undefined) {
-	      prepared.dist = dist;
-	    }
 
-	    if (prepared.message) {
-	      prepared.message = truncate(prepared.message, maxValueLength);
-	    }
+	    var finalScope = scope;
 
-	    var exception = prepared.exception && prepared.exception.values && prepared.exception.values[0];
-
-	    if (exception && exception.value) {
-	      exception.value = truncate(exception.value, maxValueLength);
-	    }
-
-	    var request = prepared.request;
-
-	    if (request && request.url) {
-	      request.url = truncate(request.url, maxValueLength);
-	    }
-
-	    if (prepared.event_id === undefined) {
-	      prepared.event_id = hint && hint.event_id ? hint.event_id : uuid4();
-	    }
-
-	    this._addIntegrations(prepared.sdk); // We prepare the result here with a resolved Event.
+	    if (hint && hint.captureContext) {
+	      finalScope = Scope.clone(finalScope).update(hint.captureContext);
+	    } // We prepare the result here with a resolved Event.
 
 
 	    var result = SyncPromise.resolve(prepared); // This should be the last thing called, since we want that
 	    // {@link Hub.addEventProcessor} gets the finished prepared event.
 
-	    if (scope) {
+	    if (finalScope) {
 	      // In case we have a hub we reassign it.
-	      result = scope.applyToEvent(prepared, hint);
+	      result = finalScope.applyToEvent(prepared, hint);
 	    }
 
 	    return result.then(function (evt) {
-	      // tslint:disable-next-line:strict-type-predicates
 	      if (typeof normalizeDepth === 'number' && normalizeDepth > 0) {
 	        return _this._normalizeEvent(evt, normalizeDepth);
 	      }
@@ -11401,22 +11550,79 @@ typeof navigator === "object" && (function () {
 	  BaseClient.prototype._normalizeEvent = function (event, depth) {
 	    if (!event) {
 	      return null;
-	    } // tslint:disable:no-unsafe-any
+	    }
 
-
-	    return _assign({}, event, event.breadcrumbs && {
+	    var normalized = _assign(_assign(_assign(_assign(_assign({}, event), event.breadcrumbs && {
 	      breadcrumbs: event.breadcrumbs.map(function (b) {
-	        return _assign({}, b, b.data && {
+	        return _assign(_assign({}, b), b.data && {
 	          data: normalize$1(b.data, depth)
 	        });
 	      })
-	    }, event.user && {
+	    }), event.user && {
 	      user: normalize$1(event.user, depth)
-	    }, event.contexts && {
+	    }), event.contexts && {
 	      contexts: normalize$1(event.contexts, depth)
-	    }, event.extra && {
+	    }), event.extra && {
 	      extra: normalize$1(event.extra, depth)
-	    });
+	    }); // event.contexts.trace stores information about a Transaction. Similarly,
+	    // event.spans[] stores information about child Spans. Given that a
+	    // Transaction is conceptually a Span, normalization should apply to both
+	    // Transactions and Spans consistently.
+	    // For now the decision is to skip normalization of Transactions and Spans,
+	    // so this block overwrites the normalized event to add back the original
+	    // Transaction information prior to normalization.
+
+
+	    if (event.contexts && event.contexts.trace) {
+	      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+	      normalized.contexts.trace = event.contexts.trace;
+	    }
+
+	    return normalized;
+	  };
+	  /**
+	   *  Enhances event using the client configuration.
+	   *  It takes care of all "static" values like environment, release and `dist`,
+	   *  as well as truncating overly long values.
+	   * @param event event instance to be enhanced
+	   */
+
+
+	  BaseClient.prototype._applyClientOptions = function (event) {
+	    var _a = this.getOptions(),
+	        environment = _a.environment,
+	        release = _a.release,
+	        dist = _a.dist,
+	        _b = _a.maxValueLength,
+	        maxValueLength = _b === void 0 ? 250 : _b;
+
+	    if (event.environment === undefined && environment !== undefined) {
+	      event.environment = environment;
+	    }
+
+	    if (event.release === undefined && release !== undefined) {
+	      event.release = release;
+	    }
+
+	    if (event.dist === undefined && dist !== undefined) {
+	      event.dist = dist;
+	    }
+
+	    if (event.message) {
+	      event.message = truncate(event.message, maxValueLength);
+	    }
+
+	    var exception = event.exception && event.exception.values && event.exception.values[0];
+
+	    if (exception && exception.value) {
+	      exception.value = truncate(exception.value, maxValueLength);
+	    }
+
+	    var request = event.request;
+
+	    if (request && request.url) {
+	      request.url = truncate(request.url, maxValueLength);
+	    }
 	  };
 	  /**
 	   * This function adds all used integrations to the SDK info in the event.
@@ -11424,12 +11630,22 @@ typeof navigator === "object" && (function () {
 	   */
 
 
-	  BaseClient.prototype._addIntegrations = function (sdkInfo) {
+	  BaseClient.prototype._applyIntegrationsMetadata = function (event) {
+	    var sdkInfo = event.sdk;
 	    var integrationsArray = Object.keys(this._integrations);
 
 	    if (sdkInfo && integrationsArray.length > 0) {
 	      sdkInfo.integrations = integrationsArray;
 	    }
+	  };
+	  /**
+	   * Tells the backend to send this event
+	   * @param event The Sentry event to send
+	   */
+
+
+	  BaseClient.prototype._sendEvent = function (event) {
+	    this._getBackend().sendEvent(event);
 	  };
 	  /**
 	   * Processes an event (either error or message) and sends it to Sentry.
@@ -11440,14 +11656,15 @@ typeof navigator === "object" && (function () {
 	   *
 	   *
 	   * @param event The event to send to Sentry.
-	   * @param hint May contain additional informartion about the original exception.
+	   * @param hint May contain additional information about the original exception.
 	   * @param scope A scope containing event metadata.
 	   * @returns A SyncPromise that resolves with the event or rejects in case event was/will not be send.
 	   */
 
 
 	  BaseClient.prototype._processEvent = function (event, hint, scope) {
-	    var _this = this;
+	    var _this = this; // eslint-disable-next-line @typescript-eslint/unbound-method
+
 
 	    var _a = this.getOptions(),
 	        beforeSend = _a.beforeSend,
@@ -11455,11 +11672,13 @@ typeof navigator === "object" && (function () {
 
 	    if (!this._isEnabled()) {
 	      return SyncPromise.reject('SDK not enabled, will not send event.');
-	    } // 1.0 === 100% events are sent
+	    }
+
+	    var isTransaction = event.type === 'transaction'; // 1.0 === 100% events are sent
 	    // 0.0 === 0% events are sent
+	    // Sampling for transaction happens somewhere else
 
-
-	    if (typeof sampleRate === 'number' && Math.random() > sampleRate) {
+	    if (!isTransaction && typeof sampleRate === 'number' && Math.random() > sampleRate) {
 	      return SyncPromise.reject('This event has been sampled, will not send event.');
 	    }
 
@@ -11471,16 +11690,16 @@ typeof navigator === "object" && (function () {
 	        }
 
 	        var finalEvent = prepared;
-	        var isInternalException = hint && hint.data && hint.data.__sentry__ === true;
+	        var isInternalException = hint && hint.data && hint.data.__sentry__ === true; // We skip beforeSend in case of transactions
 
-	        if (isInternalException || !beforeSend) {
-	          _this._getBackend().sendEvent(finalEvent);
+	        if (isInternalException || !beforeSend || isTransaction) {
+	          _this._sendEvent(finalEvent);
 
 	          resolve(finalEvent);
 	          return;
 	        }
 
-	        var beforeSendResult = beforeSend(prepared, hint); // tslint:disable-next-line:strict-type-predicates
+	        var beforeSendResult = beforeSend(prepared, hint);
 
 	        if (typeof beforeSendResult === 'undefined') {
 	          logger.error('`beforeSend` method has to return `null` or a valid event.');
@@ -11496,7 +11715,7 @@ typeof navigator === "object" && (function () {
 	          } // From here on we are really async
 
 
-	          _this._getBackend().sendEvent(finalEvent);
+	          _this._sendEvent(finalEvent);
 
 	          resolve(finalEvent);
 	        }
@@ -11527,7 +11746,7 @@ typeof navigator === "object" && (function () {
 	      } // From here on we are really async
 
 
-	      _this._getBackend().sendEvent(processedEvent);
+	      _this._sendEvent(processedEvent);
 
 	      resolve(processedEvent);
 	    }).then(null, function (e) {
@@ -11586,16 +11805,9 @@ typeof navigator === "object" && (function () {
 	    this._transport = this._setupTransport();
 	  }
 	  /**
-	   * Sets up the transport so it can be used later to send requests.
-	   */
-
-
-	  BaseBackend.prototype._setupTransport = function () {
-	    return new NoopTransport();
-	  };
-	  /**
 	   * @inheritDoc
 	   */
+	  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/explicit-module-boundary-types
 
 
 	  BaseBackend.prototype.eventFromException = function (_exception, _hint) {
@@ -11627,9 +11839,51 @@ typeof navigator === "object" && (function () {
 	  BaseBackend.prototype.getTransport = function () {
 	    return this._transport;
 	  };
+	  /**
+	   * Sets up the transport so it can be used later to send requests.
+	   */
+
+
+	  BaseBackend.prototype._setupTransport = function () {
+	    return new NoopTransport();
+	  };
 
 	  return BaseBackend;
 	}();
+
+	/** Creates a SentryRequest from an event. */
+
+	function eventToSentryRequest(event, api) {
+	  var useEnvelope = event.type === 'transaction';
+	  var req = {
+	    body: JSON.stringify(event),
+	    url: useEnvelope ? api.getEnvelopeEndpointWithUrlEncodedAuth() : api.getStoreEndpointWithUrlEncodedAuth()
+	  }; // https://develop.sentry.dev/sdk/envelopes/
+	  // Since we don't need to manipulate envelopes nor store them, there is no
+	  // exported concept of an Envelope with operations including serialization and
+	  // deserialization. Instead, we only implement a minimal subset of the spec to
+	  // serialize events inline here.
+
+	  if (useEnvelope) {
+	    var envelopeHeaders = JSON.stringify({
+	      event_id: event.event_id,
+	      // We need to add * 1000 since we divide it by 1000 by default but JS works with ms precision
+	      // The reason we use timestampWithMs here is that all clocks across the SDK use the same clock
+	      sent_at: new Date(timestampWithMs() * 1000).toISOString()
+	    });
+	    var itemHeaders = JSON.stringify({
+	      type: event.type
+	    }); // The trailing newline is optional. We intentionally don't send it to avoid
+	    // sending unnecessary bytes.
+	    //
+	    // const envelope = `${envelopeHeaders}\n${itemHeaders}\n${req.body}\n`;
+
+	    var envelope = envelopeHeaders + "\n" + itemHeaders + "\n" + req.body;
+	    req.body = envelope;
+	  }
+
+	  return req;
+	}
 
 	/**
 	 * Internal function to create a new SDK client instance. The client is
@@ -11667,7 +11921,8 @@ typeof navigator === "object" && (function () {
 
 
 	  FunctionToString.prototype.setupOnce = function () {
-	    originalFunctionToString = Function.prototype.toString;
+	    // eslint-disable-next-line @typescript-eslint/unbound-method
+	    originalFunctionToString = Function.prototype.toString; // eslint-disable-next-line @typescript-eslint/no-explicit-any
 
 	    Function.prototype.toString = function () {
 	      var args = [];
@@ -11676,8 +11931,7 @@ typeof navigator === "object" && (function () {
 	        args[_i] = arguments[_i];
 	      }
 
-	      var context = this.__sentry_original__ || this; // tslint:disable-next-line:no-unsafe-any
-
+	      var context = this.__sentry_original__ || this;
 	      return originalFunctionToString.apply(context, args);
 	    };
 	  };
@@ -11768,13 +12022,13 @@ typeof navigator === "object" && (function () {
 	      return true;
 	    }
 
-	    if (this._isBlacklistedUrl(event, options)) {
-	      logger.warn("Event dropped due to being matched by `blacklistUrls` option.\nEvent: " + getEventDescription(event) + ".\nUrl: " + this._getEventFilterUrl(event));
+	    if (this._isDeniedUrl(event, options)) {
+	      logger.warn("Event dropped due to being matched by `denyUrls` option.\nEvent: " + getEventDescription(event) + ".\nUrl: " + this._getEventFilterUrl(event));
 	      return true;
 	    }
 
-	    if (!this._isWhitelistedUrl(event, options)) {
-	      logger.warn("Event dropped due to not being matched by `whitelistUrls` option.\nEvent: " + getEventDescription(event) + ".\nUrl: " + this._getEventFilterUrl(event));
+	    if (!this._isAllowedUrl(event, options)) {
+	      logger.warn("Event dropped due to not being matched by `allowUrls` option.\nEvent: " + getEventDescription(event) + ".\nUrl: " + this._getEventFilterUrl(event));
 	      return true;
 	    }
 
@@ -11784,10 +12038,6 @@ typeof navigator === "object" && (function () {
 
 
 	  InboundFilters.prototype._isSentryError = function (event, options) {
-	    if (options === void 0) {
-	      options = {};
-	    }
-
 	    if (!options.ignoreInternal) {
 	      return false;
 	    }
@@ -11802,10 +12052,6 @@ typeof navigator === "object" && (function () {
 
 
 	  InboundFilters.prototype._isIgnoredError = function (event, options) {
-	    if (options === void 0) {
-	      options = {};
-	    }
-
 	    if (!options.ignoreErrors || !options.ignoreErrors.length) {
 	      return false;
 	    }
@@ -11820,38 +12066,30 @@ typeof navigator === "object" && (function () {
 	  /** JSDoc */
 
 
-	  InboundFilters.prototype._isBlacklistedUrl = function (event, options) {
-	    if (options === void 0) {
-	      options = {};
-	    } // TODO: Use Glob instead?
-
-
-	    if (!options.blacklistUrls || !options.blacklistUrls.length) {
+	  InboundFilters.prototype._isDeniedUrl = function (event, options) {
+	    // TODO: Use Glob instead?
+	    if (!options.denyUrls || !options.denyUrls.length) {
 	      return false;
 	    }
 
 	    var url = this._getEventFilterUrl(event);
 
-	    return !url ? false : options.blacklistUrls.some(function (pattern) {
+	    return !url ? false : options.denyUrls.some(function (pattern) {
 	      return isMatchingPattern(url, pattern);
 	    });
 	  };
 	  /** JSDoc */
 
 
-	  InboundFilters.prototype._isWhitelistedUrl = function (event, options) {
-	    if (options === void 0) {
-	      options = {};
-	    } // TODO: Use Glob instead?
-
-
-	    if (!options.whitelistUrls || !options.whitelistUrls.length) {
+	  InboundFilters.prototype._isAllowedUrl = function (event, options) {
+	    // TODO: Use Glob instead?
+	    if (!options.allowUrls || !options.allowUrls.length) {
 	      return true;
 	    }
 
 	    var url = this._getEventFilterUrl(event);
 
-	    return !url ? true : options.whitelistUrls.some(function (pattern) {
+	    return !url ? true : options.allowUrls.some(function (pattern) {
 	      return isMatchingPattern(url, pattern);
 	    });
 	  };
@@ -11864,10 +12102,10 @@ typeof navigator === "object" && (function () {
 	    }
 
 	    return {
-	      blacklistUrls: __spread(this._options.blacklistUrls || [], clientOptions.blacklistUrls || []),
+	      allowUrls: __spread(this._options.whitelistUrls || [], this._options.allowUrls || [], clientOptions.whitelistUrls || [], clientOptions.allowUrls || []),
+	      denyUrls: __spread(this._options.blacklistUrls || [], this._options.denyUrls || [], clientOptions.blacklistUrls || [], clientOptions.denyUrls || []),
 	      ignoreErrors: __spread(this._options.ignoreErrors || [], clientOptions.ignoreErrors || [], DEFAULT_IGNORE_ERRORS),
-	      ignoreInternal: typeof this._options.ignoreInternal !== 'undefined' ? this._options.ignoreInternal : true,
-	      whitelistUrls: __spread(this._options.whitelistUrls || [], clientOptions.whitelistUrls || [])
+	      ignoreInternal: typeof this._options.ignoreInternal !== 'undefined' ? this._options.ignoreInternal : true
 	    };
 	  };
 	  /** JSDoc */
@@ -11931,16 +12169,26 @@ typeof navigator === "object" && (function () {
 	// generates filenames without a prefix like `file://` the filenames in the stacktrace are just 42.js
 	// We need this specific case for now because we want no other regex to match.
 
-	var gecko = /^\s*(.*?)(?:\((.*?)\))?(?:^|@)?((?:file|https?|blob|chrome|webpack|resource|moz-extension).*?:\/.*?|\[native code\]|[^@]*(?:bundle|\d+\.js))(?::(\d+))?(?::(\d+))?\s*$/i;
+	var gecko = /^\s*(.*?)(?:\((.*?)\))?(?:^|@)?((?:file|https?|blob|chrome|webpack|resource|moz-extension|capacitor).*?:\/.*?|\[native code\]|[^@]*(?:bundle|\d+\.js))(?::(\d+))?(?::(\d+))?\s*$/i;
 	var winjs = /^\s*at (?:((?:\[object object\])?.+) )?\(?((?:file|ms-appx|https?|webpack|blob):.*?):(\d+)(?::(\d+))?\)?\s*$/i;
 	var geckoEval = /(\S+) line (\d+)(?: > eval line \d+)* > eval/i;
-	var chromeEval = /\((\S*)(?::(\d+))(?::(\d+))\)/;
+	var chromeEval = /\((\S*)(?::(\d+))(?::(\d+))\)/; // Based on our own mapping pattern - https://github.com/getsentry/sentry/blob/9f08305e09866c8bd6d0c24f5b0aabdd7dd6c59c/src/sentry/lang/javascript/errormapping.py#L83-L108
+
+	var reactMinifiedRegexp = /Minified React error #\d+;/i;
 	/** JSDoc */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/explicit-module-boundary-types
 
 	function computeStackTrace(ex) {
-	  // tslint:disable:no-unsafe-any
 	  var stack = null;
-	  var popSize = ex && ex.framesToPop;
+	  var popSize = 0;
+
+	  if (ex) {
+	    if (typeof ex.framesToPop === 'number') {
+	      popSize = ex.framesToPop;
+	    } else if (reactMinifiedRegexp.test(ex.message)) {
+	      popSize = 1;
+	    }
+	  }
 
 	  try {
 	    // This must be tried first because Opera 10 *destroys*
@@ -11971,10 +12219,9 @@ typeof navigator === "object" && (function () {
 	  };
 	}
 	/** JSDoc */
-	// tslint:disable-next-line:cyclomatic-complexity
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any, complexity
 
 	function computeStackTraceFromStackProp(ex) {
-	  // tslint:disable:no-conditional-assignment
 	  if (!ex || !ex.stack) {
 	    return null;
 	  }
@@ -12064,6 +12311,7 @@ typeof navigator === "object" && (function () {
 	  };
 	}
 	/** JSDoc */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 
 
 	function computeStackTraceFromStacktraceProp(ex) {
@@ -12076,13 +12324,12 @@ typeof navigator === "object" && (function () {
 
 	  var stacktrace = ex.stacktrace;
 	  var opera10Regex = / line (\d+).*script (?:in )?(\S+)(?:: in function (\S+))?$/i;
-	  var opera11Regex = / line (\d+), column (\d+)\s*(?:in (?:<anonymous function: ([^>]+)>|([^\)]+))\((.*)\))? in (.*):\s*$/i;
+	  var opera11Regex = / line (\d+), column (\d+)\s*(?:in (?:<anonymous function: ([^>]+)>|([^)]+))\((.*)\))? in (.*):\s*$/i;
 	  var lines = stacktrace.split('\n');
 	  var stack = [];
 	  var parts;
 
 	  for (var line = 0; line < lines.length; line += 2) {
-	    // tslint:disable:no-conditional-assignment
 	    var element = null;
 
 	    if (parts = opera10Regex.exec(lines[line])) {
@@ -12127,7 +12374,7 @@ typeof navigator === "object" && (function () {
 
 	function popFrames(stacktrace, popSize) {
 	  try {
-	    return _assign({}, stacktrace, {
+	    return _assign(_assign({}, stacktrace), {
 	      stack: stacktrace.stack.slice(popSize)
 	    });
 	  } catch (e) {
@@ -12139,6 +12386,7 @@ typeof navigator === "object" && (function () {
 	 * https://github.com/getsentry/sentry-javascript/issues/1949
 	 * In this specific case we try to extract stacktrace.message.error.message
 	 */
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 
 
 	function extractMessage(ex) {
@@ -12173,8 +12421,7 @@ typeof navigator === "object" && (function () {
 	    exception.stacktrace = {
 	      frames: frames
 	    };
-	  } // tslint:disable-next-line:strict-type-predicates
-
+	  }
 
 	  if (exception.type === undefined && exception.value === '') {
 	    exception.value = 'Unrecoverable error caught';
@@ -12244,7 +12491,7 @@ typeof navigator === "object" && (function () {
 	  } // The frame where the crash happened, should be the last entry in the array
 
 
-	  return localStack.map(function (frame) {
+	  return localStack.slice(0, STACKTRACE_LIMIT).map(function (frame) {
 	    return {
 	      colno: frame.column === null ? undefined : frame.column,
 	      filename: frame.url || localStack[0].url,
@@ -12252,10 +12499,56 @@ typeof navigator === "object" && (function () {
 	      in_app: true,
 	      lineno: frame.line === null ? undefined : frame.line
 	    };
-	  }).slice(0, STACKTRACE_LIMIT).reverse();
+	  }).reverse();
 	}
 
-	/** JSDoc */
+	/**
+	 * Builds and Event from a Exception
+	 * @hidden
+	 */
+
+	function eventFromException(options, exception, hint) {
+	  var syntheticException = hint && hint.syntheticException || undefined;
+	  var event = eventFromUnknownInput(exception, syntheticException, {
+	    attachStacktrace: options.attachStacktrace
+	  });
+	  addExceptionMechanism(event, {
+	    handled: true,
+	    type: 'generic'
+	  });
+	  event.level = Severity.Error;
+
+	  if (hint && hint.event_id) {
+	    event.event_id = hint.event_id;
+	  }
+
+	  return SyncPromise.resolve(event);
+	}
+	/**
+	 * Builds and Event from a Message
+	 * @hidden
+	 */
+
+	function eventFromMessage(options, message, level, hint) {
+	  if (level === void 0) {
+	    level = Severity.Info;
+	  }
+
+	  var syntheticException = hint && hint.syntheticException || undefined;
+	  var event = eventFromString(message, syntheticException, {
+	    attachStacktrace: options.attachStacktrace
+	  });
+	  event.level = level;
+
+	  if (hint && hint.event_id) {
+	    event.event_id = hint.event_id;
+	  }
+
+	  return SyncPromise.resolve(event);
+	}
+	/**
+	 * @hidden
+	 */
 
 	function eventFromUnknownInput(exception, syntheticException, options) {
 	  if (options === void 0) {
@@ -12266,9 +12559,9 @@ typeof navigator === "object" && (function () {
 
 	  if (isErrorEvent(exception) && exception.error) {
 	    // If it is an ErrorEvent with `error` property, extract it to get actual Error
-	    var errorEvent = exception;
-	    exception = errorEvent.error; // tslint:disable-line:no-parameter-reassignment
+	    var errorEvent = exception; // eslint-disable-next-line no-param-reassign
 
+	    exception = errorEvent.error;
 	    event = eventFromStacktrace(computeStackTrace(exception));
 	    return event;
 	  }
@@ -12319,9 +12612,10 @@ typeof navigator === "object" && (function () {
 	    synthetic: true
 	  });
 	  return event;
-	} // this._options.attachStacktrace
-
-	/** JSDoc */
+	}
+	/**
+	 * @hidden
+	 */
 
 	function eventFromString(input, syntheticException, options) {
 	  if (options === void 0) {
@@ -12353,7 +12647,9 @@ typeof navigator === "object" && (function () {
 	    /** A simple buffer holding all requests. */
 
 	    this._buffer = new PromiseBuffer(30);
-	    this.url = new API(this.options.dsn).getStoreEndpointWithUrlEncodedAuth();
+	    this._api = new API(this.options.dsn); // eslint-disable-next-line deprecation/deprecation
+
+	    this.url = this._api.getStoreEndpointWithUrlEncodedAuth();
 	  }
 	  /**
 	   * @inheritDoc
@@ -12407,8 +12703,9 @@ typeof navigator === "object" && (function () {
 	      });
 	    }
 
-	    var defaultOptions = {
-	      body: JSON.stringify(event),
+	    var sentryReq = eventToSentryRequest(event, this._api);
+	    var options = {
+	      body: sentryReq.body,
 	      method: 'POST',
 	      // Despite all stars in the sky saying that Edge supports old draft syntax, aka 'never', 'always', 'origin' and 'default
 	      // https://caniuse.com/#feat=referrer-policy
@@ -12417,12 +12714,16 @@ typeof navigator === "object" && (function () {
 	      referrerPolicy: supportsReferrerPolicy() ? 'origin' : ''
 	    };
 
+	    if (this.options.fetchParameters !== undefined) {
+	      Object.assign(options, this.options.fetchParameters);
+	    }
+
 	    if (this.options.headers !== undefined) {
-	      defaultOptions.headers = this.options.headers;
+	      options.headers = this.options.headers;
 	    }
 
 	    return this._buffer.add(new SyncPromise(function (resolve, reject) {
-	      global$3.fetch(_this.url, defaultOptions).then(function (response) {
+	      global$3.fetch(sentryReq.url, options).then(function (response) {
 	        var status = Status.fromHttpCode(response.status);
 
 	        if (status === Status.Success) {
@@ -12434,7 +12735,13 @@ typeof navigator === "object" && (function () {
 
 	        if (status === Status.RateLimit) {
 	          var now = Date.now();
-	          _this._disabledUntil = new Date(now + parseRetryAfterHeader(now, response.headers.get('Retry-After')));
+	          /**
+	           * "The name is case-insensitive."
+	           * https://developer.mozilla.org/en-US/docs/Web/API/Headers/get
+	           */
+
+	          var retryAfterHeader = response.headers.get('Retry-After');
+	          _this._disabledUntil = new Date(now + parseRetryAfterHeader(now, retryAfterHeader));
 	          logger.warn("Too many requests, backing off till: " + _this._disabledUntil);
 	        }
 
@@ -12477,6 +12784,7 @@ typeof navigator === "object" && (function () {
 	      });
 	    }
 
+	    var sentryReq = eventToSentryRequest(event, this._api);
 	    return this._buffer.add(new SyncPromise(function (resolve, reject) {
 	      var request = new XMLHttpRequest();
 
@@ -12496,14 +12804,20 @@ typeof navigator === "object" && (function () {
 
 	        if (status === Status.RateLimit) {
 	          var now = Date.now();
-	          _this._disabledUntil = new Date(now + parseRetryAfterHeader(now, request.getResponseHeader('Retry-After')));
+	          /**
+	           * "The search for the header name is case-insensitive."
+	           * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/getResponseHeader
+	           */
+
+	          var retryAfterHeader = request.getResponseHeader('Retry-After');
+	          _this._disabledUntil = new Date(now + parseRetryAfterHeader(now, retryAfterHeader));
 	          logger.warn("Too many requests, backing off till: " + _this._disabledUntil);
 	        }
 
 	        reject(request);
 	      };
 
-	      request.open('POST', _this.url);
+	      request.open('POST', sentryReq.url);
 
 	      for (var header in _this.options.headers) {
 	        if (_this.options.headers.hasOwnProperty(header)) {
@@ -12511,7 +12825,7 @@ typeof navigator === "object" && (function () {
 	        }
 	      }
 
-	      request.send(JSON.stringify(event));
+	      request.send(sentryReq.body);
 	    }));
 	  };
 
@@ -12536,13 +12850,33 @@ typeof navigator === "object" && (function () {
 	   */
 
 
+	  BrowserBackend.prototype.eventFromException = function (exception, hint) {
+	    return eventFromException(this._options, exception, hint);
+	  };
+	  /**
+	   * @inheritDoc
+	   */
+
+
+	  BrowserBackend.prototype.eventFromMessage = function (message, level, hint) {
+	    if (level === void 0) {
+	      level = Severity.Info;
+	    }
+
+	    return eventFromMessage(this._options, message, level, hint);
+	  };
+	  /**
+	   * @inheritDoc
+	   */
+
+
 	  BrowserBackend.prototype._setupTransport = function () {
 	    if (!this._options.dsn) {
 	      // We return the noop transport here in case there is no Dsn.
 	      return _super.prototype._setupTransport.call(this);
 	    }
 
-	    var transportOptions = _assign({}, this._options.transportOptions, {
+	    var transportOptions = _assign(_assign({}, this._options.transportOptions), {
 	      dsn: this._options.dsn
 	    });
 
@@ -12556,148 +12890,9 @@ typeof navigator === "object" && (function () {
 
 	    return new XHRTransport(transportOptions);
 	  };
-	  /**
-	   * @inheritDoc
-	   */
-
-
-	  BrowserBackend.prototype.eventFromException = function (exception, hint) {
-	    var syntheticException = hint && hint.syntheticException || undefined;
-	    var event = eventFromUnknownInput(exception, syntheticException, {
-	      attachStacktrace: this._options.attachStacktrace
-	    });
-	    addExceptionMechanism(event, {
-	      handled: true,
-	      type: 'generic'
-	    });
-	    event.level = Severity.Error;
-
-	    if (hint && hint.event_id) {
-	      event.event_id = hint.event_id;
-	    }
-
-	    return SyncPromise.resolve(event);
-	  };
-	  /**
-	   * @inheritDoc
-	   */
-
-
-	  BrowserBackend.prototype.eventFromMessage = function (message, level, hint) {
-	    if (level === void 0) {
-	      level = Severity.Info;
-	    }
-
-	    var syntheticException = hint && hint.syntheticException || undefined;
-	    var event = eventFromString(message, syntheticException, {
-	      attachStacktrace: this._options.attachStacktrace
-	    });
-	    event.level = level;
-
-	    if (hint && hint.event_id) {
-	      event.event_id = hint.event_id;
-	    }
-
-	    return SyncPromise.resolve(event);
-	  };
 
 	  return BrowserBackend;
 	}(BaseBackend);
-
-	var SDK_NAME = 'sentry.javascript.browser';
-	var SDK_VERSION = '5.15.5';
-
-	/**
-	 * The Sentry Browser SDK Client.
-	 *
-	 * @see BrowserOptions for documentation on configuration options.
-	 * @see SentryClient for usage documentation.
-	 */
-
-	var BrowserClient =
-	/** @class */
-	function (_super) {
-	  __extends(BrowserClient, _super);
-	  /**
-	   * Creates a new Browser SDK instance.
-	   *
-	   * @param options Configuration options for this SDK.
-	   */
-
-
-	  function BrowserClient(options) {
-	    if (options === void 0) {
-	      options = {};
-	    }
-
-	    return _super.call(this, BrowserBackend, options) || this;
-	  }
-	  /**
-	   * @inheritDoc
-	   */
-
-
-	  BrowserClient.prototype._prepareEvent = function (event, scope, hint) {
-	    event.platform = event.platform || 'javascript';
-	    event.sdk = _assign({}, event.sdk, {
-	      name: SDK_NAME,
-	      packages: __spread(event.sdk && event.sdk.packages || [], [{
-	        name: 'npm:@sentry/browser',
-	        version: SDK_VERSION
-	      }]),
-	      version: SDK_VERSION
-	    });
-	    return _super.prototype._prepareEvent.call(this, event, scope, hint);
-	  };
-	  /**
-	   * Show a report dialog to the user to send feedback to a specific event.
-	   *
-	   * @param options Set individual options for the dialog
-	   */
-
-
-	  BrowserClient.prototype.showReportDialog = function (options) {
-	    if (options === void 0) {
-	      options = {};
-	    } // doesn't work without a document (React Native)
-
-
-	    var document = getGlobalObject().document;
-
-	    if (!document) {
-	      return;
-	    }
-
-	    if (!this._isEnabled()) {
-	      logger.error('Trying to call showReportDialog with Sentry Client is disabled');
-	      return;
-	    }
-
-	    var dsn = options.dsn || this.getDsn();
-
-	    if (!options.eventId) {
-	      logger.error('Missing `eventId` option in showReportDialog call');
-	      return;
-	    }
-
-	    if (!dsn) {
-	      logger.error('Missing `Dsn` option in showReportDialog call');
-	      return;
-	    }
-
-	    var script = document.createElement('script');
-	    script.async = true;
-	    script.src = new API(dsn).getReportDialogEndpoint(options);
-
-	    if (options.onLoad) {
-	      script.onload = options.onLoad;
-	    }
-
-	    (document.head || document.body).appendChild(script);
-	  };
-
-	  return BrowserClient;
-	}(BaseClient);
 
 	var ignoreOnError = 0;
 	/**
@@ -12730,8 +12925,7 @@ typeof navigator === "object" && (function () {
 	function wrap$1(fn, options, before) {
 	  if (options === void 0) {
 	    options = {};
-	  } // tslint:disable-next-line:strict-type-predicates
-
+	  }
 
 	  if (typeof fn !== 'function') {
 	    return fn;
@@ -12753,15 +12947,18 @@ typeof navigator === "object" && (function () {
 	    // Bail on wrapping and return the function as-is (defers to window.onerror).
 	    return fn;
 	  }
+	  /* eslint-disable prefer-rest-params */
+	  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 
 	  var sentryWrapped = function sentryWrapped() {
-	    var args = Array.prototype.slice.call(arguments); // tslint:disable:no-unsafe-any
+	    var args = Array.prototype.slice.call(arguments);
 
 	    try {
-	      // tslint:disable-next-line:strict-type-predicates
 	      if (before && typeof before === 'function') {
 	        before.apply(this, arguments);
-	      }
+	      } // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+
 
 	      var wrappedArguments = args.map(function (arg) {
 	        return wrap$1(arg, options);
@@ -12772,6 +12969,7 @@ typeof navigator === "object" && (function () {
 	        // NOTE: If you are a Sentry user, and you are seeing this stack frame, it
 	        //       means the sentry.javascript SDK caught an error invoking your application code. This
 	        //       is expected behavior and NOT indicative of a bug with sentry.javascript.
+	        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 	        return fn.handleEvent.apply(this, wrappedArguments);
 	      } // Attempt to invoke user-land function
 	      // NOTE: If you are a Sentry user, and you are seeing this stack frame, it
@@ -12779,7 +12977,7 @@ typeof navigator === "object" && (function () {
 	      //       is expected behavior and NOT indicative of a bug with sentry.javascript.
 
 
-	      return fn.apply(this, wrappedArguments); // tslint:enable:no-unsafe-any
+	      return fn.apply(this, wrappedArguments);
 	    } catch (ex) {
 	      ignoreNextOnError();
 	      withScope(function (scope) {
@@ -12791,7 +12989,7 @@ typeof navigator === "object" && (function () {
 	            addExceptionMechanism(processedEvent, options.mechanism);
 	          }
 
-	          processedEvent.extra = _assign({}, processedEvent.extra, {
+	          processedEvent.extra = _assign(_assign({}, processedEvent.extra), {
 	            arguments: args
 	          });
 	          return processedEvent;
@@ -12800,7 +12998,9 @@ typeof navigator === "object" && (function () {
 	      });
 	      throw ex;
 	    }
-	  }; // Accessing some objects may throw
+	  };
+	  /* eslint-enable prefer-rest-params */
+	  // Accessing some objects may throw
 	  // ref: https://github.com/getsentry/sentry-javascript/issues/1168
 
 
@@ -12810,7 +13010,7 @@ typeof navigator === "object" && (function () {
 	        sentryWrapped[property] = fn[property];
 	      }
 	    }
-	  } catch (_oO) {} // tslint:disable-line:no-empty
+	  } catch (_oO) {} // eslint-disable-line no-empty
 
 
 	  fn.prototype = fn.prototype || {};
@@ -12841,12 +13041,42 @@ typeof navigator === "object" && (function () {
 	          return fn.name;
 	        }
 	      });
-	    }
-	  } catch (_oO) {
-	    /*no-empty*/
-	  }
+	    } // eslint-disable-next-line no-empty
+
+	  } catch (_oO) {}
 
 	  return sentryWrapped;
+	}
+	/**
+	 * Injects the Report Dialog script
+	 * @hidden
+	 */
+
+	function injectReportDialog(options) {
+	  if (options === void 0) {
+	    options = {};
+	  }
+
+	  if (!options.eventId) {
+	    logger.error("Missing eventId option in showReportDialog call");
+	    return;
+	  }
+
+	  if (!options.dsn) {
+	    logger.error("Missing dsn option in showReportDialog call");
+	    return;
+	  }
+
+	  var script = document.createElement('script');
+	  script.async = true;
+	  script.src = new API(options.dsn).getReportDialogEndpoint(options);
+
+	  if (options.onLoad) {
+	    // eslint-disable-next-line @typescript-eslint/unbound-method
+	    script.onload = options.onLoad;
+	  }
+
+	  (document.head || document.body).appendChild(script);
 	}
 
 	/** Global handlers */
@@ -12902,6 +13132,7 @@ typeof navigator === "object" && (function () {
 	    }
 
 	    addInstrumentationHandler({
+	      // eslint-disable-next-line @typescript-eslint/no-explicit-any
 	      callback: function callback(data) {
 	        var error = data.error;
 	        var currentHub = getCurrentHub();
@@ -12940,6 +13171,7 @@ typeof navigator === "object" && (function () {
 	    }
 
 	    addInstrumentationHandler({
+	      // eslint-disable-next-line @typescript-eslint/no-explicit-any
 	      callback: function callback(e) {
 	        var error = e; // dig the object of the rejection out of known event types
 
@@ -12989,6 +13221,7 @@ typeof navigator === "object" && (function () {
 	  /**
 	   * This function creates a stack from an old, error-less onerror handler.
 	   */
+	  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 
 
 	  GlobalHandlers.prototype._eventFromIncompleteOnError = function (msg, url, line, column) {
@@ -13019,6 +13252,7 @@ typeof navigator === "object" && (function () {
 	  /**
 	   * This function creates an Event from an TraceKitStackTrace that has part of it missing.
 	   */
+	  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 
 
 	  GlobalHandlers.prototype._eventFromIncompleteRejection = function (error) {
@@ -13032,6 +13266,7 @@ typeof navigator === "object" && (function () {
 	    };
 	  };
 	  /** JSDoc */
+	  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 
 
 	  GlobalHandlers.prototype._enhanceEventWithInitialFrame = function (event, url, line, column) {
@@ -13065,24 +13300,63 @@ typeof navigator === "object" && (function () {
 	  return GlobalHandlers;
 	}();
 
+	var DEFAULT_EVENT_TARGET = ['EventTarget', 'Window', 'Node', 'ApplicationCache', 'AudioTrackList', 'ChannelMergerNode', 'CryptoOperation', 'EventSource', 'FileReader', 'HTMLUnknownElement', 'IDBDatabase', 'IDBRequest', 'IDBTransaction', 'KeyOperation', 'MediaController', 'MessagePort', 'ModalWindow', 'Notification', 'SVGElementInstance', 'Screen', 'TextTrack', 'TextTrackCue', 'TextTrackList', 'WebSocket', 'WebSocketWorker', 'Worker', 'XMLHttpRequest', 'XMLHttpRequestEventTarget', 'XMLHttpRequestUpload'];
 	/** Wrap timer functions and event targets to catch errors and provide better meta data */
 
 	var TryCatch =
 	/** @class */
 	function () {
-	  function TryCatch() {
-	    /** JSDoc */
-	    this._ignoreOnError = 0;
+	  /**
+	   * @inheritDoc
+	   */
+	  function TryCatch(options) {
 	    /**
 	     * @inheritDoc
 	     */
-
 	    this.name = TryCatch.id;
+	    this._options = _assign({
+	      XMLHttpRequest: true,
+	      eventTarget: true,
+	      requestAnimationFrame: true,
+	      setInterval: true,
+	      setTimeout: true
+	    }, options);
 	  }
+	  /**
+	   * Wrap timer functions and event targets to catch errors
+	   * and provide better metadata.
+	   */
+
+
+	  TryCatch.prototype.setupOnce = function () {
+	    var global = getGlobalObject();
+
+	    if (this._options.setTimeout) {
+	      fill(global, 'setTimeout', this._wrapTimeFunction.bind(this));
+	    }
+
+	    if (this._options.setInterval) {
+	      fill(global, 'setInterval', this._wrapTimeFunction.bind(this));
+	    }
+
+	    if (this._options.requestAnimationFrame) {
+	      fill(global, 'requestAnimationFrame', this._wrapRAF.bind(this));
+	    }
+
+	    if (this._options.XMLHttpRequest && 'XMLHttpRequest' in global) {
+	      fill(XMLHttpRequest.prototype, 'send', this._wrapXHR.bind(this));
+	    }
+
+	    if (this._options.eventTarget) {
+	      var eventTarget = Array.isArray(this._options.eventTarget) ? this._options.eventTarget : DEFAULT_EVENT_TARGET;
+	      eventTarget.forEach(this._wrapEventTarget.bind(this));
+	    }
+	  };
 	  /** JSDoc */
 
 
 	  TryCatch.prototype._wrapTimeFunction = function (original) {
+	    // eslint-disable-next-line @typescript-eslint/no-explicit-any
 	    return function () {
 	      var args = [];
 
@@ -13104,11 +13378,14 @@ typeof navigator === "object" && (function () {
 	    };
 	  };
 	  /** JSDoc */
+	  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 
 
 	  TryCatch.prototype._wrapRAF = function (original) {
+	    // eslint-disable-next-line @typescript-eslint/no-explicit-any
 	    return function (callback) {
-	      return original(wrap$1(callback, {
+	      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+	      return original.call(this, wrap$1(callback, {
 	        mechanism: {
 	          data: {
 	            function: 'requestAnimationFrame',
@@ -13124,8 +13401,10 @@ typeof navigator === "object" && (function () {
 
 
 	  TryCatch.prototype._wrapEventTarget = function (target) {
-	    var global = getGlobalObject();
-	    var proto = global[target] && global[target].prototype;
+	    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+	    var global = getGlobalObject(); // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+
+	    var proto = global[target] && global[target].prototype; // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 
 	    if (!proto || !proto.hasOwnProperty || !proto.hasOwnProperty('addEventListener')) {
 	      return;
@@ -13134,7 +13413,6 @@ typeof navigator === "object" && (function () {
 	    fill(proto, 'addEventListener', function (original) {
 	      return function (eventName, fn, options) {
 	        try {
-	          // tslint:disable-next-line:no-unbound-method strict-type-predicates
 	          if (typeof fn.handleEvent === 'function') {
 	            fn.handleEvent = wrap$1(fn.handleEvent.bind(fn), {
 	              mechanism: {
@@ -13151,7 +13429,8 @@ typeof navigator === "object" && (function () {
 	        } catch (err) {// can sometimes get 'Permission denied to access property "handle Event'
 	        }
 
-	        return original.call(this, eventName, wrap$1(fn, {
+	        return original.call(this, eventName, // eslint-disable-next-line @typescript-eslint/no-explicit-any
+	        wrap$1(fn, {
 	          mechanism: {
 	            data: {
 	              function: 'addEventListener',
@@ -13166,14 +13445,29 @@ typeof navigator === "object" && (function () {
 	    });
 	    fill(proto, 'removeEventListener', function (original) {
 	      return function (eventName, fn, options) {
-	        var callback = fn;
-
+	        /**
+	         * There are 2 possible scenarios here:
+	         *
+	         * 1. Someone passes a callback, which was attached prior to Sentry initialization, or by using unmodified
+	         * method, eg. `document.addEventListener.call(el, name, handler). In this case, we treat this function
+	         * as a pass-through, and call original `removeEventListener` with it.
+	         *
+	         * 2. Someone passes a callback, which was attached after Sentry was initialized, which means that it was using
+	         * our wrapped version of `addEventListener`, which internally calls `wrap` helper.
+	         * This helper "wraps" whole callback inside a try/catch statement, and attached appropriate metadata to it,
+	         * in order for us to make a distinction between wrapped/non-wrapped functions possible.
+	         * If a function was wrapped, it has additional property of `__sentry_wrapped__`, holding the handler.
+	         *
+	         * When someone adds a handler prior to initialization, and then do it again, but after,
+	         * then we have to detach both of them. Otherwise, if we'd detach only wrapped one, it'd be impossible
+	         * to get rid of the initial handler and it'd stick there forever.
+	         */
 	        try {
-	          callback = callback && (callback.__sentry_wrapped__ || callback);
+	          original.call(this, eventName, fn.__sentry_wrapped__, options);
 	        } catch (e) {// ignore, accessing __sentry_wrapped__ will throw in some Selenium environments
 	        }
 
-	        return original.call(this, eventName, callback, options);
+	        return original.call(this, eventName, fn, options);
 	      };
 	    });
 	  };
@@ -13181,18 +13475,20 @@ typeof navigator === "object" && (function () {
 
 
 	  TryCatch.prototype._wrapXHR = function (originalSend) {
+	    // eslint-disable-next-line @typescript-eslint/no-explicit-any
 	    return function () {
 	      var args = [];
 
 	      for (var _i = 0; _i < arguments.length; _i++) {
 	        args[_i] = arguments[_i];
-	      }
+	      } // eslint-disable-next-line @typescript-eslint/no-this-alias
 
-	      var xhr = this; // tslint:disable-line:no-this-assignment
 
+	      var xhr = this;
 	      var xmlHttpRequestProps = ['onload', 'onerror', 'onprogress', 'onreadystatechange'];
 	      xmlHttpRequestProps.forEach(function (prop) {
 	        if (prop in xhr && typeof xhr[prop] === 'function') {
+	          // eslint-disable-next-line @typescript-eslint/no-explicit-any
 	          fill(xhr, prop, function (original) {
 	            var wrapOptions = {
 	              mechanism: {
@@ -13216,25 +13512,6 @@ typeof navigator === "object" && (function () {
 	      });
 	      return originalSend.apply(this, args);
 	    };
-	  };
-	  /**
-	   * Wrap timer functions and event targets to catch errors
-	   * and provide better metadata.
-	   */
-
-
-	  TryCatch.prototype.setupOnce = function () {
-	    this._ignoreOnError = this._ignoreOnError;
-	    var global = getGlobalObject();
-	    fill(global, 'setTimeout', this._wrapTimeFunction.bind(this));
-	    fill(global, 'setInterval', this._wrapTimeFunction.bind(this));
-	    fill(global, 'requestAnimationFrame', this._wrapRAF.bind(this));
-
-	    if ('XMLHttpRequest' in global) {
-	      fill(XMLHttpRequest.prototype, 'send', this._wrapXHR.bind(this));
-	    }
-
-	    ['EventTarget', 'Window', 'Node', 'ApplicationCache', 'AudioTrackList', 'ChannelMergerNode', 'CryptoOperation', 'EventSource', 'FileReader', 'HTMLUnknownElement', 'IDBDatabase', 'IDBRequest', 'IDBTransaction', 'KeyOperation', 'MediaController', 'MessagePort', 'ModalWindow', 'Notification', 'SVGElementInstance', 'Screen', 'TextTrack', 'TextTrackCue', 'TextTrackList', 'WebSocket', 'WebSocketWorker', 'Worker', 'XMLHttpRequest', 'XMLHttpRequestEventTarget', 'XMLHttpRequestUpload'].forEach(this._wrapEventTarget.bind(this));
 	  };
 	  /**
 	   * @inheritDoc
@@ -13271,173 +13548,22 @@ typeof navigator === "object" && (function () {
 	    }, options);
 	  }
 	  /**
-	   * Creates breadcrumbs from console API calls
+	   * Create a breadcrumb of `sentry` from the events themselves
 	   */
 
 
-	  Breadcrumbs.prototype._consoleBreadcrumb = function (handlerData) {
-	    var breadcrumb = {
-	      category: 'console',
-	      data: {
-	        arguments: handlerData.args,
-	        logger: 'console'
-	      },
-	      level: Severity.fromString(handlerData.level),
-	      message: safeJoin(handlerData.args, ' ')
-	    };
-
-	    if (handlerData.level === 'assert') {
-	      if (handlerData.args[0] === false) {
-	        breadcrumb.message = "Assertion failed: " + (safeJoin(handlerData.args.slice(1), ' ') || 'console.assert');
-	        breadcrumb.data.arguments = handlerData.args.slice(1);
-	      } else {
-	        // Don't capture a breadcrumb for passed assertions
-	        return;
-	      }
-	    }
-
-	    getCurrentHub().addBreadcrumb(breadcrumb, {
-	      input: handlerData.args,
-	      level: handlerData.level
-	    });
-	  };
-	  /**
-	   * Creates breadcrumbs from DOM API calls
-	   */
-
-
-	  Breadcrumbs.prototype._domBreadcrumb = function (handlerData) {
-	    var target; // Accessing event.target can throw (see getsentry/raven-js#838, #768)
-
-	    try {
-	      target = handlerData.event.target ? htmlTreeAsString(handlerData.event.target) : htmlTreeAsString(handlerData.event);
-	    } catch (e) {
-	      target = '<unknown>';
-	    }
-
-	    if (target.length === 0) {
+	  Breadcrumbs.prototype.addSentryBreadcrumb = function (event) {
+	    if (!this._options.sentry) {
 	      return;
 	    }
 
 	    getCurrentHub().addBreadcrumb({
-	      category: "ui." + handlerData.name,
-	      message: target
+	      category: "sentry." + (event.type === 'transaction' ? 'transaction' : 'event'),
+	      event_id: event.event_id,
+	      level: event.level,
+	      message: getEventDescription(event)
 	    }, {
-	      event: handlerData.event,
-	      name: handlerData.name
-	    });
-	  };
-	  /**
-	   * Creates breadcrumbs from XHR API calls
-	   */
-
-
-	  Breadcrumbs.prototype._xhrBreadcrumb = function (handlerData) {
-	    if (handlerData.endTimestamp) {
-	      // We only capture complete, non-sentry requests
-	      if (handlerData.xhr.__sentry_own_request__) {
-	        return;
-	      }
-
-	      getCurrentHub().addBreadcrumb({
-	        category: 'xhr',
-	        data: handlerData.xhr.__sentry_xhr__,
-	        type: 'http'
-	      }, {
-	        xhr: handlerData.xhr
-	      });
-	      return;
-	    } // We only capture issued sentry requests
-
-
-	    if (this._options.sentry && handlerData.xhr.__sentry_own_request__) {
-	      addSentryBreadcrumb(handlerData.args[0]);
-	    }
-	  };
-	  /**
-	   * Creates breadcrumbs from fetch API calls
-	   */
-
-
-	  Breadcrumbs.prototype._fetchBreadcrumb = function (handlerData) {
-	    // We only capture complete fetch requests
-	    if (!handlerData.endTimestamp) {
-	      return;
-	    }
-
-	    var client = getCurrentHub().getClient();
-	    var dsn = client && client.getDsn();
-
-	    if (this._options.sentry && dsn) {
-	      var filterUrl = new API(dsn).getStoreEndpoint(); // if Sentry key appears in URL, don't capture it as a request
-	      // but rather as our own 'sentry' type breadcrumb
-
-	      if (filterUrl && handlerData.fetchData.url.indexOf(filterUrl) !== -1 && handlerData.fetchData.method === 'POST' && handlerData.args[1] && handlerData.args[1].body) {
-	        addSentryBreadcrumb(handlerData.args[1].body);
-	        return;
-	      }
-	    }
-
-	    if (handlerData.error) {
-	      getCurrentHub().addBreadcrumb({
-	        category: 'fetch',
-	        data: _assign({}, handlerData.fetchData, {
-	          status_code: handlerData.response.status
-	        }),
-	        level: Severity.Error,
-	        type: 'http'
-	      }, {
-	        data: handlerData.error,
-	        input: handlerData.args
-	      });
-	    } else {
-	      getCurrentHub().addBreadcrumb({
-	        category: 'fetch',
-	        data: _assign({}, handlerData.fetchData, {
-	          status_code: handlerData.response.status
-	        }),
-	        type: 'http'
-	      }, {
-	        input: handlerData.args,
-	        response: handlerData.response
-	      });
-	    }
-	  };
-	  /**
-	   * Creates breadcrumbs from history API calls
-	   */
-
-
-	  Breadcrumbs.prototype._historyBreadcrumb = function (handlerData) {
-	    var global = getGlobalObject();
-	    var from = handlerData.from;
-	    var to = handlerData.to;
-	    var parsedLoc = parseUrl(global.location.href);
-	    var parsedFrom = parseUrl(from);
-	    var parsedTo = parseUrl(to); // Initial pushState doesn't provide `from` information
-
-	    if (!parsedFrom.path) {
-	      parsedFrom = parsedLoc;
-	    } // Use only the path component of the URL if the URL matches the current
-	    // document (almost all the time when using pushState)
-
-
-	    if (parsedLoc.protocol === parsedTo.protocol && parsedLoc.host === parsedTo.host) {
-	      // tslint:disable-next-line:no-parameter-reassignment
-	      to = parsedTo.relative;
-	    }
-
-	    if (parsedLoc.protocol === parsedFrom.protocol && parsedLoc.host === parsedFrom.host) {
-	      // tslint:disable-next-line:no-parameter-reassignment
-	      from = parsedFrom.relative;
-	    }
-
-	    getCurrentHub().addBreadcrumb({
-	      category: 'navigation',
-	      data: {
-	        from: from,
-	        to: to
-	      }
+	      event: event
 	    });
 	  };
 	  /**
@@ -13529,6 +13655,164 @@ typeof navigator === "object" && (function () {
 	    }
 	  };
 	  /**
+	   * Creates breadcrumbs from console API calls
+	   */
+	  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+
+	  Breadcrumbs.prototype._consoleBreadcrumb = function (handlerData) {
+	    var breadcrumb = {
+	      category: 'console',
+	      data: {
+	        arguments: handlerData.args,
+	        logger: 'console'
+	      },
+	      level: Severity.fromString(handlerData.level),
+	      message: safeJoin(handlerData.args, ' ')
+	    };
+
+	    if (handlerData.level === 'assert') {
+	      if (handlerData.args[0] === false) {
+	        breadcrumb.message = "Assertion failed: " + (safeJoin(handlerData.args.slice(1), ' ') || 'console.assert');
+	        breadcrumb.data.arguments = handlerData.args.slice(1);
+	      } else {
+	        // Don't capture a breadcrumb for passed assertions
+	        return;
+	      }
+	    }
+
+	    getCurrentHub().addBreadcrumb(breadcrumb, {
+	      input: handlerData.args,
+	      level: handlerData.level
+	    });
+	  };
+	  /**
+	   * Creates breadcrumbs from DOM API calls
+	   */
+	  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+
+	  Breadcrumbs.prototype._domBreadcrumb = function (handlerData) {
+	    var target; // Accessing event.target can throw (see getsentry/raven-js#838, #768)
+
+	    try {
+	      target = handlerData.event.target ? htmlTreeAsString(handlerData.event.target) : htmlTreeAsString(handlerData.event);
+	    } catch (e) {
+	      target = '<unknown>';
+	    }
+
+	    if (target.length === 0) {
+	      return;
+	    }
+
+	    getCurrentHub().addBreadcrumb({
+	      category: "ui." + handlerData.name,
+	      message: target
+	    }, {
+	      event: handlerData.event,
+	      name: handlerData.name
+	    });
+	  };
+	  /**
+	   * Creates breadcrumbs from XHR API calls
+	   */
+	  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+
+	  Breadcrumbs.prototype._xhrBreadcrumb = function (handlerData) {
+	    if (handlerData.endTimestamp) {
+	      // We only capture complete, non-sentry requests
+	      if (handlerData.xhr.__sentry_own_request__) {
+	        return;
+	      }
+
+	      getCurrentHub().addBreadcrumb({
+	        category: 'xhr',
+	        data: handlerData.xhr.__sentry_xhr__,
+	        type: 'http'
+	      }, {
+	        xhr: handlerData.xhr
+	      });
+	      return;
+	    }
+	  };
+	  /**
+	   * Creates breadcrumbs from fetch API calls
+	   */
+	  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+
+	  Breadcrumbs.prototype._fetchBreadcrumb = function (handlerData) {
+	    // We only capture complete fetch requests
+	    if (!handlerData.endTimestamp) {
+	      return;
+	    }
+
+	    if (handlerData.fetchData.url.match(/sentry_key/) && handlerData.fetchData.method === 'POST') {
+	      // We will not create breadcrumbs for fetch requests that contain `sentry_key` (internal sentry requests)
+	      return;
+	    }
+
+	    if (handlerData.error) {
+	      getCurrentHub().addBreadcrumb({
+	        category: 'fetch',
+	        data: handlerData.fetchData,
+	        level: Severity.Error,
+	        type: 'http'
+	      }, {
+	        data: handlerData.error,
+	        input: handlerData.args
+	      });
+	    } else {
+	      getCurrentHub().addBreadcrumb({
+	        category: 'fetch',
+	        data: _assign(_assign({}, handlerData.fetchData), {
+	          status_code: handlerData.response.status
+	        }),
+	        type: 'http'
+	      }, {
+	        input: handlerData.args,
+	        response: handlerData.response
+	      });
+	    }
+	  };
+	  /**
+	   * Creates breadcrumbs from history API calls
+	   */
+	  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+
+	  Breadcrumbs.prototype._historyBreadcrumb = function (handlerData) {
+	    var global = getGlobalObject();
+	    var from = handlerData.from;
+	    var to = handlerData.to;
+	    var parsedLoc = parseUrl(global.location.href);
+	    var parsedFrom = parseUrl(from);
+	    var parsedTo = parseUrl(to); // Initial pushState doesn't provide `from` information
+
+	    if (!parsedFrom.path) {
+	      parsedFrom = parsedLoc;
+	    } // Use only the path component of the URL if the URL matches the current
+	    // document (almost all the time when using pushState)
+
+
+	    if (parsedLoc.protocol === parsedTo.protocol && parsedLoc.host === parsedTo.host) {
+	      to = parsedTo.relative;
+	    }
+
+	    if (parsedLoc.protocol === parsedFrom.protocol && parsedLoc.host === parsedFrom.host) {
+	      from = parsedFrom.relative;
+	    }
+
+	    getCurrentHub().addBreadcrumb({
+	      category: 'navigation',
+	      data: {
+	        from: from,
+	        to: to
+	      }
+	    });
+	  };
+	  /**
 	   * @inheritDoc
 	   */
 
@@ -13536,26 +13820,6 @@ typeof navigator === "object" && (function () {
 	  Breadcrumbs.id = 'Breadcrumbs';
 	  return Breadcrumbs;
 	}();
-	/**
-	 * Create a breadcrumb of `sentry` from the events themselves
-	 */
-
-	function addSentryBreadcrumb(serializedData) {
-	  // There's always something that can go wrong with deserialization...
-	  try {
-	    var event_1 = JSON.parse(serializedData);
-	    getCurrentHub().addBreadcrumb({
-	      category: "sentry." + (event_1.type === 'transaction' ? 'transaction' : 'event'),
-	      event_id: event_1.event_id,
-	      level: event_1.level || Severity.fromString('error'),
-	      message: getEventDescription(event_1)
-	    }, {
-	      event: event_1
-	    });
-	  } catch (_oO) {
-	    logger.error('Error while adding sentry type breadcrumb');
-	  }
-	}
 
 	var DEFAULT_KEY = 'cause';
 	var DEFAULT_LIMIT = 5;
@@ -13660,14 +13924,13 @@ typeof navigator === "object" && (function () {
 	      if (getCurrentHub().getIntegration(UserAgent)) {
 	        if (!global$4.navigator || !global$4.location) {
 	          return event;
-	        } // Request Interface: https://docs.sentry.io/development/sdk-dev/event-payloads/request/
-
+	        }
 
 	        var request = event.request || {};
 	        request.url = request.url || global$4.location.href;
 	        request.headers = request.headers || {};
 	        request.headers['User-Agent'] = global$4.navigator.userAgent;
-	        return _assign({}, event, {
+	        return _assign(_assign({}, event), {
 	          request: request
 	        });
 	      }
@@ -13683,6 +13946,97 @@ typeof navigator === "object" && (function () {
 	  UserAgent.id = 'UserAgent';
 	  return UserAgent;
 	}();
+
+	var SDK_NAME = 'sentry.javascript.browser';
+	var SDK_VERSION = '5.22.3';
+
+	/**
+	 * The Sentry Browser SDK Client.
+	 *
+	 * @see BrowserOptions for documentation on configuration options.
+	 * @see SentryClient for usage documentation.
+	 */
+
+	var BrowserClient =
+	/** @class */
+	function (_super) {
+	  __extends(BrowserClient, _super);
+	  /**
+	   * Creates a new Browser SDK instance.
+	   *
+	   * @param options Configuration options for this SDK.
+	   */
+
+
+	  function BrowserClient(options) {
+	    if (options === void 0) {
+	      options = {};
+	    }
+
+	    return _super.call(this, BrowserBackend, options) || this;
+	  }
+	  /**
+	   * Show a report dialog to the user to send feedback to a specific event.
+	   *
+	   * @param options Set individual options for the dialog
+	   */
+
+
+	  BrowserClient.prototype.showReportDialog = function (options) {
+	    if (options === void 0) {
+	      options = {};
+	    } // doesn't work without a document (React Native)
+
+
+	    var document = getGlobalObject().document;
+
+	    if (!document) {
+	      return;
+	    }
+
+	    if (!this._isEnabled()) {
+	      logger.error('Trying to call showReportDialog with Sentry Client disabled');
+	      return;
+	    }
+
+	    injectReportDialog(_assign(_assign({}, options), {
+	      dsn: options.dsn || this.getDsn()
+	    }));
+	  };
+	  /**
+	   * @inheritDoc
+	   */
+
+
+	  BrowserClient.prototype._prepareEvent = function (event, scope, hint) {
+	    event.platform = event.platform || 'javascript';
+	    event.sdk = _assign(_assign({}, event.sdk), {
+	      name: SDK_NAME,
+	      packages: __spread(event.sdk && event.sdk.packages || [], [{
+	        name: 'npm:@sentry/browser',
+	        version: SDK_VERSION
+	      }]),
+	      version: SDK_VERSION
+	    });
+	    return _super.prototype._prepareEvent.call(this, event, scope, hint);
+	  };
+	  /**
+	   * @inheritDoc
+	   */
+
+
+	  BrowserClient.prototype._sendEvent = function (event) {
+	    var integration = this.getIntegration(Breadcrumbs);
+
+	    if (integration) {
+	      integration.addSentryBreadcrumb(event);
+	    }
+
+	    _super.prototype._sendEvent.call(this, event);
+	  };
+
+	  return BrowserClient;
+	}(BaseClient);
 
 	var defaultIntegrations = [new InboundFilters(), new FunctionToString(), new TryCatch(), new Breadcrumbs(), new GlobalHandlers(), new LinkedErrors(), new UserAgent()];
 	/**
