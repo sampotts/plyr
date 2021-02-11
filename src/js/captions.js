@@ -154,7 +154,9 @@ const captions = {
     }
 
     // Enable or disable captions based on track length
-    toggleClass(this.elements.container, this.config.classNames.captions.enabled, !is.empty(tracks));
+    if (this.elements) {
+      toggleClass(this.elements.container, this.config.classNames.captions.enabled, !is.empty(tracks));
+    }
 
     // Update available languages in list
     if (
