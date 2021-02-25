@@ -10,7 +10,7 @@ const gulp = require('gulp');
 const gitbranch = require('git-branch');
 const rename = require('gulp-rename');
 const replace = require('gulp-replace');
-const ansi = require('ansi-colors');
+const { green, cyan, bold } = require('colorette');
 const log = require('fancy-log');
 const open = require('gulp-open');
 const size = require('gulp-size');
@@ -128,7 +128,7 @@ gulp.task('version', (done) => {
 
   const { domain } = deploy.cdn;
 
-  log(`Updating version in files to ${ansi.green.bold(version)}...`);
+  log(`Updating version in files to ${green(bold(version))}...`);
 
   // Replace versioned URLs in source
   const files = ['plyr.js', 'plyr.polyfilled.js', 'config/defaults.js'];
@@ -156,7 +156,7 @@ gulp.task('cdn', (done) => {
     throw new Error('No publisher instance. Check AWS configuration.');
   }
 
-  log(`Uploading ${ansi.green.bold(pkg.version)} to ${ansi.cyan(domain)}...`);
+  log(`Uploading ${green(bold(pkg.version))} to ${cyan(domain)}...`);
 
   // Upload to CDN
   return (
@@ -199,7 +199,7 @@ gulp.task('purge', () => {
       const purge = new FastlyPurge(fastly.token);
 
       list.forEach((url) => {
-        log(`Purging ${ansi.cyan(url)}...`);
+        log(`Purging ${cyan(url)}...`);
 
         purge.url(url, (error, result) => {
           if (error) {
@@ -226,7 +226,7 @@ gulp.task('demo', (done) => {
     throw new Error('No publisher instance. Check AWS configuration.');
   }
 
-  log(`Uploading ${ansi.green.bold(pkg.version)} to ${ansi.cyan(domain)}...`);
+  log(`Uploading ${green(bold(pkg.version))} to ${cyan(domain)}...`);
 
   // Replace versioned files in README.md
   gulp
