@@ -863,6 +863,9 @@ const controls = {
 
       case 'quality':
         if (is.number(value)) {
+          //inside if add below
+          if (value === 0) return "Auto";
+
           const label = i18n.get(`qualityLabel.${value}`, this.config);
 
           if (!label.length) {
