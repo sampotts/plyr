@@ -88,7 +88,7 @@ export function triggerEvent(element, type = '', bubbles = false, detail = {}) {
   }
 
   // Create and dispatch the event
-  const event = new CustomEvent(type, {
+  const event = new CustomEvent('plyr:' + type, {
     bubbles,
     detail: { ...detail, plyr: this },
   });
