@@ -2,31 +2,37 @@
 // Type checking utils
 // ==========================================================================
 
-const getConstructor = input => (input !== null && typeof input !== 'undefined' ? input.constructor : null);
+const getConstructor = (input) => (input !== null && typeof input !== 'undefined' ? input.constructor : null);
 const instanceOf = (input, constructor) => Boolean(input && constructor && input instanceof constructor);
-const isNullOrUndefined = input => input === null || typeof input === 'undefined';
-const isObject = input => getConstructor(input) === Object;
-const isNumber = input => getConstructor(input) === Number && !Number.isNaN(input);
-const isString = input => getConstructor(input) === String;
-const isBoolean = input => getConstructor(input) === Boolean;
-const isFunction = input => getConstructor(input) === Function;
-const isArray = input => Array.isArray(input);
-const isWeakMap = input => instanceOf(input, WeakMap);
-const isNodeList = input => instanceOf(input, NodeList);
-const isElement = input => instanceOf(input, Element);
-const isTextNode = input => getConstructor(input) === Text;
-const isEvent = input => instanceOf(input, Event);
-const isKeyboardEvent = input => instanceOf(input, KeyboardEvent);
-const isCue = input => instanceOf(input, window.TextTrackCue) || instanceOf(input, window.VTTCue);
-const isTrack = input => instanceOf(input, TextTrack) || (!isNullOrUndefined(input) && isString(input.kind));
-const isPromise = input => instanceOf(input, Promise) && isFunction(input.then);
+const isNullOrUndefined = (input) => input === null || typeof input === 'undefined';
+const isObject = (input) => getConstructor(input) === Object;
+const isNumber = (input) => getConstructor(input) === Number && !Number.isNaN(input);
+const isString = (input) => getConstructor(input) === String;
+const isBoolean = (input) => getConstructor(input) === Boolean;
+const isFunction = (input) => getConstructor(input) === Function;
+const isArray = (input) => Array.isArray(input);
+const isWeakMap = (input) => instanceOf(input, WeakMap);
+const isNodeList = (input) => instanceOf(input, NodeList);
+const isTextNode = (input) => getConstructor(input) === Text;
+const isEvent = (input) => instanceOf(input, Event);
+const isKeyboardEvent = (input) => instanceOf(input, KeyboardEvent);
+const isCue = (input) => instanceOf(input, window.TextTrackCue) || instanceOf(input, window.VTTCue);
+const isTrack = (input) => instanceOf(input, TextTrack) || (!isNullOrUndefined(input) && isString(input.kind));
+const isPromise = (input) => instanceOf(input, Promise) && isFunction(input.then);
 
-const isEmpty = input =>
+const isElement = (input) =>
+  input !== null &&
+  typeof input === 'object' &&
+  input.nodeType === 1 &&
+  typeof input.style === 'object' &&
+  typeof input.ownerDocument === 'object';
+
+const isEmpty = (input) =>
   isNullOrUndefined(input) ||
   ((isString(input) || isArray(input) || isNodeList(input)) && !input.length) ||
   (isObject(input) && !Object.keys(input).length);
 
-const isUrl = input => {
+const isUrl = (input) => {
   // Accept a URL object
   if (instanceOf(input, window.URL)) {
     return true;

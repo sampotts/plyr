@@ -5,7 +5,7 @@
 // ==========================================================================
 
 import browser from './utils/browser';
-import { closest,getElements, hasClass, toggleClass } from './utils/elements';
+import { closest, getElements, hasClass, toggleClass } from './utils/elements';
 import { on, triggerEvent } from './utils/events';
 import is from './utils/is';
 import { silencePromise } from './utils/promise';
@@ -43,20 +43,22 @@ class Fullscreen {
     );
 
     // Fullscreen toggle on double click
-    on.call(this.player, this.player.elements.container, 'dblclick', event => {
+    on.call(this.player, this.player.elements.container, 'dblclick', (event) => {
       // Ignore double click in controls
       if (is.element(this.player.elements.controls) && this.player.elements.controls.contains(event.target)) {
         return;
       }
 
-      this.toggle();
+      this.player.listeners.proxy(event, this.toggle, 'fullscreen');
     });
 
     // Tap focus when in fullscreen
-    on.call(this, this.player.elements.container, 'keydown', event => this.trapFocus(event));
+    on.call(this, this.player.elements.container, 'keydown', (event) => this.trapFocus(event));
 
     // Update the UI
     this.update();
+
+    // this.toggle = this.toggle.bind(this);
   }
 
   // Determine if native supported
@@ -85,7 +87,7 @@ class Fullscreen {
     let value = '';
     const prefixes = ['webkit', 'moz', 'ms'];
 
-    prefixes.some(pre => {
+    prefixes.some((pre) => {
       if (is.function(document[`${pre}ExitFullscreen`]) || is.function(document[`${pre}CancelFullScreen`])) {
         value = pre;
         return true;
@@ -134,7 +136,7 @@ class Fullscreen {
       : this.player.elements.fullscreen || this.player.elements.container;
   }
 
-  onChange() {
+  onChange = () => {
     if (!this.enabled) {
       return;
     }
@@ -149,9 +151,9 @@ class Fullscreen {
     const target = this.target === this.player.media ? this.target : this.player.elements.container;
     // Trigger an event
     triggerEvent.call(this.player, target, this.active ? 'enterfullscreen' : 'exitfullscreen', true);
-  }
+  };
 
-  toggleFallback(toggle = false) {
+  toggleFallback = (toggle = false) => {
     // Store or restore scroll position
     if (toggle) {
       this.scrollPosition = {
@@ -191,17 +193,17 @@ class Fullscreen {
       } else if (this.cleanupViewport) {
         viewport.content = viewport.content
           .split(',')
-          .filter(part => part.trim() !== property)
+          .filter((part) => part.trim() !== property)
           .join(',');
       }
     }
 
     // Toggle button and fire events
     this.onChange();
-  }
+  };
 
   // Trap focus inside container
-  trapFocus(event) {
+  trapFocus = (event) => {
     // Bail if iOS, not active, not the tab key
     if (browser.isIos || !this.active || event.key !== 'Tab' || event.keyCode !== 9) {
       return;
@@ -222,10 +224,10 @@ class Fullscreen {
       last.focus();
       event.preventDefault();
     }
-  }
+  };
 
   // Update UI
-  update() {
+  update = () => {
     if (this.enabled) {
       let mode;
 
@@ -244,17 +246,21 @@ class Fullscreen {
 
     // Add styling hook to show button
     toggleClass(this.player.elements.container, this.player.config.classNames.fullscreen.enabled, this.enabled);
-  }
+  };
 
   // Make an element fullscreen
-  enter() {
+  enter = () => {
     if (!this.enabled) {
       return;
     }
 
     // iOS native fullscreen doesn't need the request step
     if (browser.isIos && this.player.config.fullscreen.iosNative) {
-      this.target.webkitEnterFullscreen();
+      if (this.player.isVimeo) {
+        this.player.embed.requestFullscreen();
+      } else {
+        this.target.webkitEnterFullscreen();
+      }
     } else if (!Fullscreen.native || this.forceFallback) {
       this.toggleFallback(true);
     } else if (!this.prefix) {
@@ -262,10 +268,10 @@ class Fullscreen {
     } else if (!is.empty(this.prefix)) {
       this.target[`${this.prefix}Request${this.property}`]();
     }
-  }
+  };
 
   // Bail from fullscreen
-  exit() {
+  exit = () => {
     if (!this.enabled) {
       return;
     }
@@ -282,16 +288,16 @@ class Fullscreen {
       const action = this.prefix === 'moz' ? 'Cancel' : 'Exit';
       document[`${this.prefix}${action}${this.property}`]();
     }
-  }
+  };
 
   // Toggle state
-  toggle() {
+  toggle = () => {
     if (!this.active) {
       this.enter();
     } else {
       this.exit();
     }
-  }
+  };
 }
 
 export default Fullscreen;

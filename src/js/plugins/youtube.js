@@ -70,7 +70,7 @@ const youtube = {
       };
 
       // Load the SDK
-      loadScript(this.config.urls.youtube.sdk).catch(error => {
+      loadScript(this.config.urls.youtube.sdk).catch((error) => {
         this.debug.warn('YouTube API failed to load', error);
       });
     }
@@ -81,7 +81,7 @@ const youtube = {
     const url = format(this.config.urls.youtube.api, videoId);
 
     fetch(url)
-      .then(data => {
+      .then((data) => {
         if (is.object(data)) {
           const { title, height, width } = data;
 
@@ -104,6 +104,7 @@ const youtube = {
   // API ready
   ready() {
     const player = this;
+    const config = player.config.youtube;
     // Ignore already setup (race condition)
     const currentId = player.media && player.media.getAttribute('id');
     if (!is.empty(currentId) && currentId.startsWith('youtube-')) {
@@ -121,43 +122,46 @@ const youtube = {
     // Replace the <iframe> with a <div> due to YouTube API issues
     const videoId = parseId(source);
     const id = generateId(player.provider);
-    // Get poster, if already set
-    const { poster } = player;
     // Replace media element
-    const container = createElement('div', { id, 'data-poster': poster });
+    const container = createElement('div', { id, 'data-poster': config.customControls ? player.poster : undefined });
     player.media = replaceElement(container, player.media);
 
-    // Id to poster wrapper
-    const posterSrc = s => `https://i.ytimg.com/vi/${videoId}/${s}default.jpg`;
+    // Only load the poster when using custom controls
+    if (config.customControls) {
+      const posterSrc = (s) => `https://i.ytimg.com/vi/${videoId}/${s}default.jpg`;
 
-    // Check thumbnail images in order of quality, but reject fallback thumbnails (120px wide)
-    loadImage(posterSrc('maxres'), 121) // Higest quality and unpadded
-      .catch(() => loadImage(posterSrc('sd'), 121)) // 480p padded 4:3
-      .catch(() => loadImage(posterSrc('hq'))) // 360p padded 4:3. Always exists
-      .then(image => ui.setPoster.call(player, image.src))
-      .then(src => {
-        // If the image is padded, use background-size "cover" instead (like youtube does too with their posters)
-        if (!src.includes('maxres')) {
-          player.elements.poster.style.backgroundSize = 'cover';
-        }
-      })
-      .catch(() => {});
-
-    const config = player.config.youtube;
+      // Check thumbnail images in order of quality, but reject fallback thumbnails (120px wide)
+      loadImage(posterSrc('maxres'), 121) // Higest quality and unpadded
+        .catch(() => loadImage(posterSrc('sd'), 121)) // 480p padded 4:3
+        .catch(() => loadImage(posterSrc('hq'))) // 360p padded 4:3. Always exists
+        .then((image) => ui.setPoster.call(player, image.src))
+        .then((src) => {
+          // If the image is padded, use background-size "cover" instead (like youtube does too with their posters)
+          if (!src.includes('maxres')) {
+            player.elements.poster.style.backgroundSize = 'cover';
+          }
+        })
+        .catch(() => {});
+    }
 
     // Setup instance
     // https://developers.google.com/youtube/iframe_api_reference
-    player.embed = new window.YT.Player(id, {
+    player.embed = new window.YT.Player(player.media, {
       videoId,
       host: getHost(config),
       playerVars: extend(
         {},
         {
-          autoplay: player.config.autoplay ? 1 : 0, // Autoplay
-          hl: player.config.hl, // iframe interface language
-          controls: player.supported.ui ? 0 : 1, // Only show controls if not fully supported
-          disablekb: 1, // Disable keyboard as we handle it
-          playsinline: !player.config.fullscreen.iosNative ? 1 : 0, // Allow iOS inline playback
+          // Autoplay
+          autoplay: player.config.autoplay ? 1 : 0,
+          // iframe interface language
+          hl: player.config.hl,
+          // Only show controls if not fully supported or opted out
+          controls: player.supported.ui && config.customControls ? 0 : 1,
+          // Disable keyboard as we handle it
+          disablekb: 1,
+          // Allow iOS inline playback
+          playsinline: !player.config.fullscreen.iosNative ? 1 : 0,
           // Captions are flaky on YouTube
           cc_load_policy: player.captions.active ? 1 : 0,
           cc_lang_pref: player.config.captions.language,
@@ -278,6 +282,7 @@ const youtube = {
               const toggle = is.boolean(input) ? input : muted;
               muted = toggle;
               instance[toggle ? 'mute' : 'unMute']();
+              instance.setVolume(volume * 100);
               triggerEvent.call(player, player.media, 'volumechange');
             },
           });
@@ -299,10 +304,10 @@ const youtube = {
           // Get available speeds
           const speeds = instance.getAvailablePlaybackRates();
           // Filter based on config
-          player.options.speed = speeds.filter(s => player.config.speed.options.includes(s));
+          player.options.speed = speeds.filter((s) => player.config.speed.options.includes(s));
 
           // Set the tabindex to avoid focus entering iframe
-          if (player.supported.ui) {
+          if (player.supported.ui && config.customControls) {
             player.media.setAttribute('tabindex', -1);
           }
 
@@ -335,7 +340,9 @@ const youtube = {
           }, 200);
 
           // Rebuild UI
-          setTimeout(() => ui.build.call(player), 50);
+          if (config.customControls) {
+            setTimeout(() => ui.build.call(player), 50);
+          }
         },
         onStateChange(event) {
           // Get the instance
@@ -386,7 +393,7 @@ const youtube = {
 
             case 1:
               // Restore paused state (YouTube starts playing on seek if the video hasn't been played yet)
-              if (!player.config.autoplay && player.media.paused && !player.embed.hasPlayed) {
+              if (config.customControls && !player.config.autoplay && player.media.paused && !player.embed.hasPlayed) {
                 player.media.pause();
               } else {
                 assurePlaybackState.call(player, true);

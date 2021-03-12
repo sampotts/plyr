@@ -36,8 +36,8 @@ Please follow the instructions in our issue templates. Don't use github issues t
 You can use Gitpod (a free online VS Code-like IDE) for contributing. With a single click it will launch a workspace and automatically:
 
 - clone the plyr repo.
-- install the dependencies.
-- run `gulp` to the start the server.
+- install the dependencies with `yarn install` in root directory and "demo" directory.
+- run `gulp` in root directory to start the dev server.
 
 So that you can start straight away.
 
@@ -49,6 +49,6 @@ So that you can start straight away.
 
 - If your modifications changes the documented behavior or add new features, document these changes in [README.md](README.md).
 
-- When finished, push the changes to your GitHub repository and send a pull request to **develop**. Describe what your PR does.
+- When finished, push the changes to your GitHub repository and send a pull request. Describe what your PR does.
 
 - If the Travis build fails, or if you get a code review with change requests, you can fix these by pushing new or rebased commits to the branch.

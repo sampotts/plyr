@@ -31,7 +31,7 @@ Plyr is a simple, lightweight, accessible and customizable HTML5, YouTube and Vi
 
 ### Demos
 
-You can try Plyr in Codepen using our minimal templates: [HTML5 video](https://codepen.io/pen?template=bKeqpr), [HTML5 audio](https://codepen.io/pen?template=rKLywR), [YouTube](https://codepen.io/pen?template=GGqbbJ), [Vimeo](https://codepen.io/pen?template=bKeXNq). For Streaming we also have example integrations with: [Dash.js](https://codepen.io/pen?template=zaBgBy), [Hls.js](https://codepen.io/pen?template=oyLKQb) and [Shaka Player](https://codepen.io/pen?template=ZRpzZO)
+You can try Plyr in Codepen using our minimal templates: [HTML5 video](https://codepen.io/pen?template=bKeqpr), [HTML5 audio](https://codepen.io/pen?template=rKLywR), [YouTube](https://codepen.io/pen?template=GGqbbJ), [Vimeo](https://codepen.io/pen?template=bKeXNq). For Streaming we also have example integrations with: [Dash.js](https://codepen.io/pen?template=GRoogML), [Hls.js](https://codepen.io/pen?template=oyLKQb) and [Shaka Player](https://codepen.io/pen?template=ZRpzZO)
 
 # Quick setup
 
@@ -134,13 +134,13 @@ See [initialising](#initialising) for more information on advanced setups.
 You can use our CDN (provided by [Fastly](https://www.fastly.com/)) for the JavaScript. There's 2 versions; one with and one without [polyfills](#polyfills). My recommendation would be to manage polyfills seperately as part of your application but to make life easier you can use the polyfilled build.
 
 ```html
-<script src="https://cdn.plyr.io/3.6.1/plyr.js"></script>
+<script src="https://cdn.plyr.io/3.6.4/plyr.js"></script>
 ```
 
 ...or...
 
 ```html
-<script src="https://cdn.plyr.io/3.6.1/plyr.polyfilled.js"></script>
+<script src="https://cdn.plyr.io/3.6.4/plyr.polyfilled.js"></script>
 ```
 
 ## CSS
@@ -154,13 +154,13 @@ Include the `plyr.css` stylsheet into your `<head>`.
 If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for the default CSS, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/3.6.1/plyr.css" />
+<link rel="stylesheet" href="https://cdn.plyr.io/3.6.4/plyr.css" />
 ```
 
 ## SVG Sprite
 
 The SVG sprite is loaded automatically from our CDN (provided by [Fastly](https://www.fastly.com/)). To change this, see the [options](#options) below. For
-reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.6.1/plyr.svg`.
+reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.6.4/plyr.svg`.
 
 # Ads
 
@@ -185,6 +185,7 @@ Here's a list of the properties and what they are used for:
 | Name                                           | Description                                                                                             | Default / Fallback                                                    |
 | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
 | `--plyr-color-main`                            | The primary UI color.                                                                                   | ![#f03c15](https://placehold.it/15/00b3ff/000000?text=+) `#00b3ff`    |
+| `--plyr-video-background`                      | The background color of video and poster wrappers for using alpha channel videos and poster images.     | `rgba(0, 0, 0, 1)`    |
 | `--plyr-tab-focus-color`                       | The color used for the dotted outline when an element is `:focus-visible` (equivalent) keyboard focus.  | `--plyr-color-main`                                                   |
 | `--plyr-badge-background`                      | The background color for badges in the menu.                                                            | ![#4a5464](https://placehold.it/15/4a5464/000000?text=+) `#4a5464`    |
 | `--plyr-badge-text-color`                      | The text color for badges.                                                                              | ![#ffffff](https://placehold.it/15/ffffff/000000?text=+) `#ffffff`    |
@@ -268,7 +269,7 @@ You can set them in your CSS for all players:
 ```html
 <video class="player" style="--plyr-color-main: #1ac266;">
     ...
-</vieo>
+</video>
 ```
 
 ### SASS
@@ -790,6 +791,7 @@ Some awesome folks have made plugins for CMSs and Components for JavaScript fram
 | Neos      | Jon Uhlmann ([@jonnitto](https://github.com/jonnitto))                    | [https://packagist.org/packages/jonnitto/plyr](https://packagist.org/packages/jonnitto/plyr) |
 | Kirby     | Dominik Pschenitschni ([@dpschen](https://github.com/dpschen))            | [https://github.com/dpschen/kirby-plyrtag](https://github.com/dpschen/kirby-plyrtag)         |
 | REDAXO    | FriendsOfRedaxo / skerbis ([@skerbis](https://friendsofredaxo.github.io)) | [https://github.com/FriendsOfREDAXO/plyr](https://github.com/FriendsOfREDAXO/plyr)           |
+| svelte-plyr    | Ben Woodward / benwoodward ([@benwoodward](https://github.com/benwoodward)) | [https://github.com/benwoodward](https://github.com/benwoodward)           |
 
 # Issues
 
@@ -833,6 +835,10 @@ Plyr costs money to run, not only my time. I donate my time for free as I enjoy 
 - [Oscar Radio](http://oscar-radio.xyz/)
 - [Sparkk TV](https://www.sparkktv.com/)
 - [@halfhalftravel](https://www.halfhalftravel.com/)
+- [BitChute](https://www.bitchute.com)
+- [Rutheneum-Bote](https://gymnasium-rutheneum.de/content/newspaper/kreativwettbewerb.php)
+- [pressakey.com | Blog-Magazin für Videospiele](https://pressakey.com)
+- [STROLLÿN: Work with a View](https://strollyn.com)
 
 If you want to be added to the list, open a pull request. It'd be awesome to see how you're using Plyr 😎
 

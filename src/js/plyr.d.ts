@@ -139,9 +139,14 @@ declare class Plyr {
   ratio?: string;
 
   /**
+   * Access Elements cache
+   */
+  elements: Plyr.Elements;
+
+  /**
    * Returns the current video Provider
    */
-  readonly provider: 'html5' | 'vimeo' | 'youtube';
+  readonly provider: Plyr.Provider;
 
   /**
    * Returns the native API for Vimeo or Youtube players
@@ -214,26 +219,17 @@ declare class Plyr {
   /**
    * Add an event listener for the specified event.
    */
-  on(
-    event: Plyr.StandardEvent | Plyr.Html5Event | Plyr.YoutubeEvent,
-    callback: (this: this, event: Plyr.PlyrEvent) => void,
-  ): void;
+  on<K extends keyof Plyr.PlyrEventMap>(event: K, callback: (this: this, event: Plyr.PlyrEventMap[K]) => void): void;
 
   /**
    * Add an event listener for the specified event once.
    */
-  once(
-    event: Plyr.StandardEvent | Plyr.Html5Event | Plyr.YoutubeEvent,
-    callback: (this: this, event: Plyr.PlyrEvent) => void,
-  ): void;
+  once<K extends keyof Plyr.PlyrEventMap>(event: K, callback: (this: this, event: Plyr.PlyrEventMap[K]) => void): void;
 
   /**
    * Remove an event listener for the specified event.
    */
-  off(
-    event: Plyr.StandardEvent | Plyr.Html5Event | Plyr.YoutubeEvent,
-    callback: (this: this, event: Plyr.PlyrEvent) => void,
-  ): void;
+  off<K extends keyof Plyr.PlyrEventMap>(event: K, callback: (this: this, event: Plyr.PlyrEventMap[K]) => void): void;
 
   /**
    * Check support for a mime type.
@@ -249,37 +245,51 @@ declare class Plyr {
 declare namespace Plyr {
   type MediaType = 'audio' | 'video';
   type Provider = 'html5' | 'youtube' | 'vimeo';
-  type StandardEvent =
-    | 'progress'
-    | 'playing'
-    | 'play'
-    | 'pause'
-    | 'timeupdate'
-    | 'volumechange'
-    | 'seeking'
-    | 'seeked'
-    | 'ratechange'
-    | 'ended'
-    | 'enterfullscreen'
-    | 'exitfullscreen'
-    | 'captionsenabled'
-    | 'captionsdisabled'
-    | 'languagechange'
-    | 'controlshidden'
-    | 'controlsshown'
-    | 'ready';
-  type Html5Event =
-    | 'loadstart'
-    | 'loadeddata'
-    | 'loadedmetadata'
-    | 'canplay'
-    | 'canplaythrough'
-    | 'stalled'
-    | 'waiting'
-    | 'emptied'
-    | 'cuechange'
-    | 'error';
-  type YoutubeEvent = 'statechange' | 'qualitychange' | 'qualityrequested';
+  type StandardEventMap = {
+    progress: PlyrEvent;
+    playing: PlyrEvent;
+    play: PlyrEvent;
+    pause: PlyrEvent;
+    timeupdate: PlyrEvent;
+    volumechange: PlyrEvent;
+    seeking: PlyrEvent;
+    seeked: PlyrEvent;
+    ratechange: PlyrEvent;
+    ended: PlyrEvent;
+    enterfullscreen: PlyrEvent;
+    exitfullscreen: PlyrEvent;
+    captionsenabled: PlyrEvent;
+    captionsdisabled: PlyrEvent;
+    languagechange: PlyrEvent;
+    controlshidden: PlyrEvent;
+    controlsshown: PlyrEvent;
+    ready: PlyrEvent;
+  };
+  // For retrocompatibility, we keep StandadEvent
+  type StandadEvent = keyof Plyr.StandardEventMap;
+  type Html5EventMap = {
+    loadstart: PlyrEvent;
+    loadeddata: PlyrEvent;
+    loadedmetadata: PlyrEvent;
+    canplay: PlyrEvent;
+    canplaythrough: PlyrEvent;
+    stalled: PlyrEvent;
+    waiting: PlyrEvent;
+    emptied: PlyrEvent;
+    cuechange: PlyrEvent;
+    error: PlyrEvent;
+  };
+  // For retrocompatibility, we keep Html5Event
+  type Html5Event = keyof Plyr.Html5EventMap;
+  type YoutubeEventMap = {
+    statechange: PlyrStateChangeEvent;
+    qualitychange: PlyrEvent;
+    qualityrequested: PlyrEvent;
+  };
+  // For retrocompatibility, we keep YoutubeEvent
+  type YoutubeEvent = keyof Plyr.YoutubeEventMap;
+
+  type PlyrEventMap = StandardEventMap & Html5EventMap & YoutubeEventMap;
 
   interface FullscreenControl {
     /**
@@ -357,7 +367,7 @@ declare namespace Plyr {
     /**
      * Specify a URL or path to a blank video file used to properly cancel network requests.
      */
-    blankUrl?: string;
+    blankVideo?: string;
 
     /**
      * Autoplay the media on load. This is generally advised against on UX grounds. It is also disabled by default in some browsers.
@@ -505,6 +515,8 @@ declare namespace Plyr {
 
   interface QualityOptions {
     default: number;
+    forced?: boolean;
+    onChange?: (quality: number) => void;
     options: number[];
   }
 
@@ -534,7 +546,7 @@ declare namespace Plyr {
 
   interface FullScreenOptions {
     enabled?: boolean;
-    fallback?: boolean;
+    fallback?: boolean | 'force';
     allowAudio?: boolean;
     iosNative?: boolean;
   }
@@ -552,7 +564,28 @@ declare namespace Plyr {
 
   interface PreviewThumbnailsOptions {
     enabled?: boolean;
-    src?: string;
+    src?: string | string[];
+  }
+
+  export interface Elements {
+    buttons: {
+      airplay?: HTMLButtonElement;
+      captions?: HTMLButtonElement;
+      download?: HTMLButtonElement;
+      fastForward?: HTMLButtonElement;
+      fullscreen?: HTMLButtonElement;
+      mute?: HTMLButtonElement;
+      pip?: HTMLButtonElement;
+      play?: HTMLButtonElement | HTMLButtonElement[];
+      restart?: HTMLButtonElement;
+      rewind?: HTMLButtonElement;
+      settings?: HTMLButtonElement;
+    };
+    captions: HTMLElement | null;
+    container: HTMLElement | null;
+    controls: HTMLElement | null;
+    fullscreen: HTMLElement | null;
+    wrapper: HTMLElement | null;
   }
 
   interface SourceInfo {
@@ -621,6 +654,22 @@ declare namespace Plyr {
 
   interface PlyrEvent extends CustomEvent {
     readonly detail: { readonly plyr: Plyr };
+  }
+
+  enum YoutubeState {
+    UNSTARTED = -1,
+    ENDED = 0,
+    PLAYING = 1,
+    PAUSED = 2,
+    BUFFERING = 3,
+    CUED = 5,
+  }
+
+  interface PlyrStateChangeEvent extends CustomEvent {
+    readonly detail: {
+      readonly plyr: Plyr;
+      readonly code: YoutubeState;
+    };
   }
 
   interface Support {

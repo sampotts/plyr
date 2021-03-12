@@ -54,7 +54,7 @@ export default function loadSprite(url, id) {
 
     // Get the sprite
     fetch(url)
-      .then(result => {
+      .then((result) => {
         if (is.empty(result)) {
           return;
         }
