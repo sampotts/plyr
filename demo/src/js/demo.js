@@ -22,7 +22,7 @@ import toggleClass from './toggle-class';
   if (window.location.host === production) {
     Sentry.init({
       dsn: 'https://d4ad9866ad834437a4754e23937071e4@sentry.io/305555',
-      whitelistUrls: [production].map(d => new RegExp(`https://(([a-z0-9])+(.))*${d}`)),
+      whitelistUrls: [production].map((d) => new RegExp(`https://(([a-z0-9])+(.))*${d}`)),
     });
   }
 
@@ -79,13 +79,13 @@ import toggleClass from './toggle-class';
 
     function render(type) {
       // Remove active classes
-      Array.from(buttons).forEach(button => toggleClass(button.parentElement, 'active', false));
+      Array.from(buttons).forEach((button) => toggleClass(button.parentElement, 'active', false));
 
       // Set active on parent
       toggleClass(document.querySelector(`[data-source="${type}"]`), 'active', true);
 
       // Show cite
-      Array.from(document.querySelectorAll('.plyr__cite')).forEach(cite => {
+      Array.from(document.querySelectorAll('.plyr__cite')).forEach((cite) => {
         // eslint-disable-next-line no-param-reassign
         cite.hidden = true;
       });
@@ -110,7 +110,7 @@ import toggleClass from './toggle-class';
     }
 
     // Bind to each button
-    Array.from(buttons).forEach(button => {
+    Array.from(buttons).forEach((button) => {
       button.addEventListener('click', () => {
         const type = button.getAttribute('data-source');
 
@@ -123,7 +123,7 @@ import toggleClass from './toggle-class';
     });
 
     // List for backwards/forwards
-    window.addEventListener('popstate', event => {
+    window.addEventListener('popstate', (event) => {
       if (event.state && Object.keys(event.state).includes('type')) {
         setSource(event.state.type);
       }

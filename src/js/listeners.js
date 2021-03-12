@@ -183,7 +183,7 @@ class Listeners {
   }
 
   // Device is touch enabled
-  firstTouch() {
+  firstTouch = () => {
     const { player } = this;
     const { elements } = player;
 
@@ -191,9 +191,9 @@ class Listeners {
 
     // Add touch class
     toggleClass(elements.container, player.config.classNames.isTouch, true);
-  }
+  };
 
-  setTabFocus(event) {
+  setTabFocus = (event) => {
     const { player } = this;
     const { elements } = player;
 
@@ -241,10 +241,10 @@ class Listeners {
         toggleClass(document.activeElement, player.config.classNames.tabFocus, true);
       }, 10);
     }
-  }
+  };
 
   // Global window & document listeners
-  global(toggle = true) {
+  global = (toggle = true) => {
     const { player } = this;
 
     // Keyboard shortcuts
@@ -260,10 +260,10 @@ class Listeners {
 
     // Tab focus detection
     toggleListener.call(player, document.body, 'keydown focus blur focusout', this.setTabFocus, toggle, false, true);
-  }
+  };
 
   // Container listeners
-  container() {
+  container = () => {
     const { player } = this;
     const { config, elements, timers } = player;
 
@@ -277,7 +277,7 @@ class Listeners {
       player,
       elements.container,
       'mousemove mouseleave touchstart touchmove enterfullscreen exitfullscreen',
-      event => {
+      (event) => {
         const { controls: controlsElement } = elements;
 
         // Remove button states for fullscreen
@@ -319,7 +319,7 @@ class Listeners {
     };
 
     // Resize on fullscreen change
-    const setPlayerSize = measure => {
+    const setPlayerSize = (measure) => {
       // If we don't need to measure the viewport
       if (!measure) {
         return setAspectRatio.call(player);
@@ -336,7 +336,7 @@ class Listeners {
       timers.resized = setTimeout(setPlayerSize, 50);
     };
 
-    on.call(player, elements.container, 'enterfullscreen exitfullscreen', event => {
+    on.call(player, elements.container, 'enterfullscreen exitfullscreen', (event) => {
       const { target, usingNative } = player.fullscreen;
 
       // Ignore events not from target
@@ -356,6 +356,11 @@ class Listeners {
       // Set Vimeo gutter
       setGutter(ratio, padding, isEnter);
 
+      // Horrible hack for Safari 14 not repainting properly on entering fullscreen
+      if (isEnter) {
+        setTimeout(() => repaint(elements.container), 100);
+      }
+
       // If not using native browser fullscreen API, we need to check for resizes of viewport
       if (!usingNative) {
         if (isEnter) {
@@ -365,18 +370,18 @@ class Listeners {
         }
       }
     });
-  }
+  };
 
   // Listen for media events
-  media() {
+  media = () => {
     const { player } = this;
     const { elements } = player;
 
     // Time change on media
-    on.call(player, player.media, 'timeupdate seeking seeked', event => controls.timeUpdate.call(player, event));
+    on.call(player, player.media, 'timeupdate seeking seeked', (event) => controls.timeUpdate.call(player, event));
 
     // Display duration
-    on.call(player, player.media, 'durationchange loadeddata loadedmetadata', event =>
+    on.call(player, player.media, 'durationchange loadeddata loadedmetadata', (event) =>
       controls.durationUpdate.call(player, event),
     );
 
@@ -393,20 +398,20 @@ class Listeners {
     });
 
     // Check for buffer progress
-    on.call(player, player.media, 'progress playing seeking seeked', event =>
+    on.call(player, player.media, 'progress playing seeking seeked', (event) =>
       controls.updateProgress.call(player, event),
     );
 
     // Handle volume changes
-    on.call(player, player.media, 'volumechange', event => controls.updateVolume.call(player, event));
+    on.call(player, player.media, 'volumechange', (event) => controls.updateVolume.call(player, event));
 
     // Handle play/pause
-    on.call(player, player.media, 'playing play pause ended emptied timeupdate', event =>
+    on.call(player, player.media, 'playing play pause ended emptied timeupdate', (event) =>
       ui.checkPlaying.call(player, event),
     );
 
     // Loading state
-    on.call(player, player.media, 'waiting canplay seeked playing', event => ui.checkLoading.call(player, event));
+    on.call(player, player.media, 'waiting canplay seeked playing', (event) => ui.checkLoading.call(player, event));
 
     // Click video
     if (player.supported.ui && player.config.clickToPlay && !player.isAudio) {
@@ -419,7 +424,7 @@ class Listeners {
       }
 
       // On click play, pause or restart
-      on.call(player, elements.container, 'click', event => {
+      on.call(player, elements.container, 'click', (event) => {
         const targets = [elements.container, wrapper];
 
         // Ignore if click if not container or in video wrapper
@@ -459,7 +464,7 @@ class Listeners {
         player,
         elements.wrapper,
         'contextmenu',
-        event => {
+        (event) => {
           event.preventDefault();
         },
         false,
@@ -485,7 +490,7 @@ class Listeners {
     });
 
     // Quality change
-    on.call(player, player.media, 'qualitychange', event => {
+    on.call(player, player.media, 'qualitychange', (event) => {
       // Update UI
       controls.updateSetting.call(player, 'quality', null, event.detail.quality);
     });
@@ -499,7 +504,7 @@ class Listeners {
     // Bubble up key events for Edge
     const proxyEvents = player.config.events.concat(['keyup', 'keydown']).join(' ');
 
-    on.call(player, player.media, proxyEvents, event => {
+    on.call(player, player.media, proxyEvents, (event) => {
       let { detail = {} } = event;
 
       // Get error details from media
@@ -509,10 +514,10 @@ class Listeners {
 
       triggerEvent.call(player, elements.container, event.type, true, detail);
     });
-  }
+  };
 
   // Run default and custom handlers
-  proxy(event, defaultHandler, customHandlerKey) {
+  proxy = (event, defaultHandler, customHandlerKey) => {
     const { player } = this;
     const customHandler = player.config.listeners[customHandlerKey];
     const hasCustomHandler = is.function(customHandler);
@@ -527,10 +532,10 @@ class Listeners {
     if (returned !== false && is.function(defaultHandler)) {
       defaultHandler.call(player, event);
     }
-  }
+  };
 
   // Trigger custom and default handlers
-  bind(element, type, defaultHandler, customHandlerKey, passive = true) {
+  bind = (element, type, defaultHandler, customHandlerKey, passive = true) => {
     const { player } = this;
     const customHandler = player.config.listeners[customHandlerKey];
     const hasCustomHandler = is.function(customHandler);
@@ -539,13 +544,13 @@ class Listeners {
       player,
       element,
       type,
-      event => this.proxy(event, defaultHandler, customHandlerKey),
+      (event) => this.proxy(event, defaultHandler, customHandlerKey),
       passive && !hasCustomHandler,
     );
-  }
+  };
 
   // Listen for control events
-  controls() {
+  controls = () => {
     const { player } = this;
     const { elements } = player;
     // IE doesn't support input event, so we fallback to change
@@ -553,7 +558,7 @@ class Listeners {
 
     // Play/pause toggle
     if (elements.buttons.play) {
-      Array.from(elements.buttons.play).forEach(button => {
+      Array.from(elements.buttons.play).forEach((button) => {
         this.bind(
           button,
           'click',
@@ -569,10 +574,28 @@ class Listeners {
     this.bind(elements.buttons.restart, 'click', player.restart, 'restart');
 
     // Rewind
-    this.bind(elements.buttons.rewind, 'click', player.rewind, 'rewind');
+    this.bind(
+      elements.buttons.rewind,
+      'click',
+      () => {
+        // Record seek time so we can prevent hiding controls for a few seconds after rewind
+        player.lastSeekTime = Date.now();
+        player.rewind();
+      },
+      'rewind',
+    );
 
     // Rewind
-    this.bind(elements.buttons.fastForward, 'click', player.forward, 'fastForward');
+    this.bind(
+      elements.buttons.fastForward,
+      'click',
+      () => {
+        // Record seek time so we can prevent hiding controls for a few seconds after fast forward
+        player.lastSeekTime = Date.now();
+        player.forward();
+      },
+      'fastForward',
+    );
 
     // Mute toggle
     this.bind(
@@ -624,7 +647,7 @@ class Listeners {
     this.bind(
       elements.buttons.settings,
       'click',
-      event => {
+      (event) => {
         // Prevent the document click listener closing the menu
         event.stopPropagation();
         event.preventDefault();
@@ -641,7 +664,7 @@ class Listeners {
     this.bind(
       elements.buttons.settings,
       'keyup',
-      event => {
+      (event) => {
         const code = event.which;
 
         // We only care about space and return
@@ -669,21 +692,21 @@ class Listeners {
     );
 
     // Escape closes menu
-    this.bind(elements.settings.menu, 'keydown', event => {
+    this.bind(elements.settings.menu, 'keydown', (event) => {
       if (event.which === 27) {
         controls.toggleMenu.call(player, event);
       }
     });
 
     // Set range input alternative "value", which matches the tooltip time (#954)
-    this.bind(elements.inputs.seek, 'mousedown mousemove', event => {
+    this.bind(elements.inputs.seek, 'mousedown mousemove', (event) => {
       const rect = elements.progress.getBoundingClientRect();
       const percent = (100 / rect.width) * (event.pageX - rect.left);
       event.currentTarget.setAttribute('seek-value', percent);
     });
 
     // Pause while seeking
-    this.bind(elements.inputs.seek, 'mousedown mouseup keydown keyup touchstart touchend', event => {
+    this.bind(elements.inputs.seek, 'mousedown mouseup keydown keyup touchstart touchend', (event) => {
       const seek = event.currentTarget;
       const code = event.keyCode ? event.keyCode : event.which;
       const attribute = 'play-on-seeked';
@@ -715,14 +738,14 @@ class Listeners {
     // it takes over further interactions on the page. This is a hack
     if (browser.isIos) {
       const inputs = getElements.call(player, 'input[type="range"]');
-      Array.from(inputs).forEach(input => this.bind(input, inputEvent, event => repaint(event.target)));
+      Array.from(inputs).forEach((input) => this.bind(input, inputEvent, (event) => repaint(event.target)));
     }
 
     // Seek
     this.bind(
       elements.inputs.seek,
       inputEvent,
-      event => {
+      (event) => {
         const seek = event.currentTarget;
         // If it exists, use seek-value instead of "value" for consistency with tooltip time (#954)
         let seekTo = seek.getAttribute('seek-value');
@@ -739,13 +762,13 @@ class Listeners {
     );
 
     // Seek tooltip
-    this.bind(elements.progress, 'mouseenter mouseleave mousemove', event =>
+    this.bind(elements.progress, 'mouseenter mouseleave mousemove', (event) =>
       controls.updateSeekTooltip.call(player, event),
     );
 
     // Preview thumbnails plugin
     // TODO: Really need to work on some sort of plug-in wide event bus or pub-sub for this
-    this.bind(elements.progress, 'mousemove touchmove', event => {
+    this.bind(elements.progress, 'mousemove touchmove', (event) => {
       const { previewThumbnails } = player;
 
       if (previewThumbnails && previewThumbnails.loaded) {
@@ -763,7 +786,7 @@ class Listeners {
     });
 
     // Show scrubbing preview
-    this.bind(elements.progress, 'mousedown touchstart', event => {
+    this.bind(elements.progress, 'mousedown touchstart', (event) => {
       const { previewThumbnails } = player;
 
       if (previewThumbnails && previewThumbnails.loaded) {
@@ -771,7 +794,7 @@ class Listeners {
       }
     });
 
-    this.bind(elements.progress, 'mouseup touchend', event => {
+    this.bind(elements.progress, 'mouseup touchend', (event) => {
       const { previewThumbnails } = player;
 
       if (previewThumbnails && previewThumbnails.loaded) {
@@ -781,8 +804,8 @@ class Listeners {
 
     // Polyfill for lower fill in <input type="range"> for webkit
     if (browser.isWebkit) {
-      Array.from(getElements.call(player, 'input[type="range"]')).forEach(element => {
-        this.bind(element, 'input', event => controls.updateRangeFill.call(player, event.target));
+      Array.from(getElements.call(player, 'input[type="range"]')).forEach((element) => {
+        this.bind(element, 'input', (event) => controls.updateRangeFill.call(player, event.target));
       });
     }
 
@@ -805,30 +828,30 @@ class Listeners {
     this.bind(
       elements.inputs.volume,
       inputEvent,
-      event => {
+      (event) => {
         player.volume = event.target.value;
       },
       'volume',
     );
 
     // Update controls.hover state (used for ui.toggleControls to avoid hiding when interacting)
-    this.bind(elements.controls, 'mouseenter mouseleave', event => {
+    this.bind(elements.controls, 'mouseenter mouseleave', (event) => {
       elements.controls.hover = !player.touch && event.type === 'mouseenter';
     });
 
     // Also update controls.hover state for any non-player children of fullscreen element (as above)
     if (elements.fullscreen) {
       Array.from(elements.fullscreen.children)
-        .filter(c => !c.contains(elements.container))
-        .forEach(child => {
-          this.bind(child, 'mouseenter mouseleave', event => {
+        .filter((c) => !c.contains(elements.container))
+        .forEach((child) => {
+          this.bind(child, 'mouseenter mouseleave', (event) => {
             elements.controls.hover = !player.touch && event.type === 'mouseenter';
           });
         });
     }
 
     // Update controls.pressed state (used for ui.toggleControls to avoid hiding when interacting)
-    this.bind(elements.controls, 'mousedown mouseup touchstart touchend touchcancel', event => {
+    this.bind(elements.controls, 'mousedown mouseup touchstart touchend touchcancel', (event) => {
       elements.controls.pressed = ['mousedown', 'touchstart'].includes(event.type);
     });
 
@@ -861,12 +884,12 @@ class Listeners {
     this.bind(
       elements.inputs.volume,
       'wheel',
-      event => {
+      (event) => {
         // Detect "natural" scroll - suppored on OS X Safari only
         // Other browsers on OS X will be inverted until support improves
         const inverted = event.webkitDirectionInvertedFromDevice;
         // Get delta from event. Invert if `inverted` is true
-        const [x, y] = [event.deltaX, -event.deltaY].map(value => (inverted ? -value : value));
+        const [x, y] = [event.deltaX, -event.deltaY].map((value) => (inverted ? -value : value));
         // Using the biggest delta, normalize to 1 or -1 (or 0 if no delta)
         const direction = Math.sign(Math.abs(x) > Math.abs(y) ? x : y);
 
@@ -882,7 +905,7 @@ class Listeners {
       'volume',
       false,
     );
-  }
+  };
 }
 
 export default Listeners;

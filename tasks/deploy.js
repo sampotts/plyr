@@ -27,7 +27,7 @@ const { version } = pkg;
 const minSuffix = '.min';
 
 // Get AWS config
-Object.values(deploy).forEach(target => {
+Object.values(deploy).forEach((target) => {
   Object.assign(target, {
     publisher: publish.create({
       region: target.region,
@@ -102,7 +102,7 @@ const localPath = new RegExp('(../)?dist/', 'gi');
 const versionPath = `https://${deploy.cdn.domain}/${version}/`;
 const cdnpath = new RegExp(`${deploy.cdn.domain}/${regex}/`, 'gi');
 
-const renameFile = rename(p => {
+const renameFile = rename((p) => {
   p.basename = p.basename.replace(minSuffix, ''); // eslint-disable-line
   p.dirname = p.dirname.replace('.', version); // eslint-disable-line
 });
@@ -120,7 +120,7 @@ const canDeploy = () => {
   return true;
 };
 
-gulp.task('version', done => {
+gulp.task('version', (done) => {
   if (!canDeploy()) {
     done();
     return null;
@@ -135,7 +135,7 @@ gulp.task('version', done => {
 
   return gulp
     .src(
-      files.map(file => path.join(root, `src/js/${file}`)),
+      files.map((file) => path.join(root, `src/js/${file}`)),
       { base: '.' },
     )
     .pipe(replace(semver, `v${version}`))
@@ -144,7 +144,7 @@ gulp.task('version', done => {
 });
 
 // Publish version to CDN bucket
-gulp.task('cdn', done => {
+gulp.task('cdn', (done) => {
   if (!canDeploy()) {
     done();
     return null;
@@ -198,7 +198,7 @@ gulp.task('purge', () => {
     .on('end', () => {
       const purge = new FastlyPurge(fastly.token);
 
-      list.forEach(url => {
+      list.forEach((url) => {
         log(`Purging ${ansi.cyan(url)}...`);
 
         purge.url(url, (error, result) => {
@@ -213,7 +213,7 @@ gulp.task('purge', () => {
 });
 
 // Publish to demo bucket
-gulp.task('demo', done => {
+gulp.task('demo', (done) => {
   if (!canDeploy()) {
     done();
     return null;
@@ -248,7 +248,7 @@ gulp.task('demo', done => {
     .src(pages)
     .pipe(replace(localPath, versionPath))
     .pipe(
-      rename(p => {
+      rename((p) => {
         if (options.demo.uploadPath) {
           // eslint-disable-next-line no-param-reassign
           p.dirname += options.demo.uploadPath;

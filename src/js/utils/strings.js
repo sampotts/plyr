@@ -33,7 +33,7 @@ export const replaceAll = (input = '', find = '', replace = '') =>
 
 // Convert to title case
 export const toTitleCase = (input = '') =>
-  input.toString().replace(/\w\S*/g, text => text.charAt(0).toUpperCase() + text.substr(1).toLowerCase());
+  input.toString().replace(/\w\S*/g, (text) => text.charAt(0).toUpperCase() + text.substr(1).toLowerCase());
 
 // Convert string to pascalCase
 export function toPascalCase(input = '') {

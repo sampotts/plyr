@@ -56,7 +56,7 @@ const captions = {
     if (browser.isIE && window.URL) {
       const elements = this.media.querySelectorAll('track');
 
-      Array.from(elements).forEach(track => {
+      Array.from(elements).forEach((track) => {
         const src = track.getAttribute('src');
         const url = parseUrl(src);
 
@@ -66,7 +66,7 @@ const captions = {
           ['http:', 'https:'].includes(url.protocol)
         ) {
           fetch(src, 'blob')
-            .then(blob => {
+            .then((blob) => {
               track.setAttribute('src', window.URL.createObjectURL(blob));
             })
             .catch(() => {
@@ -84,7 +84,7 @@ const captions = {
     // * toggled:   The real captions state
 
     const browserLanguages = navigator.languages || [navigator.language || navigator.userLanguage || 'en'];
-    const languages = dedupe(browserLanguages.map(language => language.split('-')[0]));
+    const languages = dedupe(browserLanguages.map((language) => language.split('-')[0]));
     let language = (this.storage.get('language') || this.config.captions.language || 'auto').toLowerCase();
 
     // Use first browser language when language is 'auto'
@@ -119,13 +119,13 @@ const captions = {
     const tracks = captions.getTracks.call(this, true);
     // Get the wanted language
     const { active, language, meta, currentTrackNode } = this.captions;
-    const languageExists = Boolean(tracks.find(track => track.language === language));
+    const languageExists = Boolean(tracks.find((track) => track.language === language));
 
     // Handle tracks (add event listener and "pseudo"-default)
     if (this.isHTML5 && this.isVideo) {
       tracks
-        .filter(track => !meta.get(track))
-        .forEach(track => {
+        .filter((track) => !meta.get(track))
+        .forEach((track) => {
           this.debug.log('Track added', track);
 
           // Attempt to store if the original dom element was "default"
@@ -309,19 +309,19 @@ const captions = {
     // For HTML5, use cache instead of current tracks when it exists (if captions.update is false)
     // Filter out removed tracks and tracks that aren't captions/subtitles (for example metadata)
     return tracks
-      .filter(track => !this.isHTML5 || update || this.captions.meta.has(track))
-      .filter(track => ['captions', 'subtitles'].includes(track.kind));
+      .filter((track) => !this.isHTML5 || update || this.captions.meta.has(track))
+      .filter((track) => ['captions', 'subtitles'].includes(track.kind));
   },
 
   // Match tracks based on languages and get the first
   findTrack(languages, force = false) {
     const tracks = captions.getTracks.call(this);
-    const sortIsDefault = track => Number((this.captions.meta.get(track) || {}).default);
+    const sortIsDefault = (track) => Number((this.captions.meta.get(track) || {}).default);
     const sorted = Array.from(tracks).sort((a, b) => sortIsDefault(b) - sortIsDefault(a));
     let track;
 
-    languages.every(language => {
-      track = sorted.find(t => t.language === language);
+    languages.every((language) => {
+      track = sorted.find((t) => t.language === language);
       return !track; // Break iteration if there is a match
     });
 
@@ -383,12 +383,12 @@ const captions = {
       const track = captions.getCurrentTrack.call(this);
 
       cues = Array.from((track || {}).activeCues || [])
-        .map(cue => cue.getCueAsHTML())
+        .map((cue) => cue.getCueAsHTML())
         .map(getHTML);
     }
 
     // Set new caption text
-    const content = cues.map(cueText => cueText.trim()).join('\n');
+    const content = cues.map((cueText) => cueText.trim()).join('\n');
     const changed = content !== this.elements.captions.innerHTML;
 
     if (changed) {

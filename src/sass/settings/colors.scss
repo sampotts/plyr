@@ -3,6 +3,7 @@
 // ==========================================================================
 
 $plyr-color-main: var(--plyr-color-main, hsl(198, 100%, 50%)) !default;
+$plyr-video-background: var(--plyr-video-background, rgba(0,0,0,1)) !default;
 
 // Grayscale
 $plyr-color-gray-900: hsl(216, 15%, 16%) !default;

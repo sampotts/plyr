@@ -1,3 +1,31 @@
+### v3.6.4
+
+- Remove unnecessary calc from media query (thanks @naomiaz)
+- Enhance types (thanks @lunika)
+- Fix: Object.values for the providers must be used (thanks @syteknet-core)
+- Fix: Improve support inside iframes (thanks @ajgagnon)
+- Added --plyr-video-background for having control over the background of a video with alpha channel (webm) or a poster image with alpha channel (thanks @nepomuc)
+- Fix issue with not entering iosfullscreen of vimeo videos with playsinline=true (thanks @lordon and @Frosch)
+- fix: use new syntax for iframe allow attribute
+- chore: package updates
+- chore: add @babel/plugin-proposal-class-properties
+- fix: use bound arrow functions in classes
+
+### v3.6.3
+
+- Fix volume when unmuting from volume 0 using YouTube (thanks @stephanefbouchard)
+- Add missing unit to calc in media query (thanks @vincentorback)
+- Assigning player's lastSeekTime on rewind/fast forward to prevent immediate controls hide on mobile (thanks @trafium)
+- Fix for volume control overflowing in Firefox (thanks @dirkjf)
+- Force fullscreen events to trigger on plyr element (media element in iOS) and not fullscreen container (thanks @theprojectsomething)
+- TypeScript types improvements (thanks @akuma06 & @iwatakeshi)
+- Dash demo link fixed (thanks @jonathanarbely)
+- Fix "A `ReferenceError: _classCallCheck is not defined` error has occurred." error (thanks @hex-ci)
+- Fix issue with CSS custom property check (thanks @syedhusain-appspace)
+- Fix for slow loading videos not autoplaying (thanks @DanielHuntleySBG)
+- Fix for betwork requests are not cancelled after the player is destroyed (thanks @DanielHuntleySBG)
+- Added option to disable custom controls for YouTube and Vimeo
+
 ### v3.6.2
 
 - Fixes for CSS Custom Property related errors in some build tools (thanks @Bashev)
