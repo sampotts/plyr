@@ -20,3 +20,11 @@
 .plyr--stopped.plyr__poster-enabled .plyr__poster {
   opacity: 1;
 }
+
+.plyr__poster-enabled.plyr--paused .plyr__poster {
+	z-index: -1;
+}
+
+.plyr__poster-enabled .plyr__poster {
+	z-index: -1;
+}
