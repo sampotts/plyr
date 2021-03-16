@@ -61,7 +61,7 @@ export function setAspectRatio(input) {
   const [w, h] = is.array(ratio) ? ratio : [0, 0];
   const padding = (100 / w) * h;
 
-  wrapper.style.paddingBottom = `${padding}%`;
+  wrapper.style.paddingBottom = `${padding - 0.25}%`;
 
   // For Vimeo we have an extra <div> to hide the standard controls and UI
   if (this.isVimeo && !this.config.vimeo.premium && this.supported.ui) {
