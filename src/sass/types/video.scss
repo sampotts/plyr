@@ -4,7 +4,7 @@
 
 // Container
 .plyr--video {
-  background: #000;
+  background: var(--plyr-video-background, $plyr-video-background);
   overflow: hidden;
 
   &.plyr--menu-open {
@@ -13,7 +13,7 @@
 }
 
 .plyr__video-wrapper {
-  background: #000;
+  background: var(--plyr-video-background, $plyr-video-background);
   height: 100%;
   margin: auto;
   overflow: hidden;

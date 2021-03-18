@@ -104,7 +104,7 @@ const vimeo = {
     const src = format(player.config.urls.vimeo.iframe, id, params);
     iframe.setAttribute('src', src);
     iframe.setAttribute('allowfullscreen', '');
-    iframe.setAttribute('allow', 'autoplay;fullscreen;picture-in-picture');
+    iframe.setAttribute('allow', ['autoplay', 'fullscreen', 'picture-in-picture'].join('; '));
 
     // Set the referrer policy if required
     if (!is.empty(referrerPolicy)) {

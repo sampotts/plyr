@@ -14,7 +14,7 @@
     margin-right: $plyr-control-spacing;
   }
 
-  @media (max-width: calc(#{$plyr-bp-md} - 1px)) {
+  @media (max-width: ($plyr-bp-md - 1px)) {
     display: none;
   }
 }
