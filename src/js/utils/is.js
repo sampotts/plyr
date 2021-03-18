@@ -32,13 +32,6 @@ const isEmpty = (input) =>
   ((isString(input) || isArray(input) || isNodeList(input)) && !input.length) ||
   (isObject(input) && !Object.keys(input).length);
 
-const isElement = (input) =>
-  input !== null &&
-  (typeof input === "object") &&
-  (input.nodeType === 1) &&
-  (typeof input.style === "object") &&
-  (typeof input.ownerDocument === "object");
-
 const isUrl = (input) => {
   // Accept a URL object
   if (instanceOf(input, window.URL)) {
