@@ -7,7 +7,6 @@
 const path = require('path');
 const gulp = require('gulp');
 // JavaScript
-const terser = require('gulp-terser');
 const rollup = require('gulp-better-rollup');
 const babel = require('rollup-plugin-babel');
 const commonjs = require('rollup-plugin-commonjs');
@@ -27,40 +26,17 @@ const filter = require('gulp-filter');
 const header = require('gulp-header');
 const rename = require('gulp-rename');
 const plumber = require('gulp-plumber');
-const size = require('gulp-size');
-const sourcemaps = require('gulp-sourcemaps');
-const browserSync = require('browser-sync').create();
 const gulpIf = require('gulp-if');
 // Configs
 const build = require('../build.json');
-// Info from package
-const minSuffix = '.min';
 // Paths
 const root = path.join(__dirname, '..');
 const paths = {
   plyr: {
-    // Source paths
-    src: {
-      sass: path.join(root, 'src/sass/**/*.scss'),
-      js: path.join(root, 'src/js/**/*.js'),
-      sprite: path.join(root, 'src/sprite/*.svg'),
-    },
-
-    // Output paths
     output: path.join(root, 'dist/'),
   },
   demo: {
-    // Source paths
-    src: {
-      sass: path.join(root, 'demo/src/sass/**/*.scss'),
-      js: path.join(root, 'demo/src/js/**/*.js'),
-    },
-
-    // Output paths
     output: path.join(root, 'demo/dist/'),
-
-    // Demo
-    root: path.join(root, 'demo/'),
   },
 };
 
@@ -70,9 +46,6 @@ const tasks = {
   js: [],
   sprite: [],
 };
-
-// Size plugin
-const sizeOptions = { showFiles: true, gzip: true };
 
 // Clean out /dist
 gulp.task('clean', (done) => {
@@ -99,7 +72,6 @@ Object.entries(build.js).forEach(([filename, entry]) => {
       gulp
         .src(src)
         .pipe(plumber())
-        .pipe(sourcemaps.init())
         .pipe(
           rollup(
             {
@@ -138,10 +110,6 @@ Object.entries(build.js).forEach(([filename, entry]) => {
         )
         .pipe(gulp.dest(dist))
         .pipe(filter(`**/*.${extension}`))
-        .pipe(terser())
-        .pipe(rename({ suffix: minSuffix }))
-        .pipe(size(sizeOptions))
-        .pipe(sourcemaps.write(''))
         .pipe(gulp.dest(dist)),
     );
   });
@@ -159,7 +127,6 @@ Object.entries(build.css).forEach(([filename, entry]) => {
       .pipe(plumber())
       .pipe(sass())
       .pipe(postcss([customprops(), autoprefixer(), clean()]))
-      .pipe(size(sizeOptions))
       .pipe(gulp.dest(dist)),
   );
 });
@@ -183,7 +150,6 @@ Object.entries(build.sprite).forEach(([filename, entry]) => {
       )
       .pipe(svgstore())
       .pipe(rename({ basename: path.parse(filename).name }))
-      .pipe(size(sizeOptions))
       .pipe(gulp.dest(dist)),
   );
 });
@@ -193,32 +159,5 @@ gulp.task('js', gulp.parallel(...tasks.js));
 gulp.task('css', gulp.parallel(...tasks.css));
 gulp.task('sprites', gulp.parallel(...tasks.sprite));
 
-// Watch for file changes
-gulp.task('watch', () => {
-  // Plyr core
-  gulp.watch(paths.plyr.src.js, gulp.parallel('js'));
-  gulp.watch(paths.plyr.src.sass, gulp.parallel('css'));
-  gulp.watch(paths.plyr.src.sprite, gulp.parallel('sprites'));
-
-  // Demo
-  gulp.watch(paths.demo.src.js, gulp.parallel('js'));
-  gulp.watch(paths.demo.src.sass, gulp.parallel('css'));
-});
-
-// Serve via browser sync
-gulp.task('serve', () =>
-  browserSync.init({
-    server: {
-      baseDir: paths.demo.root,
-    },
-    notify: false,
-    watch: true,
-    ghostMode: false,
-  }),
-);
-
 // Build distribution
 gulp.task('build', gulp.series('clean', gulp.parallel('js', 'css', 'sprites')));
-
-// Default gulp task
-gulp.task('default', gulp.series('build', gulp.parallel('serve', 'watch')));
