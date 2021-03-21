@@ -1,6 +1,0 @@
-tasks:
-  - before: npm install && npm i gulp -g
-    command: gulp
-ports:
-  - port: 3000
-    onOpen: open-preview

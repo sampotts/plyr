@@ -1,5 +1,0 @@
-linters:
-  eslint:
-files:
-  ignore:
-    - 'node_modules/*'
