@@ -15,7 +15,6 @@ const resolve = require('rollup-plugin-node-resolve');
 const sass = require('gulp-sass');
 const postcss = require('gulp-postcss');
 const autoprefixer = require('autoprefixer');
-const clean = require('postcss-clean');
 const customprops = require('postcss-custom-properties');
 // Images
 const svgstore = require('gulp-svgstore');
@@ -26,7 +25,6 @@ const filter = require('gulp-filter');
 const header = require('gulp-header');
 const rename = require('gulp-rename');
 const plumber = require('gulp-plumber');
-const gulpIf = require('gulp-if');
 // Configs
 const build = require('../build.json');
 // Paths
@@ -102,7 +100,7 @@ Object.entries(build.js).forEach(([filename, entry]) => {
             },
           ),
         )
-        .pipe(gulpIf(() => extension !== 'mjs', header('typeof navigator === "object" && '))) // "Support" SSR (#935)
+        .pipe(header('typeof navigator === "object" && '))
         .pipe(
           rename({
             extname: `.${extension}`,
@@ -126,7 +124,7 @@ Object.entries(build.css).forEach(([filename, entry]) => {
       .src(src)
       .pipe(plumber())
       .pipe(sass())
-      .pipe(postcss([customprops(), autoprefixer(), clean({ format: 'beautify' })]))
+      .pipe(postcss([customprops(), autoprefixer()]))
       .pipe(gulp.dest(dist)),
   );
 });
