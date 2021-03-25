@@ -25,7 +25,7 @@
 .plyr--fullscreen-fallback {
   @include plyr-fullscreen-active();
   bottom: 0;
-  display: block;
+  display: flex;
   left: 0;
   position: fixed;
   right: 0;
