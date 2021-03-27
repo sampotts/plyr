@@ -839,6 +839,7 @@ Plyr costs money to run, not only my time. I donate my time for free as I enjoy 
 - [Rutheneum-Bote](https://gymnasium-rutheneum.de/content/newspaper/kreativwettbewerb.php)
 - [pressakey.com | Blog-Magazin für Videospiele](https://pressakey.com)
 - [STROLLÿN: Work with a View](https://strollyn.com)
+- [CFDA Runway360](https://runway360.cfda.com/)
 
 If you want to be added to the list, open a pull request. It'd be awesome to see how you're using Plyr 😎
 
