@@ -5,8 +5,6 @@
 // ==========================================================================
 
 import './tab-focus';
-import 'custom-event-polyfill';
-import 'url-polyfill';
 
 import Plyr from '../../../src/js/plyr';
 import sources from './sources';

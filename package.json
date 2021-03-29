@@ -58,11 +58,6 @@
     "rollup-plugin-node-resolve": "^5.2.0"
   },
   "dependencies": {
-    "caniuse": "^0.1.3",
-    "core-js": "^3.9.1",
-    "custom-event-polyfill": "^1.0.7",
-    "loadjs": "^4.2.0",
-    "rangetouch": "^2.0.1",
-    "url-polyfill": "^1.1.12"
+    "rangetouch": "^2.0.1"
   }
 }
