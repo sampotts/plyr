@@ -64,545 +64,9 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
       focused.classList.add(tabClassName);
     }, 10);
-  }); // Polyfill for creating CustomEvents on IE9/10/11
-  // code pulled from:
-  // https://github.com/d4tocchini/customevent-polyfill
-  // https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent#Polyfill
-
-  (function () {
-    if (typeof window === 'undefined') {
-      return;
-    }
-
-    try {
-      var ce = new window.CustomEvent('test', {
-        cancelable: true
-      });
-      ce.preventDefault();
-
-      if (ce.defaultPrevented !== true) {
-        // IE has problems with .preventDefault() on custom events
-        // http://stackoverflow.com/questions/23349191
-        throw new Error('Could not prevent default');
-      }
-    } catch (e) {
-      var CustomEvent = function CustomEvent(event, params) {
-        var evt, origPrevent;
-        params = params || {};
-        params.bubbles = !!params.bubbles;
-        params.cancelable = !!params.cancelable;
-        evt = document.createEvent('CustomEvent');
-        evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
-        origPrevent = evt.preventDefault;
-
-        evt.preventDefault = function () {
-          origPrevent.call(this);
-
-          try {
-            Object.defineProperty(this, 'defaultPrevented', {
-              get: function get() {
-                return true;
-              }
-            });
-          } catch (e) {
-            this.defaultPrevented = true;
-          }
-        };
-
-        return evt;
-      };
-
-      CustomEvent.prototype = window.Event.prototype;
-      window.CustomEvent = CustomEvent; // expose definition to window
-    }
-  })();
-
-  var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
-
-  (function (global) {
-    /**
-     * Polyfill URLSearchParams
-     *
-     * Inspired from : https://github.com/WebReflection/url-search-params/blob/master/src/url-search-params.js
-     */
-    var checkIfIteratorIsSupported = function checkIfIteratorIsSupported() {
-      try {
-        return !!Symbol.iterator;
-      } catch (error) {
-        return false;
-      }
-    };
-
-    var iteratorSupported = checkIfIteratorIsSupported();
-
-    var createIterator = function createIterator(items) {
-      var iterator = {
-        next: function next() {
-          var value = items.shift();
-          return {
-            done: value === void 0,
-            value: value
-          };
-        }
-      };
-
-      if (iteratorSupported) {
-        iterator[Symbol.iterator] = function () {
-          return iterator;
-        };
-      }
-
-      return iterator;
-    };
-    /**
-     * Search param name and values should be encoded according to https://url.spec.whatwg.org/#urlencoded-serializing
-     * encodeURIComponent() produces the same result except encoding spaces as `%20` instead of `+`.
-     */
-
-
-    var serializeParam = function serializeParam(value) {
-      return encodeURIComponent(value).replace(/%20/g, '+');
-    };
-
-    var deserializeParam = function deserializeParam(value) {
-      return decodeURIComponent(String(value).replace(/\+/g, ' '));
-    };
-
-    var polyfillURLSearchParams = function polyfillURLSearchParams() {
-      var URLSearchParams = function URLSearchParams(searchString) {
-        Object.defineProperty(this, '_entries', {
-          writable: true,
-          value: {}
-        });
-
-        var typeofSearchString = _typeof(searchString);
-
-        if (typeofSearchString === 'undefined') ;else if (typeofSearchString === 'string') {
-          if (searchString !== '') {
-            this._fromString(searchString);
-          }
-        } else if (searchString instanceof URLSearchParams) {
-          var _this = this;
-
-          searchString.forEach(function (value, name) {
-            _this.append(name, value);
-          });
-        } else if (searchString !== null && typeofSearchString === 'object') {
-          if (Object.prototype.toString.call(searchString) === '[object Array]') {
-            for (var i = 0; i < searchString.length; i++) {
-              var entry = searchString[i];
-
-              if (Object.prototype.toString.call(entry) === '[object Array]' || entry.length !== 2) {
-                this.append(entry[0], entry[1]);
-              } else {
-                throw new TypeError('Expected [string, any] as entry at index ' + i + ' of URLSearchParams\'s input');
-              }
-            }
-          } else {
-            for (var key in searchString) {
-              if (searchString.hasOwnProperty(key)) {
-                this.append(key, searchString[key]);
-              }
-            }
-          }
-        } else {
-          throw new TypeError('Unsupported input\'s type for URLSearchParams');
-        }
-      };
-
-      var proto = URLSearchParams.prototype;
-
-      proto.append = function (name, value) {
-        if (name in this._entries) {
-          this._entries[name].push(String(value));
-        } else {
-          this._entries[name] = [String(value)];
-        }
-      };
-
-      proto.delete = function (name) {
-        delete this._entries[name];
-      };
-
-      proto.get = function (name) {
-        return name in this._entries ? this._entries[name][0] : null;
-      };
-
-      proto.getAll = function (name) {
-        return name in this._entries ? this._entries[name].slice(0) : [];
-      };
-
-      proto.has = function (name) {
-        return name in this._entries;
-      };
-
-      proto.set = function (name, value) {
-        this._entries[name] = [String(value)];
-      };
-
-      proto.forEach = function (callback, thisArg) {
-        var entries;
-
-        for (var name in this._entries) {
-          if (this._entries.hasOwnProperty(name)) {
-            entries = this._entries[name];
-
-            for (var i = 0; i < entries.length; i++) {
-              callback.call(thisArg, entries[i], name, this);
-            }
-          }
-        }
-      };
-
-      proto.keys = function () {
-        var items = [];
-        this.forEach(function (value, name) {
-          items.push(name);
-        });
-        return createIterator(items);
-      };
-
-      proto.values = function () {
-        var items = [];
-        this.forEach(function (value) {
-          items.push(value);
-        });
-        return createIterator(items);
-      };
-
-      proto.entries = function () {
-        var items = [];
-        this.forEach(function (value, name) {
-          items.push([name, value]);
-        });
-        return createIterator(items);
-      };
-
-      if (iteratorSupported) {
-        proto[Symbol.iterator] = proto.entries;
-      }
-
-      proto.toString = function () {
-        var searchArray = [];
-        this.forEach(function (value, name) {
-          searchArray.push(serializeParam(name) + '=' + serializeParam(value));
-        });
-        return searchArray.join('&');
-      };
-
-      global.URLSearchParams = URLSearchParams;
-    };
-
-    var checkIfURLSearchParamsSupported = function checkIfURLSearchParamsSupported() {
-      try {
-        var URLSearchParams = global.URLSearchParams;
-        return new URLSearchParams('?a=1').toString() === 'a=1' && typeof URLSearchParams.prototype.set === 'function' && typeof URLSearchParams.prototype.entries === 'function';
-      } catch (e) {
-        return false;
-      }
-    };
-
-    if (!checkIfURLSearchParamsSupported()) {
-      polyfillURLSearchParams();
-    }
-
-    var proto = global.URLSearchParams.prototype;
-
-    if (typeof proto.sort !== 'function') {
-      proto.sort = function () {
-        var _this = this;
-
-        var items = [];
-        this.forEach(function (value, name) {
-          items.push([name, value]);
-
-          if (!_this._entries) {
-            _this.delete(name);
-          }
-        });
-        items.sort(function (a, b) {
-          if (a[0] < b[0]) {
-            return -1;
-          } else if (a[0] > b[0]) {
-            return +1;
-          } else {
-            return 0;
-          }
-        });
-
-        if (_this._entries) {
-          // force reset because IE keeps keys index
-          _this._entries = {};
-        }
-
-        for (var i = 0; i < items.length; i++) {
-          this.append(items[i][0], items[i][1]);
-        }
-      };
-    }
-
-    if (typeof proto._fromString !== 'function') {
-      Object.defineProperty(proto, '_fromString', {
-        enumerable: false,
-        configurable: false,
-        writable: false,
-        value: function value(searchString) {
-          if (this._entries) {
-            this._entries = {};
-          } else {
-            var keys = [];
-            this.forEach(function (value, name) {
-              keys.push(name);
-            });
-
-            for (var i = 0; i < keys.length; i++) {
-              this.delete(keys[i]);
-            }
-          }
-
-          searchString = searchString.replace(/^\?/, '');
-          var attributes = searchString.split('&');
-          var attribute;
-
-          for (var i = 0; i < attributes.length; i++) {
-            attribute = attributes[i].split('=');
-            this.append(deserializeParam(attribute[0]), attribute.length > 1 ? deserializeParam(attribute[1]) : '');
-          }
-        }
-      });
-    } // HTMLAnchorElement
-
-  })(typeof commonjsGlobal !== 'undefined' ? commonjsGlobal : typeof window !== 'undefined' ? window : typeof self !== 'undefined' ? self : commonjsGlobal);
-
-  (function (global) {
-    /**
-     * Polyfill URL
-     *
-     * Inspired from : https://github.com/arv/DOM-URL-Polyfill/blob/master/src/url.js
-     */
-    var checkIfURLIsSupported = function checkIfURLIsSupported() {
-      try {
-        var u = new global.URL('b', 'http://a');
-        u.pathname = 'c d';
-        return u.href === 'http://a/c%20d' && u.searchParams;
-      } catch (e) {
-        return false;
-      }
-    };
-
-    var polyfillURL = function polyfillURL() {
-      var _URL = global.URL;
-
-      var URL = function URL(url, base) {
-        if (typeof url !== 'string') url = String(url); // Only create another document if the base is different from current location.
-
-        var doc = document,
-            baseElement;
-
-        if (base && (global.location === void 0 || base !== global.location.href)) {
-          doc = document.implementation.createHTMLDocument('');
-          baseElement = doc.createElement('base');
-          baseElement.href = base;
-          doc.head.appendChild(baseElement);
-
-          try {
-            if (baseElement.href.indexOf(base) !== 0) throw new Error(baseElement.href);
-          } catch (err) {
-            throw new Error('URL unable to set base ' + base + ' due to ' + err);
-          }
-        }
-
-        var anchorElement = doc.createElement('a');
-        anchorElement.href = url;
-
-        if (baseElement) {
-          doc.body.appendChild(anchorElement);
-          anchorElement.href = anchorElement.href; // force href to refresh
-        }
-
-        var inputElement = doc.createElement('input');
-        inputElement.type = 'url';
-        inputElement.value = url;
-
-        if (anchorElement.protocol === ':' || !/:/.test(anchorElement.href) || !inputElement.checkValidity() && !base) {
-          throw new TypeError('Invalid URL');
-        }
-
-        Object.defineProperty(this, '_anchorElement', {
-          value: anchorElement
-        }); // create a linked searchParams which reflect its changes on URL
-
-        var searchParams = new global.URLSearchParams(this.search);
-        var enableSearchUpdate = true;
-        var enableSearchParamsUpdate = true;
-
-        var _this = this;
-
-        ['append', 'delete', 'set'].forEach(function (methodName) {
-          var method = searchParams[methodName];
-
-          searchParams[methodName] = function () {
-            method.apply(searchParams, arguments);
-
-            if (enableSearchUpdate) {
-              enableSearchParamsUpdate = false;
-              _this.search = searchParams.toString();
-              enableSearchParamsUpdate = true;
-            }
-          };
-        });
-        Object.defineProperty(this, 'searchParams', {
-          value: searchParams,
-          enumerable: true
-        });
-        var search = void 0;
-        Object.defineProperty(this, '_updateSearchParams', {
-          enumerable: false,
-          configurable: false,
-          writable: false,
-          value: function value() {
-            if (this.search !== search) {
-              search = this.search;
-
-              if (enableSearchParamsUpdate) {
-                enableSearchUpdate = false;
-
-                this.searchParams._fromString(this.search);
-
-                enableSearchUpdate = true;
-              }
-            }
-          }
-        });
-      };
-
-      var proto = URL.prototype;
-
-      var linkURLWithAnchorAttribute = function linkURLWithAnchorAttribute(attributeName) {
-        Object.defineProperty(proto, attributeName, {
-          get: function get() {
-            return this._anchorElement[attributeName];
-          },
-          set: function set(value) {
-            this._anchorElement[attributeName] = value;
-          },
-          enumerable: true
-        });
-      };
-
-      ['hash', 'host', 'hostname', 'port', 'protocol'].forEach(function (attributeName) {
-        linkURLWithAnchorAttribute(attributeName);
-      });
-      Object.defineProperty(proto, 'search', {
-        get: function get() {
-          return this._anchorElement['search'];
-        },
-        set: function set(value) {
-          this._anchorElement['search'] = value;
-
-          this._updateSearchParams();
-        },
-        enumerable: true
-      });
-      Object.defineProperties(proto, {
-        'toString': {
-          get: function get() {
-            var _this = this;
-
-            return function () {
-              return _this.href;
-            };
-          }
-        },
-        'href': {
-          get: function get() {
-            return this._anchorElement.href.replace(/\?$/, '');
-          },
-          set: function set(value) {
-            this._anchorElement.href = value;
-
-            this._updateSearchParams();
-          },
-          enumerable: true
-        },
-        'pathname': {
-          get: function get() {
-            return this._anchorElement.pathname.replace(/(^\/?)/, '/');
-          },
-          set: function set(value) {
-            this._anchorElement.pathname = value;
-          },
-          enumerable: true
-        },
-        'origin': {
-          get: function get() {
-            // get expected port from protocol
-            var expectedPort = {
-              'http:': 80,
-              'https:': 443,
-              'ftp:': 21
-            }[this._anchorElement.protocol]; // add port to origin if, expected port is different than actual port
-            // and it is not empty f.e http://foo:8080
-            // 8080 != 80 && 8080 != ''
-
-            var addPortToOrigin = this._anchorElement.port != expectedPort && this._anchorElement.port !== '';
-            return this._anchorElement.protocol + '//' + this._anchorElement.hostname + (addPortToOrigin ? ':' + this._anchorElement.port : '');
-          },
-          enumerable: true
-        },
-        'password': {
-          // TODO
-          get: function get() {
-            return '';
-          },
-          set: function set(value) {},
-          enumerable: true
-        },
-        'username': {
-          // TODO
-          get: function get() {
-            return '';
-          },
-          set: function set(value) {},
-          enumerable: true
-        }
-      });
-
-      URL.createObjectURL = function (blob) {
-        return _URL.createObjectURL.apply(_URL, arguments);
-      };
-
-      URL.revokeObjectURL = function (url) {
-        return _URL.revokeObjectURL.apply(_URL, arguments);
-      };
-
-      global.URL = URL;
-    };
-
-    if (!checkIfURLIsSupported()) {
-      polyfillURL();
-    }
-
-    if (global.location !== void 0 && !('origin' in global.location)) {
-      var getOrigin = function getOrigin() {
-        return global.location.protocol + '//' + global.location.hostname + (global.location.port ? ':' + global.location.port : '');
-      };
-
-      try {
-        Object.defineProperty(global.location, 'origin', {
-          get: getOrigin,
-          enumerable: true
-        });
-      } catch (e) {
-        setInterval(function () {
-          global.location.origin = getOrigin();
-        }, 100);
-      }
-    }
-  })(typeof commonjsGlobal !== 'undefined' ? commonjsGlobal : typeof window !== 'undefined' ? window : typeof self !== 'undefined' ? self : commonjsGlobal); // ==========================================================================
+  }); // ==========================================================================
   // Type checking utils
   // ==========================================================================
-
 
   var getConstructor$1 = function getConstructor$1(input) {
     return input !== null && typeof input !== 'undefined' ? input.constructor : null;
@@ -1987,7 +1451,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
 
   function toggleListener(element, event, callback) {
-    var _this2 = this;
+    var _this = this;
 
     var toggle = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
     var passive = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
@@ -2015,9 +1479,9 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
 
     events.forEach(function (type) {
-      if (_this2 && _this2.eventListeners && toggle) {
+      if (_this && _this.eventListeners && toggle) {
         // Cache event listener
-        _this2.eventListeners.push({
+        _this.eventListeners.push({
           element: element,
           type: type,
           callback: callback,
@@ -2049,7 +1513,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
 
   function once(element) {
-    var _this3 = this;
+    var _this2 = this;
 
     var events = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
     var callback = arguments.length > 2 ? arguments[2] : undefined;
@@ -2063,7 +1527,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
         args[_key2] = arguments[_key2];
       }
 
-      callback.apply(_this3, args);
+      callback.apply(_this2, args);
     };
 
     toggleListener.call(this, element, events, onceCallback, true, passive, capture);
@@ -2107,10 +1571,10 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
 
   function ready() {
-    var _this4 = this;
+    var _this3 = this;
 
     return new Promise(function (resolve) {
-      return _this4.ready ? setTimeout(resolve, 0) : on.call(_this4, _this4.elements.container, 'ready', resolve);
+      return _this3.ready ? setTimeout(resolve, 0) : on.call(_this3, _this3.elements.container, 'ready', resolve);
     }).then(function () {});
   }
   /**
@@ -2221,7 +1685,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
   var html5 = {
     getSources: function getSources() {
-      var _this5 = this;
+      var _this4 = this;
 
       if (!this.isHTML5) {
         return [];
@@ -2236,7 +1700,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
           return true;
         }
 
-        return support.mime.call(_this5, type);
+        return support.mime.call(_this4, type);
       });
     },
     // Get quality levels
@@ -2376,16 +1840,16 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
   var Storage = /*#__PURE__*/function () {
     function Storage(player) {
-      var _this6 = this;
+      var _this5 = this;
 
       _classCallCheck2(this, Storage);
 
       _defineProperty2(this, "get", function (key) {
-        if (!Storage.supported || !_this6.enabled) {
+        if (!Storage.supported || !_this5.enabled) {
           return null;
         }
 
-        var store = window.localStorage.getItem(_this6.key);
+        var store = window.localStorage.getItem(_this5.key);
 
         if (is$1.empty(store)) {
           return null;
@@ -2397,7 +1861,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
       _defineProperty2(this, "set", function (object) {
         // Bail if we don't have localStorage support or it's disabled
-        if (!Storage.supported || !_this6.enabled) {
+        if (!Storage.supported || !_this5.enabled) {
           return;
         } // Can only store objectst
 
@@ -2407,7 +1871,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
         } // Get current storage
 
 
-        var storage = _this6.get(); // Default to empty object
+        var storage = _this5.get(); // Default to empty object
 
 
         if (is$1.empty(storage)) {
@@ -2417,7 +1881,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
         extend(storage, object); // Update storage
 
-        window.localStorage.setItem(_this6.key, JSON.stringify(storage));
+        window.localStorage.setItem(_this5.key, JSON.stringify(storage));
       });
 
       this.enabled = player.config.storage.enabled;
@@ -2709,7 +2173,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
     },
     // Create a <button>
     createButton: function createButton(buttonType, attr) {
-      var _this7 = this;
+      var _this6 = this;
 
       var attributes = extend({}, attr);
       var type = toCamelCase(buttonType);
@@ -2735,7 +2199,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
       if (Object.keys(attributes).includes('class')) {
         if (!attributes.class.split(' ').some(function (c) {
-          return c === _this7.config.classNames.control;
+          return c === _this6.config.classNames.control;
         })) {
           extend(attributes, {
             class: "".concat(attributes.class, " ").concat(this.config.classNames.control)
@@ -2897,7 +2361,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
     // We have to bind to keyup otherwise Firefox triggers a click when a keydown event handler shifts focus
     // https://bugzilla.mozilla.org/show_bug.cgi?id=1220143
     bindMenuItemShortcuts: function bindMenuItemShortcuts(menuItem, type) {
-      var _this8 = this;
+      var _this7 = this;
 
       // Navigate through menus via arrow keys and space
       on.call(this, menuItem, 'keydown keyup', function (event) {
@@ -2917,7 +2381,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
         var isRadioButton = matches(menuItem, '[role="menuitemradio"]'); // Show the respective menu
 
         if (!isRadioButton && [32, 39].includes(event.which)) {
-          controls.showMenuPanel.call(_this8, type, true);
+          controls.showMenuPanel.call(_this7, type, true);
         } else {
           var target;
 
@@ -2936,7 +2400,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
               }
             }
 
-            setFocus.call(_this8, target, true);
+            setFocus.call(_this7, target, true);
           }
         }
       }, false); // Enter will fire a `click` event but we still need to manage focus
@@ -2947,12 +2411,12 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
           return;
         }
 
-        controls.focusFirstMenuItem.call(_this8, null, true);
+        controls.focusFirstMenuItem.call(_this7, null, true);
       });
     },
     // Create a settings menu item
     createMenuItem: function createMenuItem(_ref9) {
-      var _this9 = this;
+      var _this8 = this;
 
       var value = _ref9.value,
           list = _ref9.list,
@@ -3009,19 +2473,19 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
         switch (type) {
           case 'language':
-            _this9.currentTrack = Number(value);
+            _this8.currentTrack = Number(value);
             break;
 
           case 'quality':
-            _this9.quality = value;
+            _this8.quality = value;
             break;
 
           case 'speed':
-            _this9.speed = parseFloat(value);
+            _this8.speed = parseFloat(value);
             break;
         }
 
-        controls.showMenuPanel.call(_this9, 'home', is$1.keyboardEvent(event));
+        controls.showMenuPanel.call(_this8, 'home', is$1.keyboardEvent(event));
       }, type, false);
       controls.bindMenuItemShortcuts.call(this, menuItem, type);
       list.appendChild(menuItem);
@@ -3085,7 +2549,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
     },
     // Update <progress> elements
     updateProgress: function updateProgress(event) {
-      var _this10 = this;
+      var _this9 = this;
 
       if (!this.supported.ui || !is$1.event(event)) {
         return;
@@ -3095,7 +2559,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
       var setProgress = function setProgress(target, input) {
         var val = is$1.number(input) ? input : 0;
-        var progress = is$1.element(target) ? target : _this10.elements.display.buffer; // Update value and label
+        var progress = is$1.element(target) ? target : _this9.elements.display.buffer; // Update value and label
 
         if (is$1.element(progress)) {
           progress.value = val; // Update text label inside
@@ -3164,7 +2628,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
     },
     // Update hover tooltip for seeking
     updateSeekTooltip: function updateSeekTooltip(event) {
-      var _this11 = this;
+      var _this10 = this;
 
       // Bail if setting not true
       if (!this.config.tooltips.seek || !is$1.element(this.elements.inputs.seek) || !is$1.element(this.elements.display.seekTooltip) || this.duration === 0) {
@@ -3174,7 +2638,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
       var visible = "".concat(this.config.classNames.tooltip, "--visible");
 
       var toggle = function toggle(show) {
-        return toggleClass$1(_this11.elements.display.seekTooltip, visible, show);
+        return toggleClass$1(_this10.elements.display.seekTooltip, visible, show);
       }; // Hide on touch
 
 
@@ -3343,7 +2807,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
     },
     // Set the quality menu
     setQualityMenu: function setQualityMenu(options) {
-      var _this12 = this;
+      var _this11 = this;
 
       // Menu required
       if (!is$1.element(this.elements.settings.panels.quality)) {
@@ -3355,7 +2819,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
       if (is$1.array(options)) {
         this.options.quality = dedupe(options).filter(function (quality) {
-          return _this12.config.quality.options.includes(quality);
+          return _this11.config.quality.options.includes(quality);
         });
       } // Toggle the pane and tab
 
@@ -3373,25 +2837,25 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
 
       var getBadge = function getBadge(quality) {
-        var label = i18n.get("qualityBadge.".concat(quality), _this12.config);
+        var label = i18n.get("qualityBadge.".concat(quality), _this11.config);
 
         if (!label.length) {
           return null;
         }
 
-        return controls.createBadge.call(_this12, label);
+        return controls.createBadge.call(_this11, label);
       }; // Sort options by the config and then render options
 
 
       this.options.quality.sort(function (a, b) {
-        var sorting = _this12.config.quality.options;
+        var sorting = _this11.config.quality.options;
         return sorting.indexOf(a) > sorting.indexOf(b) ? 1 : -1;
       }).forEach(function (quality) {
-        controls.createMenuItem.call(_this12, {
+        controls.createMenuItem.call(_this11, {
           value: quality,
           list: list,
           type: type,
-          title: controls.getLabel.call(_this12, 'quality', quality),
+          title: controls.getLabel.call(_this11, 'quality', quality),
           badge: getBadge(quality)
         });
       });
@@ -3437,7 +2901,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
     // TODO: rework this to user the getter in the API?
     // Set a list of available captions languages
     setCaptionsMenu: function setCaptionsMenu() {
-      var _this13 = this;
+      var _this12 = this;
 
       // Menu required
       if (!is$1.element(this.elements.settings.panels.captions)) {
@@ -3464,9 +2928,9 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
       var options = tracks.map(function (track, value) {
         return {
           value: value,
-          checked: _this13.captions.toggled && _this13.currentTrack === value,
-          title: captions.getLabel.call(_this13, track),
-          badge: track.language && controls.createBadge.call(_this13, track.language.toUpperCase()),
+          checked: _this12.captions.toggled && _this12.currentTrack === value,
+          title: captions.getLabel.call(_this12, track),
+          badge: track.language && controls.createBadge.call(_this12, track.language.toUpperCase()),
           list: list,
           type: 'language'
         };
@@ -3485,7 +2949,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
     },
     // Set a list of available captions languages
     setSpeedMenu: function setSpeedMenu() {
-      var _this14 = this;
+      var _this13 = this;
 
       // Menu required
       if (!is$1.element(this.elements.settings.panels.speed)) {
@@ -3496,7 +2960,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
       var list = this.elements.settings.panels.speed.querySelector('[role="menu"]'); // Filter out invalid speeds
 
       this.options.speed = this.options.speed.filter(function (o) {
-        return o >= _this14.minimumSpeed && o <= _this14.maximumSpeed;
+        return o >= _this13.minimumSpeed && o <= _this13.maximumSpeed;
       }); // Toggle the pane and tab
 
       var toggle = !is$1.empty(this.options.speed) && this.options.speed.length > 1;
@@ -3512,11 +2976,11 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
 
       this.options.speed.forEach(function (speed) {
-        controls.createMenuItem.call(_this14, {
+        controls.createMenuItem.call(_this13, {
           value: speed,
           list: list,
           type: type,
-          title: controls.getLabel.call(_this14, 'speed', speed)
+          title: controls.getLabel.call(_this13, 'speed', speed)
         });
       });
       controls.updateSetting.call(this, type, list);
@@ -3612,7 +3076,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
     },
     // Show a panel in the menu
     showMenuPanel: function showMenuPanel() {
-      var _this15 = this;
+      var _this14 = this;
 
       var type = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
       var tabFocus = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
@@ -3645,7 +3109,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
           container.style.removeProperty('width');
           container.style.removeProperty('height'); // Only listen once
 
-          off.call(_this15, container, transitionEndEvent, restore);
+          off.call(_this14, container, transitionEndEvent, restore);
         }; // Listen for the transition finishing and restore auto height/width
 
 
@@ -3675,7 +3139,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
     },
     // Build the default HTML
     create: function create(data) {
-      var _this16 = this;
+      var _this15 = this;
 
       var bindMenuItemShortcuts = controls.bindMenuItemShortcuts,
           createButton = controls.createButton,
@@ -3702,22 +3166,22 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
       dedupe(is$1.array(this.config.controls) ? this.config.controls : []).forEach(function (control) {
         // Restart button
         if (control === 'restart') {
-          container.appendChild(createButton.call(_this16, 'restart', defaultAttributes));
+          container.appendChild(createButton.call(_this15, 'restart', defaultAttributes));
         } // Rewind button
 
 
         if (control === 'rewind') {
-          container.appendChild(createButton.call(_this16, 'rewind', defaultAttributes));
+          container.appendChild(createButton.call(_this15, 'rewind', defaultAttributes));
         } // Play/Pause button
 
 
         if (control === 'play') {
-          container.appendChild(createButton.call(_this16, 'play', defaultAttributes));
+          container.appendChild(createButton.call(_this15, 'play', defaultAttributes));
         } // Fast forward button
 
 
         if (control === 'fast-forward') {
-          container.appendChild(createButton.call(_this16, 'fast-forward', defaultAttributes));
+          container.appendChild(createButton.call(_this15, 'fast-forward', defaultAttributes));
         } // Progress
 
 
@@ -3725,53 +3189,53 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
           var progressContainer = createElement('div', {
             class: "".concat(defaultAttributes.class, " ggs-plyr__progress__container")
           });
-          var progress = createElement('div', getAttributesFromSelector(_this16.config.selectors.progress)); // Seek range slider
+          var progress = createElement('div', getAttributesFromSelector(_this15.config.selectors.progress)); // Seek range slider
 
-          progress.appendChild(createRange.call(_this16, 'seek', {
+          progress.appendChild(createRange.call(_this15, 'seek', {
             id: "ggs-plyr-seek-".concat(data.id)
           })); // Buffer progress
 
-          progress.appendChild(createProgress.call(_this16, 'buffer')); // TODO: Add loop display indicator
+          progress.appendChild(createProgress.call(_this15, 'buffer')); // TODO: Add loop display indicator
           // Seek tooltip
 
-          if (_this16.config.tooltips.seek) {
+          if (_this15.config.tooltips.seek) {
             var tooltip = createElement('span', {
-              class: _this16.config.classNames.tooltip
+              class: _this15.config.classNames.tooltip
             }, '00:00');
             progress.appendChild(tooltip);
-            _this16.elements.display.seekTooltip = tooltip;
+            _this15.elements.display.seekTooltip = tooltip;
           }
 
-          _this16.elements.progress = progress;
-          progressContainer.appendChild(_this16.elements.progress);
+          _this15.elements.progress = progress;
+          progressContainer.appendChild(_this15.elements.progress);
           container.appendChild(progressContainer);
         } // Media current time display
 
 
         if (control === 'current-time') {
-          container.appendChild(createTime.call(_this16, 'currentTime', defaultAttributes));
+          container.appendChild(createTime.call(_this15, 'currentTime', defaultAttributes));
         } // Media duration display
 
 
         if (control === 'duration') {
-          container.appendChild(createTime.call(_this16, 'duration', defaultAttributes));
+          container.appendChild(createTime.call(_this15, 'duration', defaultAttributes));
         } // Volume controls
 
 
         if (control === 'mute' || control === 'volume') {
-          var volume = _this16.elements.volume; // Create the volume container if needed
+          var volume = _this15.elements.volume; // Create the volume container if needed
 
           if (!is$1.element(volume) || !container.contains(volume)) {
             volume = createElement('div', extend({}, defaultAttributes, {
               class: "".concat(defaultAttributes.class, " ggs-plyr__volume").trim()
             }));
-            _this16.elements.volume = volume;
+            _this15.elements.volume = volume;
             container.appendChild(volume);
           } // Toggle mute button
 
 
           if (control === 'mute') {
-            volume.appendChild(createButton.call(_this16, 'mute'));
+            volume.appendChild(createButton.call(_this15, 'mute'));
           } // Volume range control
           // Ignored on iOS as it's handled globally
           // https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html
@@ -3782,10 +3246,10 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
             var attributes = {
               max: 1,
               step: 0.05,
-              value: _this16.config.volume
+              value: _this15.config.volume
             }; // Create the volume range slider
 
-            volume.appendChild(createRange.call(_this16, 'volume', extend(attributes, {
+            volume.appendChild(createRange.call(_this15, 'volume', extend(attributes, {
               id: "ggs-plyr-volume-".concat(data.id)
             })));
           }
@@ -3793,16 +3257,16 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
 
         if (control === 'captions') {
-          container.appendChild(createButton.call(_this16, 'captions', defaultAttributes));
+          container.appendChild(createButton.call(_this15, 'captions', defaultAttributes));
         } // Settings button / menu
 
 
-        if (control === 'settings' && !is$1.empty(_this16.config.settings)) {
+        if (control === 'settings' && !is$1.empty(_this15.config.settings)) {
           var wrapper = createElement('div', extend({}, defaultAttributes, {
             class: "".concat(defaultAttributes.class, " ggs-plyr__menu").trim(),
             hidden: ''
           }));
-          wrapper.appendChild(createButton.call(_this16, 'settings', {
+          wrapper.appendChild(createButton.call(_this15, 'settings', {
             'aria-haspopup': true,
             'aria-controls': "ggs-plyr-settings-".concat(data.id),
             'aria-expanded': false
@@ -3822,26 +3286,26 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
           });
           home.appendChild(menu);
           inner.appendChild(home);
-          _this16.elements.settings.panels.home = home; // Build the menu items
+          _this15.elements.settings.panels.home = home; // Build the menu items
 
-          _this16.config.settings.forEach(function (type) {
+          _this15.config.settings.forEach(function (type) {
             // TODO: bundle this with the createMenuItem helper and bindings
-            var menuItem = createElement('button', extend(getAttributesFromSelector(_this16.config.selectors.buttons.settings), {
+            var menuItem = createElement('button', extend(getAttributesFromSelector(_this15.config.selectors.buttons.settings), {
               type: 'button',
-              class: "".concat(_this16.config.classNames.control, " ").concat(_this16.config.classNames.control, "--forward"),
+              class: "".concat(_this15.config.classNames.control, " ").concat(_this15.config.classNames.control, "--forward"),
               role: 'menuitem',
               'aria-haspopup': true,
               hidden: ''
             })); // Bind menu shortcuts for keyboard users
 
-            bindMenuItemShortcuts.call(_this16, menuItem, type); // Show menu on click
+            bindMenuItemShortcuts.call(_this15, menuItem, type); // Show menu on click
 
-            on.call(_this16, menuItem, 'click', function () {
-              showMenuPanel.call(_this16, type, false);
+            on.call(_this15, menuItem, 'click', function () {
+              showMenuPanel.call(_this15, type, false);
             });
-            var flex = createElement('span', null, i18n.get(type, _this16.config));
+            var flex = createElement('span', null, i18n.get(type, _this15.config));
             var value = createElement('span', {
-              class: _this16.config.classNames.menu.value
+              class: _this15.config.classNames.menu.value
             }); // Speed contains HTML entities
 
             value.innerHTML = data[type];
@@ -3856,18 +3320,18 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
             var backButton = createElement('button', {
               type: 'button',
-              class: "".concat(_this16.config.classNames.control, " ").concat(_this16.config.classNames.control, "--back")
+              class: "".concat(_this15.config.classNames.control, " ").concat(_this15.config.classNames.control, "--back")
             }); // Visible label
 
             backButton.appendChild(createElement('span', {
               'aria-hidden': true
-            }, i18n.get(type, _this16.config))); // Screen reader label
+            }, i18n.get(type, _this15.config))); // Screen reader label
 
             backButton.appendChild(createElement('span', {
-              class: _this16.config.classNames.hidden
-            }, i18n.get('menuBack', _this16.config))); // Go back via keyboard
+              class: _this15.config.classNames.hidden
+            }, i18n.get('menuBack', _this15.config))); // Go back via keyboard
 
-            on.call(_this16, pane, 'keydown', function (event) {
+            on.call(_this15, pane, 'keydown', function (event) {
               // We only care about <-
               if (event.which !== 37) {
                 return;
@@ -3877,11 +3341,11 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
               event.preventDefault();
               event.stopPropagation(); // Show the respective menu
 
-              showMenuPanel.call(_this16, 'home', true);
+              showMenuPanel.call(_this15, 'home', true);
             }, false); // Go back via button click
 
-            on.call(_this16, backButton, 'click', function () {
-              showMenuPanel.call(_this16, 'home', false);
+            on.call(_this15, backButton, 'click', function () {
+              showMenuPanel.call(_this15, 'home', false);
             }); // Add to pane
 
             pane.appendChild(backButton); // Menu
@@ -3890,55 +3354,55 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
               role: 'menu'
             }));
             inner.appendChild(pane);
-            _this16.elements.settings.buttons[type] = menuItem;
-            _this16.elements.settings.panels[type] = pane;
+            _this15.elements.settings.buttons[type] = menuItem;
+            _this15.elements.settings.panels[type] = pane;
           });
 
           popup.appendChild(inner);
           wrapper.appendChild(popup);
           container.appendChild(wrapper);
-          _this16.elements.settings.popup = popup;
-          _this16.elements.settings.menu = wrapper;
+          _this15.elements.settings.popup = popup;
+          _this15.elements.settings.menu = wrapper;
         } // Picture in picture button
 
 
         if (control === 'pip' && support.pip) {
-          container.appendChild(createButton.call(_this16, 'pip', defaultAttributes));
+          container.appendChild(createButton.call(_this15, 'pip', defaultAttributes));
         } // Airplay button
 
 
         if (control === 'airplay' && support.airplay) {
-          container.appendChild(createButton.call(_this16, 'airplay', defaultAttributes));
+          container.appendChild(createButton.call(_this15, 'airplay', defaultAttributes));
         } // Download button
 
 
         if (control === 'download') {
           var _attributes = extend({}, defaultAttributes, {
             element: 'a',
-            href: _this16.download,
+            href: _this15.download,
             target: '_blank'
           }); // Set download attribute for HTML5 only
 
 
-          if (_this16.isHTML5) {
+          if (_this15.isHTML5) {
             _attributes.download = '';
           }
 
-          var download = _this16.config.urls.download;
+          var download = _this15.config.urls.download;
 
-          if (!is$1.url(download) && _this16.isEmbed) {
+          if (!is$1.url(download) && _this15.isEmbed) {
             extend(_attributes, {
-              icon: "logo-".concat(_this16.provider),
-              label: _this16.provider
+              icon: "logo-".concat(_this15.provider),
+              label: _this15.provider
             });
           }
 
-          container.appendChild(createButton.call(_this16, 'download', _attributes));
+          container.appendChild(createButton.call(_this15, 'download', _attributes));
         } // Toggle fullscreen button
 
 
         if (control === 'fullscreen') {
-          container.appendChild(createButton.call(_this16, 'fullscreen', defaultAttributes));
+          container.appendChild(createButton.call(_this15, 'fullscreen', defaultAttributes));
         }
       }); // Set available quality levels
 
@@ -3951,7 +3415,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
     },
     // Insert controls
     inject: function inject() {
-      var _this17 = this;
+      var _this16 = this;
 
       // Sprite
       if (this.config.loadSprite) {
@@ -4044,7 +3508,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
       if (!is$1.empty(this.elements.buttons)) {
         var addProperty = function addProperty(button) {
-          var className = _this17.config.classNames.controlPressed;
+          var className = _this16.config.classNames.controlPressed;
           Object.defineProperty(button, 'pressed', {
             enumerable: true,
             get: function get() {
@@ -4080,8 +3544,8 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
         var selector = "".concat(selectors.controls.wrapper, " ").concat(selectors.labels, " .").concat(classNames.hidden);
         var labels = getElements.call(this, selector);
         Array.from(labels).forEach(function (label) {
-          toggleClass$1(label, _this17.config.classNames.hidden, false);
-          toggleClass$1(label, _this17.config.classNames.tooltip, true);
+          toggleClass$1(label, _this16.config.classNames.hidden, false);
+          toggleClass$1(label, _this16.config.classNames.tooltip, true);
         });
       }
     }
@@ -4089,26 +3553,26 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
   var Fullscreen = /*#__PURE__*/function () {
     function Fullscreen(player) {
-      var _this18 = this;
+      var _this17 = this;
 
       _classCallCheck2(this, Fullscreen);
 
       _defineProperty2(this, "onChange", function () {
-        if (!_this18.enabled) {
+        if (!_this17.enabled) {
           return;
         } // Update toggle button
 
 
-        var button = _this18.player.elements.buttons.fullscreen;
+        var button = _this17.player.elements.buttons.fullscreen;
 
         if (is$1.element(button)) {
-          button.pressed = _this18.active;
+          button.pressed = _this17.active;
         } // Always trigger events on the plyr / media element (not a fullscreen container) and let them bubble up
 
 
-        var target = _this18.target === _this18.player.media ? _this18.target : _this18.player.elements.container; // Trigger an event
+        var target = _this17.target === _this17.player.media ? _this17.target : _this17.player.elements.container; // Trigger an event
 
-        triggerEvent.call(_this18.player, target, _this18.active ? 'enterfullscreen' : 'exitfullscreen', true);
+        triggerEvent.call(_this17.player, target, _this17.active ? 'enterfullscreen' : 'exitfullscreen', true);
       });
 
       _defineProperty2(this, "toggleFallback", function () {
@@ -4116,12 +3580,12 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
         // Store or restore scroll position
         if (toggle) {
-          _this18.scrollPosition = {
+          _this17.scrollPosition = {
             x: window.scrollX || 0,
             y: window.scrollY || 0
           };
         } else {
-          window.scrollTo(_this18.scrollPosition.x, _this18.scrollPosition.y);
+          window.scrollTo(_this17.scrollPosition.x, _this17.scrollPosition.y);
         } // Toggle scroll
 
 
@@ -4132,7 +3596,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
         } // Toggle class hook
 
 
-        toggleClass$1(_this18.target, _this18.player.config.classNames.fullscreen.fallback, toggle); // Force full viewport on iPhone X+
+        toggleClass$1(_this17.target, _this17.player.config.classNames.fullscreen.fallback, toggle); // Force full viewport on iPhone X+
 
         if (browser.isIos) {
           var viewport = document.head.querySelector('meta[name="viewport"]');
@@ -4147,12 +3611,12 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
           var hasProperty = is$1.string(viewport.content) && viewport.content.includes(property);
 
           if (toggle) {
-            _this18.cleanupViewport = !hasProperty;
+            _this17.cleanupViewport = !hasProperty;
 
             if (!hasProperty) {
               viewport.content += ",".concat(property);
             }
-          } else if (_this18.cleanupViewport) {
+          } else if (_this17.cleanupViewport) {
             viewport.content = viewport.content.split(',').filter(function (part) {
               return part.trim() !== property;
             }).join(',');
@@ -4160,18 +3624,18 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
         } // Toggle button and fire events
 
 
-        _this18.onChange();
+        _this17.onChange();
       });
 
       _defineProperty2(this, "trapFocus", function (event) {
         // Bail if iOS, not active, not the tab key
-        if (browser.isIos || !_this18.active || event.key !== 'Tab' || event.keyCode !== 9) {
+        if (browser.isIos || !_this17.active || event.key !== 'Tab' || event.keyCode !== 9) {
           return;
         } // Get the current focused element
 
 
         var focused = document.activeElement;
-        var focusable = getElements.call(_this18.player, 'a[href], button:not(:disabled), input:not(:disabled), [tabindex]');
+        var focusable = getElements.call(_this17.player, 'a[href], button:not(:disabled), input:not(:disabled), [tabindex]');
 
         var _focusable = _slicedToArray(focusable, 1),
             first = _focusable[0];
@@ -4190,10 +3654,10 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
       });
 
       _defineProperty2(this, "update", function () {
-        if (_this18.enabled) {
+        if (_this17.enabled) {
           var mode;
 
-          if (_this18.forceFallback) {
+          if (_this17.forceFallback) {
             mode = 'Fallback (forced)';
           } else if (Fullscreen.native) {
             mode = 'Native';
@@ -4201,63 +3665,63 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
             mode = 'Fallback';
           }
 
-          _this18.player.debug.log("".concat(mode, " fullscreen enabled"));
+          _this17.player.debug.log("".concat(mode, " fullscreen enabled"));
         } else {
-          _this18.player.debug.log('Fullscreen not supported and fallback disabled');
+          _this17.player.debug.log('Fullscreen not supported and fallback disabled');
         } // Add styling hook to show button
 
 
-        toggleClass$1(_this18.player.elements.container, _this18.player.config.classNames.fullscreen.enabled, _this18.enabled);
+        toggleClass$1(_this17.player.elements.container, _this17.player.config.classNames.fullscreen.enabled, _this17.enabled);
       });
 
       _defineProperty2(this, "enter", function () {
-        if (!_this18.enabled) {
+        if (!_this17.enabled) {
           return;
         } // iOS native fullscreen doesn't need the request step
 
 
-        if (browser.isIos && _this18.player.config.fullscreen.iosNative) {
-          if (_this18.player.isVimeo) {
-            _this18.player.embed.requestFullscreen();
+        if (browser.isIos && _this17.player.config.fullscreen.iosNative) {
+          if (_this17.player.isVimeo) {
+            _this17.player.embed.requestFullscreen();
           } else {
-            _this18.target.webkitEnterFullscreen();
+            _this17.target.webkitEnterFullscreen();
           }
-        } else if (!Fullscreen.native || _this18.forceFallback) {
-          _this18.toggleFallback(true);
-        } else if (!_this18.prefix) {
-          _this18.target.requestFullscreen({
+        } else if (!Fullscreen.native || _this17.forceFallback) {
+          _this17.toggleFallback(true);
+        } else if (!_this17.prefix) {
+          _this17.target.requestFullscreen({
             navigationUI: 'hide'
           });
-        } else if (!is$1.empty(_this18.prefix)) {
-          _this18.target["".concat(_this18.prefix, "Request").concat(_this18.property)]();
+        } else if (!is$1.empty(_this17.prefix)) {
+          _this17.target["".concat(_this17.prefix, "Request").concat(_this17.property)]();
         }
       });
 
       _defineProperty2(this, "exit", function () {
-        if (!_this18.enabled) {
+        if (!_this17.enabled) {
           return;
         } // iOS native fullscreen
 
 
-        if (browser.isIos && _this18.player.config.fullscreen.iosNative) {
-          _this18.target.webkitExitFullscreen();
+        if (browser.isIos && _this17.player.config.fullscreen.iosNative) {
+          _this17.target.webkitExitFullscreen();
 
-          silencePromise(_this18.player.play());
-        } else if (!Fullscreen.native || _this18.forceFallback) {
-          _this18.toggleFallback(false);
-        } else if (!_this18.prefix) {
+          silencePromise(_this17.player.play());
+        } else if (!Fullscreen.native || _this17.forceFallback) {
+          _this17.toggleFallback(false);
+        } else if (!_this17.prefix) {
           (document.cancelFullScreen || document.exitFullscreen).call(document);
-        } else if (!is$1.empty(_this18.prefix)) {
-          var action = _this18.prefix === 'moz' ? 'Cancel' : 'Exit';
-          document["".concat(_this18.prefix).concat(action).concat(_this18.property)]();
+        } else if (!is$1.empty(_this17.prefix)) {
+          var action = _this17.prefix === 'moz' ? 'Cancel' : 'Exit';
+          document["".concat(_this17.prefix).concat(action).concat(_this17.property)]();
         }
       });
 
       _defineProperty2(this, "toggle", function () {
-        if (!_this18.active) {
-          _this18.enter();
+        if (!_this17.active) {
+          _this17.enter();
         } else {
-          _this18.exit();
+          _this17.exit();
         }
       });
 
@@ -4280,24 +3744,24 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
       on.call(this.player, document, this.prefix === 'ms' ? 'MSFullscreenChange' : "".concat(this.prefix, "fullscreenchange"), function () {
         // TODO: Filter for target??
-        _this18.onChange();
+        _this17.onChange();
       }); // Fullscreen toggle on double click
 
       on.call(this.player, this.player.elements.container, 'dblclick', function (event) {
-        if (!_this18.player.config.fullscreen.dblclick) {
+        if (!_this17.player.config.fullscreen.dblclick) {
           return;
         } // Ignore double click in controls
 
 
-        if (is$1.element(_this18.player.elements.controls) && _this18.player.elements.controls.contains(event.target)) {
+        if (is$1.element(_this17.player.elements.controls) && _this17.player.elements.controls.contains(event.target)) {
           return;
         }
 
-        _this18.player.listeners.proxy(event, _this18.toggle, 'fullscreen');
+        _this17.player.listeners.proxy(event, _this17.toggle, 'fullscreen');
       }); // Tap focus when in fullscreen
 
       on.call(this.player, this.player.elements.container, 'keydown', function (event) {
-        return _this18.trapFocus(event);
+        return _this17.trapFocus(event);
       }); // Update the UI
 
       this.update(); // this.toggle = this.toggle.bind(this);
@@ -4417,7 +3881,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
     },
     // Setup the UI
     build: function build() {
-      var _this19 = this;
+      var _this18 = this;
 
       // Re-attach media element listeners
       // TODO: Use event bubbling?
@@ -4474,7 +3938,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
       this.ready = true; // Ready event at end of execution stack
 
       setTimeout(function () {
-        triggerEvent.call(_this19, _this19.media, 'ready');
+        triggerEvent.call(_this18, _this18.media, 'ready');
       }, 0); // Set the title
 
       ui.setTitle.call(this); // Assure the poster image is set, if the property was added before the element was created
@@ -4524,7 +3988,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
     // Set the poster image (async)
     // Used internally for the poster setter, with the passive option forced to false
     setPoster: function setPoster(poster) {
-      var _this20 = this;
+      var _this19 = this;
 
       var passive = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
 
@@ -4543,29 +4007,29 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
         return loadImage(poster);
       }).catch(function (err) {
         // Hide poster on error unless it's been set by another call
-        if (poster === _this20.poster) {
-          ui.togglePoster.call(_this20, false);
+        if (poster === _this19.poster) {
+          ui.togglePoster.call(_this19, false);
         } // Rethrow
 
 
         throw err;
       }).then(function () {
         // Prevent race conditions
-        if (poster !== _this20.poster) {
+        if (poster !== _this19.poster) {
           throw new Error('setPoster cancelled by later call to setPoster');
         }
       }).then(function () {
-        _this20.elements.poster.style.setProperty('background-image', "url('".concat(poster, "')"), 'important');
+        _this19.elements.poster.style.setProperty('background-image', "url('".concat(poster, "')"), 'important');
 
-        _this20.elements.poster.style.removeProperty('background-size');
+        _this19.elements.poster.style.removeProperty('background-size');
 
-        ui.togglePoster.call(_this20, true);
+        ui.togglePoster.call(_this19, true);
         return poster;
       });
     },
     // Check playing state
     checkPlaying: function checkPlaying(event) {
-      var _this21 = this;
+      var _this20 = this;
 
       // Class hooks
       toggleClass$1(this.elements.container, this.config.classNames.playing, this.playing);
@@ -4574,9 +4038,9 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
       Array.from(this.elements.buttons.play || []).forEach(function (target) {
         Object.assign(target, {
-          pressed: _this21.playing
+          pressed: _this20.playing
         });
-        target.setAttribute('aria-label', i18n.get(_this21.playing ? 'pause' : 'play', _this21.config));
+        target.setAttribute('aria-label', i18n.get(_this20.playing ? 'pause' : 'play', _this20.config));
       }); // Only update controls on non timeupdate events
 
       if (is$1.event(event) && event.type === 'timeupdate') {
@@ -4588,7 +4052,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
     },
     // Check if media is loading
     checkLoading: function checkLoading(event) {
-      var _this22 = this;
+      var _this21 = this;
 
       this.loading = ['stalled', 'waiting'].includes(event.type); // Clear timer
 
@@ -4596,9 +4060,9 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
       this.timers.loading = setTimeout(function () {
         // Update progress bar loading class state
-        toggleClass$1(_this22.elements.container, _this22.config.classNames.loading, _this22.loading); // Update controls visibility
+        toggleClass$1(_this21.elements.container, _this21.config.classNames.loading, _this21.loading); // Update controls visibility
 
-        ui.toggleControls.call(_this22);
+        ui.toggleControls.call(_this21);
       }, this.loading ? 250 : 0);
     },
     // Toggle controls based on state and `force` argument
@@ -4614,7 +4078,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
     },
     // Migrate any custom properties from the media to the parent
     migrateStyles: function migrateStyles() {
-      var _this23 = this;
+      var _this22 = this;
 
       // Loop through values (as they are the keys when the object is spread 🤔)
       Object.values(_objectSpread({}, this.media.style)) // We're only fussed about Plyr specific properties
@@ -4622,10 +4086,10 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
         return !is$1.empty(key) && is$1.string(key) && key.startsWith('--plyr');
       }).forEach(function (key) {
         // Set on the container
-        _this23.elements.container.style.setProperty(key, _this23.media.style.getPropertyValue(key), 'important'); // Clean up from media element
+        _this22.elements.container.style.setProperty(key, _this22.media.style.getPropertyValue(key), 'important'); // Clean up from media element
 
 
-        _this23.media.style.removeProperty(key);
+        _this22.media.style.removeProperty(key);
       }); // Remove attribute if empty
 
       if (is$1.empty(this.media.style)) {
@@ -4636,12 +4100,12 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
   var Listeners = /*#__PURE__*/function () {
     function Listeners(_player) {
-      var _this24 = this;
+      var _this23 = this;
 
       _classCallCheck2(this, Listeners);
 
       _defineProperty2(this, "firstTouch", function () {
-        var player = _this24.player;
+        var player = _this23.player;
         var elements = player.elements;
         player.touch = true; // Add touch class
 
@@ -4649,9 +4113,9 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
       });
 
       _defineProperty2(this, "setTabFocus", function (event) {
-        var player = _this24.player;
+        var player = _this23.player;
         var elements = player.elements;
-        clearTimeout(_this24.focusTimer); // Ignore any key other than tab
+        clearTimeout(_this23.focusTimer); // Ignore any key other than tab
 
         if (event.type === 'keydown' && event.which !== 9) {
           return;
@@ -4659,7 +4123,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
 
         if (event.type === 'keydown') {
-          _this24.lastKeyDown = event.timeStamp;
+          _this23.lastKeyDown = event.timeStamp;
         } // Remove current classes
 
 
@@ -4670,7 +4134,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
         }; // Determine if a key was pressed to trigger this event
 
 
-        var wasKeyDown = event.timeStamp - _this24.lastKeyDown <= 20; // Ignore focus events if a key was pressed prior
+        var wasKeyDown = event.timeStamp - _this23.lastKeyDown <= 20; // Ignore focus events if a key was pressed prior
 
         if (event.type === 'focus' && !wasKeyDown) {
           return;
@@ -4681,7 +4145,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
         // This event fires before the focusin event
 
         if (event.type !== 'focusout') {
-          _this24.focusTimer = setTimeout(function () {
+          _this23.focusTimer = setTimeout(function () {
             var focused = document.activeElement; // Ignore if current focus element isn't inside the player
 
             if (!elements.container.contains(focused)) {
@@ -4695,28 +4159,28 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
       _defineProperty2(this, "global", function () {
         var toggle = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-        var player = _this24.player; // Keyboard shortcuts
+        var player = _this23.player; // Keyboard shortcuts
 
         if (player.config.keyboard.global) {
-          toggleListener.call(player, window, 'keydown keyup', _this24.handleKey, toggle, false);
+          toggleListener.call(player, window, 'keydown keyup', _this23.handleKey, toggle, false);
         } // Click anywhere closes menu
 
 
-        toggleListener.call(player, document.body, 'click', _this24.toggleMenu, toggle); // Detect touch by events
+        toggleListener.call(player, document.body, 'click', _this23.toggleMenu, toggle); // Detect touch by events
 
-        once.call(player, document.body, 'touchstart', _this24.firstTouch); // Tab focus detection
+        once.call(player, document.body, 'touchstart', _this23.firstTouch); // Tab focus detection
 
-        toggleListener.call(player, document.body, 'keydown focus blur focusout', _this24.setTabFocus, toggle, false, true);
+        toggleListener.call(player, document.body, 'keydown focus blur focusout', _this23.setTabFocus, toggle, false, true);
       });
 
       _defineProperty2(this, "container", function () {
-        var player = _this24.player;
+        var player = _this23.player;
         var config = player.config,
             elements = player.elements,
             timers = player.timers; // Keyboard shortcuts
 
         if (!config.keyboard.global && config.keyboard.focused) {
-          on.call(player, elements.container, 'keydown keyup', _this24.handleKey, false);
+          on.call(player, elements.container, 'keydown keyup', _this23.handleKey, false);
         } // Toggle controls on mouse events and entering fullscreen
 
 
@@ -4829,7 +4293,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
       });
 
       _defineProperty2(this, "media", function () {
-        var player = _this24.player;
+        var player = _this23.player;
         var elements = player.elements; // Time change on media
 
         on.call(player, player.media, 'timeupdate seeking seeked', function (event) {
@@ -4888,13 +4352,13 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
             }
 
             if (player.ended) {
-              _this24.proxy(event, player.restart, 'restart');
+              _this23.proxy(event, player.restart, 'restart');
 
-              _this24.proxy(event, function () {
+              _this23.proxy(event, function () {
                 silencePromise(player.play());
               }, 'play');
             } else {
-              _this24.proxy(event, function () {
+              _this23.proxy(event, function () {
                 silencePromise(player.togglePlay());
               }, 'play');
             }
@@ -4950,7 +4414,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
       });
 
       _defineProperty2(this, "proxy", function (event, defaultHandler, customHandlerKey) {
-        var player = _this24.player;
+        var player = _this23.player;
         var customHandler = player.config.listeners[customHandlerKey];
         var hasCustomHandler = is$1.function(customHandler);
         var returned = true; // Execute custom handler
@@ -4967,75 +4431,75 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
       _defineProperty2(this, "bind", function (element, type, defaultHandler, customHandlerKey) {
         var passive = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : true;
-        var player = _this24.player;
+        var player = _this23.player;
         var customHandler = player.config.listeners[customHandlerKey];
         var hasCustomHandler = is$1.function(customHandler);
         on.call(player, element, type, function (event) {
-          return _this24.proxy(event, defaultHandler, customHandlerKey);
+          return _this23.proxy(event, defaultHandler, customHandlerKey);
         }, passive && !hasCustomHandler);
       });
 
       _defineProperty2(this, "controls", function () {
-        var player = _this24.player;
+        var player = _this23.player;
         var elements = player.elements; // IE doesn't support input event, so we fallback to change
 
         var inputEvent = browser.isIE ? 'change' : 'input'; // Play/pause toggle
 
         if (elements.buttons.play) {
           Array.from(elements.buttons.play).forEach(function (button) {
-            _this24.bind(button, 'click', function () {
+            _this23.bind(button, 'click', function () {
               silencePromise(player.togglePlay());
             }, 'play');
           });
         } // Pause
 
 
-        _this24.bind(elements.buttons.restart, 'click', player.restart, 'restart'); // Rewind
+        _this23.bind(elements.buttons.restart, 'click', player.restart, 'restart'); // Rewind
 
 
-        _this24.bind(elements.buttons.rewind, 'click', function () {
+        _this23.bind(elements.buttons.rewind, 'click', function () {
           // Record seek time so we can prevent hiding controls for a few seconds after rewind
           player.lastSeekTime = Date.now();
           player.rewind();
         }, 'rewind'); // Rewind
 
 
-        _this24.bind(elements.buttons.fastForward, 'click', function () {
+        _this23.bind(elements.buttons.fastForward, 'click', function () {
           // Record seek time so we can prevent hiding controls for a few seconds after fast forward
           player.lastSeekTime = Date.now();
           player.forward();
         }, 'fastForward'); // Mute toggle
 
 
-        _this24.bind(elements.buttons.mute, 'click', function () {
+        _this23.bind(elements.buttons.mute, 'click', function () {
           player.muted = !player.muted;
         }, 'mute'); // Captions toggle
 
 
-        _this24.bind(elements.buttons.captions, 'click', function () {
+        _this23.bind(elements.buttons.captions, 'click', function () {
           return player.toggleCaptions();
         }); // Download
 
 
-        _this24.bind(elements.buttons.download, 'click', function () {
+        _this23.bind(elements.buttons.download, 'click', function () {
           triggerEvent.call(player, player.media, 'download');
         }, 'download'); // Fullscreen toggle
 
 
-        _this24.bind(elements.buttons.fullscreen, 'click', function () {
+        _this23.bind(elements.buttons.fullscreen, 'click', function () {
           player.fullscreen.toggle();
         }, 'fullscreen'); // Picture-in-Picture
 
 
-        _this24.bind(elements.buttons.pip, 'click', function () {
+        _this23.bind(elements.buttons.pip, 'click', function () {
           player.pip = 'toggle';
         }, 'pip'); // Airplay
 
 
-        _this24.bind(elements.buttons.airplay, 'click', player.airplay, 'airplay'); // Settings menu - click toggle
+        _this23.bind(elements.buttons.airplay, 'click', player.airplay, 'airplay'); // Settings menu - click toggle
 
 
-        _this24.bind(elements.buttons.settings, 'click', function (event) {
+        _this23.bind(elements.buttons.settings, 'click', function (event) {
           // Prevent the document click listener closing the menu
           event.stopPropagation();
           event.preventDefault();
@@ -5046,7 +4510,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
         // https://bugzilla.mozilla.org/show_bug.cgi?id=1220143
 
 
-        _this24.bind(elements.buttons.settings, 'keyup', function (event) {
+        _this23.bind(elements.buttons.settings, 'keyup', function (event) {
           var code = event.which; // We only care about space and return
 
           if (![13, 32].includes(code)) {
@@ -5069,21 +4533,21 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
         ); // Escape closes menu
 
 
-        _this24.bind(elements.settings.menu, 'keydown', function (event) {
+        _this23.bind(elements.settings.menu, 'keydown', function (event) {
           if (event.which === 27) {
             controls.toggleMenu.call(player, event);
           }
         }); // Set range input alternative "value", which matches the tooltip time (#954)
 
 
-        _this24.bind(elements.inputs.seek, 'mousedown mousemove', function (event) {
+        _this23.bind(elements.inputs.seek, 'mousedown mousemove', function (event) {
           var rect = elements.progress.getBoundingClientRect();
           var percent = 100 / rect.width * (event.pageX - rect.left);
           event.currentTarget.setAttribute('seek-value', percent);
         }); // Pause while seeking
 
 
-        _this24.bind(elements.inputs.seek, 'mousedown mouseup keydown keyup touchstart touchend', function (event) {
+        _this23.bind(elements.inputs.seek, 'mousedown mouseup keydown keyup touchstart touchend', function (event) {
           var seek = event.currentTarget;
           var code = event.keyCode ? event.keyCode : event.which;
           var attribute = 'play-on-seeked';
@@ -5114,14 +4578,14 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
         if (browser.isIos) {
           var inputs = getElements.call(player, 'input[type="range"]');
           Array.from(inputs).forEach(function (input) {
-            return _this24.bind(input, inputEvent, function (event) {
+            return _this23.bind(input, inputEvent, function (event) {
               return repaint(event.target);
             });
           });
         } // Seek
 
 
-        _this24.bind(elements.inputs.seek, inputEvent, function (event) {
+        _this23.bind(elements.inputs.seek, inputEvent, function (event) {
           var seek = event.currentTarget; // If it exists, use seek-value instead of "value" for consistency with tooltip time (#954)
 
           var seekTo = seek.getAttribute('seek-value');
@@ -5135,13 +4599,13 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
         }, 'seek'); // Seek tooltip
 
 
-        _this24.bind(elements.progress, 'mouseenter mouseleave mousemove', function (event) {
+        _this23.bind(elements.progress, 'mouseenter mouseleave mousemove', function (event) {
           return controls.updateSeekTooltip.call(player, event);
         }); // Preview thumbnails plugin
         // TODO: Really need to work on some sort of plug-in wide event bus or pub-sub for this
 
 
-        _this24.bind(elements.progress, 'mousemove touchmove', function (event) {
+        _this23.bind(elements.progress, 'mousemove touchmove', function (event) {
           var previewThumbnails = player.previewThumbnails;
 
           if (previewThumbnails && previewThumbnails.loaded) {
@@ -5150,7 +4614,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
         }); // Hide thumbnail preview - on mouse click, mouse leave, and video play/seek. All four are required, e.g., for buffering
 
 
-        _this24.bind(elements.progress, 'mouseleave touchend click', function () {
+        _this23.bind(elements.progress, 'mouseleave touchend click', function () {
           var previewThumbnails = player.previewThumbnails;
 
           if (previewThumbnails && previewThumbnails.loaded) {
@@ -5159,7 +4623,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
         }); // Show scrubbing preview
 
 
-        _this24.bind(elements.progress, 'mousedown touchstart', function (event) {
+        _this23.bind(elements.progress, 'mousedown touchstart', function (event) {
           var previewThumbnails = player.previewThumbnails;
 
           if (previewThumbnails && previewThumbnails.loaded) {
@@ -5167,7 +4631,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
           }
         });
 
-        _this24.bind(elements.progress, 'mouseup touchend', function (event) {
+        _this23.bind(elements.progress, 'mouseup touchend', function (event) {
           var previewThumbnails = player.previewThumbnails;
 
           if (previewThumbnails && previewThumbnails.loaded) {
@@ -5178,7 +4642,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
         if (browser.isWebkit) {
           Array.from(getElements.call(player, 'input[type="range"]')).forEach(function (element) {
-            _this24.bind(element, 'input', function (event) {
+            _this23.bind(element, 'input', function (event) {
               return controls.updateRangeFill.call(player, event.target);
             });
           });
@@ -5187,7 +4651,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
 
         if (player.config.toggleInvert && !is$1.element(elements.display.duration)) {
-          _this24.bind(elements.display.currentTime, 'click', function () {
+          _this23.bind(elements.display.currentTime, 'click', function () {
             // Do nothing if we're at the start
             if (player.currentTime === 0) {
               return;
@@ -5199,12 +4663,12 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
         } // Volume
 
 
-        _this24.bind(elements.inputs.volume, inputEvent, function (event) {
+        _this23.bind(elements.inputs.volume, inputEvent, function (event) {
           player.volume = event.target.value;
         }, 'volume'); // Update controls.hover state (used for ui.toggleControls to avoid hiding when interacting)
 
 
-        _this24.bind(elements.controls, 'mouseenter mouseleave', function (event) {
+        _this23.bind(elements.controls, 'mouseenter mouseleave', function (event) {
           elements.controls.hover = !player.touch && event.type === 'mouseenter';
         }); // Also update controls.hover state for any non-player children of fullscreen element (as above)
 
@@ -5213,19 +4677,19 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
           Array.from(elements.fullscreen.children).filter(function (c) {
             return !c.contains(elements.container);
           }).forEach(function (child) {
-            _this24.bind(child, 'mouseenter mouseleave', function (event) {
+            _this23.bind(child, 'mouseenter mouseleave', function (event) {
               elements.controls.hover = !player.touch && event.type === 'mouseenter';
             });
           });
         } // Update controls.pressed state (used for ui.toggleControls to avoid hiding when interacting)
 
 
-        _this24.bind(elements.controls, 'mousedown mouseup touchstart touchend touchcancel', function (event) {
+        _this23.bind(elements.controls, 'mousedown mouseup touchstart touchend touchcancel', function (event) {
           elements.controls.pressed = ['mousedown', 'touchstart'].includes(event.type);
         }); // Show controls when they receive focus (e.g., when using keyboard tab key)
 
 
-        _this24.bind(elements.controls, 'focusin', function () {
+        _this23.bind(elements.controls, 'focusin', function () {
           var config = player.config,
               timers = player.timers; // Skip transition to prevent focus from scrolling the parent element
 
@@ -5237,7 +4701,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
             toggleClass$1(elements.controls, config.classNames.noTransition, false);
           }, 0); // Delay a little more for mouse users
 
-          var delay = _this24.touch ? 3000 : 4000; // Clear timer
+          var delay = _this23.touch ? 3000 : 4000; // Clear timer
 
           clearTimeout(timers.controls); // Hide again after delay
 
@@ -5247,7 +4711,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
         }); // Mouse wheel for volume
 
 
-        _this24.bind(elements.inputs.volume, 'wheel', function (event) {
+        _this23.bind(elements.inputs.volume, 'wheel', function (event) {
           // Detect "natural" scroll - suppored on OS X Safari only
           // Other browsers on OS X will be inverted until support improves
           var inverted = event.webkitDirectionInvertedFromDevice; // Get delta from event. Invert if `inverted` is true
@@ -5526,7 +4990,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
   var source = {
     // Add elements to HTML5 media (source, tracks, etc)
     insertElements: function insertElements(type, attributes) {
-      var _this25 = this;
+      var _this24 = this;
 
       if (is$1.string(attributes)) {
         insertElement(type, this.media, {
@@ -5534,14 +4998,14 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
         });
       } else if (is$1.array(attributes)) {
         attributes.forEach(function (attribute) {
-          insertElement(type, _this25.media, attribute);
+          insertElement(type, _this24.media, attribute);
         });
       }
     },
     // Update source
     // Sources are not checked for support so be careful
     change: function change(input) {
-      var _this26 = this;
+      var _this25 = this;
 
       if (!getDeep(input, 'sources.length')) {
         this.debug.warn('Invalid source format');
@@ -5553,13 +5017,13 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
       this.destroy.call(this, function () {
         // Reset quality options
-        _this26.options.quality = []; // Remove elements
+        _this25.options.quality = []; // Remove elements
 
-        removeElement(_this26.media);
-        _this26.media = null; // Reset class name
+        removeElement(_this25.media);
+        _this25.media = null; // Reset class name
 
-        if (is$1.element(_this26.elements.container)) {
-          _this26.elements.container.removeAttribute('class');
+        if (is$1.element(_this25.elements.container)) {
+          _this25.elements.container.removeAttribute('class');
         } // Set the type and provider
 
 
@@ -5576,97 +5040,97 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
         var attributes = provider === 'html5' ? {} : {
           src: src
         };
-        Object.assign(_this26, {
+        Object.assign(_this25, {
           provider: provider,
           type: type,
           // Check for support
-          supported: support.check(type, provider, _this26.config.playsinline),
+          supported: support.check(type, provider, _this25.config.playsinline),
           // Create new element
           media: createElement(tagName, attributes)
         }); // Inject the new element
 
-        _this26.elements.container.appendChild(_this26.media); // Autoplay the new source?
+        _this25.elements.container.appendChild(_this25.media); // Autoplay the new source?
 
 
         if (is$1.boolean(input.autoplay)) {
-          _this26.config.autoplay = input.autoplay;
+          _this25.config.autoplay = input.autoplay;
         } // Set attributes for audio and video
 
 
-        if (_this26.isHTML5) {
-          if (_this26.config.crossorigin) {
-            _this26.media.setAttribute('crossorigin', '');
+        if (_this25.isHTML5) {
+          if (_this25.config.crossorigin) {
+            _this25.media.setAttribute('crossorigin', '');
           }
 
-          if (_this26.config.autoplay) {
-            _this26.media.setAttribute('autoplay', '');
+          if (_this25.config.autoplay) {
+            _this25.media.setAttribute('autoplay', '');
           }
 
           if (!is$1.empty(input.poster)) {
-            _this26.poster = input.poster;
+            _this25.poster = input.poster;
           }
 
-          if (_this26.config.loop.active) {
-            _this26.media.setAttribute('loop', '');
+          if (_this25.config.loop.active) {
+            _this25.media.setAttribute('loop', '');
           }
 
-          if (_this26.config.muted) {
-            _this26.media.setAttribute('muted', '');
+          if (_this25.config.muted) {
+            _this25.media.setAttribute('muted', '');
           }
 
-          if (_this26.config.playsinline) {
-            _this26.media.setAttribute('playsinline', '');
+          if (_this25.config.playsinline) {
+            _this25.media.setAttribute('playsinline', '');
           }
         } // Restore class hook
 
 
-        ui.addStyleHook.call(_this26); // Set new sources for html5
+        ui.addStyleHook.call(_this25); // Set new sources for html5
 
-        if (_this26.isHTML5) {
-          source.insertElements.call(_this26, 'source', sources);
+        if (_this25.isHTML5) {
+          source.insertElements.call(_this25, 'source', sources);
         } // Set video title
 
 
-        _this26.config.title = input.title; // Set up from scratch
+        _this25.config.title = input.title; // Set up from scratch
 
-        media.setup.call(_this26); // HTML5 stuff
+        media.setup.call(_this25); // HTML5 stuff
 
-        if (_this26.isHTML5) {
+        if (_this25.isHTML5) {
           // Setup captions
           if (Object.keys(input).includes('tracks')) {
-            source.insertElements.call(_this26, 'track', input.tracks);
+            source.insertElements.call(_this25, 'track', input.tracks);
           }
         } // If HTML5 or embed but not fully supported, setupInterface and call ready now
 
 
-        if (_this26.isHTML5 || _this26.isEmbed && !_this26.supported.ui) {
+        if (_this25.isHTML5 || _this25.isEmbed && !_this25.supported.ui) {
           // Setup interface
-          ui.build.call(_this26);
+          ui.build.call(_this25);
         } // Load HTML5 sources
 
 
-        if (_this26.isHTML5) {
-          _this26.media.load();
+        if (_this25.isHTML5) {
+          _this25.media.load();
         } // Update previewThumbnails config & reload plugin
 
 
         if (!is$1.empty(input.previewThumbnails)) {
-          Object.assign(_this26.config.previewThumbnails, input.previewThumbnails); // Cleanup previewThumbnails plugin if it was loaded
+          Object.assign(_this25.config.previewThumbnails, input.previewThumbnails); // Cleanup previewThumbnails plugin if it was loaded
 
-          if (_this26.previewThumbnails && _this26.previewThumbnails.loaded) {
-            _this26.previewThumbnails.destroy();
+          if (_this25.previewThumbnails && _this25.previewThumbnails.loaded) {
+            _this25.previewThumbnails.destroy();
 
-            _this26.previewThumbnails = null;
+            _this25.previewThumbnails = null;
           } // Create new instance if it is still enabled
 
 
-          if (_this26.config.previewThumbnails.enabled) {
-            _this26.previewThumbnails = new PreviewThumbnails(_this26);
+          if (_this25.config.previewThumbnails.enabled) {
+            _this25.previewThumbnails = new PreviewThumbnails(_this25);
           }
         } // Update the fullscreen support
 
 
-        _this26.fullscreen.update();
+        _this25.fullscreen.update();
       }, true);
     }
   };
@@ -5764,103 +5228,103 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
   var Plyr = /*#__PURE__*/function () {
     function Plyr(target, options) {
-      var _this27 = this;
+      var _this26 = this;
 
       _classCallCheck2(this, Plyr);
 
       _defineProperty2(this, "play", function () {
-        if (!is$1.function(_this27.media.play)) {
+        if (!is$1.function(_this26.media.play)) {
           return null;
         } // Intecept play with ads
 
 
-        if (_this27.ads && _this27.ads.enabled) {
-          _this27.ads.managerPromise.then(function () {
-            return _this27.ads.play();
+        if (_this26.ads && _this26.ads.enabled) {
+          _this26.ads.managerPromise.then(function () {
+            return _this26.ads.play();
           }).catch(function () {
-            return silencePromise(_this27.media.play());
+            return silencePromise(_this26.media.play());
           });
         } // Return the promise (for HTML5)
 
 
-        return _this27.media.play();
+        return _this26.media.play();
       });
 
       _defineProperty2(this, "pause", function () {
-        if (!_this27.playing || !is$1.function(_this27.media.pause)) {
+        if (!_this26.playing || !is$1.function(_this26.media.pause)) {
           return null;
         }
 
-        return _this27.media.pause();
+        return _this26.media.pause();
       });
 
       _defineProperty2(this, "togglePlay", function (input) {
         // Toggle based on current state if nothing passed
-        var toggle = is$1.boolean(input) ? input : !_this27.playing;
+        var toggle = is$1.boolean(input) ? input : !_this26.playing;
 
         if (toggle) {
-          return _this27.play();
+          return _this26.play();
         }
 
-        return _this27.pause();
+        return _this26.pause();
       });
 
       _defineProperty2(this, "stop", function () {
-        if (_this27.isHTML5) {
-          _this27.pause();
+        if (_this26.isHTML5) {
+          _this26.pause();
 
-          _this27.restart();
-        } else if (is$1.function(_this27.media.stop)) {
-          _this27.media.stop();
+          _this26.restart();
+        } else if (is$1.function(_this26.media.stop)) {
+          _this26.media.stop();
         }
       });
 
       _defineProperty2(this, "restart", function () {
-        _this27.currentTime = 0;
+        _this26.currentTime = 0;
       });
 
       _defineProperty2(this, "rewind", function (seekTime) {
-        _this27.currentTime -= is$1.number(seekTime) ? seekTime : _this27.config.seekTime;
+        _this26.currentTime -= is$1.number(seekTime) ? seekTime : _this26.config.seekTime;
       });
 
       _defineProperty2(this, "forward", function (seekTime) {
-        _this27.currentTime += is$1.number(seekTime) ? seekTime : _this27.config.seekTime;
+        _this26.currentTime += is$1.number(seekTime) ? seekTime : _this26.config.seekTime;
       });
 
       _defineProperty2(this, "increaseVolume", function (step) {
-        var volume = _this27.media.muted ? 0 : _this27.volume;
-        _this27.volume = volume + (is$1.number(step) ? step : 0);
+        var volume = _this26.media.muted ? 0 : _this26.volume;
+        _this26.volume = volume + (is$1.number(step) ? step : 0);
       });
 
       _defineProperty2(this, "decreaseVolume", function (step) {
-        _this27.increaseVolume(-step);
+        _this26.increaseVolume(-step);
       });
 
       _defineProperty2(this, "airplay", function () {
         // Show dialog if supported
         if (support.airplay) {
-          _this27.media.webkitShowPlaybackTargetPicker();
+          _this26.media.webkitShowPlaybackTargetPicker();
         }
       });
 
       _defineProperty2(this, "toggleControls", function (toggle) {
         // Don't toggle if missing UI support or if it's audio
-        if (_this27.supported.ui && !_this27.isAudio) {
+        if (_this26.supported.ui && !_this26.isAudio) {
           // Get state before change
-          var isHidden = hasClass(_this27.elements.container, _this27.config.classNames.hideControls); // Negate the argument if not undefined since adding the class to hides the controls
+          var isHidden = hasClass(_this26.elements.container, _this26.config.classNames.hideControls); // Negate the argument if not undefined since adding the class to hides the controls
 
           var force = typeof toggle === 'undefined' ? undefined : !toggle; // Apply and get updated state
 
-          var hiding = toggleClass$1(_this27.elements.container, _this27.config.classNames.hideControls, force); // Close menu
+          var hiding = toggleClass$1(_this26.elements.container, _this26.config.classNames.hideControls, force); // Close menu
 
-          if (hiding && is$1.array(_this27.config.controls) && _this27.config.controls.includes('settings') && !is$1.empty(_this27.config.settings)) {
-            controls.toggleMenu.call(_this27, false);
+          if (hiding && is$1.array(_this26.config.controls) && _this26.config.controls.includes('settings') && !is$1.empty(_this26.config.settings)) {
+            controls.toggleMenu.call(_this26, false);
           } // Trigger event on change
 
 
           if (hiding !== isHidden) {
             var eventName = hiding ? 'controlshidden' : 'controlsshown';
-            triggerEvent.call(_this27, _this27.media, eventName);
+            triggerEvent.call(_this26, _this26.media, eventName);
           }
 
           return !hiding;
@@ -5870,21 +5334,21 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
       });
 
       _defineProperty2(this, "on", function (event, callback) {
-        on.call(_this27, _this27.elements.container, event, callback);
+        on.call(_this26, _this26.elements.container, event, callback);
       });
 
       _defineProperty2(this, "once", function (event, callback) {
-        once.call(_this27, _this27.elements.container, event, callback);
+        once.call(_this26, _this26.elements.container, event, callback);
       });
 
       _defineProperty2(this, "off", function (event, callback) {
-        off(_this27.elements.container, event, callback);
+        off(_this26.elements.container, event, callback);
       });
 
       _defineProperty2(this, "destroy", function (callback) {
         var soft = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
-        if (!_this27.ready) {
+        if (!_this26.ready) {
           return;
         }
 
@@ -5892,20 +5356,20 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
           // Reset overflow (incase destroyed while in fullscreen)
           document.body.style.removeProperty('overflow'); // GC for embed
 
-          _this27.embed = null; // If it's a soft destroy, make minimal changes
+          _this26.embed = null; // If it's a soft destroy, make minimal changes
 
           if (soft) {
-            if (Object.keys(_this27.elements).length) {
+            if (Object.keys(_this26.elements).length) {
               // Remove elements
-              removeElement(_this27.elements.buttons.play);
-              removeElement(_this27.elements.captions);
-              removeElement(_this27.elements.controls);
-              removeElement(_this27.elements.wrapper); // Clear for GC
+              removeElement(_this26.elements.buttons.play);
+              removeElement(_this26.elements.captions);
+              removeElement(_this26.elements.controls);
+              removeElement(_this26.elements.wrapper); // Clear for GC
 
-              _this27.elements.buttons.play = null;
-              _this27.elements.captions = null;
-              _this27.elements.controls = null;
-              _this27.elements.wrapper = null;
+              _this26.elements.buttons.play = null;
+              _this26.elements.captions = null;
+              _this26.elements.controls = null;
+              _this26.elements.wrapper = null;
             } // Callback
 
 
@@ -5914,55 +5378,55 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
             }
           } else {
             // Unbind listeners
-            unbindListeners.call(_this27); // Cancel current network requests
+            unbindListeners.call(_this26); // Cancel current network requests
 
-            html5.cancelRequests.call(_this27); // Replace the container with the original element provided
+            html5.cancelRequests.call(_this26); // Replace the container with the original element provided
 
-            replaceElement(_this27.elements.original, _this27.elements.container); // Event
+            replaceElement(_this26.elements.original, _this26.elements.container); // Event
 
-            triggerEvent.call(_this27, _this27.elements.original, 'destroyed', true); // Callback
+            triggerEvent.call(_this26, _this26.elements.original, 'destroyed', true); // Callback
 
             if (is$1.function(callback)) {
-              callback.call(_this27.elements.original);
+              callback.call(_this26.elements.original);
             } // Reset state
 
 
-            _this27.ready = false; // Clear for garbage collection
+            _this26.ready = false; // Clear for garbage collection
 
-            _this27.elements = myMock(_this27.elements);
-            _this27.media = myIsAudio(_this27.media) ? myDumpAudio : myDumpVideo;
+            _this26.elements = myMock(_this26.elements);
+            _this26.media = myIsAudio(_this26.media) ? myDumpAudio : myDumpVideo;
           }
         }; // Stop playback
 
 
-        _this27.stop(); // Clear timeouts
+        _this26.stop(); // Clear timeouts
 
 
-        clearTimeout(_this27.timers.loading);
-        clearTimeout(_this27.timers.controls);
-        clearTimeout(_this27.timers.resized); // Provider specific stuff
+        clearTimeout(_this26.timers.loading);
+        clearTimeout(_this26.timers.controls);
+        clearTimeout(_this26.timers.resized); // Provider specific stuff
 
-        if (_this27.isHTML5) {
+        if (_this26.isHTML5) {
           // Restore native video controls
-          ui.toggleNativeControls.call(_this27, true); // Clean up
+          ui.toggleNativeControls.call(_this26, true); // Clean up
 
           done();
-        } else if (_this27.isYouTube) {
+        } else if (_this26.isYouTube) {
           // Clear timers
-          clearInterval(_this27.timers.buffering);
-          clearInterval(_this27.timers.playing); // Destroy YouTube API
+          clearInterval(_this26.timers.buffering);
+          clearInterval(_this26.timers.playing); // Destroy YouTube API
 
-          if (_this27.embed !== null && is$1.function(_this27.embed.destroy)) {
-            _this27.embed.destroy();
+          if (_this26.embed !== null && is$1.function(_this26.embed.destroy)) {
+            _this26.embed.destroy();
           } // Clean up
 
 
           done();
-        } else if (_this27.isVimeo) {
+        } else if (_this26.isVimeo) {
           // Destroy Vimeo API
           // then clean up (wait, to prevent postmessage errors)
-          if (_this27.embed !== null) {
-            _this27.embed.unload().then(done);
+          if (_this26.embed !== null) {
+            _this26.embed.unload().then(done);
           } // Vimeo does not always return
 
 
@@ -5971,7 +5435,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
       });
 
       _defineProperty2(this, "supports", function (type) {
-        return support.mime.call(_this27, type);
+        return support.mime.call(_this26, type);
       });
 
       this.timers = {}; // State
@@ -5997,7 +5461,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
       this.config = extend({}, defaults$1, Plyr.defaults, options || {}, function () {
         try {
-          return JSON.parse(_this27.media.getAttribute('data-plyr-config'));
+          return JSON.parse(_this26.media.getAttribute('data-plyr-config'));
         } catch (e) {
           return {};
         }
@@ -6192,7 +5656,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
       if (this.config.debug) {
         on.call(this, this.elements.container, this.config.events.join(' '), function (event) {
-          _this27.debug.log("event: ".concat(event.type));
+          _this26.debug.log("event: ".concat(event.type));
         });
       } // Setup fullscreen
 
@@ -6216,7 +5680,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
       if (this.isHTML5 && this.config.autoplay) {
         this.once('canplay', function () {
-          return silencePromise(_this27.play());
+          return silencePromise(_this26.play());
         });
       } // Seek time will be recorded (in listeners.js) so we can prevent hiding controls for a few seconds after seek
 
@@ -6509,7 +5973,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
        */
       ,
       set: function set(input) {
-        var _this28 = this;
+        var _this27 = this;
 
         var speed = null;
 
@@ -6533,7 +5997,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
         this.config.speed.selected = speed; // Set media speed
 
         setTimeout(function () {
-          _this28.media.playbackRate = speed;
+          _this27.media.playbackRate = speed;
         }, 0);
       }
     }, {
