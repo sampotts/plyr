@@ -8,7 +8,6 @@ const path = require('path');
 const gulp = require('gulp');
 // JavaScript
 const rollup = require('gulp-better-rollup');
-const babel = require('rollup-plugin-babel');
 const commonjs = require('rollup-plugin-commonjs');
 const resolve = require('rollup-plugin-node-resolve');
 // CSS
@@ -76,22 +75,6 @@ Object.entries(build.js).forEach(([filename, entry]) => {
               plugins: [
                 resolve(),
                 commonjs(),
-                babel({
-                  presets: [
-                    [
-                      '@babel/env',
-                      {
-                        // debug: true,
-                        useBuiltIns: polyfill ? 'usage' : false,
-                        corejs: polyfill ? 3 : undefined,
-                        bugfixes: true,
-                      },
-                    ],
-                  ],
-                  plugins: ['@babel/plugin-proposal-class-properties'],
-                  babelrc: false,
-                  exclude: [/\/core-js\//],
-                }),
               ],
             },
             {
