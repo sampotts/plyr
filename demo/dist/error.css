@@ -499,6 +499,7 @@ h1 {
   position: relative;
   text-shadow: none;
   -webkit-user-select: none;
+      -ms-user-select: none;
           user-select: none;
   vertical-align: middle; }
 
