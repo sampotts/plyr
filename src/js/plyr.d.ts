@@ -549,6 +549,7 @@ declare namespace Plyr {
     fallback?: boolean | 'force';
     allowAudio?: boolean;
     iosNative?: boolean;
+    container?: string;
   }
 
   interface CaptionOptions {
