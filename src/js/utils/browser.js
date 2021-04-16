@@ -4,7 +4,7 @@
 // ==========================================================================
 
 const browser = {
-  isIE: /* @cc_on!@ */ false || !!document.documentMode,
+  isIE: Boolean(window.document.documentMode),
   isEdge: window.navigator.userAgent.includes('Edge'),
   isWebkit: 'WebkitAppearance' in document.documentElement.style && !/Edge/.test(navigator.userAgent),
   isIPhone: /(iPhone|iPod)/gi.test(navigator.platform),
