@@ -1,3 +1,11 @@
+### v3.6.5
+
+- Migrate color formatting to colorette (thanks @jorgebucaran)
+- Fix: issue with IE detection
+- Fix: missing styles for embeds
+- Fix: regression regarding poster image
+- Add all required props to vimeo iframe allow attribute - fixes #2151 (thanks @didrip)
+
 ### v3.6.4
 
 - Remove unnecessary calc from media query (thanks @naomiaz)
