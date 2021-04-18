@@ -20,3 +20,8 @@
 .plyr--stopped.plyr__poster-enabled .plyr__poster {
   opacity: 1;
 }
+
+// Allow interaction with YouTube controls while paused
+.plyr--youtube.plyr--paused.plyr__poster-enabled:not(.plyr--stopped) .plyr__poster {
+  display: none;
+}
