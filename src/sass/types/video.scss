@@ -26,9 +26,13 @@ $embed-padding: ((100 / 16) * 9);
 
 .plyr__video-embed,
 .plyr__video-wrapper--fixed-ratio {
-  height: 0;
-  padding-bottom: to-percentage($embed-padding);
-  position: relative;
+  @supports not (aspect-ratio: 16 / 9) {
+    height: 0;
+    padding-bottom: to-percentage($embed-padding);
+    position: relative;
+  }
+
+  aspect-ratio: 16 / 9;
 }
 
 .plyr__video-embed iframe,
