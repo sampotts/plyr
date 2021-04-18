@@ -11,7 +11,7 @@ import fetch from '../utils/fetch';
 import is from '../utils/is';
 import loadScript from '../utils/load-script';
 import { format, stripHTML } from '../utils/strings';
-import { setAspectRatio } from '../utils/style';
+import { roundAspectRatio, setAspectRatio } from '../utils/style';
 import { buildUrlParams } from '../utils/urls';
 
 // Parse Vimeo ID from URL
@@ -294,7 +294,7 @@ const vimeo = {
     // Set aspect ratio based on video size
     Promise.all([player.embed.getVideoWidth(), player.embed.getVideoHeight()]).then((dimensions) => {
       const [width, height] = dimensions;
-      player.embed.ratio = [width, height];
+      player.embed.ratio = roundAspectRatio(width, height);
       setAspectRatio.call(this);
     });
 
