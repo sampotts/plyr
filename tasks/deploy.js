@@ -14,11 +14,9 @@ const { green, cyan, bold } = require('colorette');
 const log = require('fancy-log');
 const open = require('gulp-open');
 const size = require('gulp-size');
-const through = require('through2');
 // Deployment
 const aws = require('aws-sdk');
 const publish = require('gulp-awspublish');
-const FastlyPurge = require('fastly-purge');
 // Configs
 const pkg = require('../package.json');
 const deploy = require('../deploy.json');
@@ -52,14 +50,6 @@ const paths = {
     path.join(root, 'demo/dist/*.svg'),
   ],
 };
-
-// Get credentials
-let credentials = {};
-try {
-  credentials = require('../credentials.json'); //eslint-disable-line
-} catch (e) {
-  // Do nothing
-}
 
 // Get branch info
 const branch = {
@@ -177,41 +167,6 @@ gulp.task('cdn', (done) => {
   );
 });
 
-// Purge the fastly cache incase any 403/404 are cached
-gulp.task('purge', () => {
-  if (!Object.keys(credentials).includes('fastly')) {
-    throw new Error('Fastly credentials required to purge cache.');
-  }
-
-  const { fastly } = credentials;
-  const list = [];
-
-  return gulp
-    .src(paths.upload)
-    .pipe(
-      through.obj((file, enc, cb) => {
-        const filename = file.path.split('/').pop();
-        list.push(`${versionPath}${filename.replace(minSuffix, '')}`);
-        cb(null);
-      }),
-    )
-    .on('end', () => {
-      const purge = new FastlyPurge(fastly.token);
-
-      list.forEach((url) => {
-        log(`Purging ${cyan(url)}...`);
-
-        purge.url(url, (error, result) => {
-          if (error) {
-            log.error(error);
-          } else if (result) {
-            log(result);
-          }
-        });
-      });
-    });
-});
-
 // Publish to demo bucket
 gulp.task('demo', (done) => {
   if (!canDeploy()) {
@@ -271,4 +226,4 @@ gulp.task('open', () => {
 });
 
 // Do everything
-gulp.task('deploy', gulp.series('cdn', 'demo', 'purge', 'open'));
+gulp.task('deploy', gulp.series('cdn', 'demo', 'open'));
