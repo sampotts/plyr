@@ -1,3 +1,8 @@
+### v3.6.6
+
+- Improvements to how aspect ratio is handled. Use `aspect-ratio` CSS property instead of the legacy method (still used as fallback). Also automatically determined aspect ratios are rounded to the nearast standard ratio. This fixes issues with the YouTube embeds showing a 1-2px black bar.
+- Hide the YouTube poster image container when paused so that the controls underneath can be used.
+
 ### v3.6.5
 
 - Migrate color formatting to colorette (thanks @jorgebucaran)
