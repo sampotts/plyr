@@ -87,7 +87,7 @@ export function setAspectRatio(input) {
   }
 
   const [x, y] = ratio;
-  const useNative = window.CSS ? window.CSS.supports(`aspect-ratio: ${x} / ${y}`) : false;
+  const useNative = window.CSS ? window.CSS.supports(`aspect-ratio: ${x}/${y}`) : false;
   const padding = (100 / x) * y;
 
   if (useNative) {
