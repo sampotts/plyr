@@ -1,3 +1,7 @@
+### v3.6.7
+
+- Fix: remove regression caused by optional chaining and nullish coalescing in check for `window.CSS` check for aspect-ratio (fixes #2174)
+
 ### v3.6.6
 
 - Improvements to how aspect ratio is handled. Use `aspect-ratio` CSS property instead of the legacy method (still used as fallback). Also automatically determined aspect ratios are rounded to the nearast standard ratio. This fixes issues with the YouTube embeds showing a 1-2px black bar.
