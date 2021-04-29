@@ -3,7 +3,7 @@
 // --------------------------------------------------------------
 
 .plyr__poster {
-  background-color: #000;
+  background-color: var(--plyr-video-background, $plyr-video-background);
   background-position: 50% 50%;
   background-repeat: no-repeat;
   background-size: contain;
@@ -19,4 +19,9 @@
 
 .plyr--stopped.plyr__poster-enabled .plyr__poster {
   opacity: 1;
+}
+
+// Allow interaction with YouTube controls while paused
+.plyr--youtube.plyr--paused.plyr__poster-enabled:not(.plyr--stopped) .plyr__poster {
+  display: none;
 }

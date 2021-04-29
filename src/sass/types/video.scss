@@ -4,7 +4,7 @@
 
 // Container
 .plyr--video {
-  background: #000;
+  background: var(--plyr-video-background, $plyr-video-background);
   overflow: hidden;
 
   &.plyr--menu-open {
@@ -13,7 +13,7 @@
 }
 
 .plyr__video-wrapper {
-  background: #000;
+  background: var(--plyr-video-background, $plyr-video-background);
   height: 100%;
   margin: auto;
   overflow: hidden;
@@ -26,16 +26,23 @@ $embed-padding: ((100 / 16) * 9);
 
 .plyr__video-embed,
 .plyr__video-wrapper--fixed-ratio {
-  height: 0;
-  padding-bottom: to-percentage($embed-padding);
+  @supports not (aspect-ratio: 16 / 9) {
+    height: 0;
+    padding-bottom: to-percentage($embed-padding);
+    position: relative;
+  }
+
+  aspect-ratio: 16 / 9;
 }
 
 .plyr__video-embed iframe,
 .plyr__video-wrapper--fixed-ratio video {
   border: 0;
+  height: 100%;
   left: 0;
   position: absolute;
   top: 0;
+  width: 100%;
 }
 
 // If the full custom UI is supported

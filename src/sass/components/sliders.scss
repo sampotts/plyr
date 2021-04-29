@@ -3,7 +3,6 @@
 // --------------------------------------------------------------
 
 .plyr--full-ui input[type='range'] {
-  // WebKit
   -webkit-appearance: none; /* stylelint-disable-line */
   background: transparent;
   border: 0;
@@ -13,6 +12,7 @@
   display: block;
   height: calc((#{$plyr-range-thumb-active-shadow-width} * 2) + #{$plyr-range-thumb-height});
   margin: 0;
+  min-width: 0;
   padding: 0;
   transition: box-shadow 0.3s ease;
   width: 100%;

@@ -2,9 +2,30 @@
 // Style utils
 // ==========================================================================
 
+import { closest } from './arrays';
 import is from './is';
 
-export function validateRatio(input) {
+// Standard/common aspect ratios
+const standardRatios = [
+  [1, 1],
+  [4, 3],
+  [3, 4],
+  [5, 4],
+  [4, 5],
+  [3, 2],
+  [2, 3],
+  [16, 10],
+  [10, 16],
+  [16, 9],
+  [9, 16],
+  [21, 9],
+  [9, 21],
+  [32, 9],
+  [9, 32],
+].reduce((out, [x, y]) => ({ ...out, [x / y]: [x, y] }), {});
+
+// Validate an aspect ratio
+export function validateAspectRatio(input) {
   if (!is.array(input) && (!is.string(input) || !input.includes(':'))) {
     return false;
   }
@@ -14,6 +35,7 @@ export function validateRatio(input) {
   return ratio.map(Number).every(is.number);
 }
 
+// Reduce an aspect ratio to it's lowest form
 export function reduceAspectRatio(ratio) {
   if (!is.array(ratio) || !ratio.every(is.number)) {
     return null;
@@ -26,8 +48,9 @@ export function reduceAspectRatio(ratio) {
   return [width / divider, height / divider];
 }
 
+// Calculate an aspect ratio
 export function getAspectRatio(input) {
-  const parse = ratio => (validateRatio(ratio) ? ratio.split(':').map(Number) : null);
+  const parse = (ratio) => (validateAspectRatio(ratio) ? ratio.split(':').map(Number) : null);
   // Try provided ratio
   let ratio = parse(input);
 
@@ -58,22 +81,50 @@ export function setAspectRatio(input) {
 
   const { wrapper } = this.elements;
   const ratio = getAspectRatio.call(this, input);
-  const [w, h] = is.array(ratio) ? ratio : [0, 0];
-  const padding = (100 / w) * h;
 
-  wrapper.style.paddingBottom = `${padding}%`;
+  if (!is.array(ratio)) {
+    return {};
+  }
+
+  const [x, y] = ratio;
+  const useNative = window.CSS ? window.CSS.supports(`aspect-ratio: ${x}/${y}`) : false;
+  const padding = (100 / x) * y;
+
+  if (useNative) {
+    wrapper.style.aspectRatio = `${x}/${y}`;
+  } else {
+    wrapper.style.paddingBottom = `${padding}%`;
+  }
 
   // For Vimeo we have an extra <div> to hide the standard controls and UI
   if (this.isVimeo && !this.config.vimeo.premium && this.supported.ui) {
     const height = (100 / this.media.offsetWidth) * parseInt(window.getComputedStyle(this.media).paddingBottom, 10);
     const offset = (height - padding) / (height / 50);
 
-    this.media.style.transform = `translateY(-${offset}%)`;
+    if (this.fullscreen.active) {
+      wrapper.style.paddingBottom = null;
+    } else {
+      this.media.style.transform = `translateY(-${offset}%)`;
+    }
   } else if (this.isHTML5) {
     wrapper.classList.toggle(this.config.classNames.videoFixedRatio, ratio !== null);
   }
 
   return { padding, ratio };
+}
+
+// Round an aspect ratio to closest standard ratio
+export function roundAspectRatio(x, y, tolerance = 0.05) {
+  const ratio = x / y;
+  const closestRatio = closest(Object.keys(standardRatios), ratio);
+
+  // Check match is within tolerance
+  if (Math.abs(closestRatio - ratio) <= tolerance) {
+    return standardRatios[closestRatio];
+  }
+
+  // No match
+  return [x, y];
 }
 
 export default { setAspectRatio };

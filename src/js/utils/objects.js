@@ -26,7 +26,7 @@ export function extend(target = {}, ...sources) {
     return target;
   }
 
-  Object.keys(source).forEach(key => {
+  Object.keys(source).forEach((key) => {
     if (is.object(source[key])) {
       if (!Object.keys(target).includes(key)) {
         Object.assign(target, { [key]: {} });

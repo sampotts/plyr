@@ -7,6 +7,6 @@ credentials.json
 deploy.json
 yarn.lock
 package-lock.json
-*.mp4
 *.webm
+*.mp4
 !dist/blank.mp4
