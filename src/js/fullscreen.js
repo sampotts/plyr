@@ -124,7 +124,7 @@ class Fullscreen {
       return hasClass(this.target, this.player.config.classNames.fullscreen.fallback);
     }
 
-    const element = !this.prefix ? document.fullscreenElement : document[`${this.prefix}${this.property}Element`];
+    const element = !this.prefix ? this.target.getRootNode().fullscreenElement : this.target.getRootNode()[`${this.prefix}${this.property}Element`];
 
     return element && element.shadowRoot ? element === this.target.getRootNode().host : element === this.target;
   }
