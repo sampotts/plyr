@@ -1,3 +1,9 @@
+### v3.6.8
+
+- Typings: add FullscreenOptions.container to typing files (thanks @MeguminSama!)
+- Fix: added iPadOS detection to isIos util (thanks @Benny739!)
+- Fix: issues with Vimeo fullscreen
+
 ### v3.6.7
 
 - Fix: remove regression caused by optional chaining and nullish coalescing in check for `window.CSS` check for aspect-ratio (fixes #2174)
