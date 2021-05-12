@@ -5,6 +5,15 @@
 import { closest } from './arrays';
 import is from './is';
 
+// Check support for a CSS declaration
+export function supportsCSS(declaration) {
+  if (!window || !window.CSS) {
+    return false;
+  }
+
+  return window.CSS.supports(declaration);
+}
+
 // Standard/common aspect ratios
 const standardRatios = [
   [1, 1],
@@ -67,10 +76,10 @@ export function getAspectRatio(input) {
   // Get from HTML5 video
   if (ratio === null && this.isHTML5) {
     const { videoWidth, videoHeight } = this.media;
-    ratio = reduceAspectRatio([videoWidth, videoHeight]);
+    ratio = [videoWidth, videoHeight];
   }
 
-  return ratio;
+  return reduceAspectRatio(ratio);
 }
 
 // Set aspect ratio for responsive container
@@ -86,8 +95,8 @@ export function setAspectRatio(input) {
     return {};
   }
 
-  const [x, y] = ratio;
-  const useNative = window.CSS ? window.CSS.supports(`aspect-ratio: ${x}/${y}`) : false;
+  const [x, y] = reduceAspectRatio(ratio);
+  const useNative = supportsCSS(`aspect-ratio: ${x}/${y}`);
   const padding = (100 / x) * y;
 
   if (useNative) {
@@ -107,7 +116,7 @@ export function setAspectRatio(input) {
       this.media.style.transform = `translateY(-${offset}%)`;
     }
   } else if (this.isHTML5) {
-    wrapper.classList.toggle(this.config.classNames.videoFixedRatio, ratio !== null);
+    wrapper.classList.add(this.config.classNames.videoFixedRatio);
   }
 
   return { padding, ratio };
@@ -127,4 +136,10 @@ export function roundAspectRatio(x, y, tolerance = 0.05) {
   return [x, y];
 }
 
-export default { setAspectRatio };
+// Get the size of the viewport
+// https://stackoverflow.com/questions/1248081/how-to-get-the-browser-viewport-dimensions
+export function getViewportSize() {
+  const width = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+  const height = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+  return [width, height];
+}
