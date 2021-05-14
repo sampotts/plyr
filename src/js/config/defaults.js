@@ -192,6 +192,7 @@ const defaults = {
       576: 'SD',
       480: 'SD',
     },
+    auto: "AUTO",
   },
 
   // URLs

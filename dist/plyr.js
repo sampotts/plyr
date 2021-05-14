@@ -2123,7 +2123,7 @@ typeof navigator === "object" && (function (global, factory) {
         case 'quality':
           if (is.number(value)) {
             //inside if add below
-            if (value === 0) return "Auto";
+            if (value === 0) return i18n.get('auto', this.config);
             const label = i18n.get(`qualityLabel.${value}`, this.config);
 
             if (!label.length) {
@@ -3430,7 +3430,8 @@ typeof navigator === "object" && (function (global, factory) {
         720: 'HD',
         576: 'SD',
         480: 'SD'
-      }
+      },
+      auto: "AUTO"
     },
     // URLs
     urls: {
