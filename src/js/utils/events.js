@@ -86,9 +86,14 @@ export function triggerEvent(element, type = '', bubbles = false, detail = {}) {
   if (!is.element(element) || is.empty(type)) {
     return;
   }
+  // error event should not bubble and break error tracking tools
+  // https://developer.mozilla.org/en-US/docs/Web/API/Element/error_event
+  if (type === 'error') {
+    bubbles = false;
+  }
 
   // Create and dispatch the event
-  const event = new CustomEvent('plyr:' + type, {
+  const event = new CustomEvent(type, {
     bubbles,
     detail: { ...detail, plyr: this },
   });
