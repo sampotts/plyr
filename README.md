@@ -247,6 +247,7 @@ Here's a list of the properties and what they are used for:
 | `--plyr-font-weight-bold`                      | The bold font weight.                                                                                   | `600`                                                                 |
 | `--plyr-line-height`                           | The line height used within the player.                                                                 | `1.7`                                                                 |
 | `--plyr-font-smoothing`                        | Whether to enable font antialiasing within the player.                                                  | `false`                                                               |
+| `--plyr-pending-caption-opacity`                        | The opacity of WebVTT "future text" for karaoke style captions                                                  | `30%`                                                               |
 
 You can set them in your CSS for all players:
 
