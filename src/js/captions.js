@@ -221,8 +221,8 @@ const captions = {
     // Wait for the call stack to clear before setting mode='hidden'
     // on the active track - forcing the browser to download it
     setTimeout(() => {
-      if (active && this.captions.toggled) {
-        this.captions.currentTrackNode && this.captions.currentTrackNode.mode = 'hidden';
+      if (active && this.captions.toggled && this.captions.currentTrackNode) {
+         this.captions.currentTrackNode.mode = 'hidden';
       }
     });
   },
