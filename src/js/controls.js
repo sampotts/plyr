@@ -4,7 +4,6 @@
 // ==========================================================================
 
 import RangeTouch from 'rangetouch';
-
 import captions from './captions';
 import html5 from './html5';
 import support from './support';
@@ -23,7 +22,7 @@ import {
   setAttributes,
   setFocus,
   toggleClass,
-  toggleHidden,
+  toggleHidden
 } from './utils/elements';
 import { off, on } from './utils/events';
 import i18n from './utils/i18n';
@@ -32,6 +31,7 @@ import loadSprite from './utils/load-sprite';
 import { extend } from './utils/objects';
 import { getPercentage, replaceAll, toCamelCase, toTitleCase } from './utils/strings';
 import { formatTime, getHours } from './utils/time';
+
 
 // TODO: Don't export a massive object - break down and create class
 const controls = {
@@ -864,7 +864,7 @@ const controls = {
       case 'quality':
         if (is.number(value)) {
           //inside if add below
-          if (value === 0) return "Auto";
+          if (value === 0) return i18n.get('auto', this.config);
 
           const label = i18n.get(`qualityLabel.${value}`, this.config);
 
