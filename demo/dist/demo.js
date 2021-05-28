@@ -3691,7 +3691,7 @@ typeof navigator === "object" && (function (Sentry, Shr) {
 
 
       setTimeout(() => {
-        if (active && this.captions.toggled) {
+        if (active && this.captions.toggled && this.captions.currentTrackNode) {
           this.captions.currentTrackNode.mode = 'hidden';
         }
       });

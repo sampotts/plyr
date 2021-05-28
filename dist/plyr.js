@@ -3098,7 +3098,7 @@ typeof navigator === "object" && (function (global, factory) {
 
 
       setTimeout(() => {
-        if (active && this.captions.toggled) {
+        if (active && this.captions.toggled && this.captions.currentTrackNode) {
           this.captions.currentTrackNode.mode = 'hidden';
         }
       });
