@@ -222,7 +222,7 @@ const captions = {
     // on the active track - forcing the browser to download it
     setTimeout(() => {
       if (active && this.captions.toggled) {
-        this.captions.currentTrackNode.mode = 'hidden';
+        this.captions.currentTrackNode && this.captions.currentTrackNode.mode = 'hidden';
       }
     });
   },
