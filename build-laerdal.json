@@ -1,0 +1,48 @@
+{
+  "js": {
+    "plyr.js": {
+      "src": "./src/js/plyr.js",
+      "dist": "./dist/",
+      "formats": ["es", "umd"],
+      "namespace": "Plyr"
+    },
+    "plyr.polyfilled.js": {
+      "src": "./src/js/plyr.polyfilled.js",
+      "dist": "./dist/",
+      "formats": ["es", "umd"],
+      "namespace": "Plyr",
+      "polyfill": true
+    },
+    "demo.js": {
+      "src": "./demo-laerdal/src/js/demo.js",
+      "dist": "./demo-laerdal/dist/",
+      "formats": ["iife"],
+      "namespace": "Demo",
+      "polyfill": true
+    }
+  },
+  "css": {
+    "plyr.css": {
+      "src": "./src/sass/plyr.scss",
+      "dist": "./dist/"
+    },
+    "demo.css": {
+      "src": "./demo-laerdal/src/sass/bundles/demo.scss",
+      "dist": "./demo-laerdal/dist/"
+    },
+    "error.css": {
+      "src": "./demo-laerdal/src/sass/bundles/error.scss",
+      "dist": "./demo-laerdal/dist/"
+    }
+  },
+  "sprite": {
+    "plyr.svg": {
+      "src": "./src/sprite/*.svg",
+      "dist": "./dist"
+    },
+    "demo.svg": {
+      "src": "./src/sprite/*.svg",
+      "dist": "./demo-laerdal/dist"
+    }
+  }
+}

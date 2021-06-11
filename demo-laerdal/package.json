@@ -1,0 +1,14 @@
+{
+  "name": "plyr-demo",
+  "version": "1.0.0",
+  "description": "Demo for Plyr",
+  "homepage": "https://plyr.io",
+  "author": "Sam Potts <sam@potts.es>",
+  "dependencies": {
+    "@sentry/browser": "^5.22.3",
+    "core-js": "^3.6.5",
+    "custom-event-polyfill": "^1.0.7",
+    "shr-buttons": "2.0.3",
+    "url-polyfill": "^1.1.10"
+  }
+}

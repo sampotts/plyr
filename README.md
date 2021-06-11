@@ -1,3 +1,10 @@
+# Laerdal Fork of Plyr
+
+```js
+grunt laerdal-build
+grunt laerdal-dev
+```
+
 Plyr is a simple, lightweight, accessible and customizable HTML5, YouTube and Vimeo media player that supports [_modern_](#browser-support) browsers.
 
 [Checkout the demo](https://plyr.io) - [Donate](#donate) - [Slack](https://bit.ly/plyr--chat)

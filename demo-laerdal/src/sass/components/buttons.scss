@@ -1,0 +1,84 @@
+// ==========================================================================
+// Buttons
+// ==========================================================================
+
+// Shared
+.button,
+.button__count {
+  align-items: center;
+  border: 0;
+  border-radius: $border-radius-base;
+  box-shadow: 0 1px 1px rgba(#000, 0.1);
+  display: inline-flex;
+  padding: ($spacing-base * 0.75);
+  position: relative;
+  text-shadow: none;
+  user-select: none;
+  vertical-align: middle;
+}
+
+// Buttons
+.button {
+  background: $color-button-background;
+  color: $color-button-text;
+  font-weight: $font-weight-bold;
+  padding-left: ($spacing-base * 1.25);
+  padding-right: ($spacing-base * 1.25);
+  transition: all 0.2s ease;
+
+  &:hover,
+  &:focus {
+    background: $color-button-background-hover;
+
+    // Remove the underline/border
+    &::after {
+      display: none;
+    }
+  }
+
+  &:hover {
+    box-shadow: 0 2px 2px rgba(#000, 0.1);
+  }
+
+  &:focus {
+    outline: 0;
+  }
+
+  &.tab-focus {
+    @include tab-focus();
+  }
+
+  &:active {
+    top: 1px;
+  }
+}
+
+// Button group
+.button--with-count {
+  display: inline-flex;
+
+  .button .icon {
+    flex-shrink: 0;
+  }
+}
+
+// Count bubble
+.button__count {
+  animation: fadein 0.2s ease;
+  background: $color-button-count-background;
+  color: $color-button-count-text;
+  margin-left: ($spacing-base * 0.75);
+
+  &::before {
+    border: $arrow-size solid transparent;
+    border-left-width: 0;
+    border-right-color: $color-button-count-background;
+    content: '';
+    height: 0;
+    position: absolute;
+    right: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+  }
+}
