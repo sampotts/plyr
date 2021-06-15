@@ -1,0 +1,49 @@
+// --------------------------------------------------------------
+// Descriptions
+// --------------------------------------------------------------
+
+.plyr__descriptions {
+  animation: plyr-fade-in 0.3s ease;
+  display: none;
+  font-size: $plyr-font-size-descriptions-small;
+  left: 0;
+  padding: $plyr-control-spacing;
+  position: absolute;
+  text-align: center;
+  top: 0;
+  transition: transform 0.4s ease-in-out;
+  width: 100%;
+
+  span:empty {
+    display: none;
+  }
+
+  @media (min-width: $plyr-bp-sm) {
+    font-size: $plyr-font-size-descriptions-base;
+    padding: calc(#{$plyr-control-spacing} * 2);
+  }
+
+  @media (min-width: $plyr-bp-md) {
+    font-size: $plyr-font-size-descriptions-medium;
+  }
+}
+
+// If the lower controls are shown and not empty
+.plyr:not(.plyr--hide-controls) .plyr__controls:not(:empty) ~ .plyr__descriptions {
+  transform: translateY(calc(#{$plyr-control-spacing} * -4));
+}
+
+.plyr__description {
+  background: $plyr-descriptions-background;
+  border-radius: 2px;
+  box-decoration-break: clone;
+  color: $plyr-descriptions-text-color;
+  line-height: 185%;
+  padding: 0.2em 0.5em;
+  white-space: pre-wrap;
+
+  // Firefox adds a <div> when using getCueAsHTML()
+  div {
+    display: inline;
+  }
+}

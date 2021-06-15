@@ -123,6 +123,11 @@ declare class Plyr {
   currentTrack: number;
 
   /**
+   * Gets or sets the caption track by index. 1 means the track is missing or captions is not active
+   */
+  currentTrackDescriptions: number;
+
+  /**
    * Gets or sets the preferred captions language for the player. The setter accepts an ISO twoletter language code. Support for the languages is dependent on the captions you include.
    * If your captions don't have any language data, or if you have multiple tracks with the same language, you may want to use currentTrack instead.
    */
@@ -461,6 +466,12 @@ declare namespace Plyr {
     captions?: CaptionOptions;
 
     /**
+     * active: Toggles if descriptions should be active by default. language: Sets the default language to load (if available). 'auto' uses the browser language.
+     * update: Listen to changes to tracks and update menu. This is needed for some streaming libraries, but can result in unselectable language options).
+     */
+    descriptions?: DescriptionOptions;
+
+    /**
      * enabled: Toggles whether fullscreen should be enabled. fallback: Allow fallback to a full-window solution.
      * iosNative: whether to use native iOS fullscreen when entering fullscreen (no custom controls)
      */
@@ -572,6 +583,7 @@ declare namespace Plyr {
     buttons: {
       airplay?: HTMLButtonElement;
       captions?: HTMLButtonElement;
+      descriptions?: HTMLButtonElement;
       download?: HTMLButtonElement;
       fastForward?: HTMLButtonElement;
       fullscreen?: HTMLButtonElement;
@@ -583,6 +595,7 @@ declare namespace Plyr {
       settings?: HTMLButtonElement;
     };
     captions: HTMLElement | null;
+    descriptions: HTMLElement | null;
     container: HTMLElement | null;
     controls: HTMLElement | null;
     fullscreen: HTMLElement | null;

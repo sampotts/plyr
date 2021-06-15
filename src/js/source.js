@@ -114,7 +114,7 @@ const source = {
 
         // HTML5 stuff
         if (this.isHTML5) {
-          // Setup captions
+          // Setup captions and descriptions
           if (Object.keys(input).includes('tracks')) {
             source.insertElements.call(this, 'track', input.tracks);
           }

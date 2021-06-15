@@ -6,6 +6,7 @@
 import RangeTouch from 'rangetouch';
 
 import captions from './captions';
+import descriptions from './descriptions';
 import html5 from './html5';
 import support from './support';
 import { repaint, transitionEndEvent } from './utils/animation';
@@ -63,6 +64,7 @@ const controls = {
         airplay: getElement.call(this, this.config.selectors.buttons.airplay),
         settings: getElement.call(this, this.config.selectors.buttons.settings),
         captions: getElement.call(this, this.config.selectors.buttons.captions),
+        descriptions: getElement.call(this, this.config.selectors.buttons.descriptions),
         fullscreen: getElement.call(this, this.config.selectors.buttons.fullscreen),
       };
 
@@ -226,6 +228,14 @@ const controls = {
         props.labelPressed = 'disableCaptions';
         props.icon = 'captions-off';
         props.iconPressed = 'captions-on';
+        break;
+
+      case 'descriptions':
+        props.toggle = true;
+        props.label = 'enableDescriptions';
+        props.labelPressed = 'disableDescriptions';
+        props.icon = 'descriptions-off';
+        props.iconPressed = 'descriptions-on';
         break;
 
       case 'fullscreen':
@@ -812,6 +822,8 @@ const controls = {
 
     if (setting === 'captions') {
       value = this.currentTrack;
+    } else if (setting === 'descriptions') {
+      value = this.currentTrackDescriptions;
     } else {
       value = !is.empty(input) ? input : this[setting];
 
@@ -876,6 +888,8 @@ const controls = {
 
       case 'captions':
         return captions.getLabel.call(this);
+      case 'descriptions':
+        return descriptions.getLabel.call(this);
 
       default:
         return null;
@@ -1041,7 +1055,57 @@ const controls = {
     controls.updateSetting.call(this, type, list);
   },
 
-  // Set a list of available captions languages
+  setDescriptionsMenu() {
+    // Menu required
+    if (!is.element(this.elements.settings.panels.descriptions)) {
+      return;
+    }
+
+    const type = 'descriptions';
+    const list = this.elements.settings.panels.descriptions.querySelector('[role="menu"]');
+    const tracks = descriptions.getTracks.call(this);
+    const toggle = Boolean(tracks.length);
+
+    // Toggle the pane and tab
+    controls.toggleMenuButton.call(this, type, toggle);
+
+    // Empty the menu
+    emptyElement(list);
+
+    // Check if we need to toggle the parent
+    controls.checkMenu.call(this);
+
+    // If there's no descriptions, bail
+    if (!toggle) {
+      return;
+    }
+
+    // Generate options data
+    const options = tracks.map((track, value) => ({
+      value,
+      checked: this.descriptions.toggled && this.currentTrackDescriptions === value,
+      title: descriptions.getLabel.call(this, track),
+      badge: track.language && controls.createBadge.call(this, track.language.toUpperCase()),
+      list,
+      type: 'language',
+    }));
+
+    // Add the "Disabled" option to turn off descriptions
+    options.unshift({
+      value: -1,
+      checked: !this.descriptions.toggled,
+      title: i18n.get('disabled', this.config),
+      list,
+      type: 'language',
+    });
+
+    // Generate options
+    options.forEach(controls.createMenuItem.bind(this));
+
+    controls.updateSetting.call(this, type, list);
+  },
+
+  // Set a list of available descriptions languages
   setSpeedMenu() {
     // Menu required
     if (!is.element(this.elements.settings.panels.speed)) {
@@ -1397,6 +1461,11 @@ const controls = {
         container.appendChild(createButton.call(this, 'captions', defaultAttributes));
       }
 
+      // Toggle Descriptions button
+      if (control === 'descriptions') {
+        container.appendChild(createButton.call(this, 'descriptions', defaultAttributes));
+      }
+
       // Settings button / menu
       if (control === 'settings' && !is.empty(this.config.settings)) {
         const wrapper = createElement(
@@ -1654,6 +1723,7 @@ const controls = {
         speed: this.speed,
         quality: this.quality,
         captions: captions.getLabel.call(this),
+        descriptions: descriptions.getLabel.call(this),
         // TODO: Looping
         // loop: 'None',
       });

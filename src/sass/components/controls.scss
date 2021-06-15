@@ -51,12 +51,14 @@
 
 // Some options are hidden by default
 .plyr [data-plyr='captions'],
+.plyr [data-plyr='descriptions'],
 .plyr [data-plyr='pip'],
 .plyr [data-plyr='airplay'],
 .plyr [data-plyr='fullscreen'] {
   display: none;
 }
 .plyr--captions-enabled [data-plyr='captions'],
+.plyr--descriptions-enabled [data-plyr='descriptions'],
 .plyr--pip-supported [data-plyr='pip'],
 .plyr--airplay-supported [data-plyr='airplay'],
 .plyr--fullscreen-enabled [data-plyr='fullscreen'] {
