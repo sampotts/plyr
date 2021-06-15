@@ -39,6 +39,19 @@ const sources = {
         srclang: 'fr',
         src: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.fr.vtt',
       },
+      {
+        kind: 'descriptions',
+        label: 'English',
+        srclang: 'en',
+        src: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.en.vtt',
+        default: true,
+      },
+      {
+        kind: 'descriptions',
+        label: 'French',
+        srclang: 'fr',
+        src: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.fr.vtt',
+      },
     ],
     previewThumbnails: {
       src: ['https://cdn.plyr.io/static/demo/thumbs/100p.vtt', 'https://cdn.plyr.io/static/demo/thumbs/240p.vtt'],

@@ -8,53 +8,40 @@
     <!-- Docs styles -->
     <link rel="stylesheet" href="dist/demo.css" />
   </head>
-
   <body>
     <div class="grid">
-      <header>
-        <h1>Plyr</h1>
-      </header>
+      <header><h1>Laerdal Plyr Demo</h1></header>
       <main>
         <div id="container">
-          <video
-            controls
-            crossorigin
-            playsinline
-            data-poster="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.jpg"
-            id="player"
-          >
-            <!-- Video files -->
-            <source
-              src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-576p.mp4"
-              type="video/mp4"
-              size="576"
-            />
-            <source
-              src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-720p.mp4"
-              type="video/mp4"
-              size="720"
-            />
-            <source
-              src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-1080p.mp4"
-              type="video/mp4"
-              size="1080"
-            />
+          <!-- Video -->
+          <h2>Video</h2>
+          <video id="video-player" controls crossorigin playsinline></video>
 
-            <!-- Caption files -->
-            <track
-              kind="captions"
-              label="English"
-              srclang="en"
-              src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.en.vtt"
-              default
-            />
-            <track
-              kind="captions"
-              label="Français"
-              srclang="fr"
-              src="https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.fr.vtt"
-            />
-          </video>
+          <!-- Audio -->
+          <h2>Audio</h2>
+          <audio id="audio-player" controls crossorigin></audio>
+
+          <!-- Youtube -->
+          <h2>Youtube</h2>
+          <div class="plyr__video-embed" id="youtube-player">
+            <iframe
+              src="https://www.youtube.com/embed/bTqVqk7FSmY?origin=https://plyr.io&amp;iv_load_policy=3&amp;modestbranding=1&amp;playsinline=1&amp;showinfo=0&amp;rel=0&amp;enablejsapi=1"
+              allowfullscreen
+              allowtransparency
+              allow="autoplay"
+            ></iframe>
+          </div>
+
+          <!-- Vimeo -->
+          <h2>Vimeo</h2>
+          <div class="plyr__video-embed" id="vimeo-player">
+            <iframe
+              src="https://player.vimeo.com/video/76979871?loop=false&amp;byline=false&amp;portrait=false&amp;title=false&amp;speed=true&amp;transparent=0&amp;gesture=media"
+              allowfullscreen
+              allowtransparency
+              allow="autoplay"
+            ></iframe>
+          </div>
         </div>
       </main>
     </div>
