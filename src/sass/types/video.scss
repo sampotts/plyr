@@ -163,3 +163,8 @@ $embed-padding: ((100 / 16) * 9);
 .plyr--video .plyr__progress__buffer {
   color: $plyr-video-progress-buffered-background;
 }
+
+// Descriptions
+.plyr--video.plyr--debug-enabled .plyr__descriptions {
+  display: block;
+}

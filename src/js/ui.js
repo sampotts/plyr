@@ -4,6 +4,7 @@
 
 import captions from './captions';
 import controls from './controls';
+import descriptions from './descriptions';
 import support from './support';
 import browser from './utils/browser';
 import { getElement, toggleClass } from './utils/elements';
@@ -59,6 +60,11 @@ const ui = {
     // Setup captions for HTML5
     if (this.isHTML5) {
       captions.setup.call(this);
+    }
+
+    // Setup descriptions for HTML5
+    if (this.isHTML5) {
+      descriptions.setup.call(this);
     }
 
     // Reset volume

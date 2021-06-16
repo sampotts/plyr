@@ -39,12 +39,12 @@
     "start": "gulp"
   },
   "devDependencies": {
+    "@babel/core": "^7.13.15",
+    "@babel/plugin-proposal-class-properties": "^7.13.0",
+    "@babel/preset-env": "^7.13.15",
     "@sampotts/eslint-config": "1.1.7",
     "autoprefixer": "^10.2.5",
     "aws-sdk": "^2.888.0",
-    "@babel/core": "^7.13.15",
-    "@babel/preset-env": "^7.13.15",
-    "@babel/plugin-proposal-class-properties": "^7.13.0",
     "babel-eslint": "^10.1.0",
     "browser-sync": "^2.26.14",
     "colorette": "1.2.2",
@@ -90,6 +90,7 @@
     "stylelint-selector-bem-pattern": "^2.1.0"
   },
   "dependencies": {
+    "basic-tts": "^1.0.10",
     "core-js": "^3.10.1",
     "custom-event-polyfill": "^1.0.7",
     "loadjs": "^4.2.0",

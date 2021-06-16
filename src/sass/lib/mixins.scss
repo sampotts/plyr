@@ -75,7 +75,8 @@
 
   // Large captions in full screen on larger screens
   @media (min-width: $plyr-bp-lg) {
-    .plyr__captions {
+    .plyr__captions,
+    .plyr__descriptions {
       font-size: $plyr-font-size-captions-large;
     }
   }

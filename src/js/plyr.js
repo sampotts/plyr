@@ -11,6 +11,7 @@ import { pip } from './config/states';
 import { getProviderByUrl, providers, types } from './config/types';
 import Console from './console';
 import controls from './controls';
+import descriptions from './descriptions';
 import Fullscreen from './fullscreen';
 import html5 from './html5';
 import Listeners from './listeners';
@@ -83,6 +84,7 @@ class Plyr {
       container: null,
       fullscreen: null,
       captions: null,
+      descriptions: null,
       buttons: {},
       display: {},
       progress: {},
@@ -97,6 +99,13 @@ class Plyr {
 
     // Captions
     this.captions = {
+      active: null,
+      currentTrack: -1,
+      meta: new WeakMap(),
+    };
+
+    // Descriptions
+    this.descriptions = {
       active: null,
       currentTrack: -1,
       meta: new WeakMap(),
@@ -951,6 +960,14 @@ class Plyr {
   }
 
   /**
+   * Toggle Descriptions
+   * @param {Boolean} input - Whether to enable captions
+   */
+  toggleDescriptions(input) {
+    descriptions.toggle.call(this, input, false);
+  }
+
+  /**
    * Set the caption track by index
    * @param {Number} - Caption index
    */
@@ -963,6 +980,22 @@ class Plyr {
    */
   get currentTrack() {
     const { toggled, currentTrack } = this.captions;
+    return toggled ? currentTrack : -1;
+  }
+
+  /**
+   * Set the descriptions track by index
+   * @param {Number} - Description index
+   */
+  set currentTrackDescriptions(input) {
+    captions.set.call(this, input, false);
+  }
+
+  /**
+   * Get the current description track index (-1 if disabled)
+   */
+  get currentTrackDescriptions() {
+    const { toggled, currentTrack } = this.descriptions;
     return toggled ? currentTrack : -1;
   }
 
@@ -1128,12 +1161,14 @@ class Plyr {
           // Remove elements
           removeElement(this.elements.buttons.play);
           removeElement(this.elements.captions);
+          removeElement(this.elements.descriptions);
           removeElement(this.elements.controls);
           removeElement(this.elements.wrapper);
 
           // Clear for GC
           this.elements.buttons.play = null;
           this.elements.captions = null;
+          this.elements.descriptions = null;
           this.elements.controls = null;
           this.elements.wrapper = null;
         }
