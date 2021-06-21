@@ -65,6 +65,7 @@ const controls = {
         settings: getElement.call(this, this.config.selectors.buttons.settings),
         captions: getElement.call(this, this.config.selectors.buttons.captions),
         descriptions: getElement.call(this, this.config.selectors.buttons.descriptions),
+        transcript: getElement.call(this, this.config.selectors.buttons.transcript),
         fullscreen: getElement.call(this, this.config.selectors.buttons.fullscreen),
       };
 
@@ -1340,6 +1341,10 @@ const controls = {
 
     // Loop through controls in order
     dedupe(is.array(this.config.controls) ? this.config.controls : []).forEach((control) => {
+      // Transcript button
+      if (control === 'transcript') {
+        container.appendChild(createButton.call(this, 'transcript', defaultAttributes));
+      }
       // Restart button
       if (control === 'restart') {
         container.appendChild(createButton.call(this, 'restart', defaultAttributes));

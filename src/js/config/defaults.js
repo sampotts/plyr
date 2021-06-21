@@ -138,6 +138,7 @@ const defaults = {
   // Default controls
   controls: [
     'play-large',
+    // 'transcript',
     // 'restart',
     // 'rewind',
     'play',
@@ -159,6 +160,7 @@ const defaults = {
 
   // Localisation
   i18n: {
+    transcript: 'Open transcript',
     restart: 'Restart',
     rewind: 'Rewind {seektime}s',
     play: 'Play',
@@ -229,6 +231,7 @@ const defaults = {
     seek: null,
     play: null,
     pause: null,
+    transcript: null,
     restart: null,
     rewind: null,
     fastForward: null,
@@ -315,6 +318,7 @@ const defaults = {
     buttons: {
       play: '[data-plyr="play"]',
       pause: '[data-plyr="pause"]',
+      transcript: '[data-plyr="transcript"]',
       restart: '[data-plyr="restart"]',
       rewind: '[data-plyr="rewind"]',
       fastForward: '[data-plyr="fast-forward"]',
