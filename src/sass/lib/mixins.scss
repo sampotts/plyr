@@ -5,10 +5,7 @@
 // Nicer focus styles
 // ---------------------------------------
 @mixin plyr-tab-focus($color: $plyr-tab-focus-color) {
-  outline-color: $color;
-  outline-offset: 2px;
-  outline-style: dotted;
-  outline-width: 3px;
+  box-shadow: 0 4px 12px rgba(46, 127, 161, 0.25), 0 0 8px $color;
 }
 
 // Font smoothing
