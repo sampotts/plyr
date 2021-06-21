@@ -7,11 +7,12 @@
   @include plyr-font-smoothing($plyr-font-smoothing);
   align-items: center;
   direction: ltr;
-  display: flex;
-  flex-direction: column;
+  display: grid;
   font-family: $plyr-font-family;
   font-variant-numeric: tabular-nums; // Force monosace-esque number widths
   font-weight: $plyr-font-weight-regular;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr auto;
   line-height: $plyr-line-height;
   max-width: 100%;
   min-width: 200px;

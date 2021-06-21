@@ -162,7 +162,7 @@ Object.entries(build.css).forEach(([filename, entry]) => {
       .pipe(
         postcss([
           customprops(),
-          autoprefixer(),
+          autoprefixer({ grid: true }),
           cssnano({
             preset: 'default',
           }),
