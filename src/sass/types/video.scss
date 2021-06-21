@@ -44,6 +44,17 @@ $embed-padding: ((100 / 16) * 9);
   width: 100%;
 }
 
+// Fallback styles for IE11 embedded iframes
+.plyr--vimeo,
+.plyr--youtube {
+  @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+    display: block;
+    .plyr__video-embed {
+      height: 0;
+    }
+  }
+}
+
 // For Vimeo, if the full custom UI is supported
 .plyr--full-ui .plyr__video-embed > .plyr__video-embed__container {
   $height: 240;
@@ -58,19 +69,12 @@ $embed-padding: ((100 / 16) * 9);
   background: $plyr-video-controls-background;
   border-bottom-left-radius: inherit;
   border-bottom-right-radius: inherit;
-  bottom: 0;
   color: $plyr-video-control-color;
-  left: 0;
   padding: calc(#{$plyr-control-spacing} / 2);
-  padding-top: calc(#{$plyr-control-spacing} * 2);
-  position: absolute;
-  right: 0;
   transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
-  z-index: 3;
 
   @media (min-width: $plyr-bp-sm) {
     padding: $plyr-control-spacing;
-    padding-top: calc(#{$plyr-control-spacing} * 3.5);
   }
 }
 

@@ -28,7 +28,7 @@
   "bugs": {
     "url": "https://github.com/sampotts/plyr/issues"
   },
-  "browserslist": "> 1%",
+  "browserslist": "defaults, ie 11",
   "scripts": {
     "build": "gulp build",
     "lint": "eslint src/js && npm run-script remark",
