@@ -250,7 +250,7 @@ const controls = {
         attributes.class += ` ${this.config.classNames.control}--overlaid`;
         type = 'play';
         props.label = 'play';
-        props.icon = 'play';
+        props.icon = 'play-large';
         break;
 
       default:
@@ -1763,7 +1763,8 @@ const controls = {
 
     // Inject controls HTML (needs to be before captions, hence "afterbegin")
     const insertMethod = is.element(container) ? 'insertAdjacentElement' : 'insertAdjacentHTML';
-    target[insertMethod]('afterbegin', container);
+    //target[insertMethod]('afterbegin', container);
+    target.appendChild(container);
 
     // Find the elements if need be
     if (!is.element(this.elements.controls)) {
