@@ -13,16 +13,14 @@ $plyr-control-toggle-checked-background: var(
   var(--plyr-color-main, $plyr-color-main)
 ) !default;
 
-$plyr-video-controls-background: var(
-  --plyr-video-controls-background,
-  linear-gradient(rgba(#000, 0), rgba(#000, 0.75))
-) !default;
-$plyr-video-control-color: var(--plyr-video-control-color, #fff) !default;
-$plyr-video-control-color-hover: var(--plyr-video-control-color-hover, #fff) !default;
-$plyr-video-control-background-hover: var(
-  --plyr-video-control-background-hover,
-  var(--plyr-color-main, $plyr-color-main)
-) !default;
+$plyr-video-controls-background: var(--plyr-video-controls-background, #fff) !default;
+$plyr-video-control-color: var(--plyr-video-control-color, #666) !default;
+$plyr-video-control-color-hover: var(--plyr-video-control-color-hover, #215369) !default;
+$plyr-video-control-background-hover: var(--plyr-video-control-background-hover, #f1fbfe) !default;
+
+// play-large control
+$plyr-video-control-large-background: var(--plyr-video-control-large-background, #215369) !default;
+$plyr-video-control-large-color: var(--plyr-video-control-large-color, #fff) !default;
 
 $plyr-audio-controls-background: var(--plyr-audio-controls-background, #fff) !default;
 $plyr-audio-control-color: var(--plyr-audio-control-color, $plyr-color-gray-700) !default;
