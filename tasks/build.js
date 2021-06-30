@@ -16,7 +16,7 @@ const resolve = require('rollup-plugin-node-resolve');
 const sass = require('gulp-sass');
 const postcss = require('gulp-postcss');
 const autoprefixer = require('autoprefixer');
-const clean = require('postcss-clean');
+const cssnano = require('cssnano');
 const customprops = require('postcss-custom-properties');
 // Images
 const svgstore = require('gulp-svgstore');
@@ -158,7 +158,15 @@ Object.entries(build.css).forEach(([filename, entry]) => {
       .src(src)
       .pipe(plumber())
       .pipe(sass())
-      .pipe(postcss([customprops(), autoprefixer()]))
+      .pipe(
+        postcss([
+          customprops(),
+          autoprefixer(),
+          cssnano({
+            preset: 'default',
+          }),
+        ]),
+      )
       .pipe(size(sizeOptions))
       .pipe(gulp.dest(dist)),
   );
