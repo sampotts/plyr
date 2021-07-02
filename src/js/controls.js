@@ -38,7 +38,8 @@ const controls = {
   // Get icon URL
   getIconUrl() {
     const url = new URL(this.config.iconUrl, window.location);
-    const cors = url.host !== window.location.host || (browser.isIE && !window.svg4everybody);
+    const host = window.location.host ? window.location.host : window.top.location.host;
+    const cors = url.host !== host || (browser.isIE && !window.svg4everybody);
 
     return {
       url: this.config.iconUrl,
