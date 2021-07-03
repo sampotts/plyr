@@ -10,7 +10,7 @@ import { getElement, getElements, matches, toggleClass } from './utils/elements'
 import { off, on, once, toggleListener, triggerEvent } from './utils/events';
 import is from './utils/is';
 import { silencePromise } from './utils/promise';
-import { getAspectRatio, setAspectRatio } from './utils/style';
+import { getAspectRatio, getViewportSize, supportsCSS } from './utils/style';
 
 class Listeners {
   constructor(player) {
@@ -149,16 +149,16 @@ class Listeners {
           break;
 
         /* case 73:
-                    this.setLoop('start');
-                    break;
+          this.setLoop('start');
+          break;
 
-                case 76:
-                    this.setLoop();
-                    break;
+        case 76:
+          this.setLoop();
+          break;
 
-                case 79:
-                    this.setLoop('end');
-                    break; */
+        case 79:
+          this.setLoop('end');
+          break; */
 
         default:
           break;
@@ -305,39 +305,49 @@ class Listeners {
     );
 
     // Set a gutter for Vimeo
-    const setGutter = (ratio, padding, toggle) => {
+    const setGutter = () => {
       if (!player.isVimeo || player.config.vimeo.premium) {
         return;
       }
 
-      const target = player.elements.wrapper.firstChild;
-      const [, y] = ratio;
-      const [videoX, videoY] = getAspectRatio.call(player);
+      const target = elements.wrapper;
+      const { active } = player.fullscreen;
+      const [videoWidth, videoHeight] = getAspectRatio.call(player);
+      const useNativeAspectRatio = supportsCSS(`aspect-ratio: ${videoWidth} / ${videoHeight}`);
 
-      target.style.maxWidth = toggle ? `${(y / videoY) * videoX}px` : null;
-      target.style.margin = toggle ? '0 auto' : null;
-    };
-
-    // Resize on fullscreen change
-    const setPlayerSize = (measure) => {
-      // If we don't need to measure the viewport
-      if (!measure) {
-        return setAspectRatio.call(player);
+      // If not active, remove styles
+      if (!active) {
+        if (useNativeAspectRatio) {
+          target.style.width = null;
+          target.style.height = null;
+        } else {
+          target.style.maxWidth = null;
+          target.style.margin = null;
+        }
+        return;
       }
 
-      const rect = elements.container.getBoundingClientRect();
-      const { width, height } = rect;
+      // Determine which dimension will overflow and constrain view
+      const [viewportWidth, viewportHeight] = getViewportSize();
+      const overflow = viewportWidth / viewportHeight > videoWidth / videoHeight;
 
-      return setAspectRatio.call(player, `${width}:${height}`);
+      if (useNativeAspectRatio) {
+        target.style.width = overflow ? 'auto' : '100%';
+        target.style.height = overflow ? '100%' : 'auto';
+      } else {
+        target.style.maxWidth = overflow ? `${(viewportHeight / videoHeight) * videoWidth}px` : null;
+        target.style.margin = overflow ? '0 auto' : null;
+      }
     };
 
+    // Handle resizing
     const resized = () => {
       clearTimeout(timers.resized);
-      timers.resized = setTimeout(setPlayerSize, 50);
+      timers.resized = setTimeout(setGutter, 50);
     };
 
     on.call(player, elements.container, 'enterfullscreen exitfullscreen', (event) => {
-      const { target, usingNative } = player.fullscreen;
+      const { target } = player.fullscreen;
 
       // Ignore events not from target
       if (target !== elements.container) {
@@ -349,26 +359,12 @@ class Listeners {
         return;
       }
 
-      const isEnter = event.type === 'enterfullscreen';
-      // Set the player size when entering fullscreen to viewport size
-      const { padding, ratio } = setPlayerSize(isEnter);
-
       // Set Vimeo gutter
-      setGutter(ratio, padding, isEnter);
+      setGutter();
 
-      // Horrible hack for Safari 14 not repainting properly on entering fullscreen
-      if (isEnter) {
-        setTimeout(() => repaint(elements.container), 100);
-      }
-
-      // If not using native browser fullscreen API, we need to check for resizes of viewport
-      if (!usingNative) {
-        if (isEnter) {
-          on.call(player, window, 'resize', resized);
-        } else {
-          off.call(player, window, 'resize', resized);
-        }
-      }
+      // Watch for resizes
+      const method = event.type === 'enterfullscreen' ? on : off;
+      method.call(player, window, 'resize', resized);
     });
   };
 

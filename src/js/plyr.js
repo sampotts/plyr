@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v3.6.4
+// plyr.js v3.6.8
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -29,7 +29,7 @@ import loadSprite from './utils/load-sprite';
 import { clamp } from './utils/numbers';
 import { cloneDeep, extend } from './utils/objects';
 import { silencePromise } from './utils/promise';
-import { getAspectRatio, reduceAspectRatio, setAspectRatio, validateRatio } from './utils/style';
+import { getAspectRatio, reduceAspectRatio, setAspectRatio, validateAspectRatio } from './utils/style';
 import { parseUrl } from './utils/urls';
 
 // Private properties
@@ -916,12 +916,12 @@ class Plyr {
       return;
     }
 
-    if (!is.string(input) || !validateRatio(input)) {
+    if (!is.string(input) || !validateAspectRatio(input)) {
       this.debug.error(`Invalid aspect ratio specified (${input})`);
       return;
     }
 
-    this.config.ratio = input;
+    this.config.ratio = reduceAspectRatio(input);
 
     setAspectRatio.call(this);
   }
