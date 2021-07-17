@@ -108,11 +108,6 @@ declare class Plyr {
   source: Plyr.SourceInfo;
 
   /**
-   * Gets or sets preview thubmnails for the current source.
-   */
-  previewThumbnails: string;
-
-  /**
    * Gets or sets the current poster image URL for the player.
    */
   poster: string;
@@ -215,6 +210,11 @@ declare class Plyr {
    * Trigger the airplay dialog on supported devices.
    */
   airplay(): void;
+
+  /**
+   * Sets the preview thubmnails for the current source.
+   */
+  setPreviewThumbnails(source: Plyr.PreviewThumbnailsOptions): void;
 
   /**
    * Toggle the controls (video only). Takes optional truthy value to force it on/off.
@@ -621,6 +621,11 @@ declare namespace Plyr {
      * Booleans are converted to HTML5 value-less attributes.
      */
     tracks?: Track[];
+
+    /**
+     * Enable or disable preview thumbnails for current source
+     */
+    previewThumbnails?: Plyr.PreviewThumbnailsOptions;
   }
 
   interface Source {
@@ -634,8 +639,6 @@ declare namespace Plyr {
     type?: string;
     provider?: Provider;
     size?: number;
-
-    previewThumbnails?: PreviewThumbnailsOptions;
   }
 
   type TrackKind = 'subtitles' | 'captions' | 'descriptions' | 'chapters' | 'metadata';

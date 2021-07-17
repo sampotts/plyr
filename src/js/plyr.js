@@ -849,34 +849,6 @@ class Plyr {
   }
 
   /**
-   * Get current preview thubmnail source
-   */
-  get previewThumbnails() {
-    return this.config && this.config.previewThumbnails && this.config.previewThumbnails.src;
-  }
-
-  /**
-   * Set new preview Thumbnail
-   */
-  set previewThumbnails(input) {
-    // Cleanup previewThumbnails plugin if it was loaded
-    if (this.previewThumbnails && this.previewThumbnails.loaded) {
-      this.previewThumbnails.destroy();
-      this.previewThumbnails = null;
-    }
-
-    Object.assign(this.config.previewThumbnails, {
-      enabled: !!input,
-      src: input,
-    });
-
-    // Create new instance if it is still enabled
-    if (this.config.previewThumbnails.enabled) {
-      this.previewThumbnails = new PreviewThumbnails(this);
-    }
-  }
-
-  /**
    * Get a download URL (either source or custom)
    */
   get download() {
@@ -1055,6 +1027,23 @@ class Plyr {
 
     // Chrome
     return this.media === document.pictureInPictureElement;
+  }
+
+  /**
+   * Sets the preview thubmnails for the current source
+   */
+  setPreviewThumbnails(thumbnailSource) {
+    if (this.previewThumbnails && this.previewThumbnails.loaded) {
+      this.previewThumbnails.destroy();
+      this.previewThumbnails = null;
+    }
+
+    Object.assign(this.config.previewThumbnails, thumbnailSource);
+
+    // Create new instance if it is still enabled
+    if (this.config.previewThumbnails.enabled) {
+      this.previewThumbnails = new PreviewThumbnails(this);
+    }
   }
 
   /**

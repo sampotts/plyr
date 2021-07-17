@@ -467,6 +467,7 @@ player.fullscreen.enter(); // Enter fullscreen
 | `fullscreen.exit()`        | -                | Exit fullscreen.                                                                                           |
 | `fullscreen.toggle()`      | -                | Toggle fullscreen.                                                                                         |
 | `airplay()`                | -                | Trigger the airplay dialog on supported devices.                                                           |
+| `setPreviewThumbnails(source: PreviewThumbnailsOptions)`                | -                | Sets the preview thubmnails for the current source.                                                           |
 | `toggleControls(toggle)`   | Boolean          | Toggle the controls (video only). Takes optional truthy value to force it on/off.                          |
 | `on(event, function)`      | String, Function | Add an event listener for the specified event.                                                             |
 | `once(event, function)`    | String, Function | Add an event listener for the specified event once.                                                        |
