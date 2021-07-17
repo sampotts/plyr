@@ -108,6 +108,11 @@ declare class Plyr {
   source: Plyr.SourceInfo;
 
   /**
+   * Gets or sets preview thubmnails for the current source.
+   */
+  previewThumbnails: string;
+
+  /**
    * Gets or sets the current poster image URL for the player.
    */
   poster: string;
@@ -629,6 +634,8 @@ declare namespace Plyr {
     type?: string;
     provider?: Provider;
     size?: number;
+
+    previewThumbnails?: PreviewThumbnailsOptions;
   }
 
   type TrackKind = 'subtitles' | 'captions' | 'descriptions' | 'chapters' | 'metadata';
