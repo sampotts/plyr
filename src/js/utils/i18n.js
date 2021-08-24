@@ -13,6 +13,7 @@ const resources = {
   html5: 'HTML5',
   vimeo: 'Vimeo',
   youtube: 'YouTube',
+  dailymotion: 'DailyMotion',
 };
 
 const i18n = {

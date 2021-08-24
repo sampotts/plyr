@@ -149,7 +149,7 @@ declare class Plyr {
   readonly provider: Plyr.Provider;
 
   /**
-   * Returns the native API for Vimeo or Youtube players
+   * Returns the native API for Vimeo, Youtube or DailyMotion players
    */
   readonly embed?: any;
 
@@ -246,7 +246,7 @@ declare class Plyr {
 
 declare namespace Plyr {
   type MediaType = 'audio' | 'video';
-  type Provider = 'html5' | 'youtube' | 'vimeo';
+  type Provider = 'html5' | 'vimeo' | 'youtube' | 'dailymotion';
   type StandardEventMap = {
     progress: PlyrEvent;
     playing: PlyrEvent;
@@ -508,6 +508,11 @@ declare namespace Plyr {
      * Youtube Player Options.
      */
     youtube?: object;
+
+    /**
+     * DailyMotion Player Options.
+     */
+    dailymotion?: object;
 
     /**
      * Preview Thumbnails Options.

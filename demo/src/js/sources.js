@@ -76,6 +76,15 @@ const sources = {
       },
     ],
   },
+  dailymotion: {
+    type: 'video',
+    sources: [
+      {
+        src: 'https://www.dailymotion.com/video/x7tritx',
+        provider: 'dailymotion',
+      },
+    ],
+  },
 };
 
 export default sources;

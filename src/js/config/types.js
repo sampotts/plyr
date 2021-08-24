@@ -6,6 +6,7 @@ export const providers = {
   html5: 'html5',
   youtube: 'youtube',
   vimeo: 'vimeo',
+  dailymotion: 'dailymotion',
 };
 
 export const types = {
@@ -26,6 +27,11 @@ export function getProviderByUrl(url) {
   // Vimeo
   if (/^https?:\/\/player.vimeo.com\/video\/\d{0,9}(?=\b|\/)/.test(url)) {
     return providers.vimeo;
+  }
+
+  // DailyMotion
+  if (/^(https?:\/\/)?(www\.)?(dailymotion\.com|dai\.ly)\/.+$/.test(url)) {
+    return providers.dailymotion;
   }
 
   return null;

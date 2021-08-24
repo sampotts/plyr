@@ -152,7 +152,7 @@ class Plyr {
     this.elements.original = clone;
 
     // Set media type based on tag or data attribute
-    // Supported: video, audio, vimeo, youtube
+    // Supported: video, audio, vimeo, youtube, dailymotion
     const type = this.media.tagName.toLowerCase();
     // Embed properties
     let iframe = null;
@@ -333,7 +333,7 @@ class Plyr {
   }
 
   get isEmbed() {
-    return this.isYouTube || this.isVimeo;
+    return this.isYouTube || this.isVimeo || this.isDailyMotion;
   }
 
   get isYouTube() {
@@ -342,6 +342,10 @@ class Plyr {
 
   get isVimeo() {
     return this.provider === providers.vimeo;
+  }
+
+  get isDailyMotion() {
+    return this.provider === providers.dailymotion;
   }
 
   get isVideo() {
@@ -491,7 +495,7 @@ class Plyr {
   get buffered() {
     const { buffered } = this.media;
 
-    // YouTube / Vimeo return a float between 0-1
+    // YouTube / Vimeo / DailyMotion return a float between 0-1
     if (is.number(buffered)) {
       return buffered;
     }
@@ -700,6 +704,11 @@ class Plyr {
       return 0.5;
     }
 
+    if (this.isDailyMotion) {
+      // No playback rate support
+      return 1;
+    }
+
     // https://stackoverflow.com/a/32320020/1191319
     return 0.0625;
   }
@@ -716,6 +725,11 @@ class Plyr {
     if (this.isVimeo) {
       // https://github.com/vimeo/player.js/#setplaybackrateplaybackrate-number-promisenumber-rangeerrorerror
       return 2;
+    }
+
+    if (this.isDailyMotion) {
+      // No Playback rate support
+      return 1;
     }
 
     // https://stackoverflow.com/a/32320020/1191319
@@ -1208,6 +1222,14 @@ class Plyr {
 
       // Vimeo does not always return
       setTimeout(done, 200);
+    } else if (this.isDailyMotion) {
+      // Destroy DailyMotion made function
+      if (this.embed !== null && is.function(this.embed.destroy)) {
+        this.embed.destroy();
+      }
+
+      // Clean up
+      done();
     }
   };
 
@@ -1220,7 +1242,7 @@ class Plyr {
   /**
    * Check for support
    * @param {String} type - Player type (audio/video)
-   * @param {String} provider - Provider (html5/youtube/vimeo)
+   * @param {String} provider - Provider (html5/youtube/vimeo/dailymotion)
    * @param {Boolean} inline - Where player has `playsinline` sttribute
    */
   static supported(type, provider, inline) {
