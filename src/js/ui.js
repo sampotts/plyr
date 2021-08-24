@@ -82,6 +82,9 @@ const ui = {
     // Reset time display
     controls.timeUpdate.call(this);
 
+    // Reset duration display
+    controls.durationUpdate.call(this);
+
     // Update the UI
     ui.checkPlaying.call(this);
 
