@@ -1031,6 +1031,23 @@ class Plyr {
   }
 
   /**
+   * Sets the preview thubmnails for the current source
+   */
+  setPreviewThumbnails(thumbnailSource) {
+    if (this.previewThumbnails && this.previewThumbnails.loaded) {
+      this.previewThumbnails.destroy();
+      this.previewThumbnails = null;
+    }
+
+    Object.assign(this.config.previewThumbnails, thumbnailSource);
+
+    // Create new instance if it is still enabled
+    if (this.config.previewThumbnails.enabled) {
+      this.previewThumbnails = new PreviewThumbnails(this);
+    }
+  }
+
+  /**
    * Trigger the airplay dialog
    * TODO: update player with state, support, enabled
    */
