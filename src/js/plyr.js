@@ -675,7 +675,9 @@ class Plyr {
 
     // Set media speed
     setTimeout(() => {
-      this.media.playbackRate = speed;
+      if (this.media) {
+        this.media.playbackRate = speed;
+      }
     }, 0);
   }
 
