@@ -238,8 +238,10 @@ declare class Plyr {
 
   /**
    * Destroy lib instance
+   * @param {Function} callback - Callback for when destroy is complete
+   * @param {Boolean} soft - Whether it's a soft destroy (for source changes etc)
    */
-  destroy(): void;
+  destroy(callback?: (...args: any[]) => void, soft?: boolean): void;
 }
 
 declare namespace Plyr {
