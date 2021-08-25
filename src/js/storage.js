@@ -70,7 +70,11 @@ class Storage {
     extend(storage, object);
 
     // Update storage
-    window.localStorage.setItem(this.key, JSON.stringify(storage));
+    try {
+        window.localStorage.setItem(this.key, JSON.stringify(storage));
+    } catch (e) {
+        return;
+    }
   };
 }
 
