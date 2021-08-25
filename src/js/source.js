@@ -6,6 +6,7 @@ import { providers } from './config/types';
 import html5 from './html5';
 import media from './media';
 import PreviewThumbnails from './plugins/preview-thumbnails';
+import Trim from './plugins/trim';
 import support from './support';
 import ui from './ui';
 import { createElement, insertElement, removeElement } from './utils/elements';
@@ -146,6 +147,20 @@ const source = {
             this.previewThumbnails = new PreviewThumbnails(this);
           }
         }
+
+        // Create new instance of trim plugin
+        if (this.trim && this.trim.loaded) {
+          this.trim.destroy();
+          this.trim = null;
+        }
+
+        // Create new instance if it is still enabled
+        if (this.config.trim.enabled) {
+          this.trim = new Trim(this);
+        }
+
+        // Update trimming tool support
+        this.trim.update();
 
         // Update the fullscreen support
         this.fullscreen.update();

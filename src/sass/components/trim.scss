@@ -1,0 +1,21 @@
+// --------------------------------------------------------------
+// Trim
+// --------------------------------------------------------------
+
+.plyr__trim {
+  animation: plyr-fade-in 0.3s ease;
+  bottom: 0;
+  color: $plyr-captions-text-color;
+  display: none;
+  font-size: $plyr-font-size-captions-small;
+  left: 0;
+  padding: $plyr-control-spacing;
+  position: absolute;
+  text-align: center;
+  transition: transform 0.4s ease-in-out;
+  width: 100%;
+
+  span:empty {
+    display: none;
+  }
+}

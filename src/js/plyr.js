@@ -17,6 +17,7 @@ import Listeners from './listeners';
 import media from './media';
 import Ads from './plugins/ads';
 import PreviewThumbnails from './plugins/preview-thumbnails';
+import Trim from './plugins/trim';
 import source from './source';
 import Storage from './storage';
 import support from './support';
@@ -286,6 +287,9 @@ class Plyr {
         this.debug.log(`event: ${event.type}`);
       });
     }
+
+    // Setup trim
+    this.trim = new Trim(this);
 
     // Setup fullscreen
     this.fullscreen = new Fullscreen(this);
