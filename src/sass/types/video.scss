@@ -49,7 +49,7 @@ $embed-padding: (math.div(100, 16) * 9);
 // For Vimeo, if the full custom UI is supported
 .plyr--full-ui .plyr__video-embed > .plyr__video-embed__container {
   $height: 240;
-  $offset: to-percentage(math.div(math.div($height, $embed-padding), math.div($height, 50)));
+  $offset: to-percentage(math.div($height - $embed-padding, math.div($height, 50)));
   padding-bottom: to-percentage($height);
   position: relative;
   transform: translateY(-$offset);
