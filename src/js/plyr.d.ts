@@ -454,7 +454,7 @@ declare namespace Plyr {
      * Allows binding of event listeners to the controls before the default handlers. See the defaults.js for available listeners.
      * If your handler prevents default on the event (event.preventDefault()), the default handler will not fire.
      */
-    listeners?: { [key: string]: (error: PlyrEvent) => void };
+    listeners?: {[key: string]: (error: PlyrEvent) => void};
 
     /**
      * active: Toggles if captions should be active by default. language: Sets the default language to load (if available). 'auto' uses the browser language.
@@ -528,7 +528,8 @@ declare namespace Plyr {
 
   interface AdOptions {
     enabled: boolean;
-    publisherId: string;
+    publisherId?: string;
+    tagUrl?: string;
   }
 
   interface SpeedOptions {
@@ -656,7 +657,7 @@ declare namespace Plyr {
   }
 
   interface PlyrEvent extends CustomEvent {
-    readonly detail: { readonly plyr: Plyr };
+    readonly detail: {readonly plyr: Plyr};
   }
 
   enum YoutubeState {
