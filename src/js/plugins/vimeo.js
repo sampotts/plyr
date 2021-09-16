@@ -80,6 +80,16 @@ const vimeo = {
       });
     }
 
+    // Get the source URL or ID
+    let source = player.media.getAttribute('src');
+
+    // Check wether there is a hash appended to the given url
+    const regex = /^.*(?:vimeo.com\/|video\/)(?:\d+\/)(?<hash>[\d,a-f]+)$/
+    const found = source.match(regex)
+    const hashParam = (found) ? {
+      h: found.groups.hash
+    } : {}
+
     // Get Vimeo params for the iframe
     const params = buildUrlParams({
       loop: player.config.loop.active,
@@ -87,11 +97,11 @@ const vimeo = {
       muted: player.muted,
       gesture: 'media',
       playsinline: !this.config.fullscreen.iosNative,
+      // hash has to be added to iframe-URL
+      ...hashParam,
       ...frameParams,
     });
 
-    // Get the source URL or ID
-    let source = player.media.getAttribute('src');
 
     // Get from <div> if needed
     if (is.empty(source)) {
