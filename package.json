@@ -59,5 +59,13 @@
   },
   "dependencies": {
     "rangetouch": "^2.0.1"
+  },
+  "resolutions": {
+    "glob-parent": "^6.0.1",
+    "postcss": "^8.3.6",
+    "semver-regex": "^4.0.1",
+    "set-value": "^4.0.1",
+    "trim-newlines": "^4.0.2",
+    "yargs-parser": "^20.2.9"
   }
 }
