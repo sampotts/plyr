@@ -832,7 +832,7 @@ nav {
     .ggsi .ggs-plyr__control:focus {
       outline: 0 !important; }
     .ggsi .ggs-plyr__control.ggs-plyr__tab-focus {
-      outline-color: var(--plyr-color-main, var(--plyr-color-main, #00b3ff)) !important;
+      outline-color: #00b3ff !important;
       outline-color: var(--plyr-tab-focus-color, var(--plyr-color-main, var(--plyr-color-main, #00b3ff))) !important;
       outline-offset: 2px !important;
       outline-style: dotted !important;
@@ -1033,7 +1033,7 @@ nav {
           transition: transform 0.3s ease, opacity 0.3s ease !important;
           width: 6px !important; }
         .ggsi .ggs-plyr__menu__container .ggs-plyr__control[role='menuitemradio'][aria-checked='true']::before {
-          background: var(--plyr-color-main, var(--plyr-color-main, #00b3ff)) !important;
+          background: #00b3ff !important;
           background: var(--plyr-control-toggle-checked-background, var(--plyr-color-main, var(--plyr-color-main, #00b3ff))) !important; }
         .ggsi .ggs-plyr__menu__container .ggs-plyr__control[role='menuitemradio'][aria-checked='true']::after {
           opacity: 1 !important;
@@ -1057,7 +1057,7 @@ nav {
     border: 0 !important;
     border-radius: calc(13px * 2) !important;
     border-radius: calc(var(--plyr-range-thumb-height, 13px) * 2) !important;
-    color: var(--plyr-color-main, var(--plyr-color-main, #00b3ff)) !important;
+    color: #00b3ff !important;
     color: var(--plyr-range-fill-background, var(--plyr-color-main, var(--plyr-color-main, #00b3ff))) !important;
     display: block !important;
     height: calc((3px * 2) + 13px) !important;
@@ -1185,19 +1185,19 @@ nav {
     .ggsi .ggs-plyr--full-ui input[type='range']::-moz-focus-outer {
       border: 0 !important; }
     .ggsi .ggs-plyr--full-ui input[type='range'].ggs-plyr__tab-focus::-webkit-slider-runnable-track {
-      outline-color: var(--plyr-color-main, var(--plyr-color-main, #00b3ff)) !important;
+      outline-color: #00b3ff !important;
       outline-color: var(--plyr-tab-focus-color, var(--plyr-color-main, var(--plyr-color-main, #00b3ff))) !important;
       outline-offset: 2px !important;
       outline-style: dotted !important;
       outline-width: 3px !important; }
     .ggsi .ggs-plyr--full-ui input[type='range'].ggs-plyr__tab-focus::-moz-range-track {
-      outline-color: var(--plyr-color-main, var(--plyr-color-main, #00b3ff)) !important;
+      outline-color: #00b3ff !important;
       outline-color: var(--plyr-tab-focus-color, var(--plyr-color-main, var(--plyr-color-main, #00b3ff))) !important;
       outline-offset: 2px !important;
       outline-style: dotted !important;
       outline-width: 3px !important; }
     .ggsi .ggs-plyr--full-ui input[type='range'].ggs-plyr__tab-focus::-ms-track {
-      outline-color: var(--plyr-color-main, var(--plyr-color-main, #00b3ff)) !important;
+      outline-color: #00b3ff !important;
       outline-color: var(--plyr-tab-focus-color, var(--plyr-color-main, var(--plyr-color-main, #00b3ff))) !important;
       outline-offset: 2px !important;
       outline-style: dotted !important;
@@ -1404,7 +1404,7 @@ nav {
     padding: 10px !important;
     padding: var(--plyr-control-spacing, 10px) !important; }
   .ggsi .ggs-plyr--audio .ggs-plyr__control.ggs-plyr__tab-focus, .ggsi .ggs-plyr--audio .ggs-plyr__control:hover, .ggsi .ggs-plyr--audio .ggs-plyr__control[aria-expanded='true'] {
-    background: var(--plyr-color-main, var(--plyr-color-main, #00b3ff)) !important;
+    background: #00b3ff !important;
     background: var(--plyr-audio-control-background-hover, var(--plyr-color-main, var(--plyr-color-main, #00b3ff))) !important;
     color: #fff !important;
     color: var(--plyr-audio-control-color-hover, #fff) !important; }
@@ -1485,12 +1485,12 @@ nav {
     pointer-events: none !important;
     transform: translateY(100%) !important; }
   .ggsi .ggs-plyr--video .ggs-plyr__control.ggs-plyr__tab-focus, .ggsi .ggs-plyr--video .ggs-plyr__control:hover, .ggsi .ggs-plyr--video .ggs-plyr__control[aria-expanded='true'] {
-    background: var(--plyr-color-main, var(--plyr-color-main, #00b3ff)) !important;
+    background: #00b3ff !important;
     background: var(--plyr-video-control-background-hover, var(--plyr-color-main, var(--plyr-color-main, #00b3ff))) !important;
     color: #fff !important;
     color: var(--plyr-video-control-color-hover, #fff) !important; }
   .ggsi .ggs-plyr__control--overlaid {
-    background: var(--plyr-color-main, var(--plyr-color-main, #00b3ff)) !important;
+    background: #00b3ff !important;
     background: var(--plyr-video-control-background-hover, var(--plyr-color-main, var(--plyr-color-main, #00b3ff))) !important;
     border: 0 !important;
     border-radius: 100% !important;
