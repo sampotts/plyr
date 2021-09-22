@@ -5,7 +5,6 @@
 // Base
 .plyr {
   @include plyr-font-smoothing($plyr-font-smoothing);
-  align-items: center;
   direction: ltr;
   display: grid;
   font-family: $plyr-font-family;
@@ -39,6 +38,10 @@
   // Ignore focus
   &:focus {
     outline: 0;
+  }
+
+  &.plyr--video.plyr--chapters-active {
+    grid-template-columns: 1fr 16rem;
   }
 }
 

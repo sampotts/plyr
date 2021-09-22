@@ -173,3 +173,8 @@ $embed-padding: ((100 / 16) * 9);
 .plyr--video.plyr--debug-enabled .plyr__descriptions {
   display: block;
 }
+
+// Chapters
+.plyr--video.plyr--chapters-active .plyr__chapters {
+  display: block;
+}

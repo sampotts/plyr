@@ -47,8 +47,7 @@ const captions = {
     // Inject the container
     if (!is.element(this.elements.captions)) {
       this.elements.captions = createElement('div', getAttributesFromSelector(this.config.selectors.captions));
-
-      insertAfter(this.elements.captions, this.elements.wrapper);
+      this.elements.wrapper.appendChild(this.elements.captions);
     }
 
     // Fix IE captions if CORS is used

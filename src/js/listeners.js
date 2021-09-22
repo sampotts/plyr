@@ -433,6 +433,11 @@ class Listeners {
           return;
         }
 
+        // Handle large play button inside of wrapper
+        if (elements.buttons.play.includes(event.target)) {
+          return;
+        }
+
         if (player.ended) {
           this.proxy(event, player.restart, 'restart');
           this.proxy(
@@ -608,6 +613,9 @@ class Listeners {
 
     // Descriptions toggle
     this.bind(elements.buttons.descriptions, 'click', () => player.toggleDescriptions());
+
+    // Chapters toggle
+    this.bind(elements.buttons.chapters, 'click', () => player.toggleChapters());
 
     // Download
     this.bind(

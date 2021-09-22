@@ -123,9 +123,14 @@ declare class Plyr {
   currentTrack: number;
 
   /**
-   * Gets or sets the caption track by index. 1 means the track is missing or captions is not active
+   * Gets or sets the description track by index. 1 means the track is missing or captions is not active
    */
   currentTrackDescriptions: number;
+
+  /**
+   * Gets or sets the chapter track by index. 1 means the track is missing or captions is not active
+   */
+  currentTrackChapters: number;
 
   /**
    * Gets or sets the preferred captions language for the player. The setter accepts an ISO twoletter language code. Support for the languages is dependent on the captions you include.
@@ -472,6 +477,12 @@ declare namespace Plyr {
     descriptions?: DescriptionOptions;
 
     /**
+     * active: Toggles if Chapters should be active by default. language: Sets the default language to load (if available). 'auto' uses the browser language.
+     * update: Listen to changes to tracks and update chapter list. This is needed for some streaming libraries, but can result in unselectable language options).
+     */
+    chapters?: DescriptionOptions;
+
+    /**
      * enabled: Toggles whether fullscreen should be enabled. fallback: Allow fallback to a full-window solution.
      * iosNative: whether to use native iOS fullscreen when entering fullscreen (no custom controls)
      */
@@ -584,6 +595,7 @@ declare namespace Plyr {
       airplay?: HTMLButtonElement;
       captions?: HTMLButtonElement;
       descriptions?: HTMLButtonElement;
+      chapters?: HTMLButtonElement;
       download?: HTMLButtonElement;
       fastForward?: HTMLButtonElement;
       fullscreen?: HTMLButtonElement;
@@ -596,6 +608,7 @@ declare namespace Plyr {
     };
     captions: HTMLElement | null;
     descriptions: HTMLElement | null;
+    chapters: HTMLElement | null;
     container: HTMLElement | null;
     controls: HTMLElement | null;
     fullscreen: HTMLElement | null;

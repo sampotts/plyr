@@ -9,7 +9,7 @@
 
 .plyr__captions {
   animation: plyr-fade-in 0.3s ease;
-  bottom: calc(#{$plyr-control-icon-size} + (#{$plyr-control-padding} * 2));
+  bottom: 0;
   display: none;
   font-size: $plyr-font-size-captions-small;
   left: 0;

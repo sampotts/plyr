@@ -119,6 +119,15 @@ const defaults = {
     update: false,
   },
 
+  // Chapters settings
+  chapters: {
+    active: false,
+    language: 'auto',
+    // Listen to new tracks added after Plyr is initialized.
+    // This is needed for streaming chapters, but may result in unselectable options
+    update: false,
+  },
+
   // Fullscreen settings
   fullscreen: {
     enabled: true, // Allow fullscreen?
@@ -150,6 +159,7 @@ const defaults = {
     'volume',
     'captions',
     'descriptions',
+    'chapters',
     'settings',
     'pip',
     'airplay',
@@ -179,12 +189,15 @@ const defaults = {
     disableCaptions: 'Disable captions',
     enableDescriptions: 'Enable descriptions',
     disableDescriptions: 'Disable descriptions',
+    enableChapters: 'Enable chapters',
+    disableChapters: 'Disable chapters',
     download: 'Download',
     enterFullscreen: 'Enter fullscreen',
     exitFullscreen: 'Exit fullscreen',
     frameTitle: 'Player for {title}',
     captions: 'Captions',
     descriptions: 'Descriptions',
+    chapters: 'Chapters',
     settings: 'Settings',
     pip: 'PIP',
     menuBack: 'Go back to previous menu',
@@ -239,6 +252,7 @@ const defaults = {
     volume: null,
     captions: null,
     descriptions: null,
+    chapters: null,
     download: null,
     fullscreen: null,
     pip: null,
@@ -282,6 +296,8 @@ const defaults = {
     'captionsdisabled',
     'descriptionsenabled',
     'descriptionsdisabled',
+    'chaptersenabled',
+    'chaptersdisabled',
     'languagechange',
     'controlshidden',
     'controlsshown',
@@ -325,6 +341,7 @@ const defaults = {
       mute: '[data-plyr="mute"]',
       captions: '[data-plyr="captions"]',
       descriptions: '[data-plyr="descriptions"]',
+      chapters: '[data-plyr="chapters"]',
       download: '[data-plyr="download"]',
       fullscreen: '[data-plyr="fullscreen"]',
       pip: '[data-plyr="pip"]',
@@ -349,8 +366,10 @@ const defaults = {
     progress: '.plyr__progress',
     captions: '.plyr__captions',
     descriptions: '.plyr__descriptions',
+    chapters: '.plyr__chapters',
     caption: '.plyr__caption',
     description: '.plyr__description',
+    chapter: '.plyr__chapter',
   },
 
   // Class hooks added to the player in different states
@@ -397,6 +416,10 @@ const defaults = {
     descriptions: {
       enabled: 'plyr--descriptions-enabled',
       active: 'plyr--descriptions-active',
+    },
+    chapters: {
+      enabled: 'plyr--chapters-enabled',
+      active: 'plyr--chapters-active',
     },
     fullscreen: {
       enabled: 'plyr--fullscreen-enabled',

@@ -1,0 +1,60 @@
+// --------------------------------------------------------------
+// Chapters
+// --------------------------------------------------------------
+
+.plyr__chapters {
+  animation: plyr-fade-in 0.3s ease;
+  display: none;
+  font-size: $plyr-font-size-chapters-small;
+  grid-column-start: 2;
+  grid-row-end: 3;
+  grid-row-start: 1;
+  padding: 0.125rem;
+  transition: transform 0.4s ease-in-out;
+  width: 100%;
+
+  span:empty {
+    display: none;
+  }
+
+  @media (min-width: $plyr-bp-sm) {
+    font-size: $plyr-font-size-chapters-base;
+  }
+
+  @media (min-width: $plyr-bp-md) {
+    font-size: $plyr-font-size-chapters-medium;
+  }
+}
+
+button.plyr__chapter {
+  background: $plyr-chapters-background;
+  border-bottom: 1px solid #ccc;
+  border-left: 4px solid transparent;
+  border-right: 1px solid transparent;
+  border-top: 1px solid transparent;
+  color: $plyr-chapters-text-color;
+  display: flex;
+  padding: 0.2em 0.5em;
+  text-align: left;
+  white-space: pre-wrap;
+  &[aria-checked='true'] {
+    border-left: 4px solid $plyr-color-brand;
+  }
+
+  .plyr__chapter__index {
+    margin-right: 0.5rem;
+  }
+
+  &:nth-last-child(1) {
+    border-bottom: 1px solid transparent;
+  }
+}
+.plyr__chapter-markers {
+  position: relative;
+}
+
+.plyr__chapter-marker {
+  font-size: 11px;
+  position: absolute;
+  top: -0.25rem;
+}
