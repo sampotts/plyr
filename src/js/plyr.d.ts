@@ -212,6 +212,11 @@ declare class Plyr {
   airplay(): void;
 
   /**
+   * Sets the preview thubmnails for the current source.
+   */
+  setPreviewThumbnails(source: Plyr.PreviewThumbnailsOptions): void;
+
+  /**
    * Toggle the controls (video only). Takes optional truthy value to force it on/off.
    */
   toggleControls(toggle: boolean): void;
@@ -619,6 +624,11 @@ declare namespace Plyr {
      * Booleans are converted to HTML5 value-less attributes.
      */
     tracks?: Track[];
+
+    /**
+     * Enable or disable preview thumbnails for current source
+     */
+    previewThumbnails?: Plyr.PreviewThumbnailsOptions;
   }
 
   interface Source {

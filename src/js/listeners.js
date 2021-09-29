@@ -841,7 +841,9 @@ class Listeners {
         .filter((c) => !c.contains(elements.container))
         .forEach((child) => {
           this.bind(child, 'mouseenter mouseleave', (event) => {
-            elements.controls.hover = !player.touch && event.type === 'mouseenter';
+            if (elements.controls) {
+              elements.controls.hover = !player.touch && event.type === 'mouseenter';
+            }
           });
         });
     }
