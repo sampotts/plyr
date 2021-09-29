@@ -398,6 +398,7 @@ const defaults = {
     embed: {
       provider: 'data-plyr-provider',
       id: 'data-plyr-embed-id',
+      hash: 'data-plyr-embed-hash',
     },
   },
 

@@ -28,6 +28,25 @@ function parseId(url) {
   return url.match(regex) ? RegExp.$2 : url;
 }
 
+// Try to extract a hash for private videos from the URL
+function parseHash(url) {
+  /* This regex matches a hexadecimal hash if given in any of these forms:
+   *  - [https://player.]vimeo.com/video/{id}/{hash}[?params]
+   *  - [https://player.]vimeo.com/video/{id}?h={hash}[&params]
+   *  - [https://player.]vimeo.com/video/{id}?[params]&h={hash}
+   *  - video/{id}/{hash}
+   * If matched, the hash is available in the named group `hash`
+   */
+  const regex = /^.*(?:vimeo.com\/|video\/)(?:\d+)(?:\?.*\&*h=|\/)+(?<hash>[\d,a-f]+)/
+  const found = url.match(regex)
+
+  if (found) {
+    return found.groups.hash
+  }
+
+  return null
+}
+
 // Set playback state and trigger change (only on actual change)
 function assurePlaybackState(play) {
   if (play && !this.embed.hasPlayed) {
@@ -72,6 +91,19 @@ const vimeo = {
     const config = player.config.vimeo;
     const { premium, referrerPolicy, ...frameParams } = config;
 
+    // Get the source URL or ID
+    let source = player.media.getAttribute('src');
+    let hash = ''
+    // Get from <div> if needed
+    if (is.empty(source)) {
+      source = player.media.getAttribute(player.config.attributes.embed.id);
+      // hash can also be set as attribute on the <div>
+      hash = player.media.getAttribute(player.config.attributes.embed.hash);
+    } else {
+      hash = parseHash(source)
+    }
+    const hashParam = (!!hash) ? {h: hash} : {}
+
     // If the owner has a pro or premium account then we can hide controls etc
     if (premium) {
       Object.assign(frameParams, {
@@ -87,16 +119,10 @@ const vimeo = {
       muted: player.muted,
       gesture: 'media',
       playsinline: !this.config.fullscreen.iosNative,
+      // hash has to be added to iframe-URL
+      ...hashParam,
       ...frameParams,
     });
-
-    // Get the source URL or ID
-    let source = player.media.getAttribute('src');
-
-    // Get from <div> if needed
-    if (is.empty(source)) {
-      source = player.media.getAttribute(player.config.attributes.embed.id);
-    }
 
     const id = parseId(source);
     // Build an iframe
