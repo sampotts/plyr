@@ -72,7 +72,7 @@ class Plyr {
       (() => {
         try {
           return JSON.parse(this.media.getAttribute('data-plyr-config'));
-        } catch (e) {
+        } catch (_) {
           return {};
         }
       })(),

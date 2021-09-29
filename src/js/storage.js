@@ -26,7 +26,7 @@ class Storage {
       window.localStorage.removeItem(test);
 
       return true;
-    } catch (e) {
+    } catch (_) {
       return false;
     }
   }

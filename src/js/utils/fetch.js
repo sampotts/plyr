@@ -17,7 +17,7 @@ export default function fetch(url, responseType = 'text') {
         if (responseType === 'text') {
           try {
             resolve(JSON.parse(request.responseText));
-          } catch (e) {
+          } catch (_) {
             resolve(request.responseText);
           }
         } else {
@@ -35,8 +35,8 @@ export default function fetch(url, responseType = 'text') {
       request.responseType = responseType;
 
       request.send();
-    } catch (e) {
-      reject(e);
+    } catch (error) {
+      reject(error);
     }
   });
 }
