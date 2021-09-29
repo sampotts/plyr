@@ -16,6 +16,7 @@
 
 .plyr__video-wrapper {
   background: var(--plyr-video-background, $plyr-video-background);
+  height: 100%;
   margin: auto;
   overflow: hidden;
   position: relative;
