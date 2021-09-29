@@ -1,7 +1,29 @@
-// ==========================================================================
-// Useful functions
-// ==========================================================================
+@use 'sass:math';
+@use 'sass:meta';
+@use 'sass:list';
 
 @function to-percentage($input) {
   @return $input * 1%;
+}
+
+// Private polyfill for the `math.div` function from Sass to be used until we can update the
+// minimum required Sass version to 1.34.0 or above.
+// TODO: replace with `math.div` eventually.
+@function div($a, $b) {
+  @if (meta.function-exists('div', 'math')) {
+    @return math.div($a, $b);
+  } @else {
+    @return $a / $b;
+  }
+}
+
+// Private polyfill for the `list.slash` function from Sass to be used until we can update the
+// minimum required Sass version to 1.34.0 or above.
+// TODO: replace with `list.slash` eventually.
+@function slash($a, $b) {
+  @if (meta.function-exists('slash', 'list')) {
+    @return list.slash($a, $b);
+  } @else {
+    @return #{$a}#{' / '}#{$b};
+  }
 }

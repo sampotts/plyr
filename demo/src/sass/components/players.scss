@@ -31,6 +31,6 @@
   color: $color-gray-500;
 
   .icon {
-    margin-right: ceil($spacing-base / 6);
+    margin-right: div($spacing-base, 6);
   }
 }

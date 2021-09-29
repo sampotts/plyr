@@ -21,11 +21,10 @@
   overflow: hidden;
   position: relative;
   width: 100%;
-  height: 100%;
 }
 
 // Default to 16:9 ratio but this is set by JavaScript based on config
-$embed-padding: (math.div(100, 16) * 9);
+$embed-padding: (div(100, 16) * 9);
 
 .plyr__video-embed,
 .plyr__video-wrapper--fixed-ratio {
@@ -51,7 +50,7 @@ $embed-padding: (math.div(100, 16) * 9);
 // For Vimeo, if the full custom UI is supported
 .plyr--full-ui .plyr__video-embed > .plyr__video-embed__container {
   $height: 240;
-  $offset: to-percentage(math.div($height - $embed-padding, math.div($height, 50)));
+  $offset: to-percentage(div($height - $embed-padding, div($height, 50)));
   padding-bottom: to-percentage($height);
   position: relative;
   transform: translateY(-$offset);

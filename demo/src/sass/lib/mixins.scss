@@ -32,7 +32,7 @@
 // Leave <body> at 100%/16px
 // ---------------------------------------
 @function calculate-rem($size) {
-  $rem: $size / 16;
+  $rem: div($size, 16);
   @return #{$rem}rem;
 }
 

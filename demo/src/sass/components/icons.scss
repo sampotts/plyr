@@ -19,5 +19,5 @@ label svg {
 
 a .icon,
 .btn .icon {
-  margin-right: ($spacing-base / 2);
+  margin-right: div($spacing-base, 2);
 }
