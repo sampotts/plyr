@@ -2,6 +2,8 @@
 // Examples
 // ==========================================================================
 
+@use 'sass:math';
+
 // Example players
 .plyr {
   border-radius: $border-radius-large;
@@ -31,6 +33,6 @@
   color: $color-gray-500;
 
   .icon {
-    margin-right: div($spacing-base, 6);
+    margin-right: math.div($spacing-base, 6);
   }
 }
