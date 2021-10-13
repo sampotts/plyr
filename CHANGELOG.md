@@ -1,3 +1,18 @@
+### v3.6.9
+
+- Fix: SASS issue with division (thanks @ROL4ND909 and @le0pard)
+- Fix: Captions when switching sources (thanks @zexingguo)
+- Fix: Icons loading within iframes (thanks @ajgagnon)
+- Chore: Update TypeScript types (thanks @Jackie1210 and @AntLevin)
+- Fix: iOS fullscreen centering (thanks @hemratna)
+- Feat: Added getter and setter for preview thumbnails (thanks @Benny739)
+- Fix: Change fullscreen element to player rootnode (thanks @Walter van den Houten)
+- Fix: Fixed errors when Plyr instance is destroyed before constructor setTimeout() functions execute (thanks @emilis-ideait)
+- Fix: Invalid CSS selector syntax (thanks @BjornBrandewallNaviga)
+- Fix: Video height issues
+- Feat: Improve support for Vimeo private videos (thanks @Frosch)
+- Fix: YouTube duration issues (thanks @liesahead)
+
 ### v3.6.8
 
 - Typings: add FullscreenOptions.container to typing files (thanks @MeguminSama!)
