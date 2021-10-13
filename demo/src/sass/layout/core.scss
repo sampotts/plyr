@@ -2,6 +2,8 @@
 // Core
 // ==========================================================================
 
+@use 'sass:math';
+
 html,
 body {
   display: flex;
@@ -46,7 +48,7 @@ aside {
 
   .icon {
     fill: $color-twitter;
-    margin-right: ($spacing-base / 2);
+    margin-right: math.div($spacing-base, 2);
   }
 
   p {

@@ -1,3 +1,41 @@
+### v3.6.9
+
+- Fix: SASS issue with division (thanks @ROL4ND909 and @le0pard)
+- Fix: Captions when switching sources (thanks @zexingguo)
+- Fix: Icons loading within iframes (thanks @ajgagnon)
+- Chore: Update TypeScript types (thanks @Jackie1210 and @AntLevin)
+- Fix: iOS fullscreen centering (thanks @hemratna)
+- Feat: Added getter and setter for preview thumbnails (thanks @Benny739)
+- Fix: Change fullscreen element to player rootnode (thanks @Walter van den Houten)
+- Fix: Fixed errors when Plyr instance is destroyed before constructor setTimeout() functions execute (thanks @emilis-ideait)
+- Fix: Invalid CSS selector syntax (thanks @BjornBrandewallNaviga)
+- Fix: Video height issues
+- Feat: Improve support for Vimeo private videos (thanks @Frosch)
+- Fix: YouTube duration issues (thanks @liesahead)
+
+### v3.6.8
+
+- Typings: add FullscreenOptions.container to typing files (thanks @MeguminSama!)
+- Fix: added iPadOS detection to isIos util (thanks @Benny739!)
+- Fix: issues with Vimeo fullscreen
+
+### v3.6.7
+
+- Fix: remove regression caused by optional chaining and nullish coalescing in check for `window.CSS` check for aspect-ratio (fixes #2174)
+
+### v3.6.6
+
+- Improvements to how aspect ratio is handled. Use `aspect-ratio` CSS property instead of the legacy method (still used as fallback). Also automatically determined aspect ratios are rounded to the nearast standard ratio. This fixes issues with the YouTube embeds showing a 1-2px black bar.
+- Hide the YouTube poster image container when paused so that the controls underneath can be used.
+
+### v3.6.5
+
+- Migrate color formatting to colorette (thanks @jorgebucaran)
+- Fix: issue with IE detection
+- Fix: missing styles for embeds
+- Fix: regression regarding poster image
+- Add all required props to vimeo iframe allow attribute - fixes #2151 (thanks @didrip)
+
 ### v3.6.4
 
 - Remove unnecessary calc from media query (thanks @naomiaz)

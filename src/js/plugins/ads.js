@@ -213,8 +213,8 @@ class Ads {
       request.setAdWillPlayMuted(!this.player.muted);
 
       this.loader.requestAds(request);
-    } catch (e) {
-      this.onAdError(e);
+    } catch (error) {
+      this.onAdError(error);
     }
   };
 

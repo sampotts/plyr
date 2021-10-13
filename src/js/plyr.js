@@ -1,6 +1,6 @@
 // ==========================================================================
 // Plyr
-// plyr.js v3.6.4
+// plyr.js v3.6.9
 // https://github.com/sampotts/plyr
 // License: The MIT License (MIT)
 // ==========================================================================
@@ -29,7 +29,7 @@ import loadSprite from './utils/load-sprite';
 import { clamp } from './utils/numbers';
 import { cloneDeep, extend } from './utils/objects';
 import { silencePromise } from './utils/promise';
-import { getAspectRatio, reduceAspectRatio, setAspectRatio, validateRatio } from './utils/style';
+import { getAspectRatio, reduceAspectRatio, setAspectRatio, validateAspectRatio } from './utils/style';
 import { parseUrl } from './utils/urls';
 
 // Private properties
@@ -72,7 +72,7 @@ class Plyr {
       (() => {
         try {
           return JSON.parse(this.media.getAttribute('data-plyr-config'));
-        } catch (e) {
+        } catch (_) {
           return {};
         }
       })(),
@@ -918,12 +918,12 @@ class Plyr {
       return;
     }
 
-    if (!is.string(input) || !validateRatio(input)) {
+    if (!is.string(input) || !validateAspectRatio(input)) {
       this.debug.error(`Invalid aspect ratio specified (${input})`);
       return;
     }
 
-    this.config.ratio = input;
+    this.config.ratio = reduceAspectRatio(input);
 
     setAspectRatio.call(this);
   }
@@ -958,6 +958,7 @@ class Plyr {
    */
   set currentTrack(input) {
     captions.set.call(this, input, false);
+    captions.setup();
   }
 
   /**
@@ -1029,6 +1030,23 @@ class Plyr {
 
     // Chrome
     return this.media === document.pictureInPictureElement;
+  }
+
+  /**
+   * Sets the preview thubmnails for the current source
+   */
+  setPreviewThumbnails(thumbnailSource) {
+    if (this.previewThumbnails && this.previewThumbnails.loaded) {
+      this.previewThumbnails.destroy();
+      this.previewThumbnails = null;
+    }
+
+    Object.assign(this.config.previewThumbnails, thumbnailSource);
+
+    // Create new instance if it is still enabled
+    if (this.config.previewThumbnails.enabled) {
+      this.previewThumbnails = new PreviewThumbnails(this);
+    }
   }
 
   /**

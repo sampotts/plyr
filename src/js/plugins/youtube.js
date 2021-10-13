@@ -11,7 +11,7 @@ import loadImage from '../utils/load-image';
 import loadScript from '../utils/load-script';
 import { extend } from '../utils/objects';
 import { format, generateId } from '../utils/strings';
-import { setAspectRatio } from '../utils/style';
+import { roundAspectRatio, setAspectRatio } from '../utils/style';
 
 // Parse YouTube ID from URL
 function parseId(url) {
@@ -90,7 +90,7 @@ const youtube = {
           ui.setTitle.call(this);
 
           // Set aspect ratio
-          this.embed.ratio = [width, height];
+          this.embed.ratio = roundAspectRatio(width, height);
         }
 
         setAspectRatio.call(this);

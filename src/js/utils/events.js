@@ -19,7 +19,7 @@ const supportsPassiveListeners = (() => {
     });
     window.addEventListener('test', null, options);
     window.removeEventListener('test', null, options);
-  } catch (e) {
+  } catch (_) {
     // Do nothing
   }
 

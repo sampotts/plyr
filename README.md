@@ -134,13 +134,13 @@ See [initialising](#initialising) for more information on advanced setups.
 You can use our CDN (provided by [Fastly](https://www.fastly.com/)) for the JavaScript. There's 2 versions; one with and one without [polyfills](#polyfills). My recommendation would be to manage polyfills seperately as part of your application but to make life easier you can use the polyfilled build.
 
 ```html
-<script src="https://cdn.plyr.io/3.6.4/plyr.js"></script>
+<script src="https://cdn.plyr.io/3.6.9/plyr.js"></script>
 ```
 
 ...or...
 
 ```html
-<script src="https://cdn.plyr.io/3.6.4/plyr.polyfilled.js"></script>
+<script src="https://cdn.plyr.io/3.6.9/plyr.polyfilled.js"></script>
 ```
 
 ## CSS
@@ -154,13 +154,13 @@ Include the `plyr.css` stylsheet into your `<head>`.
 If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for the default CSS, you can use the following:
 
 ```html
-<link rel="stylesheet" href="https://cdn.plyr.io/3.6.4/plyr.css" />
+<link rel="stylesheet" href="https://cdn.plyr.io/3.6.9/plyr.css" />
 ```
 
 ## SVG Sprite
 
 The SVG sprite is loaded automatically from our CDN (provided by [Fastly](https://www.fastly.com/)). To change this, see the [options](#options) below. For
-reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.6.4/plyr.svg`.
+reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.6.9/plyr.svg`.
 
 # Ads
 
@@ -184,43 +184,43 @@ Here's a list of the properties and what they are used for:
 
 | Name                                           | Description                                                                                             | Default / Fallback                                                    |
 | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| `--plyr-color-main`                            | The primary UI color.                                                                                   | ![#f03c15](https://placehold.it/15/00b3ff/000000?text=+) `#00b3ff`    |
+| `--plyr-color-main`                            | The primary UI color.                                                                                   | ![#f03c15](https://place-hold.it/15/00b3ff/000000?text=+) `#00b3ff`    |
 | `--plyr-video-background`                      | The background color of video and poster wrappers for using alpha channel videos and poster images.     | `rgba(0, 0, 0, 1)`    |
 | `--plyr-tab-focus-color`                       | The color used for the dotted outline when an element is `:focus-visible` (equivalent) keyboard focus.  | `--plyr-color-main`                                                   |
-| `--plyr-badge-background`                      | The background color for badges in the menu.                                                            | ![#4a5464](https://placehold.it/15/4a5464/000000?text=+) `#4a5464`    |
-| `--plyr-badge-text-color`                      | The text color for badges.                                                                              | ![#ffffff](https://placehold.it/15/ffffff/000000?text=+) `#ffffff`    |
+| `--plyr-badge-background`                      | The background color for badges in the menu.                                                            | ![#4a5464](https://place-hold.it/15/4a5464/000000?text=+) `#4a5464`    |
+| `--plyr-badge-text-color`                      | The text color for badges.                                                                              | ![#ffffff](https://place-hold.it/15/ffffff/000000?text=+) `#ffffff`    |
 | `--plyr-badge-border-radius`                   | The border radius used for badges.                                                                      | `2px`                                                                 |
 | `--plyr-tab-focus-color`                       | The color used to highlight tab (keyboard) focus.                                                       | `--plyr-color-main`                                                   |
 | `--plyr-captions-background`                   | The color for the background of captions.                                                               | `rgba(0, 0, 0, 0.8)`                                                  |
-| `--plyr-captions-text-color`                   | The color used for the captions text.                                                                   | ![#ffffff](https://placehold.it/15/ffffff/000000?text=+) `#ffffff`    |
+| `--plyr-captions-text-color`                   | The color used for the captions text.                                                                   | ![#ffffff](https://place-hold.it/15/ffffff/000000?text=+) `#ffffff`    |
 | `--plyr-control-icon-size`                     | The size of the icons used in the controls.                                                             | `18px`                                                                |
 | `--plyr-control-spacing`                       | The space between controls (sometimes used in a multiple - e.g. `10px / 2 = 5px`).                      | `10px`                                                                |
 | `--plyr-control-padding`                       | The padding inside controls.                                                                            | `--plyr-control-spacing * 0.7` (`7px`)                                |
 | `--plyr-control-radius`                        | The border radius used on controls.                                                                     | `3px`                                                                 |
 | `--plyr-control-toggle-checked-background`     | The background color used for checked menu items.                                                       | `--plyr-color-main`                                                   |
 | `--plyr-video-controls-background`             | The background for the video controls.                                                                  | `linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75))`              |
-| `--plyr-video-control-color`                   | The text/icon color for video controls.                                                                 | ![#ffffff](https://placehold.it/15/ffffff/000000?text=+) `#ffffff`    |
-| `--plyr-video-control-color-hover`             | The text/icon color used when video controls are `:hover`, `:focus` and `:focus-visible` (equivalent).  | ![#ffffff](https://placehold.it/15/ffffff/000000?text=+) `#ffffff`    |
+| `--plyr-video-control-color`                   | The text/icon color for video controls.                                                                 | ![#ffffff](https://place-hold.it/15/ffffff/000000?text=+) `#ffffff`    |
+| `--plyr-video-control-color-hover`             | The text/icon color used when video controls are `:hover`, `:focus` and `:focus-visible` (equivalent).  | ![#ffffff](https://place-hold.it/15/ffffff/000000?text=+) `#ffffff`    |
 | `--plyr-video-control-background-hover`        | The background color used when video controls are `:hover`, `:focus` and `:focus-visible` (equivalent). | `--plyr-color-main`                                                   |
-| `--plyr-audio-controls-background`             | The background for the audio controls.                                                                  | ![#ffffff](https://placehold.it/15/ffffff/000000?text=+) `#ffffff`    |
-| `--plyr-audio-control-color`                   | The text/icon color for audio controls.                                                                 | ![#4a5464](https://placehold.it/15/4a5464/000000?text=+) `#4a5464`    |
-| `--plyr-audio-control-color-hover`             | The text/icon color used when audio controls are `:hover`, `:focus` and `:focus-visible` (equivalent).  | ![#ffffff](https://placehold.it/15/ffffff/000000?text=+) `#ffffff`    |
+| `--plyr-audio-controls-background`             | The background for the audio controls.                                                                  | ![#ffffff](https://place-hold.it/15/ffffff/000000?text=+) `#ffffff`    |
+| `--plyr-audio-control-color`                   | The text/icon color for audio controls.                                                                 | ![#4a5464](https://place-hold.it/15/4a5464/000000?text=+) `#4a5464`    |
+| `--plyr-audio-control-color-hover`             | The text/icon color used when audio controls are `:hover`, `:focus` and `:focus-visible` (equivalent).  | ![#ffffff](https://place-hold.it/15/ffffff/000000?text=+) `#ffffff`    |
 | `--plyr-audio-control-background-hover`        | The background color used when video controls are `:hover`, `:focus` and `:focus-visible` (equivalent). | `--plyr-color-main`                                                   |
 | `--plyr-menu-background`                       | The background color for menus.                                                                         | `rgba(255, 255, 255, 0.9)`                                            |
-| `--plyr-menu-color`                            | The text/icon color for menu items.                                                                     | ![#4a5464](https://placehold.it/15/4a5464/000000?text=+) `#4a5464`    |
+| `--plyr-menu-color`                            | The text/icon color for menu items.                                                                     | ![#4a5464](https://place-hold.it/15/4a5464/000000?text=+) `#4a5464`    |
 | `--plyr-menu-shadow`                           | The shadow used on menus.                                                                               | `0 1px 2px rgba(0, 0, 0, 0.15)`                                       |
 | `--plyr-menu-radius`                           | The border radius on the menu.                                                                          | `4px`                                                                 |
 | `--plyr-menu-arrow-size`                       | The size of the arrow on the bottom of the menu.                                                        | `6px`                                                                 |
-| `--plyr-menu-item-arrow-color`                 | The color of the arrows in the menu.                                                                    | ![#728197](https://placehold.it/15/728197/000000?text=+) `#728197`    |
+| `--plyr-menu-item-arrow-color`                 | The color of the arrows in the menu.                                                                    | ![#728197](https://place-hold.it/15/728197/000000?text=+) `#728197`    |
 | `--plyr-menu-item-arrow-size`                  | The size of the arrows in the menu.                                                                     | `4px`                                                                 |
-| `--plyr-menu-border-color`                     | The border color for the bottom of the back button in the top of the sub menu pages.                    | ![#dcdfe5](https://placehold.it/15/dcdfe5/000000?text=+) `#dcdfe5`    |
-| `--plyr-menu-border-shadow-color`              | The shadow below the border of the back button in the top of the sub menu pages.                        | ![#ffffff](https://placehold.it/15/ffffff/000000?text=+) `#ffffff`    |
+| `--plyr-menu-border-color`                     | The border color for the bottom of the back button in the top of the sub menu pages.                    | ![#dcdfe5](https://place-hold.it/15/dcdfe5/000000?text=+) `#dcdfe5`    |
+| `--plyr-menu-border-shadow-color`              | The shadow below the border of the back button in the top of the sub menu pages.                        | ![#ffffff](https://place-hold.it/15/ffffff/000000?text=+) `#ffffff`    |
 | `--plyr-progress-loading-size`                 | The size of the stripes in the loading state in the scrubber.                                           | `25px`                                                                |
 | `--plyr-progress-loading-background`           | The background color on the loading state in the scrubber.                                              | `rgba(35, 40, 47, 0.6)`                                               |
 | `--plyr-video-progress-buffered-background`    | The fill color for the buffer indication in the scrubber for video.                                     | `rgba(255, 255, 255, 0.25)`                                           |
 | `--plyr-audio-progress-buffered-background`    | The fill color for the buffer indication in the scrubber for audio.                                     | `rgba(193, 200, 209, 0.6)`                                            |
 | `--plyr-range-thumb-height`                    | The height of the scrubber handle/thumb.                                                                | `13px`                                                                |
-| `--plyr-range-thumb-background`                | The background of the scrubber handle/thumb.                                                            | ![#ffffff](https://placehold.it/15/ffffff/000000?text=+) `#ffffff`    |
+| `--plyr-range-thumb-background`                | The background of the scrubber handle/thumb.                                                            | ![#ffffff](https://place-hold.it/15/ffffff/000000?text=+) `#ffffff`    |
 | `--plyr-range-thumb-shadow`                    | The shadow of the scrubber handle/thumb.                                                                | `0 1px 1px rgba(215, 26, 18, 0.15), 0 0 0 1px rgba(215, 26, 18, 0.2)` |
 | `--plyr-range-thumb-active-shadow-width`       | The width of the shadow when the scrubber handle/thumb is `:active` (pressed).                          | `3px`                                                                 |
 | `--plyr-range-track-height`                    | The height of the scrubber/progress track.                                                              | `5px`                                                                 |
@@ -230,7 +230,7 @@ Here's a list of the properties and what they are used for:
 | `--plyr-audio-range-track-background`          | The background of the scrubber/progress.                                                                | `--plyr-video-progress-buffered-background`                           |
 | `--plyr-audio-range-thumb-active-shadow-color` | The color of the shadow when the audio scrubber handle/thumb is `:active` (pressed).                    | `rgba(215, 26, 18, 0.1)`                                              |
 | `--plyr-tooltip-background`                    | The background color for tooltips.                                                                      | `rgba(255, 255, 255, 0.9)`                                            |
-| `--plyr-tooltip-color`                         | The text color for tooltips.                                                                            | ![#4a5464](https://placehold.it/15/4a5464/000000?text=+) `#4a5464`    |
+| `--plyr-tooltip-color`                         | The text color for tooltips.                                                                            | ![#4a5464](https://place-hold.it/15/4a5464/000000?text=+) `#4a5464`    |
 | `--plyr-tooltip-padding`                       | The padding for tooltips.                                                                               | `calc(var(--plyr-control-spacing) / 2))`                              |
 | `--plyr-tooltip-arrow-size`                    | The size of the arrow under tooltips.                                                                   | `4px`                                                                 |
 | `--plyr-tooltip-radius`                        | The border radius on tooltips.                                                                          | `3px`                                                                 |
@@ -467,6 +467,7 @@ player.fullscreen.enter(); // Enter fullscreen
 | `fullscreen.exit()`        | -                | Exit fullscreen.                                                                                           |
 | `fullscreen.toggle()`      | -                | Toggle fullscreen.                                                                                         |
 | `airplay()`                | -                | Trigger the airplay dialog on supported devices.                                                           |
+| `setPreviewThumbnails(source: PreviewThumbnailsOptions)`                | -                | Sets the preview thubmnails for the current source.                                                           |
 | `toggleControls(toggle)`   | Boolean          | Toggle the controls (video only). Takes optional truthy value to force it on/off.                          |
 | `on(event, function)`      | String, Function | Add an event listener for the specified event.                                                             |
 | `once(event, function)`    | String, Function | Add an event listener for the specified event once.                                                        |
@@ -513,6 +514,7 @@ player.fullscreen.active; // false;
 | `loop`               | ✓      | ✓      | Gets or sets the current loop state of the player. The setter accepts a boolean.                                                                                                                                                                                                                                                       |
 | `source`             | ✓      | ✓      | Gets or sets the current source for the player. The setter accepts an object. See [source setter](#the-source-setter) below for examples.                                                                                                                                                                                              |
 | `poster`             | ✓      | ✓      | Gets or sets the current poster image for the player. The setter accepts a string; the URL for the updated poster image.                                                                                                                                                                                                               |
+| `previewThumbnails`  | ✓      | ✓      | Gets or sets the current preview Thubmnail source for the player. The setter accepts a string                                                                                                                                                                                                                                          |
 | `autoplay`           | ✓      | ✓      | Gets or sets the autoplay state of the player. The setter accepts a boolean.                                                                                                                                                                                                                                                           |
 | `currentTrack`       | ✓      | ✓      | Gets or sets the caption track by index. `-1` means the track is missing or captions is not active                                                                                                                                                                                                                                     |
 | `language`           | ✓      | ✓      | Gets or sets the preferred captions language for the player. The setter accepts an ISO two-letter language code. Support for the languages is dependent on the captions you include. If your captions don't have any language data, or if you have multiple tracks with the same language, you may want to use `currentTrack` instead. |
@@ -791,7 +793,7 @@ Some awesome folks have made plugins for CMSs and Components for JavaScript fram
 | Neos      | Jon Uhlmann ([@jonnitto](https://github.com/jonnitto))                    | [https://packagist.org/packages/jonnitto/plyr](https://packagist.org/packages/jonnitto/plyr) |
 | Kirby     | Dominik Pschenitschni ([@dpschen](https://github.com/dpschen))            | [https://github.com/dpschen/kirby-plyrtag](https://github.com/dpschen/kirby-plyrtag)         |
 | REDAXO    | FriendsOfRedaxo / skerbis ([@skerbis](https://friendsofredaxo.github.io)) | [https://github.com/FriendsOfREDAXO/plyr](https://github.com/FriendsOfREDAXO/plyr)           |
-| svelte-plyr    | Ben Woodward / benwoodward ([@benwoodward](https://github.com/benwoodward)) | [https://github.com/benwoodward](https://github.com/benwoodward)           |
+| svelte-plyr    | Ben Woodward / benwoodward ([@benwoodward](https://github.com/benwoodward)) | [https://github.com/benwoodward/svelte-plyr](https://github.com/benwoodward/svelte-plyr)           |
 
 # Issues
 
@@ -839,6 +841,7 @@ Plyr costs money to run, not only my time. I donate my time for free as I enjoy 
 - [Rutheneum-Bote](https://gymnasium-rutheneum.de/content/newspaper/kreativwettbewerb.php)
 - [pressakey.com | Blog-Magazin für Videospiele](https://pressakey.com)
 - [STROLLÿN: Work with a View](https://strollyn.com)
+- [CFDA Runway360](https://runway360.cfda.com/)
 
 If you want to be added to the list, open a pull request. It'd be awesome to see how you're using Plyr 😎
 

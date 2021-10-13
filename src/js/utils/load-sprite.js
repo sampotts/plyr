@@ -60,12 +60,16 @@ export default function loadSprite(url, id) {
         }
 
         if (useStorage) {
-          window.localStorage.setItem(
-            `${prefix}-${id}`,
-            JSON.stringify({
-              content: result,
-            }),
-          );
+          try {
+            window.localStorage.setItem(
+              `${prefix}-${id}`,
+              JSON.stringify({
+                content: result,
+              }),
+            );
+          } catch (_) {
+            // Do nothing
+          }
         }
 
         update(container, result);

@@ -212,6 +212,11 @@ declare class Plyr {
   airplay(): void;
 
   /**
+   * Sets the preview thubmnails for the current source.
+   */
+  setPreviewThumbnails(source: Plyr.PreviewThumbnailsOptions): void;
+
+  /**
    * Toggle the controls (video only). Takes optional truthy value to force it on/off.
    */
   toggleControls(toggle: boolean): void;
@@ -238,8 +243,10 @@ declare class Plyr {
 
   /**
    * Destroy lib instance
+   * @param {Function} callback - Callback for when destroy is complete
+   * @param {Boolean} soft - Whether it's a soft destroy (for source changes etc)
    */
-  destroy(): void;
+  destroy(callback?: (...args: any[]) => void, soft?: boolean): void;
 }
 
 declare namespace Plyr {
@@ -452,7 +459,7 @@ declare namespace Plyr {
      * Allows binding of event listeners to the controls before the default handlers. See the defaults.js for available listeners.
      * If your handler prevents default on the event (event.preventDefault()), the default handler will not fire.
      */
-    listeners?: { [key: string]: (error: PlyrEvent) => void };
+    listeners?: {[key: string]: (error: PlyrEvent) => void};
 
     /**
      * active: Toggles if captions should be active by default. language: Sets the default language to load (if available). 'auto' uses the browser language.
@@ -526,7 +533,8 @@ declare namespace Plyr {
 
   interface AdOptions {
     enabled: boolean;
-    publisherId: string;
+    publisherId?: string;
+    tagUrl?: string;
   }
 
   interface SpeedOptions {
@@ -616,6 +624,11 @@ declare namespace Plyr {
      * Booleans are converted to HTML5 value-less attributes.
      */
     tracks?: Track[];
+
+    /**
+     * Enable or disable preview thumbnails for current source
+     */
+    previewThumbnails?: Plyr.PreviewThumbnailsOptions;
   }
 
   interface Source {
@@ -654,7 +667,7 @@ declare namespace Plyr {
   }
 
   interface PlyrEvent extends CustomEvent {
-    readonly detail: { readonly plyr: Plyr };
+    readonly detail: {readonly plyr: Plyr};
   }
 
   enum YoutubeState {

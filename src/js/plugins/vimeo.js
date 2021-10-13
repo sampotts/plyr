@@ -11,7 +11,7 @@ import fetch from '../utils/fetch';
 import is from '../utils/is';
 import loadScript from '../utils/load-script';
 import { format, stripHTML } from '../utils/strings';
-import { setAspectRatio } from '../utils/style';
+import { roundAspectRatio, setAspectRatio } from '../utils/style';
 import { buildUrlParams } from '../utils/urls';
 
 // Parse Vimeo ID from URL
@@ -37,14 +37,10 @@ function parseHash(url) {
    *  - video/{id}/{hash}
    * If matched, the hash is available in the named group `hash`
    */
-  const regex = /^.*(?:vimeo.com\/|video\/)(?:\d+)(?:\?.*\&*h=|\/)+(?<hash>[\d,a-f]+)/
-  const found = url.match(regex)
+  const regex = /^.*(?:vimeo.com\/|video\/)(?:\d+)(?:\?.*&*h=|\/)+(?<hash>[\d,a-f]+)/;
+  const found = url.match(regex);
 
-  if (found) {
-    return found.groups.hash
-  }
-
-  return null
+  return found ? found.groups.hash : null;
 }
 
 // Set playback state and trigger change (only on actual change)
@@ -90,19 +86,18 @@ const vimeo = {
     const player = this;
     const config = player.config.vimeo;
     const { premium, referrerPolicy, ...frameParams } = config;
-
     // Get the source URL or ID
     let source = player.media.getAttribute('src');
-    let hash = ''
+    let hash = '';
     // Get from <div> if needed
     if (is.empty(source)) {
       source = player.media.getAttribute(player.config.attributes.embed.id);
       // hash can also be set as attribute on the <div>
       hash = player.media.getAttribute(player.config.attributes.embed.hash);
     } else {
-      hash = parseHash(source)
+      hash = parseHash(source);
     }
-    const hashParam = (!!hash) ? {h: hash} : {}
+    const hashParam = hash ? { h: hash } : {};
 
     // If the owner has a pro or premium account then we can hide controls etc
     if (premium) {
@@ -130,7 +125,10 @@ const vimeo = {
     const src = format(player.config.urls.vimeo.iframe, id, params);
     iframe.setAttribute('src', src);
     iframe.setAttribute('allowfullscreen', '');
-    iframe.setAttribute('allow', ['autoplay', 'fullscreen', 'picture-in-picture'].join('; '));
+    iframe.setAttribute(
+      'allow',
+      ['autoplay', 'fullscreen', 'picture-in-picture', 'encrypted-media', 'accelerometer', 'gyroscope'].join('; '),
+    );
 
     // Set the referrer policy if required
     if (!is.empty(referrerPolicy)) {
@@ -317,7 +315,7 @@ const vimeo = {
     // Set aspect ratio based on video size
     Promise.all([player.embed.getVideoWidth(), player.embed.getVideoHeight()]).then((dimensions) => {
       const [width, height] = dimensions;
-      player.embed.ratio = [width, height];
+      player.embed.ratio = roundAspectRatio(width, height);
       setAspectRatio.call(this);
     });
 

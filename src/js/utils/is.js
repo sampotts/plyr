@@ -51,7 +51,7 @@ const isUrl = (input) => {
 
   try {
     return !isEmpty(new URL(string).hostname);
-  } catch (e) {
+  } catch (_) {
     return false;
   }
 };

@@ -13,10 +13,10 @@ const babel = require('rollup-plugin-babel');
 const commonjs = require('rollup-plugin-commonjs');
 const resolve = require('rollup-plugin-node-resolve');
 // CSS
-const sass = require('gulp-sass');
+const sass = require('gulp-sass')(require('sass'));
 const postcss = require('gulp-postcss');
 const autoprefixer = require('autoprefixer');
-const clean = require('postcss-clean');
+const cssnano = require('cssnano');
 const customprops = require('postcss-custom-properties');
 // Images
 const svgstore = require('gulp-svgstore');
@@ -158,7 +158,15 @@ Object.entries(build.css).forEach(([filename, entry]) => {
       .src(src)
       .pipe(plumber())
       .pipe(sass())
-      .pipe(postcss([customprops(), autoprefixer(), clean()]))
+      .pipe(
+        postcss([
+          customprops(),
+          autoprefixer(),
+          cssnano({
+            preset: 'default',
+          }),
+        ]),
+      )
       .pipe(size(sizeOptions))
       .pipe(gulp.dest(dist)),
   );

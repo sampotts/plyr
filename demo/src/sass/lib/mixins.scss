@@ -2,6 +2,8 @@
 // Mixins
 // ==========================================================================
 
+@use 'sass:math';
+
 // Convert a <button> into an <a>
 // ---------------------------------------
 @mixin cancel-button-styles() {
@@ -32,7 +34,7 @@
 // Leave <body> at 100%/16px
 // ---------------------------------------
 @function calculate-rem($size) {
-  $rem: $size / 16;
+  $rem: math.div($size, 16);
   @return #{$rem}rem;
 }
 

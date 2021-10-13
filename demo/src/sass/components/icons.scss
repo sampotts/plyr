@@ -2,6 +2,8 @@
 // Icons
 // ==========================================================================
 
+@use 'sass:math';
+
 // Base size icon styles
 .icon {
   fill: currentColor;
@@ -19,5 +21,5 @@ label svg {
 
 a .icon,
 .btn .icon {
-  margin-right: ($spacing-base / 2);
+  margin-right: math.div($spacing-base, 4);
 }

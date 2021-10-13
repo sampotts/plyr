@@ -26,7 +26,7 @@ class Storage {
       window.localStorage.removeItem(test);
 
       return true;
-    } catch (e) {
+    } catch (_) {
       return false;
     }
   }
@@ -70,7 +70,11 @@ class Storage {
     extend(storage, object);
 
     // Update storage
-    window.localStorage.setItem(this.key, JSON.stringify(storage));
+    try {
+      window.localStorage.setItem(this.key, JSON.stringify(storage));
+    } catch (_) {
+      // Do nothing
+    }
   };
 }
 
