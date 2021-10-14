@@ -463,6 +463,9 @@ player.fullscreen.enter(); // Enter fullscreen
 | `increaseVolume(step)`     | Number           | Increase volume by the specified step. If no parameter is passed, the default step will be used.           |
 | `decreaseVolume(step)`     | Number           | Increase volume by the specified step. If no parameter is passed, the default step will be used.           |
 | `toggleCaptions(toggle)`   | Boolean          | Toggle captions display. If no parameter is passed, it will toggle based on current status.                |
+| `trim.enter()`             | -                | Enter Trimming tool.                                                                                       |
+| `trim.exit()`              | -                | Exit Trimming tool.                                                                                        |
+| `trim.toggle()`            | -                | Toggle Trimming tool.                                                                                      |
 | `fullscreen.enter()`       | -                | Enter fullscreen. If fullscreen is not supported, a fallback "full window/viewport" is used instead.       |
 | `fullscreen.exit()`        | -                | Exit fullscreen.                                                                                           |
 | `fullscreen.toggle()`      | -                | Toggle fullscreen.                                                                                         |
@@ -523,6 +526,8 @@ player.fullscreen.active; // false;
 | `pip`&sup1;          | ✓      | ✓      | Gets or sets the picture-in-picture state of the player. The setter accepts a boolean. This currently only supported on Safari 10+ (on MacOS Sierra+ and iOS 10+) and Chrome 70+.                                                                                                                                                      |
 | `ratio`              | ✓      | ✓      | Gets or sets the video aspect ratio. The setter accepts a string in the same format as the `ratio` option.                                                                                                                                                                                                                             |
 | `download`           | ✓      | ✓      | Gets or sets the URL for the download button. The setter accepts a string containing a valid absolute URL.                                                                                                                                                                                                                             |
+| `trim.startTime`     | ✓      | ✓      | Gets or sets the trimming range start time. The setter accepts a float in seconds.                                                                                                                                                                                                                                                     |
+| `trim.endTime`       | ✓      | ✓      | Gets or sets the trimming range end time. The setter accepts a float in seconds.                                                                                                                                                                                                                                                       |
 
 1.  HTML5 only
 
@@ -679,6 +684,9 @@ player.on('ready', event => {
 | `waiting`        | Sent when the requested operation (such as playback) is delayed pending the completion of another operation (such as a seek).                                                                                                                                                                                                                  |
 | `emptied`        | he media has become empty; for example, this event is sent if the media has already been loaded (or partially loaded), and the `load()` method is called to reload it.                                                                                                                                                                         |
 | `cuechange`      | Sent when a `TextTrack` has changed the currently displaying cues.                                                                                                                                                                                                                                                                             |
+| `entertrim`      | Sent when the player enters the trimming tool.                                                                                                                                                                                                                                                                                                 |
+| `exittrim`       | Sent when the player exits the trimming tool mode.                                                                                                                                                                                                                                                                                             |
+| `trimchange`     | Sent when the trimming region has changed.                                                                                                                                                                                                                                                                                                     |
 | `error`          | Sent when an error occurs. The element's `error` attribute contains more information.                                                                                                                                                                                                                                                          |
 
 ### YouTube only
@@ -720,6 +728,7 @@ document then the shortcuts will work when any element has focus, apart from an 
 | `F`        | Toggle fullscreen                      |
 | `C`        | Toggle captions                        |
 | `L`        | Toggle loop                            |
+| `T`        | Toggle trimming tool                   |
 
 # Preview thumbnails
 
@@ -730,6 +739,10 @@ You can see the example VTT files [here](https://cdn.plyr.io/static/demo/thumbs/
 # Fullscreen
 
 Fullscreen in Plyr is supported by all browsers that [currently support it](http://caniuse.com/#feat=fullscreen).
+
+# Trimming
+
+It's possible to create a trim region from your video using the trim mode. This is useful when creating clips or repeating loops. The 'trimchange' event will give you the start and end time of the selected region.
 
 # Browser support
 

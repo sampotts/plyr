@@ -131,6 +131,11 @@ class Listeners {
           player.rewind();
           break;
 
+        case 84:
+          // T key
+          player.trim.toggle();
+          break;
+
         case 70:
           // F key
           player.fullscreen.toggle();
@@ -616,6 +621,16 @@ class Listeners {
       'download',
     );
 
+    // Trim toggle
+    this.bind(
+      elements.buttons.trim,
+      'click',
+      () => {
+        player.trim.toggle();
+      },
+      'trim',
+    );
+
     // Fullscreen toggle
     this.bind(
       elements.buttons.fullscreen,
@@ -795,6 +810,24 @@ class Listeners {
 
       if (previewThumbnails && previewThumbnails.loaded) {
         previewThumbnails.endScrubbing(event);
+      }
+    });
+
+    // Move trim handles if selected
+    this.bind(elements.controls, 'mousemove touchmove', event => {
+      const { trim } = player;
+
+      if (trim && trim.editing) {
+        trim.setTrimLength(event);
+      }
+    });
+
+    // Stop trimming when handle is no longer selected
+    this.bind(elements.controls, 'mouseup touchend', event => {
+      const { trim } = player;
+
+      if (trim && trim.editing) {
+        trim.setEditing(event);
       }
     });
 

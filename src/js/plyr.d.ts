@@ -263,6 +263,8 @@ declare namespace Plyr {
     seeked: PlyrEvent;
     ratechange: PlyrEvent;
     ended: PlyrEvent;
+    entertrim: PlyrEvent;
+    exitTrim: PlyrEvent;
     enterfullscreen: PlyrEvent;
     exitfullscreen: PlyrEvent;
     captionsenabled: PlyrEvent;
@@ -468,6 +470,11 @@ declare namespace Plyr {
     captions?: CaptionOptions;
 
     /**
+     * enabled: Toggles whether trimming should be enabled.
+     */
+    trim?: TrimOptions;
+
+    /**
      * enabled: Toggles whether fullscreen should be enabled. fallback: Allow fallback to a full-window solution.
      * iosNative: whether to use native iOS fullscreen when entering fullscreen (no custom controls)
      */
@@ -550,6 +557,17 @@ declare namespace Plyr {
   interface TooltipOptions {
     controls?: boolean;
     seek?: boolean;
+  }
+
+  interface TrimOptions {
+    enabled?: boolean;
+    active?: boolean;
+    trimTime?: TrimTime;
+  }
+
+  interface TrimTime {
+    startTime: number;
+    endTime: number;
   }
 
   interface FullScreenOptions {

@@ -110,6 +110,11 @@ const defaults = {
     update: false,
   },
 
+  // Trim settings
+  trim: {
+    enabled: true, // Allow trim?
+  },
+
   // Fullscreen settings
   fullscreen: {
     enabled: true, // Allow fullscreen?
@@ -143,6 +148,7 @@ const defaults = {
     'pip',
     'airplay',
     // 'download',
+    // 'trim',
     'fullscreen',
   ],
   settings: ['captions', 'quality', 'speed'],
@@ -166,6 +172,10 @@ const defaults = {
     enableCaptions: 'Enable captions',
     disableCaptions: 'Disable captions',
     download: 'Download',
+    enterTrim: 'Enter trim',
+    exitTrim: 'Exit trim',
+    trimStart: 'Trim Start',
+    trimEnd: 'Trim End',
     enterFullscreen: 'Enter fullscreen',
     exitFullscreen: 'Exit fullscreen',
     frameTitle: 'Player for {title}',
@@ -222,6 +232,7 @@ const defaults = {
     mute: null,
     volume: null,
     captions: null,
+    trim: null,
     download: null,
     fullscreen: null,
     pip: null,
@@ -284,6 +295,11 @@ const defaults = {
     'adsallcomplete',
     'adsimpression',
     'adsclick',
+
+    // Trimming
+    'entertrim',
+    'exittrim',
+    'trimchange',
   ],
 
   // Selectors
@@ -305,6 +321,7 @@ const defaults = {
       mute: '[data-plyr="mute"]',
       captions: '[data-plyr="captions"]',
       download: '[data-plyr="download"]',
+      trim: '[data-plyr="trim"]',
       fullscreen: '[data-plyr="fullscreen"]',
       pip: '[data-plyr="pip"]',
       airplay: '[data-plyr="airplay"]',
@@ -367,6 +384,16 @@ const defaults = {
     captions: {
       enabled: 'plyr--captions-enabled',
       active: 'plyr--captions-active',
+    },
+    trim: {
+      enabled: 'plyr--trim-enabled',
+      active: 'plyr--trim-active',
+      // Trim tool
+      trimTool: 'plyr__trim-tool',
+      leftThumb: 'plyr__trim-tool__thumb-left',
+      rightThumb: 'plyr__trim-tool__thumb-right',
+      timeContainer: 'plyr__trim-tool__time-container',
+      timeContainerShown: 'plyr__trim-tool__time-container--is-shown',
     },
     fullscreen: {
       enabled: 'plyr--fullscreen-enabled',

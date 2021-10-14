@@ -28,6 +28,7 @@ controls: [
     'settings', // Settings menu
     'pip', // Picture-in-picture (currently Safari only)
     'airplay', // Airplay (currently Safari only)
+    'trim', // Trim Control
     'download', // Show a download button with a link to either the current source or a custom URL you specify in your options
     'fullscreen', // Toggle fullscreen
 ];
@@ -56,6 +57,10 @@ i18n: {
     unmute: 'Unmute',
     enableCaptions: 'Enable captions',
     disableCaptions: 'Disable captions',
+    enterTrim: 'Enter trim',
+    exitTrim: 'Exit trim',
+    trimStart: 'Trim Start',
+    trimEnd: 'Trim End',
     enterFullscreen: 'Enter fullscreen',
     exitFullscreen: 'Exit fullscreen',
     frameTitle: 'Player for {title}',
