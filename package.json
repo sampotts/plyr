@@ -35,7 +35,7 @@
     "@babel/core": "^7.16.0",
     "@babel/plugin-proposal-class-properties": "^7.16.0",
     "@babel/preset-env": "^7.16.0",
-    "autoprefixer": "^10.3.4",
+    "autoprefixer": "^10.4.0",
     "del": "^6.0.0",
     "eslint": "^7.32.0",
     "gulp": "^4.0.2",
