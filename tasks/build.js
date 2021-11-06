@@ -11,13 +11,12 @@ const rollup = require('gulp-better-rollup');
 const commonjs = require('rollup-plugin-commonjs');
 const resolve = require('rollup-plugin-node-resolve');
 // CSS
-const sass = require('gulp-sass');
+const sass = require('gulp-sass')(require('node-sass'));
 const postcss = require('gulp-postcss');
 const autoprefixer = require('autoprefixer');
 const customprops = require('postcss-custom-properties');
 // Images
 const svgstore = require('gulp-svgstore');
-const imagemin = require('gulp-imagemin');
 // Utils
 const del = require('del');
 const filter = require('gulp-filter');
@@ -122,13 +121,6 @@ Object.entries(build.sprite).forEach(([filename, entry]) => {
     gulp
       .src(src)
       .pipe(plumber())
-      .pipe(
-        imagemin([
-          imagemin.svgo({
-            plugins: [{ removeViewBox: false }],
-          }),
-        ]),
-      )
       .pipe(svgstore())
       .pipe(rename({ basename: path.parse(filename).name }))
       .pipe(gulp.dest(dist)),
