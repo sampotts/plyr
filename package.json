@@ -61,9 +61,9 @@
     "rangetouch": "^2.0.1"
   },
   "resolutions": {
-    "glob-parent": "^6.0.1",
+    "glob-parent": "^6.0.2",
     "postcss": "^8.3.11",
-    "semver-regex": "^4.0.1",
+    "semver-regex": "^4.0.2",
     "set-value": "^4.0.1",
     "tar": "^6.1.11",
     "trim-newlines": "^4.0.2",
