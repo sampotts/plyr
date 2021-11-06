@@ -61,6 +61,7 @@
     "rangetouch": "^2.0.1"
   },
   "resolutions": {
+    "ansi-regex": "^5.0.1",
     "glob-parent": "^6.0.2",
     "postcss": "^8.3.11",
     "semver-regex": "^4.0.2",
