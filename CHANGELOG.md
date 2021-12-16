@@ -1,3 +1,8 @@
+### v3.6.10
+
+- Fix: Use `list.slash` instead of deprecated syntax
+- Chore: Clean up demo
+
 ### v3.6.9
 
 - Fix: SASS issue with division (thanks @ROL4ND909 and @le0pard)
