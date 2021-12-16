@@ -131,7 +131,7 @@ Alternatively you can include the `plyr.js` script before the closing `</body>` 
 
 See [initialising](#initialising) for more information on advanced setups.
 
-You can use our CDN (provided by [Fastly](https://www.fastly.com/)) for the JavaScript. There's 2 versions; one with and one without [polyfills](#polyfills). My recommendation would be to manage polyfills seperately as part of your application but to make life easier you can use the polyfilled build.
+You can use our CDN (provided by [Fastly](https://www.fastly.com/)) for the JavaScript. There's 2 versions; one with and one without [polyfills](#polyfills). My recommendation would be to manage polyfills separately as part of your application but to make life easier you can use the polyfilled build.
 
 ```html
 <script src="https://cdn.plyr.io/3.6.10/plyr.js"></script>
@@ -145,7 +145,7 @@ You can use our CDN (provided by [Fastly](https://www.fastly.com/)) for the Java
 
 ## CSS
 
-Include the `plyr.css` stylsheet into your `<head>`.
+Include the `plyr.css` stylesheet into your `<head>`.
 
 ```html
 <link rel="stylesheet" href="path/to/plyr.css" />
@@ -184,43 +184,43 @@ Here's a list of the properties and what they are used for:
 
 | Name                                           | Description                                                                                             | Default / Fallback                                                    |
 | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| `--plyr-color-main`                            | The primary UI color.                                                                                   | ![#f03c15](https://place-hold.it/15/00b3ff/000000?text=+) `#00b3ff`    |
-| `--plyr-video-background`                      | The background color of video and poster wrappers for using alpha channel videos and poster images.     | `rgba(0, 0, 0, 1)`    |
+| `--plyr-color-main`                            | The primary UI color.                                                                                   | ![#f03c15](https://place-hold.it/15/00b3ff/000000?text=+) `#00b3ff`   |
+| `--plyr-video-background`                      | The background color of video and poster wrappers for using alpha channel videos and poster images.     | `rgba(0, 0, 0, 1)`                                                    |
 | `--plyr-tab-focus-color`                       | The color used for the dotted outline when an element is `:focus-visible` (equivalent) keyboard focus.  | `--plyr-color-main`                                                   |
-| `--plyr-badge-background`                      | The background color for badges in the menu.                                                            | ![#4a5464](https://place-hold.it/15/4a5464/000000?text=+) `#4a5464`    |
-| `--plyr-badge-text-color`                      | The text color for badges.                                                                              | ![#ffffff](https://place-hold.it/15/ffffff/000000?text=+) `#ffffff`    |
+| `--plyr-badge-background`                      | The background color for badges in the menu.                                                            | ![#4a5464](https://place-hold.it/15/4a5464/000000?text=+) `#4a5464`   |
+| `--plyr-badge-text-color`                      | The text color for badges.                                                                              | ![#ffffff](https://place-hold.it/15/ffffff/000000?text=+) `#ffffff`   |
 | `--plyr-badge-border-radius`                   | The border radius used for badges.                                                                      | `2px`                                                                 |
 | `--plyr-tab-focus-color`                       | The color used to highlight tab (keyboard) focus.                                                       | `--plyr-color-main`                                                   |
 | `--plyr-captions-background`                   | The color for the background of captions.                                                               | `rgba(0, 0, 0, 0.8)`                                                  |
-| `--plyr-captions-text-color`                   | The color used for the captions text.                                                                   | ![#ffffff](https://place-hold.it/15/ffffff/000000?text=+) `#ffffff`    |
+| `--plyr-captions-text-color`                   | The color used for the captions text.                                                                   | ![#ffffff](https://place-hold.it/15/ffffff/000000?text=+) `#ffffff`   |
 | `--plyr-control-icon-size`                     | The size of the icons used in the controls.                                                             | `18px`                                                                |
 | `--plyr-control-spacing`                       | The space between controls (sometimes used in a multiple - e.g. `10px / 2 = 5px`).                      | `10px`                                                                |
 | `--plyr-control-padding`                       | The padding inside controls.                                                                            | `--plyr-control-spacing * 0.7` (`7px`)                                |
 | `--plyr-control-radius`                        | The border radius used on controls.                                                                     | `3px`                                                                 |
 | `--plyr-control-toggle-checked-background`     | The background color used for checked menu items.                                                       | `--plyr-color-main`                                                   |
 | `--plyr-video-controls-background`             | The background for the video controls.                                                                  | `linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75))`              |
-| `--plyr-video-control-color`                   | The text/icon color for video controls.                                                                 | ![#ffffff](https://place-hold.it/15/ffffff/000000?text=+) `#ffffff`    |
-| `--plyr-video-control-color-hover`             | The text/icon color used when video controls are `:hover`, `:focus` and `:focus-visible` (equivalent).  | ![#ffffff](https://place-hold.it/15/ffffff/000000?text=+) `#ffffff`    |
+| `--plyr-video-control-color`                   | The text/icon color for video controls.                                                                 | ![#ffffff](https://place-hold.it/15/ffffff/000000?text=+) `#ffffff`   |
+| `--plyr-video-control-color-hover`             | The text/icon color used when video controls are `:hover`, `:focus` and `:focus-visible` (equivalent).  | ![#ffffff](https://place-hold.it/15/ffffff/000000?text=+) `#ffffff`   |
 | `--plyr-video-control-background-hover`        | The background color used when video controls are `:hover`, `:focus` and `:focus-visible` (equivalent). | `--plyr-color-main`                                                   |
-| `--plyr-audio-controls-background`             | The background for the audio controls.                                                                  | ![#ffffff](https://place-hold.it/15/ffffff/000000?text=+) `#ffffff`    |
-| `--plyr-audio-control-color`                   | The text/icon color for audio controls.                                                                 | ![#4a5464](https://place-hold.it/15/4a5464/000000?text=+) `#4a5464`    |
-| `--plyr-audio-control-color-hover`             | The text/icon color used when audio controls are `:hover`, `:focus` and `:focus-visible` (equivalent).  | ![#ffffff](https://place-hold.it/15/ffffff/000000?text=+) `#ffffff`    |
+| `--plyr-audio-controls-background`             | The background for the audio controls.                                                                  | ![#ffffff](https://place-hold.it/15/ffffff/000000?text=+) `#ffffff`   |
+| `--plyr-audio-control-color`                   | The text/icon color for audio controls.                                                                 | ![#4a5464](https://place-hold.it/15/4a5464/000000?text=+) `#4a5464`   |
+| `--plyr-audio-control-color-hover`             | The text/icon color used when audio controls are `:hover`, `:focus` and `:focus-visible` (equivalent).  | ![#ffffff](https://place-hold.it/15/ffffff/000000?text=+) `#ffffff`   |
 | `--plyr-audio-control-background-hover`        | The background color used when video controls are `:hover`, `:focus` and `:focus-visible` (equivalent). | `--plyr-color-main`                                                   |
 | `--plyr-menu-background`                       | The background color for menus.                                                                         | `rgba(255, 255, 255, 0.9)`                                            |
-| `--plyr-menu-color`                            | The text/icon color for menu items.                                                                     | ![#4a5464](https://place-hold.it/15/4a5464/000000?text=+) `#4a5464`    |
+| `--plyr-menu-color`                            | The text/icon color for menu items.                                                                     | ![#4a5464](https://place-hold.it/15/4a5464/000000?text=+) `#4a5464`   |
 | `--plyr-menu-shadow`                           | The shadow used on menus.                                                                               | `0 1px 2px rgba(0, 0, 0, 0.15)`                                       |
 | `--plyr-menu-radius`                           | The border radius on the menu.                                                                          | `4px`                                                                 |
 | `--plyr-menu-arrow-size`                       | The size of the arrow on the bottom of the menu.                                                        | `6px`                                                                 |
-| `--plyr-menu-item-arrow-color`                 | The color of the arrows in the menu.                                                                    | ![#728197](https://place-hold.it/15/728197/000000?text=+) `#728197`    |
+| `--plyr-menu-item-arrow-color`                 | The color of the arrows in the menu.                                                                    | ![#728197](https://place-hold.it/15/728197/000000?text=+) `#728197`   |
 | `--plyr-menu-item-arrow-size`                  | The size of the arrows in the menu.                                                                     | `4px`                                                                 |
-| `--plyr-menu-border-color`                     | The border color for the bottom of the back button in the top of the sub menu pages.                    | ![#dcdfe5](https://place-hold.it/15/dcdfe5/000000?text=+) `#dcdfe5`    |
-| `--plyr-menu-border-shadow-color`              | The shadow below the border of the back button in the top of the sub menu pages.                        | ![#ffffff](https://place-hold.it/15/ffffff/000000?text=+) `#ffffff`    |
+| `--plyr-menu-border-color`                     | The border color for the bottom of the back button in the top of the sub menu pages.                    | ![#dcdfe5](https://place-hold.it/15/dcdfe5/000000?text=+) `#dcdfe5`   |
+| `--plyr-menu-border-shadow-color`              | The shadow below the border of the back button in the top of the sub menu pages.                        | ![#ffffff](https://place-hold.it/15/ffffff/000000?text=+) `#ffffff`   |
 | `--plyr-progress-loading-size`                 | The size of the stripes in the loading state in the scrubber.                                           | `25px`                                                                |
 | `--plyr-progress-loading-background`           | The background color on the loading state in the scrubber.                                              | `rgba(35, 40, 47, 0.6)`                                               |
 | `--plyr-video-progress-buffered-background`    | The fill color for the buffer indication in the scrubber for video.                                     | `rgba(255, 255, 255, 0.25)`                                           |
 | `--plyr-audio-progress-buffered-background`    | The fill color for the buffer indication in the scrubber for audio.                                     | `rgba(193, 200, 209, 0.6)`                                            |
 | `--plyr-range-thumb-height`                    | The height of the scrubber handle/thumb.                                                                | `13px`                                                                |
-| `--plyr-range-thumb-background`                | The background of the scrubber handle/thumb.                                                            | ![#ffffff](https://place-hold.it/15/ffffff/000000?text=+) `#ffffff`    |
+| `--plyr-range-thumb-background`                | The background of the scrubber handle/thumb.                                                            | ![#ffffff](https://place-hold.it/15/ffffff/000000?text=+) `#ffffff`   |
 | `--plyr-range-thumb-shadow`                    | The shadow of the scrubber handle/thumb.                                                                | `0 1px 1px rgba(215, 26, 18, 0.15), 0 0 0 1px rgba(215, 26, 18, 0.2)` |
 | `--plyr-range-thumb-active-shadow-width`       | The width of the shadow when the scrubber handle/thumb is `:active` (pressed).                          | `3px`                                                                 |
 | `--plyr-range-track-height`                    | The height of the scrubber/progress track.                                                              | `5px`                                                                 |
@@ -230,7 +230,7 @@ Here's a list of the properties and what they are used for:
 | `--plyr-audio-range-track-background`          | The background of the scrubber/progress.                                                                | `--plyr-video-progress-buffered-background`                           |
 | `--plyr-audio-range-thumb-active-shadow-color` | The color of the shadow when the audio scrubber handle/thumb is `:active` (pressed).                    | `rgba(215, 26, 18, 0.1)`                                              |
 | `--plyr-tooltip-background`                    | The background color for tooltips.                                                                      | `rgba(255, 255, 255, 0.9)`                                            |
-| `--plyr-tooltip-color`                         | The text color for tooltips.                                                                            | ![#4a5464](https://place-hold.it/15/4a5464/000000?text=+) `#4a5464`    |
+| `--plyr-tooltip-color`                         | The text color for tooltips.                                                                            | ![#4a5464](https://place-hold.it/15/4a5464/000000?text=+) `#4a5464`   |
 | `--plyr-tooltip-padding`                       | The padding for tooltips.                                                                               | `calc(var(--plyr-control-spacing) / 2))`                              |
 | `--plyr-tooltip-arrow-size`                    | The size of the arrow under tooltips.                                                                   | `4px`                                                                 |
 | `--plyr-tooltip-radius`                        | The border radius on tooltips.                                                                          | `3px`                                                                 |
@@ -267,9 +267,7 @@ You can set them in your CSS for all players:
 ...or in your HTML:
 
 ```html
-<video class="player" style="--plyr-color-main: #1ac266;">
-    ...
-</video>
+<video class="player" style="--plyr-color-main: #1ac266;">...</video>
 ```
 
 ### SASS
@@ -344,7 +342,7 @@ The HTMLElement or string selector can be the target `<video>`, `<audio>`, or `<
 You have two choices here. You can either use a simple array loop to map the constructor:
 
 ```javascript
-const players = Array.from(document.querySelectorAll('.js-player')).map(p => new Plyr(p));
+const players = Array.from(document.querySelectorAll('.js-player')).map((p) => new Plyr(p));
 ```
 
 ...or use a static method where you can pass a [CSS string selector](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors), a [NodeList](https://developer.mozilla.org/en-US/docs/Web/API/NodeList), an [Array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array) of [HTMLElement](https://developer.mozilla.org/en/docs/Web/API/HTMLElement), or a [JQuery](https://jquery.com) object:
@@ -400,7 +398,7 @@ Note the single quotes encapsulating the JSON and double quotes on the object ke
 | `invertTime`         | Boolean                    | `true`                                                                                                                         | Display the current time as a countdown rather than an incremental counter.                                                                                                                                                                                                                                                                                                                             |
 | `toggleInvert`       | Boolean                    | `true`                                                                                                                         | Allow users to click to toggle the above.                                                                                                                                                                                                                                                                                                                                                               |
 | `listeners`          | Object                     | `null`                                                                                                                         | Allows binding of event listeners to the controls before the default handlers. See the `defaults.js` for available listeners. If your handler prevents default on the event (`event.preventDefault()`), the default handler will not fire.                                                                                                                                                              |
-| `captions`           | Object                     | `{ active: false, language: 'auto', update: false }`                                                                           | `active`: Toggles if captions should be active by default. `language`: Sets the default language to load (if available). 'auto' uses the browser language. `update`: Listen to changes to tracks and update menu. This is needed for some streaming libraries, but can result in unselectable language options).                                                                                        |
+| `captions`           | Object                     | `{ active: false, language: 'auto', update: false }`                                                                           | `active`: Toggles if captions should be active by default. `language`: Sets the default language to load (if available). 'auto' uses the browser language. `update`: Listen to changes to tracks and update menu. This is needed for some streaming libraries, but can result in non-selectable language options).                                                                                      |
 | `fullscreen`         | Object                     | `{ enabled: true, fallback: true, iosNative: false, container: null }`                                                         | `enabled`: Toggles whether fullscreen should be enabled. `fallback`: Allow fallback to a full-window solution (`true`/`false`/`'force'`). `iosNative`: whether to use native iOS fullscreen when entering fullscreen (no custom controls). `container`: A selector for an ancestor of the player element, allows contextual content to remain visual in fullscreen mode. Non-ancestors are ignored.     |
 | `ratio`              | String                     | `null`                                                                                                                         | Force an aspect ratio for all videos. The format is `'w:h'` - e.g. `'16:9'` or `'4:3'`. If this is not specified then the default for HTML5 and Vimeo is to use the native resolution of the video. As dimensions are not available from YouTube via SDK, 16:9 is forced as a sensible default.                                                                                                         |
 | `storage`            | Object                     | `{ enabled: true, key: 'plyr' }`                                                                                               | `enabled`: Allow use of local storage to store user settings. `key`: The key name to use.                                                                                                                                                                                                                                                                                                               |
@@ -437,7 +435,7 @@ const player = new Plyr('#player', {
 You can also access the object through any events:
 
 ```javascript
-element.addEventListener('ready', event => {
+element.addEventListener('ready', (event) => {
   const player = event.detail.plyr;
 });
 ```
@@ -451,29 +449,29 @@ player.play(); // Start playback
 player.fullscreen.enter(); // Enter fullscreen
 ```
 
-| Method                     | Parameters       | Description                                                                                                |
-| -------------------------- | ---------------- | ---------------------------------------------------------------------------------------------------------- |
-| `play()`&sup1;             | -                | Start playback.                                                                                            |
-| `pause()`                  | -                | Pause playback.                                                                                            |
-| `togglePlay(toggle)`&sup1; | Boolean          | Toggle playback, if no parameters are passed, it will toggle based on current status.                      |
-| `stop()`                   | -                | Stop playback and reset to start.                                                                          |
-| `restart()`                | -                | Restart playback.                                                                                          |
-| `rewind(seekTime)`         | Number           | Rewind playback by the specified seek time. If no parameter is passed, the default seek time will be used. |
-| `forward(seekTime)`        | Number           | Fast forward by the specified seek time. If no parameter is passed, the default seek time will be used.    |
-| `increaseVolume(step)`     | Number           | Increase volume by the specified step. If no parameter is passed, the default step will be used.           |
-| `decreaseVolume(step)`     | Number           | Increase volume by the specified step. If no parameter is passed, the default step will be used.           |
-| `toggleCaptions(toggle)`   | Boolean          | Toggle captions display. If no parameter is passed, it will toggle based on current status.                |
-| `fullscreen.enter()`       | -                | Enter fullscreen. If fullscreen is not supported, a fallback "full window/viewport" is used instead.       |
-| `fullscreen.exit()`        | -                | Exit fullscreen.                                                                                           |
-| `fullscreen.toggle()`      | -                | Toggle fullscreen.                                                                                         |
-| `airplay()`                | -                | Trigger the airplay dialog on supported devices.                                                           |
-| `setPreviewThumbnails(source: PreviewThumbnailsOptions)`                | -                | Sets the preview thubmnails for the current source.                                                           |
-| `toggleControls(toggle)`   | Boolean          | Toggle the controls (video only). Takes optional truthy value to force it on/off.                          |
-| `on(event, function)`      | String, Function | Add an event listener for the specified event.                                                             |
-| `once(event, function)`    | String, Function | Add an event listener for the specified event once.                                                        |
-| `off(event, function)`     | String, Function | Remove an event listener for the specified event.                                                          |
-| `supports(type)`           | String           | Check support for a mime type.                                                                             |
-| `destroy()`                | -                | Destroy the instance and garbage collect any elements.                                                     |
+| Method                                                   | Parameters       | Description                                                                                                |
+| -------------------------------------------------------- | ---------------- | ---------------------------------------------------------------------------------------------------------- |
+| `play()`&sup1;                                           | -                | Start playback.                                                                                            |
+| `pause()`                                                | -                | Pause playback.                                                                                            |
+| `togglePlay(toggle)`&sup1;                               | Boolean          | Toggle playback, if no parameters are passed, it will toggle based on current status.                      |
+| `stop()`                                                 | -                | Stop playback and reset to start.                                                                          |
+| `restart()`                                              | -                | Restart playback.                                                                                          |
+| `rewind(seekTime)`                                       | Number           | Rewind playback by the specified seek time. If no parameter is passed, the default seek time will be used. |
+| `forward(seekTime)`                                      | Number           | Fast forward by the specified seek time. If no parameter is passed, the default seek time will be used.    |
+| `increaseVolume(step)`                                   | Number           | Increase volume by the specified step. If no parameter is passed, the default step will be used.           |
+| `decreaseVolume(step)`                                   | Number           | Increase volume by the specified step. If no parameter is passed, the default step will be used.           |
+| `toggleCaptions(toggle)`                                 | Boolean          | Toggle captions display. If no parameter is passed, it will toggle based on current status.                |
+| `fullscreen.enter()`                                     | -                | Enter fullscreen. If fullscreen is not supported, a fallback "full window/viewport" is used instead.       |
+| `fullscreen.exit()`                                      | -                | Exit fullscreen.                                                                                           |
+| `fullscreen.toggle()`                                    | -                | Toggle fullscreen.                                                                                         |
+| `airplay()`                                              | -                | Trigger the airplay dialog on supported devices.                                                           |
+| `setPreviewThumbnails(source: PreviewThumbnailsOptions)` | -                | Sets the preview thumbnails for the current source.                                                        |
+| `toggleControls(toggle)`                                 | Boolean          | Toggle the controls (video only). Takes optional truthy value to force it on/off.                          |
+| `on(event, function)`                                    | String, Function | Add an event listener for the specified event.                                                             |
+| `once(event, function)`                                  | String, Function | Add an event listener for the specified event once.                                                        |
+| `off(event, function)`                                   | String, Function | Remove an event listener for the specified event.                                                          |
+| `supports(type)`                                         | String           | Check support for a mime type.                                                                             |
+| `destroy()`                                              | -                | Destroy the instance and garbage collect any elements.                                                     |
 
 1.  For HTML5 players, `play()` will return a [`Promise`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) for most browsers - e.g. Chrome, Firefox, Opera, Safari and Edge [according to MDN](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/play) at time of writing.
 
@@ -514,7 +512,7 @@ player.fullscreen.active; // false;
 | `loop`               | ✓      | ✓      | Gets or sets the current loop state of the player. The setter accepts a boolean.                                                                                                                                                                                                                                                       |
 | `source`             | ✓      | ✓      | Gets or sets the current source for the player. The setter accepts an object. See [source setter](#the-source-setter) below for examples.                                                                                                                                                                                              |
 | `poster`             | ✓      | ✓      | Gets or sets the current poster image for the player. The setter accepts a string; the URL for the updated poster image.                                                                                                                                                                                                               |
-| `previewThumbnails`  | ✓      | ✓      | Gets or sets the current preview Thubmnail source for the player. The setter accepts a string                                                                                                                                                                                                                                          |
+| `previewThumbnails`  | ✓      | ✓      | Gets or sets the current preview thumbnail source for the player. The setter accepts a string                                                                                                                                                                                                                                          |
 | `autoplay`           | ✓      | ✓      | Gets or sets the autoplay state of the player. The setter accepts a boolean.                                                                                                                                                                                                                                                           |
 | `currentTrack`       | ✓      | ✓      | Gets or sets the caption track by index. `-1` means the track is missing or captions is not active                                                                                                                                                                                                                                     |
 | `language`           | ✓      | ✓      | Gets or sets the preferred captions language for the player. The setter accepts an ISO two-letter language code. Support for the languages is dependent on the captions you include. If your captions don't have any language data, or if you have multiple tracks with the same language, you may want to use `currentTrack` instead. |
@@ -637,7 +635,7 @@ reference to the instance, you can use the `on()` API method or `addEventListene
 property. Here's an example:
 
 ```javascript
-player.on('ready', event => {
+player.on('ready', (event) => {
   const instance = event.detail.plyr;
 });
 ```
@@ -784,16 +782,16 @@ If a User Agent is disabled but supports `<video>` and `<audio>` natively, it wi
 
 Some awesome folks have made plugins for CMSs and Components for JavaScript frameworks:
 
-| Type      | Maintainer                                                                | Link                                                                                         |
-| --------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| WordPress | Brandon Lavigne ([@drrobotnik](https://github.com/drrobotnik))            | [https://wordpress.org/plugins/plyr/](https://wordpress.org/plugins/plyr/)                   |
-| Angular   | Simon Bobrov ([@smnbbrv](https://github.com/smnbbrv))                     | [https://github.com/smnbbrv/ngx-plyr](https://github.com/smnbbrv/ngx-plyr)                   |
-| React     | Chintan Prajapati ([@chintan9](https://github.com/chintan9))              | [https://github.com/chintan9/plyr-react](https://github.com/chintan9/plyr-react)             |
-| Vue       | Gabe Dunn ([@redxtech](https://github.com/redxtech))                      | [https://github.com/redxtech/vue-plyr](https://github.com/redxtech/vue-plyr)                 |
-| Neos      | Jon Uhlmann ([@jonnitto](https://github.com/jonnitto))                    | [https://packagist.org/packages/jonnitto/plyr](https://packagist.org/packages/jonnitto/plyr) |
-| Kirby     | Dominik Pschenitschni ([@dpschen](https://github.com/dpschen))            | [https://github.com/dpschen/kirby-plyrtag](https://github.com/dpschen/kirby-plyrtag)         |
-| REDAXO    | FriendsOfRedaxo / skerbis ([@skerbis](https://friendsofredaxo.github.io)) | [https://github.com/FriendsOfREDAXO/plyr](https://github.com/FriendsOfREDAXO/plyr)           |
-| svelte-plyr    | Ben Woodward / benwoodward ([@benwoodward](https://github.com/benwoodward)) | [https://github.com/benwoodward/svelte-plyr](https://github.com/benwoodward/svelte-plyr)           |
+| Type        | Maintainer                                                                  | Link                                                                                         |
+| ----------- | --------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| WordPress   | Brandon Lavigne ([@drrobotnik](https://github.com/drrobotnik))              | [https://wordpress.org/plugins/plyr/](https://wordpress.org/plugins/plyr/)                   |
+| Angular     | Simon Bobrov ([@smnbbrv](https://github.com/smnbbrv))                       | [https://github.com/smnbbrv/ngx-plyr](https://github.com/smnbbrv/ngx-plyr)                   |
+| React       | Chintan Prajapati ([@chintan9](https://github.com/chintan9))                | [https://github.com/chintan9/plyr-react](https://github.com/chintan9/plyr-react)             |
+| Vue         | Gabe Dunn ([@redxtech](https://github.com/redxtech))                        | [https://github.com/redxtech/vue-plyr](https://github.com/redxtech/vue-plyr)                 |
+| Neos        | Jon Uhlmann ([@jonnitto](https://github.com/jonnitto))                      | [https://packagist.org/packages/jonnitto/plyr](https://packagist.org/packages/jonnitto/plyr) |
+| Kirby       | Dominik Pschenitschni ([@dpschen](https://github.com/dpschen))              | [https://github.com/dpschen/kirby-plyrtag](https://github.com/dpschen/kirby-plyrtag)         |
+| REDAXO      | FriendsOfRedaxo / skerbis ([@skerbis](https://friendsofredaxo.github.io))   | [https://github.com/FriendsOfREDAXO/plyr](https://github.com/FriendsOfREDAXO/plyr)           |
+| svelte-plyr | Ben Woodward / benwoodward ([@benwoodward](https://github.com/benwoodward)) | [https://github.com/benwoodward/svelte-plyr](https://github.com/benwoodward/svelte-plyr)     |
 
 # Issues
 

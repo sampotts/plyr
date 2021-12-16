@@ -66,7 +66,7 @@
 - Fix "A `ReferenceError: _classCallCheck is not defined` error has occurred." error (thanks @hex-ci)
 - Fix issue with CSS custom property check (thanks @syedhusain-appspace)
 - Fix for slow loading videos not autoplaying (thanks @DanielHuntleySBG)
-- Fix for betwork requests are not cancelled after the player is destroyed (thanks @DanielHuntleySBG)
+- Fix for network requests are not cancelled after the player is destroyed (thanks @DanielHuntleySBG)
 - Added option to disable custom controls for YouTube and Vimeo
 
 ### v3.6.2
@@ -111,7 +111,7 @@
 ### v3.5.8
 
 - Added `flex-direction` property to fix some issues introduced in v3.5.7 when using custom CSS
-- Cleaned up the organisation of some of the SCSS files (should not effect CSS output)
+- Cleaned up the organization of some of the SCSS files (should not effect CSS output)
 - Added `referrerPolicy` option for Vimeo to prevent an issue present in the demo site
 - Remove all Vimeo controls for Pro & Premium accounts
 - Improve thumbnail size calculations when size is set per css (thanks @ydylla)
@@ -126,7 +126,7 @@
 - Accessibility tweak for the play button (thanks @lunika)
 - Fix for ads configuration (thanks @SoftCreatR)
 - Fix handling listener return value (thanks @taion)
-- Added localisation key for PIP (picture-in-picture) (thanks @lmislm)
+- Added localization key for PIP (picture-in-picture) (thanks @lmislm)
 - Preserve viewBox attribute in SVG sprite symbols (thanks @bseib)
 - Fix being unable to unmute autoplayed video on iOS (thanks @sumanbh)
 - Fixed Plyr container not resizing responsively (thanks @shravan2x)
