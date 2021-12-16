@@ -3,10 +3,11 @@
 // --------------------------------------------------------------
 
 .plyr--full-ui input[type='range'] {
-  -webkit-appearance: none; /* stylelint-disable-line */
+  appearance: none;
   background: transparent;
   border: 0;
   border-radius: calc(#{$plyr-range-thumb-height} * 2);
+
   // `color` property is used in JS to populate lower fill for WebKit
   color: $plyr-range-fill-background;
   display: block;
@@ -18,23 +19,25 @@
   width: 100%;
 
   &::-webkit-slider-runnable-track {
-    @include plyr-range-track();
+    @include plyr-range-track;
+
     background-image: linear-gradient(to right, currentColor var(--value, 0%), transparent var(--value, 0%));
   }
 
   &::-webkit-slider-thumb {
-    @include plyr-range-thumb();
-    -webkit-appearance: none; /* stylelint-disable-line */
+    @include plyr-range-thumb;
+
+    appearance: none;
     margin-top: calc(((#{$plyr-range-thumb-height} - #{$plyr-range-track-height}) / 2) * -1);
   }
 
   // Mozilla
   &::-moz-range-track {
-    @include plyr-range-track();
+    @include plyr-range-track;
   }
 
   &::-moz-range-thumb {
-    @include plyr-range-thumb();
+    @include plyr-range-thumb;
   }
 
   &::-moz-range-progress {
@@ -45,22 +48,24 @@
 
   // Microsoft
   &::-ms-track {
-    @include plyr-range-track();
+    @include plyr-range-track;
+
     color: transparent;
   }
 
   &::-ms-fill-upper {
-    @include plyr-range-track();
+    @include plyr-range-track;
   }
 
   &::-ms-fill-lower {
-    @include plyr-range-track();
+    @include plyr-range-track;
 
     background: currentColor;
   }
 
   &::-ms-thumb {
-    @include plyr-range-thumb();
+    @include plyr-range-thumb;
+
     // For some reason, Edge uses the -webkit margin above
     margin-top: 0;
   }
@@ -70,25 +75,25 @@
   }
 
   // Focus styles
-  &:focus {
-    outline: 0;
-  }
-
   &::-moz-focus-outer {
     border: 0;
   }
 
+  &:focus {
+    outline: 0;
+  }
+
   &.plyr__tab-focus {
     &::-webkit-slider-runnable-track {
-      @include plyr-tab-focus();
+      @include plyr-tab-focus;
     }
 
     &::-moz-range-track {
-      @include plyr-tab-focus();
+      @include plyr-tab-focus;
     }
 
     &::-ms-track {
-      @include plyr-tab-focus();
+      @include plyr-tab-focus;
     }
   }
 }

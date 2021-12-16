@@ -10,6 +10,7 @@
   .plyr__control svg {
     transition: transform 0.3s ease;
   }
+
   .plyr__control[aria-expanded='true'] {
     svg {
       transform: rotate(90deg);
@@ -73,10 +74,7 @@
       color: $plyr-menu-color;
       display: flex;
       font-size: $plyr-font-size-menu;
-      padding-bottom: calc(#{$plyr-control-padding} / 1.5);
-      padding-left: calc(#{$plyr-control-padding} * 1.5);
-      padding-right: calc(#{$plyr-control-padding} * 1.5);
-      padding-top: calc(#{$plyr-control-padding} / 1.5);
+      padding: calc(#{$plyr-control-padding} / 1.5) calc(#{$plyr-control-padding} * 1.5);
       user-select: none;
       width: 100%;
 
@@ -176,6 +174,7 @@
         &::before {
           background: $plyr-control-toggle-checked-background;
         }
+
         &::after {
           opacity: 1;
           transform: translateY(-50%) scale(1);

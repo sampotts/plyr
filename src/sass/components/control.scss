@@ -29,7 +29,7 @@
 
   // Tab focus
   &.plyr__tab-focus {
-    @include plyr-tab-focus();
+    @include plyr-tab-focus;
   }
 }
 

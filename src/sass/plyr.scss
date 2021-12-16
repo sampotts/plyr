@@ -4,15 +4,14 @@
 // TODO: Review use of BEM classnames
 // ==========================================================================
 @charset 'UTF-8';
-
 @import 'lib/css-vars';
+
 $css-vars-use-native: true;
 
 @import 'settings/breakpoints';
 @import 'settings/colors';
 @import 'settings/cosmetics';
 @import 'settings/type';
-
 @import 'settings/badges';
 @import 'settings/captions';
 @import 'settings/controls';
@@ -21,13 +20,10 @@ $css-vars-use-native: true;
 @import 'settings/progress';
 @import 'settings/sliders';
 @import 'settings/tooltips';
-
 @import 'lib/animation';
 @import 'lib/functions';
 @import 'lib/mixins';
-
 @import 'base';
-
 @import 'components/badges';
 @import 'components/captions';
 @import 'components/control';
@@ -39,14 +35,10 @@ $css-vars-use-native: true;
 @import 'components/tooltips';
 @import 'components/progress';
 @import 'components/volume';
-
 @import 'types/audio';
 @import 'types/video';
-
 @import 'states/fullscreen';
-
 @import 'plugins/ads';
 @import 'plugins/preview-thumbnails/index';
-
 @import 'utils/animation';
 @import 'utils/hidden';

@@ -51,6 +51,7 @@ $embed-padding: (math.div(100, 16) * 9);
 .plyr--full-ui .plyr__video-embed > .plyr__video-embed__container {
   $height: 240;
   $offset: to-percentage(math.div($height - $embed-padding, math.div($height, 50)));
+
   padding-bottom: to-percentage($height);
   position: relative;
   transform: translateY(-$offset);

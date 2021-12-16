@@ -3,27 +3,13 @@
 // --------------------------------------------------------------
 
 .plyr:fullscreen {
-  @include plyr-fullscreen-active();
-}
-
-/* stylelint-disable-next-line */
-.plyr:-webkit-full-screen {
-  @include plyr-fullscreen-active();
-}
-
-/* stylelint-disable-next-line */
-.plyr:-moz-full-screen {
-  @include plyr-fullscreen-active();
-}
-
-/* stylelint-disable-next-line */
-.plyr:-ms-fullscreen {
-  @include plyr-fullscreen-active();
+  @include plyr-fullscreen-active;
 }
 
 // Fallback for unsupported browsers
 .plyr--fullscreen-fallback {
-  @include plyr-fullscreen-active();
+  @include plyr-fullscreen-active;
+
   bottom: 0;
   display: block;
   left: 0;
