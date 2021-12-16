@@ -1,3 +1,7 @@
+### v3.6.12
+
+- Fix: remove division logic from ads.scss (fixes #2370)
+
 ### v3.6.11
 
 - Fix: Replace `list.slash` added in 3.6.10 with `calc`
