@@ -1,6 +1,7 @@
 {
-  "plugins": ["stylelint-selector-bem-pattern", "stylelint-scss"],
-  "extends": ["stylelint-config-recommended", "stylelint-config-sass-guidelines", "stylelint-config-prettier"],
+  "plugins": ["stylelint-selector-bem-pattern"],
+  "extends": ["stylelint-config-sass-guidelines", "stylelint-config-prettier"],
+  "customSyntax": "postcss-scss",
   "rules": {
     "selector-class-pattern": null,
     "selector-no-qualifying-type": [
@@ -9,10 +10,7 @@
         "ignore": ["attribute", "class"]
       }
     ],
-    "string-no-newline": null,
-    "indentation": 2,
-    "string-quotes": "single",
-    "max-nesting-depth": 2,
+    "max-nesting-depth": 4,
     "plugin/selector-bem-pattern": {
       "preset": "bem",
       "componentName": "(([a-z0-9]+(?!-$)-?)+)",
