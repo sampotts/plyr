@@ -1,3 +1,10 @@
+### v3.6.11
+
+- Fix: Replace `list.slash` added in 3.6.10 with `calc`
+- Chore: Package upgrades
+- Chore: SASS clean up
+- Chore: Improvements to style linting
+
 ### v3.6.10
 
 - Fix: Use `list.slash` instead of deprecated syntax
