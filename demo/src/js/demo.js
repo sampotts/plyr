@@ -65,6 +65,17 @@ import toggleClass from './toggle-class';
         // Prevent Vimeo blocking plyr.io demo site
         referrerPolicy: 'no-referrer',
       },
+      mediaMetadata: {
+        title: 'View From A Blue Moon',
+        album: 'Sports',
+        artist: 'Brainfarm',
+        artwork: [
+          {
+            src: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.jpg',
+            type: 'image/jpeg',
+          },
+        ],
+      },
     });
 
     // Expose for tinkering in the console

@@ -441,6 +441,14 @@ const defaults = {
     customControls: true,
     noCookie: false, // Whether to use an alternative version of YouTube without cookies
   },
+
+  // Media Metadata
+  mediaMetadata: {
+    title: '',
+    artist: '',
+    album: '',
+    artwork: [],
+  },
 };
 
 export default defaults;

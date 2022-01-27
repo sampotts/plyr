@@ -1745,6 +1745,21 @@ const controls = {
       });
     }
   },
+
+  // Set media metadata
+  setMediaMetadata() {
+    try {
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.metadata = new window.MediaMetadata({
+          title: this.config.mediaMetadata.title,
+          artist: this.config.mediaMetadata.artist,
+          album: this.config.mediaMetadata.album,
+          artwork: this.config.mediaMetadata.artwork,
+        });
+      }
+      // eslint-disable-next-line no-empty
+    } catch (e) {}
+  },
 };
 
 export default controls;

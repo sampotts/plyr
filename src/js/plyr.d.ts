@@ -518,6 +518,11 @@ declare namespace Plyr {
      * Preview Thumbnails Options.
      */
     previewThumbnails?: PreviewThumbnailsOptions;
+
+    /**
+     * Media Metadata Options.
+     */
+    mediaMetadata?: MediaMetadataOptions;
   }
 
   interface QualityOptions {
@@ -574,6 +579,19 @@ declare namespace Plyr {
   interface PreviewThumbnailsOptions {
     enabled?: boolean;
     src?: string | string[];
+  }
+
+  interface MediaMetadataArtwork {
+    src: string;
+    sizes?: string;
+    type: string;
+  }
+
+  interface MediaMetadataOptions {
+    title?: string;
+    artist?: string;
+    album?: string;
+    artwork?: MediaMetadataArtwork[];
   }
 
   export interface Elements {
