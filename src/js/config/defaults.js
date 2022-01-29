@@ -206,6 +206,11 @@ const defaults = {
       sdk: 'https://www.youtube.com/iframe_api',
       api: 'https://noembed.com/embed?url=https://www.youtube.com/watch?v={0}',
     },
+    dailymotion: {
+      sdk: 'https://api.dmcdn.net/all.js',
+      api:
+        'https://api.dailymotion.com/video/{0}?fields=aspect_ratio,duration,embed_url,height,thumbnail_1080_url,width,title',
+    },
     googleIMA: {
       sdk: 'https://imasdk.googleapis.com/js/sdkloader/ima3.js',
     },
@@ -440,6 +445,16 @@ const defaults = {
     // Custom settings from Plyr
     customControls: true,
     noCookie: false, // Whether to use an alternative version of YouTube without cookies
+  },
+
+  // DailyMotion plugin
+  dailymotion: {
+    api: 'postMessage', // Enable the Player API https://developer.dailymotion.com/player/#player-parameters
+    'autoplay-mute': false, // Try to autoplay while muting the video if autoplay didn't work
+    syndication: '', // Syndication key for the player
+    'ui-logo': false, // Hide the dailymotion logo
+    'ui-start-screen-info': false, // Hide video information (title and owner) on the start screen
+    apimode: 'queryString', // How to encode/decode messages sent from the player. https://developer.dailymotion.com/player/#player-parameters
   },
 };
 
