@@ -60,11 +60,7 @@
     "rangetouch": "^2.0.1"
   },
   "resolutions": {
-    "ansi-regex": "^5.0.1",
     "glob-parent": "^6.0.2",
-    "postcss": "^8.4.6",
-    "semver-regex": "^4.0.2",
-    "set-value": "^4.0.1",
-    "yargs-parser": "^21.0.0"
+    "postcss": "^8.4.6"
   }
 }
