@@ -27,7 +27,7 @@
     "url": "https://github.com/sampotts/plyr/issues"
   },
   "scripts": {
-    "build": "gulp build && postcss demo/dist/demo.css -r && babel dist/plyr.js -o dist/plyr.js && babel demo/dist/demo.js -o demo/dist/demo.js",
+    "build": "gulp build && node reinforce-demo.js && babel dist/plyr.js -o dist/plyr.js && babel demo/dist/demo.js -o demo/dist/demo.js",
     "lint": "eslint src/js"
   },
   "devDependencies": {
@@ -50,7 +50,6 @@
     "gulp-svgstore": "^8.0.0",
     "node-sass": "^6.0.1",
     "postcss": "^8.3.11",
-    "postcss-cli": "^9.0.2",
     "postcss-custom-properties": "^12.0.0",
     "postcss-safe-important": "^1.2.0",
     "rollup": "^2.59.0",
