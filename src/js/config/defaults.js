@@ -391,6 +391,10 @@ const defaults = {
       scrubbingContainer: 'plyr__preview-scrubbing',
       scrubbingContainerShown: 'plyr__preview-scrubbing--is-shown',
     },
+    markers: {
+      points: 'plyr__marker__points',
+      tip: 'plyr__marker__tip',
+    },
   },
 
   // Embed attributes
@@ -440,6 +444,12 @@ const defaults = {
     // Custom settings from Plyr
     customControls: true,
     noCookie: false, // Whether to use an alternative version of YouTube without cookies
+  },
+
+  // markers
+  markers: {
+    enabled: false,
+    points: [],
   },
 };
 

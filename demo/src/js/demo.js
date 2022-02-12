@@ -65,6 +65,23 @@ import toggleClass from './toggle-class';
         // Prevent Vimeo blocking plyr.io demo site
         referrerPolicy: 'no-referrer',
       },
+      markers: {
+        enabled: true,
+        points: [
+          {
+            time: 10,
+            tip: 'first marker',
+          },
+          {
+            time: 40,
+            tip: 'second marker',
+          },
+          {
+            time: 120,
+            tipHTML: '<strong>third</strong> marker',
+          },
+        ],
+      },
     });
 
     // Expose for tinkering in the console
