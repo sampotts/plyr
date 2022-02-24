@@ -28,10 +28,7 @@
   "bugs": {
     "url": "https://github.com/sampotts/plyr/issues"
   },
-  "browserslist": [
-    "cover 100%",
-    "not dead"
-  ],
+  "browserslist": "> 1%",
   "scripts": {
     "build": "gulp build",
     "lint": "eslint src/js && npm run remark && stylelint **/*.scss",
