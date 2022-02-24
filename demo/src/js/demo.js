@@ -76,6 +76,23 @@ import toggleClass from './toggle-class';
           },
         ],
       },
+      markers: {
+        enabled: true,
+        points: [
+          {
+            time: 10,
+            tip: 'first marker',
+          },
+          {
+            time: 40,
+            tip: 'second marker',
+          },
+          {
+            time: 120,
+            tipHTML: '<strong>third</strong> marker',
+          },
+        ],
+      },
     });
 
     // Expose for tinkering in the console
