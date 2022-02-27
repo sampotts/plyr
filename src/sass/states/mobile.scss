@@ -1,0 +1,37 @@
+// --------------------------------------------------------------
+// Mobile
+// --------------------------------------------------------------
+
+.plyr .double-container{
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  top: 0;
+}
+.plyr .double-container > .double-left{
+  display: none;
+  position: absolute;
+  height: 100%;
+  width: 50%;
+  bottom: 0;
+  left: 0;
+  top: 0;
+  background: rgba(0,0,0,0.5);
+  border-radius: 0 50% 50% 0;
+  opacity: 0;
+}
+.plyr .double-container > .double-right{
+  display: none;
+  position: absolute;
+  height: 100%;
+  width: 50%;
+  bottom: 0;
+  right: 0;
+  top: 0;
+  background: rgba(0,0,0,0.5);
+  border-radius: 50% 0 0 50%;
+  opacity: 0;
+}

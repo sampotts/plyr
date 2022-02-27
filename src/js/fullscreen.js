@@ -41,16 +41,19 @@ class Fullscreen {
         this.onChange();
       },
     );
+    
+    // Check mobile plugin for double tap
+    if(browser.IsPhone==false || ( browser.IsPhone==true && this.player.config.mobile.enabled==false)){
+      // Fullscreen toggle on double click
+      on.call(this.player, this.player.elements.container, 'dblclick', (event) => {
+        // Ignore double click in controls
+        if (is.element(this.player.elements.controls) && this.player.elements.controls.contains(event.target)) {
+          return;
+        }
 
-    // Fullscreen toggle on double click
-    on.call(this.player, this.player.elements.container, 'dblclick', (event) => {
-      // Ignore double click in controls
-      if (is.element(this.player.elements.controls) && this.player.elements.controls.contains(event.target)) {
-        return;
-      }
-
-      this.player.listeners.proxy(event, this.toggle, 'fullscreen');
-    });
+        this.player.listeners.proxy(event, this.toggle, 'fullscreen');
+      });
+    }
 
     // Tap focus when in fullscreen
     on.call(this, this.player.elements.container, 'keydown', (event) => this.trapFocus(event));

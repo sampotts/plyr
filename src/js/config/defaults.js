@@ -70,7 +70,7 @@ const defaults = {
   quality: {
     default: 576,
     // The options to display in the UI, if available for the source media
-    options: [4320, 2880, 2160, 1440, 1080, 720, 576, 480, 360, 240],
+    options: [-1, 4320, 2880, 2160, 1440, 1080, 720, 576, 480, 360, 240],
     forced: false,
     onChange: null,
   },
@@ -147,6 +147,13 @@ const defaults = {
   ],
   settings: ['captions', 'quality', 'speed'],
 
+  mobile:{
+    enabled:true,
+    seekInterval:10,
+    autoRotateFullscreen:false,
+    hideVolume:true
+  },
+
   // Localisation
   i18n: {
     restart: 'Restart',
@@ -185,6 +192,7 @@ const defaults = {
     enabled: 'Enabled',
     advertisement: 'Ad',
     qualityBadge: {
+      0:    'Auto',
       2160: '4K',
       1440: 'HD',
       1080: 'HD',
@@ -192,6 +200,9 @@ const defaults = {
       576: 'SD',
       480: 'SD',
     },
+    qualityLabel:{
+      0: 'Auto'
+    }
   },
 
   // URLs

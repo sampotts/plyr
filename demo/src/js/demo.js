@@ -57,10 +57,82 @@ import toggleClass from './toggle-class';
         enabled: window.location.host.includes(production),
         publisherId: '918848828995742',
       },
-      previewThumbnails: {
+      /*previewThumbnails: {
         enabled: true,
         src: ['https://cdn.plyr.io/static/demo/thumbs/100p.vtt', 'https://cdn.plyr.io/static/demo/thumbs/240p.vtt'],
+      },*/
+      /*previewThumbnails: {
+        enabled: true,
+        src: (resolver)=>{
+          var thumbnails = [
+          {
+            frames: [
+              {
+                startTime: 0,
+                endTime: 60,
+                text: "https://i.imgur.com/D4gAAOV.jpeg",
+                x: 0,
+                y: 0,
+                w: 1920,
+                h: 1080
+              },
+              {
+                startTime: 61,
+                endTime: 120,
+                text: "https://i.imgur.com/QJVfTKP.jpeg",
+                x: 0,
+                y: 0,
+                w: 1920,
+                h: 1080
+              }
+            ],
+            width: 1920,
+            height: 1090,
+            urlPrefix: "",
+          }
+        ];
+
+        resolver(thumbnails);
+        },
+      },*/
+      previewThumbnails: {
+        enabled: true,
+        src: [
+          {
+            frames: [
+              {
+                startTime: 0,
+                endTime: 60,
+                text: "https://i.imgur.com/D4gAAOV.jpeg",
+                x: 0,
+                y: 0,
+                w: 1920,
+                h: 1080
+              },
+              {
+                startTime: 61,
+                endTime: 10000,
+                text: "https://i.imgur.com/QJVfTKP.jpeg",
+                x: 0,
+                y: 0,
+                w: 1920,
+                h: 1080
+              }
+            ],
+            width: 1920,
+            height: 1090,
+            urlPrefix: "",
+          }
+        ]
       },
+
+      mobile:{
+        enabled:true,
+        seekInterval:10,
+        autoRotateFullscreen:true,
+        hideVolume:true
+      },
+
       vimeo: {
         // Prevent Vimeo blocking plyr.io demo site
         referrerPolicy: 'no-referrer',
@@ -89,7 +161,7 @@ import toggleClass from './toggle-class';
           },
           {
             time: 120,
-            tipHTML: '<strong>third</strong> marker',
+            tipHTML: '<a href="http://example.com">third</a> marker',
           },
         ],
       },

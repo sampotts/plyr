@@ -819,7 +819,7 @@ const controls = {
       value = this.currentTrack;
     } else {
       value = !is.empty(input) ? input : this[setting];
-
+      
       // Get default
       if (is.empty(value)) {
         value = this.config[setting].default;
@@ -868,6 +868,8 @@ const controls = {
 
       case 'quality':
         if (is.number(value)) {
+          if(value==-1) value=0;
+
           const label = i18n.get(`qualityLabel.${value}`, this.config);
 
           if (!label.length) {
@@ -889,6 +891,7 @@ const controls = {
 
   // Set the quality menu
   setQualityMenu(options) {
+
     // Menu required
     if (!is.element(this.elements.settings.panels.quality)) {
       return;
@@ -919,6 +922,8 @@ const controls = {
 
     // Get the badge HTML for HD, 4K etc
     const getBadge = (quality) => {
+      if(quality==-1) quality=0;
+
       const label = i18n.get(`qualityBadge.${quality}`, this.config);
 
       if (!label.length) {
@@ -1350,50 +1355,54 @@ const controls = {
         container.appendChild(createTime.call(this, 'duration', defaultAttributes));
       }
 
-      // Volume controls
-      if (control === 'mute' || control === 'volume') {
-        let { volume } = this.elements;
+      // Check if mobile disabled
+      if(browser.IsPhone==false || ( browser.IsPhone==true && this.config.mobile.enabled==false) || (browser.IsPhone==true && this.config.mobile.enabled==true && this.config.mobile.hideVolume==false)){
+        // Volume controls AAAA
+        if (control === 'mute' || control === 'volume') {
+          
+          let { volume } = this.elements;
 
-        // Create the volume container if needed
-        if (!is.element(volume) || !container.contains(volume)) {
-          volume = createElement(
-            'div',
-            extend({}, defaultAttributes, {
-              class: `${defaultAttributes.class} plyr__volume`.trim(),
-            }),
-          );
-
-          this.elements.volume = volume;
-
-          container.appendChild(volume);
-        }
-
-        // Toggle mute button
-        if (control === 'mute') {
-          volume.appendChild(createButton.call(this, 'mute'));
-        }
-
-        // Volume range control
-        // Ignored on iOS as it's handled globally
-        // https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html
-        if (control === 'volume' && !browser.isIos) {
-          // Set the attributes
-          const attributes = {
-            max: 1,
-            step: 0.05,
-            value: this.config.volume,
-          };
-
-          // Create the volume range slider
-          volume.appendChild(
-            createRange.call(
-              this,
-              'volume',
-              extend(attributes, {
-                id: `plyr-volume-${data.id}`,
+          // Create the volume container if needed
+          if (!is.element(volume) || !container.contains(volume)) {
+            volume = createElement(
+              'div',
+              extend({}, defaultAttributes, {
+                class: `${defaultAttributes.class} plyr__volume`.trim(),
               }),
-            ),
-          );
+            );
+
+            this.elements.volume = volume;
+
+            container.appendChild(volume);
+          }
+
+          // Toggle mute button
+          if (control === 'mute') {
+            volume.appendChild(createButton.call(this, 'mute'));
+          }
+
+          // Volume range control
+          // Ignored on iOS as it's handled globally
+          // https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html
+          if (control === 'volume' && !browser.isIos) {
+            // Set the attributes
+            const attributes = {
+              max: 1,
+              step: 0.05,
+              value: this.config.volume,
+            };
+
+            // Create the volume range slider
+            volume.appendChild(
+              createRange.call(
+                this,
+                'volume',
+                extend(attributes, {
+                  id: `plyr-volume-${data.id}`,
+                }),
+              ),
+            );
+          }
         }
       }
 

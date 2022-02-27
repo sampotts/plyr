@@ -148,7 +148,10 @@ class PreviewThumbnails {
       };
 
       // Via callback()
-      if (is.function(src)) {
+      if(is.array(src) && is.object(src[0])){
+        this.thumbnails = src;
+        sortAndResolve();
+      }else if (is.function(src)) {
         src((thumbnails) => {
           this.thumbnails = thumbnails;
           sortAndResolve();
@@ -208,11 +211,11 @@ class PreviewThumbnails {
     if (!this.loaded) {
       return;
     }
-
+    
     if (!is.event(event) || !['touchmove', 'mousemove'].includes(event.type)) {
       return;
     }
-
+    
     // Wait until media has a duration
     if (!this.player.media.duration) {
       return;
