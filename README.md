@@ -30,7 +30,7 @@ Plyr is a simple, lightweight, accessible and customizable HTML5, YouTube and Vi
 - 🌎 **i18n support** - support for internationalization of controls
 - 👌 **[Preview thumbnails](#preview-thumbnails)** - support for displaying preview thumbnails
 - 🤟 **No frameworks** - written in "vanilla" ES6 JavaScript, no jQuery required
-- 💁‍♀️ **SASS** - to include in your build processes
+- 💁‍♀️ **Sass** - to include in your build processes
 
 ### Demos
 
@@ -273,9 +273,9 @@ You can set them in your CSS for all players:
 <video class="player" style="--plyr-color-main: #1ac266;">...</video>
 ```
 
-### SASS
+### Sass
 
-You can use `plyr.scss` file included in `/src/sass` as part of your build and change variables to suit your design. The SASS requires you to
+You can use `plyr.scss` file included in `/src/sass` as part of your build and change variables to suit your design. The Sass requires you to
 use [autoprefixer](https://www.npmjs.com/package/gulp-autoprefixer) (you should be already!) as all declarations use the W3C definitions.
 
 The HTML markup uses the BEM methodology with `plyr` as the block, e.g. `.plyr__controls`. You can change the class hooks in the options to match any custom CSS
