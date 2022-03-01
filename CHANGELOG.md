@@ -6,7 +6,7 @@
 
 - Fix: Replace `list.slash` added in 3.6.10 with `calc`
 - Chore: Package upgrades
-- Chore: SASS clean up
+- Chore: Sass clean up
 - Chore: Improvements to style linting
 
 ### v3.6.10
@@ -16,7 +16,7 @@
 
 ### v3.6.9
 
-- Fix: SASS issue with division (thanks @ROL4ND909 and @le0pard)
+- Fix: Sass issue with division (thanks @ROL4ND909 and @le0pard)
 - Fix: Captions when switching sources (thanks @zexingguo)
 - Fix: Icons loading within iframes (thanks @ajgagnon)
 - Chore: Update TypeScript types (thanks @Jackie1210 and @AntLevin)
@@ -171,7 +171,7 @@ _Note:_ This update contains CSS changes.
 ### v3.5.4
 
 - Added: Set download URL via new setter
-- Improvement: The order of the `controls` option now effects the order in the DOM - i.e. you can re-order the controls - Note: this may break any custom CSS you have setup. Please see the changes in the PR to the default SASS
+- Improvement: The order of the `controls` option now effects the order in the DOM - i.e. you can re-order the controls - Note: this may break any custom CSS you have setup. Please see the changes in the PR to the default Sass
 - Fixed issue with empty controls and preview thumbs
 - Fixed issue with setGutter call (from Sentry)
 - Fixed issue with initial selected speed not working
@@ -534,7 +534,7 @@ This is a massive release. A _mostly_ complete rewrite in ES6. What started out 
 
 ### Other stuff
 
-- Now using SASS exclusively. Sorry, LESS folk it just made sense to maintain one method as SASS is what the cool kids use. It may come back if we work out an automated way to convert the SASS
+- Now using Sass exclusively. Sorry, LESS folk it just made sense to maintain one method as Sass is what the cool kids use. It may come back if we work out an automated way to convert the Sass
 - Moved to ES6. All the rage these days. You'll need to look at polyfills. The demo uses [polyfill.io](https://polyfill.io)
 - Added basic looping support
 - Added an aspect ratio option for those that can't leave the 90s and want 4:3
@@ -767,7 +767,7 @@ And some other changes and bug fixes:
 
 ## v1.7.0
 
-- SASS cleanup (fixes #265)
+- Sass cleanup (fixes #265)
 - Docs tidy up to help quick start (fixes #253)
 - Fix for issues with data attribute options passing (fixes #257)
 - **_(Important)_** Removed the requirement for a wrapper div to setup Plyr and removed the dependency on the `plyr` classname as a JS hook. By default it will now look for `<video>`, `<audio>` and `[data-type]` elements. If you are just calling `setup()` with a `<div class="plyr">` you may want to give it a good test after upgrading. You can probably remove the wrapper div. The reason behind this is to make setup easier for newcomers and prevent the styling being used on unsupported players (because the plyr classname was used as a CSS and JS hook - which isn't ideal)
@@ -889,7 +889,7 @@ And some other changes and bug fixes:
 ### v1.5.18
 
 - Added 'ready' event for initial setup complete or source change occurs
-- Fixed SASS stylesheet references to transparentize
+- Fixed Sass stylesheet references to transparentize
 - Added default font stack to controls
 - Docs fixes inc controls HTML (fixes #180)
 
@@ -926,7 +926,7 @@ And some other changes and bug fixes:
 
 - iOS embed bug fixes (fixes #166)
 - Hide IE/Edge <input type='range'> tooltip (since we have a styled one) (fixes #160)
-- SASS bug fix for default values (fixes #158)
+- Sass bug fix for default values (fixes #158)
 
 ### v1.5.9
 
@@ -948,7 +948,7 @@ And some other changes and bug fixes:
 ### v1.5.6
 
 - Seek tooltip (option for tooltips changed, please check docs)
-- SASS compile error fixes (fixes #148)
+- Sass compile error fixes (fixes #148)
 - Fullscreen fixes for controls not always hiding/showing (fixes #149)
 - Screen reader icon fixes (title was being read twice due to the tooltip/hidden label)
 
@@ -1025,7 +1025,7 @@ And some other changes and bug fixes:
 
 ### v1.2.6
 
-- SASS updates and fixes (cheers @ChristianPV)
+- Sass updates and fixes (cheers @ChristianPV)
 
 ### v1.2.5
 
@@ -1140,7 +1140,7 @@ And some other changes and bug fixes:
 
 ### v1.0.26
 
-- Fixes for SASS (cheers @brunowego)
+- Fixes for Sass (cheers @brunowego)
 - Indentation reset to 4 spaces
 
 ### v1.0.25
@@ -1185,7 +1185,7 @@ And some other changes and bug fixes:
 
 ### v1.0.17
 
-- SASS support added (thanks to @brunowego)
+- Sass support added (thanks to @brunowego)
 - Docs completely separated to avoid any confusion
 - New gulp tasks (will add more documentation for this)
 
