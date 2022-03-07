@@ -19,25 +19,25 @@ import toggleClass from './toggle-class';
   const production = 'plyr.io';
 
   // Sentry for demo site (https://plyr.io) only
-  if (window.location.host === production) {
+  /*if (window.location.host === production) {
     Sentry.init({
       dsn: 'https://d4ad9866ad834437a4754e23937071e4@sentry.io/305555',
       whitelistUrls: [production].map((d) => new RegExp(`https://(([a-z0-9])+(.))*${d}`)),
     });
-  }
+  }*/
 
   document.addEventListener('DOMContentLoaded', () => {
     const selector = '#player';
 
     // Setup share buttons
-    Shr.setup('.js-shr', {
+    /*Shr.setup('.js-shr', {
       count: {
         className: 'button__count',
       },
       wrapper: {
         className: 'button--with-count',
       },
-    });
+    });*/
 
     // Setup the player
     const player = new Plyr(selector, {
@@ -52,10 +52,6 @@ import toggleClass from './toggle-class';
       },
       captions: {
         active: true,
-      },
-      ads: {
-        enabled: window.location.host.includes(production),
-        publisherId: '918848828995742',
       },
       /*previewThumbnails: {
         enabled: true,
@@ -97,33 +93,11 @@ import toggleClass from './toggle-class';
       },*/
       previewThumbnails: {
         enabled: true,
-        src: [
-          {
-            frames: [
-              {
-                startTime: 0,
-                endTime: 60,
-                text: "https://i.imgur.com/D4gAAOV.jpeg",
-                x: 0,
-                y: 0,
-                w: 1920,
-                h: 1080
-              },
-              {
-                startTime: 61,
-                endTime: 10000,
-                text: "https://i.imgur.com/QJVfTKP.jpeg",
-                x: 0,
-                y: 0,
-                w: 1920,
-                h: 1080
-              }
-            ],
-            width: 1920,
-            height: 1090,
-            urlPrefix: "",
-          }
-        ]
+        src: ["/media/thumbnails-1.png","/media/thumbnails-2.png"],
+        column:5,
+        row:10,
+        height:90,
+        width:160
       },
 
       mobile:{

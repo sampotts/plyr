@@ -203,6 +203,8 @@ gulp.task('sprites', gulp.parallel(...tasks.sprite));
 
 // Watch for file changes
 gulp.task('watch', () => {
+  gulp.watch("C:\\Users\\erencan.kurt\\Documents\\GitHub\\plyr\\src\\js", gulp.parallel('js'));
+  gulp.watch("C:\\Users\\erencan.kurt\\Documents\\GitHub\\plyr\\demo\\src\\js", gulp.parallel('js'));
   // Plyr core
   gulp.watch(paths.plyr.src.js, gulp.parallel('js'));
   gulp.watch(paths.plyr.src.sass, gulp.parallel('css'));
