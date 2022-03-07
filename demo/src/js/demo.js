@@ -96,8 +96,6 @@ import toggleClass from './toggle-class';
         src: ["/media/thumbnails-1.png","/media/thumbnails-2.png"],
         column:5,
         row:10,
-        height:90,
-        width:160
       },
 
       mobile:{

@@ -295,6 +295,10 @@ const defaults = {
     'adsallcomplete',
     'adsimpression',
     'adsclick',
+
+    // Thumbnail Preview Plugin
+    'previewThumbnailsPlugin:show',
+    'previewThumbnailsPlugin:hide'
   ],
 
   // Selectors

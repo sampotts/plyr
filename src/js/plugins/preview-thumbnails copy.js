@@ -1,56 +1,9 @@
 import { createElement } from '../utils/elements';
 import { once } from '../utils/events';
-import fetch from '../utils/fetch';
+
 import is from '../utils/is';
 import { formatTime } from '../utils/time';
-
-// Arg: vttDataString example: "WEBVTT\n\n1\n00:00:05.000 --> 00:00:10.000\n1080p-00001.jpg"
-const parseVtt = (vttDataString) => {
-  const processedList = [];
-  const frames = vttDataString.split(/\r\n\r\n|\n\n|\r\r/);
-
-  frames.forEach((frame) => {
-    const result = {};
-    const lines = frame.split(/\r\n|\n|\r/);
-
-    lines.forEach((line) => {
-      if (!is.number(result.startTime)) {
-        // The line with start and end times on it is the first line of interest
-        const matchTimes = line.match(
-          /([0-9]{2})?:?([0-9]{2}):([0-9]{2}).([0-9]{2,3})( ?--> ?)([0-9]{2})?:?([0-9]{2}):([0-9]{2}).([0-9]{2,3})/,
-        ); // Note that this currently ignores caption formatting directives that are optionally on the end of this line - fine for non-captions VTT
-
-        if (matchTimes) {
-          result.startTime =
-            Number(matchTimes[1] || 0) * 60 * 60 +
-            Number(matchTimes[2]) * 60 +
-            Number(matchTimes[3]) +
-            Number(`0.${matchTimes[4]}`);
-          result.endTime =
-            Number(matchTimes[6] || 0) * 60 * 60 +
-            Number(matchTimes[7]) * 60 +
-            Number(matchTimes[8]) +
-            Number(`0.${matchTimes[9]}`);
-        }
-      } else if (!is.empty(line.trim()) && is.empty(result.text)) {
-        // If we already have the startTime, then we're definitely up to the text line(s)
-        const lineSplit = line.trim().split('#xywh=');
-        [result.text] = lineSplit;
-
-        // If there's content in lineSplit[1], then we have sprites. If not, then it's just one frame per image
-        if (lineSplit[1]) {
-          [result.x, result.y, result.w, result.h] = lineSplit[1].split(',');
-        }
-      }
-    });
-
-    if (result.text) {
-      processedList.push(result);
-    }
-  });
-
-  return processedList;
-};
+import {clamp} from '../utils/numbers'
 
 /**
  * Preview thumbnails for seek hover and scrubbing
@@ -87,16 +40,26 @@ class PreviewThumbnails {
     this.player = player;
     this.thumbnails = [];
     this.loaded = false;
+    this.config=null;
+
+
     this.lastMouseMoveTime = Date.now();
     this.mouseDown = false;
     this.loadedImages = [];
+    
+
 
     this.elements = {
       thumb: {},
       scrubbing: {},
     };
 
-    this.load();
+    this.interval=0;
+    this.itemInPage=0;
+
+    this.player.on("loadeddata",()=>{
+      this.load();
+    });
   }
 
   get enabled() {
@@ -113,99 +76,33 @@ class PreviewThumbnails {
       return;
     }
 
-    this.getThumbnails().then(() => {
-      if (!this.enabled) {
-        return;
-      }
+    this.config=this.player.config.previewThumbnails;
 
-      // Render DOM elements
-      this.render();
+    this.prepareThumbnails();
+    this.render();
+    this.determineContainerAutoSizing();
 
-      // Check to see if thumb container size was specified manually in CSS
-      this.determineContainerAutoSizing();
-
-      this.loaded = true;
-    });
+    this.loaded = true;
   };
 
-  // Download VTT files and parse them
-  getThumbnails = () => {
-    return new Promise((resolve) => {
-      const { src } = this.player.config.previewThumbnails;
+  
+  prepareThumbnails = () => {
 
-      if (is.empty(src)) {
-        throw new Error('Missing previewThumbnails.src config attribute');
-      }
+    this.itemInPage= this.config.column*this.config.row;
+    this.interval= this.player.duration/this.itemInPage*this.config.src.length;
 
-      // Resolve promise
-      const sortAndResolve = () => {
-        // Sort smallest to biggest (e.g., [120p, 480p, 1080p])
-        this.thumbnails.sort((x, y) => x.height - y.height);
-
-        this.player.debug.log('Preview thumbnails', this.thumbnails);
-
-        resolve();
-      };
-
-      // Via callback()
-      if(is.array(src) && is.object(src[0])){
-        this.thumbnails = src;
-        sortAndResolve();
-      }else if (is.function(src)) {
-        src((thumbnails) => {
-          this.thumbnails = thumbnails;
-          sortAndResolve();
-        });
-      }
-      // VTT urls
-      else {
-        // If string, convert into single-element list
-        const urls = is.string(src) ? [src] : src;
-        // Loop through each src URL. Download and process the VTT file, storing the resulting data in this.thumbnails
-        const promises = urls.map((u) => this.getThumbnail(u));
-        // Resolve
-        Promise.all(promises).then(sortAndResolve);
-      }
-    });
-  };
-
-  // Process individual VTT file
-  getThumbnail = (url) => {
-    return new Promise((resolve) => {
-      fetch(url).then((response) => {
-        const thumbnail = {
-          frames: parseVtt(response),
-          height: null,
-          urlPrefix: '',
-        };
-
-        // If the URLs don't start with '/', then we need to set their relative path to be the location of the VTT file
-        // If the URLs do start with '/', then they obviously don't need a prefix, so it will remain blank
-        // If the thumbnail URLs start with with none of '/', 'http://' or 'https://', then we need to set their relative path to be the location of the VTT file
-        if (
-          !thumbnail.frames[0].text.startsWith('/') &&
-          !thumbnail.frames[0].text.startsWith('http://') &&
-          !thumbnail.frames[0].text.startsWith('https://')
-        ) {
-          thumbnail.urlPrefix = url.substring(0, url.lastIndexOf('/') + 1);
-        }
-
-        // Download the first frame, so that we can determine/set the height of this thumbnailsDef
-        const tempImage = new Image();
-
-        tempImage.onload = () => {
-          thumbnail.height = tempImage.naturalHeight;
-          thumbnail.width = tempImage.naturalWidth;
-
-          this.thumbnails.push(thumbnail);
-
-          resolve();
-        };
-
-        tempImage.src = thumbnail.urlPrefix + thumbnail.frames[0].text;
+    this.player.config.previewThumbnails.src.forEach(SingleUrl => {
+      this.thumbnails.push({
+        url:SingleUrl,
+        isLoading:false,
+        isLoaded:false,
+        image:null,
+        blob:null
       });
     });
+    
   };
+
 
   startMove = (event) => {
     if (!this.loaded) {
@@ -240,7 +137,6 @@ class PreviewThumbnails {
         this.seekTime = this.player.media.duration - 1;
       }
 
-      
       this.mousePosX = event.pageX;
 
       // Set time text inside image container
@@ -361,30 +257,17 @@ class PreviewThumbnails {
       this.setThumbContainerSizeAndPos();
     }
 
-    // Find the desired thumbnail index
-    // TODO: Handle a video longer than the thumbs where thumbNum is null
-    const thumbNum = this.thumbnails[0].frames.findIndex(
-      (frame) => this.seekTime >= frame.startTime && this.seekTime <= frame.endTime,
-    );
-    const hasThumb = thumbNum >= 0;
-    let qualityIndex = 0;
+    const perIndex= Math.floor(this.seekTime / this.interval);
 
+    const thumbNum= perIndex + 1 - this.itemInPage * (Math.ceil((perIndex + 1) / this.itemInPage) - 1);
+
+    const hasThumb = thumbNum >= 0;
+
+    let qualityIndex = clamp(Math.ceil((perIndex + 1) / this.itemInPage) - 1, 0, this.thumbnails.length-1);
     // Show the thumb container if we're not scrubbing
     if (!this.mouseDown) {
       this.toggleThumbContainer(hasThumb);
     }
-
-    // No matching thumb found
-    if (!hasThumb) {
-      return;
-    }
-
-    // Check to see if we've already downloaded higher quality versions of this image
-    this.thumbnails.forEach((thumbnail, index) => {
-      if (this.loadedImages.includes(thumbnail.frames[thumbNum].text)) {
-        qualityIndex = index;
-      }
-    });
 
     // Only proceed if either thumbnum or thumbfilename has changed
     if (thumbNum !== this.showingThumb) {
@@ -397,46 +280,35 @@ class PreviewThumbnails {
   loadImage = (qualityIndex = 0) => {
     const thumbNum = this.showingThumb;
     const thumbnail = this.thumbnails[qualityIndex];
-    const { urlPrefix } = thumbnail;
-    const frame = thumbnail.frames[thumbNum];
-    const thumbFilename = thumbnail.frames[thumbNum].text;
-    const thumbUrl = urlPrefix + thumbFilename;
 
-    if (!this.currentImageElement || this.currentImageElement.dataset.filename !== thumbFilename) {
-      // If we're already loading a previous image, remove its onload handler - we don't want it to load after this one
-      // Only do this if not using sprites. Without sprites we really want to show as many images as possible, as a best-effort
-      if (this.loadingImage && this.usingSprites) {
-        this.loadingImage.onload = null;
-      }
+    if(thumbnail.isLoading==false && thumbnail.isLoaded==false){
+      thumbnail.isLoading=true;
 
-      // We're building and adding a new image. In other implementations of similar functionality (YouTube), background image
-      // is instead used. But this causes issues with larger images in Firefox and Safari - switching between background
-      // images causes a flicker. Putting a new image over the top does not
-      const previewImage = new Image();
-      previewImage.src = thumbUrl;
-      previewImage.dataset.index = thumbNum;
-      previewImage.dataset.filename = thumbFilename;
-      this.showingThumbFilename = thumbFilename;
+      fetch(thumbnail.url)
+        .then(response=>response.blob())
+        .then(blob=>{
+          const imageObjectURL = URL.createObjectURL(blob);
 
-      this.player.debug.log(`Loading image: ${thumbUrl}`);
+          thumbnail.blob=imageObjectURL;
+          thumbnail.image= new Image();;
+          thumbnail.image.src= thumbnail.blob;
 
-      // For some reason, passing the named function directly causes it to execute immediately. So I've wrapped it in an anonymous function...
-      previewImage.onload = () => this.showImage(previewImage, frame, qualityIndex, thumbNum, thumbFilename, true);
-      this.loadingImage = previewImage;
-      this.removeOldImages(previewImage);
-    } else {
-      // Update the existing image
-      this.showImage(this.currentImageElement, frame, qualityIndex, thumbNum, thumbFilename, false);
-      this.currentImageElement.dataset.index = thumbNum;
-      this.removeOldImages(this.currentImageElement);
+          thumbnail.isLoading=false;
+          thumbnail.isLoaded=true;
+        });
+      
     }
+
+    if(thumbnail.isLoaded==false) return;
+
+    this.showImage(thumbnail.image, qualityIndex, thumbNum, true);
   };
 
-  showImage = (previewImage, frame, qualityIndex, thumbNum, thumbFilename, newImage = true) => {
+  showImage = (previewImage, qualityIndex, thumbNum, newImage = true) => {
     this.player.debug.log(
-      `Showing thumb: ${thumbFilename}. num: ${thumbNum}. qual: ${qualityIndex}. newimg: ${newImage}`,
+      `num: ${thumbNum}. qual: ${qualityIndex}. newimg: ${newImage}`,
     );
-    this.setImageSizeAndOffset(previewImage, frame);
+    this.setImageSizeAndOffset(previewImage, qualityIndex);
 
     if (newImage) {
       this.currentImageContainer.appendChild(previewImage);
@@ -564,16 +436,9 @@ class PreviewThumbnails {
     return this.elements.thumb.imageContainer;
   }
 
-  get usingSprites() {
-    return Object.keys(this.thumbnails[0].frames[0]).includes('w');
-  }
 
   get thumbAspectRatio() {
-    if (this.usingSprites) {
-      return this.thumbnails[0].frames[0].w / this.thumbnails[0].frames[0].h;
-    }
-
-    return this.thumbnails[0].width / this.thumbnails[0].height;
+    return this.config.width / this.config.height;
   }
 
   get thumbContainerHeight() {
@@ -639,6 +504,7 @@ class PreviewThumbnails {
   // Set the size to be about a quarter of the size of video. Unless option dynamicSize === false, in which case it needs to be set in CSS
   setThumbContainerSizeAndPos = () => {
     if (!this.sizeSpecifiedInCSS) {
+      debugger;
       const thumbWidth = Math.floor(this.thumbContainerHeight * this.thumbAspectRatio);
       this.elements.thumb.imageContainer.style.height = `${this.thumbContainerHeight}px`;
       this.elements.thumb.imageContainer.style.width = `${thumbWidth}px`;
@@ -692,21 +558,17 @@ class PreviewThumbnails {
 
   // Sprites need to be offset to the correct location
   setImageSizeAndOffset = (previewImage, frame) => {
-    if (!this.usingSprites) {
-      return;
-    }
-
     // Find difference between height and preview container height
-    const multiplier = this.thumbContainerHeight / frame.h;
+    const multiplier = this.thumbContainerHeight / this.config.height;
 
     // eslint-disable-next-line no-param-reassign
-    previewImage.style.height = `${previewImage.naturalHeight * multiplier}px`;
+    previewImage.style.height = `${this.config.height * multiplier}px`;
     // eslint-disable-next-line no-param-reassign
-    previewImage.style.width = `${previewImage.naturalWidth * multiplier}px`;
+    previewImage.style.width = `${this.config.width * multiplier}px`;
     // eslint-disable-next-line no-param-reassign
-    previewImage.style.left = `-${frame.x * multiplier}px`;
+    previewImage.style.left = `-${frame * this.config.width}px`;
     // eslint-disable-next-line no-param-reassign
-    previewImage.style.top = `-${frame.y * multiplier}px`;
+    previewImage.style.top = `-${frame * this.config.height}px`;
   };
 }
 
