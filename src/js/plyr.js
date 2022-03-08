@@ -12,6 +12,7 @@ import { getProviderByUrl, providers, types } from './config/types';
 import Console from './console';
 import controls from './controls';
 import Fullscreen from './fullscreen';
+import Mobile from './mobile';
 import html5 from './html5';
 import Listeners from './listeners';
 import media from './media';
@@ -31,7 +32,7 @@ import { cloneDeep, extend } from './utils/objects';
 import { silencePromise } from './utils/promise';
 import { getAspectRatio, reduceAspectRatio, setAspectRatio, validateAspectRatio } from './utils/style';
 import { parseUrl } from './utils/urls';
-
+import browser from './utils/browser';
 // Private properties
 // TODO: Use a WeakMap for private globals
 // const globals = new WeakMap();
@@ -290,6 +291,12 @@ class Plyr {
     // Setup fullscreen
     this.fullscreen = new Fullscreen(this);
 
+    // Setup mobile
+    
+    if(browser.IsPhone && this.config.mobile.enabled){
+      this.mobile= new Mobile(this);
+    }
+
     // Setup interface
     // If embed but not fully supported, build interface now to avoid flash of controls
     if (this.isHTML5 || (this.isEmbed && !this.supported.ui)) {
@@ -314,7 +321,6 @@ class Plyr {
 
     // Seek time will be recorded (in listeners.js) so we can prevent hiding controls for a few seconds after seek
     this.lastSeekTime = 0;
-
     // Setup preview thumbnails if enabled
     if (this.config.previewThumbnails.enabled) {
       this.previewThumbnails = new PreviewThumbnails(this);

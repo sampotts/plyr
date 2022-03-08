@@ -7,6 +7,7 @@ const browser = {
   isIE: Boolean(window.document.documentMode),
   isEdge: window.navigator.userAgent.includes('Edge'),
   isWebkit: 'WebkitAppearance' in document.documentElement.style && !/Edge/.test(navigator.userAgent),
+  IsPhone: navigator.userAgentData!=null? navigator.userAgentData.mobile : /(Android|webOS|iPhone|iPad|iPod|BlackBerry|Windows Phone)/gi.test(navigator.userAgent),
   isIPhone: /(iPhone|iPod)/gi.test(navigator.platform),
   isIos:
     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) ||
