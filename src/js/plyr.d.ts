@@ -523,6 +523,11 @@ declare namespace Plyr {
      * Media Metadata Options.
      */
     mediaMetadata?: MediaMetadataOptions;
+
+    /**
+     * Markers Options
+     */
+    markers?: MarkersOptions;
   }
 
   interface QualityOptions {
@@ -592,6 +597,16 @@ declare namespace Plyr {
     artist?: string;
     album?: string;
     artwork?: MediaMetadataArtwork[];
+  }
+
+  interface MarkersPoints {
+    time: number;
+    label: string;
+  }
+
+  interface MarkersOptions {
+    enabled: boolean;
+    points: MarkersPoints[]
   }
 
   export interface Elements {
