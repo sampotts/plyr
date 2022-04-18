@@ -36,6 +36,7 @@
     "remark": "remark -f --use 'validate-links=repository:\"sampotts/plyr\"' '{,!(node_modules),.?**/}*.md'",
     "deploy": "yarn lint && gulp version && gulp build && gulp deploy",
     "format": "prettier --write \"./{src,demo/src}/**/*.{js,scss}\"",
+    "spellcheck": "cspell \"**/*.{js,md,scss,json}\" --no-must-find-files",
     "start": "gulp"
   },
   "devDependencies": {
@@ -48,6 +49,7 @@
     "babel-eslint": "^10.1.0",
     "browser-sync": "^2.27.9",
     "colorette": "2.0.16",
+    "cspell": "^5.19.7",
     "cssnano": "^5.1.7",
     "del": "^6.0.0",
     "eslint": "^7.23.0",
