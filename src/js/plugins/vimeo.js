@@ -35,12 +35,12 @@ function parseHash(url) {
    *  - [https://player.]vimeo.com/video/{id}?h={hash}[&params]
    *  - [https://player.]vimeo.com/video/{id}?[params]&h={hash}
    *  - video/{id}/{hash}
-   * If matched, the hash is available in the named group `hash`
+   * If matched, the hash is available in capture group 4
    */
-  const regex = /^.*(?:vimeo.com\/|video\/)(?:\d+)(?:\?.*&*h=|\/)+(?<hash>[\d,a-f]+)/;
+  const regex = /^.*(vimeo.com\/|video\/)(\d+)(\?.*&*h=|\/)+([\d,a-f]+)/;
   const found = url.match(regex);
 
-  return found ? found.groups.hash : null;
+  return found && found.length === 5 ? found[4] : null;
 }
 
 // Set playback state and trigger change (only on actual change)
