@@ -404,7 +404,7 @@ const controls = {
       'keydown keyup',
       (event) => {
         // We only care about space and ⬆️ ⬇️️ ➡️
-        if (![32, 38, 39, 40].includes(event.which)) {
+        if (!['Space', 'ArrowUp', 'ArrowDown', 'ArrowRight'].includes(event.key)) {
           return;
         }
 
@@ -420,13 +420,13 @@ const controls = {
         const isRadioButton = matches(menuItem, '[role="menuitemradio"]');
 
         // Show the respective menu
-        if (!isRadioButton && [32, 39].includes(event.which)) {
+        if (!isRadioButton && ['Space', 'ArrowRight'].includes(event.key)) {
           controls.showMenuPanel.call(this, type, true);
         } else {
           let target;
 
-          if (event.which !== 32) {
-            if (event.which === 40 || (isRadioButton && event.which === 39)) {
+          if (event.key !== 'Space') {
+            if (event.key === 'ArrowDown' || (isRadioButton && event.key === 'ArrowRight')) {
               target = menuItem.nextElementSibling;
 
               if (!is.element(target)) {
@@ -450,9 +450,7 @@ const controls = {
     // Enter will fire a `click` event but we still need to manage focus
     // So we bind to keyup which fires after and set focus here
     on.call(this, menuItem, 'keyup', (event) => {
-      if (event.which !== 13) {
-        return;
-      }
+      if (event.key !== 'Return') return;
 
       controls.focusFirstMenuItem.call(this, null, true);
     });
@@ -506,7 +504,7 @@ const controls = {
       menuItem,
       'click keyup',
       (event) => {
-        if (is.keyboardEvent(event) && event.which !== 32) {
+        if (is.keyboardEvent(event) && event.key !== 'Space') {
           return;
         }
 
@@ -1139,7 +1137,7 @@ const controls = {
 
     if (is.boolean(input)) {
       show = input;
-    } else if (is.keyboardEvent(input) && input.which === 27) {
+    } else if (is.keyboardEvent(input) && input.key === 'Escape') {
       show = false;
     } else if (is.event(input)) {
       // If Plyr is in a shadowDOM, the event target is set to the component, instead of the
@@ -1527,8 +1525,7 @@ const controls = {
             pane,
             'keydown',
             (event) => {
-              // We only care about <-
-              if (event.which !== 37) {
+              if (event.key !== 'ArrowLeft') {
                 return;
               }
 

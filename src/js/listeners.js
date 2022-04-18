@@ -29,25 +29,25 @@ class Listeners {
   handleKey(event) {
     const { player } = this;
     const { elements } = player;
-    const code = event.keyCode ? event.keyCode : event.which;
-    const pressed = event.type === 'keydown';
-    const repeat = pressed && code === this.lastKey;
+    const { key, type, altKey, ctrlKey, metaKey, shiftKey } = event;
+    const pressed = type === 'keydown';
+    const repeat = pressed && key === this.lastKey;
 
     // Bail if a modifier key is set
-    if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) {
+    if (altKey || ctrlKey || metaKey || shiftKey) {
       return;
     }
 
     // If the event is bubbled from the media element
-    // Firefox doesn't get the keycode for whatever reason
-    if (!is.number(code)) {
+    // Firefox doesn't get the key for whatever reason
+    if (!key) {
       return;
     }
 
-    // Seek by the number keys
-    const seekByKey = () => {
+    // Seek by increment
+    const seekByIncrement = (increment) => {
       // Divide the max duration into 10th's and times by the number value
-      player.currentTime = (player.duration / 10) * (code - 48);
+      player.currentTime = (player.duration / 10) * increment;
     };
 
     // Handle the key on keydown
@@ -65,100 +65,101 @@ class Listeners {
           return;
         }
 
-        if (event.which === 32 && matches(focused, 'button, [role^="menuitem"]')) {
+        if (event.key === 'Space' && matches(focused, 'button, [role^="menuitem"]')) {
           return;
         }
       }
 
-      // Which keycodes should we prevent default
-      const preventDefault = [32, 37, 38, 39, 40, 48, 49, 50, 51, 52, 53, 54, 56, 57, 67, 70, 73, 75, 76, 77, 79];
+      // Which keys should we prevent default
+      const preventDefault = [
+        'Space',
+        'ArrowLeft',
+        'ArrowUp',
+        'ArrowRight',
+        'ArrowDown',
 
-      // If the code is found prevent default (e.g. prevent scrolling for arrows)
-      if (preventDefault.includes(code)) {
+        '0',
+        '1',
+        '2',
+        '3',
+        '4',
+        '5',
+        '6',
+        '7',
+        '8',
+        '9',
+
+        'c',
+        'f',
+        'k',
+        'l',
+        'm',
+      ];
+
+      // If the key is found prevent default (e.g. prevent scrolling for arrows)
+      if (preventDefault.includes(key)) {
         event.preventDefault();
         event.stopPropagation();
       }
 
-      switch (code) {
-        case 48:
-        case 49:
-        case 50:
-        case 51:
-        case 52:
-        case 53:
-        case 54:
-        case 55:
-        case 56:
-        case 57:
-          // 0-9
+      switch (key) {
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
           if (!repeat) {
-            seekByKey();
+            seekByIncrement(parseInt(key, 10));
           }
           break;
 
-        case 32:
-        case 75:
-          // Space and K key
+        case 'Space':
+        case 'k':
           if (!repeat) {
             silencePromise(player.togglePlay());
           }
           break;
 
-        case 38:
-          // Arrow up
+        case 'ArrowUp':
           player.increaseVolume(0.1);
           break;
 
-        case 40:
-          // Arrow down
+        case 'ArrowDown':
           player.decreaseVolume(0.1);
           break;
 
-        case 77:
-          // M key
+        case 'm':
           if (!repeat) {
             player.muted = !player.muted;
           }
           break;
 
-        case 39:
-          // Arrow forward
+        case 'ArrowRight':
           player.forward();
           break;
 
-        case 37:
-          // Arrow back
+        case 'ArrowLeft':
           player.rewind();
           break;
 
-        case 70:
-          // F key
+        case 'f':
           player.fullscreen.toggle();
           break;
 
-        case 67:
-          // C key
+        case 'c':
           if (!repeat) {
             player.toggleCaptions();
           }
           break;
 
-        case 76:
-          // L key
+        case 'l':
           player.loop = !player.loop;
           break;
-
-        /* case 73:
-          this.setLoop('start');
-          break;
-
-        case 76:
-          this.setLoop();
-          break;
-
-        case 79:
-          this.setLoop('end');
-          break; */
 
         default:
           break;
@@ -166,12 +167,12 @@ class Listeners {
 
       // Escape is handle natively when in full screen
       // So we only need to worry about non native
-      if (code === 27 && !player.fullscreen.usingNative && player.fullscreen.active) {
+      if (key === 'Escape' && !player.fullscreen.usingNative && player.fullscreen.active) {
         player.fullscreen.toggle();
       }
 
-      // Store last code for next cycle
-      this.lastKey = code;
+      // Store last key for next cycle
+      this.lastKey = key;
     } else {
       this.lastKey = null;
     }
@@ -196,17 +197,18 @@ class Listeners {
   setTabFocus = (event) => {
     const { player } = this;
     const { elements } = player;
+    const { key, type, timeStamp } = event;
 
     clearTimeout(this.focusTimer);
 
     // Ignore any key other than tab
-    if (event.type === 'keydown' && event.which !== 9) {
+    if (type === 'keydown' && key !== 'Tab') {
       return;
     }
 
     // Store reference to event timeStamp
-    if (event.type === 'keydown') {
-      this.lastKeyDown = event.timeStamp;
+    if (type === 'keydown') {
+      this.lastKeyDown = timeStamp;
     }
 
     // Remove current classes
@@ -217,10 +219,10 @@ class Listeners {
     };
 
     // Determine if a key was pressed to trigger this event
-    const wasKeyDown = event.timeStamp - this.lastKeyDown <= 20;
+    const wasKeyDown = timeStamp - this.lastKeyDown <= 20;
 
     // Ignore focus events if a key was pressed prior
-    if (event.type === 'focus' && !wasKeyDown) {
+    if (type === 'focus' && !wasKeyDown) {
       return;
     }
 
@@ -229,7 +231,7 @@ class Listeners {
 
     // Delay the adding of classname until the focus has changed
     // This event fires before the focusin event
-    if (event.type !== 'focusout') {
+    if (type !== 'focusout') {
       this.focusTimer = setTimeout(() => {
         const focused = document.activeElement;
 
@@ -661,15 +663,12 @@ class Listeners {
       elements.buttons.settings,
       'keyup',
       (event) => {
-        const code = event.which;
-
-        // We only care about space and return
-        if (![13, 32].includes(code)) {
+        if (!['Space', 'Enter'].includes(event.key)) {
           return;
         }
 
         // Because return triggers a click anyway, all we need to do is set focus
-        if (code === 13) {
+        if (event.key === 'Enter') {
           controls.focusFirstMenuItem.call(player, null, true);
           return;
         }
@@ -689,7 +688,7 @@ class Listeners {
 
     // Escape closes menu
     this.bind(elements.settings.menu, 'keydown', (event) => {
-      if (event.which === 27) {
+      if (event.key === 'Escape') {
         controls.toggleMenu.call(player, event);
       }
     });
@@ -704,10 +703,9 @@ class Listeners {
     // Pause while seeking
     this.bind(elements.inputs.seek, 'mousedown mouseup keydown keyup touchstart touchend', (event) => {
       const seek = event.currentTarget;
-      const code = event.keyCode ? event.keyCode : event.which;
       const attribute = 'play-on-seeked';
 
-      if (is.keyboardEvent(event) && code !== 39 && code !== 37) {
+      if (is.keyboardEvent(event) && !['ArrowLeft', 'ArrowRight'].includes(event.key)) {
         return;
       }
 
