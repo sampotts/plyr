@@ -212,7 +212,7 @@ declare class Plyr {
   airplay(): void;
 
   /**
-   * Sets the preview thubmnails for the current source.
+   * Sets the preview thumbnails for the current source.
    */
   setPreviewThumbnails(source: Plyr.PreviewThumbnailsOptions): void;
 

@@ -883,7 +883,7 @@ class Listeners {
       elements.inputs.volume,
       'wheel',
       (event) => {
-        // Detect "natural" scroll - suppored on OS X Safari only
+        // Detect "natural" scroll - supported on OS X Safari only
         // Other browsers on OS X will be inverted until support improves
         const inverted = event.webkitDirectionInvertedFromDevice;
         // Get delta from event. Invert if `inverted` is true
