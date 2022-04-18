@@ -827,7 +827,6 @@ Plyr costs money to run, not only my time. I donate my time for free as I enjoy 
 
 # Used by
 
-- [NKLAV | Filmmaker](https://nklav.com)
 - [Selz.com](https://selz.com)
 - [Peugeot.fr](http://www.peugeot.fr/marque-et-technologie/technologies/peugeot-i-cockpit.html)
 - [Peugeot.de](http://www.peugeot.de/modelle/modellberater/208-3-turer/fotos-videos.html)
@@ -843,6 +842,7 @@ Plyr costs money to run, not only my time. I donate my time for free as I enjoy 
 - [pressakey.com | Blog-Magazin für Videospiele](https://pressakey.com)
 - [STROLLÿN: Work with a View](https://strollyn.com)
 - [CFDA Runway360](https://runway360.cfda.com/)
+- [NKLAV | Filmmaker](https://nklav.com)
 
 If you want to be added to the list, open a pull request. It'd be awesome to see how you're using Plyr 😎
 
