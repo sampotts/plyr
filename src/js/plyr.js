@@ -933,8 +933,7 @@ class Plyr {
    * @param {Boolean} input - Whether to autoplay or not
    */
   set autoplay(input) {
-    const toggle = is.boolean(input) ? input : this.config.autoplay;
-    this.config.autoplay = toggle;
+    this.config.autoplay = is.boolean(input) ? input : this.config.autoplay;
   }
 
   /**
