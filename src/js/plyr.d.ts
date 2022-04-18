@@ -272,8 +272,8 @@ declare namespace Plyr {
     controlsshown: PlyrEvent;
     ready: PlyrEvent;
   };
-  // For retrocompatibility, we keep StandadEvent
-  type StandadEvent = keyof Plyr.StandardEventMap;
+  // For retrocompatibility, we keep StandardEvent
+  type StandardEvent = keyof Plyr.StandardEventMap;
   type Html5EventMap = {
     loadstart: PlyrEvent;
     loadeddata: PlyrEvent;
