@@ -1,3 +1,13 @@
+## v3.7.0
+
+- Feat: Add markers support (🚨 Requires a SCSS/CSS update 🚨) (thanks @ForeverSc and @fengshuo!)
+- Feat: Add support for MediaMetadata (thanks @Hashen110!)
+- Fix: Pass this context to captions.setup (fixes #2352) (thanks @WilliamMHerring, @willherring and @zenyr!)
+- Fix: Modify vimeo parseHash to use non-named capture groups (fixes #2396) (thanks @fekle!)
+- Fix: Replace deprecated String.prototype.substr() (thanks @CommanderRoot!)
+- Docs: Update speed option default to match the source (thanks @ozgurg!)
+- Docs: SASS → Sass (thanks @toastal!)
+
 ### v3.6.12
 
 - Fix: remove division logic from ads.scss (fixes #2370)
