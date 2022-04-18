@@ -5,7 +5,7 @@
 // Make a <button> look like an <a>
 button.faux-link {
   @extend a; // stylelint-disable-line
-  @include cancel-button-styles();
+  @include cancel-button-styles;
 }
 
 // Links
@@ -39,7 +39,7 @@ a {
   }
 
   &.tab-focus {
-    @include tab-focus();
+    @include tab-focus;
   }
 
   &.no-border::after {

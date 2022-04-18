@@ -7,14 +7,10 @@ $plyr-font-size-base: var(--plyr-font-size-base, 15px) !default;
 $plyr-font-size-small: var(--plyr-font-size-small, 13px) !default;
 $plyr-font-size-large: var(--plyr-font-size-large, 18px) !default;
 $plyr-font-size-xlarge: var(--plyr-font-size-xlarge, 21px) !default;
-
 $plyr-font-size-time: var(--plyr-font-size-time, $plyr-font-size-small) !default;
 $plyr-font-size-menu: var(--plyr-font-size-menu, $plyr-font-size-small) !default;
 $plyr-font-size-badge: var(--plyr-font-size-badge, 9px) !default;
-
 $plyr-font-weight-regular: var(--plyr-font-weight-regular, 400) !default;
 $plyr-font-weight-bold: var(--plyr-font-weight-bold, 600) !default;
-
 $plyr-line-height: var(--plyr-line-height, 1.7) !default;
-
 $plyr-font-smoothing: var(--plyr-font-smoothing, false) !default;

@@ -125,6 +125,11 @@ const ui = {
     if (this.config.duration) {
       controls.durationUpdate.call(this);
     }
+
+    // Media metadata
+    if (this.config.mediaMetadata) {
+      controls.setMediaMetadata.call(this);
+    }
   },
 
   // Setup aria attribute for play and iframe title

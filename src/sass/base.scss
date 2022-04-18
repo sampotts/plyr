@@ -5,6 +5,7 @@
 // Base
 .plyr {
   @include plyr-font-smoothing($plyr-font-smoothing);
+
   align-items: center;
   direction: ltr;
   display: flex;

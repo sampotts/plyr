@@ -47,10 +47,10 @@
   display: block;
   height: $plyr-range-track-height;
   left: 0;
-  margin: -($plyr-range-track-height / 2) 0 0;
   opacity: 0.8;
   position: absolute;
   top: 50%;
+  transform: translateY(-50%);
   width: 3px;
   z-index: 3; // Between progress and thumb
 }

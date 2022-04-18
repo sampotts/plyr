@@ -61,7 +61,7 @@ const defaults = {
   // Sprite (for icons)
   loadSprite: true,
   iconPrefix: 'plyr',
-  iconUrl: 'https://cdn.plyr.io/3.6.9/plyr.svg',
+  iconUrl: 'https://cdn.plyr.io/3.6.12/plyr.svg',
 
   // Blank video (used to prevent errors on source change)
   blankVideo: 'https://cdn.plyr.io/static/blank.mp4',
@@ -391,6 +391,10 @@ const defaults = {
       scrubbingContainer: 'plyr__preview-scrubbing',
       scrubbingContainerShown: 'plyr__preview-scrubbing--is-shown',
     },
+    markers: {
+      points: 'plyr__marker__points',
+      tip: 'plyr__marker__tip',
+    },
   },
 
   // Embed attributes
@@ -440,6 +444,20 @@ const defaults = {
     // Custom settings from Plyr
     customControls: true,
     noCookie: false, // Whether to use an alternative version of YouTube without cookies
+  },
+
+  // Media Metadata
+  mediaMetadata: {
+    title: '',
+    artist: '',
+    album: '',
+    artwork: [],
+  },
+  
+  // Markers
+  markers: {
+    enabled: false,
+    points: [],
   },
 };
 

@@ -18,7 +18,7 @@
   position: relative;
   text-align: inherit;
   text-shadow: inherit;
-  -moz-user-select: text; // stylelint-disable-line
+  user-select: text;
   vertical-align: baseline;
   width: auto;
 }

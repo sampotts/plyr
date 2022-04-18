@@ -7,12 +7,10 @@ $plyr-control-spacing: var(--plyr-control-spacing, 10px) !default;
 $plyr-control-padding: calc(#{$plyr-control-spacing} * 0.7);
 $plyr-control-padding: var(--plyr-control-padding, $plyr-control-padding) !default;
 $plyr-control-radius: var(--plyr-control-radius, 3px) !default;
-
 $plyr-control-toggle-checked-background: var(
   --plyr-control-toggle-checked-background,
   var(--plyr-color-main, $plyr-color-main)
 ) !default;
-
 $plyr-video-controls-background: var(
   --plyr-video-controls-background,
   linear-gradient(rgba(#000, 0), rgba(#000, 0.75))
@@ -23,7 +21,6 @@ $plyr-video-control-background-hover: var(
   --plyr-video-control-background-hover,
   var(--plyr-color-main, $plyr-color-main)
 ) !default;
-
 $plyr-audio-controls-background: var(--plyr-audio-controls-background, #fff) !default;
 $plyr-audio-control-color: var(--plyr-audio-control-color, $plyr-color-gray-700) !default;
 $plyr-audio-control-color-hover: var(--plyr-audio-control-color-hover, #fff) !default;

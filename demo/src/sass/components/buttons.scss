@@ -45,7 +45,7 @@
   }
 
   &.tab-focus {
-    @include tab-focus();
+    @include tab-focus;
   }
 
   &:active {
@@ -64,7 +64,7 @@
 
 // Count bubble
 .button__count {
-  animation: fadein 0.2s ease;
+  animation: fade-in 0.2s ease;
   background: $color-button-count-background;
   color: $color-button-count-text;
   margin-left: ($spacing-base * 0.75);

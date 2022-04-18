@@ -12,7 +12,9 @@
 
     // Linting
     "stylelint.enable": true,
+    "stylelint.validate": ["css", "scss"],
     "css.validate": false,
+    "less.validate": false,
     "scss.validate": false,
     "javascript.validate.enable": false,
 

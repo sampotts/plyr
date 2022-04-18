@@ -73,7 +73,7 @@ const html5 = {
           return;
         }
 
-        // If we're using an an external handler...
+        // If we're using an external handler...
         if (player.config.quality.forced && is.function(player.config.quality.onChange)) {
           player.config.quality.onChange(input);
         } else {
