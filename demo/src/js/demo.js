@@ -81,15 +81,15 @@ import toggleClass from './toggle-class';
         points: [
           {
             time: 10,
-            tip: 'first marker',
+            label: 'first marker',
           },
           {
             time: 40,
-            tip: 'second marker',
+            label: 'second marker',
           },
           {
             time: 120,
-            tipHTML: '<strong>third</strong> marker',
+            label: '<strong>third</strong> marker',
           },
         ],
       },

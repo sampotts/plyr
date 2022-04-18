@@ -350,6 +350,7 @@ const defaults = {
     hover: 'plyr--hover',
     tooltip: 'plyr__tooltip',
     cues: 'plyr__cues',
+    marker: 'plyr__progress__marker',
     hidden: 'plyr__sr-only',
     hideControls: 'plyr--hide-controls',
     isIos: 'plyr--is-ios',
@@ -390,10 +391,6 @@ const defaults = {
       // Scrubbing
       scrubbingContainer: 'plyr__preview-scrubbing',
       scrubbingContainerShown: 'plyr__preview-scrubbing--is-shown',
-    },
-    markers: {
-      points: 'plyr__marker__points',
-      tip: 'plyr__marker__tip',
     },
   },
 
@@ -453,7 +450,7 @@ const defaults = {
     album: '',
     artwork: [],
   },
-  
+
   // Markers
   markers: {
     enabled: false,

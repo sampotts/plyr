@@ -24,8 +24,10 @@ $plyr-progress-offset: $plyr-range-thumb-height;
 
   // Seek tooltip to show time
   .plyr__tooltip {
-    font-size: $plyr-font-size-time;
     left: 0;
+    max-width: 120px;
+    overflow-wrap: break-word;
+    white-space: normal;
   }
 }
 
@@ -91,4 +93,16 @@ $plyr-progress-offset: $plyr-range-thumb-height;
 
 .plyr--audio.plyr--loading .plyr__progress__buffer {
   background-color: $plyr-audio-progress-buffered-background;
+}
+
+// Markers
+.plyr__progress__marker {
+  background-color: $plyr-progress-marker-background;
+  border-radius: 1px;
+  height: $plyr-range-track-height;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: $plyr-progress-marker-width;
+  z-index: 3;
 }

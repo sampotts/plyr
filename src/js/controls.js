@@ -484,7 +484,7 @@ const controls = {
 
     menuItem.appendChild(flex);
 
-    // Replicate radio button behaviour
+    // Replicate radio button behavior
     Object.defineProperty(menuItem, 'checked', {
       enumerable: true,
       get() {
@@ -698,8 +698,9 @@ const controls = {
       return;
     }
 
+    const tipElement = this.elements.display.seekTooltip;
     const visible = `${this.config.classNames.tooltip}--visible`;
-    const toggle = (show) => toggleClass(this.elements.display.seekTooltip, visible, show);
+    const toggle = (show) => toggleClass(tipElement, visible, show);
 
     // Hide on touch
     if (this.touch) {
@@ -713,8 +714,8 @@ const controls = {
 
     if (is.event(event)) {
       percent = (100 / clientRect.width) * (event.pageX - clientRect.left);
-    } else if (hasClass(this.elements.display.seekTooltip, visible)) {
-      percent = parseFloat(this.elements.display.seekTooltip.style.left, 10);
+    } else if (hasClass(tipElement, visible)) {
+      percent = parseFloat(tipElement.style.left, 10);
     } else {
       return;
     }
@@ -726,11 +727,21 @@ const controls = {
       percent = 100;
     }
 
+    const time = (this.duration / 100) * percent;
+
     // Display the time a click would seek to
-    controls.updateTimeDisplay.call(this, this.elements.display.seekTooltip, (this.duration / 100) * percent);
+    tipElement.innerText = controls.formatTime(time);
+
+    // Get marker point for time
+    const point = this.config.markers?.points?.find(({ time: t }) => t === Math.round(time));
+
+    // Append the point label to the tooltip
+    if (point) {
+      tipElement.insertAdjacentHTML('afterbegin', `${point.label}<br>`);
+    }
 
     // Set position
-    this.elements.display.seekTooltip.style.left = `${percent}%`;
+    tipElement.style.left = `${percent}%`;
 
     // Show/hide the tooltip
     // If the event is a moues in/out and percentage is inside bounds
@@ -1761,70 +1772,81 @@ const controls = {
           artwork: this.config.mediaMetadata.artwork,
         });
       }
-      // eslint-disable-next-line no-empty
-    } catch (e) {}
-  }, 
-    
-  // Add markers 
+    } catch (_) {
+      // Do nothing
+    }
+  },
+
+  // Add markers
   setMarkers() {
-    if (this.duration > 0 && !this.elements.markers) {
-      const { points } = this.config.markers;
-      const markersContainerFragment = document.createDocumentFragment();
-      const markersPointsFragment = document.createDocumentFragment();
-      const markerTipElement = createElement(
+    if (!this.duration || this.elements.markers) return;
+
+    // Get valid points
+    const points = this.config.markers?.points?.filter(({ time }) => time > 0 && time < this.duration);
+    if (!points?.length) return;
+
+    const containerFragment = document.createDocumentFragment();
+    const pointsFragment = document.createDocumentFragment();
+    let tipElement = null;
+    const tipVisible = `${this.config.classNames.tooltip}--visible`;
+    const toggleTip = (show) => toggleClass(tipElement, tipVisible, show);
+
+    // Inject markers to progress container
+    points.forEach((point) => {
+      const markerElement = createElement(
         'span',
         {
-          class: this.config.classNames.markers.tip,
+          class: this.config.classNames.marker,
         },
         '',
       );
 
-      points.forEach((point) => {
-        if (point < 0 || point > this.duration) {
-          return;
-        }
+      const left = `${(point.time / this.duration) * 100}%`;
 
-        const markerPointElement = createElement(
-          'span',
-          {
-            class: this.config.classNames.markers.points,
-          },
-          '',
-        );
-
-        const left = `${(point.time / this.duration) * 100}%`;
-        const tipVisible = `${this.config.classNames.markers.tip}--visible`;
-        const toggle = (show) => toggleClass(markerTipElement, tipVisible, show);
-
-        markerPointElement.addEventListener('mouseenter', () => {
-          markerTipElement.style.left = left;
-          if (point.tipHTML) {
-            markerTipElement.innerHTML = point.tipHTML;
-          } else {
-            markerTipElement.innerText = point.tip;
-          }
-          toggle(true);
-        });
-        markerPointElement.addEventListener('mouseleave', () => {
-          toggle(false);
-        });
-        markerPointElement.addEventListener('click', () => {
-          this.currentTime = point.time;
+      if (tipElement) {
+        // Show on hover
+        markerElement.addEventListener('mouseenter', () => {
+          if (point.label) return;
+          tipElement.style.left = left;
+          tipElement.innerHTML = point.label;
+          toggleTip(true);
         });
 
-        markerPointElement.style.left = left;
-        markersPointsFragment.appendChild(markerPointElement);
+        // Hide on leave
+        markerElement.addEventListener('mouseleave', () => {
+          toggleTip(false);
+        });
+      }
+
+      markerElement.addEventListener('click', () => {
+        this.currentTime = point.time;
       });
 
-      markersContainerFragment.appendChild(markersPointsFragment);
-      markersContainerFragment.appendChild(markerTipElement);
+      markerElement.style.left = left;
+      pointsFragment.appendChild(markerElement);
+    });
 
-      this.elements.markers = {
-        points: markersPointsFragment,
-        tip: markerTipElement,
-      };
-      this.elements.progress.appendChild(markersContainerFragment);
+    containerFragment.appendChild(pointsFragment);
+
+    // Inject a tooltip if needed
+    if (!this.config.tooltips.seek) {
+      tipElement = createElement(
+        'span',
+        {
+          class: this.config.classNames.tooltip,
+        },
+        '',
+      );
+
+      containerFragment.appendChild(tipElement);
     }
+
+    this.elements.markers = {
+      points: pointsFragment,
+      tip: tipElement,
+    };
+
+    this.elements.progress.appendChild(containerFragment);
   },
 };
 

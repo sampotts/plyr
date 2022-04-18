@@ -6,12 +6,12 @@
 
 .plyr__preview-thumb {
   background-color: $plyr-preview-background;
-  border-radius: 3px;
+  border-radius: $plyr-preview-radius;
   bottom: 100%;
   box-shadow: $plyr-preview-shadow;
   margin-bottom: calc(#{$plyr-preview-padding} * 2);
   opacity: 0;
-  padding: $plyr-preview-radius;
+  padding: 3px;
   pointer-events: none;
   position: absolute;
   transform: translate(0, 10px) scale(0.8);
@@ -59,19 +59,20 @@
 
   // Seek time text
   &__time-container {
-    bottom: $plyr-preview-time-bottom-offset;
+    background: $plyr-preview-time-container-background;
+    border-bottom-left-radius: calc(#{$plyr-preview-radius} - 1px);
+    border-bottom-right-radius: calc(#{$plyr-preview-radius} - 1px);
+    bottom: 0;
     left: 0;
+    line-height: 1.1;
+    padding: $plyr-preview-time-container-padding;
     position: absolute;
     right: 0;
-    white-space: nowrap;
     z-index: 3;
 
     span {
-      background-color: $plyr-preview-time-background;
-      border-radius: calc(#{$plyr-preview-radius} - 1px);
       color: $plyr-preview-time-color;
       font-size: $plyr-preview-time-font-size;
-      padding: $plyr-preview-time-padding;
     }
   }
 }

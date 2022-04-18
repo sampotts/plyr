@@ -241,6 +241,15 @@ class PreviewThumbnails {
 
       // Set time text inside image container
       this.elements.thumb.time.innerText = formatTime(this.seekTime);
+
+      // Get marker point for time
+      const point = this.player.config.markers?.points?.find(({ time: t }) => t === Math.round(this.seekTime));
+
+      // Append the point label to the tooltip
+      if (point) {
+        // this.elements.thumb.time.innerText.concat('\n');
+        this.elements.thumb.time.insertAdjacentHTML('afterbegin', `${point.label}<br>`);
+      }
     }
 
     // Download and show image
@@ -326,7 +335,7 @@ class PreviewThumbnails {
     this.elements.thumb.time = createElement('span', {}, '00:00');
     timeContainer.appendChild(this.elements.thumb.time);
 
-    this.elements.thumb.container.appendChild(timeContainer);
+    this.elements.thumb.imageContainer.appendChild(timeContainer);
 
     // Inject the whole thumb
     if (is.element(this.player.elements.progress)) {
