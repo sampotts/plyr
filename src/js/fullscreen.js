@@ -207,7 +207,7 @@ class Fullscreen {
   // Trap focus inside container
   trapFocus = (event) => {
     // Bail if iOS, not active, not the tab key
-    if (browser.isIos || !this.active || event.key !== 'Tab' || event.keyCode !== 9) {
+    if (browser.isIos || !this.active || event.key !== 'Tab') {
       return;
     }
 
