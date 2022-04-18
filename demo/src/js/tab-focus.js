@@ -13,7 +13,7 @@ document.addEventListener('focusout', (event) => {
 
 // Add classname to tabbed elements
 document.addEventListener('keydown', (event) => {
-  if (event.keyCode !== 9) {
+  if (event.key !== 'Tab') {
     return;
   }
 
