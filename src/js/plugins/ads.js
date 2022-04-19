@@ -240,7 +240,7 @@ class Ads {
 
   /**
    * This method is called whenever the ads are ready inside the AdDisplayContainer
-   * @param {Event} adsManagerLoadedEvent
+   * @param {Event} event - adsManagerLoadedEvent
    */
   onAdsManagerLoaded = (event) => {
     // Load could occur after a source change (race condition)
@@ -581,6 +581,7 @@ class Ads {
   /**
    * Handles callbacks after an ad event was invoked
    * @param {String} event - Event type
+   * @param args
    */
   trigger = (event, ...args) => {
     const handlers = this.events[event];

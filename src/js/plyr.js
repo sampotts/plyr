@@ -649,7 +649,7 @@ class Plyr {
 
   /**
    * Set playback speed
-   * @param {Number} speed - the speed of playback (0.5-2.0)
+   * @param {Number} input - the speed of playback (0.5-2.0)
    */
   set speed(input) {
     let speed = null;
@@ -953,7 +953,7 @@ class Plyr {
 
   /**
    * Set the caption track by index
-   * @param {Number} - Caption index
+   * @param {Number} input - Caption index
    */
   set currentTrack(input) {
     captions.set.call(this, input, false);
@@ -971,7 +971,7 @@ class Plyr {
   /**
    * Set the wanted language for captions
    * Since tracks can be added later it won't update the actual caption track until there is a matching track
-   * @param {String} - Two character ISO language code (e.g. EN, FR, PT, etc)
+   * @param {String} input - Two character ISO language code (e.g. EN, FR, PT, etc)
    */
   set language(input) {
     captions.setLanguage.call(this, input, false);
