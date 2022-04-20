@@ -1,3 +1,10 @@
+### v3.7.1
+
+- Feat: Minor styling improvements to the preview thumbnails (🚨 Requires a SCSS/CSS update 🚨)
+- Fix: fix invalid CSS @charset rule in Sass files (thanks @Hashen110!)
+- Chore: Replace deprecated KeyboardEvent `keyCode` references to use `key` instead (thanks @Hashen110!)
+- Various other code clean up and typo fixes (thanks @Hashen110!)
+
 ## v3.7.0
 
 - Feat: Add markers support (🚨 Requires a SCSS/CSS update 🚨) (thanks @ForeverSc and @fengshuo!)
