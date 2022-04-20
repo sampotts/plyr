@@ -32,7 +32,7 @@
     bottom: calc(#{$plyr-preview-arrow-size} * -1);
     content: '';
     height: 0;
-    left: 50%;
+    left: calc(50% + var(--preview-arrow-offset));
     position: absolute;
     transform: translateX(-50%);
     width: 0;
@@ -46,14 +46,26 @@
     position: relative;
     z-index: 0;
 
-    img {
-      height: 100%; // Non sprite images are 100%. Sprites will have their size applied by JavaScript
+    img,
+    &::after {
+      height: 100%;
       left: 0;
-      max-height: none;
-      max-width: none;
       position: absolute;
       top: 0;
       width: 100%;
+    }
+
+    &::after {
+      border-radius: inherit;
+      box-shadow: inset 0 0 0 1px rgba(#000, 15%);
+      content: '';
+      pointer-events: none;
+    }
+
+    img {
+      // Non sprite images are 100%. Sprites will have their size applied by JavaScript
+      max-height: none;
+      max-width: none;
     }
   }
 

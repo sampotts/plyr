@@ -2,6 +2,7 @@ import { createElement } from '../utils/elements';
 import { once } from '../utils/events';
 import fetch from '../utils/fetch';
 import is from '../utils/is';
+import { clamp } from '../utils/numbers';
 import { formatTime } from '../utils/time';
 
 // Arg: vttDataString example: "WEBVTT\n\n1\n00:00:05.000 --> 00:00:10.000\n1080p-00001.jpg"
@@ -109,9 +110,7 @@ class PreviewThumbnails {
       this.player.elements.display.seekTooltip.hidden = this.enabled;
     }
 
-    if (!this.enabled) {
-      return;
-    }
+    if (!this.enabled) return;
 
     this.getThumbnails().then(() => {
       if (!this.enabled) {
@@ -205,18 +204,12 @@ class PreviewThumbnails {
   };
 
   startMove = (event) => {
-    if (!this.loaded) {
-      return;
-    }
+    if (!this.loaded) return;
 
-    if (!is.event(event) || !['touchmove', 'mousemove'].includes(event.type)) {
-      return;
-    }
+    if (!is.event(event) || !['touchmove', 'mousemove'].includes(event.type)) return;
 
     // Wait until media has a duration
-    if (!this.player.media.duration) {
-      return;
-    }
+    if (!this.player.media.duration) return;
 
     if (event.type === 'touchmove') {
       // Calculate seek hover position as approx video seconds
@@ -391,7 +384,7 @@ class PreviewThumbnails {
       }
     });
 
-    // Only proceed if either thumbnum or thumbfilename has changed
+    // Only proceed if either thumb num or thumbfilename has changed
     if (thumbNum !== this.showingThumb) {
       this.showingThumb = thumbNum;
       this.loadImage(qualityIndex);
@@ -562,11 +555,7 @@ class PreviewThumbnails {
   };
 
   get currentImageContainer() {
-    if (this.mouseDown) {
-      return this.elements.scrubbing.container;
-    }
-
-    return this.elements.thumb.imageContainer;
+    return this.mouseDown ? this.elements.scrubbing.container : this.elements.thumb.imageContainer;
   }
 
   get usingSprites() {
@@ -599,11 +588,7 @@ class PreviewThumbnails {
   }
 
   get currentImageElement() {
-    if (this.mouseDown) {
-      return this.currentScrubbingImageElement;
-    }
-
-    return this.currentThumbnailImageElement;
+    return this.mouseDown ? this.currentScrubbingImageElement : this.currentThumbnailImageElement;
   }
 
   set currentImageElement(element) {
@@ -643,46 +628,39 @@ class PreviewThumbnails {
 
   // Set the size to be about a quarter of the size of video. Unless option dynamicSize === false, in which case it needs to be set in CSS
   setThumbContainerSizeAndPos = () => {
+    const { imageContainer } = this.elements.thumb;
+
     if (!this.sizeSpecifiedInCSS) {
       const thumbWidth = Math.floor(this.thumbContainerHeight * this.thumbAspectRatio);
-      this.elements.thumb.imageContainer.style.height = `${this.thumbContainerHeight}px`;
-      this.elements.thumb.imageContainer.style.width = `${thumbWidth}px`;
-    } else if (
-      this.elements.thumb.imageContainer.clientHeight > 20 &&
-      this.elements.thumb.imageContainer.clientWidth < 20
-    ) {
-      const thumbWidth = Math.floor(this.elements.thumb.imageContainer.clientHeight * this.thumbAspectRatio);
-      this.elements.thumb.imageContainer.style.width = `${thumbWidth}px`;
-    } else if (
-      this.elements.thumb.imageContainer.clientHeight < 20 &&
-      this.elements.thumb.imageContainer.clientWidth > 20
-    ) {
-      const thumbHeight = Math.floor(this.elements.thumb.imageContainer.clientWidth / this.thumbAspectRatio);
-      this.elements.thumb.imageContainer.style.height = `${thumbHeight}px`;
+      imageContainer.style.height = `${this.thumbContainerHeight}px`;
+      imageContainer.style.width = `${thumbWidth}px`;
+    } else if (imageContainer.clientHeight > 20 && imageContainer.clientWidth < 20) {
+      const thumbWidth = Math.floor(imageContainer.clientHeight * this.thumbAspectRatio);
+      imageContainer.style.width = `${thumbWidth}px`;
+    } else if (imageContainer.clientHeight < 20 && imageContainer.clientWidth > 20) {
+      const thumbHeight = Math.floor(imageContainer.clientWidth / this.thumbAspectRatio);
+      imageContainer.style.height = `${thumbHeight}px`;
     }
 
     this.setThumbContainerPos();
   };
 
   setThumbContainerPos = () => {
-    const seekbarRect = this.player.elements.progress.getBoundingClientRect();
-    const plyrRect = this.player.elements.container.getBoundingClientRect();
+    const scrubberRect = this.player.elements.progress.getBoundingClientRect();
+    const containerRect = this.player.elements.container.getBoundingClientRect();
     const { container } = this.elements.thumb;
     // Find the lowest and highest desired left-position, so we don't slide out the side of the video container
-    const minVal = plyrRect.left - seekbarRect.left + 10;
-    const maxVal = plyrRect.right - seekbarRect.left - container.clientWidth - 10;
+    const min = containerRect.left - scrubberRect.left + 10;
+    const max = containerRect.right - scrubberRect.left - container.clientWidth - 10;
     // Set preview container position to: mousepos, minus seekbar.left, minus half of previewContainer.clientWidth
-    let previewPos = this.mousePosX - seekbarRect.left - container.clientWidth / 2;
+    const position = this.mousePosX - scrubberRect.left - container.clientWidth / 2;
+    const clamped = clamp(position, min, max);
 
-    if (previewPos < minVal) {
-      previewPos = minVal;
-    }
+    // Move the popover position
+    container.style.left = `${clamped}px`;
 
-    if (previewPos > maxVal) {
-      previewPos = maxVal;
-    }
-
-    container.style.left = `${previewPos}px`;
+    // The arrow can follow the cursor
+    container.style.setProperty('--preview-arrow-offset', `${position - clamped}px`);
   };
 
   // Can't use 100% width, in case the video is a different aspect ratio to the video container
@@ -697,9 +675,7 @@ class PreviewThumbnails {
 
   // Sprites need to be offset to the correct location
   setImageSizeAndOffset = (previewImage, frame) => {
-    if (!this.usingSprites) {
-      return;
-    }
+    if (!this.usingSprites) return;
 
     // Find difference between height and preview container height
     const multiplier = this.thumbContainerHeight / frame.h;
