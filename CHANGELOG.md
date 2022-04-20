@@ -1,7 +1,11 @@
+### v3.7.2
+
+- Fix: Add `@babel/plugin-proposal-optional-chaining` to transform optional chaining in build output
+
 ### v3.7.1
 
 - Feat: Minor styling improvements to the preview thumbnails (🚨 Requires a SCSS/CSS update 🚨)
-- Fix: fix invalid CSS @charset rule in Sass files (thanks @Hashen110!)
+- Fix: Fix invalid CSS @charset rule in Sass files (thanks @Hashen110!)
 - Chore: Replace deprecated KeyboardEvent `keyCode` references to use `key` instead (thanks @Hashen110!)
 - Various other code clean up and typo fixes (thanks @Hashen110!)
 
