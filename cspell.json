@@ -1,6 +1,10 @@
 {
   "version": "0.2",
-  "ignorePaths": ["package.json", "dist/*", "demo/node_modules/*"],
+  "ignorePaths": [
+    "package.json",
+    "dist/*",
+    "demo/node_modules/*"
+  ],
   "dictionaryDefinitions": [],
   "dictionaries": [],
   "words": [
@@ -13,9 +17,11 @@
     "fastly",
     "fullscreen",
     "gordita",
+    "loadjs",
     "magazin",
     "menuitemradio",
     "noupe",
+    "otransitionend",
     "playsinline",
     "plyr",
     "rutheneum",
