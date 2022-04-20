@@ -1525,9 +1525,7 @@ const controls = {
             pane,
             'keydown',
             (event) => {
-              if (event.key !== 'ArrowLeft') {
-                return;
-              }
+              if (event.key !== 'ArrowLeft') return;
 
               // Prevent seek
               event.preventDefault();
