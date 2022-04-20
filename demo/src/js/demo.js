@@ -17,9 +17,10 @@ import toggleClass from './toggle-class';
 
 (() => {
   const production = 'plyr.io';
+  const isProduction = window.location.host.includes(production);
 
   // Sentry for demo site (https://plyr.io) only
-  if (window.location.host === production) {
+  if (isProduction) {
     Sentry.init({
       dsn: 'https://d4ad9866ad834437a4754e23937071e4@sentry.io/305555',
       whitelistUrls: [production].map((d) => new RegExp(`https://(([a-z0-9])+(.))*${d}`)),
@@ -53,10 +54,10 @@ import toggleClass from './toggle-class';
       captions: {
         active: true,
       },
-      ads: {
-        enabled: window.location.host.includes(production),
+      /* ads: {
+        enabled: isProduction,
         publisherId: '918848828995742',
-      },
+      }, */
       previewThumbnails: {
         enabled: true,
         src: ['https://cdn.plyr.io/static/demo/thumbs/100p.vtt', 'https://cdn.plyr.io/static/demo/thumbs/240p.vtt'],
