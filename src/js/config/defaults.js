@@ -70,7 +70,7 @@ const defaults = {
   quality: {
     default: 576,
     // The options to display in the UI, if available for the source media
-    options: [4320, 2880, 2160, 1440, 1080, 720, 576, 480, 360, 240],
+    options: [0x7fffffff, 4320, 2880, 2160, 1440, 1080, 720, 576, 480, 360, 240],
     forced: false,
     onChange: null,
   },
@@ -87,6 +87,14 @@ const defaults = {
     selected: 1,
     // The options to display in the UI, if available for the source media (e.g. Vimeo and YouTube only support 0.5x-4x)
     options: [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 4],
+  },
+
+  audioTrack: {
+    default: 'Default',
+    // The options to display in the UI, if available for the source media
+    options: ['Default'],
+    forced: false,
+    onChange: null,
   },
 
   // Keyboard shortcut settings
@@ -145,7 +153,7 @@ const defaults = {
     // 'download',
     'fullscreen',
   ],
-  settings: ['captions', 'quality', 'speed'],
+  settings: ['captions', 'quality', 'speed', 'audioTrack'],
 
   // Localisation
   i18n: {
@@ -174,6 +182,7 @@ const defaults = {
     pip: 'PIP',
     menuBack: 'Go back to previous menu',
     speed: 'Speed',
+    audioTrack: 'Audio track',
     normal: 'Normal',
     quality: 'Quality',
     loop: 'Loop',
@@ -184,6 +193,9 @@ const defaults = {
     disabled: 'Disabled',
     enabled: 'Enabled',
     advertisement: 'Ad',
+    qualityLabel: {
+      0x7fffffff: 'Auto',
+    },
     qualityBadge: {
       2160: '4K',
       1440: 'HD',
@@ -274,6 +286,9 @@ const defaults = {
     // Quality
     'qualitychange',
 
+    // MPEG-DASH
+    'audiotrackchange',
+
     // Ads
     'adsloaded',
     'adscontentpause',
@@ -317,6 +332,7 @@ const defaults = {
       speed: '[data-plyr="speed"]',
       language: '[data-plyr="language"]',
       quality: '[data-plyr="quality"]',
+      audioTrack: '[data-plyr="audioTrack"]',
     },
     display: {
       currentTime: '.plyr__time--current',

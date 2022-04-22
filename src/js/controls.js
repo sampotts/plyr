@@ -7,6 +7,7 @@ import RangeTouch from 'rangetouch';
 
 import captions from './captions';
 import html5 from './html5';
+import mpd from './plugins/mpd';
 import support from './support';
 import { repaint, transitionEndEvent } from './utils/animation';
 import { dedupe } from './utils/arrays';
@@ -526,6 +527,11 @@ const controls = {
             this.speed = parseFloat(value);
             break;
 
+          case 'audioTrack':
+            this.audioTrack = value;
+            // controls.updateSetting.call(this, type, list);
+            break;
+
           default:
             break;
         }
@@ -824,7 +830,9 @@ const controls = {
     let value = null;
     let list = container;
 
-    if (setting === 'captions') {
+    if (setting === 'audioTrack') {
+      value = this.audioTrack;
+    } else if (setting === 'captions') {
       value = this.currentTrack;
     } else {
       value = !is.empty(input) ? input : this[setting];
@@ -872,6 +880,15 @@ const controls = {
   // Translate a value into a nice label
   getLabel(setting, value) {
     switch (setting) {
+      case 'audioTrack':
+        const label = i18n.get(`audioTrack.${value}`, this.config);
+
+        if (!label.length) {
+          return `${value}`;
+        }
+
+        return label;
+
       case 'speed':
         return value === 1 ? i18n.get('normal', this.config) : `${value}&times;`;
 
@@ -1096,6 +1113,54 @@ const controls = {
     controls.updateSetting.call(this, type, list);
   },
 
+  setAudioTrackMenu(options) {
+    console.log(this.elements.settings.panels);
+    // Menu required
+    if (!is.element(this.elements.settings.panels.audioTrack)) {
+      return;
+    }
+
+    const type = 'audioTrack';
+    const list = this.elements.settings.panels.audioTrack.querySelector('[role="menu"]');
+
+    // Set options if passed and filter based on uniqueness and config
+    if (is.array(options)) {
+      this.options.audioTrack = dedupe(options);
+    }
+
+    // Toggle the pane and tab
+    const toggle = !is.empty(this.options.audioTrack) && this.options.audioTrack.length > 1;
+    controls.toggleMenuButton.call(this, type, toggle);
+
+    // Empty the menu
+    emptyElement(list);
+
+    // Check if we need to toggle the parent
+    controls.checkMenu.call(this);
+
+    // If we're hiding, nothing more to do
+    if (!toggle) {
+      return;
+    }
+
+    // Sort options by the config and then render options
+    this.options.audioTrack
+      .sort((a, b) => {
+        const sorting = this.config.audioTrack.options;
+        return sorting.indexOf(a) > sorting.indexOf(b) ? 1 : -1;
+      })
+      .forEach((audioTrack) => {
+        controls.createMenuItem.call(this, {
+          value: audioTrack,
+          list,
+          type,
+          title: controls.getLabel.call(this, 'audioTrack', audioTrack),
+        });
+      });
+
+    controls.updateSetting.call(this, type, list);
+  },
+
   // Check if we need to hide/show the settings menu
   checkMenu() {
     const { buttons } = this.elements.settings;
@@ -1272,6 +1337,7 @@ const controls = {
       createTime,
       setQualityMenu,
       setSpeedMenu,
+      setAudioTrackMenu,
       showMenuPanel,
     } = controls;
     this.elements.controls = null;
@@ -1614,6 +1680,18 @@ const controls = {
       setQualityMenu.call(this, html5.getQualityOptions.call(this));
     }
 
+    if (this.isMPD) {
+      setQualityMenu.call(this, mpd.getQualityOptions.call(this));
+      this.dash.on('periodSwitchCompleted', () => {
+        setQualityMenu.call(this, mpd.getQualityOptions.call(this));
+      });
+
+      setAudioTrackMenu.call(this, mpd.getAudioTrackOptions.call(this));
+      this.dash.on('periodSwitchCompleted', () => {
+        setAudioTrackMenu.call(this, mpd.getAudioTrackOptions.call(this));
+      });
+    }
+
     setSpeedMenu.call(this);
 
     return container;
@@ -1666,6 +1744,7 @@ const controls = {
         seektime: this.config.seekTime,
         speed: this.speed,
         quality: this.quality,
+        audioTrack: this.audioTrack,
         captions: captions.getLabel.call(this),
         // TODO: Looping
         // loop: 'None',

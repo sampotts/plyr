@@ -74,7 +74,7 @@ export function getAspectRatio(input) {
   }
 
   // Get from HTML5 video
-  if (ratio === null && this.isHTML5) {
+  if (ratio === null && (this.isHTML5 || this.isMPD)) {
     const { videoWidth, videoHeight } = this.media;
     ratio = [videoWidth, videoHeight];
   }
@@ -115,7 +115,7 @@ export function setAspectRatio(input) {
     } else {
       this.media.style.transform = `translateY(-${offset}%)`;
     }
-  } else if (this.isHTML5) {
+  } else if (this.isHTML5 || this.isMPD) {
     wrapper.classList.add(this.config.classNames.videoFixedRatio);
   }
 

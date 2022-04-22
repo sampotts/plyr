@@ -13,6 +13,7 @@ const resources = {
   html5: 'HTML5',
   vimeo: 'Vimeo',
   youtube: 'YouTube',
+  mpd: 'MPEG-DASH',
 };
 
 const i18n = {

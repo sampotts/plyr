@@ -28,6 +28,11 @@ declare class Plyr {
   readonly isHTML5: boolean;
 
   /**
+   * Indicates if the current player is MPEG-DASH.
+   */
+  readonly isMPD: boolean;
+
+  /**
    * Indicates if the current player is an embedded player.
    */
   readonly isEmbed: boolean;
@@ -251,7 +256,7 @@ declare class Plyr {
 
 declare namespace Plyr {
   type MediaType = 'audio' | 'video';
-  type Provider = 'html5' | 'youtube' | 'vimeo';
+  type Provider = 'html5' | 'youtube' | 'vimeo' | 'mpd';
   type StandardEventMap = {
     progress: PlyrEvent;
     playing: PlyrEvent;
@@ -513,6 +518,11 @@ declare namespace Plyr {
      * Youtube Player Options.
      */
     youtube?: object;
+
+    /**
+     * MPEG-DASH Player Options.
+     */
+    mpd?: object;
 
     /**
      * Preview Thumbnails Options.

@@ -386,7 +386,7 @@ class Listeners {
     // Handle the media finishing
     on.call(player, player.media, 'ended', () => {
       // Show poster on end
-      if (player.isHTML5 && player.isVideo && player.config.resetOnEnd) {
+      if ((player.isHTML5 || player.isMPD) && player.isVideo && player.config.resetOnEnd) {
         // Restart
         player.restart();
 
@@ -491,6 +491,12 @@ class Listeners {
     on.call(player, player.media, 'qualitychange', (event) => {
       // Update UI
       controls.updateSetting.call(player, 'quality', null, event.detail.quality);
+    });
+
+    // Audio track change
+    on.call(player, player.media, 'audiotrackchange', (event) => {
+      // Update UI
+      controls.updateSetting.call(player, 'audioTrack', null, event.detail.audioTrack);
     });
 
     // Update download link when ready and if quality changes

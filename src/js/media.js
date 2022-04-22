@@ -3,6 +3,7 @@
 // ==========================================================================
 
 import html5 from './html5';
+import mpd from './plugins/mpd';
 import vimeo from './plugins/vimeo';
 import youtube from './plugins/youtube';
 import { createElement, toggleClass, wrap } from './utils/elements';
@@ -48,6 +49,8 @@ const media = {
 
     if (this.isHTML5) {
       html5.setup.call(this);
+    } else if (this.isMPD) {
+      mpd.setup.call(this);
     } else if (this.isYouTube) {
       youtube.setup.call(this);
     } else if (this.isVimeo) {

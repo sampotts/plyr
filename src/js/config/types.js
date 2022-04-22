@@ -6,6 +6,7 @@ export const providers = {
   html5: 'html5',
   youtube: 'youtube',
   vimeo: 'vimeo',
+  mpd: 'mpd',
 };
 
 export const types = {
