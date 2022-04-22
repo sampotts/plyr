@@ -43,7 +43,6 @@ const mpd = {
     Object.defineProperty(player.media, 'quality', {
       get() {
         const currentIndex = player.dash.getQualityFor('video');
-        console.log("get", "quality", currentIndex);
         if(currentIndex){
           return player.dash.getBitrateInfoListFor('video')[currentIndex].height;
         }
@@ -59,9 +58,11 @@ const mpd = {
         };
 
         if (input === 0x7fffffff) {
+          // Auto quality
           cfg.streaming.abr.autoSwitchBitrate['video'] = true;
           player.dash.updateSettings(cfg);
         } else {
+          // Get quality by height
           const currentIndex = player.dash.getQualityFor('video');
           const currentHeight = (currentIndex) ? player.dash.getBitrateInfoListFor('video')[currentIndex].height : 0;
           for (const bitrate of player.dash.getBitrateInfoListFor('video')) {

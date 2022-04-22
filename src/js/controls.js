@@ -529,7 +529,6 @@ const controls = {
 
           case 'audioTrack':
             this.audioTrack = value;
-            // controls.updateSetting.call(this, type, list);
             break;
 
           default:
@@ -1114,7 +1113,6 @@ const controls = {
   },
 
   setAudioTrackMenu(options) {
-    console.log(this.elements.settings.panels);
     // Menu required
     if (!is.element(this.elements.settings.panels.audioTrack)) {
       return;
@@ -1681,14 +1679,13 @@ const controls = {
     }
 
     if (this.isMPD) {
-      setQualityMenu.call(this, mpd.getQualityOptions.call(this));
-      this.dash.on('periodSwitchCompleted', () => {
+      const updateSettings = () => {
         setQualityMenu.call(this, mpd.getQualityOptions.call(this));
-      });
-
-      setAudioTrackMenu.call(this, mpd.getAudioTrackOptions.call(this));
-      this.dash.on('periodSwitchCompleted', () => {
         setAudioTrackMenu.call(this, mpd.getAudioTrackOptions.call(this));
+      };
+      updateSettings();
+      this.dash.on('periodSwitchCompleted', () => {
+        updateSettings();
       });
     }
 
