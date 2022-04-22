@@ -24,6 +24,14 @@ const mpd = {
     return audioTrackList;
   },
 
+  getVideoTrackOptions() {
+    const videoTrackList = this.dash.getTracksFor('video').map((videoTrack) => {
+      return videoTrack.id;
+    });
+
+    return videoTrackList;
+  },
+
   setup() {
     if (!this.isMPD) {
       return;
@@ -102,8 +110,10 @@ const mpd = {
           if (currentTrack) {
             return currentTrack.id;
           }
-          return "Default";
-        }catch(e){}
+        }catch(e){
+
+        }
+        return "default";
       },
       set(input) {
         const cfg = {
@@ -130,6 +140,40 @@ const mpd = {
         // Trigger change event
         triggerEvent.call(player, player.media, 'audiotrackchange', false, {
           audioTrack: input,
+        });
+      },
+    });
+
+    // Video track
+    Object.defineProperty(player.media, 'videoTrack', {
+      get() {
+        try {
+          const currentTrack = player.dash.getCurrentTrackFor('video');
+          if (currentTrack) {
+            return currentTrack.id;
+          }
+        }catch(e){
+
+        }
+        return "default";
+      },
+      set(input) {
+        for (const track of player.dash.getTracksFor('video')) {
+          if (track.id === input) {
+            // Update video track
+            player.dash.setCurrentTrack(track);
+            break;
+          }
+        }
+
+        // If we're using an external handler...
+        if (player.config.videoTrack.forced && is.function(player.config.videoTrack.onChange)) {
+          player.config.videoTrack.onChange(input);
+        }
+
+        // Trigger change event
+        triggerEvent.call(player, player.media, 'videotrackchange', false, {
+          videoTrack: input,
         });
       },
     });

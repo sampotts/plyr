@@ -499,6 +499,12 @@ class Listeners {
       controls.updateSetting.call(player, 'audioTrack', null, event.detail.audioTrack);
     });
 
+    // Video track change
+    on.call(player, player.media, 'videotrackchange', (event) => {
+      // Update UI
+      controls.updateSetting.call(player, 'videoTrack', null, event.detail.videoTrack);
+    });
+
     // Update download link when ready and if quality changes
     on.call(player, player.media, 'ready qualitychange', () => {
       controls.setDownloadUrl.call(player);

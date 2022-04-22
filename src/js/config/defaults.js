@@ -90,9 +90,15 @@ const defaults = {
   },
 
   audioTrack: {
-    default: 'Default',
-    // The options to display in the UI, if available for the source media
-    options: ['Default'],
+    default: 'default',
+    options: ['default'],
+    forced: false,
+    onChange: null,
+  },
+
+  videoTrack: {
+    default: 'default',
+    options: ['default'],
     forced: false,
     onChange: null,
   },
@@ -153,7 +159,7 @@ const defaults = {
     // 'download',
     'fullscreen',
   ],
-  settings: ['captions', 'quality', 'speed', 'audioTrack'],
+  settings: ['captions', 'quality', 'speed', 'audioTrack', 'videoTrack'],
 
   // Localisation
   i18n: {
@@ -182,7 +188,8 @@ const defaults = {
     pip: 'PIP',
     menuBack: 'Go back to previous menu',
     speed: 'Speed',
-    audioTrack: 'Audio track',
+    audioTrack: 'Audio Track',
+    videoTrack: 'Video Track',
     normal: 'Normal',
     quality: 'Quality',
     loop: 'Loop',
@@ -288,6 +295,7 @@ const defaults = {
 
     // MPEG-DASH
     'audiotrackchange',
+    'videotrackchange',
 
     // Ads
     'adsloaded',
@@ -333,6 +341,7 @@ const defaults = {
       language: '[data-plyr="language"]',
       quality: '[data-plyr="quality"]',
       audioTrack: '[data-plyr="audioTrack"]',
+      videoTrack: '[data-plyr="videoTrack"]',
     },
     display: {
       currentTime: '.plyr__time--current',

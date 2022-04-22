@@ -783,6 +783,54 @@ class Plyr {
   }
 
   /**
+   * Set video track
+   */
+  set videoTrack(input) {
+    const config = this.config.videoTrack;
+    const options = this.options.videoTrack;
+
+    if (!options.length) {
+      return;
+    }
+
+    let videoTrack = [
+      !is.empty(input) && input,
+      this.storage.get('videoTrack'),
+      config.selected,
+      config.default,
+    ].find((e)=>{return !is.empty(e)});
+
+    let updateStorage = true;
+
+    if (!options.includes(videoTrack)) {
+      const value = closest(options, videoTrack);
+      this.debug.warn(`Unsupported videoTrack option: ${videoTrack}, using ${value} instead`);
+      videoTrack = value;
+
+      // Don't update storage if quality is not supported
+      updateStorage = false;
+    }
+
+    // Update config
+    config.selected = videoTrack;
+
+    // Set quality
+    this.media.videoTrack = videoTrack;
+
+    // Save to storage
+    if (updateStorage) {
+      this.storage.set({ videoTrack });
+    }
+  }
+
+  /**
+   * Get current video track
+   */
+  get videoTrack() {
+    return this.media.videoTrack;
+  }
+
+  /**
    * Set playback quality
    * Currently HTML5 & YouTube only
    * @param {Number} input - Quality level
