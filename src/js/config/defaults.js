@@ -296,6 +296,9 @@ const defaults = {
     // MPEG-DASH
     'audiotrackchange',
     'videotrackchange',
+    'qualitylistupdate',
+    'audiotracklistupdate',
+    'videotracklistupdate',
 
     // Ads
     'adsloaded',

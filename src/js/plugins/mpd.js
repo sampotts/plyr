@@ -141,6 +141,9 @@ const mpd = {
         triggerEvent.call(player, player.media, 'audiotrackchange', false, {
           audioTrack: input,
         });
+        triggerEvent.call(player, player.media, 'qualitylistupdate', false, {
+          list: mpd.getQualityOptions.call(player),
+        });
       },
     });
 
@@ -175,8 +178,26 @@ const mpd = {
         triggerEvent.call(player, player.media, 'videotrackchange', false, {
           videoTrack: input,
         });
+        triggerEvent.call(player, player.media, 'qualitylistupdate', false, {
+          list: mpd.getQualityOptions.call(player),
+        });
       },
     });
+
+    // Update settings list
+    const triggerEvents = () => {
+      triggerEvent.call(player, player.media, 'qualitylistupdate', false, {
+        list: mpd.getQualityOptions.call(player),
+      });
+      triggerEvent.call(player, player.media, 'audiotracklistupdate', false, {
+        list: mpd.getAudioTrackOptions.call(player),
+      });
+      triggerEvent.call(player, player.media, 'videotracklistupdate', false, {
+        list: mpd.getVideoTrackOptions.call(player),
+      });
+    }
+
+    player.dash.on('periodSwitchCompleted', triggerEvents);
   },
 };
 

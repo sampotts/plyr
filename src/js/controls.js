@@ -1748,15 +1748,9 @@ const controls = {
     }
 
     if (this.isMPD) {
-      const updateSettings = () => {
-        setQualityMenu.call(this, mpd.getQualityOptions.call(this));
-        setAudioTrackMenu.call(this, mpd.getAudioTrackOptions.call(this));
-        setVideoTrackMenu.call(this, mpd.getVideoTrackOptions.call(this));
-      };
-      updateSettings();
-      this.dash.on('periodSwitchCompleted', () => {
-        updateSettings();
-      });
+      setQualityMenu.call(this, mpd.getQualityOptions.call(this));
+      setAudioTrackMenu.call(this, mpd.getAudioTrackOptions.call(this));
+      setVideoTrackMenu.call(this, mpd.getVideoTrackOptions.call(this));
     }
 
     setSpeedMenu.call(this);

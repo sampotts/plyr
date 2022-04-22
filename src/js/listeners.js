@@ -505,6 +505,27 @@ class Listeners {
       controls.updateSetting.call(player, 'videoTrack', null, event.detail.videoTrack);
     });
 
+    // Quality list update
+    on.call(player, player.media, 'qualitylistupdate', (event) => {
+      // Update UI
+      console.log(event.detail);
+      controls.setQualityMenu.call(player, event.detail.list);
+    });
+
+    // Audio track list update
+    on.call(player, player.media, 'audiotracklistupdate', (event) => {
+      // Update UI
+      console.log(event.detail);
+      controls.setAudioTrackMenu.call(player, event.detail.list);
+    });
+
+    // Video track list update
+    on.call(player, player.media, 'videotracklistupdate', (event) => {
+      // Update UI
+      console.log(event.detail);
+      controls.setVideoTrackMenu.call(player, event.detail.list);
+    });
+
     // Update download link when ready and if quality changes
     on.call(player, player.media, 'ready qualitychange', () => {
       controls.setDownloadUrl.call(player);
