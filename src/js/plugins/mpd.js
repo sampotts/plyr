@@ -42,11 +42,16 @@ const mpd = {
     // Quality
     Object.defineProperty(player.media, 'quality', {
       get() {
-        const currentIndex = player.dash.getQualityFor('video');
-        if(currentIndex){
-          return player.dash.getBitrateInfoListFor('video')[currentIndex].height;
+        const settings = player.dash.getSettings();
+        if (settings.streaming && settings.streaming.abr && settings.streaming.abr.autoSwitchBitrate && settings.streaming.abr.autoSwitchBitrate.video) {
+          return 0x7fffffff;
         }
-        return 0x7fffffff;
+        const currentIndex = player.dash.getQualityFor('video');
+        const bitrateList = player.dash.getBitrateInfoListFor('video');
+        if(typeof currentIndex === 'number' && bitrateList[currentIndex]){
+          return bitrateList[currentIndex].height;
+        }
+        return 0;
       },
       set(input) {
         const cfg = {
