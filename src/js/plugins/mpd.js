@@ -116,29 +116,29 @@ const mpd = {
         return 0;
       },
       set(input) {
-        const cfg = {
-          'streaming': {
-            'abr': {
-              'autoSwitchBitrate': {}
-            }
-          }
+        const dashConfig = {
+          streaming: {
+            abr: {
+              autoSwitchBitrate: {},
+            },
+          },
         };
 
         if (input === 0x7fffffff) {
-          // Auto quality
-          cfg.streaming.abr.autoSwitchBitrate['video'] = true;
-          player.dash.updateSettings(cfg);
+          // Enabling auto switch quality
+          dashConfig.streaming.abr.autoSwitchBitrate.video = true;
+          player.dash.updateSettings(dashConfig);
         } else {
           // Get quality by height
           const currentIndex = player.dash.getQualityFor('video');
           const currentHeight = (currentIndex) ? player.dash.getBitrateInfoListFor('video')[currentIndex].height : 0;
           for (const bitrate of player.dash.getBitrateInfoListFor('video')) {
             if (bitrate.height === input) {
-              // Disable auto switch quality
-              cfg.streaming.abr.autoSwitchBitrate['video'] = false;
-              player.dash.updateSettings(cfg);
+              // Disabling auto switch quality
+              dashConfig.streaming.abr.autoSwitchBitrate.video = false;
+              player.dash.updateSettings(dashConfig);
               // Update quality
-              player.dash.setQualityFor('video', bitrate.qualityIndex, (bitrate.height > currentHeight));
+              player.dash.setQualityFor('video', bitrate.qualityIndex, bitrate.height > currentHeight);
               break;
             }
           }
@@ -169,14 +169,14 @@ const mpd = {
         }
       },
       set(input) {
-        const cfg = {
-          'streaming': {
-            'trackSwitchMode': {
-              'audio': 'alwaysReplace'
-            }
-          }
-        };
-        player.dash.updateSettings(cfg);
+        // Replace already buffered frames
+        player.dash.updateSettings({
+          streaming: {
+            trackSwitchMode: {
+              audio: 'alwaysReplace',
+            },
+          },
+        });
 
         const match = input.match(/^_index([0-9]+)$/);
         if (match) {
