@@ -157,7 +157,7 @@ const mpd = {
         }
 
         // If we're using an external handler...
-        if (player.config.quality.forced && is.function(player.config.quality.onChange)) {
+        if (is.function(player.config.quality.onChange)) {
           player.config.quality.onChange(input);
         }
 
@@ -214,7 +214,7 @@ const mpd = {
         }
 
         // If we're using an external handler...
-        if (player.config.audioTrack.forced && is.function(player.config.audioTrack.onChange)) {
+        if (is.function(player.config.audioTrack.onChange)) {
           player.config.audioTrack.onChange(input);
         }
 
@@ -265,7 +265,7 @@ const mpd = {
         }
 
         // If we're using an external handler...
-        if (player.config.videoTrack.forced && is.function(player.config.videoTrack.onChange)) {
+        if (is.function(player.config.videoTrack.onChange)) {
           player.config.videoTrack.onChange(input);
         }
 

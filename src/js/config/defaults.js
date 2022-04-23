@@ -91,13 +91,11 @@ const defaults = {
 
   audioTrack: {
     options: [],
-    forced: false,
     onChange: null,
   },
 
   videoTrack: {
     options: [],
-    forced: false,
     onChange: null,
   },
 
