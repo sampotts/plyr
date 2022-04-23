@@ -159,17 +159,14 @@ const mpd = {
             }
             return 0;
           });
-          // Brute all bitrates
-          // eslint-disable-next-line no-restricted-syntax
-          for (const bitrate of bitrateList) {
-            if (bitrate.height === input) {
-              // Disabling auto switch quality
-              dashConfig.streaming.abr.autoSwitchBitrate.video = false;
-              player.dash.updateSettings(dashConfig);
-              // Update quality
-              player.dash.setQualityFor('video', bitrate.qualityIndex, bitrate.height > currentHeight);
-              break;
-            }
+          // Find quality
+          const quality = bitrateList.find((e) => e.height === input);
+          // Disabling auto switch quality
+          dashConfig.streaming.abr.autoSwitchBitrate.video = false;
+          player.dash.updateSettings(dashConfig);
+          // Update quality
+          if (quality) {
+            player.dash.setQualityFor('video', quality.qualityIndex, quality.height > currentHeight);
           }
         }
 
@@ -213,25 +210,19 @@ const mpd = {
           match = input.match(/^_index([0-9]+)$/);
         }
         if (match) {
-          // Brute by index
+          // Find by index
           const index = parseInt(match[1], 10);
-          // eslint-disable-next-line no-restricted-syntax
-          for (const track of player.dash.getTracksFor('audio')) {
-            if (track.index === index) {
-              // Update video track
-              player.dash.setCurrentTrack(track);
-              break;
-            }
+          const track = player.dash.getTracksFor('audio').find((e) => e.index === index);
+          // Update video track
+          if (track) {
+            player.dash.setCurrentTrack(track);
           }
         } else {
-          // Brute by id
-          // eslint-disable-next-line no-restricted-syntax
-          for (const track of player.dash.getTracksFor('audio')) {
-            if (track.id === input) {
-              // Update audio track
-              player.dash.setCurrentTrack(track);
-              break;
-            }
+          // Find by id
+          const track = player.dash.getTracksFor('audio').find((e) => e.id === input);
+          // Update audio track
+          if (track) {
+            player.dash.setCurrentTrack(track);
           }
         }
 
@@ -269,25 +260,19 @@ const mpd = {
           match = input.match(/^_index([0-9]+)$/);
         }
         if (match) {
-          // Brute by index
+          // Find by index
           const index = parseInt(match[1], 10);
-          // eslint-disable-next-line no-restricted-syntax
-          for (const track of player.dash.getTracksFor('video')) {
-            if (track.index === index) {
-              // Update video track
-              player.dash.setCurrentTrack(track);
-              break;
-            }
+          const track = player.dash.getTracksFor('video').find((e) => e.index === index);
+          // Update video track
+          if (track) {
+            player.dash.setCurrentTrack(track);
           }
         } else {
-          // Brute by id
-          // eslint-disable-next-line no-restricted-syntax
-          for (const track of player.dash.getTracksFor('video')) {
-            if (track.id === input) {
-              // Update video track
-              player.dash.setCurrentTrack(track);
-              break;
-            }
+          // Find by id
+          const track = player.dash.getTracksFor('video').find((e) => e.id === input);
+          // Update video track
+          if (track) {
+            player.dash.setCurrentTrack(track);
           }
         }
 
