@@ -318,6 +318,11 @@ class Plyr {
       this.once('canplay', () => silencePromise(this.play()));
     }
 
+    // playsinline for MPD
+    if (this.isMPD && this.config.playsinline) {
+      this.media.setAttribute('playsinline', '');
+    }
+
     // Seek time will be recorded (in listeners.js) so we can prevent hiding controls for a few seconds after seek
     this.lastSeekTime = 0;
 
