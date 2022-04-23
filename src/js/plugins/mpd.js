@@ -183,7 +183,7 @@ const mpd = {
           if (currentTrack) {
             return mpd.getTrackName.call(player, currentTrack);
           }
-        }catch(e){
+        }catch{
 
         }
       },
@@ -246,7 +246,7 @@ const mpd = {
           if (currentTrack) {
             return mpd.getTrackName.call(player, currentTrack);
           }
-        }catch(e){
+        }catch{
 
         }
       },
@@ -292,7 +292,7 @@ const mpd = {
     });
 
     // Update settings list when perion changed
-    const triggerEvents = () => {
+    player.dash.on('periodSwitchCompleted', ()=>{
       triggerEvent.call(player, player.media, 'qualitylistupdate', false, {
         list: mpd.getQualityOptions.call(player),
       });
@@ -308,9 +308,7 @@ const mpd = {
       triggerEvent.call(player, player.media, 'videotracklabelsupdate', false, {
         list: mpd.getVideoTrackLabels.call(player),
       });
-    };
-
-    player.dash.on('periodSwitchCompleted', triggerEvents);
+    });
   },
 };
 
