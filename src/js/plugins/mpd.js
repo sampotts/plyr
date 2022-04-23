@@ -63,10 +63,12 @@ const mpd = {
   },
 
   getQualityOptions() {
-    const qualityList = this.dash.getBitrateInfoListFor('video').map((bitrate) => {
-      return bitrate.height;
-    });
-
+    const qualityList = [];
+    for (const bitrate of this.dash.getBitrateInfoListFor('video')) {
+      if(!qualityList.includes(bitrate.height)){
+        qualityList.push(bitrate.height);
+      }
+    }
     return [0x7fffffff, ...qualityList];
   },
 
@@ -132,7 +134,17 @@ const mpd = {
           // Get quality by height
           const currentIndex = player.dash.getQualityFor('video');
           const currentHeight = (currentIndex) ? player.dash.getBitrateInfoListFor('video')[currentIndex].height : 0;
-          for (const bitrate of player.dash.getBitrateInfoListFor('video')) {
+          const bitrateList = player.dash.getBitrateInfoListFor('video');
+          bitrateList.sort(function(a,b){
+            if (a.bitrate < b.bitrate) {
+              return 1;
+            }
+            if (a.bitrate > b.bitrate) {
+              return -1;
+            }
+            return 0;
+          });
+          for (const bitrate of bitrateList) {
             if (bitrate.height === input) {
               // Disabling auto switch quality
               dashConfig.streaming.abr.autoSwitchBitrate.video = false;
