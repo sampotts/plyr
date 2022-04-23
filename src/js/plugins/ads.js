@@ -67,7 +67,7 @@ class Ads {
     const { config } = this;
 
     return (
-      this.player.isHTML5 &&
+      (this.player.isHTML5 || this.player.isMPD) &&
       this.player.isVideo &&
       config.enabled &&
       (!is.empty(config.publisherId) || is.url(config.tagUrl))
