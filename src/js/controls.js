@@ -887,27 +887,37 @@ const controls = {
     switch (setting) {
       case 'audioTrack':
         if(value) {
-          const label = i18n.get(`audioTrack.${value}`, this.config);
+          let label;
 
-          if (!label.length) {
-            return `${value}`;
+          label = i18n.get(`audioTrackLabel.labels.${value}`, this.config);
+          if (label.length) {
+            return label;
           }
 
-          return label;
+          label = i18n.get(`audioTrackLabel.mpdLabels.${value}`, this.config);
+          if (label.length) {
+            return label;
+          }
+
+          return `${value}`;
         }
-        return 'Audio Track';
 
       case 'videoTrack':
         if(value) {
-          const label = i18n.get(`videoTrack.${value}`, this.config);
+          let label;
 
-          if (!label.length) {
-            return `${value}`;
+          label = i18n.get(`videoTrackLabel.labels.${value}`, this.config);
+          if (label.length) {
+            return label;
           }
 
-          return label;
+          label = i18n.get(`videoTrackLabel.mpdLabels.${value}`, this.config);
+          if (label.length) {
+            return label;
+          }
+
+          return `${value}`;
         }
-        return 'Video Track';
 
       case 'speed':
         return value === 1 ? i18n.get('normal', this.config) : `${value}&times;`;

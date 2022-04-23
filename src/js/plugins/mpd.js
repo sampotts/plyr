@@ -7,7 +7,61 @@ import is from '../utils/is';
 import { setAspectRatio } from '../utils/style';
 
 const mpd = {
-  // Get quality levels
+  getTrackName(track) {
+    if(track.id){
+      return track.id;
+    }
+    return `_index${track.index}`;
+  },
+
+  getTrackLabel(track) {
+    // Normal label
+    const browserLanguage = navigator.language;
+    for (const label of track.labels) {
+      if (label.lang && label.lang === browserLanguage) {
+        return label.text;
+      }
+    }
+    if(track.labels[0]){
+      return track.labels[0].text;
+    }
+
+    // No label
+    const outputStr = [];
+    if(track.lang){
+      outputStr.push(`Lang: ${track.lang}`);
+    }
+    if(track.id){
+      outputStr.push(`ID: ${track.id}`);
+    }
+    outputStr.push(`Index: ${track.index}`);
+    return outputStr.join(", ");
+  },
+
+  getVideoTrackLabels() {
+    const labels = {};
+
+    for (const track of this.dash.getTracksFor('video')) {
+      const name = mpd.getTrackName.call(this, track);
+      const text = mpd.getTrackLabel.call(this, track);
+      labels[name] = text;
+    }
+
+    return labels;
+  },
+
+  getAudioTrackLabels() {
+    const labels = {};
+
+    for (const track of this.dash.getTracksFor('audio')) {
+      const name = mpd.getTrackName.call(this, track);
+      const text = mpd.getTrackLabel.call(this, track);
+      labels[name] = text;
+    }
+
+    return labels;
+  },
+
   getQualityOptions() {
     const qualityList = this.dash.getBitrateInfoListFor('video').map((bitrate) => {
       return bitrate.height;
@@ -18,7 +72,7 @@ const mpd = {
 
   getAudioTrackOptions() {
     const audioTrackList = this.dash.getTracksFor('audio').map((audioTrack) => {
-      return audioTrack.id;
+      return mpd.getTrackName.call(this, audioTrack);
     });
 
     return audioTrackList;
@@ -26,7 +80,7 @@ const mpd = {
 
   getVideoTrackOptions() {
     const videoTrackList = this.dash.getTracksFor('video').map((videoTrack) => {
-      return videoTrack.id;
+      return mpd.getTrackName.call(this, videoTrack);
     });
 
     return videoTrackList;
@@ -108,12 +162,11 @@ const mpd = {
         try {
           const currentTrack = player.dash.getCurrentTrackFor('audio');
           if (currentTrack) {
-            return currentTrack.id;
+            return mpd.getTrackName.call(player, currentTrack);
           }
         }catch(e){
 
         }
-        return "default";
       },
       set(input) {
         const cfg = {
@@ -123,12 +176,25 @@ const mpd = {
             }
           }
         };
-        for (const track of player.dash.getTracksFor('audio')) {
-          if (track.id === input) {
-            // Update audio track
-            player.dash.updateSettings(cfg);
-            player.dash.setCurrentTrack(track);
-            break;
+        player.dash.updateSettings(cfg);
+
+        const match = input.match(/^_index([0-9]+)$/);
+        if (match) {
+          const index = parseInt(match[1]);
+          for (const track of player.dash.getTracksFor('audio')) {
+            if (track.index === index) {
+              // Update video track
+              player.dash.setCurrentTrack(track);
+              break;
+            }
+          }
+        } else {
+          for (const track of player.dash.getTracksFor('audio')) {
+            if (track.id === input) {
+              // Update audio track
+              player.dash.setCurrentTrack(track);
+              break;
+            }
           }
         }
 
@@ -153,19 +219,30 @@ const mpd = {
         try {
           const currentTrack = player.dash.getCurrentTrackFor('video');
           if (currentTrack) {
-            return currentTrack.id;
+            return mpd.getTrackName.call(player, currentTrack);
           }
         }catch(e){
 
         }
-        return "default";
       },
       set(input) {
-        for (const track of player.dash.getTracksFor('video')) {
-          if (track.id === input) {
-            // Update video track
-            player.dash.setCurrentTrack(track);
-            break;
+        const match = input.match(/^_index([0-9]+)$/);
+        if (match) {
+          const index = parseInt(match[1]);
+          for (const track of player.dash.getTracksFor('video')) {
+            if (track.index === index) {
+              // Update video track
+              player.dash.setCurrentTrack(track);
+              break;
+            }
+          }
+        } else {
+          for (const track of player.dash.getTracksFor('video')) {
+            if (track.id === input) {
+              // Update video track
+              player.dash.setCurrentTrack(track);
+              break;
+            }
           }
         }
 
@@ -195,7 +272,13 @@ const mpd = {
       triggerEvent.call(player, player.media, 'videotracklistupdate', false, {
         list: mpd.getVideoTrackOptions.call(player),
       });
-    }
+      triggerEvent.call(player, player.media, 'audiotracklabelsupdate', false, {
+        list: mpd.getAudioTrackLabels.call(player),
+      });
+      triggerEvent.call(player, player.media, 'videotracklabelsupdate', false, {
+        list: mpd.getVideoTrackLabels.call(player),
+      });
+    };
 
     player.dash.on('periodSwitchCompleted', triggerEvents);
   },

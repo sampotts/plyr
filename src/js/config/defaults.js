@@ -211,6 +211,14 @@ const defaults = {
       576: 'SD',
       480: 'SD',
     },
+    audioTrackLabel: {
+      mpdLabels: {},
+      labels: {},
+    },
+    videoTrackLabel: {
+      mpdLabels: {},
+      labels: {},
+    },
   },
 
   // URLs
@@ -299,6 +307,8 @@ const defaults = {
     'qualitylistupdate',
     'audiotracklistupdate',
     'videotracklistupdate',
+    'audiotracklabelsupdate',
+    'videotracklabelsupdate',
 
     // Ads
     'adsloaded',

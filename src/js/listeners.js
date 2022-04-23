@@ -508,22 +508,31 @@ class Listeners {
     // Quality list update
     on.call(player, player.media, 'qualitylistupdate', (event) => {
       // Update UI
-      console.log(event.detail);
       controls.setQualityMenu.call(player, event.detail.list);
     });
 
     // Audio track list update
     on.call(player, player.media, 'audiotracklistupdate', (event) => {
       // Update UI
-      console.log(event.detail);
       controls.setAudioTrackMenu.call(player, event.detail.list);
     });
 
     // Video track list update
     on.call(player, player.media, 'videotracklistupdate', (event) => {
       // Update UI
-      console.log(event.detail);
       controls.setVideoTrackMenu.call(player, event.detail.list);
+    });
+
+    // Audio track labels update
+    on.call(player, player.media, 'audiotracklabelsupdate', (event) => {
+      player.config.i18n.audioTrackLabel.mpdLabels = event.detail.list;
+      controls.setAudioTrackMenu.call(player, player.options.audioTrack);
+    });
+
+    // Video track labels update
+    on.call(player, player.media, 'videotracklabelsupdate', (event) => {
+      player.config.i18n.videoTrackLabel.mpdLabels = event.detail.list;
+      controls.setVideoTrackMenu.call(player, player.options.videoTrack);
     });
 
     // Update download link when ready and if quality changes
