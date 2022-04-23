@@ -525,13 +525,13 @@ class Listeners {
 
     // Audio track labels update
     on.call(player, player.media, 'audiotracklabelsupdate', (event) => {
-      player.config.i18n.audioTrackLabel.mpdLabels = event.detail.list;
+      player.config.i18n.audioTrackMPDLabel = event.detail.list;
       controls.setAudioTrackMenu.call(player, player.options.audioTrack);
     });
 
     // Video track labels update
     on.call(player, player.media, 'videotracklabelsupdate', (event) => {
-      player.config.i18n.videoTrackLabel.mpdLabels = event.detail.list;
+      player.config.i18n.videoTrackMPDLabel = event.detail.list;
       controls.setVideoTrackMenu.call(player, player.options.videoTrack);
     });
 

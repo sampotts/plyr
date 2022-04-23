@@ -70,7 +70,7 @@ const defaults = {
   quality: {
     default: 576,
     // The options to display in the UI, if available for the source media
-    options: [0x7fffffff, 4320, 2880, 2160, 1440, 1080, 720, 576, 480, 360, 240],
+    options: [2147483647, 4320, 2880, 2160, 1440, 1080, 720, 576, 480, 360, 240],
     forced: false,
     onChange: null,
   },
@@ -90,15 +90,13 @@ const defaults = {
   },
 
   audioTrack: {
-    default: 'default',
-    options: ['default'],
+    options: [],
     forced: false,
     onChange: null,
   },
 
   videoTrack: {
-    default: 'default',
-    options: ['default'],
+    options: [],
     forced: false,
     onChange: null,
   },
@@ -201,7 +199,7 @@ const defaults = {
     enabled: 'Enabled',
     advertisement: 'Ad',
     qualityLabel: {
-      0x7fffffff: 'Auto',
+      2147483647: 'Auto',
     },
     qualityBadge: {
       2160: '4K',
@@ -210,14 +208,6 @@ const defaults = {
       720: 'HD',
       576: 'SD',
       480: 'SD',
-    },
-    audioTrackLabel: {
-      mpdLabels: {},
-      labels: {},
-    },
-    videoTrackLabel: {
-      mpdLabels: {},
-      labels: {},
     },
   },
 

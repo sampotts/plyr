@@ -69,7 +69,7 @@ const mpd = {
         qualityList.push(bitrate.height);
       }
     }
-    return [0x7fffffff, ...qualityList];
+    return [2147483647, ...qualityList];
   },
 
   getAudioTrackOptions() {
@@ -108,7 +108,7 @@ const mpd = {
       get() {
         const settings = player.dash.getSettings();
         if (settings.streaming && settings.streaming.abr && settings.streaming.abr.autoSwitchBitrate && settings.streaming.abr.autoSwitchBitrate.video) {
-          return 0x7fffffff;
+          return 2147483647;
         }
         const currentIndex = player.dash.getQualityFor('video');
         const bitrateList = player.dash.getBitrateInfoListFor('video');
@@ -126,7 +126,7 @@ const mpd = {
           },
         };
 
-        if (input === 0x7fffffff) {
+        if (input === 2147483647) {
           // Enabling auto switch quality
           dashConfig.streaming.abr.autoSwitchBitrate.video = true;
           player.dash.updateSettings(dashConfig);

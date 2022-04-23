@@ -889,12 +889,12 @@ const controls = {
         if(value) {
           let label;
 
-          label = i18n.get(`audioTrackLabel.labels.${value}`, this.config);
+          label = i18n.get(`audioTrackLabel.${value}`, this.config);
           if (label.length) {
             return label;
           }
 
-          label = i18n.get(`audioTrackLabel.mpdLabels.${value}`, this.config);
+          label = i18n.get(`audioTrackMPDLabel.${value}`, this.config);
           if (label.length) {
             return label;
           }
@@ -906,12 +906,12 @@ const controls = {
         if(value) {
           let label;
 
-          label = i18n.get(`videoTrackLabel.labels.${value}`, this.config);
+          label = i18n.get(`videoTrackLabel.${value}`, this.config);
           if (label.length) {
             return label;
           }
 
-          label = i18n.get(`videoTrackLabel.mpdLabels.${value}`, this.config);
+          label = i18n.get(`videoTrackMPDLabel.${value}`, this.config);
           if (label.length) {
             return label;
           }
@@ -1758,8 +1758,8 @@ const controls = {
     }
 
     if (this.isMPD) {
-      this.config.i18n.audioTrackLabel.mpdLabels = mpd.getAudioTrackLabels.call(this);
-      this.config.i18n.videoTrackLabel.mpdLabels = mpd.getVideoTrackLabels.call(this);
+      this.config.i18n.audioTrackMPDLabel = mpd.getAudioTrackLabels.call(this);
+      this.config.i18n.videoTrackMPDLabel = mpd.getVideoTrackLabels.call(this);
       setQualityMenu.call(this, mpd.getQualityOptions.call(this));
       setAudioTrackMenu.call(this, mpd.getAudioTrackOptions.call(this));
       setVideoTrackMenu.call(this, mpd.getVideoTrackOptions.call(this));
