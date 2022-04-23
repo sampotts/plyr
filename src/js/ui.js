@@ -57,7 +57,7 @@ const ui = {
     ui.toggleNativeControls.call(this);
 
     // Setup captions for HTML5
-    if (this.isHTML5 || this.isMPD) {
+    if (this.isHTML5) {
       captions.setup.call(this);
     }
 
