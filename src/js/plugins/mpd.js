@@ -18,12 +18,9 @@ const mpd = {
   // Get human-like name of track
   getTrackLabel(track) {
     // Normal label
-    const browserLanguage = navigator.language;
-    // eslint-disable-next-line no-restricted-syntax
-    for (const label of track.labels) {
-      if (label.lang && label.lang === browserLanguage) {
-        return label.text;
-      }
+    const labelByLanguage = track.labels.find((e) => e.lang && e.lang === navigator.language);
+    if (labelByLanguage) {
+      return labelByLanguage;
     }
     if (track.labels[0]) {
       return track.labels[0].text;
