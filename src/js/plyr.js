@@ -755,7 +755,7 @@ class Plyr {
       this.storage.get('audioTrack'),
       config.selected,
       config.default,
-    ].find((e)=>{return !is.empty(e)});
+    ].find(e => e);
 
     let updateStorage = true;
 
@@ -803,7 +803,7 @@ class Plyr {
       this.storage.get('videoTrack'),
       config.selected,
       config.default,
-    ].find((e)=>{return !is.empty(e)});
+    ].find(e => e);
 
     let updateStorage = true;
 
