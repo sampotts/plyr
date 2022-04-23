@@ -182,14 +182,12 @@ const mpd = {
     // Audio track
     Object.defineProperty(player.media, 'audioTrack', {
       get() {
-        // Try-catch in case of empty streamInfo
-        try {
+        if (player.dash.getActiveStream()) {
           const currentTrack = player.dash.getCurrentTrackFor('audio');
           if (currentTrack) {
             return mpd.getTrackName.call(player, currentTrack);
           }
-          // eslint-disable-next-line no-empty
-        } catch {}
+        }
         return undefined;
       },
       set(input) {
@@ -241,14 +239,12 @@ const mpd = {
     // Video track
     Object.defineProperty(player.media, 'videoTrack', {
       get() {
-        // Try-catch in case of empty streamInfo
-        try {
+        if (player.dash.getActiveStream()) {
           const currentTrack = player.dash.getCurrentTrackFor('video');
           if (currentTrack) {
             return mpd.getTrackName.call(player, currentTrack);
           }
-          // eslint-disable-next-line no-empty
-        } catch {}
+        }
         return undefined;
       },
       set(input) {
