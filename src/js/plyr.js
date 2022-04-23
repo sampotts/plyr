@@ -13,7 +13,6 @@ import Console from './console';
 import controls from './controls';
 import Fullscreen from './fullscreen';
 import html5 from './html5';
-import mpd from './plugins/mpd';
 import Listeners from './listeners';
 import media from './media';
 import Ads from './plugins/ads';
@@ -750,12 +749,9 @@ class Plyr {
       return;
     }
 
-    let audioTrack = [
-      !is.empty(input) && input,
-      this.storage.get('audioTrack'),
-      config.selected,
-      config.default,
-    ].find(e => e);
+    let audioTrack = [!is.empty(input) && input, this.storage.get('audioTrack'), config.selected, config.default].find(
+      (e) => e,
+    );
 
     let updateStorage = true;
 
@@ -798,12 +794,9 @@ class Plyr {
       return;
     }
 
-    let videoTrack = [
-      !is.empty(input) && input,
-      this.storage.get('videoTrack'),
-      config.selected,
-      config.default,
-    ].find(e => e);
+    let videoTrack = [!is.empty(input) && input, this.storage.get('videoTrack'), config.selected, config.default].find(
+      (e) => e,
+    );
 
     let updateStorage = true;
 

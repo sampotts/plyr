@@ -9,7 +9,7 @@ import { setAspectRatio } from '../utils/style';
 const mpd = {
   // Get name of track
   getTrackName(track) {
-    if(track.id){
+    if (track.id) {
       return track.id;
     }
     return `_index${track.index}`;
@@ -19,30 +19,32 @@ const mpd = {
   getTrackLabel(track) {
     // Normal label
     const browserLanguage = navigator.language;
+    // eslint-disable-next-line no-restricted-syntax
     for (const label of track.labels) {
       if (label.lang && label.lang === browserLanguage) {
         return label.text;
       }
     }
-    if(track.labels[0]){
+    if (track.labels[0]) {
       return track.labels[0].text;
     }
 
     // When label doesn't exist
     const outputStr = [];
-    if(track.lang){
+    if (track.lang) {
       outputStr.push(`Lang: ${track.lang}`);
     }
-    if(track.id){
+    if (track.id) {
       outputStr.push(`ID: ${track.id}`);
     }
     outputStr.push(`Index: ${track.index}`);
-    return outputStr.join(", ");
+    return outputStr.join(', ');
   },
 
   // Get video labels
   getVideoTrackLabels() {
     const labels = {};
+    // eslint-disable-next-line no-restricted-syntax
     for (const track of this.dash.getTracksFor('video')) {
       const name = mpd.getTrackName.call(this, track);
       const text = mpd.getTrackLabel.call(this, track);
@@ -54,6 +56,7 @@ const mpd = {
   // Get audio labels
   getAudioTrackLabels() {
     const labels = {};
+    // eslint-disable-next-line no-restricted-syntax
     for (const track of this.dash.getTracksFor('audio')) {
       const name = mpd.getTrackName.call(this, track);
       const text = mpd.getTrackLabel.call(this, track);
@@ -65,8 +68,9 @@ const mpd = {
   // Get quality levels
   getQualityOptions() {
     const qualityList = [];
+    // eslint-disable-next-line no-restricted-syntax
     for (const bitrate of this.dash.getBitrateInfoListFor('video')) {
-      if(!qualityList.includes(bitrate.height)){
+      if (!qualityList.includes(bitrate.height)) {
         qualityList.push(bitrate.height);
       }
     }
@@ -110,15 +114,21 @@ const mpd = {
       get() {
         // Check "auto" attribute
         const settings = player.dash.getSettings();
-        if (settings.streaming && settings.streaming.abr && settings.streaming.abr.autoSwitchBitrate && settings.streaming.abr.autoSwitchBitrate.video) {
+        if (
+          settings.streaming &&
+          settings.streaming.abr &&
+          settings.streaming.abr.autoSwitchBitrate &&
+          settings.streaming.abr.autoSwitchBitrate.video
+        ) {
           return 2147483647;
         }
         // Get quality value
         const currentIndex = player.dash.getQualityFor('video');
         const bitrateList = player.dash.getBitrateInfoListFor('video');
-        if(typeof currentIndex === 'number' && bitrateList[currentIndex]){
+        if (typeof currentIndex === 'number' && bitrateList[currentIndex]) {
           return bitrateList[currentIndex].height;
         }
+        return undefined;
       },
       set(input) {
         const dashConfig = {
@@ -137,10 +147,10 @@ const mpd = {
         } else {
           // Get quality by height
           const currentIndex = player.dash.getQualityFor('video');
-          const currentHeight = (currentIndex) ? player.dash.getBitrateInfoListFor('video')[currentIndex].height : 0;
+          const currentHeight = currentIndex ? player.dash.getBitrateInfoListFor('video')[currentIndex].height : 0;
           // Sorting bitrates by DESC
           const bitrateList = player.dash.getBitrateInfoListFor('video');
-          bitrateList.sort(function(a,b){
+          bitrateList.sort(function (a, b) {
             if (a.bitrate < b.bitrate) {
               return 1;
             }
@@ -150,6 +160,7 @@ const mpd = {
             return 0;
           });
           // Brute all bitrates
+          // eslint-disable-next-line no-restricted-syntax
           for (const bitrate of bitrateList) {
             if (bitrate.height === input) {
               // Disabling auto switch quality
@@ -183,9 +194,9 @@ const mpd = {
           if (currentTrack) {
             return mpd.getTrackName.call(player, currentTrack);
           }
-        }catch{
-
-        }
+          // eslint-disable-next-line no-empty
+        } catch {}
+        return undefined;
       },
       set(input) {
         // Replace already buffered frames
@@ -203,7 +214,8 @@ const mpd = {
         }
         if (match) {
           // Brute by index
-          const index = parseInt(match[1]);
+          const index = parseInt(match[1], 10);
+          // eslint-disable-next-line no-restricted-syntax
           for (const track of player.dash.getTracksFor('audio')) {
             if (track.index === index) {
               // Update video track
@@ -213,6 +225,7 @@ const mpd = {
           }
         } else {
           // Brute by id
+          // eslint-disable-next-line no-restricted-syntax
           for (const track of player.dash.getTracksFor('audio')) {
             if (track.id === input) {
               // Update audio track
@@ -246,9 +259,9 @@ const mpd = {
           if (currentTrack) {
             return mpd.getTrackName.call(player, currentTrack);
           }
-        }catch{
-
-        }
+          // eslint-disable-next-line no-empty
+        } catch {}
+        return undefined;
       },
       set(input) {
         let match;
@@ -257,7 +270,8 @@ const mpd = {
         }
         if (match) {
           // Brute by index
-          const index = parseInt(match[1]);
+          const index = parseInt(match[1], 10);
+          // eslint-disable-next-line no-restricted-syntax
           for (const track of player.dash.getTracksFor('video')) {
             if (track.index === index) {
               // Update video track
@@ -267,6 +281,7 @@ const mpd = {
           }
         } else {
           // Brute by id
+          // eslint-disable-next-line no-restricted-syntax
           for (const track of player.dash.getTracksFor('video')) {
             if (track.id === input) {
               // Update video track
@@ -292,7 +307,7 @@ const mpd = {
     });
 
     // Update settings list when perion changed
-    player.dash.on('periodSwitchCompleted', ()=>{
+    player.dash.on('periodSwitchCompleted', () => {
       triggerEvent.call(player, player.media, 'qualitylistupdate', false, {
         list: mpd.getQualityOptions.call(player),
       });

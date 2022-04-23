@@ -100,7 +100,9 @@ class PreviewThumbnails {
   }
 
   get enabled() {
-    return (this.player.isHTML5 || this.player.isMPD) && this.player.isVideo && this.player.config.previewThumbnails.enabled;
+    return (
+      (this.player.isHTML5 || this.player.isMPD) && this.player.isVideo && this.player.config.previewThumbnails.enabled
+    );
   }
 
   load = () => {
