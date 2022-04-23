@@ -771,7 +771,7 @@ class Plyr {
     // Update config
     config.selected = audioTrack;
 
-    // Set quality
+    // Set audio track
     this.media.audioTrack = audioTrack;
 
     // Save to storage
@@ -819,7 +819,7 @@ class Plyr {
     // Update config
     config.selected = videoTrack;
 
-    // Set quality
+    // Set video track
     this.media.videoTrack = videoTrack;
 
     // Save to storage
