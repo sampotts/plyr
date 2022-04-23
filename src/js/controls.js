@@ -1143,6 +1143,7 @@ const controls = {
     controls.updateSetting.call(this, type, list);
   },
 
+  // Set a list of available audio tracks
   setAudioTrackMenu(options) {
     // Menu required
     if (!is.element(this.elements.settings.panels.audioTrack)) {
@@ -1190,6 +1191,7 @@ const controls = {
     controls.updateSetting.call(this, type, list);
   },
 
+  // Set a list of available video tracks
   setVideoTrackMenu(options) {
     // Menu required
     if (!is.element(this.elements.settings.panels.videoTrack)) {
@@ -1758,8 +1760,10 @@ const controls = {
     }
 
     if (this.isMPD) {
+      // Get track labels
       this.config.i18n.audioTrackMPDLabel = mpd.getAudioTrackLabels.call(this);
       this.config.i18n.videoTrackMPDLabel = mpd.getVideoTrackLabels.call(this);
+      // Set available tracks and quality levels
       setQualityMenu.call(this, mpd.getQualityOptions.call(this));
       setAudioTrackMenu.call(this, mpd.getAudioTrackOptions.call(this));
       setVideoTrackMenu.call(this, mpd.getVideoTrackOptions.call(this));
