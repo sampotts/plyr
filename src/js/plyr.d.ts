@@ -103,6 +103,16 @@ declare class Plyr {
   quality: number;
 
   /**
+   * Gets or sets the audio track for the player. The setter accepts a value from the options specified in your config.
+   */
+  audioTrack: string;
+
+  /**
+   * Gets or sets the video track for the player. The setter accepts a value from the options specified in your config.
+   */
+  videoTrack: string;
+
+  /**
    * Gets or sets the current loop state of the player.
    */
   loop: boolean;
