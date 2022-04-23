@@ -8,6 +8,9 @@ import is from '../utils/is';
 import { setAspectRatio } from '../utils/style';
 
 const mpd = {
+  // Reserved value that must not be the same as other values
+  qualityAutoMagicValue: 2147483647,
+
   // Get name of track
   getTrackName(track) {
     if (track.id) {
@@ -70,7 +73,7 @@ const mpd = {
       }
     });
     // "Auto"
-    qualityList.push(2147483647);
+    qualityList.push(mpd.qualityAutoMagicValue);
     // Sort by DESC
     qualityList.sort(function (a, b) {
       const aInt = parseInt(a, 10);
@@ -115,11 +118,11 @@ const mpd = {
 
     // Config hacks
     // "Auto"
-    player.config.quality.options.unshift(2147483647);
+    player.config.quality.options.unshift(mpd.qualityAutoMagicValue);
     if (!player.config.i18n.qualityLabel) {
       player.config.i18n.qualityLabel = {};
     }
-    player.config.i18n.qualityLabel[2147483647] = i18n.get('qualityAuto', player.config);
+    player.config.i18n.qualityLabel[mpd.qualityAutoMagicValue] = i18n.get('qualityAuto', player.config);
 
     // Set speed options from config
     player.options.speed = player.config.speed.options;
@@ -140,7 +143,7 @@ const mpd = {
           settings.streaming.abr.autoSwitchBitrate &&
           settings.streaming.abr.autoSwitchBitrate.video
         ) {
-          return 2147483647;
+          return mpd.qualityAutoMagicValue;
         }
         // Get quality value
         const currentIndex = player.dash.getQualityFor('video');
@@ -160,7 +163,7 @@ const mpd = {
         };
 
         // If "auto"
-        if (input === 2147483647) {
+        if (input === mpd.qualityAutoMagicValue) {
           // Enabling auto switch quality
           dashConfig.streaming.abr.autoSwitchBitrate.video = true;
           player.dash.updateSettings(dashConfig);
