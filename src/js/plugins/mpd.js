@@ -68,8 +68,23 @@ const mpd = {
         qualityList.push(bitrate.height);
       }
     });
-    // 2147483647 - "Auto"
-    return [2147483647, ...qualityList];
+    // "Auto"
+    qualityList.push(2147483647);
+    // Sort by DESC
+    qualityList.sort(function (a, b) {
+      const aInt = parseInt(a, 10);
+      const bInt = parseInt(b, 10);
+      if (aInt < bInt) {
+        return 1;
+      }
+      if (aInt > bInt) {
+        return -1;
+      }
+      return 0;
+    });
+    // Update supported options
+    this.config.quality.options = qualityList;
+    return qualityList;
   },
 
   // Get audio tracks

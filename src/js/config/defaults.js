@@ -70,8 +70,7 @@ const defaults = {
   quality: {
     default: 576,
     // The options to display in the UI, if available for the source media
-    // 2147483647 - "Auto" for MPEG-DASH
-    options: [2147483647, 4320, 2880, 2160, 1440, 1080, 720, 576, 480, 360, 240],
+    options: [4320, 2880, 2160, 1440, 1080, 720, 576, 480, 360, 240],
     forced: false,
     onChange: null,
   },
