@@ -7,6 +7,7 @@ import is from '../utils/is';
 import { setAspectRatio } from '../utils/style';
 
 const mpd = {
+  // Get name of track
   getTrackName(track) {
     if(track.id){
       return track.id;
@@ -14,6 +15,7 @@ const mpd = {
     return `_index${track.index}`;
   },
 
+  // Get human-like name of track
   getTrackLabel(track) {
     // Normal label
     const browserLanguage = navigator.language;
@@ -26,7 +28,7 @@ const mpd = {
       return track.labels[0].text;
     }
 
-    // No label
+    // When label doesn't exist
     const outputStr = [];
     if(track.lang){
       outputStr.push(`Lang: ${track.lang}`);
@@ -38,30 +40,29 @@ const mpd = {
     return outputStr.join(", ");
   },
 
+  // Get video labels
   getVideoTrackLabels() {
     const labels = {};
-
     for (const track of this.dash.getTracksFor('video')) {
       const name = mpd.getTrackName.call(this, track);
       const text = mpd.getTrackLabel.call(this, track);
       labels[name] = text;
     }
-
     return labels;
   },
 
+  // Get audio labels
   getAudioTrackLabels() {
     const labels = {};
-
     for (const track of this.dash.getTracksFor('audio')) {
       const name = mpd.getTrackName.call(this, track);
       const text = mpd.getTrackLabel.call(this, track);
       labels[name] = text;
     }
-
     return labels;
   },
 
+  // Get quality levels
   getQualityOptions() {
     const qualityList = [];
     for (const bitrate of this.dash.getBitrateInfoListFor('video')) {
@@ -69,22 +70,23 @@ const mpd = {
         qualityList.push(bitrate.height);
       }
     }
+    // 2147483647 - "Auto"
     return [2147483647, ...qualityList];
   },
 
+  // Get audio tracks
   getAudioTrackOptions() {
     const audioTrackList = this.dash.getTracksFor('audio').map((audioTrack) => {
       return mpd.getTrackName.call(this, audioTrack);
     });
-
     return audioTrackList;
   },
 
+  // Get video tracks
   getVideoTrackOptions() {
     const videoTrackList = this.dash.getTracksFor('video').map((videoTrack) => {
       return mpd.getTrackName.call(this, videoTrack);
     });
-
     return videoTrackList;
   },
 
@@ -106,16 +108,17 @@ const mpd = {
     // Quality
     Object.defineProperty(player.media, 'quality', {
       get() {
+        // Check "auto" attribute
         const settings = player.dash.getSettings();
         if (settings.streaming && settings.streaming.abr && settings.streaming.abr.autoSwitchBitrate && settings.streaming.abr.autoSwitchBitrate.video) {
           return 2147483647;
         }
+        // Get quality value
         const currentIndex = player.dash.getQualityFor('video');
         const bitrateList = player.dash.getBitrateInfoListFor('video');
         if(typeof currentIndex === 'number' && bitrateList[currentIndex]){
           return bitrateList[currentIndex].height;
         }
-        return 0;
       },
       set(input) {
         const dashConfig = {
@@ -126,6 +129,7 @@ const mpd = {
           },
         };
 
+        // If "auto"
         if (input === 2147483647) {
           // Enabling auto switch quality
           dashConfig.streaming.abr.autoSwitchBitrate.video = true;
@@ -134,6 +138,7 @@ const mpd = {
           // Get quality by height
           const currentIndex = player.dash.getQualityFor('video');
           const currentHeight = (currentIndex) ? player.dash.getBitrateInfoListFor('video')[currentIndex].height : 0;
+          // Sorting bitrates by DESC
           const bitrateList = player.dash.getBitrateInfoListFor('video');
           bitrateList.sort(function(a,b){
             if (a.bitrate < b.bitrate) {
@@ -144,6 +149,7 @@ const mpd = {
             }
             return 0;
           });
+          // Brute all bitrates
           for (const bitrate of bitrateList) {
             if (bitrate.height === input) {
               // Disabling auto switch quality
@@ -171,6 +177,7 @@ const mpd = {
     // Audio track
     Object.defineProperty(player.media, 'audioTrack', {
       get() {
+        // Try-catch in case of empty streamInfo
         try {
           const currentTrack = player.dash.getCurrentTrackFor('audio');
           if (currentTrack) {
@@ -195,6 +202,7 @@ const mpd = {
           match = input.match(/^_index([0-9]+)$/);
         }
         if (match) {
+          // Brute by index
           const index = parseInt(match[1]);
           for (const track of player.dash.getTracksFor('audio')) {
             if (track.index === index) {
@@ -204,6 +212,7 @@ const mpd = {
             }
           }
         } else {
+          // Brute by id
           for (const track of player.dash.getTracksFor('audio')) {
             if (track.id === input) {
               // Update audio track
@@ -231,6 +240,7 @@ const mpd = {
     // Video track
     Object.defineProperty(player.media, 'videoTrack', {
       get() {
+        // Try-catch in case of empty streamInfo
         try {
           const currentTrack = player.dash.getCurrentTrackFor('video');
           if (currentTrack) {
@@ -246,6 +256,7 @@ const mpd = {
           match = input.match(/^_index([0-9]+)$/);
         }
         if (match) {
+          // Brute by index
           const index = parseInt(match[1]);
           for (const track of player.dash.getTracksFor('video')) {
             if (track.index === index) {
@@ -255,6 +266,7 @@ const mpd = {
             }
           }
         } else {
+          // Brute by id
           for (const track of player.dash.getTracksFor('video')) {
             if (track.id === input) {
               // Update video track
@@ -279,7 +291,7 @@ const mpd = {
       },
     });
 
-    // Update settings list
+    // Update settings list when perion changed
     const triggerEvents = () => {
       triggerEvent.call(player, player.media, 'qualitylistupdate', false, {
         list: mpd.getQualityOptions.call(player),
