@@ -44,36 +44,33 @@ const mpd = {
   // Get video labels
   getVideoTrackLabels() {
     const labels = {};
-    // eslint-disable-next-line no-restricted-syntax
-    for (const track of this.dash.getTracksFor('video')) {
+    this.dash.getTracksFor('video').forEach((track) => {
       const name = mpd.getTrackName.call(this, track);
       const text = mpd.getTrackLabel.call(this, track);
       labels[name] = text;
-    }
+    });
     return labels;
   },
 
   // Get audio labels
   getAudioTrackLabels() {
     const labels = {};
-    // eslint-disable-next-line no-restricted-syntax
-    for (const track of this.dash.getTracksFor('audio')) {
+    this.dash.getTracksFor('audio').forEach((track) => {
       const name = mpd.getTrackName.call(this, track);
       const text = mpd.getTrackLabel.call(this, track);
       labels[name] = text;
-    }
+    });
     return labels;
   },
 
   // Get quality levels
   getQualityOptions() {
     const qualityList = [];
-    // eslint-disable-next-line no-restricted-syntax
-    for (const bitrate of this.dash.getBitrateInfoListFor('video')) {
+    this.dash.getBitrateInfoListFor('video').forEach((bitrate) => {
       if (!qualityList.includes(bitrate.height)) {
         qualityList.push(bitrate.height);
       }
-    }
+    });
     // 2147483647 - "Auto"
     return [2147483647, ...qualityList];
   },
