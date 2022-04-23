@@ -178,7 +178,10 @@ const mpd = {
           },
         });
 
-        const match = input.match(/^_index([0-9]+)$/);
+        let match;
+        if (typeof input === 'string') {
+          match = input.match(/^_index([0-9]+)$/);
+        }
         if (match) {
           const index = parseInt(match[1]);
           for (const track of player.dash.getTracksFor('audio')) {
@@ -226,7 +229,10 @@ const mpd = {
         }
       },
       set(input) {
-        const match = input.match(/^_index([0-9]+)$/);
+        let match;
+        if (typeof input === 'string') {
+          match = input.match(/^_index([0-9]+)$/);
+        }
         if (match) {
           const index = parseInt(match[1]);
           for (const track of player.dash.getTracksFor('video')) {
