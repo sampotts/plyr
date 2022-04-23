@@ -3,6 +3,7 @@
 // ==========================================================================
 
 import { triggerEvent } from '../utils/events';
+import i18n from '../utils/i18n';
 import is from '../utils/is';
 import { setAspectRatio } from '../utils/style';
 
@@ -82,8 +83,10 @@ const mpd = {
       }
       return 0;
     });
-    // Update supported options
-    this.config.quality.options = qualityList;
+    if (this.config.quality.allowOverwrite) {
+      // Update supported options
+      this.config.quality.options = qualityList;
+    }
     return qualityList;
   },
 
@@ -109,6 +112,14 @@ const mpd = {
     }
 
     const player = this;
+
+    // Config hacks
+    // "Auto"
+    player.config.quality.options.unshift(2147483647);
+    if (!player.config.i18n.qualityLabel) {
+      player.config.i18n.qualityLabel = {};
+    }
+    player.config.i18n.qualityLabel[2147483647] = i18n.get('qualityAuto', player.config);
 
     // Set speed options from config
     player.options.speed = player.config.speed.options;

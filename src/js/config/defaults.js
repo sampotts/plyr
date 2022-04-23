@@ -198,9 +198,7 @@ const defaults = {
     disabled: 'Disabled',
     enabled: 'Enabled',
     advertisement: 'Ad',
-    qualityLabel: {
-      2147483647: 'Auto',
-    },
+    qualityAuto: 'Auto',
     qualityBadge: {
       2160: '4K',
       1440: 'HD',
