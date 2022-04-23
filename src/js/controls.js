@@ -1758,6 +1758,8 @@ const controls = {
     }
 
     if (this.isMPD) {
+      this.config.i18n.audioTrackLabel.mpdLabels = mpd.getAudioTrackLabels.call(this);
+      this.config.i18n.videoTrackLabel.mpdLabels = mpd.getVideoTrackLabels.call(this);
       setQualityMenu.call(this, mpd.getQualityOptions.call(this));
       setAudioTrackMenu.call(this, mpd.getAudioTrackOptions.call(this));
       setVideoTrackMenu.call(this, mpd.getVideoTrackOptions.call(this));
