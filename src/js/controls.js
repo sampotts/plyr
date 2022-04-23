@@ -885,39 +885,37 @@ const controls = {
   // Translate a value into a nice label
   getLabel(setting, value) {
     switch (setting) {
-      case 'audioTrack':
-        if(value) {
-          let label;
+      case 'audioTrack': {
+        let label;
 
-          label = i18n.get(`audioTrackLabel.${value}`, this.config);
-          if (label.length) {
-            return label;
-          }
-
-          label = i18n.get(`audioTrackMPDLabel.${value}`, this.config);
-          if (label.length) {
-            return label;
-          }
-
-          return `${value}`;
+        label = i18n.get(`audioTrackLabel.${value}`, this.config);
+        if (label.length) {
+          return label;
         }
 
-      case 'videoTrack':
-        if(value) {
-          let label;
-
-          label = i18n.get(`videoTrackLabel.${value}`, this.config);
-          if (label.length) {
-            return label;
-          }
-
-          label = i18n.get(`videoTrackMPDLabel.${value}`, this.config);
-          if (label.length) {
-            return label;
-          }
-
-          return `${value}`;
+        label = i18n.get(`audioTrackMPDLabel.${value}`, this.config);
+        if (label.length) {
+          return label;
         }
+
+        return `${value}`;
+      }
+
+      case 'videoTrack': {
+        let label;
+
+        label = i18n.get(`videoTrackLabel.${value}`, this.config);
+        if (label.length) {
+          return label;
+        }
+
+        label = i18n.get(`videoTrackMPDLabel.${value}`, this.config);
+        if (label.length) {
+          return label;
+        }
+
+        return `${value}`;
+      }
 
       case 'speed':
         return value === 1 ? i18n.get('normal', this.config) : `${value}&times;`;
