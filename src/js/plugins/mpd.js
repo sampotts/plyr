@@ -75,17 +75,7 @@ const mpd = {
     // "Auto"
     qualityList.push(mpd.qualityAutoMagicValue);
     // Sort by DESC
-    qualityList.sort(function (a, b) {
-      const aInt = parseInt(a, 10);
-      const bInt = parseInt(b, 10);
-      if (aInt < bInt) {
-        return 1;
-      }
-      if (aInt > bInt) {
-        return -1;
-      }
-      return 0;
-    });
+    qualityList.sort((a, b) => b - a);
     if (this.config.quality.allowOverwrite) {
       // Update supported options
       this.config.quality.options = qualityList;
@@ -173,15 +163,7 @@ const mpd = {
           const currentHeight = currentIndex ? player.dash.getBitrateInfoListFor('video')[currentIndex].height : 0;
           // Sorting bitrates by DESC
           const bitrateList = player.dash.getBitrateInfoListFor('video');
-          bitrateList.sort(function (a, b) {
-            if (a.bitrate < b.bitrate) {
-              return 1;
-            }
-            if (a.bitrate > b.bitrate) {
-              return -1;
-            }
-            return 0;
-          });
+          bitrateList.sort((a, b) => b.bitrate - a.bitrate);
           // Find quality
           const quality = bitrateList.find((e) => e.height === input);
           // Disabling auto switch quality
