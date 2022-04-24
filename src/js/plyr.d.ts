@@ -341,7 +341,7 @@ declare namespace Plyr {
      * id (the unique id for the player), seektime (the seektime step in seconds), and title (the media title). See CONTROLS.md for more info on how the html needs to be structured.
      * Defaults to ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen']
      */
-    controls?: string[] | ((id: string, seektime: number, title: string) => unknown) | Element;
+    controls?: string | ((id: string, seektime: number, title: string) => unknown) | Element;
 
     /**
      * If you're using the default controls are used then you can specify which settings to show in the menu
