@@ -9,7 +9,7 @@ import { setAspectRatio } from '../utils/style';
 
 const mpd = {
   // Reserved value that must not be the same as other values
-  qualityAutoMagicValue: 2147483647,
+  qualityAutoMagicValue: Infinity,
 
   // Get name of track
   getTrackName(track) {
