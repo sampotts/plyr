@@ -11,6 +11,7 @@
   width: 20%;
 
   input[type='range'] {
+    cursor: pointer;
     margin-left: calc(#{$plyr-control-spacing} / 2);
     margin-right: calc(#{$plyr-control-spacing} / 2);
     position: relative;
