@@ -18,6 +18,7 @@ $plyr-progress-offset: $plyr-range-thumb-height;
   }
 
   input[type='range'] {
+    cursor: pointer;
     position: relative;
     z-index: 2;
   }
