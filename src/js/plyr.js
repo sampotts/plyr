@@ -216,7 +216,7 @@ class Plyr {
 
         break;
 
-      case 'video':
+      //case 'video':
       case 'audio':
         this.type = type;
         this.provider = providers.html5;
