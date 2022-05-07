@@ -70,7 +70,7 @@ const source = {
 
         // Initialize MPEG-DASH
         if (this.isMPD && window.dashjs) {
-          const dash = dashjs.MediaPlayer().create();
+          const dash = window.dashjs.MediaPlayer().create();
           dash.initialize(this.media, src, false);
           Object.assign(this, {
             dash,
