@@ -31,7 +31,7 @@ const captions = {
     }
 
     // Only Vimeo and HTML5 video supported at this point
-    if (!this.isVideo || this.isYouTube || (this.isHTML5 && !support.textTracks)) {
+    if (!this.isVideo || this.isYouTube || ((this.isHTML5 || this.isMPD) && !support.textTracks)) {
       // Clear menu and hide
       if (
         is.array(this.config.controls) &&
@@ -109,6 +109,9 @@ const captions = {
       const trackEvents = this.config.captions.update ? 'addtrack removetrack' : 'removetrack';
       on.call(this, this.media.textTracks, trackEvents, captions.update.bind(this));
     }
+    if (this.isMPD) {
+      on.call(this, this.media.textTracks, 'addtrack removetrack', captions.update.bind(this));
+    }
 
     // Update available languages in list next tick (the event must not be triggered before the listeners)
     setTimeout(captions.update.bind(this), 0);
@@ -122,7 +125,7 @@ const captions = {
     const languageExists = Boolean(tracks.find((track) => track.language === language));
 
     // Handle tracks (add event listener and "pseudo"-default)
-    if (this.isHTML5 && this.isVideo) {
+    if ((this.isHTML5 || this.isMPD) && this.isVideo) {
       tracks
         .filter((track) => !meta.get(track))
         .forEach((track) => {
@@ -276,10 +279,15 @@ const captions = {
       triggerEvent.call(this, this.media, 'languagechange');
     }
 
+    // Load captions for MPEG-DASH
+    if (this.isMPD) {
+      this.dash.setTextTrack(index);
+    }
+
     // Show captions
     captions.toggle.call(this, true, passive);
 
-    if (this.isHTML5 && this.isVideo) {
+    if ((this.isHTML5 || this.isMPD) && this.isVideo) {
       // If we change the active track while a cue is already displayed we need to update it
       captions.updateCues.call(this);
     }
@@ -311,7 +319,7 @@ const captions = {
     // For HTML5, use cache instead of current tracks when it exists (if captions.update is false)
     // Filter out removed tracks and tracks that aren't captions/subtitles (for example metadata)
     return tracks
-      .filter((track) => !this.isHTML5 || update || this.captions.meta.has(track))
+      .filter((track) => !this.isHTML5 || !this.isMPD || update || this.captions.meta.has(track))
       .filter((track) => ['captions', 'subtitles'].includes(track.kind));
   },
 
