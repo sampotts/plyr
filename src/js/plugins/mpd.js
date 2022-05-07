@@ -107,8 +107,9 @@ const mpd = {
     const player = this;
 
     // Config hacks
-    // "Auto"
-    player.config.quality.options.unshift(mpd.qualityAutoMagicValue);
+    if (!player.config.quality.options.includes(mpd.qualityAutoMagicValue)) {
+      player.config.quality.options.push(mpd.qualityAutoMagicValue);
+    }
     if (!player.config.i18n.qualityLabel) {
       player.config.i18n.qualityLabel = {};
     }
