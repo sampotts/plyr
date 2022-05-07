@@ -56,7 +56,7 @@ const source = {
         // Set the type and provider
         const { sources, type } = input;
         const [{ provider = providers.html5, src }] = sources;
-        const tagName = provider === 'html5' ? type : 'div';
+        const tagName = ['html5', 'mpd'].includes(provider) ? type : 'div';
         const attributes = provider === 'html5' ? {} : { src };
 
         Object.assign(this, {
@@ -68,6 +68,15 @@ const source = {
           media: createElement(tagName, attributes),
         });
 
+        // Initialize MPEG-DASH
+        if (this.isMPD && window.dashjs) {
+          const dash = dashjs.MediaPlayer().create();
+          dash.initialize(this.media, src, false);
+          Object.assign(this, {
+            dash,
+          });
+        }
+
         // Inject the new element
         this.elements.container.appendChild(this.media);
 
@@ -77,7 +86,7 @@ const source = {
         }
 
         // Set attributes for audio and video
-        if (this.isHTML5) {
+        if (this.isHTML5 || this.isMPD) {
           if (this.config.crossorigin) {
             this.media.setAttribute('crossorigin', '');
           }
@@ -121,7 +130,7 @@ const source = {
         }
 
         // If HTML5 or embed but not fully supported, setupInterface and call ready now
-        if (this.isHTML5 || (this.isEmbed && !this.supported.ui)) {
+        if (this.isHTML5 || this.isMPD || (this.isEmbed && !this.supported.ui)) {
           // Setup interface
           ui.build.call(this);
         }
