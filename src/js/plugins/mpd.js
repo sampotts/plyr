@@ -72,10 +72,10 @@ const mpd = {
         qualityList.push(bitrate.height);
       }
     });
-    // "Auto"
-    qualityList.push(mpd.qualityAutoMagicValue);
     // Sort by DESC
     qualityList.sort((a, b) => b - a);
+    // "Auto"
+    qualityList.push(mpd.qualityAutoMagicValue);
     if (this.config.quality.allowOverwrite) {
       // Update supported options
       this.config.quality.options = qualityList;
