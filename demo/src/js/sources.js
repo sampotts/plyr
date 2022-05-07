@@ -76,6 +76,15 @@ const sources = {
       },
     ],
   },
+  mpd: {
+    type: 'video',
+    sources: [
+      {
+        src: 'https://media.axprod.net/TestVectors/Cmaf/clear_1080p_h264/manifest.mpd',
+        provider: 'mpd',
+      },
+    ],
+  },
 };
 
 export default sources;
