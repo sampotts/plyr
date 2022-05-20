@@ -1716,6 +1716,7 @@ const controls = {
       const addProperty = (button) => {
         const className = this.config.classNames.controlPressed;
         Object.defineProperty(button, 'pressed', {
+          configurable: true,
           enumerable: true,
           get() {
             return hasClass(button, className);
