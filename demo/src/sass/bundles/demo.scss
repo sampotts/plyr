@@ -8,7 +8,7 @@
 
 $css-vars-use-native: true;
 
-// Settings
+ //Settings
 @import '../settings/breakpoints';
 @import '../settings/colors';
 @import '../settings/cosmetic';
@@ -18,7 +18,7 @@ $css-vars-use-native: true;
 @import '../settings/spacing';
 @import '../settings/type';
 
-// Libs
+ //Libs
 @import '../lib/fontface';
 @import '../lib/animation';
 @import '../lib/mixins';
@@ -46,6 +46,6 @@ $css-vars-use-native: true;
 // Plyr
 @import '../../../../src/sass/plyr';
 
-// Utils
+//// Utils
 @import '../utilities/cosmetic';
 @import '../utilities/hidden';

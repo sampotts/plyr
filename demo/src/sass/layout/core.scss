@@ -32,6 +32,15 @@ main {
   margin: auto;
   padding-bottom: 1px; // Collapsing margins
   text-align: center;
+
+  .content-block{
+    height:400px;
+    background-color: grey;
+    &:nth-child(even){
+      background-color: darkgrey;
+    }
+  }
+
 }
 
 aside {
@@ -62,4 +71,5 @@ aside {
       @include tab-focus($color-twitter);
     }
   }
+
 }
