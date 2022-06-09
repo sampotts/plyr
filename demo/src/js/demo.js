@@ -1,11 +1,11 @@
 import Plyr from '../../../src/js/plyr';
+import Detachable from './detachableContainer';
 import sources from './sources';
 
 (() => {
   document.addEventListener('DOMContentLoaded', () => {
     const selector = '#player';
     // Setup the player
-
     const playerConfig = {
       debug: true,
       ads: {
@@ -16,6 +16,7 @@ import sources from './sources';
     };
     const player = new Plyr(selector, playerConfig);
     player.source = sources.video;
+    const _ = new Detachable('#playerContainer');
     // Expose for tinkering in the console
     window.player = player;
     window.sources = sources;

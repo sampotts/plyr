@@ -8,6 +8,9 @@
 
 $css-vars-use-native: true;
 
+
+
+
  //Settings
 @import '../settings/breakpoints';
 @import '../settings/colors';
@@ -49,3 +52,6 @@ $css-vars-use-native: true;
 //// Utils
 @import '../utilities/cosmetic';
 @import '../utilities/hidden';
+
+// Custom modules
+@import "../custom/detachable.scss";

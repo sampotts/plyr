@@ -9,10 +9,8 @@ const sources = {
         size: 576,
       },
     ],
-    poster: 'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-HD.jpg',
-    previewThumbnails: {
-      src: ['https://cdn.plyr.io/static/demo/thumbs/100p.vtt', 'https://cdn.plyr.io/static/demo/thumbs/240p.vtt'],
-    },
+    poster:
+      'https://images.1plus1.video/vod-1/images/202206/8/8e/8edd9fccdce1b544934a24a4a707d21214f5e4762aef547cb52be50ecf12f7b9_1.jpg',
   },
 };
 
