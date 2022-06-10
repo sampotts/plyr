@@ -9,7 +9,7 @@ const isObject = (input) => getConstructor(input) === Object;
 const isNumber = (input) => getConstructor(input) === Number && !Number.isNaN(input);
 const isString = (input) => getConstructor(input) === String;
 const isBoolean = (input) => getConstructor(input) === Boolean;
-const isFunction = (input) => getConstructor(input) === Function;
+const isFunction = (input) => typeof getConstructor(input) === 'function';
 const isArray = (input) => Array.isArray(input);
 const isWeakMap = (input) => instanceOf(input, WeakMap);
 const isNodeList = (input) => instanceOf(input, NodeList);
