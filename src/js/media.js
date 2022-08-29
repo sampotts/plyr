@@ -5,7 +5,7 @@
 import html5 from './html5';
 import vimeo from './plugins/vimeo';
 import youtube from './plugins/youtube';
-import { createElement, toggleClass, wrap } from './utils/elements';
+import { createElement, toggleClass, wrap, insertElement } from './utils/elements';
 
 const media = {
   // Setup media
@@ -14,6 +14,13 @@ const media = {
     if (!this.media) {
       this.debug.warn('No media element found!');
       return;
+    }
+    
+    // If there's no source in media, create with config
+    if(this.media.querySelectorAll('source').length == 0 && this.config.sources!=null && this.config.sources.length > 0){
+      this.config.sources.forEach((source) => {
+        insertElement("source", this.media, source);
+      });
     }
 
     // Add type class
@@ -28,6 +35,7 @@ const media = {
       toggleClass(this.elements.container, this.config.classNames.type.replace('{0}', 'video'), true);
     }
 
+    
     // Inject the player wrapper
     if (this.isVideo) {
       // Create the wrapper div

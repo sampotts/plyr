@@ -3,7 +3,7 @@ import { once } from '../utils/events';
 
 import is from '../utils/is';
 import { formatTime } from '../utils/time';
-import {clamp} from '../utils/numbers'
+import { clamp }  from '../utils/numbers'
 import { triggerEvent,on } from '../utils/events';
 
 /**
@@ -61,10 +61,6 @@ class PreviewThumbnails {
       scrubbing:{}
     };
 
-    this.player.on("previewThumbnailsPlugin:show",(event)=>{
-      this.show(event.detail);
-    });
-    
   }
 
   get enabled() {
@@ -74,13 +70,24 @@ class PreviewThumbnails {
 
   load=()=>{
 
+    if (this.player.elements.display.seekTooltip) {
+      this.player.elements.display.seekTooltip.hidden = true;
+    }
+
     this.config= this.player.config.previewThumbnails;
     this.itemInPage= (this.config.column*this.config.row);
-    this.interval= this.player.duration/(this.itemInPage*this.config.src.length);
-   
+    this.interval= this.player.duration/((this.itemInPage*this.config.src.length) - this.config.blankFrame);
+    
+    debugger;
+    
+    var Toplam= (this.itemInPage*this.config.src.length);
+
+    console.log(Toplam - this.config.blankFrame);
+
     this.config.src.forEach(url => {
       this.thumbnails.push({
         url,
+        isLoading:false,
         isLoaded:false,
         image:null,
         blob:null
@@ -88,8 +95,26 @@ class PreviewThumbnails {
     });
 
     this.render();
-
     this.loaded=true;
+  }
+
+  showTime= async (event,time) =>{
+    this.scrub=true;
+    this.seekTime=time;
+
+    const posWidth= event.pageX;
+    var Thumbnail= this.getThumbnail();
+
+    if(Thumbnail!=null)
+      this.show(
+        {
+          thumbnail:Thumbnail,
+          event:{
+            second,
+            posWidth
+          }
+        }
+      )
   }
 
   render= ()=>{
@@ -127,23 +152,29 @@ class PreviewThumbnails {
     this.player.elements.wrapper.appendChild(this.elements.scrubbing.container);
   }
   
-  getImage = async (imageIndex)=>{
+  getImage = (imageIndex)=>{
     var getImage= this.thumbnails[imageIndex];
 
     if(getImage.isLoaded===false){
-        var Res= await fetch(getImage.url);
-        const blob= await Res.blob();
+      getImage.isLoading=true;
+
+      fetch(getImage.url)
+      .then(res=>res.blob())
+      .then(blob=>{
         const imageObjectURL = URL.createObjectURL(blob);
         getImage.blob=imageObjectURL
         getImage.image= new Image();
         getImage.image.src= getImage.blob;
-        getImage.isLoaded=true;  
+        getImage.image.onload=()=>{
+          getImage.isLoaded=true;
+        };
+      })
     }
 
     return getImage;
   }
 
-  getThumbnail = async () =>{
+  getThumbnail = () =>{
 
     const {
       column,
@@ -152,10 +183,13 @@ class PreviewThumbnails {
 
     const perIndex=  Math.floor(this.seekTime / this.interval);
     const imageIndex= clamp(Math.ceil((perIndex + 1) / this.itemInPage) - 1, 0, this.thumbnails.length-1);
-    var getImage= await this.getImage(imageIndex);
 
-    const width = 1600 / row;
-    const height= 450 / column;
+    var getImage= this.getImage(imageIndex);
+
+    if(getImage.isLoading==true && getImage.isLoaded==false) return null;
+
+    const width = getImage.image.naturalWidth / row;
+    const height= getImage.image.naturalHeight / column;
     const indexInImage= perIndex + 1 - this.itemInPage * (Math.ceil((perIndex + 1) / this.itemInPage) - 1)
     const rowIndex = Math.ceil(indexInImage / row) - 1
     const colIndex = indexInImage - rowIndex * row - 1
@@ -170,7 +204,8 @@ class PreviewThumbnails {
     }
   }
 
-  startMove= async (event)=>{
+  startMove= (event)=>{
+    
     if (!is.event(event) || !['touchmove', 'mousemove'].includes(event.type)) {
       return;
     }
@@ -178,33 +213,40 @@ class PreviewThumbnails {
     if (event.type === 'touchmove') {
       this.seekTime = this.player.media.duration * (this.player.elements.inputs.seek.value / 100);
     } else {
-      // Calculate seek hover position as approx video seconds
+      
       const clientRect = this.player.elements.progress.getBoundingClientRect();
       const percentage = (100 / clientRect.width) * (event.pageX - clientRect.left);
       this.seekTime = this.player.media.duration * (percentage / 100);
 
       if (this.seekTime < 0) {
-        // The mousemove fires for 10+px out to the left
         this.seekTime = 0;
       }
 
       if (this.seekTime > this.player.media.duration - 1) {
-        // Took 1 second off the duration for safety, because different players can disagree on the real duration of a video
         this.seekTime = this.player.media.duration - 1;
       }
+
+      this.elements.thumb.time.innerText = formatTime(this.seekTime);
     }
 
     const second= this.seekTime;
     const posWidth= event.pageX;
 
-    triggerEvent.call(this.player, this.player.media, 'previewThumbnailsPlugin:show', false, {
-      thumbnail:await this.getThumbnail(),
-      event:{
-        second,
-        posWidth
-      }
-    });
+    var Thumbnail= this.getThumbnail();
+
+    if(Thumbnail!=null)
+      this.show(
+        {
+          thumbnail:Thumbnail,
+          event:{
+            second,
+            posWidth
+          }
+        }
+      )
+    
   }
+
   endMove = (event)=>{
     const className = this.player.config.classNames.previewThumbnails.thumbContainerShown;
 
@@ -217,10 +259,12 @@ class PreviewThumbnails {
     // Only act on left mouse button (0), or touch device (event.button does not exist or is false)
     if (is.nullOrUndefined(event.button) || event.button === false || event.button === 0) {
       this.scrub = true;
+      this.endMove();
     }
   };
 
   endScrubbing = () => {
+    
     this.scrub = false;
 
     const className = this.player.config.classNames.previewThumbnails.scrubbingContainerShown;
@@ -232,11 +276,19 @@ class PreviewThumbnails {
   };
 
   show = (detail)=>{
+    let El= this.elements.thumb.imageContainer;
+
     if(this.scrub){
-      this.showOnVideo(detail)
-    }else{
-      this.showOnProgress(detail);
+      El= this.elements.scrubbing.container;
     }
+
+    El.style.backgroundImage=`url(${this.thumbnails[detail.thumbnail.image].blob})`;
+    El.style.height= `${detail.thumbnail.height}px`;
+    El.style.width=`${detail.thumbnail.width}px`;
+    El.style.backgroundPosition= `-${detail.thumbnail.colIndex * detail.thumbnail.width}px -${detail.thumbnail.rowIndex*detail.thumbnail.height}px`;
+
+    this.scrub==true?this.showOnVideo(detail):this.showOnProgress(detail);
+
   }
 
   showOnProgress= (detail)=>{
@@ -245,12 +297,6 @@ class PreviewThumbnails {
     if(this.elements.thumb.container.classList.contains(className)===false){
       this.elements.thumb.container.classList.toggle(className, true);
     }
-
-    var El= this.elements.thumb.imageContainer;
-    El.style.backgroundImage=`url(${this.thumbnails[detail.thumbnail.image].blob})`;
-    El.style.height= `${detail.thumbnail.height}px`;
-    El.style.width=`${detail.thumbnail.width}px`;
-    El.style.backgroundPosition= `-${detail.thumbnail.colIndex * detail.thumbnail.width}px -${detail.thumbnail.rowIndex*detail.thumbnail.height}px`;
 
     const seekbarRect = this.player.elements.progress.getBoundingClientRect();
     const plyrRect = this.player.elements.container.getBoundingClientRect();
@@ -279,15 +325,14 @@ class PreviewThumbnails {
       this.elements.scrubbing.container.classList.toggle(className, true);
     }
 
-    var El= this.elements.scrubbing.container;
-    El.style.backgroundImage=`url(${this.thumbnails[detail.thumbnail.image].blob})`;
-    El.style.height= `${detail.thumbnail.height}px`;
-    El.style.width=`${detail.thumbnail.width}px`;
-    El.style.backgroundPosition= `-${detail.thumbnail.colIndex * detail.thumbnail.width}px -${detail.thumbnail.rowIndex*detail.thumbnail.height}px`;
+    const { width, height } = fitRatio(detail.thumbnail.width/detail.thumbnail.height, {
+      width: this.player.media.clientWidth,
+      height: this.player.media.clientHeight,
+    });
 
-    var Scale= 'scale('+this.player.elements.container.clientHeight/detail.thumbnail.height+')';
-    El.style.transform= Scale;
-
+    var Scale= 'scale('+(height/detail.thumbnail.height)+')';
+    this.elements.scrubbing.container.style.transform= Scale;
+    
   }
 }
 

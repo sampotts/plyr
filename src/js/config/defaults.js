@@ -9,6 +9,9 @@ const defaults = {
   // Custom media title
   title: '',
 
+  // Sources
+  sources:[],
+  
   // Logging to console
   debug: false,
 
@@ -132,10 +135,12 @@ const defaults = {
     // 'restart',
     // 'rewind',
     'play',
+
+    'current-time',
+    'duration',
+    
     // 'fast-forward',
     'progress',
-    'current-time',
-    // 'duration',
     'mute',
     'volume',
     'captions',
@@ -298,7 +303,8 @@ const defaults = {
 
     // Thumbnail Preview Plugin
     'previewThumbnailsPlugin:show',
-    'previewThumbnailsPlugin:hide'
+    'previewThumbnailsPlugin:hide',
+    'previewThumbnailsPlugin:showTime'
   ],
 
   // Selectors
@@ -406,6 +412,12 @@ const defaults = {
       scrubbingContainer: 'plyr__preview-scrubbing',
       scrubbingContainerShown: 'plyr__preview-scrubbing--is-shown',
     },
+    mobile:{
+      doubleContainer: 'plyr__mobile__double-container',
+      isShown:'--is-shown',
+      left:'plyr__mobile__double-container__left',
+      right:'plyr__mobile__double-container__right',
+    },
     markers: {
       points: 'plyr__marker__points',
       tip: 'plyr__marker__tip',
@@ -433,6 +445,7 @@ const defaults = {
   previewThumbnails: {
     enabled: false,
     src: '',
+    blankFrame:11
   },
 
   // Vimeo plugin

@@ -40,6 +40,7 @@ $css-vars-use-native: true;
 @import 'types/audio';
 @import 'types/video';
 @import 'states/fullscreen';
+@import 'states/mobile';
 @import 'plugins/ads';
 @import 'plugins/preview-thumbnails/index';
 @import 'utils/animation';

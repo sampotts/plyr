@@ -53,6 +53,8 @@ const source = {
           this.elements.container.removeAttribute('class');
         }
 
+        
+
         // Set the type and provider
         const { sources, type } = input;
         const [{ provider = providers.html5, src }] = sources;

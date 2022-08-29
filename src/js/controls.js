@@ -1355,56 +1355,54 @@ const controls = {
         container.appendChild(createTime.call(this, 'duration', defaultAttributes));
       }
 
-      // Check if mobile disabled
-      if(browser.IsPhone==false || ( browser.IsPhone==true && this.config.mobile.enabled==false) || (browser.IsPhone==true && this.config.mobile.enabled==true && this.config.mobile.hideVolume==false)){
-        // Volume controls AAAA
-        if (control === 'mute' || control === 'volume') {
+      // Volume controls AAAA
+      if (control === 'mute' || control === 'volume') {
           
-          let { volume } = this.elements;
+        let { volume } = this.elements;
 
-          // Create the volume container if needed
-          if (!is.element(volume) || !container.contains(volume)) {
-            volume = createElement(
-              'div',
-              extend({}, defaultAttributes, {
-                class: `${defaultAttributes.class} plyr__volume`.trim(),
+        // Create the volume container if needed
+        if (!is.element(volume) || !container.contains(volume)) {
+          volume = createElement(
+            'div',
+            extend({}, defaultAttributes, {
+              class: `${defaultAttributes.class} plyr__volume`.trim(),
+            }),
+          );
+
+          this.elements.volume = volume;
+
+          container.appendChild(volume);
+        }
+
+        // Toggle mute button
+        if (control === 'mute') {
+          volume.appendChild(createButton.call(this, 'mute'));
+        }
+
+        // Volume range control
+        // Ignored on iOS as it's handled globally
+        // https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html
+        if (control === 'volume' && !browser.isIos) {
+          // Set the attributes
+          const attributes = {
+            max: 1,
+            step: 0.05,
+            value: this.config.volume,
+          };
+
+          // Create the volume range slider
+          volume.appendChild(
+            createRange.call(
+              this,
+              'volume',
+              extend(attributes, {
+                id: `plyr-volume-${data.id}`,
               }),
-            );
-
-            this.elements.volume = volume;
-
-            container.appendChild(volume);
-          }
-
-          // Toggle mute button
-          if (control === 'mute') {
-            volume.appendChild(createButton.call(this, 'mute'));
-          }
-
-          // Volume range control
-          // Ignored on iOS as it's handled globally
-          // https://developer.apple.com/library/safari/documentation/AudioVideo/Conceptual/Using_HTML5_Audio_Video/Device-SpecificConsiderations/Device-SpecificConsiderations.html
-          if (control === 'volume' && !browser.isIos) {
-            // Set the attributes
-            const attributes = {
-              max: 1,
-              step: 0.05,
-              value: this.config.volume,
-            };
-
-            // Create the volume range slider
-            volume.appendChild(
-              createRange.call(
-                this,
-                'volume',
-                extend(attributes, {
-                  id: `plyr-volume-${data.id}`,
-                }),
-              ),
-            );
-          }
+            ),
+          );
         }
       }
+      
 
       // Toggle captions button
       if (control === 'captions') {

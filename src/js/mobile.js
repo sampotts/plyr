@@ -1,6 +1,8 @@
 import { createElement } from './utils/elements';
 import { on } from './utils/events';
 import is from './utils/is';
+import { clamp } from './utils/numbers'
+import { formatTime,getHours } from './utils/time';
 
 class Mobile {
     constructor(player) {
@@ -13,6 +15,47 @@ class Mobile {
 
         this.IsDouble=false;
         this.LastTouch=0;
+
+        this.isDragging=false;
+        this.startX=0;
+        this.currentTime=0;
+
+        on.call(this.player,this.player.elements.container,'touchstart',(event)=>{
+            if (event.touches.length === 1) {
+                this.isDragging = true;
+                this.startX = event.touches[0].clientX;
+            }
+        })
+
+        on.call(this.player,this.player.elements.container,'touchmove',(event)=>{
+            if (event.touches.length === 1 && this.isDragging) {
+
+                if(this.player.playing) this.player.pause();
+
+                const widthDiff = event.touches[0].clientX - this.startX;
+                const proportion = clamp(widthDiff / this.player.elements.container.clientWidth, -1, 1);
+                this.currentTime = clamp(this.player.currentTime+this.player.duration*proportion,0,this.player.duration);
+
+                const forceHours = getHours(this.player.duration) > 0
+                const Time= formatTime(this.currentTime,forceHours,false);
+                this.player.elements.display.currentTime.innerHTML=Time;
+
+                this.player.previewThumbnails.showTime(event,this.currentTime);
+            }
+        })
+
+        on.call(this.player,this.player.elements.container,'touchend',(event)=>{
+            this.player.previewThumbnails.endScrubbing();
+
+            if(this.isDragging && this.currentTime){
+                this.player.currentTime= this.currentTime;
+                this.player.play();
+            }
+            this.isDragging=false;
+            this.startX=0;
+            this.currentTime=0;
+        })
+
 
         on.call(this.player, this.player.elements.container, 'click', (event) => {
             // Ignore double click in controls
@@ -45,43 +88,27 @@ class Mobile {
                 screen.orientation.lock('landscape');
             })
         }
+        
+        if(this.player.config.mobile.hideVolume){
+            this.player.config.controls= this.player.config.controls.filter(x=>x!="volume");
+        }
 
         this.render();
-    }
-    animate= (el)=>{
-        let Interval= null;
-        let Opacity=0;
 
-        el.style.display="block";
-        el.style.opacity=Opacity;
-
-        const Show = (cb)=>{
-            Interval= setInterval(()=>{
-                Opacity+=0.1;
-                console.log(Opacity);
-                el.style.opacity= Opacity;
-    
-                if(Opacity>=1){
-                    clearInterval(Interval);
-                    cb()
-                }
-            }, 30);
-        }
-        const Hide = ()=>{
-            Interval= setInterval(()=>{
-                Opacity-=0.1;
-                console.log(Opacity);
-                el.style.opacity= Opacity;
-    
-                if(Opacity<=0){
-                    clearInterval(Interval);
-                }
-            }, 25);
-        }
-        
-        Show(Hide);
-        
+        this.player.on("ready",()=>this.removeItems());
     }
+
+    animate = (el)=>{
+        if(el.className.includes(this.player.config.classNames.mobile.isShown)==false){
+            var mainName=el.className;
+            el.classList.toggle(mainName+this.player.config.classNames.mobile.isShown, true);
+
+            setTimeout(() => {
+                el.classList.toggle(mainName+this.player.config.classNames.mobile.isShown, false);
+            }, 300);
+        }
+    }
+
     forward= () =>{
         this.animate(this.elements.double.right);
         this.player.forward(this.SeekSecond);
@@ -94,16 +121,18 @@ class Mobile {
 
     render=()=>{
         this.elements.double.container = createElement('div', {
-            class: "double-container",
+            class: this.player.config.classNames.mobile.doubleContainer,
         });
 
         this.elements.double.left = createElement('div', {
-            class: "double-left",
+            class: this.player.config.classNames.mobile.left,
         });
+        this.elements.double.left.innerHTML="- "+this.SeekSecond;
 
         this.elements.double.right = createElement('div', {
-            class: "double-right",
+            class: this.player.config.classNames.mobile.right,
         });
+        this.elements.double.right.innerHTML="+ "+this.SeekSecond;
 
         this.elements.double.container.appendChild(this.elements.double.left);
         this.elements.double.container.appendChild(this.elements.double.right);
@@ -111,7 +140,9 @@ class Mobile {
         this.player.elements.wrapper.appendChild(this.elements.double.container);
     }
 
-
+    removeItems = () =>{
+        if(this.player.config.mobile.hideVolume) this.player.elements.volume.hidden=true;
+    }
 }
 
 export default Mobile;

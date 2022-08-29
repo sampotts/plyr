@@ -2,7 +2,7 @@
 // Mobile
 // --------------------------------------------------------------
 
-.plyr .double-container{
+.plyr__mobile__double-container{
   position: absolute;
   height: 100%;
   width: 100%;
@@ -10,28 +10,48 @@
   right: 0;
   left: 0;
   top: 0;
-}
-.plyr .double-container > .double-left{
-  display: none;
-  position: absolute;
-  height: 100%;
-  width: 50%;
-  bottom: 0;
-  left: 0;
-  top: 0;
-  background: rgba(0,0,0,0.5);
-  border-radius: 0 50% 50% 0;
-  opacity: 0;
-}
-.plyr .double-container > .double-right{
-  display: none;
-  position: absolute;
-  height: 100%;
-  width: 50%;
-  bottom: 0;
-  right: 0;
-  top: 0;
-  background: rgba(0,0,0,0.5);
-  border-radius: 50% 0 0 50%;
-  opacity: 0;
+  z-index: 1;
+  color: white;
+
+  &__left{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    height: 100%;
+    width: 50%;
+    bottom: 0;
+    left: 0;
+    top: 0;
+    background: rgba(0,0,0,0.5);
+    border-radius: 0 50% 50% 0;
+    opacity: 0;
+    transition: transform 0.2s 0.1s ease, opacity 0.2s 0.1s ease;
+
+    &--is-shown {
+      opacity: 1;
+      transform: translate(0, 0) scale(1);
+    }
+  }
+
+  &__right{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    height: 100%;
+    width: 50%;
+    bottom: 0;
+    right: 0;
+    top: 0;
+    background: rgba(0,0,0,0.5);
+    border-radius: 50% 0 0 50%;
+    opacity: 0;
+    transition: transform 0.2s 0.1s ease, opacity 0.2s 0.1s ease;
+    
+    &--is-shown {
+      opacity: 1;
+      transform: translate(0, 0) scale(1);
+    }
+  }
 }

@@ -43,6 +43,20 @@ import toggleClass from './toggle-class';
     const player = new Plyr(selector, {
       debug: true,
       title: 'View From A Blue Moon',
+      
+      sources:[
+        {
+          src:"./media/video3.mp4",
+          type:"video/mp4",
+          size:"-1"
+        },
+        {
+          src:"./media/video3.mp4",
+          type:"video/mp4",
+          size:"1080"
+        }
+      ],
+
       iconUrl: 'dist/demo.svg',
       keyboard: {
         global: true,
@@ -53,49 +67,14 @@ import toggleClass from './toggle-class';
       captions: {
         active: true,
       },
-      /*previewThumbnails: {
-        enabled: true,
-        src: ['https://cdn.plyr.io/static/demo/thumbs/100p.vtt', 'https://cdn.plyr.io/static/demo/thumbs/240p.vtt'],
-      },*/
-      /*previewThumbnails: {
-        enabled: true,
-        src: (resolver)=>{
-          var thumbnails = [
-          {
-            frames: [
-              {
-                startTime: 0,
-                endTime: 60,
-                text: "https://i.imgur.com/D4gAAOV.jpeg",
-                x: 0,
-                y: 0,
-                w: 1920,
-                h: 1080
-              },
-              {
-                startTime: 61,
-                endTime: 120,
-                text: "https://i.imgur.com/QJVfTKP.jpeg",
-                x: 0,
-                y: 0,
-                w: 1920,
-                h: 1080
-              }
-            ],
-            width: 1920,
-            height: 1090,
-            urlPrefix: "",
-          }
-        ];
-
-        resolver(thumbnails);
-        },
-      },*/
+      invertTime:false,
+      
       previewThumbnails: {
         enabled: true,
-        src: ["/media/thumbnails-1.png","/media/thumbnails-2.png"],
+        src: ["/media/v3thumbs/S0.jpg","/media/v3thumbs/S1.jpg","/media/v3thumbs/S2.jpg","/media/v3thumbs/S3.jpg","/media/v3thumbs/S4.jpg"],
         column:5,
-        row:10,
+        row:5,
+        blankFrame:15
       },
 
       mobile:{
@@ -124,15 +103,15 @@ import toggleClass from './toggle-class';
         enabled: true,
         points: [
           {
-            time: 10,
+            time: 200,
             tip: 'first marker',
           },
           {
-            time: 40,
+            time: 220,
             tip: 'second marker',
           },
           {
-            time: 120,
+            time: 260,
             tipHTML: '<a href="http://example.com">third</a> marker',
           },
         ],

@@ -3,7 +3,7 @@
 // ==========================================================================
 
 import support from './support';
-import { removeElement } from './utils/elements';
+import { createElement, removeElement, insertElement } from './utils/elements';
 import { triggerEvent } from './utils/events';
 import is from './utils/is';
 import { silencePromise } from './utils/promise';

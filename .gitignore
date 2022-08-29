@@ -7,3 +7,9 @@ yarn-error.log
 *.webm
 .idea/
 dist/
+demo/media/v2thumbs/
+demo/media/v3thumbs/
+src/js/plugins/preview-thumbnails copy.js
+src/js/plugins/preview-thumbnails-orj.js
+src/js/plugins/preview-thumbnails.drawio
+src/js/plugins/preview demo.txt
