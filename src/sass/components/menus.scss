@@ -192,7 +192,7 @@
       align-items: center;
       display: flex;
       margin-left: auto;
-      margin-right: calc((#{$plyr-control-padding} - 2) * -1);
+      margin-right: calc((#{$plyr-control-padding} - 2px) * -1);
       overflow: hidden;
       padding-left: calc(#{$plyr-control-padding} * 3.5);
       pointer-events: none;
