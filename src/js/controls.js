@@ -1718,6 +1718,7 @@ const controls = {
         button.setAttribute('aria-pressed', 'false');
 
         Object.defineProperty(button, 'pressed', {
+          configurable: true,
           enumerable: true,
           get() {
             return hasClass(button, className);
