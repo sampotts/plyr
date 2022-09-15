@@ -5,12 +5,11 @@
 
 const browser = {
   isIE: Boolean(window.document.documentMode),
-  isEdge: window.navigator.userAgent.includes('Edge'),
-  isWebkit: 'WebkitAppearance' in document.documentElement.style && !/Edge/.test(navigator.userAgent),
-  isIPhone: /(iPhone|iPod)/gi.test(navigator.platform),
+  isEdge: /Edge/g.test(navigator.userAgent),
+  isWebkit: 'WebkitAppearance' in document.documentElement.style && !/Edge/g.test(navigator.userAgent),
+  isIPhone: /iPhone|iPod/gi.test(navigator.userAgent) && navigator.maxTouchPoints > 1,
   isIos:
-    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) ||
-    /(iPad|iPhone|iPod)/gi.test(navigator.platform),
+    /iPad|iPhone|iPod/gi.test(navigator.userAgent) && navigator.maxTouchPoints > 1
 };
 
 export default browser;
