@@ -35,7 +35,7 @@
     "@babel/core": "^7.20.2",
     "@babel/plugin-proposal-class-properties": "^7.18.6",
     "@babel/preset-env": "^7.20.2",
-    "autoprefixer": "^10.4.2",
+    "autoprefixer": "^10.4.13",
     "del": "^6.0.0",
     "eslint": "^8.27.0",
     "gulp": "^4.0.2",
@@ -49,8 +49,8 @@
     "gulp-sass": "^5.1.0",
     "gulp-svgstore": "^9.0.0",
     "node-sass": "^7.0.1",
-    "postcss": "^8.4.6",
-    "postcss-custom-properties": "12.0.0",
+    "postcss": "^8.4.19",
+    "postcss-custom-properties": "12.1.10",
     "postcss-safe-important": "^1.2.0",
     "rollup": "^2.67.0",
     "rollup-plugin-commonjs": "^10.1.0",
@@ -61,6 +61,6 @@
   },
   "resolutions": {
     "glob-parent": "^6.0.2",
-    "postcss": "^8.4.6"
+    "postcss": "^8.4.19"
   }
 }
