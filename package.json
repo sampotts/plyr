@@ -37,7 +37,7 @@
     "@babel/preset-env": "^7.20.2",
     "autoprefixer": "^10.4.2",
     "del": "^6.0.0",
-    "eslint": "^8.8.0",
+    "eslint": "^8.27.0",
     "gulp": "^4.0.2",
     "gulp-better-rollup": "^4.0.1",
     "gulp-filter": "^7.0.0",
