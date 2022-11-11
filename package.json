@@ -48,7 +48,7 @@
     "gulp-rename": "^2.0.0",
     "gulp-sass": "^5.1.0",
     "gulp-svgstore": "^9.0.0",
-    "node-sass": "^7.0.1",
+    "node-sass": "^8.0.0",
     "postcss": "^8.4.19",
     "postcss-custom-properties": "12.1.10",
     "postcss-safe-important": "^1.2.0",
