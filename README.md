@@ -846,6 +846,7 @@ Plyr costs money to run, not only my time. I donate my time for free as I enjoy 
 - [STROLLÿN: Work with a View](https://strollyn.com)
 - [CFDA Runway360](https://runway360.cfda.com/)
 - [NKLAV | Filmmaker](https://nklav.com)
+- [GDI.JS.ORG - Google Drive Index](https://gitlab.com/GoogleDriveIndex/Google-Drive-Index)
 
 If you want to be added to the list, open a pull request. It'd be awesome to see how you're using Plyr 😎
 
