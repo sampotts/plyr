@@ -1,3 +1,18 @@
+### v3.7.3
+
+- Fix: force nowrap in progress tooltips (related: #2549) (thanks @raad-altaie!)
+- Feat(i18n): Make captions autodetect text direction (#2540) (thanks @ebraminio!)
+- Fix: fixed menu border radius bug (#2548) (thanks @raad-altaie!)
+- Chore: navigator.platform is deprecated (#2530) (thanks @stamat!)
+- Feat: Added configurable property to elements for re-use (#2489) (thanks @NoirHusky!)
+- Docs: Replace example video ID with one that still works (#2518) (thanks @luvejo!)
+- Fix: Improve accessibility on control buttons with aria-pressed (#2523) (thanks @emilkarl!)
+- Fix: Fix for calc() in newer Dart Sass versions (#2519) (thanks @ckhicks!)
+- Fix: simplify logic for isFunction assertion method
+- Chore: update types to include string for controls
+- Chore: upgrade packages
+- Chore: use `.node-version` instead of `.nvmrc`
+
 ### v3.7.2
 
 - Fix: Add `@babel/plugin-proposal-optional-chaining` to transform optional chaining in build output
