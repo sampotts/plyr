@@ -341,7 +341,7 @@ declare namespace Plyr {
      * id (the unique id for the player), seektime (the seektime step in seconds), and title (the media title). See CONTROLS.md for more info on how the html needs to be structured.
      * Defaults to ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen']
      */
-    controls?: string[] | ((id: string, seektime: number, title: string) => unknown) | Element;
+    controls?: string | string[] | ((id: string, seektime: number, title: string) => unknown) | Element;
 
     /**
      * If you're using the default controls are used then you can specify which settings to show in the menu
@@ -459,7 +459,7 @@ declare namespace Plyr {
      * Allows binding of event listeners to the controls before the default handlers. See the defaults.js for available listeners.
      * If your handler prevents default on the event (event.preventDefault()), the default handler will not fire.
      */
-    listeners?: {[key: string]: (error: PlyrEvent) => void};
+    listeners?: { [key: string]: (error: PlyrEvent) => void };
 
     /**
      * active: Toggles if captions should be active by default. language: Sets the default language to load (if available). 'auto' uses the browser language.
@@ -606,7 +606,7 @@ declare namespace Plyr {
 
   interface MarkersOptions {
     enabled: boolean;
-    points: MarkersPoints[]
+    points: MarkersPoints[];
   }
 
   export interface Elements {
@@ -700,7 +700,7 @@ declare namespace Plyr {
   }
 
   interface PlyrEvent extends CustomEvent {
-    readonly detail: {readonly plyr: Plyr};
+    readonly detail: { readonly plyr: Plyr };
   }
 
   enum YoutubeState {
