@@ -211,9 +211,9 @@ const defaults = {
     },
     googleIMA: {
       sdk: 'https://imasdk.googleapis.com/js/sdkloader/ima3.js',
-      googlecast: {
-        api: 'https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1',
-      },
+    },
+    googlecast: {
+      api: 'https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1',
     },
   },
 
