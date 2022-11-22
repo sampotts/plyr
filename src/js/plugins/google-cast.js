@@ -29,8 +29,6 @@ const googlecast = {
         // TODO: Get cast logs under a separate namespace?
 
         // Inject the container
-
-        debugger
         if (!is.element(this.elements.googlecast)) {
             this.elements.googlecast = createElement(
                 'div',
