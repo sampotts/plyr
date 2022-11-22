@@ -44,8 +44,8 @@ const googlecast = {
 
           googlecast.defaults = {
             options: {
-              // receiverApplicationId: window.chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
-              receiverApplicationId: 'C248C800',
+              receiverApplicationId: window.chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
+              // receiverApplicationId: 'C248C800',
               autoJoinPolicy: window.chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED,
             },
           };
