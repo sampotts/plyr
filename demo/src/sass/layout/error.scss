@@ -5,26 +5,26 @@
 // Error page
 html.error,
 .error body {
-    height: 100%;
+  height: 100%;
 }
 
 html.error {
-    background: $page-background;
-    background-attachment: fixed;
+  background: $page-background;
+  background-attachment: fixed;
 }
 
 .error body {
-    align-items: center;
-    display: flex;
-    width: 100%;
+  align-items: center;
+  display: flex;
+  width: 100%;
 }
 
 .error main {
-    padding: $spacing-base;
-    text-align: center;
-    width: 100%;
+  padding: $spacing-base;
+  text-align: center;
+  width: 100%;
 
-    p {
-        @include font-size($font-size-large);
-    }
+  p {
+    @include font-size($font-size-large);
+  }
 }

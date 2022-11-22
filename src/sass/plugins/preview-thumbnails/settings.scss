@@ -1,0 +1,17 @@
+// --------------------------------------------------------------
+// Preview Thumbnails
+// --------------------------------------------------------------
+
+$plyr-preview-padding: $plyr-tooltip-padding !default;
+$plyr-preview-background: $plyr-tooltip-background !default;
+$plyr-preview-radius: 6px !default;
+$plyr-preview-shadow: $plyr-tooltip-shadow !default;
+$plyr-preview-arrow-size: $plyr-tooltip-arrow-size !default;
+$plyr-preview-image-background: $plyr-color-gray-200 !default;
+$plyr-preview-time-container-background: var(
+  --plyr-video-controls-background,
+  linear-gradient(rgba(#000, 0), rgba(#000, 0.75))
+) !default;
+$plyr-preview-time-container-padding: 20px 6px 6px !default;
+$plyr-preview-time-color: #fff;
+$plyr-preview-time-font-size: $plyr-font-size-time !default;

@@ -2,6 +2,9 @@
 // Plyr.io Demo Page
 // ==========================================================================
 @charset 'UTF-8';
+@import '../../../../src/sass/lib/css-vars';
+
+$css-vars-use-native: true;
 
 // Settings
 @import '../settings/breakpoints';

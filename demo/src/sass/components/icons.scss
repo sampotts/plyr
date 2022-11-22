@@ -2,22 +2,24 @@
 // Icons
 // ==========================================================================
 
+@use 'sass:math';
+
 // Base size icon styles
 .icon {
-    fill: currentColor;
-    height: $icon-size;
-    vertical-align: -3px;
-    width: $icon-size;
+  fill: currentColor;
+  height: $icon-size;
+  vertical-align: -3px;
+  width: $icon-size;
 }
 
 // Within elements
 a svg,
 button svg,
 label svg {
-    pointer-events: none;
+  pointer-events: none;
 }
 
 a .icon,
 .btn .icon {
-    margin-right: ($spacing-base / 2);
+  margin-right: math.div($spacing-base, 4);
 }

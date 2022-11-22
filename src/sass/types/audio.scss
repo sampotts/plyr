@@ -1,0 +1,61 @@
+// --------------------------------------------------------------
+// Audio styles
+// --------------------------------------------------------------
+
+// Container
+.plyr--audio {
+  display: block;
+}
+
+// Controls container
+.plyr--audio .plyr__controls {
+  background: $plyr-audio-controls-background;
+  border-radius: inherit;
+  color: $plyr-audio-control-color;
+  padding: $plyr-control-spacing;
+}
+
+// Control elements
+.plyr--audio .plyr__control {
+  &.plyr__tab-focus,
+  &:hover,
+  &[aria-expanded='true'] {
+    background: $plyr-audio-control-background-hover;
+    color: $plyr-audio-control-color-hover;
+  }
+}
+
+// Range inputs
+.plyr--full-ui.plyr--audio input[type='range'] {
+  &::-webkit-slider-runnable-track {
+    background-color: $plyr-audio-range-track-background;
+  }
+
+  &::-moz-range-track {
+    background-color: $plyr-audio-range-track-background;
+  }
+
+  &::-ms-track {
+    background-color: $plyr-audio-range-track-background;
+  }
+
+  // Pressed styles
+  &:active {
+    &::-webkit-slider-thumb {
+      @include plyr-range-thumb-active($plyr-audio-range-thumb-active-shadow-color);
+    }
+
+    &::-moz-range-thumb {
+      @include plyr-range-thumb-active($plyr-audio-range-thumb-active-shadow-color);
+    }
+
+    &::-ms-thumb {
+      @include plyr-range-thumb-active($plyr-audio-range-thumb-active-shadow-color);
+    }
+  }
+}
+
+// Progress
+.plyr--audio .plyr__progress__buffer {
+  color: $plyr-audio-progress-buffered-background;
+}

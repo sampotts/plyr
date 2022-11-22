@@ -3,9 +3,16 @@
 // ==========================================================================
 
 // Loading
-$plyr-progress-loading-size: 25px !default;
-$plyr-progress-loading-bg: rgba($plyr-color-gray-9, 0.6) !default;
+$plyr-progress-loading-size: var(--plyr-progress-loading-size, 25px) !default;
+$plyr-progress-loading-background: var(--plyr-progress-loading-background, rgba($plyr-color-gray-900, 0.6)) !default;
+
+// Markers
+$plyr-progress-marker-background: var(--plyr-progress-marker-background, #fff) !default;
+$plyr-progress-marker-width: var(--plyr-progress-marker-width, 3px) !default;
 
 // Buffered
-$plyr-video-progress-buffered-bg: rgba(#fff, 0.25) !default;
-$plyr-audio-progress-buffered-bg: rgba($plyr-color-gray-2, 0.66) !default;
+$plyr-video-progress-buffered-background: var(--plyr-video-progress-buffered-background, rgba(#fff, 0.25)) !default;
+$plyr-audio-progress-buffered-background: var(
+  --plyr-audio-progress-buffered-background,
+  rgba($plyr-color-gray-200, 0.6)
+) !default;

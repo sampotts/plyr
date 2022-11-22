@@ -2,23 +2,38 @@
 // Sliders
 // ==========================================================================
 
-// Active state
-$plyr-range-thumb-active-shadow-width: 3px !default;
-
 // Thumb
-$plyr-range-thumb-height: 13px !default;
-$plyr-range-thumb-bg: #fff !default;
-$plyr-range-thumb-border: 2px solid transparent !default;
-$plyr-range-thumb-shadow: 0 1px 1px rgba(#000, 0.15), 0 0 0 1px rgba($plyr-color-gray-9, 0.2) !default;
+$plyr-range-thumb-height: var(--plyr-range-thumb-height, 13px) !default;
+$plyr-range-thumb-background: var(--plyr-range-thumb-background, #fff) !default;
+$plyr-range-thumb-shadow: var(
+  --plyr-range-thumb-shadow,
+  0 1px 1px rgba($plyr-color-gray-900, 0.15),
+  0 0 0 1px rgba($plyr-color-gray-900, 0.2)
+) !default;
+
+// Active state
+$plyr-range-thumb-active-shadow-width: var(--plyr-range-thumb-active-shadow-width, 3px) !default;
 
 // Track
-$plyr-range-track-height: 5px !default;
-$plyr-range-max-height: ($plyr-range-thumb-active-shadow-width * 2) + $plyr-range-thumb-height !default;
+$plyr-range-track-height: var(--plyr-range-track-height, 5px) !default;
 
 // Fill
-$plyr-range-fill-bg: $plyr-color-main !default;
+$plyr-range-fill-background: var(--plyr-range-fill-background, var(--plyr-color-main, $plyr-color-main)) !default;
 
 // Type specific
-$plyr-video-range-track-bg: $plyr-video-progress-buffered-bg !default;
-$plyr-audio-range-track-bg: $plyr-audio-progress-buffered-bg !default;
-$plyr-audio-range-thumb-shadow-color: rgba(#000, 0.1) !default;
+$plyr-video-range-track-background: var(
+  --plyr-video-range-track-background,
+  $plyr-video-progress-buffered-background
+) !default;
+$plyr-video-range-thumb-active-shadow-color: var(
+  --plyr-audio-range-thumb-active-shadow-color,
+  rgba(#fff, 0.5)
+) !default;
+$plyr-audio-range-track-background: var(
+  --plyr-audio-range-track-background,
+  $plyr-audio-progress-buffered-background
+) !default;
+$plyr-audio-range-thumb-active-shadow-color: var(
+  --plyr-audio-range-thumb-active-shadow-color,
+  rgba($plyr-color-gray-900, 0.1)
+) !default;

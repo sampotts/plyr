@@ -4,45 +4,45 @@
 
 // Make a <button> look like an <a>
 button.faux-link {
-    @extend a; // stylelint-disable-line
-    @include cancel-button-styles();
+  @extend a; // stylelint-disable-line
+  @include cancel-button-styles;
 }
 
 // Links
 a {
-    border-bottom: 1px dotted currentColor;
-    color: $color-link;
-    position: relative;
-    text-decoration: none;
-    transition: all 0.2s ease;
+  border-bottom: 1px dotted currentColor;
+  color: $color-link;
+  position: relative;
+  text-decoration: none;
+  transition: all 0.2s ease;
+
+  &::after {
+    background: currentColor;
+    content: '';
+    height: 1px;
+    left: 50%;
+    position: absolute;
+    top: 100%;
+    transform: translateX(-50%);
+    transition: width 0.2s ease;
+    width: 0;
+  }
+
+  &:hover,
+  &:focus {
+    border-bottom-color: transparent;
+    outline: 0;
 
     &::after {
-        background: currentColor;
-        content: '';
-        height: 1px;
-        left: 50%;
-        position: absolute;
-        top: 100%;
-        transform: translateX(-50%);
-        transition: width 0.2s ease;
-        width: 0;
+      width: 100%;
     }
+  }
 
-    &:hover,
-    &:focus {
-        border-bottom-color: transparent;
-        outline: 0;
+  &.tab-focus {
+    @include tab-focus;
+  }
 
-        &::after {
-            width: 100%;
-        }
-    }
-
-    &.tab-focus {
-        @include tab-focus();
-    }
-
-    &.no-border::after {
-        display: none;
-    }
+  &.no-border::after {
+    display: none;
+  }
 }

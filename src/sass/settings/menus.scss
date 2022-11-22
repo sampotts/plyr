@@ -2,9 +2,12 @@
 // Menus
 // ==========================================================================
 
-$plyr-menu-bg: rgba(#fff, 0.9) !default;
-$plyr-menu-color: $plyr-color-gray-7 !default;
-$plyr-menu-arrow-size: 6px !default;
-$plyr-menu-border-color: $plyr-color-gray-2 !default;
-$plyr-menu-border-shadow-color: #fff !default;
-$plyr-menu-shadow: 0 1px 2px rgba(#000, 0.15) !default;
+$plyr-menu-background: var(--plyr-menu-background, rgba(#fff, 0.9)) !default;
+$plyr-menu-radius: var(--plyr-menu-radius, 4px) !default;
+$plyr-menu-color: var(--plyr-menu-color, $plyr-color-gray-700) !default;
+$plyr-menu-shadow: var(--plyr-menu-shadow, 0 1px 2px rgba(#000, 0.15)) !default;
+$plyr-menu-arrow-size: var(--plyr-menu-arrow-size, 4px) !default;
+$plyr-menu-item-arrow-size: var(--plyr-menu-item-arrow-size, 4px) !default;
+$plyr-menu-item-arrow-color: var(--plyr-menu-arrow-color, $plyr-color-gray-500) !default;
+$plyr-menu-back-border-color: var(--plyr-menu-back-border-color, $plyr-color-gray-100) !default;
+$plyr-menu-back-border-shadow-color: var(--plyr-menu-back-border-shadow-color, #fff) !default;

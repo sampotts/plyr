@@ -3,10 +3,11 @@
 // ==========================================================================
 
 h1 {
-    @include font-size($font-size-h1);
-    color: $color-headings;
-    font-weight: $font-weight-bold;
-    letter-spacing: $letter-spacing-headings;
-    line-height: 1.2;
-    margin: 0 0 ($spacing-base * 1.5);
+  @include font-size($font-size-h1);
+
+  color: $color-headings;
+  font-weight: $font-weight-bold;
+  letter-spacing: $letter-spacing-headings;
+  line-height: 1.2;
+  margin: 0 0 ($spacing-base * 1.5);
 }

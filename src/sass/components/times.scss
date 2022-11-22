@@ -3,22 +3,18 @@
 // --------------------------------------------------------------
 
 .plyr__time {
-    font-size: $plyr-font-size-time;
+  font-size: $plyr-font-size-time;
 }
 
 // Media duration hidden on small screens
 .plyr__time + .plyr__time {
-    // Add a slash in before
-    &::before {
-        content: '\2044';
-        margin-right: $plyr-control-spacing;
-    }
+  // Add a slash in before
+  &::before {
+    content: '\2044';
+    margin-right: $plyr-control-spacing;
+  }
 
-    @media (max-width: $plyr-bp-sm-max) {
-        display: none;
-    }
-}
-
-.plyr--video .plyr__time {
-    text-shadow: 0 1px 1px rgba(#000, 0.15);
+  @media (max-width: ($plyr-bp-md - 1px)) {
+    display: none;
+  }
 }

@@ -1,0 +1,103 @@
+// Downloaded from https://github.com/malyw/css-vars (and modified)
+
+@use 'sass:list';
+@use 'sass:map';
+
+// global map to be filled via variables
+$css-vars: ();
+
+// the variable may be set to "true" anywhere in the code,
+// so native CSS custom properties will be used instead of the Sass global map
+$css-vars-use-native: false !default;
+
+///
+// Assigns a variable to the global map
+///
+@function css-var-assign($varName: null, $varValue: null) {
+  @return map-merge(
+    $css-vars,
+    (
+      $varName: $varValue,
+    )
+  );
+}
+
+///
+// Emulates var() CSS native function behavior
+// $args[0] {String} "--" + variable name
+// [$args[1]] Optional default value if variable is not assigned yet
+// E.G.:
+// color: var(--main-color);
+// background: var(--main-background, green);
+///
+@function var($args...) {
+  // CHECK PARAMS
+  @if length($args) == 0 {
+    @error 'Variable name is expected to be passed to the var() function';
+  }
+
+  @if str-length(nth($args, 1)) < 2 or str-slice(nth($args, 1), 0, 2) != '--' {
+    @error "Variable name is expected to start from '--'";
+  }
+
+  // PROCESS
+  $var-name: list.nth($args, 1);
+  $var-value: map.get($css-vars, $var-name);
+
+  @if $css-vars-use-native {
+    // CSS variables
+    // Native CSS: don't process function in case of native
+    @return unquote('var(' + $args + ')');
+  } @else {
+    @if not $var-value {
+      // variable is not provided so far
+      @if length($args) == 2 {
+        $var-value: list.nth($args, 2);
+      }
+    }
+
+    // Sass: return value from the map
+    @return $var-value;
+  }
+}
+
+///
+// Sass mixin to provide variables
+// E.G.:
+// @include css-vars((
+//    --color: rebeccapurple,
+//    --height: 68px,
+//    --margin-top: calc(2vh + 20px)
+// ));
+///
+@mixin css-vars($var-map: null) {
+  // CHECK PARAMS
+  @if not $var-map {
+    @error 'Map of variables is expected, instead got: null';
+  }
+
+  @if type_of($var-map) != map {
+    @error 'Map of variables is expected, instead got another type passed: #{type_of($var, ap)}';
+  }
+
+  // PROCESS
+  @if $css-vars-use-native {
+    // CSS variables
+    // Native CSS: assign CSS custom properties to the global scope
+    @at-root :root {
+      @each $var-name, $var-value in $var-map {
+        @if type_of($var-value) == string {
+          #{$var-name}: $var-value; // to prevent quotes interpolation
+        } @else {
+          #{$var-name}: #{$var-value};
+        }
+      }
+    }
+  } @else {
+    // Sass or debug
+    // merge variables and values to the global map (provides no output)
+    @each $var-name, $var-value in $var-map {
+      $css-vars: css-var-assign($varName, $varValue) !global; // store in global variable
+    }
+  }
+}

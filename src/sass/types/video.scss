@@ -1,0 +1,169 @@
+// --------------------------------------------------------------
+// Video styles
+// --------------------------------------------------------------
+
+@use 'sass:math';
+
+// Container
+.plyr--video {
+  background: var(--plyr-video-background, $plyr-video-background);
+  overflow: hidden;
+
+  &.plyr--menu-open {
+    overflow: visible;
+  }
+}
+
+.plyr__video-wrapper {
+  background: var(--plyr-video-background, $plyr-video-background);
+  height: 100%;
+  margin: auto;
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+
+// Default to 16:9 ratio but this is set by JavaScript based on config
+$embed-padding: (math.div(100, 16) * 9);
+
+.plyr__video-embed,
+.plyr__video-wrapper--fixed-ratio {
+  @supports not (aspect-ratio: 16 / 9) {
+    height: 0;
+    padding-bottom: to-percentage($embed-padding);
+    position: relative;
+  }
+
+  aspect-ratio: 16 / 9;
+}
+
+.plyr__video-embed iframe,
+.plyr__video-wrapper--fixed-ratio video {
+  border: 0;
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+
+// For Vimeo, if the full custom UI is supported
+.plyr--full-ui .plyr__video-embed > .plyr__video-embed__container {
+  $height: 240;
+  $offset: to-percentage(math.div($height - $embed-padding, math.div($height, 50)));
+
+  padding-bottom: to-percentage($height);
+  position: relative;
+  transform: translateY(-$offset);
+}
+
+// Controls container
+.plyr--video .plyr__controls {
+  background: $plyr-video-controls-background;
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
+  bottom: 0;
+  color: $plyr-video-control-color;
+  left: 0;
+  padding: calc(#{$plyr-control-spacing} / 2);
+  padding-top: calc(#{$plyr-control-spacing} * 2);
+  position: absolute;
+  right: 0;
+  transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+  z-index: 3;
+
+  @media (min-width: $plyr-bp-sm) {
+    padding: $plyr-control-spacing;
+    padding-top: calc(#{$plyr-control-spacing} * 3.5);
+  }
+}
+
+// Hide controls
+.plyr--video.plyr--hide-controls .plyr__controls {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(100%);
+}
+
+// Control elements
+.plyr--video .plyr__control {
+  // Hover and tab focus
+  &.plyr__tab-focus,
+  &:hover,
+  &[aria-expanded='true'] {
+    background: $plyr-video-control-background-hover;
+    color: $plyr-video-control-color-hover;
+  }
+}
+
+// Large play button (video only)
+.plyr__control--overlaid {
+  background: $plyr-video-control-background-hover;
+  border: 0;
+  border-radius: 100%;
+  color: $plyr-video-control-color;
+  display: none;
+  left: 50%;
+  opacity: 0.9;
+  padding: calc(#{$plyr-control-spacing} * 1.5);
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transition: 0.3s;
+  z-index: 2;
+
+  // Offset icon to make the play button look right
+  svg {
+    left: 2px;
+    position: relative;
+  }
+
+  &:hover,
+  &:focus {
+    opacity: 1;
+  }
+}
+
+.plyr--playing .plyr__control--overlaid {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.plyr--full-ui.plyr--video .plyr__control--overlaid {
+  display: block;
+}
+
+// Video range inputs
+.plyr--full-ui.plyr--video input[type='range'] {
+  &::-webkit-slider-runnable-track {
+    background-color: $plyr-video-range-track-background;
+  }
+
+  &::-moz-range-track {
+    background-color: $plyr-video-range-track-background;
+  }
+
+  &::-ms-track {
+    background-color: $plyr-video-range-track-background;
+  }
+
+  // Pressed styles
+  &:active {
+    &::-webkit-slider-thumb {
+      @include plyr-range-thumb-active($plyr-video-range-thumb-active-shadow-color);
+    }
+
+    &::-moz-range-thumb {
+      @include plyr-range-thumb-active($plyr-video-range-thumb-active-shadow-color);
+    }
+
+    &::-ms-thumb {
+      @include plyr-range-thumb-active($plyr-video-range-thumb-active-shadow-color);
+    }
+  }
+}
+
+// Progress
+.plyr--video .plyr__progress__buffer {
+  color: $plyr-video-progress-buffered-background;
+}
