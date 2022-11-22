@@ -38,24 +38,23 @@ const googlecast = {
     toggleClass(this.elements.container, this.config.classNames.googlecast.enabled, true);
 
     if (!window.chrome.cast) {
-      loadScript(this.config.urls.googlecast.api).then(() => {
-        // FIXME: There __has__ to be a better way to do this
-        // window.chrome.cast isn't immediately available when this function runs
-        const interval = setInterval(() => {
-          if (window.chrome.cast.isAvailable) {
-            clearInterval(interval);
-            googlecast.defaults = {
-              options: {
-                // receiverApplicationId: window.chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
-                receiverApplicationId: 'C248C800',
-                autoJoinPolicy: window.chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED,
-              },
-            };
-            const opts = extend({}, googlecast.defaults, config);
-            googlecast.initializeCastApi(opts);
-          }
-        }, 100);
-      });
+      if (!window.chrome.cast) {
+        window['__onGCastApiAvailable'] = function (isAvailable) {
+          if (!isAvailable) return;
+
+          googlecast.defaults = {
+            options: {
+              // receiverApplicationId: window.chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
+              receiverApplicationId: 'C248C800',
+              autoJoinPolicy: window.chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED,
+            },
+          };
+          const opts = extend({}, googlecast.defaults, config);
+          googlecast.initializeCastApi(opts);
+        };
+
+        loadScript(this.config.urls.googlecast.api);
+      }
     }
   },
 
