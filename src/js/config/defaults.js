@@ -143,6 +143,7 @@ const defaults = {
     'pip',
     'airplay',
     // 'download',
+    'googlecast',
     'fullscreen',
   ],
   settings: ['captions', 'quality', 'speed'],
@@ -168,6 +169,8 @@ const defaults = {
     download: 'Download',
     enterFullscreen: 'Enter fullscreen',
     exitFullscreen: 'Exit fullscreen',
+    enableGoogleCast: 'Google Cast',
+    disableGoogleCast: 'Disable Cast',
     frameTitle: 'Player for {title}',
     captions: 'Captions',
     settings: 'Settings',
@@ -209,6 +212,9 @@ const defaults = {
     googleIMA: {
       sdk: 'https://imasdk.googleapis.com/js/sdkloader/ima3.js',
     },
+    googlecast: {
+      api: 'https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1',
+    },
   },
 
   // Custom control listeners
@@ -226,6 +232,7 @@ const defaults = {
     fullscreen: null,
     pip: null,
     airplay: null,
+    googlecast: null,
     speed: null,
     quality: null,
     loop: null,
@@ -308,6 +315,7 @@ const defaults = {
       fullscreen: '[data-plyr="fullscreen"]',
       pip: '[data-plyr="pip"]',
       airplay: '[data-plyr="airplay"]',
+      googlecast: '[data-plyr="googlecast"]',
       settings: '[data-plyr="settings"]',
       loop: '[data-plyr="loop"]',
     },
@@ -328,6 +336,7 @@ const defaults = {
     progress: '.plyr__progress',
     captions: '.plyr__captions',
     caption: '.plyr__caption',
+    googlecast: '.plyr__googlecast',
   },
 
   // Class hooks added to the player in different states
@@ -382,6 +391,10 @@ const defaults = {
       active: 'plyr--airplay-active',
     },
     tabFocus: 'plyr__tab-focus',
+    googlecast: {
+      enabled: 'plyr--googlecast-enabled',
+      active: 'plyr--googlecast-active',
+    },
     previewThumbnails: {
       // Tooltip thumbs
       thumbContainer: 'plyr__preview-thumb',
