@@ -404,7 +404,7 @@ const controls = {
       'keydown keyup',
       (event) => {
         // We only care about space and ⬆️ ⬇️️ ➡️
-        if (!['Space', 'ArrowUp', 'ArrowDown', 'ArrowRight'].includes(event.key)) {
+        if (![' ', 'ArrowUp', 'ArrowDown', 'ArrowRight'].includes(event.key)) {
           return;
         }
 
@@ -420,12 +420,12 @@ const controls = {
         const isRadioButton = matches(menuItem, '[role="menuitemradio"]');
 
         // Show the respective menu
-        if (!isRadioButton && ['Space', 'ArrowRight'].includes(event.key)) {
+        if (!isRadioButton && [' ', 'ArrowRight'].includes(event.key)) {
           controls.showMenuPanel.call(this, type, true);
         } else {
           let target;
 
-          if (event.key !== 'Space') {
+          if (event.key !== ' ') {
             if (event.key === 'ArrowDown' || (isRadioButton && event.key === 'ArrowRight')) {
               target = menuItem.nextElementSibling;
 
@@ -504,7 +504,7 @@ const controls = {
       menuItem,
       'click keyup',
       (event) => {
-        if (is.keyboardEvent(event) && event.key !== 'Space') {
+        if (is.keyboardEvent(event) && event.key !== ' ') {
           return;
         }
 
