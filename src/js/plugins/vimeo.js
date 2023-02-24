@@ -265,7 +265,7 @@ const vimeo = {
       set(input) {
         const toggle = is.boolean(input) ? input : false;
 
-        player.embed.setVolume(toggle ? 0 : player.config.volume).then(() => {
+        player.embed.setMuted(toggle ? true : player.config.muted).then(() => {
           muted = toggle;
           triggerEvent.call(player, player.media, 'volumechange');
         });
