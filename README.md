@@ -134,7 +134,7 @@ Alternatively you can include the `plyr.js` script before the closing `</body>` 
 
 See [initialising](#initialising) for more information on advanced setups.
 
-You can use our CDN (provided by [Fastly](https://www.fastly.com/)) for the JavaScript. There's 2 versions; one with and one without [polyfills](#polyfills). My recommendation would be to manage polyfills separately as part of your application but to make life easier you can use the polyfilled build.
+You can use our CDN (provided by [Cloudflare](https://www.cloudflare.com/)) for the JavaScript. There's 2 versions; one with and one without [polyfills](#polyfills). My recommendation would be to manage polyfills separately as part of your application but to make life easier you can use the polyfilled build.
 
 ```html
 <script src="https://cdn.plyr.io/3.7.3/plyr.js"></script>
@@ -154,7 +154,7 @@ Include the `plyr.css` stylesheet into your `<head>`.
 <link rel="stylesheet" href="path/to/plyr.css" />
 ```
 
-If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for the default CSS, you can use the following:
+If you want to use our CDN (provided by [Cloudflare](https://www.cloudflare.com/)) for the default CSS, you can use the following:
 
 ```html
 <link rel="stylesheet" href="https://cdn.plyr.io/3.7.3/plyr.css" />
@@ -162,7 +162,7 @@ If you want to use our CDN (provided by [Fastly](https://www.fastly.com/)) for t
 
 ## SVG Sprite
 
-The SVG sprite is loaded automatically from our CDN (provided by [Fastly](https://www.fastly.com/)). To change this, see the [options](#options) below. For
+The SVG sprite is loaded automatically from our CDN (provided by [Cloudflare](https://www.cloudflare.com/)). To change this, see the [options](#options) below. For
 reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.7.3/plyr.svg`.
 
 # Ads
@@ -857,13 +857,8 @@ If you want to be added to the list, open a pull request. It'd be awesome to see
 
 # Thanks
 
-[![Fastly](https://cdn.plyr.io/static/fastly-logo.png)](https://www.fastly.com/)
-
-Massive thanks to [Fastly](https://www.fastly.com/) for providing the CDN services.
-
-[![Sentry](https://cdn.plyr.io/static/sentry-logo-black.svg)](https://sentry.io/)
-
-Massive thanks to [Sentry](https://sentry.io/) for providing the logging services for the demo site.
+- [Cloudflare](https://www.cloudflare.com/) and [Fastly](https://www.fastly.com/) for providing the CDN services.
+- [Sentry](https://sentry.io/) for error logging service on the demo website. 
 
 ## Contributors
 
