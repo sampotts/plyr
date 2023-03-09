@@ -30,11 +30,12 @@
   },
   "browserslist": "> 1%",
   "scripts": {
+    "postinstall": "pnpm build",
     "build": "gulp build",
-    "lint": "eslint src/js && npm run remark && stylelint **/*.scss",
+    "lint": "eslint src/js && pnpm remark && stylelint **/*.scss",
     "lint:fix": "eslint --fix src/js && stylelint **/*.scss --fix",
     "remark": "remark -f --use 'validate-links=repository:\"sampotts/plyr\"' '{,!(node_modules),.?**/}*.md'",
-    "deploy": "yarn lint && gulp version && gulp build && gulp deploy",
+    "deploy": "pnpm lint && gulp version && gulp build && gulp deploy",
     "format": "prettier --write \"./{src,demo/src}/**/*.{js,scss}\"",
     "spellcheck": "cspell \"**/*.{js,md,scss,json}\" --no-must-find-files",
     "start": "gulp"
