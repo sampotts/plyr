@@ -1,3 +1,7 @@
+### v3.7.5
+
+- Fix: Replace `pnpm` with `npm` in scripts to fix build issues
+
 ### v3.7.4
 
 - Fix: Fixed event key with space (thanks @royeden!)
