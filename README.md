@@ -165,6 +165,14 @@ If you want to use our CDN (provided by [Cloudflare](https://www.cloudflare.com/
 The SVG sprite is loaded automatically from our CDN (provided by [Cloudflare](https://www.cloudflare.com/)). To change this, see the [options](#options) below. For
 reference, the CDN hosted SVG sprite can be found at `https://cdn.plyr.io/3.7.3/plyr.svg`.
 
+### Self hosting
+
+If you don't want to create a build system to include Plyr as an npm module, you can use the pre-built files. You have a few options:
+
+- Download the files from the CDN links above, they're already minified.
+- Download the files from [unpkg](https://unpkg.com/browse/plyr/dist/) or similar services.
+- Build the project yourself using `pnpm i`, which installs the dependencies and spits out a build to `dist`.
+
 # Ads
 
 Plyr has partnered up with [vi.ai](https://vi.ai/publisher-video-monetization/?aid=plyrio) to offer monetization options for your videos. Getting setup is easy:
