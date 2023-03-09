@@ -5,7 +5,6 @@
 import captions from './captions';
 import controls from './controls';
 import support from './support';
-import browser from './utils/browser';
 import { getElement, toggleClass } from './utils/elements';
 import { ready, triggerEvent } from './utils/events';
 import i18n from './utils/i18n';
