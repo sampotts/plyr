@@ -1,3 +1,11 @@
+### v3.7.4
+
+- Fix: Fixed event key with space (thanks @royeden!)
+- Fix: Changing Vimeo function call from `setVolume` to `setMuted` to fix iOS issue (issue #2624) (thanks @HandreMelo and Andre Fernandes Cristofolini Melo!)
+- Fix: Call preview-thumbnails listeners() function on load (thanks @mogzol!)
+- Fix: Fullscreen improvements for iOS & iPadOS
+- Feat: Remove need for iOS-specific styling (please update [volume.scss](https://github.com/sampotts/plyr/blob/master/src/sass/components/volume.scss))
+
 ### v3.7.3
 
 - Fix: force nowrap in progress tooltips (related: #2549) (thanks @raad-altaie!)
@@ -630,10 +638,10 @@ Because we're using the fancy new ES6 syntax, you will need to polyfill for vint
 
 - Vimeo controls fix (fixes #697)
 - SVG4everybody compatibility fix
-- Allow Plyr.setup event listeners to be set up as separate event listeners (https://github.com/sampotts/plyr/pull/703)
-- Added title to the layer html template (for custom controls) (https://github.com/sampotts/plyr/pull/649)
-- Target is null bug fix (https://github.com/sampotts/plyr/pull/617)
-- fix #684 memory leaks issues after destroy (https://github.com/sampotts/plyr/pull/700)
+- Allow Plyr.setup event listeners to be set up as separate event listeners (<https://github.com/sampotts/plyr/pull/703>)
+- Added title to the layer html template (for custom controls) (<https://github.com/sampotts/plyr/pull/649>)
+- Target is null bug fix (<https://github.com/sampotts/plyr/pull/617>)
+- fix #684 memory leaks issues after destroy (<https://github.com/sampotts/plyr/pull/700>)
 
 ### v2.0.16
 
@@ -653,8 +661,8 @@ Because we're using the fancy new ES6 syntax, you will need to polyfill for vint
 
 ### v2.0.12
 
-- Ability to set custom `blankUrl` for source changes (https://github.com/sampotts/plyr/pull/504)
-- Ability to set caption button listener (https://github.com/sampotts/plyr/pull/468)
+- Ability to set custom `blankUrl` for source changes (<https://github.com/sampotts/plyr/pull/504>)
+- Ability to set caption button listener (<https://github.com/sampotts/plyr/pull/468>)
 
 ### v2.0.11
 
