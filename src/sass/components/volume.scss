@@ -5,21 +5,19 @@
 .plyr__volume {
   align-items: center;
   display: flex;
-  max-width: 110px;
-  min-width: 80px;
   position: relative;
-  width: 20%;
 
   input[type='range'] {
     margin-left: calc(#{$plyr-control-spacing} / 2);
     margin-right: calc(#{$plyr-control-spacing} / 2);
+    max-width: 90px;
+    min-width: 60px;
     position: relative;
     z-index: 2;
   }
 }
 
-// Auto size on iOS as there's no slider
-.plyr--is-ios .plyr__volume {
-  min-width: 0;
-  width: auto;
+// Set size if there's a slider
+.plyr__volume:has(input[type='range']) {
+  // width: 20%;
 }
